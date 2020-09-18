@@ -59,7 +59,7 @@ If you are using the version from gitHub:
 If you use the PyPi version:  
 
 * make a directory, cd into that directory, set up a virtual environment, activate it
-* pip install gnssrefl0
+* pip install gnssrefl
 
 
 # Non-Python Code 
