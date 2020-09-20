@@ -61,11 +61,27 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 r = station + cdoy + '0.' + cyy + 'o'
                 print(station, year, doy, ': will try to find RINEX /make SNR ')
                 if nol:
-                    if os.path.exists(r):
-                        print('RINEX file exists locally')
-                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran) 
-                    else:
-                        print('You Chose the No Look Option, but did not provide the needed RINEX file.')
+                    if version == 2:
+                        if os.path.exists(r):
+                            print('RINEX 2 file exists locally')
+                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran) 
+                        else:
+                            print('You Chose the No Look Option, but did not provide the needed RINEX file.')
+                    if version == 3:
+                        r3 = station9ch + '_R_' + str(year) + cdoy + '0000_01D_30S_MO.rnx'
+                        r2 = station + cdoy + '0.' + cyy + 'o'
+                        print(r2,r3)
+                        if os.path.exists(r3):
+                            print('RINEX 3 file exists locally')
+                            fexists = g.new_rinex3_rinex2(r3,r2)
+                            if fexists:
+                                print('Rinex 3 to 2 conversion worked, now convert to snr format')
+                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran) 
+                            else:
+                                print('Something about rinex 3-2 conversion did not work')
+                        else:
+                            print('You Chose the No Look Option, but did not provide the needed RINEX file.')
+
                 else:
                     print('will look for the RINEX file both locally and externally')
                     if version == 3:
@@ -136,17 +152,19 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
             if rexist:
                 if texist and fortran:
                     # only do this for the older version
-                    print('teqc executable exists, will use to eliminate unnecessary observables')
-                    foutname = 'tmp.' + rinexfile
-                    fout = open(foutname,'w')
-                    subprocess.call([exc, '-O.obs','S1+S2+S5+S6+S7+S8', '-n_GLONASS', '27', rinexfile],stdout=fout)
-                    fout.close()
+                    #print('teqc executable exists, will use to eliminate unnecessary observables')
+                    #foutname = 'tmp.' + rinexfile
+                    #fout = open(foutname,'w')
+                    #subprocess.call([exc, '-O.obs','S1+S2+S5+S6+S7+S8', '-n_GLONASS', '27', rinexfile],stdout=fout)
+                    #fout.close()
+                    print('no longer use teqc for reducing observables')
                 # store it in the original rinex filename
-                    subprocess.call(['rm','-f',rinexfile])
-                    subprocess.call(['mv','-f',foutname, rinexfile])
+                    #subprocess.call(['rm','-f',rinexfile])
+                    #subprocess.call(['mv','-f',foutname, rinexfile])
                 # decimate this new rinex file
                     if (rexist and dec_rate > 0): 
                         print('decimate using teqc ', dec_rate, ' seconds')
+                        print('unfortunately Lou Estey removes Beidou data. Eventually I will remove this.')
                         rinexout = rinexfile + '.tmp'; cdec = str(dec_rate)
                         fout = open(rinexout,'w')
                         subprocess.call([exc, '-O.dec', cdec, rinexfile],stdout=fout)
@@ -184,7 +202,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         print(snrname_full)
                         g.store_snrfile(snrname,year,station) 
             else:
-                print('Either the rinex file or orbit file does not exist, so there is nothing to convert')
+                print('Either the RINEX file or orbit file does not exist, so there is nothing to convert')
 
     return True
 

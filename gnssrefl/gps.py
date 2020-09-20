@@ -3790,6 +3790,34 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
             else:
                 print('eek - I have run out of archives')
 
+
+def new_rinex3_rinex2(r3_filename,r2_filename):
+    """
+    will add doc later
+    """
+    fexists = False
+    gexe = gfz_version()
+    # flags for Beidou
+    gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I'
+    if not os.path.exists(gexe):
+        print('gfzrnx executable does not exist and this file cannot be translated')
+    else:
+        print('gfzrnx executable does exist')
+        if os.path.isfile(r3_filename):
+            try:
+                subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f'])
+                if os.path.exists(r2_filename):
+                    print('look for the rinex 2.11 file here: ', r2_filename)
+                    fexists = True
+                else:
+                    print('rinex 2 was not created')
+
+                print('remove rinex 3 file')
+                subprocess.call(['rm', '-f', r3_filename ])
+            except:
+                print('some kind of problem in translation from 3 to 2.11')
+    return fexists
+
 def cddis_rinex3(station9ch, year, doy,srate,orbtype):
     """
     attempt to download Rinex3 files from CDDIS
@@ -3830,8 +3858,8 @@ def cddis_rinex3(station9ch, year, doy,srate,orbtype):
         gobblygook = 'G:S1C,S2X,S2L,S2S,S5'
     else:
     # I hate S2W 
-    # should add beidou here???
-        gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8'
+    # tried to add Beidou on September 19, 2020
+        gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I'
     print(gobblygook)
     if os.path.isfile(rfilename):
         print('rinex3 file already exists')
@@ -3846,17 +3874,20 @@ def cddis_rinex3(station9ch, year, doy,srate,orbtype):
         except:
             print('no file at CDDIS')
 
-    if os.path.isfile(rfilename) and os.path.isfile(gexe):
-        print('making rinex 2.11')
-        try:
-            subprocess.call([gexe,'-finp', rfilename, '-fout', smallff, '-vo','2','-ot', gobblygook, '-f'])
-            print('woohoo!')
-            print('look for the rinex 2.11 file here: ', smallff)
-            fexists = True
-        except:
-            print('some kind of problem in translation to 2.11')
-    else:
-        print('either the rinex3 file does not exist OR the gfzrnx executable does not exist')
+    # try using my newfunction  
+    r2_filename = smallff
+    fexists = new_rinex3_rinex2(rfilename,r2_filename)
+    #if os.path.isfile(rfilename) and os.path.isfile(gexe):
+    #    print('making rinex 2.11')
+    #    try:
+    #        subprocess.call([gexe,'-finp', rfilename, '-fout', smallff, '-vo','2','-ot', gobblygook, '-f'])
+    #        print('woohoo!')
+    #        print('look for the rinex 2.11 file here: ', smallff)
+    #        fexists = True
+    #    except:
+    #        print('some kind of problem in translation to 2.11')
+    #else:
+    #    print('either the rinex3 file does not exist OR the gfzrnx executable does not exist')
 
     return fexists, rfilename
 def bkg_rinex3(station9ch, year, doy,srate):
@@ -4045,7 +4076,8 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
         gobblygook = 'G:S1C,S2X,S2L,S2S,S5'
     else:
     # I hate S2W  - so it is not written out
-        gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8'
+    # added Beidou 9/20/2020
+        gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I'
     print(gobblygook)
     if os.path.isfile(rfilename):
         print('rinex3 file already exists')
@@ -4060,15 +4092,18 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
         except:
             print('no file at unavco')
 
+    # use new function
     if os.path.isfile(rfilename) and os.path.isfile(gexe):
-        print('making rinex 2.11')
-        try:
-            subprocess.call([gexe,'-finp', rfilename, '-fout', smallff, '-vo','2','-ot', gobblygook, '-f'])
-            print('woohoo!')
-            print('look for the rinex 2.11 file here: ', smallff)
-            fexists = True
-        except:
-            print('some kind of problem in translation to 2.11')
+        r2_filename = smallff
+        fexists = new_rinex3_rinex2(rfilename,r2_filename)
+        #print('making rinex 2.11')
+        #try:
+            #subprocess.call([gexe,'-finp', rfilename, '-fout', smallff, '-vo','2','-ot', gobblygook, '-f'])
+            #print('woohoo!')
+            #print('look for the rinex 2.11 file here: ', smallff)
+            #fexists = True
+        #except:
+            #print('some kind of problem in translation to 2.11')
     else:
         print('either the rinex3 file does not exist OR the gfzrnx executable does not exist')
 
