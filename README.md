@@ -215,6 +215,22 @@ must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data 
 - *gnssir p041 2020 151 99 -fr 201 -plt True* (look at the lovely Galileo L1 data) 
 
 
+# Bugs/Features I know about 
+
+I have been using teqc to reduce the number of observables and to decimate.  I have removed the former 
+because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
+and fortran is set to True, unfortunately this will still occur. I am working on removing my code's dependence on teqc.
+
+# Helper Codes
+
+**download_rinex** can be useful if you want to download RINEX v2 or 3 files without using 
+the reflection specific codes. It mostly wants station name and year, month, day (or year, doy if you set
+the third input to zero).  You can also specify the RINEX v2 archive (using same names as above). I think for v3 it will
+check unavco and cddis.
+
+I will be soon releasing code that makes **daily averages**, which is useful for snow applications. Tides and water
+levels are a bit more complicated.
+
 # Publications
 
 There are A LOT of publications about GPS and GNSS interferometric reflectometry.
@@ -226,3 +242,7 @@ Also look to the publications page on my [personal website](https://kristinelars
 # How can I import the libraries in this package?
 
 I will be adding more documentation and examples here.
+
+# Jupyter Notebooks
+
+These are being created by UNAVCO with NASA funding.  Please contact Dave Mencin if you have specific questions about that. Thanks!

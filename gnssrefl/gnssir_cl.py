@@ -70,36 +70,17 @@ def main():
     else:
         extension = args.extension
 
-    guts.read_json_file(station, extension)
-# get instructions first - this should be a standalone function some day
-   # instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
-   # instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
-   # if os.path.isfile(instructions_ext):
-   #     print('using specific instructions for this extension')
-   #     with open(instructions_ext) as f:
-   #             lsp = json.load(f)
-   # else:
-    #    print('will use the default instructions')
-    #    if os.path.isfile(instructions):
-    #        with open(instructions) as f:
-    #            lsp = json.load(f)
-    #    else:
-    #        print('Instruction file does not exist: ', instructions)
-    #        print('Please make with make_json_input and run this code again.')
-    #        sys.exit()
-
+    lsp = guts.read_json_file(station, extension)
+    print(lsp)
     # now check the overrides to the json instructions
-    print(lsp['plt_screen'])
     print('plt argument', args.plt)
     if (args.plt != None):
         if args.plt == 'True':
             lsp['plt_screen'] = True
         if args.plt == 'False':
             lsp['plt_screen'] = False
-
-    if lsp['plt_screen']:
-        print('LSP plots will come to the screen')
-
+    else:
+        lsp['plt_screen'] = False
 
     if (args.delTmax != None):
         lsp['delTmax'] = args.delTmax
@@ -193,4 +174,21 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# get instructions first - this should be a standalone function some day
+# instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
+# instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
+# if os.path.isfile(instructions_ext):
+#     print('using specific instructions for this extension')
+#     with open(instructions_ext) as f:
+#             lsp = json.load(f)
+# else:
+#    print('will use the default instructions')
+#    if os.path.isfile(instructions):
+#        with open(instructions) as f:
+#            lsp = json.load(f)
+#    else:
+#        print('Instruction file does not exist: ', instructions)
+#        print('Please make with make_json_input and run this code again.')
+#        sys.exit()
 

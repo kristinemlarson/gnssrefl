@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import json
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -186,12 +187,13 @@ def read_json_file(station, extension):
     picks up json instructions for periodogram
     inputs are the station name and an extension (which can just be '')
     """
+    lsp = {} # ???
     instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
     instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
     if os.path.isfile(instructions_ext):
         print('using specific instructions for this extension')
         with open(instructions_ext) as f:
-                lsp = json.load(f)
+            lsp = json.load(f)
     else:
         print('will use the default instruction file')
         if os.path.isfile(instructions):
@@ -201,3 +203,5 @@ def read_json_file(station, extension):
             print('json instruction file does not exist: ', instructions)
             print('Please make with make_json_input and run this code again.')
             sys.exit()
+
+    return lsp
