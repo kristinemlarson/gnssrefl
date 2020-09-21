@@ -15,6 +15,10 @@ I recommend you use the web app [I developed](https://gnss-reflections.org). It
 can show you how the technique works without installing any code. It also picks up 
 the data for you and provides results in less than 10 seconds. 
 
+# For those of you who don't like python
+
+I have a [working matlab version on github](https://github.com/kristinemlarson/gnssIR_matlab_v3), 
+but I will not be updating it.
 
 # Overview Comments
 
