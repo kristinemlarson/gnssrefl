@@ -221,6 +221,12 @@ I have been using teqc to reduce the number of observables and to decimate.  I h
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
 and fortran is set to True, unfortunately this will still occur. I am working on removing my code's dependence on teqc.
 
+If there is interest, I will ask UNAVCO to implement the Fortran translation code automatically (i.e. download
+and compile it for you as part of the pypi install). But doing this myself is well beyond my skillset. 
+
+No phase center offsets have been applied to these reflector heights. While these values are relatively small,
+we do plan to remove them in subsequent versions of the code.
+
 # Helper Codes
 
 **download_rinex** can be useful if you want to download RINEX v2 or 3 files without using 
@@ -228,8 +234,8 @@ the reflection specific codes. It mostly wants station name and year, month, day
 the third input to zero).  You can also specify the RINEX v2 archive (using same names as above). I think for v3 it will
 check unavco and cddis.
 
-I will be soon releasing code that makes **daily averages**, which is useful for snow applications. Tides and water
-levels are a bit more complicated.
+I will be soon releasing code that makes **daily averages**, which is useful 
+for snow applications. Tides and water levels are a bit more complicated.
 
 # Publications
 
@@ -243,6 +249,11 @@ Also look to the publications page on my [personal website](https://kristinelars
 
 I will be adding more documentation and examples here.
 
-# Jupyter Notebooks
+# Acknowledgements
 
-These are being created by UNAVCO with NASA funding.  Please contact Dave Mencin if you have specific questions about that. Thanks!
+People that helped me with this code include Radon Rosborough, Joakim Strandberg, and Johannes Boehm. 
+I also thank Peter Shearer and Lisa Tauxe for some very nice Python lecture notes.
+
+Updated September 21, 2020
+
+Kristine M. Larson
