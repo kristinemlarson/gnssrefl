@@ -100,14 +100,21 @@ to the systems, I would choose **option 99**, which is all data between elevatio
 
 The command line driver is **rinex2snr**. You need to tell the program the name of the station,
 the year and doy of year, your orbit file preference, and your SNR format type.
-A sample call for a station called p041, restricted to GPS satellites, on day of year 132 and year 2020 would be:
+If you installed gpsSNR.e, a sample call for a station called p041, restricted 
+to GPS satellites, on day of year 132 and year 2020 would be:
 
 *rinex2snr p041 2020 132 99 nav*
 
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
 it will check four archives (unavco, sopac, cddis, and sonel) to find it. 
-I will also search ga (geoscience Australia), nz (New Zealand), ngs, and bkg if you invoke -archive,
-e.g.
+
+If you did not install a fortran translator, use this for a GPS file:
+
+*rinex2snr p041 2020 132 99 nav -fortran False* 
+
+
+The code will also search ga (geoscience Australia), nz (New Zealand), 
+ngs, and bkg if you invoke -archive, e.g.
 
 *rinex2snr tgho 2020 132 99 nav -archive nz*
 
@@ -136,7 +143,7 @@ orbit file options:
 - grg: French group, GPS, Galileo and Glonass, not rapid
 - wum : Wuhan, multi-GNSS, not rapid
 
-What if you do not want to install the fortran translators?  Use -fortran True on the command line.
+What if you do not want to install the fortran translators?  Use -fortran False on the command line.
 
 # quickLook 
 
@@ -226,6 +233,8 @@ and compile it for you as part of the pypi install). But doing this myself is we
 
 No phase center offsets have been applied to these reflector heights. While these values are relatively small,
 we do plan to remove them in subsequent versions of the code.
+
+The L2C and L5 satellite lists are not time coded as they should be. I currently have a list from 2020.
 
 # Helper Codes
 
