@@ -65,6 +65,13 @@ If you use the PyPi version:
 * make a directory, cd into that directory, set up a virtual environment, activate it
 * pip install gnssrefl
 
+To use **only** python codes, you will need to be sure that your RINEX files are uncompressed (i.e.
+not using Hatanaka compression and ending in a d). Since **many** archives use 
+Hatanaka compression, this will significantly
+limit what you can do. Second thing to know is that you should use the -fortran False flag 
+when you make SNR files because the default behavior is to assume you are using fortran 
+translators (gnssSNR.e or gpsSNR.e). Finally, you will not be able to use RINEX 3 files because
+I rely on the gfz RINEX3 to RINEX2 translator.
 
 # Non-Python Code 
 
@@ -75,7 +82,7 @@ they are optional, that's fine. FYI, the python version is slow
 not because of the RINEX - it is because you need to calculate
 a crude model for satellite coordinates in this code. And that takes cpu time....
 
-* **Required** translator for compressed RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html
+* Required Translator for compressed RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html
 
 * Optional Fortran RINEX Translator for GPS, the executable must be called gpsSNR.e, https://github.com/kristinemlarson/gpsonlySNR
 
@@ -158,7 +165,8 @@ The required inputs are station name, year, doy of year, and SNR Format (start w
 If the SNR file has not been previously stored, you can provide a properly named RINEX file
 (lowercase only) in your working directory. If it doesn't find a file in either of these places, it
 will try to pick up the RINEX data from various archives (unavco, sopac, sonel, and cddis) and translate it for
-you into the correct SNR format. There are stored defaults for analyzing the
+you into the correct SNR format (note: this feature might make use of the Fortran translators). 
+There are stored defaults for analyzing the
 spectral characteristics of the SNR data.  If you want to override those, use *quickLook -h*
 
 *quickLook p041 2020 150 99*  (this uses defaults)
@@ -175,7 +183,15 @@ going higher than typical geodetic sampling rates.
 
 # gnssir
 
-This is the main driver for the reflectometry code.  You need a set of instructions which can be made using **make_json_input**.  At a minimum **make_json_input** needs the station name (4 char), the latitude (degrees), longitude (degrees) and ellipsoidal height (meters). It will use defaults for other parameters if you do not provide them. Those defaults tell the code an azimuth and elevation angle mask (i.e. which directions you want to allow reflections from), and which frequencies you want to use, and various quality control metrics. 
+This is the main driver for the reflectometry code.  You need a set of instructions which 
+can be made using **make_json_input**.  At a minimum **make_json_input** needs the 
+station name (4 char), the latitude (degrees), longitude (degrees) and ellipsoidal height (meters). 
+It will use defaults for other parameters if you do not provide them. Those defaults 
+tell the code an azimuth and elevation angle mask (i.e. which directions you want 
+to allow reflections from), and which frequencies you want to use, and various quality control metrics. 
+Right now the default frequencies are GPS L1 and L2C and a peak 2 noise ratio of 2.7 is set.
+This is fine for water, but I would suggest higher for snow (3.5). GPS L5 provides excellent data,
+but very geodesists track it, so it is not currently a default.  
 
 Things that are helpful to know for the json and commandline inputs:
 
