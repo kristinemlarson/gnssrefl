@@ -66,12 +66,12 @@ If you use the PyPi version:
 * pip install gnssrefl
 
 To use **only** python codes, you will need to be sure that your RINEX files are uncompressed (i.e.
-not using Hatanaka compression and ending in a d). Since **many** archives use 
+not using Hatanaka compression, which end in a d instead of an o). Since **many** archives use 
 Hatanaka compression, this will significantly
 limit what you can do. Second thing to know is that you should use the -fortran False flag 
 when you make SNR files because the default behavior is to assume you are using fortran 
 translators (gnssSNR.e or gpsSNR.e). Finally, you will not be able to use RINEX 3 files because
-I rely on the gfz RINEX3 to RINEX2 translator.
+I rely on the gfzrnx RINEX3 to RINEX2 translator.
 
 # Non-Python Code 
 
@@ -98,16 +98,19 @@ http://dx.doi.org/10.5880/GFZ.1.1.2016.002
 # rinex2snr - making SNR files from RINEX files
 
 I run a lowercase shop. Please name RINEX files accordingly and use lowercase station names. It also means 
-that the filename must be N characters long (ssssddd0.yyo), where ssss is station name, ddd is day of year, and yy is
-two character year. If you have installed the CRX2RNX code, you can also provide a compressed RINEX format file, 
-which means your file must be called ssssddd0.yyd.  I think my code allows gz or Z as compression types.
+that the filename must be 12 characters long (ssssddd0.yyo), where ssss is station name, 
+ddd is day of year, followed by a zero, yy is the two character year and o stands for observation. 
+If you have installed the CRX2RNX code, you can also provide a compressed RINEX format file, which ends in a d.
+I think my code allows gz or Z as compression types.
 
-A RINEX file has extraneous information in it (the data used for positioning) - and does not provide some of the 
-information needed (elevation and azimuth angles) for reflectometry. The first task you 
-have is to translate a data file from RINEX into what I will call a SNR format - and to calculate those geometric angles.  
-For the latter you will need an orbit file. If you tell it which kind of orbit file you want, the code will go get it for you.  
+A RINEX file has extraneous information in it (the data used for positioning, LOL) - and it 
+does not provide some of the information needed for reflectometry (elevation and azimuth angles). 
+The first task you have is to translate a from RINEX into what I will call a SNR format - and 
+to calculate those geometric angles. For the latter you will need an **orbit** file. If you 
+tell it which kind of orbit file you want, the code will go get it for you.  
 Secondly, you will need to decide how much of the data file you want to save. If you are new
-to the systems, I would choose **option 99**, which is all data between elevation angles of 5 and 30 degrees.
+to the my codes, I suggest you choose **option 99**, which means all data between elevation 
+angles of 5 and 30 degrees.
 
 The command line driver is **rinex2snr**. You need to tell the program the name of the station,
 the year and doy of year, your orbit file preference, and your SNR format type.
@@ -122,7 +125,6 @@ it will check four archives (unavco, sopac, cddis, and sonel) to find it.
 If you did not install a fortran translator, use this for a GPS file:
 
 *rinex2snr p041 2020 132 99 nav -fortran False* 
-
 
 The code will also search ga (geoscience Australia), nz (New Zealand), 
 ngs, and bkg if you invoke -archive, e.g.
@@ -241,6 +243,11 @@ must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data 
 - *rinex2snr p041 2020 151 99 gbm* (use GFZ orbits so you can use GPS, Glonass, and Galileo)
 - *gnssir p041 2020 151 99 -fr 201 -plt True* (look at the lovely Galileo L1 data) 
 
+What should the periodogram plots look like? Until we have Jupyter notebooks, I recommend you
+look at [the paper I wrote with Carolyn Roesler](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
+or the [question section of my web app.](https://gnss-reflections.org). Note that a failed
+arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
+the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 # Bugs/Features I know about 
 
@@ -258,13 +265,20 @@ The L2C and L5 satellite lists are not time coded as they should be. I currently
 
 # Helper Codes
 
-**download_rinex** can be useful if you want to download RINEX v2 or 3 files without using 
-the reflection specific codes. It mostly wants station name and year, month, day (or year, doy if you set
-the third input to zero).  You can also specify the RINEX v2 archive (using same names as above). I think for v3 it will
-check unavco and cddis.
+**download_rinex** can be useful if you want to download RINEX v2 or 3 files (use the version flag) without using 
+the reflection specific codes. Sample calls:
 
-I will be soon releasing code that makes **daily averages**, which is useful 
-for snow applications. Tides and water levels are a bit more complicated.
+- *download_rinex p041 2020 6 1* would download the data from June 1, 2020
+
+- *download_rinex p041 2020 150 0* would download the data from day of year 150 in 2020
+
+- *download_rinex p041 2020 150 0 -archive sopac * would download the data from sopac archive on day of year 150 in 2020
+
+
+**daily averages** is a helper code for cryosphere people interested in daily snow 
+accumulation. It can be used for lake levels. It is not for tides!
+
+
 
 # Publications
 
