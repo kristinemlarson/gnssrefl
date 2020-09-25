@@ -193,7 +193,7 @@ tell the code an azimuth and elevation angle mask (i.e. which directions you wan
 to allow reflections from), and which frequencies you want to use, and various quality control metrics. 
 Right now the default frequencies are GPS L1 and L2C and a peak 2 noise ratio of 2.7 is set.
 This is fine for water, but I would suggest higher for snow (3.5). GPS L5 provides excellent data,
-but very geodesists track it, so it is not currently a default.  
+but very few geodesists track it, so it is not currently a default.  
 
 Things that are helpful to know for the json and commandline inputs:
 
@@ -251,9 +251,10 @@ the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 # Bugs/Features I know about 
 
-I have been using teqc to reduce the number of observables and to decimate.  I have removed the former 
+I have been using **teqc** to reduce the number of observables and to decimate.  I have removed the former 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
-and fortran is set to True, unfortunately this will still occur. I am working on removing my code's dependence on teqc.
+and fortran is set to True, unfortunately this will still occur. I am working on removing my 
+code's dependence on **teqc**.
 
 If there is interest, I will ask UNAVCO to implement the Fortran translation code automatically (i.e. download
 and compile it for you as part of the pypi install). But doing this myself is well beyond my skillset. 
@@ -268,11 +269,11 @@ The L2C and L5 satellite lists are not time coded as they should be. I currently
 **download_rinex** can be useful if you want to download RINEX v2 or 3 files (use the version flag) without using 
 the reflection specific codes. Sample calls:
 
-- *download_rinex p041 2020 6 1* would download the data from June 1, 2020
+- *download_rinex p041 2020 6 1* downloads the data from June 1, 2020
 
-- *download_rinex p041 2020 150 0* would download the data from day of year 150 in 2020
+- *download_rinex p041 2020 150 0* downloads the data from day of year 150 in 2020
 
-- *download_rinex p041 2020 150 0 -archive sopac * would download the data from sopac archive on day of year 150 in 2020
+- *download_rinex p041 2020 150 0 -archive sopac* downloads the data from sopac archive on day of year 150 in 2020
 
 
 **daily averages** is a helper code for cryosphere people interested in daily snow 
@@ -297,6 +298,6 @@ I will be adding more documentation and examples here.
 People that helped me with this code include Radon Rosborough, Joakim Strandberg, and Johannes Boehm. 
 I also thank Peter Shearer and Lisa Tauxe for some very nice Python lecture notes.
 
-Updated September 21, 2020
+Updated September 25, 2020
 
 Kristine M. Larson
