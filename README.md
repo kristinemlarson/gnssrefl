@@ -158,6 +158,10 @@ orbit file options:
 
 What if you do not want to install the fortran translators?  Use -fortran False on the command line.
 
+There is a **rate** command line input that has two values, high or low. However, it currently only looks at unavco.
+Please beward - it takes a long time to download a highrate GNSS RINEX file (even when it is compressed). 
+And it also takes a long time to compute orbits for it (and thus create a SNR file).
+
 # quickLook 
 
 Before using the **gnssir** code, I recommend you try **quickLook**. This allows you

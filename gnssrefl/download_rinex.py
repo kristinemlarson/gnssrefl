@@ -7,21 +7,31 @@ kristine larson
 import argparse
 import gnssrefl.gps as g
 
-def version3(station,year,doy,NS):
+def version3(station,year,doy,NS,archive):
     """
     subroutine to take care of RINEX version 3
     """
+    fexist = False
     if NS == 9:
-        srate = 30 # rate supported by CDDIS
-        fexist = g.cddis3(station, year, doy,srate)
-        if not fexist:
-            print('**** will look for the file at UNAVCO ***')
+        if archive == 'cddis':
+            srate = 30 # rate supported by CDDIS
+            fexist = g.cddis3(station, year, doy,srate)
+        if archive == 'unavco':
             srate = 15
             fexist = g.unavco3(station, year, doy,srate)
-            if fexist:
-                print('RINEX 3 DOWNLOAD SUCCESSFUL')
+        if archive == 'bkg':
+            srate = 30
+            fexist = g.bkg_rinex3(station, year, doy,srate)
+        if archive == 'ign':
+            srate = 30
+            fexist = g.ign_rinex3(station, year, doy,srate)
+        if archive == 'ga':
+            srate = 30
+            fexist = g.ga_rinex3(station, year, doy,srate)
+        if fexist:
+            print('RINEX 3 DOWNLOAD SUCCESSFUL from ', archive)
         else:
-            print('*** found the file at CDDIS *** ')
+            print('could not find the RINEX 3 file')
     else:
         print('exiting: station names must have 9 characters')
 
@@ -37,7 +47,7 @@ def main():
     parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
 # optional arguments
     parser.add_argument("-rate", default=None, metavar='low',type=str, help="sample rate: low or high")
-    parser.add_argument("-archive", default=None, metavar='all',help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs)", type=str)
+    parser.add_argument("-archive", default=None, metavar='all',help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg)", type=str)
     parser.add_argument("-version", default=None, metavar=2,type=int, help="rinex version (2 or 3)")
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
 
@@ -75,28 +85,36 @@ def main():
         doy_end = doy
     else:
         doy_end = args.doy_end
-    
-    if args.archive == None:
-        archive = 'all'
-    else:
-        archive = args.archive.lower()
-        if archive not in archive_list:
-            print('You picked an archive that does not exist')
-            print('I am going to check the main ones (unavco,sopac,sonel,cddis)')
-            print('For future reference: I allow these archives:')
-            print(archive_list)
-            archive = 'all'
-
 
     NS = len(station)
 
     if NS == 9:
         version = 3 # even if you don't choose version 3 .... 
+    
+    # this is for version 2
+    if (version == 2):
+        if args.archive == None:
+            archive = 'all'
+        else:
+            archive = args.archive.lower()
+            if archive not in archive_list:
+                print('You picked an archive that does not exist')
+                print('I am going to check the main ones (unavco,sopac,sonel,cddis)')
+                print('For future reference: I allow these archives:')
+                print(archive_list)
+                archive = 'all'
+
+    # default archive wil be CDDIS for version 3
+    if (args.archive == None) and (version == 3):
+        archive = 'cddis'
+        print('no archive was specified, so looking for it at CDDIS')
+    else:
+        archive = args.archive
 
     for d in range(doy, doy_end+1):
-        print('working on day of year:', d)
+        print('working on year, day of year:', year, d)
         if version == 3:
-            version3(station,year,d,NS)
+            version3(station,year,d,NS,archive)
         else: # RINEX VERSION 2
             if NS == 4:
                 g.go_get_rinex_flex(station,year,d,0,rate,archive)
