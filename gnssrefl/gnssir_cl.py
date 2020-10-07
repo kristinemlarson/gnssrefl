@@ -34,7 +34,7 @@ def main():
     parser.add_argument("snrEnd", help="snr file ending", type=int)
 
 # optional inputs
-    parser.add_argument("-plt", "--plt", default=None, help="ploting is boolean now. Default is True", type=str)
+    parser.add_argument("-plt", "--plt", default=None, help="plt to screen (True or False)", type=str)
     parser.add_argument("-fr", "--fr", default=None, type=int, help="try -fr 1 for GPS L1 only, or -fr 101 for Glonass L1")
     parser.add_argument("-ampl", "--ampl", default=None, type=float, help="try -ampl 5-6 for minimum spectral amplitude")
     parser.add_argument("-sat", "--sat", default=None, type=int, help="allow individual satellite")
@@ -74,12 +74,9 @@ def main():
     print(lsp)
     # now check the overrides to the json instructions
     print('plt argument', args.plt)
-    if (args.plt != None):
-        if args.plt == 'True':
-            lsp['plt_screen'] = True
-        if args.plt == 'False':
-            lsp['plt_screen'] = False
-    else:
+    if args.plt == 'True':
+        lsp['plt_screen'] = True
+    elif args.plt == 'False':
         lsp['plt_screen'] = False
 
     if (args.delTmax != None):
@@ -112,9 +109,6 @@ def main():
         year_end = year
     else:
         year_end = args.year_end
-
-
-
 
 # default will be to overwrite
     if args.nooverwrite == None:

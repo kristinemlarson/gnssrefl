@@ -3734,6 +3734,7 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
     print('requested data rate: ', receiverrate)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
     print('Name of the rinexfile should be:', rinexfile)
+    print('Archive',archive)
 
     if (os.path.isfile(rinexfile) == True):
         print('RINEX file exists')

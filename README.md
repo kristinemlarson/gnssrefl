@@ -297,6 +297,18 @@ Also look to the publications page on my [personal website](https://kristinelars
 
 I will be adding more documentation and examples here.
 
+If you wanted to run the gnssir code without the command line interface, here is 
+an example for station p041 where the json instructions exist and the SNR file has already been created.  
+
+import gnssrefl.gps as g
+import gnssrefl.gnssir as guts
+
+station = 'p041'; extension = ''
+lsp = guts.read_json_file(station, extension)
+year = 2020; doy = 150; snr_type =  99 
+guts.gnssir_guts(station,year,doy, snr_type, extension, lsp)
+
+
 # Acknowledgements
 
 People that helped me with this code include Radon Rosborough, Joakim Strandberg, and Johannes Boehm. 
