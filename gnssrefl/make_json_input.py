@@ -27,6 +27,7 @@ def main():
     parser.add_argument("-nr1", "--nr1", default=None, type=float, help="lower limit noise region for QC(m)")
     parser.add_argument("-nr2", "--nr2", default=None, type=float, help="upper limit noise region for QC(m)")
     parser.add_argument("-peak2noise", "--peak2noise", default=None, type=float, help="peak 2 noise ratio used for QC")
+    parser.add_argument("-allfreq", "--allfreq", default=None, type=str, help="set to True to include all GNSS")
     args = parser.parse_args()
 #
 
@@ -105,7 +106,12 @@ def main():
 # 
 # frequencies to use - and their required amplitudes. The amplitudes are not set in stone
 #
-    lsp['freqs'] = [1, 20]; lsp['reqAmp'] = [6, 6]
+# added L5 as default october 13, 2020
+    if args.allfreq == None:
+        # choose GPS as the default
+        lsp['freqs'] = [1, 20, 5]; lsp['reqAmp'] = [6, 6,6]
+    else:
+        lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206,207,208,302, 306,307]; lsp['reqAmp'] = [6, 6,6,6,6,6,6,6,6,6,6,6,6]
 # use refraction correction
     lsp['refraction'] = True
 
