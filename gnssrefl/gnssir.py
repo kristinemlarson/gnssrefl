@@ -109,7 +109,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                             gj +=1
                             if screenstats:
                                 T = g.nicerTime(UTCtime)
-                                print('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s}'.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T))
+                                print('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} '.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
                             if plot_screen:
                                 local_update_plot(x,y,px,pz,ax1,ax2)
                         else:

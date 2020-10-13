@@ -189,15 +189,29 @@ going higher than typical geodetic sampling rates.
 
 # gnssir
 
-This is the main driver for the reflectometry code.  You need a set of instructions which 
-can be made using **make_json_input**.  At a minimum **make_json_input** needs the 
-station name (4 char), the latitude (degrees), longitude (degrees) and ellipsoidal height (meters). 
+This is the main driver for the reflectometry code.  
+
+You need a set of instructions which can be made using **make_json_input**.  
+At a minimum **make_json_input** needs the station name (4 char), the latitude (degrees), 
+longitude (degrees) and ellipsoidal height (meters). This location DOES NOT have to be cm-level for the reflections code.
+Within a few hundred meters is sufficient.  
+
+
+*make_json_input p101 41.692 -111.236 2016.1* 
+
 It will use defaults for other parameters if you do not provide them. Those defaults 
 tell the code an azimuth and elevation angle mask (i.e. which directions you want 
 to allow reflections from), and which frequencies you want to use, and various quality control metrics. 
-Right now the default frequencies are GPS L1 and L2C and a peak 2 noise ratio of 2.7 is set.
+Right now the default frequencies are GPS L1 and L2C and a peak to noise ratio of 2.7 is set.
 This is fine for water, but I would suggest higher for snow (3.5). GPS L5 provides excellent data,
-but very few geodesists track it, so it is not currently a default.  
+but very few geodesists track it, so it is not currently a default. The fiel will be put in 
+$REFL_CODE/input/p101.json. You should look at it to get an idea of the kinds of inputs the code will be using.
+
+You can edit the json file directly, or you can set some of the parameters from the command line.
+For example, if you only want to use elevation angles between 5 and 10 degrees:
+
+
+*make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10* 
 
 Things that are helpful to know for the json and commandline inputs:
 
@@ -208,7 +222,7 @@ Things that are helpful to know for the json and commandline inputs:
 - 201, 205, 206, 207, 208: Galileo frequencies
 - 302, 306, 307 : Beidou frequencies
 
-*Reflection parameters:*
+*Reflection parameters settings in the json file:*
 - e1 and e2 are the min and max elevation angle, in degrees
 - minH and maxH are the min and max allowed reflector height, in meters
 - desiredP, desired reflector height precision, in meters

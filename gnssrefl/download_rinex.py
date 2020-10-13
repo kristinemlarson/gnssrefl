@@ -77,6 +77,9 @@ def main():
     # default is low
     rate = args.rate
 
+    # set archive variable
+    archive = args.archive
+
     archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs']
 
     if args.version == None:

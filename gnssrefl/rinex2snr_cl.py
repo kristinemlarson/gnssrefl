@@ -47,6 +47,12 @@ def main():
         print('Illegal input - Station must have 4 or 9 characters')
         sys.exit()
     year = args.year
+
+
+    if len(str(year)) != 4:
+        print('Year must be four characters long: ', year)
+        sys.exit()
+
     doy1= args.doy1
     snrt = args.snrEnd # string
     isnr = int(snrt)

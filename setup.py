@@ -7,7 +7,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests"]
 
 setup(
     name="gnssrefl",
-    version="0.0.17",
+    version="0.0.18",
     author="Kristine Larson",
     author_email="kristine.larson@colorado.edu",
     description="A GNSS reflectometry software package ",
@@ -22,6 +22,7 @@ setup(
             'daily_avg = gnssrefl.daily_avg:main',
             'quickLook= gnssrefl.quickLook_cl:main',
             'download_rinex = gnssrefl.download_rinex:main',
+            'download_orbits = gnssrefl.download_orbits:main',
             'make_json_input = gnssrefl.make_json_input:main',
             ], 
         },

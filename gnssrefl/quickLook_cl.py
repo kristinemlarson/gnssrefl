@@ -52,6 +52,11 @@ def main():
     doy= args.doy
     snr_type = args.snrEnd
 
+    if len(str(year)) != 4:
+        print('Year must have four characters: ', year)
+        sys.exit()
+
+
     exitS = g.check_inputs(station,year,doy,snr_type)
     if exitS:
         sys.exit()

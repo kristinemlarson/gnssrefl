@@ -63,6 +63,15 @@ def main():
     doy= args.doy
     snr_type = args.snrEnd
 
+
+    if len(str(year)) != 4:
+        print('Year must have four characters: ', year)
+        sys.exit()
+
+    if (doy > 366):
+        print('doy cannot be larger than 366: ', year)
+        sys.exit()
+
 # allow people to have an extension to the output file name so they can run different analysis strategies
 # this is undocumented and only for Kristine at the moment
     if args.extension == None:
