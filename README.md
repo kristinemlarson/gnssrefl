@@ -1,3 +1,9 @@
+# NEWS
+
+For **rinex2snr** I now assume you are using GPS orbits. You can change that by optionally
+specifying an orbit type, or more generic names, such as gps+glo and gnss.  My goal in removing
+this as a required input is so that the non-geodesists don't have to know about orbits ;-)
+
 # gnssrefl
 
 This package is a new version of my GNSS interferometric reflectometry (GNSS_IR) code. 
@@ -117,23 +123,23 @@ the year and doy of year, your orbit file preference, and your SNR format type.
 If you installed gpsSNR.e, a sample call for a station called p041, restricted 
 to GPS satellites, on day of year 132 and year 2020 would be:
 
-*rinex2snr p041 2020 132 99 nav*
+*rinex2snr p041 2020 132 99*
 
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
 it will check four archives (unavco, sopac, cddis, and sonel) to find it. 
 
 If you did not install a fortran translator, use this for a GPS file:
 
-*rinex2snr p041 2020 132 99 nav -fortran False* 
+*rinex2snr p041 2020 132 99 -fortran False* 
 
 The code will also search ga (geoscience Australia), nz (New Zealand), 
 ngs, and bkg if you invoke -archive, e.g.
 
-*rinex2snr tgho 2020 132 99 nav -archive nz*
+*rinex2snr tgho 2020 132 99 -archive nz*
 
 What if you want to run the code for all the data for a given year?  
 
-*rinex2snr tgho 2019 1 99 nav -archive nz -doy_end 365* 
+*rinex2snr tgho 2019 1 99 -archive nz -doy_end 365* 
  
 If your station name has 9 characters, the code assumes you are looking for a 
 RINEX 3 file. However, it will store the SNR data using the normal
@@ -148,13 +154,16 @@ The snr options are always two digit numbers.  Choices are:
 
 orbit file options:
 
-- nav : GPS broadcast, perfectly adequate for reflectometry
+- nav : GPS broadcast, perfectly adequate for reflectometry. This is the default.
 - igs : IGS precise, GPS only
 - igr : IGS rapid, GPS only
 - jax : JAXA, GPS + Glonass, within a few days
 - gbm : GFZ Potsdam, multi-GNSS, not rapid
 - grg: French group, GPS, Galileo and Glonass, not rapid
 - wum : Wuhan, multi-GNSS, not rapid
+- gps : will use GPS broadcast
+- gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
+- gnss : will GFZ orbits, which have four main constellations (available in 3-4 days?)
 
 What if you do not want to install the fortran translators?  Use -fortran False on the command line.
 
@@ -244,7 +253,7 @@ Things that are helpful to know for the json and commandline inputs:
 Simple example for my favorite GPS site [p041](https://spotlight.unavco.org/station-pages/p042/eo/scientistPhoto.jpg)
 
 - *make_json_input p041 39.949 -105.194 1728.856* (use defaults and write out a json instruction file)
-- *rinex2snr p041 2020 150 99 nav* (pick up and translate RINEX file from unavco)
+- *rinex2snr p041 2020 150 99 * (pick up and translate RINEX file from unavco)
 - *gnssir p041 2020 150 99* (calculate the reflector heights) 
 - *gnssir p041 2020 150 99 -fr 5 -plt True* (override defaults, only look at L5, SNR data and periodogram plots come to the screen)
 
@@ -258,7 +267,7 @@ Where are the files for this example?
 If you want multi-GNSS, you need to use multi-GNSS orbits and edit the json file. And the RINEX you select 
 must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data in the RINEX file:
 
-- *rinex2snr p041 2020 151 99 gbm* (use GFZ orbits so you can use GPS, Glonass, and Galileo)
+- *rinex2snr p041 2020 151 99 -orb gnss* (gnss option uses GFZ orbits so you can use GPS, Glonass, and Galileo)
 - *gnssir p041 2020 151 99 -fr 201 -plt True* (look at the lovely Galileo L1 data) 
 
 What should the periodogram plots look like? Until we have Jupyter notebooks, I recommend you

@@ -24,8 +24,8 @@ def main():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy1", help="start day of year", type=int)
     parser.add_argument("snrEnd", help="snr ending", type=str)
-    parser.add_argument("orbType", help="orbit type, nav or sp3 (igs,igr,gbm,jax,sha,wum,grg)", type=str)
 # optional arguments
+    parser.add_argument("-orb", default='nav', type=str, help="orbit type, gps/gnss or you can specify nav,igs,igr,jax,gbm,grg,wum")
     parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high, only unavco")
     parser.add_argument("-dec", default=0, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default='False', metavar='False', type=str, help="True means only use RINEX files on local machine")
@@ -56,13 +56,25 @@ def main():
     doy1= args.doy1
     snrt = args.snrEnd # string
     isnr = int(snrt)
-    orbtype = args.orbType
-# currently allowed orbit types - sha removed 2020sep08
-    orbit_list = ['nav', 'igs','igr','gbm','jax','grg','wum']
+    orbtype = args.orb
+    print(orbtype)
+# currently allowed orbit types - shanghai removed 2020sep08
+    orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum']
     if orbtype not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
         sys.exit()
+    # if you choose GPS, you get the nav message
+    if orbtype == 'gps':
+        orbtype = 'nav'
+
+    # if you choose GNSS, you get the GFZ sp3 file 
+    if orbtype == 'gnss':
+        orbtype = 'gbm'
+
+    # if you choose GPS+GLO, you get the JAXA sp3 file 
+    if orbtype == 'gps+glo':
+        orbtype = 'jax'
 
     if args.fortran == 'True':
         fortran = True
