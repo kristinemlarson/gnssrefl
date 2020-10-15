@@ -22,9 +22,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
-    parser.add_argument("doy1", help="start day of year", type=int)
-    parser.add_argument("snrEnd", help="snr ending", type=str)
+    parser.add_argument("doy", help="start day of year", type=int)
 # optional arguments
+    parser.add_argument("-snr", default=66, help="snr file ending", type=str)
     parser.add_argument("-orb", default='nav', type=str, help="orbit type, gps/gnss or you can specify nav,igs,igr,jax,gbm,grg,wum")
     parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high, only unavco")
     parser.add_argument("-dec", default=0, type=int, help="decimate (seconds)")
@@ -53,9 +53,10 @@ def main():
         print('Year must be four characters long: ', year)
         sys.exit()
 
-    doy1= args.doy1
-    snrt = args.snrEnd # string
-    isnr = int(snrt)
+    doy1= args.doy
+    isnr = args.snr # defined as an integer
+    #snrt = args.snrEnd # 
+    #isnr = int(snrt)
     orbtype = args.orb
     print(orbtype)
 # currently allowed orbit types - shanghai removed 2020sep08

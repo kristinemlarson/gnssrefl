@@ -31,9 +31,9 @@ def main():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="doy", type=int)
-    parser.add_argument("snrEnd", help="snr file ending", type=int)
 
 # optional inputs
+    parser.add_argument("-snr", default=66,help="snr file ending, default is 66", type=int)
     parser.add_argument("-plt", "--plt", default=None, help="plt to screen (True or False)", type=str)
     parser.add_argument("-fr", "--fr", default=None, type=int, help="try -fr 1 for GPS L1 only, or -fr 101 for Glonass L1")
     parser.add_argument("-ampl", "--ampl", default=None, type=float, help="try -ampl 5-6 for minimum spectral amplitude")
@@ -61,7 +61,9 @@ def main():
     station = args.station
     year = args.year
     doy= args.doy
-    snr_type = args.snrEnd
+    # this is now optional
+    snr_type = args.snr
+    #snr_type = args.snrEnd
 
 
     if len(str(year)) != 4:

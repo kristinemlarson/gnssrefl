@@ -27,8 +27,8 @@ def main():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="day of year", type=int)
-    parser.add_argument("snrEnd", help="snrEnding, try 99", type=int)
 # these are the optional inputs
+    parser.add_argument("-snr", default=66,help="snr ending - default is 66", type=int)
     parser.add_argument("-fr", default=None, type=int, help="try -fr 1 for GPS L1 only, or -fr 101 for Glonass L1")
     parser.add_argument("-ampl", default=None, type=float, help="minimum spectral amplitude allowed")
     parser.add_argument("-e1",  default=None, type=int, help="lower limit elevation angle (deg)")
@@ -36,8 +36,8 @@ def main():
     parser.add_argument("-h1",  default=None, type=float, help="lower limit reflector height (m)")
     parser.add_argument("-h2",  default=None, type=float, help="upper limit reflector height (m)")
     parser.add_argument("-sat", default=None, type=int, help="satellite")
-    parser.add_argument("-peak2noise",  default=None, type=float, help="quality control ratio")
-    parser.add_argument("-fortran", default='True', type=str, help="True: use Fortran translators")
+    parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio")
+    parser.add_argument("-fortran", default='True', type=str, help="Default is True: use Fortran translators")
     args = parser.parse_args()
 
 
@@ -50,14 +50,17 @@ def main():
     station = args.station
     year = args.year
     doy= args.doy
-    snr_type = args.snrEnd
+    #snr_type = args.snrEnd - now optional
 
     if len(str(year)) != 4:
         print('Year must have four characters: ', year)
         sys.exit()
 
+# default value is 66 for now
+    snr_type = args.snr 
 
     exitS = g.check_inputs(station,year,doy,snr_type)
+
     if exitS:
         sys.exit()
 
@@ -115,6 +118,8 @@ def main():
 
     f=freqs[0]
     NReg = [minH, maxH] # noise region - again, this is for typical snow setup
+
+
     quick.quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,sat,PkNoise,fortran)
 
 
