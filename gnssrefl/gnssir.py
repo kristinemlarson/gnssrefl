@@ -56,6 +56,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         sys.exit()
     print('go ahead and access SNR data - first define SNR filename')
     obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
+    print(obsfile, 'snrexistence',snre,' and ', snr_type)
     if (not snre) and (not lsp['seekRinex']):
         print('SNR file does not exist and you have set the seekRinex variable to False')
         print('Use rinex2snr.py to make SNR files')

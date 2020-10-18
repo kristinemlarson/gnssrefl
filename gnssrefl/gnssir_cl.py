@@ -59,8 +59,8 @@ def main():
 # rename the user inputs as variables
 #
     station = args.station
-    year = args.year
-    doy= args.doy
+    year = int(args.year)
+    doy= int(args.doy)
     # this is now optional
     snr_type = args.snr
     #snr_type = args.snrEnd
@@ -113,13 +113,13 @@ def main():
     if args.doy_end == None:
         doy_end = doy
     else:
-        doy_end = args.doy_end
+        doy_end = int(args.doy_end)
 
 # in case you want to analyze multiple years of data
     if args.year_end == None:
         year_end = year
     else:
-        year_end = args.year_end
+        year_end = int(args.year_end)
 
 # default will be to overwrite
     if args.nooverwrite == None:
@@ -168,10 +168,11 @@ def main():
         lsp['onesat'] = [args.sat]
 
 
-    print(lsp)
+    #print(lsp)
 
     year_list = list(range(year, year_end+1))
     doy_list = list(range(doy, doy_end+1))
+    print(doy_list)
     for year in year_list:
         for doy in doy_list:
             guts.gnssir_guts(station,year,doy, snr_type, extension,lsp)

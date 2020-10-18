@@ -42,9 +42,9 @@ def main():
 #
     station = args.station; NS = len(station)
     if (NS == 4) or (NS == 9):
-        print('nominally valid station name')
+        print('You have submitted a nominally valid station name')
     else:
-        print('Illegal input - Station must have 4 or 9 characters')
+        print('Illegal input - Station name must have 4 or 9 characters')
         sys.exit()
     year = args.year
 
@@ -58,7 +58,6 @@ def main():
     #snrt = args.snrEnd # 
     #isnr = int(snrt)
     orbtype = args.orb
-    print(orbtype)
 # currently allowed orbit types - shanghai removed 2020sep08
     orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum']
     if orbtype not in orbit_list:
@@ -77,6 +76,7 @@ def main():
     if orbtype == 'gps+glo':
         orbtype = 'jax'
 
+    print('Orbit type:', orbtype)
     if args.fortran == 'True':
         fortran = True
     else:

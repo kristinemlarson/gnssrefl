@@ -148,27 +148,40 @@ If your station name has 9 characters, the code assumes you are looking for a
 RINEX 3 file. However, it will store the SNR data using the normal
 4 character name. This requires you install the gfzrnx executable that translates RINEX 3 to 2.
 
-The snr options are always two digit numbers.  Choices are:
+The snr options are mostly based on the need to remove the "direct" signal. This is 
+not related to a specific site mask and that is why the most frequently used 
+options (99 and 66) have a maximum elevation angle of 30 degrees. The
+mask is decided later when you need to run **gnssir**.  The SNR choices are:
 
+- 66 is elevation angles less than 30 degrees (the default - you apply the mask in **gnssir**)
 - 99 is elevation angles of 5-30 degrees  
 - 88 is elevation angles of 5-90 degrees
-- 66 is elevation angles less than 30 degrees (the default - you apply the mask in **gnssir**)
 - 50 is elevation angles less than 10 degrees (good for tall, high-rate applications)
 
-orbit file options:
+SNR option of 50 is generally best for really tall sites where you are using 1-Hz data.
 
-- nav : GPS broadcast, perfectly adequate for reflectometry. **This is the default.**
+orbit file options for general users:
+
+- gps : will use GPS broadcast orbits **the default**
+- gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
+- gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
+
+orbit file options for experts:
+
+- nav : GPS broadcast, perfectly adequate for reflectometry. 
 - igs : IGS precise, GPS only
 - igr : IGS rapid, GPS only
 - jax : JAXA, GPS + Glonass, within a few days
 - gbm : GFZ Potsdam, multi-GNSS, not rapid
 - grg: French group, GPS, Galileo and Glonass, not rapid
 - wum : Wuhan, multi-GNSS, not rapid
-- gps : will use GPS broadcast
-- gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
-- gnss : will use GFZ orbits, which have four main constellations (available in 3-4 days?)
 
-What if you do not want to install the fortran translators?  Use -fortran False on the command line.
+Other questions:
+
+- What if you do not want to install the fortran translators?  Use -fortran False on the command line.
+
+- What if you are providing the RINEX files and you don't want the code to search for 
+the files online? Use -nolook True
 
 There is a **rate** command line input that has two values, high or low. However, it currently only looks at unavco.
 Please beward - it takes a long time to download a highrate GNSS RINEX file (even when it is compressed). 

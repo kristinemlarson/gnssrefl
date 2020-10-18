@@ -59,18 +59,24 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 print('snr file for ', station, str(year), cdoy, csnr, ' already exists')
             else:
                 r = station + cdoy + '0.' + cyy + 'o'
+                rgz = station + cdoy + '0.' + cyy + 'o.gz'
                 print(station, year, doy, ': will try to find RINEX /make SNR ')
                 if nol:
                     if version == 2:
-                        if os.path.exists(r):
+
+                        if os.path.exists(r) or os.path.exists(rgz):
                             print('RINEX 2 file exists locally')
+                            if not os.path.exists(r):
+                                subprocess.call(['gunzip', rgz])
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran) 
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
                         r3 = station9ch + '_R_' + str(year) + cdoy + '0000_01D_30S_MO.rnx'
+                        r3gz = station9ch + '_R_' + str(year) + cdoy + '0000_01D_30S_MO.rnx.gz'
                         r2 = station + cdoy + '0.' + cyy + 'o'
-                        print(r2,r3)
+                        if os.path.exists(r3gz):
+                            subprocess.call(['gunzip', r3gz])
                         if os.path.exists(r3):
                             print('RINEX 3 file exists locally')
                             fexists = g.new_rinex3_rinex2(r3,r2)

@@ -22,7 +22,7 @@ def main():
 # must input start and end year
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
-    parser.add_argument("medfilter", help="median filter for daily RH (m)", type=float)
+    parser.add_argument("medfilter", help="Median filter for daily RH (m). Start with 0.25 ", type=float)
     parser.add_argument("ReqTracks", help="required number of tracks", type=int)
 # optional inputs: filename to output daily RH results 
     parser.add_argument("-txtfile", default='None', type=str, help="output filename")
@@ -30,12 +30,14 @@ def main():
     parser.add_argument("-extension", default='None', type=str, help="extension for solution names")
     parser.add_argument("-year1", default='None', type=str, help="restrict to years starting with")
     parser.add_argument("-year2", default='None', type=str, help="restrict to years ending with")
+    parser.add_argument("-fr", default=0, type=int, help="frequency, default is 1")
     args = parser.parse_args()
 #   these are required
     station = args.station
     medfilter= args.medfilter
     ReqTracks = args.ReqTracks
 
+    fr = args.fr
 #   these are optional
     txtfile = args.txtfile
 #   default is to show the plot 
@@ -80,6 +82,7 @@ def main():
     plt.figure()
     year_list = np.arange(year1, year2+1, 1)
     #print('Years to examine: ',year_list)
+    print(fr)
     for yr in year_list:
         direc = xdir + '/' + str(yr) + '/results/' + station + '/' + extension + '/'
         if os.path.isdir(direc):
@@ -96,10 +99,14 @@ def main():
                         numlines = len(a) 
                         if (len(a) > 0):
                             y = a[0] +a[1]/365.25; rh = a[2] ; doy = int(np.mean(a[1]))
+                            frequency = a[10]
         # change from doy to month and day in datetime
                             d = datetime.date(yr,1,1) + datetime.timedelta(doy-1)
                             medv = np.median(rh)
-                            cc = (rh < (medv+howBig))  & (rh > (medv-howBig))
+                            if fr == 0:
+                                cc = (rh < (medv+howBig))  & (rh > (medv-howBig))
+                            else:
+                                cc = (rh < (medv+howBig))  & (rh > (medv-howBig)) & (frequency == fr)
                             good =rh[cc]; goodT =y[cc]
         # only save if there are some minimal number of values
                             if (len(good) > ReqTracks):
