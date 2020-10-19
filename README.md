@@ -276,14 +276,14 @@ Simple example for my favorite GPS site [p041](https://spotlight.unavco.org/stat
 
 - *make_json_input p041 39.949 -105.194 1728.856* (use defaults and write out a json instruction file)
 - *rinex2snr p041 2020 150* (pick up and translate RINEX file from unavco, uses snr=66 default)
-- *gnssir p041 2020 150 * (calculate the reflector heights) 
-- *gnssir p041 2020 150 -fr 5 -plt True* (override defaults, only look at L5, SNR data and periodogram plots come to the screen)
+- *gnssir p041 2020 150* (calculate the reflector heights) 
+- *gnssir p041 2020 150 -fr 5 -plt True* (override defaults, only look at L5 SNR data, and periodogram plots come to the screen)
 
 Where are the files for this example?
 
-- json is stored in REFL_CODE/input/p041.json
-- SNR files are stored in REFL_CODE/2020/snr/p041
-- Reflector Height (RH) results are stored in REFL_CODE/2020/results/p041
+- json is stored in $REFL_CODE/input/p041.json
+- SNR files are stored in $REFL_CODE/2020/snr/p041
+- Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041
 - I do not save RINEX files. In fact, my code deletes them.
 
 If you want a multi-GNSS solution, you need make a new json file and use multi-GNSS orbits. And the RINEX you select 
