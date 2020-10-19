@@ -80,12 +80,7 @@ when you make SNR files because the default behavior is to assume you are using 
 translators (gnssSNR.e or gpsSNR.e). Finally, you will not be able to use RINEX 3 files because
 I rely on the gfzrnx RINEX3 to RINEX2 translator.
 
-# Non-Python Code 
-
-All executables should be stored in the EXE directory.  If you do not define EXE, it will look for them in your 
-local working directory.  The Fortran translators are much faster than using python. But if 
-you don't want to use them,
-they are optional, that's fine. FYI, the python version is slow 
+# Non-Python Code All executables should be stored in the EXE directory.  If you do not define EXE, it will look for them in your local working directory.  The Fortran translators are much faster than using python. But if you don't want to use them, they are optional, that's fine. FYI, the python version is slow 
 not because of the RINEX - it is because you need to calculate
 a crude model for satellite coordinates in this code. And that takes cpu time....
 
@@ -104,26 +99,33 @@ http://dx.doi.org/10.5880/GFZ.1.1.2016.002
 
 # rinex2snr - making SNR files from RINEX files
 
-I run a lowercase shop. Please name RINEX files accordingly and use lowercase station names. It also means 
-that the filename must be 12 characters long (ssssddd0.yyo), where ssss is station name, 
-ddd is day of year, followed by a zero, yy is the two character year and o stands for observation. 
-If you have installed the CRX2RNX code, you can also provide a compressed RINEX format file, which ends in a d.
-I think my code allows gz or Z as compression types.
-
+The international standard for sharing GNSS data is called the RINEX format.
 A RINEX file has extraneous information in it (the data used for positioning, LOL) - and it 
 does not provide some of the information needed for reflectometry (elevation and azimuth angles). 
-The first task you have is to translate a from RINEX into what I will call a SNR format - and 
-to calculate those geometric angles. For the latter you will need an **orbit** file. If you 
-tell it which kind of orbit file you want, the code will go get it for you.  
-Secondly, you will need to decide how much of the data file you want to save. 
-I used to have you type in a number for this selection - but this is now optional.  For all data < 30 degrees
-elevation angle (which is the default), the snr file value is 66 and that is the default.  For all data
-between 5 and 30, the snr file value is 99.  The others are given below.
+The first task you have is to translate a from RINEX into what I will call the SNR format - and 
+to calculate those geometric angles. For the latter you will need an **orbit** file. **rinex2snr**
+will go get an orbit file for you. You can override the default orbit choice by selections given below.
 
-The command line driver is **rinex2snr**. You absolutely must tell the program the name of the station,
-the year and doy of year.  
+There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
+angles. The default is to save all data with elevation lower than 30 degrees (this is called SNR format 66).
+Another SNR choice is 99, which saves elevation angle data between 5 and 30.  
 
-If you installed gpsSNR.e, a sample call for a station called p041, restricted 
+There are rules for naming RINEX files. I **require** that RINEX (version 2) be lowercase.
+The filename must be 12 characters long (ssssddd0.yyo), where ssss is station name, 
+ddd is day of year, followed by a zero, yy is the two character year and o stands for observation. 
+If you have installed the CRX2RNX code, you can also provide a compressed RINEX format file, which ends in a d.
+I think my code allows you to gzip the RINEX files if you are providing them.
+
+For RINEX version 3 I believe the rules are that the file should be upper case, except for the extension,
+which is rnx.  I have no idea why this is the case.
+
+You can run **rinex2snr** at the command line. You required inputs are:
+
+- station name
+- year
+- day of year
+
+If you installed the fortran translator gpsSNR.e, a sample call for a station called p041, restricted 
 to GPS satellites, on day of year 132 and year 2020 would be:
 
 *rinex2snr p041 2020 132*
@@ -146,7 +148,7 @@ What if you want to run the code for all the data for a given year?
  
 If your station name has 9 characters, the code assumes you are looking for a 
 RINEX 3 file. However, it will store the SNR data using the normal
-4 character name. This requires you install the gfzrnx executable that translates RINEX 3 to 2.
+4 character name. This requires you install the **gfzrnx** executable that translates RINEX 3 to 2.
 
 The snr options are mostly based on the need to remove the "direct" signal. This is 
 not related to a specific site mask and that is why the most frequently used 
@@ -160,13 +162,13 @@ mask is decided later when you need to run **gnssir**.  The SNR choices are:
 
 SNR option of 50 is generally best for really tall sites where you are using 1-Hz data.
 
-orbit file options for general users:
+*orbit file options for general users:*
 
 - gps : will use GPS broadcast orbits **the default**
 - gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 - gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
 
-orbit file options for experts:
+*orbit file options for experts:*
 
 - nav : GPS broadcast, perfectly adequate for reflectometry. 
 - igs : IGS precise, GPS only
@@ -183,8 +185,9 @@ Other questions:
 - What if you are providing the RINEX files and you don't want the code to search for 
 the files online? Use -nolook True
 
-There is a **rate** command line input that has two values, high or low. However, it currently only looks at unavco.
-Please beward - it takes a long time to download a highrate GNSS RINEX file (even when it is compressed). 
+There is a **rate** command line input that has two values, high or low. However, if you invoke high,
+it currently only looks at unavco. Please beware - it takes a long time to download a 
+highrate GNSS RINEX file (even when it is compressed). 
 And it also takes a long time to compute orbits for it (and thus create a SNR file).
 
 # quickLook 
@@ -200,17 +203,17 @@ you into the correct SNR format (note: this feature might make use of the Fortra
 There are stored defaults for analyzing the
 spectral characteristics of the SNR data.  If you want to override those, use *quickLook -h*
 
-*quickLook p041 2020 150 *  (this uses defaults)
+*quickLook p041 2020 150*  (this uses defaults)
 
-*quickLook gls1 2011 271 *  (this uses defaults)
+*quickLook gls1 2011 271*  (this uses defaults)
 
 *quickLook smm3 2018 271 -snr 99 -h1 8 -h2 20*  (smm3 is about 15 meters tall, and I am specifying a file with snr = 99 ending)
 
 Many archives make it difficult for you to access modern GNSS signals. This is really unfortunate,
 as the L2C and L5 GPS signals are great, as are the signals from Galileo, Glonass, and Beidou.
 
-Many archives also make it difficult for you to use high-rate data. Especially for sea level studies, I recommend
-going higher than typical geodetic sampling rates.
+Many archives also make it difficult for you to use high-rate data. 
+Especially for sea level studies, I recommend going higher than typical geodetic sampling rates.
 
 # gnssir
 
@@ -218,7 +221,8 @@ This is the main driver for the reflectometry code.
 
 You need a set of instructions which can be made using **make_json_input**.  
 At a minimum **make_json_input** needs the station name (4 char), the latitude (degrees), 
-longitude (degrees) and ellipsoidal height (meters). This location DOES NOT have to be cm-level for the reflections code.
+longitude (degrees) and ellipsoidal height (meters). This location does not 
+have to be cm-level for the reflections code.
 Within a few hundred meters is sufficient.  
 
 
@@ -240,6 +244,7 @@ For example, if you only want to use elevation angles between 5 and 10 degrees:
 Things that are helpful to know for the json and commandline inputs:
 
 *Names for the GNSS frequencies*
+
 - 1,2,5 are GPS L1, L2, L5
 - 20 is GPS L2C 
 - 101,102 Glonass L1 and L2
@@ -247,6 +252,7 @@ Things that are helpful to know for the json and commandline inputs:
 - 302, 306, 307 : Beidou frequencies
 
 *Reflection parameters settings in the json file:*
+
 - e1 and e2 are the min and max elevation angle, in degrees
 - minH and maxH are the min and max allowed reflector height, in meters
 - desiredP, desired reflector height precision, in meters
@@ -258,6 +264,7 @@ Things that are helpful to know for the json and commandline inputs:
 - azval are the azimuth regions for study, in pairs (i.e. 0 90 270 360 means you want to evaluate 0 to 90 and 270 to 360).
 
 *Other json inputs:*
+
 - wantCompression, boolean, compress SNR files
 - screenstats, boolean, whether minimal periodogram results come to screen
 - refraction, boolean, whether simple refraction model is applied.
@@ -277,17 +284,19 @@ Where are the files for this example?
 - json is stored in REFL_CODE/input/p041.json
 - SNR files are stored in REFL_CODE/2020/snr/p041
 - Reflector Height (RH) results are stored in REFL_CODE/2020/results/p041
-- I do not save RINEX files.  
+- I do not save RINEX files. In fact, my code deletes them.
 
-If you want multi-GNSS, you need to use multi-GNSS orbits and edit the json file. And the RINEX you select 
-must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data in the RINEX file and 
-let's say you used the snr=99 ending instead of the default 66:
+If you want a multi-GNSS solution, you need make a new json file and use multi-GNSS orbits. And the RINEX you select 
+must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data in the RINEX file, so you 
+can use it as a test.
 
-- *rinex2snr p041 2020 151 -snr 99 -orb gnss* (gnss option uses GFZ orbits so you can use GPS, Glonass, and Galileo)
-- *gnssir p041 2020 151 -snr 99 -fr 201 -plt True* (look at the lovely Galileo L1 data) 
+- *make_json_input p041 39.949 -105.194 1728.856 -allfreq True* 
+- *rinex2snr p041 2020 151 -orb gnss* 
+- *gnssir p041 2020 151 -fr 201 -plt True* (look at the lovely Galileo L1 data) 
 
-What should the periodogram plots look like? Until we have Jupyter notebooks, I recommend you
-look at [the paper I wrote with Carolyn Roesler](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
+What should the periodogram plots look like? Until we have Jupyter notebooks, I 
+recommend you look at 
+[the paper I wrote with Carolyn Roesler](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
 or the [question section of my web app.](https://gnss-reflections.org). Note that a failed
 arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
