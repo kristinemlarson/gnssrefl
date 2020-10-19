@@ -80,7 +80,12 @@ when you make SNR files because the default behavior is to assume you are using 
 translators (gnssSNR.e or gpsSNR.e). Finally, you will not be able to use RINEX 3 files because
 I rely on the gfzrnx RINEX3 to RINEX2 translator.
 
-# Non-Python Code All executables should be stored in the EXE directory.  If you do not define EXE, it will look for them in your local working directory.  The Fortran translators are much faster than using python. But if you don't want to use them, they are optional, that's fine. FYI, the python version is slow 
+# Non-Python Code 
+
+All executables should be stored in the EXE directory.  If you do not define EXE, 
+it will look for them in your local working directory.  The Fortran translators are 
+much faster than using python. But if you don't want to use them, 
+they are optional, that's fine. FYI, the python version is slow 
 not because of the RINEX - it is because you need to calculate
 a crude model for satellite coordinates in this code. And that takes cpu time....
 
