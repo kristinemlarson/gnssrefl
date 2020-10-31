@@ -1,3 +1,10 @@
+# IMPORTANT
+
+CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
+implemented security restrictions, we have had to change our download access. 
+For this reason we strongly urge that you install **wget** on your machine.
+You will only have very limited analysis abilities without it.
+
 # NEWS
 
 I have added defaults so you don't have to think quite so much. The defaults are that  
@@ -14,7 +21,7 @@ attempting to use proper python packaging rules, LOL. I have separated out the m
 parts of the code and the command line inputs so that you can use the gnssrefl libraries
 yourself or do it all from the command line. This should also - hopefully - make
 it easier for the production of Jupyter notebooks. The latter are to be developed
-by UNAVCO with NASA funding.
+by UNAVCO with NASA GNSS Science Team funding.
 
 # For those of you who don't like reading documentation
 
@@ -41,7 +48,13 @@ called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main code
 * **quickLook** gives you a quick (visual) assessment of a file without dealing
 with the details associated with **gnssir**.
 
-There is also a RINEX download script **download_rinex**, but it is not required.
+There is also a RINEX download script **download_rinex** and an orbit download script 
+**download_orbits**, but you are not required to use them.
+
+The rest of this file is about how to install and run the code. *It is not a class about 
+reflectometry.* If you are unsure about why various restrictions are being applied, you need
+to read Roesler and Larson (2018) and similar. I am committed in principle to set up some online
+courses to teach people about reflections, but funding for these couress is not in hand at the moment.  
 
 # Environment Variables 
 
@@ -63,13 +76,15 @@ directories in year, followed by type, i.e. snr, results, sp3, nav, and then by 
 
 If you are using the version from gitHub:
 
-* make a directory, cd into that directory, set up a virtual environment, a la python3 -m venv env, activate it
+* make a directory, cd into that directory, set up a virtual environment, a la python3 -m venv env 
+* activate your virtual environment
 * git clone https://github.com/kristinemlarson/gnssrefl 
 * pip install .
 
 If you use the PyPi version:  
 
-* make a directory, cd into that directory, set up a virtual environment, activate it
+* make a directory, cd into that directory, set up a virtual environment 
+* activate the virtual environment
 * pip install gnssrefl
 
 To use **only** python codes, you will need to be sure that your RINEX files are uncompressed (i.e.
@@ -121,8 +136,6 @@ ddd is day of year, followed by a zero, yy is the two character year and o stand
 If you have installed the CRX2RNX code, you can also provide a compressed RINEX format file, which ends in a d.
 I think my code allows you to gzip the RINEX files if you are providing them.
 
-For RINEX version 3 I believe the rules are that the file should be upper case, except for the extension,
-which is rnx.  I have no idea why this is the case.
 
 You can run **rinex2snr** at the command line. You required inputs are:
 
@@ -138,7 +151,7 @@ to GPS satellites, on day of year 132 and year 2020 would be:
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
 it will check four archives (unavco, sopac, cddis, and sonel) to find it. 
 
-If you did not install a fortran translator, use this for a GPS file on year 2020 and doy 132:
+If you did not install a fortran translator, the command would be:
 
 *rinex2snr p041 2020 132 -fortran False* 
 
@@ -151,21 +164,35 @@ What if you want to run the code for all the data for a given year?
 
 *rinex2snr tgho 2019 1  -archive nz -doy_end 365* 
  
-If your station name has 9 characters, the code assumes you are looking for a 
-RINEX 3 file. However, it will store the SNR data using the normal
-4 character name. This requires you install the **gfzrnx** executable that translates RINEX 3 to 2.
+If your station name has 9 characters (lower case please), the code assumes you are looking for a 
+RINEX 3 file. However, my code will store the SNR data using the normal
+4 character name. **You must install the gfzrnx executable that translates RINEX 3 to 2 to use RINEX 3 files
+in my code.** *rinex2snr* currently only looks for RINEX 3 files at CDDIS (30 sec) and UNAVCO (15 sec).  There 
+are more archive options in **download_rinex** and someday I will merge these. If you do have your own RINEX 3
+files, I use the community standard, that is upper case except for the extension (which is rnx).  I know, it is weird.
+
+Here are some examples for RINEX 3 conversions:
+
+*rinex2snr onsa00swe 2020 298*
+
+*rinex2snr at0100usa 2020 55*
+
+*rinex2snr mdo100usa 2020 290*
+
+*rinex2snr mkea00usa 2020 290*
+
+*rinex2snr p36000usa 2020 290*
 
 The snr options are mostly based on the need to remove the "direct" signal. This is 
 not related to a specific site mask and that is why the most frequently used 
 options (99 and 66) have a maximum elevation angle of 30 degrees. The
-mask is decided later when you need to run **gnssir**.  The SNR choices are:
+azimuth-specific mask is decided later when you need to run **gnssir**.  The SNR choices are:
 
-- 66 is elevation angles less than 30 degrees (the default - you apply the mask in **gnssir**)
+- 66 is elevation angles less than 30 degrees (the default)
 - 99 is elevation angles of 5-30 degrees  
 - 88 is elevation angles of 5-90 degrees
-- 50 is elevation angles less than 10 degrees (good for tall, high-rate applications)
+- 50 is elevation angles less than 10 degrees (good for very tall sites, high-rate applications)
 
-SNR option of 50 is generally best for really tall sites where you are using 1-Hz data.
 
 *orbit file options for general users:*
 
@@ -205,20 +232,21 @@ If the SNR file has not been previously stored, you can provide a properly named
 (lowercase only) in your working directory. If it doesn't find a file in either of these places, it
 will try to pick up the RINEX data from various archives (unavco, sopac, sonel, and cddis) and translate it for
 you into the correct SNR format (note: this feature might make use of the Fortran translators). 
-There are stored defaults for analyzing the
-spectral characteristics of the SNR data.  If you want to override those, use *quickLook -h*
+There are stored defaults for analyzing the spectral characteristics of the SNR data. 
+If you want to override those, use *quickLook -h*
 
-*quickLook p041 2020 150*  (this uses defaults)
+Here are some examples:
 
-*quickLook gls1 2011 271*  (this uses defaults)
+*quickLook p041 2020 150*  (uses defaults)
 
-*quickLook smm3 2018 271 -snr 99 -h1 8 -h2 20*  (smm3 is about 15 meters tall, and I am specifying a file with snr = 99 ending)
+*quickLook gls1 2011 271*  (uses defaults)
 
-Many archives make it difficult for you to access modern GNSS signals. This is really unfortunate,
-as the L2C and L5 GPS signals are great, as are the signals from Galileo, Glonass, and Beidou.
+The defaults are inappropriate for many sites. For example, smm3 is about 15 
+meters tall. If you use the defaults you won't see anything useful. Here I am overriding
+the defaults to require that the analysis code only look at reflector heights between 
+8 and 20 meters. (I am also telling it to use snr format 99).
 
-Many archives also make it difficult for you to use high-rate data. 
-Especially for sea level studies, I recommend going higher than typical geodetic sampling rates.
+*quickLook smm3 2018 271 -snr 99 -h1 8 -h2 20*  
 
 # gnssir
 
@@ -308,7 +336,7 @@ the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 # Bugs/Features I know about 
 
-I have been using **teqc** to reduce the number of observables and to decimate.  I have removed the former 
+I have been using **teqc** to reduce the number of observables and to decimate. I have removed the former 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
 and fortran is set to True, unfortunately this will still occur. I am working on removing my 
 code's dependence on **teqc**.
@@ -319,12 +347,12 @@ and compile it for you as part of the pypi install). But doing this myself is we
 No phase center offsets have been applied to these reflector heights. While these values are relatively small,
 we do plan to remove them in subsequent versions of the code.
 
-The L2C and L5 satellite lists are not time coded as they should be. I currently have a list from 2020.
+The L2C and L5 satellite lists are not time coded as they should be. I currently use a list from 2020.
 
 # Helper Codes
 
-**download_rinex** can be useful if you want to download RINEX v2 or 3 files (use the version flag) without using 
-the reflection specific codes. Sample calls:
+**download_rinex** can be useful if you want to download RINEX v2 or 3 files (using the version flag) without using 
+the reflection-specific codes. Sample calls:
 
 - *download_rinex p041 2020 6 1* downloads the data from June 1, 2020
 
@@ -338,6 +366,7 @@ accumulation. It can be used for lake levels. It is not for tides!
 
 **download_orbits** does what it sounds like. Feel free to use it. 
 
+**ymd** is for those annoying days when you don't know what day of year is October 15.
 
 # Publications
 

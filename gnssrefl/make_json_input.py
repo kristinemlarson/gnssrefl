@@ -111,7 +111,8 @@ def main():
         # choose GPS as the default
         lsp['freqs'] = [1, 20, 5]; lsp['reqAmp'] = [6, 6,6]
     else:
-        lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206,207,208,302, 306,307]; lsp['reqAmp'] = [6, 6,6,6,6,6,6,6,6,6,6,6,6]
+        # 307 was making it crash.  did not check as to why
+        lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206,207,208,302, 306]; lsp['reqAmp'] = [6, 6,6,6,6,6,6,6,6,6,6,6]
 # use refraction correction
     lsp['refraction'] = True
 

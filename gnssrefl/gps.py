@@ -789,22 +789,21 @@ def getnavfile(year, month, day):
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     navname,navdir = nav_name(year, month, day)
     nfile = navdir + '/' + navname
-    if os.path.exists(navdir):
-        print('navdir already exists')
-    else:
+    if not os.path.exists(navdir):
         subprocess.call(['mkdir',navdir])
 
     if os.path.exists(nfile):
+        print('navfile exists online')
         foundit = True
     elif os.path.exists(nfile + '.xz' ):
-        print('xz compressed navfile exists online')
+        print('xz compressed navfile exists online, uncompressing ...')
         subprocess.call(['unxz',nfile + '.xz'])
         foundit = True
     else:
         print('go pick up the navfile')
         navstatus = navfile_retrieve(navname, cyyyy,cyy,cdoy) 
         if navstatus:
-            print('mv the navfile')
+            print('navfile being moved to online storage area')
             subprocess.call(['mv',navname, navdir])
             foundit = True
         else:
@@ -3203,47 +3202,27 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     20jun14 added secure ftp for CDDIS
     """
     FileExists = True
-    unavco= 'ftp://data-out.unavco.org'
-    sopac = 'ftp://garner.ucsd.edu'
-    cddis = 'ftp://ftp.cddis.eosdis.nasa.gov'
     navname = navfile
-    navfile_sopac1 =  navfile   + '.Z' # regular nav file
-    navfile_compressed = navfile + '.Z'
-    url_sopac1 = sopac + '/pub/rinex/' + cyyyy + '/' + cdoy + '/' + navfile_sopac1
-
-    navfile_sopac2 =  navfile
-    url_sopac2 = sopac + '/pub/rinex/' + cyyyy + '/' + cdoy + '/' + navfile_sopac2
-
-    navfile_unavco = 'sc02' + navfile[4:] + '.Z'
-    url_unavco = unavco + '/pub/rinex/nav/' + cyyyy + '/' + cdoy + '/' + navfile_unavco
-
-    navfile_cddis = 'brdc' + navfile[4:] + '.Z'
-    url_cddis = cddis + '/gps/data/daily/' + cyyyy + '/' + cdoy + '/' +cyy + 'n/' + navfile_cddis
-    print(url_cddis)
     try:
-        # use a function instead
-        get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
-        #print('try cddis first')
-        #wget.download(url_cddis,navfile_compressed)
-        #subprocess.call(['uncompress',navfile_compressed])
-        print('success at cddis')
-    except:
-        print('no success at cddis')
+        print('try to find it at SOPAC ')
+        get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
+    except Exception as err:
+        print(err)
+        print('could not find file at SOPAC')
+        FileExists = False
+    if not FileExists:
         try:
-            print('try SOPAC next')
-            wget.download(url_sopac1,navfile_sopac1)
-            subprocess.call(['uncompress',navfile_sopac1])
-        except:
-            print('no success at SOPAC')
-            if not os.path.exists(navname):
-                print('get rid of corrupted SOPAC file, if any')
-                subprocess.call(['rm','-f',navfile_sopac1])
-                subprocess.call(['rm','-f',navname])
+            print('try to find it at cddis - but there are issues ')
+            get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
+        except Exception as err:
+            print(err)
+            FileExists = False
 
     if not os.path.isfile(navfile):
         FileExists = False
 
     return FileExists
+
 def make_nav_dirs(yyyy):
     """
     input year and it makes sure output directories are created for orbits
@@ -4170,6 +4149,30 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
 
     return fexists, rfilename
 
+def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
+    """
+    kristine larson
+    tries to download nav file from SOPAC 
+
+    """
+    sopac = 'ftp://garner.ucsd.edu'
+    navfile_sopac1 =  navfile   + '.Z' # regular nav file
+    navfile_compressed = navfile_sopac1
+    url_sopac1 = sopac + '/pub/rinex/' + cyyyy + '/' + cdoy + '/' + navfile_sopac1
+
+    # sometimes it is not compressed ... but I am going to ignore these times
+    navfile_sopac2 =  navfile
+    url_sopac2 = sopac + '/pub/rinex/' + cyyyy + '/' + cdoy + '/' + navfile_sopac2
+
+
+    try:
+        wget.download(url_sopac1,navfile_compressed)
+        subprocess.call(['uncompress',navfile_compressed])
+    except Exception as err:
+        print(err)
+
+    return navfile
+
 def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     """
     kristine larson
@@ -4180,12 +4183,10 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     """
     # ths old way
     # just in case you sent it the navfile with auto instead of brdc
-    cddisfile = 'brdc' + navfile[4:] + '.Z'
-    cddis = 'ftp://cddis.nasa.gov'
+    #cddisfile = 'brdc' + navfile[4:] + '.Z'
+    #cddis = 'ftp://cddis.nasa.gov'
     # navfile will continue to be called auto
-    navfile_compressed = cddisfile
-    url_cddis = cddis + '/gps/data/daily/' + cyyyy + '/' + cdoy + '/' +cyy + 'n/' + navfile_compressed
-    #print(url_cddis)
+    #navfile_compressed = cddisfile
 
     # new way
     cddisfile = 'brdc' + cdoy + '0.' +cyy  +'n'
@@ -4194,16 +4195,15 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     mdir = '/gps/data/daily/' + cyyyy + '/' + cdoy + '/' +cyy + 'n/'
 
     try:
-        #wget.download(url_cddis,navfile_compressed)
         cddis_download(navfile_compressed,mdir)
+    except Exception as err:
+        print(err)
+    if os.path.isfile(navfile_compressed):
         subprocess.call(['uncompress',navfile_compressed])
-        print('success at cddis')
+        # changing the name to auto
         subprocess.call(['mv',cddisfile,navfile])
-    except:
-        print('no success at cddis')
+
     return navfile
-
-
 
 def cddis_download(filename, directory):
     """
@@ -4215,14 +4215,11 @@ def cddis_download(filename, directory):
     this will replace using wget.download when CDDIS turns off anonymous ftp
 
     was supposed to returns whether file was created but now it just returns true
-
+#   --no-check-certificate
 
     """
     filename = 'ftps://gdc.cddis.eosdis.nasa.gov' + directory + filename 
-    callit = ['wget', '--ftp-user','anonymous','--ftp-password', 'kristine@colorado.edu', filename]
-    #print(callit)
-    #print(filename)
-    #print(filename)
+    callit = ['wget', '--ftp-user','anonymous','--ftp-password', 'kristine@colorado.edu', '--no-check-certificate', filename]
     subprocess.call(callit)
     return True 
 

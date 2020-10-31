@@ -27,8 +27,8 @@ def main():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="day of year", type=int)
-    parser.add_argument("snrEnd", help="snrEnding, try 99", type=int)
 # these are the optional inputs
+    parser.add_argument("-snr", default=66,help="snr ending, try 66", type=int)
     parser.add_argument("-fr", default=None, type=int, help="try -fr 1 for GPS L1 only, or -fr 101 for Glonass L1")
     parser.add_argument("-ampl", default=None, type=float, help="minimum spectral amplitude allowed")
     parser.add_argument("-e1",  default=None, type=int, help="lower limit elevation angle (deg)")
@@ -50,7 +50,8 @@ def main():
     station = args.station
     year = args.year
     doy= args.doy
-    snr_type = args.snrEnd
+    # this is now optional
+    #snr_type = args.snrEnd
 
     exitS = g.check_inputs(station,year,doy,snr_type)
     if exitS:
@@ -107,6 +108,8 @@ def main():
     if args.ampl != None:
         reqAmp[0] = args.ampl
 
+    # default value is 66 for now
+    snr_type = args.snr 
 
     f=freqs[0]
     NReg = [minH, maxH] # noise region - again, this is for typical snow setup
