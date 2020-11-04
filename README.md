@@ -239,7 +239,7 @@ you into the correct SNR format (note: this feature might make use of the Fortra
 
 **quickLook** has stored defaults for analyzing the spectral characteristics of the SNR data. 
 IN GENERAL THESE DEFAULTS ARE MEANT TO FACILITATE USERS WHERE THE ANTENNA IS LESS
-THAN 4 METERS TALL.  If your site is taller than that, you will need to override them.
+THAN 5 METERS TALL.  If your site is taller than that, you will need to override them.
 Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
 you don't want to use, you need to override them.
 
@@ -273,16 +273,14 @@ means the antenna was further from the planar reflector, which in this case is i
 
 Finally, what do you do if your reflections site is taller than the default value of 6 meters?
 Does the code figure this out for you automatically? **No, it does not.**
-Example:
-
-Make a SNR file using the defaults: *rinex2snr smm3 2018 271*
-
+A short example: Make a SNR file using the defaults: *rinex2snr smm3 2018 271*
 Now run **quickLook** using the defaults [quickLook smm3 2018 271](tests/smm3-default.png). 
-Everything is gray because you only calculated periodograms from 0.5 to 6 meters.  The
-site is 15 meters above the ice.  Accordingly, if you change the inputs to tell the program
+Everything is gray (which means it didn't find a significant reflector) because you 
+only calculated periodograms for height values of 0.5 to 6 meters. The
+site is 15 meters above the ice. Accordingly, if you change the inputs to tell the program
 that you want to examine heights between 8 and 20 meters, i.e. 
-[quickLook smm3 2018 271 -h1 8 -h2 20](tests/smm3-sensible.png) you see the proper 
-reflector value. 
+[quickLook smm3 2018 271 -h1 8 -h2 20](tests/smm3-sensible.png) you now see what you 
+expect to see - peaks of periodograms at ~15 meters height.
 
 # gnssir
 
