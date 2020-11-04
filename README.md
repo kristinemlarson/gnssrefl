@@ -294,7 +294,7 @@ A short example: Make a SNR file using the defaults: *rinex2snr smm3 2018 271*
 Now run **quickLook** using the defaults [quickLook smm3 2018 271](tests/smm3-default.png). 
 Everything is gray (which means it didn't find a significant reflector) because you 
 only calculated periodograms for height values of 0.5 to 6 meters. The
-site is 15 meters above the ice. Accordingly, if you change the inputs to tell the program
+site is ~16 meters above the ice. Accordingly, if you change the inputs to tell the program
 that you want to examine heights between 8 and 20 meters, i.e. 
 [quickLook smm3 2018 271 -h1 8 -h2 20](tests/smm3-sensible.png) you now see what you 
 expect to see - peaks of periodograms at ~16 meters height. Why is the northwest quadrant 
