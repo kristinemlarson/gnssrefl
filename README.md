@@ -280,7 +280,9 @@ only calculated periodograms for height values of 0.5 to 6 meters. The
 site is 15 meters above the ice. Accordingly, if you change the inputs to tell the program
 that you want to examine heights between 8 and 20 meters, i.e. 
 [quickLook smm3 2018 271 -h1 8 -h2 20](tests/smm3-sensible.png) you now see what you 
-expect to see - peaks of periodograms at ~15 meters height.
+expect to see - peaks of periodograms at ~16 meters height. Why is the northwest quadrant 
+so messy? I leave that as an exercise for the reader. Hint: start out by trying
+to examine this site on Google Earth.
 
 # gnssir
 
