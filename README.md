@@ -5,13 +5,11 @@ implemented security restrictions, we have had to change our download access.
 For this reason we strongly urge that you install **wget** on your machine.
 You will only have very limited analysis abilities without it.
 
-# NEWS
-
-I have added defaults so you don't have to think quite so much. The defaults are that  
-you are using GPS and have a fairly standard site (not super tall, < 5 meters).
-Pleae note changes to **rinex2snr**, **quickLook**, and **gnssir**.
-There are still optional inputs that allow you to vary things.  
-
+Recently I added more defaults so you don't have to think quite so much. The defaults are that  
+you are using GPS receiver (not GNSS) and have a fairly standard geodetic 
+site (i.e. not super tall, < 5 meters). If you have previously used this package, please
+note these changes to **rinex2snr**, **quickLook**, and **gnssir**.
+Optional commandline inputs are still allowed.
 
 # gnssrefl
 
@@ -48,13 +46,13 @@ called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main code
 * **quickLook** gives you a quick (visual) assessment of a file without dealing
 with the details associated with **gnssir**.
 
-There is also a RINEX download script **download_rinex** and an orbit download script 
-**download_orbits**, but you are not required to use them.
+There are also various utilities you might find to be useful (see in the last section).
 
-The rest of this file is about how to install and run the code. *It is not a class about 
-reflectometry.* If you are unsure about why various restrictions are being applied, you need
+The rest of this README file is about how to install and run the code. *It is not a class about 
+GNSS interferometric reflectometry.* If you are unsure about why various 
+restrictions are being applied, you really need
 to read Roesler and Larson (2018) and similar. I am committed in principle to set up some online
-courses to teach people about reflections, but funding for these couress is not in hand at the moment.  
+courses to teach people about reflections, but funding for these courses is not in hand at the moment.  
 
 # Environment Variables 
 
@@ -233,20 +231,29 @@ to quickly test various options (elevation angles, frequencies, azimuths).
 The required inputs are station name, year, and doy of year. 
 
 If the SNR file has not been previously stored, you can provide a properly named RINEX file
-(lowercase only) in your working directory. If it doesn't find a file in either of these places, it
-will try to pick up the RINEX data from various archives (unavco, sopac, sonel, and cddis) and translate it for
+(lowercase only) in your working directory. If it doesn't find a file in 
+either of these places, it
+will try to pick up the RINEX data from various 
+archives (unavco, sopac, sonel, and cddis) and translate it for
 you into the correct SNR format (note: this feature might make use of the Fortran translators). 
+
 **quickLook** has stored defaults for analyzing the spectral characteristics of the SNR data. 
 IN GENERAL THESE DEFAULTS ARE MEANT TO FACILITATE USERS WHERE THE ANTENNA IS LESS
 THAN 4 METERS TALL.  If your site is taller than that, you will need to override them.
 Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
 you don't want to use, you need to override them.
 
-If you want to override those, use *quickLook -h*
+For more information, use *quickLook -h*
 
 Here are some examples using defaults. Both sites are about 2 meters above the reflecting surface:
 
-*quickLook p041 2020 150*  
+*quickLook p041 2020 132*  
+
+will produce [this periodogram summary](tests/p041-l1.png). These are L1 data only.
+L2C will look like [this](tests/p041-l2c.png). To invoke L2C read the -h inputs.  
+The defaults reflector heights will not go beyond 6 meters.  You can change that 
+by telling it, e.g. h2=20, but you really aren't learrning anything about the reflector by
+doing that.
 
 *quickLook gls1 2011 271* 
 
