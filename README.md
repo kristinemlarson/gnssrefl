@@ -252,10 +252,11 @@ Going back to our **rinex2snr** example, try running the data for p041.
 That command will produce [this periodogram summary](tests/p041-l1.png). By default, 
 these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
 you have used the dfeaults which set that.  Furthermore, you are not able to resolve very small
-reflector heights, so there are no results shown smaller than 0.5 meters.  THESE ARE PERIODOGRAMS 
-to give you a sense of whether there is a planar reflector below your antenna.  The fact that 
-the periodograms bunch up around 2 meters means that at this site the antenna phase center
-is ~ 2 meters. The colors change as you try different satellites.  If the data are plotted in
+reflector heights, so there are no results shown smaller than 0.5 meters. These are periodograms  
+to give you a sense of whether there is a planar reflector below your antenna. The fact that 
+the peaks in the periodograms bunch up around 2 meters means that at 
+this site the antenna phase center is ~ 2 meters above the ground. The colors 
+change as you try different satellites.  If the data are plotted in
 gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
 
 If you want to look at L2C data, [try this by invoking -freq 20](tests/p041-l2c.png). 
@@ -263,15 +264,25 @@ In general, the results will be cleaner than L1 data (freq 1).
 The defaults reflector heights will not go beyond 6 meters.  If you had set -h2 20, it would
 look [like this](tests/p041-l2c-again.png). You aren't gaining anything by doing this.
 
-Try out the Greenland SNR file you created in the previous section.
+Now look at the Greenland SNR file you created in the previous section.
 
 *quickLook gls1 2011 271* 
 
+The periodogram peaks bunch up at a [larger value](tests/gls1-example.png), which just
+means the antenna was further from the planar reflector, which in this case is ice.
 
+Finally, what do you do if your reflections site is taller than the default value of 6 meters?
+Does the code figure this out for you automatically? **No, it does not.**
+Example:
 
-*quickLook smm3 2018 271 -h1 8 -h2 20*  
+Make a SNR file using the defaults: *rinex2snr smm3 2018 271*
 
-*quickLook smm3 2018 271 -h1 8 -h2 20*  
+Now run **quickLook** using the defaults [quickLook smm3 2018 271](tests/smm3-default.png). 
+Everything is gray because you only calculated periodograms from 0.5 to 6 meters.  The
+site is 15 meters above the ice.  Accordingly, if you change the inputs to tell the program
+that you want to examine heights between 8 and 20 meters, i.e. 
+[quickLook smm3 2018 271 -h1 8 -h2 20](tests/smm3-sensible.png) you see the proper 
+reflector value. 
 
 # gnssir
 
