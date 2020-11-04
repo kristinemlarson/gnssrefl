@@ -8,9 +8,10 @@ You will only have very limited analysis abilities without it.
 # NEWS
 
 I have added defaults so you don't have to think quite so much. The defaults are that  
-you are using GPS and have a fairly standard site (not super tall, < 20 meters).
+you are using GPS and have a fairly standard site (not super tall, < 5 meters).
 Pleae note changes to **rinex2snr**, **quickLook**, and **gnssir**.
 There are still optional inputs that allow you to vary things.  
+
 
 # gnssrefl
 
@@ -39,7 +40,6 @@ but I will not be updating it.
 The goal of this python repository is to help you compute (and evaluate) GNSS-based
 reflectometry parameters using geodetic data. This method is often
 called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main codes:
-
 
 * **rinex2snr** translates RINEX files into SNR files needed for analysis.
 
@@ -155,6 +155,10 @@ If you did not install a fortran translator, the command would be:
 
 *rinex2snr p041 2020 132 -fortran False* 
 
+Here is an example from a site in Greenland (the RINEX file will be picked up from unavco):
+
+*rinex2snr gls1 2011 271* 
+
 The code will also search ga (geoscience Australia), nz (New Zealand), 
 ngs, and bkg if you invoke -archive, e.g.
 
@@ -232,21 +236,23 @@ If the SNR file has not been previously stored, you can provide a properly named
 (lowercase only) in your working directory. If it doesn't find a file in either of these places, it
 will try to pick up the RINEX data from various archives (unavco, sopac, sonel, and cddis) and translate it for
 you into the correct SNR format (note: this feature might make use of the Fortran translators). 
-There are stored defaults for analyzing the spectral characteristics of the SNR data. 
+**quickLook** has stored defaults for analyzing the spectral characteristics of the SNR data. 
+IN GENERAL THESE DEFAULTS ARE MEANT TO FACILITATE USERS WHERE THE ANTENNA IS LESS
+THAN 4 METERS TALL.  If your site is taller than that, you will need to override them.
+Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
+you don't want to use, you need to override them.
+
 If you want to override those, use *quickLook -h*
 
-Here are some examples:
+Here are some examples using defaults. Both sites are about 2 meters above the reflecting surface:
 
-*quickLook p041 2020 150*  (uses defaults)
+*quickLook p041 2020 150*  
 
-*quickLook gls1 2011 271*  (uses defaults)
+*quickLook gls1 2011 271* 
 
-The defaults are inappropriate for many sites. For example, smm3 is about 15 
-meters tall. If you use the defaults you won't see anything useful. Here I am overriding
-the defaults to require that the analysis code only look at reflector heights between 
-8 and 20 meters. (I am also telling it to use snr format 99).
+*quickLook smm3 2018 271 -h1 8 -h2 20*  
 
-*quickLook smm3 2018 271 -snr 99 -h1 8 -h2 20*  
+*quickLook smm3 2018 271 -h1 8 -h2 20*  
 
 # gnssir
 
@@ -351,6 +357,9 @@ The L2C and L5 satellite lists are not time coded as they should be. I currently
 
 # Helper Codes
 
+**daily averages** is a helper code for cryosphere people interested in daily snow 
+accumulation. It can be used for lake levels. It is not for tides!
+
 **download_rinex** can be useful if you want to download RINEX v2 or 3 files (using the version flag) without using 
 the reflection-specific codes. Sample calls:
 
@@ -360,13 +369,16 @@ the reflection-specific codes. Sample calls:
 
 - *download_rinex p041 2020 150 0 -archive sopac* downloads the data from sopac archive on day of year 150 in 2020
 
-
-**daily averages** is a helper code for cryosphere people interested in daily snow 
-accumulation. It can be used for lake levels. It is not for tides!
-
 **download_orbits** does what it sounds like. Feel free to use it. 
 
-**ymd** is for those annoying days when you don't know what day of year is October 15.
+**ymd** translates year,month,day to day of year
+
+**ydoy** translates year,day of year to month and day
+
+**llh2xyz** translates latitude, longitude, and ellipsoidal ht to X, Y, Z
+
+**xyz2llh** translates Cartesian coordinates to latitude, longitude, height
+
 
 # Publications
 
