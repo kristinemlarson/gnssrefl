@@ -44,9 +44,9 @@ called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main code
 * **gnssir** computes reflector heights (RH) from GNSS data.
 
 * **quickLook** gives you a quick (visual) assessment of a file without dealing
-with the details associated with **gnssir**.
+with the details associated with **gnssir**. It is not meant to be used for routine analysis.
 
-There are also various utilities you might find to be useful (see in the last section).
+There are also various utilities you might find to be useful (see the last section).
 
 The rest of this README file is about how to install and run the code. *It is not a class about 
 GNSS interferometric reflectometry.* If you are unsure about why various 
@@ -245,17 +245,29 @@ you don't want to use, you need to override them.
 
 For more information, use *quickLook -h*
 
-Here are some examples using defaults. Both sites are about 2 meters above the reflecting surface:
+Going back to our **rinex2snr** example, try running the data for p041.
 
 *quickLook p041 2020 132*  
 
-will produce [this periodogram summary](tests/p041-l1.png). These are L1 data only.
-L2C will look like [this](tests/p041-l2c.png). To invoke L2C read the -h inputs.  
-The defaults reflector heights will not go beyond 6 meters.  You can change that 
-by telling it, e.g. h2=20, but you really aren't learrning anything about the reflector by
-doing that.
+That command will produce [this periodogram summary](tests/p041-l1.png). By default, 
+these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
+you have used the dfeaults which set that.  Furthermore, you are not able to resolve very small
+reflector heights, so there are no results shown smaller than 0.5 meters.  THESE ARE PERIODOGRAMS 
+to give you a sense of whether there is a planar reflector below your antenna.  The fact that 
+the periodograms bunch up around 2 meters means that at this site the antenna phase center
+is ~ 2 meters. The colors change as you try different satellites.  If the data are plotted in
+gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
+
+If you want to look at L2C data, [try this by invoking -freq 20](tests/p041-l2c.png). 
+In general, the results will be cleaner than L1 data (freq 1).
+The defaults reflector heights will not go beyond 6 meters.  If you had set -h2 20, it would
+look [like this](tests/p041-l2c-again.png). You aren't gaining anything by doing this.
+
+Try out the Greenland SNR file you created in the previous section.
 
 *quickLook gls1 2011 271* 
+
+
 
 *quickLook smm3 2018 271 -h1 8 -h2 20*  
 
