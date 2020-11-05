@@ -28,9 +28,9 @@ How can you learn how to run this code correctly? You can start by reading
 Although this article was originally written with matlab scripts,
 the principles are the same. If nothing else, it should explain to you what a reflection
 zone means and what a Nyquist frequency is for GNSS reflections. For sea level, 
-you have access to my web app will tell you [how high your site is above 
+my web app tells you [how high your site is above 
 sea level](https://gnss-reflections.org/geoid). My reflection zone app will [help 
-yoou pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones). 
+you pick appropriate elevation and azimuth angles](https://gnss-reflections.org/rzones). 
 At that point it really is up to you to think
 about what it means. Get to know your site. If it belongs to you, look at 
 photographs. If it doesn't belong to you, look at Google Earth. 
