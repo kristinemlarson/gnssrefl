@@ -19,21 +19,21 @@ is ! (with respect to your antenna, i.e. which azimuths are good and which are b
 Another application of this code is to measure snow accumulation. If you 
 have a bunch of obstructions near your antenna, 
 you are responsible for knowing not to use that region. If your antenna is 10 meters 
-above the reflection area, and the software default is to not go beyond 6 meters, the code
-will not tell you anything useful. It is up to you to know what is best for the site and 
+above the reflection area, and the software default only computes answers up to 6 meters,
+the code will not tell you anything useful. It is up to you to know what is best for the site and 
 modify the inputs accordingly. 
 
 How can you learn how to run this code correctly? You can start by reading
-Roesler and Larson, 2018. Although this article was originally written with matlab scripts,
+[Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
+Although this article was originally written with matlab scripts,
 the principles are the same. If nothing else, it should explain to you what a reflection
-zone is and what a Nyquist frequency is for GNSS reflections. For sea level, 
+zone means and what a Nyquist frequency is for GNSS reflections. For sea level, 
 you have access to my web app will tell you [how high your site is above 
-sea level](https://gnss-reflections.org/geoid). My reflection zone app will [give you help 
-on picking appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones). 
-But it really is up to you to think
+sea level](https://gnss-reflections.org/geoid). My reflection zone app will [help 
+yoou pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones). 
+At that point it really is up to you to think
 about what it means. Get to know your site. If it belongs to you, look at 
-pictures. If it doesn't belong to you, look at Google Earth. Sometimes an archive will
-have photo of a site - sometimes not - but you can learn a lot just by using Google Earth.
+photographs. If it doesn't belong to you, look at Google Earth. 
 
 # gnssrefl
 
