@@ -276,8 +276,8 @@ this site the antenna phase center is ~ 2 meters above the ground. The colors
 change as you try different satellites.  If the data are plotted in
 gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
 
-If you want to look at L2C data, [try this by invoking -freq 20](tests/p041-l2c.png). 
-In general, the results will be cleaner than L1 data (freq 1).
+If you want to look at L2C data, [try this by invoking -fr 20](tests/p041-l2c.png). 
+In general, the results will be cleaner than L1 data (frequency number 1 in my code).
 The defaults reflector heights will not go beyond 6 meters.  If you had set -h2 20, it would
 look [like this](tests/p041-l2c-again.png). You aren't gaining anything by doing this.
 
@@ -465,6 +465,6 @@ guts.gnssir_guts(station,year,doy, snr_type, extension, lsp)
 People that helped me with this code include Radon Rosborough, Joakim Strandberg, and Johannes Boehm. 
 I also thank Peter Shearer and Lisa Tauxe for some very nice Python lecture notes.
 
-Updated September 25, 2020
+This documentation was updated on November 5, 2020
 
 Kristine M. Larson

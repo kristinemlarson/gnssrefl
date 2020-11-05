@@ -28,6 +28,7 @@ def main():
     parser.add_argument("-nr2",default=None, type=float, help="upper limit noise region for QC(m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="peak to noise ratio used for QC")
     parser.add_argument("-allfreq", default=None, type=str, help="set to True to include all GNSS")
+    parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
     args = parser.parse_args()
 #
 
@@ -41,6 +42,10 @@ def main():
     Lat = args.lat
     Long = args.long
     Height = args.height
+
+    if args.xyz == 'True':
+        xyz = [Lat, Long, Height]
+        Lat,Long,Height = g.xyz2llhd(xyz)
 
 # start the lsp dictionary
     lsp={}
