@@ -98,9 +98,9 @@ directories in year, followed by type, i.e. snr, results, sp3, nav, and then by 
 
 If you are using the version from gitHub:
 
-* make a directory, cd into that directory, set up a virtual environment, a la python3 -m venv env 
-* activate your virtual environment
 * git clone https://github.com/kristinemlarson/gnssrefl 
+* cd into that directory, set up a virtual environment, a la python3 -m venv env 
+* activate your virtual environment
 * pip install .
 
 If you use the PyPi version:  
