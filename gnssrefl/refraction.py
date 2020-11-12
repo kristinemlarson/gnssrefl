@@ -266,7 +266,7 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
     if os.path.isfile(outfile):
         print('refraction file for this station already exists')
     else:
-        print('refraction output file will be written to ', outfile)
+        print('station specific refraction output file will be written to ', outfile)
 
 #   change to radians
         dlat = site_lat*np.pi/180 
@@ -274,20 +274,20 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
 
 #   read VMF gridfile in pickle format 
         pname = xdir + '/input/' + 'gpt_1wA.pickle'
-        print('large refraction file should be stored here:', pname)
+        print('The large refraction file should be stored here:', pname)
         try:
             f = open(pname, 'rb')
             [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
             f.close()
         except:
-            print('I did not find it, will look in current working directory')
+            print('I did not find it, I will look in current working directory')
             try:
                 pname =  'gpt_1wA.pickle'
                 f = open(pname, 'rb')
                 [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
                 f.close()
             except:
-                print('hmm, failed again. ... try yet again')
+                print('hmm, failed again. ... try yet again here: ')
                 #cwd = os.getcwd()
                 #pname =  cwd + '/data/gpt_1wA.pickle'
                 pname =   try3
@@ -298,6 +298,7 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
                     f.close()
                 except:
                     print('could not get this done')
+                    print('download the missing gpt_1wA.pickle file from github and put it in the $REFL_CODE/input directory ')
                     sys.exit()
 
 
@@ -397,7 +398,7 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
 
             w+=1
         fout.close()
-        print('file written')
+        print('station specific refraction file written')
 
 
 def corr_el_angles(el_deg, press, temp):
