@@ -37,7 +37,7 @@ photographs. If it doesn't belong to you, look at Google Earth.
 
 # gnssrefl
 
-This package is a new version of my GNSS interferometric reflectometry (GNSS_IR) code. 
+This package is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
 The main difference bewteen this version and previous versions is that I am
 attempting to use proper python packaging rules, LOL. I have separated out the main
@@ -52,10 +52,11 @@ I recommend you use the web app [I developed](https://gnss-reflections.org). It
 can show you how the technique works without installing any code. It also picks up 
 the data for you and provides results in less than 10 seconds. 
 
-# For those of you who don't like python
+# For those of you who prefer Matlab
 
-I have a [working matlab version on github](https://github.com/kristinemlarson/gnssIR_matlab_v3), 
-but I will not be updating it.
+I had a [working matlab version on github](https://github.com/kristinemlarson/gnssIR_matlab_v3), 
+but I will not be updating it. You will very likely have to make changes to accommodate the recent
+change in security protocols at CDDIS.
 
 # Overview Comments
 
@@ -65,7 +66,7 @@ called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main code
 
 * **rinex2snr** translates RINEX files into SNR files needed for analysis.
 
-* **gnssir** computes reflector heights (RH) from GNSS data.
+* **gnssir** computes reflector heights (RH) from SNR files.
 
 * **quickLook** gives you a quick (visual) assessment of a file without dealing
 with the details associated with **gnssir**. It is not meant to be used for routine analysis.
@@ -75,8 +76,10 @@ There are also various utilities you might find to be useful (see the last secti
 The rest of this README file is about how to install and run the code. *It is not a class about 
 GNSS interferometric reflectometry.* If you are unsure about why various 
 restrictions are being applied, you really need
-to read Roesler and Larson (2018) and similar. I am committed in principle to set up some online
-courses to teach people about reflections, but funding for these courses is not in hand at the moment.  
+to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
+and similar. I am committed in principle to set up some online
+courses to teach people about GNSS reflections, but funding for these courses is 
+not in hand at the moment.  
 
 # Environment Variables 
 
@@ -112,10 +115,10 @@ If you use the PyPi version:
 To use **only** python codes, you will need to be sure that your RINEX files are uncompressed (i.e.
 not using Hatanaka compression, which end in a d instead of an o). Since **many** archives use 
 Hatanaka compression, this will significantly
-limit what you can do. Second thing to know is that you should use the -fortran False flag 
+limit what you can do. The second thing to know is that you should use the -fortran False flag 
 when you make SNR files because the default behavior is to assume you are using fortran 
 translators (gnssSNR.e or gpsSNR.e). Finally, you will not be able to use RINEX 3 files because
-I rely on the gfzrnx RINEX3 to RINEX2 translator.
+I rely on the **gfzrnx** RINEX3 to RINEX2 translator.
 
 # Non-Python Code 
 
@@ -152,7 +155,7 @@ There is no reason to save ALL the RINEX data as the reflections are only useful
 angles. The default is to save all data with elevation lower than 30 degrees (this is called SNR format 66).
 Another SNR choice is 99, which saves elevation angle data between 5 and 30.  
 
-There are rules for naming RINEX files. I **require** that RINEX (version 2) be lowercase.
+There are rules for naming RINEX files. **My code requires that RINEX (version 2) files be lowercase.**
 The filename must be 12 characters long (ssssddd0.yyo), where ssss is station name, 
 ddd is day of year, followed by a zero, yy is the two character year and o stands for observation. 
 If you have installed the CRX2RNX code, you can also provide a compressed RINEX format file, which ends in a d.
@@ -172,7 +175,6 @@ to GPS satellites, on day of year 132 and year 2020 would be:
 
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
 it will check four archives (unavco, sopac, cddis, and sonel) to find it. 
-
 If you did not install a fortran translator, the command would be:
 
 *rinex2snr p041 2020 132 -fortran False* 
@@ -186,7 +188,8 @@ ngs, and bkg if you invoke -archive, e.g.
 
 *rinex2snr tgho 2020 132 -archive nz*
 
-What if you want to run the code for all the data for a given year?  
+What if you want to run the code for all the data for a given year?  This command 
+analyzes all the data from the year 2019.
 
 *rinex2snr tgho 2019 1  -archive nz -doy_end 365* 
  
@@ -207,14 +210,12 @@ Here are some examples for RINEX 3 conversions:
 
 *rinex2snr mkea00usa 2020 290*
 
-*rinex2snr p36000usa 2020 290*
-
 The snr options are mostly based on the need to remove the "direct" signal. This is 
 not related to a specific site mask and that is why the most frequently used 
 options (99 and 66) have a maximum elevation angle of 30 degrees. The
 azimuth-specific mask is decided later when you need to run **gnssir**.  The SNR choices are:
 
-- 66 is elevation angles less than 30 degrees (the default)
+- 66 is elevation angles less than 30 degrees (**this is the default**)
 - 99 is elevation angles of 5-30 degrees  
 - 88 is elevation angles of 5-90 degrees
 - 50 is elevation angles less than 10 degrees (good for very tall sites, high-rate applications)
@@ -222,7 +223,7 @@ azimuth-specific mask is decided later when you need to run **gnssir**.  The SNR
 
 *orbit file options for general users:*
 
-- gps : will use GPS broadcast orbits **the default**
+- gps : will use GPS broadcast orbits (**this is the default**)
 - gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 - gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
 
@@ -231,7 +232,7 @@ azimuth-specific mask is decided later when you need to run **gnssir**.  The SNR
 - nav : GPS broadcast, perfectly adequate for reflectometry. 
 - igs : IGS precise, GPS only
 - igr : IGS rapid, GPS only
-- jax : JAXA, GPS + Glonass, within a few days
+- jax : JAXA, GPS + Glonass, within a few days, very reliable
 - gbm : GFZ Potsdam, multi-GNSS, not rapid
 - grg: French group, GPS, Galileo and Glonass, not rapid
 - wum : Wuhan, multi-GNSS, not rapid
@@ -244,7 +245,7 @@ Other questions:
 the files online? Use -nolook True
 
 There is a **rate** command line input that has two values, high or low. However, if you invoke high,
-it currently only looks at unavco. Please beware - it takes a long time to download a 
+it currently only looks at the UNAVCO archive. Please beware - it takes a long time to download a 
 highrate GNSS RINEX file (even when it is compressed). 
 And it also takes a long time to compute orbits for it (and thus create a SNR file).
 
@@ -262,8 +263,8 @@ archives (unavco, sopac, sonel, and cddis) and translate it for
 you into the correct SNR format (note: this feature might make use of the Fortran translators). 
 
 **quickLook** has stored defaults for analyzing the spectral characteristics of the SNR data. 
-IN GENERAL THESE DEFAULTS ARE MEANT TO FACILITATE USERS WHERE THE ANTENNA IS LESS
-THAN 5 METERS TALL.  If your site is taller than that, you will need to override them.
+**In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**
+If your site is taller than that, you will need to override them.
 Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
 you don't want to use, you need to override them.
 
@@ -275,9 +276,10 @@ Going back to our **rinex2snr** example, try running the data for p041.
 
 That command will produce [this periodogram summary](tests/p041-l1.png). By default, 
 these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
-you have used the dfeaults which set that.  Furthermore, you are not able to resolve very small
-reflector heights, so there are no results shown smaller than 0.5 meters. These are periodograms  
-to give you a sense of whether there is a planar reflector below your antenna. The fact that 
+you have used the defaults.  Furthermore, note that results on the x-axis begin at 0.5 meters.
+Since you are not able to resolve very small reflector heights with this method, this region 
+is not allowed. These periodograms give you a sense of whether there is a 
+planar reflector below your antenna. The fact that 
 the peaks in the periodograms bunch up around 2 meters means that at 
 this site the antenna phase center is ~ 2 meters above the ground. The colors 
 change as you try different satellites.  If the data are plotted in
@@ -310,7 +312,7 @@ to examine this site on Google Earth.
 
 # gnssir
 
-This is the main driver for the reflectometry code.  
+This is the main driver for the GNSS interferometric reflectometry code.  
 
 You need a set of instructions which can be made using **make_json_input**.  
 At a minimum **make_json_input** needs the station name (4 char), the latitude (degrees), 
@@ -318,8 +320,10 @@ longitude (degrees) and ellipsoidal height (meters). This location does not
 have to be cm-level for the reflections code.
 Within a few hundred meters is sufficient.  
 
-
 *make_json_input p101 41.692 -111.236 2016.1* 
+
+If you happen to have the Cartesian coordinates (in meters), you can set -xyz True and input those instead of 
+lat, long, and height.
 
 It will use defaults for other parameters if you do not provide them. Those defaults 
 tell the code an azimuth and elevation angle mask (i.e. which directions you want 
@@ -328,9 +332,8 @@ Right now the default frequencies are GPS L1 and L2C and a peak to noise ratio o
 This is fine for water, but I would suggest higher for snow (3.5). GPS L5 provides excellent data,
 but very few geodesists track it, so it is not currently a default. The output file will be put in 
 $REFL_CODE/input/p101.json. You should look at it to get an idea of the kinds of inputs the code will be using.
-
-You can edit the json file directly, or you can set some of the parameters from the command line.
-For example, if you only want to use elevation angles between 5 and 10 degrees:
+The default azimuths can be changed, but need to be done by hand. Some parameters can be set
+via the command line, a la
 
 *make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10* 
 
@@ -412,7 +415,7 @@ The L2C and L5 satellite lists are not time coded as they should be. I currently
 # Helper Codes
 
 **daily averages** is a helper code for cryosphere people interested in daily snow 
-accumulation. It can be used for lake levels. It is not for tides!
+accumulation. It can be used for lake levels. **It is not to be used for tides!**
 
 **download_rinex** can be useful if you want to download RINEX v2 or 3 files (using the version flag) without using 
 the reflection-specific codes. Sample calls:
@@ -465,7 +468,6 @@ lsp = guts.read_json_file(station, extension)
 year = 2020; doy = 150; snr_type =  99 
 guts.gnssir_guts(station,year,doy, snr_type, extension, lsp)
 ```
-
 
 # Acknowledgements
 

@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import subprocess
+import sys
 
 import gnssrefl.gps as g
 
@@ -38,6 +39,11 @@ def main():
 # rename the user inputs into variables
 #
     station = args.station
+    NS = len(station)
+    if (NS != 4):
+        print('station name must be four characters long. Exiting.')
+        sys.exit()
+
 # location of the site - does not have to be very good.  within 100 meters is fine
     Lat = args.lat
     Long = args.long
