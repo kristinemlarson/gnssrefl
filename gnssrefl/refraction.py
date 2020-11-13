@@ -100,7 +100,7 @@ def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
 
 
 # change the reference epoch to January 1 2000
-    print('Modified Julian Day', dmjd)
+    #print('Modified Julian Day', dmjd)
     dmjd1 = dmjd-51544.5 
 
     pi2 = 2*np.pi
@@ -116,7 +116,7 @@ def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
 
 # factors for amplitudes, i.e. whether you want time varying
     if (it==1):
-        print('>>>> no refraction time variation ')
+        #print('>>>> no refraction time variation ')
         cosfy = 0; coshy = 0; sinfy = 0; sinhy = 0;
     else: 
         cosfy = np.cos(pi2*dmjd1/365.25)
@@ -252,9 +252,9 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
     """
     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(PROJECT_ROOT)
-    print(PROJECT_ROOT)
+    #print(PROJECT_ROOT)
     # this appears to be the one i want
-    print(BASE_DIR)
+    #print(BASE_DIR)
     try3 = PROJECT_ROOT + '/' + 'gpt_1wA.pickle'
 
     # check that output path exists.  
@@ -264,9 +264,10 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
 
     outfile = outpath + station + '_refr.txt'
     if os.path.isfile(outfile):
-        print('refraction file for this station already exists')
+        okokok = 1
+        #print('refraction file for this station already exists')
     else:
-        print('station specific refraction output file will be written to ', outfile)
+        print('A station specific refraction output file will be written to ', outfile)
 
 #   change to radians
         dlat = site_lat*np.pi/180 

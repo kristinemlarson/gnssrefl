@@ -29,14 +29,13 @@ def read_snr_multiday(obsfile,obsfile2,twoDays):
     #e2 = 15
     try:
 #       this will be 24 hours - all in one calendar day 
-        print('>>>>>>>>>>>>>>>>>>>>> try to read file 1:')
+#        print('>>>>>>>>>>>>>>>>>>>>> try to read file 1:')
         compressedObs = obsfile + '.xz'
         if (os.path.isfile(compressedObs) == True):
             print('compressed file exists, so uncompress it')
             subprocess.call(['unxz', compressedObs])
         sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE = read_one_snr(obsfile,1)
         allGood1 = 1
-#        print(ele)
 #        g.print_file_stats(ele,sat,s1,s2,s5,s6,s7,s8,e1,e2)
     except:
         print('failed to read the first SNR file')
@@ -73,7 +72,7 @@ def read_snr_multiday(obsfile,obsfile2,twoDays):
             if (os.path.isfile(compressedObs) == True):
                 print('compressed file exists, so uncompress it')
                 cmd = 'unxz ' + compressedObs; os.system(cmd)
-            print('>>>>>>>>>>>>>>>>>>>>> try to read last three hours of file 2:')
+            #print('>>>>>>>>>>>>>>>>>>>>> try to read last three hours of file 2:')
             Psat, Pele, Pazi, Pt, Pedot, Ps1, Ps2, Ps5, Ps6, Ps7, Ps8, PsnrE = read_one_snr(obsfile2,2)
             allGood2 = 1
         except: 
@@ -101,7 +100,7 @@ def read_one_snr(obsfile,ifile):
     """
 
     sat=[]; ele=[]; az=[]; t=[]; edot=[]; s=[];  s2=[]; s5=[];  s6=[]; s7=[];  s8=[];
-#SNR existance array : s0, s1,s2,s3,s4,s5,s6,s7,s8.  fields 0,3,4 are always false
+#SNR existence array : s0, s1,s2,s3,s4,s5,s6,s7,s8.  fields 0,3,4 are always false
 #
 
     snrE = np.array([False, True, True,False,False,True,True,True,True],dtype = bool)
@@ -150,7 +149,6 @@ def read_one_snr(obsfile,ifile):
         s5 = f[:,8]
         if (sum(s5) > 0):
             s5 = s5/20; s5 = np.power(10,s5)  
-        print(len(s5))
     if c > 9:
         s7 = f[:,9]
         if (sum(s7) > 0):

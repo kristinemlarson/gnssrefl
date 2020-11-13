@@ -82,9 +82,9 @@ def main():
         extension = args.extension
 
     lsp = guts.read_json_file(station, extension)
-    print(lsp)
+    #print(lsp)
     # now check the overrides to the json instructions
-    print('plt argument', args.plt)
+    #print('plt argument', args.plt)
     if args.plt == 'True':
         lsp['plt_screen'] = True
     elif args.plt == 'False':
@@ -102,11 +102,13 @@ def main():
             lsp['wantCompression'] = False
 
 
+    #print(lsp['screenstats'], 'screenstats from json')
+    # do you override them?
     if args.screenstats == 'False':
-        print('no statistics will come to the screen')
+        print('No statistics will come to the screen')
         lsp['screenstats'] = False
-    else:
-        print('no statistics will come to the screen')
+    if args.screenstats == 'True':
+        print('Statistics will come to the screen')
         lsp['screenstats'] = True
 
 # in case you want to analyze multiple days of data
@@ -130,10 +132,10 @@ def main():
         print('LSP results will not be overwritten')
 
     if (args.e1 != None):
-        print('overriding minimum elevation angle: ',args.e1)
+        print('Overriding minimum elevation angle: ',args.e1)
         lsp['e1'] = float(args.e1)
     if (args.e2 != None):
-        print('overriding maximum elevation angle: ',args.e2)
+        print('Overriding maximum elevation angle: ',args.e2)
         lsp['e2'] = float(args.e2)
 
 # number of azimuth regions 
@@ -158,25 +160,21 @@ def main():
 # rather than using the input restrictions
     if args.fr != None:
         lsp['freqs'] = [args.fr]
-        print('overriding frequency choices')
+        print('Overriding frequency choices')
     if args.ampl != None:
-        print('overriding amplitude choices')
+        print('Overriding amplitude choices')
         lsp['reqAmp'] = [args.ampl]
 
     if args.sat != None:
-        print('overriding - only looking at a single satellite')
+        print('Overriding - only looking at a single satellite')
         lsp['onesat'] = [args.sat]
 
 
-    #print(lsp)
-
     year_list = list(range(year, year_end+1))
     doy_list = list(range(doy, doy_end+1))
-    print(doy_list)
     for year in year_list:
         for doy in doy_list:
             guts.gnssir_guts(station,year,doy, snr_type, extension,lsp)
-
 
 if __name__ == "__main__":
     main()

@@ -2284,9 +2284,10 @@ def open_outputfile(station,year,doy,extension):
     july 2020, no longer open frej file
     """
     if os.path.isdir('logs'):
-        print('log directory exists')
+        skippingxist = True
+        #print('log directory exists')
     else:
-        print('making log directory ')
+        #print('making log directory ')
         subprocess.call(['mkdir', 'logs'])
     fout = 0
 #   primary reflector height output goes to this directory
@@ -2303,7 +2304,7 @@ def open_outputfile(station,year,doy,extension):
 #    filepath1 =  filedir + '/' + cdoy  + '.txt'
 #   changed to a function
     filepath1,fexit = LSPresult_name(station,year,doy,extension)
-    print('output will go to:', filepath1)
+    #print('Output will go to:', filepath1)
     try:
         fout=open(filepath1,'w+')
 #       put a header in the output file
@@ -2452,7 +2453,7 @@ def doy2ymd(year, doy):
     """
 
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
-    print('ymd',d)
+    #print('ymd',d)
     return d 
 
 def getMJD(year,month,day,fract_hour):
@@ -3087,17 +3088,17 @@ def LSPresult_name(station,year,doy,extension):
     # this is now also done in the result_directories function,
     # but I guess no harm is done
     if not os.path.isdir(filedir):
-        print('making new results bdirectory ')
+        #print('making new results bdirectory ')
         subprocess.call(['mkdir', filedir])
     filedirx = filedir + '/' + extension
     # this is what you do if there is an extension
     if not os.path.isdir(filedirx):
-        print('making new results subdirectory ')
+        #print('making new results subdirectory ')
         subprocess.call(['mkdir', filedirx])
 
     filepath1 =  filedirx + '/' + cdoy  + '.txt'
 
-    print('output for this date will go to:', filepath1)
+    #print('output for this date will go to:', filepath1)
     if os.path.isfile(filepath1):
         #print('A result file already exists')
         fileexists = True
@@ -3133,8 +3134,8 @@ def result_directories(station,year,extension):
         f1 = f1 + '/' + extension
         if not os.path.isdir(f1):
             subprocess.call(['mkdir',f1])
-    else:
-        print('no extension')
+    #else:
+        #print('no extension')
 
     f1 = xdir + '/' + cyear + '/phase'
     if not os.path.isdir(f1):

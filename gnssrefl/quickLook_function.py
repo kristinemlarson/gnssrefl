@@ -30,7 +30,7 @@ def read_snr_simple(obsfile):
     try:
         f = np.genfromtxt(obsfile,comments='%')
         r,c = f.shape
-        print('read_snr_simple, Number of rows:', r, ' Number of columns:',c)
+        #print('read_snr_simple, Number of rows:', r, ' Number of columns:',c)
         sat = f[:,0]; ele = f[:,1]; azi = f[:,2]; t =  f[:,3]
         edot =  f[:,4]; s1 = f[:,6]; s2 = f[:,7]; s6 = f[:,5]
         s1 = np.power(10,(s1/20))  

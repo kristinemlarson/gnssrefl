@@ -30,6 +30,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp'] 
     plot_screen = lsp['plt_screen'] 
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
+    #print('value of screenstats ', screenstats, lsp['screenstats'])
     azval = lsp['azval']
 
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
@@ -47,22 +48,23 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     twoDays = False
     obsfile2= '' # dummy value for name of file for the day before, when we get to that
     fname, resultExist = g.LSPresult_name(station,year,doy,extension) 
+    print('Results are written to:', fname)
 
-    if (resultExist):
-        print('Results already exist on disk')
+    #if (resultExist):
+    #    print('Results already exist on disk')
     if (lsp['overwriteResults'] == False) & (resultExist == True):
         allGood = 0
-        print('>>>>> The result file exists for this day and you have selected the do not overwrite option')
+        print('>>>>> The result file already exists for this day and you have selected the do not overwrite option')
         sys.exit()
-    print('go ahead and access SNR data - first define SNR filename')
+    #print('go ahead and access SNR data - first define SNR filename')
     obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
-    print(obsfile, 'snrexistence',snre,' and ', snr_type)
+    #print(obsfile, 'snrexistence',snre,' and ', snr_type)
     if (not snre) and (not lsp['seekRinex']):
-        print('SNR file does not exist and you have set the seekRinex variable to False')
+        print('The SNR file does not exist and you have set the seekRinex variable to False')
         print('Use rinex2snr.py to make SNR files')
         sys.exit()
     if (not snre) and lsp['seekRinex']:
-        print('SNR file does not exist. I will try to make a GPS only file.')
+        print('The SNR file does not exist. I will try to make a GPS only file using the Fortran option.')
         rate = 'low'; dec_rate = 0; orbtype = 'nav'
         g.quick_rinex_snrC(year, doy, station, snr_type, orbtype,rate, dec_rate)
 
@@ -76,10 +78,14 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         total_arcs = 0
         ct = 0
         for f in freqs:
-            if plot_screen: fig, (ax1, ax2) = plt.subplots(2, 1)
+            if plot_screen: 
+                # no idea if this will work
+                fig, (ax1, ax2) = plt.subplots(2, 1,figsize=(10,7))
+                #axes = fig.subplots(2, 2)
+                #fig = Figure(figsize=(10,6))
             rj = 0
             gj = 0
-            print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'YYYY/MM/DD', year, month, day )
+            print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
 #   get the list of satellites for this frequency
             if onesat == None:
                 satlist = g.find_satlist(f,snrE)
@@ -104,7 +110,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                         okPk = True
                         if abs(maxF - minH) < 0.10: #  peak too close to min value
                             okPk = False
-                            print('found a peak too close to the edge of the restricted RH region')
+                            #print('found a peak too close to the edge of the restricted RH region')
                         if okPk & (delT < lsp['delTmax']) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
                             fout.write(" {0:4.0f} {1:3.0f} {2:6.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} \n".format(year,doy,maxF,satNu, UTCtime, avgAzim,maxAmp,eminObs,emaxObs,Nv, f,riseSet, Edot2, maxAmp/Noise, delT, MJD,irefr)) 
                             gj +=1
@@ -144,7 +150,7 @@ def set_refraction_params(station, dmjd,lsp):
         it = 1
         dlat = lsp['lat']*np.pi/180; dlong = lsp['lon']*np.pi/180; ht = lsp['ht']
         p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
-        print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
+        #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
 
     return p,T,irefr
 
@@ -152,7 +158,7 @@ def apply_refraction_corr(lsp,ele,p,T):
     """
     """
     if lsp['refraction']:
-        print('<<<<<< apply refraction correction >>>>>>')
+        #print('<<<<<< apply refraction correction >>>>>>')
         corrE = refr.corr_el_angles(ele, p,T)
         ele = corrE
 
@@ -173,9 +179,11 @@ def plot2screen(station, f,ax1,ax2,pltname):
     painful painful
     https://www.semicolonworld.com/question/57658/matplotlib-adding-an-axes-using-the-same-arguments-as-a-previous-axes
     """
-    print(pltname)
+    #print(pltname)
     ax2.set_xlabel('Reflector Height (m)'); 
-    ax2.set_title('SNR periodogram')
+    #ax2.set_title('SNR periodogram')
+    ax2.set_ylabel('SNR periodogram')
+    ax1.set_ylabel('volts/volts')
     ax1.set_xlabel('Elevation Angles (deg)')
     ax1.set_title(station + ' SNR Data and Frequency L' + str(f))
     plt.show()
