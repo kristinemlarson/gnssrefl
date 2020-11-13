@@ -129,17 +129,17 @@ they are optional, that's fine. FYI, the python version is slow
 not because of the RINEX - it is because you need to calculate
 a crude model for satellite coordinates in this code. And that takes cpu time....
 
-* Required Translator for compressed RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html
+* Required Translator for compressed RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. **You must put this executable in the EXE area.**
 
-* Optional Fortran RINEX Translator for GPS, the executable must be called gpsSNR.e, https://github.com/kristinemlarson/gpsonlySNR
+* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e and it must be in the EXE area.** For the code: https://github.com/kristinemlarson/gpsonlySNR
 
-* Optional Fortran RINEX translator for multi-GNSS, the executable must be called gnssSNR.e, https://github.com/kristinemlarson/gnssSNR
+* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e and it must be in the EXE area.** For the code: https://github.com/kristinemlarson/gnssSNR
 
 * Optional datatool, teqc, is highly recommended.  There is a list of static executables at the
-bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html)
+bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). **It must be stored in the EXE area.**
 
 * Optional datatool, gfzrnx is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
-http://dx.doi.org/10.5880/GFZ.1.1.2016.002
+http://dx.doi.org/10.5880/GFZ.1.1.2016.002. **You must store it in the EXE area.**
 
 
 # rinex2snr - making SNR files from RINEX files
