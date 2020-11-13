@@ -135,10 +135,10 @@ a crude model for satellite coordinates in this code. And that takes cpu time...
 
 * Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e and it must be in the EXE area.** For the code: https://github.com/kristinemlarson/gnssSNR
 
-* Optional datatool, teqc, is highly recommended.  There is a list of static executables at the
+* Optional datatool, **teqc**, is highly recommended.  There is a list of static executables at the
 bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). **It must be stored in the EXE area.**
 
-* Optional datatool, gfzrnx is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
+* Optional datatool, **gfzrnx** is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. **You must store it in the EXE area.**
 
 
