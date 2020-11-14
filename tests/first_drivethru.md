@@ -1,4 +1,6 @@
-# First drivethru This is a test case for GNSS interferometric reflectometry. 
+# First drivethru 
+
+This is a test case for GNSS interferometric reflectometry. 
 It does not explain everything about the technique, the code, or 
 the site we will be using, but it will provide some tests you can use 
 to make sure you have properly installed the code. For details about the technique, 
@@ -13,12 +15,16 @@ Install either the github or the pypi version of gnssrefl
 
 Make the requested environment variables. 
 
-Strongly urged: put CRXRNX in the EXE are area. Make sure it is executable
+Put CRXRNX in the EXE are area. Make sure it is executable
 
-There are use cases in the gnssrefl documentation that you can try.
+There are use cases in the **gnssrefl** documentation that you can try.
 
 If you know how to compile Fortran code, I strongly urge you to download/compile the requested
 codes and install those executables in the correct place.
+
+FWIW, I have had times when archives have apprently blocked me (?). When I turn on my VPN,
+all is well. I have not investigated this in any detail - except that the one archive
+I contacted denied that they block anyone. So take that for what you will. 
 
 # Test the code for p041
 
@@ -30,43 +36,95 @@ This antenna is ~2 meters tall.
 
 [Get an idea of the reflection zones for a site that is 2 meters tall.](https://gnss-reflections.org/rzones)
 
-
-Make a SNR file using the defaults: 
+Make a SNR file using the defaults (if you have Fortran installed): 
 
 *rinex2snr p041 2020 132*
+
+If you don't have Fortran installed:
+
+*rinex2snr p041 2020 132 -fortran false*
 
 Lets look at the spectral characteristics of the SNR data for the default L1 settings:
 
 *quickLook p041 2020 132* [png](p041-l1.png)
 
+The four subplots show you different regions around the antenna. The x-axis tells you 
+reflector height (RH) and the y-axis gives you the spectral amplitude of the SNR data.
+The multiple colors are used to depict different satellites that rise or set over that
+section (quadrant) of the field at P041. Which colors go to which satelliets is not super important.
+The goal of this exercise is to notice that the peaks of those periodograms are lining up
+around an x value of 2 meters. You also see some skinnier gray data - and those are **failed periodograms.**
+This means that the code doesn't believe the results are relevant.  I did not originally plot failed
+periodograms, but people asked for them, and I do think it is useful to see that there is some
+quality control being used in this code.
+
+I will also point out that these are the data from an excellent receiver, a Septentrio.
+Not all receivers produce L1 data that are as nice as these.
+
 Now try L2C:
 
 *quickLook p041 2020 132 -fr 20* [png](p041-l2c.png)
 
-Now try L5:
+One thing you can notice here is that there are more colors in the L1 plots than in the L2C 
+plots. That is simply the result of the fact that there are more L1 satellites than L2C satellites.
+
+Now try L5. These are FABULOUS satellites, but unfortunately there are not a lot of them:
+
 *quickLook p041 2020 132 -fr 5* 
 
+You can try different things to test the code. For example, change the height restrictions:
 
-# Test the code on ice
+*quickLook p041 2020 132 -h1 0.5 -h2 10* 
 
-Now use lorg.  The data are archived at UNAVCO.  Get some coordinates for the site, either lat,long,ht
-or XYZ. The coordinates do not have to be super precise (within 100 meters is fine).
+**quickLook** is meant to be a visual assessment of the spectral characteristics. However, 
+it does print out the answers to a file called rh.txt
+
+# Test the code on a longer dataset on the ice
+
+Now we will look at a station called lorg. 
+
+The data are archived at UNAVCO.  
+
+Get some coordinates for the site, either lat,long,ht or XYZ. 
+Use the [UNAVCO DAI](https://www.unavco.org/data/gps-gnss/data-access-methods/dai2/app/dai2.html#4Char=LORG;scope=Station;sampleRate=both;4CharMod=contains) if you like.
+Or you can try the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/LORG.sta).
+
+The coordinates do not have to be super precise (within 100 meters is fine).
 
 **Exercise for the reader:** get a photograph of lorg from UNAVCO. If you cannot find it at their site,
-email them and ask them to provide it.
+email david.mencin@unavco.org and ask him to post it.
 
-You can try out lorg here, though Google Maps does not have imagery. https://gnss-reflections.org/rzones
+You need to make some snr files. This time we will do eight months or so. 
+And we will restrict the search to the unavco archive. Here I say fortran is False, but 
+of course if you have installed it, you can use it and the exercise will run faster.
 
+*rinex2snr lorg 2019 1 -doy_end 233 -fortran False -archive unavco*
 
+Use **quickLook** for one file. 
 
-Just in general, what do you think the azimuth mask should be?  Based on your reading, Elevation angle mask?
+Compare the periodograms for frequencies 1, 20 and 5. 
 
-Make SNR files for station lorg, year 2019, doy 1 through 233
+Now let's get ready to run **gnssir**. This is the code that saves the output.
+First you need to make a set of file instructions. If you use defaults, you only
+need the station name, lat, lon, and ht. Make this file using **make_json_input**.
 
-Do a quickLook for one file using the defaults. What frequency is displayed?  Compare frequencies 1,2 and 5.  Note the differences. Now run frequency 20.  How is that different than frequency 2?
-Make a json input for station lorg. Use defaults. (Why is that reasonable?)
-Run gnssir for all the SNR data.
-Try out daily_avg using median filter of 0.25 meters and ReqTrack of 50. It should let you use different frequencies.  Try that out.  
-Figure out how to save the output of daily_avg - both to a text file and to a plot.  
+Run **gnssir** for all the SNR data.
 
+*gnssir lorg 2019 1 -doy_end 233*
 
+The code will tell you which satellites it is looking at and give you an overview for 
+the estimated reflector heights. You can turn off these statistics in the json (screenstats).
+The default does not send any plots to the screen - and you definitely do not want it to if you arer analyzing
+233 days of data. But if you want to look at the plots for a single day, that is an option in the json 
+and at the command line.
+
+The reflector height results are stored in REFL_CODE/2019/results/lorg. You can concatenate 
+the daily files and create your own daily average values (which is what is appropriate for this site), or you can 
+use **daily_avg**. To avoid using outliers in these daily averages, a median filter is set.  I recommend 
+0.25 m and ReqTrack of 50 at this site.
+
+*daily_avg lorg 0.25 50*
+
+The first plot is [all the data](lorg_1.png) (and very quite colorful). Once you delete it,
+the second plot gives you the [daily averages](lorg_2.png). There are also optional inputs for saving
+a text file of the daily averages.  The plot is stored at REFL_CODE/Files/lorg_RH.png 
