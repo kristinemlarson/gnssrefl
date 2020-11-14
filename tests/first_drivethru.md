@@ -15,7 +15,7 @@ Install either the github or the pypi version of gnssrefl
 
 Make the requested environment variables. 
 
-Put CRXRNX in the EXE are area. Make sure it is executable
+Put CRX2RNX in the EXE are area. Make sure it is executable
 
 There are use cases in the **gnssrefl** documentation that you can try.
 
