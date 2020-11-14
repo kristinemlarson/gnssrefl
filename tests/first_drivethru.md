@@ -1,25 +1,53 @@
-# Getting Started with gnssrefl
+# First drivethru This is a test case for GNSS interferometric reflectometry. 
+It does not explain everything about the technique, the code, or 
+the site we will be using, but it will provide some tests you can use 
+to make sure you have properly installed the code. For details about the technique, 
+you should start with reading [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
+which was published open option.  
 
-This is a test case for GNSS interferometric reflectometry. 
-It is not meant to explain everything about the technique, the code, or 
-the site we are using. You really should read Roesler and Larson (2018) first.
+# Install the gnssrefl code 
 
-# Install the code
+Read the [gnssrefl documentation](https://github.com/kristinemlarson/gnssrefl). 
 
-Read the gnssrefl documentation.
+Install either the github or the pypi version of gnssrefl
 
-Install either the github or the pypi version. 
+Make the requested environment variables. 
 
-Make requested environment variables.
+Strongly urged: put CRXRNX in the EXE are area. Make sure it is executable
 
-Put CRXRNX in the EXE are area. Make sure it is executable
+There are use cases in the gnssrefl documentation that you can try.
+
+If you know how to compile Fortran code, I strongly urge you to download/compile the requested
+codes and install those executables in the correct place.
+
+# Test the code for p041
+
+I will use a site in Boulder, Colorado (p041) using the bare bones code (mostly with defaults)
+
+Start with [a photo of P041](https://gnss-reflections.org/static/images/P041.jpg)
+
+This antenna is ~2 meters tall. 
+
+[Get an idea of the reflection zones for a site that is 2 meters tall.](https://gnss-reflections.org/rzones)
 
 
-# Set up the code to run for a single site 
+Make a SNR file using the defaults: 
 
-Start with p041.  
+*rinex2snr p041 2020 132*
+
+Lets look at the spectral characteristics of the SNR data for the default L1 settings:
+
+*quickLook p041 2020 132* [png](p041-l1.png)
+
+Now try L2C:
+
+*quickLook p041 2020 132 -fr 20* [png](p041-l2c.png)
+
+Now try L5:
+*quickLook p041 2020 132 -fr 5* 
 
 
+# Test the code on ice
 
 Now use lorg.  The data are archived at UNAVCO.  Get some coordinates for the site, either lat,long,ht
 or XYZ. The coordinates do not have to be super precise (within 100 meters is fine).
