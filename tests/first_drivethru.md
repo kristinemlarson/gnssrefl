@@ -100,13 +100,16 @@ of course if you have installed it, you can use it and the exercise will run fas
 
 *rinex2snr lorg 2019 1 -doy_end 233 -fortran False -archive unavco*
 
-Use **quickLook** for one file. 
+If you want to look at a SNR file, they are stored in REFL_CODE/2019/snr/lorg
+
+I recommend that you use **quickLook** for one file. This gives you an idea of the quality of the site.
 
 Compare the periodograms for frequencies 1, 20 and 5. 
 
 Now let's get ready to run **gnssir**. This is the code that saves the output.
 First you need to make a set of file instructions. If you use defaults, you only
 need the station name, lat, lon, and ht. Make this file using **make_json_input**.
+The json output will be stored in REFL_CODE/input/lorg.json
 
 Run **gnssir** for all the SNR data.
 
@@ -125,6 +128,10 @@ use **daily_avg**. To avoid using outliers in these daily averages, a median fil
 
 *daily_avg lorg 0.25 50*
 
-The first plot is [all the data](lorg_1.png) (and very quite colorful). Once you delete it,
+The first plot is [all the data](lorg_1.png) (and very colorful). Once you delete it,
 the second plot gives you the [daily averages](lorg_2.png). There are also optional inputs for saving
 a text file of the daily averages.  The plot is stored at REFL_CODE/Files/lorg_RH.png 
+This is not yet perfect - as there are some outliers which I have circled in red for you. 
+
+In this exercise you used L1, L2C, and L5. Your reflector heights are telling you snow accumulation
+changes at lorg. 
