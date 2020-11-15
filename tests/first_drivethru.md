@@ -48,6 +48,8 @@ Lets look at the spectral characteristics of the SNR data for the default L1 set
 
 *quickLook p041 2020 132* [png](p041-l1.png)
 
+![L1 periodogram!](p041-l1.png)
+
 The four subplots show you different regions around the antenna. The x-axis tells you 
 reflector height (RH) and the y-axis gives you the spectral amplitude of the SNR data.
 The multiple colors are used to depict different satellites that rise or set over that
