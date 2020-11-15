@@ -146,14 +146,14 @@ def main():
     plt.gca().invert_yaxis()
     pltname = txtdir + '/' + station + '_RH.png'
     plt.savefig(pltname)
-    #print('png file saved: ', pltname)
+    print('png file saved as: ', pltname)
 
     # default is to show the plot
     if plt2screen:
         plt.show()
 
     if txtfile == 'None':
-        print('no txt output file name has been provided, so no results are written')
+        print('no output file name has been provided, so no results are written')
     else:
     # sort the time tags
         ii = np.argsort(obstimes)

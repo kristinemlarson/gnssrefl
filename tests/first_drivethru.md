@@ -67,6 +67,8 @@ Now try L2C:
 
 *quickLook p041 2020 132 -fr 20* [png](p041-l2c.png)
 
+![L2C periodogram!](p041-l2c.png)
+
 One thing you can notice here is that there are more colors in the L1 plots than in the L2C 
 plots. That is simply the result of the fact that there are more L1 satellites than L2C satellites.
 
@@ -81,9 +83,9 @@ You can try different things to test the code. For example, change the height re
 **quickLook** is meant to be a visual assessment of the spectral characteristics. However, 
 it does print out the answers to a file called rh.txt
 
-# Test the code on a longer dataset on the ice
+# Test the code on a longer dataset 
 
-Now we will look at a station called lorg. 
+Now we will look at a station called lorg. This site is on the Ross Ice Shelf, Antarctica. 
 
 The data are archived at UNAVCO.  
 
@@ -94,7 +96,7 @@ Or you can try the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/sta
 The coordinates do not have to be super precise (within 100 meters is fine).
 
 **Exercise for the reader:** get a photograph of lorg from UNAVCO. If you cannot find it at their site,
-email david.mencin@unavco.org and ask him to post it.
+email dmencin@unavco.org and ask him to post it.
 
 You need to make some snr files. This time we will do eight months or so. 
 And we will restrict the search to the unavco archive. Here I say fortran is False, but 
@@ -111,17 +113,31 @@ Compare the periodograms for frequencies 1, 20 and 5.
 Now let's get ready to run **gnssir**. This is the code that saves the output.
 First you need to make a set of file instructions. If you use defaults, you only
 need the station name, lat, lon, and ht. Make this file using **make_json_input**.
-The json output will be stored in REFL_CODE/input/lorg.json
+The json output will be stored in REFL_CODE/input/lorg.json.
+[Here is a sample.](lorg.json)
 
-Run **gnssir** for all the SNR data.
+Run **gnssir** for all the SNR files you made in the previous section.
 
 *gnssir lorg 2019 1 -doy_end 233*
 
 The code will tell you which satellites it is looking at and give you an overview for 
 the estimated reflector heights. You can turn off these statistics in the json (screenstats).
+Or from the command line:
+
+*gnssir lorg 2019 1 -doy_end 233 -screenstats False*
+
 The default does not send any plots to the screen - and you definitely do not want it to if you arer analyzing
 233 days of data. But if you want to look at the plots for a single day, that is an option in the json 
-and at the command line.
+and at the command line:
+
+
+*gnssir lorg 2019 1 -screenstats False -plt True* 
+
+Unlike **quickLook**, here you get the periodograms for each frequency all together.
+To see the next frequency, you need to eliminate the current plot, etc.
+
+We can certainly clean these results up by eliminating various azimuths and requiring stronger peaks in 
+the periodograms.
 
 The reflector height results are stored in REFL_CODE/2019/results/lorg. You can concatenate 
 the daily files and create your own daily average values (which is what is appropriate for this site), or you can 
@@ -131,9 +147,13 @@ use **daily_avg**. To avoid using outliers in these daily averages, a median fil
 *daily_avg lorg 0.25 50*
 
 The first plot is [all the data](lorg_1.png) (and very colorful). Once you delete it,
-the second plot gives you the [daily averages](lorg_2.png). There are also optional inputs for saving
-a text file of the daily averages.  The plot is stored at REFL_CODE/Files/lorg_RH.png 
+the second plot gives you the [daily averages](lorg_2.png). 
+
+![daily averages for lorg!](lorg_2.png)
+
+There are also optional inputs for saving a text file of the daily averages. 
+The plot is stored at REFL_CODE/Files/lorg_RH.png 
 This is not yet perfect - as there are some outliers which I have circled in red for you. 
 
-In this exercise you used L1, L2C, and L5. Your reflector heights are telling you snow accumulation
-changes at lorg. 
+In this exercise you used L1, L2C, and L5 signals (i.e. only GPS data). Your reflector heights are telling you 
+about snow accumulation changes at lorg.  
