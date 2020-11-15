@@ -46,13 +46,13 @@ yourself or do it all from the command line. This should also - hopefully - make
 it easier for the production of Jupyter notebooks. The latter are to be developed
 by UNAVCO with NASA GNSS Science Team funding.
 
-# For those of you who don't like reading documentation
+# If you would like to try out reflectometry without installing the code
 
 I recommend you use the web app [I developed](https://gnss-reflections.org). It 
-can show you how the technique works without installing any code. It also picks up 
-the data for you and provides results in less than 10 seconds. 
+can show you representative results with minimal constraints. It should provide 
+results in less than 10 seconds.
 
-# For those of you who prefer Matlab
+# If you prefer Matlab
 
 I had a [working matlab version on github](https://github.com/kristinemlarson/gnssIR_matlab_v3), 
 but I will not be updating it. You will very likely have to make changes to accommodate the recent
@@ -62,7 +62,7 @@ change in security protocols at CDDIS.
 
 The goal of this python repository is to help you compute (and evaluate) GNSS-based
 reflectometry parameters using geodetic data. This method is often
-called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main codes:
+called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modules:
 
 * **rinex2snr** translates RINEX files into SNR files needed for analysis.
 
@@ -93,7 +93,7 @@ year and sp3 or nav depending on the orbit format.
 * REFL_CODE = where the reflection code inputs (SNR files and instructions) and outputs (RH)
 will be stored (see below). Both SNR files and results will be saved here in year subdirectories.
 
-However, if you do not do this, the code will assume your local working directory (where you installed
+If you don't define these environment variables, the code should assume your local working directory (where you installed
 the code) is where you want everything to be. The orbits, SNR files, and periodogram results are stored in 
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
@@ -393,9 +393,13 @@ can use it as a test.
 What should the periodogram plots look like? Until we have Jupyter notebooks, I 
 recommend you look at 
 [the paper I wrote with Carolyn Roesler](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
-or the [question section of my web app.](https://gnss-reflections.org). Note that a failed
+or the [question section of my web app.](https://gnss-reflections.org/overview). Note that a failed
 arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
+
+Quality Control is currently set by requiring a minimum amplitude and a peak to noise ratio.
+Both of these are set in the json and you are free to change them. I find a peak to noise of 
+3.5 is good for snow - but should be a little smaller for water.  
 
 # Bugs/Features I know about 
 
@@ -408,7 +412,7 @@ If there is interest, I will ask UNAVCO to implement the Fortran translation cod
 and compile it for you as part of the pypi install). But doing this myself is well beyond my skillset. 
 
 No phase center offsets have been applied to these reflector heights. While these values are relatively small,
-we do plan to remove them in subsequent versions of the code.
+we do plan to remove them in subsequent versions of the code. 
 
 The L2C and L5 satellite lists are not time coded as they should be. I currently use a list from 2020.
 
