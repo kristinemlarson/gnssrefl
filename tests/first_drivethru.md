@@ -9,17 +9,17 @@ which was published open option.
 
 # Install the gnssrefl code 
 
-Make sure wget exists on your machine.  If you type which wget and something comes back, you should be good.
+Make sure **wget** exists on your machine.  If you type *which wget* and something comes back, you should be good.
 
 Read the [gnssrefl documentation](https://github.com/kristinemlarson/gnssrefl). 
+Note that there are some utilities described at the end of the code that you might
+find to be useful.
 
 Install either the github or the pypi version of gnssrefl
 
 Make the requested environment variables. 
 
 Put CRX2RNX in the EXE are area. Make sure it is executable
-
-There are use cases in the **gnssrefl** documentation that you can try.
 
 If you know how to compile Fortran code, I strongly urge you to download/compile the requested
 codes and install those executables in the correct place.
@@ -83,7 +83,8 @@ You can try different things to test the code. For example, change the height re
 *quickLook p041 2020 132 -h1 0.5 -h2 10* 
 
 **quickLook** is meant to be a visual assessment of the spectral characteristics. However, 
-it does print out the answers to a file called rh.txt
+it does print out the answers to a file called rh.txt. If you want to assess changes in the reflection
+environment around a GPS/GNSS sites, i.e. look at multiple days, please read on.
 
 # Test the code on a longer dataset  - cryosphere
 
@@ -199,16 +200,13 @@ Make a daily average (since you only have L1 at this site, I am requiring 30 tra
 
 *daily_avg gls1 0.25 30*
 
-The first plot:
+The plots:
 
 <img src="gls1-1.png" width="500"/>
-
-The second:
-
 <img src="gls1-2.png" width="500"/>
 
-That is what I call a lot of melt!
+That is what I call a lot of melt! If you want the reflector height answers, set the requested txt 
+output filename in **daily_avg**.
 
 
-
-
+# Under Construction: Test the code on a lake
