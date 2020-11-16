@@ -201,11 +201,11 @@ Make a daily average (since you only have L1 at this site, I am requiring 30 tra
 
 The first plot:
 
-![gls1-1!](gls1-1.png)
+![gls1-1!](gls1-1.png =250x)
 
 The second:
 
-![gls1-2!](gls1-2.png)
+![gls1-2!](gls1-2.png =250x)
 
 That is what I call a lot of melt!
 
