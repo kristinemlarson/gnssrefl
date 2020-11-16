@@ -50,7 +50,7 @@ Lets look at the spectral characteristics of the SNR data for the default L1 set
 
 *quickLook p041 2020 132* [png](p041-l1.png)
 
-![L1 periodogram!](p041-l1.png)
+<img src="p041-l1.png" width="400"/>
 
 The four subplots show you different regions around the antenna. The x-axis tells you 
 reflector height (RH) and the y-axis gives you the spectral amplitude of the SNR data.
@@ -69,7 +69,7 @@ Now try L2C:
 
 *quickLook p041 2020 132 -fr 20* [png](p041-l2c.png)
 
-![L2C periodogram!](p041-l2c.png)
+<img src="p041-l2c.png" width="400"/>
 
 One thing you can notice here is that there are more colors in the L1 plots than in the L2C 
 plots. That is simply the result of the fact that there are more L1 satellites than L2C satellites.
@@ -151,7 +151,7 @@ use **daily_avg**. To avoid using outliers in these daily averages, a median fil
 The first plot is [all the data](lorg_1.png) (and very colorful). Once you delete it,
 the second plot gives you the [daily averages](lorg_2.png). 
 
-![daily averages for lorg!](lorg_2.png)
+<img src="lorg_2.png" width="400"/>
 
 There are also optional inputs for saving a text file of the daily averages. 
 The plot is stored at REFL_CODE/Files/lorg_RH.png 
@@ -188,7 +188,7 @@ Look at the first one - make sure that the RH defaults are big enough to include
 
 *quickLook gls1 2012 1 -e1 7 -e2 25*
 
-![January 1, 2012 for gls1!](gls1-example.png)
+<img src="gls1-example.png" width="400"/>
 
 Analyze all the 2012 data:
 
@@ -201,15 +201,14 @@ Make a daily average (since you only have L1 at this site, I am requiring 30 tra
 
 The first plot:
 
-![gls1-1!](gls1-1.png)
+<img src="gls1-1.png" width="400"/>
 
 The second:
 
-![gls1-2!](gls1-2.png)
+<img src="gls1-2.png" width="400"/>
 
 That is what I call a lot of melt!
 
 
-<img src="gls1-1.png" width="200"/>
 
 
