@@ -548,14 +548,20 @@ def rinex_unavco(station, year, month, day):
         print('found the rinex file')
     except:
         print('did not find observation file, try hatanaka version')
-        try:
-            wget.download(url2,filename2)
-            status = subprocess.call(['uncompress', filename2])
-            status = subprocess.call([crnxpath, rinexfiled])
-            status = subprocess.call(['rm', '-f', rinexfiled])
-            print('found d file and converted to observation file')
-        except:
-            print('failed to find either RINEX file at unavco')
+        if os.path.exists(crnxpath):
+            try:
+                wget.download(url2,filename2)
+                status = subprocess.call(['uncompress', filename2])
+                status = subprocess.call([crnxpath, rinexfiled])
+                status = subprocess.call(['rm', '-f', rinexfiled])
+                print('found d file and converted to observation file')
+            except:
+                print('download from unavco failed in some way')
+        else:
+            print('WARNING WARNING WARNING WARNING')
+            print('You are trying to convert Hatanaka files without having the proper')
+            print('executable, CRX2RNX. See links in the gnssrefl documentation')
+
 
 
 def rinex_sopac(station, year, month, day):
@@ -574,28 +580,28 @@ def rinex_sopac(station, year, month, day):
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
 
     crnxpath = hatanaka_version()
+    if os.path.exists(crnxpath):
+        sopac = 'ftp://garner.ucsd.edu'
+        oname,fname = rinex_name(station, year, month, day) 
+        file1 = fname + '.Z'
+        path1 = '/pub/rinex/' + cyyyy + '/' + cdoy + '/' 
+        url1 = sopac + path1 + file1 
 
-    #doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    sopac = 'ftp://garner.ucsd.edu'
-    oname,fname = rinex_name(station, year, month, day) 
-    # compressed version??
-    file1 = fname + '.Z'
-    path1 = '/pub/rinex/' + cyyyy + '/' + cdoy + '/' 
-    url1 = sopac + path1 + file1 
+        try:
+            wget.download(url1,file1)
+            subprocess.call(['uncompress', file1])
+            subprocess.call([crnxpath, fname])
+            subprocess.call(['rm', '-f',fname])
+            print('successful Hatanaka download from SOPAC ')
+        except:
+            print('not able to download from SOPAC',file1)
+            subprocess.call(['rm', '-f',file1])
+            subprocess.call(['rm', '-f',fname])
+    else:
+        print('WARNING WARNING WARNING WARNING')
+        print('You are trying to convert Hatanaka files without having the proper')
+        print('executable, CRX2RNX. See links in the gnssrefl documentation')
 
-    #file2 = oname   + '.Z'
-    #path2 = '/pub/rinex/' + cyyyy + '/' + cdoy + '/' 
-    #url2 = sopac + path2 + file2 
-    try:
-        wget.download(url1,file1)
-        subprocess.call(['uncompress', file1])
-        subprocess.call([crnxpath, fname])
-        subprocess.call(['rm', '-f',fname])
-        print('successful Hatanaka download from SOPAC ')
-    except:
-        print('not able to download from SOPAC',file1)
-        subprocess.call(['rm', '-f',file1])
-        subprocess.call(['rm', '-f',fname])
 
 def rinex_sonel(station, year, month, day):
     """
@@ -612,18 +618,22 @@ def rinex_sonel(station, year, month, day):
     file1 = fname + '.Z'
     path1 = '/gps/data/' + cyyyy + '/' + cdoy + '/' 
     url = sonel + path1 + file1 
-    print(url)
 
-    # I don't think they have normal RINEX, so only hatanaka
-    try:
-        wget.download(url,file1)
-        subprocess.call(['uncompress', file1])
-        subprocess.call([crnxpath, fname])
-        subprocess.call(['rm', '-f',fname])
-        print('successful Hatanaka download from SONEL ')
-    except:
-        print('some kind of problem with Hatanaka download from SONEL',file1)
-        subprocess.call(['rm', '-f',file1])
+
+    if os.path.exists(crnxpath):
+        try:
+            wget.download(url,file1)
+            subprocess.call(['uncompress', file1])
+            subprocess.call([crnxpath, fname])
+            subprocess.call(['rm', '-f',fname])
+            print('successful Hatanaka download from SONEL ')
+        except:
+            print('some kind of problem with Hatanaka download from SONEL',file1)
+            subprocess.call(['rm', '-f',file1])
+    else:
+        print('WARNING WARNING WARNING WARNING')
+        print('You are trying to convert Hatanaka files without having the proper')
+        print('executable, CRX2RNX. See links in the gnssrefl documentation')
 
 def rinex_cddis(station, year, month, day):
     """

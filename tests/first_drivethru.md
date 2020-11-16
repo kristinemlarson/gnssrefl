@@ -9,6 +9,8 @@ which was published open option.
 
 # Install the gnssrefl code 
 
+Make sure wget exists on your machine.  If you type which wget and something comes back, you should be good.
+
 Read the [gnssrefl documentation](https://github.com/kristinemlarson/gnssrefl). 
 
 Install either the github or the pypi version of gnssrefl
@@ -83,19 +85,18 @@ You can try different things to test the code. For example, change the height re
 **quickLook** is meant to be a visual assessment of the spectral characteristics. However, 
 it does print out the answers to a file called rh.txt
 
-# Test the code on a longer dataset 
+# Test the code on a longer dataset  - cryosphere
 
 Now we will look at a station called lorg. This site is on the Ross Ice Shelf, Antarctica. 
-
 The data are archived at UNAVCO.  
 
 Get some coordinates for the site, either lat,long,ht or XYZ. 
 Use the [UNAVCO DAI](https://www.unavco.org/data/gps-gnss/data-access-methods/dai2/app/dai2.html#4Char=LORG;scope=Station;sampleRate=both;4CharMod=contains) if you like.
 Or you can try the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/LORG.sta).
-
 The coordinates do not have to be super precise (within 100 meters is fine).
 
-**Exercise for the reader:** get a photograph of lorg from UNAVCO. If you cannot find it at their site,
+**Exercise for the reader:** It is always nice to have a photograph of site. Try to
+get a photograph of lorg from the UNAVCO website. If you cannot find it at there,
 email dmencin@unavco.org and ask him to post it.
 
 You need to make some snr files. This time we will do eight months or so. 
@@ -126,10 +127,10 @@ Or from the command line:
 
 *gnssir lorg 2019 1 -doy_end 233 -screenstats False*
 
-The default does not send any plots to the screen - and you definitely do not want it to if you arer analyzing
-233 days of data. But if you want to look at the plots for a single day, that is an option in the json 
+The default does not send any plots to the screen - and you definitely 
+do not want it to if you are analyzing 233 days of data. But if you want 
+to look at the plots for a single day, that is an option in the json 
 and at the command line:
-
 
 *gnssir lorg 2019 1 -screenstats False -plt True* 
 
@@ -140,7 +141,8 @@ We can certainly clean these results up by eliminating various azimuths and requ
 the periodograms.
 
 The reflector height results are stored in REFL_CODE/2019/results/lorg. You can concatenate 
-the daily files and create your own daily average values (which is what is appropriate for this site), or you can 
+the daily files and create your own daily average values (which is 
+what is appropriate for this site), or you can 
 use **daily_avg**. To avoid using outliers in these daily averages, a median filter is set.  I recommend 
 0.25 m and ReqTrack of 50 at this site.
 
@@ -157,3 +159,54 @@ This is not yet perfect - as there are some outliers which I have circled in red
 
 In this exercise you used L1, L2C, and L5 signals (i.e. only GPS data). Your reflector heights are telling you 
 about snow accumulation changes at lorg.  
+
+# Test the code on a longer dataset  - Dye 2, Greenland
+
+The site is called gls1.  Here we will only analyze the data from 2012.  The data are archived at UNAVCO.
+The dataset is discussed extensively in this [open option paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf).
+
+**Exercise for the reader:** find a photograph of the site at UNAVCO
+
+Coordinates: 
+
+Use the [UNAVCO DAI](https://www.unavco.org/data/gps-gnss/data-access-methods/dai2/app/dai2.html#4Char=GLS1;scope=Station;sampleRate=both;4CharMod=contains) if you like.
+Or you can try the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/GLS1.sta).
+
+This site was originally installed with an elevation mask. Later it was changed. To keep things the 
+same, I strongly prefer that hte same mask is used throughout.  Meaning:
+
+
+*make_json_input gls1 66.479 -46.310 2148.578 -h1 0.5 -h2 8 -e1 7 -e2 25*
+
+The make_json_input defaults are to use all GPS frequencies. However, the standard L2 data are really not useful. It is better 
+to simply use L1 (L5 has never been tracked). Handedit the json to remove L2 and L5. It should look [like this.](gls1.json)
+Now make some SNR files for the year 2012:
+
+*rinex2snr gls1 2012 1 -doy_end 365*
+
+Look at the first one - make sure that the RH defaults are big enough to include the answer:
+
+*quickLook gls1 2012 1 -e1 7 -e2 25*
+
+![January 1, 2012 for gls1!](gls1-example.png)
+
+Analyze all the 2012 data:
+
+*gnssir gls1 2012 1 -doy_end 365
+
+
+Make a daily average (since you only have L1 at this site, I am requiring 30 tracks instead of 50)
+
+*daily_avg gls1 0.25 30*
+
+The first plot:
+
+![gls1-1!](gls1-1.png)
+
+The second:
+
+![gls1-2!](gls1-2.png)
+
+That is what I call a lot of melt!
+
+
