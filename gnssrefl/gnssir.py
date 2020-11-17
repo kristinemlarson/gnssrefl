@@ -55,22 +55,24 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     if (lsp['overwriteResults'] == False) & (resultExist == True):
         allGood = 0
         print('>>>>> The result file already exists for this day and you have selected the do not overwrite option')
-        sys.exit()
+        #sys.exit()
     #print('go ahead and access SNR data - first define SNR filename')
-    obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
+    else:
+        obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
     #print(obsfile, 'snrexistence',snre,' and ', snr_type)
-    if (not snre) and (not lsp['seekRinex']):
-        print('The SNR file does not exist and you have set the seekRinex variable to False')
-        print('Use rinex2snr.py to make SNR files')
-        sys.exit()
-    if (not snre) and lsp['seekRinex']:
-        print('The SNR file does not exist. I will try to make a GPS only file using the Fortran option.')
-        rate = 'low'; dec_rate = 0; orbtype = 'nav'
-        g.quick_rinex_snrC(year, doy, station, snr_type, orbtype,rate, dec_rate)
+    # removing this option
+    #if (not snre) and (not lsp['seekRinex']):
+    #    print('The SNR file does not exist and you have set the seekRinex variable to False')
+    #    print('Use rinex2snr.py to make SNR files')
+    #    #sys.exit()
+    #    allGood = 0
+    #if (not snre) and lsp['seekRinex']:
+    #    print('The SNR file does not exist. I will try to make a GPS only file using the Fortran option.')
+    #    rate = 'low'; dec_rate = 0; orbtype = 'nav'
+    #    g.quick_rinex_snrC(year, doy, station, snr_type, orbtype,rate, dec_rate)
 
-    allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays)
-    snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays) 
-    # SNR exists - go ahead
+        allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays)
+        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays) 
     if (allGood == 1):
         ele=apply_refraction_corr(lsp,ele,p,T)
         fout,frej = g.open_outputfile(station,year,doy,extension) 

@@ -365,7 +365,7 @@ Things that are helpful to know for the json and commandline inputs:
 - screenstats, boolean, whether minimal periodogram results come to screen
 - refraction, boolean, whether simple refraction model is applied.
 - plt_screen: boolean, whether SNR data and periodogram are plotted to the screen
-- seekRinex: boolean, whether code looks for RINEX at an archive
+- (*this option has been removed*) seekRinex: boolean, whether code looks for RINEX at an archive
 
 
 Simple example for my favorite GPS site [p041](https://spotlight.unavco.org/station-pages/p042/eo/scientistPhoto.jpg)

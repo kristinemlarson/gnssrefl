@@ -659,12 +659,19 @@ def rinex_cddis(station, year, month, day):
     file1 = oname + '.Z'
     url = cddis + '/pub/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'o/' + file1
 
+    file2 = oname + '.gz'
+    url2 = cddis + '/pub/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'o/' + file2
+
     # try new way using secure ftp
     dir_secure = '/pub/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'o/'
     file_secure = file1
 
+    # they say they are going to use gzip - but apparently not yet
+    #print('try the gzip way')
+    #cddis_download(file2,dir_secure)
+    #subprocess.call(['gunzip', file2])
+
     try:
-        #wget.download(url,file1)
         cddis_download(file_secure,dir_secure)
         subprocess.call(['uncompress', file1])
     except:

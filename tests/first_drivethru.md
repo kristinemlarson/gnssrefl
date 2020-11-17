@@ -19,7 +19,7 @@ Install either the github or the pypi version of gnssrefl
 
 Make the requested environment variables. 
 
-Put CRX2RNX in the EXE are area. Make sure it is executable
+Put CRX2RNX in the EXE area. Make sure it is executable
 
 If you know how to compile Fortran code, I strongly urge you to download/compile the requested
 codes and install those executables in the correct place.
@@ -30,11 +30,9 @@ I contacted denied that they block anyone. So take that for what you will.
 
 # Test the code for p041
 
-I will use a site in Boulder, Colorado (p041) using the bare bones code (mostly with defaults)
-
-Start with [a photo of P041](https://gnss-reflections.org/static/images/P041.jpg)
-
-This antenna is ~2 meters tall. 
+I will use a site in Boulder, Colorado (p041) using the bare bones code.  
+Start by looking at [a photo of p041](https://gnss-reflections.org/static/images/P041.jpg).
+The p041 antenna is ~2 meters tall. 
 
 [Get an idea of the reflection zones for a site that is 2 meters tall.](https://gnss-reflections.org/rzones)
 
@@ -83,10 +81,10 @@ You can try different things to test the code. For example, change the height re
 *quickLook p041 2020 132 -h1 0.5 -h2 10* 
 
 **quickLook** is meant to be a visual assessment of the spectral characteristics. However, 
-it does print out the answers to a file called rh.txt. If you want to assess changes in the reflection
+it does print out the answers to a file called *rh.txt*. If you want to assess changes in the reflection
 environment around a GPS/GNSS sites, i.e. look at multiple days, please read on.
 
-# Test the code on a longer dataset  - cryosphere
+# Test the code on a longer dataset  - Cryosphere Example
 
 Now we will look at a station called lorg. This site is on the Ross Ice Shelf, Antarctica. 
 The data are archived at UNAVCO.  
@@ -106,16 +104,16 @@ of course if you have installed it, you can use it and the exercise will run fas
 
 *rinex2snr lorg 2019 1 -doy_end 233 -fortran False -archive unavco*
 
-If you want to look at a SNR file, they are stored in REFL_CODE/2019/snr/lorg
+If you want to look at a SNR file, they are stored in $REFL_CODE/2019/snr/lorg
 
 I recommend that you use **quickLook** for one file. This gives you an idea of the quality of the site.
 
-Compare the periodograms for frequencies 1, 20 and 5. 
+Compare the periodograms for frequencies 1, 20 (L2C) and 5. 
 
 Now let's get ready to run **gnssir**. This is the code that saves the output.
 First you need to make a set of file instructions. If you use defaults, you only
 need the station name, lat, lon, and ht. Make this file using **make_json_input**.
-The json output will be stored in REFL_CODE/input/lorg.json.
+The json output will be stored in $REFL_CODE/input/lorg.json.
 [Here is a sample.](lorg.json)
 
 Run **gnssir** for all the SNR files you made in the previous section.
@@ -141,7 +139,7 @@ To see the next frequency, you need to eliminate the current plot, etc.
 We can certainly clean these results up by eliminating various azimuths and requiring stronger peaks in 
 the periodograms.
 
-The reflector height results are stored in REFL_CODE/2019/results/lorg. You can concatenate 
+The reflector height results are stored in $REFL_CODE/2019/results/lorg. You can concatenate 
 the daily files and create your own daily average values (which is 
 what is appropriate for this site), or you can 
 use **daily_avg**. To avoid using outliers in these daily averages, a median filter is set.  I recommend 
@@ -158,8 +156,9 @@ There are also optional inputs for saving a text file of the daily averages.
 The plot is stored at REFL_CODE/Files/lorg_RH.png 
 This is not yet perfect - as there are some outliers which I have circled in red for you. 
 
-In this exercise you used L1, L2C, and L5 signals (i.e. only GPS data). Your reflector heights are telling you 
-about snow accumulation changes at lorg.  
+In this exercise you used L1, L2C, and L5 signals (i.e. only GPS data). Your reflector heights (RH) are telling you 
+about snow accumulation changes at lorg. You should notice that when I plot RH, I reverse the y-axis so 
+as RH gets smaller, that means the snow layer is increasing.
 
 # Test the code on a longer dataset  - Dye 2, Greenland
 
@@ -209,4 +208,66 @@ That is what I call a lot of melt! If you want the reflector height answers, set
 output filename in **daily_avg**.
 
 
-# Under Construction: Test the code on a lake
+# Test the code on a lake
+
+tgho is operated by GNS in New Zealand.  It is on Lake Taupo.
+
+<img src="http://gnss-reflections.org/static/images/TGHO.jpg"/>
+
+The receiver does not track L2C and it is not clear to me that L5 data are available. However, Glonass L1 and L2 are 
+tracked, which is a good thing. It uses geodetic sampling rate - 30 sec - which is not great but acceptable for this 
+reflector height, which appears to be ~ 4 meters.
+
+Let's make a SNR file and take a quick look at the spectral characteristics. Because of all the 
+clutter at the site and the dielectric constant of water, I am going to emphasize the lower elevation angles.
+
+*rinex2snr tgho 2020 300 -archive nz*
+
+*quickLook tgho 2020 300 -e1 5 -e2 15*
+
+<img src="tgho-default.png" width="500"/>
+
+There is a lot of clutter at the small RH values.  So try again, windowing:
+
+<img src="tgho-better.png" width="500"/>
+
+Why don't I like default L2 data?
+
+<img src="tgho-l2.png" width="500"/>
+
+Now make a SNR file that includes both GPS and Glonass:
+
+*rinex2snr tgho 2020 303 -archive nz -orb gps+glo*
+
+Look at the Glonass L1 results. Very nice.
+
+*quickLook tgho 2020 303 -e1 5 -e2 15 -fr 101*
+
+<img src="tgho-glonass-l1.png" width="500"/>
+
+
+You need to set an azimuth mask at this site. I will rely on the work of
+Lucas Holden at RMIT. Currently this needs to be done by hand-editing the json.
+So, first make the standard json with height and elevation angle settings:
+
+*make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3.2*
+
+Hand edit to only look at L1, Glonass L1 (freq 101) and Glonass L2 (freq 102) and 
+include an azimuth mask. [Sample here](tgho.json).
+
+Now let's run a couple months of data for this site to see what Lake Taupo is up to,
+say 9/1/2020 through 11/14/2020
+
+Use **ymd** to find the day of years for these dates.
+
+*rinex2snr tgho 2020 245 -archive nz -doy_end 319 -orb gps+glo*
+
+Then:
+
+*gnssir tgho 2020 245 -doy_end 319 -screenstats False*
+
+Of course if you want some screenstats, you can leave that part out.
+
+Remember, the RH results are in $REFL_CODE/2020/results/tgho. Since this is a lake, you can 
+use **daily_avg** to give you a daily value.
+
