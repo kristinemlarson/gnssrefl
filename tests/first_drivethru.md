@@ -1,4 +1,4 @@
-# First drivethru 
+# First drivethru of gnssrefl
 
 This is a test case for GNSS interferometric reflectometry. 
 It does not explain everything about the technique, the code, or 
@@ -84,7 +84,7 @@ You can try different things to test the code. For example, change the height re
 it does print out the answers to a file called *rh.txt*. If you want to assess changes in the reflection
 environment around a GPS/GNSS sites, i.e. look at multiple days, please read on.
 
-# Test the code on a longer dataset  - Cryosphere Example
+# Test the code on a longer dataset  - Ross Ice Shelf 
 
 Now we will look at a station called lorg. This site is on the Ross Ice Shelf, Antarctica. 
 The data are archived at UNAVCO.  
@@ -229,9 +229,11 @@ clutter at the site and the dielectric constant of water, I am going to emphasiz
 
 There is a lot of clutter at the small RH values.  So try again, windowing:
 
+*quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8*
+
 <img src="tgho-better.png" width="500"/>
 
-Why don't I like default L2 data?
+Why don't I like L2 data?
 
 <img src="tgho-l2.png" width="500"/>
 
@@ -241,7 +243,7 @@ Now make a SNR file that includes both GPS and Glonass:
 
 Look at the Glonass L1 results. Very nice.
 
-*quickLook tgho 2020 303 -e1 5 -e2 15 -fr 101*
+*quickLook tgho 2020 303 -e1 5 -e2 15 -fr 101 -h1 2 -h2 8*
 
 <img src="tgho-glonass-l1.png" width="500"/>
 
@@ -253,16 +255,16 @@ So, first make the standard json with height and elevation angle settings:
 *make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3.2*
 
 Hand edit to only look at L1, Glonass L1 (freq 101) and Glonass L2 (freq 102) and 
-include an azimuth mask. [Sample here](tgho.json).
+include an azimuth mask. Note: I also set a higher peak to noise than the default and 
+I increased the required amplitude to 9. [Sample json here](tgho.json).
 
 Now let's run a couple months of data for this site to see what Lake Taupo is up to,
-say 9/1/2020 through 11/14/2020
-
-Use **ymd** to find the day of years for these dates.
+say 9/1/2020 through 11/14/2020. Use **ymd** to find the day of year for these dates.
+Make sure you ask for the NZ archive and the correct orbits:
 
 *rinex2snr tgho 2020 245 -archive nz -doy_end 319 -orb gps+glo*
 
-Then:
+Then analyze the data:
 
 *gnssir tgho 2020 245 -doy_end 319 -screenstats False*
 
