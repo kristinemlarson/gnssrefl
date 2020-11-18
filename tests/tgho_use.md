@@ -1,4 +1,4 @@
-# Test the code on a lake
+# Lake Taupo
 
 Station tgho is operated by GNS in New Zealand.  It is on Lake Taupo.
 
@@ -49,15 +49,15 @@ Hand edit to only look at L1, Glonass L1 (freq 101) and Glonass L2 (freq 102) an
 include an azimuth mask. [Sample json here](tgho.json).
 Note that I increased the required amplitude to 9 for all frequencies. 
 
-Now let's run a couple months of data for this site to see what Lake Taupo is up to,
-say 9/1/2020 through 11/14/2020. Use **ymd** to find the day of year for these dates.
+Now let's run a longer dataset for this site to see what Lake Taupo is up to,
+say 5/9/2020 through 11/14/2020. Use **ymd** to find the day of year for these dates.
 Make sure you ask for the NZ archive and the correct orbits:
 
-*rinex2snr tgho 2020 245 -archive nz -doy_end 319 -orb gps+glo*
+*rinex2snr tgho 2020 130 -archive nz -doy_end 319 -orb gps+glo*
 
 Then analyze the data:
 
-*gnssir tgho 2020 245 -doy_end 319 -screenstats False*
+*gnssir tgho 2020 130 -doy_end 319 -screenstats False*
 
 Of course if you want some screenstats, you can leave that part out.
 
@@ -66,6 +66,6 @@ use **daily_avg** to give you a daily value. I used this command:
 
 *daily_avg tgho 0.25 50*
 
-<img src="tgho-two-months.png" width="500"/>
+<img src="tgho-six-months.png" width="500"/>
 
 
