@@ -1,4 +1,4 @@
-# First drivethru of gnssrefl
+### First drivethru of gnssrefl
 
 This is a test case for GNSS interferometric reflectometry. 
 It does not explain everything about the technique, the code, or 
@@ -7,7 +7,7 @@ to make sure you have properly installed the code. For details about the techniq
 you should start with reading [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
 which was published open option.  
 
-# Install the gnssrefl code 
+### Install the gnssrefl code 
 
 Make sure **wget** exists on your machine.  If you type *which wget* and something comes back, you should be good.
 
@@ -28,7 +28,7 @@ FWIW, I have had times when archives have apprently blocked me (?). When I turn 
 all is well. I have not investigated this in any detail - except that the one archive
 I contacted denied that they block anyone. So take that for what you will. 
 
-# Test the code for p041
+### Test the code for p041
 
 I will use a site in Boulder, Colorado (p041) to show you some of the features of the code and the data.
 The p041 antenna is ~2 meters tall. The site is relatively planar and free of obstructions.
@@ -91,7 +91,7 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 Note: If you want to look at Glonass and Galileo signals, you need to create SNR files using the -orb gnss flag.
 I believe Beidou signals are tracked at this site, but the data are not available in the RINEX 2 file.
 
-# Use Cases (Under Development)
+### Use Cases (Under Development)
 
 * [Ross Ice Shelf](lorg_use.md)
 
