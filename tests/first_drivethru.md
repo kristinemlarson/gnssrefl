@@ -30,14 +30,17 @@ I contacted denied that they block anyone. So take that for what you will.
 
 # Test the code for p041
 
-I will use a site in Boulder, Colorado (p041) using the bare bones code.  
-The p041 antenna is ~2 meters tall. 
+I will use a site in Boulder, Colorado (p041) to show you some of the features of the code and the data.
+The p041 antenna is ~2 meters tall. The site is relatively planar and free of obstructions.
+Since October 2018 the site has operated a Septentrio receiver. It has multi-GNSS signals in the 
+default RINEX file and is archived at UNAVCO.
+
 <img src="https://gnss-reflections.org/static/images/P041.jpg" width="500">
 
 I have made a web tool to give you an idea of the [reflection zones for a site that is 2 meters tall.](https://gnss-reflections.org/rzones)
 You should only need to enter the station name and the reflector height (2 meters).
 
-Make a SNR file using the defaults (if you have Fortran installed): 
+First you need to make a SNR file. I will use the defaults, which only translates the GPS signals. If you have Fortran installed: 
 
 *rinex2snr p041 2020 132*
 
@@ -77,13 +80,16 @@ Now try L5. These are FABULOUS satellites, but unfortunately there are not a lot
 
 *quickLook p041 2020 132 -fr 5* 
 
-You can try different things to test the code. For example, change the height restrictions:
+You can try different things to test the code. For example, you can change the height restrictions:
 
 *quickLook p041 2020 132 -h1 0.5 -h2 10* 
 
 **quickLook** is meant to be a visual assessment of the spectral characteristics. However, 
 it does print out the answers to a file called *rh.txt*. If you want to assess changes in the reflection
 environment around a GPS/GNSS sites, i.e. look at multiple days, please look at these use cases I have compiled.
+
+Note: If you want to look at Glonass and Galileo signals, you need to create SNR files using the -orb gnss flag.
+I believe Beidou signals are tracked at this site, but the data are not available in the RINEX 2 file.
 
 # Use Cases (Under Development)
 
