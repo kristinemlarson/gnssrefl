@@ -1,4 +1,4 @@
-# IMPORTANT
+### IMPORTANT
 
 CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
 implemented security restrictions, we have had to change our download access. 
@@ -35,7 +35,7 @@ At that point it really is up to you to think
 about what it means. Get to know your site. If it belongs to you, look at 
 photographs. If it doesn't belong to you, look at Google Earth. 
 
-# gnssrefl
+### gnssrefl
 
 This package is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
@@ -46,19 +46,19 @@ yourself or do it all from the command line. This should also - hopefully - make
 it easier for the production of Jupyter notebooks. The latter are to be developed
 by UNAVCO with NASA GNSS Science Team funding.
 
-# If you would like to try out reflectometry without installing the code
+### If you would like to try out reflectometry without installing the code
 
 I recommend you use the web app [I developed](https://gnss-reflections.org). It 
 can show you representative results with minimal constraints. It should provide 
 results in less than 10 seconds.
 
-# If you prefer Matlab
+### If you prefer Matlab
 
 I had a [working matlab version on github](https://github.com/kristinemlarson/gnssIR_matlab_v3), 
 but I will not be updating it. You will very likely have to make changes to accommodate the recent
 change in security protocols at CDDIS.
 
-# Overview Comments
+### Overview Comments
 
 The goal of this python repository is to help you compute (and evaluate) GNSS-based
 reflectometry parameters using geodetic data. This method is often
@@ -81,7 +81,7 @@ and similar. I am committed in principle to set up some online
 courses to teach people about GNSS reflections, but funding for these courses is 
 not in hand at the moment.  
 
-# Environment Variables 
+### Environment Variables 
 
 You should define three environment variables:
 
@@ -97,7 +97,7 @@ If you don't define these environment variables, the code should assume your loc
 the code) is where you want everything to be. The orbits, SNR files, and periodogram results are stored in 
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
-# Python
+### Python
 
 If you are using the version from gitHub:
 
@@ -120,7 +120,7 @@ when you make SNR files because the default behavior is to assume you are using 
 translators (gnssSNR.e or gpsSNR.e). Finally, you will not be able to use RINEX 3 files because
 I rely on the **gfzrnx** RINEX3 to RINEX2 translator.
 
-# Non-Python Code 
+### Non-Python Code 
 
 All executables should be stored in the EXE directory.  If you do not define EXE, 
 it will look for them in your local working directory.  The Fortran translators are 
@@ -142,7 +142,7 @@ bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.h
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. **You must store it in the EXE area.**
 
 
-# rinex2snr - making SNR files from RINEX files
+### rinex2snr - making SNR files from RINEX files
 
 The international standard for sharing GNSS data is called the RINEX format.
 A RINEX file has extraneous information in it (the data used for positioning, LOL) - and it 
@@ -249,7 +249,7 @@ it currently only looks at the UNAVCO archive. Please beware - it takes a long t
 highrate GNSS RINEX file (even when it is compressed). 
 And it also takes a long time to compute orbits for it (and thus create a SNR file).
 
-# quickLook 
+### quickLook 
 
 Before using the **gnssir** code, I recommend you try **quickLook**. This allows you
 to quickly test various options (elevation angles, frequencies, azimuths).
@@ -310,7 +310,7 @@ expect to see - peaks of periodograms at ~16 meters height. Why is the northwest
 so messy? I leave that as an exercise for the reader. Hint: start out by trying
 to examine this site on Google Earth.
 
-# gnssir
+### gnssir
 
 This is the main driver for the GNSS interferometric reflectometry code.  
 
@@ -416,7 +416,7 @@ we do plan to remove them in subsequent versions of the code.
 
 The L2C and L5 satellite lists are not time coded as they should be. I currently use a list from 2020.
 
-# Helper Codes
+### Helper Codes
 
 **daily averages** is a helper code for cryosphere people interested in daily snow 
 accumulation. It can be used for lake levels. **It is not to be used for tides!**
@@ -441,7 +441,7 @@ the reflection-specific codes. Sample calls:
 **xyz2llh** translates Cartesian coordinates to latitude, longitude, height
 
 
-# Publications
+### Publications
 
 There are A LOT of publications about GPS and GNSS interferometric reflectometry.
 If you want something with a how-to flavor, try this paper, 
@@ -449,7 +449,7 @@ which is [open option](https://link.springer.com/article/10.1007/s10291-018-0744
 
 Also look to the publications page on my [personal website](https://kristinelarson.net/publications)
 
-# How can I import the libraries in this package?
+### How can I import the libraries in this package?
 
 I will be adding more documentation and examples here.
 
@@ -473,11 +473,11 @@ year = 2020; doy = 150; snr_type =  99
 guts.gnssir_guts(station,year,doy, snr_type, extension, lsp)
 ```
 
-# Acknowledgements
+### Acknowledgements
 
 People that helped me with this code include Radon Rosborough, Joakim Strandberg, and Johannes Boehm. 
 I also thank Peter Shearer and Lisa Tauxe for some very nice Python lecture notes.
 
-This documentation was updated on November 5, 2020
+This documentation was updated on November 19, 2020.
 
 Kristine M. Larson
