@@ -68,4 +68,5 @@ use **daily_avg** to give you a daily value. I used this command:
 
 <img src="tgho-six-months.png" width="500"/>
 
-
+As noted by Lucas, the number of RH retrievals is significantly smaller on days when the wind speeds are high.
+High winds == rough surface == less specular. We are being conservative here and requiring 50 measurements/day for a daily average.

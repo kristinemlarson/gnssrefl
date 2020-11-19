@@ -31,10 +31,11 @@ I contacted denied that they block anyone. So take that for what you will.
 # Test the code for p041
 
 I will use a site in Boulder, Colorado (p041) using the bare bones code.  
-Start by looking at [a photo of p041](https://gnss-reflections.org/static/images/P041.jpg).
 The p041 antenna is ~2 meters tall. 
+<img src="https://gnss-reflections.org/static/images/P041.jpg" width="500">
 
-[Get an idea of the reflection zones for a site that is 2 meters tall.](https://gnss-reflections.org/rzones)
+I have made a web tool to give you an idea of the [reflection zones for a site that is 2 meters tall.](https://gnss-reflections.org/rzones)
+You should only need to enter the station name and the reflector height (2 meters).
 
 Make a SNR file using the defaults (if you have Fortran installed): 
 
