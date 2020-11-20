@@ -1,4 +1,4 @@
-# Test the code on a longer dataset  - Dye 2, Greenland
+### Test the code at Dye 2, Greenland
 
 The site is called gls1.  Here we will only analyze the data from 2012.  The data are archived at UNAVCO.
 The dataset is discussed extensively in this [open option paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf).

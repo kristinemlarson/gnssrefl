@@ -93,10 +93,25 @@ I believe Beidou signals are tracked at this site, but the data are not availabl
 
 ### Use Cases (Under Development)
 
-* [Ross Ice Shelf](lorg_use.md)
+* [Ross Ice Shelf, Antarctica](lorg_use.md)
 
 * [Greenland Ice Sheet](gls1_use.md)
 
-* [Lake Taupo](tgho_use.md)
+* [Lake Taupo, New Zealand](tgho_use.md)
+
+* Thwaites Glacier, Antarctica
+
+* Summit Camp, Greenland
+
+* Peterson Bay, Alaska
+
+* Lake Superior
+
+* Steenbras Reservoir, Republic of South Africa
+
+* Hurricane Zeta Storm Surge
+
+* Half Island Park, Idaho (snow)
+
 
 

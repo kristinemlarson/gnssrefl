@@ -1,4 +1,4 @@
-# Lake Taupo
+### Lake Taupo
 
 Station tgho is operated by GNS in New Zealand.  It is on Lake Taupo.
 

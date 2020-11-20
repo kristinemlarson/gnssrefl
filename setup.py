@@ -29,6 +29,7 @@ setup(
             'ydoy = gnssrefl.ydoy:main',
             'xyz2llh = gnssrefl.xyz2llh:main',
             'llh2xyz = gnssrefl.llh2xyz:main',
+            'prn2gps = gnssrefl.prn2gps:main',
             ], 
         },
     install_requires=requirements,

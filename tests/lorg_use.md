@@ -1,4 +1,4 @@
-# Test the code on a longer dataset  - Ross Ice Shelf 
+### Test the code on a longer dataset from the Ross Ice Shelf 
 
 Now we will look at a station called lorg. This site is on the Ross Ice Shelf, Antarctica. The data are archived at UNAVCO.  
 
