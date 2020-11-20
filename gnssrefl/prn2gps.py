@@ -30,8 +30,7 @@ def main():
         t2 = g.cdate2nums(col2[i])
         prn = int(x[i,3])
         gps = int(x[i,2])
-        if (prn == rprn):
-        if (seekTime >= t1) & (seekTime < t2):
+        if (prn == rprn) and ((seekTime >= t1) and (seekTime < t2)):
             print(seekTime, t1,t2,prn,gps)
 
 if __name__ == "__main__":
