@@ -4543,7 +4543,7 @@ def cdate2nums(col1):
         month = int(col1[5:7])
         day = int(col1[8:10])
         #print(col1, year, month, day)
-        doy,cdoy,cyyyy,cyy = g.ymd2doy(year, month, day )
+        doy,cdoy,cyyyy,cyy = ymd2doy(year, month, day )
         t = year + doy/365.25
 
     return t
