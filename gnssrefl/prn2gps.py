@@ -17,7 +17,6 @@ def main():
     rprn = args.prn
     cdate = args.rdate
     seekTime =  g.cdate2nums(cdate)
-    print(rprn, cdate,seekTime)
 
     fname = 'PRN_GPS'
     x=np.loadtxt(fname, usecols=(0,1,2,3), skiprows=1,dtype='str')
@@ -31,7 +30,7 @@ def main():
         prn = int(x[i,3])
         gps = int(x[i,2])
         if (prn == rprn) and ((seekTime >= t1) and (seekTime < t2)):
-            print(seekTime, t1,t2,prn,gps)
+            print(gps)
 
 if __name__ == "__main__":
     main()
