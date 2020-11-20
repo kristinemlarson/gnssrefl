@@ -4530,6 +4530,24 @@ def check_environ_variables():
             print(env_var, ' not found, so set to current directory')
             os.environ[env_var] = '.'
 
+
+def cdate2nums(col1):
+    """
+    returns fractional year from ch date, e.g. 2012-02-15
+    if time is blank, return 3000
+    """
+    year = int(col1[0:4])
+    if year == 0:
+        t=3000 # made up very big time!
+    else:
+        month = int(col1[5:7])
+        day = int(col1[8:10])
+        #print(col1, year, month, day)
+        doy,cdoy,cyyyy,cyy = g.ymd2doy(year, month, day )
+        t = year + doy/365.25
+
+    return t
+
 # don't need to print out success
 #print('found the ', env_var, ' environment variable')
 
