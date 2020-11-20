@@ -401,7 +401,7 @@ Quality Control is currently set by requiring a minimum amplitude and a peak to 
 Both of these are set in the json and you are free to change them. I find a peak to noise of 
 3.5 is good for snow - but should be a little smaller for water.  
 
-# Bugs/Features I know about 
+### Bugs/Features I know about 
 
 I have been using **teqc** to reduce the number of observables and to decimate. I have removed the former 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
