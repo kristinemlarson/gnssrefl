@@ -1,6 +1,6 @@
 ### Lower Thwaites Glacier
 
-Station lthw is operated by UNAVCO. The data are archive at UNAVCO.
+Station lthw is operated by UNAVCO. The data are archived at UNAVCO.
 
 <img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"/>
 
@@ -56,7 +56,7 @@ Now let's run **gnssir**. First we need to make json input,
 
 Handedit the json file so that only L1 is used.  
 
-Run **gnssir** for 2018 from day 1 to day 365:
+Analyze the data for 2018 from day 1 to day 365:
 
 *gnssir lthw 2018 1 -doy_end 365 -screenstats False*
 

@@ -101,9 +101,9 @@ I believe Beidou signals are tracked at this site, but the data are not availabl
 
 * [Thwaites Glacier, Antarctica](lthw_use.md)
 
-* Summit Camp, Greenland
+* [Lake Superior](mchn_use.md)
 
-* Lake Superior
+* Summit Camp, Greenland
 
 * Steenbras Reservoir, Republic of South Africa
 
