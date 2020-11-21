@@ -99,17 +99,15 @@ I believe Beidou signals are tracked at this site, but the data are not availabl
 
 * [Lake Taupo, New Zealand](tgho_use.md)
 
-* Thwaites Glacier, Antarctica
+* [Thwaites Glacier, Antarctica](lthw_use.md)
 
 * Summit Camp, Greenland
-
-* Peterson Bay, Alaska
 
 * Lake Superior
 
 * Steenbras Reservoir, Republic of South Africa
 
-* Hurricane Zeta Storm Surge
+* Storm Surge
 
 * Half Island Park, Idaho (snow)
 
