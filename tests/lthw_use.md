@@ -1,6 +1,6 @@
 ### Lower Thwaites Glacier
 
-Station lthw is operated by Unavco.  
+Station lthw is operated by UNAVCO. The data are archive at UNAVCO.
 
 <img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"/>
 
@@ -17,9 +17,9 @@ To my knowledge the receiver only tracks L1, and it does not track L2C or L5.
 For that reason, only L1 data should be used. The reflector height changes 
 significantly with time and the site must be dug out of the snow
 and reset fairly regularly. You can see this effect in the vertical position data compiled 
-by Nevada Reno.
+by [Nevada Reno](http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta).
 
-<img src="http://geodesy.unr.edu/tsplots/IGS14/IGS14/TimeSeries/LTHW.png" width=500/>
+<img src="LTHW_UNR.png" width=500/>
 
 Don't pay attention to the red "model" as Nevada Reno is using a default model
 that is more relevant for crustal deformation than a glacier. The important 
