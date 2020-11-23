@@ -72,3 +72,9 @@ You get something much more reasonable with a 0.25 meter median filter.
 The number of tracks you will require is going to depend on the site. Here the azimuth is restricted because
 we are on a coastline of a lake. On an ice sheet we can often use every azimuth, which means more tracks. And
 some of those sites also tracked multiple frequencies. Here we can only reliably use L1.
+
+Please note that these reflections are from ice in the winter and water during the summer. With our NASA funding we 
+will be implementing surface bias corrections to our software. Until then, please take this into account when interpreting
+the results.
+
+Note: there is a tide gauge at this site. Please contact NRCAN for more information.
