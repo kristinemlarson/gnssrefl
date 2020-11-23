@@ -2325,7 +2325,7 @@ def open_outputfile(station,year,doy,extension):
     try:
         fout=open(filepath1,'w+')
 #       put a header in the output file
-        fout.write("% gnssIR_python, https://github.com/kristinemlarson \n")
+        fout.write("% gnssrefl, https://github.com/kristinemlarson \n")
         fout.write("% Phase Center corrections have NOT been applied \n")
         fout.write("% year, doy, maxF,sat,UTCtime, Azim, Amp,  eminO, emaxO,  Nv,freq,rise,EdotF, PkNoise  DelT     MJD   refr-appl\n")
         fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10) (11) (12) (13)  (14)     (15)     (16)   (17)\n")
@@ -3220,25 +3220,25 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
 
     20jun14 added secure ftp for CDDIS
     """
-    FileExists = True
     navname = navfile
+    FileExists = False
     try:
         print('try to find it at SOPAC ')
         get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
     except Exception as err:
         print(err)
         print('could not find file at SOPAC')
-        FileExists = False
-    if not FileExists:
+    if not os.path.isfile(navfile):
+        print('Try to find it at CDDIS  ')
         try:
-            print('try to find it at cddis - but there are issues ')
             get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
         except Exception as err:
             print(err)
-            FileExists = False
 
     if not os.path.isfile(navfile):
         FileExists = False
+    else:
+        FileExists = True
 
     return FileExists
 

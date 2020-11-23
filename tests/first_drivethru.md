@@ -24,9 +24,9 @@ Put CRX2RNX in the EXE area. Make sure it is executable
 If you know how to compile Fortran code, I strongly urge you to download/compile the requested
 codes and install those executables in the correct place.
 
-FWIW, I have had times when archives have apprently blocked me (?). When I turn on my VPN,
-all is well. I have not investigated this in any detail - except that the one archive
-I contacted denied that they block anyone. So take that for what you will. 
+FWIW, I have had times when I have been blocked from downloading files (? after 20 file downloads - so maybe it is 
+my internet provider ?). When I turn on my VPN, all is well. I have not investigated this 
+in any detail. So take that for what you will. 
 
 ### Test the code for p041
 
@@ -103,7 +103,7 @@ I believe Beidou signals are tracked at this site, but the data are not availabl
 
 * [Lake Superior](mchn_use.md)
 
-* Summit Camp, Greenland
+* [Summit Camp, Greenland](smm3_use.md)
 
 * Steenbras Reservoir, Republic of South Africa
 

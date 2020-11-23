@@ -8,6 +8,7 @@ import numpy as np
 import time
 import pickle
 import os
+import sys
 
 import gnssrefl.gps as g
 
@@ -55,8 +56,8 @@ def read_jpl_file():
                 newl = [t1, t2, gps, prn]
                 tv = np.append(tv, [newl], axis=0)
     else:
-        print('could not find the file ', fname)
-
+        print('could not find the PRN to GPS conversion file ', fname)
+        sys.exit()
     #pname = 'PRN_GPS.pickle'
     #write_jpl_pickle_file(pname,tv)
     return tv
