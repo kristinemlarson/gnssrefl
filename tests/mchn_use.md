@@ -1,7 +1,7 @@
 ### Lake Superior
 
-**Background:** Station mchn is operated by NRCAN. The data are archived at SOPAC. Don't tell Fox News, but 
-this site is in Canada.
+**Background:** Station mchn is operated by NRCAN. The data are archived at SOPAC. 
+[Don't tell Fox News, but this site is in Canada.](canada.png)
 
 Unfortunately only L1 data should be used at this site. Encourage the station operators to 
 track L2C, L5 (and Galileo, Glonass, and Beidou !)
