@@ -19,9 +19,10 @@ Or use the ones on my web app. They are the same.
 **Picking a mask:**
 From the periodogram and google Earth map you should be able to come up with a pretty good 
 azimuth mask.  Elevation angle might be a bit trickier, but in this case, go ahead and 
-use what I did, which is in the title of the periodogram plot.
+use what I did, which is in the title of the periodogram plot. For azimuth, I suggest that you 
+[use my web app.](https://gnss-reflections.org/rzones)
 
-Reproduce the web app results:
+**Reproduce the web app results:**
 
 *rinex2snr mchn 2019 205 -archive scripps*
 
@@ -39,11 +40,35 @@ Once you figure out what you need to do, go ahead and analyze the data from 2013
 
 *rinex2snr mchn 2013 1 -archive sopac -doy_end 365*
 
-make a json file. You will need to hand-edit it to only use L1 and to set the azimuth region.
+You need to make a json file. You will need to hand-edit it to only use L1 and to set the azimuth region.
 You will notice that I have a pretty restricted azimuth region.  Although you can get
-good reflections beyond 180 degrees, tehre is clearly something funny in the water there
+good reflections beyond 180 degrees, there is clearly something funny in the water there
 (from google Earth), and if you look at the photograph, it is apparent that there is something 
-there that is not water. So I am going with the safer region.
+there that is not water. [So I am going with the safer region.](mchn.json) Of course feel free to try something 
+different. But if you choose a mask that reflects off water and something else, you aren't really measuring 
+the height of the water.
 
+*gnssir mchn 2013 1 -doy_end 365*
 
+**Computing daily average**
 
+There are still outliers in your solutions - and in principle I encourage you to figure out better 
+restrictions, i.e. increase amplitude requirement or peak 2 noise restriction. If you don't take this inout
+account, you will see what I mean:
+
+*daily_avg mchn 2 10*
+
+This says the median filter allows any value within 2 meters of the median.  And it requires 10 tracks to compute 
+an average.  
+
+<img src="mchn_1.png" width="500">
+
+You get something much more reasonable with a 0.25 meter median filter.
+
+*daily_avg mchn 0.25 10*
+
+<img src="mchn_2.png" width="500">
+
+The number of tracks you will require is going to depend on the site. Here the azimuth is restricted because
+we are on a coastline of a lake. On an ice sheet we can often use every azimuth, which means more tracks. And
+some of those sites also tracked multiple frequencies. Here we can only reliably use L1.
