@@ -397,6 +397,17 @@ Where are the files for this example?
 - Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041
 - I do not save RINEX files. In fact, my code deletes them.
 
+This is a snippet of what the result file would look like
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/results-snippet.png" width="600" />
+
+*maxF* is a not very helpful name for the RH values (RH comes from the significant frequency in the SNR data.
+I will be changing that column heading, but in case your version has not been fixed yet ....)
+*Amp* is the amplitude of the most significant peak in the periodogram (i.e. the amplitude for the RH you estimated).  
+*DelT* is how long a given rising or setting satellite arc was, in minutes. While you have set minimum and maximum elevation angles, 
+there are various reasons why these may not be retrieved in the code. The result file thus tells you what the *actual* 
+minimum and maximum elevation angles were in the data are used in the estimation of RH.
+
 If you want a multi-GNSS solution, you need make a new json file and use multi-GNSS orbits. And the RINEX you select 
 must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data in the RINEX file, so you 
 can use it as a test.
