@@ -2327,9 +2327,9 @@ def open_outputfile(station,year,doy,extension):
 #       put a header in the output file
         fout.write("% gnssrefl, https://github.com/kristinemlarson \n")
         fout.write("% Phase Center corrections have NOT been applied \n")
-        fout.write("% year, doy, maxF,sat,UTCtime, Azim, Amp,  eminO, emaxO,  Nv,freq,rise,EdotF, PkNoise  DelT     MJD   refr-appl\n")
-        fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10) (11) (12) (13)  (14)     (15)     (16)   (17)\n")
-        fout.write("%            m         hrs    deg   v/v    deg    deg                  hrs            min             1 is yes  \n")
+        fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD   refr-appl\n")
+        fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16)   (17)\n")
+        fout.write("%             m        hrs    deg   v/v    deg    deg  values               hrs            min         1 is yes  \n")
     except:
         print('problem on first attempt - so try making results directory')
         f1 = xdir + '/' + str(year) + '/results/'
