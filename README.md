@@ -82,7 +82,9 @@ courses to teach people about GNSS reflections, but funding for these courses is
 not in hand at the moment. To summarize, the direct and reflectded GNSS signals interfere and create
 an interference pattern that can be observed in GNSS data.  This code estimates the reflector height, RH, shown in purple.
 
+<center>
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
+</center>
 
 ### Environment Variables 
 
@@ -399,7 +401,7 @@ Where are the files for this example?
 
 This is a snippet of what the result file would look like
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/results-snippet.png" width="600" />
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/results-snippet.png" width="600">
 
 *maxF* is a not very helpful name for the RH values (RH comes from the significant frequency in the SNR data.
 I will be changing that column heading, but in case your version has not been fixed yet ....)
