@@ -79,7 +79,10 @@ restrictions are being applied, you really need
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
 and similar. I am committed in principle to set up some online
 courses to teach people about GNSS reflections, but funding for these courses is 
-not in hand at the moment.  
+not in hand at the moment. To summarize, the direct and reflectded GNSS signals interfere and create
+an interference pattern that can be observed in GNSS data.  This code estimates the reflector height, RH, shown in purple.
+
+<img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
 
 ### Environment Variables 
 
@@ -327,13 +330,23 @@ lat, long, and height.
 
 It will use defaults for other parameters if you do not provide them. Those defaults 
 tell the code an azimuth and elevation angle mask (i.e. which directions you want 
-to allow reflections from), and which frequencies you want to use, and various quality control metrics. 
-Right now the default frequencies are GPS L1 and L2C and a peak to noise ratio of 2.7 is set.
-This is fine for water, but I would suggest higher for snow (3.5). GPS L5 provides excellent data,
-but very few geodesists track it, so it is not currently a default. The output file will be put in 
-$REFL_CODE/input/p101.json. You should look at it to get an idea of the kinds of inputs the code will be using.
+to allow reflections from), and which frequencies you want to use, and various quality control (QC) metrics. 
+As discussed in Roesler and Larson (2018), there are two QC measures used in this code. One is the peak 
+value of the peak in the periodogram. In this example the peak is ~17, so if you define the rquired amplitude 
+to be 15, this one would pass.  Secondly it uses a very simple peak to noise calculation. In this case the 
+average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise". 
+You then take the peak value (here ~17) and divide by the "noise" value.  
+For water I generally recoommend a peak to noise ratio of 2.7, but for snow 3.2-3.5 or so. It can be tricky 
+to set these QC values in general. 
+
+<img src="https://gnss-reflections.org/static/images/from_the_web.png" width="500"/>
+
+
+Right now the default frequencies are GPS L1, L2C and L5. 
+The output file of instructions will be put in $REFL_CODE/input/p101.json. You should look at 
+it to get an idea of the kinds of inputs the code will be using.
 The default azimuths can be changed, but need to be done by hand. Some parameters can be set
-via the command line, a la
+via the command line, as in:
 
 *make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10* 
 
@@ -364,7 +377,9 @@ Things that are helpful to know for the json and commandline inputs:
 - wantCompression, boolean, compress SNR files
 - screenstats, boolean, whether minimal periodogram results come to screen
 - refraction, boolean, whether simple refraction model is applied.
-- plt_screen: boolean, whether SNR data and periodogram are plotted to the screen
+- plt_screen: boolean, whether SNR data and periodogram are plotted to the screen 
+- NReg [min and max required] : define the RH region where the "noise value" for the periodogram 
+is computed. This is used to compute the peak to noise ratio used i n QC.
 - (*this option has been removed*) seekRinex: boolean, whether code looks for RINEX at an archive
 
 
