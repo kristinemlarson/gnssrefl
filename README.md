@@ -341,8 +341,7 @@ You then take the peak value (here ~17) and divide by the "noise" value.
 For water I generally recoommend a peak to noise ratio of 2.7, but for snow 3.2-3.5 or so. It can be tricky 
 to set these QC values in general. 
 
-<img src="https://gnss-reflections.org/static/images/for_the_web.png" width="500"/>
-
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="500"/>
 
 Right now the default frequencies are GPS L1, L2C and L5. 
 The output file of instructions will be put in $REFL_CODE/input/p101.json. You should look at 
