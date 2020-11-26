@@ -1,4 +1,4 @@
-### <<<<<<<<<<<<<<<<<<<<<<<<<READ THIS>>>>>>>>>>>>>>>>>>>>>>>>
+### News 
 
 CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
 implemented security restrictions, we have had to change our download access. 
