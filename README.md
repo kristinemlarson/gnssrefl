@@ -1,4 +1,4 @@
-### IMPORTANT
+### <<<<<<<<<<<<<<<<<<<<<<<<< READ THIS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
 implemented security restrictions, we have had to change our download access. 
@@ -23,14 +23,16 @@ above the reflection area, and the software default only computes answers up to 
 the code will not tell you anything useful. It is up to you to know what is best for the site and 
 modify the inputs accordingly. 
 
-How can you learn how to run this code correctly? You can start by reading
+How can you learn how to run this code correctly? You should start by reading
 [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
-Although this article was originally written with matlab scripts,
+Although this article was originally written to accompany Matlab scripts,
 the principles are the same. If nothing else, it should explain to you what a reflection
-zone means and what a Nyquist frequency is for GNSS reflections. For sea level, 
-my web app tells you [how high your site is above 
-sea level](https://gnss-reflections.org/geoid). My reflection zone app will [help 
-you pick appropriate elevation and azimuth angles](https://gnss-reflections.org/rzones). 
+zone means and what a Nyquist frequency is for GNSS reflections. 
+
+If you are interested in measuring sea level, this webapp tells you [how high your site is above 
+sea level](https://gnss-reflections.org/geoid). 
+
+My reflection zone webapp will [help you pick appropriate elevation and azimuth angles](https://gnss-reflections.org/rzones). 
 At that point it really is up to you to think
 about what it means. Get to know your site. If it belongs to you, look at 
 photographs. If it doesn't belong to you, look at Google Earth. 
@@ -79,8 +81,13 @@ restrictions are being applied, you really need
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
 and similar. I am committed in principle to set up some online
 courses to teach people about GNSS reflections, but funding for these courses is 
-not in hand at the moment. To summarize, the direct and reflectded GNSS signals interfere and create
-an interference pattern that can be observed in GNSS data.  This code estimates the reflector height, RH, shown in purple.
+not in hand at the moment. 
+
+To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
+an interference pattern that can be observed in GNSS data as a satellite rises or sets. 
+The frequency of this interference pattern is directly related to the height of the antenna phase
+center above the reflecting surface, or reflector height RH (purple). Accordingly, this code strips out 
+rising and setting satellite arcs and estimates RH.
 
 <center>
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
@@ -149,11 +156,11 @@ http://dx.doi.org/10.5880/GFZ.1.1.2016.002. **You must store it in the EXE area.
 
 ### rinex2snr - making SNR files from RINEX files
 
-The international standard for sharing GNSS data is called the RINEX format.
-A RINEX file has extraneous information in it (the data used for positioning, LOL) - and it 
-does not provide some of the information needed for reflectometry (elevation and azimuth angles). 
-The first task you have is to translate a from RINEX into what I will call the SNR format - and 
-to calculate those geometric angles. For the latter you will need an **orbit** file. **rinex2snr**
+The international standard for sharing GNSS data is called the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
+A RINEX file has extraneous information in it (which we want to throw out) - and it 
+does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
+The first task you have in GNSS-IR is to translate from RINEX into what I will call the SNR format. The latter will include 
+azimuth and elevation angles. For the latter you will need an **orbit** file. **rinex2snr**
 will go get an orbit file for you. You can override the default orbit choice by selections given below.
 
 There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
@@ -262,20 +269,19 @@ The required inputs are station name, year, and doy of year.
 
 If the SNR file has not been previously stored, you can provide a properly named RINEX file
 (lowercase only) in your working directory. If it doesn't find a file in 
-either of these places, it
-will try to pick up the RINEX data from various 
+either of these places, it will try to pick up the RINEX data from various 
 archives (unavco, sopac, sonel, and cddis) and translate it for
 you into the correct SNR format (note: this feature might make use of the Fortran translators). 
 
 **quickLook** has stored defaults for analyzing the spectral characteristics of the SNR data. 
-**In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**
-If your site is taller than that, you will need to override them.
+In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**
+If your site is taller than that, you will need to override the defaults.
 Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
 you don't want to use, you need to override them.
 
 For more information, use *quickLook -h*
 
-Going back to our **rinex2snr** example, try running the data for p041.
+Going back to our **rinex2snr** example, try running the data for station p041.
 
 *quickLook p041 2020 132*  
 
@@ -318,12 +324,16 @@ to examine this site on Google Earth.
 ### gnssir
 
 This is the main driver for the GNSS interferometric reflectometry code.  
+You need a set of instructions for **gnssir** which can be made using **make_json_input**.  
+The inputs for **make_json_input** are: 
 
-You need a set of instructions which can be made using **make_json_input**.  
-At a minimum **make_json_input** needs the station name (4 char), the latitude (degrees), 
-longitude (degrees) and ellipsoidal height (meters). This location does not 
-have to be cm-level for the reflections code.
-Within a few hundred meters is sufficient.  
+* station name 
+* latitude (degrees)  
+* longitude (degrees) 
+* ellipsoidal height (meters). 
+
+The station location does not have to be cm-level for the reflections code. Within a few hundred meters is sufficient.  
+For example: 
 
 *make_json_input p101 41.692 -111.236 2016.1* 
 
@@ -333,9 +343,20 @@ lat, long, and height.
 It will use defaults for other parameters if you do not provide them. Those defaults 
 tell the code an azimuth and elevation angle mask (i.e. which directions you want 
 to allow reflections from), and which frequencies you want to use, and various quality control (QC) metrics. 
+Right now the default frequencies are GPS only, e.g. L1, L2C and L5. 
+The json file of instructions will be put in $REFL_CODE/input/p101.json. You should look at 
+it to get an idea of the kinds of inputs the code uses.
+The default azimuths can be changed, but this needs to be done by hand. Some parameters can be set
+via the command line, as in:
+
+*make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10* 
+
+This changes elevation angles to 5-10 degrees.
+
 As discussed in Roesler and Larson (2018), there are two QC measures used in this code. One is the peak 
-value of the peak in the periodogram. In this example the peak is ~17, so if you define the rquired amplitude 
-to be 15, this one would pass.  Secondly it uses a very simple peak to noise calculation. In this case the 
+value of the peak in the periodogram. In the example below the amplitude of the most significant 
+peak is ~17, so if you define the required amplitude 
+to be 15, this one would pass. Secondly it uses a very simple peak to noise calculation. In this case the 
 average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise". 
 You then take the peak value (here ~17) and divide by the "noise" value.  
 For water I generally recoommend a peak to noise ratio of 2.7, but for snow 3.2-3.5 or so. It can be tricky 
@@ -343,15 +364,7 @@ to set these QC values in general.
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="500"/>
 
-Right now the default frequencies are GPS L1, L2C and L5. 
-The output file of instructions will be put in $REFL_CODE/input/p101.json. You should look at 
-it to get an idea of the kinds of inputs the code will be using.
-The default azimuths can be changed, but need to be done by hand. Some parameters can be set
-via the command line, as in:
-
-*make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10* 
-
-Things that are helpful to know for the json and commandline inputs:
+Things that are helpful to know for the make_json_input inputs:
 
 *Names for the GNSS frequencies*
 
@@ -361,7 +374,7 @@ Things that are helpful to know for the json and commandline inputs:
 - 201, 205, 206, 207, 208: Galileo frequencies
 - 302, 306, 307 : Beidou frequencies
 
-*Reflection parameters settings in the json file:*
+* Some json settings can be set at the command line.  run **make_json_input -h** to see these.  Otherwise, edit the json file.
 
 - e1 and e2 are the min and max elevation angle, in degrees
 - minH and maxH are the min and max allowed reflector height, in meters
@@ -372,9 +385,6 @@ Things that are helpful to know for the json and commandline inputs:
 - freqs are selected frequencies for analysis
 - delTmax is the maximum length of allowed satellite arc, in minutes
 - azval are the azimuth regions for study, in pairs (i.e. 0 90 270 360 means you want to evaluate 0 to 90 and 270 to 360).
-
-*Other json inputs:*
-
 - wantCompression, boolean, compress SNR files
 - screenstats, boolean, whether minimal periodogram results come to screen
 - refraction, boolean, whether simple refraction model is applied.
@@ -387,7 +397,7 @@ is computed. This is used to compute the peak to noise ratio used i n QC.
 Simple example for my favorite GPS site [p041](https://spotlight.unavco.org/station-pages/p042/eo/scientistPhoto.jpg)
 
 - *make_json_input p041 39.949 -105.194 1728.856* (use defaults and write out a json instruction file)
-- *rinex2snr p041 2020 150* (pick up and translate RINEX file from unavco, uses snr=66 default)
+- *rinex2snr p041 2020 150* (pick up and translate RINEX file for day of year 150 and year 2020 from unavco )
 - *gnssir p041 2020 150* (calculate the reflector heights) 
 - *gnssir p041 2020 150 -fr 5 -plt True* (override defaults, only look at L5 SNR data, and periodogram plots come to the screen)
 
@@ -396,20 +406,19 @@ Where are the files for this example?
 - json is stored in $REFL_CODE/input/p041.json
 - SNR files are stored in $REFL_CODE/2020/snr/p041
 - Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041
-- I do not save RINEX files. In fact, my code deletes them.
 
 This is a snippet of what the result file would look like
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/results-snippet.png" width="600">
 
-*maxF* is a not very helpful name for the RH values (RH comes from the significant frequency in the SNR data.
-I will be changing that column heading, but in case your version has not been fixed yet ....)
-*Amp* is the amplitude of the most significant peak in the periodogram (i.e. the amplitude for the RH you estimated).  
-*DelT* is how long a given rising or setting satellite arc was, in minutes. While you have set minimum and maximum elevation angles, 
-there are various reasons why these may not be retrieved in the code. The result file thus tells you what the *actual* 
-minimum and maximum elevation angles were in the data are used in the estimation of RH.
+- *Amp* is the amplitude of the most significant peak in the periodogram (i.e. the amplitude for the RH you estimated).  
+- *DelT* is how long a given rising or setting satellite arc was, in minutes. 
+- *emin0* and *emax0* are the min and max observed elevation angles in the arc.
+- *rise/set* tells you wehther the satellite arc was rising or setting
+- *Azim* is the average azimuth angle of the satellite arc
+- *sat* and *freq* are as defined in this document
 
-If you want a multi-GNSS solution, you need make a new json file and use multi-GNSS orbits. And the RINEX you select 
+If you want a multi-GNSS solution, you need make a new json file and use multi-GNSS orbits. And the RINEX file you use  
 must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data in the RINEX file, so you 
 can use it as a test.
 
@@ -418,15 +427,10 @@ can use it as a test.
 - *gnssir p041 2020 151 -fr 201 -plt True* (look at the lovely Galileo L1 data) 
 
 What should the periodogram plots look like? Until we have Jupyter notebooks, I 
-recommend you look at 
-[the paper I wrote with Carolyn Roesler](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
+recommend you look at [the paper I wrote with Carolyn Roesler](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
 or the [question section of my web app.](https://gnss-reflections.org/overview). Note that a failed
 arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
-
-Quality Control is currently set by requiring a minimum amplitude and a peak to noise ratio.
-Both of these are set in the json and you are free to change them. I find a peak to noise of 
-3.5 is good for snow - but should be a little smaller for water.  
 
 ### Bugs/Features I know about 
 
