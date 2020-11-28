@@ -733,16 +733,19 @@ def rinex_bkg(station, year, month, day):
     url = gns +  cyyyy + '/' + cdoy +  '/' + file1
     print(url)
 
-    try:
-        wget.download(url,file1)
-        subprocess.call(['uncompress', file1])
-        print('successful download from BKG')
-        subprocess.call([crnxpath, fname])
-        subprocess.call(['rm', '-f',fname])
-        print('successful Hatanaka download and translation from BKG')
-    except:
-        print('some kind of problem with download',file1)
-        subprocess.call(['rm', '-f',file1])
+    if os.path.exists(crnxpath):
+        try:
+            wget.download(url,file1)
+            subprocess.call(['uncompress', file1])
+            print('successful download from BKG')
+            subprocess.call([crnxpath, fname])
+            subprocess.call(['rm', '-f',fname])
+            print('successful Hatanaka download and translation from BKG')
+        except:
+            print('some kind of problem with download',file1)
+            subprocess.call(['rm', '-f',file1])
+    else:
+        print('You cannot use the BKG archive without installing CRX2RNX.')
 
 def rinex_nrcan(station, year, month, day):
     """
@@ -766,25 +769,30 @@ def rinex_nrcan(station, year, month, day):
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     # was using this ...
     gns = 'ftp://gauss.geod.nrcan.gc.ca/data/ftp/naref/pub/rinex/'
+    # user narefftp
+    # password 4NAREF2use
     gns = 'ftp://gauss.geod.nrcan.gc.ca/data/ftp/naref/pub/data/rinex/'
     gns = 'ftp://rtopsdata1.geod.nrcan.gc.ca/gps/data/'
 
     xxdir = gns + 'gpsdata/' + cyy + cdoy  + '/' + cyy + 'd'
-    # user narefftp
-    # password 4NAREF2use
     oname,fname = rinex_name(station, year, month, day)
-    # only hatanaka in canada and normal unix compression
+    # only hatanaka files in canada and normal unix compression
     file1 = fname + '.Z'
     url = xxdir + '/' +  file1
     print(url)
-
-    try:
-        wget.download(url,file1)
-        subprocess.call(['uncompress', file1])
-        print('successful download from NRCAN ')
-    except:
-        print('some kind of problem with download',file1)
-        subprocess.call(['rm', '-f',file1])
+#   all nrcan data are in hatanaka format
+    if os.path.exists(crnxpath):
+        try:
+            wget.download(url,file1)
+            subprocess.call(['uncompress', file1])
+            subprocess.call([crnxpath, fname])
+            subprocess.call(['rm', '-f',fname])
+            print('successful download from NRCAN ')
+        except:
+            print('some kind of problem with download',file1)
+            subprocess.call(['rm', '-f',file1])
+    else:
+        print('You cannot use the NRCAN archive without installing CRX2RNX.')
 
 def getnavfile(year, month, day):
     """
