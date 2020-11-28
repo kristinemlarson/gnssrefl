@@ -1,8 +1,8 @@
 ### First drivethru of gnssrefl
 
-This is a test case for GNSS interferometric reflectometry. 
+This document provides use cases for GNSS interferometric reflectometry. 
 It does not explain everything about the technique, the code, or 
-the site we will be using, but it will provide some tests you can use 
+the sites we will be using, but it will provide some tests you can use 
 to make sure you have properly installed the code. For details about the technique, 
 you should start with reading [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
 which was published open option.  
@@ -24,7 +24,8 @@ Put CRX2RNX in the EXE area. Make sure it is executable
 If you know how to compile Fortran code, I strongly urge you to download/compile the requested
 codes and install those executables in the correct place.
 
-FWIW, I have had times when I have been blocked from downloading files (? after 20 file downloads - so maybe it is 
+For what it is worth, I have had times when I have been blocked from 
+downloading files (? after 20 file downloads - so maybe it is 
 my internet provider ?). When I turn on my VPN, all is well. I have not investigated this 
 in any detail. So take that for what you will. 
 
@@ -91,23 +92,23 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 Note: If you want to look at Glonass and Galileo signals, you need to create SNR files using the -orb gnss flag.
 I believe Beidou signals are tracked at this site, but the data are not available in the RINEX 2 file.
 
-### Use Cases (Under Development)
+### Use Cases (These are under development)
 
 * [Ross Ice Shelf, Antarctica](lorg_use.md)
 
-* [Greenland Ice Sheet](gls1_use.md)
+* [Dye2, Greenland Ice Sheet](gls1_use.md)
 
 * [Lake Taupo, New Zealand](tgho_use.md)
 
 * [Thwaites Glacier, Antarctica](lthw_use.md)
 
-* [Lake Superior](mchn_use.md)
+* [Lake Superior, Canada](mchn_use.md)
 
 * [Summit Camp, Greenland](smm3_use.md)
 
 * Steenbras Reservoir, Republic of South Africa
 
-* Storm Surge
+* Storm Surge - Hurricane Laura
 
 * Half Island Park, Idaho (snow)
 

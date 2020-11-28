@@ -2051,8 +2051,9 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     if (f == 208):
         dat = s8
 #   get the scaling factor for this frequency and satellite number
-#   print(f,satNu)
+    #print(f,satNu)
     cf = arc_scaleF(f,satNu)
+    #print(cf)
 
 #   if not, frequency does not exist, will be tripped by Nv
 #   this does remove the direct signal component - but gets you ready to do that

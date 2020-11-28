@@ -95,7 +95,6 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                 satlist = onesat
                 if (int(satlist[0]) < 100) and (f > 100):
                     print('wrong satellite name for this frequency')
-                
             for satNu in satlist:
                 #if screenstats: print('Satellite', satNu)
                 for a in range(naz):
@@ -103,6 +102,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                     x,y,Nv,cf,UTCtime,avgAzim,avgEdot,Edot2,delT= g.window_data(s1,s2,s5,s6,s7,s8,sat,ele,azi,t,edot,f,az1,az2,e1,e2,satNu,lsp['polyV'],lsp['pele'],screenstats) 
                     MJD = g.getMJD(year,month,day, UTCtime)
                     if Nv > minNumPts:
+                        #print('length of x', len(x))
                         maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,lsp['desiredP'],lsp['polyV'],minH) 
                         nij =   pz[(px > NReg[0]) & (px < NReg[1])]
                         Noise = 0

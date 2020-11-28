@@ -359,7 +359,7 @@ peak is ~17, so if you define the required amplitude
 to be 15, this one would pass. Secondly it uses a very simple peak to noise calculation. In this case the 
 average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise". 
 You then take the peak value (here ~17) and divide by the "noise" value.  
-For water I generally recoommend a peak to noise ratio of 2.7, but for snow 3.2-3.5 or so. It can be tricky 
+For water I generally recommend a peak to noise ratio of 2.7, but for snow 3.2-3.5 or so. It can be tricky 
 to set these QC values in general. 
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="500"/>
@@ -418,9 +418,7 @@ This is a snippet of what the result file would look like
 - *Azim* is the average azimuth angle of the satellite arc
 - *sat* and *freq* are as defined in this document
 
-If you want a multi-GNSS solution, you need make a new json file and use multi-GNSS orbits. And the RINEX file you use  
-must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data in the RINEX file, so you 
-can use it as a test.
+If you want a multi-GNSS solution, you need make a new json file and use multi-GNSS orbits. And the RINEX file you use must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data in the RINEX file, so you can use it as a test.
 
 - *make_json_input p041 39.949 -105.194 1728.856 -allfreq True* 
 - *rinex2snr p041 2020 151 -orb gnss* 
@@ -461,7 +459,7 @@ the reflection-specific codes. Sample calls:
 
 - *download_rinex p041 2020 150 0 -archive sopac* downloads the data from sopac archive on day of year 150 in 2020
 
-**download_orbits** does what it sounds like. Feel free to use it. 
+**download_orbits** downloads orbit files 
 
 **ymd** translates year,month,day to day of year
 

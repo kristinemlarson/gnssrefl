@@ -2,11 +2,9 @@
 
 Station smm3 is operated by UNAVCO. The data are archived at UNAVCO. 
 
-[You should use my web app to get a sense of what the site looks like. Please note that the app 
+[You can use my webapp to get a sense of what the results for this site looks like. Please note that the app 
 will be analyzing data in real-time, so please wait for the answers to "pop" up in the 
-left hand side of the page. It takes about 5 seconds](https://gnss-reflections.org/fancy6?example=smm3)
-You are provided with a photograph, coordinates (make a note of them), and a google 
-Earth map. Save the periodogram so you can look at it more closely.
+left hand side of the page. It takes 5-10 seconds](https://gnss-reflections.org/fancy6?example=smm3)
 
 **Coordinates:**
 You can try the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/SMM3.sta).
@@ -21,29 +19,42 @@ archive of record.
 Start out by trying to reproduce the web app results. The year and day of year are in the 
 title of the periodogram plot. As are the elevation angle limits.
 
-* First make the SNR file  
+- First make the SNR file using **rinex2snr**
 
-* Use quickLook
+- Use **quickLook** on the same day
+
+<img src="smm3-default.png" width="500" />
 
 Why does this not look like the periodogram results from my web app?? Look closely.
+Now modify your call to **quickLook**,
 
-If you previously used the defaults, remake the SNR file using gnss rather than gps orbits.
-Make sure that your reflector height limits include the answer. Rerun **quickLook**. 
+[This is not identical to the webapp, but it is more sensible](smm3-sensible.png)
+You notice that in general there is quite a bit of spread in the northwest.  That is because the reflection 
+area is more complex (and maybe also reflecting off things that are not snow.
 
-
-
-For running **gnssir**:
+### Steps: 
 
 Use **make_json_input** but set -allfreq True and -peak2noise 3.5
 
-you need to do some hand-editing to the json file. For example, set the allowed azimuths:
+I had to do some hand-editing to the json file. For example, I set the allowed azimuths:
 
-* 70-180
-* 180-270
+- 70-180
+- 180-270
 
-These are the "quiet" areas. To keep the reflection zones quite large - I only use data from 5-15 degree
-elevation angles. This will make the amplitudes larger  - also because the surface is
-relatively smooth, so I would set the required amplitude to 15, though in all honestly it 
+These are the "quiet" areas for making scientific measurements Summit Camp. To keep the reflection 
+zones quite large - I only use data from 5-15 degree elevation angles. This will make the amplitudes of the peaks 
+in the periodogram larger, so I also set the required amplitude to 15, though in all honestly it 
 could be set even higher. [Sample json](smm3.json)
 
+
+Make daily SNR files:
+
+- rinex2snr smm3 2018 180 -orb gnss -doy_end 365
+
+
+Analyze daily SNR files:
+
+- gnssir smm3 2018 180 -doy_end 365
+
+Compute daily average of these results:
 
