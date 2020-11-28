@@ -767,12 +767,15 @@ def rinex_nrcan(station, year, month, day):
     # was using this ...
     gns = 'ftp://gauss.geod.nrcan.gc.ca/data/ftp/naref/pub/rinex/'
     gns = 'ftp://gauss.geod.nrcan.gc.ca/data/ftp/naref/pub/data/rinex/'
+    gns = 'ftp://rtopsdata1.geod.nrcan.gc.ca/gps/data/'
+
+    xxdir = gns + 'gpsdata/' + cyy + cdoy  + '/' + cyy + 'd'
     # user narefftp
     # password 4NAREF2use
     oname,fname = rinex_name(station, year, month, day)
-    # only hatanaka in canada and normal compression
+    # only hatanaka in canada and normal unix compression
     file1 = fname + '.Z'
-    url = gns +  cyy + cdoy + '/' +  file1
+    url = xxdir + '/' +  file1
     print(url)
 
     try:
@@ -3722,6 +3725,7 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
     20jul10 preferred RINEX archive can be set (all is everything)
     added geoscience australia and nz archives
     2020aug28 added NGS, aka big_Disk_in_DC
+    2020nov28 added NRCAN
     """
     if (day == 0):
         doy = month
@@ -3761,6 +3765,8 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
                     rinex_ga_lowrate(station,year,month,day)
                 elif (archive == 'bkg'):
                     rinex_bkg(station,year,month,day)
+                elif (archive == 'nrcan'):
+                    rinex_nrcan(station,year,month,day)
                 elif (archive == 'jeff'):
                     pickup_pbay(year,month,day)
                 elif (archive == 'ngs'):

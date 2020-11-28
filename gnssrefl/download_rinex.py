@@ -48,7 +48,7 @@ def main():
     parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
 # optional arguments
     parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high")
-    parser.add_argument("-archive", default=None, metavar='cddis',help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg)", type=str)
+    parser.add_argument("-archive", default=None, metavar='cddis',help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan)", type=str)
     parser.add_argument("-version", default=None, metavar=2,type=int, help="rinex version (2 or 3)")
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
 
@@ -80,7 +80,7 @@ def main():
     # set archive variable
     archive = args.archive
 
-    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs']
+    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan']
 
     if args.version == None:
         version = 2
