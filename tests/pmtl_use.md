@@ -20,7 +20,7 @@ For reflections, you want to know the height above sea level - which means you n
 the geoid correction to the ellipsoidal height. [My web app will do that for you.](https://gnss-reflections.org/rzones)
 I suggest you try different azimuth ranges and elevation angles.
 
-<img src="pmtl-rzone.png" width="500" />
+<img src="pmtl_rzone.png" width="500" />
 
 **Exercise for the reader:** Download a 1-Hz RINEX file from NRCAN. Make sure to include GPS and Glonass.
 
@@ -29,9 +29,9 @@ I suggest you try different azimuth ranges and elevation angles.
 - run quickLook - but given the height of pmtl, you are going to need to change the RH values
 
 
-
 You need to use **make_json_input** to set up the analysis instructions.
-[You will need to hand-edit it to remove L2 and to set the azimuth region.](pmtl.json)
+The restricted elevation angles can be set at the command line, as can the heights. Use -allfreq True.
+[You will need to hand-edit it to remove L2 and Galileo and to set the azimuth region.](pmtl.json)
 
 
 
