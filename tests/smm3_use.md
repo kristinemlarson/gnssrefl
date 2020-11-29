@@ -20,7 +20,8 @@ Note that there is an antenna height blunder in the very early data for the site
 
 **This site has been optimally set up for positions and reflectometry.** This means there is no elevation 
 angle applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
-well as Glonass and Galileo. Unlike some of the earlier reflectometry demonstrations, the 
+well as Glonass. I am not sure if it tracks Galileo - but you can inquire with Dave Mencin at UNAVCO. 
+Unlike some of the earlier reflectometry demonstrations, the 
 L1 data from this receiver are great. How can you tell what signals are tracked at this receiver?
 Unfortunately I do not know how to find this information at the archive of record. Although 1 second
 data are available at smm3, they are not needed for daily average reflectometry described here.
@@ -53,7 +54,8 @@ I had to do some hand-editing to the json file. For example, I set the allowed a
 
 These azimuths are the "quiet" areas for making scientific measurements Summit Camp. To keep the reflection 
 zones quite large - I only opted to only use data from 5-15 degree elevation angles. This will make the amplitudes of the peaks 
-in the periodogram larger, so I also set the required amplitude to 15. [Sample json](smm3.json)
+in the periodogram larger, so I also set the required amplitude to 15. I also removed the Galileo signals from
+the json since they are not in the RINEX files I am using. [Sample json](smm3.json)
 
 
 Make daily SNR files:
@@ -67,3 +69,12 @@ Now analyze daily SNR files:
 Compute daily average of these results:
 
 - *daily_avg smm3 0.25 50 -txtfile smm3_rh.txt*
+
+<img src="smm3_RH.png" width="500" />
+
+Notice that the [daily average RH file](smm3_rh.txt) shows well over 150 measurements per day are being 
+used in the average.  So you could rerun the code to use a bigger value than 50.  Here the observations are so
+robust it won't make a difference.
+
+- *daily_avg smm3 0.25 100 -txtfile smm3_rh.txt*
+
