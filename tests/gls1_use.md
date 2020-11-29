@@ -1,12 +1,15 @@
 ### Test the code at Dye 2, Greenland
 
 The site is called gls1.  Here we will only analyze the data from 2012.  The data are archived at UNAVCO.
-The dataset is discussed extensively in this [open option paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf).
+The dataset is discussed extensively in 
+this [open option paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf).
 
 **Exercise for the reader:** find a photograph of the site at UNAVCO
 
 **Coordinates:** Use the [UNAVCO DAI](https://www.unavco.org/data/gps-gnss/data-access-methods/dai2/app/dai2.html#4Char=GLS1;scope=Station;sampleRate=both;4CharMod=contains) if you like.
 Or you can try the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/GLS1.sta).
+
+Position time series for gls1 can be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3)
 
 This site was originally installed with an elevation mask of 7 degrees. Later it was changed. To keep things the 
 same, I strongly prefer that the same elevation angle mask is used 

@@ -66,9 +66,7 @@ periodograms, but people asked for them, and I do think it is useful to see that
 quality control being used in this code.
 
 I will also point out that these are the data from an excellent receiver, a Septentrio.
-Not all receivers produce L1 data that are as nice as these.
-
-Now try L2C:
+Not all receivers produce L1 data that are as nice as these. Now try L2C:
 
 *quickLook p041 2020 132 -fr 20* 
 
@@ -85,12 +83,16 @@ You can try different things to test the code. For example, you can change the h
 
 *quickLook p041 2020 132 -h1 0.5 -h2 10* 
 
+
+If you want to look at Glonass and Galileo signals, you need to create SNR files using the -orb gnss flag.
+
+*rinex2snr p041 2020 132 -orb gnss*
+
+I believe Beidou signals are tracked at this site, but the data are not available in the RINEX 2 file.
+
 **quickLook** is meant to be a visual assessment of the spectral characteristics. However, 
 it does print out the answers to a file called *rh.txt*. If you want to assess changes in the reflection
 environment around a GPS/GNSS sites, i.e. look at multiple days, please look at these use cases I have compiled.
-
-Note: If you want to look at Glonass and Galileo signals, you need to create SNR files using the -orb gnss flag.
-I believe Beidou signals are tracked at this site, but the data are not available in the RINEX 2 file.
 
 ### Use Cases (These are under development)
 

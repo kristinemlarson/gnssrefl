@@ -127,11 +127,11 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
 
     """
     # define directory for the conversion executables
-    print('receiver rate:',receiverrate)
-    print('decimation rate: ', dec_rate)
-    print('archive: ', archive)
-    print('use fortran: ', fortran)
-    print('orbtype: ', orbtype)
+    print('Receiver rate:',receiverrate)
+    print('Decimation rate: ', dec_rate)
+    print('Archive: ', archive)
+    print('Use fortran: ', fortran)
+    print('Orbtype: ', orbtype)
     exedir = os.environ['EXE']
     snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
     if (snre == True):

@@ -3425,11 +3425,11 @@ def rinex_ga_lowrate(station,year,month,day):
 
     return fexists
 
-def rinex_ga_highrate(station, year, month, day):
+def rinex_nrcan_highrate(station, year, month, day):
     """
     author: kristine larson
     inputs: station name, year, month, day
-    picks up a higrate RINEX file from Geoscience Australia
+    picks up a higrate RINEX file from NRCAN
     you can input day =0 and it will assume month is day of year
     not sure if it merges them ...
     2020 September 2 - moved to gz and new ftp site
@@ -3443,6 +3443,71 @@ def rinex_ga_highrate(station, year, month, day):
         d = doy2ymd(year,doy);
         month = d.month; day = d.day
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    gns = 'ftp://rtopsdata1.geod.nrcan.gc.ca/gps/data/hrdata/' +cyy + cdoy + '/' + cyy + 'd/'
+
+    for h in range(0,24):
+        # subdirectory
+        ch = '{:02d}'.format(h)
+        for e in ['00', '15', '30', '45']:
+            dname = station + cdoy + alpha[h] + e + '.' + cyy + 'd.Z'
+            dname1 = station + cdoy + alpha[h] + e + '.' + cyy + 'd'
+            dname2 = station + cdoy + alpha[h] + e + '.' + cyy + 'o'
+            url = gns +  ch + '/' + dname
+            print(url)
+            try:
+                wget.download(url,dname)
+                subprocess.call(['uncompress',dname])
+                subprocess.call([crnxpath, dname1])
+                subprocess.call(['rm',dname1])
+            except:
+                print('download failed for some reason')
+
+    if os.path.isfile(teqcpath):
+        foutname = 'tmp.' + station + cdoy
+        rinexname = station + cdoy + '0.' + cyy + 'o'
+        print('merge the 15 minute files and move to ', rinexname)
+        mergecommand = [teqcpath + ' ' + station + cdoy + '*o']
+        fout = open(foutname,'w')
+        subprocess.call(mergecommand,stdout=fout,shell=True)
+        fout.close()
+        cm = 'rm ' + station + cdoy + '*o'
+        print(cm)
+        # if the output is made (though I guess this does not check to see if it is empty)
+        if os.path.isfile(foutname):
+            # try to remove the 15 minute files
+            subprocess.call(cm,shell=True)
+            subprocess.call(['mv',foutname,rinexname])
+    else:
+        print('If you had installed teqc, I would have merged the files for you')
+
+
+def rinex_ga_highrate(station, year, month, day):
+    """
+    author: kristine larson
+    inputs: station name, year, month, day
+    picks up a higrate RINEX file from Geoscience Australia
+    you can input day =0 and it will assume month is day of year
+    not sure if it merges them ...
+    2020 September 2 - moved to gz and new ftp site
+    ??? does not appear to have Rinex 2 files anymore ???
+    ??? goes they switched in 2020 .... ???
+    """
+    crnxpath = hatanaka_version()
+    teqcpath = teqc_version()
+    alpha='abcdefghijklmnopqrstuvwxyz'
+    # if doy is input
+    if day == 0:
+        doy=month
+        d = doy2ymd(year,doy);
+        month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+
+    GAstopday = 2020 + 196/365.25 # date i got the email saing they weren't going to have v2.11 anymore 
+    if (year + doy/365.25) > GAstopday:
+        print('GA no longer proivdes high-rate v 2.11 RINEX files')
+        print('If there is significant interest, I will try to port this function over to RINEX 3')
+        return
+    # old directory
     #gns = 'ftp://ftp.ga.gov.au/geodesy-outgoing/gnss/data/highrate/' + cyyyy + '/' + cyy + cdoy 
     gns = 'ftp://ftp.data.gnss.ga.gov.au/highrate/' + cyyyy + '/' + cdoy + '/'
     for h in range(0,24):
@@ -3458,13 +3523,29 @@ def rinex_ga_highrate(station, year, month, day):
                 wget.download(url,dname)
                 subprocess.call(['gunzip',dname])
                 subprocess.call([crnxpath, dname1])
-                subprocess.call([teqcpath])
                 # delete the d file
                 subprocess.call(['rm',dname1])
             except:
                 print('download failed for some reason')
 
-    print('a nice person would merge them for you ... ')
+    if os.path.isfile(teqcpath):
+        foutname = 'tmp.' + station + cdoy
+        rinexname = station + cdoy + '0.' + cyy + 'o'
+        print('merge the 15 minute files and move to ', rinexname)
+        mergecommand = [teqcpath + ' ' + station + cdoy + '*o']
+        fout = open(foutname,'w')
+        subprocess.call(mergecommand,stdout=fout,shell=True)
+        fout.close()
+        cm = 'rm ' + station + cdoy + '*o'
+        print(cm)
+        # if the output is made (though I guess this does not check to see if it is empty)
+        if os.path.isfile(foutname):
+            # try to remove the 15 minute files
+            subprocess.call(cm,shell=True)
+            subprocess.call(['mv',foutname,rinexname])
+    else:
+        print('If you had installed teqc, I would have merged the files for you.')
+
 
 def highrate_nz(station, year, month, day):
     """
@@ -3742,7 +3823,7 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
 
-    print('requested data rate: ', receiverrate)
+    print('Requested data rate: ', receiverrate)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
     print('Name of the rinexfile should be:', rinexfile)
     print('Archive',archive)
@@ -3751,8 +3832,15 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
         print('RINEX file exists')
     else:
         if receiverrate == 'high':
-            print('seeking high rate at unavco - my only highrate archive option')
-            rinex_unavco_highrate(station, year, month, day)
+            if archive == 'unavco':
+                print('seeking high rate data at UNAVCO ')
+                rinex_unavco_highrate(station, year, month, day)
+            if archive == 'nrcan':
+                print('seeking high rate data at NRCAN ')
+                rinex_nrcan_highrate(station, year, month, day)
+            if archive == 'ga':
+                print('seeking high rate data at GA')
+                rinex_ga_highrate(station, year, month, day)
         else:
           # lowrate data
             if archive == 'all':

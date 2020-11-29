@@ -45,7 +45,7 @@ def main():
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("month", help="month (or day of year)", type=int)
-    parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
+    parser.add_argument("day",   help="day (zero if you use day of year earlier)", type=int)
 # optional arguments
     parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high")
     parser.add_argument("-archive", default=None, metavar='cddis',help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan)", type=str)
@@ -80,7 +80,10 @@ def main():
     # set archive variable
     archive = args.archive
 
+
     archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan']
+
+    archive_list_high = ['unavco','nrcan','ga']
 
     if args.version == None:
         version = 2
@@ -98,7 +101,7 @@ def main():
         version = 3 # even if you don't choose version 3 .... 
     
     # this is for version 2
-    if (version == 2):
+    if (version == 2) and (rate == 'low'):
         if (NS != 4):
             print('exiting: RINEX 2.11 station names must have 4 characters, lowercase please')
             sys.exit()
@@ -122,10 +125,16 @@ def main():
         else:
             archive = args.archive
 
-    # currently only search unavco for 1 sec data
     print('data rate', rate)
-    if rate == 'high':
-        archive = 'unavco'
+    if (rate == 'high') and (version == 2):
+        if args.archive == None:
+            archive = 'unavco'
+        else:
+            archive = args.archive
+
+        if archive not in archive_list_high:
+            print('You picked an archive that is not supported by my code. Exiting')
+            sys.exit()
 
     for d in range(doy, doy_end+1):
         print('working on year, day of year:', year, d)
