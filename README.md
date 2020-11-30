@@ -259,9 +259,10 @@ Other questions:
 the files online? Use -nolook True
 
 There is a **rate** command line input that has two values, high or low. However, if you invoke high,
-it currently only looks at the UNAVCO archive. Please beware - it takes a long time to download a 
+it currently only looks at the UNAVCO, GA, or NRCAN archives. Please beware - it takes a long time to download a 
 highrate GNSS RINEX file (even when it is compressed). 
 And it also takes a long time to compute orbits for it (and thus create a SNR file).
+If you did not install the Fortan RINEX translators, it takes a very, very, long time.
 
 ### quickLook 
 
