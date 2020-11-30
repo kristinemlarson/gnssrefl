@@ -76,5 +76,5 @@ Notice that the [daily average RH file](smm3_RH.txt) shows well over 150 measure
 used in the average.  So you could rerun the code to use a bigger value than 50.  Here the observations are so
 robust it won't make a difference.
 
-- *daily_avg smm3 0.25 100 -txtfile smm3_rh.txt*
+- *daily_avg smm3 0.25 100 -txtfile smm3_RH.txt*
 
