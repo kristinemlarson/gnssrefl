@@ -15,7 +15,7 @@ It also has a google map and photograph.
 You can try the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/SMM3.sta).
 Or use the ones on my web app. They are the same.
 
-Position time series for smm3 can be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3)
+Position time series for smm3 can easily be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3).
 Note that there is an antenna height blunder in the very early data for the site. It is trivial to find and remove.
 
 **This site has been optimally set up for positions and reflectometry.** This means there is no elevation 
@@ -68,11 +68,11 @@ Now analyze daily SNR files:
 
 Compute daily average of these results:
 
-- *daily_avg smm3 0.25 50 -txtfile smm3_rh.txt*
+- *daily_avg smm3 0.25 50 -txtfile smm3_RH.txt*
 
 <img src="smm3_RH.png" width="500" />
 
-Notice that the [daily average RH file](smm3_rh.txt) shows well over 150 measurements per day are being 
+Notice that the [daily average RH file](smm3_RH.txt) shows well over 150 measurements per day are being 
 used in the average.  So you could rerun the code to use a bigger value than 50.  Here the observations are so
 robust it won't make a difference.
 
