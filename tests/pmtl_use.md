@@ -22,25 +22,31 @@ geographic mask, and use the geoid corrected ellipsoidal height from [my webapp]
 <img src="pmtl_rzone.png" width="500" />
 
 
-- make a SNR file using the -orb gnss option, -archive nrcan, and -rate high option
+Make a SNR file using the -orb gnss option, -archive nrcan, and -rate high option
 
-- rinex2snr pmtl 2020 300 -archive nrcan -rate high -orb gps+glo
+- *rinex2snr pmtl 2020 300 -archive nrcan -rate high -orb gps+glo*
 
-- run **quickLook** - but given the height of pmtl, you are going to need to change the RH values. If you aren't
+Run **quickLook** - but given the height of pmtl, you are going to need to change the RH values. If you aren't
 sure how that should go, try a broad RH region:
+
+- *quickLook pmtl 2020 300 -h1 40 -h2 90 -e1 5 -e2 12*
 
 <img src="pmtl-first-try.png" width="500"/>
 
-I have annotated this to point out that there is an outlier in the SW region. Clearly we do not 
-need to lok at the lower RH values, so I will further restrict the analysis zone.
-The restricted elevation angles can be set at the command line, as can the heights. 
+I have annotated this quickLook periodogram to point out that there is an outlier in the SW region. 
+You can also see that the NW region is useless, which is what we should expect.
+You can try looking at a few more frequencies (such as Glonass) and using a more restricted RH region.
 
-- *make_json_input test 45.5571 -73.5204 54.073 -h1 70 -h2 90 -e1 5 -e2 12 -allfreq True*
+For a final analysis, you need to use **gnssir**. First you set up a json of instructions using
+**make_json_input**:  
+
+- *make_json_input pmtl 45.5571 -73.5204 54.073 -h1 70 -h2 90 -e1 5 -e2 12 -allfreq True*
 
 [You will need to hand-edit the json to remove GPS L2C, GPS L5, and Galileo, and 
-to set the azimuth region and amplitudes. Here is my version that you can compare to](pmtl.json).
+to set the azimuth region and amplitudes. Here is my json that you can compare to](pmtl.json).
 Note: I do not consider this to be the "final" mask. For a busy region 
-like a harbor, you would want to examine multiple days and weeks of data before making final decisions.
+like a harbor, you would want to examine multiple days and weeks of data before 
+making final decisions.
 
 There is a tide gauge near this site. Please see NRCAN for more information.
 
