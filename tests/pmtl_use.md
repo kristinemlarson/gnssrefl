@@ -17,23 +17,22 @@ note the ellipsoidal height (and geoid corrected height),
 
 For reflections, you want to know the height above the water.
 This is easy for an ocean site - but a little trickier here. To start out, concentrate on the 
-geographic mask, and use the geoid corrected ellipsoidal height from [my webapp](https://gnss-reflections.org/rzones).
+geographic mask appropriate for its location using my [reflection zone webapp](https://gnss-reflections.org/rzones).
 
 <img src="pmtl_rzone.png" width="500" />
 
-
-Make a SNR file using the -orb gnss option, -archive nrcan, and -rate high option
+Make a SNR file using the -orb gps+glo, -archive nrcan, and -rate high options.
 
 - *rinex2snr pmtl 2020 300 -archive nrcan -rate high -orb gps+glo*
 
 Run **quickLook** - but given the height of pmtl, you are going to need to change the RH values. If you aren't
-sure how that should go, try a broad RH region:
+sure how that should go, start out with a broad RH region:
 
 - *quickLook pmtl 2020 300 -h1 40 -h2 90 -e1 5 -e2 12*
 
 <img src="pmtl-first-try.png" width="500"/>
 
-I have annotated this quickLook periodogram to point out that there is an outlier in the SW region. 
+I have annotated this **quickLook** periodogram to point out that there is an outlier in the SW region. 
 You can also see that the NW region is useless, which is what we should expect.
 You can try looking at a few more frequencies (such as Glonass) and using a more restricted RH region.
 
@@ -49,8 +48,8 @@ like a harbor, you would want to examine multiple days and weeks of data before
 making final decisions.
 
 There is a tide gauge near this site. Please see NRCAN for more information.
-I downloaded this plot. You can see the expected signal for November 25, 2020, the day
-i used as an example. The St Lawrence River height is just where you would expect, given the difference between
+I downloaded this plot. You can see the expected height of the river on November 25, 2020, the day
+I used as an example. The St Lawrence River height is just where you would expect, given the difference between
 the RH analysis and the orthometric height of the GNSS antenna.
 
 <img src="montreal.png" width="500">
