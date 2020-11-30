@@ -23,12 +23,12 @@ geographic mask appropriate for its location using my [reflection zone webapp](h
 
 Make a SNR file using the -orb gps+glo, -archive nrcan, and -rate high options.
 
-- *rinex2snr pmtl 2020 300 -archive nrcan -rate high -orb gps+glo*
+- *rinex2snr pmtl 2020 330 -archive nrcan -rate high -orb gps+glo*
 
 Run **quickLook** - but given the height of pmtl, you are going to need to change the RH values. If you aren't
 sure how that should go, start out with a broad RH region:
 
-- *quickLook pmtl 2020 300 -h1 40 -h2 90 -e1 5 -e2 12*
+- *quickLook pmtl 2020 330 -h1 40 -h2 90 -e1 5 -e2 12*
 
 <img src="pmtl-first-try.png" width="500"/>
 
