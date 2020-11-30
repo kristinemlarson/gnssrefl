@@ -1,4 +1,4 @@
-### Some uses cases to help you test out gnssrefl
+### Some Use Cases to Help You Test Out gnssrefl
 
 This document provides some use cases for GNSS interferometric reflectometry. 
 The goal is to provide you with tests to make sure you have properly installed the code. For details about the technique, 
