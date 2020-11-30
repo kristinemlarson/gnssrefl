@@ -42,12 +42,15 @@ For a final analysis, you need to use **gnssir**. First you set up a json of ins
 
 - *make_json_input pmtl 45.5571 -73.5204 54.073 -h1 70 -h2 90 -e1 5 -e2 12 -allfreq True*
 
-[You will need to hand-edit the json to remove GPS L2C, GPS L5, and Galileo, and 
-to set the azimuth region and amplitudes. Here is my json that you can compare to](pmtl.json).
+You will need to hand-edit the json to remove GPS L2C, GPS L5, and Galileo data, and 
+to set your azimuth region and amplitudes. [Here is my json that you can compare to](pmtl.json).
 Note: I do not consider this to be the "final" mask. For a busy region 
 like a harbor, you would want to examine multiple days and weeks of data before 
 making final decisions.
 
 There is a tide gauge near this site. Please see NRCAN for more information.
+I downloaded this plot. You can see the expected signal for November 25, 2020, the day
+i used as an example. The St Lawrence River height is just where you would expect, given the difference between
+the RH analysis and the orthometric height of the GNSS antenna.
 
 <img src="montreal.png" width="500">
