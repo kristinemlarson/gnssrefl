@@ -1,5 +1,7 @@
 ### News 
 
+[I have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
+
 CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
 implemented security restrictions, we have had to change our download access. 
 For this reason we strongly urge that you install **wget** on your machine.
@@ -39,7 +41,7 @@ photographs. If it doesn't belong to you, look at Google Earth.
 
 ### gnssrefl
 
-This package is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
+**gnssrefl** is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
 The main difference bewteen this version and previous versions is that I am
 attempting to use proper python packaging rules, LOL. I have separated out the main

@@ -1,9 +1,7 @@
-### First drivethru of gnssrefl
+### Some uses cases to help you test out gnssrefl
 
-This document provides use cases for GNSS interferometric reflectometry. 
-It does not explain everything about the technique, the code, or 
-the sites we will be using, but it will provide some tests you can use 
-to make sure you have properly installed the code. For details about the technique, 
+This document provides some use cases for GNSS interferometric reflectometry. 
+The goal is to provide you with tests to make sure you have properly installed the code. For details about the technique, 
 you should start with reading [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
 which was published open option.  
 
@@ -104,7 +102,7 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 
 * [Thwaites Glacier, Antarctica](lthw_use.md)
 
-* [Lake Superior, Canada](mchn_use.md)
+* [Michipicoten, Lake Superior, Canada](mchn_use.md)
 
 * [Summit Camp, Greenland](smm3_use.md)
 

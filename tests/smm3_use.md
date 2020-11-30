@@ -33,14 +33,19 @@ title of the periodogram plot. As are the elevation angle limits.
 
 - Look at the results using default parameters: *quickLook smm3 2020 106*
 
-Why does this not look like the periodogram results from my web app?? Look closely.
+<img src="smm3-default.png" width="500" />
+
+Why does this not look like the periodogram results from my web app? Look closely.
 smm3 is ~16 meters above the ice sheet - and this far exceeds the code default of 6 meters.
-You need to reset the allowed reflector heights. Now modify your call to 
-**quickLook**, using elevation angle mask of 5-15 and RH mask of 8-20 meters.
+You need to reset the allowed reflector heights. Modify your call to 
+**quickLook**, using RH mask of 8-20 meters.  Also change the elevation angle mask to 5-15.
 
 - *quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15*
 
-Notice that there is quite a bit of spread in the northwest.  That is because the reflection 
+<img src="smm3-sensible.png" width="500" />
+
+Notice that instead of strong peaks center at a single RH value, 
+there is quite a bit of spread in the northwest quadrant. That is because the reflection 
 area is more complex (and maybe also reflecting off things that are not snow). 
 
 ### Steps for Longer Analysis: 
