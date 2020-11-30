@@ -20,7 +20,8 @@ Note that there is an antenna height blunder in the very early data for the site
 
 **This site has been optimally set up for positions and reflectometry.** This means there is no elevation 
 angle applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
-well as Glonass. I am not sure if it tracks Galileo - but you can inquire with Dave Mencin at UNAVCO. 
+well as Glonass. I am not sure if it tracks Galileo - but you can try to find out by 
+inquiring with Dave Mencin at UNAVCO. 
 Unlike some of the earlier reflectometry demonstrations, the 
 L1 data from this receiver are great. How can you tell what signals are tracked at this receiver?
 Unfortunately I do not know how to find this information at the archive of record. Although 1 second
@@ -35,17 +36,17 @@ title of the periodogram plot. As are the elevation angle limits.
 
 <img src="smm3-default.png" width="500" />
 
+Periodogram traces in gray means the code did not find a significant RH peak.  
 Why does this not look like the periodogram results from my web app? Look closely.
-smm3 is ~16 meters above the ice sheet - and this far exceeds the code default of 6 meters.
-You need to reset the allowed reflector heights. Modify your call to 
-**quickLook**, using RH mask of 8-20 meters.  Also change the elevation angle mask to 5-15.
+smm3 is ~14 meters above the ice sheet - and this far exceeds the code default of 6 meters.
+You need to reset the allowed reflector heights. Modify your call to **quickLook**, using RH mask of 8-20 meters.  Also change the elevation angle mask to 5-15.
 
 - *quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15*
 
 <img src="smm3-sensible.png" width="500" />
 
 Notice that instead of strong peaks center at a single RH value, 
-there is quite a bit of spread in the northwest quadrant. That is because the reflection 
+there is quite a bit of spread in the northwest and northeast quadrants. That is because the reflection 
 area is more complex (and maybe also reflecting off things that are not snow). 
 
 ### Steps for Longer Analysis: 
