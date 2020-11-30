@@ -2,8 +2,13 @@
 
 Station pmtl is operated by the Montreal Port Authority. The data are archived at NRCAN. 
 
-GPS L1, Glonass L1 and L2 can be used at this site. It would be great to get L2C, L5, Galileo, and Beidou data
-in the future.
+Because I need to use high-rate data at this site, you need to have installed **teqc**.
+See the [main documentation for more information](https://github.com/kristinemlarson/gnssrefl).
+I also urge you to install the **gnssSNR** Fortran code, as it is MUCH faster 
+than my python-only RINEX reader/orbit interpolator.
+
+GPS L1, Glonass L1 and L2 can be used at this site. Tracking L2C, L5, Galileo, and Beidou signals 
+would significantly improve the site.
 
 Look at the [NRCAN Site Description for pmtl](https://webapp.geod.nrcan.gc.ca/geod/data-donnees/station/report-rapport.php?id=M0722900)
 
@@ -22,8 +27,10 @@ geographic mask appropriate for its location using my [reflection zone webapp](h
 <img src="pmtl_rzone.png" width="500" />
 
 Make a SNR file using the -orb gps+glo, -archive nrcan, and -rate high options.
+Warning: downloading a high-rate GNSS file can take a while ... 
 
 - *rinex2snr pmtl 2020 330 -archive nrcan -rate high -orb gps+glo*
+
 
 Run **quickLook** - but given the height of pmtl, you are going to need to change the RH values. If you aren't
 sure how that should go, start out with a broad RH region:
