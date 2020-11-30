@@ -70,9 +70,14 @@ These are the results for Glonass L1
 
 <img src="pmtl_l101.png" width="500" />
 
-The RH results are written to $REFL_CODE/2020/results/pmtl/330.txt
-Once you are happy with how you have set your mask and QC metrics, you would analyze multiple days, and at this 
-site, convert the results to a daily average.
+The RH results for a single day are written to $REFL_CODE/2020/results/pmtl/330.txt
+Once you are happy with how you have set your station mask (elevation and azimuth angles) 
+and quality control metrics, you can analyze as much data as you like. This command would do all the data
+between day of year 300 and day of year 330 (assuming you had previously run **rinex2snr** for the same time period):
+
+- *gnssir pmtl 2020 300 -doy_end 330*
+
+At this site you would most likely convert the results to a daily average using **daily_avg**.
 
 There is a tide gauge near this site. Please see NRCAN for more information.
 I downloaded this plot. You can see the expected height of the river on November 25, 2020, the day
