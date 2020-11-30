@@ -16,22 +16,31 @@ note the ellipsoidal height (and geoid corrected height),
 **Picking a mask:** 
 
 For reflections, you want to know the height above the water.
-This is easy for an ocean site - but a little tricker here. To start out, concentrate on the 
-geographic mask, and use the geoid corrected ellipsoidal height using [my webapp.] (https://gnss-reflections.org/rzones)
+This is easy for an ocean site - but a little trickier here. To start out, concentrate on the 
+geographic mask, and use the geoid corrected ellipsoidal height from [my webapp](https://gnss-reflections.org/rzones).
 
 <img src="pmtl_rzone.png" width="500" />
 
-**Exercise for the reader:** Download a 1-Hz RINEX file from NRCAN. Make sure to include both GPS and Glonass.
 
-- make a SNR file using the -orb gnss option
+- make a SNR file using the -orb gnss option, -archive nrcan, and -rate high option
 
-- run quickLook - but given the height of pmtl, you are going to need to change the RH values
+- rinex2snr pmtl 2020 300 -archive nrcan -rate high -orb gps+glo
 
+- run **quickLook** - but given the height of pmtl, you are going to need to change the RH values. If you aren't
+sure how that should go, try a broad RH region:
 
-You need to use **make_json_input** to set up the analysis instructions.
-The restricted elevation angles can be set at the command line, as can the heights. Use -allfreq True.
-[You will need to hand-edit it to remove L2 and Galileo and to set the azimuth region.](pmtl.json)
+<img src="pmtl-first-try.png" width="500"/>
 
+I have annotated this to point out that there is an outlier in the SW region. Clearly we do not 
+need to lok at the lower RH values, so I will further restrict the analysis zone.
+The restricted elevation angles can be set at the command line, as can the heights. 
+
+- *make_json_input test 45.5571 -73.5204 54.073 -h1 70 -h2 90 -e1 5 -e2 12 -allfreq True*
+
+[You will need to hand-edit the json to remove GPS L2C, GPS L5, and Galileo, and 
+to set the azimuth region and amplitudes. Here is my version that you can compare to](pmtl.json).
+Note: I do not consider this to be the "final" mask. For a busy region 
+like a harbor, you would want to examine multiple days and weeks of data before making final decisions.
 
 There is a tide gauge near this site. Please see NRCAN for more information.
 
