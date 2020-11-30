@@ -52,7 +52,27 @@ You will need to hand-edit the json to remove GPS L2C, GPS L5, and Galileo data,
 to set your azimuth region and amplitudes. [Here is my json that you can compare to](pmtl.json).
 Note: I do not consider this to be the "final" mask. For a busy region 
 like a harbor, you would want to examine multiple days and weeks of data before 
-making final decisions.
+making final decisions. To run the **gnssir** code, you really only need to provide the station name,
+the year, and doy.  The rest of the inputs are in that json.
+
+- *gnssir pmtl 2020 330*
+
+If you want to see some plots of different frequencies (they will not be like the quadrants you saw before):
+
+- *gnssir pmtl 2020 330 -plt True*
+
+This is L1. The top plot is all the SNR data used in the periodograms. The plot below is the RH periodograms all on 
+top of each other. Different colors are different satellites.
+
+<img src="pmtl_l1.png" width="500" />
+
+These are the results for Glonass L1
+
+<img src="pmtl_l101.png" width="500" />
+
+The RH results are written to $REFL_CODE/2020/results/pmtl/330.txt
+Once you are happy with how you have set your mask and QC metrics, you would analyze multiple days, and at this 
+site, convert the results to a daily average.
 
 There is a tide gauge near this site. Please see NRCAN for more information.
 I downloaded this plot. You can see the expected height of the river on November 25, 2020, the day
