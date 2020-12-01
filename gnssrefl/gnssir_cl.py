@@ -49,6 +49,7 @@ def main():
     parser.add_argument("-delTmax", default=None, type=int, help="Req satellite arc length (minutes)")
     parser.add_argument("-e1", default=None, type=str, help="override min elev angle")
     parser.add_argument("-e2", default=None, type=str, help="override max elev angle")
+    parser.add_argument("-mmdd", default=None, type=str, help="boolean, add columns for month,day,hour,minute")
 
     args = parser.parse_args()
 
@@ -116,6 +117,12 @@ def main():
         doy_end = doy
     else:
         doy_end = int(args.doy_end)
+        
+
+    add_mmddhhss = False
+    if args.mmdd == 'True':
+        add_mmddhhss = True
+
 
 # in case you want to analyze multiple years of data
     if args.year_end == None:
@@ -169,6 +176,7 @@ def main():
         print('Overriding - only looking at a single satellite')
         lsp['onesat'] = [args.sat]
 
+    lsp['mmdd'] = add_mmddhhss
 
     year_list = list(range(year, year_end+1))
     doy_list = list(range(doy, doy_end+1))

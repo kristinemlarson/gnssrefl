@@ -3478,7 +3478,7 @@ def rinex_nrcan_highrate(station, year, month, day):
             subprocess.call(cm,shell=True)
             subprocess.call(['mv',foutname,rinexname])
     else:
-        print('If you had installed teqc, I would have merged the files for you')
+        print('If you had installed teqc, I would have merged the files for you. ')
 
 
 def rinex_ga_highrate(station, year, month, day):
@@ -3679,7 +3679,8 @@ def warn_and_exit(snrexe,fortran):
     else:
         print('you are using fortran, so good to check now if translation exe exists')
         if (os.path.isfile(snrexe) == False):
-            print('The translation executable does not exist:' + snrexe + ' Exiting ')
+            print('This RINEX translation executable does not exist:' + snrexe + ' Exiting ')
+            print('Install it or use -fortran False')
             sys.exit()
 
 def quick_rinex_snrC(year, doy, station, option, orbtype,receiverrate,dec_rate,archive):
