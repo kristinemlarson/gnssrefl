@@ -96,6 +96,7 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 
 <table>
 <TR>
+<TH>Cryosphere</TH>
 <TD>
 
 * [Ross Ice Shelf, Antarctica](lorg_use.md)
@@ -106,6 +107,7 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 
 * [Summit Camp, Greenland](smm3_use.md)
 </TD>
+<TH>Lakes and Rivers</TH>
 <td>
 
 * [Lake Taupo, New Zealand](tgho_use.md)
@@ -117,12 +119,18 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 
 * Steenbras Reservoir, Republic of South Africa
 </TD>
-
+<TH>Tides and Storm Surges</TH>
 <TD>
 * Storm Surge - Hurricane Laura
+</TD>
+</TR>
 
+<TR>
+<TH>Seasonal Snow</TH>
+<TD>
 * Half Island Park, Idaho (snow)
 </TD>
+
 </TR>
 </Table>
 
