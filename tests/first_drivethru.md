@@ -143,7 +143,11 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 </TD>
 <TH>Soil Moisture</TH>
 
+<TD>
+
 * TBD
+
+</TD>
 
 </TR>
 </Table>
