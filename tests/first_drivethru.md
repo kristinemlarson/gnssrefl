@@ -99,7 +99,7 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 <TH>Cryosphere</TH>
 <TD>
 
-* [Ross Ice Shelf, Antarctica](lorg_use.md)
+* [Lorne, Ross Ice Shelf, Antarctica](lorg_use.md)
 
 * [Dye2, Greenland Ice Sheet](gls1_use.md)
 
@@ -121,15 +121,24 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 </TD>
 <TH>Tides and Storm Surges</TH>
 <TD>
-* Storm Surge - Hurricane Laura
+*Hurricane Laura*
+
+*St Michael, Alaska*
+
+*Palmer Station, Antarctica*
+
 </TD>
 </TR>
 
 <TR>
 <TH>Seasonal Snow</TH>
 <TD>
-* Half Island Park, Idaho (snow)
+*Half Island Park, Idaho*
+
+*Niwot Ridge, Colorado*
 </TD>
+<TH>Soil Moisture</TH>
+TBD
 
 </TR>
 </Table>
