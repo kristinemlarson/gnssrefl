@@ -122,6 +122,7 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 </TD>
 <TH>Tides and Storm Surges</TH>
 <TD>
+
 * Hurricane Laura
 
 * St Michael, Alaska
@@ -141,7 +142,8 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 
 </TD>
 <TH>Soil Moisture</TH>
-TBD
+
+* TBD
 
 </TR>
 </Table>
