@@ -140,6 +140,10 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 
 * Niwot Ridge, Colorado
 
+* Coldfoot, Alaska
+
+* Priddis, Alberta, Canada
+
 </TD>
 <TH>Soil Moisture</TH>
 
