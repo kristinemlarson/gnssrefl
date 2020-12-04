@@ -118,14 +118,15 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 * [St Lawrence River, Montreal, Canada](pmtl_use.md)
 
 * Steenbras Reservoir, Republic of South Africa
+
 </TD>
 <TH>Tides and Storm Surges</TH>
 <TD>
-*Hurricane Laura*
+* Hurricane Laura
 
-*St Michael, Alaska*
+* St Michael, Alaska
 
-*Palmer Station, Antarctica*
+* Palmer Station, Antarctica
 
 </TD>
 </TR>
@@ -133,9 +134,11 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 <TR>
 <TH>Seasonal Snow</TH>
 <TD>
-*Half Island Park, Idaho*
 
-*Niwot Ridge, Colorado*
+* Half Island Park, Idaho
+
+* Niwot Ridge, Colorado
+
 </TD>
 <TH>Soil Moisture</TH>
 TBD
