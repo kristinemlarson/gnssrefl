@@ -30,6 +30,7 @@ setup(
             'xyz2llh = gnssrefl.xyz2llh:main',
             'llh2xyz = gnssrefl.llh2xyz:main',
             'prn2gps = gnssrefl.prn2gps:main',
+            'download_tides = gnssrefl.download_tides:main',
             ], 
         },
     install_requires=requirements,

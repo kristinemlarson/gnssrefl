@@ -643,6 +643,7 @@ def rinex_cddis(station, year, month, day):
 
     June 2020, changed  to use secure ftp
     if day is zero, then month is assumed to be doy
+    This is only Rinex version 2 I believe
     
     """
     print('try to find file at CDDIS')
@@ -677,10 +678,17 @@ def rinex_cddis(station, year, month, day):
     except:
         print('some issue at CDDIS',file1)
         subprocess.call(['rm', '-f',file1])
+    if not (os.path.exists(oname)):
+        print('unsuccessful RINEX 2.11 download from CDDIS')
+        print('will try the gz version')
+        try:
+            cddis_download(file2,dir_secure)
+            subprocess.call(['gunzip', file2])
+        except:
+            print('gzip version failed',file2)
+
     if os.path.exists(oname):
         print('successful RINEX 2.11 download from CDDIS')
-    else:
-        print('unsuccessful RINEX 2.11 download from CDDIS')
 
 def rinex_nz(station, year, month, day):
     """

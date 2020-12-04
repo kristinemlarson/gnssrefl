@@ -94,23 +94,36 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 
 ### Use Cases (These are under development)
 
+<table>
+<TR>
+<TD>
+
 * [Ross Ice Shelf, Antarctica](lorg_use.md)
 
 * [Dye2, Greenland Ice Sheet](gls1_use.md)
 
+* [Thwaites Glacier, Antarctica](lthw_use.md)
+
+* [Summit Camp, Greenland](smm3_use.md)
+</TD>
+<td>
+
 * [Lake Taupo, New Zealand](tgho_use.md)
 
-* [Thwaites Glacier, Antarctica](lthw_use.md)
 
 * [Michipicoten, Lake Superior, Canada](mchn_use.md)
 
-* [Summit Camp, Greenland](smm3_use.md)
+* [St Lawrence River, Montreal, Canada](pmtl_use.md)
 
 * Steenbras Reservoir, Republic of South Africa
+</TD>
 
+<TD>
 * Storm Surge - Hurricane Laura
 
 * Half Island Park, Idaho (snow)
+</TD>
+</TR>
+</Table>
 
-* St Lawrence River, Montreal, Canada
 
