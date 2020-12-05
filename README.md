@@ -472,6 +472,10 @@ the reflection-specific codes. Sample calls:
 
 **xyz2llh** translates Cartesian coordinates to latitude, longitude, height
 
+**download_tides** downloads up to a month of NOAA tide gauge data given station number (7 characters),
+and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,
+but this utility writes out a file with only numbers (which I always prefer) instead of 
+csv. And I did not need to learn how to use pandas.
 
 ### Publications
 
