@@ -21,7 +21,6 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     snr_type is an integer (99, 66, etc). lsp is a json
     """
 
-    print('new input', lsp['mmdd'])
     #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
@@ -88,7 +87,8 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                 #fig = Figure(figsize=(10,6))
             rj = 0
             gj = 0
-            print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
+            if screenstats: 
+                print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
 #   get the list of satellites for this frequency
             if onesat == None:
                 satlist = g.find_satlist(f,snrE)
@@ -132,9 +132,11 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                             if screenstats:
                                 print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
                                 g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct])
-            print('=================================================================================')
-            print('     Frequency ', f, ' good arcs:', gj, ' rejected arcs:', rj )
-            print('=================================================================================')
+
+            if screenstats:
+                print('=================================================================================')
+                print('     Frequency ', f, ' good arcs:', gj, ' rejected arcs:', rj )
+                print('=================================================================================')
             total_arcs = gj + total_arcs
 # close the output files
             ct += 1

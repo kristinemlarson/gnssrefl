@@ -6,6 +6,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+import subprocess
 
 import scipy.interpolate
 import scipy.signal
@@ -87,6 +88,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     # make sure environment variables exist
     g.check_environ_variables()
 
+    if not os.path.isdir('logs'):
+        subprocess.call(['mkdir', 'logs'])
+
     webapp = False 
     # orbit directories
     ann = g.make_nav_dirs(year)
@@ -104,7 +108,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     minNumPts = 20 
     #noise region for LSP QC. these are meters
     NReg = [minH, maxH]
-    print('Refl. Ht. Noise Region used: ', NReg)
+    #print('Refl. Ht. Noise Region used: ', NReg)
     # for quickLook, we use the four geographic quadrants - these are azimuth angles in degrees
     azval = [270, 360, 180, 270, 0, 90, 90, 180]
     naz = int(len(azval)/2) # number of azimuth pairs
@@ -120,26 +124,29 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         print('>>>> The snr file exists ',obsfile)
     else:
         if True:
-            print('looking for the SNR file on disk')
+            #print('looking for the SNR file on disk')
             obsfile, obsfileCmp, snre =  g.define_and_xz_snr(station,year,doy,snr_type)
             if snre:
                 dkfjaklj = True
                 #print('file exists on disk')
             else:
                 print('>>>> The SNR the file does not exist ',obsfile)
-                print('I will try to pick up a RINEX file ')
-                print('and translate it for you. This will be GPS only.')
-                print('For now I will check all the official archives for you.')
-                rate = 'low'; dec_rate = 0; archive = 'all'; 
-                rinex.conv2snr(year, doy, station, int(snr_type), 'nav',rate,dec_rate,archive,fortran)
-                if os.path.isfile(obsfile):
-                    print('the SNR file now exists')  
-                else:
-                    print('the RINEX file did not exist, had no SNR data, or failed to convert, so exiting.')
+                print('This code used to try and make one for you, but I have removed this option.')
+                print('Please us rinex2snr and make a SNR file')
+                sys.exit()
+                #print('I will try to pick up a RINEX file ')
+                #print('and translate it for you. This will be GPS only.')
+                #print('For now I will check all the official archives for you.')
+                #rate = 'low'; dec_rate = 0; archive = 'all'; 
+                #rinex.conv2snr(year, doy, station, int(snr_type), 'nav',rate,dec_rate,archive,fortran)
+                #if os.path.isfile(obsfile):
+                #    print('the SNR file now exists')  
+                #else:
+                #    print('the RINEX file did not exist, had no SNR data, or failed to convert, so exiting.')
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)
     if allGood == 1:
         # make output file for the quickLook RRH values, just so you can give them a quick look see
-        rhout = open('rh.txt','w+')
+        rhout = open('logs/rh.txt','w+')
         amax = 0
         minEdataset = np.min(ele)
         print('minimum elevation angle (degrees) for this dataset: ', minEdataset)
@@ -197,7 +204,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         plt.suptitle(tt, fontsize=12)
 
         rhout.close()
-        print('Reflector Height results are stored in a file called rh.txt')
+        print('Reflector Height results are stored in a file called logs/rh.txt')
         if webapp:
             fig.savefig('temp.png', format="png")
         else:

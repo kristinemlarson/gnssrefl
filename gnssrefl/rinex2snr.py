@@ -19,7 +19,12 @@ class constants:
     c= 299792458 # m/sec
  
 #
-def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol):
+def quickname(station,year,cyy, cdoy, csnr):
+    xdir  = os.environ['REFL_CODE'] + '/'
+    fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
+    return fname
+
+def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite):
     """
     runs the rinex 2 snr conversion
     inputs:
@@ -33,14 +38,17 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     archive = allows you to pick a specific archive
     fortran = boolean, whether you use fortran rinex translators
     nol = boolean for nolook, if set to True, then it will assume RINEX files are in local directory
+    overwrite = boolean, make a new SNR file even if one already exists
     """
 
     NS = len(station)
     if (NS == 4):
-        print('Assume RINEX 2.11'); version = 2
+        #print('Assume RINEX 2.11'); 
+        version = 2
         station = station.lower()
     elif (NS == 9):
-        print('Assume RINEX 3'); version = 3
+        #print('Assume RINEX 3'); 
+        version = 3
         station9ch = station.upper()
         station = station[0:4].lower()
     else:
@@ -54,18 +62,24 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             csnr = str(isnr)
             cdoy = '{:03d}'.format(doy) ; cyy = '{:02d}'.format(year-2000)
             # first, check to see if the SNR file exists
+            fname =  quickname(station,year,cyy,cdoy,csnr)
+            #print(fname)
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
-                print('snr file for ', station, str(year), cdoy, csnr, ' already exists')
-            else:
+                #print('snr file for ', station, str(year), cdoy, csnr, ' already exists')
+                if overwrite:
+                    #print('you requested it be overwritten, so removing file')
+                    subprocess.call(['rm', fname])
+                    snre = False
+            if (not snre):
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
-                print(station, year, doy, ': will try to find RINEX /make SNR ')
+                #print(station, year, doy, ': will try to find RINEX /make SNR ')
                 if nol:
+                    # this assumes RINEX file is in local directory
                     if version == 2:
-
                         if os.path.exists(r) or os.path.exists(rgz):
-                            print('RINEX 2 file exists locally')
+                            #print('RINEX 2 file exists locally')
                             if not os.path.exists(r):
                                 subprocess.call(['gunzip', rgz])
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran) 
@@ -78,20 +92,20 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         if os.path.exists(r3gz):
                             subprocess.call(['gunzip', r3gz])
                         if os.path.exists(r3):
-                            print('RINEX 3 file exists locally')
+                            #print('RINEX 3 file exists locally')
                             fexists = g.new_rinex3_rinex2(r3,r2)
                             if fexists:
-                                print('Rinex 3 to 2 conversion worked, now convert to snr format')
+                                #print('Rinex 3 to 2 conversion worked, now convert to snr format')
                                 conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran) 
                             else:
-                                print('Something about rinex 3-2 conversion did not work')
+                                print('Something about the RINEX 3-2 conversion did not work')
                         else:
-                            print('You Chose the No Look Option, but did not provide the needed RINEX file.')
+                            print('You Chose the No Look Option, but did not provide the needed RINEX3 file.')
 
                 else:
-                    print('will look for the RINEX file both locally and externally')
+                    #print('will look for the RINEX file both locally and externally')
                     if version == 3:
-                        print('rinex 3 search with orbtype ', orbtype)
+                        #print('rinex 3 search with orbtype ', orbtype)
                         srate = 30 # rate supported by CDDIS 
                         rinex2exists, rinex3name = g.cddis_rinex3(station9ch, year, doy,srate,orbtype)
                         if not rinex2exists:
@@ -102,12 +116,12 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         if rinex2exists:
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran) 
                         else:
-                            print('rinex file does not exist for ', year, doy)
+                            print('RINEX file does not exist for ', year, doy)
                     else:
-                        print('rinex 2.11 conversion with ', orbtype)
+                        # this is rinex version 2
                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran) 
 
-    print('And I guess I am done now!')
+    print('And I guess my work is done now!')
 
 def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,fortran):
     """
@@ -127,17 +141,24 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
 
     """
     # define directory for the conversion executables
-    print('Receiver rate:',receiverrate)
-    print('Decimation rate: ', dec_rate)
-    print('Archive: ', archive)
-    print('Use fortran: ', fortran)
-    print('Orbtype: ', orbtype)
+    if not os.path.isdir('logs'):
+        subprocess.call(['mkdir', 'logs'])
+    logname = 'logs/' + station + '.txt' 
+    log = open(logname, 'w+')
+    log.write("Receiver rate: {0:5s} \n".format(receiverrate))
+    log.write("Decimation rate: {0:3.0f} \n".format(dec_rate))
+    log.write("Archive: {0:10s} \n".format(archive))
+    if fortran:
+        log.write("Use Fortran: {0:4s} \n".format('True'))
+    else:
+        log.write("Use Fortran: {0:5s} \n".format('False'))
+    log.write("Orbits : {0:10s} \n".format(orbtype))
     exedir = os.environ['EXE']
     snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
     if (snre == True):
-        print('snrfile already exists:', snrname_full)
+        log.write("The snrfile already exists: {0:50s} \n".format(snrname_full))
     else:
-        print('the snrfile does not exist ', snrname_full)
+        log.write("The snrfile does not exist: {0:50s} \n".format(snrname_full))
         d = g.doy2ymd(year,doy); 
         month = d.month; day = d.day
         # new function to do the whole orbit thing
@@ -163,14 +184,14 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                     #fout = open(foutname,'w')
                     #subprocess.call([exc, '-O.obs','S1+S2+S5+S6+S7+S8', '-n_GLONASS', '27', rinexfile],stdout=fout)
                     #fout.close()
-                    print('no longer use teqc for reducing observables')
+                    log.write('This option deprecated - no longer use teqc for reducing observables \n')
                 # store it in the original rinex filename
                     #subprocess.call(['rm','-f',rinexfile])
                     #subprocess.call(['mv','-f',foutname, rinexfile])
                 # decimate this new rinex file
                     if (rexist and dec_rate > 0): 
-                        print('decimate using teqc ', dec_rate, ' seconds')
-                        print('unfortunately Lou Estey removes Beidou data. Eventually I will remove this.')
+                        log.write("Decimating using teqc:  {0:3.0f}  seconds \n".format(dec_rate))
+                        log.write('Unfortunately teqc removes Beidou data. Eventually I will remove this. \n')
                         rinexout = rinexfile + '.tmp'; cdec = str(dec_rate)
                         fout = open(rinexout,'w')
                         subprocess.call([exc, '-O.dec', cdec, rinexfile],stdout=fout)
@@ -181,34 +202,42 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                 snrname = g.snr_name(station, year,month,day,option)
                 orbfile = orbdir + '/' + f
                 if fortran:
-                    print('Using fortran for translation')
                     try:
-                        subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
+                        #subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
+                        log.write('Using fortran for translation  - separate log is used for stdout \n')
+                        flogname = 'logs/' + station + '_fortran.txt'
+                        flog = open(flogname, 'w+')
+                        a=subprocess.run([snrexe, rinexfile, snrname, orbfile, str(option)],capture_output=True,text=True)
+                        ddd = a.stdout; flog.write(ddd); flog.close()
                         status = subprocess.call(['rm','-f', rinexfile ])
                         status = subprocess.call(['xz', orbfile])
                     except:
-                        print('no success making SNR file')
+                        log.write('Problem with making SNR file, check log {0:50s} \n'.format(flogname))
                 else:
-                    print('Do not use fortran to make ', snrname)
-                    print('decimating will be done here instead of using teqc')
-                    rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate)
+                    log.write('SNR file {0:50s} \n will not use fortran to make \n'.format( snrname))
+                    log.write('Decimating will be done here instead of using teqc \n')
+                    rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate,log)
 
                 # remove the rinex file
                 subprocess.call(['rm', '-f',rinexfile])
 
-                # check to make sure the conversion worked
                 if os.path.isfile(snrname): 
 #                make sure it exists and is non-zero size before moving it
                     if (os.stat(snrname).st_size == 0):
-                        print('you created a zero file size which could mean a lot of things')
-                        print('bad exe, bad snr option, do not really have the orbit file')
+                        log.write('you created a zero file size which could mean a lot of things \n')
+                        log.write('bad exe, bad snr option, do not really have the orbit file \n')
                         status = subprocess.call(['rm','-f', snrname ])
                     else:
-                        print('a SNR file was created and it is non-zero in length')
-                        print(snrname_full)
+                        log.write('A SNR file was created: {0:50s}  \n'.format(snrname_full))
+                        print('\n')
+                        print('A SNR file was created:', snrname_full)
                         g.store_snrfile(snrname,year,station) 
             else:
                 print('Either the RINEX file or orbit file does not exist, so there is nothing to convert')
+                log.write('Either the RINEX file or orbit file does not exist, so there is nothing to convert \n')
+
+    # close the log file
+    log.close()
 
     return True
 
@@ -264,7 +293,7 @@ def satorb(week, sec_of_week, ephem):
     return np.array([xk, yk, zk])
 
 
-def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate):
+def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
     """
     inputs are obsfile - RINEX 2.11
     navfile, which can be nav message or sp3 file
@@ -279,12 +308,16 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate):
     Kristine M. Larson August 2020
     This relies on Joakim's rinex reading code
     """
-    # figure out if you have a nav file or a sp3 file
+    station = obsfile[0:4]
+    #logname = 'logs/' + station + 'python.txt'
+    #log = open(logname, 'w+')
     last3 = navfile[-3::]
+    # figure out if you have a nav file or a sp3 file
     orbtype = 'sp3' # assume it is sp3
     if (last3 != 'SP3') and (last3 != 'sp3'):
         orbtype = 'nav'
-    print('orbit type ', orbtype,navfile)
+    log.write("Orbit type {0:4s} \n".format(orbtype))
+    log.write("File name {0:50s} \n".format(navfile))
     # these are the elevation angle limits I have been using for the various SNR formats
     emin,emax = elev_limits(snroption)
 
@@ -295,14 +328,15 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate):
     # need to check to see what happens without coordinates
     key = 'APPROX POSITION XYZ' 
     if key in header.keys():
-        print('has Cartesian coordinates in the RINEX Header')
+        log.write('Cartesian coordinates are in the RINEX Header \n')
     else:
-        print('RINEX file does not have station coordinates. Exiting')
+        log.write('RINEX file does not have station coordinates. Exiting \n')
+        print('RINEX file does not have station coordinates. This is illegal. Exiting')
         return
     rv =  header['APPROX POSITION XYZ'] 
     recv = [float(i) for i in rv.split()]
     recv = np.array(recv)
-    print('XYZ from header', recv)
+    log.write("XYZ from header {0:15.5f} {1:15.5f} {2:15.5f} \n".format(recv[0],recv[1],recv[2]))
     if np.sum(np.abs(recv)) < 5:
         print('Your receiver coordinates are in the middle of the Earth. Exiting.')
         exitQ = True
@@ -321,43 +355,46 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate):
     if 'S5' in obslist :
         s5exist = True
     if not s1exist and not s2exist: 
-        print('hard to know why you are translating this RINEX file as there are no S1 and S2 data')
+        log.write('There are no S1 and no S2 data - this file is not useful for reflectometry \n')
         exitQ = True
     if (orbtype == 'nav'):
         gpssatlist = systemsatlists['G'][:] 
-        print('GPS satellite list', gpssatlist)
-        navorbits(navfile,obstimes,obsdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate)
+        #print('GPS satellite list', gpssatlist)
+        navorbits(navfile,obstimes,obsdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log)
     else:
-        print('read the sp3 file'); sp3 = g.read_sp3file(navfile)
-        test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate)
+        log.write('Read the sp3 file \n'); sp3 = g.read_sp3file(navfile)
+        test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate,log)
 
+    #print('Closing python RINEX conversion log file:',logname)
+    #log.close()
 
-def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate):
+def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log):
     """
     This is for GPS only files !
     navfile is nav broadcast ephemeris in RINEX format
     inputs are rinex info, obstimes, observationdata,prntoidx,gpssatlist
     various bits about SNR existence
     snrfile is output name
+    log is for screen outputs - now going to a file
     """
-    print('read ephemeris data')
+    log.write('reading the ephemeris data \n')
     ephemdata = g.myreadnav(navfile)
     if len(ephemdata) == 0:
-        print("empty ephemeris or does not exist")
+        log.write("Empty ephemeris or the file does not exist \n")
         return
 
     # change variable name to save typing
     a=obstimes
     if True:
-        print('opening output file for the SNR data ')
+        log.write('Opening output file for the SNR data \n')
         fout = open(snrfile, 'w+')
         K=len(obstimes)
-        print('number of epochs in the RINEX file ', K)
-        print('decimation rate',dec_rate)
+        log.write('Number of epochs in the RINEX file {0:6.0f} \n '.format( K))
+        log.write('Decimation rate {0:3.0f} \n'.format(dec_rate))
 
         for i in range(0,K):
             if np.remainder(i,1000) == 0:
-                print('epoch ', i)
+                log.write('Epoch {0:6.0f} \n'.format( i))
             # sod is seconds of the day
             sod = 3600*a[i].hour + 60*a[i].minute + a[i].second
             if dec_rate > 0:
@@ -379,6 +416,7 @@ def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfi
                                 fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} \n".format(sat,eleA, azimA, sod,0, 0, s1,s2, s5))
         fout.close()
     else:
+        log.write('There was some kind of problem with your file, exiting ...\n')
         print('There was some kind of problem with your file, exiting ...')
 
 def readSNRval(s1exist,s2exist,s5exist,observationdata,prntoidx,sat,i):
@@ -471,16 +509,17 @@ def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij):
 
     return SatOrbn
 
-def test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day, emin,emax,outputfile,up,East,North,recv,dec_rate):
+def test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day, emin,emax,outputfile,up,East,North,recv,dec_rate,log):
     """
     inputs are gpstime( numpy array with week and sow)
     sp3 is what has been read from the sp3 file
     columsn are satNu, week, sow, x, y, z (in meters)
+    log is for comments
     """
     checkD = False
     if dec_rate > 0:
         checkD = True
-        print('decimating')
+        log.write('You are decimating \n')
     # epoch at the beginning of the day of your RINEX file
     gweek0, gpssec0 = g.kgpsweek(year, month,day,0,0,0 )
 
@@ -490,13 +529,13 @@ def test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day
     fout = open(outputfile, 'w+')
     for con in ['G','E','R','C']:
         if con in obstypes:
-            print('good news - found data for constellation ', con)
+            log.write('Good news - found data for constellation {0:s} \n'.format( con))
             obslist = obstypes[con][:]
             satlist = systemsatlists[con][:]
-            print(satlist)
+            #print(satlist)
             for prn in satlist:
                 addon = g.findConstell(con) # 100,200,or 300 for R,E, and C 
-                print('Constellation ', con, ' satellite ', prn, addon)
+                log.write('Constellation {0:1s} Satellite {1:2.0f}  Addon {2:3.0f} \n'.format( con, prn, addon))
                 # window out the data for this satellite
                 m = sp3[:,0] == prn + addon
                 x = sp3[m,3]
@@ -540,9 +579,9 @@ def test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day
                                 fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} {9:7.2f} {10:7.2f} \n".format( 
                                     prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s6[ij]),float(s7[ij]) ))
                 else:
-                    print('this satellite is not in the orbit file.', prn)
+                    log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
         else:
-            print('no data for constellation ', con)
+            log.write('No data for constellation {0:1s} \n'.format(con))
     # print('sort by time')
     # tried saving to variable but it was very slow
     #ne = np.array([prn,eleA,azimA,Tp[ij],0,0,s1[ij],s2[ij],s5[ij],0,0])
@@ -550,7 +589,7 @@ def test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day
     #i = np.argsort(saveit[:,3])
     # apply that sort to variable with shorter name
     #s = saveit[i,:]
-    print('write to file')
+    log.write('write SNR data to file \n')
     fout.close()
 
 

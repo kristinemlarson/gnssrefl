@@ -21,9 +21,9 @@ import gnssrefl.gps as g
 
 def main():
 # pick up the environment variable for where you are keeping your LSP data
-    print('=================================================================================')
-    print('===========================RUNNING GNSS IR ======================================')
-    print('=================================================================================')
+#    print('=================================================================================')
+#    print('===========================RUNNING GNSS IR ======================================')
+#    print('=================================================================================')
  
 #
 # user inputs the observation file information
@@ -93,7 +93,7 @@ def main():
 
     if (args.delTmax != None):
         lsp['delTmax'] = args.delTmax
-        print('Using user defined maximum satellite arc time (minutes) ', lsp['delTmax'])
+        #print('Using user defined maximum satellite arc time (minutes) ', lsp['delTmax'])
 
 # though I would think not many people would do this ... 
     if (args.compress != None):
@@ -106,10 +106,10 @@ def main():
     #print(lsp['screenstats'], 'screenstats from json')
     # do you override them?
     if args.screenstats == 'False':
-        print('No statistics will come to the screen')
+        #print('No statistics will come to the screen')
         lsp['screenstats'] = False
     if args.screenstats == 'True':
-        print('Statistics will come to the screen')
+        #print('Statistics will come to the screen')
         lsp['screenstats'] = True
 
 # in case you want to analyze multiple days of data
@@ -133,16 +133,16 @@ def main():
 # default will be to overwrite
     if args.nooverwrite == None:
         lsp['overwriteResults'] = True
-        print('LSP results will be overwritten')
+        #print('LSP results will be overwritten')
     else:
         lsp['overwriteResults'] = False
-        print('LSP results will not be overwritten')
+        #print('LSP results will not be overwritten')
 
     if (args.e1 != None):
-        print('Overriding minimum elevation angle: ',args.e1)
+        #print('Overriding minimum elevation angle: ',args.e1)
         lsp['e1'] = float(args.e1)
     if (args.e2 != None):
-        print('Overriding maximum elevation angle: ',args.e2)
+        #print('Overriding maximum elevation angle: ',args.e2)
         lsp['e2'] = float(args.e2)
 
 # number of azimuth regions 
@@ -167,13 +167,13 @@ def main():
 # rather than using the input restrictions
     if args.fr != None:
         lsp['freqs'] = [args.fr]
-        print('Overriding frequency choices')
+        #print('Overriding frequency choices')
     if args.ampl != None:
-        print('Overriding amplitude choices')
+        #print('Overriding amplitude choices')
         lsp['reqAmp'] = [args.ampl]
 
     if args.sat != None:
-        print('Overriding - only looking at a single satellite')
+        #print('Overriding - only looking at a single satellite')
         lsp['onesat'] = [args.sat]
 
     lsp['mmdd'] = add_mmddhhss

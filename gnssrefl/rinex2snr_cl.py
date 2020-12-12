@@ -33,6 +33,7 @@ def main():
     parser.add_argument("-archive", default=None, metavar='all',help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan)", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
+    parser.add_argument("-overwrite", default=None, help="boolean", type=str)
 
     args = parser.parse_args()
 #   make sure environment variables exist.  set to current directory if not
@@ -42,45 +43,67 @@ def main():
 #
     station = args.station; NS = len(station)
     if (NS == 4) or (NS == 9):
-        print('You have submitted a nominally valid station name')
+        #print('You have submitted a nominally valid station name')
+        okok = 1
     else:
-        print('Illegal input - Station name must have 4 or 9 characters')
+        print('Illegal input - Station name must have 4 or 9 characters. Exiting.')
         sys.exit()
     year = args.year
 
 
     if len(str(year)) != 4:
-        print('Year must be four characters long: ', year)
+        print('Year must be four characters long. Exiting.', year)
         sys.exit()
 
-    doy1= args.doy
-    isnr = args.snr # defined as an integer
-    #snrt = args.snrEnd # 
-    #isnr = int(snrt)
-    orbtype = args.orb
-# currently allowed orbit types - shanghai removed 2020sep08
-    orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum']
-    if orbtype not in orbit_list:
-        print('You picked an orbit type I do not recognize. Here are the ones I allow')
-        print(orbit_list)
-        sys.exit()
-    # if you choose GPS, you get the nav message
-    if orbtype == 'gps':
-        orbtype = 'nav'
-
-    # if you choose GNSS, you get the GFZ sp3 file 
-    if orbtype == 'gnss':
-        orbtype = 'gbm'
-
-    # if you choose GPS+GLO, you get the JAXA sp3 file 
-    if orbtype == 'gps+glo':
-        orbtype = 'jax'
-
-    print('Orbit type:', orbtype)
     if args.fortran == 'True':
         fortran = True
     else:
         fortran = False
+
+    doy= args.doy
+    isnr = args.snr # defined as an integer
+    #snrt = args.snrEnd # 
+    #isnr = int(snrt)
+    orb = args.orb
+# currently allowed orbit types - shanghai removed 2020sep08
+    orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum']
+    if orb not in orbit_list:
+        print('You picked an orbit type I do not recognize. Here are the ones I allow')
+        print(orbit_list)
+        print('Exiting')
+        sys.exit()
+    # if you choose GPS, you get the nav message
+    if orb == 'gps':
+        orb = 'nav'
+
+    # if you choose GNSS, you get the GFZ sp3 file 
+    if orb == 'gnss':
+        orb = 'gbm'
+
+    # if you choose GPS+GLO, you get the JAXA sp3 file 
+    if orb == 'gps+glo':
+        orb = 'jax'
+
+
+
+
+    # check that the fortran exe exist
+    if fortran:
+        if (orb == 'nav'):
+            snrexe = g.gpsSNR_version()
+            if not os.path.isfile(snrexe):
+                print('You have selected the fortran and GPS only options.')
+                print('However, the fortran translator gpsSNR.e has not been properly installed.')
+                print('We are changing to the non-fortran option.')
+                fortran = False
+        else:
+            snrexe = g.gnssSNR_version()
+            if not os.path.isfile(snrexe):
+                print('You have selected the fortran and GNSS options.')
+                print('However, the fortran translator gnssSNR.e has not been properly installed.')
+                print('We are changing to the non-fortran option.')
+                fortran = False
+
 
 # if true ony use local RINEX files, which speeds up analysis of local datasets
     nolook = args.nolook
@@ -93,7 +116,7 @@ def main():
     rate = args.rate
 
     if args.doy_end == None:
-        doy2 = doy1
+        doy2 = doy
     else:
         doy2 = args.doy_end
 
@@ -106,9 +129,10 @@ def main():
         archive = args.archive.lower()
         if archive not in archive_list:
             print('You picked an archive that does not exist')
-            print('I am going to check the main ones (unavco,sopac,sonel,cddis)')
             print('For future reference: I allow these archives:') 
             print(archive_list)
+            print('Exiting')
+            sys.exit()
 
     year1=year
     if args.year_end == None:
@@ -119,11 +143,14 @@ def main():
 # decimation rate
     dec_rate = args.dec
 
-    doy_list = list(range(doy1, doy2+1))
+    doy_list = list(range(doy, doy2+1))
     year_list = list(range(year1, year2+1))
 
-# this sets up the loops
-    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol)
+    overwrite = False
+    if (args.overwrite == 'True'):
+        overwrite = True
+    print('Feedback is written to files in the subdirectory logs/')
+    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite)
 
 
 if __name__ == "__main__":

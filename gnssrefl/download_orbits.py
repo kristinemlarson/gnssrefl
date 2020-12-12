@@ -62,9 +62,13 @@ def main():
 
 
     if pCtr == 'nav':
-        g.getnavfile(year, month, day) 
+        navname,navdir,foundit = g.getnavfile(year, month, day) 
+        if foundit:
+            print('SUCCESS:', navname)
     else:
-        g.getsp3file_mgex(year,month,day,pCtr)
+        filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)
+        if foundit:
+            print('SUCCESS:', filename )
 
 
 

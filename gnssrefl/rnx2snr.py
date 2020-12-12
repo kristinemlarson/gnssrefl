@@ -192,7 +192,7 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate):
     orbtype = 'sp3' # assume it is sp3
     if (last3 != 'SP3') and (last3 != 'sp3'):
         orbtype = 'nav'
-    print('orbit type ', orbtype,navfile)
+    #print('orbit type ', orbtype,navfile)
     # these are the elevation angle limits I have been using for the various SNR formats
     emin,emax = elev_limits(snroption)
 
@@ -203,14 +203,15 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate):
     # need to check to see what happens without coordinates
     key = 'APPROX POSITION XYZ' 
     if key in header.keys():
-        print('has Cartesian coordinates in the RINEX Header')
+        okok = 1
+        #print('has Cartesian coordinates in the RINEX Header')
     else:
         print('RINEX file does not have station coordinates. Exiting')
         return
     rv =  header['APPROX POSITION XYZ'] 
     recv = [float(i) for i in rv.split()]
     recv = np.array(recv)
-    print('XYZ from header', recv)
+    #print('XYZ from header', recv)
     if np.sum(np.abs(recv)) < 5:
         print('Your receiver coordinates are in the middle of the Earth. Exiting.')
         exitQ = True

@@ -28,7 +28,7 @@ def main():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="day of year", type=int)
 # these are the optional inputs
-    parser.add_argument("-snr", default=66,help="snr ending - default is 66", type=int)
+    parser.add_argument("-snr", type=int,default=66,help="snr ending - default is 66")
     parser.add_argument("-fr", default=None, type=int, help="try -fr 1 for GPS L1 only, or -fr 101 for Glonass L1")
     parser.add_argument("-ampl", default=None, type=float, help="minimum spectral amplitude allowed")
     parser.add_argument("-e1",  default=None, type=int, help="lower limit elevation angle (deg)")
@@ -50,16 +50,15 @@ def main():
     station = args.station
     year = args.year
     doy= args.doy
-    #snr_type = args.snrEnd - now optional
 
     if len(str(year)) != 4:
         print('Year must have four characters: ', year)
         sys.exit()
 
 # default value is 66 for now
-    snr_type = args.snr 
+    snr = args.snr 
 
-    exitS = g.check_inputs(station,year,doy,snr_type)
+    exitS = g.check_inputs(station,year,doy,snr)
 
     if exitS:
         sys.exit()
@@ -74,7 +73,7 @@ def main():
 # most of these can be overriden at the command line
     freqs = [1] # default is to do L1 
     pele = [5, 30] # polynomial fit limits 
-    minH = 0.5; maxH = 6 # RH limits in meters - this is typical for a snow setup
+    h1 = 0.5; h2 = 6 # RH limits in meters - this is typical for a snow setup
     e1 = 5; e2 = 25 # elevation angle limits for estimating LSP
 # look at the four geographic quadrants to get started - these are azimuth angles
     azval = [0, 90, 90,180, 180, 270, 270, 360]
@@ -99,9 +98,9 @@ def main():
         PkNoise = args.peak2noise
 
     if (args.h1 != None):
-        minH  = args.h1
+        h1 = args.h1
     if (args.h2 != None):
-        maxH = args.h2
+        h2 = args.h2
     if (args.sat != None):
         sat = args.sat
     else:
@@ -117,10 +116,10 @@ def main():
 
 
     f=freqs[0]
-    NReg = [minH, maxH] # noise region - again, this is for typical snow setup
+    NReg = [h1, h2] # noise region - again, this is for typical snow setup
 
 
-    quick.quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,sat,PkNoise,fortran)
+    quick.quickLook_function(station, year, doy, snr,f,e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran)
 
 
 if __name__ == "__main__":

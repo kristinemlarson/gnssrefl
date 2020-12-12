@@ -268,13 +268,7 @@ If you did not install the Fortan RINEX translators, it takes a very, very, long
 
 Before using the **gnssir** code, I recommend you try **quickLook**. This allows you
 to quickly test various options (elevation angles, frequencies, azimuths).
-The required inputs are station name, year, and doy of year. 
-
-If the SNR file has not been previously stored, you can provide a properly named RINEX file
-(lowercase only) in your working directory. If it doesn't find a file in 
-either of these places, it will try to pick up the RINEX data from various 
-archives (unavco, sopac, sonel, and cddis) and translate it for
-you into the correct SNR format (note: this feature might make use of the Fortran translators). 
+The required inputs are station name, year, and doy of year. **You must have previously translated a RINEX file using rinex2snr for this to work.**
 
 **quickLook** has stored defaults for analyzing the spectral characteristics of the SNR data. 
 In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**

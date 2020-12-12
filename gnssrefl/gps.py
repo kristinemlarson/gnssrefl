@@ -100,11 +100,11 @@ def define_and_xz_snr(station,year,doy,snr):
     fname2 = xdir + '/' + str(year) + '/snr/' + station + '/' + f  + '.xz'
     snre = False
     if os.path.isfile(fname):
-        print('snr file exists')
+        #print('snr file exists')
         snre = True
     else:
         if os.path.isfile(fname2):
-            print('found xz compressed snr file - try to unxz it')
+            #print('found xz compressed snr file - try to unxz it')
             subprocess.call(['unxz', fname2])
         # check that it was success
             if os.path.isfile(fname):
@@ -542,26 +542,26 @@ def rinex_unavco(station, year, month, day):
     url1 = unavco+ '/pub/rinex/obs/' + cyyyy + '/' + cdoy + '/' + filename1
     url2 = unavco+ '/pub/rinex/obs/' + cyyyy + '/' + cdoy + '/' + filename2
     try:
-        print('try to get observation file at unavco')
+        #print('try to get observation file at unavco')
         wget.download(url1,filename1)
         status = subprocess.call(['uncompress', filename1])
-        print('found the rinex file')
+        #print('found the rinex file')
     except:
-        print('did not find observation file, try hatanaka version')
+        #print('did not find observation file, try hatanaka version')
         if os.path.exists(crnxpath):
             try:
                 wget.download(url2,filename2)
                 status = subprocess.call(['uncompress', filename2])
                 status = subprocess.call([crnxpath, rinexfiled])
                 status = subprocess.call(['rm', '-f', rinexfiled])
-                print('found d file and converted to observation file')
+                #print('found d file and converted to observation file')
             except:
-                print('download from unavco failed in some way')
+                okokok = 1
+                #print('download from UNAVCO failed in some way')
         else:
             print('WARNING WARNING WARNING WARNING')
             print('You are trying to convert Hatanaka files without having the proper')
-            print('executable, CRX2RNX. See links in the gnssrefl documentation')
-
+            print('executable, CRX2RNX. See links in the gnssrefl documentation. ')
 
 
 def rinex_sopac(station, year, month, day):
@@ -592,9 +592,9 @@ def rinex_sopac(station, year, month, day):
             subprocess.call(['uncompress', file1])
             subprocess.call([crnxpath, fname])
             subprocess.call(['rm', '-f',fname])
-            print('successful Hatanaka download from SOPAC ')
+            #print('successful Hatanaka download from SOPAC ')
         except:
-            print('not able to download from SOPAC',file1)
+            #print('Not able to download from SOPAC',file1)
             subprocess.call(['rm', '-f',file1])
             subprocess.call(['rm', '-f',fname])
     else:
@@ -626,7 +626,7 @@ def rinex_sonel(station, year, month, day):
             subprocess.call(['uncompress', file1])
             subprocess.call([crnxpath, fname])
             subprocess.call(['rm', '-f',fname])
-            print('successful Hatanaka download from SONEL ')
+            #print('successful Hatanaka download from SONEL ')
         except:
             print('some kind of problem with Hatanaka download from SONEL',file1)
             subprocess.call(['rm', '-f',file1])
@@ -646,7 +646,7 @@ def rinex_cddis(station, year, month, day):
     This is only Rinex version 2 I believe
     
     """
-    print('try to find file at CDDIS')
+    #print('try to find file at CDDIS')
     crnxpath = hatanaka_version()
     if (day == 0):
         doy = month
@@ -679,8 +679,8 @@ def rinex_cddis(station, year, month, day):
         print('some issue at CDDIS',file1)
         subprocess.call(['rm', '-f',file1])
     if not (os.path.exists(oname)):
-        print('unsuccessful RINEX 2.11 download from CDDIS')
-        print('will try the gz version')
+        #print('unsuccessful RINEX 2.11 download from CDDIS')
+        #print('will try the gz version')
         try:
             cddis_download(file2,dir_secure)
             subprocess.call(['gunzip', file2])
@@ -688,7 +688,8 @@ def rinex_cddis(station, year, month, day):
             print('gzip version failed',file2)
 
     if os.path.exists(oname):
-        print('successful RINEX 2.11 download from CDDIS')
+        okok = 1
+        #print('successful RINEX 2.11 download from CDDIS')
 
 def rinex_nz(station, year, month, day):
     """
@@ -699,7 +700,7 @@ def rinex_nz(station, year, month, day):
     20jul10 - changed access point and ending
     """
     # if doy is input 
-    print('try to find the file in New Zealand')
+    #print('try to find the file in New Zealand')
     if day == 0:
         doy=month
         d = doy2ymd(year,doy);
@@ -714,9 +715,9 @@ def rinex_nz(station, year, month, day):
     try:
         wget.download(url,file1)
         subprocess.call(['gunzip', file1])
-        print('successful download from GeoNet New Zealand')
+        #print('successful download from GeoNet New Zealand')
     except:
-        print('some kind of problem with download',file1)
+        print('some kind of problem with GeoNet download',file1)
         subprocess.call(['rm', '-f',file1])
 
 def rinex_bkg(station, year, month, day):
@@ -745,12 +746,12 @@ def rinex_bkg(station, year, month, day):
         try:
             wget.download(url,file1)
             subprocess.call(['uncompress', file1])
-            print('successful download from BKG')
+            #print('successful download from BKG')
             subprocess.call([crnxpath, fname])
             subprocess.call(['rm', '-f',fname])
-            print('successful Hatanaka download and translation from BKG')
+            #print('successful Hatanaka download and translation from BKG')
         except:
-            print('some kind of problem with download',file1)
+            print('some kind of problem with BKG download',file1)
             subprocess.call(['rm', '-f',file1])
     else:
         print('You cannot use the BKG archive without installing CRX2RNX.')
@@ -795,9 +796,9 @@ def rinex_nrcan(station, year, month, day):
             subprocess.call(['uncompress', file1])
             subprocess.call([crnxpath, fname])
             subprocess.call(['rm', '-f',fname])
-            print('successful download from NRCAN ')
+            #print('successful download from NRCAN ')
         except:
-            print('some kind of problem with download',file1)
+            print('some kind of problem with NRCAN download',file1)
             subprocess.call(['rm', '-f',file1])
     else:
         print('You cannot use the NRCAN archive without installing CRX2RNX.')
@@ -829,21 +830,21 @@ def getnavfile(year, month, day):
         subprocess.call(['mkdir',navdir])
 
     if os.path.exists(nfile):
-        print('navfile exists online')
+        #print('navfile exists online')
         foundit = True
     elif os.path.exists(nfile + '.xz' ):
-        print('xz compressed navfile exists online, uncompressing ...')
+        #print('xz compressed navfile exists online, uncompressing ...')
         subprocess.call(['unxz',nfile + '.xz'])
         foundit = True
     else:
-        print('go pick up the navfile')
+        #print('go pick up the navfile')
         navstatus = navfile_retrieve(navname, cyyyy,cyy,cdoy) 
         if navstatus:
-            print('navfile being moved to online storage area')
+            #print('navfile being moved to online storage area')
             subprocess.call(['mv',navname, navdir])
             foundit = True
         else:
-            print('no navfile')
+            print('no navfile found')
 
     return navname,navdir,foundit
 
@@ -858,7 +859,6 @@ def getsp3file(year,month,day):
     20jun14 - add CDDIS secure ftp
     """
     name, fdir = sp3_name(year,month,day,'igs') 
-    print(name,fdir)
     cddis = 'ftp://cddis.nasa.gov'
 
 
@@ -867,7 +867,8 @@ def getsp3file(year,month,day):
     #file_secure = file1
 
     if (os.path.isfile(fdir + '/' + name ) == True):
-        print('sp3file already exists')
+        okok = 1
+        #print('sp3file already exists')
     else:
         gps_week = name[3:7]
         file1 = name + '.Z'
@@ -882,7 +883,7 @@ def getsp3file(year,month,day):
             subprocess.call(['uncompress',file1])
             store_orbitfile(name,year,'sp3') 
         except:
-            print('some kind of problem-remove empty file')
+            print('some kind of problem -remove empty file')
             subprocess.call(['rm',file1])
 
 #   return the name of the file so that if you want to store it
@@ -914,10 +915,10 @@ def getsp3file_flex(year,month,day,pCtr):
     sec_file = file1
 
     if (os.path.isfile(ofile ) == True):
-        print('sp3file already exists online')
+        #print('sp3file already exists online')
         foundit = True
     elif (os.path.isfile(ofile + '.xz') == True):
-        print('xz compressed sp3file already exists online')
+        #print('xz compressed sp3file already exists online')
         subprocess.call(['unxz', ofile + '.xz'])
         foundit = True
     else:
@@ -961,7 +962,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     name, fdir = sp3_name(year,month,day,pCtr) 
     gps_week = name[3:7]
     igps_week = int(gps_week)
-    print('GPS week', gps_week,igps_week)
+    #print('GPS week', gps_week,igps_week)
     file1 = name + '.Z'
 
     # get the sp3 filename for the new format
@@ -994,11 +995,11 @@ def getsp3file_mgex(year,month,day,pCtr):
     n1 = os.path.isfile(fdir + '/' + name)
     n1c = os.path.isfile(fdir + '/' + name + '.xz')
     if (n1 == True):
-        print('first kind of MGEX sp3file already exists online')
+        #print('first kind of MGEX sp3file already exists online')
         mgex = 1
         foundit = True
     elif (n1c  == True): 
-        print('xz first kind of MGEX sp3file already exists online-unxz it')
+        #print('xz first kind of MGEX sp3file already exists online-unxz it')
         fx =  fdir + '/' + name + '.xz'
         subprocess.call(['unxz', fx])
         mgex = 1
@@ -1007,10 +1008,10 @@ def getsp3file_mgex(year,month,day,pCtr):
     n2 = os.path.isfile(fdir + '/' + name2)
     n2c = os.path.isfile(fdir + '/' + name2 + '.xz')
     if (n2 == True):
-        print('second kind of MGEX sp3file already exists online')
+        #print('second kind of MGEX sp3file already exists online')
         mgex = 2 ; foundit = True
     elif (n2c == True):
-        print('xz second kind of MGEX sp3file already exists online')
+        #print('xz second kind of MGEX sp3file already exists online')
         mgex = 2 ; foundit = True
         fx =  fdir + '/' + name2 + '.xz'
         subprocess.call(['unxz', fx])
@@ -1028,7 +1029,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     if (mgex == 0):
         secure_file = file1
         name = file1[:-2]
-        print('first file input',secure_file)
+        #print('first file input',secure_file)
         
 #https://cddis.nasa.gov/Data_and_Derived_Products/GNSS/gnss_mgex_products.html
 # CDDIS claims the old way stopped at GPS week 1945
@@ -1041,14 +1042,16 @@ def getsp3file_mgex(year,month,day,pCtr):
                     subprocess.call(['uncompress', file1])
                     store_orbitfile(name,year,'sp3') ; foundit = True
             except:
-                print('did not find', file1)
+                okokok = 1
+                #print('did not find', file1)
         else:
-            print('will only use the long orbit name for weeks after 2000')
+            okokok = 1
+            #print('will only use the long orbit name for weeks after 2000')
         if not foundit:
             name = file2[:-3]
             # new secure filename 
             secure_file = file2
-            print('next secure file to check',secure_file)
+            #print('next secure file to check',secure_file)
             try:
                 cddis_download(secure_file, secure_dir)
                 if os.path.isfile(secure_file):
@@ -1056,7 +1059,8 @@ def getsp3file_mgex(year,month,day,pCtr):
                     store_orbitfile(name,year,'sp3') 
                     foundit = True
             except:
-                print('did not find',file2)
+                okokok = 1
+                #print('did not find',file2)
 
 
     return name, fdir, foundit
@@ -1166,7 +1170,7 @@ def myreadnav(file):
         nephem = int(nephem) #    print(nephem)         
         lines = nav.split('END OF HEADER')[1].splitlines()[1:]
         table = np.zeros((nephem, 32))
-        print('Total number of ephemeris messages',nephem)
+        #print('Total number of ephemeris messages',nephem)
         for i in range(nephem):
             for j in range(8):
                 if j == 0:
@@ -1210,7 +1214,7 @@ def myreadnav(file):
 #	
         ephem = table
     except:
-        print('This ephemeris file does not exist',file)
+        #print('This ephemeris file does not exist',file)
         ephem = []
     return ephem
 def myfindephem(week, sweek, ephem, prn):
@@ -2561,25 +2565,27 @@ def quick_rinex_snr(year, doy, station, option, orbtype,receiverrate,dec_rate):
             rinexfile,rinexfiled = rinex_name(station, year, month, day)
             print('rinexfile should be ', rinexfile)
             if (os.path.isfile(rinexfile) == True):
-                print('rinex file exists')
+                okok = 1
+                #print('rinex file exists')
             else:
                 if receiverrate == 'low':
                     rinex_unavco(station, year, month, day) 
                 else:
                     rinex_unavco_highrate(station, year, month, day) 
                 if os.path.isfile(rinexfile):
-                    print('you have the rinex file')
+                    okok = 1
+                    #print('you have the rinex file')
                 else:
                     # only keep looking if you are seeking lowrate data
                     if receiverrate == 'low':
                         try:
-                            print('try to get it from SOPAC')
+                            #print('try to get it from SOPAC')
                             rinex_sopac(station, year, month, day)
                         except:
                             print('no success at SOPAC.')
                     if not os.path.isfile(rinexfile) and receiverrate == 'low':
                         try:
-                            print('try SONEL')
+                            #print('try SONEL')
                             rinex_sonel(station, year, month, day)
                         except:
                             print('got nothing - I give up')
@@ -2654,7 +2660,7 @@ def store_orbitfile(filename,year,orbtype):
     if not os.path.isdir(xdir): #if year folder doesn't exist, make it
         os.makedirs(xdir)
     if (os.path.isfile(filename) == True):
-        print('moving ', filename, ' to ', xdir)
+        #print('moving ', filename, ' to ', xdir)
         status = subprocess.call(['mv','-f', filename, xdir])
     else:
         print('The orbit file did not exist, so it was not stored')
@@ -3243,13 +3249,13 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     navname = navfile
     FileExists = False
     try:
-        print('try to find it at SOPAC ')
+        #print('try to find it at SOPAC ')
         get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
     except Exception as err:
         print(err)
         print('could not find file at SOPAC')
     if not os.path.isfile(navfile):
-        print('Try to find it at CDDIS  ')
+        #print('Try to find it at CDDIS  ')
         try:
             get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
         except Exception as err:
@@ -3312,7 +3318,8 @@ def check_inputs(station,year,doy,snr_type):
 
     s = snr_type
     if (s == 99) or (s == 50) or (s==66) or (s==88) or (s==77):
-        print('You have picked a proper SNR file format ending.' )
+        okokok = 1
+        #print('You have picked a proper SNR file format ending.' )
     else:
         print('You have picked an improper SNR file format ending: ' + str(s))
         print('Allowed values are 99, 66, 88, 77, or 50. Exiting')
@@ -3685,10 +3692,10 @@ def warn_and_exit(snrexe,fortran):
         ok = 1
         #print('not using fortran, so it does not matter if translation exe exists')
     else:
-        print('you are using fortran, so good to check now if translation exe exists')
+        #print('you are using fortran, so good to check now if translation exe exists')
         if (os.path.isfile(snrexe) == False):
-            print('This RINEX translation executable does not exist:' + snrexe + ' Exiting ')
-            print('Install it or use -fortran False')
+            print('This RINEX translation executable does not exist:' + snrexe )
+            print('Install it or use -fortran False. Exiting')
             sys.exit()
 
 def quick_rinex_snrC(year, doy, station, option, orbtype,receiverrate,dec_rate,archive):
@@ -3789,13 +3796,14 @@ def go_get_rinex(station,year,month,day,receiverrate):
         print('RINEX file exists')
     else:
         if receiverrate == 'low':
-            print('seeking low rate at unavco')
+            #print('seeking low rate at unavco')
             rinex_unavco(station, year, month, day)
         else:
-            print('seeking high rate at unavco')
+            #print('seeking high rate at unavco')
             rinex_unavco_highrate(station, year, month, day)
         if os.path.isfile(rinexfile):
-            print('you now have the rinex file')
+            okok = 1
+            #print('you now have the rinex file')
         else:
           # only keep looking if you are seeking lowrate data
             if receiverrate == 'low':
@@ -3832,28 +3840,29 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
 
-    print('Requested data rate: ', receiverrate)
+    #print('Requested data rate: ', receiverrate)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
-    print('Name of the rinexfile should be:', rinexfile)
-    print('Archive',archive)
+    #print('Name of the rinexfile should be:', rinexfile)
+    #print('Archive',archive)
 
     if (os.path.isfile(rinexfile) == True):
-        print('RINEX file exists')
+        ignoreFornow = 1
+        #print('RINEX file exists')
     else:
         if receiverrate == 'high':
             if archive == 'unavco':
-                print('seeking high rate data at UNAVCO ')
+                #print('seeking high rate data at UNAVCO ')
                 rinex_unavco_highrate(station, year, month, day)
             if archive == 'nrcan':
-                print('seeking high rate data at NRCAN ')
+                #print('seeking high rate data at NRCAN ')
                 rinex_nrcan_highrate(station, year, month, day)
             if archive == 'ga':
-                print('seeking high rate data at GA')
+                #print('seeking high rate data at GA')
                 rinex_ga_highrate(station, year, month, day)
         else:
           # lowrate data
             if archive == 'all':
-                print('will search four archives for your file')
+                #print('will search four archives for your file')
                 go_get_rinex(station,year,month,day,receiverrate) 
             else:
                 if archive == 'unavco':
@@ -3936,7 +3945,7 @@ def cddis_rinex3(station9ch, year, doy,srate,orbtype):
     filename = ff+ending  # the crx file
     rfilename = ff+rending # the rnx file
     url = ftp + f + gzfilename  
-    print(url)
+    #print(url)
     # not sure i still neeed this
     #exedir = os.environ['EXE']
     gexe = gfz_version()
@@ -4349,9 +4358,19 @@ def cddis_download(filename, directory):
 #   --no-check-certificate
 
     """
+    # make sure there is a logs directory
+    if not os.path.isdir('logs'):
+        subprocess.call(['mkdir', 'logs'])
+    station = filename[0:4]
+    fn = 'logs/' + station + '_cddis.txt'
+    cddislog = open(fn, 'w+') 
     filename = 'ftps://gdc.cddis.eosdis.nasa.gov' + directory + filename 
     callit = ['wget', '--ftp-user','anonymous','--ftp-password', 'kristine@colorado.edu', '--no-check-certificate', filename]
-    subprocess.call(callit)
+    #subprocess.call(callit)
+    # try this new way - I am trying to send the messages to the file
+    out = subprocess.run(callit, capture_output=True,text=True)
+    cddislog.write(out.stderr)
+    cddislog.close()
     return True 
 
 def pickup_pbay(year,month, day):
@@ -4460,11 +4479,11 @@ def read_sp3file(file_path):
             if (not firstEpochFound):
                 firstWeek = wk 
                 firstEpochFound = True
-                print('first GPS Week and Seconds in the file', firstWeek, swk)
+                #print('first GPS Week and Seconds in the file', firstWeek, swk)
             count += 1
             if (wk != firstWeek):
-                print('this is a problem - this code should not be used with files that crossover GPS weeks ')
-                print('JAXA orbits have this extra point, which is going to be thrown out')
+                #print('this is a problem - this code should not be used with files that crossover GPS weeks ')
+                #print('JAXA orbits have this extra point, which is going to be thrown out')
                 ignorePoint = True
         if (line[0] == 'P') and (not ignorePoint):
             co = line[1]
@@ -4480,7 +4499,7 @@ def read_sp3file(file_path):
                 sp3 = np.vstack((sp3,lis))
     f.close()
     nr,nc = sp3.shape
-    print('number of rows and columns being returned from the sp3 file', nr,nc)
+    #print('number of rows and columns being returned from the sp3 file', nr,nc)
     return sp3
 
 def nicerTime(UTCtime):
