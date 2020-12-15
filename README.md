@@ -1,50 +1,55 @@
 ### News 
 
+The code now checks to see if you have installed fortran translators. If you haven't,
+it uses python to translate the RINEX file. SO while the default is still assuming you
+are using fortran, it is not a deal breaker.
+
 [I have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
 CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
 implemented security restrictions, we have had to change our download access. 
-For this reason we strongly urge that you install **wget** on your machine.
-You will only have very limited analysis abilities without it.
+For this reason we strongly urge that you install **wget** on your machine and that 
+it live in your path. You will only have very limited analysis abilities without it.
 
-Recently I added more defaults so you don't have to think quite so much. The defaults are that  
+I have added more defaults so you don't have to make so many decisions. The defaults are that  
 you are using GPS receiver (not GNSS) and have a fairly standard geodetic 
 site (i.e. not super tall, < 5 meters). If you have previously used this package, please
 note these changes to **rinex2snr**, **quickLook**, and **gnssir**.
 Optional commandline inputs are still allowed.
 
+How can you learn how to run this code correctly? You should start by reading
+[Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
+Although this article was originally written to accompany Matlab scripts,
+the principles are the same. It explains to you what a reflection
+zone means and what a Nyquist frequency is for GNSS reflections. 
+My reflection zone webapp will [help you pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones) 
+
+If you are interested in measuring sea level, this webapp tells you [how high your site is above 
+sea level.](https://gnss-reflections.org/geoid)  
+
+
+### Philosophical Statement
 In geodesy, you don't really need to know much about what you are doing to 
 calculate a reasonably precise position from GPS data. That's just the way it is.
-For GPS/GNSS reflections, you need to know a little bit more - like what are you
-trying to do ? Are you trying to measure water levels? Then you need to know where the water
-is ! (with respect to your antenna, i.e. which azimuths are good and which are bad). 
+(Note: that is also thanks to the hard work of the geodesists that wrote the 
+computer codes). For GPS/GNSS reflections, you need to know a little bit more - like what are you
+trying to do? Are you trying to measure water levels? Then you need to know where the water
+is! (with respect to your antenna, i.e. which azimuths are good and which are bad). 
 Another application of this code is to measure snow accumulation. If you 
 have a bunch of obstructions near your antenna, 
 you are responsible for knowing not to use that region. If your antenna is 10 meters 
 above the reflection area, and the software default only computes answers up to 6 meters,
 the code will not tell you anything useful. It is up to you to know what is best for the site and 
 modify the inputs accordingly. 
-
-How can you learn how to run this code correctly? You should start by reading
-[Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
-Although this article was originally written to accompany Matlab scripts,
-the principles are the same. If nothing else, it should explain to you what a reflection
-zone means and what a Nyquist frequency is for GNSS reflections. 
-
-If you are interested in measuring sea level, this webapp tells you [how high your site is above 
-sea level](https://gnss-reflections.org/geoid). 
-
-My reflection zone webapp will [help you pick appropriate elevation and azimuth angles](https://gnss-reflections.org/rzones). 
-At that point it really is up to you to think
-about what it means. Get to know your site. If it belongs to you, look at 
-photographs. If it doesn't belong to you, look at Google Earth. 
+I encourage you to get to know your site. If it belongs to you, look at 
+photographs. If you can't find photographs, use Google Earth. 
 
 ### gnssrefl
 
 **gnssrefl** is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
 The main difference bewteen this version and previous versions is that I am
-attempting to use proper python packaging rules, LOL. I have separated out the main
+attempting to use proper python packaging rules!. I have separated out the main
 parts of the code and the command line inputs so that you can use the gnssrefl libraries
 yourself or do it all from the command line. This should also - hopefully - make
 it easier for the production of Jupyter notebooks. The latter are to be developed
@@ -321,7 +326,7 @@ to examine this site on Google Earth.
 ### gnssir
 
 This is the main driver for the GNSS interferometric reflectometry code.  
-You need a set of instructions for **gnssir** which can be made using **make_json_input**.  
+You need a set of instructions for **gnssir** which are made using **make_json_input**.  
 The inputs for **make_json_input** are: 
 
 * station name 
