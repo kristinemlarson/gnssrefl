@@ -832,19 +832,20 @@ def getnavfile(year, month, day):
     if os.path.exists(nfile):
         #print('navfile exists online')
         foundit = True
-    elif os.path.exists(nfile + '.xz' ):
+    if os.path.exists(nfile + '.xz' ):
         #print('xz compressed navfile exists online, uncompressing ...')
         subprocess.call(['unxz',nfile + '.xz'])
         foundit = True
-    else:
+
+    if not os.path.exists(nfile):
         #print('go pick up the navfile')
         navstatus = navfile_retrieve(navname, cyyyy,cyy,cdoy) 
         if navstatus:
-            #print('navfile being moved to online storage area')
+            print('\n navfile being moved to online storage area')
             subprocess.call(['mv',navname, navdir])
             foundit = True
         else:
-            print('no navfile found')
+            print('No navfile found')
 
     return navname,navdir,foundit
 
@@ -1041,6 +1042,7 @@ def getsp3file_mgex(year,month,day,pCtr):
                 if os.path.isfile(file1):
                     subprocess.call(['uncompress', file1])
                     store_orbitfile(name,year,'sp3') ; foundit = True
+                    print('store file in the ORBIT area')
             except:
                 okokok = 1
                 #print('did not find', file1)
@@ -1056,6 +1058,7 @@ def getsp3file_mgex(year,month,day,pCtr):
                 cddis_download(secure_file, secure_dir)
                 if os.path.isfile(secure_file):
                     subprocess.call(['gunzip', file2])
+                    print('store file in the ORBIT area')
                     store_orbitfile(name,year,'sp3') 
                     foundit = True
             except:

@@ -11,7 +11,72 @@ from datetime import date
 # my code
 import gnssrefl.gps as g
 
+
+import scipy.interpolate as interpolate
+from scipy.interpolate import interp1d
+import math
+
+def fract_to_obstimes(spl_x):
+    N=len(spl_x)
+    obstimes = np.empty(shape=[0, 1])
+    year = np.floor(spl_x)
+    fdoy = 365.25*(spl_x - year)
+    doy = np.floor(fdoy)
+    fhours = 24*(fdoy - doy)
+    hours = np.floor(fhours)
+    leftover = 60*(fhours - hours)
+    minutes = np.floor(leftover)
+    for i in range(0,N):
+        y = int(year[i]); d = int(doy[i])
+        y, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(y,d)
+        h= int(hours[i])
+        m = int(minutes[i])
+        #print(y,month,day,h,m)
+        obstimes = np.append(obstimes, datetime.datetime(year=y, month=month, day=day, hour=h, minute=m, second=0 ))
+
+    return obstimes
+
 #
+def splines_for_dummies(x,y):
+    """
+    inputs for now are fractional years (x) and RH (y)
+    """
+    ii = np.argsort(x).T
+    x = x[ii]
+    y = y[ii]
+    knots_per_day = 12
+    Ndays = 365.25*(x.max()-x.min())
+    numKnots = int(knots_per_day*(Ndays))
+    print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
+    x1 = x.min()+0.1/365.25
+    x2 = x.max()-0.1/365.25
+    knots =np.linspace(x1,x2,num=numKnots)
+    t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
+#   calculate water level hourly for now
+    N = int(Ndays*24 )
+    xx = np.linspace(x.min(), x.max(), N)
+    spline = interpolate.BSpline(t, c, k, extrapolate=False)
+    Plt.figure()
+    Plt.plot(x, y, 'bo', label='Original points',markersize=3)
+
+    Plt.figure()
+    Plt.plot(x, y, 'bo', label='Original points',markersize=3)
+# equal spacing
+    spl_x = xx
+    spl_y = spline(xx)
+    obstimes = fract_to_obstimes(spl_x)
+    Plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
+
+    Plt.figure()
+    resid = y-spline(x)
+    ii = np.absolute(resid) > 0.5; 
+    Plt.plot(x, resid, 'bo', x[ii], resid[ii],'ro', markersize=3)
+    Plt.show()
+
+    return True
+
+
+    
 def write_out_header(fout,station):
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     fout.write('% Results for {0:4s} calculated on {1:20s} \n'.format(  station, xxx ))
@@ -76,25 +141,33 @@ def main():
             tv = np.append(tv, a,axis=0)
 
     #print(tv.shape)
-    Plt.figure()
     t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
     rh = tv[:,2]
+
+    # sort the data
+    ii = np.argsort(t)
+    t = t[ii] ; rh = rh[ii]
+    # store it all in a new variable
+    ntv = tv[ii,:]
+    #
+    Plt.figure()
     Plt.plot(t, rh,'.')
     Plt.ylabel('Reflector Height (m)')
     Plt.title('GNSS station: ' + station)
     Plt.gca().invert_yaxis()
     Plt.grid()
     # default is to show the plot
-    if plt:
-        Plt.show()
+    #if plt:
+        #Plt.show()
     # always make a png file
     plotname = txtdir + '/' + station + '_subdaily_RH.png'
     Plt.savefig(plotname)
     print('png file saved as: ', plotname)
 
-    ii = np.argsort(t)
+
+    splines_for_dummies(t,rh)
+
     # apply time tags to a new variable
-    ntv = tv[ii,:]
     N,M = np.shape(ntv)
     #txtfile = station + '_subdaily_rh.txt'
     #csvfile = station + '_subdaily_rh.csv'

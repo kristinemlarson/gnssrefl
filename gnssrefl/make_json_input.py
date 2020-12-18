@@ -30,6 +30,7 @@ def main():
     parser.add_argument("-peak2noise", default=None, type=float, help="peak to noise ratio used for QC")
     parser.add_argument("-allfreq", default=None, type=str, help="set to True to include all GNSS")
     parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
+    parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     args = parser.parse_args()
 #
 
@@ -124,8 +125,11 @@ def main():
     else:
         # 307 was making it crash.  did not check as to why
         lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206,207,208,302, 306]; lsp['reqAmp'] = [6, 6,6,6,6,6,6,6,6,6,6,6]
-# use refraction correction
+#   default is to use refraction correction
+
     lsp['refraction'] = True
+    if args.refraction == 'False':
+        lsp['refraction'] = False
 
 # write new RH results  each time you run the code
     lsp['overwriteResults'] = True; 
@@ -142,8 +146,9 @@ def main():
 # command line req to only do a single satellite - default is do all satellites
     lsp['onesat'] = None; 
 
+# default will now be False ....
 # send some information on periodogram RH retrievals to the screen
-    lsp['screenstats'] = True 
+    lsp['screenstats'] = False
 
 # save the output plots
     lsp['pltname'] = station + '_lsp.png'
