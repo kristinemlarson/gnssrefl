@@ -66,7 +66,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             #print(fname)
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
-                #print('snr file for ', station, str(year), cdoy, csnr, ' already exists')
+                print('SNR file already exists', fname)
                 if overwrite:
                     #print('you requested it be overwritten, so removing file')
                     subprocess.call(['rm', fname])
@@ -157,6 +157,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
     snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
     if (snre == True):
         log.write("The snrfile already exists: {0:50s} \n".format(snrname_full))
+        print("The snrfile already exists: ", snrname_full)
     else:
         log.write("The snrfile does not exist: {0:50s} \n".format(snrname_full))
         d = g.doy2ymd(year,doy); 

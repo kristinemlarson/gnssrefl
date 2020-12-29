@@ -1,6 +1,7 @@
 # preliminary tide data. 
 import argparse
 import datetime
+import json
 import matplotlib.pyplot as Plt
 import numpy as np
 import os
@@ -15,6 +16,31 @@ import gnssrefl.gps as g
 import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
+
+def quickTr(year, doy,frachours):
+    """
+    inputs from the lomb scargle code (year, doy) and UTC hour (fractional)
+    returns character string for json 
+    """
+    year = int(year); doy = int(doy); frachours = float(frachours)
+    # convert doy to get month and day
+    d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
+    month = int(d.month)
+    day = int(d.day)
+
+    hours = int(np.floor(frachours))
+    leftover = 60*(frachours - hours)
+    minutes = int(np.floor(leftover))
+    leftover_hours  = frachours - (hours + minutes/60)
+    seconds = int(leftover_hours*3600)
+    #print(frachours, hours,minutes,leftover_seconds)
+
+    jd = datetime.datetime(year,month, day,hours,minutes,seconds)
+    datestring = jd.strftime("%Y-%m-%d %H:%M:%S")
+
+
+    return datestring
+
 
 def fract_to_obstimes(spl_x):
     N=len(spl_x)
@@ -37,7 +63,7 @@ def fract_to_obstimes(spl_x):
     return obstimes
 
 #
-def splines_for_dummies(x,y):
+def splines_for_dummies(x,y,plt):
     """
     inputs for now are fractional years (x) and RH (y)
     """
@@ -47,7 +73,7 @@ def splines_for_dummies(x,y):
     knots_per_day = 12
     Ndays = 365.25*(x.max()-x.min())
     numKnots = int(knots_per_day*(Ndays))
-    print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
+    #print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
     x1 = x.min()+0.1/365.25
     x2 = x.max()-0.1/365.25
     knots =np.linspace(x1,x2,num=numKnots)
@@ -56,22 +82,22 @@ def splines_for_dummies(x,y):
     N = int(Ndays*24 )
     xx = np.linspace(x.min(), x.max(), N)
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
-    Plt.figure()
-    Plt.plot(x, y, 'bo', label='Original points',markersize=3)
+    if plt:
+        Plt.figure()
+        Plt.plot(x, y, 'bo', label='Original points',markersize=3)
 
-    Plt.figure()
-    Plt.plot(x, y, 'bo', label='Original points',markersize=3)
+        Plt.figure()
+        Plt.plot(x, y, 'bo', label='Original points',markersize=3)
 # equal spacing
-    spl_x = xx
-    spl_y = spline(xx)
-    obstimes = fract_to_obstimes(spl_x)
-    Plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
+        spl_x = xx; spl_y = spline(xx)
+        obstimes = fract_to_obstimes(spl_x)
+        Plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
 
-    Plt.figure()
-    resid = y-spline(x)
-    ii = np.absolute(resid) > 0.5; 
-    Plt.plot(x, resid, 'bo', x[ii], resid[ii],'ro', markersize=3)
-    Plt.show()
+        Plt.figure()
+        resid = y-spline(x)
+        ii = np.absolute(resid) > 0.5; 
+        Plt.plot(x, resid, 'bo', x[ii], resid[ii],'ro', markersize=3)
+        Plt.show()
 
     return True
 
@@ -98,6 +124,7 @@ def main():
     parser.add_argument("-year", default='None', type=str, help="restrict to years beginning with")
     parser.add_argument("-txtfile", default='None', type=str, help="output (plain text)") 
     parser.add_argument("-csvfile", default='None', type=str, help="output (csv)")
+    parser.add_argument("-jsonfile", default='None', type=str, help="output (json)")
     parser.add_argument("-plt", default='None', type=str, help="set to False to suppress plots")
 
     args = parser.parse_args()
@@ -107,22 +134,28 @@ def main():
 #   these are optional
     txtfile = args.txtfile
     csvfile = args.csvfile
-    if args.plt == 'False':
-        plt= False
-    else:
-        plt = True
+    jsonfile = args.jsonfile
 
-    writetxt = True; writecsv = True
+
+    writetxt = True  
     if txtfile == 'None':
         writetxt = False
+    writecsv = True  
     if csvfile == 'None':
         writecsv = False
+    writejson = True
+    if jsonfile == 'None':
+        writejson = False
 
     if args.year == 'None':
         year = 2020
     else:
         year=int(args.year)
 
+    if args.plt == 'False':
+        plt= False
+    else:
+        plt = True
 
 # where the summary files will be written to
     txtdir = xdir + '/Files' 
@@ -164,21 +197,81 @@ def main():
     Plt.savefig(plotname)
     print('png file saved as: ', plotname)
 
-
-    splines_for_dummies(t,rh)
+    splines_for_dummies(t,rh,plt)
 
     # apply time tags to a new variable
     N,M = np.shape(ntv)
-    #txtfile = station + '_subdaily_rh.txt'
-    #csvfile = station + '_subdaily_rh.csv'
+    if writejson:
+        outfile = txtdir + '/' + jsonfile
     if writecsv:
         outfile = txtdir + '/' + csvfile
     if writetxt:
         outfile = txtdir + '/' + txtfile
-    if (writecsv) and (writetxt):
+    if (writecsv) and (writetxt) :
         print('You cannot simultaneously write out a csvfile and a txtfile')
         print('Default to writing only a txtfile')
         writecsv = False
+
+    if (writejson):
+        print('you picked the json output')
+        o = {}
+        N= len(ntv)
+        column_names = ['timestamp','rh','sat','freq','ampl','azim','edotf','mjd']
+
+        # this worked - but didn't have names, so not useful
+        #o['station'] = station
+        #o['data'] =  ntv[:,[0,1,2,4,15,3]].tolist()
+        # give my numpy variables names
+        # to make a string
+        # x=datetime.datetime(2018,9,15)
+        # print(x.strftime("%b %d %Y %H:%M:%S"))
+        year  =  ntv[:,0].tolist()
+        year =[str(int(year[i])) for i in range(N)]; 
+
+        doy =  ntv[:,1].tolist()
+        doy=[str(int(doy[i])) for i in range(N)]; 
+
+        UTChour = ntv[:,4].tolist()
+        UTChour = [str(UTChour[i]) for i in range(N)]; 
+
+        timestamp = [quickTr(ntv[i,0], ntv[i,1], ntv[i,4]) for i in range(N)]
+
+        rh = ntv[:,2].tolist()
+        rh=[str(rh[i]) for i in range(N)]; 
+
+        sat  = ntv[:,3].tolist()
+        sat =[int(sat[i]) for i in range(N)]; 
+
+        freq  = ntv[:,10].tolist()
+        freq =[int(freq[i]) for i in range(N)]; 
+
+        ampl  = ntv[:,6].tolist()
+        ampl =[str(ampl[i]) for i in range(N)]; 
+
+        azim  = ntv[:,5].tolist()
+        azim =[str(azim[i]) for i in range(N)]; 
+
+        edotf  = ntv[:,12].tolist()
+        edotf =[str(edotf[i]) for i in range(N)]; 
+
+        mjd = ntv[:,15].tolist()
+        mjd=[str(mjd[i]) for i in range(N)]; 
+
+        # now attempt to zip them
+        l = zip(timestamp,rh,sat,freq,ampl,azim,edotf,mjd)
+        dzip = [dict(zip(column_names, next(l))) for i in range(N)]
+        # make a dictionary with metadata and data
+        o={}
+        lat = "0"; lon = "0"; 
+        firstline = {'name': station, 'latitude': lat, 'longitude': lon}
+        o['metadata'] = firstline
+        o['data'] = dzip
+
+        outf = outfile
+        print(outfile)
+        with open(outf,'w+') as outf:
+            json.dump(o,outf,indent=4)
+        #close(outf)
 
     if (writecsv) or (writetxt):
         print('Results are being written to : ', outfile)

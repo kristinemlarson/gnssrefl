@@ -623,12 +623,14 @@ def rinex_sonel(station, year, month, day):
     if os.path.exists(crnxpath):
         try:
             wget.download(url,file1)
-            subprocess.call(['uncompress', file1])
-            subprocess.call([crnxpath, fname])
-            subprocess.call(['rm', '-f',fname])
+            # if successful download, uncompress and translate it 
+            if os.path.exists(file1):
+                subprocess.call(['uncompress', file1])
+                subprocess.call([crnxpath, fname])
+                subprocess.call(['rm', '-f',fname])
             #print('successful Hatanaka download from SONEL ')
         except:
-            print('some kind of problem with Hatanaka download from SONEL',file1)
+            #print('some kind of problem with Hatanaka download from SONEL',file1)
             subprocess.call(['rm', '-f',file1])
     else:
         print('WARNING WARNING WARNING WARNING')
@@ -674,18 +676,19 @@ def rinex_cddis(station, year, month, day):
 
     try:
         cddis_download(file_secure,dir_secure)
-        subprocess.call(['uncompress', file1])
+        if os.path.exists(file1):
+            subprocess.call(['uncompress', file1])
     except:
         print('some issue at CDDIS',file1)
-        subprocess.call(['rm', '-f',file1])
+        if os.path.exists(file1):
+            subprocess.call(['rm', '-f',file1])
     if not (os.path.exists(oname)):
-        #print('unsuccessful RINEX 2.11 download from CDDIS')
-        #print('will try the gz version')
         try:
             cddis_download(file2,dir_secure)
-            subprocess.call(['gunzip', file2])
+            if os.path.exists(file2):
+                subprocess.call(['gunzip', file2])
         except:
-            print('gzip version failed',file2)
+            print('some issue at CDDIS ',file2)
 
     if os.path.exists(oname):
         okok = 1

@@ -7,7 +7,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests"]
 
 setup(
     name="gnssrefl",
-    version="0.0.39",
+    version="0.0.40",
     author="Kristine Larson",
     author_email="kristine.larson@colorado.edu",
     description="A GNSS reflectometry software package ",
@@ -32,6 +32,7 @@ setup(
             'prn2gps = gnssrefl.prn2gps:main',
             'download_tides = gnssrefl.download_tides:main',
             'prelim_tides = gnssrefl.prelim_tides:main',
+            'update_snr_files = gnssrefl.update_snr_files:main',
             ], 
         },
     install_requires=requirements,

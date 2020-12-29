@@ -11,6 +11,9 @@ import sys
 def main():
     """
     command line interface for download_rinex
+    it downloads a json and converts it to plain txt with columns! 
+
+    author: kristine m. larson
     """
 
     parser = argparse.ArgumentParser()
@@ -64,6 +67,6 @@ def main():
             doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
             fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} \n".format(year,mm,dd,hh,minutes,sl,doy))
     fout.close()
-    print('data written out to ', outfile)
+    print('NOAA tide data written out to ', outfile)
 if __name__ == "__main__":
     main()

@@ -146,6 +146,8 @@ def main():
             rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
             if os.path.isfile(rinexfile):
                 print('SUCCESS: ', rinexfile)
+            else:
+                print(rinexfile, ' not found')
 
 if __name__ == "__main__":
     main()

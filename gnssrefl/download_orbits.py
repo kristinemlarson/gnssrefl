@@ -68,7 +68,9 @@ def main():
     else:
         filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)
         if foundit:
-            print('SUCCESS:', filename )
+            print('SUCCESS:', filename, fdir )
+        else:
+            print(filename , ' not found')
 
 
 
