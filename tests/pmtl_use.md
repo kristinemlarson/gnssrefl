@@ -16,7 +16,7 @@ Look at the [NRCAN Site Description for pmtl](https://webapp.geod.nrcan.gc.ca/ge
 
 The GNSS antenna is on the roof of grain terminal. Also 
 note the ellipsoidal height (and geoid corrected height),
-[also provided at my geoid site](https://gnss-reflections.org/geoid)
+[also provided at my geoid site](https://gnss-reflections.org/geoid_test?station=pmtl)
 
 **Picking a mask:** 
 

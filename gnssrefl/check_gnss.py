@@ -1,7 +1,11 @@
+# various codes to update a SNR file to use new orbits
 import numpy as np
 import os
 import subprocess
-import gps as g
+# my code
+import gnssrefl.gps as g
+import gnssrefl.rinex2snr as rnx
+
 
 
 def rerun_lsp(station, year, doy, snrEnd, mac):
@@ -10,9 +14,9 @@ def rerun_lsp(station, year, doy, snrEnd, mac):
     should change that code to a callable function, but hey, not there yet.
     kristine larson
     """
+    print('try to run the LSP code')
     if (mac == True):
-# use poetry package manager
-        subprocess.call(['poetry','run', 'python','gnssIR_lomb.py', station, str(year), str(doy), str(snrEnd), '0'])
+        subprocess.call(['gnssir', station, str(year), str(doy), '-snr',str(snrEnd)])
     else:
 # use digital ocean setup - change to new package
         subprocess.call(['gnssir', station, str(year), str(doy), '-snr', str(snrEnd) ])
@@ -23,6 +27,7 @@ def gnss_stats(ffull):
     for gps only, 100 for gps+glonass, 200 for gps+glonass+galileo etc
     """
     # default 
+    print('check the GNSS status of a file')
     stat = 0 # which is basically to do nothing ...
     x=np.loadtxt(ffull, comments='%')
     if len(x) > 0:
@@ -41,7 +46,7 @@ def gnss_stats(ffull):
         if (gps > 0) & (glonass > 0) & (galileo > 0) & (beidou > 0):
             stat = 300
 
-        print('Number of obs: ', gps,glonass,galileo, beidou)
+        print('Obs: ', gps, 'GPS', glonass, 'GLO', galileo, 'GAL',beidou, 'B')
     return stat 
 
 def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
@@ -51,6 +56,11 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
     and receiverrate ('low' or 'high')
     """
     exedir = os.environ['EXE']
+    fortran = True # because it is me
+    archive = 'all'
+    rrate = receiverrate
+    nol = False
+    overwrite = True
     mac = False
     if exedir == '/Users/kristine/bin':
         mac = True
@@ -58,29 +68,28 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
     fname,fname_xz = g.define_filename(station,year,doy,snrEnd)
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
     f=fname
-    #year,month,day = g.ydoy2ymd(year, doy)
 
     print('decimation and receiver rate',dec_rate,receiverrate)
 
     xit = False
     if os.path.exists(fname):
-        print('snr file exists')
+        print('SNR file exists')
         xit = True
     elif os.path.exists(fname_xz): 
-        print('xz file exists ??')
+        print('xz file exists -unxz it ')
         subprocess.call(['unxz',fname_xz])
         xit = True
     if xit:
         satstat = gnss_stats(fname) 
-        print('satstat',satstat)
+        print('Current File Status',orbch(satstat))
 
         if (satstat < 100) and (goal == 100 ):
-            print(' gps only was found but you want gps and glonass')
+            print('Orbit goal: ',orbch(goal))
             orbtype = 'jax'
             f,orbdir,foundit=g.getsp3file_mgex(year,month,day,orbtype)
             if foundit:
                 subprocess.call(['rm',fname]) # remove old file and make a new one
-                g.quick_rinex_snrC(year, doy, station, snrEnd, orbtype,receiverrate,dec_rate,'all')
+                rnx.run_rinex2snr(station, [year], [doy], snrEnd, orbtype, rrate,dec_rate,archive,fortran,nol,overwrite)
                 rerun_lsp(station, year, doy, snrEnd, mac)
             else:
                 print('bummer,no JAXA, I guess, try GFZ')
@@ -88,17 +97,17 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
                 f,orbdir,foundit=g.getsp3file_mgex(year,month,day,orbtype)
                 if foundit:
                     print('found GFZ orbit - make file')
-                    g.quick_rinex_snrC(year, doy, station, snrEnd, orbtype,receiverrate,dec_rate,'all')
+                    rnx.run_rinex2snr(station, [year], [doy], snrEnd, orbtype, rrate,dec_rate,archive,fortran,nol,overwrite)
                     rerun_lsp(station, year, doy, snrEnd, mac)
                 else:
                     print('no GFZ, will have to try GRG?')
         if (satstat < 200) and (goal == 200 ):
-            print('no galileo but you wanted galileo')
+            print('Orbit goal: ',orbch(goal))
             orbtype = 'gbm'
             f,orbdir,foundit=g.getsp3file_mgex(year,month,day,orbtype)
             if foundit:
                 subprocess.call(['rm',fname]) # remove old file and make a new one
-                g.quick_rinex_snrC(year, doy, station, snrEnd, orbtype,receiverrate,dec_rate,'all')
+                rnx.run_rinex2snr(station, [year], [doy], snrEnd, orbtype, rrate,dec_rate,archive,fortran,nol,overwrite)
                 rerun_lsp(station, year, doy, snrEnd, mac)
             else:
                 print('bummer,no GFZ orbit, I guess, try GRG')
@@ -107,37 +116,58 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
                 if foundit:
                     subprocess.call(['rm',fname]) # remove old file and make a new one
                     print('found French orbit - make snr file')
-                    g.quick_rinex_snrC(year, doy, station, snrEnd, orbtype,receiverrate,dec_rate,'all')
+                    rnx.run_rinex2snr(station, [year], [doy], snrEnd, orbtype,rrate,dec_rate,archive,fortran,nol,overwrite)
                     rerun_lsp(station, year, doy, snrEnd, mac)
                 else:
-                    print('No German orbits. No French orbits. There never were American orbits, so I give up.')
+                    print('No German orbits. No French orbits. Were there ever American orbits?  Nah.')
         if (satstat == 200) and (goal == 200 ):
-            print('you have what you wanted', satstat,goal)
+            print('You have what you wanted', satstat,goal)
         if (satstat == 100) and (goal == 100 ):
-            print('you have what you wanted', satstat,goal)
+            print('You have what you wanted', satstat,goal)
 
     else:
-        print('no snr file was found, so attempt to create it')
+        print('No SNR file was found, so attempt to create it')
         foundit = False
+        print('Orbit goal: ',orbch(goal))
         if (goal == 100):
             orbtype = 'jax'
             f,orbdir,foundit=g.getsp3file_mgex(year,month,day,orbtype)
             if foundit:
-                g.quick_rinex_snrC(year, doy, station, snrEnd, orbtype,receiverrate,dec_rate,'all')
+                rnx.run_rinex2snr(station, [year], [doy], snrEnd, orbtype, rrate,dec_rate,archive,fortran,nol,overwrite)
                 rerun_lsp(station, year, doy, snrEnd, mac)
-        # otherwise, use the other orbit sources because they should have galileo
             else:
                 orbtype = 'gbm' ; print('try GFZ')
                 f,orbdir,foundit=g.getsp3file_mgex(year,month,day,orbtype)
+                if foundit: 
+                    rnx.run_rinex2snr(station, [year], [doy], snrEnd, orbtype, rrate,dec_rate,archive,fortran,nol,overwrite)
+                rerun_lsp(station, year, doy, snrEnd, mac)
+        if (goal == 200):
+            orbtype = 'gbm' ; print('try GFZ')
+            f,orbdir,foundit=g.getsp3file_mgex(year,month,day,orbtype)
+            if foundit:
+                print('trying to use GBM')
+                rnx.run_rinex2snr(station, [year], [doy], snrEnd, orbtype,rrate,dec_rate,archive,fortran,nol,overwrite)
+                rerun_lsp(station, year, doy, snrEnd, mac)
+            else:
+                print('using French orbits, GRG '); orbtype = 'grg'
+                f,orbdir,foundit=g.getsp3file_mgex(year,month,day,orbtype)
                 if foundit:
-                    g.quick_rinex_snrC(year, doy, station, snrEnd, orbtype,receiverrate,dec_rate,'all')
+                    rnx.run_rinex2snr(station, [year], [doy], snrEnd,orbtype,rrate,dec_rate,archive,fortran,nol,overwrite)
                     rerun_lsp(station, year, doy, snrEnd, mac)
-                else:
-                    print('using French orbit'); orbtype = 'grg'
-                    f,orbdir,foundit=g.getsp3file_mgex(year,month,day,orbtype)
-                    if foundit:
-                        g.quick_rinex_snrC(year, doy, station, snrEnd, orbtype,receiverrate,dec_rate,'all')
-                        rerun_lsp(station, year, doy, snrEnd, mac)
-
+        if (goal == 300):
+            print('Sorry - I have not coded this up yet')
 
     return True
+
+def orbch(goal):
+    ch = ''
+    if goal == 0:
+        ch='GPS only'
+    if goal == 100:
+        ch='GPS+Glonass'
+    if goal == 200:
+        ch='GPS+Glonass+Galileo'
+    if goal == 300:
+        ch='GNSS'
+
+    return ch

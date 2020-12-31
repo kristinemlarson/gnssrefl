@@ -26,7 +26,7 @@ def read_4by5(station, dlat,dlon,hell):
 #        os.makedirs(inputpath)
 
     obsfile = inputpath + station + '_refr.txt'
-    print('reading from station refraction file: ', obsfile)
+    #print('reading from station refraction file: ', obsfile)
     x = np.genfromtxt(obsfile,comments='%')
     max_ind = 4
     pgrid = np.zeros((4,5))

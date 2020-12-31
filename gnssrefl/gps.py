@@ -3734,6 +3734,7 @@ def quick_rinex_snrC(year, doy, station, option, orbtype,receiverrate,dec_rate,a
         d = doy2ymd(year,doy); 
         month = d.month; day = d.day
         # new function to do the whole orbit thing
+        print(year,month,day,orbtype)
         foundit, f, orbdir, snrexe = get_orbits_setexe(year,month,day,orbtype) 
         # if you have the orbit file, you can get the rinex file
         if foundit:

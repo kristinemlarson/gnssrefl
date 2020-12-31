@@ -107,7 +107,12 @@ def read_one_snr(obsfile,ifile):
     f = np.genfromtxt(obsfile,comments='%')
     print('reading from this snr file ',obsfile)
     r,c = f.shape
-    print('Number of rows:', r, ' Number of columns:',c)
+    if r == 0:
+        print('no rows in this file!')
+    if c == 0:
+        print('no columns in this file!')
+
+    #print('Number of rows:', r, ' Number of columns:',c)
 #   store into new variable f
 #   now only keep last three hours if previous day's file
     hoursKept = 21*3600

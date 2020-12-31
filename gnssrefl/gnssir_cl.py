@@ -182,9 +182,10 @@ def main():
     doy_list = list(range(doy, doy_end+1))
     for year in year_list:
         for doy in doy_list:
-            print('--------------------------------------------------')
-            print('RESULTS gnssir for: ', station, year, doy)
-            print('--------------------------------------------------')
+            # to make kelly happy :-)
+            #print('--------------------------------------------------')
+            #print('RESULTS gnssir for: ', station, year, doy)
+            #print('--------------------------------------------------')
             guts.gnssir_guts(station,year,doy, snr_type, extension,lsp)
 
 if __name__ == "__main__":
