@@ -19,7 +19,7 @@ Or use the ones on my web app. They are the same.
 From the periodogram and google Earth map you should be able to come up with a pretty good 
 azimuth mask.  Elevation angle might be a bit trickier, but in this case, go ahead and 
 use what I did, which is in the title of the periodogram plot. For azimuth, I suggest that you 
-[use my web app.](https://gnss-reflections.org/rzones)
+use my web app. [Here is a pretty good start on an elevation and azimuth angle mask.](https://gnss-reflections.org/rzones?station=mchn&msl=on&RH=7&eang=2&azim1=80&azim2=180). 
 
 **Reproduce the web app results:**
 
