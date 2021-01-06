@@ -24,14 +24,19 @@ Link to Blewitt page
 Include photograph
 
 
-##Webapp:
+## Webapp:
 
 lorg is an example station on my webapp. [Please note that the app will be analyzing data in 
 real-time, so you need to wait for the answers to "pop" up in the left hand side of the page. It takes 5-10 
 seconds](https://gnss-reflections.org/fancy6?example=lorg). You might save the periodogram of results so you have a 
 better idea of what the reflection characteristics of the site.
 
-##Make SNR Files:
+
+## Setting azimuth and elevation mask
+
+This will call the web app. 
+
+## Make SNR Files:
 
 You need to make some snr files. This time we will do eight months or so. 
 And we will restrict the search to the unavco archive to make the code run faster (otherwise it will check
@@ -42,7 +47,7 @@ use it and the exercise will run faster.
 
 If you want to look at the contents of a SNR file, they are stored in $REFL_CODE/2019/snr/lorg
 
-##Take a quick look at the data:
+## Take a quick look at the data:
 
 I recommend that you use **quickLook** for one file. This gives you an idea of the quality of the site.
 
@@ -53,8 +58,7 @@ Compare the periodograms for frequencies 1, 20 (L2C) and 5.
 It should be simlar to the webapp periodogram except that the peaks in the periodogram
 will be in a different place depending on how much snow has accumulated at this site.
 
-Link to the L1, L2, L5 periodograms here (which you should save and store).
-
+Christine - put Link to the L1, L2, L5 periodograms here (which you need to save and store).
 
 
 ## Analyze the data
