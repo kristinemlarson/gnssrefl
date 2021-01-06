@@ -3251,17 +3251,18 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     If they do, I do not know where they are kept.
 
     20jun14 added secure ftp for CDDIS
+    21jan05 gzip after december 1, 2020, because, you know, CDDIS
     """
     navname = navfile
     FileExists = False
     try:
-        #print('try to find it at SOPAC ')
+        print('try to find it at SOPAC ')
         get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
     except Exception as err:
         print(err)
         print('could not find file at SOPAC')
     if not os.path.isfile(navfile):
-        #print('Try to find it at CDDIS  ')
+        print('Try to find it at CDDIS  ')
         try:
             get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
         except Exception as err:
@@ -4327,6 +4328,7 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     tries to download from CDDIS archive
 
     20jun11, implemented new CDDIS security requirements
+    21jan06, gz instead of Z
     """
     # ths old way
     # just in case you sent it the navfile with auto instead of brdc
@@ -4337,17 +4339,27 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
 
     # new way
     cddisfile = 'brdc' + cdoy + '0.' +cyy  +'n'
-    navfile_compressed = cddisfile + '.Z'
+    cddisfile_compressed = cddisfile + '.Z'
+    cddisfile_gzip = cddisfile + '.gz'
     # where the file should be at CDDIS ....
     mdir = '/gps/data/daily/' + cyyyy + '/' + cdoy + '/' +cyy + 'n/'
 
     try:
-        cddis_download(navfile_compressed,mdir)
+        cddis_download(cddisfile_compressed,mdir)
+        if os.path.isfile(cddisfile_compressed):
+            subprocess.call(['uncompress',cddisfile_compressed])
     except Exception as err:
         print(err)
-    if os.path.isfile(navfile_compressed):
-        subprocess.call(['uncompress',navfile_compressed])
-        # changing the name to auto
+    if not os.path.isfile(cddisfile):
+        try:
+            cddis_download(cddisfile_gzip,mdir)
+            if os.path.isfile(cddisfile_gzip):
+                subprocess.call(['gunzip',cddisfile_gzip])
+        except Exception as err:
+            print(err)
+    
+    if os.path.isfile(cddisfile):
+        #print('found it and move to ORBIT area')
         subprocess.call(['mv',cddisfile,navfile])
 
     return navfile

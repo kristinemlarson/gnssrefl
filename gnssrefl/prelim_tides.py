@@ -73,7 +73,7 @@ def splines_for_dummies(x,y,plt):
     knots_per_day = 12
     Ndays = 365.25*(x.max()-x.min())
     numKnots = int(knots_per_day*(Ndays))
-    #print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
+    print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
     x1 = x.min()+0.1/365.25
     x2 = x.max()-0.1/365.25
     knots =np.linspace(x1,x2,num=numKnots)
@@ -83,8 +83,6 @@ def splines_for_dummies(x,y,plt):
     xx = np.linspace(x.min(), x.max(), N)
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
     if plt:
-        Plt.figure()
-        Plt.plot(x, y, 'bo', label='Original points',markersize=3)
 
         Plt.figure()
         Plt.plot(x, y, 'bo', label='Original points',markersize=3)
@@ -96,12 +94,41 @@ def splines_for_dummies(x,y,plt):
         Plt.figure()
         resid = y-spline(x)
         ii = np.absolute(resid) > 0.5; 
+        jj = np.absolute(resid) < 0.5; 
         Plt.plot(x, resid, 'bo', x[ii], resid[ii],'ro', markersize=3)
+
+        # with residuals removed?
+        Plt.figure()
+        xx=x[jj]
+        yy= y[jj]
+        splx,sply = in_out(xx,yy)
+        Plt.plot(xx,yy, 'o', markersize=3)
+        Plt.plot(splx,sply,'r-')
+
+        Plt.figure()
+        Plt.plot(xx, yy-sply, 'ro', markersize=3)
+
         Plt.show()
 
     return True
 
+def in_out(x,y):
+    """
+    """
+    knots_per_day = 12
+    Ndays = 365.25*(x.max()-x.min())
+    numKnots = int(knots_per_day*(Ndays))
+    #print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
+    x1 = x.min()+0.1/365.25
+    x2 = x.max()-0.1/365.25
+    knots =np.linspace(x1,x2,num=numKnots)
+    t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
+#   calculate water level hourly for now
+    N = int(Ndays*24 )
+    xx = np.linspace(x.min(), x.max(), N)
+    spline = interpolate.BSpline(t, c, k, extrapolate=False)
 
+    return x,spline(x) 
     
 def write_out_header(fout,station):
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
@@ -167,13 +194,14 @@ def main():
     tv = np.empty(shape=[0, 17])
     if os.path.isdir(direc):
         all_files = os.listdir(direc)
-        #print('Number of files in ', year1, len(all_files))
+        print('Number of files in ', year, len(all_files))
         for f in all_files:
             fname = direc + f
             a = np.loadtxt(fname,comments='%')
             tv = np.append(tv, a,axis=0)
+            print(len(tv))
 
-    #print(tv.shape)
+    print(tv.shape)
     t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
     rh = tv[:,2]
 
