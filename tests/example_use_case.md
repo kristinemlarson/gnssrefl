@@ -23,6 +23,9 @@ Link to Blewitt page
 
 Include photograph
 
+## Data Summary
+
+Only GPS signals are tracked at this site.  L2C and L5 are available.
 
 ## Webapp:
 
@@ -34,7 +37,7 @@ better idea of what the reflection characteristics of the site.
 
 ## Setting azimuth and elevation mask
 
-This will call the web app. 
+This will call the web app.  Christine - put in the correct link here.
 
 ## Make SNR Files:
 
@@ -63,7 +66,7 @@ Christine - put Link to the L1, L2, L5 periodograms here (which you need to save
 
 ## Analyze the data
 
-Now let's get ready to run **gnssir**. This is the code that saves the RH output.
+Now let's get ready to run **gnssir**. This is the code that saves the reflector height (RH) output.
 First you need to make a set of file instructions. If you use defaults, you only
 need the station name, lat, lon, and ht. Make this file using **make_json_input**.
 The json output will be stored in $REFL_CODE/input/lorg.json.
