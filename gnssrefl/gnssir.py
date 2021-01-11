@@ -210,16 +210,16 @@ def read_json_file(station, extension):
     instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
     instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
     if os.path.isfile(instructions_ext):
-        print('using specific instructions for this extension')
+        #print('using specific instructions for this extension')
         with open(instructions_ext) as f:
             lsp = json.load(f)
     else:
-        print('will use the default instruction file')
+        #print('will use the default instruction file')
         if os.path.isfile(instructions):
             with open(instructions) as f:
                 lsp = json.load(f)
         else:
-            print('json instruction file does not exist: ', instructions)
+            print('The json instruction file does not exist: ', instructions)
             print('Please make with make_json_input and run this code again.')
             sys.exit()
 

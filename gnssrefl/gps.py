@@ -956,6 +956,8 @@ def getsp3file_mgex(year,month,day,pCtr):
     20jun25 added French and JAXA orbits
     20jul01 allow year, doy as input instead of year, month, day
     20jul10 allow Wuhan, but only one of them.
+    21jan08 obnoxious problem at CDDIS
+    21jan09 CDDIS, again
     """
     foundit = False
     # this returns sp3 orbit product name
@@ -966,6 +968,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     name, fdir = sp3_name(year,month,day,pCtr) 
     gps_week = name[3:7]
     igps_week = int(gps_week)
+    igps_week_at_cddis = 1 + int(gps_week)
     #print('GPS week', gps_week,igps_week)
     file1 = name + '.Z'
 
@@ -987,13 +990,10 @@ def getsp3file_mgex(year,month,day,pCtr):
     # try out JAXA - should have GPS and glonass
     if pCtr == 'jax':
         file2 = 'JAX0MGXFIN_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz'
+    # this is name without the gzip
     name2 = file2[:-3] 
 
-    # where the files used to live at CDDIS
-    #cddis = 'ftp://cddis.nasa.gov'
-    dirlocation = '/gps/products/mgex/' + str(gps_week) + '/'
-    #url = cddis + dirlocation  + file1; 
-    #url2 = cddis + dirlocation + file2; 
+     
     # this is the default setting - no file exists
     mgex = 0
     n1 = os.path.isfile(fdir + '/' + name)
@@ -1024,51 +1024,65 @@ def getsp3file_mgex(year,month,day,pCtr):
         name = name2
     if (mgex == 1):
         name = file1[:-2]
-# there has to be a better way ... but for now  this works
-# only try to download if neither exists
-
-# new using secure ftp
-# this is the directory
-    secure_dir = '/gps/products/mgex/' + str(gps_week) + '/'
+    #print(mgex, igps_week)
     if (mgex == 0):
-        secure_file = file1
-        name = file1[:-2]
-        #print('first file input',secure_file)
-        
-#https://cddis.nasa.gov/Data_and_Derived_Products/GNSS/gnss_mgex_products.html
-# CDDIS claims the old way stopped at GPS week 1945
-
-        if (igps_week < 2050):
-            try:
-            # secure filename # 1??
-                cddis_download(secure_file, secure_dir)
-                if os.path.isfile(file1):
-                    subprocess.call(['uncompress', file1])
-                    store_orbitfile(name,year,'sp3') ; foundit = True
-                    print('store file in the ORBIT area')
-            except:
-                okokok = 1
-                #print('did not find', file1)
-        else:
-            okokok = 1
-            #print('will only use the long orbit name for weeks after 2000')
-        if not foundit:
+        # this is to deal with the bug at CDDIS
+        if (igps_week > 2137):
             name = file2[:-3]
-            # new secure filename 
-            secure_file = file2
-            #print('next secure file to check',secure_file)
-            try:
-                cddis_download(secure_file, secure_dir)
-                if os.path.isfile(secure_file):
-                    subprocess.call(['gunzip', file2])
-                    print('store file in the ORBIT area')
-                    store_orbitfile(name,year,'sp3') 
-                    foundit = True
-            except:
-                okokok = 1
-                #print('did not find',file2)
-
-
+            # get JAXA orbits from IGN
+            # this is pretty slow, so turning it off
+            #if pCtr == 'jax':
+                #dirlocation_IGN = 'ftp://igs.ensg.ign.fr/pub/igs/products/mgex/' + str(gps_week) + '/'
+                #foundit = ign_orbits(file2, dirlocation_IGN,year)
+            if True:
+            #else:
+                secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
+                name = file2[:-3]
+                secure_file = file2
+                #print(secure_file, secure_dir)
+                try:
+                    cddis_download(secure_file, secure_dir)
+                    if os.path.isfile(secure_file):
+                        subprocess.call(['gunzip', file2])
+                        store_orbitfile(name,year,'sp3') ; foundit = True
+                except:
+                    okok = 1
+                if not foundit:
+                    # change the directory
+                    secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
+                    #print(secure_file, secure_dir)
+                    try:
+                        cddis_download(secure_file, secure_dir)
+                        if os.path.isfile(secure_file):
+                            subprocess.call(['gunzip', file2])
+                            store_orbitfile(name,year,'sp3') ; foundit = True
+                    except:
+                        okok = 1
+        else:
+            secure_dir = '/gps/products/mgex/' + str(gps_week) + '/'
+            secure_file = file1
+            name = file1[:-2]
+            if (igps_week < 2050):
+                #print('old name')
+                try:
+                    cddis_download(secure_file, secure_dir)
+                    if os.path.isfile(file1):
+                        subprocess.call(['uncompress', file1])
+                        store_orbitfile(name,year,'sp3') ; foundit = True
+                except:
+                    okok = 1
+            else:
+                #print('new name')
+                name = file2[:-3]
+                secure_file = file2
+                try:
+                    cddis_download(secure_file, secure_dir)
+                    if os.path.isfile(secure_file):
+                        subprocess.call(['gunzip', file2])
+                        store_orbitfile(name,year,'sp3') ; foundit = True
+                except:
+                    okok = 1
+    #print(name,fdir,foundit)
     return name, fdir, foundit
 
 
@@ -2283,8 +2297,9 @@ def find_satlist(f,snrExist):
     if (f > 300):
         satlist = np.arange(301,333,1)
 
-    if len(satlist) == 0:
-        print('     illegal frequency: no sat list being returned')
+    # minimize screen output
+    #if len(satlist) == 0:
+    #    print('     illegal frequency: no sat list being returned')
     return satlist
 
 def glonass_channels(f,prn):
@@ -3256,13 +3271,13 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     navname = navfile
     FileExists = False
     try:
-        print('try to find it at SOPAC ')
+        #print('Try to find it at SOPAC ')
         get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
     except Exception as err:
         print(err)
-        print('could not find file at SOPAC')
+        #print('could not find file at SOPAC')
     if not os.path.isfile(navfile):
-        print('Try to find it at CDDIS  ')
+        #print('Try to find it at CDDIS  ')
         try:
             get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
         except Exception as err:
@@ -3995,6 +4010,28 @@ def cddis_rinex3(station9ch, year, doy,srate,orbtype):
     #    print('either the rinex3 file does not exist OR the gfzrnx executable does not exist')
 
     return fexists, rfilename
+
+def ign_orbits(filename, directory,year):
+    """
+    inputs are filename of MGEX sp3 and directory at IGN
+    """
+    # without gz
+    stripped_name = filename[0:-3]
+    url = directory + filename
+
+    try:
+        wget.download(url,filename)
+        if os.path.exists(filename):
+            subprocess.call(['gunzip',filename])
+            store_orbitfile(stripped_name,year,'sp3') ; 
+            foundit = True
+    except:
+        #print('some kind of issue at ign_orbits')
+        foundit = False
+
+    return foundit 
+
+
 def bkg_rinex3(station9ch, year, doy,srate):
     """
     download rinex 3 from BKG
@@ -4359,7 +4396,7 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
             print(err)
     
     if os.path.isfile(cddisfile):
-        #print('found it and move to ORBIT area')
+        print('found it and move to ORBIT area')
         subprocess.call(['mv',cddisfile,navfile])
 
     return navfile
