@@ -9,6 +9,8 @@ from scipy.interpolate import interp1d
 import subprocess
 import sys
 
+# progress bar for RINEX translation/orbits
+from progress.bar import Bar
 
 import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
@@ -66,7 +68,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             #print(fname)
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
-                print('SNR file already exists', fname)
+                print('SNR file exists', fname)
                 if overwrite:
                     #print('you requested it be overwritten, so removing file')
                     subprocess.call(['rm', fname])
@@ -74,7 +76,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             if (not snre):
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
-                #print(station, year, doy, ': will try to find RINEX /make SNR ')
+                l= 'python'
+                if fortran:
+                    l= 'fortran'
+                print('Will seek RINEX file ', station, ' year:', year, ' doy:', doy, ' and translate with ', l)
                 if nol:
                     # this assumes RINEX file is in local directory
                     if version == 2:
@@ -121,7 +126,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         # this is rinex version 2
                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran) 
 
-    print('And I guess my work is done now!')
+    #print('And I guess my work is done now!')
 
 def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,fortran):
     """
@@ -203,6 +208,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                 snrname = g.snr_name(station, year,month,day,option)
                 orbfile = orbdir + '/' + f
                 if fortran:
+                    #print('Using fortran for translation of RINEX')
                     try:
                         #subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
                         log.write('Using fortran for translation  - separate log is used for stdout \n')
@@ -231,11 +237,15 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                     else:
                         log.write('A SNR file was created: {0:50s}  \n'.format(snrname_full))
                         print('\n')
-                        print('A SNR file was created:', snrname_full)
+                        print('SUCCESS: SNR file was created:', snrname_full)
                         g.store_snrfile(snrname,year,station) 
+                else:
+                    print('No SNR file was created')
             else:
                 print('Either the RINEX file or orbit file does not exist, so there is nothing to convert')
                 log.write('Either the RINEX file or orbit file does not exist, so there is nothing to convert \n')
+        else:
+            print('The orbit file you requested does not exist.')
 
     # close the log file
     log.close()
@@ -364,7 +374,8 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
         navorbits(navfile,obstimes,obsdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log)
     else:
         log.write('Read the sp3 file \n'); sp3 = g.read_sp3file(navfile)
-        test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate,log)
+        testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate,log)
+        #test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate,log)
 
     #print('Closing python RINEX conversion log file:',logname)
     #log.close()
@@ -393,28 +404,30 @@ def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfi
         log.write('Number of epochs in the RINEX file {0:6.0f} \n '.format( K))
         log.write('Decimation rate {0:3.0f} \n'.format(dec_rate))
 
-        for i in range(0,K):
-            if np.remainder(i,1000) == 0:
-                log.write('Epoch {0:6.0f} \n'.format( i))
+        with Bar('Processing RINEX', max=K,fill='@',suffix='%(percent)d%%') as bar:
+            for i in range(0,K):
+                bar.next()
+                if np.remainder(i,200) == 0:
+                    log.write('Epoch {0:6.0f} \n'.format( i))
             # sod is seconds of the day
-            sod = 3600*a[i].hour + 60*a[i].minute + a[i].second
-            if dec_rate > 0:
-                rem = sod % dec_rate
-            else:
-                rem = 0
-            if (rem == 0):
-                gweek, gpss = g.kgpsweek(a[i].year, a[i].month, a[i].day, a[i].hour, a[i].minute, a[i].second)
-                for sat in gpssatlist:
-                    s1,s2,s5 = readSNRval(s1exist,s2exist,s5exist,observationdata,prntoidx,sat,i)
-                    if (s1 > 0):
-                        closest = g.myfindephem(gweek, gpss, ephemdata, sat)
-                        if len(closest) > 0:
-                            satv = satorb_prop(gweek, gpss, sat, recv, closest)
-                            r=np.subtract(satv,recv) # satellite minus receiver vector
-                            eleA = g.elev_angle(up, r)*180/np.pi
-                            azimA = g.azimuth_angle(r, East, North)
-                            if (eleA >= emin) and (eleA <= emax):
-                                fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} \n".format(sat,eleA, azimA, sod,0, 0, s1,s2, s5))
+                sod = 3600*a[i].hour + 60*a[i].minute + a[i].second
+                if dec_rate > 0:
+                    rem = sod % dec_rate
+                else:
+                    rem = 0
+                if (rem == 0):
+                    gweek, gpss = g.kgpsweek(a[i].year, a[i].month, a[i].day, a[i].hour, a[i].minute, a[i].second)
+                    for sat in gpssatlist:
+                        s1,s2,s5 = readSNRval(s1exist,s2exist,s5exist,observationdata,prntoidx,sat,i)
+                        if (s1 > 0):
+                            closest = g.myfindephem(gweek, gpss, ephemdata, sat)
+                            if len(closest) > 0:
+                                satv = satorb_prop(gweek, gpss, sat, recv, closest)
+                                r=np.subtract(satv,recv) # satellite minus receiver vector
+                                eleA = g.elev_angle(up, r)*180/np.pi
+                                azimA = g.azimuth_angle(r, East, North)
+                                if (eleA >= emin) and (eleA <= emax):
+                                    fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} \n".format(sat,eleA, azimA, sod,0, 0, s1,s2, s5))
         fout.close()
     else:
         log.write('There was some kind of problem with your file, exiting ...\n')
@@ -646,3 +659,86 @@ def testit(input):
     """
     print(input)
     return True
+
+
+def testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day, emin,emax,outputfile,up,East,North,recv,dec_rate,log):
+    """
+    inputs are gpstime( numpy array with week and sow)
+    sp3 is what has been read from the sp3 file
+    columsn are satNu, week, sow, x, y, z (in meters)
+    log is for comments
+    """
+    checkD = False
+    if dec_rate > 0:
+        checkD = True
+        log.write('You are decimating \n')
+    # epoch at the beginning of the day of your RINEX file
+    gweek0, gpssec0 = g.kgpsweek(year, month,day,0,0,0 )
+
+    ll = 'quadratic'
+#   will store in this variable, then sort it before writing out to a file
+    saveit = np.empty(shape=[0,11] )
+    fout = open(outputfile, 'w+')
+    NsatT = 0
+    # make a dictionary for constellation name
+    sname ={}; sname['G']='GPS' ; sname['R'] = 'GLONASS'; sname['E'] = 'GALILEO'; sname['C']='BEIDOU'
+    for con in ['G','E','R','C']:
+        if con in obstypes:
+            satL = len(systemsatlists[con][:])
+            satS = 'Processing ' + sname[con]
+            with Bar(satS, max=satL,fill='@',suffix='%(percent)d%%') as bar:
+                log.write('Good news - found data for constellation {0:s} \n'.format( con))
+                obslist = obstypes[con][:]
+                satlist = systemsatlists[con][:]
+                for prn in satlist:
+                    bar.next()
+                    addon = g.findConstell(con) # 100,200,or 300 for R,E, and C 
+                    log.write('Constellation {0:1s} Satellite {1:2.0f}  Addon {2:3.0f} \n'.format( con, prn, addon))
+                # window out the data for this satellite
+                    m = sp3[:,0] == prn + addon
+                    x = sp3[m,3]
+                    if len(x) > 0:
+                        sp3_week = sp3[m,1] ; sp3_sec = sp3[m,2]
+                        x = sp3[m,3] ; y = sp3[m,4] ; z = sp3[m,5]
+                # fit the orbits for this satellite
+                        t=sp3_sec
+                        iX= interp1d(t, x, ll,bounds_error=False,fill_value='extrapolate')
+                        iY= interp1d(t, y, ll,bounds_error=False,fill_value='extrapolate')
+                        iZ= interp1d(t, z, ll,bounds_error=False,fill_value='extrapolate')
+        # get the S1 data for this satellite
+                        if 'S1' in obslist:
+                            s1 = obsdata[con]['S1'][:, prntoidx[con][prn]]
+
+        # indices when there are no data for this satellite
+                        ij = np.isnan(s1)
+        # indices when there are data in the RINEX file - this way you do not compute 
+        # orbits unless there are data.
+                        not_ij = np.logical_not(ij)
+                        Tp = gpstime[not_ij,1] # only use the seconds of the week for now
+                        s1 = s1[not_ij]; 
+                    #print(s1.shape)
+                        emp = np.zeros(shape=[len(s1),1],dtype=float)
+        # get the rest of the SNR data in a function
+                        s2,s5,s6,s7,s8 = extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp)
+        # make sure there are no nan values in s2 or s5
+
+                        nepochs = len(Tp)
+                        for ij in range(0,nepochs):
+                            TT = 0 # default value
+                            if checkD:
+                                TT = Tp[ij]  % dec_rate # get the modulus
+                            if TT == 0:
+                                SatOrb = satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij) 
+                                r=np.subtract(SatOrb,recv)
+                                azimA = g.azimuth_angle(r, East, North)
+                                eleA = g.elev_angle(up, r)*180/np.pi
+                                if (eleA >= emin) and (eleA <= emax):
+                                    fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} {9:7.2f} {10:7.2f} \n".format( 
+                                        prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s6[ij]),float(s7[ij]) ))
+                    else:
+                        log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
+        else:
+            log.write('No data for constellation {0:1s} \n'.format(con))
+    log.write('write SNR data to file \n')
+    fout.close()
+

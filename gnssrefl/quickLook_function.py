@@ -43,7 +43,7 @@ def read_snr_simple(obsfile):
             s5 = f[:,8]
             if (sum(s5) > 0):
                 s5 = s5/20; s5 = np.power(10,s5)  
-            print(len(s5))
+            #print(len(s5))
         if c > 9:
             s7 = f[:,9]
             if (sum(s7) > 0):
@@ -201,10 +201,12 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             amax = max(amax,  bbb) # do not know how to implement this ...
             if (a == 3) or (a==1):
                 plt.xlabel('reflector height (m)')
+            if (a == 1) or (a==0):
+                plt.ylabel('volts/volts')
         plt.suptitle(tt, fontsize=12)
 
         rhout.close()
-        print('Reflector Height results are stored in a file called logs/rh.txt')
+        print('preliminary reflector height results are stored in a file called logs/rh.txt')
         if webapp:
             fig.savefig('temp.png', format="png")
         else:

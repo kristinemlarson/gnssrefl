@@ -192,8 +192,8 @@ def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays):
     """
     if wantCompression:
         if (os.path.isfile(obsfile) == True):
-            print('xz compressing first SNR day')
+            #print('xz compressing first SNR day')
             subprocess.call(['xz', obsfile])
         if (os.path.isfile(obsfile2) == True and twoDays == True):
-            print('compressing second day')
+            #print('compressing second day')
             subprocess.call(['xz', obsfile2])

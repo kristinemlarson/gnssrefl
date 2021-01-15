@@ -89,7 +89,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                 snrname = g.snr_name(station, year,month,day,option)
                 orbfile = orbdir + '/' + f
                 if fortran:
-                    print('Using fortran for translation')
                     try:
                         subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
                         status = subprocess.call(['rm','-f', rinexfile ])

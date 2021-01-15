@@ -192,7 +192,7 @@ def plot2screen(station, f,ax1,ax2,pltname):
     #print(pltname)
     ax2.set_xlabel('Reflector Height (m)'); 
     #ax2.set_title('SNR periodogram')
-    ax2.set_ylabel('SNR periodogram')
+    ax2.set_ylabel('volts/volts')
     ax1.set_ylabel('volts/volts')
     ax1.set_xlabel('Elevation Angles (deg)')
     ax1.set_title(station + ' SNR Data and Frequency L' + str(f))

@@ -541,27 +541,31 @@ def rinex_unavco(station, year, month, day):
     # URL path for the o file and the d file
     url1 = unavco+ '/pub/rinex/obs/' + cyyyy + '/' + cdoy + '/' + filename1
     url2 = unavco+ '/pub/rinex/obs/' + cyyyy + '/' + cdoy + '/' + filename2
+
     try:
-        #print('try to get observation file at unavco')
         wget.download(url1,filename1)
         status = subprocess.call(['uncompress', filename1])
-        #print('found the rinex file')
+    #except Exception as err:
+    #    print(err)
     except:
-        #print('did not find observation file, try hatanaka version')
+        okokok =1
+
+    if not os.path.exists(rinexfile):
+        # look for hatanaka version
         if os.path.exists(crnxpath):
             try:
                 wget.download(url2,filename2)
                 status = subprocess.call(['uncompress', filename2])
                 status = subprocess.call([crnxpath, rinexfiled])
                 status = subprocess.call(['rm', '-f', rinexfiled])
-                #print('found d file and converted to observation file')
             except:
-                okokok = 1
-                #print('download from UNAVCO failed in some way')
+                okokok =1
+            #except Exception as err:
+            #    print(err)
         else:
             print('WARNING WARNING WARNING WARNING')
             print('You are trying to convert Hatanaka files without having the proper')
-            print('executable, CRX2RNX. See links in the gnssrefl documentation. ')
+            print('executable, CRX2RNX. Read the gnssrefl documentation. ')
 
 
 def rinex_sopac(station, year, month, day):
@@ -713,7 +717,6 @@ def rinex_nz(station, year, month, day):
     oname,fname = rinex_name(station, year, month, day)
     file1 = oname + '.gz'
     url = gns +  cyyyy + '/' + cdoy +  '/' + file1
-    print(url)
 
     try:
         wget.download(url,file1)
@@ -835,7 +838,7 @@ def getnavfile(year, month, day):
     if os.path.exists(nfile):
         #print('navfile exists online')
         foundit = True
-    if os.path.exists(nfile + '.xz' ):
+    if (not foundit) and (os.path.exists(nfile + '.xz' )):
         #print('xz compressed navfile exists online, uncompressing ...')
         subprocess.call(['unxz',nfile + '.xz'])
         foundit = True
@@ -844,7 +847,7 @@ def getnavfile(year, month, day):
         #print('go pick up the navfile')
         navstatus = navfile_retrieve(navname, cyyyy,cyy,cdoy) 
         if navstatus:
-            print('\n navfile being moved to online storage area')
+            #print('\n navfile being moved to online storage area')
             subprocess.call(['mv',navname, navdir])
             foundit = True
         else:
@@ -3270,23 +3273,15 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     """
     navname = navfile
     FileExists = False
-    try:
-        #print('Try to find it at SOPAC ')
-        get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
-    except Exception as err:
-        print(err)
-        #print('could not find file at SOPAC')
-    if not os.path.isfile(navfile):
-        #print('Try to find it at CDDIS  ')
-        try:
-            get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
-        except Exception as err:
-            print(err)
+    get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
 
     if not os.path.isfile(navfile):
-        FileExists = False
-    else:
+        get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
+
+    if os.path.isfile(navfile):
         FileExists = True
+    else:
+        FileExists = False
 
     return FileExists
 
@@ -3886,6 +3881,7 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
           # lowrate data
             if archive == 'all':
                 #print('will search four archives for your file')
+                # use the old code
                 go_get_rinex(station,year,month,day,receiverrate) 
             else:
                 if archive == 'unavco':
@@ -4353,8 +4349,10 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     try:
         wget.download(url_sopac1,navfile_compressed)
         subprocess.call(['uncompress',navfile_compressed])
-    except Exception as err:
-        print(err)
+    except:
+        okokok = 1
+    #except Exception as err:
+    #    print(err)
 
     return navfile
 
@@ -4385,15 +4383,14 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
         cddis_download(cddisfile_compressed,mdir)
         if os.path.isfile(cddisfile_compressed):
             subprocess.call(['uncompress',cddisfile_compressed])
-    except Exception as err:
-        print(err)
+    except:
+        okokok = 1
+    #except Exception as err:
+    #    print(err)
     if not os.path.isfile(cddisfile):
-        try:
-            cddis_download(cddisfile_gzip,mdir)
-            if os.path.isfile(cddisfile_gzip):
-                subprocess.call(['gunzip',cddisfile_gzip])
-        except Exception as err:
-            print(err)
+        cddis_download(cddisfile_gzip,mdir)
+        if os.path.isfile(cddisfile_gzip):
+            subprocess.call(['gunzip',cddisfile_gzip])
     
     if os.path.isfile(cddisfile):
         print('found it and move to ORBIT area')
@@ -4434,7 +4431,7 @@ def pickup_pbay(year,month, day):
     jeff freymueller's site. L2C, but GPS only.
     changed to year,month,day to be consistent with other
     """
-    print('downloading highrate PBAY')
+    #print('downloading highrate PBAY')
     station = 'pbay'
     if (day == 0):
         doy = month

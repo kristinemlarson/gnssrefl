@@ -64,14 +64,14 @@ def main():
     if pCtr == 'nav':
         navname,navdir,foundit = g.getnavfile(year, month, day) 
         if foundit:
-            print('SUCCESS:', navname)
+            print('SUCCESS:', navdir+'/'+navname)
     else:
         if (pCtr == 'igs') or (pCtr == 'igr'):
             filename, fdir, foundit = g.getsp3file_flex(year,month,day,pCtr)
         else:
             filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)
         if foundit:
-            print('SUCCESS:', filename, fdir )
+            print('SUCCESS:', fdir+'/'+filename )
         else:
             print(filename , ' not found')
 
