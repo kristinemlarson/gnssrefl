@@ -10,7 +10,7 @@ import subprocess
 import sys
 
 # progress bar for RINEX translation/orbits
-from progress.bar import Bar
+#from progress.bar import Bar
 
 import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
@@ -405,8 +405,9 @@ def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfi
         log.write('Decimation rate {0:3.0f} \n'.format(dec_rate))
 
         with Bar('Processing RINEX', max=K,fill='@',suffix='%(percent)d%%') as bar:
+        if True:
             for i in range(0,K):
-                bar.next()
+                #bar.next()
                 if np.remainder(i,200) == 0:
                     log.write('Epoch {0:6.0f} \n'.format( i))
             # sod is seconds of the day
@@ -686,7 +687,8 @@ def testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,
         if con in obstypes:
             satL = len(systemsatlists[con][:])
             satS = 'Processing ' + sname[con]
-            with Bar(satS, max=satL,fill='@',suffix='%(percent)d%%') as bar:
+            if True:
+            #with Bar(satS, max=satL,fill='@',suffix='%(percent)d%%') as bar:
                 log.write('Good news - found data for constellation {0:s} \n'.format( con))
                 obslist = obstypes[con][:]
                 satlist = systemsatlists[con][:]
