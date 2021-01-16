@@ -3,11 +3,11 @@ from setuptools import setup, find_packages
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
-requirements = ["numpy","wget","scipy","matplotlib","requests"]
+requirements = ["numpy","wget","scipy","matplotlib","requests","progress"]
 
 setup(
     name="gnssrefl",
-    version="0.0.44",
+    version="0.0.45",
     author="Kristine Larson",
     author_email="kristine.larson@colorado.edu",
     description="A GNSS reflectometry software package ",

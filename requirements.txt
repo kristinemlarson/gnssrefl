@@ -6,3 +6,4 @@ scipy
 wget
 matplotlib
 requests
+progress
