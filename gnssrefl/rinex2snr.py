@@ -687,14 +687,12 @@ def testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,
         if con in obstypes:
             satL = len(systemsatlists[con][:])
             satS = 'Processing ' + sname[con]
-            if True:
-                print(satS)
-            #with Bar(satS, max=satL,fill='@',suffix='%(percent)d%%') as bar:
+            with Bar(satS, max=satL,fill='@',suffix='%(percent)d%%') as bar:
                 log.write('Good news - found data for constellation {0:s} \n'.format( con))
                 obslist = obstypes[con][:]
                 satlist = systemsatlists[con][:]
                 for prn in satlist:
-                    #bar.next()
+                    bar.next()
                     addon = g.findConstell(con) # 100,200,or 300 for R,E, and C 
                     log.write('Constellation {0:1s} Satellite {1:2.0f}  Addon {2:3.0f} \n'.format( con, prn, addon))
                 # window out the data for this satellite
