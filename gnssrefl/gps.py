@@ -2793,7 +2793,7 @@ def rinex_unavco_highrate(station, year, month, day):
 
     WARNING: only rinex version 2 in this world
     """
-    print('unavco high rate')
+    #print('unavco high rate')
     crnxpath = hatanaka_version()
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
@@ -2803,20 +2803,23 @@ def rinex_unavco_highrate(station, year, month, day):
     # URL path for the o file and the d file
     url1 = unavco+ '/pub/highrate/1-Hz/rinex/' + cyyyy + '/' + cdoy + '/' + station + '/' + filename1
     url2 = unavco+ '/pub/highrate/1-Hz/rinex/' + cyyyy + '/' + cdoy + '/' + station + '/' + filename2
-    try:
-        print('try to get d file')
-        wget.download(url2,filename2)
-        subprocess.call(['uncompress',filename2])
-        subprocess.call([crnxpath, rinexfiled])
-        subprocess.call(['rm','-f',rinexfiled])
-        print('found d file and converted to o file')
-    except:
-        print('did not find d file - will look for an o file')
+    # hatanaka executable has to exist
+    if os.path.isfile(crnxpath): 
+        try:
+            wget.download(url2,filename2)
+            subprocess.call(['uncompress',filename2])
+            subprocess.call([crnxpath, rinexfiled])
+            subprocess.call(['rm','-f',rinexfiled])
+        except:
+            okok = 1
+    if not os.path.isfile(rinexfile):
+        #print('did not find d file - will look for an o file')
         try:
             wget.download(url1,filename1)
             subprocess.call(['uncompress',filename1])
         except:
-            print('failed to find either RINEX file at unavco')
+            okok = 1
+            #print('failed to find either RINEX file at unavco')
 
 def big_Disk_in_DC(station, year, month, day):
     """
@@ -2845,7 +2848,8 @@ def big_Disk_in_DC(station, year, month, day):
         wget.download(url, out=gzip_rinexfile)
         status = subprocess.call(['gunzip', gzip_rinexfile])
     except:
-        print('some problem in download - maybe the site does not exist on this archive')
+        okok = 1
+        #print('some problem in download - maybe the site does not exist on this archive')
 
 def ydoy2ymd(year, doy):
     """

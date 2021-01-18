@@ -99,35 +99,34 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 <TH>Cryosphere</TH>
 <TD>
 
-* [Lorne, Ross Ice Shelf, Antarctica](lorg_use.md)
+* [Lorne, Ross Ice Shelf, Antarctica](lorg_use.md) (lorg)
 
-* [Dye2, Greenland Ice Sheet](gls1_use.md)
+* [Dye2, Greenland Ice Sheet](gls1_use.md) (gls1)
 
-* [Thwaites Glacier, Antarctica](lthw_use.md)
+* [Thwaites Glacier, Antarctica](lthw_use.md) (lthw)
 
-* [Summit Camp, Greenland](smm3_use.md)
+* [Summit Camp, Greenland](smm3_use.md) (smm3)
 </TD>
 <TH>Lakes and Rivers</TH>
 <td>
 
-* [Lake Taupo, New Zealand](tgho_use.md)
+* [Lake Taupo, New Zealand](tgho_use.md) (tgho)
 
+* [Michipicoten, Lake Superior, Canada](mchn_use.md) (mchn)
 
-* [Michipicoten, Lake Superior, Canada](mchn_use.md)
+* [St Lawrence River, Montreal, Canada](pmtl_use.md) (pmtl)
 
-* [St Lawrence River, Montreal, Canada](pmtl_use.md)
-
-* Steenbras Reservoir, Republic of South Africa
+* Steenbras Reservoir, Republic of South Africa (sbas)
 
 </TD>
 <TH>Tides and Storm Surges</TH>
 <TD>
 
-* Hurricane Laura
+* Hurricane Laura (calc)
 
-* St Michael, Alaska
+* St Michael, Alaska (at01)
 
-* Palmer Station, Antarctica
+* Palmer Station, Antarctica (pal2)
 
 </TD>
 </TR>
@@ -136,13 +135,11 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 <TH>Seasonal Snow</TH>
 <TD>
 
-* Half Island Park, Idaho
+* Half Island Park, Idaho (p360)
 
-* Niwot Ridge, Colorado
+* Coldfoot, Alaska (ab33)
 
-* Coldfoot, Alaska
-
-* Priddis, Alberta, Canada
+* Priddis, Alberta, Canada (prds)
 
 </TD>
 <TH>Soil Moisture</TH>
