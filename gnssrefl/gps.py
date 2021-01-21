@@ -4420,14 +4420,14 @@ def cddis_download(filename, directory):
         subprocess.call(['mkdir', 'logs'])
     station = filename[0:4]
     fn = 'logs/' + station + '_cddis.txt'
-    cddislog = open(fn, 'w+') 
+    #cddislog = open(fn, 'w+') 
     filename = 'ftps://gdc.cddis.eosdis.nasa.gov' + directory + filename 
     callit = ['wget', '--ftp-user','anonymous','--ftp-password', 'kristine@colorado.edu', '--no-check-certificate', filename]
-    #subprocess.call(callit)
+    subprocess.call(callit)
     # try this new way - I am trying to send the messages to the file
-    out = subprocess.run(callit, capture_output=True,text=True)
-    cddislog.write(out.stderr)
-    cddislog.close()
+    #out = subprocess.run(callit, capture_output=True,text=True)
+    #cddislog.write(out.stderr)
+    #cddislog.close()
     return True 
 
 def pickup_pbay(year,month, day):
