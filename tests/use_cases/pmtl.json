@@ -1,0 +1,49 @@
+{
+    "station": "pmtl",
+    "lat": 45.5571,
+    "lon": -73.5204,
+    "ht": 54.073,
+    "minH": 70.0,
+    "maxH": 90.0,
+    "e1": 5,
+    "e2": 12,
+    "NReg": [
+        70.0,
+        90.0
+    ],
+    "PkNoise": 2.7,
+    "polyV": 4,
+    "pele": [
+        5,
+        30
+    ],
+    "ediff": 2,
+    "desiredP": 0.005,
+    "azval": [
+        45,
+        90,
+        90,
+        180,
+        180,
+        225 
+    ],
+    "freqs": [
+        1,
+        101, 
+        102 
+    ],
+    "reqAmp": [
+        7,
+        7,
+        6 
+    ],
+    "refraction": true,
+    "overwriteResults": true,
+    "seekRinex": false,
+    "wantCompression": false,
+    "plt_screen": false,
+    "onesat": null,
+    "screenstats": true,
+    "pltname": "pmtl_lsp.png",
+    "delTmax": 75
+}
