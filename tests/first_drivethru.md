@@ -99,22 +99,22 @@ environment around a GPS/GNSS sites, i.e. look at multiple days, please look at 
 <TH>Cryosphere</TH>
 <TD>
 
-* [Lorne, Ross Ice Shelf, Antarctica](lorg_use.md) (lorg)
+* [Lorne, Ross Ice Shelf, Antarctica](use_cases/lorg_use.md) (lorg)
 
-* [Dye2, Greenland Ice Sheet](gls1_use.md) (gls1)
+* [Dye2, Greenland Ice Sheet](use_cases/gls1_use.md) (gls1)
 
-* [Thwaites Glacier, Antarctica](lthw_use.md) (lthw)
+* [Thwaites Glacier, Antarctica](use_cases/lthw_use.md) (lthw)
 
-* [Summit Camp, Greenland](smm3_use.md) (smm3)
+* [Summit Camp, Greenland](use_cases/smm3_use.md) (smm3)
 </TD>
 <TH>Lakes and Rivers</TH>
 <td>
 
-* [Lake Taupo, New Zealand](tgho_use.md) (tgho)
+* [Lake Taupo, New Zealand](use_cases/tgho_use.md) (tgho)
 
-* [Michipicoten, Lake Superior, Canada](mchn_use.md) (mchn)
+* [Michipicoten, Lake Superior, Canada](use_cases/mchn_use.md) (mchn)
 
-* [St Lawrence River, Montreal, Canada](pmtl_use.md) (pmtl)
+* [St Lawrence River, Montreal, Canada](use_cases/pmtl_use.md) (pmtl)
 
 * Steenbras Reservoir, Republic of South Africa (sbas)
 
