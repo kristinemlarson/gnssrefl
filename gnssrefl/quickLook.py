@@ -7,6 +7,7 @@ wrapper for the quickLook function code
 import argparse
 import os
 import sys
+import subprocess
 
 import matplotlib.pyplot as plt
 import numpy as np
