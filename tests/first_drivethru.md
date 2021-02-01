@@ -51,7 +51,7 @@ Lets look at the spectral characteristics of the SNR data for the default L1 set
 
 *quickLook p041 2020 132* 
 
-<img src="p041-l1.png" width="500"/>
+<img src="use_cases/p041-l1.png" width="500"/>
 
 The four subplots show you different regions around the antenna. The x-axis tells you 
 reflector height (RH) and the y-axis gives you the spectral amplitude of the SNR data.
@@ -68,7 +68,7 @@ Not all receivers produce L1 data that are as nice as these. Now try L2C:
 
 *quickLook p041 2020 132 -fr 20* 
 
-<img src="p041-l2c.png" width="500"/>
+<img src="use_cases/p041-l2c.png" width="500"/>
 
 One thing you can notice here is that there are more colors in the L1 plots than in the L2C 
 plots. That is simply the result of the fact that there are more L1 satellites than L2C satellites.
@@ -92,7 +92,7 @@ I believe Beidou signals are tracked at this site, but the data are not availabl
 it does print out the answers to a file called *rh.txt*. If you want to assess changes in the reflection
 environment around a GPS/GNSS sites, i.e. look at multiple days, please look at these use cases I have compiled.
 
-### Use Cases (These are under development)
+### Use Cases (These are still under development)
 
 <table>
 <TR>
