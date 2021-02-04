@@ -23,11 +23,11 @@ def main():
 
     args = parser.parse_args()
 
-    os = args.os
+    opsys = args.os
     exedir = os.environ['EXE']
     print(exedir)
 
-    if os == 'linux':
+    if opsys == 'linux':
         print('linux')
 
     else:
