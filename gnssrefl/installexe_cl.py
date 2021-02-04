@@ -16,6 +16,7 @@ def download_chmod_move(url,savename,exedir):
     wget.download(url,savename)
     os.chmod(savename,0o777)
     subprocess.call(['mv', '-f',savename, exedir])
+    print('\n Executable stored:', savename)
 
 def main():
     """
@@ -34,7 +35,7 @@ def main():
 
     opsys = args.opsys
     exedir = os.environ['EXE']
-    print('executable environment area:', exedir)
+    print('Executable environment area:', exedir)
 
 
     # where the files are stored publicly
