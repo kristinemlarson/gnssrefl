@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-downloads RINEX files
-kristine larson
-2020sep03 - modified environment variable requirement
+installs non-python executables
 """
 import argparse
 import gnssrefl.gps as g
