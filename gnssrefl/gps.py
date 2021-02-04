@@ -24,11 +24,11 @@ import gnssrefl.read_snr_files as snr
 # various numbers you need in the GNSS world
 # mostly frequencies and wavelengths
 class constants:
-    c= 299792458 # m/sec
+    c= 299792458 # speed of light m/sec
 #   GPS frequencies and wavelengths
     fL1 = 1575.42 # MegaHz 154*10.23
     fL2 = 1227.60 # 120*10.23
-    fL5 = 115*10.23
+    fL5 = 115*10.23 # L5
 #  GPS wavelengths
     wL1 = c/(fL1*1e6) # meters wavelength
     wL2 = c/(fL2*1e6)
@@ -61,22 +61,22 @@ class constants:
 
 class wgs84:
     """
-    wgs84 parameters
+    wgs84 parameters for Earth radius and flattening
     """
-    a = 6378137. # meters
+    a = 6378137. # meters Earth radius
     f  =  1./298.257223563 # flattening factor
     e = np.sqrt(2*f-f**2) # 
 
 def define_filename(station,year,doy,snr):
     """
-    given station name, year, doy, snr type
+    given station name, year, doy, snr type (e.g. 99, 66)
     year doy and snr are integers
-    returns snr filenames (both uncompressed and compressed)
+    returns snr filenames (both uncompressed and xz compressed)
     author: Kristine Larson
     19mar25: return compressed filename too
     20apr12: fixed typo in xz name!
     """
-    xdir = os.environ['REFL_CODE']
+    xdir = os.environ['REFL_CODE'] # main directory for SNR files
     cdoy = '{:03d}'.format(doy)
     cyy = '{:02d}'.format(year-2000)
     f= station + str(cdoy) + '0.' + cyy + '.snr' + str(snr)
@@ -87,7 +87,8 @@ def define_filename(station,year,doy,snr):
 def define_and_xz_snr(station,year,doy,snr):
     """
     given station name, year, doy, snr type
-    returns snr filename
+    returns snr filenames and whether it exists
+    if it is xz compressed, it uncompresses it
     author: Kristine Larson
     19mar25: return compressed filename too
     20apr12: fixed typo in xz name! now try to compress here
@@ -116,6 +117,7 @@ def define_filename_prevday(station,year,doy,snr):
     """
     given station name, year, doy, snr type
     returns snr filename for the PREVIOUS day
+    fix type for xz
     author: Kristine Larson
     """
     xdir = os.environ['REFL_CODE']
@@ -123,7 +125,7 @@ def define_filename_prevday(station,year,doy,snr):
     doy = int(doy)
     if (doy == 1):
         pyear = year -1
-        print('found january 1, so previous day is december 31')
+        #print('found january 1, so previous day is december 31')
         doyx,cdoyx,cyyyy,cyy = ymd2doy(pyear,12,31)
         pdoy = doyx 
     else:
@@ -135,8 +137,8 @@ def define_filename_prevday(station,year,doy,snr):
     cyy = '{:02d}'.format(pyear-2000)
     f= station + str(cdoy) + '0.' + cyy + '.snr' + str(snr)
     fname = xdir + '/' + str(year) + '/snr/' + station + '/' + f 
-    fname2 = xdir + '/' + str(year) + '/snr/' + station + '/' + f + '.xv'
-    print('snr filename for the previous day is ', fname) 
+    fname2 = xdir + '/' + str(year) + '/snr/' + station + '/' + f + '.xz'
+    #print('snr filename for the previous day is ', fname) 
     return fname, fname2
 
 def read_inputs(station,**kwargs):
@@ -146,11 +148,14 @@ def read_inputs(station,**kwargs):
     19sep22 change name of longitude variable, add error messages
     20may20 add peak to noise as an returned variable
 
+    leaving this for now - but it is no longer used.  
+
     """
-#   directory name is currently defined using REFL_CODE
+#   directory name is currently defined using REFL_CODE environment variable
     peak2noise = 0 # assume it is not set here but in the main code,
     # which is how it used to be
     xdir = os.environ['REFL_CODE']
+    # this is the old code before I made json inputs
     fname = xdir + '/input/' + station
     print('default inputs should be in this file: ', fname)
 #   default location values - not used now
@@ -251,9 +256,12 @@ def read_inputs(station,**kwargs):
 
 def satclock(week, epoch, prn, closest_ephem):
     """
-    inputs: gps week, second of week, satellite number (PRN)
-    and ephemeris. returns clock clorrection in  meters
+    author: kristine larson, unknown date
+    integer inputs: gps week, second of week, satellite number (PRN)
+    and broadcast ephemeris. 
     note: although second order correction exists, it is not used  
+
+    returns clock correction in  meters
     """
     # what is sent should be the appropriate ephemeris for given
     # satellite and time
@@ -295,9 +303,9 @@ def azimuth_angle(RecSat, East, North):
 
 def rot3(vector, angle):
     """
-    input a vector (3) and output the same vector rotated by angle
+    input a vector (3) and output the same vector rotated by an angle
     in radians apparently.
-    from ryan hardy
+    original code from ryan hardy
     """
     rotmat = np.matrix([[ np.cos(angle), np.sin(angle), 0],
                         [-np.sin(angle), np.cos(angle), 0],
@@ -307,9 +315,11 @@ def rot3(vector, angle):
 
 def xyz2llh(xyz, tol):
     """
-    inputs are station coordinate vector xyz (x,y,z in meters), tolerance for convergence
+    inputs are station coordinate vector xyz (x,y,z in meters) in a list?, 
+    tolerance for convergence should be small (1E-8)
     outputs are lat, lon in radians and wgs84 ellipsoidal height in meters
-    kristine larson
+    author: kristine larson
+    uses wgs84 for Earth parameters
     """
     x=xyz[0]
     y=xyz[1]
@@ -321,7 +331,7 @@ def xyz2llh(xyz, tol):
     error = 1
     a2=wgs84.a**2
     i=0 # make sure it doesn't go forever
-    while error > tol and i < 10:
+    while error > tol and i < 6:
         n = a2/np.sqrt(a2*np.cos(lat0)**2+b**2*np.sin(lat0)**2)
         h = p/np.cos(lat0)-n
         lat = np.arctan((z/p)/(1-wgs84.e**2*n/(n+h)))
@@ -334,6 +344,7 @@ def xyz2llhd(xyz):
     """
     inputs are station vector xyz (x,y,z in meters), tolerance for convergence is hardwired
     outputs are lat, lon in degrees and wgs84 ellipsoidal height in meters
+    same as xyz2llh but lat and lon outputs are in degrees
     author : kristine larson
     """
     x=xyz[0]
@@ -347,7 +358,7 @@ def xyz2llhd(xyz):
     a2=wgs84.a**2
     i=0 # make sure it doesn't go forever
     tol = 1e-10
-    while error > tol and i < 10:
+    while error > tol and i < 6:
         n = a2/np.sqrt(a2*np.cos(lat0)**2+b**2*np.sin(lat0)**2)
         h = p/np.cos(lat0)-n
         lat = np.arctan((z/p)/(1-wgs84.e**2*n/(n+h)))
@@ -363,6 +374,8 @@ def zenithdelay(h):
     author: kristine larson
     input the station ellipsoidal (height) in meters
     the output is a very simple zenith troposphere delay in meters
+    this is NOT to be used for precise geodetic applications
+
     """
 
     zd = 0.1 + 2.31*np.exp(-h/7000.0)
@@ -371,8 +384,9 @@ def zenithdelay(h):
 def up(lat,lon):
     """
     author: kristine larson
-    inputs rae latitude and longitude in radians
-    returns the up unit vector, and local east and north used for azimuth calc.
+    inputs are latitude and longitude of a station in radians
+    returns the up unit vector, and local east and north unit vectdors needed 
+    for azimuth calc.
     """
     xo = np.cos(lat)*np.cos(lon)
     yo = np.cos(lat)*np.sin(lon)
@@ -400,7 +414,7 @@ def elev_angle(up, RecSat):
     """
     inputs:
     up - unit vector in up direction
-    RecSat is the Cartesian vector that points from receiver 
+    RecSat is the numpy Cartesian vector that points from receiver 
     to the satellite in meters
     the output is elevation angle in radians
     author: kristine larson
@@ -411,7 +425,7 @@ def elev_angle(up, RecSat):
 
 def sp3_interpolator(t, tow, x0, y0, z0, clock0):
     """
-    got this from ryan hardy - who coded it for my class?
+    author: originally from ryan hardy  
     inputs are??? tow is GPS seconds
     xyz are the precise satellite coordinates (in meters)
     clocks are likely satellite clock corrections (microseconds)
@@ -477,11 +491,12 @@ def readPreciseClock(filename):
     author: kristine larson
     filename of precise clocks
     returns prn, time (gps seconds of the week), and clock corrections (in meters)
+    only works for GPS
     """          
     StationNFO=open(filename).readlines()
     c= 299792458 # m/sec
  
-    nsat = 32
+    nsat = 32 # max number of satellites, for GPS only 
     k=0
 # this is for 5 second clocks
     nepochs = 17280
@@ -510,9 +525,9 @@ def readPreciseClock(filename):
 
 def ymd2doy(year,month,day):
     """
-    takes in year, month, day and returns day of year (doy)
-    and the character version of that day of year
-    19mar20: and now it returns character versions of 4 and 2 character years
+    takes in integer year, month, day 
+    returns day of year (doy)
+    string doy, string year and string (2ch) year
     """
     today=datetime.datetime(year,month,day)
     doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
@@ -524,15 +539,16 @@ def ymd2doy(year,month,day):
 def rinex_unavco(station, year, month, day):
     """
     author: kristine larson
-    picks up a RINEX file from unavco.  it tries to pick up an o file,
+    picks up a RINEX file from default unavco area, i.e. not highrate.  
+    it tries to pick up an o file,
     but if it does not work, it tries the "d" version, which must be
     decompressed.  the location of this executable is defined in the crnxpath
-    variable. This is from the main unavco directory - not the highrate directory.
+    variable. 
 
     WARNING: only rinex version 2 in this world
     """
     exedir = os.environ['EXE']
-    crnxpath = hatanaka_version() 
+    crnxpath = hatanaka_version()  # where hatanaka will be
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
     unavco= 'ftp://data-out.unavco.org'
@@ -545,6 +561,7 @@ def rinex_unavco(station, year, month, day):
     try:
         wget.download(url1,filename1)
         status = subprocess.call(['uncompress', filename1])
+    # removed to keep jupyter notebooks clean. 
     #except Exception as err:
     #    print(err)
     except:
@@ -563,9 +580,10 @@ def rinex_unavco(station, year, month, day):
             #except Exception as err:
             #    print(err)
         else:
-            print('WARNING WARNING WARNING WARNING')
-            print('You are trying to convert Hatanaka files without having the proper')
-            print('executable, CRX2RNX. Read the gnssrefl documentation. ')
+            hatanaka_warning()
+            #print('WARNING WARNING WARNING WARNING')
+            #print('You are trying to convert Hatanaka files without having the proper')
+            #print('executable, CRX2RNX. Read the gnssrefl documentation. ')
 
 
 def rinex_sopac(station, year, month, day):
@@ -573,8 +591,7 @@ def rinex_sopac(station, year, month, day):
     author: kristine larson
     inputs: station name, year, month, day
     picks up a hatanaka RINEX file from SOPAC - converts to o
-    hatanaka exe hardwired  for my machine
-    allow doy input to month
+    can also be called as station, year, doy, 0
     """
     if (day == 0):
         doy = month
@@ -602,9 +619,10 @@ def rinex_sopac(station, year, month, day):
             subprocess.call(['rm', '-f',file1])
             subprocess.call(['rm', '-f',fname])
     else:
-        print('WARNING WARNING WARNING WARNING')
-        print('You are trying to convert Hatanaka files without having the proper')
-        print('executable, CRX2RNX. See links in the gnssrefl documentation')
+        hatanaka_warning()
+        #print('WARNING WARNING WARNING WARNING')
+        #print('You are trying to convert Hatanaka files without having the proper')
+        #print('executable, CRX2RNX. See links in the gnssrefl documentation')
 
 
 def rinex_sonel(station, year, month, day):
@@ -637,9 +655,20 @@ def rinex_sonel(station, year, month, day):
             #print('some kind of problem with Hatanaka download from SONEL',file1)
             subprocess.call(['rm', '-f',file1])
     else:
-        print('WARNING WARNING WARNING WARNING')
-        print('You are trying to convert Hatanaka files without having the proper')
-        print('executable, CRX2RNX. See links in the gnssrefl documentation')
+        hatanaka_warning()
+        #print('WARNING WARNING WARNING WARNING')
+        #print('You are trying to convert Hatanaka files without having the proper')
+        #print('executable, CRX2RNX. See links in the gnssrefl documentation')
+
+def hatanaka_warning():
+    """
+    return warning about missing Hatanaka executable
+    author: kristine larson
+    """
+    print('WARNING WARNING WARNING WARNING')
+    print('You are trying to convert Hatanaka files without having the proper')
+    print('executable, CRX2RNX. See links in the gnssrefl documentation')
+
 
 def rinex_cddis(station, year, month, day):
     """
@@ -3303,14 +3332,14 @@ def make_nav_dirs(yyyy):
     navfiledir = os.environ['ORBITS'] + '/' + cyyyy 
     if not os.path.exists(navfiledir):
         subprocess.call(['mkdir',navfiledir])
-        print('making year directory')
+        #print('making year directory')
     navfiledir1 = os.environ['ORBITS'] + '/' + cyyyy + '/nav' 
     if not os.path.exists(navfiledir1):
         subprocess.call(['mkdir',navfiledir1])
-        print('making nav specific directory')
+        #print('making nav specific directory')
     navfiledir2 = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
     if not os.path.exists(navfiledir2):
-        print('making sp3 specific directory')
+        #print('making sp3 specific directory')
         subprocess.call(['mkdir',navfiledir2])
 
     return True
