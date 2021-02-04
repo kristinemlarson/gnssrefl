@@ -8,6 +8,14 @@ import os
 import subprocess
 import sys
 
+def download_chmod_move(url,savename,exedir):
+    """
+    inputs are url, filename and executable directory
+    it should chmod g+rwx and  move to exe area
+    """
+    wget.download(url,savename)
+    os.chmod(savename,0o777)
+    subprocess.call(['mv', '-f',savename, exedir])
 
 def main():
     """
@@ -19,7 +27,7 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("opsys", help="operating system (linux or macos)", type=str)
+    parser.add_argument("opsys", help="operating system (linux64 or macos)", type=str)
 # optional arguments
 
     args = parser.parse_args()
@@ -28,36 +36,46 @@ def main():
     exedir = os.environ['EXE']
     print('executable environment area:', exedir)
 
-    # download executable and mv to EXE area
-    if (opsys == 'linux'):
+
+    # where the files are stored publicly
+    sto = 'https://morefunwithgps.com/public_html/'
+
+    if (opsys == 'linux64'):
         savename = 'CRX2RNX'
-        url = 'https://github.com/kristinemlarson/gnssrefl/blob/master/static/CRX2RNX.linux64.e'
-        wget.download(url,savename)
-        os.chmod('CRX2RNX',0o111)
-        subprocess.call('mv', savename, exedir)
+        url = sto + savename + '.' + opsys + '.e'
+        download_chmod_move(url,savename,exedir)
+
         savename = 'gpsSNR.e'
-        url = 'https://github.com/kristinemlarson/gnssrefl/blob/master/static/gpsSNR.linux64.e'
-        wget.download(url,savename)
-        os.chmod(savename,0o111)
-        subprocess.call('mv', savename, exedir)
+        url = sto + 'gpsSNR.' + opsys + '.e'
+        download_chmod_move(url,savename,exedir)
+
+        savename = 'gnssSNR.e'
+        url = sto + 'gnssSNR.' + opsys + '.e'
+        download_chmod_move(url,savename,exedir)
+
+        savename = 'gfzrnx'
+        url = sto + 'gfzrnx.' + opsys + '.e'
+        download_chmod_move(url,savename,exedir)
 
     elif (opsys == 'macos'):
         savename = 'CRX2RNX'
-        url = 'https://github.com/kristinemlarson/gnssrefl/blob/master/static/CRX2RNX.macos.e'
-        print(url,savename,exedir)
-        wget.download(url,savename)
-        os.chmod(savename,0o111)
-        subprocess.call('mv', savename, exedir)
+        url = sto + savename + '.' + opsys + '.e'
+        download_chmod_move(url,savename,exedir)
 
         savename = 'gpsSNR.e'
-        url = 'https://github.com/kristinemlarson/gnssrefl/blob/master/static/gpsSNR.macos.e'
-        print(url,savename,exedir)
-        wget.download(url,savename)
-        os.chmod(savename,0o111)
-        subprocess.call('mv', savename, exedir)
+        url = sto + 'gpsSNR.' + opsys + '.e'
+        download_chmod_move(url,savename,exedir)
+
+        savename = 'gnssSNR.e'
+        url = sto + 'gnssSNR.' + opsys + '.e'
+        download_chmod_move(url,savename,exedir)
+
+        savename = 'gfzrnx'
+        url = sto + 'gfzrnx.' + opsys + '.e'
+        download_chmod_move(url,savename,exedir)
 
     else:
-        print('do not recognize your input. Exiting.')
+        print('do not recognize your operating system input. Exiting.')
         sys.exit()
 
 
