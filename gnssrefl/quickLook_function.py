@@ -196,7 +196,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                             plt.plot(px,pz,'gray',linewidth=0.5)
 
             # i do not know how to add a grid using these version of matplotlib
-            tt = 'GNSS-IR results: ' + station.upper() + ' Freq:' + str(f) + ' ' + str(year) + '/' + str(doy)
+            tt = 'GNSS-IR results: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy)
             aaa, bbb = plt.ylim()
             amax = max(amax,  bbb) # do not know how to implement this ...
             if (a == 3) or (a==1):

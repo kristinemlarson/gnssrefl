@@ -612,7 +612,7 @@ def rinex_sopac(station, year, month, day):
             wget.download(url1,file1)
             subprocess.call(['uncompress', file1])
             subprocess.call([crnxpath, fname])
-            subprocess.call(['rm', '-f',fname])
+            #subprocess.call(['rm', '-f',fname])
             #print('successful Hatanaka download from SOPAC ')
         except:
             #print('Not able to download from SOPAC',file1)
@@ -4747,6 +4747,33 @@ def check_environ_variables():
             print(env_var, ' not found, so set to current directory')
             os.environ[env_var] = '.'
 
+
+def ftitle(freq):
+    """
+    frequency title for plots 
+    """
+    f=str(freq)
+    out = {}
+    out['1'] = 'GPS L1'
+    out['2'] = 'GPS L2'
+    out['20'] = 'GPS L2C'
+    out['5'] = 'GPS L5'
+    out['101'] = 'Glonass L1'
+    out['102'] = 'Glonass L2'
+    out['201'] = 'Galileo L1'
+    out['205'] = 'Galileo L5'
+    out['206'] = 'Galileo L6'
+    out['207'] = 'Galileo L7'
+    out['208'] = 'Galileo L8'
+    out['302'] = 'Beidou L2'
+    out['305'] = 'Beidou L5'
+    out['306'] = 'Beidou L6'
+    if freq not in [1,2, 20,5,101,102,201,205,206,207,208,302,305,306]:
+        returnf = ''
+    else:
+        returnf = out[f]
+
+    return returnf 
 
 def cdate2nums(col1):
     """

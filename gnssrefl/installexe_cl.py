@@ -63,17 +63,18 @@ def main():
         url = sto + savename + '.' + opsys + '.e'
         download_chmod_move(url,savename,exedir)
 
-        savename = 'gpsSNR.e'
-        url = sto + 'gpsSNR.' + opsys + '.e'
-        download_chmod_move(url,savename,exedir)
+        #savename = 'gpsSNR.e'
+        #url = sto + 'gpsSNR.' + opsys + '.e'
+        #download_chmod_move(url,savename,exedir)
 
-        savename = 'gnssSNR.e'
-        url = sto + 'gnssSNR.' + opsys + '.e'
-        download_chmod_move(url,savename,exedir)
+        #savename = 'gnssSNR.e'
+        #url = sto + 'gnssSNR.' + opsys + '.e'
+        #download_chmod_move(url,savename,exedir)
 
         savename = 'gfzrnx'
         url = sto + 'gfzrnx.' + opsys + '.e'
         download_chmod_move(url,savename,exedir)
+        print('Unfortunately there are no static executables for gpsSNR.e and gnssSNR.e')
 
     else:
         print('do not recognize your operating system input. Exiting.')
