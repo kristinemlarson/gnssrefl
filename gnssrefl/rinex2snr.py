@@ -8,6 +8,7 @@ import os
 from scipy.interpolate import interp1d
 import subprocess
 import sys
+#import time
 
 # progress bar for RINEX translation/orbits
 from progress.bar import Bar
@@ -209,6 +210,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                 orbfile = orbdir + '/' + f
                 if fortran:
                     #print('Using fortran for translation of RINEX')
+                    #time1  = time.time()
                     try:
                         #subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
                         log.write('Using fortran for translation  - separate log is used for stdout \n')
@@ -220,10 +222,15 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         status = subprocess.call(['xz', orbfile])
                     except:
                         log.write('Problem with making SNR file, check log {0:50s} \n'.format(flogname))
+                    #time2 = time.time()
+                    #print('conversion time', time2-time1)
                 else:
                     log.write('SNR file {0:50s} \n will not use fortran to make \n'.format( snrname))
                     log.write('Decimating will be done here instead of using teqc \n')
+                    #time1 = time.time()
                     rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate,log)
+                    #time2 = time.time()
+                    #print('python conversion time', time2-time1)
 
                 # remove the rinex file
                 subprocess.call(['rm', '-f',rinexfile])
@@ -405,7 +412,6 @@ def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfi
         log.write('Decimation rate {0:3.0f} \n'.format(dec_rate))
 
         with Bar('Processing RINEX', max=K,fill='@',suffix='%(percent)d%%') as bar:
-        #if True:
             for i in range(0,K):
                 bar.next()
                 if np.remainder(i,200) == 0:
