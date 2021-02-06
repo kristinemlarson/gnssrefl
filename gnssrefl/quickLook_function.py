@@ -72,7 +72,7 @@ def read_snr_simple(obsfile):
     return allGood, sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE
 
 
-def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran):
+def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen):
     """
     inputs:
     station name (4 char), year, day of year
@@ -84,7 +84,18 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     pele is the elevation angle limits for the polynomial removal.  units: degrees
     KL 20may10 pk2noise value is now sent from main function, which can be set online
     KL 20aug07 added fortran boolean
+    KL 21feb06 return data from the plots so that Jupyter notebooks can use them.
+    also added pltscreen variable so that the default plots are not always displayed
     """
+    #  return data to Jupyter Notebook people, good results
+    nw = {}; sw = {}; ne = {}; se = {}
+    # failed periodograms
+    failnw = {}; failsw = {}; failne = {}; failse = {}
+    list1 = {}; 
+    # list of satellites in each quadrant
+    list1['NW']=[]; list1['NE']=[]; list1['SW']=[]; list1['SE']=[];
+    list1['failNW']=[]; list1['failNE']=[]; list1['failSW']=[]; list1['failSE']=[];
+
     # make sure environment variables exist
     g.check_environ_variables()
 
@@ -96,6 +107,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     ann = g.make_nav_dirs(year)
     # titles in 4 quadrants - for webApp
     titles = ['Northwest', 'Southwest','Northeast', 'Southeast']
+    stitles = ['NW', 'SW','NE', 'SE']
     # define where the axes are located
     bx = [0,1,0,1]; by = [0,0,1,1]; bz = [1,3,2,4]
 
@@ -134,15 +146,6 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 print('This code used to try and make one for you, but I have removed this option.')
                 print('Please us rinex2snr and make a SNR file')
                 sys.exit()
-                #print('I will try to pick up a RINEX file ')
-                #print('and translate it for you. This will be GPS only.')
-                #print('For now I will check all the official archives for you.')
-                #rate = 'low'; dec_rate = 0; archive = 'all'; 
-                #rinex.conv2snr(year, doy, station, int(snr_type), 'nav',rate,dec_rate,archive,fortran)
-                #if os.path.isfile(obsfile):
-                #    print('the SNR file now exists')  
-                #else:
-                #    print('the RINEX file did not exist, had no SNR data, or failed to convert, so exiting.')
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)
     if allGood == 1:
         # make output file for the quickLook RRH values, just so you can give them a quick look see
@@ -153,15 +156,10 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         if minEdataset > (e1+0.5):
             print('It looks like the receiver had an elevation mask')
             e1 = minEdataset
-        if webapp:
-            fig = Figure(figsize=(10,6), dpi=120)
-            axes = fig.subplots(2, 2)
-        else:
-            #plt.figure()
-            # trying to help Kelly
+        if pltscreen:
             plt.figure(figsize=(10,6))
         for a in range(naz):
-            if not webapp:
+            if pltscreen:
                 plt.subplot(2,2,bz[a])
                 plt.title(titles[a])
             az1 = azval[(a*2)] ; az2 = azval[(a*2 + 1)]
@@ -186,30 +184,62 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         T = g.nicerTime(UTCtime)
                         rhout.write('SUCCESS Azimuth {0:3.0f} RH {1:6.3f} m, Sat {2:3.0f} Freq {3:3.0f} Amp {4:4.1f} PkNoise {5:3.1f} UTC {6:5s} \n '.format( 
                             avgAzim,maxF,satNu,f,maxAmp,maxAmp/Noise,T))
-                        if not webapp:
+                        if pltscreen:
                             plt.plot(px,pz,linewidth=1.5)
-                        else:
-                            axes[bx[a],by[a]].plot(px,pz,linewidth=2)
-                            axes[bx[a],by[a]].set_title(titles[a])
+                        if a==0:
+                               nw[satNu] = [px,pz]; list1['NW'].append(satNu)
+                        elif a==1:
+                               sw[satNu] = [px,pz]; list1['SW'].append(satNu)
+                        elif a==2:
+                               ne[satNu] = [px,pz]; list1['NE'].append(satNu)
+                        elif a==3:
+                               se[satNu] = [px,pz]; list1['SE'].append(satNu)
+
                     else:
-                        if not webapp:
+                        # these are failed tracks
+                        if pltscreen:
                             plt.plot(px,pz,'gray',linewidth=0.5)
+                        if a==0:
+                               failnw[satNu] = [px,pz]; list1['failNW'].append(satNu)
+                        elif a==1:
+                               failsw[satNu] = [px,pz]; list1['failSW'].append(satNu)
+                        elif a==2:
+                               failne[satNu] = [px,pz]; list1['failNE'].append(satNu)
+                        elif a==3:
+                               failse[satNu] = [px,pz]; list1['failSE'].append(satNu)
 
             # i do not know how to add a grid using these version of matplotlib
             tt = 'GNSS-IR results: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy)
-            aaa, bbb = plt.ylim()
-            amax = max(amax,  bbb) # do not know how to implement this ...
-            if (a == 3) or (a==1):
-                plt.xlabel('reflector height (m)')
-            if (a == 1) or (a==0):
-                plt.ylabel('volts/volts')
-        plt.suptitle(tt, fontsize=12)
+            if pltscreen:
+                aaa, bbb = plt.ylim()
+                amax = max(amax,  bbb) # do not know how to implement this ...
+                if (a == 3) or (a==1):
+                    plt.xlabel('reflector height (m)')
+                if (a == 1) or (a==0):
+                    plt.ylabel('volts/volts')
 
         rhout.close()
         print('preliminary reflector height results are stored in a file called logs/rh.txt')
-        if webapp:
-            fig.savefig('temp.png', format="png")
-        else:
+        # do not plot if sending data to Jupyter Notebooks
+        if pltscreen:
+            plt.suptitle(tt, fontsize=12)
             plt.show()
+          
     else: 
         print('some kind of problem with SNR file, so I am exiting the code politely.')
+
+
+    return nw,sw,ne,se,failnw,failsw,failne,failse,list1
+
+
+
+# old code
+#print('I will try to pick up a RINEX file ')
+#print('and translate it for you. This will be GPS only.')
+#print('For now I will check all the official archives for you.')
+#rate = 'low'; dec_rate = 0; archive = 'all'; 
+#rinex.conv2snr(year, doy, station, int(snr_type), 'nav',rate,dec_rate,archive,fortran)
+#if os.path.isfile(obsfile):
+#    print('the SNR file now exists')  
+#else:
+#    print('the RINEX file did not exist, had no SNR data, or failed to convert, so exiting.')

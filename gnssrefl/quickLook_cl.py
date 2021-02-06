@@ -118,9 +118,11 @@ def main():
     f=freqs[0]
     NReg = [h1, h2] # noise region - again, this is for typical snow setup
 
-
-    quick.quickLook_function(station, year, doy, snr,f,e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran)
-
+    pltscreen = True
+    # Kelly for jupyter notebooks set this to false
+    #pltscreen = False
+    nw,sw,ne,se,failnw,failsw,failne,failse,quadlist = quick.quickLook_function(station, year, doy, snr, 
+            f,e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran,pltscreen)
 
 if __name__ == "__main__":
     main()
