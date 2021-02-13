@@ -1,10 +1,5 @@
 from setuptools import setup, find_packages
-from numpy.distutils.core import setup, Extension
 
-ext1 = Extension(name='gnssrefl.gpssnr',
-        sources=['gnssrefl/gpssnr.f'],
-        f2py_options=['--quiet'],
-        )
 
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
@@ -13,7 +8,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests","progress"]
 
 setup(
     name="gnssrefl",
-    version="0.0.49",
+    version="0.0.50",
     author="Kristine Larson",
     author_email="kristine.larson@colorado.edu",
     description="A GNSS reflectometry software package ",
@@ -22,7 +17,6 @@ setup(
     url="https://github.com/kristinemlarson/gnssrefl/",
     packages=find_packages(),
     include_package_data=True,
-    ext_modules=[ext1],
     entry_points ={ 
         'console_scripts': [ 
             'gnssir = gnssrefl.gnssir_cl:main',
