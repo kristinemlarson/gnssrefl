@@ -3283,7 +3283,8 @@ def update_quick_plot(station, f):
     plt.xlabel('reflector height (m)'); plt.title('SNR periodogram')
     plt.subplot(211)
     plt.xlabel('elev Angles (deg)')
-    plt.title(station + ' SNR Data and Frequency L' + str(f))
+    #ftitle(freq)
+    plt.title(station + ' SNR Data/' + ftitle(f) + ' Frequency') 
 
     return True
 

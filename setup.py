@@ -1,4 +1,10 @@
 from setuptools import setup, find_packages
+from numpy.distutils.core import setup, Extension
+
+ext1 = Extension(name='gnssrefl.gpssnr',
+        sources=['gnssrefl/gpssnr.f'],
+        f2py_options=['--quiet'],
+        )
 
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
@@ -16,6 +22,7 @@ setup(
     url="https://github.com/kristinemlarson/gnssrefl/",
     packages=find_packages(),
     include_package_data=True,
+    ext_modules=[ext1],
     entry_points ={ 
         'console_scripts': [ 
             'gnssir = gnssrefl.gnssir_cl:main',

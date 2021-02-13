@@ -7,11 +7,12 @@ kristine larson
 
 import argparse
 import datetime
+import numpy as np
 import os
 import sys
 import subprocess
+import time
 
-import numpy as np
 
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rnx
@@ -34,6 +35,7 @@ def main():
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
+    parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
 
     args = parser.parse_args()
 #   make sure environment variables exist.  set to current directory if not
@@ -149,8 +151,17 @@ def main():
     overwrite = False
     if (args.overwrite == 'True'):
         overwrite = True
-    print('Feedback is written to files in the subdirectory logs/')
-    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite)
+
+    # default is to use python for RINEX translator
+    if args.translator == None:
+        translator = 'python'
+    else:
+        translator = args.translator
+
+    t1=time.time()
+    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator)
+    t2=time.time()
+    print('Exe time:', '{0:4.2f}'.format(t2-t1),' sec/Feedback written to subdirectory logs/')
 
 
 if __name__ == "__main__":
