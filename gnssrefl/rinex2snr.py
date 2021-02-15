@@ -9,7 +9,7 @@ import os
 from scipy.interpolate import interp1d
 import subprocess
 import sys
-#import time
+import time
 
 # progress bar for RINEX translation/orbits
 from progress.bar import Bar
@@ -220,6 +220,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
 
                 else:
                     if fortran:
+                        t1=time.time()
                         try:
                             #subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
                             log.write('Using fortran for translation  - separate log is used for stdout \n')
@@ -231,10 +232,15 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                             status = subprocess.call(['xz', orbfile])
                         except:
                             log.write('Problem with making SNR file, check fortran specific log {0:50s} \n'.format(flogname))
+                        t2=time.time()
+#                        print(' Exec time:', '{0:4.2f}'.format(t2-t1) )
                     else:
                         log.write('SNR file {0:50s} \n will not use fortran to make \n'.format( snrname))
                         log.write('Decimating will be done here instead of using teqc \n')
+                        t1=time.time()
                         rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate,log)
+                        t2=time.time()
+#                        print(' Exec time:', '{0:4.2f}'.format(t2-t1) )
 
                 # remove the rinex file
                 subprocess.call(['rm', '-f',rinexfile])

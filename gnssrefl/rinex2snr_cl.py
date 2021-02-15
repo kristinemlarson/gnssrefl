@@ -158,10 +158,11 @@ def main():
     else:
         translator = args.translator
 
-    t1=time.time()
+#    t1=time.time()
     rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator)
-    t2=time.time()
-    print('Exe time:', '{0:4.2f}'.format(t2-t1),' sec/Feedback written to subdirectory logs/')
+#    t2=time.time()
+    print('Feedback written to subdirectory logs')
+#print('Exe time:', '{0:4.2f}'.format(t2-t1),' sec/Feedback written to subdirectory logs/')
 
 
 if __name__ == "__main__":
