@@ -16,12 +16,12 @@
 
 ### News <a name="news"></a>
 
-We now have three translation options: fortran, hybrid, and python. The last of these
-is ok for 30 sec data but too slow otherwise.  Hybrid binds the python to fortran.
-So far this is for GPS only solutions.  If you need fast multi-GNSS solutions, I still
-recommend you install gnssSNR.
+We now have three translation options for RINEX files: fortran, hybrid, and python. The last of these
+is ok for 30 sec data but really too slow otherwise. Hybrid binds the python to fortran.
+So far this is for GPS only RINEX files.  If you need fast multi-GNSS solutions, I still
+recommend you install the fortran code (gnssSNR).
 
-[I have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
+[We have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
 CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
 implemented security restrictions, we have had to change our download access. 
@@ -43,7 +43,6 @@ My reflection zone webapp will [help you pick appropriate elevation and azimuth 
 
 If you are interested in measuring sea level, this webapp tells you [how high your site is above 
 sea level.](https://gnss-reflections.org/geoid)  
-
 
 ### Philosophical Statement <a name="philosophy"></a>
 In geodesy, you don't really need to know much about what you are doing to 
@@ -203,16 +202,20 @@ You can run **rinex2snr** at the command line. You required inputs are:
 - year
 - day of year
 
-If you installed the fortran translator gpsSNR.e, a sample call for a station called p041, restricted 
-to GPS satellites, on day of year 132 and year 2020 would be:
+A sample call for a station called p041, restricted to GPS satellites, on day of year 132 and year 2020 would be:
 
 *rinex2snr p041 2020 132*
 
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
 it will check four archives (unavco, sopac, cddis, and sonel) to find it. 
-If you did not install a fortran translator, the command would be:
+This uses the hybrid translator.  If you did install a fortran translator, the command would be:
 
-*rinex2snr p041 2020 132 -fortran False* 
+*rinex2snr p041 2020 132 -translator fortran* 
+
+For python:
+
+*rinex2snr p041 2020 132 -translator python* 
+
 
 Here is an example from a site in Greenland (the RINEX file will be picked up from unavco):
 
@@ -274,7 +277,7 @@ azimuth-specific mask is decided later when you need to run **gnssir**.  The SNR
 
 Other questions:
 
-- What if you do not want to install the fortran translators?  Use -fortran False on the command line.
+- What if you do not want to install the fortran translators?  Use -translator hybrid (though I believe this is the default)
 
 - What if you are providing the RINEX files and you don't want the code to search for 
 the files online? Use -nolook True
@@ -455,6 +458,8 @@ because it unfortunately- by default - removes Beidou observations in Rinex 2.11
 and fortran is set to True, unfortunately this will still occur. I am working on removing my 
 code's dependence on **teqc**.
 
+The translator option is currently only for GPS satellites. It does not cover multi-GNSS.
+
 No phase center offsets have been applied to these reflector heights. While these values are relatively small,
 we do plan to remove them in subsequent versions of the code. 
 
@@ -500,9 +505,11 @@ Also look to the publications page on my [personal website](https://kristinelars
 
 ### Acknowledgements <a name="acknowledgements"></a>
 
-People that helped me with this code include [Radon Rosborough](https://github.com/raxod502), Joakim Strandberg, and Johannes Boehm. 
-I also thank Peter Shearer and Lisa Tauxe for some very nice Python lecture notes.
+[Radon Rosborough](https://github.com/raxod502) helped me with my many python questions. 
+Joakim Strandberg provided python RINEX translators, and Johannes Boehm provided source code for the 
+refraction correction. 
 
-This documentation was updated on November 19, 2020.
 
 Kristine M. Larson
+
+This documentation was updated on February 17, 2021.
