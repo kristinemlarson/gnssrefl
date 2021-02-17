@@ -14,11 +14,13 @@ import time
 # progress bar for RINEX translation/orbits
 from progress.bar import Bar
 
+# my gps libraries
 import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
 
-# does not work as i have set it up
-#import gnssrefl.rinex as rinex
+# fortran code for translating RINEX
+import gnssrefl.gpssnr as gpssnr
+
 
 class constants:
     omegaEarth = 7.2921151467E-5 #      %rad/sec
