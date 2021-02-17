@@ -46,6 +46,7 @@ setup(
             ], 
         },
     install_requires=requirements,
+    ext_modules = [ext1],
     classifiers=[
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
