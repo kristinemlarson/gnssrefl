@@ -5,14 +5,14 @@
 1. [News](#news)
 2. [Philosophy](#philosophy)
 3. [Code Description](#code)
-5. [Installation](#environment)
-6. [rinex2snr: translating input files](#module1)
-7. [quickLook: assessing files](#module2)
-8. [gnssir: estimating reflector heights](#module3)
-9. [bugs](#bugs)
-9. [Utilities](#helper)
-10. [publications](#publications)
-11. [acknowledgements](#acknowledgements)
+    1. [Installation](#environment)
+    2. [rinex2snr: translating input files](#module1)
+    3. [quickLook: assessing files](#module2)
+    4. [gnssir: estimating reflector heights](#module3)
+4. [Bugs/Future Work](#bugs)
+5. [Utilities](#helper)
+6. [Publications](#publications)
+7. [Acknowledgements](#acknowledgements)
 
 ### News <a name="news"></a>
 
