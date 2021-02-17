@@ -1,4 +1,14 @@
-### News 
+## gnssrefl
+
+### Table of Contents
+
+1. [News](#news)
+2 [Philosophy](#philosophy)
+3. [Code Description](#code)
+4. [Goals](#goals)
+4. [Environment Variables](#environment)
+
+### News <a name="news"></a>
 
 The code now checks to see if you have installed fortran translators. If you haven't,
 it uses python to translate the RINEX file. SO while the default is still assuming you
@@ -28,7 +38,7 @@ If you are interested in measuring sea level, this webapp tells you [how high yo
 sea level.](https://gnss-reflections.org/geoid)  
 
 
-### Philosophical Statement
+### Philosophical Statement <a name="philosophy"></a>
 In geodesy, you don't really need to know much about what you are doing to 
 calculate a reasonably precise position from GPS data. That's just the way it is.
 (Note: that is also thanks to the hard work of the geodesists that wrote the 
@@ -44,7 +54,8 @@ modify the inputs accordingly.
 I encourage you to get to know your site. If it belongs to you, look at 
 photographs. If you can't find photographs, use Google Earth. 
 
-### gnssrefl
+
+### Code Description<a name="code"></a>
 
 **gnssrefl** is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
@@ -55,19 +66,19 @@ yourself or do it all from the command line. This should also - hopefully - make
 it easier for the production of Jupyter notebooks. The latter are to be developed
 by UNAVCO with NASA GNSS Science Team funding.
 
-### If you would like to try out reflectometry without installing the code
+*If you would like to try out reflectometry without installing the code*
 
 I recommend you use the web app [I developed](https://gnss-reflections.org). It 
 can show you representative results with minimal constraints. It should provide 
 results in less than 10 seconds.
 
-### If you prefer Matlab
+*If you prefer Matlab*
 
 I had a [working matlab version on github](https://github.com/kristinemlarson/gnssIR_matlab_v3), 
 but I will not be updating it. You will very likely have to make changes to accommodate the recent
 change in security protocols at CDDIS.
 
-### Overview Comments
+*Goals*
 
 The goal of this python repository is to help you compute (and evaluate) GNSS-based
 reflectometry parameters using geodetic data. This method is often
@@ -100,7 +111,7 @@ rising and setting satellite arcs and estimates RH.
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
 </center>
 
-### Environment Variables 
+### Environment Variables <a name="environment"></a>
 
 You should define three environment variables:
 
