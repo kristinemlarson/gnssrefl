@@ -17,8 +17,9 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import numpy as np
 import wget
+from numpy import array
 
-# my code
+# my code - is it needed here?
 import gnssrefl.read_snr_files as snr
 
 # various numbers you need in the GNSS world
@@ -4792,6 +4793,17 @@ def cdate2nums(col1):
         t = year + doy/365.25
 
     return t
+
+def binary(string):
+    """
+    changes python string to bytes for use in
+    fortran code using f2py via numpy
+    input is a string, output is bytes with null at the end
+    """
+    j=bytes(string,'ascii') + b'\0\0'
+
+    return array(j)
+
 
 # don't need to print out success
 #print('found the ', env_var, ' environment variable')

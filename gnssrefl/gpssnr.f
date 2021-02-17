@@ -1,12 +1,13 @@
 C FILE: GPSSNR.F
-      SUBROUTINE FOO(rawfilename,outfilename,broadfile,snrtype) 
+      SUBROUTINE FOO(rawfilename,outfilename,broadfile,snrtype,decfac) 
       implicit none
       character*80 rawfilename, outfilename, broadfile
-      character*2 snrtype
+      character*2 snrtype, decfac
 Cf2py intent(in) rawfilename
 Cf2py intent(in) outfilename
 Cf2py intent(in) broadfile
 Cf2py intent(in) snrtype
+Cf2py intent(in) decfac
 
       integer maxsat, maxeph, maxob
       parameter (maxsat = 50)
@@ -26,13 +27,13 @@ Cf2py intent(in) snrtype
      .   ios, itrack,  i, iobs(maxsat),
      .  gpsweek, the_hour, prn_pick, current_hour,npts,
      .  fileIN, fileOUT,iymd(3),
-     .  rinex_year, rinex_doy,nav_doy, nav_year
+     .  rinex_year, rinex_doy,nav_doy, nav_year, idec,itod
       real*8  obs(maxob,maxsat),  tod,North(3), East(3), 
      .   Up(3), azimuth, elev, staXYZ(3), tod_save, 
      .   s1,s2,xrec, yrec, zrec, tc, Lat,Long,Ht,
      .   bele(maxeph, maxsat, 28),s5
-      logical eof, bad_point
-      logical debugging
+      logical eof, bad_point, keep_point
+      logical debugging, decimate
 c     Kristine M. Larson
 c     version 2.0 new version - uses subroutines, fixed bug in az-el
 c     verison 2.1 fixes bug in selection 77 (reading the LLI value)
@@ -47,6 +48,9 @@ c       to read the header and the data block
 c     version 2.10 check dates on input files to make sure they are
 c           in agreement
 c
+c     version 3.0 removed moving sites, blockIIRM (snr77) feature 
+c     etc to streamline for use in python.  added decimation factor
+
 c     common block for the GPS broadcast ephemeris
 
       real*8 naode,ncrs, ndeltan, nem0, ncuc,ne, ncus,
@@ -64,8 +68,13 @@ c    change dimension to place for ephemeris each hour
      .  nxclk(24,maxsat,3),nsclk(24,maxsat,3),
      .  nridot(24,maxsat), nistano(24,maxsat)
 
-c block IIRM feature removed
 c     set some defaults - used for input and output file IDs
+      READ (decfac, '(I2)') idec 
+c     print*, decfac, idec
+      decimate = .true.
+      if (idec .eq. 0) then
+          decimate = .false.
+      endif
       debugging = .false.
       fileIN = 12
       fileOUT = 55
@@ -78,7 +87,6 @@ c     prn_pickc = '99'
 c
 c     figure out which option is being requested
       READ (prn_pickc, '(I2)') prn_pick
-c     write(stderr, *) 'Selection ', prn_pick
 
 c     Check to see if broadcast file exists
       open(22,file=broadfile, status='old',iostat=ios)
@@ -142,6 +150,7 @@ c     start reading the observation records
         endif
 c       seconds in the day
         tod = itime(4)*3600.0 + 60.0*itime(5) + sec
+        itod = int(tod)
         if (tod.lt.tod_save) then
 c         print*,'Time is going backwards or standing still'
 c         print*,'Ignoring this record'
@@ -160,6 +169,14 @@ c      19mar01 - expanding number of observables allowed
      .    prn,obs,lli)
 c       if flag has value 4, that means there were comment
 c       lines, and those were skipped
+c       print*, itod, itime(4),itime(5), sec 
+        keep_point = .true.
+        if (decimate) then
+          if (mod(itod,idec) .ne.0) then
+              keep_point = .false.
+          endif
+        endif
+        if (keep_point) then
         if (flag .ne. 4) then
           call convert_time(itime,sec, msec, gpsweek, tc)
           do itrack = 1, numsat
@@ -182,9 +199,6 @@ c             check for S5
               else
                 s5=0
               endif
-c             if (debugging) then
-c               print*, s1, s2, s5
-c             endif
               if (s1.eq.0.d0 .and. s2.eq.0.d0) then
 c                 no data, SNR so do not print it
               else
@@ -197,6 +211,7 @@ c                 no data, SNR so do not print it
 c             print*, 'skipping non-GPS satellite'
             endif
           enddo
+        endif
         endif
       enddo
 99    continue

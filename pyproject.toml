@@ -9,4 +9,4 @@
 #
 # [1]: https://www.python.org/dev/peps/pep-0518/#build-system-table
 # [2]: https://www.python.org/dev/peps/pep-0518/#rationale
-requires = ["setuptools", "wheel", "numpy","wget","scipy","matplotlib","requests","progress"]
+requires = ["setuptools", "wheel", "numpy"]

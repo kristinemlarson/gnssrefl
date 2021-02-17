@@ -209,14 +209,14 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                 snrname = g.snr_name(station, year,month,day,option)
                 orbfile = orbdir + '/' + f
                 if translator == 'hybrid':
-                    print('you are at the hybrid choice, but it does not work yet using pip install')
-                    print('need to re-install binary')
-                    #in1 = binary(rinexfile)
-                    #in2 = binary(snrname)
-                    #in3 = binary(orbit)
-                    #in4 = binary(str(option))
-                    # should think about adding decimation
-                    #gpssnr.foo(in1,in2,in3,in4)
+                    print('you are at the hybrid choice, still under development')
+                    in1 = g.binary(rinexfile)
+                    in2 = g.binary(snrname)
+                    in3 = g.binary(orbit)
+                    in4 = g.binary(str(option))
+                    # should think about adding decimation, for now set to zero
+                    in5 = g.binary('0')
+                    gpssnr.foo(in1,in2,in3,in4,in5)
 
                 else:
                     if fortran:
