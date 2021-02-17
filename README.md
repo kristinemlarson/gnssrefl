@@ -306,7 +306,7 @@ Going back to our **rinex2snr** example, try running the data for station p041.
 
 *quickLook p041 2020 132*  
 
-That command will produce [this periodogram summary](tests/p041-l1.png). By default, 
+That command will produce [this periodogram summary](tests/use_cases/p041-l1.png). By default, 
 these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
 you have used the defaults.  Furthermore, note that results on the x-axis begin at 0.5 meters.
 Since you are not able to resolve very small reflector heights with this method, this region 
@@ -317,27 +317,27 @@ this site the antenna phase center is ~ 2 meters above the ground. The colors
 change as you try different satellites.  If the data are plotted in
 gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
 
-If you want to look at L2C data, [try this by invoking -fr 20](tests/p041-l2c.png). 
+If you want to look at L2C data, [try this by invoking -fr 20](tests/use_cases/p041-l2c.png). 
 In general, the results will be cleaner than L1 data (frequency number 1 in my code).
 The defaults reflector heights will not go beyond 6 meters.  If you had set -h2 20, it would
-look [like this](tests/p041-l2c-again.png). You aren't gaining anything by doing this.
+look [like this](tests/use_cases/p041-l2c-again.png). You aren't gaining anything by doing this.
 
 Now look at the Greenland SNR file you created in the previous section.
 
 *quickLook gls1 2011 271* 
 
-The periodogram peaks bunch up at a [larger value](tests/gls1-example.png), which just
+The periodogram peaks bunch up at a [larger value](tests/use_cases/gls1-example.png), which just
 means the antenna was further from the planar reflector, which in this case is ice.
 
 Finally, what do you do if your reflections site is taller than the default value of 6 meters?
 Does the code figure this out for you automatically? **No, it does not.**
 A short example: Make a SNR file using the defaults: *rinex2snr smm3 2018 271*
-Now run **quickLook** using the defaults [quickLook smm3 2018 271](tests/smm3-default.png). 
+Now run **quickLook** using the defaults [quickLook smm3 2018 271](tests/use_cases/smm3-default.png). 
 Everything is gray (which means it didn't find a significant reflector) because you 
 only calculated periodograms for height values of 0.5 to 6 meters. The
 site is ~16 meters above the ice. Accordingly, if you change the inputs to tell the program
 that you want to examine heights between 8 and 20 meters, i.e. 
-[quickLook smm3 2018 271 -h1 8 -h2 20](tests/smm3-sensible.png) you now see what you 
+[quickLook smm3 2018 271 -h1 8 -h2 20](tests/use_cases/smm3-sensible.png) you now see what you 
 expect to see - peaks of periodograms at ~16 meters height. Why is the northwest quadrant 
 so messy? I leave that as an exercise for the reader. Hint: start out by trying
 to examine this site on Google Earth.
@@ -422,9 +422,9 @@ Simple example for my favorite GPS site [p041](https://spotlight.unavco.org/stat
 - *gnssir p041 2020 150* (calculate the reflector heights) 
 - *gnssir p041 2020 150 -fr 5 -plt True* (override defaults, only look at L5 SNR data, and periodogram plots come to the screen)
 
-Where are the files for this example?
+Where would the code store the files for this example?
 
-- json is stored in $REFL_CODE/input/p041.json
+- json instructions are stored in $REFL_CODE/input/p041.json
 - SNR files are stored in $REFL_CODE/2020/snr/p041
 - Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041
 
@@ -439,7 +439,9 @@ This is a snippet of what the result file would look like
 - *Azim* is the average azimuth angle of the satellite arc
 - *sat* and *freq* are as defined in this document
 
-If you want a multi-GNSS solution, you need make a new json file and use multi-GNSS orbits. And the RINEX file you use must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data in the RINEX file, so you can use it as a test.
+If you want a multi-GNSS solution, you need to make a new json file and 
+use multi-GNSS orbits, and use a RINEX file that has multi-GNSS SNR observations in it. 
+p041 currently has multi-GNSS data in the RINEX file, so you can use it as a test. 
 
 - *make_json_input p041 39.949 -105.194 1728.856 -allfreq True* 
 - *rinex2snr p041 2020 151 -orb gnss* 
@@ -458,17 +460,17 @@ because it unfortunately- by default - removes Beidou observations in Rinex 2.11
 and fortran is set to True, unfortunately this will still occur. I am working on removing my 
 code's dependence on **teqc**.
 
-The translator option is currently only for GPS satellites. It does not cover multi-GNSS.
+The hybrid translator option is currently only for GPS satellites. It does not cover multi-GNSS.
 
 No phase center offsets have been applied to these reflector heights. While these values are relatively small,
 we do plan to remove them in subsequent versions of the code. 
 
-The L2C and L5 satellite lists are not time coded as they should be. I currently use a list from 2020.
+The L2C and L5 GPS satellite lists are not time coded as they should be. I currently use a list from 2020.
 
 ### Utilities <a name="helper"</a>
 
 **daily averages** is a helper code for cryosphere people interested in daily snow 
-accumulation. It can be used for lake levels. **It is not to be used for tides!**
+accumulation. It can be used for lake levels. *It is not to be used for tides!*
 
 **download_rinex** can be useful if you want to download RINEX v2 or 3 files (using the version flag) without using 
 the reflection-specific codes. Sample calls:
@@ -479,7 +481,7 @@ the reflection-specific codes. Sample calls:
 
 - *download_rinex p041 2020 150 0 -archive sopac* downloads the data from sopac archive on day of year 150 in 2020
 
-**download_orbits** downloads orbit files 
+**download_orbits** downloads orbit files. See -h for more information.
 
 **ymd** translates year,month,day to day of year
 
