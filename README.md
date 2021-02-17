@@ -16,9 +16,10 @@
 
 ### News <a name="news"></a>
 
-The code now checks to see if you have installed fortran translators. If you haven't,
-it uses python to translate the RINEX file. SO while the default is still assuming you
-are using fortran, it is not a deal breaker.
+We now have three translation options: fortran, hybrid, and python. The last of these
+is ok for 30 sec data but too slow otherwise.  Hybrid binds the python to fortran.
+So far this is for GPS only solutions.  If you need fast multi-GNSS solutions, I still
+recommend you install gnssSNR.
 
 [I have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
@@ -67,7 +68,7 @@ photographs. If you can't find photographs, use Google Earth.
 
 The main difference bewteen this version and previous versions is that I am
 attempting to use proper python packaging rules!. I have separated out the main
-parts of the code and the command line inputs so that you can use the gnssrefl libraries
+parts of the code and the command line inputs so that you can use the libraries
 yourself or do it all from the command line. This should also - hopefully - make
 it easier for the production of Jupyter notebooks. The latter are to be developed
 by UNAVCO with NASA GNSS Science Team funding.
@@ -99,8 +100,8 @@ with the details associated with **gnssir**. It is not meant to be used for rout
 
 There are also various utilities you might find to be useful (see the last section).
 
-The rest of this README file is about how to install and run the code. *It is not a class about 
-GNSS interferometric reflectometry.* If you are unsure about why various 
+*This document is not a class about GNSS interferometric reflectometry.* 
+If you are unsure about why various 
 restrictions are being applied, you really need
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
 and similar. I am committed in principle to set up some online
@@ -135,7 +136,7 @@ If you don't define these environment variables, the code should assume your loc
 the code) is where you want everything to be. The orbits, SNR files, and periodogram results are stored in 
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
-*Installation the Python*
+*Installing the Python*
 
 If you are using the version from gitHub:
 
@@ -150,44 +151,41 @@ If you use the PyPi version:
 * activate the virtual environment
 * pip install gnssrefl
 
-To use **only** python codes, you will need to be sure that your RINEX files are uncompressed (i.e.
-not using Hatanaka compression, which end in a d instead of an o). Since **many** archives use 
-Hatanaka compression, this will significantly
-limit what you can do. The second thing to know is that you should use the -fortran False flag 
-when you make SNR files because the default behavior is to assume you are using fortran 
-translators (gnssSNR.e or gpsSNR.e). Finally, you will not be able to use RINEX 3 files because
-I rely on the **gfzrnx** RINEX3 to RINEX2 translator.
+To use **only** python codes, you will need to be sure that your RINEX files are not Hatanaka 
+compressed.
 
 *Non-Python Code*
 
-All executables should be stored in the EXE directory.  If you do not define EXE, 
+**All executables must be stored in the EXE directory.**  If you do not define EXE, 
 it will look for them in your local working directory.  The Fortran translators are 
-much faster than using python. But if you don't want to use them, 
-they are optional, that's fine. FYI, the python version is slow 
-not because of the RINEX - it is because you need to calculate
-a crude model for satellite coordinates in this code. And that takes cpu time....
+much faster than using python. We now advocate using the hybrid translator option, which 
+links to the Fortran internally. Using true python to translate a high-rate GPS file is 
+impossibly slow.
 
-* Required Translator for compressed RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. **You must put this executable in the EXE area.**
+* Required Translator for compressed (Hatanaka) RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. 
 
-* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e and it must be in the EXE area.** For the code: https://github.com/kristinemlarson/gpsonlySNR
+* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e.** For the code: https://github.com/kristinemlarson/gpsonlySNR
 
-* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e and it must be in the EXE area.** For the code: https://github.com/kristinemlarson/gnssSNR
+* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e** For the code: https://github.com/kristinemlarson/gnssSNR
 
 * Optional datatool, **teqc**, is highly recommended.  There is a list of static executables at the
-bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). **It must be stored in the EXE area.**
+bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). 
 
 * Optional datatool, **gfzrnx** is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
-http://dx.doi.org/10.5880/GFZ.1.1.2016.002. **You must store it in the EXE area.**
+http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
 
 
 ### rinex2snr - making SNR files from RINEX files <a name="module1"></a>
 
-The international standard for sharing GNSS data is called the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
-A RINEX file has extraneous information in it (which we want to throw out) - and it 
+The international standard for sharing GNSS data is called 
+the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
+A RINEX file has extraneous information in it (which we will throw out) - and it 
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
-The first task you have in GNSS-IR is to translate from RINEX into what I will call the SNR format. The latter will include 
-azimuth and elevation angles. For the latter you will need an **orbit** file. **rinex2snr**
-will go get an orbit file for you. You can override the default orbit choice by selections given below.
+The first task you have in GNSS-IR is to translate from RINEX into what I will 
+call the SNR format. The latter will include azimuth and elevation angles. For the 
+latter you will need an **orbit** file. **rinex2snr**
+will go get an orbit file for you. You can override the default orbit 
+choice by selections given below.
 
 There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
 angles. The default is to save all data with elevation lower than 30 degrees (this is called SNR format 66).
@@ -198,7 +196,6 @@ The filename must be 12 characters long (ssssddd0.yyo), where ssss is station na
 ddd is day of year, followed by a zero, yy is the two character year and o stands for observation. 
 If you have installed the CRX2RNX code, you can also provide a compressed RINEX format file, which ends in a d.
 I think my code allows you to gzip the RINEX files if you are providing them.
-
 
 You can run **rinex2snr** at the command line. You required inputs are:
 

@@ -18,7 +18,7 @@ import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
 
 # fortran code for translating RINEX
-#import gnssrefl.gpssnr as gpssnr
+import gnssrefl.gpssnr as gpssnr
 
 
 class constants:
@@ -88,10 +88,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             if (not snre):
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
-                l= 'python'
-                if fortran:
-                    l= 'fortran'
-                print('Will seek RINEX file ', station, ' year:', year, ' doy:', doy, ' and translate with ', l)
+                print('Will seek RINEX file ', station, ' year:', year, ' doy:', doy, ' translate with ', translator)
                 if nol:
                     # this assumes RINEX file is in local directory
                     if version == 2:
@@ -165,10 +162,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
     log.write("Receiver rate: {0:5s} \n".format(receiverrate))
     log.write("Decimation rate: {0:3.0f} \n".format(dec_rate))
     log.write("Archive: {0:10s} \n".format(archive))
-    if fortran:
-        log.write("Use Fortran: {0:4s} \n".format('True'))
-    else:
-        log.write("Use Fortran: {0:5s} \n".format('False'))
     log.write("Orbits : {0:10s} \n".format(orbtype))
     exedir = os.environ['EXE']
     snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
@@ -193,38 +186,40 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
             rexist = os.path.isfile(rinexfile) == True
             exc = exedir + '/teqc' 
             texist = os.path.isfile(exc) == True
-            if rexist:
-                if texist and fortran:
-                    log.write('This option deprecated - no longer use teqc for reducing observables \n')
-                # decimate this new rinex file
-                    if (rexist and dec_rate > 0): 
-                        log.write("Decimating using teqc:  {0:3.0f}  seconds \n".format(dec_rate))
-                        log.write('Unfortunately teqc removes Beidou data. Eventually I will remove this. \n')
-                        rinexout = rinexfile + '.tmp'; cdec = str(dec_rate)
-                        fout = open(rinexout,'w')
-                        subprocess.call([exc, '-O.dec', cdec, rinexfile],stdout=fout)
-                        fout.close() # needed?
-                        status = subprocess.call(['mv','-f', rinexout, rinexfile])
-            # orbits and rinexfile exist
-            if (oexist and rexist):
+            if rexist: 
+                # decimate using teqc 
+                if (texist) and (fortran) and (dec_rate > 0): 
+                    log.write("Decimating using teqc:  {0:3.0f}  seconds \n".format(dec_rate))
+                    log.write('Unfortunately teqc removes Beidou data. Eventually I will remove this. \n')
+                    rinexout = rinexfile + '.tmp'; cdec = str(dec_rate)
+                    fout = open(rinexout,'w')
+                    subprocess.call([exc, '-O.dec', cdec, rinexfile],stdout=fout)
+                    fout.close() # needed?
+                    status = subprocess.call(['mv','-f', rinexout, rinexfile])
+            # if orbits and rinexfile exist
+            if (oexist) and (rexist):
                 snrname = g.snr_name(station, year,month,day,option)
                 orbfile = orbdir + '/' + f
+                #print('translator',translator)
                 if translator == 'hybrid':
-                    print('you are at the hybrid choice, still under development')
+                    g.make_snrdir(year,station) # make sure output directory exists
                     in1 = g.binary(rinexfile)
-                    in2 = g.binary(snrname)
-                    in3 = g.binary(orbit)
+                    in2 = g.binary(snrname) # this file is made locally and moved later
+                    in3 = g.binary(orbfile)
                     in4 = g.binary(str(option))
-                    # should think about adding decimation, for now set to zero
-                    in5 = g.binary('0')
-#                    gpssnr.foo(in1,in2,in3,in4,in5)
-
+                    if (dec_rate > 0):
+                        decr = str(dec_rate)
+                    else:
+                        decr = '0'
+                    in5 = g.binary(decr) # decimation can be used in hybrid option
+                    log.write('SNR file {0:50s} \n will use hybrid of python and fortran to make \n'.format( snrname))
+                    gpssnr.foo(in1,in2,in3,in4,in5)
                 else:
-                    if fortran:
+                    if (translator == 'fortran'):
                         t1=time.time()
                         try:
                             #subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
-                            log.write('Using fortran for translation  - separate log is used for stdout \n')
+                            log.write('Using standalone fortran for translation  - separate log is used for stdout \n')
                             flogname = 'logs/' + station + '_fortran.txt'
                             flog = open(flogname, 'w+')
                             a=subprocess.run([snrexe, rinexfile, snrname, orbfile, str(option)],capture_output=True,text=True)
@@ -235,8 +230,9 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                             log.write('Problem with making SNR file, check fortran specific log {0:50s} \n'.format(flogname))
                         t2=time.time()
 #                        print(' Exec time:', '{0:4.2f}'.format(t2-t1) )
+# this is for people that want to use slow python code
                     else:
-                        log.write('SNR file {0:50s} \n will not use fortran to make \n'.format( snrname))
+                        log.write('SNR file {0:50s} \n will use python to make \n'.format( snrname))
                         log.write('Decimating will be done here instead of using teqc \n')
                         t1=time.time()
                         rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate,log)

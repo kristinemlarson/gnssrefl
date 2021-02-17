@@ -2720,6 +2720,21 @@ def store_orbitfile(filename,year,orbtype):
         print('The orbit file did not exist, so it was not stored')
     return xdir
 
+def make_snrdir(year,station):
+    """
+    simple code to move an snr file to the right place 
+    inputs are the filename, the year, and the station name
+    """
+    xdir = os.environ['REFL_CODE'] + '/' + str(year)
+    # check that directories exist
+    if not os.path.isdir(xdir): #if year folder doesn't exist, make it
+        os.makedirs(xdir)
+    xdir = xdir + '/snr'
+    if not os.path.isdir(xdir): #if year folder doesn't exist, make it
+        os.makedirs(xdir)
+    xdir = xdir + '/' + station 
+    if not os.path.isdir(xdir): #if year folder doesn't exist, make it
+        os.makedirs(xdir)
 
 def store_snrfile(filename,year,station):
     """

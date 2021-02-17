@@ -57,10 +57,6 @@ def main():
         print('Year must be four characters long. Exiting.', year)
         sys.exit()
 
-    if args.fortran == 'True':
-        fortran = True
-    else:
-        fortran = False
 
     doy= args.doy
     isnr = args.snr # defined as an integer
@@ -88,6 +84,10 @@ def main():
 
 
 
+    if args.fortran == 'True':
+        fortran = True
+    else:
+        fortran = False
 
     # check that the fortran exe exist
     if fortran:
@@ -96,15 +96,17 @@ def main():
             if not os.path.isfile(snrexe):
                 print('You have selected the fortran and GPS only options.')
                 print('However, the fortran translator gpsSNR.e has not been properly installed.')
-                print('We are changing to the non-fortran option.')
+                print('We are changing to the hybrid translator option.')
                 fortran = False
+                translator = 'hybrid'
         else:
             snrexe = g.gnssSNR_version()
             if not os.path.isfile(snrexe):
                 print('You have selected the fortran and GNSS options.')
                 print('However, the fortran translator gnssSNR.e has not been properly installed.')
-                print('We are changing to the non-fortran option.')
+                print('We are changing to the python translator option (the hybrid is not yet working).')
                 fortran = False
+                translator = 'python'
 
 
 # if true ony use local RINEX files, which speeds up analysis of local datasets
@@ -152,17 +154,18 @@ def main():
     if (args.overwrite == 'True'):
         overwrite = True
 
-    # default is to use python for RINEX translator
+    # default is to use hybrid for RINEX translator
     if args.translator == None:
-        translator = 'python'
+        translator = 'hybrid'
     else:
         translator = args.translator
+        if translator == 'hybrid':
+            fortran = False # override
+        if translator == 'python':
+            fortran = False # override - but this is sllllllooooowwww
 
-#    t1=time.time()
     rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator)
-#    t2=time.time()
     print('Feedback written to subdirectory logs')
-#print('Exe time:', '{0:4.2f}'.format(t2-t1),' sec/Feedback written to subdirectory logs/')
 
 
 if __name__ == "__main__":
