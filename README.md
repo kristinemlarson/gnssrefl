@@ -3,10 +3,16 @@
 ### Table of Contents
 
 1. [News](#news)
-2 [Philosophy](#philosophy)
+2. [Philosophy](#philosophy)
 3. [Code Description](#code)
 4. [Goals](#goals)
-4. [Environment Variables](#environment)
+5. [Installation](#environment)
+6. [rinex2snr: translating input files](#module1)
+7. [quickLook: assessing files](#module2)
+8. [gnssir: estimating reflector heights](#module3)
+9. [bugs](#bugs)
+10. [publications](#publications)
+11. [acknowledgements](#acknowledgements)
 
 ### News <a name="news"></a>
 
@@ -127,7 +133,6 @@ If you don't define these environment variables, the code should assume your loc
 the code) is where you want everything to be. The orbits, SNR files, and periodogram results are stored in 
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
-### Python
 
 If you are using the version from gitHub:
 
@@ -150,7 +155,7 @@ when you make SNR files because the default behavior is to assume you are using 
 translators (gnssSNR.e or gpsSNR.e). Finally, you will not be able to use RINEX 3 files because
 I rely on the **gfzrnx** RINEX3 to RINEX2 translator.
 
-### Non-Python Code 
+*Non-Python Code*
 
 All executables should be stored in the EXE directory.  If you do not define EXE, 
 it will look for them in your local working directory.  The Fortran translators are 
@@ -172,7 +177,7 @@ bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.h
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. **You must store it in the EXE area.**
 
 
-### rinex2snr - making SNR files from RINEX files
+### rinex2snr - making SNR files from RINEX files <a name="module1"></a>
 
 The international standard for sharing GNSS data is called the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
 A RINEX file has extraneous information in it (which we want to throw out) - and it 
@@ -280,7 +285,7 @@ highrate GNSS RINEX file (even when it is compressed).
 And it also takes a long time to compute orbits for it (and thus create a SNR file).
 If you did not install the Fortan RINEX translators, it takes a very, very, long time.
 
-### quickLook 
+### quickLook <a name="module2"></a>
 
 Before using the **gnssir** code, I recommend you try **quickLook**. This allows you
 to quickly test various options (elevation angles, frequencies, azimuths).
@@ -334,7 +339,7 @@ expect to see - peaks of periodograms at ~16 meters height. Why is the northwest
 so messy? I leave that as an exercise for the reader. Hint: start out by trying
 to examine this site on Google Earth.
 
-### gnssir
+### gnssir <a name="module3"></a>
 
 This is the main driver for the GNSS interferometric reflectometry code.  
 You need a set of instructions for **gnssir** which are made using **make_json_input**.  
@@ -443,7 +448,7 @@ or the [question section of my web app.](https://gnss-reflections.org/overview).
 arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
-### Bugs/Features I know about 
+### Bugs/Features I know about <a name="bugs"></a>
 
 I have been using **teqc** to reduce the number of observables and to decimate. I have removed the former 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
@@ -487,7 +492,7 @@ and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works per
 but this utility writes out a file with only numbers (which I always prefer) instead of 
 csv. And I did not need to learn how to use pandas.
 
-### Publications
+### Publications <a name="publications"></a>
 
 There are A LOT of publications about GPS and GNSS interferometric reflectometry.
 If you want something with a how-to flavor, try this paper, 
@@ -519,9 +524,9 @@ year = 2020; doy = 150; snr_type =  99
 guts.gnssir_guts(station,year,doy, snr_type, extension, lsp)
 ```
 
-### Acknowledgements
+### Acknowledgements <a name="acknowledgements"></a>
 
-People that helped me with this code include Radon Rosborough, Joakim Strandberg, and Johannes Boehm. 
+People that helped me with this code include [Radon Rosborough](https://github.com/raxod502), Joakim Strandberg, and Johannes Boehm. 
 I also thank Peter Shearer and Lisa Tauxe for some very nice Python lecture notes.
 
 This documentation was updated on November 19, 2020.
