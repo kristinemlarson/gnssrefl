@@ -5,12 +5,12 @@
 1. [News](#news)
 2. [Philosophy](#philosophy)
 3. [Code Description](#code)
-4. [Goals](#goals)
 5. [Installation](#environment)
 6. [rinex2snr: translating input files](#module1)
 7. [quickLook: assessing files](#module2)
 8. [gnssir: estimating reflector heights](#module3)
 9. [bugs](#bugs)
+9. [Utilities](#helper)
 10. [publications](#publications)
 11. [acknowledgements](#acknowledgements)
 
@@ -117,8 +117,10 @@ rising and setting satellite arcs and estimates RH.
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
 </center>
 
-### Environment Variables <a name="environment"></a>
+### Installing the Code<a name="environment"></a>
 
+*Environment Variables*
+   
 You should define three environment variables:
 
 * EXE = where various RINEX executables will live.
@@ -133,6 +135,7 @@ If you don't define these environment variables, the code should assume your loc
 the code) is where you want everything to be. The orbits, SNR files, and periodogram results are stored in 
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
+*Installation the Python*
 
 If you are using the version from gitHub:
 
@@ -341,7 +344,7 @@ to examine this site on Google Earth.
 
 ### gnssir <a name="module3"></a>
 
-This is the main driver for the GNSS interferometric reflectometry code.  
+This is the main driver for the GNSS-IR code.  
 You need a set of instructions for **gnssir** which are made using **make_json_input**.  
 The inputs for **make_json_input** are: 
 
@@ -448,7 +451,7 @@ or the [question section of my web app.](https://gnss-reflections.org/overview).
 arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
-### Bugs/Features I know about <a name="bugs"></a>
+### Bugs/Features <a name="bugs"></a>
 
 I have been using **teqc** to reduce the number of observables and to decimate. I have removed the former 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
@@ -463,7 +466,7 @@ we do plan to remove them in subsequent versions of the code.
 
 The L2C and L5 satellite lists are not time coded as they should be. I currently use a list from 2020.
 
-### Helper Codes
+### Utilities <a name="helper"</a>
 
 **daily averages** is a helper code for cryosphere people interested in daily snow 
 accumulation. It can be used for lake levels. **It is not to be used for tides!**
@@ -500,29 +503,6 @@ which is [open option](https://link.springer.com/article/10.1007/s10291-018-0744
 
 Also look to the publications page on my [personal website](https://kristinelarson.net/publications)
 
-### How can I import the libraries in this package?
-
-I will be adding more documentation and examples here.
-
-If you wanted to run the gnssir code without the command line interface, here is 
-an example for station p041 where the json instructions exist and the SNR file has already been created.  
-
-```sh
-# my internal libraries you need
-import gnssrefl.gps as g
-import gnssrefl.gnssir as guts
-
-
-station = 'p041' 
-extension = ''  
-
-# instructions for the Lomb Scargle Periodogram
-lsp = guts.read_json_file(station, extension)
-
-# set the year, doy, and type of snr file
-year = 2020; doy = 150; snr_type =  99 
-guts.gnssir_guts(station,year,doy, snr_type, extension, lsp)
-```
 
 ### Acknowledgements <a name="acknowledgements"></a>
 
