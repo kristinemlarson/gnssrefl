@@ -467,9 +467,9 @@ we do plan to remove them in subsequent versions of the code.
 
 The L2C and L5 GPS satellite lists are not time coded as they should be. I currently use a list from 2020.
 
-### Utilities <a name="helper"</a>
+### Utilities <a name="helper"></a>
 
-**daily averages** is a helper code for cryosphere people interested in daily snow 
+**daily averages** is a utility for cryosphere people interested in computing daily snow 
 accumulation. It can be used for lake levels. *It is not to be used for tides!*
 
 **download_rinex** can be useful if you want to download RINEX v2 or 3 files (using the version flag) without using 
