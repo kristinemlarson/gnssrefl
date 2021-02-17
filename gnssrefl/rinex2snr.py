@@ -18,7 +18,7 @@ import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
 
 # fortran code for translating RINEX
-import gnssrefl.gpssnr as gpssnr
+#import gnssrefl.gpssnr as gpssnr
 
 
 class constants:
