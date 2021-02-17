@@ -6,9 +6,9 @@
 2. [Philosophy](#philosophy)
 3. [Code Description](#code)
     1. [Installation](#environment)
-    2. [rinex2snr: translating input files](#module1)
-    3. [quickLook: assessing files](#module2)
-    4. [gnssir: estimating reflector heights](#module3)
+    2. [rinex2snr: translating RINEX files into SNR ](#module1)
+    3. [quickLook: assessing SNR files](#module2)
+    4. [gnssir: estimating reflector heights from SNR data](#module3)
 4. [Bugs/Future Work](#bugs)
 5. [Utilities](#helper)
 6. [Publications](#publications)
@@ -457,9 +457,6 @@ I have been using **teqc** to reduce the number of observables and to decimate. 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
 and fortran is set to True, unfortunately this will still occur. I am working on removing my 
 code's dependence on **teqc**.
-
-If there is interest, I will ask UNAVCO to implement the Fortran translation code automatically (i.e. download
-and compile it for you as part of the pypi install). But doing this myself is well beyond my skillset. 
 
 No phase center offsets have been applied to these reflector heights. While these values are relatively small,
 we do plan to remove them in subsequent versions of the code. 
