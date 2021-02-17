@@ -1,11 +1,10 @@
 from setuptools import setup, find_packages
 from numpy.distutils.core import setup, Extension
 
-ext1 = Extension(name='gnssrefl.gpssnr',
-        sources=['gnssrefl/gpssnr.f'],
+ext1 = Extension(name='gnssrefl.gpssnr', 
+        sources=['gnssrefl/gpssnr.f'], 
         f2py_options=['--verbose'],
         )
-
 
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()

@@ -4,7 +4,6 @@
 import datetime
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy import array
 import os
 from scipy.interpolate import interp1d
 import subprocess
@@ -218,7 +217,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                     in4 = g.binary(str(option))
                     # should think about adding decimation, for now set to zero
                     in5 = g.binary('0')
-                    gpssnr.foo(in1,in2,in3,in4,in5)
+#                    gpssnr.foo(in1,in2,in3,in4,in5)
 
                 else:
                     if fortran:
