@@ -96,6 +96,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     list1['NW']=[]; list1['NE']=[]; list1['SW']=[]; list1['SE']=[];
     list1['failNW']=[]; list1['failNE']=[]; list1['failSW']=[]; list1['failSE']=[];
 
+    # try the kelly way
+    data = {'NW':{},'SW':{},'NE':{},'SE':{},'fNW':{},'fSW':{},'fNE':{},'fSE': {} }
+
     # make sure environment variables exist
     g.check_environ_variables()
 
@@ -194,6 +197,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                                ne[satNu] = [px,pz]; list1['NE'].append(satNu)
                         elif a==3:
                                se[satNu] = [px,pz]; list1['SE'].append(satNu)
+                        idc = stitles[a]
+                        data[idc][satNu] = [px,pz]
 
                     else:
                         # these are failed tracks
@@ -207,6 +212,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                                failne[satNu] = [px,pz]; list1['failNE'].append(satNu)
                         elif a==3:
                                failse[satNu] = [px,pz]; list1['failSE'].append(satNu)
+                        idc = 'f' + stitles[a]
+                        data[idc][satNu] = [px,pz]
 
             # i do not know how to add a grid using these version of matplotlib
             tt = 'GNSS-IR results: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy)
@@ -229,7 +236,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         print('some kind of problem with SNR file, so I am exiting the code politely.')
 
 
-    return nw,sw,ne,se,failnw,failsw,failne,failse,list1
+    return data
 
 
 
