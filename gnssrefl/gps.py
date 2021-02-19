@@ -17,8 +17,9 @@ from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import numpy as np
 import wget
+from numpy import array
 
-# my code
+# my code - is it needed here?
 import gnssrefl.read_snr_files as snr
 
 # various numbers you need in the GNSS world
@@ -2719,6 +2720,21 @@ def store_orbitfile(filename,year,orbtype):
         print('The orbit file did not exist, so it was not stored')
     return xdir
 
+def make_snrdir(year,station):
+    """
+    simple code to move an snr file to the right place 
+    inputs are the filename, the year, and the station name
+    """
+    xdir = os.environ['REFL_CODE'] + '/' + str(year)
+    # check that directories exist
+    if not os.path.isdir(xdir): #if year folder doesn't exist, make it
+        os.makedirs(xdir)
+    xdir = xdir + '/snr'
+    if not os.path.isdir(xdir): #if year folder doesn't exist, make it
+        os.makedirs(xdir)
+    xdir = xdir + '/' + station 
+    if not os.path.isdir(xdir): #if year folder doesn't exist, make it
+        os.makedirs(xdir)
 
 def store_snrfile(filename,year,station):
     """
@@ -3283,7 +3299,8 @@ def update_quick_plot(station, f):
     plt.xlabel('reflector height (m)'); plt.title('SNR periodogram')
     plt.subplot(211)
     plt.xlabel('elev Angles (deg)')
-    plt.title(station + ' SNR Data and Frequency L' + str(f))
+    #ftitle(freq)
+    plt.title(station + ' SNR Data/' + ftitle(f) + ' Frequency') 
 
     return True
 
@@ -4791,6 +4808,17 @@ def cdate2nums(col1):
         t = year + doy/365.25
 
     return t
+
+def binary(string):
+    """
+    changes python string to bytes for use in
+    fortran code using f2py via numpy
+    input is a string, output is bytes with null at the end
+    """
+    j=bytes(string,'ascii') + b'\0\0'
+
+    return array(j)
+
 
 # don't need to print out success
 #print('found the ', env_var, ' environment variable')

@@ -1,0 +1,12 @@
+[build-system]
+
+# setup.py script requires numpy to be installed in order to configure
+# the Fortran bindings. setuptools and wheel are standard
+# dependencies, as per [1]. See [2] for discussion of why the numpy
+# build-time dependency causes a problem and how this configuration in
+# pyproject.toml solves the problem, which has been well-known in the
+# Python packaging community for quite some time.
+#
+# [1]: https://www.python.org/dev/peps/pep-0518/#build-system-table
+# [2]: https://www.python.org/dev/peps/pep-0518/#rationale
+requires = ["setuptools", "wheel", "numpy"]

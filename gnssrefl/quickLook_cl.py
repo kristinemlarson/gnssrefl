@@ -121,8 +121,10 @@ def main():
     pltscreen = True
     # Kelly for jupyter notebooks set this to false
     #pltscreen = False
-    nw,sw,ne,se,failnw,failsw,failne,failse,quadlist = quick.quickLook_function(station, year, doy, snr, 
-            f,e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran,pltscreen)
+    data = quick.quickLook_function(station, year, doy, snr, f, e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran,pltscreen)
+    #plt.figure()
+    #plt.plot( data['NW'][1][0], data['NW'][1][1])
+    #plt.show()
 
 if __name__ == "__main__":
     main()

@@ -148,7 +148,8 @@ def satorb(week, sec_of_week, ephem):
     Ek = Mk
     E0 = Mk + ecc*np.sin(Mk)
     # solve kepler's equation
-    while(i < 3 or np.abs(Ek-E0) > 1e-12):
+    # was i < 3 and e-12.  
+    while(i < 2 or np.abs(Ek-E0) > 1e-6):
         i +=1
         Ek = Mk + ecc*np.sin(E0)
         E0 = Mk + ecc*np.sin(Ek)
@@ -322,18 +323,19 @@ def satorb_prop(week, secweek, prn, rrec0, closest_ephem):
     Kristine Larson, April 2017
     """
     error = 1
+    c= 299792458 # m/sec
 
     # might as well start with 70 milliseconds
     SatOrb = satorb(week, secweek-0.07, closest_ephem)
     # first estimate of the geometric range
     geo= g.norm(SatOrb-rrec0)
 
-    deltaT = g.norm(SatOrb - rrec0)/constants.c
+    deltaT = geo/c
     k=0
     #while (error > 1e-8) or (k < 2):
     # should not need more than two iterations, since i am
     #starting with 70 msec
-    while (k < 2):
+    while (k < 1):
         SatOrb = satorb(week, secweek-deltaT, closest_ephem)
         Th = -constants.omegaEarth * deltaT
         xs = SatOrb[0]*np.cos(Th)-SatOrb[1]*np.sin(Th)
@@ -341,9 +343,10 @@ def satorb_prop(week, secweek, prn, rrec0, closest_ephem):
         SatOrbn = [xs, ys, SatOrb[2]]
         # try this ???
         geo = g.norm(SatOrbn-rrec0)
-        deltaT_new = g.norm(SatOrbn-rrec0)/constants.c
-        error = np.abs(deltaT - deltaT_new)
-        deltaT = deltaT_new
+        deltaT = geo/c
+        # not using this anymore
+        #error = np.abs(deltaT - deltaT_new)
+        #deltaT = deltaT_new
         k += 1
     return SatOrbn
 
@@ -360,6 +363,8 @@ def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij):
     nx = iX(Tp[ij]-0.07); ny = iY(Tp[ij]-0.07); nz = iZ(Tp[ij]-0.07)
     oE = constants.omegaEarth
     c = constants.c
+    #mu = 3.986005e14 # Earth GM value
+    #c= 299792458 # m/sec
     # get initial deltaA
     SatOrb=np.array([nx,ny,nz]).T
     r=np.subtract(SatOrb,recv)

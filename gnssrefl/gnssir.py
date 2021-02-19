@@ -19,6 +19,8 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     my attempt to separate the inputs to the code and the guts of the code
     inputs are station name, year, day of year (integers)
     snr_type is an integer (99, 66, etc). lsp is a json
+
+    check to see if there were any results before sending a plot to the screen
     """
 
     #   make sure environment variables exist.  set to current directory if not
@@ -80,6 +82,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         total_arcs = 0
         ct = 0
         for f in freqs:
+            found_results = False
             if plot_screen: 
                 # no idea if this will work
                 fig, (ax1, ax2) = plt.subplots(2, 1,figsize=(10,7))
@@ -103,6 +106,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                     x,y,Nv,cf,UTCtime,avgAzim,avgEdot,Edot2,delT= g.window_data(s1,s2,s5,s6,s7,s8,sat,ele,azi,t,edot,f,az1,az2,e1,e2,satNu,lsp['polyV'],lsp['pele'],screenstats) 
                     MJD = g.getMJD(year,month,day, UTCtime)
                     if Nv > minNumPts:
+                        found_results = True
                         #print('length of x', len(x))
                         maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,lsp['desiredP'],lsp['polyV'],minH) 
                         nij =   pz[(px > NReg[0]) & (px < NReg[1])]
@@ -141,7 +145,8 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
 # close the output files
             ct += 1
             #'Yes' if fruit == 'Apple' else 'No'
-            if plot_screen: plot2screen(station, f, ax1, ax2,lsp['pltname']) 
+            if found_results and plot_screen:
+                plot2screen(station, f, ax1, ax2,lsp['pltname']) 
         fout.close() ; # these are the LSP results written to text file 
 
 
@@ -195,7 +200,7 @@ def plot2screen(station, f,ax1,ax2,pltname):
     ax2.set_ylabel('volts/volts')
     ax1.set_ylabel('volts/volts')
     ax1.set_xlabel('Elevation Angles (deg)')
-    ax1.set_title(station + ' SNR Data and Frequency L' + str(f))
+    ax1.set_title(station + ' SNR Data/' + g.ftitle(f) + ' Frequency')
     plt.show()
 
     return True

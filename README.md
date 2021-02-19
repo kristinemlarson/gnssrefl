@@ -1,10 +1,27 @@
-### News 
+## gnssrefl
 
-The code now checks to see if you have installed fortran translators. If you haven't,
-it uses python to translate the RINEX file. SO while the default is still assuming you
-are using fortran, it is not a deal breaker.
+### Table of Contents
 
-[I have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
+1. [News](#news)
+2. [Philosophy](#philosophy)
+3. [Code Description](#code)
+    1. [Installation](#environment)
+    2. [rinex2snr: translating RINEX files into SNR ](#module1)
+    3. [quickLook: assessing SNR files](#module2)
+    4. [gnssir: estimating reflector heights from SNR data](#module3)
+4. [Bugs/Future Work](#bugs)
+5. [Utilities](#helper)
+6. [Publications](#publications)
+7. [Acknowledgements](#acknowledgements)
+
+### News <a name="news"></a>
+
+We now have three translation options for RINEX files: fortran, hybrid, and python. The last of these
+is ok for 30 sec data but really too slow otherwise. Hybrid binds the python to fortran.
+So far this is for GPS only RINEX files.  If you need fast multi-GNSS solutions, I still
+recommend you install the fortran code (gnssSNR).
+
+[We have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
 CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
 implemented security restrictions, we have had to change our download access. 
@@ -27,8 +44,7 @@ My reflection zone webapp will [help you pick appropriate elevation and azimuth 
 If you are interested in measuring sea level, this webapp tells you [how high your site is above 
 sea level.](https://gnss-reflections.org/geoid)  
 
-
-### Philosophical Statement
+### Philosophical Statement <a name="philosophy"></a>
 In geodesy, you don't really need to know much about what you are doing to 
 calculate a reasonably precise position from GPS data. That's just the way it is.
 (Note: that is also thanks to the hard work of the geodesists that wrote the 
@@ -44,30 +60,31 @@ modify the inputs accordingly.
 I encourage you to get to know your site. If it belongs to you, look at 
 photographs. If you can't find photographs, use Google Earth. 
 
-### gnssrefl
+
+### Code Description<a name="code"></a>
 
 **gnssrefl** is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
 The main difference bewteen this version and previous versions is that I am
 attempting to use proper python packaging rules!. I have separated out the main
-parts of the code and the command line inputs so that you can use the gnssrefl libraries
+parts of the code and the command line inputs so that you can use the libraries
 yourself or do it all from the command line. This should also - hopefully - make
 it easier for the production of Jupyter notebooks. The latter are to be developed
 by UNAVCO with NASA GNSS Science Team funding.
 
-### If you would like to try out reflectometry without installing the code
+*If you would like to try out reflectometry without installing the code*
 
 I recommend you use the web app [I developed](https://gnss-reflections.org). It 
 can show you representative results with minimal constraints. It should provide 
 results in less than 10 seconds.
 
-### If you prefer Matlab
+*If you prefer Matlab*
 
 I had a [working matlab version on github](https://github.com/kristinemlarson/gnssIR_matlab_v3), 
 but I will not be updating it. You will very likely have to make changes to accommodate the recent
 change in security protocols at CDDIS.
 
-### Overview Comments
+*Goals*
 
 The goal of this python repository is to help you compute (and evaluate) GNSS-based
 reflectometry parameters using geodetic data. This method is often
@@ -82,8 +99,8 @@ with the details associated with **gnssir**. It is not meant to be used for rout
 
 There are also various utilities you might find to be useful (see the last section).
 
-The rest of this README file is about how to install and run the code. *It is not a class about 
-GNSS interferometric reflectometry.* If you are unsure about why various 
+*This document is not a class about GNSS interferometric reflectometry.* 
+If you are unsure about why various 
 restrictions are being applied, you really need
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
 and similar. I am committed in principle to set up some online
@@ -100,8 +117,10 @@ rising and setting satellite arcs and estimates RH.
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
 </center>
 
-### Environment Variables 
+### Installing the Code<a name="environment"></a>
 
+*Environment Variables*
+   
 You should define three environment variables:
 
 * EXE = where various RINEX executables will live.
@@ -116,7 +135,7 @@ If you don't define these environment variables, the code should assume your loc
 the code) is where you want everything to be. The orbits, SNR files, and periodogram results are stored in 
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
-### Python
+*Installing the Python*
 
 If you are using the version from gitHub:
 
@@ -131,44 +150,41 @@ If you use the PyPi version:
 * activate the virtual environment
 * pip install gnssrefl
 
-To use **only** python codes, you will need to be sure that your RINEX files are uncompressed (i.e.
-not using Hatanaka compression, which end in a d instead of an o). Since **many** archives use 
-Hatanaka compression, this will significantly
-limit what you can do. The second thing to know is that you should use the -fortran False flag 
-when you make SNR files because the default behavior is to assume you are using fortran 
-translators (gnssSNR.e or gpsSNR.e). Finally, you will not be able to use RINEX 3 files because
-I rely on the **gfzrnx** RINEX3 to RINEX2 translator.
+To use **only** python codes, you will need to be sure that your RINEX files are not Hatanaka 
+compressed.
 
-### Non-Python Code 
+*Non-Python Code*
 
-All executables should be stored in the EXE directory.  If you do not define EXE, 
+**All executables must be stored in the EXE directory.**  If you do not define EXE, 
 it will look for them in your local working directory.  The Fortran translators are 
-much faster than using python. But if you don't want to use them, 
-they are optional, that's fine. FYI, the python version is slow 
-not because of the RINEX - it is because you need to calculate
-a crude model for satellite coordinates in this code. And that takes cpu time....
+much faster than using python. We now advocate using the hybrid translator option, which 
+links to the Fortran internally. Using true python to translate a high-rate GPS file is 
+impossibly slow.
 
-* Required Translator for compressed RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. **You must put this executable in the EXE area.**
+* Required Translator for compressed (Hatanaka) RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. 
 
-* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e and it must be in the EXE area.** For the code: https://github.com/kristinemlarson/gpsonlySNR
+* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e.** For the code: https://github.com/kristinemlarson/gpsonlySNR
 
-* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e and it must be in the EXE area.** For the code: https://github.com/kristinemlarson/gnssSNR
+* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e** For the code: https://github.com/kristinemlarson/gnssSNR
 
 * Optional datatool, **teqc**, is highly recommended.  There is a list of static executables at the
-bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). **It must be stored in the EXE area.**
+bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). 
 
 * Optional datatool, **gfzrnx** is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
-http://dx.doi.org/10.5880/GFZ.1.1.2016.002. **You must store it in the EXE area.**
+http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
 
 
-### rinex2snr - making SNR files from RINEX files
+### rinex2snr - making SNR files from RINEX files <a name="module1"></a>
 
-The international standard for sharing GNSS data is called the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
-A RINEX file has extraneous information in it (which we want to throw out) - and it 
+The international standard for sharing GNSS data is called 
+the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
+A RINEX file has extraneous information in it (which we will throw out) - and it 
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
-The first task you have in GNSS-IR is to translate from RINEX into what I will call the SNR format. The latter will include 
-azimuth and elevation angles. For the latter you will need an **orbit** file. **rinex2snr**
-will go get an orbit file for you. You can override the default orbit choice by selections given below.
+The first task you have in GNSS-IR is to translate from RINEX into what I will 
+call the SNR format. The latter will include azimuth and elevation angles. For the 
+latter you will need an **orbit** file. **rinex2snr**
+will go get an orbit file for you. You can override the default orbit 
+choice by selections given below.
 
 There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
 angles. The default is to save all data with elevation lower than 30 degrees (this is called SNR format 66).
@@ -180,23 +196,26 @@ ddd is day of year, followed by a zero, yy is the two character year and o stand
 If you have installed the CRX2RNX code, you can also provide a compressed RINEX format file, which ends in a d.
 I think my code allows you to gzip the RINEX files if you are providing them.
 
-
 You can run **rinex2snr** at the command line. You required inputs are:
 
 - station name
 - year
 - day of year
 
-If you installed the fortran translator gpsSNR.e, a sample call for a station called p041, restricted 
-to GPS satellites, on day of year 132 and year 2020 would be:
+A sample call for a station called p041, restricted to GPS satellites, on day of year 132 and year 2020 would be:
 
 *rinex2snr p041 2020 132*
 
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
 it will check four archives (unavco, sopac, cddis, and sonel) to find it. 
-If you did not install a fortran translator, the command would be:
+This uses the hybrid translator.  If you did install a fortran translator, the command would be:
 
-*rinex2snr p041 2020 132 -fortran False* 
+*rinex2snr p041 2020 132 -translator fortran* 
+
+For python:
+
+*rinex2snr p041 2020 132 -translator python* 
+
 
 Here is an example from a site in Greenland (the RINEX file will be picked up from unavco):
 
@@ -258,7 +277,7 @@ azimuth-specific mask is decided later when you need to run **gnssir**.  The SNR
 
 Other questions:
 
-- What if you do not want to install the fortran translators?  Use -fortran False on the command line.
+- What if you do not want to install the fortran translators?  Use -translator hybrid (though I believe this is the default)
 
 - What if you are providing the RINEX files and you don't want the code to search for 
 the files online? Use -nolook True
@@ -269,7 +288,7 @@ highrate GNSS RINEX file (even when it is compressed).
 And it also takes a long time to compute orbits for it (and thus create a SNR file).
 If you did not install the Fortan RINEX translators, it takes a very, very, long time.
 
-### quickLook 
+### quickLook <a name="module2"></a>
 
 Before using the **gnssir** code, I recommend you try **quickLook**. This allows you
 to quickly test various options (elevation angles, frequencies, azimuths).
@@ -287,7 +306,7 @@ Going back to our **rinex2snr** example, try running the data for station p041.
 
 *quickLook p041 2020 132*  
 
-That command will produce [this periodogram summary](tests/p041-l1.png). By default, 
+That command will produce [this periodogram summary](tests/use_cases/p041-l1.png). By default, 
 these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
 you have used the defaults.  Furthermore, note that results on the x-axis begin at 0.5 meters.
 Since you are not able to resolve very small reflector heights with this method, this region 
@@ -298,34 +317,34 @@ this site the antenna phase center is ~ 2 meters above the ground. The colors
 change as you try different satellites.  If the data are plotted in
 gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
 
-If you want to look at L2C data, [try this by invoking -fr 20](tests/p041-l2c.png). 
+If you want to look at L2C data, [try this by invoking -fr 20](tests/use_cases/p041-l2c.png). 
 In general, the results will be cleaner than L1 data (frequency number 1 in my code).
 The defaults reflector heights will not go beyond 6 meters.  If you had set -h2 20, it would
-look [like this](tests/p041-l2c-again.png). You aren't gaining anything by doing this.
+look [like this](tests/use_cases/p041-l2c-again.png). You aren't gaining anything by doing this.
 
 Now look at the Greenland SNR file you created in the previous section.
 
 *quickLook gls1 2011 271* 
 
-The periodogram peaks bunch up at a [larger value](tests/gls1-example.png), which just
+The periodogram peaks bunch up at a [larger value](tests/use_cases/gls1-example.png), which just
 means the antenna was further from the planar reflector, which in this case is ice.
 
 Finally, what do you do if your reflections site is taller than the default value of 6 meters?
 Does the code figure this out for you automatically? **No, it does not.**
 A short example: Make a SNR file using the defaults: *rinex2snr smm3 2018 271*
-Now run **quickLook** using the defaults [quickLook smm3 2018 271](tests/smm3-default.png). 
+Now run **quickLook** using the defaults [quickLook smm3 2018 271](tests/use_cases/smm3-default.png). 
 Everything is gray (which means it didn't find a significant reflector) because you 
 only calculated periodograms for height values of 0.5 to 6 meters. The
 site is ~16 meters above the ice. Accordingly, if you change the inputs to tell the program
 that you want to examine heights between 8 and 20 meters, i.e. 
-[quickLook smm3 2018 271 -h1 8 -h2 20](tests/smm3-sensible.png) you now see what you 
+[quickLook smm3 2018 271 -h1 8 -h2 20](tests/use_cases/smm3-sensible.png) you now see what you 
 expect to see - peaks of periodograms at ~16 meters height. Why is the northwest quadrant 
 so messy? I leave that as an exercise for the reader. Hint: start out by trying
 to examine this site on Google Earth.
 
-### gnssir
+### gnssir <a name="module3"></a>
 
-This is the main driver for the GNSS interferometric reflectometry code.  
+This is the main driver for the GNSS-IR code.  
 You need a set of instructions for **gnssir** which are made using **make_json_input**.  
 The inputs for **make_json_input** are: 
 
@@ -403,9 +422,9 @@ Simple example for my favorite GPS site [p041](https://spotlight.unavco.org/stat
 - *gnssir p041 2020 150* (calculate the reflector heights) 
 - *gnssir p041 2020 150 -fr 5 -plt True* (override defaults, only look at L5 SNR data, and periodogram plots come to the screen)
 
-Where are the files for this example?
+Where would the code store the files for this example?
 
-- json is stored in $REFL_CODE/input/p041.json
+- json instructions are stored in $REFL_CODE/input/p041.json
 - SNR files are stored in $REFL_CODE/2020/snr/p041
 - Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041
 
@@ -420,7 +439,9 @@ This is a snippet of what the result file would look like
 - *Azim* is the average azimuth angle of the satellite arc
 - *sat* and *freq* are as defined in this document
 
-If you want a multi-GNSS solution, you need make a new json file and use multi-GNSS orbits. And the RINEX file you use must have multi-GNSS SNR observations in it. p041 currently has multi-GNSS data in the RINEX file, so you can use it as a test.
+If you want a multi-GNSS solution, you need to make a new json file and 
+use multi-GNSS orbits, and use a RINEX file that has multi-GNSS SNR observations in it. 
+p041 currently has multi-GNSS data in the RINEX file, so you can use it as a test. 
 
 - *make_json_input p041 39.949 -105.194 1728.856 -allfreq True* 
 - *rinex2snr p041 2020 151 -orb gnss* 
@@ -432,25 +453,24 @@ or the [question section of my web app.](https://gnss-reflections.org/overview).
 arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
-### Bugs/Features I know about 
+### Bugs/Features <a name="bugs"></a>
 
 I have been using **teqc** to reduce the number of observables and to decimate. I have removed the former 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
 and fortran is set to True, unfortunately this will still occur. I am working on removing my 
 code's dependence on **teqc**.
 
-If there is interest, I will ask UNAVCO to implement the Fortran translation code automatically (i.e. download
-and compile it for you as part of the pypi install). But doing this myself is well beyond my skillset. 
+The hybrid translator option is currently only for GPS satellites. It does not cover multi-GNSS.
 
 No phase center offsets have been applied to these reflector heights. While these values are relatively small,
 we do plan to remove them in subsequent versions of the code. 
 
-The L2C and L5 satellite lists are not time coded as they should be. I currently use a list from 2020.
+The L2C and L5 GPS satellite lists are not time coded as they should be. I currently use a list from 2020.
 
-### Helper Codes
+### Utilities <a name="helper"></a>
 
-**daily averages** is a helper code for cryosphere people interested in daily snow 
-accumulation. It can be used for lake levels. **It is not to be used for tides!**
+**daily averages** is a utility for cryosphere people interested in computing daily snow 
+accumulation. It can be used for lake levels. *It is not to be used for tides!*
 
 **download_rinex** can be useful if you want to download RINEX v2 or 3 files (using the version flag) without using 
 the reflection-specific codes. Sample calls:
@@ -461,7 +481,7 @@ the reflection-specific codes. Sample calls:
 
 - *download_rinex p041 2020 150 0 -archive sopac* downloads the data from sopac archive on day of year 150 in 2020
 
-**download_orbits** downloads orbit files 
+**download_orbits** downloads orbit files. See -h for more information.
 
 **ymd** translates year,month,day to day of year
 
@@ -476,7 +496,7 @@ and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works per
 but this utility writes out a file with only numbers (which I always prefer) instead of 
 csv. And I did not need to learn how to use pandas.
 
-### Publications
+### Publications <a name="publications"></a>
 
 There are A LOT of publications about GPS and GNSS interferometric reflectometry.
 If you want something with a how-to flavor, try this paper, 
@@ -484,35 +504,14 @@ which is [open option](https://link.springer.com/article/10.1007/s10291-018-0744
 
 Also look to the publications page on my [personal website](https://kristinelarson.net/publications)
 
-### How can I import the libraries in this package?
 
-I will be adding more documentation and examples here.
+### Acknowledgements <a name="acknowledgements"></a>
 
-If you wanted to run the gnssir code without the command line interface, here is 
-an example for station p041 where the json instructions exist and the SNR file has already been created.  
+[Radon Rosborough](https://github.com/raxod502) helped me with my many python questions. 
+Joakim Strandberg provided python RINEX translators, and Johannes Boehm provided source code for the 
+refraction correction. 
 
-```sh
-# my internal libraries you need
-import gnssrefl.gps as g
-import gnssrefl.gnssir as guts
-
-
-station = 'p041' 
-extension = ''  
-
-# instructions for the Lomb Scargle Periodogram
-lsp = guts.read_json_file(station, extension)
-
-# set the year, doy, and type of snr file
-year = 2020; doy = 150; snr_type =  99 
-guts.gnssir_guts(station,year,doy, snr_type, extension, lsp)
-```
-
-### Acknowledgements
-
-People that helped me with this code include Radon Rosborough, Joakim Strandberg, and Johannes Boehm. 
-I also thank Peter Shearer and Lisa Tauxe for some very nice Python lecture notes.
-
-This documentation was updated on November 19, 2020.
 
 Kristine M. Larson
+
+This documentation was updated on February 17, 2021.
