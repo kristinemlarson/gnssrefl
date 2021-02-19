@@ -288,6 +288,22 @@ highrate GNSS RINEX file (even when it is compressed).
 And it also takes a long time to compute orbits for it (and thus create a SNR file).
 If you did not install the Fortan RINEX translators, it takes a very, very, long time.
 
+*SNR file format*
+
+To columns are defined as:
+
+1. Satellite number (remember 100 is added for Glonass, etc)
+2. Elevation angle, degrees
+3. Azimuth angle, degrees
+4. Seconds of the day, GPS time
+5. elevation angle rate of change, degrees/sec.
+6.  S6
+7.  S1
+8.  S2
+9.  S5
+10. S7
+11. S8
+
 ### quickLook <a name="module2"></a>
 
 Before using the **gnssir** code, I recommend you try **quickLook**. This allows you
