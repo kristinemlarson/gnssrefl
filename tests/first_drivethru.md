@@ -72,7 +72,7 @@ in any detail. So take that for what you will.
 <TH>Seasonal Snow</TH>
 <TD>
 
-* Marshall, Colorado (p041)
+* [Marshall, Colorado](use_cases/p041_use.md) (p041)
 
 * Half Island Park, Idaho (p360)
 
