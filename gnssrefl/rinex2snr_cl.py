@@ -3,6 +3,9 @@
 command line tool for the rinex2snr module
 pretty much what it sounds like - it translates rinex files and makes SNR files
 kristine larson
+
+compile the fortran first
+f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
 """
 
 import argparse
@@ -36,6 +39,7 @@ def main():
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
+    parser.add_argument("-srate", default=None, help="sample rate (RINEX 3 only)", type=int)
 
     args = parser.parse_args()
 #   make sure environment variables exist.  set to current directory if not
@@ -164,7 +168,25 @@ def main():
         if translator == 'python':
             fortran = False # override - but this is sllllllooooowwww
 
-    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator)
+    if translator == 'hybrid':
+        snrexe = g.gnssSNR_version()
+        if (orb == 'jax') or (orb == 'gbm'):
+            print('The hybrid option does not currently work on multi-GNSS files')
+            if not os.path.isfile(snrexe):
+                print('setting to python in the interim')
+                translator = 'python'
+            else:
+                print('setting to fortran in the interim')
+                translator = 'fortran'
+
+    # this is for RINEX 3 only - default will be 30
+    if args.srate == None:
+        srate = 30
+    else:
+        srate = args.srate
+
+
+    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate)
     print('Feedback written to subdirectory logs')
 
 

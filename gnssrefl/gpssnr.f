@@ -1,13 +1,16 @@
-C FILE: GPSSNR.F
-      SUBROUTINE FOO(rawfilename,outfilename,broadfile,snrtype,decfac) 
+C FILE: GPSSNR.F 
+      SUBROUTINE FOO(rawf,outf,broadf,snrtype,decfac,mess,errf) 
       implicit none
       character*80 rawfilename, outfilename, broadfile
       character*2 snrtype, decfac
-Cf2py intent(in) rawfilename
-Cf2py intent(in) outfilename
-Cf2py intent(in) broadfile
+      character*80 rawf,outf,broadf,mess,errf
+Cf2py intent(in) rawf
+Cf2py intent(in) outf
+Cf2py intent(in) broadf
 Cf2py intent(in) snrtype
 Cf2py intent(in) decfac
+Cf2py intent(inout) mess
+Cf2py intent(in) errf
 
       integer maxsat, maxeph, maxob
       parameter (maxsat = 50)
@@ -68,6 +71,18 @@ c    change dimension to place for ephemeris each hour
      .  nxclk(24,maxsat,3),nsclk(24,maxsat,3),
      .  nridot(24,maxsat), nistano(24,maxsat)
 
+c     was not sure about inputs - so use short names there
+c     print*, 'message', mess
+      broadfile = broadf
+      rawfilename = rawf
+      outfilename = outf
+c     open a file so you can write out status messages 
+      open(53,file=errf,status='unknown',iostat=ios)
+      write(53,*) 'Broadcast:',broadf
+      write(53,*) 'RINEX file:',rawf
+      write(53,*) 'Output file:',outf
+      write(53,*) 'Selection:',snrtype
+
 c     set some defaults - used for input and output file IDs
       READ (decfac, '(I2)') idec 
 c     print*, decfac, idec
@@ -91,10 +106,9 @@ c     figure out which option is being requested
 c     Check to see if broadcast file exists
       open(22,file=broadfile, status='old',iostat=ios)
       if (ios.ne.0) then
-        print*, 'Problem opening navigation file:',broadfile 
-        print*, 'Exiting'
+        mess = 'ERROR:Problem opening navigation file'
         close(22)
-        call exit(0)
+        return
       endif
       close(22)
 
@@ -102,7 +116,10 @@ c     Check to see if broadcast file exists
 c     read the header of the RINEX file, returning station coordinates
 c     19mar01 - change to 20 observables
       call read_header_20obs(fileIN,rawfilename, xrec,yrec,zrec, 
-     .  iobs,nobs,iymd,station)
+     .  iobs,nobs,iymd,station,mess)
+      write(53,*) 'Coords',xrec, yrec, zrec
+      write(53,*) mess
+
       call name2ydoy(rawfilename,rinex_year, rinex_doy)
 
       call name2ydoy(broadfile,nav_year, nav_doy)
@@ -113,17 +130,21 @@ c     write(stderr,*)'The day of year in your filename: ', rinex_doy
 
 c removed subroutine moving_sites bevacuse life is short
       if ((xrec+yrec+zrec) .eq.0) then
-        print*, 'No apriori coordinates - exiting'
-        call exit
+        mess='ERROR:No (useful) apriori coordinates - exiting'
+        write(53,*)mess
+        return
       endif
       if (iobs(6) .eq. 0) then
-        print*, 'no L1 SNR data - exiting '
-        call exit
+        mess='ERROR:no L1 SNR data - exiting'
+        write(53,*)mess
+        return
       endif
       if (nobs .gt. 20) then
-        print*, 'This code only works for <= 20 obs types'
-        call exit
+        mess = 'ERROR: code only works for <= 20 obs types'
+        write(53,*)mess
+        return
       endif
+      close(53)
 
 
 c     read the broadcast ephemeris information
@@ -369,7 +390,7 @@ c       19jan09 changed to allow up to 60 satellites
         if (numsat > 60) then
           print*, 'I cannot read more than 60 satellites'
           print*, 'Please stop launching them!'
-          call exit
+          return
         endif
 c       change to allow up to 20 observable types
         if (flag .le. 1) then
@@ -471,10 +492,11 @@ c do not need this many iterations - change to 3
        end
 
       subroutine read_header_20obs(fileID,rawf,xrec,yrec,zrec,
-     .  iobs,nobs,iymd,station)
+     .  iobs,nobs,iymd,station,mess)
 c     new version (19mar01) taken from my GNSS code
 c     kristine larson
 c     allows 20 observables
+c     allow error message to be returned to main program
       implicit none
 
       integer maxsat, maxeph, maxob
@@ -485,8 +507,8 @@ c     allows 20 observables
       parameter (c = 0.299792458D+09)       
 
       integer  i, fileID
-      character*80 rawf
-      character*80 line, dynfmt 
+      character*80 rawf, mess
+      character*80 line, dynfmt,errf
       logical  endofheader
       integer nobs,iobs(maxsat), iymd(3), ios
       character*2 key(maxsat)
@@ -495,14 +517,18 @@ c     allows 20 observables
 c     returns receiver coordinates
 c     station name is empty to start with
 c     returned to main code
+c     asssume station is at center of eaerth so as 
+c     to trigger error if it is not found in the file
+      xrec = 0
+      yrec = 0
+      zrec = 0
       station = '    '
       endofheader = .false.
 
       open(fileID,file=rawf, status='old',iostat=ios)
       if (ios.ne.0) then
-        print*, 'problem opening RINEX file'
-        print*, 'name:', rawf
-        call exit(0)
+        mess = 'ERROR:problem opening RINEX file'
+        return
       endif
       do while (.not.endofheader)
 c     KL 18mar05, fixed bug on nobs
@@ -511,8 +537,8 @@ c     KL 18mar05, fixed bug on nobs
           read(line, fmt='(I6)') nobs
 c         exit if more than 20 observables
           if (nobs.gt.20) then
-             print*,'this code only supports <=20 observ types'
-             call exit
+             mess ='ERROR:supports <=20 observ types'
+             return
           endif
 c   KL 19jan09 allowing more lines of OBS types
 c         first line has up to 9 OBS types
@@ -554,11 +580,9 @@ c           read the third line
 c         print*, 'NUMBER OF OBSERVABLES ', nobs
         else if (line(61:80).eq.'APPROX POSITION XYZ') then
           read(line, fmt= '(3f14.4)') xrec, yrec, zrec
-c          print*, 'XYZ coordinates ', xrec, yrec, zrec
           if (xrec.eq.0) then
-            print*, 'I cannot compute satellite elevation angles'
-            print*, 'without apriori receiver coordinates - exiting'
-            call exit
+            mess = 'ERROR:receiver coordinates required'
+            return
           endif
         else if (line(61:77).eq.'TIME OF FIRST OBS') then
           read(line, fmt= '(3i6)') iymd(1), iymd(2), iymd(3)
@@ -884,7 +908,7 @@ c
       real*8 c
       parameter (c = 0.299792458D+09)      
 
-      character*80 filename, temp
+      character*80 filename, temp,mess
       real*8 bele (maxeph,maxsat,28), rt1, rt2, rt3, rt4
       integer i, j, k, k1, iymd(3),year4ch,
      .  iprn, file(maxsat), it1, it2, it3, it4, it5, iversion, ios
@@ -898,9 +922,8 @@ c
       open (44, file = filename, status='old',iostat=ios ) 
       if (ios.eq.0) then
       else
-        print*, 'problems with this ', filename
-        print*, 'perhaps it does not exist'
-        call exit
+        mess= 'ERROR:problems with navfile'
+        return
       endif 
       read(44, '(i6)') iversion 
       if (iversion.eq.2.or.iversion.eq.1) then
@@ -911,8 +934,8 @@ c
           goto 102
         endif
       else
-        print*, 'can only read version 1 or 2'
-        call exit(1)
+        mess= 'ERROR can only read version 1 or 2'
+        return
       endif
 12    read( 44, '(i2, 5i3, f5.1, 3d19.12)',err=14,iostat=ios) iprn, it1,
      .  it2, it3, it4, it5, rt1, rt2, rt3, rt4
@@ -1032,97 +1055,6 @@ c     want ephemeris closest to ihr
       enddo  
       end
 
-      subroutine read_header(fileID,rawf,xrec,yrec,zrec,iobs,nobs, 
-     .  iymd,station)
-      implicit none
-c     Author: kristine larson
-c     reads header of a RINEX file
-c     KL added marker name, 18jan15, returns to main program
-c     16jul15 added S5
-c     note: marker name might be uppercase and filename uses lowercase
-c     if you use moving site coordinates, make sure they are consistent
-c     18feb22 added L5
-
-      integer maxsat, maxeph, maxob
-      parameter (maxsat = 50)
-      parameter (maxeph = 50)
-      parameter (maxob = 20)
-      real*8 c
-      parameter (c = 0.299792458D+09)     
-
-      integer  i, fileID
-      character*80 rawf
-      character*80 line, dynfmt
-      logical  endofheader 
-      integer nobs,iobs(maxsat), iymd(3)
-      character*2  key(maxsat)
-      real*8 xrec, yrec, zrec
-      character*4 station
-c     default value is empty
-      station = '    '
-      endofheader = .false.
-
-      open(fileID,file=rawf, status='old')
-      do while (.not.endofheader)
-        read (fileID,'(a80)') line
-c       print*, line
-        if (line(61:80).eq.'# / TYPES OF OBSERV') then
-          read(line, fmt='(I6)') nobs
-          if (nobs .lt. 10) then
-            write(dynfmt, fmt='(A, I3.3, A)')
-     +                      "(6X,", nobs, "(4X,A2))"
-            read(line, fmt=dynfmt) (key(i), i=1,nobs)
-          else
-            write(dynfmt, fmt='(A, I3.3, A)')
-     +                      "(6X,", 9, "(4X,A2))"
-            read(line, fmt=dynfmt) (key(i), i=1,9)
-c           read the next line
-            read (fileID,'(a80)') line
-            write(dynfmt, fmt='(A, I3.3, A)')
-     +                      "(6X,", nobs-9, "(4X,A2))"
-            read(line, fmt=dynfmt) (key(i), i=10,nobs)
-          endif
-          print*, 'NUMBER OF OBSERVABLES ', nobs
-        else if (line(61:80).eq.'APPROX POSITION XYZ') then
-          read(line, fmt= '(3f14.4)') xrec, yrec, zrec
-           print*, 'XYZ coordinates ', xrec, yrec, zrec
-          if (xrec.eq.0) then
-            print*, 'I cannot compute satellite elevation angles'
-            print*, 'without apriori receiver coordinates - exiting'
-            call exit
-          endif
-c       added station name
-        else if (line(61:71).eq.'MARKER NAME') then
-          read(line(1:4), fmt= '(a4)')  station
-          print*, 'Station name ', station
-        else if (line(61:77).eq.'TIME OF FIRST OBS') then
-          read(line, fmt= '(3i6)') iymd(1), iymd(2), iymd(3)
-c         print*, iymd
-        endif
-        if (line(61:73).eq.'END OF HEADER'.or.
-     +       line(61:73).eq.'end of header'.or.
-     +       line(61:73).eq.' ') endofheader = .true.
-      enddo
-      print*, 'FOUND END OF HEADER'
-      do i = 1,maxsat
-          iobs(i) = 0
-      enddo
-c     18feb22 added L5
-      do i = 1, nobs
-          if (key(i).eq.'l1' .or. key(i).eq.'L1') iobs(1) = i
-          if (key(i).eq.'l2' .or. key(i).eq.'L2') iobs(2) = i
-          if (key(i).eq.'c1' .or. key(i).eq.'C1') iobs(3) = i
-          if (key(i).eq.'p1' .or. key(i).eq.'P1') iobs(4) = i
-          if (key(i).eq.'p2' .or. key(i).eq.'P2') iobs(5) = i
-          if (key(i).eq.'s1' .or. key(i).eq.'S1') iobs(6) = i
-          if (key(i).eq.'s2' .or. key(i).eq.'S2') iobs(7) = i
-          if (key(i).eq.'s5' .or. key(i).eq.'S5') then
-            iobs(8) = i
-            print*, 'found S5 in this file'
-          endif
-          if (key(i).eq.'l5' .or. key(i).eq.'L5') iobs(9) = i
-      enddo
-      end
 
 
       subroutine envTrans(xrec,yrec,zrec,stationXYZ, Lat,Long, 

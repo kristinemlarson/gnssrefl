@@ -238,6 +238,7 @@ in my code.** *rinex2snr* currently only looks for RINEX 3 files at CDDIS (30 se
 are more archive options in **download_rinex** and someday I will merge these. If you do have your own RINEX 3
 files, I use the community standard, that is upper case except for the extension (which is rnx).  I know, it is weird.
 
+
 Here are some examples for RINEX 3 conversions:
 
 *rinex2snr onsa00swe 2020 298*
@@ -485,7 +486,7 @@ The L2C and L5 GPS satellite lists are not time coded as they should be. I curre
 
 ### Utilities <a name="helper"></a>
 
-**daily averages** is a utility for cryosphere people interested in computing daily snow 
+**daily_avg** is a utility for cryosphere people interested in computing daily snow 
 accumulation. It can be used for lake levels. *It is not to be used for tides!*
 
 **download_rinex** can be useful if you want to download RINEX v2 or 3 files (using the version flag) without using 
@@ -507,6 +508,8 @@ the reflection-specific codes. Sample calls:
 
 **xyz2llh** translates Cartesian coordinates to latitude, longitude, height
 
+**gpsweek** translates year, month, day into GPS week, day of week (0-6) 
+
 **download_tides** downloads up to a month of NOAA tide gauge data given station number (7 characters),
 and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,
 but this utility writes out a file with only numbers (which I always prefer) instead of 
@@ -516,9 +519,8 @@ csv. And I did not need to learn how to use pandas.
 
 There are A LOT of publications about GPS and GNSS interferometric reflectometry.
 If you want something with a how-to flavor, try this paper, 
-which is [open option](https://link.springer.com/article/10.1007/s10291-018-0744-8)
-
-Also look to the publications page on my [personal website](https://kristinelarson.net/publications)
+which is [open option](https://link.springer.com/article/10.1007/s10291-018-0744-8). Also 
+look to the publications page on my [personal website](https://kristinelarson.net/publications).
 
 
 ### Acknowledgements <a name="acknowledgements"></a>

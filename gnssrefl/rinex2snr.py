@@ -33,7 +33,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
     return fname
 
-def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator):
+def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate):
     """
     runs the rinex 2 snr conversion
     inputs:
@@ -50,9 +50,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     overwrite = boolean, make a new SNR file even if one already exists
 
     2021feb11, kristine Larson
-    ultimately we will get rid of the fortran option, but we are keeping it for backwards compatibility
-    translator has three possibilies: fortran, python, or hybrid. the hybrid option requires 
-    you to have compiled the fortran code using numpy.f2py
+    translator = fortran, python, or hybrid
+    srate - integer sample rate, for RINEX 3 only.
     """
 
     NS = len(station)
@@ -100,8 +99,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
-                        r3 = station9ch + '_R_' + str(year) + cdoy + '0000_01D_30S_MO.rnx'
-                        r3gz = station9ch + '_R_' + str(year) + cdoy + '0000_01D_30S_MO.rnx.gz'
+##                        print(' 2021feb22 using sample rate explicitly')
+                        # this is going to fail when srate < 10
+                        r3 = station9ch + '_R_' + str(year) + cdoy + '0000_01D_' + str(srate) + 'S_MO.rnx'
+                        r3gz = station9ch + '_R_' + str(year) + cdoy + '0000_01D_' + str(srate) + 'S_MO.rnx.gz'
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         if os.path.exists(r3gz):
                             subprocess.call(['gunzip', r3gz])
@@ -120,7 +121,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                     #print('will look for the RINEX file both locally and externally')
                     if version == 3:
                         #print('rinex 3 search with orbtype ', orbtype)
-                        srate = 30 # rate supported by CDDIS 
+                        #srate = 30 # rate supported by CDDIS 
+                        # this is now sent
                         rinex2exists, rinex3name = g.cddis_rinex3(station9ch, year, doy,srate,orbtype)
                         if not rinex2exists:
                         # try again - unavco has 15 sec I believe
@@ -212,8 +214,16 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                     else:
                         decr = '0'
                     in5 = g.binary(decr) # decimation can be used in hybrid option
+                    message = 'None '
+                    in6 = g.binary(message)
+                    errorlog = 'logs/' + station + '_hybrid_error.txt'
+                    in7 = g.binary(errorlog)
                     log.write('SNR file {0:50s} \n will use hybrid of python and fortran to make \n'.format( snrname))
-                    gpssnr.foo(in1,in2,in3,in4,in5)
+                    gpssnr.foo(in1,in2,in3,in4,in5,in6,in7)
+                    b=in6.astype(str)
+                    # i gave up on this
+#                   print('output from gpssnr fortran in ',b)
+
                 else:
                     if (translator == 'fortran'):
                         t1=time.time()
