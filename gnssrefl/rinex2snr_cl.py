@@ -175,6 +175,7 @@ def main():
         srate = args.srate
 
 
+    print(archive)
     rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate)
     print('Feedback written to subdirectory logs')
 

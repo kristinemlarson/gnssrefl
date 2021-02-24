@@ -4198,8 +4198,8 @@ def rinex3_rinex2(gzfilename,v2_filename):
     l=len(gzfilename)
     cnxfilename = gzfilename[0:l-3]
     rnxfilename = gzfilename[0:l-6] + 'rnx'
-    print(cnxfilename)
-    print(rnxfilename)
+    #print(cnxfilename)
+    #print(rnxfilename)
     if os.path.isfile(gzfilename):
         # unzip and Hatanaka decompress
         subprocess.call(['gunzip',gzfilename])
@@ -4208,7 +4208,6 @@ def rinex3_rinex2(gzfilename,v2_filename):
         print('making rinex 2.11 of this file')
         try:
             subprocess.call([gexe,'-finp', rnxfilename, '-fout', v2_filename, '-vo','2','-ot', gobblygook, '-f'])
-            print('woohoo!')
             print('look for the rinex 2.11 file here: ', v2_filename)
             fexists = True
         except:
@@ -4320,13 +4319,11 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
     author: kristine larson
     """
     fexists = False 
-    print(orbtype)
     cdoy = '{:03d}'.format(doy)
     cyy = '{:02d}'.format(year-2000)
     csrate = '{:02d}'.format(srate)
     cyyyy = str(year)
     ftp = 'ftp://data-out.unavco.org/pub/rinex3/obs/' 
-    #ftp = 'ftp://cddis.nasa.gov/gnss/data/daily/'
 
     f = cyyyy + '/' + cdoy + '/' 
     ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO'
@@ -4337,19 +4334,18 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
     filename = ff+ending  # the crx file
     rfilename = ff+rending # the rnx file
     url = ftp + f + gzfilename  
-    print(url)
+#    print(url)
     # not sure i still neeed this
     exedir = os.environ['EXE']
     gexe = gfz_version()
     crnxpath = hatanaka_version()
-    if orbtype == 'nav':
-        # added this bevcause weird Glonass data were making teqc unhappy
+    if (orbtype == 'nav') or (orbtype == 'gps'):
+        # added this because weird Glonass data were making teqc unhappy
         gobblygook = 'G:S1C,S2X,S2L,S2S,S5'
     else:
     # I hate S2W  - so it is not written out
     # added Beidou 9/20/2020
         gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I'
-    print(gobblygook)
     if os.path.isfile(rfilename):
         print('rinex3 file already exists')
     else:
@@ -4361,7 +4357,7 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
             # remove the crx file
             subprocess.call(['rm',filename])
         except:
-            print('no file at unavco')
+            print('no RINEX 3 file at unavco')
 
     # use new function
     if os.path.isfile(rfilename) and os.path.isfile(gexe):

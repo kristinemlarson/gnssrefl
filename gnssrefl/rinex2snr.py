@@ -121,15 +121,20 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 else:
                     #print('will look for the RINEX file both locally and externally')
                     if version == 3:
-                        #print('rinex 3 search with orbtype ', orbtype)
-                        #srate = 30 # rate supported by CDDIS 
-                        # this is now sent
-                        rinex2exists, rinex3name = g.cddis_rinex3(station9ch, year, doy,srate,orbtype)
-                        if not rinex2exists:
-                        # try again - unavco has 15 sec I believe
+                        #  try unavco
+                        if (archive == 'all') or (archive == 'unavco'):
                             srate = 15
                             rinex2exists, rinex3name = g.unavco_rinex3(station9ch, year, doy,srate,orbtype)
+
+                        # try cddis
+                        if not os.path.exists(r):
+                            if (archive == 'all') or (archive == 'cddis'):
+                                srate = 30
+                                rinex2exists, rinex3name = g.cddis_rinex3(station9ch, year, doy,srate,orbtype)
+
+                        # remove rinex 3 file
                         subprocess.call(['rm', '-f', rinex3name]) # remove rinex3 file
+
                         if rinex2exists:
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
                         else:
