@@ -16,10 +16,11 @@
 
 ### News <a name="news"></a>
 
+February 24, 2021
+
 We now have three translation options for RINEX files: fortran, hybrid, and python. The last of these
-is ok for 30 sec data but really too slow otherwise. Hybrid binds the python to fortran.
-So far this is for GPS only RINEX files.  If you need fast multi-GNSS solutions, I still
-recommend you install the fortran code (gnssSNR).
+is ok for 30 sec data but really too slow otherwise. Hybrid binds the python to my (fast) fortran code.
+This has now been implemented for both GPS and multi-GNSS.
 
 [We have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
@@ -66,7 +67,8 @@ photographs. If you can't find photographs, use Google Earth.
 **gnssrefl** is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
 The main difference bewteen this version and previous versions is that I am
-attempting to use proper python packaging rules!. I have separated out the main
+attempting to use proper python packaging rules! However, this is a big learning curve for me,
+and I know that I still have a lot to learn. I have separated out the main
 parts of the code and the command line inputs so that you can use the libraries
 yourself or do it all from the command line. This should also - hopefully - make
 it easier for the production of Jupyter notebooks. The latter are to be developed
@@ -99,7 +101,8 @@ with the details associated with **gnssir**. It is not meant to be used for rout
 
 There are also various utilities you might find to be useful (see the last section).
 
-*This document is not a class about GNSS interferometric reflectometry.* 
+*This user manual is not a class about GNSS interferometric reflectometry.* 
+
 If you are unsure about why various 
 restrictions are being applied, you really need
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
@@ -513,7 +516,7 @@ the reflection-specific codes. Sample calls:
 **download_tides** downloads up to a month of NOAA tide gauge data given station number (7 characters),
 and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,
 but this utility writes out a file with only numbers (which I always prefer) instead of 
-csv. And I did not need to learn how to use pandas.
+csv. 
 
 ### Publications <a name="publications"></a>
 
@@ -532,4 +535,4 @@ refraction correction.
 
 Kristine M. Larson
 
-This documentation was updated on February 17, 2021.
+This documentation was updated on February 24, 2021.

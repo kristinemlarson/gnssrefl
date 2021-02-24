@@ -17,8 +17,9 @@ from progress.bar import Bar
 import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
 
-# fortran code for translating RINEX
+# fortran codes for translating RINEX
 import gnssrefl.gpssnr as gpssnr
+import gnssrefl.gnsssnr as gnsssnr 
 
 
 class constants:
@@ -215,15 +216,14 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         decr = '0'
                     in5 = g.binary(decr) # decimation can be used in hybrid option
                     message = 'None '
-                    in6 = g.binary(message)
                     errorlog = 'logs/' + station + '_hybrid_error.txt'
-                    in7 = g.binary(errorlog)
+                    in6 = g.binary(errorlog)
                     log.write('SNR file {0:50s} \n will use hybrid of python and fortran to make \n'.format( snrname))
-                    gpssnr.foo(in1,in2,in3,in4,in5,in6,in7)
-                    b=in6.astype(str)
-                    # i gave up on this
-#                   print('output from gpssnr fortran in ',b)
-
+                    # these are calls to the fortran codes that have been ported to be called from python
+                    if (orbtype  == 'gps') or (orbtype == 'nav'):
+                        gpssnr.foo(in1,in2,in3,in4,in5,in6)
+                    else:
+                        gnsssnr.foo(in1,in2,in3,in4,in5,in6)
                 else:
                     if (translator == 'fortran'):
                         t1=time.time()
@@ -264,7 +264,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         print('SUCCESS: SNR file was created:', snrname_full)
                         g.store_snrfile(snrname,year,station) 
                 else:
-                    print('No SNR file was created')
+                    print('No SNR file was created - check logs section for additional information')
             else:
                 print('Either the RINEX file or orbit file does not exist, so there is nothing to convert')
                 log.write('Either the RINEX file or orbit file does not exist, so there is nothing to convert \n')

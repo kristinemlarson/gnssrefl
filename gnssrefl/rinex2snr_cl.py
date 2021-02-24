@@ -168,17 +168,6 @@ def main():
         if translator == 'python':
             fortran = False # override - but this is sllllllooooowwww
 
-    if translator == 'hybrid':
-        snrexe = g.gnssSNR_version()
-        if (orb == 'jax') or (orb == 'gbm'):
-            print('The hybrid option does not currently work on multi-GNSS files')
-            if not os.path.isfile(snrexe):
-                print('setting to python in the interim')
-                translator = 'python'
-            else:
-                print('setting to fortran in the interim')
-                translator = 'fortran'
-
     # this is for RINEX 3 only - default will be 30
     if args.srate == None:
         srate = 30
@@ -192,3 +181,19 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+#    if translator == 'hybrid':
+#        snrexe = g.gnssSNR_version()
+#        if (orb == 'jax') or (orb == 'gbm') or (orb=='igr'):
+#            print('The hybrid option does not currently work on multi-GNSS files')
+#            print('I am currently testing this option')
+#           if not os.path.isfile(snrexe):
+#                print('setting to python in the interim')
+                #translator = 'python'
+    #        else:
+    #            print('setting to fortran in the interim')
+    #            translator = 'fortran'
+

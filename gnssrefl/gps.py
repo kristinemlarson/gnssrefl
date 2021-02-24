@@ -3968,20 +3968,20 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
     if not os.path.exists(gexe):
         print('gfzrnx executable does not exist and this file cannot be translated')
     else:
-        print('gfzrnx executable does exist')
+#        print('gfzrnx executable does exist')
         if os.path.isfile(r3_filename):
             try:
                 subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f'])
                 if os.path.exists(r2_filename):
-                    print('look for the rinex 2.11 file here: ', r2_filename)
+                    #print('look for the rinex 2.11 file here: ', r2_filename)
                     fexists = True
                 else:
-                    print('rinex 2 was not created')
-
-                print('remove rinex 3 file')
+                    sigh = 0
+#                print('rinex 2 was not created')
+#                print('remove rinex 3 file')
                 subprocess.call(['rm', '-f', r3_filename ])
             except:
-                print('some kind of problem in translation from 3 to 2.11')
+                print('some kind of problem in translation from RINEX 3 to RINEX 2.11')
     return fexists
 
 def cddis_rinex3(station9ch, year, doy,srate,orbtype):

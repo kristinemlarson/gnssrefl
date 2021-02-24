@@ -1,5 +1,5 @@
 C FILE: GPSSNR.F 
-      SUBROUTINE FOO(rawf,outf,broadf,snrtype,decfac,mess,errf) 
+      SUBROUTINE FOO(rawf,outf,broadf,snrtype,decfac,errf) 
       implicit none
       character*80 rawfilename, outfilename, broadfile
       character*2 snrtype, decfac
@@ -9,7 +9,6 @@ Cf2py intent(in) outf
 Cf2py intent(in) broadf
 Cf2py intent(in) snrtype
 Cf2py intent(in) decfac
-Cf2py intent(inout) mess
 Cf2py intent(in) errf
 
       integer maxsat, maxeph, maxob
@@ -26,11 +25,10 @@ Cf2py intent(in) errf
       character*2  prn_pickc
       character*1 satID(maxsat)
       integer  nobs, itime(5), prn(maxsat), numsat, flag, sec,
-     +   msec, lli(maxob,maxsat), iprn, 
-     .   ios, itrack,  i, iobs(maxsat),
-     .  gpsweek, the_hour, prn_pick, current_hour,npts,
-     .  fileIN, fileOUT,iymd(3),
-     .  rinex_year, rinex_doy,nav_doy, nav_year, idec,itod
+     +   msec, lli(maxob,maxsat), iprn, ios, itrack,  i, 
+     .   iobs(maxsat), gpsweek, the_hour, prn_pick, current_hour,npts,
+     .  fileIN, fileOUT,iymd(3),errid, rinex_year, rinex_doy, 
+     .  nav_doy, nav_year, idec,itod
       real*8  obs(maxob,maxsat),  tod,North(3), East(3), 
      .   Up(3), azimuth, elev, staXYZ(3), tod_save, 
      .   s1,s2,xrec, yrec, zrec, tc, Lat,Long,Ht,
@@ -72,27 +70,29 @@ c    change dimension to place for ephemeris each hour
      .  nridot(24,maxsat), nistano(24,maxsat)
 
 c     was not sure about inputs - so use short names there
-c     print*, 'message', mess
+      mess = 'message'
+      errid = 53
+      fileIN = 12
+      fileOUT = 55
+
       broadfile = broadf
       rawfilename = rawf
       outfilename = outf
 c     open a file so you can write out status messages 
-      open(53,file=errf,status='unknown',iostat=ios)
-      write(53,*) 'Broadcast:',broadf
-      write(53,*) 'RINEX file:',rawf
-      write(53,*) 'Output file:',outf
-      write(53,*) 'Selection:',snrtype
+      open(errid,file=errf,status='unknown',iostat=ios)
+      write(errid,*) 'Broadcast:',broadf
+      write(errid,*) 'RINEX file:',rawf
+      write(errid,*) 'Output file:',outf
+      write(errid,*) 'Selection:',snrtype
 
 c     set some defaults - used for input and output file IDs
       READ (decfac, '(I2)') idec 
-c     print*, decfac, idec
+      write(errid,*) 'Decimation',decfac, idec
       decimate = .true.
       if (idec .eq. 0) then
           decimate = .false.
       endif
       debugging = .false.
-      fileIN = 12
-      fileOUT = 55
       tod_save = 0.0
       npts = 0
       bad_point = .false.
@@ -106,7 +106,7 @@ c     figure out which option is being requested
 c     Check to see if broadcast file exists
       open(22,file=broadfile, status='old',iostat=ios)
       if (ios.ne.0) then
-        mess = 'ERROR:Problem opening navigation file'
+        write(errid,*)'ERROR:Problem opening navigation file'
         close(22)
         return
       endif
@@ -116,9 +116,9 @@ c     Check to see if broadcast file exists
 c     read the header of the RINEX file, returning station coordinates
 c     19mar01 - change to 20 observables
       call read_header_20obs(fileIN,rawfilename, xrec,yrec,zrec, 
-     .  iobs,nobs,iymd,station,mess)
-      write(53,*) 'Coords',xrec, yrec, zrec
-      write(53,*) mess
+     .  iobs,nobs,iymd,station,errid)
+      write(errid,*) 'Coords',xrec, yrec, zrec
+      write(errid,*) mess
 
       call name2ydoy(rawfilename,rinex_year, rinex_doy)
 
@@ -131,17 +131,17 @@ c     write(stderr,*)'The day of year in your filename: ', rinex_doy
 c removed subroutine moving_sites bevacuse life is short
       if ((xrec+yrec+zrec) .eq.0) then
         mess='ERROR:No (useful) apriori coordinates - exiting'
-        write(53,*)mess
+        write(errid,*)mess
         return
       endif
       if (iobs(6) .eq. 0) then
         mess='ERROR:no L1 SNR data - exiting'
-        write(53,*)mess
+        write(errid,*)mess
         return
       endif
       if (nobs .gt. 20) then
         mess = 'ERROR: code only works for <= 20 obs types'
-        write(53,*)mess
+        write(errid,*)mess
         return
       endif
       close(53)
@@ -492,7 +492,7 @@ c do not need this many iterations - change to 3
        end
 
       subroutine read_header_20obs(fileID,rawf,xrec,yrec,zrec,
-     .  iobs,nobs,iymd,station,mess)
+     .  iobs,nobs,iymd,station,fid)
 c     new version (19mar01) taken from my GNSS code
 c     kristine larson
 c     allows 20 observables
@@ -506,7 +506,7 @@ c     allow error message to be returned to main program
       real*8 c
       parameter (c = 0.299792458D+09)       
 
-      integer  i, fileID
+      integer  i, fileID,fid
       character*80 rawf, mess
       character*80 line, dynfmt,errf
       logical  endofheader
@@ -528,6 +528,7 @@ c     to trigger error if it is not found in the file
       open(fileID,file=rawf, status='old',iostat=ios)
       if (ios.ne.0) then
         mess = 'ERROR:problem opening RINEX file'
+        write(fid,*)mess
         return
       endif
       do while (.not.endofheader)
@@ -538,6 +539,7 @@ c     KL 18mar05, fixed bug on nobs
 c         exit if more than 20 observables
           if (nobs.gt.20) then
              mess ='ERROR:supports <=20 observ types'
+             write(fid,*) mess
              return
           endif
 c   KL 19jan09 allowing more lines of OBS types
@@ -577,16 +579,17 @@ c           read the third line
             read(line, fmt=dynfmt) (key(i), i=19,nobs)
 
           endif
-c         print*, 'NUMBER OF OBSERVABLES ', nobs
+          write(fid,*)'NUMBER OF OBSERVABLES ', nobs
         else if (line(61:80).eq.'APPROX POSITION XYZ') then
           read(line, fmt= '(3f14.4)') xrec, yrec, zrec
           if (xrec.eq.0) then
             mess = 'ERROR:receiver coordinates required'
+            write(fid,*)mess
             return
           endif
         else if (line(61:77).eq.'TIME OF FIRST OBS') then
           read(line, fmt= '(3i6)') iymd(1), iymd(2), iymd(3)
-c         print*, 'Time of first Obs: ', iymd
+          write(fid,*) 'Time of first Obs: ', iymd
         else if (line(61:71).eq.'MARKER NAME') then
           read(line(1:4), fmt= '(a4)')  station
 c         print*, 'Station name ', station
@@ -595,7 +598,7 @@ c         print*, 'Station name ', station
      +       line(61:73).eq.'end of header'.or.
      +       line(61:73).eq.' ') endofheader = .true.
       enddo
-c     print*, 'FOUND END OF HEADER'
+      write(fid,*)'FOUND END OF HEADER'
       do i = 1,maxsat
           iobs(i) = 0
       enddo
