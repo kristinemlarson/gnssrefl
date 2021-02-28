@@ -17,6 +17,118 @@ import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
 
+def output_names(txtdir, txtfile,csvfile,jsonfile):
+    """
+    send the command line values and decide
+    which file is selected and its name
+    """
+    writetxt = True
+    if txtfile == None:
+        writetxt = False
+    writecsv = True
+    if csvfile == None:
+        writecsv = False
+    writejson = True
+
+    if jsonfile == None:
+        writejson = False
+
+    if writejson:
+        outfile = txtdir + '/' + jsonfile
+    if writecsv:
+        outfile = txtdir + '/' + csvfile
+    if writetxt:
+        outfile = txtdir + '/' + txtfile
+    if (writecsv) and (writetxt) :
+        print('You cannot simultaneously write out a csvfile and a txtfile')
+        print('Default to writing only a txtfile')
+        writecsv = False
+
+    print('outputfile ', outfile)
+    return writetxt,writecsv,writejson,outfile
+
+def write_subdaily(outfile,station,ntv,N,writecsv,writetxt):
+    """
+    input: output filename
+    nvt is the variable with the LSP results
+    writecsv and writetxt are booleans to tell you whether you 
+    want csv or plain txt (with spaces between colunmns)
+    N is how many rows in your nvt variable
+    """
+    if True:
+        print('Results are being written to : ', outfile)
+        fout = open(outfile, 'w+')
+        write_out_header(fout,station)
+        for i in np.arange(0,N,1):
+            year = int(ntv[i,0]); doy = int(ntv[i,1])
+            year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
+            rh = ntv[i,2]; UTCtime = ntv[i,4]; mjd = ntv[i,15]
+            ctime = g.nicerTime(UTCtime); ctime2 = ctime[0:2] + ' ' + ctime[3:5]
+            if writecsv:
+                fout.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:7.3f},{5:8.2f},{6:7.2f},{7:5.2f},   {8:3.0f},{9:8.5f}, {10:2.0f}, {11:2.0f},{12:2s},{13:2s},{14:15.6f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,13],ntv[i,10],ntv[i,12],month,day,ctime[0:2],ctime[3:5] ,mjd ))
+            else:
+                fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:7.3f} {5:8.2f} {6:7.2f} {7:5.2f}    {8:3.0f} {9:8.5f}  {10:2.0f}  {11:2.0f} {12:5s} {13:15.6f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,13],ntv[i,10],ntv[i,12],month,day,ctime2,mjd ))
+        fout.close()
+
+
+def readin_and_plot(xdir, station, year,d1,d2,plt2screen):
+    """
+    xdir - main analysis directory (REFL_CODE)
+    station - name
+    year - the usual
+    d1 and d2 are days of year if you want to look at a smaller dataset
+    """
+    print('read in the data and plot it',d1,d2)
+
+    txtdir = xdir + '/Files'
+    if not os.path.exists(txtdir):
+        os.makedirs(txtdir)
+
+    direc = xdir + '/' + str(year) + '/results/' + station  + '/'
+    tv = np.empty(shape=[0, 17])
+    if os.path.isdir(direc):
+        all_files = os.listdir(direc)
+        print('Number of files in ', year, len(all_files))
+        for f in all_files:
+            fname = direc + f
+            a = np.loadtxt(fname,comments='%')
+            tv = np.append(tv, a,axis=0)
+            #print(len(tv))
+
+    print(tv.shape)
+    t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
+    rh = tv[:,2]
+
+    # sort the data
+    ii = np.argsort(t)
+    t = t[ii] ; rh = rh[ii]
+    # store it all in a new variable
+    tv = tv[ii,:]
+    # and restrict by doy
+    ii = (tv[:,1] >= d1) & (tv[:,1] <= d2)
+    tv = tv[ii,:]
+
+    #
+    if plt2screen:
+        Plt.figure()
+        Plt.plot( tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25, tv[:,2], '.')
+        Plt.ylabel('Reflector Height (m)')
+        Plt.title('GNSS station: ' + station)
+        Plt.gca().invert_yaxis()
+        Plt.grid()
+        Plt.show()
+    # default is to show the plot
+    #if plt:
+        #Plt.show()
+    # always make a png file
+#    plotname = txtdir + '/' + station + '_subdaily_RH.png'
+#    Plt.savefig(plotname)
+#    print('png file saved as: ', plotname)
+
+    
+    return tv
+
+
 def quickTr(year, doy,frachours):
     """
     inputs from the lomb scargle code (year, doy) and UTC hour (fractional)
@@ -158,88 +270,34 @@ def main():
 #   these are required
     station = args.station
 
-#   these are optional
+    txtdir = xdir + '/Files'
+    if not os.path.exists(txtdir):
+        subprocess.call(['mkdir',txdir])
+ 
+#   these are optional output options
     txtfile = args.txtfile
     csvfile = args.csvfile
     jsonfile = args.jsonfile
-
-
-    writetxt = True  
-    if txtfile == 'None':
-        writetxt = False
-    writecsv = True  
-    if csvfile == 'None':
-        writecsv = False
-    writejson = True
-    if jsonfile == 'None':
-        writejson = False
+    writetxt,writecsv,writejson,outfile = output_names(txtdir, txtfile,csvfile,jsonfile)
 
     if args.year == 'None':
         year = 2020
     else:
         year=int(args.year)
 
+    plt = True
     if args.plt == 'False':
         plt= False
-    else:
-        plt = True
 
-# where the summary files will be written to
-    txtdir = xdir + '/Files' 
-
-    if not os.path.exists(txtdir):
-        os.makedirs(txtdir)
-
-    direc = xdir + '/' + str(year) + '/results/' + station  + '/'
-    tv = np.empty(shape=[0, 17])
-    if os.path.isdir(direc):
-        all_files = os.listdir(direc)
-        print('Number of files in ', year, len(all_files))
-        for f in all_files:
-            fname = direc + f
-            a = np.loadtxt(fname,comments='%')
-            tv = np.append(tv, a,axis=0)
-            print(len(tv))
-
-    print(tv.shape)
-    t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
-    rh = tv[:,2]
-
-    # sort the data
-    ii = np.argsort(t)
-    t = t[ii] ; rh = rh[ii]
-    # store it all in a new variable
-    ntv = tv[ii,:]
-    #
-    Plt.figure()
-    Plt.plot(t, rh,'.')
-    Plt.ylabel('Reflector Height (m)')
-    Plt.title('GNSS station: ' + station)
-    Plt.gca().invert_yaxis()
-    Plt.grid()
-    # default is to show the plot
-    #if plt:
-        #Plt.show()
-    # always make a png file
-    plotname = txtdir + '/' + station + '_subdaily_RH.png'
-    Plt.savefig(plotname)
-    print('png file saved as: ', plotname)
-
-    splines_for_dummies(t,rh,plt)
-
-    # apply time tags to a new variable
+    # read in the data and make a plot
+    ntv = readin_and_plot(xdir, station, year,1,366)
     N,M = np.shape(ntv)
-    if writejson:
-        outfile = txtdir + '/' + jsonfile
-    if writecsv:
-        outfile = txtdir + '/' + csvfile
-    if writetxt:
-        outfile = txtdir + '/' + txtfile
-    if (writecsv) and (writetxt) :
-        print('You cannot simultaneously write out a csvfile and a txtfile')
-        print('Default to writing only a txtfile')
-        writecsv = False
 
+    # use function instead of writing it here
+    write_subdaily(outfile,station,nvt,N,writecsv,writetxt)
+    # for now exit
+    sys.exit()
+    # this should also be in a function
     if (writejson):
         print('you picked the json output')
         o = {}
@@ -301,6 +359,7 @@ def main():
             json.dump(o,outf,indent=4)
         #close(outf)
 
+    sys.exit()
     if (writecsv) or (writetxt):
         print('Results are being written to : ', outfile)
         fout = open(outfile, 'w+')

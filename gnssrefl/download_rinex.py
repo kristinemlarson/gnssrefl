@@ -143,9 +143,9 @@ def main():
             version3(station,year,d,NS,archive)
         else: # RINEX VERSION 2
             g.go_get_rinex_flex(station,year,d,0,rate,archive)
-            rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
+            rinexfile,rinexfiled = g.rinex_name(station, year, d, 0)
             if os.path.isfile(rinexfile):
-                print('SUCCESS: ', rinexfile)
+                print('\n SUCCESS: ', rinexfile)
             else:
                 print(rinexfile, ' not found')
 

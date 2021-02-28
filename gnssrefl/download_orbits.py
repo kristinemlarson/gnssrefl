@@ -64,7 +64,7 @@ def main():
     if pCtr == 'nav':
         navname,navdir,foundit = g.getnavfile(year, month, day) 
         if foundit:
-            print('SUCCESS:', navdir+'/'+navname)
+            print('\n SUCCESS:', navdir+'/'+navname)
     else:
         if (pCtr == 'igs') or (pCtr == 'igr'):
             filename, fdir, foundit = g.getsp3file_flex(year,month,day,pCtr)

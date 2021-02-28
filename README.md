@@ -100,6 +100,9 @@ called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modu
 with the details associated with **gnssir**. It is not meant to be used for routine analysis.
 
 There are also various utilities you might find to be useful (see the last section).
+To see the names of these utilities:
+
+* pip list 
 
 *This user manual is not a class about GNSS interferometric reflectometry.* 
 
@@ -512,6 +515,8 @@ the reflection-specific codes. Sample calls:
 **xyz2llh** translates Cartesian coordinates to latitude, longitude, height
 
 **gpsweek** translates year, month, day into GPS week, day of week (0-6) 
+   
+**download_unr** downloads ENV time series for GPS sites from the Nevada Reno website (IGS14)
 
 **download_tides** downloads up to a month of NOAA tide gauge data given station number (7 characters),
 and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,

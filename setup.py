@@ -47,6 +47,8 @@ setup(
             'update_snr_files = gnssrefl.update_snr_files:main',
             'nmea2snr= gnssrefl.nmea2snr_cl:main',
             'installexe= gnssrefl.installexe_cl:main',
+            'download_unr = gnssrefl.download_unr:main',
+            'mp1mp2= gnssrefl.computemp1mp2:main',
             ], 
         },
     install_requires=requirements,

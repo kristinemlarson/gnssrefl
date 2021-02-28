@@ -550,7 +550,10 @@ def rinex_unavco(station, year, month, day):
     """
     exedir = os.environ['EXE']
     crnxpath = hatanaka_version()  # where hatanaka will be
-    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    if day == 0:
+        doy = month
+    else:
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
     unavco= 'ftp://data-out.unavco.org'
     filename1 = rinexfile + '.Z'
@@ -2762,7 +2765,13 @@ def rinex_name(station, year, month, day):
     given station (4 char), year, month, day, return rinexfile name
     and the hatanaka equivalent
     """
-    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    if day == 0:
+        doy = month
+        cyyyy = str(year)
+        cyy = str(year-2000)
+        cdoy = '{:03d}'.format(month)
+    else:
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
 
     fnameo = station + cdoy + '0.' + cyy + 'o'
     fnamed = station + cdoy + '0.' + cyy + 'd'
