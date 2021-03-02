@@ -50,7 +50,7 @@ def sfilename(station, year, doy):
 
 
 
-def readoutmp(rinexfile):
+def readoutmp(rinexfile,rcvtype):
     """
     """
     f=open(rinexfile,'r')
@@ -65,8 +65,9 @@ def readoutmp(rinexfile):
             mp1 = line[26:34].strip()
         if "Moving average MP2" in line:
             mp2 = line[26:34].strip()
-        if "NETRS" in line:
+        if  rcvtype in line:
             netrs = True
+#        if  "NETRS" in line:
     f.close()
 #    print(mp1,mp2,netrs)
     return mp1, mp2, netrs
@@ -84,6 +85,8 @@ def mpfile_unavco(station,year,doy):
     fdir = fdir + cyyyy + '/' + cdoy + '/'
     fname = station + cdoy + '0.' + cyy + 'S'
     url = fdir + fname
+    print(url)
+    print(fname)
 
     # local directory info
     ddir = os.environ['REFL_CODE'] + '/' + cyyyy + '/mp/' + station + '/'
@@ -199,9 +202,10 @@ def main():
     parser.add_argument("doy", help="day of year", type=int)
     parser.add_argument("-doy_end", default = None, help="day of year - to analyze multiple days", type=int)
     parser.add_argument("-year_end", default = None,  type=int)
-    parser.add_argument("-unavco", default = None, help="True or False", type=str)
-    parser.add_argument("-combine", default = None, help="True or False", type=str)
-    parser.add_argument("-winter", default = None, help="True to remove Nov-Apr", type=str)
+    parser.add_argument("-unavco", default = None, help="True picks up UNAVCO log", type=str)
+    parser.add_argument("-combine", default = None, help="True combines multiple years", type=str)
+    parser.add_argument("-winter", default = None, help="Removes winter points", type=str)
+    parser.add_argument("-rcvtype", default = None, help="Receiver type", type=str)
 
     args = parser.parse_args()
 
@@ -224,27 +228,35 @@ def main():
     if args.combine != None:
         tv = np.empty(shape=[0, 4])
         y1 = year; y2 = year + 1
+        if args.rcvtype == None:
+            rcvtype = 'NETRS'
+        else:
+            rcvtype = args.rcvtype
         if args.year_end != None:
             y2 = args.year_end + 1
-        vegout =  station + '_veg.txt'
-        print('file written to: ', vegout)
+
+        vegdir = os.environ['REFL_CODE'] + '/Files'
+        if not os.path.isdir(vegdir):
+            subprocess.call(['mkdir',vegdir])
+        vegdir = vegdir + '/veg'
+        if not os.path.isdir(vegdir):
+            subprocess.call(['mkdir',vegdir])
+
+        vegout =  vegdir + '/' + station + '_veg.txt'
+        if 
+        print('File will be written to: ', vegout)
+
         vegid = open(vegout,'w+')
+        # should add a header
 
         a = []; b=[]; m1=[]; m2=[]
         for y in range(y1,y2):
             for d in range(doy,doy_end):
                 sfile = sfilename(station, y, d)
                 if os.path.isfile(sfile):
-                    mp1, mp2,isnetrs= readoutmp(sfile)
-                    if isnetrs:
+                    mp1, mp2,reqested_receiver=readoutmp(sfile,rcvtype)
+                    if requested_receiver:
                         vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s} \n".format(y,d,mp1[0:6],mp2[0:6]))
-
-                    #newl = [y, d, float(mp1[0:6]), float(mp2[0:6])]
-                        #m1.append(float(mp1))
-                        #m2.append(float(mp2))
-                    #tv = np.append(tv, [newl], axis=0)
-                    #print("{0:4.0f} {1:3.0f} {2:s} {3:s} ".format(y,d,mp1[0:6],mp2[0:6]))
-
         vegid.close()
         tv = np.loadtxt(vegout)
         vegplt(station, tv,args.winter)
@@ -259,7 +271,7 @@ def main():
                 navfile, rinexfile,foutname,mpdir = get_files(station,year,d)
                 run_teqc(teqc,navfile,rinexfile,foutname,mpdir)
     else:
-        # picking up logs from unavco for multiple years
+        # picking up teqc logs from unavco for multiple years
         y1 = year; y2 = year + 1
         if args.year_end != None:
             y2 = args.year_end + 1
@@ -270,6 +282,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
 #        for y in range(y1,y2):
 #            for d in range(doy,doy_end):
 #                sfile = sfilename(station, y, d)
@@ -279,3 +294,8 @@ if __name__ == "__main__":
 #                    tv = np.append(tv, [newl], axis=0)
                     #print("{0:4.0f} {1:3.0f} {2:s} {3:s} ".format(y,d,mp1[0:6],mp2[0:6]))
                     #vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s} \n".format(y,d,mp1[0:6],mp2[0:6]))
+                    #newl = [y, d, float(mp1[0:6]), float(mp2[0:6])]
+                        #m1.append(float(mp1))
+                        #m2.append(float(mp2))
+                    #tv = np.append(tv, [newl], axis=0)
+                    #print("{0:4.0f} {1:3.0f} {2:s} {3:s} ".format(y,d,mp1[0:6],mp2[0:6]))

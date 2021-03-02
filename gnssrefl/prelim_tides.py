@@ -1,4 +1,4 @@
-# preliminary tide data. 
+# preliminary water analysis to apply RHdot correction
 import argparse
 import datetime
 import json
@@ -11,244 +11,12 @@ from datetime import date
 
 # my code
 import gnssrefl.gps as g
+import gnssrefl.tide_library as t
 
 
 import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
-
-def output_names(txtdir, txtfile,csvfile,jsonfile):
-    """
-    send the command line values and decide
-    which file is selected and its name
-    """
-    writetxt = True
-    if txtfile == None:
-        writetxt = False
-    writecsv = True
-    if csvfile == None:
-        writecsv = False
-    writejson = True
-
-    if jsonfile == None:
-        writejson = False
-
-    if writejson:
-        outfile = txtdir + '/' + jsonfile
-    if writecsv:
-        outfile = txtdir + '/' + csvfile
-    if writetxt:
-        outfile = txtdir + '/' + txtfile
-    if (writecsv) and (writetxt) :
-        print('You cannot simultaneously write out a csvfile and a txtfile')
-        print('Default to writing only a txtfile')
-        writecsv = False
-
-    print('outputfile ', outfile)
-    return writetxt,writecsv,writejson,outfile
-
-def write_subdaily(outfile,station,ntv,N,writecsv,writetxt):
-    """
-    input: output filename
-    nvt is the variable with the LSP results
-    writecsv and writetxt are booleans to tell you whether you 
-    want csv or plain txt (with spaces between colunmns)
-    N is how many rows in your nvt variable
-    """
-    if True:
-        print('Results are being written to : ', outfile)
-        fout = open(outfile, 'w+')
-        write_out_header(fout,station)
-        for i in np.arange(0,N,1):
-            year = int(ntv[i,0]); doy = int(ntv[i,1])
-            year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
-            rh = ntv[i,2]; UTCtime = ntv[i,4]; mjd = ntv[i,15]
-            ctime = g.nicerTime(UTCtime); ctime2 = ctime[0:2] + ' ' + ctime[3:5]
-            if writecsv:
-                fout.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:7.3f},{5:8.2f},{6:7.2f},{7:5.2f},   {8:3.0f},{9:8.5f}, {10:2.0f}, {11:2.0f},{12:2s},{13:2s},{14:15.6f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,13],ntv[i,10],ntv[i,12],month,day,ctime[0:2],ctime[3:5] ,mjd ))
-            else:
-                fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:7.3f} {5:8.2f} {6:7.2f} {7:5.2f}    {8:3.0f} {9:8.5f}  {10:2.0f}  {11:2.0f} {12:5s} {13:15.6f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,13],ntv[i,10],ntv[i,12],month,day,ctime2,mjd ))
-        fout.close()
-
-
-def readin_and_plot(xdir, station, year,d1,d2,plt2screen):
-    """
-    xdir - main analysis directory (REFL_CODE)
-    station - name
-    year - the usual
-    d1 and d2 are days of year if you want to look at a smaller dataset
-    """
-    print('read in the data and plot it',d1,d2)
-
-    txtdir = xdir + '/Files'
-    if not os.path.exists(txtdir):
-        os.makedirs(txtdir)
-
-    direc = xdir + '/' + str(year) + '/results/' + station  + '/'
-    tv = np.empty(shape=[0, 17])
-    if os.path.isdir(direc):
-        all_files = os.listdir(direc)
-        print('Number of files in ', year, len(all_files))
-        for f in all_files:
-            fname = direc + f
-            a = np.loadtxt(fname,comments='%')
-            tv = np.append(tv, a,axis=0)
-            #print(len(tv))
-
-    print(tv.shape)
-    t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
-    rh = tv[:,2]
-
-    # sort the data
-    ii = np.argsort(t)
-    t = t[ii] ; rh = rh[ii]
-    # store it all in a new variable
-    tv = tv[ii,:]
-    # and restrict by doy
-    ii = (tv[:,1] >= d1) & (tv[:,1] <= d2)
-    tv = tv[ii,:]
-
-    #
-    if plt2screen:
-        Plt.figure()
-        Plt.plot( tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25, tv[:,2], '.')
-        Plt.ylabel('Reflector Height (m)')
-        Plt.title('GNSS station: ' + station)
-        Plt.gca().invert_yaxis()
-        Plt.grid()
-        Plt.show()
-    # default is to show the plot
-    #if plt:
-        #Plt.show()
-    # always make a png file
-#    plotname = txtdir + '/' + station + '_subdaily_RH.png'
-#    Plt.savefig(plotname)
-#    print('png file saved as: ', plotname)
-
-    
-    return tv
-
-
-def quickTr(year, doy,frachours):
-    """
-    inputs from the lomb scargle code (year, doy) and UTC hour (fractional)
-    returns character string for json 
-    """
-    year = int(year); doy = int(doy); frachours = float(frachours)
-    # convert doy to get month and day
-    d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
-    month = int(d.month)
-    day = int(d.day)
-
-    hours = int(np.floor(frachours))
-    leftover = 60*(frachours - hours)
-    minutes = int(np.floor(leftover))
-    leftover_hours  = frachours - (hours + minutes/60)
-    seconds = int(leftover_hours*3600)
-    #print(frachours, hours,minutes,leftover_seconds)
-
-    jd = datetime.datetime(year,month, day,hours,minutes,seconds)
-    datestring = jd.strftime("%Y-%m-%d %H:%M:%S")
-
-
-    return datestring
-
-
-def fract_to_obstimes(spl_x):
-    N=len(spl_x)
-    obstimes = np.empty(shape=[0, 1])
-    year = np.floor(spl_x)
-    fdoy = 365.25*(spl_x - year)
-    doy = np.floor(fdoy)
-    fhours = 24*(fdoy - doy)
-    hours = np.floor(fhours)
-    leftover = 60*(fhours - hours)
-    minutes = np.floor(leftover)
-    for i in range(0,N):
-        y = int(year[i]); d = int(doy[i])
-        y, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(y,d)
-        h= int(hours[i])
-        m = int(minutes[i])
-        #print(y,month,day,h,m)
-        obstimes = np.append(obstimes, datetime.datetime(year=y, month=month, day=day, hour=h, minute=m, second=0 ))
-
-    return obstimes
-
-#
-def splines_for_dummies(x,y,plt):
-    """
-    inputs for now are fractional years (x) and RH (y)
-    """
-    ii = np.argsort(x).T
-    x = x[ii]
-    y = y[ii]
-    knots_per_day = 12
-    Ndays = 365.25*(x.max()-x.min())
-    numKnots = int(knots_per_day*(Ndays))
-    print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
-    x1 = x.min()+0.1/365.25
-    x2 = x.max()-0.1/365.25
-    knots =np.linspace(x1,x2,num=numKnots)
-    t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
-#   calculate water level hourly for now
-    N = int(Ndays*24 )
-    xx = np.linspace(x.min(), x.max(), N)
-    spline = interpolate.BSpline(t, c, k, extrapolate=False)
-    if plt:
-
-        Plt.figure()
-        Plt.plot(x, y, 'bo', label='Original points',markersize=3)
-# equal spacing
-        spl_x = xx; spl_y = spline(xx)
-        obstimes = fract_to_obstimes(spl_x)
-        Plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
-
-        Plt.figure()
-        resid = y-spline(x)
-        ii = np.absolute(resid) > 0.5; 
-        jj = np.absolute(resid) < 0.5; 
-        Plt.plot(x, resid, 'bo', x[ii], resid[ii],'ro', markersize=3)
-
-        # with residuals removed?
-        Plt.figure()
-        xx=x[jj]
-        yy= y[jj]
-        splx,sply = in_out(xx,yy)
-        Plt.plot(xx,yy, 'o', markersize=3)
-        Plt.plot(splx,sply,'r-')
-
-        Plt.figure()
-        Plt.plot(xx, yy-sply, 'ro', markersize=3)
-
-        Plt.show()
-
-    return True
-
-def in_out(x,y):
-    """
-    """
-    knots_per_day = 12
-    Ndays = 365.25*(x.max()-x.min())
-    numKnots = int(knots_per_day*(Ndays))
-    #print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
-    x1 = x.min()+0.1/365.25
-    x2 = x.max()-0.1/365.25
-    knots =np.linspace(x1,x2,num=numKnots)
-    t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
-#   calculate water level hourly for now
-    N = int(Ndays*24 )
-    xx = np.linspace(x.min(), x.max(), N)
-    spline = interpolate.BSpline(t, c, k, extrapolate=False)
-
-    return x,spline(x) 
-    
-def write_out_header(fout,station):
-    xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-    fout.write('% Results for {0:4s} calculated on {1:20s} \n'.format(  station, xxx ))
-    fout.write('% gnssrefl, https://github.com/kristinemlarson \n')
-    fout.write('% Phase Center corrections have NOT been applied \n')
-    fout.write('% (1)  (2)  (3)   (4)    (5)      (6)    (7)    (8)      (9)  (10)   (11)(12)(13)(14)   (15)\n')
-    fout.write('% year, doy, RH,  sat, UTCtime,  Azim,   Amp,  PkNoise, Freq, edotF, Mon,Day, Hr,Min,  MJD \n')
 
 
 def main():
@@ -278,7 +46,7 @@ def main():
     txtfile = args.txtfile
     csvfile = args.csvfile
     jsonfile = args.jsonfile
-    writetxt,writecsv,writejson,outfile = output_names(txtdir, txtfile,csvfile,jsonfile)
+    writetxt,writecsv,writejson,outfile = t.output_names(txtdir, txtfile,csvfile,jsonfile)
 
     if args.year == 'None':
         year = 2020
@@ -290,12 +58,15 @@ def main():
         plt= False
 
     # read in the data and make a plot
-    ntv = readin_and_plot(xdir, station, year,1,366)
+    ntv = t.readin_and_plot(xdir, station, year,1,366)
     N,M = np.shape(ntv)
 
     # use function instead of writing it here
-    write_subdaily(outfile,station,nvt,N,writecsv,writetxt)
+    t.write_subdaily(outfile,station,nvt,N,writecsv,writetxt)
     # for now exit
+    if (writejson):
+        print(outfile)
+        t.writejson(ntv,station, outfile):
     sys.exit()
     # this should also be in a function
     if (writejson):
