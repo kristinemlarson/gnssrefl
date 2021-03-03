@@ -65,8 +65,8 @@ def main():
     t.write_subdaily(outfile,station,nvt,N,writecsv,writetxt)
     # for now exit
     if (writejson):
-        print(outfile)
-        t.writejson(ntv,station, outfile):
+        print(outfile, station)
+        t.writejson(ntv,station, outfile)
     sys.exit()
     # this should also be in a function
     if (writejson):

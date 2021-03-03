@@ -32,9 +32,9 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     writecsv = True
     if csvfile == None:
         writecsv = False
-    writejson = True
 
-    if jsonfile == None:
+    writejson = True
+    if writejson == None:
         writejson = False
 
     if writejson:
@@ -205,6 +205,7 @@ def splines_for_dummies(x,y,perday,plt):
     x1 = x.min()+0.1/365.25
     x2 = x.max()-0.1/365.25
     knots =np.linspace(x1,x2,num=numKnots)
+#    Plt.figure()
     t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
     # user specifies how many values per day you want to provide
     N = int(Ndays*perday)
@@ -212,6 +213,11 @@ def splines_for_dummies(x,y,perday,plt):
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
     # equal spacing in both x and y
     spl_x = xx; spl_y = spline(xx)
+
+    resid = y-spline(x)
+    ii = np.absolute(resid) > 0.5; 
+    jj = np.absolute(resid) < 0.5; 
+
     if plt:
 
         Plt.figure()
@@ -220,21 +226,18 @@ def splines_for_dummies(x,y,perday,plt):
         Plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
 
         Plt.figure()
-        resid = y-spline(x)
-        ii = np.absolute(resid) > 0.5; 
-        jj = np.absolute(resid) < 0.5; 
         Plt.plot(x, resid, 'bo', x[ii], resid[ii],'ro', markersize=3)
 
         # with large outliers removed?
-        Plt.figure()
-        xx=x[jj]
-        yy= y[jj]
-        splx,sply = in_out(xx,yy)
-        Plt.plot(xx,yy, 'o', markersize=3)
-        Plt.plot(splx,sply,'r-')
+        #Plt.figure()
+        #xx=x[jj]
+        #yy= y[jj]
+        #splx,sply = in_out(xx,yy)
+        #Plt.plot(xx,yy, 'o', markersize=3)
+        #Plt.plot(splx,sply,'r-')
 
-        Plt.figure()
-        Plt.plot(xx, yy-sply, 'ro', markersize=3)
+        #Plt.figure()
+        #Plt.plot(xx, yy-sply, 'ro', markersize=3)
 
         Plt.show()
 
@@ -339,6 +342,68 @@ def writejson(ntv,station, outfile):
         json.dump(o,outf,indent=4)
 
     return True
+
+def splines_for_dummies2(x,y,origx,origy,azim,perday,plt):
+    """
+    
+    inputs for now are fractional days (x) and RH (y)
+    and number of values per day you want in the outputs
+
+    it is assumed that x and y have had some interpolation
+    to remove gaps.  
+    origx and origy are as advertised (original points without
+    the interpolation)
+
+    plt is a boolean for plots to come to the screen
+    note: x was in units of years before
+        
+
+    Returns xx and spline(xx) in the same units as x and y
+    """
+    # sort the data by time
+    ii = np.argsort(x).T
+    x = x[ii]
+    y = y[ii]
+
+    knots_per_day = 12
+    Ndays = x.max()-x.min()
+    numKnots = int(knots_per_day*(Ndays))
+    print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,'number of days ', Ndays )
+    # need the first and last knot to be inside the time series
+    x1 = x.min()+0.1
+    x2 = x.max()-0.1
+    knots =np.linspace(x1,x2,num=numKnots)
+#    Plt.figure()
+    t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
+    # user specifies how many values per day you want to provide
+    N = int(Ndays*perday)
+    # evenly spaced data - units of days
+    xx = np.linspace(x.min(), x.max(), N)
+    spline = interpolate.BSpline(t, c, k, extrapolate=False)
+    # equal spacing in both x and y
+    spl_x = xx; spl_y = spline(xx)
+    # this is the residual for each measurement defined in x,y
+    # they are not time sorted however
+    resid = origy-spline(origx)
+    ii = np.absolute(resid) > 0.5;
+    print(azim[ii])
+    print(resid[ii])
+    # "good points"
+    jj = np.absolute(resid) < 0.5;
+    if plt:
+        Plt.figure()
+        Plt.subplot(211)
+        Plt.plot(x, y, 'bo', label='Original points',markersize=3)
+        obstimes = fract_to_obstimes(spl_x)
+        Plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
+
+        Plt.subplot(212)
+        Plt.plot(origx[jj],origy[jj],'b.',origx[ii],origy[ii],'ro')
+
+
+        Plt.show()
+
+    return spl_x, spl_y
         # this worked - but didn't have names, so not useful
         #o['station'] = station
         #o['data'] =  ntv[:,[0,1,2,4,15,3]].tolist()

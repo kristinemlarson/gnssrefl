@@ -70,7 +70,11 @@ class wgs84:
 
 def define_filename(station,year,doy,snr):
     """
-    given station name, year, doy, snr type (e.g. 99, 66)
+    inputs:
+    station name 
+    year 
+    doy 
+    snr file type (e.g. 99, 66)
     year doy and snr are integers
     returns snr filenames (both uncompressed and xz compressed)
     author: Kristine Larson
@@ -116,7 +120,7 @@ def define_and_xz_snr(station,year,doy,snr):
 
 def define_filename_prevday(station,year,doy,snr):
     """
-    given station name, year, doy, snr type
+    given station name, year, doy, snr file type
     returns snr filename for the PREVIOUS day
     fix type for xz
     author: Kristine Larson
@@ -2705,10 +2709,15 @@ def quick_rinex_snr(year, doy, station, option, orbtype,receiverrate,dec_rate):
 
 def store_orbitfile(filename,year,orbtype):
     """
-    simple code to move an orbit file to the right place 
-    inputs are the filename, the year, and the kind of orbit
-    (sp3 or nav)
+    inputs:
+    orbit filename 
+    year
+    orbit type (nav or sp3)
+    the function moves the file into the appropriate directory
+    author: kristine larson
+
     """
+    # parent directory of the orbits for that year
     xdir = os.environ['ORBITS'] + '/' + str(year)
     # check that directories exist
     if not os.path.isdir(xdir): #if year folder doesn't exist, make it
@@ -2725,8 +2734,9 @@ def store_orbitfile(filename,year,orbtype):
 
 def make_snrdir(year,station):
     """
-    simple code to move an snr file to the right place 
-    inputs are the filename, the year, and the station name
+    given a year and station name, it makes various directories needed
+    for SNR file/analysis outputs
+    author: kristine larson
     """
     xdir = os.environ['REFL_CODE'] + '/' + str(year)
     # check that directories exist
@@ -2743,6 +2753,7 @@ def store_snrfile(filename,year,station):
     """
     simple code to move an snr file to the right place 
     inputs are the filename, the year, and the station name
+    author: kristine larson
     """
     xdir = os.environ['REFL_CODE'] + '/' + str(year)
     # check that directories exist
@@ -2883,8 +2894,7 @@ def big_Disk_in_DC(station, year, month, day):
     both but the d file appears to be 30 sec, and that I do not want
     allow doy to be sent to code in the month spot.  set day to zero
     """
-    #exedir = os.environ['EXE']
-    #crnxpath = exedir + '/CRX2RNX'
+    # get the proper path/name of the hatanaka code
     crnxpath = hatanaka_version()
     if day == 0:
         doy = month
@@ -2908,7 +2918,8 @@ def big_Disk_in_DC(station, year, month, day):
 def ydoy2ymd(year, doy):
     """
     inputs: year and day of year (doy)
-    returns: useful stuff
+    returns: year, month, day
+    author: kristine larson
     """
 
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
@@ -2923,6 +2934,7 @@ def rewrite_UNR_highrate(fname,station,year,doy):
     no header, but year, month, day, day of year, seconds vertical, east, north
     the latter three are in meters
     stores in $REFL_CODE/yyyy/pos/station
+    author: kristine larson
     """
 # make sure the various output directories  are there
     xdir = os.environ['REFL_CODE'] 

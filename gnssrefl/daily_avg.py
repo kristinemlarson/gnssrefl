@@ -13,6 +13,8 @@ from datetime import date
 # my code
 import gnssrefl.gps as g
 #
+# changes to output requested by Kelly Enloe for JN
+# two text files will now always made - but you can override the name of the average file via command line
 
 def main():
 #   make surer environment variables are set 
@@ -24,13 +26,13 @@ def main():
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("medfilter", help="Median filter for daily RH (m). Start with 0.25 ", type=float)
     parser.add_argument("ReqTracks", help="required number of tracks", type=int)
-# optional inputs: filename to output daily RH results 
-    parser.add_argument("-txtfile", default='None', type=str, help="output filename")
-    parser.add_argument("-plt", default='None', type=str, help="plt to screen: True or False")
-    parser.add_argument("-extension", default='None', type=str, help="extension for solution names")
-    parser.add_argument("-year1", default='None', type=str, help="restrict to years starting with")
-    parser.add_argument("-year2", default='None', type=str, help="restrict to years ending with")
+    parser.add_argument("-txtfile", default=None, type=str, help="Set your own output filename")
+    parser.add_argument("-plt", default=None, type=str, help="plt to screen: True or False")
+    parser.add_argument("-extension", default=None, type=str, help="extension for solution names")
+    parser.add_argument("-year1", default=None, type=str, help="restrict to years starting with")
+    parser.add_argument("-year2", default=None, type=str, help="restrict to years ending with")
     parser.add_argument("-fr", default=0, type=int, help="frequency, default is 1")
+    parser.add_argument("-csv", default=None, type=str, help="True if you want csv instead of plain text")
     args = parser.parse_args()
 #   these are required
     station = args.station
@@ -38,25 +40,28 @@ def main():
     ReqTracks = args.ReqTracks
 
     fr = args.fr
-#   these are optional
-    txtfile = args.txtfile
+    if args.csv == None:
+        csvformat = False
+    else:
+        csvformat = True
+
 #   default is to show the plot 
-    if (args.plt == 'None') or (args.plt == 'True'):
+    if (args.plt == None) or (args.plt == 'True'):
         plt2screen = True 
     else:
         plt2screen = False
 
-    if args.extension == 'None':
+    if args.extension == None:
         extension = ''
     else:
         extension = args.extension
 
-    if args.year1 == 'None':
+    if args.year1 == None:
         year1 = 2005
     else:
         year1=int(args.year1)
 
-    if args.year2 == 'None':
+    if args.year2 == None:
         year2 = 2021
     else:
         year2=int(args.year2)
@@ -68,6 +73,14 @@ def main():
         print('make an output directory', txtdir)
         os.makedirs(txtdir)
 
+    if csvformat:
+        alldatafile = txtdir + '/' + station + '_allRH.csv' 
+    else:
+        alldatafile = txtdir + '/' + station + '_allRH.txt' 
+
+    print('all RH will be written to: ', alldatafile) 
+    allrh = open(alldatafile, 'w+')
+    allrh.write(" {0:s}  \n".format('% year,doy, RH(m), Month, day, azimuth(deg),freq, satNu, LSP amp,peak2noise' ))
 # outliers limit, defined in meters
     howBig = medfilter;
     k=0
@@ -82,7 +95,6 @@ def main():
     plt.figure()
     year_list = np.arange(year1, year2+1, 1)
     #print('Years to examine: ',year_list)
-    print(fr)
     for yr in year_list:
         direc = xdir + '/' + str(yr) + '/results/' + station + '/' + extension + '/'
         if os.path.isdir(direc):
@@ -99,7 +111,8 @@ def main():
                         numlines = len(a) 
                         if (len(a) > 0):
                             y = a[0] +a[1]/365.25; rh = a[2] ; doy = int(np.mean(a[1]))
-                            frequency = a[10]
+                            frequency = a[10]; azimuth = a[5]; sat = a[3]; amplitude=a[6]
+                            peak2noise = a[13]
         # change from doy to month and day in datetime
                             d = datetime.date(yr,1,1) + datetime.timedelta(doy-1)
                             medv = np.median(rh)
@@ -108,12 +121,26 @@ def main():
                             else:
                                 cc = (rh < (medv+howBig))  & (rh > (medv-howBig)) & (frequency == fr)
                             good =rh[cc]; goodT =y[cc]
+                            gazim = azimuth[cc]; gsat = sat[cc]; gamp = amplitude[cc]; gpeak2noise = peak2noise[cc]
+                            gfreq = frequency[cc]
+                            
+                            NG = len(good)
+                            if (NG > 0):
+                                if csvformat:
+                                    for ijk in range(0,NG):
+                                        allrh.write(" {0:4.0f},  {1:3.0f},{2:7.3f}, {3:2.0f}, {4:2.0f},{5:6.1f},{6:4.0f},{7:4.0f},{8:6.2f},{9:6.2f}\n".format(yr, 
+                                            doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk]))
+                                else:
+                                    for ijk in range(0,NG):
+                                        allrh.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:2.0f} {4:2.0f} {5:6.1f} {6:4.0f} {7:4.0f} {8:6.2f} {9:6.2f}\n".format(yr, 
+                                            doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk]))
+
         # only save if there are some minimal number of values
                             if (len(good) > ReqTracks):
                                 rh = good
                                 obstimes.append(datetime.datetime(year=yr, month=d.month, day=d.day, hour=12, minute=0, second=0))
                                 medRH =np.append(medRH, medv)
-                                plt.plot(goodT, good,'.')
+                                plt.plot(goodT, good,'b.')
             # store the meanRH after the outliers are removed using simple median filter
                                 meanRHtoday = np.mean(good)
                                 stdRHtoday = np.std(good)
@@ -134,10 +161,8 @@ def main():
     plt.title('GNSS station: ' + station)
     plt.gca().invert_yaxis()
     plt.grid()
-    if plt2screen:
-        plt.show()
     fig,ax=plt.subplots()
-    ax.plot(obstimes,meanRH,'.')
+    ax.plot(obstimes,meanRH,'b.')
     fig.autofmt_xdate()
     plt.ylabel('Reflector Height (m)')
     today = str(date.today())
@@ -146,32 +171,55 @@ def main():
     plt.gca().invert_yaxis()
     pltname = txtdir + '/' + station + '_RH.png'
     plt.savefig(pltname)
-    print('png file saved as: ', pltname)
+    print('Daily average RH png file saved as: ', pltname)
+
+    fig,ax=plt.subplots()
+    plt.plot(obstimes, tv[:,3],'b.')
+    fig.autofmt_xdate()
+    plt.title('Number of values used in the daily average')
+    plt.grid()
+    
+
+    # close the file with all the RH values'
+    allrh.close()
 
     # default is to show the plot
     if plt2screen:
         plt.show()
 
-    if txtfile == 'None':
-        print('no output file name has been provided, so no results are written')
+    if args.txtfile == None:
+        if csvformat:
+            outfile = txtdir + '/' + station + '_dailyRH.csv' 
+        else:
+        # use default  filename for the average
+            outfile = txtdir + '/' + station + '_dailyRH.txt' 
     else:
-    # sort the time tags
+        txtfile = args.txtfile
+        # use filename provided by the user
+        outfile = txtdir + '/' + txtfile
+    print('Daily average RH will be written to: ', outfile)
+    # to avoid indenting again,  use True
+    if True:
+        # sort the time tags
         ii = np.argsort(obstimes)
     # apply time tags to a new variable
         ntv = tv[ii,:]
         N,M = np.shape(ntv)
-        outfile = txtdir + '/' + txtfile
         xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-        print('output file: ', outfile)
         fout = open(outfile, 'w+')
     # change comment value from # to %
         fout.write("{0:28s} \n".format( '% calculated on ' + xxx ))
         fout.write("% year doy   RH    numval month day RH-sigma\n")
         fout.write("% year doy   (m)                      (m)\n")
         fout.write("% (1)  (2)   (3)    (4)    (5)  (6)   (7)\n")
-        for i in np.arange(0,N,1):
-            fout.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:3.0f} {4:4.0f} {5:4.0f} {6:7.3f} \n".format(ntv[i,0], 
-                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6]))
+        if csvformat:
+            for i in np.arange(0,N,1):
+                fout.write(" {0:4.0f},  {1:3.0f},{2:7.3f},{3:3.0f},{4:4.0f},{5:4.0f},{6:7.3f} \n".format(ntv[i,0], 
+                    ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6]))
+        else:
+            for i in np.arange(0,N,1):
+                fout.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:3.0f} {4:4.0f} {5:4.0f} {6:7.3f} \n".format(ntv[i,0], 
+                    ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6]))
         fout.close()
 
 if __name__ == "__main__":
