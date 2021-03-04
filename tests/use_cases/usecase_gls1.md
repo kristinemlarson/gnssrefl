@@ -22,8 +22,7 @@
 
 [Google Maps Link](https://goo.gl/maps/391a7h2HpacAa59u8) 
 
-<img src="gls1-photo.png" width="300">
-Image source: IRIS/PASSCAL
+<img src="gls1.jpg" width="400">
 
 ## Data Summary
 
