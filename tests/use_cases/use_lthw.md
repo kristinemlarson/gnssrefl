@@ -4,7 +4,7 @@
 
 **Location:** Thwaites Glacier, Antarctica
 
-**Data are archived:** [UNAVCO](http://www.unavco.org)
+**Archive:** [UNAVCO](http://www.unavco.org)
 
 **Ellipsoidal Coordinates:**
 
@@ -72,7 +72,7 @@ Then use quickLook:
 Now the peaks in the RH periodograms are ~2.2 meters - so that means ~2.5 meters of surface change 
 from 2018 to 2020.
 
-## Analyze the SNR Data for the year 2018
+## Estimate Snow Accumulation for the year 2018
 
 First you need to make the list of analysis inputs:
 
@@ -96,3 +96,4 @@ You can loosen the required track number if you want:
 
 <img src="lthw-req40.png" width="500"/>
 
+[daily average RH file for 2018](lthw_dailyRH.txt)

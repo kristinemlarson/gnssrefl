@@ -95,23 +95,20 @@ Now that the analysis parameters are set, run **gnssir** to save the reflector h
 The daily output files are stored in $REFL_CODE/2013/results/mchn. [Here is an example output for a single day.](195.txt) 
 Plots can be seen with the -plt option.
 
-*gnssir mchn 2013 195 -screenstats False -plt True*
+*gnssir mchn 2013 195  -plt True*
 
 <img src="mchn-g-l1.png" width="500">
 
-There are still outliers in the solutions - and in principle these can be reduced by experimenting 
-with better restrictions, i.e. increase the amplitude requirement or peak to noise restriction. If the outliers are 
-not taken into account, they will show up in the daily average:
+For a lake, it is appropriate to use the daily average. Our utility for computing a daily average requires a value
+for the median filter and a minimum number of tracks.  If the median value is set to the be large (2 meters), you can see 
+large outliers: 
 
 *daily_avg mchn 2 10*
-
-This command sets the median filter to allow any value within 2 meters of the median. The input of 10 indicates the 
-minimum number of tracks needed to compute an average. 
 
 <img src="mchn_1.png" width="500">
 
 A more reasonable result is obtained with a 0.25-meter median filter and the 12-track requirement. If you want to save 
-the daily averages to a specific fgile, use the -txtfile option.
+the daily averages to a specific file, use the -txtfile option. Otherwise it will use a default location (which is printed to the screen)
 
 *daily_avg mchn 0.25 12 -txtfile mchn-dailyavg.txt*
 
@@ -119,13 +116,10 @@ the daily averages to a specific fgile, use the -txtfile option.
 
 [Sample daily average RH file.](mchn-dailyavg.txt)
 
-The number of tracks required will depend on the site. Here the azimuth is restricted because 
-mchn is on the coastline of Lake Superior, so the azimuth mask will limit the number of satellite tracks available. 
-
+The number of tracks required will depend on the site. Here the azimuth is restricted because  of the location of the antenna.
 Please note that these reflections are from ice in the winter and water during the summer. Surface 
-bias corrections (ice,snow) will be implemented in the software in the future. Until then, please take 
+bias corrections (ice, snow) will be implemented in the software in the future. Until then, please take 
 this into account when interpreting the results.
-
 
 There is a [tide gauge](https://tides.gc.ca/eng/Station/Month?sid=10750) at this site. The data can be 
 downloaded from [this link](http://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&region=CA&tst=1&no=10750). 
@@ -136,8 +130,8 @@ The water levels measured by the traditional tide gauge and GNSS-IR are shown he
 
 <img src="mchn-timeseries-tide-rh.png" width="500">
 
-The linear regression between the two serries gives a slope m=-1.03.  The rms of the 
-residuals is 0.025 m.  
+The linear regression between the two series gives a slope m=-1.03. The rms of the 
+residuals is very good, 0.025 m.  
 
 <img src="mchn-linreg.png" width="500">
 

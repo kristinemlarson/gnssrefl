@@ -149,3 +149,7 @@ Plots are also provided:
 
 <img src="p041-daily2.png" width="500">
 
+The changes in reflector height in January-April and September-December are consistent with snow accumulation.
+We will be comparing to validation data later. The changes in the summer are related to soil moisture changes.
+
+
