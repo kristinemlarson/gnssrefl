@@ -29,10 +29,8 @@
 Station gls1 was installed on the Greenland Ice Sheet.
 The antenna mounted on a ~3.5-meter pole.  The receiver at the site tracks only 
 GPS signals, and the data are archived at UNAVCO and SOPAC.  A detailed discussion of 
-data from the station can be found in this 
-[open option paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
-Position time series for gls1 can be retrieved 
-from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3).
+data from the station can be found in [Larson, MacFerrin, and Nylen (2020)](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
+Position time series for gls1 can be retrieved from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3).
 
 ## Web App
 
@@ -52,7 +50,7 @@ First, make an SNR file by downloading the RINEX file and extracting the GPS SNR
 
 *rinex2snr gls1 2019 200*
 
-**Take a Quick Look at the Data**
+**Take a Look at the SNR Data**
 
 Use **quickLook** to produce a periodogram similar to the one in the web app. The periodogram  is set to use the L1 frequency by default.
 

@@ -1,6 +1,6 @@
-### Use Case for Lower Thwaites Glacier
+### Lower Thwaites Glacier
 
-**Station Name:" lthw
+**Station Name:** lthw
 
 **Location:** Thwaites Glacier, Antarctica
 
@@ -27,7 +27,7 @@
 The receiver only tracks legacy GPS signals, so only L1 should be used for reflectometry. The pole
 is set in the snow/ice and routinely (every few years) reset. Please use the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta) to get a feel for when the pole has been reset.
 
-## Setting Azimuth and Elevation Mask**
+## Setting Azimuth and Elevation Mask
 
 Because there are no structures surrounding the site, elevation and azimuth defaults can mostly be used.
 The only restriction that should be imposed is a minimum elevation angle of 7 because that is what
@@ -36,10 +36,10 @@ the field crew set as a mask at the site.
 
 ## WebApp
 
-lthw is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/fancy6?example=p041)
+lthw is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/fancy6?example=lthw)
 The webapp analyzes data in real-time, so please wait for 5-10 seconds.
 
-## Make SNR Files and take a quickLook at the data
+## Take a Look at the SNR data
 
 Translate the GPS data for the year 2018
 

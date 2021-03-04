@@ -1,4 +1,4 @@
-### Use Case for Marshall, Colorado, USA
+### Marshall, Colorado, USA
 
 **Station Name:** p041 
 

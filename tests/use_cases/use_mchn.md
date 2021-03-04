@@ -1,4 +1,4 @@
-### Use Case for Michipicoten Harbor, Ontario, Canada
+### Michipicoten Harbor, Ontario, Canada
 
 **Station Name:** 	mchn
 

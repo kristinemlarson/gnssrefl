@@ -1,4 +1,4 @@
-### Use Case for Ross Ice Shelf, Antarctica
+### Ross Ice Shelf, Antarctica
 
 **Station Name:**  lorg
 
@@ -31,9 +31,9 @@ It recorded only GPS frequencies during its operation.
 
 ## Web App
 
-LORG is an example station on the web app for the Ross Ice Shelf. [Please note that the app will be analyzing data in 
-real-time, so it will take 5-10 seconds for the periodogram to appear on the left side of the page](https://gnss-reflections.org/fancy6?example=lorg). The web app will return a photograph, station coordinates, a Google Earth Map, and a sample periodogram. The periodogram plots the reflector height (RH) in four quadrants (NW, NE, SW, SE), allowing the reflection characteristics and quality of the site to be inferred. For example, variations in topography or buildings blocking the reflections would all affect the periodograms.
-
+LORG is an example station on the [GNSS-IR web app.](https://gnss-reflections.org/fancy6?example=lorg) 
+Please note that the app will be analyzing data in 
+real-time, so it will take 5-10 seconds.
 
 **Setting Elevation and Azimuth Masks**
 
@@ -51,13 +51,15 @@ Start by downloading the RINEX file and extracting the GPS SNR data:
 **Take a Quick Look at the Data**
 
 
-Use **quickLook** to produce a periodogram similar to the one in the web app. The periodogram  is set to use the L1 frequency by default.
+Use **quickLook** to produce a periodogram similar to the one in the web app. quickLook is set to use the L1 frequency by default:
 
 *quickLook lorg 2019 205*
 
 <img src="lorg-ql-l1.png" width="500">
  
-Compare the periodograms for frequencies 1, 20 (L2C) and 5. They should be similar to the L1 periodogram, except that there will be fewer satellite traces because only GPS satellites launched after 2005 broadcast L2C and only satellites after 2010 broadcast L5.
+Compare the periodograms for frequencies 1, 20 (L2C) and 5. They should be similar to the L1 periodogram, except that there 
+will be fewer satellite traces because only GPS satellites launched after 2005 broadcast L2C and only satellites after 2010 broadcast L5.
+The northwest qudarant is the noisiest and one could certainly try to improve the results by restricting some azimuths there.
 
 *quickLook lorg 2019 205 -fr 20*
 
@@ -69,16 +71,17 @@ Compare the periodograms for frequencies 1, 20 (L2C) and 5. They should be simil
 
 ## Analyze the Data
 
-Now prepare to run **gnssir**. This code saves the daily RH output, allowing the change in reflector height at different times to be determined.
-
-First a set of file instructions is generated. The default settings only
-need the station name, lat, lon, and ht. Make this file using **make_json_input**, setting the minimum and maximum elevation flags to 5 and 25 degrees respectively.
-The json output will be stored in $REFL_CODE/input/lorg.json.  [Here is a sample json file.](lorg.json)
+Now prepare to analyze the data using **gnssir**.  First you need to create a set of analysis instructions. 
+The default settings only need the station name, latitude, longitude, and ellipsoidal height. You make 
+this file using **make_json_input**: 
 
 *make_json_input -e1 5 -e2 25 lorg -78.18365 170.03361 -7.778*
 
-Next make some snr files for a time span of about eight months. 
-Restrict the search to the UNAVCO archive to make the code run faster (otherwise it will check four archives). The resulting SNR files will be stored in $REFL_CODE/2019/snr/lorg. 
+The json output will be stored in $REFL_CODE/input/lorg.json. 
+[Here is a sample json file.](lorg.json)
+
+Next make some snr files for a time span of about eight months. Restrict the search to the UNAVCO archive to make the 
+code run faster (otherwise it will check three other archives as well). The resulting SNR files will be stored in $REFL_CODE/2019/snr/lorg. 
 
 *rinex2snr lorg 2019 1 -doy_end 233 -archive unavco*
 
@@ -86,28 +89,21 @@ Run **gnssir** for all the SNR files from **rinex2snr**.
 
 *gnssir lorg 2019 1 -doy_end 233*
 
-The code will print to the screen an overview of the estimated reflector heights for each satellite. These statistics can be turned off by manually editing the json file (screenstats) or changing the screenstats flag in the command line:
-
-*gnssir lorg 2019 1 -doy_end 233 -screenstats False*
-
 The default does not send any plots to the screen. If you do want to see them, set -plt:
 
 *gnssir lorg 2019 1 -screenstats False -plt True* 
 
 <img src="lorg-g-panels.png" width="800"/>
 
-These results can be improved by eliminating various azimuths and requiring stronger 
-peaks in the periodograms. The results for a single day are stored in a folder for that year, i.e. 
+The results for a single day are stored in a folder for that year, i.e. 
 $REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt)
 
 The **daily_avg** command will calculate the daily average reflector height from the daily output files. 
 To minimize outliers in these daily averages, a median filter is set to allow 
-values within 0.25 meters of the median and the required minimum number of daily satellite 
-tracks is set to 50.  
+values within a given value of the median. The user is also asked to set a required minimum number of daily satellite 
+tracks. Here we use 0.25 meters and 50 tracks. We have also set a specific output filename:
 
 *daily_avg lorg 0.25 50 -txtfile lorg-dailyavg.txt*
-
-[The daily average Reflector height file is provided here.](lorg-dailyavg.txt). 
 
 
 <img src="lorg_1.png" width="500"/>
@@ -115,3 +111,4 @@ tracks is set to 50.
 
 <img src="lorg-dailyavg.png" width="500"/>
 
+[A daily average Reflector height file is provided here.](lorg-dailyavg.txt). 
