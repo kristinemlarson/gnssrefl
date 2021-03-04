@@ -29,27 +29,27 @@ my internet provider ?). When I turn on my VPN, all is well. I have not investig
 in any detail. So take that for what you will. 
 
 
-### Use Cases (These are still under development)
+### Use Cases 
 
 <table>
 <TR>
 <TH>Cryosphere</TH>
 <TD>
 
-* [Lorne, Ross Ice Shelf, Antarctica](use_cases/lorg_use.md) (lorg)
+* [Lorne, Ross Ice Shelf, Antarctica](use_cases/use_lorg.md) (lorg)
 
-* [Dye2, Greenland Ice Sheet](use_cases/gls1_use.md) (gls1)
+* [Dye2, Greenland Ice Sheet](use_cases/use_gls1.md) (gls1)
 
-* [Thwaites Glacier, Antarctica](use_cases/lthw_use.md) (lthw)
+* [Thwaites Glacier, Antarctica](use_cases/use_lthw.md) (lthw)
 
-* [Summit Camp, Greenland](use_cases/smm3_use.md) (smm3)
+* Summit Camp, Greenland (smm3)
 </TD>
 <TH>Lakes and Rivers</TH>
 <td>
 
-* [Lake Taupo, New Zealand](use_cases/tgho_use.md) (tgho)
+* Lake Taupo, New Zealand (tgho)
 
-* [Michipicoten, Lake Superior, Canada](use_cases/mchn_use.md) (mchn)
+* [Michipicoten, Lake Superior, Canada](use_cases/use_mchn.md) (mchn)
 
 * [St Lawrence River, Montreal, Canada](use_cases/pmtl_use.md) (pmtl)
 
@@ -72,13 +72,15 @@ in any detail. So take that for what you will.
 <TH>Seasonal Snow</TH>
 <TD>
 
-* [Marshall, Colorado](use_cases/p041_use.md) (p041)
+* [Marshall, Colorado](use_cases/use_p041.md) (p041)
 
 * Half Island Park, Idaho (p360)
 
 * Coldfoot, Alaska (ab33)
 
 * Priddis, Alberta, Canada (prds)
+
+* Niwot Ridge, Colorado (nwot)
 
 </TD>
 <TH>Soil Moisture</TH>
