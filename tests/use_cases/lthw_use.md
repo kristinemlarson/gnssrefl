@@ -60,13 +60,13 @@ Analyze the data for 2018 from day 1 to day 365:
 
 *gnssir lthw 2018 1 -doy_end 365 -screenstats False*
 
-Compute daily averages requiring 50 satellite tracks and median filter of 0.25 meters:
+Then compute daily averages requiring 50 satellite tracks and using a median filter of 0.25 meters:
 
 *daily_avg lthw 0.25 50*
 
 <img src="lthw-req50.png" width="500"/>
 
-You can loosen the required track number if you want:
+You can tighten required number of tracks if you want:
 
 *daily_avg lthw 0.25 40*
 

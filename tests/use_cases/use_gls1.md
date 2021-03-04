@@ -32,14 +32,11 @@ The receiver at the site only consistently tracks legacy GPS signals. A detailed
 data from the station can be found in [Larson, MacFerrin, and Nylen (2020)](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
 Position time series for gls1 can be retrieved from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3).
 
-## Web App
 
-The [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=gls1) uses gls1 as an example. 
-It takes 5-10 seconds to run.
+The [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=gls1) uses gls1 as an example. It takes 5-10 seconds to run.
 
-## Setting Elevation and Azimuth Mask**
 
-The site is on an ice sheet, flat in all directions, so a special azimuth mask is not required.
+gls1 is on an ice sheet, relatively smooth in all directions, so a special azimuth mask is not required.
 gls1 was originally installed with an elevation mask of 7 degrees, so 7-25 should be used for the elevation mask.
 
 ## Reproduce the Web App
@@ -60,7 +57,7 @@ Use **quickLook** to produce a periodogram similar to the one in the web app. Th
 
 The SNR values for the L2 and L5 frequencies do not meet the quality standards for GNSS reflectometry.
 
-## Measure Snow Accumulation 
+## Measure Snow Accumulation in 2012
 
 Set up the analysis file. The min and max reflector height values are set to 0.5 and 8 meters. 
 Use a minimum elevation angle of 7 degrees: 

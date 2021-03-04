@@ -24,24 +24,22 @@
 
 ## Data Summary
 
-The receiver only tracks legacy GPS signals, so only L1 should be used for reflectometry. The pole
-is set in the snow/ice and routinely (every few years) reset. Please use the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta) to get a feel for when the pole has been reset.
-
-## Setting Azimuth and Elevation Mask
+The receiver only tracks legacy GPS signals, so only L1 should be used for 
+reflectometry. The pole
+is set in the snow/ice and routinely (every few years) reset. Please 
+use the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta) to get a 
+feel for when the pole has been reset and where data gaps exist.
 
 Because there are no structures surrounding the site, elevation and azimuth defaults can mostly be used.
-The only restriction that should be imposed is a minimum elevation angle of 7 because that is what
-the field crew set as a mask at the site.
-
-
-## WebApp
+The only restriction that should be imposed is a minimum elevation angle of 7 because was set at 
+the receiver when the site was installed.
 
 lthw is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/fancy6?example=lthw)
 The webapp analyzes data in real-time, so please wait for 5-10 seconds.
 
-## Take a Look at the SNR data
+## Take a look at the SNR data
 
-Translate the GPS data for the year 2018
+Translate the GPS data for the year 2018:
 
 *rinex2snr lthw 2018 1 -doy_end 365 -archive unavco*
 
@@ -69,16 +67,17 @@ Then use quickLook:
 
 <img src="lthw-day1-2020.png" width=500/>
 
-Now the peaks in the RH periodograms are ~2.2 meters - so that means ~2.5 meters of surface change 
+Now the peaks in the reflector height (RH) periodograms are ~2.2 meters - 
+so that means ~2.5 meters of surface change 
 from 2018 to 2020.
 
-## Estimate Snow Accumulation for the year 2018
+## Measure Snow Accumulation for 2018
 
 First you need to make the list of analysis inputs:
 
 *make_json_input lthw -76.458  -107.782 1011.0 -e1 7 -e2 25 -peak2noise 3.2*
 
-Handedit the json file so that only L1 is used. [Example json file](lthw.json).
+Handedit the json file so that only L1 data are used. [Example json file](lthw.json).
 
 Analyze the data for 2018 from day 1 to day 365:
 
@@ -90,10 +89,10 @@ Compute daily averages requiring 50 satellite tracks and median filter of 0.25 m
 
 <img src="lthw-req50.png" width="500"/>
 
-You can loosen the required track number if you want:
+You can tighten the required track number if you want:
 
 *daily_avg lthw 0.25 40*
 
 <img src="lthw-req40.png" width="500"/>
 
-[daily average RH file for 2018](lthw_dailyRH.txt)
+[Sample daily average RH file for 2018](lthw_dailyRH.txt)

@@ -23,24 +23,22 @@
 <img src="mchn_monu-cors.png" width="500"/>
 
 
-### Data Summary
+## Data Summary
 
 Station mchn is operated by [NRCAN](https://www.nrcan.gc.ca/home).
 The station overlooks Lake Superior in a favorable location for measuring seasonal water levels.
 This site only tracks legacy GPS signals. 
 
-## Web App
 
-More information on the station can be obtained from the [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=mchn).
-where mchn is one of the test cases. Note that the app will be analyzing data in real-time, so please wait 5-10 seconds.
+More information on mchn can be obtained 
+from the [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=mchn).
+where mchn is one of the test cases. Note that the app will be analyzing data in 
+real-time, so please wait 5-10 seconds.
 
-**Setting Azimuth and Elevation Mask**
+For GNSS reflectometry, you need to set an azimuth and elevation angle mask.
+The azimuths are chosen to ensure that the reflected signals reflect off the surface of interest.
+[Here is a good start on an elevation and azimuth angle mask](https://gnss-reflections.org/rzones?station=mchn&msl=on&RH=7&eang=2&azim1=80&azim2=180). 
 
-From the periodogram and Google Earth a good 
-azimuth mask can be selected.  Elevation angle might be a bit trickier, but in this case, go ahead and 
-use the default values included in the title of the periodogram plot from the web app. The web app has an option to calculate 
-the reflection zones  [Here is a good start on an elevation and azimuth angle mask](https://gnss-reflections.org/rzones?station=mchn&msl=on&RH=7&eang=2&azim1=80&azim2=180). 
-In the linked page, the reflection zones at 5, 10, and 15-degree elevation angles are plotted as colored ellipses surrounding the station. 
 
 ## Reproduce the Web App
 

@@ -29,13 +29,8 @@ The site is a largely featureless ice plain with no obstructions (see photo abov
 The site was installed on November 27, 2018 and decommissioned and removed on November 15, 2019. 
 It recorded only GPS frequencies during its operation. 
 
-## Web App
-
 LORG is an example station on the [GNSS-IR web app.](https://gnss-reflections.org/fancy6?example=lorg) 
-Please note that the app will be analyzing data in 
-real-time, so it will take 5-10 seconds.
-
-**Setting Elevation and Azimuth Masks**
+Please note that the app will be analyzing data in real-time, so it will take 5-10 seconds.
 
 There are no significant topographic features near the station, so it is recommended to use default values 
 for the elevation mask. An azimuth mask is not required.
@@ -48,8 +43,7 @@ Start by downloading the RINEX file and extracting the GPS SNR data:
 
 *rinex2snr lorg 2019 205*
 
-**Take a Quick Look at the Data**
-
+**Take a Look at the Data**
 
 Use **quickLook** to produce a periodogram similar to the one in the web app. quickLook is set to use the L1 frequency by default:
 

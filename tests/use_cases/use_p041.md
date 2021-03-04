@@ -26,7 +26,7 @@
 
 ## Data Summary
 
-The p041 antenna is ~2 meters tall and is located at Marshall Mesa, Colorado.
+The p041 antenna is ~2 meters above the soil surface. It is located at Marshall Mesa, Colorado.
 The site is relatively planar and free of obstructions. Since October 2018 the site has 
 recorded multi-GNSS signals. Marshall Mesa has been featured in multiple publications on GNSS-IR:
 
@@ -36,18 +36,14 @@ recorded multi-GNSS signals. Marshall Mesa has been featured in multiple publica
 
 * [Vegetation](https://www.kristinelarson.net/wp-content/uploads/2015/10/small_etal_2010.pdf) 
 
-## WebApp
 
 p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/fancy6?example=p041) 
 The webapp analyzes data in real-time, so please wait for 5-10 seconds.
 
-
-**Setting Azimuth and Elevation Mask**
-
 To get a sense of whether an azimuth or elevation mask is appropriate, 
 check the [Reflection Zone Mapping in the web app](https://gnss-reflections.org/rzones?station=p041&lat=39.9495&lon=-105.1943&height=1728.842&msl=on&RH=2&eang=2&azim1=0&azim2=360).  
 In the linked page, the reflection zones at 5, 10, and 15-degree elevation angles are plotted as 
-colored ellipses surrounding the station, all overlaid on a Google Earth map.  Higher elevation angles are closer to the station.
+colored ellipses surrounding the station.  
 
 ## Reproduce the Web App 
 
