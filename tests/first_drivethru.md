@@ -7,27 +7,17 @@ which was published open option.
 
 ### Install the gnssrefl code 
 
-Make sure **wget** exists on your machine.  If you type *which wget* and something comes back, you should be good.
+* Make sure **wget** exists on your machine.  If you type *which wget* and something comes back, you should be good.
 
-Read the [gnssrefl documentation](https://github.com/kristinemlarson/gnssrefl). 
+* Read the [gnssrefl documentation](https://github.com/kristinemlarson/gnssrefl). 
 Note that there are some utilities described at the end of the code that you might
 find to be useful.
 
-Install either the github or the pypi version of gnssrefl
+* Install either the github or the pypi version of gnssrefl
 
-Make the requested environment variables. 
+* Make the requested environment variables. 
 
-Put CRX2RNX in the EXE area. Make sure it is executable
-
-If you know how to compile Fortran code, I strongly urge you to download/compile the requested
-codes and install those executables in the correct place.  We are currently testing a hybrid 
-option (for translator) that allows access to Fortran speed from within python.
-
-For what it is worth, I have had times when I have been blocked from 
-downloading files (? after 20 file downloads - so maybe it is 
-my internet provider ?). When I turn on my VPN, all is well. I have not investigated this 
-in any detail. So take that for what you will. 
-
+* Put CRX2RNX in the EXE area. Make sure it is executable
 
 ### Use Cases 
 

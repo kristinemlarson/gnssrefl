@@ -41,8 +41,8 @@ It takes 5-10 seconds to run.
 
 **Setting Elevation and Azimuth Mask**
 
-The site is on an ice sheet, flat in all directions, so no elevation or azimuth masks are required 
-to run the reflectometry codes and defaults are sufficient.
+The site is on an ice sheet, flat in all directions, so a special azimuth mask is not required.
+gls1 was originally installed with an elevation mask of 7 degrees, so 7-25 should be used for the elevation mask.
 
 ## Reproduce the Web App
 
@@ -60,21 +60,16 @@ Use **quickLook** to produce a periodogram similar to the one in the web app. Th
 
 <img src="gls1-L1.png" width="500">
 
-The four subplots show different regions around the antenna (NW, NE, SW, SE). The x-axis gives the reflector height (RH) and the y-axis gives the spectral amplitude of the SNR data. The multiple colors are used to depict different satellites that rise or set over that section (quadrant) of the field at gls1. The goal of this exercise is to notice that the peaks of those periodograms are lining up around an x-value of ~1.3 meters. There are also some thin gray lines - and those are failed periodograms. This means that the SNR data for a satellite do not meet the quality standards in the code.
-
-The SNR values for the L2 and L5 frequencies do not meet the quality standards for **quickLook** and are not plotted here.
+The SNR values for the L2 and L5 frequencies do not meet the quality standards for GNSS reflectometry.
 
 ## Analyze the Data
 
-gls1 was originally installed with an elevation mask of 7 degrees. 
-The mask was later changed, but for consistency the gnssir code will be set to use a 
-minimum elevation angle of 7 degrees. This is done when setting up the json file containing the analysis paramters:
+Set up the analysis file. The min and max reflector height values are set to 0.5 and 8 meters. 
+Use a minimum elevation angle of 7 degrees: 
 
 *make_json_input gls1 66.479 -46.310 2148.578 -h1 0.5 -h2 8 -e1 7 -e2 25*
 
 The **make_json_input** defaults are to use all GPS frequencies (1,20,5). 
-
-However, the L2 data are problematic at this site. L5 data do not exist.
 Manually edit the json file to remove L2 and L5 from the list 
 labeled "freqs". Then change the list "reqAmp" so that it has the same number 
 of elements as the list "freqs" (by default, all elements in "reqAmp" will have a value of 6). 
