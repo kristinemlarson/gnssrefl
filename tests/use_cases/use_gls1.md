@@ -1,4 +1,4 @@
-### Use Case for Greenland Ice Sheet, Greenland
+### Dye2, Greenland 
 
 **Station Name:**		gls1
 
@@ -26,9 +26,9 @@
 
 ## Data Summary
 
-Station gls1 was installed on the Greenland Ice Sheet.
-The antenna mounted on a ~3.5-meter pole.  The receiver at the site tracks only 
-GPS signals, and the data are archived at UNAVCO and SOPAC.  A detailed discussion of 
+Station gls1 was installed on the Greenland Ice Sheet in 2011. 
+The antenna is mounted on a long pole; approximately 3.5-meter of the pole was above the ice at the time of installation. 
+The receiver at the site only consistently tracks legacy GPS signals. A detailed discussion of the monument and 
 data from the station can be found in [Larson, MacFerrin, and Nylen (2020)](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
 Position time series for gls1 can be retrieved from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3).
 
@@ -37,7 +37,7 @@ Position time series for gls1 can be retrieved from the [Nevada Geodetic Laborat
 The [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=gls1) uses gls1 as an example. 
 It takes 5-10 seconds to run.
 
-**Setting Elevation and Azimuth Mask**
+## Setting Elevation and Azimuth Mask**
 
 The site is on an ice sheet, flat in all directions, so a special azimuth mask is not required.
 gls1 was originally installed with an elevation mask of 7 degrees, so 7-25 should be used for the elevation mask.
@@ -60,7 +60,7 @@ Use **quickLook** to produce a periodogram similar to the one in the web app. Th
 
 The SNR values for the L2 and L5 frequencies do not meet the quality standards for GNSS reflectometry.
 
-## Analyze the Data
+## Measure Snow Accumulation 
 
 Set up the analysis file. The min and max reflector height values are set to 0.5 and 8 meters. 
 Use a minimum elevation angle of 7 degrees: 
@@ -97,5 +97,4 @@ Daily averages:
 
 [An sample daily average RH file.](gls1-dailyavg.txt)
 
-
-
+Validation snow accumulation data for this site are provided in Larson et al (2020) (the link is given above).
