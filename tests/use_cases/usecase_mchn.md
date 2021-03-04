@@ -4,9 +4,7 @@
 
 **Location:** Michipicoten Harbour, Ontario, Canada
 
-**Archive:**  [SOPAC](http://sopac-csrc.ucsd.edu/index.php/sopac/), 
-
-**DOI:** N/A
+**Archive:**  [SOPAC](http://sopac-csrc.ucsd.edu/index.php/sopac/) 
 
 **Ellipsoidal Coordinates:**
 
@@ -119,7 +117,7 @@ the daily averages to a specific fgile, use the -txtfile option.
 
 <img src="mchn_3.png" width="500">
 
-[Sample daily average RH file.](mchn-dailyavg.txt).
+[Sample daily average RH file.](mchn-dailyavg.txt)
 
 The number of tracks required will depend on the site. Here the azimuth is restricted because 
 mchn is on the coastline of Lake Superior, so the azimuth mask will limit the number of satellite tracks available. 

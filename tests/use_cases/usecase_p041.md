@@ -28,7 +28,7 @@
 
 The p041 antenna is ~2 meters tall and is located at Marshall Mesa, Colorado.
 The site is relatively planar and free of obstructions. Since October 2018 the site has 
-recorded multi-GNSS signals. Marshall Mesa has been featured in multiple publications:
+recorded multi-GNSS signals. Marshall Mesa has been featured in multiple publications on GNSS-IR:
 
 * [Soil Moisture](https://www.kristinelarson.net/wp-content/uploads/2015/10/larson_soil_grl2008.pdf)
 
@@ -38,9 +38,8 @@ recorded multi-GNSS signals. Marshall Mesa has been featured in multiple publica
 
 ## WebApp
 
-p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/fancy6?example=p041). 
-The webapp analyzes data in real-time, so please wait for the periodogram to appear on the left side 
-of the page. It takes from 5-10 seconds
+p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/fancy6?example=p041) 
+The webapp analyzes data in real-time, so please wait for 5-10 seconds.
 
 
 **Setting Azimuth and Elevation Mask**
@@ -125,21 +124,19 @@ There is an option to produce plots:
  
 *gnssir p041 2020 24 -plt True*
 
-The GPS data will be plotted first:
 
 <img src="p041-gnssir-gpspanels.png" width="700">
 
-Then the GLONASS frequencies:
 
 <img src="p041-gnssir-glopanels.png" width="700">
 
-And the Galileo frequencies:
 
 <img src="p041-gnsirr-galpanels.png" width="700">
 
-Typically a daily average is used by most scientists. To ensure the average is meaningful and not impacted by large outliers, 
-minimal quality control values are used, a median filter (meters) and minimum number of tracks per day. Here a median filter of 0.25 meter
-is used and 50 tracks are required.  
+Typically a daily average is used by most scientists. To ensure the average is 
+meaningful and not impacted by large outliers, 
+minimal quality control values are used, a median filter (meters) and minimum number 
+of tracks per day. Here a median filter of 0.25 meter is used and 50 tracks are required.  
 
 *daily_avg p041 .25 50 -txtfile p041-dailyavg.txt*
 

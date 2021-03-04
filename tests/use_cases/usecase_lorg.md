@@ -18,7 +18,7 @@
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/LORG.sta)
 
-[Google Maps Link](https://goo.gl/maps/bSAuLXLLMmzWqPdW9). 
+[Google Maps Link](https://goo.gl/maps/bSAuLXLLMmzWqPdW9) 
 
 <img src="https://gnss-reflections.org/static/images/LORG.jpg" width="500">
 
@@ -90,28 +90,25 @@ The code will print to the screen an overview of the estimated reflector heights
 
 *gnssir lorg 2019 1 -doy_end 233 -screenstats False*
 
-The default does not send any plots to the screen - and plotting the periodograms for 233 days of data is not recommended. Plotting the results for a single day will only produce a periodogram for each GPS frequency, and this option can be used to check the results.  Plots can be enabled in the json file or at the command line:
+The default does not send any plots to the screen. If you do want to see them, set -plt:
 
 *gnssir lorg 2019 1 -screenstats False -plt True* 
 
 <img src="lorg-g-panels.png" width="800"/>
 
-Unlike **quickLook**, **gnssir** plots the periodograms for each frequency with no quadrants. To see the next frequency, close the current plot.
-
 These results can be improved by eliminating various azimuths and requiring stronger 
 peaks in the periodograms. The results for a single day are stored in a folder for that year, i.e. 
-$REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt).
+$REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt)
 
 The **daily_avg** command will calculate the daily average reflector height from the daily output files. 
 To minimize outliers in these daily averages, a median filter is set to allow 
 values within 0.25 meters of the median and the required minimum number of daily satellite 
 tracks is set to 50.  
 
-
 *daily_avg lorg 0.25 50 -txtfile lorg-dailyavg.txt*
 
-[The daily average file is linked here.](lorg-dailyavg.txt). The first plot includes all the data,  while the 
-the second has the daily averages.
+[The daily average Reflector height file is provided here.](lorg-dailyavg.txt). 
+
 
 <img src="lorg_1.png" width="500"/>
 
