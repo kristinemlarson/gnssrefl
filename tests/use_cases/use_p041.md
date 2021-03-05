@@ -56,8 +56,7 @@ Begin by making an SNR file. Use the defaults, which only use the GPS signals:
 
 **Take a Quick Look at the Data**
 
-The **quickLook** command will produce a periodogram similar to the one from the web app.  
-[(For details on quickLook output.)](../../docs/quickLook_desc.md)
+**quickLook** analyzes the reflection characteristics of a GNSS site [(For details on quickLook output)](../../docs/quickLook_desc.md).
 
 The default return is for the L1 frequency:
 
