@@ -50,7 +50,8 @@ The default settings will only translate the GPS signals from the RINEX file.
 
 **Take a Quick Look at the Data**
 
-Use **quickLook** to examine the spectral characteristics of the SNR data for the default L1 settings:
+Use **quickLook** to examine the spectral characteristics of the SNR data for the default L1 settings
+[(For details on quickLook output.)](../../docs/quickLook_desc.md):
 
 *quickLook mchn 2019 205*
 

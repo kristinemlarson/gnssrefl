@@ -56,14 +56,14 @@ Begin by making an SNR file. Use the defaults, which only use the GPS signals:
 
 **Take a Quick Look at the Data**
 
-The **quickLook** command will produce a periodogram similar to the one from the web app.  By default, L1 SNR data are used:
+The **quickLook** command will produce a periodogram similar to the one from the web app.  
+[(For details on quickLook output.)](../../docs/quickLook_desc.md)
+
+The default return is for the L1 frequency:
 
 *quickLook p041 2020 132*
 
 <img src="p041-l1.png" width="500">
-
-The four subplots show different regions around the antenna (NW, NE, SW, SE). The x-axis gives the reflector height (RH) and the y-axis gives the spectral amplitude of the SNR data. The multiple colors are used to depict different satellites that rise or set over that quadrant of the field at p041. The goal of this exercise is to notice that the peaks of those periodograms are lining up around an x-value of 2 meters. There are also some thin gray lines - and those are failed periodograms. This means that the SNR data for a satellite do not meet the quality standards in the code.
-
 
 Now try looking at the periodogram for L2C:
 
@@ -71,15 +71,17 @@ Now try looking at the periodogram for L2C:
 
 <img src="p041-l2c.png" width="500">
 
-Note that there are more colors in the L1 plots than in the L2C plots. That is the result of the fact that there are more L1 satellites than L2C satellites.
+Note that there are more colors in the L1 plots than in the L2C plots. That is the result of 
+the fact that there are more L1 satellites than L2C satellites.
 
-Now try L5. These are fabulous satellites, but unfortunately there are not a lot of them:
+Now try L5:
 
 *quickLook p041 2020 132 -fr 5*
 
 <img src="p041-ql-l5.png" width="500">
 
-The L5 signal has only been available on satellites launched after 2010, so there fewer colors than for L1 (available from all satellites) or even L2C (available on satellites launched after 2005).
+The L5 signal has only been available on satellites launched after 2010, so there fewer satellite tracks than 
+for L1.
 
 The **quickLook** code has multiple options. For example, it is possible change the reflector height range:
 
