@@ -10,4 +10,23 @@ in converted SNR units (volts/volts).  If you see a strong peak in the periodogr
 that means you will have a good estimate of the RH for that satellite arc. The data
 represented in gray are "failed" periodograms. 
 
+This example is bare soil at an airport. The surface is very uniform and thus the periodograms 
+are particularly repeatable.
+
+<img src="p038_L2C.png" width=400>
+
+This example is on an ice sheet. There is some spread in reflector height peaks:
+
+<img src="lorg_L5.png" width=400>
+
+This example is taken from a site where the surface of interest is water. You will only
+see useful reflections in certain directions (and thus certain quadrants). And you will
+notice that the peaks in the periodograms are spread out because the system is sensing 
+**tides**. This means the reflector heights are varying with time, and that is what it 
+should be doing.
+
+<img src=http://gnss-reflections.org/static/images/examples/sc02100f1.png width=400>
+
+
 [Additional discussion of the GNSS-IR method, with example periodogram links.](https://gnss-reflections.org/overview)
+
