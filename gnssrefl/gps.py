@@ -3656,6 +3656,9 @@ def highrate_nz(station, year, month, day):
     inputs: station name, year, month, day
     picks up a RINEX file from GNS New zealand
     you can input day =0 and it will assume month is day of year
+    you can also try this site - not coded up yet, but I think
+    the data stay there for a couple months for some sites.
+    ftp://ftp.geonet.org.nz/rtgps/rinex1Hz/PositioNZ/2021/062/
     """
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     gns = 'ftp://ftp.geonet.org.nz/gnss/event.highrate/1hz/raw/' + cyyyy +'/' + cdoy + '/'

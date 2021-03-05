@@ -51,15 +51,15 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     print('outputfile ', outfile)
     return writetxt,writecsv,writejson,outfile
 
-def write_subdaily(outfile,station,ntv,N,writecsv,writetxt):
+def write_subdaily(outfile,station,ntv,writecsv,writetxt):
     """
     input: output filename
     station - 4 character station name
     nvt is the variable with the LSP results
-    N is the number of rows in the ntv variable
     writecsv and writetxt are booleans to tell you whether you 
     want csv output format or plain txt format (with spaces between colunmns)
     """
+    N= len(ntv)
     # this is true so I don't have to move the indents
     if True:
         print('Results are being written to : ', outfile)
@@ -77,15 +77,15 @@ def write_subdaily(outfile,station,ntv,N,writecsv,writetxt):
         fout.close()
 
 
-def readin_and_plot(xdir, station, year,d1,d2,plt2screen):
+def readin_and_plot(station, year,d1,d2,plt2screen):
     """
-    xdir - main analysis directory (REFL_CODE)
     station - 4 character name
     year -  
     d1 and d2 are days of year if you want to look at a smaller dataset
     plt2screen is a boolean whether you want the plot displayed to the screen
     """
     print('read in the data and plot it',d1,d2)
+    xdir = os.environ['REFL_CODE']
 
     # output will go to REFL_CODE/Files
     txtdir = xdir + '/Files'
@@ -343,27 +343,54 @@ def writejson(ntv,station, outfile):
 
     return True
 
-def splines_for_dummies2(x,y,origx,origy,azim,perday,plt):
+def splines_for_dummies2(tvd,azim,perday,plt):
     """
     
-    inputs for now are fractional days (x) and RH (y)
-    and number of values per day you want in the outputs
-
-    it is assumed that x and y have had some interpolation
-    to remove gaps.  
-    origx and origy are as advertised (original points without
-    the interpolation)
+    inputs for now are fractional days (origx) and RH (origy)
+    and number of values per day you want in the smoothed outputs
 
     plt is a boolean for plots to come to the screen
     note: x was in units of years before
-        
 
-    Returns xx and spline(xx) in the same units as x and y
+    Returns xx and spline(xx) in the same units as origx and origy
     """
     # sort the data by time
-    ii = np.argsort(x).T
-    x = x[ii]
-    y = y[ii]
+    t = tvd[:,1] + tvd[:,4]/24
+    ii = np.argsort(t).T
+    tvd = tvd[ii,:]
+
+    t= tvd[:,1] + tvd[:,4]/24; 
+    h = tvd[:,2]
+
+    fillgap = 2/24
+    gap = 4/24 # up to four hour gap allowed
+
+    xnew =[] ; ynew =[]
+    for i in range(1,len(t)):
+    d= t[i]-t[i-1]
+    if (d > gap):
+        print(t[i], t[i-1])
+        #print(h[i], h[i-1])
+        print('found a gap in hours',d*24)
+        x0 = t[i-1:i+1]
+        h0 = h[i-1:i+1]
+        f = scipy.interpolate.interp1d(x0,h0)
+        xnew = np.arange(t[i-1]+fillgap, t[i], fillgap)
+        ynew = f(xnew)
+        print('new t values', xnew)
+        print('new h values', ynew)
+
+# append the interpolated values so the splines don't get unhappy
+if (len(xnew) > 0):
+    xnew = np.append(t,xnew)
+    ynew = np.append(h,ynew)
+else:
+    xnew = t
+    ynew = h
+
+    # now make a x and y array that fills gaps - just makes things easier
+    # to calculate RH dot.  it IS NOT because we think interpolation is 
+    # acceptable
 
     knots_per_day = 12
     Ndays = x.max()-x.min()
