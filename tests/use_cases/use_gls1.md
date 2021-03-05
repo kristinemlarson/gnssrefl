@@ -49,7 +49,9 @@ First, make an SNR file by downloading the RINEX file and extracting the GPS SNR
 
 **Take a Look at the SNR Data**
 
-Use **quickLook** to produce a periodogram similar to the one in the web app. The periodogram  is set to use the L1 frequency by default.
+Use **quickLook** to produce a periodogram similar to the one in the web app. 
+([For details on quickLook output.](../../docs/quickLook_desc.md)
+The periodogram  is set to use the L1 frequency by default.
 
 *quickLook gls1 2019 200*
 
