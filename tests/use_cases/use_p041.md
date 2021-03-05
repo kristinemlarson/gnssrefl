@@ -38,7 +38,6 @@ recorded multi-GNSS signals. Marshall Mesa has been featured in multiple publica
 
 
 p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/fancy6?example=p041) 
-The webapp analyzes data in real-time, so please wait for 5-10 seconds.
 
 To get a sense of whether an azimuth or elevation mask is appropriate, 
 check the [Reflection Zone Mapping in the web app](https://gnss-reflections.org/rzones?station=p041&lat=39.9495&lon=-105.1943&height=1728.842&msl=on&RH=2&eang=2&azim1=0&azim2=360).  

@@ -30,7 +30,6 @@ The site was installed on November 27, 2018 and decommissioned and removed on No
 It recorded only GPS frequencies during its operation. 
 
 LORG is an example station on the [GNSS-IR web app.](https://gnss-reflections.org/fancy6?example=lorg) 
-Please note that the app will be analyzing data in real-time, so it will take 5-10 seconds.
 
 There are no significant topographic features near the station, so it is recommended to use default values 
 for the elevation mask. An azimuth mask is not required.

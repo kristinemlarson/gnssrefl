@@ -243,7 +243,6 @@ def main():
             subprocess.call(['mkdir',vegdir])
 
         vegout =  vegdir + '/' + station + '_veg.txt'
-        if 
         print('File will be written to: ', vegout)
 
         vegid = open(vegout,'w+')

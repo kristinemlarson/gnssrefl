@@ -32,8 +32,7 @@ This site only tracks legacy GPS signals.
 
 More information on mchn can be obtained 
 from the [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=mchn).
-where mchn is one of the test cases. Note that the app will be analyzing data in 
-real-time, so please wait 5-10 seconds.
+where mchn is one of the test cases. 
 
 For GNSS reflectometry, you need to set an azimuth and elevation angle mask.
 The azimuths are chosen to ensure that the reflected signals reflect off the surface of interest.

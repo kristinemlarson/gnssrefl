@@ -33,7 +33,7 @@ data from the station can be found in [Larson, MacFerrin, and Nylen (2020)](http
 Position time series for gls1 can be retrieved from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3).
 
 
-The [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=gls1) uses gls1 as an example. It takes 5-10 seconds to run.
+More information about gls1 can be found on the [GNSS-IR Web App.](https://gnss-reflections.org/fancy6?example=gls1)
 
 
 gls1 is on an ice sheet, relatively smooth in all directions, so a special azimuth mask is not required.
