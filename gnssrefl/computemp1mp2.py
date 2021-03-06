@@ -20,24 +20,26 @@ def vegplt(station, tv,winter):
     """
     input station name 
     tv: np array (year, doy, mp1, mp2) 
-    and winter flag for wehther to throw out jan-apr
-    and oct-dec
+    and winter flag for wehther to throw out ~jan-apr
+    and ~oct-dec
     """
     if (winter == 'True'):
-        cc = ((tv[:,1] > 105) & (tv[:,1] < 244))
+        cc = ((tv[:,1] > 105) & (tv[:,1] < 274))
         tv = tv[cc,:]
     plt.figure()
     t = tv[:,0]+tv[:,1]/365.25
     d = tv[:,2]
-    plt.plot(t,-d,'bo',marker='o',markersize=5)
+    plt.plot(t,-d,'b.')
     plt.ylabel('-MP1rms(m)')
-    plt.title(station + ' prelim veg stat')
+    plt.title(station + ' preliminary Vegetation statistic')
     plt.grid()
     plt.show()
 
 
 def sfilename(station, year, doy):
     """
+    input station name, year and day of year
+    and it returns the full filename on your local system
     """
     cdoy = '{:03d}'.format(doy)
     cyyyy = str(year)
@@ -50,56 +52,62 @@ def sfilename(station, year, doy):
 
 
 
-def readoutmp(rinexfile,rcvtype):
+def ReadRecAnt(teqclog):
     """
+    input is the name of a teqc log 
+    prints out Receiver and Antenna name
     """
+    mp1 = 0
+    mp2 = 0
+    foundRec = False
+    rinexfile = teqclog
+    if os.path.isfile(teqclog):
+        f=open(rinexfile,'r')
+        lines = f.read().splitlines(True)
+        lines.append('')
+
+        for i,line in enumerate(lines):
+            if "Receiver type" in line:
+                print(line[0:60])
+            if "Antenna type" in line:
+                print(line[0:60])
+            # this assumes Antenna is after Receiver
+                break
+        f.close()
+    else:
+        print('File does not exist:', teqclog)
+
+def readoutmp(teqcfile,rcvtype):
+    """
+    teqcfile input is the full name of a teqc log 
+    rcvtype is a string that includes the name of the receiver you are searching
+    for. it does not have to be exact (so NETR would work for NETRS)
+    returns MP1, MP2 (both in meters), and a boolean as to whether the values were found
+    if rcvtype is set to NONE, it will return data without restriction 
+    """
+    # change variable be ause i am reusing old code
+    rinexfile = teqcfile
+
     f=open(rinexfile,'r')
     lines = f.read().splitlines(True)
     lines.append('')
 
     mp1 = 0
     mp2 = 0
-    netrs = False
+    # set this to always be true if you don't want to restrict to one receiver
+    if rcvtype == 'NONE':
+        foundRec = True
+    else:
+        foundRec = False
     for i,line in enumerate(lines):
         if "Moving average MP1" in line:
             mp1 = line[26:34].strip()
         if "Moving average MP2" in line:
             mp2 = line[26:34].strip()
         if  rcvtype in line:
-            netrs = True
-#        if  "NETRS" in line:
+            foundRec = True
     f.close()
-#    print(mp1,mp2,netrs)
-    return mp1, mp2, netrs
-
-def mpfile_unavco(station,year,doy):
-    """
-    picks up teqc log from unavco if it exists
-    """
-    cdoy = '{:03d}'.format(doy)
-    cyyyy = str(year)
-    cyy = cyyyy[2:4]
-
-    # info for unavco
-    fdir = 'ftp://data-out.unavco.org/pub/rinex/qc/'
-    fdir = fdir + cyyyy + '/' + cdoy + '/'
-    fname = station + cdoy + '0.' + cyy + 'S'
-    url = fdir + fname
-    print(url)
-    print(fname)
-
-    # local directory info
-    ddir = os.environ['REFL_CODE'] + '/' + cyyyy + '/mp/' + station + '/'
-    if os.path.isfile(ddir + fname):
-        print('file already exists')
-    else:
-        try:
-            wget.download(url,out=fname)
-        except:
-            print('download failed for ', station)
-        if os.path.isfile(fname):
-           subprocess.call(['mv', fname, ddir])
-           print('\n SUCCESS', fname)
+    return mp1, mp2, foundRec
 
 
 def run_teqc(teqc,navfile,rinexfile,foutname,mpdir):
@@ -117,6 +125,8 @@ def run_teqc(teqc,navfile,rinexfile,foutname,mpdir):
 def check_directories(station,year):
     """
     inputs: station name and year
+    checks that directories exist for teqc logs
+    author: kristine larson
     """
     navfiledir = os.environ['ORBITS']  + '/' + str(year)
     if not os.path.isdir(navfiledir):
@@ -125,8 +135,6 @@ def check_directories(station,year):
     navfiledir = os.environ['ORBITS']  + '/' + str(year) + '/nav'
     if not os.path.isdir(navfiledir):
         subprocess.call(['mkdir',navfiledir] )
-
-
 
     foutdir =  os.environ['REFL_CODE'] + '/' + str(year) 
     if not os.path.isdir(foutdir):
@@ -148,17 +156,6 @@ def get_files(station,year,doy):
     inputs station name, year, and day of year
     makes sure the files exist etc.
     """
-
-    # should check that REFL_CODE and ORBITS exist
-
-    if len(str(year)) != 4:
-        print('Year must have four characters: ', year)
-        sys.exit()
-
-    if len(station) != 4:
-        print('station must have four characters: ', station)
-        sys.exit()
-
 
     # check that directories exist. Make them if they do not
     navfiledir, foutdir = check_directories(station,year)
@@ -202,10 +199,7 @@ def main():
     parser.add_argument("doy", help="day of year", type=int)
     parser.add_argument("-doy_end", default = None, help="day of year - to analyze multiple days", type=int)
     parser.add_argument("-year_end", default = None,  type=int)
-    parser.add_argument("-unavco", default = None, help="True picks up UNAVCO log", type=str)
-    parser.add_argument("-combine", default = None, help="True combines multiple years", type=str)
-    parser.add_argument("-winter", default = None, help="Removes winter points", type=str)
-    parser.add_argument("-rcvtype", default = None, help="Receiver type", type=str)
+    parser.add_argument("-rcvant", default = None, help="True to output receiver/antenna type", type=str)
 
     args = parser.parse_args()
 
@@ -224,77 +218,27 @@ def main():
         doy_end = doy + 1
     else:
         doy_end = args.doy_end + 1
-    teqc = g.teqc_version()
-    if args.combine != None:
-        tv = np.empty(shape=[0, 4])
-        y1 = year; y2 = year + 1
-        if args.rcvtype == None:
-            rcvtype = 'NETRS'
-        else:
-            rcvtype = args.rcvtype
-        if args.year_end != None:
-            y2 = args.year_end + 1
 
-        vegdir = os.environ['REFL_CODE'] + '/Files'
-        if not os.path.isdir(vegdir):
-            subprocess.call(['mkdir',vegdir])
-        vegdir = vegdir + '/veg'
-        if not os.path.isdir(vegdir):
-            subprocess.call(['mkdir',vegdir])
-
-        vegout =  vegdir + '/' + station + '_veg.txt'
-        print('File will be written to: ', vegout)
-
-        vegid = open(vegout,'w+')
-        # should add a header
-
-        a = []; b=[]; m1=[]; m2=[]
-        for y in range(y1,y2):
-            for d in range(doy,doy_end):
-                sfile = sfilename(station, y, d)
-                if os.path.isfile(sfile):
-                    mp1, mp2,reqested_receiver=readoutmp(sfile,rcvtype)
-                    if requested_receiver:
-                        vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s} \n".format(y,d,mp1[0:6],mp2[0:6]))
-        vegid.close()
-        tv = np.loadtxt(vegout)
-        vegplt(station, tv,args.winter)
+    # check the receiver and antenna in the teqc file
+    if args.rcvant != None: 
+        s = sfilename(station, year, doy)
+        ReadRecAnt(s)
         sys.exit()
-    if args.unavco == None: 
-        if not os.path.isfile(teqc):
-            print('teqc has to be installed in EXE. Exiting. ')
-            sys.exit()
-        else:
-           # run multiple days for a station within a given year
-            for d in range(doy,doy_end):
-                navfile, rinexfile,foutname,mpdir = get_files(station,year,d)
-                run_teqc(teqc,navfile,rinexfile,foutname,mpdir)
+
+
+    # get the name/location of the teqc executable
+    teqc = g.teqc_version()
+
+    if not os.path.isfile(teqc):
+        print('teqc has to be installed in EXE. Exiting. ')
+        sys.exit()
     else:
-        # picking up teqc logs from unavco for multiple years
-        y1 = year; y2 = year + 1
-        if args.year_end != None:
-            y2 = args.year_end + 1
-        for y in range(y1,y2):
-            check_directories(station,y)
-            for d in range(doy,doy_end):
-                mpfile_unavco(station, y, d)
+           # run multiple days for a station within a given year
+        for d in range(doy,doy_end):
+            navfile, rinexfile,foutname,mpdir = get_files(station,year,d)
+            run_teqc(teqc,navfile,rinexfile,foutname,mpdir)
 
 if __name__ == "__main__":
     main()
 
 
-
-#        for y in range(y1,y2):
-#            for d in range(doy,doy_end):
-#                sfile = sfilename(station, y, d)
-#                if os.path.isfile(sfile):
-#                    mp1, mp2 = readoutmp(sfile)
-#                    newl = [y, d, float(mp1[0:6]), float(mp2[0:6])]
-#                    tv = np.append(tv, [newl], axis=0)
-                    #print("{0:4.0f} {1:3.0f} {2:s} {3:s} ".format(y,d,mp1[0:6],mp2[0:6]))
-                    #vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s} \n".format(y,d,mp1[0:6],mp2[0:6]))
-                    #newl = [y, d, float(mp1[0:6]), float(mp2[0:6])]
-                        #m1.append(float(mp1))
-                        #m2.append(float(mp2))
-                    #tv = np.append(tv, [newl], axis=0)
-                    #print("{0:4.0f} {1:3.0f} {2:s} {3:s} ".format(y,d,mp1[0:6],mp2[0:6]))

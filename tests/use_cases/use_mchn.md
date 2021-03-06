@@ -29,9 +29,8 @@ Station mchn is operated by [NRCAN](https://www.nrcan.gc.ca/home).
 The station overlooks Lake Superior in a favorable location for measuring seasonal water levels.
 This site only tracks legacy GPS signals. 
 
-
 More information on mchn can be obtained 
-from the [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=mchn).
+from the [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=mchn),
 where mchn is one of the test cases. 
 
 For GNSS reflectometry, you need to set an azimuth and elevation angle mask.
@@ -43,7 +42,8 @@ The azimuths are chosen to ensure that the reflected signals reflect off the sur
 
 **Make SNR File** 
 
-The default settings will only translate the GPS signals from the RINEX file.
+If you know where the data are stored (i.e. sopac), it is better (faster) to set that flag.
+Since the receiver only tracks GPS signals, there is no need to specify gnss orbits.
 
 *rinex2snr mchn 2019 205 -archive sopac*
 
@@ -84,14 +84,14 @@ Analysis parameters are set up with **make_json_input**.
 [The json file will then need to be manually edited to use only L1 and to set the azimuth region.](mchn.json) 
 The frequency used is set by modifying the list "freqs" to contain only the L1 code (1), and the list "reqAmp" 
 to have the same number of elements as "freqs". Note that the azimuth region is restricted to the range of 80-180 degrees. 
-Although it is possible to get good reflections beyond 180 degrees, the reflecting surface is clearly not uniform.
+Although it is possible to get good reflections beyond 180 degrees, the photographs suggest barriers are present.  
 
 Now that the analysis parameters are set, run **gnssir** to save the reflector height (RH) output for each day in 2013.
 
 *gnssir mchn 2013 1 -doy_end 365*
 
 The daily output files are stored in $REFL_CODE/2013/results/mchn. [Here is an example output for a single day.](195.txt) 
-Plots can be seen with the -plt option.
+Plots of SNR data can be seen with the -plt option.
 
 *gnssir mchn 2013 195  -plt True*
 

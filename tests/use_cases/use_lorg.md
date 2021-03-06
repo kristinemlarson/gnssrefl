@@ -34,6 +34,8 @@ LORG is an example station on the [GNSS-IR web app.](https://gnss-reflections.or
 There are no significant topographic features near the station, so it is recommended to use default values 
 for the elevation mask. An azimuth mask is not required.
 
+If you are curious about the position time series for the antenna, you can use *download_unr lorg* for more information.
+
 ## Reproduce the Web App
 
 **Make SNR File**

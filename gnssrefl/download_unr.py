@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-downloads nevada reno blewitt files
-kristine larson
+downloads East North Vertical nevada reno position files
+IGS2014 frame
+author: kristine larson
 """
 import argparse
 import wget
@@ -19,28 +20,25 @@ def main():
 
     args = parser.parse_args()
 
-#   make sure environment variables exist.  set to current directory if not
-
     station = args.station
     if len(station) != 4:
-        print('illegal name-must be 4 characters')
+        print('illegal station name-must be 4 characters')
         sys.exit()
+    # geoff blewitt likes upper case
     station = station.upper()
-#    http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/P101.tenv3
     url= 'http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/'
-         # http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/P101.tenv3
     fname = station + '.tenv3'
+    stationL = station.lower() # lower case
     url = url + fname
-    print(url)
+    # file will be stored here
+    myfname = stationL + '_igs14.tenv3'
     try:
-        wget.download(url, out=fname)
+        wget.download(url, out=myfname)
     except:
-        print('\n download failed:', fname)
+        print('\n download failed:', url)
 
     if os.path.exists(fname):
-        print('\n SUCCESS:', fname)
-    else:
-
+        print('\n SUCCESS:', myfname)
 
 if __name__ == "__main__":
     main()

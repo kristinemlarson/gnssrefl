@@ -30,14 +30,17 @@ Station gls1 was installed on the Greenland Ice Sheet in 2011.
 The antenna is mounted on a long pole; approximately 3.5-meter of the pole was above the ice at the time of installation. 
 The receiver at the site only consistently tracks legacy GPS signals. A detailed discussion of the monument and 
 data from the station can be found in [Larson, MacFerrin, and Nylen (2020)](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
-Position time series for gls1 can be retrieved from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3).
+Various position time series for gls1 can be retrieved 
+from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3). We also have 
+a utility you can use:
 
+*download_unr gls1*
 
 More information about gls1 can be found on the [GNSS-IR Web App.](https://gnss-reflections.org/fancy6?example=gls1)
 
 
 gls1 is on an ice sheet, relatively smooth in all directions, so a special azimuth mask is not required.
-gls1 was originally installed with an elevation mask of 7 degrees, so 7-25 should be used for the elevation mask.
+gls1 was originally installed with an elevation mask of 7 degrees, so 7-25 should be used with GNSS-IR.
 
 ## Reproduce the Web App
 
@@ -57,7 +60,9 @@ quickLook uses the L1 frequency by default:
 
 <img src="gls1-L1.png" width="500">
 
-The SNR values for the L2 and L5 frequencies do not meet the quality standards for GNSS reflectometry.
+The peaks in all four qudarants are bunched at ~1.2 meters reflector height (RH).  
+
+This site did not consistently track L2C, so we will not use the L2 data. L5 was not tracked.
 
 ## Measure Snow Accumulation in 2012
 
