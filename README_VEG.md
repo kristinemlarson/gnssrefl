@@ -31,11 +31,13 @@ year and sp3 or nav depending on the orbit format.
 
 * REFL_CODE = where outputs of the code will be stored
 
-You might need to install CRX2RNX in the EXE area. See gnssrefl readme file. 
+Eventually you might need to install CRX2RNX in the EXE area. See the gnssrefl readme file for more details. 
 
 UNAVCO has a large stockpile of teqc logs that are used to extra vegetation stats.
 For PBO H2O we had a system for QC that we do not reproduce here. We also provided context
 for preciptation and thus provided NLDAS and NDVI data. We do not do that here. 
+A big 
+
 
 To download teqc logs for station p048 (which is used in Larson and Small, 2014) in 2008:
 

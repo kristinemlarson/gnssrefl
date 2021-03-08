@@ -624,7 +624,7 @@ def rinex_sopac(station, year, month, day):
             wget.download(url1,file1)
             subprocess.call(['uncompress', file1])
             subprocess.call([crnxpath, fname])
-            #subprocess.call(['rm', '-f',fname])
+            subprocess.call(['rm', '-f',fname])
             #print('successful Hatanaka download from SOPAC ')
         except:
             #print('Not able to download from SOPAC',file1)

@@ -15,6 +15,14 @@ import wget
 
 import gnssrefl.gps as g
 import gnssrefl.computemp1mp2 as veg
+def in_winter(d):
+    """
+    pretty silly winter screen tool
+    """
+    inwinter = False
+    if (d < 105) or (d > 274):
+        inwinter = True
+    return inwinter 
 
 def newvegplot(vegout):
     """
@@ -86,8 +94,6 @@ def main():
     parser.add_argument("-rcvtype", default = None, help="Receiver type", type=str)
     parser.add_argument("-winter", default = None, help="Removes winter points", type=str)
 
-
-
     args = parser.parse_args()
 
 #   make sure environment variables exist.  set to current directory if not
@@ -113,24 +119,26 @@ def main():
     # should add a header
     vegid = open(vegout,'w+')
 
+    if args.winter == None:
+        winter = False
+    else:
+        winter = True
+        #if (winter == 'True'):
+        #cc = ((tv[:,1] > 105) & (tv[:,1] < 274))
+        #tv = tv[cc,:]
     k = 0
     for y in range(y1,y2):
         for d in range(1,367):
-            sfile = veg.sfilename(station, y, d)
-            if os.path.isfile(sfile):
-                mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
-                if requested_rcv:
-                    k+=1
-                    vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}   {4:s}\n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile))
+            if not in_winter(d):
+                sfile = veg.sfilename(station, y, d)
+                if os.path.isfile(sfile):
+                    mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
+                    if requested_rcv:
+                        k+=1
+                        vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}   {4:s}\n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile))
     vegid.close()
-    print(k)
+    print(k, ' daily observations')
     if k > 0:
         newvegplot(vegout)
-        # for now
-        #tv = np.loadtxt(vegout,usecols=(0,1,2,3))
-        # read the receiver type separately ...
-        #r = np.genfromtxt(vegout,usecols=(4),dtype='str')
-        #if len(tv) > 0:
-        #    veg.vegplt(station, tv,args.winter)
 if __name__ == "__main__":
     main()
