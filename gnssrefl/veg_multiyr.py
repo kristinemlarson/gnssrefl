@@ -16,6 +16,47 @@ import wget
 import gnssrefl.gps as g
 import gnssrefl.computemp1mp2 as veg
 
+def newvegplot(vegout):
+    """
+    send the file name and try to make a plot segreating for 
+    changes in teqc metric and receiver type
+    """
+    # get the numerical data
+    tv = np.loadtxt(vegout,usecols=(0,1,2,3))
+    # read the receiver type separately ... because it is a string
+    r = np.genfromtxt(vegout,usecols=(4),dtype='str')
+    rcvs = np.unique(r)
+# number of receivers
+    N = len(rcvs)
+    colors = 'brybrybry'
+    plt.figure()
+    k=0
+    for i in range(0,N):
+        receiver = rcvs[i]
+    # find the indices with the correct receiver
+        ii = (receiver == r)
+        outx = tv[ii,0] + tv[ii,1]/365.25
+    # now segreate by those that are not zero ... because teqc changed
+    # from using MP1 to MP12
+        outcol2 = tv[ii,2]
+        outcol3 = tv[ii,3]
+        ii = (outcol2 > 0)
+        jj = (outcol3 > 0)
+    # since we have a legend we don't want to plot it when it is empty
+        xout = np.append(outx[ii],outx[jj])
+        yout = np.append(-outcol2[ii],-outcol3[jj])
+        plt.plot(xout,yout,'.', label=receiver)
+        #if (len(outx[ii]) > 0):
+        #    plt.plot(outx[ii], -outcol2[ii],dd,label=receiver)
+        #if (len(outx[jj]) > 0):
+        #    plt.plot(outx[jj], -outcol3[jj],dd,label=receiver)
+        k = k + 1
+    plt.legend(loc="upper left")
+    plt.ylabel('-L1 rms (m)')
+    plt.grid()
+    plt.title(vegout)
+    plt.show()
+
 def vegoutfile(station):
     """
     make sure directories exist for prelim veg output file
@@ -77,15 +118,19 @@ def main():
         for d in range(1,367):
             sfile = veg.sfilename(station, y, d)
             if os.path.isfile(sfile):
-                mp1, mp2,requested_rcv=veg.readoutmp(sfile,rcvtype)
+                mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
                 if requested_rcv:
                     k+=1
-                    vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s} \n".format(y,d,mp1[0:6],mp2[0:6]))
+                    vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}   {4:s}\n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile))
     vegid.close()
     print(k)
-    tv = np.loadtxt(vegout)
-    if len(tv) > 0:
-        veg.vegplt(station, tv,args.winter)
-
+    if k > 0:
+        newvegplot(vegout)
+        # for now
+        #tv = np.loadtxt(vegout,usecols=(0,1,2,3))
+        # read the receiver type separately ...
+        #r = np.genfromtxt(vegout,usecols=(4),dtype='str')
+        #if len(tv) > 0:
+        #    veg.vegplt(station, tv,args.winter)
 if __name__ == "__main__":
     main()

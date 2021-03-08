@@ -28,9 +28,11 @@ def vegplt(station, tv,winter):
         tv = tv[cc,:]
     plt.figure()
     t = tv[:,0]+tv[:,1]/365.25
-    d = tv[:,2]
-    plt.plot(t,-d,'b.')
-    plt.ylabel('-MP1rms(m)')
+    ii = (tv[:,2] > 0) # MP12
+    jj = (tv[:,3] > 0) # MP1
+    plt.plot(t[ii],-tv[ii,2],'b.',label='MP12')
+    plt.plot(t[jj],-tv[jj,3],'r.',label='MP1')
+    plt.ylabel('-L1 Multipath rms(m)')
     plt.title(station + ' preliminary Vegetation statistic')
     plt.grid()
     plt.show()
@@ -92,22 +94,30 @@ def readoutmp(teqcfile,rcvtype):
     lines = f.read().splitlines(True)
     lines.append('')
 
-    mp1 = 0
-    mp2 = 0
+    # defaults  so there is something to return
+    mp12 = '0'
+    mp1 = '0'
+    rcvtypeinfile = 'xxxx'
     # set this to always be true if you don't want to restrict to one receiver
     if rcvtype == 'NONE':
         foundRec = True
     else:
         foundRec = False
+
     for i,line in enumerate(lines):
-        if "Moving average MP1" in line:
+        if "Receiver type" in line:
+            # remove white space
+            rcvtypeinfile=line[26:40].replace(" ","")
+        # new style teqc
+        if "Moving average MP12" in line:
+            mp12 = line[26:34].strip()
+        # old style teqc
+        if "Moving average MP1 " in line:
             mp1 = line[26:34].strip()
-        if "Moving average MP2" in line:
-            mp2 = line[26:34].strip()
         if  rcvtype in line:
             foundRec = True
     f.close()
-    return mp1, mp2, foundRec
+    return mp12, mp1, foundRec, rcvtypeinfile
 
 
 def run_teqc(teqc,navfile,rinexfile,foutname,mpdir):
@@ -115,12 +125,13 @@ def run_teqc(teqc,navfile,rinexfile,foutname,mpdir):
     inputs: nav file, rinexfile, and output file name 
     run teqc and store in the file called foutname
     """
-    fout = open(foutname,'w')
-    subprocess.call([teqc, '-nav', navfile, '+qc', rinexfile], stdout=fout)
-    fout.close()
+    line = [teqc, '-nav', navfile, '+qc', rinexfile]
+    subprocess.call(line)
     details = rinexfile[0:11] + 'S'
     print('SUCCESS: ',mpdir + '/' + details)
     subprocess.call(['mv','-f',details,mpdir] )
+    # clean up - remove rinex file
+    subprocess.call(['rm','-f',rinexfile] )
 
 def check_directories(station,year):
     """
@@ -151,17 +162,20 @@ def check_directories(station,year):
     return navfiledir, foutdir
 
 
-def get_files(station,year,doy):
+def get_files(station,year,doy,look):
     """
     inputs station name, year, and day of year
     makes sure the files exist etc.
     """
+    goahead = False # means you found everything and can run teqc
 
     # check that directories exist. Make them if they do not
     navfiledir, foutdir = check_directories(station,year)
     mpdir = foutdir
 
-    cdoy = '{:03d}'.format(doy) ; cyy = '{:02d}'.format(year-2000)
+    cdoy = '{:03d}'.format(doy) ; 
+    cyy = '{:02d}'.format(year-2000)
+    cyyyy = '{:04d}'.format(year-2000)
 
     navfile = navfiledir + '/' + 'auto' + cdoy + '0.' + cyy + 'n'
     nd = navfile + '.xz'
@@ -179,18 +193,28 @@ def get_files(station,year,doy):
     nexist = os.path.isfile(navfile)
 
     if not rexist:
-        print('No input RINEX file',rinexfile)
-        sys.exit()
+        print('No RINEX file',rinexfile)
+        if look == None:
+            goahead = False
+        else:
+            g.rinex_unavco(station, year, doy,0)
+            if os.path.isfile(rinexfile):
+                goahead = True
+                print('retrieved from UNAVCO: ',rinexfile)
+    else:
+        goahead = True
+
     if not nexist:
+        goahead = False
         print('No nav file',navfile)
-        sys.exit()
 
     foutname = foutdir + '/' + station + cdoy + '0.' + cyy + '.mp'
-    return navfile, rinexfile,foutname,mpdir
+    print(navfile, rinexfile,foutname,mpdir)
+    return navfile, rinexfile,foutname,mpdir, goahead
 
 def main():
     """
-    command line interface for download_rinex
+    computes MP1 MP2 stats using teqc or reads existing log
     """
 
     parser = argparse.ArgumentParser()
@@ -200,6 +224,7 @@ def main():
     parser.add_argument("-doy_end", default = None, help="day of year - to analyze multiple days", type=int)
     parser.add_argument("-year_end", default = None,  type=int)
     parser.add_argument("-rcvant", default = None, help="True to output receiver/antenna type", type=str)
+    parser.add_argument("-look", default = None, help="True to try and download from unavco", type=str)
 
     args = parser.parse_args()
 
@@ -235,8 +260,9 @@ def main():
     else:
            # run multiple days for a station within a given year
         for d in range(doy,doy_end):
-            navfile, rinexfile,foutname,mpdir = get_files(station,year,d)
-            run_teqc(teqc,navfile,rinexfile,foutname,mpdir)
+            navfile, rinexfile,foutname,mpdir,goahead = get_files(station,year,d,args.look)
+            if goahead:
+                run_teqc(teqc,navfile,rinexfile,foutname,mpdir)
 
 if __name__ == "__main__":
     main()

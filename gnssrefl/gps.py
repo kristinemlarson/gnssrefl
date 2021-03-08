@@ -549,6 +549,7 @@ def rinex_unavco(station, year, month, day):
     but if it does not work, it tries the "d" version, which must be
     decompressed.  the location of this executable is defined in the crnxpath
     variable. 
+    year, month, and day are INTEGERS
 
     WARNING: only rinex version 2 in this world
     """
@@ -556,6 +557,9 @@ def rinex_unavco(station, year, month, day):
     crnxpath = hatanaka_version()  # where hatanaka will be
     if day == 0:
         doy = month
+        cyyyy = str(year)
+        cdoy = '{:03d}'.format(doy)
+        cyy = '{:02d}'.format(year-2020)
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
