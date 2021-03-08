@@ -70,26 +70,26 @@ For p208:
 
 *veg_multiyr p208 2008 2020*
 
-<img src="docs/p208.png">
+<img src="docs/p208.png" width=450>
 
 p048 was highlighted in Larson and Small (2014):
 
 *veg_multiyr p048 2008 2020*
 
-<img src="docs/p048.png">
+<img src="docs/p048.png" width=450>
 
 At this site a snow filter is required. We only have a simple one:
 
 *veg_multiyr p048 2008 2020 -winter True*
 
-<img src="docs/p048_winter.png">
+<img src="docs/p048_winter.png" width=450>
 
 the trend you see IS NOT VEGETATION. It is the long-term death of this receiver.
 You can see we got lucky that our original paper only had eight years of data:
 
 *veg_multiyr p048 2008 2015 -winter True*
 
-<img src="docs/p048_edit.png">
+<img src="docs/p048_shorter.png" width=450>
 
 
 p537 has a change from Trimble to Septentrio. This is relevant because 
@@ -99,13 +99,14 @@ always been normalized against the receiver behavior when the vegetation is drie
 
 *veg_multiyr p537 2008 2020*
 
-<img src="docs/p537.png">
+<img src="docs/p537.png" width=450>
 
 ### mp1mp2
 So the sort of bad news is I am hesitant to trust the multi-GNSS teqc logs
-that UNAVCO computes. In order to avoid any confusion, for NEW experiments, it is best
-to run teqc yourself. To do this yourself, it only requires the station name, the year, and 
-the day of year. In this example, you must have the RINEX file in your directory:
+that UNAVCO computes. In order to avoid any confusion, for NEW experiments, I think it is best
+to run teqc yourself. You need to have installed the teqc executable.  Otherwise, it 
+only requires the station name, the year, and the day of year. In this example, 
+you must have the RINEX file in your directory:
 
 *mp1mp2 p537 2020 1*
 
@@ -115,6 +116,25 @@ If you RINEX file is stored at UNAVCO, just add the look option:
 
 It will pick up the RINEX file for you and the orbits and compute the teqc log making sure that
 only GPS data are used.  
+
+The utility recognizes that sometimes you will want to do multiple days of this, so you can do the whole year:
+
+*mp1mp2 p537 2020 1 -look True -doy_end 366*
+
+
+### Receiver/Antenna
+
+If you have teqc logs for a site and you just want to check the receiver and antenna type:
+
+*mp1mp2 p537 2020 50 -rcvant True*
+
+It will print to the screen:
+
+Receiver type           : SEPT POLARX5 (# = 3012343) (fw = 5
+
+Antenna type            : TRM59800.00     SCIT (# = 52113544
+
+
 
 
 
