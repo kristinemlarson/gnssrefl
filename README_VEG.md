@@ -12,7 +12,16 @@ The first is a "how to" and the second is a validation using sites in Montana.
 Matt Jones does a very nice job of showing how the GPS stats compare to vegetation optical depth
 [(pdf)](https://www.kristinelarson.net/wp-content/uploads/2015/10/JonesMJ_etal_2013.pdf).
 
-Mike Willis has been kind enough to provide a home for the [PBO H2O results](https://cires1.colorado.edu/portal). And finally, there was one paper led by Eric Small to use these data to 
+Mike Willis has been kind enough to provide a home for the [PBO H2O results](https://cires1.colorado.edu/portal). Some
+of the sites are highlighted in this documentation:
+
+* [p048](http://cires1.colorado.edu/portal/index.php?product=vegetation&station=p048)
+
+* [p208](http://cires1.colorado.edu/portal/index.php?product=vegetation&station=p208)
+
+* [p537](http://cires1.colorado.edu/portal/index.php?product=vegetation&station=p537)
+
+And finally, there was one paper led by Eric Small to use these data to 
 study the [2012-2014 California drought.](https://www.kristinelarson.net/wp-content/uploads/2018/03/Small-Roesler-Larson2018-1.pdf) 
 
 
