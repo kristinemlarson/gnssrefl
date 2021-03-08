@@ -41,17 +41,16 @@ Eventually you will need to install teqc and CRX2RNX in the EXE area. See the gn
 
 UNAVCO has a large stockpile of teqc logs that can be used to extract vegetation stats.
 For PBO H2O we had a system for QC that worked pretty well to eliminate outliers caused 
-by snow or rain. *We do not reproduce here.* We also provided context
+by snow or rain. *We do not reproduce that here.* We also provided context
 for preciptation and thus provided NLDAS and NDVI data. We do not do that here. 
 PBO took advantage of the fact that 1100 identical receivers that only tracked GPS signals (Trimble NETRS) were 
-installed at the same time. By the mid2010s receivers did start to fail and were replaced
+installed at the same time. By the mid-2010s the GPS receivers did start to fail and were replaced
 with newer units. We deliberately removed the data from these receivers because there were 
 biases. This points to a problem that will be an issue going forward, as receivers WILL be 
-updated.  And multi-GNSS is not the same as GPS.
+updated. And multi-GNSS is not the same as GPS. Generally, receivers today are multi-GNSS. PBO H2O was GPS only.
 
 
-
-To download teqc logs for station p048 (which is used in Larson and Small, 2014) in 2008:
+To download teqc logs for station p048 in the year 2008 (which is used in Larson and Small paper) :
 
 *download_teqc p048 2008* 
 
@@ -59,7 +58,7 @@ If you want to look at more than one year for p048:
 
 *download_teqc p048 2008 -year_end 2020* 
 
-Go ahead and download teqc logs for p208, which is an awfully nice site:
+Go ahead and also download teqc logs for p208, which is an awfully nice site:
 
 *download_teqc p208 2008 -year_end 2020* 
 
@@ -93,7 +92,7 @@ You can see we got lucky that our original paper only had eight years of data:
 
 
 p537 has a change from Trimble to Septentrio. This is relevant because 
-we are going to use Septentrio. Even though there is a bias between the 
+we are going to use a multi-GNSS Septentrio unit. Even though there is a bias between the 
 receivers, that is OK.  We are looking at variations - and the data have 
 always been normalized against the receiver behavior when the vegetation is driest:
 
@@ -110,7 +109,7 @@ you must have the RINEX file in your directory:
 
 *mp1mp2 p537 2020 1*
 
-If you RINEX file is stored at UNAVCO, just add the look option:
+If your RINEX file is stored at UNAVCO, just add the look option:
 
 *mp1mp2 p537 2020 1 -look True*
 
@@ -122,7 +121,7 @@ The utility recognizes that sometimes you will want to do multiple days of this,
 *mp1mp2 p537 2020 1 -look True -doy_end 366*
 
 
-### Receiver/Antenna
+### Receiver/Antenna Information
 
 If you have teqc logs for a site and you just want to check the receiver and antenna type:
 
@@ -135,6 +134,15 @@ Receiver type           : SEPT POLARX5 (# = 3012343) (fw = 5
 Antenna type            : TRM59800.00     SCIT (# = 52113544
 
 
+### Download RINEX files from UNACVCO
+
+For December 2, 2010 and station p537:
+
+*download_rinex 537 2010 12 2* 
+
+If you prefer to use day of year, leave the last input as zero.  So for year 2010 and day of year 2:
+
+*download_rinex p537 2010 2 0* 
 
 
 
