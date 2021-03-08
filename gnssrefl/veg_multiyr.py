@@ -24,7 +24,7 @@ def in_winter(d):
         inwinter = True
     return inwinter 
 
-def newvegplot(vegout):
+def newvegplot(vegout,station):
     """
     send the file name and try to make a plot segreating for 
     changes in teqc metric and receiver type
@@ -62,7 +62,7 @@ def newvegplot(vegout):
     plt.legend(loc="upper left")
     plt.ylabel('-L1 rms (m)')
     plt.grid()
-    plt.title(vegout)
+    plt.title('L1 Multipath Statistics for ' + station.upper() )
     plt.show()
 
 def vegoutfile(station):
@@ -120,16 +120,23 @@ def main():
     vegid = open(vegout,'w+')
 
     if args.winter == None:
-        winter = False
+        winterMask = False
     else:
-        winter = True
-        #if (winter == 'True'):
-        #cc = ((tv[:,1] > 105) & (tv[:,1] < 274))
-        #tv = tv[cc,:]
+        winterMask = True
     k = 0
-    for y in range(y1,y2):
-        for d in range(1,367):
-            if not in_winter(d):
+    if winterMask:
+        for y in range(y1,y2):
+            for d in range(1,367):
+                if not in_winter(d):
+                    sfile = veg.sfilename(station, y, d)
+                    if os.path.isfile(sfile):
+                        mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
+                        if requested_rcv:
+                            k+=1
+                            vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}   {4:s}\n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile))
+    else:
+        for y in range(y1,y2):
+            for d in range(1,367):
                 sfile = veg.sfilename(station, y, d)
                 if os.path.isfile(sfile):
                     mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
@@ -139,6 +146,6 @@ def main():
     vegid.close()
     print(k, ' daily observations')
     if k > 0:
-        newvegplot(vegout)
+        newvegplot(vegout,station)
 if __name__ == "__main__":
     main()
