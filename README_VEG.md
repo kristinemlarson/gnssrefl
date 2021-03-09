@@ -4,16 +4,19 @@ This is an unofficial part of the [gnssrefl package](README.md).
 The best way to learn about this technique is to read 
 these two papers:
 
-* [Larson and Small, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson_2014Small.pdf) 
+* [Larson and Small, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson_2014Small.pdf)
+Normalized Microwave Reflection Index: A Vegetation Measurement Derived from GPS Data 
 
 * [Small, Larson, and Smith , 2014](https://www.kristinelarson.net/wp-content/uploads/2015/11/SmallLarsonSmith2014.pdf)
+Normalized Microwave Reflection Index: Validation of Vegetation Water Content Estimates at Montana Grasslands
 
 The first is a "how to" and the second is a validation using sites in Montana.
 Matt Jones does a very nice job of showing how the GPS stats compare to vegetation optical depth
-[(pdf)](https://www.kristinelarson.net/wp-content/uploads/2015/10/JonesMJ_etal_2013.pdf).
+[(pdf)](https://www.kristinelarson.net/wp-content/uploads/2015/10/JonesMJ_etal_2013.pdf)
+Comparing Land Surface Phenology Derived from Satellite and GPS Network Microwave Remote Sensing.
 
 Mike Willis has been kind enough to provide a home for the [PBO H2O results](https://cires1.colorado.edu/portal). Some
-of the sites are highlighted in this documentation:
+of the sites are highlighted in this documentation (includes photos, ancillary data, terrain maps, google Earth link):
 
 * [p048](http://cires1.colorado.edu/portal/index.php?product=vegetation&station=p048)
 
@@ -23,6 +26,7 @@ of the sites are highlighted in this documentation:
 
 And finally, there was one paper led by Eric Small to use these data to 
 study the [2012-2014 California drought.](https://www.kristinelarson.net/wp-content/uploads/2018/03/Small-Roesler-Larson2018-1.pdf) 
+Vegetation Response to the 2012-2014 California Drought from GPS and Optical Measurements
 
 
 ### Installing the Code
@@ -159,4 +163,17 @@ If you prefer to use day of year, leave the last input as zero.  So for year 201
 *download_rinex p537 2010 2 0* 
 
 
+### Reflection Zone
+
+The reflection zone depends on the height of the antenna over the reflecting surface. While
+for snow and soil moisture we used the SNR data down to 5 degrees, the vegetation statistic only
+uses pseudorange and carrier phase data down to 10 degrees (there are reasons for 
+this). I made a webapp that produces reflection
+zone maps over google earth. I have added a vegetation friendly option (elevation angles 10,15,20)
+and you should use the tower height (~18 meters) not the default sea level option.  Here is the command
+using 66.15696 and -147.5028:
+
+[BONA](http://gnss-reflections.org/rzones?station=&lat=66.15696&lon=-147.5028&height=100&msl=off&RH=18&eang=5&azim1=0&azim2=360)
+
+I used a fake height for BONA since the app only needs lat and long.
 
