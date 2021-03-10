@@ -1,4 +1,6 @@
 """
+author: kristine larson
+called by quickLook_cl.py
 quickLook functions - consolidated snr reader (previously in a separate file)
 """
 import sys
@@ -87,21 +89,14 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     KL 21feb06 return data from the plots so that Jupyter notebooks can use them.
     also added pltscreen variable so that the default plots are not always displayed
     """
-    #  return data to Jupyter Notebook people, good results
-    nw = {}; sw = {}; ne = {}; se = {}
-    # failed periodograms
-    failnw = {}; failsw = {}; failne = {}; failse = {}
-    list1 = {}; 
-    # list of satellites in each quadrant
-    list1['NW']=[]; list1['NE']=[]; list1['SW']=[]; list1['SE']=[];
-    list1['failNW']=[]; list1['failNE']=[]; list1['failSW']=[]; list1['failSE']=[];
 
-    # try the kelly way
+    # dictionary for output
     data = {'NW':{},'SW':{},'NE':{},'SE':{},'fNW':{},'fSW':{},'fNE':{},'fSE': {} }
 
     # make sure environment variables exist
     g.check_environ_variables()
 
+    # make sure logs directory exists
     if not os.path.isdir('logs'):
         subprocess.call(['mkdir', 'logs'])
 
@@ -189,14 +184,6 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                             avgAzim,maxF,satNu,f,maxAmp,maxAmp/Noise,T))
                         if pltscreen:
                             plt.plot(px,pz,linewidth=1.5)
-                        if a==0:
-                               nw[satNu] = [px,pz]; list1['NW'].append(satNu)
-                        elif a==1:
-                               sw[satNu] = [px,pz]; list1['SW'].append(satNu)
-                        elif a==2:
-                               ne[satNu] = [px,pz]; list1['NE'].append(satNu)
-                        elif a==3:
-                               se[satNu] = [px,pz]; list1['SE'].append(satNu)
                         idc = stitles[a]
                         data[idc][satNu] = [px,pz]
 
@@ -204,14 +191,6 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         # these are failed tracks
                         if pltscreen:
                             plt.plot(px,pz,'gray',linewidth=0.5)
-                        if a==0:
-                               failnw[satNu] = [px,pz]; list1['failNW'].append(satNu)
-                        elif a==1:
-                               failsw[satNu] = [px,pz]; list1['failSW'].append(satNu)
-                        elif a==2:
-                               failne[satNu] = [px,pz]; list1['failNE'].append(satNu)
-                        elif a==3:
-                               failse[satNu] = [px,pz]; list1['failSE'].append(satNu)
                         idc = 'f' + stitles[a]
                         data[idc][satNu] = [px,pz]
 
@@ -236,6 +215,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         print('some kind of problem with SNR file, so I am exiting the code politely.')
 
 
+    # returns multidimensional dictionary of lomb scargle results so 
+    # that the jupyter notebook people can replot them
     return data
 
 

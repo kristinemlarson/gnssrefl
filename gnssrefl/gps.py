@@ -2917,7 +2917,20 @@ def big_Disk_in_DC(station, year, month, day):
         status = subprocess.call(['gunzip', gzip_rinexfile])
     except:
         okok = 1
-        #print('some problem in download - maybe the site does not exist on this archive')
+
+    if os.path.isfile(rinexfile):
+        print('found it')
+    else:
+        print('try hatanaka')
+        try:
+            url = mainadd + str(year) + '/' + cdoy+ '/' + station + '/' + comp_rinexfiled 
+            wget.download(url, out=comp_rinexfiled)
+            subprocess.call(['uncompress',comp_rinexfiled])
+            #subprocess.call([crnxpath,comp_rinexfiled])
+            # get rid of d file
+            #subprocess.call(['rm',comp_rinexfiled])
+        except:
+            okok = 1
 
 def ydoy2ymd(year, doy):
     """

@@ -29,9 +29,9 @@ def main():
     parser.add_argument("station", help="station name", type=str)
 # optional inputs: filename to output daily RH results 
     parser.add_argument("-year", default='None', type=str, help="restrict to years beginning with")
-    parser.add_argument("-txtfile", default='None', type=str, help="output (plain text)") 
-    parser.add_argument("-csvfile", default='None', type=str, help="output (csv)")
-    parser.add_argument("-jsonfile", default='None', type=str, help="output (json)")
+    parser.add_argument("-txtfile", default='None', type=str, help="output filename (plain text)") 
+    parser.add_argument("-csvfile", default='None', type=str, help="output filename (csv)")
+    parser.add_argument("-jsonfile", default='None', type=str, help="output filename(json)")
     parser.add_argument("-plt", default='None', type=str, help="set to False to suppress plots")
 
     args = parser.parse_args()
@@ -66,7 +66,7 @@ def main():
     # for now exit
     if (writejson):
         print(outfile, station)
-        t.writejson(ntv,station, outfile)
+        t.writejsonfile(ntv,station, outfile)
     sys.exit()
     # this should also be in a function
     if (writejson):

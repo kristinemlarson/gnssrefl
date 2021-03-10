@@ -4,7 +4,7 @@
 import argparse
 import datetime
 import json
-import matplotlib.pyplot as Plt
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 import sys
@@ -118,13 +118,13 @@ def readin_and_plot(station, year,d1,d2,plt2screen):
 
     #
     if plt2screen:
-        Plt.figure()
-        Plt.plot( tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25, tv[:,2], '.')
-        Plt.ylabel('Reflector Height (m)')
-        Plt.title('GNSS station: ' + station)
-        Plt.gca().invert_yaxis()
-        Plt.grid()
-        Plt.show()
+        plt.figure()
+        plt.plot( tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25, tv[:,2], '.')
+        plt.ylabel('Reflector Height (m)')
+        plt.title('GNSS station: ' + station)
+        plt.gca().invert_yaxis()
+        plt.grid()
+        plt.show()
     # always make a png file
 #    plotname = txtdir + '/' + station + '_subdaily_RH.png'
 #    Plt.savefig(plotname)
@@ -179,7 +179,7 @@ def fract_to_obstimes(spl_x):
     return obstimes
 
 #
-def splines_for_dummies(x,y,perday,plt):
+def splines_for_dummies(x,y,perday,pltit):
     """
     inputs for now are fractional years (x) and RH (y)
     and number of values per day
@@ -205,7 +205,6 @@ def splines_for_dummies(x,y,perday,plt):
     x1 = x.min()+0.1/365.25
     x2 = x.max()-0.1/365.25
     knots =np.linspace(x1,x2,num=numKnots)
-#    Plt.figure()
     t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
     # user specifies how many values per day you want to provide
     N = int(Ndays*perday)
@@ -218,15 +217,15 @@ def splines_for_dummies(x,y,perday,plt):
     ii = np.absolute(resid) > 0.5; 
     jj = np.absolute(resid) < 0.5; 
 
-    if plt:
+    if pltit:
 
-        Plt.figure()
-        Plt.plot(x, y, 'bo', label='Original points',markersize=3)
+        plt.figure()
+        plt.plot(x, y, 'bo', label='Original points',markersize=3)
         obstimes = fract_to_obstimes(spl_x)
-        Plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
+        plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
 
-        Plt.figure()
-        Plt.plot(x, resid, 'bo', x[ii], resid[ii],'ro', markersize=3)
+        plt.figure()
+        plt.plot(x, resid, 'bo', x[ii], resid[ii],'ro', markersize=3)
 
         # with large outliers removed?
         #Plt.figure()
@@ -239,7 +238,7 @@ def splines_for_dummies(x,y,perday,plt):
         #Plt.figure()
         #Plt.plot(xx, yy-sply, 'ro', markersize=3)
 
-        Plt.show()
+        plt.show()
 
     return spl_x, spl_y
 
@@ -272,7 +271,7 @@ def write_out_header(fout,station):
     fout.write('% year, doy, RH,  sat, UTCtime,  Azim,   Amp,  PkNoise, Freq, edotF, Mon,Day, Hr,Min,  MJD \n')
 
 
-def writejson(ntv,station, outfile):
+def writejsonfile(ntv,station, outfile):
     """
     subdaily RH values written out in json format
     inputs: ntv is the variable with concatenated results
@@ -343,17 +342,20 @@ def writejson(ntv,station, outfile):
 
     return True
 
-def splines_for_dummies2(tvd,azim,perday,plt):
+def splines_for_dummies2(tvd,azim,perday,pltit):
     """
     
     inputs for now are fractional days (origx) and RH (origy)
     and number of values per day you want in the smoothed outputs
 
-    plt is a boolean for plots to come to the screen
-    note: x was in units of years before
+    pltit is a boolean for plots to come to the screen
+    note: x was in units of years before but now is in days??
+
+    what is azim?
 
     Returns xx and spline(xx) in the same units as origx and origy
     """
+    # tvd is the normal output of gnssir i think ???
     # sort the data by time
     t = tvd[:,1] + tvd[:,4]/24
     ii = np.argsort(t).T
@@ -367,32 +369,35 @@ def splines_for_dummies2(tvd,azim,perday,plt):
 
     xnew =[] ; ynew =[]
     for i in range(1,len(t)):
-    d= t[i]-t[i-1]
-    if (d > gap):
-        print(t[i], t[i-1])
-        #print(h[i], h[i-1])
-        print('found a gap in hours',d*24)
-        x0 = t[i-1:i+1]
-        h0 = h[i-1:i+1]
-        f = scipy.interpolate.interp1d(x0,h0)
-        xnew = np.arange(t[i-1]+fillgap, t[i], fillgap)
-        ynew = f(xnew)
-        print('new t values', xnew)
-        print('new h values', ynew)
+        d= t[i]-t[i-1]
+        if (d > gap):
+            #print(t[i], t[i-1])
+            print('found a gap in hours',d*24)
+            x0 = t[i-1:i+1]
+            h0 = h[i-1:i+1]
+            f = scipy.interpolate.interp1d(x0,h0)
+            xnew = np.arange(t[i-1]+fillgap, t[i], fillgap)
+            ynew = f(xnew)
+            print('new t values', xnew)
+            print('new h values', ynew)
 
 # append the interpolated values so the splines don't get unhappy
-if (len(xnew) > 0):
-    xnew = np.append(t,xnew)
-    ynew = np.append(h,ynew)
-else:
-    xnew = t
-    ynew = h
+    if (len(xnew) > 0):
+        xnew = np.append(t,xnew)
+        ynew = np.append(h,ynew)
+    else:
+        xnew = t
+        ynew = h
 
     # now make a x and y array that fills gaps - just makes things easier
     # to calculate RH dot.  it IS NOT because we think interpolation is 
     # acceptable
 
     knots_per_day = 12
+    #???? since i am reusing code
+    x = xnew
+    y = ynew
+
     Ndays = x.max()-x.min()
     numKnots = int(knots_per_day*(Ndays))
     print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,'number of days ', Ndays )
@@ -400,9 +405,8 @@ else:
     x1 = x.min()+0.1
     x2 = x.max()-0.1
     knots =np.linspace(x1,x2,num=numKnots)
-#    Plt.figure()
     t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
-    # user specifies how many values per day you want to provide
+    # user specifies how many values per day you want to send back to the user  
     N = int(Ndays*perday)
     # evenly spaced data - units of days
     xx = np.linspace(x.min(), x.max(), N)
@@ -410,25 +414,21 @@ else:
     # equal spacing in both x and y
     spl_x = xx; spl_y = spline(xx)
     # this is the residual for each measurement defined in x,y
-    # they are not time sorted however
-    resid = origy-spline(origx)
-    ii = np.absolute(resid) > 0.5;
-    print(azim[ii])
-    print(resid[ii])
+    #resid = origy-spline(origx)
+    #ii = np.absolute(resid) > 0.5;
     # "good points"
-    jj = np.absolute(resid) < 0.5;
-    if plt:
-        Plt.figure()
-        Plt.subplot(211)
-        Plt.plot(x, y, 'bo', label='Original points',markersize=3)
+    #jj = np.absolute(resid) < 0.5;
+    if pltit:
+        plt.figure()
+        plt.subplot(211)
+        plt.plot(xnew, ynew, 'bo', label='Original points',markersize=3)
         obstimes = fract_to_obstimes(spl_x)
-        Plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
+        plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
 
-        Plt.subplot(212)
-        Plt.plot(origx[jj],origy[jj],'b.',origx[ii],origy[ii],'ro')
-
-
-        Plt.show()
+        # put the original series without outliers eventually?
+        #plt.subplot(212)
+        #plt.plot(origx[jj],origy[jj],'b.',origx[ii],origy[ii],'ro')
+        plt.show()
 
     return spl_x, spl_y
         # this worked - but didn't have names, so not useful
