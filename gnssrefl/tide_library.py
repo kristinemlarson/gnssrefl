@@ -1,4 +1,4 @@
-# preliminary tide data. 
+# codes for subdaily/tide data. 
 # used primarily by prelim_tides.py
 # kristine larson february 2021
 import argparse
@@ -19,6 +19,20 @@ import scipy
 import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
+
+def print_badpoints(t):
+    """
+    input: station name and lomb scargle result array of "bad points"
+    """
+#  year, doy, RH,  sat, UTCtime,  Azim,   Amp,  PkNoise, Freq, edotF, Mon,Day, Hr,Min,  MJD
+#   (0)  (1)  (2)  (3)   (4)    (5)      (6)    (7)    (8)      (9)  (10)   (11)(12)(13)(14)   (15)
+    m,n = t.shape
+    f = 'outliers.txt'
+    print('outliers written to file: ', f) 
+    fout = open(f, 'w+')
+    for i in range(0,m):
+         fout.write('doy {0:3.0f} sat {1:3.0f} azim {2:6.2f} fr {3:3.0f} \n'.format(t[i,1], t[i,3],t[i,5], t[i,8]) )
+    fout.close()
 
 def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
@@ -317,7 +331,8 @@ def splines_for_dummies2(fname,perday,pltit,outlierV):
     h = tvd[:,2]
     xfac = tvd[:,9]
 
-    fillgap = 2/24
+    # 
+    fillgap = 1/24 # one hour fake values
     gap = 4/24 # up to four hour gap allowed
 
     tnew =[] ; ynew =[]; 
@@ -358,26 +373,31 @@ def splines_for_dummies2(fname,perday,pltit,outlierV):
     print('Number of knots', numKnots)
     print('Number of days ', '{0:8.2f}'.format ( Ndays) )
     # need the first and last knot to be inside the time series
-    t1 = tnew.min()+0.1
-    t2 = tnew.max()-0.1
+    t1 = tnew.min()+0.05
+    t2 = tnew.max()-0.05
+    # try this 
     # 
     knots =np.linspace(t1,t2,num=numKnots)
 
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
     # user specifies how many values per day you want to send back to the user  
-    N = int(Ndays*perday)
 
-    # evenly spaced data - units of days
-    xx = np.linspace(tnew.min(), tnew.max(), N)
-    # should i do extrapolate True? I think so
-    spline = interpolate.BSpline(t, c, k, extrapolate=False)
+    # should i do extrapolate True? it is the default  - could make it periodic?
+    spline = interpolate.BSpline(t, c, k, extrapolate=True)
     # equal spacing in both x and y
+    # evenly spaced data - units of days
+    N = int(Ndays*perday)
+    xx = np.linspace(tnew.min(), tnew.max(), N)
     spl_x = xx; spl_y = spline(xx)
 
 #  clean up the data a bit
     resid_spl = h - spline(th) 
+    # good points
     i = (np.absolute(resid_spl) < outlierV)
+    # bad points
     j = (np.absolute(resid_spl) > outlierV)
+    # put these in a file if you are interested
+    print_badpoints(tvd[j,:])
     if pltit:
         plt.figure()
         plt.subplot(211)
@@ -388,6 +408,7 @@ def splines_for_dummies2(fname,perday,pltit,outlierV):
         plt.title('Reflector Height')
         plt.ylabel('meters')
         plt.plot(th[j], h[j], 'co',label='Outliers') 
+        plt.grid()
         #plt.legend(loc="upper left")
 
 # take out the bad points
@@ -397,12 +418,12 @@ def splines_for_dummies2(fname,perday,pltit,outlierV):
 # remove bad points from the original variable
     tvd = tvd[i,:]
 
-
 # put the original series without outliers eventually?
 # use first diff to get simple velocity.  
 # 24 hours a day, you asked for perday values by day
     obsPerHour= perday/24
         
+    # these are unreliable at beginning and end of the series for clear reasons
     tvel = spl_x[1:N]
     yvel = obsPerHour*np.diff(spl_y)
 
@@ -418,6 +439,7 @@ def splines_for_dummies2(fname,perday,pltit,outlierV):
         plt.plot(th, rhdot_at_th,'.',label='RHdot at obs')
         plt.title('RHdot in meters per hour')
         plt.ylabel('meters per hour'); plt.xlabel('days of the year')
+        plt.grid()
         plt.xticks(rotation=45)
 
         plt.figure()
@@ -426,12 +448,14 @@ def splines_for_dummies2(fname,perday,pltit,outlierV):
         plt.plot(th, resid_spl - correction,'.',label='wcorr')
         plt.legend(loc="upper left")
         plt.xlabel('days of the year')
+        plt.grid()
         plt.xticks(rotation=45)
         plt.show()
     print('RMS no corr (m)', '{0:6.3f}'.format ( np.std(resid_spl)) )
     print('RMS w/ corr (m)', '{0:6.3f}'.format ( np.std(resid_spl - correction))  )
     # this is RH with the RHdot correction
     a = resid_spl - correction
+    print('Freq   Bias(m)   Sigma (m)')
     for f in [1, 20, 5, 101, 102, 201, 205,207,208]:
         ff = (tvd[:,8] == f)
         if len(a[ff]) > 0:
