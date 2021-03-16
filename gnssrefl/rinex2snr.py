@@ -214,6 +214,10 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                     in1 = g.binary(rinexfile)
                     in2 = g.binary(snrname) # this file is made locally and moved later
                     in3 = g.binary(orbfile)
+                    if (len(snrname) > 132) or (len(orbfile) > 132):
+                        print('The orbit or SNR file name is too long.')
+                        print('Make your environment variable names shorter.')
+                        return
                     in4 = g.binary(str(option))
                     if (dec_rate > 0):
                         decr = str(dec_rate)

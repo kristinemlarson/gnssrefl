@@ -15,6 +15,7 @@ from datetime import date
 import gnssrefl.gps as g
 
 
+import scipy
 import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
@@ -77,14 +78,15 @@ def write_subdaily(outfile,station,ntv,writecsv,writetxt):
         fout.close()
 
 
-def readin_and_plot(station, year,d1,d2,plt2screen):
+def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     """
     station - 4 character name
-    year -  
+    year is year ;-)  
     d1 and d2 are days of year if you want to look at a smaller dataset
     plt2screen is a boolean whether you want the plot displayed to the screen
+    author: kristine larson
     """
-    print('read in the data and plot it',d1,d2)
+    print('read in the data and plot it between these days: ',d1,d2)
     xdir = os.environ['REFL_CODE']
 
     # output will go to REFL_CODE/Files
@@ -93,17 +95,27 @@ def readin_and_plot(station, year,d1,d2,plt2screen):
         os.makedirs(txtdir)
 
     # where the LSP results are kept
-    direc = xdir + '/' + str(year) + '/results/' + station  + '/'
+    direc = xdir + '/' + str(year) + '/results/' + station  + '/' + extension + '/'
     tv = np.empty(shape=[0, 17])
     if os.path.isdir(direc):
         all_files = os.listdir(direc)
-        print('Number of files in ', year, len(all_files))
+        print(direc)
+        #print('Number of files in ', year, len(all_files))
         for f in all_files:
-            fname = direc + f
-            a = np.loadtxt(fname,comments='%')
-            tv = np.append(tv, a,axis=0)
+            # only evaluate txt files
+            if (len(f) ==  7) and (f[4:8] == 'txt'):
+                day = int(f[0:3])
+                if (day >= d1) & (day <= d2):
+                    fname = direc + f
+                    try:
+                        a = np.loadtxt(fname,comments='%')
+                        if len(a) > 0:
+                            tv = np.append(tv, a,axis=0)
+                    except:
+                        print('some issue with ',fname)
 
     print('Number of rows and columns ', tv.shape)
+    print(tv.shape)
     t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
     rh = tv[:,2]
 
@@ -112,6 +124,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen):
     t = t[ii] ; rh = rh[ii]
     # store it all in a new variable
     tv = tv[ii,:]
+    # sill y - why read it if you are not going to use it
     # and restrict by doy - mostly to make testing go faster
     ii = (tv[:,1] >= d1) & (tv[:,1] <= d2)
     tv = tv[ii,:]
@@ -119,10 +132,12 @@ def readin_and_plot(station, year,d1,d2,plt2screen):
     #
     if plt2screen:
         plt.figure()
-        plt.plot( tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25, tv[:,2], '.')
+        plt.plot( tv[:,1] + tv[:,4]/24, tv[:,2], '.')
         plt.ylabel('Reflector Height (m)')
         plt.title('GNSS station: ' + station)
+        plt.xlabel('Days in the Year ' + str(year) ) 
         plt.gca().invert_yaxis()
+        plt.xticks(rotation =45)
         plt.grid()
         plt.show()
     # always make a png file
@@ -177,70 +192,6 @@ def fract_to_obstimes(spl_x):
         obstimes = np.append(obstimes, datetime.datetime(year=y, month=month, day=day, hour=h, minute=m, second=0 ))
 
     return obstimes
-
-#
-def splines_for_dummies(x,y,perday,pltit):
-    """
-    inputs for now are fractional years (x) and RH (y)
-    and number of values per day
-    plt is a boolean for plots to come to the screen
-        
-    this is not an attempt to model water varaiations
-    Our goal here is to remove a first model for RH dot impacts.  
-    There are other ways to do this - and we will be adding more
-    of them as time allows
-    For a full tidal analysis you should estimate tidal coefficients
-
-    Returns xx and spline(xx) in the same units as x and y
-    """
-    # sort the data by time
-    ii = np.argsort(x).T
-    
-    x = x[ii]
-    y = y[ii]
-    knots_per_day = 12
-    Ndays = 365.25*(x.max()-x.min())
-    numKnots = int(knots_per_day*(Ndays))
-    print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
-    x1 = x.min()+0.1/365.25
-    x2 = x.max()-0.1/365.25
-    knots =np.linspace(x1,x2,num=numKnots)
-    t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
-    # user specifies how many values per day you want to provide
-    N = int(Ndays*perday)
-    xx = np.linspace(x.min(), x.max(), N)
-    spline = interpolate.BSpline(t, c, k, extrapolate=False)
-    # equal spacing in both x and y
-    spl_x = xx; spl_y = spline(xx)
-
-    resid = y-spline(x)
-    ii = np.absolute(resid) > 0.5; 
-    jj = np.absolute(resid) < 0.5; 
-
-    if pltit:
-
-        plt.figure()
-        plt.plot(x, y, 'bo', label='Original points',markersize=3)
-        obstimes = fract_to_obstimes(spl_x)
-        plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
-
-        plt.figure()
-        plt.plot(x, resid, 'bo', x[ii], resid[ii],'ro', markersize=3)
-
-        # with large outliers removed?
-        #Plt.figure()
-        #xx=x[jj]
-        #yy= y[jj]
-        #splx,sply = in_out(xx,yy)
-        #Plt.plot(xx,yy, 'o', markersize=3)
-        #Plt.plot(splx,sply,'r-')
-
-        #Plt.figure()
-        #Plt.plot(xx, yy-sply, 'ro', markersize=3)
-
-        plt.show()
-
-    return spl_x, spl_y
 
 def in_out(x,y):
     """
@@ -342,99 +293,150 @@ def writejsonfile(ntv,station, outfile):
 
     return True
 
-def splines_for_dummies2(tvd,azim,perday,pltit):
+def splines_for_dummies2(fname,perday,pltit,outlierV):
     """
-    
-    inputs for now are fractional days (origx) and RH (origy)
-    and number of values per day you want in the smoothed outputs
+    tvd is a filename for subdaily RH results 
 
     pltit is a boolean for plots to come to the screen
     note: x was in units of years before but now is in days??
 
-    what is azim?
 
-    Returns xx and spline(xx) in the same units as origx and origy
+    Returns xx and y- these are in units of days (xx)
+    and meters (yy), where yy is the spline fit to reflector height
+    computed perday times per day
     """
-    # tvd is the normal output of gnssir i think ???
-    # sort the data by time
-    t = tvd[:,1] + tvd[:,4]/24
-    ii = np.argsort(t).T
+    # read in the tvd values which are the output of gnssir
+    tvd = np.loadtxt(fname,comments='%')
+    # sort the data by days 
+    ii = np.argsort( (tvd[:,1]+tvd[:,4]/24) ).T
     tvd = tvd[ii,:]
 
-    t= tvd[:,1] + tvd[:,4]/24; 
+    # time variable in days
+    th= tvd[:,1] + tvd[:,4]/24; 
+    # reflector height
     h = tvd[:,2]
+    xfac = tvd[:,9]
 
     fillgap = 2/24
     gap = 4/24 # up to four hour gap allowed
 
-    xnew =[] ; ynew =[]
-    for i in range(1,len(t)):
-        d= t[i]-t[i-1]
+    tnew =[] ; ynew =[]; 
+    # fill in gaps using variables called tnew and ynew
+    for i in range(1,len(th)):
+        d= th[i]-th[i-1]
         if (d > gap):
             #print(t[i], t[i-1])
             print('found a gap in hours',d*24)
-            x0 = t[i-1:i+1]
+            x0 = th[i-1:i+1]
             h0 = h[i-1:i+1]
             f = scipy.interpolate.interp1d(x0,h0)
-            xnew = np.arange(t[i-1]+fillgap, t[i], fillgap)
-            ynew = f(xnew)
-            print('new t values', xnew)
-            print('new h values', ynew)
+            tnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
+            ynew = f(tnew)
+#            print('new t values', tnew)
+#            print('new h values', ynew)
 
 # append the interpolated values so the splines don't get unhappy
-    if (len(xnew) > 0):
-        xnew = np.append(t,xnew)
+
+    if (len(tnew) > 0):
+        tnew = np.append(th,tnew)
         ynew = np.append(h,ynew)
+        # try sorting to see if that fixes it
+        ii = np.argsort( tnew) 
+        tnew = tnew[ii]
+        ynew = ynew[ii]
     else:
-        xnew = t
+        tnew = th
         ynew = h
 
-    # now make a x and y array that fills gaps - just makes things easier
-    # to calculate RH dot.  it IS NOT because we think interpolation is 
-    # acceptable
-
     knots_per_day = 12
-    #???? since i am reusing code
-    x = xnew
-    y = ynew
 
-    Ndays = x.max()-x.min()
+    Ndays = tnew.max()-tnew.min()
     numKnots = int(knots_per_day*(Ndays))
-    print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,'number of days ', Ndays )
+    print('First and last time values', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
+    print('Number of RH obs', len(h))
+    print('Average obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
+    print('Number of knots', numKnots)
+    print('Number of days ', '{0:8.2f}'.format ( Ndays) )
     # need the first and last knot to be inside the time series
-    x1 = x.min()+0.1
-    x2 = x.max()-0.1
-    knots =np.linspace(x1,x2,num=numKnots)
-    t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
+    t1 = tnew.min()+0.1
+    t2 = tnew.max()-0.1
+    # 
+    knots =np.linspace(t1,t2,num=numKnots)
+
+    t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
     # user specifies how many values per day you want to send back to the user  
     N = int(Ndays*perday)
+
     # evenly spaced data - units of days
-    xx = np.linspace(x.min(), x.max(), N)
+    xx = np.linspace(tnew.min(), tnew.max(), N)
+    # should i do extrapolate True? I think so
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
     # equal spacing in both x and y
     spl_x = xx; spl_y = spline(xx)
-    # this is the residual for each measurement defined in x,y
-    #resid = origy-spline(origx)
-    #ii = np.absolute(resid) > 0.5;
-    # "good points"
-    #jj = np.absolute(resid) < 0.5;
+
+#  clean up the data a bit
+    resid_spl = h - spline(th) 
+    i = (np.absolute(resid_spl) < outlierV)
+    j = (np.absolute(resid_spl) > outlierV)
     if pltit:
         plt.figure()
         plt.subplot(211)
-        plt.plot(xnew, ynew, 'bo', label='Original points',markersize=3)
-        obstimes = fract_to_obstimes(spl_x)
-        plt.plot(spl_x, spl_y, 'r', label='Kristine spline')
+        plt.plot(th, h, 'bo', label='Original points',markersize=3)
+        # cannot use this because i do not have the year in the tnew variable
+        #obstimes = fract_to_obstimes(spl_x)
+        plt.plot(spl_x, spl_y, 'r', label='spline')
+        plt.title('Reflector Height')
+        plt.ylabel('meters')
+        plt.plot(th[j], h[j], 'co',label='Outliers') 
+        #plt.legend(loc="upper left")
 
-        # put the original series without outliers eventually?
-        #plt.subplot(212)
-        #plt.plot(origx[jj],origy[jj],'b.',origx[ii],origy[ii],'ro')
+# take out the bad points
+    th = th[i]; h = h[i]
+    xfac = xfac[i]
+    resid_spl = resid_spl[i]
+# remove bad points from the original variable
+    tvd = tvd[i,:]
+
+
+# put the original series without outliers eventually?
+# use first diff to get simple velocity.  
+# 24 hours a day, you asked for perday values by day
+    obsPerHour= perday/24
+        
+    tvel = spl_x[1:N]
+    yvel = obsPerHour*np.diff(spl_y)
+
+    rhdot_at_th = np.interp(th, tvel, yvel)
+
+    # this is the RHdot correction. This can be done better - 
+    # this is just a start
+    correction = xfac*rhdot_at_th
+
+    if pltit:
+        plt.subplot(212)
+        plt.plot(tvel, yvel, '-',label='RHdot')
+        plt.plot(th, rhdot_at_th,'.',label='RHdot at obs')
+        plt.title('RHdot in meters per hour')
+        plt.ylabel('meters per hour'); plt.xlabel('days of the year')
+        plt.xticks(rotation=45)
+
+        plt.figure()
+        plt.subplot(211)
+        plt.plot(th, resid_spl,'.',label='uncorr')
+        plt.plot(th, resid_spl - correction,'.',label='wcorr')
+        plt.legend(loc="upper left")
+        plt.xlabel('days of the year')
+        plt.xticks(rotation=45)
         plt.show()
+    print('RMS no corr (m)', '{0:6.3f}'.format ( np.std(resid_spl)) )
+    print('RMS w/ corr (m)', '{0:6.3f}'.format ( np.std(resid_spl - correction))  )
+    # this is RH with the RHdot correction
+    a = resid_spl - correction
+    for f in [1, 20, 5, 101, 102, 201, 205,207,208]:
+        ff = (tvd[:,8] == f)
+        if len(a[ff]) > 0:
+            print('{0:3.0f} {1:6.2f} {2:6.2f} '.format (f, np.mean(a[ff]), np.std(a[ff]) ) )
 
-    return spl_x, spl_y
-        # this worked - but didn't have names, so not useful
-        #o['station'] = station
-        #o['data'] =  ntv[:,[0,1,2,4,15,3]].tolist()
-        # give my numpy variables names
-        # to make a string
-        # x=datetime.datetime(2018,9,15)
-        # print(x.strftime("%b %d %Y %H:%M:%S"))
+
+    return tvd, correction 
+

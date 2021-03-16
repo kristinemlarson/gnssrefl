@@ -45,22 +45,22 @@ c     21feb22 port to python f2py so it can be used in gnssrefl
       character*4 station
 c     character*2  key(maxsat) 
       character*2 prn_pickc
-      character*1 char, satID(maxsat)
+      character*1 satID(maxsat)
       integer  nobs, itime(5), prn(maxsat), numsat, flag, sec,
      +   msec, lli(maxob,maxsat), iprn,
      .   ios, itrack, i, iobs(maxsat), 
      .  gpsweek, prn_pick, fileIN, fileOUT,
-     .  iymd(3), nepochs, FirstWeek  
+     .  iymd(3), nepochs, FirstWeek, idec
       real*8  obs(maxob,maxsat), tod,North(3),
      .   East(3), Up(3), azimuth, elev, staXYZ(3), tod_save,
      .   pi,s1,s2,s5,xrec, yrec, zrec, tc, 
      .   edot,elev2, s6, s7, s8,rt,
      .   rt_lastEpoch, FirstSecond, tod2, Lat,Long,Ht
-      logical eof, bad_point,simon 
+      logical eof, bad_point,simon,keep_point,decimate
       integer sp3_gps_weeks(np),sp3_nsat,sp3_satnames(maxsat)
       real*8 sp3_XYZ(maxsat,np,3), sp3_gps_seconds(np),
      .  t9(9), x9(9), y9(9), z9(9), sp3_rel_secs(np)
-      integer ipointer(maxGNSS),errid
+      integer ipointer(maxGNSS),errid,itod
       logical haveorbit(maxGNSS), debug
       debug = .false.
 c      file id for error log
@@ -81,7 +81,13 @@ c     shorter filenames
       write(errid,*) 'RINEX file:',rawf
       write(errid,*) 'Output file:',outf
       write(errid,*) 'Selection:',snrtype
-      write(errid,*) 'dec factor (not implemented):',decfac
+      write(errid,*) 'dec factor :',decfac
+
+      READ (decfac, '(I2)') idec
+      decimate = .true.
+      if (idec .eq. 0) then
+          decimate = .false.
+      endif
 
       prn_pickc = snrtype
 c
@@ -139,10 +145,6 @@ c     open output file
         if (ios.ne.0) goto 99
         read(inline(1:32),'(5I3,X,I2,X,I3,4X,2I3)')
      +         (itime(i), i=1,5), sec, msec, flag, numsat
-c       if (debug) then
-c         print*, 'number of satellites ' ,numsat
-c         print*, inline
-c       endif
 c       seconds in the day
         tod = itime(4)*3600.0 + 60.0*itime(5) + sec
 c       print*, tod, tod_save
@@ -159,7 +161,17 @@ c       read the observation block
      .    prn,obs,lli)
 c       flag 4 means it is a comment block, so that gets skipped
 c       added that the point is good
-        if (flag .ne. 4 .and. .not.bad_point) then
+        itod = int(tod)
+        keep_point = .true.
+        if (decimate) then
+          if (mod(itod,idec) .ne.0) then
+c             write(errid,*) tod ,' begone'
+              keep_point = .false.
+          endif
+        endif
+
+        if (keep_point) then 
+        if (flag .ne.4.and..not.bad_point) then
 c         find out gpsweek and gpsseconds (tc)
           call convert_time(itime,sec, msec, gpsweek, tc)
 c         then convert it to relative time to first sp3 point 
@@ -203,15 +215,15 @@ c               print*,iprn,' bad orbit'
 c                   since i did time values 0.5 seconds apart, multiply by 2
                     edot =  2.d0*(elev2-elev)
                 endif
-c                 assign the SNR values to variables
+c               assign the SNR values to variables
                 call pickup_snr(obs, iobs, itrack, s1, s2, s5,s6,s7,s8)
 c                 write out to a file
-cprint*,iprn,' good orbit',s1,s2  
                 call write_gnss_to_file(fileOUT, iprn, tod,
      .          s1,s2,s5,azimuth, elev,edot,prn_pick,s6,s7,s8,tod2)
               endif
             endif
           enddo
+        endif
         endif
       enddo
 99    continue
@@ -507,7 +519,7 @@ c     print*, gps_second, rt
 
       integer  i, fileID,fid
       character*80 rawf
-      character*80 line, dynfmt, dynfmt2
+      character*80 line, dynfmt 
       logical  endofheader 
       integer nobs,iobs(maxsat), iymd(3), ios
       character*2 key(maxsat)
@@ -775,7 +787,7 @@ c     kl 2021 feb 24
       integer jj, ierr,prn, ihr, t(9),polyorder
 c     real*8 xrec, yrec, zrec
       real*8 tc, SatPos(3), toffset, omeg, ghadot,
-     . xnew, ynew, znew, tod,
+     . xnew, ynew, znew,
      . azimuth, elev, North(3), East(3), Up(3),stationXYZ(3), range2,
      .  t9(9), x9(9),y9(9), z9(9), outX,outY,outZ,dy
 c    this code requests the azel for a time (tc) and satellite (prn)
@@ -1119,7 +1131,7 @@ c     returns s1,s2,s5 etc
       parameter (c = 0.299792458D+09)      
 
       character*1 char, satID(maxsat)
-      integer fileID, i, itrack, flag, nobs, numsat, sec
+      integer fileID, i, itrack, flag, nobs, numsat 
       integer prn(maxsat), ios, nsat
       character*80 inline, dynfmt, dynfmt2, dynfmt3,dynfmt4
       character*80 anotherline
@@ -1345,7 +1357,7 @@ c     all data < 10
         endif
       endif
 c this format statement gives space for edot and S5
-111   format(i3,  2f10.4, f10.0, f10.6, f7.2, 3f7.2)
+c 111   format(i3,  2f10.4, f10.0, f10.6, f7.2, 3f7.2)
 c this format allows galileo
 112   format(i3,  2f10.4, f10.1, f10.6, f7.2, 5f7.2)
       end
