@@ -1,15 +1,17 @@
 C FILE: GPSSNR.F 
       SUBROUTINE FOO(rawf,outf,broadf,snrtype,decfac,errf) 
       implicit none
-      character*80 rawfilename, outfilename, broadfile
+      character*132 rawfilename, outfilename, broadfile
       character*2 snrtype, decfac
-      character*80 rawf,outf,broadf,mess,errf
+      character*132 rawf,outf,broadf,mess,errf
 Cf2py intent(in) rawf
 Cf2py intent(in) outf
 Cf2py intent(in) broadf
 Cf2py intent(in) snrtype
 Cf2py intent(in) decfac
 Cf2py intent(in) errf
+
+c change to 132 characters for inputs
 
       integer maxsat, maxeph, maxob
       parameter (maxsat = 50)
@@ -497,6 +499,7 @@ c     new version (19mar01) taken from my GNSS code
 c     kristine larson
 c     allows 20 observables
 c     allow error message to be returned to main program
+c     march 2021 change filename to 132 characters
       implicit none
 
       integer maxsat, maxeph, maxob
@@ -507,7 +510,7 @@ c     allow error message to be returned to main program
       parameter (c = 0.299792458D+09)       
 
       integer  i, fileID,fid
-      character*80 rawf, mess
+      character*132 rawf, mess
       character*80 line, dynfmt,errf
       logical  endofheader
       integer nobs,iobs(maxsat), iymd(3), ios
@@ -903,6 +906,8 @@ c
       end
       subroutine read_broadcast4(filename, bele,iymd)
       implicit none
+c     not sure if this is read but i am having 
+c     filename be up to 132 characters
 
       integer maxsat, maxeph, maxob
       parameter (maxsat = 50)
@@ -911,7 +916,8 @@ c
       real*8 c
       parameter (c = 0.299792458D+09)      
 
-      character*80 filename, temp,mess
+      character*80 temp
+      character*132 filename, mess
       real*8 bele (maxeph,maxsat,28), rt1, rt2, rt3, rt4
       integer i, j, k, k1, iymd(3),year4ch,
      .  iprn, file(maxsat), it1, it2, it3, it4, it5, iversion, ios
@@ -1110,7 +1116,7 @@ c     gps seconds, including non integer parts
       end
 
       subroutine name2ydoy(rawfilename,year,doy)
-      character*80 rawfilename
+      character*132 rawfilename
       integer ts, k1, k2,year,doy
       ts = index(rawfilename,' ')
       k1 = ts-13 + 5

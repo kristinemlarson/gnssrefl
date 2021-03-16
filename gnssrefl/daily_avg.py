@@ -31,7 +31,7 @@ def main():
     parser.add_argument("-extension", default=None, type=str, help="extension for solution names")
     parser.add_argument("-year1", default=None, type=str, help="restrict to years starting with")
     parser.add_argument("-year2", default=None, type=str, help="restrict to years ending with")
-    parser.add_argument("-fr", default=0, type=int, help="frequency, default is 1")
+    parser.add_argument("-fr", default=0, type=int, help="frequency, default is to use all")
     parser.add_argument("-csv", default=None, type=str, help="True if you want csv instead of plain text")
     args = parser.parse_args()
 #   these are required
@@ -116,6 +116,7 @@ def main():
         # change from doy to month and day in datetime
                             d = datetime.date(yr,1,1) + datetime.timedelta(doy-1)
                             medv = np.median(rh)
+                            # 0 means use all frequencies.  otherwise, you can specify 
                             if fr == 0:
                                 cc = (rh < (medv+howBig))  & (rh > (medv-howBig))
                             else:
