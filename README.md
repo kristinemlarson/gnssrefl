@@ -16,6 +16,17 @@
 
 ### News <a name="news"></a>
 
+March 17, 2021
+
+I have removed CDDIS from the default RINEX 2.11 archive search list. It is still useable if you use 
+-archive cddis.
+
+March 14, 2021
+
+Minor changes - filenames using the hybrid option are allowed to be 132 characters long.
+This might address issue with people that want to have very very very long path names.
+I also added the decimation feature so it works for both GPS and GNSS.
+
 February 24, 2021
 
 We now have three translation options for RINEX files: fortran, hybrid, and python. The last of these
@@ -180,6 +191,15 @@ bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.h
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
 
 
+### File Formats <a name=fileformats"></a>
+
+RINEX files must be version 2.11 or 3.  For RINEX 2.11, filenames should be lowercase and following the 
+community standard. 
+
+Assuming the environment variables for ORBITS and REFL_CODE have been set :
+
+(under construction)
+
 ### rinex2snr - making SNR files from RINEX files <a name="module1"></a>
 
 The international standard for sharing GNSS data is called 
@@ -213,7 +233,7 @@ A sample call for a station called p041, restricted to GPS satellites, on day of
 *rinex2snr p041 2020 132*
 
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
-it will check four archives (unavco, sopac, cddis, and sonel) to find it. 
+it will check three archives (unavco, sopac, and sonel) to find it. 
 This uses the hybrid translator.  If you did install a fortran translator, the command would be:
 
 *rinex2snr p041 2020 132 -translator fortran* 

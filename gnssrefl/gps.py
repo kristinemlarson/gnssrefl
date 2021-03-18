@@ -3899,6 +3899,11 @@ def go_get_rinex(station,year,month,day,receiverrate):
     """
     function to do the dirty work of getting a rinex file
     inputs station name, year, month, day
+
+    21mar17
+    cddis puts out very large screen outputs.  when trying to meld this
+    with jupyter notebooks, we had difficulties. cddis can still be 
+    accessed directly, but we are removing it from the "default" list
     """
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
     if (os.path.isfile(rinexfile) == True):
@@ -3920,11 +3925,11 @@ def go_get_rinex(station,year,month,day,receiverrate):
                     rinex_sopac(station, year, month, day)
                 except:
                     print('SOPAC did not work')
-                if not os.path.isfile(rinexfile):
-                    try:
-                        rinex_cddis(station, year, month, day)
-                    except:
-                        print('CDDIS did not work')
+                #if not os.path.isfile(rinexfile):
+                #    try:
+                #        rinex_cddis(station, year, month, day)
+                #    except:
+                #        print('CDDIS did not work')
                 if not os.path.isfile(rinexfile):
                     try:
                         rinex_sonel(station, year, month, day)
