@@ -109,6 +109,7 @@ c     Check to see if broadcast file exists
       open(22,file=broadfile, status='old',iostat=ios)
       if (ios.ne.0) then
         write(errid,*)'ERROR:Problem opening navigation file'
+        write(errid,*)'broadfile'
         close(22)
         return
       endif
@@ -142,7 +143,11 @@ c removed subroutine moving_sites bevacuse life is short
         return
       endif
       if (nobs .gt. 20) then
-        mess = 'ERROR: code only works for <= 20 obs types'
+        mess = 'ERROR: this code only works for <= 20 obs types'
+        write(errid,*)mess
+        mess = '1 solution is to to run teqc on the original RINEX'
+        write(errid,*)mess
+        mess = 'with -O.obs S1+S2+S5 as the option, rerun.'
         write(errid,*)mess
         return
       endif
