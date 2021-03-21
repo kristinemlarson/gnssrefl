@@ -8,15 +8,15 @@
 
 **Ellipsoidal Coordinates:**
 
--Latitude: 40.05539 
+- Latitude: 40.05539 
 
--Longitude: -105.59053
+- Longitude: -105.59053
 
--Height(m): 3522.729 
+- Height(m): 3522.729 
 
 [UNAVCO station page](https://www.unavco.org/instrumentation/networks/status/nota/overview/NWOT)
 
-###Data Summary
+### Data Summary
 
 Station nwot was originally installed/designed by Jim Normandeau (UNAVCO) to support research 
 by Kristine Larson, Eric Small, Ethan Gutmann, and Felipe Nievinski at the University of Colorado. 
@@ -27,7 +27,7 @@ buried by snow. It is approximately 3 meters above
 the bare soil surface.  Because it was installed to support testing GPS reflections, nwot has always tracked L2C.
 nwot was also part of [PBO H2O](http://cires1.colorado.edu/portal/?station=nwot).
 
-<img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/NWOT.jpg>
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/NWOT.jpg" width=400/>
 
 The site has generally not been used by geodesists and there is very little useful information 
 at UNAVCO (i.e. no time series) or at the Nevada Reno group.
@@ -44,8 +44,8 @@ decimate it to 15 seconds.
 
 *rinex2snr nwot 2014 270 -archive unavco -rate high -dec 15*
 
-Both L1 and L2C can be used at this site. Unfortunately there were not very many L2C satellites
-at that time.  Nevertheless, it is more than enough to measure snow.
+Both L1 and L2C signals can be used at this site. Unfortunately there were not very many L2C satellites
+at the time it was first installed.  Nevertheless, there is more than enough to measure snow.
 
 *quickLook nwot 2014 270* 
 
@@ -68,8 +68,8 @@ the failed tracks in the gray.
 ### Make multiple years of SNR files and and run gnssir 
 
 
-Until UNAVCO makes lowrate data avilalbe for this site, we need to use the highrate data and decimate.
-We are going to look at the data from installation (fall 2009) through spring 2015.
+Until UNAVCO makes lowrate data with L2C available for this site, we need to use the highrate data and decimate.
+We are going to look at the data from installation (Fall 2009) through spring 2015.
 
 *rinex2snr nwot 2009 240 -doy_end 365 -archive unavco -rate high -dec 15*
 
@@ -78,14 +78,14 @@ We are going to look at the data from installation (fall 2009) through spring 20
 *rinex2snr nwot 2015 1 -doy_end 120 -archive unavco -rate high -dec 15*
 
 
-Make json file for your analysis:
+Make a json file for your analysis:
 
-make_json_file nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2
+*make_json_file nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2*
 
-[sample json file for gnssrefl](nwot.json)
+I have opted to only use the southern quadrants (azimuths 90 through 270). 
+[A sample json file for this site.](nwot.json)
 
 Run **gnssir** for the years 2009-2015:
-
 
 *gnssir nwot 2009 1 -doy_end 366 -year_end 2015*
 
@@ -93,7 +93,6 @@ Run **gnssir** for the years 2009-2015:
 ### Compute daily averages:
 
 *daily_avg nwot 0.25 10 -year1 2009 -year2 2015*
-
 
 produces this plot:
 
