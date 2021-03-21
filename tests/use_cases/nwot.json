@@ -1,0 +1,45 @@
+{
+    "station": "nwot",
+    "lat": 40.055,
+    "lon": -105.591,
+    "ht": 3522.449,
+    "minH": 0.5,
+    "maxH": 6.0,
+    "e1": 7,
+    "e2": 25,
+    "NReg": [
+        0.5,
+        6.0
+    ],
+    "PkNoise": 3.2,
+    "polyV": 4,
+    "pele": [
+        5,
+        30
+    ],
+    "ediff": 2,
+    "desiredP": 0.005,
+    "azval": [
+        90,
+        180,
+        180,
+        270
+    ],
+    "freqs": [
+        1,
+        20
+    ],
+    "reqAmp": [
+        8,
+        8
+    ],
+    "refraction": true,
+    "overwriteResults": true,
+    "seekRinex": false,
+    "wantCompression": false,
+    "plt_screen": false,
+    "onesat": null,
+    "screenstats": false,
+    "pltname": "nwot_lsp.png",
+    "delTmax": 75
+}
