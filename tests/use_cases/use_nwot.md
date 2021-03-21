@@ -8,11 +8,11 @@
 
 **Ellipsoidal Coordinates:**
 
-*Latitude: 40.05539 
+-Latitude: 40.05539 
 
-*Longitude: -105.59053
+-Longitude: -105.59053
 
-*Height(m): 3522.729 
+-Height(m): 3522.729 
 
 [UNAVCO station page](https://www.unavco.org/instrumentation/networks/status/nota/overview/NWOT)
 
