@@ -106,8 +106,8 @@ and [this file](nwot_dailyRH.txt). The files will be stored in the $REFL_CODE/Fi
 We installed the GPS site at Niwot Ridge because there was a long-standing experiment 
 for measuring snow depth (and snow water equivalent). We therefore have a way to assess
 accuracy. We download the *in situ* data from 
-the [Niwot Ridge facility](https://portal.edirepository.org/nis/mapbrowse?scope=knb-lter-nwt&identifier=34)
-The relevant csv file is provided here: 
+the [Niwot Ridge facility.](https://portal.edirepository.org/nis/mapbrowse?scope=knb-lter-nwt&identifier=34)
+We will compare to pole 16, which is shown in the photograph above. The relevant Niwot Ridge csv file is provided here: 
 
 [in situ data from the Niwot Ridge LTER](saddsnow.dw.data.csv)
 
