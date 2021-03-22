@@ -1,8 +1,8 @@
-### Michipicoten Harbor, Ontario, Canada
+### Michipicoten, Lake Superior 
 
 **Station Name:** 	mchn
 
-**Location:** Michipicoten Harbour, Ontario, Canada
+**Location:** Michipicoten Harbor, Ontario, Canada
 
 **Archive:**  [SOPAC](http://sopac-csrc.ucsd.edu/index.php/sopac/) 
 
