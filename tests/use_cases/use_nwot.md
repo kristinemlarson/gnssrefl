@@ -79,7 +79,7 @@ We are going to look at the data from installation (Fall 2009) through spring 20
 
 Make a json file for your analysis:
 
-*make_json_file nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2*
+*make_json_input nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2*
 
 I have opted to only use the southern quadrants (azimuths 90 through 270). Note: L5 has 
 not been tracked at this site, so it is not listed in the json file. [A sample json file for this site.](nwot.json)
