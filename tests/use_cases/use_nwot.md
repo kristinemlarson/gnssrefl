@@ -46,11 +46,12 @@ decimate it to 15 seconds.
 *rinex2snr nwot 2014 270 -archive unavco -rate high -dec 15*
 
 Both L1 and L2C signals can be used at this site. Unfortunately there were not very many L2C satellites
-at the time it was first installed.  Nevertheless, there is more than enough to measure snow.
+at the time it was first installed.  Nevertheless, there is more than enough to measure snow. This quickLook 
+command:
 
 *quickLook nwot 2014 270* 
 
-will produce
+will produce:
 
 <img src="nwot_L1.png" width="600"/>
 
@@ -64,7 +65,7 @@ Nice strong peaks in the south.  Try L2:
 This will have both L2C and non-L2C. But it is easy to see why I don't use non-L2C. They are
 the failed tracks in the gray that I have circled.
 
-### Make multiple years of SNR files and and run gnssir 
+### Make multiple years of SNR files 
 
 We are going to look at the data from installation (Fall 2009) through spring 2015.
 
@@ -74,13 +75,14 @@ We are going to look at the data from installation (Fall 2009) through spring 20
 
 *rinex2snr nwot 2015 1 -doy_end 120 -archive unavco -rate high -dec 15*
 
+### Run gnssir 
 
 Make a json file for your analysis:
 
 *make_json_file nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2*
 
-I have opted to only use the southern quadrants (azimuths 90 through 270). 
-[A sample json file for this site.](nwot.json)
+I have opted to only use the southern quadrants (azimuths 90 through 270). Note: L5 has 
+not been tracked at this site, so it is not listed in the json file. [A sample json file for this site.](nwot.json)
 
 Run **gnssir** for the years 2009-2015:
 
@@ -89,13 +91,16 @@ Run **gnssir** for the years 2009-2015:
 
 ### Compute daily averages:
 
+Using the **daily_avg** utility to compute RH each day. A median filter of 0.25 meter is used
+to eliminate large outliers and a minimum number of tracks is set to 10. The year inputs are optional.
+
 *daily_avg nwot 0.25 10 -year1 2009 -year2 2015*
 
 produces this plot:
 
 <img src="nwot_RH.png" width="500"/>
 
-and [this file](nwot_dailyRH.txt).
+and [this file](nwot_dailyRH.txt). The files will be stored in the $REFL_CODE/Files directory.
 
 
 We installed the GPS site at Niwot Ridge because there was a long-standing experiment 
@@ -111,9 +116,11 @@ If the daily average RH file created above is stored in the same directory as th
 
 *python nwot_usecase.py*
 
-produces:
-
 <img src="nwot_usecase.png" width="500"/>
+
+We hae used the data from the fall to set the bare soil value for reflector height (RH_baresoil). Snow depth is then defined as:
+
+*snow depth = RH_baresoil - RH*
 
 We do not pursue a quantitative comparison at this site as there are at least two 
 publications in a refereed journals and a PhD Dissertation:
@@ -122,3 +129,4 @@ publications in a refereed journals and a PhD Dissertation:
 Snow measurement by GPS interferometric reflectometry: an evaluation at Niwot Ridge, Colorado, Hydrologic Processes, Vol. 26, 2951-2961, 2012](https://www.kristinelarson.net/wp-content/uploads/2015/10/GutmannEtAl_2012.pdf)
 
 [Nievinski, F.G. and K.M. Larson, Inverse Modeling of GPS Multipath for Snow Depth Estimation, Part II: Application and Validation, IEEE TGRS, Vol. 52(10), 6564-6573, doi:10.1109/TGRS.2013.2297688, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/felipe_inv2_revised.pdf)
+
