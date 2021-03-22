@@ -123,7 +123,7 @@ We hae used the data from the fall to set the bare soil value for reflector heig
 *snow depth = RH_baresoil - RH*
 
 We do not pursue a quantitative comparison at this site as there are at least two 
-publications in a refereed journals and a PhD Dissertation:
+publications in refereed journals and a PhD Dissertation:
 
 [Gutmann, E., K. M. Larson, M. Williams, F.G. Nievinski, and V. Zavorotny, 
 Snow measurement by GPS interferometric reflectometry: an evaluation at Niwot Ridge, Colorado, Hydrologic Processes, Vol. 26, 2951-2961, 2012](https://www.kristinelarson.net/wp-content/uploads/2015/10/GutmannEtAl_2012.pdf)

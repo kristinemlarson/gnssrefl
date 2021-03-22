@@ -53,6 +53,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     2021feb11, kristine Larson
     translator = fortran, python, or hybrid
     srate - integer sample rate, for RINEX 3 only.
+    2021mar20 check for illegal day of years ....
     """
 
     NS = len(station)
@@ -72,6 +73,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 # loop thru years and days 
     for year in year_list:
         ann = g.make_nav_dirs(year)
+        dec31 = g.dec31(year)
         for doy in doy_list:
             csnr = str(isnr)
             cdoy = '{:03d}'.format(doy) ; cyy = '{:02d}'.format(year-2000)
@@ -85,7 +87,12 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                     #print('you requested it be overwritten, so removing file')
                     subprocess.call(['rm', fname])
                     snre = False
-            if (not snre):
+            illegal_day = False
+            if (doy > dec31):
+                illegal_day = True
+                #print('illegal day',illegal_day, doy, dec31)
+            # combining these so i don't have to indent everything
+            if (not illegal_day) and (not snre):
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
                 print('Will seek RINEX file ', station, ' year:', year, ' doy:', doy, ' translate with ', translator)

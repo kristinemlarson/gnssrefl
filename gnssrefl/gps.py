@@ -528,6 +528,16 @@ def readPreciseClock(filename):
     return prn, t, clockc
 
 
+def dec31(year):
+    """
+    input: year
+    returns doy of december 31
+    """
+    today=datetime.datetime(year,12,31)
+    doy = (today - datetime.datetime(year, 1, 1)).days + 1
+
+    return doy
+
 def ymd2doy(year,month,day):
     """
     takes in integer year, month, day 
