@@ -23,7 +23,7 @@ find to be useful.
 
 <table>
 <TR>
-<TH>Cryosphere</TH>
+<TH>Antarctica and Greenland</TH>
 <TD>
 
 * [Lorne, Ross Ice Shelf, Antarctica](use_cases/use_lorg.md) (lorg)
@@ -37,9 +37,9 @@ find to be useful.
 <TH>Lakes and Rivers</TH>
 <td>
 
-* Lake Taupo, New Zealand (tgho)
-
 * [Michipicoten, Lake Superior, Canada](use_cases/use_mchn.md) (mchn)
+
+* Lake Taupo, New Zealand (tgho)
 
 * [St Lawrence River, Montreal, Canada](use_cases/pmtl_use.md) (pmtl)
 
@@ -64,13 +64,13 @@ find to be useful.
 
 * [Marshall, Colorado](use_cases/use_p041.md) (p041)
 
+* [Niwot Ridge, Colorado](use_cases/use_nwot.md) (nwot)
+
 * Half Island Park, Idaho (p360)
 
 * Coldfoot, Alaska (ab33)
 
 * Priddis, Alberta, Canada (prds)
-
-* Niwot Ridge, Colorado (nwot)
 
 </TD>
 <TH>Soil Moisture</TH>

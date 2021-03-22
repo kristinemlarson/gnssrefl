@@ -18,8 +18,8 @@
 
 ### Data Summary
 
-Station nwot was originally installed/designed by Jim Normandeau (UNAVCO) to support research 
-by Kristine Larson, Eric Small, Ethan Gutmann, and Felipe Nievinski at the University of Colorado. 
+Station nwot was originally installed/designed by Jim Normandeau (UNAVCO) to support GPS reflections research 
+by Kristine Larson, Eric Small, Ethan Gutmann, Felipe Nievinski, and Mark Williams at the University of Colorado. 
 The site was hosted by the Niwot Ridge LTER. 
 
 nwot was deliberately made to be taller than the typical geodetic antenna so that it would never be 
@@ -27,13 +27,14 @@ buried by snow. It is approximately 3 meters above
 the bare soil surface.  Because it was installed to support testing GPS reflections, nwot has always tracked L2C.
 nwot was also part of [PBO H2O](http://cires1.colorado.edu/portal/?station=nwot).
 
-<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/NWOT.jpg" width=400/>
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/NWOT.jpg" width=500/>
 
 The site has generally not been used by geodesists and there is very little useful information 
 at UNAVCO (i.e. no time series) or at the Nevada Reno group.
-After the original receiver failed in 2015, a new receiver was installed in late 2016 with help from 
-Mark Raleigh (then at CIRES, now at the University Oregon).
-Though it may be tracking now, it has not been downloaded in some time and there is no working telemetry.
+After the original receiver failed in spring 2015, a new receiver was installed in late 2016 with help from 
+Mark Raleigh (then at CIRES, now at the University Oregon). Though the nwot receiver 
+may be tracking now, it has not been downloaded in some time and there is no working telemetry.
+We will focus on the data between 2009-2015.
 
 ### Make a SNR File and run quickLook
 
@@ -51,24 +52,20 @@ at the time it was first installed.  Nevertheless, there is more than enough to 
 
 will produce
 
-<img src="nwot_L1.png" width="500"/>
+<img src="nwot_L1.png" width="600"/>
 
 A bit ratty in the low RH area - which is just noise from this particular receiver.
 Nice strong peaks in the south.  Try L2:
 
 *quickLook nwot 2014 270 -fr 2*
 
-<img src="nwot_L2.png" width="500"/>
+<img src="nwot_L2.png" width="600"/>
 
 This will have both L2C and non-L2C. But it is easy to see why I don't use non-L2C. They are
-the failed tracks in the gray.
-
-
+the failed tracks in the gray that I have circled.
 
 ### Make multiple years of SNR files and and run gnssir 
 
-
-Until UNAVCO makes lowrate data with L2C available for this site, we need to use the highrate data and decimate.
 We are going to look at the data from installation (Fall 2009) through spring 2015.
 
 *rinex2snr nwot 2009 240 -doy_end 365 -archive unavco -rate high -dec 15*
@@ -96,14 +93,16 @@ Run **gnssir** for the years 2009-2015:
 
 produces this plot:
 
-<img src="nwot_RH.png" width="400"/>
+<img src="nwot_RH.png" width="500"/>
 
 and [this file](nwot_dailyRH.txt).
 
 
 We installed the GPS site at Niwot Ridge because there was a long-standing experiment 
 for measuring snow depth (and snow water equivalent). We therefore have a way to assess
-accuracy. We download the *in situ* data and provided the necessary csv file:
+accuracy. We download the *in situ* data from 
+the [Niwot Ridge facility](https://portal.edirepository.org/nis/mapbrowse?scope=knb-lter-nwt&identifier=34)
+The relevant csv file is provided here: 
 
 [in situ data from the Niwot Ridge LTER](saddsnow.dw.data.csv)
 
@@ -114,14 +113,12 @@ If the daily average RH file created above is stored in the same directory as th
 
 produces:
 
-<img src="nwot_usecase.png" width="400"/>
+<img src="nwot_usecase.png" width="500"/>
 
 We do not pursue a quantitative comparison at this site as there are at least two 
-publicadtions in a refereed journals and a PhD Dissertation:
-
+publications in a refereed journals and a PhD Dissertation:
 
 [Gutmann, E., K. M. Larson, M. Williams, F.G. Nievinski, and V. Zavorotny, 
 Snow measurement by GPS interferometric reflectometry: an evaluation at Niwot Ridge, Colorado, Hydrologic Processes, Vol. 26, 2951-2961, 2012](https://www.kristinelarson.net/wp-content/uploads/2015/10/GutmannEtAl_2012.pdf)
-
 
 [Nievinski, F.G. and K.M. Larson, Inverse Modeling of GPS Multipath for Snow Depth Estimation, Part II: Application and Validation, IEEE TGRS, Vol. 52(10), 6564-6573, doi:10.1109/TGRS.2013.2297688, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/felipe_inv2_revised.pdf)
