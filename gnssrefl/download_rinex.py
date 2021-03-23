@@ -82,7 +82,7 @@ def main():
     archive = args.archive
 
 
-    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan']
+    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special']
 
     archive_list_high = ['unavco','nrcan','ga']
 
