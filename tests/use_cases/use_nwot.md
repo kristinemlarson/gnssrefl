@@ -4,7 +4,7 @@
 
 **Location:** Niwot Ridge LTER
 
-**Archive:** UNAVCO
+**Archive:** [UNAVCO](https://www.unavco.org)
 
 **Ellipsoidal Coordinates:**
 
@@ -40,34 +40,34 @@ We will focus on the data between 2009-2015.
 
 Start slow. Make a SNR file for one day, specifying unavco archive (no point looking
 elsewhere since it is only at UNAVCO). The best data are currently unavailable unless you download
-the 1-sec data.  However, you do not need this sample rate for reflectometry, so we are going to 
+the 1-sec data.  However, you do not need this sample rate for GPS reflectometry, so we are going to 
 decimate it to 15 seconds.
 
 *rinex2snr nwot 2014 270 -archive unavco -rate high -dec 15*
 
 Both L1 and L2C signals can be used at this site. Unfortunately there were not very many L2C satellites
-at the time it was first installed.  Nevertheless, there is more than enough to measure snow. This quickLook 
-command:
+at the time it was first installed.  Nevertheless, there is more than enough to measure snow accumulation. 
+Use this **quickLook** command:
 
 *quickLook nwot 2014 270* 
 
-will produce:
+to look at the L1 data:
 
 <img src="nwot_L1.png" width="600"/>
 
 A bit ratty in the low RH area - which is just noise from this particular receiver.
-Nice strong peaks in the south.  Try L2:
+Nice strong peaks in the south. Now try L2:
 
 *quickLook nwot 2014 270 -fr 2*
 
 <img src="nwot_L2.png" width="600"/>
 
-This will have both L2C and non-L2C. But it is easy to see why I don't use non-L2C. They are
+This plot will have both L2C and non-L2C. But it is easy to see why I don't use non-L2C. They are
 the failed tracks in the gray that I have circled.
 
 ### Make multiple years of SNR files 
 
-We are going to look at the data from installation (Fall 2009) through spring 2015.
+We are going to look at the data from installation (Fall 2009) through Spring 2015.
 
 *rinex2snr nwot 2009 240 -doy_end 365 -archive unavco -rate high -dec 15*
 
@@ -75,9 +75,9 @@ We are going to look at the data from installation (Fall 2009) through spring 20
 
 *rinex2snr nwot 2015 1 -doy_end 120 -archive unavco -rate high -dec 15*
 
-### Run gnssir 
+### Run gnssir  for multiple years
 
-Make a json file for your analysis:
+Make a json file for your **gnssir** analysis:
 
 *make_json_input nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2*
 

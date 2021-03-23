@@ -551,6 +551,34 @@ def ymd2doy(year,month,day):
     cyy = '{:02d}'.format(year-2000)
     return doy, cdoy, cyyyy, cyy
 
+def rinex_special(station, year, month, day):
+    """
+    author: kristine larson
+    picks up a RINEX file from special unavco area
+    year, month, and day are INTEGERS
+
+    WARNING: only rinex version 2 in this world
+    """
+    exedir = os.environ['EXE']
+    if day == 0:
+        doy = month
+        cyyyy = str(year)
+        cdoy = '{:03d}'.format(doy)
+        cyy = '{:02d}'.format(year-2020)
+    else:
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    rinexfile,rinexfiled = rinex_name(station, year, month, day)
+    unavco= 'ftp://data-out.unavco.org/pub/products/reflectometry/'
+    filename1 = rinexfile 
+    # URL path for the o file 
+    url1 = unavco + cyyyy + '/' + cdoy + '/' + filename1
+
+    try:
+        wget.download(url1,filename1)
+    except:
+        okokok =1
+
+
 def rinex_unavco(station, year, month, day):
     """
     author: kristine larson
@@ -603,9 +631,6 @@ def rinex_unavco(station, year, month, day):
             #    print(err)
         else:
             hatanaka_warning()
-            #print('WARNING WARNING WARNING WARNING')
-            #print('You are trying to convert Hatanaka files without having the proper')
-            #print('executable, CRX2RNX. Read the gnssrefl documentation. ')
 
 
 def rinex_sopac(station, year, month, day):
@@ -3956,6 +3981,7 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
     added geoscience australia and nz archives
     2020aug28 added NGS, aka big_Disk_in_DC
     2020nov28 added NRCAN
+    2021mar23 added special archive for reflectometry files at unavco
     """
     if (day == 0):
         doy = month
@@ -3992,6 +4018,8 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
             else:
                 if archive == 'unavco':
                     rinex_unavco(station, year, month, day)
+                elif (archive == 'special'):
+                    rinex_special(station, year, month, day)
                 elif (archive == 'sopac'):
                     rinex_sopac(station, year, month, day)
                 elif (archive == 'cddis'):

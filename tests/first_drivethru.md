@@ -59,7 +59,7 @@ find to be useful.
 </TR>
 
 <TR>
-<TH>Seasonal Snow</TH>
+<TH>Seasonal Snow Accumulation</TH>
 <TD>
 
 * [Marshall, Colorado](use_cases/use_p041.md) (p041)
