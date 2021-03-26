@@ -30,33 +30,36 @@ nwot was also part of [PBO H2O](http://cires1.colorado.edu/portal/?station=nwot)
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/NWOT.jpg" width=500/>
 
 The site has generally not been used by geodesists and there is very little useful information 
-at UNAVCO (i.e. no time series) or at the Nevada Reno group.
-After the original receiver failed in spring 2015, a new receiver was installed in late 2016 with help from 
+at UNAVCO or the Nevada Reno group (i.e. no time series).
+After the original receiver failed in spring 2015, a new receiver was installed in late 2016 by 
 Mark Raleigh (then at CIRES, now at the University Oregon). Though the nwot receiver 
 may be tracking now, it has not been downloaded in some time and there is no working telemetry.
 We will focus on the data between 2009-2015.
 
 ### Make a SNR File and run quickLook
 
-Start slow. Make a SNR file for one day, specifying unavco archive (no point looking
-elsewhere since it is only at UNAVCO). The best data are currently unavailable unless you download
-the 1-sec data.  However, you do not need this sample rate for GPS reflectometry, so we are going to 
-decimate it to 15 seconds.
+We will start by making a single SNR file.
+
+Here there are two options. The main archive for this dataset only provides the high-quality
+L2C data in the highrate (1-sec) area. We do not need this sample rate for GPS reflectometry,
+so to speed things up, we strongly encourage you to use the "special" archive option.  Here
+the 1-sec data have been decimated to 15 seconds:
+
+*rinex2snr nwot 2014 270 -archive special*
+
+If for any reason this command does not work, please use the direct command:
 
 *rinex2snr nwot 2014 270 -archive unavco -rate high -dec 15*
 
-Both L1 and L2C signals can be used at this site. Unfortunately there were not very many L2C satellites
-at the time it was first installed.  Nevertheless, there is more than enough to measure snow accumulation. 
-Use this **quickLook** command:
+Both L1 and L2C signals can be used at this site. Use this **quickLook** command to 
+get a sense of the quality of the L1 reflector height (RH) retrievals:
 
 *quickLook nwot 2014 270* 
 
-to look at the L1 data:
-
 <img src="nwot_L1.png" width="600"/>
 
-A bit ratty in the low RH area - which is just noise from this particular receiver.
-Nice strong peaks in the south. Now try L2:
+These periodograms are a bit ratty in the low RH area - which is 
+just noise for this particular receiver. There are nice strong peaks in the southern quadrants. Now try L2:
 
 *quickLook nwot 2014 270 -fr 2*
 
@@ -69,27 +72,27 @@ the failed tracks in the gray that I have circled.
 
 We are going to look at the data from installation (Fall 2009) through Spring 2015.
 
-*rinex2snr nwot 2009 240 -doy_end 365 -archive unavco -rate high -dec 15*
+*rinex2snr nwot 2009 240 -doy_end 365 -archive special*
 
-*rinex2snr nwot 2010 1 -doy_end 366 -archive unavco -rate high -dec 15 -year_end 2014*
+*rinex2snr nwot 2010 1 -doy_end 366 -archive special -year_end 2014*
 
-*rinex2snr nwot 2015 1 -doy_end 120 -archive unavco -rate high -dec 15*
+*rinex2snr nwot 2015 1 -doy_end 120 -archive special*
 
-### Run gnssir  for multiple years
+### Run gnssir for multiple years
 
 Make a json file for your **gnssir** analysis:
 
 *make_json_input nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2*
 
-I have opted to only use the southern quadrants (azimuths 90 through 270). Note: L5 has 
-not been tracked at this site, so it is not listed in the json file. [A sample json file for this site.](nwot.json)
+I have opted to only use the southern quadrants (azimuths 90 through 270). Note that since
+L5 was not tracked at this site, it is not listed in the json file. 
+[A sample json file for this site.](nwot.json)
 
-Run **gnssir** for the years 2009-2015:
+Once you have a json file set up, run **gnssir** for the years 2009-2015:
 
 *gnssir nwot 2009 1 -doy_end 366 -year_end 2015*
 
-
-### Compute daily averages:
+### Compute daily average RH values:
 
 Using the **daily_avg** utility to compute RH each day. A median filter of 0.25 meter is used
 to eliminate large outliers and a minimum number of tracks is set to 10. The year inputs are optional.
@@ -107,18 +110,21 @@ We installed the GPS site at Niwot Ridge because there was a long-standing exper
 for measuring snow depth (and snow water equivalent). We therefore have a way to assess
 accuracy. We download the *in situ* data from 
 the [Niwot Ridge facility.](https://portal.edirepository.org/nis/mapbrowse?scope=knb-lter-nwt&identifier=34)
-We will compare to pole 16, which is shown in the photograph above. The relevant Niwot Ridge csv file is provided here: 
+We will compare to pole 16, which is shown in the photograph above. 
+The relevant Niwot Ridge csv file is provided here: 
 
 [in situ data from the Niwot Ridge LTER](saddsnow.dw.data.csv)
 
-If the daily average RH file created above is stored in the same directory as the Niwot Ridge in situ datafile, you can use 
-[this python script](nwot_usecase.py) to visual compare them:
+If the daily average RH file created above is stored in the same directory 
+as the Niwot Ridge *in situ* datafile, you can use 
+[this python script](nwot_usecase.py) to visually compare them:
 
 *python nwot_usecase.py*
 
 <img src="nwot_usecase.png" width="500"/>
 
-We hae used the data from the fall to set the bare soil value for reflector height (RH_baresoil). Snow depth is then defined as:
+We hae used the data from the fall to set the bare soil value 
+for reflector height (RH_baresoil). Snow depth is then defined as:
 
 *snow depth = RH_baresoil - RH*
 

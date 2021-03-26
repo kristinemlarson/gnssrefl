@@ -558,6 +558,7 @@ def rinex_special(station, year, month, day):
     year, month, and day are INTEGERS
 
     WARNING: only rinex version 2 in this world
+    march25,2021 added gz
     """
     exedir = os.environ['EXE']
     if day == 0:
@@ -569,12 +570,14 @@ def rinex_special(station, year, month, day):
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
     unavco= 'ftp://data-out.unavco.org/pub/products/reflectometry/'
+    filenamegz = rinexfile  + '.gz'
     filename1 = rinexfile 
     # URL path for the o file 
-    url1 = unavco + cyyyy + '/' + cdoy + '/' + filename1
+    url1 = unavco + cyyyy + '/' + cdoy + '/' + filenamegz
 
     try:
-        wget.download(url1,filename1)
+        wget.download(url1,filenamegz)
+        status = subprocess.call(['gunzip', filenamegz])
     except:
         okokok =1
 
@@ -4043,7 +4046,8 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
 
 def new_rinex3_rinex2(r3_filename,r2_filename):
     """
-    will add doc later
+    takes as input the names of a rinex3 file and a rinex2 file
+    code checks that gfzrnx executable exists
     """
     fexists = False
     gexe = gfz_version()
