@@ -2,7 +2,7 @@
 
 **Station name:** nwot
 
-**Location:** Niwot Ridge LTER
+**Location:** [Niwot Ridge LTER](https://nwt.lternet.edu)
 
 **Archive:** [UNAVCO](https://www.unavco.org)
 
@@ -94,8 +94,10 @@ Once you have a json file set up, run **gnssir** for the years 2009-2015:
 
 ### Compute daily average RH values:
 
-Using the **daily_avg** utility to compute RH each day. A median filter of 0.25 meter is used
-to eliminate large outliers and a minimum number of tracks is set to 10. The year inputs are optional.
+Use the **daily_avg** utility to compute RH for each day. A median filter of 0.25 meter is used
+to eliminate large outliers and a minimum number of tracks is set to 10. This is relatively
+low because of the small number of L2C transmitting satellites in the early years of 
+the dataset. The year inputs here are optional.
 
 *daily_avg nwot 0.25 10 -year1 2009 -year2 2015*
 
@@ -128,6 +130,8 @@ for reflector height (RH_baresoil). Snow depth is then defined as:
 
 *snow depth = RH_baresoil - RH*
 
+Please keep in mind that the pole measurements are not representative of the same
+footprint as the GPS measurements. The latter cover an average over a much larger region.
 We do not pursue a quantitative comparison at this site as there are at least two 
 publications in refereed journals and a PhD Dissertation:
 
