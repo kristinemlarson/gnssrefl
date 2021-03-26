@@ -88,10 +88,14 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     KL 20aug07 added fortran boolean
     KL 21feb06 return data from the plots so that Jupyter notebooks can use them.
     also added pltscreen variable so that the default plots are not always displayed
+    KL 21mar25 added datakey dictionaries for the Jupyter notebook people
     """
 
     # dictionary for output
     data = {'NW':{},'SW':{},'NE':{},'SE':{},'fNW':{},'fSW':{},'fNE':{},'fSE': {} }
+
+    # dictionary for key
+    datakey = {'NW':{},'SW':{},'NE':{},'SE':{},'fNW':{},'fSW':{},'fNE':{},'fSE': {} }
 
     # make sure environment variables exist
     g.check_environ_variables()
@@ -186,6 +190,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                             plt.plot(px,pz,linewidth=1.5)
                         idc = stitles[a]
                         data[idc][satNu] = [px,pz]
+                        datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
 
                     else:
                         # these are failed tracks
@@ -193,6 +198,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                             plt.plot(px,pz,'gray',linewidth=0.5)
                         idc = 'f' + stitles[a]
                         data[idc][satNu] = [px,pz]
+                        datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
 
             # i do not know how to add a grid using these version of matplotlib
             tt = 'GNSS-IR results: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy)
@@ -217,7 +223,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
     # returns multidimensional dictionary of lomb scargle results so 
     # that the jupyter notebook people can replot them
-    return data
+    # 21mar26 added a key
+    return data,datakey
 
 
 

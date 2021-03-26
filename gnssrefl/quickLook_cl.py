@@ -121,10 +121,9 @@ def main():
     pltscreen = True
     # Kelly for jupyter notebooks set this to false
     #pltscreen = False
-    data = quick.quickLook_function(station, year, doy, snr, f, e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran,pltscreen)
-    #plt.figure()
-    #plt.plot( data['NW'][1][0], data['NW'][1][1])
-    #plt.show()
+    data,datakey = quick.quickLook_function(station, year, doy, snr, f, e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran,pltscreen)
+    # the key is saved wth the same keys as the data dictionary, in this order 
+    # [avgAzim, RH, satNumber,frequency,maxAmplitude,Peak2Noise, UTChour]
 
 if __name__ == "__main__":
     main()
