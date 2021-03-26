@@ -9,10 +9,11 @@
     2. [rinex2snr: translating RINEX files into SNR files](#module1)
     3. [quickLook: assessing a site using SNR files](#module2)
     4. [gnssir: estimating reflector heights from SNR data](#module3)
-4. [Bugs/Future Work](#bugs)
-5. [Utilities](#helper)
-6. [Publications](#publications)
-7. [Acknowledgements](#acknowledgements)
+4. [File Formats](#fileformats)
+5. [Bugs/Future Work](#bugs)
+6. [Utilities](#helper)
+7. [Publications](#publications)
+8. [Acknowledgements](#acknowledgements)
 
 ### News <a name="news"></a>
 
@@ -191,14 +192,20 @@ bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.h
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
 
 
-### File Formats <a name=fileformats"></a>
-
-RINEX files must be version 2.11 or 3.  For RINEX 2.11, filenames should be lowercase and following the 
-community standard. 
-
-Assuming the environment variables for ORBITS and REFL_CODE have been set :
+### File Formats <a name="fileformats"></a>
 
 (under construction)
+
+RINEX files must be version 2.11 or 3. 
+
+For RINEX 2.11, filenames should be lowercase and following the community standard: 
+
+4 character station name + day of year (3 characters) + '0.' + two character year  + 'o'
+
+In many cases Hatanaka compressed formats are used by data archives. These haev a 
+'d' instead an 'o' at the end of the filename.
+
+We are working to make a NMEA reader for this software package.
 
 ### rinex2snr - making SNR files from RINEX files <a name="module1"></a>
 
