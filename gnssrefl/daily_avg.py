@@ -91,7 +91,7 @@ def main():
 #ReqTracks = 80
 # putting the results in a np.array, year, doy, RH, Nvalues, month, day
     tv = np.empty(shape=[0, n])
-    obstimes = []; medRH = []; meanRH = [] 
+    obstimes = []; medRH = []; meanRH = [] ; alltimes = []
     plt.figure()
     year_list = np.arange(year1, year2+1, 1)
     #print('Years to examine: ',year_list)
@@ -112,6 +112,9 @@ def main():
                         if (len(a) > 0):
                             y = a[0] +a[1]/365.25; rh = a[2] ; doy = int(np.mean(a[1]))
                             frequency = a[10]; azimuth = a[5]; sat = a[3]; amplitude=a[6]
+                            xd = datetime.date(yr,1,1) + datetime.timedelta(doy-1)
+                            # year =[str(int(year[i])) for i in range(N)];
+                            #alltimes.append(datetime.datetime(year=a[0], month=d.month, day=d.day, hour=12, minute=0, second=0))
                             peak2noise = a[13]
         # change from doy to month and day in datetime
                             d = datetime.date(yr,1,1) + datetime.timedelta(doy-1)

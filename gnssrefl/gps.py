@@ -2384,6 +2384,61 @@ def find_satlist(f,snrExist):
     #    print('     illegal frequency: no sat list being returned')
     return satlist
 
+def find_satlist_wdate(f,snrExist):
+    """
+    inputs: frequency and boolean numpy array that tells you
+    if a signal is (potentially) legal
+    outputs: list of satellites to use
+    author: kristine m. larson
+    """
+# set list of GPS satellites for now
+#
+# Block III will be 4, 18, 23
+#   these are the only L2C satellites as of 18oct10
+    l2c_sat = [1, 3, 5, 6, 7, 8, 9, 10, 12, 15, 17, 24, 25, 26, 27, 29, 30, 31, 32]
+    # updated on 20 jul 15 - really should make this time dependent ....
+    l2c_sat = [1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 23, 24, 25, 26, 27, 29, 30, 31, 32]
+
+#   only L5 satellites thus far
+    l5_sat = [1, 3,  6,  8, 9, 10, 24, 25, 26, 27, 30,  32]
+    # l5_sat = [1, 3,  4, 6,  8, 9, 10, 24, 25, 26, 27, 30,  32]
+#   assume l1 and l2 can be up to 32
+    l1_sat = np.arange(1,33,1)
+    satlist = []
+    if f == 1:
+        satlist = l1_sat
+    if f == 20:
+        satlist = l2c_sat
+    if f == 2:
+        satlist = l1_sat
+    if f == 5:
+        satlist = l5_sat
+#   i do not think they have 26 - but ....
+#   glonass L1
+    if (f == 101) or (f==102):
+# only have 24 frequencies defined
+        satlist = np.arange(101,125,1)
+#   galileo - 40 max?
+#   use this to check for existence, mostly driven by whether there are
+#   extra columns (or if they are non-zero)
+    gfs = int(f-200)
+
+    if (f >  200) and (f < 210) and (snrExist[gfs]):
+        satlist = np.arange(201,241,1)
+#   galileo has no L2 frequency, so set that always to zero
+    if f == 202:
+        satlist = []
+#   pretend there are 32 Beidou satellites for now
+    if (f > 300):
+        satlist = np.arange(301,333,1)
+
+    # minimize screen output
+    #if len(satlist) == 0:
+    #    print('     illegal frequency: no sat list being returned')
+    return satlist
+
+
+
 def glonass_channels(f,prn):
     """
     inputs frequency and prn number
@@ -4892,6 +4947,35 @@ def cdate2nums(col1):
         t = year + doy/365.25
 
     return t
+
+def l2c_l5_list(year,doy):
+    """
+    for given year and day of year, returns a satellite list of 
+    L2C and L5 transmitting satellites
+
+    to update this numpy array, the data are stored in a simple triple of PRN number, launch year,
+    and launch date.  
+    author: kristine larson
+    date: march 27, 2021
+    """
+
+    # this numpy array
+    l2c=np.array([[1 ,2011 ,290], [3 ,2014 ,347], [4 ,2018 ,357], [5 ,2008 ,240],
+        [6 ,2014 ,163], [7 ,2008 ,85], [8 ,2015 ,224], [9 ,2014 ,258], [10 ,2015 ,343],
+        [12 ,2006 ,300], [14 ,2020 ,310], [15 ,2007 ,285], [17 ,2005 ,270],
+        [18 ,2019 ,234], [23 ,2020 ,182], [24 ,2012 ,319], [25 ,2010 ,240],
+        [26 ,2015 ,111], [27 ,2013 ,173], [29 ,2007 ,355], [30 ,2014 ,151], [31 ,2006 ,270], [32 ,2016 ,36]])
+    # indices that meet your criteria
+    ij=(l2c[:,1] + l2c[:,2]/365.25) < (year + doy/365.25)
+    l2csatlist = l2c[ij,0]
+    firstL5 = 2010 + 148/365.25 # launch may 28, 2010  - some delay before becoming healthy
+
+    newlist = l2c[ij,:]
+    ik= (newlist[:,1] + newlist[:,2]/365.25) > firstL5
+    l5satlist = newlist[ik,0]
+
+    return l2csatlist, l5satlist
+
 
 def binary(string):
     """

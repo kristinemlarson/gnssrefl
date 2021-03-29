@@ -30,7 +30,7 @@ nwot was also part of [PBO H2O](http://cires1.colorado.edu/portal/?station=nwot)
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/NWOT.jpg" width=500/>
 
 The site has generally not been used by geodesists and there is very little useful information 
-at UNAVCO or the Nevada Reno group (i.e. no time series).
+about when data are available at either UNAVCO or Nevada Reno (i.e. no time series).
 After the original receiver failed in spring 2015, a new receiver was installed in late 2016 by 
 Mark Raleigh (then at CIRES, now at the University Oregon). Though the nwot receiver 
 may be tracking now, it has not been downloaded in some time and there is no working telemetry.
@@ -38,8 +38,7 @@ We will focus on the data between 2009-2015.
 
 ### Make a SNR File and run quickLook
 
-We will start by making a single SNR file.
-
+We will start by making a single SNR file. 
 Here there are two options. The main archive for this dataset only provides the high-quality
 L2C data in the highrate (1-sec) area. We do not need this sample rate for GPS reflectometry,
 so to speed things up, we strongly encourage you to use the "special" archive option.  Here
@@ -51,15 +50,16 @@ If for any reason this command does not work, please use the direct command:
 
 *rinex2snr nwot 2014 270 -archive unavco -rate high -dec 15*
 
-Both L1 and L2C signals can be used at this site. Use this **quickLook** command to 
-get a sense of the quality of the L1 reflector height (RH) retrievals:
+Both L1 and L2C signals can be used at this site, though the L2C data are far superior in quality
+to the L1 data. Use this **quickLook** command to get a sense of the quality of the 
+reflector height (RH) retrievals. First L1:
 
 *quickLook nwot 2014 270* 
 
 <img src="nwot_L1.png" width="600"/>
 
-These periodograms are a bit ratty in the low RH area - which is 
-just noise for this particular receiver. There are nice strong peaks in the southern quadrants. Now try L2:
+These periodograms are a bit ratty in the low RH area. There are 
+nice strong peaks in the southern quadrants. Now try L2:
 
 *quickLook nwot 2014 270 -fr 2*
 
@@ -70,7 +70,9 @@ the failed tracks in the gray that I have circled.
 
 ### Make multiple years of SNR files 
 
-We are going to look at the data from installation (Fall 2009) through Spring 2015.
+We are going to look at the data from installation (Fall 2009) through Spring 2015. To speed things
+up I will run 2009 and 2015 separately, while the year 2010 through 2014 can be analyzed in 
+one line:
 
 *rinex2snr nwot 2009 240 -doy_end 365 -archive special*
 
@@ -85,8 +87,10 @@ Make a json file for your **gnssir** analysis:
 *make_json_input nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2*
 
 I have opted to only use the southern quadrants (azimuths 90 through 270). Note that since
-L5 was not tracked at this site, it is not listed in the json file. 
-[A sample json file for this site.](nwot.json)
+L5 was not tracked at this site, it is not listed in the json file. I am using a minimum elevation
+angle of 7 degrees because this particular receiver had a limit on the number of satellites it 
+could track. In some cases this meant the low elevation data are not available and that triggers 
+QC restrictions. [A sample json file for this site.](nwot.json)
 
 Once you have a json file set up, run **gnssir** for the years 2009-2015:
 
