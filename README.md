@@ -17,6 +17,12 @@
 
 ### News <a name="news"></a>
 
+[We have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
+
+March 29, 2021
+
+The L2C and L5 options now use (appropriate) time-dependent lists of satellites. 
+
 March 17, 2021
 
 I have removed CDDIS from the default RINEX 2.11 archive search list. It is still useable if you use 
@@ -34,7 +40,6 @@ We now have three translation options for RINEX files: fortran, hybrid, and pyth
 is ok for 30 sec data but really too slow otherwise. Hybrid binds the python to my (fast) fortran code.
 This has now been implemented for both GPS and multi-GNSS.
 
-[We have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
 CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
 implemented security restrictions, we have had to change our download access. 
@@ -510,12 +515,8 @@ because it unfortunately- by default - removes Beidou observations in Rinex 2.11
 and fortran is set to True, unfortunately this will still occur. I am working on removing my 
 code's dependence on **teqc**.
 
-The hybrid translator option is currently only for GPS satellites. It does not cover multi-GNSS.
-
-No phase center offsets have been applied to these reflector heights. While these values are relatively small,
+No phase center offsets have been applied to reflector heights. While these values are relatively small,
 we do plan to remove them in subsequent versions of the code. 
-
-The L2C and L5 GPS satellite lists are not time coded as they should be. I currently use a list from 2020.
 
 ### Utilities <a name="helper"></a>
 
