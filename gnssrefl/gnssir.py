@@ -94,7 +94,10 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                 print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
 #   get the list of satellites for this frequency
             if onesat == None:
-                satlist = g.find_satlist(f,snrE)
+                #satlist = g.find_satlist(f,snrE)
+                # added time dependent L2c and L5 satellite lists
+                satlist = g.find_satlist_wdate(f,snrE,year,doy)
+
             else:
                 satlist = onesat
                 if (int(satlist[0]) < 100) and (f > 100):

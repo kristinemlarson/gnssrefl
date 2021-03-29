@@ -2340,14 +2340,14 @@ def find_satlist(f,snrExist):
     """
 # set list of GPS satellites for now
 # 
-# Block III will be 4, 18, 23
+# Block III will be 4, 18, 23, 
 #   these are the only L2C satellites as of 18oct10
-    l2c_sat = [1, 3, 5, 6, 7, 8, 9, 10, 12, 15, 17, 24, 25, 26, 27, 29, 30, 31, 32]
-    # updated on 20 jul 15 - really should make this time dependent ....
-    l2c_sat = [1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 23, 24, 25, 26, 27, 29, 30, 31, 32]
+    #l2c_sat = [1, 3, 5, 6, 7, 8, 9, 10, 12, 15, 17, 24, 25, 26, 27, 29, 30, 31, 32]
+    # updated on  march 26, 2021 - really should make this time dependent ....
+    l2c_sat = [1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 17, 18, 23, 24, 25, 26, 27, 29, 30, 31, 32]
 
 #   only L5 satellites thus far
-    l5_sat = [1, 3,  6,  8, 9, 10, 24, 25, 26, 27, 30,  32]
+    l5_sat = [1, 3,  4, 6,  8, 9, 10, 14, 18, 23, 24, 25, 26, 27, 30,  32]
     # l5_sat = [1, 3,  4, 6,  8, 9, 10, 24, 25, 26, 27, 30,  32]
 #   assume l1 and l2 can be up to 32
     l1_sat = np.arange(1,33,1)
@@ -2384,25 +2384,31 @@ def find_satlist(f,snrExist):
     #    print('     illegal frequency: no sat list being returned')
     return satlist
 
-def find_satlist_wdate(f,snrExist):
+def find_satlist_wdate(f,snrExist,year,doy):
     """
     inputs: frequency and boolean numpy array that tells you
     if a signal is (potentially) legal
     outputs: list of satellites to use
+
+    now includes date informaiton so that accurate lists of l2c and l5
+    transmitting satellites are reasonable (previously it was a full list for 
+    current day, that may or may not be correct in the past)
     author: kristine m. larson
     """
 # set list of GPS satellites for now
 #
 # Block III will be 4, 18, 23
 #   these are the only L2C satellites as of 18oct10
-    l2c_sat = [1, 3, 5, 6, 7, 8, 9, 10, 12, 15, 17, 24, 25, 26, 27, 29, 30, 31, 32]
+    #l2c_sat = [1, 3, 5, 6, 7, 8, 9, 10, 12, 15, 17, 24, 25, 26, 27, 29, 30, 31, 32]
     # updated on 20 jul 15 - really should make this time dependent ....
-    l2c_sat = [1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 23, 24, 25, 26, 27, 29, 30, 31, 32]
+    #l2c_sat = [1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 23, 24, 25, 26, 27, 29, 30, 31, 32]
 
 #   only L5 satellites thus far
-    l5_sat = [1, 3,  6,  8, 9, 10, 24, 25, 26, 27, 30,  32]
+    #l5_sat = [1, 3,  6,  8, 9, 10, 24, 25, 26, 27, 30,  32]
     # l5_sat = [1, 3,  4, 6,  8, 9, 10, 24, 25, 26, 27, 30,  32]
 #   assume l1 and l2 can be up to 32
+    l2c_sat, l5_sat = l2c_l5_list(year,doy)
+
     l1_sat = np.arange(1,33,1)
     satlist = []
     if f == 1:

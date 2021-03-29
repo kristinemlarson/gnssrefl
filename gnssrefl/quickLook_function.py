@@ -167,7 +167,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             az1 = azval[(a*2)] ; az2 = azval[(a*2 + 1)]
             # this means no satellite list was given, so get them all
             if satsel == None:
-                satlist = g.find_satlist(f,snrE)
+                #satlist = g.find_satlist(f,snrE)
+                #march 29, 2021 made l2c and l5 time dependent
+                satlist = g.find_satlist_wdate(f,snrE,year,doy)
             else:
                 satlist = [satsel]
 
