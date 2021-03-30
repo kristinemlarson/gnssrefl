@@ -281,9 +281,9 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
             [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
             f.close()
         except:
-            print('I did not find it, I will look in current working directory')
+            print('I did not find it, I will look in the subdirectory gnssrefl of the current working directory')
             try:
-                pname =  'gpt_1wA.pickle'
+                pname =  'gnssrefl/gpt_1wA.pickle'
                 f = open(pname, 'rb')
                 [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
                 f.close()
