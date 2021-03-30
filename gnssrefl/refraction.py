@@ -7,11 +7,79 @@ import datetime
 import os
 import pickle
 import sys
+import wget
 
 import numpy as np
 from scipy.interpolate import interp1d
 
 import gnssrefl.gps as g
+
+def find_the_pickle_file():
+    """
+    sad attempt to find the refraction GPT pickle file that 
+    keeps disappearing
+    """
+#   read VMF gridfile in pickle format
+    print('in the find_the_pickle_file function')
+    xdir = str(os.environ['REFL_CODE'])
+    foundit = False
+    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+    BASE_DIR = os.path.dirname(PROJECT_ROOT)
+    # this where it would be using pypi??
+
+    try3 = PROJECT_ROOT + '/' + 'gpt_1wA.pickle'
+    print('might be here', try3)
+
+    # where you might like it to live
+    pname = xdir + '/input/' + 'gpt_1wA.pickle'
+    print('might be here', pname)
+
+    url = 'https://github.com/kristinemlarson/gnssrefl/gnssrefl/gpt_1wA.pickle'
+    print(url)
+    # download from github and store 
+    try:
+        wget.download(url,pname)
+        foundit = True
+    except:
+        okok = 1
+
+    if foundit:
+        print('download owrked')
+    else:
+        print('did not find it')
+
+    print('The large refraction file should be stored here:', pname)
+    try:
+        f = open(pname, 'rb')
+        [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
+        f.close()
+        foundit = True
+    except:
+        print('I did not find it, I will look in the subdirectory gnssrefl of the current working directory: gnssrefl/gpt_1wA.pickle')
+        try:
+            pname =  'gnssrefl/gpt_1wA.pickle'
+            f = open(pname, 'rb')
+            [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
+            f.close()
+            foundit = True
+        except:
+            pname =   try3
+            print('hmm, failed again. ... try yet again here: ',pname)
+                #cwd = os.getcwd()
+                #pname =  cwd + '/data/gpt_1wA.pickle'
+            try:
+                f = open(pname, 'rb')
+                [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
+                f.close()
+                foundit = True
+            except:
+                print('could not get this done')
+                print('download the missing gpt_1wA.pickle file from github and put it in the $REFL_CODE/input directory ')
+                sys.exit()
+
+    if foundit:
+        print('file was found')
+    return foundit
 
 def read_4by5(station, dlat,dlon,hell):
     """
@@ -250,6 +318,9 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
     lat and lon in degrees (NOT RADIANS)
     kristine m. larson
     """
+
+    find_the_pickle_file
+
     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(PROJECT_ROOT)
     #print(PROJECT_ROOT)
