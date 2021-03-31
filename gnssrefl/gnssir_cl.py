@@ -13,6 +13,7 @@ import scipy.signal
 import subprocess
 import sys
 import warnings
+import wget
 
 import gnssrefl.gnssir as guts
 import gnssrefl.gps as g
@@ -177,6 +178,21 @@ def main():
         lsp['onesat'] = [args.sat]
 
     lsp['mmdd'] = add_mmddhhss
+
+    xdir = str(os.environ['REFL_CODE'])
+    pickle = 'gpt_1wA.pickle'
+    pname = xdir + '/input/' + pickle
+
+    if os.path.isfile(pname):
+        print('refraction file exists')
+    else:
+        url='https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/gpt_1wA.pickle'
+        wget.download(url,pickle)
+        subprocess.call(['mv','-f',pickle, xdir + '/input/' ])
+        print('refraction file downloaded and moved')
+        if os.path.isfile(pname):
+            print('now it exists')
+
 
     year_list = list(range(year, year_end+1))
     doy_list = list(range(doy, doy_end+1))

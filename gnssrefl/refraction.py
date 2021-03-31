@@ -14,72 +14,6 @@ from scipy.interpolate import interp1d
 
 import gnssrefl.gps as g
 
-def find_the_pickle_file():
-    """
-    sad attempt to find the refraction GPT pickle file that 
-    keeps disappearing
-    """
-#   read VMF gridfile in pickle format
-    print('in the find_the_pickle_file function')
-    xdir = str(os.environ['REFL_CODE'])
-    foundit = False
-    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-    BASE_DIR = os.path.dirname(PROJECT_ROOT)
-    # this where it would be using pypi??
-
-    try3 = PROJECT_ROOT + '/' + 'gpt_1wA.pickle'
-    print('might be here', try3)
-
-    # where you might like it to live
-    pname = xdir + '/input/' + 'gpt_1wA.pickle'
-    print('might be here', pname)
-
-    url = 'https://github.com/kristinemlarson/gnssrefl/gnssrefl/gpt_1wA.pickle'
-    print(url)
-    # download from github and store 
-    try:
-        wget.download(url,pname)
-        foundit = True
-    except:
-        okok = 1
-
-    if foundit:
-        print('download owrked')
-    else:
-        print('did not find it')
-
-    print('The large refraction file should be stored here:', pname)
-    try:
-        f = open(pname, 'rb')
-        [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
-        f.close()
-        foundit = True
-    except:
-        print('I did not find it, I will look in the subdirectory gnssrefl of the current working directory: gnssrefl/gpt_1wA.pickle')
-        try:
-            pname =  'gnssrefl/gpt_1wA.pickle'
-            f = open(pname, 'rb')
-            [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
-            f.close()
-            foundit = True
-        except:
-            pname =   try3
-            print('hmm, failed again. ... try yet again here: ',pname)
-                #cwd = os.getcwd()
-                #pname =  cwd + '/data/gpt_1wA.pickle'
-            try:
-                f = open(pname, 'rb')
-                [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
-                f.close()
-                foundit = True
-            except:
-                print('could not get this done')
-                print('download the missing gpt_1wA.pickle file from github and put it in the $REFL_CODE/input directory ')
-                sys.exit()
-
-    if foundit:
-        print('file was found')
-    return foundit
 
 def read_4by5(station, dlat,dlon,hell):
     """
@@ -88,6 +22,9 @@ def read_4by5(station, dlat,dlon,hell):
     requires that an environment variable exists for REFL_CODE
     """
 #
+
+
+
     xdir = str(os.environ['REFL_CODE'])
     inputpath = xdir + '/input/'
 #    if not os.path.isdir(inputpath): #if year folder doesn't exist, make it
@@ -319,7 +256,6 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
     kristine m. larson
     """
 
-    find_the_pickle_file
 
     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(PROJECT_ROOT)
@@ -347,35 +283,41 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
 #   read VMF gridfile in pickle format 
         pname = xdir + '/input/' + 'gpt_1wA.pickle'
         print('The large refraction file should be stored here:', pname)
-        try:
+        foundit = False
+        if os.path.isfile(pname):
             f = open(pname, 'rb')
             [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
             f.close()
-        except:
-            print('I did not find it, I will look in the subdirectory gnssrefl of the current working directory')
-            try:
-                pname =  'gnssrefl/gpt_1wA.pickle'
-                print(pname)
+            foundit = True
+        if not foundit:
+            pname =  'gnssrefl/gpt_1wA.pickle'
+            print('2nd attempt: subdirectory gnssrefl of current working directory:', pname)
+            if os.path.isfile(pname):
                 f = open(pname, 'rb')
                 [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
                 f.close()
+                foundit = True
+        if not foundit:
+            pname = try3
+            print('3rd attempt try here: ',pname)
+            if os.path.isfile(pname):
+                f = open(pname, 'rb')
+                [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
+                f.close()
+                foundit = True
+        if not foundit:
+            print('fourth attempt - download from github')
+            try:
+                url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/gpt_1wA.pickle'
+                pickle = 'gpt_1wA.pickle'
+                wget.download(url,pickle)
+                subprocess.call(['mv','-f',pickle, xdir + '/input/' ])
+                foundit = True
             except:
-                print('hmm, failed again. ... try yet again here: ')
-                #cwd = os.getcwd()
-                #pname =  cwd + '/data/gpt_1wA.pickle'
-                pname =   try3
-                print(pname)
-                try:
-                    f = open(pname, 'rb')
-                    [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
-                    f.close()
-                except:
-                    print('could not get this done')
-                    print('download the missing gpt_1wA.pickle file from github and put it in the $REFL_CODE/input directory ')
-                    sys.exit()
+                print('download gpt_1wA.pickle from github and store in REFL_CODE/input')
+                sys.exit()
 
 
-#    print(np.shape(All_pgrid))
 # really should e zero to four, but whatever
         indx = np.zeros(4,dtype=int)
         indx_lat = np.zeros(4,dtype=int)
