@@ -255,13 +255,8 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
     lat and lon in degrees (NOT RADIANS)
     kristine m. larson
     """
-
-
     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(PROJECT_ROOT)
-    #print(PROJECT_ROOT)
-    # this appears to be the one i want
-    #print(BASE_DIR)
     try3 = PROJECT_ROOT + '/' + 'gpt_1wA.pickle'
 
     # check that output path exists.  
@@ -308,10 +303,10 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
         if not foundit:
             print('fourth attempt - download from github')
             try:
-                url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/gpt_1wA.pickle'
-                pickle = 'gpt_1wA.pickle'
-                wget.download(url,pickle)
-                subprocess.call(['mv','-f',pickle, xdir + '/input/' ])
+                pfile = 'gpt_1wA.pickle'
+                url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/' + pfile
+                wget.download(url,pfile)
+                subprocess.call(['mv','-f',pfile, xdir + '/input/' ])
                 foundit = True
             except:
                 print('download gpt_1wA.pickle from github and store in REFL_CODE/input')
