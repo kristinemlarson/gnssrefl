@@ -180,19 +180,21 @@ def main():
     lsp['mmdd'] = add_mmddhhss
 
     xdir = str(os.environ['REFL_CODE'])
-    pickle = 'gpt_1wA.pickle'
-    pname = xdir + '/input/' + pickle
+    picklefile = 'gpt_1wA.pickle'
+    pname = xdir + '/input/' + picklefile
 
     if os.path.isfile(pname):
         print('refraction file exists')
     else:
-        url='https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/gpt_1wA.pickle'
-        wget.download(url,pickle)
-        subprocess.call(['mv','-f',pickle, xdir + '/input/' ])
-        print('refraction file downloaded and moved')
-        if os.path.isfile(pname):
-            print('now it exists')
-
+        local_copy = 'gnssrefl/' + picklefile
+        if os.path.isfile(local_copy):
+            print('found local copy of refraction file')
+            subprocess.call(['cp','-f',local_copy, xdir + '/input/' ])
+        else:
+            print('download and move refraction file')
+            url='https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/gpt_1wA.pickle'
+            wget.download(url,picklefile)
+            subprocess.call(['mv','-f',picklefile, xdir + '/input/' ])
 
     year_list = list(range(year, year_end+1))
     doy_list = list(range(doy, doy_end+1))

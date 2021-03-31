@@ -22,9 +22,6 @@ def read_4by5(station, dlat,dlon,hell):
     requires that an environment variable exists for REFL_CODE
     """
 #
-
-
-
     xdir = str(os.environ['REFL_CODE'])
     inputpath = xdir + '/input/'
 #    if not os.path.isdir(inputpath): #if year folder doesn't exist, make it
