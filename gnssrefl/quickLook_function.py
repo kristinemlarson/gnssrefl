@@ -151,7 +151,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)
     if allGood == 1:
         # make output file for the quickLook RRH values, just so you can give them a quick look see
-        rhout = open('logs/rh.txt','w+')
+        quicklog = 'logs/rh' + station + '.txt'
+        rhout = open(quicklog,'w+')
         amax = 0
         minEdataset = np.min(ele)
         print('minimum elevation angle (degrees) for this dataset: ', minEdataset)
@@ -186,8 +187,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         Noise = 1; iAzim = 0 # made up numbers
                     if (delT < delTmax) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise):
                         T = g.nicerTime(UTCtime)
-                        rhout.write('SUCCESS Azimuth {0:3.0f} RH {1:6.3f} m, Sat {2:3.0f} Freq {3:3.0f} Amp {4:4.1f} PkNoise {5:3.1f} UTC {6:5s} \n '.format( 
-                            avgAzim,maxF,satNu,f,maxAmp,maxAmp/Noise,T))
+                        # az, RH, sat, amp, peak2noise, Time
+                        rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,1))
                         if pltscreen:
                             plt.plot(px,pz,linewidth=1.5)
                         idc = stitles[a]
@@ -201,6 +202,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         idc = 'f' + stitles[a]
                         data[idc][satNu] = [px,pz]
                         datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
+                        rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,-1))
 
             # i do not know how to add a grid using these version of matplotlib
             tt = 'GNSS-IR results: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy)
@@ -213,10 +215,14 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                     plt.ylabel('volts/volts')
 
         rhout.close()
-        print('preliminary reflector height results are stored in a file called logs/rh.txt')
+        #print('preliminary reflector height results are stored in a file called logs/rh.txt')
         # do not plot if sending data to Jupyter Notebooks
+
+
         if pltscreen:
             plt.suptitle(tt, fontsize=12)
+            # sure - throw in another plot
+            goodbad(quicklog,station)
             plt.show()
           
     else: 
@@ -227,6 +233,25 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     # that the jupyter notebook people can replot them
     # 21mar26 added a key
     return data,datakey
+
+def goodbad(fname,station):
+    """
+    simple visualizer of "good" and "bad" azimuths
+    input is a filename
+    """
+    a = np.loadtxt(fname,comments='%')
+    ij = (a[:,6] == 1)
+    ik = (a[:,6] == -1)
+    plt.figure(figsize=(10,6))
+    plt.plot(a[ij,0], a[ij,1], 'o',color='black',label='good')
+    plt.plot(a[ik,0], a[ik,1], 'o',color='gray', label='bad')
+    plt.title('quickLook Reflector Heights for ' + station)
+    plt.legend(loc="upper left")
+    plt.xlabel('Azimuth (degrees')
+    plt.ylabel('meters')
+    plt.xlim((0, 360))
+
+    plt.grid()
 
 
 
