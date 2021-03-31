@@ -19,6 +19,11 @@
 
 [We have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
+March 30, 2021 
+
+Hopefully bug fixed related to the refraction file (gpt_1wA.pickle). If it is missing from your build,
+it is now downloaded for you. Apologies. 
+
 March 29, 2021
 
 The L2C and L5 options now use (appropriate) time-dependent lists of satellites. 
@@ -39,7 +44,6 @@ February 24, 2021
 We now have three translation options for RINEX files: fortran, hybrid, and python. The last of these
 is ok for 30 sec data but really too slow otherwise. Hybrid binds the python to my (fast) fortran code.
 This has now been implemented for both GPS and multi-GNSS.
-
 
 CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
 implemented security restrictions, we have had to change our download access. 
