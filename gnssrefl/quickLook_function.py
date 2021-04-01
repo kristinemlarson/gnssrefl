@@ -237,23 +237,40 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 def goodbad(fname,station):
     """
     simple visualizer of "good" and "bad" azimuths
-    input is a filename
+    input is a filename and the station name
     """
     a = np.loadtxt(fname,comments='%')
-    ij = (a[:,6] == 1)
-    ik = (a[:,6] == -1)
+    ij = (a[:,6] == 1) # good retrievals
+    ik = (a[:,6] == -1) # bad retrievals
     plt.figure(figsize=(10,6))
-    plt.plot(a[ij,0], a[ij,1], 'o',color='black',label='good')
+    plt.subplot(3,1,1)
+    plt.plot(a[ij,0], a[ij,1], 'o',color='blue',label='good')
     plt.plot(a[ik,0], a[ik,1], 'o',color='gray', label='bad')
-    plt.title('quickLook Reflector Heights for ' + station)
-    plt.legend(loc="upper left")
-    plt.xlabel('Azimuth (degrees')
-    plt.ylabel('meters')
-    plt.xlim((0, 360))
-
+    plt.title('quickLook Retrieval Metrics: ' + station)
+    plt.legend(loc="upper right")
+    plt.ylabel('reflector ht (m)')
     plt.grid()
+    plt.xlim((0, 360))
+    ax = plt.gca()
+    ax.axes.xaxis.set_ticklabels([])
 
 
+    plt.subplot(3,1,2)
+    plt.plot(a[ij,0], a[ij,4], 'o',color='blue',label='good')
+    plt.plot(a[ik,0], a[ik,4], 'o',color='gray', label='bad')
+    plt.ylabel('peak2noise')
+    plt.grid()
+    plt.xlim((0, 360))
+    ax = plt.gca()
+    ax.axes.xaxis.set_ticklabels([])
+
+    plt.subplot(3,1,3)
+    plt.plot(a[ij,0], a[ij,3], 'o',color='blue',label='good')
+    plt.plot(a[ik,0], a[ik,3], 'o',color='gray', label='bad')
+    plt.ylabel('spectral peak amplitude')
+    plt.xlabel('Azimuth (degrees)')
+    plt.grid()
+    plt.xlim((0, 360))
 
 # old code
 #print('I will try to pick up a RINEX file ')
