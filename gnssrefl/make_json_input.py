@@ -29,6 +29,8 @@ def main():
     parser.add_argument("-nr2",default=None, type=float, help="upper limit noise region for QC(m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="peak to noise ratio used for QC")
     parser.add_argument("-allfreq", default=None, type=str, help="set to True to include all GNSS")
+    parser.add_argument("-l1", default=None, type=str, help="set to True to only use GPS L1")
+    parser.add_argument("-l2c", default=None, type=str, help="set to True to only use GPS L2C")
     parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     args = parser.parse_args()
@@ -116,16 +118,22 @@ def main():
 # you can of course have more subdivisions here
     lsp['azval'] = [0, 90 , 90 ,180 , 180 , 270 , 270 , 360] 
 # 
-# frequencies to use - and their required amplitudes. The amplitudes are not set in stone
-#
-# added L5 as default october 13, 2020
-    if args.allfreq == None:
-        # choose GPS as the default
-        lsp['freqs'] = [1, 20, 5]; lsp['reqAmp'] = [6, 6,6]
-    else:
+#   default frequencies to use - and their required amplitudes. The amplitudes are not set in stone
+    # this is the case for only GPS, but the good L2 
+    lsp['freqs'] = [1, 20, 5]; lsp['reqAmp'] = [6, 6,6]
+    if args.allfreq == 'True':
         # 307 was making it crash.  did not check as to why
-        lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206,207,208,302, 306]; lsp['reqAmp'] = [6, 6,6,6,6,6,6,6,6,6,6,6]
-#   default is to use refraction correction
+        # includes glonass, galileo, and beidou
+        lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206,207,208,302, 306]; 
+        lsp['reqAmp'] = [6, 6,6,6,6,6,6,6,6,6,6,6]
+
+    if args.l1 == 'True':
+        lsp['freqs'] = [1]
+        lsp['reqAmp'] = [6]
+
+    if args.l2c == 'True':
+        lsp['freqs'] = [20]
+        lsp['reqAmp'] = [6]
 
     lsp['refraction'] = True
     if args.refraction == 'False':

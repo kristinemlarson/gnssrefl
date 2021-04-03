@@ -127,6 +127,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     #print('Refl. Ht. Noise Region used: ', NReg)
     # for quickLook, we use the four geographic quadrants - these are azimuth angles in degrees
     azval = [270, 360, 180, 270, 0, 90, 90, 180]
+    # try adding 5 degrees at the quadrant edges, except for north
     naz = int(len(azval)/2) # number of azimuth pairs
     pltname = 'temp.png' # default plot
     requireAmp = reqAmp[0]
@@ -276,6 +277,7 @@ def goodbad(fname,station,h1,h2,PkNoise,reqAmp,freq):
 
     ij = (a[:,6] == 1) # good retrievals
     ik = (a[:,6] == -1) # bad retrievals
+    fs = 12
     plt.figure(figsize=(10,6))
     plt.subplot(3,1,1)
     plt.plot(a[ij,0], a[ij,1], 'o',color='blue',label='good')
