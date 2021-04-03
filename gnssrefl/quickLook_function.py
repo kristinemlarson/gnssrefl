@@ -36,6 +36,7 @@ def read_snr_simple(obsfile):
         #print('read_snr_simple, Number of rows:', r, ' Number of columns:',c)
         sat = f[:,0]; ele = f[:,1]; azi = f[:,2]; t =  f[:,3]
         edot =  f[:,4]; s1 = f[:,6]; s2 = f[:,7]; s6 = f[:,5]
+        # 
         s1 = np.power(10,(s1/20))  
         s2 = np.power(10,(s2/20))  
         s6 = s6/20; s6 = np.power(10,s6)  
@@ -89,6 +90,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     KL 21feb06 return data from the plots so that Jupyter notebooks can use them.
     also added pltscreen variable so that the default plots are not always displayed
     KL 21mar25 added datakey dictionaries for the Jupyter notebook people
+    KL 21apr02 added error checking on whether requested datastreams exist. no data, no analysis
     """
 
     # dictionary for output
@@ -151,10 +153,30 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)
     if allGood == 1:
         # make output file for the quickLook RRH values, just so you can give them a quick look see
-        quicklog = 'logs/rh' + station + '.txt'
+        quicklog = 'logs/rh_' + station + '.txt'
         rhout = open(quicklog,'w+')
         amax = 0
         minEdataset = np.min(ele)
+        sats = sat 
+        # very rare that no GPS data exist, so will not check it.  I will probably regret this
+        #if (f < 6):
+        #    b = sats[(sats<100)]; print('gps',len(b))
+        if (f > 100) and (f < 200): # glonass
+            b = sats[(sats>100) & (sats<200)]; # print('glonass',len(b))
+            if len(b) == 0:
+                print('NO Glonass DATA') ; 
+                return data, datakey
+        elif (f > 200) & (f < 300): # galileo
+            b = sats[(sats>200) & (sats<300)]; # print('galileo',len(b))
+            if len(b) == 0:
+                print('NO Galileo data'); 
+                return data, datakey
+        elif (f > 300): # beidou
+            b = sats[(sats>300) & (sats<400)]; # print('beidou',len(b))
+            if len(b) == 0:
+                print('NO Beidou data'); 
+                return data, datakey
+
         print('minimum elevation angle (degrees) for this dataset: ', minEdataset)
         if minEdataset > (e1+0.5):
             print('It looks like the receiver had an elevation mask')
@@ -208,6 +230,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             tt = 'GNSS-IR results: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy)
             if pltscreen:
                 aaa, bbb = plt.ylim()
+                # see if this works
+                plt.grid()
                 amax = max(amax,  bbb) # do not know how to implement this ...
                 if (a == 3) or (a==1):
                     plt.xlabel('reflector height (m)')
@@ -216,13 +240,13 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
         rhout.close()
         #print('preliminary reflector height results are stored in a file called logs/rh.txt')
-        # do not plot if sending data to Jupyter Notebooks
+        # this file seems to have an empty line at the end.  i do not know why.
 
 
         if pltscreen:
             plt.suptitle(tt, fontsize=12)
             # sure - throw in another plot
-            goodbad(quicklog,station)
+            goodbad(quicklog,station,minH,maxH,PkNoise,reqAmp,f)
             plt.show()
           
     else: 
@@ -234,30 +258,43 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     # 21mar26 added a key
     return data,datakey
 
-def goodbad(fname,station):
+def goodbad(fname,station,h1,h2,PkNoise,reqAmp,freq):
     """
     simple visualizer of "good" and "bad" azimuths
-    input is a filename and the station name
+    input is a filename, the station name, and the min and max RH
+    and the peak to noise, required amplitude criteria, and frequency used
+    should not even call this code if there are no data.  need to fix this
+    author: kristine larson
     """
-    a = np.loadtxt(fname,comments='%')
+    try:
+        a = np.loadtxt(fname,comments='%')
+    except:
+        print('no results in the file')
+
+    if len(a) == 0:
+        return
+
     ij = (a[:,6] == 1) # good retrievals
     ik = (a[:,6] == -1) # bad retrievals
     plt.figure(figsize=(10,6))
     plt.subplot(3,1,1)
     plt.plot(a[ij,0], a[ij,1], 'o',color='blue',label='good')
     plt.plot(a[ik,0], a[ik,1], 'o',color='gray', label='bad')
-    plt.title('quickLook Retrieval Metrics: ' + station)
+    plt.title('quickLook Retrieval Metrics: ' + station + ' ' + g.ftitle(freq))
     plt.legend(loc="upper right")
-    plt.ylabel('reflector ht (m)')
+    plt.ylabel('Reflector Height (m)')
     plt.grid()
     plt.xlim((0, 360))
+    plt.ylim((h1, h2))
     ax = plt.gca()
     ax.axes.xaxis.set_ticklabels([])
 
 
     plt.subplot(3,1,2)
-    plt.plot(a[ij,0], a[ij,4], 'o',color='blue',label='good')
-    plt.plot(a[ik,0], a[ik,4], 'o',color='gray', label='bad')
+    plt.plot([0, 360], [PkNoise, PkNoise], 'k--',label='QC value used')
+    plt.plot(a[ij,0], a[ij,4], 'o',color='blue')
+    plt.plot(a[ik,0], a[ik,4], 'o',color='gray')
+    plt.legend(loc="upper right")
     plt.ylabel('peak2noise')
     plt.grid()
     plt.xlim((0, 360))
@@ -265,9 +302,11 @@ def goodbad(fname,station):
     ax.axes.xaxis.set_ticklabels([])
 
     plt.subplot(3,1,3)
-    plt.plot(a[ij,0], a[ij,3], 'o',color='blue',label='good')
-    plt.plot(a[ik,0], a[ik,3], 'o',color='gray', label='bad')
-    plt.ylabel('spectral peak amplitude')
+    plt.plot([0, 360], [reqAmp, reqAmp], 'k--',label='QC value used')
+    plt.plot(a[ij,0], a[ij,3], 'o',color='blue')
+    plt.plot(a[ik,0], a[ik,3], 'o',color='gray') 
+    plt.legend(loc="upper right")
+    plt.ylabel('Spectral Peak Amplitude')
     plt.xlabel('Azimuth (degrees)')
     plt.grid()
     plt.xlim((0, 360))

@@ -19,6 +19,11 @@
 
 [We have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
+April 3, 2021
+
+Added new plot in quickLook that provides perspective on choosing the right
+azimuths and QC metrics
+
 March 30, 2021 
 
 Hopefully bug fixed related to the refraction file (gpt_1wA.pickle). If it is missing from your build,
@@ -365,9 +370,12 @@ Going back to our **rinex2snr** example, try running the data for station p041.
 
 *quickLook p041 2020 132*  
 
-That command will produce [this periodogram summary](tests/use_cases/p041-l1.png). By default, 
-these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
-you have used the defaults.  Furthermore, note that results on the x-axis begin at 0.5 meters.
+That command will produce this periodogram summary:
+
+<img src="tests/use_cases/p041-l1.png" width=500>
+
+By default, these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
+you have used the defaults. Furthermore, note that results on the x-axis begin at 0.5 meters.
 Since you are not able to resolve very small reflector heights with this method, this region 
 is not allowed. These periodograms give you a sense of whether there is a 
 planar reflector below your antenna. The fact that 
@@ -376,9 +384,22 @@ this site the antenna phase center is ~ 2 meters above the ground. The colors
 change as you try different satellites.  If the data are plotted in
 gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
 
-If you want to look at L2C data, [try this by invoking -fr 20](tests/use_cases/p041-l2c.png). 
-In general, the results will be cleaner than L1 data (frequency number 1 in my code).
-The defaults reflector heights will not go beyond 6 meters.  If you had set -h2 20, it would
+**quickLook** also provides a summary of various quality control metrics:
+
+<img src="tests/use_cases/p041_l1_qc.png" width=500>
+
+The top plot shows the sucessful RH retrievals in blue and unsuccessful RH retrievals in gray. 
+Below are the peak to noise ratios. The last plot is the amplitude of the spectral peak. The dashed
+lines show you what QC metrics quickLook was using. You can control/change these on the command line
+(quickLook -h).
+
+If you want to look at L2C data: 
+
+*quickLook p041 2020 132 -fr 20*  
+
+<img src="tests/use_cases/p041-l2c.png" width=500>
+
+In general, L2C results are always superior to L1 results. If you had set -h2 20, it would
 look [like this](tests/use_cases/p041-l2c-again.png). You aren't gaining anything by doing this.
 
 Now look at the Greenland SNR file you created in the previous section.
@@ -390,14 +411,24 @@ means the antenna was further from the planar reflector, which in this case is i
 
 Finally, what do you do if your reflections site is taller than the default value of 6 meters?
 Does the code figure this out for you automatically? **No, it does not.**
-A short example: Make a SNR file using the defaults: *rinex2snr smm3 2018 271*
+
+A short example: Make a SNR file using the defaults: 
+
+*rinex2snr smm3 2018 271*
+
 Now run **quickLook** using the defaults [quickLook smm3 2018 271](tests/use_cases/smm3-default.png). 
+
 Everything is gray (which means it didn't find a significant reflector) because you 
 only calculated periodograms for height values of 0.5 to 6 meters. The
 site is ~16 meters above the ice. Accordingly, if you change the inputs to tell the program
 that you want to examine heights between 8 and 20 meters, i.e. 
-[quickLook smm3 2018 271 -h1 8 -h2 20](tests/use_cases/smm3-sensible.png) you now see what you 
-expect to see - peaks of periodograms at ~16 meters height. Why is the northwest quadrant 
+
+*quickLook smm3 2018 271 -h1 8 -h2 20*
+
+<img src="tests/use_cases/smm3-sensible.png" width=500>
+
+You now see what you expect to see - peaks of periodograms at ~16 meters height. 
+Why is the northwest quadrant 
 so messy? I leave that as an exercise for the reader. Hint: start out by trying
 to examine this site on Google Earth.
 
