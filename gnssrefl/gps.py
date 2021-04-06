@@ -4583,6 +4583,7 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     #except Exception as err:
     #    print(err)
     if not os.path.isfile(cddisfile):
+        print('going for the gzip version of the file')
         cddis_download(cddisfile_gzip,mdir)
         if os.path.isfile(cddisfile_gzip):
             subprocess.call(['gunzip',cddisfile_gzip])

@@ -462,7 +462,22 @@ via the command line, as in:
 
 *make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10* 
 
-This changes elevation angles to 5-10 degrees.
+This changes elevation angles to 5-10 degrees. The default is to only use PGS frequencies, specifically L1, L2C, and L5.
+If you want all GNSS frequencies:
+
+
+*make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -allfreq True* 
+
+Only use GPS L1:
+
+
+*make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l1 True* 
+
+Only use GPS L2C:
+
+
+*make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True* 
+
 
 As discussed in Roesler and Larson (2018), there are two QC measures used in this code. One is the peak 
 value of the peak in the periodogram. In the example below the amplitude of the most significant 
