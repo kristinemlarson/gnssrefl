@@ -21,6 +21,13 @@ from numpy import array
 
 # my code - is it needed here?
 import gnssrefl.read_snr_files as snr
+# for future ref
+#import urllib.request
+
+#file="P041.cwu.nam14.csv"
+#url="ftp://data-out.unavco.org/pub/products/position/P041/" + file
+#urllib.request.urlretrieve(url, file)
+
 
 # various numbers you need in the GNSS world
 # mostly frequencies and wavelengths

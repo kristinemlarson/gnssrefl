@@ -64,17 +64,20 @@ The peaks in all four qudarants are bunched at ~1.2 meters reflector height (RH)
 
 This site did not consistently track L2C, so we will not use the L2 data. L5 was not tracked.
 
+
+<img src=gls1-quicklook-2019.png width=500>
+<img src=qc-2012-gls1.png width=500>
+<img src=qc-gls1.png width=500>
+<img src=quickLook-gls1-2012A.png width=500>
+
 ## Measure Snow Accumulation in 2012
 
-Set up the analysis file. The min and max reflector height values are set to 0.5 and 8 meters. 
-Use a minimum elevation angle of 7 degrees: 
+Set up the analysis file. We will use the default minimum and maximum 
+reflector height values. The field crews used inconsistent elevation cutoffs 
+at the receiver, so we will enforce the larger of those two at the analysis level: 
+7 degrees. We also specify L1 because the quality of the L2 is highly-variable over time.
 
-*make_json_input gls1 66.479 -46.310 2148.578 -h1 0.5 -h2 8 -e1 7 -e2 25*
-
-The **make_json_input** defaults are to use all GPS frequencies (1,20,5). 
-Manually edit the json file to remove L2 and L5 from the list 
-labeled "freqs". Then change the list "reqAmp" so that it has the same number 
-of elements as the list "freqs" (by default, all elements in "reqAmp" will have a value of 6). 
+*make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -e2 25 -l1 True*
 [Example json file.](gls1.json)
 
 To test the code, we will use the year 2012. First, make SNR files.
