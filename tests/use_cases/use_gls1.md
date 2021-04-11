@@ -2,7 +2,7 @@
 
 **Station Name:** gls1
 
-**Location:**  Greenland Ice Sheet in Qeqqata Province 
+**Location:**  Dye2, Qeqqata Province, Greenland 
 
 **Archive:**  [UNAVCO](http://www.unavco.org), [SOPAC](http://sopac-csrc.ucsd.edu/index.php/sopac/)
 
@@ -24,30 +24,30 @@
 
 <img src="gls1.jpg" width="400">
 <BR>
-gls1 at installation
 
 ## Data Summary
 
-Station gls1 was installed on the Greenland Ice Sheet in 2011. 
+Station gls1 was installed at [Dye2](http://greenlandtoday.com/dye-2-a-relic-from-a-not-so-distant-past/?lang=en) on the Greenland Ice Sheet in 2011. 
 The antenna is mounted on a long pole; approximately 3.5-meter of the pole was above the ice at the time of installation. 
 The receiver at the site only consistently tracks legacy GPS signals. A detailed discussion of the monument and 
 data from the station can be found in [Larson, MacFerrin, and Nylen (2020)](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
-Various position time series for gls1 can be retrieved 
-from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3). We also have 
-a utility you can use: **download_unr**
+The latest position time series for gls1 can be retrieved 
+from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3). 
+We also have a utility you can use: **download_unr**
 
 As gls1 is on an ice sheet and the ice surface is relatively smooth in all directions, it 
 is unlikely that a complicated azimuth mask will be required.
 gls1 was originally installed with an elevation mask of 7 degrees, which is suboptimal for reflections research.
 Even though the mask was later removed, we will use 7 degrees as the minimum elevation angle for all our analysis.
-Similarly, even though the site managers later changed to enable L2C tracking, to ensure that a consistent dataset is being 
-used, we will only use L1 data. More information about 
-gls1 can be found on the [GNSS-IR Web App.](https://gnss-reflections.org/fancy6?example=gls1)
+Similarly, even though the site managers later changed to enable L2C tracking, to ensure that 
+a consistent dataset is being used, we will only use L1 data. gls1 is an example case 
+for the [GNSS-IR Web App.](https://gnss-reflections.org/fancy6?example=gls1)
 
 ## quickLook 
 
-Our goal in this use case is to analyze one year of data. We have chosen 2012. In order to set the proper
-quality control parameters, we will use quickLook for one day. First we need to translate 
+Our ultimate goal in this use case is to analyze one year of data. We have chosen the year 
+2012 because there was a large melt event on the ice sheet. In order to set the proper
+quality control parameters, we will use **quickLook** for one day. First we need to translate 
 one day of RINEX data using **rinex2snr**:
 
 *rinex2snr gls1 2012 100*
@@ -68,40 +68,40 @@ peak amplitude and peak to noise ratio.
 
 <img src=quicklook-gls1-qc.png width=500>
 
-In the top plot we see that in the reflector heights are consistent at all azimuths.
-The azimuths between 340 degrees and 40 degrees do not appear to provide reliable RH retrievals.
-We also see that a peak2noise QC metric (middle plot) of 3 is reasonable. 
+In the top plot we see that the retrieved reflector heights are consistent at all azimuths.
+Retrievals for azimuths between 340 degrees and 40 degrees are consistently marked as not having
+met quality control settings.From the center plot we can see that a peak2noise QC metric of 3 is reasonable. 
 Similarly, the amplitudes (bottom plot) are generally larger than 10, so 8 is an acceptable minimum value.
 
 ## Measure Snow Accumulation in 2012
 
-We will next analyze a year of data from this site. We will use the default minimum and maximum 
-reflector height values. But for the reasons previously stated, we will set a minimum elevation angle 
-of 7 degrees. We also specify that we only want to use the L1 data and set peak2noise and a mimimum
-amplitude for the periodograms:
-
-*make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -e2 25 -l1 True -peak2noise 3 -ampl 8*
-
-[Example json file.](gls1.json)
-
-We have also excluded a bit of the northern tracks by handediting the json. This is not required as 
-the software appears to be appropriately removing these unreliable azimuths. Note: the removal of these
-azimuths is more related to the GPS satellite inclination than local conditions at gls1.
-
-Now make SNR files for the year 2012:
+Make SNR files for the year 2012:
 
 *rinex2snr gls1 2012 1 -doy_end 366*
 
-Then estimate reflector heights:
+We will next analyze a year of L1 GPS reflection data from this site. We will use the default minimum and maximum 
+reflector height values (0.4 and 6 meters). But for the reasons previously stated, we will set a minimum elevation angle 
+of 7 degrees. We also specify that we only want to use the L1 data and set peak2noise and a mimimum
+amplitude for the periodograms:
+
+*make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -l1 True -peak2noise 3 -ampl 8*
+
+[Example json file.](gls1.json)
+
+We have also excluded a bit of the northern tracks by hand-editing the json. This is not required as 
+the software appears to be appropriately removing these unreliable azimuths. Note: the removal of these
+azimuths is more related to the GPS satellite inclination than local conditions at gls1.
+
+Now that you have SNR files and json inputs, estimate reflector heights for the year 2012:
 
 *gnssir gls1 2012 1 -doy_end 366*
 
-We will use the **daily_avg** tool to compute a daily average. Here the median filter is set to 0.25 meters 
-and 30 individual tracks are required:
+We will use the **daily_avg** tool to compute a daily average RH. The median filter is set to 0.25 meters 
+and 30 individual tracks are required in order to recover a daily average:
 
 *daily_avg gls1 0.25 30*
 
-All tracks:
+Three plots are returned. All tracks:
 
 <img src="dailyavg-gls1-3.png" width="500"/>
 
@@ -113,12 +113,12 @@ Average RH for the year 2012:
 
 <img src="dailyavg-gls1-2.png" width="500"/>
 
-Questions:
+**Questions to think about:**
 
-* Why do you think the number of useable tracks drops drastically at various times in the year?
+* Why do the number of useable tracks drop drastically at various times in the year?
 
-* Why do you think the number of tracks retrieved in the summer days are consistently higher in number than 
-in other times of the year?
+* Why are the number of tracks retrieved in the summer days consistently higher in number than 
+in other times of the year? What is different about the surface in the summer of 2012?
 
 [A sample daily average RH file.](gls1_dailyRH.txt)
 
