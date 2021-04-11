@@ -28,6 +28,7 @@ def main():
     parser.add_argument("-nr1",default=None, type=float, help="lower limit noise region for QC(m)")
     parser.add_argument("-nr2",default=None, type=float, help="upper limit noise region for QC(m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="peak to noise ratio used for QC")
+    parser.add_argument("-ampl", default=None, type=float, help="required spectral peak amplitude for QC")
     parser.add_argument("-allfreq", default=None, type=str, help="set to True to include all GNSS")
     parser.add_argument("-l1", default=None, type=str, help="set to True to only use GPS L1")
     parser.add_argument("-l2c", default=None, type=str, help="set to True to only use GPS L2C")
@@ -60,6 +61,12 @@ def main():
     lsp={}
     lsp['station'] = station
     lsp['lat'] = Lat; lsp['lon'] = Long; lsp['ht']=Height
+
+#   spectral peak amplitude
+    if args.ampl == None:
+        reqA = 6.0
+    else:
+        reqA = args.ampl 
 
 # reflector height (meters)
     if (args.h1 != None):
@@ -120,20 +127,20 @@ def main():
 # 
 #   default frequencies to use - and their required amplitudes. The amplitudes are not set in stone
     # this is the case for only GPS, but the good L2 
-    lsp['freqs'] = [1, 20, 5]; lsp['reqAmp'] = [6, 6,6]
+    lsp['freqs'] = [1, 20, 5]; lsp['reqAmp'] = [reqA, reqA,reqA]
     if args.allfreq == 'True':
         # 307 was making it crash.  did not check as to why
         # includes glonass, galileo, and beidou
         lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206,207,208,302, 306]; 
-        lsp['reqAmp'] = [6, 6,6,6,6,6,6,6,6,6,6,6]
+        lsp['reqAmp'] =[ reqA,reqA,reqA,reqA,reqA,reqA, reqA,reqA,reqA,reqA,reqA,reqA ]
 
     if args.l1 == 'True':
         lsp['freqs'] = [1]
-        lsp['reqAmp'] = [6]
+        lsp['reqAmp'] = [reqA]
 
     if args.l2c == 'True':
         lsp['freqs'] = [20]
-        lsp['reqAmp'] = [6]
+        lsp['reqAmp'] = [reqA]
 
     lsp['refraction'] = True
     if args.refraction == 'False':

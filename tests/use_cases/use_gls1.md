@@ -1,8 +1,8 @@
 ### Dye2, Greenland 
 
-**Station Name:**		gls1
+**Station Name:** gls1
 
-**Location:**  Greenland Ice Sheet in Qeqqata Province, Greenland
+**Location:**  Greenland Ice Sheet in Qeqqata Province 
 
 **Archive:**  [UNAVCO](http://www.unavco.org), [SOPAC](http://sopac-csrc.ucsd.edu/index.php/sopac/)
 
@@ -14,7 +14,7 @@
 
 - Longitude:  -46.31015
 
-- Height:    2150 m
+- Height: 2150 m
 
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/gls1)
 
@@ -23,6 +23,8 @@
 [Google Maps Link](https://goo.gl/maps/391a7h2HpacAa59u8) 
 
 <img src="gls1.jpg" width="400">
+<BR>
+gls1 at installation
 
 ## Data Summary
 
@@ -36,57 +38,64 @@ a utility you can use:
 
 *download_unr gls1*
 
-More information about gls1 can be found on the [GNSS-IR Web App.](https://gnss-reflections.org/fancy6?example=gls1)
+gls1 is on an ice sheet and relatively smooth in all directions; it is unlikely that a special azimuth mask is required.
+gls1 was originally installed with an elevation mask of 7 degrees, which is suboptimal for reflections research.
+Even though the mask was later removed, we will use 7 degrees as the minimum elevation angle for all our analysis.
+Similarly, even though the site managers later changed to L2C tracking, to ensure that a consistent dataset is being 
+used, we will only use L1 data. More information about 
+gls1 can be found on the [GNSS-IR Web App.](https://gnss-reflections.org/fancy6?example=gls1)
 
+## quickLook 
 
-gls1 is on an ice sheet, relatively smooth in all directions, so a special azimuth mask is not required.
-gls1 was originally installed with an elevation mask of 7 degrees, so 7-25 should be used with GNSS-IR.
+Our goal in this use case is to analyze one year of data. We have chosen 2012. In order to set the proper
+quality control parameters, we will use quickLook for one day. First we need to translate 
+one day of RINEX data using **rinex2snr**:
 
-## Reproduce the Web App
+*rinex2snr gls1 2012 100*
 
-**Make SNR File**
+We then use **quickLook**:
 
-First, make an SNR file by downloading the RINEX file and extracting the GPS SNR data:
+*quickLook gls1 2012 100*
 
-*rinex2snr gls1 2019 200*
+This produces two plots:
 
-**Take a Look at the SNR Data**
+<img src=quicklook-gls1-lsp.png width=500>
 
-Use **quickLook** to produce a periodogram similar to the one from the web app. [(For details on quickLook output)](../../docs/quickLook_desc.md)
-
-quickLook uses the L1 frequency by default:
-
-*quickLook gls1 2019 200*
-
-<img src="gls1-L1.png" width="500">
-
+[(For more details on quickLook output)](../../docs/quickLook_desc.md)
 The peaks in all four qudarants are bunched at ~1.2 meters reflector height (RH).  
 
-This site did not consistently track L2C, so we will not use the L2 data. L5 was not tracked.
+The next plot puts the RH retrievals in the context of azimuth and two quality control measures:
+peak amplitude and peak to noise ratio.
 
+<img src=quicklook-gls1-qc.png width=500>
 
-<img src=gls1-quicklook-2019.png width=500>
-<img src=qc-2012-gls1.png width=500>
-<img src=qc-gls1.png width=500>
-<img src=quickLook-gls1-2012A.png width=500>
+In the top plot we see that in the reflector heights are consistent at all azimuths.
+The azimuths between 340 degrees and 40 degrees do not appear to provide reliable RH retrievals.
+We also see that a peak2noise QC metric (middle plot) of 3 is reasonable. 
+Similarly, the amplitudes (bottom plot) are generally larger than 10, so 8 is an acceptable minimum value.
 
 ## Measure Snow Accumulation in 2012
 
-Set up the analysis file. We will use the default minimum and maximum 
-reflector height values. The field crews used inconsistent elevation cutoffs 
-at the receiver, so we will enforce the larger of those two at the analysis level: 
-7 degrees. We also specify L1 because the quality of the L2 is highly-variable over time.
+We will next analyze a year of data from this site. We will use the default minimum and maximum 
+reflector height values. But for the reasons previously stated, we will set a minimum elevation angle 
+of 7 degrees. We also specify that we only want to use the L1 data and set peak2noise and a mimimum
+amplitude for the periodograms:
 
-*make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -e2 25 -l1 True*
+*make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -e2 25 -l1 True -peak2noise 3 -ampl 8*
+
 [Example json file.](gls1.json)
 
-To test the code, we will use the year 2012. First, make SNR files.
+We have also excluded a bit of the northern tracks by handediting the json. This is not required as 
+the software appears to be appropriately removing these unreliable azimuths. Note: the removal of these
+azimuths is more related to the GPS satellite inclination than local conditions at gls1.
 
-*rinex2snr gls1 2012 1 -doy_end 365*
+Now make SNR files for the year 2012:
+
+*rinex2snr gls1 2012 1 -doy_end 366*
 
 Then estimate reflector heights:
 
-*gnssir gls1 2012 1 -doy_end 365*
+*gnssir gls1 2012 1 -doy_end 366*
 
 We will use the **daily_avg** tool to compute a daily average. Here the median filter is set to 0.25 meters 
 and 30 individual tracks are required:
@@ -95,13 +104,15 @@ and 30 individual tracks are required:
 
 All tracks:
 
-<img src="gls1-1.png" width="500"/>
+<img src="dailyavg-gls1-1.png" width="500"/>
 
 Daily averages:
 
-<img src="gls1-2.png" width="500"/>
+<img src="dailyavg-gls1-2.png" width="500"/>
+
+<img src="dailyavg-gls1-3.png" width="500"/>
 
 
-[An sample daily average RH file.](gls1-dailyavg.txt)
+[A sample daily average RH file.](gls1_dailyRH.txt)
 
-Validation snow accumulation data for this site are provided in Larson et al (2020) (the link is given above).
+Validation snow accumulation data for this site are provided in [Larson et al., 2020](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf).

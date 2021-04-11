@@ -4,14 +4,14 @@
     "lon": -46.31,
     "ht": 2148.578,
     "minH": 0.5,
-    "maxH": 8.0,
+    "maxH": 6.0,
     "e1": 7,
     "e2": 25,
     "NReg": [
         0.5,
-        8.0
+        6.0
     ],
-    "PkNoise": 2.7,
+    "PkNoise": 3.0,
     "polyV": 4,
     "pele": [
         5,
@@ -20,20 +20,20 @@
     "ediff": 2,
     "desiredP": 0.005,
     "azval": [
-        0,
+        40,
         90,
         90,
         180,
         180,
         270,
         270,
-        360
+        330
     ],
     "freqs": [
-        1 
+        1
     ],
     "reqAmp": [
-        6
+        8.0
     ],
     "refraction": true,
     "overwriteResults": true,
@@ -41,7 +41,7 @@
     "wantCompression": false,
     "plt_screen": false,
     "onesat": null,
-    "screenstats": true,
+    "screenstats": false,
     "pltname": "gls1_lsp.png",
     "delTmax": 75
 }
