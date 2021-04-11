@@ -34,7 +34,7 @@ The receiver at the site only consistently tracks legacy GPS signals. A detailed
 data from the station can be found in [Larson, MacFerrin, and Nylen (2020)](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
 Various position time series for gls1 can be retrieved 
 from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3). We also have 
-a utility you can use: *download_unr*
+a utility you can use: **download_unr**
 
 As gls1 is on an ice sheet and the ice surface is relatively smooth in all directions, it 
 is unlikely that a complicated azimuth mask will be required.
@@ -123,3 +123,5 @@ in other times of the year?
 [A sample daily average RH file.](gls1_dailyRH.txt)
 
 Validation snow accumulation data for this site are provided in [Larson et al., 2020](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf).
+
+[The original paper by Larson, Wahr, and Kuipers Munneke discussing this site.](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonWahrKuipers_2015.pdf )
