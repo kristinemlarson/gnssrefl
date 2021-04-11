@@ -34,14 +34,13 @@ The receiver at the site only consistently tracks legacy GPS signals. A detailed
 data from the station can be found in [Larson, MacFerrin, and Nylen (2020)](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
 Various position time series for gls1 can be retrieved 
 from the [Nevada Geodetic Laboratory](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3). We also have 
-a utility you can use:
+a utility you can use: *download_unr*
 
-*download_unr gls1*
-
-gls1 is on an ice sheet and relatively smooth in all directions; it is unlikely that a special azimuth mask is required.
+As gls1 is on an ice sheet and the ice surface is relatively smooth in all directions, it 
+is unlikely that a complicated azimuth mask will be required.
 gls1 was originally installed with an elevation mask of 7 degrees, which is suboptimal for reflections research.
 Even though the mask was later removed, we will use 7 degrees as the minimum elevation angle for all our analysis.
-Similarly, even though the site managers later changed to L2C tracking, to ensure that a consistent dataset is being 
+Similarly, even though the site managers later changed to enable L2C tracking, to ensure that a consistent dataset is being 
 used, we will only use L1 data. More information about 
 gls1 can be found on the [GNSS-IR Web App.](https://gnss-reflections.org/fancy6?example=gls1)
 
@@ -61,8 +60,8 @@ This produces two plots:
 
 <img src=quicklook-gls1-lsp.png width=500>
 
+The peaks in all four qudarants are bunched at ~2.5 meters reflector height (RH).  
 [(For more details on quickLook output)](../../docs/quickLook_desc.md)
-The peaks in all four qudarants are bunched at ~1.2 meters reflector height (RH).  
 
 The next plot puts the RH retrievals in the context of azimuth and two quality control measures:
 peak amplitude and peak to noise ratio.
@@ -104,14 +103,22 @@ and 30 individual tracks are required:
 
 All tracks:
 
+<img src="dailyavg-gls1-3.png" width="500"/>
+
+Number of tracks used in the daily average:
+
 <img src="dailyavg-gls1-1.png" width="500"/>
 
-Daily averages:
+Average RH for the year 2012:
 
 <img src="dailyavg-gls1-2.png" width="500"/>
 
-<img src="dailyavg-gls1-3.png" width="500"/>
+Questions:
 
+* Why do you think the number of useable tracks drops drastically at various times in the year?
+
+* Why do you think the number of tracks retrieved in the summer days are consistently higher in number than 
+in other times of the year?
 
 [A sample daily average RH file.](gls1_dailyRH.txt)
 
