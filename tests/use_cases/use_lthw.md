@@ -46,7 +46,7 @@ Use our utility **quickLook** to look at these data [(For more details on quickL
 
 *quickLook lthw 2018 1 -e1 7*
 
-<img src="lthw-day1-2018.png" width="500"/>
+<img src="lthw-day1-2018.png" width="600"/>
 
 This is a bit of a mess really. If there are significant peaks, they are really 
 close to the cutoff for the method (at 0.5 meters). Let's compare with about a week later.
@@ -58,10 +58,20 @@ Now run quickLook:
 
 *quickLook lthw 2018 9 -e1 7*
 
-<img src="lthw-day9-2018.png" width="500"/>
+<img src="qc-lthw-1.png" width="600"/>
 
 This is *much* better and clearly shows that a field crew reset the antenna to a little 
-less than 5 meters sometime between day 1 and day 9 in the year 2018.
+less than 5 meters sometime between day 1 and day 9 in the year 2018. You can also look 
+at the second plot to get an idea of how well the method performs for various azimuths 
+and QC parameters:
+
+
+<img src="qc-lthw-2.png" width="600"/>
+
+Except for a region ~270-300 degrees in azimuth, and directly south, retrievals are consistently good.
+A peak to noise ratio of 3 appears to be appropriate. The rejected southern retrievals are unlikely to be 
+of local origin, but rather related to the inclination of the satellite orbits at this latitude.
+
 
 If you like you can compare this to the first day of 2020, first make the SNR file:
 
@@ -69,11 +79,10 @@ If you like you can compare this to the first day of 2020, first make the SNR fi
 
 Again use quickLook:
 
-<img src="lthw-day1-2020.png" width=500/>
+<img src="qc-lthw-2020.png" width=500/>
 
 Now the peaks in the reflector height (RH) periodograms are ~2.2 meters - 
-so that means ~2.5 meters of surface change 
-from 2018 to 2020.
+so that means that there was ~2.5 meters of surface change from 2018 to 2020.
 
 ## Measure Snow Accumulation for 2018
 
@@ -85,13 +94,14 @@ First you need to make the list of analysis inputs:
 
 *make_json_input lthw -76.458  -107.782 1011.0 -e1 7 -e2 25 -peak2noise 3.2 -l1 True*
 
-[Example json file](lthw.json).
+[Example json file](lthw.json). It is fine to hand edit the json file to remove the unreliable azimuths if 
+you prefer.
 
 Now analyze the data for 2018 from day 1 to day 365 using **gnssir**:
 
 *gnssir lthw 2018 1 -doy_end 365 -screenstats False*
 
-This produces reflector heights for every rising and setting satellite track that meets you 
+This produces reflector heights for every rising and setting satellite track that meets your 
 quality control selections.  In order to estimate snow accumulation, you will want to calculate
 the daily average. Using our **daily_avg** utility - and specifying 50 satellite tracks and median filter of 0.25 meters:
 
