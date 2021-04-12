@@ -67,6 +67,10 @@ Also look at the QC metrics:
 
 <img src="qc-mchn-2.png" width="600">
 
+The water is ~6.5 meters below the antenna. You can see from the top plot that the good retrievals (in blue) 
+very clearly show you which azimuths are acceptable and which are not.  The middle plot shows the peak to noise 
+ratio, which we would like to at least exceed 3. And here again, the bad retrievals are always below this level.
+The amplitudes in the bottom plot indicate that 8 is an acceptable minimal value.
 
 ## Analyze the Data
 
@@ -76,14 +80,14 @@ The data from 2013 will be analyzed here as a test case.  Begin by generating th
 
 The resulting SNR files are stored in $REFL_CODE/2013/snr/mchn.  
 
-Analysis parameters are set up with **make_json_input**.
+Analysis parameters are set up with **make_json_input**. 
 
-*make_json_input -e1 5 -e2 25 mchn 47.961 -84.901 152.019*
+*make_json_input mchn 47.961 -84.901 152.019 -h1 3 -h2 10 -e1 5 -e2 25 -l1 True -peak2noise 3 -ampl 8*
 
-[The json file will then need to be manually edited to use only L1 and to set the azimuth region.](mchn.json) 
-The frequency used is set by modifying the list "freqs" to contain only the L1 code (1), and the list "reqAmp" 
-to have the same number of elements as "freqs". Note that the azimuth region is restricted to the range of 80-180 degrees. 
-Although it is possible to get good reflections beyond 180 degrees, the photographs suggest barriers are present.  
+[Sample json file](mchn.json) While most of the analysis settings can be done by the command 
+line, you can see that the azimuths have been set by
+hand to be limited to 80-180 degrees. Although it is possible to get good reflections beyond 
+180 degrees, the photographs suggest barriers are present in that region.  
 
 Now that the analysis parameters are set, run **gnssir** to save the reflector height (RH) output for each day in 2013.
 
