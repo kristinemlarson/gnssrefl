@@ -58,7 +58,7 @@ We then invoke **quickLook**:
 
 This produces two plots. The first is a geographically oriented-summary of the frequency content of the GPS data:
 
-<img src=quicklook-gls1-lsp.png width=500>
+<img src=quicklook-gls1-lsp.png width=600>
 
 The peaks in these periodograms tell us how high the GPS antenna is above the ice surface.
 The peaks are associated with a reflector height (RH) of ~2.5 meters.  
@@ -67,7 +67,7 @@ The peaks are associated with a reflector height (RH) of ~2.5 meters.
 The next plot shows results with respect to azimuth angle.  The top plot is RH and the other 
 two are quality control measures: peak amplitude and peak to noise ratio.
 
-<img src=quicklook-gls1-qc.png width=500>
+<img src=quicklook-gls1-qc.png width=600>
 
 In the top plot we see that the retrieved reflector heights are consistent at all azimuths.
 Retrievals for azimuths between 340 degrees and 40 degrees are consistently marked as not having
@@ -104,15 +104,15 @@ and 30 individual tracks are required in order to recover a daily average:
 
 Three plots are returned. The first is all tracks:
 
-<img src="dailyavg-gls1-3.png" width="500"/>
+<img src="dailyavg-gls1-3.png" width="600"/>
 
 The second shows the number of tracks used in the daily average:
 
-<img src="dailyavg-gls1-1.png" width="500"/>
+<img src="dailyavg-gls1-1.png" width="600"/>
 
 Finally, the average RH each day for the year 2012:
 
-<img src="dailyavg-gls1-2.png" width="500"/>
+<img src="dailyavg-gls1-2.png" width="600"/>
 
 This data shown in the last plot show you long-term accumulation as well as relatively small snow accumulation events. The overall 
 plot is dominated by the large melt event in the summer.
