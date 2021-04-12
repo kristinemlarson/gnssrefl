@@ -48,23 +48,24 @@ for the [GNSS-IR Web App.](https://gnss-reflections.org/fancy6?example=gls1)
 Our ultimate goal in this use case is to analyze one year of data. We have chosen the year 
 2012 because there was a large melt event on the ice sheet. In order to set the proper
 quality control parameters, we will use **quickLook** for one day. First we need to translate 
-one day of RINEX data using **rinex2snr**:
+one day of RINEX data using **rinex2snr**. We will use day of year 100:
 
 *rinex2snr gls1 2012 100*
 
-We then use **quickLook**:
+We then invoke **quickLook**:
 
 *quickLook gls1 2012 100*
 
-This produces two plots:
+This produces two plots. The first is a geographically oriented-summary of the frequency content of the GPS data:
 
 <img src=quicklook-gls1-lsp.png width=500>
 
-The peaks in all four qudarants are bunched at ~2.5 meters reflector height (RH).  
+The peaks in these periodograms tell us how high the GPS antenna is above the ice surface.
+The peaks are associated with a reflector height (RH) of ~2.5 meters.  
 [(For more details on quickLook output)](../../docs/quickLook_desc.md)
 
-The next plot puts the RH retrievals in the context of azimuth and two quality control measures:
-peak amplitude and peak to noise ratio.
+The next plot shows results with respect to azimuth angle.  The top plot is RH and the other 
+two are quality control measures: peak amplitude and peak to noise ratio.
 
 <img src=quicklook-gls1-qc.png width=500>
 
@@ -75,14 +76,14 @@ Similarly, the amplitudes (bottom plot) are generally larger than 10, so 8 is an
 
 ## Measure Snow Accumulation in 2012
 
-Make SNR files for the year 2012:
+The first step is to make SNR files for the year 2012:
 
 *rinex2snr gls1 2012 1 -doy_end 366*
 
 We will next analyze a year of L1 GPS reflection data from this site. We will use the default minimum and maximum 
 reflector height values (0.4 and 6 meters). But for the reasons previously stated, we will set a minimum elevation angle 
 of 7 degrees. We also specify that we only want to use the L1 data and set peak2noise and a mimimum
-amplitude for the periodograms:
+amplitude for the periodograms. We use the utility **make_json_input** to set and store these analysis settings:
 
 *make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -l1 True -peak2noise 3 -ampl 8*
 
@@ -92,26 +93,28 @@ We have also excluded a bit of the northern tracks by hand-editing the json. Thi
 the software appears to be appropriately removing these unreliable azimuths. Note: the removal of these
 azimuths is more related to the GPS satellite inclination than local conditions at gls1.
 
-Now that you have SNR files and json inputs, estimate reflector heights for the year 2012:
+Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012:
 
 *gnssir gls1 2012 1 -doy_end 366*
 
-We will use the **daily_avg** tool to compute a daily average RH. The median filter is set to 0.25 meters 
+We will use the **daily_avg** tool to compute a daily average RH. A median filter is set to 0.25 meters 
 and 30 individual tracks are required in order to recover a daily average:
 
 *daily_avg gls1 0.25 30*
 
-Three plots are returned. All tracks:
+Three plots are returned. The first is all tracks:
 
 <img src="dailyavg-gls1-3.png" width="500"/>
 
-Number of tracks used in the daily average:
+The second shows the number of tracks used in the daily average:
 
 <img src="dailyavg-gls1-1.png" width="500"/>
 
-Average RH for the year 2012:
+Finally, the average RH each day for the year 2012:
 
 <img src="dailyavg-gls1-2.png" width="500"/>
+
+This data shown in the last plot give you snow accumulation.
 
 **Questions to think about:**
 
@@ -122,6 +125,7 @@ in other times of the year? What is different about the surface in the summer of
 
 [A sample daily average RH file.](gls1_dailyRH.txt)
 
-Validation snow accumulation data for this site are provided in [Larson et al., 2020](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf).
+Validation snow accumulation data for this site are provided 
+in [Larson et al., 2020](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf).
 
-[The original paper by Larson, Wahr, and Kuipers Munneke discussing this site.](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonWahrKuipers_2015.pdf )
+The original [J. Glaciology paper](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonWahrKuipers_2015.pdf ) discussing this site.
