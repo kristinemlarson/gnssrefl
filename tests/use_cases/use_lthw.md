@@ -79,7 +79,7 @@ If you like you can compare this to the first day of 2020, first make the SNR fi
 
 Again use quickLook:
 
-<img src="qc-lthw-2020.png" width=500/>
+<img src="qc-lthw-2020.png" width=600/>
 
 Now the peaks in the reflector height (RH) periodograms are ~2.2 meters - 
 so that means that there was ~2.5 meters of surface change from 2018 to 2020.
@@ -107,12 +107,13 @@ the daily average. Using our **daily_avg** utility - and specifying 50 satellite
 
 *daily_avg lthw 0.25 50*
 
-<img src="lthw-req50.png" width="500"/>
+<img src="lthw-req50.png" width="600"/>
 
-You can loosen the required track number if you want:
+You can loosen the required track number if you want, but in this case it does not change the 
+overall character of the results:
 
 *daily_avg lthw 0.25 40*
 
-<img src="lthw-req40.png" width="500"/>
+<img src="lthw-req40.png" width="600"/>
 
 [Sample daily average RH file for 2018](lthw_dailyRH.txt)
