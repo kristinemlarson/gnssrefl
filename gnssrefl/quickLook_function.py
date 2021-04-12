@@ -115,6 +115,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     # define where the axes are located
     bx = [0,1,0,1]; by = [0,0,1,1]; bz = [1,3,2,4]
 
+    # 
+    fs = 12
     # various defaults - ones the user doesn't change in this quick Look code
     delTmax = 70
     polyV = 4 # polynomial order for the direct signal
@@ -188,7 +190,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         for a in range(naz):
             if pltscreen:
                 plt.subplot(2,2,bz[a])
-                plt.title(titles[a])
+                plt.title(titles[a],fontsize=fs)
             az1 = azval[(a*2)] ; az2 = azval[(a*2 + 1)]
             # this means no satellite list was given, so get them all
             if satsel == None:
@@ -285,12 +287,15 @@ def goodbad(fname,station,h1,h2,PkNoise,reqAmp,freq):
     plt.subplot(3,1,1)
     plt.plot(a[ij,0], a[ij,1], 'o',color='blue',label='good')
     plt.plot(a[ik,0], a[ik,1], 'o',color='gray', label='bad')
-    plt.title('quickLook Retrieval Metrics: ' + station + ' ' + g.ftitle(freq))
+    plt.title('quickLook Retrieval Metrics: ' + station + ' ' + g.ftitle(freq),fontsize=fs)
     plt.legend(loc="upper right")
-    plt.ylabel('Reflector Height (m)')
+    plt.ylabel('Refl. Ht. (m)',fontsize=fs)
     plt.grid()
     plt.xlim((0, 360))
     plt.ylim((h1, h2))
+    plt.xticks(fontsize=fs)
+    plt.yticks(fontsize=fs)
+
     ax = plt.gca()
     ax.axes.xaxis.set_ticklabels([])
 
@@ -300,9 +305,11 @@ def goodbad(fname,station,h1,h2,PkNoise,reqAmp,freq):
     plt.plot(a[ij,0], a[ij,4], 'o',color='blue')
     plt.plot(a[ik,0], a[ik,4], 'o',color='gray')
     plt.legend(loc="upper right")
-    plt.ylabel('peak2noise')
+    plt.ylabel('peak2noise',fontsize=fs)
     plt.grid()
     plt.xlim((0, 360))
+    plt.xticks(fontsize=fs)
+    plt.yticks(fontsize=fs)
     ax = plt.gca()
     ax.axes.xaxis.set_ticklabels([])
 
@@ -311,9 +318,11 @@ def goodbad(fname,station,h1,h2,PkNoise,reqAmp,freq):
     plt.plot(a[ij,0], a[ij,3], 'o',color='blue')
     plt.plot(a[ik,0], a[ik,3], 'o',color='gray') 
     plt.legend(loc="upper right")
-    plt.ylabel('Spectral Peak Amplitude')
-    plt.xlabel('Azimuth (degrees)')
+    plt.ylabel('Spectral Peak Ampl.',fontsize=fs)
+    plt.xlabel('Azimuth (degrees)',fontsize=fs)
     plt.grid()
+    plt.xticks(fontsize=fs)
+    plt.yticks(fontsize=fs)
     plt.xlim((0, 360))
 
 # old code

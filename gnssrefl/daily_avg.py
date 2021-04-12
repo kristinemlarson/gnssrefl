@@ -24,13 +24,17 @@ def daily_avg_stat_plots(obstimes,meanRH,station,txtdir,tv):
     and tv is the variable of daily results
     """
 #   new plot
+    fs = 12
     fig,ax=plt.subplots()
     ax.plot(obstimes,meanRH,'b.')
     fig.autofmt_xdate()
-    plt.ylabel('Reflector Height (m)')
+    plt.ylabel('Reflector Height (m)',fontsize=fs)
     today = str(date.today())
-    plt.title(station.upper() + ': Daily Mean Reflector Height, Computed ' + today)
+    plt.title(station.upper() + ': Daily Mean Reflector Height, Computed ' + today,fontsize=fs)
     plt.grid()
+    plt.xticks(fontsize=fs)
+    plt.yticks(fontsize=fs)
+
     plt.gca().invert_yaxis()
     pltname = txtdir + '/' + station + '_RH.png'
     plt.savefig(pltname)
@@ -39,7 +43,9 @@ def daily_avg_stat_plots(obstimes,meanRH,station,txtdir,tv):
     fig,ax=plt.subplots()
     plt.plot(obstimes, tv[:,3],'b.')
     fig.autofmt_xdate()
-    plt.title('Number of values used in the daily average')
+    plt.title('Number of values used in the daily average',fontsize=fs)
+    plt.xticks(fontsize=fs)
+    plt.yticks(fontsize=fs)
     plt.grid()
 
 
@@ -146,6 +152,8 @@ def main():
     k=0
 # added standard deviation 2020 feb 14, changed n=6
     n=7
+    # fontsize for hte plot
+    fs = 12
 # now require it as an input
 # you can change this - trying out 80 for now
 #ReqTracks = 80
@@ -230,8 +238,8 @@ def main():
             abc = 0; # dummy line
             #print('that directory does not exist - so skipping')
     fig.autofmt_xdate()
-    plt.ylabel('Reflector Height (m)')
-    plt.title('GNSS station: ' + station)
+    plt.ylabel('Reflector Height (m)',fontsize=fs)
+    plt.title('GNSS station: ' + station,fontsize=fs)
     plt.gca().invert_yaxis()
     plt.grid()
 #   new plot
