@@ -462,22 +462,22 @@ via the command line, as in:
 
 *make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10* 
 
-This changes elevation angles to 5-10 degrees. The default is to only use PGS frequencies, specifically L1, L2C, and L5.
+This changes elevation angles to 5-10 degrees. The default is to only use GPS frequencies, specifically L1, L2C, and L5.
 If you want all GNSS frequencies:
-
 
 *make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -allfreq True* 
 
-Only use GPS L1:
-
+To only use GPS L1:
 
 *make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l1 True* 
 
-Only use GPS L2C:
+To only use GPS L2C and require a spectral amplitude of 10:
 
+*make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True -ampl 10* 
 
-*make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True* 
+To use GPS L2C, require a spectral amplitude of 10, and spectral peak to noise ratio of 3:
 
+*make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True -ampl 10 -peak2noise 3* 
 
 As discussed in Roesler and Larson (2018), there are two QC measures used in this code. One is the peak 
 value of the peak in the periodogram. In the example below the amplitude of the most significant 
@@ -492,7 +492,7 @@ to set these QC values in general.
 
 Things that are helpful to know for the make_json_input inputs:
 
-*Names for the GNSS frequencies*
+*Our names for the GNSS frequencies*
 
 - 1,2,5 are GPS L1, L2, L5
 - 20 is GPS L2C 
@@ -501,6 +501,8 @@ Things that are helpful to know for the make_json_input inputs:
 - 302, 306, 307 : Beidou frequencies
 
 * Some json settings can be set at the command line.  run **make_json_input -h** to see these.  Otherwise, edit the json file.
+Note that there are a few inconstencies between the command line and the json file (for example, h1 and h2 on the command line become
+minH and maxH in the json file). I apologize for this.
 
 - e1 and e2 are the min and max elevation angle, in degrees
 - minH and maxH are the min and max allowed reflector height, in meters

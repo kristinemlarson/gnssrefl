@@ -83,9 +83,9 @@ Translate the GPS data for the year of 2018:
 
 First you need to make the list of analysis inputs:
 
-*make_json_input lthw -76.458  -107.782 1011.0 -e1 7 -e2 25 -peak2noise 3.2*
+*make_json_input lthw -76.458  -107.782 1011.0 -e1 7 -e2 25 -peak2noise 3.2 -l1 True*
 
-Handedit the json file so that only L1 data are used. [Example json file](lthw.json).
+[Example json file](lthw.json).
 
 Now analyze the data for 2018 from day 1 to day 365 using **gnssir**:
 
