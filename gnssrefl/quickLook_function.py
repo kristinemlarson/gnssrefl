@@ -132,6 +132,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     pltname = 'temp.png' # default plot
     requireAmp = reqAmp[0]
     screenstats = True
+    FS = 12
 
 # to avoid having to do all the indenting over again
 # this allows snr file to live in main directory
@@ -235,9 +236,11 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 plt.grid()
                 amax = max(amax,  bbb) # do not know how to implement this ...
                 if (a == 3) or (a==1):
-                    plt.xlabel('reflector height (m)')
+                    plt.xlabel('reflector height (m)',fontsize=FS)
                 if (a == 1) or (a==0):
-                    plt.ylabel('volts/volts')
+                    plt.ylabel('volts/volts',fontsize=FS)
+                plt.xticks(fontsize=FS)
+                plt.yticks(fontsize=FS)
 
         rhout.close()
         #print('preliminary reflector height results are stored in a file called logs/rh.txt')
@@ -245,7 +248,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
 
         if pltscreen:
-            plt.suptitle(tt, fontsize=12)
+            plt.suptitle(tt, fontsize=FS)
             # sure - throw in another plot
             goodbad(quicklog,station,minH,maxH,PkNoise,reqAmp,f)
             plt.show()

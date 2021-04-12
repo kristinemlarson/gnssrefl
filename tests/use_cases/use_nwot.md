@@ -107,7 +107,7 @@ the dataset. The year inputs here are optional.
 
 produces this plot:
 
-<img src="nwot_RH.png" width="500"/>
+<img src="nwot_RH.png" width="600"/>
 
 and [this file](nwot_dailyRH.txt). The files will be stored in the $REFL_CODE/Files directory.
 
@@ -127,7 +127,7 @@ as the Niwot Ridge *in situ* datafile, you can use
 
 *python nwot_usecase.py*
 
-<img src="nwot_usecase.png" width="500"/>
+<img src="nwot_usecase.png" width="600"/>
 
 We hae used the data from the fall to set the bare soil value 
 for reflector height (RH_baresoil). Snow depth is then defined as:
