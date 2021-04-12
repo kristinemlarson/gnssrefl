@@ -114,18 +114,21 @@ Finally, the average RH each day for the year 2012:
 
 <img src="dailyavg-gls1-2.png" width="500"/>
 
-This data shown in the last plot give you snow accumulation.
+This data shown in the last plot show you long-term accumulation as well as relatively small snow accumulation events. The overall 
+plot is dominated by the large melt event in the summer.
 
-**Questions to think about:**
+[A sample daily average RH file.](gls1_dailyRH.txt)
+
+**Things to think about:**
 
 * Why do the number of useable tracks drop drastically at various times in the year?
 
 * Why are the number of tracks retrieved in the summer days consistently higher in number than 
 in other times of the year? What is different about the surface in the summer of 2012?
 
-[A sample daily average RH file.](gls1_dailyRH.txt)
+* How would you find out whether this year was anomalously large melt?  
 
-Validation snow accumulation data for this site are provided 
-in [Larson et al., 2020](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf).
+* Try comparing the GNSS-IR results with the [validation data](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf)
+
 
 The original [J. Glaciology paper](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonWahrKuipers_2015.pdf ) discussing this site.
