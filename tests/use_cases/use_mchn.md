@@ -56,18 +56,17 @@ Use **quickLook** to examine the spectral characteristics of the SNR data for th
 
 <img src="mchn-example.png" width="500">
 
-The four subplots show different regions around the antenna (NW, NE, SW, SE). The x-axis 
-gives the reflector height (RH) and the y-axis gives the spectral amplitude of the SNR data. The multiple colors are used 
-to depict different satellites that rise or set over that section (quadrant) of the field at mchn. 
-There are also some thin gray lines - and those are failed periodograms. This means that the SNR data for 
-a satellite do not meet the quality standards in the code.
-
 Why does this not look like the results from the web app? Look closely at the station photo and the x-axis 
-of the periodograme, then change the range of reflector heights at the command line for **quickLook**:
+of the periodograms, then change the range of reflector heights at the command line for **quickLook**:
 
 *quickLook mchn 2019 205 -h1 2 -h2 8*
 
-<img src="mchn-better.png" width="500">
+<img src="qc-mchn-1.png" width="600">
+
+Also look at the QC metrics:
+
+<img src="qc-mchn-2.png" width="600">
+
 
 ## Analyze the Data
 
