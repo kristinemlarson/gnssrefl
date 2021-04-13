@@ -30,7 +30,7 @@ The station overlooks Lake Superior in a favorable location for measuring season
 This site only tracks legacy GPS signals. 
 
 More information on mchn can be obtained 
-from the [GNSS-IR Web App](https://gnss-reflections.org/fancy6?example=mchn),
+from the [GNSS-IR Web App](https://gnss-reflections.org/api?example=mchn),
 where mchn is one of the test cases. 
 
 For GNSS reflectometry, you need to set an azimuth and elevation angle mask.

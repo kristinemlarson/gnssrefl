@@ -37,7 +37,7 @@ recorded multi-GNSS signals. Marshall Mesa has been featured in multiple publica
 * [Vegetation](https://www.kristinelarson.net/wp-content/uploads/2015/10/small_etal_2010.pdf) 
 
 
-p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/fancy6?example=p041) 
+p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=p041) 
 
 To get a sense of whether an azimuth or elevation mask is appropriate, 
 check the [Reflection Zone Mapping in the web app](https://gnss-reflections.org/rzones?station=p041&lat=39.9495&lon=-105.1943&height=1728.842&msl=on&RH=2&eang=2&azim1=0&azim2=360).  
@@ -61,13 +61,13 @@ The default return is for the L1 frequency:
 
 *quickLook p041 2020 132*
 
-<img src="p041-l1.png" width="500">
+<img src="p041-l1.png" width="600">
 
 Now try looking at the periodogram for L2C:
 
 *quickLook p041 2020 132 -fr 20*
 
-<img src="p041-l2c.png" width="500">
+<img src="p041-l2c.png" width="600">
 
 Note that there are more colors in the L1 plots than in the L2C plots. That is the result of 
 the fact that there are more L1 satellites than L2C satellites.
@@ -76,7 +76,7 @@ Now try L5:
 
 *quickLook p041 2020 132 -fr 5*
 
-<img src="p041-ql-l5.png" width="500">
+<img src="p041-ql-l5.png" width="600">
 
 The L5 signal has only been available on satellites launched after 2010, so there fewer satellite tracks than 
 for L1.
@@ -99,7 +99,7 @@ Beidou signals are tracked at this site, but the data are not available in the R
 Begin by setting up the analysis parameters. These are stored in a json file. In this case, the p041 RINEX data are multi-gnss, so set 
 the options to allow all frequencies from all constellations:
 
-*make_json_input -e1 5 -e2 25 p041 39.94949 -105.19427 1728.842 -allfreq True*
+*make_json_input p041 39.94949 -105.19427 1728.842 -allfreq True -e1 5 -e2 25*
 
 Because the site is fairly planar, the parameters can be left at default settings. The elevation angles for the SNR 
 data are set to minimum and maximum values of 5 and 25 degrees, respectively. The json output will be stored in $REFL_CODE/input/p041.json.

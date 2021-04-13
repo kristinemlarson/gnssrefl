@@ -34,7 +34,7 @@ Because there are no permanent structures surrounding the site, elevation and az
 The only restriction that should be imposed is a minimum elevation angle of 7; this is because the field
 crew set this at the receiver when it was originally installed.
 
-lthw is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/fancy6?example=lthw)
+lthw is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=lthw)
 
 ## Take a look at the SNR data
 

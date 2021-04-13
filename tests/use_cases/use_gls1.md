@@ -41,7 +41,7 @@ gls1 was originally installed with an elevation mask of 7 degrees, which is subo
 Even though the mask was later removed, we will use 7 degrees as the minimum elevation angle for all our analysis.
 Similarly, even though the site managers later changed to enable L2C tracking, to ensure that 
 a consistent dataset is being used, we will only use L1 data. gls1 is an example case 
-for the [GNSS-IR Web App.](https://gnss-reflections.org/fancy6?example=gls1)
+for the [GNSS-IR Web App.](https://gnss-reflections.org/api?example=gls1)
 
 ## quickLook 
 
