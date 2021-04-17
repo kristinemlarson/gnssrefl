@@ -50,11 +50,11 @@ Our ultimate goal in this use case is to analyze one year of data. We have chose
 quality control parameters, we will use **quickLook** for one day. First we need to translate 
 one day of RINEX data using **rinex2snr**. We will use day of year 100:
 
-*rinex2snr gls1 2012 100*
+<code>rinex2snr gls1 2012 100</code>
 
 We then invoke **quickLook**:
 
-*quickLook gls1 2012 100*
+<code>quickLook gls1 2012 100</code>
 
 This produces two plots. The first is a geographically oriented-summary of the frequency content of the GPS data:
 
@@ -78,14 +78,14 @@ Similarly, the amplitudes (bottom plot) are generally larger than 10, so 8 is an
 
 The first step is to make SNR files for the year 2012:
 
-*rinex2snr gls1 2012 1 -doy_end 366*
+<code>rinex2snr gls1 2012 1 -doy_end 366</code>
 
 We will next analyze a year of L1 GPS reflection data from this site. We will use the default minimum and maximum 
 reflector height values (0.4 and 6 meters). But for the reasons previously stated, we will set a minimum elevation angle 
 of 7 degrees. We also specify that we only want to use the L1 data and set peak2noise and a mimimum
 amplitude for the periodograms. We use the utility **make_json_input** to set and store these analysis settings:
 
-*make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -l1 True -peak2noise 3 -ampl 8*
+<code>make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -l1 True -peak2noise 3 -ampl 8</code>
 
 [Example json file.](gls1.json)
 
@@ -95,12 +95,12 @@ azimuths is more related to the GPS satellite inclination than local conditions 
 
 Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012:
 
-*gnssir gls1 2012 1 -doy_end 366*
+<code>gnssir gls1 2012 1 -doy_end 366</code>
 
 We will use the **daily_avg** tool to compute a daily average RH. A median filter is set to 0.25 meters 
 and 30 individual tracks are required in order to recover a daily average:
 
-*daily_avg gls1 0.25 30*
+<code>daily_avg gls1 0.25 30</code>
 
 Three plots are returned. The first is all tracks:
 

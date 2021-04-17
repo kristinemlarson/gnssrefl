@@ -54,14 +54,14 @@ Both L1 and L2C signals can be used at this site, though the L2C data are far su
 to the L1 data. Use this **quickLook** command to get a sense of the quality of the 
 reflector height (RH) retrievals. First L1:
 
-*quickLook nwot 2014 270* 
+<code>quickLook nwot 2014 270 </code>
 
 <img src="nwot_L1.png" width="600"/>
 
 These periodograms are a bit ratty in the low RH area. There are 
 nice strong peaks in the southern quadrants. Now try L2:
 
-*quickLook nwot 2014 270 -fr 2*
+<code>quickLook nwot 2014 270 -fr 2</code>
 
 <img src="nwot_L2.png" width="600"/>
 
@@ -74,17 +74,17 @@ We are going to look at the data from installation (Fall 2009) through Spring 20
 up I will run 2009 and 2015 separately, while the year 2010 through 2014 can be analyzed in 
 one line:
 
-*rinex2snr nwot 2009 240 -doy_end 365 -archive special*
+<code>rinex2snr nwot 2009 240 -doy_end 365 -archive special</code>
 
-*rinex2snr nwot 2010 1 -doy_end 366 -archive special -year_end 2014*
+<code>rinex2snr nwot 2010 1 -doy_end 366 -archive special -year_end 2014</code>
 
-*rinex2snr nwot 2015 1 -doy_end 120 -archive special*
+<code>rinex2snr nwot 2015 1 -doy_end 120 -archive special</code>
 
 ### Run gnssir for multiple years
 
 Make a json file for your **gnssir** analysis:
 
-*make_json_input nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2*
+<code>make_json_input nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2</code>
 
 I have opted to only use the southern quadrants (azimuths 90 through 270). Note that since
 L5 was not tracked at this site, it is not listed in the json file. I am using a minimum elevation
@@ -94,7 +94,7 @@ QC restrictions. [A sample json file for this site.](nwot.json)
 
 Once you have a json file set up, run **gnssir** for the years 2009-2015:
 
-*gnssir nwot 2009 1 -doy_end 366 -year_end 2015*
+<code>gnssir nwot 2009 1 -doy_end 366 -year_end 2015</code>
 
 ### Compute daily average RH values
 
@@ -103,7 +103,7 @@ to eliminate large outliers and a minimum number of tracks is set to 10. This is
 low because of the small number of L2C transmitting satellites in the early years of 
 the dataset. The year inputs here are optional.
 
-*daily_avg nwot 0.25 10 -year1 2009 -year2 2015*
+<code>daily_avg nwot 0.25 10 -year1 2009 -year2 2015</code>
 
 produces this plot:
 
@@ -131,14 +131,14 @@ If the daily average RH file created above is stored in the same directory
 as the Niwot Ridge *in situ* datafile, you can use 
 [this python script](nwot_usecase.py) to visually compare them:
 
-*python nwot_usecase.py*
+<code>python nwot_usecase.py</code>
 
 <img src="nwot_usecase.png" width="600"/>
 
 We hae used the data from the fall to set the bare soil value 
 for reflector height (RH_baresoil). Snow depth is then defined as:
 
-*snow depth = RH_baresoil - RH*
+<code>snow depth = RH_baresoil - RH</code>
 
 Please keep in mind that the pole measurements are not representative of the same
 footprint as the GPS measurements. The latter cover an average over a much larger region.

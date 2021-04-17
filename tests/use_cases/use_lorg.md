@@ -36,33 +36,33 @@ for the elevation mask. An azimuth mask is not required.
 
 If you are curious about the position time series for the antenna, you can use *download_unr lorg* for more information.
 
-## Reproduce the Web App
+## Take a Look at the Data
 
-**Make SNR File**
+First make a SNR file.
 
-Start by downloading the RINEX file and extracting the GPS SNR data:
 
-*rinex2snr lorg 2019 205*
+<code>rinex2snr lorg 2019 205</code>
 
-**Take a Look at the Data**
 
-Use **quickLook** to produce a periodogram similar to the one in the web app [(For details on quickLook output)](../../docs/quickLook_desc.md).
+Use **quickLook** to produce a periodogram similar to the one in the web app [(For details on quickLook output)](../../docs/quickLook_desc.md). quickLook is set to use the L1 frequency by default:
 
-quickLook is set to use the L1 frequency by default:
-
-*quickLook lorg 2019 205*
+<code>quickLook lorg 2019 205*</code>
 
 <img src="lorg-ql-l1.png" width="600">
  
-Compare the periodograms for frequencies 1, 20 (L2C) and 5. They should be similar to the L1 periodogram, except that there 
-will be fewer satellite traces because only GPS satellites launched after 2005 broadcast L2C and only satellites after 2010 broadcast L5.
+Compare the periodograms for other frequencies: L2C and L5. They should be similar to the L1 periodogram, except that there 
+will be fewer satellite traces because only GPS satellites launched after 2005 
+broadcast L2C and only satellites after 2010 broadcast L5.
 The northwest qudarant is the noisiest and one could certainly try to improve the results by restricting some azimuths there.
+This is for L2C:
 
-*quickLook lorg 2019 205 -fr 20*
+<code>quickLook lorg 2019 205 -fr 20</code>
 
 <img src="lorg-ql-l2c.png" width="600">
 
-*quickLook lorg 2019 205 -fr 5*
+This is for L5:
+
+<code>quickLook lorg 2019 205 -fr 5</code>
 
 <img src="lorg-ql-l5.png" width="600">
 
@@ -72,7 +72,7 @@ Now prepare to analyze the data using **gnssir**.  First you need to create a se
 The default settings only need the station name, latitude, longitude, and ellipsoidal height. You make 
 this file using **make_json_input**: 
 
-*make_json_input lorg -78.18365 170.03361 -7.778 -e1 5 -e2 25*
+<code>make_json_input lorg -78.18365 170.03361 -7.778 -e1 5 -e2 25</code>
 
 The json output will be stored in $REFL_CODE/input/lorg.json. 
 [Here is a sample json file.](lorg.json)
@@ -80,15 +80,15 @@ The json output will be stored in $REFL_CODE/input/lorg.json.
 Next make some snr files for a time span of about eight months. Restrict the search to the UNAVCO archive to make the 
 code run faster (otherwise it will check three other archives as well). The resulting SNR files will be stored in $REFL_CODE/2019/snr/lorg. 
 
-*rinex2snr lorg 2019 1 -doy_end 233 -archive unavco*
+<code>rinex2snr lorg 2019 1 -doy_end 233 -archive unavco</code>
 
 Run **gnssir** for all the SNR files from **rinex2snr**.
 
-*gnssir lorg 2019 1 -doy_end 233*
+<code>gnssir lorg 2019 1 -doy_end 233</code>
 
 The default does not send any plots to the screen. If you do want to see them, set -plt:
 
-*gnssir lorg 2019 1 -screenstats False -plt True* 
+<code>gnssir lorg 2019 1 -screenstats False -plt True </code>
 
 <img src="lorg-g-panels.png" width="800"/>
 
@@ -100,7 +100,7 @@ To minimize outliers in these daily averages, a median filter is set to allow
 values within a given value of the median. The user is also asked to set a required minimum number of daily satellite 
 tracks. Here we use 0.25 meters and 50 tracks. We have also set a specific output filename:
 
-*daily_avg lorg 0.25 50 -txtfile lorg-dailyavg.txt*
+<code>daily_avg lorg 0.25 50 -txtfile lorg-dailyavg.txt</code>
 
 
 <img src="lorg_1.png" width="600"/>

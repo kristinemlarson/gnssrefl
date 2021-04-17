@@ -40,11 +40,11 @@ lthw is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflecti
 
 Translate the GPS data for January 1 in 2018. First you need to make the SNR file:
 
-*rinex2snr lthw 2018 1*
+<code>rinex2snr lthw 2018 1</code>
 
 Use our utility **quickLook** to look at these data [(For more details on quickLook output)](../../docs/quickLook_desc.md):
 
-*quickLook lthw 2018 1 -e1 7*
+<code>quickLook lthw 2018 1 -e1 7</code>
 
 <img src="lthw-day1-2018.png" width="600"/>
 
@@ -56,7 +56,7 @@ First make a SNR file:
 
 Now run quickLook:
 
-*quickLook lthw 2018 9 -e1 7*
+<code>quickLook lthw 2018 9 -e1 7</code>
 
 <img src="qc-lthw-1.png" width="600"/>
 
@@ -75,7 +75,7 @@ of local origin, but rather related to the inclination of the satellite orbits a
 
 If you like you can compare this to the first day of 2020, first make the SNR file:
 
-*rinex2snr lthw 2020 1*
+<code>rinex2snr lthw 2020 1</code>
 
 Again use quickLook:
 
@@ -88,31 +88,31 @@ so that means that there was ~2.5 meters of surface change from 2018 to 2020.
 
 Translate the GPS data for the year of 2018:
 
-*rinex2snr lthw 2018 1 -doy_end 365*
+<code>rinex2snr lthw 2018 1 -doy_end 365</code>
 
-First you need to make the list of analysis inputs:
+First you need to make the list of analysis inputs (stored in json format):
 
-*make_json_input lthw -76.458  -107.782 1011.0 -e1 7 -e2 25 -peak2noise 3.2 -l1 True*
+<code>make_json_input lthw -76.458  -107.782 1011.0 -e1 7 -e2 25 -peak2noise 3.2 -l1 True</code>
 
 [Example json file](lthw.json). It is fine to hand edit the json file to remove the unreliable azimuths if 
 you prefer.
 
 Now analyze the data for 2018 from day 1 to day 365 using **gnssir**:
 
-*gnssir lthw 2018 1 -doy_end 365 -screenstats False*
+<code>gnssir lthw 2018 1 -doy_end 365 -screenstats False</code>
 
 This produces reflector heights for every rising and setting satellite track that meets your 
 quality control selections.  In order to estimate snow accumulation, you will want to calculate
 the daily average. Using our **daily_avg** utility - and specifying 50 satellite tracks and median filter of 0.25 meters:
 
-*daily_avg lthw 0.25 50*
+<code>daily_avg lthw 0.25 50</code>
 
 <img src="lthw-req50.png" width="600"/>
 
 You can loosen the required track number if you want, but in this case it does not change the 
 overall character of the results:
 
-*daily_avg lthw 0.25 40*
+<code>daily_avg lthw 0.25 40</code>
 
 <img src="lthw-req40.png" width="600"/>
 

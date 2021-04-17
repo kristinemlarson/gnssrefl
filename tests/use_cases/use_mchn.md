@@ -45,21 +45,21 @@ The azimuths are chosen to ensure that the reflected signals reflect off the sur
 If you know where the data are stored (i.e. sopac), it is better (faster) to set that flag.
 Since the receiver only tracks GPS signals, there is no need to specify gnss orbits.
 
-*rinex2snr mchn 2019 205 -archive sopac*
+<code>rinex2snr mchn 2019 205 -archive sopac</code>
 
 **Take a Quick Look at the Data**
 
 Use **quickLook** to examine the spectral characteristics of the SNR data for the default L1 settings
 [(For details on quickLook output.)](../../docs/quickLook_desc.md):
 
-*quickLook mchn 2019 205*
+<code>quickLook mchn 2019 205</code>
 
 <img src="mchn-example.png" width="500">
 
 Why does this not look like the results from the web app? Look closely at the station photo and the x-axis 
 of the periodograms, then change the range of reflector heights at the command line for **quickLook**:
 
-*quickLook mchn 2019 205 -h1 2 -h2 8*
+<code>quickLook mchn 2019 205 -h1 2 -h2 8</code>
 
 <img src="qc-mchn-1.png" width="600">
 
@@ -76,13 +76,13 @@ The amplitudes in the bottom plot indicate that 8 is an acceptable minimal value
 
 The data from 2013 will be analyzed here as a test case.  Begin by generating the SNR files:
 
-*rinex2snr mchn 2013 1 -archive sopac -doy_end 365*
+<code>rinex2snr mchn 2013 1 -archive sopac -doy_end 365 </code>
 
 The resulting SNR files are stored in $REFL_CODE/2013/snr/mchn.  
 
 Analysis parameters are set up with **make_json_input**. 
 
-*make_json_input mchn 47.961 -84.901 152.019 -h1 3 -h2 10 -e1 5 -e2 25 -l1 True -peak2noise 3 -ampl 8*
+<code>make_json_input mchn 47.961 -84.901 152.019 -h1 3 -h2 10 -e1 5 -e2 25 -l1 True -peak2noise 3 -ampl 8</code>
 
 [Sample json file](mchn.json) While most of the analysis settings can be done by the command 
 line, you can see that the azimuths have been set by
@@ -91,12 +91,12 @@ hand to be limited to 80-180 degrees. Although it is possible to get good reflec
 
 Now that the analysis parameters are set, run **gnssir** to save the reflector height (RH) output for each day in 2013.
 
-*gnssir mchn 2013 1 -doy_end 365*
+<code>gnssir mchn 2013 1 -doy_end 365</code>
 
 The daily output files are stored in $REFL_CODE/2013/results/mchn. [Here is an example output for a single day.](195.txt) 
 Plots of SNR data can be seen with the -plt option.
 
-*gnssir mchn 2013 195  -plt True*
+<code>gnssir mchn 2013 195  -plt True</code>
 
 <img src="mchn-g-l1.png" width="500">
 
@@ -104,14 +104,14 @@ For a lake, it is appropriate to use the daily average. Our utility for computin
 for the median filter and a minimum number of tracks.  If the median value is set to the be large (2 meters), you can see 
 large outliers: 
 
-*daily_avg mchn 2 10*
+<code>daily_avg mchn 2 10</code>
 
 <img src="mchn_1.png" width="500">
 
 A more reasonable result is obtained with a 0.25-meter median filter and the 12-track requirement. If you want to save 
 the daily averages to a specific file, use the -txtfile option. Otherwise it will use a default location (which is printed to the screen)
 
-*daily_avg mchn 0.25 12 -txtfile mchn-dailyavg.txt*
+<code>daily_avg mchn 0.25 12 -txtfile mchn-dailyavg.txt</code>
 
 <img src="mchn_3.png" width="500">
 
@@ -129,12 +129,12 @@ We have downloaded [the 2013 data](10750-01-JAN-2013_slev.csv).
 
 The water levels measured by the traditional tide gauge and GNSS-IR are shown here:
 
-<img src="mchn-timeseries-tide-rh.png" width="500">
+<img src="mchn-timeseries-tide-rh.png" width="600">
 
 The linear regression between the two series gives a slope m=-1.03. The rms of the 
 residuals is very good, 0.025 m.  
 
-<img src="mchn-linreg.png" width="500">
+<img src="mchn-linreg.png" width="600">
 
 The [python script](plotmchn.py) used to generate these plots is provided.
 
