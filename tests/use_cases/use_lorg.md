@@ -52,7 +52,7 @@ quickLook is set to use the L1 frequency by default:
 
 *quickLook lorg 2019 205*
 
-<img src="lorg-ql-l1.png" width="500">
+<img src="lorg-ql-l1.png" width="600">
  
 Compare the periodograms for frequencies 1, 20 (L2C) and 5. They should be similar to the L1 periodogram, except that there 
 will be fewer satellite traces because only GPS satellites launched after 2005 broadcast L2C and only satellites after 2010 broadcast L5.
@@ -60,11 +60,11 @@ The northwest qudarant is the noisiest and one could certainly try to improve th
 
 *quickLook lorg 2019 205 -fr 20*
 
-<img src="lorg-ql-l2c.png" width="500">
+<img src="lorg-ql-l2c.png" width="600">
 
 *quickLook lorg 2019 205 -fr 5*
 
-<img src="lorg-ql-l5.png" width="500">
+<img src="lorg-ql-l5.png" width="600">
 
 ## Analyze the Data
 
@@ -72,7 +72,7 @@ Now prepare to analyze the data using **gnssir**.  First you need to create a se
 The default settings only need the station name, latitude, longitude, and ellipsoidal height. You make 
 this file using **make_json_input**: 
 
-*make_json_input -e1 5 -e2 25 lorg -78.18365 170.03361 -7.778*
+*make_json_input lorg -78.18365 170.03361 -7.778 -e1 5 -e2 25*
 
 The json output will be stored in $REFL_CODE/input/lorg.json. 
 [Here is a sample json file.](lorg.json)
@@ -103,9 +103,9 @@ tracks. Here we use 0.25 meters and 50 tracks. We have also set a specific outpu
 *daily_avg lorg 0.25 50 -txtfile lorg-dailyavg.txt*
 
 
-<img src="lorg_1.png" width="500"/>
+<img src="lorg_1.png" width="600"/>
 
 
-<img src="lorg-dailyavg.png" width="500"/>
+<img src="lorg-dailyavg.png" width="600"/>
 
 [A daily average Reflector height file is provided here.](lorg-dailyavg.txt). 

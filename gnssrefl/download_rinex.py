@@ -7,6 +7,7 @@ kristine larson
 import argparse
 import gnssrefl.gps as g
 import os
+import subprocess
 import sys
 
 def version3(station,year,doy,NS,archive):
@@ -51,6 +52,7 @@ def main():
     parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high")
     parser.add_argument("-archive", default=None, metavar='cddis',help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan)", type=str)
     parser.add_argument("-version", default=None, metavar=2,type=int, help="rinex version (2 or 3)")
+    parser.add_argument("-strip", default=None, type=str, help="set to True to strip to only SNR observables")
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
 
     args = parser.parse_args()
@@ -111,8 +113,8 @@ def main():
         else:
             archive = args.archive.lower()
             if archive not in archive_list:
-                print('You picked an archive that does not exist')
-                print('I am going to check the main ones (unavco,sopac,sonel,cddis)')
+                print('You picked an archive that does not exist. To be nice, ')
+                print('I am going to check the main ones (unavco,sopac,sonel,cddis) for you')
                 print('For future reference: I allow these archives:')
                 print(archive_list)
                 archive = 'all'
@@ -145,7 +147,19 @@ def main():
             g.go_get_rinex_flex(station,year,d,0,rate,archive)
             rinexfile,rinexfiled = g.rinex_name(station, year, d, 0)
             if os.path.isfile(rinexfile):
-                print('\n SUCCESS: ', rinexfile)
+                if args.strip == 'True':
+                    print('use teqc to strip the RINEX file')
+                    teqcv = g.teqc_version()
+                    if os.path.isfile(teqcv):
+                        foutname = 'tmp.' + rinexfile
+                        fout = open(foutname,'w')
+                        subprocess.call([teqcv, '-O.obs','S1+S2+S5+S6+S7+S8', rinexfile],stdout=fout)
+                        fout.close()
+                        subprocess.call(['rm','-f',rinexfile])
+                        subprocess.call(['mv','-f',foutname, rinexfile])
+                        print('\n SUCCESS: ', rinexfile)
+                else:
+                    print('\n SUCCESS: ', rinexfile)
             else:
                 print(rinexfile, ' not found')
 

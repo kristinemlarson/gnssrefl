@@ -7,6 +7,7 @@ kristine larson
 import argparse
 import gnssrefl.gps as g
 import sys
+import subprocess
 
 
 def main():

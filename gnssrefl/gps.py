@@ -4063,8 +4063,8 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
 
     #print('Requested data rate: ', receiverrate)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
-    #print('Name of the rinexfile should be:', rinexfile)
-    #print('Archive',archive)
+#    print('Name of the rinexfile should be:', rinexfile)
+#    print('Archive',archive)
 
     if (os.path.isfile(rinexfile) == True):
         ignoreFornow = 1
@@ -4096,6 +4096,7 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
                 elif (archive == 'cddis'):
                     rinex_cddis(station, year, month, day)
                 elif (archive == 'sonel'):
+                    print('sonel')
                     rinex_sonel(station, year, month, day)
                 elif (archive == 'nz'):
                     rinex_nz(station, year, month, day)

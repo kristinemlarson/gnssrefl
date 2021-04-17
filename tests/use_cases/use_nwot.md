@@ -44,7 +44,7 @@ L2C data in the highrate (1-sec) area. We do not need this sample rate for GPS r
 so to speed things up, we strongly encourage you to use the "special" archive option.  Here
 the 1-sec data have been decimated to 15 seconds:
 
-*rinex2snr nwot 2014 270 -archive special*
+<code>rinex2snr nwot 2014 270 -archive special</code>
 
 If for any reason this command does not work, please use the direct command:
 
@@ -96,7 +96,7 @@ Once you have a json file set up, run **gnssir** for the years 2009-2015:
 
 *gnssir nwot 2009 1 -doy_end 366 -year_end 2015*
 
-### Compute daily average RH values:
+### Compute daily average RH values
 
 Use the **daily_avg** utility to compute RH for each day. A median filter of 0.25 meter is used
 to eliminate large outliers and a minimum number of tracks is set to 10. This is relatively
@@ -111,6 +111,12 @@ produces this plot:
 
 and [this file](nwot_dailyRH.txt). The files will be stored in the $REFL_CODE/Files directory.
 
+You are also shown how many successful retrievals there are each day so that you can change that
+input if you prefer:
+
+<img src="retrievals_nwot.png" width="600"/>
+
+### Validation
 
 We installed the GPS site at Niwot Ridge because there was a long-standing experiment 
 for measuring snow depth (and snow water equivalent). We therefore have a way to assess
