@@ -97,6 +97,8 @@ def read_one_snr(obsfile,ifile):
     input: observation filename 
     ifile: 1 (primary) or 2 (day before)
     output: contents of the file, withe various other metrics
+    21apr18 eliminate negative elevation angles to be safe
+    (come from satellites set to bad by JAXa - should not have been written to SNR file)
     """
 
     sat=[]; ele=[]; az=[]; t=[]; edot=[]; s=[];  s2=[]; s5=[];  s6=[]; s7=[];  s8=[];
@@ -107,6 +109,10 @@ def read_one_snr(obsfile,ifile):
     f = np.genfromtxt(obsfile,comments='%')
     print('reading from this snr file ',obsfile)
     r,c = f.shape
+    if (r > 0) & (c > 0):
+        #print('make sure no negative elevation angle data are used')
+        i= f[:,1] > 0
+        f=f[i,:]
     if r == 0:
         print('no rows in this file!')
     if c == 0:
