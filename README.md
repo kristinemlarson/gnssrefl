@@ -278,7 +278,7 @@ for the file extension (which is rnx).  I know, it is weird.
 
 Here are some examples for RINEX 3 conversions:
 
-<code>rinex2snr onsa00swe 2020 298*</code>
+<code>rinex2snr onsa00swe 2020 298</code>
 
 <code>rinex2snr at0100usa 2020 55</code>
 
@@ -399,13 +399,15 @@ Now look at the Greenland SNR file you created in the previous section.
 
 <CODE>quickLook gls1 2011 271</CODE> 
 
-The periodogram peaks bunch up at a [larger value](tests/use_cases/gls1-example.png), which just
-means the antenna was further from the planar reflector, which in this case is ice.
+The periodogram peaks bunch up at a larger value:
 
+<img src="tests/use_cases/gls1-example.png" width=600>
+
+which just means the antenna was further from the planar reflector, which in this case is ice.
 Finally, what do you do if your reflections site is taller than the default value of 6 meters?
 Does the code figure this out for you automatically? **No, it does not.**
 
-A short example: Make a SNR file using the defaults: 
+A short example with data from Greenland. First make a SNR file using the defaults: 
 
 <CODE>rinex2snr smm3 2018 271</CODE>
 
@@ -416,17 +418,17 @@ Now run **quickLook** using the defaults:
 <img src="tests/use_cases/smm3-default.png" width=600> 
 
 Everything is gray (which means it didn't find a significant reflector) because you 
-only calculated periodograms for height values of 0.5 to 6 meters. The
-site is ~16 meters above the ice. Accordingly, if you change the inputs to tell the program
-that you want to examine heights between 8 and 20 meters, i.e. 
+only calculated periodograms for reflector height values of 0.5 to 6 meters. You see some things
+that might be significant at small RH, but this is just the effect of the antenna gain pattern. 
+This site is ~16 meters above the ice. Accordingly, if you change the inputs to tell the program
+that you want to examine reflector heights between 8 and 20 meters, i.e. 
 
 <CODE>quickLook smm3 2018 271 -h1 8 -h2 20</CODE>
 
 <img src="tests/use_cases/smm3-sensible.png" width=600>
 
 You now see what you expect to see - peaks of periodograms at ~16 meters height. 
-Why is the northwest quadrant 
-so messy? I leave that as an exercise for the reader. Hint: start out by trying
+Why is the northwest quadrant so messy? I leave that as an exercise for the reader. Hint: start out by trying
 to examine this site on Google Earth.
 
 ### gnssir <a name="module3"></a>
@@ -482,8 +484,8 @@ peak is ~17, so if you define the required amplitude
 to be 15, this one would pass. Secondly it uses a very simple peak to noise calculation. In this case the 
 average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise". 
 You then take the peak value (here ~17) and divide by the "noise" value.  
-For water I generally recommend a peak to noise ratio of 2.7, but for snow 3.2-3.5 or so. It can be tricky 
-to set these QC values in general. 
+For the ocean, I generally recommend starting with a peak to noise ratio of 2.7, but for lakes or snow, I use 
+3.2-3.5 or so. It can be tricky to set these QC values in general. 
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
 
@@ -547,12 +549,14 @@ This is a snippet of what the result file would look like
 
 If you want a multi-GNSS solution, you need to make a new json file and 
 use multi-GNSS orbits, and use a RINEX file that has multi-GNSS SNR observations in it. 
-p041 currently has multi-GNSS data in the RINEX file, so you can use it as a test. 
+In 2020 p041 had a multi-GNSS receiver operating, so we can look at some of the non-GPS signals.
+In this case, we will look at Galileo L1.  
 
 <CODE>make_json_input p041 39.949 -105.194 1728.856 -allfreq True</CODE>
 
 <CODE>rinex2snr p041 2020 151 -orb gnss</CODE>
-<CODE>gnssir p041 2020 151 -fr 201 -plt True</CODE> (look at the lovely Galileo L1 data) 
+
+<CODE>gnssir p041 2020 151 -fr 201 -plt True</CODE> 
 
 What should the periodogram plots look like? Until we have Jupyter notebooks, I 
 recommend you look at [the paper I wrote with Carolyn Roesler](https://link.springer.com/article/10.1007/s10291-018-0744-8) 

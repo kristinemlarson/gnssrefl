@@ -4269,6 +4269,39 @@ def bkg_rinex3(station9ch, year, doy,srate):
     return fexist 
 
 
+def bev_rinex3(station9ch, year, doy,srate):
+    """
+    download rinex 3 from BEV
+    inputs: 9 character station name, year, day of year and srate
+    is sample rate in seconds
+    note: this code works - but it does not turn it into RINEX 2 for you
+    """
+    fexist = False
+    crnxpath = hatanaka_version()
+    cdoy = '{:03d}'.format(doy)
+    cyy = '{:02d}'.format(year-2000)
+    csrate = '{:02d}'.format(srate)
+    cyyyy = str(year)
+    url = 'ftp://gnss.bev.gv.at/pub/obs/' + cyyyy + '/' + cdoy + '/'
+    ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
+    ff1 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
+    ff2 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.rnx'
+    url = url + ff
+    #print(url)
+    try:
+        wget.download(url,ff)
+        subprocess.call(['gunzip',ff])
+        subprocess.call([crnxpath,ff1])
+        # get rid of compressed file
+        subprocess.call(['rm','-f',ff1])
+    except:
+        print('problem with IGS download')
+
+    if os.path.exists(ff2):
+        fexist = True
+
+    return fexist
+
 def ign_rinex3(station9ch, year, doy,srate):
     """
     download rinex 3 from IGN
@@ -4301,8 +4334,6 @@ def ign_rinex3(station9ch, year, doy,srate):
         fexist = True
 
     return fexist
-
-
 
 def ga_rinex3(station9ch, year, doy,srate):
     """

@@ -13,6 +13,7 @@ import sys
 def version3(station,year,doy,NS,archive):
     """
     subroutine to take care of RINEX version 3
+    21april20 added BEV austria
     """
     fexist = False
     if NS == 9:
@@ -28,6 +29,9 @@ def version3(station,year,doy,NS,archive):
         if archive == 'ign':
             srate = 30
             fexist = g.ign_rinex3(station, year, doy,srate)
+        if archive == 'bev':
+            srate = 30
+            fexist = g.bev_rinex3(station, year, doy,srate)
         if archive == 'ga':
             srate = 30
             fexist = g.ga_rinex3(station, year, doy,srate)
