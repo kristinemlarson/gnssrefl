@@ -122,12 +122,10 @@ To see the names of these utilities:
 
 * pip list 
 
-*This user manual is not a class about GNSS interferometric reflectometry.* 
 
-If you are unsure about why various 
-restrictions are being applied, you really need
+If you are unsure about why various restrictions are being applied, it is really useful 
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
-and similar. I am committed in principle to set up some online
+or similar. I am committed in principle to set up some online
 courses to teach people about GNSS reflections, but funding for these courses is 
 not in hand at the moment. 
 
@@ -208,12 +206,12 @@ For RINEX 2.11, filenames should be lowercase and following the community standa
 
 4 character station name + day of year (3 characters) + '0.' + two character year  + 'o'
 
-In many cases Hatanaka compressed formats are used by data archives. These haev a 
+In many cases Hatanaka compressed formats are used by data archives. These have a 
 'd' instead an 'o' at the end of the filename.
 
 We are working to make a NMEA reader for this software package.
 
-### rinex2snr - making SNR files from RINEX files <a name="module1"></a>
+### rinex2snr - extracting SNR data from RINEX files <a name="module1"></a>
 
 The international standard for sharing GNSS data is called 
 the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
@@ -243,7 +241,7 @@ You can run **rinex2snr** at the command line. You required inputs are:
 
 A sample call for a station called p041, restricted to GPS satellites, on day of year 132 and year 2020 would be:
 
-*rinex2snr p041 2020 132*
+<code>rinex2snr p041 2020 132</code>
 
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
 it will check three archives (unavco, sopac, and sonel) to find it. 

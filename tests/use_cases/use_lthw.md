@@ -52,7 +52,7 @@ This is a bit of a mess really. If there are significant peaks, they are really
 close to the cutoff for the method (at 0.5 meters). Let's compare with about a week later.
 First make a SNR file:
 
-*rinex2snr lthw 2018 9*
+<code>rinex2snr lthw 2018 9</code>
 
 Now run quickLook:
 
@@ -90,7 +90,7 @@ Translate the GPS data for the year of 2018:
 
 <code>rinex2snr lthw 2018 1 -doy_end 365</code>
 
-First you need to make the list of analysis inputs (stored in json format):
+Then you need to make the list of analysis inputs (stored in json format):
 
 <code>make_json_input lthw -76.458  -107.782 1011.0 -e1 7 -e2 25 -peak2noise 3.2 -l1 True</code>
 

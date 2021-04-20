@@ -30,42 +30,49 @@ The p041 antenna is ~2 meters above the soil surface. It is located at Marshall 
 The site is relatively planar and free of obstructions. Since October 2018 the site has 
 recorded multi-GNSS signals. Marshall Mesa has been featured in multiple publications on GNSS-IR:
 
-* [Soil Moisture](https://www.kristinelarson.net/wp-content/uploads/2015/10/larson_soil_grl2008.pdf)
+* [Use of GPS Receivers as a Soil Moisture Network for Water Cycle Studies (2008)](https://www.kristinelarson.net/wp-content/uploads/2015/10/larson_soil_grl2008.pdf)
 
-* [Snow Depth](https://www.kristinelarson.net/wp-content/uploads/2015/10/larsonetal_snow_2009.pdf) 
+* [Can We Measure Snow Depth with GPS Receivers (2009)](https://www.kristinelarson.net/wp-content/uploads/2015/10/larsonetal_snow_2009.pdf) 
 
-* [Vegetation](https://www.kristinelarson.net/wp-content/uploads/2015/10/small_etal_2010.pdf) 
-
-
-p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=p041) 
+* [Sensing Vegetation Growth with Reflected GPS Signals (2010)](https://www.kristinelarson.net/wp-content/uploads/2015/10/small_etal_2010.pdf) 
 
 To get a sense of whether an azimuth or elevation mask is appropriate, 
 check the [Reflection Zone Mapping in the web app](https://gnss-reflections.org/rzones?station=p041&lat=39.9495&lon=-105.1943&height=1728.842&msl=on&RH=2&eang=2&azim1=0&azim2=360).  
-In the linked page, the reflection zones at 5, 10, and 15-degree elevation angles are plotted as 
+In the linked page, the reflection zones from 5 to 25 degree elevation angles are plotted as 
 colored ellipses surrounding the station.  
 
-## Reproduce the Web App 
+##Reproduce the Web App ##
 
-**Make SNR File**
+p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=p041) 
+You can see from the title of the plot that the web app reproduces 
+results for the year 2019, day of year 150, and L1 frequency. You can make something that looks similar
+to this using these commands:
 
-Begin by making an SNR file. Use the defaults, which only use the GPS signals:
+<code>rinex2snr p041 2019 150</code>
 
-*rinex2snr p041 2020 132*
+and
+
+<code>quickLook p041 2019 150</code>
 
 
-**Take a Quick Look at the Data**
+##Take a Quick Look at the Data##
 
-**quickLook** analyzes the reflection characteristics of a GNSS site [(For details on quickLook output)](../../docs/quickLook_desc.md).
+First make a SNR file:
+
+<code>rinex2snr p041 2020 132</code>
+
+
+Then use **quickLook** to analyze the reflection characteristics of the site [(For details on quickLook output)](../../docs/quickLook_desc.md).
 
 The default return is for the L1 frequency:
 
-*quickLook p041 2020 132*
+<code>quickLook p041 2020 132</code>
 
 <img src="p041-l1.png" width="600">
 
 Now try looking at the periodogram for L2C:
 
-*quickLook p041 2020 132 -fr 20*
+<code>quickLook p041 2020 132 -fr 20</code>
 
 <img src="p041-l2c.png" width="600">
 
@@ -74,51 +81,52 @@ the fact that there are more L1 satellites than L2C satellites.
 
 Now try L5:
 
-*quickLook p041 2020 132 -fr 5*
+<CODE>quickLook p041 2020 132 -fr 5</code>
 
 <img src="p041-ql-l5.png" width="600">
 
-The L5 signal has only been available on satellites launched after 2010, so there fewer satellite tracks than 
-for L1.
+The L5 signal has only been available on satellites launched after 2010, so there are 
+fewer satellite tracks than either L1 or L2C.
 
 The **quickLook** code has multiple options. For example, it is possible change the reflector height range:
 
-*quickLook p041 2020 132 -h1 0.5 -h2 10*
+<code>quickLook p041 2020 132 -h1 0.5 -h2 10</code>
 
 To look at Glonass and Galileo signals, the SNR files must be created using the -orb gnss flag.
+If you have already made a file using only the GPS data, you will need the overwrite flag.
 
-*rinex2snr p041 2020 132 -orb gnss*
+<code>rinex2snr p041 2020 132 -orb gnss -overwrite True</code>
 
-Beidou signals are tracked at this site, but the data are not available in the RINEX 2 file.
+Beidou signals are tracked at this site, but unfortunately the data are not available in the RINEX 2.11 file.
+They are very likely available in the RINEX 3 file, so you are encouraged to look there.
 
-**quickLook** is meant to be a visual assessment of the spectral characteristics. Output amplitude data are printed out to a file called rh.txt. To assess changes in the reflection environment around a GPS/GNSS sites over at multiple days, it will be necessary to run **gnssir**.
-
+**quickLook** is meant to be a visual assessment of the spectral characteristics at a given site on a given day.  
+For routine analysis, one must use **gnssir**.
 
 ## Analyze the Data
 
-Begin by setting up the analysis parameters. These are stored in a json file. In this case, the p041 RINEX data are multi-gnss, so set 
+You can start by setting up the analysis parameters. These are stored 
+in a json file. In this case, the p041 RINEX data are multi-gnss, so set 
 the options to allow all frequencies from all constellations:
 
 *make_json_input p041 39.94949 -105.19427 1728.842 -allfreq True -e1 5 -e2 25*
 
-Because the site is fairly planar, the parameters can be left at default settings. The elevation angles for the SNR 
-data are set to minimum and maximum values of 5 and 25 degrees, respectively. The json output will be stored in $REFL_CODE/input/p041.json.
-[Here is a sample json file](p041.json).
+Because the site is fairly planar, the parameters can be left at default settings. The elevation 
+angles for the SNR data are set to minimum and maximum values of 5 and 25 degrees, respectively. 
+The json output will be stored in $REFL_CODE/input/p041.json. [Here is a sample json file](p041.json).
 
 Then run **rnx2snr** to obtain the SNR values for the year 2020.  In this case, the 
 p041 RINEX data are multi-gnss, so the orbit flag is set to allow all available constellations:
 
-*rinex2snr p041 2020 1 -doy_end 365 -orb gnss*
+<code>rinex2snr p041 2020 1 -doy_end 365 -orb gnss</code>
 
-The output SNR files are stored in $REFL_CODE/2020/snr/p041. 
-Once the SNR values are available, run **gnssir** for 2020 to save the reflector heights for each day.
+The output SNR files are stored in $REFL_CODE/2020/snr/p041. Once the SNR values are available, run **gnssir** for an entire snow season.
 
-*gnssir p041 2020 1 -doy_end 365*
+<code>gnssir p041 2020 1 -doy_end 365</code>
 
-The daily output files for **gnssir** are stored in $REFL_CODE/2020/results/p041. [Here are the results for a single day](024.txt). 
-There is an option to produce plots:
+The daily output files for **gnssir** are stored in $REFL_CODE/2020/results/p041. [Here are the results for a single day](024.txt). There is an option to produce plots:
  
-*gnssir p041 2020 24 -plt True*
+<code>gnssir p041 2020 24 -plt True</code>
 
 
 <img src="p041-gnssir-gpspanels.png" width="700">
@@ -134,7 +142,7 @@ meaningful and not impacted by large outliers,
 minimal quality control values are used, a median filter (meters) and minimum number 
 of tracks per day. Here a median filter of 0.25 meter is used and 50 tracks are required.  
 
-*daily_avg p041 .25 50 -txtfile p041-dailyavg.txt*
+<code>daily_avg p041 .25 50 -txtfile p041-dailyavg.txt</code>
 
 [Example daily average RH file](p041-dailyavg.txt).
 

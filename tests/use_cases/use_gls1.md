@@ -61,8 +61,7 @@ This produces two plots. The first is a geographically oriented-summary of the f
 <img src=quicklook-gls1-lsp.png width=600>
 
 The peaks in these periodograms tell us how high the GPS antenna is above the ice surface.
-The peaks are associated with a reflector height (RH) of ~2.5 meters.  
-[(For more details on quickLook output)](../../docs/quickLook_desc.md)
+The peaks are associated with a reflector height (RH) of ~2.5 meters. [(For more details on quickLook output)](../../docs/quickLook_desc.md)
 
 The next plot shows results with respect to azimuth angle.  The top plot is RH and the other 
 two are quality control measures: peak amplitude and peak to noise ratio.
