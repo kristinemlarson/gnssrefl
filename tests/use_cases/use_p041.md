@@ -41,7 +41,7 @@ check the [Reflection Zone Mapping in the web app](https://gnss-reflections.org/
 In the linked page, the reflection zones from 5 to 25 degree elevation angles are plotted as 
 colored ellipses surrounding the station.  
 
-##Reproduce the Web App ##
+## Reproduce the Web App 
 
 p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=p041) 
 You can see from the title of the plot that the web app reproduces 
@@ -55,7 +55,7 @@ and
 <code>quickLook p041 2019 150</code>
 
 
-##Take a Quick Look at the Data##
+## Take a Quick Look at the Data
 
 First make a SNR file:
 
@@ -100,34 +100,60 @@ If you have already made a file using only the GPS data, you will need the overw
 Beidou signals are tracked at this site, but unfortunately the data are not available in the RINEX 2.11 file.
 They are very likely available in the RINEX 3 file, so you are encouraged to look there.
 
-**quickLook** is meant to be a visual assessment of the spectral characteristics at a given site on a given day.  
-For routine analysis, one must use **gnssir**.
+**quickLook** is meant to be a visual assessment of the spectral characteristics at a given site on a given day. For routine analysis, one must use **gnssir**.
 
 ## Analyze the Data
 
 You can start by setting up the analysis parameters. These are stored 
-in a json file. In this case, the p041 RINEX data are multi-gnss, so set 
-the options to allow all frequencies from all constellations:
+in a json file. In this case, the p041 RINEX data are multi-gnss, so you could 
+set the options to allow all frequencies from all constellations:
 
-*make_json_input p041 39.94949 -105.19427 1728.842 -allfreq True -e1 5 -e2 25*
-
-Because the site is fairly planar, the parameters can be left at default settings. The elevation 
-angles for the SNR data are set to minimum and maximum values of 5 and 25 degrees, respectively. 
-The json output will be stored in $REFL_CODE/input/p041.json. [Here is a sample json file](p041.json).
-
-Then run **rnx2snr** to obtain the SNR values for the year 2020.  In this case, the 
-p041 RINEX data are multi-gnss, so the orbit flag is set to allow all available constellations:
-
-<code>rinex2snr p041 2020 1 -doy_end 365 -orb gnss</code>
-
-The output SNR files are stored in $REFL_CODE/2020/snr/p041. Once the SNR values are available, run **gnssir** for an entire snow season.
-
-<code>gnssir p041 2020 1 -doy_end 365</code>
-
-The daily output files for **gnssir** are stored in $REFL_CODE/2020/results/p041. [Here are the results for a single day](024.txt). There is an option to produce plots:
+<code>make_json_input p041 39.94949 -105.19427 1728.842 -allfreq True -e1 5 -e2 25</code>
  
-<code>gnssir p041 2020 24 -plt True</code>
+[Here is a sample json file which used multi-GNSS signals](p041.json).
 
+We are going to concentrate on GPS-only, which is the default:
+
+<code>make_json_input p041 39.94949 -105.19427 1728.842 -e1 5 -e2 25 </code>
+
+We are going to look at a subset of p041 data from 2019/2020 to look at changes due to 
+snow accumulation. The series will begin doy 245 (2019) and end on doy 70 (2020).  
+
+<code>rinex2snr p041 2019 245 -doy_end 365 -archive unavco</code>
+
+<code>rinex2snr p041 2020 1 -doy_end 70 -archive unavco</code>
+
+Now run **gnssir** for 2019/2020:
+
+<code>gnssir p041 2019 1 -doy_end 366 -year_end 2020</code>
+
+The RH results from **gnssir** are stored in $REFL_CODE/2020/results/p041. 
+
+Typically a daily average is sufficient for climatology studies.
+To ensure the average is meaningful and not impacted by large outliers, 
+a median filter (meters) is used and a minimum number 
+of tracks is required. Here a median filter of 0.15 meter is used and 80 tracks are required.  
+Either of these parameters can be changed depending on your site.
+In this particular example, I only used three GPS frequencies, L1, L2C, and L5.
+
+<code>daily_avg p041 .15 80 -txtfile p041-dailyavg.txt</code>
+
+Three plots are created. All retrievals:
+
+<img src=p041-RH-all.png width=600/>
+
+
+How many values are used in the daily average:
+
+<img src=p041-numval.png width=600/>
+
+Daily average:
+
+<img src=p041-RH.png width=600/>
+
+
+p041 has been tracking multi-GNSS since 2019.  Plots of the different constellation signals 
+are provided below (set -plt True when running **gnssir**)
 
 <img src="p041-gnssir-gpspanels.png" width="700">
 
@@ -136,24 +162,4 @@ The daily output files for **gnssir** are stored in $REFL_CODE/2020/results/p041
 
 
 <img src="p041-gnsirr-galpanels.png" width="700">
-
-Typically a daily average is used by most scientists. To ensure the average is 
-meaningful and not impacted by large outliers, 
-minimal quality control values are used, a median filter (meters) and minimum number 
-of tracks per day. Here a median filter of 0.25 meter is used and 50 tracks are required.  
-
-<code>daily_avg p041 .25 50 -txtfile p041-dailyavg.txt</code>
-
-[Example daily average RH file](p041-dailyavg.txt).
-
-Plots are also provided: 
-
-<img src="p041-daily1.png" width="500">
-
-
-<img src="p041-daily2.png" width="500">
-
-The changes in reflector height in January-April and September-December are consistent with snow accumulation.
-We will be comparing to validation data later. The changes in the summer are related to soil moisture changes.
-
 
