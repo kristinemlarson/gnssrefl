@@ -104,17 +104,19 @@ They are very likely available in the RINEX 3 file, so you are encouraged to loo
 
 ## Analyze the Data
 
-You can start by setting up the analysis parameters. These are stored 
+We will start by setting up the analysis parameters. These are stored 
 in a json file. In this case, the p041 RINEX data are multi-gnss, so you could 
 set the options to allow all frequencies from all constellations:
 
 <code>make_json_input p041 39.94949 -105.19427 1728.842 -allfreq True -e1 5 -e2 25</code>
  
-[Here is a sample json file which used multi-GNSS signals](p041.json).
 
-We are going to concentrate on GPS-only, which is the default:
+We are going to concentrate on GPS-only, which is the default. We have set stricter QC values by 
+setting the amplitude minimum to 8 and the peak 2 noise ratio to 3.2:
 
-<code>make_json_input p041 39.94949 -105.19427 1728.842 -e1 5 -e2 25 </code>
+<code>make_json_input p041 39.94949 -105.19427 1728.842 -e1 5 -e2 25 -peak2noise 3.2 -ampl 8 </code>
+j
+[Here is a sample json file](p041.json).
 
 We are going to look at a subset of p041 data from 2019/2020 to look at changes due to 
 snow accumulation. The series will begin doy 245 (2019) and end on doy 70 (2020).  
@@ -127,7 +129,7 @@ Now run **gnssir** for 2019/2020:
 
 <code>gnssir p041 2019 1 -doy_end 366 -year_end 2020</code>
 
-The RH results from **gnssir** are stored in $REFL_CODE/2020/results/p041. 
+The RH results from **gnssir** are stored in $REFL_CODE/2019/results/p041 and $REFL_CODE/2020/results/p041. 
 
 Typically a daily average is sufficient for climatology studies.
 To ensure the average is meaningful and not impacted by large outliers, 
