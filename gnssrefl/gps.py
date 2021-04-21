@@ -2889,8 +2889,9 @@ def rinex_name(station, year, month, day):
     if day == 0:
         doy = month
         cyyyy = str(year)
-        cyy = str(year-2000)
+        #cyy = str(year-2000)
         cdoy = '{:03d}'.format(month)
+        cyy =  '{:02d}'.format(year-2000)
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
 
@@ -4053,6 +4054,7 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
     2020aug28 added NGS, aka big_Disk_in_DC
     2020nov28 added NRCAN
     2021mar23 added special archive for reflectometry files at unavco
+    2021apr20 added BEV archive
     """
     if (day == 0):
         doy = month
@@ -4063,8 +4065,8 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
 
     #print('Requested data rate: ', receiverrate)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
-#    print('Name of the rinexfile should be:', rinexfile)
-#    print('Archive',archive)
+    #print('Name of the rinexfile should be:', rinexfile)
+    #print('Archive',archive)
 
     if (os.path.isfile(rinexfile) == True):
         ignoreFornow = 1
@@ -4110,6 +4112,8 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
                     pickup_pbay(year,month,day)
                 elif (archive == 'ngs'):
                     big_Disk_in_DC(station, year,month,day)
+                elif (archive == 'bev'):
+                    bev_rinex2(station, year, doy)
                 else:
                     print('eek - I have run out of archives')
 
@@ -4268,6 +4272,54 @@ def bkg_rinex3(station9ch, year, doy,srate):
 
     return fexist 
 
+def bev_rinex2(station, year, doy):
+    """
+    download rinex 2.11 from BEV
+    inputs: station name, year, day of year 
+    """
+    fexist = False
+    crnxpath = hatanaka_version()
+    cdoy = '{:03d}'.format(doy)
+    cyy = '{:02d}'.format(year-2000)
+    cyyyy = str(year)
+    url = 'ftp://gnss.bev.gv.at/pub/obs/' + cyyyy + '/' + cdoy + '/'
+    ff_Z =  station + cdoy + '0.' + cyy + 'd' + '.Z'
+    ff_gz = station + cdoy + '0.' + cyy + 'd' + '.gz'
+    ff1 = station + cdoy + '0.' + cyy + 'd' 
+    ff2 = station + cdoy + '0.' + cyy + 'o' 
+    # if hatanaka decompression exe does not exist, exit early
+    if not os.path.exists(crnxpath):
+        hatanaka_warning()
+        return fexist
+
+    # illegal Z files ...  only look for gz files
+    #try:
+    #    this_url = url + ff_Z
+    #    wget.download(this_url,ff_Z)
+        # subprocess.call(['uncompress',ff_Z])
+        # subprocess.call([crnxpath,ff1])
+    #except:
+    #    print('no luck first try')
+
+
+    #if os.path.exists(ff_Z):
+    #    print('yippee')
+    try:
+        this_url = url + ff_gz
+        wget.download(this_url,ff_gz)
+        subprocess.call(['gunzip',ff_gz])
+        subprocess.call([crnxpath,ff1])
+    except:
+        print('no luck ')
+
+    # get rid of Hatanaka file
+    if os.path.exists(ff1):
+        subprocess.call(['rm','-f',ff1])
+
+    if os.path.exists(ff2):
+        fexist = True
+
+    return fexist
 
 def bev_rinex3(station9ch, year, doy,srate):
     """

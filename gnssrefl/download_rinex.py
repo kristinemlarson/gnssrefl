@@ -88,7 +88,7 @@ def main():
     archive = args.archive
 
 
-    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special']
+    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev']
 
     archive_list_high = ['unavco','nrcan','ga']
 
@@ -150,6 +150,7 @@ def main():
         else: # RINEX VERSION 2
             g.go_get_rinex_flex(station,year,d,0,rate,archive)
             rinexfile,rinexfiled = g.rinex_name(station, year, d, 0)
+            print(rinexfile)
             if os.path.isfile(rinexfile):
                 if args.strip == 'True':
                     print('use teqc to strip the RINEX file')

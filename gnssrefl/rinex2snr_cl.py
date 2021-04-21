@@ -130,7 +130,7 @@ def main():
 
 
 # currently allowed archives 
-    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special']
+    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev']
     if args.archive == None:
         archive = 'all'
     else:
