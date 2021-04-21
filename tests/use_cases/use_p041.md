@@ -137,21 +137,22 @@ In this particular example, I only used three GPS frequencies, L1, L2C, and L5.
 
 <code>daily_avg p041 .15 80</code>
 
-Three plots are created. All retrievals:
+Three plots are created. All RH retrievals:
 
 <img src=p041-RH-all.png width=600/>
 
-
-How many values are used in the daily average:
+A summary of how many values are being used in the daily average:
 
 <img src=p041-numval.png width=600/>
 
-Daily average:
+And the daily RH average:
 
 <img src=p041-RH.png width=600/>
 
 
-p041 has been tracking multi-GNSS since 2019.  Plots of the different constellation signals 
+## Multi-GNSS
+
+p041 has been tracking multi-GNSS signals since 2019. Plots of the GPS, Galileo, and Glonass constellation signals 
 are provided below (set -plt True when running **gnssir**)
 
 <img src="p041-gnssir-gpspanels.png" width="700">
