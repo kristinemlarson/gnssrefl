@@ -115,7 +115,6 @@ We are going to concentrate on GPS-only, which is the default. We have set stric
 setting the amplitude minimum to 8 and the peak 2 noise ratio to 3.2:
 
 <code>make_json_input p041 39.94949 -105.19427 1728.842 -e1 5 -e2 25 -peak2noise 3.2 -ampl 8 </code>
-j
 [Here is a sample json file](p041.json).
 
 We are going to look at a subset of p041 data from 2019/2020 to look at changes due to 
@@ -133,12 +132,10 @@ The RH results from **gnssir** are stored in $REFL_CODE/2019/results/p041 and $R
 
 Typically a daily average is sufficient for climatology studies.
 To ensure the average is meaningful and not impacted by large outliers, 
-a median filter (meters) is used and a minimum number 
-of tracks is required. Here a median filter of 0.15 meter is used and 80 tracks are required.  
-Either of these parameters can be changed depending on your site.
+a median filter (meters) is used and a minimum number of tracks is required. Here a median filter of 0.15 meter is used and 80 tracks are required. Either of these parameters can be changed depending on your site.
 In this particular example, I only used three GPS frequencies, L1, L2C, and L5.
 
-<code>daily_avg p041 .15 80 -txtfile p041-dailyavg.txt</code>
+<code>daily_avg p041 .15 80</code>
 
 Three plots are created. All retrievals:
 
