@@ -39,7 +39,7 @@ find to be useful.
 
 * [Michipicoten, Lake Superior, Canada](use_cases/use_mchn.md) (mchn)
 
-* Lake Taupo, New Zealand (tgho)
+* [Lake Taupo, New Zealand](use_cases/use_tgho.md) (tgho)
 
 * [St Lawrence River, Montreal, Canada](use_cases/pmtl_use.md) (pmtl)
 
@@ -66,7 +66,7 @@ find to be useful.
 
 * [Niwot Ridge, Colorado](use_cases/use_nwot.md) (nwot)
 
-* Half Island Park, Idaho (p360)
+* [Half Island Park, Idaho](use_cases/use_p360) (p360)
 
 * Coldfoot, Alaska (ab33)
 
