@@ -62,7 +62,8 @@ be used in subsequent analysis here.  Next, try the two Glonass frequencies:
 
 <img src="tgho-glonass-l1.png" width="500"/>
 
-<img src="tgho-ql-102.png" width="500"/>
+<img src="tgho-glonass-l2.png" width="500"/>
+
 
 
 ## Analyze the Data
@@ -74,33 +75,27 @@ but will have to be manually edited in the json file.  The peak noise will also 
 <code>make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3.2</code>
 
 
-Then run **rnx2snr** for a a few months, to see how Lake Taupo's water level varies 
-between 5/9/2020 and 11/14/2020. Use **ymd** to find the day of year for these dates if a doy calender is not available.
-
-<code>ymd 2020 5 9</code>
-
-<code>ymd 2020 11 14</code>
+Then run **rnx2snr** for six months:
 
 <code>rinex2snr tgho 2020 130 -archive nz -doy_end 319 -orb gnss</code>
 
 The output SNR files are stored in $REFL_CODE/2020/snr/tgho.
 
-Now run **gnssir** for these dates
+Now run **gnssir** for these same dates:
 
 <code>gnssir tgho 2020 130 -doy_end 319 </code>
-
 
 To look at daily averages, use **daily_avg**. The median filter is set to allow values within 0.25 meters of the 
 median, and the minimum number of tracks required to calculate the average is set to 50 tracks.  
 
 <CODE>daily_avg tgho .25 50 </code>
 
-<img src="tgho-dailyavg.png" width="600">
+<img src="tgho-numvals.png" width="600">
 
+<img src="tgho-all.png" width="600">
 
-<img src="tgho-dailyrange.png" width="600">
+<img src="tgho-rhavg.png" width="600">
 
-<img src="tgho-dailynums.png" width="600">
-
-
-Although Taupo is in a volcanic caldera, lake levels are determined by seasonal processes such as evaporation, precipitation, input from local drainages, and outflow.  The Waikoto River is sole river draining the lake, and river flow is regulated by a series of hydroelectric dams.
+Although Taupo is in a volcanic caldera, lake levels are determined by seasonal processes such 
+as evaporation, precipitation, input from local drainages, and outflow. The Waikoto 
+River is sole river draining the lake, and river flow is regulated by a series of hydroelectric dams.
