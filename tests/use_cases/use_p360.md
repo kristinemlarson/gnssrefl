@@ -4,7 +4,7 @@
 
 **Location:**  Island Park, Idaho
 
-**Archive:**  [UNAVCO](http://www.unavco.org), [SOPAC](http://sopac-csrc.ucsd.edu/index.php/sopac/)
+**Archive:**  [UNAVCO](http://www.unavco.org)
 
 **DOI:**  [https://doi.org/10.7283/T5DB7ZR3](https://doi.org/10.7283/T5DB7ZR3)
 
@@ -14,7 +14,7 @@
 
 - Longitude: -111.45068
 
-- Height:       1857.861 m
+- Height: 1857.861 m
 
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/P360)
 
@@ -31,11 +31,11 @@
 
 Station p360 is located to the west of Yellowstone National Park, near the town of Island Park 
 in Idaho.  At an elevation of ~1858 m, winter snowfall can be frequent and heavy.
+The site has been recording multi-GNSS data since March 2020. Before that time, only the 
+L2C GPS data are of reliable quality.
 
-The site has been recording multi-GNSS data since March 2020. Before that time, only the L2C GPS data are of reliable quality.
-
-The station is in a flat, grassy plain with no obstacles or changes in topography, so elevation and azimuth 
-masks are not particularly required.  
+The station is in a flat, grassy plain with no obstacles or changes in topography, so complicated elevation and azimuth 
+angle masks are not required.  
 
 P360 was part of [PBO H2O](http://cires1.colorado.edu/portal/)
 
@@ -44,6 +44,8 @@ P360 was part of [PBO H2O](http://cires1.colorado.edu/portal/)
 Make an SNR file. Use the special archive to allow access to L2C data.
 
 <CODE>rinex2snr p360 2017 290 -archive special</code>
+
+and then
 
 <code>quickLook p360 2017 290</code>
 
@@ -58,11 +60,10 @@ And for L2C:
 
 <img src="qc-p360-l2c.png" width="600">
 
-This is far superior. The southern quadrants give far superior retrievals.  
-This is confirmed in the QC plot show here:
+This is far superior to the L1 data. The southern quadrants give 
+better retrievals than for the north. This is confirmed in the QC plot show here:
 
 <img src="p360-qc.png" width="600">
-
 
 ## Analyze the Data
 
@@ -101,6 +102,8 @@ used to fine-tune the minimum number of reflector heights for the **daily_avg** 
 <img src="p360-dailynums.png" width="600">
 
 
-<img src="p360-dailyrange.png" width="600">
-
 <img src="p360-all.png" width="600">
+
+<img src="p360-dailyavg.png" width="600">
+
+<img src="p360-obs1.png" width="600">
