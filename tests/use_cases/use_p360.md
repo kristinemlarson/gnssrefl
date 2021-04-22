@@ -32,7 +32,7 @@
 Station p360 is located to the west of Yellowstone National Park, near the town of Island Park 
 in Idaho.  At an elevation of ~1858 m, winter snowfall can be frequent and heavy.
 
-The site has been recording multi-GNSS data since March 2020.
+The site has been recording multi-GNSS data since March 2020. Before that time, only the L2C GPS data are of reliable quality.
 
 The station is in a flat, grassy plain with no obstacles or changes in topography, so elevation and azimuth 
 masks are not particularly required.  
@@ -45,24 +45,37 @@ Make an SNR file. Use the special archive to allow access to L2C data.
 
 <CODE>rinex2snr p360 2017 290 -archive special</code>
 
-
 <code>quickLook p360 2017 290</code>
+
+The default return is for L1. This plot confirms our concerns about the quality of the L1 data.
+It also suggests the southern quadrants are preferred to other quadrants.
 
 <img src="p360-qc1.png" width="600">
 
 And for L2C:
 
+<code>quickLook p360 2017 290 -fr 20</code>
+
 <img src="qc-p360-l2c.png" width="600">
 
+This is far superior. The southern quadrants give far superior retrievals.  
+This is confirmed in the QC plot show here:
 
 <img src="p360-qc.png" width="600">
 
 
 ## Analyze the Data
 
-Set the analysis paramaters using **make_json_input**. This analysis will use the L2C frequency.  
+First we will set the analysis paramaters using **make_json_input**. This analysis will use the L2C frequency and 
+will use QC metrics derived from the previous plot (for peak to noise ratio and amplitude).  
 
-<code>make_json_input p360 44.31785 -111.45068 1857.861 -l2c True</code>
+<code>make_json_input p360 44.31785 -111.45068 1857.861 -l2c True -peak2noise 3.2 -ampl 8 </code>
+
+We will hand edit the json file to disallow 0-90 degrees in azimuth.
+
+[Sample json file](p360.json)
+
+We then make SNR files to encompass one water year:
 
 <code>rinex2snr p360 2017 245 -doy_end 365 -archive special</code>
 
@@ -70,10 +83,15 @@ Set the analysis paramaters using **make_json_input**. This analysis will use th
 
 Output SNR values are stored in $REFL_CODE/$year/snr/p360, where $year = 2017 or 2018.
 
-Then run **gnssir** to calculate the reflector heights for 2017/208
+Then we run **gnssir** to calculate the reflector heights for 2017/2018. Because the code
+only creates results if the SNR file exists, we can use the year_end and doy_end settings.
 
 <code>gnssir p360 2017 1 -year_end 2018 -doy_end 366</code>
 
+
+## Derive Snow Accumulation
+
+Use the **daily_avg** utility:
 
 <code>daily_avg p360 0.25 12 </code>
 
