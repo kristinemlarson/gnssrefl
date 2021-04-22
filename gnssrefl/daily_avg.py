@@ -154,25 +154,25 @@ def main():
     n=7
     # fontsize for hte plot
     fs = 12
-# now require it as an input
-# you can change this - trying out 80 for now
-#ReqTracks = 80
+    NotEnough = 0
 # putting the results in a np.array, year, doy, RH, Nvalues, month, day
     tv = np.empty(shape=[0, n])
     obstimes = []; medRH = []; meanRH = [] ; alltimes = []
     fig,ax=plt.subplots()
     year_list = np.arange(year1, year2+1, 1)
     #print('Years to examine: ',year_list)
+    NumFiles = 0
     for yr in year_list:
         direc = xdir + '/' + str(yr) + '/results/' + station + '/' + extension + '/'
         if os.path.isdir(direc):
             all_files = os.listdir(direc)
-            print('Number of files in ', yr, len(all_files))
+            #print('Number of files in ', yr, len(all_files))
             for f in all_files:
                 fname = direc + f
                 L = len(f)
         # file names must have 7 characters in them ... 
                 if (L == 7):
+                    NumFiles +=  1
         # check that it is a file and not a directory and that it has something/anything in it
                     try:
                         a = np.loadtxt(fname,skiprows=3,comments='%')
@@ -230,7 +230,8 @@ def main():
                                 tv = np.append(tv, [newl],axis=0)
                                 k += 1
                             else:
-                                print('not enough retrievals on ', yr, d.month, d.day, len(good))
+                                #print('not enough retrievals on ', yr, d.month, d.day, len(good))
+                                NotEnough = NotEnough + 1
                     except:
                         okok = 1;
                         #print('problem reading ', fname, ' so skipping it')
@@ -243,6 +244,8 @@ def main():
     plt.gca().invert_yaxis()
     plt.grid()
 #   new plot
+    print('A total of ', NumFiles, ' were evaluated.')
+    print('A total of ', NotEnough, ' days did not meet the threshold set for a dependable daily average')
 
 
     # close the file with all the RH values'
@@ -266,7 +269,7 @@ def main():
         txtfile = args.txtfile
         # use filename provided by the user
         outfile = txtdir + '/' + txtfile
-    print('Daily average RH will be written to: ', outfile)
+    print('Daily average RH file will be written to: ', outfile)
     write_out_RH_file(obstimes,tv,outfile,csvformat)
 
 if __name__ == "__main__":

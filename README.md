@@ -258,7 +258,18 @@ Here is an example from a site in Greenland (the RINEX file will be picked up fr
 
 <code>rinex2snr gls1 2011 271</code>
 
-The code can also search ga (geoscience Australia), nz (New Zealand), ngs, and bkg if you invoke -archive, e.g.
+Allowed GNSS Data Archives:
+
+- unavco
+- sonel (global sea level observing system)
+- sopac (Scripps Orbit and Permanent Array Center)
+- cddis
+- ngs (National Geodetic Survey)
+- nrcan (Natural Resources Canada)
+- bkg (German Agency for Cartography and Geodesy)
+- nz (GNS New Zealand)
+- ga (Geoscience Australia)
+- bev (Austria Federal Office of Metrology and Surveying)
 
 <code>rinex2snr tgho 2020 132 -archive nz</code>
 

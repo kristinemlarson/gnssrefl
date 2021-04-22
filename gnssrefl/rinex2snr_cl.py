@@ -30,7 +30,7 @@ def main():
 # optional arguments
     parser.add_argument("-snr", default=66, help="snr file ending", type=str)
     parser.add_argument("-orb", default='nav', type=str, help="orbit type, gps, gps+glo, gnss or you can specify nav,igs,igr,jax,gbm,grg,wum")
-    parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high, only unavco")
+    parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high")
     parser.add_argument("-dec", default=0, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default='False', metavar='False', type=str, help="True means only use RINEX files on local machine")
     parser.add_argument("-fortran", default='True', metavar='True',type=str, help="True means use Fortran RINEX translators ")
@@ -120,7 +120,7 @@ def main():
     else:
         nol = False
 
-    # default is set to low.  pick high for 1sec files from unavco
+    # default is set to low.  pick high for 1sec files 
     rate = args.rate
 
     if args.doy_end == None:
