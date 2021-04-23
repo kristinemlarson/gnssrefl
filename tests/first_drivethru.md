@@ -42,8 +42,8 @@ find to be useful.
 * [Lake Taupo, New Zealand](use_cases/use_tgho.md) (tgho)
 
 * [St Lawrence River, Montreal, Canada](use_cases/pmtl_use.md) (pmtl)
+</TD>
 
-<TR>
 <TH>Seasonal Snow Accumulation</TH>
 <TD>
 
@@ -52,7 +52,6 @@ find to be useful.
 * [Niwot Ridge, Colorado](use_cases/use_nwot.md) (nwot)
 
 * [Half Island Park, Idaho](use_cases/use_p360) (p360)
-
 
 </TD>
 </TR>
