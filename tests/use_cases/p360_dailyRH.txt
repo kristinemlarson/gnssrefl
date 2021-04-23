@@ -1,4 +1,4 @@
-% calculated on 2021-04-22 17:06 
+% calculated on 2021-04-23 08:08 
 % year doy   RH    numval month day RH-sigma
 % year doy   (m)                      (m)
 % (1)  (2)   (3)    (4)    (5)  (6)   (7)
