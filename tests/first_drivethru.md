@@ -24,7 +24,6 @@ find to be useful.
 <table>
 <TR>
 <TD>
-<TH>Antarctica and Greenland</TH>
 
 * [Lorne, Ross Ice Shelf, Antarctica](use_cases/use_lorg.md) (lorg)
 
@@ -35,7 +34,6 @@ find to be useful.
 * Summit Camp, Greenland (smm3)
 </TD>
 <td>
-<TH>Lakes and Rivers</TH>
 
 * [Michipicoten, Lake Superior, Canada](use_cases/use_mchn.md) (mchn)
 
@@ -44,8 +42,8 @@ find to be useful.
 * [St Lawrence River, Montreal, Canada](use_cases/pmtl_use.md) (pmtl)
 </TD>
 
-<TH>Seasonal Snow Accumulation</TH>
 <TD>
+Seasonal Snow Accumulation
 
 * [Marshall, Colorado](use_cases/use_p041.md) (p041)
 
