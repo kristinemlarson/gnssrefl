@@ -63,7 +63,7 @@ And for L2C:
 This is far superior to the L1 data. The southern quadrants give 
 better retrievals than for the north. This is confirmed in the QC plot show here:
 
-<img src="p360-qc.png" width="600">
+<img src="p360-qc-l2c.png" width="600">
 
 ## Analyze the Data
 

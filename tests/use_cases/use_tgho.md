@@ -75,9 +75,9 @@ amplitude can be set on the command line.
 
 <code>make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3.2 -ampl 9</code>
  
-[The azimuth mask was set by hand to exclude empty regions and azimiths with poor retrievals.](tgho.json)
+[The azimuth mask was set by hand to exclude empty regions and azimiths with poor retrievals. Glonass signals were added and GPS L2/L5 were removed.](tgho.json)
 
-Then run **rnx2snr** for six months:
+Then run **rnx2snr** for ~six months:
 
 <code>rinex2snr tgho 2020 130 -archive nz -doy_end 319 -orb gnss</code>
 
@@ -87,14 +87,23 @@ Now run **gnssir** for these same dates:
 
 <code>gnssir tgho 2020 130 -doy_end 319 </code>
 
-To look at daily averages, use **daily_avg**. The median filter is set to allow values within 0.25 meters of the 
+To look at daily averages, use the utility **daily_avg**. The median filter is set to allow values within 0.25 meters of the 
 median, and the minimum number of tracks required to calculate the average is set to 50 tracks.  
 
 <CODE>daily_avg tgho .25 50 </code>
 
+The number of retrievals each day is show here:
+
 <img src="tgho-numvals.png" width="600">
 
+All retrievals are shown here:
+
 <img src="tgho-all.png" width="600">
+
+Note in particular that there are quite a few data outages in this series, which means the RINEX files were missing 
+from the NZ archive.
+
+Finally, the average RH plot:
 
 <img src="tgho-rhavg.png" width="600">
 
