@@ -1,8 +1,8 @@
-### Use Case for Lake Taupo, New Zealand
+### Lake Taupo, New Zealand
 
 **Station Name:** tgho 
 
-**Location:** Lake Taupo, New Zealand
+**Location:** Lake Taupo, North Island
 
 **Archive:** [Geonet](https://www.geonet.org.nz/)
 
@@ -27,9 +27,7 @@
 ## Data Summary
 
 Station tgho is operated by Geonet (GNS) in New Zealand.  It is located 
-on a platform in Lake Taupo and currently records GPS (L1 and L2 only) and Glonass.
-
-
+on a platform in Lake Taupo and currently records only standard GPS and Glonass signals.
 
 ## Take a Quick Look at the Data
 
@@ -37,43 +35,47 @@ Begin by making an SNR file. Use both GPS and Glonass and set the archive to Geo
 
 <code>rinex2snr tgho 2020 300 -orb gnss -archive nz</code>
 
-
 <code>quickLook tgho 2020 300 -e1 5 -e2 15</code>
 
-<img src="tgho-default.png" width="500">
+<img src="tgho-default.png" width="600">
 
+The clutter near the monument produces noise at the small RH values.  A better result 
+can be found if those values are eliminated by setting h1 to 2. We also extend h2 to 8.
 
 <code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8</code>
 
-<img src="tgho-better.png" width="500">
+<img src="tgho-better.png" width="600">
 
 Now try looking at the periodogram for L2:
 
 <code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 2</code>
 
-<img src="tgho-l2.png" width="500"/>
+<img src="tgho-l2.png" width="600"/>
 
-These results are not very compelling, and GPS L2 data will not 
-be used in subsequent analysis here.  Next, try the two Glonass frequencies:
+These results are not very compelling, and the GPS L2 data will not be used in subsequent analysis.  Next, try the two Glonass frequencies:
 
 <CODE>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 101</code>
 
+<img src="tgho-glonass-l1.png" width="600"/>
+
 <code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 102</code>
 
-<img src="tgho-glonass-l1.png" width="500"/>
-
-<img src="tgho-glonass-l2.png" width="500"/>
+<img src="tgho-glonass-l2.png" width="600"/>
 
 
+The QC metrics from Glonass 101 are helpful for setting the azimuth mask:
+
+<img src=tgho-glonss-qc.png wdith=600/>
 
 ## Analyze the Data
 
 Begin by **make_json_input** to create a json file to set up analysis parameters. 
-Set the elevation and reflector heights as in **quickLook**.  An azimuth mask will be used in this analysis, 
-but will have to be manually edited in the json file.  The peak noise will also be set in this example.
+Set the elevation and reflector heights as in **quickLook**. The peak to noise ratio and required 
+amplitude can be set on the command line. 
 
-<code>make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3.2</code>
-
+<code>make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3.2 -ampl 9</code>
+ 
+[The azimuth mask was set by hand to exclude empty regions and azimiths with poor retrievals.](tgho.json)
 
 Then run **rnx2snr** for six months:
 

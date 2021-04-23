@@ -11,7 +11,7 @@
         2.0,
         8.0
     ],
-    "PkNoise": 3.2,
+    "PkNoise": 2.7,
     "polyV": 4,
     "pele": [
         5,
@@ -45,7 +45,7 @@
     "wantCompression": false,
     "plt_screen": false,
     "onesat": null,
-    "screenstats": true,
+    "screenstats": false,
     "pltname": "tgho_lsp.png",
     "delTmax": 75
 }
