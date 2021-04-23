@@ -24,6 +24,7 @@ find to be useful.
 <table>
 <TR>
 <TD>
+<B>Greenland/Antarctica</B>
 
 * [Lorne, Ross Ice Shelf, Antarctica](use_cases/use_lorg.md) (lorg)
 
@@ -31,9 +32,11 @@ find to be useful.
 
 * [Thwaites Glacier, Antarctica](use_cases/use_lthw.md) (lthw)
 
-* Summit Camp, Greenland (smm3)
+* [Summit Camp, Greenland](use_cases/use_smm3.md) (smm3)
+
 </TD>
 <td>
+<B>Lakes and Rivers</B>
 
 * [Michipicoten, Lake Superior, Canada](use_cases/use_mchn.md) (mchn)
 
@@ -43,7 +46,7 @@ find to be useful.
 </TD>
 
 <TD>
-Seasonal Snow Accumulation
+<B>Seasonal Snow Accumulation</B>
 
 * [Marshall, Colorado](use_cases/use_p041.md) (p041)
 

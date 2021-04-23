@@ -1,49 +1,56 @@
 ### Summit Camp, Greenland
 
-Station smm3 is operated by UNAVCO. The data are archived at UNAVCO. 
 
-If you are interested in interpreting the results for this site, you should 
-read [this paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf), which was published open option.
-smm3 was one of the sites highlighted in this paper.
+**Station Name:** smm3
 
-[You can use my webapp to get a sense of what the results for this site looks like. Please note that the app 
+**Location:** Summit Camp, Greenland
+
+**Archive:** [Geonet](https://www.geonet.org.nz/)
+
+**Ellipsoidal Coordinates:**
+
+Latitude: 72.573 degrees
+
+Longitude: -38.470 degrees
+
+Height: 3252.453 meters
+
+## Data Summary
+
+You can use my webapp to get a sense of what the results for this site looks like. Please note that the app 
 will be analyzing data in real-time, so please wait for the answers to "pop" up in the 
-left hand side of the page. It takes 5-10 seconds](https://gnss-reflections.org/fancy6?example=smm3).
+left hand side of the page. It takes about 10 seconds](https://gnss-reflections.org/fancy6?example=smm3).
 It also has a google map and photograph.
 
-**Coordinates:**
-You can try the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/SMM3.sta).
-Or use the ones on my web app. They are the same.
-
 Position time series for smm3 can easily be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3).
-Note that there is an antenna height blunder in the very early data for the site. It is trivial to find and remove.
+Note that there is an antenna height blunder in the very early data for the site. It is straight forward to find and remove.
 
-**This site has been optimally set up for positions and reflectometry.** This means there is no elevation 
-angle applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
-well as Glonass. I am not sure if it tracks Galileo - but you can try to find out by 
-inquiring with Dave Mencin at UNAVCO. 
-Unlike some of the earlier reflectometry demonstrations, the 
-L1 data from this receiver are great. How can you tell what signals are tracked at this receiver?
-Unfortunately I do not know how to find this information at the archive of record. Although 1 second
-data are available at smm3, they are not needed for daily average reflectometry described here.
+This site has been optimally set up for positions and reflectometry. This means there is no elevation 
+mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
+well as Glonass. 
 
-Start out by trying to reproduce the web app results. The year and day of year are in the 
-title of the periodogram plot. As are the elevation angle limits.
+## A Quick Look at the Data
 
-- First make the SNR file *rinex2snr smm3 2020 106*
+First make the SNR file:
 
-- Look at the results using default parameters: *quickLook smm3 2020 106*
+<code>rinex2snr smm3 2020 106 -orb gnss </code>
 
-<img src="smm3-default.png" width="500" />
+
+Then run **quickLook**:
+
+<code>quickLook smm3 2020 106</code>
+
+<img src="smm3-default.png" width="600" />
 
 Periodogram traces in gray means the code did not find a significant RH peak.  
 Why does this not look like the periodogram results from my web app? Look closely.
-smm3 is ~14 meters above the ice sheet - and this far exceeds the code default of 6 meters.
-You need to reset the allowed reflector heights. Modify your call to **quickLook**, using RH mask of 8-20 meters.  Also change the elevation angle mask to 5-15.
+On the web app smm3 is ~14 meters above the ice sheet - and this far exceeds the 
+defaults of 6 meters used in quickLook. You need to reset the allowed reflector heights. 
+Modify your call to **quickLook**, using RH mask of 8-20 meters. Also change the elevation angle mask to 5-15.
 
-- *quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15*
+- <code>quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15</code>
 
-<img src="smm3-sensible.png" width="500" />
+<img src="smm3-sensible.png" width="600" />
 
 Notice that instead of strong peaks center at a single RH value, 
 there is quite a bit of spread in the northwest and northeast quadrants. That is because the reflection 
@@ -66,21 +73,24 @@ the json since they are not in the RINEX files I am using. [Sample json](smm3.js
 
 Make daily SNR files:
 
-- *rinex2snr smm3 2018 180 -orb gnss -doy_end 365*
+<code>rinex2snr smm3 2018 180 -orb gnss -doy_end 365</code>
 
 Now analyze daily SNR files:
 
-- *gnssir smm3 2018 180 -doy_end 365 -screenstats False*
+<code>gnssir smm3 2018 180 -doy_end 365 </code>
 
 Compute daily average of these results:
 
-- *daily_avg smm3 0.25 50 -txtfile smm3_RH.txt*
+<code>daily_avg smm3 0.25 50 </code>
 
-<img src="smm3_RH.png" width="500" />
+<img src="smm3_RH.png" width="600" />
 
 Notice that the [daily average RH file](smm3_RH.txt) shows well over 150 measurements per day are being 
-used in the average.  So you could rerun the code to use a bigger value than 50.  Here the observations are so
+used in the average. So you could rerun the code to use a bigger value than 50. Here the observations are so
 robust it won't make a difference.
 
-- *daily_avg smm3 0.25 100 -txtfile smm3_RH.txt*
+<code>daily_avg smm3 0.25 100</code> 
 
+If you are interested in interpreting the results for this site, you should 
+read [this paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf), which was published open option.
+smm3 was one of the sites highlighted in this paper.
