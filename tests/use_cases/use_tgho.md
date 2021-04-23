@@ -22,7 +22,7 @@
 
 [Google Map Link](https://goo.gl/maps/1zmgi6rRHPVPDAfV8)
 
-<img src="https://gnss-reflections.org/static/images/TGHO.jpg" width="600">
+<img src="https://gnss-reflections.org/static/images/TGHO.jpg" width="400">
 
 ## Data Summary
 
@@ -65,7 +65,7 @@ These results are not very compelling, and the GPS L2 data will not be used in s
 
 The QC metrics from Glonass 101 are helpful for setting the azimuth mask:
 
-<img src=tgho-glonss-qc.png wdith=600/>
+<img src=tgho-glonss-qc.png width="600">
 
 ## Analyze the Data
 
