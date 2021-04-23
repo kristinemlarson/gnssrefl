@@ -89,7 +89,7 @@ def main():
 
     fs = 12
     fig,ax=plt.subplots()
-    plt.plot(obstimes, tv[:,2]/1000,'bo')
+    plt.plot(obstimes, tv[:,2]/1000,'b.')
     fig.autofmt_xdate()
     plt.ylabel('nobs/1000',fontsize=fs)
     plt.title('Observations for Station: ' + station,fontsize=fs)

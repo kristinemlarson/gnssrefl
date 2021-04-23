@@ -26,8 +26,9 @@
 
 ## Data Summary
 
-Station tgho is operated by Geonet (GNS) in New Zealand.  It is located 
-on a platform in Lake Taupo and currently records only standard GPS and Glonass signals.
+Station tgho is operated by GNS. It is located 
+on a platform in Lake Taupo. It records standard GPS and Glonass signals at a low sample rate (30 sec).
+The site could be significantly improved with a modern receiver that tracks new signals at a higher sample rate.
 
 ## Take a Quick Look at the Data
 
@@ -69,7 +70,7 @@ The QC metrics from Glonass 101 are helpful for setting the azimuth mask:
 
 ## Analyze the Data
 
-Begin by **make_json_input** to create a json file to set up analysis parameters. 
+Use **make_json_input** to set up the analysis parameters. 
 Set the elevation and reflector heights as in **quickLook**. The peak to noise ratio and required 
 amplitude can be set on the command line. 
 
