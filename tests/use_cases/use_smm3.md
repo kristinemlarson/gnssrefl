@@ -64,16 +64,22 @@ Notice that instead of strong peaks center at a single RH value,
 there is quite a bit of spread in the northwest and northeast quadrants. That is because the reflection 
 area is more complex (and maybe also reflecting off things that are not snow). 
 
+The QC metrics indicate that almost all azimuths produce "good" retrievals:
+
+<img src="smm3_qc.png" width="600" />
+
 Now let's try L2C:
 
 <img src="smm3_l2c.png" width="600" />
 
-What is going on here?
+There is definitely some interesting stuff going on with double peaks, but it has nothing
+to do with the snow surface. It is related to the L2C GPS signal structure and the receiver tracking algorithm.
+The good news is that the primary peak is at the right place (!). I would bet that 
+the location of the second peak is exactly 1.55/1.20 times the location of the first peak.
 
-and now L5:
+Now L5 data:
 
 <img src="smm3_l5.png" width="600" />
-
 
 ### Steps for Longer Analysis: 
 
@@ -88,11 +94,11 @@ zones quite large - I only opted to only use data from 5-15 degree elevation ang
 in the periodogram larger. I also removed the Galileo signals from the json since they are not 
 in the RINEX files I am using. [Sample json](smm3.json)
 
-Then make SNR files:
+Then make SNR files for ~6 months:
 
 <code>rinex2snr smm3 2018 180 -orb gnss -doy_end 365</code>
 
-Run **gnssir**:
+Estimate reflector height:
 
 <code>gnssir smm3 2018 180 -doy_end 365 </code>
 
@@ -106,6 +112,5 @@ Notice that the [daily average RH file](smm3_RH.txt) shows well over 150 measure
 used in the average. So you could rerun the code to use a bigger value than 50. Here the observations are so
 robust it won't make a difference.
 
-If you are interested in interpreting the results for this site, you should 
-read [this paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf), which was published open option.
+How should you interpret these results?  Please read [this paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
 smm3 was one of the sites highlighted in this paper.
