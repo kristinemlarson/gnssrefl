@@ -68,15 +68,18 @@ The QC metrics from Glonass 101 are helpful for setting the azimuth mask:
 
 <img src=tgho-glonss-qc.png width="600">
 
+We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 and a peak to noise ratio of 3.0.
+
 ## Analyze the Data
 
 Use **make_json_input** to set up the analysis parameters. 
 Set the elevation and reflector heights as in **quickLook**. The peak to noise ratio and required 
 amplitude can be set on the command line. 
 
-<code>make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3.2 -ampl 9</code>
+<code>make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9</code>
  
-[The azimuth mask was set by hand to exclude empty regions and azimiths with poor retrievals. Glonass signals were added and GPS L2/L5 were removed.](tgho.json)
+The azimuth mask was set by hand to exclude empty regions and azimiths with poor retrievals. 
+Glonass signals (frequencies 101 and 102) were added and GPS L2/L5 were removed.[Sample json](tgho.json)
 
 Then run **rnx2snr** for ~six months:
 
@@ -108,6 +111,9 @@ Finally, the average RH plot:
 
 <img src="tgho-rhavg.png" width="600">
 
+[Sample RH file](tgho_dailyRH.txt)
+
 Although Taupo is in a volcanic caldera, lake levels are determined by seasonal processes such 
 as evaporation, precipitation, input from local drainages, and outflow. The Waikoto 
 River is sole river draining the lake, and river flow is regulated by a series of hydroelectric dams.
+
