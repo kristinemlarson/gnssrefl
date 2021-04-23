@@ -9,27 +9,34 @@
 
 **Ellipsoidal Coordinates:**
 
-Latitude: 72.573 degrees
+- Latitude: 72.573 degrees
 
-Longitude: -38.470 degrees
+- Longitude: -38.470 degrees
 
-Height: 3252.453 meters
+- Height: 3252.453 meters
+
+[Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/SMM3)
+
+[Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/SMM3.sta)
 
 ## Data Summary
+
+
+This site has been optimally set up for positions and reflectometry. This means there is no elevation 
+mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
+well as Glonass. You can see that it is NOT the typical 2-meter monument.
+
+<img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
+
+Position time series for smm3 can easily be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3).
+Note that there is an antenna height blunder in the very early data for the site. It is straight forward to find and remove.
 
 You can use my webapp to get a sense of what the results for this site looks like. Please note that the app 
 will be analyzing data in real-time, so please wait for the answers to "pop" up in the 
 left hand side of the page. It takes about 10 seconds](https://gnss-reflections.org/api?example=smm3).
 It also has a google map and photograph.
 
-Position time series for smm3 can easily be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3).
-Note that there is an antenna height blunder in the very early data for the site. It is straight forward to find and remove.
-
-This site has been optimally set up for positions and reflectometry. This means there is no elevation 
-mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
-well as Glonass. 
-
-<img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
+Sadly, as of this writing (April 2021), this site is dead. It could be the receiver works but the telemetryis down.
 
 ## A Quick Look at the Data
 
@@ -51,11 +58,22 @@ Modify your call to **quickLook**, using RH mask of 8-20 meters. Also change the
 
 <code>quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15</code>
 
-<img src="smm3-sensible.png" width="600" />
+<img src="smm3_l1.png" width="600" />
 
 Notice that instead of strong peaks center at a single RH value, 
 there is quite a bit of spread in the northwest and northeast quadrants. That is because the reflection 
 area is more complex (and maybe also reflecting off things that are not snow). 
+
+Now let's try L2C:
+
+<img src="smm3_l2c.png" width="600" />
+
+What is going on here?
+
+and now L5:
+
+<img src="smm3_l5.png" width="600" />
+
 
 ### Steps for Longer Analysis: 
 
