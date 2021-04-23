@@ -26,7 +26,9 @@ This site has been optimally set up for positions and reflectometry. This means 
 mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
 well as Glonass. You can see that it is NOT the typical 2-meter monument.
 
+<center>
 <img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
+</center>
 
 Position time series for smm3 can easily be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3).
 Note that there is an antenna height blunder in the very early data for the site. It is straight forward to find and remove.
@@ -64,7 +66,9 @@ Notice that instead of strong peaks center at a single RH value,
 there is quite a bit of spread in the northwest and northeast quadrants. That is because the reflection 
 area is more complex (and maybe also reflecting off things that are not snow). 
 
-The QC metrics indicate that almost all azimuths produce "good" retrievals:
+The QC metrics indicate that almost all azimuths produce "good" retrievals, but certainly the northern quadrants 
+have much smaller amplitudes and peak to noise ratios (middle and bottom panel). At this particular site, we 
+will use an azimuth mask recommended by the science team working at Summit Camp.
 
 <img src="smm3_qc.png" width="600" />
 
