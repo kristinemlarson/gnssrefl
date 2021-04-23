@@ -43,21 +43,6 @@ find to be useful.
 
 * [St Lawrence River, Montreal, Canada](use_cases/pmtl_use.md) (pmtl)
 
-* Steenbras Reservoir, Republic of South Africa (sbas)
-
-</TD>
-<TH>Tides and Storm Surges</TH>
-<TD>
-
-* Hurricane Laura (calc)
-
-* St Michael, Alaska (at01)
-
-* Palmer Station, Antarctica (pal2)
-
-</TD>
-</TR>
-
 <TR>
 <TH>Seasonal Snow Accumulation</TH>
 <TD>
@@ -68,20 +53,10 @@ find to be useful.
 
 * [Half Island Park, Idaho](use_cases/use_p360) (p360)
 
-* Coldfoot, Alaska (ab33)
-
-* Priddis, Alberta, Canada (prds)
 
 </TD>
-<TH>Soil Moisture</TH>
-
-<TD>
-
-* TBD
-
-</TD>
-
 </TR>
 </Table>
 
-
+The gnssrefl code can be used now for tides, but use cases are still under development.
+Our code does not currently support soil moisture applications.
