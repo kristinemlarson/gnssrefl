@@ -23,8 +23,8 @@ find to be useful.
 
 <table>
 <TR>
-<TH>Antarctica and Greenland</TH>
 <TD>
+<TH>Antarctica and Greenland</TH>
 
 * [Lorne, Ross Ice Shelf, Antarctica](use_cases/use_lorg.md) (lorg)
 
@@ -34,8 +34,8 @@ find to be useful.
 
 * Summit Camp, Greenland (smm3)
 </TD>
-<TH>Lakes and Rivers</TH>
 <td>
+<TH>Lakes and Rivers</TH>
 
 * [Michipicoten, Lake Superior, Canada](use_cases/use_mchn.md) (mchn)
 
