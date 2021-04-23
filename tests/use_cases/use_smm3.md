@@ -3,9 +3,9 @@
 
 **Station Name:** smm3
 
-**Location:** Summit Camp, Greenland
+**Location:** Dye2 
 
-**Archive:** [Geonet](https://www.geonet.org.nz/)
+**Archive:** UNAVCO 
 
 **Ellipsoidal Coordinates:**
 
@@ -19,7 +19,7 @@ Height: 3252.453 meters
 
 You can use my webapp to get a sense of what the results for this site looks like. Please note that the app 
 will be analyzing data in real-time, so please wait for the answers to "pop" up in the 
-left hand side of the page. It takes about 10 seconds](https://gnss-reflections.org/fancy6?example=smm3).
+left hand side of the page. It takes about 10 seconds](https://gnss-reflections.org/api?example=smm3).
 It also has a google map and photograph.
 
 Position time series for smm3 can easily be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3).
@@ -29,9 +29,11 @@ This site has been optimally set up for positions and reflectometry. This means 
 mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
 well as Glonass. 
 
+<img src="https://gnss-reflections.org/static/files/SMM3.jpg" width=400>
+
 ## A Quick Look at the Data
 
-First make the SNR file:
+First make a multi-GNSS SNR file:
 
 <code>rinex2snr smm3 2020 106 -orb gnss </code>
 
@@ -42,13 +44,12 @@ Then run **quickLook**:
 
 <img src="smm3-default.png" width="600" />
 
-Periodogram traces in gray means the code did not find a significant RH peak.  
 Why does this not look like the periodogram results from my web app? Look closely.
 On the web app smm3 is ~14 meters above the ice sheet - and this far exceeds the 
 defaults of 6 meters used in quickLook. You need to reset the allowed reflector heights. 
 Modify your call to **quickLook**, using RH mask of 8-20 meters. Also change the elevation angle mask to 5-15.
 
-- <code>quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15</code>
+<code>quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15</code>
 
 <img src="smm3-sensible.png" width="600" />
 
@@ -58,24 +59,22 @@ area is more complex (and maybe also reflecting off things that are not snow).
 
 ### Steps for Longer Analysis: 
 
-Use **make_json_input** but set -allfreq True and -peak2noise 3.5
+Use **make_json_input** to set your analysis inputs. Instead of the defaults, set the special height and 
+elevation angles, allfreq to True, peak to noise ratio to 3.5, and minimum amplitude to 15:
 
-I had to do some hand-editing to the json file. For example, I set the allowed azimuths:
+<code>make_json_input smm3 72.573 -38.470  3252.453 -peak2noise 3.5 -allfreq True  -ampl 15 -e1 5 -e2 15 -h1 8 -h2 20</code>
 
-- 70-180
-- 180-270
-
-These azimuths are the "quiet" areas for making scientific measurements Summit Camp. To keep the reflection 
+The azimuth mask had to be hand-edited. These azimuths are the "quiet" areas for making scientific 
+measurements at Summit Camp. To keep the reflection 
 zones quite large - I only opted to only use data from 5-15 degree elevation angles. This will make the amplitudes of the peaks 
-in the periodogram larger, so I also set the required amplitude to 15. I also removed the Galileo signals from
-the json since they are not in the RINEX files I am using. [Sample json](smm3.json)
+in the periodogram larger. I also removed the Galileo signals from the json since they are not 
+in the RINEX files I am using. [Sample json](smm3.json)
 
-
-Make daily SNR files:
+Then make SNR files:
 
 <code>rinex2snr smm3 2018 180 -orb gnss -doy_end 365</code>
 
-Now analyze daily SNR files:
+Run **gnssir**:
 
 <code>gnssir smm3 2018 180 -doy_end 365 </code>
 
@@ -88,8 +87,6 @@ Compute daily average of these results:
 Notice that the [daily average RH file](smm3_RH.txt) shows well over 150 measurements per day are being 
 used in the average. So you could rerun the code to use a bigger value than 50. Here the observations are so
 robust it won't make a difference.
-
-<code>daily_avg smm3 0.25 100</code> 
 
 If you are interested in interpreting the results for this site, you should 
 read [this paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf), which was published open option.
