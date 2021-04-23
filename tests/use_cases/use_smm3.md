@@ -29,7 +29,7 @@ This site has been optimally set up for positions and reflectometry. This means 
 mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
 well as Glonass. 
 
-<img src="https://gnss-reflections.org/static/files/SMM3.jpg" width=400>
+<img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
 
 ## A Quick Look at the Data
 
