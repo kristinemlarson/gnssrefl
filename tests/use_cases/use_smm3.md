@@ -3,7 +3,7 @@
 
 **Station Name:** smm3
 
-**Location:** Dye2 
+**Location:** central Greenland
 
 **Archive:** UNAVCO 
 
