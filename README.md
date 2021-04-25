@@ -415,6 +415,7 @@ In general, L2C results are always superior to L1 results. If you had set -h2 20
 look [like this](tests/use_cases/p041-l2c-again.png). You aren't gaining anything by doing this.
 
 <HR>
+
 Lets look at two days of data collected on the Greenland Ice Sheet. 
 You already have one file. Now make one three years later.
 <P>
@@ -460,6 +461,7 @@ Why is the northwest quadrant so messy? I leave that as an exercise for the read
 to examine this site on Google Earth.
 
 <HR>
+
 ### gnssir <a name="module3"></a>
 
 This is the main driver for the GNSS-IR code.  
