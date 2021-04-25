@@ -80,6 +80,8 @@ photographs. If you can't find photographs, use Google Earth.  You can also try 
 my [google maps web app interface](https://gnss-reflections.org/geoid?station=smm3).
 
 
+<HR>
+
 ### Code Description<a name="code"></a>
 
 **gnssrefl** is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
@@ -140,6 +142,7 @@ rising and setting satellite arcs and estimates RH.
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
 </center>
 
+<HR>
 ### Installing the Code<a name="environment"></a>
 
 *Environment Variables*
@@ -424,14 +427,8 @@ Now run quickLook, focusing on the QC plots:
 <CODE>quickLook gls1 2014 271</CODE> 
 
 
-<TABLE>
-<TR>
 <img src="tests/use_cases/gls1-2011.png">
-</TR>
-<TR>
-<img src="tests/use_cases/gls2-2014.png">
-</TR>
-</TABLE>
+<img src="tests/use_cases/gls1-2014.png">
 
 <P>
 <HR>
@@ -462,6 +459,7 @@ You now see what you expect to see - peaks of periodograms at ~16 meters height.
 Why is the northwest quadrant so messy? I leave that as an exercise for the reader. Hint: start out by trying
 to examine this site on Google Earth.
 
+<HR>
 ### gnssir <a name="module3"></a>
 
 This is the main driver for the GNSS-IR code.  
