@@ -421,15 +421,20 @@ You already have one file. Now make one three years later.
 <P>
 <code>rinex2snr gls1 2014 271</CODE>
 
-Now run quickLook, focusing on the QC plots:
+Now run quickLook, <CODE>quickLook gls1 2011 271</CODE> focusing on the QC plots:
 
-<CODE>quickLook gls1 2011 271</CODE> 
-
-<CODE>quickLook gls1 2014 271</CODE> 
-
+We see a broad region for the southern azimuths (90-270) that give consistently good reflector height retrievals of 
+about 3 meters.
 
 <img src="tests/use_cases/gls1-2011.png">
+
+Three years later, <CODE>quickLook gls1 2014 271</CODE>, we find similar behavior:
+
 <img src="tests/use_cases/gls1-2014.png">
+
+Now the reflector height retrievals are just below 2 meters. At this site, that means there has been about two meters of snow accumulation in three years. [Please see our use case for an in depth study of this site in 2012](tests/use_cases/use_gls1.md).
+The defaults used in quickLook appear to be doing a good job, 8 for the minimum amplitude and 3 for the required peak 
+to noise ratio.
 
 <P>
 <HR>
