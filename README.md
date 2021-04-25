@@ -76,7 +76,8 @@ above the reflection area, and the software default only computes answers up to 
 the code will not tell you anything useful. It is up to you to know what is best for the site and 
 modify the inputs accordingly. 
 I encourage you to get to know your site. If it belongs to you, look at 
-photographs. If you can't find photographs, use Google Earth. 
+photographs. If you can't find photographs, use Google Earth.  You can also try using
+my [google maps web app interface](https://gnss-reflections.org/geoid?station=smm3).
 
 
 ### Code Description<a name="code"></a>
@@ -321,7 +322,11 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - jax : JAXA, GPS + Glonass, within a few days, very reliable
 - gbm : GFZ Potsdam, multi-GNSS, not rapid
 - grg: French group, GPS, Galileo and Glonass, not rapid
-- wum : Wuhan, multi-GNSS, not rapid
+- wum : (disabled) Wuhan, multi-GNSS, not rapid
+
+It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beidou. Based 
+on my experience with GPS, I know that this will be much much much faster if we use Fortran
+code and bind with python using numpy. If you have such code, or know where it lives, please let me know.
 
 Other questions:
 
@@ -406,19 +411,34 @@ If you want to look at L2C data:
 In general, L2C results are always superior to L1 results. If you had set -h2 20, it would
 look [like this](tests/use_cases/p041-l2c-again.png). You aren't gaining anything by doing this.
 
-Now look at the Greenland SNR file you created in the previous section.
+<HR>
+Lets look at two days of data collected on the Greenland Ice Sheet. 
+You already have one file. Now make one three years later.
+<P>
+<code>rinex2snr gls1 2014 271</CODE>
+
+Now run quickLook, focusing on the QC plots:
 
 <CODE>quickLook gls1 2011 271</CODE> 
 
-The periodogram peaks bunch up at a larger value:
+<CODE>quickLook gls1 2014 271</CODE> 
 
-<img src="tests/use_cases/gls1-example.png" width=600>
 
-which just means the antenna was further from the planar reflector, which in this case is ice.
+<TABLE>
+<TR>
+<img src="tests/use_cases/gls1-gls1.png">
+</TR>
+<TR>
+<img src="tests/use_cases/gls2-gls1.png">
+</TR>
+</TABLE>
+
+<P>
+<HR>
+<P>
 Finally, what do you do if your reflections site is taller than the default value of 6 meters?
-Does the code figure this out for you automatically? **No, it does not.**
-
-A short example with data from Greenland. First make a SNR file using the defaults: 
+Does the code figure this out for you automatically? **No, it does not.** We use an example 
+from Greenland to demonstrate this issue. First make a SNR file using the defaults: 
 
 <CODE>rinex2snr smm3 2018 271</CODE>
 
@@ -498,7 +518,9 @@ You then take the peak value (here ~17) and divide by the "noise" value.
 For the ocean, I generally recommend starting with a peak to noise ratio of 2.7, but for lakes or snow, I use 
 3.2-3.5 or so. It can be tricky to set these QC values in general. 
 
+<center>
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
+</center>
 
 Things that are helpful to know for the make_json_input inputs:
 

@@ -1,25 +1,4 @@
-### Some Use Cases to Help You Test Out gnssrefl
-
-This document provides some use cases for GNSS interferometric reflectometry. 
-The goal is to provide you with tests to make sure you have properly installed the code. For details about the technique, 
-you should start with reading [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
-which was published open option.  
-
-### Install the gnssrefl code 
-
-* Make sure **wget** exists on your machine.  If you type *which wget* and something comes back, you should be good.
-
-* Read the [gnssrefl documentation](https://github.com/kristinemlarson/gnssrefl). 
-Note that there are some utilities described at the end of the code that you might
-find to be useful.
-
-* Install either the github or the pypi version of gnssrefl
-
-* Make the requested environment variables. 
-
-* Put CRX2RNX in the EXE area. Make sure it is executable
-
-### Use Cases 
+### gnssrefl Use Cases 
 
 <table>
 <TR>
@@ -58,5 +37,19 @@ find to be useful.
 </TR>
 </Table>
 
-The gnssrefl code can be used now for tides, but use cases are still under development.
+The gnssrefl code can also be used for tides, but use cases are still under development. 
 Our code does not currently support soil moisture applications.
+For more details about the technique, please see [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
+<P>
+### Summary Guide for Installation 
+
+* Make sure **wget** exists on your machine.  If you type *which wget* and something comes back, you should be good.
+
+* Follow the [documentation guidelines](https://github.com/kristinemlarson/gnssrefl). 
+
+* Install either the github or the pypi version of gnssrefl
+
+* Make the requested environment variables. 
+
+* Put CRX2RNX in the EXE area. Make sure it is executable
+

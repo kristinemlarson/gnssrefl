@@ -256,7 +256,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         if pltscreen:
             plt.suptitle(tt, fontsize=FS)
             # sure - throw in another plot
-            goodbad(quicklog,station,minH,maxH,PkNoise,reqAmp,f)
+            goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f)
             plt.show()
           
     else: 
@@ -268,7 +268,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     # 21mar26 added a key
     return data,datakey
 
-def goodbad(fname,station,h1,h2,PkNoise,reqAmp,freq):
+def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq):
     """
     simple visualizer of "good" and "bad" azimuths
     input is a filename, the station name, and the min and max RH
@@ -291,7 +291,8 @@ def goodbad(fname,station,h1,h2,PkNoise,reqAmp,freq):
     plt.subplot(3,1,1)
     plt.plot(a[ij,0], a[ij,1], 'o',color='blue',label='good')
     plt.plot(a[ik,0], a[ik,1], 'o',color='gray', label='bad')
-    plt.title('quickLook Retrieval Metrics: ' + station + ' ' + g.ftitle(freq),fontsize=fs)
+    ydoy = ' ' + str(year) + '/' + str(doy) + ' '
+    plt.title('quickLook Retrieval Metrics: ' + station + ydoy + g.ftitle(freq),fontsize=fs)
     plt.legend(loc="upper right")
     plt.ylabel('Refl. Ht. (m)',fontsize=fs)
     plt.grid()
