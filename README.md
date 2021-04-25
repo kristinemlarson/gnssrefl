@@ -426,10 +426,10 @@ Now run quickLook, focusing on the QC plots:
 
 <TABLE>
 <TR>
-<img src="tests/use_cases/gls1-gls1.png">
+<img src="tests/use_cases/gls1-2011.png">
 </TR>
 <TR>
-<img src="tests/use_cases/gls2-gls1.png">
+<img src="tests/use_cases/gls2-2014.png">
 </TR>
 </TABLE>
 
