@@ -6,8 +6,6 @@ Station pmtl is operated by the Montreal Port Authority. The data are archived a
 
 Because I need to use high-rate data at this site, you need to have installed **teqc**.
 See the [main documentation for more information](https://github.com/kristinemlarson/gnssrefl).
-I also urge you to install the **gnssSNR** Fortran code, as it is MUCH faster 
-than my python-only RINEX reader/orbit interpolator.
 
 GPS L1, Glonass L1 and L2 can be used at this site. Tracking L2C, L5, Galileo, and Beidou signals 
 would significantly improve the site.

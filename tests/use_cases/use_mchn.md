@@ -54,7 +54,7 @@ Use **quickLook** to examine the spectral characteristics of the SNR data for th
 
 <code>quickLook mchn 2019 205</code>
 
-<img src="mchn-example.png" width="500">
+<img src="mchn-example.png" width="600">
 
 Why does this not look like the results from the web app? Look closely at the station photo and the x-axis 
 of the periodograms, then change the range of reflector heights at the command line for **quickLook**:
