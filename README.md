@@ -52,8 +52,7 @@ site (i.e. not super tall, < 5 meters). If you have previously used this package
 note these changes to **rinex2snr**, **quickLook**, and **gnssir**.
 Optional commandline inputs are still allowed.
 
-How can you learn how to run this code correctly? You should start by reading
-[Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
+I encourage you to read [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
 Although this article was originally written to accompany Matlab scripts,
 the principles are the same. It explains to you what a reflection
 zone means and what a Nyquist frequency is for GNSS reflections. 
