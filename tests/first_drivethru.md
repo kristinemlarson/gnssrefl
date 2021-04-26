@@ -46,11 +46,9 @@ For more details about the technique, please see [Roesler and Larson, 2018](http
 
 * Make sure **wget** exists on your machine.  If you type *which wget* and something comes back, you should be good.
 
-* Follow the [documentation guidelines](https://github.com/kristinemlarson/gnssrefl/README.md). 
+* Install the [github version of gnssrefl](https://github.com/kristinemlarson/gnssrefl). Follow the documentation guidelines. 
 
-* Install the [github version of gnssrefl](https://github.com/kristinemlarson/gnssrefl)
+* Make the requested environment variables.
 
-* Make the requested environment variables (see documentation)
-
-* Download the Hatanaka translator, CRX2RNX, and put it in the EXE area. Make sure it is executable
+* Download the Hatanaka translator, CRX2RNX, and put it in the EXE area. Make sure it is executable.
 
