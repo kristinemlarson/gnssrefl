@@ -6,14 +6,14 @@
 2. [Philosophy](#philosophy)
 3. [Code Description](#code)
     1. [Installation](#environment)
-    2. [rinex2snr: translating RINEX files into SNR files](#module1)
-    3. [quickLook: assessing a site using SNR files](#module2)
-    4. [gnssir: estimating reflector heights from SNR data](#module3)
-4. [File Formats](#fileformats)
-5. [Bugs/Future Work](#bugs)
-6. [Utilities](#helper)
-7. [Publications](#publications)
-8. [Acknowledgements](#acknowledgements)
+    2. [RINEX File Formats](#fileformats)
+    3. [rinex2snr: translating RINEX files into SNR files](#module1)
+    4. [quickLook: assessing a site using SNR files](#module2)
+    5. [gnssir: estimating reflector heights from SNR data](#module3)
+4. [Bugs/Future Work](#bugs)
+5. [Utilities](#helper)
+6. [Publications](#publications)
+7. [Acknowledgements](#acknowledgements)
 
 ### News <a name="news"></a>
 
@@ -200,7 +200,7 @@ bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.h
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
 
 
-### File Formats <a name="fileformats"></a>
+### RINEX File Formats <a name="fileformats"></a>
 
 (under construction)
 
@@ -209,6 +209,8 @@ RINEX files must be version 2.11 or 3.
 For RINEX 2.11, filenames should be lowercase and following the community standard: 
 
 4 character station name + day of year (3 characters) + '0.' + two character year  + 'o'
+
+Example: at010050.12o is station at01 on day 5 and year 2012.
 
 In many cases Hatanaka compressed formats are used by data archives. These have a 
 'd' instead an 'o' at the end of the filename.
@@ -249,7 +251,12 @@ A sample call for a station called p041, restricted to GPS satellites, on day of
 
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
 it will check three archives (unavco, sopac, and sonel) to find it. 
-This uses the hybrid translator.  If you did install a fortran translator, the command would be:
+This uses the hybrid translator.  
+
+
+**Examples for different translators:**
+
+For a fortran translator, the command would be:
 
 <code>rinex2snr p041 2020 132 -translator fortran</code>
 
@@ -258,11 +265,11 @@ For python:
 <code>rinex2snr p041 2020 132 -translator python</CODE>
 
 
-Here is an example from a site in Greenland (the RINEX file will be picked up from unavco):
+Using hybrid (the default): 
 
 <code>rinex2snr gls1 2011 271</code>
 
-Allowed GNSS Data Archives:
+**Allowed GNSS Data Archives:**
 
 - unavco
 - sonel (global sea level observing system)
@@ -271,9 +278,11 @@ Allowed GNSS Data Archives:
 - ngs (National Geodetic Survey)
 - nrcan (Natural Resources Canada)
 - bkg (German Agency for Cartography and Geodesy)
-- nz (GNS New Zealand)
+- nz (GNS, New Zealand)
 - ga (Geoscience Australia)
 - bev (Austria Federal Office of Metrology and Surveying)
+
+**Example setting archive:**
 
 <code>rinex2snr tgho 2020 132 -archive nz</code>
 
@@ -311,6 +320,8 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - 88 is elevation angles of 5-90 degrees
 - 50 is elevation angles less than 10 degrees (good for very tall sites, high-rate applications)
 
+**More rinex2snr options:**
+
 *orbit file options for general users:*
 
 - gps : will use GPS broadcast orbits (**this is the default**)
@@ -346,7 +357,7 @@ highrate GNSS RINEX file (even when it is compressed).
 And it also takes a long time to compute orbits for it (and thus create a SNR file).
 For high-rate data, you should use hybrid or fortran translators.
 
-*SNR file format*
+**Output SNR file format**
 
 To columns are defined as:
 
@@ -374,17 +385,15 @@ The required inputs are station name, year, and doy of year. **You must have pre
 In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**
 If your site is taller than that, you will need to override the defaults.
 Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
-you don't want to use, you need to override them.
+you don't want to use, you need to override them.  For more information, use <code>quickLook -h</CODE>
 
-For more information, use <code>quickLook -h</CODE>
-
-Going back to our **rinex2snr** example, try running the data for station p041.
+Going back to our **rinex2snr** example, try using the data for station p041.
 
 <code>quickLook p041 2020 132 </CODE>
 
 That command will produce this periodogram summary:
 
-<img src="tests/use_cases/p041-l1.png" width=500>
+<img src="tests/use_cases/p041-l1.png" width=600>
 
 By default, these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
 you have used the defaults. Furthermore, note that results on the x-axis begin at 0.5 meters.
@@ -405,7 +414,8 @@ Below are the peak to noise ratios. The last plot is the amplitude of the spectr
 lines show you what QC metrics quickLook was using. You can control/change these on the command line
 (quickLook -h).
 
-If you want to look at L2C data: 
+If you want to look at L2C data you just change the frequency on the command line. L2C is designated by 
+frequency 20: 
 
 <CODE>quickLook p041 2020 132 -fr 20</CODE>
 
@@ -418,7 +428,7 @@ look [like this](tests/use_cases/p041-l2c-again.png). You aren't gaining anythin
 
 Lets look at two days of data collected on the Greenland Ice Sheet. 
 You already have one file. Now make one three years later.
-<P>
+
 <code>rinex2snr gls1 2014 271</CODE>
 
 Now run quickLook, <CODE>quickLook gls1 2011 271</CODE> focusing on the QC plots:
@@ -436,9 +446,8 @@ Now the reflector height retrievals are just below 2 meters. At this site, that 
 The defaults used in quickLook appear to be doing a good job, 8 for the minimum amplitude and 3 for the required peak 
 to noise ratio.
 
-<P>
 <HR>
-<P>
+
 Finally, what do you do if your reflections site is taller than the default value of 6 meters?
 Does the code figure this out for you automatically? **No, it does not.** We use an example 
 from Greenland to demonstrate this issue. First make a SNR file using the defaults: 
@@ -454,14 +463,14 @@ Now run **quickLook** using the defaults:
 Everything is gray (which means it didn't find a significant reflector) because you 
 only calculated periodograms for reflector height values of 0.5 to 6 meters. You see some things
 that might be significant at small RH, but this is just the effect of the antenna gain pattern. 
-This site is ~16 meters above the ice. Accordingly, if you change the inputs to tell the program
+This site is ~ 14 meters above the ice. Accordingly, if you change the inputs to tell the program
 that you want to examine reflector heights between 8 and 20 meters, i.e. 
 
 <CODE>quickLook smm3 2018 271 -h1 8 -h2 20</CODE>
 
 <img src="tests/use_cases/smm3-sensible.png" width=600>
 
-You now see what you expect to see - peaks of periodograms at ~16 meters height. 
+You now see what you expect to see - peaks of periodograms at ~14 meters height. 
 Why is the northwest quadrant so messy? I leave that as an exercise for the reader. Hint: start out by trying
 to examine this site on Google Earth.
 
@@ -581,9 +590,12 @@ This is a snippet of what the result file would look like
 - *Amp* is the amplitude of the most significant peak in the periodogram (i.e. the amplitude for the RH you estimated).  
 - *DelT* is how long a given rising or setting satellite arc was, in minutes. 
 - *emin0* and *emax0* are the min and max observed elevation angles in the arc.
-- *rise/set* tells you wehther the satellite arc was rising or setting
+- *rise/set* tells you whether the satellite arc was rising (1) or setting (-1)
 - *Azim* is the average azimuth angle of the satellite arc
 - *sat* and *freq* are as defined in this document
+- MJD is modified julian date
+- PkNoise is the peak to noise ratio of the periodogram values
+- last column is currently set to tell you whether the refration correction has been applied (1)
 
 If you want a multi-GNSS solution, you need to make a new json file and 
 use multi-GNSS orbits, and use a RINEX file that has multi-GNSS SNR observations in it. 
@@ -592,7 +604,7 @@ In this case, we will look at Galileo L1.
 
 <CODE>make_json_input p041 39.949 -105.194 1728.856 -allfreq True</CODE>
 
-<CODE>rinex2snr p041 2020 151 -orb gnss</CODE>
+<CODE>rinex2snr p041 2020 151 -orb gnss -overwrite True</CODE>
 
 <CODE>gnssir p041 2020 151 -fr 201 -plt True</CODE> 
 
