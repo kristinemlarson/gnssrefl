@@ -143,6 +143,7 @@ rising and setting satellite arcs and estimates RH.
 </center>
 
 <HR>
+
 ### Installing the Code<a name="environment"></a>
 
 *Environment Variables*
@@ -199,6 +200,7 @@ bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.h
 * Optional datatool, **gfzrnx** is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
 
+<HR>
 
 ### RINEX File Formats <a name="fileformats"></a>
 
@@ -292,21 +294,16 @@ What if you want to run the code for all the data for any year?  You can use doy
  
 If your station name has 9 characters (lower case please), the code assumes you are looking for a 
 RINEX 3 file. However, my code will store the SNR data using the normal
-4 character name. **You must install the gfzrnx executable that translates RINEX 3 to 2 to use RINEX 3 files
-in my code.** *rinex2snr* currently only looks for 
-RINEX 3 files at CDDIS (30 sec) and UNAVCO (15 sec).  There 
-are more archive options in **download_rinex** and someday I will 
-merge these. If you do have your own RINEX 3
-files, I use the community standard, that is upper case except 
-for the file extension (which is rnx).  I know, it is weird.
+4 character name. *You must install the gfzrnx executable that translates RINEX 3 to 2 to use RINEX 3 files
+in my code.* *rinex2snr* currently only looks for RINEX 3 files at CDDIS (30 sec) and UNAVCO (15 sec).  There 
+are more archive options in **download_rinex** and someday I will merge these. If you do have your own RINEX 3
+files, I use the community standard, that is upper case except for the file extension (which is rnx).  
 
 Here are some examples for RINEX 3 conversions:
 
 <code>rinex2snr onsa00swe 2020 298</code>
 
 <code>rinex2snr at0100usa 2020 55</code>
-
-<code>rinex2snr mdo100usa 2020 290</code>
 
 <code>rinex2snr mkea00usa 2020 290</code>
 
@@ -423,6 +420,14 @@ frequency 20:
 
 In general, L2C results are always superior to L1 results. If you had set -h2 20, it would
 look [like this](tests/use_cases/p041-l2c-again.png). You aren't gaining anything by doing this.
+
+
+*Our names for the GNSS frequencies*
+
+- 1,2,20, and 5 are GPS L1, L2, L2C, and L5
+- 101,102 Glonass L1 and L2
+- 201, 205, 206, 207, 208: Galileo frequencies
+- 302, 306, 307 : Beidou frequencies
 
 <HR>
 
