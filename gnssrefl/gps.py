@@ -3670,8 +3670,19 @@ def rinex_nrcan_highrate(station, year, month, day):
         d = doy2ymd(year,doy);
         month = d.month; day = d.day
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    gns = 'ftp://rtopsdata1.geod.nrcan.gc.ca/gps/data/hrdata/' +cyy + cdoy + '/' + cyy + 'd/'
+    # NRCAN moving to new server names,
+    #  cacsa.nrcan.gc.ca and cacsb.nrcan.gc.ca
+    #gns = 'ftp://rtopsdata1.geod.nrcan.gc.ca/gps/data/hrdata/' +cyy + cdoy + '/' + cyy + 'd/'
+    gns = 'ftp://cacsa.nrcan.gc.ca/gps/data/hrdata/' +cyy + cdoy + '/' + cyy + 'd/'
 
+    # no point downloading data if the teqc code is not there
+    if not os.path.isfile(teqcpath):
+        print('FATAL WARNING: You need to install teqc to use gnssrefl with highrate RINEX data from NRCAN.')
+        return
+
+
+    foundFile = 0
+    print('WARNING: downloading highrate RINEX data is a slow process')
     for h in range(0,24):
         # subdirectory
         ch = '{:02d}'.format(h)
@@ -3680,19 +3691,27 @@ def rinex_nrcan_highrate(station, year, month, day):
             dname1 = station + cdoy + alpha[h] + e + '.' + cyy + 'd'
             dname2 = station + cdoy + alpha[h] + e + '.' + cyy + 'o'
             url = gns +  ch + '/' + dname
-            print(url)
             try:
                 wget.download(url,dname)
                 subprocess.call(['uncompress',dname])
                 subprocess.call([crnxpath, dname1])
                 subprocess.call(['rm',dname1])
+                foundFile = foundFile + 1
             except:
-                print('download failed for some reason')
+                okok = 1
+                #print('download failed for some reason')
 
-    if os.path.isfile(teqcpath):
+    print('found ', foundFile ,' files')
+#direc = '.'
+#all_files = os.listdir(direc)
+#for f in all_files:
+#    if (f[0:7] == station + cdoy):
+#        print('found one', f)
+
+    if os.path.isfile(teqcpath) and (foundFile > 0):
         foutname = 'tmp.' + station + cdoy
         rinexname = station + cdoy + '0.' + cyy + 'o'
-        print('merge the 15 minute files and move to ', rinexname)
+        print('Attempt to merge the 15 minute files and move to ', rinexname)
         mergecommand = [teqcpath + ' ' + station + cdoy + '*o']
         fout = open(foutname,'w')
         subprocess.call(mergecommand,stdout=fout,shell=True)
@@ -3705,7 +3724,10 @@ def rinex_nrcan_highrate(station, year, month, day):
             subprocess.call(cm,shell=True)
             subprocess.call(['mv',foutname,rinexname])
     else:
-        print('If you had installed teqc, I would have merged the files for you. ')
+        if (foundFile == 0):
+            print('No data could be retrieved from NRCAN')
+        if not os.path.isfile(teqcpath):
+            print('You need to install teqc to merge NRCAN 15 minute RINEX files. ')
 
 
 def rinex_ga_highrate(station, year, month, day):
@@ -5085,6 +5107,31 @@ def binary(string):
 
     return array(j)
 
+def ymd_hhmmss(year,doy,utc,dtime):
+    """
+    since i save things in year, doy and UTC hours ...
+    this gives back datetime obj and the input for that
+    (year month day hour minute second, in integers i believe)
+    """
+    year = int(year) # just in case
+    d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
+    month = int(d.month)
+    day = int(d.day)
+    hour = int(np.floor(utc))
+    minute = int ( np.floor(60* ( utc- hour )))
+    second = int(utc*3600 - (hour*3600 + minute*60))
+    if second == 60:
+        second = 0
+        minute = minute + 1
+    if minute == 60:
+        minute = 0
+        hour = hour + 1
+    # i dunno what you do if hour > 24! well, i do, but it is annoying
+    bigT = 0
+    if dtime:
+        bigT = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+    return bigT, year, month, day, hour, minute, second
+
 
 # don't need to print out success
 #print('found the ', env_var, ' environment variable')
@@ -5094,3 +5141,44 @@ def binary(string):
         #status = subprocess.call([crnxpath, rinexfiled])
         # rm the hatanaka file
         #status = subprocess.call(['rm','-f',rinexfiled])
+
+
+def get_obstimes(tvd):
+    """
+    send a LSP results, so the variable created when you read 
+    in the results file.  return obstimes for plotting 
+    """
+    nr,nc = tvd.shape
+    obstimes = []
+
+    if nr > 0:
+        for ijk in range(0,nr):
+            dtime, iyear,imon,iday,ihour,imin,isec = ymd_hhmmss(tvd[ijk,0],tvd[ijk,1],tvd[ijk,4],True)
+            obstimes.append(dtime)
+    else:
+        print('empty file')
+
+    return obstimes
+
+
+
+def get_noaa_obstimes(t):
+    """
+    send a noaa file variable. returns obstimes.
+    i guess one could learn how to use pandas ... nah
+    """
+    nr,nc = t.shape
+    obstimes = []
+
+    # if i read in the file better, would not have to change from float
+    if nr > 0:
+        for i in range(0,nr):
+            dtime = datetime.datetime(year=int(t[i,0]), month=int(t[i,1]), day=int(t[i,2]), hour=int(t[i,3]), minute=int(t[i,4]), second=0)
+            obstimes.append(dtime)
+    else:
+        print('you sent me an empty variable')
+
+    return obstimes
+
+
+

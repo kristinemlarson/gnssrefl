@@ -68,11 +68,12 @@ def main():
         else:
             doy2 = int(args.doy2)
 
-        ntv = t.readin_and_plot(station, year,doy1,doy2,plt,ext)
+        ntv,obstimes = t.readin_and_plot(station, year,doy1,doy2,plt,ext)
         N,M = np.shape(ntv)
      # use function instead of writing it here
         writecsv = False;   writetxt = True
         fname = xdir + '/Files/' + station + '_subdaily_rh.txt'
+        fname_new = xdir + '/Files/' + station + '_subdaily_edits_rh.txt'
         t.write_subdaily(fname,station,ntv,writecsv,writetxt)
     else:
         fname = args.txtfile
@@ -83,12 +84,13 @@ def main():
     # I think these are used just for velocity ...
     perday = 24*20 # every 3 minutes
 
+    # if not specified, use outlier criterion of 0.5 m
     if args.outlier == None:
-        outlier = 0.45
+        outlier = 0.5 
     else:
         outlier = float(args.outlier)
 
-    tv,corr = t.splines_for_dummies2(fname, perday,plt,outlier)
+    tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,obstimes=obstimes)
 
 if __name__ == "__main__":
     main()
