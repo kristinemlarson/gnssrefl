@@ -32,6 +32,9 @@ From the [geoid app](http://gnss-reflections.org/geoid?station=at01&lat=0.0&lon=
 see the general location of the antenna with respect to the coast. You will also note that it is at 
 ~12 meters above sea level.
 
+
+Use the gnss-reflections.org webapp to set a [possible Mask](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240)
+
 ### Take a Quick Look at the Data
 
 First make a SNR file:
@@ -46,12 +49,14 @@ If you use the default settings with **quickLook** you will mistakenly think it 
 <img src=at01_default_qc.png width=600>		
 
 Remember that the site is 12 meters above sea level and the default restricts the reflector height
-region to < 6 meters.  Try again using elevation angles 5 and 13 degrees:
+region to < 6 meters.  Try again using a reflector height region that includes the water surface (h1 = 8 and h2 = 15) and better elevation angles 5 and 13 degrees:
 
 <code> quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15</code>
 
+
 <img src=at01_day109.png width=600>		
 
+Now you see good retrievals at azimuths from 0 to about 22 degrees.  
 You will also see strong retrievals in the Lomb Scargle periodograms:
 
 <img src=at01_lsp_109.png width=600>
@@ -65,11 +70,15 @@ We will look at 31 days from April 2020. First make the SNR files:
 
 Now set up the analysis instructions:
 
-<code>make_json_input</code>
+<code>make_json_input make_json_input at01 63.484 -162.006 21.565 -h1 8 -h2 15 -e1 5 -e2 13 -allfreq True </code>
+
+You will need to hand-edit the file to restrict the azimuths per our QC output.
 
 Then estimate RH:
 
 <code>gnssir at01 2020 100 -doy_end 130</code>
+
+**at01 is the only tide gauge in this region of Alaska.**
 
 
 
