@@ -3686,6 +3686,7 @@ def rinex_nrcan_highrate(station, year, month, day):
     for h in range(0,24):
         # subdirectory
         ch = '{:02d}'.format(h)
+        print('\n Hour: ', ch)
         for e in ['00', '15', '30', '45']:
             dname = station + cdoy + alpha[h] + e + '.' + cyy + 'd.Z'
             dname1 = station + cdoy + alpha[h] + e + '.' + cyy + 'd'
@@ -3712,7 +3713,8 @@ def rinex_nrcan_highrate(station, year, month, day):
         foutname = 'tmp.' + station + cdoy
         rinexname = station + cdoy + '0.' + cyy + 'o'
         print('Attempt to merge the 15 minute files and move to ', rinexname)
-        mergecommand = [teqcpath + ' ' + station + cdoy + '*o']
+        mergecommand = [teqcpath + ' +quiet ' + station + cdoy + '*o']
+        #mergecommand = [teqcpath + ' ' + station + cdoy + '*o']
         fout = open(foutname,'w')
         subprocess.call(mergecommand,stdout=fout,shell=True)
         fout.close()
@@ -3753,35 +3755,45 @@ def rinex_ga_highrate(station, year, month, day):
 
     GAstopday = 2020 + 196/365.25 # date i got the email saing they weren't going to have v2.11 anymore 
     if (year + doy/365.25) > GAstopday:
-        print('GA no longer proivdes high-rate v 2.11 RINEX files')
+        print('GA no longer provides high-rate v 2.11 RINEX files')
         print('If there is significant interest, I will try to port this function over to RINEX 3')
         return
     # old directory
     #gns = 'ftp://ftp.ga.gov.au/geodesy-outgoing/gnss/data/highrate/' + cyyyy + '/' + cyy + cdoy 
+    if not os.path.isfile(teqcpath):
+        print('You need to install teqc to use high-rate RINEX data from GA.')
+        return
+
     gns = 'ftp://ftp.data.gnss.ga.gov.au/highrate/' + cyyyy + '/' + cdoy + '/'
+    print('WARNING: Downloading high-rate GPS data takes a long time.')
+    fileF = 0
     for h in range(0,24):
         # subdirectory
         ch = '{:02d}'.format(h)
+        print('Hour: ', ch)
         for e in ['00', '15', '30', '45']:
             dname = station + cdoy + alpha[h] + e + '.' + cyy + 'd.gz'
             dname1 = station + cdoy + alpha[h] + e + '.' + cyy + 'd'
             dname2 = station + cdoy + alpha[h] + e + '.' + cyy + 'o'
             url = gns + '/' + ch + '/' + dname
-            print(url)
+            #print(url)
             try:
                 wget.download(url,dname)
                 subprocess.call(['gunzip',dname])
                 subprocess.call([crnxpath, dname1])
                 # delete the d file
                 subprocess.call(['rm',dname1])
+                fileF = fileF + 1
             except:
-                print('download failed for some reason')
+                okok = 1
+                #print('download failed for some reason')
 
-    if os.path.isfile(teqcpath):
+    # you cannot merge things that do not exist
+    if (fileF > 0):
         foutname = 'tmp.' + station + cdoy
         rinexname = station + cdoy + '0.' + cyy + 'o'
         print('merge the 15 minute files and move to ', rinexname)
-        mergecommand = [teqcpath + ' ' + station + cdoy + '*o']
+        mergecommand = [teqcpath + ' +quiet ' + station + cdoy + '*o']
         fout = open(foutname,'w')
         subprocess.call(mergecommand,stdout=fout,shell=True)
         fout.close()
@@ -3793,7 +3805,7 @@ def rinex_ga_highrate(station, year, month, day):
             subprocess.call(cm,shell=True)
             subprocess.call(['mv',foutname,rinexname])
     else:
-        print('If you had installed teqc, I would have merged the files for you.')
+        print('No files were available for you from GA.')
 
 
 def highrate_nz(station, year, month, day):
@@ -4868,10 +4880,24 @@ def nicerTime(UTCtime):
     """
     input float hour
     output HH:MM string
+    2021 may 3, changed to deal with hour boundaries
+    since thsi only does hours and minutes, it rounds up or down
+    depending on seconds < or > 30
+    fails near midnite ... 
     """
     hour = int(np.floor(UTCtime))
+    minute = int ( np.floor(60* ( UTCtime - hour )))
+    second = int ( 3600*UTCtime - 3600*hour  - 60*minute)
+    #print(hour,minute,second)
+    if (second > 30):
+        # up the minutes ...
+        minute = minute + 1
+        # sure hope this works - beyond annoying
+        if minute == 60:
+            minute = 0
+            hour = hour + 1
+
     chour = '{:02d}'.format(hour)
-    minute = int ( np.round(60* ( UTCtime - hour )))
     cminute = '{:02d}'.format(minute)
     T = chour + ':' + cminute  
 
