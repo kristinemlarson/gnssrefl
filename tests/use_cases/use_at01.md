@@ -52,7 +52,8 @@ First we need to make a SNR file:
 This will generate a SNR file at a sampling rate of 15 seconds. One second data are available if you would 
 like to use them (-rate high).
 
-If you use the default settings with **quickLook** you will mistakenly think it is not a useful site:
+If you use the default settings with **quickLook** you will mistakenly think it is not a useful site. Nearly
+every single retrieval is set as bad (i.e. it is gray rather than blue):
 
 <img src=at01_default_qc.png width=600>		
 
@@ -74,19 +75,19 @@ Here are some sample results:
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 20</code>
 
-<img src=at01_lsp_l2c.png width=600>
+<img src=at01_l2c.png width=600>
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 101</code>
 
-<img src=at01_lsp_glonass.png width=600>
+<img src=at01_glonass.png width=600>
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 205</code>
 
-<img src=at01_lsp_galileo.png width=600>
+<img src=at01_galileo.png width=600>
 
 ### Analyze the Data
 
-We will look at days 100-131 for the year 2020. First make the SNR files:
+Next we analyze data for days 100-131 for the year 2020. First make the SNR files:
 
 <code>rinex2snr at01 2020 100 -archive unavco -doy_end 130</code>
 
