@@ -198,7 +198,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
         plt.yticks(fontsize=fs)
         plt.grid()
         plotname = txtdir + '/' + station + '_subdaily_RH.png'
-        plt.savefig(plotname)
+        plt.savefig(plotname,dpi=300)
         print('png file saved as: ', plotname)
         plt.show()
     # probably nice to also have a plot with number of retrievals vs time

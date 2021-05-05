@@ -37,13 +37,13 @@ see the general location of the antenna with respect to the coast. You will also
 ~12 meters above sea level.
 
 
-Use the gnss-reflections.org webapp to set a [possible Mask](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240). In this example we used elevation angle 5-12 degrees. The goal is to have the ellipses on the water with no intersection of 
-the land.
+Use the gnss-reflections.org webapp to set a [possible mask.](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240) In this example we used the option for 
+elevation angles between 5 and 12 degrees. The goal is to have the ellipses on the water and not the land.
 
 ### Take a Quick Look at the Data
 
 We will use **quickLook** to examine the spectral characteristics of the SNR data. 
-[(For details on quickLook output.)](../../docs/quickLook_desc.md):
+[(For details on quickLook output.)](../../docs/quickLook_desc.md)
 
 First we need to make a SNR file:
 
@@ -70,16 +70,20 @@ You will also see strong retrievals in the Lomb Scargle periodograms:
 
 <img src=at01_lsp_109.png width=600>
 
-This site has modern GPS signals, Galileo signal, and Glonass signals. 
-Here are some sample results:
+This site has modern GPS signals, Galileo signal, and Glonass signals. Here are some sample results for L2C:
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 20</code>
 
+
 <img src=at01_l2c.png width=600>
+
+Glonass:
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 101</code>
 
 <img src=at01_glonass.png width=600>
+
+and Galileo:
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 205</code>
 
@@ -113,7 +117,8 @@ It basically [concatenates the daily files](at01_subdaily_rh.txt.gz) for this pe
 
 It tries to do some simple outlier removal and will make an effort to compute the RH dot correction.
 The default for outliers is 0.5 meters, but you can set that value at the command line.
-*The RH dot correction is preliminary code.* It uses a cubic spline to fit the RH data which allows a 
+*The RH dot correction computed here is using a test version of our code.* It uses a cubic 
+spline to fit the RH data which allows a 
 first order estimate for RH dot. That, along with geometrical information as to the 
 elevation angle rate of change, is used to make the RH dot correction. This term
 is **very important** for sites with large tidal ranges, but is of minimal importance at sites like at01.
