@@ -107,7 +107,7 @@ but you can certainly give it a try:
 
 <code>subdaily at01 2020 -doy1 100 -doy2 130</code>
 
-It basically [concatenates the daily files](at01_subdaily_rh.txt) for this period and makes this plot:
+It basically [concatenates the daily files](at01_subdaily_rh.txt.gz) for this period and makes this plot:
 
 <img src=at01_raw.png width=600>
 

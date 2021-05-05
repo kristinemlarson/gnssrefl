@@ -31,7 +31,7 @@ setup(
         'console_scripts': [ 
             'gnssir = gnssrefl.gnssir_cl:main',
             'rinex2snr = gnssrefl.rinex2snr_cl:main',
-            'daily_avg = gnssrefl.daily_avg:main',
+            'daily_avg = gnssrefl.daily_avg_cl:main',
             'quickLook= gnssrefl.quickLook_cl:main',
             'download_rinex = gnssrefl.download_rinex:main',
             'download_orbits = gnssrefl.download_orbits:main',
@@ -42,7 +42,7 @@ setup(
             'llh2xyz = gnssrefl.llh2xyz:main',
             'prn2gps = gnssrefl.prn2gps:main',
             'download_tides = gnssrefl.download_tides:main',
-            'subdaily= gnssrefl.subdaily:main',
+            'subdaily= gnssrefl.subdaily_cl:main',
             'gpsweek = gnssrefl.gpsweek:main',
             'update_snr_files = gnssrefl.update_snr_files:main',
             'nmea2snr= gnssrefl.nmea2snr_cl:main',

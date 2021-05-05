@@ -1,4 +1,5 @@
 # preliminary water analysis to apply RHdot correction
+# originally called prelim-tides - now subdaily_cl.py
 import argparse
 import datetime
 import json
@@ -11,7 +12,7 @@ from datetime import date
 
 # my code
 import gnssrefl.gps as g
-import gnssrefl.tide_library as t
+import gnssrefl.subdaily as t
 
 
 import scipy.interpolate as interpolate
@@ -74,7 +75,8 @@ def main():
         writecsv = False;   writetxt = True
         fname = xdir + '/Files/' + station + '_subdaily_rh.txt'
         fname_new = xdir + '/Files/' + station + '_subdaily_edits_rh.txt'
-        t.write_subdaily(fname,station,ntv,writecsv,writetxt)
+        extraline = ''
+        t.write_subdaily(fname,station,ntv,writecsv,writetxt,extraline)
     else:
         fname = args.txtfile
         if not os.path.isfile(fname):
@@ -90,6 +92,7 @@ def main():
     else:
         outlier = float(args.outlier)
 
+    # changed this to use new format .... for subdaily file
     tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,obstimes=obstimes)
 
 if __name__ == "__main__":
