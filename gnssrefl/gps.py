@@ -5135,6 +5135,8 @@ def binary(string):
 
 def ymd_hhmmss(year,doy,utc,dtime):
     """
+    inputs: year, day of year, UTC (fractional hours)
+    dtime is a logical for whether you want a datetime object
     since i save things in year, doy and UTC hours ...
     this gives back datetime obj and the input for that
     (year month day hour minute second, in integers i believe)

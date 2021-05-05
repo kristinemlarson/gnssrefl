@@ -42,7 +42,7 @@ setup(
             'llh2xyz = gnssrefl.llh2xyz:main',
             'prn2gps = gnssrefl.prn2gps:main',
             'download_tides = gnssrefl.download_tides:main',
-            'prelim_tides = gnssrefl.prelim_tides:main',
+            'subdaily= gnssrefl.subdaily:main',
             'gpsweek = gnssrefl.gpsweek:main',
             'update_snr_files = gnssrefl.update_snr_files:main',
             'nmea2snr= gnssrefl.nmea2snr_cl:main',

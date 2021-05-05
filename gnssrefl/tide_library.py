@@ -20,18 +20,21 @@ import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
 
-def print_badpoints(t):
+def print_badpoints(t,outliersize):
     """
     input: station name and lomb scargle result array of "bad points"
+    second input is the size of the outlier
     """
-#  year, doy, RH,  sat, UTCtime,  Azim,   Amp,  PkNoise, Freq, edotF, Mon,Day, Hr,Min,  MJD
-#   (0)  (1)  (2)  (3)   (4)    (5)      (6)    (7)    (8)      (9)  (10)   (11)(12)(13)(14)   (15)
+# (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)
+# year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS
+# (0)  (1)   (2) (3)  (4)     (5)   6 )    (7)    (8)   (9)  (10) (11) (12)    (13)     (14)    (
+
     m,n = t.shape
     f = 'outliers.txt'
     print('outliers written to file: ', f) 
     fout = open(f, 'w+')
     for i in range(0,m):
-         fout.write('doy {0:3.0f} sat {1:3.0f} azim {2:6.2f} fr {3:3.0f} \n'.format(t[i,1], t[i,3],t[i,5], t[i,8]) )
+        fout.write('doy {0:3.0f} sat {1:3.0f} azim {2:6.2f} fr {3:3.0f} residual {4:5.2f} \n'.format(t[i,1], t[i,3],t[i,5], t[i,10], outliersize[i] ))
     fout.close()
 
 def output_names(txtdir, txtfile,csvfile,jsonfile):
@@ -66,13 +69,16 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     print('outputfile ', outfile)
     return writetxt,writecsv,writejson,outfile
 
-def write_subdaily(outfile,station,ntv,writecsv,writetxt):
+def write_subdaily(outfile,station,ntv,writecsv,writetxt,extraline):
     """
     input: output filename
     station - 4 character station name
     nvt is the variable with the LSP results
     writecsv and writetxt are booleans to tell you whether you 
     want csv output format or plain txt format (with spaces between colunmns)
+    21may04 - extra line may be added to the header
+    changed this to use hte original format.  changing the number of columns was a HUGE
+    mistake.  put m,d,h,m,s at the end
     """
     # this is lazy - should use shape
     N= len(ntv)
@@ -80,22 +86,25 @@ def write_subdaily(outfile,station,ntv,writecsv,writetxt):
     print('write_subdaily', nr,nc)
     N= nr
     # this is true so I don't have to move the indents
-    if True:
-        print('Results are being written to : ', outfile)
-        fout = open(outfile, 'w+')
-        write_out_header(fout,station)
-        for i in np.arange(0,N,1):
-            year = int(ntv[i,0]); doy = int(ntv[i,1])
-            year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
-            rh = ntv[i,2]; UTCtime = ntv[i,4]; 
-            #??? mjd = ntv[i,15] ???
-            mjd = ntv[i,14]
-            ctime = g.nicerTime(UTCtime); ctime2 = ctime[0:2] + ' ' + ctime[3:5]
-            if writecsv:
-                fout.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:7.3f},{5:8.2f},{6:7.2f},{7:5.2f},   {8:3.0f},{9:8.5f}, {10:2.0f}, {11:2.0f},{12:2s},{13:2s},{14:15.6f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,13],ntv[i,10],ntv[i,12],month,day,ctime[0:2],ctime[3:5] ,mjd ))
-            else:
-                fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:7.3f} {5:8.2f} {6:7.2f} {7:5.2f}    {8:3.0f} {9:8.5f}  {10:2.0f}  {11:2.0f} {12:5s} {13:15.6f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,13],ntv[i,10],ntv[i,12],month,day,ctime2,mjd ))
-        fout.close()
+    print('Results are being written to : ', outfile)
+    fout = open(outfile, 'w+')
+    write_out_header(fout,station,extraline)
+    dtime = False
+    for i in np.arange(0,N,1):
+        year = int(ntv[i,0]); doy = int(ntv[i,1])
+        year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
+        rh = ntv[i,2]; UTCtime = ntv[i,4]; 
+        dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
+        #ctime = g.nicerTime(UTCtime); 
+        #hr = ctime[0:2]
+        #minute = ctime[3:5]
+        if writecsv:
+            fout.write(" {0:4.0f},{1:3.0f},{2:6.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
+                            ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
+        else:
+            fout.write(" {0:4.0f} {1:3.0f} {2:6.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
+                            ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
+    fout.close()
 
 
 def readin_and_plot(station, year,d1,d2,plt2screen,extension):
@@ -172,12 +181,12 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     #
     fs = 12
     if plt2screen:
-        plt.figure()
-        plt.plot(tval,nval,'.')
-        plt.xlabel('Days in the Year ' + str(year),fontsize=fs ) 
-        plt.xticks(rotation =45)
-        plt.title(station + ': number of RH retrievals each day',fontsize=fs)
-        plt.grid()
+        #plt.figure()
+        #plt.plot(tval,nval,'.')
+        #plt.xlabel('Days in the Year ' + str(year),fontsize=fs ) 
+        #plt.xticks(rotation =45)
+        #plt.title(station + ': number of RH retrievals each day',fontsize=fs)
+        #plt.grid()
 
         plt.figure()
         #plt.plot( tv[:,1] + tv[:,4]/24, tv[:,2], '.')
@@ -265,13 +274,19 @@ def in_out(x,y):
 
     return x,spline(x) 
     
-def write_out_header(fout,station):
+def write_out_header(fout,station,extraline):
+    """
+    21may04 extra line for user
+    changed this so that it is EXACTLY THE SAME as gnssir, with extra columns for m/d/h/m
+    """
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     fout.write('% Results for {0:4s} calculated on {1:20s} \n'.format(  station, xxx ))
     fout.write('% gnssrefl, https://github.com/kristinemlarson \n')
+    if len(extraline) > 0:
+        fout.write('% IMPORTANT {0:s} \n'.format(  extraline ))
     fout.write('% Phase Center corrections have NOT been applied \n')
-    fout.write('% (1)  (2)  (3)   (4)    (5)      (6)    (7)    (8)      (9)  (10)   (11)(12)(13)(14)   (15)\n')
-    fout.write('% year, doy, RH,  sat, UTCtime,  Azim,   Amp,  PkNoise, Freq, edotF, Mon,Day, Hr,Min,  MJD \n')
+    fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)\n")
+    fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS \n")
 
 
 def writejsonfile(ntv,station, outfile):
@@ -279,8 +294,9 @@ def writejsonfile(ntv,station, outfile):
     subdaily RH values written out in json format
     inputs: ntv is the variable with concatenated results
     outfile is output file name
+    2021may05 fixed a ton of column definition errors
     """
-    print('you picked the json output')
+    print('You picked the json output')
     # dictionary
     #o = {}
     N= len(ntv)
@@ -309,7 +325,7 @@ def writejsonfile(ntv,station, outfile):
     sat =[int(sat[i]) for i in range(N)];
 
     # frequency
-    freq  = ntv[:,10].tolist()
+    freq  = ntv[:,8].tolist()
     freq =[int(freq[i]) for i in range(N)];
 
     # amplitude of main periodogram (LSP)
@@ -321,11 +337,12 @@ def writejsonfile(ntv,station, outfile):
     azim =[str(azim[i]) for i in range(N)];
 
     # edotF in units ??
-    edotf  = ntv[:,12].tolist()
+    edotf  = ntv[:,9].tolist()
     edotf =[str(edotf[i]) for i in range(N)];
 
     # modified julian day
-    mjd = ntv[:,15].tolist()
+    #mjd = ntv[:,15].tolist()
+    mjd = ntv[:,14].tolist()
     mjd=[str(mjd[i]) for i in range(N)];
 
     #column_names = ['timestamp','rh','sat','freq','ampl','azim','edotf','mjd']
@@ -358,6 +375,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     computed perday times per day
 
     2021april27 sending obstimes as kwarg input
+    2021may5 change file format back to original
     """
     # read in the tvd values which are the output of gnssir
     tvd = np.loadtxt(fname,comments='%')
@@ -369,7 +387,8 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     th= tvd[:,1] + tvd[:,4]/24; 
     # reflector height
     h = tvd[:,2]
-    xfac = tvd[:,9]
+    # using old format
+    xfac = tvd[:,12]
 
     # now get obstimes if they were not passed
     obstimes = kwargs.get('obstimes',[])
@@ -444,8 +463,9 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     # bad points
     j = (np.absolute(resid_spl) > outlierV)
     # put these in a file if you are interested
-    print_badpoints(tvd[j,:])
+    print_badpoints(tvd[j,:], resid_spl[j])
     if pltit:
+        fs = 12
         plt.figure()
         #plt.subplot(211)
         #plt.plot(obstimes, h, 'bo', label='Original points',markersize=3)
@@ -453,12 +473,12 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         # cannot use this because i do not have the year in the tnew variable
         #obstimes = fract_to_obstimes(spl_x)
         plt.plot(spl_x, spl_y, 'r', label='spline')
-        plt.title('Reflector Height')
-        plt.ylabel('meters')
-        plt.xlabel('days')
+        plt.title('Station: ' + station + ' Reflector Height')
         plt.plot(th[j], h[j], 'co',label='Outliers') 
         plt.grid()
-        #plt.legend(loc="upper left")
+        plt.ylabel('meters',fontsize=fs)
+        plt.xlabel('days',fontsize=fs)
+        plt.legend(loc="upper left")
 
 # take out the bad points
     th = th[i]; h = h[i]
@@ -487,11 +507,12 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
     # argh!
     if pltit:
+        fs = 12
         plt.figure()
         plt.plot(tvel, yvel, '-',label='RHdot')
         plt.plot(th, rhdot_at_th,'.',label='RHdot at obs')
-        plt.title('RHdot in meters per hour')
-        plt.ylabel('meters per hour'); plt.xlabel('days of the year')
+        plt.title('RHdot in meters per hour',fontsize=fs)
+        plt.ylabel('meters per hour',fontsize=fs); plt.xlabel('days of the year',fontsize=fs)
         plt.grid()
         plt.xticks(rotation=45)
 
@@ -500,7 +521,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         plt.plot(th, resid_spl,'.',label='uncorr')
         plt.plot(th, resid_spl - correction,'.',label='wcorr')
         plt.legend(loc="upper left")
-        plt.xlabel('days of the year')
+        plt.xlabel('days of the year',fontsize=fs)
         plt.title('Reflector Height Residuals to the Spline Fit')
         plt.grid()
         plt.xticks(rotation=45)
@@ -508,20 +529,28 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     print('RMS no corr (m)', '{0:6.3f}'.format ( np.std(resid_spl)) )
     print('RMS w/ corr (m)', '{0:6.3f}'.format ( np.std(resid_spl - correction))  )
     # this is RH with the RHdot correction
-    a = resid_spl - correction
+    correctedRH = resid_spl - correction
     print('Freq   Bias(m)   Sigma (m)')
     for f in [1, 20, 5, 101, 102, 201, 205,207,208]:
         ff = (tvd[:,8] == f)
-        if len(a[ff]) > 0:
-            print('{0:3.0f} {1:6.2f} {2:6.2f} '.format (f, np.mean(a[ff]), np.std(a[ff]) ) )
+        if len(correctedRH[ff]) > 0:
+            print('{0:3.0f} {1:6.2f} {2:6.2f} '.format (f, np.mean(correctedRH[ff]), np.std(correctedRH[ff]) ) )
 
     # i hope this is right! - just change the value in the RH column ... or should i add one?
-    nr,nc=tvd.shape
-    print(nr,nc)
+    print(len(tvd))
+    print(len(correction))
     tvd[:,2] = tvd[:,2] - correction
-    write_subdaily(fname_new,station,tvd,False,True)
-    #d1 = int(np.floor(tvd[:,1].min() ))
-    #d2 = int(np.ceil(tvd[:,1].max() ))
+    writecsv = False
+    writetxt = True
+    extraline = 'Large outliers removed and RHDot correction has been applied'
+    write_subdaily(fname_new,station,tvd,writecsv,writetxt,extraline)
+    return tvd, correction 
+
+
+def testing_hourly(tvd):
+    """
+    this does not work
+    """
     d1 = 15
     d2 = 40
     # start with hourly
@@ -542,5 +571,4 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     plt.figure()
     plt.plot(t_hourly, rh_hourly,'.')
     plt.show()
-    return tvd, correction 
 
