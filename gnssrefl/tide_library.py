@@ -377,6 +377,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     2021april27 sending obstimes as kwarg input
     2021may5 change file format back to original
     """
+    fs = 12 # fontsize
     # read in the tvd values which are the output of gnssir
     tvd = np.loadtxt(fname,comments='%')
     # sort the data by days 
@@ -387,7 +388,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     th= tvd[:,1] + tvd[:,4]/24; 
     # reflector height
     h = tvd[:,2]
-    # using old format
+    # using old format - this is the edot factor
     xfac = tvd[:,12]
 
     # now get obstimes if they were not passed
@@ -465,7 +466,6 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     # put these in a file if you are interested
     print_badpoints(tvd[j,:], resid_spl[j])
     if pltit:
-        fs = 12
         plt.figure()
         #plt.subplot(211)
         #plt.plot(obstimes, h, 'bo', label='Original points',markersize=3)
@@ -507,8 +507,8 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
     # argh!
     if pltit:
-        fs = 12
         plt.figure()
+        plt.subplot(2,1,1)
         plt.plot(tvel, yvel, '-',label='RHdot')
         plt.plot(th, rhdot_at_th,'.',label='RHdot at obs')
         plt.title('RHdot in meters per hour',fontsize=fs)
@@ -516,13 +516,12 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         plt.grid()
         plt.xticks(rotation=45)
 
-        plt.figure()
-        #plt.subplot(211)
+        plt.subplot(2,1,2)
         plt.plot(th, resid_spl,'.',label='uncorr')
         plt.plot(th, resid_spl - correction,'.',label='wcorr')
         plt.legend(loc="upper left")
         plt.xlabel('days of the year',fontsize=fs)
-        plt.title('Reflector Height Residuals to the Spline Fit')
+        plt.title('Reflector Height Residuals to the Spline Fit',fontsize=fs)
         plt.grid()
         plt.xticks(rotation=45)
         plt.show()
@@ -532,18 +531,17 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     correctedRH = resid_spl - correction
     print('Freq   Bias(m)   Sigma (m)')
     for f in [1, 20, 5, 101, 102, 201, 205,207,208]:
-        ff = (tvd[:,8] == f)
+        ff = (tvd[:,10] == f)
         if len(correctedRH[ff]) > 0:
             print('{0:3.0f} {1:6.2f} {2:6.2f} '.format (f, np.mean(correctedRH[ff]), np.std(correctedRH[ff]) ) )
 
     # i hope this is right! - just change the value in the RH column ... or should i add one?
-    print(len(tvd))
-    print(len(correction))
     tvd[:,2] = tvd[:,2] - correction
     writecsv = False
     writetxt = True
     extraline = 'Large outliers removed and RHDot correction has been applied'
     write_subdaily(fname_new,station,tvd,writecsv,writetxt,extraline)
+
     return tvd, correction 
 
 

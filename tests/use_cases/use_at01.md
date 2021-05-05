@@ -96,13 +96,30 @@ Now set up the analysis instructions:
 <code>make_json_input make_json_input at01 63.484 -162.006 21.565 -h1 8 -h2 15 -e1 5 -e2 13 -allfreq True </code>
 
 You will need to hand-edit the file to restrict the azimuths per our QC output. I also removed the Beidou signals (frequencies > 300) 
-because they are not in the RINEX 2.11 file.  
+because they are not in the RINEX 2.11 file. [Sample json file.](at01.json)
 
-Then estimate RH for the 31 day period:
+Then estimate reflector height (RH) for the one month period:
 
 <code>gnssir at01 2020 100 -doy_end 130</code>
 
+We have written some code to help you look at these subdaily files - it is not complete as yet,
+but you can certainly give it a try:
 
+<code>subdaily at01 2020 -doy1 100 -doy2 130</code>
 
+It basically [concatenates the daily files](at01_subdaily_rh.txt) for this period and makes this plot:
+
+<img src=at01_raw.png width=600>
+
+It tries to do some simple outlier removal and will make an effort to compute the RH dot correction.
+The default for outliers is 0.5 meters, but you can set that value at the command line.
+*The RH dot correction is preliminary code.* It uses a cubic spline to fit the RH data which allows a 
+first order estimate for RH dot. That, along with geometrical information as to the 
+elevation angle rate of change, is used to make the RH dot correction. This term
+is **very important** for sites with large tidal ranges, but is of minimal importance at sites like at01.
+
+<img src=at01_edits.png width=600>
+
+The code will also print out a list of outliers so that you can assess whether you might want to change your azimuth mask.
 
 
