@@ -106,9 +106,47 @@ by concatenating the results and applying a 3 sigma outlier criterion using 0.12
 
 <img src="raw_sc02.png"	width=600>
 
+This code will create and apply the RH dot correction. The outliers are identified and removed
+from the output file. Below are shown the initial solutions with a spline fit and 
+outliers identified.
 
-This will also create and apply the RH dot correction. The outliers are identified and removed
-from the output file.
+<img src="sc02-outliers.png" width=600>
+
+Residuals with and without RHdot correction:
 
 <img src="sc02-rhdot.png" width=600>
+
+And summary of the number of satellite arcs available:
+
+<img src="sc02-nvals.png" width=600>
+
+Some statistics come to the screen that give some perspective 
+on the performance of the different frequencies and constellations.
+Note that there *should* be biases because we have not yet applied the 
+phase center correction.
+
+<PRE>
+RMS no RHdot correction (m)  0.139
+RMS w/ RHdot correction (m)  0.106
+Freq  Bias  Sigma   NumObs
+       (m)   (m)
+  1   0.08   0.11   1025
+ 20  -0.02   0.09    803
+  5  -0.04   0.09    615
+101   0.06   0.09    613
+102  -0.03   0.10    667
+201   0.07   0.09    603
+205  -0.04   0.08    616
+207  -0.03   0.08    617
+208  -0.05   0.08    616
+</PRE>
+
+This is a standard Lomb Scargle analysis of reflection data at sc02.
+Multiple authors have recommended using different analysis strategies, and 
+you are most definitely encouraged to look at using these techniques. In most cases
+smoothness strategies are used to improve the retrievals.  
+
+I would like to include Simon Williams RH retrieval/tidal estimation code in this 
+package. He has been kind enough to make the Matlab code open source. If someone 
+is willing to convert it to python, that would be fabulous.
 

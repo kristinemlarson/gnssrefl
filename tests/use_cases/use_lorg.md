@@ -2,7 +2,7 @@
 
 **Station Name:**  lorg
 
-**Location:**  Ross Ice Shelf, Antarctica
+**Location:**  Lorne, Antarctica
 
 **Archive:**  [UNAVCO](http://www.unavco.org), [SOPAC](http://sopac-csrc.ucsd.edu/index.php/sopac/)
 

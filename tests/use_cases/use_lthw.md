@@ -1,4 +1,4 @@
-### Lower Thwaites Glacier
+#h## Lower Thwaites Glacier
 
 **Station Name:** lthw
 
@@ -18,14 +18,11 @@
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta)
 
-
 <img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"/>
-
 
 ### Data Summary
 
-The receiver only tracks legacy GPS signals, so only L1 should be used for 
-reflectometry. The pole
+The receiver only tracks legacy GPS signals, so only L1 should be used for reflectometry. The pole
 is set in the snow/ice and routinely (every few years) reset. Please 
 use the [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta) to get a 
 feel for when the pole has been reset and where data gaps exist.
@@ -99,7 +96,7 @@ you prefer.
 
 Now analyze the data for 2018 from day 1 to day 365 using **gnssir**:
 
-<code>gnssir lthw 2018 1 -doy_end 365 -screenstats False</code>
+<code>gnssir lthw 2018 1 -doy_end 365</code>
 
 This produces reflector heights for every rising and setting satellite track that meets your 
 quality control selections.  In order to estimate snow accumulation, you will want to calculate
@@ -117,3 +114,6 @@ overall character of the results:
 <img src="lthw-req40.png" width="600"/>
 
 [Sample daily average RH file for 2018](lthw_dailyRH.txt)
+
+If you are feeling ambitious, try looking at the data for [Upper Thwaites Glacier](https://www.unavco.org/instrumentation/networks/status/nota/overview/UTHW) :-)
+

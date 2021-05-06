@@ -513,16 +513,16 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     # h = h - correction
 
 
-    # argh!
     if pltit:
         fig,ax=plt.subplots()
         ax.plot(tvel, yvel, '-',label='RHdot')
         ax.plot(th, rhdot_at_th,'.',label='RHdot at obs')
         plt.title('RHdot in meters per hour',fontsize=fs)
-        plt.ylabel('meters per hour',fontsize=fs); plt.xlabel('days of the year',fontsize=fs)
+        plt.ylabel('meters per hour',fontsize=fs); 
+        plt.xlabel('days of the year',fontsize=fs)
         plt.grid()
         plt.yticks(fontsize=fs)
-        plt.xticks(rotation=45,fontsize=fs)
+        plt.xticks(fontsize=fs)
         #fig.autofmt_xdate()
 
         #plt.figure()
@@ -531,20 +531,23 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         ax.plot(th, resid_spl - correction,'.',label='with RHdot corr')
         plt.legend(loc="upper left")
         plt.xlabel('days of the year',fontsize=fs)
+        plt.ylabel('meters',fontsize=fs)
         plt.yticks(fontsize=fs)
-        plt.xticks(rotation=45,fontsize=fs)
+        plt.xticks(fontsize=fs)
         plt.title('Reflector Height Residuals to the Spline Fit',fontsize=fs)
         plt.grid()
         plt.show()
-    print('RMS no corr (m)', '{0:6.3f}'.format ( np.std(resid_spl)) )
-    print('RMS w/ corr (m)', '{0:6.3f}'.format ( np.std(resid_spl - correction))  )
+    print('RMS no RHdot correction (m)', '{0:6.3f}'.format ( np.std(resid_spl)) )
+    print('RMS w/ RHdot correction (m)', '{0:6.3f}'.format ( np.std(resid_spl - correction))  )
     # this is RH with the RHdot correction
     correctedRH = resid_spl - correction
-    print('Freq   Bias(m)   Sigma (m)')
+    print('Freq  Bias  Sigma   NumObs ')
+    print('       (m)   (m)       ')
     for f in [1, 20, 5, 101, 102, 201, 205,207,208]:
         ff = (tvd[:,10] == f)
-        if len(correctedRH[ff]) > 0:
-            print('{0:3.0f} {1:6.2f} {2:6.2f} '.format (f, np.mean(correctedRH[ff]), np.std(correctedRH[ff]) ) )
+        ret = correctedRH[ff]
+        if len(ret) > 0:
+            print('{0:3.0f} {1:6.2f} {2:6.2f} {3:6.0f}'.format (f, np.mean(ret), np.std(ret), len(ret) ) )
 
     # put the correction in column 2
     tvd[:,2] = tvd[:,2] - correction
