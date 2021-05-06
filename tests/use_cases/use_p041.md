@@ -151,4 +151,4 @@ And the daily RH average:
 
 <img src=p041-RH.png width=600/>
 
-
+The location of the output files are printed to the screen.

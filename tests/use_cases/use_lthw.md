@@ -22,7 +22,7 @@
 <img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"/>
 
 
-## Data Summary
+### Data Summary
 
 The receiver only tracks legacy GPS signals, so only L1 should be used for 
 reflectometry. The pole
@@ -36,7 +36,7 @@ crew set this at the receiver when it was originally installed.
 
 lthw is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=lthw)
 
-## Take a look at the SNR data
+### Take a quick look at the SNR data
 
 Translate the GPS data for January 1 in 2018. First you need to make the SNR file:
 
@@ -84,7 +84,7 @@ Again use quickLook:
 Now the peaks in the reflector height (RH) periodograms are ~2.2 meters - 
 so that means that there was ~2.5 meters of surface change from 2018 to 2020.
 
-## Measure Snow Accumulation for 2018
+### Measure Snow Accumulation for 2018
 
 Translate the GPS data for the year of 2018:
 
