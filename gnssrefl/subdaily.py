@@ -33,7 +33,8 @@ def print_badpoints(t,outliersize):
     print('outliers written to file: ', f) 
     fout = open(f, 'w+')
     for i in range(0,m):
-        fout.write('doy {0:3.0f} sat {1:3.0f} azim {2:6.2f} fr {3:3.0f} residual {4:5.2f} \n'.format(t[i,1], t[i,3],t[i,5], t[i,10], outliersize[i] ))
+        fout.write('doy {0:3.0f} sat {1:3.0f} azim {2:6.2f} fr {3:3.0f} pk2noise {4:5.1f} residual {5:5.2f} \n'.format(
+            t[i,1], t[i,3],t[i,5], t[i,10], t[i,13], outliersize[i] ))
     fout.close()
 
 def output_names(txtdir, txtfile,csvfile,jsonfile):
@@ -115,7 +116,11 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     author: kristine larson
     2021april27 return datetime object
     """
-    print('read in the data and plot it between these days: ',d1,d2)
+    print('Read in the RH retrievals and plot it between these days: ',d1,d2)
+    if (d2 < d1):
+        print('First day of year must be less than last day of year. Exiting')
+        sys.exit()
+
     xdir = os.environ['REFL_CODE']
 
     # output will go to REFL_CODE/Files
@@ -145,8 +150,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
                     except:
                         print('some issue with ',fname)
 
-    #print('Number of rows and columns ', tv.shape)
-    print(tv.shape)
+    nr,nc=tv.shape
+    print('Number of RH retrievals', nr)
+
     t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
     rh = tv[:,2]
 
@@ -180,23 +186,25 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     #
     fs = 12
     if plt2screen:
+        fig,ax=plt.subplots()
         #plt.figure()
-        #plt.plot(tval,nval,'.')
-        #plt.xlabel('Days in the Year ' + str(year),fontsize=fs ) 
-        #plt.xticks(rotation =45)
-        #plt.title(station + ': number of RH retrievals each day',fontsize=fs)
-        #plt.grid()
+        ax.plot(tval,nval,'.')
+        plt.title(station + ': number of RH retrievals each day',fontsize=fs)
+        plt.xticks(rotation =45,fontsize=fs)
+        plt.yticks(fontsize=fs)
+        plt.grid()
+        fig.autofmt_xdate()
 
-        plt.figure()
-        #plt.plot( tv[:,1] + tv[:,4]/24, tv[:,2], '.')
-        plt.plot( otimes, tv[:,2], '.')
+        fig,ax=plt.subplots()
+        ax.plot( otimes, tv[:,2], '.')
         plt.ylabel('meters',fontsize=fs)
         plt.title('GNSS station: ' + station + ' Reflector Heights', fontsize=fs)
-        #plt.xlabel('Days in the Year ' + str(year),fontsize=fs ) 
         plt.gca().invert_yaxis()
         plt.xticks(rotation =45,fontsize=fs)
         plt.yticks(fontsize=fs)
         plt.grid()
+        fig.autofmt_xdate()
+
         plotname = txtdir + '/' + station + '_subdaily_RH.png'
         plt.savefig(plotname,dpi=300)
         print('png file saved as: ', plotname)
@@ -375,7 +383,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     computed perday times per day
 
     2021april27 sending obstimes as kwarg input
-    2021may5 change file format back to original
+    2021may5 change file format back to original file format
     """
     fs = 12 # fontsize
     # read in the tvd values which are the output of gnssir
@@ -386,9 +394,9 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
     # time variable in days
     th= tvd[:,1] + tvd[:,4]/24; 
-    # reflector height
+    # reflector height (meters)
     h = tvd[:,2]
-    # using old format - this is the edot factor
+    # this is the edot factor
     xfac = tvd[:,12]
 
     # now get obstimes if they were not passed
@@ -507,23 +515,26 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
     # argh!
     if pltit:
-        plt.figure()
-        plt.subplot(2,1,1)
-        plt.plot(tvel, yvel, '-',label='RHdot')
-        plt.plot(th, rhdot_at_th,'.',label='RHdot at obs')
+        fig,ax=plt.subplots()
+        ax.plot(tvel, yvel, '-',label='RHdot')
+        ax.plot(th, rhdot_at_th,'.',label='RHdot at obs')
         plt.title('RHdot in meters per hour',fontsize=fs)
         plt.ylabel('meters per hour',fontsize=fs); plt.xlabel('days of the year',fontsize=fs)
         plt.grid()
-        plt.xticks(rotation=45)
+        plt.yticks(fontsize=fs)
+        plt.xticks(rotation=45,fontsize=fs)
+        #fig.autofmt_xdate()
 
-        plt.subplot(2,1,2)
-        plt.plot(th, resid_spl,'.',label='uncorr')
-        plt.plot(th, resid_spl - correction,'.',label='wcorr')
+        #plt.figure()
+        fig,ax=plt.subplots()
+        ax.plot(th, resid_spl,'.',label='without RHdot corr')
+        ax.plot(th, resid_spl - correction,'.',label='with RHdot corr')
         plt.legend(loc="upper left")
         plt.xlabel('days of the year',fontsize=fs)
+        plt.yticks(fontsize=fs)
+        plt.xticks(rotation=45,fontsize=fs)
         plt.title('Reflector Height Residuals to the Spline Fit',fontsize=fs)
         plt.grid()
-        plt.xticks(rotation=45)
         plt.show()
     print('RMS no corr (m)', '{0:6.3f}'.format ( np.std(resid_spl)) )
     print('RMS w/ corr (m)', '{0:6.3f}'.format ( np.std(resid_spl - correction))  )
@@ -535,7 +546,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         if len(correctedRH[ff]) > 0:
             print('{0:3.0f} {1:6.2f} {2:6.2f} '.format (f, np.mean(correctedRH[ff]), np.std(correctedRH[ff]) ) )
 
-    # i hope this is right! - just change the value in the RH column ... or should i add one?
+    # put the correction in column 2
     tvd[:,2] = tvd[:,2] - correction
     writecsv = False
     writetxt = True
