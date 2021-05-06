@@ -23,7 +23,7 @@
 [Google Map Link](https://goo.gl/maps/1zmgi6rRHPVPDAfV8)
 
 <p align="center">
-<img src="tgho_barker.jpg" width="500">
+<img src="tgho_barker.jpg" width="500"><BR>
 Photo credit: Simon Barker
 </P>
 
