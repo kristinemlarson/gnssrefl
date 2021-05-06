@@ -24,8 +24,8 @@
 
 <p align="center">
 <img src="tgho_barker.jpg" width="500">
-</P>
 Photo credit: Simon Barker
+</P>
 
 ### Data Summary
 
