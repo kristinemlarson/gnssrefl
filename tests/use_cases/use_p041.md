@@ -22,7 +22,9 @@
 
 [Google Map Link](https://goo.gl/maps/GwGV8PS4CQVQzYHC7) 
 
+<p align="center">
 <img src="https://gnss-reflections.org/static/images/P041.jpg" width="500">
+</P>
 
 ### Data Summary
 

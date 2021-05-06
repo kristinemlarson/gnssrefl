@@ -20,17 +20,16 @@
 
 [Google Map Link](https://goo.gl/maps/uWyoNFf4DRjYLmfUA)
 
-<center>
+<p align="center">
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">
-</center>
+</p>
 
-**at01 is the only tide gauge in this region of Alaska.**
 
 ### Data Summary
 
-at01 was installed for reflectometry and thus has excellent tracking characteristics. It observes
+**at01 is the only tide gauge in this region of Alaska.** The site observes
 all constellation signals and high-rate data are available. There is good visibility over a large 
-azimuthal region. The monument is about a meter taller to improve visibility.
+azimuthal region. The monument is about a meter taller to improve visibility of the sea surface.
 
 From the [geoid app](http://gnss-reflections.org/geoid?station=at01&lat=0.0&lon=0.0&height=0.0) you can 
 see the general location of the antenna with respect to the coast. You will also note that it is at 
