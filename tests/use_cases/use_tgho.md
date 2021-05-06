@@ -22,15 +22,16 @@
 
 [Google Map Link](https://goo.gl/maps/1zmgi6rRHPVPDAfV8)
 
-<img src="https://gnss-reflections.org/static/images/TGHO.jpg" width="400">
+<img src="tgho_barker.jpg" width="400">
+<BR> Photo credit: Simon Barker<BR>
 
-## Data Summary
+### Data Summary
 
 Station tgho is operated by GNS. It is located 
 on a platform in Lake Taupo. It records standard GPS and Glonass signals at a low sample rate (30 sec).
 The site could be significantly improved with a modern receiver that tracks new signals at a higher sample rate.
 
-## Take a Quick Look at the Data
+### Take a Quick Look at the Data
 
 Begin by making an SNR file. Use both GPS and Glonass and set the archive to Geonet:
 
@@ -70,7 +71,7 @@ The QC metrics from Glonass 101 are helpful for setting the azimuth mask:
 
 We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 and a peak to noise ratio of 3.0.
 
-## Analyze the Data
+### Analyze the Data
 
 Use **make_json_input** to set up the analysis parameters. 
 Set the elevation and reflector heights as in **quickLook**. The peak to noise ratio and required 

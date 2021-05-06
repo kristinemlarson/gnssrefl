@@ -23,7 +23,7 @@
 <img src="mchn_monu-cors.png" width="500"/>
 
 
-## Data Summary
+### Data Summary
 
 Station mchn is operated by [NRCAN](https://www.nrcan.gc.ca/home).
 The station overlooks Lake Superior in a favorable location for measuring seasonal water levels.
@@ -38,7 +38,7 @@ The azimuths are chosen to ensure that the reflected signals reflect off the sur
 [Here is a good start on an elevation and azimuth angle mask](https://gnss-reflections.org/rzones?station=mchn&msl=on&RH=7&eang=2&azim1=80&azim2=180). 
 
 
-## Reproduce the Web App
+### Reproduce the Web App
 
 **Make SNR File** 
 
@@ -72,7 +72,7 @@ very clearly show you which azimuths are acceptable and which are not.  The midd
 ratio, which we would like to at least exceed 3. And here again, the bad retrievals are always below this level.
 The amplitudes in the bottom plot indicate that 8 is an acceptable minimal value.
 
-## Analyze the Data
+### Analyze the Data
 
 The data from 2013 will be analyzed here as a test case.  Begin by generating the SNR files:
 
@@ -138,7 +138,7 @@ residuals is very good, 0.025 m.
 
 The [python script](plotmchn.py) used to generate these plots is provided.
 
-## Reference
+### Reference
 
 DFO (2021). Institute of Ocean Sciences Data Archive. Ocean Sciences Division. Department of Fisheries and Oceans 
 Canada. http://www.pac.dfo-mpo.gc.ca/science/oceans/data-donnees/index-eng.html. Data obtained on 2021-01-28.

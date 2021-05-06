@@ -22,7 +22,7 @@
 
 <img src="https://gnss-reflections.org/static/images/LORG.jpg" width="500">
 
-## Data Summary
+### Data Summary
 
 Station lorg is on the Ross Ice Shelf, Antarctica.
 The site is a largely featureless ice plain with no obstructions (see photo above). 
@@ -36,7 +36,7 @@ for the elevation mask. An azimuth mask is not required.
 
 If you are curious about the position time series for the antenna, you can use *download_unr lorg* for more information.
 
-## Take a Look at the Data
+### Take a Look at the Data
 
 First make a SNR file.
 
@@ -66,7 +66,7 @@ This is for L5:
 
 <img src="lorg-ql-l5.png" width="600">
 
-## Analyze the Data
+### Analyze the Data
 
 Now prepare to analyze the data using **gnssir**.  First you need to create a set of analysis instructions. 
 The default settings only need the station name, latitude, longitude, and ellipsoidal height. You make 
@@ -98,9 +98,9 @@ $REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt)
 The **daily_avg** command will calculate the daily average reflector height from the daily output files. 
 To minimize outliers in these daily averages, a median filter is set to allow 
 values within a given value of the median. The user is also asked to set a required minimum number of daily satellite 
-tracks. Here we use 0.25 meters and 50 tracks. We have also set a specific output filename:
+tracks. Here we use 0.25 meters and 50 tracks. 
 
-<code>daily_avg lorg 0.25 50 -txtfile lorg-dailyavg.txt</code>
+<code>daily_avg lorg 0.25 50</code>
 
 
 <img src="lorg_1.png" width="600"/>
@@ -108,4 +108,4 @@ tracks. Here we use 0.25 meters and 50 tracks. We have also set a specific outpu
 
 <img src="lorg-dailyavg.png" width="600"/>
 
-[A daily average Reflector height file is provided here.](lorg-dailyavg.txt). 
+[A daily average reflector height file.](lorg-dailyavg.txt). 
