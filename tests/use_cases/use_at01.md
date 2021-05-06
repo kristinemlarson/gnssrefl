@@ -97,7 +97,7 @@ Next we analyze data for days 100-131 for the year 2020. First make the SNR file
 
 Now set up the analysis instructions:
 
-<code>make_json_input make_json_input at01 63.484 -162.006 21.565 -h1 8 -h2 15 -e1 5 -e2 13 -allfreq True </code>
+<code>make_json_input at01 63.484 -162.006 21.565 -h1 8 -h2 15 -e1 5 -e2 13 -allfreq True </code>
 
 You will need to hand-edit the file to restrict the azimuths per our QC output. I also removed the Beidou signals (frequencies > 300) 
 because they are not in the RINEX 2.11 file. [Sample json file.](at01.json)
@@ -107,11 +107,12 @@ Then estimate reflector height (RH) for the one month period:
 <code>gnssir at01 2020 100 -doy_end 130</code>
 
 We have written some code to help you look at these subdaily files - it is not complete as yet,
-but you can certainly give it a try:
+but you can certainly give it a try. We have set an outlier criteria of ~3 sigma. At this site (without
+removing biases between frequencies), this will be ~0.12 m, so 0.36 m.
 
-<code>subdaily at01 2020 -doy1 100 -doy2 130</code>
+<code>subdaily at01 2020 -doy1 100 -doy2 130 -outlier 0.36</code>
 
-It basically [concatenates the daily files](at01_subdaily_rh.txt.gz) for this period and makes this plot:
+The code [concatenates the daily RH files](at01_subdaily_rh.txt.gz) for this period and also makes this plot:
 
 <img src=at01_raw.png width=600>
 
@@ -125,6 +126,7 @@ is **very important** for sites with large tidal ranges, but is of minimal impor
 
 <img src=at01_edits.png width=600>
 
-The code will also print out a list of outliers so that you can assess whether you might want to change your azimuth mask.
+The code will also print out a list of outliers (outliers.txt) so that you can assess whether you 
+might want to change your azimuth mask.
 
 

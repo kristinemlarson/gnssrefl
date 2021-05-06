@@ -32,8 +32,12 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp'] 
     plot_screen = lsp['plt_screen'] 
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
-    #print('value of screenstats ', screenstats, lsp['screenstats'])
-    azval = lsp['azval']
+    for i in range(0,naz):
+        if (azval[i+1] - azval[i]) > 100:
+            print('FATAL WARNING: You are prohibited from having an azimuth range that is larger than 100 degrees.')
+            print('Azimuth values:', azval[i], azval[i+1])
+            print('Change the json input file. Exiting.')
+            sys.exit()
 
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
     dmjd, fracS = g.mjd(year,month,day,0,0,0)
