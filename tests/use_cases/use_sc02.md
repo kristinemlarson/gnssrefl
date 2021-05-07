@@ -62,10 +62,10 @@ Use our utility **quickLook** with defaults [(For more details on quickLook outp
 
 <img src="sc02-default.png" width="600"/>
 
-These results for reflector height are pretty bad (gray means the retrieval does not pass QC). Why? 
+These results for reflector height in the top panel are pretty bad (gray means the retrieval does not pass QC). Why? 
 The reflector height defaults are restricted to 0.5-6 meters, which includes part of 
 the tidal range, but not all of it. Furthermore, the default elevation angles of 5 to 25 degrees are 
-not acceptable here, as they include rocks and soil in addition to the water.
+not acceptable here, as these elevation angles include rocks and soil in addition to the water.
 
 Now let's make better choices. Following the suggestions of *Larson, Ray, and Williams* (2017), use 
 elevation angle restrictions of 5 to 13 degrees and reflector height restrictions of 3 to 12 meters. And let's 
@@ -87,10 +87,10 @@ We can also check the retrievals stats for L1 to make sure these look good too.
 
 <img src="sc02-l1-qc.png" width="600">
 
-### Measure Tides with GNSS-IRh
+### Measure Tides with GNSS-IR
 
 We will not attempt to analyze a long time series, but instead focus here on 
-the process. We will be using ~two weeks of GNSS data from 2021 as our sample dataset.
+the process. We will be using three+ weeks of GNSS data from 2021 as our sample dataset.
 
 <code>rinex2snr sc02 2021 15 -doy_end 40</code>
 
@@ -101,14 +101,14 @@ Then you need to make the list of analysis inputs (stored in json format):
 Hand edit the json file to remove the unreliable azimuths and the Beidou signals because they are 
 not in the RINEX 2.11 file [Example json file](sc02.json). 
 
-Once you have the json file set up, you can go ahead and analyze the data:
+Once you have the json file set up, you can go ahead and analyze all the data with a single command:
 
 <code>gnssir sc02 2021 15 -doy_end 40</code>
 
 This produces reflector heights for every rising and setting satellite track that meets the 
 quality control metrics that you have set. We have some preliminary code that will help you evaluate 
-these RH retrievals. It is a work in progress, so it does not do everything yet. We start
-by concatenating the results and applying a 3 sigma outlier criterion 
+these RH retrievals. It is a work in progress, so it does not do everything yet. It starts  
+by concatenating the daily results and applying a 3 sigma outlier criterion 
 using 0.12 meters as the standard deviation.
 
 <code>subdaily sc02 2021 -outlier 0.36</code>
@@ -126,14 +126,20 @@ Residuals with and without RHdot correction:
 
 <img src="sc02-rhdot.png" width=600>
 
-And a summary of the number of satellite arcs that are available:
+The spline fit is used to calculate a velocity solution for the RH dot correction and 
+to identify outliers. 
+
+A summary of the number of satellite arcs that are available:
 
 <img src="sc02-nvals.png" width=600>
 
 Some statistics come to the screen that give you some perspective 
 on the performance of the different frequencies and constellations.
-Note that there *should* be biases because we have not yet applied the 
-phase center correction.
+Note that there *should* be biases because we have not yet applied 
+*phase center corrections*. This also shows that the RHdot correction
+should be applied at this site, as it does reduce the scatter. Once
+the phase center corrections are made, the precision will be further 
+improved.
 
 <PRE>
 RMS no RHdot correction (m)  0.139
@@ -161,9 +167,13 @@ package. He has been kind enough to make the Matlab code open source. If someone
 is willing to convert it to python, that would be fabulous. Please contact me if 
 you are interested (I will post a link to the Matlab code).
 
-How well does this simple analyis compare to the [official NOAA tide gauge stream?]
-(https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
+How well does this simple analyis compare to the [official NOAA tide gauge data stream?](https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
+
+You can download the NOAA data yourselves or use our utility:
 
 <code>download_tides 9449880 20210115 20210209</code>
+
+We then compared the two series. You might notice that the RH data have been flipped for this 
+comparison because GNSS-IR measures the negative of tides.  
 
 <img src="sc02-noaa.png" width=500>
