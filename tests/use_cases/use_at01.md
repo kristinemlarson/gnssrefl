@@ -1,4 +1,4 @@
-### Use Case for Bering Sea 
+### Bering Sea 
   
 **Station Name:**  at01
 
@@ -12,7 +12,7 @@
 
 - Longitude: -162.0064
 
-- Height:       21.7 m
+- Height: 21.7 m
 
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/AT01)
 

@@ -18,6 +18,7 @@
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/SC02.sta)
 
+[NOAA tide gauge](https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
 
 <p align="center">
 <img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>
@@ -31,13 +32,23 @@ back a bit too far from the shore - and would have been far superior for reflect
 a bit taller. Furthermore, there are obstructions (docks). For further details, you are encouraged to read 
 [this early paper](https://www.kristinelarson.net/wp-content/uploads/2015/12/LarsonRayWilliams-2017-FridayHarbor.pdf) 
 summarizing a comparison of 10 years of GNSS-IR results with the colocated tide gauge operated by NOAA. That paper only
-used the GPS L1 SNR data.  Since that time a multi-GNSS receiver has been operating and there is an order of 
+used the GPS L1 SNR data.  Since that time a multi-GNSS receiver has been installed and there is an order of 
 magnitude increase in the number of useable signals. We will only use the data from this new receiver.
 Although there are 1-sec data archived at UNAVCO, for this small study we will use the 15 second files.
 
 
 Take some time to look at the [reflection zones webapp.](https://gnss-reflections.org/rzones?station=sc02) 
+The goal is to play with the different elevation angle settings and azimuths. This screen 
+shot shows clearly that not all azimuths are going to work. But it does not tell you which 
+elevation angles will be over water and which will not. The default will use mean sea level -
+but keep in mind that the reflector heights will not always be at mean sea level. so you might
+try using different reflector heights to see how those reflection zones change. We have 
+data from the site, so you can check later to see which ones are the limiting reflector 
+heights.
 
+<P align=center>
+<img src="sc02-google.png" width=400>
+</p>
 
 ### Take a quick look at the SNR data
 
@@ -57,7 +68,7 @@ the tidal range, but not all of it. Furthermore, the default elevation angles of
 not acceptable here, as they include rocks and soil in addition to the water.
 
 Now let's make better choices. Following the suggestions of *Larson, Ray, and Williams* (2017), use 
-elevation angle restrictions of 5 to 13 degrees and reflector height restrictions of 3 to 10 meters. And let's 
+elevation angle restrictions of 5 to 13 degrees and reflector height restrictions of 3 to 12 meters. And let's 
 use a modern GPS signal, L2C.
 
 <code>quickLook sc02 2021 15 -e1 5 -e2 13 -h1 3 -h2 12 -fr 20</code>
@@ -65,24 +76,21 @@ use a modern GPS signal, L2C.
 <img src="sc02-l2c.png" width=600>
 
 Now instead of vast numbers of unsuccessful reflector height retrivals, you can begin to 
-see where the acceptable azimuths will be, ~50 to 230 degrees. Peak to noise of 3 works pretty well.
-The Lomb Scargle periodograms show the retrievals in periodogram space. You can see here that the northwest
-is a dead zone for water reflections, but this is what you should expect if you 
-[look at google maps](https://gnss-reflections.org/geoid?station=sc02):
+see where the acceptable azimuths will be, ~50 to 230 degrees. A peak to noise ratio 
+of 3 works pretty well.  The Lomb Scargle periodograms show the 
+retrievals in periodogram space. You can see here that the northwest
+is a dead zone for water reflections, and that was expected.
 
 <img src="sc02-l2c-lsp.png" width=600>
-
-<img src="sc02-google.png" width=600>
-
 
 We can also check the retrievals stats for L1 to make sure these look good too.
 
 <img src="sc02-l1-qc.png" width="600">
 
-### Measure Tides 
+### Measure Tides with GNSS-IRh
 
-We will not attempt to analyze a long time series, but instead focus here on the process. We will be 
-using ~two weeks of GNSS data from 2021 as our sample dataset.
+We will not attempt to analyze a long time series, but instead focus here on 
+the process. We will be using ~two weeks of GNSS data from 2021 as our sample dataset.
 
 <code>rinex2snr sc02 2021 15 -doy_end 40</code>
 
@@ -93,22 +101,24 @@ Then you need to make the list of analysis inputs (stored in json format):
 Hand edit the json file to remove the unreliable azimuths and the Beidou signals because they are 
 not in the RINEX 2.11 file [Example json file](sc02.json). 
 
-Once you have the json file set up, you can analyze the data:
+Once you have the json file set up, you can go ahead and analyze the data:
 
 <code>gnssir sc02 2021 15 -doy_end 40</code>
 
 This produces reflector heights for every rising and setting satellite track that meets the 
-quality control metrics that you set. We have some preliminary code that will help you evaluate 
-these retrievals. It is a work in progress, so it does not do everything yet. I am going to start
-by concatenating the results and applying a 3 sigma outlier criterion using 0.12 meters as the standard deviation.
+quality control metrics that you have set. We have some preliminary code that will help you evaluate 
+these RH retrievals. It is a work in progress, so it does not do everything yet. We start
+by concatenating the results and applying a 3 sigma outlier criterion 
+using 0.12 meters as the standard deviation.
 
 <code>subdaily sc02 2021 -outlier 0.36</code>
 
 <img src="raw_sc02.png"	width=600>
 
-This code will create and apply the RH dot correction. The outliers are identified and removed
-from the output file. Below are shown the initial solutions with a spline fit and 
-outliers identified.
+The output is stored in a plain text or csv file.
+This code will also apply the RH dot correction. Outliers are identified and 
+removed and these new solutions are also written to a file in either plain text or csv format.
+Below are shown the initial solutions with a spline fit and outliers identified.
 
 <img src="sc02-outliers.png" width=600>
 
@@ -116,11 +126,11 @@ Residuals with and without RHdot correction:
 
 <img src="sc02-rhdot.png" width=600>
 
-And summary of the number of satellite arcs available:
+And a summary of the number of satellite arcs that are available:
 
 <img src="sc02-nvals.png" width=600>
 
-Some statistics come to the screen that give some perspective 
+Some statistics come to the screen that give you some perspective 
 on the performance of the different frequencies and constellations.
 Note that there *should* be biases because we have not yet applied the 
 phase center correction.
@@ -148,5 +158,12 @@ smoothness strategies are used to improve the retrievals.
 
 I would like to include Simon Williams RH retrieval/tidal estimation code in this 
 package. He has been kind enough to make the Matlab code open source. If someone 
-is willing to convert it to python, that would be fabulous.
+is willing to convert it to python, that would be fabulous. Please contact me if 
+you are interested (I will post a link to the Matlab code).
 
+How well does this simple analyis compare to the [official NOAA tide gauge stream?]
+(https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
+
+<code>download_tides 9449880 20210115 20210209</code>
+
+<img src="sc02-noaa.png" width=500>
