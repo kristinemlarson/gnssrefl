@@ -475,7 +475,6 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     print_badpoints(tvd[j,:], resid_spl[j])
     if pltit:
         plt.figure()
-        #plt.subplot(211)
         #plt.plot(obstimes, h, 'bo', label='Original points',markersize=3)
         plt.plot(th, h, 'bo', label='Original points',markersize=3)
         # cannot use this because i do not have the year in the tnew variable
@@ -483,9 +482,10 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         plt.plot(spl_x, spl_y, 'r', label='spline')
         plt.title('Station: ' + station + ' Reflector Height')
         plt.plot(th[j], h[j], 'co',label='Outliers') 
-        plt.grid()
         plt.ylabel('meters',fontsize=fs)
         plt.xlabel('days',fontsize=fs)
+        plt.grid()
+        plt.gca().invert_yaxis()
         plt.legend(loc="upper left")
 
 # take out the bad points

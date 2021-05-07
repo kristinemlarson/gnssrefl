@@ -4,7 +4,7 @@
 
 **Location:** Boulder, CO, USA
 
-**Archive:** [UNAVCO](http://www.unavco.org), [SOPAC](http://sopac-csrc.ucsd.edu/index.php/sopac/) 
+**Archive:** [UNAVCO](http://www.unavco.org)
 
 **DOI:**  	[https://doi.org/10.7283/T5R49NQQ](https://doi.org/10.7283/T5R49NQQ)
 

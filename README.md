@@ -218,6 +218,8 @@ In many cases Hatanaka compressed formats are used by data archives. These have 
 
 We are working to make a NMEA reader for this software package.
 
+<HR>
+
 ### rinex2snr - extracting SNR data from RINEX files <a name="module1"></a>
 
 The international standard for sharing GNSS data is called 
@@ -283,7 +285,7 @@ Using hybrid (the default):
 - ga (Geoscience Australia)
 - bev (Austria Federal Office of Metrology and Surveying)
 
-**Example setting archive:**
+**Example setting the archive:**
 
 <code>rinex2snr tgho 2020 132 -archive nz</code>
 
@@ -291,14 +293,14 @@ What if you want to run the code for all the data for any year?  You can use doy
 
 <code>rinex2snr tgho 2019 1  -archive nz -doy_end 365</code>
  
+**Examples using RINEX 3:**
+
 If your station name has 9 characters (lower case please), the code assumes you are looking for a 
 RINEX 3 file. However, my code will store the SNR data using the normal
 4 character name. *You must install the gfzrnx executable that translates RINEX 3 to 2 to use RINEX 3 files
 in my code.* *rinex2snr* currently only looks for RINEX 3 files at CDDIS (30 sec) and UNAVCO (15 sec).  There 
 are more archive options in **download_rinex** and someday I will merge these. If you do have your own RINEX 3
 files, I use the community standard, that is upper case except for the file extension (which is rnx).  
-
-Here are some examples for RINEX 3 conversions:
 
 <code>rinex2snr onsa00swe 2020 298</code>
 
@@ -370,6 +372,8 @@ To columns are defined as:
 11. S8 SNR on L8
 
 The unit for all SNR data is dB-Hz.
+
+<HR>
 
 ### quickLook <a name="module2"></a>
 
@@ -618,6 +622,8 @@ or the [question section of my web app.](https://gnss-reflections.org/overview).
 arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
+<HR>
+
 ### Bugs/Features <a name="bugs"></a>
 
 I have been using **teqc** to reduce the number of observables and to decimate. I have removed the former 
@@ -632,6 +638,8 @@ At least one agency (JAXA) writes out 9999 values for unhealthy satellites. I sh
 at the rinex2snr level, but currently (I believe) the code simply removes the satellites because the elevation
 angles are all very negative (-51). JAXA also has an incomplete number of GPS satellites in its sp3 files (removing 
 the newer ones). It is unfortunate, but I cannot do anything about this.
+
+<HR>
 
 ### Utilities <a name="helper"></a>
 
@@ -666,6 +674,8 @@ and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works per
 but this utility writes out a file with only columns of numbers instead of 
 csv. 
 
+<HR>
+
 ### Publications <a name="publications"></a>
 
 There are A LOT of publications about GPS and GNSS interferometric reflectometry.
@@ -673,6 +683,8 @@ If you want something with a how-to flavor, try this paper,
 which is [open option](https://link.springer.com/article/10.1007/s10291-018-0744-8). Also 
 look to the publications page on my [personal website](https://kristinelarson.net/publications).
 
+
+<HR>
 
 ### Acknowledgements <a name="acknowledgements"></a>
 
@@ -683,4 +695,4 @@ refraction correction.
 
 Kristine M. Larson
 
-This documentation was updated on April 17, 2021.
+This documentation was updated on May 7, 2021.
