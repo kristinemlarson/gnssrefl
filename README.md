@@ -148,10 +148,16 @@ you can use for environmental sensing depends on how reflection-friendly your si
 What do these satellite arcs look like?  Here I am showing how these look for pretty standard 
 sites, one in the northern hemisphere and one in the southern hemisphere.
 
-<img src=tests/use_cases/mchl_google.jpg>
-<img src=tests/use_cases/p038_google.jpg>
-<img src=http://gnss-reflections.org/static/images/MCHL.jpg>
-<img src=http://gnss-reflections.org/static/images/P038.jpg>
+<table>
+<TR>
+<TD><img src=tests/use_cases/mchl_google.jpg width=300></TD>
+<TD><img src=tests/use_cases/p038_google.jpg width=300></TD>
+</TR>
+<TR>
+<TD><img src=http://gnss-reflections.org/static/images/MCHL.jpg width=300></TD>
+<TD><img src=http://gnss-reflections.org/static/images/P038.jpg width=300></TD>
+</TR>
+</table>
 
 As discussed in [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
 there are two QC measures used in this code. One is the peak
