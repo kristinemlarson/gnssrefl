@@ -165,6 +165,43 @@ sites, one in the northern hemisphere and one in the southern hemisphere.
 </TR>
 </table>
 </p>
+Each one of the yellow/blue/red/green/cyan cluster represents the reflection zone
+for a single rising or setting GPS satellite arc. The colors represent different elevation angles - 
+so yellow is lowest (5 degrees), blue (10 degrees) and so on. The missing satellite signals in the north
+(for New Mexico) and south (for Mitchell) are the result of the GPS satellite 
+inclination angle and the station latitudes. The length of the ellipses depends on the height of the 
+antenna above the surface - so a height of 2 meters gives an ellipse that is shorter than one 
+that is 10 meters. In this case we used 2 meters for both sites - and these are pretty 
+simple GNSS-IR sites. The surfaces below
+th GPS antennas are fairly smooth and that will generate coherent reflections. In general, you can 
+use all azimuths.  
+
+Now let's look at a more complex case, station ross on Lake Superior.  
+
+<p align=center>
+<table>
+<TR>
+<TD>A. <img=tests/use_cases/ross-google.jpg width=300</TD>
+<TD>B. <img=https://gnss-reflections.org/static/images/ROSS.jpg width=300></TD>
+</TR>
+<Tr>
+<TD>C. <img=tests/use_cases/ross-first.jpg width=300</TD> 
+<TD>D. <img=tests/use_cases/ross-second.jpg width=300</TD>
+</Tr>
+</table>
+</p>
+Here the goal is to measure the level of Lake Superior and the map image (panel A) makes it clear
+that we cannot use all azimuths. It is a bit tricky to know what the lake level is likely 
+to be, but the photograph (panel B) suggests it is quite a bit taller than 2 meters - but not too tall.
+We are going to try 4 meters.  
+
+Using the reflection zone web app, we can plot up the appropriate reflection zones for various options.
+Since ross is a longstanding site, we have its coordinates in our database, so you can just plug in ross
+for the station and leave latitude/longitude/height blank. You do need to plug in a RH of 4 since mean 
+sea level would not be an appropriate reflector here. We start out with azimuth range of 90 to 180 degrees.
+Using 5-25 degree elevation angles (panel C) looks like it won't quite work - and going all the way to 180 degrees
+in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15).
+
 
 As discussed in [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
 there are two QC measures used in this code. One is the peak
