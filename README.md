@@ -186,12 +186,12 @@ We are going to try 4 meters.
 <p align=center>
 <table>
 <TR>
-<TD>A. <img=tests/use_cases/ross-google.jpg width=300> </TD>
-<TD>B. <img=https://gnss-reflections.org/static/images/ROSS.jpg width=300> </TD>
+<TD>A. <img src=tests/use_cases/ross-google.jpg width=300> </TD>
+<TD>B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> </TD>
 </TR>
 <Tr>
-<TD>C. <img=tests/use_cases/ross-first.jpg width=300></TD> 
-<TD>D. <img=tests/use_cases/ross-second.jpg width=300></TD>
+<TD>C. <img src=tests/use_cases/ross-first.jpg width=300></TD> 
+<TD>D. <img src=tests/use_cases/ross-second.jpg width=300></TD>
 </Tr>
 </table>
 </p>
