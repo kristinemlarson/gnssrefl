@@ -1,4 +1,4 @@
-## gnssrefl
+### gnssrefl
 
 ### Table of Contents
 
@@ -21,9 +21,6 @@
 
 **April 17, 2012** New plot added to quickLook. This should provide feedback to the user on which QC 
 metrics to use and which azimuths are valid. New plot also added to daily_avg.
-
-**April 3, 2021** Added new plot in quickLook that provides perspective on choosing the right
-azimuths and QC metrics
 
 **March 30, 2021** Hopefully bug fixed related to the refraction file (gpt_1wA.pickle). If it is missing from your build,
 it is now downloaded for you. Apologies. 
@@ -78,7 +75,6 @@ I encourage you to get to know your site. If it belongs to you, look at
 photographs. If you can't find photographs, use Google Earth.  You can also try using
 my [google maps web app interface](https://gnss-reflections.org/geoid?station=smm3).
 
-
 <HR>
 
 ### Code Description<a name="code"></a>
@@ -124,26 +120,57 @@ To see the names of these utilities:
 
 * pip list 
 
-
 If you are unsure about why various restrictions are being applied, it is really useful 
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
 or similar. I am committed in principle to set up some online
 courses to teach people about GNSS reflections, but funding for these courses is 
 not in hand at the moment. 
 
+<HR>
+
+### What is this Code Doing?
+
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
 an interference pattern that can be observed in GNSS data as a satellite rises or sets. 
 The frequency of this interference pattern is directly related to the height of the antenna phase
-center above the reflecting surface, or reflector height RH (purple). Accordingly, this code strips out 
-rising and setting satellite arcs and estimates RH.
+center above the reflecting surface, or reflector height RH (purple). 
 
-<center>
+<p align=center>
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
-</center>
+</p>
+
+Accordingly, this code strips out rising and setting satellite data and estimates RH 
+for each satellite arc. Each satellite arc is associated with a specific time (usually about 
+30 minutes) and a direction (azimuth) on the surface of the Earth. How many satellite arcs 
+you can use for environmental sensing depends on how reflection-friendly your site is. 
+
+
+What do these satellite arcs look like?  Here I am showing how these look for pretty standard 
+sites, one in the northern hemisphere and one in the southern hemisphere.
+
+<img src=tests/use_cases/mchl_google.jpg>
+<img src=tests/use_cases/p038_google.jpg>
+<img src=http://gnss-reflections.org/static/images/MCHL.jpg>
+<img src=http://gnss-reflections.org/static/images/P038.jpg>
+
+As discussed in [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
+there are two QC measures used in this code. One is the peak
+value of the peak in the periodogram. In the example below the amplitude of the most significant
+peak is ~17, so if you define the required amplitude
+to be 15, this one would pass. Secondly it uses a very simple peak to noise ratio (pk2noise) calculation. In this case the
+average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise".
+You then take the peak value (here ~17) and divide by the "noise" value.
+For the ocean, I generally recommend starting with a peak to noise ratio of 2.7, but for lakes or snow, I use
+3.2-3.5 or so. Use **quickLook** to help you get a sense of the typical values for your site.
+
+<p align=center>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
+</p>
+
 
 <HR>
 
-### Installing the Code<a name="environment"></a>
+### Installing the gnssrefl Code<a name="environment"></a>
 
 *Environment Variables*
    

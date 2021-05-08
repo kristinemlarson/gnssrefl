@@ -115,19 +115,15 @@ using 0.12 meters as the standard deviation.
 
 <img src="raw_sc02.png"	width=600>
 
-The output is stored in a plain text or csv file.
-This code will also apply the RH dot correction. Outliers are identified and 
+The output is stored in a plain text or csv file. This code will also apply the RH dot correction. Outliers are identified and 
 removed and these new solutions are also written to a file in either plain text or csv format.
 Below are shown the initial solutions with a spline fit and outliers identified.
 
 <img src="sc02-outliers.png" width=600>
 
-Residuals with and without RHdot correction:
+Residuals to the spline fit with and without a RHdot correction:
 
 <img src="sc02-rhdot.png" width=600>
-
-The spline fit is used to calculate a velocity solution for the RH dot correction and 
-to identify outliers. 
 
 A summary of the number of satellite arcs that are available:
 
@@ -173,7 +169,6 @@ You can download the NOAA data yourselves or use our utility:
 
 <code>download_tides 9449880 20210115 20210209</code>
 
-We then compared the two series. You might notice that the RH data have been flipped for this 
-comparison because GNSS-IR measures the negative of tides.  
+We then compared the two series. 
 
 <img src="sc02-noaa.png" width=500>
