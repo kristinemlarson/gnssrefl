@@ -176,9 +176,9 @@ that is 10 meters. In this case we used 2 meters for both sites - and these are 
 simple GNSS-IR sites. The surfaces below
 th GPS antennas are fairly smooth and that will generate coherent reflections. In general, you can 
 use all azimuths.  
-
-Now let's look at a more complex case, station ross on Lake Superior.  
-Here the goal is to measure the level of Lake Superior and the map image (panel A) makes it clear
+<P>
+Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
+is to measure the level of Lake Superior and the map image (panel A) makes it clear
 that we cannot use all azimuths. It is a bit tricky to know what the lake level is likely 
 to be, but the photograph (panel B) suggests it is quite a bit taller than 2 meters - but not too tall.
 We are going to try 4 meters.  
@@ -202,8 +202,14 @@ database. You can just plug in ross for the station and leave
 latitude/longitude/height blank. You do need to plug in a RH of 4 since mean 
 sea level would not be an appropriate reflector here. Start out with azimuth range of 90 to 180 degrees.
 Using 5-25 degree elevation angles (panel C) looks like it won't quite work - and going all the way to 180 degrees
-in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15).
+in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15) that is 
+better than 5-25 degrees. It is also worth noting that the GPS antenna has been attached to a pier - 
+and boats dock at piers. You might very well see outliers at this site when a boat is docked at the pier.
 
+
+Once you have the code set up, it is important that you check the quality of data. This will also 
+allow you to check on your assumptions, such as the appropriate azimuth and elevation angle 
+mask and reflector height. This is one of the reasons <code>quickLook</code> was developed. 
 
 As discussed in [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
 there are two QC measures used in this code. One is the peak
