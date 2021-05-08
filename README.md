@@ -133,13 +133,18 @@ not in hand at the moment.
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
 an interference pattern that can be observed in GNSS data as a satellite rises or sets. 
 The frequency of this interference pattern is directly related to the height of the antenna phase
-center above the reflecting surface, or reflector height RH (purple). 
+center above the reflecting surface, or reflector height RH (purple). *The primary goal of this software 
+is to measure RH.* This parameter is directly related to changes in snow height and water levels below
+an antenna, which is why GNSS-IR can be used as a snow sensor and tide gauge. GNSS-IR can also be 
+used to measure soil moisture, but the code to estimate soil moisture is not as strongly related to RH as
+snow and water. We will be posting the code you need to measure soil moisture later in the year.
 
 <p align=center>
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
 </p>
 
-Accordingly, this code strips out rising and setting satellite data and estimates RH 
+GNSS-IR only works with low elevation angle data; generally the range from 5 to 30 degrees is useable.  
+This code finds the rising and setting satellite arcs and estimates RH 
 for each satellite arc. Each satellite arc is associated with a specific time (usually about 
 30 minutes) and a direction (azimuth) on the surface of the Earth. How many satellite arcs 
 you can use for environmental sensing depends on how reflection-friendly your site is. 
