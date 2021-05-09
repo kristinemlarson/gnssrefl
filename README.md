@@ -646,19 +646,6 @@ To use GPS L2C, require a spectral amplitude of 10, and spectral peak to noise r
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True -ampl 10 -peak2noise 3</CODE>
 
-As discussed in Roesler and Larson (2018), there are two QC measures used in this code. One is the peak 
-value of the peak in the periodogram. In the example below the amplitude of the most significant 
-peak is ~17, so if you define the required amplitude 
-to be 15, this one would pass. Secondly it uses a very simple peak to noise calculation. In this case the 
-average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise". 
-You then take the peak value (here ~17) and divide by the "noise" value.  
-For the ocean, I generally recommend starting with a peak to noise ratio of 2.7, but for lakes or snow, I use 
-3.2-3.5 or so. It can be tricky to set these QC values in general. 
-
-<center>
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
-</center>
-
 Things that are helpful to know for the make_json_input inputs:
 
 * Some json settings can be set at the command line.  run <code>make_json_input -h</code> to see these.  
