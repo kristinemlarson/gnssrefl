@@ -151,8 +151,7 @@ for each satellite arc. Each satellite arc is associated with a specific time (u
 you can use for environmental sensing depends on how reflection-friendly your site is. 
 
 
-What do these satellite arcs look like? Below are photographs and [reflection zone 
-maps](https://gnss-reflections/rzones) for two standard GNSS-IR sites, one in the 
+What do these satellite arcs look like? Below are photographs and [reflection zone maps](https://gnss-reflections.org/rzones) for two standard GNSS-IR sites, one in the 
 northern hemisphere and one in the southern hemisphere.
 
 <p align=center>
@@ -425,20 +424,20 @@ It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beido
 on my experience with GPS, I know that this will be much much much faster if we use Fortran
 code and bind with python using numpy. If you have such code, or know where it lives, please let me know.
 
-Other questions:
 
-- What if you do not want to install the fortran translators? That should be ok as the default
-is the hybrid option, which does not require fortran.
+**What if you are providing the RINEX files and you don't want the code to search for 
+the files online?**
 
-- What if you are providing the RINEX files and you don't want the code to search for 
-the files online? Use -nolook True
+Use <code>-nolook True</code>
 
-There is a **rate** command line input that has two values, high or low. 
-However, if you invoke high, it currently only looks at the UNAVCO, GA, or 
+**What if you want to use high-rate data?** Use:
+
+<code>-rate high</code>
+
+However, if you invoke this, it currently only looks at the UNAVCO, GA, or 
 NRCAN archives. Please beware - it takes a long time to download a 
-highrate GNSS RINEX file (even when it is compressed). 
-And it also takes a long time to compute orbits for it (and thus create a SNR file).
-For high-rate data, you should use hybrid or fortran translators.
+highrate GNSS RINEX file (even when it is compressed).  And it also takes a 
+long time to compute orbits for it. For high-rate data, you should never use the python translation option.
 
 **Output SNR file format**
 
