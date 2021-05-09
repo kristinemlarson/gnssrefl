@@ -547,11 +547,9 @@ This is further emphasized in the next panel, that shows the actual periodograms
 **Example from Greenland:**
 
 Let us look at two days of data collected on the Greenland Ice Sheet. 
-You already have one file. Now make one three years later.
+You already have one SNR file. Now make one for a date three years later.
 
 <code>rinex2snr gls1 2014 271</CODE>
-
-Now run <code>quickLook</code>
 
 <CODE>quickLook gls1 2011 271</CODE> 
 
