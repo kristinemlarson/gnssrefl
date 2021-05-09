@@ -528,23 +528,20 @@ frequency 20:
 
 <img src="tests/use_cases/p041-l2c.png" width=600>
 
-In general, L2C results are always superior to L1 results. 
+**L2C results are always superior to L1 results.** If you have any influence over a GNSS, please 
+ask the station operators to track modern GPS signals.
 
 **Example from a lake:**
 
-Make a SNR file:
-
-
-<code>rinex2snr ross 2020 170</code>
-
-and
-
-<code>quickLook ross 2020 170 -e1 5 -e2 15</code>
+Make a SNR file <code>rinex2snr ross 2020 170</code> and <code>quickLook ross 2020 170 -e1 5 -e2 15</code>
 
 <img src=tests/use_cases/ross-qc.png width=600>
+The good RH estimates (in blue in the top panel) are telling us that we were right when we assessed 
+reflection zones using 4 meters. We can also see that the best retrievals are in the 
+southeast quadrant (azimuths 90-180 degrees).
+This is further emphasized in the next panel, that shows the actual periodograms.
 
 <img src=tests/use_cases/ross-lsp.png width=600>
-
 
 **Example from Greenland:**
 
