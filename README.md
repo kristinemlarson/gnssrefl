@@ -181,7 +181,7 @@ antenna above the surface - so a height of 2 meters gives an ellipse that is sma
 that is 10 meters. In this case we used 2 meters for both sites - and these are pretty 
 simple GNSS-IR sites. The surfaces below th GPS antennas are fairly smooth and that 
 will generate coherent reflections. In general, you can use all azimuths at these sites.  
-<P>
+
 Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
 is to measure water levels. The map image (panel A) makes it clear
 that unlike Mitchell and Portales, we cannot use all azimuths to measure the lake. To understand our reflection 
@@ -202,7 +202,7 @@ Photograph of station ROSS</TD>
 <TD>C. <img src=tests/use_cases/ross-first.jpg width=300><BR>
 Reflection zones for GPS satellites at elevation angles of 5-25 degrees 
 for a reflector height of 4 meters.</TD> 
-<TD>D. <img src=tests/use_cases/ross-second.jpg width=300>
+<TD>D. <img src=tests/use_cases/ross-second.jpg width=300><BR>
 Reflection zones for GPS satellites at elevation angles of 5-15 degrees 
 for a reflector height of 4 meters.  </TD>
 </Tr>
@@ -215,8 +215,9 @@ database. You can just plug in ross for the station name and leave
 latitude/longitude/height blank. You *do* need to plug in a RH of 4 since mean 
 sea level would not be an appropriate reflector here. Start out with azimuth range of 90 to 180 degrees.
 Using 5-25 degree elevation angles (panel C) looks like it won't quite work - and going all the way to 180 degrees
-in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15) that is 
-better than 5-25 degrees. It is also worth noting that the GPS antenna has been attached to a pier - 
+in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15) and cuts 
+off azimuths at 160.  These choices appear to be better than those from Panel C. 
+It is also worth noting that the GPS antenna has been attached to a pier - 
 and *boats dock at piers*. You might very well see outliers at this site when a boat is docked at the pier.
 
 Once you have the code set up, it is important that you check the quality of data. This will also 
@@ -478,12 +479,11 @@ If your site is taller than that, you will need to override the defaults.
 Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
 you don't want to use, you need to override them.  For more information, use <code>quickLook -h</CODE>
 
-There are two QC measures used in quickLook (and gnssir). One is the peak
+There are two QC measures used in <Code>quickLook</code> and <code>gnssir</code>. One is the peak
 value of the peak in the periodogram. In the example below the amplitude of the most significant
 peak is ~17, so if you define the required amplitude
 to be 15, this one would pass. Secondly it uses a very simple peak to noise ratio (pk2noise) 
-calculation. In this case the
-average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise".
+calculation. In this case the average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise".
 You then take the peak value (here ~17) and divide by the "noise" value.
 For the ocean, I generally recommend starting with a peak to noise ratio of 2.7, but for lakes or snow, I use
 3.2-3.5 or so. 
@@ -492,6 +492,8 @@ For the ocean, I generally recommend starting with a peak to noise ratio of 2.7,
 <p align=center>
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
 </p>
+
+**Example from Boulder:**
 
 We start with one of our <code>rinex2snr</code> examples, p041
 
@@ -528,15 +530,19 @@ frequency 20:
 
 In general, L2C results are always superior to L1 results. 
 
-We can now check
+**Example from a lake:**
 
+
+**Example from Greenland:**
 
 Let us look at two days of data collected on the Greenland Ice Sheet. 
 You already have one file. Now make one three years later.
 
 <code>rinex2snr gls1 2014 271</CODE>
 
-Now run quickLook, <CODE>quickLook gls1 2011 271</CODE> focusing on the QC plots:
+Now run <code>quickLook</code>
+
+<CODE>quickLook gls1 2011 271</CODE> 
 
 We see a broad region for the southern azimuths (90-270) that give consistently good reflector height retrievals of 
 about 3 meters.
@@ -553,15 +559,15 @@ three years. [Please see our use case for an in depth study of this site in 2012
 The defaults used in <code>quickLook</code> appear to be doing a good job, 8 for the minimum amplitude and 3 for the required peak 
 to noise ratio.
 
-<HR>
+**Example for a tall site:**
 
-Finally, what do you do if your reflections site is taller than the default value of 6 meters?
+What do you do if your reflections site is taller than the default value of 6 meters?
 Does the code figure this out for you automatically? **No, it does not.** We use an example 
 from Greenland to demonstrate this issue. First make a SNR file using the defaults: 
 
 <CODE>rinex2snr smm3 2018 271</CODE>
 
-Now run **quickLook** using the defaults:
+Now run <code>quickLook</code> using the defaults:
 
 <CODE>quickLook smm3 2018 271</CODE>
 
@@ -585,8 +591,8 @@ to examine this site on Google Earth.
 
 ### gnssir <a name="module3"></a>
 
-This is the main driver for the GNSS-IR code.  
-You need a set of instructions for <code>gnssir</code> which are made using <code>make_json_input</code>.  
+<code>gnssir</code> is the main driver for the GNSS-IR code.  
+You need a set of instructions which are made using <code>make_json_input</code>.  
 The required inputs for <code>make_json_input</code> are: 
 
 * station name 
