@@ -128,14 +128,14 @@ not in hand at the moment.
 
 <HR>
 
-### What is this Code Doing?
+### Understanding what the code is doing
 
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
-an interference pattern that can be observed in GNSS data as a satellite rises or sets. 
-The frequency of this interference pattern is directly related to the height of the antenna phase
+an interference pattern that can be observed in GNSS Signal to Noise Ratio (SNR) data as a satellite rises or sets. 
+The frequency of this interference pattern is directly related to the height of the GNSS antenna phase
 center above the reflecting surface, or reflector height RH (purple). *The primary goal of this software 
 is to measure RH.* This parameter is directly related to changes in snow height and water levels below
-an antenna, which is why GNSS-IR can be used as a snow sensor and tide gauge. GNSS-IR can also be 
+a GNSS antenna. This is why GNSS-IR can be used as a snow sensor and tide gauge. GNSS-IR can also be 
 used to measure soil moisture, but the code to estimate soil moisture is not as strongly related to RH as
 snow and water. We will be posting the code you need to measure soil moisture later in the year.
 
@@ -143,14 +143,15 @@ snow and water. We will be posting the code you need to measure soil moisture la
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
 </p>
 
-GNSS-IR only works with low elevation angle data; generally the range from 5 to 30 degrees is useable.  
+GNSS-IR only works with low elevation angle data; generally the range from 5 to 30 
+degrees is useable though the sensitivity on elevation angle also depends on the kind of surface.  
 This code finds the rising and setting satellite arcs and estimates RH 
 for each satellite arc. Each satellite arc is associated with a specific time (usually about 
 30 minutes) and a direction (azimuth) on the surface of the Earth. How many satellite arcs 
 you can use for environmental sensing depends on how reflection-friendly your site is. 
 
 
-What do these satellite arcs look like?  Below are photographs and [reflection zone 
+What do these satellite arcs look like? Below are photographs and [reflection zone 
 maps](https://gnss-reflections/rzones) for two standard GNSS-IR sites, one in the 
 northern hemisphere and one in the southern hemisphere.
 
@@ -178,15 +179,14 @@ so yellow is lowest (5 degrees), blue (10 degrees) and so on. The missing satell
 inclination angle and the station latitudes. The length of the ellipses depends on the height of the 
 antenna above the surface - so a height of 2 meters gives an ellipse that is smaller than one 
 that is 10 meters. In this case we used 2 meters for both sites - and these are pretty 
-simple GNSS-IR sites. The surfaces below
-th GPS antennas are fairly smooth and that will generate coherent reflections. In general, you can 
-use all azimuths.  
+simple GNSS-IR sites. The surfaces below th GPS antennas are fairly smooth and that 
+will generate coherent reflections. In general, you can use all azimuths at these sites.  
 <P>
 Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
-is to measure the level of Lake Superior. The map image (panel A) makes it clear
-that unlike Mitchell and Portales, we cannot use all azimuths. To understand our reflection 
+is to measure water levels. The map image (panel A) makes it clear
+that unlike Mitchell and Portales, we cannot use all azimuths to measure the lake. To understand our reflection 
 zones, we need to know the approximate lake level. That is a bit tricky to know, but the 
-photograph (panel B) suggests it is quite a bit taller than the 2 meters we used at Portales - 
+photograph (panel B) suggests it is more than the 2 meters we used at Portales - 
 but not too tall. We will try try 4 meters and then check later to make sure that was a good assumption.  
 
 <p align=center>
@@ -210,18 +210,18 @@ for a reflector height of 4 meters.  </TD>
 </p>
 
 Again using the reflection zone web app, we can plot up the appropriate reflection zones for various options.
-Since ross has been around a long time, gnss-reflections.org has its coordinates in a 
-database. You can just plug in ross for the station and leave 
-latitude/longitude/height blank. You do need to plug in a RH of 4 since mean 
+Since ross has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) has its coordinates in a 
+database. You can just plug in ross for the station name and leave 
+latitude/longitude/height blank. You *do* need to plug in a RH of 4 since mean 
 sea level would not be an appropriate reflector here. Start out with azimuth range of 90 to 180 degrees.
 Using 5-25 degree elevation angles (panel C) looks like it won't quite work - and going all the way to 180 degrees
 in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15) that is 
 better than 5-25 degrees. It is also worth noting that the GPS antenna has been attached to a pier - 
-and boats dock at piers. You might very well see outliers at this site when a boat is docked at the pier.
+and *boats dock at piers*. You might very well see outliers at this site when a boat is docked at the pier.
 
 Once you have the code set up, it is important that you check the quality of data. This will also 
 allow you to check on your assumptions, such as the appropriate azimuth and elevation angle 
-mask and reflector height. This is one of the reasons <code>quickLook</code> was developed. 
+mask and reflector height range. This is one of the reasons <code>quickLook</code> was developed. 
 
 <HR>
 
@@ -455,9 +455,8 @@ To columns are defined as:
 
 The unit for all SNR data is dB-Hz.
 
-<HR>
 
-### Our names for the GNSS frequencies
+**Our names for the GNSS frequencies**
 
 - 1,2,20, and 5 are GPS L1, L2, L2C, and L5
 - 101,102 Glonass L1 and L2
@@ -494,7 +493,7 @@ For the ocean, I generally recommend starting with a peak to noise ratio of 2.7,
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
 </p>
 
-We start with one of our **rinex2snr** examples, p041
+We start with one of our <code>rinex2snr</code> examples, p041
 
 <code>quickLook p041 2020 132 </CODE>
 
@@ -548,8 +547,10 @@ Three years later, <CODE>quickLook gls1 2014 271</CODE>, we find similar behavio
 
 <img src="tests/use_cases/gls1-2014.png">
 
-Now the reflector height retrievals are just below 2 meters. At this site, that means there has been about two meters of snow accumulation in three years. [Please see our use case for an in depth study of this site in 2012](tests/use_cases/use_gls1.md).
-The defaults used in quickLook appear to be doing a good job, 8 for the minimum amplitude and 3 for the required peak 
+Now the reflector height retrievals are just below 2 meters. At this site, 
+that means there has been about two meters of snow accumulation in 
+three years. [Please see our use case for an in depth study of this site in 2012](tests/use_cases/use_gls1.md).
+The defaults used in <code>quickLook</code> appear to be doing a good job, 8 for the minimum amplitude and 3 for the required peak 
 to noise ratio.
 
 <HR>
@@ -585,8 +586,8 @@ to examine this site on Google Earth.
 ### gnssir <a name="module3"></a>
 
 This is the main driver for the GNSS-IR code.  
-You need a set of instructions for **gnssir** which are made using **make_json_input**.  
-The required inputs for **make_json_input** are: 
+You need a set of instructions for <code>gnssir</code> which are made using <code>make_json_input</code>.  
+The required inputs for <code>make_json_input</code> are: 
 
 * station name 
 * latitude (degrees)  
@@ -598,7 +599,7 @@ a few hundred meters is sufficient. For example:
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1</CODE>
 
-If you happen to have the Cartesian coordinates (in meters), you can set -xyz True and input those instead of 
+If you happen to have the Cartesian coordinates (in meters), you can set <code>-xyz True</code> and input those instead of 
 lat, long, and height.
 
 It will use defaults for other parameters if you do not provide them. Those defaults 
@@ -644,15 +645,8 @@ For the ocean, I generally recommend starting with a peak to noise ratio of 2.7,
 
 Things that are helpful to know for the make_json_input inputs:
 
-*Our names for the GNSS frequencies*
-
-- 1,2,5,20 are GPS L1, L2, L5, and L2C
-- 101,102 Glonass L1 and L2
-- 201, 205, 206, 207, 208: Galileo frequencies
-- 302, 306, 307 : Beidou frequencies
-
-* Some json settings can be set at the command line.  run **make_json_input -h** to see these.  
-Otherwise, edit the json file.  Note that there are a few inconstencies between the command line names 
+* Some json settings can be set at the command line.  run <code>make_json_input -h</code> to see these.  
+Otherwise, you will need to edit the json file.  Note that there are a few inconstencies between the command line names 
 and the json file (for example, h1 and h2 on the command line become
 minH and maxH in the json file). I apologize for this.
 
@@ -714,26 +708,23 @@ In this case, we will look at Galileo L1.
 
 <CODE>gnssir p041 2020 151 -fr 201 -plt True</CODE> 
 
-What should the periodogram plots look like? Until we have Jupyter notebooks, I 
-recommend you look at [the paper I wrote with Carolyn Roesler](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
-or the [question section of my web app.](https://gnss-reflections.org/overview). Note that a failed
-arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
+Note that a failed satellite arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 <HR>
 
 ### Bugs/Features <a name="bugs"></a>
 
-I have been using **teqc** to reduce the number of observables and to decimate. I have removed the former 
+I have been using <code>teqc</code> to reduce the number of observables and to decimate. I have removed the former 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
 and fortran is set to True, unfortunately this will still occur. I am working on removing my 
-code's dependence on **teqc**.
+code's dependence on <code>teqc</code>.
 
 No phase center offsets have been applied to reflector heights. While these values are relatively small,
 we do plan to remove them in subsequent versions of the code. 
 
 At least one agency (JAXA) writes out 9999 values for unhealthy satellites. I should remove these satellites 
-at the rinex2snr level, but currently (I believe) the code simply removes the satellites because the elevation
+at the <code>rinex2snr</code> level, but currently (I believe) the code simply removes the satellites because the elevation
 angles are all very negative (-51). JAXA also has an incomplete number of GPS satellites in its sp3 files (removing 
 the newer ones). It is unfortunate, but I cannot do anything about this.
 
@@ -741,10 +732,10 @@ the newer ones). It is unfortunate, but I cannot do anything about this.
 
 ### Utilities <a name="helper"></a>
 
-**daily_avg** is a utility for cryosphere people interested in computing daily snow 
+<code>daily_avg</code> is a utility for cryosphere people interested in computing daily snow 
 accumulation. It can be used for lake levels. *It is not to be used for tides!*
 
-**download_rinex** can be useful if you want to download RINEX v2 or 3 files (using the version flag) without using 
+<code>download_rinex</code> can be useful if you want to download RINEX v2.11 or 3 files (using the version flag) without using 
 the reflection-specific codes. Sample calls:
 
 <CODE>download_rinex p041 2020 6 1</CODE> downloads the data from June 1, 2020
@@ -753,24 +744,23 @@ the reflection-specific codes. Sample calls:
 
 <CODE>download_rinex p041 2020 150 0 -archive sopac</CODE> downloads the data from sopac archive on day of year 150 in 2020
 
-**download_orbits** downloads orbit files. See -h for more information.
+<code>download_orbits</code> downloads orbit files and stores them in $ORBITS. See -h for more information.
 
-**ymd** translates year,month,day to day of year
+<code>ymd</code> translates year,month,day to day of year
 
-**ydoy** translates year,day of year to month and day
+<code>ydoy</code> translates year,day of year to month and day
 
-**llh2xyz** translates latitude, longitude, and ellipsoidal ht to X, Y, Z
+<code>llh2xyz</code> translates latitude, longitude, and ellipsoidal ht to X, Y, Z
 
-**xyz2llh** translates Cartesian coordinates to latitude, longitude, height
+<code>xyz2llh</code> translates Cartesian coordinates to latitude, longitude, height
 
-**gpsweek** translates year, month, day into GPS week, day of week (0-6) 
+<code>gpsweek</code> translates year, month, day into GPS week, day of week (0-6) 
    
-**download_unr** downloads ENV time series for GPS sites from the Nevada Reno website (IGS14), so ITRF 2014.
+<code>download_unr</code> downloads ENV time series for GPS sites from the Nevada Reno website (IGS14), so ITRF 2014.
 
-**download_tides** downloads up to a month of NOAA tide gauge data given station number (7 characters),
+<code>download_tides</code> downloads up to a month of NOAA tide gauge data given station number (7 characters),
 and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,
-but this utility writes out a file with only columns of numbers instead of 
-csv. 
+but this utility writes out a file with only columns of numbers instead of csv. 
 
 <HR>
 
