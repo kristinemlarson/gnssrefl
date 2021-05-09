@@ -574,9 +574,7 @@ to noise ratio.
 
 ### gnssir <a name="module3"></a>
 
-<code>gnssir</code> is the main driver for the GNSS-IR code.  
-You need a set of instructions which are made using <code>make_json_input</code>.  
-The required inputs for <code>make_json_input</code> are: 
+<code>gnssir</code> is the main driver for the GNSS-IR code. You need a set of instructions which are made using <code>make_json_input</code>. The required inputs are: 
 
 * station name 
 * latitude (degrees)  
