@@ -532,6 +532,19 @@ In general, L2C results are always superior to L1 results.
 
 **Example from a lake:**
 
+Make a SNR file:
+
+
+<code>rinex2snr ross 2020 170</code>
+
+and
+
+<code>quickLook ross 2020 170 -e1 5 -e2 15</code>
+
+<img src=tests/use_cases/ross-qc.png width=600>
+
+<img src=tests/use_cases/ross-lsp.png width=600>
+
 
 **Example from Greenland:**
 
