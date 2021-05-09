@@ -183,20 +183,28 @@ th GPS antennas are fairly smooth and that will generate coherent reflections. I
 use all azimuths.  
 <P>
 Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
-is to measure the level of Lake Superior and the map image (panel A) makes it clear
-that we cannot use all azimuths. It is a bit tricky to know what the lake level is likely 
-to be, but the photograph (panel B) suggests it is quite a bit taller than 2 meters - but not too tall.
-We are going to try 4 meters.  
+is to measure the level of Lake Superior. The map image (panel A) makes it clear
+that unlike Mitchell and Portales, we cannot use all azimuths. To understand our reflection 
+zones, we need to know the approximate lake level. That is a bit tricky to know, but the 
+photograph (panel B) suggests it is quite a bit taller than the 2 meters we used at Portales - 
+but not too tall. We will try try 4 meters and then check later to make sure that was a good assumption.  
 
 <p align=center>
 <table>
 <TR>
-<TD>A. <img src=tests/use_cases/ross-google.jpg width=300> </TD>
-<TD>B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> </TD>
+<TD>A. <img src=tests/use_cases/ross-google.jpg width=300> <BR>
+Map view of station ROSS </TD>
+<TD>B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> <BR>
+Photograph of station ROSS</TD>
+</TD>
 </TR>
 <Tr>
-<TD>C. <img src=tests/use_cases/ross-first.jpg width=300></TD> 
-<TD>D. <img src=tests/use_cases/ross-second.jpg width=300></TD>
+<TD>C. <img src=tests/use_cases/ross-first.jpg width=300><BR>
+Reflection zones for GPS satellites at elevation angles of 5-25 degrees 
+for a reflector height of 4 meters.</TD> 
+<TD>D. <img src=tests/use_cases/ross-second.jpg width=300>
+Reflection zones for GPS satellites at elevation angles of 5-15 degrees 
+for a reflector height of 4 meters.  </TD>
 </Tr>
 </table>
 </p>
@@ -211,25 +219,9 @@ in azimuth also looks it will be problematic. Panel D shows a smaller elevation 
 better than 5-25 degrees. It is also worth noting that the GPS antenna has been attached to a pier - 
 and boats dock at piers. You might very well see outliers at this site when a boat is docked at the pier.
 
-
 Once you have the code set up, it is important that you check the quality of data. This will also 
 allow you to check on your assumptions, such as the appropriate azimuth and elevation angle 
 mask and reflector height. This is one of the reasons <code>quickLook</code> was developed. 
-
-As discussed in [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8), 
-there are two QC measures used in this code. One is the peak
-value of the peak in the periodogram. In the example below the amplitude of the most significant
-peak is ~17, so if you define the required amplitude
-to be 15, this one would pass. Secondly it uses a very simple peak to noise ratio (pk2noise) calculation. In this case the
-average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise".
-You then take the peak value (here ~17) and divide by the "noise" value.
-For the ocean, I generally recommend starting with a peak to noise ratio of 2.7, but for lakes or snow, I use
-3.2-3.5 or so. Use **quickLook** to help you get a sense of the typical values for your site.
-
-<p align=center>
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
-</p>
-
 
 <HR>
 
@@ -465,19 +457,44 @@ The unit for all SNR data is dB-Hz.
 
 <HR>
 
+### Our names for the GNSS frequencies
+
+- 1,2,20, and 5 are GPS L1, L2, L2C, and L5
+- 101,102 Glonass L1 and L2
+- 201, 205, 206, 207, 208: Galileo frequencies
+- 302, 306, 307 : Beidou frequencies
+
+<HR>
+
 ### quickLook <a name="module2"></a>
 
-Before using the **gnssir** code, I recommend you try **quickLook**. This allows you
-to quickly test various options (elevation angles, frequencies, azimuths).
-The required inputs are station name, year, and doy of year. **You must have previously translated a RINEX file using rinex2snr for this to work.**
+Before using the **gnssir** code, I recommend you use <code>quickLook</code>. This allows you
+to quickly test various options (elevation angles, frequencies, azimuths, and quality control 
+parameters).  The required inputs are station name, year, and doy of year. 
+**You must have previously translated a RINEX file using rinex2snr for this to work.**
 
-**quickLook** has stored defaults for analyzing the spectral characteristics of the SNR data. 
-In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**
+<CODE>quickLook</code> has stored defaults for analyzing the spectral characteristics of the SNR data. 
+**In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**
 If your site is taller than that, you will need to override the defaults.
 Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
 you don't want to use, you need to override them.  For more information, use <code>quickLook -h</CODE>
 
-Going back to our **rinex2snr** example, try using the data for station p041.
+There are two QC measures used in quickLook (and gnssir). One is the peak
+value of the peak in the periodogram. In the example below the amplitude of the most significant
+peak is ~17, so if you define the required amplitude
+to be 15, this one would pass. Secondly it uses a very simple peak to noise ratio (pk2noise) 
+calculation. In this case the
+average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise".
+You then take the peak value (here ~17) and divide by the "noise" value.
+For the ocean, I generally recommend starting with a peak to noise ratio of 2.7, but for lakes or snow, I use
+3.2-3.5 or so. 
+
+
+<p align=center>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
+</p>
+
+We start with one of our **rinex2snr** examples, p041
 
 <code>quickLook p041 2020 132 </CODE>
 
@@ -495,14 +512,13 @@ this site the antenna phase center is ~ 2 meters above the ground. The colors
 change as you try different satellites.  If the data are plotted in
 gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
 
-**quickLook** also provides a summary of various quality control metrics:
+<CODE>quickLook</code> also provides a summary of various quality control metrics:
 
 <img src="tests/use_cases/p041_l1_qc.png" width=600>
 
 The top plot shows the sucessful RH retrievals in blue and unsuccessful RH retrievals in gray. 
-Below are the peak to noise ratios. The last plot is the amplitude of the spectral peak. The dashed
-lines show you what QC metrics quickLook was using. You can control/change these on the command line
-(quickLook -h).
+In the center panel are the peak to noise ratios. The last plot is the amplitude of the spectral peak. The dashed
+lines show you what QC metrics quickLook was using. You can control/change these on the command line.
 
 If you want to look at L2C data you just change the frequency on the command line. L2C is designated by 
 frequency 20: 
@@ -511,20 +527,12 @@ frequency 20:
 
 <img src="tests/use_cases/p041-l2c.png" width=600>
 
-In general, L2C results are always superior to L1 results. If you had set -h2 20, it would
-look [like this](tests/use_cases/p041-l2c-again.png). You aren't gaining anything by doing this.
+In general, L2C results are always superior to L1 results. 
+
+We can now check
 
 
-*Our names for the GNSS frequencies*
-
-- 1,2,20, and 5 are GPS L1, L2, L2C, and L5
-- 101,102 Glonass L1 and L2
-- 201, 205, 206, 207, 208: Galileo frequencies
-- 302, 306, 307 : Beidou frequencies
-
-<HR>
-
-Lets look at two days of data collected on the Greenland Ice Sheet. 
+Let us look at two days of data collected on the Greenland Ice Sheet. 
 You already have one file. Now make one three years later.
 
 <code>rinex2snr gls1 2014 271</CODE>
