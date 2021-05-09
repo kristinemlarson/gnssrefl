@@ -179,7 +179,7 @@ so yellow is lowest (5 degrees), blue (10 degrees) and so on. The missing satell
 inclination angle and the station latitudes. The length of the ellipses depends on the height of the 
 antenna above the surface - so a height of 2 meters gives an ellipse that is smaller than one 
 that is 10 meters. In this case we used 2 meters for both sites - and these are pretty 
-simple GNSS-IR sites. The surfaces below th GPS antennas are fairly smooth and that 
+simple GNSS-IR sites. The surfaces below the GPS antennas are fairly smooth and that 
 will generate coherent reflections. In general, you can use all azimuths at these sites.  
 
 Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
