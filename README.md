@@ -181,7 +181,7 @@ antenna above the surface - so a height of 2 meters gives an ellipse that is sma
 that is 10 meters. In this case we used 2 meters for both sites - and these are pretty 
 simple GNSS-IR sites. The surfaces below the GPS antennas are fairly smooth and that 
 will generate coherent reflections. In general, you can use all azimuths at these sites.  
-<P>
+/bin/bash: :wq: command not found
 Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
 is to measure water levels. The map image (panel A) makes it clear
 that unlike Mitchell and Portales, we cannot use all azimuths to measure the lake. To understand our reflection 
