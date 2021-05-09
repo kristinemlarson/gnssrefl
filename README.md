@@ -570,33 +570,7 @@ three years. [Please see our use case for an in depth study of this site in 2012
 The defaults used in <code>quickLook</code> appear to be doing a good job, 8 for the minimum amplitude and 3 for the required peak 
 to noise ratio.
 
-**Example for a tall site:**
-
-What do you do if your reflections site is taller than the default value of 6 meters?
-Does the code figure this out for you automatically? **No, it does not.** We use an example 
-from Greenland to demonstrate this issue. First make a SNR file using the defaults: 
-
-<CODE>rinex2snr smm3 2018 271</CODE>
-
-Now run <code>quickLook</code> using the defaults:
-
-<CODE>quickLook smm3 2018 271</CODE>
-
-<img src="tests/use_cases/smm3-default.png" width=600> 
-
-Everything is gray (which means it didn't find a significant reflector) because you 
-only calculated periodograms for reflector height values of 0.5 to 6 meters. You see some things
-that might be significant at small RH, but this is just the effect of the antenna gain pattern. 
-This site is ~ 14 meters above the ice. Accordingly, if you change the inputs to tell the program
-that you want to examine reflector heights between 8 and 20 meters, i.e. 
-
-<CODE>quickLook smm3 2018 271 -h1 8 -h2 20</CODE>
-
-<img src="tests/use_cases/smm3-sensible.png" width=600>
-
-You now see what you expect to see - peaks of periodograms at ~14 meters height. 
-Why is the northwest quadrant so messy? I leave that as an exercise for the reader. Hint: start out by trying
-to examine this site on Google Earth.
+[**Example for a tall site:**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
 
 <HR>
 
