@@ -681,11 +681,11 @@ accumulation. It can be used for lake levels. *It is not to be used for tides!*
 <code>download_rinex</code> can be useful if you want to download RINEX v2.11 or 3 files (using the version flag) without using 
 the reflection-specific codes. Sample calls:
 
-<CODE>download_rinex p041 2020 6 1</CODE> downloads the data from June 1, 2020
+- <CODE>download_rinex p041 2020 6 1</CODE> downloads the data from June 1, 2020
 
-<CODE>download_rinex p041 2020 150 0</CODE> downloads the data from day of year 150 in 2020
+- <CODE>download_rinex p041 2020 150 0</CODE> downloads the data from day of year 150 in 2020
 
-<CODE>download_rinex p041 2020 150 0 -archive sopac</CODE> downloads the data from sopac archive on day of year 150 in 2020
+- <CODE>download_rinex p041 2020 150 0 -archive sopac</CODE> downloads the data from sopac archive on day of year 150 in 2020
 
 <code>download_orbits</code> downloads orbit files and stores them in $ORBITS. See -h for more information.
 
