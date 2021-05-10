@@ -520,7 +520,7 @@ frequency 20:
 
 <img src="tests/use_cases/p041-l2c.png" width=600>
 
-**L2C results are always superior to L1 results.** If you have any influence over a GNSS, please 
+**L2C results are always superior to L1 results.** If you have any influence over a GNSS site, please 
 ask the station operators to track modern GPS signals.
 
 **Check back for our site on Lake Superior:**
@@ -535,9 +535,9 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 <img src=tests/use_cases/ross-lsp.png width=600>
 
-[**Example for a site on an ice sheet :**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_gls1.md)
+[**Example for a site on an ice sheet**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_gls1.md)
 
-[**Example for a tall site:**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
+[**Example for a tall site**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
 
 <HR>
 
