@@ -26,19 +26,20 @@ This site has been optimally set up for positions and reflectometry. This means 
 mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
 well as Glonass. You can see that it is NOT the typical 2-meter monument.
 
-<center>
+<p align=center>
 <img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
-</center>
+</p>
 
 Position time series for smm3 can easily be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3).
 Note that there is an antenna height blunder in the very early data for the site. It is straight forward to find and remove.
 
 You can use my webapp to get a sense of what the results for this site looks like. Please note that the app 
 will be analyzing data in real-time, so please wait for the answers to "pop" up in the 
-left hand side of the page. It takes about 10 seconds](https://gnss-reflections.org/api?example=smm3).
+left hand side of the page. [It takes about 10 seconds](https://gnss-reflections.org/api?example=smm3).
 It also has a google map and photograph.
 
-Sadly, as of this writing (April 2021), this site is dead. It could be the receiver works but the telemetryis down.
+Sadly, as of this writing (April 2021), smm3 is dead. It could be that the receiver is working but the telemetry is down.
+Please contact unavco.org for information about the site. 
 
 ## A Quick Look at the Data
 
@@ -46,8 +47,7 @@ First make a multi-GNSS SNR file:
 
 <code>rinex2snr smm3 2020 106 -orb gnss </code>
 
-
-Then run **quickLook**:
+Then run <code>quickLook</code>:
 
 <code>quickLook smm3 2020 106</code>
 

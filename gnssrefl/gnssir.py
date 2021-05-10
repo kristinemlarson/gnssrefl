@@ -137,12 +137,16 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                                 T = g.nicerTime(UTCtime)
                                 print('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} '.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
                             if plot_screen:
-                                local_update_plot(x,y,px,pz,ax1,ax2)
+                                failed = False
+                                local_update_plot(x,y,px,pz,ax1,ax2,failed)
                         else:
                             rj +=1
                             if screenstats:
                                 print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
                                 g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct])
+                            if plot_screen:
+                                failed = True
+                                local_update_plot(x,y,px,pz,ax1,ax2,failed)
 
             if screenstats:
                 print('=================================================================================')
@@ -186,14 +190,19 @@ def apply_refraction_corr(lsp,ele,p,T):
 
     return ele
 
-def local_update_plot(x,y,px,pz,ax1, ax2):
+def local_update_plot(x,y,px,pz,ax1, ax2,failure):
     """
     input plt_screen integer value from gnssIR_lomb.
     (value of one means update the SNR and LSP plot)
     and values of the SNR data (x,y) and LSP (px,pz)
+    added fail criterion to put out bad periodograms in gray
     """
-    ax1.plot(x,y)
-    ax2.plot(px,pz)
+    if failure:
+        ax1.plot(x,y,color='gray',linewidth=0.5)
+        ax2.plot(px,pz,color='gray',linewidth=0.5)
+    else:
+        ax1.plot(x,y)
+        ax2.plot(px,pz)
 
 
 def plot2screen(station, f,ax1,ax2,pltname):
@@ -207,6 +216,8 @@ def plot2screen(station, f,ax1,ax2,pltname):
     ax2.set_ylabel('volts/volts')
     ax1.set_ylabel('volts/volts')
     ax1.set_xlabel('Elevation Angles (deg)')
+    ax1.grid(True, linestyle='-')
+    ax2.grid(True, linestyle='-')
     ax1.set_title(station + ' SNR Data/' + g.ftitle(f) + ' Frequency')
     plt.show()
 

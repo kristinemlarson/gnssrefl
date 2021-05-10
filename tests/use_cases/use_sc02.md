@@ -56,7 +56,7 @@ Translate the GPS data for January 15 2021. First you need to make the SNR file:
 
 <code>rinex2snr sc02 2021 15</code>
 
-Use our utility **quickLook** with defaults [(For more details on quickLook output)](../../docs/quickLook_desc.md):
+Use our utility <code>uickLook</code> with defaults [(For more details on quickLook output)](../../docs/quickLook_desc.md):
 
 <code>quickLook sc02 2021 15 </code>
 
@@ -159,9 +159,7 @@ you are most definitely encouraged to look at using these techniques. In most ca
 smoothness strategies are used to improve the retrievals.  
 
 I would like to include Simon Williams RH retrieval/tidal estimation code in this 
-package. He has been kind enough to make the Matlab code open source. If someone 
-is willing to convert it to python, that would be fabulous. Please contact me if 
-you are interested (I will post a link to the Matlab code).
+package. He has been kind enough to make the [Matlab code open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous. 
 
 How well does this simple analyis compare to the [official NOAA tide gauge data stream?](https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
 
@@ -171,4 +169,4 @@ You can download the NOAA data yourselves or use our utility:
 
 We then compared the two series. 
 
-<img src="sc02-noaa.png" width=500>
+<img src="sc02-noaa.png" width=600>

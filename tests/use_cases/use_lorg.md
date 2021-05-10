@@ -40,11 +40,9 @@ If you are curious about the position time series for the antenna, you can use *
 
 First make a SNR file.
 
-
 <code>rinex2snr lorg 2019 205</code>
 
-
-Use **quickLook** to produce a periodogram similar to the one in the web app [(For details on quickLook output)](../../docs/quickLook_desc.md). quickLook is set to use the L1 frequency by default:
+Use <code>quickLook</code> to produce a periodogram similar to the one in the web app [(For details on quickLook output)](../../docs/quickLook_desc.md). quickLook is set to use the L1 frequency by default:
 
 <code>quickLook lorg 2019 205*</code>
 
@@ -68,27 +66,25 @@ This is for L5:
 
 ### Analyze the Data
 
-Now prepare to analyze the data using **gnssir**.  First you need to create a set of analysis instructions. 
-The default settings only need the station name, latitude, longitude, and ellipsoidal height. You make 
-this file using **make_json_input**: 
+Now prepare to analyze the data using <code>gnssir</code>.  First you need to create a set of analysis instructions. 
+The default settings only need the station name, latitude, longitude, and ellipsoidal height. 
 
 <code>make_json_input lorg -78.18365 170.03361 -7.778 -e1 5 -e2 25</code>
 
-The json output will be stored in $REFL_CODE/input/lorg.json. 
-[Here is a sample json file.](lorg.json)
+The json output will be stored in $REFL_CODE/input/lorg.json. [Here is a sample json file.](lorg.json)
 
 Next make some snr files for a time span of about eight months. Restrict the search to the UNAVCO archive to make the 
 code run faster (otherwise it will check three other archives as well). The resulting SNR files will be stored in $REFL_CODE/2019/snr/lorg. 
 
 <code>rinex2snr lorg 2019 1 -doy_end 233 -archive unavco</code>
 
-Run **gnssir** for all the SNR files from **rinex2snr**.
+Run <code>gnssir</code> for all the SNR files:
 
 <code>gnssir lorg 2019 1 -doy_end 233</code>
 
-The default does not send any plots to the screen. If you do want to see them, set -plt:
+The default does not send any plots to the screen. If you do want to see them, set <code>-plt True</code>:
 
-<code>gnssir lorg 2019 1 -screenstats False -plt True </code>
+<code>gnssir lorg 2019 1 -plt True </code>
 
 <img src="lorg-g-panels.png" width="800"/>
 

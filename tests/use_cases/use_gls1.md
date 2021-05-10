@@ -48,20 +48,20 @@ for the [GNSS-IR Web App.](https://gnss-reflections.org/api?example=gls1)
 Our ultimate goal in this use case is to analyze one year of data. We have chosen the year 
 2012 because there was a large melt event on the ice sheet. In order to set the proper
 quality control parameters, we will use **quickLook** for one day. First we need to translate 
-one day of RINEX data using **rinex2snr**. We will use day of year 100:
+one day of RINEX data:
 
 <code>rinex2snr gls1 2012 100</code>
 
-We then invoke **quickLook**:
+And then:
 
 <code>quickLook gls1 2012 100</code>
 
-This produces two plots. The first is a geographically oriented-summary of the frequency content of the GPS data:
+This produces two plots. The first is a geographically oriented (northwest, northeast and so on) 
+summary of the frequency content of the GPS data:
 
 <img src=quicklook-gls1-lsp.png width=600>
 
-The peaks in these periodograms tell us how high the GPS antenna is above the ice surface.
-The peaks are associated with a reflector height (RH) of ~2.5 meters. [(For more details on quickLook output)](../../docs/quickLook_desc.md)
+The peaks in these periodograms tell us how high the GPS antenna is above the ice surface. The peaks are associated with a reflector height (RH) of ~2.5 meters. [(For more details on quickLook output)](../../docs/quickLook_desc.md)
 
 The next plot shows results with respect to azimuth angle.  The top plot is RH and the other 
 two are quality control measures: peak amplitude and peak to noise ratio.
@@ -72,6 +72,15 @@ In the top plot we see that the retrieved reflector heights are consistent at al
 Retrievals for azimuths between 340 degrees and 40 degrees are consistently marked as not having
 met quality control settings.From the center plot we can see that a peak2noise QC metric of 3 is reasonable. 
 Similarly, the amplitudes (bottom plot) are generally larger than 10, so 8 is an acceptable minimum value.
+
+
+Compare that to its level when the site was installed in the year 2011:
+
+<Code>rinex2snr gls1 2011 271 -archive unavco</code>
+
+<CODE>quickLook gls1 2014 271</CODE>
+
+<img src="tests/use_cases/gls1-2011.png">
 
 ## Measure Snow Accumulation in 2012
 

@@ -20,7 +20,9 @@
 
 [Google Maps Link](https://goo.gl/maps/mU5GbsvMsLfe5buQ7) 
 
+<p align=center>
 <img src="mchn_monu-cors.png" width="500"/>
+</P>
 
 
 ### Data Summary
@@ -49,7 +51,7 @@ Since the receiver only tracks GPS signals, there is no need to specify gnss orb
 
 **Take a Quick Look at the Data**
 
-Use **quickLook** to examine the spectral characteristics of the SNR data for the default L1 settings
+Examine the spectral characteristics of the SNR data for the default settings
 [(For details on quickLook output.)](../../docs/quickLook_desc.md):
 
 <code>quickLook mchn 2019 205</code>
@@ -80,7 +82,7 @@ The data from 2013 will be analyzed here as a test case.  Begin by generating th
 
 The resulting SNR files are stored in $REFL_CODE/2013/snr/mchn.  
 
-Analysis parameters are set up with **make_json_input**. 
+Analysis parameters are set up with <code>make_json_input</code>
 
 <code>make_json_input mchn 47.961 -84.901 152.019 -h1 3 -h2 10 -e1 5 -e2 25 -l1 True -peak2noise 3 -ampl 8</code>
 
@@ -89,7 +91,7 @@ line, you can see that the azimuths have been set by
 hand to be limited to 80-180 degrees. Although it is possible to get good reflections beyond 
 180 degrees, the photographs suggest barriers are present in that region.  
 
-Now that the analysis parameters are set, run **gnssir** to save the reflector height (RH) output for each day in 2013.
+Now that the analysis parameters are set, run <code>gnssir</code> to save the reflector height (RH) output for each day in 2013.
 
 <code>gnssir mchn 2013 1 -doy_end 365</code>
 

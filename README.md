@@ -6,10 +6,11 @@
 2. [Philosophy](#philosophy)
 3. [Code Description](#code)
     1. [Installation](#environment)
-    2. [RINEX File Formats](#fileformats)
-    3. [rinex2snr: translating RINEX files into SNR files](#module1)
-    4. [quickLook: assessing a site using SNR files](#module2)
-    5. [gnssir: estimating reflector heights from SNR data](#module3)
+    2. [Understanding the Code](#understanding)
+    3. [RINEX File Formats](#fileformats)
+    4. [rinex2snr: translating RINEX files into SNR files](#module1)
+    5. [quickLook: assessing a site using SNR files](#module2)
+    6. [gnssir: estimating reflector heights from SNR data](#module3)
 4. [Bugs/Future Work](#bugs)
 5. [Utilities](#helper)
 6. [Publications](#publications)
@@ -128,7 +129,7 @@ not in hand at the moment.
 
 <HR>
 
-### Understanding what the code is doing
+### Understanding what the code is doing  <a name="understanding"></a>
 
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
 an interference pattern that can be observed in GNSS Signal to Noise Ratio (SNR) data as a satellite rises or sets. 
@@ -146,16 +147,15 @@ snow and water. We will be posting the code you need to measure soil moisture la
 GNSS-IR only works with low elevation angle data; generally the range from 5 to 30 
 degrees is useable though the sensitivity on elevation angle also depends on the kind of surface.  
 This code finds the rising and setting satellite arcs and estimates RH 
-for each satellite arc. Each satellite arc is associated with a specific time (usually about 
+for each satellite arc. Each satellite arc is associated with a specific time period (usually about 
 30 minutes) and a direction (azimuth) on the surface of the Earth. How many satellite arcs 
 you can use for environmental sensing depends on how reflection-friendly your site is. 
 
 
-What do these satellite arcs look like? Below are photographs and [reflection zone maps](https://gnss-reflections.org/rzones) for two standard GNSS-IR sites, one in the 
-northern hemisphere and one in the southern hemisphere.
+What do these satellite arc reflection zones look like? Below are photographs and [reflection zone maps](https://gnss-reflections.org/rzones) for two standard GNSS-IR sites, one in the northern hemisphere and one in the southern hemisphere.
 
 <p align=center>
-<table>
+<table align=center>
 <TR>
 <TH>Mitchell, Queensland, Australia</TH>
 <TH>Portales, New Mexico, USA</TH>
@@ -174,16 +174,16 @@ northern hemisphere and one in the southern hemisphere.
 Each one of the yellow/blue/red/green/cyan clusters represents the reflection zone
 for a single rising or setting GPS satellite arc. The colors represent different elevation angles - 
 so yellow is lowest (5 degrees), blue (10 degrees) and so on. The missing satellite signals in the north
-(for New Mexico) and south (for Mitchell) are the result of the GPS satellite 
+(for Portales New Mexico) and south (for Mitchell, Australia) are the result of the GPS satellite 
 inclination angle and the station latitudes. The length of the ellipses depends on the height of the 
 antenna above the surface - so a height of 2 meters gives an ellipse that is smaller than one 
 that is 10 meters. In this case we used 2 meters for both sites - and these are pretty 
-simple GNSS-IR sites. The surfaces below the GPS antennas are fairly smooth and that 
+simple GNSS-IR sites. The surfaces below the GPS antennas are fairly smooth soil and that 
 will generate coherent reflections. In general, you can use all azimuths at these sites.  
 <P>
 <P>
 Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
-is to measure water levels. The map image (panel A) makes it clear
+is to measure water level. The map image (panel A) makes it clear
 that unlike Mitchell and Portales, we cannot use all azimuths to measure the lake. To understand our reflection 
 zones, we need to know the approximate lake level. That is a bit tricky to know, but the 
 photograph (panel B) suggests it is more than the 2 meters we used at Portales - 
@@ -214,10 +214,10 @@ Again using the reflection zone web app, we can plot up the appropriate reflecti
 Since ross has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) has its coordinates in a 
 database. You can just plug in ross for the station name and leave 
 latitude/longitude/height blank. You *do* need to plug in a RH of 4 since mean 
-sea level would not be an appropriate reflector here. Start out with azimuth range of 90 to 180 degrees.
+sea level would not be an appropriate reflector height value for this case. Start out with an azimuth range of 90 to 180 degrees.
 Using 5-25 degree elevation angles (panel C) looks like it won't quite work - and going all the way to 180 degrees
 in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15) and cuts 
-off azimuths at 160.  These choices appear to be better than those from Panel C. 
+off azimuths at 160. These choices appear to be better than those from Panel C.  
 It is also worth noting that the GPS antenna has been attached to a pier - 
 and *boats dock at piers*. You might very well see outliers at this site when a boat is docked at the pier.
 
@@ -297,36 +297,30 @@ For RINEX 2.11, filenames should be lowercase and following the community standa
 
 Example: at010050.12o is station at01 on day 5 and year 2012.
 
-In many cases Hatanaka compressed formats are used by data archives. These have a 
-'d' instead an 'o' at the end of the filename.
+In many cases Hatanaka compressed formats are used by data archives. These 
+have a 'd' instead an 'o' at the end of the filename. If you want to use those files, you must install the 
+CRX2RNX executable.  I think my code allows you to gzip the RINEX files if you are providing them.
 
 We are working to make a NMEA reader for this software package.
 
 <HR>
 
-### rinex2snr - extracting SNR data from RINEX files <a name="module1"></a>
+### rinex2snr - Extracting SNR data from RINEX files <a name="module1"></a>
 
 The international standard for sharing GNSS data is called 
 the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
 A RINEX file has extraneous information in it (which we will throw out) - and it 
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
-The first task you have in GNSS-IR is to translate from RINEX into what I will 
-call the SNR format. The latter will include azimuth and elevation angles. For the 
-latter you will need an **orbit** file. **rinex2snr**
-will go get an orbit file for you. You can override the default orbit 
+The first task you have in GNSS-IR is to translate from RINEX into what I will call 
+the SNR format. The latter will include azimuth and elevation angles. For the 
+latter you will need an **orbit** file. <code>rinex2snr</code> will go get an orbit file for you. You can override the default orbit 
 choice by selections given below.
 
 There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
 angles. The default is to save all data with elevation lower than 30 degrees (this is called SNR format 66).
 Another SNR choice is 99, which saves elevation angle data between 5 and 30.  
 
-There are rules for naming RINEX files. **My code requires that RINEX (version 2) files be lowercase.**
-The filename must be 12 characters long (ssssddd0.yyo), where ssss is station name, 
-ddd is day of year, followed by a zero, yy is the two character year and o stands for observation. 
-If you have installed the CRX2RNX code, you can also provide a compressed RINEX format file, which ends in a d.
-I think my code allows you to gzip the RINEX files if you are providing them.
-
-You can run **rinex2snr** at the command line. You required inputs are:
+You can run <code>rinex2snr</code> at the command line. The required inputs are:
 
 - station name
 - year
@@ -337,8 +331,7 @@ A sample call for a station called p041, restricted to GPS satellites, on day of
 <code>rinex2snr p041 2020 132</code>
 
 If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
-it will check three archives (unavco, sopac, and sonel) to find it. 
-This uses the hybrid translator.  
+it will check three archives (unavco, sopac, and sonel) to find it. This uses the hybrid translator.  
 
 
 **Examples for different translators:**
@@ -382,9 +375,9 @@ What if you want to run the code for all the data for any year?  You can use doy
 If your station name has 9 characters (lower case please), the code assumes you are looking for a 
 RINEX 3 file. However, my code will store the SNR data using the normal
 4 character name. *You must install the gfzrnx executable that translates RINEX 3 to 2 to use RINEX 3 files
-in my code.* *rinex2snr* currently only looks for RINEX 3 files at CDDIS (30 sec) and UNAVCO (15 sec).  There 
-are more archive options in **download_rinex** and someday I will merge these. If you do have your own RINEX 3
-files, I use the community standard, that is upper case except for the file extension (which is rnx).  
+in my code.* <code>rinex2snr</code> currently only looks for RINEX 3 files at CDDIS (30 sec) and UNAVCO (15 sec).  There 
+are more archive options in <code>download_rinex</code> and someday I will merge these. If you do have your own RINEX 3
+files, I use the community standard, that is upper case except for the file extension (which is rnx). 
 
 <code>rinex2snr onsa00swe 2020 298</code>
 
@@ -402,7 +395,8 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - 88 is elevation angles of 5-90 degrees
 - 50 is elevation angles less than 10 degrees (good for very tall sites, high-rate applications)
 
-**More rinex2snr options:**
+
+**More options:**
 
 *orbit file options for general users:*
 
@@ -425,8 +419,7 @@ on my experience with GPS, I know that this will be much much much faster if we 
 code and bind with python using numpy. If you have such code, or know where it lives, please let me know.
 
 
-**What if you are providing the RINEX files and you don't want the code to search for 
-the files online?**
+**What if you are providing the RINEX files and you don't want the code to search for the files online?**
 
 Use <code>-nolook True</code>
 
@@ -434,10 +427,8 @@ Use <code>-nolook True</code>
 
 <code>-rate high</code>
 
-However, if you invoke this, it currently only looks at the UNAVCO, GA, or 
-NRCAN archives. Please beware - it takes a long time to download a 
-highrate GNSS RINEX file (even when it is compressed).  And it also takes a 
-long time to compute orbits for it. For high-rate data, you should never use the python translation option.
+However, if you invoke this, it currently only looks at the UNAVCO, GA, or NRCAN archives. Please beware - it takes a long time to download a 
+highrate GNSS RINEX file (even when it is compressed).  And it also takes a long time to compute orbits for it. For high-rate data, you should never use the python translation option.
 
 **Output SNR file format**
 
@@ -532,7 +523,7 @@ frequency 20:
 **L2C results are always superior to L1 results.** If you have any influence over a GNSS, please 
 ask the station operators to track modern GPS signals.
 
-**Example from a lake:**
+**Check back for our site on Lake Superior:**
 
 Make a SNR file <code>rinex2snr ross 2020 170</code> and <code>quickLook ross 2020 170 -e1 5 -e2 15</code>
 
@@ -544,29 +535,7 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 <img src=tests/use_cases/ross-lsp.png width=600>
 
-**Example from Greenland:**
-
-Let us look at two days of data collected on the Greenland Ice Sheet. 
-You already have one SNR file. Now make one for a date three years later.
-
-<code>rinex2snr gls1 2014 271</CODE>
-
-<CODE>quickLook gls1 2011 271</CODE> 
-
-We see a broad region for the southern azimuths (90-270) that give consistently good reflector height retrievals of 
-about 3 meters.
-
-<img src="tests/use_cases/gls1-2011.png">
-
-Three years later, <CODE>quickLook gls1 2014 271</CODE>, we find similar behavior:
-
-<img src="tests/use_cases/gls1-2014.png">
-
-Now the reflector height retrievals are just below 2 meters. At this site, 
-that means there has been about two meters of snow accumulation in 
-three years. [Please see our use case for an in depth study of this site in 2012](tests/use_cases/use_gls1.md).
-The defaults used in <code>quickLook</code> appear to be doing a good job, 8 for the minimum amplitude and 3 for the required peak 
-to noise ratio.
+[**Example for a site on an ice sheet :**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_gls1.md)
 
 [**Example for a tall site:**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
 

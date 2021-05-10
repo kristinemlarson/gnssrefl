@@ -93,7 +93,10 @@ def main():
         outlier = float(args.outlier)
 
     # changed this to use new format .... for subdaily file
-    tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,obstimes=obstimes)
+    try:
+        tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,obstimes=obstimes)
+    except: 
+        print('Some issues with the spline fit, mostly likely due to data gaps')
 
 if __name__ == "__main__":
     main()

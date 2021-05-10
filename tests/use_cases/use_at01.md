@@ -41,17 +41,13 @@ elevation angles between 5 and 12 degrees. The goal is to have the ellipses on t
 
 ### Take a Quick Look at the Data
 
-We will use **quickLook** to examine the spectral characteristics of the SNR data. 
-[(For details on quickLook output.)](../../docs/quickLook_desc.md)
-
-First we need to make a SNR file:
+First examine the spectral characteristics of the SNR data.  [(For details on quickLook output.)](../../docs/quickLook_desc.md). Make a SNR file:
 
 <code>rinex2snr at01 2020 109 -archive unavco</code>
 
-This will generate a SNR file at a sampling rate of 15 seconds. One second data are available if you would 
-like to use them (-rate high).
+This will generate a SNR file at a sampling rate of 15 seconds. One second data are available if you would like to use them (-rate high).
 
-If you use the default settings with **quickLook** you will mistakenly think it is not a useful site. Nearly
+If you use the default settings with <code>quickLook</code> you will mistakenly think it is not a useful site. Nearly
 every single retrieval is set as bad (i.e. it is gray rather than blue):
 
 <img src=at01_default_qc.png width=600>		
