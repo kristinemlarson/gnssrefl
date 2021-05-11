@@ -32,7 +32,9 @@ GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more t
 
 Note the [ellipsoidal height and geoid corrected height](https://gnss-reflections.org/geoid?station=pmtl). To pick an azimuth and elevation mask, try the [reflection zone webapp](https://gnss-reflections.org/rzones) with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:
 
+<P align=center>
 <img src="pmtl_rzone.png" width="500" />
+</P>
 
 ### quickLook
 
