@@ -27,8 +27,9 @@
 
 ### Data Summary
 
-**at01 is the only tide gauge in this region of Alaska.** The site observes
-all constellation signals and high-rate data are available. There is good visibility over a large 
+**at01 is the only tide gauge in this region of Alaska.** 
+
+at01 observes all constellation signals and high-rate data are available. There is good visibility over a large 
 azimuthal region. The monument is about a meter taller to improve visibility of the sea surface.
 
 From the [geoid app](http://gnss-reflections.org/geoid?station=at01&lat=0.0&lon=0.0&height=0.0) you can 
@@ -36,12 +37,11 @@ see the general location of the antenna with respect to the coast. You will also
 ~12 meters above sea level.
 
 
-Use the gnss-reflections.org webapp to set a [possible mask.](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240) In this example we used the option for 
-elevation angles between 5 and 12 degrees. The goal is to have the ellipses on the water and not the land.
+Use the gnss-reflections.org webapp to set a [possible mask.](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240) In this example we used the option for elevation angles between 5 and 12 degrees. The goal is to have the ellipses on the water and not the land.
 
 ### Take a Quick Look at the Data
 
-First examine the spectral characteristics of the SNR data.  [(For details on quickLook output.)](../../docs/quickLook_desc.md). Make a SNR file:
+First examine the spectral characteristics of the SNR data. [(For details on quickLook output.)](../../docs/quickLook_desc.md). Make a SNR file:
 
 <code>rinex2snr at01 2020 109 -archive unavco</code>
 

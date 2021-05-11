@@ -2,7 +2,7 @@
 
 **Station Name:** tgho 
 
-**Location:** Lake Taupo, North Island
+**Location:** North Island
 
 **Archive:** [Geonet](https://www.geonet.org.nz/)
 
@@ -29,13 +29,13 @@ Photo credit: Simon Barker
 
 ### Data Summary
 
-Station tgho is operated by GNS. It is located 
+Station tgho is operated by [GNS](https://www.gns.cri.nz). The GNSS site is located 
 on a platform in Lake Taupo. It records standard GPS and Glonass signals at a low sample rate (30 sec).
-The site could be significantly improved with a modern receiver that tracks new signals at a higher sample rate.
+The site could be significantly improved with a newer receiver that tracks modern signals at a higher sample rate.
 
 ### Take a Quick Look at the Data
 
-Begin by making an SNR file. Use both GPS and Glonass and set the archive to Geonet:
+Begin by making an SNR file. Use both GPS and Glonass and set the archive to nz:
 
 <code>rinex2snr tgho 2020 300 -orb gnss -archive nz</code>
 
@@ -56,7 +56,8 @@ Now try looking at the periodogram for L2:
 
 <img src="tgho-l2.png" width="600"/>
 
-These results are not very compelling, and the GPS L2 data will not be used in subsequent analysis.  Next, try the two Glonass frequencies:
+These results are not very compelling for a variety of reasons. The GPS L2 data 
+will not be used in subsequent analysis. Next, check the two Glonass frequencies:
 
 <CODE>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 101</code>
 
@@ -66,7 +67,6 @@ These results are not very compelling, and the GPS L2 data will not be used in s
 
 <img src="tgho-glonass-l2.png" width="600"/>
 
-
 The QC metrics from Glonass 101 are helpful for setting the azimuth mask:
 
 <img src=tgho-glonss-qc.png width="600">
@@ -75,26 +75,24 @@ We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 an
 
 ### Analyze the Data
 
-Use **make_json_input** to set up the analysis parameters. 
-Set the elevation and reflector heights as in **quickLook**. The peak to noise ratio and required 
-amplitude can be set on the command line. 
+Use <code>make_json_input</code> to set up the analysis parameters. Set the elevation and reflector heights as in <code>quickLook</code>. The peak to noise ratio and required amplitude can be set on the command line. 
 
 <code>make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9</code>
  
-The azimuth mask was set by hand to exclude empty regions and azimiths with poor retrievals. 
+The azimuth mask has to be set by hand to exclude empty regions and azimiths with poor retrievals. 
 Glonass signals (frequencies 101 and 102) were added and GPS L2/L5 were removed.[Sample json](tgho.json)
 
-Then run **rnx2snr** for ~six months:
+Then run <code>rnx2snr</code> for ~six months:
 
 <code>rinex2snr tgho 2020 130 -archive nz -doy_end 319 -orb gnss</code>
 
 The output SNR files are stored in $REFL_CODE/2020/snr/tgho.
 
-Now run **gnssir** for these same dates:
+Now run <code>gnssir</code> for these same dates:
 
 <code>gnssir tgho 2020 130 -doy_end 319 </code>
 
-To look at daily averages, use the utility **daily_avg**. The median filter is set to allow values within 0.25 meters of the 
+To look at daily averages, use the utility <code>daily_avg</code>. The median filter is set to allow values within 0.25 meters of the 
 median, and the minimum number of tracks required to calculate the average is set to 50 tracks.  
 
 <CODE>daily_avg tgho .25 50 </code>

@@ -38,8 +38,7 @@ We will focus on the data between 2009-2015.
 
 ### Make a SNR File and run quickLook
 
-We will start by making a single SNR file. 
-Here there are two options. The main archive for this dataset only provides the high-quality
+We will start by making a single SNR file. Here there are two options. The main archive for this dataset only provides the high-quality
 L2C data in the highrate (1-sec) area. We do not need this sample rate for GPS reflectometry,
 so to speed things up, we strongly encourage you to use the "special" archive option.  Here
 the 1-sec data have been decimated to 15 seconds:
@@ -82,7 +81,7 @@ one line:
 
 ### Run gnssir for multiple years
 
-Make a json file for your **gnssir** analysis:
+Make a json file for your <code>gnssir</code> analysis:
 
 <code>make_json_input nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2</code>
 
@@ -92,13 +91,13 @@ angle of 7 degrees because this particular receiver had a limit on the number of
 could track. In some cases this meant the low elevation data are not available and that triggers 
 QC restrictions. [A sample json file for this site.](nwot.json)
 
-Once you have a json file set up, run **gnssir** for the years 2009-2015:
+Once you have a json file set up, run <code>gnssir</code> for the years 2009-2015:
 
 <code>gnssir nwot 2009 1 -doy_end 366 -year_end 2015</code>
 
 ### Compute daily average RH values
 
-Use the **daily_avg** utility to compute RH for each day. A median filter of 0.25 meter is used
+Use the <code>daily_avg</code> utility to compute RH for each day. A median filter of 0.25 meter is used
 to eliminate large outliers and a minimum number of tracks is set to 10. This is relatively
 low because of the small number of L2C transmitting satellites in the early years of 
 the dataset. The year inputs here are optional.
