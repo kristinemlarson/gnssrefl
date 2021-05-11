@@ -3,15 +3,15 @@
     "lat": 45.5571,
     "lon": -73.5204,
     "ht": 54.073,
-    "minH": 70.0,
-    "maxH": 90.0,
+    "minH": 75.0,
+    "maxH": 85.0,
     "e1": 5,
     "e2": 12,
     "NReg": [
-        70.0,
-        90.0
+        75.0,
+        85.0
     ],
-    "PkNoise": 2.7,
+    "PkNoise": 3.0,
     "polyV": 4,
     "pele": [
         5,
@@ -25,7 +25,7 @@
         90,
         180,
         180,
-        225 
+        205 
     ],
     "freqs": [
         1,
@@ -35,7 +35,7 @@
     "reqAmp": [
         7,
         7,
-        6 
+        7 
     ],
     "refraction": true,
     "overwriteResults": true,
@@ -43,7 +43,7 @@
     "wantCompression": false,
     "plt_screen": false,
     "onesat": null,
-    "screenstats": true,
+    "screenstats": false,
     "pltname": "pmtl_lsp.png",
     "delTmax": 75
 }

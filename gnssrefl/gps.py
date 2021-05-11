@@ -3714,7 +3714,6 @@ def rinex_nrcan_highrate(station, year, month, day):
         rinexname = station + cdoy + '0.' + cyy + 'o'
         print('Attempt to merge the 15 minute files and move to ', rinexname)
         mergecommand = [teqcpath + ' +quiet ' + station + cdoy + '*o']
-        #mergecommand = [teqcpath + ' ' + station + cdoy + '*o']
         fout = open(foutname,'w')
         subprocess.call(mergecommand,stdout=fout,shell=True)
         fout.close()
