@@ -51,7 +51,8 @@ Windowing down the reflector region and using day of year 270:
 
 <img src=pmtl-lsp-75-85.png width=600>
 
-The QC plot gives the azimuth windows - and help on setting the required amplitude and peak to noise ratio:
+The QC plot gives the azimuth windows - and help on setting the required amplitude and peak to noise ratio.
+Retrievals are not returned near 90 degrees because of the satellite inclination and the way the azimuth regions are defined in <code>quickLook</code>. It does not mean there are obstructions in that direction.
 
 <img src=pmtl-qc-75-85.png width=600>
 
@@ -74,7 +75,7 @@ This is also slow - though not as slow as translating RINEX files and computing 
 
 One way to make the gnssir code run faster would be to loosen up the RH precision.  Since you 
 are using daily averages, it is not necessary to use the default of 5 mm.  10 mm would suffice.
-that needs to be hand-edited in the json instructions.
+This needs to be hand-edited in the json file.
 
 Now compute daily averages:
 
@@ -88,7 +89,7 @@ The daily average:
 
 <img src=pmtl_RH.png width=600>
 
-[RH file](pmtl-rh.txt)
+[Daily average RH file](pmtl-rh.txt)
 
 ### Accuracy
 
@@ -97,6 +98,8 @@ River, the closest of which is Montreal Jetee #1 (station 15520), about 1 km sou
 Tide data can be [downloaded](https://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&region=PAC&tst=1&no=15520). Use the daily mean water level and UTC when submitting a request and download the resulting csv file. 
 
 For this use case, the tidal data have already been [downloaded](pmtl.csv). 
+Given that there is quite drastic water level changes within a day, it is entirely
+plausible that the correlation will improve if using the subdaily RH and hourly tide gauge data.
 
 <img src=pmtl-compare-time.png width=600>
 

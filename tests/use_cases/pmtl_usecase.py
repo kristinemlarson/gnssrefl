@@ -96,10 +96,10 @@ if __name__ == "__main__":
     ax.tick_params(labelsize=14)
     plt.grid()
     txtstr = '\n'.join((
-        'Slope=%.2f' % (slope, ),
-        'Intercept=%.2f m' % (intercept, ),
+        'Slope=%.3f' % (slope, ),
+        #'Intercept=%.2f m' % (intercept, ),
         'Correlation=%.3f' % (r_val, ),
-        'P-value=%.2f' % (p_val, ),
+        #'P-value=%.2f' % (p_val, ),
         'RMS of Residuals=%.3f m' % (rms_resids, )))
     props = dict(boxstyle='round', facecolor='white', alpha=1)
     ax.text(.65, .95, txtstr, transform=ax.transAxes, fontsize=14, verticalalignment='top', bbox=props)
