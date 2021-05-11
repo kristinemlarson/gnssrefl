@@ -72,6 +72,10 @@ This is also slow - though not as slow as translating RINEX files and computing 
 
 <code>gnssir pmtl 2020 270 -doy_end 300</code>
 
+One way to make the gnssir code run faster would be to loosen up the RH precision.  Since you 
+are using daily averages, it is not necessary to use the default of 5 mm.  10 mm would suffice.
+that needs to be hand-edited in the json instructions.
+
 Now compute daily averages:
 
 <code>daily_avg pmtl 2020 0.25 50</code>
@@ -92,8 +96,10 @@ Tide data can be [downloaded](https://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inve
 
 For this use case, the tidal data have already been [downloaded](pmtl.csv). 
 
+<img src=pmtl-compare-time.png width=600>
+
 <img src=pmtl-correlation.png width=600>
 
-<img src=pmtl-compare*png width=600>
+
 
 
