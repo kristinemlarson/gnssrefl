@@ -28,7 +28,7 @@
 
 Station PMTL is located on the Viterra Montreal Terminal building on the St Lawrence River in Montreal, Canada. It is operated by the Montreal Port Authority.
 
-GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more than 60 meters above the water, you need to use high-rate GNSS data. Because of the awy that NRCAN stores these data, this means you need to have installed <code>teqc</code>.
+GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more than 60 meters above the water, you need to use high-rate GNSS data. Because of the way that NRCAN stores these data, you need to install <code>teqc</code>.
 
 Note the [ellipsoidal height and geoid corrected height](https://gnss-reflections.org/geoid?station=pmtl). To pick an azimuth and elevation mask, try the [reflection zone webapp](https://gnss-reflections.org/rzones) with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:
 
@@ -49,30 +49,40 @@ I have annotated this <code>quickLook</code> periodogram to point out that there
 You can also see that the NW region is useless, which is what we should expect. 
 Windowing down the reflector region and using day of year 270:
 
+<img src=pmtl-lsp-75-85.png width=600>
+
+The QC plot gives the azimuth windows - and help on setting the required amplitude and peak to noise ratio:
 
 <img src=pmtl-qc-75-85.png width=600>
 
-<img src=pmtl-lsp-75-85.png width=600>
 
 ### Analyze the Data
 
 Set up analysis instructions, using a smaller RH region: 
 
-<code>make_json_input pmtl 45.5571 -73.5204 54.073 -h1 75 -h2 85 -e1 5 -e2 12 -allfreq True</code>
+<code>make_json_input pmtl 45.5571 -73.5204 54.073 -h1 75 -h2 85 -e1 5 -e2 12 -allfreq True -peak2noise 3 -ampl 7</code>
 
-Hand-edit the json to remove GPS L2C, GPS L5, and Galileo data, and to set your azimuth region. [Here is my json that you can compare to](pmtl.json).
+Hand-edit the json to remove GPS L2C, GPS L5, and Galileo data, and to set your azimuth region. [Sample json](pmtl.json)
 
 Make the SNR files (this takes a long long time):
 
 <code>rinex2snr pmtl 2020 270 -doy_end 300 -archive nrcan -rate high -orb gnss</code>
 
-This is also slow - though not as slow as translating RINEX files:
+This is also slow - though not as slow as translating RINEX files and computing orbits:
 
 <code>gnssir pmtl 2020 270 -doy_end 300</code>
 
 Now compute daily averages:
 
-<code>daily_avg pmtl 2020 -doy1 270 -doy2 300</code>
+<code>daily_avg pmtl 2020 0.25 50</code>
+
+All tracks:
+
+<img src=pmtl-all.png width=600>
+
+The daily average:
+
+<img src=pmtl_RH.png width=600>
 
 ### Accuracy
 
@@ -80,6 +90,10 @@ The Canadian Hydrographic Service within Fisheries and Ocean Canada operates tid
 River, the closest of which is Montreal Jetee #1 (station 15520), about 1 km south of the GNSS site. 
 Tide data can be [downloaded](https://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&region=PAC&tst=1&no=15520). Use the daily mean water level when submitting a request and download the resulting csv file. 
 
+For this use case, the tidal data have already been [downloaded](pmtl.csv). 
 
-For this use case, the tidal data have already been [downloaded](15520-26-SEP-2020_slev.csv).
+<img src=pmtl-correlation.png width=600>
+
+<img src=pmtl-compare*png width=600>
+
 
