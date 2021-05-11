@@ -78,7 +78,7 @@ that needs to be hand-edited in the json instructions.
 
 Now compute daily averages:
 
-<code>daily_avg pmtl 2020 0.25 50</code>
+<code>daily_avg pmtl 2020 0.25 50 -txtfile pmtl-rh.txt </code>
 
 All tracks:
 
@@ -88,11 +88,13 @@ The daily average:
 
 <img src=pmtl_RH.png width=600>
 
+[RH file](pmtl-rh.txt)
+
 ### Accuracy
 
 The Canadian Hydrographic Service within Fisheries and Ocean Canada operates tide gauges along the St Lawrence 
 River, the closest of which is Montreal Jetee #1 (station 15520), about 1 km south of the GNSS site. 
-Tide data can be [downloaded](https://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&region=PAC&tst=1&no=15520). Use the daily mean water level when submitting a request and download the resulting csv file. 
+Tide data can be [downloaded](https://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&region=PAC&tst=1&no=15520). Use the daily mean water level and UTC when submitting a request and download the resulting csv file. 
 
 For this use case, the tidal data have already been [downloaded](pmtl.csv). 
 
@@ -101,5 +103,6 @@ For this use case, the tidal data have already been [downloaded](pmtl.csv).
 <img src=pmtl-correlation.png width=600>
 
 
+[Code for comparison](pmtl_usecase.py)
 
 
