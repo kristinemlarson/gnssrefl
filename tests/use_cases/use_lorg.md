@@ -4,7 +4,7 @@
 
 **Location:**  Lorne, Antarctica
 
-**Archive:**  [UNAVCO](http://www.unavco.org), [SOPAC](http://sopac-csrc.ucsd.edu/index.php/sopac/)
+**Archive:**  [UNAVCO](http://www.unavco.org)
 
 **DOI:**  [https://doi.org/10.7283/ACF6-YT23](https://doi.org/10.7283/ACF6-YT23)
 
