@@ -29,12 +29,16 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     csvformat is a boolean for the output file. if true, csv file written instead of plain txt
     howBig is criterion for the median filter, i.e. how far in meters can a RH be from the median for that day
     ReqTracks is the number of retrievals required per day
+
+    21may14 added utcTime to allRH file
+
+    author: kristine larson
     """
     xdir = os.environ['REFL_CODE']
     print('All RH retrievals will be written to: ', alldatafile)
     allrh = open(alldatafile, 'w+')
     # put in a header
-    allrh.write(" {0:s}  \n".format('% year,doy, RH(m), Month, day, azimuth(deg),freq, satNu, LSP amp,peak2noise' ))
+    allrh.write(" {0:s}  \n".format('% year,doy, RH(m), Month, day, azimuth(deg),freq, satNu, LSP amp,pk2noise,UTC(hr)' ))
 
     fs = 12
     NotEnough = 0
@@ -66,6 +70,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                         if (nr > 0):
                             y = a[:,0] +a[:,1]/365.25; rh = a[:,2] ; 
                             frequency = a[:,10]; azimuth = a[:,5]; sat = a[:,3]; amplitude=a[:,6]
+                            # added utc to the all RH file
+                            utcTime = a[:,4]; 
                             yr = int(a[0,0]); doy = int(a[0,1])
                             d = datetime.date(yr,1,1) + datetime.timedelta(doy-1)
                             peak2noise = a[:,13]
@@ -79,17 +85,19 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                             good =rh[cc]; goodT =y[cc]
                             gazim = azimuth[cc]; gsat = sat[cc]; gamp = amplitude[cc]; gpeak2noise = peak2noise[cc]
                             gfreq = frequency[cc]
+                            # added 21may14
+                            gutcTime = utcTime[cc]
                             
                             NG = len(good)
                             if (NG > 0):
                                 if csvformat:
                                     for ijk in range(0,NG):
-                                        allrh.write(" {0:4.0f},  {1:3.0f},{2:7.3f}, {3:2.0f}, {4:2.0f},{5:6.1f},{6:4.0f},{7:4.0f},{8:6.2f},{9:6.2f}\n".format(yr, 
-                                            doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk]))
+                                        allrh.write(" {0:4.0f},  {1:3.0f},{2:7.3f}, {3:2.0f}, {4:2.0f},{5:6.1f},{6:4.0f},{7:4.0f},{8:6.2f},{9:6.2f},{10:6.2f}\n".format(yr, 
+                                            doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk], gutcTime[ijk]))
                                 else:
                                     for ijk in range(0,NG):
-                                        allrh.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:2.0f} {4:2.0f} {5:6.1f} {6:4.0f} {7:4.0f} {8:6.2f} {9:6.2f}\n".format(yr, 
-                                            doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk]))
+                                        allrh.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:2.0f} {4:2.0f} {5:6.1f} {6:4.0f} {7:4.0f} {8:6.2f} {9:6.2f} {10:6.2f}\n".format(yr, 
+                                            doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk],gutcTime[ijk]))
 
         # only save if there are some minimal number of values
                             if (len(good) > ReqTracks):
