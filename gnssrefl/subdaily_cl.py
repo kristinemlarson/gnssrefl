@@ -1,5 +1,6 @@
 # preliminary water analysis to apply RHdot correction
 # originally called prelim-tides - now subdaily_cl.py
+# kristine larson, modified may 2021
 import argparse
 import datetime
 import json
@@ -35,6 +36,7 @@ def main():
     parser.add_argument("-extension", default=None, type=str, help="soln subdirectory")
     parser.add_argument("-doy1", default=None, type=str, help="initial day of year")
     parser.add_argument("-doy2", default=None, type=str, help="end day of year")
+    parser.add_argument("-testing", default=None, type=str, help="set to True for testing mode")
 
     args = parser.parse_args()
 #   these are required
@@ -92,11 +94,15 @@ def main():
     else:
         outlier = float(args.outlier)
 
-    # changed this to use new format .... for subdaily file
-    try:
+    # this way if it crashes, only effects me.  and I get more useful error messages
+    if args.testing == None:
+        try:
+            tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,obstimes=obstimes)
+        except: 
+            print('Some issues with the spline fit, mostly likely due to data gaps')
+    else:
         tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,obstimes=obstimes)
-    except: 
-        print('Some issues with the spline fit, mostly likely due to data gaps')
+
 
 if __name__ == "__main__":
     main()

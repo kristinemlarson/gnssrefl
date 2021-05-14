@@ -22,7 +22,9 @@ import math
 def print_badpoints(t,outliersize):
     """
     input: station name and lomb scargle result array of "bad points"
-    second input is the size of the outlier
+    second input is the size of the outlier, in meters
+    author: kristine larson
+
     """
 # (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)
 # year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS
@@ -40,9 +42,11 @@ def print_badpoints(t,outliersize):
 def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
     input: txtdir is the directory where the results should be written out
-    txtfile, csvfile, and jsonfile 
-    are the command line input values 
+    txtfile, csvfile, and jsonfile are the command line input values 
     if they are not set (i.e. they are None), that means you do not want it.
+    if writejson is true, then it is written to txtdir + jsonfile 
+    if writecsv is true, then it is written to txtdir + csvfile and so on
+    author: kristine larson
     """
     writetxt = True
     if txtfile == None:
@@ -79,6 +83,8 @@ def write_subdaily(outfile,station,ntv,writecsv,writetxt,extraline):
     21may04 - extra line may be added to the header
     changed this to use hte original format.  changing the number of columns was a HUGE
     mistake.  put m,d,h,m,s at the end
+
+    author: kristine larson
     """
     # this is lazy - should use shape
     N= len(ntv)
@@ -98,6 +104,7 @@ def write_subdaily(outfile,station,ntv,writecsv,writetxt,extraline):
         #ctime = g.nicerTime(UTCtime); 
         #hr = ctime[0:2]
         #minute = ctime[3:5]
+        # you can either write a csv or text, but not both
         if writecsv:
             fout.write(" {0:4.0f},{1:3.0f},{2:6.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
                             ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
@@ -109,10 +116,12 @@ def write_subdaily(outfile,station,ntv,writecsv,writetxt,extraline):
 
 def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     """
+    Inputs:
     station - 4 character name
     year is year ;-)  
     d1 and d2 are days of year if you want to look at a smaller dataset
     plt2screen is a boolean whether you want the plot displayed to the screen
+
     author: kristine larson
     2021april27 return datetime object
     """
@@ -384,6 +393,10 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
     2021april27 sending obstimes as kwarg input
     2021may5 change file format back to original file format
+    author: kristine larson
+
+    where did splines_for_dummies go? LOL
+
     """
     fs = 12 # fontsize
     # read in the tvd values which are the output of gnssir
@@ -412,33 +425,30 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     tnew =[] ; ynew =[]; 
     # fill in gaps using variables called tnew and ynew
     for i in range(1,len(th)):
-        d= th[i]-th[i-1]
+        d= th[i]-th[i-1] # delta in time
         if (d > gap):
             #print(t[i], t[i-1])
-            print('found a gap in hours',d*24)
             x0 = th[i-1:i+1]
             h0 = h[i-1:i+1]
+            print('found a gap in hours',d*24, 'day ', x0[0])
             f = scipy.interpolate.interp1d(x0,h0)
-            tnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
-            ynew = f(tnew)
-#            print('new t values', tnew)
-#            print('new h values', ynew)
+            # so this is fake data
+            ttnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
+            yynew = f(ttnew)
+            print(ttnew)
+            # now append it to your real data
+            tnew = np.append(tnew,ttnew)
+            ynew = np.append(ynew,yynew)
+        else:
+            tnew = np.append(tnew,th[i])
+            ynew = np.append(ynew,h[i])
 
-# append the interpolated values so the splines don't get unhappy
-
-    if (len(tnew) > 0):
-        tnew = np.append(th,tnew)
-        ynew = np.append(h,ynew)
-        # try sorting to see if that fixes it
-        ii = np.argsort( tnew) 
-        tnew = tnew[ii]
-        ynew = ynew[ii]
-    else:
-        tnew = th
-        ynew = h
+    # sort it just to make sure ...
+    ii = np.argsort( tnew) 
+    tnew = tnew[ii]
+    ynew = ynew[ii]
 
     knots_per_day = 12
-
     Ndays = tnew.max()-tnew.min()
     numKnots = int(knots_per_day*(Ndays))
     print('First and last time values', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
@@ -453,8 +463,16 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     # 
     knots =np.linspace(t1,t2,num=numKnots)
 
+    ftest = open('testing.txt', 'w+')
+    for i in range(0,len(tnew)):
+        ftest.write('{0:9.4f} {1:7.3f}  \n'.format( tnew[i], ynew[i]))
+
+    ftest.close()
+
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
+
     # user specifies how many values per day you want to send back to the user  
+    print('got past this 0 or did i ... ')
 
     # should i do extrapolate True? it is the default  - could make it periodic?
     spline = interpolate.BSpline(t, c, k, extrapolate=True)
