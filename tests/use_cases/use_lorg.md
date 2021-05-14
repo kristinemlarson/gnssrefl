@@ -101,7 +101,7 @@ values within a given value of the median. The user is also asked to set a requi
 
 <img src="lorg-dailyavg.png" width="600"/>
 
-[All reflector heights.](lorg_allRH.txt)
+[All reflector heights (gzipped) ](lorg_allRH.txt.gz)
 
 [Daily average reflector height file.](lorg-dailyavg.txt)
 
