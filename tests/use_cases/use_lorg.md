@@ -44,7 +44,7 @@ First make a SNR file.
 
 Use <code>quickLook</code> to produce a periodogram similar to the one in the web app [(For details on quickLook output)](../../docs/quickLook_desc.md). quickLook is set to use the L1 frequency by default:
 
-<code>quickLook lorg 2019 205*</code>
+<code>quickLook lorg 2019 205</code>
 
 <img src="lorg-ql-l1.png" width="600">
  
@@ -88,13 +88,10 @@ The default does not send any plots to the screen. If you do want to see them, s
 
 <img src="lorg-g-panels.png" width="800"/>
 
-The results for a single day are stored in a folder for that year, i.e. 
-$REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt)
+The results for a single day are stored in a folder for that year, i.e.  $REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt)
 
-The **daily_avg** command will calculate the daily average reflector height from the daily output files. 
-To minimize outliers in these daily averages, a median filter is set to allow 
-values within a given value of the median. The user is also asked to set a required minimum number of daily satellite 
-tracks. Here we use 0.25 meters and 50 tracks. 
+The **daily_avg** command will calculate the daily average reflector height from the daily output files.  To minimize outliers in these daily averages, a median filter is set to allow 
+values within a given value of the median. The user is also asked to set a required minimum number of daily satellite tracks. Here we use 0.25 meters and 50 tracks. 
 
 <code>daily_avg lorg 0.25 50</code>
 
@@ -104,4 +101,7 @@ tracks. Here we use 0.25 meters and 50 tracks.
 
 <img src="lorg-dailyavg.png" width="600"/>
 
-[A daily average reflector height file.](lorg-dailyavg.txt). 
+[All reflector heights.](lorg_allRH.txt)
+
+[Daily average reflector height file.](lorg-dailyavg.txt)
+
