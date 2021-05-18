@@ -24,24 +24,34 @@
 
 [Google Map Link](https://goo.gl/maps/EcTkbHjaSaWp4d8H9)
 
+<p align=center>
 <img src="https://gnss-reflections.org/static/images/P360.jpg" width="500">
+</p>
 
 
 ## Data Summary
 
-Station p360 is located to the west of Yellowstone National Park. At an elevation of ~1858 m, 
-winter snowfall can be frequent and heavy. The site has been recording multi-GNSS data since March 2020. Before that time, only 
-the L2C GPS data are of reliable quality. p360 was part of [PBO H2O](http://cires1.colorado.edu/portal/)
+Station p360 is located to the west of Yellowstone National 
+Park. At an elevation of ~1858 m, 
+winter snowfall can be frequent and heavy. 
+The site has been recording multi-GNSS data since March 2020. Before that time, only 
+the L2C GPS data are of reliable quality for snow accumulation studies. 
+p360 was part of [PBO H2O](http://cires1.colorado.edu/portal/)
 
-The station is in a flat, grassy plain with no obstacles or changes in topography, so complicated elevation and azimuth 
-angle masks are not required.  
+The station is in a flat, grassy plain with minimal obstacles or 
+changes in topography. Complicated elevation and azimuth angle masks are not required.  
 
 
 ## Take a Quick Look at the Data
 
-Make an SNR file. Use the *special* archive to allow access to L2C data:
+First you need to make an SNR file. Ordinarily one can only access L2C data at 
+this site using the 1-sec data. To support <code>gnssrefl</code> users, UNAVCO 
+has created special RINEX files with L2C SNR data in them at a friendlier sample
+rate, 15 sec. Use the *special* archive:
 
 <CODE>rinex2snr p360 2017 290 -archive special</code>
+
+Then run <code>quickLook</code>:
 
 <code>quickLook p360 2017 290</code>
 
@@ -56,14 +66,16 @@ Now check L2C:
 
 <img src="qc-p360-l2c.png" width="600">
 
-These reflector height retrievals are far superior to the L1 data. The southern quadrants give more 
-consistent retrievals than for the north. This is confirmed in the QC plot show here:
+These reflector height retrievals are far superior to the L1 
+data. The southern quadrants give more consistent retrievals than for the 
+north. This is confirmed in the QC plot show here:
 
 <img src="p360-qc-l2c.png" width="600">
 
 ## Analyze the Data
 
-First we will set the analysis paramaters using <code>make_json_input</code>. This analysis will use the L2C frequency and 
+First we will set the analysis paramaters 
+using <code>make_json_input</code>. This analysis will use the L2C frequency and 
 will use QC metrics derived from the previous plot (for peak to noise ratio and amplitude).  
 
 <code>make_json_input p360 44.31785 -111.45068 1857.861 -l2c True -peak2noise 3.2 -ampl 8 </code>
