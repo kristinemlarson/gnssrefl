@@ -1,5 +1,8 @@
 ### Summit Camp, Greenland
 
+<p align=center>
+<img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
+</p>
 
 **Station Name:** smm3
 
@@ -21,14 +24,9 @@
 
 ## Data Summary
 
-
-This site has been optimally set up for positions and reflectometry. This means there is no elevation 
+This site has been optimally set up to accommodate both positions and reflectometry. This means there is no elevation 
 mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) as 
-well as Glonass. You can see that it is NOT the typical 2-meter monument.
-
-<p align=center>
-<img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
-</p>
+well as Glonass. You can see from the photo at the top that it is NOT the typical 2-meter monument.
 
 Position time series for smm3 can easily be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3).
 Note that there is an antenna height blunder in the very early data for the site. It is straight forward to find and remove.

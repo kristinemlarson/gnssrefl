@@ -1,5 +1,9 @@
 ### Dye2, Greenland 
 
+<p align=center>
+<img src="gls1.jpg" width="400"><br>
+</p>
+
 **Station Name:** gls1
 
 **Location:**  Dye2, Qeqqata Province, Greenland 
@@ -22,8 +26,6 @@
 
 [Google Maps Link](https://goo.gl/maps/391a7h2HpacAa59u8) 
 
-<img src="gls1.jpg" width="400">
-<BR>
 
 ## Data Summary
 

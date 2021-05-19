@@ -1,5 +1,9 @@
 ### Marshall, Colorado, USA
 
+<p align="center">
+<img src="https://gnss-reflections.org/static/images/P041.jpg" width="500">
+</P>
+
 **Station Name:** p041 
 
 **Location:** Boulder, CO, USA
@@ -22,9 +26,6 @@
 
 [Google Map Link](https://goo.gl/maps/GwGV8PS4CQVQzYHC7) 
 
-<p align="center">
-<img src="https://gnss-reflections.org/static/images/P041.jpg" width="500">
-</P>
 
 ### Data Summary
 

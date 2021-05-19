@@ -1,8 +1,13 @@
-### Lake Taupo, New Zealand
+### Lake Taupo
+
+<p align="center">
+<img src="tgho_barker.jpg" width="500"><BR>
+Photo credit: Simon Barker
+</P>
 
 **Station Name:** tgho 
 
-**Location:** North Island
+**Location:** North Island, New Zealand
 
 **Archive:** [Geonet](https://www.geonet.org.nz/)
 
@@ -22,10 +27,6 @@
 
 [Google Map Link](https://goo.gl/maps/1zmgi6rRHPVPDAfV8)
 
-<p align="center">
-<img src="tgho_barker.jpg" width="500"><BR>
-Photo credit: Simon Barker
-</P>
 
 ### Data Summary
 

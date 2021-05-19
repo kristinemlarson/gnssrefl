@@ -1,5 +1,9 @@
 ### Bering Sea 
   
+<p align="center">
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">
+</p>
+
 **Station Name:**  at01
 
 **Location:**  St Michael, Alaska
@@ -19,11 +23,6 @@
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/AT01.sta)
 
 [Google Map Link](https://goo.gl/maps/uWyoNFf4DRjYLmfUA)
-
-<p align="center">
-<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">
-</p>
-
 
 ### Data Summary
 

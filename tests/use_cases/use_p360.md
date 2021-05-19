@@ -1,5 +1,9 @@
 ### Island Park, Idaho
   
+<p align=center>
+<img src="https://gnss-reflections.org/static/images/P360.jpg" width="500">
+</p>
+
 **Station Name:**  p360
 
 **Location:**  Island Park, Idaho
@@ -24,9 +28,6 @@
 
 [Google Map Link](https://goo.gl/maps/EcTkbHjaSaWp4d8H9)
 
-<p align=center>
-<img src="https://gnss-reflections.org/static/images/P360.jpg" width="500">
-</p>
 
 
 ## Data Summary

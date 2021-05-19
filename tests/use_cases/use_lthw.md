@@ -1,4 +1,8 @@
-#h## Lower Thwaites Glacier
+### Lower Thwaites Glacier
+
+<p align=center>
+<img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"/><BR>
+</p>
 
 **Station Name:** lthw
 
@@ -18,7 +22,6 @@
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta)
 
-<img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"/>
 
 ### Data Summary
 

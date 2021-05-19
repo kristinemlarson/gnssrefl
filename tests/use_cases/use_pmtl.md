@@ -1,5 +1,9 @@
 ### St Lawrence River
 
+<p align=center>
+<img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500"/>
+</p>
+
 **Station Name:** 	pmtl
 
 **Location:** Port de Montreal, Montreal, Canada
@@ -20,9 +24,6 @@
 
 [Google Map Link](https://goo.gl/maps/FoJ68HDT2KZ6KnZc7)
 
-<p align=center>
-<img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500"/>
-</p>
 
 ### Data Summary
 

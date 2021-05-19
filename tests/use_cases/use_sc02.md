@@ -1,5 +1,9 @@
 ### Friday Harbor
 
+<p align="center">
+<img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>
+</P>
+
 **Station Name:** sc02
 
 **Location:** Friday Harbor, Washington, USA 
@@ -18,12 +22,7 @@
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/SC02.sta)
 
-[NOAA tide gauge](https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
-
-<p align="center">
-<img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>
-</P>
-
+[Colocated NOAA tide gauge](https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
 
 ### Data Summary
 
