@@ -726,6 +726,11 @@ refraction correction.
 
 Kristine M. Larson
 
-This documentation was updated on May 7, 2021.
+[https://kristinelarson.net](https://kristinelarson.net)
 
+This documentation was updated on May 17, 2021.
+
+```html
+<script src="https://cdn.usefathom.com/script.js" data-site="EHWFICJC" defer></script>
+```
 
