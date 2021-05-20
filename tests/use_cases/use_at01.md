@@ -96,7 +96,7 @@ Now set up the analysis instructions:
 You will need to hand-edit the file to restrict the azimuths per our QC output. I also removed the Beidou signals (frequencies > 300) 
 because they are not in the RINEX 2.11 file. We also removed frequency 208. [Sample json file.](at01.json)
 
-Next estimate reflector height (RH) for the one month period:
+Next estimate reflector height (RH) for the two month time period:
 
 <code>gnssir at01 2020 230 -doy_end 290</code>
 
@@ -105,8 +105,7 @@ certainly give it a try. We have set an outlier criteria of 0.36 meters to start
 
 <code>subdaily at01 2020 -doy1 230 -doy2 290 -outlier 0.36</code>
 
-The code [concatenates the daily RH files](at01_subdaily_rh.txt.gz) for this period:
-
+The code concatenates the daily RH files for this period:
 
 <img src=at01_raw.png width=600>
 
@@ -147,5 +146,8 @@ Freq  Bias  Sigma   NumObs
 
 The code also prints out a list of outliers (outliers.txt) so that you can assess whether you 
 might want to change your azimuth mask.
+
+Files for both the raw RH estimates and the QC/RH corrected estimates are provided (file names come to the screen).
+
 
 
