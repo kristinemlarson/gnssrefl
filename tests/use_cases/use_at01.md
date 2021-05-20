@@ -113,10 +113,7 @@ You can see that there are a very large number of RH retrievals per day:
 
 <img src=at01_nvals.png width=600>
 
-This preliminary version of the code makes an effort to compute the RH dot correction.
-It uses a cubic spline to fit the RH data which allows a first order estimate for RH dot. That, along with geometrical information as to the 
-elevation angle rate of change, is used to make the RH dot correction. This term is **very important** for sites with large tidal ranges, 
-but is of less importance at sites like at01.  Nevertheless, you can see here that it does help a bit:
+This preliminary version of the code removes outliers and makes an effort to compute the RH dot correction.  It uses a cubic spline to fit the RH data which allows a first order estimate for RH dot. That, along with geometrical information as to the elevation angle rate of change, is used to make the RH dot correction. This term is **very important** for sites with large tidal ranges, but is of less importance at sites like at01. Nevertheless, you can see here that it does help a bit:
 
 <PRE>
 RMS no RHdot correction (m)  0.082
@@ -129,7 +126,7 @@ Final view:
 
 <img src=at01-final.png width=600>
 
-There are some statistics here that indicate that the precision is ~ 5 cm.  We are working on removing inter-frequency biases. Some is simply do to the phase center - but we also want to be be careful to take into account surface changes (ice to water, e.g.)
+There are some statistics here that indicate that the precision is ~ 5 cm.  We are working on removing inter-frequency biases. Some of the bias is simply due to the phase center - but we also want to be be careful to take into account surface changes (ice to water, e.g.)
 
 <PRE>
 Freq  Bias  Sigma   NumObs
