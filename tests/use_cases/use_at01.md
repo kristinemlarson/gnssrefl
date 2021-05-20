@@ -98,27 +98,36 @@ because they are not in the RINEX 2.11 file. [Sample json file.](at01.json)
 
 Then estimate reflector height (RH) for the one month period:
 
-<code>gnssir at01 2020 100 -doy_end 130</code>
+<code>gnssir at01 2020 230 -doy_end 290</code>
 
 We have written some code to help you look at these subdaily files - it is not complete as yet,
 but you can certainly give it a try. We have set an outlier criteria of ~3 sigma. At this site (without
 removing biases between frequencies), this will be ~0.12 m, so 0.36 m.
 
-<code>subdaily at01 2020 -doy1 100 -doy2 130 -outlier 0.36</code>
+<code>subdaily at01 2020 -doy1 230 -doy2 290 -outlier 0.36</code>
 
 The code [concatenates the daily RH files](at01_subdaily_rh.txt.gz) for this period and also makes this plot:
 
+
 <img src=at01_raw.png width=600>
+
+
+<img src=at01-nvals.png width=600>
 
 It tries to do some simple outlier removal and will make an effort to compute the RH dot correction.
 The default for outliers is 0.5 meters, but you can set that value at the command line.
-*The RH dot correction computed here is using a test version of our code.* It uses a cubic 
-spline to fit the RH data which allows a 
+*The RH dot correction computed here is using a test version of our code.* It uses a cubic spline to fit the RH data which allows a 
 first order estimate for RH dot. That, along with geometrical information as to the 
 elevation angle rate of change, is used to make the RH dot correction. This term
 is **very important** for sites with large tidal ranges, but is of minimal importance at sites like at01.
+Nevertheless, you can see here that it does help a bit:
 
-<img src=at01_edits.png width=600>
+<img src=at01-spline.png width=600>
+
+
+Final view:
+
+<img src=at01-final.png width=600>
 
 The code will also print out a list of outliers (outliers.txt) so that you can assess whether you 
 might want to change your azimuth mask.
