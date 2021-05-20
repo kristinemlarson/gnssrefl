@@ -85,51 +85,67 @@ and Galileo:
 
 ### Analyze the Data
 
-Next we analyze data for days 100-131 for the year 2020. First make the SNR files:
+Next we analyze data for two months in the fall of 2020. First make the SNR files:
 
-<code>rinex2snr at01 2020 100 -archive unavco -doy_end 130</code>
+<code>rinex2snr at01 2020 230 -archive unavco -doy_end 290</code>
 
 Now set up the analysis instructions:
 
 <code>make_json_input at01 63.484 -162.006 21.565 -h1 8 -h2 15 -e1 5 -e2 13 -allfreq True </code>
 
 You will need to hand-edit the file to restrict the azimuths per our QC output. I also removed the Beidou signals (frequencies > 300) 
-because they are not in the RINEX 2.11 file. [Sample json file.](at01.json)
+because they are not in the RINEX 2.11 file. We also removed frequency 208. [Sample json file.](at01.json)
 
-Then estimate reflector height (RH) for the one month period:
+Next estimate reflector height (RH) for the one month period:
 
 <code>gnssir at01 2020 230 -doy_end 290</code>
 
-We have written some code to help you look at these subdaily files - it is not complete as yet,
-but you can certainly give it a try. We have set an outlier criteria of ~3 sigma. At this site (without
-removing biases between frequencies), this will be ~0.12 m, so 0.36 m.
+We have written some code to help you look at these subdaily files - it is not complete as yet, but you can 
+certainly give it a try. We have set an outlier criteria of 0.36 meters to start with.  
 
 <code>subdaily at01 2020 -doy1 230 -doy2 290 -outlier 0.36</code>
 
-The code [concatenates the daily RH files](at01_subdaily_rh.txt.gz) for this period and also makes this plot:
+The code [concatenates the daily RH files](at01_subdaily_rh.txt.gz) for this period:
 
 
 <img src=at01_raw.png width=600>
 
+You can see that there are a very large number of RH retrievals per day:
 
-<img src=at01-nvals.png width=600>
+<img src=at01_nvals.png width=600>
 
-It tries to do some simple outlier removal and will make an effort to compute the RH dot correction.
-The default for outliers is 0.5 meters, but you can set that value at the command line.
-*The RH dot correction computed here is using a test version of our code.* It uses a cubic spline to fit the RH data which allows a 
-first order estimate for RH dot. That, along with geometrical information as to the 
-elevation angle rate of change, is used to make the RH dot correction. This term
-is **very important** for sites with large tidal ranges, but is of minimal importance at sites like at01.
-Nevertheless, you can see here that it does help a bit:
+This preliminary version of the code makes an effort to compute the RH dot correction.
+It uses a cubic spline to fit the RH data which allows a first order estimate for RH dot. That, along with geometrical information as to the 
+elevation angle rate of change, is used to make the RH dot correction. This term is **very important** for sites with large tidal ranges, 
+but is of less importance at sites like at01.  Nevertheless, you can see here that it does help a bit:
+
+<PRE>
+RMS no RHdot correction (m)  0.082
+RMS w/ RHdot correction (m)  0.070
+</PRE>
 
 <img src=at01-spline.png width=600>
-
 
 Final view:
 
 <img src=at01-final.png width=600>
 
-The code will also print out a list of outliers (outliers.txt) so that you can assess whether you 
+There are some statistics here that indicate that the precision is ~ 5 cm.  We are working on removing inter-frequency biases. Some is simply do to the phase center - but we also want to be be careful to take into account surface changes (ice to water, e.g.)
+
+<PRE>
+Freq  Bias  Sigma   NumObs
+       (m)   (m)
+  1   0.07   0.06   2751
+ 20  -0.03   0.05   2208
+  5  -0.04   0.05   1592
+101   0.06   0.06   1803
+102  -0.03   0.05   2086
+201   0.07   0.05   1164
+205  -0.05   0.05   1880
+207  -0.04   0.04   1864
+</PRE>
+
+The code also prints out a list of outliers (outliers.txt) so that you can assess whether you 
 might want to change your azimuth mask.
 
 
