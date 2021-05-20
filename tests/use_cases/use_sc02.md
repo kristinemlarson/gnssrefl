@@ -1,4 +1,4 @@
-### Friday Harbor
+### The Most Famous GPS Tide Gauge
 
 <p align="center">
 <img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>
@@ -24,16 +24,18 @@
 
 [Colocated NOAA tide gauge](https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
 
+[Google Maps](https://www.google.com/maps/place/48°32'45.6%22N+123°00'28.8%22W/@48.546,-123.010194,17z/data=!3m1!4b1!4m5!3m4!1s0x0:0x0!8m2!3d48.546!4d-123.008)
+
 ### Data Summary
 
-There have been *a lot* of papers written about sc02. That being said, it is not an ideal site. It is set 
-back a bit too far from the shore - and would have been far superior for reflections if the antenna were
+There have been *a lot* of papers written about sc02. That being said, it is not an ideal GNSS reflections site. It is set 
+back a bit too far from the shore - and it would have been far superior for reflections if the antenna were
 a bit taller. Furthermore, there are obstructions (docks). For further details, you are encouraged to read 
 [this early paper](https://www.kristinelarson.net/wp-content/uploads/2015/12/LarsonRayWilliams-2017-FridayHarbor.pdf) 
 summarizing a comparison of 10 years of GNSS-IR results with the colocated tide gauge operated by NOAA. That paper only
 used the GPS L1 SNR data.  Since that time a multi-GNSS receiver has been installed and there is an order of 
-magnitude increase in the number of useable signals. We will only use the data from this new receiver.
-Although there are 1-sec data archived at UNAVCO, for this small study we will use the 15 second files.
+magnitude increase in the number of useable signals. Here we will only use the low-rate (15 sec) data from this new receiver. 
+If you are interested, UNAVCO does have a 1-sec dataset available for use.
 
 
 Take some time to look at the [reflection zones webapp.](https://gnss-reflections.org/rzones?station=sc02) 

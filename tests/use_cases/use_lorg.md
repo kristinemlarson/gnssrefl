@@ -1,5 +1,9 @@
 ### Ross Ice Shelf, Antarctica
 
+<P align=center>
+<img src="https://gnss-reflections.org/static/images/LORG.jpg" width="500">
+</p>
+
 **Station Name:**  lorg
 
 **Location:**  Lorne, Antarctica
@@ -20,21 +24,16 @@
 
 [Google Maps Link](https://goo.gl/maps/bSAuLXLLMmzWqPdW9) 
 
-<img src="https://gnss-reflections.org/static/images/LORG.jpg" width="500">
-
 ### Data Summary
 
-Station lorg is on the Ross Ice Shelf, Antarctica.
-The site is a largely featureless ice plain with no obstructions (see photo above). 
-The site was installed on November 27, 2018 and decommissioned and removed on November 15, 2019. 
-It recorded only GPS frequencies during its operation. 
+Station lorg is on the Ross Ice Shelf, Antarctica. The site is a largely featureless ice plain with no obstructions (see photo above). 
+The site was installed on November 27, 2018 and decommissioned on November 15, 2019. It recorded only GPS frequencies during its operation. 
 
 LORG is an example station on the [GNSS-IR web app.](https://gnss-reflections.org/api?example=lorg) 
 
-There are no significant topographic features near the station, so it is recommended to use default values 
-for the elevation mask. An azimuth mask is not required.
+Because there are no significant topographic features near the station, so it is recommended to use default values for the elevation mask. An azimuth mask is not required.
 
-If you are curious about the position time series for the antenna, you can use *download_unr lorg* for more information.
+If you are curious about the position time series for the antenna, you can use <code>download_unr lorg</code>. 
 
 ### Take a Look at the Data
 

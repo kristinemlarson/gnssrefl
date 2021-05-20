@@ -397,6 +397,8 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
     where did splines_for_dummies go? LOL
 
+    21may18 try to remove massive outliers
+
     """
     fs = 12 # fontsize
     # read in the tvd values which are the output of gnssir
@@ -404,6 +406,31 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     # sort the data by days 
     ii = np.argsort( (tvd[:,1]+tvd[:,4]/24) ).T
     tvd = tvd[ii,:]
+
+    print('try to remove massive outliers')
+    NV = len(tvd)
+    medval = np.median(tvd[:,2])
+    xx= tvd[:,2]-medval
+    plt.figure()
+    plt.subplot(211)
+    n, bins, patches = plt.hist(xx, 50, density=True, facecolor='g', alpha=0.75)
+    plt.xlabel('standard deviations')
+    plt.title('RH (median removed) ')
+
+    # use 3 sigma ... 
+    Sig = np.std(xx)
+    ij =  np.absolute(xx) < 3*Sig
+    xnew = xx[ij]
+    #plt.figure()
+    plt.subplot(212)
+    n, bins, patches = plt.hist(xnew, 50, density=True, facecolor='g', alpha=0.75)
+    plt.xlabel('standard deviations')
+    plt.title('RH (median removed) without massive outliers')
+    if pltit:
+        plt.show()
+
+    tvd = tvd[ij,:]
+
 
     # time variable in days
     th= tvd[:,1] + tvd[:,4]/24; 
@@ -435,7 +462,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
             # so this is fake data
             ttnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
             yynew = f(ttnew)
-            print(ttnew)
+            #print(ttnew)
             # now append it to your real data
             tnew = np.append(tnew,ttnew)
             ynew = np.append(ynew,yynew)
@@ -463,16 +490,14 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     # 
     knots =np.linspace(t1,t2,num=numKnots)
 
-    ftest = open('testing.txt', 'w+')
-    for i in range(0,len(tnew)):
-        ftest.write('{0:9.4f} {1:7.3f}  \n'.format( tnew[i], ynew[i]))
-
-    ftest.close()
+    #ftest = open('testing.txt', 'w+')
+    #for i in range(0,len(tnew)):
+    #    ftest.write('{0:9.4f} {1:7.3f}  \n'.format( tnew[i], ynew[i]))
+    #ftest.close()
 
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
 
     # user specifies how many values per day you want to send back to the user  
-    print('got past this 0 or did i ... ')
 
     # should i do extrapolate True? it is the default  - could make it periodic?
     spline = interpolate.BSpline(t, c, k, extrapolate=True)
