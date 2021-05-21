@@ -146,5 +146,7 @@ might want to change your azimuth mask.
 
 Files for both the raw RH estimates and the QC/RH corrected estimates are provided (file names come to the screen).
 
+I would like to include Simon Williams RH retrieval/tidal estimation code in this
+package. He has been kind enough to make the [Matlab code open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous.
 
 
