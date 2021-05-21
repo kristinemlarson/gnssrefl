@@ -46,6 +46,8 @@ For more details about the technique, please see [Roesler and Larson, 2018](http
 
 * Make sure **wget** exists on your machine.  If you type *which wget* and something comes back, you should be good.
 
+* gzip, xz, and unix compression (Z) should be supported by your machine
+
 * Install the [github version of gnssrefl](https://github.com/kristinemlarson/gnssrefl). Follow the documentation guidelines. 
 
 * Make the requested environment variables.

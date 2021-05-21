@@ -3894,6 +3894,10 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         # French multi gnss, but there are no Beidou results
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'grg')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
+    elif (orbtype == 'gfr'):
+        print('uses rapid GFZ orbits, avail as of 2021/137 ')
+        f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
+        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
         print('uses default IGS orbits, so only GPS ?')
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igs')
@@ -5208,4 +5212,49 @@ def get_noaa_obstimes(t):
     return obstimes
 
 
+def rapid_gfz_orbits(year,month,day):
+    """
+    input year, month, day OR
+    year, doy, 0
+    downloads rapid GFZ sp3 file and stores in $ORBITS
+    """
+    foundit = False
+    dday = 2021 + 137/365.25
+    wk,sec=kgpsweek(year,month,day,0,0,0)
+    gns = 'ftp://isdcftp.gfz-potsdam.de/gnss/products/rapid/'
+    if day == 0:
+       doy=month
+       d = doy2ymd(year,doy);
+       month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
+    bigname = 'GFZ0OPSRAP_' + cyyyy + cdoy + '0000_01D_15M_ORB.SP3'
+    bignamegz = bigname + '.gz'
+    url = gns + 'w' + str(wk) + '/' + bignamegz
+    if (year + doy/365.25) < dday:
+        print('No rapid GFZ orbits until 2021/doy137')
+        return '', '', foundit
+    fullname = fdir + '/' + bigname + '.xz'
+    # look for compressed file
+    if os.path.isfile(fullname):
+        subprocess.call(['unxz', fullname])
+
+    if os.path.isfile(fdir + '/' + bigname):
+        print(bigname, ' already exists')
+        return bigname, fdir, True 
+
+
+
+    #print(url,bignamegz)
+     
+    try:
+        wget.download(url,bignamegz)
+        subprocess.call(['gunzip', bignamegz])
+    except:
+        print('Problems downloading Rapid GFZ orbit')
+
+    if os.path.isfile(bigname):
+       store_orbitfile(bigname,year,'sp3') ; foundit = True
+
+    return bigname, fdir, foundit
 

@@ -412,6 +412,7 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - jax : JAXA, GPS + Glonass, within a few days, very reliable
 - gbm : GFZ Potsdam, multi-GNSS, not rapid
 - grg: French group, GPS, Galileo and Glonass, not rapid
+- gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021 
 - wum : (disabled) Wuhan, multi-GNSS, not rapid
 
 It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beidou. Based 
@@ -423,11 +424,9 @@ code and bind with python using numpy. If you have such code, or know where it l
 
 Use <code>-nolook True</code>
 
-**What if you want to use high-rate data?** Use:
+**What if you want to use high-rate data?**  <code>-rate high</code>
 
-<code>-rate high</code>
-
-However, if you invoke this, it currently only looks at the UNAVCO, GA, or NRCAN archives. Please beware - it takes a long time to download a 
+If you invoke this, it currently only looks at the UNAVCO, GA, or NRCAN archives. Please beware - it takes a long time to download a 
 highrate GNSS RINEX file (even when it is compressed).  And it also takes a long time to compute orbits for it. For high-rate data, you should never use the python translation option.
 
 **Output SNR file format**

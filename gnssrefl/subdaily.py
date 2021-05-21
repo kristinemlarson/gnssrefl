@@ -412,7 +412,6 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     medval = np.median(tvd[:,2])
     xx= tvd[:,2]-medval
     plt.figure()
-    plt.subplot(211)
     n, bins, patches = plt.hist(xx, 50, density=True, facecolor='g', alpha=0.75)
     plt.xlabel('standard deviations')
     plt.title('RH (median removed) ')
@@ -421,7 +420,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     Sig = np.std(xx)
     ij =  np.absolute(xx) < 3*Sig
     xnew = xx[ij]
-    #plt.figure()
+    plt.figure()
     plt.subplot(212)
     n, bins, patches = plt.hist(xnew, 50, density=True, facecolor='g', alpha=0.75)
     plt.xlabel('standard deviations')
