@@ -74,6 +74,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     for year in year_list:
         ann = g.make_nav_dirs(year)
         dec31 = g.dec31(year)
+        cyyyy = str(year)
         for doy in doy_list:
             csnr = str(isnr)
             cdoy = '{:03d}'.format(doy) ; cyy = '{:02d}'.format(year-2000)
@@ -97,12 +98,11 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
                 print('Will seek RINEX file ', station, ' year:', year, ' doy:', doy, ' translate with ', translator)
                 if nol:
-                    # this assumes RINEX file is in local directory
+                    # this assumes RINEX file is in local directory or "nearby"
                     if version == 2:
-                        if os.path.exists(r) or os.path.exists(rgz):
+                        the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
+                        if os.path.exists(r):
                             #print('RINEX 2 file exists locally')
-                            if not os.path.exists(r):
-                                subprocess.call(['gunzip', rgz])
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
@@ -126,7 +126,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             print('You Chose the No Look Option, but did not provide the needed RINEX3 file.')
 
                 else:
-                    #print('will look for the RINEX file both locally and externally')
                     if version == 3:
                         #  try unavco
                         if (archive == 'all') or (archive == 'unavco'):
@@ -791,3 +790,100 @@ def testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,
                 # store it in the original rinex filename
                     #subprocess.call(['rm','-f',rinexfile])
                     #subprocess.call(['mv','-f',foutname, rinexfile])
+
+def the_makan_option(station,cyyyy,cyy,cdoy):
+    """
+    this ugly looking code checks a bazillion versions of RINEX versions
+    (Z, gz, regular, hatanaka) both in the working directory and in an external rinex area
+    $REFL_CODE/rinex/station/year
+    
+    turns whatever it finds into a regular RINEX file in the working directory
+    that file WILL be deleted, but it will not delete those stored externally.
+    """
+    missing = True
+    crnxpath = g.hatanaka_version()  # where hatanaka will be
+    r = station + cdoy + '0.' + cyy + 'o'
+    rd = station + cdoy + '0.' + cyy + 'd'
+    locdir= os.environ['REFL_CODE'] + '/rinex/' + station + '/' + cyyyy + '/'
+    print('Will look for files in the working directory and ', locdir)
+
+    if os.path.exists(r):
+        missing = False
+
+    if os.path.exists(r + '.gz') and missing:
+        subprocess.call(['gunzip', r + '.gz'])
+        missing = False
+
+    if os.path.exists(r + '.Z') and missing:
+        subprocess.call(['uncompress', r + '.Z'])
+        missing = False
+
+    if os.path.exists(rd) and missing:
+        if os.path.exists(crnxpath):
+            subprocess.call([crnxpath,rd])
+            subprocess.call(['rm',rd])
+            missing = False
+        else:
+            g.hatanaka_warning(); return
+
+    if os.path.exists(rd + '.gz') and missing:
+        subprocess.call(['gunzip', rd + '.gz'])
+        if os.path.exists(crnxpath):
+            subprocess.call([crnxpath,rd])
+            subprocess.call(['rm',rd])
+            missing = False
+        else:
+            g.hatanaka_warning(); 
+
+    if os.path.exists(rd + '.Z') and missing:
+        subprocess.call(['uncompress', rd + '.Z'])
+        if os.path.exists(crnxpath):
+            subprocess.call([crnxpath,rd])
+            subprocess.call(['rm',rd])
+            missing = False
+        else:
+            g.hatanaka_warning() 
+
+    if os.path.exists(locdir + r) and missing:
+        subprocess.call(['cp', '-f',locdir + r,'.'])
+        missing = False
+
+    if os.path.exists(locdir + r + '.gz') and missing:
+        subprocess.call(['cp', '-f',locdir + r + '.gz' ,'.'])
+        subprocess.call(['gunzip', r + '.gz'])
+        missing = False
+
+    if os.path.exists(locdir + r + '.Z') and missing:
+        subprocess.call(['cp', '-f',locdir + r + '.Z','.'])
+        subprocess.call(['uncompress', r + '.Z'])
+        missing = False
+
+    if os.path.exists(locdir + rd) and missing:
+        subprocess.call(['cp','-f',locdir + rd,'.'])
+        if os.path.exists(crnxpath):
+            subprocess.call([crnxpath,rd])
+            subprocess.call(['rm',rd])
+            missing = False
+        else:
+            g.hatanaka_warning(); 
+
+    if os.path.exists(locdir + rd + '.Z') and missing:
+        subprocess.call(['cp','-f',locdir + rd + '.Z','.'])
+        subprocess.call(['uncompress', rd + '.Z'])
+        if os.path.exists(crnxpath):
+            subprocess.call([crnxpath,rd])
+            subprocess.call(['rm',rd])
+            missing = False
+        else:
+            g.hatanaka_warning(); 
+
+    if os.path.exists(locdir + rd + '.gz') and missing:
+        subprocess.call(['cp','-f',locdir + rd + '.gz','.'])
+        subprocess.call(['gunzip',rd + '.gz'])
+        if os.path.exists(crnxpath):
+            subprocess.call([crnxpath,rd])
+            subprocess.call(['rm',rd])
+            missing = False
+        else:
+            g.hatanaka_warning()
+
