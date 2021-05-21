@@ -1,4 +1,4 @@
-### The Most Famous GPS Tide Gauge in the World
+### Friday Harbor
 
 <p align="center">
 <img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>
