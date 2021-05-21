@@ -409,20 +409,15 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - nav : GPS broadcast, perfectly adequate for reflectometry. 
 - igs : IGS precise, GPS only
 - igr : IGS rapid, GPS only
-- jax : JAXA, GPS + Glonass, within a few days, very reliable
+- jax : JAXA, GPS + Glonass, within a few days, missing block III GPS satellites
 - gbm : GFZ Potsdam, multi-GNSS, not rapid
 - grg: French group, GPS, Galileo and Glonass, not rapid
 - gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021 
 - wum : (disabled) Wuhan, multi-GNSS, not rapid
 
-It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beidou. Based 
-on my experience with GPS, I know that this will be much much much faster if we use Fortran
-code and bind with python using numpy. If you have such code, or know where it lives, please let me know.
+It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beidou. Based on my experience with GPS, I know that this will be much much much faster if we use Fortran code and bind with python using numpy. If you have such code, or know where it lives, please let me know.
 
-
-**What if you are providing the RINEX files and you don't want the code to search for the files online?**
-
-Use <code>-nolook True</code>
+**What if you are providing the RINEX files and you don't want the code to search for the files online?** <code>-nolook True</code>
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
@@ -447,11 +442,10 @@ To columns are defined as:
 
 The unit for all SNR data is dB-Hz.
 
-
 **Our names for the GNSS frequencies**
 
 - 1,2,20, and 5 are GPS L1, L2, L2C, and L5
-- 101,102 Glonass L1 and L2
+- 101,102 are Glonass L1 and L2
 - 201, 205, 206, 207, 208: Galileo frequencies
 - 302, 306, 307 : Beidou frequencies
 
