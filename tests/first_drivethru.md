@@ -1,6 +1,8 @@
-<center>
+<p align=center>
+
 ### gnssrefl use cases 
-</Center>
+
+</p>
 
 
 <table align=center>
