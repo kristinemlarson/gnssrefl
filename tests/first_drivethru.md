@@ -23,6 +23,8 @@
 
 * [St Lawrence River, Montreal, Canada](use_cases/use_pmtl.md) (pmtl)
 </TD>
+</TR>
+<TR>
 
 <TD>
 <B>Seasonal Snow Accumulation</B>
