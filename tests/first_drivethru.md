@@ -1,8 +1,5 @@
-<center>
 
 ### gnssrefl use cases 
-
-</center>
 
 
 <table align=center>
@@ -22,11 +19,11 @@
 <td>
 <B>Lakes and Rivers</B>
 
-* [Michipicoten, Lake Superior, Canada](use_cases/use_mchn.md) (mchn)
+* [Michipicoten, Lake Superior, Canada](use_cases/use_mchn.md) 
 
-* [Lake Taupo, New Zealand](use_cases/use_tgho.md) (tgho)
+* [Lake Taupo, New Zealand](use_cases/use_tgho.md) 
 
-* [St Lawrence River, Montreal, Canada](use_cases/use_pmtl.md) (pmtl)
+* [St Lawrence River, Montreal, Canada](use_cases/use_pmtl.md) 
 </TD>
 </TR>
 <TR>
@@ -34,25 +31,24 @@
 <TD>
 <B>Seasonal Snow Accumulation</B>
 
-* [Marshall, Colorado](use_cases/use_p041.md) (p041)
+* [Marshall, Colorado](use_cases/use_p041.md) 
 
-* [Niwot Ridge, Colorado](use_cases/use_nwot.md) (nwot)
+* [Niwot Ridge, Colorado](use_cases/use_nwot.md) 
 
-* [Half Island Park, Idaho](use_cases/use_p360.md) (p360)
+* [Half Island Park, Idaho](use_cases/use_p360.md) 
 
 </TD>
 <TD>
 <B>Ocean Tides</B>
 
-* [Friday Harbor, WA](use_cases/use_sc02.md) (sc02)
+* [Friday Harbor, WA](use_cases/use_sc02.md) 
 
-* [St Michael, AK](use_cases/use_at01.md) (at01)
+* [St Michael, AK](use_cases/use_at01.md) 
 
 </TD>
 </TR>
 </Table>
 
-The gnssrefl code can also be used for tides, but use cases are still under development. 
 Our code does not currently support soil moisture applications.
 For more details about the technique, please see [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
 <P>
