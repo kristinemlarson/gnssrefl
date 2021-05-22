@@ -1,4 +1,6 @@
+<center>
 ### gnssrefl use cases 
+</Center>
 
 
 <table align=center>
@@ -38,7 +40,7 @@
 
 </TD>
 <TD>
-<B>Tide Gauges (Ocean)</B>
+<B>Ocean Tides</B>
 
 * [Friday Harbor, WA](use_cases/use_sc02.md) (sc02)
 
