@@ -1,5 +1,7 @@
 ### gnssrefl
 
+<script src="https://cdn.usefathom.com/script.js" data-site="EHWFICJC" defer></script>
+
 ### Table of Contents
 
 1. [News](#news)
@@ -723,6 +725,5 @@ Kristine M. Larson
 
 This documentation was updated on May 17, 2021.
 
-<script src="https://cdn.usefathom.com/script.js" data-site="EHWFICJC" defer></script>
 
 
