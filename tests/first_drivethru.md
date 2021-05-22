@@ -1,6 +1,7 @@
-### gnssrefl Use Cases 
+### gnssrefl use cases 
 
-<table>
+
+<table align=center>
 <TR>
 <TD>
 <B>Greenland/Antarctica</B>
@@ -34,6 +35,14 @@
 * [Niwot Ridge, Colorado](use_cases/use_nwot.md) (nwot)
 
 * [Half Island Park, Idaho](use_cases/use_p360.md) (p360)
+
+</TD>
+<TD>
+<B>Tide Gauges (Ocean)</B>
+
+* [Friday Harbor, WA](use_cases/use_sc02.md) (sc02)
+
+* [St Michael, AK](use_cases/use_at01.md) (at01)
 
 </TD>
 </TR>
