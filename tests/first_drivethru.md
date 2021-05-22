@@ -2,7 +2,7 @@
 ### gnssrefl use cases 
 
 
-<table align=center>
+<table>
 <TR>
 <TD>
 <B>Greenland/Antarctica</B>
@@ -49,8 +49,6 @@
 </TR>
 </Table>
 
-Our code does not currently support soil moisture applications.
-For more details about the technique, please see [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
 <P>
 
 ### Summary Guide for Installation 
@@ -59,9 +57,12 @@ For more details about the technique, please see [Roesler and Larson, 2018](http
 
 * gzip, xz, and unix compression (Z) should be supported by your machine
 
-* Install the [github version of gnssrefl](https://github.com/kristinemlarson/gnssrefl). Follow the documentation guidelines. 
+* Install the [github version of gnssrefl](https://github.com/kristinemlarson/gnssrefl). Follow the [documentation guidelines](https://github.com/kristinemlarson/gnssrefl). 
 
 * Make the requested environment variables.
 
 * Download the Hatanaka translator, CRX2RNX, and put it in the EXE area. Make sure it is executable.
 
+<P>
+
+Our code does not currently support soil moisture applications.
