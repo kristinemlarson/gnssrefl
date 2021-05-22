@@ -727,6 +727,4 @@ This documentation was updated on May 17, 2021.
 
 <pre>
 
-<script src="https://cdn.usefathom.com/script.js" data-site="EHWFICJC" defer></script>
-
 </pre>
