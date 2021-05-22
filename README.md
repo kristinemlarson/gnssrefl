@@ -1,4 +1,3 @@
-<script src="https://cdn.usefathom.com/script.js" data-site="EHWFICJC" defer></script>
 
 ### gnssrefl
 
@@ -725,5 +724,8 @@ Kristine M. Larson
 
 This documentation was updated on May 17, 2021.
 
+<p>
 
+<script src="https://cdn.usefathom.com/script.js" data-site="EHWFICJC" defer></script>
 
+</p>
