@@ -725,9 +725,6 @@ Kristine M. Larson
 This documentation was updated on May 17, 2021.
 
 
-
-```
 &lt;script=src="https://cdn.usefathom.com/script.js" data-site="EHWFICJC" defer>
 &lt;/script>
-```
 
