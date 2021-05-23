@@ -113,7 +113,7 @@ You can see that there are a very large number of RH retrievals per day:
 
 <img src=at01_nvals.png width=600>
 
-This preliminary version of the code removes outliers and makes an effort to compute the RH dot correction.  It uses a cubic spline to fit the RH data which allows a first order estimate for RH dot. That, along with geometrical information as to the elevation angle rate of change, is used to make the RH dot correction. This term is **very important** for sites with large tidal ranges, but is of less importance at sites like at01. Nevertheless, you can see here that it does help a bit:
+This preliminary version of the code removes outliers and makes an effort to compute the RH dot correction.  It uses a cubic spline to fit the RH data which allows a first order estimate for the surface rate of change. That, along with geometrical information as to the elevation angle rate of change, is used to make the RH dot correction ([for more information](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf). This term is **very important** for sites with large tidal ranges, but is of less importance at sites like at01. Nevertheless, you can see here that it does help a bit:
 
 <PRE>
 RMS no RHdot correction (m)  0.082
@@ -148,5 +148,9 @@ Files for both the raw RH estimates and the QC/RH corrected estimates are provid
 
 I would like to include Simon Williams RH retrieval/tidal estimation code in this
 package. He has been kind enough to make the [Matlab code open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous.
+ 
+I am happy to list publications using data from sc02 here. Please send me the reference by email.
 
+[Larson, L&ouml;fgren, Haas, Coastal Sea Level Measurements Using A Single Geodetic GPS Receiver, 2011](https://www.kristinelarson.net/wp-content/uploads/2015/10/Larson_TideGauge.pdf)
 
+[Larson, Ray, and  Williams, A ten year comparison of water levels measured with a geodetic GPS receiver versus a conventional tide gauge, 2017](https://www.kristinelarson.net/wp-content/uploads/2015/12/LarsonRayWilliams-2017-FridayHarbor.pdf)
