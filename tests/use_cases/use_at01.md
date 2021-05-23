@@ -122,11 +122,14 @@ RMS w/ RHdot correction (m)  0.070
 
 <img src=at01-spline.png width=600>
 
-Final view:
+Final view of the surface estimates:
 
 <img src=at01-final.png width=600>
 
-There are some statistics here that indicate that the precision is ~ 5 cm.  We are working on removing inter-frequency biases. Some of the bias is simply due to the phase center - but we also want to be be careful to take into account surface changes (ice to water, e.g.)
+There are some statistics here that indicate that the precision for an individual arc is ~ 5 cm.  Remember that since we have nearly 300 measurements per day, 
+the ability to measure tides with this system is much much better than that.  
+
+We are working on removing inter-frequency biases. Some of the bias is simply due to the phase center - but we also want to be be careful to take into account surface changes (ice to water, e.g.)
 
 <PRE>
 Freq  Bias  Sigma   NumObs
@@ -146,9 +149,10 @@ might want to change your azimuth mask.
 
 Files for both the raw RH estimates and the QC/RH corrected estimates are provided (file names come to the screen).
 
-I would like to include Simon Williams RH retrieval/tidal estimation code in this
-package. He has been kind enough to make the [Matlab code open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous.
+I would like to include Simon Williams RH retrieval/tidal estimation code in <code>subdaily</code> code. Simon has been kind enough to make the [Matlab code open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous.
  
+<HR>
+
 I am happy to list publications using data from sc02 here. Please send me the reference by email.
 
 * [Larson, L&ouml;fgren, Haas, Coastal Sea Level Measurements Using A Single Geodetic GPS Receiver, 2011](https://www.kristinelarson.net/wp-content/uploads/2015/10/Larson_TideGauge.pdf)
