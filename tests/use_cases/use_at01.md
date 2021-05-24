@@ -1,4 +1,4 @@
-### St Michale Bay
+### St Michael Bay
   
 <p align="center">
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">
