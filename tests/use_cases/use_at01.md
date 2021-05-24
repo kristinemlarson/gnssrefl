@@ -29,14 +29,14 @@
 **at01 is the only tide gauge in this region of Alaska.** 
 
 at01 observes all constellation signals and high-rate data are available. There is good visibility over a large 
-azimuthal region. The monument is about a meter taller to improve visibility of the sea surface.
+azimuthal region. The monument is about a meter taller than normal geodetic monuments to improve visibility of the sea surface.
 
 From the [geoid app](http://gnss-reflections.org/geoid?station=at01&lat=0.0&lon=0.0&height=0.0) you can 
 see the general location of the antenna with respect to the coast. You will also note that it is at 
 ~12 meters above sea level.
 
 
-Use the gnss-reflections.org webapp to set a [possible mask.](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240) In this example we used the option for elevation angles between 5 and 12 degrees. The goal is to have the ellipses on the water and not the land.
+Use the gnss-reflections.org webapp to set a [possible mask.](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240) In this example we used the option for elevation angles between 5 and 12 degrees. 
 
 ### Take a Quick Look at the Data
 
@@ -149,19 +149,6 @@ might want to change your azimuth mask.
 
 Files for both the raw RH estimates and the QC/RH corrected estimates are provided (file names come to the screen).
 
-I would like to include Simon Williams RH retrieval/tidal estimation code in <code>subdaily</code> code. Simon has been kind enough to make the [Matlab code open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous.
+I would like to include Simon Williams' RH retrieval/tidal estimation code in this package. Simon has been kind enough to make the Matlab code [open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous.
  
-<HR>
-
-I am happy to list publications using data from sc02 here. Please send me the reference by email.
-
-* [Larson, L&ouml;fgren, Haas, Coastal Sea Level Measurements Using A Single Geodetic GPS Receiver, 2011](https://www.kristinelarson.net/wp-content/uploads/2015/10/Larson_TideGauge.pdf)
-
-* [Larson, Ray, and  Williams, A ten year comparison of water levels measured with a geodetic GPS receiver versus a conventional tide gauge, 2017](https://www.kristinelarson.net/wp-content/uploads/2015/12/LarsonRayWilliams-2017-FridayHarbor.pdf)
-
-* [Purnell, Gomez, Chan, Strandberg, Hobiger, Quantifying the Uncertainty in Ground-Based GNSS-Reflectometry Sea Level Measurements, 2021](https://www.researchgate.net/publication/343091181_Quantifying_the_Uncertainty_in_Ground-Based_GNSS-Reflectometry_Sea_Level_Measurements)
-
-* L&ouml;fgren, Haas, and Scherneck, 2014 Sea level time series and ocean tide analysis from multipath signals at five GPS sites in different parts of the world
-
-* Wang, Zhang and Zhang, 2018 Sea level estimation from SNR data of geodetic receivers using wavelet analysis
 
