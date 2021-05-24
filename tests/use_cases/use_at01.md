@@ -99,7 +99,7 @@ Next estimate reflector height (RH) for the two month time period:
 <code>gnssir at01 2020 230 -doy_end 290</code>
 
 We have written some code to help you look at these subdaily files - it is not complete as yet, but you can 
-certainly give it a try. We have set an outlier criteria of 0.36 meters to start with.  
+certainly give it a try. We have set an outlier criteria of 0.36 meters (one sigma 0.12 meters ==> 0.36 meters three sigma) to start with.  
 
 <code>subdaily at01 2020 -doy1 230 -doy2 290 -outlier 0.36</code>
 
