@@ -31,7 +31,7 @@
 at01 observes all constellation signals and high-rate data are available. There is good visibility over a large azimuthal region. The monument is about a meter taller than normal geodetic monuments to improve visibility of the sea surface.  From the [geoid app](http://gnss-reflections.org/geoid?station=at01&lat=0.0&lon=0.0&height=0.0) you can see the general location of the antenna with respect to the coast. You will also note that it is at ~12 meters above sea level.
 
 <p align=center>
-<img src=geoid-at01.png width=600>
+<img src=geoid-at01.png width=400>
 </p>
 
 Use the gnss-reflections.org webapp to set a [possible mask.](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240) In this example we used the option for elevation angles between 5 and 12 degrees. 
