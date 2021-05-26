@@ -1,6 +1,8 @@
 
 ### gnssrefl
 
+[Short cut to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
+
 ### Table of Contents
 
 1. [News](#news)
@@ -18,8 +20,6 @@
 7. [Acknowledgements](#acknowledgements)
 
 ### News <a name="news"></a>
-
-[We have started putting together a set of use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
 **April 17, 2012** New plot added to quickLook. This should provide feedback to the user on which QC 
 metrics to use and which azimuths are valid. New plot also added to daily_avg.
@@ -600,7 +600,7 @@ minH and maxH in the json file). I apologize for this.
 - screenstats, boolean, whether minimal periodogram results come to screen
 - refraction, boolean, whether simple refraction model is applied.
 - plt_screen: boolean, whether SNR data and periodogram are plotted to the screen 
-- NReg [min and max required] : define the RH region where the "noise value" for the periodogram 
+- NReg [min and max required] : define the RH region (in meters) where the "noise value" for the periodogram 
 is computed. This is used to compute the peak to noise ratio used in QC.
 - (*this option has been removed*) seekRinex: boolean, whether code looks for RINEX at an archive
 
@@ -722,6 +722,6 @@ Kristine M. Larson
 
 [https://kristinelarson.net](https://kristinelarson.net)
 
-This documentation was updated on May 17, 2021.
+This documentation was updated on May 24, 2021.
 
 

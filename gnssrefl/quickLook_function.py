@@ -281,7 +281,7 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq):
     except:
         print('no results in the file')
 
-    if len(a) == 0:
+    if (a.ndim == 1) or (len(a) == 0):
         return
 
     ij = (a[:,6] == 1) # good retrievals

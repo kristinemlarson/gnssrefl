@@ -1,38 +1,36 @@
-### Description of Quick Look Analysis
+### Quick Description of the quickLook Code 
 
-The four subplots show the GNSS-IR analysis from the different regions surrounding the GNSS 
-antenna (northwest, northeast, southwest, southeast). 
+<code>quickLook</code> is meant to give you a visual assessment of the reflection characteristics 
+of your GNSS site. It is **not** meant for routine analysis of your data - instead it is 
+meant to give you a better understanding of how to choose settings for that routine analysis, which 
+is done in <code>gnssir</code>.
 
-Within each plot, each color represents the results of a frequency analysis for 
-a different satellite arc. The periodogram has been computed so that the x-axis 
-is the reflector height (RH, in meters) and the y-axis is the spectral amplitude
-in converted SNR units (volts/volts).  If you see a strong peak in the periodogram,
-that means you will have a good estimate of the RH for that satellite arc. The data
-represented in gray are "failed" periodograms. 
+<code>quickLook</code> takes all the SNR data at a site and splits it into four geographic 
+quadrants (northwest, northeast, southwest, southeast). Within those quadrants, it identifies rising
+and setting arcs for one GNSS transmitter frequency and uses a periodogram to estimate the dominant Reflector Height (RH) 
+in meters.
 
-This example is bare soil measured at an airport in New Mexico. The surface is **very uniform** and thus the periodograms 
-are particularly repeatable.
+Two plots are returned. One is a summary periodogram plot. This allows you to see for yourself the periodograms
+that will be used to retrieve RH.  Each  color here represents a different satellite. Defaults were used, so the periodograms
+were limited to the region 0.5 to 6 meters. The GPS L1 frequency is the default. (This site has good L1 SNR data at this time - in previous 
+years it was a diffreent receiver with poor quality).
 
-<img src="p038_L2C.png" width=500>
+<img src="../tests/use_cases/p041-l1.png" width=600>
 
-This example is on an ice sheet. There is some spread in reflector height peaks as well as in its amplitudes:
+The y-axis is the spectral amplitude in converted SNR units (volts/volts).  If you see a strong peak in the periodogram,
+that means you will have a good estimate of the RH for that satellite arc. The data represented in gray are "failed" periodograms. 
 
-<img src="lorg_L5.png" width=500>
+The second plot returned is a summary for various quality control metrics. 
 
-This example is taken from a site where the surface of interest is water. You will only
-see useful reflections in certain directions (and thus certain quadrants). And you will
-notice that the peaks in the periodograms are spread out because the system is sensing 
-**tides**. This means the reflector heights are varying with time, and that is what it 
-should be doing. The peak amplitudes in the periodograms are also smaller than in the ice reflection examples and 
-that is because a water surface reflects differently than ice/snow surfaces.
+* the top plot is the color coded RH retrieval color: blue for good and gray for bad.
 
-<img src=http://gnss-reflections.org/static/images/examples/sc02100f1.png width=500>
+* the middle plot is the "peak to noise ratio" which is defined as peak spectral amplitude divided by the average 
+spectral value over a defined noise region.  In <code>quickLook</code> this will be the same region you used for your RH estimate.
+So here the noise region would be 0.5 to 6 meters.
+
+* the bottom plot is the spectral amplitude for the RH peak. 
+
+<img src="../tests/use_cases/p041_l1_qc.png" width=600>
 
 
 [Additional discussion of the GNSS-IR method, with example periodogram links.](https://gnss-reflections.org/overview)
-
-If you would like to investigate the physical surroundings of a site, and it is a well-known geodetic site,
-you can try entering the 4 character ID at [this site.](http://gnss-reflections.org/geoid). If it is not a 
-currently operating GNSS site (or not recognized by the University of Nevada Reno), you can enter the latitude, longitude,
-and height. A photograph is only returned by this webapp if a photograph is available at the UNAVCO archive.
-

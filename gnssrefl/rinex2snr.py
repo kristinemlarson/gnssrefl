@@ -805,7 +805,12 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
     r = station + cdoy + '0.' + cyy + 'o'
     rd = station + cdoy + '0.' + cyy + 'd'
     locdir= os.environ['REFL_CODE'] + '/rinex/' + station + '/' + cyyyy + '/'
+    # 
+    locdir2= os.environ['RINEX'] + station + '/' + cyyyy + '/'
+    locdir3= os.environ['RINEX'] + station.upper() + '/' + cyyyy + '/'
+
     print('Will look for files in the working directory and ', locdir)
+    so_many_permutations(r,rd,locdir, crnxpath)
 
     if os.path.exists(r):
         missing = False
@@ -886,4 +891,5 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
             missing = False
         else:
             g.hatanaka_warning()
+
 
