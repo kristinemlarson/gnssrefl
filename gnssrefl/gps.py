@@ -618,6 +618,7 @@ def rinex_unavco(station, year, month, day):
     url1 = unavco+ '/pub/rinex/obs/' + cyyyy + '/' + cdoy + '/' + filename1
     url2 = unavco+ '/pub/rinex/obs/' + cyyyy + '/' + cdoy + '/' + filename2
 
+    #print('try regular RINEX at unavco')
     try:
         wget.download(url1,filename1)
         status = subprocess.call(['uncompress', filename1])
@@ -627,6 +628,7 @@ def rinex_unavco(station, year, month, day):
     except:
         okokok =1
 
+    #print('try hatanaka RINEX at unavco')
     if not os.path.exists(rinexfile):
         # look for hatanaka version
         if os.path.exists(crnxpath):
@@ -855,8 +857,7 @@ def rinex_nrcan(station, year, month, day):
     picks up a RINEX file from GNS New zealand
     you can input day =0 and it will assume month is day of year
 
-    Note: this code does not work - let me know if you have a way
-    to access NRCAN anonymously
+    2021june02, use new ftp site.
     """
     #exedir = os.environ['EXE']
     #crnxpath = exedir + '/CRX2RNX'
@@ -874,6 +875,8 @@ def rinex_nrcan(station, year, month, day):
     # password 4NAREF2use
     gns = 'ftp://gauss.geod.nrcan.gc.ca/data/ftp/naref/pub/data/rinex/'
     gns = 'ftp://rtopsdata1.geod.nrcan.gc.ca/gps/data/'
+    # 2021 June 2
+    gns = 'ftp://cacsa.nrcan.gc.ca/gps/data/'
 
     xxdir = gns + 'gpsdata/' + cyy + cdoy  + '/' + cyy + 'd'
     oname,fname = rinex_name(station, year, month, day)
@@ -4102,8 +4105,8 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
 
     #print('Requested data rate: ', receiverrate)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
-    #print('Name of the rinexfile should be:', rinexfile)
-    #print('Archive',archive)
+    print('Name of the rinexfile should be:', rinexfile)
+    print('Archive',archive)
 
     if (os.path.isfile(rinexfile) == True):
         ignoreFornow = 1
