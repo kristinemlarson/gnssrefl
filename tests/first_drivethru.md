@@ -25,10 +25,6 @@
 
 * [St Lawrence River, Montreal, Canada](use_cases/use_pmtl.md) 
 
-* [St Michael, Alaska](use_cases/use_at01.md) 
-
-* [Friday Harbor, Washington](use_cases/use_sc02.md) 
-
 </TD>
 </TR>
 <TR>
@@ -46,9 +42,9 @@
 <TD>
 <B>Ocean Tides</B>
 
-* [Friday Harbor, WA](use_cases/use_sc02.md) 
+* [Friday Harbor, Washington](use_cases/use_sc02.md) 
 
-* [St Michael, AK](use_cases/use_at01.md) 
+* [St Michael, Alaska](use_cases/use_at01.md) 
 
 </TD>
 </TR>
