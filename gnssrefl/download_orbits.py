@@ -25,7 +25,7 @@ def main():
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    orbit_list = ['igs', 'igr','jax','grg','wum','gbm','nav','gps','gps+glo','gnss','gfr']
+    orbit_list = ['igs', 'igr','jax','grg','wum','gbm','nav','gps','gps+glo','gnss','gfr','esa']
 
 
 #   assign to normal variables
@@ -73,7 +73,11 @@ def main():
             if pCtr == 'gfr':
                 filename, fdir, foundit = g.rapid_gfz_orbits(year,month,day)
             else:
-                filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)
+                if pCtr == 'esa':
+                    # this is ugly - but hopefully will work for now.  
+                    filename, fdir, foundit = g.getsp3file_flex(year,month,day,pCtr)
+                else:
+                    filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)
         if foundit:
             print('SUCCESS:', fdir+'/'+filename )
         else:

@@ -24,6 +24,11 @@
 * [Lake Taupo, New Zealand](use_cases/use_tgho.md) 
 
 * [St Lawrence River, Montreal, Canada](use_cases/use_pmtl.md) 
+
+* [St Michael, Alaska](use_cases/use_at01.md) 
+
+* [Friday Harbor, Washington](use_cases/use_sc02.md) 
+
 </TD>
 </TR>
 <TR>

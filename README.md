@@ -21,6 +21,8 @@
 
 ### News <a name="news"></a>
 
+**June 1, 2021 Added esa orbits 
+
 **April 17, 2012** New plot added to quickLook. This should provide feedback to the user on which QC 
 metrics to use and which azimuths are valid. New plot also added to daily_avg.
 
@@ -413,6 +415,7 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - jax : JAXA, GPS + Glonass, within a few days, missing block III GPS satellites
 - gbm : GFZ Potsdam, multi-GNSS, not rapid
 - grg: French group, GPS, Galileo and Glonass, not rapid
+- esa : ESA, multi-GNSS
 - gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021 
 - wum : (disabled) Wuhan, multi-GNSS, not rapid
 

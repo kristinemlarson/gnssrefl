@@ -69,7 +69,8 @@ def main():
     orb = args.orb
 # currently allowed orbit types - shanghai removed 2020sep08
 # added GFZ rapid, aka gfr 2021May19
-    orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum','gfr']
+# added ESA, thank you to Makan
+    orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum','gfr','esa']
     if orb not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
