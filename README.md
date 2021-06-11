@@ -8,8 +8,8 @@
 1. [News](#news)
 2. [Philosophy](#philosophy)
 3. [Code Description](#code)
-    1. [Installation](#environment)
-    2. [Understanding the Code](#understanding)
+    1. [Understanding the Code](#understanding)
+    2. [Installation](#environment)
     3. [RINEX File Formats](#fileformats)
     4. [rinex2snr: translating RINEX files into SNR files](#module1)
     5. [quickLook: assessing a site using SNR files](#module2)
@@ -19,11 +19,11 @@
 6. [Publications](#publications)
 7. [Acknowledgements](#acknowledgements)
 
-### News <a name="news"></a>
+### 1. News <a name="news"></a>
 
-**June 1, 2021 Added esa orbits 
+**June 1, 2021** Added esa orbits 
 
-**April 17, 2012** New plot added to quickLook. This should provide feedback to the user on which QC 
+**April 17, 2021** New plot added to quickLook. This should provide feedback to the user on which QC 
 metrics to use and which azimuths are valid. New plot also added to daily_avg.
 
 **March 30, 2021** Hopefully bug fixed related to the refraction file (gpt_1wA.pickle). If it is missing from your build,
@@ -62,7 +62,7 @@ My reflection zone webapp will [help you pick appropriate elevation and azimuth 
 If you are interested in measuring sea level, this webapp tells you [how high your site is above 
 sea level.](https://gnss-reflections.org/geoid)  
 
-### Philosophical Statement <a name="philosophy"></a>
+### 2. Philosophical Statement <a name="philosophy"></a>
 In geodesy, you don't really need to know much about what you are doing to 
 calculate a reasonably precise position from GPS data. That's just the way it is.
 (Note: that is also thanks to the hard work of the geodesists that wrote the 
@@ -132,7 +132,7 @@ not in hand at the moment.
 
 <HR>
 
-### Understanding what the code is doing  <a name="understanding"></a>
+### Understanding What the Code is Doing  <a name="understanding"></a>
 
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
 an interference pattern that can be observed in GNSS Signal to Noise Ratio (SNR) data as a satellite rises or sets. 
@@ -155,7 +155,9 @@ for each satellite arc. Each satellite arc is associated with a specific time pe
 you can use for environmental sensing depends on how reflection-friendly your site is. 
 
 
-What do these satellite arc reflection zones look like? Below are photographs and [reflection zone maps](https://gnss-reflections.org/rzones) for two standard GNSS-IR sites, one in the northern hemisphere and one in the southern hemisphere.
+What do these satellite arc reflection zones look like? Below are 
+photographs and [reflection zone maps](https://gnss-reflections.org/rzones) for two standard GNSS-IR sites, 
+one in the northern hemisphere and one in the southern hemisphere.
 
 <p align=center>
 <table align=center>
@@ -183,7 +185,6 @@ antenna above the surface - so a height of 2 meters gives an ellipse that is sma
 that is 10 meters. In this case we used 2 meters for both sites - and these are pretty 
 simple GNSS-IR sites. The surfaces below the GPS antennas are fairly smooth soil and that 
 will generate coherent reflections. In general, you can use all azimuths at these sites.  
-<P>
 <P>
 Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
 is to measure water level. The map image (panel A) makes it clear
@@ -404,7 +405,7 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 *orbit file options for general users:*
 
 - gps : will use GPS broadcast orbits (**this is the default**)
-- gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
+- gps+glo : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 - gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
 
 *orbit file options for experts:*
@@ -459,8 +460,8 @@ The unit for all SNR data is dB-Hz.
 
 Before using the **gnssir** code, I recommend you use <code>quickLook</code>. This allows you
 to quickly test various options (elevation angles, frequencies, azimuths, and quality control 
-parameters).  The required inputs are station name, year, and doy of year. 
-**You must have previously translated a RINEX file using rinex2snr for this to work.**
+parameters). The required inputs are station name, year, and doy of year. 
+**You must have previously translated a RINEX file using rinex2snr to use quickLook.**
 
 <CODE>quickLook</code> has stored defaults for analyzing the spectral characteristics of the SNR data. 
 **In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**
