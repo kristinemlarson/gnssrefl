@@ -245,9 +245,9 @@ but not too tall. We will try 4 meters and then check later to make sure that wa
 <p align=center>
 <table>
 <TR>
-<TD>A. <img src=tests/use_cases/ross-google.jpg width=300> <BR>
+<TD width=300>A. <img src=tests/use_cases/ross-google.jpg width=300> <BR>
 Map view of station ROSS </TD>
-<TD>B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> <BR>
+<TD width=300>B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> <BR>
 Photograph of station ROSS</TD>
 </TD>
 </TR>
