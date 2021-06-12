@@ -234,6 +234,7 @@ that is 10 meters. In this case we used 2 meters for both sites - and these are 
 simple GNSS-IR sites. The surfaces below the GPS antennas are fairly smooth soil and that 
 will generate coherent reflections. In general, you can use all azimuths at these sites.  
 <P>
+<P>
 Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
 is to measure water level. The map image (panel A) makes it clear
 that unlike Mitchell and Portales, we cannot use all azimuths to measure the lake. To understand our reflection 
