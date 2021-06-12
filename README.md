@@ -81,7 +81,7 @@ my [google maps web app interface](https://gnss-reflections.org/geoid?station=sm
 
 <HR>
 
-### Code Description<a name="code"></a>
+### 3. Code Description<a name="code"></a>
 
 **gnssrefl** is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
@@ -95,7 +95,7 @@ by UNAVCO with NASA GNSS Science Team funding.
 
 *If you would like to try out reflectometry without installing the code*
 
-I recommend you use the web app [I developed](https://gnss-reflections.org). It 
+I recommend you use [this web app](https://gnss-reflections.org). It 
 can show you representative results with minimal constraints. It should provide 
 results in less than 10 seconds.
 
@@ -145,6 +145,19 @@ snow and water. We will be posting the code you need to measure soil moisture la
 
 <p align=center>
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
+</p>
+
+This code is meant to be used with Signal to Noise Ratio (SNR) data. This is a SNR sample for a site in the 
+the northern hemisphere (Colorado) and a single GPS satellite. The SNR data are plotted with respect to time - however,
+we have also highlighted in red the data where elevation angles are less than 25 degrees. These are the data used in 
+GNSS Interferomertric Reflectometry GNSS-IR.
+
+<p align=center>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/p041-snr.png" width="600"/>
+</p>
+
+<p align=center>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
 </p>
 
 GNSS-IR only works with low elevation angle data; generally the range from 5 to 30 
