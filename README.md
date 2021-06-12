@@ -496,10 +496,9 @@ The unit for all SNR data is dB-Hz.
 
 ### quickLook <a name="module2"></a>
 
-Before using the **gnssir** code, I recommend you use <code>quickLook</code>. This allows you
+Before using <code>gnssir</code>code, I recommend you use <code>quickLook</code>. This allows you
 to quickly test various options (elevation angles, frequencies, azimuths, and quality control 
-parameters). The required inputs are station name, year, and doy of year. 
-**You must have previously translated a RINEX file using rinex2snr to use quickLook.**
+parameters). The required inputs are station name, year, and doy of year. **You must have previously translated a RINEX file using rinex2snr to use quickLook.**
 
 <CODE>quickLook</code> has stored defaults for analyzing the spectral characteristics of the SNR data. 
 **In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**
@@ -507,19 +506,10 @@ If your site is taller than that, you will need to override the defaults.
 Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
 you don't want to use, you need to override them.  For more information, use <code>quickLook -h</CODE>
 
-There are two QC measures used in <Code>quickLook</code> and <code>gnssir</code>. One is the peak
-value of the peak in the periodogram. In the example below the amplitude of the most significant
-peak is ~17, so if you define the required amplitude
-to be 15, this one would pass. Secondly it uses a very simple peak to noise ratio (pk2noise) 
-calculation. In this case the average periodogram amplitude value is calculated for a RH region that you define, and that is the "noise".
-You then take the peak value (here ~17) and divide by the "noise" value.
-For the ocean, I generally recommend starting with a peak to noise ratio of 2.7, but for lakes or snow, I use
-3.2-3.5 or so. 
-
-
-<p align=center>
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
-</p>
+As discussed earlier, there are two QC measures used in <Code>gnssrefl</code>. One is the peak
+value of the peak in the periodogram. Secondly it uses a very simple peak to noise ratio (pk2noise) 
+calculation. In this case the average periodogram amplitude value is calculated for a RH 
+region that you define. For <code>quickLook</code> it uses the same RH region for the the "noise" region.
 
 **Example from Boulder:**
 
