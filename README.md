@@ -611,7 +611,13 @@ To use GPS L2C, require a spectral amplitude of 10, and spectral peak to noise r
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True -ampl 10 -peak2noise 3</CODE>
 
-Things that are helpful to know for the make_json_input inputs:
+Azimuth regions should not be larger than ~100 degrees. If for example you want to use the region from 0 to 
+270 degrees, you should not set a region from 0 - 270, but instead a region from 0-90, 90-180, and the last
+from 180-270. This is necessary to make sure you don't mix rising and setting satellite arcs from different 
+times of day. I believe the code currently refuses to let you use a region larger than 100 degrees. The default
+is to allow four regions, each of 90 degrees.  
+
+Other things that are helpful to know for the make_json_input inputs:
 
 * Some json settings can be set at the command line.  run <code>make_json_input -h</code> to see these.  
 Otherwise, you will need to edit the json file.  Note that there are a few inconstencies between the command line names 
@@ -663,7 +669,7 @@ This is a snippet of what the result file would look like
 - *sat* and *freq* are as defined in this document
 - MJD is modified julian date
 - PkNoise is the peak to noise ratio of the periodogram values
-- last column is currently set to tell you whether the refration correction has been applied (1)
+- last column is currently set to tell you whether the refration correction has been applied 
 
 If you want a multi-GNSS solution, you need to make a new json file and 
 use multi-GNSS orbits, and use a RINEX file that has multi-GNSS SNR observations in it. 
