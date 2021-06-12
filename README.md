@@ -150,11 +150,26 @@ snow and water. We will be posting the code you need to measure soil moisture la
 This code is meant to be used with Signal to Noise Ratio (SNR) data. This is a SNR sample for a site in the 
 the northern hemisphere (Colorado) and a single GPS satellite. The SNR data are plotted with respect to time - however,
 we have also highlighted in red the data where elevation angles are less than 25 degrees. These are the data used in 
-GNSS Interferomertric Reflectometry GNSS-IR.
+GNSS Interferomertric Reflectometry GNSS-IR. You can also see that there is an overall smooth polynomial signature
+in the SNR data. This represents the dual effects of the satellite power transmission level and the antenna 
+gain pattern. We aren't interested in that so we will be removing it with a low order polynomial (and 
+we will convert to linear units on y-axis). 
 
 <p align=center>
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/p041-snr.png" width="600"/>
 </p>
+
+After that polynomial is removed, we will concentrate on the *rising* 
+and *setting* satellite arcs. That is the red parts on the left and right.  
+Here you can see those next two steps. On the top is the "straightened" SNR data. Instead of time,
+it is plotted with respect to sine of the elevation angle. It was shown a long time ago by Penina 
+Axelrad that the frequency extracted from these data is representative of the reflector height.
+Here a periodogram was used to extract this frequency, and that is shown below, with the x-axis 
+units changed to reflector height. In a nutshell, that is what this code does. It figures out the 
+rising and setting satellite arcs in all the azimuth regions you have said are acceptable. It does a 
+simple analysis (removes the polynomial, changes units) and uses a periodogram to look at the 
+frequency content of the data. You only want to report  
+
 
 <p align=center>
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
