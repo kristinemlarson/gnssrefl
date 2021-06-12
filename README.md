@@ -132,7 +132,7 @@ not in hand at the moment.
 
 <HR>
 
-### Understanding What the Code is Doing  <a name="understanding"></a>
+### i. Understanding What the Code is Doing  <a name="understanding"></a>
 
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
 an interference pattern that can be observed in GNSS Signal to Noise Ratio (SNR) data as a satellite rises or sets. 
@@ -269,7 +269,7 @@ mask and reflector height range. This is one of the reasons <code>quickLook</cod
 
 <HR>
 
-### Installing the gnssrefl Code<a name="environment"></a>
+### ii. Installation<a name="environment"></a>
 
 *Environment Variables*
    
@@ -327,7 +327,7 @@ http://dx.doi.org/10.5880/GFZ.1.1.2016.002.
 
 <HR>
 
-### RINEX File Formats <a name="fileformats"></a>
+### iii. RINEX File Formats <a name="fileformats"></a>
 
 (under construction)
 
@@ -347,7 +347,7 @@ We are working to make a NMEA reader for this software package.
 
 <HR>
 
-### rinex2snr - Extracting SNR data from RINEX files <a name="module1"></a>
+### iv. rinex2snr - Extracting SNR data from RINEX files <a name="module1"></a>
 
 The international standard for sharing GNSS data is called 
 the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
@@ -494,7 +494,7 @@ The unit for all SNR data is dB-Hz.
 
 <HR>
 
-### quickLook <a name="module2"></a>
+### v. quickLook <a name="module2"></a>
 
 Before using <code>gnssir</code>code, I recommend you use <code>quickLook</code>. This allows you
 to quickly test various options (elevation angles, frequencies, azimuths, and quality control 
@@ -567,7 +567,7 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 <HR>
 
-### gnssir <a name="module3"></a>
+### vi. gnssir <a name="module3"></a>
 
 <code>gnssir</code> is the main driver for the GNSS-IR code. You need a set of instructions which are made using <code>make_json_input</code>. The required inputs are: 
 
@@ -576,15 +576,14 @@ This is further emphasized in the next panel, that shows the actual periodograms
 * longitude (degrees) 
 * ellipsoidal height (meters). 
 
-The station location *does not* have to be cm-level for the reflections code. Within 
-a few hundred meters is sufficient. For example: 
+The station location *does not* have to be cm-level for the reflections code. Within a few hundred meters is sufficient. For example: 
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1</CODE>
 
 If you happen to have the Cartesian coordinates (in meters), you can set <code>-xyz True</code> and input those instead of 
 lat, long, and height.
 
-It will use defaults for other parameters if you do not provide them. Those defaults 
+<code>gnssir</code> will use defaults for other parameters if you do not provide them. Those defaults 
 tell the code an azimuth and elevation angle mask (i.e. which directions you want 
 to allow reflections from), and which frequencies you want to use, and various quality control (QC) metrics. 
 Right now the default frequencies are GPS only, e.g. L1, L2C and L5. 
