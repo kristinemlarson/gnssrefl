@@ -243,7 +243,7 @@ but not too tall. We will try 4 meters and then check later to make sure that wa
 </P>
 
 <p align=center>
-<table>
+<table align=center>
 <TR>
 <TD>A. <img src=tests/use_cases/ross-google.jpg width=300> <BR>
 Map view of station ROSS </TD>
@@ -254,10 +254,10 @@ Photograph of station ROSS</TD>
 <Tr>
 <TD>C. <img src=tests/use_cases/ross-first.jpg width=300><BR>
 Reflection zones for GPS satellites at elevation <BR>angles of 5-25 degrees 
-for a reflector height of 4 meters.</TD> 
+for a reflector height of <BR>4 meters.</TD> 
 <TD>D. <img src=tests/use_cases/ross-second.jpg width=300><BR>
 Reflection zones for GPS satellites at elevation <BR>angles of 5-15 degrees 
-for a reflector height of 4 meters.  </TD>
+for a reflector height of <BR>4 meters.  </TD>
 </Tr>
 </table>
 </p>
