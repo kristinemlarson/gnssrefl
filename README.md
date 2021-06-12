@@ -168,22 +168,32 @@ Here a periodogram was used to extract this frequency, and that is shown below, 
 units changed to reflector height. In a nutshell, that is what this code does. It figures out the 
 rising and setting satellite arcs in all the azimuth regions you have said are acceptable. It does a 
 simple analysis (removes the polynomial, changes units) and uses a periodogram to look at the 
-frequency content of the data. You only want to report  
+frequency content of the data. You only want to report RH when you think the peak on the periodogram is 
+significant. There are many ways to do this - we only use two quality control metrics:
 
+* is the peak larger than a user-defined value  (amplitude of the dominant peak in your periodogram)
+
+* is the peak divided by a "noise" metric larger than a user-defined value. The code calls this the peak2noise.
 
 <p align=center>
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
 </p>
 
-GNSS-IR only works with low elevation angle data; generally the range from 5 to 30 
-degrees is useable though the sensitivity on elevation angle also depends on the kind of surface.  
-This code finds the rising and setting satellite arcs and estimates RH 
-for each satellite arc. Each satellite arc is associated with a specific time period (usually about 
-30 minutes) and a direction (azimuth) on the surface of the Earth. How many satellite arcs 
-you can use for environmental sensing depends on how reflection-friendly your site is. 
+A couple common sense issues: one is that since you define the noise region, if you make it really large, that 
+will artificially make the peak2noise ratio larger. I have generally used a region of 6-8 meters for this 
+calculation. So in the figure above the region was for 0-6 meters. The amplitude can be tricky because 
+some receivers report low SNR values, which then leads to lower amplitudes. The default amplitude values are 
+for the most commonly used signals in GNSS-IR (L1, L2C, L5, Glonass, Galileo, Beidou). The L2P data
+used by geodesists are generally not useable for reasons to be discussed later.
 
 
-What do these satellite arc reflection zones look like? Below are 
+Even though we analyze the data as a function of sine of elevation angle, each satellite arc
+is associated with a specific time period. The code keeps track of that and reports it in the final answers.
+It also keeps track of the average azimuth for each rising and setting satellite arc that passes quality 
+control tests.
+
+
+What do these satellite reflection zones look like? Below are 
 photographs and [reflection zone maps](https://gnss-reflections.org/rzones) for two standard GNSS-IR sites, 
 one in the northern hemisphere and one in the southern hemisphere.
 
