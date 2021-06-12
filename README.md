@@ -681,7 +681,7 @@ the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 <HR>
 
-### Bugs/Features <a name="bugs"></a>
+### 4. Bugs/Features <a name="bugs"></a>
 
 I have been using <code>teqc</code> to reduce the number of observables and to decimate. I have removed the former 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
@@ -698,7 +698,7 @@ the newer ones). It is unfortunate, but I cannot do anything about this.
 
 <HR>
 
-### Utilities <a name="helper"></a>
+### 5. Utilities <a name="helper"></a>
 
 <code>daily_avg</code> is a utility for cryosphere people interested in computing daily snow 
 accumulation. It can be used for lake levels. *It is not to be used for tides!*
@@ -732,7 +732,7 @@ but this utility writes out a file with only columns of numbers instead of csv.
 
 <HR>
 
-### Publications <a name="publications"></a>
+### 6. Publications <a name="publications"></a>
 
 There are A LOT of publications about GPS and GNSS interferometric reflectometry.
 If you want something with a how-to flavor, try this paper, 
@@ -742,7 +742,7 @@ look to the publications page on my [personal website](https://kristinelarson.ne
 
 <HR>
 
-### Acknowledgements <a name="acknowledgements"></a>
+### 7. Acknowledgements <a name="acknowledgements"></a>
 
 [Radon Rosborough](https://github.com/raxod502) helped me with my python questions. 
 Joakim Strandberg provided python RINEX translators, and Johannes Boehm provided source code for the 
@@ -753,6 +753,6 @@ Kristine M. Larson
 
 [https://kristinelarson.net](https://kristinelarson.net)
 
-This documentation was updated on May 24, 2021.
+This documentation was updated on June 12, 2021.
 
 
