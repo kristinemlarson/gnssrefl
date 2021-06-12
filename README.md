@@ -179,6 +179,16 @@ significant. There are many ways to do this - we only use two quality control me
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/for_the_web.png" width="600"/>
 </p>
 
+The Colorado SNR example is for a fairly planar field where the RH for the rising and setting arc 
+should be very close to the same name. What does the SNR data look like for a more extreme case? 
+Shown below is the SNR data for [Peterson Bay](https://gnss-reflections.org/static/images/PBAY.jpg), where the rising arc (at low tide) has a very different
+frequency than during the setting arc (high tide). This gives you an idea of how the code can be 
+used to measure tides. 
+
+<p align=center>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/pbay-snr.png" width="600"/>
+</p>
+
 A couple common sense issues: one is that since you define the noise region, if you make it really large, that 
 will artificially make the peak2noise ratio larger. I have generally used a region of 6-8 meters for this 
 calculation. So in the figure above the region was for 0-6 meters. The amplitude can be tricky because 
