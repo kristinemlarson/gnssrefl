@@ -235,7 +235,7 @@ simple GNSS-IR sites. The surfaces below the GPS antennas are fairly smooth soil
 will generate coherent reflections. In general, you can use all azimuths at these sites.  
 <P>
 <P>
-Now let's look at a more complex case, station ross on Lake Superior. Here the goal 
+Now let's look at a more complex case, station <code>ross</code> on Lake Superior. Here the goal 
 is to measure water level. The map image (panel A) makes it clear
 that unlike Mitchell and Portales, we cannot use all azimuths to measure the lake. To understand our reflection 
 zones, we need to know the approximate lake level. That is a bit tricky to know, but the 
@@ -264,8 +264,8 @@ for a reflector height of <BR>4 meters.  </TD>
 </p>
 
 Again using the reflection zone web app, we can plot up the appropriate reflection zones for various options.
-Since ross has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) has its coordinates in a 
-database. You can just plug in ross for the station name and leave 
+Since <code>ross</code> has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) has its coordinates in a 
+database. You can just plug in <code>ross</code> for the station name and leave 
 latitude/longitude/height blank. You *do* need to plug in a RH of 4 since mean 
 sea level would not be an appropriate reflector height value for this case. Start out with an azimuth range of 90 to 180 degrees.
 Using 5-25 degree elevation angles (panel C) looks like it won't quite work - and going all the way to 180 degrees
@@ -379,11 +379,11 @@ You can run <code>rinex2snr</code> at the command line. The required inputs are:
 - year
 - day of year
 
-A sample call for a station called p041, restricted to GPS satellites, on day of year 132 and year 2020 would be:
+A sample call for a station called <code>p041</code>, restricted to GPS satellites, on day of year 132 and year 2020 would be:
 
 <code>rinex2snr p041 2020 132</code>
 
-If the RINEX file for p041 is in your local directory, it will translate it.  If not, 
+If the RINEX file for <code>p041</code> is in your local directory, it will translate it.  If not, 
 it will check three archives (unavco, sopac, and sonel) to find it. This uses the hybrid translator.  
 
 
@@ -524,7 +524,7 @@ region that you define. For <code>quickLook</code> it uses the same RH region fo
 
 **Example from Boulder:**
 
-We start with one of our <code>rinex2snr</code> examples, p041
+We start with one of our <code>rinex2snr</code> examples, <code>p041</code>
 
 <code>quickLook p041 2020 132 </CODE>
 
@@ -535,12 +535,8 @@ That command will produce this periodogram summary:
 By default, these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
 you have used the defaults. Furthermore, note that results on the x-axis begin at 0.5 meters.
 Since you are not able to resolve very small reflector heights with this method, this region 
-is not allowed. These periodograms give you a sense of whether there is a 
-planar reflector below your antenna. The fact that 
-the peaks in the periodograms bunch up around 2 meters means that at 
-this site the antenna phase center is ~ 2 meters above the ground. The colors 
-change as you try different satellites.  If the data are plotted in
-gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
+is not allowed. These periodograms give you a sense of whether there is a planar reflector below your antenna. The fact that the peaks in the periodograms bunch up around 2 meters means that at 
+this site the antenna phase center is ~ 2 meters above the ground. The colors change as you try different satellites.  If the data are plotted in gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
 
 <CODE>quickLook</code> also provides a summary of various quality control metrics:
 
@@ -558,7 +554,7 @@ frequency 20:
 <img src="tests/use_cases/p041-l2c.png" width=600>
 
 **L2C results are always superior to L1 results.** If you have any influence over a GNSS site, please 
-ask the station operators to track modern GPS signals.
+ask the station operators to track modern GPS signals such as L2C and L5.
 
 **Check back for our site on Lake Superior:**
 
@@ -566,8 +562,7 @@ Make a SNR file <code>rinex2snr ross 2020 170</code> and <code>quickLook ross 20
 
 <img src=tests/use_cases/ross-qc.png width=600>
 The good RH estimates (in blue in the top panel) are telling us that we were right when we assessed 
-reflection zones using 4 meters. We can also see that the best retrievals are in the 
-southeast quadrant (azimuths 90-180 degrees).
+reflection zones using 4 meters. We can also see that the best retrievals are in the southeast quadrant (azimuths 90-180 degrees).
 This is further emphasized in the next panel, that shows the actual periodograms.
 
 <img src=tests/use_cases/ross-lsp.png width=600>
