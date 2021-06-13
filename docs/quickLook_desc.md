@@ -15,7 +15,9 @@ that will be used to retrieve RH.  Each  color here represents a different satel
 were limited to the region 0.5 to 6 meters. The GPS L1 frequency is the default. (This site has good L1 SNR data at this time - in previous 
 years it was a different receiver with poor data quality).
 
+<p align=center>
 <img src="../tests/use_cases/p041-l1.png" width=600>
+</p>
 
 The y-axis is the spectral amplitude in converted SNR units (volts/volts).  If you see a strong peak in the periodogram,
 that means you will have a good estimate of the RH for that satellite arc. The data represented in gray are "failed" periodograms. 
@@ -37,14 +39,20 @@ noise ratios than a day without wind. I generally use 3.5 for snow, 3.2 for lake
 * the bottom plot is the spectral amplitude for the RH peak. This will depend -again - on the surface type. Different surfaces (water, ice, snow, bare soil) reflect 
 signals differently. It also reflects how smooth the surface is and which elevation angle limits were used.
 
+<p align=center>
 <img src="../tests/use_cases/p041_l1_qc.png" width=600>
+</p>
 
-Common Questions:
+**Common Questions:**
 
 Why are spectral amplitudes bigger when lower elevation angles (5-15) are used? Because the GNSS antenna does a relatively poor job 
 of rejecting reflections there.  When you start to include higher elevation angles (> 20), the reflection oscillations are still there,
 but they are much smaller.
 
 Is there something magical about a peak to noise ratio of 3? No. In fact we used a peak to noise ratio of 4 for most of PBO H2O. 
+
+Does a "gray" failed periodogram mean there is an obstruction of some kind on the ground? No. It can also mean that the satellite arc
+is too small. The code also tries ot make sure that you have a long enough data series to retrieve a reliable spectral peak. So some arcs
+have too little data - sometimes because the arc crosses your azimuth boundaries.
 
 [Additional discussion of the GNSS-IR method, with example periodogram links.](https://gnss-reflections.org/overview)
