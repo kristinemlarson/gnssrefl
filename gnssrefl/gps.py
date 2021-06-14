@@ -3471,9 +3471,11 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     """
     navname = navfile
     FileExists = False
+    print('try sopac')
     get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
 
     if not os.path.isfile(navfile):
+        print('try cddis')
         get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
 
     if os.path.isfile(navfile):
@@ -3624,14 +3626,18 @@ def rinex_ga_lowrate(station,year,month,day):
     """
     fexists = False
     crnxpath = hatanaka_version()
-    print('trying geoscience australia')
+#    print('trying geoscience australia')
+
 
     if day == 0:
         doy=month
         d = doy2ymd(year,doy);
         month = d.month; day = d.day
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    csrate = '30'
+    r3 = station.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
     # changed september 2, 2020
+    #print(r3)
     #ftpg = 'ftp://ftp.ga.gov.au/geodesy-outgoing/gnss/data/daily/' + cyyyy + '/' + cyy + cdoy  + '/'
     #dnameZ = station + cdoy + '0.' + cyy + 'd.Z' 
     ftpg = 'ftp://ftp.data.gnss.ga.gov.au/daily/' + cyyyy + '/' + cdoy  + '/'
@@ -3936,6 +3942,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=getsp3file_flex(year,month,day,'esa')
         snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     elif orbtype == 'nav':
+        #print('getting nav orbits ... i hope')
         f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
         snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
     else:
@@ -4165,6 +4172,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
     """
     takes as input the names of a rinex3 file and a rinex2 file
     code checks that gfzrnx executable exists
+    this does multi-GNSS
     """
     fexists = False
     gexe = gfz_version()
@@ -4173,7 +4181,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
     if not os.path.exists(gexe):
         print('gfzrnx executable does not exist and this file cannot be translated')
     else:
-#        print('gfzrnx executable does exist')
+        #print('gfzrnx executable does exist')
         if os.path.isfile(r3_filename):
             try:
                 subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f'])
@@ -4183,10 +4191,12 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
                 else:
                     sigh = 0
 #                print('rinex 2 was not created')
-#                print('remove rinex 3 file')
+                print('remove rinex 3 file')
                 subprocess.call(['rm', '-f', r3_filename ])
             except:
                 print('some kind of problem in translation from RINEX 3 to RINEX 2.11')
+
+
     return fexists
 
 def cddis_rinex3(station9ch, year, doy,srate,orbtype):
@@ -4459,17 +4469,56 @@ def ga_rinex3(station9ch, year, doy,srate):
     except:
         print('problem with geoscience australia download')
 
+
     if os.path.exists(ff2):
         fexist = True
 
     return fexist
 
+def ga_rinex3_to_rinex2(station9ch, year, doy,srate):
+    """
+    download rinex 3 from Geoscience Australia and translte to rinex 2
+    inputs: 9 character station name, year, day of year and srate
+    seconds
+    kristine larson
+    """
+    fexist = False
+    crnxpath = hatanaka_version()
+    cdoy = '{:03d}'.format(doy)
+    cyy = '{:02d}'.format(year-2000)
+    csrate = '{:02d}'.format(srate)
+    cyyyy = str(year)
+    url = 'ftp://ftp.data.gnss.ga.gov.au/daily/' + cyyyy + '/' + cdoy + '/'
+
+    ff = station9ch.upper() +    '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
+    ff1 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
+    ff2 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.rnx'
+    url = url + ff
+    print(url)
+    rinex2name = station9ch[0:4].lower() + cdoy + '0.' + cyy + 'o'
+    try:
+        wget.download(url,ff)
+        subprocess.call(['gunzip',ff])
+        if os.path.exists(ff1):
+            print('uncompress Hatanaka')
+            subprocess.call([crnxpath,ff1])
+        else:
+            print('compressed file does not exist')
+        if os.path.exists(ff2):
+            print(ff2, rinex2name)
+            fexist = new_rinex3_rinex2(ff2,rinex2name)
+    except:
+        print('problem with geoscience australia download')
+
+    # returns rinex3name by convention
+    return fexist, ff2 
 
 def rinex3_rinex2(gzfilename,v2_filename):
     """
     input gzfile name
     gunzip, de-hatanaka, then convert to RINEX 2.11
-    WARNING: this doesn't work yet
+    returns whether the rinex2file exists
+    this is GPS only
     """
     fexists = False
     gexe = gfz_version()
@@ -4482,10 +4531,11 @@ def rinex3_rinex2(gzfilename,v2_filename):
     l=len(gzfilename)
     cnxfilename = gzfilename[0:l-3]
     rnxfilename = gzfilename[0:l-6] + 'rnx'
+    #print(gzfilename)
     #print(cnxfilename)
     #print(rnxfilename)
     if os.path.isfile(gzfilename):
-        # unzip and Hatanaka decompress
+        print('unzip and Hatanaka decompress')
         subprocess.call(['gunzip',gzfilename])
         subprocess.call([hexe,cnxfilename])
     if os.path.isfile(rnxfilename) and os.path.isfile(gexe):
@@ -4630,6 +4680,7 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
     # I hate S2W  - so it is not written out
     # added Beidou 9/20/2020
         gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I'
+    print(gobblygook)
     if os.path.isfile(rfilename):
         print('rinex3 file already exists')
     else:
@@ -4724,7 +4775,7 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
             subprocess.call(['gunzip',cddisfile_gzip])
     
     if os.path.isfile(cddisfile):
-        print('found it and move to ORBIT area')
+        print('found it and change the name ')
         subprocess.call(['mv',cddisfile,navfile])
 
     return navfile

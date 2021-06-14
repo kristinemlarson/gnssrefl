@@ -14,7 +14,7 @@ Cf2py intent(in) errf
 c change to 132 characters for inputs
 
       integer maxsat, maxeph, maxob
-      parameter (maxsat = 50)
+      parameter (maxsat = 150)
       parameter (maxeph = 50)
       parameter (maxob = 20)
       real*8 c
@@ -257,7 +257,7 @@ c     close input and output files
       implicit none
 
       integer maxsat, maxeph, maxob
-      parameter (maxsat = 50)
+      parameter (maxsat = 150)
       parameter (maxeph = 50)
       parameter (maxob = 20)
       real*8 c
@@ -326,7 +326,7 @@ c     I transfered it over from the GNSS code - hopefully to save time
       implicit none
 
       integer maxsat, maxeph, maxob
-      parameter (maxsat = 50)
+      parameter (maxsat = 150)
       parameter (maxeph = 50)
       parameter (maxob = 20)
       real*8 c
@@ -508,7 +508,7 @@ c     march 2021 change filename to 132 characters
       implicit none
 
       integer maxsat, maxeph, maxob
-      parameter (maxsat = 50)
+      parameter (maxsat = 150)
       parameter (maxeph = 50)
       parameter (maxob = 20)
       real*8 c
@@ -684,7 +684,7 @@ c     returns satellite coordinates in METERS
       implicit real*8 (a-h,o-z)
       save
       integer maxsat
-      parameter (maxsat=50)
+      parameter (maxsat=150)
       dimension recf(3)
       integer hr, izh
 
@@ -915,7 +915,7 @@ c     not sure if this is read but i am having
 c     filename be up to 132 characters
 
       integer maxsat, maxeph, maxob
-      parameter (maxsat = 50)
+      parameter (maxsat = 150)
       parameter (maxeph = 50)
       parameter (maxob = 20)
       real*8 c
@@ -992,7 +992,7 @@ c       print*, it1, it2, it3, it4, it5, 'PRN ', iprn
       implicit none
 
       integer maxsat, maxeph, maxob
-      parameter (maxsat = 50)
+      parameter (maxsat = 150)
       parameter (maxeph = 50)
       parameter (maxob = 20)
       real*8 c
@@ -1046,7 +1046,7 @@ c         subtract one hour because ephem 1 goes to hour 0
       implicit none
 
       integer maxsat, maxeph, maxob
-      parameter (maxsat = 50)
+      parameter (maxsat = 150)
       parameter (maxeph = 50)
       parameter (maxob = 20)
       real*8 c

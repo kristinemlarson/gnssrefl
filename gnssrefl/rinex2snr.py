@@ -128,20 +128,26 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 else:
                     if version == 3:
                         #  try unavco
-                        if (archive == 'all') or (archive == 'unavco'):
+                        rinex2exists = False; rinex3name = '';
+                        if (archive == 'unavco'):
                             srate = 15
                             rinex2exists, rinex3name = g.unavco_rinex3(station9ch, year, doy,srate,orbtype)
 
                         # try cddis
                         if not os.path.exists(r):
-                            if (archive == 'all') or (archive == 'cddis'):
+                            if (archive == 'cddis'):
                                 srate = 30
                                 rinex2exists, rinex3name = g.cddis_rinex3(station9ch, year, doy,srate,orbtype)
+                        if not os.path.exists(r):
+                            if (archive == 'ga') :
+                                srate = 30
+                                rinex2exists, rinex3name = g.ga_rinex3_to_rinex2(station9ch, year, doy,srate)
 
                         # remove rinex 3 file
-                        subprocess.call(['rm', '-f', rinex3name]) # remove rinex3 file
+                        # subprocess.call(['rm', '-f', rinex3name]) # remove rinex3 file
 
                         if rinex2exists:
+                            print('RINEX version 2 has been created from version 3', year, doy)
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
                         else:
                             print('RINEX file does not exist for ', year, doy)
@@ -806,11 +812,12 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
     rd = station + cdoy + '0.' + cyy + 'd'
     locdir= os.environ['REFL_CODE'] + '/rinex/' + station + '/' + cyyyy + '/'
     # 
-    locdir2= os.environ['RINEX'] + station + '/' + cyyyy + '/'
-    locdir3= os.environ['RINEX'] + station.upper() + '/' + cyyyy + '/'
+    #locdir2= os.environ['RINEX'] + station + '/' + cyyyy + '/'
+    #locdir3= os.environ['RINEX'] + station.upper() + '/' + cyyyy + '/'
 
     print('Will look for files in the working directory and ', locdir)
-    so_many_permutations(r,rd,locdir, crnxpath)
+    # I was testing this ... but have not finished
+    #so_many_permutations(r,rd,locdir, crnxpath)
 
     if os.path.exists(r):
         missing = False
