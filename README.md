@@ -21,6 +21,8 @@
 
 ### 1. News <a name="news"></a>
 
+**June 14,2021** Fixed bug in nolook option.  Fixed rinex2snr conversion for RINEX 3/nav orbits.
+
 **June 1, 2021** Added esa orbits 
 
 **April 17, 2021** New plot added to quickLook. This should provide feedback to the user on which QC 
