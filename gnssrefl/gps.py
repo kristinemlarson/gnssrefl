@@ -2152,9 +2152,15 @@ def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
     px = new_px
     pz = new_pz
 #   find the max
-    ij = np.argmax(pz)
-    maxF = px[ij]
-    maxAmp = np.max(pz)
+#   was causing it to crash.  check that pz has anything in it
+    if len(pz) == 0:
+        print('invalid LSP, no data returned. If this is pervasive, check your inputs')
+        maxF = 0; maxAmp = 0
+    else:
+        ij = np.argmax(pz)
+        maxF = px[ij]
+        maxAmp = np.max(pz)
+
     return maxF, maxAmp, eminObs, emaxObs,riseSet, px,pz
 
 def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satNu,pfitV,pele,screenstats):
@@ -2404,6 +2410,7 @@ def find_satlist_wdate(f,snrExist,year,doy):
     transmitting satellites are reasonable (previously it was a full list for 
     current day, that may or may not be correct in the past)
     author: kristine m. larson
+    june 24, 2021: updated for SVN78
     """
 # set list of GPS satellites for now
 #
@@ -3471,11 +3478,11 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     """
     navname = navfile
     FileExists = False
-    print('try sopac')
+    #print('try sopac')
     get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
 
     if not os.path.isfile(navfile):
-        print('try cddis')
+        print('sopac did not work, so try cddis')
         get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
 
     if os.path.isfile(navfile):
@@ -5164,11 +5171,13 @@ def l2c_l5_list(year,doy):
     and launch date.  
     author: kristine larson
     date: march 27, 2021
+    june 24, 2021: updated for SVN78
     """
 
     # this numpy array
     l2c=np.array([[1 ,2011 ,290], [3 ,2014 ,347], [4 ,2018 ,357], [5 ,2008 ,240],
         [6 ,2014 ,163], [7 ,2008 ,85], [8 ,2015 ,224], [9 ,2014 ,258], [10 ,2015 ,343],
+        [11, 2021, 168],
         [12 ,2006 ,300], [14 ,2020 ,310], [15 ,2007 ,285], [17 ,2005 ,270],
         [18 ,2019 ,234], [23 ,2020 ,182], [24 ,2012 ,319], [25 ,2010 ,240],
         [26 ,2015 ,111], [27 ,2013 ,173], [29 ,2007 ,355], [30 ,2014 ,151], [31 ,2006 ,270], [32 ,2016 ,36]])

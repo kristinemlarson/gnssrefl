@@ -21,8 +21,8 @@ def main():
     parser.add_argument("long", help="longitude (degrees)", type=float)
     parser.add_argument("height", help="ellipsoidal height (meters)", type=float)
 # these are the optional inputs 
-    parser.add_argument("-e1", default=None, type=int, help="lower limit elevation angle")
-    parser.add_argument("-e2", default=None, type=int, help="upper limit elevation angle")
+    parser.add_argument("-e1", default=None, type=int, help="lower limit elevation angle (deg)")
+    parser.add_argument("-e2", default=None, type=int, help="upper limit elevation angle (deg)")
     parser.add_argument("-h1", default=None, type=float, help="lower limit reflector height (m)")
     parser.add_argument("-h2", default=None, type=float, help="upper limit reflector height (m)")
     parser.add_argument("-nr1",default=None, type=float, help="lower limit noise region for QC(m)")
@@ -79,6 +79,10 @@ def main():
     else:
         h2=6.0
 #
+    if (h1 > h2):
+        print('h1 cannot be greater than h2. ', h1, h2, ' Exiting.')
+        sys.exit()
+
     lsp['minH'] = h1; lsp['maxH'] = h2
 
 # elevation angles (degrees)

@@ -97,6 +97,10 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     KL 21apr02 added error checking on whether requested datastreams exist. no data, no analysis
     """
 
+    if (minH > maxH):
+        print('Minimum RH',minH, ' cannot be greater than maximum RH.', maxH, ' Exiting.')
+        return [],[]
+
     # dictionary for output
     data = {'NW':{},'SW':{},'NE':{},'SE':{},'fNW':{},'fSW':{},'fNE':{},'fSE': {} }
 
@@ -281,7 +285,9 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq):
     except:
         print('no results in the file')
 
+    #print(a.ndim, len(a))
     if (a.ndim == 1) or (len(a) == 0):
+        print('no results in the file')
         return
 
     ij = (a[:,6] == 1) # good retrievals
