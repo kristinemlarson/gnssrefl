@@ -205,6 +205,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 #satlist = g.find_satlist(f,snrE)
                 #march 29, 2021 made l2c and l5 time dependent
                 satlist = g.find_satlist_wdate(f,snrE,year,doy)
+                #print(f,year,doy)
+                #print(satlist)
             else:
                 satlist = [satsel]
 

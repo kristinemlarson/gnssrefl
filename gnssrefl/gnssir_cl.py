@@ -171,7 +171,11 @@ def main():
         #print('Overriding frequency choices')
     if args.ampl != None:
         #print('Overriding amplitude choices')
-        lsp['reqAmp'] = [args.ampl]
+        dumA = args.ampl
+        # this is not elegant - but allows people to set ampl on the command line 
+        # but use the frequency list from their json ...  which i think has max of 12
+        # but use 14 to be sure
+        lsp['reqAmp'] =  [dumA for i in range(14)]
 
     if args.sat != None:
         #print('Overriding - only looking at a single satellite')
