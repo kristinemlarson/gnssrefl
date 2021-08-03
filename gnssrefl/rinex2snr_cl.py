@@ -3,6 +3,7 @@
 command line tool for the rinex2snr module
 pretty much what it sounds like - it translates rinex files and makes SNR files
 kristine larson
+2021aug01 added mk option for uppercase file names
 
 compile the fortran first
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
@@ -40,6 +41,7 @@ def main():
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-srate", default=None, help="sample rate (RINEX 3 only)", type=int)
+    parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
 
     args = parser.parse_args()
 #   make sure environment variables exist.  set to current directory if not
@@ -174,8 +176,13 @@ def main():
     else:
         srate = args.srate
 
+    # the Makan option
+    mk = False
+    if args.mk == 'True':
+        print('you have invoked the Makan option')
+        mk = True
 
-    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate)
+    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk)
     print('Feedback written to subdirectory logs')
 
 
