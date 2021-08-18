@@ -1128,28 +1128,15 @@ def getsp3file_mgex(year,month,day,pCtr):
                 #foundit = ign_orbits(file2, dirlocation_IGN,year)
             if True:
             #else:
-                secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
                 name = file2[:-3]
                 secure_file = file2
-                #print(secure_file, secure_dir)
-                try:
-                    cddis_download(secure_file, secure_dir)
-                    if os.path.isfile(secure_file):
-                        subprocess.call(['gunzip', file2])
-                        store_orbitfile(name,year,'sp3') ; foundit = True
-                except:
-                    okok = 1
+                print('check the correct week everyone uses')
+                secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
+                foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
                 if not foundit:
-                    # change the directory
-                    secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
-                    #print(secure_file, secure_dir)
-                    try:
-                        cddis_download(secure_file, secure_dir)
-                        if os.path.isfile(secure_file):
-                            subprocess.call(['gunzip', file2])
-                            store_orbitfile(name,year,'sp3') ; foundit = True
-                    except:
-                        okok = 1
+                    print('use the wrong week at CDDIS')
+                    secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
+                    foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
         else:
             secure_dir = '/gps/products/mgex/' + str(gps_week) + '/'
             secure_file = file1
@@ -1177,7 +1164,24 @@ def getsp3file_mgex(year,month,day,pCtr):
     #print(name,fdir,foundit)
     return name, fdir, foundit
 
+def orbfile_cddis(name, year, secure_file, secure_dir, file2):
+    """
+    tries to download a file from a directory at CDDIS
+    file2 is like this: GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz
+    it then stores it the year directory (with a given name)
+    """
+    foundit = False
+    print(secure_dir, secure_file)
+    try:
+        cddis_download(secure_file, secure_dir)
+        if os.path.isfile(secure_file):
+            subprocess.call(['gunzip', file2])
+            store_orbitfile(name,year,'sp3') ; 
+            foundit = True
+    except:
+        ok = 1
 
+    return foundit
 def kgpsweek(year, month, day, hour, minute, second):
     """
     inputs are year (4 char), month, day, hour, minute, second
