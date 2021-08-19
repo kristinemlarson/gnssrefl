@@ -49,12 +49,14 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     fortran = boolean, whether you use fortran rinex translators
     nol = boolean for nolook, if set to True, then it will assume RINEX files are in local directory
     overwrite = boolean, make a new SNR file even if one already exists
+    weekly = boolean to make snr files with 7 day difference
 
     2021feb11, kristine Larson
     translator = fortran, python, or hybrid
     srate - integer sample rate, for RINEX 3 only.
     2021mar20 check for illegal day of years ....
     2021aug01 added mk option for uppercase file names per makan karegar request
+    2021aug15v added weekly option
     """
 
     NS = len(station)

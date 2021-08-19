@@ -42,6 +42,7 @@ def main():
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-srate", default=None, help="sample rate (RINEX 3 only)", type=int)
     parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
+    parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
 
     args = parser.parse_args()
 #   make sure environment variables exist.  set to current directory if not
@@ -153,7 +154,13 @@ def main():
 # decimation rate
     dec_rate = args.dec
 
-    doy_list = list(range(doy, doy2+1))
+# the weekly option
+    skipit = 1
+    if args.weekly == 'True':
+        print('you have invoked the weekly option')
+        skipit = 7
+
+    doy_list = list(range(doy, doy2+1,skipit))
     year_list = list(range(year1, year2+1))
 
     overwrite = False
@@ -181,6 +188,7 @@ def main():
     if args.mk == 'True':
         print('you have invoked the Makan option')
         mk = True
+
 
     rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk)
     print('Feedback written to subdirectory logs')
