@@ -2,7 +2,7 @@
 
 **Due date:** This homework is to be completed **before** the short course given on October 21. You need to make
 sure the software has been properly installed and you have successfully completed the "homework 0" assignment. You should 
-also read the [gnssrefl documentation provided on GitHub.](https://github.com/kristinemlarson/gnssrefl).
+also read the [gnssrefl documentation provided on GitHub.](https://github.com/kristinemlarson/gnssrefl)
 
 **Purpose:** Learn how to measure water level with gnssrefl using GNSS data 
 
@@ -40,8 +40,7 @@ Use the [reflection zone section of the web app](https://gnss-reflections.org/rz
 of what reflection zones are possible for this site. We cannot use the default sea level reflection 
 value, so you need to set a Reflector Height (RH) value. Based on the photograph, try values that
 you think are reasonable. You don't want your reflection zones to cross 
-a dock or the nearby boats, so you should also rerun it with different azimuth limits.  
-Don't worry about it too much as we will get feedback from the actual GPS data.
+a dock or the nearby boats, so you should also rerun it with different azimuth limits. Don't worry about it too much as we will get feedback from the actual GPS data.
 
 Make a note of:
 
@@ -64,7 +63,7 @@ The only required inputs are the station name (ross), the year (2020) and day of
 month, day and vice versa, try the modules <code>ydoy</code> and 
 <code>ymd</code>). 
 
-By default the <code>gnssrefl </code> tries to find the RINEX data for you by looking at a few 
+By default <code>rinex2snr</code> tries to find the RINEX data for you by looking at a few 
 key archives.  However, if you know where the data are, it will be faster to specify it.
 In this case they are available from both sopac and nrcan. Try the <code>-archive</code> option.
 
@@ -82,9 +81,10 @@ make sure you are happy with your azimuth and elevation angle selections.
 
 Next we need to save our <code>gnssrefl</code> analysis strategy using 
 <code>make_json_input</code>. At a minimum you need to know 
-the latitude, longitude, and height for the station 
+the latitude, longitude, and height for the station. However, your analysis strategy can and should
+be improved by setting some parameters on the command line.
 
-**Hints:**
+*Hints:*
 
 * Check the documentation to see how to set the elevation angles and RH limits on the command line
 
@@ -104,10 +104,10 @@ created (the screen output will tell you where it is).
 
 The <code>gnssir</code> output tells you the vertical distance between the GPS antenna and 
 the lake for each successful satellite track. That is not 
-super exciting; it is a little more intetesting to see if it changes over time, which means 
+super exciting; it is a little more interesting to see if it changes over time, which means 
 you need to analyze a bit more data. 
 
-* make SNR files for the same year, but now do doy 120 through 290. Remewmber to use <code>-doy_end</code> to
+* use <code>rinex2snr</code> to make SNR files for the same year, but now do doy 120 through 290. Remember to use <code>-doy_end</code> to
 do that in a single command.  And use <code>-weekly True</code> to make fewer files (which will make
 everything much faster).  Why did I pick those dates? Mostly to avoid snow (yeap, it snows up there!) 
 
@@ -118,6 +118,6 @@ next day, etc.
 * You can now use the <code>daily_avg</code> to make a daily average for the lake level on each day 
 you analyzed.  
 
-** Extra Extra Credit:**
+**Extra Extra Credit:**
 
-Compare with the [lake gauge data](https://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/sd-ds-eng.asp?no=10220&user=isdm-gdsi&region=CA)
+Compare your results with the [lake gauge data.](https://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/sd-ds-eng.asp?no=10220&user=isdm-gdsi&region=CA)
