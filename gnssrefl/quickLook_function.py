@@ -261,6 +261,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
         if pltscreen:
             plt.suptitle(tt, fontsize=FS)
+            print('plot saved to quickLook_lsp.png')
+            plt.savefig('quickLook_lsp.png')
             # sure - throw in another plot
             goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f)
             plt.show()
@@ -272,6 +274,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     # returns multidimensional dictionary of lomb scargle results so 
     # that the jupyter notebook people can replot them
     # 21mar26 added a key
+
     return data,datakey
 
 def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq):
@@ -338,6 +341,8 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq):
     plt.yticks(fontsize=fs)
     plt.xlim((0, 360))
 
+    print('plot saved to quickLook_summary.png')
+    plt.savefig('quickLook_summary.png')
 # old code
 #print('I will try to pick up a RINEX file ')
 #print('and translate it for you. This will be GPS only.')
