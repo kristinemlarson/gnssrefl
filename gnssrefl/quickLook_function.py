@@ -261,7 +261,11 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
         if pltscreen:
             plt.suptitle(tt, fontsize=FS)
-            f = os.environ['REFL_CODE'] + '/Files/quickLook_lsp.png'
+            # make sure Files directory exists
+            fdir = os.environ['REFL_CODE'] + '/Files'
+            if not os.path.isdir(fdir):
+                subprocess.call(['mkdir', fdir])
+            f = fdir + '/quickLook_lsp.png'
             print('plot saved to ', f)
             plt.savefig(f)
             # sure - why not throw in another plot?
@@ -342,7 +346,10 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq):
     plt.yticks(fontsize=fs)
     plt.xlim((0, 360))
 
-    f = os.environ['REFL_CODE'] + '/Files/quickLook_summary.png'
+    fdir = os.environ['REFL_CODE'] + '/Files'
+    if not os.path.isdir(fdir):
+        subprocess.call(['mkdir', fdir])
+    f = fdir + '/quickLook_summary.png'
     print('plot saved to ', f)
     plt.savefig(f)
 

@@ -132,13 +132,13 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                     if version == 3:
                         #  try unavco
                         rinex2exists = False; rinex3name = '';
-                        if (archive == 'unavco'):
+                        if (archive == 'unavco') or (archive == 'all'):
                             srate = 15
                             rinex2exists, rinex3name = g.unavco_rinex3(station9ch, year, doy,srate,orbtype)
 
                         # try cddis
                         if not os.path.exists(r):
-                            if (archive == 'cddis'):
+                            if (archive == 'cddis') or (archive == 'all'):
                                 srate = 30
                                 rinex2exists, rinex3name = g.cddis_rinex3(station9ch, year, doy,srate,orbtype)
                         if not os.path.exists(r):
