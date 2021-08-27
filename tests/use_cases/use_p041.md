@@ -71,7 +71,7 @@ The default return is for the L1 frequency:
 
 <code>quickLook p041 2020 132</code>
 
-<img src="p041-l1.png" width="600">
+<img src="p041-l1.x.png" width="600">
 
 Now try looking at the periodogram for L2C:
 
