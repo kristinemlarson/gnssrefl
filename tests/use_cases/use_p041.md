@@ -73,11 +73,18 @@ The default return is for the L1 frequency:
 
 <img src="p041-l1.x.png" width="600">
 
+The code also summarizes these RH retrievals in terms of 
+azimuth (x-axis) and QC metrics:
+
+<img src="new-qc-p041-l1.png" width="600">
+
 Now try looking at the periodogram for L2C:
 
 <code>quickLook p041 2020 132 -fr 20</code>
 
 <img src="p041-l2c.x.png" width="600">
+<P>
+<img src="new-qc-p041-l2c.png" width="600">
 
 Note that there are more colors in the L1 plots than in the L2C plots. That is the result of 
 the fact that there are more L1 satellites than L2C satellites.
