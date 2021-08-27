@@ -18,7 +18,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests","progress"]
 
 setup(
     name="gnssrefl",
-    version="1.0.0",
+    version="1.0.1",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -48,6 +48,7 @@ setup(
             'nmea2snr= gnssrefl.nmea2snr_cl:main',
             'installexe= gnssrefl.installexe_cl:main',
             'download_unr = gnssrefl.download_unr:main',
+            'query_unr= gnssrefl.query_unr:main',
             'mp1mp2= gnssrefl.computemp1mp2:main',
             'download_teqc = gnssrefl.download_teqc:main',
             'rinex3_rinex2= gnssrefl.rinex3_rinex2:main',

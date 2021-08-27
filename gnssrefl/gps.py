@@ -5282,6 +5282,35 @@ def get_noaa_obstimes(t):
 
     return obstimes
 
+def queryUNR(station):
+    """
+    use UNR database to get a priori lat/long in degrees
+    and ellipsoidal height (meters)
+    """
+    lower = station
+    if len(lower) != 4:
+        print('No coordinates in the UNR database for ', lower)
+        print('The station name must be four characters long')
+        return
+
+    labels = np.genfromtxt('gnssrefl/Data.names', delimiter=' ', dtype=str)
+    raw_data = np.genfromtxt('gnssrefl/Data.pos', delimiter=' ' )
+    data = {label: row for label, row in zip(labels, raw_data)}
+    # should put this in a try
+    station = station.upper()
+    llat = 0; llon = 0; height = 0;
+    try:
+        llh = data[station]
+        llat =llh[0]
+        llon =llh[1]
+        height =llh[2]
+    except:
+        print('nada')
+
+    if (llat != 0):
+        print(lower, llat, llon, height)
+    else:
+        print('No coordinates in the UNR database for ', lower)
 
 def rapid_gfz_orbits(year,month,day):
     """
