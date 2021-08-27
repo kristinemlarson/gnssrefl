@@ -86,7 +86,7 @@ Now try L5:
 
 <CODE>quickLook p041 2020 132 -fr 5</code>
 
-<img src="p041-ql-l5.png" width="600">
+<img src="p041-l5.png" width="600">
 
 The L5 signal has only been available on satellites launched after 2010, so there are 
 fewer satellite tracks than either L1 or L2C.
