@@ -3011,6 +3011,53 @@ def rinex_unavco_highrate(station, year, month, day):
             okok = 1
             #print('failed to find either RINEX file at unavco')
 
+
+def new_big_Disk_in_DC(station, year, month, day):
+    """
+    author: kristine larson
+    21aug28 uses https instead of ftp
+
+    picks up a RINEX file from CORS.  
+    changed it to pick up gzip o file instead of d file.  Not sure why they have 
+    both but the d file appears to be 30 sec, and that I do not want
+    allow doy to be sent to code in the month spot.  set day to zero
+    """
+    # get the proper path/name of the hatanaka code
+    crnxpath = hatanaka_version()
+    if day == 0:
+        doy = month
+        year, month, day, cyyyy,cdoy, YMD = ydoy2useful(year,doy)
+        cyy = cyyyy[2:4]
+    else:
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    rinexfile,rinexfiled = rinex_name(station, year, month, day)
+    comp_rinexfiled = rinexfiled + '.Z'
+    gzip_rinexfile = rinexfile + '.gz'
+    #mainadd = 'ftp://www.ngs.noaa.gov/cors/rinex/'
+    # KL updated august 28, 2021
+    mainadd = 'https://geodesy.noaa.gov/corsdata/rinex/'
+    #url = mainadd + str(year) + '/' + cdoy+ '/' + station + '/' + comp_rinexfiled 
+    url = mainadd + str(year) + '/' + cdoy+ '/' + station + '/' + gzip_rinexfile 
+    try:
+        wget.download(url, out=gzip_rinexfile)
+        status = subprocess.call(['gunzip', gzip_rinexfile])
+    except:
+        okok = 1
+
+    if os.path.isfile(rinexfile):
+        print('found it')
+    else:
+        print('try hatanaka')
+        try:
+            url = mainadd + str(year) + '/' + cdoy+ '/' + station + '/' + comp_rinexfiled 
+            wget.download(url, out=comp_rinexfiled)
+            subprocess.call(['uncompress',comp_rinexfiled])
+            #subprocess.call([crnxpath,comp_rinexfiled])
+            # get rid of d file
+            #subprocess.call(['rm',comp_rinexfiled])
+        except:
+            okok = 1
+
 def big_Disk_in_DC(station, year, month, day):
     """
     author: kristine larson
@@ -4173,7 +4220,8 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
                 elif (archive == 'jeff'):
                     pickup_pbay(year,month,day)
                 elif (archive == 'ngs'):
-                    big_Disk_in_DC(station, year,month,day)
+                    # changed 2021 august 28 to use https instead of ftp
+                    new_big_Disk_in_DC(station, year,month,day)
                 elif (archive == 'bev'):
                     bev_rinex2(station, year, doy)
                 else:
@@ -5022,14 +5070,18 @@ def big_Disk_in_DC_hourly(station, year, month, day,idtag):
     """
     author: kristine larson
     picks up a RINEX file from CORS. and gunzips it
+    # updated for new access protocol, 2021 aug 28
     """
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     #rinexfile,rinexfiled = rinex_name(station, year, month, day)
     # compressed rinexfile
     crinexfile = station + cdoy + idtag + '.' + cyy + 'o.gz'
     rinexfile =  station + cdoy + idtag + '.' + cyy + 'o'
-    mainadd = 'ftp://www.ngs.noaa.gov/cors/rinex/'
+    # do not know if this works - but what the hey
+    mainadd = 'https://geodesy.noaa.gov/corsdata/rinex/'
+    #mainadd = 'ftp://www.ngs.noaa.gov/cors/rinex/'
     url = mainadd + cyyyy + '/' + cdoy+ '/' + station + '/' + crinexfile
+    print(url)
     try:
         wget.download(url, out=crinexfile)
         status = subprocess.call(['gunzip', crinexfile])
