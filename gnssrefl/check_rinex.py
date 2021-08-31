@@ -27,14 +27,11 @@ def check_rinex_header(rinexfile):
             if ('APPROX POSITION XYZ') in desc:
                 print('Receiver coordinates (m):', line[:60].strip())
                 base = line[0:60]
-                #recx = float(base[0:13])
-                #recy = float(base[13:26])
-                #recz = float(base[26:40])
 
                 recx = float(base[0:14])
                 recy = float(base[14:28])
                 recz = float(base[28:42])
-                print(recx,recy,recz)
+                #print(recx,recy,recz)
             if ('REC #') in desc:
                 print('Receiver information: ', line[:60].strip())
             if ('ANT #') in desc:
@@ -64,6 +61,7 @@ def main():
 # must input start and end year
     parser = argparse.ArgumentParser()
     parser.add_argument("rinexfile", help="rinexfile name", type=str)
+    args = parser.parse_args()
     rinexfile = args.rinexfile
     check_rinex_header(rinexfile)
 
