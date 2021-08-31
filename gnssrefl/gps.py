@@ -3017,10 +3017,8 @@ def new_big_Disk_in_DC(station, year, month, day):
     author: kristine larson
     21aug28 uses https instead of ftp
 
-    picks up a RINEX file from CORS.  
-    changed it to pick up gzip o file instead of d file.  Not sure why they have 
-    both but the d file appears to be 30 sec, and that I do not want
-    allow doy to be sent to code in the month spot.  set day to zero
+    picks up gzip o file 
+    removed Z option and now only use gz with d file
     """
     # get the proper path/name of the hatanaka code
     crnxpath = hatanaka_version()
@@ -3031,12 +3029,14 @@ def new_big_Disk_in_DC(station, year, month, day):
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
+    # as i understand it this file type has gone away
     comp_rinexfiled = rinexfiled + '.Z'
     gzip_rinexfile = rinexfile + '.gz'
+    # added 21aug30
+    gzip_rinexfiled = rinexfiled + '.gz'
     #mainadd = 'ftp://www.ngs.noaa.gov/cors/rinex/'
     # KL updated august 28, 2021
     mainadd = 'https://geodesy.noaa.gov/corsdata/rinex/'
-    #url = mainadd + str(year) + '/' + cdoy+ '/' + station + '/' + comp_rinexfiled 
     url = mainadd + str(year) + '/' + cdoy+ '/' + station + '/' + gzip_rinexfile 
     try:
         wget.download(url, out=gzip_rinexfile)
@@ -3045,16 +3045,18 @@ def new_big_Disk_in_DC(station, year, month, day):
         okok = 1
 
     if os.path.isfile(rinexfile):
-        print('found it')
+        okok = 1
+        #print('found it')
     else:
-        print('try hatanaka')
+        print('Look for hatanaka file with gzip')
         try:
-            url = mainadd + str(year) + '/' + cdoy+ '/' + station + '/' + comp_rinexfiled 
-            wget.download(url, out=comp_rinexfiled)
-            subprocess.call(['uncompress',comp_rinexfiled])
-            #subprocess.call([crnxpath,comp_rinexfiled])
-            # get rid of d file
-            #subprocess.call(['rm',comp_rinexfiled])
+            url = mainadd + str(year) + '/' + cdoy+ '/' + station + '/' + gzip_rinexfiled 
+            wget.download(url, out=gzip_rinexfiled)
+            subprocess.call(['gunzip',gzip_rinexfiled])
+            # un hatanaka
+            subprocess.call([crnxpath, rinexfiled])
+            # remove d file
+            subprocess.call(['rm','-f',rinexfiled])
         except:
             okok = 1
 
