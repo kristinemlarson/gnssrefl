@@ -25,6 +25,8 @@
 
 ### 1. News <a name="news"></a>
 
+**August 28, 2021** Fixed NGS archive accessibility.
+
 **June 14,2021** Fixed bug in nolook option.  Fixed rinex2snr conversion for RINEX 3/nav orbits.
 
 **June 1, 2021** Added esa orbits 
