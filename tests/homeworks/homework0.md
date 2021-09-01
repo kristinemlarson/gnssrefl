@@ -10,20 +10,21 @@ Pick the method that you prefer to do your analysis in the course, or experiment
 
 ## **Jupyter Notebook version:**
 
-run the HW0 notebook from the notebook directory; there are two versions: a [jupyter notebook docker container](https://hub.docker.com/r/unavdocker/gnssrefl_jupyter)
+run the HW0 notebook from the notebook directory
+
+there are two versions: 
+
+* a [jupyter notebook docker container](https://hub.docker.com/r/unavdocker/gnssrefl_jupyter)
 
 or  
 
-[jupyter notebook repository to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).  Use the version you intend to use for the course, and/or experiment with both. \
+* [jupyter notebook repository to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).  Use the version you intend to use for the course, and/or experiment with both. \
+
 Skip the rest of the steps below here-- they will be covered in the notebook version of HW0.
 
-## **Command line version Setup:**
+## **Command line version setup:**
 
-There are currently 2 options for running gnssrefl from the command line.
-
-### Run locally (linux/macOS) using the code on GitHub
-
-This HW begins after the user has followed the [gnssrefl installation instructions](https://github.com/kristinemlarson/gnssrefl#environment):
+### Runs locally on linux or macOS using code from GitHub
 
 
 * git clone https://github.com/kristinemlarson/gnssrefl
@@ -42,8 +43,6 @@ This HW begins after the user has followed the [gnssrefl installation instructio
 cd into gnssrefl directory
 
 *NB:* if you use the <code>quicklook</code> function, the figures generated will **not** plot to the screen but will be available in the mounted REFL_CODE/Files volume mounted locally.
-
-
 
 
 ---
