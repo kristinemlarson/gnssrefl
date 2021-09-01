@@ -1,12 +1,9 @@
-# [2021 gnssrefl short course](https://www.unavco.org/event/2021-gnss-interferometric-reflectometry/) 
+##Homework 0
 
-Homework 0 
-
-**goal:** to test if environment and code is ready for processing with gnssrefl
+**goal:** to test if you have properly installed the gnssrefl code.
 
 There are two versions of this homework:  A Jupyter Notebook version, and a gnssrefl command line version.  
 Pick the method that you prefer to do your analysis in the course, or experiment with both.
-
 
 ## **Jupyter Notebook version:**
 
@@ -75,7 +72,7 @@ CRX2RNX  gfzrnx  teqc
 <code>which unxz</code>\
 <code>which uncompress</code>
 
-If you don't get a response, these dependencies are probably note installed in your path. \
+If you don't get a response, these dependencies are probably not installed in your path. \
 If you're running the docker image,
 you should get:
 
@@ -103,11 +100,7 @@ for future analysis.
 Reminder, the .66 file name suffix refers to the
 [elevation masking options](https://github.com/kristinemlarson/gnssrefl#iv-rinex2snr---extracting-snr-data-from-rinex-files-).
 
-Notice the translator version that was used.  
-Unless you explicitly call the pure fortran (<code>-translator fortran</code>) or pure python (<code>-translator python</code>) version, it will be the "hybrid" version (python wrapped fortran using [numpy f2py](https://numpy.org/devdocs/f2py/python-usage.html_).
-
-If you still get an error, we will need to address this.
-We will begin to compile a list of any additional common errors and solutions here.
+If the file is not created - check the logs directory for additional information.
 
 #### b. simple use case that requires CRX2RNX and SP3 orbits:
 <code>rinex2snr p042 2018 150 -orb gnss</code>
