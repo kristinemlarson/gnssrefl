@@ -4,7 +4,7 @@
 
 [You are strongly encouraged to read the documentation.](https://github.com/kristinemlarson/gnssrefl)
 
-There are two versions of this homework:  A Jupyter Notebook version, and a gnssrefl command line version.  
+There are two versions of this homework: a Jupyter Notebook version and a command line version.  
 Pick the method that you prefer to do your analysis in the course, or experiment with both.
 
 ## **Jupyter Notebook version:**
@@ -17,9 +17,8 @@ there are two versions:
 
 or  
 
-* [jupyter notebook repository to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).  Use the version you intend to use for the course, and/or experiment with both. \
+* [jupyter notebook repository to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).  Use the version you intend to use for the course, and/or experiment with both. 
 
-Skip the rest of the steps below here-- they will be covered in the notebook version of HW0.
 
 ## **Command line version setup:**
 
@@ -84,7 +83,7 @@ which gunzip
 ```
 ### 4. Run a quick test of rinex2snr:
 
-#### a. simple use case that requires hatanaka decompression and broadcast orbits:
+#### a. simple use case that requires Hatanaka decompression and broadcast orbits:
 
 <code>rinex2snr p042 2018 150</code>
 
@@ -94,7 +93,7 @@ If you get:
 *SUCCESS: SNR file was created: ...*
 
 you've successfully run the rinex2snr program that:
-* downloaded and uncompressed [hatanaka](https://www.unavco.org/data/gps-gnss/hatanaka/hatanaka.html) rinex for a single station (p042) for a single day (doy 150 in 2018)
+* downloaded and uncompressed [Hatanaka](https://www.unavco.org/data/gps-gnss/hatanaka/hatanaka.html) rinex for a single station (p042) for a single day (doy 150 in 2018)
 * downloaded GPS broadcast orbits
 * calculated azimuth and elevation for each satellite at each epoch given these orbits
 * wrote this az/el, signal, time and CN0 information to a formatted snr output file
@@ -104,7 +103,7 @@ Reminder, the .66 file name suffix refers to the
 
 If the file is not created - check the logs directory for additional information.
 
-#### b. simple use case that requires CRX2RNX and SP3 orbits:
+#### b. simple use case that requires Hatanaka decompression and uses SP3 orbits:
 <code>rinex2snr p042 2018 150 -orb gnss</code>
 
 If you get:
@@ -131,8 +130,9 @@ snr output file for future analysis.
 If you get an error, we will need to address this.
 We will begin to compile a list of any additional common errors and solutions here.
 
-#### c. (optional but encouraged) RINEX 3 simple use case that requires gfzrnx
-**If** you are interested in using RINEX version 3 data, please run this test: \
+#### c. (optional but encouraged) RINEX 3 simple use case that requires that you install gfzrnx
+
+If you are interested in using RINEX version 3 data, please run this test: \
 <code>rinex2snr onsa00swe 2020 1 -archive cddis -orb gnss </code>
 
 If you get:
