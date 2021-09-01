@@ -42,7 +42,7 @@ def check_rinex_header(rinexfile):
                     firstO = False
                     numobs = int(line[0:6].strip())
                     print('Number of observables',numobs)
-                    obs = thisline[6:60]
+                    obs = line[6:60]
                 else:
                     obs = obs + '     ' + thisline
         print(obs)
