@@ -1,6 +1,8 @@
-##Homework 0
+## Homework 0
 
-**goal:** to test if you have properly installed the gnssrefl code.
+**goal:** to make sure you have properly installed <code>gnssrefl</code> 
+
+[You are strongly encouraged to read the documentation.](https://github.com/kristinemlarson/gnssrefl)
 
 There are two versions of this homework:  A Jupyter Notebook version, and a gnssrefl command line version.  
 Pick the method that you prefer to do your analysis in the course, or experiment with both.
