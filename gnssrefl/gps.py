@@ -795,6 +795,7 @@ def rinex_nz(station, year, month, day):
     picks up a RINEX file from GNS New zealand
     you can input day =0 and it will assume month is day of year
     20jul10 - changed access point and ending
+    21sep02 - chagned from ftp to https
     """
     # if doy is input 
     #print('try to find the file in New Zealand')
@@ -803,11 +804,12 @@ def rinex_nz(station, year, month, day):
         d = doy2ymd(year,doy);
         month = d.month; day = d.day
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    gns = 'ftp://ftp.geonet.org.nz/gnss/rinex/'
+    #gns = 'ftp://ftp.geonet.org.nz/gnss/rinex/'
+    # new access point
+    gns = 'https://data.geonet.org.nz/gnss/rinex/'
     oname,fname = rinex_name(station, year, month, day)
     file1 = oname + '.gz'
     url = gns +  cyyyy + '/' + cdoy +  '/' + file1
-
     try:
         wget.download(url,file1)
         subprocess.call(['gunzip', file1])
@@ -832,25 +834,41 @@ def rinex_bkg(station, year, month, day):
         month = d.month; day = d.day
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     gns = 'ftp://igs.bkg.bund.de/EUREF/obs/'
+    #https://igs.bkg.bund.de/root_ftp/IGS/obs/2021/019/
+    # changing to https and gzip
+    gns = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/'
+
     oname,fname = rinex_name(station, year, month, day)
-    # they store hatanaka and normal unix compression
+    # they store hatanaka - compression must depend on year 
     file1 = fname + '.Z'
+    file2 = fname + '.gz'
     url = gns +  cyyyy + '/' + cdoy +  '/' + file1
-    print(url)
 
     if os.path.exists(crnxpath):
+        print('try unix compression')
         try:
             wget.download(url,file1)
             subprocess.call(['uncompress', file1])
-            #print('successful download from BKG')
             subprocess.call([crnxpath, fname])
             subprocess.call(['rm', '-f',fname])
-            #print('successful Hatanaka download and translation from BKG')
         except:
             print('some kind of problem with BKG download',file1)
             subprocess.call(['rm', '-f',file1])
+
+        if not os.path.exists(oname):
+            try:
+                url = gns +  cyyyy + '/' + cdoy +  '/' + file2
+                print('try gzip compression')
+                wget.download(url,file2)
+                subprocess.call(['gunzip', file2])
+                subprocess.call([crnxpath, fname])
+                subprocess.call(['rm', '-f',fname])
+            except:
+                print('some kind of problem with BKG download',file1)
+                subprocess.call(['rm', '-f',file2])
     else:
         print('You cannot use the BKG archive without installing CRX2RNX.')
+
 
 def rinex_nrcan(station, year, month, day):
     """
@@ -2984,17 +3002,31 @@ def rinex_unavco_highrate(station, year, month, day):
     variable. This is from the main unavco directory - not the highrate directory.
 
     WARNING: only rinex version 2 in this world
+    21sep02 - update from ftp to https, also added doy work around
     """
-    #print('unavco high rate')
     crnxpath = hatanaka_version()
-    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    # added this for people that submit doy instead of month and day
+    if day == 0:
+        doy = month
+        cyyyy = str(year)
+        cdoy = '{:03d}'.format(doy)
+        cyy = '{:02d}'.format(year-2020)
+    else:
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    #doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
-    unavco= 'ftp://data-out.unavco.org'
+    #unavco= 'ftp://data-out.unavco.org'
+    unavco= 'https://data.unavco.org/archive/gnss/highrate/1-Hz/rinex/'
+
     filename1 = rinexfile + '.Z'
     filename2 = rinexfiled + '.Z'
     # URL path for the o file and the d file
-    url1 = unavco+ '/pub/highrate/1-Hz/rinex/' + cyyyy + '/' + cdoy + '/' + station + '/' + filename1
-    url2 = unavco+ '/pub/highrate/1-Hz/rinex/' + cyyyy + '/' + cdoy + '/' + station + '/' + filename2
+    #url1 = unavco+ '/pub/highrate/1-Hz/rinex/' + cyyyy + '/' + cdoy + '/' + station + '/' + filename1
+    #url2 = unavco+ '/pub/highrate/1-Hz/rinex/' + cyyyy + '/' + cdoy + '/' + station + '/' + filename2
+    # new path names
+    url1 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename1
+    url2 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename2
+
     # hatanaka executable has to exist
     if os.path.isfile(crnxpath): 
         try:
@@ -3887,9 +3919,11 @@ def highrate_nz(station, year, month, day):
     you can also try this site - not coded up yet, but I think
     the data stay there for a couple months for some sites.
     ftp://ftp.geonet.org.nz/rtgps/rinex1Hz/PositioNZ/2021/062/
+    21sep02 - started to change from ftp to https - but did not finish
     """
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     gns = 'ftp://ftp.geonet.org.nz/gnss/event.highrate/1hz/raw/' + cyyyy +'/' + cdoy + '/'
+    gns = 'https://data.geonet.org.nz/gnss/event.highrate/1hz/raw/' + cyyyy +'/' + cdoy + '/'
     print(gns)
     stationU=station.upper()
     # will not work for all days but life is short
@@ -4510,6 +4544,7 @@ def ga_rinex3(station9ch, year, doy,srate):
     inputs: 9 character station name, year, day of year and srate
     is sample rate in seconds
     note: this code works - but it does not turn it into RINEX 2 for you
+    21sep02 failed attempt to update to https
     """
     fexist = False
     crnxpath = hatanaka_version()
@@ -4518,11 +4553,12 @@ def ga_rinex3(station9ch, year, doy,srate):
     csrate = '{:02d}'.format(srate)
     cyyyy = str(year)
     url = 'ftp://ftp.data.gnss.ga.gov.au/daily/' + cyyyy + '/' + cdoy + '/'
+    #url = 'https://data.gnss.ga.gov.au/daily/' + cyyyy + '/' + cdoy + '/'
     ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
     ff1 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
     ff2 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.rnx'
     url = url + ff
-    #print(url)
+    print(url)
     try:
         wget.download(url,ff)
         subprocess.call(['gunzip',ff])

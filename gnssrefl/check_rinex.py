@@ -36,6 +36,8 @@ def check_rinex_header(rinexfile):
                 print('Receiver information: ', line[:60].strip())
             if ('ANT #') in desc:
                 print('Antenna information:  ',line[:60].strip())
+            if ('INTERVAL') in desc:
+                print('Sample interval    :  ',line[:60].strip())
             if ('TYPES OF OBSERV') in desc:
                 thisline = line[:60].strip()
                 if firstO:
