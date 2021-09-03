@@ -25,50 +25,17 @@
 
 ### 1. News <a name="news"></a>
 
-**August 28, 2021** Fixed NGS archive accessibility.
-
-**June 14,2021** Fixed bug in nolook option.  Fixed rinex2snr conversion for RINEX 3/nav orbits.
-
-**June 1, 2021** Added esa orbits 
-
-**April 17, 2021** New plot added to quickLook. This should provide feedback to the user on which QC 
-metrics to use and which azimuths are valid. New plot also added to daily_avg.
-
-**March 30, 2021** Hopefully bug fixed related to the refraction file (gpt_1wA.pickle). If it is missing from your build,
-it is now downloaded for you. Apologies. 
-
-**March 29, 2021** The L2C and L5 options now use (appropriate) time-dependent lists of satellites. 
-
-**March 17, 2021** I have removed CDDIS from the default RINEX 2.11 archive search list. It is still useable if you use 
--archive cddis.
-
-**March 14, 2021** Minor changes - filenames using the hybrid option are allowed to be 132 characters long.
-This might address issue with people that want to have very very very long path names.
-I also added the decimation feature so it works for both GPS and GNSS.
-
-February 24, 2021 We now have three translation options for RINEX files: fortran, hybrid, and python. The last of these
-is ok for 30 sec data but really too slow otherwise. Hybrid binds the python to my (fast) fortran code.
-This has now been implemented for both GPS and multi-GNSS.
-
-CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
-implemented security restrictions, we have had to change our download access. 
-For this reason we strongly urge that you install **wget** on your machine and that 
-it live in your path. You will only have very limited analysis abilities without it.
-
-I have added more defaults so you don't have to make so many decisions. The defaults are that  
-you are using GPS receiver (not GNSS) and have a fairly standard geodetic 
-site (i.e. not super tall, < 5 meters). If you have previously used this package, please
-note these changes to **rinex2snr**, **quickLook**, and **gnssir**.
-Optional commandline inputs are still allowed.
+As they are announced, I am trying to update dependencies for various archives, 
+as the GNSS world moves from Z compression to gzip and anonymous ftp to https. 
+I recently fixed ngs, bkg, unavco, and nz archives. Bug fixes have been moved to the Bug section.
 
 I encourage you to read [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
-Although this article was originally written to accompany Matlab scripts,
+Although this article was originally written to accompany Matlab scripts, 
 the principles are the same. It explains to you what a reflection
 zone means and what a Nyquist frequency is for GNSS reflections. 
 My reflection zone webapp will [help you pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones) 
 
-If you are interested in measuring sea level, this webapp tells you [how high your site is above 
-sea level.](https://gnss-reflections.org/geoid)  
+If you are interested in measuring sea level, this webapp tells you [how high your site is above sea level.](https://gnss-reflections.org/geoid)  
 
 ### 2. Philosophical Statement <a name="philosophy"></a>
 In geodesy, you don't really need to know much about what you are doing to 
@@ -703,12 +670,50 @@ the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 ### 4. Bugs/Features <a name="bugs"></a>
 
+Bug Diary
+
+**August 28, 2021** Fixed NGS archive accessibility. Also, switched UNAVCO, BKG, NZ Geonet to https.
+
+**June 14,2021** Fixed bug in nolook option.  Fixed rinex2snr conversion for RINEX 3/nav orbits.
+
+**June 1, 2021** Added esa orbits 
+
+**April 17, 2021** New plot added to quickLook. This should provide feedback to the user on which QC 
+metrics to use and which azimuths are valid. New plot also added to daily_avg.
+
+**March 30, 2021** Hopefully bug fixed related to the refraction file (gpt_1wA.pickle). If it is missing from your build,
+it is now downloaded for you. Apologies. 
+
+**March 29, 2021** The L2C and L5 options now use (appropriate) time-dependent lists of satellites. 
+
+**March 17, 2021** I have removed CDDIS from the default RINEX 2.11 archive search list. It is still useable if you use 
+-archive cddis.
+
+**March 14, 2021** Minor changes - filenames using the hybrid option are allowed to be 132 characters long.
+This might address issue with people that want to have very very very long path names.
+I also added the decimation feature so it works for both GPS and GNSS.
+
+**February 24, 2021** We now have three translation options for RINEX files: fortran, hybrid, and python. The last of these
+is ok for 30 sec data but really too slow otherwise. Hybrid binds the python to my (fast) fortran code.
+This has now been implemented for both GPS and multi-GNSS.
+
+CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
+implemented security restrictions, we have had to change our download access. 
+For this reason we strongly urge that you install **wget** on your machine and that 
+it live in your path. You will only have very limited analysis abilities without it.
+
+I have added more defaults so you don't have to make so many decisions. The defaults are that  
+you are using GPS receiver (not GNSS) and have a fairly standard geodetic 
+site (i.e. not super tall, < 5 meters). If you have previously used this package, please
+note these changes to **rinex2snr**, **quickLook**, and **gnssir**.
+Optional commandline inputs are still allowed.
+
 I have been using <code>teqc</code> to reduce the number of observables and to decimate. I have removed the former 
 because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
 and fortran is set to True, unfortunately this will still occur. I am working on removing my 
 code's dependence on <code>teqc</code>.
 
-No phase center offsets have been applied to reflector heights. While these values are relatively small,
+No phase center offsets have been applied to reflector heights. While these values are relatively small for RH < 5 m,
 we do plan to remove them in subsequent versions of the code. 
 
 At least one agency (JAXA) writes out 9999 values for unhealthy satellites. I should remove these satellites 

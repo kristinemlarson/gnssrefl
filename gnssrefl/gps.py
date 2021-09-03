@@ -825,7 +825,6 @@ def rinex_bkg(station, year, month, day):
     picks up a lowrate RINEX file BKG
     you can input day =0 and it will assume month is day of year
     """
-    print('try BKG')
     crnxpath = hatanaka_version()
     # if doy is input 
     if day == 0:
@@ -836,7 +835,8 @@ def rinex_bkg(station, year, month, day):
     gns = 'ftp://igs.bkg.bund.de/EUREF/obs/'
     #https://igs.bkg.bund.de/root_ftp/IGS/obs/2021/019/
     # changing to https and gzip
-    gns = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/'
+    # there is also an IGS directory - which I should add
+    gns = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/'
 
     oname,fname = rinex_name(station, year, month, day)
     # they store hatanaka - compression must depend on year 
@@ -4396,6 +4396,8 @@ def bkg_rinex3(station9ch, year, doy,srate):
     inputs: 9 character station name, year, day of year and srate  
     is sample rate in seconds
     note: this code works - but it does not turn it into RINEX 2 for you
+
+    21sep03 moved from ftp to https
     """
     fexist = False
     crnxpath = hatanaka_version()
@@ -4403,7 +4405,10 @@ def bkg_rinex3(station9ch, year, doy,srate):
     cyy = '{:02d}'.format(year-2000)
     csrate = '{:02d}'.format(srate)
     cyyyy = str(year)
+
     url = 'ftp://igs.bkg.bund.de/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
+    # try this one now?
+    url = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/' 
     ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
     ff1 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
     ff2 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.rnx'
@@ -4749,6 +4754,8 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
 
     warning - i do not write out the L2P data - only the good L2C signals.
 
+    21sep02 -change from ftp to https
+
     author: kristine larson
     """
     fexists = False 
@@ -4757,6 +4764,8 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
     csrate = '{:02d}'.format(srate)
     cyyyy = str(year)
     ftp = 'ftp://data-out.unavco.org/pub/rinex3/obs/' 
+    # updated 21sep03
+    ftp = 'https://data.unavco.org/archive/gnss/rinex3/obs/'
 
     f = cyyyy + '/' + cdoy + '/' 
     ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO'
@@ -5168,6 +5177,9 @@ def cddis3(station9ch, year, doy,srate):
 def unavco3(station9ch, year, doy,srate):
     """
     just gets rinex 3 file from unavco
+    inputs 9 character station id, year, day of year, sample rate
+    author: kristine larson
+    21sep03: change from ftp to https
     """
     fexists = False
     cdoy = '{:03d}'.format(doy)
@@ -5175,6 +5187,8 @@ def unavco3(station9ch, year, doy,srate):
     csrate = '{:02d}'.format(srate)
     cyyyy = str(year)
     ftp = 'ftp://data-out.unavco.org/pub/rinex3/obs/'
+    ftp = 'https://data.unavco.org/archive/gnss/rinex3/obs/'
+
 
     f = cyyyy + '/' + cdoy + '/'
     ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO'
