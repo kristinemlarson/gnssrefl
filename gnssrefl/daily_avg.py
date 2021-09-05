@@ -100,7 +100,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                             doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk],gutcTime[ijk]))
 
         # only save if there are some minimal number of values
-                            if (len(good) > ReqTracks):
+                            if (len(good) >= ReqTracks):
                                 rh = good
                                 # this is the plot with all the data -not the daily average
                                 alltimes = []
