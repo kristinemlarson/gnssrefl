@@ -45,6 +45,7 @@ def main():
 
 
     # where the executable files are (currently) stored publicly
+
     sto = 'https://morefunwithgps.com/public_html/'
 
     if (opsys == 'linux64'):
@@ -56,6 +57,18 @@ def main():
         url = sto + 'gfzrnx.' + opsys + '.e'
         download_chmod_move(url,savename,exedir)
 
+        savename = 'teqc'
+        # static executable 64bit
+        url = 'https://www.unavco.org/software/data-processing/teqc/development/teqc_CentOSLx86_64s.zip'
+        print('Downloading teqc from: ', url)
+        try:
+            wget.download(url,savename + '.zip')
+            subprocess.call(['unzip', savename + '.zip' ])
+            subprocess.call(['mv', '-f',savename, exedir])
+            print('\n Executable stored:', savename)
+        except:
+            print('some kind of kerfuffle trying to install teqc')
+
     elif (opsys == 'macos'):
         savename = 'CRX2RNX'
         url = sto + savename + '.' + opsys + '.e'
@@ -64,10 +77,12 @@ def main():
         savename = 'teqc'
         # added 2021sep13
         url = 'https://www.unavco.org/software/data-processing/teqc/development/teqc_OSX_i5_gcc4.3d_64.zip'
+        print('Downloading teqc from: ', url)
         try:
+            wget.download(url,savename + '.zip')
             subprocess.call(['unzip', savename + '.zip' ])
             subprocess.call(['mv', '-f',savename, exedir])
-            print('\n teqc executable stored:', savename)
+            print('\n Executable stored:', savename)
         except:
             print('some kind of kerfuffle trying to install teqc')
 
