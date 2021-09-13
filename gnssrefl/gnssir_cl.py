@@ -62,6 +62,7 @@ def main():
 #
     station = args.station
     year = int(args.year)
+    year_st = year
     doy= int(args.doy)
     # this is now optional
     snr_type = args.snr
@@ -73,7 +74,7 @@ def main():
         sys.exit()
 
     if (doy > 366):
-        print('doy cannot be larger than 366: ', year)
+        print('doy cannot be larger than 366: ', doy)
         sys.exit()
 
 # allow people to have an extension to the output file name so they can run different analysis strategies
@@ -127,7 +128,7 @@ def main():
 
 # in case you want to analyze multiple years of data
     if args.year_end == None:
-        year_end = year
+        year_end = year_st
     else:
         year_end = int(args.year_end)
 
@@ -200,10 +201,24 @@ def main():
             wget.download(url,picklefile)
             subprocess.call(['mv','-f',picklefile, xdir + '/input/' ])
 
-    year_list = list(range(year, year_end+1))
-    doy_list = list(range(doy, doy_end+1))
+    year_list = list(range(year_st, year_end+1))
+    # changed to better describe year and doy start/end
+    #doy_list = list(range(doy, doy_end+1))
     for year in year_list:
+        # edits made 2021Sep10 by Makan karegar
+        if year != year_end:
+            doy_en = 366
+        else:
+            doy_en = doy_end
+
+        # edits made 2021Sep10 by Makan karegar
+        if year == year_st:
+            doy_list = list(range(doy, doy_en+1))
+        else:
+            doy_list = list(range(1, doy_en+1))
+
         for doy in doy_list:
+
             # to make kelly happy :-)
             #print('--------------------------------------------------')
             #print('RESULTS gnssir for: ', station, year, doy)

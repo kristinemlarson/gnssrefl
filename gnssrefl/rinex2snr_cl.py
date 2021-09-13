@@ -58,6 +58,7 @@ def main():
         print('Illegal input - Station name must have 4 or 9 characters. Exiting.')
         sys.exit()
     year = args.year
+    year_st = year
 
 
     if len(str(year)) != 4:
@@ -66,6 +67,7 @@ def main():
 
 
     doy= args.doy
+    doy_st = doy
     isnr = args.snr # defined as an integer
     #snrt = args.snrEnd # 
     #isnr = int(snrt)
@@ -160,7 +162,11 @@ def main():
         print('you have invoked the weekly option')
         skipit = 7
 
-    doy_list = list(range(doy, doy2+1,skipit))
+    # change skipit to be sent to rinex2snr.py
+    #doy_list = list(range(doy, doy2+1))
+    #doy_list = list(range(doy, doy2+1,skipit))
+    # this makes the correct lists in the function
+    doy_list = [doy_st, doy2]
     year_list = list(range(year1, year2+1))
 
     overwrite = False
@@ -188,9 +194,7 @@ def main():
     if args.mk == 'True':
         print('you have invoked the Makan option')
         mk = True
-
-
-    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk)
+    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk,skipit)
     print('Feedback written to subdirectory logs')
 
 

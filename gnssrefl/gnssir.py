@@ -54,7 +54,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     twoDays = False
     obsfile2= '' # dummy value for name of file for the day before, when we get to that
     fname, resultExist = g.LSPresult_name(station,year,doy,extension) 
-    print('Results are written to:', fname)
+    #print('Results are written to:', fname)
 
     #if (resultExist):
     #    print('Results already exist on disk')
@@ -80,6 +80,8 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays)
         snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays) 
     if (allGood == 1):
+        print('Results will be written to:', fname)
+
         ele=apply_refraction_corr(lsp,ele,p,T)
         fout,frej = g.open_outputfile(station,year,doy,extension) 
 #  main loop a given list of frequencies

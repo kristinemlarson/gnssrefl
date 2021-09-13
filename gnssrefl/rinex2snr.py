@@ -34,7 +34,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
     return fname
 
-def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk):
+def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk,skipit):
     """
     runs the rinex 2 snr conversion
     inputs:
@@ -49,7 +49,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     fortran = boolean, whether you use fortran rinex translators
     nol = boolean for nolook, if set to True, then it will assume RINEX files are in local directory
     overwrite = boolean, make a new SNR file even if one already exists
-    weekly = boolean to make snr files with 7 day difference
+    translate = string with .... fortran, python, hybrid ??
+    srate = sample rate
+    mk = makan option
+    skipit = skips making files every day, so a value of 7 means weekly.  1 means do every day
 
     2021feb11, kristine Larson
     translator = fortran, python, or hybrid
@@ -58,6 +61,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     2021aug01 added mk option for uppercase file names per makan karegar request
     2021aug15v added weekly option
     """
+    # do not allow illegal skipit values
+    if skipit < 1:
+        skipit = 1
 
     NS = len(station)
     if (NS == 4):
@@ -74,11 +80,31 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     else:
         print('Illegal station input - Station must have 4 or 9 characters. Exiting')
         sys.exit()
+    year_st = year_list[0]
+    year_end = year_list[-1]
+    doy_st = doy_list[0]
+    doy_end = doy_list[-1]
+    # 2021 september 12 KL
+    # i would like to put this in rinex2snr_cl.py - but I am trying to avoid increasing
+    # the workload for the Notebook programmers before the short course.
+    #print(year_st,year_end,doy_st, doy_end)
+
+# this way we are overwriting the doy_list variable
 # loop thru years and days 
     for year in year_list:
         ann = g.make_nav_dirs(year)
-        dec31 = g.dec31(year)
         cyyyy = str(year)
+        dec31 = g.dec31(year)
+        if year != year_end:
+            doy_en = dec31
+        else:
+            doy_en = doy_end
+
+        if year == year_st:
+            doy_list = list(range(doy_st, doy_en+1,skipit))
+        else:
+            doy_list = list(range(1, doy_en+1,skipit))
+
         for doy in doy_list:
             csnr = str(isnr)
             cdoy = '{:03d}'.format(doy) ; cyy = '{:02d}'.format(year-2000)
