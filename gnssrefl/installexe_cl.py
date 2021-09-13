@@ -65,6 +65,7 @@ def main():
             wget.download(url,savename + '.zip')
             subprocess.call(['unzip', savename + '.zip' ])
             subprocess.call(['mv', '-f',savename, exedir])
+            subprocess.call(['rm', '-f',savename + '.zip' ])
             print('\n Executable stored:', savename)
         except:
             print('some kind of kerfuffle trying to install teqc')
@@ -82,6 +83,7 @@ def main():
             wget.download(url,savename + '.zip')
             subprocess.call(['unzip', savename + '.zip' ])
             subprocess.call(['mv', '-f',savename, exedir])
+            subprocess.call(['rm', '-f',savename + '.zip' ])
             print('\n Executable stored:', savename)
         except:
             print('some kind of kerfuffle trying to install teqc')
