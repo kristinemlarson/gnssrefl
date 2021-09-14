@@ -34,7 +34,7 @@ def main():
     parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high")
     parser.add_argument("-dec", default=0, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default='False', metavar='False', type=str, help="True means only use RINEX files on local machine")
-    parser.add_argument("-fortran", default='True', metavar='True',type=str, help="True means use Fortran RINEX translators ")
+    parser.add_argument("-fortran", default='False', metavar='True',type=str, help="True means use Fortran RINEX translators ")
     parser.add_argument("-archive", default=None, metavar='all',help="specify one archive: unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
