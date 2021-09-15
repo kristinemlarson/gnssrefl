@@ -297,12 +297,14 @@ compressed.
 
 *Non-Python Code*
 
-**All executables must be stored in the EXE directory.**  If you do not define EXE, 
+**All executables must be stored in the EXE directory.** There are three 
+main codes I recommend that you install:
 
 * Required translator for compressed (Hatanaka) RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. 
 
 * Optional datatool, **teqc**, is highly recommended.  There is a list of static executables at the
-bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). 
+bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). Unfortunately 
+this code is no longer supported by UNAVCO.
 
 * Optional datatool, **gfzrnx** is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
