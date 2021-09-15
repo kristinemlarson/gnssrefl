@@ -60,7 +60,7 @@ my [google maps web app interface](https://gnss-reflections.org/geoid?station=sm
 
 **gnssrefl** is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
-The main difference bewteen this version and previous versions is that I am
+The main difference between this version and previous versions is that I am
 attempting to use proper python packaging rules! However, this is a big learning curve for me,
 and I know that I still have a lot to learn. I have separated out the main
 parts of the code and the command line inputs so that you can use the libraries
@@ -458,10 +458,16 @@ It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beido
 
 **What if you are providing the RINEX files and you don't want the code to search for the files online?** <code>-nolook True</code>
 
+**What if you are have high-rate (e.g. 1 second) RINEX files, but you want (e.g.) 5 second data?**  <code>-dec 5 </code>
+
+
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
-If you invoke this, it currently only looks at the UNAVCO, GA, or NRCAN archives. Please beware - it takes a long time to download a 
-highrate GNSS RINEX file (even when it is compressed).  And it also takes a long time to compute orbits for it. For high-rate data, you should never use the python translation option.
+If you invoke this flag, it currently only looks at the UNAVCO, GA, or 
+NRCAN archives. Please beware - it takes a long time to download a 
+highrate GNSS RINEX file (even when it is compressed). And it also takes 
+a long time to compute orbits for it. For high-rate data, you should **never** use 
+the python translation option.
 
 **Output SNR file format**
 
