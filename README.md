@@ -672,6 +672,10 @@ the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 Bug Diary
 
+**September 15, 2021** There was a screen output about missing fortran translators that 
+was a bug. The hybrid translator is the default and you should not be getting warnings 
+about missing fortran translators.
+
 **August 28, 2021** Fixed NGS archive accessibility. Also, switched UNAVCO, BKG, NZ Geonet to https.
 
 **June 14,2021** Fixed bug in nolook option.  Fixed rinex2snr conversion for RINEX 3/nav orbits.
@@ -725,10 +729,21 @@ the newer ones). It is unfortunate, but I cannot do anything about this.
 
 ### 5. Utilities <a name="helper"></a>
 
-<code>daily_avg</code> is a utility for cryosphere people interested in computing daily snow 
-accumulation. It can be used for lake levels. *It is not to be used for tides!*
+<code>daily_avg</code> is a utility for cryosphere people interested 
+in measuring snow accumulation via daily values. It can also 
+be used for lake levels. *It is not to be used for tides!*
+The goal is to make a valid daily average - for this reason, we have two required inputs 
+for quality control. The first is called a *median filter* value. This input helps remove
+large outliers. For each day, a median RH is found. Then all values larger than the 
+*median filter* value from the median RH are thrown out. The daily average 
+is computed with the remaining RH values. The second required input 
+to the code sets a limit for how many satellite arcs are considered
+sufficient for a daily average. If you had 5 arcs, e.g., you might not want to compare that 
+with another day where 100 arcs were available. The number of tracks required 
+varies a lot depending on the azimuth mask and the number of frequencies available.
 
-<code>download_rinex</code> can be useful if you want to download RINEX v2.11 or 3 files (using the version flag) without using 
+<code>download_rinex</code> can be useful if you want to 
+download RINEX v2.11 or 3 files (using the version flag) without using 
 the reflection-specific codes. Sample calls:
 
 - <CODE>download_rinex p041 2020 6 1</CODE> downloads the data from June 1, 2020
