@@ -735,7 +735,13 @@ be used for lake levels. *It is not to be used for tides!*
 The goal is to make a valid daily average - for this reason, we have two required inputs 
 for quality control. The first is called a *median filter* value. This input helps remove
 large outliers. For each day, a median RH is found. Then all values larger than the 
-*median filter* value from the median RH are thrown out. The daily average 
+*median filter* value from the median RH are thrown out. Here is an example from one of 
+our use cases. THe median filter value is set to remove those larger outliers before 
+we compute daily averages. 
+
+<img src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn_1.png>
+
+The daily average 
 is computed with the remaining RH values. The second required input 
 to the code sets a limit for how many satellite arcs are considered
 sufficient for a daily average. If you had 5 arcs, e.g., you might not want to compare that 
