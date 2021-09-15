@@ -269,8 +269,12 @@ year and sp3 or nav depending on the orbit format.
 * REFL_CODE = where the reflection code inputs (SNR files and instructions) and outputs (RH)
 will be stored (see below). Both SNR files and results will be saved here in year subdirectories.
 
-If you don't define these environment variables, the code should assume your local working directory (where you installed
-the code) is where you want everything to be. The orbits, SNR files, and periodogram results are stored in 
+If you are running in a bash environment, you should save these environment variables in
+the .bashrc file that is run whenever you log on.
+
+If you don't define these environment variables, the code should assume 
+your local working directory (where you installed the code) is where 
+you want everything to be. The orbits, SNR files, and periodogram results are stored in 
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
 *Installing the Python*
@@ -294,16 +298,8 @@ compressed.
 *Non-Python Code*
 
 **All executables must be stored in the EXE directory.**  If you do not define EXE, 
-it will look for them in your local working directory.  The Fortran translators are 
-much faster than using python. We now advocate using the hybrid translator option, which 
-links to the Fortran internally. Using true python to translate a high-rate GPS file is 
-impossibly slow.
 
-* Required Translator for compressed (Hatanaka) RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. 
-
-* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e.** For the code: https://github.com/kristinemlarson/gpsonlySNR
-
-* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e** For the code: https://github.com/kristinemlarson/gnssSNR
+* Required translator for compressed (Hatanaka) RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. 
 
 * Optional datatool, **teqc**, is highly recommended.  There is a list of static executables at the
 bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). 
@@ -311,11 +307,21 @@ bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.h
 * Optional datatool, **gfzrnx** is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
 
+While I think it is better for people to download these tools to make sure you get
+the right one, I have written a utility that will download the appropriate files for 
+a macOS or linux (64 bit) installation.  It is called <code>installexe</code>.  
+Type -h for more information.
+
+We no longer encourage people to install these Fortran RINEX translators. The Fortran is now 
+included in the python build.
+
+* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e.** For the code: https://github.com/kristinemlarson/gpsonlySNR
+
+* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e** For the code: https://github.com/kristinemlarson/gnssSNR
+
 <HR>
 
 ### iii. RINEX File Formats <a name="fileformats"></a>
-
-(under construction)
 
 RINEX files must be version 2.11 or 3. 
 
@@ -326,8 +332,10 @@ For RINEX 2.11, filenames should be lowercase and following the community standa
 Example: at010050.12o is station at01 on day 5 and year 2012.
 
 In many cases Hatanaka compressed formats are used by data archives. These 
-have a 'd' instead an 'o' at the end of the filename. If you want to use those files, you must install the 
-CRX2RNX executable.  I think my code allows you to gzip the RINEX files if you are providing them.
+have a 'd' instead an 'o' at the end of the filename. If you want 
+to use those files, you must install the 
+CRX2RNX executable described in the previous section.  I think my code 
+allows you to gzip the RINEX files if you are providing them.
 
 We are working to make a NMEA reader for this software package.
 
