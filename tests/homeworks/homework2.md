@@ -54,22 +54,15 @@ Hand-edit the azimuths in the json file to:
 ```
 "azval": [ 40, 90, 90, 180, 180, 270, 270, 330 ],
 ```
-
     
-Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012:
+Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012.
 
-*note that it will be normal to see 'Could not read the first SNR file:' results - this is because we used 
-the weekly setting when downloading the snr files. We are setting gnssir to run for 
-every day of the year but if the snr file doesn't exist, it will continue on - in this case we only have one snr file per week.
+Note that it is normal to see 'Could not read the first SNR file:' results - this is because we used 
+the weekly setting when downloading the snr files. We are setting <code>gnssir</code> to run for 
+every day of the year but if the snr file doesn't exist, it will continue on.
 
-Now, we can use the daily_avg tool to compute a daily average reflector height. A median filter is set to 0.25 meters 
-and 30 individual tracks are required in order to recover a daily average:
-
-
-
-This will create a daily file that contains the daily averages. Let's plot them:
-
-
+Now, we can use the <code>daily_avg</code> tool to compute a daily average reflector height. 
+A median filter is set to 0.25 meters and 30 individual tracks are required in order to recover a daily average.
 The data in this plot show you long-term accumulation as well as relatively small snow 
-accumulation events. The overall plot is dominated by the large melt event in the summer.
+accumulation events. The overall plot is dominated by the large melt event in the summer of 2012.
 
