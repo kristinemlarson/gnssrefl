@@ -1,6 +1,6 @@
 ## Homework 0
 
-**goal:** to make sure you have properly installed <code>gnssrefl</code> 
+**goal:** to make sure you have properly installed <code>gnssrefl</code>
 
 [You are strongly encouraged to read the documentation.](https://github.com/kristinemlarson/gnssrefl)
 
@@ -9,20 +9,30 @@ Pick the method that you prefer to do your analysis in the course, or experiment
 
 ## **Jupyter Notebook version:**
 
-run the HW0 notebook from the notebook directory
-
-there are two versions: 
-
-* a [jupyter notebook docker container](https://hub.docker.com/r/unavdocker/gnssrefl_jupyter)
-
-or  
-
-* [jupyter notebook repository to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).  Use the version you intend to use for the course, and/or experiment with both. 
+run the HW0 notebook from the [jupyter notebook repository, either via docker or to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).
 
 
-## **Command line version setup:**
+## **Command line version options: [gitHub](#runs-locally-on-linux-or-macos-using-code-from-github) or [Docker image](#docker-gnssrefl-command-line-container-option)**
 
 ### Runs locally on linux or macOS using code from GitHub
+
+**NOTE** this setup requires system dependencies: **gcc** and **gfortran**.  To install:
+* if you are using a LINUX then simply run `apt-get install -y gcc` and `apt-get install -y gfortran` in your terminal (or <code>yum install -y gcc-gfortran</code> ).
+* if you are using a MacOS then you will need to install xcode. First, in your terminal, check if you have xcode by `xcode-select -p`.
+If it is installed, it should return a path. If it is not installed then run `xcode-select --install`.
+This should install gcc.You can check if you have gcc by `gcc --version`. Check if you have gfortran by `gfortran --version`.
+If you do not have gfortran, then you can use homebrew to install, if you have it `brew install gfortran`.
+If you don't have homebrew, then see [here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
+
+  * If you are still experiencing trouble then it is recommended you try the [docker container version](#docker-gnssrefl-command-line-container-option).
+
+**Assign environment variables and install gnssrefl**
+([here is a helpful video covering this portion](https://www.youtube.com/watch?v=tdFi2OGIQwg))
+* cd to your desired working directory
+* create the following directories for gnssrefl: EXE, ORBITS and REFL_CODE [hint <code>mkdir</code> ]
+* set your gnssrefl [enviroment variables](https://en.wikipedia.org/wiki/Environment_variable), EXE, ORBITS and REFL_CODE to these respective paths
+  * hint: to check absolute path of a directory <code>pwd</code>
+  * hint: to set environment variable in shell, <code>export VARNAME=path/to/directory</code>.  [To set an environment variable everytime you open the shell](https://unix.stackexchange.com/questions/117467/how-to-permanently-set-environmental-variables), use the same export command in the the appropriate initialization file for your shell).
 
 
 * git clone https://github.com/kristinemlarson/gnssrefl
@@ -30,15 +40,22 @@ or
 * activate your virtual environment
 * pip install .
 
+Finally, if you haven't already installed required executables in $EXE (CRX2RNX, gfzrnx):
+* install them using gnssrefl commandline installer
+  * <code>installexe *OS_type*</code>, where *OS_type* is either {<code>macos</code>, <code>linux64</code>}
+
 ### Docker gnssrefl command line container option
 
 [docker image run commands](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_docker#repo-for-gnssrefl-command-line-docker-image)
 
-(run in directory location that you wish to store processed results)
+* cd into directory that you wish to store processed results
 
-<code>docker run -it -v $(pwd)/REFL_CODE:/home/jovyan/gnssir/gnssrefl/REFL_CODE/ -v $(pwd)/REFL_CODE/Files:/home/jovyan/gnssir/gnssrefl/REFL_CODE/Files unavdocker/gnssrefl:latest /bin/bash</code>
+* <code>docker run -it -v $(pwd)/REFL_CODE:/home/jovyan/gnssir/gnssrefl/REFL_CODE/ -v $(pwd)/REFL_CODE/Files:/home/jovyan/gnssir/gnssrefl/REFL_CODE/Files unavdocker/gnssrefl:latest /bin/bash</code>
 
-cd into gnssrefl directory
+(Description of the commands used:  <code>-it</code> calls interactive process (bin/bash shell); <code>-v</code> mounts external volumes)
+
+
+* cd into gnssrefl directory, and you now have a linux container running gnssrefl.
 
 *NB:* if you use the <code>quicklook</code> function, the figures generated will **not** plot to the screen but will be available in the mounted REFL_CODE/Files volume mounted locally.
 
@@ -52,7 +69,15 @@ cd into gnssrefl directory
 <code>echo $ORBITS</code> \
 <code>echo $REFL_CODE</code>
 
-If you don't get a response, these probably aren't set correctly.  If you're running the docker gnssrefl,
+If you don't get a response, these probably aren't set correctly.  
+
+You should get something like:
+```console
+echo $EXE
+/path/to/directory/EXE
+```
+
+If you're running the docker gnssrefl,
 you should get:
 
 ```console
