@@ -43,15 +43,17 @@ control settings.
 
 Now make SNR files for gls1 for the whole year 2012. Use the <code>-weekly True</code> setting to save time.
 
-We will next analyze a year of L1 GPS reflection data from this site. We will use the default minimum and maximum 
+We will next analyze a year of L1 GPS reflection data from this site. 
+We will use the default minimum and maximum 
 reflector height values (0.5 and 6 meters). But for the reasons previously stated, we will 
-set a minimum elevation angle of 7 degrees. We also specify that we only want to use the L1 data and set peak2noise and a mimimum
-amplitude for the periodograms. We use the utility make_json_input to set and store these analysis settings:
+set a minimum elevation angle of 7 degrees. We also specify that we only want to use the L1 data.
+Use the utility <code>make_json_input</code> to set and store the analysis settings.
 
-Now we are going to hand edit the azimuths to between 40 and 330 degrees.
+Hand-edit the azimuths in the json file to:
 
-
-file['azval'] = [40,90,90,180,180,270,270,330]
+```
+"azval": [ 40, 90, 90, 180, 180, 270, 270, 330 ],
+```
 
     
 Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012:
