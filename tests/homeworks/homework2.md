@@ -1,6 +1,3 @@
-# [2021 gnssrefl short course](https://www.unavco.org/event/2021-gnss-interferometric-reflectometry/)
-
-
 ## Homework 2
 
 **Due date:** This homework is to be completed **before** the short course given on October 21. You need to make
@@ -36,16 +33,13 @@ longitude, and ellipsoidal height that is returned by the webapp because you wil
 Our ultimate goal in this use case is to analyze one year of data. We have chosen the year 2012 
 because there was a large melt event on the ice sheet. In order to set the proper quality control parameters, we will use 
 <code>quickLook</code> for one day. First we need to translate one day of RINEX data. 
-We use the <code>rinex2snr</code> for this purpose. 
-Please make this conversion for the year 2012 and day of year 100.
+We use the <code>rinex2snr</code> for this purpose. Use day of year 100.
 Once you have successfully created a SNR file, run <code>quickLook</code>.
 [For more details on quicklook output](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/quickLook_desc.md).
-
 
 Looking at the metrics plots, the top plot we see that the retrieved reflector heights are consistent at all azimuths.
 Retrievals for azimuths between ~340 degrees and ~40 degrees are consistently marked as not having met quality 
 control settings. 
-
 
 Now make SNR files for gls1 for the whole year 2012. Use the <code>-weekly True</code> setting to save time.
 
