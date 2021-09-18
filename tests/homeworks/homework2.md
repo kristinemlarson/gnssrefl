@@ -32,20 +32,16 @@ longitude, and ellipsoidal height that is returned by the webapp because you wil
 
 Our ultimate goal in this use case is to analyze one year of data. We have chosen the year 2012 
 because there was a large melt event on the ice sheet. In order to set the proper quality control parameters, we will use 
-<code>quickLook</code> for one day. First we need to translate one day of RINEX data. 
-We use the <code>rinex2snr</code> for this purpose. Use day of year 100.
+<code>quickLook</code> for one day. First you need to translate one day of RINEX data.  Use the year 2012 and day of year 100.
 Once you have successfully created a SNR file, run <code>quickLook</code>.
-[For more details on quicklook output](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/quickLook_desc.md).
+[For more details on translating RINEX files and quicklook output](https://github.com/kristinemlarson/gnssrefl).
 
-Looking at the metrics plots, the top plot we see that the retrieved reflector heights are consistent at all azimuths.
-Retrievals for azimuths between ~340 degrees and ~40 degrees are consistently marked as not having met quality 
-control settings. 
+Looking at the QC metrics plots created by <code>quickLook</code>, do you have some ideas on how to change the azimuth mask angles?
 
-Now make SNR files for gls1 for the whole year 2012. Use the <code>-weekly True</code> setting to save time.
+Now make SNR files for gls1 for the all of 2012. Use the <code>-weekly True</code> setting to save time.
 
-We will next analyze a year of L1 GPS reflection data from this site. 
-We will use the default minimum and maximum 
-reflector height values (0.5 and 6 meters). But for the reasons previously stated, we will 
+We will next analyze a year of L1 GPS reflection data from gls1. We will use the default minimum and maximum 
+reflector height values (0.5 and 6 meters). But for the reasons previously stated, you will want to 
 set a minimum elevation angle of 7 degrees. We also specify that we only want to use the L1 data.
 Use the utility <code>make_json_input</code> to set and store the analysis settings.
 
@@ -55,13 +51,10 @@ Hand-edit the azimuths in the json file to:
 "azval": [ 40, 90, 90, 180, 180, 270, 270, 330 ],
 ```
     
-Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012.
+Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012 using <code>gnssir</code>.
+Note that it is normal to see 'Could not read the first SNR file:' because we only created SNR files once a week.
 
-Note that it is normal to see 'Could not read the first SNR file:' results - this is because we used 
-the weekly setting when downloading the snr files. We are setting <code>gnssir</code> to run for 
-every day of the year but if the snr file doesn't exist, it will continue on.
-
-Now, we can use the <code>daily_avg</code> tool to compute a daily average reflector height. 
+Now you can use the <code>daily_avg</code> tool to compute a daily average reflector height for gls1. 
 A median filter is set to 0.25 meters and 30 individual tracks are required in order to recover a daily average.
 The data in this plot show you long-term accumulation as well as relatively small snow 
 accumulation events. The overall plot is dominated by the large melt event in the summer of 2012.

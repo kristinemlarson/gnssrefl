@@ -35,9 +35,7 @@ look back to the [documentation](https://github.com/kristinemlarson/gnssrefl).
 
 Now use your knowledge of the site's height above mean sea level to properly window 
 the reflector height and using the azimuth and elevation angle mask you picked out
-earlier.
-
-Now you should see better retrievals.
+earlier. Do you think the retrievals are better now? Should your azimuth mask be modified?
 
 
 ## Example 2
