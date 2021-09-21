@@ -4,7 +4,7 @@
 sure the software has been properly installed and you have successfully completed the "homework 0" assignment. You should 
 also read the [gnssrefl documentation provided on GitHub.](https://github.com/kristinemlarson/gnssrefl)
 
-**Purpose:** Learn how to measure water level with gnssrefl using GNSS data 
+**Purpose:** Learn how to measure water level with <code>gnssrefl</code> using GNSS data 
 
 
 **Station:**

@@ -4,7 +4,7 @@
 **Due date:** This homework is to be completed **before** the short course given on October 21. You need to make
 sure the software has been properly installed and you have successfully completed the "homework 0" assignment.
 
-**Purpose:** Learn how to set your azimuth and elevation angle mask  
+**Purpose:** Practice setting your azimuth and elevation angle mask  
 
 The purpose of this homework is to get you to better understand 
 how to properly run <code>gnssrefl</code>. Each GNSS station is different and you will have to 
@@ -15,7 +15,8 @@ some tools to help you determine this mask.
 
 ## Example 1
 
-Let us start with station **at01** in St. Michael, Alaska. The data from
+Let us start with station **at01** in St. Michael, Alaska. 
+It is operated by [UNAVCO](https://www.unavco.org). The data from
 this GNSS site will be used to measure sea level, so the relevant reflecting surface is 
 the ocean. Use the geoid tab on the webapp and enter the station name.
 You can see the general location of the antenna with respect to the coast. 
@@ -54,4 +55,8 @@ lower bound. Also compare the defaults with 5-15 degrees elevation angles to see
 Refer to this [publication](https://www.kristinelarson.net/wp-content/uploads/2021/05/Holden-May2021.pdf) on 
 Lake Taupo for more information on this site.
 
+## Extra Credit
 
+* Try to find a station website for TGHO at GNS.
+
+* Try to find a station website for AT01 at UNAVCO.

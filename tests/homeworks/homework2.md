@@ -3,7 +3,7 @@
 **Due date:** This homework is to be completed **before** the short course given on October 21. You need to make
 sure the software has been properly installed and you have successfully completed the "homework 0" assignment.
 
-**Purpose:** Learn how to measure snow depth levels with gnssrefl using GNSS data 
+**Purpose:** Learn how to measure snow depth levels with <code>gnssrefl</code> using GNSS data 
 
 
 **Station:**
@@ -20,7 +20,7 @@ is unlikely that a complicated azimuth mask will be required.
 
 gls1 was originally installed with an elevation mask of 7 degrees, which is suboptimal for reflections research.
 Even though the mask was later removed, we will use 7 degrees as the minimum elevation angle for all our analysis.
-Similarly, even though the site managers later changed to enable L2C tracking, here we will only use L1 data.
+Similarly, even though the site managers later changed to enable L2C tracking, this was not the case in 2012, so here we will only use L1 data.
 
 Use the geoid tab at the [gnss-reflections webapp](https://gnss-reflections.org) to gather more information about the site. 
 You can enter the station coordinates by hand if 
@@ -32,7 +32,9 @@ longitude, and ellipsoidal height that is returned by the webapp because you wil
 
 Our ultimate goal in this use case is to analyze one year of data. We have chosen the year 2012 
 because there was a large melt event on the ice sheet. In order to set the proper quality control parameters, we will use 
-<code>quickLook</code> for one day. First you need to translate one day of RINEX data.  Use the year 2012 and day of year 100.
+<code>quickLook</code> for one day. 
+
+First you need to translate one day of RINEX data.  Use the year 2012 and day of year 100.
 Once you have successfully created a SNR file, run <code>quickLook</code>.
 [For more details on translating RINEX files and quicklook output](https://github.com/kristinemlarson/gnssrefl).
 
@@ -55,7 +57,8 @@ Now that you have SNR files and json inputs, you can go ahead and estimate refle
 Note that it is normal to see 'Could not read the first SNR file:' because we only created SNR files once a week.
 
 Now you can use the <code>daily_avg</code> tool to compute a daily average reflector height for gls1. 
-A median filter is set to 0.25 meters and 30 individual tracks are required in order to recover a daily average.
+A median filter is set to 0.25 meters and 30 individual tracks are required in order to recover a daily average 
+[there is more information here on these parameters](https://github.com/kristinemlarson/gnssrefl#helper).
 The data in this plot show you long-term accumulation as well as relatively small snow 
 accumulation events. The overall plot is dominated by the large melt event in the summer of 2012.
 

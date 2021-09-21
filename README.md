@@ -780,9 +780,9 @@ the reflection-specific codes. Sample calls:
 
 <code>ydoy</code> translates year,day of year to month and day
 
-<code>llh2xyz</code> translates latitude, longitude, and ellipsoidal ht to X, Y, Z
+<code>llh2xyz</code> translates latitude (deg), longitude (deg), and ellipsoidal ht (m) to X, Y, Z (m)
 
-<code>xyz2llh</code> translates Cartesian coordinates to latitude, longitude, height
+<code>xyz2llh</code> translates Cartesian coordinates (meters) to latitude (deg), longitude (deg), ellipsoidal height (m)
 
 <code>gpsweek</code> translates year, month, day into GPS week, day of week (0-6) 
    
@@ -791,6 +791,12 @@ the reflection-specific codes. Sample calls:
 <code>download_tides</code> downloads up to a month of NOAA tide gauge data given station number (7 characters),
 and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,
 but this utility writes out a file with only columns of numbers instead of csv. 
+
+<code>query_unr</code> returns latitude, longitude, and ellipsoidal height for stations that 
+were in the Nevada Reno database a year ago (i.e. when I downloaded it).
+
+<code>check_rinex</code> returns simple information from the file header, such as receiver
+and antenna type, receiver coordinates, and whether SNR data are in the file. RINEX 2.11 only
 
 <HR>
 
