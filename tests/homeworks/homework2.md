@@ -57,8 +57,11 @@ Now that you have SNR files and json inputs, you can go ahead and estimate refle
 Note that it is normal to see 'Could not read the first SNR file:' because we only created SNR files once a week.
 
 Now you can use the <code>daily_avg</code> tool to compute a daily average reflector height for gls1. 
-A median filter is set to 0.25 meters and 30 individual tracks are required in order to recover a daily average 
-[there is more information here on these parameters](https://github.com/kristinemlarson/gnssrefl#helper).
-The data in this plot show you long-term accumulation as well as relatively small snow 
+Try setting the median filter to 0.25 meters and individual tracks to 30. These numbers are used 
+by <code>daily_vg</code> to set QC in order to recover a trustwortth daily average [(there is more information here on these parameters).](https://github.com/kristinemlarson/gnssrefl#helper). A plain txt file 
+with the RH outputs are created as well as several plots. 
+The data in the main RH plot show you long-term accumulation as well as relatively small snow 
 accumulation events. The overall plot is dominated by the large melt event in the summer of 2012.
+Note that RH is plotted on the y-axis with RH decreasing rather than increasing. Why do you think we 
+did that?
 
