@@ -11,6 +11,8 @@
 
 [Link to youtube videos on GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)
 
+[Link to the Jupyter Notebooks](https://www.unavco.org/event/2021-gnss-interferometric-reflectometry/)
+
 ### Table of Contents
 
 1. [News](#news)
