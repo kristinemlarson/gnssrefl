@@ -7,6 +7,10 @@
 
 [Short cut to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
+[Homeworks for the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks)
+
+[Link to youtube videos on GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)
+
 ### Table of Contents
 
 1. [News](#news)
