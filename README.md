@@ -410,7 +410,7 @@ Using hybrid (the default):
 
 <code>rinex2snr tgho 2020 132 -archive nz</code>
 
-What if you want to run the code for all the data for any year?  You can use doy_end:
+**Run the code for all the data for any year?**
 
 <code>rinex2snr tgho 2019 1  -archive nz -doy_end 365</code>
  

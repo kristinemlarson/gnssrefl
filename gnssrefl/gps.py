@@ -1152,6 +1152,7 @@ def getsp3file_mgex(year,month,day,pCtr):
                 secure_file = file2
                 print('check the correct week everyone uses')
                 secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
+                #print(secure_dir, secure_file)
                 foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
                 if not foundit:
                     print('use the wrong week at CDDIS')
@@ -5437,6 +5438,7 @@ def rapid_gfz_orbits(year,month,day):
     bigname = 'GFZ0OPSRAP_' + cyyyy + cdoy + '0000_01D_15M_ORB.SP3'
     bignamegz = bigname + '.gz'
     url = gns + 'w' + str(wk) + '/' + bignamegz
+    print(url)
     if (year + doy/365.25) < dday:
         print('No rapid GFZ orbits until 2021/doy137')
         return '', '', foundit

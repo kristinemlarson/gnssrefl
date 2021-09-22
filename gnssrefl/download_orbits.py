@@ -61,6 +61,8 @@ def main():
     if pCtr == 'gps+glo':
         pCtr = 'jax'
 
+    if pCtr == 'gfr':
+        pCtr = 'gbm' # since I cannot get their direct address to work 
 
     if pCtr == 'nav':
         navname,navdir,foundit = g.getnavfile(year, month, day) 
@@ -70,14 +72,16 @@ def main():
         if (pCtr == 'igs') or (pCtr == 'igr'):
             filename, fdir, foundit = g.getsp3file_flex(year,month,day,pCtr)
         else:
-            if pCtr == 'gfr':
-                filename, fdir, foundit = g.rapid_gfz_orbits(year,month,day)
-            else:
-                if pCtr == 'esa':
+            #if pCtr == 'gfr':
+                # does not work and i cannot access the directory so I cannot fix it
+                #filename, fdir, foundit = g.rapid_gfz_orbits(year,month,day)
+                #filename, fdir, foundit = g.rapid_gfz_orbits(year,month,day)
+            #else:
+            if pCtr == 'esa':
                     # this is ugly - but hopefully will work for now.  
-                    filename, fdir, foundit = g.getsp3file_flex(year,month,day,pCtr)
-                else:
-                    filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)
+                filename, fdir, foundit = g.getsp3file_flex(year,month,day,pCtr)
+            else:
+                filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)
         if foundit:
             print('SUCCESS:', fdir+'/'+filename )
         else:

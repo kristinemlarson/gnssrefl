@@ -73,7 +73,8 @@ def main():
     #isnr = int(snrt)
     orb = args.orb
 # currently allowed orbit types - shanghai removed 2020sep08
-# added GFZ rapid, aka gfr 2021May19
+# added GFZ rapid, aka gfr 2021May19 but it does not work anymore.  point it to gbm
+# 
 # added ESA, thank you to Makan
     orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum','gfr','esa']
     if orb not in orbit_list:
@@ -87,6 +88,10 @@ def main():
 
     # if you choose GNSS, you get the GFZ sp3 file 
     if orb == 'gnss':
+        orb = 'gbm'
+
+    # if you choose gfz rapid, you get the GFZ rapid file  I believe
+    if orb == 'gfr':
         orb = 'gbm'
 
     # if you choose GPS+GLO, you get the JAXA sp3 file 
