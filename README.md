@@ -200,8 +200,8 @@ one in the northern hemisphere and one in the southern hemisphere.
 <TD><img src=http://gnss-reflections.org/static/images/P038.jpg width=300></TD>
 </TR>
 <TR>
-<TD><img src=tests/use_cases/mchl_google.jpg width=300></TD>
-<TD><img src=tests/use_cases/p038_google.jpg width=300></TD>
+<TD><img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/mchl_google.jpg width=300></TD>
+<TD><img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p038_google.jpg width=300></TD>
 </TR>
 </table>
 </p>
@@ -227,17 +227,17 @@ but not too tall. We will try 4 meters and then check later to make sure that wa
 <p align=center>
 <table align=center>
 <TR>
-<TD>A. <img src=tests/use_cases/ross-google.jpg width=300> <BR>
+<TD>A. <img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-google.jpg width=300> <BR>
 Map view of station ROSS </TD>
 <TD>B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> <BR>
 Photograph of station ROSS</TD>
 </TD>
 </TR>
 <Tr>
-<TD>C. <img src=tests/use_cases/ross-first.jpg width=300><BR>
+<TD>C. <img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-first.jpg width=300><BR>
 Reflection zones for GPS satellites at elevation <BR>angles of 5-25 degrees 
 for a reflector height of <BR>4 meters.</TD> 
-<TD>D. <img src=tests/use_cases/ross-second.jpg width=300><BR>
+<TD>D. <img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-second.jpg width=300><BR>
 Reflection zones for GPS satellites at elevation <BR>angles of 5-15 degrees 
 for a reflector height of <BR>4 meters.  </TD>
 </Tr>
@@ -537,7 +537,7 @@ this site the antenna phase center is ~ 2 meters above the ground. The colors ch
 
 <CODE>quickLook</code> also provides a summary of various quality control metrics:
 
-<img src="tests/use_cases/p041_l1_qc.png" width=600>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041_l1_qc.png" width=600>
 
 The top plot shows the sucessful RH retrievals in blue and unsuccessful RH retrievals in gray. 
 In the center panel are the peak to noise ratios. The last plot is the amplitude of the spectral peak. The dashed
@@ -548,7 +548,7 @@ frequency 20:
 
 <CODE>quickLook p041 2020 132 -fr 20</CODE>
 
-<img src="tests/use_cases/p041-l2c.png" width=600>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l2c.png" width=600>
 
 **L2C results are always superior to L1 results.** If you have any influence over a GNSS site, please 
 ask the station operators to track modern GPS signals such as L2C and L5.
@@ -557,12 +557,12 @@ ask the station operators to track modern GPS signals such as L2C and L5.
 
 Make a SNR file <code>rinex2snr ross 2020 170</code> and <code>quickLook ross 2020 170 -e1 5 -e2 15</code>
 
-<img src=tests/use_cases/ross-qc.png width=600>
+<img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-qc.png width=600>
 The good RH estimates (in blue in the top panel) are telling us that we were right when we assessed 
 reflection zones using 4 meters. We can also see that the best retrievals are in the southeast quadrant (azimuths 90-180 degrees).
 This is further emphasized in the next panel, that shows the actual periodograms.
 
-<img src=tests/use_cases/ross-lsp.png width=600>
+<img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-lsp.png width=600>
 
 [**Example for a site on an ice sheet**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_gls1.md)
 
