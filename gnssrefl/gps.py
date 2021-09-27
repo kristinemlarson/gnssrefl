@@ -5416,6 +5416,8 @@ def queryUNR(station):
 
     if (llat != 0):
         print(lower, llat, llon, height)
+        x,y,z=llh2xyz(llat,llon,height)
+        print("%15.4f %15.4f %15.4f "% (x,y,z) )
     else:
         print('No coordinates in the UNR database for ', lower)
 
@@ -5424,6 +5426,7 @@ def rapid_gfz_orbits(year,month,day):
     input year, month, day OR
     year, doy, 0
     downloads rapid GFZ sp3 file and stores in $ORBITS
+    2021 sep 21: this does not work anymore.  I do not know why
     """
     foundit = False
     dday = 2021 + 137/365.25
