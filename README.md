@@ -758,18 +758,6 @@ The goal is to make a valid daily average - for this reason, we have two require
 for quality control. The first is called a *median filter* value. This input helps remove
 large outliers. For each day, a median RH is found. Then all values larger than the 
 *median filter* value from the median RH are thrown out. 
-
-Here is an example from one of our use cases. You can easily see that there are some very large outliers,
-and an average could be impacted by them. 
-
-
-<img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-A.png>
-<BR>
-
-<img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-B.png>
-
-However, if you use a median filter value of say 0.25 to 0.35 meters, 
-the big outliers will be removed before you compute the daily average. 
 The second required input to <code>daily_avg</code> sets a limit for how 
 many satellite arcs are considered sufficient to create a trustworth daily average. 
 If you had 5 arcs, for example, you probably would not want to compare that 
@@ -777,6 +765,28 @@ with another day where 100 arcs were available. The number of tracks required
 varies a lot depending on the azimuth mask and the number of frequencies available.
 If you are not sure what values to use at your GNSS site, run it once with very minimal constraints.
 The code provides some feedback plots that will let you pick better values.
+
+
+Here is an example from one of our use cases where there are a few large outliers.  
+I have set the median filter value to 2 meters and the required number of tracks to 12:
+
+<code> daily_avg mchn 2 12 </code>
+
+You can easily see the outliers. 
+
+
+<center>
+<img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-A.png>
+</center>
+
+Next I have rerun the code with a better median filter constraint of 0.25 meters:
+
+<code> daily_avg mchn 0.25 12 </code>
+
+<center>
+<img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-B.png>
+</center>
+
 
 <code>download_rinex</code> can be useful if you want to 
 download RINEX v2.11 or 3 files (using the version flag) without using 
