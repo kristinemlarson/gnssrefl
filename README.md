@@ -775,18 +775,23 @@ I have set the median filter value to 2 meters and the required number of tracks
 You can easily see the outliers. 
 
 
-<center>
+<p align=center>
 <img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-A.png>
-</center>
+</p>
 
 Next I have rerun the code with a better median filter constraint of 0.25 meters:
 
 <code> daily_avg mchn 0.25 12 </code>
 
-<center>
+<p align=center>
 <img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-B.png>
-</center>
+</p>
 
+A daily average plot is also made and a text file of the outputs is created.
+
+<p align=centerr>
+<img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-C.png>
+</p>
 
 <code>download_rinex</code> can be useful if you want to 
 download RINEX v2.11 or 3 files (using the version flag) without using 
@@ -817,7 +822,7 @@ and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works per
 but this utility writes out a file with only columns of numbers instead of csv. 
 
 <code>query_unr</code> returns latitude, longitude, and ellipsoidal height for stations that 
-were in the Nevada Reno database a year ago (i.e. when I downloaded it).
+were in the Nevada Reno database a year ago (i.e. when I downloaded it). 
 
 <code>check_rinex</code> returns simple information from the file header, such as receiver
 and antenna type, receiver coordinates, and whether SNR data are in the file. RINEX 2.11 only
