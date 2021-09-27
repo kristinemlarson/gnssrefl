@@ -763,7 +763,10 @@ Here is an example from one of our use cases. You can easily see that there are 
 and an average could be impacted by them. 
 
 
-<img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn_1.png>
+<img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-A.png>
+<BR>
+
+<img width=400 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-B.png>
 
 However, if you use a median filter value of say 0.25 to 0.35 meters, 
 the big outliers will be removed before you compute the daily average. 
