@@ -125,7 +125,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             if (not illegal_day) and (not snre):
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
-                print('Will seek RINEX file ', station, ' year:', year, ' doy:', doy, ' translate with ', translator)
+                print('Will seek RINEX file ', station, ' year:', year, ' doy:', doy, ' translate with ', translator, ' at the ', archive, ' archive')
                 if nol:
                     # this assumes RINEX file is in local directory or "nearby"
                     if version == 2:
@@ -224,6 +224,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
         # new function to do the whole orbit thing
         foundit, f, orbdir, snrexe = g.get_orbits_setexe(year,month,day,orbtype,fortran) 
         # if you have the orbit file, you can get the rinex file
+        print('Orbit file: ', orbdir + '/' + f)
         if foundit:
             # now you can look for a rinex file
             rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
