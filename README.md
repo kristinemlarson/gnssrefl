@@ -445,15 +445,15 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 *orbit file options for general users:*
 
 - gps : will use GPS broadcast orbits (**this is the default**)
-- gps+glo : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
-- gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
+- gps+glo : uses rapid GFZ orbits
+- gnss : uses GFZ orbits, which is multi-GNSS (available in 3-4 days?)
 
 *orbit file options for experts:*
 
 - nav : GPS broadcast, perfectly adequate for reflectometry. 
 - igs : IGS precise, GPS only
 - igr : IGS rapid, GPS only
-- jax : JAXA, GPS + Glonass, within a few days, missing block III GPS satellites
+- jax : JAXA, GPS + Glonass, reliably within a few days, missing block III GPS satellites
 - gbm : GFZ Potsdam, multi-GNSS, not rapid
 - grg: French group, GPS, Galileo and Glonass, not rapid
 - esa : ESA, multi-GNSS
@@ -465,7 +465,6 @@ It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beido
 **What if you are providing the RINEX files and you don't want the code to search for the files online?** <code>-nolook True</code>
 
 **What if you are have high-rate (e.g. 1 second) RINEX files, but you want (e.g.) 5 second data?**  <code>-dec 5 </code>
-
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
