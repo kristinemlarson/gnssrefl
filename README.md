@@ -846,9 +846,8 @@ We need help to maintain and improve this code. How can you help?
 
 <ol>
 
-* Archives are constantly changing their protocols. If you find one in <code>gnssrefl</code> that doesn't work anymore,
+* Archives are *constantly* changing their file transfer protocols. If you find one in <code>gnssrefl</code> that doesn't work anymore,
 please fix it and let us know. Please test that it works for older and newer data.
-
 
 * If you would like to add an archive, please do so. Use the existing code in gps.py as a starting point. 
 
