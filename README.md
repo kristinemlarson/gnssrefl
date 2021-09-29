@@ -18,12 +18,12 @@
 
 **IMPORTANT:**
 
-This setup requires system dependencies: gcc and gfortran. To install: 
+This setup requires system dependencies: gcc and gfortran.  
 
-**if you are using LINUX** then simply run apt-get install -y gcc and apt-get install -y 
+**If you are using LINUX** then simply run apt-get install -y gcc and apt-get install -y 
 gfortran in your terminal (or yum install -y gcc-gfortran ).
 
-**if you are using a MacOS** then you will need to install xcode. First, in your terminal, check if you have xcode 
+**If you are using a MacOS** then you will need to install xcode. First, in your terminal, check if you have xcode 
 by xcode-select -p. If it is installed, it should return a path. If it is not installed then run 
 xcode-select --install. This should install gcc.You can check if you have gcc by gcc --version. 
 Check if you have gfortran by gfortran --version. If you do not have gfortran, then you can use homebrew 
