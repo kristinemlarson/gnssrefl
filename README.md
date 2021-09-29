@@ -695,6 +695,8 @@ the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 Bug Diary
 
+**fixed query_unr input files and -rate high archive choices.**
+
 **September 15, 2021** There was a screen output about missing fortran translators that 
 was a bug. The hybrid translator is the default and you should not be getting warnings 
 about missing fortran translators.
