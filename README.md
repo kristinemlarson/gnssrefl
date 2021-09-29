@@ -849,6 +849,7 @@ We need help to maintain and improve this code. How can you help?
 * Archives are constantly changing their protocols. If you find one in <code>gnssrefl</code> that doesn't work anymore,
 please fix it and let us know. Please test that it works for older and newer data.
 
+
 * If you would like to add an archive, please do so. Use the existing code in gps.py as a starting point. 
 
 * We need better models for GNSS-IR far more than we need more journal articles finding that the 
@@ -858,6 +859,12 @@ method works. And we need these models to be in python.
 works on fitting the detrended SNR data, please consider contributing it.
 
 * If you have a better refraction correction, please provide it to us in python.
+
+* Write up a new [use case](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md).
+
+* Investigate surface related biases for polar tide gauge calculations (ice vs water).
+
+* We have contributors for allowing the NMEA format. We currently need to translate to Fortran to improve the speed.
 
 </ol>
 
@@ -874,6 +881,6 @@ Kristine M. Larson
 
 [https://kristinelarson.net](https://kristinelarson.net)
 
-This documentation was updated on June 12, 2021.
+This documentation was updated on September 28, 2021.
 
 
