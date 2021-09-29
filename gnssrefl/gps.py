@@ -3027,6 +3027,9 @@ def rinex_unavco_highrate(station, year, month, day):
     # new path names
     url1 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename1
     url2 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename2
+    print('looking here')
+    print(url1)
+    print(url2)
 
     # hatanaka executable has to exist
     if os.path.isfile(crnxpath): 
@@ -3796,6 +3799,7 @@ def rinex_nrcan_highrate(station, year, month, day):
             dname1 = station + cdoy + alpha[h] + e + '.' + cyy + 'd'
             dname2 = station + cdoy + alpha[h] + e + '.' + cyy + 'o'
             url = gns +  ch + '/' + dname
+            print(url)
             try:
                 wget.download(url,dname)
                 subprocess.call(['uncompress',dname])
@@ -4222,15 +4226,17 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
         #print('RINEX file exists')
     else:
         if receiverrate == 'high':
-            if archive == 'unavco':
+            if (archive == 'unavco') or (archive == 'all'):
                 #print('seeking high rate data at UNAVCO ')
                 rinex_unavco_highrate(station, year, month, day)
-            if archive == 'nrcan':
+            if not os.path.isfile(rinexfile):  
+                if (archive == 'nrcan') or (archive == 'all'):
                 #print('seeking high rate data at NRCAN ')
-                rinex_nrcan_highrate(station, year, month, day)
-            if archive == 'ga':
+                    rinex_nrcan_highrate(station, year, month, day)
+            if not os.path.isfile(rinexfile):
+                if (archive == 'ga') or (archive == 'all'):
                 #print('seeking high rate data at GA')
-                rinex_ga_highrate(station, year, month, day)
+                    rinex_ga_highrate(station, year, month, day)
         else:
           # lowrate data
             if archive == 'all':
@@ -5394,32 +5400,58 @@ def queryUNR(station):
     use UNR database to get a priori lat/long in degrees
     and ellipsoidal height (meters)
     """
+    xdir = os.environ['REFL_CODE']
+    print('Check for the database')
+
     lower = station
     if len(lower) != 4:
         print('No coordinates in the UNR database for ', lower)
         print('The station name must be four characters long')
         return
-
-    labels = np.genfromtxt('gnssrefl/Data.names', delimiter=' ', dtype=str)
-    raw_data = np.genfromtxt('gnssrefl/Data.pos', delimiter=' ' )
-    data = {label: row for label, row in zip(labels, raw_data)}
-    # should put this in a try
-    station = station.upper()
-    llat = 0; llon = 0; height = 0;
-    try:
-        llh = data[station]
-        llat =llh[0]
-        llon =llh[1]
-        height =llh[2]
-    except:
-        print('nada')
-
-    if (llat != 0):
-        print(lower, llat, llon, height)
-        x,y,z=llh2xyz(llat,llon,height)
-        print("%15.4f %15.4f %15.4f "% (x,y,z) )
+    # if you used github and run the code from that directory
+    nfile = 'gnssrefl/Data.names'
+    pfile = 'gnssrefl/Data.pos'
+    if os.path.isfile(nfile) and os.path.isfile(pfile):
+       print('found the files in the gnssrefl directory')
     else:
-        print('No coordinates in the UNR database for ', lower)
+        nfile = xdir + '/Files/Data.names'
+        pfile = xdir + '/Files/Data.pos'
+        if os.path.isfile(nfile) and os.path.isfile(pfile):
+            print('found the files in the REFL_CODE Files directory')
+        else:
+            print('try to download the files from github for you')
+            try:
+                url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/Data.names' 
+                url2= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/Data.pos' 
+                wget.download(url1,nfile)
+                wget.download(url2,pfile)
+            except:
+                print('failed to get the database files')
+                return
+    if os.path.isfile(nfile) and os.path.isfile(pfile):
+        labels = np.genfromtxt(nfile, delimiter=' ', dtype=str)
+        raw_data = np.genfromtxt(pfile, delimiter=' ' )
+        data = {label: row for label, row in zip(labels, raw_data)}
+    # should put this in a try
+        station = station.upper()
+        llat = 0; llon = 0; height = 0;
+        try:
+            llh = data[station]
+            llat =llh[0]; llon =llh[1]; height =llh[2]
+        except:
+            print('nada-no coordinates in the database')
+
+        if (llat != 0):
+            print('\n', lower, llat, llon, height)
+            x,y,z=llh2xyz(llat,llon,height)
+            print("%15.4f %15.4f %15.4f "% (x,y,z) )
+        else:
+            print('No coordinates in the UNR database for ', lower)
+    else:
+        print('Cannot find the requesite UNR files, which usually live in the gnssrefl directory below')
+        print('where you installed the gnssrefl code or in $REFL_CODE/Files.')
+        return
+
 
 def rapid_gfz_orbits(year,month,day):
     """

@@ -5,6 +5,8 @@
 
 ### gnssrefl
 
+[Would you like to help write code for this software package?](#help)
+
 [Short cut to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
 [Homeworks for the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks)
@@ -838,7 +840,29 @@ look to the publications page on my [personal website](https://kristinelarson.ne
 
 <HR>
 
-### 7. Acknowledgements <a name="acknowledgements"></a>
+### 7. Help <a name="help"></a>
+
+We need help to maintain and improve this code. How can you help?
+
+<ol>
+* Archives are constantly changing their protocols. If you find one that doesn't work anymore,
+please consider fixing the existing code. 
+
+* If you would like to add an archive, please do so. Use the existing code in gps.py as a starting point.
+
+* We need better models for GNSS-IR far more than we need more journal articles finding that the 
+method works. And we need these models to be in python.
+
+* I would like to add a significant wave height calculation to this code. If you have such code that 
+works on fitting the detrended SNR data, please consider contributing it.
+
+* If you have a better refraction correction, please provide it in python.
+
+</ol>
+
+<HR>
+
+### 8. Acknowledgements <a name="acknowledgements"></a>
 
 [Radon Rosborough](https://github.com/raxod502) helped me with my python questions. 
 Joakim Strandberg provided python RINEX translators, and Johannes Boehm provided source code for the 

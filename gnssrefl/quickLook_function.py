@@ -159,8 +159,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 #print('file exists on disk')
             else:
                 print('>>>> The SNR the file does not exist ',obsfile)
-                print('This code used to try and make one for you, but I have removed this option.')
-                print('Please us rinex2snr and make a SNR file')
+                #print('This code used to try and make one for you, but I have removed this option.')
+                print('Please us rinex2snr to make a SNR file')
                 sys.exit()
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)
     if allGood == 1:
