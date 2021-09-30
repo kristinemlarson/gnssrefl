@@ -838,8 +838,8 @@ the reflection-specific codes. Sample calls:
 and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,
 but this utility writes out a file with only columns of numbers instead of csv. 
 
-<code>query_unr</code> returns latitude, longitude, and ellipsoidal height for stations that 
-were in the Nevada Reno database a year ago (i.e. when I downloaded it). 
+<code>query_unr</code> returns latitude, longitude, and ellipsoidal height and Cartesian position 
+for stations that were in the Nevada Reno database ~ a year ago (i.e. when I downloaded it). 
 
 <code>check_rinex</code> returns simple information from the file header, such as receiver
 and antenna type, receiver coordinates, and whether SNR data are in the file. RINEX 2.11 only
