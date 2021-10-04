@@ -4046,6 +4046,9 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         #print('getting nav orbits ... i hope')
         f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
         snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
+    elif orbtype == 'test':
+        print('getting gFZ orbits from CDDIS using test protocol')
+        f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
     else:
         print('I do not recognize the orbit type you tried to use: ', orbtype)
 
@@ -5556,4 +5559,60 @@ def rinex_unavco(station, year, month, day):
             #    print(err)
         else:
             hatanaka_warning()
+
+
+def avoid_cddis(year,month,day):
+    """
+    work around for people that can't use CDDIS ftps
+    this will get multi-GNSS files for GFZ from IGN
+    """
+    fdir = os.environ['ORBITS'] + '/' + str(year) + '/sp3/'
+    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    foundit = False; 
+    wk,swk = kgpsweek(year, month, day, 0,0,0)
+    cwk = '{:04d}'.format(wk); cday = str(int(swk/86400))
+    # old file name for precise files
+    filenameZ = 'gbm' + cwk + cday + '.sp3.Z'
+    filename = 'gbm' + cwk + cday + '.sp3'
+    if os.path.isfile(fdir + filename):
+        print(filename,' orbit file already exists on disk'); foundit = True
+        return filename, fdir, foundit
+    if os.path.isfile(fdir + filename + '.xz'):
+        subprocess.call(['unxz',fdir + filename + '.xz'])
+        print(filename, ' orbit file already exists on disk'); foundit = True
+        return filename, fdir, foundit
+
+    # only use this for weeks < 2050
+    if (wk < 2050):
+        url = 'ftp://igs.ensg.ign.fr/pub/igs/products/mgex/' + cwk +  '/' + filenameZ
+        try:
+            wget.download(url,filenameZ)
+            subprocess.call(['uncompress',filenameZ])
+            subprocess.call(['mv',filename, fdir])
+            foundit = True
+        except:
+            print('could not find ', filename)
+    if (not foundit):
+        filename = 'GFZ0MGXRAP_' + cyyyy  + cdoy + '0000_01D_05M_ORB.SP3'
+        filenamegz = 'GFZ0MGXRAP_' + cyyyy  + cdoy + '0000_01D_05M_ORB.SP3.gz'
+
+        if os.path.isfile(fdir + filename):
+            print(filename, ' orbit file already exists on disk'); foundit = True
+            return filename, fdir, foundit
+        if os.path.isfile(fdir + filename + '.xz'):
+            subprocess.call(['unxz',fdir + filename + '.xz'])
+            print(filename, ' orbit file already exists on disk'); foundit = True
+            return filename, fdir, foundit
+
+        url = 'ftp://igs.ensg.ign.fr/pub/igs/products/mgex/' + cwk +  '/' + filenamegz
+        try:
+            wget.download(url, filenamegz)
+            if os.path.exists(filenamegz):
+                subprocess.call(['gunzip',filenamegz])
+                subprocess.call(['mv',filename, fdir])
+                foundit=True
+        except:
+            print('could not find',filename)
+
+    return filename, fdir, foundit
 
