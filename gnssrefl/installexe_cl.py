@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-installs non-python executables
+installs non-python executables for the gnssrefl code
 """
 import argparse
 import wget

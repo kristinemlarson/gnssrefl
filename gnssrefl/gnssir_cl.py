@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # kristine M. larson
+# command line for gnssir.py module
 
 
 import argparse
@@ -21,10 +22,6 @@ import gnssrefl.gps as g
 
 
 def main():
-# pick up the environment variable for where you are keeping your LSP data
-#    print('=================================================================================')
-#    print('===========================RUNNING GNSS IR ======================================')
-#    print('=================================================================================')
  
 #
 # user inputs the observation file information

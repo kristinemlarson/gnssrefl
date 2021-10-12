@@ -871,15 +871,17 @@ please fix it and let us know. Please test that it works for older and newer dat
 method works. And we need these models to be in python.
 
 * I would like to add a significant wave height calculation to this code. If you have such code that 
-works on fitting the detrended SNR data, please consider contributing it.
+works on fitting the spectrum computed with detrended SNR data, please consider contributing it.
 
-* If you have a better refraction correction, please provide it to us in python.
+* If you have a better refraction correction than we are using, please provide it to us as a function in python.
 
 * Write up a new [use case](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md).
 
 * Investigate surface related biases for polar tide gauge calculations (ice vs water).
 
 * We have contributors for allowing the NMEA format. We currently need to translate to Fortran to improve the speed.
+
+* I have ported NOCtide.m and will add it here when I get a chance.
 
 </ol>
 

@@ -7,6 +7,7 @@ import argparse
 import datetime
 import requests
 import sys
+import gnssrefl.gps as g
 
 def main():
     """
@@ -65,8 +66,11 @@ def main():
             hh = int(t[11:13]); minutes = int(t[14:16])
             today=datetime.datetime(year,mm,dd)
             doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
-            fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} \n".format(year,mm,dd,hh,minutes,sl,doy))
+            m,f = g.mjd(year,mm,dd,hh,minutes,0)
+            mjd = m + f;
+            #print(mjd)
+            fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year,mm,dd,hh,minutes,sl,doy,mjd))
     fout.close()
-    print('NOAA tide data written out to ', outfile)
+    print('NOAA tide gauge data written out to: ', outfile)
 if __name__ == "__main__":
     main()

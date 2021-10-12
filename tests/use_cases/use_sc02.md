@@ -159,10 +159,11 @@ Multiple authors have recommended using different analysis strategies, and
 you are most definitely encouraged to look at using these techniques. In most cases
 smoothness strategies are used to improve the retrievals.  
 
-I would like to include Simon Williams RH retrieval/tidal estimation code in this 
-package. He has been kind enough to make the [Matlab code open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous. 
+I have recently posted Simon Williams tidal estimation code to python. I will do my best to add it to this 
+package.
 
-How well does this simple analyis compare to the [official NOAA tide gauge data stream?](https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
+How well does this simple analyis compare 
+to the [official NOAA tide gauge data stream?](https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880)
 
 You can download the NOAA data yourselves or use our utility:
 

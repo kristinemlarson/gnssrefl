@@ -19,14 +19,9 @@ import numpy as np
 import wget
 from numpy import array
 
-# my code - is it needed here?
 import gnssrefl.read_snr_files as snr
 # for future ref
 #import urllib.request
-
-#file="P041.cwu.nam14.csv"
-#url="ftp://data-out.unavco.org/pub/products/position/P041/" + file
-#urllib.request.urlretrieve(url, file)
 
 
 # various numbers you need in the GNSS world
@@ -78,7 +73,7 @@ class wgs84:
 def define_filename(station,year,doy,snr):
     """
     inputs:
-    station name 
+    station name  (4 char lowercase)
     year 
     doy 
     snr file type (e.g. 99, 66)
@@ -5616,3 +5611,46 @@ def avoid_cddis(year,month,day):
 
     return filename, fdir, foundit
 
+def get_cddis_navfile_test(navfile,cyyyy,cyy,cdoy):
+    """
+    kristine larson
+    inputs navfile name with character string verisons of year, 2ch year and doy
+    tries to download from CDDIS archive
+
+    20jun11, implemented new CDDIS security requirements
+    21jan06, gz instead of Z
+    try to get galileo nav files
+    """
+    # ths old way
+    # just in case you sent it the navfile with auto instead of brdc
+    #cddisfile = 'brdc' + navfile[4:] + '.Z'
+    #cddis = 'ftp://cddis.nasa.gov'
+    # navfile will continue to be called auto
+    #navfile_compressed = cddisfile
+
+    # new way
+    cddisfile = 'brdc' + cdoy + '0.' +cyy  +'e'
+    cddisfile_compressed = cddisfile + '.Z'
+    cddisfile_gzip = cddisfile + '.gz'
+    # where the file should be at CDDIS ....
+    mdir = '/gps/data/daily/' + cyyyy + '/' + cdoy + '/' +cyy + 'n/'
+
+    try:
+        cddis_download(cddisfile_compressed,mdir)
+        if os.path.isfile(cddisfile_compressed):
+            subprocess.call(['uncompress',cddisfile_compressed])
+    except:
+        okokok = 1
+    #except Exception as err:
+    #    print(err)
+    if not os.path.isfile(cddisfile):
+        print('going for the gzip version of the file')
+        cddis_download(cddisfile_gzip,mdir)
+        if os.path.isfile(cddisfile_gzip):
+            subprocess.call(['gunzip',cddisfile_gzip])
+
+    if os.path.isfile(cddisfile):
+        print('found it and change the name ')
+        subprocess.call(['mv',cddisfile,navfile])
+
+    return navfile

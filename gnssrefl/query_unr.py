@@ -3,6 +3,8 @@
 extracts coordinates for stations that were in the UNR
 database (when I downloaded it ;-)
 author: kristine larson
+input four character station name, lowercase
+
 """
 import argparse
 import wget
@@ -17,7 +19,7 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="station name", type=str)
+    parser.add_argument("station", help="station name - 4 char - lowercase ", type=str)
 
     args = parser.parse_args()
 

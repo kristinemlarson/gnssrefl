@@ -2,7 +2,7 @@
 """
 Translates rinex3 to rinex2 - but only
 cares about SNR data and reflections
-kristine larson
+author: kristine larson
 Updated: March 24, 2021
 """
 import argparse

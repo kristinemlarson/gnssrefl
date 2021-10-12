@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-converts XYZ to latlonht
-kristine larson
+converts latlonht to cartesian coordinates
+author: kristine larson
 """
 import argparse
 import sys

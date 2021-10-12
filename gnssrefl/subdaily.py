@@ -1,5 +1,5 @@
 # codes for subdaily module. primarily for tidal applications
-# kristine larson february 2021
+# author: kristine larson february 2021
 import argparse
 import datetime
 import json
@@ -28,7 +28,7 @@ def print_badpoints(t,outliersize):
     """
 # (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)
 # year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS
-# (0)  (1)   (2) (3)  (4)     (5)   6 )    (7)    (8)   (9)  (10) (11) (12)    (13)     (14)    (
+# (0)  (1)   (2) (3)  (4)     (5)   6 )    (7)    (8)   (9)  (10) (11) (12)    (13)     (14)    (15)  (16) ... 
 
     m,n = t.shape
     f = 'outliers.txt'
@@ -172,7 +172,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     tv = tv[ii,:]
 
 
-    # sill y - why read it if you are not going to use it
+    # silly - why read it if you are not going to use it
     # and restrict by doy - mostly to make testing go faster
     ii = (tv[:,1] >= d1) & (tv[:,1] <= d2)
     tv = tv[ii,:]
@@ -250,6 +250,9 @@ def quickTr(year, doy,frachours):
 
 
 def fract_to_obstimes(spl_x):
+    """
+    this should be documented!
+    """
     N=len(spl_x)
     obstimes = np.empty(shape=[0, 1])
     year = np.floor(spl_x)
@@ -293,8 +296,10 @@ def in_out(x,y):
     
 def write_out_header(fout,station,extraline):
     """
+    writes out header for results file ... 
     21may04 extra line for user
     changed this so that it is EXACTLY THE SAME as gnssir, with extra columns for m/d/h/m
+    author: kristine larson
     """
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     fout.write('% Results for {0:4s} calculated on {1:20s} \n'.format(  station, xxx ))
@@ -402,6 +407,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     """
     fs = 12 # fontsize
     # read in the tvd values which are the output of gnssir
+    # i.e. the reflector heights
     tvd = np.loadtxt(fname,comments='%')
     # sort the data by days 
     ii = np.argsort( (tvd[:,1]+tvd[:,4]/24) ).T

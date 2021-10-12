@@ -241,7 +241,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,-1))
 
             # i do not know how to add a grid using these version of matplotlib
-            tt = 'GNSS-IR results: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy)
+            tt = 'GNSS-IR: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy) + ' elev: ' + str(e1) + '-' +  str(e2)
             if pltscreen:
                 aaa, bbb = plt.ylim()
                 # see if this works
@@ -269,7 +269,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             print('plot saved to ', f)
             plt.savefig(f)
             # sure - why not throw in another plot?
-            goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f)
+            goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2)
             plt.show()
           
     else: 
@@ -282,7 +282,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
     return data,datakey
 
-def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq):
+def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     """
     simple visualizer of "good" and "bad" azimuths
     input is a filename, the station name, and the min and max RH
@@ -308,7 +308,7 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq):
     plt.plot(a[ij,0], a[ij,1], 'o',color='blue',label='good')
     plt.plot(a[ik,0], a[ik,1], 'o',color='gray', label='bad')
     ydoy = ' ' + str(year) + '/' + str(doy) + ' '
-    plt.title('quickLook Retrieval Metrics: ' + station + ydoy + g.ftitle(freq),fontsize=fs)
+    plt.title('quickLook Retrieval Metrics: ' + station + ydoy + g.ftitle(freq) + 'elev:' + str(e1) + '-' + str(e2) ,fontsize=fs)
     plt.legend(loc="upper right")
     plt.ylabel('Refl. Ht. (m)',fontsize=fs)
     plt.grid()
