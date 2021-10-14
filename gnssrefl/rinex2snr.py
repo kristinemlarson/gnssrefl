@@ -228,6 +228,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
         if foundit:
             # now you can look for a rinex file
             rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
+            rinexfile = exedir + "/" + rinexfile
             # This goes to find the rinex file. I am changing it to allow 
             # an archive preference 
             g.go_get_rinex_flex(station,year,month,day,receiverrate,archive)
