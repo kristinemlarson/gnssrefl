@@ -4839,6 +4839,9 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     navfile_sopac2 =  navfile
     url_sopac2 = sopac + '/pub/rinex/' + cyyyy + '/' + cdoy + '/' + navfile_sopac2
 
+    #print(url_sopac1)
+    #print(url_sopac2)
+
 
     try:
         wget.download(url_sopac1,navfile_compressed)

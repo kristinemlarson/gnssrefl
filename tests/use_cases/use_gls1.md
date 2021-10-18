@@ -82,7 +82,7 @@ Compare that to its level when the site was installed in the year 2011:
 
 <CODE>quickLook gls1 2014 271</CODE>
 
-<img src="tests/use_cases/gls1-2011.png">
+<img src="gls1-2011.png">
 
 ## Measure Snow Accumulation in 2012
 
