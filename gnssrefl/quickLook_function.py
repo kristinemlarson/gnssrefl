@@ -308,6 +308,7 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     plt.plot(a[ij,0], a[ij,1], 'o',color='blue',label='good')
     plt.plot(a[ik,0], a[ik,1], 'o',color='gray', label='bad')
     ydoy = ' ' + str(year) + '/' + str(doy) + ' '
+    print(freq, g.ftitle(freq))
     plt.title('quickLook Retrieval Metrics: ' + station + ydoy + g.ftitle(freq) + 'elev:' + str(e1) + '-' + str(e2) ,fontsize=fs)
     plt.legend(loc="upper right")
     plt.ylabel('Refl. Ht. (m)',fontsize=fs)
