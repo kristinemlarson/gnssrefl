@@ -479,6 +479,7 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beidou. Based on my experience with GPS, I know that this will be much much much faster if we use Fortran code and bind with python using numpy. If you have such code, or know where it lives, please let me know.
 
 **What if you are providing the RINEX files and you don't want the code to search for the files online?** <code>-nolook True</code>
+Just put the RINEX files in the same directory where you are running the code, using my naming rules (lower case for RINEX 2.11).
 
 **What if you are have high-rate (e.g. 1 second) RINEX files, but you want (e.g.) 5 second data?**  <code>-dec 5 </code>
 
