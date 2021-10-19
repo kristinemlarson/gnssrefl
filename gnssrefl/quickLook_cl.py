@@ -120,7 +120,6 @@ def main():
 
     pltscreen = True
     # Kelly for jupyter notebooks set this to false
-    #pltscreen = False
     data,datakey = quick.quickLook_function(station, year, doy, snr, f, e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran,pltscreen)
     # the key is saved wth the same keys as the data dictionary, in this order 
     # [avgAzim, RH, satNumber,frequency,maxAmplitude,Peak2Noise, UTChour]

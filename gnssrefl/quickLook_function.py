@@ -265,9 +265,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             fdir = os.environ['REFL_CODE'] + '/Files'
             if not os.path.isdir(fdir):
                 subprocess.call(['mkdir', fdir])
-            f = fdir + '/quickLook_lsp.png'
-            print('plot saved to ', f)
-            plt.savefig(f)
+            filename = fdir + '/quickLook_lsp.png'
+            print('plot saved to ', filename)
+            plt.savefig(filename)
             # sure - why not throw in another plot?
             goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2)
             plt.show()
@@ -308,8 +308,8 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     plt.plot(a[ij,0], a[ij,1], 'o',color='blue',label='good')
     plt.plot(a[ik,0], a[ik,1], 'o',color='gray', label='bad')
     ydoy = ' ' + str(year) + '/' + str(doy) + ' '
-    print(freq, g.ftitle(freq))
-    plt.title('quickLook Retrieval Metrics: ' + station + ydoy + g.ftitle(freq) + 'elev:' + str(e1) + '-' + str(e2) ,fontsize=fs)
+    #print(freq, g.ftitle(freq))
+    plt.title('quickLook Retrieval Metrics: ' + station + ' Freq:' + g.ftitle(freq) + ydoy + ' elev:' + str(e1) + '-' + str(e2) ,fontsize=fs)
     plt.legend(loc="upper right")
     plt.ylabel('Refl. Ht. (m)',fontsize=fs)
     plt.grid()

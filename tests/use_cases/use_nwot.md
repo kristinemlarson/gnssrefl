@@ -120,7 +120,9 @@ input if you prefer:
 We installed the GPS site at Niwot Ridge because there was a long-standing experiment 
 for measuring snow depth (and snow water equivalent). We therefore have a way to assess
 accuracy. We download the *in situ* data from 
-the [Niwot Ridge facility.](https://portal.edirepository.org/nis/mapbrowse?scope=knb-lter-nwt&identifier=34)
+
+
+the [Niwot Ridge facility.](https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-nwt.31.18)
 We will compare to pole 16, which is shown in the photograph above. 
 The relevant Niwot Ridge csv file is provided here: 
 

@@ -417,22 +417,26 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     NV = len(tvd)
     medval = np.median(tvd[:,2])
     xx= tvd[:,2]-medval
-    plt.figure()
-    n, bins, patches = plt.hist(xx, 50, density=True, facecolor='g', alpha=0.75)
-    plt.xlabel('standard deviations')
-    plt.title('RH (median removed) ')
+    plt_histograms = False
+    if plt_histograms:
+        plt.figure()
+        n, bins, patches = plt.hist(xx, 50, density=True, facecolor='g', alpha=0.75)
+        plt.xlabel('standard deviations')
+        plt.title('RH (median removed) ')
 
     # use 3 sigma ... 
     Sig = np.std(xx)
     ij =  np.absolute(xx) < 3*Sig
     xnew = xx[ij]
-    plt.figure()
-    plt.subplot(212)
-    n, bins, patches = plt.hist(xnew, 50, density=True, facecolor='g', alpha=0.75)
-    plt.xlabel('standard deviations')
-    plt.title('RH (median removed) without massive outliers')
-    if pltit:
-        plt.show()
+
+    if plt_histograms:
+        plt.figure()
+        plt.subplot(212)
+        n, bins, patches = plt.hist(xnew, 50, density=True, facecolor='g', alpha=0.75)
+        plt.xlabel('standard deviations')
+        plt.title('RH (median removed) without massive outliers')
+        if pltit:
+            plt.show()
 
     tvd = tvd[ij,:]
 

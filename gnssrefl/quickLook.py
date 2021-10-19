@@ -114,6 +114,7 @@ def main():
 
     f=freqs[0]
     NReg = [minH, maxH] # noise region - again, this is for typical snow setup
+    print(f)
     quick.quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,sat,PkNoise,fortran)
 
 
