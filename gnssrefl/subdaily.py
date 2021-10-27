@@ -148,8 +148,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
         #print('Number of files in ', year, len(all_files))
         for f in all_files:
             # only evaluate txt files
-            if (len(f) ==  7) and (f[4:8] == 'txt'):
+            if (len(f) ==  7) and (f[4:7] == 'txt'):
                 day = int(f[0:3])
+                #print('looking at file: ', day)
                 if (day >= d1) & (day <= d2):
                     fname = direc + f
                     try:
@@ -160,7 +161,11 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
                         print('some issue with ',fname)
 
     nr,nc=tv.shape
-    print('Number of RH retrievals', nr)
+    print('Number of total RH retrievals', nr)
+    if (nr == 0):
+        print('Exiting')
+        sys.exit()
+
 
     t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
     rh = tv[:,2]
@@ -176,6 +181,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     # and restrict by doy - mostly to make testing go faster
     ii = (tv[:,1] >= d1) & (tv[:,1] <= d2)
     tv = tv[ii,:]
+    firstdoy = int(min(tv[:,1]))
+    lastdoy =  int(max(tv[:,1]))
 
     # now that you have everything the way you want it .... 
     nr,nc = tv.shape
@@ -186,7 +193,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
 
     # make arrays to save number of RH retrievals on each day
     nval = []; tval = []; y = tv[0,0]
-    for d in range(d1,(d2+1)):
+    for d in range(firstdoy,(lastdoy+1)):
         ii = (tv[:,1] == d)
         dtime, iyear,imon,iday,ihour,imin,isec = g.ymd_hhmmss(year,d,12,True)
         tval.append(dtime)
@@ -460,6 +467,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
     tnew =[] ; ynew =[]; 
     # fill in gaps using variables called tnew and ynew
+    Ngaps = 0
     for i in range(1,len(th)):
         d= th[i]-th[i-1] # delta in time
         if (d > gap):
@@ -467,6 +475,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
             x0 = th[i-1:i+1]
             h0 = h[i-1:i+1]
             print('found a gap in hours',d*24, 'day ', x0[0])
+            Ngaps = Ngaps + 1
             f = scipy.interpolate.interp1d(x0,h0)
             # so this is fake data
             ttnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
@@ -479,6 +488,9 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
             tnew = np.append(tnew,th[i])
             ynew = np.append(ynew,h[i])
 
+    if (Ngaps > 2):
+        print('This is a beta version - and does not work well with gaps. Exiting for your own safety.')
+        sys.exit()
     # sort it just to make sure ...
     ii = np.argsort( tnew) 
     tnew = tnew[ii]

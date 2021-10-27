@@ -5402,7 +5402,7 @@ def queryUNR(station):
     and ellipsoidal height (meters)
     """
     xdir = os.environ['REFL_CODE']
-    print('Check for the database')
+    print('Check for the UNR station coordinate database')
 
     lower = station
     if len(lower) != 4:
@@ -5413,21 +5413,21 @@ def queryUNR(station):
     nfile = 'gnssrefl/Data.names'
     pfile = 'gnssrefl/Data.pos'
     if os.path.isfile(nfile) and os.path.isfile(pfile):
-       print('found the files in the gnssrefl directory')
+       print('found the station database files in the gnssrefl directory')
     else:
         nfile = xdir + '/Files/Data.names'
         pfile = xdir + '/Files/Data.pos'
         if os.path.isfile(nfile) and os.path.isfile(pfile):
-            print('found the files in the REFL_CODE Files directory')
+            print('found the station database files in the REFL_CODE Files directory')
         else:
-            print('try to download the files from github for you')
+            print('try to download the station database files from github for you')
             try:
                 url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/Data.names' 
                 url2= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/Data.pos' 
                 wget.download(url1,nfile)
                 wget.download(url2,pfile)
             except:
-                print('failed to get the database files')
+                print('failed to get the station database files')
                 return
     if os.path.isfile(nfile) and os.path.isfile(pfile):
         labels = np.genfromtxt(nfile, delimiter=' ', dtype=str)
@@ -5451,8 +5451,10 @@ def queryUNR(station):
     else:
         print('Cannot find the requesite UNR files, which usually live in the gnssrefl directory below')
         print('where you installed the gnssrefl code or in $REFL_CODE/Files.')
-        return
+        return 0,0,0
 
+    # lat and lon are in degrees
+    return llat,llon,height
 
 def rapid_gfz_orbits(year,month,day):
     """

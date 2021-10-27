@@ -664,9 +664,13 @@ def test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day
                             r=np.subtract(SatOrb,recv)
                             azimA = g.azimuth_angle(r, East, North)
                             eleA = g.elev_angle(up, r)*180/np.pi
+                            # 2021 october 26
+                            # thank you to andrea gatti for pointing out the mistake
                             if (eleA >= emin) and (eleA <= emax):
                                 fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} {9:7.2f} {10:7.2f} \n".format( 
-                                    prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s6[ij]),float(s7[ij]) ))
+                                    prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s7[ij]),float(s8[ij]) ))
+                                #fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} {9:7.2f} {10:7.2f} \n".format( 
+                                #    prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s6[ij]),float(s7[ij]) ))
                 else:
                     log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
         else:
@@ -808,8 +812,9 @@ def testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,
                                 azimA = g.azimuth_angle(r, East, North)
                                 eleA = g.elev_angle(up, r)*180/np.pi
                                 if (eleA >= emin) and (eleA <= emax):
+                                    # bug reported by Andrea Gatti. 2021 October 26
                                     fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} {9:7.2f} {10:7.2f} \n".format( 
-                                        prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s6[ij]),float(s7[ij]) ))
+                                        prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s7[ij]),float(s8[ij]) ))
                     else:
                         log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
         else:

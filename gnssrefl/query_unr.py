@@ -27,7 +27,7 @@ def main():
     if len(station) != 4:
         print('illegal station name-must be 4 characters')
         sys.exit()
-    g.queryUNR(station)
+    a,b,c=g.queryUNR(station)
 
 if __name__ == "__main__":
     main()
