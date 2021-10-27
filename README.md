@@ -602,6 +602,10 @@ The station location *does not* have to be cm-level for the reflections code. Wi
 If you happen to have the Cartesian coordinates (in meters), you can set <code>-xyz True</code> and input those instead of 
 lat, long, and height.
 
+If you are using a site that is in the UNR database, as of 2021/10/26 you can set a flag to use it instead of typing in values:
+
+<CODE>make_json_input p101 0 0 0 -query_unr True </CODE>
+
 <code>gnssir</code> will use defaults for other parameters if you do not provide them. Those defaults 
 tell the code an azimuth and elevation angle mask (i.e. which directions you want 
 to allow reflections from), and which frequencies you want to use, and various quality control (QC) metrics. 
@@ -709,6 +713,9 @@ the azimuth and elevation angle mask), you won't be looking at plots anymore.
 ### 4. Bugs/Features <a name="bugs"></a>
 
 Bug Diary
+
+** October 26, 2021 Fixed bug in the rinex2snr code for the python translator. It was mixing up
+S6 and S7 - or something like that. Subdaily now exits when there are data gaps.  
 
 **fixed query_unr input files and -rate high archive choices.**
 
