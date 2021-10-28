@@ -504,7 +504,7 @@ To columns are defined as:
 7.  S1 SNR on L1
 8.  S2 SNR on L2
 9.  S5 SNR on L5
-10. S7 SNR on L6
+10. S7 SNR on L7
 11. S8 SNR on L8
 
 The unit for all SNR data is dB-Hz.
