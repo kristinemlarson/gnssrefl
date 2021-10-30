@@ -391,7 +391,7 @@ def writejsonfile(ntv,station, outfile):
 
     return True
 
-def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs):
+def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline,**kwargs):
     """
     tvd is a filename for subdaily RH results 
 
@@ -410,6 +410,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     where did splines_for_dummies go? LOL
 
     21may18 try to remove massive outliers
+    21oct27 add usespline option because this code is not robust
 
     """
     fs = 12 # fontsize
@@ -454,6 +455,19 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     h = tvd[:,2]
     # this is the edot factor
     xfac = tvd[:,12]
+    if not usespline:
+        print('spline fitting turned off for RH dot correction')
+        plt.figure()
+        #plt.plot(obstimes, h, 'bo', label='Original points',markersize=3)
+        plt.plot(th, h, 'bo', label='Original points',markersize=3)
+        plt.title('Station: ' + station + ' Reflector Height')
+        plt.ylabel('meters',fontsize=fs)
+        plt.xlabel('days',fontsize=fs)
+        plt.grid()
+        plt.gca().invert_yaxis()
+        plt.legend(loc="upper left")
+        plt.show()
+        return
 
     # now get obstimes if they were not passed
     obstimes = kwargs.get('obstimes',[])

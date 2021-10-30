@@ -34,6 +34,7 @@ def main():
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
     parser.add_argument("-outlier", default=None, type=str, help="outlier criterion input (meters)")
     parser.add_argument("-extension", default=None, type=str, help="soln subdirectory")
+    parser.add_argument("-spline", default=None, type=str, help="set to True to turn on spline fitting for RHdot correction")
     parser.add_argument("-doy1", default=None, type=str, help="initial day of year")
     parser.add_argument("-doy2", default=None, type=str, help="end day of year")
     parser.add_argument("-testing", default=None, type=str, help="set to True for testing mode")
@@ -94,14 +95,19 @@ def main():
     else:
         outlier = float(args.outlier)
 
+    usespline = False # though it is dangerous
+    if args.spline == 'True':
+        usespline = True
+
     # this way if it crashes, only effects me.  and I get more useful error messages
+    # added nospline 2021 oct 27.
     if args.testing == None:
         try:
-            tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,obstimes=obstimes)
+            tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,usespline,obstimes=obstimes)
         except: 
             print('Some issues with the spline fit, mostly likely due to data gaps')
     else:
-        tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,obstimes=obstimes)
+        tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,usespline,obstimes=obstimes)
 
 
 if __name__ == "__main__":
