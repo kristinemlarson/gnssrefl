@@ -15,6 +15,13 @@
 
 [Link to the Jupyter Notebooks](https://www.unavco.org/event/2021-gnss-interferometric-reflectometry/)
 
+Access to GSI RINEX data has been provided Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
+In my experience GSI is very response to account requests.  
+
+A bug was fixed in the old python translator option for S6/S7 data. Thank you to Andrea Gatti for this information.
+
+We are working on access to broadcast Glonass, Galileo, Beidou constellations. Thank you to Giulio Tagliaferro for suggestions
+on this improvement.
 
 **IMPORTANT:**
 
