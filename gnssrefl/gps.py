@@ -5670,7 +5670,7 @@ def rinex_jp(station, year, month, day):
     Picks up RINEX file from Japanese GSI GeoNet archive
     URL : https://www.gsi.go.jp/ENGLISH/index.html
     """
-    fdir = os.environ['ORBITS']
+    fdir = os.environ['REFL_CODE'] + '/Files/passwords'
     userinfo_file = fdir + '/' + 'userinfo.pickle'
     #userinfo.pickle stores your login info
     try:
