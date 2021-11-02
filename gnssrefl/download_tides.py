@@ -21,6 +21,7 @@ def main():
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("date1", help="start-date, 20150101", type=str)
     parser.add_argument("date2", help="end-date, 20150110", type=str)
+    parser.add_argument("-output", default = None, help="Optional output filename", type=str)
 
     args = parser.parse_args()
 
@@ -49,7 +50,12 @@ def main():
         print(data['metadata'])
     # number of records
     NV = len(data['data']) 
-    outfile  = station + '_' + 'noaa.txt'
+    if args.output == None:
+        # use the default
+        outfile  = station + '_' + 'noaa.txt'
+    else:
+        outfile = args.output
+
     fout = open(outfile, 'w+')
     fout.write("%YYYY MM DD HH MM  Water(m) DOY\n")
     for i in range(0,NV):

@@ -99,13 +99,14 @@ def main():
     if args.spline == 'True':
         usespline = True
 
-    # this way if it crashes, only effects me.  and I get more useful error messages
-    # added nospline 2021 oct 27.
+    # testing added so that if it crashes, only effects me.  and I get more useful error messages
+    # added spline input 2021 oct 27. It was not coded well enough for gaps etc.
     if args.testing == None:
         try:
             tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,usespline,obstimes=obstimes)
         except: 
-            print('Some issues with the spline fit, mostly likely due to data gaps')
+            if usespline == True:
+                print('Some issues with the spline fit, mostly likely due to data gaps')
     else:
         tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,usespline,obstimes=obstimes)
 

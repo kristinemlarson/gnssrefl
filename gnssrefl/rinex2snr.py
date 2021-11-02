@@ -71,6 +71,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         version = 2
         if not mk:
             station = station.lower()
+    elif (NS == 6 and archive == 'jp') :
+        version = 2
+        if not mk:
+            station = station[-4:].upper()
     elif (NS == 9):
         #print('Assume RINEX 3'); 
         version = 3

@@ -35,7 +35,7 @@ def main():
     parser.add_argument("-dec", default=0, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default='False', metavar='False', type=str, help="True means only use RINEX files on local machine")
     parser.add_argument("-fortran", default='False', metavar='False',type=str, help="True means use Fortran RINEX translators ")
-    parser.add_argument("-archive", default=None, metavar='all',help="specify one archive: unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan", type=str)
+    parser.add_argument("-archive", default=None, metavar='all',help="specify one archive: unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan,jp", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
@@ -51,11 +51,11 @@ def main():
 # rename the user inputs as variables
 #
     station = args.station; NS = len(station)
-    if (NS == 4) or (NS == 9):
+    if (NS == 4) or (NS == 6) or (NS == 9):
         #print('You have submitted a nominally valid station name')
         okok = 1
     else:
-        print('Illegal input - Station name must have 4 or 9 characters. Exiting.')
+        print('Illegal input - Station name must have 4 (RINEX 2), 6 (GSI), or 9 (RINEX 3) characters. Exiting.')
         sys.exit()
     year = args.year
     year_st = year
@@ -140,7 +140,7 @@ def main():
 
 
 # currently allowed archives 
-    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev']
+    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','jp']
     if args.archive == None:
         archive = 'all'
     else:

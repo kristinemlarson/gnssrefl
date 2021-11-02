@@ -4267,6 +4267,9 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
                     new_big_Disk_in_DC(station, year,month,day)
                 elif (archive == 'bev'):
                     bev_rinex2(station, year, doy)
+                elif (archive == 'jp'):
+                    # thank you to naoya kadota for writing this 
+                    rinex_jp(station, year, month, day)
                 else:
                     print('eek - I have run out of archives')
 
@@ -5659,3 +5662,48 @@ def get_cddis_navfile_test(navfile,cyyyy,cyy,cdoy):
         subprocess.call(['mv',cddisfile,navfile])
 
     return navfile
+
+def rinex_jp(station, year, month, day):
+    """
+    author: Naoya Kadota
+    2021oct25
+    Picks up RINEX file from Japanese GSI GeoNet archive
+    URL : https://www.gsi.go.jp/ENGLISH/index.html
+    """
+    fdir = os.environ['ORBITS']
+    userinfo_file = fdir + '/' + 'userinfo.pickle'
+    #userinfo.pickle stores your login info
+    try:
+        with open(userinfo_file, 'rb') as client_info:
+            login_info = pickle.load(client_info)
+            user_id = login_info[0]
+            password = login_info[1]
+    except:
+        print('User registration is required to use the database')
+        print('access https://www.gsi.go.jp/ENGLISH/geonet_english.html (English) or https://terras.gsi.go.jp/ftp_user_regist.php (Japanese) to create an acount')
+        print('enter your FTP user id')
+        user_id = input()
+        print('enter your FTP password')
+        password = input()
+    # if doy is input
+    #print('try to find the file in DoY format')
+    if day == 0:
+        doy=month
+        d = doy2ymd(year,doy);
+        month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    gns = 'terras.gsi.go.jp/data/GR_2.11/'
+    file1 =station[-4:].upper() + cdoy + '0.' + cyy + 'o' + '.gz'
+    url = 'ftp://' + user_id + ':' + password + '@' + gns +  cyyyy + '/' + cdoy +  '/' + file1
+
+    try:
+        wget.download(url,file1)
+        subprocess.call(['gunzip', file1])
+        print('successful download from JP GeoNet')
+        if not os.path.isfile(userinfo_file):
+            with open(userinfo_file, 'wb') as client_info:
+                pickle.dump((user_id,password) , client_info)
+                print('user id and password saved to', userinfo_file)
+    except:
+        print('some kind of problem with Japanese GSI GeoNet download',file1)
+        subprocess.call(['rm', '-f',file1])
