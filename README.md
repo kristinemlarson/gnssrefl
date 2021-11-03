@@ -428,6 +428,7 @@ Using hybrid (the default):
 - nz (GNS, New Zealand)
 - ga (Geoscience Australia)
 - bev (Austria Federal Office of Metrology and Surveying)
+- jp (Geospatial Information Authority of Japan)
 
 **Example setting the archive:**
 
