@@ -5725,16 +5725,15 @@ def queryUNR_modern(station):
     xdir = os.environ['REFL_CODE']
     nfile2 = xdir + '/Files/station_pos.db'
     nfile2_exist = os.path.isfile(nfile2)
-    print(nfile1)
-    print(nfile2)
 
     if (not nfile1_exist) and (not nfile2_exist):
-        print('try to download the station database from github for you')
+        print('Try to download the station database from github for you')
         try:
             url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/station_pos.db'
             wget.download(url1,nfile2)
+            nfile2_exist = True
         except:
-            print('could not download the file for you')
+            print('Could not download the database for you')
             return lat, lon, ht
     # if you used github and run the code from that directory
     if nfile1_exist:
@@ -5748,7 +5747,7 @@ def queryUNR_modern(station):
         [(name,lat,lon,ht)] = w
         print(lat,lon,ht)
     else:
-        print('did not find the station in the database:', station)
+        print('Did not find the station in the database:', station)
 
     # close the database
     conn.close()
