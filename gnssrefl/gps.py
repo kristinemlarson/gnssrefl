@@ -10,6 +10,7 @@ import pickle
 import re
 import subprocess
 import sys
+import sqlite3
 
 import scipy.signal as spectral
 from scipy.interpolate import interp1d
@@ -20,6 +21,7 @@ import wget
 from numpy import array
 
 import gnssrefl.read_snr_files as snr
+
 # for future ref
 #import urllib.request
 
@@ -5707,3 +5709,49 @@ def rinex_jp(station, year, month, day):
     except:
         print('some kind of problem with Japanese GSI GeoNet download',file1)
         subprocess.call(['rm', '-f',file1])
+
+
+def queryUNR_modern(station):
+    """
+    query UNR database that has been stored in sql
+    """
+    lat = 0; lon = 0; ht = 0
+    if len(station) != 4:
+        print('The station name must be four characters long')
+        return lat, lon, ht
+
+    nfile1 = 'gnssrefl/station_pos.db'
+    nfile1_exist = os.path.isfile(nfile1)
+    xdir = os.environ['REFL_CODE']
+    nfile2 = xdir + '/Files/station_pos.db'
+    nfile2_exist = os.path.isfile(nfile2)
+    print(nfile1)
+    print(nfile2)
+
+    if (not nfile1_exist) and (not nfile2_exist):
+        print('try to download the station database from github for you')
+        try:
+            url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/station_pos.db'
+            wget.download(url1,nfile2)
+        except:
+            print('could not download the file for you')
+            return lat, lon, ht
+    # if you used github and run the code from that directory
+    if nfile1_exist:
+        conn = sqlite3.connect(nfile1)
+    elif nfile2_exist:
+        conn = sqlite3.connect(nfile2)
+    c=conn.cursor()
+    c.execute("SELECT * FROM  stations WHERE station=:station",{'station': station})
+    w = c.fetchall()
+    if len(w) > 0:
+        [(name,lat,lon,ht)] = w
+        print(lat,lon,ht)
+    else:
+        print('did not find the station in the database:', station)
+
+    # close the database
+    conn.close()
+    # lat and lon are in degrees
+    return lat,lon,ht
+

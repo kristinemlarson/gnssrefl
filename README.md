@@ -380,7 +380,8 @@ A RINEX file has extraneous information in it (which we will throw out) - and it
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
 The first task you have in GNSS-IR is to translate from RINEX into what I will call 
 the SNR format. The latter will include azimuth and elevation angles. For the 
-latter you will need an **orbit** file. <code>rinex2snr</code> will go get an orbit file for you. You can override the default orbit 
+latter you will need an **orbit** file. <code>rinex2snr</code> will go get an orbit file for you. It will save
+those orbit files in case you want to use them at some later date. You can override the default orbit 
 choice by selections given below.
 
 There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
@@ -393,7 +394,8 @@ You can run <code>rinex2snr</code> at the command line. The required inputs are:
 - year
 - day of year
 
-A sample call for a station called <code>p041</code>, restricted to GPS satellites, on day of year 132 and year 2020 would be:
+A sample call for a station called <code>p041</code>, restricted to 
+GPS satellites, on day of year 132 and year 2020 would be:
 
 <code>rinex2snr p041 2020 132</code>
 
