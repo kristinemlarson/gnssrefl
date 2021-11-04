@@ -125,6 +125,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     author: kristine larson
     2021april27 return datetime object
     """
+    # fontsize
+    fs = 12
     print('Read in the RH retrievals and plot it between these days: ',d1,d2)
     if (d2 < d1):
         print('First day of year must be less than last day of year. Exiting')
@@ -192,16 +194,29 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
         otimes.append(dtime)
 
     # make arrays to save number of RH retrievals on each day
-    nval = []; tval = []; y = tv[0,0]
+    residuals = np.empty(shape=[0,1])
+    nval = []; tval = []; y = tv[0,0]; 
+    multiSigma = 2.5
+    stats = np.empty(shape=[0,3])
     for d in range(firstdoy,(lastdoy+1)):
         ii = (tv[:,1] == d)
         dtime, iyear,imon,iday,ihour,imin,isec = g.ymd_hhmmss(year,d,12,True)
         tval.append(dtime)
         n = len(tv[ii,1])
         nval.append(n)
+        rhavg = np.mean(tv[ii,2]); 
+        rhstd = np.std(tv[ii,2]); 
+        newl = [dtime, rhavg, rhstd]
+        stats = np.append(stats, [newl], axis=0)
+        b = ( tv[ii,2] - rhavg*np.ones( len(tv[ii,2]) ))/ rhstd
+        residuals = np.append(residuals, b)
     #
-    fs = 12
+
+
     if plt2screen:
+        #plt.figure()
+        #plt.plot(otimes, residuals,'.')
+
         fig,ax=plt.subplots()
         #plt.figure()
         ax.plot(tval,nval,'bo')
@@ -247,6 +262,31 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
         plotname = txtdir + '/' + station + '_subdaily_ampl_RH.png'
         plt.savefig(plotname,dpi=300)
         print('png file saved as: ', plotname)
+
+        # poor man's outlier detector
+        fig,ax=plt.subplots()
+        colors = tv[:,5]
+        # put some amplitude information on it
+        # ax.plot( otimes, tv[:,2], '.')
+        # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
+        ii = (np.absolute(residuals) > multiSigma)
+        otimesarray = np.asarray(otimes)
+        plt.plot(otimes,tv[:,2], '.',color='gray',label='arcs')
+        plt.plot(stats[:,0], stats[:,1], 'o',markersize=8,color='blue',label='daily avg')
+        plt.plot(stats[:,0], stats[:,1]-2.5*stats[:,2], '--',color='black',label='2.5 sigma')
+        plt.plot(stats[:,0], stats[:,1]+2.5*stats[:,2], '--',color='black')
+        plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
+        plt.legend(loc="upper left")
+        plt.ylabel('meters',fontsize=fs)
+        plt.title('GNSS station: ' + station.upper() + ' Reflector Heights', fontsize=fs)
+        plt.gca().invert_yaxis()
+        plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+        plt.grid() ; fig.autofmt_xdate()
+
+        plotname = txtdir + '/' + station + '_outlier_hunting.png'
+        plt.savefig(plotname,dpi=300)
+        print('png file saved as: ', plotname)
+
 
         plt.show()
     # probably nice to also have a plot with number of retrievals vs time

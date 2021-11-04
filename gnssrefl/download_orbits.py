@@ -26,7 +26,7 @@ def main():
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    orbit_list = ['igs', 'igr','jax','grg','wum','gbm','nav','gps','gps+glo','gnss','gfr','esa','gnss2']
+    orbit_list = ['igs', 'igr','jax','grg','wum','gbm','nav','gps','gps+glo','gnss','gfr','esa','gnss2','brdc']
 
 
 #   assign to normal variables
@@ -85,6 +85,11 @@ def main():
             elif (pCtr == 'gnss2'):
                 # use IGN instead of CDDIS
                 filename,fdir,foundit = g.avoid_cddis(year,month,day)
+            elif (pCtr == 'brdc'):
+                # https://cddis.nasa.gov/archive/gnss/data/daily/2021/brdc/
+                # test code to get rinex 3 broadcast file
+                # will not store it in ORBITS because it is not used explicitly
+                filename,fdir,foundit = g.rinex3_nav(year,month,day)
             else:
                 filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)
         if foundit:

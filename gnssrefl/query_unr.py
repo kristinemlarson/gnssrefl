@@ -5,6 +5,10 @@ database (when I downloaded it ;-)
 author: kristine larson
 input four character station name, lowercase
 
+2021 November 2
+modified to use UNR database. Downloads it if you don't have it.
+Hopefully
+
 """
 import argparse
 import wget
@@ -27,7 +31,8 @@ def main():
     if len(station) != 4:
         print('illegal station name-must be 4 characters')
         sys.exit()
-    a,b,c=g.queryUNR(station)
+    a,b,c=g.queryUNR_modern(station)
+    #a,b,c=g.queryUNR(station)
 
 if __name__ == "__main__":
     main()

@@ -4,6 +4,7 @@
 # toolbox for GPS/GNSS data analysis
 import datetime
 from datetime import date
+import getpass
 import math
 import os
 import pickle
@@ -5753,4 +5754,29 @@ def queryUNR_modern(station):
     conn.close()
     # lat and lon are in degrees
     return lat,lon,ht
+
+def rinex3_nav(year,month,day):
+    """
+    """
+    foundit = False
+    fdir = ''
+    name = ''
+    # https://cddis.nasa.gov/archive/gnss/data/daily/2021/brdc/
+    if (day == 0):
+        doy = month
+        year, month, day, cyyyy,cdoy, YMD = ydoy2useful(year,doy)
+        cyy = cyyyy[2:4]
+    else:
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    dir_secure = '/pub/gnss/data/daily/' + cyyyy + '/brdc/'
+    bname = 'BRDC00IGS_R_' + str(year) + cdoy + '0000_01D_MN.rnx'
+    filename = bname + '.gz'
+    print(dir_secure, filename)
+    cddis_download(filename,dir_secure)
+    status = subprocess.call(['gunzip', filename])
+    if os.path.exists(bname):
+        foundit = True
+        name = bname
+    return name, fdir, foundit
+
 
