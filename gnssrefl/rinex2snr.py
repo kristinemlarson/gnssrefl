@@ -21,6 +21,7 @@ import gnssrefl.rinpy as rinpy
 import gnssrefl.gpssnr as gpssnr
 import gnssrefl.gnsssnr as gnsssnr 
 
+import gnssrefl.gnsssnrbigger as gnsssnrbigger
 
 class constants:
     omegaEarth = 7.2921151467E-5 #      %rad/sec
@@ -278,7 +279,12 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                     if (orbtype  == 'gps') or (orbtype == 'nav'):
                         gpssnr.foo(in1,in2,in3,in4,in5,in6)
                     else:
-                        gnsssnr.foo(in1,in2,in3,in4,in5,in6)
+                        if (orbtype == 'ultra') or (orbtype == 'wum'):
+                            print('testing out things for orbit type ', orbtype)
+                            print('this file requires that more epochs be allowed.')
+                            gnsssnrbigger.foo(in1,in2,in3,in4,in5,in6)
+                        else:
+                            gnsssnr.foo(in1,in2,in3,in4,in5,in6)
                 else:
                     if (translator == 'fortran'):
                         t1=time.time()

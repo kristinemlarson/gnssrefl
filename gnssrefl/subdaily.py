@@ -204,12 +204,13 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
         tval.append(dtime)
         n = len(tv[ii,1])
         nval.append(n)
-        rhavg = np.mean(tv[ii,2]); 
-        rhstd = np.std(tv[ii,2]); 
-        newl = [dtime, rhavg, rhstd]
-        stats = np.append(stats, [newl], axis=0)
-        b = ( tv[ii,2] - rhavg*np.ones( len(tv[ii,2]) ))/ rhstd
-        residuals = np.append(residuals, b)
+        if (n > 0):
+            rhavg = np.mean(tv[ii,2]); 
+            rhstd = np.std(tv[ii,2]); 
+            newl = [dtime, rhavg, rhstd]
+            stats = np.append(stats, [newl], axis=0)
+            b = ( tv[ii,2] - rhavg*np.ones( len(tv[ii,2]) ))/ rhstd
+            residuals = np.append(residuals, b)
     #
 
 

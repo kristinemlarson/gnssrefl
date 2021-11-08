@@ -1086,11 +1086,11 @@ def getsp3file_mgex(year,month,day,pCtr):
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     if pCtr == 'gbm': # GFZ
         file2 = 'GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz'
-    if pCtr == 'wum': # Wuhan, but only the one at midnite(they are updated more frequently)
-        print('use previous day for Wuhan ultra products since gnssSNR does not allow two day files')
-        nyear, ndoy = nextdoy(year,doy)
-        cndoy = '{:03d}'.format(ndoy); cnyear = '{:03d}'.format(nyear)
-        file2 = 'WUM0MGXULA_' + cnyear + cndoy + '0000_01D_05M_ORB.SP3.gz'
+    if pCtr == 'wum': # Wuhan, 
+        # used to only use first 24 hours, but now can use whole orbit file
+        #nyear, ndoy = nextdoy(year,doy)
+        #cndoy = '{:03d}'.format(ndoy); cnyear = '{:03d}'.format(nyear)
+        file2 = 'WUM0MGXULA_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz'
     if pCtr == 'grg': # french group
         file2 = 'GRG0MGXFIN_' + cyyyy + cdoy + '0000_01D_15M_ORB.SP3.gz'
     if pCtr == 'sha': # shanghai observatory
@@ -3985,6 +3985,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     kristine larson
     20sep04: fortran (boolean) sent as an input, so you know whether
     to worry that the gpsSNR.e or gnssSNR.e executable does or does not exist
+    21nov05 added ultra
     """
     #default values
     foundit = False
@@ -4003,7 +4004,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'grg')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gfr'):
-        print('uses rapid GFZ orbits, avail as of 2021/137 ')
+        print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
@@ -4039,14 +4040,21 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     elif orbtype == 'esa':
         # this uses ESA, GPS+GLONASS available from Aug 6, 2006 (added by Makan)
         f,orbdir,foundit=getsp3file_flex(year,month,day,'esa')
-        snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
+        snrexe = gnssSNR_version(); 
+        warn_and_exit(snrexe,fortran)
     elif orbtype == 'nav':
         #print('getting nav orbits ... i hope')
         f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
         snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
     elif orbtype == 'test':
+        # i can't even remember this ... 
         print('getting gFZ orbits from CDDIS using test protocol')
         f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
+        snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
+    elif orbtype == 'ultra':
+        print('getting ultra rapid orbits from GFZ local machine')
+        f, orbdir, foundit = ultra_gfz_orbits(year,month,day,0)
+        snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     else:
         print('I do not recognize the orbit type you tried to use: ', orbtype)
 
@@ -5134,6 +5142,7 @@ def big_Disk_in_DC_hourly(station, year, month, day,idtag):
     author: kristine larson
     picks up a RINEX file from CORS. and gunzips it
     # updated for new access protocol, 2021 aug 28
+    idtag is a small case letter from a to x (i think)
     """
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     #rinexfile,rinexfiled = rinex_name(station, year, month, day)
@@ -5467,49 +5476,90 @@ def rapid_gfz_orbits(year,month,day):
     input year, month, day OR
     year, doy, 0
     downloads rapid GFZ sp3 file and stores in $ORBITS
-    2021 sep 21: this does not work anymore.  I do not know why
+    november 5, 2021 fixed their ftp address
     """
     foundit = False
     dday = 2021 + 137/365.25
     wk,sec=kgpsweek(year,month,day,0,0,0)
-    gns = 'ftp://isdcftp.gfz-potsdam.de/gnss/products/rapid/'
+
+    gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/rapid/'
     if day == 0:
        doy=month
        d = doy2ymd(year,doy);
        month = d.month; day = d.day
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
-    bigname = 'GFZ0OPSRAP_' + cyyyy + cdoy + '0000_01D_15M_ORB.SP3'
-    bignamegz = bigname + '.gz'
-    url = gns + 'w' + str(wk) + '/' + bignamegz
+    littlename = 'gfz' + str(wk) + str(int(sec/86400)) + '.sp3'
+    url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
     print(url)
     if (year + doy/365.25) < dday:
         print('No rapid GFZ orbits until 2021/doy137')
         return '', '', foundit
-    fullname = fdir + '/' + bigname + '.xz'
+    fullname = fdir + '/' + littlename + '.xz'
     # look for compressed file
     if os.path.isfile(fullname):
         subprocess.call(['unxz', fullname])
 
-    if os.path.isfile(fdir + '/' + bigname):
-        print(bigname, ' already exists')
-        return bigname, fdir, True 
-
-
-
-    #print(url,bignamegz)
-     
+    if os.path.isfile(fdir + '/' + littlename):
+        print(littlename, ' already exists on disk')
+        return littlename, fdir, True 
     try:
-        wget.download(url,bignamegz)
-        subprocess.call(['gunzip', bignamegz])
+        wget.download(url,littlename + '.gz')
+        subprocess.call(['gunzip', littlename + '.gz'])
     except:
         print('Problems downloading Rapid GFZ orbit')
 
-    if os.path.isfile(bigname):
-       store_orbitfile(bigname,year,'sp3') ; foundit = True
+    if os.path.isfile(littlename):
+       store_orbitfile(littlename,year,'sp3') ; foundit = True
 
-    return bigname, fdir, foundit
+    return littlename, fdir, foundit
 
+
+def ultra_gfz_orbits(year,month,day,hour):
+    """
+    input year, month, day OR
+    year, doy, 0
+    hour is needed to figur out which ultra file to pick up 
+    downloads rapid GFZ sp3 file and stores in $ORBITS
+    """
+    foundit = False
+    dday = 2021 + 137/365.25
+    wk,sec=kgpsweek(year,month,day,0,0,0)
+    gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/ultra/'
+    if day == 0:
+       doy=month
+       d = doy2ymd(year,doy);
+       month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
+    # change the hour into two character string
+    chr = '{:02d}'.format(hour)
+    littlename = 'gfu' + str(wk) + str(int(sec/86400)) + '_' + chr + '.sp3'  
+    url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
+    print(url)
+    if (year + doy/365.25) < dday:
+        print('No rapid GFZ orbits until 2021/doy137')
+        return '', '', foundit
+
+    fullname = fdir + '/' + littlename + '.xz'
+    if os.path.isfile(fullname):
+        subprocess.call(['unxz', fullname])
+
+    if os.path.isfile(fdir + '/' + littlename):
+        print(littlename, ' already exists on disk')
+        return littlename, fdir, True
+
+
+    try:
+        wget.download(url,littlename + '.gz')
+        subprocess.call(['gunzip', littlename + '.gz'])
+    except:
+        print('Problems downloading ultrarapid GFZ orbit')
+
+    if os.path.isfile(littlename):
+        store_orbitfile(littlename,year,'sp3') ; foundit = True
+
+    return littlename, fdir, foundit
 
 def rinex_unavco(station, year, month, day):
     """
@@ -5673,8 +5723,18 @@ def rinex_jp(station, year, month, day):
     Picks up RINEX file from Japanese GSI GeoNet archive
     URL : https://www.gsi.go.jp/ENGLISH/index.html
     """
-    fdir = os.environ['ORBITS']
-    userinfo_file = fdir + '/' + 'userinfo.pickle'
+    fdir = os.environ['REFL_CODE']
+    if not os.path.isdir(fdir):
+        print('You need to define the REFL_CODE environment variable')
+        return 
+
+    # make sure the directory exists to store passwords
+    if not os.path.isdir(fdir + '/Files'):
+        subprocess.call(['mkdir',fdir + '/Files'])
+    if not os.path.isdir(fdir + '/Files/passwords'):
+        subprocess.call(['mkdir',fdir + '/Files/passwords'])
+
+    userinfo_file = fdir + '/Files/passwords/' + 'userinfo.pickle'
     #userinfo.pickle stores your login info
     try:
         with open(userinfo_file, 'rb') as client_info:
@@ -5683,13 +5743,16 @@ def rinex_jp(station, year, month, day):
             password = login_info[1]
     except:
         print('User registration is required to use the database')
-        print('access https://www.gsi.go.jp/ENGLISH/geonet_english.html (English) or https://terras.gsi.go.jp/ftp_user_regist.php (Japanese) to create an acount')
-        print('enter your FTP user id')
+        print('Access https://www.gsi.go.jp/ENGLISH/geonet_english.html (English)')
+        print('or https://terras.gsi.go.jp/ftp_user_regist.php (Japanese) to create an acount')
+        print('Please enter your FTP user id (if you do not have an account type none')
         user_id = input()
-        print('enter your FTP password')
-        password = input()
-    # if doy is input
-    #print('try to find the file in DoY format')
+        if user_id == 'none':
+            print('You have no account at Geonet so returning to the main code')
+            return
+        password= getpass.getpass(prompt='Password: ', stream=None)
+        #password = input()
+    # if doy is input, convert to month and day
     if day == 0:
         doy=month
         d = doy2ymd(year,doy);
@@ -5698,7 +5761,7 @@ def rinex_jp(station, year, month, day):
     gns = 'terras.gsi.go.jp/data/GR_2.11/'
     file1 =station[-4:].upper() + cdoy + '0.' + cyy + 'o' + '.gz'
     url = 'ftp://' + user_id + ':' + password + '@' + gns +  cyyyy + '/' + cdoy +  '/' + file1
-
+    print('attempt to download RINEX file from Jp GeoNet')
     try:
         wget.download(url,file1)
         subprocess.call(['gunzip', file1])
