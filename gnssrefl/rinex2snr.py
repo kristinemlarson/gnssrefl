@@ -60,7 +60,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     srate - integer sample rate, for RINEX 3 only.
     2021mar20 check for illegal day of years ....
     2021aug01 added mk option for uppercase file names per makan karegar request
-    2021aug15v added weekly option
+    2021aug15 added weekly option
+    2021nov08 making nolook work for rinex 3 files ...
     """
     # do not allow illegal skipit values
     if skipit < 1:
@@ -130,8 +131,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             if (not illegal_day) and (not snre):
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
-                print('Will seek RINEX file ', station, ' year:', year, ' doy:', doy, ' translate with ', translator, ' at the ', archive, ' archive')
                 if nol:
+                    print('Will assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is in the local directory')
                     # this assumes RINEX file is in local directory or "nearby"
                     if version == 2:
                         the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
@@ -142,14 +143,15 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
 ##                        print(' 2021feb22 using sample rate explicitly')
-                        # this is going to fail when srate < 10
-                        r3 = station9ch + '_R_' + str(year) + cdoy + '0000_01D_' + str(srate) + 'S_MO.rnx'
-                        r3gz = station9ch + '_R_' + str(year) + cdoy + '0000_01D_' + str(srate) + 'S_MO.rnx.gz'
+                        # make sure sample rate takes up two characters ...
+                        csrate = '{:02d}'.format(srate)
+                        r3 = station9ch + '_R_' + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
+                        r3gz = station9ch + '_R_' + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         if os.path.exists(r3gz):
                             subprocess.call(['gunzip', r3gz])
                         if os.path.exists(r3):
-                            #print('RINEX 3 file exists locally')
+                            print('The RINEX 3 file exists locally')
                             fexists = g.new_rinex3_rinex2(r3,r2)
                             if fexists:
                                 #print('Rinex 3 to 2 conversion worked, now convert to snr format')
@@ -158,8 +160,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                 print('Something about the RINEX 3-2 conversion did not work')
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX3 file.')
+                            print('I assumed its name was ', r3)
 
                 else:
+                    print('Will seek the RINEX file externally for ', station, ' year:', year, ' doy:', doy, ' translate with ', translator, ' at the ', archive, ' archive')
                     if version == 3:
                         #  try unavco
                         rinex2exists = False; rinex3name = '';
