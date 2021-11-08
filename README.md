@@ -430,10 +430,17 @@ Using hybrid (the default):
 - nz (GNS, New Zealand)
 - ga (Geoscience Australia)
 - bev (Austria Federal Office of Metrology and Surveying)
+- jp (Geospatial Information Authority of Japan)
 
 **Example setting the archive:**
 
 <code>rinex2snr tgho 2020 132 -archive nz</code>
+
+The Geospatial Institute of Japan uses 6 numbers to specify 
+station names. You will be prompted for a username and password.
+This will be saved on your computer for future use.
+
+<code> rinex2snr 940050 2021 31 -archive jp </code>
 
 **Run the code for all the data for any year?**
 
@@ -479,15 +486,20 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - igs : IGS precise, GPS only
 - igr : IGS rapid, GPS only
 - jax : JAXA, GPS + Glonass, reliably within a few days, missing block III GPS satellites
-- gbm : GFZ Potsdam, multi-GNSS, not rapid
+- gbm : GFZ Potsdam, multi-GNSS, not rapid (GPS, Galileo,Glonass, Beidou)
 - grg: French group, GPS, Galileo and Glonass, not rapid
 - esa : ESA, multi-GNSS
 - gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021 
-- wum : (disabled) Wuhan, multi-GNSS, not rapid
+- wum : Wuhan, multi-GNSS (precise+prediction, GPS,Galileo,Glonass,Beidou)
+- ultra : GFZ ultra rapid (GPS, Galileo, Glonass), since May 17, 2021 
 
-It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beidou. Based on my experience with GPS, I know that this will be much much much faster if we use Fortran code and bind with python using numpy. If you have such code, or know where it lives, please let me know.
+We are likely to add access to multi-GNSS broadcast orbits, but for now you can use the 
+ultra orbit option. Although it is provided every three hours, we currently only download the 
+file from midnite (hour 0).
 
-**What if you are providing the RINEX files and you don't want the code to search for the files online?** <code>-nolook True</code>
+**What if you are providing the RINEX files and you don't want the code to search for the files online?** 
+<code>-nolook True</code>
+
 Just put the RINEX files in the same directory where you are running the code, using my naming rules (lower case for RINEX 2.11).
 
 **What if you are have high-rate (e.g. 1 second) RINEX files, but you want (e.g.) 5 second data?**  <code>-dec 5 </code>
