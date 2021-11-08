@@ -546,13 +546,13 @@ The unit for all SNR data is dB-Hz.
 
 Put your RINEX 2.11 files in the directory where you are going to run the code.
 They must have SNR data in them (S1, S2, etc) and have the receiver coordinates in the header.
-The files should be named as follows .
+The files should be named as follows:
 
 - lowercase
 - station name (4 characters) followed by day of year (3 characters) then 0.yyo where yy is the two character year.
 - Example: algo0500.21o where station name is algo on day of year 50 from the year 2021
 
-You also need to set -nolook True
+<code>rinex2snr algo 2021 50 -nolook True</code>
 
 If you have RINEX 3 files, you should name them as follows:
 
@@ -565,6 +565,13 @@ very long station file name are no doubt useful, but they are not recognized by 
 
 - Example: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 
+<code>rinex2snr onsa00swe 2021 305 -nolook True </code>
+
+If you have something other than 30 second sampling, it can be set with -srate.
+
+The RINEX inputs are always deleted, so do not put your only copy of the files in the working directory.
+Please note: we are using the publicly available <code>gfzrnx</code> code to convert RINEX 3 files into RINEX 2.11 files. 
+If you do not have <code>gfzrnx</code> installed, you will not be able to use RINEX 3 files.
 
 <HR>
 
