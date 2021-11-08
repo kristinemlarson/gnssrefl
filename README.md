@@ -545,15 +545,25 @@ The unit for all SNR data is dB-Hz.
 **What if you want to analyze your own data?**
 
 Put your RINEX 2.11 files in the directory where you are going to run the code.
-They should be 
+They must have SNR data in them (S1, S2, etc) and have the receiver coordinates in the header.
+The files should be named as follows .
 
 - lowercase
-- station name (4 characters) followed by day of year (3 characters) then 0.yyo where yy is the two character 
-so algo0500.21o is station algo on day of year 50 from the year 2021
+- station name (4 characters) followed by day of year (3 characters) then 0.yyo where yy is the two character year.
+- Example: algo0500.21o where station name is algo on day of year 50 from the year 2021
 
 You also need to set -nolook True
 
+If you have RINEX 3 files, you should name them as follows:
 
+- upper case (except for the extension)
+
+- station name (9 characters where the last 3 characters are the country), underscore, capital R, 
+underscore, four character year, three character day of year, four zeroes, underscore, 01D_30S_M0. followed by rnx 
+30S means it is 30 second sampling. 01D means it is one day. Some of the other parts of the 
+very long station file name are no doubt useful, but they are not recognized by this code.
+
+- Example: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 
 
 <HR>
