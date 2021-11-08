@@ -436,13 +436,16 @@ Using hybrid (the default):
 
 <code>rinex2snr tgho 2020 132 -archive nz</code>
 
+**Example using the Japanese GNSS archive:**
+
 The Geospatial Institute of Japan uses 6 numbers to specify 
 station names. You will be prompted for a username and password.
-This will be saved on your computer for future use.
+This will be saved on your computer for future use. Since gnssrefl
+only uses four character statiion names, the last four values will be used as the station name.
 
 <code> rinex2snr 940050 2021 31 -archive jp </code>
 
-**Run the code for all the data for any year?**
+**Run the code for all the data for any year**
 
 <code>rinex2snr tgho 2019 1  -archive nz -doy_end 365</code>
  
@@ -479,6 +482,8 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - gps : will use GPS broadcast orbits (**this is the default**)
 - gps+glo : uses rapid GFZ orbits
 - gnss : uses GFZ orbits, which is multi-GNSS (available in 3-4 days?)
+- rapid : uses GFZ multi-GNSS rapid orbits, available in ~1 day
+- ultra : since mid-2021, we can use multi-GNSS near realtime orbits from GFZ
 
 *orbit file options for experts:*
 
@@ -536,6 +541,20 @@ The unit for all SNR data is dB-Hz.
 - 101,102 are Glonass L1 and L2
 - 201, 205, 206, 207, 208: Galileo frequencies
 - 302, 306, 307 : Beidou frequencies
+
+**What if you want to analyze your own data?**
+
+Put your RINEX 2.11 files in the directory where you are going to run the code.
+They should be 
+
+- lowercase
+- station name (4 characters) followed by day of year (3 characters) then 0.yyo where yy is the two character 
+so algo0500.21o is station algo on day of year 50 from the year 2021
+
+You also need to set -nolook True
+
+
+
 
 <HR>
 

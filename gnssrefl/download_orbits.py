@@ -26,7 +26,7 @@ def main():
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    orbit_list = ['igs', 'igr','jax','grg','wum','gbm','nav','gps','gps+glo','gnss','gfr','esa','gnss2','brdc','ultra']
+    orbit_list = ['igs', 'igr','jax','grg','wum','gbm','nav','gps','gps+glo','gnss','gfr','esa','gnss2','brdc','ultra','rapid']
 
 
 #   assign to normal variables
@@ -64,9 +64,9 @@ def main():
     if pCtr == 'gps+glo':
         pCtr = 'jax'
 
-    # this is now fixed ... 
-    #if pCtr == 'gfr':
-    #    pCtr = 'gbm' # since I cannot get their direct address to work 
+    # using gfz multi-gnss for rapid
+    if pCtr == 'rapid':
+        pCtr = 'gfr'
 
     if pCtr == 'nav':
         navname,navdir,foundit = g.getnavfile(year, month, day) 
@@ -80,7 +80,7 @@ def main():
                     # this is ugly - but hopefully will work for now.  
                 filename, fdir, foundit = g.getsp3file_flex(year,month,day,pCtr)
             elif pCtr == 'gfr':
-            # rapid GFZ is now available again ... 
+            # rapid GFZ is available again ... 
                 filename, fdir, foundit = g.rapid_gfz_orbits(year,month,day)
             # also at GFZ
             elif pCtr == 'ultra':
@@ -93,6 +93,7 @@ def main():
                 # https://cddis.nasa.gov/archive/gnss/data/daily/2021/brdc/
                 # test code to get rinex 3 broadcast file
                 # will not store it in ORBITS because it is not used explicitly
+                # this is not operational as yet
                 filename,fdir,foundit = g.rinex3_nav(year,month,day)
             else:
                 filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)

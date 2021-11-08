@@ -30,7 +30,7 @@ def main():
     parser.add_argument("doy", help="start day of year", type=int)
 # optional arguments
     parser.add_argument("-snr", default=66, help="snr file ending", type=str)
-    parser.add_argument("-orb", default='nav', type=str, help="orbit type, gps, gps+glo, gnss or you can specify nav,igs,igr,jax,gbm,grg,wum,gfr,ultra")
+    parser.add_argument("-orb", default='nav', type=str, help="orbit type, gps, gps+glo, gnss, rapid or you can specify nav,igs,igr,jax,gbm,grg,wum,gfr,ultra")
     parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high")
     parser.add_argument("-dec", default=0, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default='False', metavar='False', type=str, help="True means only use RINEX files on local machine")
@@ -76,7 +76,7 @@ def main():
 # added GFZ rapid, aka gfr 2021May19 but it does not work anymore.  point it to gbm
 # 
 # added ESA, thank you to Makan
-    orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum','gfr','esa','ultra']
+    orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum','gfr','esa','ultra','rapid']
     if orb not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
@@ -85,15 +85,13 @@ def main():
     # if you choose GPS, you get the nav message
     if orb == 'gps':
         orb = 'nav'
+    # if you choose ultra , you get the GFZ rapid 
+    if orb == 'rapid':
+        orb = 'gfr'
 
-    # if you choose GNSS, you get the GFZ sp3 file 
+    # if you choose GNSS, you get the GFZ sp3 file  (precise)
     if orb == 'gnss':
         orb = 'gbm'
-
-    # if you choose gfz rapid, you get the GFZ rapid file  I believe
-    #if orb == 'gfr':
-    #    orb = 'gbm'
-    # i think gfr should point to gfr ... 
 
     # if you choose GPS+GLO, you get the JAXA sp3 file 
     if orb == 'gps+glo':
@@ -147,7 +145,7 @@ def main():
     else:
         archive = args.archive.lower()
         if archive not in archive_list:
-            print('You picked an archive that does not exist')
+            print('You picked an archive that is not allowed')
             print('For future reference: I allow these archives:') 
             print(archive_list)
             print('Exiting')
