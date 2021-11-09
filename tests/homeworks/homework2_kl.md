@@ -52,17 +52,23 @@ Try setting the median filter to 0.25 meters and individual tracks to 30.*
 
 <code>daily_avg gls1 0.25 30</code>
 
-Produces three plots and a daily average file.  My plots have ALL the data in them.
+Produces three plots and a daily average file.  My plots have every day of 2012 in them whereas yours will only have one point per week.
+
+This is all the individual RH:
 
 <img src=gls1-av.png width=500/>
 
+This is the daily average after outliers have been removed:
+
 <img src=gls1-av2.png width=500/>
+
+This lets you know how many arcs went into each day's average:
 
 <img src=gls1-av3.png width=500/>
 
-The data in the main RH plot show you long-term accumulation as well as relatively small snow 
-accumulation events. The overall plot is dominated by the large melt event in the summer of 2012.
 *Note that RH is plotted on the y-axis with RH decreasing rather than increasing. Why do you think we did that?*
 
 Most people are interested in snow accumulation, so reversing the y-axis accommodates that.
+
+[Here is my RH result for 2012.](gls1_dailyRH.txt)
 
