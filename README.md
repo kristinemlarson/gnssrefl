@@ -575,6 +575,11 @@ The RINEX inputs are always deleted, so do not put your only copy of the files i
 Please note: we are using the publicly available <code>gfzrnx</code> code to convert RINEX 3 files into RINEX 2.11 files. 
 If you do not have <code>gfzrnx</code> installed, you will not be able to use RINEX 3 files.
 
+I believe it is also allowed to put your 
+RINEX files into $REFL_CODE/YYYY/rinex/ssss where YYYY is the year 
+and ssss is the four character station name. The advantage of doing 
+this is that your RINEX files will not be deleted.
+
 <HR>
 
 ### v. quickLook <a name="module2"></a>
@@ -957,14 +962,16 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 ### 8. Acknowledgements <a name="acknowledgements"></a>
 
 [Radon Rosborough](https://github.com/raxod502) helped me with my python questions. 
-Joakim Strandberg provided python RINEX translators, and Johannes Boehm provided source code for the 
-refraction correction. 
+Naoya Kadota added the GSI data archive. Joakim Strandberg provided python RINEX 
+translators, and Johannes Boehm provided source code for the 
+refraction correction. Kelly Enloe made Jupyter notebooks and Tim 
+Dittmann made docker builds.
 
 
 Kristine M. Larson
 
 [https://kristinelarson.net](https://kristinelarson.net)
 
-This documentation was updated on September 28, 2021.
+This documentation was updated on November 8, 2021.
 
 
