@@ -54,11 +54,12 @@ Try setting the median filter to 0.25 meters and individual tracks to 30.*
 
 Produces three plots and a daily average file.  My plots have ALL the data in them.
 
-<img src=gls1_av.png width=500/>
+<img src=gls1-av.png width=500/>
 
-<img src=gls1_av2.png width=500/>
+<img src=gls1-av2.png width=500/>
 
-<img src=gls1_av3.png width=500/>
+<img src=gls1-av3.png width=500/>
+
 The data in the main RH plot show you long-term accumulation as well as relatively small snow 
 accumulation events. The overall plot is dominated by the large melt event in the summer of 2012.
 *Note that RH is plotted on the y-axis with RH decreasing rather than increasing. Why do you think we did that?*
