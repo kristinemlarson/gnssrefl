@@ -1,0 +1,41 @@
+{
+    "station": "ross",
+    "lat": 48.8337,
+    "lon": -87.5196,
+    "ht": 149.835,
+    "minH": 2,
+    "maxH": 8,
+    "e1": 5,
+    "e2": 15,
+    "NReg": [
+        2.0,
+        8.0
+    ],
+    "PkNoise": 3.0,
+    "polyV": 4,
+    "pele": [
+        5,
+        30
+    ],
+    "ediff": 2,
+    "desiredP": 0.005,
+    "azval": [
+        90,
+        180 
+    ],
+    "freqs": [
+        1
+    ],
+    "reqAmp": [
+        6.0
+    ],
+    "refraction": true,
+    "overwriteResults": true,
+    "seekRinex": false,
+    "wantCompression": false,
+    "plt_screen": false,
+    "onesat": null,
+    "screenstats": false,
+    "pltname": "ross_lsp.png",
+    "delTmax": 75
+}

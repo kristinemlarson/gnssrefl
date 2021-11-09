@@ -22,16 +22,20 @@ were trying out the webapp?
 How about the azimuths?  Go back to the reflection zone webapp and 
 make sure you are happy with your azimuth and elevation angle selections.
 
-*Next we need to save our <code>gnssrefl</code> analysis strategy using 
-<code>make_json_input</code>.*
+*Next we need to save our <code>gnssrefl</code> analysis strategy*
+
+<code>make_json_input ross 48.833729447 -87.519598801 149.8350237 -l1 True -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3</code>
 
 
+[My json was hand edited for the southeast azimuths.](ross.json)
 
-* You will need to hand edit the azimuths in the json file. You want
-to cut up your azimuth range in 60-90 degree chunks.  So if you wanted to use the region 
-for 90-270 degrees, you should say 90-180
-and 180-270. You can use smaller chunks, but I generally do not use less than 45 degree azimuth chunks.
+*Now analyze data for the year 2020 using weekly flag*
 
-*Now run <code>gnssir</code> for the year 2020/doy 150.*
+First you need to make the snr files:
 
+<code>rinex2snr ross 2020 120 -doy_end 290 -weekly True</code> 
+
+<code>gnssir ross 2020 120 -doy_end 290 </code> 
+
+<code>daily_avg ross 0.25 15</code>
 
