@@ -1,6 +1,8 @@
 ## Homework 2 Solution
 
 
+
+
 **Purpose:** Learn how to measure snow depth levels with <code>gnssrefl</code> using GNSS data 
 
 **Station:**
@@ -35,7 +37,9 @@ First you need to translate one day of RINEX data.  Use the year 2012 and day of
 Once you have successfully created a SNR file, run <code>quickLook</code>.
 [For more details on translating RINEX files and quicklook output](https://github.com/kristinemlarson/gnssrefl).
 
-**rinex2snr gls1 2012 100 -archive unavco**
+<span style="color: red;">
+rinex2snr gls1 2012 100 -archive unavco
+</span>
 
 Looking at the QC metrics plots created by <code>quickLook</code>, do you have some ideas on how to change the azimuth mask angles?
 
