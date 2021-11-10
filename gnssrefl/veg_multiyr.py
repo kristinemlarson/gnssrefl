@@ -133,7 +133,8 @@ def main():
                         mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
                         if requested_rcv:
                             k+=1
-                            vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}   {4:s}\n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile))
+                            yy,mm,dd= g.ydoy2ymd(y,d)
+                            vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}  {4:s} {5:2.0f} {6:2.0f} \n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile,mm,dd))
     else:
         for y in range(y1,y2):
             for d in range(1,367):
@@ -142,7 +143,8 @@ def main():
                     mp12, mp1,requested_rcv,rcvinfile=veg.readoutmp(sfile,rcvtype)
                     if requested_rcv:
                         k+=1
-                        vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}   {4:s}\n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile))
+                        yy,mm,dd= g.ydoy2ymd(y,d)
+                        vegid.write("{0:4.0f} {1:3.0f} {2:s} {3:s}  {4:s} {5:2.0f} {6:2.0f} \n".format(y,d,mp12[0:6],mp1[0:6], rcvinfile,mm,dd))
     vegid.close()
     print(k, ' daily observations')
     if k > 0:
