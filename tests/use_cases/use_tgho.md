@@ -83,7 +83,7 @@ Use <code>make_json_input</code> to set up the analysis parameters. Set the elev
 The azimuth mask has to be set by hand to exclude empty regions and azimiths with poor retrievals. 
 Glonass signals (frequencies 101 and 102) were added and GPS L2/L5 were removed.[Sample json](tgho.json)
 
-Then run <code>rnx2snr</code> for ~six months:
+Then make SNR files for ~six months:
 
 <code>rinex2snr tgho 2020 130 -archive nz -doy_end 319 -orb gnss</code>
 
