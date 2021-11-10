@@ -185,7 +185,6 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv):
     plt.title(station.upper() + ': Daily Mean Reflection Amplitude, Computed ' + today,fontsize=fs)
     plt.grid()
     plt.xticks(fontsize=fs); plt.yticks(fontsize=fs)
-    plt.gca().invert_yaxis()
     pltname = txtdir + '/' + station + '_RHamp.png'
     plt.savefig(pltname)
     print('Daily average RH amplitude file saved as: ', pltname)

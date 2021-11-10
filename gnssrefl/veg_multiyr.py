@@ -59,7 +59,7 @@ def newvegplot(vegout,station):
         #if (len(outx[jj]) > 0):
         #    plt.plot(outx[jj], -outcol3[jj],dd,label=receiver)
         k = k + 1
-    plt.legend(loc="upper left")
+    plt.legend(loc="lower left")
     plt.ylabel('-L1 rms (m)')
     plt.grid()
     plt.title('L1 Multipath Statistics for ' + station.upper() )
