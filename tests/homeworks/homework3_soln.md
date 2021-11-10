@@ -1,7 +1,8 @@
 ### Homework 3 Solution
 
 
-*Make SNR data. The only required inputs are the station name (ross), the year (2020) and day of year (150)*
+*Make SNR data. The only required inputs are the 
+station name (ross), the year (2020) and day of year (150)*
 
 
 <code>rinex2snr ross 2020 150</code> 
@@ -32,13 +33,11 @@ elevation angles to 5-15 and used the peak2noise from the quickLook (which is 3)
 
 [My json was hand edited for the southeast azimuths.](ross.json)
 
-*Now analyze data for the year 2020 using weekly flag*
-
-First you need to make the snr files:
+*Now analyze data for the year 2020. First you need to make the snr files:*
 
 <code>rinex2snr ross 2020 120 -doy_end 290 -weekly True</code> 
 
-Then analyze the data for RH:
+Then use the SNR data to estimate RH:
 
 <code>gnssir ross 2020 120 -doy_end 290 </code> 
 
@@ -54,6 +53,6 @@ The daily average for RH:
 
 <img src=ross-dailyavg.png width=500  />
 
-You can compare these retrievals with the NRCAN tide gauge data for Rossport.
+You can compare these retrievals with the [NRCAN](https://www.nrcan.gc.ca/home) 
+tide gauge data for Rossport.
 To see another Canadian lake level example, see the [use case for mchn.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_mchn.md)
-
