@@ -30,9 +30,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", default=None, type=str, help="for now one year at a time")
-    parser.add_argument("-txtfile", default=None, type=str, help="Filename/will create if not provided") 
+    parser.add_argument("-txtfile", default=None, type=str, help="Provide your filename if you want to use it for spline fitting") 
+    parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt") 
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
-    parser.add_argument("-outlier", default=None, type=str, help="outlier criterion input (meters)")
+    parser.add_argument("-outlier", default=None, type=str, help="outlier criterion used in splinefit (meters)")
+    parser.add_argument("-sigma", default=None, type=str, help="simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)")
     parser.add_argument("-extension", default=None, type=str, help="soln subdirectory")
     parser.add_argument("-spline", default=None, type=str, help="set to True to turn on spline fitting for RHdot correction")
     parser.add_argument("-doy1", default=None, type=str, help="initial day of year")
@@ -58,10 +60,22 @@ def main():
     else:
         ext = args.extension
 
+    # if not specified, use 2.5 sigma
+    if args.sigma == None:
+        sigma = 2.5 
+    else:
+        sigma = float(args.sigma)
+
+    # if not specified, use outlier criterion of 0.5 m
+    # i believe this is only used for spline
+    if args.outlier == None:
+        outlier = 0.5 
+    else:
+        outlier = float(args.outlier)
+
 #   these are optional output options
     if args.txtfile == None:
-        #create the subdaily file
-    # read in the data and make a plot
+    #create the subdaily file
         if args.doy1 == None:
             doy1 = 1
         else:
@@ -72,43 +86,45 @@ def main():
         else:
             doy2 = int(args.doy2)
 
-        ntv,obstimes = t.readin_and_plot(station, year,doy1,doy2,plt,ext)
+        # writejson not allowed as of yet.
+        writecsv = False
+        if args.csvfile == 'True':
+            writecsv = True
+
+        ntv,obstimes,fname,fname_new = t.readin_and_plot(station, year,doy1,doy2,plt,ext,sigma,writecsv)
+        haveObstimes = True
         N,M = np.shape(ntv)
-     # use function instead of writing it here
-        writecsv = False;   writetxt = True
-        fname = xdir + '/Files/' + station + '_subdaily_rh.txt'
-        fname_new = xdir + '/Files/' + station + '_subdaily_edits_rh.txt'
-        extraline = ''
-        t.write_subdaily(fname,station,ntv,writecsv,writetxt,extraline)
     else:
-        fname = args.txtfile
-        if not os.path.isfile(fname):
-            print('Input subdaily RH file does not exist:', fname)
+        haveObstimes = False
+        fname_new = args.txtfile
+        if not os.path.isfile(fname_new):
+            print('Input subdaily RH file you provided does not exist:', fname_new)
             sys.exit()
 
     # I think these are used just for velocity ...
-    perday = 24*20 # every 3 minutes
-
-    # if not specified, use outlier criterion of 0.5 m
-    if args.outlier == None:
-        outlier = 0.5 
-    else:
-        outlier = float(args.outlier)
+    perday = 24*20 # yikes - every 3 minutes
 
     usespline = False # though it is dangerous
     if args.spline == 'True':
         usespline = True
-
     # testing added so that if it crashes, only effects me.  and I get more useful error messages
     # added spline input 2021 oct 27. It was not coded well enough for gaps etc.
-    if args.testing == None:
-        try:
-            tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,usespline,obstimes=obstimes)
-        except: 
-            if usespline == True:
-                print('Some issues with the spline fit, mostly likely due to data gaps')
-    else:
-        tv,corr = t.splines_for_dummies2(station,fname, fname_new, perday,plt,outlier,usespline,obstimes=obstimes)
+    input2spline = fname_new; output4spline = fname_new + '.rev'
+    if usespline:
+        if (args.testing == None): 
+            try:
+                if haveObstimes:
+                    tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier,obstimes=obstimes)
+                else:
+                    tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier)
+            except: 
+                okok = 1
+        else:
+            print('for me only')
+            if haveObstimes:
+                tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier,obstimes=obstimes)
+            else:
+                tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier)
 
 
 if __name__ == "__main__":

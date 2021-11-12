@@ -34,10 +34,13 @@ def print_badpoints(t,outliersize):
     f = 'outliers.txt'
     print('outliers written to file: ', f) 
     fout = open(f, 'w+')
-    for i in range(0,m):
-        fout.write('doy {0:3.0f} sat {1:3.0f} azim {2:6.2f} fr {3:3.0f} pk2noise {4:5.1f} residual {5:5.2f} \n'.format(
-            t[i,1], t[i,3],t[i,5], t[i,10], t[i,13], outliersize[i] ))
-    fout.close()
+    if (m > 0):
+        for i in range(0,m):
+            fout.write('doy {0:3.0f} sat {1:3.0f} azim {2:6.2f} fr {3:3.0f} pk2noise {4:5.1f} residual {5:5.2f} \n'.format( 
+                t[i,1], t[i,3],t[i,5], t[i,10], t[i,13], outliersize[i] ))
+        fout.close()
+    else:
+        print('no outlier points to write to a file')
 
 def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
@@ -47,6 +50,9 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     if writejson is true, then it is written to txtdir + jsonfile 
     if writecsv is true, then it is written to txtdir + csvfile and so on
     author: kristine larson
+
+    this is pretty dumb - should have one variable telling you the output you want (csv or json or txt)
+    the writejson option is not available
     """
     writetxt = True
     if txtfile == None:
@@ -73,7 +79,7 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     print('outputfile ', outfile)
     return writetxt,writecsv,writejson,outfile
 
-def write_subdaily(outfile,station,ntv,writecsv,writetxt,extraline):
+def write_subdaily(outfile,station,ntv,writecsv,extraline):
     """
     input: output filename
     station - 4 character station name
@@ -85,14 +91,17 @@ def write_subdaily(outfile,station,ntv,writecsv,writetxt,extraline):
     mistake.  put m,d,h,m,s at the end
 
     author: kristine larson
+
+    this does not accommodate json as yet
     """
     # this is lazy - should use shape
     N= len(ntv)
     nr,nc = ntv.shape
-    print('write_subdaily', nr,nc)
+    if nr == 0:
+        print('No results in this file, so nothing to write out.')
+        return
+    print(nr, ' observations will be written to ',outfile)
     N= nr
-    # this is true so I don't have to move the indents
-    print('Results are being written to : ', outfile)
     fout = open(outfile, 'w+')
     write_out_header(fout,station,extraline)
     dtime = False
@@ -114,20 +123,25 @@ def write_subdaily(outfile,station,ntv,writecsv,writetxt,extraline):
     fout.close()
 
 
-def readin_and_plot(station, year,d1,d2,plt2screen,extension):
+def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv):
     """
     Inputs:
     station - 4 character name
     year is year ;-)  
-    d1 and d2 are days of year if you want to look at a smaller dataset
+    d1 and d2 are days of year if you want to look at a smaller dataset (integers)
     plt2screen is a boolean whether you want the plot displayed to the screen
+    extension is where the results files stored in that subdirectory ('' for default) 
+    sigma is how many standard deviations away from mean you allow.   (float)
+
+    files now written out here rather than from subdaily_cl.py
 
     author: kristine larson
     2021april27 return datetime object
     """
     # fontsize
     fs = 12
-    print('Read in the RH retrievals and plot it between these days: ',d1,d2)
+    print('>>>>>>>>>>>>>>>>>>>>>>>> readin RH data <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    print('Read in the RH retrievals for ', year, ' and these days: ',d1,d2)
     if (d2 < d1):
         print('First day of year must be less than last day of year. Exiting')
         sys.exit()
@@ -144,6 +158,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     # datetime object for time
     obstimes = []
     tv = np.empty(shape=[0, 17])
+    print('Will remove daily outliers greater than ', sigma, ' sigma')
     if os.path.isdir(direc):
         all_files = os.listdir(direc)
         #print(direc)
@@ -163,7 +178,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
                         print('some issue with ',fname)
 
     nr,nc=tv.shape
+    tvoriginal = tv
     print('Number of total RH retrievals', nr)
+    nroriginal = nr
     if (nr == 0):
         print('Exiting')
         sys.exit()
@@ -175,7 +192,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     # sort the data
     ii = np.argsort(t)
     t = t[ii] ; rh = rh[ii]
-    # store it all in a new variable
+    # store the sorted data 
     tv = tv[ii,:]
 
 
@@ -187,6 +204,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     lastdoy =  int(max(tv[:,1]))
 
     # now that you have everything the way you want it .... 
+    # make the datatime objects
     nr,nc = tv.shape
     otimes = []
     for ijk in range(0,nr):
@@ -196,7 +214,6 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     # make arrays to save number of RH retrievals on each day
     residuals = np.empty(shape=[0,1])
     nval = []; tval = []; y = tv[0,0]; 
-    multiSigma = 2.5
     stats = np.empty(shape=[0,3])
     for d in range(firstdoy,(lastdoy+1)):
         ii = (tv[:,1] == d)
@@ -214,12 +231,10 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
     #
 
 
+    ii = (np.absolute(residuals) > sigma)
+    jj = (np.absolute(residuals) < sigma)
     if plt2screen:
-        #plt.figure()
-        #plt.plot(otimes, residuals,'.')
-
         fig,ax=plt.subplots()
-        #plt.figure()
         ax.plot(tval,nval,'bo')
         plt.title(station + ': number of RH retrievals each day',fontsize=fs)
         plt.xticks(rotation =45,fontsize=fs)
@@ -270,12 +285,12 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
         # put some amplitude information on it
         # ax.plot( otimes, tv[:,2], '.')
         # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-        ii = (np.absolute(residuals) > multiSigma)
         otimesarray = np.asarray(otimes)
         plt.plot(otimes,tv[:,2], '.',color='gray',label='arcs')
         plt.plot(stats[:,0], stats[:,1], 'o',markersize=8,color='blue',label='daily avg')
-        plt.plot(stats[:,0], stats[:,1]-2.5*stats[:,2], '--',color='black',label='2.5 sigma')
-        plt.plot(stats[:,0], stats[:,1]+2.5*stats[:,2], '--',color='black')
+        slabel = str(sigma) + ' sigma'
+        plt.plot(stats[:,0], stats[:,1]-sigma*stats[:,2], '--',color='black',label=slabel)
+        plt.plot(stats[:,0], stats[:,1]+sigma*stats[:,2], '--',color='black')
         plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
         plt.legend(loc="upper left")
         plt.ylabel('meters',fontsize=fs)
@@ -288,12 +303,23 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension):
         plt.savefig(plotname,dpi=300)
         print('png file saved as: ', plotname)
 
-
         plt.show()
-    # probably nice to also have a plot with number of retrievals vs time
 
+    # now write things out
+    fname = xdir + '/Files/' + station + '_subdaily_rh.txt'
+    fname_new = xdir + '/Files/' + station + '_subdaily_rh_edits.txt'
+    extraline = ''
+
+    editedtv = tv[jj,:]
+    nr,nc = editedtv.shape
+    print('Original observations', nroriginal)
+    write_subdaily(fname,station,tvoriginal,writecsv,extraline)
+    print('Edited observations',nr)
+    write_subdaily(fname_new,station,editedtv,writecsv,extraline)
+    print('Percent of observations removed: ', round(100*(nroriginal-nr)/nroriginal,2))
     
-    return tv,otimes
+    # now return the names of the output files ... 
+    return tv,otimes, fname, fname_new
 
 
 def quickTr(year, doy,frachours):
@@ -456,17 +482,18 @@ def writejsonfile(ntv,station, outfile):
 
     return True
 
-def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline,**kwargs):
+def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs):
     """
-    tvd is a filename for subdaily RH results 
+    inputs:
+    station - 4 char
+    fname - input filename 
+    fname_new - output filename
+    perday is number of velocity measurements per day (interpolated)
+    pltit - boolean for plots to the screen
+    outlierV is meter outlier cutoff
 
     pltit is a boolean for plots to come to the screen
     note: x was in units of years before but now is in days??
-
-
-    Returns xx and y- these are in units of days (xx)
-    and meters (yy), where yy is the spline fit to reflector height
-    computed perday times per day
 
     2021april27 sending obstimes as kwarg input
     2021may5 change file format back to original file format
@@ -479,24 +506,32 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
 
     """
     fs = 12 # fontsize
+    print('>>>>>>>>>>>>>>>>>>>> Entering spline fit <<<<<<<<<<<<<<<<<<<<<<<<')
+    print('Input filename:', fname)
+    print('Output filename: ', fname_new)
     # read in the tvd values which are the output of gnssir
     # i.e. the reflector heights
     tvd = np.loadtxt(fname,comments='%')
+    if len(tvd) == 0:
+        print('empty input file')
+        return
     # sort the data by days 
     ii = np.argsort( (tvd[:,1]+tvd[:,4]/24) ).T
     tvd = tvd[ii,:]
 
     NV = len(tvd)
+    # remove a median value
     medval = np.median(tvd[:,2])
     xx= tvd[:,2]-medval
     plt_histograms = False
+    # turned off these plots at request of jupyter notebook users 
     if plt_histograms:
         plt.figure()
         n, bins, patches = plt.hist(xx, 50, density=True, facecolor='g', alpha=0.75)
         plt.xlabel('standard deviations')
         plt.title('RH (median removed) ')
 
-    # use 3 sigma ...  ??? 
+    # use 3 sigma for the histogram plot
     Sig = np.std(xx)
     ij =  np.absolute(xx) < 3*Sig
     xnew = xx[ij]
@@ -510,6 +545,8 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
         if pltit:
             plt.show()
 
+    # sure looks like 3 sigma is being removed here! But this would get rid of a real storm surge
+    # perhaps not needed since 3 sigma could be taken out from the daily values
     tvd = tvd[ij,:]
 
 
@@ -519,14 +556,11 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
     h = tvd[:,2]
     # this is the edot factor
     xfac = tvd[:,12]
-    if not usespline:
-        return
-    print('This code will try to remove massive outliers using a spline fit')
     
     # now get obstimes if they were not passed
     obstimes = kwargs.get('obstimes',[])
     if len(obstimes) == 0:
-        print('you need to get those obstimes ...')
+        print('Calculating obstimes ...')
         obstimes = g.get_obstimes(tvd)
 
     # 
@@ -537,12 +571,12 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
     # fill in gaps using variables called tnew and ynew
     Ngaps = 0
     for i in range(1,len(th)):
-        d= th[i]-th[i-1] # delta in time
+        d= th[i]-th[i-1] # delta in time in units of days ?
         if (d > gap):
             #print(t[i], t[i-1])
             x0 = th[i-1:i+1]
             h0 = h[i-1:i+1]
-            print('Gap on doy:', int(np.floor(x0[0])),'/hr:', int(100*d*24)/100)
+            print('Gap on doy:', int(np.floor(x0[0])), ' lasting ', round(d*24,2), ' hours ')
             Ngaps = Ngaps + 1
             f = scipy.interpolate.interp1d(x0,h0)
             # so this is fake data
@@ -556,32 +590,56 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
             tnew = np.append(tnew,th[i])
             ynew = np.append(ynew,h[i])
 
-    if (Ngaps > 2):
-        print('This is a beta version - and does not work well with gaps. Exiting for your own safety.')
+    if (Ngaps > 3):
+        print('This is a beta version of the spline fit code - and does not work well with gaps. Exiting for your own safety.')
         sys.exit()
     # sort it just to make sure ...
     ii = np.argsort( tnew) 
     tnew = tnew[ii]
     ynew = ynew[ii]
+#   going to add more fake data ...
+    first = tnew[0]
+    last = tnew[-1]
+    ii = (tnew <= first + 0.25)
+    jj = (tnew >= last-0.25)
+    first6hours = np.mean(ynew[ii])
+    last6hours = np.mean(ynew[jj])
+    for ii in range(1,24):
+        tnew = np.append(tnew,first-ii/48)
+        ynew = np.append(ynew, first6hours)
+    for ii in range(1,24):
+        tnew = np.append(tnew,last+ii/48)
+        ynew = np.append(ynew, last6hours)
 
-    knots_per_day = 12
+    
+    # now sort them again .... 
+    ii = np.argsort(tnew) 
+    tnew = tnew[ii]
+    ynew = ynew[ii]
+
+    # making a knot every three hours ...
+    knots_per_day = 8
     Ndays = tnew.max()-tnew.min()
     numKnots = int(knots_per_day*(Ndays))
     print('First and last time values', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
     print('Number of RH obs', len(h))
     print('Average obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
     print('Number of knots: ', numKnots)
+    print('Outlier criterion with respect to spline fit: ', outlierV, ' m ')
     print('Number of days of data: ', '{0:8.2f}'.format ( Ndays) )
     # need the first and last knot to be inside the time series
-    t1 = tnew.min()+0.05
-    t2 = tnew.max()-0.05
+    firstKnot_in_minutes = 15
+    #t1 = tnew.min()+0.05
+    #t2 = tnew.max()-0.05
+    t1 = tnew.min()+firstKnot_in_minutes/60/24
+    t2 = tnew.max()-firstKnot_in_minutes/60/24
     # try this 
     # 
     knots =np.linspace(t1,t2,num=numKnots)
 
     #ftest = open('testing.txt', 'w+')
-    #for i in range(0,len(tnew)):
-    #    ftest.write('{0:9.4f} {1:7.3f}  \n'.format( tnew[i], ynew[i]))
+    #for i in range(0,len(knots)):
+    #    ftest.write('{0:9.4f} \n'.format( knots[i]))
     #ftest.close()
 
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
@@ -589,7 +647,8 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
     # user specifies how many values per day you want to send back to the user  
 
     # should i do extrapolate True? it is the default  - could make it periodic?
-    spline = interpolate.BSpline(t, c, k, extrapolate=True)
+    #spline = interpolate.BSpline(t, c, k, extrapolate=True)
+    spline = interpolate.BSpline(t, c, k, extrapolate=False)
     # equal spacing in both x and y
     # evenly spaced data - units of days
     N = int(Ndays*perday)
@@ -613,7 +672,8 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
         #obstimes = fract_to_obstimes(spl_x)
         plt.plot(spl_x, spl_y, 'r', label='spline')
         plt.title('Station: ' + station + ' Reflector Height')
-        plt.plot(th[j], h[j], 'co',label='Outliers') 
+        outlierstring = str(outlierV) + '(m) outliers'
+        plt.plot(th[j], h[j], 'co',label=outlierstring) 
         plt.ylabel('meters',fontsize=fs)
         plt.xlabel('days',fontsize=fs)
         plt.grid()
@@ -637,7 +697,11 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
     yvel = obsPerHour*np.diff(spl_y)
 
     rhdot_at_th = np.interp(th, tvel, yvel)
-
+    #debug = open('debugging.txt', 'w+')
+    #for w in range(0,len(spl_x)):
+    #    debug.write(' {0:9.4f} {1:8.3f} \n'.format (spl_x[w], spl_y[w] ) )
+#
+#    debug.close()
     # this is the RHdot correction. This can be done better - 
     # this is just a start
     correction = xfac*rhdot_at_th
@@ -655,6 +719,12 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
         plt.grid()
         plt.yticks(fontsize=fs)
         plt.xticks(fontsize=fs)
+        ydiff = max(yvel) - min(yvel)
+        y2 = 0.1*ydiff + max(yvel)  ; y1 = min(yvel) - 0.1*ydiff
+        plt.xlim((th[0], th[-1]))
+        #print('min and max values', y1,y2,max(yvel), min(yvel))
+
+        plt.ylim((y1,y2))
         #fig.autofmt_xdate()
 
         #plt.figure()
@@ -683,10 +753,11 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,usespline
 
     # put the correction in column 2
     tvd[:,2] = tvd[:,2] - correction
-    writecsv = False
-    writetxt = True
+    writecsv = False; writetxt = True
     extraline = 'Large outliers removed and RHDot correction has been applied'
-    write_subdaily(fname_new,station,tvd,writecsv,writetxt,extraline)
+    write_subdaily(fname_new,station,tvd,writecsv,extraline)
+    nr,nc = tvd.shape
+    print('Percent of observations removed:', round(100*(NV-nr)/NV,2))
 
     return tvd, correction 
 
