@@ -5,6 +5,9 @@
 
 ### gnssrefl
 
+[PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
+[DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
+
 
 [Would you like to help write code for this software package?](#help)
 
