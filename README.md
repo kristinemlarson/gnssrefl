@@ -965,11 +965,12 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 ### 8. Acknowledgements <a name="acknowledgements"></a>
 
-[Radon Rosborough](https://github.com/raxod502) helped me with my python questions. 
-Naoya Kadota added the GSI data archive. Joakim Strandberg provided python RINEX 
-translators, and Johannes Boehm provided source code for the 
-refraction correction. Kelly Enloe made Jupyter notebooks and Tim 
-Dittmann made docker builds.
+- [Radon Rosborough](https://github.com/raxod502) helped me with my python questions. 
+- Naoya Kadota added the GSI data archive. 
+- Joakim Strandberg provided python RINEX translators. 
+- Johannes Boehm provided source code for the refraction correction. 
+- Kelly Enloe made Jupyter notebooks and Tim Dittmann made docker builds. 
+- Makan Karegar added NMEA capability.
 
 
 Kristine M. Larson
