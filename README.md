@@ -53,6 +53,7 @@ to install, if you have it brew install gfortran. If you don't have homebrew, th
     4. [rinex2snr: translating RINEX files into SNR files](#module1)
     5. [quickLook: assessing a site using SNR files](#module2)
     6. [gnssir: estimating reflector heights from SNR data](#module3)
+    7. [nmea2snr: translating NMEA files into SNR files](#module4)
 4. [Bugs/Future Work](#bugs)
 5. [Utilities](#helper)
 6. [Publications](#publications)
@@ -652,6 +653,7 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 [**Example for a tall site**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
 
+
 <HR>
 
 ### vi. gnssir <a name="module3"></a>
@@ -777,6 +779,16 @@ Note that a failed satellite arc is shown as gray in the periodogram plots. And 
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 <HR>
+
+### vii. nmea2snr <a name="module4"></a>
+
+NMEA formats can be translated to SNR using <code>nmea2snr</code>.
+Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
+NMEA files are assumed to be stored in $REFL_CODE/ directories as:
+
+['REFL_CODE'] + '/nmea/ABCD/2021/ABCD0030.21.A
+
+which is station ABCD in year 2021 and day of year 3. NMEA files may be gzipped.
 
 ### 4. Bugs/Features <a name="bugs"></a>
 
