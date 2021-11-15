@@ -105,8 +105,13 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                 rh = good
                                 # this is the plot with all the data -not the daily average
                                 alltimes = []
-                                filler = datetime.datetime(year=yr, month=d.month, day=d.day)
+
+                                # put in the real time (as opposed to just year,month day)
+                                #filler = datetime.datetime(year=yr, month=d.month, day=d.day, hour = hrr, minute=mm, second = ss)
                                 for w in range(0,len(good)):
+                                    hrr = int(np.floor(gutcTime[w])) # 
+                                    mm = int(60*(gutcTime[w] - hrr )); ss = 0
+                                    filler = datetime.datetime(year=yr, month=d.month, day=d.day, hour = hrr, minute=mm, second = ss)
                                     alltimes.append(filler)
                                 ax.plot(alltimes,good,'b.')
 

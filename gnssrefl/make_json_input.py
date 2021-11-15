@@ -60,7 +60,9 @@ def main():
 
     if args.query_unr == 'True':
         # try to find the default coordinates 
-        Lat, Long, Height = g.queryUNR(station)
+        #Lat, Long, Height = g.queryUNR(station)
+        # updated to new database
+        Lat, Long, Height = g.queryUNR_modern(station)
         if (Lat == 0):
             print('Tried to find coordinates in our UNR database. Not found so exiting')
             sys.exit()

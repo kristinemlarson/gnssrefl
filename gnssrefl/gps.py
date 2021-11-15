@@ -4289,15 +4289,30 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
     takes as input the names of a rinex3 file and a rinex2 file
     code checks that gfzrnx executable exists
     this does multi-GNSS
+    2021nov14 checks for gz files too
+    will translate Hatanaka.  Maintains initial rinex3 file.
+    does not store anything. Everything stays where it was 
     """
     fexists = False
     gexe = gfz_version()
-    # flags for Beidou
+    crnxpath = hatanaka_version()
+    #lastbit =  r3_filename[-6:]
+    if r3_filename[-3:] == 'crx':
+        if not os.path.exists(crnxpath):
+            print('You need to install Hatanaka translator. Exiting.')
+            sys.exit()
+        r3_filename_new = r3_filename[0:35] + 'rnx'
+        print('Converting to Hatanaka compressed to uncompressed')
+        subprocess.call([crnxpath, r3_filename])
+        # removing the compressed version - will keep new version
+        subprocess.call(['rm', '-f', r3_filename ])
+        # now swap name
+        r3_filename = r3_filename_new
+    # these are my favorite observables
     gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I'
     if not os.path.exists(gexe):
         print('gfzrnx executable does not exist and this file cannot be translated')
     else:
-        #print('gfzrnx executable does exist')
         if os.path.isfile(r3_filename):
             try:
                 subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f'])
@@ -4306,11 +4321,10 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
                     fexists = True
                 else:
                     sigh = 0
-#                print('rinex 2 was not created')
-                print('remove rinex 3 file')
-                subprocess.call(['rm', '-f', r3_filename ])
             except:
                 print('some kind of problem in translation from RINEX 3 to RINEX 2.11')
+        else:
+            print('RINEX 3 file does not exist', r3_filename)
 
 
     return fexists

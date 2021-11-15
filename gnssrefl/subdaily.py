@@ -303,6 +303,17 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv):
         plt.savefig(plotname,dpi=300)
         print('png file saved as: ', plotname)
 
+        fig,ax=plt.subplots()
+        plt.plot(otimesarray[jj],tv[jj,2], '.',color='green',label='arcs')
+        plt.gca().invert_yaxis()
+        plt.ylabel('meters',fontsize=fs)
+        plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+        plt.title('GNSS station: ' + station.upper() + ' Edited Reflector Heights', fontsize=fs)
+        plt.grid() ; fig.autofmt_xdate()
+        plotname = txtdir + '/' + station + '_outliers_removed.png'
+        plt.savefig(plotname,dpi=300)
+        print('png file saved as: ', plotname)
+
         plt.show()
 
     # now write things out
