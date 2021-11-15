@@ -30,7 +30,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", default=None, type=str, help="for now one year at a time")
-    parser.add_argument("-txtfile", default=None, type=str, help="Provide your filename if you want to use it for spline fitting") 
+    parser.add_argument("-txtfile", default=None, type=str, help="Filename for editing") 
+    parser.add_argument("-splinefile", default=None, type=str, help="Input filename for spline fitting (optional)") 
     parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt") 
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
     parser.add_argument("-outlier", default=None, type=str, help="outlier criterion used in splinefit (meters)")
@@ -57,7 +58,7 @@ def main():
 
     txtdir = xdir + '/Files'
     if not os.path.exists(txtdir):
-        subprocess.call(['mkdir',txdir])
+        subprocess.call(['mkdir',txtdir])
  
     if args.extension == None:
         ext = ''
@@ -94,30 +95,38 @@ def main():
     if not (args.peak2noise == None):
         peak2noise = float(args.peak2noise)
 
+    usespline = False # though it is dangerous
+    if args.spline == 'True':
+        usespline = True
+
 #   these are optional output options
-    if args.txtfile == None:
     #create the subdaily file
-        if args.doy1 == None:
-            doy1 = 1
-        else:
-            doy1 = int(args.doy1)
-
-        if args.doy2 == None:
-            doy2 = 366
-        else:
-            doy2 = int(args.doy2)
-
+    if args.doy1 == None:
+        doy1 = 1
+    else:
+        doy1 = int(args.doy1)
+    if args.doy2 == None:
+        doy2 = 366
+    else:
+        doy2 = int(args.doy2)
         # writejson not allowed as of yet.
-        writecsv = False
-        if args.csvfile == 'True':
-            writecsv = True
-
-        ntv,obstimes,fname,fname_new = t.readin_and_plot(station, year,doy1,doy2,plt,ext,sigma,writecsv,azim1,azim2,ampl,peak2noise)
+    writecsv = False
+    if (args.csvfile == 'True'):
+        writecsv = True
+    if (args.splinefile == None):
+        txtfile = ''
+        if (args.txtfile == None):
+            print('Will pick up and concatenate daily result files')
+        else:
+            txtfile = args.txtfile 
+            print('Using ',txtfile)
+        # if txtfile provided, you can use that as your starting dataset 
+        ntv,obstimes,fname,fname_new = t.readin_and_plot(station, year,doy1,doy2,plt,ext,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile)
         haveObstimes = True
         N,M = np.shape(ntv)
     else:
         haveObstimes = False
-        fname_new = args.txtfile
+        fname_new = args.splinefile
         if not os.path.isfile(fname_new):
             print('Input subdaily RH file you provided does not exist:', fname_new)
             sys.exit()
@@ -125,9 +134,6 @@ def main():
     # I think these are used just for velocity ...
     perday = 24*20 # yikes - every 3 minutes
 
-    usespline = False # though it is dangerous
-    if args.spline == 'True':
-        usespline = True
     # testing added so that if it crashes, only effects me.  and I get more useful error messages
     # added spline input 2021 oct 27. It was not coded well enough for gaps etc.
     input2spline = fname_new; output4spline = fname_new + '.rev'

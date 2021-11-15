@@ -123,7 +123,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline):
     fout.close()
 
 
-def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise):
+def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile):
     """
     Inputs:
     station - 4 character name
@@ -137,46 +137,48 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     author: kristine larson
     2021april27 return datetime object
-    added azimuth and amplitude constraints
+    added azimuth, amplitude,peak2noise constraints
+    allow file to be input
     """
     # fontsize
     fs = 12
-    print('>>>>>>>>>>>>>>>>>>>>>>>> readin RH data <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-    print('Read in the RH retrievals for ', year, ' and these days: ',d1,d2)
-    if (d2 < d1):
-        print('First day of year must be less than last day of year. Exiting')
-        sys.exit()
-
     xdir = os.environ['REFL_CODE']
-
     # output will go to REFL_CODE/Files
     txtdir = xdir + '/Files'
+    print('Will remove daily outliers greater than ', sigma, ' sigma')
     if not os.path.exists(txtdir):
         os.makedirs(txtdir)
 
+    print('>>>>>>>>>>>>>>>>>>>>>>>> readin RH data <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+    if txtfile == '':
+        print('Read in the RH retrievals for ', year, ' and these days: ',d1,d2)
+        if (d2 < d1):
+            print('First day of year must be less than last day of year. Exiting')
+            sys.exit()
     # where the LSP results are kept
-    direc = xdir + '/' + str(year) + '/results/' + station  + '/' + extension + '/'
+        direc = xdir + '/' + str(year) + '/results/' + station  + '/' + extension + '/'
     # datetime object for time
-    obstimes = []
-    tv = np.empty(shape=[0, 17])
-    print('Will remove daily outliers greater than ', sigma, ' sigma')
-    if os.path.isdir(direc):
-        all_files = os.listdir(direc)
-        #print(direc)
-        #print('Number of files in ', year, len(all_files))
-        for f in all_files:
+        obstimes = []
+        tv = np.empty(shape=[0, 17])
+        if os.path.isdir(direc):
+            all_files = os.listdir(direc)
+            for f in all_files:
             # only evaluate txt files
-            if (len(f) ==  7) and (f[4:7] == 'txt'):
-                day = int(f[0:3])
+                if (len(f) ==  7) and (f[4:7] == 'txt'):
+                    day = int(f[0:3])
                 #print('looking at file: ', day)
-                if (day >= d1) & (day <= d2):
-                    fname = direc + f
-                    try:
-                        a = np.loadtxt(fname,comments='%')
-                        if len(a) > 0:
-                            tv = np.append(tv, a,axis=0)
-                    except:
-                        print('some issue with ',fname)
+                    if (day >= d1) & (day <= d2):
+                        fname = direc + f
+                        try:
+                            a = np.loadtxt(fname,comments='%')
+                            if len(a) > 0:
+                                tv = np.append(tv, a,axis=0)
+                        except:
+                            print('some issue with ',fname)
+
+    else:
+        # using external file of concatenated results
+        tv = np.loadtxt(txtfile,comments='%')
 
     nr,nc=tv.shape
     tvoriginal = tv
@@ -639,10 +641,10 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     jj = (tnew >= last-0.25)
     first6hours = np.mean(ynew[ii])
     last6hours = np.mean(ynew[jj])
-    for ii in range(1,24):
+    for ii in range(1,12):
         tnew = np.append(tnew,first-ii/48)
         ynew = np.append(ynew, first6hours)
-    for ii in range(1,24):
+    for ii in range(1,12):
         tnew = np.append(tnew,last+ii/48)
         ynew = np.append(ynew, last6hours)
 
