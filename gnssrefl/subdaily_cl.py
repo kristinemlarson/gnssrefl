@@ -40,6 +40,10 @@ def main():
     parser.add_argument("-doy1", default=None, type=str, help="initial day of year")
     parser.add_argument("-doy2", default=None, type=str, help="end day of year")
     parser.add_argument("-testing", default=None, type=str, help="set to True for testing mode")
+    parser.add_argument("-ampl", default=None, type=str, help="new amplitude constraint")
+    parser.add_argument("-azim1", default=None, type=str, help="new min azimuth")
+    parser.add_argument("-azim2", default=None, type=str, help="new max azimuth")
+    parser.add_argument("-peak2noise", default=None, type=str, help="new peak2noise constraint")
 
     args = parser.parse_args()
 #   these are required
@@ -73,6 +77,23 @@ def main():
     else:
         outlier = float(args.outlier)
 
+# these constraints are added at the command line
+    azim1 = 0
+    if not (args.azim1 == None):
+        azim1 = int(args.azim1)
+
+    azim2 = 360 
+    if not (args.azim2 == None):
+        azim2 = int(args.azim2)
+
+    ampl = 0 
+    if not (args.ampl == None):
+        ampl = float(args.ampl)
+
+    peak2noise = 0
+    if not (args.peak2noise == None):
+        peak2noise = float(args.peak2noise)
+
 #   these are optional output options
     if args.txtfile == None:
     #create the subdaily file
@@ -91,7 +112,7 @@ def main():
         if args.csvfile == 'True':
             writecsv = True
 
-        ntv,obstimes,fname,fname_new = t.readin_and_plot(station, year,doy1,doy2,plt,ext,sigma,writecsv)
+        ntv,obstimes,fname,fname_new = t.readin_and_plot(station, year,doy1,doy2,plt,ext,sigma,writecsv,azim1,azim2,ampl,peak2noise)
         haveObstimes = True
         N,M = np.shape(ntv)
     else:

@@ -123,7 +123,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline):
     fout.close()
 
 
-def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv):
+def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise):
     """
     Inputs:
     station - 4 character name
@@ -137,6 +137,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv):
 
     author: kristine larson
     2021april27 return datetime object
+    added azimuth and amplitude constraints
     """
     # fontsize
     fs = 12
@@ -179,12 +180,11 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv):
 
     nr,nc=tv.shape
     tvoriginal = tv
-    print('Number of total RH retrievals', nr)
+    print('Number of initial RH retrievals', nr)
     nroriginal = nr
     if (nr == 0):
         print('Exiting')
         sys.exit()
-
 
     t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
     rh = tv[:,2]
@@ -195,6 +195,21 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv):
     # store the sorted data 
     tv = tv[ii,:]
 
+    # apply azimuth constraints 
+    ii = (tv[:,5]  >= azim1) & (tv[:,5] <= azim2)
+    tv = tv[ii,:]
+    print(nr-len(tv) , ' points removed for azimuth constraints ',azim1,azim2)
+
+    # now apply amplitude constraint
+    nr,nc = tv.shape
+    ii = (tv[:,6]  >= ampl) ; tv = tv[ii,:]
+    print(nr-len(tv) , ' points removed for amplitude constraint ')
+
+    # now apply peak2noise constraint
+    nr,nc = tv.shape
+    ii = (tv[:,13]  >= peak2noise) ; tv = tv[ii,:]
+    print(nr-len(tv) , ' points removed for peak2noise constraints ')
+
 
     # silly - why read it if you are not going to use it
     # and restrict by doy - mostly to make testing go faster
@@ -202,6 +217,10 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv):
     tv = tv[ii,:]
     firstdoy = int(min(tv[:,1]))
     lastdoy =  int(max(tv[:,1]))
+
+    tvoriginal = tv
+    nr,nc = tvoriginal.shape
+    print('RH retrievals after all constraints', nr)
 
     # now that you have everything the way you want it .... 
     # make the datatime objects
@@ -316,6 +335,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv):
 
         plt.show()
 
+    # this might work... and then again, it might not
+    print_badpoints(tv[ii,:],residuals[ii])
+
     # now write things out
     fname = xdir + '/Files/' + station + '_subdaily_rh.txt'
     fname_new = xdir + '/Files/' + station + '_subdaily_rh_edits.txt'
@@ -323,11 +345,13 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv):
 
     editedtv = tv[jj,:]
     nr,nc = editedtv.shape
-    print('Original observations', nroriginal)
+
+    #print('Observations after constraints ', nroriginal)
     write_subdaily(fname,station,tvoriginal,writecsv,extraline)
     print('Edited observations',nr)
     write_subdaily(fname_new,station,editedtv,writecsv,extraline)
-    print('Percent of observations removed: ', round(100*(nroriginal-nr)/nroriginal,2))
+    NV = len(tvoriginal)
+    print('Percent of observations removed: ', round(100*(NV-nr)/NV,2))
     
     # now return the names of the output files ... 
     return tv,otimes, fname, fname_new
