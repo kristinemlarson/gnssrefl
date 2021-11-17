@@ -79,7 +79,7 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     print('outputfile ', outfile)
     return writetxt,writecsv,writejson,outfile
 
-def write_subdaily(outfile,station,ntv,writecsv,extraline):
+def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     """
     input: output filename
     station - 4 character station name
@@ -95,6 +95,13 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline):
     this does not accommodate json as yet
     """
     # this is lazy - should use shape
+    RHdot_corr= kwargs.get('RHdot_corr',[])
+    newRH = kwargs.get('newRH',[])
+    if len(RHdot_corr) + len(newRH) == 0:
+        extra  = False
+    else:
+        print('extra columns are being written')
+        extra = True
     N= len(ntv)
     nr,nc = ntv.shape
     if nr == 0:
@@ -103,7 +110,10 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline):
     print(nr, ' observations will be written to ',outfile)
     N= nr
     fout = open(outfile, 'w+')
-    write_out_header(fout,station,extraline)
+    if extra:
+        write_out_header(fout,station,extraline,extra_columns=True)
+    else:
+        write_out_header(fout,station,extraline)
     dtime = False
     for i in np.arange(0,N,1):
         year = int(ntv[i,0]); doy = int(ntv[i,1])
@@ -115,10 +125,14 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline):
         #minute = ctime[3:5]
         # you can either write a csv or text, but not both
         if writecsv:
-            fout.write(" {0:4.0f},{1:3.0f},{2:6.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
+            fout.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
                             ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
         else:
-            fout.write(" {0:4.0f} {1:3.0f} {2:6.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
+            if extra:
+                fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:6.3f} {23:6.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
+                            ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), RHdot_corr[i], newRH[i]))
+            else:
+                fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
                             ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
     fout.close()
 
@@ -222,7 +236,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     tvoriginal = tv
     nr,nc = tvoriginal.shape
-    print('RH retrievals after all constraints', nr)
+    print('RH retrievals after all commandline constraints', nr)
 
     # now that you have everything the way you want it .... 
     # make the datatime objects
@@ -429,21 +443,26 @@ def in_out(x,y):
 
     return x,spline(x) 
     
-def write_out_header(fout,station,extraline):
+def write_out_header(fout,station,extraline,**kwargs):
     """
     writes out header for results file ... 
     21may04 extra line for user
     changed this so that it is EXACTLY THE SAME as gnssir, with extra columns for m/d/h/m
     author: kristine larson
     """
+    extra_columns = kwargs.get('extra_columns',False)
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     fout.write('% Results for {0:4s} calculated on {1:20s} \n'.format(  station, xxx ))
     fout.write('% gnssrefl, https://github.com/kristinemlarson \n')
     if len(extraline) > 0:
         fout.write('% IMPORTANT {0:s} \n'.format(  extraline ))
     fout.write('% Phase Center corrections have NOT been applied \n')
-    fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)\n")
-    fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS \n")
+    if extra_columns:
+        fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22) (23)    (24)\n")
+        fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS  RHcor  newRH\n")
+    else:
+        fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)\n")
+        fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS \n")
 
 
 def writejsonfile(ntv,station, outfile):
@@ -604,7 +623,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     fillgap = 1/24 # one hour fake values
     gap = 4/24 # up to four hour gap allowed
 
-    tnew =[] ; ynew =[]; 
+    tnew =[] ; ynew =[]; faket = []; 
     # fill in gaps using variables called tnew and ynew
     Ngaps = 0
     for i in range(1,len(th)):
@@ -615,11 +634,13 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
             h0 = h[i-1:i+1]
             print('Gap on doy:', int(np.floor(x0[0])), ' lasting ', round(d*24,2), ' hours ')
             Ngaps = Ngaps + 1
-            f = scipy.interpolate.interp1d(x0,h0)
+            #f = scipy.interpolate.interp1d(x0,h0)
+            f = scipy.interpolate.interp1d(x0,h0,'quadratic')
             # so this is fake data
             ttnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
             yynew = f(ttnew)
-            #print(ttnew)
+            print(ttnew)
+            faket = np.append(faket, ttnew)
             # now append it to your real data
             tnew = np.append(tnew,ttnew)
             ynew = np.append(ynew,yynew)
@@ -634,17 +655,18 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     ii = np.argsort( tnew) 
     tnew = tnew[ii]
     ynew = ynew[ii]
+#  should really just mirror it or remove data at the ends
 #   going to add more fake data ...
     first = tnew[0]
     last = tnew[-1]
-    ii = (tnew <= first + 0.25)
-    jj = (tnew >= last-0.25)
+    ii = (tnew <= first + 0.1)
+    jj = (tnew >= last-0.1)
     first6hours = np.mean(ynew[ii])
     last6hours = np.mean(ynew[jj])
-    for ii in range(1,12):
+    for ii in range(1,6):
         tnew = np.append(tnew,first-ii/48)
         ynew = np.append(ynew, first6hours)
-    for ii in range(1,12):
+    for ii in range(1,6):
         tnew = np.append(tnew,last+ii/48)
         ynew = np.append(ynew, last6hours)
 
@@ -662,12 +684,10 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     print('Number of RH obs', len(h))
     print('Average obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
     print('Number of knots: ', numKnots)
-    print('Outlier criterion with respect to spline fit: ', outlierV, ' m ')
+    print('Outlier criterion with respect to spline fit (m): ', outlierV)
     print('Number of days of data: ', '{0:8.2f}'.format ( Ndays) )
     # need the first and last knot to be inside the time series
     firstKnot_in_minutes = 15
-    #t1 = tnew.min()+0.05
-    #t2 = tnew.max()-0.05
     t1 = tnew.min()+firstKnot_in_minutes/60/24
     t2 = tnew.max()-firstKnot_in_minutes/60/24
     # try this 
@@ -717,12 +737,30 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         plt.gca().invert_yaxis()
         plt.legend(loc="upper left")
 
-# take out the bad points
+
+# take out these points
     th = th[i]; h = h[i]
     xfac = xfac[i]
     resid_spl = resid_spl[i]
-# remove bad points from the original variable
     tvd = tvd[i,:]
+
+# should take out first and last six hours as well
+    t1 = float(th[0] + 6/24)
+    t2 = float(th[-1] - 6/24)
+# and again
+    i = (th >= t1)
+    th = th[i]; h = h[i]
+    xfac = xfac[i]
+    resid_spl = resid_spl[i]
+    tvd = tvd[i,:]
+
+    i = (th <= t2)
+    th = th[i]; h = h[i]
+    xfac = xfac[i]
+    resid_spl = resid_spl[i]
+    tvd = tvd[i,:]
+
+
 
 # put the original series without outliers eventually?
 # use first diff to get simple velocity.  
@@ -748,6 +786,12 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
     if pltit:
         fig,ax=plt.subplots()
+        ax.plot(th, correction,'.',label='RHcorr')
+        plt.title('RHdot Correction',fontsize=fs)
+        plt.ylabel('meters',fontsize=fs); 
+        plt.grid()
+
+        fig,ax=plt.subplots()
         ax.plot(tvel, yvel, '-',label='RHdot')
         ax.plot(th, rhdot_at_th,'.',label='RHdot at obs')
         plt.title('RHdot in meters per hour',fontsize=fs)
@@ -766,8 +810,10 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
         #plt.figure()
         fig,ax=plt.subplots()
-        ax.plot(th, resid_spl,'.',label='without RHdot corr')
-        ax.plot(th, resid_spl - correction,'.',label='with RHdot corr')
+        label1 = 'w/o RHdot ' + str( round(np.std(resid_spl),2)) + 'm'
+        label2 = 'w/ RHdot ' + str(round(np.std(resid_spl-correction),2)) + 'm'
+        ax.plot(th, resid_spl,'.',label= label1)
+        ax.plot(th, resid_spl - correction,'.',label=label2)
         plt.legend(loc="upper left")
         plt.xlabel('days of the year',fontsize=fs)
         plt.ylabel('meters',fontsize=fs)
@@ -788,11 +834,13 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         if len(ret) > 0:
             print('{0:3.0f} {1:6.2f} {2:6.2f} {3:6.0f}'.format (f, np.mean(ret), np.std(ret), len(ret) ) )
 
-    # put the correction in column 2
-    tvd[:,2] = tvd[:,2] - correction
+    # put the correct RH in column 2
+    # but it would be good to keep the correction and the original value!
+    # and also chop off beginning and end
     writecsv = False; writetxt = True
-    extraline = 'Large outliers removed and RHDot correction has been applied'
-    write_subdaily(fname_new,station,tvd,writecsv,extraline)
+    extraline = 'Large outliers removed/two exta columns '
+    newRH = tvd[:,2] - correction
+    write_subdaily(fname_new,station,tvd,writecsv,extraline,newRH=newRH, RHdot_corr=correction)
     nr,nc = tvd.shape
     print('Percent of observations removed:', round(100*(NV-nr)/NV,2))
 
