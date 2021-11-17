@@ -145,9 +145,9 @@ def main():
                 else:
                     tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier)
             except: 
+                print('Exited the spline code for unknown reasons. Rrun with testing as True if you want more info')
                 okok = 1
         else:
-            print('for me only')
             if haveObstimes:
                 tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier,obstimes=obstimes)
             else:

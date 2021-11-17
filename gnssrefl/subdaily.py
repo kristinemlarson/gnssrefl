@@ -130,7 +130,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
         else:
             if extra:
                 fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:6.3f} {23:6.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
-                            ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), RHdot_corr[i], newRH[i]))
+                            ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], RHdot_corr[i]))
             else:
                 fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
                             ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
@@ -362,9 +362,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     editedtv = tv[jj,:]
     nr,nc = editedtv.shape
 
-    #print('Observations after constraints ', nroriginal)
     write_subdaily(fname,station,tvoriginal,writecsv,extraline)
     print('Edited observations',nr)
+    extraline = 'outliers removed/restrictions'
     write_subdaily(fname_new,station,editedtv,writecsv,extraline)
     NV = len(tvoriginal)
     print('Percent of observations removed: ', round(100*(NV-nr)/NV,2))
@@ -459,7 +459,7 @@ def write_out_header(fout,station,extraline,**kwargs):
     fout.write('% Phase Center corrections have NOT been applied \n')
     if extra_columns:
         fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22) (23)    (24)\n")
-        fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS  RHcor  newRH\n")
+        fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS  newRH  RHcorr\n")
     else:
         fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)\n")
         fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS \n")
@@ -634,8 +634,8 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
             h0 = h[i-1:i+1]
             print('Gap on doy:', int(np.floor(x0[0])), ' lasting ', round(d*24,2), ' hours ')
             Ngaps = Ngaps + 1
-            #f = scipy.interpolate.interp1d(x0,h0)
-            f = scipy.interpolate.interp1d(x0,h0,'quadratic')
+            f = scipy.interpolate.interp1d(x0,h0)
+            #f = scipy.interpolate.interp1d(x0,h0,'quadratic')
             # so this is fake data
             ttnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
             yynew = f(ttnew)
@@ -760,8 +760,6 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     resid_spl = resid_spl[i]
     tvd = tvd[i,:]
 
-
-
 # put the original series without outliers eventually?
 # use first diff to get simple velocity.  
 # 24 hours a day, you asked for perday values by day
@@ -834,11 +832,8 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         if len(ret) > 0:
             print('{0:3.0f} {1:6.2f} {2:6.2f} {3:6.0f}'.format (f, np.mean(ret), np.std(ret), len(ret) ) )
 
-    # put the correct RH in column 2
-    # but it would be good to keep the correction and the original value!
-    # and also chop off beginning and end
     writecsv = False; writetxt = True
-    extraline = 'Large outliers removed/two exta columns '
+    extraline = 'outliers removed/two new columns: corrected RH and the RHdot correction applied '
     newRH = tvd[:,2] - correction
     write_subdaily(fname_new,station,tvd,writecsv,extraline,newRH=newRH, RHdot_corr=correction)
     nr,nc = tvd.shape
