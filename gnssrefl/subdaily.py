@@ -805,7 +805,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         plt.xlim((th[0], th[-1]))
         #print('min and max values', y1,y2,max(yvel), min(yvel))
 
-        plt.ylim((y1,y2))
+        #plt.ylim((y1,y2))
         #fig.autofmt_xdate()
 
         #plt.figure()
