@@ -162,6 +162,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     print('Will remove daily outliers greater than ', sigma, ' sigma')
     if not os.path.exists(txtdir):
         os.makedirs(txtdir)
+    print('Plot to the screen has been set to ', plt2screen)
 
     print('>>>>>>>>>>>>>>>>>>>>>>>> readin RH data <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     if txtfile == '':
@@ -278,7 +279,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
         two_stacked_plots(otimes,tv,station,txtdir)
         stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma)
-
+        print('stacked plots done')
         plt.show()
 
     # this might work... and then again, it might not
@@ -852,6 +853,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
         # ax.plot( otimes, tv[:,2], '.')
         # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
         otimesarray = np.asarray(otimes)
+
         ax1 = fig.add_subplot(211)
         plt.plot(otimes,tv[:,2], '.',color='gray',label='arcs')
         plt.plot(stats[:,0], stats[:,1], 'o',markersize=4,color='blue',label='daily avg')
