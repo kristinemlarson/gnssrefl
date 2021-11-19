@@ -618,7 +618,6 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
         plt.gca().invert_yaxis()
         plt.legend(loc="upper left")
 
-
 # take out these points
     th = th[i]; h = h[i]
     xfac = xfac[i]
@@ -719,114 +718,95 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     return tvd, correction 
 
 
-def testing_hourly(tvd):
-    """
-    this does not work
-    """
-    d1 = 15
-    d2 = 40
-    # start with hourly
-    t = tvd[:,1] + tvd[:,4]/24
-    rh = tvd[:,2]
-    rh_hourly = []; t_hourly = []
-    for d in range(d1,d2):
-        for h in range(0,24):
-            t1= d + h/24; t2= d + (h+1)/24;
-            ii = (t >= t1) & (t < t2)  
-            if len(rh[ii]) > 0:
-                avgRH = np.average(rh[ii])
-                #print(d,h,avgRH)
-                rh_hourly.append(avgRH)
-                # put each time at the half hour
-                t_hourly.append(d+(h+0.5)/24)
-            
-    plt.figure()
-    plt.plot(t_hourly, rh_hourly,'.')
-    plt.show()
-
 
 def two_stacked_plots(otimes,tv,station,txtdir):
     """
+    otimes - datetime
+    tv = gnssrefl results variable
+    station - name just for the title
+    txtdir is where the plots will be written to
+
+    author: kristine larson
     """
     fs = 10
-    if True:
-        fig,(ax1,ax2)=plt.subplots(2,1,sharex=True)
+    fig,(ax1,ax2)=plt.subplots(2,1,sharex=True)
         # put some azimuth information on it
-        colors = tv[:,5]
+    colors = tv[:,5]
         # ax.plot( otimes, tv[:,2], '.')
         # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-        scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
-        colorbar = fig.colorbar(scatter, ax=ax1)
-        colorbar.set_label('deg', fontsize=fs)
-        ax1.set_ylabel('meters',fontsize=fs)
-        fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
-        ax1.title.set_text('Azimuth')
-        plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-        ax1.invert_yaxis()
-        ax1.grid(True)
-        fig.autofmt_xdate()
+    scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax1)
+    colorbar.set_label('deg', fontsize=fs)
+    ax1.set_ylabel('meters',fontsize=fs)
+    fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
+    ax1.title.set_text('Azimuth')
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    ax1.invert_yaxis()
+    ax1.grid(True)
+    fig.autofmt_xdate()
 
+# put some amplitude information on it
+    colors = tv[:,6]
+    # ax.plot( otimes, tv[:,2], '.')
+    # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
+    scatter = ax2.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax2)
+    ax2.set_ylabel('meters',fontsize=fs)
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    ax2.set_title('Amplitude')
+    ax2.invert_yaxis()
+    ax2.grid(True)
+    fig.autofmt_xdate()
+    colorbar.set_label('v/v', fontsize=fs)
 
-        # put some amplitude information on it
-        colors = tv[:,6]
-        # ax.plot( otimes, tv[:,2], '.')
-        # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-        scatter = ax2.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
-        colorbar = fig.colorbar(scatter, ax=ax2)
-        ax2.set_ylabel('meters',fontsize=fs)
-        plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-        ax2.set_title('Amplitude')
-        ax2.invert_yaxis()
-        ax2.grid(True)
-        fig.autofmt_xdate()
-        colorbar.set_label('v/v', fontsize=fs)
-
-        plotname = txtdir + '/' + station + '_combined.png'
-        plt.savefig(plotname,dpi=300)
-        print('png file saved as: ', plotname)
+    plotname = txtdir + '/' + station + '_combined.png'
+    plt.savefig(plotname,dpi=300)
+    print('png file saved as: ', plotname)
 
 def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
     """
-# poor man's outlier detector
+    otimes - datetime object
+    tv - variable with the gnssrefl results
+    ii - good data?
+    jj - bad data?
+    station - for title
+    txtdir - where plots will be written
+    sigma is constraint used for the outlier detection
+ poor man's outlier detector
     """
     fs = 10
-    if True:
-        fig = plt.figure()
-        colors = tv[:,5]
-        # put some amplitude information on it
-        # ax.plot( otimes, tv[:,2], '.')
-        # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-        otimesarray = np.asarray(otimes)
+    fig = plt.figure()
+    colors = tv[:,5]
+# put some amplitude information on it
+# ax.plot( otimes, tv[:,2], '.')
+# https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
+    otimesarray = np.asarray(otimes)
 
-        ax1 = fig.add_subplot(211)
-        plt.plot(otimes,tv[:,2], '.',color='gray',label='arcs')
-        plt.plot(stats[:,0], stats[:,1], 'o',markersize=4,color='blue',label='daily avg')
-        slabel = str(sigma) + ' sigma'
-        plt.plot(stats[:,0], stats[:,1]-sigma*stats[:,2], '--',color='black',label=slabel)
-        plt.plot(stats[:,0], stats[:,1]+sigma*stats[:,2], '--',color='black')
-        plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
-        plt.legend(loc="best",bbox_to_anchor=(0.95, 0.9),prop={"size":8})
-        plt.ylabel('meters',fontsize=fs)
-        plt.title(station.upper() + ' Reflector Heights', fontsize=fs)
-        plt.gca().invert_yaxis()
-        plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-        plt.grid() ; fig.autofmt_xdate()
+    ax1 = fig.add_subplot(211)
+    plt.plot(otimes,tv[:,2], '.',color='gray',label='arcs')
+    plt.plot(stats[:,0], stats[:,1], 'o',markersize=4,color='blue',label='daily avg')
+    slabel = str(sigma) + ' sigma'
+    plt.plot(stats[:,0], stats[:,1]-sigma*stats[:,2], '--',color='black',label=slabel)
+    plt.plot(stats[:,0], stats[:,1]+sigma*stats[:,2], '--',color='black')
+    plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
+    plt.legend(loc="best",bbox_to_anchor=(0.95, 0.9),prop={"size":8})
+    plt.ylabel('meters',fontsize=fs)
+    plt.title(station.upper() + ' Reflector Heights', fontsize=fs)
+    plt.gca().invert_yaxis()
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    plt.grid() ; fig.autofmt_xdate()
 
-        ax2 = fig.add_subplot(212)
-        plt.plot(otimesarray[jj],tv[jj,2], '.',color='green',label='arcs')
-        plt.gca().invert_yaxis()
-        plt.ylabel('meters',fontsize=fs)
-        plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-        plt.title('Edited Reflector Heights', fontsize=fs)
-        plt.grid() ; fig.autofmt_xdate()
-        plotname = txtdir + '/' + station + '_outliers_hunting.png'
-        plt.savefig(plotname,dpi=300)
-        print('png file saved as: ', plotname)
+    ax2 = fig.add_subplot(212)
+    plt.plot(otimesarray[jj],tv[jj,2], '.',color='green',label='arcs')
+    plt.gca().invert_yaxis()
+    plt.ylabel('meters',fontsize=fs)
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    plt.title('Edited Reflector Heights', fontsize=fs)
+    plt.grid() ; fig.autofmt_xdate()
+    plotname = txtdir + '/' + station + '_outliers_hunting.png'
+    plt.savefig(plotname,dpi=300)
+    print('png file saved as: ', plotname)
 
-        plt.figure()
-        n, bins, patches = plt.hist(xx, 50, density=True, facecolor='g', alpha=0.75)
-        plt.xlabel('standard deviations')
-        plt.title('RH (median removed) ')
 
 def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2):
     """
