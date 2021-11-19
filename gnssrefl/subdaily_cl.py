@@ -131,9 +131,6 @@ def main():
             print('Input subdaily RH file you provided does not exist:', fname_new)
             sys.exit()
 
-    # I think these are used just for velocity ...
-    perday = 24*20 # yikes - every 3 minutes
-
     # testing added so that if it crashes, only effects me.  and I get more useful error messages
     # added spline input 2021 oct 27. It was not coded well enough for gaps etc.
     input2spline = fname_new; output4spline = fname_new + '.rev'
@@ -141,17 +138,17 @@ def main():
         if (args.testing == None): 
             try:
                 if haveObstimes:
-                    tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier,obstimes=obstimes)
+                    tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,obstimes=obstimes)
                 else:
-                    tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier)
+                    tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier)
             except: 
-                print('Exited the spline code for unknown reasons. Rrun with testing as True if you want more info')
+                print('Exited the spline code for unknown reasons. Run with testing as True if you want more info')
                 okok = 1
         else:
             if haveObstimes:
-                tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier,obstimes=obstimes)
+                tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,obstimes=obstimes)
             else:
-                tv,corr = t.splines_for_dummies2(station,input2spline, output4spline, perday,plt,outlier)
+                tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier)
 
 
 if __name__ == "__main__":

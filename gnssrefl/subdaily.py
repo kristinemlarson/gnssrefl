@@ -147,12 +147,14 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     extension is where the results files stored in that subdirectory ('' for default) 
     sigma is how many standard deviations away from mean you allow.   (float)
 
-    files now written out here rather than from subdaily_cl.py
+    files now written out here rather than in subdaily_cl.py
 
     author: kristine larson
     2021april27 return datetime object
+    2021november
     added azimuth, amplitude,peak2noise constraints
     allow file to be input
+    consolidated plots
     """
     # fontsize
     fs = 10
@@ -195,45 +197,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         # using external file of concatenated results
         tv = np.loadtxt(txtfile,comments='%')
 
-    nr,nc=tv.shape
-    tvoriginal = tv
-    print('Number of initial RH retrievals', nr)
-    nroriginal = nr
-    if (nr == 0):
-        print('Exiting')
-        sys.exit()
-
-    t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
-    rh = tv[:,2]
-
-    # sort the data
-    ii = np.argsort(t)
-    t = t[ii] ; rh = rh[ii]
-    # store the sorted data 
-    tv = tv[ii,:]
-
-    # apply azimuth constraints 
-    ii = (tv[:,5]  >= azim1) & (tv[:,5] <= azim2)
-    tv = tv[ii,:]
-    print(nr-len(tv) , ' points removed for azimuth constraints ',azim1,azim2)
-
-    # now apply amplitude constraint
-    nr,nc = tv.shape
-    ii = (tv[:,6]  >= ampl) ; tv = tv[ii,:]
-    print(nr-len(tv) , ' points removed for amplitude constraint ')
-
-    # now apply peak2noise constraint
-    nr,nc = tv.shape
-    ii = (tv[:,13]  >= peak2noise) ; tv = tv[ii,:]
-    print(nr-len(tv) , ' points removed for peak2noise constraints ')
-
-
-    # silly - why read it if you are not going to use it
-    # and restrict by doy - mostly to make testing go faster
-    ii = (tv[:,1] >= d1) & (tv[:,1] <= d2)
-    tv = tv[ii,:]
-    firstdoy = int(min(tv[:,1]))
-    lastdoy =  int(max(tv[:,1]))
+    tv,t,rh= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2)
 
     tvoriginal = tv
     nr,nc = tvoriginal.shape
@@ -251,7 +215,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     residuals = np.empty(shape=[0,1])
     nval = []; tval = []; y = tv[0,0]; 
     stats = np.empty(shape=[0,3])
-    for d in range(firstdoy,(lastdoy+1)):
+    # only look at the doy range where i have data
+    for d in range(d1,(d2+1)):
         ii = (tv[:,1] == d)
         dtime, iyear,imon,iday,ihour,imin,isec = g.ymd_hhmmss(year,d,12,True)
         tval.append(dtime)
@@ -265,8 +230,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             b = ( tv[ii,2] - rhavg*np.ones( len(tv[ii,2]) ))/ rhstd
             residuals = np.append(residuals, b)
     #
-    ii = (np.absolute(residuals) > sigma)
-    jj = (np.absolute(residuals) < sigma)
+    ii = (np.absolute(residuals) > sigma) # data you like
+    jj = (np.absolute(residuals) < sigma) # data you do not like ;-)
     if plt2screen:
         fig,ax=plt.subplots()
         ax.plot(tval,nval,'bo')
@@ -279,7 +244,6 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
         two_stacked_plots(otimes,tv,station,txtdir)
         stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma)
-        print('stacked plots done')
         plt.show()
 
     # this might work... and then again, it might not
@@ -469,13 +433,12 @@ def writejsonfile(ntv,station, outfile):
 
     return True
 
-def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs):
+def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     """
     inputs:
     station - 4 char
     fname - input filename 
     fname_new - output filename
-    perday is number of velocity measurements per day (interpolated)
     pltit - boolean for plots to the screen
     outlierV is meter outlier cutoff
 
@@ -484,15 +447,19 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
 
     2021april27 sending obstimes as kwarg input
     2021may5 change file format back to original file format
-    author: kristine larson
-
-    where did splines_for_dummies go? LOL
-
     21may18 try to remove massive outliers
     21oct27 add usespline option because this code is not robust
 
+    author: kristine larson
+
     """
-    fs = 12 # fontsize
+    # output will go to REFL_CODE/Files
+    xdir = os.environ['REFL_CODE']
+    txtdir = xdir + '/Files'
+
+#   how often do you want velocity computed (per day)
+    perday = 24*20 # so every 3 minutes
+    fs = 10 # fontsize
     print('>>>>>>>>>>>>>>>>>>>> Entering spline fit <<<<<<<<<<<<<<<<<<<<<<<<')
     print('Input filename:', fname)
     print('Output filename: ', fname_new)
@@ -502,38 +469,22 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     if len(tvd) == 0:
         print('empty input file')
         return
-    # sort the data by days 
+    # sort the data in time
     ii = np.argsort( (tvd[:,1]+tvd[:,4]/24) ).T
     tvd = tvd[ii,:]
 
     NV = len(tvd)
-    # remove a median value
+    # remove a median value from RH
     medval = np.median(tvd[:,2])
     xx= tvd[:,2]-medval
-    plt_histograms = False
-    # turned off these plots at request of jupyter notebook users 
-    if plt_histograms:
-        plt.figure()
-        n, bins, patches = plt.hist(xx, 50, density=True, facecolor='g', alpha=0.75)
-        plt.xlabel('standard deviations')
-        plt.title('RH (median removed) ')
 
-    # use 3 sigma for the histogram plot
+    # use 3 sigma for the histogram plot ????
     Sig = np.std(xx)
     ij =  np.absolute(xx) < 3*Sig
     xnew = xx[ij]
 
-    if plt_histograms:
-        plt.figure()
-        plt.subplot(212)
-        n, bins, patches = plt.hist(xnew, 50, density=True, facecolor='g', alpha=0.75)
-        plt.xlabel('standard deviations')
-        plt.title('RH (median removed) without massive outliers')
-        if pltit:
-            plt.show()
-
     # sure looks like 3 sigma is being removed here! But this would get rid of a real storm surge
-    # perhaps not needed since 3 sigma could be taken out from the daily values
+    # perhaps not needed since 3 sigma should have been taken out from the daily values
     tvd = tvd[ij,:]
 
 
@@ -580,8 +531,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
             ynew = np.append(ynew,h[i])
 
     if (Ngaps > 3):
-        print('This is a beta version of the spline fit code - and does not work well with gaps. Exiting for your own safety.')
-        #sys.exit()
+        print('This is a beta version of the spline fit code - and does not work well with gaps. You have been warned!')
     # sort it just to make sure ...
     ii = np.argsort( tnew) 
     tnew = tnew[ii]
@@ -659,7 +609,7 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
         # cannot use this because i do not have the year in the tnew variable
         #obstimes = fract_to_obstimes(spl_x)
         plt.plot(spl_x, spl_y, 'r', label='spline')
-        plt.title('Station: ' + station + ' Reflector Height')
+        plt.title( station.upper() + ' Reflector Heights')
         outlierstring = str(outlierV) + '(m) outliers'
         plt.plot(th[j], h[j], 'co',label=outlierstring) 
         plt.ylabel('meters',fontsize=fs)
@@ -701,56 +651,52 @@ def splines_for_dummies2(station,fname,fname_new,perday,pltit,outlierV,**kwargs)
     yvel = obsPerHour*np.diff(spl_y)
 
     rhdot_at_th = np.interp(th, tvel, yvel)
-    #debug = open('debugging.txt', 'w+')
-    #for w in range(0,len(spl_x)):
-    #    debug.write(' {0:9.4f} {1:8.3f} \n'.format (spl_x[w], spl_y[w] ) )
-#
-#    debug.close()
     # this is the RHdot correction. This can be done better - 
     # this is just a start
     correction = xfac*rhdot_at_th
     #  this is where i should do a new spline fit with the corrected RH values
     # h = h - correction
 
-
     if pltit:
-        fig,ax=plt.subplots()
-        ax.plot(th, correction,'.',label='RHcorr')
+        fig=plt.figure(figsize=(12,6))
+        ax1=fig.add_subplot(311)
+        plt.plot(th, correction,'.',label='RHcorr')
         plt.title('RHdot Correction',fontsize=fs)
-        plt.ylabel('meters',fontsize=fs); 
+        plt.ylabel('m',fontsize=fs);
         plt.grid()
-
-        fig,ax=plt.subplots()
-        ax.plot(tvel, yvel, '-',label='RHdot')
-        ax.plot(th, rhdot_at_th,'.',label='RHdot at obs')
-        plt.title('RHdot in meters per hour',fontsize=fs)
-        plt.ylabel('meters per hour',fontsize=fs); 
-        plt.xlabel('days of the year',fontsize=fs)
-        plt.grid()
-        plt.yticks(fontsize=fs)
-        plt.xticks(fontsize=fs)
-        ydiff = max(yvel) - min(yvel)
-        y2 = 0.1*ydiff + max(yvel)  ; y1 = min(yvel) - 0.1*ydiff
+        plt.setp(ax1.get_xticklabels(), visible=False)
         plt.xlim((th[0], th[-1]))
-        #print('min and max values', y1,y2,max(yvel), min(yvel))
 
-        #plt.ylim((y1,y2))
-        #fig.autofmt_xdate()
+        ax2=fig.add_subplot(312)
+        plt.plot(tvel[2:-2], yvel[2:-2], '-',label='modeled')
+        plt.plot(th, rhdot_at_th,'.',label='at obs')
+        plt.title('RHdot in meters per hour',fontsize=fs)
+        plt.ylabel('m/hr',fontsize=fs);
+        plt.legend(loc="best")
+        plt.grid()
+        plt.setp(ax2.get_xticklabels(), visible=False)
+        plt.yticks(fontsize=fs); plt.xticks(fontsize=fs)
+        plt.xlim((th[0], th[-1]))
 
-        #plt.figure()
-        fig,ax=plt.subplots()
+        ax3=fig.add_subplot(313)
         label1 = 'w/o RHdot ' + str( round(np.std(resid_spl),2)) + 'm'
         label2 = 'w/ RHdot ' + str(round(np.std(resid_spl-correction),2)) + 'm'
-        ax.plot(th, resid_spl,'.',label= label1)
-        ax.plot(th, resid_spl - correction,'.',label=label2)
-        plt.legend(loc="upper left")
+        plt.plot(th, resid_spl,'.',label= label1)
+        plt.plot(th, resid_spl - correction,'.',label=label2)
+        plt.legend(loc="best")
         plt.xlabel('days of the year',fontsize=fs)
-        plt.ylabel('meters',fontsize=fs)
-        plt.yticks(fontsize=fs)
-        plt.xticks(fontsize=fs)
+        plt.ylabel('m',fontsize=fs)
+        plt.yticks(fontsize=fs); plt.xticks(fontsize=fs)
         plt.title('Reflector Height Residuals to the Spline Fit',fontsize=fs)
+        plt.xlim((th[0], th[-1]))
         plt.grid()
+
+        plotname = txtdir + '/' + station + '_rhdot.png'
+        plt.savefig(plotname,dpi=300)
+        print('png file saved as: ', plotname)
+
         plt.show()
+
     print('RMS no RHdot correction (m)', '{0:6.3f}'.format ( np.std(resid_spl)) )
     print('RMS w/ RHdot correction (m)', '{0:6.3f}'.format ( np.std(resid_spl - correction))  )
     # this is RH with the RHdot correction
@@ -821,8 +767,6 @@ def two_stacked_plots(otimes,tv,station,txtdir):
         fig.autofmt_xdate()
 
 
-        #fig,ax=plt.subplots()
-        #ax2 =plt.subplot(212, sharex=ax1)
         # put some amplitude information on it
         colors = tv[:,6]
         # ax.plot( otimes, tv[:,2], '.')
@@ -861,7 +805,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
         plt.plot(stats[:,0], stats[:,1]-sigma*stats[:,2], '--',color='black',label=slabel)
         plt.plot(stats[:,0], stats[:,1]+sigma*stats[:,2], '--',color='black')
         plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
-        plt.legend(loc="best",bbox_to_anchor=(1.0, 0.9),prop={"size":8})
+        plt.legend(loc="best",bbox_to_anchor=(0.95, 0.9),prop={"size":8})
         plt.ylabel('meters',fontsize=fs)
         plt.title(station.upper() + ' Reflector Heights', fontsize=fs)
         plt.gca().invert_yaxis()
@@ -879,4 +823,62 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
         plt.savefig(plotname,dpi=300)
         print('png file saved as: ', plotname)
 
+        plt.figure()
+        n, bins, patches = plt.hist(xx, 50, density=True, facecolor='g', alpha=0.75)
+        plt.xlabel('standard deviations')
+        plt.title('RH (median removed) ')
 
+def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2):
+    """
+    cleaning up the main code. this sorts data and applies various "commandline" constraints
+    tv is the full set of results from gnssrefl
+    t and rh are just time (in fractional doy) and reflector height
+    other inputs:
+    azim1-aimz2 - azimuth constraints in degrees
+    ampl is amplitude of the periodogram (volts/volts)
+    d1 and d2 are days of year
+    peak2noise 
+    """
+    nr,nc=tv.shape
+    tvoriginal = tv
+    print('Number of initial RH retrievals', nr)
+    nroriginal = nr
+    if (nr == 0):
+        print('Exiting')
+        sys.exit()
+
+    # not sure these need to be here - are they used elsewhere?
+    # could be moved to apply_new_constraints
+    t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
+    rh = tv[:,2]
+
+# sort the data
+    ii = np.argsort(t)
+    t = t[ii] ; rh = rh[ii]
+    # store the sorted data
+    tv = tv[ii,:]
+
+    # apply azimuth constraints
+    ii = (tv[:,5]  >= azim1) & (tv[:,5] <= azim2)
+    tv = tv[ii,:]
+    print(nr-len(tv) , ' points removed for azimuth constraints ',azim1,azim2)
+
+    # now apply amplitude constraint
+    nr,nc = tv.shape
+    ii = (tv[:,6]  >= ampl) ; tv = tv[ii,:]
+    print(nr-len(tv) , ' points removed for amplitude constraint ')
+
+    # now apply peak2noise constraint
+    nr,nc = tv.shape
+    ii = (tv[:,13]  >= peak2noise) ; tv = tv[ii,:]
+    print(nr-len(tv) , ' points removed for peak2noise constraints ')
+
+
+    # silly - why read it if you are not going to use it
+    # and restrict by doy - mostly to make testing go faster
+    ii = (tv[:,1] >= d1) & (tv[:,1] <= d2)
+    tv = tv[ii,:]
+    firstdoy = int(min(tv[:,1]))
+    lastdoy =  int(max(tv[:,1]))
+
+    return tv,t,rh
