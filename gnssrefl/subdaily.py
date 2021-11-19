@@ -197,7 +197,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         # using external file of concatenated results
         tv = np.loadtxt(txtfile,comments='%')
 
-    tv,t,rh= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2)
+    tv,t,rh,fdoy,ldoy= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2)
 
     tvoriginal = tv
     nr,nc = tvoriginal.shape
@@ -216,7 +216,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     nval = []; tval = []; y = tv[0,0]; 
     stats = np.empty(shape=[0,3])
     # only look at the doy range where i have data
-    for d in range(d1,(d2+1)):
+    for d in range(fdoy,(ldoy+1)):
         ii = (tv[:,1] == d)
         dtime, iyear,imon,iday,ihour,imin,isec = g.ymd_hhmmss(year,d,12,True)
         tval.append(dtime)
@@ -861,4 +861,4 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2):
     firstdoy = int(min(tv[:,1]))
     lastdoy =  int(max(tv[:,1]))
 
-    return tv,t,rh
+    return tv,t,rh,firstdoy,lastdoy
