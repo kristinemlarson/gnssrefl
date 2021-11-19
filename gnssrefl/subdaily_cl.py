@@ -133,7 +133,8 @@ def main():
 
     # testing added so that if it crashes, only effects me.  and I get more useful error messages
     # added spline input 2021 oct 27. It was not coded well enough for gaps etc.
-    input2spline = fname_new; output4spline = fname_new + '.rev'
+    # only allow plaint text?  i think that is what is really going on here
+    input2spline = fname_new; output4spline = fname_new + '.withrhdot'
     if usespline:
         if (args.testing == None): 
             try:
