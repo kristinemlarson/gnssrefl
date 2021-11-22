@@ -31,13 +31,13 @@ def main():
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", default=None, type=str, help="for now one year at a time")
     parser.add_argument("-txtfile", default=None, type=str, help="Filename for editing") 
-    parser.add_argument("-splinefile", default=None, type=str, help="Input filename for spline fitting (optional)") 
+    parser.add_argument("-splinefile", default=None, type=str, help="Input filename for rhdot/spline fitting (optional)") 
     parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt") 
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
     parser.add_argument("-outlier", default=None, type=str, help="outlier criterion used in splinefit (meters)")
     parser.add_argument("-sigma", default=None, type=str, help="simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)")
     parser.add_argument("-extension", default=None, type=str, help="soln subdirectory")
-    parser.add_argument("-spline", default=None, type=str, help="set to True to turn on spline fitting for RHdot correction")
+    parser.add_argument("-rhdot", default=None, type=str, help="set to True to turn on spline fitting for RHdot correction")
     parser.add_argument("-doy1", default=None, type=str, help="initial day of year")
     parser.add_argument("-doy2", default=None, type=str, help="end day of year")
     parser.add_argument("-testing", default=None, type=str, help="set to True for testing mode")
@@ -96,7 +96,7 @@ def main():
         peak2noise = float(args.peak2noise)
 
     usespline = False # though it is dangerous
-    if args.spline == 'True':
+    if args.rhdot == 'True':
         usespline = True
 
 #   these are optional output options

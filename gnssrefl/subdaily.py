@@ -487,7 +487,6 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     # perhaps not needed since 3 sigma should have been taken out from the daily values
     tvd = tvd[ij,:]
 
-
     # time variable in days
     th= tvd[:,1] + tvd[:,4]/24; 
     # reflector height (meters)
@@ -504,7 +503,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     # 
     fillgap = 1/24 # one hour fake values
     # ???
-    gap = 5/24 # up to five hour gap allowed
+    gap = 5/24 # up to five hour gap allowed before warning
 
     tnew =[] ; ynew =[]; faket = []; 
     # fill in gaps using variables called tnew and ynew
@@ -531,7 +530,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
             ynew = np.append(ynew,h[i])
 
     if (Ngaps > 3):
-        print('This is a beta version of the spline fit code - and does not work well with gaps. You have been warned!')
+        print('This is a beta version of the rhdot/spline fit code - and does not work well with gaps. You have been warned!')
     # sort it just to make sure ...
     ii = np.argsort( tnew) 
     tnew = tnew[ii]
@@ -702,11 +701,13 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     correctedRH = resid_spl - correction
     print('Freq  Bias  Sigma   NumObs ')
     print('       (m)   (m)       ')
+    biasCorrected_RH = tvd[:,2] - correction
     for f in [1, 20, 5, 101, 102, 201, 205,207,208]:
         ff = (tvd[:,10] == f)
         ret = correctedRH[ff]
         if len(ret) > 0:
             print('{0:3.0f} {1:6.2f} {2:6.2f} {3:6.0f}'.format (f, np.mean(ret), np.std(ret), len(ret) ) )
+            biasCorrected_RH[ff] = biasCorrected_RH[ff] - np.mean(ret)
 
     writecsv = False; writetxt = True
     extraline = 'outliers removed/two new columns: corrected RH and the RHdot correction applied '
@@ -714,6 +715,10 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     write_subdaily(fname_new,station,tvd,writecsv,extraline,newRH=newRH, RHdot_corr=correction)
     nr,nc = tvd.shape
     print('Percent of observations removed:', round(100*(NV-nr)/NV,2))
+
+    # doy
+    newt = tvd[:,1] + tvd[:,4]/24 ; 
+    redo_spline(newt, newRH, biasCorrected_RH,pltit,txtdir,station)
 
     return tvd, correction 
 
@@ -862,3 +867,87 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2):
     lastdoy =  int(max(tv[:,1]))
 
     return tv,t,rh,firstdoy,lastdoy
+
+def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
+    """
+    having calculated and applied RHdot corretion
+    AND applied the frequency biases
+    tnew is in doy
+    ynew is rhdot corrected RH in meters (not currently used)
+    biasCorr_ynew has frequency biases removed (empirically defined)
+    pltit - boolean, for screen viewing
+    txtdir - where the plots will go ($REFL_CODE/Files
+    station - just for the title and name of plot
+
+    """
+    fs = 10
+    ynew = biasCorr_ynew
+    # now sort them again ....
+    ii = np.argsort(tnew)
+    tnew = tnew[ii]
+    ynew = ynew[ii]
+    outlierV = 0.5 # for now
+
+    # making a knot every three hours ...
+    knots_per_day = 8
+    Ndays = tnew.max()-tnew.min()
+    numKnots = int(knots_per_day*(Ndays))
+    NV = len(ynew)
+    print('First and last time values', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
+    print('Number of RH obs', NV)
+    print('Number of days of data: ', '{0:8.2f}'.format ( Ndays) )
+    print('Average obs per day', '{0:5.1f} '.format (NV/Ndays) )
+    print('Number of knots: ', numKnots)
+    # need the first and last knot to be inside the time series
+    firstKnot_in_minutes = 15
+    t1 = tnew.min()+firstKnot_in_minutes/60/24
+    t2 = tnew.max()-firstKnot_in_minutes/60/24
+    # try this
+    #
+    knots =np.linspace(t1,t2,num=numKnots)
+    t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
+
+    # user specifies how many values per day you want to send back to the user
+
+    # should i do extrapolate True? it is the default  - could make it periodic?
+    #spline = interpolate.BSpline(t, c, k, extrapolate=True)
+    spline = interpolate.BSpline(t, c, k, extrapolate=False)
+
+    # evenly spaced data - units of days
+    perday = 48 # so every 30 minutes in this case
+    N = int(Ndays*perday)
+    xx = np.linspace(tnew.min(), tnew.max(), N)
+    spl_x = xx; spl_y = spline(xx)
+    spline_at_tnew = spline(tnew)
+    plt.subplot(211)
+    plt.plot(tnew,ynew,'.')
+    plt.plot(tnew,biasCorr_ynew,'.',label='freq/rhdot corr')
+    plt.plot(spl_x, spl_y,'-',label='spline fit')
+    plt.title(station + 'RH Obs and spline fit after freq bias removed')
+    plt.legend(loc="upper right")
+    plt.ylabel('meters')
+    plt.grid()
+
+    rms = np.std(ynew-spline_at_tnew)
+    print('std (m)', round(rms,3))
+    ii = np.abs(ynew-spline_at_tnew) > 3*rms
+    jj = np.abs(ynew-spline_at_tnew) < 3*rms
+    res = ynew-spline_at_tnew
+    plt.subplot(212)
+    plt.plot(tnew,res,'b.', label='residuals')
+    plt.plot(tnew[ii],res[ii],'r.',label='3sigma outliers')
+    plt.title('residuals')
+    plt.xlabel('day of year'); plt.ylabel('meters')
+    plt.legend(loc="upper right")
+    plt.grid()
+    Ntot = len(res)
+    Nout = len(res[ii])
+    print('Percentage of 3-sigma outliers', round(100*Nout/Ntot,2))
+    #
+    plotname = txtdir + '/' + station + '_final.png'
+    plt.savefig(plotname,dpi=300)
+    print('png file saved as: ', plotname)
+
+    if pltit:
+        plt.show()
+
