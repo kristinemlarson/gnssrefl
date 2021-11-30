@@ -966,12 +966,28 @@ Picks up all results files from 2021, sorts and concatenates them. The output fi
 is sent to the screen. It then tries to remove large outliers by using a standard deviation test.
 This can be controlled at the command line. Example outputs sent to the screen.
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc01-1.png" width="600"/>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-1.png" width="600"/>
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc01-2.png" width="600"/>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" width="600"/>
+
+Sites with large tidal signatures require a RHdot correction. There are definitely multiple ways to 
+make this correction. If you have a well observed site (lots of arcs and minimal gaps), 
+you can use the data to estimate a smooth model for RH and then RHdot. If you invoke -rhdot True, 
+the code will compute and apply the RHdot correction. It will also do a second effort to remove outliers.  
+Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
+outliers in the first section of this code. The first and last half day of data used in the 
+spline fit is removed. 
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" width="600"/>
 
 
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-4.png" width="600"/>
 
+After the RHdot correction has been applied, the code estimates a new spline fit and 
+removes frequency biases. Stats for this fit with respect to the spline fit 
+are printed to the screen.
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" width="600"/>
 
 
 

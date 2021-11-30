@@ -931,7 +931,7 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     plt.subplot(211)
     plt.plot(tnew,ynew,'k.')
     plt.plot(tnew,biasCorr_ynew,'b.',label='freq/rhdot corr')
-    plt.plot(spl_x, spl_y,'-',label='spline fit')
+    plt.plot(spl_x, spl_y,'-',color='orange',label='spline fit')
     plt.title(station + ' RH Obs and new spline fit after freq bias removed')
     plt.legend(loc="upper right")
     plt.ylabel('meters')
