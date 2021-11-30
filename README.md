@@ -796,11 +796,11 @@ the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 NMEA formats can be translated to SNR using <code>nmea2snr</code>.
 Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
-NMEA files are assumed to be stored in $REFL_CODE/ directories as:
+NMEA files are assumed to be stored as:
 
-['REFL_CODE'] + '/nmea/ABCD/2021/ABCD0030.21.A
+$REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
 
-which is station ABCD in year 2021 and day of year 3. NMEA files may be gzipped.
+for station ABCD in year 2021 and day of year 3. NMEA files may be gzipped.
 
 ### 4. Bugs/Features <a name="bugs"></a>
 
@@ -945,6 +945,8 @@ than they were originally (UNR used to provide four decimal points in lat/long).
 <code>check_rinex</code> returns simple information from the file header, such as receiver
 and antenna type, receiver coordinates, and whether SNR data are in the file. RINEX 2.11 only
 
+<HR>
+
 <code>subdaily</code>
 
 This module is primarily meant for RH measurements that have a subdaily component. It is not strictly 
@@ -958,37 +960,42 @@ run <code>gnssir</code> for a station called sc02 in the year 2021:
 
 <code>cat $REFL_CODE/2021/sc02/*.txt >sc02.txt</code>
 
-Using subdaily:
+Subdaily minimally requires the station name and year:
 
 <code>subdaily sc02 2021 </code>
 
-Picks up all results files from 2021, sorts and concatenates them. The output file location
-is sent to the screen. It then tries to remove large outliers by using a standard deviation test.
-This can be controlled at the command line. Example outputs sent to the screen.
+It picks up all results files from 2021, sorts and concatenates them (if you only want to 
+look at a subset of days, you can set -doy1 and -doy2). The output file location
+is sent to the screen. subdaily then tries to remove large outliers 
+by using a standard deviation test. This can be controlled at the command 
+line. Example figures:
+
+Results are presented with azimuth and amplitude colors to help you modify QC choices or azimuth mask:
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-1.png" width="600"/>
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" width="600"/>
 
 Sites with large tidal signatures require a RHdot correction. There are definitely multiple ways to 
-make this correction. If you have a well observed site (lots of arcs and minimal gaps), 
-you can use the data to estimate a smooth model for RH and then RHdot. If you invoke -rhdot True, 
-the code will compute and apply the RHdot correction. It will also do a second effort to remove outliers.  
+make this correction. If you have a well-observed site (lots of arcs and minimal gaps), 
+you can use the RH data themselves to estimate a smooth model for RH (cubic splines) and 
+then RHdot. If you invoke -rhdot True, the code will compute and 
+apply the RHdot correction. It will also do a second effort to remove outliers.  
 Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
-outliers in the first section of this code. The first and last half day of data used in the 
-spline fit is removed. 
+outliers in the first section of this code. 
+
+In the bottom panel you can see that applying the RHdot correction at this site improves the 
+RMS fit from 0.15 to 0.11 meters.
+
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" width="600"/>
 
-
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-4.png" width="600"/>
-
-After the RHdot correction has been applied, the code estimates a new spline fit and 
-removes frequency biases. Stats for this fit with respect to the spline fit 
-are printed to the screen.
+After the RHdot correction has been applied, the code then estimates a new spline fit and 
+removes frequency-specific biases. Stats for this fit with respect to the spline fit 
+are printed to the screen. Three-sigma outliers with respect to the new fit are removed.
+In this example the RMS improves from 0.11 to 0.09 m. 
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" width="600"/>
-
 
 
 <HR>
