@@ -284,8 +284,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         gpssnr.foo(in1,in2,in3,in4,in5,in6)
                     else:
                         if (orbtype == 'ultra') or (orbtype == 'wum'):
-                            print('testing out things for orbit type ', orbtype)
-                            print('this file requires that more epochs be allowed.')
+                            print('Using an ultrarapid orbit', orbtype)
                             gnsssnrbigger.foo(in1,in2,in3,in4,in5,in6)
                         else:
                             gnsssnr.foo(in1,in2,in3,in4,in5,in6)
