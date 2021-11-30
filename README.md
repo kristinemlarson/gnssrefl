@@ -948,10 +948,32 @@ and antenna type, receiver coordinates, and whether SNR data are in the file. RI
 <code>subdaily</code>
 
 This module is primarily meant for RH measurements that have a subdaily component. It is not strictly 
-for water levels, but that is generally where it should be used. There are two main issues:
+for water levels, but that is generally where it should be used. There are two main goal for this code:
 
-- finding/removing outliers
+- consolidating daily files and finding/removing outliers
 - applying the RHdot correction
+
+If you want to do your own QC, you can simply cat the files in your results area. As an example, after you have 
+run <code>gnssir</code> for a station called sc02 in the year 2021:
+
+<code>cat $REFL_CODE/2021/sc02/*.txt >sc02.txt</code>
+
+Using subdaily:
+
+<code>subdaily sc02 2021 </code>
+
+Picks up all results files from 2021, sorts and concatenates them. The output file location
+is sent to the screen. It then tries to remove large outliers by using a standard deviation test.
+This can be controlled at the command line. Example outputs sent to the screen.
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc01-1.png" width="600"/>
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc01-2.png" width="600"/>
+
+
+
+
+
 
 <HR>
 
