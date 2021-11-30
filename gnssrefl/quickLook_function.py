@@ -79,7 +79,7 @@ def read_snr_simple(obsfile):
     return allGood, sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE
 
 
-def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen):
+def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,**kwargs):
     """
     inputs:
     station name (4 char), year, day of year
@@ -95,7 +95,11 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     also added pltscreen variable so that the default plots are not always displayed
     KL 21mar25 added datakey dictionaries for the Jupyter notebook people
     KL 21apr02 added error checking on whether requested datastreams exist. no data, no analysis
+    KL 21nov24 added screen stats, boolean, kwargs
     """
+    screenstats = kwargs.get('screenstats',False)
+    if screenstats:
+        print('Some screen statistics will print to the screen')
 
     if (minH > maxH):
         print('Minimum RH',minH, ' cannot be greater than maximum RH.', maxH, ' Exiting.')
@@ -141,7 +145,6 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     naz = int(len(azval)/2) # number of azimuth pairs
     pltname = 'temp.png' # default plot
     requireAmp = reqAmp[0]
-    screenstats = True
     FS = 12
 
 # to avoid having to do all the indenting over again
@@ -230,11 +233,17 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         idc = stitles[a]
                         data[idc][satNu] = [px,pz]
                         datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
+                        if screenstats:
+                            print('SUCCESS for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
 
                     else:
                         # these are failed tracks
                         if pltscreen:
                             plt.plot(px,pz,'gray',linewidth=0.5)
+                        if screenstats:
+                            print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
+                            g.write_QC_fails(delT,75,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp)
+
                         idc = 'f' + stitles[a]
                         data[idc][satNu] = [px,pz]
                         datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]

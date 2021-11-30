@@ -20,14 +20,15 @@
 
 [Link to Docker build](https://hub.docker.com/r/unavdocker/gnssrefl)
 
-Access to GSI RINEX data has been provided Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
+Access to GSI RINEX data has been provided 
+Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
 In my experience GSI is very response to account requests.  
 
 A bug was fixed in the old python translator option for S6/S7 data. Thank you to Andrea Gatti for this information.
 
-We are working on access to broadcast Glonass, Galileo, Beidou constellations. Thank you to Giulio Tagliaferro for suggestions
-on this improvement.
+Thanks to Makan Karegar the NMEA file format is now supported.  [See <code>nmea2snr</code> -h](#module4).
 
+Access to ultrarapid multi-GNSS (and thus real-time) orbits is now available via the [GFZ](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/topics/gnss-services/). Please use the -ultra flag in <code>rinex2snr</code>.
 
 **IMPORTANT:**
 
@@ -653,6 +654,17 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 [**Example for a tall site**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
 
+In addition to the peak2 noise and required amplitude metrics, there is a couple more QC metrics that 
+are hardwired. One is the length of time for the arc - this can be a problem when you have an arc that crosses midnite;
+since the gnssrefl code works on elevation angle, it will combine part of the arc from the beginning of the day and the rest 
+from the end of the day. This is not sensible - and it will reject this arc nominally for being far too long.
+Really it is rejecting it because it is non-physical.  
+
+The second hidding QC setting is called "ediff." If you specify emin and emax for your arcs, it will allow you
+to use arcs that are within (emin +ediff) and (emax - ediff). The net result of this QC setting 
+default is to make it less likely you will try to use a very short arc. The default value is set to 2 degrees.  
+
+<code>quickLook -screenstats True</code> provides more information to the screen about why arcs have been rejected.
 
 <HR>
 
@@ -927,10 +939,19 @@ and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works per
 but this utility writes out a file with only columns of numbers instead of csv. 
 
 <code>query_unr</code> returns latitude, longitude, and ellipsoidal height and Cartesian position 
-for stations that were in the Nevada Reno database ~ a year ago (i.e. when I downloaded it). 
+for stations that were in the Nevada Reno database as of Octoner 2021. Coordinates are now more precise 
+than they were originally (UNR used to provide four decimal points in lat/long). 
 
 <code>check_rinex</code> returns simple information from the file header, such as receiver
 and antenna type, receiver coordinates, and whether SNR data are in the file. RINEX 2.11 only
+
+<code>subdaily</code>
+
+This module is primarily meant for RH measurements that have a subdaily component. It is not strictly 
+for water levels, but that is generally where it should be used. There are two main issues:
+
+- finding/removing outliers
+- applying the RHdot correction
 
 <HR>
 
@@ -967,8 +988,6 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 * Investigate surface related biases for polar tide gauge calculations (ice vs water).
 
-* We have contributors for allowing the NMEA format. We currently need to translate to Fortran to improve the speed.
-
 * I have ported NOCtide.m and will add it here when I get a chance.
 
 </ol>
@@ -989,6 +1008,6 @@ Kristine M. Larson
 
 [https://kristinelarson.net](https://kristinelarson.net)
 
-This documentation was updated on November 13, 2021.
+This documentation was updated on November 28, 2021.
 
 Testing updates.

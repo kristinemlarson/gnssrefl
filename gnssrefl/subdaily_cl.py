@@ -35,6 +35,7 @@ def main():
     parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt") 
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
     parser.add_argument("-outlier", default=None, type=str, help="outlier criterion used in splinefit (meters)")
+    parser.add_argument("-knots", default=None, type=str, help="Knots per day, spline fit only (default is 8)")
     parser.add_argument("-sigma", default=None, type=str, help="simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)")
     parser.add_argument("-extension", default=None, type=str, help="soln subdirectory")
     parser.add_argument("-rhdot", default=None, type=str, help="set to True to turn on spline fitting for RHdot correction")
@@ -135,21 +136,25 @@ def main():
     # added spline input 2021 oct 27. It was not coded well enough for gaps etc.
     # only allow plaint text?  i think that is what is really going on here
     input2spline = fname_new; output4spline = fname_new + '.withrhdot'
+    if (args.knots== None):
+        knots = 8
+    else:
+        knots = int(args.knots)
     if usespline:
         if (args.testing == None): 
             try:
                 if haveObstimes:
-                    tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,obstimes=obstimes)
+                    tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,obstimes=obstimes,knots=knots)
                 else:
-                    tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier)
+                    tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,knots=knots)
             except: 
                 print('Exited the spline code for unknown reasons. Run with testing as True if you want more info')
                 okok = 1
         else:
             if haveObstimes:
-                tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,obstimes=obstimes)
+                tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,obstimes=obstimes,knots=knots)
             else:
-                tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier)
+                tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,knots=knots)
 
 
 if __name__ == "__main__":

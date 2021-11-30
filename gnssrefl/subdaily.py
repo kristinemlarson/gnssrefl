@@ -449,6 +449,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     2021may5 change file format back to original file format
     21may18 try to remove massive outliers
     21oct27 add usespline option because this code is not robust
+    can also input knots per day 
 
     author: kristine larson
 
@@ -460,6 +461,10 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
 #   how often do you want velocity computed (per day)
     perday = 24*20 # so every 3 minutes
     fs = 10 # fontsize
+    # making a knot every three hours ...
+    # knots_per_day = 8
+    knots_default = 8
+    knots_per_day= kwargs.get('knots',8)
     print('>>>>>>>>>>>>>>>>>>>> Entering spline fit <<<<<<<<<<<<<<<<<<<<<<<<')
     print('Input filename:', fname)
     print('Output filename: ', fname_new)
@@ -556,14 +561,12 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     tnew = tnew[ii]
     ynew = ynew[ii]
 
-    # making a knot every three hours ...
-    knots_per_day = 8
     Ndays = tnew.max()-tnew.min()
     numKnots = int(knots_per_day*(Ndays))
     print('First and last time values', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
     print('Number of RH obs', len(h))
     print('Average obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
-    print('Number of knots: ', numKnots)
+    print('Knots per day: ', knots_per_day, ' Number of knots: ', numKnots)
     print('Outlier criterion with respect to spline fit (m): ', outlierV)
     print('Number of days of data: ', '{0:8.2f}'.format ( Ndays) )
     # need the first and last knot to be inside the time series
@@ -604,18 +607,21 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     if pltit:
         plt.figure()
         #plt.plot(obstimes, h, 'bo', label='Original points',markersize=3)
-        plt.plot(th, h, 'bo', label='Original points',markersize=3)
+        plt.plot(th, h, 'b.', label='Original points',markersize=3)
         # cannot use this because i do not have the year in the tnew variable
         #obstimes = fract_to_obstimes(spl_x)
         plt.plot(spl_x, spl_y, 'r', label='spline')
         plt.title( station.upper() + ' Reflector Heights')
         outlierstring = str(outlierV) + '(m) outliers'
-        plt.plot(th[j], h[j], 'co',label=outlierstring) 
+        plt.plot(th[j], h[j], 'c.',label=outlierstring) 
         plt.ylabel('meters',fontsize=fs)
         plt.xlabel('days',fontsize=fs)
         plt.grid()
         plt.gca().invert_yaxis()
         plt.legend(loc="upper left")
+        plotname = txtdir + '/' + station + '_rhdot1.png'
+        plt.savefig(plotname,dpi=300)
+        print('png file saved as: ', plotname)
 
 # take out these points
     th = th[i]; h = h[i]
@@ -658,7 +664,9 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     if pltit:
         fig=plt.figure(figsize=(12,6))
         ax1=fig.add_subplot(311)
-        plt.plot(th, correction,'.',label='RHcorr')
+        ijk = np.abs(correction) >  1
+        plt.plot(th, correction,'b.',label='RHcorr')
+        plt.plot(th[ijk], correction[ijk],'rx',label='suspect')
         plt.title('RHdot Correction',fontsize=fs)
         plt.ylabel('m',fontsize=fs);
         plt.grid()
@@ -666,8 +674,8 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
         plt.xlim((th[0], th[-1]))
 
         ax2=fig.add_subplot(312)
-        plt.plot(tvel[2:-2], yvel[2:-2], '-',label='modeled')
-        plt.plot(th, rhdot_at_th,'.',label='at obs')
+        plt.plot(th, rhdot_at_th,'b.',label='at obs')
+        plt.plot(tvel[2:-2], yvel[2:-2], 'c-',label='modeled')
         plt.title('RHdot in meters per hour',fontsize=fs)
         plt.ylabel('m/hr',fontsize=fs);
         plt.legend(loc="best")
@@ -679,8 +687,9 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
         ax3=fig.add_subplot(313)
         label1 = 'w/o RHdot ' + str( round(np.std(resid_spl),2)) + 'm'
         label2 = 'w/ RHdot ' + str(round(np.std(resid_spl-correction),2)) + 'm'
-        plt.plot(th, resid_spl,'.',label= label1)
-        plt.plot(th, resid_spl - correction,'.',label=label2)
+        plt.plot(th, resid_spl,'g.',label= label1)
+        plt.plot(th, resid_spl - correction,'b.',label=label2)
+        plt.plot(th[ijk], resid_spl[ijk] - correction[ijk],'rx',label='suspect')
         plt.legend(loc="best")
         plt.xlabel('days of the year',fontsize=fs)
         plt.ylabel('m',fontsize=fs)
@@ -689,10 +698,9 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
         plt.xlim((th[0], th[-1]))
         plt.grid()
 
-        plotname = txtdir + '/' + station + '_rhdot.png'
+        plotname = txtdir + '/' + station + '_rhdot2.png'
         plt.savefig(plotname,dpi=300)
         print('png file saved as: ', plotname)
-
         plt.show()
 
     print('RMS no RHdot correction (m)', '{0:6.3f}'.format ( np.std(resid_spl)) )
@@ -702,7 +710,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     print('Freq  Bias  Sigma   NumObs ')
     print('       (m)   (m)       ')
     biasCorrected_RH = tvd[:,2] - correction
-    for f in [1, 20, 5, 101, 102, 201, 205,207,208]:
+    for f in [1, 2, 20, 5, 101, 102, 201, 205,207,208]:
         ff = (tvd[:,10] == f)
         ret = correctedRH[ff]
         if len(ret) > 0:
@@ -789,11 +797,12 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
 
     ax1 = fig.add_subplot(211)
     plt.plot(otimes,tv[:,2], '.',color='gray',label='arcs')
-    plt.plot(stats[:,0], stats[:,1], 'o',markersize=4,color='blue',label='daily avg')
+    plt.plot(stats[:,0], stats[:,1], '.',markersize=4,color='blue',label='daily avg')
     slabel = str(sigma) + ' sigma'
     plt.plot(stats[:,0], stats[:,1]-sigma*stats[:,2], '--',color='black',label=slabel)
     plt.plot(stats[:,0], stats[:,1]+sigma*stats[:,2], '--',color='black')
-    plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
+    plt.plot(otimesarray[ii],tv[ii,2], 'r.',markersize=4,label='outliers')
+    #plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
     plt.legend(loc="best",bbox_to_anchor=(0.95, 0.9),prop={"size":8})
     plt.ylabel('meters',fontsize=fs)
     plt.title(station.upper() + ' Reflector Heights', fontsize=fs)
@@ -920,10 +929,10 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     spl_x = xx; spl_y = spline(xx)
     spline_at_tnew = spline(tnew)
     plt.subplot(211)
-    plt.plot(tnew,ynew,'.')
-    plt.plot(tnew,biasCorr_ynew,'.',label='freq/rhdot corr')
+    plt.plot(tnew,ynew,'k.')
+    plt.plot(tnew,biasCorr_ynew,'b.',label='freq/rhdot corr')
     plt.plot(spl_x, spl_y,'-',label='spline fit')
-    plt.title(station + 'RH Obs and spline fit after freq bias removed')
+    plt.title(station + ' RH Obs and new spline fit after freq bias removed')
     plt.legend(loc="upper right")
     plt.ylabel('meters')
     plt.grid()
@@ -947,7 +956,7 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     plotname = txtdir + '/' + station + '_final.png'
     plt.savefig(plotname,dpi=300)
     print('png file saved as: ', plotname)
-
     if pltit:
         plt.show()
+
 

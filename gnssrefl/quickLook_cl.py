@@ -36,6 +36,7 @@ def main():
     parser.add_argument("-h1",  default=None, type=float, help="lower limit reflector height (m)")
     parser.add_argument("-h2",  default=None, type=float, help="upper limit reflector height (m)")
     parser.add_argument("-sat", default=None, type=int, help="satellite")
+    parser.add_argument("-screenstats", default=None, type=str, help="if True, Success and Failure info printed to the screen")
     parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio")
     parser.add_argument("-fortran", default='True', type=str, help="Default is True: use Fortran translators")
     args = parser.parse_args()
@@ -118,9 +119,13 @@ def main():
     f=freqs[0]
     NReg = [h1, h2] # noise region - again, this is for typical snow setup
 
+    # student requested more information about what tracks worked
+    screenstats = False
+    if args.screenstats == 'True':
+        screenstats = True
     pltscreen = True
     # Kelly for jupyter notebooks set this to false
-    data,datakey = quick.quickLook_function(station, year, doy, snr, f, e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran,pltscreen)
+    data,datakey = quick.quickLook_function(station, year, doy, snr, f, e1,e2,h1,h2,reqAmp,pele,sat,PkNoise,fortran,pltscreen,screenstats=screenstats)
     # the key is saved wth the same keys as the data dictionary, in this order 
     # [avgAzim, RH, satNumber,frequency,maxAmplitude,Peak2Noise, UTChour]
 

@@ -3511,15 +3511,15 @@ def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNois
 
     """
     if delT > delTmax:
-        print('       delT {0:.1f} minutes '.format(delT ))
+        print('     Obs delT {0:.1f} minutes vs {1:.1f} requested limit '.format(delT,delTmax ))
     if eminObs  > (e1 + ediff):
-        print('       emin {0:.1f} '.format(eminObs ))
+        print('     Obs emin {0:.1f} is higher than {1:.1f} +- {2:.1f} degrees '.format(eminObs, e1, ediff ))
     if emaxObs  < (e2 - ediff):
-        print('       emax {0:.1f} '.format(emaxObs ))
+        print('     Obs emax {0:.1f} is lower than {1:.1f} +- {2:.1f} degrees'.format(emaxObs, e2, ediff ))
     if maxAmp < reqamp:
-        print('       Ampl {0:.1f} '.format(maxAmp  ))
+        print('     Obs Ampl {0:.1f} vs {1:.1f} required '.format(maxAmp,reqamp  ))
     if maxAmp/Noise < PkNoise:
-        print('       PkN  {0:.1f} '.format(maxAmp/Noise ))
+        print('     Obs PkN  {0:.1f} vs {1:.1f} required'.format(maxAmp/Noise, PkNoise ))
         
 def define_quick_filename(station,year,doy,snr):
     """
@@ -5823,6 +5823,9 @@ def queryUNR_modern(station):
     w = c.fetchall()
     if len(w) > 0:
         [(name,lat,lon,ht)] = w
+        # if longitude is ridiculous, as it often is in the Nevada Reno database make it less so
+        if (lon < -180):
+            lon = lon + 360
         print(lat,lon,ht)
     else:
         print('Did not find the station in the database:', station)
@@ -5830,6 +5833,7 @@ def queryUNR_modern(station):
     # close the database
     conn.close()
     # lat and lon are in degrees
+
     return lat,lon,ht
 
 def rinex3_nav(year,month,day):
