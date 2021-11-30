@@ -997,6 +997,14 @@ In this example the RMS improves from 0.11 to 0.09 m.
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" width="600"/>
 
+Here is an example where the RHdot correction even more important :
+
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_rhdot1.png" width="600"/>
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp-rhdot2.png" width="600"/>
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp-1.png" width="600"/>
 
 <HR>
 
