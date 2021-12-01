@@ -5,6 +5,9 @@
 
 ### gnssrefl
 
+[![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
+
 [Would you like to help write code for this software package?](#help)
 
 [Short cut to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
@@ -13,15 +16,19 @@
 
 [Link to youtube videos on GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)
 
-[Link to the Jupyter Notebooks](https://www.unavco.org/event/2021-gnss-interferometric-reflectometry/)
+[Link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
-Access to GSI RINEX data has been provided Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
+[Link to Docker build](https://hub.docker.com/r/unavdocker/gnssrefl)
+
+Access to GSI RINEX data has been provided 
+Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
 In my experience GSI is very response to account requests.  
 
 A bug was fixed in the old python translator option for S6/S7 data. Thank you to Andrea Gatti for this information.
 
-We are working on access to broadcast Glonass, Galileo, Beidou constellations. Thank you to Giulio Tagliaferro for suggestions
-on this improvement.
+Thanks to Makan Karegar the NMEA file format is now supported.  [See <code>nmea2snr</code> -h](#module4).
+
+Access to ultrarapid multi-GNSS (and thus real-time) orbits is now available via the [GFZ](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/topics/gnss-services/). Please use the -ultra flag in <code>rinex2snr</code>.
 
 **IMPORTANT:**
 
@@ -47,6 +54,9 @@ to install, if you have it brew install gfortran. If you don't have homebrew, th
     4. [rinex2snr: translating RINEX files into SNR files](#module1)
     5. [quickLook: assessing a site using SNR files](#module2)
     6. [gnssir: estimating reflector heights from SNR data](#module3)
+    7. [nmea2snr: translating NMEA files into SNR files](#module4)
+    8. [daily_avg](#module5)
+    9. [subdaily](#module6)
 4. [Bugs/Future Work](#bugs)
 5. [Utilities](#helper)
 6. [Publications](#publications)
@@ -62,7 +72,9 @@ I encourage you to read [Roesler and Larson, 2018](https://link.springer.com/art
 Although this article was originally written to accompany Matlab scripts, 
 the principles are the same. It explains to you what a reflection
 zone means and what a Nyquist frequency is for GNSS reflections. 
-My reflection zone webapp will [help you pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones) 
+My reflection zone webapp 
+will [help you pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones)
+If you click the box, the same web app will also compute the Nyquist for L1,L2, and L5.
 
 If you are interested in measuring sea level, this webapp tells you [how high your site is above sea level.](https://gnss-reflections.org/geoid)  
 
@@ -271,7 +283,8 @@ Again using the reflection zone web app, we can plot up the appropriate reflecti
 Since <code>ross</code> has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) has its coordinates in a 
 database. You can just plug in <code>ross</code> for the station name and leave 
 latitude/longitude/height blank. You *do* need to plug in a RH of 4 since mean 
-sea level would not be an appropriate reflector height value for this case. Start out with an azimuth range of 90 to 180 degrees.
+sea level would not be an appropriate reflector height value for this 
+case. Start out with an azimuth range of 90 to 180 degrees.
 Using 5-25 degree elevation angles (panel C) looks like it won't quite work - and going all the way to 180 degrees
 in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15) and cuts 
 off azimuths at 160. These choices appear to be better than those from Panel C.  
@@ -368,8 +381,6 @@ to use those files, you must install the
 CRX2RNX executable described in the previous section.  I think my code 
 allows you to gzip the RINEX files if you are providing them.
 
-We are working to make a NMEA reader for this software package.
-
 <HR>
 
 ### iv. rinex2snr - Extracting SNR data from RINEX files <a name="module1"></a>
@@ -380,7 +391,8 @@ A RINEX file has extraneous information in it (which we will throw out) - and it
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
 The first task you have in GNSS-IR is to translate from RINEX into what I will call 
 the SNR format. The latter will include azimuth and elevation angles. For the 
-latter you will need an **orbit** file. <code>rinex2snr</code> will go get an orbit file for you. You can override the default orbit 
+latter you will need an **orbit** file. <code>rinex2snr</code> will go get an orbit file for you. It will save
+those orbit files in case you want to use them at some later date. You can override the default orbit 
 choice by selections given below.
 
 There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
@@ -393,7 +405,8 @@ You can run <code>rinex2snr</code> at the command line. The required inputs are:
 - year
 - day of year
 
-A sample call for a station called <code>p041</code>, restricted to GPS satellites, on day of year 132 and year 2020 would be:
+A sample call for a station called <code>p041</code>, restricted to 
+GPS satellites, on day of year 132 and year 2020 would be:
 
 <code>rinex2snr p041 2020 132</code>
 
@@ -434,7 +447,16 @@ Using hybrid (the default):
 
 <code>rinex2snr tgho 2020 132 -archive nz</code>
 
-**Run the code for all the data for any year?**
+**Example using the Japanese GNSS archive:**
+
+The Geospatial Institute of Japan uses 6 numbers to specify 
+station names. You will be prompted for a username and password.
+This will be saved on your computer for future use. Since gnssrefl
+only uses four character statiion names, the last four values will be used as the station name.
+
+<code> rinex2snr 940050 2021 31 -archive jp </code>
+
+**Run the code for all the data for any year**
 
 <code>rinex2snr tgho 2019 1  -archive nz -doy_end 365</code>
  
@@ -471,6 +493,8 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - gps : will use GPS broadcast orbits (**this is the default**)
 - gps+glo : uses rapid GFZ orbits
 - gnss : uses GFZ orbits, which is multi-GNSS (available in 3-4 days?)
+- rapid : uses GFZ multi-GNSS rapid orbits, available in ~1 day
+- ultra : since mid-2021, we can use multi-GNSS near realtime orbits from GFZ
 
 *orbit file options for experts:*
 
@@ -478,18 +502,23 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - igs : IGS precise, GPS only
 - igr : IGS rapid, GPS only
 - jax : JAXA, GPS + Glonass, reliably within a few days, missing block III GPS satellites
-- gbm : GFZ Potsdam, multi-GNSS, not rapid
+- gbm : GFZ Potsdam, multi-GNSS, not rapid (GPS, Galileo,Glonass, Beidou)
 - grg: French group, GPS, Galileo and Glonass, not rapid
 - esa : ESA, multi-GNSS
 - gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021 
-- wum : (disabled) Wuhan, multi-GNSS, not rapid
+- wum : Wuhan, multi-GNSS (precise+prediction, GPS,Galileo,Glonass,Beidou)
+- ultra : GFZ ultra rapid (GPS, Galileo, Glonass), since May 17, 2021 
 
-It would be very helpful to add broadcast orbits for Galileo, Glonass, and Beidou. Based on my experience with GPS, I know that this will be much much much faster if we use Fortran code and bind with python using numpy. If you have such code, or know where it lives, please let me know.
+We are likely to add access to multi-GNSS broadcast orbits, but for now you can use the 
+ultra orbit option. Although it is provided every three hours, we currently only download the 
+file from midnite (hour 0).
 
-**What if you are providing the RINEX files and you don't want the code to search for the files online?** <code>-nolook True</code>
+**What if you are providing the RINEX files and you don't want the code to search for the files online?** 
+<code>-nolook True</code>
+
 Just put the RINEX files in the same directory where you are running the code, using my naming rules (lower case for RINEX 2.11).
 
-**What if you are have high-rate (e.g. 1 second) RINEX files, but you want (e.g.) 5 second data?**  <code>-dec 5 </code>
+**What if you have high-rate (e.g. 1 sec) RINEX files, but you want 5 sec data?** <code>-dec 5</code>
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
@@ -523,6 +552,42 @@ The unit for all SNR data is dB-Hz.
 - 101,102 are Glonass L1 and L2
 - 201, 205, 206, 207, 208: Galileo frequencies
 - 302, 306, 307 : Beidou frequencies
+
+**What if you want to analyze your own data?**
+
+Put your RINEX 2.11 files in the directory where you are going to run the code.
+They must have SNR data in them (S1, S2, etc) and have the receiver coordinates in the header.
+The files should be named as follows:
+
+- lowercase
+- station name (4 characters) followed by day of year (3 characters) then 0.yyo where yy is the two character year.
+- Example: algo0500.21o where station name is algo on day of year 50 from the year 2021
+
+<code>rinex2snr algo 2021 50 -nolook True</code>
+
+If you have RINEX 3 files, you should name them as follows:
+
+- upper case (except for the extension)
+
+- station name (9 characters where the last 3 characters are the country), underscore, capital R, 
+underscore, four character year, three character day of year, four zeroes, underscore, 01D_30S_M0. followed by rnx 
+30S means it is 30 second sampling. 01D means it is one day. Some of the other parts of the 
+very long station file name are no doubt useful, but they are not recognized by this code.
+
+- Example: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
+
+<code>rinex2snr onsa00swe 2021 305 -nolook True </code>
+
+If you have something other than 30 second sampling, it can be set with -srate.
+
+The RINEX inputs are always deleted, so do not put your only copy of the files in the working directory.
+Please note: we are using the publicly available <code>gfzrnx</code> code to convert RINEX 3 files into RINEX 2.11 files. 
+If you do not have <code>gfzrnx</code> installed, you will not be able to use RINEX 3 files.
+
+I believe it is also allowed to put your 
+RINEX files into $REFL_CODE/YYYY/rinex/ssss where YYYY is the year 
+and ssss is the four character station name. The advantage of doing 
+this is that your RINEX files will not be deleted.
 
 <HR>
 
@@ -592,6 +657,24 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 [**Example for a tall site**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
 
+In addition to the peak2noise and required amplitude (ampl) QC metrics, there is a 
+couple more QC metrics that are hardwired. One is the length of time 
+allowed for an arc - this can be a problem when you have an arc that crosses midnite;
+since the gnssrefl code works on elevation angle, it will combine part of 
+the arc from the beginning of the day and the rest 
+from the end of the day. This is not sensible - and it will reject this arc 
+nominally for being far too long. Really it is rejecting it because it is non-physical.  
+
+The second hidden QC setting is called "ediff." If you specify emin 
+and emax for your arcs, quickLook will allow you
+to use arcs that are within (emin +ediff) and (emax - ediff). The net result of this QC setting 
+default is to make it less likely you will try to use a very short arc. 
+The default value is set to 2 degrees. Although this cannot be changed for <code>quickLook</code>, you 
+can change it in <code>gnssir</code> in your json file.
+
+<code>quickLook -screenstats True</code> provides more information to the screen 
+about why arcs have been rejected.
+
 <HR>
 
 ### vi. gnssir <a name="module3"></a>
@@ -657,6 +740,7 @@ minH and maxH in the json file). I apologize for this.
 
 - e1 and e2 are the min and max elevation angle, in degrees
 - minH and maxH are the min and max allowed reflector height, in meters
+- ediff, in degrees: restricts arcs to be within this range of input elevation angles e1 and e2
 - desiredP, desired reflector height precision, in meters
 - PkNoise is the periodogram peak divided by the periodogram noise ratio.  
 - reqAmp is the required periodogram amplitude value, in volts/volts
@@ -717,6 +801,123 @@ Note that a failed satellite arc is shown as gray in the periodogram plots. And 
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
 <HR>
+
+### vii. nmea2snr <a name="module4"></a>
+
+NMEA formats can be translated to SNR using <code>nmea2snr</code>.
+Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
+NMEA files are assumed to be stored as:
+
+$REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
+
+for station ABCD in year 2021 and day of year 3. NMEA files may be gzipped.
+
+<hr>
+
+### viii. daily_avg<a name="module5"></a>
+
+<code>daily_avg</code> is a utility for people interested 
+in measuring snow accumulation via daily values. It can also 
+be used for lake levels. *It is not to be used for tides!*
+The goal is to make a valid daily average - for this reason, we have two required inputs 
+for quality control. 
+
+- The first is called a *median filter* value. This input helps remove
+large outliers. For each day, a median RH is found. Then all values larger than the 
+*median filter* value from the median RH are thrown out. 
+
+- The second required input to <code>daily_avg</code> sets a limit for how 
+many satellite arcs are considered sufficient to create a trustworth daily average. 
+If you had 5 arcs, for example, you probably would not want to compare that 
+with another day where 100 arcs were available. The number of tracks required 
+varies a lot depending on the azimuth mask and the number of frequencies available.
+If you are not sure what values to use at your GNSS site, run it once with very minimal constraints.
+The code provides some feedback plots that will let you pick better values.
+
+Here is an example from one of our use cases where there are a few large outliers.  
+I have set the median filter value to 2 meters and the required number of tracks to 12:
+
+<code> daily_avg mchn 2 12 </code>
+
+You can easily see the outliers. 
+
+
+<p align=center>
+<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-A.png>
+</p>
+
+Next I have rerun the code with a better median filter constraint of 0.25 meters:
+
+<code> daily_avg mchn 0.25 12 </code>
+
+<p align=center>
+<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-B.png>
+</p>
+
+A daily average plot is also made and a text file of the outputs is created.
+
+<p align=center>
+<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-C.png>
+</p>
+
+### ix. subdaily<a name="module6"></a>
+
+This module is primarily meant for RH measurements that have a subdaily component. It is not strictly 
+for water levels, but that is generally where it should be used. There are two main goals for this code:
+
+- consolidate daily result files and find/remove outliers
+- apply the [RHdot correction](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf)
+
+If you want to do your own QC, you can simply cat the files in your results area. As an example, after you have 
+run <code>gnssir</code> for a station called sc02 in the year 2021:
+
+<code>cat $REFL_CODE/2021/sc02/*.txt >sc02.txt</code>
+
+<code>subdaily</code> minimally requires the station name and year:
+
+<code>subdaily sc02 2021 </code>
+
+It picks up all result files from 2021, sorts and concatenates them. If you only want to 
+look at a subset of days, you can set -doy1 and/or -doy2. The output file location
+is sent to the screen. <code>subdaily</code> then tries to remove large outliers 
+by using a standard deviation test. This can be controlled at the command 
+line. Example figures:
+
+Results are presented with azimuth and amplitude colors to help you modify QC choices or azimuth mask:
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-1.png" width="600"/>
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" width="600"/>
+
+Sites with large tidal signatures require a RHdot correction. There are definitely multiple ways to 
+make this correction. If you have a well-observed site (lots of arcs and minimal gaps), 
+you can use the RH data themselves to estimate a smooth model for RH (cubic splines) and 
+then RHdot. If you invoke -rhdot True, the code will compute and 
+apply the RHdot correction. It will also make a second effort to remove outliers.  
+Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
+outliers in the first section of this code as this is really signal, not noise. 
+
+In the bottom panel you can see that applying the RHdot correction at this site improves the 
+RMS fit from 0.15 to 0.11 meters.
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" width="600"/>
+
+After the RHdot correction has been applied, the code then estimates a new spline fit and 
+removes frequency-specific biases. Stats for this fit with respect to the spline fit 
+are printed to the screen. Three-sigma outliers with respect to the new fit are removed.
+In this example the RMS improves from 0.11 to 0.09 m. 
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" width="600"/>
+
+Here is an example of a site (TNPP) where the RHdot correction is even more important :
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_rhdot2.png" width="600"/>
+
+After removing the RHdot effect and frequency biases, the RMS improves from 0.244 to 0.1 meters.
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_final.png" width="600"/>
+
+<hr>
 
 ### 4. Bugs/Features <a name="bugs"></a>
 
@@ -784,48 +985,6 @@ the newer ones). It is unfortunate, but I cannot do anything about this.
 
 ### 5. Utilities <a name="helper"></a>
 
-<code>daily_avg</code> is a utility for cryosphere people interested 
-in measuring snow accumulation via daily values. It can also 
-be used for lake levels. *It is not to be used for tides!*
-The goal is to make a valid daily average - for this reason, we have two required inputs 
-for quality control. The first is called a *median filter* value. This input helps remove
-large outliers. For each day, a median RH is found. Then all values larger than the 
-*median filter* value from the median RH are thrown out. 
-The second required input to <code>daily_avg</code> sets a limit for how 
-many satellite arcs are considered sufficient to create a trustworth daily average. 
-If you had 5 arcs, for example, you probably would not want to compare that 
-with another day where 100 arcs were available. The number of tracks required 
-varies a lot depending on the azimuth mask and the number of frequencies available.
-If you are not sure what values to use at your GNSS site, run it once with very minimal constraints.
-The code provides some feedback plots that will let you pick better values.
-
-
-Here is an example from one of our use cases where there are a few large outliers.  
-I have set the median filter value to 2 meters and the required number of tracks to 12:
-
-<code> daily_avg mchn 2 12 </code>
-
-You can easily see the outliers. 
-
-
-<p align=center>
-<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-A.png>
-</p>
-
-Next I have rerun the code with a better median filter constraint of 0.25 meters:
-
-<code> daily_avg mchn 0.25 12 </code>
-
-<p align=center>
-<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-B.png>
-</p>
-
-A daily average plot is also made and a text file of the outputs is created.
-
-<p align=center>
-<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-C.png>
-</p>
-
 <code>download_rinex</code> can be useful if you want to 
 download RINEX v2.11 or 3 files (using the version flag) without using 
 the reflection-specific codes. Sample calls:
@@ -855,7 +1014,8 @@ and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works per
 but this utility writes out a file with only columns of numbers instead of csv. 
 
 <code>query_unr</code> returns latitude, longitude, and ellipsoidal height and Cartesian position 
-for stations that were in the Nevada Reno database ~ a year ago (i.e. when I downloaded it). 
+for stations that were in the Nevada Reno database as of Octoner 2021. Coordinates are now more precise 
+than they were originally (UNR used to provide four decimal points in lat/long). 
 
 <code>check_rinex</code> returns simple information from the file header, such as receiver
 and antenna type, receiver coordinates, and whether SNR data are in the file. RINEX 2.11 only
@@ -868,7 +1028,6 @@ There are A LOT of publications about GPS and GNSS interferometric reflectometry
 If you want something with a how-to flavor, try this paper, 
 which is [open option](https://link.springer.com/article/10.1007/s10291-018-0744-8). Also 
 look to the publications page on my [personal website](https://kristinelarson.net/publications).
-
 
 <HR>
 
@@ -895,8 +1054,6 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 * Investigate surface related biases for polar tide gauge calculations (ice vs water).
 
-* We have contributors for allowing the NMEA format. We currently need to translate to Fortran to improve the speed.
-
 * I have ported NOCtide.m and will add it here when I get a chance.
 
 </ol>
@@ -905,15 +1062,17 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 ### 8. Acknowledgements <a name="acknowledgements"></a>
 
-[Radon Rosborough](https://github.com/raxod502) helped me with my python questions. 
-Joakim Strandberg provided python RINEX translators, and Johannes Boehm provided source code for the 
-refraction correction. 
+- [Radon Rosborough](https://github.com/raxod502) helped me with my python questions. 
+- Naoya Kadota added the GSI data archive. 
+- Joakim Strandberg provided python RINEX translators. 
+- Johannes Boehm provided source code for the refraction correction. 
+- Kelly Enloe made Jupyter notebooks and Tim Dittmann made docker builds. 
+- Makan Karegar added NMEA capability.
 
 
 Kristine M. Larson
 
 [https://kristinelarson.net](https://kristinelarson.net)
 
-This documentation was updated on September 28, 2021.
-
+This documentation was updated on December 1, 2021.
 

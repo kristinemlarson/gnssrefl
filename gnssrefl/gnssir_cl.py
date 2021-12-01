@@ -43,7 +43,7 @@ def main():
     parser.add_argument("-nooverwrite",  default=None, type=int, help="use any integer to not overwrite")
     parser.add_argument("-extension", default=None, type=str, help="extension for result file, useful for testing strategies")
     parser.add_argument("-compress",  default=None, type=str, help="xz compress SNR files after use")
-    parser.add_argument("-screenstats",  default=None, type=str, help="some stats printed to screen(default is True)")
+    parser.add_argument("-screenstats",  default=None, type=str, help="some stats printed to screen(default is False)")
     parser.add_argument("-delTmax", default=None, type=int, help="Req satellite arc length (minutes)")
     parser.add_argument("-e1", default=None, type=str, help="override min elev angle")
     parser.add_argument("-e2", default=None, type=str, help="override max elev angle")

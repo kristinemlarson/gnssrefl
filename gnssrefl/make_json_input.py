@@ -34,6 +34,7 @@ def main():
     parser.add_argument("-l2c", default=None, type=str, help="set to True to only use GPS L2C")
     parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
+    parser.add_argument("-extension", default=None, type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-query_unr", default=None, type=str, help="set to True if you want to use the Nevada Reno database values (enter 0,0,0 for lat/lon/ht)")
     args = parser.parse_args()
 #
@@ -60,7 +61,9 @@ def main():
 
     if args.query_unr == 'True':
         # try to find the default coordinates 
-        Lat, Long, Height = g.queryUNR(station)
+        #Lat, Long, Height = g.queryUNR(station)
+        # updated to new database
+        Lat, Long, Height = g.queryUNR_modern(station)
         if (Lat == 0):
             print('Tried to find coordinates in our UNR database. Not found so exiting')
             sys.exit()
@@ -126,7 +129,10 @@ def main():
     if not os.path.isdir(outputdir):
         subprocess.call(['mkdir',outputdir])
 
-    outputfile = outputdir + '/' + station + '.json'
+    if args.extension == None:
+        outputfile = outputdir + '/' + station + '.json'
+    else:
+        outputfile = outputdir + '/' + station + '.' + args.extension + '.json'
 
 
     lsp['polyV'] = 4 ; # polynomial order for DC removal

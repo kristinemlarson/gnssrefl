@@ -44,8 +44,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     NotEnough = 0
 # putting the results in a np.array, with this ordering
 # [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday]
-    tv = np.empty(shape=[0, 7])
-    obstimes = []; medRH = []; meanRH = [] ; alltimes = []
+# 2021 november 8, added amplitude, so now 8 columns
+    tv = np.empty(shape=[0, 8])
+    obstimes = []; medRH = []; meanRH = [] ; alltimes = []; meanAmp = []
     fig,ax=plt.subplots()
     year_list = np.arange(year1, year2+1, 1)
     NumFiles = 0
@@ -82,7 +83,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                 cc = (rh < (medv+howBig))  & (rh > (medv-howBig))
                             else:
                                 cc = (rh < (medv+howBig))  & (rh > (medv-howBig)) & (frequency == fr)
-                            good =rh[cc]; goodT =y[cc]
+                            good =rh[cc]; goodT =y[cc]; goodAmp = amplitude[cc]
                             gazim = azimuth[cc]; gsat = sat[cc]; gamp = amplitude[cc]; gpeak2noise = peak2noise[cc]
                             gfreq = frequency[cc]
                             # added 21may14
@@ -104,8 +105,13 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                 rh = good
                                 # this is the plot with all the data -not the daily average
                                 alltimes = []
-                                filler = datetime.datetime(year=yr, month=d.month, day=d.day)
+
+                                # put in the real time (as opposed to just year,month day)
+                                #filler = datetime.datetime(year=yr, month=d.month, day=d.day, hour = hrr, minute=mm, second = ss)
                                 for w in range(0,len(good)):
+                                    hrr = int(np.floor(gutcTime[w])) # 
+                                    mm = int(60*(gutcTime[w] - hrr )); ss = 0
+                                    filler = datetime.datetime(year=yr, month=d.month, day=d.day, hour = hrr, minute=mm, second = ss)
                                     alltimes.append(filler)
                                 ax.plot(alltimes,good,'b.')
 
@@ -116,9 +122,12 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                 meanRHtoday = np.mean(good)
                                 stdRHtoday = np.std(good)
                                 meanRH =np.append(meanRH, meanRHtoday)
+                                # added amplitude 2021 Nov 8 
+                                meanAmp = np.append(meanAmp, np.mean(goodAmp))
             # add month and day just cause some people like that instead of doy
             # added standard deviation feb14, 2020
-                                newl = [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday]
+                                # updated this to include mean amplitude 2021 november 8
+                                newl = [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday, np.mean(goodAmp)]
                                 tv = np.append(tv, [newl],axis=0)
                                 k += 1
                             else:
@@ -145,11 +154,11 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     # plot the number of retrievals vs time
     txtdir =  xdir + '/Files'
-    daily_avg_stat_plots(obstimes,meanRH,station,txtdir,tv)
+    daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv)
 
     return tv, obstimes
 
-def daily_avg_stat_plots(obstimes,meanRH,station,txtdir,tv):
+def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv):
     """
     make some plots of results - moved here to make it cleaner
     inputs: obstimes is datetime object
@@ -165,13 +174,26 @@ def daily_avg_stat_plots(obstimes,meanRH,station,txtdir,tv):
     today = str(date.today())
     plt.title(station.upper() + ': Daily Mean Reflector Height, Computed ' + today,fontsize=fs)
     plt.grid()
-    plt.xticks(fontsize=fs)
-    plt.yticks(fontsize=fs)
+    plt.xticks(fontsize=fs); plt.yticks(fontsize=fs)
 
     plt.gca().invert_yaxis()
     pltname = txtdir + '/' + station + '_RH.png'
     plt.savefig(pltname)
     print('Daily average RH png file saved as: ', pltname)
+
+#   new plot of reflector amplitudes as of November 8, 2021
+    fig,ax=plt.subplots()
+    ax.plot(obstimes,meanAmp,'b.')
+    fig.autofmt_xdate()
+    plt.ylabel('Amplitude (v/v)',fontsize=fs)
+    today = str(date.today())
+    plt.title(station.upper() + ': Daily Mean Reflection Amplitude, Computed ' + today,fontsize=fs)
+    plt.grid()
+    plt.xticks(fontsize=fs); plt.yticks(fontsize=fs)
+    pltname = txtdir + '/' + station + '_RHamp.png'
+    plt.savefig(pltname)
+    print('Daily average RH amplitude file saved as: ', pltname)
+
 
     fig,ax=plt.subplots()
     plt.plot(obstimes, tv[:,3],'b.')
@@ -198,19 +220,20 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     fout = open(outfile, 'w+')
     #  header of a sorts
     # change comment value from # to %
+    # 2021 november 8 added another column that has mean amplitude
     fout.write("{0:28s} \n".format( '% calculated on ' + xxx ))
     fout.write("% Daily average reflector heights (RH) calculated using the gnssrefl software \n")
-    fout.write("% year doy   RH    numval month day RH-sigma\n")
-    fout.write("% year doy   (m)                      (m)\n")
-    fout.write("% (1)  (2)   (3)    (4)    (5)  (6)   (7)\n")
+    fout.write("% year doy   RH    numval month day RH-sigma RH-amp\n")
+    fout.write("% year doy   (m)                      (m)    (v/v)\n")
+    fout.write("% (1)  (2)   (3)    (4)    (5)  (6)   (7)     (8) \n")
     if csvformat:
         for i in np.arange(0,N,1):
-            fout.write(" {0:4.0f},  {1:3.0f},{2:7.3f},{3:3.0f},{4:4.0f},{5:4.0f},{6:7.3f} \n".format(ntv[i,0], 
-                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6]))
+            fout.write(" {0:4.0f},  {1:3.0f},{2:7.3f},{3:3.0f},{4:4.0f},{5:4.0f},{6:7.3f},{7:6.2f} \n".format(ntv[i,0], 
+                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6],ntv[i,7]))
     else:
         for i in np.arange(0,N,1):
-            fout.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:3.0f} {4:4.0f} {5:4.0f} {6:7.3f} \n".format(ntv[i,0], 
-                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6]))
+            fout.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:3.0f} {4:4.0f} {5:4.0f} {6:7.3f} {7:6.2f} \n".format(ntv[i,0], 
+                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6], ntv[i,7]))
     fout.close()
 
 

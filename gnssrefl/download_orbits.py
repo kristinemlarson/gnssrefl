@@ -26,7 +26,7 @@ def main():
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    orbit_list = ['igs', 'igr','jax','grg','wum','gbm','nav','gps','gps+glo','gnss','gfr','esa','gnss2']
+    orbit_list = ['igs', 'igr','jax','grg','wum','gbm','nav','gps','gps+glo','gnss','gfr','esa','gnss2','brdc','ultra','rapid']
 
 
 #   assign to normal variables
@@ -57,14 +57,16 @@ def main():
     if pCtr == 'gps':
         pCtr = 'nav'
 
+    # this is picked up from CDDIS
     if pCtr == 'gnss':
         pCtr = 'gbm'
 
     if pCtr == 'gps+glo':
         pCtr = 'jax'
 
-    if pCtr == 'gfr':
-        pCtr = 'gbm' # since I cannot get their direct address to work 
+    # using gfz multi-gnss for rapid
+    if pCtr == 'rapid':
+        pCtr = 'gfr'
 
     if pCtr == 'nav':
         navname,navdir,foundit = g.getnavfile(year, month, day) 
@@ -74,17 +76,25 @@ def main():
         if (pCtr == 'igs') or (pCtr == 'igr'):
             filename, fdir, foundit = g.getsp3file_flex(year,month,day,pCtr)
         else:
-            #if pCtr == 'gfr':
-                # does not work and i cannot access the directory so I cannot fix it
-                #filename, fdir, foundit = g.rapid_gfz_orbits(year,month,day)
-                #filename, fdir, foundit = g.rapid_gfz_orbits(year,month,day)
-            #else:
             if pCtr == 'esa':
                     # this is ugly - but hopefully will work for now.  
                 filename, fdir, foundit = g.getsp3file_flex(year,month,day,pCtr)
+            elif pCtr == 'gfr':
+            # rapid GFZ is available again ... 
+                filename, fdir, foundit = g.rapid_gfz_orbits(year,month,day)
+            # also at GFZ
+            elif pCtr == 'ultra':
+                hour = 0 # for now
+                filename, fdir, foundit = g.ultra_gfz_orbits(year,month,day,hour)
             elif (pCtr == 'gnss2'):
                 # use IGN instead of CDDIS
                 filename,fdir,foundit = g.avoid_cddis(year,month,day)
+            elif (pCtr == 'brdc'):
+                # https://cddis.nasa.gov/archive/gnss/data/daily/2021/brdc/
+                # test code to get rinex 3 broadcast file
+                # will not store it in ORBITS because it is not used explicitly
+                # this is not operational as yet
+                filename,fdir,foundit = g.rinex3_nav(year,month,day)
             else:
                 filename, fdir, foundit = g.getsp3file_mgex(year,month,day,pCtr)
         if foundit:

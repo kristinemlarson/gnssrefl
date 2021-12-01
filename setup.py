@@ -10,6 +10,10 @@ ext2 = Extension(name='gnssrefl.gnsssnr',
         sources=['gnssrefl/gnsssnr.f'], 
         f2py_options=['--verbose'],
         )
+ext3 = Extension(name='gnssrefl.gnsssnrbigger', 
+        sources=['gnssrefl/gnsssnrbigger.f'], 
+        f2py_options=['--verbose'],
+        )
 
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
@@ -18,7 +22,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests","progress"]
 
 setup(
     name="gnssrefl",
-    version="1.0.10",
+    version="1.0.12",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -54,11 +58,12 @@ setup(
             'rinex3_rinex2= gnssrefl.rinex3_rinex2:main',
             'veg_multiyr= gnssrefl.veg_multiyr:main',
             'check_rinex= gnssrefl.check_rinex:main',
+            'rinex3_snr= gnssrefl.rinex3_snr:main',
             'filesizes= gnssrefl.filesizes:main',
             ], 
         },
     install_requires=requirements,
-    ext_modules = [ext1,ext2],
+    ext_modules = [ext1,ext2,ext3],
     classifiers=[
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
