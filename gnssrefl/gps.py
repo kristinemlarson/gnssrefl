@@ -5737,11 +5737,11 @@ def rinex_jp(station, year, month, day):
     Picks up RINEX file from Japanese GSI GeoNet archive
     URL : https://www.gsi.go.jp/ENGLISH/index.html
     """
-
     fdir = os.environ['REFL_CODE']
     if not os.path.isdir(fdir):
         print('You need to define the REFL_CODE environment variable')
         return 
+    
     # make sure the directory exists to store passwords
     if not os.path.isdir(fdir + '/Files'):
         subprocess.call(['mkdir',fdir + '/Files'])
@@ -5781,7 +5781,6 @@ def rinex_jp(station, year, month, day):
         subprocess.call(['gunzip', file1])
         print('successful download from JP GeoNet')
         if not os.path.isfile(userinfo_file):
-            os.makedirs(fdir, exist_ok=True)
             with open(userinfo_file, 'wb') as client_info:
                 pickle.dump((user_id,password) , client_info)
                 print('user id and password saved to', userinfo_file)
