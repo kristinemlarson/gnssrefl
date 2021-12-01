@@ -654,17 +654,23 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 [**Example for a tall site**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
 
-In addition to the peak2 noise and required amplitude metrics, there is a couple more QC metrics that 
-are hardwired. One is the length of time for the arc - this can be a problem when you have an arc that crosses midnite;
-since the gnssrefl code works on elevation angle, it will combine part of the arc from the beginning of the day and the rest 
-from the end of the day. This is not sensible - and it will reject this arc nominally for being far too long.
-Really it is rejecting it because it is non-physical.  
+In addition to the peak2noise and required amplitude (ampl) QC metrics, there is a 
+couple more QC metrics that are hardwired. One is the length of time 
+allowed for an arc - this can be a problem when you have an arc that crosses midnite;
+since the gnssrefl code works on elevation angle, it will combine part of 
+the arc from the beginning of the day and the rest 
+from the end of the day. This is not sensible - and it will reject this arc 
+nominally for being far too long. Really it is rejecting it because it is non-physical.  
 
-The second hidding QC setting is called "ediff." If you specify emin and emax for your arcs, it will allow you
+The second hidding QC setting is called "ediff." If you specify emin 
+and emax for your arcs, quickLook will allow you
 to use arcs that are within (emin +ediff) and (emax - ediff). The net result of this QC setting 
-default is to make it less likely you will try to use a very short arc. The default value is set to 2 degrees.  
+default is to make it less likely you will try to use a very short arc. 
+The default value is set to 2 degrees. Although this cannot be changed for <code>quickLook</code>, you 
+can change it in <code>gnssir</code> in your json file.
 
-<code>quickLook -screenstats True</code> provides more information to the screen about why arcs have been rejected.
+<code>quickLook -screenstats True</code> provides more information to the screen 
+about why arcs have been rejected.
 
 <HR>
 
