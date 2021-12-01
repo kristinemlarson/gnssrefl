@@ -72,7 +72,9 @@ I encourage you to read [Roesler and Larson, 2018](https://link.springer.com/art
 Although this article was originally written to accompany Matlab scripts, 
 the principles are the same. It explains to you what a reflection
 zone means and what a Nyquist frequency is for GNSS reflections. 
-My reflection zone webapp will [help you pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones) 
+My reflection zone webapp 
+will [help you pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones)
+If you click the box, the same web app will also compute the Nyquist for L1,L2, and L5.
 
 If you are interested in measuring sea level, this webapp tells you [how high your site is above sea level.](https://gnss-reflections.org/geoid)  
 
@@ -379,8 +381,6 @@ to use those files, you must install the
 CRX2RNX executable described in the previous section.  I think my code 
 allows you to gzip the RINEX files if you are providing them.
 
-We are working to make a NMEA reader for this software package.
-
 <HR>
 
 ### iv. rinex2snr - Extracting SNR data from RINEX files <a name="module1"></a>
@@ -518,7 +518,7 @@ file from midnite (hour 0).
 
 Just put the RINEX files in the same directory where you are running the code, using my naming rules (lower case for RINEX 2.11).
 
-**What if you are have high-rate (e.g. 1 second) RINEX files, but you want (e.g.) 5 second data?**  <code>-dec 5 </code>
+**What if you have high-rate (e.g. 1 sec) RINEX files, but you want 5 sec data?** <code>-dec 5</code>
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
