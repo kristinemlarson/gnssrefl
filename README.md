@@ -55,6 +55,8 @@ to install, if you have it brew install gfortran. If you don't have homebrew, th
     5. [quickLook: assessing a site using SNR files](#module2)
     6. [gnssir: estimating reflector heights from SNR data](#module3)
     7. [nmea2snr: translating NMEA files into SNR files](#module4)
+    8. [daily_avg](#module5)
+    9. [subdaily](#module6)
 4. [Bugs/Future Work](#bugs)
 5. [Utilities](#helper)
 6. [Publications](#publications)
@@ -279,7 +281,8 @@ Again using the reflection zone web app, we can plot up the appropriate reflecti
 Since <code>ross</code> has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) has its coordinates in a 
 database. You can just plug in <code>ross</code> for the station name and leave 
 latitude/longitude/height blank. You *do* need to plug in a RH of 4 since mean 
-sea level would not be an appropriate reflector height value for this case. Start out with an azimuth range of 90 to 180 degrees.
+sea level would not be an appropriate reflector height value for this 
+case. Start out with an azimuth range of 90 to 180 degrees.
 Using 5-25 degree elevation angles (panel C) looks like it won't quite work - and going all the way to 180 degrees
 in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15) and cuts 
 off azimuths at 160. These choices appear to be better than those from Panel C.  
@@ -808,6 +811,109 @@ $REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
 
 for station ABCD in year 2021 and day of year 3. NMEA files may be gzipped.
 
+### viii. daily_avg<a name="module5"></a>
+
+<code>daily_avg</code> is a utility (mostly) for cryosphere people interested 
+in measuring snow accumulation via daily values. It can also 
+be used for lake levels. *It is not to be used for tides!*
+The goal is to make a valid daily average - for this reason, we have two required inputs 
+for quality control. The first is called a *median filter* value. This input helps remove
+large outliers. For each day, a median RH is found. Then all values larger than the 
+*median filter* value from the median RH are thrown out. 
+The second required input to <code>daily_avg</code> sets a limit for how 
+many satellite arcs are considered sufficient to create a trustworth daily average. 
+If you had 5 arcs, for example, you probably would not want to compare that 
+with another day where 100 arcs were available. The number of tracks required 
+varies a lot depending on the azimuth mask and the number of frequencies available.
+If you are not sure what values to use at your GNSS site, run it once with very minimal constraints.
+The code provides some feedback plots that will let you pick better values.
+
+Here is an example from one of our use cases where there are a few large outliers.  
+I have set the median filter value to 2 meters and the required number of tracks to 12:
+
+<code> daily_avg mchn 2 12 </code>
+
+You can easily see the outliers. 
+
+
+<p align=center>
+<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-A.png>
+</p>
+
+Next I have rerun the code with a better median filter constraint of 0.25 meters:
+
+<code> daily_avg mchn 0.25 12 </code>
+
+<p align=center>
+<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-B.png>
+</p>
+
+A daily average plot is also made and a text file of the outputs is created.
+
+<p align=center>
+<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-C.png>
+</p>
+
+### ix. subdaily<a name="module6"></a>
+
+<code>subdaily</code>
+
+This module is primarily meant for RH measurements that have a subdaily component. It is not strictly 
+for water levels, but that is generally where it should be used. There are two main goal for this code:
+
+- consolidating daily files and finding/removing outliers
+- applying the RHdot correction
+
+If you want to do your own QC, you can simply cat the files in your results area. As an example, after you have 
+run <code>gnssir</code> for a station called sc02 in the year 2021:
+
+<code>cat $REFL_CODE/2021/sc02/*.txt >sc02.txt</code>
+
+Subdaily minimally requires the station name and year:
+
+<code>subdaily sc02 2021 </code>
+
+It picks up all results files from 2021, sorts and concatenates them (if you only want to 
+look at a subset of days, you can set -doy1 and -doy2). The output file location
+is sent to the screen. subdaily then tries to remove large outliers 
+by using a standard deviation test. This can be controlled at the command 
+line. Example figures:
+
+Results are presented with azimuth and amplitude colors to help you modify QC choices or azimuth mask:
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-1.png" width="600"/>
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" width="600"/>
+
+Sites with large tidal signatures require a RHdot correction. There are definitely multiple ways to 
+make this correction. If you have a well-observed site (lots of arcs and minimal gaps), 
+you can use the RH data themselves to estimate a smooth model for RH (cubic splines) and 
+then RHdot. If you invoke -rhdot True, the code will compute and 
+apply the RHdot correction. It will also do a second effort to remove outliers.  
+Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
+outliers in the first section of this code. 
+
+In the bottom panel you can see that applying the RHdot correction at this site improves the 
+RMS fit from 0.15 to 0.11 meters.
+
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" width="600"/>
+
+After the RHdot correction has been applied, the code then estimates a new spline fit and 
+removes frequency-specific biases. Stats for this fit with respect to the spline fit 
+are printed to the screen. Three-sigma outliers with respect to the new fit are removed.
+In this example the RMS improves from 0.11 to 0.09 m. 
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" width="600"/>
+
+Here is an example of a site (TNPP) where the RHdot correction is even more important :
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_rhdot2.png" width="600"/>
+
+After removing the RHdot effect and frequency biases, the RMS improves from 0.244 to 0.1 meters.
+
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_final.png" width="600"/>
+
 ### 4. Bugs/Features <a name="bugs"></a>
 
 Bug Diary
@@ -874,48 +980,6 @@ the newer ones). It is unfortunate, but I cannot do anything about this.
 
 ### 5. Utilities <a name="helper"></a>
 
-<code>daily_avg</code> is a utility for cryosphere people interested 
-in measuring snow accumulation via daily values. It can also 
-be used for lake levels. *It is not to be used for tides!*
-The goal is to make a valid daily average - for this reason, we have two required inputs 
-for quality control. The first is called a *median filter* value. This input helps remove
-large outliers. For each day, a median RH is found. Then all values larger than the 
-*median filter* value from the median RH are thrown out. 
-The second required input to <code>daily_avg</code> sets a limit for how 
-many satellite arcs are considered sufficient to create a trustworth daily average. 
-If you had 5 arcs, for example, you probably would not want to compare that 
-with another day where 100 arcs were available. The number of tracks required 
-varies a lot depending on the azimuth mask and the number of frequencies available.
-If you are not sure what values to use at your GNSS site, run it once with very minimal constraints.
-The code provides some feedback plots that will let you pick better values.
-
-
-Here is an example from one of our use cases where there are a few large outliers.  
-I have set the median filter value to 2 meters and the required number of tracks to 12:
-
-<code> daily_avg mchn 2 12 </code>
-
-You can easily see the outliers. 
-
-
-<p align=center>
-<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-A.png>
-</p>
-
-Next I have rerun the code with a better median filter constraint of 0.25 meters:
-
-<code> daily_avg mchn 0.25 12 </code>
-
-<p align=center>
-<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-B.png>
-</p>
-
-A daily average plot is also made and a text file of the outputs is created.
-
-<p align=center>
-<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-C.png>
-</p>
-
 <code>download_rinex</code> can be useful if you want to 
 download RINEX v2.11 or 3 files (using the version flag) without using 
 the reflection-specific codes. Sample calls:
@@ -950,66 +1014,6 @@ than they were originally (UNR used to provide four decimal points in lat/long).
 
 <code>check_rinex</code> returns simple information from the file header, such as receiver
 and antenna type, receiver coordinates, and whether SNR data are in the file. RINEX 2.11 only
-
-<HR>
-
-<code>subdaily</code>
-
-This module is primarily meant for RH measurements that have a subdaily component. It is not strictly 
-for water levels, but that is generally where it should be used. There are two main goal for this code:
-
-- consolidating daily files and finding/removing outliers
-- applying the RHdot correction
-
-If you want to do your own QC, you can simply cat the files in your results area. As an example, after you have 
-run <code>gnssir</code> for a station called sc02 in the year 2021:
-
-<code>cat $REFL_CODE/2021/sc02/*.txt >sc02.txt</code>
-
-Subdaily minimally requires the station name and year:
-
-<code>subdaily sc02 2021 </code>
-
-It picks up all results files from 2021, sorts and concatenates them (if you only want to 
-look at a subset of days, you can set -doy1 and -doy2). The output file location
-is sent to the screen. subdaily then tries to remove large outliers 
-by using a standard deviation test. This can be controlled at the command 
-line. Example figures:
-
-Results are presented with azimuth and amplitude colors to help you modify QC choices or azimuth mask:
-
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-1.png" width="600"/>
-
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" width="600"/>
-
-Sites with large tidal signatures require a RHdot correction. There are definitely multiple ways to 
-make this correction. If you have a well-observed site (lots of arcs and minimal gaps), 
-you can use the RH data themselves to estimate a smooth model for RH (cubic splines) and 
-then RHdot. If you invoke -rhdot True, the code will compute and 
-apply the RHdot correction. It will also do a second effort to remove outliers.  
-Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
-outliers in the first section of this code. 
-
-In the bottom panel you can see that applying the RHdot correction at this site improves the 
-RMS fit from 0.15 to 0.11 meters.
-
-
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" width="600"/>
-
-After the RHdot correction has been applied, the code then estimates a new spline fit and 
-removes frequency-specific biases. Stats for this fit with respect to the spline fit 
-are printed to the screen. Three-sigma outliers with respect to the new fit are removed.
-In this example the RMS improves from 0.11 to 0.09 m. 
-
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" width="600"/>
-
-Here is an example of a site (TNPP) where the RHdot correction is even more important :
-
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_rhdot2.png" width="600"/>
-
-After removing the RHdot effect and frequency biases, the RMS improves from 0.244 to 0.1 meters.
-
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_final.png" width="600"/>
 
 <HR>
 
