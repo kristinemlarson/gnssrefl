@@ -665,7 +665,7 @@ the arc from the beginning of the day and the rest
 from the end of the day. This is not sensible - and it will reject this arc 
 nominally for being far too long. Really it is rejecting it because it is non-physical.  
 
-The second hidding QC setting is called "ediff." If you specify emin 
+The second hidden QC setting is called "ediff." If you specify emin 
 and emax for your arcs, quickLook will allow you
 to use arcs that are within (emin +ediff) and (emax - ediff). The net result of this QC setting 
 default is to make it less likely you will try to use a very short arc. 
@@ -740,6 +740,7 @@ minH and maxH in the json file). I apologize for this.
 
 - e1 and e2 are the min and max elevation angle, in degrees
 - minH and maxH are the min and max allowed reflector height, in meters
+- ediff, in degrees: restricts arcs to be within this range of input elevation angles e1 and e2
 - desiredP, desired reflector height precision, in meters
 - PkNoise is the periodogram peak divided by the periodogram noise ratio.  
 - reqAmp is the required periodogram amplitude value, in volts/volts
@@ -811,16 +812,21 @@ $REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
 
 for station ABCD in year 2021 and day of year 3. NMEA files may be gzipped.
 
+<hr>
+
 ### viii. daily_avg<a name="module5"></a>
 
-<code>daily_avg</code> is a utility (mostly) for cryosphere people interested 
+<code>daily_avg</code> is a utility for people interested 
 in measuring snow accumulation via daily values. It can also 
 be used for lake levels. *It is not to be used for tides!*
 The goal is to make a valid daily average - for this reason, we have two required inputs 
-for quality control. The first is called a *median filter* value. This input helps remove
+for quality control. 
+
+- The first is called a *median filter* value. This input helps remove
 large outliers. For each day, a median RH is found. Then all values larger than the 
 *median filter* value from the median RH are thrown out. 
-The second required input to <code>daily_avg</code> sets a limit for how 
+
+- The second required input to <code>daily_avg</code> sets a limit for how 
 many satellite arcs are considered sufficient to create a trustworth daily average. 
 If you had 5 arcs, for example, you probably would not want to compare that 
 with another day where 100 arcs were available. The number of tracks required 
