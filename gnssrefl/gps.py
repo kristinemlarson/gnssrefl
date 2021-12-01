@@ -5741,7 +5741,7 @@ def rinex_jp(station, year, month, day):
     if not os.path.isdir(fdir):
         print('You need to define the REFL_CODE environment variable')
         return 
-    
+
     # make sure the directory exists to store passwords
     if not os.path.isdir(fdir + '/Files'):
         subprocess.call(['mkdir',fdir + '/Files'])
