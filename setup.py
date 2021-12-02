@@ -22,7 +22,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests","progress"]
 
 setup(
     name="gnssrefl",
-    version="1.0.12",
+    version="1.0.13",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
