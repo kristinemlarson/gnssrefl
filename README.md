@@ -26,9 +26,9 @@ In my experience GSI is very response to account requests.
 
 A bug was fixed in the old python translator option for S6/S7 data. Thank you to Andrea Gatti for this information.
 
-Thanks to Makan Karegar the NMEA file format is now supported.  [See <code>nmea2snr</code>](#module4).
+Thanks to Makan Karegar the NMEA file format is now supported. See [<code>nmea2snr</code>](#module4).
 
-Access to ultrarapid multi-GNSS (and thus real-time) orbits is now available via the [GFZ](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/topics/gnss-services/). Please use the -ultra flag in <code>rinex2snr</code>.
+Access to ultrarapid multi-GNSS (and thus real-time) orbits is now available via the [GFZ](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/topics/gnss-services/). Please use the -ultra flag in [<code>rinex2snr</code>](#module1).
 
 **IMPORTANT:**
 
