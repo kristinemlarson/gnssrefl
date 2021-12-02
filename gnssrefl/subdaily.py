@@ -675,7 +675,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
 
         ax2=fig.add_subplot(312)
         plt.plot(th, rhdot_at_th,'b.',label='at obs')
-        plt.plot(tvel[2:-2], yvel[2:-2], 'c-',label='modeled')
+        plt.plot(tvel[2:-2], yvel[2:-2], '-',color='orange',label='modeled')
         plt.title('RHdot in meters per hour',fontsize=fs)
         plt.ylabel('m/hr',fontsize=fs);
         plt.legend(loc="best")
@@ -930,7 +930,7 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     spline_at_tnew = spline(tnew)
     plt.subplot(211)
     plt.plot(tnew,ynew,'k.')
-    plt.plot(tnew,biasCorr_ynew,'b.',label='freq/rhdot corr')
+    plt.plot(tnew,biasCorr_ynew,'b.',label='with freq/rhdot corr')
     plt.plot(spl_x, spl_y,'-',color='orange',label='spline fit')
     plt.title(station + ' RH Obs and new spline fit after freq bias removed')
     plt.legend(loc="upper right")
@@ -938,14 +938,15 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     plt.grid()
 
     rms = np.std(ynew-spline_at_tnew)
-    print('std (m)', round(rms,3))
+    newrms = str(round(rms,3))
+    print('std (m)', newrms)
     ii = np.abs(ynew-spline_at_tnew) > 3*rms
     jj = np.abs(ynew-spline_at_tnew) < 3*rms
     res = ynew-spline_at_tnew
     plt.subplot(212)
-    plt.plot(tnew,res,'b.', label='residuals')
+    plt.plot(tnew,res,'b.', label='RH rms:' + newrms + ' m')
     plt.plot(tnew[ii],res[ii],'r.',label='3sigma outliers')
-    plt.title('residuals')
+    #plt.title('residuals')
     plt.xlabel('day of year'); plt.ylabel('meters')
     plt.legend(loc="upper right")
     plt.grid()

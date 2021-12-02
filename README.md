@@ -900,10 +900,10 @@ data themselves to estimate a smooth model for RH (cubic splines) and
 then just back out RHdot. If (and only if) you invoke -rhdot True, the code will compute and 
 apply the RHdot correction. It will also make a second effort to remove outliers.  
 Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
-outliers in the first section of this code as this is really signal, not noise. It also does a run of 
-removing frequency biases.
+outliers in the first section of this code as this is really signal, not noise. You can set the outlier criterion 
+with <code>-outlier N</code>, where N is in meters. It also makes an attempt to remove frequency biases. 
 
-This is the SC02 site again. In the bottom panel you can see that applying the RHdot correction at this site improves the 
+Here is the SC02 site again - but now from the second section of the code. In the bottom panel you can see that applying the RHdot correction at this site improves the 
 RMS fit from 0.15 to 0.11 meters.
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" width="600"/>
