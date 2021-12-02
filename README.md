@@ -862,7 +862,7 @@ A daily average plot is also made and a text file of the outputs is created.
 
 ### ix. subdaily<a name="module6"></a>
 
-This module is primarily meant for RH measurements that have a subdaily component. It is not strictly 
+This module is meant for RH measurements that have a subdaily component. It is not strictly 
 for water levels, but that is generally where it should be used. There are two main goals for this code:
 
 - consolidate daily result files and find/remove outliers
@@ -873,7 +873,8 @@ run <code>gnssir</code> for a station called sc02 in the year 2021:
 
 <code>cat $REFL_CODE/2021/sc02/*.txt >sc02.txt</code>
 
-<code>subdaily</code> minimally requires the station name and year:
+If you would prefer to use our code, it is pretty straightforward. It has two sections.  The first 
+minimally requires the station name and year:
 
 <code>subdaily sc02 2021 </code>
 
@@ -889,15 +890,20 @@ Results are presented with azimuth and amplitude colors to help you modify QC ch
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" width="600"/>
 
-Sites with large tidal signatures require a RHdot correction. There are definitely multiple ways to 
-make this correction. If you have a well-observed site (lots of arcs and minimal gaps), 
-you can use the RH data themselves to estimate a smooth model for RH (cubic splines) and 
-then RHdot. If you invoke -rhdot True, the code will compute and 
+The second section is related to the RHdot correction. You must explicitly ask for it.
+There are lots of ways to apply the RHdot correction - I am only providing a simple one at this point.  
+The RHdot correction requires you know the average elevation angle during an arc, 
+edot (elevation angle rate of change) and RHdot (RH rate of change). 
+The first is trivial to compute and is included in the results file. The second part is a bit trickier.
+If you have a well-observed site (lots of arcs and minimal gaps), you can use the RH 
+data themselves to estimate a smooth model for RH (cubic splines) and 
+then just back out RHdot. If (and only if) you invoke -rhdot True, the code will compute and 
 apply the RHdot correction. It will also make a second effort to remove outliers.  
 Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
-outliers in the first section of this code as this is really signal, not noise. 
+outliers in the first section of this code as this is really signal, not noise. It also does a run of 
+removing frequency biases.
 
-In the bottom panel you can see that applying the RHdot correction at this site improves the 
+This is the SC02 site again. In the bottom panel you can see that applying the RHdot correction at this site improves the 
 RMS fit from 0.15 to 0.11 meters.
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" width="600"/>
@@ -916,6 +922,11 @@ Here is an example of a site (TNPP) where the RHdot correction is even more impo
 After removing the RHdot effect and frequency biases, the RMS improves from 0.244 to 0.1 meters.
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_final.png" width="600"/>
+
+Comment: if you have an existing file with results, you can just run the second part of the code. 
+If the input file is called test.txt, you would call it as:
+
+<code>subdaily sc02 2021 -splinefile test.txt -rhdot True</code>
 
 <hr>
 
