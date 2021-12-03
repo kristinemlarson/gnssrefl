@@ -687,7 +687,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
         ax3=fig.add_subplot(313)
         label1 = 'w/o RHdot ' + str( round(np.std(resid_spl),2)) + 'm'
         label2 = 'w/ RHdot ' + str(round(np.std(resid_spl-correction),2)) + 'm'
-        plt.plot(th, resid_spl,'g.',label= label1)
+        plt.plot(th, resid_spl,'.',color='orange',label= label1)
         plt.plot(th, resid_spl - correction,'b.',label=label2)
         plt.plot(th[ijk], resid_spl[ijk] - correction[ijk],'rx',label='suspect')
         plt.legend(loc="best")
