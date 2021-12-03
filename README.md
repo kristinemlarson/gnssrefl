@@ -1077,7 +1077,8 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 ### 8. Acknowledgements <a name="acknowledgements"></a>
 
-- [Radon Rosborough](https://github.com/raxod502) helped me with my python questions. 
+- [Radon Rosborough](https://github.com/raxod502) helped with 
+python/packaging questions and improved our docker distribution. 
 - [Naoya Kadota](https://github.com/naoyakadota) added the GSI data archive. 
 - Joakim Strandberg provided python RINEX translators. 
 - Johannes Boehm provided source code for the refraction correction. 
