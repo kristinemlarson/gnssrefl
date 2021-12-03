@@ -890,6 +890,9 @@ Results are presented with azimuth and amplitude colors to help you modify QC ch
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" width="600"/>
 
+Whle this code is meant to be used AFTER you have chosen an analysis strategy, you can 
+apply new azimuth and amplitude constraints on the commandline, <code>-azim1, azim2, ampl</code>.
+
 The second section is related to the RHdot correction. You must explicitly ask for it.
 There are lots of ways to apply the RHdot correction - I am only providing a simple one at this point.  
 The RHdot correction requires you know the average elevation angle during an arc, 
@@ -903,7 +906,8 @@ Note: if you have a site with a large RHdot correction, you should be cautious o
 outliers in the first section of this code as this is really signal, not noise. You can set the outlier criterion 
 with <code>-spline_outlier N</code>, where N is in meters. It also makes an attempt to remove frequency biases. 
 
-Here is the SC02 site again - but now from the second section of the code. In the bottom panel you can see that applying the RHdot correction at this site improves the 
+Here is the SC02 site again - but now from the second section of the code. 
+In the bottom panel you can see that applying the RHdot correction at this site improves the 
 RMS fit from 0.15 to 0.11 meters.
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" width="600"/>
