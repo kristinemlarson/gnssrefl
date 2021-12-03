@@ -34,7 +34,7 @@ def main():
     parser.add_argument("-splinefile", default=None, type=str, help="Input filename for rhdot/spline fitting (optional)") 
     parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt") 
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
-    parser.add_argument("-spl_outlier", default=None, type=str, help="outlier criterion used in splinefit (meters)")
+    parser.add_argument("-spline_outlier", default=None, type=str, help="outlier criterion used in splinefit (meters)")
     parser.add_argument("-knots", default=None, type=str, help="Knots per day, spline fit only (default is 8)")
     parser.add_argument("-sigma", default=None, type=str, help="simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)")
     parser.add_argument("-extension", default=None, type=str, help="soln subdirectory")
@@ -74,10 +74,10 @@ def main():
 
     # if not specified, use outlier criterion of 0.5 m
     # this is JUST for the splinefit. changed variable in thte input to make that more clear
-    if args.spl_outlier == None:
+    if args.spline_outlier == None:
         outlier = 1.0 
     else:
-        outlier = float(args.outlier)
+        outlier = float(args.spline_outlier)
 
 # these constraints are added at the command line
     azim1 = 0
