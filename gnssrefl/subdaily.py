@@ -250,8 +250,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     print_badpoints(tv[ii,:],residuals[ii])
 
     # now write things out
-    fname = xdir + '/Files/' + station + '_subdaily_rh.txt'
-    fname_new = xdir + '/Files/' + station + '_subdaily_rh_edits.txt'
+    fname = xdir + '/Files/' + station + '_all.txt'
+    fname_new = xdir + '/Files/' + station + '_subdaily_edits.txt'
     extraline = ''
 
     editedtv = tv[jj,:]
@@ -316,15 +316,14 @@ def fract_to_obstimes(spl_x):
 
     return obstimes
 
-def in_out(x,y):
+def spline_in_out(x,y,knots_per_day):
     """
-    inputs are numpy arrays of time (in years) and reflector heights (m)
+    inputs are numpy arrays of time (in doy) and reflector heights (m)
     outputs are the spline fit
 
     note: i have to assume this does not work well with data outages
     """
-    knots_per_day = 12
-    Ndays = 365.25*(x.max()-x.min())
+    Ndays = round(x.max()-x.min())
     numKnots = int(knots_per_day*(Ndays))
     #print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
     x1 = x.min()+0.1/365.25
@@ -336,7 +335,7 @@ def in_out(x,y):
     xx = np.linspace(x.min(), x.max(), N)
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
 
-    return x,spline(x) 
+    return xx,spline(xx) 
     
 def write_out_header(fout,station,extraline,**kwargs):
     """
@@ -540,26 +539,6 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     ii = np.argsort( tnew) 
     tnew = tnew[ii]
     ynew = ynew[ii]
-#  should really just mirror it or remove data at the ends
-#   going to add more fake data ...
-    first = tnew[0]
-    last = tnew[-1]
-    ii = (tnew <= first + 0.1)
-    jj = (tnew >= last-0.1)
-    first6hours = np.mean(ynew[ii])
-    last6hours = np.mean(ynew[jj])
-    for ii in range(1,6):
-        tnew = np.append(tnew,first-ii/48)
-        ynew = np.append(ynew, first6hours)
-    for ii in range(1,6):
-        tnew = np.append(tnew,last+ii/48)
-        ynew = np.append(ynew, last6hours)
-
-    
-    # now sort them again .... 
-    ii = np.argsort(tnew) 
-    tnew = tnew[ii]
-    ynew = ynew[ii]
 
     Ndays = tnew.max()-tnew.min()
     numKnots = int(knots_per_day*(Ndays))
@@ -569,24 +548,24 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     print('Knots per day: ', knots_per_day, ' Number of knots: ', numKnots)
     print('Outlier criterion with respect to spline fit (m): ', outlierV)
     print('Number of days of data: ', '{0:8.2f}'.format ( Ndays) )
-    # need the first and last knot to be inside the time series
+    # need the first and last knot to be inside the time series ???
     firstKnot_in_minutes = 15
     t1 = tnew.min()+firstKnot_in_minutes/60/24
     t2 = tnew.max()-firstKnot_in_minutes/60/24
-    # try this 
     # 
-    knots =np.linspace(t1,t2,num=numKnots)
+    # try this instead - first and last day
+    tt1 = tvd[0,1]
+    tt2 = tvd[-1,1] + 1
+    kdt = knots_per_day/24
+    knots = np.linspace(tt1 + kdt/2, tt2 - kdt/2, numKnots)
 
-    #ftest = open('testing.txt', 'w+')
-    #for i in range(0,len(knots)):
-    #    ftest.write('{0:9.4f} \n'.format( knots[i]))
-    #ftest.close()
+    # knots =np.linspace(t1,t2,num=numKnots)
+
 
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
 
-    # user specifies how many values per day you want to send back to the user  
 
-    # should i do extrapolate True? it is the default  - could make it periodic?
+    # should i do extrapolate True? it is the default  
     #spline = interpolate.BSpline(t, c, k, extrapolate=True)
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
     # equal spacing in both x and y
@@ -629,21 +608,21 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     resid_spl = resid_spl[i]
     tvd = tvd[i,:]
 
-# should take out first and last six hours as well
+# taking out first and last six hours as well
     t1 = float(th[0] + 6/24)
     t2 = float(th[-1] - 6/24)
 # and again
-    i = (th >= t1)
+    i = (th >= t1) & (th <= t2)
     th = th[i]; h = h[i]
     xfac = xfac[i]
     resid_spl = resid_spl[i]
     tvd = tvd[i,:]
 
-    i = (th <= t2)
-    th = th[i]; h = h[i]
-    xfac = xfac[i]
-    resid_spl = resid_spl[i]
-    tvd = tvd[i,:]
+    #i = (th <= t2)
+    #th = th[i]; h = h[i]
+    #xfac = xfac[i]
+    #resid_spl = resid_spl[i]
+    #tvd = tvd[i,:]
 
 # put the original series without outliers eventually?
 # use first diff to get simple velocity.  
@@ -961,3 +940,29 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
         plt.show()
 
 
+
+#  should really just mirror it or remove data at the ends
+#   going to add more fake data ...
+#    first = tnew[0]
+#    last = tnew[-1]
+#    ii = (tnew <= first + 0.1)
+#    jj = (tnew >= last-0.1)
+#    first6hours = np.mean(ynew[ii])
+#    last6hours = np.mean(ynew[jj])
+#    for ii in range(1,6):
+#        tnew = np.append(tnew,first-ii/48)
+#        ynew = np.append(ynew, first6hours)
+#    for ii in range(1,6):
+#        tnew = np.append(tnew,last+ii/48)
+#        ynew = np.append(ynew, last6hours)
+
+
+    # now sort them again ....
+#   ii = np.argsort(tnew)
+#   tnew = tnew[ii]
+#   ynew = ynew[ii]
+
+    #ftest = open('testing.txt', 'w+')
+    #for i in range(0,len(knots)):
+    #    ftest.write('{0:9.4f} \n'.format( knots[i]))
+    #ftest.close()
