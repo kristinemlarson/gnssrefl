@@ -549,17 +549,16 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     print('Outlier criterion with respect to spline fit (m): ', outlierV)
     print('Number of days of data: ', '{0:8.2f}'.format ( Ndays) )
     # need the first and last knot to be inside the time series ???
-    firstKnot_in_minutes = 15
-    t1 = tnew.min()+firstKnot_in_minutes/60/24
-    t2 = tnew.max()-firstKnot_in_minutes/60/24
     # 
     # try this instead - first and last day
     tt1 = tvd[0,1]
     tt2 = tvd[-1,1] + 1
     kdt = knots_per_day/24
     knots = np.linspace(tt1 + kdt/2, tt2 - kdt/2, numKnots)
-
-    # knots =np.linspace(t1,t2,num=numKnots)
+    firstKnot_in_minutes = 15
+    t1 = tnew.min()+firstKnot_in_minutes/60/24
+    t2 = tnew.max()-firstKnot_in_minutes/60/24
+    knots =np.linspace(t1,t2,num=numKnots)
 
 
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
