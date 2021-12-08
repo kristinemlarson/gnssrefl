@@ -28,7 +28,12 @@ A bug was fixed in the old python translator option for S6/S7 data. Thank you to
 
 Thanks to Makan Karegar the NMEA file format is now supported. See [<code>nmea2snr</code>](#module4).
 
-Access to ultrarapid multi-GNSS (and thus real-time) orbits is now available via the [GFZ](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/topics/gnss-services/). Please use the -ultra flag in [<code>rinex2snr</code>](#module1).
+A new UNR database has been created/updated - it can be used to provide precise lat/long/ht a priori coordinates 
+in <code>make_json_input</code> if you have a station that is recognized by UNR.
+
+Access to ultrarapid multi-GNSS (and thus real-time) orbits is now available 
+via the [GFZ](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/topics/gnss-services/). 
+Please use the -ultra flag in [<code>rinex2snr</code>](#module1).
 
 **IMPORTANT:**
 
@@ -939,7 +944,9 @@ In this example the RMS improves from 0.11 to 0.09 m.
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" width="600"/>
 
-Here is an example of a site (TNPP) where the RHdot correction is even more important :
+Here is an example of a site (TNPP) where the RHdot correction is 
+even more important (I apologize for color choice here. The 
+current code uses more color-blindness-friendly colors):
 
 <img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_rhdot2.png" width="600"/>
 
