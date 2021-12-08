@@ -657,7 +657,7 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 [**Example for a tall site**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
 
-In addition to the peak2noise and required amplitude (ampl) QC metrics, there is a 
+In addition to the **peak2noise** and required amplitude (**ampl**) QC metrics, there is a 
 couple more QC metrics that are hardwired. One is the length of time 
 allowed for an arc - this can be a problem when you have an arc that crosses midnite;
 since the gnssrefl code works on elevation angle, it will combine part of 
@@ -665,12 +665,18 @@ the arc from the beginning of the day and the rest
 from the end of the day. This is not sensible - and it will reject this arc 
 nominally for being far too long. Really it is rejecting it because it is non-physical.  
 
-The second hidden QC setting is called "ediff." If you specify emin 
-and emax for your arcs, quickLook will allow you
-to use arcs that are within (emin +ediff) and (emax - ediff). The net result of this QC setting 
+The code tries to find all eligible arcs between elevation angles **e1 (emin)** and **e2 (emax)**.
+Why? In my experience you don't want to use an arc that only goes from 5-10 degrees if you 
+are trying to use all arcs between 5 and 25 degrees. The same is true for small
+arcs at higher elevation angles (20-25). However, you don't want to be 
+too strict, so there is a QC setting called **ediff**.
+The default is 2 degrees. For a given emin and emax for your arcs, <code>quickLook</code> 
+will allow you to use arcs that are at least within this amount in degrees, i.e. 
+(emin +ediff) and (emax - ediff). The net result of this QC setting 
 default is to make it less likely you will try to use a very short arc. 
-The default value is set to 2 degrees. Although this cannot be changed for <code>quickLook</code>, you 
-can change it in <code>gnssir</code> in your json file.
+Although this cannot be changed for <code>quickLook</code>, you 
+can change it in <code>gnssir</code> in your json file. If you want <code>gnssir</code> to use
+everything, just make **ediff** very large. 
 
 <code>quickLook -screenstats True</code> provides more information to the screen 
 about why arcs have been rejected.
