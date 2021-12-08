@@ -678,6 +678,18 @@ Although this cannot be changed for <code>quickLook</code>, you
 can change it in <code>gnssir</code> in your json file. If you want <code>gnssir</code> to use
 everything, just make **ediff** very large. 
 
+Warning: <code>quickLook</code> calculates the minimum observed elevation 
+angle in your file and prints that to the screen so you know 
+what it is. It also uses that as your emin
+value (e1) if the default is smaller. It does this so you don't see all arcs as rejected.
+**Example**: your file had a receiver imposed elevation cutoff of 10 degrrees. The default
+minimum elevation angle in <code>quickLook</code> is 5 degrees. 
+So would the default **ediff** value, not a single arc would reach the minimum 
+required of 7 (5 + 2); everything would be rejected. <code>quickLook</code> instead sees that
+you have a emin of 10 and would substitute that for the default emin. 
+However, <code>gnssir</code> does not do this because at that point you 
+are supposed to have chosen a strategy, which is stored in the json file.
+
 <code>quickLook -screenstats True</code> provides more information to the screen 
 about why arcs have been rejected.
 
