@@ -22,7 +22,7 @@
 
 Access to GSI RINEX data has been provided 
 Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
-In my experience GSI is very response to account requests.  
+In my experience GSI is very responsive to account requests.  
 
 A bug was fixed in the old python translator option for S6/S7 data. Thank you to Andrea Gatti for this information.
 
@@ -40,8 +40,9 @@ gfortran in your terminal (or yum install -y gcc-gfortran ).
 **If you are using a MacOS** then you will need to install xcode. First, in your terminal, check if you have xcode 
 by xcode-select -p. If it is installed, it should return a path. If it is not installed then run 
 xcode-select --install. This should install gcc.You can check if you have gcc by gcc --version. 
-Check if you have gfortran by gfortran --version. If you do not have gfortran, then you can use homebrew 
-to install, if you have it brew install gfortran. If you don't have homebrew, then see [check here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
+Check if you have gfortran by gfortran --version. If you do not have 
+gfortran, then you can use homebrew to install (brew install gfortran). If you 
+don't have homebrew, then [check here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
 
 ### Table of Contents
 
