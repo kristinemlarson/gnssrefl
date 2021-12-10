@@ -811,7 +811,9 @@ This is a snippet of what the result file would look like
 - MJD is modified julian date
 - PkNoise is the peak to noise ratio of the periodogram values
 - last column is currently set to tell you whether the refraction correction has been applied 
-- EdotF is used in the RHdot correction needed for dynamic sea level sites. The units are  
+- EdotF is used in the RHdot correction needed for dynamic sea level sites. The units are hours/rad.
+When multiplied by RHdot (meters/hour), you will get a correction in units of meters. For further
+information, see <code>subdaily</code>.
 
 If you want a multi-GNSS solution, you need to:
 
@@ -893,7 +895,8 @@ A daily average plot is also made and a text file of the outputs is created.
 ### ix. subdaily<a name="module6"></a>
 
 This module is meant for RH measurements that have a subdaily component. It is not strictly 
-for water levels, but that is generally where it should be used. There are two main goals for this code:
+for water levels, but that is generally where it should be used. There are 
+two main goals for this code:
 
 - consolidate daily result files and find/remove outliers
 - apply the [RHdot correction](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf)
@@ -911,8 +914,7 @@ minimally requires the station name and year:
 It picks up all result files from 2021, sorts and concatenates them. If you only want to 
 look at a subset of days, you can set -doy1 and/or -doy2. The output file location
 is sent to the screen. <code>subdaily</code> then tries to remove large outliers 
-by using a standard deviation test. This can be controlled at the command 
-line. Example figures:
+by using a standard deviation test. This can be controlled at the command line. Example figures:
 
 Results are presented with azimuth and amplitude colors to help you modify QC choices or azimuth mask:
 
@@ -923,18 +925,31 @@ Results are presented with azimuth and amplitude colors to help you modify QC ch
 Whle this code is meant to be used AFTER you have chosen an analysis strategy, you can 
 apply new azimuth and amplitude constraints on the commandline, <code>-azim1, azim2, ampl</code>.
 
-The second section is related to the RHdot correction. You must explicitly ask for it.
+The second section of <code>subdaily</code> is related to the RHdot correction. You must explicitly ask for it. 
 There are lots of ways to apply the RHdot correction - I am only providing a simple one at this point.  
-The RHdot correction requires you know the average elevation angle during an arc, 
-edot (elevation angle rate of change) and RHdot (RH rate of change). 
-The first is trivial to compute and is included in the results file. The second part is a bit trickier.
-If you have a well-observed site (lots of arcs and minimal gaps), you can use the RH 
-data themselves to estimate a smooth model for RH (cubic splines) and 
-then just back out RHdot. If (and only if) you invoke -rhdot True, the code will compute and 
-apply the RHdot correction. It will also make a second effort to remove outliers.  
+The RHdot correction requires you know the average of the tangent of the elevation angle during an arc, 
+edot (elevation angle rate of change with respect to time) and RHdot (RH rate of change). 
+The first two are trivial to compute and are included in the results file in column 13 as the edotF. 
+This edot factor has units of rad/(rad/hour), or hours. So if you know RHdot in units of meters/hour, 
+you can get the correction by simple multiplication. 
+
+Computing RHdot is the trickiest part of calculating the RHdot correction.
+And multiple papers have been written about it. If you have a well-observed site (lots of arcs and minimal gaps), you can use the RH 
+data themselves to estimate a smooth model for RH (via cubic splines) and 
+then just back out RHdot. This is what is done in <code>subdaily</code> (if and only if you invoke -rhdot True). 
+It will also make a second effort to remove outliers.  
 Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
 outliers in the first section of this code as this is really signal, not noise. You can set the outlier criterion 
 with <code>-spline_outlier N</code>, where N is in meters. It also makes an attempt to remove frequency biases. 
+
+There are other ways to compute the RHdot correction:
+- computing tidal coefficients, and then iterating using the forward predictions (Larson et al. 2013b)
+- estimating it simultaneously with tidal coefficient (Larson et al. 2017). 
+- low-order tidal fit (Lofgren et al 2014)
+- direct inversion of the SNR data (Strandberg et al 2016 , Purnell et al. 2021)
+- estimate rate and an acceleration term (Tabibi et al 2020)
+
+I am working to make some of these other methods available in this package.
 
 Here is the SC02 site again - but now from the second section of the code. 
 In the bottom panel you can see that applying the RHdot correction at this site improves the 
