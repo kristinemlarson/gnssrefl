@@ -73,6 +73,26 @@ class wgs84:
     f  =  1./298.257223563 # flattening factor
     e = np.sqrt(2*f-f**2) # 
 
+def ydoych(year,doy):
+    """
+    why why why did RINEX allow year to be two characters?
+    """
+    cyyyy = str(year)
+    cyy = cyyyy[2:4]
+    cdoy = '{:03d}'.format(doy)
+
+    return cyyyy,cyy,cdoy
+
+def year_twoch(year):
+    """
+    why why why did RINEX allow year to be two characters?
+    """
+    cyear = str(year)
+    cyy = cyear[2:4]
+
+    return cyy
+
+
 def define_filename(station,year,doy,snr):
     """
     inputs:
@@ -87,11 +107,11 @@ def define_filename(station,year,doy,snr):
     20apr12: fixed typo in xz name!
     """
     xdir = os.environ['REFL_CODE'] # main directory for SNR files
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
-    f= station + str(cdoy) + '0.' + cyy + '.snr' + str(snr)
-    fname = xdir + '/' + str(year) + '/snr/' + station + '/' + f 
-    fname2 = xdir + '/' + str(year) + '/snr/' + station + '/' + f  + '.xz'
+    cyyyy, cyy, cdoy = ydoych(year,doy) 
+
+    f= station + cdoy + '0.' + cyy + '.snr' + str(snr)
+    fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f 
+    fname2 = xdir + '/' + cyyyy  + '/snr/' + station + '/' + f  + '.xz'
     return fname, fname2
 
 def define_and_xz_snr(station,year,doy,snr):
@@ -104,11 +124,10 @@ def define_and_xz_snr(station,year,doy,snr):
     20apr12: fixed typo in xz name! now try to compress here
     """
     xdir = os.environ['REFL_CODE']
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
-    f= station + str(cdoy) + '0.' + cyy + '.snr' + str(snr)
-    fname = xdir + '/' + str(year) + '/snr/' + station + '/' + f
-    fname2 = xdir + '/' + str(year) + '/snr/' + station + '/' + f  + '.xz'
+    cyyyy, cyy, cdoy = ydoych(year,doy)
+    f= station + cdoy + '0.' + cyy + '.snr' + str(snr)
+    fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f
+    fname2 = xdir + '/' + cyyyy  + '/snr/' + station + '/' + f  + '.xz'
     snre = False
     if os.path.isfile(fname):
         #print('snr file exists')
@@ -143,11 +162,12 @@ def define_filename_prevday(station,year,doy,snr):
         pdoy = doy - 1
         pyear = year
 
-    cdoy = '{:03d}'.format(pdoy)
-    cyy = '{:02d}'.format(pyear-2000)
-    f= station + str(cdoy) + '0.' + cyy + '.snr' + str(snr)
-    fname = xdir + '/' + str(year) + '/snr/' + station + '/' + f 
-    fname2 = xdir + '/' + str(year) + '/snr/' + station + '/' + f + '.xz'
+    # change to characters 
+    cyyyy, cyy, cdoy = ydoych(pyear,pdoy)
+
+    f= station + cdoy + '0.' + cyy + '.snr' + str(snr)
+    fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f 
+    fname2 = xdir + '/' + cyyyy + '/snr/' + station + '/' + f + '.xz'
     #print('snr filename for the previous day is ', fname) 
     return fname, fname2
 
@@ -551,9 +571,7 @@ def ymd2doy(year,month,day):
     """
     today=datetime.datetime(year,month,day)
     doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
-    cdoy = '{:03d}'.format(doy)
-    cyyyy = '{:04d}'.format(year)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
     return doy, cdoy, cyyyy, cyy
 
 def rinex_special(station, year, month, day):
@@ -568,9 +586,7 @@ def rinex_special(station, year, month, day):
     exedir = os.environ['EXE']
     if day == 0:
         doy = month
-        cyyyy = str(year)
-        cdoy = '{:03d}'.format(doy)
-        cyy = '{:02d}'.format(year-2020)
+        cyyyy, cyy, cdoy = ydoych(year,doy)
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
@@ -605,9 +621,7 @@ def rinex_unavco_old(station, year, month, day):
     crnxpath = hatanaka_version()  # where hatanaka will be
     if day == 0:
         doy = month
-        cyyyy = str(year)
-        cdoy = '{:03d}'.format(doy)
-        cyy = '{:02d}'.format(year-2020)
+        cyyyy, cyy, cdoy = ydoych(year,doy)
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
@@ -2290,7 +2304,8 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
             delT = (np.max(t) - np.min(t))/60 
 # average tan(elev)
             cunit =np.mean(np.tan(np.pi*x/180))
-#           return tan(e)/edot, in units of radians/hour now. used for RHdot correction
+#           return tan(e)/edot, in units of one over (radians/hour) now. used for RHdot correction
+#           so when multiplyed by RHdot - which would be meters/hours ===>>> you will get a meter correction
     if avgEdot == 0:
         outFact1 = 0
     else:
@@ -2557,7 +2572,7 @@ def open_outputfile(station,year,doy,extension):
         fout.write("% Phase Center corrections have NOT been applied \n")
         fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD   refr-appl\n")
         fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16)   (17)\n")
-        fout.write("%             m        hrs    deg   v/v    deg    deg  values               hrs            min         1 is yes  \n")
+        fout.write("%             m        hrs    deg   v/v    deg    deg  values            hrs               min         1 is yes  \n")
     except:
         print('problem on first attempt - so try making results directory')
         f1 = xdir + '/' + str(year) + '/results/'
@@ -2921,10 +2936,7 @@ def rinex_name(station, year, month, day):
     """
     if day == 0:
         doy = month
-        cyyyy = str(year)
-        #cyy = str(year-2000)
-        cdoy = '{:03d}'.format(month)
-        cyy =  '{:02d}'.format(year-2000)
+        cyyyy, cyy, cdoy = ydoych(year,doy)
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
 
@@ -2950,10 +2962,7 @@ def nav_name(year, month, day):
     returns nav file name and directory
     """
     if (day == 0):
-#        print('using doy instead of month and day')
-        cdoy = '{:03d}'.format(month)
-        cyyyy = str(year)
-        cyy = '{:02d}'.format(year-2000)
+        cyyyy, cyy, cdoy = ydoych(year,doy)
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     navfilename = 'auto'  + cdoy + '0.' + cyy  +  'n'
@@ -3528,8 +3537,7 @@ def define_quick_filename(station,year,doy,snr):
     author: Kristine Larson
     19mar25: return compressed filename too
     """
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
     f= station + str(cdoy) + '0.' + cyy + '.snr' + str(snr)
     return f
 
@@ -4345,9 +4353,7 @@ def cddis_rinex3(station9ch, year, doy,srate,orbtype):
     """
     fexists = False 
     ftp = 'ftp://cddis.nasa.gov/gnss/data/daily/'
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
-    cyyyy = str(year)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
 
     f = cyyyy + '/' + cdoy + '/' + cyy + 'd'  + '/'
     new_way_f = '/gnss/data/daily/' + f
@@ -4434,10 +4440,8 @@ def bkg_rinex3(station9ch, year, doy,srate):
     """
     fexist = False
     crnxpath = hatanaka_version()
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
     csrate = '{:02d}'.format(srate)
-    cyyyy = str(year)
 
     url = 'ftp://igs.bkg.bund.de/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
     # try this one now?
@@ -4468,9 +4472,8 @@ def bev_rinex2(station, year, doy):
     """
     fexist = False
     crnxpath = hatanaka_version()
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
-    cyyyy = str(year)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
+
     url = 'ftp://gnss.bev.gv.at/pub/obs/' + cyyyy + '/' + cdoy + '/'
     ff_Z =  station + cdoy + '0.' + cyy + 'd' + '.Z'
     ff_gz = station + cdoy + '0.' + cyy + 'd' + '.gz'
@@ -4519,10 +4522,9 @@ def bev_rinex3(station9ch, year, doy,srate):
     """
     fexist = False
     crnxpath = hatanaka_version()
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
+
     csrate = '{:02d}'.format(srate)
-    cyyyy = str(year)
     url = 'ftp://gnss.bev.gv.at/pub/obs/' + cyyyy + '/' + cdoy + '/'
     ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
     ff1 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
@@ -4552,10 +4554,10 @@ def ign_rinex3(station9ch, year, doy,srate):
     """
     fexist = False
     crnxpath = hatanaka_version()
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
+
     csrate = '{:02d}'.format(srate)
-    cyyyy = str(year)
+
     url = 'ftp://igs.ensg.ign.fr/pub/igs/data/' + cyyyy + '/' + cdoy + '/'
     ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
     ff1 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
@@ -4586,10 +4588,9 @@ def ga_rinex3(station9ch, year, doy,srate):
     """
     fexist = False
     crnxpath = hatanaka_version()
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
+
     csrate = '{:02d}'.format(srate)
-    cyyyy = str(year)
     url = 'ftp://ftp.data.gnss.ga.gov.au/daily/' + cyyyy + '/' + cdoy + '/'
     #url = 'https://data.gnss.ga.gov.au/daily/' + cyyyy + '/' + cdoy + '/'
     ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
@@ -4621,10 +4622,9 @@ def ga_rinex3_to_rinex2(station9ch, year, doy,srate):
     """
     fexist = False
     crnxpath = hatanaka_version()
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
+
     csrate = '{:02d}'.format(srate)
-    cyyyy = str(year)
     url = 'ftp://ftp.data.gnss.ga.gov.au/daily/' + cyyyy + '/' + cdoy + '/'
 
     ff = station9ch.upper() +    '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
@@ -4754,11 +4754,11 @@ def snr_exist(station,year,doy,snrEnd):
 
     """
     xdir = os.environ['REFL_CODE']
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
+
     f= station + cdoy + '0.' + cyy + '.snr' + snrEnd
-    fname = xdir + '/' + str(year) + '/snr/' + station + '/' + f
-    fname2 = xdir + '/' + str(year) + '/snr/' + station + '/' + f  + '.xz'
+    fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f
+    fname2 = xdir + '/' + cyyyy + '/snr/' + station + '/' + f  + '.xz'
     snre = False
     # check for both
     if os.path.isfile(fname):
@@ -4792,10 +4792,8 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
     author: kristine larson
     """
     fexists = False 
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
     csrate = '{:02d}'.format(srate)
-    cyyyy = str(year)
     ftp = 'ftp://data-out.unavco.org/pub/rinex3/obs/' 
     # updated 21sep03
     ftp = 'https://data.unavco.org/archive/gnss/rinex3/obs/'
@@ -4985,13 +4983,11 @@ def ydoy2useful(year, doy):
     """
 
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
-#    print('ymd',d)
 #   not sure you need to do this int step
     month = int(d.month)
     day = int(d.day)
-    cdoy = '{:03d}'.format(doy)
-    cyyyy = '{:04d}'.format(year)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
+
     cdd = '{:02d}'.format(day)
     cmonth = char_month_converter(month)
     YMD = cyy + cmonth + cdd
@@ -5182,9 +5178,7 @@ def cddis3(station9ch, year, doy,srate):
     """
     fexists = False
     ftp = 'ftp://cddis.nasa.gov/gnss/data/daily/'
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
-    cyyyy = str(year)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
 
     f = cyyyy + '/' + cdoy + '/' + cyy + 'd'  + '/'
     new_way_f = '/gnss/data/daily/' + f
@@ -5219,10 +5213,8 @@ def unavco3(station9ch, year, doy,srate):
     21sep03: change from ftp to https
     """
     fexists = False
-    cdoy = '{:03d}'.format(doy)
-    cyy = '{:02d}'.format(year-2000)
+    cyyyy, cyy, cdoy = ydoych(year,doy)
     csrate = '{:02d}'.format(srate)
-    cyyyy = str(year)
     ftp = 'ftp://data-out.unavco.org/pub/rinex3/obs/'
     ftp = 'https://data.unavco.org/archive/gnss/rinex3/obs/'
 

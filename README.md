@@ -711,7 +711,8 @@ about why arcs have been rejected.
 * longitude (degrees) 
 * ellipsoidal height (meters). 
 
-The station location *does not* have to be cm-level for the reflections code. Within a few hundred meters is sufficient. For example: 
+The station location *does not* have to be cm-level for the reflections code. Within a few hundred meters is 
+sufficient. For example: 
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1</CODE>
 
@@ -809,10 +810,14 @@ This is a snippet of what the result file would look like
 - *sat* and *freq* are as defined in this document
 - MJD is modified julian date
 - PkNoise is the peak to noise ratio of the periodogram values
-- last column is currently set to tell you whether the refration correction has been applied 
+- last column is currently set to tell you whether the refraction correction has been applied 
+- EdotF is used in the RHdot correction needed for dynamic sea level sites. The units are  
 
-If you want a multi-GNSS solution, you need to make a new json file and 
-use multi-GNSS orbits, and use a RINEX file that has multi-GNSS SNR observations in it. 
+If you want a multi-GNSS solution, you need to:
+
+- make sure your json file is set appropriately
+- use a RINEX file with multi-GNSS data in it (i.e. use multi-GNSS orbits and in some cases rerun rinex2snr).
+
 In 2020 p041 had a multi-GNSS receiver operating, so we can look at some of the non-GPS signals.
 In this case, we will look at Galileo L1.  
 

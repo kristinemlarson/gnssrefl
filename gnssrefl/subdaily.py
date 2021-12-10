@@ -495,7 +495,11 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     th= tvd[:,1] + tvd[:,4]/24; 
     # reflector height (meters)
     h = tvd[:,2]
-    # this is the edot factor
+    # this is the edot factor - 
+    # this was computed by gnssir as the mean of the tangent(eangles) over an arc,
+    # divided by edot (the tiem rate of change of elevation angle, initially rad/sec,
+    # but then converted to rad/hour).  Thus this parameter has units  rad/(rad/hour) >>>> hours
+    # it is multiplied by RHDot in meters/hour, which gives you a correction value in meters
     xfac = tvd[:,12]
     
     # now get obstimes if they were not passed
@@ -629,6 +633,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     obsPerHour= perday/24
         
     # these are unreliable at beginning and end of the series for clear reasons
+    # these velocities are in meters/hour
     tvel = spl_x[1:N]
     yvel = obsPerHour*np.diff(spl_y)
 
