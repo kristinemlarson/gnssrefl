@@ -10,7 +10,7 @@
 
 If you are being blocked by CDDIS (currently used for downloading almost
 all multi-GNSS orbit files), you can try the <code>-orb gnss2</code> option in either the <code>download_orbit</code> 
-or <code>rinex2snr</code>. It retrieves files from IGN instead of CDDIS.
+or <code>rinex2snr</code>. It retrieves multi-GNSS files for GFZ from IGN instead of CDDIS.
 
 If you have orbit files you would like to use and they follow the naming conventions used 
 by <code>gnssrefl</code>, you can use them. You need to store them in 
