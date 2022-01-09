@@ -8,6 +8,14 @@
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
+If you are being blocked by CDDIS (currently used for downloading almost
+all multi-GNSS orbit files), you can try the <code>-orb gnss2</code> option in either the <code>download_orbit</code> 
+or <code>rinex2snr</code>. It retrieves files from IGN instead of CDDIS.
+
+If you have orbit files you would like to use and they follow the naming conventions used 
+by <code>gnssrefl</code>, you can use them. You need to store them in 
+the proper place ($ORBITS/yyyy/nav for nav messages and $ORBITS/yyyy/sp3 for sp3 files).
+
 [Would you like to help write code for this software package?](#help)
 
 [Short cut to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)

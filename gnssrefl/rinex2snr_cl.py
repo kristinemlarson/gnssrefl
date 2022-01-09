@@ -76,7 +76,7 @@ def main():
 # added GFZ rapid, aka gfr 2021May19 but it does not work anymore.  point it to gbm
 # 
 # added ESA, thank you to Makan
-    orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum','gfr','esa','ultra','rapid']
+    orbit_list = ['gps','gps+glo','gnss','nav', 'igs','igr','jax','gbm','grg','wum','gfr','esa','ultra','rapid','gnss2']
     if orb not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
@@ -92,6 +92,20 @@ def main():
     # if you choose GNSS, you get the GFZ sp3 file  (precise)
     if orb == 'gnss':
         orb = 'gbm'
+
+    if orb == 'gnss2':
+        # this code wants year month day....
+        year,month,day=g.ydoy2ymd(year, doy)
+        filename,fdir,foundit = g.avoid_cddis(year,month,day)
+        orb = 'gbm'
+        if not foundit:
+            print('You picked the backup multi-GNSS option.')
+            print('I tried to get the file from IGN and failed. Exiting')
+            sys.exit()
+        else:
+            print('found GFZ orbits at IGN - warning, only a single file at a time')
+
+
 
     # if you choose GPS+GLO, you get the JAXA sp3 file 
     if orb == 'gps+glo':
