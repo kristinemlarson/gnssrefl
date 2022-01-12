@@ -564,8 +564,10 @@ The unit for all SNR data is dB-Hz.
 
 - 1,2,20, and 5 are GPS L1, L2, L2C, and L5
 - 101,102 are Glonass L1 and L2
-- 201, 205, 206, 207, 208: Galileo frequencies
-- 302, 306, 307 : Beidou frequencies
+- 201, 205, 206, 207, 208: Galileo frequencies, which are 
+set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
+- 302, 306, 307 : Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz
+
 
 **What if you want to analyze your own data?**
 
