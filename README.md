@@ -562,7 +562,8 @@ The unit for all SNR data is dB-Hz.
 
 **Our names for the GNSS frequencies**
 
-- 1,2,20, and 5 are GPS L1, L2, L2C, and L5
+- 1,2,20, and 5 are GPS L1, L2, L2C, and L5 (L2 and L2C are the same frequency - but we use different numbers in this code so that 
+one can *only* use L2C if wished.
 - 101,102 are Glonass L1 and L2
 - 201, 205, 206, 207, 208: Galileo frequencies, which are 
 set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
