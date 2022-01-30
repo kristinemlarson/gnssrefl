@@ -26,8 +26,8 @@ def main():
     parser.add_argument("e1", default=None, type=float, help="lower limit elev. angle (deg)")
     parser.add_argument("e2", default=None, type=float, help="upper limit elev. angle (deg)")
 
-    parser.add_argument("-azim1", default=None, type=float, help="lower limit azimuth angle (deg)")
-    parser.add_argument("-azim2", default=None, type=float, help="upper limit azimuth angle (deg)")
+    parser.add_argument("-a1", default=None, type=float, help="lower limit azimuth angle (deg)")
+    parser.add_argument("-a2", default=None, type=float, help="upper limit azimuth angle (deg)")
 
     parser.add_argument("-lat", help="latitude (degrees)", type=str,default=None)
     parser.add_argument("-long", help="longitude (degrees)", type=str, default=None)
@@ -62,28 +62,28 @@ def main():
     lsp['lat'] = Lat; lsp['lon'] = Long; lsp['ht']=Height
 
 # reflector height limits (meters)
-    h1 = args.rh1
-    h2 = args.rh2
+    h1 = args.h1
+    h2 = args.h2
 #
     if (h1 > h2):
         print('h1 cannot be greater than h2. ', h1, h2, ' Exiting.')
         sys.exit()
 
-    e1 = float(args.elev1)
-    e2 = float(args.elev2)
+    e1 = float(args.e1)
+    e2 = float(args.e2)
     if (e1 > e2):
         print('e1 must be less than e2.', e1, e2, ' Exiting.')
         sys.exit()
 
-    if args.azim1 == None:
-        azim1 = 0
+    if (args.a1 == None):
+        a1 = 0
     else: 
-        a1 = float(args.azim1)
+        a1 = float(args.a1)
 
-    if args.azim2 == None:
-        azim2 = 360
+    if (args.a2 == None):
+        a2 = 360
     else: 
-        a2 = float(args.azim2)
+        a2 = float(args.a2)
 
     if (a1 > a2):
         print('a1 must be less than a2.', a1, a2, ' Exiting.')

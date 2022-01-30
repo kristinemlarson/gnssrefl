@@ -43,23 +43,24 @@ def main():
     xdir = os.environ['REFL_CODE']
     # location of the analysis inputs, if it exists
     jsondir  = xdir + '/input/'
+# removed this capability.  
 # file using the current directory location
-    instructions =  station + '.inv.json'
+#    instructions =  station + '.inv.json'
 # file using the gnssrefl package directory
     instructions2 =  jsondir + station + '.inv.json'
 
-    if os.path.isfile(instructions):
-        print('using:', instructions)
-        with open(instructions) as f:
+#    if os.path.isfile(instructions):
+#        print('using:', instructions)
+#        with open(instructions) as f:
+#            lsp = json.load(f)
+#    else:
+    if os.path.isfile(instructions2):
+        print('using:', instructions2)
+        with open(instructions2) as f:
             lsp = json.load(f)
     else:
-        if os.path.isfile(instructions2):
-            print('using:', instructions2)
-            with open(instructions2) as f:
-                lsp = json.load(f)
-        else:
-            print('instruction file does not exist. exiting')
-            sys.exit()
+        print('Instruction file does not exist.', instructions2, ' Exiting.')
+        sys.exit()
 
 # save json inputs to variables
     precision = lsp['precision']
