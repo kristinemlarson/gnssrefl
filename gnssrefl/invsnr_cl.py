@@ -6,7 +6,7 @@ import os
 import sys
 
 # all the main functions used by the code are stored here
-import gnssrefl.spline_functions as sf
+import gnssrefl.spline_functions as spline_functions
 
 def main():
     parser = argparse.ArgumentParser()
@@ -134,7 +134,7 @@ def main():
     l2conly = True
     kdt = knot_space * 60 * 60  # change knot spacing to seconds 
 
-    sf.spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only)
+    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only)
 
 
 if __name__ == "__main__":
