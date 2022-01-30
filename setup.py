@@ -61,6 +61,7 @@ setup(
             'rinex3_snr= gnssrefl.rinex3_snr:main',
             'filesizes= gnssrefl.filesizes:main',
             'invsnr= gnssrefl.invsnr_cl:main',
+            'invsnr_input= gnssrefl.invsnr_input:main',
             ], 
         },
     install_requires=requirements,
