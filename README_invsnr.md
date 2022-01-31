@@ -5,6 +5,8 @@ The method was first introduced by [Joakim Strandberg](https://github.com/Ydmir)
 [David Purnell](https://purnelldj.github.io/). It reads the inputs from the <code>gnssrefl</code> package (SNR files). 
 It also does multiple frequencies and constellations.
 
+The <code>gnssrefl</code> **REFL_CODE** environment variable must be set.
+
 
 ### Inputs
 
@@ -17,26 +19,24 @@ It also does multiple frequencies and constellations.
 
 **Optional inputs:**
 
--pktnlim peak2noise ratio for QC
--constel CONSTEL (G,E, or R, which repesent GPS, Galileo, and Glonass)
--screenstats (True or False)
--tempres decimation value for your SNR file (seconds)
--polydeg polynomial degree for direct signal removal (default is 2)
--snrfit Do invsnr fit? True is the default
--doplot Send a summary plot to the screen? default is True
--doy_end day of year for multiday analysis
--lspfigs make LSP plots, default False. slow.
--snrfigs make SNR plots, default False. slow.
--knot_space value used for smoothing, in hours 
+- pktnlim peak2noise ratio for QC
+- constel CONSTEL (G,E, or R, which repesent GPS, Galileo, and Glonass)
+- screenstats (True or False)
+- tempres decimation value for your SNR file (seconds)
+- polydeg polynomial degree for direct signal removal (default is 2)
+- snrfit Do invsnr fit? True is the default
+- doplot Send a summary plot to the screen? default is True
+- doy_end day of year for multiday analysis
+- lspfigs and -snrfigs make LSP and SNR plots, default False. 
+- knot_space value used for smoothing, in hours 
 
-###Running the code
+### Running the code
 
 Follow these steps:
 
 - make SNR files as you would normally for gnssrefl (use <code>rinex2snr</code>)
 
-- set up a simple set of instructions for your site   
-
+- set up analysis instructions for your site. They are stored in $REFL_CODE/inputs
 
 
 ###Further reading
