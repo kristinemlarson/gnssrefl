@@ -5,14 +5,12 @@ The method was first introduced by [Joakim Strandberg](https://github.com/Ydmir)
 [David Purnell](https://purnelldj.github.io/). It reads the inputs from the <code>gnssrefl</code> package (SNR files). 
 It also does the L1, L2, and L5 frequencies and the GPS, Galileo, and Glonass constellations.
 
-The <code>gnssrefl</code> **REFL_CODE** environment variable must be set.
-
-
+The <code>gnssrefl</code> **REFL_CODE** environment variable must be set. This variable is used for storage of 
+the SNR files and the inputs to the analysis strategy.
 
 ### Running the code
 
-
-I. Make SNR files as you would normally for <code>gnssrefl</code> (use <code>rinex2snr</code>).
+I. Make SNR files as you would normally for <code>gnssrefl</code> using <code>rinex2snr</code>.
 
 II. Set up analysis instructions. These instructions are stored in $REFL_CODE/inputs.
 
@@ -55,10 +53,11 @@ III. Run invsnr
 
 *Output of the invsnr Code*
 
-(still working in this) The code makes a first cut of reflector height estimation using a 
+The code makes a first cut of reflector height estimation using a 
 Lomb Scargle Periodogram. It also does
 a cubic spline fit and then the spline fit estimation. 
 *No phase center or refraction corrections are currently applied.*
+(I am still working in this, especially storing the outputs.) 
 
 *Examples*
 
@@ -86,7 +85,7 @@ We need to add a refraction correction.
 
 Need to add a txt/json/csv output.
 
-Allow SNR files other than 66.
+Allow SNR input files other than 66.
 
 ### Further reading
 
