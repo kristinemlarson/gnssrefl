@@ -36,12 +36,14 @@ III. Run invsnr
 - station name (4 characters, lowercase)
 - year
 - day of year 
-- frequency (e.g. L1, L2, L5, L1+L2, L1+L2+L5)
+- frequency (e.g. L1, L2, L5, L1+L2, L1+L2+L5). Default is L1
+
+The code will attempt GPS, Galileo, and Glonass by default.
 
 *Optional inputs*
 
 - pktnlim peak2noise ratio for QC
-- constel (G,E, or R, which repesent GPS, Galileo, and Glonass)
+- constel (G,E, or R, which represent GPS, Galileo, and Glonass)
 - screenstats (True or False)
 - tempres decimation value for the SNR file (seconds)
 - polydeg polynomial degree for direct signal removal (default is 2)
@@ -50,7 +52,8 @@ III. Run invsnr
 - doy_end day of year for multiday analysis
 - lspfigs and -snrfigs make LSP and SNR plots, default False. 
 - knot_space value used for smoothing, in hours 
-
+- rough_in, roughness parameter as described in Strandberg et al (2016). Default is 0.1
+ 
 
 *Output of the invsnr Code*
 
@@ -77,6 +80,18 @@ a cubic spline fit and then the spline fit estimation.
 - Two days with L1+L2+L5 and all constellations: <code>invsnr at01 2021 301 L1+L2+L5 -doy_end 302</code> 
 
 <img src="docs/at01-ex3.png" width=500>
+
+*Example for station TNPP*
+
+- Make SNR files using <code>rinex2snr</code>, using high-rate data, UNAVCO archive, and GNSS orbits
+
+- Save analysis strategy <code>invsnr_input tnpp 58 67  5 12 -a1 180 -a2 270</code>
+
+- Two days with L1+L2+L5, all constellations, decimate to speed up the code (1-sec data will be very slow) 
+
+<code>invsnr tnpp 2021 332 L1+L2+L5 -doy_end 333 -tempres 2</code> 
+
+<img src="docs/tnpp-ex1.png" width=500>
 
 ### Future Changes
 

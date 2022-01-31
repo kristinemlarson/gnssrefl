@@ -227,6 +227,7 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     kl changed the pktnlim definition
     kl made multi frequency for rh_arr
     kl working on making snrdt_arr multi frequency
+    kl added roughness
     """
     # get a list for lateron
     if 'l2c_only' in kwargs:
@@ -550,6 +551,12 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     satconsts: default use all given, otherwise specify from ['G', 'R', 'E'] (gps / glonass / galileo)
     :return invout: dictionary with outputs from inverse analysis
     """
+
+    if 'rough_in' in kwargs:
+        rough_in  = kwargs.get('rough_in')
+
+    print('roughness',rough_in)
+
     if 'screenstats' in kwargs:
         screenstats = kwargs.get('screenstats')
     
@@ -591,7 +598,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     # Setting up knots ...
     knots = np.linspace(gbase + int(kdt/2), gbase + numdays*86400 - int(kdt/2), int(numdays*86400/kdt))
     print('the knots', knots)
-    print('Knot spacing',int(kdt/2), 'number of knots',int(numdays*86400/kdt))
+    print('Knot spacing in seconds ',int(kdt/2), 'number of knots',int(numdays*86400/kdt))
     knots = np.append(gbase, knots)  # add start and end of day for more stable output but dont use these points
     knots = np.append(knots, gbase + numdays*86400)
 
@@ -642,20 +649,20 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     print('max gap is ' + str(int(maxtgap / 60)) + ' minutes')
 
     if maxtgap > kdt * 1.05:  # giving 5% margin?
-        print('gap in data bigger than node spacing - continue with risk of instabilities if you want')
-        exit()
+        print('Gap in data bigger than node spacing - will continue with risk of instabilities.')
+        #exit()
 
     def residuals_spectral_ls(kval):
         residuals = residuals_cubspl_spectral(kval, knots, rh_arr)
         return residuals
 
-    print('now fitting a cubic spline to the arcs with rhdot included?')
+    print('Now fitting a cubic spline to the arcs with rhdot included?')
     kval_0 = np.nanmean(rh_arr[:, 1]) * np.ones(len(knots))
-    print('number of knots here ', len(knots))
+    print('Number of knots here ', len(knots))
     s1=time.time()
     ls_spectral = least_squares(residuals_spectral_ls, kval_0, method='trf', bounds=rhlims)
     kval_spectral = ls_spectral.x
-    print('len of kval_spectral', len(kval_spectral))
+    print('Length of kval_spectral', len(kval_spectral))
     invout['knots'] = knots
     invout['kval_spectral'] = kval_spectral[1:-1]  # dont save first and last points
     s2=time.time()
@@ -663,16 +670,17 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     print('satellite constellations ', satconsts)
     if snrfit:
         s1=time.time()
-        print('now doing Joakim Strandberg SNR fitting inversion')
+        print('Now doing Joakim Strandberg SNR fitting inversion')
         kval_0 = kval_spectral
         print('kval_0', kval_0)
         final_list, Nfreq = smarterWay(fspecdict)
         print(final_list)
-        print('number of constellation specific frequencies', Nfreq)
+        print('Number of constellation specific frequencies', Nfreq)
         # consts = len(satconsts)
         #kval_0 = np.append(kval_0, np.zeros(consts * 2))
         # this should be correct .... 
         kval_0 = np.append(kval_0, np.zeros(Nfreq* 2))
+        print('roughness', rough_in)
         kval_0 = np.append(kval_0, rough_in)
 
         aa,bb = snrdt_arr.shape
@@ -681,7 +689,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         def residuals_js_ls(inparam):
             residuals = residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,Nfreq)
             return residuals
-        print('calling least squares')
+        print('Calling the least squares code')
         ls_js = least_squares(residuals_js_ls, kval_0, method='lm')
         invout_js = ls_js.x
         kval_js = invout_js[:len(knots)]
@@ -689,7 +697,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         invout['kval_js'] = kval_js[1:-1]  # dont save first and last points
         invout['outparams_js'] = outparams_js
         s2 = time.time()
-        print('time spend in snrfit', round(s2-s1,2), ' seconds')
+        print('Time spend in snrfit', round(s2-s1,2), ' seconds')
 
     if doplot:
         plotdt = 5 * 60

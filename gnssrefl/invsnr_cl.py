@@ -13,7 +13,7 @@ def main():
     parser.add_argument("station", help="station name", default=None,type=str)
     parser.add_argument("year", default=None, type=int, help="year")
     parser.add_argument("doy", default=None, type=int, help="doy")
-    parser.add_argument("signal", default=None, type=str, help="signal, L1, L2, or L5")
+    parser.add_argument("signal", default=None, type=str, help="L1, L2, L5, L1+L2, L1+L2+L5")
   
     parser.add_argument("-pktnlim", default=None, type=float, help="peak2noise ratio for QC")
     parser.add_argument("-constel", default=None, type=str, help="single constellation (G,E, or R)")
@@ -25,7 +25,8 @@ def main():
     parser.add_argument("-doy_end", default=None, type=str, help="day of year to end analysis")
     parser.add_argument("-lspfigs", default=None, type=str, help="make LSP plots, default False. slow.") 
     parser.add_argument("-snrfigs", default=None, type=str, help="make SNR plots, default False. slow.")
-    parser.add_argument("-knot_space", default=None, type=int, help="knot spacing in hours")
+    parser.add_argument("-knot_space", default=None, type=str, help="knot spacing in hours (default is 3)")
+    parser.add_argument("-rough_in", default=None, type=str, help="Roughness (default is 0.1)")
 
     args = parser.parse_args()
 # the required inputs
@@ -125,17 +126,23 @@ def main():
     if args.lspfigs== 'True':
         lspfigs = True 
 
+# default roughness 
+    rough_in = 0.1 # default
+    if (args.rough_in != None):
+        rough_in  = float(args.rough_in)
+    print('Roughness:', rough_in)
+
 # default knot spacing  in hours
-    knot_space = 3 # default
+    knot_space = 3.0 # default
     if (args.knot_space != None):
-        knot_space = int(args.knot_space)
+        knot_space = float(args.knot_space)
     print('Knot spacing (hours):', knot_space)
 
 # default is to only use l2c GPS satellites (rather than all satellites)
     l2conly = True
     kdt = knot_space * 60 * 60  # change knot spacing to seconds 
 
-    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only)
+    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in)
 
 
 if __name__ == "__main__":
