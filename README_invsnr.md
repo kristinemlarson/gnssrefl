@@ -62,9 +62,9 @@ a cubic spline fit and then the spline fit estimation.
 
 *Examples*
 
-- <code>rinex2snr at01 2021 301 -doy_end 303 -orb gnss -archive unavco</code>
+- Make SNR files <code>rinex2snr at01 2021 301 -doy_end 303 -orb gnss -archive unavco</code>
 
-- <code>invsnr_input at01 9 14 5 13 -a1 20 -a2 220</code>
+- Save analysis strategy <code>invsnr_input at01 9 14 5 13 -a1 20 -a2 220</code>
 
 - Just one day of GPS on L1: <code>invsnr at01 2021 301 L1 -constel G</code> 
 
