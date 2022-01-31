@@ -33,7 +33,7 @@ You can add an azimuth restriction using -a1 and -a2:
 
 III. Run invsnr
 
-** Required inputs**
+**Required inputs**
 
 - station name (4 characters, lowercase)
 - year
@@ -54,7 +54,7 @@ III. Run invsnr
 - knot_space value used for smoothing, in hours 
 
 
-** Output of the invsnr Code**
+**Output of the invsnr Code**
 
 (still working in this) The code makes a first cut of reflector height estimation using a 
 Lomb Scargle Periodogram. It also does
