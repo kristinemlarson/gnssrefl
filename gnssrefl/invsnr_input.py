@@ -21,17 +21,17 @@ def main():
     parser = argparse.ArgumentParser()
 # required arguments
     parser.add_argument("station", help="station name", type=str)
-    parser.add_argument("h1", default=None, type=float, help="lower limit reflector height (m)")
-    parser.add_argument("h2", default=None, type=float, help="upper limit reflector height (m)")
-    parser.add_argument("e1", default=None, type=float, help="lower limit elev. angle (deg)")
-    parser.add_argument("e2", default=None, type=float, help="upper limit elev. angle (deg)")
+    parser.add_argument("h1", default=None, type=float, help="Lower limit reflector height (m)")
+    parser.add_argument("h2", default=None, type=float, help="Upper limit reflector height (m)")
+    parser.add_argument("e1", default=None, type=float, help="Lower limit elev. angle (deg)")
+    parser.add_argument("e2", default=None, type=float, help="Upper limit elev. angle (deg)")
 
-    parser.add_argument("-a1", default=None, type=float, help="lower limit azimuth angle (deg)")
-    parser.add_argument("-a2", default=None, type=float, help="upper limit azimuth angle (deg)")
+    parser.add_argument("-a1", default=None, type=float, help="Lower limit azimuth angle (deg)")
+    parser.add_argument("-a2", default=None, type=float, help="Upper limit azimuth angle (deg)")
 
-    parser.add_argument("-lat", help="latitude (degrees)", type=str,default=None)
-    parser.add_argument("-long", help="longitude (degrees)", type=str, default=None)
-    parser.add_argument("-height", help="ellipsoidal height (meters)", type=str, default=None)
+    parser.add_argument("-lat", help="Latitude (degrees)", type=str,default=None)
+    parser.add_argument("-lon", help="Longitude (degrees)", type=str, default=None)
+    parser.add_argument("-height", help="Ellipsoidal height (meters)", type=str, default=None)
 # these are the optional inputs 
     args = parser.parse_args()
 #
@@ -53,7 +53,7 @@ def main():
             sys.exit()
         else:
             Lat = float(args.lat)
-            Long = float(args.long)
+            Long = float(args.lon)
             Height = float(args.height)
 
 # start the lsp dictionary (left over name from another piece of code)
