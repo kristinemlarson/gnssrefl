@@ -13,11 +13,11 @@ The <code>gnssrefl</code> **REFL_CODE** environment variable must be set.
 
 Follow these steps:
 
-- make SNR files as you would normally for <code>gnssrefl</code> (use <code>rinex2snr</code>).
-- set up analysis instructions for your site. These instructions are stored in $REFL_CODE/inputs.
+I. Make SNR files as you would normally for <code>gnssrefl</code> (use <code>rinex2snr</code>).
 
-The required inputs are the station 
-name (four characters lowercase), the reflector height limits (in meters)
+II. Set up analysis instructions. These instructions are stored in $REFL_CODE/inputs.
+
+The required inputs are the station name (four characters lowercase), the reflector height limits (in meters)
 the elevation angle limits (in degrees). 
 
 *Example:*
@@ -31,20 +31,19 @@ You can add an azimuth restriction using -a1 and -a2:
 
 <code>invsnr_input p041 0.5 6 5 25 -a1 180 -a2 270</code>
 
+III. Run invsnr
 
-- run invsnr
+** Required inputs**
 
-** Required inputs:**
+- station name (4 characters, lowercase)
+- year
+- day of year 
+- frequency (e.g. L1, L2, L5, L1+L2, L1+L2+L5)
 
--- station name (4 characters, lowercase)
--- year
--- day of year 
--- frequency (e.g. L1, L2, L5, L1+L2, L1+L2+L5)
+**Optional inputs**
 
-**Optional inputs:**
-
--- pktnlim peak2noise ratio for QC
--- constel (G,E, or R, which repesent GPS, Galileo, and Glonass)
+- pktnlim peak2noise ratio for QC
+- constel (G,E, or R, which repesent GPS, Galileo, and Glonass)
 - screenstats (True or False)
 - tempres decimation value for the SNR file (seconds)
 - polydeg polynomial degree for direct signal removal (default is 2)
@@ -55,13 +54,20 @@ You can add an azimuth restriction using -a1 and -a2:
 - knot_space value used for smoothing, in hours 
 
 
+** Output of the invsnr Code**
 
-### Output of the invsnr Code
-
-The code makes a first cut of reflector height estimation using a 
+(still working in this) The code makes a first cut of reflector height estimation using a 
 Lomb Scargle Periodogram. It also does
 a cubic spline fit and then the spline fit estimation. 
 *No phase center or refraction corrections are currently applied.*
+
+**Example**
+
+- <code>rinex2snr at01 2021 301 -doy_end 303 -orb gnss -archive unavco</code>
+
+- <code>invsnr_input at01 9 14 5 13 -a1 20 -a2 220</code>
+
+- Just L1: <code>invsnr at01 2021 301 L1</code>
 
 ### Future Changes
 
