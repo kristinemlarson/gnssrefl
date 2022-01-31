@@ -10,7 +10,8 @@ the SNR files and the inputs to the analysis strategy.
 
 ### Running the code
 
-I. Make SNR files as you would normally for <code>gnssrefl</code> using <code>rinex2snr</code>.
+I. Make SNR files as you would normally for the <code>gnssrefl</code> using <code>rinex2snr</code>. They will be stored in
+$REFL_CODE/yyyy/snr/ssss where yyyy is the year and ssss is the station name.
 
 II. Set up analysis instructions. These instructions are stored in $REFL_CODE/inputs.
 
@@ -59,7 +60,7 @@ a cubic spline fit and then the spline fit estimation.
 *No phase center or refraction corrections are currently applied.*
 (I am still working in this, especially storing the outputs.) 
 
-*Examples*
+*Example for station AT01*
 
 - Make SNR files <code>rinex2snr at01 2021 301 -doy_end 303 -orb gnss -archive unavco</code>
 
