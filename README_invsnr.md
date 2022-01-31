@@ -11,7 +11,6 @@ The <code>gnssrefl</code> **REFL_CODE** environment variable must be set.
 
 ### Running the code
 
-Follow these steps:
 
 I. Make SNR files as you would normally for <code>gnssrefl</code> (use <code>rinex2snr</code>).
 
@@ -33,14 +32,14 @@ You can add an azimuth restriction using -a1 and -a2:
 
 III. Run invsnr
 
-**Required inputs**
+*Required inputs*
 
 - station name (4 characters, lowercase)
 - year
 - day of year 
 - frequency (e.g. L1, L2, L5, L1+L2, L1+L2+L5)
 
-**Optional inputs**
+*Optional inputs*
 
 - pktnlim peak2noise ratio for QC
 - constel (G,E, or R, which repesent GPS, Galileo, and Glonass)
@@ -54,26 +53,38 @@ III. Run invsnr
 - knot_space value used for smoothing, in hours 
 
 
-**Output of the invsnr Code**
+*Output of the invsnr Code*
 
 (still working in this) The code makes a first cut of reflector height estimation using a 
 Lomb Scargle Periodogram. It also does
 a cubic spline fit and then the spline fit estimation. 
 *No phase center or refraction corrections are currently applied.*
 
-**Example**
+*Examples*
 
 - <code>rinex2snr at01 2021 301 -doy_end 303 -orb gnss -archive unavco</code>
 
 - <code>invsnr_input at01 9 14 5 13 -a1 20 -a2 220</code>
 
-- Just L1: <code>invsnr at01 2021 301 L1</code>
+- Just one day of GPS on L1: <code>invsnr at01 2021 301 L1 -constel G</code> 
+
+<img src="docs/at01-ex1.png" width=500>
+
+- Two days with L1 and all constellations: <code>invsnr at01 2021 301 L1 -doy_end 302</code> 
+
+<img src="docs/at01-ex2.png" width=500>
+
+- Two days with L1+L2+L5 and all constellations: <code>invsnr at01 2021 301 L1+L2+L5 -doy_end 302</code> 
+
+<img src="docs/at01-ex3.png" width=500>
 
 ### Future Changes
 
 We need to add Beidou.
 
 We need to add a refraction correction.
+
+Need to add a txt/json/csv output.
 
 Allow SNR files other than 66.
 

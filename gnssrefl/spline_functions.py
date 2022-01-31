@@ -13,6 +13,10 @@ import time
 import subprocess
 import sys
 
+# my local functions
+import gnssrefl.gps as g
+
+
 # all codes below written by David Purnell
 # https://github.com/purnelldj
 # modifications by kristine larson, december 2021
@@ -20,16 +24,17 @@ import sys
 # various numbers you need in the GNSS world
 # mostly frequencies and wavelengths
 
-class constants:
-    c= 299792458 # speed of light m/sec
+# removed this since i now have access to gps.py
+#class constants:
+#    c= 299792458 # speed of light m/sec
 #   GPS & galileo frequencies and wavelengths
-    fL1 = 1575.42 # MegaHz 154*10.23
-    fL2 = 1227.60 # 120*10.23
-    fL5 = 115*10.23 # L5
+#    fL1 = 1575.42 # MegaHz 154*10.23
+#    fL2 = 1227.60 # 120*10.23
+#    fL5 = 115*10.23 # L5
 #  GPS & Galileo wavelengths
-    wL1 = c/(fL1*1e6) # meters wavelength
-    wL2 = c/(fL2*1e6)
-    wL5 = c/(fL5*1e6)
+#    wL1 = c/(fL1*1e6) # meters wavelength
+#    wL2 = c/(fL2*1e6)
+#    wL5 = c/(fL5*1e6)
 
 def make_wavelength_column(nr,snrdata,signal):
     """
@@ -155,6 +160,9 @@ def glonasswlen(prn, signal):
     """
     returns wavelength for glonass, meters
     this only works for L1 and L2
+    this was written by david.  
+    KL: i need to move it to my gps.py listing
+    for now just use the speed of light constant variable
     """
     channel = [1, -4, 5, 6, 1, -4, 5, 6, -2, -7, 0, -1, -2, -7, 0, -1, 4, -3, 3, 2, 4, -3, 3, 2]
     offset = 101  # 101 onwards is glonass
@@ -163,9 +171,11 @@ def glonasswlen(prn, signal):
     except TypeError:
         channel_t = channel[prn-offset]
     if signal == 'L1':
-        lcar = 299792458 / (1602e06 + channel_t * 0.5625e06)
+        lcar = g.constants.c / (1602e06 + channel_t * 0.5625e06)
+        #lcar = 299792458 / (1602e06 + channel_t * 0.5625e06)
     elif signal == 'L2':
-        lcar = 299792458. / (1246e06 + channel_t * 0.4375e06)
+        lcar = g.constants.c / (1246e06 + channel_t * 0.4375e06)
+        #lcar = 299792458. / (1246e06 + channel_t * 0.4375e06)
     else:
         #print('signal not recognised')
         lcar = np.nan
@@ -308,13 +318,14 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
             tempd = first_tempd[sfilter]
 
             # this is still the same ....  
+            # use the constants in gps.py
             if np.logical_or(sat < 100, np.logical_and(sat > 200, sat < 300)):
                 if xsignal == 'L1':
-                    lcar = constants.wL1
+                    lcar = g.constants.wL1
                 elif xsignal == 'L2':
-                    lcar = constants.wL2
+                    lcar = g.constants.wL2
                 elif xsignal == 'L5':
-                    lcar = constants.wL5
+                    lcar = g.constants.wL5
             elif np.logical_and(sat > 100, sat < 200):
                 lcar = glonasswlen(int(sat), xsignal)
 
@@ -799,11 +810,11 @@ def satfreq2waveL(satc, xsignal,fsatnos):
     """
     if (satc == 'G'):
         if (xsignal == 'L1'):
-            lcar = constants.wL1
+            lcar = g.constants.wL1
         elif (xsignal == 'L2'):
-            lcar = constants.wL2
+            lcar = g.constants.wL2
         elif (xsignal == 'L5'):
-            lcar = constants.wL5
+            lcar = g.constants.wL5
     elif satc == 'R':
         if xsignal == 'L5':
             lcar = np.nan
@@ -812,11 +823,11 @@ def satfreq2waveL(satc, xsignal,fsatnos):
             lcar = glonasswlen(satnos, xsignal)
     elif (satc == 'E'):
         if xsignal == 'L1':
-            lcar = constants.wL1
+            lcar = g.constants.wL1
         elif xsignal == 'L2':
             lcar = np.nan
         elif xsignal == 'L5':
-            lcar = constants.wL5
+            lcar = g.constants.wL5
 
     return lcar
 
