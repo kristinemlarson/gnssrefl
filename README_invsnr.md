@@ -81,17 +81,6 @@ a cubic spline fit and then the spline fit estimation.
 
 <img src="docs/at01-ex3.png" width=500>
 
-*Example for station TNPP*
-
-- Make SNR files using <code>rinex2snr</code>, using high-rate data, UNAVCO archive, and GNSS orbits
-
-- Save analysis strategy <code>invsnr_input tnpp 58 67  5 12 -a1 180 -a2 270</code>
-
-- Two days with L1+L2+L5, all constellations, decimate to speed up the code (1-sec data will be very slow) 
-
-<code>invsnr tnpp 2021 332 L1+L2+L5 -doy_end 333 -tempres 2</code> 
-
-<img src="docs/tnpp-ex1.png" width=500>
 
 ### Future Changes
 
@@ -102,6 +91,10 @@ We need to add a refraction correction.
 Need to add a txt/json/csv output.
 
 Allow SNR input files other than 66.
+
+Currently assumes you are sending full 24 hour SNR files. 
+This obviously is not very sensible if you have a large gap 
+at the beginning or end of your analysis.  
 
 ### Further reading
 

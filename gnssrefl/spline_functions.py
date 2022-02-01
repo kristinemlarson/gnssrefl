@@ -557,8 +557,22 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     print('roughness',rough_in)
 
+    risky = False
+    if 'risky' in kwargs:
+        risky = kwargs.get('risky')
+
+    if risky: 
+        print('You are a risk taker.')
+    else:
+        print('You are not a risk taker.')
+
+
     if 'screenstats' in kwargs:
         screenstats = kwargs.get('screenstats')
+
+    snr_ending = 66
+    if 'snr_ending' in kwargs:
+        snr_ending = kwargs.get('snr_ending')
     
     if 'doy_end' in kwargs:
         doy_end = kwargs.get('doy_end')
@@ -568,13 +582,13 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     if (doy == doy_end):
         print('Only doing one day')
-        snrfile, snrdir, stryear, strdoy = define_inputfile(station,year,doy)
+        snrfile, snrdir, stryear, strdoy = define_inputfile(station,year,doy,snr_ending)
         snrdata = readklsnrtxt(snrfile, snrdir,signal)
         numdays = 1
     else:
         numdays = doy_end - doy + 1
         for d in range(doy, doy_end+1):
-            snrfile, snrdir, stryear_temp, strdoy_temp = define_inputfile(station,year,d)
+            snrfile, snrdir, stryear_temp, strdoy_temp = define_inputfile(station,year,d,snr_ending)
             snrtemp = readklsnrtxt(snrfile, snrdir,signal)
             if d == doy:
                 #print('first day')
@@ -597,8 +611,9 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     gbase = tobj.gps
     # Setting up knots ...
     knots = np.linspace(gbase + int(kdt/2), gbase + numdays*86400 - int(kdt/2), int(numdays*86400/kdt))
-    print('the knots', knots)
-    print('Knot spacing in seconds ',int(kdt/2), 'number of knots',int(numdays*86400/kdt))
+    print('Here be the knots:', knots)
+    print('Knot spacing in seconds ',int(kdt/2))
+    print('Number of knots',int(numdays*86400/kdt))
     knots = np.append(gbase, knots)  # add start and end of day for more stable output but dont use these points
     knots = np.append(knots, gbase + numdays*86400)
 
@@ -649,8 +664,10 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     print('max gap is ' + str(int(maxtgap / 60)) + ' minutes')
 
     if maxtgap > kdt * 1.05:  # giving 5% margin?
-        print('Gap in data bigger than node spacing - will continue with risk of instabilities.')
-        #exit()
+        print('Gap in data bigger than node spacing, which has risk of instabilities.')
+        if (not risky):
+            print('If you are a risk-taker, you need to set -risky True and rerun the code.')
+            sys.exit()
 
     def residuals_spectral_ls(kval):
         residuals = residuals_cubspl_spectral(kval, knots, rh_arr)
@@ -743,16 +760,18 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         print('dumped a pickle')
     return invout
 
-def define_inputfile(station,year,doy):
+def define_inputfile(station,year,doy,snr_ending):
     """
     given station, year, day of year, returns
     snr filename and directory and string version of year and doy
+    kl:
+    22feb01 added snr ending as required input
     """
     cdoy = '{:03d}'.format(doy) ;
     cyy = '{:02d}'.format(year-2000)
     cyyyy = str(year)
     xdir = os.environ['REFL_CODE'] + '/' + cyyyy + '/snr/' + station + '/'
-    snrfile = station + cdoy + '0.' + cyy + '.snr66'  
+    snrfile = station + cdoy + '0.' + cyy + '.snr' + str(snr_ending)
     snrdir = ''
     if not os.path.isfile(snrfile):
         #print('SNR file does not exist in the local directory')

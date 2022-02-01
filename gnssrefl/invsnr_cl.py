@@ -15,18 +15,20 @@ def main():
     parser.add_argument("doy", default=None, type=int, help="doy")
     parser.add_argument("signal", default=None, type=str, help="L1, L2, L5, L1+L2, L1+L2+L5")
   
-    parser.add_argument("-pktnlim", default=None, type=float, help="peak2noise ratio for QC")
-    parser.add_argument("-constel", default=None, type=str, help="single constellation (G,E, or R)")
+    parser.add_argument("-pktnlim", default=None, type=float, help="Peak2noise ratio for Quality Control")
+    parser.add_argument("-constel", default=None, type=str, help="Only a single constellation (G,E, or R)")
     parser.add_argument("-screenstats", default=None, type=str, help="screen stats, False is default")
     parser.add_argument("-tempres", default=None, type=int, help="SNR file decimator (seconds)")
     parser.add_argument("-polydeg", default=None, type=int, help="polynomial degree for direct signal removal (default is 2)")
     parser.add_argument("-snrfit", default=None, type=str, help="Do invsnr fit? True is the default ")
     parser.add_argument("-doplot", default=None, type=str, help="Plot to the screen?  default is True")
     parser.add_argument("-doy_end", default=None, type=str, help="day of year to end analysis")
-    parser.add_argument("-lspfigs", default=None, type=str, help="make LSP plots, default False. slow.") 
-    parser.add_argument("-snrfigs", default=None, type=str, help="make SNR plots, default False. slow.")
+    parser.add_argument("-lspfigs", default=None, type=str, help="Make LSP plots, default False.") 
+    parser.add_argument("-snrfigs", default=None, type=str, help="Make SNR plots, default False.")
     parser.add_argument("-knot_space", default=None, type=str, help="knot spacing in hours (default is 3)")
     parser.add_argument("-rough_in", default=None, type=str, help="Roughness (default is 0.1)")
+    parser.add_argument("-risky", default=None, type=str, help="Risky taker related to gaps/knot spacing, False is default)")
+    parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66)")
 
     args = parser.parse_args()
 # the required inputs
@@ -132,6 +134,15 @@ def main():
         rough_in  = float(args.rough_in)
     print('Roughness:', rough_in)
 
+    risky = False
+    if (args.risky != None):
+        if args.risky == 'True':
+            risky = True
+
+    snr_ending = 66 
+    if (args.snr_ending!= None):
+        snr_ending = int(args.snr_ending)
+
 # default knot spacing  in hours
     knot_space = 3.0 # default
     if (args.knot_space != None):
@@ -142,7 +153,7 @@ def main():
     l2conly = True
     kdt = knot_space * 60 * 60  # change knot spacing to seconds 
 
-    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in)
+    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending)
 
 
 if __name__ == "__main__":

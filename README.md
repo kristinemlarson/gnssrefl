@@ -8,6 +8,9 @@
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
+
+**New utility for subdaily analysis:** [invsnr](https://github.com/kristinemlarson/gnssrefl/blob/master/README_invsnr.md)
+
 If you are being blocked by CDDIS (currently used for downloading almost
 all multi-GNSS orbit files), you can try the <code>-orb gnss2</code> option in either the <code>download_orbit</code> 
 or <code>rinex2snr</code>. It retrieves multi-GNSS files for GFZ from IGN instead of CDDIS.
@@ -70,7 +73,8 @@ don't have homebrew, then [check here](https://gcc.gnu.org/wiki/GFortranBinaries
     6. [gnssir: estimating reflector heights from SNR data](#module3)
     7. [nmea2snr: translating NMEA files into SNR files](#module4)
     8. [daily_avg: daily average reflector heights](#module5)
-    9. [subdaily: quality control and RHdot for reflector height estimates](#module6)
+    9. [subdaily: LSP quality control and RHdot for reflector height estimates](#module6)
+    10. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/README_invsnr.md)
 4. [Bugs/Future Work](#bugs)
 5. [Utilities](#helper)
 6. [Publications](#publications)
