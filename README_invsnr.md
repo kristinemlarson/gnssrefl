@@ -19,7 +19,7 @@ the SNR files and the inputs to the analysis strategy.
 I. Make SNR files as you would normally for the <code>gnssrefl</code> using <code>rinex2snr</code>. They will be stored in
 $REFL_CODE/yyyy/snr/ssss where yyyy is the year and ssss is the station name.
 
-II. Set up analysis instructions. These instructions are stored in $REFL_CODE/inputs.
+II. Set up analysis instructions. These instructions are stored in $REFL_CODE/input.
 
 The required inputs are the station name (four characters lowercase), the reflector height limits (in meters)
 the elevation angle limits (in degrees). 
