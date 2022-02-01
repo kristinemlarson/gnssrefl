@@ -3,7 +3,7 @@
 This is a utility for analyzing time-varying smooth surfaces with GNSS interferometric reflectometry.
 The method was first introduced by [Joakim Strandberg](https://github.com/Ydmir) and his colleagues. This implementation of the method was written by 
 [David Purnell](https://purnelldj.github.io/). It reads the inputs from the <code>gnssrefl</code> package (SNR files). 
-It also does the L1, L2, and L5 frequencies and the GPS, Galileo, and Glonass constellations.
+It analyzes L1, L2, and L5 signals and the GPS, Galileo, and Glonass constellations.
 
 You might notice that the Lomb Scargle Periodogram (LSP) results from this software are different 
 than <code>gnssir</code>. In some locations you might see relatively large outliers. *This is to be expected.* 
@@ -132,7 +132,8 @@ at the beginning or end of your analysis.
 
 ### Further reading
 
-J. Strandberg,, T. Hobiger, and R. Haas (2016), Improving GNSS-R sea level determination through inverse modeling of SNR data, Radio Science, 51, 1286–1296
+J. Strandberg, T. Hobiger, and R. Haas (2016), Improving GNSS-R sea level determination through 
+inverse modeling of SNR data, Radio Science, 51, 1286–1296
 [pdf](https://publications.lib.chalmers.se/records/fulltext/241876/local_241876.pdf)
 
 D. Purnell, N. Gomez,  et al. (2021) Precise water level measurements using low-cost GNSS antenna arrays, Earth Surf. Dynam., 9, 673–685 [pdf](https://esurf.copernicus.org/articles/9/673/2021/)
