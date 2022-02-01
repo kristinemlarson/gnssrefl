@@ -5,9 +5,6 @@ The method was first introduced by [Joakim Strandberg](https://github.com/Ydmir)
 [David Purnell](https://purnelldj.github.io/). It reads the inputs from the <code>gnssrefl</code> package (SNR files). 
 It also does the L1, L2, and L5 frequencies and the GPS, Galileo, and Glonass constellations.
 
-The <code>gnssrefl</code> **REFL_CODE** environment variable must be set. This variable is used for storage of 
-the SNR files and the inputs to the analysis strategy.
-
 You might notice that the Lomb Scargle Periodogram (LSP) results from this software are different 
 than <code>gnssir</code>. In some locations you might see relatively large outliers. *This is to be expected.* 
 This code uses the LSP results as a starting place - the quality control applied 
@@ -15,6 +12,9 @@ is entirely different than what was used in <code>gnssir</code>. Since the point
 varying sea level, I don't think we need to make the LSP portion of it a clone of <code>gnssir</code>. 
 
 ### Running the code
+
+The <code>gnssrefl</code> **REFL_CODE** environment variable must be set. This variable is used for storage of 
+the SNR files and the inputs to the analysis strategy.
 
 I. Make SNR files as you would normally for the <code>gnssrefl</code> using <code>rinex2snr</code>. They will be stored in
 $REFL_CODE/yyyy/snr/ssss where yyyy is the year and ssss is the station name.
@@ -68,11 +68,10 @@ Please see <code>invsnr -h</code> for more options.
 
 *Output of the invsnr Code*
 
-The code makes a first cut of reflector height estimation using a 
-Lomb Scargle Periodogram. It also does
+The code makes a first cut of LSP reflector height estimation. It also does
 a cubic spline fit and then the spline fit estimation. 
+I am still working on creating a txt/csv version of the smooth results.
 *No phase center or refraction corrections are currently applied.*
-(I am still working in this, especially storing the outputs.) 
 
 *Example for station AT01*
 
