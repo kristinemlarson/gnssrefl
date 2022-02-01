@@ -8,6 +8,12 @@ It also does the L1, L2, and L5 frequencies and the GPS, Galileo, and Glonass co
 The <code>gnssrefl</code> **REFL_CODE** environment variable must be set. This variable is used for storage of 
 the SNR files and the inputs to the analysis strategy.
 
+You might notice that the Lomb Scargle Periodogram (LSP) results from this software are different 
+than <code>gnssir</code>. In some locations you might see relatively large outliers. *This is to be expected.* 
+This code uses the LSP results as a starting place - the quality control applied 
+is entirely different than what was used in <code>gnssir</code>. Since the point of this code is to estimate smoothly
+varying sea level, I don't think we need to make the LSP portion of it a clone of <code>gnssir</code>. 
+
 ### Running the code
 
 I. Make SNR files as you would normally for the <code>gnssrefl</code> using <code>rinex2snr</code>. They will be stored in
@@ -28,6 +34,9 @@ site that is not in the database, please use -lat, -lon, -height inputs.
 You can add an azimuth restriction using -a1 and -a2:
 
 <code>invsnr_input p041 0.5 6 5 25 -a1 180 -a2 270</code>
+
+Because this software identifies rising and setting arcs in a different way than <code>gnssir</code>, you 
+can set a single range of azimuth ranges.
 
 III. Run invsnr
 
@@ -67,6 +76,8 @@ a cubic spline fit and then the spline fit estimation.
 
 *Example for station AT01*
 
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width=500>
+
 - Make SNR files <code>rinex2snr at01 2021 301 -doy_end 303 -orb gnss -archive unavco</code>
 
 - Save analysis strategy <code>invsnr_input at01 9 14 5 13 -a1 20 -a2 220</code>
@@ -83,6 +94,19 @@ a cubic spline fit and then the spline fit estimation.
 
 <img src="docs/at01-ex3.png" width=500>
 
+*Example for station TNPP*
+
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg" width=500>
+
+- Make SNR files using <code>rinex2snr</code>, using high-rate data, UNAVCO archive, and GNSS orbits options 
+
+- Save analysis strategy <code>invsnr_input tnpp 58 67  5 12 -a1 180 -a2 270</code>
+
+- Two days with L1+L2+L5, all constellations, decimate to speed up the code (1-sec data will be very slow)
+
+<code>invsnr tnpp 2021 315 L1+L2+L5 -doy_end 316 -tempres 2</code>
+
+<img src="docs/tnpp-ex2.png" width=500>
 
 ### Future Changes
 

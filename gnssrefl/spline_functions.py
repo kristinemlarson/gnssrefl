@@ -227,7 +227,7 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     kl changed the pktnlim definition
     kl made multi frequency for rh_arr
     kl working on making snrdt_arr multi frequency
-    kl added roughness
+    kl added l2c_only
     """
     # get a list for lateron
     if 'l2c_only' in kwargs:
@@ -555,7 +555,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     if 'rough_in' in kwargs:
         rough_in  = kwargs.get('rough_in')
 
-    print('roughness',rough_in)
+    #print('roughness',rough_in)
 
     risky = False
     if 'risky' in kwargs:
@@ -618,10 +618,10 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     knots = np.append(knots, gbase + numdays*86400)
 
 
-    print('sorting snr data into arcs')
+    print('Sorting snr data into arcs')
 
     # arguments sent directly
-    print('begin Lomb Scargle analysis')
+    print('Begin Lomb Scargle analysis')
     s1=time.time()
     rh_arr, snrdt_arr, fspecdict= snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year, doy, signal=signal,**kwargs)
     s2=time.time()
@@ -697,7 +697,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         #kval_0 = np.append(kval_0, np.zeros(consts * 2))
         # this should be correct .... 
         kval_0 = np.append(kval_0, np.zeros(Nfreq* 2))
-        print('roughness', rough_in)
+        print('Roughness', rough_in)
         kval_0 = np.append(kval_0, rough_in)
 
         aa,bb = snrdt_arr.shape
