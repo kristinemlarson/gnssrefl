@@ -53,6 +53,8 @@ The code will attempt GPS, Galileo, and Glonass by default.
 - lspfigs and -snrfigs make LSP and SNR plots, default False. 
 - knot_space value used for smoothing, in hours 
 - rough_in, roughness parameter as described in Strandberg et al (2016). Default is 0.1
+
+Please see <code>invsnr -h</code> for more options.
  
 
 *Output of the invsnr Code*
@@ -84,16 +86,13 @@ a cubic spline fit and then the spline fit estimation.
 
 ### Future Changes
 
-We need to add Beidou.
+- We need to add Beidou.
 
-We need to add a refraction correction.
+- We need to add a refraction correction.
 
-Need to add a txt/json/csv output.
+- Need to add a txt/json/csv output.
 
-Allow SNR input files other than 66.
-
-Currently assumes you are sending full 24 hour SNR files. 
-This obviously is not very sensible if you have a large gap 
+- Currently assumes you are sending full 24 hour SNR files.  This obviously is not very sensible if you have a large gap 
 at the beginning or end of your analysis.  
 
 ### Further reading
