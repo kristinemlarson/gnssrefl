@@ -107,6 +107,17 @@ I am still working on creating a txt/csv version of the smooth results.
 
 <img src="docs/tnpp-ex2.png" width=500>
 
+*Example for station SC02*
+
+
+- Used default 15 second RINEX files from UNAVCO and -orb gnss option
+
+- ranges: 3.5-8 meter RH, 5-13 elevation angle, 40-240 azimuth 
+
+- Multi-day, multi constellation, L1+L2 <code>invsnr sc02 2021 30 L1+L2 -doy_end 33 </code>
+
+<img src="docs/sc02-ex1.png" width=500>
+
 ### Future Changes
 
 - We need to add Beidou.
