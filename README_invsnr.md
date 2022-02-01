@@ -109,6 +109,7 @@ I am still working on creating a txt/csv version of the smooth results.
 
 *Example for station SC02*
 
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/SC02.jpg" width=500>
 
 - Used default 15 second RINEX files from UNAVCO and -orb gnss option
 
