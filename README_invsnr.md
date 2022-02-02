@@ -11,6 +11,11 @@ This code uses the LSP results as a starting place - the quality control applied
 is entirely different than what was used in <code>gnssir</code>. Since the point of this code is to estimate smoothly
 varying sea level, I don't think we need to make the LSP portion of it a clone of <code>gnssir</code>. 
 
+### Installation 
+
+The module is part of <code>gnssrefl</code>. Please see the installation instructions for 
+[the main package](https://github.com/kristinemlarson/gnssrefl).
+
 ### Running the code
 
 The <code>gnssrefl</code> **REFL_CODE** environment variable must be set. This variable is used for storage of 
