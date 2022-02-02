@@ -14,7 +14,8 @@ varying sea level, I don't think we need to make the LSP portion of it a clone o
 ### Installation 
 
 The module is part of <code>gnssrefl</code>. Please see the installation instructions for 
-[the main package](https://github.com/kristinemlarson/gnssrefl#environment).
+[the main package](https://github.com/kristinemlarson/gnssrefl#environment). It is currently only available on gitHub.
+We will be making a docker and pypi version.
 
 ### Running the code
 
