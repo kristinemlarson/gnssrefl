@@ -14,7 +14,7 @@ varying sea level, I don't think we need to make the LSP portion of it a clone o
 ### Installation 
 
 The module is part of <code>gnssrefl</code>. Please see the installation instructions for 
-[the main package](https://github.com/kristinemlarson/gnssrefl).
+[the main package](https://github.com/kristinemlarson/gnssrefl#environment).
 
 ### Running the code
 
