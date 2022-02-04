@@ -5,7 +5,6 @@
 
 ### gnssrefl
 
-
 **Current github version: 1.1.1**
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
@@ -18,8 +17,6 @@
 [Short cut to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
 [Homeworks for the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks)
-
-[Link to youtube videos on GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)
 
 [Link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
@@ -1151,6 +1148,9 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 </ol>
 
 ### 8. How to get help with your gnssrefl questions<a name="helpmeplease"></a>
+
+If you are new to the software, you should consider watching the 
+[videos about GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)
 
 Before you ask for help - a few things to ask yourself:
 
