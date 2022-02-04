@@ -5,23 +5,15 @@
 
 ### gnssrefl
 
-Current github version: 1.1.1
+
+**Current github version: 1.1.1**
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
-**New utility for subdaily analysis:** [invsnr](https://github.com/kristinemlarson/gnssrefl/blob/master/README_invsnr.md)
 
-If you are being blocked by CDDIS (currently used for downloading almost
-all multi-GNSS orbit files), you can try the <code>-orb gnss2</code> option in either the <code>download_orbit</code> 
-or <code>rinex2snr</code>. It retrieves multi-GNSS files for GFZ from IGN instead of CDDIS.
-
-If you have orbit files you would like to use and they follow the naming conventions used 
-by <code>gnssrefl</code>, you can use them. You need to store them in 
-the proper place ($ORBITS/yyyy/nav for nav messages and $ORBITS/yyyy/sp3 for sp3 files).
-
-[Would you like to help write code for this software package?](#help)
+[How to ask for help](#helpmeplease)
 
 [Short cut to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
@@ -33,34 +25,6 @@ the proper place ($ORBITS/yyyy/nav for nav messages and $ORBITS/yyyy/sp3 for sp3
 
 [Link to Docker build](https://hub.docker.com/r/unavdocker/gnssrefl)
 
-Access to GSI RINEX data has been provided 
-Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
-In my experience GSI is very responsive to account requests.  
-
-A bug was fixed in the old python translator option for S6/S7 data. Thank you to Andrea Gatti for this information.
-
-Thanks to Makan Karegar the NMEA file format is now supported. See [<code>nmea2snr</code>](#module4).
-
-A new UNR database has been created/updated - it can be used to provide precise lat/long/ht a priori coordinates 
-in <code>make_json_input</code> if you have a station that is recognized by UNR.
-
-Access to ultrarapid multi-GNSS (and thus real-time) orbits is now available 
-via the [GFZ](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/topics/gnss-services/). 
-Please use the -ultra flag in [<code>rinex2snr</code>](#module1).
-
-**IMPORTANT:**
-
-This setup requires system dependencies: gcc and gfortran.  
-
-**If you are using LINUX** then simply run apt-get install -y gcc and apt-get install -y 
-gfortran in your terminal (or yum install -y gcc-gfortran ).
-
-**If you are using a MacOS** then you will need to install xcode. First, in your terminal, check if you have xcode 
-by xcode-select -p. If it is installed, it should return a path. If it is not installed then run 
-xcode-select --install. This should install gcc.You can check if you have gcc by gcc --version. 
-Check if you have gfortran by gfortran --version. If you do not have 
-gfortran, then you can use homebrew to install (brew install gfortran). If you 
-don't have homebrew, then [check here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
 
 ### Table of Contents
 
@@ -80,9 +44,37 @@ don't have homebrew, then [check here](https://gcc.gnu.org/wiki/GFortranBinaries
 4. [Bugs/Future Work](#bugs)
 5. [Utilities](#helper)
 6. [Publications](#publications)
-7. [Acknowledgements](#acknowledgements)
+7. [How can you help write code for this project?](#weneedhelp)
+8. [How to ask for help about running the code](#helpmeplease)
+9. [Acknowledgements](#acknowledgements)
 
 ### 1. News <a name="news"></a>
+
+**New utility for subdaily analysis:** [invsnr](https://github.com/kristinemlarson/gnssrefl/blob/master/README_invsnr.md) This is currently only available for the command line version on github.
+
+A new UNR database has been created/updated - it can be used to provide precise lat/long/ht a priori coordinates 
+in <code>make_json_input</code> if you have a station that is recognized by UNR.
+
+If you are being blocked by CDDIS (currently used for downloading almost
+all multi-GNSS orbit files), you can try the <code>-orb gnss2</code> option 
+in either the <code>download_orbit</code> 
+or <code>rinex2snr</code>. It retrieves multi-GNSS files for GFZ from IGN instead of CDDIS.
+
+Access to ultrarapid multi-GNSS (and thus real-time) orbits is now available 
+via the [GFZ](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/topics/gnss-services/). 
+Please use the -ultra flag in [<code>rinex2snr</code>](#module1).
+
+If you have orbit files you would like to use and they follow the naming conventions used 
+by <code>gnssrefl</code>, you can use them. You need to store them in 
+the proper place ($ORBITS/yyyy/nav for nav messages and $ORBITS/yyyy/sp3 for sp3 files).
+
+Access to GSI RINEX data has been provided 
+Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
+In my experience GSI is very responsive to account requests.  
+
+A bug was fixed in the old python translator option for S6/S7 data. Thank you to Andrea Gatti for this information.
+
+Thanks to Makan Karegar the NMEA file format is now supported. See [<code>nmea2snr</code>](#module4).
 
 As they are announced, I am trying to update dependencies for various archives, 
 as the GNSS world moves from Z compression to gzip and anonymous ftp to https. 
@@ -318,6 +310,20 @@ mask and reflector height range. This is one of the reasons <code>quickLook</cod
 <HR>
 
 ### ii. Installation<a name="environment"></a>
+
+**VERY IMPORTANT:**
+
+This setup requires system dependencies: gcc and gfortran.
+
+**If you are using LINUX** then simply run apt-get install -y gcc and apt-get install -y
+gfortran in your terminal (or yum install -y gcc-gfortran ).
+
+**If you are using a MacOS** then you will need to install xcode. First, in your terminal, check if you have xcode
+by xcode-select -p. If it is installed, it should return a path. If it is not installed then run
+xcode-select --install. This should install gcc.You can check if you have gcc by gcc --version.
+Check if you have gfortran by gfortran --version. If you do not have
+gfortran, then you can use homebrew to install (brew install gfortran). If you
+don't have homebrew, then [check here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
 
 *Environment Variables*
    
@@ -1115,19 +1121,21 @@ look to the publications page on my [personal website](https://kristinelarson.ne
 
 <HR>
 
-### 7. Help <a name="help"></a>
+### 7. Would you like to help with writing code for this project?<a name="weneedhelp"></a>
 
 We need help to maintain and improve this code. How can you help?
 
 <ol>
 
-* Archives are *constantly* changing their file transfer protocols. If you find one in <code>gnssrefl</code> that doesn't work anymore,
-please fix it and let us know. Please test that it works for older and newer data.
+* Archives are *constantly* changing their file transfer protocols. If you 
+find one in <code>gnssrefl</code> that doesn't work anymore,
+please fix it and let us know. Please test that it 
+works for both older and newer data.
 
 * If you would like to add an archive, please do so. Use the existing code in gps.py as a starting point. 
 
 * We need better models for GNSS-IR far more than we need more journal articles finding that the 
-method works. And we need these models to be in python.
+method works. And we need these models to be in python. 
 
 * I would like to add a significant wave height calculation to this code. If you have such code that 
 works on fitting the spectrum computed with detrended SNR data, please consider contributing it.
@@ -1142,9 +1150,44 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 </ol>
 
+### 8. How to get help with your gnssrefl questions<a name="helpmeplease"></a>
+
+Before you ask for help - a few things to ask yourself:
+
+Are you running the current software?
+
+- gnssrefl command line  - git pull 
+
+- gnssrefl docker command line  - docker pull unavdocker/gnssrefl
+
+- gnssrefl jupyter notebook  - git pull
+
+- gnssrefl jupyter notebook docker- docker pull unavdocker/gnssrefl_jupyter   
+
+You are encouraged to submit your concerns as an issue to 
+the [github repository](https://github.com/kristinemlarson/gnssrefl). If you are unfamiliar 
+with github, you can also email Kelly (enloe@unavco.org ) about Jupyter 
+NoteBooks or Tim (dittmann@unavco.org) for commandline/docker issues.
+
+Please
+
+- include the exact command or section of code you were running that prompted your question.
+
+- Include details such as the error message or behavior you are getting. 
+Please copy and paste (this is preferred over a screenshot) the error string. 
+If the string is long - please post the error string in a thread response to your question.
+
+- Please include the operating system of your computer.
+
+
+Would you like to join our <code>gnssrefl</code> users email list? 
+Send an email to gnss-ir-request@postal.unavco.org and put the word 
+subscribe (or unsubscribe to leave) in your email subject.
+
 <HR>
 
-### 8. Acknowledgements <a name="acknowledgements"></a>
+### 9. Acknowledgements <a name="acknowledgements"></a>
+
 
 - [Radon Rosborough](https://github.com/raxod502) helped with 
 python/packaging questions and improved our docker distribution. 
@@ -1153,6 +1196,7 @@ python/packaging questions and improved our docker distribution.
 - Johannes Boehm provided source code for the refraction correction. 
 - Kelly Enloe made Jupyter notebooks and Tim Dittmann made docker builds. 
 - Makan Karegar added NMEA capability.
+- Dave Purnell added the <code>invsnr</code> capability.  
 
 
 Kristine M. Larson
