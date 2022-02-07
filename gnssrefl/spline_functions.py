@@ -202,7 +202,8 @@ def gps2datenum(gt):
 
 
 def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1', normalize=False, 
-        snrfigs=False, lspfigs=False, polydeg=2, gaptlim=5*60, pktnlim=4, savefile=False, screenstats=False, l2c_only=False,**kwargs):
+        snrfigs=False, lspfigs=False, polydeg=2, gaptlim=5*60, pktnlim=4, 
+        savefile=False, screenstats=False, l2c_only=False,satconsts=['G','R','E'], **kwargs):
     """
     reads an array of snr data (output from readklsnrtxt) and organises into:
     reflector height estimates, stats and detrended snr data for inverse analysis
@@ -253,21 +254,30 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
             print('Decimating the SNR file')
             tfilter = np.where(np.mod(snrdata[:, 3] - snrdata[0, 3], tempres) == 0)[0]
             snrdata = snrdata[tfilter]
+            print('Num of obs after decimation', len(snrdata))
 
+    print('sat consts before if statement', satconsts)
     # remove satellite data from non-requested constellations
     if 'satconsts' in kwargs:
         satconsts = kwargs.get('satconsts')
-        if 'G' not in satconsts:
-            nogps = snrdata[:, 0] > 100
-            snrdata = snrdata[nogps]
-        if 'R' not in satconsts:
-            noglo = np.logical_or(snrdata[:, 0] < 100, snrdata[:, 0] > 200)
-            snrdata = snrdata[noglo]
-        if 'E' not in satconsts:
-            nogal = np.logical_or(snrdata[:, 0] < 200, snrdata[:, 0] > 300)
-            snrdata = snrdata[nogal]
+        print('Now the sat consts', satconsts)
+    if 'G' not in satconsts:
+        nogps = snrdata[:, 0] > 100
+        snrdata = snrdata[nogps]
+        print('Num of obs after G removal', len(snrdata))
+
+    if 'R' not in satconsts:
+        noglo = np.logical_or(snrdata[:, 0] < 100, snrdata[:, 0] > 200)
+        snrdata = snrdata[noglo]
+        print('Num of obs after R removal', len(snrdata))
+    if 'E' not in satconsts:
+        nogal = np.logical_or(snrdata[:, 0] < 200, snrdata[:, 0] > 300)
+        snrdata = snrdata[nogal]
+        print('Num of obs after E removal', len(snrdata))
+
     # apply elevation and azimuth restrictions.   
     # KL: we usually do the DC first and then apply the restrictions DC  
+    print('Apply elevation angle filter: ', elvlims[0], elvlims[1])
     tfilter = np.logical_and(snrdata[:, 1] > elvlims[0], snrdata[:, 1] < elvlims[1])
     snrdata = snrdata[tfilter]
     if azilims[0] < azilims[1]:
@@ -275,6 +285,7 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     else:
         tfilter = np.logical_or(snrdata[:, 2] > azilims[0], snrdata[:, 2] < azilims[1])
     snrdata = snrdata[tfilter]
+    print('Apply azimuth angle filter: ', azilims[0], azilims[1])
 
     print('Using Lomb Scargle precision of ', precision, ' m')
     # setting up arrays for the output of the LSP

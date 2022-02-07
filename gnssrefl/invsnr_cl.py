@@ -153,6 +153,7 @@ def main():
     l2conly = True
     kdt = knot_space * 60 * 60  # change knot spacing to seconds 
 
+    print(satconsts)
     spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending)
 
 
