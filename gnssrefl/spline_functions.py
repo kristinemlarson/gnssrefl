@@ -728,7 +728,14 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         print('Time spend in snrfit', round(s2-s1,2), ' seconds')
 
     if doplot:
-        plotdt = 5 * 60
+        delta_out = 300 # seconds
+        if 'delta_out' in kwargs:
+            delta_out = int(kwargs.get('delta_out'))
+        outfile_type= 'txt'
+        if 'outfile_type' in kwargs:
+            outfile_type = kwargs.get('outfile_type')
+        #plotdt = 5 * 60
+        plotdt = delta_out # make it so people can change it
         tplot = np.linspace(gbase, gbase + numdays*86400, int(86400/plotdt + 1))
         tplot_dn = gps2datenum(tplot)
         cubspl_f = interpolate.interp1d(knots, kval_spectral, kind='cubic')
@@ -752,10 +759,15 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
                 subprocess.call(['mkdir',xdir])
 
             
-            ioutputfile= xdir + station + '_invsnr.txt'
-            iout = open(ioutputfile, 'w+')
+            if outfile_type == 'txt':
+                txt = True; ioutputfile= xdir + station + '_invsnr.txt'
+                iout = open(ioutputfile, 'w+')
+                iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('#'))
+            else:
+                txt = False; ioutputfile= xdir + station + '_invsnr.csv'
+                iout = open(ioutputfile, 'w+')
+                iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('%'))
             print('invsnr output written to: ', ioutputfile)
-            iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('%'))
             for ijk in range(0,len(rh_js_plot)):
                 # undo dave's time units (rel gps) into a datetime object
                 dt = gps2datetime(tplot[ijk])
@@ -765,8 +777,12 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
                 # get the MJD value
                 MJD, fracS = g.mjd(y,m,d,h,mi,s)
                 #print(y,m,d,h,mi,s,doy,MJD+fracS, rh_js_plot[ijk])
-                iout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:8.3f} {7:3.0f} {8:13.6f} \n".format(y, m, 
-                    d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS))
+                if txt:
+                    iout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:8.3f} {7:3.0f} {8:13.6f} \n".format(y, m, 
+                        d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS))
+                else:
+                    iout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:2.0f},{6:8.3f},{7:3.0f},{8:13.6f} \n".format(y, m, 
+                        d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS))
             pjs, = plt.plot_date(tplot_dn, rh_js_plot, '-',color='black')
             pjs.set_label('invmod')
             iout.close()

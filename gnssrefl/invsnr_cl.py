@@ -29,6 +29,8 @@ def main():
     parser.add_argument("-rough_in", default=None, type=str, help="Roughness (default is 0.1)")
     parser.add_argument("-risky", default=None, type=str, help="Risky taker related to gaps/knot spacing, False is default)")
     parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66)")
+    parser.add_argument("-outfile_type", default=None, type=str, help="Output file type (txt or csv)")
+    parser.add_argument("-delta_out", default=None, type=str, help="Output increment, in seconds (default is 300)")
 
     args = parser.parse_args()
 # the required inputs
@@ -153,8 +155,19 @@ def main():
     l2conly = True
     kdt = knot_space * 60 * 60  # change knot spacing to seconds 
 
-    print(satconsts)
-    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending)
+# default is 300 seconds and plain txt
+    if (args.delta_out == None):
+        delta_out = 300
+    else:
+        delta_out = int(args.delta_out)
+
+    if (args.outfile_type == None):
+        outfile_type = 'txt'
+    else:
+        outfile_type = args.outfile_type
+
+    print(outfile_type, delta_out)
+    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending,outfile_type=outfile_type,delta_out=delta_out)
 
 
 if __name__ == "__main__":

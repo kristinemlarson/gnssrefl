@@ -69,6 +69,7 @@ The code will attempt GPS, Galileo, and Glonass by default.
 - knot_space value used for smoothing, in hours 
 - rough_in, roughness parameter as described in Strandberg et al (2016). Default is 0.1
 
+
 Please see <code>invsnr -h</code> for more options.
  
 
@@ -77,7 +78,7 @@ Please see <code>invsnr -h</code> for more options.
 The code makes a first cut of LSP reflector height estimation. It also does
 a cubic spline fit and then the spline fit estimation. 
 I am currently printing out the smoothed results to a plain txt file every five minutes.
-I will work on making a csv and json formatted file available.
+You can modify that temporal setting or change to a csv format at the command line.
 
 Warning: No phase center or refraction corrections are currently applied to the reflector heights.
 
