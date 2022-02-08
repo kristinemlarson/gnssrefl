@@ -742,12 +742,38 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         if snrfit:
             cubspl_f = interpolate.interp1d(knots, kval_js, kind='cubic')
             rh_js_plot = cubspl_f(tplot)
+            #year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
+            #dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
+
+            # the code should already have checked to see that REFL_CODE exists 
+            xdir = os.environ['REFL_CODE'] + '/Files/'
+            if not os.path.isdir(xdir):
+                print('make output directory for file')
+                subprocess.call(['mkdir',xdir])
+
+            
+            ioutputfile= xdir + station + '_invsnr.txt'
+            iout = open(ioutputfile, 'w+')
+            print('invsnr output written to: ', ioutputfile)
+            iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('%'))
+            for ijk in range(0,len(rh_js_plot)):
+                # undo dave's time units (rel gps) into a datetime object
+                dt = gps2datetime(tplot[ijk])
+                y= dt.year; m=dt.month; d=dt.day; h=dt.hour; mi = dt.minute ; s=int(dt.second)
+                # get doy = i am sure this can be done better but i am not fluent in datetime
+                doy, cdoy, cyyyy, cyy = g.ymd2doy(y,m,d)
+                # get the MJD value
+                MJD, fracS = g.mjd(y,m,d,h,mi,s)
+                #print(y,m,d,h,mi,s,doy,MJD+fracS, rh_js_plot[ijk])
+                iout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:8.3f} {7:3.0f} {8:13.6f} \n".format(y, m, 
+                    d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS))
             pjs, = plt.plot_date(tplot_dn, rh_js_plot, '-',color='black')
             pjs.set_label('invmod')
+            iout.close()
 
         dformat = DateFormatter('%Y-%m-%d')
         ax.xaxis.set_major_formatter(dformat)
-        ax.set_title(station.upper() + ' ' + signal)
+        ax.set_title('Station ' + station.upper() + ' ' + signal)
         ax.set_xlim(gps2datenum(gbase), gps2datenum(gbase + numdays*86400))
         ax.set_xticks(np.linspace(gps2datenum(gbase), gps2datenum(gbase + numdays*86400), int(86400 / (60 * 60 * 6) + 1)))
         ax.xaxis.set_major_formatter(DateFormatter('%m-%d %H:%M'))
