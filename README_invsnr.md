@@ -76,8 +76,10 @@ Please see <code>invsnr -h</code> for more options.
 
 The code makes a first cut of LSP reflector height estimation. It also does
 a cubic spline fit and then the spline fit estimation. 
-I am still working on creating a txt/csv version of the smooth results.
-*No phase center or refraction corrections are currently applied.*
+I am currently printing out the smoothed results to a plain txt file every five minutes.
+I will work on making a csv and json formatted file available.
+
+Warning: No phase center or refraction corrections are currently applied to the reflector heights.
 
 *Example for station AT01*
 
