@@ -120,6 +120,9 @@ def main():
         if (args.constel == 'E') and (signal == 'L2'):
             print('illegal constellation/frequency choice', args/constel, '/', signal)
             sys.exit()
+        if (args.constel == 'C') and (signal == 'L1'):
+            print('illegal constellation/frequency choice', args/constel, '/', signal)
+            sys.exit()
 
 # don't turn these on unless you really need plots be acuse it is slow to make one
 # per satellite arc

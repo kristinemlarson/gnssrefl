@@ -130,13 +130,12 @@ Warning: No phase center or refraction corrections are currently applied to the 
 
 ### Future Changes
 
-- We need to add Beidou.
+- We need to add Beidou. This should not be too hard.
 
 - We need to add a refraction correction.
 
-- Need to add a txt/json/csv output.
-
-- Currently assumes you are sending full 24 hour SNR files.  This obviously is not very sensible if you have a large gap 
+- Currently assumes you are using full 24 hour 
+SNR files.  This obviously is not very sensible if you have a large gap 
 at the beginning or end of your analysis.  
 
 ### Further reading

@@ -21,20 +21,6 @@ import gnssrefl.gps as g
 # https://github.com/purnelldj
 # modifications by kristine larson, december 2021
 
-# various numbers you need in the GNSS world
-# mostly frequencies and wavelengths
-
-# removed this since i now have access to gps.py
-#class constants:
-#    c= 299792458 # speed of light m/sec
-#   GPS & galileo frequencies and wavelengths
-#    fL1 = 1575.42 # MegaHz 154*10.23
-#    fL2 = 1227.60 # 120*10.23
-#    fL5 = 115*10.23 # L5
-#  GPS & Galileo wavelengths
-#    wL1 = c/(fL1*1e6) # meters wavelength
-#    wL2 = c/(fL2*1e6)
-#    wL5 = c/(fL5*1e6)
 
 def make_wavelength_column(nr,snrdata,signal):
     """
@@ -939,6 +925,7 @@ def plot_tracks(rh_arr, rh_dn):
     """
     send the array of LSP results (rh_arr) with time variable for 
     plotting (rh_dn)
+    kl feb09 adding beidou
     """
     ms=4
     ii = (rh_arr[:,2] < 100) & (rh_arr[:,11] == 1)# GPS
@@ -948,9 +935,18 @@ def plot_tracks(rh_arr, rh_dn):
     jj = (rh_arr[:,2] > 100) & (rh_arr[:,2] < 200)  & (rh_arr[:,11] == 1) # Glonass
     jj2 = (rh_arr[:,2] > 100) & (rh_arr[:,2] < 200)  & (rh_arr[:,11] == 2) # Glonass
 
-    kk = (rh_arr[:,2] > 200) &  (rh_arr[:,11] == 1)# galileo
-    kk5 = (rh_arr[:,2] > 200) & (rh_arr[:,11] == 5) # galileo
+    kk = (rh_arr[:,2] > 200) & (rh_arr[:,2] < 300) & (rh_arr[:,11] == 1)# galileo
+    kk5 =(rh_arr[:,2] > 200) & (rh_arr[:,2] < 300) & (rh_arr[:,11] == 5) # galileo
 
+    mm = (rh_arr[:,2] > 300) &  (rh_arr[:,11] == 2)# beidou 
+    mm5 = (rh_arr[:,2] > 300) & (rh_arr[:,11] == 5) # beidou
+
+    if len(rh_dn[mm]) > 0:
+        psec, = plt.plot_date(rh_dn[mm], rh_arr[mm, 1], '<',color='magenta',markersize=ms)
+        psec.set_label('BEI L2')
+    if len(rh_dn[mm5]) > 0:
+        psec, = plt.plot_date(rh_dn[mm5], rh_arr[mm5, 1], 's',color='magenta',markersize=ms)
+        psec.set_label('BEI L5')
 
     if len(rh_dn[ii]) > 0:
         psec, = plt.plot_date(rh_dn[ii], rh_arr[ii, 1], 'o',color='blue',markersize=ms)
@@ -982,6 +978,7 @@ def plot_tracks(rh_arr, rh_dn):
 
 def kristine_dictionary(alld,sat,xsignal):
     """
+    22feb09 added beidou
     """
     if len(alld) == 0:
         alld['G1'] = False
@@ -993,6 +990,9 @@ def kristine_dictionary(alld,sat,xsignal):
         alld['R1'] = False
         alld['R2'] = False
         alld['R5'] = False
+        alld['C1'] = False
+        alld['C2'] = False
+        alld['C5'] = False
     else:
         if (sat < 100) and (xsignal == 'L1'):
             alld['G1'] = True
@@ -1009,6 +1009,11 @@ def kristine_dictionary(alld,sat,xsignal):
             alld['E1'] = True
         if ((sat > 200) and (sat < 300))  and (xsignal == 'L5'):
             alld['E5'] = True
+
+        if ((sat > 300) and (sat < 400))  and (xsignal == 'L2'):
+            alld['C2'] = True
+        if ((sat > 300) and (sat < 400))  and (xsignal == 'L5'):
+            alld['C5'] = True
 
     return alld
 
