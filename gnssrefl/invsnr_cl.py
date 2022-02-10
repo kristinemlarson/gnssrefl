@@ -5,6 +5,8 @@ import json
 import os
 import sys
 
+# 22feb09 adding beidou
+
 # all the main functions used by the code are stored here
 import gnssrefl.spline_functions as spline_functions
 
@@ -13,7 +15,7 @@ def main():
     parser.add_argument("station", help="station name", default=None,type=str)
     parser.add_argument("year", default=None, type=int, help="year")
     parser.add_argument("doy", default=None, type=int, help="doy")
-    parser.add_argument("signal", default=None, type=str, help="L1, L2, L5, L1+L2, L1+L2+L5")
+    parser.add_argument("signal", default=None, type=str, help="L1, L2, L5, L1+L2, L1+L2+L5, etc")
   
     parser.add_argument("-pktnlim", default=None, type=float, help="Peak2noise ratio for Quality Control")
     parser.add_argument("-constel", default=None, type=str, help="Only a single constellation (G,E, or R)")
@@ -38,10 +40,14 @@ def main():
     year = args.year 
     doy = args.doy  
     signal = args.signal
-    if signal not in ['L1','L2','L5','L1+L2','L1+L2+L5','L1+L5']:
+    if signal not in ['L1','L2','L5','L6','L7','L1+L2','L1+L2+L5','L1+L5','ALL']:
+        print('Currently only allow L1,L2,L5,L6,L7 and various combinations')
         print('Illegal signal:', signal)
         sys.exit()
-
+    if signal == 'ALL':
+        print('Using all signals')
+        signal = 'L1+L2+L5+L6+L7'
+    print(signal)
     # build a dictionary with the analysis inputs
     lsp = {} # ??? do i need this?
     # environment variable for the file inputs
@@ -110,7 +116,8 @@ def main():
 
 # set constellation.
     if args.constel == None:
-        satconsts=['E','G','R'] # the default is gps,glonass, and galileo
+        # added beidou 22feb09
+        satconsts=['E','G','R','C'] # the default is gps,glonass, and galileo
     else: 
         satconsts=[args.constel]
         # save people from themselves
@@ -120,9 +127,12 @@ def main():
         if (args.constel == 'E') and (signal == 'L2'):
             print('illegal constellation/frequency choice', args/constel, '/', signal)
             sys.exit()
-        if (args.constel == 'C') and (signal == 'L1'):
+        if (args.constel == 'C') and (signal == 'L1' or signal == 'L5'):
             print('illegal constellation/frequency choice', args/constel, '/', signal)
             sys.exit()
+        #if (args.constel == 'C') and (signal == 'L6' or signal == 'L7'):
+        #    print('Sorry - I have not added L6 and L7 to the code yet. Exiting.')
+        #    sys.exit()
 
 # don't turn these on unless you really need plots be acuse it is slow to make one
 # per satellite arc

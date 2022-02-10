@@ -51,14 +51,14 @@ III. Run invsnr
 - station name (4 characters, lowercase)
 - year
 - day of year 
-- frequency (e.g. L1, L2, L5, L1+L2, L1+L2+L5). Default is L1
+- frequency (e.g. L1, L2, L5, L6, L1+L2, L1+L2+L5). ALL means L1+L2+L5+L6+L7
 
-The code will attempt GPS, Galileo, and Glonass by default.
+The code will attempt GPS, Galileo, Beidou and Glonass unless you tell it otherwise
 
 *Optional inputs*
 
 - pktnlim peak2noise ratio for QC
-- constel (G,E, or R, which represent GPS, Galileo, and Glonass)
+- constel (G,E,R, or C which represent GPS, Galileo, Glonass, and Beidou)
 - screenstats (True or False)
 - tempres decimation value for the SNR file (seconds)
 - polydeg polynomial degree for direct signal removal (default is 2)
@@ -68,7 +68,7 @@ The code will attempt GPS, Galileo, and Glonass by default.
 - lspfigs and -snrfigs make LSP and SNR plots, default False. 
 - knot_space value used for smoothing, in hours 
 - rough_in, roughness parameter as described in Strandberg et al (2016). Default is 0.1
-
+- risky set to True means you will ignore the warrning telling you that you have a gap and should not do this.
 
 Please see <code>invsnr -h</code> for more options.
  
@@ -129,8 +129,6 @@ Warning: No phase center or refraction corrections are currently applied to the 
 <img src="docs/sc02-ex1.png" width=500>
 
 ### Future Changes
-
-- We need to add Beidou. This should not be too hard.
 
 - We need to add a refraction correction.
 

@@ -57,8 +57,12 @@ class constants:
     bei_L7 = 1207.14
     bei_L6 = 1268.52
     wbL2 = c/(bei_L2*1e6)
+    # these values are defined in Rinex 3 
     wbL7 = c/(bei_L7*1e6)
     wbL6 = c/(bei_L6*1e6)
+    # does this even exist? I am using gps l5 for now
+    bei_L5 = 1176.45
+    wbL5 = c/(bei_L5*1e6)
 
 #   Earth rotation rate used in GPS Nav message
     omegaEarth = 7.2921151467E-5 #	%rad/sec
@@ -72,6 +76,15 @@ class wgs84:
     a = 6378137. # meters Earth radius
     f  =  1./298.257223563 # flattening factor
     e = np.sqrt(2*f-f**2) # 
+
+def myfavoriteobs():
+    """
+    returns list of SNR obs for gfzrnx. that is all
+    """
+    # not even sure why i have C here for beidou
+    gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I'
+
+    return gobblygook
 
 def ydoych(year,doy):
     """
@@ -2215,7 +2228,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     dat = []; x=[]; y=[]
 #   get scale factor
 #   added glonass, 101 and 102
-    if (f == 1) or (f==101) or (f==201):
+    if (f == 1) or (f==101) or (f==201) or (f==301):
         dat = s1
     if (f == 2) or (f == 20) or (f == 102) or (f==302):
         dat = s2
@@ -2340,13 +2353,16 @@ def arc_scaleF(f,satNu):
             w = constants.wgL8
 #
 #   add beidou 18oct15
+#  i am confused about this ...
     if (f > 300) and (f < 310):
+        if (f == 301):
+            w = constants.wbL1
         if (f == 302):
             w = constants.wbL2
-        if (f == 307):
-            w = constants.wbL7
         if (f == 306):
             w = constants.wbL6
+        if (f == 307):
+            w = constants.wbL7
 
 #   glonass satellite frequencies
     if (f == 101) or (f == 102):
@@ -4317,7 +4333,8 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
         # now swap name
         r3_filename = r3_filename_new
     # these are my favorite observables
-    gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I'
+    #gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I,S6I'
+    gobblygook = myfavoriteobs()
     if not os.path.exists(gexe):
         print('gfzrnx executable does not exist and this file cannot be translated')
     else:
@@ -4376,8 +4393,9 @@ def cddis_rinex3(station9ch, year, doy,srate,orbtype):
     else:
     # I hate S2W 
     # tried to add Beidou on September 19, 2020
-        gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I'
-    print(gobblygook)
+        #gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I,S6,S5'
+        gobblygook = myfavoriteobs()
+        print(gobblygook)
     if os.path.isfile(rfilename):
         print('rinex3 file already exists')
     else:
@@ -4818,8 +4836,9 @@ def unavco_rinex3(station9ch, year, doy,srate,orbtype):
     else:
     # I hate S2W  - so it is not written out
     # added Beidou 9/20/2020
-        gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I'
-    print(gobblygook)
+    # tried again
+        #gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I,S5,S6'
+        gobblygook = myfavoriteobs()
     if os.path.isfile(rfilename):
         print('rinex3 file already exists')
     else:
@@ -5274,10 +5293,13 @@ def ftitle(freq):
     out['206'] = 'Galileo L6'
     out['207'] = 'Galileo L7'
     out['208'] = 'Galileo L8'
+    # still need to work on these because it is confusing!...
+    out['301'] = 'Beidou L1'
     out['302'] = 'Beidou L2'
     out['305'] = 'Beidou L5'
     out['306'] = 'Beidou L6'
-    if freq not in [1,2, 20,5,101,102,201,205,206,207,208,302,305,306]:
+    out['307'] = 'Beidou L7'
+    if freq not in [1,2, 20,5,101,102,201,205,206,207,208,301,302,305,306,307]:
         returnf = ''
     else:
         returnf = out[f]

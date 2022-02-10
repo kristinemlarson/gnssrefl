@@ -27,12 +27,17 @@ def make_wavelength_column(nr,snrdata,signal):
     returns column with nr rows that has the relevant GNSS wavelength for
     the satellites storeid in column zero of snrdata.
     signal is L1, L2 etc
+    22feb10 added l6, l7
     """
     onecolumn = np.ones((nr,1))
     if signal == 'L2':
         onecolumn = 2*onecolumn
     if signal == 'L5':
         onecolumn = 5*onecolumn
+    if signal == 'L6':
+        onecolumn = 6*onecolumn
+    if signal == 'L7':
+        onecolumn = 7*onecolumn
 
     return onecolumn
 
@@ -67,6 +72,7 @@ def readklsnrtxt(snrfile, thedir, signal):
     # this is for the frequency information
 
     # will add Beidou later
+    # 22feb09 and now the day has come!
 
     if signal == 'L1':
         snrdata = snrall[:,[0,1,2,3,6]]
@@ -94,7 +100,7 @@ def readklsnrtxt(snrfile, thedir, signal):
         #print('vertically stacking L1 and L5 data')
         snrdata = np.vstack((l1,l5))
         onecolumn = np.vstack((l1col,l5col))
-    elif signal == 'L1+L2+L5':
+    elif (signal == 'L1+L2+L5'):
         l1 = snrall[:,[0,1,2,3,6]]
         l1col = make_wavelength_column(nr,snrall,'L1')
 
@@ -104,23 +110,47 @@ def readklsnrtxt(snrfile, thedir, signal):
         l5 = snrall[:,[0,1,2,3,8]]
         l5col = make_wavelength_column(nr,snrall,'L5')
 
-        #print('vertically stacking L1,L2 L5 data')
         tmp = np.vstack((l1,l2))
         snrdata = np.vstack((tmp,l5))
 
         tmp = np.vstack((l1col,l2col))
         onecolumn = np.vstack((tmp,l5col))
+    elif (signal == 'L1+L2+L5+L6+L7'):
+        l1 = snrall[:,[0,1,2,3,6]]
+        l1col = make_wavelength_column(nr,snrall,'L1')
+
+        l2 = snrall[:,[0,1,2,3,7]]
+        l2col = make_wavelength_column(nr,snrall,'L2')
+
+        l5 = snrall[:,[0,1,2,3,8]]
+        l5col = make_wavelength_column(nr,snrall,'L5')
+
+        l6 = snrall[:,[0,1,2,3,5]]
+        l6col = make_wavelength_column(nr,snrall,'L6')
+
+        l7 = snrall[:,[0,1,2,3,9]]
+        l7col = make_wavelength_column(nr,snrall,'L7')
+
+        tmp1 = np.vstack((l1,l2)) # stack 1,2
+        tmp2 = np.vstack((l5,l6)) # stack 5,6
+        tmp3 = np.vstack((tmp1,tmp2)) #stack 1,2,5,6
+        snrdata = np.vstack((tmp3,l7)) # and ... 
+
+        tmp1 = np.vstack((l1col,l2col))
+        tmp2 = np.vstack((l5col,l6col))
+        tmp3 = np.vstack((tmp1,tmp2))
+        # now put them together ...
+        onecolumn = np.vstack((tmp3,l7col))
+    elif signal == 'L6':
+        snrdata = snrall[:,[0,1,2,3,5]]
+        onecolumn = make_wavelength_column(nr,snrdata,signal)
+    elif signal == 'L7':
+        snrdata = snrall[:,[0,1,2,3,9]]
+        onecolumn = make_wavelength_column(nr,snrdata,signal)
     else:
         print('Did not find what was requested or illegal frequency. Exiting.')
         sys.exit()
 
-    # i do not have time at the moment to implement these frequencies
-    #elif signal == 'L6':
-    #    snrdata = snrall[:,[0,1,2,3,5]]
-    #elif signal == 'L7':
-    #    snrdata = snrall[:,[0,1,2,3,9]]
-    #elif signal == 'L8':
-    #    snrdata = snrall[:,[0,1,2,3,10]]
 
     # add frequency column 
     snrdata = np.hstack((snrdata, onecolumn))
@@ -215,12 +245,13 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     kl made multi frequency for rh_arr
     kl working on making snrdt_arr multi frequency
     kl added l2c_only
+    kl 2022feb10 trying to add beidou
     """
     # get a list for lateron
     if 'l2c_only' in kwargs:
         l2c_only = kwargs.get('l2c_only')
     if l2c_only:
-        print('L2c only')
+        print('For L2, only use L2c ')
 
     # get the list
     l2clist,l5list = l2c_l5_list(year,doy)
@@ -250,16 +281,20 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     if 'G' not in satconsts:
         nogps = snrdata[:, 0] > 100
         snrdata = snrdata[nogps]
-        print('Num of obs after G removal', len(snrdata))
+        print('Num of obs after GPS removal', len(snrdata))
 
     if 'R' not in satconsts:
         noglo = np.logical_or(snrdata[:, 0] < 100, snrdata[:, 0] > 200)
         snrdata = snrdata[noglo]
-        print('Num of obs after R removal', len(snrdata))
+        print('Num of obs after Glonass removal', len(snrdata))
     if 'E' not in satconsts:
         nogal = np.logical_or(snrdata[:, 0] < 200, snrdata[:, 0] > 300)
         snrdata = snrdata[nogal]
-        print('Num of obs after E removal', len(snrdata))
+        print('Num of obs after Galileo removal', len(snrdata))
+    if 'C' not in satconsts:
+        nogal = np.logical_or(snrdata[:, 0] < 300, snrdata[:, 0] > 400)
+        snrdata = snrdata[nogal]
+        print('Num of obs after Beidou removal', len(snrdata))
 
     # apply elevation and azimuth restrictions.   
     # KL: we usually do the DC first and then apply the restrictions DC  
@@ -288,9 +323,10 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
 
     print('Using this signal: ', signal)
     # speed of light should be a declared constant
-    if signal not in ['L1','L2','L5','L1+L2','L1+L5','L1+L2+L5']:
-        print('code only currently works for L1, L2, L5 and combinations therein- exiting')
-        sys.exit()
+    # this should be cheked before you call the code
+    #if signal not in ['L1','L2','L5','L1+L2','L1+L5','L1+L2+L5','L1+L6','L6','L1+L2+L6','L1+L2+L5+L6']:
+    #    print('code only currently works for L1, L2, L5, L6, and combinations therein- exiting')
+    #    sys.exit()
     print('Satellites:')
     satellite_list = np.unique(snrdata[:,0]); 
     print(satellite_list)
@@ -317,6 +353,7 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
 
             # this is still the same ....  
             # use the constants in gps.py
+            # 22feb09 add beidou
             if np.logical_or(sat < 100, np.logical_and(sat > 200, sat < 300)):
                 if xsignal == 'L1':
                     lcar = g.constants.wL1
@@ -324,8 +361,21 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
                     lcar = g.constants.wL2
                 elif xsignal == 'L5':
                     lcar = g.constants.wL5
+                # these are for galileo, should not have this in the GPS loop - 
+                # but will be lazy here because of how it was originally written
+                elif xsignal == 'L6':
+                    lcar = g.constants.wgL6
+                elif xsignal == 'L7':
+                    lcar = g.constants.wgL7
             elif np.logical_and(sat > 100, sat < 200):
                 lcar = glonasswlen(int(sat), xsignal)
+            elif np.logical_and(sat > 300, sat < 400):# beidou
+                if xsignal == 'L2':
+                    lcar = g.constants.wbL2
+                if xsignal == 'L6':
+                    lcar = g.constants.wbL6
+                if xsignal == 'L7':
+                    lcar = g.constants.wbL7
 
             # this restricts to L2C satellite but only if requested.
             # this does not mean the file has L2C data in it however.  unfortunately
@@ -452,6 +502,7 @@ def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,
 
     this has to be modified for multi-frequency
     fspecdict and Nfreq
+    22feb09 added beidou
     """
     if len(inparam) - Nfreq * 2 == len(knots):
         # then no roughness
@@ -476,7 +527,7 @@ def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,
         # this is where tmpc was originally
         tmpc = tmpc + 1
         c = satc[0:1] # constellation: E,G,R
-        f = int(satc[1:2]) # frequency: 1,2,5
+        f = int(satc[1:2]) # frequency: 1,2,5,6,7
         
         # figuring out which satellites are which
         if c == 'G':
@@ -485,6 +536,8 @@ def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,
             tfilter = np.logical_and(snrdt_arr[:, 1] > 100, snrdt_arr[:, 1] < 200)
         elif c == 'E':
             tfilter = np.logical_and(snrdt_arr[:, 1] > 200, snrdt_arr[:, 1] < 300)
+        elif c == 'C':
+            tfilter = np.logical_and(snrdt_arr[:, 1] > 300, snrdt_arr[:, 1] < 400)
         else:
             print('unknown satellite constellation')
         # take out the constellation
@@ -552,8 +605,6 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     if 'rough_in' in kwargs:
         rough_in  = kwargs.get('rough_in')
 
-    #print('roughness',rough_in)
-
     risky = False
     if 'risky' in kwargs:
         risky = kwargs.get('risky')
@@ -588,7 +639,6 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             snrfile, snrdir, stryear_temp, strdoy_temp = define_inputfile(station,year,d,snr_ending)
             snrtemp = readklsnrtxt(snrfile, snrdir,signal)
             if d == doy:
-                #print('first day')
                 snrdata = snrtemp
                 # save these
                 stryear = stryear_temp
@@ -622,7 +672,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     s1=time.time()
     rh_arr, snrdt_arr, fspecdict= snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year, doy, signal=signal,**kwargs)
     s2=time.time()
-    print('Time spent in snr2arcs: ',round(s2-s1,2), ' seconds')
+    print('Time spent: ',round(s2-s1,2), ' seconds')
     print(fspecdict)
     print('Found ' + str(np.ma.size(rh_arr, axis=0)) + ' arcs')
     if screenstats:
@@ -645,6 +695,8 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             satconsts = np.append(satconsts, 'R')
         if len(np.where(np.logical_and(allsats > 200, allsats < 300))[0]) > 0:
             satconsts = np.append(satconsts, 'E')
+        if len(np.where(np.logical_and(allsats > 300, allsats < 400))[0]) > 0:
+            satconsts = np.append(satconsts, 'C')
     if np.ma.size(rh_arr, axis=0) < 2:
         print('not enough data - exit')
         exit()
@@ -699,7 +751,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
         aa,bb = snrdt_arr.shape
         print('Dimensions of the snrdt_arr variable', aa,bb)
-        print('Now sending it ', Nfreq, ' different frequencies')
+        print('Now sending it ', Nfreq, ' different constellation specific frequencies')
         def residuals_js_ls(inparam):
             residuals = residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,Nfreq)
             return residuals
@@ -857,13 +909,18 @@ def arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,azdesc)
 def signal2list(signal):
     """
     turns signal input (e.g. L1+L2) to a list
+    22feb09 tried to add more frequencies ...
     """
     if (len(signal) == 2):
         signal_list = [signal]
     elif (len(signal) == 5):
         signal_list = [signal[0:2],signal[3:5]]
     elif (len(signal) == 8):
-        signal_list = ['L1','L2','L5']
+        signal_list = [signal[0:2],signal[3:5], signal[6:8]] 
+    elif (len(signal) == 11):
+        signal_list = [signal[0:2],signal[3:5], signal[6:8],signal[9:11] ]
+    elif (len(signal) == 14):
+        signal_list = [signal[0:2],signal[3:5], signal[6:8],signal[9:11], signal[12:14] ]
 
     return signal_list
 
@@ -873,6 +930,7 @@ def satfreq2waveL(satc, xsignal,fsatnos):
     given satellite constellation ('G', 'E' ...)
     xsignal ('L1','L2' ...)
     satnos (satellite numbers)
+    2022feb09 added Beidou.
     """
     if (satc == 'G'):
         if (xsignal == 'L1'):
@@ -894,6 +952,18 @@ def satfreq2waveL(satc, xsignal,fsatnos):
             lcar = np.nan
         elif xsignal == 'L5':
             lcar = g.constants.wL5
+        # added galileo l6,l7
+        elif xsignal == 'L6':
+            lcar = g.constants.wgL6
+        elif xsignal == 'L7':
+            lcar = g.constants.wgL7
+    elif (satc == 'C'):
+        if xsignal == 'L2':
+            lcar = g.constants.wbL2
+        if xsignal == 'L6':
+            lcar = g.constants.wbL6
+        if xsignal == 'L7':
+            lcar = g.constants.wbL7
 
     return lcar
 
@@ -937,16 +1007,22 @@ def plot_tracks(rh_arr, rh_dn):
 
     kk = (rh_arr[:,2] > 200) & (rh_arr[:,2] < 300) & (rh_arr[:,11] == 1)# galileo
     kk5 =(rh_arr[:,2] > 200) & (rh_arr[:,2] < 300) & (rh_arr[:,11] == 5) # galileo
+    kk6 =(rh_arr[:,2] > 200) & (rh_arr[:,2] < 300) & (rh_arr[:,11] == 6) # galileo
+    kk7 =(rh_arr[:,2] > 200) & (rh_arr[:,2] < 300) & (rh_arr[:,11] == 7) # galileo
 
     mm = (rh_arr[:,2] > 300) &  (rh_arr[:,11] == 2)# beidou 
-    mm5 = (rh_arr[:,2] > 300) & (rh_arr[:,11] == 5) # beidou
+    mm6 = (rh_arr[:,2] > 300) & (rh_arr[:,11] == 6) # beidou
+    mm7 = (rh_arr[:,2] > 300) & (rh_arr[:,11] == 7) # beidou
 
     if len(rh_dn[mm]) > 0:
         psec, = plt.plot_date(rh_dn[mm], rh_arr[mm, 1], '<',color='magenta',markersize=ms)
         psec.set_label('BEI L2')
-    if len(rh_dn[mm5]) > 0:
-        psec, = plt.plot_date(rh_dn[mm5], rh_arr[mm5, 1], 's',color='magenta',markersize=ms)
-        psec.set_label('BEI L5')
+    if len(rh_dn[mm6]) > 0:
+        psec, = plt.plot_date(rh_dn[mm6], rh_arr[mm6, 1], '+',color='magenta',markersize=ms)
+        psec.set_label('BEI L6')
+    if len(rh_dn[mm7]) > 0:
+        psec, = plt.plot_date(rh_dn[mm7], rh_arr[mm7, 1], 'v',color='magenta',markersize=ms)
+        psec.set_label('BEI L7')
 
     if len(rh_dn[ii]) > 0:
         psec, = plt.plot_date(rh_dn[ii], rh_arr[ii, 1], 'o',color='blue',markersize=ms)
@@ -968,6 +1044,14 @@ def plot_tracks(rh_arr, rh_dn):
         psec, = plt.plot_date(rh_dn[kk5], rh_arr[kk5, 1], 's',color='orange',markersize=ms)
         psec.set_label('GAL L5')
 
+    if len(rh_dn[kk6]) > 0:
+        psec, = plt.plot_date(rh_dn[kk6], rh_arr[kk6, 1], '+',color='orange',markersize=ms)
+        psec.set_label('GAL L6')
+
+    if len(rh_dn[kk7]) > 0:
+        psec, = plt.plot_date(rh_dn[kk7], rh_arr[kk7, 1], 'v',color='orange',markersize=ms)
+        psec.set_label('GAL L7')
+
     if len(rh_dn[jj]) > 0:
         psec, = plt.plot_date(rh_dn[jj], rh_arr[jj, 1], 'ro',markersize=ms)
         psec.set_label('GLO L1')
@@ -987,12 +1071,14 @@ def kristine_dictionary(alld,sat,xsignal):
         alld['E1'] = False
         alld['E2'] = False
         alld['E5'] = False
+        alld['E6'] = False
+        alld['E7'] = False
         alld['R1'] = False
         alld['R2'] = False
         alld['R5'] = False
-        alld['C1'] = False
         alld['C2'] = False
-        alld['C5'] = False
+        alld['C6'] = False
+        alld['C7'] = False
     else:
         if (sat < 100) and (xsignal == 'L1'):
             alld['G1'] = True
@@ -1009,11 +1095,18 @@ def kristine_dictionary(alld,sat,xsignal):
             alld['E1'] = True
         if ((sat > 200) and (sat < 300))  and (xsignal == 'L5'):
             alld['E5'] = True
+        # added more galileo
+        if ((sat > 200) and (sat < 300))  and (xsignal == 'L6'):
+            alld['E6'] = True
+        if ((sat > 200) and (sat < 300))  and (xsignal == 'L7'):
+            alld['E7'] = True
 
         if ((sat > 300) and (sat < 400))  and (xsignal == 'L2'):
             alld['C2'] = True
-        if ((sat > 300) and (sat < 400))  and (xsignal == 'L5'):
-            alld['C5'] = True
+        if ((sat > 300) and (sat < 400))  and (xsignal == 'L6'):
+            alld['C6'] = True
+        if ((sat > 300) and (sat < 400))  and (xsignal == 'L7'):
+            alld['C7'] = True
 
     return alld
 
