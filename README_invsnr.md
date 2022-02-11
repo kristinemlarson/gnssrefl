@@ -11,6 +11,8 @@ This code uses the LSP results as a starting place - the quality control applied
 is entirely different than what was used in <code>gnssir</code>. Since the point of this code is to estimate smoothly
 varying sea level, I don't think we need to make the LSP portion of it a clone of <code>gnssir</code>. 
 
+Note: txt and csv output is now supported.
+
 ### Installation 
 
 The module is part of <code>gnssrefl</code>. Please see the installation instructions for 

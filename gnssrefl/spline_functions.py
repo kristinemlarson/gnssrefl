@@ -15,6 +15,7 @@ import sys
 
 # my local functions
 import gnssrefl.gps as g
+import datetime
 
 
 # all codes below written by David Purnell
@@ -796,16 +797,18 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
                 print('make output directory for file')
                 subprocess.call(['mkdir',xdir])
 
+            # opens the file, writes a header
+            iout, usetxt = invsnr_header(xdir, outfile_type, station) 
             
-            if outfile_type == 'txt':
-                txt = True; ioutputfile= xdir + station + '_invsnr.txt'
-                iout = open(ioutputfile, 'w+')
-                iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('#'))
-            else:
-                txt = False; ioutputfile= xdir + station + '_invsnr.csv'
-                iout = open(ioutputfile, 'w+')
-                iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('%'))
-            print('invsnr output written to: ', ioutputfile)
+            #if outfile_type == 'txt':
+            #    txt = True; ioutputfile= xdir + station + '_invsnr.txt'
+            #    iout = open(ioutputfile, 'w+')
+            #    iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('#'))
+            #else:
+            #    txt = False; ioutputfile= xdir + station + '_invsnr.csv'
+            #    iout = open(ioutputfile, 'w+')
+            #    iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('%'))
+            #print('invsnr output written to: ', ioutputfile)
             for ijk in range(0,len(rh_js_plot)):
                 # undo dave's time units (rel gps) into a datetime object
                 dt = gps2datetime(tplot[ijk])
@@ -815,7 +818,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
                 # get the MJD value
                 MJD, fracS = g.mjd(y,m,d,h,mi,s)
                 #print(y,m,d,h,mi,s,doy,MJD+fracS, rh_js_plot[ijk])
-                if txt:
+                if usetxt:
                     iout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:8.3f} {7:3.0f} {8:13.6f} \n".format(y, m, 
                         d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS))
                 else:
@@ -850,6 +853,34 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         f.close()
         print('dumped a pickle')
     return invout
+
+def invsnr_header(xdir, outfile_type,station):
+    """
+    inputs: 
+    directory for the output file
+    type of output file (txt or csv)
+    station name, 4 char
+    returns:
+    fileID
+    usetxt - boolean for the code calling this function to use
+    """
+    if outfile_type == 'txt':
+        usetxt = True; 
+        ioutputfile= xdir + station + '_invsnr.txt'
+        iout = open(ioutputfile, 'w+')
+        commentl = '#'
+    else:
+        usetxt = False; 
+        ioutputfile= xdir + station + '_invsnr.csv'
+        iout = open(ioutputfile, 'w+')
+        commentl = '%'
+    print('invsnr output written to: ', ioutputfile)
+    xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    iout.write('{0:s} Results for {1:4s} calculated on {2:20s} \n'.format(commentl,  station, xxx ))
+    iout.write('{0:s} gnssrefl, https://github.com/kristinemlarson \n'.format(commentl))
+    iout.write('{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n'.format(commentl))
+
+    return iout, usetxt
 
 def define_inputfile(station,year,doy,snr_ending):
     """
