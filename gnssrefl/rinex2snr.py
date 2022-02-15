@@ -187,6 +187,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                 fexists = g.new_rinex3_rinex2(rnx_filename,r2)
                             if fexists:
                                 print('RINEX version 2 has been created from version 3', year, doy)
+                                print('remove RINEX 3 files')
+                                subprocess.call(['rm', file_name[:-3]]) # crx
+                                subprocess.call(['rm', rnx_filename]) # rnx
                                 conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
                         else:
                             print('RINEX 3 file was not found', year, doy)
