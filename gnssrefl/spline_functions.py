@@ -62,8 +62,6 @@ def readklsnrtxt(snrfile, thedir, signal):
 
     if SNR data are zero for a given signal, the row is eliminated
     
-    turned off l6,l7,l8 for now
-    doesn't do beidou
 
     """
     # do a straight load of the file
@@ -117,6 +115,11 @@ def readklsnrtxt(snrfile, thedir, signal):
         tmp = np.vstack((l1col,l2col))
         onecolumn = np.vstack((tmp,l5col))
     elif (signal == 'L1+L2+L5+L6+L7'):
+        if (nc <=9):
+            print('You requested L1+L2+L5+L6+L7')
+            print('But you can only do L1+L2+L5 with this size SNR file. Exiting.')
+            sys.exit()
+
         l1 = snrall[:,[0,1,2,3,6]]
         l1col = make_wavelength_column(nr,snrall,'L1')
 
@@ -1047,13 +1050,13 @@ def plot_tracks(rh_arr, rh_dn):
 
     if len(rh_dn[mm]) > 0:
         psec, = plt.plot_date(rh_dn[mm], rh_arr[mm, 1], '<',color='magenta',markersize=ms)
-        psec.set_label('BEI L2')
+        psec.set_label('BDS L2')
     if len(rh_dn[mm6]) > 0:
         psec, = plt.plot_date(rh_dn[mm6], rh_arr[mm6, 1], '+',color='magenta',markersize=ms)
-        psec.set_label('BEI L6')
+        psec.set_label('BDS L6')
     if len(rh_dn[mm7]) > 0:
         psec, = plt.plot_date(rh_dn[mm7], rh_arr[mm7, 1], 'v',color='magenta',markersize=ms)
-        psec.set_label('BEI L7')
+        psec.set_label('BDS L7')
 
     if len(rh_dn[ii]) > 0:
         psec, = plt.plot_date(rh_dn[ii], rh_arr[ii, 1], 'o',color='blue',markersize=ms)

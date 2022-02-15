@@ -5,12 +5,14 @@
 
 ### gnssrefl
 
-**Current github version: 1.1.1**
+**Current github version: 1.1.2**
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
+Please note: <code>rinex2snr</code> and <code>download_rinex</code> have been substantially changed for RINEX 3 files. Please
+let me know if I broke anything.
 
 [How to ask for help](#helpmeplease)
 
@@ -439,20 +441,19 @@ it will check three archives (unavco, sopac, and sonel) to find it. This uses th
 
 **Examples for different translators:**
 
-For a fortran translator, the command would be:
-
-<code>rinex2snr p041 2020 132 -translator fortran</code>
-
-For python:
-
-<code>rinex2snr p041 2020 132 -translator python</CODE>
-
-
 Using hybrid (the default): 
 
 <code>rinex2snr gls1 2011 271</code>
 
-**Allowed GNSS Data Archives:**
+For a fortran translator, the command would be:
+
+<code>rinex2snr p041 2020 132 -translator fortran</code>
+
+For python (very slow!):
+
+<code>rinex2snr p041 2020 132 -translator python</CODE>
+
+**Allowed GNSS Rinex 2.11 Data Archives:**
 
 - unavco
 - sonel (global sea level observing system)
@@ -485,18 +486,33 @@ only uses four character statiion names, the last four values will be used as th
  
 **Examples using RINEX 3:**
 
-If your station name has 9 characters (lower case please), the code assumes you are looking for a 
-RINEX 3 file. However, my code will store the SNR data using the normal
-4 character name. *You must install the gfzrnx executable that translates RINEX 3 to 2 to use RINEX 3 files
-in my code.* <code>rinex2snr</code> currently only looks for RINEX 3 files at CDDIS (30 sec) and UNAVCO (15 sec).  There 
-are more archive options in <code>download_rinex</code> and someday I will merge these. If you do have your own RINEX 3
-files, I use the community standard, that is upper case except for the file extension (which is rnx). 
+If your station name has 9 characters (lower case please), 
+the code assumes you are looking for a RINEX 3 file. However, my code will store the SNR data using the normal
+4 character name. *You must install the gfzrnx executable that translates 
+RINEX 3 to 2 to use RINEX 3 files in my code.* 
+<code>rinex2snr</code> currently supports RINEX3 for 30 second data at :
+
+- unavco
+- cddis
+- bev
+- bkg
+- ga
+
+The caveat is that UNAVCO is set to 15 sec because that is mostly what is there.
+If you don't know where your data are, you can try <code>-archive all<code>, 
+which should try all archives in sequence. I believe the default archive is cddis.
 
 <code>rinex2snr onsa00swe 2020 298</code>
 
 <code>rinex2snr at0100usa 2020 55</code>
 
-<code>rinex2snr mkea00usa 2020 290</code>
+<code>rinex2snr pots00deu 2020 298 -archive bkg</code>
+
+<code>rinex2snr mchl00aus 2022 55 -archive ga</code>
+
+RINEX 3 has a file ID parameter that is a nuisance. If you know yours, you can set it 
+with <code>-stream R</code> or <code>-stream S</code>. Because I think it is an 
+annoying thing, I look for both files without you having to set it. 
 
 The snr options are mostly based on the need to remove the "direct" signal. This is 
 not related to a specific site mask and that is why the most frequently used 
@@ -507,7 +523,6 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - 99 is elevation angles of 5-30 degrees  
 - 88 is elevation angles of 5-90 degrees
 - 50 is elevation angles less than 10 degrees (good for very tall sites, high-rate applications)
-
 
 **More options:**
 
@@ -1081,6 +1096,9 @@ the reflection-specific codes. Sample calls:
 - <CODE>download_rinex p041 2020 150 0</CODE> downloads the data from day of year 150 in 2020
 
 - <CODE>download_rinex p041 2020 150 0 -archive sopac</CODE> downloads the data from sopac archive on day of year 150 in 2020
+
+- <CODE>download_rinex onsa00swe 2020 150 0 -archive cddis</CODE> downloads the RINEX 3 data 
+from the cddis archive on day of year 150 in 2020
 
 <code>download_orbits</code> downloads orbit files and stores them in $ORBITS. See -h for more information.
 

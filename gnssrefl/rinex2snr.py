@@ -16,6 +16,7 @@ from progress.bar import Bar
 # my gps libraries
 import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
+import gnssrefl.karnak_sub as k
 
 # fortran codes for translating RINEX
 import gnssrefl.gpssnr as gpssnr
@@ -35,7 +36,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
     return fname
 
-def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk,skipit):
+def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk,skipit,stream='R'):
     """
     runs the rinex 2 snr conversion
     inputs:
@@ -62,7 +63,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     2021aug01 added mk option for uppercase file names per makan karegar request
     2021aug15 added weekly option
     2021nov08 making nolook work for rinex 3 files ...
+    2022feb10 added stream
+    2022feb15 added karnak library
     """
+    # 
     # do not allow illegal skipit values
     if skipit < 1:
         skipit = 1
@@ -84,7 +88,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         if not mk:
             station = station[0:4].lower()
     else:
-        print('Illegal station input - Station must have 4 or 9 characters. Exiting')
+        print('Illegal station input - Station must have 4,6,or 9 characters. Exiting')
         sys.exit()
     year_st = year_list[0]
     year_end = year_list[-1]
@@ -142,11 +146,11 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
-##                        print(' 2021feb22 using sample rate explicitly')
-                        # make sure sample rate takes up two characters ...
                         csrate = '{:02d}'.format(srate)
-                        r3 = station9ch + '_R_' + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
-                        r3gz = station9ch + '_R_' + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
+                        streamid = '_' + stream  + '_'
+                        # this can be done in a function now ... 
+                        r3 = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
+                        r3gz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         if os.path.exists(r3gz):
                             subprocess.call(['gunzip', r3gz])
@@ -154,7 +158,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             print('The RINEX 3 file exists locally')
                             fexists = g.new_rinex3_rinex2(r3,r2)
                             if fexists:
-                                #print('Rinex 3 to 2 conversion worked, now convert to snr format')
                                 conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
                             else:
                                 print('Something about the RINEX 3-2 conversion did not work')
@@ -163,32 +166,30 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             print('I assumed its name was ', r3)
 
                 else:
-                    print('Will seek the RINEX file externally for ', station, ' year:', year, ' doy:', doy, ' translate with ', translator, ' at the ', archive, ' archive')
+                    print('Will seek the RINEX file externally')
+                    print(station9ch, ' year:', year, ' doy:', doy, 'from: ', archive)
                     if version == 3:
-                        #  try unavco
+                        r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
-                        if (archive == 'unavco') or (archive == 'all'):
-                            srate = 15
-                            rinex2exists, rinex3name = g.unavco_rinex3(station9ch, year, doy,srate,orbtype)
-
-                        # try cddis
-                        if not os.path.exists(r):
-                            if (archive == 'cddis') or (archive == 'all'):
-                                srate = 30
-                                rinex2exists, rinex3name = g.cddis_rinex3(station9ch, year, doy,srate,orbtype)
-                        if not os.path.exists(r):
-                            if (archive == 'ga') :
-                                srate = 30
-                                rinex2exists, rinex3name = g.ga_rinex3_to_rinex2(station9ch, year, doy,srate)
-
-                        # remove rinex 3 file
-                        # subprocess.call(['rm', '-f', rinex3name]) # remove rinex3 file
-
-                        if rinex2exists:
-                            print('RINEX version 2 has been created from version 3', year, doy)
-                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
+                        if (archive == 'all'):
+                            file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream)
+                            if (not foundit): # try again
+                                file_name,foundit = k.universal_all(station9ch, year, doy, srate,k.swapRS(stream))
                         else:
-                            print('RINEX file does not exist for ', year, doy)
+                            file_name,foundit = k.universal(station9ch, year, doy, archive,srate,stream)
+                            if (not foundit): # try again
+                                file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
+                        if foundit: # version 3 found - now need to gzip, then hatanaka decompress
+                            translated, rnx_filename = go_from_crxgz_to_rnx(file_name)
+                            # now make rinex2
+                            if translated:
+                                print('The RINEX 3 file has been downloaded. Try to make ', r2)
+                                fexists = g.new_rinex3_rinex2(rnx_filename,r2)
+                            if fexists:
+                                print('RINEX version 2 has been created from version 3', year, doy)
+                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
+                        else:
+                            print('RINEX 3 file was not found', year, doy)
                     else:
                         # this is rinex version 2
                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
@@ -946,5 +947,64 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
             missing = False
         else:
             g.hatanaka_warning()
+
+def go_from_crxgz_to_rnx(c3gz):
+    """
+    sent a gzipped hatanaka file.  gunzip, hatanaka translate
+    checks to see if the rnx version exists and returns that
+    and the filename
+    """
+    translated = False # assume failure
+    c3 = c3gz[:-3] # crx filename
+    rnx = c3.replace('crx','rnx') # rnx filename
+    # gunzip
+    if os.path.exists(c3gz):
+        subprocess.call(['gunzip', c3gz])
+
+    # executable
+    crnxpath = g.hatanaka_version()
+    if not os.path.exists(crnxpath):
+        g.hatanaka_warning()
+    else:
+        if os.path.exists(c3): # file exists
+            subprocess.call([crnxpath,c3])
+    if os.path.exists(rnx): # file exists
+        translated = True
+
+    return translated, rnx
+
+
+def version3(station,year,doy,NS,archive,streamvar):
+    """
+    subroutine to take care of RINEX version 3
+    21april20 added BEV austria
+    this code has been supplanted by karnak_sub.- keeping for unknown reasons
+    """
+    fexist = False
+    if NS == 9:
+        if archive == 'cddis':
+            srate = 30 # rate supported by CDDIS
+            fexist = g.cddis3(station, year, doy,srate)
+        if archive == 'unavco':
+            srate = 15
+            fexist = g.unavco3(station, year, doy,srate)
+        if archive == 'bkg':
+            srate = 30
+            fexist = g.bkg_rinex3(station, year, doy,srate,streamvar)
+        if archive == 'ign':
+            srate = 30
+            fexist = g.ign_rinex3(station, year, doy,srate)
+        if archive == 'bev':
+            srate = 30
+            fexist = g.bev_rinex3(station, year, doy,srate,streamvar)
+        if archive == 'ga':
+            srate = 30
+            fexist = g.ga_rinex3(station, year, doy,srate)
+        if fexist:
+            print('SUCESSFUL RINEX3 DOWNLOAD:', archive)
+        else:
+            print('could not find the RINEX 3 file')
+    else:
+        print('exiting: station names must have 9 characters')
 
 

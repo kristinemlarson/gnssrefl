@@ -82,7 +82,7 @@ def myfavoriteobs():
     returns list of SNR obs for gfzrnx. that is all
     """
     # not even sure why i have C here for beidou
-    gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I'
+    gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
 
     return gobblygook
 
@@ -4447,7 +4447,7 @@ def ign_orbits(filename, directory,year):
     return foundit 
 
 
-def bkg_rinex3(station9ch, year, doy,srate):
+def bkg_rinex3(station9ch, year, doy,srate,streamvar):
     """
     download rinex 3 from BKG
     inputs: 9 character station name, year, day of year and srate  
@@ -4455,6 +4455,7 @@ def bkg_rinex3(station9ch, year, doy,srate):
     note: this code works - but it does not turn it into RINEX 2 for you
 
     21sep03 moved from ftp to https
+    22feb09 changed euref to IGS? also added stream variable
     """
     fexist = False
     crnxpath = hatanaka_version()
@@ -4464,11 +4465,13 @@ def bkg_rinex3(station9ch, year, doy,srate):
     url = 'ftp://igs.bkg.bund.de/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
     # try this one now?
     url = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/' 
-    ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
-    ff1 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
-    ff2 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.rnx'
+    url = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cyyyy + '/' + cdoy + '/' 
+    oo = '_' + streamvar + '_'
+    ff = station9ch.upper()  + oo + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
+    ff1 = station9ch.upper() + oo  + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
+    ff2 = station9ch.upper() + oo + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.rnx'
     url = url + ff
-    #print(url)
+    print(url)
     try:
         wget.download(url,ff)
         subprocess.call(['gunzip',ff])
@@ -4487,12 +4490,14 @@ def bev_rinex2(station, year, doy):
     """
     download rinex 2.11 from BEV
     inputs: station name, year, day of year 
+    2022feb09 change to https
     """
     fexist = False
     crnxpath = hatanaka_version()
     cyyyy, cyy, cdoy = ydoych(year,doy)
 
     url = 'ftp://gnss.bev.gv.at/pub/obs/' + cyyyy + '/' + cdoy + '/'
+    url = 'https://gnss.bev.gv.at/at.gv.bev.dc/data/obs/' + cyyyy + '/' + cdoy + '/'
     ff_Z =  station + cdoy + '0.' + cyy + 'd' + '.Z'
     ff_gz = station + cdoy + '0.' + cyy + 'd' + '.gz'
     ff1 = station + cdoy + '0.' + cyy + 'd' 
@@ -4531,22 +4536,28 @@ def bev_rinex2(station, year, doy):
 
     return fexist
 
-def bev_rinex3(station9ch, year, doy,srate):
+def bev_rinex3(station9ch, year, doy,srate,streamvar):
     """
     download rinex 3 from BEV
     inputs: 9 character station name, year, day of year and srate
     is sample rate in seconds
     note: this code works - but it does not turn it into RINEX 2 for you
+    added stream variable
+    22feb09 changd to https
     """
     fexist = False
     crnxpath = hatanaka_version()
     cyyyy, cyy, cdoy = ydoych(year,doy)
+    print('BEV rinex 3 download')
 
     csrate = '{:02d}'.format(srate)
     url = 'ftp://gnss.bev.gv.at/pub/obs/' + cyyyy + '/' + cdoy + '/'
-    ff = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
-    ff1 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
-    ff2 = station9ch.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.rnx'
+    url = 'https://gnss.bev.gv.at/at.gv.bev.dc/data/obs/' + cyyyy + '/' + cdoy + '/'
+    streamlink = '_' + streamvar + '_'
+    print(url)
+    ff = station9ch.upper() +   streamlink + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
+    ff1 = station9ch.upper() +  streamlink + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx'
+    ff2 = station9ch.upper() +  streamlink + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.rnx'
     url = url + ff
     #print(url)
     try:
@@ -4556,7 +4567,7 @@ def bev_rinex3(station9ch, year, doy,srate):
         # get rid of compressed file
         subprocess.call(['rm','-f',ff1])
     except:
-        print('problem with IGS download')
+        print('problem with BEV rinex 3 download')
 
     if os.path.exists(ff2):
         fexist = True
@@ -4589,7 +4600,7 @@ def ign_rinex3(station9ch, year, doy,srate):
         # get rid of compressed file
         subprocess.call(['rm','-f',ff1])
     except:
-        print('problem with IGS download')
+        print('problem with IGN download')
 
     if os.path.exists(ff2):
         fexist = True
@@ -5209,8 +5220,10 @@ def cddis3(station9ch, year, doy,srate):
     filename = ff+ending  # the crx file
     rfilename = ff+rending # the rnx file
     url = ftp + f + gzfilename
-    print(url)
+    #print(url)
     crnxpath = hatanaka_version()
+    print(gzfilename)
+    print(new_way_f)
     try:
         cddis_download(gzfilename,new_way_f)
         subprocess.call(['gunzip',gzfilename])

@@ -7,6 +7,8 @@ kristine larson
 
 compile the fortran first
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
+
+2022feb15 added karnak_sub for rinex3
 """
 
 import argparse
@@ -16,7 +18,6 @@ import os
 import sys
 import subprocess
 import time
-
 
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rnx
@@ -35,12 +36,13 @@ def main():
     parser.add_argument("-dec", default=0, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default='False', metavar='False', type=str, help="True means only use RINEX files on local machine")
     parser.add_argument("-fortran", default='False', metavar='False',type=str, help="True means use Fortran RINEX translators ")
-    parser.add_argument("-archive", default=None, metavar='all',help="specify one archive: unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan,jp", type=str)
+    parser.add_argument("-archive", default=None, metavar='all',help="specify an archive or all. See documentation.", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
-    parser.add_argument("-srate", default=None, help="sample rate (RINEX 3 only)", type=int)
+    parser.add_argument("-samplerate", default=None, help="sample rate in sec (RINEX 3 only)", type=int)
+    parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
     parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
     parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
 
@@ -52,19 +54,17 @@ def main():
 #
     station = args.station; NS = len(station)
     if (NS == 4) or (NS == 6) or (NS == 9):
-        #print('You have submitted a nominally valid station name')
         okok = 1
     else:
         print('Illegal input - Station name must have 4 (RINEX 2), 6 (GSI), or 9 (RINEX 3) characters. Exiting.')
         sys.exit()
+
     year = args.year
     year_st = year
-
 
     if len(str(year)) != 4:
         print('Year must be four characters long. Exiting.', year)
         sys.exit()
-
 
     doy= args.doy
     doy_st = doy
@@ -152,19 +152,28 @@ def main():
         doy2 = args.doy_end
 
 
-# currently allowed archives for RINEX observation data
-    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','jp']
-    if args.archive == None:
-        archive = 'all'
-    else:
-        archive = args.archive.lower()
-        if archive not in archive_list:
-            print('You picked an archive that is not allowed')
-            print('For future reference: I allow these archives:') 
-            print(archive_list)
-            print('Exiting')
-            sys.exit()
+    # rinex3 list 
+    archive = args.archive
+    archive_list_rinex3 = ['unavco','cddis','bev','bkg','ga','all']
+    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','jp','all']
 
+    if (NS == 9):
+        # rinex3
+        if archive == None:
+            archive = 'all'
+        if archive not in  archive_list_rinex3:
+            print('You chose an archive not supported by my code.')
+            print(archive_list_rinex3)
+            sys.exit()
+    else:
+        # rinex2
+        if archive == None:
+            archive = 'all'
+        else:
+            if archive not in archive_list:
+                print('You picked an archive that is not allowed. Exiting')
+                print(archive_list)
+                sys.exit()
     year1=year
     if args.year_end == None:
         year2 = year 
@@ -202,17 +211,26 @@ def main():
             fortran = False # override - but this is sllllllooooowwww
 
     # this is for RINEX 3 only - default will be 30
-    if args.srate == None:
+    if args.samplerate == None:
         srate = 30
     else:
-        srate = args.srate
+        srate = int(args.samplerate)
 
     # the Makan option
     mk = False
     if args.mk == 'True':
         print('you have invoked the Makan option')
         mk = True
-    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk,skipit)
+
+    if args.stream == None:
+        stream = 'R'
+    else:
+        stream = args.stream
+    if stream not in ['R','S']:
+        stream = 'R'
+
+    rnx.run_rinex2snr(station, year_list, doy_list, isnr, orb, rate,dec_rate,
+            archive,fortran,nol,overwrite,translator,srate,mk,skipit,stream=stream)
     print('Feedback written to subdirectory logs')
 
 

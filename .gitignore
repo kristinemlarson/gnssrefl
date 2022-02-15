@@ -7,3 +7,5 @@ test_local.py
 spline_out.png
 logs
 outliers.txt
+karnak.py
+karnak_sub.py
