@@ -47,6 +47,10 @@ def universal(station9ch, year, doy, archive,srate,stream):
         elif (archive == 'bev'):
             dir1 = 'https://gnss.bev.gv.at/at.gv.bev.dc/data/obs/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
+        elif (archive == 'epn'):
+            dir1 = 'https://epncb.oma.be/ftp/obs/' + cyyyy + '/' + cdoy + '/'
+            print(dir1)
+            wget.download(dir1+file_name,file_name)
         elif (archive == 'ga'):
             QUERY_PARAMS, headers = ga_stuff(station9ch, year, doy)
             API_URL = 'https://data.gnss.ga.gov.au/api/rinexFiles/'  
@@ -116,7 +120,7 @@ def universal_all(station9ch, year, doy, srate,stream):
     """
     foundit = False
 
-    for archive in ['unavco','cddis','bkg','bev']:
+    for archive in ['unavco','cddis','bkg','bev','epncb','ga']:
         if archive == 'unavco':
             srate_in = 15
         else:

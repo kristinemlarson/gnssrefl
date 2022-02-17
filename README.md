@@ -496,6 +496,7 @@ RINEX 3 to 2 to use RINEX 3 files in my code.*
 - cddis
 - bev
 - bkg
+- epn
 - ga
 
 The caveat is that UNAVCO is set to 15 sec because that is mostly what is there.

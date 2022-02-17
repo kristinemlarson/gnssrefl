@@ -65,7 +65,7 @@ def main():
 
     archive_list_high = ['unavco','nrcan','ga']
 
-    archive_list_rinex3 = ['unavco','cddis','ga','bev','bkg','ign','all']
+    archive_list_rinex3 = ['unavco','cddis','ga','bev','bkg','ign','epn','all']
 
     if args.version == None:
         version = 2
