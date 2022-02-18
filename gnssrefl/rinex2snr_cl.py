@@ -145,6 +145,7 @@ def main():
 
     # default is set to low.  pick high for 1sec files 
     rate = args.rate
+    print(rate)
 
     if args.doy_end == None:
         doy2 = doy
@@ -152,23 +153,29 @@ def main():
         doy2 = args.doy_end
 
 
-    # rinex3 list 
     archive = args.archive
+    if archive == None:
+        archive = 'all'
+
     archive_list_rinex3 = ['unavco','cddis','bev','bkg','ga','epn','all']
     archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','jp','all']
 
+    highrate_list = ['unavco','nrcan','all']
+
+
     if (NS == 9):
         # rinex3
-        if archive == None:
-            archive = 'all'
         if archive not in  archive_list_rinex3:
             print('You chose an archive not supported by my code.')
             print(archive_list_rinex3)
             sys.exit()
     else:
         # rinex2
-        if archive == None:
-            archive = 'all'
+        if (rate == 'high'):
+            if archive not in highrate_list:
+                print('You chose highrate and ', archive, ' but  I only allow unavco and nrcan. Exiting.')
+                print('Please help code up access to additional archives')
+                sys.exit()
         else:
             if archive not in archive_list:
                 print('You picked an archive that is not allowed. Exiting')

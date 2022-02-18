@@ -61,9 +61,10 @@ def main():
     archive = args.archive
 
 
-    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','jp','all']
+    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','all']
 
     archive_list_high = ['unavco','nrcan','ga']
+    archive_list_high = ['unavco','nrcan','all'] # removed GA
 
     archive_list_rinex3 = ['unavco','cddis','ga','bev','bkg','ign','epn','all']
 
@@ -83,6 +84,7 @@ def main():
         version = 3 # even if you don't choose version 3 .... 
     
     # this is for version 2
+    # not going to allow GSI for now
     if (version == 2) and (rate == 'low'):
         if (NS != 4):
             if not (args.archive == 'jp'):
@@ -160,24 +162,28 @@ def main():
                     subprocess.call(['rm','-f',new_file_name.replace('rnx','crx')]) # delete crx file
                     print('\n SUCCESS 2: ', new_file_name)
         else: # RINEX VERSION 2
-            # using new code
-            if archive == 'all':
-                foundit = False
-                print('cycle thru unavco,sopac,sonel archives')
-                for archive in ['unavco','sopac','sonel']:
-                    if (not foundit):
-                        file_name,foundit = k.universal_rinex2(station, year, doy, archive)
+            # using new karnak code
+            rinexfile,rinexfiled = g.rinex_name(station, year, d, 0)
+            if rate == 'high':
+                rinexfile, foundit = k.rinex2_highrate(station, year, doy,archive)
             else:
-                file_name,foundit = k.universal_rinex2(station, year, doy, archive)
-            if foundit: #strip it to make o files ... 
-                rinexfile, foundit2 = k.make_rinex2_ofiles(file_name) # translate
-                if foundit2:
-                    print('SUCCESS', rinexfile)
+                if archive == 'all':
+                    foundit = False
+                    print('cycle thru unavco,sopac,sonel archives')
+                    for archiveinput in ['unavco','sopac','sonel']:
+                        if (not foundit):
+                            file_name,foundit = k.universal_rinex2(station, year, doy, archiveinput)
+                else:
+                    file_name,foundit = k.universal_rinex2(station, year, doy, archive)
+                if foundit: # uncompress and make o files ... 
+                    rinexfile, foundit = k.make_rinex2_ofiles(file_name) # translate
+
+            if foundit: 
+                 print('SUCCESS:', rinexfile, ' was found')
             else:
-                 print('FAILURE ', file_name, ' was not found')
+                 print('FAILURE:', rinexfile, ' was not found')
             #g.go_get_rinex_flex(station,year,d,0,rate,archive)
             # a bit redundant ... but life is short 
-            rinexfile,rinexfiled = g.rinex_name(station, year, d, 0)
             if os.path.isfile(rinexfile) and (args.strip == 'True'):
                 k.strip_rinexfile(rinexfile)
 

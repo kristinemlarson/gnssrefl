@@ -141,7 +141,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                     if version == 2:
                         the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
                         if os.path.exists(r):
-                            #print('RINEX 2 file exists locally')
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
@@ -246,10 +245,18 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
             # This goes to find the rinex file. I am changing it to allow 
             # an archive preference 
             if receiverrate == 'high':
-                # use the old code because i am tired
-                g.go_get_rinex_flex(station,year,month,day,receiverrate,archive)
+                #g.go_get_rinex_flex(station,year,month,day,receiverrate,archive)
+                file_name, foundit = k.rinex2_highrate(station, year, doy,archive)
             else:
-                file_name,foundrinex = k.universal_rinex2(station, year, doy, archive)
+                # added karnak librariies
+                if (archive == 'all'):
+                    foundrinex = False
+                    for archivechoice in ['unavco','sopac','sonel']:
+                        if (not foundrinex):
+                            file_name,foundrinex = k.universal_rinex2(station, year, doy, archivechoice)
+                else:
+                    file_name,foundrinex = k.universal_rinex2(station, year, doy, archive)
+
                 if foundrinex: #uncompress etc  to make o files ...
                     rinexfile, foundit2 = k.make_rinex2_ofiles(file_name) # translate
                     if foundit2:

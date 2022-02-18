@@ -561,10 +561,12 @@ Just put the RINEX files in the same directory where you are running the code, u
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
-If you invoke this flag, it currently only looks at the UNAVCO, GA, or 
-NRCAN archives. Please beware - it takes a long time to download a 
-highrate GNSS RINEX file (even when it is compressed). And it also takes 
-a long time to compute orbits for it. For high-rate data, you should **never** use 
+If you invoke this flag, it currently only looks at the UNAVCO or 
+NRCAN archives. GA has data - but my code to access their site is not 
+reliable anymore (given the changes at the archive). If you would like high-rate GA data 
+to be part of this code, please help out by writing a downloader for me.
+
+For high-rate data, you should **never** use 
 the python translation option.
 
 **Output SNR file format**

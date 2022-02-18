@@ -233,7 +233,7 @@ def universal_rinex2(station, year, doy, archive):
         dir1 = 'ftp://gps.alaska.edu/pub/gpsdata/permanent/C2/' + cydoy
         foundit, file_name = gogetit(dir1, oname, '.gz');
     elif (archive == 'ngs'):
-        dir1 = 'https://geodesy.noaa.gov/corsdata/rinex/' + cydoy
+        dir1 = 'https://geodesy.noaa.gov/corsdata/rinex/' + cydoy + '/' + station + '/'
         foundit, file_name = gogetit(dir1, oname, '.gz');
         if not foundit:
             foundit, file_name = gogetit(dir1, dname, '.gz')
@@ -320,9 +320,33 @@ def strip_rinexfile(rinexfile):
 def gsi_data(station,year,doy):
     """
 # kluge  so i don't have to rewrite this code
+# calling the original rinex downloader
     """
-    d = doy2ymd(year,doy);
+    d = g.doy2ymd(year,doy);
     month = d.month; day = d.day
     g.rinex_jp(station, year, month, day)
 
 
+def rinex2_highrate(station, year, doy,archive):
+    """
+    kluge to download highrate data since i have revamped the rinex2 code
+    """
+    foundit = False
+    d = g.doy2ymd(year,doy);
+    month = d.month; day = d.day
+    rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
+    if (archive == 'unavco') or (archive == 'all'):
+        g.rinex_unavco_highrate(station, year, month, day)
+    # file does not exist, so keep looking
+    if not os.path.isfile(rinexfile):
+        if (archive == 'nrcan') or (archive == 'all'):
+            g.rinex_nrcan_highrate(station, year, month, day)
+    #if not os.path.isfile(rinexfile):
+    #    if not os.path.isfile(rinexfile):
+    #        if (archive == 'ga') or (archive == 'all'):
+    #            g.rinex_ga_highrate(station, year, month, day)
+
+    if os.path.isfile(rinexfile):
+        foundit = True
+
+    return rinexfile, foundit
