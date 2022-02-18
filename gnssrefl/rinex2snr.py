@@ -167,8 +167,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
                 else:
                     print('Will seek the RINEX file externally')
-                    print(station9ch, ' year:', year, ' doy:', doy, 'from: ', archive)
                     if version == 3:
+                        print(station9ch, ' year:', year, ' doy:', doy, 'from: ', archive)
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
                         if (archive == 'all'):
@@ -194,6 +194,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         else:
                             print('RINEX 3 file was not found', year, doy)
                     else:
+                        print(station, ' year:', year, ' doy:', doy, 'from: ', archive)
                         # this is rinex version 2
                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
 
@@ -236,14 +237,24 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
         month = d.month; day = d.day
         # new function to do the whole orbit thing
         foundit, f, orbdir, snrexe = g.get_orbits_setexe(year,month,day,orbtype,fortran) 
-        # if you have the orbit file, you can get the rinex file
+        # if you have the orbit file, you can get the rinex file. First lets define the expected names
         print('Orbit file: ', orbdir + '/' + f)
+        print(foundit)
         if foundit:
             # now you can look for a rinex file
             rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
             # This goes to find the rinex file. I am changing it to allow 
             # an archive preference 
-            g.go_get_rinex_flex(station,year,month,day,receiverrate,archive)
+            if receiverrate == 'high':
+                # use the old code because i am tired
+                g.go_get_rinex_flex(station,year,month,day,receiverrate,archive)
+            else:
+                file_name,foundrinex = k.universal_rinex2(station, year, doy, archive)
+                if foundrinex: #uncompress etc  to make o files ...
+                    rinexfile, foundit2 = k.make_rinex2_ofiles(file_name) # translate
+                    if foundit2:
+                        print('SUCCESS', rinexfile)
+
 #           define booleans for various files
             oexist = os.path.isfile(orbdir + '/' + f) == True
             rexist = os.path.isfile(rinexfile) == True

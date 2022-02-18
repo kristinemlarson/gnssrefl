@@ -154,7 +154,7 @@ def main():
 
     # rinex3 list 
     archive = args.archive
-    archive_list_rinex3 = ['unavco','cddis','bev','bkg','ga','all']
+    archive_list_rinex3 = ['unavco','cddis','bev','bkg','ga','epn','all']
     archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','jp','all']
 
     if (NS == 9):

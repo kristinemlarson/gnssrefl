@@ -1,3 +1,7 @@
+# kristine Larson, February 2022
+# library to support RINEX downloads.
+# started with RINEX 3, and now adding RINEX 2
+# this should replace the spaghetti code in gps.py
 import datetime
 import json
 import os
@@ -8,8 +12,30 @@ import wget
 from urllib.parse import urlparse
 import gnssrefl.gps as g
 
-# kristine Larson, February 2022
-# new libraries to download Rinex 3 files
+def gogetit(dir1, filename, ext):
+    """
+    to download RINEX 2 files
+    given the main directory address, filename, and then ext (Z, gz etc)
+    try to get the file and chck to see if it was successful
+    this is used by the rinex2 code
+    returns boolean foundit and filename
+    """
+    foundit = False
+    f= filename + ext
+    print(dir1 + f)
+    if os.path.exists(f):
+        print('File is already on your disk')
+        foundit = True
+    else:
+        try:
+            wget.download(dir1+f,f)
+        except:
+            okok =1
+        if os.path.exists(f):
+            print('\n File has been found ',f)
+            foundit = True
+
+    return foundit, f
 
 def swapRS(stream):
     """
@@ -120,7 +146,7 @@ def universal_all(station9ch, year, doy, srate,stream):
     """
     foundit = False
 
-    for archive in ['unavco','cddis','bkg','bev','epncb','ga']:
+    for archive in ['unavco','cddis','bkg','bev','epn','ga']:
         if archive == 'unavco':
             srate_in = 15
         else:
@@ -132,3 +158,171 @@ def universal_all(station9ch, year, doy, srate,stream):
                 foundit = True
 
     return file_name, foundit
+
+def rinex2names(station,year,doy):
+    """
+    given station year and doy returns
+    rinex2 names hatanaka and obs names
+    and strings for year and doy
+    """
+    cyyyy = str(year)
+    cdoy = '{:03d}'.format(doy)
+    f1 = station  + cdoy + '0.' + cyyyy[2:4] + 'd'
+    f2 = station  + cdoy + '0.' + cyyyy[2:4] + 'o'
+
+    return f1, f2, cyyyy, cdoy
+
+
+def universal_rinex2(station, year, doy, archive):
+    """
+    seamless archive for rinex 2 files ...
+    inputs are 4 char station, yar, doy and archiv nam 
+    """
+    # define the file name
+    print('Searching the ', archive, ' archive for ', station)
+
+    foundit = False; dir1 = ''; file_name = ''
+
+    dname, oname, cyyyy, cdoy = rinex2names(station,year,doy)
+    if os.path.exists(oname):
+        print('RINEX o File is already on disk')
+        return oname, True 
+
+    cydoy = cyyyy + '/' + cdoy + '/'
+
+    if (archive == 'jp'):
+        # did not want to rewrite the code
+        gsi_data(station, year, doy)
+        file_name = oname
+        if os.path.exists(file_name):
+            foundit = True
+    elif (archive == 'unavco'):
+        dir1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy
+        foundit, file_name = gogetit(dir1, dname, '.Z'); 
+        if not foundit:
+            foundit, file_name = gogetit(dir1, oname, '.Z')
+    elif (archive == 'special'):
+        dir1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy
+        foundit, file_name = gogetit(dir1, oname, '.gz'); 
+    elif archive == 'sopac':
+        dir1 = 'ftp://garner.ucsd.edu/pub/rinex/' + cydoy
+        foundit, file_name = gogetit(dir1, dname, '.Z');
+    elif archive == 'sonel':
+        dir1 = 'ftp://ftp.sonel.org/gps/data/' + cydoy
+        foundit, file_name = gogetit(dir1, dname, '.Z');
+    elif archive == 'nz':
+        dir1 =  'https://data.geonet.org.nz/gnss/rinex/' + cydoy
+        foundit, file_name = gogetit(dir1, oname, '.gz'); 
+    elif archive == 'bkg':
+        # are the old data with Z instead of gz?
+        dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cydoy
+        dir2 = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cydoy
+
+        foundit, file_name = gogetit(dir1, dname, '.Z');
+        if not os.path.exists(file_name):
+            foundit, file_name = gogetit(dir2, dname, '.Z')
+        # not even sure this is a thing ???
+        if not os.path.exists(file_name):
+            foundit, file_name = gogetit(dir1, dname, '.gz')
+        if not os.path.exists(file_name):
+            foundit, file_name = gogetit(dir2, dname, '.gz')
+    elif (archive == 'bev'):
+        dir1 = 'https://gnss.bev.gv.at/at.gv.bev.dc/data/obs/' + cydoy
+        foundit, file_name = gogetit(dir1, dname, '.gz');
+    elif (archive == 'jeff'):
+        dir1 = 'ftp://gps.alaska.edu/pub/gpsdata/permanent/C2/' + cydoy
+        foundit, file_name = gogetit(dir1, oname, '.gz');
+    elif (archive == 'ngs'):
+        dir1 = 'https://geodesy.noaa.gov/corsdata/rinex/' + cydoy
+        foundit, file_name = gogetit(dir1, oname, '.gz');
+        if not foundit:
+            foundit, file_name = gogetit(dir1, dname, '.gz')
+    elif (archive == 'cddis'):
+         # try gz, then Z.  so annoying
+        file_name = dname + '.gz'
+        if os.path.exists(file_name):
+            foundit = True
+        else:
+            new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyyyy[2:4] + 'd/'
+            g.cddis_download(file_name,new_way_dir) ;
+            if os.path.exists(file_name):
+                foundit = True
+            else:
+                file_name = dname + '.Z'
+                g.cddis_download(file_name,new_way_dir) ;
+                if os.path.exists(file_name):
+                    foundit = True
+    elif (archive == 'ga'):
+        QUERY_PARAMS, headers = ga_stuff(station, year, doy)
+        API_URL = 'https://data.gnss.ga.gov.au/api/rinexFiles/'
+        QUERY_PARAMS['rinexVersion'] = '2'
+        request = requests.get(API_URL, QUERY_PARAMS, headers=headers)
+        file_name = ''
+        if len(json.loads(request.content)) == 1:
+            foundit = True
+            for query_response_item in json.loads(request.content):
+                file_url = query_response_item['fileLocation']
+                file_name = urlparse(file_url).path.rsplit('/', 1)[1]
+                wget.download(file_url,file_name)
+    elif (archive == 'nrcan'):
+        dir1 = 'ftp://cacsa.nrcan.gc.ca/gps/data/gpsdata/' + cyy + cdoy  + '/' + cyy + 'd' + '/'
+        foundit, f = gogetit(dir1, dname, '.Z'); file_name = f
+    else:
+         print('I do not recognize your archive')
+
+    return file_name,foundit
+
+def make_rinex2_ofiles(file_name):
+    """
+    take a rinex2 downloads, decompress,hatanaka ...
+    """
+    if (file_name[-1:] == 'Z'):
+        subprocess.call(['uncompress', file_name])
+        file_name = file_name[:-2]
+    if (file_name[-2:] == 'gz'):
+        subprocess.call(['gunzip', file_name])
+        file_name = file_name[:-3]
+
+    crnxpath = g.hatanaka_version()
+    # take off the d and make it an o
+    new_name = file_name[:-1] + 'o'
+
+    if file_name[-1:] == 'd':
+        if os.path.exists(crnxpath):
+            subprocess.call([crnxpath, file_name])
+            subprocess.call(['rm', '-f',file_name])
+        else:
+            g.hatanaka_warning()
+    elif file_name[-1:] == 'o':
+        thisisagoodthing = 1
+    else:
+        print('I only recognize d and o files')
+
+    fexist = False
+    if os.path.exists(new_name):
+        fexist = True
+
+    return new_name, fexist
+
+def strip_rinexfile(rinexfile):
+    """
+    """
+    print('use teqc to strip the RINEX 2 file')
+    teqcv = g.teqc_version()
+    if os.path.isfile(teqcv):
+        foutname = 'tmp.' + rinexfile
+        fout = open(foutname,'w')
+        subprocess.call([teqcv, '-O.obs','S1+S2+S5+S6+S7+S8', rinexfile],stdout=fout)
+        fout.close()
+        subprocess.call(['rm','-f',rinexfile])
+        subprocess.call(['mv','-f',foutname, rinexfile])
+
+def gsi_data(station,year,doy):
+    """
+# kluge  so i don't have to rewrite this code
+    """
+    d = doy2ymd(year,doy);
+    month = d.month; day = d.day
+    g.rinex_jp(station, year, month, day)
+
+

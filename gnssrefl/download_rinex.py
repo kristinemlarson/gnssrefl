@@ -61,7 +61,7 @@ def main():
     archive = args.archive
 
 
-    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev']
+    archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','jp','all']
 
     archive_list_high = ['unavco','nrcan','ga']
 
@@ -85,15 +85,16 @@ def main():
     # this is for version 2
     if (version == 2) and (rate == 'low'):
         if (NS != 4):
-            print('exiting: RINEX 2.11 station names must have 4 characters, lowercase please')
-            sys.exit()
+            if not (args.archive == 'jp'):
+                print('exiting: RINEX 2.11 station names must have 4 characters, lowercase please')
+                sys.exit()
         if args.archive == None:
             archive = 'all'
         else:
             archive = args.archive.lower()
             if archive not in archive_list:
                 print('You picked an archive that does not exist. To be nice, ')
-                print('I am going to check the main ones (unavco,sopac,sonel,cddis) for you')
+                print('I am going to check the main ones (unavco,sopac,sonel) for you')
                 print('For future reference: I allow these archives:')
                 print(archive_list)
                 archive = 'all'
@@ -159,25 +160,26 @@ def main():
                     subprocess.call(['rm','-f',new_file_name.replace('rnx','crx')]) # delete crx file
                     print('\n SUCCESS 2: ', new_file_name)
         else: # RINEX VERSION 2
-            g.go_get_rinex_flex(station,year,d,0,rate,archive)
-            rinexfile,rinexfiled = g.rinex_name(station, year, d, 0)
-            print(rinexfile)
-            if os.path.isfile(rinexfile):
-                if args.strip == 'True':
-                    print('use teqc to strip the RINEX file')
-                    teqcv = g.teqc_version()
-                    if os.path.isfile(teqcv):
-                        foutname = 'tmp.' + rinexfile
-                        fout = open(foutname,'w')
-                        subprocess.call([teqcv, '-O.obs','S1+S2+S5+S6+S7+S8', rinexfile],stdout=fout)
-                        fout.close()
-                        subprocess.call(['rm','-f',rinexfile])
-                        subprocess.call(['mv','-f',foutname, rinexfile])
-                        print('\n SUCCESS: ', rinexfile)
-                else:
-                    print('\n SUCCESS: ', rinexfile)
+            # using new code
+            if archive == 'all':
+                foundit = False
+                print('cycle thru unavco,sopac,sonel archives')
+                for archive in ['unavco','sopac','sonel']:
+                    if (not foundit):
+                        file_name,foundit = k.universal_rinex2(station, year, doy, archive)
             else:
-                print(rinexfile, ' not found')
+                file_name,foundit = k.universal_rinex2(station, year, doy, archive)
+            if foundit: #strip it to make o files ... 
+                rinexfile, foundit2 = k.make_rinex2_ofiles(file_name) # translate
+                if foundit2:
+                    print('SUCCESS', rinexfile)
+            else:
+                 print('FAILURE ', file_name, ' was not found')
+            #g.go_get_rinex_flex(station,year,d,0,rate,archive)
+            # a bit redundant ... but life is short 
+            rinexfile,rinexfiled = g.rinex_name(station, year, d, 0)
+            if os.path.isfile(rinexfile) and (args.strip == 'True'):
+                k.strip_rinexfile(rinexfile)
 
 if __name__ == "__main__":
     main()

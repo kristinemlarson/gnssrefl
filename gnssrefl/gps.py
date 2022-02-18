@@ -862,15 +862,18 @@ def rinex_bkg(station, year, month, day):
     # changing to https and gzip
     # there is also an IGS directory - which I should add
     gns = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/'
+    # igs
+    gns2 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/'
 
     oname,fname = rinex_name(station, year, month, day)
     # they store hatanaka - compression must depend on year 
     file1 = fname + '.Z'
     file2 = fname + '.gz'
     url = gns +  cyyyy + '/' + cdoy +  '/' + file1
+    url2 = gns2 +  cyyyy + '/' + cdoy +  '/' + file1
 
     if os.path.exists(crnxpath):
-        print('try unix compression')
+        print('try unix EUREF area ',url)
         try:
             wget.download(url,file1)
             subprocess.call(['uncompress', file1])
@@ -880,17 +883,17 @@ def rinex_bkg(station, year, month, day):
             print('some kind of problem with BKG download',file1)
             subprocess.call(['rm', '-f',file1])
 
-        if not os.path.exists(oname):
-            try:
-                url = gns +  cyyyy + '/' + cdoy +  '/' + file2
-                print('try gzip compression')
-                wget.download(url,file2)
-                subprocess.call(['gunzip', file2])
-                subprocess.call([crnxpath, fname])
-                subprocess.call(['rm', '-f',fname])
-            except:
-                print('some kind of problem with BKG download',file1)
-                subprocess.call(['rm', '-f',file2])
+        print('try IGS area ',url2)
+        try:
+            wget.download(url2,file1)
+            subprocess.call(['uncompress', file1])
+            subprocess.call([crnxpath, fname])
+            subprocess.call(['rm', '-f',fname])
+        except:
+            print('some kind of problem with BKG download',file1)
+            subprocess.call(['rm', '-f',file1])
+
+
     else:
         print('You cannot use the BKG archive without installing CRX2RNX.')
 
