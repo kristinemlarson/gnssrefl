@@ -189,6 +189,7 @@ def universal_rinex2(station, year, doy, archive):
         return oname, True 
 
     cydoy = cyyyy + '/' + cdoy + '/'
+    cyy = cyyyy[2:4]
 
     if (archive == 'jp'):
         # did not want to rewrite the code

@@ -97,7 +97,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     # 2021 september 12 KL
     # i would like to put this in rinex2snr_cl.py - but I am trying to avoid increasing
     # the workload for the Notebook programmers before the short course.
-    #print(year_st,year_end,doy_st, doy_end)
 
 # this way we are overwriting the doy_list variable
 # loop thru years and days 
@@ -194,7 +193,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             print('RINEX 3 file was not found', year, doy)
                     else:
                         print(station, ' year:', year, ' doy:', doy, 'from: ', archive)
-                        # this is rinex version 2
+                        # this is rinex version 2 - finds rinex and converts it
                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
 
     #print('And I guess my work is done now!')
@@ -995,37 +994,5 @@ def go_from_crxgz_to_rnx(c3gz):
     return translated, rnx
 
 
-def version3(station,year,doy,NS,archive,streamvar):
-    """
-    subroutine to take care of RINEX version 3
-    21april20 added BEV austria
-    this code has been supplanted by karnak_sub.- keeping for unknown reasons
-    """
-    fexist = False
-    if NS == 9:
-        if archive == 'cddis':
-            srate = 30 # rate supported by CDDIS
-            fexist = g.cddis3(station, year, doy,srate)
-        if archive == 'unavco':
-            srate = 15
-            fexist = g.unavco3(station, year, doy,srate)
-        if archive == 'bkg':
-            srate = 30
-            fexist = g.bkg_rinex3(station, year, doy,srate,streamvar)
-        if archive == 'ign':
-            srate = 30
-            fexist = g.ign_rinex3(station, year, doy,srate)
-        if archive == 'bev':
-            srate = 30
-            fexist = g.bev_rinex3(station, year, doy,srate,streamvar)
-        if archive == 'ga':
-            srate = 30
-            fexist = g.ga_rinex3(station, year, doy,srate)
-        if fexist:
-            print('SUCESSFUL RINEX3 DOWNLOAD:', archive)
-        else:
-            print('could not find the RINEX 3 file')
-    else:
-        print('exiting: station names must have 9 characters')
 
 

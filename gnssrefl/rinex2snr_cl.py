@@ -145,7 +145,6 @@ def main():
 
     # default is set to low.  pick high for 1sec files 
     rate = args.rate
-    print(rate)
 
     if args.doy_end == None:
         doy2 = doy
@@ -226,7 +225,7 @@ def main():
     # the Makan option
     mk = False
     if args.mk == 'True':
-        print('you have invoked the Makan option')
+        print('You have invoked the Makan option')
         mk = True
 
     if args.stream == None:
@@ -244,18 +243,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-
-
-#    if translator == 'hybrid':
-#        snrexe = g.gnssSNR_version()
-#        if (orb == 'jax') or (orb == 'gbm') or (orb=='igr'):
-#            print('The hybrid option does not currently work on multi-GNSS files')
-#            print('I am currently testing this option')
-#           if not os.path.isfile(snrexe):
-#                print('setting to python in the interim')
-                #translator = 'python'
-    #        else:
-    #            print('setting to fortran in the interim')
-    #            translator = 'fortran'
 
