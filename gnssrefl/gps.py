@@ -82,7 +82,7 @@ def myfavoriteobs():
     returns list of SNR obs for gfzrnx. that is all
     """
     # not even sure why i have C here for beidou
-    gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
+    gobblygook = 'G:S1C,S2X,S2L,S2S,S2X,S5I,S5Q+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
 
     return gobblygook
 
@@ -184,118 +184,6 @@ def define_filename_prevday(station,year,doy,snr):
     #print('snr filename for the previous day is ', fname) 
     return fname, fname2
 
-def read_inputs(station,**kwargs):
-    """
-    given station name, read LSP parameters for strip_snrfile.py
-    author: Kristine M Larson
-    19sep22 change name of longitude variable, add error messages
-    20may20 add peak to noise as an returned variable
-
-    leaving this for now - but it is no longer used.  
-
-    """
-#   directory name is currently defined using REFL_CODE environment variable
-    peak2noise = 0 # assume it is not set here but in the main code,
-    # which is how it used to be
-    xdir = os.environ['REFL_CODE']
-    # this is the old code before I made json inputs
-    fname = xdir + '/input/' + station
-    print('default inputs should be in this file: ', fname)
-#   default location values - not used now
-    lat = 0; lon = 0; h = 0;
-#   counter variables
-    k = 0
-    lc = 0
-#   elevation angle list, degrees
-    elang = []
-#   azimuth angle list, degrees
-    azval = []
-    freqs = [] ; reqAmp = []
-#   this limits the reflector height values you compute LSP for
-    Hlimits = []
-#   default polyfit, elevation angle limits for DC removal
-    polyFit = 3; pele = [5, 30]
-#   desired reflector height precision, in meters
-    desiredP = 0.01
-    ediff = 2
-    noiseRegion = [0.25, 6]
-    default_extension = ''
-    extension = kwargs.get('extension',default_extension)
-    if os.path.exists(fname + '.' + extension):
-        fname = fname + '.' + extension
-        print('extension input file found: ', fname)
-    else:
-        print('use the original input file')
-                
-    try:
-        f = open(fname, 'r')
-#       read all the lines
-        l=f.readlines()
-#       figure out what is on each
-        for line in l:
-#           print(line)
-            if line[0] == '#':
-                lc = lc + 1
-            else:
-                k=k+1
-                nfo=line.split()
-                if k==1:
-# read in the latitude, longitude, and height. currently this information is not used
-                    lat = float(nfo[0])
-                    lon = float(nfo[1])
-                    h = float(nfo[2])
-                    print("latitude/longitude/height:", lat,lon,h)
-# read in the elevation angle ranges
-                if k==2:
-                    elang.append(float(nfo[0]))
-                    elang.append(float(nfo[1]))
-                    print('elevation angle limits', elang[0], elang[1])
-                    # these are elevation angle limits for polyfit
-                    if (len(nfo)==4):
-                        pele = [float(nfo[2]), float(nfo[3]) ]
-# read in the azimuth ranges
-                if k==3:
-                    naz = len(nfo)
-                    for j in range(naz):
-                        azval.append(float(nfo[j]))
-# read in the frequencies and the required spectral amplitudes
-                if k==4:
-                    nnp = int(len(nfo)/2)
-                    for j in range(nnp):
-                        ni = 2*j; nj = 2*j+1
-                        freqs.append(int(nfo[ni]))
-                        reqAmp.append(float(nfo[nj]))
-                        print('Frequency ', int(nfo[ni]), ' Amplitude ', float(nfo[nj]))
-# read in reflector height restrictions etc
-                if k==5:
-                    np = len(nfo)
-                    polyFit = int(nfo[0])
-# this is desired precision of the LSP
-                    desiredP = float(nfo[1])
-                    H1 = Hlimits.append(float(nfo[2]))
-                    H2 = Hlimits.append(float(nfo[3]))
-                    ediff = float(nfo[4])
-                    print('Polynomial Fit ', polyFit, ' Precision: ', desiredP,' ediff ', ediff)
-                    if (np > 5):
-# range of reflector heights used for noise calculation
-                        ns1 = float(nfo[5])
-                        ns2 = float(nfo[6])
-                        noiseRegion = [ns1,ns2]
-                        # this means peak to noise is on the line too
-                        if np > 7:
-                            peak2noise = float(nfo[7])
-                        
-        f.close
-    except:
-        print('Some kind of problem reading the required input file: ' + fname)
-        print('Please use make_input_file.py if it does not exist. It will need at a minimum the ')
-        print('latitude, longitude, and height of the station.  This location does not need to be precise')
-        print('If you do not have your site location handy, just enter 0,0,0.')
-        print('The rest of the inputs can be defaults, but if ')
-        print('your site requires RH > 6 meters, please adjust using -h1 and -h2. Exiting now.')
-        sys.exit()
-
-    return lat,lon,h,elang, azval, freqs, reqAmp,polyFit, desiredP, Hlimits, ediff, pele,noiseRegion, peak2noise
 
 def satclock(week, epoch, prn, closest_ephem):
     """
@@ -2574,119 +2462,6 @@ def open_plot(plt_screen):
     if (plt_screen == 1):
         plt.figure()
 
-def quick_rinex_snr(year, doy, station, option, orbtype,receiverrate,dec_rate):
-    """
-    inputs: year and day of year (integers) and station name
-    option is for the snr creation
-    orbtype can be nav or sp3.  if the former, then gpsSNR is used.
-    if the later, then gnssSNR
-    this assumes you follow my definitions for where things go,
-    i.e. REFL_CODE and ORBITS
-    it currently checks Unavco, SOPAC, and SONEL. I should add CDDIS
-    author: kristine m. larson
-    19may20, added decimation
-    19sep12, I got tired of code crashing for files > 20 observables.  I am thus using teqc
-    20apr15, xz compression added
-    """
-    # define directory for the conversion executables
-    #exedir = os.environ['EXE']
-    # FIRST, check to see if the SNR file already exists
-#    snrname_full,snrname_compressed = define_filename(station,year,doy,option)
-    snrname_full, snrname_compressed, snre = define_and_xz_snr(station,year,doy,option)
-    if (snre == True):
-        print('snrfile already exists:', snrname_full)
-    else:
-        print('snr does not exist so pick up orbits and rinex')
-        d = doy2ymd(year,doy); 
-        month = d.month; day = d.day
-        # new function to do the whole orbit thing
-        foundit, f, orbdir, snrexe = get_orbits_setexe(year,month,day,orbtype) 
-        # if you have the orbit file, you can get the rinex file
-        if foundit:
-            # now you can look for a rinex file
-            rinexfile,rinexfiled = rinex_name(station, year, month, day)
-            print('rinexfile should be ', rinexfile)
-            if (os.path.isfile(rinexfile) == True):
-                okok = 1
-                #print('rinex file exists')
-            else:
-                if receiverrate == 'low':
-                    rinex_unavco(station, year, month, day) 
-                else:
-                    rinex_unavco_highrate(station, year, month, day) 
-                if os.path.isfile(rinexfile):
-                    okok = 1
-                    #print('you have the rinex file')
-                else:
-                    # only keep looking if you are seeking lowrate data
-                    if receiverrate == 'low':
-                        try:
-                            #print('try to get it from SOPAC')
-                            rinex_sopac(station, year, month, day)
-                        except:
-                            print('no success at SOPAC.')
-                    if not os.path.isfile(rinexfile) and receiverrate == 'low':
-                        try:
-                            #print('try SONEL')
-                            rinex_sonel(station, year, month, day)
-                        except:
-                            print('got nothing - I give up')
-
-    # check to see if you found the rinex file
-    # should check that the orbit really exists too
-            oexist = os.path.isfile(orbdir + '/' + f) == True
-            rexist = os.path.isfile(rinexfile) == True
-            # if rinex exists
-            if rexist:
-                exc = teqc_version()
-                # get rid of all the observables i do not need
-                if os.path.isfile(exc):
-                    print('teqc executable exists, so let us use it')
-                    foutname = 'tmp.' + rinexfile
-                    fout = open(foutname,'w')
-                # not sure this will work
-                    print('try to fix glonass bug using teqc input')
-                    subprocess.call([exc, '-O.obs','S1+S2+S5+S6+S7+S8', '-n_GLONASS', '27', rinexfile],stdout=fout)
-                    fout.close()
-                # store it in the original rinex filename
-                    subprocess.call(['rm','-f',rinexfile])
-                    subprocess.call(['mv','-f',foutname, rinexfile])
-            if (rexist and dec_rate > 0):
-                try:
-                    print('decimate using teqc ', dec_rate, ' seconds')
-                    print('testing subprocess while decimating')
-                    exc = teqc_version()
-                    # exc = exedir + '/teqc' 
-                    rinexout = rinexfile + '.tmp'; cdec = str(dec_rate)
-                    fout = open(rinexout,'w')
-                    subprocess.call([exc, '-O.dec', cdec, rinexfile],stdout=fout)
-                    # not sure this is needed
-                    fout.close()
-                    # try using subprocess instead of os.system
-                    status = subprocess.call(['mv','-f', rinexout, rinexfile])
-                except:
-                    print('decimation failed')
-            if (oexist and rexist):
-            #convert to SNR file
-                snrname = snr_name(station, year,month,day,option)
-                orbfile = orbdir + '/' + f
-                try:
-                    subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
-                    status = subprocess.call(['rm','-f', rinexfile ])
-                except:
-                    print('no success making SNR file')
-                if os.path.isfile(snrname): 
-#                make sure it exists and is non-zero size before moving it
-                    if (os.stat(snrname).st_size == 0):
-                        print('you created a zero file size which could mean a lot of things')
-                        print('bad exe, bad snr option, do not really have the orbit file')
-                        status = subprocess.call(['rm','-f', snrname ])
-                    else:
-                        print('a SNR file was created and it is non-zero in length')
-                        print(snrname_full)
-                        store_snrfile(snrname,year,station) 
-            else:
-                print('rinex file or orbit file does not exist, so there is nothing to convert')
 
 def store_orbitfile(filename,year,orbtype):
     """
@@ -3542,51 +3317,6 @@ def back2thefuture(iyear, idoy):
 
     return badDay
 
-def rinex_ga_lowrate(station,year,month,day):
-    """
-    pick up lowrate data from Geoscience Australia
-    only Rinex 2.11 for now
-    kristine larson
-    20jul10: change from year doy to year month day, because that is what the others are
-    20sep02: change ftp site and Z to gz (per IGS mail from Ryan Ruddick)
-    20sep02: allow year, doy input by setting day to zero (send doy in month slot)
-    """
-    fexists = False
-    crnxpath = hatanaka_version()
-#    print('trying geoscience australia')
-
-
-    if day == 0:
-        doy=month
-        d = doy2ymd(year,doy);
-        month = d.month; day = d.day
-    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    csrate = '30'
-    r3 = station.upper() +   '_R_' + cyyyy + cdoy + '0000_01D_' + csrate + 'S_MO' + '.crx.gz'
-    # changed september 2, 2020
-    #print(r3)
-    #ftpg = 'ftp://ftp.ga.gov.au/geodesy-outgoing/gnss/data/daily/' + cyyyy + '/' + cyy + cdoy  + '/'
-    #dnameZ = station + cdoy + '0.' + cyy + 'd.Z' 
-    ftpg = 'ftp://ftp.data.gnss.ga.gov.au/daily/' + cyyyy + '/' + cdoy  + '/'
-    dnameZ = station + cdoy + '0.' + cyy + 'd.gz' 
-    dname = station + cdoy + '0.' + cyy + 'd'
-    rname = station + cdoy + '0.' + cyy + 'o'
-    url = ftpg + dnameZ
-    print(url)
-    try:
-        wget.download(url,dnameZ)
-        if os.path.isfile(dnameZ):
-            status = subprocess.call(['gunzip', dnameZ])
-            status = subprocess.call([crnxpath, dname])
-            status = subprocess.call(['rm', '-f', dname])
-    except:
-        print('download from GA did not work')
-
-    if os.path.isfile(rname):
-        print('file found')
-        fexists = True
-
-    return fexists
 
 def rinex_nrcan_highrate(station, year, month, day):
     """
@@ -3906,94 +3636,6 @@ def warn_and_exit(snrexe,fortran):
             print('Install it or use -fortran False. Exiting')
             sys.exit()
 
-def quick_rinex_snrC(year, doy, station, option, orbtype,receiverrate,dec_rate,archive):
-    """
-    inputs: year and day of year (integers) and station name
-    option is for the snr creation ??? integer or character?
-    orbtype can be nav or sp3.  if the former, then gpsSNR is used.
-    if the later, then gnssSNR
-    what are receiverrate and dec_rate defaults?
-    this assumes you follow my definitions for where things go,
-    i.e. REFL_CODE and ORBITS
-    it currently checks Unavco, SOPAC, and SONEL. I should add CDDIS
-    author: kristine m. larson
-    19may20, added decimation
-    19sep12, I got tired of code crashing for files > 20 observables.  I am thus using teqc
-    20apr15, xz compression added but also try to streamline it.
-    20jul10, added arvchive setting. default is 'all'
-
-    """
-    # define directory for the conversion executables
-    print('receiver rate:',receiverrate)
-    print('decimation: ', dec_rate)
-    print('archive: ', archive)
-    exedir = os.environ['EXE']
-    snrname_full, snrname_compressed, snre = define_and_xz_snr(station,year,doy,option)
-    if (snre == True):
-        print('snrfile already exists:', snrname_full)
-    else:
-        print('the snrfile does not exist ', snrname_full)
-        d = doy2ymd(year,doy); 
-        month = d.month; day = d.day
-        # new function to do the whole orbit thing
-        print(year,month,day,orbtype)
-        foundit, f, orbdir, snrexe = get_orbits_setexe(year,month,day,orbtype) 
-        # if you have the orbit file, you can get the rinex file
-        if foundit:
-            # now you can look for a rinex file
-            rinexfile,rinexfiled = rinex_name(station, year, month, day)
-            # This goes to find the rinex file. I am changing it to allow 
-            # an archive preference 
-             
-            go_get_rinex_flex(station,year,month,day,receiverrate,archive)
-# define booleans
-            oexist = os.path.isfile(orbdir + '/' + f) == True
-            rexist = os.path.isfile(rinexfile) == True
-            exc = exedir + '/teqc' 
-            texist = os.path.isfile(exc) == True
-            if rexist:
-                # and teqc executable exists, then 
-                # get rid of all the observables i do not need
-                if texist:
-                    print('teqc executable exists, so let us use it')
-                    foutname = 'tmp.' + rinexfile
-                    fout = open(foutname,'w')
-                    subprocess.call([exc, '-O.obs','S1+S2+S5+S6+S7+S8', '-n_GLONASS', '27', rinexfile],stdout=fout)
-                    fout.close()
-                # store it in the original rinex filename
-                    subprocess.call(['rm','-f',rinexfile])
-                    subprocess.call(['mv','-f',foutname, rinexfile])
-                # decimate this new rinex file
-                    if (rexist and dec_rate > 0): 
-                        print('decimate using teqc ', dec_rate, ' seconds')
-                        rinexout = rinexfile + '.tmp'; cdec = str(dec_rate)
-                        fout = open(rinexout,'w')
-                        subprocess.call([exc, '-O.dec', cdec, rinexfile],stdout=fout)
-                        fout.close() # needed?
-                        status = subprocess.call(['mv','-f', rinexout, rinexfile])
-            if (oexist and rexist):
-            #convert to SNR file
-                snrname = snr_name(station, year,month,day,option)
-                orbfile = orbdir + '/' + f
-                try:
-                    subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
-                    status = subprocess.call(['rm','-f', rinexfile ])
-                    print('xz compress the orbit files here')
-                    status = subprocess.call(['xz', orbfile])
-                except:
-                    print('no success making SNR file')
-                if os.path.isfile(snrname): 
-#                make sure it exists and is non-zero size before moving it
-                    if (os.stat(snrname).st_size == 0):
-                        print('you created a zero file size which could mean a lot of things')
-                        print('bad exe, bad snr option, do not really have the orbit file')
-                        status = subprocess.call(['rm','-f', snrname ])
-                    else:
-                        print('a SNR file was created and it is non-zero in length')
-                        print(snrname_full)
-                        store_snrfile(snrname,year,station) 
-            else:
-                print('Either the rinex file or orbit file does not exist, so there is nothing to convert')
 
 def go_get_rinex(station,year,month,day,receiverrate):
     """
@@ -5292,4 +4934,66 @@ def rinex3_nav(year,month,day):
         name = bname
     return name, fdir, foundit
 
+
+def rinex_ga_highrate_rinex3(station9ch, year,doy,stream ):
+    """
+    author: kristine larson
+    inputs: station name, year, month, day
+    picks up a higrate RINEX file from Geoscience Australia
+    you can input day =0 and it will assume month is day of year
+    not sure if it merges them ...
+    2020 September 2 - moved to gz and new ftp site
+    ??? does not appear to have Rinex 2 files anymore ???
+    ??? goes they switched in 2020 .... ???
+
+    Remote working directory: /rinex/highrate/2021/002
+
+ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_01S_MO.crx.gz"
+
+    """
+    crnxpath = hatanaka_version()
+    gexe = gfz_version()
+    if not os.path.isfile(crnxpath):
+        print('No CRX2RNX, no files for you')
+        return
+    if not os.path.isfile(gexe):
+        print('No gfzrnx, no files for you')
+        return
+    stationUp = station9ch.upper()
+    streamID = '_' + stream + '_'
+    # if doy is input
+    cyyyy = str(year)
+    cdoy = '{:03d}'.format(doy)
+    rinex2name = station9ch[0:4].lower() + cdoy + '0.' + cyyyy[2:4] + 'o'
+    print(rinex2name)
+    gobbleygook = myfavoriteobs()
+    gobblygook = 'G:S1C,S2X,S2L,S2S,S5'
+
+
+    gns = 'ftp://ftp.data.gnss.ga.gov.au/highrate/' + cyyyy + '/' + cdoy + '/'
+    print('WARNING: Downloading high-rate GPS data takes a long time.')
+    fileF = 0
+    for h in range(0,1):
+        # subdirectory
+        cHH = '{:02d}'.format(h)
+        print('Hour: ', cHH)
+        for cMM in ['00', '15', '30', '45']:
+            dname = stationUp + streamID + cyyyy + cdoy + cHH + cMM + '_15M_01S_MO.crx.gz'
+            dname1 = dname[:-3]
+            #dname2 = dname1.replace('crx','rnx')
+            url = gns + cHH + '/' + dname
+            print(url)
+            try:
+                wget.download(url,dname)
+                subprocess.call(['gunzip',dname])
+                subprocess.call([crnxpath, dname1])
+                # delete the crx file
+                subprocess.call(['rm',dname1])
+                fileF = fileF + 1
+            except:
+                okok = 1
+    searchP = stationUp[0:4] + '*MO.rnx'
+    print(searchP)
+    if (fileF > 0): 
+        subprocess.call([gexe,'-finp', 'YULA*MO.rnx', '-fout', rinex2name, '-vo','2','-ot', gobbleygook, '-f'])
 
