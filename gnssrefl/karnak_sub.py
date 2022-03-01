@@ -179,7 +179,6 @@ def universal_rinex2(station, year, doy, archive):
     inputs are 4 char station, yar, doy and archiv nam 
     """
     # define the file name
-    print('Searching the ', archive, ' archive for ', station)
 
     foundit = False; dir1 = ''; file_name = ''
 
@@ -187,6 +186,8 @@ def universal_rinex2(station, year, doy, archive):
     if os.path.exists(oname):
         print('RINEX o File is already on disk')
         return oname, True 
+
+    print('Searching the ', archive, ' archive for ', station)
 
     cydoy = cyyyy + '/' + cdoy + '/'
     cyy = cyyyy[2:4]

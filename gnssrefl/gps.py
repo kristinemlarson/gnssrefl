@@ -3318,86 +3318,6 @@ def back2thefuture(iyear, idoy):
     return badDay
 
 
-def rinex_nrcan_highrate(station, year, month, day):
-    """
-    author: kristine larson
-    inputs: station name, year, month, day
-    picks up a higrate RINEX file from NRCAN
-    you can input day =0 and it will assume month is day of year
-    not sure if it merges them ...
-    2020 September 2 - moved to gz and new ftp site
-    """
-    crnxpath = hatanaka_version()
-    teqcpath = teqc_version()
-    alpha='abcdefghijklmnopqrstuvwxyz'
-    # if doy is input
-    if day == 0:
-        doy=month
-        d = doy2ymd(year,doy);
-        month = d.month; day = d.day
-    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    # NRCAN moving to new server names,
-    #  cacsa.nrcan.gc.ca and cacsb.nrcan.gc.ca
-    #gns = 'ftp://rtopsdata1.geod.nrcan.gc.ca/gps/data/hrdata/' +cyy + cdoy + '/' + cyy + 'd/'
-    gns = 'ftp://cacsa.nrcan.gc.ca/gps/data/hrdata/' +cyy + cdoy + '/' + cyy + 'd/'
-
-    # no point downloading data if the teqc code is not there
-    if not os.path.isfile(teqcpath):
-        print('FATAL WARNING: You need to install teqc to use gnssrefl with highrate RINEX data from NRCAN.')
-        return
-
-
-    foundFile = 0
-    print('WARNING: downloading highrate RINEX data is a slow process')
-    for h in range(0,24):
-        # subdirectory
-        ch = '{:02d}'.format(h)
-        print('\n Hour: ', ch)
-        for e in ['00', '15', '30', '45']:
-            dname = station + cdoy + alpha[h] + e + '.' + cyy + 'd.Z'
-            dname1 = station + cdoy + alpha[h] + e + '.' + cyy + 'd'
-            dname2 = station + cdoy + alpha[h] + e + '.' + cyy + 'o'
-            url = gns +  ch + '/' + dname
-            print(url)
-            try:
-                wget.download(url,dname)
-                subprocess.call(['uncompress',dname])
-                subprocess.call([crnxpath, dname1])
-                subprocess.call(['rm',dname1])
-                foundFile = foundFile + 1
-            except:
-                okok = 1
-                #print('download failed for some reason')
-
-    print('found ', foundFile ,' files')
-#direc = '.'
-#all_files = os.listdir(direc)
-#for f in all_files:
-#    if (f[0:7] == station + cdoy):
-#        print('found one', f)
-
-    if os.path.isfile(teqcpath) and (foundFile > 0):
-        foutname = 'tmp.' + station + cdoy
-        rinexname = station + cdoy + '0.' + cyy + 'o'
-        print('Attempt to merge the 15 minute files and move to ', rinexname)
-        mergecommand = [teqcpath + ' +quiet ' + station + cdoy + '*o']
-        fout = open(foutname,'w')
-        subprocess.call(mergecommand,stdout=fout,shell=True)
-        fout.close()
-        cm = 'rm ' + station + cdoy + '*o'
-        print(cm)
-        # if the output is made (though I guess this does not check to see if it is empty)
-        if os.path.isfile(foutname):
-            # try to remove the 15 minute files
-            subprocess.call(cm,shell=True)
-            subprocess.call(['mv',foutname,rinexname])
-    else:
-        if (foundFile == 0):
-            print('No data could be retrieved from NRCAN')
-        if not os.path.isfile(teqcpath):
-            print('You need to install teqc to merge NRCAN 15 minute RINEX files. ')
-
-
 def rinex_ga_highrate(station, year, month, day):
     """
     author: kristine larson
@@ -4997,3 +4917,95 @@ ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_0
     if (fileF > 0): 
         subprocess.call([gexe,'-finp', 'YULA*MO.rnx', '-fout', rinex2name, '-vo','2','-ot', gobbleygook, '-f'])
 
+
+def rinex_nrcan_highrate(station, year, month, day):
+    """
+    author: kristine larson
+    inputs: station name, year, month, day
+    picks up a higrate RINEX 2.11 file from NRCAN
+    you can input day =0 and it will assume month is day of year
+    not sure if it merges them ...
+    2020 September 2 - moved to gz and new ftp site
+    2022 february changed so it could use gfzrnx instead of teqc
+
+    if day is 0, assume month slot is doy
+    """
+    crnxpath = hatanaka_version()
+    teqcpath = teqc_version()
+    gfzrnxpath = gfz_version()
+    alpha='abcdefghijklmnopqrstuvwxyz'
+    # if doy is input
+    if day == 0:
+        doy=month
+        d = g.doy2ymd(year,doy);
+        month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    # NRCAN moving to new server names,
+    gns = 'ftp://cacsa.nrcan.gc.ca/gps/data/hrdata/' +cyy + cdoy + '/' + cyy + 'd/'
+
+    # no point downloading data if the teqc code is not there
+    if not os.path.isfile(teqcpath):
+        print('FATAL WARNING: You need to install teqc to use gnssrefl with highrate RINEX data from NRCAN.')
+        return
+
+    foundFile = 0
+    print('WARNING: downloading highrate RINEX data is a slow process')
+    for h in range(0,24):
+        # subdirectory
+        ch = '{:02d}'.format(h)
+        print('\n Hour: ', ch)
+        for e in ['00', '15', '30', '45']:
+            dname = station + cdoy + alpha[h] + e + '.' + cyy + 'd.Z'
+            dname1 = station + cdoy + alpha[h] + e + '.' + cyy + 'd'
+            dname2 = station + cdoy + alpha[h] + e + '.' + cyy + 'o'
+            url = gns +  ch + '/' + dname
+            if os.path.isfile(dname2):
+                print('file exists:',dname2)
+                foundFile = foundFile + 1
+            else:
+                print(url)
+                try:
+                    wget.download(url,dname)
+                    subprocess.call(['uncompress',dname])
+                    subprocess.call([crnxpath, dname1])
+                    subprocess.call(['rm',dname1])
+                    foundFile = foundFile + 1
+                except:
+                    okok = 1
+
+    print('found ', foundFile ,' individual files')
+    if (foundFile == 0):
+        print('Nothing to merge. Exiting.')
+        return
+    if (not os.path.isfile(gfzrnxpath)) and (not os.path.isfile(teqcpath)):
+        print('teqc and gfzrnx are missing. I have nothing to mrege these files with. Exiting')
+
+    searchpath = station + cdoy + '*.' + cyy + 'o'
+    print(searchpath)
+    if os.path.isfile(gfzrnxpath) and (foundFile > 0):
+        rinexname = station + cdoy + '0.' + cyy + 'o'
+        print('Attempt to merge the 15 minute files using gfzrnx and move to ', rinexname)
+        tmpname = station + cdoy + '0.' + cyy + 'o.tmp'
+        subprocess.call([gfzrnxpath,'-finp', searchpath, '-fout', tmpname, '-vo','2','-f'])
+        cm = 'rm ' + station + cdoy + '*o'
+        if os.path.isfile(tmpname):
+            # try to remove the 15 minute files
+            subprocess.call(cm,shell=True)
+            subprocess.call(['mv',tmpname,rinexname])
+        return
+
+    if (os.path.isfile(teqcpath)) and (foundFile > 0):
+        foutname = 'tmp.' + station + cdoy
+        rinexname = station + cdoy + '0.' + cyy + 'o'
+        print('Attempt to merge the 15 minute files with teqc and move to ', rinexname)
+
+        mergecommand = [teqcpath + ' +quiet ' + station + cdoy + '*o']
+        fout = open(foutname,'w')
+        subprocess.call(mergecommand,stdout=fout,shell=True)
+        fout.close()
+        cm = 'rm ' + station + cdoy + '*o'
+        if os.path.isfile(foutname):
+            # try to remove the 15 minute files
+            subprocess.call(cm,shell=True)
+            subprocess.call(['mv',foutname,rinexname])
+        return

@@ -1227,3 +1227,5 @@ Kristine M. Larson
 
 This documentation was updated on February 4, 2022.
 
+Local notes:
+f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f

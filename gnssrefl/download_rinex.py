@@ -27,7 +27,7 @@ def main():
     parser.add_argument("-rate", default='low', metavar='low',type=str, help="sample rate: low or high")
     parser.add_argument("-archive", default=None, metavar='cddis',help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan)", type=str)
     parser.add_argument("-version", default=None, metavar=2,type=int, help="rinex version (2 or 3)")
-    parser.add_argument("-strip", default=None, type=str, help="set to True to strip to only SNR observables")
+    parser.add_argument("-strip", default=None, type=str, help="set to True to strip to only SNR observables, teqc used")
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
     parser.add_argument("-stream", default=None, type=str, help="set to True to get stream defined filename. I know. I know. It is annoying.")
     parser.add_argument("-samplerate", default=None, type=str, help="Sample rate in seconds for RINEX3 only.")
