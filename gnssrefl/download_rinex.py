@@ -142,6 +142,11 @@ def main():
             print('You picked an archive that is not supported by my code. Exiting')
             sys.exit()
 
+    if (rate == 'high') and (version == 3):
+        print('I do not support high-rate RINEX 3 files as yet')
+        print('Not a fan of the 96 file thing ...')
+        sys.exit()
+
     for d in range(doy, doy_end+1):
         #print('working on year, day of year:', year, d)
         if version == 3:

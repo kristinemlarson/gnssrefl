@@ -57,6 +57,7 @@ def universal(station9ch, year, doy, archive,srate,stream):
     foundit = False
 
     file_name,cyyyy,cdoy = filename_plus(station9ch,year,doy,srate,stream)
+    cyy = cyyyy[2:4]
     dir1 = ''
     dir2 = ''
 
@@ -88,11 +89,14 @@ def universal(station9ch, year, doy, archive,srate,stream):
                     file_url = query_response_item['fileLocation']
                     file_name = urlparse(file_url).path.rsplit('/', 1)[1]
                     wget.download(file_url,file_name)
+        elif (archive == 'nrcan'):
+            dir1 = 'https://cacsa.nrcan.gc.ca/gps/data/gpsdata/' + cyy + cdoy  + '/' + cyy + 'd' + '/'
+            wget.download(dir1+file_name,file_name)
         elif (archive == 'unavco'):
             dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
         elif (archive == 'cddis'):
-            new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyyyy[2:4] + 'd/'
+            new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/'
             g.cddis_download(file_name,new_way_dir)
         else:
             return '', ''

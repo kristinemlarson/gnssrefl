@@ -3838,6 +3838,7 @@ def rinex3_rinex2(gzfilename,v2_filename):
     gunzip, de-hatanaka, then convert to RINEX 2.11
     returns whether the rinex2file exists
     this is GPS only
+    THIS NEEDS TO BE FIXED FOR multiGNSS
     """
     fexists = False
     gexe = gfz_version()
@@ -4037,7 +4038,7 @@ def cddis_download(filename, directory):
     fn = 'logs/' + station + '_cddis.txt'
     #cddislog = open(fn, 'w+') 
     filename = 'ftps://gdc.cddis.eosdis.nasa.gov' + directory + filename 
-    callit = ['wget', '--ftp-user','anonymous','--ftp-password', 'kristine@colorado.edu', '--no-check-certificate', filename]
+    callit = ['wget', '--ftp-user','anonymous','--ftp-password', 'kristine@colorado.edu', '-nv','--no-check-certificate', filename]
     subprocess.call(callit)
     # try this new way - I am trying to send the messages to the file
     #out = subprocess.run(callit, capture_output=True,text=True)

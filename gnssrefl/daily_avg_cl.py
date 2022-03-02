@@ -67,8 +67,9 @@ def main():
     else:
         year1=int(args.year1)
 
+    # hmmm - was set to 2021!
     if args.year2 == None:
-        year2 = 2021
+        year2 = 2030
     else:
         year2=int(args.year2)
 
