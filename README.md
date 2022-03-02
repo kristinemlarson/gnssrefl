@@ -500,7 +500,7 @@ RINEX 3 to 2 to use RINEX 3 files in my code.*
 - ga
 
 The caveat is that UNAVCO is set to 15 sec because that is mostly what is there.
-If you don't know where your data are, you can try <code>-archive all<code>, 
+If you don't know where your data are, you can try <code>-archive all</code>, 
 which should try all archives in sequence. I believe the default archive is cddis.
 
 <code>rinex2snr onsa00swe 2020 298</code>
