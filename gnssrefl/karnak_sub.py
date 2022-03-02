@@ -11,6 +11,7 @@ import subprocess
 import wget
 from urllib.parse import urlparse
 import gnssrefl.gps as g
+import gnssrefl.cddis_highrate as ch
 
 def gogetit(dir1, filename, ext):
     """
@@ -347,6 +348,11 @@ def rinex2_highrate(station, year, doy,archive):
     if not os.path.isfile(rinexfile):
         if (archive == 'nrcan') or (archive == 'all'):
             g.rinex_nrcan_highrate(station, year, month, day)
+    # try new cddis for highrate rINex 2
+    if not os.path.isfile(rinexfile):
+        if (archive == 'cddis') or (archive == 'all'):
+            stream = 'R'
+            ch.cddis_highrate(station, year, month, day,stream)
     #if not os.path.isfile(rinexfile):
     #    if not os.path.isfile(rinexfile):
     #        if (archive == 'ga') or (archive == 'all'):
