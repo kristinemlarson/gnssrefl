@@ -8,6 +8,7 @@ kristine larson
 import argparse
 import gnssrefl.gps as g
 import gnssrefl.karnak_sub as k
+import gnssrefl.cddis_highrate as ch
 import gnssrefl.rinex2snr as r
 import os
 import subprocess
@@ -143,29 +144,35 @@ def main():
             sys.exit()
 
     if (rate == 'high') and (version == 3):
-        print('I do not support high-rate RINEX 3 files as yet')
-        print('Not a fan of the 96 file thing ...')
-        sys.exit()
+        if (archive == 'cddis'):
+            print('Highrate RINEX 3 from CDDIS is supported - but it is very slow')
+        else:
+            print('I only support high-rate RINEX 3 files from CDDIS')
+            print('Not a fan of the 96 file thing ...')
+            sys.exit()
 
     for d in range(doy, doy_end+1):
-        #print('working on year, day of year:', year, d)
+        # RINEX Version 3
         if version == 3:
             print(station,year,d,archive,srate,stream)
-            # version3(station,year,d,NS,archive,stream) old version
-            if archive == 'all':
-                file_name,foundit = k.universal_all(station, year, doy, srate,stream)
-                if (not foundit):
-                    file_name,foundit = k.universal_all(station, year, doy, srate,k.swapRS(stream))
+            if rate == 'high':
+                print('seek highrate')
+                ch.cddis_highrate(station, year, doy, 0,stream)
             else:
-                file_name,foundit = k.universal(station, year, doy, archive,srate,stream)
-                if (not foundit):
-                    file_name,foundit = k.universal(station, year, doy, archive,srate,k.swapRS(stream))
-            if foundit: 
-                print('\n SUCCESS 1: ', file_name)
-                translated, new_file_name = r.go_from_crxgz_to_rnx(file_name)
-                if translated:
-                    subprocess.call(['rm','-f',new_file_name.replace('rnx','crx')]) # delete crx file
-                    print('\n SUCCESS 2: ', new_file_name)
+                if archive == 'all':
+                    file_name,foundit = k.universal_all(station, year, doy, srate,stream)
+                    if (not foundit):
+                        file_name,foundit = k.universal_all(station, year, doy, srate,k.swapRS(stream))
+                else:
+                    file_name,foundit = k.universal(station, year, doy, archive,srate,stream)
+                    if (not foundit):
+                        file_name,foundit = k.universal(station, year, doy, archive,srate,k.swapRS(stream))
+                if foundit: 
+                    print('\n SUCCESS 1: ', file_name)
+                    translated, new_file_name = r.go_from_crxgz_to_rnx(file_name)
+                    if translated:
+                        subprocess.call(['rm','-f',new_file_name.replace('rnx','crx')]) # delete crx file
+                        print('\n SUCCESS 2: ', new_file_name)
         else: # RINEX VERSION 2
             # using new karnak code
             rinexfile,rinexfiled = g.rinex_name(station, year, d, 0)

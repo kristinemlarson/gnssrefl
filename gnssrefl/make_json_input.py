@@ -54,15 +54,19 @@ def main():
     Lat = args.lat
     Long = args.long
     Height = args.height
+    if (Lat + Long) == 0:
+        print('Going to assume that you want to use the UNR database.')
+        query_unr = True
 
     if args.xyz == 'True':
         xyz = [Lat, Long, Height]
         Lat,Long,Height = g.xyz2llhd(xyz)
 
     if args.query_unr == 'True':
-        # try to find the default coordinates 
-        #Lat, Long, Height = g.queryUNR(station)
-        # updated to new database
+        query_unr = True
+
+    if query_unr:
+        # try to find the coordinates  at UNR
         Lat, Long, Height = g.queryUNR_modern(station)
         if (Lat == 0):
             print('Tried to find coordinates in our UNR database. Not found so exiting')

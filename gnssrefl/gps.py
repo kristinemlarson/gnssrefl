@@ -12,6 +12,7 @@ import re
 import subprocess
 import sys
 import sqlite3
+import time
 
 import scipy.signal as spectral
 from scipy.interpolate import interp1d
@@ -2619,24 +2620,16 @@ def rinex_unavco_highrate(station, year, month, day):
         cyy = '{:02d}'.format(year-2020)
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    #doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
-    #unavco= 'ftp://data-out.unavco.org'
     unavco= 'https://data.unavco.org/archive/gnss/highrate/1-Hz/rinex/'
 
     filename1 = rinexfile + '.Z'
     filename2 = rinexfiled + '.Z'
-    # URL path for the o file and the d file
-    #url1 = unavco+ '/pub/highrate/1-Hz/rinex/' + cyyyy + '/' + cdoy + '/' + station + '/' + filename1
-    #url2 = unavco+ '/pub/highrate/1-Hz/rinex/' + cyyyy + '/' + cdoy + '/' + station + '/' + filename2
-    # new path names
     url1 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename1
     url2 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename2
-    print('looking here')
-    print(url1)
-    print(url2)
 
     # hatanaka executable has to exist
+    s1 = time.time()
     if os.path.isfile(crnxpath): 
         try:
             wget.download(url2,filename2)
@@ -2646,13 +2639,14 @@ def rinex_unavco_highrate(station, year, month, day):
         except:
             okok = 1
     if not os.path.isfile(rinexfile):
-        #print('did not find d file - will look for an o file')
+        print('Did not find Hatanaka. Try for obs file')
         try:
             wget.download(url1,filename1)
             subprocess.call(['uncompress',filename1])
         except:
             okok = 1
-            #print('failed to find either RINEX file at unavco')
+    s2 = time.time()
+    print('That took ', int(s2-s1), ' seconds.')
 
 
 def new_big_Disk_in_DC(station, year, month, day):
@@ -3685,6 +3679,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
     2021nov14 checks for gz files too
     will translate Hatanaka.  Maintains initial rinex3 file.
     does not store anything. Everything stays where it was 
+    2022mar06 made it quiet ... 
     """
     fexists = False
     gexe = gfz_version()
@@ -3709,7 +3704,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
     else:
         if os.path.isfile(r3_filename):
             try:
-                subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f'])
+                subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
                 if os.path.exists(r2_filename):
                     #print('look for the rinex 2.11 file here: ', r2_filename)
                     fexists = True
@@ -4872,6 +4867,7 @@ def rinex_ga_highrate_rinex3(station9ch, year,doy,stream ):
 ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_01S_MO.crx.gz"
 
     """
+    s1=time.time()
     crnxpath = hatanaka_version()
     gexe = gfz_version()
     if not os.path.isfile(crnxpath):
@@ -4892,9 +4888,9 @@ ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_0
 
 
     gns = 'ftp://ftp.data.gnss.ga.gov.au/highrate/' + cyyyy + '/' + cdoy + '/'
-    print('WARNING: Downloading high-rate GPS data takes a long time.')
+    print('WARNING: Have some coffee, downloading high-rate GPS data takes a long time.')
     fileF = 0
-    for h in range(0,1):
+    for h in range(0,24):
         # subdirectory
         cHH = '{:02d}'.format(h)
         print('Hour: ', cHH)
@@ -4913,11 +4909,14 @@ ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_0
                 fileF = fileF + 1
             except:
                 okok = 1
-    searchP = stationUp[0:4] + '*MO.rnx'
+    searchP = stationUp + streamID + cyyyy + cdoy + '*MO.rnx'
     print(searchP)
+    outfile = stationUp + '.tmp'
     if (fileF > 0): 
-        subprocess.call([gexe,'-finp', 'YULA*MO.rnx', '-fout', rinex2name, '-vo','2','-ot', gobbleygook, '-f'])
-
+        subprocess.call([gexe,'-finp', searchP, '-fout', outfile, '-vo','3','-f','-q'])
+        #subprocess.call([gexe,'-finp', searchP, '-fout', outfile, '-vo','3','-ot', gobbleygook, '-f','-q'])
+    s2 = time.time()
+    print('That took ', int(s2-s1), ' seconds')
 
 def rinex_nrcan_highrate(station, year, month, day):
     """
@@ -4951,6 +4950,7 @@ def rinex_nrcan_highrate(station, year, month, day):
 
     foundFile = 0
     print('WARNING: downloading highrate RINEX data is a slow process')
+    s1 = time.time()
     for h in range(0,24):
         # subdirectory
         ch = '{:02d}'.format(h)
@@ -4974,7 +4974,7 @@ def rinex_nrcan_highrate(station, year, month, day):
                 except:
                     okok = 1
 
-    print('found ', foundFile ,' individual files')
+    print('Found ', foundFile ,' individual files')
     if (foundFile == 0):
         print('Nothing to merge. Exiting.')
         return
@@ -4987,12 +4987,13 @@ def rinex_nrcan_highrate(station, year, month, day):
         rinexname = station + cdoy + '0.' + cyy + 'o'
         print('Attempt to merge the 15 minute files using gfzrnx and move to ', rinexname)
         tmpname = station + cdoy + '0.' + cyy + 'o.tmp'
-        subprocess.call([gfzrnxpath,'-finp', searchpath, '-fout', tmpname, '-vo','2','-f'])
+        subprocess.call([gfzrnxpath,'-finp', searchpath, '-fout', tmpname, '-vo','2','-f','-q'])
         cm = 'rm ' + station + cdoy + '*o'
         if os.path.isfile(tmpname):
             # try to remove the 15 minute files
             subprocess.call(cm,shell=True)
             subprocess.call(['mv',tmpname,rinexname])
+            s2 = time.time(); print('That took ', int(s2-s1), ' seconds.')
         return
 
     if (os.path.isfile(teqcpath)) and (foundFile > 0):
@@ -5009,4 +5010,19 @@ def rinex_nrcan_highrate(station, year, month, day):
             # try to remove the 15 minute files
             subprocess.call(cm,shell=True)
             subprocess.call(['mv',foutname,rinexname])
+            s2 = time.time(); print('That took ', int(s2-s1), ' seconds.')
         return
+
+
+def translate_dates(year,month,day):
+    """
+    """
+    if (day == 0):
+        doy=month
+        d = doy2ymd(year,doy);
+        month = d.month; 
+        day = d.day
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day); 
+    else:
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day); 
+

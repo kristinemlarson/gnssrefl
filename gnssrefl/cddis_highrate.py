@@ -3,6 +3,7 @@ import sys
 import wget
 import subprocess
 import os 
+import time
 
 def cddis_highrate(station, year, month, day,stream):
     """
@@ -15,6 +16,7 @@ def cddis_highrate(station, year, month, day,stream):
     ??? does not appear to have Rinex 2 files anymore ???
     ??? goes they switched in 2020 .... ???
     """
+    fexist  = False
     if len(station) == 4:
         version = 2
     else:
@@ -27,7 +29,7 @@ def cddis_highrate(station, year, month, day,stream):
         doy=month
         d = g.doy2ymd(year,doy);
         month = d.month; day = d.day
-    doy,cdoy,cyyyy,cyy = g.ymd2doy(year,month,day); cyy = cyyyy[2:4]
+    doy,cdoy,cyyyy,cyy = g.ymd2doy(year,month,day); 
 
     if not os.path.isfile(gfzpath):
         print('You need to install gfzrnx to use high-rate RINEX data in my code.')
@@ -37,7 +39,7 @@ def cddis_highrate(station, year, month, day,stream):
     gns = gns + cyyyy + '/'+ cdoy + '/' +cyy + 'd/'
     #YYYY/DDD/YYt/HH/mmmmDDDHMM.YYt.gz
 
-
+    s1=time.time()
     print('WARNING: Get yourself a cup of coffeee. Downloading 96 files takes a long time.')
     fileF = 0
     streamID  = '_R_'
@@ -48,7 +50,7 @@ def cddis_highrate(station, year, month, day,stream):
         for e in ['00', '15', '30', '45']:
             if version == 2:
                 oname = station + cdoy + alpha[h] + e + '.' + cyy + 'o'; 
-                file_name, crnx_name, file_name2, crnx_name2, exe1, exe2 = indecisiveArchives(station,year,doy,cyyyy,cyy,cdoy,alpha[h],e) 
+                file_name, crnx_name, file_name2, crnx_name2, exe1, exe2 = variableArchives(station,year,doy,cyyyy,cyy,cdoy,alpha[h],e) 
             else:
                 file_name = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.crx.gz'
                 crnx_name = file_name[:-3] 
@@ -97,8 +99,13 @@ def cddis_highrate(station, year, month, day,stream):
             subprocess.call(cm,shell=True)
             subprocess.call(['mv',tmpname,rinexname])
             print('File created ', rinexname)
+            fexist = True
 
-def indecisiveArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
+    s2=time.time()
+    print('That experience took ', int(s2-s1), ' seconds.')
+    return rinexname,  fexist
+
+def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
     """
     deal with the insanity at the CDDIS archives, where they change
     things alllllll the time.

@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 
+
 # progress bar for RINEX translation/orbits
 from progress.bar import Bar
 
@@ -17,6 +18,7 @@ from progress.bar import Bar
 import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
 import gnssrefl.karnak_sub as k
+import gnssrefl.cddis_highrate as ch
 
 # fortran codes for translating RINEX
 import gnssrefl.gpssnr as gpssnr
@@ -144,7 +146,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
-                        csrate = '{:02d}'.format(srate)
+                        if rate == 'high':
+                            csrate = '01' # high rate assumes 1-sec
+                        else:
+                            csrate = '{:02d}'.format(srate)
                         streamid = '_' + stream  + '_'
                         # this can be done in a function now ... 
                         r3 = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
@@ -166,31 +171,39 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 else:
                     print('Will seek the RINEX file externally')
                     if version == 3:
+                        rnx_filename = '' # just in  case?
                         print(station9ch, ' year:', year, ' doy:', doy, 'from: ', archive)
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
-                        if (archive == 'all'):
-                            file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream)
-                            if (not foundit): # try again
-                                file_name,foundit = k.universal_all(station9ch, year, doy, srate,k.swapRS(stream))
-                        else:
-                            file_name,foundit = k.universal(station9ch, year, doy, archive,srate,stream)
-                            if (not foundit): # try again
-                                file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
-                        if foundit: # version 3 found - now need to gzip, then hatanaka decompress
-                            translated, rnx_filename = go_from_crxgz_to_rnx(file_name)
-                            # now make rinex2
-                            if translated:
+                        if (rate == 'high'):
+                            print('This code only accesses 1-Hz Rinex 3 data at CDDIS')
+                            rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream)
+                            #print(rnx_filename, foundit)
+                            if foundit:
                                 print('The RINEX 3 file has been downloaded. Try to make ', r2)
                                 fexists = g.new_rinex3_rinex2(rnx_filename,r2)
-                            if fexists:
-                                print('RINEX version 2 has been created from version 3', year, doy)
-                                print('remove RINEX 3 files')
-                                subprocess.call(['rm', file_name[:-3]]) # crx
-                                subprocess.call(['rm', rnx_filename]) # rnx
-                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
                         else:
-                            print('RINEX 3 file was not found', year, doy)
+                            if (archive == 'all'):
+                                file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream)
+                                if (not foundit): # try again
+                                    file_name,foundit = k.universal_all(station9ch, year, doy, srate,k.swapRS(stream))
+                            else:
+                                file_name,foundit = k.universal(station9ch, year, doy, archive,srate,stream)
+                                if (not foundit): # try again
+                                    file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
+                            if foundit: # version 3 found - now need to gzip, then hatanaka decompress
+                                translated, rnx_filename = go_from_crxgz_to_rnx(file_name)
+                            # now make rinex2
+                                if translated:
+                                    print('The RINEX 3 file has been downloaded. Try to make ', r2)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2)
+                        # this means the rinex 2 version exists
+                        if fexists:
+                             print('RINEX 2 created from v3', year, doy, ' Now remove RINEX 3 files and convert')
+                             subprocess.call(['rm', '-f',rnx_filename]) # rnx
+                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
+                        else:
+                            print('Unsuccessful RINEX 3 retrieval/translation', year, doy)
                     else:
                         print(station, ' year:', year, ' doy:', doy, 'from: ', archive)
                         # this is rinex version 2 - finds rinex and converts it
@@ -237,7 +250,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
         foundit, f, orbdir, snrexe = g.get_orbits_setexe(year,month,day,orbtype,fortran) 
         # if you have the orbit file, you can get the rinex file. First lets define the expected names
         print('Orbit file: ', orbdir + '/' + f)
-        print(foundit)
         if foundit:
             # now you can look for a rinex file
             rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
