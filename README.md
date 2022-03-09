@@ -5,6 +5,14 @@
 
 ### gnssrefl
 
+I recently bought a new apple laptop - with the new chip. You need both gfzrnx and crxrnx 
+for gnssrefl to work. If you are using an existing docker, you should be fine. But if you want
+to do this from a python install, you will need to:
+
+- compile the crxrnx source code and store in $EXE as <code>crxrnx</code>.
+- download and install the executable provided by GFZ (you need to sign up as a non-profit user). It needs to be 
+stored in $EXE as <code>gfzrnx</code>.
+
 **Current github version: 1.1.2**
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)

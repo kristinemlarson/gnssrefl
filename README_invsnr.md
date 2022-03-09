@@ -11,7 +11,13 @@ This code uses the LSP results as a starting place - the quality control applied
 is entirely different than what was used in <code>gnssir</code>. Since the point of this code is to estimate smoothly
 varying sea level, I don't think we need to make the LSP portion of it a clone of <code>gnssir</code>. 
 
-Note: txt and csv output is now supported.
+Note: 
+
+- txt and csv output is now supported. 
+
+- You can specify the temporal sampling of the output.
+
+- a simple refraction correction (elevation angle bending) has been included
 
 ### Installation 
 
@@ -82,7 +88,8 @@ a cubic spline fit and then the spline fit estimation.
 I am currently printing out the smoothed results to a plain txt file every five minutes.
 You can modify that temporal setting or change to a csv format at the command line.
 
-Warning: No phase center or refraction corrections are currently applied to the reflector heights.
+Warning: No phase center corrections are currently applied to the reflector heights.
+Nor are changes from material properties addressed (water, snow, ice). 
 
 *Example for station AT01*
 
@@ -132,10 +139,8 @@ Warning: No phase center or refraction corrections are currently applied to the 
 
 ### Future Changes
 
-- We need to add a refraction correction.
-
-- Currently assumes you are using full 24 hour 
-SNR files.  This obviously is not very sensible if you have a large gap 
+- Currently assumes you are using full 24 hour SNR files.  This obviously is not very sensible 
+if you have a large gap 
 at the beginning or end of your analysis.  
 
 ### Further reading

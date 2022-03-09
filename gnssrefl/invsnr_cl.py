@@ -6,9 +6,11 @@ import os
 import sys
 
 # 22feb09 adding beidou
+# 22mar08 adding refraction
 
 # all the main functions used by the code are stored here
 import gnssrefl.spline_functions as spline_functions
+import gnssrefl.refraction as refr
 
 def main():
     parser = argparse.ArgumentParser()
@@ -33,6 +35,7 @@ def main():
     parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66)")
     parser.add_argument("-outfile_type", default=None, type=str, help="Output file type (txt or csv)")
     parser.add_argument("-delta_out", default=None, type=str, help="Output increment, in seconds (default is 300)")
+    parser.add_argument("-refraction", default=None, type=str, help="Set to True to turn on")
 
     args = parser.parse_args()
 # the required inputs
@@ -54,17 +57,8 @@ def main():
     xdir = os.environ['REFL_CODE']
     # location of the analysis inputs, if it exists
     jsondir  = xdir + '/input/'
-# removed this capability.  
-# file using the current directory location
-#    instructions =  station + '.inv.json'
-# file using the gnssrefl package directory
     instructions2 =  jsondir + station + '.inv.json'
 
-#    if os.path.isfile(instructions):
-#        print('using:', instructions)
-#        with open(instructions) as f:
-#            lsp = json.load(f)
-#    else:
     if os.path.isfile(instructions2):
         print('using:', instructions2)
         with open(instructions2) as f:
@@ -73,7 +67,10 @@ def main():
         print('Instruction file does not exist.', instructions2, ' Exiting.')
         sys.exit()
 
+# look into the refraction issue
+
 # save json inputs to variables
+# this is ridiculous - I should just send the dictionary!
     precision = lsp['precision']
     azilims = lsp['azilims']
     elvlims = lsp['elvlims']
@@ -179,8 +176,15 @@ def main():
     else:
         outfile_type = args.outfile_type
 
-    print(outfile_type, delta_out)
-    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending,outfile_type=outfile_type,delta_out=delta_out)
+    # trying to add refraction to an existing dictionary. this is how it is done in the main lsp code
+    lsp['refraction'] = False
+    if (args.refraction == None):
+        lsp['refraction'] = True 
+    else:
+        if args.refraction == 'True':
+            lsp['refraction'] = True 
+
+    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending,outfile_type=outfile_type,delta_out=delta_out,lsp=lsp)
 
 
 if __name__ == "__main__":

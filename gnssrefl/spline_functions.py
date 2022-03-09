@@ -1,6 +1,7 @@
 import numpy as np
 from astropy.time import Time
 from astropy.timeseries import LombScargle
+import datetime
 import matplotlib.pyplot as plt
 import os
 import pickle
@@ -9,13 +10,13 @@ from scipy.optimize import least_squares
 import scipy.signal as spectral
 
 from matplotlib.dates import (date2num, DateFormatter)
-import time
 import subprocess
 import sys
+import time
 
 # my local functions
 import gnssrefl.gps as g
-import datetime
+import gnssrefl.refraction as refr
 
 
 # all codes below written by David Purnell
@@ -251,6 +252,8 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     kl added l2c_only
     kl 2022feb10 trying to add beidou
     """
+
+
     # get a list for lateron
     if 'l2c_only' in kwargs:
         l2c_only = kwargs.get('l2c_only')
@@ -604,7 +607,18 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     tempres: if want to use different temporal resolution to input data (in seconds)
     satconsts: default use all given, otherwise specify from ['G', 'R', 'E'] (gps / glonass / galileo)
     :return invout: dictionary with outputs from inverse analysis
+
+    trying to add refraction
     """
+
+    imodel = 0 # no refraction
+    if 'lsp' in kwargs:
+        lsp = kwargs.get('lsp')
+        if lsp['refraction']:
+            imodel = 1 #
+        dmjd = 59580 # fake number
+        p,T,irefr = set_refraction_model(station, dmjd,lsp,imodel)
+        print('refraction parameters ', p,T,irefr)
 
     if 'rough_in' in kwargs:
         rough_in  = kwargs.get('rough_in')
@@ -652,6 +666,12 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     nr,nc = snrdata.shape
     print('Number of obs', nr, ' number of days', numdays)
+    if imodel == 1:
+        print('modifying elevation angles')
+        print('Elevation angle before ', snrdata[0,1])
+        correctedE = refr.corr_el_angles(snrdata[:,1], p,T)
+        snrdata[:,1] = correctedE
+    print('Elevation angle after', snrdata[0,1])
 
     invout = {}
     # starting point - which is taken from the first day 
@@ -778,7 +798,9 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             outfile_type = kwargs.get('outfile_type')
         #plotdt = 5 * 60
         plotdt = delta_out # make it so people can change it
-        tplot = np.linspace(gbase, gbase + numdays*86400, int(86400/plotdt + 1))
+        #tplot = np.linspace(gbase, gbase + numdays*86400, int(86400/plotdt + 1))
+        numvals = 1 + int(numdays*86400/delta_out)
+        tplot = np.linspace(gbase, gbase + numdays*86400, numvals)
         tplot_dn = gps2datenum(tplot)
         cubspl_f = interpolate.interp1d(knots, kval_spectral, kind='cubic')
         rh_spectral_plot = cubspl_f(tplot)
@@ -1335,4 +1357,24 @@ def save_lsp_results(datet,maxind,reflh_sub,sat,elvt,azit,pgram_sub,snrdt,pktn,i
 
     return temp_arr
 
+
+def set_refraction_model(station, dmjd,lsp,imodel):
+    """
+    imodel is 1 for simple refraction model
+    eventually will add other refraction models
+
+    """
+    xdir = os.environ['REFL_CODE']
+    p = 0; T = 0; irefr = 0
+    print(lsp['lat'], lsp['lon'])
+    if (imodel == 1):
+        irefr = 1
+        refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
+# time varying is set to no for now (it = 1)
+        it = 1
+        dlat = lsp['lat']*np.pi/180; dlong = lsp['lon']*np.pi/180; ht = lsp['ht']
+        p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
+        #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
+
+    return p,T,irefr
 
