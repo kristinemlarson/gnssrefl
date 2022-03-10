@@ -789,7 +789,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         s2 = time.time()
         print('Time spend in snrfit', round(s2-s1,2), ' seconds')
 
-    if doplot:
+    if True:
         delta_out = 300 # seconds
         if 'delta_out' in kwargs:
             delta_out = int(kwargs.get('delta_out'))
@@ -867,8 +867,9 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         ax.set_ylabel('RH meters')
         ax.invert_yaxis()
         plt.savefig('spline_out.png')
-        plt.show()
-        plt.close()
+        if doplot:
+            plt.show()
+            plt.close()
 
     if savefile:
         invfilestr = snrfile + '.inv'
