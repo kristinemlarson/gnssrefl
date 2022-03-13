@@ -5,7 +5,7 @@ import subprocess
 import os 
 import time
 
-def cddis_highrate(station, year, month, day,stream):
+def cddis_highrate(station, year, month, day,stream,dec_rate):
     """
     author: kristine larson
     inputs: station name, year, month, day
@@ -15,6 +15,7 @@ def cddis_highrate(station, year, month, day,stream):
     2020 September 2 - moved to gz and new ftp site
     ??? does not appear to have Rinex 2 files anymore ???
     ??? goes they switched in 2020 .... ???
+    added dec rate to make the code a tiny bit faster
     """
     fexist  = False
     if len(station) == 4:
@@ -90,9 +91,17 @@ def cddis_highrate(station, year, month, day,stream):
         rinexname = station.upper() + streamID + cyyyy + cdoy + '0000_01D_01S_MO.rnx'
         tmpname = rinexname + 'tmp'
 
+    s2=time.time()
+    print('That download experience took ', int(s2-s1), ' seconds.')
+    s1 = time.time()
     print('Attempt to merge the 15 minute files using gfzrnx and move to ', rinexname)
     if (fileF > 0): # files exist
-        subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-f','-q'])
+        if (dec_rate == 1):
+            subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-f','-q'])
+        else:
+            crate = str(dec_rate)
+            subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-sei','out','-smp',crate,'-f','-q'])
+
         cm = 'rm ' + searchpath 
         if os.path.isfile(tmpname): # clean up
             ok = 1
@@ -102,7 +111,7 @@ def cddis_highrate(station, year, month, day,stream):
             fexist = True
 
     s2=time.time()
-    print('That experience took ', int(s2-s1), ' seconds.')
+    print('That merging experience took ', int(s2-s1), ' seconds.')
     return rinexname,  fexist
 
 def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):

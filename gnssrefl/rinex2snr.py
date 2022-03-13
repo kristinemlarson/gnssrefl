@@ -177,7 +177,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         rinex2exists = False; rinex3name = '';
                         if (rate == 'high'):
                             print('This code only accesses 1-Hz Rinex 3 data at CDDIS')
-                            rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream)
+                            rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
                             #print(rnx_filename, foundit)
                             if foundit:
                                 print('The RINEX 3 file has been downloaded. Try to make ', r2)

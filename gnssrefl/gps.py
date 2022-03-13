@@ -4033,7 +4033,7 @@ def cddis_download(filename, directory):
     fn = 'logs/' + station + '_cddis.txt'
     #cddislog = open(fn, 'w+') 
     filename = 'ftps://gdc.cddis.eosdis.nasa.gov' + directory + filename 
-    callit = ['wget', '--ftp-user','anonymous','--ftp-password', 'kristine@colorado.edu', '-nv','--no-check-certificate', filename]
+    callit = ['wget', '--ftp-user','anonymous','--ftp-password', 'kristine@colorado.edu', '-q','-nv','--no-check-certificate', filename]
     subprocess.call(callit)
     # try this new way - I am trying to send the messages to the file
     #out = subprocess.run(callit, capture_output=True,text=True)

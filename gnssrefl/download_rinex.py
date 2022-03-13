@@ -156,8 +156,8 @@ def main():
         if version == 3:
             print(station,year,d,archive,srate,stream)
             if rate == 'high':
-                print('seek highrate')
-                ch.cddis_highrate(station, year, doy, 0,stream)
+                print('seek highrate data at CDDIS')
+                ch.cddis_highrate(station, year, doy, 0,stream,1)
             else:
                 if archive == 'all':
                     file_name,foundit = k.universal_all(station, year, doy, srate,stream)
