@@ -13,9 +13,9 @@ RUN cd /tmp && \
     && rm teqc*
 
 RUN cd /tmp && \
-    wget https://terras.gsi.go.jp/ja/crx2rnx/RNXCMP_4.0.8_Linux_x86_64bit.tar.gz \
-    && tar -xf RNXCMP_4.0.8_Linux_x86_64bit.tar.gz \
-    && cp RNXCMP_4.0.8_Linux_x86_64bit/bin/CRX2RNX /etc/gnssrefl/exe/ \
+    wget https://terras.gsi.go.jp/ja/crx2rnx/RNXCMP_4.1.0_Linux_x86_64bit.tar.gz \
+    && tar -xf RNXCMP_4.1.0_Linux_x86_64bit.tar.gz \
+    && cp RNXCMP_4.1.0_Linux_x86_64bit/bin/CRX2RNX /etc/gnssrefl/exe/ \
     && rm -rf RNXCMP*
 
 COPY vendor/gfzrnx_1.15-8044_lx64 /etc/gnssrefl/exe/gfzrnx
