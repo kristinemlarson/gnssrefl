@@ -10,13 +10,11 @@
 
 **Archive:**  [UNAVCO](http://www.unavco.org)
 
-
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/phnx)
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/PHNX.sta)
 
 [Webapp example using this site](https://gnss-reflections.org/api?example=phnx&ftype=txt)
-
 
 ### Experiment
 
@@ -116,4 +114,4 @@ in the average. You can vary these parameters to better see what is going on.
 A file with the reflector height results is created by <code>daily_avg</code> and that 
 is what you use to evaluate snow accumulation using GNSS-IR.
 
-
+A big thank you to Thomas Nylen for his efforts on installing and maintaining this site.
