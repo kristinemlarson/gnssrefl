@@ -171,6 +171,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 else:
                     print('Will seek the RINEX file externally')
                     if version == 3:
+                        fexists = False
                         rnx_filename = '' # just in  case?
                         print(station9ch, ' year:', year, ' doy:', doy, 'from: ', archive)
                         r2 = station + cdoy + '0.' + cyy + 'o'

@@ -65,7 +65,8 @@ def main():
     archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','all']
 
     archive_list_high = ['unavco','nrcan','ga']
-    archive_list_high = ['unavco','nrcan','cddis','all'] # removed GA, added Cddis for v2
+    # removed all
+    archive_list_high = ['unavco','nrcan','cddis'] # removed GA, added Cddis for v2
 
     archive_list_rinex3 = ['unavco','cddis','ga','bev','bkg','ign','epn','all']
 

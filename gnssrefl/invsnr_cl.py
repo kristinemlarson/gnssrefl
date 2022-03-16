@@ -34,6 +34,7 @@ def main():
     parser.add_argument("-risky", default=None, type=str, help="Risky taker related to gaps/knot spacing, False is default)")
     parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66)")
     parser.add_argument("-outfile_type", default=None, type=str, help="Output file type (txt or csv)")
+    parser.add_argument("-outfile_name", default=None, type=str, help="Output file name")
     parser.add_argument("-delta_out", default=None, type=str, help="Output increment, in seconds (default is 300)")
     parser.add_argument("-refraction", default=None, type=str, help="Set to True to turn on")
 
@@ -176,6 +177,11 @@ def main():
     else:
         outfile_type = args.outfile_type
 
+    if (args.outfile_name == None):
+        outfile_name = ''
+    else:
+        outfile_name = args.outfile_name
+
     # trying to add refraction to an existing dictionary. this is how it is done in the main lsp code
     lsp['refraction'] = False
     if (args.refraction == None):
@@ -184,7 +190,7 @@ def main():
         if args.refraction == 'True':
             lsp['refraction'] = True 
 
-    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending,outfile_type=outfile_type,delta_out=delta_out,lsp=lsp)
+    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending,outfile_type=outfile_type,delta_out=delta_out,lsp=lsp,outfile_name=outfile_name)
 
 
 if __name__ == "__main__":

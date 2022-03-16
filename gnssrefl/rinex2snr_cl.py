@@ -159,7 +159,8 @@ def main():
     archive_list_rinex3 = ['unavco','cddis','bev','bkg','ga','epn','all']
     archive_list = ['sopac', 'unavco','sonel','cddis','nz','ga','bkg','jeff','ngs','nrcan','special','bev','jp','all']
 
-    highrate_list = ['unavco','nrcan','cddis','all'] # cddis is only rinex 2 for now
+    # no longer allow all
+    highrate_list = ['unavco','nrcan','cddis'] # cddis is only rinex 2 for now
 
 
     if (NS == 9):

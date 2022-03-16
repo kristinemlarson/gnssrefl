@@ -796,6 +796,9 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         outfile_type= 'txt'
         if 'outfile_type' in kwargs:
             outfile_type = kwargs.get('outfile_type')
+        outfile_name= ''
+        if 'outfile_name' in kwargs:
+            outfile_name = kwargs.get('outfile_name')
         #plotdt = 5 * 60
         plotdt = delta_out # make it so people can change it
         #tplot = np.linspace(gbase, gbase + numdays*86400, int(86400/plotdt + 1))
@@ -823,7 +826,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
                 subprocess.call(['mkdir',xdir])
 
             # opens the file, writes a header
-            iout, usetxt = invsnr_header(xdir, outfile_type, station) 
+            iout, usetxt = invsnr_header(xdir, outfile_type, station, outfile_name) 
             
             #if outfile_type == 'txt':
             #    txt = True; ioutputfile= xdir + station + '_invsnr.txt'
@@ -880,27 +883,36 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         print('dumped a pickle')
     return invout
 
-def invsnr_header(xdir, outfile_type,station):
+def invsnr_header(xdir, outfile_type,station,outfile_name):
     """
     inputs: 
     directory for the output file
     type of output file (txt or csv)
     station name, 4 char
+    outfile_name if you don't want to use the default.  default is if you send ''
     returns:
     fileID
     usetxt - boolean for the code calling this function to use
     """
     if outfile_type == 'txt':
         usetxt = True; 
-        ioutputfile= xdir + station + '_invsnr.txt'
+        if (len(outfile_name) == 0):
+            ioutputfile= xdir + station + '_invsnr.txt'
+        else:
+            ioutputfile= xdir + outfile_name + '.txt'
+
         iout = open(ioutputfile, 'w+')
         commentl = '#'
     else:
         usetxt = False; 
-        ioutputfile= xdir + station + '_invsnr.csv'
+        if (len(outfile_name) == 0):
+            ioutputfile= xdir + station + '_invsnr.csv'
+        else:
+            ioutputfile= xdir + outfile_name + '.csv'
+
         iout = open(ioutputfile, 'w+')
         commentl = '%'
-    print('invsnr output written to: ', ioutputfile)
+    print('invsnr output will be written to: ', ioutputfile)
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     iout.write('{0:s} Results for {1:4s} calculated on {2:20s} \n'.format(commentl,  station, xxx ))
     iout.write('{0:s} gnssrefl, https://github.com/kristinemlarson \n'.format(commentl))

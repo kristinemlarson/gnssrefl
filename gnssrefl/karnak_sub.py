@@ -361,5 +361,11 @@ def rinex2_highrate(station, year, doy,archive):
 
     if os.path.isfile(rinexfile):
         foundit = True
+        tempfile = rinexfile + '.tmp'
+        gfzrnxpath = g.gfz_version()
+        # save yourself heartache down the way cause those doppler data are just clogging up the works
+        if os.path.isfile(gfzrnxpath):
+            subprocess.call([gfzrnxpath,'-finp', rinexfile, '-fout', tempfile, '-vo','2','-f', '-obs_types', 'S','-q'])
+            subprocess.call(['mv', '-f', tempfile, rinexfile])
 
     return rinexfile, foundit
