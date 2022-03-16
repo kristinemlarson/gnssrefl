@@ -334,9 +334,11 @@ def gsi_data(station,year,doy):
     g.rinex_jp(station, year, month, day)
 
 
-def rinex2_highrate(station, year, doy,archive):
+def rinex2_highrate(station, year, doy,archive,strip_snr):
     """
     kluge to download highrate data since i have revamped the rinex2 code
+    strip_snr is boolean as to whether you want to strip out the non-SNR data
+    it can be slow with highrate data. it requires gfzrnx
     """
     foundit = False
     d = g.doy2ymd(year,doy);
@@ -361,10 +363,11 @@ def rinex2_highrate(station, year, doy,archive):
 
     if os.path.isfile(rinexfile):
         foundit = True
-        tempfile = rinexfile + '.tmp'
         gfzrnxpath = g.gfz_version()
+        if os.path.isfile(gfzrnxpath) and strip_snr:
+            print('You chose the strip_snr option to reduce the number of observables')
+            tempfile = rinexfile + '.tmp'
         # save yourself heartache down the way cause those doppler data are just clogging up the works
-        if os.path.isfile(gfzrnxpath):
             subprocess.call([gfzrnxpath,'-finp', rinexfile, '-fout', tempfile, '-vo','2','-f', '-obs_types', 'S','-q'])
             subprocess.call(['mv', '-f', tempfile, rinexfile])
 

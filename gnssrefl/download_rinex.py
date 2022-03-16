@@ -32,6 +32,7 @@ def main():
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
     parser.add_argument("-stream", default=None, type=str, help="set to True to get stream defined filename. I know. I know. It is annoying.")
     parser.add_argument("-samplerate", default=None, type=str, help="Sample rate in seconds for RINEX3 only.")
+    parser.add_argument("-strip_snr", default=None, type=str, help="Uses gfzrnx to strip out non-SNR data/default is False")
 
     args = parser.parse_args()
 
@@ -74,6 +75,15 @@ def main():
         version = 2
     else:
         version = args.version
+
+    # this is only for high-rate rinex2 for now
+    if args.strip_snr == None:
+        strip_snr = False
+    else:
+        if args.strip_snr == 'True':
+            strip_snr = True
+        else:
+            strip_snr = False
 
     if args.doy_end == None:
         doy_end = doy
@@ -178,7 +188,7 @@ def main():
             # using new karnak code
             rinexfile,rinexfiled = g.rinex_name(station, year, d, 0)
             if rate == 'high':
-                rinexfile, foundit = k.rinex2_highrate(station, year, doy,archive)
+                rinexfile, foundit = k.rinex2_highrate(station, year, doy,archive,strip_snr)
             else:
                 if archive == 'all':
                     foundit = False

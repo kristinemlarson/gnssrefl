@@ -258,7 +258,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
             # an archive preference 
             if receiverrate == 'high':
                 #g.go_get_rinex_flex(station,year,month,day,receiverrate,archive)
-                file_name, foundit = k.rinex2_highrate(station, year, doy,archive)
+                strip_snr = False # for now - 
+                file_name, foundit = k.rinex2_highrate(station, year, doy,archive,strip_snr)
             else:
                 # added karnak librariies
                 if (archive == 'all'):
