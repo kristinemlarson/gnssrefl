@@ -97,21 +97,23 @@ This command will go from day 1 in 2019 to day 150 in the year 2021.
 
 <code>rinex2snr phnx 2020 1 -doy_end 150 -year_end 2021</code>
 
-Then you run the <code>gnssir</code>:
+Run the <code>gnssir</code>:
 
 <code>gnssir phnx 2020 1 -year_end 2021 -doy_end 150</code>
 
 It takes a couple seconds to run <code>gnssir</code> for one day of data - so you will have to wait 
-several minutes for two and a half years of data to run. At that point you want to compute a daily 
-averaged reflector height:
+five minutes or so for two and a half years of data to run. At that point you want to compute a daily 
+average reflector height:
 
-<code>daily_avg phnx 0.2 100 </code> will create a daily average refletor height using a 
-median filter of 0.2 meters to remove outliers .  The 100 input says you require 100 arcs to have confidence
+<code>daily_avg phnx 0.2 100 </code> will create a daily average reflector height using a 
+median filter of 0.2 meters to remove outliers.  The 100 input says you require 100 arcs to have confidence
 in the average. You can vary these parameters to better see what is going on.
 
-<img src=phnx_RH.png width=500>
+<P align=center>
+<img src=phnx_RH.png width=600>
+</P>
 
-A file with the reflector height results is created by <code>daily_avg</code> and that 
-is what you use to evaluate snow accumulation using GNSS-IR.
+A file with the reflector height results is created by <code>daily_avg</code>; that is what 
+you use to measure snow accumulation using GNSS-IR.
 
 A big thank you to Thomas Nylen for his efforts on installing and maintaining this site.
