@@ -89,7 +89,7 @@ going to increase it a bit to 3.2 and require a larger amplitude.
 
 <code>make_json_input phnx 0 0 0 -query_unr True -ampl 10 -peak2noise 3.2</code>
 
-I also removed by hand the region from 320-360 degrees in the final json file I used.
+I also removed by hand the azimuths from 320-360 degrees in the final json file I used.
 
 Next we need to make some snr files. I am going to do most of 2019 thru 2021, but if you prefer, you can set
 the -weekly option to True and that will speed things up (it makes one file per week).
