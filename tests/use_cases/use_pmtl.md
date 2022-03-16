@@ -4,7 +4,11 @@
 <img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500"/>
 </p>
 
-**Station Name:** 	pmtl
+To the best of our knowledge, we are now longer allowed access to the high-rate data streams
+needed to do reflectometry at this site. NRCAN has stated that they are working to allow access 
+to these data. If you would like to make further inquiries, please contact NRCAN.
+
+**Station Name:**  pmtl
 
 **Location:** Port de Montreal, Montreal, Canada
 
