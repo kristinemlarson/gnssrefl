@@ -52,24 +52,28 @@ Remember that each color is a different satellite arc.
 
 <img src="phnx_lsp_l1.png" width="600">
 
-The summary plot shows consistent reflector height retrievals:
+The summary plot shows consistent reflector height retrievals (top plot):
 
 
 <img src="phnx_ql_l1.png" width="600">
- 
-Pretty sweet. It looks like the azimuths are pretty good. There are some low amplitudes at 
-certain azimuths. *However*, these periodograms look a lot better than 
-we saw on the automated gnss-reflections website:
+
+Pretty sweet. It looks like all azimuths are pretty good. There are some low amplitudes and peak2noise ratios at 
+certain azimuths. Some of these are caused by the way we have split the tracks into strict 
+azimuths (0-90,90-180, and so on). *However*, these periodograms look a lot better than 
+we saw on the gnss-reflections webapp example:
 
 <img src="phnx_2019_200.png" width="600">
 
-I have circled in bright yellow in the periodograms that are noise at a little less than one meter reflector height.
-If our theory is correct that this was created by the other sensors set out by the Antarctic Precipitation System, 
+I have circled in bright yellow the parts of the periodograms that are noise. These 
+are primarily bunched at a little less than one meter reflector height.
+Our theory is that this was created by the other sensors set out by the Antarctic Precipitation System. 
 Let's run <code>quickLook</code> again a few weeks after they removed their equipment:
 
 <img src="phnx_2020_001.png" width="600">
 
-You can see that that particular noise source is now gone.
+You can see that that particular noise source is now gone. And the periodograms in general are more clearly
+showing a strong single peak. This is an indication that closely co-colocating all these 
+sensors negatively impacted the GPS reflections sensor. However, the dominant GPS reflections are still be tracked.
 
 ### Analyze the Data
 
