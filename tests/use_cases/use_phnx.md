@@ -22,12 +22,14 @@
 
 phnx was installed at the same time as a [dedicated snow measurement experiment](https://essd.copernicus.org/articles/13/5803/2021/) called
 the Antarctic Precipitation System. That experiment is now over and their instruments were removed in December 2019.
-We can see from this figure from their paper that the other instruments around (and above) the GPS antenna 
-would obstruct GPS reflections in some sense:  
+We can see from this figure 
+from [their paper](https://essd.copernicus.org/articles/13/5803/2021/) that the other instruments 
+around (and above) the GPS antenna would obstruct GPS reflections in some sense:  
 
 <img src=https://essd.copernicus.org/articles/13/5803/2021/essd-13-5803-2021-f02-web.png width="500">
 
-However, we will take this opportunity to see if we can see how the clutter impacts the GNSS-IR results. The paper says 
+However, we will take this as an opportunity to see if we can see how the 
+clutter impacts the GNSS-IR results. The paper says 
 all instruments were removed by 3 December 2019. 
 
 ### Take a Look at the Data
@@ -61,15 +63,13 @@ we saw on the automated gnss-reflections website:
 
 <img src="phnx_2019_200.png" width="600">
 
-I have circled in bright yellow some noise in the periodgrams that creates noise ~one meter reflector height.
+I have circled in bright yellow in the periodograms that are noise at ~one meter reflector height.
 If our theory is correct that this was created by the other sensors set out by the Antarctic Precipitation System, 
 Let's run <code>quickLook</code> again a few weeks after they removed their equipment:
-
 
 <img src="phnx_2020_001.png" width="600">
 
 You can see that that particular noise source is now gone.
-
 
 ### Analyze the Data
 
@@ -88,7 +88,7 @@ going to increase it a bit to 3.2 and require a larger amplitude.
 
 <code>make_json_input phnx 0 0 0 -query_unr True -ampl 10 -peak2noise 3.2</code>
 
-I am also going to remove by hand the region from 320-360 degrees.
+I also removed by hand the region from 320-360 degrees in the final json file I used.
 
 Next we need to make some snr files. I am going to do most of 2019 thru 2021, but if you prefer, you can set
 the -weekly option to True and that will speed things up (it makes one file per week).
@@ -100,8 +100,9 @@ Then you run the <code>gnssir</code>:
 
 <code>gnssir phnx 2020 1 -year_end 2021 -doy_end 150</code>
 
-It takes about a second to run gnssir for one day of data - so you will have to wait several minutes 
-for two and a half years of data to run. 
+It takes a couple seconds to run <code>gnssir</code> for one day of data - so you will have to wait 
+several minutes for two and a half years of data to run. At that point you want to compute a daily 
+averaged reflector height:
 
 <code>daily_avg phnx 0.2 100 </code> will create a daily average refletor height using a 
 median filter of 0.2 meters to remove outliers .  The 100 input says you require 100 arcs to have confidence
