@@ -66,7 +66,7 @@ we saw on the automated gnss-reflections website:
 
 <img src="phnx_2019_200.png" width="600">
 
-I have circled in bright yellow in the periodograms that are noise at ~one meter reflector height.
+I have circled in bright yellow in the periodograms that are noise at a little less than one meter reflector height.
 If our theory is correct that this was created by the other sensors set out by the Antarctic Precipitation System, 
 Let's run <code>quickLook</code> again a few weeks after they removed their equipment:
 
@@ -97,7 +97,7 @@ Next we need to make some snr files. I am going to do most of 2019 thru 2021, bu
 the -weekly option to True and that will speed things up (it makes one file per week).
 This command will go from day 1 in 2019 to day 150 in the year 2021.
 
-<code>rinex2snr phnx 2020 1 -doy_end 150 -year_end 2021
+<code>rinex2snr phnx 2020 1 -doy_end 150 -year_end 2021</code>
 
 Then you run the <code>gnssir</code>:
 
