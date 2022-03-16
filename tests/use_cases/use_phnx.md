@@ -15,7 +15,7 @@
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/PHNX.sta)
 
-[GNSS-IR reflections example](https://gnss-reflections.org/api?example=phnx&ftype=txt)
+[Webapp example using this site](https://gnss-reflections.org/api?example=phnx&ftype=txt)
 
 
 ### Experiment
@@ -26,13 +26,15 @@ We can see from this figure
 from [their paper](https://essd.copernicus.org/articles/13/5803/2021/) that the other instruments 
 around (and above) the GPS antenna would obstruct GPS reflections in some sense:  
 
+<P align=center>
 <img src=https://essd.copernicus.org/articles/13/5803/2021/essd-13-5803-2021-f02-web.png width="500">
+</P>
 
 However, we will take this as an opportunity to see if we can see how the 
-clutter impacts the GNSS-IR results. The paper says 
-all instruments were removed by 3 December 2019. 
+clutter impacts the GNSS-IR results. The paper says they removed 
+all their instruments by 3 December 2019. The GPS receiver continues to operate (as of March 15,2022). 
 
-### Take a Look at the Data
+### Let's Take a Look at the Data
 
 First make a SNR file.
 
@@ -107,5 +109,10 @@ averaged reflector height:
 <code>daily_avg phnx 0.2 100 </code> will create a daily average refletor height using a 
 median filter of 0.2 meters to remove outliers .  The 100 input says you require 100 arcs to have confidence
 in the average. You can vary these parameters to better see what is going on.
+
+<img src=phnx_RH.png width=500>
+
+A file with the reflector height results is created by <code>daily_avg</code> and that 
+is what you use to evaluate snow accumulation using GNSS-IR.
 
 
