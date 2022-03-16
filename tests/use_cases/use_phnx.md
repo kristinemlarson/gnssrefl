@@ -19,8 +19,7 @@
 ### Experiment
 
 phnx was installed at the same time as a [dedicated snow measurement experiment](https://essd.copernicus.org/articles/13/5803/2021/) called
-the Antarctic Precipitation System. That experiment is now over and their instruments were removed in December 2019.
-We can see from this figure 
+the Antarctic Precipitation System. We can see from this figure 
 from [their paper](https://essd.copernicus.org/articles/13/5803/2021/) that the other instruments 
 around (and above) the GPS antenna would obstruct GPS reflections in some sense:  
 
