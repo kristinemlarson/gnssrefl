@@ -569,18 +569,14 @@ Just put the RINEX files in the same directory where you are running the code, u
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
-If you invoke this flag, it currently only looks for Rinex2 data at the UNAVCO, CDDIS and NRCAN archives. 
+If you invoke this flag, you need to specify the archive.  Your choices are Rinex2 data from UNAVCO,
+CDDIS, or NRCAN OR Rinex3 data at CDDIS.
 <a href=https://www.ga.gov.au/>Geoscience Australia</a> has high-rate GNSS data - but they 
 are currently deleting modern GPS signals. This is a deal breaker for me. Until that is changed, I cannot 
-recommend you use high-rate GNSS data from Geoscience Australia for reflectometry and access to their archive 
-is not provided in this software.
+recommend you use high-rate GNSS data from Geoscience Australia for reflectometry. Access to high-rate data from 
+their archive is not provided in this software.
 
-In principle I can pretty easily allow Rinex 3 high-rate data for CDDIS.  However, CDDIS has announced they plan
-to change their archive structure for high-rate data again. These frequent changes make it difficult for us 
-to keep this code running. All we can do is try.
-
-For high-rate data, you should **never** use 
-the python translation option.
+For high-rate data, you should **never** use the python translation option.
 
 **Output SNR file format**
 
