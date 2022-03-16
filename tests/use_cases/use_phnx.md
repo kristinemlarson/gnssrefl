@@ -122,3 +122,6 @@ you use to measure snow accumulation using GNSS-IR!
 A big thank you to Thomas Nylen for his efforts on installing and maintaining this site.
 I believe NSF funded the installation of this GPS site (PLR 1543377 and PLR 1543325). The GPS data
 are completely open. Please contact UNAVCO if you have difficulty finding them.
+
+Kristine M. Larson
+March 16, 2022
