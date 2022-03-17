@@ -4,8 +4,10 @@
 <img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500"/>
 </p>
 
-To the best of our knowledge, no one is allowed access to the high-rate data streams
-needed to do reflectometry at this site. Please contact NRCAN for further information.
+To the best of our knowledge, access to the current high-rate data streams
+needed to do reflectometry at this site are not allowed. 
+Please contact NRCAN for further information.
+The data used in the test case described below *is* still available.
 
 **Station Name:**  pmtl
 
