@@ -54,7 +54,7 @@ def parse_arguments():
 def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, fr: int = None,
            ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None,
            azim1: int = 0, azim2: int = 360, nooverwrite: bool = True, extension: str = '',
-           compress: bool = False, screenstats: bool = True, delTmax: int = None,
+           compress: bool = False, screenstats: bool = False, delTmax: int = None,
            e1: float = None, e2: float = None, mmdd: bool = False):
     """
         This is the main driver for running GNSS Interferometric Reflectometry.
