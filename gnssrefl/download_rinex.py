@@ -7,7 +7,7 @@ kristine larson
 """
 import argparse
 import gnssrefl.gps as g
-import gnssrefl.karnak_sub as k
+import gnssrefl.karnak_libraries as k
 import gnssrefl.cddis_highrate as ch
 import gnssrefl.rinex2snr as r
 import os
