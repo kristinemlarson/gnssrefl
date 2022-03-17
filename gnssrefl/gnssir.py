@@ -58,7 +58,8 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
 
     #if (resultExist):
     #    print('Results already exist on disk')
-    if (lsp['overwriteResults'] == False) & (resultExist == True):
+    #if (lsp['overwriteResults'] == False) & (resultExist == True):
+    if (lsp['nooverwrite'] == True) & (resultExist == True):
         allGood = 0
         print('>>>>> The result file already exists for this day and you have selected the do not overwrite option')
         #sys.exit()

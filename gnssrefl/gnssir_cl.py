@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-year_end", default=None, type=int, help="year end")
     parser.add_argument("-azim1", default=None, type=int, help="lower limit azimuth")
     parser.add_argument("-azim2", default=None, type=int, help="upper limit azimuth")
-    parser.add_argument("-nooverwrite", default=None, type=str, help="True or False to overwrite")
+    parser.add_argument("-nooverwrite", default=None, type=str, help="default is True, i.e. do not overwrite")
     parser.add_argument("-extension", default=None, type=str,
                         help="extension for result file, useful for testing strategies")
     parser.add_argument("-compress", default=None, type=str, help="xz compress SNR files after use")
@@ -131,8 +131,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             default is 360.
 
         nooverwrite : boolean, optional
-            Use to overwrite files or not.
-            Default is True (overwrite files).
+            Use to overwrite lomb scargle result files or not.
+            Default is True (do not overwrite files).
 
         extension : string, optional
             extension for result file, useful for testing strategies.
@@ -202,10 +202,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         year_end = year_st
 
     # default will be to overwrite
-    if nooverwrite is None:
-        lsp['overwriteResults'] = True
-    else:
-        lsp['overwriteResults'] = False
+    #if nooverwrite is None:
+    lsp['nooverwrite'] = nooverwrite
+    #else:
+    #    lsp['overwriteResults'] = False
 
     if e1 is not None:
         lsp['e1'] = e1
