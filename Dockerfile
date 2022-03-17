@@ -12,13 +12,8 @@ RUN cd /tmp && \
     && unzip teqc_CentOSLx86_64d.zip -d /etc/gnssrefl/exe \
     && rm teqc*
 
-RUN cd /tmp && \
-    wget https://terras.gsi.go.jp/ja/crx2rnx/RNXCMP_4.0.8_Linux_x86_64bit.tar.gz \
-    && tar -xf RNXCMP_4.0.8_Linux_x86_64bit.tar.gz \
-    && cp RNXCMP_4.0.8_Linux_x86_64bit/bin/CRX2RNX /etc/gnssrefl/exe/ \
-    && rm -rf RNXCMP*
-
 COPY vendor/gfzrnx_1.15-8044_lx64 /etc/gnssrefl/exe/gfzrnx
+COPY vendor/CRX2RNX /etc/gnssrefl/exe/CRX2RNX
 
 ENV EXE=/etc/gnssrefl/exe
 ENV ORBITS=/etc/gnssrefl/orbits
