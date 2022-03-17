@@ -4,180 +4,241 @@
 
 
 import argparse
-import datetime
-import json
-import numpy as np
-import matplotlib.pyplot as plt
 import os
-import scipy.interpolate
-import scipy.signal
 import subprocess
 import sys
-import warnings
 import wget
 
 import gnssrefl.gnssir as guts
 import gnssrefl.gps as g
 
+from gnssrefl.utils import str2bool
 
 
-def main():
- 
-#
-# user inputs the observation file information
+def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="doy", type=int)
 
-# optional inputs
-    parser.add_argument("-snr", default=66,help="snr file ending, default is 66", type=int)
-    parser.add_argument("-plt",  default=None, help="plt to screen (True or False)", type=str)
+    # optional inputs
+    parser.add_argument("-snr", default=None, help="snr file ending, default is 66", type=int)
+    parser.add_argument("-plt", default=None, help="plt to screen (True or False)", type=str)
     parser.add_argument("-fr", default=None, type=int, help="try -fr 1 for GPS L1 only, or -fr 101 for Glonass L1")
-    parser.add_argument("-ampl",  default=None, type=float, help="try -ampl 5-6 for minimum spectral amplitude")
+    parser.add_argument("-ampl", default=None, type=float, help="try -ampl 5-6 for minimum spectral amplitude")
     parser.add_argument("-sat", default=None, type=int, help="allow individual satellite")
-    parser.add_argument("-doy_end",  default=None, type=int, help="doy end")
+    parser.add_argument("-doy_end", default=None, type=int, help="doy end")
     parser.add_argument("-year_end", default=None, type=int, help="year end")
     parser.add_argument("-azim1", default=None, type=int, help="lower limit azimuth")
     parser.add_argument("-azim2", default=None, type=int, help="upper limit azimuth")
-    parser.add_argument("-nooverwrite",  default=None, type=int, help="use any integer to not overwrite")
-    parser.add_argument("-extension", default=None, type=str, help="extension for result file, useful for testing strategies")
-    parser.add_argument("-compress",  default=None, type=str, help="xz compress SNR files after use")
-    parser.add_argument("-screenstats",  default=None, type=str, help="some stats printed to screen(default is False)")
+    parser.add_argument("-nooverwrite", default=None, type=str, help="True or False to overwrite")
+    parser.add_argument("-extension", default=None, type=str,
+                        help="extension for result file, useful for testing strategies")
+    parser.add_argument("-compress", default=None, type=str, help="xz compress SNR files after use")
+    parser.add_argument("-screenstats", default=None, type=str, help="some stats printed to screen(default is False)")
     parser.add_argument("-delTmax", default=None, type=int, help="Req satellite arc length (minutes)")
     parser.add_argument("-e1", default=None, type=str, help="override min elev angle")
     parser.add_argument("-e2", default=None, type=str, help="override max elev angle")
     parser.add_argument("-mmdd", default=None, type=str, help="boolean, add columns for month,day,hour,minute")
 
-    args = parser.parse_args()
+    args = parser.parse_args().__dict__
+
+    # convert all expected boolean inputs from strings to booleans
+    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd']
+    args = str2bool(args, boolean_args)
+
+    # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
+    return {key: value for key, value in args.items() if value is not None}
+
+
+def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, fr: int = None,
+           ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None,
+           azim1: int = 0, azim2: int = 360, nooverwrite: bool = True, extension: str = '',
+           compress: bool = False, screenstats: bool = True, delTmax: int = None,
+           e1: float = None, e2: float = None, mmdd: bool = False):
+    """
+        This is the main driver for running GNSS Interferometric Reflectometry.
+
+        parameters:
+        ___________
+        station : string
+            4 or 9 character ID of the station
+
+        year : integer
+            Year
+
+        doy : integer
+            Day of year
+
+        snr : integer, optional
+            SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
+            value options:
+                66 (default) : saves all data with elevation angles less than 30 degress
+                99 : saves all data with elevation angles between 5 and 30 degrees
+                88 : saves all data with elevation angles between 5 and 90 degrees
+                50 : saves all data with elevation angles less than 10 degrees
+
+        plt : boolean, optional
+            Send plots to screen or not.
+            Default is False.
+
+        fr : integer, optional
+            GNSS frequency.
+            value options:
+                1 (default) : GPS L1
+                2 : GPS L2
+                20 : GPS L2C
+                5 : GPS L5
+                101 : GLONASS L1
+                102 : GLONASS L2
+                201 : GALILEO E1
+                205 : GALILEO E5a
+                206 : GALILEO E6
+                207 : GALILEO E5b
+                208 : GALILEO E5
+                302 : BEIDOU B1
+                306 : BEIDOU B3
+                307 : BEIDOU B2
+
+        ampl : float, optional
+            minimum spectral peak amplitude.
+            default is None
+
+        sat : integer, optional
+            satellite number to only look at that single satellite.
+            default is None.
+
+        doy_end : int, optional
+            end day of year. This is to create a range from doy to doy_end of days.
+            If year_end parameter is used - then day_end will end in the day of the year_end.
+            Default is None. (meaning only a single day using the doy parameter)
+
+        year_end : int, optional
+            end year. This is to create a range from year to year_end to get the snr files for more than one year.
+            doy_end will be for year_end.
+            Default is None.
+
+        azim1 : integer, optional
+            lower limit azimuth.
+            If the azimuth angles are changed in the json (using 'azval' key) and not here, then the json overrides these.
+            If changed here, then it overrides what you requested in the json.
+            default is 0.
+
+        azim2 : integer, optional
+            upper limit azimuth.
+            If the azimuth angles are changed in the json (using 'azval' key) and not changed here, then the json overrides these.
+            If changed here, then it overrides what you requested in the json.
+            default is 360.
+
+        nooverwrite : boolean, optional
+            Use to overwrite files or not.
+            Default is True (overwrite files).
+
+        extension : string, optional
+            extension for result file, useful for testing strategies.
+            default is ''. (empty string)
+
+        compress : boolean, optional
+            xz compress SNR files after use.
+            default is False.
+
+        screenstats : boolean, optional
+            whether to print stats to the screen or not.
+            default is True.
+
+        delTmax : integer, optional
+            satellite arc length in minutes.
+            default is None.
+
+        e1 : float, optional
+            use to override the minimum elevation angle.
+            default is None.
+
+        e2 : float, optional
+            use to override the maximum elevation angle.
+            default is None.
+
+        mmdd : boolean, optional
+            adds columns in results for month, day, hour, and minute.
+            default is False.
+
+    """
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-#
-# rename the user inputs as variables
-#
-    station = args.station
-    year = int(args.year)
-    year_st = year
-    doy= int(args.doy)
-    # this is now optional
-    snr_type = args.snr
-    #snr_type = args.snrEnd
+    exitS = g.check_inputs(station, year, doy, snr)
 
-
-    if len(str(year)) != 4:
-        print('Year must have four characters: ', year)
+    if exitS:
         sys.exit()
-
-    if (doy > 366):
-        print('doy cannot be larger than 366: ', doy)
-        sys.exit()
-
-# allow people to have an extension to the output file name so they can run different analysis strategies
-# this is undocumented and only for Kristine at the moment
-    if args.extension == None:
-        extension = ''
-    else:
-        extension = args.extension
 
     lsp = guts.read_json_file(station, extension)
-    #print(lsp)
     # now check the overrides to the json instructions
-    #print('plt argument', args.plt)
-    if args.plt == 'True':
-        lsp['plt_screen'] = True
-    elif args.plt == 'False':
-        lsp['plt_screen'] = False
 
-    if (args.delTmax != None):
-        lsp['delTmax'] = args.delTmax
-        #print('Using user defined maximum satellite arc time (minutes) ', lsp['delTmax'])
+    # plt is False unless user changes
+    lsp['plt_screen'] = plt
 
-# though I would think not many people would do this ... 
-    if (args.compress != None):
-        if args.compress == 'True':
-            lsp['wantCompression'] = True
-        else:
-            lsp['wantCompression'] = False
+    if delTmax is not None:
+        lsp['delTmax'] = delTmax
+
+    # compress is False unless user changes
+    lsp['wantCompression'] = compress
+
+    # screenstats is True unless user changes
+    lsp['screenstats'] = screenstats
 
 
-    #print(lsp['screenstats'], 'screenstats from json')
-    # do you override them?
-    if args.screenstats == 'False':
-        #print('No statistics will come to the screen')
-        lsp['screenstats'] = False
-    if args.screenstats == 'True':
-        #print('Statistics will come to the screen')
-        lsp['screenstats'] = True
-
-# in case you want to analyze multiple days of data
-    if args.doy_end == None:
+    # in case you want to analyze multiple days of data
+    if doy_end is None:
         doy_end = doy
-    else:
-        doy_end = int(args.doy_end)
-        
 
-    add_mmddhhss = False
-    if args.mmdd == 'True':
-        add_mmddhhss = True
+    # mmdd is False unless user changes
+    add_mmddhhss = mmdd
 
 
-# in case you want to analyze multiple years of data
-    if args.year_end == None:
+    # in case you want to analyze only data within one year
+    year_st = year  # renaming for confusing variable naming when dealing with year calculations below
+    if year_end is None:
         year_end = year_st
-    else:
-        year_end = int(args.year_end)
 
-# default will be to overwrite
-    if args.nooverwrite == None:
+    # default will be to overwrite
+    if nooverwrite is None:
         lsp['overwriteResults'] = True
-        #print('LSP results will be overwritten')
     else:
         lsp['overwriteResults'] = False
-        #print('LSP results will not be overwritten')
 
-    if (args.e1 != None):
-        #print('Overriding minimum elevation angle: ',args.e1)
-        lsp['e1'] = float(args.e1)
-    if (args.e2 != None):
-        #print('Overriding maximum elevation angle: ',args.e2)
-        lsp['e2'] = float(args.e2)
+    if e1 is not None:
+        lsp['e1'] = e1
+    if e2 is not None:
+        lsp['e2'] = e2
 
-# number of azimuth regions 
-    naz = int(len(lsp['azval'])/2)
-# in case you want to look at a restricted azimuth range from the command line 
+    # in case you want to look at a restricted azimuth range from the command line
     setA = 0
-    if args.azim1 == None:
-        azim1 = 0
-    else:
-        setA = 1; azim1 = args.azim1
+    # if azim1 is not default (has been changed)
+    if azim1 != 0:
+        setA = 1
 
-    if args.azim2 == None:
-        azim2 = 360
-    else:
-        azim2 = args.azim2; setA = setA + 1
+    # if azim2 is not default (has been changed)
+    if azim2 != 360:
+        setA = setA + 1
 
-    if (setA == 2):
-        naz = 1; 
-        lsp['azval']  = [azim1,  azim2]
+    # TODO figure out the goal here
+    # this only sets the new azim values only if bother azim1 and azim2 changed?
+    if setA == 2:
+        lsp['azval'] = [azim1,  azim2]
 
-# this is for when you want to run the code with just a single frequency, i.e. input at the console
-# rather than using the input restrictions
-    if args.fr != None:
-        lsp['freqs'] = [args.fr]
-        #print('Overriding frequency choices')
-    if args.ampl != None:
-        #print('Overriding amplitude choices')
-        dumA = args.ampl
-        # this is not elegant - but allows people to set ampl on the command line 
+    # this is for when you want to run the code with just a single frequency, i.e. input at the console
+    # rather than using the input restrictions
+    if fr is not None:
+        lsp['freqs'] = [fr]
+    if ampl is not None:
+        # this is not elegant - but allows people to set ampl on the command line
         # but use the frequency list from their json ...  which i think has max of 12
         # but use 14 to be sure
-        lsp['reqAmp'] =  [dumA for i in range(14)]
+        lsp['reqAmp'] = [ampl for i in range(14)]
 
-    if args.sat != None:
-        #print('Overriding - only looking at a single satellite')
-        lsp['onesat'] = [args.sat]
+    if sat is not None:
+        lsp['onesat'] = [sat]
 
     lsp['mmdd'] = add_mmddhhss
 
@@ -191,16 +252,18 @@ def main():
         local_copy = 'gnssrefl/' + picklefile
         if os.path.isfile(local_copy):
             print('found local copy of refraction file')
-            subprocess.call(['cp','-f',local_copy, xdir + '/input/' ])
+            subprocess.call(['cp', '-f', local_copy, xdir + '/input/'])
         else:
             print('download and move refraction file')
             url='https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/gpt_1wA.pickle'
-            wget.download(url,picklefile)
-            subprocess.call(['mv','-f',picklefile, xdir + '/input/' ])
+            wget.download(url, picklefile)
+            subprocess.call(['mv', '-f', picklefile, xdir + '/input/'])
+
+    args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp}
 
     year_list = list(range(year_st, year_end+1))
     # changed to better describe year and doy start/end
-    #doy_list = list(range(doy, doy_end+1))
+
     for year in year_list:
         # edits made 2021Sep10 by Makan karegar
         if year != year_end:
@@ -214,13 +277,16 @@ def main():
         else:
             doy_list = list(range(1, doy_en+1))
 
+        args['year'] = year
         for doy in doy_list:
+            args['doy'] = doy
+            guts.gnssir_guts(**args)
 
-            # to make kelly happy :-)
-            #print('--------------------------------------------------')
-            #print('RESULTS gnssir for: ', station, year, doy)
-            #print('--------------------------------------------------')
-            guts.gnssir_guts(station,year,doy, snr_type, extension,lsp)
+
+def main():
+    args = parse_arguments()
+    gnssir(**args)
+
 
 if __name__ == "__main__":
     main()

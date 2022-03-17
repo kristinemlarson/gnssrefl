@@ -2,31 +2,21 @@
 # originally called prelim-tides - now subdaily_cl.py
 # kristine larson, modified may 2021
 import argparse
-import datetime
-import json
-import matplotlib.pyplot as Plt
 import numpy as np
 import os
 import sys
+import subprocess
 
-from datetime import date
 
 # my code
 import gnssrefl.gps as g
 import gnssrefl.subdaily as t
 
-
-import scipy.interpolate as interpolate
-from scipy.interpolate import interp1d
-import math
+from gnssrefl.utils import str2bool
 
 
-def main():
-#   make surer environment variables are set 
-    g.check_environ_variables()
-    xdir = os.environ['REFL_CODE'] 
-
-# must input start and end year
+def parse_arguments():
+    # must input start and end year
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", default=None, type=str, help="for now one year at a time")
@@ -47,87 +37,102 @@ def main():
     parser.add_argument("-azim2", default=None, type=str, help="new max azimuth")
     parser.add_argument("-peak2noise", default=None, type=str, help="new peak2noise constraint")
 
-    args = parser.parse_args()
-#   these are required
-    station = args.station
-    year = int(args.year)
+    args = parser.parse_args().__dict__
 
-    # default is plots comes to the screen
-    plt = True
-    if args.plt == 'False':
-        plt= False
+    # convert all expected boolean inputs from strings to booleans
+    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing']
+    args = str2bool(args, boolean_args)
+
+    # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
+    return {key: value for key, value in args.items() if value is not None}
+
+
+def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, plt: bool = True,
+             spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = False,
+             doy1: int = 1, doy2: int = 366, testing: bool = False, ampl: float = 0, azim1: int = 0,
+             azim2: int = 360, peak2noise: float = 0):
+    """
+        Parameters:
+            ___________
+            station : string
+                4 or 9 character ID of the station.
+            year : integer
+                Year
+            txtfile : string, optional
+                File name.
+                default is None - will set name for you.
+            splinefile: string, optional
+                Input filename for rhdot/spline fitting
+                default is None
+            csvfile: boolean, optional
+                Set to True if you prefer csv to plain txt.
+                default is False.
+            plt : boolean, optional
+                To print plots to screen or not.
+                default is False.
+            spline_outlier : integer, optional
+                Outlier criterion used in splinefit (meters)
+                default is 1.0
+            knots : integer, optional
+                Knots per day, spline fit only.
+                default is 8.
+            sigma : float, optional
+                Simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)
+                default is 2.5
+            extension : string, optional
+                Solution subdirectory.
+                default is empty string.
+            rhdot : boolean, optional
+                Set to True to turn on spline fitting for RHdot correction.
+                default is False.
+            doy1 : integer, optional
+                Initial day of year
+                default is 1.
+            doy2 : integer, optional
+                End day of year.
+                default is 366.
+            testing : boolean, optional
+                Set to True for testing mode.
+                default is False.
+            ampl : float, optional
+                New amplitude constraint
+                default is 0.
+            azim1: int, optional
+                New min azimuth
+                default is 0.
+            azim2: int, optional
+                New max azimuth
+                default is 360.
+            peak2noise: float, optional
+                New peak to noise constraint
+                default is 0.
+    """
+
+    # make surer environment variables are set
+    g.check_environ_variables()
+    xdir = os.environ['REFL_CODE']
 
     txtdir = xdir + '/Files'
     if not os.path.exists(txtdir):
-        subprocess.call(['mkdir',txtdir])
- 
-    if args.extension == None:
-        ext = ''
-    else:
-        ext = args.extension
-
-    # if not specified, use 2.5 sigma
-    if args.sigma == None:
-        sigma = 2.5 
-    else:
-        sigma = float(args.sigma)
-
-    # if not specified, use outlier criterion of 0.5 m
-    # this is JUST for the splinefit. changed variable in thte input to make that more clear
-    if args.spline_outlier == None:
-        outlier = 1.0 
-    else:
-        outlier = float(args.spline_outlier)
-
-# these constraints are added at the command line
-    azim1 = 0
-    if not (args.azim1 == None):
-        azim1 = int(args.azim1)
-
-    azim2 = 360 
-    if not (args.azim2 == None):
-        azim2 = int(args.azim2)
-
-    ampl = 0 
-    if not (args.ampl == None):
-        ampl = float(args.ampl)
-
-    peak2noise = 0
-    if not (args.peak2noise == None):
-        peak2noise = float(args.peak2noise)
-
-    usespline = False # though it is dangerous
-    if args.rhdot == 'True':
-        usespline = True
+        subprocess.call(['mkdir', txtdir])
 
 #   these are optional output options
     #create the subdaily file
-    if args.doy1 == None:
-        doy1 = 1
-    else:
-        doy1 = int(args.doy1)
-    if args.doy2 == None:
-        doy2 = 366
-    else:
-        doy2 = int(args.doy2)
-        # writejson not allowed as of yet.
     writecsv = False
-    if (args.csvfile == 'True'):
+    if csvfile:
         writecsv = True
-    if (args.splinefile == None):
-        txtfile = ''
-        if (args.txtfile == None):
+    if splinefile is None:
+        if txtfile == '':
             print('Will pick up and concatenate daily result files')
         else:
-            txtfile = args.txtfile 
-            print('Using ',txtfile)
+            print('Using ', txtfile)
         # if txtfile provided, you can use that as your starting dataset 
-        ntv,obstimes,fname,fname_new = t.readin_and_plot(station, year,doy1,doy2,plt,ext,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile)
+        ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, extension, sigma, writecsv,
+                                                            azim1, azim2, ampl, peak2noise, txtfile)
         haveObstimes = True
-        N,M = np.shape(ntv)
     else:
         haveObstimes = False
-        fname_new = args.splinefile
+        fname_new = splinefile
         if not os.path.isfile(fname_new):
             print('Input subdaily RH file you provided does not exist:', fname_new)
             sys.exit()
@@ -136,25 +141,29 @@ def main():
     # added spline input 2021 oct 27. It was not coded well enough for gaps etc.
     # only allow plaint text?  i think that is what is really going on here
     input2spline = fname_new; output4spline = fname_new + '.withrhdot'
-    if (args.knots== None):
-        knots = 8
-    else:
-        knots = int(args.knots)
-    if usespline:
-        if (args.testing == None): 
+
+    if rhdot:
+        if testing is None:
             try:
                 if haveObstimes:
-                    tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,obstimes=obstimes,knots=knots)
+                    tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
+                                                  obstimes=obstimes,knots=knots)
                 else:
-                    tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,knots=knots)
+                    tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
+                                                  knots=knots)
             except: 
                 print('Exited the spline code for unknown reasons. Run with testing as True if you want more info')
-                okok = 1
         else:
             if haveObstimes:
-                tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,obstimes=obstimes,knots=knots)
+                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
+                                              obstimes=obstimes, knots=knots)
             else:
-                tv,corr = t.rhdot_correction(station,input2spline, output4spline, plt,outlier,knots=knots)
+                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, knots=knots)
+
+
+def main():
+    args = parse_arguments()
+    subdaily(**args)
 
 
 if __name__ == "__main__":
