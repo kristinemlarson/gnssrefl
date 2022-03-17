@@ -763,10 +763,11 @@ sufficient. For example:
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1</CODE>
 
-If you happen to have the Cartesian coordinates (in meters), you can set <code>-xyz True</code> and input those instead of 
-lat, long, and height.
+If you happen to have the Cartesian coordinates (in meters), you can 
+set <code>-xyz True</code> and input those instead of lat, long, and height.
 
-If you are using a site that is in the UNR database, as of 2021/10/26 you can set a flag to use it instead of typing in values:
+If you are using a site that is in the UNR database, as of 2021/10/26 you can set 
+a flag to use it instead of typing in lat, long, ht values:
 
 <CODE>make_json_input p101 0 0 0 -query_unr True </CODE>
 
