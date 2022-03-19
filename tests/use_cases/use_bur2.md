@@ -4,7 +4,7 @@
 
 **Location:** Tasmania, Australia
 
-**Archives:**  Multiple (Geoscience Australia, CDDIS)
+**Archive:**  Geoscience Australia
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/BUR2.sta)
 
