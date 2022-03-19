@@ -632,9 +632,15 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     else:
         print('You are not a risk taker.')
 
+    no_dots = False
+    if 'no_dots' in kwargs:
+        no_dots = kwargs.get('no_dots')
 
     if 'screenstats' in kwargs:
         screenstats = kwargs.get('screenstats')
+
+    if 'outlier_limit' in kwargs:
+        outlier_limit = kwargs.get('outlier_limit')
 
     snr_ending = 66
     if 'snr_ending' in kwargs:
@@ -664,14 +670,19 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             else:
                 snrdata = np.vstack((snrdata, snrtemp))
 
+    xdir = os.environ['REFL_CODE'] + '/Files/'
+    if not os.path.isdir(xdir):
+        print('make output directory for file')
+        subprocess.call(['mkdir',xdir])
+
     nr,nc = snrdata.shape
     print('Number of obs', nr, ' number of days', numdays)
     if imodel == 1:
-        print('modifying elevation angles')
-        print('Elevation angle before ', snrdata[0,1])
+        print('Modifying elevation angles for a simple refraction correction')
+        #print('Elevation angle before ', snrdata[0,1])
         correctedE = refr.corr_el_angles(snrdata[:,1], p,T)
         snrdata[:,1] = correctedE
-    print('Elevation angle after', snrdata[0,1])
+    #print('Elevation angle after', snrdata[0,1])
 
     invout = {}
     # starting point - which is taken from the first day 
@@ -680,6 +691,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     print(stryday)
     tobj = Time(stryday, format='yday')
     gbase = tobj.gps
+    print('>>>>  gbase value', gbase)
     # Setting up knots ...
     knots = np.linspace(gbase + int(kdt/2), gbase + numdays*86400 - int(kdt/2), int(numdays*86400/kdt))
     print('Here be the knots:', knots)
@@ -809,34 +821,35 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         rh_spectral_plot = cubspl_f(tplot)
         fig, ax = plt.subplots(figsize=(8, 4))
         rh_dn = gps2datenum(np.array(rh_arr[:, 0], dtype=float))
-        plot_tracks(rh_arr, rh_dn)
+        if not (no_dots):
+            plot_tracks(rh_arr, rh_dn)
+            pspec, = plt.plot_date(tplot_dn, rh_spectral_plot, '-.',color='gray')
+            pspec.set_label('cubspl')
 
-        pspec, = plt.plot_date(tplot_dn, rh_spectral_plot, '-.',color='gray')
-        pspec.set_label('cubspl')
         if snrfit:
             cubspl_f = interpolate.interp1d(knots, kval_js, kind='cubic')
             rh_js_plot = cubspl_f(tplot)
-            #year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
-            #dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
+            #spline_at_lsp = cubspl_f(rh_arr[:,0]) does not work - doesn't like objects
+            # maybe this will work ... 
+            Xres = np.empty(shape=[0,1])
+            # no doubt there is an easier way ...
+            for ijk in range(0,len(rh_arr)):
+                tii = float(rh_arr[ijk,0]) # change from object?
+                Xres = np.append(Xres,  tii)
 
-            # the code should already have checked to see that REFL_CODE exists 
-            xdir = os.environ['REFL_CODE'] + '/Files/'
-            if not os.path.isdir(xdir):
-                print('make output directory for file')
-                subprocess.call(['mkdir',xdir])
+            spl_at_lsp = cubspl_f(Xres)
+            ab = rh_arr
+
+            iiout = open('outliers_lsp.txt', 'w+')
+            for ijk in range(0,len(rh_arr)):
+                dd =  rh_arr[ijk,1]-spl_at_lsp[ijk]
+                if (abs(dd) > outlier_limit):
+                    iiout.write("{0:5.2f} {1:3.0f} {2:4.1f} {3:5.2f} \n".format(dd, ab[ijk,2], ab[ijk,6], ab[ijk,10]))
+            iiout.close()
 
             # opens the file, writes a header
             iout, usetxt = invsnr_header(xdir, outfile_type, station, outfile_name) 
             
-            #if outfile_type == 'txt':
-            #    txt = True; ioutputfile= xdir + station + '_invsnr.txt'
-            #    iout = open(ioutputfile, 'w+')
-            #    iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('#'))
-            #else:
-            #    txt = False; ioutputfile= xdir + station + '_invsnr.csv'
-            #    iout = open(ioutputfile, 'w+')
-            #    iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('%'))
-            #print('invsnr output written to: ', ioutputfile)
             for ijk in range(0,len(rh_js_plot)):
                 # undo dave's time units (rel gps) into a datetime object
                 dt = gps2datetime(tplot[ijk])
@@ -1391,3 +1404,12 @@ def set_refraction_model(station, dmjd,lsp,imodel):
 
     return p,T,irefr
 
+            #if outfile_type == 'txt':
+            #    txt = True; ioutputfile= xdir + station + '_invsnr.txt'
+            #    iout = open(ioutputfile, 'w+')
+            #    iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('#'))
+            #else:
+            #    txt = False; ioutputfile= xdir + station + '_invsnr.csv'
+            #    iout = open(ioutputfile, 'w+')
+            #    iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('%'))
+            #print('invsnr output written to: ', ioutputfile)

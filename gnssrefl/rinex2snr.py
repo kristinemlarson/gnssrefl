@@ -198,6 +198,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                 if translated:
                                     print('The RINEX 3 file has been downloaded. Try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2)
+                                    #subprocess.call(['rm', '-f',rnx_filename]) # rnx
                         # this means the rinex 2 version exists
                         if fexists:
                              print('RINEX 2 created from v3', year, doy, ' Now remove RINEX 3 files and convert')
@@ -1004,6 +1005,8 @@ def go_from_crxgz_to_rnx(c3gz):
             subprocess.call([crnxpath,c3])
     if os.path.exists(rnx): # file exists
         translated = True
+        print('remove Hatanaka compressed file')
+        subprocess.call(['rm','-f',c3])
 
     return translated, rnx
 

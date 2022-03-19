@@ -35,6 +35,8 @@ def main():
     parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66)")
     parser.add_argument("-outfile_type", default=None, type=str, help="Output file type (txt or csv)")
     parser.add_argument("-outfile_name", default=None, type=str, help="Output file name")
+    parser.add_argument("-outlier_limit", default=None, type=str, help="outliers plotted (meters)")
+    parser.add_argument("-no_dots", default=None, type=str, help="no lomb scargle plotted")
     parser.add_argument("-delta_out", default=None, type=str, help="Output increment, in seconds (default is 300)")
     parser.add_argument("-refraction", default=None, type=str, help="Set to True to turn on")
 
@@ -115,7 +117,8 @@ def main():
 # set constellation.
     if args.constel == None:
         # added beidou 22feb09
-        satconsts=['E','G','R','C'] # the default is gps,glonass, and galileo
+        #satconsts=['E','G','R','C'] # the default is gps,glonass, and galileo
+        satconsts=['E','G','R'] # the default is gps,glonass, and galileo
     else: 
         satconsts=[args.constel]
         # save people from themselves
@@ -131,6 +134,9 @@ def main():
         #if (args.constel == 'C') and (signal == 'L6' or signal == 'L7'):
         #    print('Sorry - I have not added L6 and L7 to the code yet. Exiting.')
         #    sys.exit()
+
+    if (args.constel == 'withBeidou'):
+        satconsts=['E','G','R','C'] # the default is gps,glonass, and galileo
 
 # don't turn these on unless you really need plots be acuse it is slow to make one
 # per satellite arc
@@ -182,6 +188,16 @@ def main():
     else:
         outfile_name = args.outfile_name
 
+    if (args.outlier_limit == None):
+        outlier_limit = 0.5
+    else:
+        outlier_limit = float(args.outlier_limit)
+
+    if (args.no_dots == None):
+        no_dots = False
+    else:
+        no_dots = True
+
     # trying to add refraction to an existing dictionary. this is how it is done in the main lsp code
     lsp['refraction'] = False
     if (args.refraction == None):
@@ -190,7 +206,7 @@ def main():
         if args.refraction == 'True':
             lsp['refraction'] = True 
 
-    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending,outfile_type=outfile_type,delta_out=delta_out,lsp=lsp,outfile_name=outfile_name)
+    spline_functions.snr2spline(station,year,doy, azilims, elvlims, rhlims, precision,kdt, signal=signal,lspfigs=lspfigs,snrfigs=snrfigs,snrfit=snrfit,doplot=doplot, pktnlim=pktnlim,satconsts=satconsts,screenstats=screenstats,tempres=tempres,doy_end=doy_end,l2c_only=l2c_only,rough_in=rough_in,risky=risky,snr_ending=snr_ending,outfile_type=outfile_type,delta_out=delta_out,lsp=lsp,outfile_name=outfile_name,outlier_limit=outlier_limit,no_dots=no_dots)
 
 
 if __name__ == "__main__":
