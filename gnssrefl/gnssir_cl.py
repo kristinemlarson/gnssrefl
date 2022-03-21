@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-year_end", default=None, type=int, help="year end")
     parser.add_argument("-azim1", default=None, type=int, help="lower limit azimuth")
     parser.add_argument("-azim2", default=None, type=int, help="upper limit azimuth")
-    parser.add_argument("-nooverwrite", default=None, type=str, help="default is True, i.e. do not overwrite")
+    parser.add_argument("-nooverwrite", default=None, type=str, help="default is False, i.e. you will overwrite")
     parser.add_argument("-extension", default=None, type=str,
                         help="extension for result file, useful for testing strategies")
     parser.add_argument("-compress", default=None, type=str, help="xz compress SNR files after use")
@@ -53,7 +53,7 @@ def parse_arguments():
 
 def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, fr: int = None,
            ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None,
-           azim1: int = 0, azim2: int = 360, nooverwrite: bool = True, extension: str = '',
+           azim1: int = 0, azim2: int = 360, nooverwrite: bool = False, extension: str = '',
            compress: bool = False, screenstats: bool = False, delTmax: int = None,
            e1: float = None, e2: float = None, mmdd: bool = False):
     """

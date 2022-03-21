@@ -2,6 +2,7 @@ import numpy as np
 from astropy.time import Time
 from astropy.timeseries import LombScargle
 import datetime
+import math
 import matplotlib.pyplot as plt
 import os
 import pickle
@@ -815,7 +816,18 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         plotdt = delta_out # make it so people can change it
         #tplot = np.linspace(gbase, gbase + numdays*86400, int(86400/plotdt + 1))
         numvals = 1 + int(numdays*86400/delta_out)
+        nv2 = 1 + int(numdays*86400/3600)
         tplot = np.linspace(gbase, gbase + numdays*86400, numvals)
+        tplot_hourly = np.linspace(gbase, gbase + numdays*86400, nv2 )
+        lsp_per_hour = []
+        for ijk in range(0,len(tplot_hourly)): 
+            H1 = float((tplot_hourly[ijk]-gbase)/3600) ; H2 = H1 + 1
+            dt = (rh_arr[:,0] - gbase)/3600
+            ii = np.logical_and(dt>= H1, dt< H2)
+            lsp_per_hour.append(len(rh_arr[ii,1]))
+            #print(H1, len(rh_arr[ii,1]))
+        print(lsp_per_hour[0])
+        print(lsp_per_hour[1])
         tplot_dn = gps2datenum(tplot)
         cubspl_f = interpolate.interp1d(knots, kval_spectral, kind='cubic')
         rh_spectral_plot = cubspl_f(tplot)
@@ -850,8 +862,12 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             # opens the file, writes a header
             iout, usetxt = invsnr_header(xdir, outfile_type, station, outfile_name) 
             
-            for ijk in range(0,len(rh_js_plot)):
+            # remove last point ...
+            for ijk in range(0,len(rh_js_plot)-1):
                 # undo dave's time units (rel gps) into a datetime object
+                # which hour from start time does this belong to?
+                whichhour = math.floor( (tplot[ijk] - gbase)/3600)
+                #print(whichhour,lsp_per_hour[whichhour])
                 dt = gps2datetime(tplot[ijk])
                 y= dt.year; m=dt.month; d=dt.day; h=dt.hour; mi = dt.minute ; s=int(dt.second)
                 # get doy = i am sure this can be done better but i am not fluent in datetime
@@ -860,11 +876,11 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
                 MJD, fracS = g.mjd(y,m,d,h,mi,s)
                 #print(y,m,d,h,mi,s,doy,MJD+fracS, rh_js_plot[ijk])
                 if usetxt:
-                    iout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:8.3f} {7:3.0f} {8:13.6f} \n".format(y, m, 
-                        d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS))
+                    iout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:8.3f} {7:3.0f} {8:13.6f} {9:3.0f}\n".format(y, m, 
+                        d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS, lsp_per_hour[whichhour]))
                 else:
-                    iout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:2.0f},{6:8.3f},{7:3.0f},{8:13.6f} \n".format(y, m, 
-                        d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS))
+                    iout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:2.0f},{6:8.3f},{7:3.0f},{8:13.6f},{9:3.0f}\n".format(y, m, 
+                        d,h,mi,s,rh_js_plot[ijk],doy,MJD+fracS),lsp_per_hour[whichhour])
             pjs, = plt.plot_date(tplot_dn, rh_js_plot, '-',color='black')
             pjs.set_label('invmod')
             iout.close()
@@ -876,7 +892,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         ax.set_xticks(np.linspace(gps2datenum(gbase), gps2datenum(gbase + numdays*86400), int(86400 / (60 * 60 * 6) + 1)))
         ax.xaxis.set_major_formatter(DateFormatter('%m-%d %H:%M'))
         #ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M'))
-        ax.legend(loc="best", prop={"size":8})
+        ax.legend(loc="upper right", prop={"size":8})
         #ax.legend(loc="upper right",bbox_to_anchor=(1. , 0.7),prop={"size":8})
         #plt.xticks(rotation =45); 
         ax.grid(True)
@@ -906,13 +922,14 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
     returns:
     fileID
     usetxt - boolean for the code calling this function to use
+    if you write out special files, they go in the working directory
     """
     if outfile_type == 'txt':
         usetxt = True; 
         if (len(outfile_name) == 0):
             ioutputfile= xdir + station + '_invsnr.txt'
         else:
-            ioutputfile= xdir + outfile_name + '.txt'
+            ioutputfile= outfile_name + '.txt'
 
         iout = open(ioutputfile, 'w+')
         commentl = '#'
@@ -921,7 +938,7 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
         if (len(outfile_name) == 0):
             ioutputfile= xdir + station + '_invsnr.csv'
         else:
-            ioutputfile= xdir + outfile_name + '.csv'
+            ioutputfile= outfile_name + '.csv'
 
         iout = open(ioutputfile, 'w+')
         commentl = '%'
@@ -929,7 +946,7 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     iout.write('{0:s} Results for {1:4s} calculated on {2:20s} \n'.format(commentl,  station, xxx ))
     iout.write('{0:s} gnssrefl, https://github.com/kristinemlarson \n'.format(commentl))
-    iout.write('{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n'.format(commentl))
+    iout.write('{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD  Nretrievals\n'.format(commentl))
 
     return iout, usetxt
 

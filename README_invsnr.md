@@ -78,8 +78,9 @@ The code will attempt GPS, Galileo, Beidou and Glonass unless you tell it otherw
 - rough_in, roughness parameter as described in Strandberg et al (2016). Default is 0.1
 - risky set to True means you will ignore the warrning telling you that you have a gap and should not do this.
 
-Please see <code>invsnr -h</code> for more options.
- 
+Please see <code>invsnr -h</code> for more options. Some are related to outputs (i.e. you can tell
+the code to write out smoothed RH values into a text or csv file.
+
 
 *Output of the invsnr Code*
 
