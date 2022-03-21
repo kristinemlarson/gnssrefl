@@ -826,8 +826,6 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             ii = np.logical_and(dt>= H1, dt< H2)
             lsp_per_hour.append(len(rh_arr[ii,1]))
             #print(H1, len(rh_arr[ii,1]))
-        print(lsp_per_hour[0])
-        print(lsp_per_hour[1])
         tplot_dn = gps2datenum(tplot)
         cubspl_f = interpolate.interp1d(knots, kval_spectral, kind='cubic')
         rh_spectral_plot = cubspl_f(tplot)

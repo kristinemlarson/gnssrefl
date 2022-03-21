@@ -453,6 +453,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     author: kristine larson
 
     """
+    outlierV = float(outlierV) #just to make sure - i think it was sending a string
     # output will go to REFL_CODE/Files
     xdir = os.environ['REFL_CODE']
     txtdir = xdir + '/Files'
@@ -897,13 +898,17 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     # try this
     #
     knots =np.linspace(t1,t2,num=numKnots)
-    t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
+    try:
+        t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
+        spline = interpolate.BSpline(t, c, k, extrapolate=False)
+    except:
+        print('crashed on the interpolation stage')
+        sys.exit()
 
     # user specifies how many values per day you want to send back to the user
 
     # should i do extrapolate True? it is the default  - could make it periodic?
     #spline = interpolate.BSpline(t, c, k, extrapolate=True)
-    spline = interpolate.BSpline(t, c, k, extrapolate=False)
 
     # evenly spaced data - units of days
     perday = 48 # so every 30 minutes in this case

@@ -70,7 +70,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             plt : boolean, optional
                 To print plots to screen or not.
                 default is False.
-            spline_outlier : integer, optional
+            spline_outlier : float, optional
                 Outlier criterion used in splinefit (meters)
                 default is 1.0
             knots : integer, optional
