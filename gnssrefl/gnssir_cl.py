@@ -37,8 +37,8 @@ def parse_arguments():
     parser.add_argument("-compress", default=None, type=str, help="xz compress SNR files after use")
     parser.add_argument("-screenstats", default=None, type=str, help="some stats printed to screen(default is False)")
     parser.add_argument("-delTmax", default=None, type=int, help="Req satellite arc length (minutes)")
-    parser.add_argument("-e1", default=None, type=str, help="override min elev angle")
-    parser.add_argument("-e2", default=None, type=str, help="override max elev angle")
+    parser.add_argument("-e1", default=None, type=float, help="override min elev angle")
+    parser.add_argument("-e2", default=None, type=float, help="override max elev angle")
     parser.add_argument("-mmdd", default=None, type=str, help="boolean, add columns for month,day,hour,minute")
 
     args = parser.parse_args().__dict__
