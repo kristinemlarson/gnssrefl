@@ -24,8 +24,8 @@ def parse_arguments():
     parser.add_argument("-txtfile", default=None, type=str, help="Set your own output filename")
     parser.add_argument("-plt", default=None, type=str, help="plt to screen: True or False")
     parser.add_argument("-extension", default=None, type=str, help="extension for solution names")
-    parser.add_argument("-year1", default=None, type=str, help="restrict to years starting with")
-    parser.add_argument("-year2", default=None, type=str, help="restrict to years ending with")
+    parser.add_argument("-year1", default=None, type=int, help="restrict to years starting with")
+    parser.add_argument("-year2", default=None, type=int, help="restrict to years ending with")
     parser.add_argument("-fr", default=0, type=int, help="frequency, default is to use all")
     parser.add_argument("-csv", default=None, type=str, help="True if you want csv instead of plain text")
     args = parser.parse_args().__dict__
