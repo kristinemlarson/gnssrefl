@@ -114,6 +114,10 @@ def main():
     else:
         doy_end = int(args.doy_end)
 
+    if (doy_end < doy):
+        print('doy_end cannot be less than doy')
+        sys.exit()
+
 # set constellation.
     if args.constel == None:
         # added beidou 22feb09

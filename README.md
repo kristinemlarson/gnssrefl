@@ -32,6 +32,8 @@ let me know if I broke anything.
 
 [Link to Docker build](https://hub.docker.com/r/unavdocker/gnssrefl)
 
+Command line inputs which previously required True also now work with T and true.
+
 
 ### Table of Contents
 
@@ -751,7 +753,10 @@ about why arcs have been rejected.
 
 ### vi. gnssir <a name="module3"></a>
 
-<code>gnssir</code> is the main driver for the GNSS-IR code. You need a set of instructions which are made using <code>make_json_input</code>. The required inputs are: 
+<code>gnssir</code> is the main driver for the GNSS-IR code. 
+
+You need a set 
+of instructions which are made using <code>make_json_input</code>. The required inputs are: 
 
 * station name 
 * latitude (degrees)  

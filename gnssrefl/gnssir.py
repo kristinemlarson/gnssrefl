@@ -127,7 +127,13 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                         okPk = True
                         if abs(maxF - minH) < 0.10: #  peak too close to min value
                             okPk = False
-                            #print('found a peak too close to the edge of the restricted RH region')
+                            if screenstats:
+                                print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} peak too close to edge '.format( iAzim,satNu,UTCtime))
+                        # KL added 2022 march 26
+                        if abs(maxF - maxH) < 0.10: #  peak too close to max value
+                            okPk = False
+                            if screenstats:
+                                print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} peak too close to edge '.format( iAzim,satNu,UTCtime))
                         if okPk & (delT < lsp['delTmax']) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
                             # request from a tide gauge person for Month, Day, Hour, Minute
                             if lsp['mmdd']:
