@@ -128,7 +128,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     bx = [0,1,0,1]; by = [0,0,1,1]; bz = [1,3,2,4]
 
     # 
-    fs = 12
+    fs = 10
     # various defaults - ones the user doesn't change in this quick Look code
     delTmax = 70
     polyV = 4 # polynomial order for the direct signal
@@ -220,11 +220,18 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                     nij =   pz[(px > NReg[0]) & (px < NReg[1])]
                     Noise = 0
                     iAzim = int(avgAzim)
+                    # 2022 march 26
+                    # introduce boolean for RH peaks that are too close to the edges of the RH periodogram
+                    tooclose = False
+                    if (abs(maxF - minH) < 0.05):
+                        tooclose = True
+                    if (abs(maxF - maxH) < 0.05):
+                        tooclose = True 
                     if (len(nij) > 0):
                         Noise = np.mean(nij)
                     else:
                         Noise = 1; iAzim = 0 # made up numbers
-                    if (delT < delTmax) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise):
+                    if (not tooclose) & (delT < delTmax) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise):
                         T = g.nicerTime(UTCtime)
                         # az, RH, sat, amp, peak2noise, Time
                         rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,1))
@@ -242,7 +249,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                             plt.plot(px,pz,'gray',linewidth=0.5)
                         if screenstats:
                             print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
-                            g.write_QC_fails(delT,75,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp)
+                            g.write_QC_fails(delT,75,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose)
 
                         idc = 'f' + stitles[a]
                         data[idc][satNu] = [px,pz]
@@ -257,11 +264,13 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 plt.grid()
                 amax = max(amax,  bbb) # do not know how to implement this ...
                 if (a == 3) or (a==1):
-                    plt.xlabel('reflector height (m)',fontsize=FS)
+                    plt.xlabel('reflector height (m)',fontsize=fs)
                 if (a == 1) or (a==0):
-                    plt.ylabel('volts/volts',fontsize=FS)
-                plt.xticks(fontsize=FS)
-                plt.yticks(fontsize=FS)
+                    plt.ylabel('volts/volts',fontsize=fs)
+                # try putting this on all of them
+                plt.xlabel('reflector height (m)',fontsize=fs)
+                plt.xticks(fontsize=fs)
+                plt.yticks(fontsize=fs)
 
         rhout.close()
         #print('preliminary reflector height results are stored in a file called logs/rh.txt')

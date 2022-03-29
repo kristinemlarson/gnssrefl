@@ -43,7 +43,7 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
     s1=time.time()
     print('WARNING: Get yourself a cup of coffeee. Downloading 96 files takes a long time.')
     fileF = 0
-    streamID  = '_R_'
+    streamID  = '_' + stream + '_'
     for h in range(0,24):
         # subdirectory
         ch = '{:02d}'.format(h)

@@ -137,7 +137,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     fout.close()
 
 
-def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile):
+def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2):
     """
     Inputs:
     station - 4 character name
@@ -146,6 +146,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     plt2screen is a boolean whether you want the plot displayed to the screen
     extension is where the results files stored in that subdirectory ('' for default) 
     sigma is how many standard deviations away from mean you allow.   (float)
+
+    h1 and h2 are strict allowed RH values to be allowed. Helps with the outlier removal
 
     files now written out here rather than in subdaily_cl.py
 
@@ -197,7 +199,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         # using external file of concatenated results
         tv = np.loadtxt(txtfile,comments='%')
 
-    tv,t,rh,fdoy,ldoy= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2)
+     
+    tv,t,rh,fdoy,ldoy= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2)
 
     tvoriginal = tv
     nr,nc = tvoriginal.shape
@@ -736,7 +739,8 @@ def two_stacked_plots(otimes,tv,station,txtdir):
     colorbar.set_label('deg', fontsize=fs)
     ax1.set_ylabel('meters',fontsize=fs)
     fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
-    ax1.title.set_text('Azimuth')
+    ax1.set_title('Azimuth',fontsize=fs)
+    #ax1.title.set_text('Azimuth')
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
     ax1.invert_yaxis()
     ax1.grid(True)
@@ -750,7 +754,7 @@ def two_stacked_plots(otimes,tv,station,txtdir):
     colorbar = fig.colorbar(scatter, ax=ax2)
     ax2.set_ylabel('meters',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-    ax2.set_title('Amplitude')
+    ax2.set_title('Amplitude',fontsize=fs)
     ax2.invert_yaxis()
     ax2.grid(True)
     fig.autofmt_xdate()
@@ -788,25 +792,25 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
     plt.plot(otimesarray[ii],tv[ii,2], 'r.',markersize=4,label='outliers')
     #plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
     plt.legend(loc="best",bbox_to_anchor=(0.95, 0.9),prop={"size":8})
-    plt.ylabel('meters',fontsize=fs)
-    plt.title(station.upper() + ' Reflector Heights', fontsize=fs)
+    plt.ylabel('meters',fontsize=8)
+    plt.title(station.upper() + ' Reflector Heights', fontsize=8)
     plt.gca().invert_yaxis()
-    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    plt.xticks(rotation =45,fontsize=8); plt.yticks(fontsize=8)
     plt.grid() ; fig.autofmt_xdate()
 
     ax2 = fig.add_subplot(212)
     plt.plot(otimesarray[jj],tv[jj,2], '.',color='green',label='arcs')
     plt.gca().invert_yaxis()
-    plt.ylabel('meters',fontsize=fs)
-    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-    plt.title('Edited Reflector Heights', fontsize=fs)
+    plt.ylabel('meters',fontsize=8)
+    plt.xticks(rotation =45,fontsize=8); plt.yticks(fontsize=8)
+    plt.title('Edited Reflector Heights', fontsize=8)
     plt.grid() ; fig.autofmt_xdate()
     plotname = txtdir + '/' + station + '_outliers_hunting.png'
     plt.savefig(plotname,dpi=300)
     print('png file saved as: ', plotname)
 
 
-def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2):
+def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
     """
     cleaning up the main code. this sorts data and applies various "commandline" constraints
     tv is the full set of results from gnssrefl
@@ -825,8 +829,15 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2):
         print('Exiting')
         sys.exit()
 
+    ii = (tv[:,2] <= h2) & (tv[:,2] >= h1)
+    tv = tv[ii,:]
+
+    if ((nr-len(tv)) > 0):
+        print(nr-len(tv) , ' points removed for reflector height constraints ',h1,h2, ' (m)')
+
     # not sure these need to be here - are they used elsewhere?
     # could be moved to apply_new_constraints
+    
     t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
     rh = tv[:,2]
 
@@ -837,6 +848,7 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2):
     tv = tv[ii,:]
 
     # apply azimuth constraints
+    nr,nc = tv.shape
     ii = (tv[:,5]  >= azim1) & (tv[:,5] <= azim2)
     tv = tv[ii,:]
     print(nr-len(tv) , ' points removed for azimuth constraints ',azim1,azim2)
@@ -921,9 +933,12 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     plt.plot(tnew,biasCorr_ynew,'b.',label='with freq/rhdot corr')
     plt.plot(spl_x, spl_y,'-',color='orange',label='spline fit')
     plt.title(station + ' RH Obs and new spline fit after freq bias removed')
+
     plt.legend(loc="upper right")
+    plt.xlabel('day of year'); 
     plt.ylabel('meters')
     plt.grid()
+    plt.gca().invert_yaxis()
 
     rms = np.std(ynew-spline_at_tnew)
     newrms = str(round(rms,3))
@@ -935,9 +950,11 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     plt.plot(tnew,res,'b.', label='RH rms:' + newrms + ' m')
     plt.plot(tnew[ii],res[ii],'r.',label='3sigma outliers')
     #plt.title('residuals')
-    plt.xlabel('day of year'); plt.ylabel('meters')
+    plt.xlabel('day of year'); 
+    plt.ylabel('meters')
     plt.legend(loc="upper right")
     plt.grid()
+    plt.gca().invert_yaxis()
     Ntot = len(res)
     Nout = len(res[ii])
     print('Percentage of 3-sigma outliers', round(100*Nout/Ntot,2))

@@ -39,6 +39,7 @@ def main():
     parser.add_argument("-no_dots", default=None, type=str, help="no lomb scargle plotted")
     parser.add_argument("-delta_out", default=None, type=str, help="Output increment, in seconds (default is 300)")
     parser.add_argument("-refraction", default=None, type=str, help="Set to True to turn on")
+    parser.add_argument("-json_override", default=None, type=str, help="Override json file name")
 
     args = parser.parse_args()
 # the required inputs
@@ -62,13 +63,24 @@ def main():
     jsondir  = xdir + '/input/'
     instructions2 =  jsondir + station + '.inv.json'
 
-    if os.path.isfile(instructions2):
-        print('using:', instructions2)
-        with open(instructions2) as f:
-            lsp = json.load(f)
+    if (args.json_override == None):
+        if os.path.isfile(instructions2):
+            print('using:', instructions2)
+            with open(instructions2) as f:
+                lsp = json.load(f)
+        else:
+            print('Instruction file does not exist.', instructions2, ' Exiting.')
+            sys.exit()
     else:
-        print('Instruction file does not exist.', instructions2, ' Exiting.')
-        sys.exit()
+        instructions2 = args.json_override
+        if os.path.isfile(instructions2):
+            print('using:', instructions2)
+            with open(instructions2) as f:
+                lsp = json.load(f)
+        else:
+            print('Instruction file does not exist.', instructions2, ' Exiting.')
+            sys.exit()
+
 
 # look into the refraction issue
 

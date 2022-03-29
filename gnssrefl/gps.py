@@ -83,7 +83,7 @@ def myfavoriteobs():
     returns list of SNR obs for gfzrnx. that is all
     """
     # not even sure why i have C here for beidou
-    gobblygook = 'G:S1C,S2X,S2L,S2S,S2X,S5I,S5Q+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
+    gobblygook = 'G:S1C,S2X,S2L,S2S,S2X,S5I,S5Q,S5X+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
 
     return gobblygook
 
@@ -3106,11 +3106,14 @@ def result_directories(station,year,extension):
     if not os.path.isdir(f1):
         subprocess.call(['mkdir',f1])
 
-def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp):
+def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp,tooclose2edge):
     """
     prints out various QC fails to the screen
 
     """
+    if tooclose2edge:
+        print('     Retrieved reflector height too close to the edge of the RH space')
+
     if delT > delTmax:
         print('     Obs delT {0:.1f} minutes vs {1:.1f} requested limit '.format(delT,delTmax ))
     if eminObs  > (e1 + ediff):

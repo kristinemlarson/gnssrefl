@@ -35,6 +35,8 @@ def parse_arguments():
     parser.add_argument("-ampl", default=None, type=float, help="new amplitude constraint")
     parser.add_argument("-azim1", default=None, type=int, help="new min azimuth")
     parser.add_argument("-azim2", default=None, type=int, help="new max azimuth")
+    parser.add_argument("-h1", default=None, type=float, help="min RH (m)")
+    parser.add_argument("-h2", default=None, type=float, help="max RH (m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="new peak2noise constraint")
 
     args = parser.parse_args().__dict__
@@ -49,8 +51,8 @@ def parse_arguments():
 
 def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, plt: bool = True,
              spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = False,
-             doy1: int = 1, doy2: int = 366, testing: bool = False, ampl: float = 0, azim1: int = 0,
-             azim2: int = 360, peak2noise: float = 0):
+             doy1: int = 1, doy2: int = 366, testing: bool = False, ampl: float = 0, 
+             h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, peak2noise: float = 0):
     """
         Parameters:
             ___________
@@ -103,6 +105,12 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             azim2: int, optional
                 New max azimuth
                 default is 360.
+            h1: integer optional (should really be a float)
+                lowest allowed reflector height
+                default is 0
+            h2: integer optional (should really be a float)
+                highest allowed reflector height
+                default is 300
             peak2noise: float, optional
                 New peak to noise constraint
                 default is 0.
@@ -116,9 +124,13 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     if not os.path.exists(txtdir):
         subprocess.call(['mkdir', txtdir])
 
+    print(h1,h2, 'new optional inputs')
 #   these are optional output options
     #create the subdaily file
     writecsv = False
+    if (h1 > h2):
+        print('h1 must be less than h2. You submitted ', h1, ' and ', h2)
+        sys.exit()
     if csvfile:
         writecsv = True
     if splinefile is None:
@@ -128,7 +140,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             print('Using ', txtfile)
         # if txtfile provided, you can use that as your starting dataset 
         ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, extension, sigma, writecsv,
-                                                            azim1, azim2, ampl, peak2noise, txtfile)
+                                                            azim1, azim2, ampl, peak2noise, txtfile,h1,h2)
         haveObstimes = True
     else:
         haveObstimes = False

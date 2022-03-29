@@ -124,17 +124,13 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                         if (len(nij) > 0):
                             Noise = np.mean(nij)
                         iAzim = int(avgAzim)
-                        okPk = True
+                        tooclose = False
                         if abs(maxF - minH) < 0.10: #  peak too close to min value
-                            okPk = False
-                            if screenstats:
-                                print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} peak too close to edge '.format( iAzim,satNu,UTCtime))
+                            tooclose = True
                         # KL added 2022 march 26
                         if abs(maxF - maxH) < 0.10: #  peak too close to max value
-                            okPk = False
-                            if screenstats:
-                                print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} peak too close to edge '.format( iAzim,satNu,UTCtime))
-                        if okPk & (delT < lsp['delTmax']) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
+                            tooclose = True
+                        if (not tooclose) & (delT < lsp['delTmax']) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
                             # request from a tide gauge person for Month, Day, Hour, Minute
                             if lsp['mmdd']:
                                 ctime = g.nicerTime(UTCtime); ctime2 = ctime[0:2] + ' ' + ctime[3:5]
@@ -152,7 +148,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                             rj +=1
                             if screenstats:
                                 print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
-                                g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct])
+                                g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose)
                             if plot_screen:
                                 failed = True
                                 local_update_plot(x,y,px,pz,ax1,ax2,failed)
