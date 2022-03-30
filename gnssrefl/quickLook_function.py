@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import subprocess
+import warnings
 
 import scipy.interpolate
 import scipy.signal
@@ -166,6 +167,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 print('Please us rinex2snr to make a SNR file')
                 sys.exit()
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)
+    # this just means the file existed ... not that it had the frequency you want to use
     if allGood == 1:
         # make output file for the quickLook RRH values, just so you can give them a quick look see
         quicklog = 'logs/rh_' + station + '.txt'
@@ -179,17 +181,17 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         if (f > 100) and (f < 200): # glonass
             b = sats[(sats>100) & (sats<200)]; # print('glonass',len(b))
             if len(b) == 0:
-                print('NO Glonass DATA') ; 
+                print('NO Glonass DATA in the file') ; 
                 return data, datakey
         elif (f > 200) & (f < 300): # galileo
             b = sats[(sats>200) & (sats<300)]; # print('galileo',len(b))
             if len(b) == 0:
-                print('NO Galileo data'); 
+                print('NO Galileo data in the file'); 
                 return data, datakey
         elif (f > 300): # beidou
             b = sats[(sats>300) & (sats<400)]; # print('beidou',len(b))
             if len(b) == 0:
-                print('NO Beidou data'); 
+                print('NO Beidou data in the file'); 
                 return data, datakey
 
         print('minimum elevation angle (degrees) for this dataset: ', minEdataset)
@@ -198,6 +200,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             e1 = minEdataset
         if pltscreen:
             plt.figure(figsize=(10,6))
+        allpoints = 0
         for a in range(naz):
             if pltscreen:
                 plt.subplot(2,2,bz[a])
@@ -215,6 +218,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
             for satNu in satlist:
                 x,y,Nv,cf,UTCtime,avgAzim,avgEdot,Edot2,delT= g.window_data(s1,s2,s5,s6,s7,s8,sat,ele,azi,t,edot,f,az1,az2,e1,e2,satNu,polyV,pele,screenstats) 
+                allpoints = allpoints + Nv
                 if Nv > minNumPts:
                     maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,desiredP,polyV,minH) 
                     nij =   pz[(px > NReg[0]) & (px < NReg[1])]
@@ -267,7 +271,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                     plt.xlabel('reflector height (m)',fontsize=fs)
                 if (a == 1) or (a==0):
                     plt.ylabel('volts/volts',fontsize=fs)
-                # try putting this on all of them
+                # try putting this label on all of them
                 plt.xlabel('reflector height (m)',fontsize=fs)
                 plt.xticks(fontsize=fs)
                 plt.yticks(fontsize=fs)
@@ -283,13 +287,16 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             fdir = os.environ['REFL_CODE'] + '/Files'
             if not os.path.isdir(fdir):
                 subprocess.call(['mkdir', fdir])
-            filename = fdir + '/quickLook_lsp.png'
-            print('plot saved to ', filename)
-            plt.savefig(filename)
+            # if you have no results, no point plotting them!
+            if (allpoints > 0):
+                filename = fdir + '/quickLook_lsp.png'
+                print('plot saved to ', filename)
+                plt.savefig(filename)
             # sure - why not throw in another plot?
-            goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2)
-            plt.show()
-          
+                goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2)
+                plt.show()
+            else:
+                print('You made a selection that does not exist (i.e. frequency or satellite or constellation)')
     else: 
         print('some kind of problem with SNR file, so I am exiting the code politely.')
 
@@ -309,7 +316,10 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     author: kristine larson
     """
     try:
-        a = np.loadtxt(fname,comments='%')
+        # added this to get rid of the warning when the file has no bad points in it
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            a = np.loadtxt(fname,comments='%')
     except:
         print('no results in the file')
 
