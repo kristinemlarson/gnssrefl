@@ -46,8 +46,9 @@ Finally, if you haven't already installed required executables in $EXE (CRX2RNX,
 
 ### Docker gnssrefl command line container option
 
-[install Docker](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter#step-1-install-docker)
 [docker hub image](https://hub.docker.com/repository/docker/unavdocker/gnssrefl)
+
+* [install Docker](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter#step-1-install-docker)
 
 * cd into the local directory that you wish to store processed results
 
