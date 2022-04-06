@@ -591,7 +591,9 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     # put these in a file if you are interested
     print_badpoints(tvd[j,:], resid_spl[j])
     if pltit:
-        plt.figure()
+        #plt.figure()
+        fig=plt.figure(figsize=(10,4))
+
         #plt.plot(obstimes, h, 'bo', label='Original points',markersize=3)
         plt.plot(th, h, 'b.', label='Original points',markersize=3)
         # cannot use this because i do not have the year in the tnew variable

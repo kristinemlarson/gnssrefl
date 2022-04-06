@@ -193,7 +193,14 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         outputfile = outputdir + '/' + station + '.' + extension + '.json'
 
     lsp['polyV'] = 4 # polynomial order for DC removal
-    lsp['pele'] = [5, 30] # elevation angles used for DC removal
+    # change this so the min elevation angle for polynomial removal is the same as the 
+    # requested analysis region. previously it was hardwired to 5-30
+    #lsp['pele'] = [5, 30] # elevation angles used for DC removal
+    if (lsp['e1']) < 5:
+        usethis = lsp['e1']
+        lsp['pele'] = [usethis, 30] # elevation angles used for DC removal
+    else:
+        lsp['pele'] = [5, 30] # elevation angles used for DC removal
     lsp['ediff'] = 2 # degrees
     lsp['desiredP'] = 0.005 # precision of RH in meters
     # azimuth regions in degrees (in pairs)
