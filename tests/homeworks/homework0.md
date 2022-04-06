@@ -46,18 +46,20 @@ Finally, if you haven't already installed required executables in $EXE (CRX2RNX,
 
 ### Docker gnssrefl command line container option
 
-[docker image run commands](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_docker#repo-for-gnssrefl-command-line-docker-image)
+[docker hub image](https://hub.docker.com/repository/docker/unavdocker/gnssrefl)
 
-* cd into directory that you wish to store processed results
+* [install Docker](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter#step-1-install-docker)
 
-* <code>docker run -it -v $(pwd)/REFL_CODE:/home/jovyan/gnssir/gnssrefl/REFL_CODE/ -v $(pwd)/REFL_CODE/Files:/home/jovyan/gnssir/gnssrefl/REFL_CODE/Files unavdocker/gnssrefl:latest /bin/bash</code>
+* cd into the local directory that you wish to store processed results
+
+* <code>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files unavdocker/gnssrefl:latest /bin/bash</code>
 
 (Description of the commands used:  <code>-it</code> calls interactive process (bin/bash shell); <code>-v</code> mounts external volumes)
 
 
 * cd into gnssrefl directory, and you now have a linux container running gnssrefl.
 
-*NB:* if you use the <code>quicklook</code> function, the figures generated will **not** plot to the screen but will be available in the mounted REFL_CODE/Files volume mounted locally.
+*NB:* if you use the <code>quicklook</code> function, the figures generated will **not** plot to the screen but will be available in the mounted refl_code/Files volume mounted locally.
 
 
 ---
