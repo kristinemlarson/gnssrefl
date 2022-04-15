@@ -66,6 +66,7 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
         mac = True
 
     fname,fname_xz = g.define_filename(station,year,doy,snrEnd)
+    print(fname,fname_xz)
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
     f=fname
 

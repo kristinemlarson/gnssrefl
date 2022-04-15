@@ -3932,6 +3932,7 @@ def snr_exist(station,year,doy,snrEnd):
     bizarrely snrEnd is a character string
     year and doy are integers, which makes sense!
     author: Kristine Larson
+    change so that it uncompresses to unxz
 
     """
     xdir = os.environ['REFL_CODE']
@@ -3940,12 +3941,18 @@ def snr_exist(station,year,doy,snrEnd):
     f= station + cdoy + '0.' + cyy + '.snr' + snrEnd
     fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f
     fname2 = xdir + '/' + cyyyy + '/snr/' + station + '/' + f  + '.xz'
+    fname3 = xdir + '/' + cyyyy + '/snr/' + station + '/' + f  + '.gz'
     snre = False
     # check for both
     if os.path.isfile(fname):
         snre = True
-    if os.path.isfile(fname2):
-        snre = True
+    else:
+        if os.path.isfile(fname2):
+            snre = True # but needs to be uncompressed
+            subprocess.call(['unxz', fname2])
+        if os.path.isfile(fname3):
+            snre = True # but needs to be ungzipped 
+            subprocess.call(['gunzip', fname3])
 
     return snre 
 

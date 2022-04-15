@@ -121,11 +121,11 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             cdoy = '{:03d}'.format(doy) ; cyy = '{:02d}'.format(year-2000)
             # first, check to see if the SNR file exists
             fname =  quickname(station,year,cyy,cdoy,csnr)
+            # now it unzips if that version exists
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
                 print('SNR file exists', fname)
                 if overwrite:
-                    #print('you requested it be overwritten, so removing file')
                     subprocess.call(['rm', fname])
                     snre = False
             illegal_day = False
