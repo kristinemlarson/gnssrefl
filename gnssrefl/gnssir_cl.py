@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # kristine M. larson
 # command line for gnssir.py module
+# 2022 April 15 added gzip boolean input
 
 
 import argparse
@@ -35,6 +36,7 @@ def parse_arguments():
     parser.add_argument("-extension", default=None, type=str,
                         help="extension for result file, useful for testing strategies")
     parser.add_argument("-compress", default=None, type=str, help="xz compress SNR files after use")
+    parser.add_argument("-gzip", default=None, type=str, help="gzip SNR files after use")
     parser.add_argument("-screenstats", default=None, type=str, help="some stats printed to screen(default is False)")
     parser.add_argument("-delTmax", default=None, type=int, help="Req satellite arc length (minutes)")
     parser.add_argument("-e1", default=None, type=float, help="override min elev angle")
@@ -44,7 +46,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd']
+    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd','gzip']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -55,7 +57,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
            ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None,
            azim1: int = 0, azim2: int = 360, nooverwrite: bool = False, extension: str = '',
            compress: bool = False, screenstats: bool = False, delTmax: int = None,
-           e1: float = None, e2: float = None, mmdd: bool = False):
+           e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False):
     """
         This is the main driver for running GNSS Interferometric Reflectometry.
 
@@ -161,11 +163,15 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         mmdd : boolean, optional
             adds columns in results for month, day, hour, and minute.
             default is False.
+        gzip : boolean, optional
+            gzip compress SNR files after use.
+            default is False.
 
     """
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
+
 
     exitS = g.check_inputs(station, year, doy, snr)
 
@@ -241,6 +247,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         lsp['onesat'] = [sat]
 
     lsp['mmdd'] = add_mmddhhss
+    # added 2022apr15
+    lsp['gzip'] = gzip
 
     xdir = str(os.environ['REFL_CODE'])
     picklefile = 'gpt_1wA.pickle'

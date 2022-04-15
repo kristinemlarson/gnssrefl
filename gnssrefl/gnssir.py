@@ -32,6 +32,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp'] 
     plot_screen = lsp['plt_screen'] 
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
+    gzip = lsp['gzip']
     for i in range(0,naz):
         if (azval[i+1] - azval[i]) > 100:
             print('FATAL WARNING: You are prohibited from having an azimuth range that is larger than 100 degrees.')
@@ -63,23 +64,13 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         allGood = 0
         print('>>>>> The result file already exists for this day and you have selected the do not overwrite option')
         #sys.exit()
-    #print('go ahead and access SNR data - first define SNR filename')
     else:
+        # uncompress here so you should not have to do it in read_snr_multiday ...
         obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
-    #print(obsfile, 'snrexistence',snre,' and ', snr_type)
-    # removing this option
-    #if (not snre) and (not lsp['seekRinex']):
-    #    print('The SNR file does not exist and you have set the seekRinex variable to False')
-    #    print('Use rinex2snr.py to make SNR files')
-    #    #sys.exit()
-    #    allGood = 0
-    #if (not snre) and lsp['seekRinex']:
-    #    print('The SNR file does not exist. I will try to make a GPS only file using the Fortran option.')
-    #    rate = 'low'; dec_rate = 0; orbtype = 'nav'
-    #    g.quick_rinex_snrC(year, doy, station, snr_type, orbtype,rate, dec_rate)
 
         allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays)
-        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays) 
+        # added gzip option.  first input is xz compression
+        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
     if (allGood == 1):
         print('Results will be written to:', fname)
 
@@ -252,3 +243,17 @@ def read_json_file(station, extension):
             sys.exit()
 
     return lsp
+
+
+# old code
+    #print(obsfile, 'snrexistence',snre,' and ', snr_type)
+    # removing this option
+    #if (not snre) and (not lsp['seekRinex']):
+    #    print('The SNR file does not exist and you have set the seekRinex variable to False')
+    #    print('Use rinex2snr.py to make SNR files')
+    #    #sys.exit()
+    #    allGood = 0
+    #if (not snre) and lsp['seekRinex']:
+    #    print('The SNR file does not exist. I will try to make a GPS only file using the Fortran option.')
+    #    rate = 'low'; dec_rate = 0; orbtype = 'nav'
+    #    g.quick_rinex_snrC(year, doy, station, snr_type, orbtype,rate, dec_rate)

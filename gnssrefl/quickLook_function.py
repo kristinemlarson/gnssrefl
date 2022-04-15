@@ -128,7 +128,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     # define where the axes are located
     bx = [0,1,0,1]; by = [0,0,1,1]; bz = [1,3,2,4]
 
-    # 
+    #  fontsize
     fs = 10
     # various defaults - ones the user doesn't change in this quick Look code
     delTmax = 70
@@ -156,14 +156,11 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         print('>>>> The snr file exists ',obsfile)
     else:
         if True:
-            #print('looking for the SNR file on disk')
             obsfile, obsfileCmp, snre =  g.define_and_xz_snr(station,year,doy,snr_type)
             if snre:
                 dkfjaklj = True
-                #print('file exists on disk')
             else:
-                print('>>>> The SNR the file does not exist ',obsfile)
-                #print('This code used to try and make one for you, but I have removed this option.')
+                print('>>>> The SNR the file needs does not exist ',obsfile)
                 print('Please us rinex2snr to make a SNR file')
                 sys.exit()
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)

@@ -136,23 +136,28 @@ def define_and_xz_snr(station,year,doy,snr):
     author: Kristine Larson
     19mar25: return compressed filename too
     20apr12: fixed typo in xz name! now try to compress here
+    22apr15: allow gzip files to be found an unzipped
     """
     xdir = os.environ['REFL_CODE']
     cyyyy, cyy, cdoy = ydoych(year,doy)
     f= station + cdoy + '0.' + cyy + '.snr' + str(snr)
     fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f
     fname2 = xdir + '/' + cyyyy  + '/snr/' + station + '/' + f  + '.xz'
+    fname3 = xdir + '/' + cyyyy  + '/snr/' + station + '/' + f  + '.gz'
     snre = False
+    # add gzip
     if os.path.isfile(fname):
-        #print('snr file exists')
         snre = True
     else:
         if os.path.isfile(fname2):
-            #print('found xz compressed snr file - try to unxz it')
             subprocess.call(['unxz', fname2])
-        # check that it was success
-            if os.path.isfile(fname):
-                snre = True
+        else:
+            if os.path.isfile(fname3):
+                subprocess.call(['gunzip', fname3])
+        # make sure the uncompression worked
+        if os.path.isfile(fname):
+            snre = True
+
 #   return fname2 but mostly for backwards compatibility
     return fname, fname2, snre 
 

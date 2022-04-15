@@ -189,17 +189,23 @@ def read_one_snr(obsfile,ifile):
 
     return sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE
 
-def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays):
+def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays,gzip):
     """
     author: kristine larson
     inputs boolean (whether you want to compress), whether you have two
     days (TwoDays) and file names
     nothing is returned
+    2022april15 allow gzip instead of xz
     """
-    if wantCompression:
+    if gzip:
         if (os.path.isfile(obsfile) == True):
-            #print('xz compressing first SNR day')
-            subprocess.call(['xz', obsfile])
+            subprocess.call(['gzip', obsfile])
         if (os.path.isfile(obsfile2) == True and twoDays == True):
-            #print('compressing second day')
-            subprocess.call(['xz', obsfile2])
+            subprocess.call(['gzip', obsfile2])
+    else:
+        # this is only for xz compression
+        if wantCompression:
+            if (os.path.isfile(obsfile) == True):
+                subprocess.call(['xz', obsfile])
+            if (os.path.isfile(obsfile2) == True and twoDays == True):
+                subprocess.call(['xz', obsfile2])
