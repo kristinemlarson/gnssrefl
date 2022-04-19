@@ -330,19 +330,19 @@ gfortran in your terminal (or yum install -y gcc-gfortran ).
 **If you are using a MacOS** then you will need to install xcode. First, in your 
 terminal, check first to see if you already have it:
 
-<code>xcode-select -p</code>. 
+<code>xcode-select -p</code> 
 
 If it is installed, it should return a path. If it is not installed then run
 
-<code>xcode-select --install</code>. 
+<code>xcode-select --install</code> 
 
 This should install gcc. You can check if you have gcc by typing 
 
-<code>gcc --version</code>.
+<code>gcc --version</code>
 
 You can check to see if you have gfortran by typing 
 
-<code>gfortran --version</code>. 
+<code>gfortran --version</code> 
 
 If you do not have gfortran, then you can use homebrew to install (<code>brew install gfortran</code>). If you
 don't have homebrew, then [check here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
