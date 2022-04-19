@@ -334,6 +334,25 @@ Check if you have gfortran by gfortran --version. If you do not have
 gfortran, then you can use homebrew to install (brew install gfortran). If you
 don't have homebrew, then [check here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
 
+
+*Installing the Python*
+
+If you are using the version from gitHub:
+
+* git clone https://github.com/kristinemlarson/gnssrefl 
+* cd into that directory, set up a virtual environment, a la python3 -m venv env 
+* activate your virtual environment
+* pip install .
+
+If you use the PyPi version:  
+
+* make a directory, cd into that directory, set up a virtual environment 
+* activate the virtual environment
+* pip install gnssrefl
+
+To use **only** python codes, you will need to be sure that your RINEX files are not Hatanaka 
+compressed.
+
 *Environment Variables*
    
 You should define three environment variables:
@@ -354,24 +373,6 @@ your local working directory (where you installed the code) is where
 you want everything to be. The orbits, SNR files, and periodogram results are stored in 
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
-*Installing the Python*
-
-If you are using the version from gitHub:
-
-* git clone https://github.com/kristinemlarson/gnssrefl 
-* cd into that directory, set up a virtual environment, a la python3 -m venv env 
-* activate your virtual environment
-* pip install .
-
-If you use the PyPi version:  
-
-* make a directory, cd into that directory, set up a virtual environment 
-* activate the virtual environment
-* pip install gnssrefl
-
-To use **only** python codes, you will need to be sure that your RINEX files are not Hatanaka 
-compressed.
-
 *Non-Python Code*
 
 **All executables must be stored in the EXE directory.** There are three 
@@ -389,14 +390,16 @@ http://dx.doi.org/10.5880/GFZ.1.1.2016.002.
 While I think it is better for people to download these tools to make sure you get
 the right one, I have written a utility that will download the appropriate files for 
 a macOS or linux (64 bit) installation.  It is called <code>installexe</code>.  
-Type -h for more information.
+**This install does not currently work for the new Apple chip.** Type -h for more information.
 
 We no longer encourage people to install these Fortran RINEX translators. The Fortran is now 
 included in the python build.
 
-* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e.** For the code: https://github.com/kristinemlarson/gpsonlySNR
+* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e.** For the 
+code: https://github.com/kristinemlarson/gpsonlySNR
 
-* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e** For the code: https://github.com/kristinemlarson/gnssSNR
+* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e** For the 
+code: https://github.com/kristinemlarson/gnssSNR
 
 <HR>
 
