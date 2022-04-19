@@ -390,9 +390,8 @@ directories in year, followed by type, i.e. snr, results, sp3, nav, and then by 
 
 **All executables must be stored in the EXE directory.** There are three 
 main executables used by <code>gnssrefl</code>: teqc, gfzrnx and CRX2RNX.
-I have written a utility that will download these executables for 
-a macOS or linux (64 bit) installation and put them in the correct place. It is called <code>installexe</code>.  
-**This install does not currently work for the new Apple chip.** Type -h for more information.
+I have written a utility - <code>installexe</code> - that will download these executables for 
+a macOS or linux (64 bit) installation and put them in the correct place. **This install does not currently work for the new Apple chip.** Type -h for more information.
 
 Further information:
 
