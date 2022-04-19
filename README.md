@@ -322,16 +322,29 @@ mask and reflector height range. This is one of the reasons <code>quickLook</cod
 
 **VERY IMPORTANT:**
 
-This setup requires system dependencies: gcc and gfortran.
+This setup requires a few system dependencies: gcc and gfortran.
 
 **If you are using LINUX** then simply run apt-get install -y gcc and apt-get install -y
 gfortran in your terminal (or yum install -y gcc-gfortran ).
 
-**If you are using a MacOS** then you will need to install xcode. First, in your terminal, check if you have xcode
-by xcode-select -p. If it is installed, it should return a path. If it is not installed then run
-xcode-select --install. This should install gcc.You can check if you have gcc by gcc --version.
-Check if you have gfortran by gfortran --version. If you do not have
-gfortran, then you can use homebrew to install (brew install gfortran). If you
+**If you are using a MacOS** then you will need to install xcode. First, in your 
+terminal, check first to see if you already have it:
+
+<code>xcode-select -p</code>. 
+
+If it is installed, it should return a path. If it is not installed then run
+
+<code>xcode-select --install</code>. 
+
+This should install gcc. You can check if you have gcc by typing 
+
+<code>gcc --version</code>.
+
+You can check to see if you have gfortran by typing 
+
+<code>gfortran --version</code>. 
+
+If you do not have gfortran, then you can use homebrew to install (<code>brew install gfortran</code>). If you
 don't have homebrew, then [check here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
 
 
@@ -376,7 +389,12 @@ directories in year, followed by type, i.e. snr, results, sp3, nav, and then by 
 *Non-Python Code*
 
 **All executables must be stored in the EXE directory.** There are three 
-main codes I recommend that you install:
+main executables used by <code>gnssrefl</code>: teqc, gfzrnx and CRX2RNX.
+I have written a utility that will download these executables for 
+a macOS or linux (64 bit) installation and put them in the correct place. It is called <code>installexe</code>.  
+**This install does not currently work for the new Apple chip.** Type -h for more information.
+
+Further information:
 
 * Required translator for compressed (Hatanaka) RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. 
 
@@ -387,13 +405,8 @@ this code is no longer supported by UNAVCO.
 * Optional datatool, **gfzrnx** is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
 http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
 
-While I think it is better for people to download these tools to make sure you get
-the right one, I have written a utility that will download the appropriate files for 
-a macOS or linux (64 bit) installation.  It is called <code>installexe</code>.  
-**This install does not currently work for the new Apple chip.** Type -h for more information.
-
 We no longer encourage people to install these Fortran RINEX translators. The Fortran is now 
-included in the python build.
+included in the python build. We provide these links for general interest:
 
 * Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e.** For the 
 code: https://github.com/kristinemlarson/gpsonlySNR
