@@ -13,6 +13,7 @@ f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
 
 import argparse
 import os
+import time
 import sys
 
 import gnssrefl.gps as g
@@ -342,7 +343,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
             'overwrite': overwrite, 'translator': translator, 'srate': samplerate, 'mk': mk,
             'skipit': skipit, 'stream': stream}
 
+    s1 = time.time()
     rnx.run_rinex2snr(**args)
+    s2 = time.time()
+    print('That took ', round(s2-s1,2), ' seconds')
     print('Feedback written to subdirectory logs')
 
 
