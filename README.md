@@ -355,15 +355,17 @@ If you are using the version from gitHub:
 * git clone https://github.com/kristinemlarson/gnssrefl 
 * cd into that directory, set up a virtual environment, a la python3 -m venv env 
 * activate your virtual environment
-* pip3 install wheel (we are working to remove this step)
-* pip3 install .
+* pip install wheel (we are working to remove this step)
+* pip install .
+* from what I understand, you should be able to use pip3 instead of pip
 
 If you use the PyPi version:  
 
 * make a directory, cd into that directory, set up a virtual environment 
 * activate the virtual environment
-* pip3 install wheel (we are working to remove this step)
-* pip3 install gnssrefl
+* pip install wheel (we are working to remove this step)
+* pip install gnssrefl
+* from what I understand, you should be able to use pip3 instead of pip
 
 To use **only** python codes, you will need to be sure that your RINEX files are not Hatanaka 
 compressed.
@@ -393,9 +395,10 @@ directories in year, followed by type, i.e. snr, results, sp3, nav, and then by 
 **All executables must be stored in the EXE directory.** There are three 
 main executables used by <code>gnssrefl</code>: teqc, gfzrnx and CRX2RNX.
 I have written a utility - <code>installexe</code> - that will download these executables for 
-a macOS or linux (64 bit) installation and put them in the correct place. **This install does not currently work for the new Apple chip.** Type -h for more information.
+a macOS or linux (64 bit) installation and put them in the 
+correct place. **This install does not currently work for the new Apple chip.** Type -h for more information.
 
-Further information:
+*Further information:*
 
 * Required translator for compressed (Hatanaka) RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. 
 
