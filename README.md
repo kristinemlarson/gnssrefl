@@ -355,15 +355,15 @@ If you are using the version from gitHub:
 * git clone https://github.com/kristinemlarson/gnssrefl 
 * cd into that directory, set up a virtual environment, a la python3 -m venv env 
 * activate your virtual environment
-* pip install wheel (we are working to remove this step)
-* pip install .
+* pip3 install wheel (we are working to remove this step)
+* pip3 install .
 
 If you use the PyPi version:  
 
 * make a directory, cd into that directory, set up a virtual environment 
 * activate the virtual environment
-* pip install wheel (we are working to remove this step)
-* pip install gnssrefl
+* pip3 install wheel (we are working to remove this step)
+* pip3 install gnssrefl
 
 To use **only** python codes, you will need to be sure that your RINEX files are not Hatanaka 
 compressed.
