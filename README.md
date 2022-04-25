@@ -9,7 +9,7 @@ I recently bought a new apple laptop - with the new chip. You need both gfzrnx a
 for gnssrefl to work. If you are using an existing docker, you should be fine. But if you want
 to do this from a python install, you will need to:
 
-- compile the crxrnx source code and store in $EXE as <code>crxrnx</code>.
+- compile the crxrnx source code and store in $EXE as <code>CRX2RNX</code>.
 - download and install the executable provided by GFZ (you need to sign up as a non-profit user). It needs to be 
 stored in $EXE as <code>gfzrnx</code>.
 
@@ -347,6 +347,26 @@ You can check to see if you have gfortran by typing
 If you do not have gfortran, then you can use homebrew to install (<code>brew install gfortran</code>). If you
 don't have homebrew, then [check here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
 
+*Environment Variables*
+   
+You should define three environment variables:
+
+* EXE = where various executables will live. These are mostly related to manipulating RINEX files.
+
+* ORBITS = where the GPS/GNSS orbits will be stored. They will be listed under directories by 
+year and sp3 or nav depending on the orbit format.
+
+* REFL_CODE = where the reflection code inputs (SNR files and instructions) and outputs (RH)
+will be stored (see below). Both snr files and results will be saved here in year subdirectories.
+
+If you are running in a bash environment, you should save these environment variables in
+the .bashrc file that is run whenever you log on.
+
+If you don't define these environment variables, the code *should* assume 
+your local working directory (where you installed the code) is where 
+you want everything to be (to be honest, I have not tested this in a while).
+The orbits, SNR files, and periodogram results are stored in 
+directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
 *Installing the Python*
 
@@ -358,6 +378,9 @@ If you are using the version from gitHub:
 * pip install wheel (we are working to remove this step)
 * pip install .
 * from what I understand, you should be able to use pip3 instead of pip
+* you DO need a few more executables, so please read below or type 
+<code>installexe linux64 </code> or <code>installexe macos </code> 
+
 
 If you use the PyPi version:  
 
@@ -366,39 +389,19 @@ If you use the PyPi version:
 * pip install wheel (we are working to remove this step)
 * pip install gnssrefl
 * from what I understand, you should be able to use pip3 instead of pip
+* you DO need a few more executables, so please read below or type 
+<code>installexe linux64 </code> or <code>installexe macos </code> 
 
-To use **only** python codes, you will need to be sure that your RINEX files are not Hatanaka 
-compressed.
-
-*Environment Variables*
-   
-You should define three environment variables:
-
-* EXE = where various RINEX executables will live.
-
-* ORBITS = where the GPS/GNSS orbits will be stored. They will be listed under directories by 
-year and sp3 or nav depending on the orbit format.
-
-* REFL_CODE = where the reflection code inputs (SNR files and instructions) and outputs (RH)
-will be stored (see below). Both SNR files and results will be saved here in year subdirectories.
-
-If you are running in a bash environment, you should save these environment variables in
-the .bashrc file that is run whenever you log on.
-
-If you don't define these environment variables, the code should assume 
-your local working directory (where you installed the code) is where 
-you want everything to be. The orbits, SNR files, and periodogram results are stored in 
-directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
 *Non-Python Code*
 
-**All executables must be stored in the EXE directory.** There are three 
+**These executables must be stored in the EXE directory.** There are three 
 main executables used by <code>gnssrefl</code>: teqc, gfzrnx and CRX2RNX.
 I have written a utility - <code>installexe</code> - that will download these executables for 
 a macOS or linux (64 bit) installation and put them in the 
 correct place. **This install does not currently work for the new Apple chip.** Type -h for more information.
 
-*Further information:*
+*Further information on these non-python codes:*
 
 * Required translator for compressed (Hatanaka) RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. 
 
