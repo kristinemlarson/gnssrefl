@@ -13,14 +13,12 @@ to do this from a python install, you will need to:
 - download and install the executable provided by GFZ (you need to sign up as a non-profit user). It needs to be 
 stored in $EXE as <code>gfzrnx</code>.
 
-**Current github version: 1.1.2**
+**Current github version: 1.1.3**
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
-Please note: <code>rinex2snr</code> and <code>download_rinex</code> have been substantially changed. Please
-let me know if I broke anything.
 
 [How to ask for help](#helpmeplease)
 
@@ -31,9 +29,6 @@ let me know if I broke anything.
 [Link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
 [Link to Docker build](https://hub.docker.com/r/unavdocker/gnssrefl)
-
-Command line inputs which previously required True also now work with T and true.
-
 
 ### Table of Contents
 
@@ -59,6 +54,21 @@ Command line inputs which previously required True also now work with T and true
 
 ### 1. News <a name="news"></a>
 
+Please note: <code>rinex2snr</code> and <code>download_rinex</code> have been substantially changed. Please
+let me know if I broke anything.
+
+Command line inputs which previously required True also now work with T and true.
+
+You can now gzip your snr files (in addition to xz compression).
+
+I recently bought a new apple laptop - with the new chip. You need both gfzrnx and crxrnx
+for gnssrefl to work. If you are using an existing docker, you should be fine. But if you want
+to do this from a python install, you will need to:
+
+- compile the crxrnx source code and store in $EXE as <code>CRX2RNX</code>.
+- download and install the executable provided by GFZ (you need to sign up as a non-profit user). It needs to be
+stored in $EXE as <code>gfzrnx</code>.
+
 **New utility for subdaily analysis:** [invsnr](https://github.com/kristinemlarson/gnssrefl/blob/master/README_invsnr.md) This is currently only available for the command line version on github.
 
 A new UNR database has been created/updated - it can be used to provide precise lat/long/ht a priori coordinates 
@@ -77,8 +87,7 @@ If you have orbit files you would like to use and they follow the naming convent
 by <code>gnssrefl</code>, you can use them. You need to store them in 
 the proper place ($ORBITS/yyyy/nav for nav messages and $ORBITS/yyyy/sp3 for sp3 files).
 
-Access to GSI RINEX data has been provided 
-Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
+Access to GSI RINEX data has been provided Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
 In my experience GSI is very responsive to account requests.  
 
 A bug was fixed in the old python translator option for S6/S7 data. Thank you to Andrea Gatti for this information.
