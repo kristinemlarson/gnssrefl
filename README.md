@@ -15,7 +15,7 @@
 
 [Quick link to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
-[Quick link to the homeworks used in the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks). They are numbered homework0, homework1, etc.
+[Quick link to the command line homeworks used in the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks). They are numbered homework0, homework1, etc.
 
 [Quick link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
