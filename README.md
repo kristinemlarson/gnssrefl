@@ -13,13 +13,13 @@
 
 [How to ask for help](#helpmeplease)
 
-[Short cut to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
+[Quick link to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 
-[Homeworks for the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks)
+[Quick link to the homeworks used in the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks). They are numbered homework0, homework1, etc.
 
-[Link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
+[Quick link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
-[Link to Docker build](https://hub.docker.com/r/unavdocker/gnssrefl)
+[Quick link to Docker build](https://hub.docker.com/r/unavdocker/gnssrefl)
 
 ### Table of Contents
 
@@ -174,7 +174,7 @@ github/pypi package installation.
 
 1. [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
-2. via a Docker container. Pick your system([Mac](https://docs.docker.com/docker-for-mac/install/), [Windows](https://docs.docker.com/docker-for-windows/install/), [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)) and download from the Docker website. Use <code>docker pull unavdocker/gnssrefl</code> to install code. Details on the [run command](https://hub.docker.com/r/unavdocker/gnssrefl)
+2. via a Docker container. Pick your system([Mac](https://docs.docker.com/docker-for-mac/install/), [Windows](https://docs.docker.com/docker-for-windows/install/), [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)) and download from the Docker website. Change to the directory where you want to run your code/store your files. Use <code>docker pull unavdocker/gnssrefl</code> to install code. Details on the [run command](https://hub.docker.com/r/unavdocker/gnssrefl) are provided.
 
 3. github or pypi 
 
