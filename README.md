@@ -5,20 +5,11 @@
 
 ### gnssrefl
 
-I recently bought a new apple laptop - with the new chip. You need both gfzrnx and crxrnx 
-for gnssrefl to work. If you are using an existing docker, you should be fine. But if you want
-to do this from a python install, you will need to:
-
-- compile the crxrnx source code and store in $EXE as <code>CRX2RNX</code>.
-- download and install the executable provided by GFZ (you need to sign up as a non-profit user). It needs to be 
-stored in $EXE as <code>gfzrnx</code>.
-
 **Current github version: 1.1.3**
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
-
 
 [How to ask for help](#helpmeplease)
 
@@ -102,11 +93,11 @@ I encourage you to read [Roesler and Larson, 2018](https://link.springer.com/art
 Although this article was originally written to accompany Matlab scripts, 
 the principles are the same. It explains to you what a reflection
 zone means and what a Nyquist frequency is for GNSS reflections. 
-My reflection zone webapp 
-will [help you pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones)
+My reflection zone webapp will [help you pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones)
 If you click the box, the same web app will also compute the Nyquist for L1,L2, and L5.
 
-If you are interested in measuring sea level, this webapp tells you [how high your site is above sea level.](https://gnss-reflections.org/geoid)  
+If you are interested in measuring sea level, this 
+webapp tells you [how high your site is above sea level.](https://gnss-reflections.org/geoid)  
 
 ### 2. Philosophical Statement <a name="philosophy"></a>
 In geodesy, you don't really need to know much about what you are doing to 
@@ -1271,7 +1262,7 @@ Kristine M. Larson
 
 [https://kristinelarson.net](https://kristinelarson.net)
 
-This documentation was updated on February 4, 2022.
+This documentation was updated on April 25, 2022.
 
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
