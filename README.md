@@ -54,15 +54,16 @@ Command line inputs which previously required True also now work with T and true
 
 You can now gzip your snr files (in addition to xz compression).
 
-I recently bought a new apple laptop - with the new chip. You need both gfzrnx and crxrnx
-for gnssrefl to work. If you are using an existing docker, you should be fine. But if you want
+I recently bought a new apple laptop - with the new chip. You need both gfzrnx and CRX2RNX 
+for gnssrefl to work. If you are using an existing docker, I think you should be fine. But if you want
 to do this from a python install, you will need to:
 
-- compile the crxrnx source code and store in $EXE as <code>CRX2RNX</code>.
-- download and install the executable provided by GFZ (you need to sign up as a non-profit user). It needs to be
-stored in $EXE as <code>gfzrnx</code>.
+- Download and compile the [Hatanaka source code](http://terras.gsi.go.jp/ja/crx2rnx.html) and store in $EXE as <code>CRX2RNX</code>.
+- Download and install the executable provided by GFZ (you need to sign up as a non-profit user). It needs to be
+stored in $EXE with the name <code>gfzrnx</code>. Remember to set the executable bit (chmod +x).
 
-**New utility for subdaily analysis:** [invsnr](https://github.com/kristinemlarson/gnssrefl/blob/master/README_invsnr.md) This is currently only available for the command line version on github.
+**New utility for subdaily analysis:** [invsnr](https://github.com/kristinemlarson/gnssrefl/blob/master/README_invsnr.md). 
+This is currently only available for the command line version on github.
 
 A new UNR database has been created/updated - it can be used to provide precise lat/long/ht a priori coordinates 
 in <code>make_json_input</code> if you have a station that is recognized by UNR.
