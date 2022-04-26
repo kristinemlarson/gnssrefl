@@ -320,9 +320,29 @@ mask and reflector height range. This is one of the reasons <code>quickLook</cod
 
 ### ii. Installation<a name="environment"></a>
 
+
+You can  access this package via Jupyter notebooks, Docker containers, or traditional
+github/pypi package installation. 
+
+* [notebooks:](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
+
+* via docker container:
+Pick your system and download from the Docker website.
+
+- [Mac](https://docs.docker.com/docker-for-mac/install/)
+
+- [Windows](https://docs.docker.com/docker-for-windows/install/)
+
+- [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+
+* <code>docker pull unavdocker/gnssrefl</code>
+
+* [run command](https://hub.docker.com/r/unavdocker/gnssrefl)
+
+<hr>
 **VERY IMPORTANT:**
 
-This setup requires a few system dependencies: gcc and gfortran.
+for installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
 
 **If you are using LINUX** then simply run apt-get install -y gcc and apt-get install -y
 gfortran in your terminal (or yum install -y gcc-gfortran ).
