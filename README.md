@@ -185,15 +185,11 @@ github/pypi package installation.
 
 2. via a Docker container. Pick your system([Mac](https://docs.docker.com/docker-for-mac/install/), [Windows](https://docs.docker.com/docker-for-windows/install/), [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)) and download from the Docker website. Use <code>docker pull unavdocker/gnssrefl</code> to install code. Details on the [run command](https://hub.docker.com/r/unavdocker/gnssrefl)
 
-3. github (see below)
+3. github or pypi 
 
-4. pypi 
-
-**VERY IMPORTANT:** for installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
-
-**If you are using LINUX** then simply run apt-get install -y gcc and apt-get install -y
+For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
+**If you are using linux** then simply run apt-get install -y gcc and apt-get install -y
 gfortran in your terminal (or yum install -y gcc-gfortran ).
-
 **If you are using a MacOS** then you will need to install xcode. First, in your 
 terminal, check first to see if you already have it:
 
@@ -211,7 +207,7 @@ You can check to see if you have gfortran by typing
 
 <code>gfortran --version</code> 
 
-If you do not have gfortran, then you can use homebrew to install (<code>brew install gfortran</code>). If you
+If you do not have gfortran, then you can use homebrew to install (<code>brew install gfortran</code>).
 
 *Environment Variables*
    
