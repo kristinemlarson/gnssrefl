@@ -166,9 +166,7 @@ with the details associated with **gnssir**. It is not meant to be used for rout
 It also helps you pick an appropriate azimtuh mask and quality control settings.
 
 There are also various utilities you might find to be useful (see the last section).
-To see the names of these utilities:
-
-* pip list 
+To see the names of these utilities: <code>pip list</code>
 
 If you are unsure about why various restrictions are being applied, it is really useful 
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
@@ -183,10 +181,9 @@ not in hand at the moment.
 You can  access this package via Jupyter notebooks, Docker containers, or traditional
 github/pypi package installation. 
 
-* [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
+1. [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
-* via a Docker container:
-Pick your system and download from the Docker website.
+2. via a Docker container. Pick your system and download from the Docker website.
 
 - [Mac](https://docs.docker.com/docker-for-mac/install/)
 
@@ -194,14 +191,15 @@ Pick your system and download from the Docker website.
 
 - [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
-* <code>docker pull unavdocker/gnssrefl</code>
+- <code>docker pull unavdocker/gnssrefl</code>
 
-* [run command](https://hub.docker.com/r/unavdocker/gnssrefl)
+- [run command](https://hub.docker.com/r/unavdocker/gnssrefl)
 
-<hr>
-**VERY IMPORTANT:**
+3. github (see below)
 
-for installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
+4. pypi 
+
+**VERY IMPORTANT:** for installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
 
 **If you are using LINUX** then simply run apt-get install -y gcc and apt-get install -y
 gfortran in your terminal (or yum install -y gcc-gfortran ).
