@@ -40,12 +40,14 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 
 
 ## For WINDOWS USERS:
-(thank you Paul Wu @ Univ. of CO for this)
-* install [Docker for Windows](https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe)
+(thank you Paul Wu and James Monaco @ Univ. of CO for this)
+* install [Docker for Windows](https://docs.docker.com/desktop/windows/install/)
 	* Problem: <code>WSL2 Installation is incomplete</code>.  
 		* Solution: Need to download and install [from step 4](https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package)
 	* Problem: Docker stuck at initial stage
 		* Solution: restart the computer after docker installation
+	* Problem: need to convert existing WSL environment into WSL 2 and associate with Docker
+	 	* Solution: follow [this documentation](https://docs.docker.com/desktop/windows/wsl/)
 
 
 * execute docker run command (see above) in terminal window
