@@ -43,6 +43,8 @@
 8. [How to ask for help about running the code](#helpmeplease)
 9. [Acknowledgements](#acknowledgements)
 
+<HR>
+
 ### 1. News <a name="news"></a>
 
 Please note: <code>rinex2snr</code> and <code>download_rinex</code> have been substantially changed. Please
@@ -98,6 +100,8 @@ If you click the box, the same web app will also compute the Nyquist for L1,L2, 
 
 If you are interested in measuring sea level, this 
 webapp tells you [how high your site is above sea level.](https://gnss-reflections.org/geoid)  
+
+<HR>
 
 ### 2. Philosophical Statement <a name="philosophy"></a>
 In geodesy, you don't really need to know much about what you are doing to 
