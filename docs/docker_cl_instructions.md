@@ -28,15 +28,14 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 * docker has vim for editing text files (ie .json station config file)
 * if you want to process rinex files already on your local machine, you can copy them into <code>/refl_code/</code> local directory that is already mounted to the container given the previous run command.  If you have a lot of rinex and want to keep organized, you can copy into refl_code/rinex/station/cyyy/, where station is the 4char ID and cyyy is the 4char year, and then mount that directory in the docker run command as follows: <code> docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ -v $(pwd)/refl_code/rinex/station/cyyy:/etc/gnssrefl/refl_code/rinex/station/cyyy/ unavdocker/gnssrefl:latest /bin/bash </code>
 
-Shutdown 
 
-#### Shutdown <a name="Shutdown"></a>
+### Shutdown Docker <a name="Shutdown"></a>
 To Shut down the container from the terminal just use `ctrl+c`
 
 To shut down the docker container run `docker stop [container name]`
 If you need to see the container(s) you have running you can use `docker ps`
 
-#### Update Docker Image to newest version <a name="Update Docker"></a>
+### Update Docker Image to newest version <a name="Update Docker"></a>
 To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 
 
