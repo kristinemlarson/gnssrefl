@@ -22,7 +22,7 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 
 (Description of the commands used:  <code>-it</code> calls interactive process (bin/bash shell); <code>-v</code> mounts external volumes to allow the user to keep their processing results and figures)
 
-* Start your [gnssrefl processing!](https://github.com/kristinemlarson/gnssrefl#iv-rinex2snr---extracting-snr-data-from-rinex-files-)
+* Start your [gnssrefl processing!](https://github.com/kristinemlarson/gnssrefl#understanding)
 
 ### notes:
 * docker has vim for editing text files (ie .json station config file)
