@@ -28,8 +28,9 @@ Description of the commands used:
 Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
 
 ### Notes:
-* docker has vim for editing text files (ie .json station config file)
-* if you want to process rinex files already on your local machine, you can copy them into 
+docker has vim for editing text files (ie .json station config file)
+
+If you want to process RINEX files that are stored on your local machine, you can copy them into 
 <code>/refl_code/</code> local directory that is already mounted to the container given the previous run command.  
 
 If you have a lot of RINEX files and want to keep them organized, you should copy them 
@@ -41,7 +42,7 @@ You should then mount that directory in the docker run command as follows:
 
 
 ### Shutdown Docker <a name="Shutdown"></a>
-To Shut down the container from the terminal just use `ctrl+c`
+To shut down the container from the terminal, use `ctrl+c`
 
 To shut down the docker container run `docker stop [container name]`
 If you need to see the container(s) you have running you can use `docker ps`
