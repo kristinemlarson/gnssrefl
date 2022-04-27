@@ -1,7 +1,7 @@
-# Assistance on deploying gnssrefl [docker image from dockerhub](https://hub.docker.com/repository/docker/unavdocker/gnssrefl)
-April 2022
+# Assistance on deploying the gnssrefl [docker image from dockerhub](https://hub.docker.com/repository/docker/unavdocker/gnssrefl)
+April 27, 2022
 
-(Feedback on these instructions is appreciated!)
+Please send your feedback on these instructions to Tim Dittmann at UNAVCO .
 
 for jupyter notebook version, please see [gnssrefl_jupyter instructions](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 ## Install Docker
@@ -20,17 +20,20 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 * cd into the local directory that you wish to keep your processed results
 * <code>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files unavdocker/gnssrefl:latest /bin/bash</code>
 
-(Description of the commands used:  <code>-it</code> calls interactive process (bin/bash shell); <code>-v</code> mounts external volumes to allow the user to keep their processing results and figures)
+Description of the commands used:  
 
-* Start your [gnssrefl processing!](https://github.com/kristinemlarson/gnssrefl#understanding)
+* <code>-it</code> calls interactive process (bin/bash shell) 
+* <code>-v</code> mounts external volumes to allow the user to keep their processing results and figures 
 
-### notes:
+* Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
+
+### Notes:
 * docker has vim for editing text files (ie .json station config file)
 * if you want to process rinex files already on your local machine, you can copy them into 
 <code>/refl_code/</code> local directory that is already mounted to the container given the previous run command.  
 
 If you have a lot of RINEX files and want to keep them organized, you should copy them 
-into refl_code/rinex/station/yyyy/, where station is the lowercase 4char ID and yyyy is the year. 
+into <code>refl_code/rinex/station/yyyy/</code>, where station is the lowercase 4char ID and yyyy is the year. 
 You should then mount that directory in the docker run command as follows: 
 
 <code> docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ 

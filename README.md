@@ -176,14 +176,12 @@ not in hand at the moment.
 You can  access this package via Jupyter notebooks, Docker containers, or traditional
 github/pypi package installation. 
 
-1. [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
+1. via [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
-2. via a Docker container
-You will need to have installed the docker executable ([Mac](https://docs.docker.com/docker-for-mac/install/), 
+2. via a Docker container. You will need to have installed the docker executable ([Mac](https://docs.docker.com/docker-for-mac/install/), 
 [Windows](https://docs.docker.com/docker-for-windows/install/), 
 [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)).
-[More details on the 
-run command you need.](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md).
+[More details on the run command you need.](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md).
 
 3. github or pypi 
 
