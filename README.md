@@ -178,7 +178,13 @@ github/pypi package installation.
 
 1. [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
-2. via a Docker container. Pick your system([Mac](https://docs.docker.com/docker-for-mac/install/), [Windows](https://docs.docker.com/docker-for-windows/install/), [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)) and download from the Docker website. Change to the directory where you want to run your code/store your files. Use <code>docker pull unavdocker/gnssrefl</code> to install code. Details on the [run command](https://hub.docker.com/r/unavdocker/gnssrefl) are provided.
+2. via a Docker container
+You will need to have installed the docker executable ([Mac](https://docs.docker.com/docker-for-mac/install/), 
+[Windows](https://docs.docker.com/docker-for-windows/install/), 
+[Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)) 
+Change to the directory where you want to run your code/store your files. 
+[For details on the 
+run command](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md).
 
 3. github or pypi 
 
@@ -1270,3 +1276,4 @@ This documentation was updated on April 25, 2022.
 
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
+docker pull unavdocker/gnssrefl to install code. 
