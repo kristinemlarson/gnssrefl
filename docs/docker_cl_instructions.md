@@ -26,7 +26,15 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 
 ### notes:
 * docker has vim for editing text files (ie .json station config file)
-* if you want to process rinex files already on your local machine, you can copy them into <code>/refl_code/</code> local directory that is already mounted to the container given the previous run command.  If you have a lot of rinex and want to keep organized, you can copy into refl_code/rinex/station/cyyy/, where station is the 4char ID and cyyy is the 4char year, and then mount that directory in the docker run command as follows: <code> docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ -v $(pwd)/refl_code/rinex/station/cyyy:/etc/gnssrefl/refl_code/rinex/station/cyyy/ unavdocker/gnssrefl:latest /bin/bash </code>
+* if you want to process rinex files already on your local machine, you can copy them into 
+<code>/refl_code/</code> local directory that is already mounted to the container given the previous run command.  
+
+If you have a lot of RINEX files and want to keep them organized, you should copy them 
+into refl_code/rinex/station/yyyy/, where station is the lowercase 4char ID and yyyy is the year. 
+You should then mount that directory in the docker run command as follows: 
+
+<code> docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ 
+-v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ unavdocker/gnssrefl:latest /bin/bash </code>
 
 
 ### Shutdown Docker <a name="Shutdown"></a>
