@@ -14,7 +14,7 @@ run the HW0 notebook from the [jupyter notebook repository, either via docker or
 
 ## **Command line version options: [gitHub](#runs-locally-on-linux-or-macos-using-code-from-github) or [Docker image](#docker-gnssrefl-command-line-container-option)**
 
-### Runs locally on linux or macOS using code from GitHub
+### GNSSREFL via GITHUB (local version)
 
 **NOTE** this setup requires system dependencies: **gcc** and **gfortran**.  To install:
 * if you are using a LINUX then simply run `apt-get install -y gcc` and `apt-get install -y gfortran` in your terminal (or <code>yum install -y gcc-gfortran</code> ).
@@ -44,20 +44,11 @@ Finally, if you haven't already installed required executables in $EXE (CRX2RNX,
 * install them using gnssrefl commandline installer
   * <code>installexe *OS_type*</code>, where *OS_type* is either {<code>macos</code>, <code>linux64</code>}
 
-### Docker gnssrefl command line container option
+### GNSSREFL DOCKER (container version)
 
 [docker hub image](https://hub.docker.com/repository/docker/unavdocker/gnssrefl)
 
-* [install Docker](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter#step-1-install-docker)
-
-* cd into the local directory that you wish to store processed results
-
-* <code>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files unavdocker/gnssrefl:latest /bin/bash</code>
-
-(Description of the commands used:  <code>-it</code> calls interactive process (bin/bash shell); <code>-v</code> mounts external volumes)
-
-
-* cd into gnssrefl directory, and you now have a linux container running gnssrefl.
+* [see docker command line instructions](https://github.com/timdittmann/gnssrefl/blob/docker_instructions/docs/docker_cl_instructions.md)
 
 *NB:* if you use the <code>quicklook</code> function, the figures generated will **not** plot to the screen but will be available in the mounted refl_code/Files volume mounted locally.
 
