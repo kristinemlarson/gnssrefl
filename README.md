@@ -181,10 +181,9 @@ github/pypi package installation.
 2. via a Docker container
 You will need to have installed the docker executable ([Mac](https://docs.docker.com/docker-for-mac/install/), 
 [Windows](https://docs.docker.com/docker-for-windows/install/), 
-[Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)) 
-Change to the directory where you want to run your code/store your files. 
-[For details on the 
-run command](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md).
+[Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)).
+[More details on the 
+run command you need.](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md).
 
 3. github or pypi 
 
