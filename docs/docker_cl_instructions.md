@@ -25,7 +25,7 @@ Description of the commands used:
 * <code>-it</code> calls interactive process (bin/bash shell) 
 * <code>-v</code> mounts external volumes to allow the user to keep their processing results and figures 
 
-* Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
+Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
 
 ### Notes:
 * docker has vim for editing text files (ie .json station config file)
