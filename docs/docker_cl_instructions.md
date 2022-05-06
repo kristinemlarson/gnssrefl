@@ -1,4 +1,4 @@
-# Assistance on deploying the gnssrefl [docker image from dockerhub](https://hub.docker.com/repository/docker/unavdocker/gnssrefl)
+# Assistance on deploying the gnssrefl [docker image from dockerhub](https://hub.docker.com/r/unavdocker/gnssrefl)
 April 27, 2022
 
 Please send your feedback on these instructions to Tim Dittmann at UNAVCO .
@@ -18,7 +18,7 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 
 ## Run gnssrefl Docker
 * cd into the local directory that you wish to keep your processed results
-* <code>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files unavdocker/gnssrefl:latest /bin/bash</code>
+* <code>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files --name gnssrefl unavdocker/gnssrefl:latest /bin/bash</code>
 
 Description of the commands used:  
 
@@ -38,13 +38,13 @@ into <code>refl_code/rinex/station/yyyy/</code>, where station is the lowercase 
 You should then mount that directory in the docker run command as follows: 
 
 <code> docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ 
--v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ unavdocker/gnssrefl:latest /bin/bash </code>
+-v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl unavdocker/gnssrefl:latest /bin/bash </code>
 
 
 ### Shutdown Docker <a name="Shutdown"></a>
 To shut down the container from the terminal, use `ctrl+c`
 
-To shut down the docker container run `docker stop [container name]`
+To shut down the docker container run `docker stop gnssrefl`
 If you need to see the container(s) you have running you can use `docker ps`
 
 ### Update Docker Image to newest version <a name="Update Docker"></a>
