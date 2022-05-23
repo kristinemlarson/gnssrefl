@@ -19,7 +19,9 @@
 
 [Quick link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
-[Quick link to Docker build](https://hub.docker.com/r/unavdocker/gnssrefl)
+[Quick link to Docker](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)
+
+[Old quick link to Docker](https://hub.docker.com/r/unavdocker/gnssrefl)
 
 ### Table of Contents
 

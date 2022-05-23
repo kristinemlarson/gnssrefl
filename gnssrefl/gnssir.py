@@ -152,9 +152,24 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
 # close the output files
             ct += 1
             #'Yes' if fruit == 'Apple' else 'No'
+            # used to send the plot to the screen and user had to clear it before it would go to the next
+            #if found_results and plot_screen:
+            #    plot2screen(station, f, ax1, ax2,lsp['pltname']) 
             if found_results and plot_screen:
-                plot2screen(station, f, ax1, ax2,lsp['pltname']) 
+                ax1.set_xlabel('Elevation Angles (deg)')
+                ax1.grid(True, linestyle='-'); ax2.grid(True, linestyle='-')
+                ax1.set_title(station + ' Raw Data/Periodogram for ' + g.ftitle(f) + ' Frequency')
+                ax2.set_xlabel('Reflector Height (m)');
+                ax2.set_ylabel('volts/volts') ; ax1.set_ylabel('volts/volts')
+            else:
+                if plot_screen: 
+                    print('no data found for this frequency: ',f)
+                    plt.close()
+
         fout.close() ; # these are the LSP results written to text file 
+        # try moving this
+        if found_results and plot_screen:
+            plot2screen(station, f, ax1, ax2,lsp['pltname']) 
 
 
 def set_refraction_params(station, dmjd,lsp):
@@ -206,7 +221,6 @@ def plot2screen(station, f,ax1,ax2,pltname):
     painful painful
     https://www.semicolonworld.com/question/57658/matplotlib-adding-an-axes-using-the-same-arguments-as-a-previous-axes
     """
-    #print(pltname)
     ax2.set_xlabel('Reflector Height (m)'); 
     #ax2.set_title('SNR periodogram')
     ax2.set_ylabel('volts/volts')
