@@ -56,9 +56,8 @@ Command line inputs which previously required True also now work with T and true
 
 You can now gzip your snr files (in addition to xz compression).
 
-I recently bought a new apple laptop - with the new chip. You need both gfzrnx and CRX2RNX 
-for gnssrefl to work. If you are using an existing docker, I think you should be fine. But if you want
-to do this from a python install, you will need to:
+Our docker (and thus jupyter notebooks) now works with the new Mac chip. If you 
+install the code using github or pypi, you will need to install gfzrnx and CRXRNX yourself:
 
 - Download and compile the [Hatanaka source code](http://terras.gsi.go.jp/ja/crx2rnx.html) and store in $EXE as <code>CRX2RNX</code>.
 - Download and install the executable provided by GFZ (you need to sign up as a non-profit user). It needs to be
