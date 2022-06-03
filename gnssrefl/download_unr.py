@@ -10,17 +10,24 @@ import sys
 import os
 
 
-def main():
-    """
-    command line interface for download_blewitt
-    """
-
+def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
+    args = parser.parse_args().__dict__
 
-    args = parser.parse_args()
+    # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
+    return {key: value for key, value in args.items() if value is not None}
 
-    station = args.station
+
+def download_unr(station: str):
+    """
+        Command line interface for download_blewitt
+        Parameters:
+        ___________
+        station : string
+            4 character ID of the station
+    """
+
     if len(station) != 4:
         print('illegal station name-must be 4 characters')
         sys.exit()
@@ -39,6 +46,12 @@ def main():
 
     if os.path.exists(fname):
         print('\n SUCCESS:', myfname)
+
+
+def main():
+    args = parse_arguments()
+    download_unr(**args)
+
 
 if __name__ == "__main__":
     main()

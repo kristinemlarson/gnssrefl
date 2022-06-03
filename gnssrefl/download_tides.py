@@ -9,56 +9,73 @@ import requests
 import sys
 import gnssrefl.gps as g
 
-def main():
-    """
-    command line interface for download_rinex
-    it downloads a json and converts it to plain txt with columns! 
 
-    author: kristine m. larson
-    """
-
+def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("date1", help="start-date, 20150101", type=str)
     parser.add_argument("date2", help="end-date, 20150110", type=str)
-    parser.add_argument("-output", default = None, help="Optional output filename", type=str)
+    parser.add_argument("-output", default=None, help="Optional output filename", type=str)
+    args = parser.parse_args().__dict__
 
-    args = parser.parse_args()
+    # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
+    return {key: value for key, value in args.items() if value is not None}
 
-# metadata records  {'id': '8764227', 'name': 'LAWMA, Amerada Pass', 'lat': '29.4496', 'lon': '-91.3381'}
 
-#   assign to normal variables
-    station = args.station
+def download_tides(station: str, date1: str, date2: str, output: str = None):
+    """
+        Downloads NOAA tide gauge files
+        Downloads a json and converts it to plain txt with columns!
+
+        Parameters:
+        ___________
+        station : string
+            7 character ID of the station.
+
+        date1 : string
+            start date.
+            Example value: 20150101
+
+        date2 : string
+            end date.
+            Example value: 20150110
+
+        output : string, optional
+            Optional output filename
+            default is None
+
+    """
+
+    # metadata records  {'id': '8764227', 'name': 'LAWMA, Amerada Pass', 'lat': '29.4496', 'lon': '-91.3381'}
+
     #station = '8764227' this was a test station
-    date1 = args.date1
-    date2 = args.date2
-    if (len(station) != 7):
+    if len(station) != 7:
         print('station must have 7 characters ', station); sys.exit()
-    if (len(date1) != 8):
+    if len(date1) != 8:
         print('date1 must have 8 characters', date1); sys.exit()
-    if (len(date2) != 8):
+    if len(date2) != 8:
         print('date2 must have 8 characters', date2); sys.exit()
 
     urlL = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?"
     endL = "&product=water_level&datum=mllw&units=metric&time_zone=gmt&application=web_services&format=json"
     url = urlL + "begin_date=" + date1 + "&end_date=" + date2 + "&station=" + station + endL
     data = requests.get(url).json()
-    if ('error' in data.keys()):
+    if 'error' in data.keys():
         print(data['error'])
         sys.exit()
     else:
         print(data['metadata'])
     # number of records
     NV = len(data['data']) 
-    if args.output == None:
+    if output is None:
         # use the default
-        outfile  = station + '_' + 'noaa.txt'
+        outfile = station + '_' + 'noaa.txt'
     else:
-        outfile = args.output
+        outfile = output
 
     fout = open(outfile, 'w+')
     fout.write("%YYYY MM DD HH MM  Water(m) DOY\n")
-    for i in range(0,NV):
+    for i in range(0, NV):
         t = data['data'][i]['t']
         slr = data['data'][i]['v']
         slf = data['data'][i]['f']
@@ -70,13 +87,20 @@ def main():
             sl = float(data['data'][i]['v'])
             year = int(t[0:4]); mm = int(t[5:7]); dd = int(t[8:10])
             hh = int(t[11:13]); minutes = int(t[14:16])
-            today=datetime.datetime(year,mm,dd)
+            today = datetime.datetime(year, mm, dd)
             doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
-            m,f = g.mjd(year,mm,dd,hh,minutes,0)
+            m, f = g.mjd(year, mm, dd, hh, minutes, 0)
             mjd = m + f;
             #print(mjd)
-            fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year,mm,dd,hh,minutes,sl,doy,mjd))
+            fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
     fout.close()
     print('NOAA tide gauge data written out to: ', outfile)
+
+
+def main():
+    args = parse_arguments()
+    download_tides(**args)
+
+
 if __name__ == "__main__":
     main()

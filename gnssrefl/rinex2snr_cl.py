@@ -123,20 +123,24 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         archive : string, optional
             Select which archive to get the files from.
             Default is None. None means that the code will search and find an archive with the data for you.
-                value options:
+            value options:
                 unavco
                 sonel (global sea level observing system)
                 sopac (Scripps Orbit and Permanent Array Center)
-                cddis
+                cddis (NASA's Archive of Space Geodesy Data)
                 ngs (National Geodetic Survey)
                 nrcan (Natural Resources Canada)
                 bkg (German Agency for Cartography and Geodesy)
                 nz (GNS, New Zealand)
                 ga (Geoscience Australia)
                 bev (Austria Federal Office of Metrology and Surveying)
+                jp
+                jeff
+                special
+                all
 
         doy_end : int, optional
-            end day of year. This is to create a range from doy to doy_end of days to get the snr files.
+            end day of year to be downloaded. This is to create a range from doy to doy_end of days to get the snr files.
             If year_end parameter is used - then day_end will end in the day of the year_end.
             Default is None. (meaning only a single day using the doy parameter)
 
