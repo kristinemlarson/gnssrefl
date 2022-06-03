@@ -48,6 +48,20 @@ def swapRS(stream):
         newstream = 'R'
     return newstream
 
+def just_bkg(cyyyy, cdoy, file_name):
+    """
+    """
+    dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cyyyy + '/' + cdoy + '/'
+    dir2 = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
+    print('trying: ',dir1+file_name)
+    try:
+        wget.download(dir1+file_name,file_name)
+    except:
+        print('>>> now trying: ',dir2+file_name)
+        wget.download(dir2+file_name,file_name)
+
+    return
+
 
 def universal(station9ch, year, doy, archive,srate,stream):
     """
@@ -58,6 +72,7 @@ def universal(station9ch, year, doy, archive,srate,stream):
     foundit = False
 
     file_name,cyyyy,cdoy = filename_plus(station9ch,year,doy,srate,stream)
+    print('Filename:', file_name)
     cyy = cyyyy[2:4]
     dir1 = ''
     dir2 = ''
@@ -67,11 +82,7 @@ def universal(station9ch, year, doy, archive,srate,stream):
             dir1='ftp://igs.ensg.ign.fr/pub/igs/data/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
         elif archive == 'bkg':
-            dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cyyyy + '/' + cdoy + '/'
-            dir2 = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
-            wget.download(dir1+file_name,file_name)
-            if not (os.path.exists(file_name)):
-                wget.download(dir2+file_name,file_name)
+            just_bkg(cyyyy, cdoy, file_name)
         elif (archive == 'bev'):
             dir1 = 'https://gnss.bev.gv.at/at.gv.bev.dc/data/obs/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
