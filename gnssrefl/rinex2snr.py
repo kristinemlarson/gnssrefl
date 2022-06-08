@@ -152,9 +152,12 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             csrate = '{:02d}'.format(srate)
                         streamid = '_' + stream  + '_'
                         # this can be done in a function now ... 
+                        r3cmpgz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.crx.gz'
                         r3 = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
                         r3gz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
                         r2 = station + cdoy + '0.' + cyy + 'o'
+                        if os.path.exists(r3cmpgz):
+                            translated, rnx_filename = go_from_crxgz_to_rnx(r3cmpgz)
                         if os.path.exists(r3gz):
                             subprocess.call(['gunzip', r3gz])
                         if os.path.exists(r3):

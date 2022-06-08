@@ -48,7 +48,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['screenstats', 'snrfit', 'doplot', 'lspfigs', 'snrfigs', 'risky', 'no_dots',' refraction', 'json_override',]
+    boolean_args = ['screenstats', 'snrfit', 'doplot', 'lspfigs', 'snrfigs', 'risky', 'no_dots','refraction', 'json_override',]
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -234,8 +234,10 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
 # multi doy listing
     if doy_end is None:
         doy_end = doy
-
-    if doy_end < doy:
+    else:
+        doy_end = int(doy_end)
+    
+    if (doy_end < doy):
         print('doy_end cannot be less than doy')
         sys.exit()
 
@@ -262,6 +264,8 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
 
     if (constel == 'withBeidou'):
         satconsts=['E', 'G', 'R', 'C'] # the default is gps, glonass, and galileo
+    if (constel == 'GPS+Gal'):
+        satconsts=['E', 'G'] # 
 
     print('Roughness:', rough_in)
 
