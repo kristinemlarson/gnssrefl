@@ -2400,6 +2400,23 @@ def diffraction_correction(el_deg, temp=20.0, press=1013.25):
     corr_el_deg = corr_el_arc_min/60
 
     return corr_el_deg
+
+
+def fdoy2mjd(year,fdoy):
+    """
+    input year and fractional doy??
+    returns MJD - maybe?
+    """
+    doy = math.floor(fdoy)
+    yy,mm,dd, cyyyy, cdoy, YMD = ydoy2useful(year,doy)
+    fract_hour = 24*(fdoy - doy)
+
+    mjd = getMJD(year,mm,dd,fract_hour)
+
+    return mjd
+
+
+
 def mjd(y,m,d,hour,minute,second):
     """
     inputs: year, month, day, hour, minute,second

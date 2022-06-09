@@ -154,17 +154,19 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
             #'Yes' if fruit == 'Apple' else 'No'
             # used to send the plot to the screen and user had to clear it before it would go to the next
             #if found_results and plot_screen:
-            #    plot2screen(station, f, ax1, ax2,lsp['pltname']) 
             if found_results and plot_screen:
+                print('data found for this frequency: ',f)
                 ax1.set_xlabel('Elevation Angles (deg)')
                 ax1.grid(True, linestyle='-'); ax2.grid(True, linestyle='-')
                 ax1.set_title(station + ' Raw Data/Periodogram for ' + g.ftitle(f) + ' Frequency')
                 ax2.set_xlabel('Reflector Height (m)');
                 ax2.set_ylabel('volts/volts') ; ax1.set_ylabel('volts/volts')
+                plt.show()
+                #plot2screen(station, f, ax1, ax2,lsp['pltname']) 
             else:
                 if plot_screen: 
                     print('no data found for this frequency: ',f)
-                    plt.close()
+                    #plt.close()
 
         fout.close() ; # these are the LSP results written to text file 
         # try moving this

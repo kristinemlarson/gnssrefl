@@ -930,6 +930,16 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     xx = np.linspace(tnew.min(), tnew.max(), N)
     spl_x = xx; spl_y = spline(xx)
     spline_at_tnew = spline(tnew)
+    N = len(spl_x)
+    ftest = open('Ktesting.txt', 'w+')
+
+    myyear = 2022
+    for i in range(0,N):
+        mjdish = g.fdoy2mjd(myyear,spl_x[i])
+        ftest.write('{0:9.4f} {1:7.3f} {2:12.6f} \n'.format( spl_x[i], spl_y[i], mjdish))
+
+    ftest.close()
+
     plt.subplot(211)
     plt.plot(tnew,ynew,'k.')
     plt.plot(tnew,biasCorr_ynew,'b.',label='with freq/rhdot corr')
