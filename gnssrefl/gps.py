@@ -1380,7 +1380,7 @@ def precise_clock(prn,prns,ts,clks,gps_seconds):
     m = [prns == prn]
     preciset = ts[m]
     precisec = clks[m]
-#           # trying to interpolate
+#   trying to interpolate
 # could do this much faster ...
     clockf = interp1d(preciset, precisec, bounds_error=False)
     scprecise = clockf(gps_seconds)
@@ -4414,6 +4414,7 @@ def get_obstimes(tvd):
     """
     send a LSP results, so the variable created when you read 
     in the results file.  return obstimes for plotting 
+    author: kristine larson
     """
     nr,nc = tvd.shape
     obstimes = []
@@ -4427,6 +4428,28 @@ def get_obstimes(tvd):
 
     return obstimes
 
+def get_obstimes_plus(tvd):
+    """
+    send a LSP results file, so the variable created when you read
+    in the results file.  return obstimes for plotting
+    2022jun10 - added MJD output
+    author: kristine larson
+    """
+    nr,nc = tvd.shape
+    obstimes = []
+    modjulian = np.empty(shape=[0,1])
+
+    if nr > 0:
+        for ijk in range(0,nr):
+            dtime, iyear,imon,iday,ihour,imin,isec = ymd_hhmmss(tvd[ijk,0],tvd[ijk,1],tvd[ijk,4],True)
+            obstimes.append(dtime)
+            m,f = mjd(iyear,imon,iday,ihour,imin,isec)
+            x=[m+f]
+            modjulian = np.append(modjulian, [x],axis=0 )
+    else:
+        print('empty file')
+
+    return obstimes, modjulian
 
 
 def get_noaa_obstimes(t):
@@ -4446,6 +4469,33 @@ def get_noaa_obstimes(t):
         print('you sent me an empty variable')
 
     return obstimes
+
+def get_noaa_obstimes_plus(t):
+    """
+    send a noaa file variable. returns obstimes.
+    updated 2022June11
+    and relative gps time (in seconds)
+    """
+    nr,nc = t.shape
+    obstimes = []
+    modjulian = np.empty(shape=[0,1])
+    modjulian=[]
+
+    # if i read in the file better, would not have to change from float
+    if nr > 0:
+        for i in range(0,nr):
+            year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = 0
+            dtime = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+            obstimes.append(dtime)
+            imjd, fr = mjd(year,month,day,hour,minute,second)
+            x = imjd+fr
+            #modjulian = np.append( modjulian, [x], axis=0 ) 
+            modjulian = np.append(modjulian, x)
+    else:
+        print('you sent me an empty variable')
+
+    return obstimes, modjulian
+
 
 def queryUNR(station):
     """

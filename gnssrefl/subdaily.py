@@ -715,7 +715,21 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     # doy
     newt = tvd[:,1] + tvd[:,4]/24 ; 
-    redo_spline(newt, newRH, biasCorrected_RH,pltit,txtdir,station)
+    residual = redo_spline(newt, newRH, biasCorrected_RH,pltit,txtdir,station)
+
+    # this is just for kristine
+    ntv = tvd
+    dtime = False
+    fout = open('ktest.txt','+w')
+    for i in range(0,nr):
+        year = int(ntv[i,0]); doy = int(ntv[i,1])
+        year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
+        rh = ntv[i,2]; UTCtime = ntv[i,4];
+        dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
+        fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:6.3f} {23:6.3f} {24:6.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], 
+            ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], correction[i], residual[i]))
+               #ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], RHdot_corr[i]))
+    fout.close()
 
     return tvd, correction 
 
@@ -731,34 +745,50 @@ def two_stacked_plots(otimes,tv,station,txtdir):
     author: kristine larson
     """
     fs = 10
-    fig,(ax1,ax2)=plt.subplots(2,1,sharex=True)
+    fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
+    i = (tv[:,10] < 100)
+    colors = tv[:,10]
+    scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax1)
+    colorbar.set_label('Sat Numbers', fontsize=fs)
+    ax1.set_title('Constellation',fontsize=fs)
+    plt.xticks(rotation =45,fontsize=fs); 
+    ax1.set_ylabel('meters',fontsize=fs)
+    plt.yticks(fontsize=fs)
+    ax1.invert_yaxis()
+    ax1.grid(True)
+    fig.autofmt_xdate()
+    fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
+
+
+
+    #fig,(ax1,ax2)=plt.subplots(2,1,sharex=True)
         # put some azimuth information on it
     colors = tv[:,5]
         # ax.plot( otimes, tv[:,2], '.')
         # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-    scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
-    colorbar = fig.colorbar(scatter, ax=ax1)
+    scatter = ax2.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax2)
     colorbar.set_label('deg', fontsize=fs)
-    ax1.set_ylabel('meters',fontsize=fs)
-    fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
-    ax1.set_title('Azimuth',fontsize=fs)
+    ax2.set_ylabel('meters',fontsize=fs)
+    ax2.set_title('Azimuth',fontsize=fs)
     #ax1.title.set_text('Azimuth')
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-    ax1.invert_yaxis()
-    ax1.grid(True)
+    ax2.invert_yaxis()
+    ax2.grid(True)
     fig.autofmt_xdate()
 
 # put some amplitude information on it
     colors = tv[:,6]
     # ax.plot( otimes, tv[:,2], '.')
     # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-    scatter = ax2.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
-    colorbar = fig.colorbar(scatter, ax=ax2)
-    ax2.set_ylabel('meters',fontsize=fs)
+    scatter = ax3.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax3)
+    ax3.set_ylabel('meters',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-    ax2.set_title('Amplitude',fontsize=fs)
-    ax2.invert_yaxis()
-    ax2.grid(True)
+    ax3.set_title('Amplitude',fontsize=fs)
+    ax3.invert_yaxis()
+    ax3.grid(True)
     fig.autofmt_xdate()
     colorbar.set_label('v/v', fontsize=fs)
 
@@ -879,7 +909,7 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     """
     having calculated and applied RHdot corretion
     AND applied the frequency biases
-    tnew is in doy
+    tnew is time in doy
     ynew is rhdot corrected RH in meters (not currently used)
     biasCorr_ynew has frequency biases removed (empirically defined)
     pltit - boolean, for screen viewing
@@ -977,7 +1007,7 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     if pltit:
         plt.show()
 
-
+    return res
 
 #  should really just mirror it or remove data at the ends
 #   going to add more fake data ...

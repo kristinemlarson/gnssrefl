@@ -21,6 +21,18 @@ def check_rinex_header(rinexfile):
             eoh+=1
             base = line[0:60].strip()
             if ("END OF HEADER" in line) or (eoh > 70):
+                #base = lines[i][0:60].strip()
+                #print(base)
+                base = lines[i+1][0:60].strip()
+                base2 = lines[i+2][0:60].strip()
+                if ('E' in base) or ('E' in base2):
+                    print('found Galileo')
+                if ('G' in base) or ('G' in base2):
+                    print('found GPS')
+                if ('R' in base) or ('R' in base2):
+                    print('found Glonass')
+                if ('C' in base) or ('C' in base2):
+                    print('found Beidou')
                 break
             else:
                 desc = line[60:80].strip()
@@ -47,7 +59,7 @@ def check_rinex_header(rinexfile):
                     obs = line[6:60]
                 else:
                     obs = obs + '     ' + thisline
-        print(obs)
+        print('Observables: ',obs)
         if ('S' not in obs):
             print('WARNING: no SNR observables in this file')
         else:
