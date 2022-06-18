@@ -263,7 +263,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         if (np.sum(Rval) > 0):
             ax.plot(tval,Rval,'ro',label='GLO',markersize=3)
         if (np.sum(Eval) > 0):
-            ax.plot(tval,Eval,'mo',label='GAL',markersize=3)
+            ax.plot(tval,Eval,'oo',label='GAL',markersize=3)
         if (np.sum(Cval) > 0):
             ax.plot(tval,Cval,'co',label='BEI',markersize=3)
         plt.legend(loc="upper left")
@@ -271,6 +271,10 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
         plt.grid()
         fig.autofmt_xdate()
+        plotname = txtdir + '/' + station + '_Subnvals.png'
+        plt.savefig(plotname,dpi=300)
+        print('png file saved as: ', plotname)
+
 
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 

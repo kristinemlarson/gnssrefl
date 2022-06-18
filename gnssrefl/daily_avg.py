@@ -46,6 +46,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 # [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday]
 # 2021 november 8, added amplitude, so now 8 columns
     tv = np.empty(shape=[0, 8])
+    ngps = []; nglo = [] ; ngal = []
     obstimes = []; medRH = []; meanRH = [] ; alltimes = []; meanAmp = []
     fig,ax=plt.subplots()
     year_list = np.arange(year1, year2+1, 1)
@@ -116,6 +117,14 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                 ax.plot(alltimes,good,'b.')
 
                                 # this is for the daily average
+                                ijk = (gsat  < 100); 
+                                #print(f, len(gsat[ijk]))
+                                ngps = np.append(ngps, len(gsat[ijk]))
+                                ijk = (gsat > 100) * (gsat < 200); 
+                                nglo = np.append(nglo, len(gsat[ijk]))
+                                ijk = (gsat > 200) * (gsat < 300); 
+                                ngal = np.append(ngal, len(gsat[ijk]))
+
                                 obstimes.append(datetime.datetime(year=yr, month=d.month, day=d.day, hour=12, minute=0, second=0))
                                 medRH =np.append(medRH, medv)
             # store the meanRH after the outliers are removed using simple median filter
@@ -128,6 +137,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
             # added standard deviation feb14, 2020
                                 # updated this to include mean amplitude 2021 november 8
                                 newl = [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday, np.mean(goodAmp)]
+
                                 tv = np.append(tv, [newl],axis=0)
                                 k += 1
                             else:
@@ -158,16 +168,17 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     # plot the number of retrievals vs time
     txtdir =  xdir + '/Files'
-    daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv)
+    daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal)
 
     return tv, obstimes
 
-def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv):
+def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal):
     """
     make some plots of results - moved here to make it cleaner
     inputs: obstimes is datetime object
     mean RH are in meters, station name, txtdir (where the results go)
     and tv is the variable of daily results
+    kl 2022jun15, added stats for gps,galileo, and glonass specific
     """
 #   new plot
     fs = 12
@@ -199,8 +210,16 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv):
     print('Daily average RH amplitude file saved as: ', pltname)
 
 
+    # added constellation specific info
     fig,ax=plt.subplots()
-    plt.plot(obstimes, tv[:,3],'b.')
+    plt.plot(obstimes, tv[:,3],'ko',label='Total')
+    if (np.sum(ngps) > 0):
+        plt.plot(obstimes, ngps,'b.',label='GPS',markersize=3)
+    if (np.sum(nglo) > 0):
+        plt.plot(obstimes, nglo,'r.',label='GLO',markersize=3)
+    if (np.sum(ngal) > 0):
+        plt.plot(obstimes, ngal,'o.',label='GAL',markersize=3)
+    plt.legend(loc="upper left")
     fig.autofmt_xdate()
     plt.title(station.upper() + ': Number of values used in the daily average',fontsize=fs)
     plt.xticks(fontsize=fs)
