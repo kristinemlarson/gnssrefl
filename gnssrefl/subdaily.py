@@ -216,15 +216,26 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     # make arrays to save number of RH retrievals on each day
     residuals = np.empty(shape=[0,1])
-    nval = []; tval = []; y = tv[0,0]; 
+    nval = []; tval = []; y = tv[0,0];  
+    # constellation spec number of values
+    Cval=[]; Gval =[]; Rval=[]; Eval=[]
     stats = np.empty(shape=[0,3])
     # only look at the doy range where i have data
     for d in range(fdoy,(ldoy+1)):
-        ii = (tv[:,1] == d)
+        ii = (tv[:,1] == d) ; tmp = tv[ii,:]
         dtime, iyear,imon,iday,ihour,imin,isec = g.ymd_hhmmss(year,d,12,True)
         tval.append(dtime)
         n = len(tv[ii,1])
+        # total
         nval.append(n)
+#       https://stackoverflow.com/questions/26786946/how-to-return-indices-of-values-between-two-numbers-in-numpy-array
+        gi =  (tmp[:,10] < 100);
+        ri =  (tmp[:,10] > 100) * (tmp[:,10] < 200);
+        ei =  (tmp[:,10] > 200) * (tmp[:,10] < 300);
+        ci =  (tmp[:,10] > 300); # beidou
+
+        #print( len(tmp[ri,1])) print( len(tmp[ei,1]))
+
         if (n > 0):
             rhavg = np.mean(tv[ii,2]); 
             rhstd = np.std(tv[ii,2]); 
@@ -232,12 +243,30 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             stats = np.append(stats, [newl], axis=0)
             b = ( tv[ii,2] - rhavg*np.ones( len(tv[ii,2]) ))/ rhstd
             residuals = np.append(residuals, b)
-    #
+            Gval = np.append(Gval, len(tmp[gi,1]))
+            Eval = np.append(Eval, len(tmp[ei,1]))
+            Rval = np.append(Rval, len(tmp[ri,1]))
+            Cval = np.append(Cval, len(tmp[ci,1]))
+        else:
+            Gval = np.append(Gval, 0)
+            Eval = np.append(Eval, 0)
+            Rval = np.append(Rval, 0)
+            Cval = np.append(Cval, 0)
+
     ii = (np.absolute(residuals) > sigma) # data you like
     jj = (np.absolute(residuals) < sigma) # data you do not like ;-)
     if plt2screen:
         fig,ax=plt.subplots()
-        ax.plot(tval,nval,'bo')
+        ax.plot(tval,nval,'ko',label='Total')
+        if (np.sum(Gval) > 0):
+            ax.plot(tval,Gval,'bo',label='GPS',markersize=3)
+        if (np.sum(Rval) > 0):
+            ax.plot(tval,Rval,'ro',label='GLO',markersize=3)
+        if (np.sum(Eval) > 0):
+            ax.plot(tval,Eval,'mo',label='GAL',markersize=3)
+        if (np.sum(Cval) > 0):
+            ax.plot(tval,Cval,'co',label='BEI',markersize=3)
+        plt.legend(loc="upper left")
         plt.title(station + ': number of RH retrievals each day',fontsize=fs)
         plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
         plt.grid()

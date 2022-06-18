@@ -147,6 +147,10 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 #   new plot
     print('A total of ', NumFiles, ' days were evaluated.')
     print( NotEnough, ' days did not meet the threshold set for a dependable daily average')
+    pltname = xdir + '/Files/' + station + '_AllRH.png'
+    plt.savefig(pltname)
+    print('All RH png file saved as: ', pltname)
+
 
 
     # close the file with all the RH values'
@@ -202,6 +206,9 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv):
     plt.xticks(fontsize=fs)
     plt.yticks(fontsize=fs)
     plt.grid()
+    pltname = txtdir + '/' + station + '_nvals.png'
+    plt.savefig(pltname)
+    print('Number of values used in average RH file saved as: ', pltname)
 
 
 def write_out_RH_file(obstimes,tv,outfile,csvformat):
