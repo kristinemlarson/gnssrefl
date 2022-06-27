@@ -1,5 +1,8 @@
 # library for daily_avg_cl.py
 # Kristine Larson May 2019
+# 2022 june 16
+# added code to calulate the fbias with respect to the daily average.
+# not all that useful - but it is there now!
 import argparse
 import datetime
 import matplotlib.pyplot as plt
@@ -13,6 +16,70 @@ from datetime import date
 # my code
 import gnssrefl.gps as g
 #
+
+def fbias_daily_avg(station):
+    """
+    input station name
+    reads QC-RH values and the daily averages
+    computes residuals and estimate the frequency
+    bias for all available frequencies
+    printed to the screen
+    """
+    xdir = os.environ['REFL_CODE']
+
+    fname =  xdir + '/Files/' + station + '_dailyRH.txt'
+    if os.path.exists(fname):
+        tv = np.loadtxt(fname,comments='%')
+    else:
+        print('no input', fname)
+        return
+
+    fname =  xdir + '/Files/' + station + '_allRH.txt'
+    if os.path.exists(fname):
+        tvall = np.loadtxt(fname,comments='%')
+    else:
+        print('no input', fname)
+        return
+
+
+# start and end year
+    minyear = int(min(tv[:,0])) ; maxyear = int(max(tv[:,0]))
+# list of hte frequencies used
+    flist = np.unique(tvall[:,6])
+
+    if len(flist) == 1:
+        print('There is only one frequency in this file, so there is no point to computing a frequency bias.')
+        return
+
+    # loop thru the frequencies
+    for ifr in range(0,len(flist)):
+        ijk = 0
+        dd = []
+        # look thru the years
+        for y in range(minyear,maxyear+1):
+            ii = (tv[:,0] == y)
+            thisyear = tv[ii,:]
+            ii = (tvall[:,0] == y)
+            thisyearAll = tvall[ii,:]
+            # and the days
+            for d in range(1, 367):
+                kk = (thisyear[:,1] == d);
+                N = len(thisyear[kk,1])
+                if (N == 1): # found a result on this day
+                    RH = thisyear[kk,2]
+                    k3 = (thisyearAll[:,1] == d);
+                    NAll = len(thisyearAll[k3,1])
+                    tt = thisyearAll[k3,1]/365.25 + thisyearAll[k3,0]
+                    f= thisyearAll[k3,6]
+                    residual =  thisyearAll[k3,2] - RH
+                    vv = (f == flist[ifr])
+                    if (len(residual[vv]) > 0):
+                        avg = np.mean(residual[vv])
+                        dd.append(avg)
+        print(" Frequency %3.0f %8.3f m " % (int(flist[ifr]), np.mean(dd)) )
+        ijk = ijk + 1
+
+
 # changes to output requested by Kelly Enloe for JN
 # two text files will now always made - but you can override the name of the average file via command line
 
@@ -46,6 +113,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 # [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday]
 # 2021 november 8, added amplitude, so now 8 columns
     tv = np.empty(shape=[0, 8])
+    tvall = np.empty(shape=[0, 7])
     ngps = []; nglo = [] ; ngal = []
     obstimes = []; medRH = []; meanRH = [] ; alltimes = []; meanAmp = []
     fig,ax=plt.subplots()
@@ -92,12 +160,17 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                             
                             NG = len(good)
                             if (NG > 0):
+                                # don't really need MM and DD, but ...
                                 if csvformat:
                                     for ijk in range(0,NG):
+                                        biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]] 
+                                        tvall = np.append(tvall, [biggerline],axis=0)
                                         allrh.write(" {0:4.0f},  {1:3.0f},{2:7.3f}, {3:2.0f}, {4:2.0f},{5:6.1f},{6:4.0f},{7:4.0f},{8:6.2f},{9:6.2f},{10:6.2f}\n".format(yr, 
                                             doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk], gutcTime[ijk]))
                                 else:
                                     for ijk in range(0,NG):
+                                        biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]] 
+                                        tvall = np.append(tvall, [biggerline],axis=0)
                                         allrh.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:2.0f} {4:2.0f} {5:6.1f} {6:4.0f} {7:4.0f} {8:6.2f} {9:6.2f} {10:6.2f}\n".format(yr, 
                                             doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk],gutcTime[ijk]))
 
@@ -161,10 +234,15 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     plt.savefig(pltname)
     print('All RH png file saved as: ', pltname)
 
+    #nr,nc = tv.shape
+    # calculate frequency biases and print to the screen
+    fbias_daily_avg(station)
+    #print(nr,nc)
 
-
-    # close the file with all the RH values'
+    # close the file with all the RH values 
     allrh.close()
+
+    # could compute each frequency with respect to the daily average?
 
     # plot the number of retrievals vs time
     txtdir =  xdir + '/Files'
@@ -212,13 +290,13 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
 
     # added constellation specific info
     fig,ax=plt.subplots()
-    plt.plot(obstimes, tv[:,3],'ko',label='Total')
+    plt.plot(obstimes, tv[:,3],'ko',label='Total',markersize=4)
     if (np.sum(ngps) > 0):
         plt.plot(obstimes, ngps,'b.',label='GPS',markersize=3)
     if (np.sum(nglo) > 0):
         plt.plot(obstimes, nglo,'r.',label='GLO',markersize=3)
     if (np.sum(ngal) > 0):
-        plt.plot(obstimes, ngal,'o.',label='GAL',markersize=3)
+        plt.plot(obstimes, ngal,'.',label='GAL',color='orange',markersize=3)
     plt.legend(loc="upper left")
     fig.autofmt_xdate()
     plt.title(station.upper() + ': Number of values used in the daily average',fontsize=fs)

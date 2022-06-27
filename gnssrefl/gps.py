@@ -4452,6 +4452,25 @@ def get_obstimes_plus(tvd):
     return obstimes, modjulian
 
 
+def confused_obstimes(tvd):
+    """
+    takes lsp results - returns MJD
+    author: kristine larson
+    """
+    nr,nc = tvd.shape
+    modifiedjulian = []
+    if nr > 0:
+        for ijk in range(0,nr):
+            dtime, iyear,imon,iday,ihour,imin,isec = ymd_hhmmss(tvd[ijk,0],tvd[ijk,1],tvd[ijk,4],True)
+            m,f = mjd(iyear,imon,iday,ihour,imin,isec)
+            modifiedjulian = np.append(modifiedjulian, m+f)
+    else:
+        print('empty file')
+
+    return modifiedjulian
+
+
+
 def get_noaa_obstimes(t):
     """
     send a noaa file variable. returns obstimes.
@@ -4479,7 +4498,7 @@ def get_noaa_obstimes_plus(t):
     nr,nc = t.shape
     obstimes = []
     modjulian = np.empty(shape=[0,1])
-    modjulian=[]
+    #modjulian=[]
 
     # if i read in the file better, would not have to change from float
     if nr > 0:
@@ -4488,7 +4507,7 @@ def get_noaa_obstimes_plus(t):
             dtime = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
             obstimes.append(dtime)
             imjd, fr = mjd(year,month,day,hour,minute,second)
-            x = imjd+fr
+            x = [imjd+fr]
             #modjulian = np.append( modjulian, [x], axis=0 ) 
             modjulian = np.append(modjulian, x)
     else:

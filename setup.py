@@ -18,7 +18,7 @@ ext3 = Extension(name='gnssrefl.gnsssnrbigger',
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
-requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy"]
+requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","bs4"]
 
 setup(
     name="gnssrefl",
@@ -55,6 +55,7 @@ setup(
             'query_unr= gnssrefl.query_unr:main',
             'mp1mp2= gnssrefl.computemp1mp2:main',
             'download_teqc = gnssrefl.download_teqc:main',
+            'download_ioc = gnssrefl.download_ioc:main',
             'rinex3_rinex2= gnssrefl.rinex3_rinex2:main',
             'veg_multiyr= gnssrefl.veg_multiyr:main',
             'check_rinex= gnssrefl.check_rinex:main',

@@ -74,7 +74,7 @@ def download_tides(station: str, date1: str, date2: str, output: str = None):
         outfile = output
 
     fout = open(outfile, 'w+')
-    fout.write("%YYYY MM DD HH MM  Water(m) DOY\n")
+    fout.write("%YYYY MM DD HH MM  Water(m) DOY  MJD\n")
     for i in range(0, NV):
         t = data['data'][i]['t']
         slr = data['data'][i]['v']

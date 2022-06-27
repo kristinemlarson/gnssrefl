@@ -263,7 +263,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         if (np.sum(Rval) > 0):
             ax.plot(tval,Rval,'ro',label='GLO',markersize=3)
         if (np.sum(Eval) > 0):
-            ax.plot(tval,Eval,'oo',label='GAL',markersize=3)
+            ax.plot(tval,Eval,'o',color='orange',label='GAL',markersize=3)
         if (np.sum(Cval) > 0):
             ax.plot(tval,Cval,'co',label='BEI',markersize=3)
         plt.legend(loc="upper left")
@@ -781,7 +781,7 @@ def two_stacked_plots(otimes,tv,station,txtdir):
     fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
     i = (tv[:,10] < 100)
     colors = tv[:,10]
-    scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
+    scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax1)
     colorbar.set_label('Sat Numbers', fontsize=fs)
     ax1.set_title('Constellation',fontsize=fs)
@@ -800,7 +800,7 @@ def two_stacked_plots(otimes,tv,station,txtdir):
     colors = tv[:,5]
         # ax.plot( otimes, tv[:,2], '.')
         # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-    scatter = ax2.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
+    scatter = ax2.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax2)
     colorbar.set_label('deg', fontsize=fs)
     ax2.set_ylabel('meters',fontsize=fs)
@@ -815,7 +815,7 @@ def two_stacked_plots(otimes,tv,station,txtdir):
     colors = tv[:,6]
     # ax.plot( otimes, tv[:,2], '.')
     # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-    scatter = ax3.scatter(otimes,tv[:,2],marker='o', s=15, c=colors)
+    scatter = ax3.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax3)
     ax3.set_ylabel('meters',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
@@ -862,6 +862,9 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
     plt.gca().invert_yaxis()
     plt.xticks(rotation =45,fontsize=8); plt.yticks(fontsize=8)
     plt.grid() ; fig.autofmt_xdate()
+    # get the limits so you can use thme on the next plot
+    #aaa, bbb = plt.ylim()
+    savey1,savey2 = plt.ylim()  
 
     ax2 = fig.add_subplot(212)
     plt.plot(otimesarray[jj],tv[jj,2], '.',color='green',label='arcs')
@@ -872,6 +875,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
     plt.grid() ; fig.autofmt_xdate()
     plotname = txtdir + '/' + station + '_outliers_hunting.png'
     plt.savefig(plotname,dpi=300)
+    plt.ylim((savey1, savey2))
     print('png file saved as: ', plotname)
 
 
