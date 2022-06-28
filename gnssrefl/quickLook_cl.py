@@ -29,6 +29,8 @@ def parse_arguments():
     parser.add_argument("-e2",  default=None, type=int, help="upper limit elevation angle (deg)")
     parser.add_argument("-h1",  default=None, type=float, help="lower limit reflector height (m)")
     parser.add_argument("-h2",  default=None, type=float, help="upper limit reflector height (m)")
+    parser.add_argument("-azim1",  default=None, type=float, help="lower limit azimuth (deg)")
+    parser.add_argument("-azim2",  default=None, type=float, help="upper limit azimuth (deg)")
     parser.add_argument("-sat", default=None, type=int, help="satellite")
     parser.add_argument("-screenstats", default=None, type=str, help="if True, Success and Failure info printed to the screen")
     parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio")
@@ -47,7 +49,8 @@ def parse_arguments():
 def quicklook(station: str, year: int, doy: int,
               snr: int = 66, fr: int = 1, ampl: float = 7.,
               e1: int = 5, e2: int = 25, h1: float = 0.5, h2: float = 6., sat: int = None,
-              peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, pltscreen: bool = True):
+              peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
+              pltscreen: bool = True, azim1: float = 0., azim2: float = 360.):
     """
 
         Parameters:
@@ -126,6 +129,15 @@ def quicklook(station: str, year: int, doy: int,
                 Whether to print plots to the screen.
                 default is True.
 
+            azim1 : float, optional
+                minimum azimuth angle (deg)
+                default is 0.
+
+            azim2 : float, optional
+                maximum azimuth angle (deg)
+                default is 360.
+
+
     """
 
 #   make sure environment variables exist.  set to current directory if not
@@ -157,7 +169,7 @@ def quicklook(station: str, year: int, doy: int,
 
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'f': fr[0], 'reqAmp': ampl, 'e1': e1,
             'e2': e2, 'minH': h1, 'maxH': h2, 'PkNoise': peak2noise, 'satsel': sat, 'fortran': fortran, 'pele': pele,
-            'pltscreen': pltscreen, 'screenstats': screenstats}
+            'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2}
 
     return quick.quickLook_function(**args)
     # returns two variables: data, datakey = quick.quicklook_function(**args)

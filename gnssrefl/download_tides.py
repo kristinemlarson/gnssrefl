@@ -9,6 +9,16 @@ import requests
 import sys
 import gnssrefl.gps as g
 
+def quickp(station,t,sealevel):
+    """
+    """
+    plt.figure()
+    plt.plot(t,sealevel)
+    plt.grid()
+    plt.title(station)
+    plt.show()
+    return
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -91,7 +101,6 @@ def download_tides(station: str, date1: str, date2: str, output: str = None):
             doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
             m, f = g.mjd(year, mm, dd, hh, minutes, 0)
             mjd = m + f;
-            #print(mjd)
             fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
     fout.close()
     print('NOAA tide gauge data written out to: ', outfile)

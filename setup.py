@@ -18,11 +18,11 @@ ext3 = Extension(name='gnssrefl.gnsssnrbigger',
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
-requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","bs4"]
+requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy"]
 
 setup(
     name="gnssrefl",
-    version="1.1.3",
+    version="1.1.4",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -46,6 +46,7 @@ setup(
             'llh2xyz = gnssrefl.llh2xyz:main',
             'prn2gps = gnssrefl.prn2gps:main',
             'download_tides = gnssrefl.download_tides:main',
+            'download_ioc = gnssrefl.download_ioc:main',
             'subdaily= gnssrefl.subdaily_cl:main',
             'gpsweek = gnssrefl.gpsweek:main',
             'update_snr_files = gnssrefl.update_snr_files:main',
@@ -55,7 +56,6 @@ setup(
             'query_unr= gnssrefl.query_unr:main',
             'mp1mp2= gnssrefl.computemp1mp2:main',
             'download_teqc = gnssrefl.download_teqc:main',
-            'download_ioc = gnssrefl.download_ioc:main',
             'rinex3_rinex2= gnssrefl.rinex3_rinex2:main',
             'veg_multiyr= gnssrefl.veg_multiyr:main',
             'check_rinex= gnssrefl.check_rinex:main',

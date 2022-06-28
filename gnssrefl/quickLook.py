@@ -36,6 +36,8 @@ def main():
     parser.add_argument("-e2",  default=None, type=int, help="upper limit elevation angle (deg)")
     parser.add_argument("-h1",  default=None, type=float, help="lower limit reflector height (m)")
     parser.add_argument("-h2",  default=None, type=float, help="upper limit reflector height (m)")
+    parser.add_argument("-azim1",  default=None, type=float, help="lower limit azimuth (deg)")
+    parser.add_argument("-azim2",  default=None, type=float, help="upper limit azimuth (deg)")
     parser.add_argument("-sat", default=None, type=int, help="satellite")
     parser.add_argument("-peak2noise",  default=None, type=float, help="quality control ratio")
     parser.add_argument("-fortran", default='True', type=str, help="True: use Fortran translators")

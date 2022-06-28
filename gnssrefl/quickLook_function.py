@@ -80,7 +80,7 @@ def read_snr_simple(obsfile):
     return allGood, sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE
 
 
-def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,**kwargs):
+def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,**kwargs):
     """
     inputs:
     station name (4 char), year, day of year
@@ -97,6 +97,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     KL 21mar25 added datakey dictionaries for the Jupyter notebook people
     KL 21apr02 added error checking on whether requested datastreams exist. no data, no analysis
     KL 21nov24 added screen stats, boolean, kwargs
+    KL 22jun25 added azim1, azim2 restrictions
     """
     screenstats = kwargs.get('screenstats',False)
     if screenstats:
@@ -203,6 +204,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 plt.subplot(2,2,bz[a])
                 plt.title(titles[a],fontsize=fs)
             az1 = azval[(a*2)] ; az2 = azval[(a*2 + 1)]
+
             # this means no satellite list was given, so get them all
             if satsel == None:
                 #satlist = g.find_satlist(f,snrE)
@@ -231,8 +233,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                     if (len(nij) > 0):
                         Noise = np.mean(nij)
                     else:
-                        Noise = 1; iAzim = 0 # made up numbers
-                    if (not tooclose) & (delT < delTmax) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise):
+                        Noise = 1;  iAzim = 0 # i think this is set to zero so something down the line doesn't fail
+                    # add azimuth constraints. default is 0-360
+                    if (not tooclose) & (delT < delTmax) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise) & (iAzim >= azim1) & (iAzim <= azim2):
                         T = g.nicerTime(UTCtime)
                         # az, RH, sat, amp, peak2noise, Time
                         rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,1))
@@ -246,16 +249,17 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
                     else:
                         # these are failed tracks
-                        if pltscreen:
-                            plt.plot(px,pz,'gray',linewidth=0.5)
-                        if screenstats:
-                            print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
-                            g.write_QC_fails(delT,75,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose)
+                        if (iAzim > azim1) & (iAzim < azim2):
+                            if pltscreen:
+                                plt.plot(px,pz,'gray',linewidth=0.5)
+                            if screenstats:
+                                print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
+                                g.write_QC_fails(delT,75,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose)
 
-                        idc = 'f' + stitles[a]
-                        data[idc][satNu] = [px,pz]
-                        datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
-                        rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,-1))
+                            idc = 'f' + stitles[a]
+                            data[idc][satNu] = [px,pz]
+                            datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
+                            rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,-1))
 
             # i do not know how to add a grid using these version of matplotlib
             tt = 'GNSS-IR: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy) + ' elev: ' + str(e1) + '-' +  str(e2)
