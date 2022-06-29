@@ -5,10 +5,7 @@ github/pypi package installation.
 
 * via [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
-* via a Docker container. You will need to have installed the docker executable ([Mac](https://docs.docker.com/docker-for-mac/install/),
-[Windows](https://docs.docker.com/docker-for-windows/install/),
-[Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)).
-[More details on the run command you need.](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)
+* [via a Docker container](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)
 
 * github or pypi
 
