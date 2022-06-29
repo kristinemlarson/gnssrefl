@@ -10,17 +10,14 @@
 ### Table of Contents
 
 1. [Philosophy](#philosophy)
-2. [Code Description](#code)
-    1. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
-    2. [Understanding the Code](#understanding)
-    3. [RINEX File Formats](#fileformats)
-    4. [rinex2snr: translating RINEX files into SNR files](#module1)
-    5. [quickLook: assessing a site using SNR files](#module2)
-    6. [gnssir: estimating reflector heights from SNR data](#module3)
-    7. [nmea2snr: translating NMEA files into SNR files](#module4)
-    8. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
-    9. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
-    10. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
+3. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
+    1. [Understanding the Code](#understanding)
+    2. [Translating GNSS Data (RINEX, NMEA)](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/rinex2snr.md)
+    3. [quickLook: assessing a GNSS site using SNR files](#module2)
+    4. [gnssir: estimating reflector heights from SNR data](#module3)
+    5. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
+    6. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
+    7. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
 3. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
 4. [Utilities](#helper)
 5. [Publications](#publications)
@@ -46,10 +43,6 @@ modify the inputs accordingly.
 I encourage you to get to know your site. If it belongs to you, look at 
 photographs. If you can't find photographs, use Google Earth.  You can also try using
 my [google maps web app interface](https://gnss-reflections.org/geoid?station=smm3).
-
-<HR>
-
-### 3. Code Description<a name="code"></a>
 
 **gnssrefl** is an open source/python version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
@@ -255,10 +248,11 @@ allows you to gzip the RINEX files if you are providing them.
 
 <HR>
 
-### iv. rinex2snr - Extracting SNR data from RINEX files <a name="module1"></a>
+### iv. rinex2snr - Extracting SNR data from RINEX/NMEA files <a name="module1"></a>
 
 The international standard for sharing GNSS data is called 
-the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt).
+the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt). (If you are using NMEA files, please see
+the bottom of this section). 
 A RINEX file has extraneous information in it (which we will throw out) - and it 
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
 The first task you have in GNSS-IR is to translate from RINEX into what I will call 
@@ -480,6 +474,16 @@ I believe it is also allowed to put your
 RINEX files into $REFL_CODE/YYYY/rinex/ssss where YYYY is the year 
 and ssss is the four character station name. The advantage of doing 
 this is that your RINEX files will not be deleted.
+
+
+NMEA formats can be translated to SNR using <code>nmea2snr</code>.
+Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
+NMEA files are assumed to be stored as:
+
+$REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
+
+for station ABCD in year 2021 and day of year 3. NMEA files may be gzipped.
+
 
 <HR>
 
@@ -721,82 +725,6 @@ In this case, we will look at Galileo L1.
 
 Note that a failed satellite arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
-
-<HR>
-
-### vii. nmea2snr <a name="module4"></a>
-
-NMEA formats can be translated to SNR using <code>nmea2snr</code>.
-Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
-NMEA files are assumed to be stored as:
-
-$REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
-
-for station ABCD in year 2021 and day of year 3. NMEA files may be gzipped.
-
-<hr>
-
-### 4. Bugs/Features <a name="bugs"></a>
-
-Bug Diary
-
-** October 26, 2021 Fixed bug in the rinex2snr code for the python translator. It was mixing up
-S6 and S7 - or something like that. Subdaily now exits when there are data gaps.  
-
-**fixed query_unr input files and -rate high archive choices.**
-
-**September 15, 2021** There was a screen output about missing fortran translators that 
-was a bug. The hybrid translator is the default and you should not be getting warnings 
-about missing fortran translators.
-
-**August 28, 2021** Fixed NGS archive accessibility. Also, switched UNAVCO, BKG, NZ Geonet to https.
-
-**June 14,2021** Fixed bug in nolook option.  Fixed rinex2snr conversion for RINEX 3/nav orbits.
-
-**June 1, 2021** Added esa orbits 
-
-**April 17, 2021** New plot added to quickLook. This should provide feedback to the user on which QC 
-metrics to use and which azimuths are valid. New plot also added to daily_avg.
-
-**March 30, 2021** Hopefully bug fixed related to the refraction file (gpt_1wA.pickle). If it is missing from your build,
-it is now downloaded for you. Apologies. 
-
-**March 29, 2021** The L2C and L5 options now use (appropriate) time-dependent lists of satellites. 
-
-**March 17, 2021** I have removed CDDIS from the default RINEX 2.11 archive search list. It is still useable if you use 
--archive cddis.
-
-**March 14, 2021** Minor changes - filenames using the hybrid option are allowed to be 132 characters long.
-This might address issue with people that want to have very very very long path names.
-I also added the decimation feature so it works for both GPS and GNSS.
-
-**February 24, 2021** We now have three translation options for RINEX files: fortran, hybrid, and python. The last of these
-is ok for 30 sec data but really too slow otherwise. Hybrid binds the python to my (fast) fortran code.
-This has now been implemented for both GPS and multi-GNSS.
-
-CDDIS is an important GNSS data archive. Because of the way that CDDIS has 
-implemented security restrictions, we have had to change our download access. 
-For this reason we strongly urge that you install **wget** on your machine and that 
-it live in your path. You will only have very limited analysis abilities without it.
-
-I have added more defaults so you don't have to make so many decisions. The defaults are that  
-you are using GPS receiver (not GNSS) and have a fairly standard geodetic 
-site (i.e. not super tall, < 5 meters). If you have previously used this package, please
-note these changes to **rinex2snr**, **quickLook**, and **gnssir**.
-Optional commandline inputs are still allowed.
-
-I have been using <code>teqc</code> to reduce the number of observables and to decimate. I have removed the former 
-because it unfortunately- by default - removes Beidou observations in Rinex 2.11 files. If you request decimation 
-and fortran is set to True, unfortunately this will still occur. I am working on removing my 
-code's dependence on <code>teqc</code>.
-
-No phase center offsets have been applied to reflector heights. While these values are relatively small for RH < 5 m,
-we do plan to remove them in subsequent versions of the code. 
-
-At least one agency (JAXA) writes out 9999 values for unhealthy satellites. I should remove these satellites 
-at the <code>rinex2snr</code> level, but currently (I believe) the code simply removes the satellites because the elevation
-angles are all very negative (-51). JAXA also has an incomplete number of GPS satellites in its sp3 files (removing 
-the newer ones). It is unfortunate, but I cannot do anything about this.
 
 <HR>
 
