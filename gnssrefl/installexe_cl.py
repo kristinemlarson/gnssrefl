@@ -21,14 +21,14 @@ def newchip_gfzrnx(exedir):
     if os.path.exists(finalpath):
         print('The gfzrnx executable already exists')
     else:
+        print('Installing gfzrnx')
         # should use my function - but this works ...
         localname = 'gfzrnx_osxarm64'
-        dfile = 'https://github.com/kristinemlarson/gnssrefl/blob/master/docs/' + localname
+        dfile = 'https://morefunwithgps.com/public_html/' + localname
         wget.download(dfile, savename)
         os.chmod(savename,0o777)
         if os.path.exists(savename):
-            print('it exists now')
-            #subprocess.call(['mv', '-f',savename, exedir])
+            subprocess.call(['mv', '-f',savename, exedir])
     return
 
 def newchip_hatanaka(exedir):
