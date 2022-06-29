@@ -10,6 +10,64 @@ import sys
 from shutil import which 
 
 
+def newchip_gfzrnx(exedir):
+    """
+    download compile hatanaka code if an existing exe is not there
+    store in EXE
+    kristine larson
+    """
+    savename = 'gfzrnx'
+    finalpath = exedir + '/' + savename
+    if os.path.exists(finalpath):
+        print('The gfzrnx executable already exists')
+    else:
+        # should use my function - but this works ...
+        localname = 'gfzrnx_osxarm64'
+        dfile = 'https://github.com/kristinemlarson/gnssrefl/blob/master/docs/' + localname
+        wget.download(dfile, savename)
+        os.chmod(savename,0o777)
+        if os.path.exists(savename):
+            print('it exists now')
+            #subprocess.call(['mv', '-f',savename, exedir])
+    return
+
+def newchip_hatanaka(exedir):
+    """
+    download compile hatanaka code if an existing exe is not there
+    store in EXE
+    kristine larson
+    """
+    savename = 'CRX2RNX'
+    finalpath = exedir + '/' + savename
+    if os.path.exists(finalpath):
+        print('This Hatanaka executable already exists')
+    else:
+        print('The Hatanaka CRX2RNX source code will be compiled. This requires gcc.')
+        exists = which('gcc')
+        if exists is None:
+            print('gcc does not exist')
+            sys.exit()
+
+        sourcefile = 'crx2rnx.c'; sourceexe =  'crx2rnx.e'
+        if os.path.exists('docs/' + sourcefile):
+            print('source code found locally')
+            s = 'docs/' + sourcefile
+            subprocess.call(['gcc', s, '-o', sourceexe])
+        else:
+            print('found source code at github')
+            cfile = 'https://github.com/kristinemlarson/gnssrefl/blob/master/docs/crx2rnx.c'
+            wget.download(cfile, sourcefile)
+            subprocess.call(['gcc', sourcefile, '-o', sourceexe])
+        if os.path.exists(sourceexe):
+            print('Hatanaka success - moving to EXE directory')
+            subprocess.call(['mv', '-f', sourceexe, finalpath])
+            subprocess.call(['rm', '-f', sourcefile])
+        else:
+            print('no Hatanaka success')
+            sys.exit()
+
+    return
+
 def checkexist(exe):
     """
     exe - executable name to check
@@ -129,8 +187,9 @@ def installexe(opsys: str):
         url = sto + 'gfzrnx.' + opsys + '.e'
         download_chmod_move(url, savename, exedir)
     elif (opsys == 'mac-newchip'):
-        print('The Hatanaka CRX2RNX source code will be compiled. This requires gcc.')
         print('There is no teqc executable for this architecture, so none will be installed.')
+        newchip_hatanaka(exedir)
+        newchip_gfzrnx(exedir)
 
     else:
         print('We do not recognize your operating system input. Exiting.')
