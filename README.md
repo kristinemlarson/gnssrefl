@@ -5,11 +5,7 @@
 
 ### gnssrefl
 
-**Current github version: 1.1.4** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
-
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
-
-[Quick link to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
+**github version: 1.1.4** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
 ### Table of Contents
 
@@ -55,15 +51,7 @@ my [google maps web app interface](https://gnss-reflections.org/geoid?station=sm
 
 ### 3. Code Description<a name="code"></a>
 
-**gnssrefl** is a new version of my GNSS interferometric reflectometry (GNSS-IR) code. 
-
-The main difference between this version and previous versions is that I am
-attempting to use proper python packaging rules! However, this is a big learning curve for me,
-and I know that I still have a lot to learn. I have separated out the main
-parts of the code and the command line inputs so that you can use the libraries
-yourself or do it all from the command line. This should also - hopefully - make
-it easier for the production of Jupyter notebooks. The latter are to be developed
-by UNAVCO with NASA GNSS Science Team funding.
+**gnssrefl** is an open source/python version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
 *If you would like to try out reflectometry without installing the code*
 
@@ -95,9 +83,7 @@ There are also various [utilities](#helper) you might find to be useful.
 
 If you are unsure about why various restrictions are being applied, it is really useful 
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
-or similar. I am committed in principle to set up some online
-courses to teach people about GNSS reflections, but funding for these courses is 
-not in hand at the moment. 
+or similar. 
 
 <HR>
 
@@ -963,3 +949,5 @@ docker pull unavdocker/gnssrefl to install code.
 [Quick link to Docker](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)
 
 [Old quick link to Docker](https://hub.docker.com/r/unavdocker/gnssrefl)
+
+[Quick link to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
