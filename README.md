@@ -11,19 +11,20 @@
 
 1. [Philosophy](#philosophy)
 2. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
+3. Main Codes
     1. [Understanding the Code](#understanding)
     2. [rinex2snr: translating GNSS Data (RINEX, NMEA)](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/rinex2snr.md)
     3. [quickLook: assessing a GNSS site using SNR files](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/quickLook.md)
     4. [gnssir: estimating reflector heights from SNR data](#module3)
-3. Products:
+4. Products:
     1. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
     2. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
     3. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
-4. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
 5. [Utilities](#helper)
-6. [Publications](#publications)
-7. [How can you help write code for this project?](#weneedhelp)
-8. [How to ask for help about running the code](#helpmeplease)
+6. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
+7. [Publications](#publications)
+8. [How can you help write code for this project?](#weneedhelp)
+9. [How to ask for help about running the code](#helpmeplease)
 
 <HR>
 
@@ -81,7 +82,7 @@ or similar.
 <HR>
 
 
-### ii. Understanding What the Code is Doing  <a name="understanding"></a>
+### Understanding What the Code is Doing  <a name="understanding"></a>
 
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
 an interference pattern that can be observed in GNSS Signal to Noise Ratio (SNR) data as a satellite rises or sets. 
