@@ -56,12 +56,8 @@ Command line inputs which previously required True also now work with T and true
 
 You can now gzip your snr files (in addition to xz compression).
 
-Our docker (and thus jupyter notebooks) now works with the new Mac chip. If you 
-install the code using github or pypi, you will need to install gfzrnx and CRXRNX yourself:
-
-- Download and compile the [Hatanaka source code](http://terras.gsi.go.jp/ja/crx2rnx.html) and store in $EXE as <code>CRX2RNX</code>.
-- Download and install the executable provided by GFZ (you need to sign up as a non-profit user). It needs to be
-stored in $EXE with the name <code>gfzrnx</code>. Remember to set the executable bit (chmod +x).
+Our docker (and thus jupyter notebooks) now works with the new Mac chip. I have also updated
+installexe for the new chip - but I have not yet changed the pypi version.
 
 **New utility for subdaily analysis:** [invsnr](https://github.com/kristinemlarson/gnssrefl/blob/master/README_invsnr.md). 
 This is currently only available for the command line version on github.
