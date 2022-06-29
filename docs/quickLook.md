@@ -24,7 +24,7 @@ We start with one of our <code>rinex2snr</code> examples, <code>p041</code>
 
 That command will produce this periodogram summary:
 
-<img src="tests/use_cases/p041-l1.png" width=600>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l1.png" width=600>
 
 By default, these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
 you have used the defaults. Furthermore, note that results on the x-axis begin at 0.5 meters.
