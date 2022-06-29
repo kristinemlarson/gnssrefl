@@ -3,19 +3,24 @@
 You can  access this package via Jupyter notebooks, Docker containers, or traditional
 github/pypi package installation.
 
-1. via [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
+* via [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
-2. via a Docker container. You will need to have installed the docker executable ([Mac](https://docs.docker.com/docker-for-mac/install/),
+* via a Docker container. You will need to have installed the docker executable ([Mac](https://docs.docker.com/docker-for-mac/install/),
 [Windows](https://docs.docker.com/docker-for-windows/install/),
 [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)).
-[More details on the run command you need.](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md).
+[More details on the run command you need.](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)
 
-3. github or pypi
+* github or pypi
 
 For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
-**If you are using linux** then simply run apt-get install -y gcc and apt-get install -y
-gfortran in your terminal (or yum install -y gcc-gfortran ).
-**If you are using a MacOS** then you will need to install xcode. First, in your
+**If you are using linux** then simply type
+
+<code>apt-get install -y gcc</code>
+
+and <code>apt-get install -y gfortran</code> 
+
+in your terminal (or <code>yum install -y gcc-gfortran</code>).
+**If you are using a MacOS** then you will need to install <code>xcode</code>. First, in your
 terminal, check first to see if you already have it:
 
 <code>xcode-select -p</code>
@@ -39,7 +44,6 @@ If you do not have gfortran, then you can use homebrew to install (<code>brew in
 You should define three environment variables:
 
 * EXE = where various executables will live. These are mostly related to manipulating RINEX files.
-
 
 * REFL_CODE = where the reflection code inputs (SNR files and instructions) and outputs (RH)
 will be stored (see below). Both snr files and results will be saved here in year subdirectories.
@@ -67,8 +71,7 @@ If you are using the version from gitHub:
 * <code>pip install wheel</code> (we are working to remove this step)
 * <code>pip install .</code>
 * from what I understand, you should be able to use pip3 instead of pip
-* you DO need a few more executables, so please read below or type
-<code>installexe linux64 </code> or <code>installexe macos </code>
+* so please read below or type <code>installexe -h</code> 
 
 
 PyPi version:
@@ -78,8 +81,7 @@ PyPi version:
 * <code>pip install wheel</code> (we are working to remove this step)
 * <code>pip install gnssrefl</code>
 * from what I understand, you should be able to use pip3 instead of pip
-* you DO need a few more executables, so please read below or type
-<code>installexe linux64 </code> or <code>installexe macos </code>
+* so please read below or type <code>installexe -h</code> 
 
 
 *Non-Python Code:*
