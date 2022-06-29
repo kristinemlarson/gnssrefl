@@ -225,13 +225,14 @@ RINEX files into $REFL_CODE/YYYY/rinex/ssss where YYYY is the year
 and ssss is the four character station name. The advantage of doing 
 this is that your RINEX files will not be deleted.
 
-
 NMEA formats can be translated to SNR using <code>nmea2snr</code>.
 Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
 NMEA files are assumed to be stored as:
 
 $REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
 
-for station ABCD in year 2021 and day of year 3. NMEA files may be gzipped.
+for station ABCD in year 2021 and day of year 3. 
+
+NMEA files may be gzipped.
 
 
