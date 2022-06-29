@@ -482,23 +482,6 @@ Send an email to gnss-ir-request@postal.unavco.org and put the word
 subscribe (or unsubscribe to leave) in your email subject.
 
 <HR>
-###  RINEX File Formats <a name="fileformats"></a>
-
-RINEX files must be version 2.11 or 3. 
-
-For RINEX 2.11, filenames should be lowercase and following the community standard: 
-
-4 character station name + day of year (3 characters) + '0.' + two character year  + 'o'
-
-Example: at010050.12o is station at01 on day 5 and year 2012.
-
-In many cases Hatanaka compressed formats are used by data archives. These 
-have a 'd' instead an 'o' at the end of the filename. If you want 
-to use those files, you must install the 
-CRX2RNX executable described in the previous section.  I think my code 
-allows you to gzip the RINEX files if you are providing them.
-
-<HR>
 
 ### 9. Acknowledgements <a name="acknowledgements"></a>
 
