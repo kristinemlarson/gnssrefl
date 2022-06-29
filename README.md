@@ -5,29 +5,16 @@
 
 ### gnssrefl
 
-**Current github version: 1.1.4**
-
-[![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
+**Current github version: 1.1.4** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl)
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
-[How to ask for help](#helpmeplease)
-
 [Quick link to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
-
-[Quick link to the command line homeworks used in the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks). They are numbered homework0, homework1, etc.
-
-[Quick link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
-
-[Quick link to Docker](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)
-
-[Old quick link to Docker](https://hub.docker.com/r/unavdocker/gnssrefl)
 
 ### Table of Contents
 
-1. [News](#news)
-2. [Philosophy](#philosophy)
-3. [Code Description](#code)
+1. [Philosophy](#philosophy)
+2. [Code Description](#code)
     1. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
     2. [Understanding the Code](#understanding)
     3. [RINEX File Formats](#fileformats)
@@ -38,70 +25,16 @@
     8. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
     9. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
     10. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
-4. [Bugs/Future Work](#bugs)
-5. [Utilities](#helper)
-6. [Publications](#publications)
-7. [How can you help write code for this project?](#weneedhelp)
-8. [How to ask for help about running the code](#helpmeplease)
-9. [Acknowledgements](#acknowledgements)
+3. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
+4. [Utilities](#helper)
+5. [Publications](#publications)
+6. [How can you help write code for this project?](#weneedhelp)
+7. [How to ask for help about running the code](#helpmeplease)
+8. [Acknowledgements](#acknowledgements)
 
 <HR>
 
-### 1. News <a name="news"></a>
-
-Please note: <code>rinex2snr</code> and <code>download_rinex</code> have been substantially changed. Please
-let me know if I broke anything.
-
-Command line inputs which previously required True also now work with T and true.
-
-You can now gzip your snr files (in addition to xz compression).
-
-Our docker (and thus jupyter notebooks) now works with the new Mac chip. I have also updated
-installexe for the new chip - but I have not yet changed the pypi version.
-
-**New utility for subdaily analysis:** [invsnr](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md). 
-This is currently only available for the command line version on github.
-
-A new UNR database has been created/updated - it can be used to provide precise lat/long/ht a priori coordinates 
-in <code>make_json_input</code> if you have a station that is recognized by UNR.
-
-If you are being blocked by CDDIS (currently used for downloading almost
-all multi-GNSS orbit files), you can try the <code>-orb gnss2</code> option 
-in either the <code>download_orbit</code> 
-or <code>rinex2snr</code>. It retrieves multi-GNSS files for GFZ from IGN instead of CDDIS.
-
-Access to ultrarapid multi-GNSS (and thus real-time) orbits is now available 
-via the [GFZ](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/topics/gnss-services/). 
-Please use the -ultra flag in [<code>rinex2snr</code>](#module1).
-
-If you have orbit files you would like to use and they follow the naming conventions used 
-by <code>gnssrefl</code>, you can use them. You need to store them in 
-the proper place ($ORBITS/yyyy/nav for nav messages and $ORBITS/yyyy/sp3 for sp3 files).
-
-Access to GSI RINEX data has been provided Naoya Kadota. [An account from GSI is required.](https://www.gsi.go.jp/ENGLISH/geonet_english.html)
-In my experience GSI is very responsive to account requests.  
-
-A bug was fixed in the old python translator option for S6/S7 data. Thank you to Andrea Gatti for this information.
-
-Thanks to Makan Karegar the NMEA file format is now supported. See [<code>nmea2snr</code>](#module4).
-
-As they are announced, I am trying to update dependencies for various archives, 
-as the GNSS world moves from Z compression to gzip and anonymous ftp to https. 
-I recently fixed ngs, bkg, unavco, and nz archives. Bug fixes have been moved to the Bug section.
-
-I encourage you to read [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
-Although this article was originally written to accompany Matlab scripts, 
-the principles are the same. It explains to you what a reflection
-zone means and what a Nyquist frequency is for GNSS reflections. 
-My reflection zone webapp will [help you pick appropriate elevation and azimuth angles.](https://gnss-reflections.org/rzones)
-If you click the box, the same web app will also compute the Nyquist for L1,L2, and L5.
-
-If you are interested in measuring sea level, this 
-webapp tells you [how high your site is above sea level.](https://gnss-reflections.org/geoid)  
-
-<HR>
-
-### 2. Philosophical Statement <a name="philosophy"></a>
+### Philosophical Statement <a name="philosophy"></a>
 In geodesy, you don't really need to know much about what you are doing to 
 calculate a reasonably precise position from GPS data. That's just the way it is.
 (Note: that is also thanks to the hard work of the geodesists that wrote the 
@@ -1023,3 +956,10 @@ This documentation was updated on June 29, 2022.
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
 docker pull unavdocker/gnssrefl to install code. 
+
+[Quick link to the command line homeworks used in the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks). They are numbered homework0, homework1, etc.
+[Quick link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
+
+[Quick link to Docker](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)
+
+[Old quick link to Docker](https://hub.docker.com/r/unavdocker/gnssrefl)
