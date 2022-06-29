@@ -10,20 +10,20 @@
 ### Table of Contents
 
 1. [Philosophy](#philosophy)
-3. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
+2. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
     1. [Understanding the Code](#understanding)
-    2. [Translating GNSS Data (RINEX, NMEA)](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/rinex2snr.md)
+    2. [rinex2snr: translating GNSS Data (RINEX, NMEA)](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/rinex2snr.md)
     3. [quickLook: assessing a GNSS site using SNR files](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/quickLook.md)
     4. [gnssir: estimating reflector heights from SNR data](#module3)
-    5. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
-    6. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
-    7. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
-3. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
-4. [Utilities](#helper)
-5. [Publications](#publications)
-6. [How can you help write code for this project?](#weneedhelp)
-7. [How to ask for help about running the code](#helpmeplease)
-8. [Acknowledgements](#acknowledgements)
+3. Products:
+    1. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
+    2. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
+    3. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
+4. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
+5. [Utilities](#helper)
+6. [Publications](#publications)
+7. [How can you help write code for this project?](#weneedhelp)
+8. [How to ask for help about running the code](#helpmeplease)
 
 <HR>
 
