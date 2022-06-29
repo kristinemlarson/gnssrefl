@@ -28,7 +28,7 @@
 1. [News](#news)
 2. [Philosophy](#philosophy)
 3. [Code Description](#code)
-    1. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/README_install.md)
+    1. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
     2. [Understanding the Code](#understanding)
     3. [RINEX File Formats](#fileformats)
     4. [rinex2snr: translating RINEX files into SNR files](#module1)
