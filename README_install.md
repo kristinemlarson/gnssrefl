@@ -14,7 +14,9 @@ For installation with github/pypi, the setup requires a few system dependencies:
 
 <code>apt-get install -y gcc</code>
 
-and <code>apt-get install -y gfortran</code> 
+and 
+
+<code>apt-get install -y gfortran</code> 
 
 in your terminal (or <code>yum install -y gcc-gfortran</code>).
 **If you are using a MacOS** then you will need to install <code>xcode</code>. First, in your

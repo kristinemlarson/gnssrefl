@@ -168,115 +168,6 @@ not in hand at the moment.
 
 <HR>
 
-### i. Installation<a name="environment"></a>
-
-You can  access this package via Jupyter notebooks, Docker containers, or traditional
-github/pypi package installation. 
-
-1. via [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
-
-2. via a Docker container. You will need to have installed the docker executable ([Mac](https://docs.docker.com/docker-for-mac/install/), 
-[Windows](https://docs.docker.com/docker-for-windows/install/), 
-[Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)).
-[More details on the run command you need.](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md).
-
-3. github or pypi 
-
-For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
-**If you are using linux** then simply run apt-get install -y gcc and apt-get install -y
-gfortran in your terminal (or yum install -y gcc-gfortran ).
-**If you are using a MacOS** then you will need to install xcode. First, in your 
-terminal, check first to see if you already have it:
-
-<code>xcode-select -p</code> 
-
-If it is installed, it should return a path. If it is not installed then run
-
-<code>xcode-select --install</code> 
-
-This should install gcc. You can check if you have gcc by typing 
-
-<code>gcc --version</code>
-
-You can check to see if you have gfortran by typing 
-
-<code>gfortran --version</code> 
-
-If you do not have gfortran, then you can use homebrew to install (<code>brew install gfortran</code>).
-
-*Environment Variables*
-   
-You should define three environment variables:
-
-* EXE = where various executables will live. These are mostly related to manipulating RINEX files.
-
-* ORBITS = where the GPS/GNSS orbits will be stored. They will be listed under directories by 
-year and sp3 or nav depending on the orbit format.
-
-* REFL_CODE = where the reflection code inputs (SNR files and instructions) and outputs (RH)
-will be stored (see below). Both snr files and results will be saved here in year subdirectories.
-
-If you are running in a bash environment, you should save these environment variables in
-the .bashrc file that is run whenever you log on.
-
-If you don't define these environment variables, the code *should* assume 
-your local working directory (where you installed the code) is where 
-you want everything to be (to be honest, I have not tested this in a while).
-The orbits, SNR files, and periodogram results are stored in 
-directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
-
-*Direct Python Install*
-
-If you are using the version from gitHub:
-
-* <code>git clone https://github.com/kristinemlarson/gnssrefl </code>
-* cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code>
-* activate your virtual environment
-* <code>pip install wheel</code> (we are working to remove this step)
-* <code>pip install .</code>
-* from what I understand, you should be able to use pip3 instead of pip
-* you DO need a few more executables, so please read below or type 
-<code>installexe linux64 </code> or <code>installexe macos </code> 
-
-
-PyPi version:  
-
-* make a directory, cd into that directory, set up a virtual environment 
-* activate the virtual environment
-* <code>pip install wheel</code> (we are working to remove this step)
-* <code>pip install gnssrefl</code>
-* from what I understand, you should be able to use pip3 instead of pip
-* you DO need a few more executables, so please read below or type 
-<code>installexe linux64 </code> or <code>installexe macos </code> 
-
-
-*Non-Python Code*
-
-**These executables must be stored in the EXE directory.** There are three 
-main executables used by <code>gnssrefl</code>: teqc, gfzrnx and CRX2RNX.
-I have written a utility - <code>installexe</code> - that will download these executables for 
-a macOS or linux (64 bit) installation and put them in the 
-correct place. **This install does not currently work for the new Apple chip.** Type -h for more information.
-
-*Further information on these non-python codes:*
-
-* Required translator for compressed (Hatanaka) RINEX files. CRX2RNX, http://terras.gsi.go.jp/ja/crx2rnx.html. 
-
-* Optional datatool, **teqc**, is highly recommended.  There is a list of static executables at the
-bottom of [this page](http://www.unavco.org/software/data-processing/teqc/teqc.html). Unfortunately 
-this code is no longer supported by UNAVCO.
-
-* Optional datatool, **gfzrnx** is required if you plan to use the RINEX 3 option. Executables available from the GFZ,
-http://dx.doi.org/10.5880/GFZ.1.1.2016.002. 
-
-We no longer encourage people to install these Fortran RINEX translators. The Fortran is now 
-included in the python build. We provide these links for general interest:
-
-* Optional Fortran RINEX Translator for GPS. **The executable must be called gpsSNR.e.** For the 
-code: https://github.com/kristinemlarson/gpsonlySNR
-
-* Optional Fortran RINEX translator for multi-GNSS. **The executable must be called gnssSNR.e** For the 
-code: https://github.com/kristinemlarson/gnssSNR
 
 ### ii. Understanding What the Code is Doing  <a name="understanding"></a>
 
@@ -1244,7 +1135,6 @@ If the string is long - please post the error string in a thread response to you
 
 - Please include the operating system of your computer.
 
-
 Would you like to join our <code>gnssrefl</code> users email list? 
 Send an email to gnss-ir-request@postal.unavco.org and put the word 
 subscribe (or unsubscribe to leave) in your email subject.
@@ -1268,7 +1158,7 @@ Kristine M. Larson
 
 [https://kristinelarson.net](https://kristinelarson.net)
 
-This documentation was updated on April 25, 2022.
+This documentation was updated on June 29, 2022.
 
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
