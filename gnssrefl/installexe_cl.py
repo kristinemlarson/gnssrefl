@@ -37,7 +37,7 @@ def download_chmod_move(url,savename,exedir):
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument("opsys", help="operating system (linux64 or macos)", type=str)
+    parser.add_argument("opsys", help="operating system (linux64, macos, or mac-newchip)", type=str)
     args = parser.parse_args().__dict__
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -76,7 +76,7 @@ def installexe(opsys: str):
 
     sto = 'https://morefunwithgps.com/public_html/'
 
-    if opsys == 'linux64':
+    if (opsys == 'linux64'):
         print('Only 64 bit static versions will be provided.')
         print('For 32 bit you will need to check the appropriate websites.')
         savename = 'CRX2RNX'
@@ -104,7 +104,7 @@ def installexe(opsys: str):
             except:
                 print('Some kind of kerfuffle trying to install teqc')
 
-    elif opsys == 'macos':
+    elif (opsys == 'macos'):
         savename = 'CRX2RNX'
         url = sto + savename + '.' + opsys + '.e'
         download_chmod_move(url, savename, exedir)
@@ -128,6 +128,9 @@ def installexe(opsys: str):
         savename = 'gfzrnx'
         url = sto + 'gfzrnx.' + opsys + '.e'
         download_chmod_move(url, savename, exedir)
+    elif (opsys == 'mac-newchip'):
+        print('The Hatanaka CRX2RNX source code will be compiled. This requires gcc.')
+        print('There is no teqc executable for this architecture, so none will be installed.')
 
     else:
         print('We do not recognize your operating system input. Exiting.')

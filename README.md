@@ -1167,6 +1167,8 @@ from the cddis archive on day of year 150 in 2020
 and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,
 but this utility writes out a file with only columns of numbers instead of csv. 
 
+<code>download_ioc</code> downloads up to a month of tide gauge records from the IOC website, http://www.ioc-sealevelmonitoring.org/. 
+
 <code>query_unr</code> returns latitude, longitude, and ellipsoidal height and Cartesian position 
 for stations that were in the Nevada Reno database as of Octoner 2021. Coordinates are now more precise 
 than they were originally (UNR used to provide four decimal points in lat/long). 
