@@ -344,9 +344,11 @@ python/packaging questions and improved our docker distribution.
 - [Naoya Kadota](https://github.com/naoyakadota) added the GSI data archive. 
 - Joakim Strandberg provided python RINEX translators. 
 - Johannes Boehm provided source code for the refraction correction. 
-- Kelly Enloe made Jupyter notebooks and Tim Dittmann made docker builds. 
+- At UNAVCO, Kelly Enloe made Jupyter notebooks and Tim Dittmann made docker builds. 
 - Makan Karegar added NMEA capability.
 - Dave Purnell added the <code>invsnr</code> capability.  
+- Carolyn Roesler helped with the original Matlab codes.
+- Felipe Nievinski and Simon Williams have provided significant advice for this project.
 
 
 Kristine M. Larson
