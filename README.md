@@ -55,10 +55,11 @@ with the details associated with **gnssir**. It is not meant to be used for rout
 It also helps you pick an appropriate azimtuh mask and quality control settings.
 
 There are also various [utilities](#helper) you might find to be useful.
-
 If you are unsure about why various restrictions are being applied, it is really useful 
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
-or similar. 
+or similar. You can also watch some background videos on GNSS-IR at [youtube](https://www.youtube.com/channel/UCC1NW5oS7liG7C8NBK148Bg).
+
+*Philosophy*
 
 In geodesy, you don't really need to know much about what you are doing to 
 calculate a reasonably precise position from GPS data. That's just the way it is.
@@ -105,7 +106,8 @@ we will convert to linear units on y-axis).
 
 After that polynomial is removed, we will concentrate on the *rising* 
 and *setting* satellite arcs. That is the red parts on the left and right.  
-Here you can see those next two steps. On the top is the "straightened" SNR data. Instead of time,
+
+Below you can see those next two steps. On the top is the "straightened" SNR data. Instead of time,
 it is plotted with respect to sine of the elevation angle. It was shown a long time ago by Penina 
 Axelrad that the frequency extracted from these data is representative of the reflector height.
 Here a periodogram was used to extract this frequency, and that is shown below, with the x-axis 
