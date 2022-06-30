@@ -268,32 +268,32 @@ and antenna type, receiver coordinates, and whether SNR data are in the file. RI
 
 <HR>
 
-### Would you like to help with writing code for this project?<a name="weneedhelp"></a>
+### GNSS-IR Community <a name="weneedhelp"></a>
 
 **We need help to maintain and improve this code. How can you help?**
 
 <ol>
 
-* Archives are *constantly* changing their file transfer protocols. If you 
+- Archives are *constantly* changing their file transfer protocols. If you 
 find one in <code>gnssrefl</code> that doesn't work anymore,
 please fix it and let us know. Please test that it 
 works for both older and newer data.
 
-* If you would like to add an archive, please do so. Use the existing code in gps.py as a starting point. 
+- If you would like to add an archive, please do so. Use the existing code in gps.py as a starting point. 
 
-* We need better models for GNSS-IR far more than we need more journal articles finding that the 
+- We need better models for GNSS-IR far more than we need more journal articles finding that the 
 method works. And we need these models to be in python. 
 
-* I would like to add a significant wave height calculation to this code. If you have such code that 
+- I would like to add a significant wave height calculation to this code. If you have such code that 
 works on fitting the spectrum computed with detrended SNR data, please consider contributing it.
 
-* If you have a better refraction correction than we are using, please provide it to us as a function in python.
+- If you have a better refraction correction than we are using, please provide it to us as a function in python.
 
-* Write up a new [use case](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md).
+- Write up a new [use case](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md).
 
-* Investigate surface related biases for polar tide gauge calculations (ice vs water).
+- Investigate surface related biases for polar tide gauge calculations (ice vs water).
 
-* I have ported NOCtide.m and will add it here when I get a chance.
+- I have ported NOCtide.m and will add it here when I get a chance.
 
 </ol>
 
