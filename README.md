@@ -22,8 +22,7 @@
 4. [Utilities](#helper)
 5. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
 6. [Publications](https://kristinelarson.net/publications)
-7. [How can you help write code for this project?](#weneedhelp)
-8. [How to ask for help about running the code](#helpmeplease)
+7. [How can you help this project? How can you ask for help?](#weneedhelp)
 
 <HR>
 
@@ -271,7 +270,7 @@ and antenna type, receiver coordinates, and whether SNR data are in the file. RI
 
 ### Would you like to help with writing code for this project?<a name="weneedhelp"></a>
 
-We need help to maintain and improve this code. How can you help?
+**We need help to maintain and improve this code. How can you help?**
 
 <ol>
 
@@ -298,7 +297,7 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 </ol>
 
-### How to get help with your gnssrefl questions<a name="helpmeplease"></a>
+** How to get help with your gnssrefl questions?**
 
 If you are new to the software, you should consider watching the 
 [videos about GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)
