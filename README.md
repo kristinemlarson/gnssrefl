@@ -297,7 +297,7 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 </ol>
 
-** How to get help with your gnssrefl questions?**
+**How to get help with your gnssrefl questions?**
 
 If you are new to the software, you should consider watching the 
 [videos about GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)
@@ -335,7 +335,7 @@ subscribe (or unsubscribe to leave) in your email subject.
 
 <HR>
 
-Acknowledgements <a name="acknowledgements"></a>
+**Acknowledgements**  
 
 
 - [Radon Rosborough](https://github.com/raxod502) helped with 
