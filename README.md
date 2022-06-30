@@ -9,41 +9,23 @@
 
 ### Table of Contents
 
-1. [Philosophy](#philosophy)
-2. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
-3. Main Codes
+1. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
+2. Main Codes
     1. [Understanding the Code](#understanding)
     2. [rinex2snr: translating GNSS Data (RINEX, NMEA)](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/rinex2snr.md)
     3. [quickLook: assessing a GNSS site using SNR files](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/quickLook.md)
     4. [gnssir: estimating reflector heights from SNR data](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/gnssir.md)
-4. Products:
+3. Products:
     1. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
     2. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
     3. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
-5. [Utilities](#helper)
-6. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
-7. [Publications](#publications)
-8. [How can you help write code for this project?](#weneedhelp)
-9. [How to ask for help about running the code](#helpmeplease)
+4. [Utilities](#helper)
+5. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
+6. [Publications]((https://kristinelarson.net/publications)
+7. [How can you help write code for this project?](#weneedhelp)
+8. [How to ask for help about running the code](#helpmeplease)
 
 <HR>
-
-### Philosophical Statement <a name="philosophy"></a>
-In geodesy, you don't really need to know much about what you are doing to 
-calculate a reasonably precise position from GPS data. That's just the way it is.
-(Note: that is also thanks to the hard work of the geodesists that wrote the 
-computer codes). For GPS/GNSS reflections, you need to know a little bit more - like what are you
-trying to do? Are you trying to measure water levels? Then you need to know where the water
-is! (with respect to your antenna, i.e. which azimuths are good and which are bad). 
-Another application of this code is to measure snow accumulation. If you 
-have a bunch of obstructions near your antenna, 
-you are responsible for knowing not to use that region. If your antenna is 10 meters 
-above the reflection area, and the software default only computes answers up to 6 meters,
-the code will not tell you anything useful. It is up to you to know what is best for the site and 
-modify the inputs accordingly. 
-I encourage you to get to know your site. If it belongs to you, look at 
-photographs. If you can't find photographs, use Google Earth.  You can also try using
-my [google maps web app interface](https://gnss-reflections.org/geoid?station=smm3).
 
 **gnssrefl** is an open source/python version of my GNSS interferometric reflectometry (GNSS-IR) code. 
 
@@ -61,7 +43,7 @@ change in security protocols at CDDIS.
 
 *Goals*
 
-The goal of this python repository is to help you compute (and evaluate) GNSS-based
+The goal of the gnssrefl python repository is to help you compute (and evaluate) GNSS-based
 reflectometry parameters using geodetic data. This method is often
 called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modules:
 
@@ -79,10 +61,23 @@ If you are unsure about why various restrictions are being applied, it is really
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
 or similar. 
 
-<HR>
+In geodesy, you don't really need to know much about what you are doing to 
+calculate a reasonably precise position from GPS data. That's just the way it is.
+(Note: that is also thanks to the hard work of the geodesists that wrote the 
+computer codes). For GPS/GNSS reflections, you need to know a little bit more - like what are you
+trying to do? Are you trying to measure water levels? Then you need to know where the water
+is! (with respect to your antenna, i.e. which azimuths are good and which are bad). 
+Another application of this code is to measure snow accumulation. If you 
+have a bunch of obstructions near your antenna, 
+you are responsible for knowing not to use that region. If your antenna is 10 meters 
+above the reflection area, and the software default only computes answers up to 6 meters,
+the code will not tell you anything useful. It is up to you to know what is best for the site and 
+modify the inputs accordingly. 
+I encourage you to get to know your site. If it belongs to you, look at 
+photographs. If you can't find photographs, use Google Earth.  You can also try using
+my [google maps web app interface](https://gnss-reflections.org/geoid?station=smm3).
 
-
-### Understanding What the Code is Doing  <a name="understanding"></a>
+*Overview*
 
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
 an interference pattern that can be observed in GNSS Signal to Noise Ratio (SNR) data as a satellite rises or sets. 
@@ -229,7 +224,7 @@ mask and reflector height range. This is one of the reasons <code>quickLook</cod
 
 <HR>
 
-### 5. Utilities <a name="helper"></a>
+### Utilities <a name="helper"></a>
 
 <code>download_rinex</code> can be useful if you want to 
 download RINEX v2.11 or 3 files (using the version flag) without using 
@@ -263,6 +258,7 @@ and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works per
 but this utility writes out a file with only columns of numbers instead of csv. 
 
 <code>download_ioc</code> downloads up to a month of tide gauge records from the IOC website, http://www.ioc-sealevelmonitoring.org/. 
+Optional output file. If the output file ends in csv, it writes a csv file instead of plain text.
 
 <code>query_unr</code> returns latitude, longitude, and ellipsoidal height and Cartesian position 
 for stations that were in the Nevada Reno database as of Octoner 2021. Coordinates are now more precise 
@@ -273,16 +269,7 @@ and antenna type, receiver coordinates, and whether SNR data are in the file. RI
 
 <HR>
 
-### 6. Publications <a name="publications"></a>
-
-There are A LOT of publications about GPS and GNSS interferometric reflectometry.
-If you want something with a how-to flavor, try this paper, 
-which is [open option](https://link.springer.com/article/10.1007/s10291-018-0744-8). Also 
-look to the publications page on my [personal website](https://kristinelarson.net/publications).
-
-<HR>
-
-### 7. Would you like to help with writing code for this project?<a name="weneedhelp"></a>
+### Would you like to help with writing code for this project?<a name="weneedhelp"></a>
 
 We need help to maintain and improve this code. How can you help?
 
@@ -311,7 +298,7 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 </ol>
 
-### 8. How to get help with your gnssrefl questions<a name="helpmeplease"></a>
+### How to get help with your gnssrefl questions<a name="helpmeplease"></a>
 
 If you are new to the software, you should consider watching the 
 [videos about GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)
@@ -349,7 +336,7 @@ subscribe (or unsubscribe to leave) in your email subject.
 
 <HR>
 
-### 9. Acknowledgements <a name="acknowledgements"></a>
+Acknowledgements <a name="acknowledgements"></a>
 
 
 - [Radon Rosborough](https://github.com/raxod502) helped with 
