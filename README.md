@@ -21,7 +21,7 @@
     3. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
 4. [Utilities](#helper)
 5. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
-6. [Publications]((https://kristinelarson.net/publications)
+6. [Publications](https://kristinelarson.net/publications)
 7. [How can you help write code for this project?](#weneedhelp)
 8. [How to ask for help about running the code](#helpmeplease)
 
