@@ -272,7 +272,6 @@ and antenna type, receiver coordinates, and whether SNR data are in the file. RI
 
 **We need help to maintain and improve this code. How can you help?**
 
-<ol>
 
 - Archives are *constantly* changing their file transfer protocols. If you 
 find one in <code>gnssrefl</code> that doesn't work anymore,
@@ -294,8 +293,6 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 - Investigate surface related biases for polar tide gauge calculations (ice vs water).
 
 - I have ported NOCtide.m and will add it here when I get a chance.
-
-</ol>
 
 **How to get help with your gnssrefl questions?**
 
