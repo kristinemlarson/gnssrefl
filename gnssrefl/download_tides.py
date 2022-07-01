@@ -5,17 +5,26 @@ kristine larson
 """
 import argparse
 import datetime
+import matplotlib.pyplot as plt
 import requests
 import sys
 import gnssrefl.gps as g
 
+from gnssrefl.utils import validate_input_datatypes, str2bool
+
+
 def quickp(station,t,sealevel):
     """
     """
-    plt.figure()
-    plt.plot(t,sealevel)
+    fs = 10
+    fig,ax=plt.subplots()
+    ax.plot(t, sealevel, '-')
+    plt.title('Tides at ' + station)
+    plt.xticks(rotation =45,fontsize=fs);
+    plt.ylabel('meters')
     plt.grid()
-    plt.title(station)
+    fig.autofmt_xdate()
+
     plt.show()
     return
 
@@ -26,13 +35,19 @@ def parse_arguments():
     parser.add_argument("date1", help="start-date, 20150101", type=str)
     parser.add_argument("date2", help="end-date, 20150110", type=str)
     parser.add_argument("-output", default=None, help="Optional output filename", type=str)
+    parser.add_argument("-plt", default=None, help="quick plot to screen", type=str)
     args = parser.parse_args().__dict__
+
+    # convert all expected boolean inputs from strings to booleans
+    boolean_args = ['plt']
+    args = str2bool(args, boolean_args)
+
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_tides(station: str, date1: str, date2: str, output: str = None):
+def download_tides(station: str, date1: str, date2: str, output: str = None, plt: bool = False):
     """
         Downloads NOAA tide gauge files
         Downloads a json and converts it to plain txt with columns!
@@ -53,6 +68,11 @@ def download_tides(station: str, date1: str, date2: str, output: str = None):
         output : string, optional
             Optional output filename
             default is None
+
+        plt: boolean, optional
+            plot comes to the screen
+            default is None
+
 
     """
 
@@ -83,6 +103,7 @@ def download_tides(station: str, date1: str, date2: str, output: str = None):
     else:
         outfile = output
 
+    tt = []; slevel = []; obstimes = []
     fout = open(outfile, 'w+')
     fout.write("%YYYY MM DD HH MM  Water(m) DOY  MJD\n")
     for i in range(0, NV):
@@ -101,9 +122,17 @@ def download_tides(station: str, date1: str, date2: str, output: str = None):
             doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
             m, f = g.mjd(year, mm, dd, hh, minutes, 0)
             mjd = m + f;
+            tt.append(mjd)
+            bigT = datetime.datetime(year=year, month=mm, day=dd, hour=hh, minute=minutes, second=0)
+            obstimes.append(bigT)
+
+            slevel.append(sl)
             fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
     fout.close()
     print('NOAA tide gauge data written out to: ', outfile)
+
+    if plt:
+        quickp(station,obstimes,slevel)
 
 
 def main():

@@ -7,6 +7,7 @@ originally used XML download. changing to json
 """
 import argparse
 import datetime
+import numpy as np
 import requests
 import sys
 import gnssrefl.gps as g
@@ -16,16 +17,24 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 
 def quickp(station,t,sealevel):
     """
+    station name
+    t - time - in datetime format
+    sealevel in meters (relative - not defined in a datum)
+    
     """
-    plt.figure()
-    plt.plot(t,sealevel)
-    plt.grid()
-    plt.xlabel('MJD')
-    plt.ylabel('meters')
-    plt.title('Tides at ' + station + ' from IOC website')
-    plt.show()
+    fs = 10
+    if (len(t) > 0):
+        fig,ax=plt.subplots()
+        ax.plot(t, sealevel, '-')
+        plt.title('Tides at ' + station)
+        plt.xticks(rotation =45,fontsize=fs);
+        plt.ylabel('meters')
+        plt.grid()
+        fig.autofmt_xdate()
+        plt.show()
+    else:
+        print('no data found - so no plot')
     return
-
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -34,11 +43,13 @@ def parse_arguments():
     parser.add_argument("date2", help="end-date, 20150101", type=str)
     parser.add_argument("-output", default=None, help="Optional output filename", type=str)
     parser.add_argument("-plt", default=None, help="Optional plot to screen", type=str)
+    parser.add_argument("-outliers", default=None, help="attempt to remove outliers", type=str)
+    parser.add_argument("-sensor", default=None, help="flt, prs or rad, default is rad", type=str)
     args = parser.parse_args().__dict__
 
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt']
+    boolean_args = ['plt','outliers']
     args = str2bool(args, boolean_args)
 
 
@@ -46,7 +57,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: bool = False):
+def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: bool = False, outliers: bool = False, sensor= None):
     """
         Downloads IOC tide gauge files
         Downloads HTML (?????)  and converts it to plain txt with columns!
@@ -56,12 +67,30 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         station : string
 
         date1 : string
+            begin date in yyyymmdd.
+            Example value: 20150101
+
+        date2 : string
             end date in yyyymmdd.
             Example value: 20150101
 
         output : string, optional
             Optional output filename
             default is None
+
+        plt: boolean, optional
+            plot comes to the screen
+            default is None
+
+        outliers: boolean, optional
+            tried to remove outliers, but 
+            it doesn't work as yet
+            default is No
+        sensor: string, optional
+            type of sensor, prs(for pressure), rad (for radar), flt (for float)
+            default is None, which means it will printout what is there.
+            if there is more than one sensor you should specifically ask for the one
+            you want
 
     """
 
@@ -70,6 +99,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     if len(date2) != 8:
         print('date2 must have 8 characters', date1); sys.exit()
     # should check for < 30 days
+
 
     csv = False
     if output is None:
@@ -88,7 +118,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     data = requests.get(newurl).json()
     NV = len(data)
     print('number of records', NV)
-    if (NV < 1):
+    if (NV < 2):
         print('exiting')
         sys.exit()
 
@@ -100,27 +130,59 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         fout.write("%YYYY MM DD HH MM  Water(m) DOY  MJD \n")
     i = 1
 
-    thetime = []; sealevel = []
+#    All values X where abs(X – median) > tolerance are hidden.
+#    With tolerance = 3*abs(percentile90 - median)
+#    The statistics (median and percentile90) are calculated on the data being plotted (12h, 1d, 7d, 30d)
+    s = []
+    for i in range(0, NV):
+        s.append(float(data[i]['slevel']))
+    medv = np.median(s) 
+    print('median',medv)
+    sv = np.sort(np.abs(s-medv))
+    percent90 = sv[int(NV*0.9)]  
+
+    print('Your sensor choice:', sensor)
+    if outliers:
+        criteria = np.abs(percent90*3)
+        print('outlier criteria:',round(criteria,2), ' meters')
+    else:
+        criteria = 100000000
+
+    all_sensors = []
+    thetime = []; sealevel = [] ; obstimes = [] ; pt = 0
     for i in range(0, NV):
         slr = data[i]['slevel']
+        instrument = data[i]['sensor']
+        if instrument not in all_sensors:
+            all_sensors.append(instrument)
+            print('Found this sensor', instrument)
         t = data[i]['stime']
         sl = float(slr)
-        year = int(t[0:4]); mm = int(t[5:7]); dd = int(t[8:10])
-        hh = int(t[11:13]); minutes = int(t[14:16])
-        #print(year, mm, dd, hh, minutes)
-        today = datetime.datetime(year, mm, dd)
-        doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
-        m, f = g.mjd(year, mm, dd, hh, minutes, 0)
-        mjd = m + f;
-        thetime.append(mjd); sealevel.append(sl)
-        if csv:
-            fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
+        if ((np.abs(sl-medv)) < criteria) and ((sensor == None) or (instrument == sensor)):
+            year = int(t[0:4]); mm = int(t[5:7]); dd = int(t[8:10])
+            hh = int(t[11:13]); minutes = int(t[14:16])
+            #print(year, mm, dd, hh, minutes)
+            today = datetime.datetime(year, mm, dd)
+            doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
+            m, f = g.mjd(year, mm, dd, hh, minutes, 0)
+            mjd = m + f;
+            thetime.append(mjd); sealevel.append(sl)
+            bigT = datetime.datetime(year=year, month=mm, day=dd, hour=hh, minute=minutes, second=0)
+            obstimes.append(bigT)
+
+            if csv:
+                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
+            else:
+                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
         else:
-            fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
+            pt = pt + 1
     fout.close()
 
     if plt:
-        quickp(station,thetime,sealevel)
+        quickp(station,obstimes,sealevel)
+
+    #for i in range(0,NV):
+    #    print(s[i], sortedvalues[i])
 
 
 def main():
