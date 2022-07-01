@@ -260,7 +260,8 @@ but this utility writes out a file with only columns of numbers (or csv if you p
 as <code>download_noaa</code> and there is an optional plot produced with -plt T.
 
 <code>download_ioc</code> downloads up to a month of tide gauge records from the IOC website, http://www.ioc-sealevelmonitoring.org/. 
-Optional output file. If the output file ends in csv, it writes a csv file instead of plain text.
+Requires beginning and ending date (yyyymmdd format) and is limited to 30 days. Optional output filename allowed. 
+If the output file ends in csv, it writes a csv file instead of plain text.
 You can pick the sensor type or you will get all of them. There is an optional plot produced with -plt T.
 
 <code>query_unr</code> returns latitude, longitude, and ellipsoidal height and Cartesian position 
