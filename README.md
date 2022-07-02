@@ -272,6 +272,10 @@ than they were originally (UNR used to provide four decimal points in lat/long).
 <code>check_rinex</code> returns simple information from the file header, such as receiver
 and antenna type, receiver coordinates, and whether SNR data are in the file. RINEX 2.11 only
 
+<code>prn2gps</code> will try to tell you which PRN numbers are associated with which SVN (or GPS) numbers 
+for a given day, as in <code>prn2gps 2021-01-01</code>. It uses the public [JPL](https://sideshow.jpl.nasa.gov/pub/gipsy_products/gipsy_params/PRN_GPS.gz) translation file, so if that file
+is no good, the translation will also be no good.  
+
 <HR>
 
 ### GNSS-IR Community <a name="weneedhelp"></a>
