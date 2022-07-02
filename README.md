@@ -252,7 +252,8 @@ from the cddis archive on day of year 150 in 2020
 
 <code>gpsweek</code> translates year, month, day into GPS week, day of week (0-6) 
    
-<code>download_unr</code> downloads ENV time series for GPS sites from the Nevada Reno website (IGS14), so ITRF 2014.
+<code>download_unr</code> downloads ENV time series for GPS sites from the Nevada Reno website (IGS14), so ITRF 2014. Input is 
+four character station name. Lowercase.
 
 <code>download_tides</code> downloads up to a month of NOAA tide gauge data given station number (7 characters),
 and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,
