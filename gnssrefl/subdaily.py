@@ -753,16 +753,17 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     # this is just for kristine
     ntv = tvd
     dtime = False
-    fout = open('ktest.txt','+w')
-    for i in range(0,nr):
-        year = int(ntv[i,0]); doy = int(ntv[i,1])
-        year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
-        rh = ntv[i,2]; UTCtime = ntv[i,4];
-        dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
-        fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:6.3f} {23:6.3f} {24:6.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], 
-            ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], correction[i], residual[i]))
+    kristine = False
+    if kristine:
+        fout = open('ktest.txt','+w')
+        for i in range(0,nr):
+            year = int(ntv[i,0]); doy = int(ntv[i,1])
+            year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
+            rh = ntv[i,2]; UTCtime = ntv[i,4];
+            dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
+            fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:6.3f} {23:6.3f} {24:6.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], correction[i], residual[i]))
                #ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], RHdot_corr[i]))
-    fout.close()
+        fout.close()
 
     return tvd, correction 
 
@@ -998,14 +999,16 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     spl_x = xx; spl_y = spline(xx)
     spline_at_tnew = spline(tnew)
     N = len(spl_x)
-    ftest = open('Ktesting.txt', 'w+')
+    kristine = False
+    if kristine:
+        ftest = open('Ktesting.txt', 'w+')
+        myyear = 2022
+        for i in range(0,N):
+            mjdish = g.fdoy2mjd(myyear,spl_x[i])
+            ftest.write('{0:9.4f} {1:7.3f} {2:12.6f} \n'.format( spl_x[i], spl_y[i], mjdish))
 
-    myyear = 2022
-    for i in range(0,N):
-        mjdish = g.fdoy2mjd(myyear,spl_x[i])
-        ftest.write('{0:9.4f} {1:7.3f} {2:12.6f} \n'.format( spl_x[i], spl_y[i], mjdish))
-
-    ftest.close()
+        ftest.close()
+        
 
     plt.subplot(211)
     plt.plot(tnew,ynew,'k.')
