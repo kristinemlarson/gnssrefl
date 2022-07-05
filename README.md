@@ -24,6 +24,7 @@
 7. [How can you help this project? How can you ask for help?](#weneedhelp)
 
 <HR> 
+
 ### Understanding <a name="understanding"></a>
 
 **gnssrefl** is an open source/python version of my GNSS interferometric reflectometry (GNSS-IR) code. 
