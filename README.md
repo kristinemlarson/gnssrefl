@@ -260,6 +260,11 @@ and begin/end dates, e.g. 20150601 would be June 1, 2015. The NOAA API works per
 but this utility writes out a file with only columns of numbers (or csv if you prefer). This can also be called
 as <code>download_noaa</code> and there is an optional plot produced with -plt T.
 
+<code>download_psml</code> downloads sealevel files from
+https://www.psmsl.org/data/gnssir/map.php. Input is the station name.
+Ouput can be plain txt of csv. To implement the latter, use csv as the ending 
+of your output filename. Optional plot to the screen if -plt is set to T.
+
 <code>download_ioc</code> downloads up to a month of tide gauge records from the IOC website, http://www.ioc-sealevelmonitoring.org/. 
 Requires beginning and ending date (yyyymmdd format) and is limited to 30 days. Optional output filename allowed. 
 If the output file ends in csv, it writes a csv file instead of plain text.
