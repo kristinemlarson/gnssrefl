@@ -259,7 +259,9 @@ four character station name. Lowercase.
 gauge data given a station number (7 characters), and begin/end dates, e.g. 
 20150601 would be June 1, 2015. The NOAA API works perfectly well for this,
 but this utility writes out a file with only columns of 
-numbers (or csv if you prefer). This can also be called
+numbers (or csv if you prefer). To implement the latter, use csv as the ending 
+of your output filename.
+This can also be called
 as <code>download_noaa</code>; there is an optional plot produced with -plt T.
 
 <code>download_psml</code> downloads sealevel files from the 
