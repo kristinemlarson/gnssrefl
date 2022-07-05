@@ -90,6 +90,7 @@ def myfavoriteobs():
 def ydoych(year,doy):
     """
     why why why did RINEX allow year to be two characters?
+    takes in integer year and doy and returns character strings for 4 and 2 ch year and doy
     """
     cyyyy = str(year)
     cyy = cyyyy[2:4]
@@ -109,12 +110,16 @@ def year_twoch(year):
 
 def define_filename(station,year,doy,snr):
     """
+    goal is to return the SNR filename 
+
     inputs:
     station name  (4 char lowercase)
     year 
     doy 
     snr file type (e.g. 99, 66)
     year doy and snr are integers
+
+    output:
     returns snr filenames (both uncompressed and xz compressed)
     author: Kristine Larson
     19mar25: return compressed filename too
@@ -2108,6 +2113,8 @@ def find_satlist(f,snrExist):
     if a signal is (potentially) legal
     outputs: list of satellites to use 
     author: kristine m. larson
+
+    you should now use find_satlist_wdate
     """
 # set list of GPS satellites for now
 # 
@@ -4343,7 +4350,7 @@ def l2c_l5_list(year,doy):
     june 24, 2021: updated for SVN78
     """
 
-    # this numpy array
+    # this numpy array has the satellite number, year, and doy of each launch of a L2C satellite
     l2c=np.array([[1 ,2011 ,290], [3 ,2014 ,347], [4 ,2018 ,357], [5 ,2008 ,240],
         [6 ,2014 ,163], [7 ,2008 ,85], [8 ,2015 ,224], [9 ,2014 ,258], [10 ,2015 ,343],
         [11, 2021, 168],
@@ -4353,6 +4360,8 @@ def l2c_l5_list(year,doy):
     # indices that meet your criteria
     ij=(l2c[:,1] + l2c[:,2]/365.25) < (year + doy/365.25)
     l2csatlist = l2c[ij,0]
+
+    # The L5 list is defined by 2010, doy 148
     firstL5 = 2010 + 148/365.25 # launch may 28, 2010  - some delay before becoming healthy
 
     newlist = l2c[ij,:]
@@ -4400,16 +4409,6 @@ def ymd_hhmmss(year,doy,utc,dtime):
     return bigT, year, month, day, hour, minute, second
 
 
-# don't need to print out success
-#print('found the ', env_var, ' environment variable')
-
-        #wget.download(url, out=comp_rinexfiled)
-        #status = subprocess.call(['uncompress', comp_rinexfiled])
-        #status = subprocess.call([crnxpath, rinexfiled])
-        # rm the hatanaka file
-        #status = subprocess.call(['rm','-f',rinexfiled])
-
-
 def get_obstimes(tvd):
     """
     send a LSP results, so the variable created when you read 
@@ -4431,7 +4430,7 @@ def get_obstimes(tvd):
 def get_obstimes_plus(tvd):
     """
     send a LSP results file, so the variable created when you read
-    in the results file.  return obstimes for plotting
+    in the results file.  return obstimes for matplotlib plotting purposes
     2022jun10 - added MJD output
     author: kristine larson
     """
@@ -4454,7 +4453,7 @@ def get_obstimes_plus(tvd):
 
 def confused_obstimes(tvd):
     """
-    takes lsp results - returns MJD
+    takes lsp results - returns list of MJD values
     author: kristine larson
     """
     nr,nc = tvd.shape
@@ -4470,10 +4469,85 @@ def confused_obstimes(tvd):
     return modifiedjulian
 
 
+def read_simon_williams(filename,outfilename):
+    """
+    input: filename of GNSS based water level measurements from Simon Williams 
+    return lists of datetime obstimes, MJD, and mod-water-level in meters
+    2022 july 4
+    also returns PRN, frequency, and azimuth numpy arrays
+    """
+
+    fout = open(outfilename,'w+')
+    print('Writing Simon Williams data to ', outfilename)
+    csv = False
+    if outfilename[-3:] == 'csv':
+        csv = True
+
+    if csv:
+        fout.write("# YYYY,MM,DD,HH,MM, Water(m),DOY, MJD, Seconds \n")
+    else:
+        fout.write("%YYYY MM DD HH MM  Water(m) DOY  MJD Seconds \n")
+
+
+
+    # read the file three times because i am loadtxt impaired
+    # string
+    tv = np.loadtxt(filename,usecols=(0,1,2),comments='#',dtype='str',delimiter=',')
+    # integers
+    ivals = np.loadtxt(filename,usecols=(4,5),skiprows=10, dtype='int',delimiter=',')
+    # floats
+    fvals = np.loadtxt(filename,usecols=(6),skiprows=10, dtype='float',delimiter=',')
+    # store the latter columns directly
+    prn = ivals[:,0]
+    fr = ivals[:,1]
+    az = fvals
+
+    nr = len(tv)
+    # these are converted to numpy at the bottom
+    obstimes = []
+    modjulian = []
+    sealevel = []
+    s1=time.time()
+
+    # start at 1 because simon has a header line
+    for i in range(1,nr):
+        year = int(tv[i,0][0:4])
+        mm = int(tv[i,0][5:7])
+        dd = int(tv[i,0][8:10])
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,mm,dd)
+        hh = int(tv[i,0][11:13])
+        minutes = int(tv[i,0][14:16])
+        sec = int(tv[i,0][17:19])
+        raw = float(tv[i,1])
+        modraw = float(tv[i,2])
+        dtime = datetime.datetime(year=year, month=mm, day=dd, hour=hh, minute=minutes, second=sec)
+        imjd, frac = mjd(year,mm,dd,hh,minutes,sec)
+        x = [imjd+frac]
+        # go ahead and write to a file ... 
+        if csv:
+            fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:2.0f} \n".format(year, mm, dd, hh, minutes, modraw, doy, imjd+frac, sec))
+        else:
+            fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:2.0f} \n".format(year, mm, dd, hh, minutes, modraw, doy, imjd+frac, sec))
+
+        obstimes.append(dtime)
+        modjulian.append(x)
+        sealevel.append(modraw)
+
+    fout.close()
+
+    s2=time.time()
+    print('that took ', round(s2-s1,2), ' seconds')
+
+    outobstimes= np.asarray(obstimes)
+    outsealevel = np.asarray(sealevel)
+    outmjd = np.asarray(modjulian)
+
+    return outobstimes, outmjd, outsealevel, prn, fr, az
+
 
 def get_noaa_obstimes(t):
     """
-    send a noaa file variable. returns obstimes.
+    send a noaa file variable. returns datetime obstimes in a list.
     i guess one could learn how to use pandas ... nah
     """
     nr,nc = t.shape

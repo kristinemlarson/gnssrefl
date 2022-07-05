@@ -896,7 +896,9 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         ax.grid(True)
         ax.set_ylabel('RH meters')
         ax.invert_yaxis()
-        plt.savefig('spline_out.png')
+        spng = 'spline_out.png'
+        print('Plot with results has been written to ', spng)
+        plt.savefig(spng)
         if doplot:
             plt.show()
             plt.close()
