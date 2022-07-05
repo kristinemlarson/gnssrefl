@@ -10,11 +10,10 @@
 ### Table of Contents
 
 1. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
-2. Main Codes
-    1. [Understanding the Code](#understanding)
-    2. [rinex2snr: translating GNSS Data (RINEX, NMEA)](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/rinex2snr.md)
-    3. [quickLook: assessing a GNSS site using SNR files](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/quickLook.md)
-    4. [gnssir: estimating reflector heights from SNR data](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/gnssir.md)
+2. [Understanding the Code](#understanding)
+    1. [rinex2snr: translating GNSS Data (RINEX, NMEA)](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/rinex2snr.md)
+    2. [quickLook: assessing a GNSS site using SNR files](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/quickLook.md)
+    3. [gnssir: estimating reflector heights from SNR data](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/gnssir.md)
 3. Products:
     1. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
     2. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
