@@ -50,7 +50,7 @@ called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modu
 
 * [**gnssir**](docs/gnssir.md) computes reflector heights (RH) from SNR files.
 
-* [**quickLook**](quickloook.md) gives you a quick (visual) assessment of a file without dealing
+* [**quickLook**](quickLook.md) gives you a quick (visual) assessment of a file without dealing
 with the details associated with **gnssir**. It is not meant to be used for routine analysis.
 It also helps you pick an appropriate azimtuh mask and quality control settings.
 
