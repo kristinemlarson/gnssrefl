@@ -99,12 +99,14 @@ def download_simon(station: str, output: str = None, plt: bool = False):
     try:
         urllib.request.urlretrieve(url, filename)
         subprocess.call(['unzip', filename])
+        subprocess.call(['rm', '-f', filename])
+        # this should produce a csv file - cfilename
     except:
         print('Some problem with the download. Perhaps the station does not exist')
         sys.exit()
-    # read the file
 
     if os.path.exists(cfilename):
+       # read the file
         obs, simon_mjdish, sl,sprn,sfr, simon_az = g.read_simon_williams(cfilename,outfile)
     else:
         print('some problem with the download')
