@@ -274,54 +274,13 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
 
 #   read VMF gridfile in pickle format 
         pname = xdir + '/input/' + 'gpt_1wA.pickle'
-        print('The large refraction file should be stored here:', pname)
-        foundit = False
-        if os.path.isfile(pname):
+        foundit, pname = look_for_pickle_file() 
+        if foundit:
             f = open(pname, 'rb')
             [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
             f.close()
-            foundit = True
-        if not foundit:
-            pname =  'gnssrefl/gpt_1wA.pickle'
-            print('2nd attempt: subdirectory gnssrefl of current working directory:', pname)
-            if os.path.isfile(pname):
-                f = open(pname, 'rb')
-                [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
-                f.close()
-                foundit = True
-        if not foundit:
-            pname = try3
-            print('3rd attempt try here: ',pname)
-            if os.path.isfile(pname):
-                f = open(pname, 'rb')
-                [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
-                f.close()
-                foundit = True
-        if not foundit:
-            print('fourth attempt - download from github')
-            try:
-                pfile = 'gpt_1wA.pickle'
-                url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/' + pfile
-                wget.download(url,pfile)
-                subprocess.call(['mv','-f',pfile, xdir + '/input/' ])
-                foundit = True
-            except:
-                print('Failed again.')
-        if not foundit:
-            print('fifth attempt - this is getting ridiculous')
-            pname = xdir + '/input/' + 'gpt_1wA.pickle'
-            print(pname)
-            try:
-                pfile = 'gpt_1wA.pickle'
-                url= 'https://morefunwithgps.com/public_html/' + pfile
-                wget.download(url,pname)
-                #subprocess.call(['mv','-f',pfile, xdir + '/input/' ])
-                foundit = True
-            except:
-                print('Failed again.')
-
-        if not os.path.isfile(pname):
-            print('You will need to download gpt_1wA.pickle MANUALLY from github and store in REFL_CODE/input')
+        else:
+            print('You will need to download gpt_1wA.pickle MANUALLY from github and store it in REFL_CODE/input')
             sys.exit()
 
 # really should e zero to four, but whatever
@@ -438,3 +397,64 @@ def corr_el_angles(el_deg, press, temp):
     return corr_el_deg
 
 
+def look_for_pickle_file():
+    """
+    latest attempt to solve this dilema
+    """
+#   read VMF gridfile in pickle format
+
+    pfile = 'gpt_1wA.pickle'
+
+    # at one point i thought this was useful
+    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+    BASE_DIR = os.path.dirname(PROJECT_ROOT)
+    try3 = PROJECT_ROOT + '/' + pfile
+    # do i need str??
+    xdir = str(os.environ['REFL_CODE'])
+
+    fullpname = xdir + '/input/' + pfile
+
+    print('The large refraction file should be stored here:', fullpname)
+    foundit = False
+
+    if os.path.isfile(fullpname):
+        print('1st attempt: found in ', fullpname)
+        foundit = True
+    if not foundit:
+        print('2nd attempt: subdirectory of current working directory:', pname)
+        pname =  'gnssrefl/gpt_1wA.pickle'
+        if os.path.isfile(pname):
+            subprocess.call(['cp','-f',pname, fullpname  ])
+            foundit = True
+
+    if not foundit:
+        pname = try3
+        print('3rd attempt try here: ',pname)
+        if os.path.isfile(pname):
+            foundit = True
+            print('cp it')
+            subprocess.call(['cp','-f',pname, fullpname])
+
+    if not foundit:
+        print('4th attempt - download from github')
+        try:
+            url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/' + pfile
+            wget.download(url,fullpname)
+        except:
+            print('download failed')
+        if os.path.isfile(fullpname):
+            foundit = True
+
+    if not foundit:
+        print('5th attempt - this is getting ridiculous')
+        try:
+            url= 'https://morefunwithgps.com/public_html/' + pfile
+            wget.download(url,fullpname)
+        except:
+            print('Failed again.')
+
+        if os.path.isfile(fullpname):
+                foundit = True
+
+    print(foundit, fullpname)
+    return foundit , fullpname

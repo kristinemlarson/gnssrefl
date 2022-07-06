@@ -65,6 +65,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ___________
         station : string
             4 or 9 character ID of the station
+            lowercase please
 
         year : integer
             Year
@@ -183,6 +184,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     # plt is False unless user changes
     lsp['plt_screen'] = plt
+
 
     if delTmax is not None:
         lsp['delTmax'] = delTmax
