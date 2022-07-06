@@ -33,7 +33,6 @@ Vegetation Response to the 2012-2014 California Drought from GPS and Optical Mea
 
 Install gnssrefl using git clone https://github.com/kristinemlarson/gnssrefl
 
-
 Set up requested gnssrefl environment variables:
 
 * EXE = where various RINEX executables will live.
@@ -42,9 +41,17 @@ Set up requested gnssrefl environment variables:
 
 * REFL_CODE = where outputs of the code will be stored
 
-If you prefer, the ORBITS and REFL_CODE environment variables can point to the same directory
+If you prefer, the ORBITS and REFL_CODE environment variables can point to the same directory. 
+You have to make sure these values are set every time you work. So please put them in your 
+.bashrc (or similar). Example from my setup: 
 
-Eventually you will need to install teqc and CRX2RNX in the EXE area. See the gnssrefl readme file for more details. 
+export ORBITS=/Users/kristine/Documents/Research/Orbits
+
+
+Eventually you will need to install *teqc* and *CRX2RNX* in the EXE area. See the gnssrefl readme file for more details. 
+I know encourage you to use <code>installexe</code>. It allows linux 
+and mac installs. Type <code>installexe -h</code> for more information. Note: there is no *teqc* for the 
+mac with the new chip - so you are out of luck there.
 
 *For the most part I live in a lowercase world.*
 
@@ -120,8 +127,8 @@ always been normalized against the receiver behavior when the vegetation is drie
 
 ### mp1mp2
 So the sort of bad news is I am hesitant to trust the multi-GNSS teqc logs
-that UNAVCO computes. In order to avoid any confusion, for NEW experiments, I think it is best
-to run teqc yourself. You need to have installed the teqc executable.  Otherwise, it 
+that UNAVCO now computes. In order to avoid any confusion, for NEW experiments, I think it is best
+to run <code>teqc</code> yourself. You need to have installed the teqc executable.  Otherwise, it 
 only requires the station name, the year, and the day of year. In this example, 
 you must have the RINEX file in your directory:
 
