@@ -267,7 +267,7 @@ of your output filename.
 This can also be called
 as <code>download_noaa</code>; there is an optional plot produced with -plt T.
 
-<code>download_psml</code> downloads sealevel files from the 
+<code>download_psmsl</code> downloads sealevel files from the 
 [Permanent Service for Mean Sea Level](https://www.psmsl.org/data/gnssir/map.php). 
 Input is the station name. Ouput can be plain txt of csv. To implement the 
 latter, use csv as the ending of your output filename. Optional plot to the screen if -plt is set to T.
