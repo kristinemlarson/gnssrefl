@@ -51,24 +51,3 @@
 </TR>
 </Table>
 
-<P>
-
-### Summary Guide for Installation 
-
-* This code has only been tested for linux and MacOS.
-
-* Make sure **wget** exists on your machine.  If you type *which wget* and something comes back, you should be good.
-
-* gzip, xz, and unix compression (Z) should be supported by your machine
-
-* Install the [github version of gnssrefl](https://github.com/kristinemlarson/gnssrefl). Follow the [documentation guidelines](https://github.com/kristinemlarson/gnssrefl). 
-
-* Make the requested environment variables.
-
-* You can try using the <code>installexe</code> utility. Or you can download the Hatanaka 
-translator, CRX2RNX, and put it in the EXE area. Make sure it is executable.
-
-<P>
-
-Our code does not currently support soil moisture applications. It will be added in year 3 of the NASA grant we received to 
-build this software.
