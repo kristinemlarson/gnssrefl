@@ -6,6 +6,7 @@ kristine larson
 import argparse
 import datetime
 import matplotlib.pyplot as plt
+import os
 import requests
 import sys
 import gnssrefl.gps as g
@@ -75,6 +76,13 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
 
 
     """
+    g.check_environ_variables()
+
+    xdir = os.environ['REFL_CODE']
+    outdir = xdir  + '/Files/'
+    if not os.path.exists(outdir) :
+        subprocess.call(['mkdir', outdir])
+
 
     # metadata records  {'id': '8764227', 'name': 'LAWMA, Amerada Pass', 'lat': '29.4496', 'lon': '-91.3381'}
 
@@ -99,9 +107,9 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
     NV = len(data['data']) 
     if output is None:
         # use the default
-        outfile = station + '_' + 'noaa.txt'
+        outfile = outdir + station + '_' + 'noaa.txt'
     else:
-        outfile = output
+        outfile = outdir +  output
 
     tt = []; slevel = []; obstimes = []
     fout = open(outfile, 'w+')

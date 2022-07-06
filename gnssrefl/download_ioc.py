@@ -8,6 +8,7 @@ originally used XML download. changing to json
 import argparse
 import datetime
 import numpy as np
+import os
 import requests
 import sys
 import gnssrefl.gps as g
@@ -100,13 +101,22 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         print('date2 must have 8 characters', date1); sys.exit()
     # should check for < 30 days
 
+    g.check_environ_variables()
+
+    xdir = os.environ['REFL_CODE']
+    if not os.path.exists(xdir):
+        print('REFL_CODE environment variable must be set')
+        sys.exit()
+    outdir = xdir  + '/Files/'
+    if not os.path.exists(outdir) :
+        subprocess.call(['mkdir', outdir])
 
     csv = False
     if output is None:
     # use the default
-        outfile = station + '_' + 'ioc.txt'
+        outfile = outdir + station + '_' + 'ioc.txt'
     else:
-        outfile = output
+        outfile = outdir + output
         if output[-3:] == 'csv':
             csv = True
 

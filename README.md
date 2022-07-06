@@ -18,10 +18,11 @@
     1. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
     2. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
     3. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
-4. [Utilities](#helper)
-5. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
-6. [Publications](https://kristinelarson.net/publications)
-7. [How can you help this project? How can you ask for help?](#weneedhelp)
+4. [Examples](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
+5. [Utilities](#helper)
+6. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
+7. [Publications](https://kristinelarson.net/publications)
+8. [How can you help this project? How can you ask for help?](#weneedhelp)
 
 <HR> 
 
@@ -387,4 +388,3 @@ docker pull unavdocker/gnssrefl to install code.
 
 [Old quick link to Docker](https://hub.docker.com/r/unavdocker/gnssrefl)
 
-[Quick link to use cases.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)

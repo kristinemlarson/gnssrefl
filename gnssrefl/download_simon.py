@@ -73,13 +73,19 @@ def download_simon(station: str, output: str = None, plt: bool = False):
             default is None
 
     """
+    g.check_environ_variables()
+    xdir = os.environ['REFL_CODE']
+    outdir = xdir  + '/Files/'
+    if not os.path.exists(outdir) :
+        subprocess.call(['mkdir', outdir])
+
 
     csv = False
     if output is None:
     # use the default
-        outfile = station + '_' + 'simon.txt'
+        outfile = outdir + station + '_' + 'simon.txt'
     else:
-        outfile = output
+        outfile = outdir + output
         if output[-3:] == 'csv':
             csv = True
 

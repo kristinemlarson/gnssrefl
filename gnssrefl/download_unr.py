@@ -8,6 +8,7 @@ import argparse
 import wget
 import sys
 import os
+import gnssrefl.gps as g
 
 
 def parse_arguments():
@@ -37,14 +38,21 @@ def download_unr(station: str):
     fname = station + '.tenv3'
     stationL = station.lower() # lower case
     url = url + fname
-    # file will be stored here
-    myfname = stationL + '_igs14.tenv3'
+    # file will be stored in this directory
+    xdir = os.environ['REFL_CODE']
+    outdir = xdir  + '/Files/'
+    if not os.path.exists(outdir) :
+        subprocess.call(['mkdir', outdir])
+
+    g.check_environ_variables()
+
+    myfname = xdir + stationL + '_igs14.tenv3'
     try:
         wget.download(url, out=myfname)
     except:
         print('\n download failed:', url)
 
-    if os.path.exists(fname):
+    if os.path.exists(myfname):
         print('\n SUCCESS:', myfname)
 
 

@@ -306,9 +306,23 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
                 subprocess.call(['mv','-f',pfile, xdir + '/input/' ])
                 foundit = True
             except:
-                print('download gpt_1wA.pickle from github and store in REFL_CODE/input')
-                sys.exit()
+                print('Failed again.')
+        if not foundit:
+            print('fifth attempt - this is getting ridiculous')
+            pname = xdir + '/input/' + 'gpt_1wA.pickle'
+            print(pname)
+            try:
+                pfile = 'gpt_1wA.pickle'
+                url= 'https://morefunwithgps.com/public_html/' + pfile
+                wget.download(url,pname)
+                #subprocess.call(['mv','-f',pfile, xdir + '/input/' ])
+                foundit = True
+            except:
+                print('Failed again.')
 
+        if not os.path.isfile(pname):
+            print('You will need to download gpt_1wA.pickle MANUALLY from github and store in REFL_CODE/input')
+            sys.exit()
 
 # really should e zero to four, but whatever
         indx = np.zeros(4,dtype=int)
