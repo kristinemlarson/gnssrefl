@@ -10,6 +10,7 @@ import numpy as np
 import os
 import sys
 import warnings
+import time
 
 from datetime import date
 
@@ -30,6 +31,9 @@ def fbias_daily_avg(station):
     fname =  xdir + '/Files/' + station + '_dailyRH.txt'
     if os.path.exists(fname):
         tv = np.loadtxt(fname,comments='%')
+        if len(tv) == 0:
+            print('No results. Exiting.')
+            return
     else:
         print('no input', fname)
         return
@@ -37,6 +41,9 @@ def fbias_daily_avg(station):
     fname =  xdir + '/Files/' + station + '_allRH.txt'
     if os.path.exists(fname):
         tvall = np.loadtxt(fname,comments='%')
+        if len(tvall) == 0:
+            print('No results. Exiting.')
+            return
     else:
         print('no input', fname)
         return
@@ -44,8 +51,15 @@ def fbias_daily_avg(station):
 
 # start and end year
     minyear = int(min(tv[:,0])) ; maxyear = int(max(tv[:,0]))
+    print('begin/end year: ', minyear, maxyear)
 # list of hte frequencies used
+
     flist = np.unique(tvall[:,6])
+    print(flist)
+
+    if len(flist) == 0:
+        print('There are no results.')
+        return
 
     if len(flist) == 1:
         print('There is only one frequency in this file, so there is no point to computing a frequency bias.')
@@ -114,11 +128,12 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 # 2021 november 8, added amplitude, so now 8 columns
     tv = np.empty(shape=[0, 8])
     tvall = np.empty(shape=[0, 7])
-    ngps = []; nglo = [] ; ngal = []
+    ngps = []; nglo = [] ; ngal = []; nbei = []
     obstimes = []; medRH = []; meanRH = [] ; alltimes = []; meanAmp = []
     fig,ax=plt.subplots()
     year_list = np.arange(year1, year2+1, 1)
     NumFiles = 0
+    s1 = time.time()
     for yr in year_list:
         direc = xdir + '/' + str(yr) + '/results/' + station + '/' + extension + '/'
         if os.path.isdir(direc):
@@ -187,16 +202,22 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                     mm = int(60*(gutcTime[w] - hrr )); ss = 0
                                     filler = datetime.datetime(year=yr, month=d.month, day=d.day, hour = hrr, minute=mm, second = ss)
                                     alltimes.append(filler)
+                                # 
                                 ax.plot(alltimes,good,'b.')
 
-                                # this is for the daily average
-                                ijk = (gsat  < 100); 
-                                #print(f, len(gsat[ijk]))
-                                ngps = np.append(ngps, len(gsat[ijk]))
-                                ijk = (gsat > 100) * (gsat < 200); 
-                                nglo = np.append(nglo, len(gsat[ijk]))
-                                ijk = (gsat > 200) * (gsat < 300); 
-                                ngal = np.append(ngal, len(gsat[ijk]))
+                                # this are stats for the daily averages - is this slowing it down? - apparently not
+                                if True:
+                                    ijk = (gsat  < 100); 
+                                    ngps = np.append(ngps, len(gsat[ijk]))
+
+                                    ijk = (gsat  > 300);  # beidou
+                                    nbei = np.append(nbei, len(gsat[ijk]))
+   
+                                    ijk = (gsat > 100) * (gsat < 200);  # glonass
+                                    nglo = np.append(nglo, len(gsat[ijk]))
+
+                                    ijk = (gsat > 200) * (gsat < 300); # galileo
+                                    ngal = np.append(ngal, len(gsat[ijk]))
 
                                 obstimes.append(datetime.datetime(year=yr, month=d.month, day=d.day, hour=12, minute=0, second=0))
                                 medRH =np.append(medRH, medv)
@@ -220,6 +241,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                         okok = 1;
         else:
             abc = 0; # dummy line
+    s2 = time.time()
+    print('This step took ', round(s2-s1,2), ' seconds')
+
     fig.autofmt_xdate()
     plt.ylabel('meters',fontsize=fs)
     plt.title('All Reflector Heights for Station: ' + station.upper(),fontsize=fs)
@@ -230,6 +254,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 #   new plot
     print('A total of ', NumFiles, ' days were evaluated.')
     print( NotEnough, ' days did not meet the threshold set for a dependable daily average')
+    if (NumFiles < 1):
+        sys.exit()
+
     pltname = xdir + '/Files/' + station + '_AllRH.png'
     plt.savefig(pltname)
     print('All RH png file saved as: ', pltname)
@@ -246,17 +273,17 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     # plot the number of retrievals vs time
     txtdir =  xdir + '/Files'
-    daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal)
+    daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei)
 
     return tv, obstimes
 
-def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal):
+def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei):
     """
     make some plots of results - moved here to make it cleaner
     inputs: obstimes is datetime object
     mean RH are in meters, station name, txtdir (where the results go)
     and tv is the variable of daily results
-    kl 2022jun15, added stats for gps,galileo, and glonass specific
+    kl 2022jun15, added stats for gps,galileo, glonass,beidou specific
     """
 #   new plot
     fs = 12
@@ -297,6 +324,9 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
         plt.plot(obstimes, nglo,'r.',label='GLO',markersize=3)
     if (np.sum(ngal) > 0):
         plt.plot(obstimes, ngal,'.',label='GAL',color='orange',markersize=3)
+    if (np.sum(nbei) > 0):
+        plt.plot(obstimes, nbei,'.',label='BEI',color='green',markersize=3)
+
     plt.legend(loc="upper left")
     fig.autofmt_xdate()
     plt.title(station.upper() + ': Number of values used in the daily average',fontsize=fs)

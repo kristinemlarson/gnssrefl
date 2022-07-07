@@ -1,7 +1,7 @@
 # command line module that calls daily_avg.py
 # Kristine Larson May 2019
 import argparse
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as matplt
 import os
 
 # my code
@@ -38,7 +38,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt2screen: bool = True,
+def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True,
               extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False):
     """
         Parameters:
@@ -56,7 +56,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
             Use this parameter to set your own output filename.
             default is None.
 
-        plt2 : boolean, optional
+        plt : boolean, optional
             whether to print plots to screen or not.
             default is True.
 
@@ -96,6 +96,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
             Whether you want csv instead of a plain text file.
             default is False (plain text).
     """
+    plt2screen = plt # since variable was originally this name 
     # make surer environment variables are set
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']
@@ -117,7 +118,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
 
     # default is to show the plots
     if plt2screen:
-        plt.show()
+        matplt.show()
 
     # now write out the result file:
 

@@ -388,3 +388,13 @@ docker pull unavdocker/gnssrefl to install code.
 
 [Old quick link to Docker](https://hub.docker.com/r/unavdocker/gnssrefl)
 
+
+# highrate 
+
+https://cddis.nasa.gov/archive/gnss/data/highrate/2019/150/19d/00/
+
+# geodetic rate
+
+https://cddis.nasa.gov/archive/gnss/data/daily/2018/015/18d/
+
+https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html
