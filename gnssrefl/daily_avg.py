@@ -220,13 +220,21 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                     ngal = np.append(ngal, len(gsat[ijk]))
 
                                 obstimes.append(datetime.datetime(year=yr, month=d.month, day=d.day, hour=12, minute=0, second=0))
-                                medRH =np.append(medRH, medv)
+                                # ???
+                                medRH.append(medv)
+                                #medRH =np.append(medRH, medv)
             # store the meanRH after the outliers are removed using simple median filter
                                 meanRHtoday = np.mean(good)
+
                                 stdRHtoday = np.std(good)
-                                meanRH =np.append(meanRH, meanRHtoday)
+                                #meanRH =np.append(meanRH, meanRHtoday)
+                                #
+                                # july 7, 2022
+                                #
+                                meanRH.append(meanRHtoday)
                                 # added amplitude 2021 Nov 8 
-                                meanAmp = np.append(meanAmp, np.mean(goodAmp))
+                                #meanAmp = np.append(meanAmp, np.mean(goodAmp))
+                                meanAmp.append(np.mean(goodAmp))
             # add month and day just cause some people like that instead of doy
             # added standard deviation feb14, 2020
                                 # updated this to include mean amplitude 2021 november 8
@@ -241,7 +249,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                         okok = 1;
         else:
             abc = 0; # dummy line
+    #meanRH = np.asarray(meanRH)
     s2 = time.time()
+
     print('This step took ', round(s2-s1,2), ' seconds')
 
     fig.autofmt_xdate()
