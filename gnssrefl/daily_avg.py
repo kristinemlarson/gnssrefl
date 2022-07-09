@@ -206,7 +206,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                 ax.plot(alltimes,good,'b.')
 
                                 # this are stats for the daily averages - is this slowing it down? - apparently not
-                                if True:
+                                # turned off for now
+                                if False:
                                     ijk = (gsat  < 100); 
                                     ngps = np.append(ngps, len(gsat[ijk]))
 
