@@ -174,20 +174,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                             gutcTime = utcTime[cc]
                             
                             NG = len(good)
-                            if (NG > 0):
-                                # don't really need MM and DD, but ...
-                                if csvformat:
-                                    for ijk in range(0,NG):
-                                        biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]] 
-                                        tvall = np.append(tvall, [biggerline],axis=0)
-                                        allrh.write(" {0:4.0f},  {1:3.0f},{2:7.3f}, {3:2.0f}, {4:2.0f},{5:6.1f},{6:4.0f},{7:4.0f},{8:6.2f},{9:6.2f},{10:6.2f}\n".format(yr, 
-                                            doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk], gutcTime[ijk]))
-                                else:
-                                    for ijk in range(0,NG):
-                                        biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]] 
-                                        tvall = np.append(tvall, [biggerline],axis=0)
-                                        allrh.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:2.0f} {4:2.0f} {5:6.1f} {6:4.0f} {7:4.0f} {8:6.2f} {9:6.2f} {10:6.2f}\n".format(yr, 
-                                            doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk],gutcTime[ijk]))
+                            # tvall no longer being used as a variable but still sending it to the function.
+                            # unfortunately the info is not sorted - because of the way the directory listing works....
+                            tvall = write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gamp,gpeak2noise,gutcTime,tvall)
 
         # only save if there are some minimal number of values
                             if (len(good) >= ReqTracks):
@@ -207,7 +196,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
                                 # this are stats for the daily averages - is this slowing it down? - apparently not
                                 # turned off for now
-                                if False:
+                                if True:
                                     ijk = (gsat  < 100); 
                                     ngps = np.append(ngps, len(gsat[ijk]))
 
@@ -274,7 +263,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     #nr,nc = tv.shape
     # calculate frequency biases and print to the screen
-    fbias_daily_avg(station)
+    # turnning this off because tvall was slowing it down
+    #fbias_daily_avg(station)
     #print(nr,nc)
 
     # close the file with all the RH values 
@@ -382,3 +372,39 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     fout.close()
 
 
+def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gamp,gpeak2noise,gutcTime,tvall ):
+    """
+    writing out all the retrievals to a single file: file ID is allrh)
+    tvall had everything in it.  but it was slowing everything down, so i removed it
+    """
+    if (NG > 0):
+        # don't really need MM and DD, but ...
+        if csvformat:
+            for ijk in range(0,NG):
+                biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]]
+                #tvall = np.append(tvall, [biggerline],axis=0)
+                allrh.write(" {0:4.0f},  {1:3.0f},{2:7.3f}, {3:2.0f}, {4:2.0f},{5:6.1f},{6:4.0f},{7:4.0f},{8:6.2f},{9:6.2f},{10:6.2f}\n".format(yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk], gutcTime[ijk]))
+        else:
+            for ijk in range(0,NG):
+                biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]]
+                #print(biggerline)
+                #tvall = np.append(tvall, [biggerline],axis=0)
+                allrh.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:2.0f} {4:2.0f} {5:6.1f} {6:4.0f} {7:4.0f} {8:6.2f} {9:6.2f} {10:6.2f}\n".format(yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk],gutcTime[ijk]))
+
+
+    return tvall
+                            #if False:
+                            #if (NG > 0):
+                                # don't really need MM and DD, but ...
+                            #    if csvformat:
+                            #        for ijk in range(0,NG):
+                            #            biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]] 
+                            #            tvall = np.append(tvall, [biggerline],axis=0)
+                            #            allrh.write(" {0:4.0f},  {1:3.0f},{2:7.3f}, {3:2.0f}, {4:2.0f},{5:6.1f},{6:4.0f},{7:4.0f},{8:6.2f},{9:6.2f},{10:6.2f}\n".format(yr, 
+                            #                doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk], gutcTime[ijk]))
+                            #    else:
+                            #        for ijk in range(0,NG):
+                            #            biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]] 
+                            #            tvall = np.append(tvall, [biggerline],axis=0)
+                            #            allrh.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:2.0f} {4:2.0f} {5:6.1f} {6:4.0f} {7:4.0f} {8:6.2f} {9:6.2f} {10:6.2f}\n".format(yr, 
+                            #                doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk],gutcTime[ijk]))
