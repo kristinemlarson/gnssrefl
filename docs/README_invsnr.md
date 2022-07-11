@@ -102,15 +102,15 @@ Nor are changes from material properties addressed (water, snow, ice).
 
 - Just one day of GPS on L1: <code>invsnr at01 2021 301 L1 -constel G</code> 
 
-<img src="docs/at01-ex1.png" width=500>
+<img src="at01-ex1.png" width=500>
 
 - Two days with L1 and all constellations: <code>invsnr at01 2021 301 L1 -doy_end 302</code> 
 
-<img src="docs/at01-ex2.png" width=500>
+<img src="at01-ex2.png" width=500>
 
 - Two days with L1+L2+L5 and all constellations: <code>invsnr at01 2021 301 L1+L2+L5 -doy_end 302</code> 
 
-<img src="docs/at01-ex3.png" width=500>
+<img src="at01-ex3.png" width=500>
 
 *Example for station TNPP*
 
@@ -124,7 +124,7 @@ Nor are changes from material properties addressed (water, snow, ice).
 
 <code>invsnr tnpp 2021 315 L1+L2+L5 -doy_end 316 -tempres 2</code>
 
-<img src="docs/tnpp-ex2.png" width=500>
+<img src="tnpp-ex2.png" width=500>
 
 *Example for station SC02*
 
@@ -136,7 +136,7 @@ Nor are changes from material properties addressed (water, snow, ice).
 
 - Multi-day, multi constellation, L1+L2 <code>invsnr sc02 2021 30 L1+L2 -doy_end 33 </code>
 
-<img src="docs/sc02-ex1.png" width=500>
+<img src="sc02-ex1.png" width=500>
 
 ### Future Changes
 
