@@ -278,7 +278,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
-        two_stacked_plots(otimes,tv,station,txtdir)
+        two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2)
         stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma)
         plt.show()
 
@@ -769,7 +769,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
 
 
 
-def two_stacked_plots(otimes,tv,station,txtdir):
+def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     """
     otimes - datetime
     tv = gnssrefl results variable
@@ -821,10 +821,20 @@ def two_stacked_plots(otimes,tv,station,txtdir):
     ax3.set_ylabel('meters',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
     ax3.set_title('Amplitude',fontsize=fs)
+
     ax3.invert_yaxis()
     ax3.grid(True)
     fig.autofmt_xdate()
     colorbar.set_label('v/v', fontsize=fs)
+    if d1 == 1 and d2 == 366:
+        # these are the defaults
+        donothing = True
+    else:
+        yyy,mm,dd = g.ydoy2ymd(year, d1)
+        th1 = datetime.datetime(year=year, month=mm, day=dd)
+        yyy,mm,dd = g.ydoy2ymd(year, d2)
+        th2 = datetime.datetime(year=year, month=mm, day=dd)
+        ax3.set_xlim((th1, th2))
 
     plotname = txtdir + '/' + station + '_combined.png'
     plt.savefig(plotname,dpi=300)

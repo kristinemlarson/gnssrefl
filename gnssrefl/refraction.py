@@ -421,8 +421,8 @@ def look_for_pickle_file():
         print('1st attempt: found in ', fullpname)
         foundit = True
     if not foundit:
-        print('2nd attempt: subdirectory of current working directory:', pname)
         pname =  'gnssrefl/gpt_1wA.pickle'
+        print('2nd attempt: subdirectory of current working directory:', pname)
         if os.path.isfile(pname):
             subprocess.call(['cp','-f',pname, fullpname  ])
             foundit = True
