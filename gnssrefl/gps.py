@@ -5290,7 +5290,7 @@ def bfg_data(fstation, year, doy, samplerate=30):
                     print('downloading', f, ' and ', rinex_rate)
                     ftp.retrbinary('RETR '+f, open(f,'wb').write)
     except:
-        print('Exiting - most likely because that directory most likely')
+        print('Exiting - most likely because that directory -and thus the data - does not exist.')
 
 
     return
