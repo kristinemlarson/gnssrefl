@@ -329,6 +329,8 @@ def universal_rinex2(station, year, doy, archive):
     else:
          print('I do not recognize your archive')
 
+    if not os.path.exists(file_name):
+        print('Did not find the Rinex file')
     return file_name,foundit
 
 def make_rinex2_ofiles(file_name):
