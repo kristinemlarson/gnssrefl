@@ -5243,11 +5243,12 @@ def bfg_password():
 
     return user_id, passport
 
-def bfg_data(station, year, month, day, samplerate=30):
+def bfg_data(fstation, year, doy, samplerate=30):
     """
     author: kristine larson
     2022 july 12
     Picks up RINEX3  file from BFG
+    changed to y, doy
     inputs: 
 
     4 char station name and year, month, day, samplerate (integers)
@@ -5261,13 +5262,8 @@ def bfg_data(station, year, month, day, samplerate=30):
     station can be upper or lowercase
 
     """
-    fstation = station
-    if day == 0:
-        doy=month
-        d = doy2ymd(year,doy);
-        month = d.month; 
-        day = d.day
-    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    cdoy = '{:03d}'.format(doy)
+    cyyyy = str(year)
 
     #### these are for RINEX 3 data
     country_code = 'DEU'#'NLD'#country code for rinex 3 file name

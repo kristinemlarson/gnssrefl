@@ -134,8 +134,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
                 nz (GNS, New Zealand)
                 ga (Geoscience Australia)
                 bev (Austria Federal Office of Metrology and Surveying)
-                jp
-                jeff
+                bfg (German Agency for water research, only Rinex 3, requires password)
+                jp (GSI, requires password)
+                jeff (Professor Freymueller)
                 special
                 all
 
@@ -280,7 +281,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     else:
         doy2 = doy_end
 
-    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'all']
+    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','all']
     archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all']
 
