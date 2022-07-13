@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument("-fortran", default=None, metavar='False', type=str,
                         help="True means use Fortran RINEX translators ")
     parser.add_argument("-archive", default=None, metavar='all',
-                        help="specify one archive: unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan,jp", type=str)
+                        help="specify one archive: unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan,jp,bfg,jeff,special", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
@@ -124,7 +124,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
             Select which archive to get the files from.
             Default is None. None means that the code will search and find an archive with the data for you.
             value options:
-                unavco
+                unavco (University Navstar Consortium)
                 sonel (global sea level observing system)
                 sopac (Scripps Orbit and Permanent Array Center)
                 cddis (NASA's Archive of Space Geodesy Data)
@@ -136,8 +136,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
                 bev (Austria Federal Office of Metrology and Surveying)
                 bfg (German Agency for water research, only Rinex 3, requires password)
                 jp (GSI, requires password)
-                jeff (Professor Freymueller)
-                special
+                jeff (My good friend Professor Freymueller!)
+                special (set aside files at UNAVCO)
                 all
 
         doy_end : int, optional
