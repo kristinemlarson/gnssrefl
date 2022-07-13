@@ -13,6 +13,8 @@ import subprocess
 import sys
 import sqlite3
 import time
+from ftplib import FTP #import FTP commands from python's built-in ftp library
+
 
 import scipy.signal as spectral
 from scipy.interpolate import interp1d
@@ -5197,6 +5199,9 @@ def rinex_nrcan_highrate(station, year, month, day):
 
 def translate_dates(year,month,day):
     """
+    input integer year month and day
+    output???
+    i do not think this is used
     """
     if (day == 0):
         doy=month
@@ -5206,4 +5211,104 @@ def translate_dates(year,month,day):
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day); 
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day); 
+
+    return doy, cdoy, cyyyy, cyy
+
+
+def bfg_password():
+    """
+    author: kristine larson
+    2022 july 12
+    Picks up BFG userid and password that is stored in a pickle file
+    or asks you to input the values and stores them for you
+
+    returns: userid and password
+    """
+
+    fdir = os.environ['REFL_CODE']
+    if not os.path.isdir(fdir):
+        print('You need to define the REFL_CODE environment variable')
+        return
+
+    # make sure the directory exists to store passwords
+    if not os.path.isdir(fdir + '/Files'):
+        subprocess.call(['mkdir',fdir + '/Files'])
+    if not os.path.isdir(fdir + '/Files/passwords'):
+        subprocess.call(['mkdir',fdir + '/Files/passwords'])
+
+    userinfo_file = fdir + '/Files/passwords/' + 'bfg.pickle'
+    print('user information file', userinfo_file)
+
+    print('Will try to pick up BFG account information')
+    if os.path.exists(userinfo_file):
+        with open(userinfo_file, 'rb') as client_info:
+            login_info = pickle.load(client_info)
+            user_id = login_info[0]
+            passport = login_info[1]
+    else:
+        user_id = getpass.getpass(prompt='Userid: ', stream=None)
+        passport= getpass.getpass(prompt='Password: ', stream=None)
+        # save to a file
+        with open(userinfo_file, 'wb') as client_info:
+            pickle.dump((user_id,passport) , client_info)
+        print('user id and password saved to', userinfo_file)
+
+    return user_id, passport
+
+def bfg_data(station, year, month, day, samplerate=30):
+    """
+    author: kristine larson
+    2022 july 12
+    Picks up RINEX3  file from BFG
+    inputs: 
+
+    4 char station name and year, month, day, samplerate (integers)
+
+    or 
+
+    4 char station and year, doy, 0, samplerate (integers)
+
+    default of 30 sec is assumed for sample rate.  but you can ask for something else
+
+    station can be upper or lowercase
+
+    """
+    fstation = station
+    if day == 0:
+        doy=month
+        d = doy2ymd(year,doy);
+        month = d.month; 
+        day = d.day
+    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+
+    #### these are for RINEX 3 data
+    country_code = 'DEU'#'NLD'#country code for rinex 3 file name
+    rinex_rate = '{:02d}'.format(samplerate)  + 'S'
+    data_server='ftp.bafg.de'
+    rinex_dirc='/obs/' #directory on the ftp server
+
+    user_id, passport = bfg_password()
+
+    ftp=FTP(data_server) #log in to server
+    ftp.login(user=user_id, passwd = passport)
+    ftp.cwd(rinex_dirc) #change to the directory
+
+    command=cyyyy + '/'+ cdoy +'/' #issue command to go to the folder
+    print('Looking at ', year, command, fstation,rinex_rate)
+    print(data_server+rinex_dirc + command)
+    try:
+        ftp.cwd(command) #change to that directory
+        files=ftp.nlst() #list files in the directory
+        for f in files:
+            station = f[0:4]
+            if (station == fstation.upper()) and ('crx' in f):
+                if (rinex_rate in f):
+                    print('downloading', f, ' and ', rinex_rate)
+                    ftp.retrbinary('RETR '+f, open(f,'wb').write)
+    except:
+        print('Exiting - most likely because that directory most likely')
+
+
+    return
+
 

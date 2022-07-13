@@ -15,11 +15,16 @@ import gnssrefl.cddis_highrate as ch
 
 def gogetit(dir1, filename, ext):
     """
-    to download RINEX 2 files
-    given the main directory address, filename, and then ext (Z, gz etc)
-    try to get the file and chck to see if it was successful
-    this is used by the rinex2 code
-    returns boolean foundit and filename
+    the purpose of this function is to to download RINEX 2 files
+    inputs:
+
+    dir1 = the main directory address 
+    filename = name of the GNSS files
+    ext = kind of ending to the filename, (Z, gz etc)
+    This code will try to get the file and chck to see if it was successful
+
+    this code is used by the rinex2 code
+    returns boolean foundit and the filename
     """
     foundit = False
     f= filename + ext
@@ -41,6 +46,8 @@ def gogetit(dir1, filename, ext):
 def swapRS(stream):
     """
     profound function that swaps R to S and vice versa
+    this is to faciliate checking whether an archive has your file in the R
+    file or the S file
     """
     if stream == 'R':
         newstream = 'S'
@@ -50,22 +57,31 @@ def swapRS(stream):
 
 def just_bkg(cyyyy, cdoy, file_name):
     """
+    looks for bkg files - 
     """
     dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cyyyy + '/' + cdoy + '/'
     dir2 = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
-    print('trying: ',dir1+file_name)
+    print('>>> Trying first : ',dir1+file_name)
+    fexist = False
     try:
         wget.download(dir1+file_name,file_name)
+        fexist = True
     except:
-        print('>>> now trying: ',dir2+file_name)
-        wget.download(dir2+file_name,file_name)
+        print('did not find the file')
+    if (not fexist):
+        print('>>> Now trying: ',dir2+file_name)
+        try:
+            wget.download(dir2+file_name,file_name)
+            fexist = True
+        except:
+            print('did not find it there either')
 
     return
 
 
 def universal(station9ch, year, doy, archive,srate,stream):
     """
-    seamless archive for rinex 3 files ... 
+    main code for seamless archive for rinex 3 files ... 
     """
     # define the file name
     print('Searching the ', archive, ' archive with rate/filetype', srate, stream)
@@ -118,11 +134,24 @@ def universal(station9ch, year, doy, archive,srate,stream):
     if os.path.exists(file_name):
         print('File exists: ', file_name, ' at ', archive)
         foundit = True
+    else:
+        print('File was not found: ', file_name, ' at ', archive)
 
     return file_name,foundit
 
 def filename_plus(station9ch,year,doy,srate,stream):
     """
+    function to create RINEX 3 filenames.
+    inputs:
+    station9ch - 9 character station name
+    year - integer
+    doy - day of year, integer
+    srate - receiver sample rate, integer
+    stream = character - either R or S. The latter means the file was streamed.
+
+    output: compliant filename with crx.gz on the end as this is how the files 
+    are stored at GNSS archives
+
     """
     cyyyy = str(year)
     cdoy = '{:03d}'.format(doy)
@@ -159,6 +188,13 @@ def ga_stuff(station, year, doy):
 
 def universal_all(station9ch, year, doy, srate,stream):
     """
+    function to check multiple archives for RINEX 3 data
+    inputs:
+    9 character station name
+    year - integer
+    doy - doy of year, integer
+    srate - receiver sample rate, integer
+    stream -  R or S
     """
     foundit = False
 
@@ -177,9 +213,14 @@ def universal_all(station9ch, year, doy, srate,stream):
 
 def rinex2names(station,year,doy):
     """
-    given station year and doy returns
-    rinex2 names hatanaka and obs names
-    and strings for year and doy
+    inputs: 
+    station year and doy
+
+    outputs:
+    hatanaka rinex2 names  (ends in d)
+    normal rinex2 observation name (ends in o)
+    it also returns the year (4 characters) and the 
+    doy as a string (3 characters)
     """
     cyyyy = str(year)
     cdoy = '{:03d}'.format(doy)
@@ -192,7 +233,7 @@ def rinex2names(station,year,doy):
 def universal_rinex2(station, year, doy, archive):
     """
     seamless archive for rinex 2 files ...
-    inputs are 4 char station, yar, doy and archiv nam 
+    inputs are 4 char station, yar, doy and archive name
     """
     # define the file name
 
@@ -209,7 +250,7 @@ def universal_rinex2(station, year, doy, archive):
     cyy = cyyyy[2:4]
 
     if (archive == 'jp'):
-        # did not want to rewrite the code
+        # i did not want to rewrite the code
         gsi_data(station, year, doy)
         file_name = oname
         if os.path.exists(file_name):
