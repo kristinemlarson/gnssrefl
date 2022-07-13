@@ -3,13 +3,16 @@
 Please note: this use case was originally written in late 2020. The dataset has been updated since that time.
 Sometimes Galileo is tracked; sometimes it is not tracked.  There has also been an equipment
 change - so you should make sure that you do not interpret small vertical biases at that time.
-Please contact UNAVCO for more information about the site.
+Please contact UNAVCO(dmencin@unavco.org) for more information about the site.
 
-University of Nevada Reno continues to do a great job of providing geodetic coordinates for this site.
-Please note that there is an error in antenna height for the first few weeks of the site. This is because
+[University of Nevada Reno](http://geodesy.unr.edu/NGLStationPages/stations/SMM3.sta) continues to do a great job 
+of providing geodetic coordinates for this site.
+Please note that there is an error in antenna height (16 meters) for the first few weeks of the site. This is because
 the offset was set wrong in the Rinex file.  Simply discard those data or put the antenna height back in the
 results. Ignore all attempts by Nevada Reno to fit a model to these data. That model is meant for tectonic
 sites; and it cannot properly deal with a 16 meter antenna height error. The results themselves are good.
+Please also keep in mind that this site is working 24/7, and does not necessarily go back and pick up data
+that are only telemetered 6 months after the fact, as they might be at an ice sheet site.
 
 Before attempting to update/analyze these data, I encourage you to read the refereed paper on the larger
 Greenland dataset.  It will save you time down the line.
