@@ -140,5 +140,10 @@ Notice that the [daily average RH file](smm3_RH.txt) shows well over 150 measure
 used in the average. So you could rerun the code to use a bigger value than 50. Here the observations are so
 robust it won't make a difference.
 
-How should you interpret these results?  Please read [this paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
-smm3 was one of the sites highlighted in this paper.
+How should you interpret these results?  
+Please read [this paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
+smm3 was one of the sites highlighted in this paper. If you decided to update/analyze the series,
+and use our code, please cite the DOI given at the top of the [README](https://github.com/kristinemlarson/gnssrefl) 
+and the NASA grant that was used to support it.
+
+
