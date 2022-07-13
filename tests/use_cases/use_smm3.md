@@ -1,5 +1,26 @@
 ### Summit Camp, Greenland
 
+Please note: this use case was originally written in late 2020. The dataset has been updated since that time.
+Sometimes Galileo is tracked; sometimes it is not tracked.  There has also been an equipment
+change - so you should make sure that you do not interpret small vertical biases at that time.
+Please contact UNAVCO for more information about the site.
+
+University of Nevada Reno continues to do a great job of providing geodetic coordinates for this site.
+Please note that there is an error in antenna height for the first few weeks of the site. This is because
+the offset was set wrong in the Rinex file.  Simply discard those data or put the antenna height back in the
+results. Ignore all attempts by Nevada Reno to fit a model to these data. That model is meant for tectonic
+sites; and it cannot properly deal with a 16 meter antenna height error. The results themselves are good.
+
+Before attempting to update/analyze these data, I encourage you to read the refereed paper on the larger
+Greenland dataset.  It will save you time down the line.
+
+[Brief Communication: Update on the GPS reflection technique for measuring snow accumulation in Greenland](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf)
+
+Sincerely,
+
+Kristine M. Larson
+
+
 <p align=center>
 <img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
 </p>
