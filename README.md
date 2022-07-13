@@ -389,21 +389,23 @@ docker pull unavdocker/gnssrefl to install code.
 [Old quick link to Docker](https://hub.docker.com/r/unavdocker/gnssrefl)
 
 
-# highrate 
+highrate  data
 
 https://cddis.nasa.gov/archive/gnss/data/highrate/2019/150/19d/00/
 
-# geodetic rate
+geodetic data
 
 https://cddis.nasa.gov/archive/gnss/data/daily/2018/015/18d/
 
 https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html
 
-# how to get a listing of orbits on a given GPS week (but not multi-GNSS)...
+how to get a listing of orbits on a given GPS week (but not multi-GNSS)...
 
 https://cddis.nasa.gov/archive/gnss/products/2037/
 
-# multi-GNSS
+multi-GNSS
 
 https://cddis.nasa.gov/archive/gps/products/mgex/2037/
+
+
 

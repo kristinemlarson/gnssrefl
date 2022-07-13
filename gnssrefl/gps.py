@@ -803,6 +803,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     20jul10 allow Wuhan, but only one of them.
     21jan08 obnoxious problem at CDDIS
     21jan09 CDDIS, again
+    22jul12 good lord - issues with the try command
     """
     foundit = False
     # this returns sp3 orbit product name
@@ -815,7 +816,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     igps_week_at_cddis = 1 + int(gps_week)
     #print('GPS week', gps_week,igps_week)
     file1 = name + '.Z'
-    print('first kind of filename', file1)
+    #print('first kind of filename', file1)
 
     # get the sp3 filename for the new format
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
@@ -838,18 +839,18 @@ def getsp3file_mgex(year,month,day,pCtr):
     # this is name without the gzip
     name2 = file2[:-3] 
 
-    print('second kind of filename', file2)
+    #print('second kind of filename', file2)
      
     # this is the default setting - no file exists
     mgex = 0
     n1 = os.path.isfile(fdir + '/' + name)
     n1c = os.path.isfile(fdir + '/' + name + '.xz')
     if (n1 == True):
-        #print('first kind of MGEX sp3file already exists online')
+        print('first kind of MGEX sp3file already exists online')
         mgex = 1
         foundit = True
     elif (n1c  == True): 
-        #print('xz first kind of MGEX sp3file already exists online-unxz it')
+        print('xz first kind of MGEX sp3file already exists online-unxz it')
         fx =  fdir + '/' + name + '.xz'
         subprocess.call(['unxz', fx])
         mgex = 1
@@ -858,10 +859,10 @@ def getsp3file_mgex(year,month,day,pCtr):
     n2 = os.path.isfile(fdir + '/' + name2)
     n2c = os.path.isfile(fdir + '/' + name2 + '.xz')
     if (n2 == True):
-        #print('second kind of MGEX sp3file already exists online')
+        print('MGEX sp3file already exists online')
         mgex = 2 ; foundit = True
     elif (n2c == True):
-        #print('xz second kind of MGEX sp3file already exists online')
+        print('MGEX sp3file already exists online')
         mgex = 2 ; foundit = True
         fx =  fdir + '/' + name2 + '.xz'
         subprocess.call(['unxz', fx])
@@ -875,48 +876,34 @@ def getsp3file_mgex(year,month,day,pCtr):
         # this is to deal with the bug at CDDIS
         if (igps_week > 2137):
             name = file2[:-3]
-            # get JAXA orbits from IGN
-            # this is pretty slow, so turning it off
-            #if pCtr == 'jax':
-                #dirlocation_IGN = 'ftp://igs.ensg.ign.fr/pub/igs/products/mgex/' + str(gps_week) + '/'
-                #foundit = ign_orbits(file2, dirlocation_IGN,year)
-            if True:
-            #else:
-                name = file2[:-3]
-                secure_file = file2
-                print('check the correct week everyone uses')
-                secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
-                #print(secure_dir, secure_file)
+            secure_file = file2
+            print('check the correct week like normal people use')
+            secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
+            foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
+            if not foundit:
+                print('use the wrong GPS week at CDDIS')
+                secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
                 foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
-                if not foundit:
-                    print('use the wrong week at CDDIS')
-                    secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
-                    foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
         else:
             secure_dir = '/gps/products/mgex/' + str(gps_week) + '/'
             secure_file = file1
             name = file1[:-2]
-            if (igps_week < 2050):
-                #print('old name')
-                try:
-                    cddis_download(secure_file, secure_dir)
-                    if os.path.isfile(file1):
-                        subprocess.call(['uncompress', file1])
-                        store_orbitfile(name,year,'sp3') ; foundit = True
-                except:
-                    okok = 1
-            else:
-                #print('new name')
+            print('Try the old sp3 filename',file1)
+            cddis_download(secure_file, secure_dir)
+            if os.path.isfile(file1):
+                subprocess.call(['uncompress', file1])
+                store_orbitfile(name,year,'sp3') ; foundit = True
+                foundit = True
+            if not foundit:
+                print('Try the new sp3file name', file2)
                 name = file2[:-3]
                 secure_file = file2
-                try:
-                    cddis_download(secure_file, secure_dir)
-                    if os.path.isfile(secure_file):
-                        subprocess.call(['gunzip', file2])
-                        store_orbitfile(name,year,'sp3') ; foundit = True
-                except:
-                    okok = 1
-    #print(name,fdir,foundit)
+                cddis_download(secure_file, secure_dir)
+                if os.path.isfile(secure_file):
+                    subprocess.call(['gunzip', file2])
+                    store_orbitfile(name,year,'sp3') ; foundit = True
+
+    print(name,fdir,foundit)
     return name, fdir, foundit
 
 def orbfile_cddis(name, year, secure_file, secure_dir, file2):
@@ -5313,3 +5300,8 @@ def bfg_data(station, year, month, day, samplerate=30):
     return
 
 
+            # get JAXA orbits from IGN
+            # this is pretty slow, so turning it off
+            #if pCtr == 'jax':
+                #dirlocation_IGN = 'ftp://igs.ensg.ign.fr/pub/igs/products/mgex/' + str(gps_week) + '/'
+                #foundit = ign_orbits(file2, dirlocation_IGN,year)
