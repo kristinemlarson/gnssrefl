@@ -398,3 +398,12 @@ https://cddis.nasa.gov/archive/gnss/data/highrate/2019/150/19d/00/
 https://cddis.nasa.gov/archive/gnss/data/daily/2018/015/18d/
 
 https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html
+
+# how to get a listing of orbits on a given GPS week (but not multi-GNSS)...
+
+https://cddis.nasa.gov/archive/gnss/products/2037/
+
+# multi-GNSS
+
+https://cddis.nasa.gov/archive/gps/products/mgex/2037/
+

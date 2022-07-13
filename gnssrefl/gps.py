@@ -807,7 +807,6 @@ def getsp3file_mgex(year,month,day,pCtr):
     foundit = False
     # this returns sp3 orbit product name
     if day == 0:
-        print('assume you were given doy in the month input')
         doy = month
         year,month,day= ydoy2ymd(year,doy)
     name, fdir = sp3_name(year,month,day,pCtr) 
@@ -816,6 +815,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     igps_week_at_cddis = 1 + int(gps_week)
     #print('GPS week', gps_week,igps_week)
     file1 = name + '.Z'
+    print('first kind of filename', file1)
 
     # get the sp3 filename for the new format
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
@@ -838,6 +838,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     # this is name without the gzip
     name2 = file2[:-3] 
 
+    print('second kind of filename', file2)
      
     # this is the default setting - no file exists
     mgex = 0
