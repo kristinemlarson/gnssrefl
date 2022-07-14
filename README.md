@@ -416,8 +416,18 @@ File structure for station abcd in the year YYYY (last two characters YY), doy D
 
 REFL_CODE/input/abcd.json - instructions for Lomb Scargle analysis
 
-REFL_CODE/YYYY/snr/abcd/abcd1240.YY.snr66  SNR files for day of year 124
+REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files 
 
-REFL_CODE/YYYY/results/abcd/010.txt  Lomb Scargle analysis for day of year 10
+REFL_CODE/YYYY/results/abcd/DDD.txt  Lomb Scargle analysis 
+
+REFL_CODE/Files/ - various output files and plots will be placed here
+
+Rinex files are not stored by this code.   In fact, the opposite. If they are being translated, 
+they are deleted. Do not keep your only copy of Rinex files in your default directory.
+
+ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file 
+
+ORBITS/YYYY/sp3/...  sp3 files of orbits. Generally we use multi-GNSS sp3 files, that are defined as:
+
 
 </PRE>
