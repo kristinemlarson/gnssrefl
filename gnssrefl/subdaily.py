@@ -278,6 +278,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
+        print(d1,d2)
         two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2)
         stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma)
         plt.show()
@@ -778,6 +779,17 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
 
     author: kristine larson
     """
+    if d1 == 1 and d2 == 366:
+        # these are the defaults
+        setlimits = False
+    else:
+        setlimits = True
+        yyy,mm,dd = g.ydoy2ymd(year, d1)
+        th1 = datetime.datetime(year=year, month=mm, day=dd)
+        yyy,mm,dd = g.ydoy2ymd(year, d2)
+        th2 = datetime.datetime(year=year, month=mm, day=dd)
+    # this is not working, so just setting it to false, cause who cares!
+    setlimits = False
     fs = 10
     fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
     i = (tv[:,10] < 100)
@@ -791,8 +803,10 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     plt.yticks(fontsize=fs)
     ax1.invert_yaxis()
     ax1.grid(True)
-    fig.autofmt_xdate()
     fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
+    if setlimits:
+        ax1.set_xlim((th1, th2))
+    fig.autofmt_xdate()
 
 
 
@@ -810,6 +824,8 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
     ax2.invert_yaxis()
     ax2.grid(True)
+    if setlimits:
+        ax2.set_xlim((th1, th2))
     fig.autofmt_xdate()
 
 # put some amplitude information on it
@@ -819,22 +835,14 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     scatter = ax3.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax3)
     ax3.set_ylabel('meters',fontsize=fs)
+    colorbar.set_label('v/v', fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
     ax3.set_title('Amplitude',fontsize=fs)
-
     ax3.invert_yaxis()
     ax3.grid(True)
-    fig.autofmt_xdate()
-    colorbar.set_label('v/v', fontsize=fs)
-    if d1 == 1 and d2 == 366:
-        # these are the defaults
-        donothing = True
-    else:
-        yyy,mm,dd = g.ydoy2ymd(year, d1)
-        th1 = datetime.datetime(year=year, month=mm, day=dd)
-        yyy,mm,dd = g.ydoy2ymd(year, d2)
-        th2 = datetime.datetime(year=year, month=mm, day=dd)
+    if setlimits:
         ax3.set_xlim((th1, th2))
+    fig.autofmt_xdate()
 
     plotname = txtdir + '/' + station + '_combined.png'
     plt.savefig(plotname,dpi=300)

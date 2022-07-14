@@ -124,7 +124,6 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     if not os.path.exists(txtdir):
         subprocess.call(['mkdir', txtdir])
 
-    print(h1,h2, 'new optional inputs')
 #   these are optional output options
     #create the subdaily file
     writecsv = False
