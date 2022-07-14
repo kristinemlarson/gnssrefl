@@ -411,4 +411,13 @@ multi-GNSS
 https://cddis.nasa.gov/archive/gps/products/mgex/2037/
 
 
+<PRE>
+File structure for station abcd in the year YYYY (last two characters YY), doy DDD:
 
+REFL_CODE/input/abcd.json - instructions for Lomb Scargle analysis
+
+REFL_CODE/YYYY/snr/abcd/abcd1240.YY.snr66  SNR files for day of year 124
+
+REFL_CODE/YYYY/results/abcd/010.txt  Lomb Scargle analysis for day of year 10
+
+</PRE>

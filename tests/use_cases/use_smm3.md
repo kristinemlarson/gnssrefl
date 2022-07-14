@@ -1,9 +1,9 @@
 ### Summit Camp, Greenland
 
 Please note: this use case was originally written in late 2020. The dataset has been updated since that time.
-Sometimes Galileo is tracked; sometimes it is not tracked.  There has also been an equipment
+Sometimes Galileo is tracked; sometimes it is not tracked. There has also been an equipment
 change - so you should make sure that you do not interpret small vertical biases at that time.
-Please contact UNAVCO(dmencin@unavco.org) for more information about the site.
+Please contact [UNAVCO](https://unavco.org) if you need more information about the site.
 
 [University of Nevada Reno](http://geodesy.unr.edu/NGLStationPages/stations/SMM3.sta) continues to do a great job 
 of providing geodetic coordinates for this site.
@@ -11,7 +11,7 @@ Please note that there is an error in antenna height (16 meters) for the first f
 the offset was set wrong in the Rinex file.  Simply discard those data or put the antenna height back in the
 results. Ignore all attempts by Nevada Reno to fit a model to these data. That model is meant for tectonic
 sites; and it cannot properly deal with a 16 meter antenna height error. The results themselves are good.
-Please also keep in mind that the Nevada Reno group is working 24/7, and does not necessarily go back and pick up data
+Please also keep in mind that the Nevada Reno analysis group is working 24/7, and does not necessarily go back and pick up data
 that are only telemetered 6 months after the fact, as they might be at an ice sheet site.
 
 Before attempting to update/analyze these data, I encourage you to read the refereed paper on the larger
@@ -24,6 +24,8 @@ Sincerely,
 Kristine M. Larson
 
 July 13, 2022
+
+<HR>
 
 
 <p align=center>
@@ -55,7 +57,7 @@ mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) 
 well as Glonass. You can see from the photo at the top that it is NOT the typical 2-meter monument.
 
 Position time series for smm3 can easily be retrieved from [Nevada Reno](http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3).
-Note that there is an antenna height blunder in the very early data for the site. It is straight forward to find and remove.
+Note that there is an antenna height blunder in the very early data for the site. It is straightforward to find and remove.
 
 You can use my webapp to get a sense of what the results for this site looks like. Please note that the app 
 will be analyzing data in real-time, so please wait for the answers to "pop" up in the 
