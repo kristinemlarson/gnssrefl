@@ -11,7 +11,7 @@ Please note that there is an error in antenna height (16 meters) for the first f
 the offset was set wrong in the Rinex file.  Simply discard those data or put the antenna height back in the
 results. Ignore all attempts by Nevada Reno to fit a model to these data. That model is meant for tectonic
 sites; and it cannot properly deal with a 16 meter antenna height error. The results themselves are good.
-Please also keep in mind that this site is working 24/7, and does not necessarily go back and pick up data
+Please also keep in mind that the Nevada Reno group is working 24/7, and does not necessarily go back and pick up data
 that are only telemetered 6 months after the fact, as they might be at an ice sheet site.
 
 Before attempting to update/analyze these data, I encourage you to read the refereed paper on the larger
@@ -142,8 +142,10 @@ robust it won't make a difference.
 
 How should you interpret these results?  
 Please read [this paper](https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf). 
-smm3 was one of the sites highlighted in this paper. If you decided to update/analyze the series,
-and use our code, please cite the DOI given at the top of the [README](https://github.com/kristinemlarson/gnssrefl) 
-and the NASA grant that was used to support it.
+smm3 was one of the sites highlighted in this paper. 
+
+If you decided to update/analyze this dataset and use our code, please cite the DOI given 
+at the top of the [README](https://github.com/kristinemlarson/gnssrefl) 
+and the NASA grant (80NSSC20K1731) that was used to support it. Thanks!
 
 

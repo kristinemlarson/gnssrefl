@@ -5225,9 +5225,9 @@ def bfg_password():
         subprocess.call(['mkdir',fdir + '/Files/passwords'])
 
     userinfo_file = fdir + '/Files/passwords/' + 'bfg.pickle'
-    print('user information file', userinfo_file)
+    #print('user information file', userinfo_file)
 
-    print('Will try to pick up BFG account information')
+    print('Will try to pick up BFG account information',userinfo_file)
     if os.path.exists(userinfo_file):
         with open(userinfo_file, 'rb') as client_info:
             login_info = pickle.load(client_info)
@@ -5239,7 +5239,7 @@ def bfg_password():
         # save to a file
         with open(userinfo_file, 'wb') as client_info:
             pickle.dump((user_id,passport) , client_info)
-        print('user id and password saved to', userinfo_file)
+        print('User id and password saved to', userinfo_file)
 
     return user_id, passport
 
@@ -5248,27 +5248,22 @@ def bfg_data(fstation, year, doy, samplerate=30):
     author: kristine larson
     2022 july 12
     Picks up RINEX3  file from BFG
-    changed to y, doy
     inputs: 
 
-    4 char station name and year, month, day, samplerate (integers)
-
-    or 
-
-    4 char station and year, doy, 0, samplerate (integers)
+    4 char station name and year, doy, samplerate (integers)
 
     default of 30 sec is assumed for sample rate.  but you can ask for something else
 
-    station can be upper or lowercase
+    station can be upper or lowercase, i think
 
     """
     cdoy = '{:03d}'.format(doy)
     cyyyy = str(year)
 
-    #### these are for RINEX 3 data
+    #### these are for RINEX 3 data from the BFG network
     country_code = 'DEU'#'NLD'#country code for rinex 3 file name
     rinex_rate = '{:02d}'.format(samplerate)  + 'S'
-    data_server='ftp.bafg.de'
+    data_server='ftp.bafg.de' # ftp server
     rinex_dirc='/obs/' #directory on the ftp server
 
     user_id, passport = bfg_password()
@@ -5279,7 +5274,7 @@ def bfg_data(fstation, year, doy, samplerate=30):
 
     command=cyyyy + '/'+ cdoy +'/' #issue command to go to the folder
     print('Looking at ', year, command, fstation,rinex_rate)
-    print(data_server+rinex_dirc + command)
+    #print(data_server+rinex_dirc + command)
     try:
         ftp.cwd(command) #change to that directory
         files=ftp.nlst() #list files in the directory

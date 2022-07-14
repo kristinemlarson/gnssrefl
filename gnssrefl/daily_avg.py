@@ -318,7 +318,7 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
 
     # added constellation specific info
     fig,ax=plt.subplots()
-    plt.plot(obstimes, tv[:,3],'ko',label='Total',markersize=4)
+    plt.plot(obstimes, tv[:,3],'k.',label='Total',markersize=4)
     if (np.sum(ngps) > 0):
         plt.plot(obstimes, ngps,'b.',label='GPS',markersize=3)
     if (np.sum(nglo) > 0):
