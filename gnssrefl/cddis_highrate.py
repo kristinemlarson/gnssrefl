@@ -44,6 +44,7 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
     print('WARNING: Get yourself a cup of coffeee. Downloading 96 files takes a long time.')
     fileF = 0
     streamID  = '_' + stream + '_'
+    s1 = time.time()
     for h in range(0,24):
         # subdirectory
         ch = '{:02d}'.format(h)
@@ -65,9 +66,10 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
                 try:
                     g.cddis_download(file_name,new_way_dir)
                     if (version == 3):
-                        subprocess.call(['gunzip',file_name])
-                        subprocess.call([crnxpath, crnx_name])
-                        subprocess.call(['rm',crnx_name])
+                        if os.path.isfile(file_name): 
+                            subprocess.call(['gunzip',file_name])
+                            subprocess.call([crnxpath, crnx_name])
+                            subprocess.call(['rm',crnx_name])
                     if (version == 2):
                         if os.path.isfile(file_name):
                             subprocess.call([exe1,file_name])
@@ -93,14 +95,17 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
 
     s2=time.time()
     print('That download experience took ', int(s2-s1), ' seconds.')
-    s1 = time.time()
     print('Attempt to merge the 15 minute files using gfzrnx and move to ', rinexname)
     if (fileF > 0): # files exist
         if (dec_rate == 1):
             subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-f','-q'])
         else:
+            print('Am decimating with gfzrnx')
+            s3=time.time()
             crate = str(dec_rate)
             subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-sei','out','-smp',crate,'-f','-q'])
+            s4=time.time()
+            print(s4-s3, 'seconds')
 
         cm = 'rm ' + searchpath 
         if os.path.isfile(tmpname): # clean up

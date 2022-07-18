@@ -262,8 +262,9 @@ def xyz2llh(xyz, tol):
     inputs are station coordinate vector xyz (x,y,z in meters) in a list?, 
     tolerance for convergence should be small (1E-8)
     outputs are lat, lon in radians and wgs84 ellipsoidal height in meters
-    author: kristine larson
     uses wgs84 for Earth parameters
+
+    author: kristine larson
     """
     x=xyz[0]
     y=xyz[1]
@@ -315,10 +316,11 @@ def xyz2llhd(xyz):
 
 def zenithdelay(h):
     """
-    author: kristine larson
     input the station ellipsoidal (height) in meters
     the output is a very simple zenith troposphere delay in meters
     this is NOT to be used for precise geodetic applications
+
+    author: kristine larson
 
     """
 
@@ -470,7 +472,7 @@ def readPreciseClock(filename):
 def dec31(year):
     """
     input: year
-    returns doy of december 31
+    returns doy for december 31
     """
     today=datetime.datetime(year,12,31)
     doy = (today - datetime.datetime(year, 1, 1)).days + 1
@@ -516,16 +518,11 @@ def rinex_sopac(station, year, month, day):
             subprocess.call(['uncompress', file1])
             subprocess.call([crnxpath, fname])
             subprocess.call(['rm', '-f',fname])
-            #print('successful Hatanaka download from SOPAC ')
         except:
-            #print('Not able to download from SOPAC',file1)
             subprocess.call(['rm', '-f',file1])
             subprocess.call(['rm', '-f',fname])
     else:
         hatanaka_warning()
-        #print('WARNING WARNING WARNING WARNING')
-        #print('You are trying to convert Hatanaka files without having the proper')
-        #print('executable, CRX2RNX. See links in the gnssrefl documentation')
 
 
 
@@ -571,10 +568,6 @@ def rinex_cddis(station, year, month, day):
     dir_secure = '/pub/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'o/'
     file_secure = file1
 
-    # they say they are going to use gzip - but apparently not yet
-    #print('try the gzip way')
-    #cddis_download(file2,dir_secure)
-    #subprocess.call(['gunzip', file2])
 
     try:
         cddis_download(file_secure,dir_secure)
@@ -678,15 +671,12 @@ def getnavfile(year, month, day):
         subprocess.call(['mkdir',navdir])
 
     if os.path.exists(nfile):
-        #print('navfile exists online')
         foundit = True
     if (not foundit) and (os.path.exists(nfile + '.xz' )):
-        #print('xz compressed navfile exists online, uncompressing ...')
         subprocess.call(['unxz',nfile + '.xz'])
         foundit = True
 
     if not os.path.exists(nfile):
-        #print('go pick up the navfile')
         navstatus = navfile_retrieve(navname, cyyyy,cyy,cdoy) 
         if navstatus:
             #print('\n navfile being moved to online storage area')
@@ -749,7 +739,7 @@ def getsp3file_flex(year,month,day,pCtr):
 
     20jun14 add CDDIS secure ftp
 
-    unfortunately this won't work with the long sp3 file names. use mgex instead
+    unfortunately this won't work with the long sp3 file names. use getsp3file_mgex instead
     """
     # returns name and the directory
     name, fdir = sp3_name(year,month,day,pCtr) 
@@ -788,7 +778,6 @@ def getsp3file_flex(year,month,day,pCtr):
 
 def getsp3file_mgex(year,month,day,pCtr):
     """
-    author: kristine larson
     retrieves MGEX sp3 orbit files 
     inputs are year, month, and day  (integers), and 
     pCtr, the processing center  (3 characters)
@@ -804,6 +793,10 @@ def getsp3file_mgex(year,month,day,pCtr):
     21jan08 obnoxious problem at CDDIS
     21jan09 CDDIS, again
     22jul12 good lord - issues with the try command
+    this is spaghetti code, i apologize
+
+    author: kristine larson
+
     """
     foundit = False
     # this returns sp3 orbit product name
@@ -3693,7 +3686,7 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
                 else:
                     print('eek - I have run out of archives')
 
-def new_rinex3_rinex2(r3_filename,r2_filename):
+def new_rinex3_rinex2(r3_filename,r2_filename,dec=1):
     """
     takes as input the names of a rinex3 file and a rinex2 file
     code checks that gfzrnx executable exists
@@ -3702,6 +3695,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
     will translate Hatanaka.  Maintains initial rinex3 file.
     does not store anything. Everything stays where it was 
     2022mar06 made it quiet ... 
+    assumes decimation is 1, which means do not 
     """
     fexists = False
     gexe = gfz_version()
@@ -3712,8 +3706,11 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
             print('You need to install Hatanaka translator. Exiting.')
             sys.exit()
         r3_filename_new = r3_filename[0:35] + 'rnx'
+        s1=time.time()
         print('Converting to Hatanaka compressed to uncompressed')
         subprocess.call([crnxpath, r3_filename])
+        s2=time.time()
+        print(round(s2-s1,2), ' seconds')
         # removing the compressed version - will keep new version
         subprocess.call(['rm', '-f', r3_filename ])
         # now swap name
@@ -3721,14 +3718,23 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
     # these are my favorite observables
     #gobblygook = 'G:S1C,S2X,S2L,S2S,S5+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S2I,S7I,S6I'
     gobblygook = myfavoriteobs()
+    print('decimate value: ', dec)
     if not os.path.exists(gexe):
         print('gfzrnx executable does not exist and this file cannot be translated')
     else:
+        s1=time.time()
         if os.path.isfile(r3_filename):
             try:
-                subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
+                if (dec == 1) or (dec == 0):
+                    subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
+                    #'-sei','out','-smp',crate
+                else:
+                    crate = str(dec)
+                   #subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-sei','out','-smp',crate,'-f','-q'])
+
+                    subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
                 if os.path.exists(r2_filename):
-                    #print('look for the rinex 2.11 file here: ', r2_filename)
+                    print('look for the rinex 2.11 file here: ', r2_filename)
                     fexists = True
                 else:
                     sigh = 0
@@ -3736,6 +3742,8 @@ def new_rinex3_rinex2(r3_filename,r2_filename):
                 print('some kind of problem in translation from RINEX 3 to RINEX 2.11')
         else:
             print('RINEX 3 file does not exist', r3_filename)
+        s2=time.time()
+        print('gfzrnx rinex3 to rinex 2:', round(s2-s1,2), ' seconds')
 
 
     return fexists
@@ -4474,15 +4482,16 @@ def read_simon_williams(filename,outfilename):
         csv = True
 
     if csv:
-        fout.write("# YYYY,MM,DD,HH,MM, Water(m),DOY, MJD, Seconds \n")
+        fout.write("# YYYY,MM,DD,HH,MM, Water(m),DOY, MJD, Seconds,Freq, Azim,PRN \n")
     else:
-        fout.write("%YYYY MM DD HH MM  Water(m) DOY  MJD Seconds \n")
+        fout.write("%YYYY  MM  DD  HH  MM  Water(m) DOY    MJD    Sec   Freq  Azim    PRN  raw  fit-tide \n")
+        fout.write("% (1) (2) (3) (4)  (5)   (6)    (7)     (8)   (9)   (10)   (11)  (12)  (13)  (14) \n")
 
 
 
     # read the file three times because i am loadtxt impaired
     # string
-    tv = np.loadtxt(filename,usecols=(0,1,2),comments='#',dtype='str',delimiter=',')
+    tv = np.loadtxt(filename,usecols=(0,1,2,3),skiprows=10,dtype='str',delimiter=',')
     # integers
     ivals = np.loadtxt(filename,usecols=(4,5),skiprows=10, dtype='int',delimiter=',')
     # floats
@@ -4499,8 +4508,7 @@ def read_simon_williams(filename,outfilename):
     sealevel = []
     s1=time.time()
 
-    # start at 1 because simon has a header line
-    for i in range(1,nr):
+    for i in range(0,nr):
         year = int(tv[i,0][0:4])
         mm = int(tv[i,0][5:7])
         dd = int(tv[i,0][8:10])
@@ -4510,14 +4518,15 @@ def read_simon_williams(filename,outfilename):
         sec = int(tv[i,0][17:19])
         raw = float(tv[i,1])
         modraw = float(tv[i,2])
+        tidefit = float(tv[i,3])
         dtime = datetime.datetime(year=year, month=mm, day=dd, hour=hh, minute=minutes, second=sec)
         imjd, frac = mjd(year,mm,dd,hh,minutes,sec)
         x = [imjd+frac]
         # go ahead and write to a file ... 
         if csv:
-            fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:2.0f} \n".format(year, mm, dd, hh, minutes, modraw, doy, imjd+frac, sec))
+            fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:2.0f},{9:1.0f},{10:8.3f},{11:2.0f},{12:6.3f},{13:6.3f} \n".format(year, mm, dd, hh, minutes, modraw, doy, imjd+frac, sec, fr[i], az[i],prn[i],raw,tidefit))
         else:
-            fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:2.0f} \n".format(year, mm, dd, hh, minutes, modraw, doy, imjd+frac, sec))
+            fout.write(" {0:4.0f} {1:3.0f} {2:3.0f} {3:3.0f} {4:3.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:2.0f} {9:1.0f} {10:8.3f} {11:2.0f} {12:6.3f} {13:6.3f}\n".format(year, mm, dd, hh, minutes, modraw, doy, imjd+frac, sec, fr[i], az[i], prn[i], raw,tidefit))
 
         obstimes.append(dtime)
         modjulian.append(x)
@@ -5288,8 +5297,36 @@ def bfg_data(fstation, year, doy, samplerate=30):
         print('Exiting - most likely because that directory -and thus the data - does not exist.')
 
 
+    ftp.quit()
     return
 
+def inout(c3gz):
+    """
+    takes hatanaka rinex3 file that has been gzipped
+    gunzips and decompresses
+    returns boolean (success) and rnx filename
+    """
+
+    translated = False # assume failure
+    c3 = c3gz[:-3] # crx filename
+    rnx = c3.replace('crx','rnx') # rnx filename
+    # gunzip
+    if os.path.exists(c3gz):
+        subprocess.call(['gunzip', c3gz])
+
+    # executable
+    crnxpath = hatanaka_version()
+    if not os.path.exists(crnxpath):
+        hatanaka_warning()
+    else:
+        if os.path.exists(c3): # file exists
+            subprocess.call([crnxpath,c3])
+    if os.path.exists(rnx): # file exists
+        translated = True
+        print('remove Hatanaka compressed file')
+        subprocess.call(['rm','-f',c3])
+
+    return translated, rnx
 
             # get JAXA orbits from IGN
             # this is pretty slow, so turning it off

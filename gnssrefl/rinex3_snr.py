@@ -8,6 +8,8 @@ Updated: November 14, 2021
 This only works on a single file (no doy_end)
 It also uses my convention for naming (lowercase) and it does not 
 store the Rinex2 files
+
+I think this has been superceded by rinex3_rinex2
 """
 import argparse
 import os

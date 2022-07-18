@@ -162,7 +162,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             subprocess.call(['gunzip', r3gz])
                         if os.path.exists(r3):
                             print('The RINEX 3 file exists locally')
-                            fexists = g.new_rinex3_rinex2(r3,r2)
+                            fexists = g.new_rinex3_rinex2(r3,r2,dec_rate)
                             if fexists:
                                 conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
                             else:
@@ -185,7 +185,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             #print(rnx_filename, foundit)
                             if foundit:
                                 print('The RINEX 3 file has been downloaded. Try to make ', r2)
-                                fexists = g.new_rinex3_rinex2(rnx_filename,r2)
+                                fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
                         else:
                             if (archive == 'all'):
                                 file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream)
@@ -202,7 +202,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             # now make rinex2
                                 if translated:
                                     print('The RINEX 3 file has been downloaded. Try to make ', r2)
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
                                     #subprocess.call(['rm', '-f',rnx_filename]) # rnx
                         # this means the rinex 2 version exists
                         if fexists:
