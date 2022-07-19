@@ -29,18 +29,19 @@ For SNR data in the year YYYY (last two characters YY), doy DDD:
 
 REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files
 
-For results:
+For Lomb Scargle (gnssir) results:
 
-REFL_CODE/YYYY/results/abcd/DDD.txt  Lomb Scargle analysis
+REFL_CODE/YYYY/results/abcd/DDD.txt  
 
-Various output files and plots will be placed here
+Various output files and plots will be placed here:
 
 REFL_CODE/Files/ 
+
+</PRE>
 
 Rinex files are not stored by this code - in fact, quite the opposite. If they are being translated,
 they are deleted. **Do not keep your only copy of RINEX files in your default directory.**
 
-</PRE>
 
 For orbits:
 
