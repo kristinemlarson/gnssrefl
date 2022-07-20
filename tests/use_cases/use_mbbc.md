@@ -9,7 +9,6 @@ Data archive is [UNAVCO](https://www.unavco.org/data/gps-gnss/data-access-method
 
 <P align=center>
 <img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=500>
-Photo credit: UNAVCO.
 <P>
 
 **Use the Reflection Zone webapp**
@@ -45,30 +44,16 @@ appropriate?
 
 <code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275</code>
 
-*How did I know to use a RH region of 7 to 35 meters?* I did not know this initially. I first tried a limit of 20 meters, 
-analyzed multiple years of data and realized that during the drought of 2015 the lake retrievals disappeared (i.e. 
-the RH was greater than 20 meters). I re-analyzed the data using the larger limit. 
-Once you have *translated* the files, it really doesn't take much cpu time to re-analyze the data.
-
-*What does this image tell us?* I know from google maps that the lake is to the south. And there 
-are retrievals to the south, but they are being set to bad because the amplitude of the 
-reflection is so small. You can override that:
-
-
-<img src=mbbc-0-70.pnp>
-
-If the amplitude limit is set to zero, the code will rely on the peak of the Lomb Scargle 
-retrieval relative to the noise (peak2noise) for quality control.
-
 I have manually added a red box to show the good azimuths. If I further edit the correct azimuths, 
 you see good strong returns in the peridograms:
 
-can you use L2? Yes, but you need to more or less turn off the amplitude restriction. These
+Can you use L2? Yes, but you need to more or less turn off the amplitude restriction. These
 values are low because of how the legacy L2 signal is extracted. With this at a low value, the peak 
 to noise ratio is used for quality control
 
 <code> quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275 -fr 20  -ampl 1</code>
 
+<img src=mbbc-l2.pnp>
 
 **Analyze a Fuller Dataset**
 
