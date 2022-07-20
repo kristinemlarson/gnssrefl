@@ -9,15 +9,13 @@ Data archive is [UNAVCO](https://www.unavco.org/data/gps-gnss/data-access-method
 
 <P align=center>
 <img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=500>
-<BR>
 Photo credit: UNAVCO.
 <P>
 
 **Use the Reflection Zone webapp**
 
-[First Try](http://gnss-reflections.org/rzones?station=mbbc&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=1&azim1=0&azim2=360&system=gps)
-
-I initially input a RH value of 20 meters and default elevation angles (5-15) to get you started.  
+[First Try](http://gnss-reflections.org/rzones?station=mbbc&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=1&azim1=0&azim2=360&system=gps). I initially input a RH value of 20 meters and 
+default elevation angles (5-15) to get you started.  
 Do the reflection zones hit the surface of the lake? Iterate on both of these until 
 your ellipses overlap the lake. Then put in azimuth restrictions.
 
@@ -39,9 +37,13 @@ appropriate?
 
 <code>quickLook mmbc 2021 1 -e1 4 -e2 10 -h1 0 -h2 70</code>
 
+<img src=mbbc-0-70.png>
 
+<code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 </code>
 
-<img src=try1_mat2.png>
+<img src=mbbc-50-70.png>
+
+<code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275</code>
 
 *How did I know to use a RH region of 7 to 35 meters?* I did not know this initially. I first tried a limit of 20 meters, 
 analyzed multiple years of data and realized that during the drought of 2015 the lake retrievals disappeared (i.e. 
@@ -69,21 +71,23 @@ you see good strong returns in the peridograms:
 
 Once you have the elevation and azimuth angles set (along with details like the required amplitude,
 which we are not using here), you really just need to turn the crank. Run <code>make_json_input</code> using 
-the information I discussed earlier (i.e. set azimuth and elevation angles limits, RH limits. Set the NReg to be
+the information I discussed earlier (i.e. set azimuth and elevation angle limits, RH limits. Set the NReg to be
 the same as the RH limits). 
 
 Make SNR files using <code>rinex2snr</code>. Then compute reflector heights:
 
-<code>gnssir mbbc 2019 1 -year_end 2021 -doy_end 365</code> 
+
+<code>gnssir mbbc 2018 1 -year_end 2021 -doy_end 100</code> 
 
 This command would analyze all the data from 2017-2021. Use <code>daily_avg</code> to create a daily average.
 Play with the inputs (median filter value, number of required RH to compute a reliable average) to make sure 
 that you have a high quality results. My plot goes back to 2008 because I downloaded more RINEX data:
 
+<p align=center>
 <img src=mbbc-rh.png>
 
 Because there were only useful GPS L1 data in the earlier dataset, I only used it for the entire time series.
-In general you should use all the good frequenices that are available to you.
+In general you should use all the good frequencies that are available to you.
 
 [Simon Williams and the Permanent Service for Mean Sea Level has analyzed this full dataset](https://www.psmsl.org/data/gnssir/site.php?id=10318)
 
