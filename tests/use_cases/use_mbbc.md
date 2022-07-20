@@ -59,10 +59,17 @@ to noise ratio is used for quality control
 
 Once you have the elevation and azimuth angles set (along with details like the required amplitude,
 which we are not using here), you really just need to turn the crank. Run <code>make_json_input</code> using 
-the information I discussed earlier (i.e. set azimuth and elevation angle limits, RH limits. Set the NReg to be
-the same as the RH limits). 
+the information I discussed earlier 
 
-Make SNR files using <code>rinex2snr</code>. Then compute reflector heights:
+- azimuth and elevation angle limits 
+- RH limits. 
+- the NReg to be the same as the RH limits 
+- amplitude limits to be small for L2 
+- allow L1 and L2 (L2C was either not tracked by these investigators or is not provided online by UNAVCO)
+
+Make SNR files using <code>rinex2snr</code>. 
+
+Compute reflector heights:
 
 <code>gnssir mbbc 2018 1 -year_end 2021 -doy_end 100</code> 
 
@@ -73,8 +80,6 @@ that you have a high quality results.
 <p align=center>
 <img src=mbbc-rh.png>
 
-Because there were only useful GPS L1 data in the earlier dataset, I only used it for the entire time series.
-In general you should use all the good frequencies that are available to you.
 
 [Simon Williams and the Permanent Service for Mean Sea Level has analyzed this full dataset](https://www.psmsl.org/data/gnssir/site.php?id=10318)
 
