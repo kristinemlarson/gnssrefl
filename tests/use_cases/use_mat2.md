@@ -30,7 +30,7 @@ observations, so you can use the default (gps-only) option.
 
 **Evaluate the Reflection Data**
 
-[Use the Reflection Zone WebApp](<a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps)
+[Use the Reflection Zone WebApp](http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps)
 
 What RH limits did I use? Azimuths? Elevation angles? Which direction is the water?
 With that information, then look at the data.
