@@ -27,13 +27,12 @@ as in:
 Note that you can use the rapid GFZ orbits after mid 2021. And before 2016, there are no multi-GNSS 
 observations, so you can use the default (gps-only) option.
 
-This is a difficult site. Because it is relatively far from the water surface, only the low 
-elevation angle data can be used (look at the reflection zone link above and note the RH value I used). 
 
 **Evaluate the Reflection Data**
 
-<a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps target="_blank">Look at the Reflection zones webApp results</a>. 
-What RH did I use? Azimuths? Elevation angles? Which direction is the water?
+[Use the Reflection Zone WebApp](<a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps)
+
+What RH limits did I use? Azimuths? Elevation angles? Which direction is the water?
 With that information, then look at the data.
 
 Use <code>quickLook</code> with elevation angles 4-8 degrees and RH 7-35 meters:
