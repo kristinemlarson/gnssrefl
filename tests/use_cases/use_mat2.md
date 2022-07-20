@@ -10,7 +10,7 @@ Data archive is [UNAVCO](https://www.unavco.org/instrumentation/networks/status/
 
 <P>
 
-<img src=https://www.unavco.org/instrumentation/networks/status/nota/photos/MAT2#gallery-10 width=500>
+<img src=south_mat2.jpg width=500>
 <P>
 
 Photograph from UNAVCO.
