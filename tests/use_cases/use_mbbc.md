@@ -25,7 +25,7 @@ aprpropriate button on the reflection zone page.
 
 **Pick Up Some Data**
 
-<code>rinex2snr mbcc 2020 1 -archive unavco</code>
+<code>rinex2snr mbcc 2021 1 -archive unavco</code>
 
 Note that we do not have to select multi-GNSS as this site is only collecting GPS data.
 
@@ -54,7 +54,6 @@ Once you have *translated* the files, it really doesn't take much cpu time to re
 are retrievals to the south, but they are being set to bad because the amplitude of the 
 reflection is so small. You can override that:
 
-<code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35 -ampl 0</code>
 
 <img src=mbbc-0-70.pnp>
 
@@ -64,7 +63,11 @@ retrieval relative to the noise (peak2noise) for quality control.
 I have manually added a red box to show the good azimuths. If I further edit the correct azimuths, 
 you see good strong returns in the peridograms:
 
-<code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35 -ampl 0 -azim1 220 -azim2 275</code>:
+can you use L2? Yes, but you need to more or less turn off the amplitude restriction. These
+values are low because of how the legacy L2 signal is extracted. With this at a low value, the peak 
+to noise ratio is used for quality control
+
+<code> quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275 -fr 20  -ampl 1</code>
 
 
 **Analyze a Fuller Dataset**
@@ -76,12 +79,11 @@ the same as the RH limits).
 
 Make SNR files using <code>rinex2snr</code>. Then compute reflector heights:
 
-
 <code>gnssir mbbc 2018 1 -year_end 2021 -doy_end 100</code> 
 
-This command would analyze all the data from 2017-2021. Use <code>daily_avg</code> to create a daily average.
-Play with the inputs (median filter value, number of required RH to compute a reliable average) to make sure 
-that you have a high quality results. My plot goes back to 2008 because I downloaded more RINEX data:
+Use <code>daily_avg</code> to create a daily average. Play with the 
+inputs (median filter value, number of required RH to compute a reliable average) to make sure 
+that you have a high quality results. 
 
 <p align=center>
 <img src=mbbc-rh.png>
