@@ -26,6 +26,8 @@
 
 * [St Lawrence River, Montreal, Canada](use_cases/use_pmtl.md) (pmtl)
 
+* [Lake Mathews](use_cases/use_mat2.md) (pmtl)
+
 </TD>
 </TR>
 <TR>
