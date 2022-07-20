@@ -8,7 +8,7 @@ Data archive is [UNAVCO](https://www.unavco.org/instrumentation/networks/status/
 <P>
 <a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps target="_blank">Reflection zone</a>
 
-<P>
+<P align=center>
 <img src=south_mat2.jpg width=500>
 <P>
 
@@ -18,7 +18,8 @@ Photograph from UNAVCO.
 **Pick Up Some Data**
 
 This site has a lot of history. It is 1-Hz and multi-GNSS since ~2016. 
-You do not need 1-Hz for this site - I have chosen to decimate it to 5 seconds,
+You do not need 1-Hz for this site - but it is definitely better than the default 
+PBO era sampling rate of 15 seconds.  Here I have chosen to decimate the 1-Hz data to 5 seconds,
 as in:
 
 <code>rinex2snr mat2 2022 193 -doy_end 199 -orb gnss -rate high -dec 5 -archive unavco</code>
@@ -27,7 +28,7 @@ Note that you can use the rapid GFZ orbits after mid 2021. And before 2016, ther
 observations, so you can use the default (gps-only) option.
 
 This is a difficult site. Because it is relatively far from the water surface, only the low 
-elevation angle data can be used (look at the reflection zone link above and note the RH). 
+elevation angle data can be used (look at the reflection zone link above and note the RH value I used). 
 
 **Evaluate the Reflection Data**
 
@@ -38,9 +39,9 @@ Here I use <code>quickLook</code> with elevation angles 4-8 degrees and RH 8-35 
 <img src=try1_mat2.png>
 
 *How did I know to use a RH region of 8 to 35 meters?* I did not know initially. I tried a limit of 20 meters, 
-analyzed multiple years of data nad relazed during the drought the lake was at a really low level. I re-analyzed 
-the data using a larger limit. Once you have translated the files, it really doesn't take much cpu time to 
-re-analyze the data.
+analyzed multiple years of data and realized that during the drought of 2015 the lake retrievals disappeared (i.e. 
+the RH was greater than 20 meters). I re-analyzed the data using the larger limit. 
+Once you have *translated* the files, it really doesn't take much cpu time to re-analyze the data.
 
 *What does this image tell us?* I know from google maps that the lake is to the south. And there are retrievals there,
 but they are being set to bad because the amplitude of the reflection is so small. You can override that:
@@ -80,3 +81,4 @@ For lake monitoring using the current receiver I would use all GPS, Galileo, and
 
 [CSV file](LAKE_MATHEWS_MHW.csv)
 
+<img src=mathews_cdec.png>
