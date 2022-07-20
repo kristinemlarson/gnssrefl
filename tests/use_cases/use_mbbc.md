@@ -13,10 +13,11 @@ Data archive is [UNAVCO](https://www.unavco.org/data/gps-gnss/data-access-method
 Photo credit: UNAVCO.
 <P>
 
-**Use the Reflection Zone webapp
-<a href=http://gnss-reflections.org/rzones?station=mbbc&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=1&azim1=0&azim2=360&system=gps target="_blank">Reflection zones</a>
+**Use the Reflection Zone webapp**
 
-I have initially input a RH of 20 meters and default elevation angles (5-15) to get you started.  
+[First Try](http://gnss-reflections.org/rzones?station=mbbc&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=1&azim1=0&azim2=360&system=gps)
+
+I initially input a RH value of 20 meters and default elevation angles (5-15) to get you started.  
 Do the reflection zones hit the surface of the lake? Iterate on both of these until 
 your ellipses overlap the lake. Then put in azimuth restrictions.
 
@@ -53,7 +54,7 @@ reflection is so small. You can override that:
 
 <code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35 -ampl 0</code>
 
-<img src=try2_mat2.png>
+<img src=mbbc-0-70.pnp>
 
 If the amplitude limit is set to zero, the code will rely on the peak of the Lomb Scargle 
 retrieval relative to the noise (peak2noise) for quality control.
@@ -63,7 +64,6 @@ you see good strong returns in the peridograms:
 
 <code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35 -ampl 0 -azim1 220 -azim2 275</code>:
 
-<img src=lsp-mat2.png>
 
 **Analyze a Fuller Dataset**
 
@@ -80,7 +80,7 @@ This command would analyze all the data from 2017-2021. Use <code>daily_avg</cod
 Play with the inputs (median filter value, number of required RH to compute a reliable average) to make sure 
 that you have a high quality results. My plot goes back to 2008 because I downloaded more RINEX data:
 
-<img src=mbbc-avg.png>
+<img src=mbbc-rh.png>
 
 Because there were only useful GPS L1 data in the earlier dataset, I only used it for the entire time series.
 In general you should use all the good frequenices that are available to you.

@@ -13,7 +13,7 @@ import gnssrefl.gps as g
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
 
-def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slevel):
+def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slevel,csv):
     """
     downloads/writes data within one year
     inputs:
@@ -25,6 +25,7 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
     tt - MJD
     obstimes - datetime
     slevel - water level in meters
+    csv - boolean, whether csv or not (plain text is csv being false)
 
     """
     cyyyy = str(year)
@@ -46,14 +47,14 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
         print(d1,d2) # send whether imeta is equal to 0 ...  
         data, error = pickup_from_noaa(station,d1,d2,datum,imeta==0)
         if not error: # only write out if error not thrown. update the variables
-            tt,obstimes,slevel = write_out_data(data,fout, tt,obstimes,slevel)
+            tt,obstimes,slevel = write_out_data(data,fout, tt,obstimes,slevel,csv)
 
         imeta = imeta + 1
 
     return tt,obstimes,slevel
 
 
-def multimonthdownload(station,datum,fout,year1,year2,month1,month2):
+def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
     """
     inputs are:
     station
@@ -61,6 +62,7 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2):
     fout - fileID for writing results
     year1, month1 start time (i will assume first of this month)
     year2, month2 end time  (i will assume end of this month)
+    csv - boolean for output format
 
     returns:
     tt - MJD
@@ -75,15 +77,15 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2):
 
     imeta = 0
     if (year1 == year2):
-        tt, obstimes, slevel = noaa_command(station,fout,year1,month1,month2,datum,metadata,tt,obstimes,slevel)
+        tt, obstimes, slevel = noaa_command(station,fout,year1,month1,month2,datum,metadata,tt,obstimes,slevel,csv)
     else:
         for y in range(year1,year2+1):
             if (y == year1):
-                tt,obstimes,slevel = noaa_command(station,fout,y,month1,12,datum,metadata,tt,obstimes,slevel)
+                tt,obstimes,slevel = noaa_command(station,fout,y,month1,12,datum,metadata,tt,obstimes,slevel,csv)
             elif (y == year2):
-                tt,obstimes,slevel = noaa_command(station,fout,y,1,month2,datum,metadata,tt,obstimes,slevel)
+                tt,obstimes,slevel = noaa_command(station,fout,y,1,month2,datum,metadata,tt,obstimes,slevel,csv)
             else:  # get whole year
-                tt,obstimes,slevel = noaa_command(station,fout,y,1,12,datum,metadata,tt,obstimes,slevel)
+                tt,obstimes,slevel = noaa_command(station,fout,y,1,12,datum,metadata,tt,obstimes,slevel,csv)
 
     return tt, obstimes, slevel
 
@@ -102,12 +104,13 @@ def noaa2me(date1):
 
     return year1, month1, day1, doy, modjulday
 
-def write_out_data(data,fout, tt,obstimes,slevel):
+def write_out_data(data,fout, tt,obstimes,slevel,csv):
     """
     input: data record from NOAA API
     tt - MJD 
     obstimes - datetime
     slevel - water level in meters
+    csv - whether csv format or not (boolean)
     """
     NV = len(data['data'])
 
@@ -131,7 +134,10 @@ def write_out_data(data,fout, tt,obstimes,slevel):
             obstimes.append(bigT)
 
             slevel.append(sl)
-            fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
+            if csv:
+                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
+            else:
+                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
 
     return tt,obstimes,slevel
 
@@ -249,15 +255,22 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
         print('date2 must have 8 characters', date2); sys.exit()
 
 
+    csv = False
     if output is None:
         # use the default
         outfile = outdir + station + '_' + 'noaa.txt'
     else:
-        outfile = outdir +  output
-    print('Writing to :', outfile)
+        if output[-3:] == 'csv':
+            csv = True
+        outfile = outdir + output
+
+    print('Writing contents to: ', outfile)
     fout = open(outfile, 'w+')
-    fout.write("%YYYY MM DD HH MM  Water(m) DOY    MJD\n")
-    fout.write("% 1    2  3  4  5    6       7       8\n")
+    if csv:
+        fout.write("#YYYY,MM,DD,HH,MM, Water(m),DOY,   MJD\n")
+    else:
+        fout.write("%YYYY MM DD HH MM  Water(m) DOY    MJD\n")
+        fout.write("% 1    2  3  4  5    6       7       8\n")
 
 
     year1, month1, day1, doy1,modjul1 = noaa2me(date1)
@@ -269,13 +282,13 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
 
     metadata = True
     if (deltad) > 31:
-        tt,obstimes,slevel = multimonthdownload(station,datum,fout,year1,year2,month1,month2)
+        tt,obstimes,slevel = multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv)
     else:
         tt = []; slevel = []; obstimes = []
         # 'data' are stored in the dictionary data
         data,error = pickup_from_noaa(station,date1,date2,datum,True)
         if not error:
-            tt,obstimes,slevel = write_out_data(data,fout, tt,obstimes,slevel)
+            tt,obstimes,slevel = write_out_data(data,fout, tt,obstimes,slevel,csv)
 
     fout.close()
     if plt:
