@@ -53,7 +53,7 @@ to noise ratio is used for quality control
 
 <code> quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275 -fr 20  -ampl 1</code>
 
-<img src=mbbc-l2.pnp>
+<img src=mbbc-l2.png>
 
 **Analyze a Fuller Dataset**
 
