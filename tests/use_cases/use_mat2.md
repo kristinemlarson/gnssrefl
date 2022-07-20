@@ -6,13 +6,13 @@ Data archive is [UNAVCO](https://www.unavco.org/instrumentation/networks/status/
 
 [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/MAT2.sta)
 <P>
-<a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps target="_blank">Reflection zone</a>
+<a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps target="_blank">Reflection zones</a>
 
 <P align=center>
 <img src=south_mat2.jpg width=500>
+Photo credit: UNAVCO.
 <P>
 
-Photograph from UNAVCO.
 
 
 **Pick Up Some Data**
@@ -22,7 +22,7 @@ You do not need 1-Hz for this site - but it is definitely better than the defaul
 PBO era sampling rate of 15 seconds.  Here I have chosen to decimate the 1-Hz data to 5 seconds,
 as in:
 
-<code>rinex2snr mat2 2022 193 -doy_end 199 -orb gnss -rate high -dec 5 -archive unavco</code>
+<code>rinex2snr mat2 2022 175  -orb gnss -rate high -dec 5 -archive unavco</code>
 
 Note that you can use the rapid GFZ orbits after mid 2021. And before 2016, there are no multi-GNSS 
 observations, so you can use the default (gps-only) option.
@@ -32,23 +32,31 @@ elevation angle data can be used (look at the reflection zone link above and not
 
 **Evaluate the Reflection Data**
 
-Here I use <code>quickLook</code> with elevation angles 4-8 degrees and RH 8-35 meters:
+<a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps target="_blank">Look at the Reflection zones webApp results</a>. 
+What RH did I use? Azimuths? Elevation angles? Which direction is the water?
+With that information, then look at the data.
+
+Use <code>quickLook</code> with elevation angles 4-8 degrees and RH 7-35 meters:
 
 <code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35</code>
 
 <img src=try1_mat2.png>
 
-*How did I know to use a RH region of 8 to 35 meters?* I did not know initially. I tried a limit of 20 meters, 
+*How did I know to use a RH region of 7 to 35 meters?* I did not know this initially. I first tried a limit of 20 meters, 
 analyzed multiple years of data and realized that during the drought of 2015 the lake retrievals disappeared (i.e. 
 the RH was greater than 20 meters). I re-analyzed the data using the larger limit. 
 Once you have *translated* the files, it really doesn't take much cpu time to re-analyze the data.
 
-*What does this image tell us?* I know from google maps that the lake is to the south. And there are retrievals there,
-but they are being set to bad because the amplitude of the reflection is so small. You can override that:
+*What does this image tell us?* I know from google maps that the lake is to the south. And there 
+are retrievals to the south, but they are being set to bad because the amplitude of the 
+reflection is so small. You can override that:
 
 <code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35 -ampl 0</code>
 
 <img src=try2_mat2.png>
+
+If the amplitude limit is set to zero, the code will rely on the peak of the Lomb Scargle 
+retrieval relative to the noise (peak2noise).
 
 I have manually added a red box to show the good azimuths. If I further edit the correct azimuths, 
 you see good strong returns in the peridograms:
@@ -62,7 +70,7 @@ you see good strong returns in the peridograms:
 Once you have the elevation and azimuth angles set (along with details like the required amplitude,
 which we are not using here), you really just need to turn the crank. Run <code>make_json_input</code> using 
 the information I discussed earlier (i.e. set azimuth and elevation angles limits, RH limits. Set the NReg to be
-the same as teh RH limits). Then compute reflector heights:
+the same as the RH limits). Then compute reflector heights:
 
 <code>gnssir mat2 2017 1 -year_end 2021 -doy_end 365</code> 
 
