@@ -4,7 +4,7 @@ Station name: MAT2
 
 Data archive is [UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/MAT2)
 
-[Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/MCHN.sta)
+[Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/MAT2.sta)
 <P>
 <a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps target="_blank">Reflection zone</a>
 
@@ -37,8 +37,13 @@ Here I use <code>quickLook</code> with elevation angles 4-8 degrees and RH 8-35 
 
 <img src=try1_mat2.png>
 
-I know from the google map image that the lake is to the south. And there are retreievals there,
-but they are being set to bad because the amplitude of the reflection is so small.  You can override that:
+*How did I know to use a RH region of 8 to 35 meters?* I did not know initially. I tried a limit of 20 meters, 
+analyzed multiple years of data nad relazed during the drought the lake was at a really low level. I re-analyzed 
+the data using a larger limit. Once you have translated the files, it really doesn't take much cpu time to 
+re-analyze the data.
+
+*What does this image tell us?* I know from google maps that the lake is to the south. And there are retrievals there,
+but they are being set to bad because the amplitude of the reflection is so small. You can override that:
 
 <code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35 -ampl 0</code>
 
@@ -55,19 +60,21 @@ you see good strong returns in the peridograms:
 
 Once you have the elevation and azimuth angles set (along with details like the required amplitude,
 which we are not using here), you really just need to turn the crank. Run <code>make_json_input</code> using 
-the information I discussed earlier. Then:
+the information I discussed earlier (i.e. set azimuth and elevation angles limits, RH limits. Set the NReg to be
+the same as teh RH limits). Then compute reflector heights:
 
 <code>gnssir mat2 2017 1 -year_end 2021 -doy_end 365</code> 
 
-would analyze all the data from 2017-2021. Use <code>daily_avg</code> to create a daily average.
-Play with the inputs to make sure that you have a high quality results.
+This command would analyze all the data from 2017-2021. Use <code>daily_avg</code> to create a daily average.
+Play with the inputs (median filter value, number of required RH to compute a reliable average) to make sure 
+that you have a high quality results.
 
 <img src=mat2-avg.png>
 
 Because there were only useful GPS L1 data in the earlier dataset, I only used it for the entire time series.
 For lake monitoring using the current receiver I would use all GPS, Galileo, and Glonass signals.
 
-In situ data:
+**In situ data:**
 
 [Monthly Data from the California Department of Water Resources](https://cdec.water.ca.gov/dynamicapp/QueryWY?Stations=MHW&SensorNums=15&End=2022-05-20&span=20+years)
 
