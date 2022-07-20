@@ -33,19 +33,15 @@ Note that we do not have to select multi-GNSS as this site is only collecting GP
 Based on the reflection app, what kind of RH, azimuth, and elevation angle limits are 
 appropriate?
 
-
-<code>quickLook mmbc 2021 1 -e1 4 -e2 10 -h1 0 -h2 70</code>
-
-<img src=mbbc-0-70.png>
-
 <code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 </code>
 
 <img src=mbbc-50-70.png>
 
-<code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275</code>
 
-I have manually added a red box to show the good azimuths. If I further edit the correct azimuths, 
-you see good strong returns in the peridograms:
+I have manually added a red box to show the good azimuths. 
+If I further edit the correct azimuths:
+
+<code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275</code>
 
 Can you use L2? Yes, but you need to more or less turn off the amplitude restriction. These
 values are low because of how the legacy L2 signal is extracted. With this at a low value, the peak 
