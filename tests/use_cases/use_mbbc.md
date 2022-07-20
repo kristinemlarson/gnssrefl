@@ -6,38 +6,39 @@ Data archive is [UNAVCO](https://www.unavco.org/data/gps-gnss/data-access-method
 
 [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/MBBC.sta)
 <P>
-<a href=http://gnss-reflections.org/rzones?station=mbbc&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps target="_blank">Reflection zones</a>
 
 <P align=center>
-<img https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=500>
+<img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=500>
+<BR>
 Photo credit: UNAVCO.
 <P>
 
+**Use the Reflection Zone webapp
+<a href=http://gnss-reflections.org/rzones?station=mbbc&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=1&azim1=0&azim2=360&system=gps target="_blank">Reflection zones</a>
 
+I have initially input a RH of 20 meters and default elevation angles (5-15) to get you started.  
+Do the reflection zones hit the surface of the lake? Iterate on both of these until 
+your ellipses overlap the lake. Then put in azimuth restrictions.
+
+Please keep in mind, this would not work at all with 30 sec data sampling. This only works because UNAVCO 
+was using a 15 second data rate at MBBC. If you want to check out the Nyquist, please click the 
+aprpropriate button on the reflection zone page.
 
 **Pick Up Some Data**
 
-This site has a lot of history. It is 1-Hz and multi-GNSS since ~2016. 
-You do not need 1-Hz for this site - but it is definitely better than the default 
-PBO era sampling rate of 15 seconds.  Here I have chosen to decimate the 1-Hz data to 5 seconds,
-as in:
+<code>rinex2snr mbcc 2020 1 -archive unavco</code>
 
-<code>rinex2snr mat2 2022 175  -orb gnss -rate high -dec 5 -archive unavco</code>
-
-Note that you can use the rapid GFZ orbits after mid 2021. And before 2016, there are no multi-GNSS 
-observations, so you can use the default (gps-only) option.
-
+Note that we do not have to select multi-GNSS as this site is only collecting GPS data.
 
 **Evaluate the Reflection Data**
 
-[Use the Reflection Zone WebApp](http://gnss-reflections.org/rzones?station=mbbc&lat=0.0&lon=0.0&height=0.0&msl=off&RH=66&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps)
+Based on the reflection app, what kind of RH, azimuth, and elevation angle limits are 
+appropriate?
 
-What RH limits did I use? Azimuths? Elevation angles? Which direction is the water?
-With that information, then look at the data.
 
-Use <code>quickLook</code> with elevation angles 4-8 degrees and RH 7-35 meters:
+<code>quickLook mmbc 2021 1 -e1 4 -e2 10 -h1 0 -h2 70</code>
 
-<code>quickLook mmbc 2022 175 -e1 4 -e2 8 -h1 7 -h2 35</code>
+
 
 <img src=try1_mat2.png>
 
@@ -73,16 +74,16 @@ the same as the RH limits).
 
 Make SNR files using <code>rinex2snr</code>. Then compute reflector heights:
 
-<code>gnssir mat2 2017 1 -year_end 2021 -doy_end 365</code> 
+<code>gnssir mbbc 2019 1 -year_end 2021 -doy_end 365</code> 
 
 This command would analyze all the data from 2017-2021. Use <code>daily_avg</code> to create a daily average.
 Play with the inputs (median filter value, number of required RH to compute a reliable average) to make sure 
 that you have a high quality results. My plot goes back to 2008 because I downloaded more RINEX data:
 
-<img src=mat2-avg.png>
+<img src=mbbc-avg.png>
 
 Because there were only useful GPS L1 data in the earlier dataset, I only used it for the entire time series.
 In general you should use all the good frequenices that are available to you.
 
-Simon Williams and the Permanent Service for Mean Sea Level has analyzed this full dataset.
+[Simon Williams and the Permanent Service for Mean Sea Level has analyzed this full dataset](https://www.psmsl.org/data/gnssir/site.php?id=10318)
 
