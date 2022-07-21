@@ -1,17 +1,22 @@
-**Lake Mathews**
+**Lake Mathews, Southern California**
 
-Station name: MAT2
+**Station name:** MAT2
+<P align=center>
+<img src=south_mat2.jpg width=500>
+<P>
 
-Data archive is [UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/MAT2)
+**Latitude:** 33.857 degrees
+
+**Longitude:** -117.437 degrees
+
+**Ellipsoidal Height:** 398 meters
+
+Data archive: [UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/MAT2)
 
 [Nevada Reno site](http://geodesy.unr.edu/NGLStationPages/stations/MAT2.sta)
 <P>
 <a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps target="_blank">Reflection zones</a>
 
-<P align=center>
-<img src=south_mat2.jpg width=500>
-Photo credit: UNAVCO.
-<P>
 
 
 

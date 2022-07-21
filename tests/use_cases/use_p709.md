@@ -18,7 +18,7 @@ P709
 
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/P709)
 
-[Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/P709.sta)
+[Station Page at UNR](http://geodesy.unr.edu/NGLStationPages/stations/P709.sta)
 
 
 **Examine the Site**
@@ -36,6 +36,9 @@ P709
 
 **Estimate Reflector Height**
 
+Set your analysis strategy using <code>make_json_input</code>. Remember, if the UNR database
+knows about the site, then you can input lat,lon,ht of 0,0,0.
+
 <code>rinex2snr p709 2021 183 -dec 5 -archive unavco -rate high -orb gnss</code>
 
 <code>gnssir 2021 1 -doy_end 180</code>
@@ -45,7 +48,7 @@ Use <code>daily_avg </code> to calculate a daily reflector height. Various stati
 come to the screen. Here is the RH series:
 
 
-<img src=p709_RH.png>
+<img src=p709_RH.png width=500>
 
 I am *only* showing the data for the new multi-GNSS receiver. If you look at earlier data, you 
 are restricted to L1.
@@ -58,7 +61,7 @@ Why do you think the amplitudes vary like this? What changes about Lake Yellowst
 
 **In Situ Data**
 
-<img src=p709-comparison-data.png>
+<img src=p709-comparison-data.png width=500>
 
 [USGS station page](https://waterdata.usgs.gov/nwis/uv?06186500)
 
