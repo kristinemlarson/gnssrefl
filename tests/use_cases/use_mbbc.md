@@ -8,7 +8,7 @@ Data archive is [UNAVCO](https://www.unavco.org/data/gps-gnss/data-access-method
 <P>
 
 <P align=center>
-<img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=500> <img src=mbbc-local.png>
+<img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=500> <img src=mbbc-locale.png>
 <P>
 
 **Use the Reflection Zone webapp**
@@ -31,7 +31,7 @@ Note that we do not have to select multi-GNSS as this site is only collecting GP
 **Evaluate the Reflection Data**
 
 Based on the reflection app, what kind of RH, azimuth, and elevation angle limits are 
-appropriate?
+appropriate? 
 
 <code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 </code>
 
