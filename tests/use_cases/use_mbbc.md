@@ -8,7 +8,7 @@ Data archive is [UNAVCO](https://www.unavco.org/data/gps-gnss/data-access-method
 <P>
 
 <P align=center>
-<img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=500>
+<img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=500> <img src=mbbc-local.png>
 <P>
 
 **Use the Reflection Zone webapp**

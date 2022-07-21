@@ -4,8 +4,6 @@ P709
 
 **Archive:** [UNAVCO](http://www.unavco.org)
 
-**DOI:**        [https://doi.org/10.7283/T5R49NQQ](https://doi.org/10.7283/T5R49NQQ)
-
 **Ellipsoidal Coordinates:**
 
 - Latitude: 44.3917953 
@@ -17,6 +15,11 @@ P709
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/P709)
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/P709.sta)
+
+
+<P align=center>
+<img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/P709.jpg width=500>
+<P>
 
 
 
