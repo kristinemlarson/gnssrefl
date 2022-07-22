@@ -59,7 +59,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
            compress: bool = False, screenstats: bool = False, delTmax: int = None,
            e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False):
     """
-        This is the main driver for running GNSS Interferometric Reflectometry.
+        This is the main driver for estimating Reflector Height using GNSS Interferometric Reflectometry.
 
         parameters:
         ___________

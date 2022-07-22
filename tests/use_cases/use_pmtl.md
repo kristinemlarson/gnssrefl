@@ -1,13 +1,15 @@
 ### St Lawrence River
 
+To the best of our knowledge, access to the current high-rate data streams
+needed to do reflectometry at this site are no longer allowed. Please contact NRCAN for further information.
+The data used in the test case described below *is* still available. However, the current code requires
+you have the *teqc* executable, which is no longer supported by UNAVCO. We would be grateful if someone would
+modify the NRCNA high rate downloads function to use *gfzrnx*, which is supported by GFZ.
+
 <p align=center>
 <img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500"/>
 </p>
 
-To the best of our knowledge, access to the current high-rate data streams
-needed to do reflectometry at this site are not allowed. 
-Please contact NRCAN for further information.
-The data used in the test case described below *is* still available.
 
 **Station Name:**  pmtl
 

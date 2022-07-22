@@ -56,7 +56,7 @@ webapp tells you [how high your site is above sea level.](https://gnss-reflectio
 
 Bug Diary
 
-** October 26, 2021 Fixed bug in the rinex2snr code for the python translator. It was mixing up
+**October 26, 2021** Fixed bug in the rinex2snr code for the python translator. It was mixing up
 S6 and S7 - or something like that. Subdaily now exits when there are data gaps.  
 
 **fixed query_unr input files and -rate high archive choices.**

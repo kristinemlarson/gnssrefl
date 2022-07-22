@@ -34,11 +34,12 @@ def parse_arguments():
                         help="set to True to get stream defined filename. I know. I know. It is annoying.")
     parser.add_argument("-samplerate", default=None, type=str, help="Sample rate in seconds for RINEX3 only.")
     parser.add_argument("-strip_snr", default=None, type=str, help="Uses gfzrnx to strip out non-SNR data/default is False")
+    parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['strip', 'strip_snr']
+    boolean_args = ['strip', 'strip_snr','debug']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -47,7 +48,7 @@ def parse_arguments():
 
 def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = None,
                    version: int = 2, strip: bool = False, doy_end: int = None, stream: str = 'R', samplerate: int = 30,
-                   strip_snr: bool = False):
+                   strip_snr: bool = False, debug: bool = False):
     """
         command line interface for download_rinex.
         Parameters:
@@ -118,6 +119,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             Uses gfzrnx to strip out non-SNR data
             Default is False
 
+        debug : boolean, optional
+            provides screen output helpful for debugging
+            Default is False
     """
 
 #   make sure environment variables exist.  set to current directory if not
@@ -140,7 +144,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     # removed all
     archive_list_high = ['unavco', 'nrcan', 'cddis'] # removed GA, added Cddis for v2
 
-    archive_list_rinex3 = ['unavco', 'cddis', 'ga', 'bev', 'bkg', 'ign', 'epn', 'all']
+    archive_list_rinex3 = ['unavco', 'cddis', 'ga', 'bev', 'bkg', 'ign', 'epn', 'bfg','all']
 
     if doy_end is None:
         doy_end = doy
@@ -219,9 +223,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                     if not foundit:
                         file_name, foundit = k.universal_all(station, year, doy, samplerate, k.swapRS(stream))
                 else:
-                    file_name, foundit = k.universal(station, year, doy, archive, samplerate, stream)
+                    file_name, foundit = k.universal(station, year, doy, archive, samplerate, stream,debug)
                     if not foundit:
-                        file_name, foundit = k.universal(station, year, doy, archive, samplerate, k.swapRS(stream))
+                        file_name, foundit = k.universal(station, year, doy, archive, samplerate, k.swapRS(stream),debug)
                 if foundit: 
                     print('\n SUCCESS 1: ', file_name)
                     translated, new_file_name = r.go_from_crxgz_to_rnx(file_name)

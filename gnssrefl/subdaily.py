@@ -257,7 +257,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     jj = (np.absolute(residuals) < sigma) # data you do not like ;-)
     if plt2screen:
         fig,ax=plt.subplots()
-        ax.plot(tval,nval,'ko',label='Total')
+        ax.plot(tval,nval,'ko',label='Total',markersize=3)
         if (np.sum(Gval) > 0):
             ax.plot(tval,Gval,'bo',label='GPS',markersize=3)
         if (np.sum(Rval) > 0):
@@ -278,7 +278,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
-        print(d1,d2)
+        #print(d1,d2)
         two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2)
         stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma)
         plt.show()

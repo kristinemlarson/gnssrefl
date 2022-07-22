@@ -40,25 +40,55 @@ def quickname(station,year,cyy, cdoy, csnr):
 
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk,skipit,stream='R'):
     """
-    runs the rinex 2 snr conversion
-    inputs:
-    station name 
+    main code to convert RINEX to SNR
+
+    Parameters:
+
+    station: string
+        4 or 9 character station name 
+
     year_list list of years to be analyzed
+
     doy_list list of doy to be analyzed
-    isnr = integer file type choice
-    orbtype = 3character orbit type
-    rate = high or low
+
+    isnr: integer 
+        SNR file type choice
+
+    orbtype: string
+        3 character orbit type, e.g. nav
+        
+    rate : string 
+        general sample rate. 
+            high: use 1-Hz area in the archive
+            low: use default area in the archive
+
     dec_rate = integer for decimation
-    archive = allows you to pick a specific archive
-    fortran = boolean, whether you use fortran rinex translators
-    nol = boolean for nolook, if set to True, then it will assume RINEX files are in local directory
-    overwrite = boolean, make a new SNR file even if one already exists
+
+    archive: string
+        choice of GNSS archive
+
+    fortran: boolean 
+        whether the fortran rinex translator is to be used
+        default: false
+
+    nol: boolean 
+        True: assumes RINEX files are in local directory
+        False (default): will look at multiple - or specific archive
+
+    overwrite: boolean
+        False (default): if SNR file exists, SNR file not made
+        True: make a new SNR file 
+
     translate = string with .... fortran, python, hybrid ??
-    srate = sample rate
+
+    srate: integer
+        sample rate for RINEX 3 files
+
     mk = makan option
+
     skipit = skips making files every day, so a value of 7 means weekly.  1 means do every day
 
-    2021feb11, kristine Larson
+    2021feb11 
     translator = fortran, python, or hybrid
     srate - integer sample rate, for RINEX 3 only.
     2021mar20 check for illegal day of years ....
@@ -278,8 +308,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
 
                 if foundrinex: #uncompress etc  to make o files ...
                     rinexfile, foundit2 = k.make_rinex2_ofiles(file_name) # translate
-                    if foundit2:
-                        print('SUCCESS', rinexfile)
+                    #if foundit2:
+                    #    print('SUCCESS', rinexfile)
 
 #           define booleans for various files
             oexist = os.path.isfile(orbdir + '/' + f) == True

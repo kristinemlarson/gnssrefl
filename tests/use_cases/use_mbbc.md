@@ -51,11 +51,11 @@ Based on the reflection app, what kind of RH, azimuth, and elevation angle limit
 
 I have manually added a red box to show the good azimuths. Can you use the L2 data at this site? Let's see:
 
-<code> quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275 -fr 20  -ampl 1</code>
+<code> quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275 -fr 2</code>
 
 <img src=mbbc-l2.png>
-
-So you can see there are good results at the same azimuths as with L1, but they are marked as bad because the amplitudes are so small. So you need to more or less turn off the amplitude restriction for L2. You are allowed to have different amplitude constraints on L1 and L2.  
+ 
+So you can see there are good RH results at the same azimuths as with L1, but they are marked as bad (gray circles) because the amplitudes are so small. So you need to more or less turn off the amplitude restriction for L2. You are allowed to have different amplitude constraints on L1 and L2.  Note: the L2 amplitudes are smaller because the receiver lacks access to the  P code.
 
 **Analyze a Fuller Dataset**
 

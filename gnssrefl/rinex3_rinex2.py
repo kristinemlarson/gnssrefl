@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Translates rinex3 to rinex2 - but only
-cares about SNR data and reflections
+Translates rinex3 to rinex2 
+cares only about SNR data and reflections
 author: kristine larson
 Updated: March 24, 2021
 """

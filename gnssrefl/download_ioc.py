@@ -61,7 +61,6 @@ def parse_arguments():
 def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: bool = False, outliers: bool = False, sensor= None):
     """
         Downloads IOC tide gauge files
-        Downloads HTML (?????)  and converts it to plain txt with columns!
 
         Parameters:
         ___________
@@ -87,6 +86,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
             tried to remove outliers, but 
             it doesn't work as yet
             default is No
+
         sensor: string, optional
             type of sensor, prs(for pressure), rad (for radar), flt (for float)
             default is None, which means it will printout what is there.

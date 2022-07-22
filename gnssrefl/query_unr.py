@@ -34,9 +34,9 @@ def main():
         print('illegal station name-must be 4 characters')
         sys.exit()
     alat,alon,ht=g.queryUNR_modern(station)
-    x,y,z=g.llh2xyz(alat,alon,ht)
-    print('XYZ', round(x,4),round(y,4),round(z,4) )
-    #a,b,c=g.queryUNR(station)
+    if (alat+alon+ht) != 0:
+        x,y,z=g.llh2xyz(alat,alon,ht)
+        print('XYZ', round(x,4),round(y,4),round(z,4) )
 
 if __name__ == "__main__":
     main()

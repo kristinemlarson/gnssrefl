@@ -79,14 +79,28 @@ def just_bkg(cyyyy, cdoy, file_name):
     return
 
 
-def universal(station9ch, year, doy, archive,srate,stream):
+def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     """
     main code for seamless archive for rinex 3 files ... 
-    inputs: station9ch (9 character rinex3 station name)
-    year and doy (intgers)
-    archive - the usual
-    srate - sample rate - I think it is an integer
-    stream - R or S
+
+    station9ch: string
+        nine character station name
+
+    year: integer
+        year 
+
+    doy: integer
+        day of year
+
+    archive: string
+        archive name
+
+    srate: integer
+        receiver samplerate
+
+    stream: string
+        one character: R or S
+
     """
     # define the file name
     print('Searching the ', archive, ' archive with rate/filetype', srate, stream)
@@ -101,7 +115,7 @@ def universal(station9ch, year, doy, archive,srate,stream):
     # put this outside the try because I think there is one in the function
     if archive == 'bfg':
         station = station9ch[0:4] ; samplerate = srate; stream = 'R'
-        g.bfg_data(station, year, doy, samplerate)
+        g.bfg_data(station, year, doy, samplerate,debug)
         if os.path.exists(file_name):
             print('File was found: ', file_name )
             foundit = True

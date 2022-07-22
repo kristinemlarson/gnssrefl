@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-downloads RINEX files
-kristine larson
+downloads Orbit files
+author: kristine larson
 2020sep03 - modified environment variable requirement
 """
 import argparse
@@ -24,31 +24,47 @@ def parse_arguments():
 
 def download_orbits(orbit: str, year: int, month: int, day: int):
     """
-        command line interface for download_rinex.
+        command line interface for download_orbits
         Parameters:
         ___________
         orbit : string
-            orbit name.
+        
             value options:
-                gps (default) : will use GPS broadcast orbit
-                gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
-                gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
-                nav : GPS broadcast, perfectly adequate for reflectometry.
+
+                gps (default) : uses GPS broadcast orbit
+
+                gps+glo : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
+
+                gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days)
+
+                nav : GPS broadcast, adequate for reflectometry.
+
                 igs : IGS precise, GPS only
+
                 igr : IGS rapid, GPS only
+
                 jax : JAXA, GPS + Glonass, within a few days, missing block III GPS satellites
+
                 gbm : GFZ Potsdam, multi-GNSS, not rapid
+
                 grg : French group, GPS, Galileo and Glonass, not rapid
+
                 esa : ESA, multi-GNSS
+
                 gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021
+
                 wum : (disabled) Wuhan, multi-GNSS, not rapid
-                gnss2 : Uses IGN instead of CDDIS
+
+                gnss2 : multi-GNSS, but uses IGN instead of CDDIS
+
                 brdc : rinex 3 broadcast file from CDDIS
-                ultra : ultra gfz orbits
-                rapid : gfz multi-gnss for rapid
+
+                ultra : ultra orbits from GFZ
+
+                rapid : rapid orbits from GFZ
 
          year : integer
-            Year
+            year
 
          month : integer
             month

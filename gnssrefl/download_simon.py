@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 downloads Simon williams GNSS-IR sea level files
-kristine larson
+author: kristine larson
 
 """
 import argparse
@@ -19,9 +19,19 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 
 def quickp(station,t,sealevel):
     """
-    station name
-    t - time - in datetime format
-    sealevel in meters (relative - not defined in a datum)
+    makes quick plot of the tide gauge data
+
+    Parameters:
+    ___________
+
+    station: string
+        4 character ID of the station
+
+    t: datetime object array
+        time
+
+    sealevel: numpy array
+        water level in meters
     
     """
     fs = 10
@@ -57,8 +67,8 @@ def parse_arguments():
 
 def download_simon(station: str, output: str = None, plt: bool = False):
     """
-        Downloads IOC tide gauge files
-        Downloads HTML (?????)  and converts it to plain txt with columns!
+        Downloads IOC tide gauge files in json format,
+        converts it to plain txt or csv format
 
         Parameters:
         ___________
@@ -126,7 +136,7 @@ def download_simon(station: str, output: str = None, plt: bool = False):
         sys.exit()
 
     if plt:
-        quickp('PMSL ' + station,obs,sl)
+        quickp('PSMSL ' + station,obs,sl)
 
 
 def main():

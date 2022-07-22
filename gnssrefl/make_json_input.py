@@ -37,12 +37,11 @@ def parse_arguments():
     parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     parser.add_argument("-extension", default=None, type=str, help="Provide extension name so you can try different strategies")
-    parser.add_argument("-query_unr", default=None, type=str, help="set to True if you want to use the Nevada Reno database values (enter 0,0,0 for lat/lon/ht)")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['allfreq', 'l1', 'l2c', 'xyz', 'refraction', 'query_unr']
+    boolean_args = ['allfreq', 'l1', 'l2c', 'xyz', 'refraction']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -53,7 +52,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               h1: float = 0.5, h2: float = 6.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.7, ampl: float = 6.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = None, query_unr: bool = False):
+              extension: str = None ):
     """
             Parameters:
             ___________
@@ -125,9 +124,6 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
                 provide extension name so you can try different strategies.
                 default is None
 
-            query_unr : boolean, optional
-                set to True if you want to use the Nevada Reno database values (enter 0,0,0 for lat/lon/ht)
-                default is False
         """
 
     # make sure environment variables exist
@@ -139,6 +135,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         sys.exit()
 
 # location of the site - does not have to be very good.  within 100 meters is fine
+    query_unr = False
     if lat + long == 0:
         print('Going to assume that you want to use the UNR database.')
         query_unr = True
