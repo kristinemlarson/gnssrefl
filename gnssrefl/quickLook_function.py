@@ -20,7 +20,6 @@ import gnssrefl.rinex2snr as rinex
 
 def read_snr_simple(obsfile):
     """
-    author: Kristine Larson
     input: SNR observation filenames and a boolean for 
     whether you want just the first day (twoDays)
     output: contents of the SNR file, withe various other metrics

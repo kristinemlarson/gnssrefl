@@ -21,6 +21,21 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     snr_type is an integer (99, 66, etc). lsp is a json
 
     check to see if there were any results before sending a plot to the screen
+
+    Parameters
+
+    station: string
+
+    year : integer
+
+    doy : integer
+
+    snr_type : integer
+
+    extension : string
+
+    lsp : dictionary
+        
     """
 
     #   make sure environment variables exist.  set to current directory if not
@@ -176,9 +191,17 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
 
 def set_refraction_params(station, dmjd,lsp):
     """
+    Parameters
+
+    station: string
+        4 character station name
+
+    dmjd : float
+        modified julian date
+
+    lsp : dictionary
+
     called from guts.  pick up refr info
-    inputs are station name, modified julian day, and the 
-    lsp dictionary
     """
     xdir = os.environ['REFL_CODE']
     p = 0; T = 0; irefr = 0
@@ -220,6 +243,11 @@ def local_update_plot(x,y,px,pz,ax1, ax2,failure):
 
 def plot2screen(station, f,ax1,ax2,pltname):
     """
+    Parameter
+
+    station : string
+        4 character station ID
+
     painful painful
     https://www.semicolonworld.com/question/57658/matplotlib-adding-an-axes-using-the-same-arguments-as-a-previous-axes
     """
@@ -240,6 +268,14 @@ def read_json_file(station, extension):
     """
     picks up json instructions for periodogram
     inputs are the station name and an extension (which can just be '')
+
+    Parameter
+
+    station : string
+        4 character station name
+
+    extension : string
+        
     """
     lsp = {} # ???
     instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'

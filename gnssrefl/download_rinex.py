@@ -254,8 +254,6 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             else:
                 print('FAILURE:', rinexfile, ' was not found')
 
-            # g.go_get_rinex_flex(station,year,d,0,rate,archive)
-            # a bit redundant ... but life is short 
             if os.path.isfile(rinexfile) and (strip is True):
                 k.strip_rinexfile(rinexfile)
 

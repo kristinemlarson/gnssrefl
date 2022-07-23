@@ -18,9 +18,16 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 
 def quickp(station,t,sealevel):
     """
-    station name
-    t - time - in datetime format
-    sealevel in meters (relative - not defined in a datum)
+    Parameters
+
+    station : string
+        station name
+
+    t : numpy array in datetime format 
+        time of the sea level observations
+
+    sealevel : numpy array, float 
+        meters (relative - not defined in a datum)
     
     """
     fs = 10
@@ -120,7 +127,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         if output[-3:] == 'csv':
             csv = True
 
-    
+    # set up the address for the API call
     url1 = 'http://www.ioc-sealevelmonitoring.org/service.php?query=data&code='
     url2 = '&format=json'
     newurl = url1 + station + '&timestart=' + date1 + '&timestop=' + date2 + url2

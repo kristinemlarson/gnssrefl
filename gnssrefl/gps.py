@@ -1,6 +1,6 @@
 #!usr/bin/env python
 # -*- coding: utf-8 -*-
-# kristine larson, june 2017
+# kristine larson, more or less, wrote all this code
 # toolbox for GPS/GNSS data analysis
 import datetime
 from datetime import date
@@ -116,16 +116,16 @@ def define_filename(station,year,doy,snr):
 
     Parameters:
 
-    station: string
+    station : string
         name  (4 char lowercase)
 
-    year: integer
+    year : integer
         year
 
-    doy: integer
+    doy : integer
         day of year
 
-    snr: integer
+    snr : integer
         SNR file type (e.g. 99, 66)
 
     output:
@@ -150,13 +150,13 @@ def define_and_xz_snr(station,year,doy,snr):
     station: string
         station name, 4 characters
 
-    year: integer
+    year : integer
         year
 
-    doy: integer
+    doy : integer
         day of year
 
-    snr: integer
+    snr : integer
         kind of snr file (66,77, 88 etc)
 
 
@@ -192,9 +192,22 @@ def define_and_xz_snr(station,year,doy,snr):
 
 def define_filename_prevday(station,year,doy,snr):
     """
-    given station name, year, doy, snr file type
+    Parameters
+
+    station: string
+        4 character station name  
+
+    year: integer
+        year
+
+    doy: integer
+        day of year
+
+    snr: integer
+        SNR file type (66,88, etc)
+
     returns snr filename for the PREVIOUS day
-    fix type for xz
+
     author: Kristine Larson
     """
     xdir = os.environ['REFL_CODE']
@@ -216,7 +229,7 @@ def define_filename_prevday(station,year,doy,snr):
     f= station + cdoy + '0.' + cyy + '.snr' + str(snr)
     fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f 
     fname2 = xdir + '/' + cyyyy + '/snr/' + station + '/' + f + '.xz'
-    #print('snr filename for the previous day is ', fname) 
+
     return fname, fname2
 
 
@@ -297,10 +310,20 @@ def xyz2llh(xyz, tol):
 
 def xyz2llhd(xyz):
     """
-    inputs are station vector xyz (x,y,z in meters), tolerance for convergence is hardwired
-    outputs are lat, lon in degrees and wgs84 ellipsoidal height in meters
+    inputs are 
+
+    station vector xyz (x,y,z in meters), 
+
+    tolerance for convergence is hardwired
+
+    outputs are 
+
+    lat 
+
+    lon in degrees and wgs84 ellipsoidal height in meters
+
     same as xyz2llh but lat and lon outputs are in degrees
-    author : kristine larson
+
     """
     x=xyz[0]
     y=xyz[1]
@@ -332,7 +355,6 @@ def zenithdelay(h):
     h: float
         ellipsoidal (height) in meters
 
-
     """
 
     zd = 0.1 + 2.31*np.exp(-h/7000.0)
@@ -340,9 +362,15 @@ def zenithdelay(h):
 
 def up(lat,lon):
     """
-    author: kristine larson
-    inputs are latitude and longitude of a station in radians
-    returns the up unit vector, and local east and north unit vectdors needed 
+    Parameters
+
+    latitude : float
+        radians
+
+    longitude : float
+        radians
+
+    returns the up unit vector, and local east and north unit vectors needed 
     for azimuth calc.
     """
     xo = np.cos(lat)*np.cos(lon)
@@ -374,7 +402,6 @@ def elev_angle(up, RecSat):
     RecSat is the numpy Cartesian vector that points from receiver 
     to the satellite in meters
     the output is elevation angle in radians
-    author: kristine larson
     """
     ang = np.arccos(np.dot(RecSat,up) / (norm(RecSat)))
     angle = np.pi/2.0 - ang
@@ -442,47 +469,11 @@ def sp3_interpolator(t, tow, x0, y0, z0, clock0):
         # returns xyz, in meters ? and satellite clock in microseconds
         return x*1e3, y*1e3, z*1e3, clock
  
-    
-def readPreciseClock(filename):     
-    """
-    author: kristine larson
-    filename of precise clocks
-    returns prn, time (gps seconds of the week), and clock corrections (in meters)
-    only works for GPS
-    """          
-    StationNFO=open(filename).readlines()
-    c= 299792458 # m/sec
- 
-    nsat = 32 # max number of satellites, for GPS only 
-    k=0
-# this is for 5 second clocks
-    nepochs = 17280
-    prn = np.zeros(nepochs*nsat)
-    t = np.zeros(nepochs*nsat)
-    clockc = np.zeros(nepochs*nsat)
-# reads in the high-rate clock file 
-    for line in StationNFO:
-        if line[0:4] == 'AS G':
-            lines= line[7:60]
-            sat = int(line[4:6])
-            year = int(lines.split()[0])
-            month = int(lines.split()[1])
-            day = int(lines.split()[2])
-            hour = int(lines.split()[3])
-            minutes = int(lines.split()[4])
-            second = float(lines.split()[5])
-            [gw, gpss] = kgpsweek(year, month, day, hour, minutes, second)
-            clock = float(lines.split()[7])
-            prn[k] = sat
-            t[k]=int(gpss)
-            clockc[k]=c*clock
-            k += 1
-    return prn, t, clockc
-
-
 def dec31(year):
     """
-    input: year
+    input: integer
+        year
+
     returns doy for december 31
     """
     today=datetime.datetime(year,12,31)
@@ -492,7 +483,17 @@ def dec31(year):
 
 def ymd2doy(year,month,day):
     """
-    takes in integer year, month, day 
+    Parameters
+
+    year : integer
+        year
+
+    month : integer
+        month
+
+    day : integer
+        day
+
     returns day of year (doy)
     string doy, string year and string (2ch) year
     """
@@ -504,10 +505,20 @@ def ymd2doy(year,month,day):
 
 def rinex_sopac(station, year, month, day):
     """
-    author: kristine larson
-    inputs: station name, year, month, day
     picks up a hatanaka RINEX file from SOPAC - converts to o
     can also be called as station, year, doy, 0
+
+    inputs: 
+
+    station : string
+        4 char station name  
+
+    year : integer
+
+    month : integer
+
+    day : integer
+
     """
     if (day == 0):
         doy = month
@@ -536,11 +547,9 @@ def rinex_sopac(station, year, month, day):
         hatanaka_warning()
 
 
-
 def hatanaka_warning():
     """
     return warning about missing Hatanaka executable
-    author: kristine larson
     """
     print('WARNING WARNING WARNING WARNING')
     print('You are trying to convert Hatanaka files without having the proper')
@@ -549,9 +558,19 @@ def hatanaka_warning():
 
 def rinex_cddis(station, year, month, day):
     """
-    author: kristine larson
-    inputs: station name, year, month, day
-    picks up a hatanaka RINEX file from CDDIS - converts to o
+    picks up a 30 sec hatanaka RINEX 2 file from CDDIS - converts to an o RINEX file
+
+    inputs: 
+
+    station : string
+        name 
+
+    year : integer
+
+    month : integer
+
+    day : integer
+
 
     June 2020, changed  to use secure ftp
     if day is zero, then month is assumed to be doy
@@ -603,10 +622,22 @@ def rinex_cddis(station, year, month, day):
 
 def rinex_bkg(station, year, month, day):
     """
-    author: kristine larson
-    inputs: station name, year, month, day
-    picks up a lowrate RINEX file BKG
-    you can input day =0 and it will assume month is day of year
+    picks up low-rate RINEX 2.11 files from BKG 
+
+    parameters
+
+    station: string
+        4 char station name 
+
+    year: integer
+        year
+
+    month: integer
+        month 
+
+    day: integer
+        day. if zero, it means the month is day of year
+
     """
     crnxpath = hatanaka_version()
     # if doy is input 
@@ -657,15 +688,26 @@ def rinex_bkg(station, year, month, day):
 
 def getnavfile(year, month, day):
     """
-    author: kristine larson
-    given year, month, day it picks up a GPS nav file from SOPAC
+    picks up nav file
     and stores it in the ORBITS directory
-    returns the name of the file,  its directory, and a boolean
+
+    parameter
+
+    year: integer
+
+    month: integer
+        if day is zero, the month value is really the day of year
+
+    day: integer
+        day
+
+    returns:
+
+
     19may7 now checks for compressed and uncompressed nav file
     19may20 now allows day of year input if day is set to zero
     20apr15 check for xz compression
 
-    if the day is zero it assumes month is doy
 
     """
     foundit = False
@@ -705,6 +747,12 @@ def getsp3file(year,month,day):
     inputs are year, month, and day 
     modified in 2019 to use wget 
     returns the name of the file and its directory
+
+    year : integer
+
+    month : integer
+
+    day : integer
 
     20jun14 - add CDDIS secure ftp
     """
@@ -794,6 +842,15 @@ def getsp3file_mgex(year,month,day,pCtr):
     pCtr, the processing center  (3 characters)
     right now it checks for the "new" name, but in reality, it 
     assumes you are going to use the GFZ product
+
+    year : integer
+
+    month : integer
+
+    day : integer
+
+    pCtr : string
+
     20apr15  check for xz compression
 
     20jun14 add CDDIS secure ftp. what a nightmare
@@ -915,6 +972,17 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     tries to download a file from a directory at CDDIS
     file2 is like this: GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz
     it then stores it the year directory (with a given name)
+
+    name : string
+
+    year : integer
+
+    secure_file : string
+ 
+    secure_dir : string
+
+    file2 : string
+
     """
     foundit = False
     print(secure_dir, secure_file)
@@ -928,6 +996,7 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
         ok = 1
 
     return foundit
+
 def kgpsweek(year, month, day, hour, minute, second):
     """
     inputs are year (4 char), month, day, hour, minute, second
@@ -956,6 +1025,7 @@ def kgpsweek(year, month, day, hour, minute, second):
     GPS_sec_wk=np.rint( ( ((JD-2444244.5)/7)-GPS_wk)*7*24*3600)            
      
     return GPS_wk, GPS_sec_wk
+
 def kgpsweekC(z):
     """
     takes in time tag from a RINEX file and converts to gps week/sec
@@ -974,7 +1044,12 @@ def kgpsweekC(z):
 
 def igsname(year,month,day):
     """
-    take in year, month, day
+    year : integer
+
+    month : integer
+
+    day : integer 
+
     returns IGS sp3 filename and COD clockname (5 sec)
     author: kristine larson
     """
@@ -987,9 +1062,10 @@ def igsname(year,month,day):
     clockname = 'cod' + dd + '.clk_05s'
 
     return name, clockname
+
 def read_sp3(file):
     """
-    borrowed from Ryan Hardy, who got it from David Wiese
+    borrowed from Ryan Hardy, who got it from David Wiese ... 
     """
     try:      
         f = open(file)
@@ -1129,6 +1205,7 @@ def findConstell(cc):
         out = 300
         
     return out
+
 def myscan(rinexfile):
     """
     stripping the header code came from pyrinex.  
@@ -1262,43 +1339,6 @@ def myscan(rinexfile):
     obs =  dict(zip(tuple(newheader.split('\t')), table.T))
     return obs,x,y,z
 
-def geometric_rangePO(secweek, prn, rrec0, sweek, ssec, sprn, sx, sy, sz, sclock):
-    """
-    Calculates and returns geometric range (in metres) given
-    time (week and sec of week), prn, Cartesisan 
-    receiver coordinates rrec0(meters)
-    using the precise ephemeris instead of the broadcast
-    returns clock correction (clockC) in meters
-    Author: Kristine Larson, May 2017
-    June 21, 2017 returns transmit time (in seconds) so I can calculate
-    relatistic correction
-    """
-    error = 1
-    # find the correct sp3 data for prn
-    m = [sprn==prn]
-    nx,ny,nz,nc = sp3_interpolator(secweek, ssec[m], sx[m], sy[m], sz[m], sclock[m]) 
-    SatOrb = np.array([nx[0],ny[0],nz[0]])
-    geo=norm(SatOrb-rrec0)
-    c=constants.c
-    clockC = nc*1e-6*c
-    oE = constants.omegaEarth
-    deltaT = norm(SatOrb - rrec0)/constants.c
-    ij=0
-    while error > 1e-16:  
-        nx,ny,nz,nc = sp3_interpolator(secweek-deltaT, ssec[m], sx[m], sy[m], sz[m], sclock[m]) 
-        SatOrb = np.array([nx[0],ny[0],nz[0]])
-#        SatOrb, relcorr = propagate(week, secweek-deltaT, closest_ephem)
-        Th = -oE * deltaT
-        xs = SatOrb[0]*np.cos(Th)-SatOrb[1]*np.sin(Th)
-        ys = SatOrb[0]*np.sin(Th)+SatOrb[1]*np.cos(Th)
-        SatOrbn = [xs, ys, SatOrb[2]]
-        geo=norm(SatOrbn-rrec0)
-        deltaT_new = norm(SatOrbn-rrec0)/constants.c               
-        error = np.abs(deltaT - deltaT_new)
-        deltaT = deltaT_new
-        ij+=1
-    #    print(ij)
-    return geo,SatOrbn,clockC, deltaT
 def read_files(year,month,day,station):
     """
     """   
@@ -1370,44 +1410,6 @@ def read_files(year,month,day,station):
         f.close()
         
     return ephemdata, prns, ts, clks, sweek, ssec, sprn, sx, sy,sz,sclock,obs,x,y,z
-def precise_clock(prn,prns,ts,clks,gps_seconds):
-    """
-    input prn and gps_seconds, and contents of precise clock file,
-    i think.
-    units of returned variable are?
-    """
-    m = [prns == prn]
-    preciset = ts[m]
-    precisec = clks[m]
-#   trying to interpolate
-# could do this much faster ...
-    clockf = interp1d(preciset, precisec, bounds_error=False)
-    scprecise = clockf(gps_seconds)
-    return scprecise
-def precise_clock_test(ttags, prns,ts,clks):
-    """
-    input timetags (gps seconds of the week)
-    and precise clock values.returns interpolated values
-    units of returned variable are?
-    """
-    NP = len(ttags)
-    print('number of time tags', NP)
-    newclks = np.zeros((NP, 32))
-    for i in range(32): 
-        prn = i+1
- #        print('checking', prn)
-        m = [prns == prn]
-        [nr,nc]=np.shape(m)
- #       print(nr,nc)
-        preciset = ts[m]
-        precisec = clks[m]
-        clockf = interp1d(preciset, precisec, bounds_error=False)
-        k=0
-        for t in ttags:
-            newclks[k,i]= clockf(t)
-            k +=1
-#        print(prn, numrows, numcols)
-    return newclks
 
 def propagate(week, sec_of_week, ephem):
     """
@@ -1462,34 +1464,6 @@ def propagate(week, sec_of_week, ephem):
     relcorr = F*ecc*sqrta*np.sin(Ek)
 #    return [xk, yk, zk], relcorr
     return [xk[0], yk[0], zk[0]], relcorr
-
-def mygeometric_range(week, secweek, prn, rrec0, closest_ephem):
-    """
-    Calculates and returns geometric range (in metres) given
-    time (week and sec of week), prn, receiver coordinates (cartesian, meters)
-    this assumes someone was nice enough to send you the closest ephemeris
-    returns the satellite coordinates as well, so you can use htem
-    in the A matrix
-    Kristine Larson, April 2017
-    """
-    error = 1
-
-    SatOrb, relcorr = propagate(week, secweek, closest_ephem)
-    # first estimate of the geometric range
-    geo=norm(SatOrb-rrec0)
-
-    deltaT = norm(SatOrb - rrec0)/constants.c
-    while error > 1e-16:     
-        SatOrb, relcorr = propagate(week, secweek-deltaT, closest_ephem)
-        Th = -constants.omegaEarth * deltaT
-        xs = SatOrb[0]*np.cos(Th)-SatOrb[1]*np.sin(Th)
-        ys = SatOrb[0]*np.sin(Th)+SatOrb[1]*np.cos(Th)
-        SatOrbn = [xs, ys, SatOrb[2]]
-        geo=norm(SatOrbn-rrec0)
-        deltaT_new = norm(SatOrbn-rrec0)/constants.c               
-        error = np.abs(deltaT - deltaT_new)
-        deltaT = deltaT_new
-    return geo,SatOrbn
 
 
 def readobs(file,nepochX):
@@ -1589,138 +1563,10 @@ def readobs(file,nepochX):
     format = tuple(np.concatenate((('%02i', '%4i', '%11.7f'), 
 							((0, ntypes+3)[-1]-3)*['%14.3f'])))
     # kinda strange - but ok - format statemenst for PRN, week, sec of week, etc
-#    print(format)
-# I guess it is making a super observable so that it can later be parsed.
-# very strange 
     obs =  dict(zip(tuple(header.split('\t')), table.T))
 
     return np.array([x0,y0,z0]),obs
   
-def readobs2(file,nepochX):
-    """
-    inputs: filename and number of epochs from the RINEX file you want to unpack
-    returns: receiver Cartesian coordinates (meters) and observation blocks
-    Kristine Larson, April 2017
-    18aug20: updated so that 0,0,0 is returned if there are no receiver coordinates
-    18aug21: version to include Glonass satellites etc
-    """
-    f = open(file, 'r')
-    obs = f.read()
-    f.close()
-    testV = obs.split('APPROX POSITION XYZ')[0].split('\n')[-1].split()
-#   set default receiver location values,              
-    x0=0
-    y0=0
-    z0=0
-    if len(testV) == 3:
-        x0, y0, z0 = np.array(obs.split('APPROX POSITION XYZ')[0].split('\n')[-1].split(), 
-							dtype=float)
-    types = obs.split('# / TYPES OF OBSERV')[0].split('\n')[-1].split()[1:]
-    print(types)
-    tfirst =  obs.split('TIME OF FIRST OBS')[0].split('\n')[-1].split()
-    print(tfirst)
-    ntypes = len(types)
-	#Identify unique epochs
-    countstr = '\n '+tfirst[0][2:]+' '+'%2i' % np.int(tfirst[1])+' '+'%2i' % np.int(tfirst[2])
-    print(countstr) # so this is 07 10 13, e.g.
-    # figures out how many times this string appears between END OF HEADER and end of file
-    nepoch = obs.split('END OF HEADER')[1].count(countstr)
-    
-    table = np.zeros((0, ntypes+3))
-	#Identify kinds of observations in the file
-    header = 'PRN\tWEEK\tTOW'
-    t0 = 0
-    for i in range(ntypes):
-        header += '\t'+types[i]
-    l = 0
-#    print('countstr',countstr[0])
-    print('header', header)
-    epochstr_master = re.split(countstr, obs)
-    print('number of data epochs in the file', nepoch)
-    # only unpack a limited number of epochs    #nepoch = 5
-    print('restricted number of epochs to be read ', nepochX)
-    for i in range(nepochX):
-#       clear satarray
-        satarray = []
-        epochstr = epochstr_master[i+1]        
-        print(epochstr[21:23])
-#       this is now the number of satellites properly read from the epochstr variable
-        nprn = int(epochstr[21:23])
-        print('Epochstr number of satellites',nprn)
-        # this will only work with new rinex files that use G as descriptor
-        for jj in range(nprn):
-            i2 = 26+jj*3
-            i1 = i2-3 
-            satName = epochstr[i1:i2] 
-            print(satName)
-            if satName[0] == 'R':
-#               found glonass
-                list.append(satarray, 100+int(satName[1:3]))
-            else:
-#               assume rest are GPS for now
-                list.append(satarray, int(satName[1:3]))
-            print(satarray)
-        prnstr = re.findall(r'G\d\d|G \d', epochstr.split('\n')[0])
-        
-        print(nprn, prnstr)
-        if nprn > 12:
-           # add the commant to read next line
-           print('read next line of satellite names')
-        # append
-        table = np.append(table, np.zeros((nprn, ntypes+3)), axis=0)
-        # decode year, month, day hour, minute ,second
-        # convert 2 char to 4 char year
-        # but it appears that the year and month and day 
-        # are being hardwired from the header, which is both  very very odd
-        # and stupid
-        year = int(tfirst[0])
-        month = int(tfirst[1])
-        day = int(tfirst[2])
-        hour = int(epochstr.split()[0])
-        minute = int(epochstr.split()[1])
-        second = float(epochstr.split()[2])
-        print(year, month, day, hour, minute, second)
-        week, tow = kgpsweek(year, month, day, hour, minute, second)
-        print('reading week number ', week, 'sec of week', tow)
-#       now you are saving the inforamtion to the table variable
-        table[l:l+nprn, 1] = week
-        table[l:l+nprn,2] = tow
-        for j in range(nprn):
-#            store this satellite
-            print(j, satarray[j])
-#            table[l+j, 0] = np.int(prnstr[j][1:])
-# try this - using new definition of observed satellite
-            table[l+j, 0] = satarray[j]
-            # split up by end of line markers, which makes sense
-#            print('something',2*j+1)
-            line0 = epochstr.split('\n')[2*j+1]#.split()
-            line = re.findall('.{%s}' % 16, line0+' '*(80-len(line0)))
-# this seems to get strings of a certain width, which he will later change 
-#through float# also where he made his mistake on reading last two characters 
-#            print(j,len(line), line)
-
-            for k in range(len(line)):
-                if line[k].isspace():
-                    table[l+j, 3+k] = np.nan
-                    continue
-                table[l+j, 3+k] = np.float(line[k][:-2])
-#                print(table[l+j,3+k])
-                # if more than 5 observaitons, he has to read the next line
-            if ntypes > 5:
-                line2 = epochstr.split('\n')[2*j+2].split()
-#                print(line2)
-                for k in range(len(line2)):
-                    table[l+j, 3+len(line)+k] = np.float(line2[k][:-2])
-        l += nprn	
-    format = tuple(np.concatenate((('%02i', '%4i', '%11.7f'), 
-							((0, ntypes+3)[-1]-3)*['%14.3f'])))
-    # kinda strange - but ok - format statemenst for PRN, week, sec of week, etc
-#    print(format)
-# I guess it is making a super observable so that it can later be parsed.
-# very strange 
-    obs =  dict(zip(tuple(header.split('\t')), table.T))
-
-    return np.array([x0,y0,z0]),obs
 
 def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
     """
@@ -1823,7 +1669,6 @@ def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
 
 def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satNu,pfitV,pele,screenstats):
     """
-    author kristine m. larson
     also calculates the scale factor for various GNNS frequencies.  currently
     returns meanTime in UTC hours and mean azimuth in degrees
     cf, which is the wavelength/2
@@ -4681,7 +4526,14 @@ def rinex_unavco(station, year, month, day):
     but if it does not work, it tries the "d" version, which must be
     decompressed.  the location of this executable is defined in the crnxpath
     variable. 
-    year, month, and day are INTEGERS
+
+    station: string 
+
+    year : integer
+
+    month : integer
+
+    day: integer
 
     WARNING: only rinex version 2.11 in this world
 
@@ -4732,7 +4584,7 @@ def rinex_unavco(station, year, month, day):
 def avoid_cddis(year,month,day):
     """
     work around for people that can't use CDDIS ftps
-    this will get multi-GNSS files for GFZ from IGN
+    this will get multi-GNSS files for GFZ from the IGN
     """
     fdir = os.environ['ORBITS'] + '/' + str(year) + '/sp3/'
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
@@ -4834,6 +4686,14 @@ def rinex_jp(station, year, month, day):
     2021oct25
     Picks up RINEX file from Japanese GSI GeoNet archive
     URL : https://www.gsi.go.jp/ENGLISH/index.html
+
+    station : string
+
+    year : integer
+
+    month: integer
+
+    day : integer
     """
     fdir = os.environ['REFL_CODE']
     if not os.path.isdir(fdir):
@@ -4970,6 +4830,12 @@ def rinex_ga_highrate_rinex3(station9ch, year,doy,stream ):
     """
     author: kristine larson
     inputs: station name, year, month, day
+
+    year : integer
+
+    doy : integer
+
+    stream : string
     picks up a higrate RINEX file from Geoscience Australia
     you can input day =0 and it will assume month is day of year
     not sure if it merges them ...
@@ -4979,17 +4845,17 @@ def rinex_ga_highrate_rinex3(station9ch, year,doy,stream ):
 
     Remote working directory: /rinex/highrate/2021/002
 
-ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_01S_MO.crx.gz"
+    ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_01S_MO.crx.gz"
 
     """
     s1=time.time()
     crnxpath = hatanaka_version()
     gexe = gfz_version()
     if not os.path.isfile(crnxpath):
-        print('No CRX2RNX, no files for you')
+        print('No CRX2RNX, so no files for you')
         return
     if not os.path.isfile(gexe):
-        print('No gfzrnx, no files for you')
+        print('No gfzrnx, so no files for you')
         return
     stationUp = station9ch.upper()
     streamID = '_' + stream + '_'
@@ -4999,7 +4865,7 @@ ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_0
     rinex2name = station9ch[0:4].lower() + cdoy + '0.' + cyyyy[2:4] + 'o'
     print(rinex2name)
     gobbleygook = myfavoriteobs()
-    gobblygook = 'G:S1C,S2X,S2L,S2S,S5'
+    #gobblygook = 'G:S1C,S2X,S2L,S2S,S5'
 
 
     gns = 'ftp://ftp.data.gnss.ga.gov.au/highrate/' + cyyyy + '/' + cdoy + '/'
@@ -5035,11 +4901,25 @@ ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_0
 
 def rinex_nrcan_highrate(station, year, month, day):
     """
-    author: kristine larson
-    inputs: station name, year, month, day
+    picks up 1-Hz RINEX 2.11 files from NRCAN
+
+    _________________________
+    parameters
+
+    station: string
+        4 character station name
+
+    year: integer
+        year
+
+    month: integer
+        month or day of year if day is set to zero
+
+    day: integer
+        day
+
     picks up a higrate RINEX 2.11 file from NRCAN
-    you can input day =0 and it will assume month is day of year
-    not sure if it merges them ...
+
     2020 September 2 - moved to gz and new ftp site
     2022 february changed so it could use gfzrnx instead of teqc
 
@@ -5152,12 +5032,11 @@ def translate_dates(year,month,day):
 
 def bfg_password():
     """
-    author: kristine larson
-    2022 july 12
     Picks up BFG userid and password that is stored in a pickle file
-    or asks you to input the values and stores them for you
+    or it asks you to input the values and stores them for you.
 
     returns: userid and password
+    2022 july 12
     """
 
     fdir = os.environ['REFL_CODE']
@@ -5192,13 +5071,12 @@ def bfg_password():
 
 def bfg_data(fstation, year, doy, samplerate=30,debug=False):
     """
-    author: kristine larson
     Picks up RINEX3  file from BFG network
 
     Parameters: 
 
     fstation: string
-        4 char station
+        4 char station ID
 
     year: integer
         year
@@ -5280,36 +5158,4 @@ def inout(c3gz):
         subprocess.call(['rm','-f',c3])
 
     return translated, rnx
-
-            # get JAXA orbits from IGN
-            # this is pretty slow, so turning it off
-            #if pCtr == 'jax':
-                #dirlocation_IGN = 'ftp://igs.ensg.ign.fr/pub/igs/products/mgex/' + str(gps_week) + '/'
-                #foundit = ign_orbits(file2, dirlocation_IGN,year)
-#def satclock(week, epoch, prn, closest_ephem):
-#    """
-#    author: kristine larson, unknown date
-#    integer inputs: gps week, second of week, satellite number (PRN)
-#    and broadcast ephemeris. 
-#    note: although second order correction exists, it is not used  
-#
-#    returns clock correction in  meters
-#    """
-#    # what is sent should be the appropriate ephemeris for given
-#    # satellite and time
-#    prn, week, Toc, Af0, Af1, Af2, IODE, Crs, delta_n, M0, Cuc,\
-#    ecc, Cus, sqrta, Toe, Cic, Loa, Cis, incl, Crc, perigee, radot, idot,\
-#    l2c, week, l2f, sigma, health, Tgd, IODC, Tob, interval = closest_ephem
-#
-#    correction = (Af0+Af1*(epoch-Toc))*constants.c
-#    return correction[0]
-
-#def year_twoch(year):
-#    """
-#    why why why did RINEX allow year to be two characters?
-#    """
-#    cyear = str(year)
-#    cyy = cyear[2:4]
-#
-#    return cyy
 

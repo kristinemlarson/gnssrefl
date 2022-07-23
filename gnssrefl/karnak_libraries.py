@@ -57,7 +57,19 @@ def swapRS(stream):
 
 def just_bkg(cyyyy, cdoy, file_name):
     """
+
     looks for bkg files - 
+
+    parameters
+
+    cyyyy:  string
+        four character year
+
+    cdoy: string
+        three character day of year
+
+    file_name: string
+        expected filename
     """
     dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cyyyy + '/' + cdoy + '/'
     dir2 = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
@@ -175,11 +187,18 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
 def filename_plus(station9ch,year,doy,srate,stream):
     """
     function to create RINEX 3 filenames.
+
+    parameters:
+
     inputs:
     station9ch - 9 character station name
+
     year - integer
+
     doy - day of year, integer
+
     srate - receiver sample rate, integer
+
     stream = character - either R or S. The latter means the file was streamed.
 
     output: compliant filename with crx.gz on the end as this is how the files 
@@ -224,9 +243,13 @@ def universal_all(station9ch, year, doy, srate,stream):
     function to check multiple archives for RINEX 3 data
     inputs:
     9 character station name
+
     year - integer
+
     doy - doy of year, integer
+
     srate - receiver sample rate, integer
+
     stream -  R or S
     """
     foundit = False
@@ -247,7 +270,12 @@ def universal_all(station9ch, year, doy, srate,stream):
 def rinex2names(station,year,doy):
     """
     inputs: 
-    station year and doy
+
+    station 
+
+    year 
+
+    doy
 
     outputs:
     hatanaka rinex2 names  (ends in d)
@@ -368,7 +396,12 @@ def universal_rinex2(station, year, doy, archive):
 
 def make_rinex2_ofiles(file_name):
     """
-    take a rinex2 downloads, decompress,hatanaka ...
+    take a rinex2 file, decompress,hatanaka ...
+
+    Parameter:
+
+    file_name: string
+
     """
     if (file_name[-1:] == 'Z'):
         subprocess.call(['uncompress', file_name])
@@ -410,6 +443,8 @@ def strip_rinexfile(rinexfile):
         fout.close()
         subprocess.call(['rm','-f',rinexfile])
         subprocess.call(['mv','-f',foutname, rinexfile])
+    else:
+        print('I do not have the teqc executable, so nothing has been done')
 
 def gsi_data(station,year,doy):
     """
@@ -426,6 +461,24 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
     kluge to download highrate data since i have revamped the rinex2 code
     strip_snr is boolean as to whether you want to strip out the non-SNR data
     it can be slow with highrate data. it requires gfzrnx
+
+    Parameters:
+    ___________
+
+    station: string
+         4 character station ID.  lowercase
+
+    year: integer
+        year
+
+    doy: integer
+        day of year
+
+    archive: string
+
+    strip_snr: boolean
+
+
     """
     foundit = False
     d = g.doy2ymd(year,doy);

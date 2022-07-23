@@ -16,16 +16,38 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slevel,csv):
     """
     downloads/writes data within one year
-    inputs:
-    station
+
+    Parameters
+
+    station : string
+
+    year : integer
+
+    month1 : integer
+
+    month2 : integer
+
+    datum : string
+
+    metadata : boolean
+
+    tt : numpy array 
+        modified julian date for water measurements
+
+    obstimes : numpy array
+
+    slevel : numpy array
+
+    csv : boolean
+        True if csv output wanted
+        default is False
+
+
     fout - fileID for writing the results
     year that you want to write out
     month1 and month2 are the starting and ending months
     metadata = boolean to decide whether to write the metadata to the screen
     tt - MJD
-    obstimes - datetime
-    slevel - water level in meters
-    csv - boolean, whether csv or not (plain text is csv being false)
 
     """
     cyyyy = str(year)
@@ -56,12 +78,21 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
 
 def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
     """
-    inputs are:
-    station
-    datum
+    downloads NOAA measurements > one month
+
+
+    Parameters:
+
+    station : string
+
+    datum : string
+
     fout - fileID for writing results
+
     year1, month1 start time (i will assume first of this month)
+
     year2, month2 end time  (i will assume end of this month)
+
     csv - boolean for output format
 
     returns:
