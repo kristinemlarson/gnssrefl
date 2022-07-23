@@ -264,8 +264,7 @@ gauge data given a station number (7 characters), and begin/end dates, e.g.
 but this utility writes out a file with only columns of 
 numbers (or csv if you prefer). To implement the latter, use csv as the ending 
 of your output filename.
-This can also be called
-as <code>download_noaa</code>; there is an optional plot produced with -plt T.
+This can also be called as <code>download_noaa</code>; there is an optional plot produced with -plt T.
 
 <code>download_psmsl</code> downloads sealevel files from the 
 [Permanent Service for Mean Sea Level](https://www.psmsl.org/data/gnssir/map.php). 
@@ -280,14 +279,15 @@ You can pick the sensor type or you will get all of them.
 There is an optional plot produced with -plt T.
 
 <code>query_unr</code> returns latitude, longitude, and ellipsoidal height and Cartesian position 
-for stations that were in the Nevada Reno database as of Octoner 2021. Coordinates are now more precise 
+for stations that were in the Nevada Reno database as of October 2021. Coordinates are now more precise 
 than they were originally (UNR used to provide four decimal points in lat/long). 
 
 <code>check_rinex</code> returns simple information from the file header, such as receiver
 and antenna type, receiver coordinates, and whether SNR data are in the file. RINEX 2.11 only
 
 <code>prn2gps</code> will try to tell you which PRN numbers are associated with which SVN (or GPS) numbers 
-for a given day, as in <code>prn2gps 2021-01-01</code>. It uses the public [JPL](https://sideshow.jpl.nasa.gov/pub/gipsy_products/gipsy_params/PRN_GPS.gz) translation file, so if that file
+for a given day, as in <code>prn2gps 2021-01-01</code>. 
+It uses the public [JPL](https://sideshow.jpl.nasa.gov/pub/gipsy_products/gipsy_params/PRN_GPS.gz) translation file, so if that file
 is no good, the translation will also be no good.  
 
 <HR>
@@ -295,7 +295,6 @@ is no good, the translation will also be no good.
 ### GNSS-IR Community <a name="weneedhelp"></a>
 
 **We need help to maintain and improve this code. How can you help?**
-
 
 - Archives are *constantly* changing their file transfer protocols. If you 
 find one in <code>gnssrefl</code> that doesn't work anymore,
@@ -369,7 +368,6 @@ python/packaging questions and improved our docker distribution.
 - Dave Purnell added the <code>invsnr</code> capability.  
 - Carolyn Roesler helped with the original Matlab codes.
 - Felipe Nievinski and Simon Williams have provided significant advice for this project.
-
 
 Kristine M. Larson
 
