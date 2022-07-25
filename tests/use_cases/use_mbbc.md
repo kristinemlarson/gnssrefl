@@ -17,18 +17,18 @@ Station name: MBBC
 [**Nevada Reno**](http://geodesy.unr.edu/NGLStationPages/stations/MBBC.sta)
 <P>
 
-**Use the Reflection Zone webapp**
+**Evalute the Site**
 
+The first thing you want to do is determine whether it is possible to see the lake from your site.
 [I initially input a RH value of 20 meters and default elevation angles to get you started.](http://gnss-reflections.org/rzones?station=mbbc&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=1&azim1=0&azim2=360&system=gps). 
-Do the reflection zones hit the surface of the lake? Iterate on 
-both of the RH and elevation angles until 
+Do the reflection zones hit the surface of the lake? Iterate on both of the RH and elevation angles until 
 your ellipses overlap the lake. Then put in azimuth restrictions.
 
-Please keep in mind, this would not work at all with 30 sec data sampling. This only works because UNAVCO 
-was using a 15 second data rate at MBBC. If you want to check out the Nyquist, please click the 
-aprpropriate button on the reflection zone page.
+Please keep in mind, GNSS-IR would not work at all at this site with 30 sec data sampling. This only works 
+because the MBBC receviver was using a 15 second data rate. If you want to check out the interplay 
+between sampling rates, RH, and the Nyquist, please click the appropriate button on the reflection zone webapp.
 
-**Translate Data and Evaluate the Site**
+**Translate Data and Check Validity of our initial Evaluation**
 
 <code>rinex2snr mbcc 2021 1 -archive unavco</code>
 
@@ -61,7 +61,8 @@ Step 1: Run <code>make_json_input</code> using the information I discussed earli
 - allow L1 and L2 
 - since MBBC is in the Nevada Reno database, you do not have to provide lat/lon/ht. Simply put 0,0,0 for those entries.
 
-Note: I usually tell people to use L2C instead of L2. This information is not available in this dataset - either because the PIs did not track L2C or because it is not provided by UNAVCO.
+Note: I usually tell people to use L2C instead of L2. This information is not available in this 
+dataset - either because the PIs chose not to track L2C or because it is not being provided by UNAVCO.
 
 Step 2: Make SNR files using <code>rinex2snr</code>. 
 
@@ -69,12 +70,13 @@ Step 3: Compute reflector heights
 
 <code>gnssir mbbc 2018 1 -year_end 2021 -doy_end 100</code> 
 
-Step 4: Use <code>daily_avg</code> to create a daily average RH. Play with the inputs (median filter value, number of required RH to compute a reliable average) to make sure 
+Step 4: Use <code>daily_avg</code> to create a daily average RH. Play with the 
+inputs (median filter value, number of required RH to compute a reliable average) to make sure 
 that you have a high quality results. 
 
 <p align=center>
 <img src=mbbc-rh.png>
-
+<p>
 
 [Simon Williams and the Permanent Service for Mean Sea Level has analyzed this full dataset](https://www.psmsl.org/data/gnssir/site.php?id=10318)
 
