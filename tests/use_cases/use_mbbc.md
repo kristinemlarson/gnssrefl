@@ -3,13 +3,7 @@
 Station name: MBBC
 
 <P align=center>
-<table>
-<tr>
-<td>
-<img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=350> </Td>
-<td><img src=mbbc-locale.png width=150></td>
-</tr>
-</table>
+<img src=mbbc-three.png>
 <P>
 
 **Latitude:** -11.2736 degrees
@@ -34,13 +28,11 @@ Please keep in mind, this would not work at all with 30 sec data sampling. This 
 was using a 15 second data rate at MBBC. If you want to check out the Nyquist, please click the 
 aprpropriate button on the reflection zone page.
 
-**Pick Up Some Data**
+**Translate Data and Evaluate the Site**
 
 <code>rinex2snr mbcc 2021 1 -archive unavco</code>
 
 Note that we do not have to select multi-GNSS orbits as this site is only collecting GPS data.
-
-**Evaluate the Reflection Data**
 
 Based on the reflection app, what kind of RH, azimuth, and elevation angle limits are appropriate? 
 
