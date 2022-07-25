@@ -28,6 +28,8 @@
 
 * [Lake Mathews](use_cases/use_mat2.md) (mat2)
 
+* [Lake Malawi](use_cases/use_mbbc.md) (mbbc)
+
 </TD>
 </TR>
 <TR>
