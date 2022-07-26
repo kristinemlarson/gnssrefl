@@ -4,13 +4,7 @@
 Station name: MBBC
 
 <P align=center>
-<table>
-<tr>
-<td>
-<img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/MBBC.jpg width=350> </Td>
-<td><img src=mbbc-locale.png width=150></td>
-</tr>
-</table>
+<img src=mbbc-three.png>
 <P>
 
 **Latitude:** -11.2736 degrees
