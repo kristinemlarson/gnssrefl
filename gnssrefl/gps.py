@@ -232,23 +232,8 @@ def define_filename_prevday(station,year,doy,snr):
 
     return fname, fname2
 
-
-
-def ionofree(L1, L2):
-    """
-    input are L1 and L2 observables (either phase or pseudorange, in meters)
-    output is L3 (meters)
-    author: kristine larson
-    """
-    f1 = constants.fL1
-    f2 = constants.fL2
-    
-    P3 = f1**2/(f1**2-f2**2)*L1-f2**2/(f1**2-f2**2)*L2
-    return P3
-
 def azimuth_angle(RecSat, East, North):
     """
-    kristine larson
     inputs are receiver satellite vector (meters)
     east and north unit vectors, computed with the up vector
     returns azimuth angle in degrees
@@ -742,7 +727,6 @@ def getnavfile(year, month, day):
 
 def getsp3file(year,month,day):
     """
-    author: kristine larson
     retrieves IGS sp3 precise orbit file from CDDIS
     inputs are year, month, and day 
     modified in 2019 to use wget 
@@ -790,7 +774,6 @@ def getsp3file(year,month,day):
 def getsp3file_flex(year,month,day,pCtr):
     """
     author: kristine larson
-    retrieves sp3 orbit files from CDDIS
     inputs are year, month, and day  (integers), and 
     pCtr, the processing center  (3 characters)
     returns the name of the file and its directory
@@ -863,7 +846,6 @@ def getsp3file_mgex(year,month,day,pCtr):
     22jul12 good lord - issues with the try command
     this is spaghetti code, i apologize
 
-    author: kristine larson
 
     """
     foundit = False
@@ -1001,7 +983,6 @@ def kgpsweek(year, month, day, hour, minute, second):
     """
     inputs are year (4 char), month, day, hour, minute, second
     outputs: gps week and second of the week
-    author: kristine larson
     modified from a matlab code
     """
 
@@ -1031,7 +1012,6 @@ def kgpsweekC(z):
     takes in time tag from a RINEX file and converts to gps week/sec
     so the input is a character string of length 26.  in this 
     kind of string, the year is only two characters
-    author: kristine larson
     """
     y= np.int(z[1:3])
     m = np.int(z[4:6])
@@ -1051,7 +1031,7 @@ def igsname(year,month,day):
     day : integer 
 
     returns IGS sp3 filename and COD clockname (5 sec)
-    author: kristine larson
+
     """
     [wk,sec]=kgpsweek(year,month,day,0,0,0)
     x=int(sec/86400)
@@ -1161,7 +1141,6 @@ def myfindephem(week, sweek, ephem, prn):
 # ephemerides and PRN number
 # returns the closest ephemeris block after the epoch
 # if one does not exist, returns the first one    
-    author: kristine larson
 """
     t = week*86400*7+sweek
 # defines the TOE in all the ephemeris 
@@ -1190,10 +1169,15 @@ def myfindephem(week, sweek, ephem, prn):
 
 def findConstell(cc):
     """
-    input is one character (from rinex satellite line)
+    cc : string  is one character (from rinex satellite line)
+        constellation definition
+        G : GPS
+        R : Glonass
+        E : Galileo
+        C : Beidou
+
     output is integer added to the satellite number
     0 for GPS, 100 for Glonass, 200 for Galileo, 300 for everything else?
-    author: kristine larson, GFZ, April 2017
     """
     if (cc == 'G' or cc == ' '):
         out = 0
@@ -1418,7 +1402,6 @@ def propagate(week, sec_of_week, ephem):
     returns the x,y,z, coordinates of the satellite 
     and relativity correction (also in meters), so you add,
     not subtract
-    Kristine Larson, April 2017
 
     """
 
@@ -1465,108 +1448,6 @@ def propagate(week, sec_of_week, ephem):
 #    return [xk, yk, zk], relcorr
     return [xk[0], yk[0], zk[0]], relcorr
 
-
-def readobs(file,nepochX):
-    """
-    inputs: filename and number of epochs from the RINEX file you want to unpack
-    returns: receiver Cartesian coordinates (meters) and observation blocks
-    Kristine Larson, April 2017
-    18aug20: updated so that 0,0,0 is returned if there are no receiver coordinates
-    """
-    f = open(file, 'r')
-    obs = f.read()
-    f.close()
-    testV = obs.split('APPROX POSITION XYZ')[0].split('\n')[-1].split()
-#   set default receiver location values,              
-    x0=0
-    y0=0
-    z0=0
-    if len(testV) == 3:
-        x0, y0, z0 = np.array(obs.split('APPROX POSITION XYZ')[0].split('\n')[-1].split(), 
-    
-							dtype=float)
-    types = obs.split('# / TYPES OF OBSERV')[0].split('\n')[-1].split()[1:]
-    print(types)
-    tfirst =  obs.split('TIME OF FIRST OBS')[0].split('\n')[-1].split()
-    print(tfirst)
-    ntypes = len(types)
-	#Identify unique epochs
-    countstr = '\n '+tfirst[0][2:]+' '+'%2i' % np.int(tfirst[1])+' '+'%2i' % np.int(tfirst[2])
-    print(countstr) # so this is 07 10 13, e.g.
-    # figures out how many times this string appears between END OF HEADER and end of file
-    nepoch = obs.split('END OF HEADER')[1].count(countstr)
-    
-    table = np.zeros((0, ntypes+3))
-	#Identify kinds of observations in the file
-    header = 'PRN\tWEEK\tTOW'
-    t0 = 0
-    for i in range(ntypes):
-        header += '\t'+types[i]
-    l = 0
-#    print('countstr',countstr[0])
-    print('header', header)
-    epochstr_master = re.split(countstr, obs)
-    print('number of data epochs in the file', nepoch)
-    # only unpack a limited number of epochs    #nepoch = 5
-    print('restricted number of epochs to be read ', nepochX)
-    for i in range(nepochX):
-        epochstr = epochstr_master[i+1]        
-        # this will only work with new rinex files that use G as descriptor
-# this only finds GPS!
-        prnstr = re.findall(r'G\d\d|G \d', epochstr.split('\n')[0])
-        print(prnstr)
-#        print('prnstr', prnstr)
-        # number of satellites for an observation block
-        # this code won't work if there are more than 12 satellites (i think)
-        nprn = len(prnstr)
-        # append
-        table = np.append(table, np.zeros((nprn, ntypes+3)), axis=0)
-        # decode year, month, day hour, minute ,second
-        # convert 2 char to 4 char year
-        # but it appears that the year nad month and day 
-        # are being hardwired from the header, which is both  very very odd
-        # and stupid
-        year = int(tfirst[0])
-        month = int(tfirst[1])
-        day = int(tfirst[2])
-        hour = int(epochstr.split()[0])
-        minute = int(epochstr.split()[1])
-        second = float(epochstr.split()[2])
-        print(year, month, day, hour, minute, second)
-        week, tow = kgpsweek(year, month, day, hour, minute, second)
-        print('reading week number ', week, 'sec of week', tow)
-        table[l:l+nprn, 1] = week
-        table[l:l+nprn,2] = tow
-        for j in range(nprn):
-            table[l+j, 0] = np.int(prnstr[j][1:])
-            # split up by end of line markers, which makes sense
-#            print('something',2*j+1)
-            line0 = epochstr.split('\n')[2*j+1]#.split()
-            line = re.findall('.{%s}' % 16, line0+' '*(80-len(line0)))
-# this seems to get strings of a certain width, which he will later change 
-#through float# also where he made his mistake on reading last two characters 
-#            print(j,len(line), line)
-
-            for k in range(len(line)):
-                if line[k].isspace():
-                    table[l+j, 3+k] = np.nan
-                    continue
-                table[l+j, 3+k] = np.float(line[k][:-2])
-#                print(table[l+j,3+k])
-                # if more than 5 observaitons, he has to read the next line
-            if ntypes > 5:
-                line2 = epochstr.split('\n')[2*j+2].split()
-#                print(line2)
-                for k in range(len(line2)):
-                    table[l+j, 3+len(line)+k] = np.float(line2[k][:-2])
-        l += nprn	
-    format = tuple(np.concatenate((('%02i', '%4i', '%11.7f'), 
-							((0, ntypes+3)[-1]-3)*['%14.3f'])))
-    # kinda strange - but ok - format statemenst for PRN, week, sec of week, etc
-    obs =  dict(zip(tuple(header.split('\t')), table.T))
-
-    return np.array([x0,y0,z0]),obs
-  
 
 def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
     """
@@ -1859,7 +1740,6 @@ def find_satlist(f,snrExist):
     inputs: frequency and boolean numpy array that tells you 
     if a signal is (potentially) legal
     outputs: list of satellites to use 
-    author: kristine m. larson
 
     you should now use find_satlist_wdate
     """
@@ -1921,18 +1801,7 @@ def find_satlist_wdate(f,snrExist,year,doy):
     author: kristine m. larson
     june 24, 2021: updated for SVN78
     """
-# set list of GPS satellites for now
-#
-# Block III will be 4, 18, 23
-#   these are the only L2C satellites as of 18oct10
-    #l2c_sat = [1, 3, 5, 6, 7, 8, 9, 10, 12, 15, 17, 24, 25, 26, 27, 29, 30, 31, 32]
-    # updated on 20 jul 15 - really should make this time dependent ....
-    #l2c_sat = [1, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 17, 23, 24, 25, 26, 27, 29, 30, 31, 32]
-
-#   only L5 satellites thus far
-    #l5_sat = [1, 3,  6,  8, 9, 10, 24, 25, 26, 27, 30,  32]
-    # l5_sat = [1, 3,  4, 6,  8, 9, 10, 24, 25, 26, 27, 30,  32]
-#   assume l1 and l2 can be up to 32
+    # get list of relevant satellites
     l2c_sat, l5_sat = l2c_l5_list(year,doy)
 
     l1_sat = np.arange(1,33,1)
@@ -2084,7 +1953,6 @@ def quick_plot(plt_screen, gj,station,pltname,f):
     which if > 0 there is something to plot
     also station name for the title
     pltname is png filename, if requested
-    author: kristine m. larson
     """
     if (plt_screen == 1  and gj > 0):
         plt.subplot(212)
@@ -2103,6 +1971,15 @@ def quick_plot(plt_screen, gj,station,pltname,f):
 def print_file_stats(ele,sat,s1,s2,s5,s6,s7,s8,e1,e2):
     """
     inputs 
+
+    ele
+
+    sat
+
+    s1 
+
+    s2 
+
     """
     gps = ele[(sat > 0) & (sat < 33) & (ele < e2) ]
     glonass = ele[(sat > 100) & (sat < 125) & (ele < e2) ]
@@ -2176,7 +2053,6 @@ def mjd(y,m,d,hour,minute,second):
     inputs: year, month, day, hour, minute,second
     output: modified julian day
     using information from http://infohost.nmt.edu/~shipman/soft/sidereal/ims/web/MJD-fromDatetime.html
-    coded by kristine m. larson
     """
     if  (m <= 2):
         y, m = y-1, m+12
@@ -2242,12 +2118,17 @@ def open_plot(plt_screen):
 
 def store_orbitfile(filename,year,orbtype):
     """
-    inputs:
-    orbit filename 
-    year
-    orbit type (nav or sp3)
     the function moves the file into the appropriate directory
-    author: kristine larson
+
+    inputs:
+
+    orbit filename 
+
+    year : integer 
+
+    orbtype : string 
+        (nav or sp3)
+
 
     """
     # parent directory of the orbits for that year
