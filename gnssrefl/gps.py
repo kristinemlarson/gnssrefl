@@ -95,12 +95,25 @@ def ydoych(year,doy):
     converts year doy to various character strings
 
     Parameters:
-    ___________
+    ---------
+
     year : integer
         year
 
     doy : integer
         day of year
+
+    Returns:
+    -------
+    cyyyy : string
+        4 character year
+
+    cyy : string
+        2 character year
+
+    cdoy : string
+        3 character year
+
 
     """
     cyyyy = str(year)
@@ -115,7 +128,7 @@ def define_filename(station,year,doy,snr):
     goal is to return the SNR filename 
 
     Parameters:
-
+    -----------
     station : string
         name  (4 char lowercase)
 
@@ -128,9 +141,14 @@ def define_filename(station,year,doy,snr):
     snr : integer
         SNR file type (e.g. 99, 66)
 
-    output:
+    Returns :
+    ---------
+    fname : string
+        snrfile name to be used
 
-    returns snr filenames (both uncompressed and xz compressed)
+    fname2 : string
+        snrfile name to be used - with xz compression extension
+
 
     """
     xdir = os.environ['REFL_CODE'] # main directory for SNR files
@@ -143,9 +161,11 @@ def define_filename(station,year,doy,snr):
 
 def define_and_xz_snr(station,year,doy,snr):
     """
-    defines SNR filename
+    finds and checks for existence of a SNR file
+    uncompresses if that is needed (xz or gz)
 
     Parameters
+    ----------
 
     station: string
         station name, 4 characters
@@ -159,13 +179,19 @@ def define_and_xz_snr(station,year,doy,snr):
     snr : integer
         kind of snr file (66,77, 88 etc)
 
+    Returns
+    --------------
 
-    returns snr filenames and whether it exists
+    fname : string
+        name of the SNR file
+
+    fname2 : string
+        no longer used but kept for backwards capability
+
+    snre : boolean
+        whether the file exists or not
 
 
-    19mar25: return compressed filename too
-    20apr12: fixed typo in xz name! now try to compress here
-    22apr15: allow gzip files to be found an unzipped
     """
     xdir = os.environ['REFL_CODE']
     cyyyy, cyy, cdoy = ydoych(year,doy)
@@ -187,12 +213,13 @@ def define_and_xz_snr(station,year,doy,snr):
         if os.path.isfile(fname):
             snre = True
 
-#   return fname2 but mostly for backwards compatibility
+#   return fname2 but only for backwards compatibility
     return fname, fname2, snre 
 
 def define_filename_prevday(station,year,doy,snr):
     """
     Parameters
+    -------------
 
     station: string
         4 character station name  
@@ -206,9 +233,10 @@ def define_filename_prevday(station,year,doy,snr):
     snr: integer
         SNR file type (66,88, etc)
 
+    Returns:
+    ---------------
     returns snr filename for the PREVIOUS day
 
-    author: Kristine Larson
     """
     xdir = os.environ['REFL_CODE']
     year = int(year)
@@ -263,7 +291,8 @@ def xyz2llh(xyz, tol):
     """
     given xyz vector, computes latitude, longitude and height
 
-    parameters
+    Parameters
+    -----------
 
     xyz: list or np array 
         X,Y,Z in meters
@@ -271,7 +300,17 @@ def xyz2llh(xyz, tol):
     tol: float
         tolerance in meters for the calculation (1E-8 is good enough)
     
-    outputs are lat, lon in radians and wgs84 ellipsoidal height in meters
+
+    Returns
+    --------------
+    lat : float
+        latitude in radians
+
+    lon : float
+        longitude in radians
+
+    h : float
+        ellipsoidal height in WGS84
 
     """
     x=xyz[0]
@@ -301,13 +340,22 @@ def xyz2llhd(xyz):
 
     tolerance for convergence is hardwired
 
-    outputs are 
+    Parameters:
+    --------------
 
-    lat 
 
-    lon in degrees and wgs84 ellipsoidal height in meters
 
-    same as xyz2llh but lat and lon outputs are in degrees
+    Returns:
+    --------------
+    lat : float
+        latitude in degrees
+
+    lon : float
+        longitude in degrees
+
+    h : float
+        ellipsoidal height in WGS84
+
 
     """
     x=xyz[0]
@@ -337,8 +385,15 @@ def zenithdelay(h):
     the output is a very simple zenith troposphere delay in meters
     this is NOT to be used for precise geodetic applications
 
+    Parameters:
+    -----------
     h: float
         ellipsoidal (height) in meters
+
+    Returns:
+    -------------
+    zd : float
+        simple zenith delay for the troposphere in meters
 
     """
 
@@ -456,10 +511,15 @@ def sp3_interpolator(t, tow, x0, y0, z0, clock0):
  
 def dec31(year):
     """
+    Parameter :
+    ---------
     input: integer
         year
 
-    returns doy for december 31
+    Returns :
+
+    doy : integer
+        day of year for December 31
     """
     today=datetime.datetime(year,12,31)
     doy = (today - datetime.datetime(year, 1, 1)).days + 1
@@ -493,7 +553,8 @@ def rinex_sopac(station, year, month, day):
     picks up a hatanaka RINEX file from SOPAC - converts to o
     can also be called as station, year, doy, 0
 
-    inputs: 
+    Parameters: 
+    -----------
 
     station : string
         4 char station name  
@@ -543,8 +604,10 @@ def hatanaka_warning():
 
 def rinex_cddis(station, year, month, day):
     """
-    picks up a 30 sec hatanaka RINEX 2 file from CDDIS - converts to an o RINEX file
+    Picks up a 30 sec hatanaka RINEX 2.11 file from CDDIS - converts to an o RINEX file
 
+    Parameters
+    --------------
     inputs: 
 
     station : string
@@ -557,9 +620,7 @@ def rinex_cddis(station, year, month, day):
     day : integer
 
 
-    June 2020, changed  to use secure ftp
     if day is zero, then month is assumed to be doy
-    This is only Rinex version 2 I believe
     
     """
     #print('try to find file at CDDIS')
@@ -610,7 +671,7 @@ def rinex_bkg(station, year, month, day):
     picks up low-rate RINEX 2.11 files from BKG 
 
     parameters
-
+    ------------
     station: string
         4 char station name 
 
@@ -676,8 +737,8 @@ def getnavfile(year, month, day):
     picks up nav file
     and stores it in the ORBITS directory
 
-    parameter
-
+    parameters
+    -----------
     year: integer
 
     month: integer
@@ -739,6 +800,13 @@ def getsp3file(year,month,day):
     day : integer
 
     20jun14 - add CDDIS secure ftp
+
+    returns
+    -----------
+    name : string
+
+    fdir : string
+
     """
     name, fdir = sp3_name(year,month,day,'igs') 
     cddis = 'ftp://cddis.nasa.gov'
@@ -773,7 +841,6 @@ def getsp3file(year,month,day):
 
 def getsp3file_flex(year,month,day,pCtr):
     """
-    author: kristine larson
     inputs are year, month, and day  (integers), and 
     pCtr, the processing center  (3 characters)
     returns the name of the file and its directory
@@ -782,6 +849,17 @@ def getsp3file_flex(year,month,day,pCtr):
     20jun14 add CDDIS secure ftp
 
     unfortunately this won't work with the long sp3 file names. use getsp3file_mgex instead
+
+    Parameters
+    ----------
+    year : integer
+
+    month : integer
+
+    day : integer
+
+    pCtr : string
+
     """
     # returns name and the directory
     name, fdir = sp3_name(year,month,day,pCtr) 
@@ -955,6 +1033,8 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     file2 is like this: GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz
     it then stores it the year directory (with a given name)
 
+    Parameters:
+    ------------
     name : string
 
     year : integer
@@ -964,6 +1044,9 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     secure_dir : string
 
     file2 : string
+
+    Returns:
+    ------------
 
     """
     foundit = False
@@ -1030,6 +1113,8 @@ def igsname(year,month,day):
 
     day : integer 
 
+    Returns
+    ------------
     returns IGS sp3 filename and COD clockname (5 sec)
 
     """
@@ -1077,7 +1162,6 @@ def myreadnav(file):
     """
     input is navfile name
     output is complicated - broadcast ephemeris blocks
-    author: Kristine Larson, April 2017
     """
 # input is the nav file
     try:
@@ -1493,6 +1577,23 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
 def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
     """
     strips snr data
+    Parameters
+    -----------
+    x : 
+
+    y : 
+
+    cf : 
+
+    maxH : float
+
+    desiredP : float
+
+    pfitV : 
+
+    minH : float
+
+
     inputs; max reflector height, desiredP is desired precision in meters
     pfitV is polynomial fit order
     minH - do not allow LSP below this value
@@ -1500,7 +1601,6 @@ def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
     max reflector height and its amplitude
     min and max observed elevation angle
     riseSet is 1 for rise and -1 for set
-    author: Kristine Larson
     """
     ofac,hifac = get_ofac_hifac(x,cf,maxH,desiredP)
 #   min and max observed elevation angles
@@ -1550,6 +1650,7 @@ def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
 
 def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satNu,pfitV,pele,screenstats):
     """
+
     also calculates the scale factor for various GNNS frequencies.  currently
     returns meanTime in UTC hours and mean azimuth in degrees
     cf, which is the wavelength/2
@@ -2789,7 +2890,6 @@ def define_quick_filename(station,year,doy,snr):
     """
     given station name, year, doy, snr type
     returns snr filename but without default directory structure
-    author: Kristine Larson
     19mar25: return compressed filename too
     """
     cyyyy, cyy, cdoy = ydoych(year,doy)
@@ -3592,7 +3692,6 @@ def snr_exist(station,year,doy,snrEnd):
     returns whether snr file exists on your machine
     bizarrely snrEnd is a character string
     year and doy are integers, which makes sense!
-    author: Kristine Larson
     change so that it uncompresses to unxz
 
     """
@@ -4783,6 +4882,7 @@ def rinex_ga_highrate_rinex3(station9ch, year,doy,stream ):
 def rinex_nrcan_highrate(station, year, month, day):
     """
     picks up 1-Hz RINEX 2.11 files from NRCAN
+    requires gfzrnx or teqc
 
     _________________________
     parameters
@@ -4799,10 +4899,7 @@ def rinex_nrcan_highrate(station, year, month, day):
     day: integer
         day
 
-    picks up a higrate RINEX 2.11 file from NRCAN
 
-    2020 September 2 - moved to gz and new ftp site
-    2022 february changed so it could use gfzrnx instead of teqc
 
     if day is 0, assume month slot is doy
     """
@@ -4914,10 +5011,20 @@ def translate_dates(year,month,day):
 def bfg_password():
     """
     Picks up BFG userid and password that is stored in a pickle file
-    or it asks you to input the values and stores them for you.
+    in your REFL_CODE/Files/passwords area
+    If it does not exist, it asks you to input the values and stores them for you.
 
-    returns: userid and password
-    2022 july 12
+
+    parameters : 
+    --------
+        none
+
+    returns : 
+    --------
+    userid : string
+
+    password : string 
+
     """
 
     fdir = os.environ['REFL_CODE']
@@ -4952,10 +5059,10 @@ def bfg_password():
 
 def bfg_data(fstation, year, doy, samplerate=30,debug=False):
     """
-    Picks up RINEX3  file from BFG network
+    Picks up a RINEX3 file from BFG network
 
     Parameters: 
-
+    -----------
     fstation: string
         4 char station ID
 
@@ -5017,6 +5124,12 @@ def inout(c3gz):
     takes hatanaka rinex3 file that has been gzipped
     gunzips and decompresses
     returns boolean (success) and rnx filename
+    Parameter
+    -----------
+
+    c3gz : string
+
+
     """
 
     translated = False # assume failure
