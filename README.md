@@ -167,7 +167,7 @@ one in the northern hemisphere and one in the southern hemisphere.
 </TR>
 <TR>
 <TD><img src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchl_google.jpg width=300</TD>
-<TD><img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p038_google.jpg width=300></TD>
+<TD><img src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/p038_google.jpg width=300></TD>
 </TR>
 </table>
 </p>
