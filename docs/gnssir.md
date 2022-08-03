@@ -17,10 +17,11 @@ sufficient. For example:
 If you happen to have the Cartesian coordinates (in meters), you can 
 set <code>-xyz True</code> and input those instead of lat, long, and height.
 
-If you are using a site that is in the UNR database, as of 2021/10/26 you can set 
-a flag to use it instead of typing in lat, long, ht values:
+If you are using a site that is in the UNR database, as of 2021/10/26 you can set
+the a priori values to zeros:
 
-<CODE>make_json_input p101 0 0 0 -query_unr True </CODE>
+<CODE>make_json_input p101 0 0 0 </CODE>
+
 
 <code>gnssir</code> will use defaults for other parameters if you do not provide them. Those defaults 
 tell the code an azimuth and elevation angle mask (i.e. which directions you want 

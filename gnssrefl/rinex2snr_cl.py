@@ -285,8 +285,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all']
 
-    # no longer allow all
-    highrate_list = ['unavco', 'nrcan', 'cddis']  # cddis is only rinex 2 for now
+    # no longer allow the all option
+    # unavco is only rinex2
+    # ga is only rinex3
+    highrate_list = ['unavco', 'nrcan', 'cddis','ga']  # cddis is only rinex 2 for now
 
     if ns == 9:
         # rinex3

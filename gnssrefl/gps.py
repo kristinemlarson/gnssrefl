@@ -4802,22 +4802,38 @@ def rinex_jp(station, year, month, day):
 
 def queryUNR_modern(station):
     """
-    query UNR database that has been stored in sql
+    queries the UNR database that has been stored in sql
+
+    parameters
+    -----------
+    station : string
+        4 character station name
+    
+    returns
+
+    lat : float
+        latitude in degrees
+
+    lon : float
+        longitude in degrees
+
+    ht : float
+        ellipsoidal ht in meters
+
     """
     lat = 0; lon = 0; ht = 0
     if len(station) != 4:
         print('The station name must be four characters long')
         return lat, lon, ht
 
+    xdir = os.environ['REFL_CODE']
     nfile1 = 'gnssrefl/station_pos.db'
     nfile1_exist = os.path.isfile(nfile1)
-    if (nfile1_exist):
-        print('Found station database in code section:', nfile1 )
-    xdir = os.environ['REFL_CODE']
     nfile2 = xdir + '/Files/station_pos.db'
     nfile2_exist = os.path.isfile(nfile2)
-    if (nfile2_exist):
-        print('Found station database in file section:', nfile2 )
+
+    if (nfile1_exist) or (nfile2_exist):
+        print('found the UNR database')
 
     if (not nfile1_exist) and (not nfile2_exist):
         url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/station_pos.db'
@@ -4850,7 +4866,6 @@ def queryUNR_modern(station):
 
     # close the database
     conn.close()
-    # lat and lon are in degrees
 
     return lat,lon,ht
 
@@ -5250,6 +5265,15 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
 
     deleteOld : boolean
         delete old rinex 3 files
+
+        returns 
+    -----
+    rinex2 : string
+        rinex2 filename created by merging 96 files!
+
+    fexist : boolean
+        whether a rinex2 file was successfully created
+
     """
     station = station9[0:4].lower()
     cyyyy = str(year)
@@ -5264,7 +5288,8 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
     if not os.path.exists(crnxpath):
         hatanaka_warning()
         return
-
+    print('WARNING 1: Have some coffee, downloading 96 files of high-rate GPS data takes a long time.')
+    print('WARNING 2: Downloading 96 files of high-rate GPS data from Australia takes an even longer time.')
     QUERY_PARAMS, headers = k.ga_stuff_highrate(station9, year, doy)
     API_URL = 'https://data.gnss.ga.gov.au/api/rinexFiles/'
     request = requests.get(API_URL, QUERY_PARAMS, headers=headers)
@@ -5292,10 +5317,11 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
                 subprocess.call(['mv', rinex2,tmpname])
             else:
                 if os.path.exists(file_name): # file exists
-                    print('file exists so gunzip')
+                    print('file exists so gunzip it')
                     subprocess.call(['gunzip', file_name])
                 else:
                     # download and gunzip it
+                    print(cv, file_name)
                     wget.download(file_url,file_name)
                     subprocess.call(['gunzip', file_name])
 
@@ -5313,6 +5339,10 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
 # now merge them
     searchpath = 'tmp' + '*' + station + cdoy + '0.' + cyy + 'o'
     subprocess.call([gexe,'-finp', searchpath, '-fout', rinex2, '-vo','2','-f'])
+    fexist = False
+    if os.path.exists(rinex2):
+        fexist = True
+
 # remove detritus
     searchpath = 'tmp*' + station + cdoy + '0.' + cyy + 'o'
     cm ='rm -f ' + searchpath
@@ -5324,4 +5354,4 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
         searchpath = station9.upper()  + '*' + cyyyy + cdoy + '*crx'
         cm ='rm -f ' + searchpath
         subprocess.call(cm,shell=True)
-
+    return rinex2, fexist

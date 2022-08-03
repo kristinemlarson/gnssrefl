@@ -227,12 +227,18 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
                         if (rate == 'high'):
-                            print('This code only accesses 1-Hz Rinex 3 data at CDDIS')
-                            rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
-                            #print(rnx_filename, foundit)
-                            if foundit:
-                                print('The RINEX 3 file has been downloaded. Try to make ', r2)
-                                fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
+                            print('This code only accesses 1-Hz Rinex 3 data at CDDIS and GA')
+                            if archive == 'ga':
+                                deleteOld = True
+                                # cold should return the new name of the rinex 2 file
+                                r2, foundit = g.ga_highrate(station9ch,year,doy,dec_rate,deleteOld)
+                                if foundit: 
+                                    print('rinex2 file should now exist:', r2)
+                            if archive == 'cddis':
+                                rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
+                                if foundit:
+                                    print('The RINEX 3 file has been downloaded. Try to make ', r2)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
                         else:
                             if (archive == 'all'):
                                 file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream)
