@@ -272,7 +272,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 if (a == 1) or (a==0):
                     plt.ylabel('volts/volts',fontsize=fs)
                 # try putting this label on all of them
-                plt.xlabel('reflector height (m)',fontsize=fs)
+                #plt.xlabel('reflector height (m)',fontsize=fs)
                 plt.xticks(fontsize=fs)
                 plt.yticks(fontsize=fs)
 

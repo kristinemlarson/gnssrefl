@@ -22,17 +22,16 @@ def parse_arguments():
 
 def download_unr(station: str):
     """
-        Command line interface for download_blewitt
-        Parameters:
-        ___________
-        station : string
-            4 character ID of the station
+    Command line interface for download_blewitt
+    Parameters:
+    ___________
+    station : string
+        4 character ID of the station name
     """
 
     if len(station) != 4:
         print('illegal station name-must be 4 characters')
         sys.exit()
-    # geoff blewitt likes upper case
     station = station.upper()
     url= 'http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/'
     fname = station + '.tenv3'
@@ -46,7 +45,8 @@ def download_unr(station: str):
 
     g.check_environ_variables()
 
-    myfname = xdir + stationL + '_igs14.tenv3'
+    # store in Files subdirectory
+    myfname = xdir + '/Files/' + stationL + '_igs14.tenv3'
     try:
         wget.download(url, out=myfname)
     except:

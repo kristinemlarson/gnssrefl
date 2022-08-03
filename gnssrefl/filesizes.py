@@ -1,5 +1,5 @@
 # very simple code to pick up all the file sizes for SNR files in a given year
-# Kristine Larson May 2019
+# not very useful since it only looks for snr66, not gzipped files
 import argparse
 import datetime
 import matplotlib.pyplot as plt
@@ -71,6 +71,7 @@ def main():
         for doy in range(0,367):
             year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(yr,doy)
             fname = direc + station + cdoy + '0.' + cyyyy[2:4]  + '.snr66'
+            print(fname)
             t = yr+doy/365.25
             if os.path.isfile(fname):
                 a = np.loadtxt(fname,skiprows=3,comments='%')
@@ -85,6 +86,7 @@ def main():
                 if (t >= tstart) & (t <= tend):
                     newl = [yr, doy, 0]
                     tv = np.append(tv, [newl],axis=0)
+                    filler = datetime.datetime(year=yr, month=month, day=day)
                     obstimes.append(filler)
 
     fs = 12

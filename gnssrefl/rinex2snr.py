@@ -34,6 +34,27 @@ class constants:
 #
 #
 def quickname(station,year,cyy, cdoy, csnr):
+    """
+    returns location of a SNR file
+    parameters 
+    ------------
+    station : string
+        station name, 4 character
+
+    year : integer
+
+    cyy : string 
+
+    cdoy : string
+
+    csnr : string
+
+    returns
+    ----------
+    fname : string
+        filename
+
+    """
     xdir  = os.environ['REFL_CODE'] + '/'
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
     return fname
@@ -43,6 +64,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     main code to convert RINEX to SNR
 
     Parameters:
+    ----------
 
     station: string
         4 or 9 character station name 
@@ -62,12 +84,13 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             high: use 1-Hz area in the archive
             low: use default area in the archive
 
-    dec_rate = integer for decimation
+    dec_rate : integer
+         decimation value
 
-    archive: string
+    archive : string
         choice of GNSS archive
 
-    fortran: boolean 
+    fortran : boolean 
         whether the fortran rinex translator is to be used
         default: false
 
@@ -79,7 +102,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         False (default): if SNR file exists, SNR file not made
         True: make a new SNR file 
 
-    translate = string with .... fortran, python, hybrid ??
+    translator : string 
+        hybrid (default), fortran, or python
+        hybrid uses fortran within the python code
 
     srate: integer
         sample rate for RINEX 3 files
@@ -88,15 +113,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     skipit = skips making files every day, so a value of 7 means weekly.  1 means do every day
 
-    2021feb11 
-    translator = fortran, python, or hybrid
-    srate - integer sample rate, for RINEX 3 only.
-    2021mar20 check for illegal day of years ....
-    2021aug01 added mk option for uppercase file names per makan karegar request
-    2021aug15 added weekly option
-    2021nov08 making nolook work for rinex 3 files ...
-    2022feb10 added stream
-    2022feb15 added karnak library
+
     """
     # 
     # do not allow illegal skipit values
@@ -541,6 +558,28 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
 
 def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log):
     """
+    parameters : 
+
+    navfile : string
+
+    obstimes : ??
+
+    observationdata :
+
+    obslist : 
+
+    prn2oidx : 
+
+    gpssatlist :
+
+    snrfile : 
+
+    s1exist :
+
+    s2exist : 
+
+    s5exist :
+
     This is for GPS only files !
     navfile is nav broadcast ephemeris in RINEX format
     inputs are rinex info, obstimes, observationdata,prntoidx,gpssatlist
@@ -597,7 +636,17 @@ def readSNRval(s1exist,s2exist,s5exist,observationdata,prntoidx,sat,i):
     what it looks like
     only reads GPS data for now
     interface between Joakim's code and mine ...
-    kristine m. larson, july 2019
+    Parameters :
+    -----------
+    s1exist : boolean
+
+    s2exist : boolean
+
+    s5exist : boolean
+
+    Returns 
+    -----------
+
     """
     s1 = 0; s2 = 0; s5 = 0 # set defaults
     if s1exist:
@@ -622,7 +671,19 @@ def satorb_prop(week, secweek, prn, rrec0, closest_ephem):
     this assumes someone was nice enough to send you the closest ephemeris
     returns the satellite coordinates as well, so you can use htem
     in the A matrix
-    Kristine Larson, April 2017
+    paramters :
+    week : integer
+        GPS week
+
+    secweek : integer
+        GPS second of the week
+
+    prn : integer
+        satellite number
+
+    rrec0 : 3vector
+        receiver coordinates, meters
+
     """
     error = 1
 
@@ -656,6 +717,14 @@ def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij):
     for satellite number prn
     and receiver coordinates rrec0
     find the x,y,z coordinates at time secweek
+    parameters 
+    ------------
+    iX : float
+    iY : float
+    iZ : float
+
+    recv : 3 vector, float
+        
 
     sp3 has the orbit information in it
     """

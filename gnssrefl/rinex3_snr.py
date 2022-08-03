@@ -9,7 +9,9 @@ This only works on a single file (no doy_end)
 It also uses my convention for naming (lowercase) and it does not 
 store the Rinex2 files
 
-I think this has been superceded by rinex3_rinex2
+I think this has more or less been superceded by rinex3_rinex2
+thought I guess it does have the extra step of making a SNR file ... 
+but that should not matter since rinex2snr allows Rinex 3 files
 """
 import argparse
 import os

@@ -512,3 +512,27 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
             subprocess.call(['mv', '-f', tempfile, rinexfile])
 
     return rinexfile, foundit
+
+def ga_stuff_highrate(station, year, doy):
+    """
+    takes 9 ch station name and year and doy
+    and returns some things that GA wants to download a Rinex 3 file
+    """
+    d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
+    month = int(d.month); day = int(d.day)
+    cmonth = '{:02d}'.format(month); cday = '{:02d}'.format(day)
+
+
+    QUERY_PARAMS = {}
+    QUERY_PARAMS['stationId'] = station[0:4].upper()
+    QUERY_PARAMS['fileType'] = 'obs'
+    QUERY_PARAMS['filePeriod'] = '15M'
+    QUERY_PARAMS['rinexVersion'] = '3'
+    QUERY_PARAMS['startDate'] = str(year) + '-' + cmonth + '-' + cday + 'T00:00:00Z'
+    QUERY_PARAMS['endDate'] =   str(year) + '-' + cmonth + '-' + cday + 'T23:59:30Z'
+
+    headers = {}
+    headers['Accept-Encoding'] = 'gzip'
+
+    return QUERY_PARAMS, headers
+

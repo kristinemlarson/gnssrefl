@@ -2,14 +2,10 @@
 """
 extracts coordinates for stations that were in the UNR
 database (when I downloaded it ;-)
-author: kristine larson
 input four character station name, lowercase
 
 2021 November 2
 modified to use UNR database. Downloads it if you don't have it.
-Hopefully
-2021 November 26
-prints out XYZ too cause why not!
 
 """
 import argparse

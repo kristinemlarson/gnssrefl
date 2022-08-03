@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 downloads IOC tide gauge files
-kristine larson
 
-originally used XML download. changing to json
+originally used XML download. now uses json
 """
 import argparse
 import datetime
@@ -90,13 +89,12 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
             default is None
 
         outliers: boolean, optional
-            tried to remove outliers, but 
-            it doesn't work as yet
+            tried to remove outliers, but it doesn't work as yet
             default is No
 
         sensor: string, optional
             type of sensor, prs(for pressure), rad (for radar), flt (for float)
-            default is None, which means it will printout what is there.
+            default is None, which means it will print out what is there.
             if there is more than one sensor you should specifically ask for the one
             you want
 

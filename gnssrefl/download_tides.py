@@ -82,24 +82,36 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
 
 
     Parameters:
-
+    -----------
     station : string
 
     datum : string
 
     fout - fileID for writing results
 
-    year1, month1 start time (i will assume first of this month)
+    year1 : integer
+        year when first measurements will be downloaded
 
-    year2, month2 end time  (i will assume end of this month)
+    month1 : integer
+        month when first measurements will be downloaded
 
-    csv - boolean for output format
+    year2 : integer
+        last yaer when measurements will be downloaded
+
+    month2 : integer 
+        last month when measurements will be downloaded
+
+    csv : boolean 
+        whether output file is csv format
 
     returns:
-    tt - MJD
-    obstimes - datetime
-    slevel - water level in meters
+    --------------
+    tt : list of times 
+        modified julian day
+    obstimes : list of datetime objects 
 
+    slevel : list 
+         water level in meters
 
     """
     # set variables for making the plot ... 
@@ -122,8 +134,24 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
 
 def noaa2me(date1):
     """
-    date1 is a string
-    returns year, month, integer, and doy all integers
+    parameters 
+    --------
+    date1 : string
+        time in format YYYYMMDD for year month and day
+
+    returns 
+    -------
+    year1 : integer
+
+    month1 : integer
+
+    day1 : integer
+
+    doy : integer  
+        day of year
+
+    modjulday : float
+
     """
     year1 = int(date1[0:4]); 
     month1=int(date1[4:6]); 

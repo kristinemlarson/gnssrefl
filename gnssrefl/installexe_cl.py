@@ -12,9 +12,13 @@ from shutil import which
 
 def newchip_gfzrnx(exedir):
     """
-    download compile hatanaka code if an existing exe is not there
-    store in EXE
-    kristine larson
+    installs the gfzrnx executable and stores in the EXE directory
+
+    parameters
+    ---------
+    exedir : string
+        location of the executable directory
+
     """
     savename = 'gfzrnx'
     finalpath = exedir + '/' + savename
@@ -22,7 +26,6 @@ def newchip_gfzrnx(exedir):
         print('The gfzrnx executable already exists')
     else:
         print('Installing gfzrnx')
-        # should use my function - but this works ...
         localname = 'gfzrnx_osxarm64'
         dfile = 'https://morefunwithgps.com/public_html/' + localname
         wget.download(dfile, savename)
@@ -33,9 +36,14 @@ def newchip_gfzrnx(exedir):
 
 def newchip_hatanaka(exedir):
     """
-    download compile hatanaka code if an existing exe is not there
-    store in EXE
-    kristine larson
+    compiles hatanaka code if an existing executable is not there
+    stores in EXE
+
+    parameters
+    ---------
+    exedir : string
+        location of the executable directory
+
     """
     savename = 'CRX2RNX'
     finalpath = exedir + '/' + savename
@@ -80,8 +88,17 @@ def checkexist(exe):
 
 def download_chmod_move(url,savename,exedir):
     """
-    inputs are url, filename and executable directory
-    it should chmod g+rwx and  move to exe area
+    parameters
+    -----------
+    url : string
+        external location of the executable
+
+    savename : string
+        name of the executable
+
+    exedir : string
+        name of local executable directory (EXE environment variable)
+
     """
     f = exedir + '/' + savename
     if os.path.exists(f):
