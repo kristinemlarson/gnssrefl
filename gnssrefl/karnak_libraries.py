@@ -215,7 +215,7 @@ def filename_plus(station9ch,year,doy,srate,stream):
 
     return file_name, cyyyy, cdoy
 
-def ga_stuff(station, year, doy):
+def ga_stuff(station, year, doy,rinexv=3):
     """
     takes 9 ch station name and year and doy 
     and returns some things that GA wants to download a Rinex 3 file
@@ -229,7 +229,7 @@ def ga_stuff(station, year, doy):
     QUERY_PARAMS['stationId'] = station[0:4].upper()
     QUERY_PARAMS['fileType'] = 'obs'
     QUERY_PARAMS['filePeriod'] = '01D'
-    QUERY_PARAMS['rinexVersion'] = '3'
+    QUERY_PARAMS['rinexVersion'] = str(rinexv) 
     QUERY_PARAMS['startDate'] = str(year) + '-' + cmonth + '-' + cday + 'T00:00:00Z'
     QUERY_PARAMS['endDate'] =   str(year) + '-' + cmonth + '-' + cday + 'T23:59:30Z'
 
@@ -513,7 +513,7 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
 
     return rinexfile, foundit
 
-def ga_stuff_highrate(station, year, doy):
+def ga_stuff_highrate(station, year, doy,rinexv=3):
     """
     takes 9 ch station name and year and doy
     and returns some things that GA wants to download a Rinex 3 file
@@ -527,7 +527,8 @@ def ga_stuff_highrate(station, year, doy):
     QUERY_PARAMS['stationId'] = station[0:4].upper()
     QUERY_PARAMS['fileType'] = 'obs'
     QUERY_PARAMS['filePeriod'] = '15M'
-    QUERY_PARAMS['rinexVersion'] = '3'
+
+    QUERY_PARAMS['rinexVersion'] = str(rinexv) 
     QUERY_PARAMS['startDate'] = str(year) + '-' + cmonth + '-' + cday + 'T00:00:00Z'
     QUERY_PARAMS['endDate'] =   str(year) + '-' + cmonth + '-' + cday + 'T23:59:30Z'
 

@@ -1,5 +1,4 @@
 """
-author: kristine larson
 called by quickLook_cl.py
 quickLook functions - consolidated snr reader (previously in a separate file)
 """
@@ -20,9 +19,14 @@ import gnssrefl.rinex2snr as rinex
 
 def read_snr_simple(obsfile):
     """
-    input: SNR observation filenames and a boolean for 
-    whether you want just the first day (twoDays)
-    output: contents of the SNR file, withe various other metrics
+    parameters
+    ------------
+    obsfile : str
+        name of SNR file
+
+    returns
+    ----------
+
     """
 #   defaults so all returned vectors have something stored in them
     sat=[]; ele =[]; azi = []; t=[]; edot=[]; s1=[];
@@ -81,22 +85,57 @@ def read_snr_simple(obsfile):
 
 def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,**kwargs):
     """
-    inputs:
-    station name (4 char), year, day of year
-    snr_type is the file extension (i.e. 99, 66 etc)
-    f is frequency (1, 2, 5), etc
-    e1 and e2 are the elevation angle limits in degrees for the LSP
-    minH and maxH are the allowed LSP limits in meters
+    parameters:
+    station : string
+        name (4 char) 
+
+    year : integer
+
+    doy : integer
+        day of year  
+
+    snr_type : integer
+        snr file extension (i.e. 99, 66 etc)
+
+    f : integer
+        frequency (1, 2, 5), etc
+    e1 : float
+        minimum elevation angle in degrees
+
+    e2 : float
+        maximum elevation angle in degrees
+
+    minH : float
+        minimum allowed reflector height in meters
+
+    maxH : float
+        maximum allowed reflector height in meters
+
     reqAmp is LSP amplitude significance criterion
+
     pele is the elevation angle limits for the polynomial removal.  units: degrees
-    KL 20may10 pk2noise value is now sent from main function, which can be set online
-    KL 20aug07 added fortran boolean
-    KL 21feb06 return data from the plots so that Jupyter notebooks can use them.
-    also added pltscreen variable so that the default plots are not always displayed
-    KL 21mar25 added datakey dictionaries for the Jupyter notebook people
-    KL 21apr02 added error checking on whether requested datastreams exist. no data, no analysis
-    KL 21nov24 added screen stats, boolean, kwargs
-    KL 22jun25 added azim1, azim2 restrictions
+
+    satsel
+
+    PkNoise : float
+        peak to noise ratio for QC
+
+    fortran : boolean
+         whether external fortran translator is being explicitly called. 
+
+    pltscreen : boolean
+        whether you want plots to the screen
+
+    azim1 : float
+         minimum azimuth in degrees
+
+    azim2 : float
+         maximum azimuth in degrees
+
+    returns
+    ------------
+
+
     """
     screenstats = kwargs.get('screenstats',False)
     if screenstats:

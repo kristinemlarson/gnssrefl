@@ -475,6 +475,14 @@ def sp3_interpolator(t, tow, x0, y0, z0, clock0):
 
     tow :  float
 
+    x0 : float
+
+    y0 : float
+
+    z0 : float
+
+    clock0 : float
+
 
     inputs are??? tow is GPS seconds
     xyz are the precise satellite coordinates (in meters)
@@ -3124,7 +3132,20 @@ def back2thefuture(iyear, idoy):
 
 def rinex_ga_highrate(station, year, month, day):
     """
-    author: kristine larson
+    no longer supported
+
+    parameters
+    ------------
+    station : string
+        4 character station ID, lowercase
+
+    year : integer
+
+    month : integer
+
+    day : integer
+
+
     inputs: station name, year, month, day
     picks up a higrate RINEX file from Geoscience Australia
     you can input day =0 and it will assume month is day of year

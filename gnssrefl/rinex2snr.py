@@ -316,7 +316,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
             # This goes to find the rinex file. I am changing it to allow 
             # an archive preference 
             if receiverrate == 'high':
-                #g.go_get_rinex_flex(station,year,month,day,receiverrate,archive)
                 strip_snr = False # for now - 
                 file_name, foundit = k.rinex2_highrate(station, year, doy,archive,strip_snr)
             else:
@@ -331,8 +330,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
 
                 if foundrinex: #uncompress etc  to make o files ...
                     rinexfile, foundit2 = k.make_rinex2_ofiles(file_name) # translate
-                    #if foundit2:
-                    #    print('SUCCESS', rinexfile)
 
 #           define booleans for various files
             oexist = os.path.isfile(orbdir + '/' + f) == True
@@ -340,7 +337,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
             exc = exedir + '/teqc' 
             texist = os.path.isfile(exc) == True
             if rexist: 
-                # decimate using teqc 
+                # decimate using teqc  if you have it
                 if (texist) and (fortran) and (dec_rate > 0): 
                     log.write("Decimating using teqc:  {0:3.0f}  seconds \n".format(dec_rate))
                     log.write('Unfortunately teqc removes Beidou data. Eventually I will remove this. \n')
@@ -436,12 +433,23 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
 
 def satorb(week, sec_of_week, ephem):
     """
-    inputs are GPS week, seconds of the week, and the appropriate
-    ephemeris block from the navigation message
-    returns the x,y,z, coordinates of the satellite
+    parameters
+    ---------
+
+    week : integer
+        GPS week
+
+    sec_of_week : float
+        GPS seconds of the week
+
+    ephem : ephemeris block
+
+    returns 
+    -----------
+    numpy array 
+         the x,y,z, coordinates of the satellite in meters
     and relativity correction (also in meters), so you add,
     not subtract
-    Kristine Larson, April 2017
 
     """
 

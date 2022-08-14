@@ -21,6 +21,7 @@ import math
 
 def print_badpoints(t,outliersize):
     """
+    ????
     input: station name and lomb scargle result array of "bad points"
     second input is the size of the outlier, in meters
     author: kristine larson
@@ -44,15 +45,34 @@ def print_badpoints(t,outliersize):
 
 def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
-    input: txtdir is the directory where the results should be written out
-    txtfile, csvfile, and jsonfile are the command line input values 
-    if they are not set (i.e. they are None), that means you do not want it.
-    if writejson is true, then it is written to txtdir + jsonfile 
-    if writecsv is true, then it is written to txtdir + csvfile and so on
-    author: kristine larson
+    parameters
+    ----------------
+    txtdir : str
+        the directory where the results should be written out
 
-    this is pretty dumb - should have one variable telling you the output you want (csv or json or txt)
-    the writejson option is not available
+    txtfile : str
+        name of the output file
+        
+    csvfile : boolean
+        cl input whether the output file should be csv format
+
+    jsonfile : boolean
+        cl input for whether the output file should be in the json format
+
+    default is plain txt file
+
+
+    returns
+    -----------
+    writetxt : boolean
+
+    writecsv : boolean
+
+    writejson : boolean
+
+    outfile : str
+        filename
+
     """
     writetxt = True
     if txtfile == None:
@@ -81,16 +101,22 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
 
 def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     """
+    parameters
+    -----------
     input: output filename
     station - 4 character station name
+
     nvt is the variable with the LSP results
+
     writecsv and writetxt are booleans to tell you whether you 
+
     want csv output format or plain txt format (with spaces between colunmns)
     21may04 - extra line may be added to the header
     changed this to use hte original format.  changing the number of columns was a HUGE
     mistake.  put m,d,h,m,s at the end
 
-    author: kristine larson
+    returns
+    -----------
 
     this does not accommodate json as yet
     """
@@ -139,11 +165,19 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
 
 def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2):
     """
-    Inputs:
-    station - 4 character name
-    year is year ;-)  
+    parameters
+    -------------
+    station : string
+        4 character station name
+
+    year : integer
+
     d1 and d2 are days of year if you want to look at a smaller dataset (integers)
-    plt2screen is a boolean whether you want the plot displayed to the screen
+
+    plt2screen : boolean
+        if True plots displayed to the screen
+
+    is a boolean whether you want the plot displayed to the screen
     extension is where the results files stored in that subdirectory ('' for default) 
     sigma is how many standard deviations away from mean you allow.   (float)
 
@@ -151,12 +185,6 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     files now written out here rather than in subdaily_cl.py
 
-    author: kristine larson
-    2021april27 return datetime object
-    2021november
-    added azimuth, amplitude,peak2noise constraints
-    allow file to be input
-    consolidated plots
     """
     # fontsize
     fs = 10
@@ -307,8 +335,20 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
 def quickTr(year, doy,frachours):
     """
+    parameters
+    -----------
+    year : integer
+
+    doy : integer
+
+    frachours : float
+        real-valued UTC hour 
+
     inputs from the lomb scargle code (year, doy) and UTC hour (fractional)
-    returns character string for json 
+    returns
+    --------
+    datestr : string
+         date ala YYYY-MM-DD HH-MM-SS
     """
     year = int(year); doy = int(doy); frachours = float(frachours)
     # convert doy to get month and day
