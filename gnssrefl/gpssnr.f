@@ -415,8 +415,8 @@ c       19jan09 changed to allow up to 60 satellites
           read(inline(33:80),'(12(A1,2x))') (satID(i),i=61,numsat)
 
         endif
-        if (numsat > 60) then
-          print*, 'I cannot read more than 60 satellites'
+        if (numsat > 72) then
+          print*, 'I cannot read more than 72 satellites'
           print*, 'Please stop launching them!'
           return
         endif
