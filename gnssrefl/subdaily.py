@@ -1,5 +1,4 @@
 # codes for subdaily module. primarily for tidal applications
-# author: kristine larson february 2021
 import argparse
 import datetime
 import json
@@ -10,7 +9,7 @@ import sys
 
 from datetime import date
 
-# my code
+# support code
 import gnssrefl.gps as g
 
 
@@ -103,20 +102,17 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     """
     parameters
     -----------
-    input: output filename
-    station - 4 character station name
+    input: str
+        output filename
+    station : str
+        4 character station name, lowercase
 
-    nvt is the variable with the LSP results
+    nvt : numpy multi-dimensional
+        the variable with the LSP results read via np.loadtxt
 
-    writecsv and writetxt are booleans to tell you whether you 
+    writecsv : boolean
 
-    want csv output format or plain txt format (with spaces between colunmns)
-    21may04 - extra line may be added to the header
-    changed this to use hte original format.  changing the number of columns was a HUGE
-    mistake.  put m,d,h,m,s at the end
-
-    returns
-    -----------
+    writetxt : boolean
 
     this does not accommodate json as yet
     """
@@ -165,6 +161,8 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
 
 def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2):
     """
+    reads in RH results and makes various plots to help users assess the quality of the solution
+
     parameters
     -------------
     station : string
@@ -172,21 +170,61 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     year : integer
 
-    d1 and d2 are days of year if you want to look at a smaller dataset (integers)
+    d1 : integer
+        first day of year
+
+    d2 : integer 
+        last day of year
 
     plt2screen : boolean
-        if True plots displayed to the screen
+        if True plots are displayed to the screen
 
-    is a boolean whether you want the plot displayed to the screen
-    extension is where the results files stored in that subdirectory ('' for default) 
-    sigma is how many standard deviations away from mean you allow.   (float)
+    extension : str
+        allow user to specify an extension for results (i.e. gnssir was run using extension string)
 
-    h1 and h2 are strict allowed RH values to be allowed. Helps with the outlier removal
+    sigma : float
+         how many standard deviations away from mean you allow.  
 
-    files now written out here rather than in subdaily_cl.py
+    writecsv : boolean
+
+    azim1 : float
+        minimum azimuth value (degrees)
+
+    azim2 : float
+        maximum azimuth value (degrees)
+
+    ampl : float
+        minimum LSP amplitude allowed
+
+    peak2noise : float
+        minim peak2noise value to set solution good
+
+    txtfile : str
+        name of output file
+
+    h1 : float
+        minimum reflector height (m)
+
+    h2 : float
+        maximum reflector height (m)
+
+    returns
+    --------------
+
+    tv : numpy array
+        LSP results (augmented)
+
+    otimes : datetime object 
+        times of observations 
+
+    fname : str
+        result file
+
+    fname_new : str
+        result file with outliers removed
 
     """
-    # fontsize
+    # fontsize for plot labels and such
     fs = 10
     xdir = os.environ['REFL_CODE']
     # output will go to REFL_CODE/Files

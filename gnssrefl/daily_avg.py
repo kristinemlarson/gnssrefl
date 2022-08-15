@@ -20,11 +20,13 @@ import gnssrefl.gps as g
 
 def fbias_daily_avg(station):
     """
-    input station name
     reads QC-RH values and the daily averages
     computes residuals and estimate the frequency
-    bias for all available frequencies
-    printed to the screen
+    bias for all available frequencies which is printed to the screen
+
+    parameter
+    station : str
+        station name - 4char - lowercase
     """
     xdir = os.environ['REFL_CODE']
 
@@ -94,26 +96,51 @@ def fbias_daily_avg(station):
         ijk = ijk + 1
 
 
-# changes to output requested by Kelly Enloe for JN
-# two text files will now always made - but you can override the name of the average file via command line
 
 def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks):
     """
     worker code for daily_avg_cl.py
     reads in daily files
-    inputs:
-    station
-    extension (usually '')
-    year1 and year2 if you want to specify beginning and ending years
-    fr is 0 for all frequencies.  otherwise, it must be a legal frequency
-    alldatafile is the output filename
-    csvformat is a boolean for the output file. if true, csv file written instead of plain txt
-    howBig is criterion for the median filter, i.e. how far in meters can a RH be from the median for that day
-    ReqTracks is the number of retrievals required per day
 
-    21may14 added utcTime to allRH file
+    parameters
+    ----------
+    station : str
+        station name, 4 ch, lowercase
 
-    author: kristine larson
+    extension : str
+        folder extension - usually ''
+
+    year1 : integer
+        first year
+
+    year2 : integer
+        second year 
+
+    fr : integer
+        0 for all frequencies.  otherwise, it must be a legal frequency (101 for Glonass L1)
+
+    alldatafile : str
+        name of the output filename
+
+    csvformat : boolean
+        whether you want output as csv format
+
+    howBig : float
+        criterion for the median filter, i.e. how far in meters can a RH be from the median for that day, in meters
+
+    ReqTracks : integer
+        is the number of retrievals required per day
+
+    returns
+    ---------
+    tv : numpy array
+        with these values [year, doy, meanRHtoday, len(rh), month, day, stdRH, averageAmplitude]
+        len(rh) is the number of RH on a given day
+        stdRH is the standard deviation of the RH values (meters)
+        averageAmplitude is in volts/volts
+
+    obstimes : datetime objects for the times
+
     """
     xdir = os.environ['REFL_CODE']
     print('All RH retrievals will be written to: ', alldatafile)
@@ -270,7 +297,6 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     # close the file with all the RH values 
     allrh.close()
 
-    # could compute each frequency with respect to the daily average?
 
     # plot the number of retrievals vs time
     txtdir =  xdir + '/Files'
