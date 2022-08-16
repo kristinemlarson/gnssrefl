@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 downloads RINEX files
-kristine larson
 2020sep03 - modified environment variable requirement
 2022feb15 - updated rinex3 to use karnak.py
 """
@@ -31,8 +30,8 @@ def parse_arguments():
                         help="set to True to strip to only SNR observables, teqc used")
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
     parser.add_argument("-stream", default=None, type=str,
-                        help="set to True to get stream defined filename. I know. I know. It is annoying.")
-    parser.add_argument("-samplerate", default=None, type=str, help="Sample rate in seconds for RINEX3 only.")
+                        help="set to True to get stream-defined Rinex3 filename. I know. I know. It is annoying.")
+    parser.add_argument("-samplerate", default=None, type=str, help="Sample rate in seconds. For RINEX3 only.")
     parser.add_argument("-strip_snr", default=None, type=str, help="Uses gfzrnx to strip out non-SNR data/default is False")
     parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
 
@@ -138,12 +137,16 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     else:
         doy, cdoy, cyyyy, cyy = g.ymd2doy(year, month, day)
 
+    # allowed archives, rinex 2.11
     archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 'bkg', 'jeff', 'ngs', 'nrcan', 'special', 'bev', 'all']
 
+    # highrate archives allowed
     archive_list_high = ['unavco', 'nrcan', 'ga']
-    # removed all
+
+    # removed the all archive
     archive_list_high = ['unavco', 'nrcan', 'cddis'] # removed GA, added Cddis for v2
 
+    # archive list for rinex3 lowrate files
     archive_list_rinex3 = ['unavco', 'cddis', 'ga', 'bev', 'bkg', 'ign', 'epn', 'bfg','all']
 
     if doy_end is None:

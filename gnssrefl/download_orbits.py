@@ -15,6 +15,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("month", help="month (or day of year)", type=int)
     parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
+    parser.add_argument("-doy_end", help="doy end for multi-day download ", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -70,6 +71,9 @@ def download_orbits(orbit: str, year: int, month: int, day: int):
             month
 
          day : integer
+            day
+
+         doy_end : integer
             day
 
     """
