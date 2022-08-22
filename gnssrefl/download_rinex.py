@@ -219,16 +219,16 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             print(station, year, d, archive, samplerate, stream)
             if rate == 'high':
                 print('seek highrate data at CDDIS')
-                ch.cddis_highrate(station, year, doy, 0, stream, 1)
+                ch.cddis_highrate(station, year, d, 0, stream, 1)
             else:
                 if archive == 'all':
-                    file_name, foundit = k.universal_all(station, year, doy, samplerate, stream)
+                    file_name, foundit = k.universal_all(station, year, d, samplerate, stream)
                     if not foundit:
-                        file_name, foundit = k.universal_all(station, year, doy, samplerate, k.swapRS(stream))
+                        file_name, foundit = k.universal_all(station, year, d, samplerate, k.swapRS(stream))
                 else:
-                    file_name, foundit = k.universal(station, year, doy, archive, samplerate, stream,debug)
+                    file_name, foundit = k.universal(station, year, d, archive, samplerate, stream,debug)
                     if not foundit:
-                        file_name, foundit = k.universal(station, year, doy, archive, samplerate, k.swapRS(stream),debug)
+                        file_name, foundit = k.universal(station, year, d, archive, samplerate, k.swapRS(stream),debug)
                 if foundit: 
                     print('\n SUCCESS 1: ', file_name)
                     translated, new_file_name = r.go_from_crxgz_to_rnx(file_name)
@@ -239,16 +239,16 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             # using new karnak code
             rinexfile, rinexfiled = g.rinex_name(station, year, d, 0)
             if rate == 'high':
-                rinexfile, foundit = k.rinex2_highrate(station, year, doy, archive, strip_snr)
+                rinexfile, foundit = k.rinex2_highrate(station, year, d, archive, strip_snr)
             else:
                 if archive == 'all':
                     foundit = False
                     print('cycle thru unavco,sopac,sonel archives')
                     for archiveinput in ['unavco', 'sopac', 'sonel']:
                         if not foundit:
-                            file_name, foundit = k.universal_rinex2(station, year, doy, archiveinput)
+                            file_name, foundit = k.universal_rinex2(station, year, d, archiveinput)
                 else:
-                    file_name, foundit = k.universal_rinex2(station, year, doy, archive)
+                    file_name, foundit = k.universal_rinex2(station, year, d, archive)
                 if foundit:  # uncompress and make o files ...
                     rinexfile, foundit = k.make_rinex2_ofiles(file_name)  # translate
 
