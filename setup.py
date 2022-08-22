@@ -22,7 +22,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astro
 
 setup(
     name="gnssrefl",
-    version="1.1.4",
+    version="1.1.5",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -70,7 +70,7 @@ setup(
     install_requires=requirements,
     ext_modules = [ext1,ext2,ext3],
     classifiers=[
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
 )

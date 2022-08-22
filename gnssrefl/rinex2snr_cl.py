@@ -288,7 +288,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     # no longer allow the all option
     # unavco is only rinex2
     # ga is only rinex3
-    highrate_list = ['unavco', 'nrcan', 'cddis','ga']  # cddis is only rinex 2 for now
+    # bkg is only rinex 3
+    highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  # cddis is only rinex 2 for now
 
     if ns == 9:
         # rinex3
@@ -300,7 +301,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         # rinex2
         if rate == 'high':
             if archive not in highrate_list:
-                print(f'You have chosen highrate and {archive} but only unavco, cddis and nrcan are allowed. Exiting.')
+                print(f'You have chosen highrate and {archive} but only unavco, bkg, cddis and nrcan are allowed. Exiting.')
                 print('Please help code up access to additional archives')
                 sys.exit()
         else:

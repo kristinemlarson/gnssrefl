@@ -148,3 +148,106 @@ def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
         exe1 = 'gunzip'
 
     return file_name, crnx_name, file_name2, crnx_name2, exe1, exe2
+
+
+
+def bkg_highrate(station, year, month, day,stream,dec_rate):
+    """
+    picks up a highrate RINEX 3 file from BKG, merges and decimates it.
+    requires gfzrnx
+
+    parameters
+    -------------
+    inputs: string
+        9 ch station name 
+    year : integer
+
+    month : integer
+
+    day : integer
+
+    stream : string
+        R or S
+
+    dec_rate : integer
+
+    returns
+    ----------
+
+    """
+    fexist  = False
+    version = 3
+    crnxpath = g.hatanaka_version()
+    gexe = g.gfz_version()
+    alpha='abcdefghijklmnopqrstuvwxyz'
+    # if doy is input
+    if day == 0:
+        doy=month
+        d = g.doy2ymd(year,doy);
+        month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = g.ymd2doy(year,month,day); 
+
+    if not os.path.isfile(crnxpath):
+        g.hatanaka_warning(); return
+
+    if not os.path.isfile(gexe):
+        print('You need to install gfzrnx to use high-rate RINEX data in my code.')
+        return '', fexist
+
+#    https://igs.bkg.bund.de/root_ftp/EUREF/highrate/2022/233/a/VLIS00NLD_R_20222330000_15M_01S_MO.crx.gz
+    gns = 'https://igs.bkg.bund.de/root_ftp/EUREF/highrate/'
+    # base directory name
+    gns = gns + cyyyy + '/'+ cdoy + '/' 
+
+    s1=time.time()
+    print('WARNING: Get yourself a cup of coffeee. Downloading 96 files takes a long time.')
+    fileF = 0
+    streamID  = '_' + stream + '_'
+    s1 = time.time()
+    for h in range(0,24):
+        # subdirectory
+        ch = '{:02d}'.format(h)
+        print('Hour: ', ch)
+        for e in ['00', '15', '30', '45']:
+            file_name = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.crx.gz'
+            crnx_name = file_name[:-3] 
+            oname = file_name[:-6] + 'rnx'
+
+            dirname = gns + '/' + alpha[h] + '/'
+            if os.path.isfile(oname):
+                fileF = fileF + 1
+                print('already have ', oname)
+            else:
+                try:
+                    wget.download(dirname+file_name,file_name)
+                    subprocess.call(['gunzip',file_name]) # unzip
+                    subprocess.call([crnxpath, crnx_name]) # hatanaka
+                    subprocess.call(['rm',crnx_name]) # remove old file
+                except:
+                    okok = 1
+                if os.path.isfile(oname):
+                    print('have downloaded ', oname)
+                    fileF = fileF + 1
+
+    searchP = station.upper() + streamID + cyyyy + cdoy + '*MO.rnx'
+    print('Found ', fileF,' 15 minute files')
+
+    outfile = station.upper() + '.tmp'
+    crate = '{:02d}'.format(dec_rate)
+
+    file_name24 = ''
+
+    if (fileF > 0):
+        subprocess.call([gexe,'-finp', searchP, '-fout', outfile, '-vo','3', '-smp', crate, '-f','-q'])
+        file_name24 = station.upper() + streamID + cyyyy + cdoy + '0000_01D_' + crate + '_MO.rnx'
+        subprocess.call(['mv',outfile, file_name24]) # remove old file
+        fexist = True
+
+    s2=time.time()
+    print('That download and merging experience took ', int(s2-s1), ' seconds.')
+
+    # remove 15 minute files
+    cm = 'rm ' + station + streamID + cyyyy + cdoy + '*15M_01S_MO.rnx'
+    if fexist:
+        subprocess.call(cm,shell=True)
+    return file_name24,  fexist
