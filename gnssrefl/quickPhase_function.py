@@ -271,11 +271,11 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
 
     t = years + doys/365.25
     tspan = t[-1] - t[0]
-    print('>>> Timespan in years: ', tspan)
+    print('>>> Timespan in years: ', np.round(tspan,3))
     if tspan < 1.5:
         polyordernum = 0  # do nothing
     else:
-        polyordernum = 1 + int(np.floor(tspan - 0.5));
+        polyordernum =  int(np.floor(tspan - 0.5));
     print('>>> Polynomial Order ', polyordernum)
 
     # need to do a 30 day smoother on amp
@@ -371,24 +371,31 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
 
     # ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order
     # Choosing the kind of fit based on the number of years requested to process
-    fit_kind = {1: 'zero', 2: 'slinear', 3: 'quadratic', 4: 'cubic'}
+    #fit_kind = {1: 'zero', 2: 'slinear', 3: 'quadratic', 4: 'cubic'}
     # ????
-    num_years = len(st)
-    if num_years > 4:
-        num_years = 4
-    print('Is this where the problem is?')
-    kind = fit_kind[num_years]
-    print(kind)
-    st_interp = interp1d(st, sp, kind=kind, fill_value='extrapolate')
-    new_level = st_interp(t)
+    #num_years = len(st)
+    #if num_years > 4:
+    #    num_years = 4
+    #kind = fit_kind[num_years]
+    # ignore the spline which was not to be used.
+    #st_interp = interp1d(st, sp, kind=kind, fill_value='extrapolate')
+    #new_level = st_interp(t)
 
+
+    anothermodel = np.polyfit(st, sp, polyordernum)
+    new_level = np.polyval(anothermodel, t)
+
+    # ??
     nv = tmin + (newvwc - new_level) / 100
 
     ax = plt.subplot(2, 1, 2)
     # plt.plot(t,vwc,label='old vwc')
     ax.plot(t_datetime, newvwc, label='new vwc')
     ax.plot(st_datetime, sp, 'o', label='nodes')
-    ax.plot(t_datetime, new_level, '-', label='level')
+
+    # this was a kluge that was not meant to be used 
+    #ax.plot(t_datetime, new_level, '-', label='level')
+    ax.plot(t_datetime, new_level, label='level')
     ax.set_ylabel('VWC')
     ax.set_title('Volumetric Water Content')
     ax.legend(loc='best')
@@ -397,10 +404,9 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
     plot_path = f'{xdir}/Files/{station}_phase_vwc_result.png'
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
-    if plt2screen:
-        plt.show()
+    #if plt2screen:
+    #    plt.show()
 
-    #plt.figure(figsize=(10, 10))
 
     fig,ax=plt.subplots()
     plt.plot(t_datetime, nv, 'b-')
@@ -414,15 +420,14 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
 
 
     plot_path = f'{xdir}/Files/{station}_vol_soil_moisture.png'
-    print(f"saving figure to {plot_path}")
+    print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
     if plt2screen:
         plt.show()
 
-    # TODO this is not used - polyordernum only gets set and then is here so is not used except with the commented-out code below.
-    if polyordernum > 0:
-        model = np.polyfit(t, vwc, polyordernum)
-        fit = np.polyval(model, t)
+    #if polyordernum > 0:
+    #    model = np.polyfit(t, vwc, polyordernum)
+    #    fit = np.polyval(model, t)
         # plt.plot(t,fit,label='poly-vwc')
         # this doesn't really help
         # sm_vwc = seasonal_smoother(vwc, 90)
@@ -430,10 +435,11 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
 
 
     vwcfile = FileManagement(station, FileTypes.volumetric_water_content).get_file_path()
-    print('VWC results going to ', vwcfile)
+    print('VWC being written to ', vwcfile)
     with open(vwcfile, 'w') as w:
         N = len(nv)
-        w.write("% gnssrefl results for GPS Station {0:4s} \n".format(station))
+        w.write("% Results for GPS Station {0:4s} \n".format(station))
+        w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
         w.write("% FracYr Year DOY  VWC  \n")
         for iw in range(0, N):
             fdate = t[iw]

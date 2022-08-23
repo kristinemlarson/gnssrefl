@@ -81,7 +81,7 @@ The daily phase results go to $REFL_CODE/Files/p038_phase.txt. [Example](p038_ph
 Then it converts those to VWC using the Clara Chew derived algorithms.
 The output goes in the same place as phase: $REFL_CODE/Files/p038_vwc.txt. [Example](p038_vwc.txt)
  <br />
-<img src="p038_az_phase.png" width="600">
+<img src="p038_azim.png" width="600">
  <br />
 <img src="p038_daily_phase.png" width="500">
  <br />

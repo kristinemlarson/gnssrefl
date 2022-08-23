@@ -45,7 +45,7 @@ This will produce color plots for the four geographic regions (northwest, northe
 
 
  <br />
-<img src="../tests/use_cases/p038_az_phase.png" width="600">
+<img src="../tests/use_cases/p038_azim.png" width="600">
  <br />
 
 If you have previously run the code it will attempt to warn you about bad satellite tracks.
@@ -63,11 +63,11 @@ and must be modeled.  We follow a multi-stage process - we change units from pha
 we model and remove the vegetation effect, and then we "level" the data using soil texture profiles for your site.
 Currently we set the minimum soil moisture value to 5%.
 
-<img src="../tests/use_cases/p038_phase_vwc_result.png" width="600">
+<img src="../tests/use_cases/p038_smc_models.png" width="600">
  <br />
 
 Final Result:
 
-<img src="../tests/use_cases/p038_vol_soil_moisture.png" width="600">
+<img src="../tests/use_cases/p038_vwc.png" width="600">
 
 

@@ -387,7 +387,7 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
     rh = vxyz[:, 5] # TODO this is not used
     amp = vxyz[:, 6]
     fileout = xdir + '/Files/' + station + '_phase.txt'
-    print(' make a new output phase file with daily averages:', fileout)
+    print('Daily averaged phases: ', fileout)
 
     if writeout:
         with open(fileout, 'w') as fout:
