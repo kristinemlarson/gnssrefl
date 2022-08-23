@@ -13,6 +13,7 @@ def parse_arguments():
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year end", type=int)
+    parser.add_argument("-min_tracks", default=None, help="minimum number of tracks needed to keep the mean RH", type=int)
     parser.add_argument("-freq", default=None, help="frequency", type=int)
 
     args = parser.parse_args().__dict__
@@ -21,7 +22,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def apriori(station: str, year: int, year_end: int = None, freq: int = 20):
+def apriori(station: str, year: int, year_end: int = None, freq: int = 20, min_tracks: int = 100):
     """
     apriori picks up reflector height results for a given station and year-year end and computes the mean values
     and returns a file with the mean values.
@@ -37,8 +38,10 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20):
         Day of year
 
     freq : integer, optional
-        GNSS frequency. Currently only supports l2c.
-        Default is 20 (l2c)
+        GPS frequency. Currently only supports l2c, which is frequency 20.
+
+    min_tracks : integer, optional
+        number of minimum tracks needed in order to keep the average RH
 
     Returns
     _______
@@ -53,6 +56,11 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20):
     if not year_end:
         year_end = year
 
+    # is this needed?
+    if not min_tracks:
+        min_tracks = 100
+
+    print('Minimum number of tracks required ', min_tracks)
     years = np.arange(year, year_end+1)
     gnssir_results = []
     for y in years:
@@ -65,6 +73,7 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20):
 
     # get the satellites for the requested frequency (20 for now) and most recent year
     # TODO - write this for any requested frequency using find_satlist_wdate
+    print('Using L2C satellite list for December 31 on ', years[-1])
     l2c_sat, l5_sat = l2c_l5_list(years[-1], 365)
     # four quadrants
     azimuth_list = [0, 90, 180, 270]
@@ -89,7 +98,7 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20):
             azimuths = azimuth_gnssir_results[(azimuth_gnssir_results > azimuth_min)
                                               & (azimuth_gnssir_results < azimuth_max)
                                               & (satellite_gnssir_results == satellite)]
-            if len(reflector_heights) > 0:
+            if (len(reflector_heights) > min_tracks):
                 b = b+1
                 average_azimuth = np.mean(azimuths)
                 #print("{0:3.0f} {1:5.2f} {2:2.0f} {3:7.2f} {4:3.0f} {5:3.0f} {6:3.0f} ".format(b, np.mean(reflector_heights), satellite, average_azimuth, len(reflector_heights),azimuth_min,azimuth_max))
@@ -98,9 +107,23 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20):
     apriori_path = FileManagement(station, FileTypes("apriori_rh_file")).get_file_path()
 
     # save file
-    print(f">>>> Apriori RH file used for phase estimation written to {apriori_path}")
-    with open(apriori_path, 'w') as my_file:
-        np.savetxt(my_file, apriori_array, fmt="%3.0f %5.2f %2.0f %7.2f %3.0f %3.0f %3.0f")
+
+    if (len(apriori_array) == 0):
+        print('Found no results - perhaps wrong year? or ')
+    else:
+        print(f">>>> Apriori RH file used for phase estimation written to {apriori_path}")
+        fout = open(apriori_path, 'w+')
+        fout.write("{0:s}  \n".format('% apriori RH values used for phase estimation'))
+        l = '% year/station ' + str(year) + ' ' + station 
+        fout.write("{0:s}  \n".format(l))
+        fout.write("{0:s}  \n".format('% tmin 0.05 (default)'))
+        fout.write("{0:s}  \n".format('% tmax 0.50 (default)'))
+        fout.write("{0:s}  \n".format('% Track  RefH SatNu MeanAz  Nval   Azimuths '))
+        fout.write("{0:s}  \n".format('%         m   ' ))
+
+    #with open(apriori_path, 'w') as my_file:
+        np.savetxt(fout, apriori_array, fmt="%3.0f %6.3f %4.0f %7.2f   %4.0f  %3.0f  %3.0f")
+        fout.close()
 
 
 def main():

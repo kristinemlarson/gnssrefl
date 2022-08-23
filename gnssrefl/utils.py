@@ -130,7 +130,8 @@ def read_files_in_dir(directory, transpose=False):
             # Make sure given path is a directory - not a file
             if dir_path.is_dir():
                 data = []
-                result_files = list(dir_path.glob("*.txt"))
+                #result_files = list(dir_path.glob("*.txt"))
+                result_files = list(dir_path.glob("???.txt"))
                 if result_files is not None:
                     for file in result_files:
                         # need to find a better way than guessing file size but this removes the UserWarning when no data in file

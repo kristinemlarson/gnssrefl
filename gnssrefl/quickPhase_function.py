@@ -271,11 +271,11 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
 
     t = years + doys/365.25
     tspan = t[-1] - t[0]
-    print('timespan', tspan)
+    print('>>> Timespan in years: ', tspan)
     if tspan < 1.5:
         polyordernum = 0  # do nothing
     else:
-        polyordernum = 1 + np.floor(tspan - 0.5);
+        polyordernum = 1 + int(np.floor(tspan - 0.5));
     print('>>> Polynomial Order ', polyordernum)
 
     # need to do a 30 day smoother on amp
@@ -325,7 +325,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
                 newl = [yr, 15, lval]
                 #print(newl)
                 nodes = np.append(nodes, [newl], axis=0)
-                print(yr, lval)
+                print('Level value:', yr, np.round(lval,2))
             else:
                 print('No summer dates found to compute VWC for ', yr)
     else:
@@ -339,7 +339,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
                 newl = [yr, 213, lval]
                 #print(newl)
                 nodes = np.append(nodes, [newl], axis=0)
-                print(yr, lval)
+                print('Level value:',yr, np.round(lval,2))
             else:
                 print('No summer dates found to compute VWC', yr)
 
@@ -372,10 +372,13 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
     # ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order
     # Choosing the kind of fit based on the number of years requested to process
     fit_kind = {1: 'zero', 2: 'slinear', 3: 'quadratic', 4: 'cubic'}
+    # ????
     num_years = len(st)
     if num_years > 4:
         num_years = 4
+    print('Is this where the problem is?')
     kind = fit_kind[num_years]
+    print(kind)
     st_interp = interp1d(st, sp, kind=kind, fill_value='extrapolate')
     new_level = st_interp(t)
 
@@ -397,8 +400,10 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
     if plt2screen:
         plt.show()
 
+    #plt.figure(figsize=(10, 10))
+
     fig,ax=plt.subplots()
-    plt.plot(t_datetime, nv, '.')
+    plt.plot(t_datetime, nv, 'b-')
     params = {'mathtext.default': 'regular'}
     plt.rcParams.update(params)
     plt.title('Soil Moisture ' + station.upper())
