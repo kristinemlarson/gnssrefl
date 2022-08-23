@@ -356,8 +356,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
     # create subplots: 2 rows 1 column, 1st subplot
     ax = plt.subplot(2, 1, 1)
 
-    ax.plot(t_datetime, ph, label='original')
-    ax.plot(t_datetime, newph, label='vegcorr')
+    ax.plot(t_datetime, ph, 'b-',label='original')
+    ax.plot(t_datetime, newph, 'r-',label='vegcorrected')
     ax.set_title(f'With and Without Vegetation Correction ')
     ax.set_ylabel('phase (degrees)')
     ax.legend(loc='best')

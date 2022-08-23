@@ -56,7 +56,7 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20, min_t
     if not year_end:
         year_end = year
 
-    # is this needed?
+    # not sure this is needed?
     if not min_tracks:
         min_tracks = 100
 
@@ -72,7 +72,6 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20, min_t
     gnssir_results = np.array(gnssir_results).T
 
     # get the satellites for the requested frequency (20 for now) and most recent year
-    # TODO - write this for any requested frequency using find_satlist_wdate
     print('Using L2C satellite list for December 31 on ', years[-1])
     l2c_sat, l5_sat = l2c_l5_list(years[-1], 365)
     # four quadrants

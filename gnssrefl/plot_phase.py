@@ -288,9 +288,8 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
             amps = amp[ii]
             rhs = rh[ii]
 
-            # this was 10.  who knows why
-            reqNumpts = 10
-            reqNumpts = 100
+            # this is the number of points in a whole year for a given satellite ??? 
+            reqNumpts = 50
             if len(x) > reqNumpts:
                 b += 1
                 sortY = np.sort(x)
@@ -386,13 +385,14 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
     az = vxyz[:, 4] # TODO this is not used
     rh = vxyz[:, 5] # TODO this is not used
     amp = vxyz[:, 6]
-    fileout = xdir + '/Files/' + station + '_phase.txt'
-    print('Daily averaged phases: ', fileout)
 
+    # 10 required for each day?
     if writeout:
+        fileout = xdir + '/Files/' + station + '_phase.txt'
+        print('Daily averaged phases: ', fileout)
         with open(fileout, 'w') as fout:
             fout.write("% Year DOY Ph Phsig NormA MM DD \n")
-            for requested_year in range(int(y[0]), year_end + 1):
+            for requested_year in range(year, year_end + 1):
                 for doy in range(1, 367):
                     # put in amplitude criteria to keep out bad L2P results
                     ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
@@ -410,18 +410,14 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
 
         datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
 
-        # unnecessary
-        #plt.figure(figsize=(10, 10))
-        #plt.grid()
-        #plt.plot(datetime_dates, tv[:, 2], 'o')
-        #plt.title(f"Daily Phase Results: {station.upper()}")
-
-        #plot_path = f'{xdir}/Files/{station}_daily_phase.png'
-        #print(f"saving figure to {plot_path}")
-        #plt.savefig(plot_path)
-        # turning this off for now
-        #if plt2screen:
-        #    plt.show()
+        plt.figure(figsize=(10, 6))
+        plt.plot(datetime_dates, tv[:, 2], 'bo')
+        plt.ylabel('phase (degrees)')
+        plt.title(f"Daily Phase Results: {station.upper()}")
+        plt.grid()
+        plot_path = f'{xdir}/Files/{station}_daily_phase.png'
+        print(f"Saving figure to {plot_path}")
+        plt.savefig(plot_path)
 
         #now convert to vwc
         qp.convert_phase(station, year, year_end, plt2screen)
