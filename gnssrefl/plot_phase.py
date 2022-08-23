@@ -34,7 +34,19 @@ def parse_arguments():
 
 def load_avg_phase(station):
     """
-    # quick and dirty pick up of phase results
+    parameters
+    -----------
+    station : string
+        4 character ID, lowercase
+
+    returns
+    --------
+    avg_exist : boolean
+
+    avg_date : ??
+
+    avg_phase : ??
+
     """
     avg_date = []
     avg_phase = []
@@ -65,9 +77,9 @@ def load_sat_phase(station, year, year_end, freq):
     """
     print('Requested frequency: ', freq)
     dataexist = False
-    subprocess.call(['rm', '-f', 'tmp.txt'])
-    txtdir = 'echo \%  > tmp.txt'
-    os.system(txtdir)
+    #subprocess.call(['rm', '-f', 'tmp.txt'])
+    #txtdir = 'echo \%  > tmp.txt'
+    #os.system(txtdir)
 
     dir = Path(os.environ["REFL_CODE"])
 
@@ -215,7 +227,7 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
         writeout = True
     else:
         writeout = False
-        print('An average file will not be produced')
+        print('An average file will not be produced.')
 
     # azimuth list
     azlist = [270, 0, 90, 180]
@@ -223,13 +235,14 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
     # load past analysis  for QC
     avg_exist, avg_date, avg_phase = load_avg_phase(station)
     if not avg_exist:
-        print('average file does not exist as yet')
+        print('WARNING: the average phase file does not exist as yet')
 
     data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp = load_sat_phase(station, year, year_end=year_end, freq=freq)
     if not data_exist:
-        print('no data uploaded. check frequency request or station name')
+        print('No data were found. Check your frequency request or station name')
         sys.exit()
 
+    
     tracks = qp.read_apriori_rh(station)
     atracks = tracks[:, 5]  # min azimuth values
     stracks = tracks[:, 2]  # satellite names
@@ -275,7 +288,10 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
             amps = amp[ii]
             rhs = rh[ii]
 
-            if len(x) > 10:
+            # this was 10.  who knows why
+            reqNumpts = 10
+            reqNumpts = 100
+            if len(x) > reqNumpts:
                 b += 1
                 sortY = np.sort(x)
 
@@ -296,8 +312,7 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
                 if len(t) == 0:
                     print('you should consider removing this satellite track', sat, amin)
 
-                # TODO else?
-                if len(t) > 10:
+                if (len(t) > reqNumpts):
                     for l in range(0, len(t)-1):
                         if new_phase[l] > 340:
                             new_phase[l] = new_phase[l] - 360
@@ -336,9 +351,9 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
                         addit = ''
                         if res > 5.5:
                             addit = '>>>>>  Consider Removing This Track <<<<<'
-                        print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azi {amin:5.0f} {max(normAmps):4.2f} {addit:20s} ")
+                        print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:5.0f} {amax:5.0f} Amp {max(normAmps):4.2f} {addit:20s} ")
                     else:
-                        print('no average , so no QC. Iterate.')
+                        print('No average , so no QC. You should iterate.')
 
 
                     # cumulative values
@@ -352,7 +367,7 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
 
 
     plot_path = f'{xdir}/Files/{station}_az_phase.png'
-    print(f"saving figure to {plot_path}")
+    print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
     #if plt2screen:
     #    plt.show()

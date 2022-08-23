@@ -356,10 +356,10 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
     # create subplots: 2 rows 1 column, 1st subplot
     ax = plt.subplot(2, 1, 1)
 
-    ax.plot(t_datetime, ph, label='Phase')
-    ax.plot(t_datetime, newph, label='ph-vegcorr')
+    ax.plot(t_datetime, ph, label='original')
+    ax.plot(t_datetime, newph, label='vegcorr')
     ax.set_title(f'With and Without Vegetation Correction ')
-    ax.set_ylabel('VWC')
+    ax.set_ylabel('phase (degrees)')
     ax.legend(loc='best')
     ax.grid()
 
@@ -392,7 +392,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True):
     ax.grid()
 
     plot_path = f'{xdir}/Files/{station}_phase_vwc_result.png'
-    print(f"saving figure to {plot_path}")
+    print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
     if plt2screen:
         plt.show()

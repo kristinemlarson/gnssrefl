@@ -98,7 +98,7 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20):
     apriori_path = FileManagement(station, FileTypes("apriori_rh_file")).get_file_path()
 
     # save file
-    print(f"saving apriori file to {apriori_path}")
+    print(f">>>> Apriori RH file used for phase estimation written to {apriori_path}")
     with open(apriori_path, 'w') as my_file:
         np.savetxt(my_file, apriori_array, fmt="%3.0f %5.2f %2.0f %7.2f %3.0f %3.0f %3.0f")
 
