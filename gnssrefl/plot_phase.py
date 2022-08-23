@@ -230,7 +230,7 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
         print('An average file will not be produced.')
 
     # azimuth list
-    azlist = [270, 0, 90, 180]
+    azlist = [270, 0, 180,90 ]
 
     # load past analysis  for QC
     avg_exist, avg_date, avg_phase = load_avg_phase(station)
