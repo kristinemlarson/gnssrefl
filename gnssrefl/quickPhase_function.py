@@ -156,6 +156,12 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
     pele : list of floats 
         elevation angle limits for the polynomial removal.  units: degrees
 
+    screenstats : boolean
+        whether statistics are printed to the screen
+
+    compute_lsp : boolean
+        this is always true
+
     only GPS frequencies are allowed
 
     """
@@ -182,7 +188,6 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
         pass
 
     else:
-        print('opening file')       
         header = "Year DOY Hour   Phase   Nv  Azimuth  Sat  Ampl emin emax  DelT aprioriRH  freq estRH  pk2noise LSPAmp\n(1)  (2)  (3)    (4)   (5)    (6)    (7)  (8)  (9)  (10)  (11)   (12)     (13)  (14)    (15)    (16)"
         file_manager = FileManagement(station, FileTypes.phase_file, year, doy, file_not_found_ok=True)
         print(f"Saving phase file to: {file_manager.get_file_path()}")
@@ -254,10 +259,6 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                                     phase = phase + 180
 
                                 result = [[year, doy, utctime, phase, nv, avg_azim, sat_number, amp, min_el, max_el, del_t, rh_apriori, freq, max_f, obs_pk2noise, max_amp]]
-                        # print(f"Year {year:4.0f} DOY {doy:3.0f} Hour {utctime:6.2f} Phase {phase:8.3f} Nv {nv:5.0f}"
-                        #       f" Azimuth {avg_azim:6.1f} Sat {sat_number:3.0f} Ampl {amp:5.2f} emin {min_el:5.2f} "
-                        #       f"emax {max_el:5.2f} DelT {del_t:6.2f} aprioriRH {rh_apriori:5.3f} freq {freq:2.0f}"
-                        #       f" estRH {max_f:6.3f} pk2noise {obs_pk2noise:6.2f} LSPAmp {max_amp:6.2f}")
                                 np.savetxt(my_file, result, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f", comments="%")
 
 
@@ -550,3 +551,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
 
     # newl = [year[-1], doys[-1], newvwc[-1]]
     # nodes = np.append(nodes, [newl],axis=0)
+
+                        # print(f"Year {year:4.0f} DOY {doy:3.0f} Hour {utctime:6.2f} Phase {phase:8.3f} Nv {nv:5.0f}"
+                        #       f" Azimuth {avg_azim:6.1f} Sat {sat_number:3.0f} Ampl {amp:5.2f} emin {min_el:5.2f} "
+                        #       f"emax {max_el:5.2f} DelT {del_t:6.2f} aprioriRH {rh_apriori:5.3f} freq {freq:2.0f}"
+                        #       f" estRH {max_f:6.3f} pk2noise {obs_pk2noise:6.2f} LSPAmp {max_amp:6.2f}")

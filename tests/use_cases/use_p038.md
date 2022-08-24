@@ -34,7 +34,6 @@ so that people can test out this code.
 
 <code>rinex2snr p038 2017 1 -doy_end 365 -archive special</code>
 
-
 Analysis parameters are set up with <code>make_json_input</code>. While ordinarily you need to input 
 the station latitude, longitude, and ellipsoidal height, if the station is in the <code>gnssrefl</code> database, you can 
 put zero values there instead.
@@ -57,7 +56,7 @@ We need a list of satellite tracks to use:
 
 <code>vwc_input p038 2017</code>
 
-This creates a file that goes in $REFL_CODE/input/p038_phaseRH.
+This creates a file that is stored in $REFL_CODE/input/p038_phaseRH.txt
 
 Now estimate the phase:
 
@@ -67,14 +66,21 @@ Finally, convert the phase to volumetric water content:
 
 <code>vwc p038 2017</code>
 
+Everything:
 
- <br />
-<img src="p038_azim.png" width="600">
- <br />
-<img src="p038_daily_phase.png" width="500">
- <br />
-<img src="p038_phase_vwc_result.png" width="600">
- <br />
-<img src="p038_vol_soil_moisture.png" width="600">
+<img src="p038_1.png" width="600">
+
+
+Daily average phase:
+
+<img src="p038_2.png" width="500">
+
+Model inputs:
+
+<img src="p038_3.png" width="600">
+
+Final results:
+
+<img src="p038_4.png" width="600">
 
 

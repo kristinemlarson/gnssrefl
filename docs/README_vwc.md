@@ -79,8 +79,9 @@ You then need to estimate the phase for the years in question. I will just use 2
 <code>phase p038 2016 1 -doy_end 366 -year_end 2018 </code>
 
 Once you have computed the phase values, you cannot change the *a priori* RH values. If you do change them, you 
-need to rerun <code>phase</code>. If you forget about this, you will see offsets in your phase - and ultimately - your VWC time seires.
-On the plus side, the phase code is fast - much faster than the time it took you to create SNR files.
+need to rerun <code>phase</code>. If you forget about this, you will see offsets in 
+your phase - and ultimately - your VWC time series. On the plus side, the phase code 
+is fast - much faster than the time it took you to create SNR files.
 
 ### 3. Estimate VWC
 

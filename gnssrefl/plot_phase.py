@@ -77,6 +77,8 @@ def load_avg_phase(station,fr):
     avg_phase : ??
 
     """
+
+
     avg_date = []
     avg_phase = []
     avg_exist = False
@@ -110,6 +112,13 @@ def load_sat_phase(station, year, year_end, freq):
     print('Requested frequency: ', freq)
     dataexist = False
 
+    xfile = xdir + '/input/override/' + station + '_vwc' 
+    found_override = False
+    if os.path.exists(xfile):
+        print('found override file')
+        override = np.loadtxt(xfile, comments='%')
+        found_override = True
+
     dir = Path(os.environ["REFL_CODE"])
 
     if not year_end:
@@ -131,23 +140,23 @@ def load_sat_phase(station, year, year_end, freq):
     freq_list = results[:, 12]
     ii = (freq_list == freq)
     results = results[ii, :]
-    print('Number of results for this frequency', len(results))
+    print('Total phase measurements for this frequency: ', len(results))
+#    common_elements, ar1_i, ar2_i = np.intersect1d(ar1, ar2, return_indices=True)
+    minyear = np.min(np.unique(results[:,0]))
+    maxyear = np.max(np.unique(results[:,0]))
+
+    print(minyear,maxyear)
+    sys.exit()
 
     results = results.T  # dumb, but i was using this convention.  easier to maintain
 
     if len(results) == 0:
         print('no data at that frequency')
-        year = []
-        doy = []
-        hr = []
-        ph = []
-        azdata = []
-        ssat = []
-        rh = []
-        amp = []
+        year = []; doy = []; hr = []; ph = []; azdata = []; ssat = []
+        rh = []; amp = []
     else:
         dataexist = True
-        # save with new variable names
+        # save with new variable names 
         year = results[0]
         doy = results[1]
         hr = results[2]
