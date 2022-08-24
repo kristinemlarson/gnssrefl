@@ -1,11 +1,14 @@
 ### Soil Moisture
-
+<p align=center>
 <img src=https://www.kristinelarson.net/wp-content/uploads/2015/10/famousFigure.png width=500>
+</p>
 
-This soil moisture code is based on many years of experiments and model development by Eric Small, Clara Chew, John Braun, Kristine Larson, Kristine Larson, and Felipe Nievinski. We cannot possibly describe all that work here - but we do attempt to give you some context to why 
-we have taken various steps.  Please look to the soil moisture publications at my website [for additional details](https://www.kristinelarson.net/publications/).
+This soil moisture code is based on many years of experiments and model development by Eric Small, Clara Chew, John Braun, 
+Valery Zavorotny, Kristine Larson, and Felipe Nievinski. We cannot possibly describe all that work here - but we do attempt to 
+give you some confirmation of the various steps. Please look to the 
+soil moisture publications at my website [for additional details](https://www.kristinelarson.net/publications/).
 
-Some cautionary notes:
+Some notes:
 
 - This algorithm only uses GPS satellites. This is because we take advantage of the repeating GPS 
 ground track. There is no reason you can't use other GNSS satellites to measure soil moisture - 
@@ -28,8 +31,8 @@ moisture, so I recommend you decimate to 15 seconds when you translate the RINEX
 to be unreliable for PBO H2O and never used them. We have tested our algorithms with newer receivers and still
 find the data to be lacking. We do not recommend you use this soil moisture code with L1 data
 
-- The PBO H2O algorithm was successfully validated for choke ring antennas. We will do our best 
-to test more antennas as time allows. 
+- The PBO H2O algorithm was successfully validated for choke ring antennas. We were not funded to include other antennas 
+in this software package - but will try to do so if others can provide the necessary corrections.
 
 
 ### 1. Analyze the reflection characteristics of your site
@@ -55,8 +58,11 @@ Regardless, you need to take these initial steps:
 
 For reasons described by Clara Chew in her [first paper](https://www.kristinelarson.net/wp-content/uploads/2015/10/Chew_etal_Proof.pdf), 
 we use phase instead of RH or amplitude to derive soil moisture. We need to 
-know which satellites to use. You should use <code>vwc_input</code> to pick the best satellite tracks. 
-The default will be to use rising and setting L2C satellites arcs. This is the signal we used for PBO H2O and we 
+know which satellites to use. 
+
+You should use <code>vwc_input</code> to pick the best satellite tracks. 
+The default will be to use rising and setting L2C satellites arcs. 
+This is the signal we used for PBO H2O and we 
 have [extensively validated its results](https://www.kristinelarson.net/wp-content/uploads/2015/12/SmallLarson_etal2016.pdf). 
 The code also requires that you pick the year that you think has the most L2C satellites (by definition this will be the latest year).
 
