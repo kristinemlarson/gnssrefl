@@ -17,6 +17,33 @@ from pathlib import Path
 
 xdir = Path(os.environ["REFL_CODE"])
 
+def vwc_plot(station,t_datetime, vwcdata, plot_path):
+    """
+    parameters
+    ----------
+    station : string
+
+    t_datetime : datetime 
+        observations time
+
+    vwcdata : numpy array of floats (I think)
+        volumetric water content
+
+    plot_path : string
+        where to put the plot
+    """
+    plt.figure(figsize=(10, 6))
+    plt.plot(t_datetime, vwcdata, 'b-')
+    plt.plot(t_datetime, vwcdata, 'b.')
+    plt.title('GNSS Station ' + station.upper())
+    plt.ylim(0, 0.5)
+    plt.ylabel('Vol. Soil Moisture')
+    plt.grid()
+    #fig.autofmt_xdate()
+
+    print(f"Saving to {plot_path}")
+    plt.savefig(plot_path)
+
 
 def read_apriori_rh(station,fr):
     """
@@ -438,11 +465,10 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
     anothermodel = np.polyfit(st, sp, polyordernum)
     new_level = np.polyval(anothermodel, t)
 
-    # ??
+    # this is applying the level and the tmin values
     nv = tmin + (newvwc - new_level) / 100
 
     ax = plt.subplot(2, 1, 2)
-    # plt.plot(t,vwc,label='old vwc')
     ax.plot(t_datetime, newvwc, label='new vwc')
     ax.plot(st_datetime, sp, 'o', label='nodes')
 
@@ -457,20 +483,9 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
     plt.savefig(plot_path)
 
 
-    fig,ax=plt.subplots()
-    plt.plot(t_datetime, nv, 'b-')
-    params = {'mathtext.default': 'regular'}
-    plt.rcParams.update(params)
-    plt.title('GNSS Station ' + station.upper())
-    plt.ylim(0, 0.5)
-    plt.ylabel('Vol. Soil Moisture')
-    plt.grid()
-    fig.autofmt_xdate()
-
-
     plot_path = f'{xdir}/Files/{station}_vol_soil_moisture.png'
-    print(f"Saving to {plot_path}")
-    plt.savefig(plot_path)
+    vwc_plot(station,t_datetime, nv, plot_path) 
+
     if plt2screen:
         plt.show()
 
