@@ -32,6 +32,16 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path):
     plot_path : string
         where to put the plot
     """
+    # i think this would work???
+    # data = [[1, 2, 3, 4], [0, 2, 3, 4], [0, 0 , 3, 4], [0, 0, 0, 4]] 
+    # data = np.array(data)
+    # data = np.where(data == 0, np.nan, data)
+    for i in range(0,len(vwcdata)):
+        if vwcdata[i] > 0.5:
+            vwcdata[i] = np.nan
+        if vwcdata[i] < 0:
+            vwcdata[i] = np.nan
+
     plt.figure(figsize=(10, 6))
     plt.plot(t_datetime, vwcdata, 'b-')
     plt.plot(t_datetime, vwcdata, 'b.')
@@ -425,8 +435,6 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
             else:
                 print('No summer dates found to compute VWC', yr)
 
-    # newl = [year[-1], doys[-1], newvwc[-1]]
-    # nodes = np.append(nodes, [newl],axis=0)
 
     plt.figure(figsize=(10, 10))
     plt.subplots_adjust(hspace=0.2)
@@ -470,10 +478,10 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
     nv = tmin + (newvwc - new_level) / 100
 
     ax = plt.subplot(2, 1, 2)
-    ax.plot(t_datetime, newvwc, label='new vwc')
-    ax.plot(st_datetime, sp, 'o', label='nodes')
+    ax.plot(t_datetime, newvwc, 'b-', label='new vwc')
 
-    ax.plot(t_datetime, new_level, label='level')
+    ax.plot(st_datetime, sp, 'ro', label='nodes')
+    ax.plot(t_datetime, new_level, 'r-', label='level')
     ax.set_ylabel('VWC')
     ax.set_title('Volumetric Water Content')
     ax.legend(loc='best')
@@ -490,8 +498,6 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
 
     if plt2screen:
         plt.show()
-
-
 
     vwcfile = FileManagement(station, FileTypes.volumetric_water_content).get_file_path()
     print('>>> VWC results being written to ', vwcfile)
@@ -510,7 +516,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
             mydoy = doys[iw]
             watercontent = nv[iw]
             # we do not allow negative soil moisture in my world.
-            if (watercontent> 0 and watercontent < 0.55):
+            if (watercontent> 0 and watercontent < 0.5):
                 w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
 
 
@@ -539,4 +545,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
     #new_level = st_interp(t)
 
     # this was a kluge that was not meant to be used 
+
     #ax.plot(t_datetime, new_level, '-', label='level')
+
+    # newl = [year[-1], doys[-1], newvwc[-1]]
+    # nodes = np.append(nodes, [newl],axis=0)

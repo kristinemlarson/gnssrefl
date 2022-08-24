@@ -34,6 +34,11 @@ find the data to be lacking. We do not recommend you use this soil moisture code
 - The PBO H2O algorithm was successfully validated for choke ring antennas. We were not funded to include other antennas 
 in this software package - but will try to do so if others can provide the necessary corrections.
 
+- Can you measure soil moisture more often than once per day? Of course you can. We routinely
+measured it twice/day at PBO H2O when there were less than 10 satellites. Now that there are 24 L2C 
+transmitting satellites, it would be straightforward to estimate VWC four times/day. 
+
+The code currently only supports sites that are ~1-3 meters above the soil. We will allow variable heights in a future version.
 
 ### 1. Analyze the reflection characteristics of your site
 
@@ -79,7 +84,10 @@ On the plus side, the phase code is fast - much faster than the time it took you
 
 ### 3. Estimate VWC
 
-First stage is to give you "raw" phase results for the four geographic regions (northwest, northeast, etc)
+<code>vwc p038 2016 -year_end 2018</code>
+
+There are three main parts to this code. The first stage is to give you "raw" phase results 
+for the four geographic regions (northwest, northeast, etc)
 
  <br />
 <img src="p038_Figure_1x.png" width="700">
@@ -93,7 +101,7 @@ You are also shown a daily average of the phase data.
 <img src="p038_Figure_2.png" width="600">
  <br />
 
-Second stage is to model and remove the vegetation effects:
+The second stage is to model and remove the vegetation effects:
 
 As described by Clara Chew in her follow up publications, vegetation will have a significant impact on the phase results 
 and that effect must be removed to achieve accurate soil moisture estimates. We follow a 
@@ -107,19 +115,16 @@ multi-stage process:
 
 - do not allow nonsense soil moisture values (e.g. negative soil moisture is not allowed)
 
-Currently we level the VWC data to 5% but we will allow that to vary by site in future versions as that value should depend on 
+We level the VWC data to 5% but we will allow that to vary by site in future versions as that value should depend on 
 the soil texture at the site.
 
 <img src="p038_Figure_3.png" width="600">
  <br />
 
-Final stage - put it all together:
+Final stage - putting it all together:
 
 <img src="p038_Figure_4.png" width="600">
 
-Can you measure soil moisture more often than once per day? Of course you can. We routinely
-measured it twice/day at PBO H2O when there were less than 10 satellites. Now that there are 24 L2C 
-transmitting satellites, it would be straightforward to estimate VWC four times/day. 
 
 Kristine M. Larson
 August 23, 2022

@@ -23,63 +23,51 @@
 </P>
  
 ### Analyze the Data
-The data from 2017 will be analyzed here as a test case.  
+P038 was a PBO site. The data from 2017 will be analyzed here as a test case.  
 We fist start by analyzing the data using the GNSS-IR process. 
 Then we will use the results gathered to run the soil moisture code.
 
 #### Step 1: GNSS-IR
-Begin by generating the SNR files:
-Use the highrate option and decimate to 15 seconds - this is required to get the L2C data.
+Begin by generating the SNR files. Although typically PBO sites do not have L2C 
+data in their low-rate RINEX files, UNAVCO is providing these data in the "special" archive section
+so that people can test out this code.
 
-<code>rinex2snr p038 2017 1 -doy-end 365 -rate high -dec 15</code>
+<code>rinex2snr p038 2017 1 -doy_end 365 -archive special</code>
 
-The resulting SNR files are stored in $REFL_CODE/2017/snr/p038.
 
-Analysis parameters are set up with <code>make_json_input</code>
+Analysis parameters are set up with <code>make_json_input</code>. While ordinarily you need to input 
+the station latitude, longitude, and ellipsoidal height, if the station is in the <code>gnssrefl</code> database, you can 
+put zero values there instead.
 
-<code>make_json_input p038 34.14726 -103.40734 1212.982 -l2c true</code>
+<code>make_json_input p038 0 0 0 -l2c true</code>
 
 The json file is saved at $REFL_CODE/input/p038.json
 
-Now run <code>gnssir</code> to save the reflector height (RH) output for each day in 2017 and set the frequency to l2c.
+Now run <code>gnssir</code> to save the reflector height (RH) output for each day in 2017.
 
-<code>gnssir p038 2017 1 -doy_end 365 -fr 20</code>
+<code>gnssir p038 2017 1 -doy_end 365 </code>
 
 The daily output files are stored in $REFL_CODE/2017/results/p038
 
 #### Step 2: Soil Moisture
 
-For this python version we can come up with a good reflector height (RH) value for each satellite in each quadrant by using the RH values you will have estimated.
-And we will define "good arcs" by successful RH estimates.
-Run **apriori** for the year of 2017:
+[Please read the soil moisture user manual.](../../docs/README_vwc.md).  It is very short and has a lot of tips that will save you time.
 
-<code>apriori p038 2017</code>
+We need a list of satellite tracks to use:
 
-This creates a file that will go in $REFL_CODE/input/p038_phaseRH.
-For each GPS satellite (column 3), a RH (meters) is given in column 2. The azimuth is column 4, 
-number of retrievals in column 5, and then the azimuths in the last two columns.
-This file can be hand edited if you find out later one arc is not working.  
-To comment lines out you use %. [This is what the file should look like.](p038_phaseRH.txt)
+<code>vwc_input p038 2017</code>
 
-The phase analysis code - **quickphase** - will use that file to restrict the number of satellite arcs that are used.
-Run quickphase for the entire year of 2017:
+This creates a file that goes in $REFL_CODE/input/p038_phaseRH.
 
-<code>quickphase p038 2017 1 -doy_end 365</code>
+Now estimate the phase:
 
-The results of quickphase will be one file per day requested, saved as doy.txt (ex: 365.txt).
-In this case, one file for every day of the year 2017. These results will be saved in the directory $REFL_CODE/2017/phase/p038.
+<code>phase p038 2017 1 -doy_end 365</code>
 
-Finally, we can run soil moisture code which is called **plotphase**.
+Finally, convert the phase to volumetric water content:
 
-<code>plotphase p038 2017</code>
+<code>vwc p038 2017</code>
 
-plotphase will produce some QC type plots, daily phase, phase w/ vegetation correction, vwc, and soil moisture plots. 
-all plots are saved in the directory $REFL_CODE/Files as p038_az_phase.png, p038_daily_phase.png,
-p038_phase_vwc_result.png, and p038_vol_soil_moisture.png
 
-The daily phase results go to $REFL_CODE/Files/p038_phase.txt. [Example](p038_phase.txt)
-Then it converts those to VWC using the Clara Chew derived algorithms.
-The output goes in the same place as phase: $REFL_CODE/Files/p038_vwc.txt. [Example](p038_vwc.txt)
  <br />
 <img src="p038_azim.png" width="600">
  <br />
