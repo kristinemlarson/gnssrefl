@@ -144,9 +144,7 @@ def load_sat_phase(station, year, year_end, freq):
 #    common_elements, ar1_i, ar2_i = np.intersect1d(ar1, ar2, return_indices=True)
     minyear = np.min(np.unique(results[:,0]))
     maxyear = np.max(np.unique(results[:,0]))
-
     print(minyear,maxyear)
-    sys.exit()
 
     results = results.T  # dumb, but i was using this convention.  easier to maintain
 
