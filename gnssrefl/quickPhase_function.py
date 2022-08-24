@@ -39,7 +39,8 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path):
     plt.ylim(0, 0.5)
     plt.ylabel('Vol. Soil Moisture')
     plt.grid()
-    #fig.autofmt_xdate()
+    plt.gcf().autofmt_xdate()
+
 
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
@@ -444,14 +445,14 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
     ax.set_ylabel('phase (degrees)')
     ax.legend(loc='best')
     ax.grid()
+    # ?? does not seem to be working.  sigh
+    plt.gcf().autofmt_xdate()
 
-    # More descriptive variable names would help :)
+
+    # More descriptive variable names would help 
     st = nodes[:, 0] + nodes[:, 1]/365.25
     st_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(nodes[:, 0], nodes[:, 1])]
-
     sp = nodes[:, 2]
-
-
 
     howmanynodes = len(sp)
     print('number of nodes', howmanynodes)
@@ -477,6 +478,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20):
     ax.set_title('Volumetric Water Content')
     ax.legend(loc='best')
     ax.grid()
+    plt.gcf().autofmt_xdate()
 
     plot_path = f'{xdir}/Files/{station}_phase_vwc_result.png'
     print(f"Saving to {plot_path}")

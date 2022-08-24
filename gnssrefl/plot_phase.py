@@ -54,6 +54,8 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
     else:
         plt.title(f"Daily L2C Phase Results: {station.upper()}")
     plt.grid()
+    plt.gcf().autofmt_xdate()
+
     plot_path = f'{xdir}/Files/{station}_daily_phase.png'
     print(f"Saving figure to {plot_path}")
     plt.savefig(plot_path)
@@ -287,9 +289,9 @@ def plot_phase(station: str, year: int, year_end: int = None, fr: int = 20, sat:
     vxyz = np.empty(shape=[0, 7]) 
 
     # try removing these
-    plt.figure(figsize=(13, 10))
-    ax=plt.subplots_adjust(hspace=0.2)
-    plt.suptitle(f"Station: {station}", size=16)
+    fig = plt.figure(figsize=(13, 10))
+    #ax=plt.subplots_adjust(hspace=0.2)
+    #plt.suptitle(f"Station: {station}", size=16)
 
     # this is the number of points for a given satellite track
     reqNumpts = min_req_pts_track
@@ -310,7 +312,6 @@ def plot_phase(station: str, year: int, year_end: int = None, fr: int = 20, sat:
         ax = plt.subplot(2, 2, index + 1)
         ax.set_title(f'Azimuth {str(amin)}-{str(amax)} deg.')
         ax.grid()
-
         #ax.autofmt_xdate()
 
         # this satellite list is really satellite TRACKS
@@ -404,6 +405,8 @@ def plot_phase(station: str, year: int, year_end: int = None, fr: int = 20, sat:
 
                     ax.plot(datetime_dates, new_phase, 'o', markersize=3)
                     ax.set_ylabel('Phase')
+                    # ???
+                    plt.gcf().autofmt_xdate()
 
 
     plot_path = f'{xdir}/Files/{station}_az_phase.png'
