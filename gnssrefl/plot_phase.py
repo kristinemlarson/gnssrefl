@@ -392,7 +392,7 @@ def plot_phase(station: str, year: int, year_end: int = None, fr: int = 20, sat:
                                 addit = '>>>>>  Consider Removing This Track <<<<<'
                             print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} Amp {max(normAmps):4.2f} {addit:20s} ")
                         else:
-                            print('No points for this satellite track:', SatNu)
+                            print('No QC assessment could be made for this satellite track')
                     else:
                         print('No average , so no QC. You should iterate.')
 
