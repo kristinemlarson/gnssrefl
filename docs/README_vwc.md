@@ -70,10 +70,10 @@ You then need to estimate the phase for the years in question. I will just use 2
 
 ### 3. Estimate VWC
 
-- First stage is to give you "raw" phase results for the four geographic regions (northwest, northeast, etc)
+First stage is to give you "raw" phase results for the four geographic regions (northwest, northeast, etc)
 
  <br />
-<img src="p038_Figure_1.png" width="600">
+<img src="p038_Figure_1.png" width="700">
  <br />
 
 If you have previously run the code it will attempt to warn you about bad satellite tracks.
@@ -84,7 +84,7 @@ You are also shown a daily average of the phase data.
 <img src="p038_Figure_2.png" width="600">
  <br />
 
-- Second stage is to model and remove the vegetation effects
+Second stage is to model and remove the vegetation effects:
 
 As described by Clara Chew in her follow up publications, vegetation will have a significant impact on the phase results 
 and that effect must be removed to achieve accurate soil moisture estimates. We follow a 
@@ -104,7 +104,7 @@ the soil texture at the site.
 <img src="p038_Figure_3.png" width="600">
  <br />
 
-Which yields:
+Final stage - put it all together:
 
 <img src="p038_Figure_4.png" width="600">
 
