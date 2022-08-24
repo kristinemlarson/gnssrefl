@@ -14,7 +14,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year end", type=int)
     parser.add_argument("-min_tracks", default=None, help="minimum number of tracks needed to keep the mean RH", type=int)
-    parser.add_argument("-freq", default=None, help="frequency", type=int)
+    parser.add_argument("-fr", default=None, help="frequency", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -22,7 +22,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def apriori(station: str, year: int, year_end: int = None, freq: int = 20, min_tracks: int = 100):
+def apriori(station: str, year: int, year_end: int = None, fr: int = 20, min_tracks: int = 100):
     """
     apriori picks up reflector height results for a given station and year-year end and computes the mean values
     and returns a file with the mean values.
@@ -37,7 +37,7 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20, min_t
     year_end : integer
         Day of year
 
-    freq : integer, optional
+    fr : integer, optional
         GPS frequency. Currently only supports l2c, which is frequency 20.
 
     min_tracks : integer, optional
@@ -53,6 +53,7 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20, min_t
     """
     # default l2c, but can ask for L1 and L2
     xdir = Path(os.environ["REFL_CODE"])
+    myxdir = os.environ['REFL_CODE']
     if not year_end:
         year_end = year
 
@@ -70,27 +71,40 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20, min_t
         gnssir_results.extend(result_files)
 
     gnssir_results = np.array(gnssir_results).T
+    if len(gnssir_results) == 0:
+        print('No results were found. Exiting')
+        sys.exit()
 
-    # get the satellites for the requested frequency (20 for now) and most recent year
-    print('Using L2C satellite list for December 31 on ', years[-1])
-    l2c_sat, l5_sat = l2c_l5_list(years[-1], 365)
     # four quadrants
     azimuth_list = [0, 90, 180, 270]
 
+    # get the satellites for the requested frequency (20 for now) and most recent year
+    if (fr == 1):
+        l1_satellite_list = np.arange(1,33)
+        satellite_list = l1_satellite_list
+        apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
+    else:
+        print('Using L2C satellite list for December 31 on ', years[-1])
+        l2c_sat, l5_sat = l2c_l5_list(years[-1], 365)
+        satellite_list = l2c_sat
+        apriori_path_f = myxdir + '/input/' + station + '_phaseRH.txt'
+
+
     # window out frequency 20
     # the following function returns the index values where the statement is True
-    frequency_indices = np.where(gnssir_results[10] == freq)
+    frequency_indices = np.where(gnssir_results[10] == fr)
 
     reflector_height_gnssir_results = gnssir_results[2][frequency_indices]
     satellite_gnssir_results = gnssir_results[3][frequency_indices]
     azimuth_gnssir_results = gnssir_results[5][frequency_indices]
 
     b=0
+
     apriori_array = []
     for azimuth in azimuth_list:
         azimuth_min = azimuth
         azimuth_max = azimuth + 90
-        for satellite in l2c_sat:
+        for satellite in satellite_list:
             reflector_heights = reflector_height_gnssir_results[(azimuth_gnssir_results > azimuth_min)
                                                                 & (azimuth_gnssir_results < azimuth_max)
                                                                 & (satellite_gnssir_results == satellite)]
@@ -110,8 +124,8 @@ def apriori(station: str, year: int, year_end: int = None, freq: int = 20, min_t
     if (len(apriori_array) == 0):
         print('Found no results - perhaps wrong year? or ')
     else:
-        print(f">>>> Apriori RH file used for phase estimation written to {apriori_path}")
-        fout = open(apriori_path, 'w+')
+        print('>>>> Apriori RH file written to ', apriori_path_f)
+        fout = open(apriori_path_f, 'w+')
         fout.write("{0:s}  \n".format('% apriori RH values used for phase estimation'))
         l = '% year/station ' + str(year) + ' ' + station 
         fout.write("{0:s}  \n".format(l))

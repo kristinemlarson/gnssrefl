@@ -15,7 +15,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="doy", type=int)
     parser.add_argument("-snr", default=None, help="snr file ending", type=int)
-    parser.add_argument("-freq", default=None, help="input frequency (use all if you want 1, 2, and 5", type=int)
+    parser.add_argument("-fr", default=None, help="frequency (use all if you want both 1 and 20)", type=str)
     parser.add_argument("-doy_end", "-doy_end", default=None, type=int, help="doy end")
     parser.add_argument("-year_end", "-year_end", default=None, type=int, help="year end")
     parser.add_argument("-e1", default=None, type=int),
@@ -34,9 +34,8 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-# TODO added e1 and e2 from a comment in the code but maybe it should be read from make_json?
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66,
-               freq: int = 20, e1: int = 5, e2: int = 30, plot: bool = False, screenstats: bool = False,
+               fr: str = '20', e1: int = 5, e2: int = 30, plot: bool = False, screenstats: bool = False,
                compute_lsp: bool = True):
     """
     quickphase uses the apriori result file to restrict the number of satellite arcs that are used.
@@ -70,7 +69,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
             88 : saves all data with elevation angles between 5 and 90 degrees
             50 : saves all data with elevation angles less than 10 degrees
 
-    freq : integer, optional
+    fr : string, optional
         GNSS frequency. Currently only supports L2C.
         Default is 20 (l2c)
 
@@ -101,6 +100,11 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     year doy hour phase nv azimuth sat ampl emin emax delT aprioriRH freq estRH pk2noise LSPAmp
     """
 
+    if fr == 'all':
+        fr_list = [1, 20]
+    else:
+        fr_list = [int(fr)]
+
     # in case you want to analyze multiple days of data
     if not doy_end:
         doy_end = doy
@@ -130,11 +134,11 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
             for d in date_range:
                 print('Analyzing year/day of year ' + str(y) + '/' + str(d))
-                qp.phase_tracks(station, y, d, snr, freq, e1, e2, pele, plot, screenstats, compute_lsp)
+                qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp)
     else:
         for d in np.arange(doy, doy_end + 1):
-            print('analyzing year/day of year ' + str(y) + '/' + str(d))
-            qp.phase_tracks(station, year, d, snr, freq, e1, e2, pele, plot, screenstats, compute_lsp)
+            print('Analyzing year/day of year ' + str(year) + '/' + str(d))
+            qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp)
 
 
 def main():

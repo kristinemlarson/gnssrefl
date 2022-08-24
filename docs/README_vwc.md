@@ -9,7 +9,7 @@ publications [for additional details](https://www.kristinelarson.net/publication
 Some cautionary notes:
 
 - This algorithm only uses GPS satellites. This is because we take advantage of the repeating GPS 
-ground track. There is no reason you can't use other GNSS satellites to measure soil mositure - 
+ground track. There is no reason you can't use other GNSS satellites to measure soil moisture - 
 but this code won't do it for you.  
 
 - Will your site be a good soil moisture site?  This is almost entirely based on how flat your site is.
@@ -21,9 +21,9 @@ find L2C data in some older datasets and at some archives (e.g. UNAVCO).
 
 - For many PBO sites (but by no means all), you can find L2C data in the 
 high-rate streams at UNAVCO.  You don't need the high-rate data for estimating soil
-mositure, so I recommend you decimate to 15 seconds when you translate the RINEX file into the SNR format.
+moisture, so I recommend you decimate to 15 seconds when you translate the RINEX file into the SNR format.
 
-- We are planning to add teh L1 frequency to this code. *However* we were never able to successfully
+- We are planning to add the L1 frequency to this code. *However* we were never able to successfully
 use the Trimble L1 data for soil moisture. It was simply too noisy. 
 
 - In contrast to some Trimble data, where the L2C data are not provided, the Septentrio datastreams often

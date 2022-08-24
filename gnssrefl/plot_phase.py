@@ -20,19 +20,46 @@ def parse_arguments():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year_end", type=int)
-    parser.add_argument("-freq", help="frequency", type=int)
+    parser.add_argument("-fr", help="frequency", type=int)
     parser.add_argument("-sat", default=None, type=int, help="satellite")
     parser.add_argument("-plt2screen", default=None, type=str, help="plot to screen")
+    parser.add_argument("-screenstats", default=None, type=str, help="plot statistics to screen")
+    parser.add_argument("-min_req_pts_track", default=None, type=int, help="minimum number of points for a track to be kept. Default is 50")
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt2screen']
+    boolean_args = ['plt2screen','screenstats']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
+def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
+    """
+    parameters
+    -----------
+    station: string
 
-def load_avg_phase(station):
+    fr : integer
+
+    datetime_dates: ...
+
+    tv : list of results
+
+    """
+    plt.figure(figsize=(10, 6))
+    plt.plot(datetime_dates, tv[:, 2], 'bo')
+    plt.ylabel('phase (degrees)')
+    if fr == 1:
+        plt.title(f"Daily L1 Phase Results: {station.upper()}")
+    else:
+        plt.title(f"Daily L2C Phase Results: {station.upper()}")
+    plt.grid()
+    plot_path = f'{xdir}/Files/{station}_daily_phase.png'
+    print(f"Saving figure to {plot_path}")
+    plt.savefig(plot_path)
+
+
+def load_avg_phase(station,fr):
     """
     parameters
     -----------
@@ -52,7 +79,10 @@ def load_avg_phase(station):
     avg_phase = []
     avg_exist = False
 
-    xfile = f'{xdir}/Files/{station}_phase.txt'
+    if fr == 1:
+        xfile = f'{xdir}/Files/{station}_phase_L1.txt'
+    else:
+        xfile = f'{xdir}/Files/{station}_phase.txt'
 
     if os.path.exists(xfile):
         result = np.loadtxt(xfile, comments='%')
@@ -77,9 +107,6 @@ def load_sat_phase(station, year, year_end, freq):
     """
     print('Requested frequency: ', freq)
     dataexist = False
-    #subprocess.call(['rm', '-f', 'tmp.txt'])
-    #txtdir = 'echo \%  > tmp.txt'
-    #os.system(txtdir)
 
     dir = Path(os.environ["REFL_CODE"])
 
@@ -102,6 +129,8 @@ def load_sat_phase(station, year, year_end, freq):
     freq_list = results[:, 12]
     ii = (freq_list == freq)
     results = results[ii, :]
+    print('Number of results for this frequency', len(results))
+
     results = results.T  # dumb, but i was using this convention.  easier to maintain
 
     if len(results) == 0:
@@ -178,7 +207,8 @@ def do_quad(vquad, year, year_end):
     return vout
 
 
-def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sat: int = None, plt2screen: bool = True):
+def plot_phase(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = None, 
+        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
     Parameters:
@@ -192,7 +222,7 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
     year_end : integer
         Day of year
 
-    freq : integer, optional
+    fr : integer, optional
         GNSS frequency. Currently only supports l2c.
         Default is 20 (l2c)
 
@@ -204,6 +234,10 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
         Whether to produce plots to the screen.
         Default is True
 
+    min_req_pts_track : integer
+        how many points needed to keep a satellite track
+        default is 50
+
     Returns
     _______
     Returns two files:
@@ -212,8 +246,10 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
         with columns: Year DOY Ph Phsig NormA MM DD
 
      - Returns the VWC results in a file at $$REFL_CODE/<year>/phase/<station>_vwc.txt
-        with columns: FracYr Year DOY  VWC
+        with columns: FracYr Year DOY  VWC Month Day
     """
+
+    freq = fr # KE kept the other variable
 
     if not year_end:
         year_end = year
@@ -221,21 +257,20 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
     if not plt2screen:
         print('no plots will come to screen. Will only be saved.')
 
-    # l2c list
     # if you don't ask for a special satellite, assume they want to write out the average
-    if (sat is None) and (freq == 20):
-        writeout = True
-    else:
-        writeout = False
-        print('An average file will not be produced.')
+    #if (sat is None) and (freq == 20 or freq == 1):
+    writeout = True
+    #else:
+    #    writeout = False
+    #    print('An average file will not be produced.')
 
     # azimuth list
     azlist = [270, 0, 180,90 ]
 
     # load past analysis  for QC
-    avg_exist, avg_date, avg_phase = load_avg_phase(station)
+    avg_exist, avg_date, avg_phase = load_avg_phase(station,freq)
     if not avg_exist:
-        print('WARNING: the average phase file does not exist as yet')
+        print('WARNING: the average phase file from a previous run does not exist as yet')
 
     data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp = load_sat_phase(station, year, year_end=year_end, freq=freq)
     if not data_exist:
@@ -243,18 +278,21 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
         sys.exit()
 
     
-    tracks = qp.read_apriori_rh(station)
+    tracks = qp.read_apriori_rh(station,freq)
     atracks = tracks[:, 5]  # min azimuth values
     stracks = tracks[:, 2]  # satellite names
 
     # column 3 is sat, 4 is azimuth, npoints is 5, azim is 6 and 7
     k = 1
-    vxyz = np.empty(shape=[0, 7])
+    vxyz = np.empty(shape=[0, 7]) 
 
     # try removing these
     plt.figure(figsize=(13, 10))
     ax=plt.subplots_adjust(hspace=0.2)
-    #plt.suptitle(f"Station: {station}", size=16)
+    plt.suptitle(f"Station: {station}", size=16)
+
+    # this is the number of points for a given satellite track
+    reqNumpts = min_req_pts_track
 
     for index, az in enumerate(azlist):
         b = 0
@@ -275,8 +313,10 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
 
         #ax.autofmt_xdate()
 
-
+        # this satellite list is really satellite TRACKS
         for satellite in satlist:
+            if screenstats:
+                print(satellite, amin, amax)
             # indices for the track you want to look at here
             ii = (ssat == satellite) & (azdata > amin) & (azdata < amax) & (phase < 360)
             x = phase[ii]
@@ -288,8 +328,6 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
             amps = amp[ii]
             rhs = rh[ii]
 
-            # this is the number of points in a whole year for a given satellite ??? 
-            reqNumpts = 50
             if len(x) > reqNumpts:
                 b += 1
                 sortY = np.sort(x)
@@ -346,11 +384,14 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
                         inter, id1, id2 = np.intersect1d(avg_date, satdate, assume_unique=True, return_indices=True)
                         aa = avg_phase[id1]
                         bb = satphase[id2]
-                        res = np.round(np.std(aa - bb), 2)
-                        addit = ''
-                        if res > 5.5:
-                            addit = '>>>>>  Consider Removing This Track <<<<<'
-                        print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:5.0f} {amax:5.0f} Amp {max(normAmps):4.2f} {addit:20s} ")
+                        if len(aa) > 0:
+                            res = np.round(np.std(aa - bb), 2)
+                            addit = ''
+                            if res > 5.5:
+                                addit = '>>>>>  Consider Removing This Track <<<<<'
+                            print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} Amp {max(normAmps):4.2f} {addit:20s} ")
+                        else:
+                            print('No points for this satellite track:', SatNu)
                     else:
                         print('No average , so no QC. You should iterate.')
 
@@ -368,13 +409,6 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
     plot_path = f'{xdir}/Files/{station}_az_phase.png'
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
-    #if plt2screen:
-    #    plt.show()
-
-        # TODO is this used? (the line below)
-        # vout = do_quad(vquad, year, year_end)
-        #plt.plot(vout[:,0] + vout[:,1]/365.25, vout[:,2], 'ko')
-        #plt.subplot(211)
 
     tv = np.empty(shape=[0, 4])
     # year, day of year, phase, satellite, azimuth, RH, and RH amplitude
@@ -386,10 +420,17 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
     rh = vxyz[:, 5] # TODO this is not used
     amp = vxyz[:, 6]
 
+    # this is different than the other metric - which was for the entire dataset.
+    # this is the number of tracks per day you need to trust the daily average
+    minvalperday = 10
     # 10 required for each day?
     if writeout:
-        fileout = xdir + '/Files/' + station + '_phase.txt'
-        print('Daily averaged phases: ', fileout)
+        if (fr == 1): 
+            fileout = xdir + '/Files/' + station + '_phase_L1.txt'
+        else:
+            fileout = xdir + '/Files/' + station + '_phase.txt'
+
+        print('Daily averaged phases will be written to : ', fileout)
         with open(fileout, 'w') as fout:
             fout.write("% Year DOY Ph Phsig NormA MM DD \n")
             for requested_year in range(year, year_end + 1):
@@ -397,7 +438,7 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
                     # put in amplitude criteria to keep out bad L2P results
                     ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
                     amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                    if len(ph1) > 10:
+                    if (len(ph1) > minvalperday):
                         newl = [requested_year, doy, np.mean(ph1), len(ph1)]
                         # i think you normalize the individual satellites before this step
                         #namp = qp.normAmp(amp1,0.15)
@@ -408,19 +449,14 @@ def plot_phase(station: str, year: int, year_end: int = None, freq: int = 20, sa
                         yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
                         fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
 
+            fout.close()
         datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
 
-        plt.figure(figsize=(10, 6))
-        plt.plot(datetime_dates, tv[:, 2], 'bo')
-        plt.ylabel('phase (degrees)')
-        plt.title(f"Daily Phase Results: {station.upper()}")
-        plt.grid()
-        plot_path = f'{xdir}/Files/{station}_daily_phase.png'
-        print(f"Saving figure to {plot_path}")
-        plt.savefig(plot_path)
+
+        daily_phase_plot(station, fr,datetime_dates, tv,xdir)
 
         #now convert to vwc
-        qp.convert_phase(station, year, year_end, plt2screen)
+        qp.convert_phase(station, year, year_end, plt2screen,fr)
 
 
 def main():

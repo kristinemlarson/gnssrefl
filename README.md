@@ -18,6 +18,7 @@
     1. [daily_avg: daily average reflector heights](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_dailyavg.md)
     2. [subdaily: LSP quality control and RHdot for reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_subdaily.md)
     3. [invsnr: SNR inversion for subdaily reflector height estimates](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_invsnr.md)
+    3. [vwc: near surface soil moisture](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_vwc.md)
 4. [Examples](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md)
 5. [Utilities](#helper)
 6. [News/Bugs/Future Work](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/news.md)
