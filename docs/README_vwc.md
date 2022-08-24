@@ -57,8 +57,8 @@ Regardless, you need to take these initial steps:
 ### 2. Estimate Phase 
 
 For reasons described by Clara Chew in her [first paper](https://www.kristinelarson.net/wp-content/uploads/2015/10/Chew_etal_Proof.pdf), 
-we use phase instead of RH or amplitude to derive soil moisture. We need to 
-know which satellites to use. 
+we use phase instead of RH or amplitude to derive soil moisture. We need to know which satellites to use. And we need 
+a starting solution for RH, i.e. *a priori* RH.
 
 You should use <code>vwc_input</code> to pick the best satellite tracks. 
 The default will be to use rising and setting L2C satellites arcs. 
@@ -73,6 +73,9 @@ You then need to estimate the phase for the years in question. I will just use 2
 
 <code>phase p038 2016 1 -doy_end 366 -year_end 2018 </code>
 
+Once you have computed the phase values, you cannot change the *a priori* RH values. If you do change them, you 
+need to rerun <code>phase</code>. If you forget about this, you will see offsets in your phase - and ultimately - your VWC time seires.
+On the plus side, the phase code is fast - much faster than the time it took you to create SNR files.
 
 ### 3. Estimate VWC
 
