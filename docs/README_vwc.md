@@ -79,7 +79,7 @@ You then need to estimate the phase for the years in question. I will just use 2
 First stage is to give you "raw" phase results for the four geographic regions (northwest, northeast, etc)
 
  <br />
-<img src="p038_Figure_1.png" width="700">
+<img src="p038_Figure_1x.png" width="700">
  <br />
 
 If you have previously run the code it will attempt to warn you about bad satellite tracks.
