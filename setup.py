@@ -67,7 +67,7 @@ setup(
             'invsnr_input= gnssrefl.invsnr_input:main',
             'vwc_input= gnssrefl.apriori:main',
             'phase= gnssrefl.quickPhase:main',
-            'vwc= gnssrefl.plot_phase:main',
+            'vwc= gnssrefl.vwc:main',
             ], 
         },
     install_requires=requirements,
