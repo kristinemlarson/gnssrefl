@@ -16,65 +16,66 @@
 
 [Google Maps Link](https://www.google.com/maps/place/26%C2%B021'32.4%22S+148%C2%B008'42.0%22E/@-26.359,148.145,11z/data=!4m5!3m4!1s0x0:0x9200f9ebb23ec5b1!8m2!3d-26.359!4d148.145?hl=en) 
 
+<p align=center>
+<img src=MCHL.jpeg>
+</p>
  
 Read the [soil moisture instructions](../../docs/README_vwc.md)!
 
 #### Step 1: GNSS-IR
-Begin by generating the SNR files:
-
+Begin by generating the SNR files.
 To be sure we can get the L2C data, we will use the RINEX 3 files.
-Use the rinex3 option (by using the 9-char station name 'mchl00aus'), 
-and GNSS orbits. The soil moisture code only
-works on GPS, but since MCHL is multi-GNSS, you might as well save the other data so someone can look at them later.
+These require the longer station name (mchl00aus) and are available at either cddis or ga.
+Choose the one that is less slow for you.
 
-<code>rinex2snr mchl00aus 2017 1 -doy_end 365 </code>
+<code>rinex2snr mchl00aus 2017 1 -doy_end 365 -year_end 2018 -archive cddis </code>
 
-Analysis parameters are set up with <code>make_json_input</code>
+Use <code>quickLook</code> with the l2c frequency to give a look to the data quality.
+Then set up your parameters with <code>make_json_input</code>
 
 <code>make_json_input mchl 0 0 0 -l2c true</code>
 
+Modify the azimuths in the json if you feel that is needed.
 
-Now run <code>gnssir</code> to save the reflector height (RH) output for each day in 2017.
+Now run the <code>gnssir</code> each day in 2017 and 2018:
 
-<code>gnssir mchl 2017 1 -doy_end 365</code>
+<code>gnssir mchl 2017 1 -doy_end 365 -year_end 2018</code>
 
 #### Step 2: Soil Moisture
 
+<code>vwc_input mchl 2018</code>
 
-<code>vwc_input mchl 2017</code>
+This creates a file that will go in $REFL_CODE/input/mchl_phaseRH.txt
 
-This creates a file that will go in $REFL_CODE/input/mchl_phaseRH.
-For each GPS satellite (column 3), a RH (meters) is given in column 2. The azimuth is column 4, 
-number of retrievals in column 5, and then the azimuths in the last two columns.
 This file can be hand edited if you find out later one arc is not working.  
-To comment lines out you use %. [This is what the file should look like.](mchl_phaseRH.txt)
+To comment lines out you use %. 
 
-The phase analysis code - **quickphase** - will use that file to restrict the number of satellite arcs that are used.
-Run quickphase for the entire year of 2017:
+Run phase for the entire year of 2017:
 
-<code>quickphase mchl 2017 1 -doy_end 365</code>
+<code>phase mchl 2017 1 -doy_end 365 -year_end 2018</code>
 
-The results of quickphase will be one file per day requested, saved as doy.txt (ex: 365.txt).
-In this case, one file for every day of the year 2017. These results will be saved in the directory $REFL_CODE/2017/phase/mchl.
+The results will be one file per day requested. The location of the output is printed to the screen.
 
-Finally, we can run soil moisture code which is called **plotphase**.
+Finally, the <code>vwc</code> module compiles all the data in the requested years and generates volumetric water content.
 
-<code>plotphase mchl 2017</code>
+<code>vwc mchl 2017 -year_end 2018</code>
 
-plotphase will produce some QC type plots, daily phase, phase w/ vegetation correction, vwc, and soil moisture plots. 
-all plots are saved in the directory $REFL_CODE/Files as mchl_az_phase.png, mchl_daily_phase.png,
-mchl_phase_vwc_result.png, and mchl_vol_soil_moisture.png
 
-The daily phase results go to $REFL_CODE/Files/mchl_phase.txt. [Example](mchl_phase.txt)
-Then it converts those to VWC using the Clara Chew derived algorithms.
-The output goes in the same place as phase: $REFL_CODE/Files/mchl_vwc.txt. [Example](mchl_vwc.txt)
+Raw phases in geographic quadrants
  <br />
-<img src="mchl_az_phase.png" width="600">
+<img src="mchl_1.png" width="600">
  <br />
-<img src="mchl_daily_phase.png" width="500">
+Daily phase averages
  <br />
-<img src="mchl_phase_vwc_result.png" width="600">
+<img src="mchl_2.png" width="500">
  <br />
-<img src="mchl_vol_soil_moisture.png" width="600">
+Modeling Results
+ <br />
+
+<img src="mchl_3.png" width="600">
+ <br />
+ Final VWC:
+ <br>
+<img src="mchl_4.png" width="600">
 
 
