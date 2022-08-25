@@ -483,7 +483,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
 
 def main():
     args = parse_arguments()
-    plot_phase(**args)
+    vwc(**args)
 
 
 if __name__ == "__main__":
