@@ -219,7 +219,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             print('I assumed its name was ', r3)
 
                 else:
-                    print('Will seek the RINEX file externally')
+                    print('Will seek the RINEX file from an external archive')
                     if version == 3:
                         fexists = False
                         rnx_filename = '' # just in  case?

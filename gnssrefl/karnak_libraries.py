@@ -136,11 +136,12 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
 
         return file_name,foundit
 
-
-
     try:
         if (archive == 'ign'):
             dir1='ftp://igs.ensg.ign.fr/pub/igs/data/' + cyyyy + '/' + cdoy + '/'
+            wget.download(dir1+file_name,file_name)
+        elif (archive == 'sonel'):
+            dir1='ftp://ftp.sonel.org/gps/data/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
         elif archive == 'bkg':
             just_bkg(cyyyy, cdoy, file_name)

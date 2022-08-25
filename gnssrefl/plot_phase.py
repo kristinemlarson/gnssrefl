@@ -107,6 +107,18 @@ def load_sat_phase(station, year, year_end, freq):
     given station name and frequency, pick up the phase data from local results section
     return to main code whether dataexist, and np arrays of year, doy, hr, phase, azdata, ssat
 
+    parameters
+    -------------
+    station : string
+        four character
+
+    year : integer
+
+    year_end : integer
+
+    freq : integer
+        GPS frequency (1,20)
+
     return reflector heights and amplitudes
     """
     print('Requested frequency: ', freq)
@@ -163,7 +175,7 @@ def load_sat_phase(station, year, year_end, freq):
         ssat = results[6]
         rh = results[13]
         amp = results[15]
-    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp
+    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results
 
 
 def normAmp(amp, basepercent):
@@ -281,7 +293,7 @@ def plot_phase(station: str, year: int, year_end: int = None, fr: int = 20, sat:
     if not avg_exist:
         print('WARNING: the average phase file from a previous run does not exist as yet')
 
-    data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp = load_sat_phase(station, year, year_end=year_end, freq=freq)
+    data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp,ext = load_sat_phase(station, year, year_end=year_end, freq=freq)
     if not data_exist:
         print('No data were found. Check your frequency request or station name')
         sys.exit()
