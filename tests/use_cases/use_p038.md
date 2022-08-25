@@ -22,10 +22,8 @@
 <img src="p038.png" width="500"/>
 </P>
  
-### Analyze the Data
-P038 was a PBO site. The data from 2017 will be analyzed here as a test case.  
-We fist start by analyzing the data using the GNSS-IR process. 
-Then we will use the results gathered to run the soil moisture code.
+P038 was a PBO site. The data from 2017 will be analyzed here as a test case. We will start by analyzing the data 
+using the normal reflector height (GNSS-IR) processing. Then we will use those results to run the soil moisture code.
 
 #### Step 1: GNSS-IR
 Begin by generating the SNR files. Although typically PBO sites do not have L2C 
@@ -34,19 +32,20 @@ so that people can test out this code.
 
 <code>rinex2snr p038 2017 1 -doy_end 365 -archive special</code>
 
-Analysis parameters are set up with <code>make_json_input</code>. While ordinarily you need to input 
-the station latitude, longitude, and ellipsoidal height, if the station is in the <code>gnssrefl</code> database, you can 
-put zero values there instead.
+If you want to remind yourself why the L2C data are superior to the L1 data recorded for this receiver, use <code>quickLook</code>.
+
+The analysis parameters are set up with <code>make_json_input</code>. While ordinarily you need to input 
+the station latitude, longitude, and ellipsoidal height for this code, if the station is in the <code>gnssrefl</code> database, you can 
+put zero values there instead. We only need the L2C data, so have set the parameter accordingly.
 
 <code>make_json_input p038 0 0 0 -l2c true</code>
 
 The json file is saved at $REFL_CODE/input/p038.json
 
-Now run <code>gnssir</code> to save the reflector height (RH) output for each day in 2017.
+Now we run <code>gnssir</code>. This will be needed for estimate a priori reflector heights for the soil moisture code.
 
 <code>gnssir p038 2017 1 -doy_end 365 </code>
 
-The daily output files are stored in $REFL_CODE/2017/results/p038
 
 #### Step 2: Soil Moisture
 
@@ -58,7 +57,7 @@ We need a list of satellite tracks to use:
 
 This creates a file that is stored in $REFL_CODE/input/p038_phaseRH.txt
 
-Now estimate the phase:
+Now we estimate the phase for each satellite track on each day:
 
 <code>phase p038 2017 1 -doy_end 365</code>
 
@@ -66,10 +65,9 @@ Finally, convert the phase to volumetric water content:
 
 <code>vwc p038 2017</code>
 
-Everything:
+Phase results plotted in geographic coordinates:
 
 <img src="p038_1.png" width="600">
-
 
 Daily average phase:
 

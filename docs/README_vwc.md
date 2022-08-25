@@ -17,7 +17,7 @@ but this code won't do it for you.
 - Will your site be a good soil moisture site?  This is almost entirely based on how flat your site is.
 Flat is good. You can use a DEM, if you have it, or a photograph.  
 
-- This algorithm is currently only recommended and validated for the L2C signal. It is **your responsbility** to make sure that 
+- This algorithm is currently only recommended and validated for the L2C signal. It is **your responsibility** to make sure that 
 your files have L2C data in them. While this is trivial with the RINEX 3 format, it can be very challenging to 
 find L2C data in some older datasets and at some archives (e.g. UNAVCO). 
 
@@ -28,8 +28,9 @@ moisture, so I recommend you decimate to 15 seconds when you translate the RINEX
 - I have generally found that people using Septentrio receivers archive the L2C data in their RINEX 2.11 files.
 
 - We have had good success using L1 data for water level, vegetation, and snow measurements. We found them
-to be unreliable for PBO H2O and never used them. We have tested our algorithms with newer receivers and still
-find the data to be lacking. We do not recommend you use this soil moisture code with L1 data
+to be unreliable for the PBO H2O soil moisture product and never used them. We have tested 
+our soil moisture algorithms with the L1 data from newer receivers and still find the data 
+to be lacking. **We do not recommend you use this soil moisture code with L1 data.**
 
 - The PBO H2O algorithm was successfully validated for choke ring antennas. We were not funded to include other antennas 
 in this software package - but will try to do so if others can provide the necessary corrections.
@@ -47,8 +48,10 @@ the [traditional reflector height method](gnssir.md). We need to use the average
 for a given year. When this method was demonstrated for a large network in the western US, 
 [PBO H2O](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson-2016-WIRES_Water.pdf), we 
 were also estimating snow depth on a daily basis. This allowed us to easily identify and remove snow-contaminated values from
-our soil moisture estimates. **We are no longer running the PBO H2O network.** The goal of this module is to provide a 
-way for you to measure soil moisture, but you must take responsibility for evaluating whether your site 
+our soil moisture estimates. **We are no longer running the PBO H2O network.** 
+
+The goal of the soil moisture module of <code>gnssrefl</code> is to help geoscientists to measure 
+soil moisture, but it requires the user to take responsibility for evaluating whether your site 
 has snow effects. For the time being we are testing the code where it does not snow or it does not snow very often. 
 Regardless, you need to take these initial steps:
 
@@ -122,7 +125,7 @@ the soil texture at the site.
 <img src="p038_Figure_3.png" width="600">
  <br />
 
-Final stage - putting it all together:
+Final stage - putting it all together. The data are also written to a text file and the location of that file is written to the screen:
 
 <img src="p038_Figure_4.png" width="600">
 
