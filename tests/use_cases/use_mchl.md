@@ -17,7 +17,7 @@
 [Google Maps Link](https://www.google.com/maps/place/26%C2%B021'32.4%22S+148%C2%B008'42.0%22E/@-26.359,148.145,11z/data=!4m5!3m4!1s0x0:0x9200f9ebb23ec5b1!8m2!3d-26.359!4d148.145?hl=en) 
 
 <p align=center>
-<img src=MCHL.jpeg>
+<img src=MCHL.jpeg width=500>
 </p>
  
 Read the [soil moisture instructions](../../docs/README_vwc.md)!

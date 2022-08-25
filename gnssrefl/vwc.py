@@ -34,6 +34,71 @@ def parse_arguments():
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
+def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
+
+    """
+    parameters
+    --------
+    station : string
+
+    phase : numpy list of phase values 
+
+    fr : integer
+        frequency
+
+    year: integer
+
+    year_end : integer
+
+    minvalperday : integer
+        required number of satellite tracks to trust the daily average 
+
+    vxyz is from some other compilation
+
+    returns
+    --------
+    tv : numpy array with elements
+        year, doy, meanph, nvals 
+
+    """
+    y1 = vxyz[:, 0]
+    d1 = vxyz[:, 1]
+    phase = vxyz[:, 2]
+    sat = vxyz[:, 3] # this is not used
+    az = vxyz[:, 4] # this is not used
+    rh = vxyz[:, 5] # this is not used
+    amp = vxyz[:, 6]
+
+    tv = np.empty(shape=[0, 4])
+
+    if (fr == 1):
+        fileout = xdir + '/Files/' + station + '_phase_L1.txt'
+    else:
+        fileout = xdir + '/Files/' + station + '_phase.txt'
+
+    print('Daily averaged phases will be written to : ', fileout)
+    with open(fileout, 'w') as fout:
+        fout.write("% Year DOY Ph Phsig NormA MM DD \n")
+        for requested_year in range(year, year_end + 1):
+            for doy in range(1, 367):
+            # put in amplitude criteria to keep out bad L2P results
+                ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
+                amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
+                if (len(ph1) > minvalperday):
+                    newl = [requested_year, doy, np.mean(ph1), len(ph1)]
+                # i think you normalize the individual satellites before this step
+                #namp = qp.normAmp(amp1,0.15)
+                    tv = np.append(tv, [newl], axis=0)
+                    rph1 = np.round(np.mean(ph1), 2)
+                    meanA = np.mean(amp1)
+                    rph1_std = np.std(ph1)
+                    yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                    fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
+
+        fout.close()
+    return tv
+
+
 def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
     """
     parameters
@@ -230,7 +295,7 @@ def do_quad(vquad, year, year_end):
 
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = None, 
-        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50, polyorder: int = 0):
+        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50, polyorder: int = -99):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
     Parameters:
@@ -260,7 +325,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
         how many points needed to keep a satellite track
         default is 50
 
-   polyorder : integer
+    polyorder : integer
         This is used for leveling.  Usually the code picks it but this allows to users to override. 
         Default is -99 which means let the code decide
 
@@ -437,7 +502,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
 
-    tv = np.empty(shape=[0, 4])
+    # this is now down in a function. i believe this can be commented out
+    #tv = np.empty(shape=[0, 4])
     # year, day of year, phase, satellite, azimuth, RH, and RH amplitude
     y1 = vxyz[:, 0]
     d1 = vxyz[:, 1]
@@ -447,45 +513,43 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
     rh = vxyz[:, 5] # TODO this is not used
     amp = vxyz[:, 6]
 
-    # this is different than the other metric - which was for the entire dataset.
     # this is the number of tracks per day you need to trust the daily average
     minvalperday = 10
-    # 10 required for each day?
     if writeout:
-        if (fr == 1): 
-            fileout = xdir + '/Files/' + station + '_phase_L1.txt'
-        else:
-            fileout = xdir + '/Files/' + station + '_phase.txt'
 
-        print('Daily averaged phases will be written to : ', fileout)
-        with open(fileout, 'w') as fout:
-            fout.write("% Year DOY Ph Phsig NormA MM DD \n")
-            for requested_year in range(year, year_end + 1):
-                for doy in range(1, 367):
-                    # put in amplitude criteria to keep out bad L2P results
-                    ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                    amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                    if (len(ph1) > minvalperday):
-                        newl = [requested_year, doy, np.mean(ph1), len(ph1)]
-                        # i think you normalize the individual satellites before this step
-                        #namp = qp.normAmp(amp1,0.15)
-                        tv = np.append(tv, [newl], axis=0)
-                        rph1 = np.round(np.mean(ph1), 2)
-                        meanA = np.mean(amp1)
-                        rph1_std = np.std(ph1)
-                        yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
-                        fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
+        tv = write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz)
 
-            fout.close()
         datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
-
 
         daily_phase_plot(station, fr,datetime_dates, tv,xdir)
 
-        #now convert to vwc
-        print('polyorder provided by user', polyorder)
         qp.convert_phase(station, year, year_end, plt2screen,fr,polyorder)
 
+#        if (fr == 1): 
+#            fileout = xdir + '/Files/' + station + '_phase_L1.txt'
+#        else:
+#            fileout = xdir + '/Files/' + station + '_phase.txt'
+#
+#        print('Daily averaged phases will be written to : ', fileout)
+#        with open(fileout, 'w') as fout:
+#            fout.write("% Year DOY Ph Phsig NormA MM DD \n")
+        #if False:
+        #    for requested_year in range(year, year_end + 1):
+        #        for doy in range(1, 367):
+                    # put in amplitude criteria to keep out bad L2P results
+        #            ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
+        #            amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
+        #            if (len(ph1) > minvalperday):
+        #                newl = [requested_year, doy, np.mean(ph1), len(ph1)]
+                        # i think you normalize the individual satellites before this step
+                        #namp = qp.normAmp(amp1,0.15)
+        #                tv = np.append(tv, [newl], axis=0)
+        #                rph1 = np.round(np.mean(ph1), 2)
+        #                meanA = np.mean(amp1)
+        #                rph1_std = np.std(ph1)
+        #                yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                        #fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
+            #fout.close()
 
 def main():
     args = parse_arguments()
