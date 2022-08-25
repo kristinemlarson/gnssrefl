@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-downloads Simon williams GNSS-IR sea level files
-author: kristine larson
+downloads Simon Williams GNSS-IR sea level files
 
 """
 import argparse
@@ -67,20 +66,20 @@ def parse_arguments():
 
 def download_simon(station: str, output: str = None, plt: bool = False):
     """
-        Downloads IOC tide gauge files in json format,
-        converts it to plain txt or csv format
+    Downloads IOC tide gauge files in json format,
+    converts it to plain txt or csv format
 
-        Parameters:
-        ___________
-        station : string
+    Parameters:
+    ___________
+    station : string
 
-        output : string, optional
-            Optional output filename
-            default is None
+    output : string, optional
+        Optional output filename
+        default is None
 
-        plt: boolean, optional
-            plot comes to the screen
-            default is None
+    plt: boolean, optional
+        plot comes to the screen
+        default is None
 
     """
     g.check_environ_variables()

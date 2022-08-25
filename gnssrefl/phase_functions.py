@@ -529,6 +529,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
 
 
 
+# Old code.  SHould be deleted
 # why is this being done this way!
 #years = np.floor(fdate)
 #??? why is this being done this way?
