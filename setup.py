@@ -65,7 +65,7 @@ setup(
             'filesizes= gnssrefl.filesizes:main',
             'invsnr= gnssrefl.invsnr_cl:main',
             'invsnr_input= gnssrefl.invsnr_input:main',
-            'vwc_input= gnssrefl.apriori:main',
+            'vwc_input= gnssrefl.vwc_input:main',
             'phase= gnssrefl.quickPhase:main',
             'vwc= gnssrefl.vwc:main',
             ], 

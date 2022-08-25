@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from pathlib import Path
 
-import gnssrefl.quickPhase_function as qp
+import gnssrefl.phase_functions as qp
 import gnssrefl.gps as g
 from gnssrefl.utils import str2bool, read_files_in_dir
 
@@ -25,6 +25,7 @@ def parse_arguments():
     parser.add_argument("-plt2screen", default=None, type=str, help="plot to screen")
     parser.add_argument("-screenstats", default=None, type=str, help="plot statistics to screen")
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="minimum number of points for a track to be kept. Default is 50")
+    parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
 
     args = parser.parse_args().__dict__
 
@@ -229,7 +230,7 @@ def do_quad(vquad, year, year_end):
 
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = None, 
-        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50):
+        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50, polyorder: int = 0):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
     Parameters:
@@ -258,6 +259,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
     min_req_pts_track : integer
         how many points needed to keep a satellite track
         default is 50
+
+   polyorder : integer
+        This is used for leveling.  Usually the code picks it but this allows to users to override. 
+        Default is -99 which means let the code decide
 
     Returns
     _______
@@ -478,7 +483,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
         daily_phase_plot(station, fr,datetime_dates, tv,xdir)
 
         #now convert to vwc
-        qp.convert_phase(station, year, year_end, plt2screen,fr)
+        print('polyorder provided by user', polyorder)
+        qp.convert_phase(station, year, year_end, plt2screen,fr,polyorder)
 
 
 def main():

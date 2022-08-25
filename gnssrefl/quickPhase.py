@@ -5,7 +5,7 @@ import argparse
 import numpy as np
 
 
-import gnssrefl.quickPhase_function as qp
+import gnssrefl.phase_functions as qp
 from gnssrefl.utils import str2bool
 
 

@@ -4,14 +4,17 @@
 <img src="VLIS.jpeg" width="500"><BR>
 </P>
 
-**Station Name:** vlsi 
+**Station Name:** vlsi  or VLSI00NLD
 
 **Location:** Vlissingen, the Netherlands
 
 **Archive:** SONEL, BKG, BEV
 
+[Station Page at NGL](http://geodesy.unr.edu/NGLStationPages/stations/VLIS.sta)
 
-[Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/VLIS.sta)
+[EUREF Page](https://epncb.oma.be/_networkdata/siteinfo4onestation.php?station=VLIS00NLD)
+
+[IOC Tide Gauge Site](http://www.ioc-sealevelmonitoring.org/station.php?code=vlis)
 
 
 ### Take a Quick Look at the Site Reflection Zones
@@ -31,20 +34,15 @@ Begin by making an SNR file.
 
 <code>quickLook tgho 2020 300 -e1 5 -e2 15</code>
 
-<img src="tgho-default.png" width="600">
+<img src="vlis-l1.png" width="600">
 
 The clutter near the monument produces noise at the small RH values.  A better result 
-can be found if those values are eliminated by setting h1 to 2. We also extend h2 to 8.
+can be found if those values are eliminated by setting h1 to 5. We also extend h2 to 15.
 
-<code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8</code>
+<code>quickLook vlsi 2020 300 -e1 5 -e2 15 -h1 2 -h2 8</code>
 
 <img src="tgho-better.png" width="600">
 
-Now try looking at the periodogram for L2:
-
-<code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 2</code>
-
-<img src="tgho-l2.png" width="600"/>
 
 ### Analyze the Reflections 
 
@@ -54,13 +52,11 @@ turning off the amplitude constraint (to 1) and using only peak2noise for QC.
 
 <code>make_json_input vlis 0 0 0 -h1 5 -h2 15 -e1 5 -e2 15 -peak2noise 3 -ampl 1 -allfreq T</code>
  
-The loThe azimuth mask has to be set by hand, so edit the file accordingly
+The azimuth mask has to be set by hand, so edit the file accordingly
 
-Glonass signals (frequencies 101 and 102) were added and GPS L2/L5 were removed.[Sample json](tgho.json)
+Then make SNR files for a couple months.
 
-Then make SNR files for ~six months:
-
-<code>rinex2snr tgho 2020 130 -archive nz -doy_end 319 -orb gnss</code>
+<code>rinex2snr vlis 2020 130 -archive nz -doy_end 319 -orb gnss</code>
 
 The output SNR files are stored in $REFL_CODE/2020/snr/tgho.
 
