@@ -17,6 +17,8 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 
 def quickp(station,t,sealevel):
     """
+    makes a quick plot of sea level for station s
+
     Parameters
 
     station : string

@@ -1,6 +1,5 @@
 #!usr/bin/env python
 # -*- coding: utf-8 -*-
-# kristine larson, more or less, wrote all this code
 # toolbox for GPS/GNSS data analysis
 import datetime
 from datetime import date
@@ -351,7 +350,7 @@ def xyz2llh(xyz, tol):
 
 def xyz2llhd(xyz):
     """
-    converts from cartesian to LLH
+    converts from cartesian to latitude,longitude,height
 
 
     Parameters:
@@ -782,12 +781,15 @@ def getnavfile(year, month, day):
         day
 
     returns:
+    ----------
+    navname : string
+        name of navigation file
 
+    navdir : string
+        location of where the file should be stored
 
-    19may7 now checks for compressed and uncompressed nav file
-    19may20 now allows day of year input if day is set to zero
-    20apr15 check for xz compression
-
+    foundit : boolean
+        whether the file was found
 
     """
     foundit = False
@@ -838,8 +840,10 @@ def getsp3file(year,month,day):
     returns
     -----------
     name : string
+        filename for the orbits
 
     fdir : string
+        directory for the orbits
 
     """
     name, fdir = sp3_name(year,month,day,'igs') 
@@ -893,6 +897,18 @@ def getsp3file_flex(year,month,day,pCtr):
     day : integer
 
     pCtr : string
+        name of the orbit center
+
+    returns
+    -----------
+    name : string
+        filename for the orbits
+
+    fdir : string
+        directory for the orbits
+
+    fexist : boolean
+        whether the orbit file was successfully found
 
     """
     # returns name and the directory
@@ -945,17 +961,9 @@ def getsp3file_mgex(year,month,day,pCtr):
     day : integer
 
     pCtr : string
+        name of the orbit center
 
-    20apr15  check for xz compression
 
-    20jun14 add CDDIS secure ftp. what a nightmare
-    20jun25 add Shanghai GNSS orbits - as they are available sooner than GFZ
-    20jun25 added French and JAXA orbits
-    20jul01 allow year, doy as input instead of year, month, day
-    20jul10 allow Wuhan, but only one of them.
-    21jan08 obnoxious problem at CDDIS
-    21jan09 CDDIS, again
-    22jul12 good lord - issues with the try command
     this is spaghetti code, i apologize
 
 
@@ -1070,16 +1078,24 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     Parameters:
     ------------
     name : string
+        the name of the orbit file you want to download from CDDIS
 
     year : integer
 
     secure_file : string
+        name of the file at CDDIS
  
     secure_dir : string
+        where the file lives at CDDIS
 
     file2 : string
+        no idea - looks very silly
 
     Returns:
+
+    foundit : boolean
+        whether the file was found
+
     ------------
 
     """
@@ -1098,9 +1114,28 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
 
 def kgpsweek(year, month, day, hour, minute, second):
     """
-    inputs are year (4 char), month, day, hour, minute, second
-    outputs: gps week and second of the week
-    modified from a matlab code
+    parameters
+    ----------
+    year : string
+        4 char
+    month : string 
+        2 char
+    day : string
+        2 char
+    hour: string
+        2 char
+    minute : string
+        2 char
+
+    second : integer?
+
+    returns
+    --------
+    GPS_wk : integer
+        GPS week
+    GPS_sec_wk : intger
+        GPS second of the week
+
     """
 
     year = np.int(year)
@@ -1129,6 +1164,15 @@ def kgpsweekC(z):
     takes in time tag from a RINEX file and converts to gps week/sec
     so the input is a character string of length 26.  in this 
     kind of string, the year is only two characters
+
+    returns
+    --------
+    gpsw : integer
+        GPS week
+
+    gpss : integer
+        GPS seconds
+
     """
     y= np.int(z[1:3])
     m = np.int(z[4:6])
@@ -1141,6 +1185,10 @@ def kgpsweekC(z):
 
 def igsname(year,month,day):
     """
+    returns the name of an IGS orbit file
+
+    parameters
+    -----------
     year : integer
 
     month : integer
@@ -1149,7 +1197,11 @@ def igsname(year,month,day):
 
     Returns
     ------------
-    returns IGS sp3 filename and COD clockname (5 sec)
+    name : string
+        IGS orbit name
+
+    clockname : string
+        COD clockname 
 
     """
     [wk,sec]=kgpsweek(year,month,day,0,0,0)
@@ -1294,8 +1346,9 @@ def findConstell(cc):
         E : Galileo
         C : Beidou
 
-    output is integer added to the satellite number
-    0 for GPS, 100 for Glonass, 200 for Galileo, 300 for everything else?
+    out : integer
+        value added to satellite number for our system,
+        0 for GPS, 100 for Glonass, 200 for Galileo, 300 for everything else
     """
     if (cc == 'G' or cc == ' '):
         out = 0

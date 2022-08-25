@@ -21,11 +21,11 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year_end", type=int)
     parser.add_argument("-fr", help="frequency", type=int)
-    parser.add_argument("-sat", default=None, type=int, help="satellite")
     parser.add_argument("-plt2screen", default=None, type=str, help="plot to screen")
     parser.add_argument("-screenstats", default=None, type=str, help="plot statistics to screen")
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="minimum number of points for a track to be kept. Default is 50")
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
+    parser.add_argument("-minvalperday", default=None, type=int, help="minimum number of satellite tracks needed each day. Default is 10")
 
     args = parser.parse_args().__dict__
 
@@ -294,8 +294,8 @@ def do_quad(vquad, year, year_end):
     return vout
 
 
-def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = None, 
-        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50, polyorder: int = -99):
+def vwc(station: str, year: int, year_end: int = None, fr: int = 20,  
+        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
     Parameters:
@@ -313,10 +313,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
         GNSS frequency. Currently only supports l2c.
         Default is 20 (l2c)
 
-    sat: integer, optional
-        Satellite number.
-        Default is None
-
     plt2screen: boolean, optional
         Whether to produce plots to the screen.
         Default is True
@@ -328,6 +324,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
     polyorder : integer
         This is used for leveling.  Usually the code picks it but this allows to users to override. 
         Default is -99 which means let the code decide
+
+    minvalperday: integer
+        how many phase measurements are needed for each daily measurement
+        default is 10
 
     Returns
     _______
@@ -348,12 +348,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
     if not plt2screen:
         print('no plots will come to screen. Will only be saved.')
 
-    # if you don't ask for a special satellite, assume they want to write out the average
-    #if (sat is None) and (freq == 20 or freq == 1):
+    # this is leftover from the old code
     writeout = True
-    #else:
-    #    writeout = False
-    #    print('An average file will not be produced.')
 
     # azimuth list
     azlist = [270, 0, 180,90 ]
@@ -385,6 +381,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
     # this is the number of points for a given satellite track
     reqNumpts = min_req_pts_track
 
+    # checking each geographic quadrant
     for index, az in enumerate(azlist):
         b = 0
         k += 1
@@ -393,10 +390,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
         # make a quadrant average for plotting purposes
         vquad = np.empty(shape=[0, 4])
         # pick up the sat list from the actual list
-        if sat is None:
-            satlist = stracks[atracks == amin]
-        else:
-            satlist = [int(sat)]
+        satlist = stracks[atracks == amin]
 
         ax = plt.subplot(2, 2, index + 1)
         ax.set_title(f'Azimuth {str(amin)}-{str(amax)} deg.')
@@ -508,16 +502,20 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, sat: int = 
     y1 = vxyz[:, 0]
     d1 = vxyz[:, 1]
     phase = vxyz[:, 2]
-    sat = vxyz[:, 3] # TODO this is not used
-    az = vxyz[:, 4] # TODO this is not used
-    rh = vxyz[:, 5] # TODO this is not used
+    #sat = vxyz[:, 3] # TODO this is not used
+    #az = vxyz[:, 4] # TODO this is not used
+    #rh = vxyz[:, 5] # TODO this is not used
     amp = vxyz[:, 6]
 
     # this is the number of tracks per day you need to trust the daily average
-    minvalperday = 10
+    #minvalperday = 10 - now an input
     if writeout:
 
         tv = write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz)
+        print('Number of daily phase measurements ', len(tv))
+        if len(tv) < 1:
+            print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
+            sys.exit()
 
         datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
 

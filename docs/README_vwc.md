@@ -1,4 +1,4 @@
-### Soil Moisture
+### Beta Release: Soil Moisture
 <p align=center>
 <img src=https://www.kristinelarson.net/wp-content/uploads/2015/10/famousFigure.png width=500>
 </p>
@@ -35,9 +35,8 @@ to be lacking. **We do not recommend you use this soil moisture code with L1 dat
 - The PBO H2O algorithm was successfully validated for choke ring antennas. We were not funded to include other antennas 
 in this software package - but will try to do so if others can provide the necessary corrections.
 
-- Can you measure soil moisture more often than once per day? Of course you can. We routinely
-measured it twice/day at PBO H2O when there were less than 10 satellites. Now that there are 24 L2C 
-transmitting satellites, it would be straightforward to estimate VWC four times/day. 
+- This software estimates soil moisture once per day. Can you measure soil moisture more often than once per day? Of course you can. We routinely
+measured it twice/day at PBO H2O when there were less than 10 satellites. Now that there are 24 L2C transmitting satellites, it would be straightforward to estimate VWC four times/day. 
 
 The code currently only supports sites that are ~1-3 meters above the soil. We will allow variable heights in a future version.
 
@@ -89,6 +88,15 @@ is fast - much faster than the time it took you to create SNR files.
 ### 3. Estimate VWC
 
 <code>vwc p038 2016 -year_end 2018</code>
+
+The main inputs are the station name and years you want to use. Other useful (optional) inputs:
+
+- min_req_pts_track sets the minimum number of observations you require for a given satellite track. This is currently set to 50.
+
+- minvalperday is the number of phase measurements you are going to require to "trust" your daily average phase (and thus VWC) value.
+The default is 10. Currently this is easy to achieve, but earlier datasets might require you reduce that value.
+
+- polyorder lets you override the code's decision on the leveling polynomial order.  Zero is a bias, one is a line, etc.
 
 There are three main parts to this code. The first stage is to give you "raw" phase results 
 for the four geographic regions (northwest, northeast, etc)
