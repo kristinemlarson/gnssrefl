@@ -20,13 +20,14 @@
 <img src=MCHL.jpeg width=500>
 </p>
  
-Read the [soil moisture instructions](../../docs/README_vwc.md)!
+Read the instructions for the [soil moisture code!](../../docs/README_vwc.md)!
 
 #### Step 1: GNSS-IR
 Begin by generating the SNR files.
 To be sure we can get the L2C data, we will use the RINEX 3 files.
 These require the longer station name (mchl00aus) and are available at either cddis or ga.
-Choose the one that is less slow for you.
+Choose the one that is less slow for you. We are going to start 
+with two years of data:
 
 <code>rinex2snr mchl00aus 2017 1 -doy_end 365 -year_end 2018 -archive cddis </code>
 
@@ -35,46 +36,56 @@ Then set up your parameters with <code>make_json_input</code>
 
 <code>make_json_input mchl 0 0 0 -l2c true</code>
 
+The location of the json file is printed to the screen. 
+The default behavior is to accept all azimuths.
 Modify the azimuths in the json if you feel that is needed.
+How can you tell if you have bad azimuths? Use <code>quickLook</code>.
+Do not worry excessively about this at this stage. Once you have a 
+VWC solution you can go back and easily/quickly iterate to remove bad 
+azimuths and satellite tracks.
 
-Now run the <code>gnssir</code> each day in 2017 and 2018:
+Run the <code>gnssir</code> each day in 2017 and 2018:
 
 <code>gnssir mchl 2017 1 -doy_end 365 -year_end 2018</code>
 
 #### Step 2: Soil Moisture
 
+Pick the satellite tracks you are going to use:
+
 <code>vwc_input mchl 2018</code>
 
 This creates a file that will go in $REFL_CODE/input/mchl_phaseRH.txt
 
-This file can be hand edited if you find out later one arc is not working.  
-To comment lines out you use %. 
+This file can be hand edited if you find out later that a 
+particularly satellite track is not working. To comment lines out you use %. 
 
-Run phase for the entire year of 2017:
+Run the <code>phase</code> code:
 
 <code>phase mchl 2017 1 -doy_end 365 -year_end 2018</code>
 
-The results will be one file per day requested. The location of the output is printed to the screen.
+The location of the output files for this stage are printed to the screen.
 
-Finally, the <code>vwc</code> module compiles all the data in the requested years and generates volumetric water content.
+Finally, the <code>vwc</code> module compiles all the 
+data in the requested years and generates a volumetric water content file.
 
 <code>vwc mchl 2017 -year_end 2018</code>
 
+It also produces plots which can help you assess your results:
 
-Raw phases in geographic quadrants
+1. Raw phases in geographic quadrants
  <br />
 <img src="mchl_1.png" width="600">
  <br />
-Daily phase averages
+2. Daily phase averages
  <br />
 <img src="mchl_2.png" width="500">
  <br />
-Modeling Results
+3. Modeling Results
  <br />
 
 <img src="mchl_3.png" width="600">
  <br />
- Final VWC:
+ 4. Final VWC:
  <br>
 <img src="mchl_4.png" width="600">
 

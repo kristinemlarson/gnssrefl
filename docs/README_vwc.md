@@ -106,8 +106,7 @@ for the four geographic regions (northwest, northeast, etc)
  <br />
 
 If you have previously run the code it will attempt to warn you about bad satellite tracks.
-You can iterate to see if removing the satellite track improved things.
-You are also shown a daily average of the phase data. 
+You can iterate to see if removing the satellite track improved things. You are also shown a daily average of the phase data. 
 
  <br />
 <img src="p038_Figure_2.png" width="600">
@@ -137,6 +136,15 @@ Final stage - putting it all together. The data are also written to a text file 
 
 <img src="p038_Figure_4.png" width="600">
 
+Things we are planning to add:
+
+- override dates so that you can remove particular time periods for a site
+
+- help with identifying and removing snow contaminated data
+
+- more automated QC
+
+- more examples 
 
 Kristine M. Larson
 August 23, 2022

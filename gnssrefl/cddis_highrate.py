@@ -229,7 +229,7 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
                     print('have downloaded ', oname)
                     fileF = fileF + 1
 
-    searchP = station.upper() + streamID + cyyyy + cdoy + '*MO.rnx'
+    searchP = station.upper() + streamID + cyyyy + cdoy + '*15M*MO.rnx'
     print('Found ', fileF,' 15 minute files')
 
     outfile = station.upper() + '.tmp'
@@ -239,7 +239,7 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
 
     if (fileF > 0):
         subprocess.call([gexe,'-finp', searchP, '-fout', outfile, '-vo','3', '-smp', crate, '-f','-q'])
-        file_name24 = station.upper() + streamID + cyyyy + cdoy + '0000_01D_' + crate + '_MO.rnx'
+        file_name24 = station.upper() + streamID + cyyyy + cdoy + '0000_01D_' + crate + 'S_MO.rnx'
         subprocess.call(['mv',outfile, file_name24]) # remove old file
         fexist = True
 
@@ -247,7 +247,7 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
     print('That download and merging experience took ', int(s2-s1), ' seconds.')
 
     # remove 15 minute files
-    cm = 'rm ' + station + streamID + cyyyy + cdoy + '*15M_01S_MO.rnx'
+    cm = 'rm ' + station.upper() + streamID + cyyyy + cdoy + '*15M_01S_MO.rnx'
     if fexist:
         subprocess.call(cm,shell=True)
     return file_name24,  fexist

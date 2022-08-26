@@ -1,5 +1,4 @@
 # command line module that calls daily_avg.py
-# Kristine Larson May 2019
 import argparse
 import matplotlib.pyplot as matplt
 import os

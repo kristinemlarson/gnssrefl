@@ -289,7 +289,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     # unavco is only rinex2
     # ga is only rinex3
     # bkg is only rinex 3
-    highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  # cddis is only rinex 2 for now
+    highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  
 
     if ns == 9:
         # rinex3

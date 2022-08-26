@@ -1,8 +1,5 @@
 # library for daily_avg_cl.py
-# Kristine Larson May 2019
 # 2022 june 16
-# added code to calulate the fbias with respect to the daily average.
-# not all that useful - but it is there now!
 import argparse
 import datetime
 import matplotlib.pyplot as plt
@@ -307,13 +304,39 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei):
     """
     make some plots of results - moved here to make it cleaner
-    inputs: obstimes is datetime object
-    mean RH are in meters, station name, txtdir (where the results go)
-    and tv is the variable of daily results
-    kl 2022jun15, added stats for gps,galileo, glonass,beidou specific
+    parameters
+    ----------
+    obstimes : datetime object 
+
+    meanRH : numpy array
+        daily averaged Reflector Height values in meters
+
+    meanAmp : numpy array
+        daily average RH amplitude
+
+    station : string
+        4 character
+
+    txtdir : string
+        directory for the results
+
+    tv : ??
+         is the variable of daily results
+
+    ngps : numpy array
+        number of gps satellites each day
+
+    nglo : numpy array
+        number of glonass satellites each day
+
+    ngal : numpy array
+        number of galileo satellites each day
+
+    nbei : numpy array
+        number of beidou satellites each day
     """
 #   new plot
-    fs = 12
+    fs = 12 # fontsize
     fig,ax=plt.subplots()
     ax.plot(obstimes,meanRH,'b.')
     fig.autofmt_xdate()
@@ -367,9 +390,19 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
 
 def write_out_RH_file(obstimes,tv,outfile,csvformat):
     """
-    given obstimes (datetime) and tv variable with LombScargle data
-    and output filename, write out daily average RH values
-    csvformat is a boolean.
+    write out the daily average RH values 
+
+    parameters
+    ---------
+    obstimes : datetime object
+
+    tv : ?? 
+
+    outfile : string
+        name of output file
+
+    csvformat : boolean
+        true if you want csv format output
     """
     print('Daily average RH file written to: ', outfile)
     # sort the time tags
@@ -400,8 +433,17 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
 
 def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gamp,gpeak2noise,gutcTime,tvall ):
     """
-    writing out all the retrievals to a single file: file ID is allrh)
+    writing out all the RH retrievals to a single file: file ID is allrh)
     tvall had everything in it.  but it was slowing everything down, so i removed it
+
+    NG :
+    yr :
+    doy :
+    d :
+    good :
+    gazim : 
+    gfreq : 
+
     """
     if (NG > 0):
         # don't really need MM and DD, but ...

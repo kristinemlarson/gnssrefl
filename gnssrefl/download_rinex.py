@@ -34,6 +34,7 @@ def parse_arguments():
     parser.add_argument("-samplerate", default=None, type=str, help="Sample rate in seconds. For RINEX3 only.")
     parser.add_argument("-strip_snr", default=None, type=str, help="Uses gfzrnx to strip out non-SNR data/default is False")
     parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
+    parser.add_argument("-dec_rate", default=None, type=int, help="Does not work for all options.")
 
     args = parser.parse_args().__dict__
 
@@ -47,7 +48,7 @@ def parse_arguments():
 
 def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = None,
                    version: int = 2, strip: bool = False, doy_end: int = None, stream: str = 'R', samplerate: int = 30,
-                   strip_snr: bool = False, debug: bool = False):
+                   strip_snr: bool = False, debug: bool = False, dec_rate: int = 1):
     """
         command line interface for download_rinex.
         Parameters:
@@ -121,6 +122,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         debug : boolean, optional
             provides screen output helpful for debugging
             Default is False
+
+        dec_rate : integer, optional
+            some highrate file downloads allow decimation 
     """
 
 #   make sure environment variables exist.  set to current directory if not
@@ -140,11 +144,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     # allowed archives, rinex 2.11
     archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 'bkg', 'jeff', 'ngs', 'nrcan', 'special', 'bev', 'all']
 
-    # highrate archives allowed
-    archive_list_high = ['unavco', 'nrcan', 'ga']
 
     # removed the all archive
-    archive_list_high = ['unavco', 'nrcan', 'cddis'] # removed GA, added Cddis for v2
+    archive_list_high = ['unavco', 'nrcan', 'cddis','ga','bkg']  # though it is confusing because some are rinex 2.11 and others 3
 
     # archive list for rinex3 lowrate files
     archive_list_rinex3 = ['unavco', 'cddis', 'ga', 'bev', 'bkg', 'ign', 'epn', 'bfg','sonel','all']
@@ -206,11 +208,10 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             sys.exit()
 
     if (rate == 'high') and (version == 3):
-        if archive == 'cddis':
-            print('Highrate RINEX 3 from CDDIS is supported - but it is very slow')
+        if ((archive == 'cddis') or (archive == 'bkg')) or (archive == 'ga'):
+            print('Highrate RINEX 3 is supported - but it is very slow. Pick up a cup of coffee.')
         else:
-            print('I only support high-rate RINEX 3 files from CDDIS')
-            print('Not a fan of the 96 file thing ...')
+            print('I do not support RINEX 3 high rate downloads from your selected archive.')
             sys.exit()
 
     for d in range(doy, doy_end+1):
@@ -218,8 +219,16 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         if version == 3:
             print(station, year, d, archive, samplerate, stream)
             if rate == 'high':
-                print('seek highrate data at CDDIS')
-                ch.cddis_highrate(station, year, d, 0, stream, 1)
+                if archive == 'cddis':
+                    print('seek highrate data at CDDIS')
+                    ch.cddis_highrate(station, year, d, 0, stream, 1)
+                if archive == 'bkg':                               
+                    print('seek highrate data at BKG')
+                    rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec_rate)
+                if archive == 'ga':
+                    print('seek highrate data at GA')
+                    deleteOld = True
+                    r2, foundit = g.ga_highrate(station,year,d,dec_rate,deleteOld)
             else:
                 if archive == 'all':
                     file_name, foundit = k.universal_all(station, year, d, samplerate, stream)
