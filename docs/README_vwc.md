@@ -47,14 +47,17 @@ the [traditional reflector height method](gnssir.md). We need to use the average
 for a given year. When this method was demonstrated for a large network in the western US, 
 [PBO H2O](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson-2016-WIRES_Water.pdf), we 
 were also estimating snow depth on a daily basis. This allowed us to easily identify and remove snow-contaminated values from
-our soil moisture estimates. **We are no longer running the PBO H2O network.**  The soil moisture products are available 
-from the [ISMN](https://ismn.geo.tuwien.ac.at/en/networks/?id=PBO_H2O) and the snow products can be 
-downloaded from the [NSIDC](https://nsidc.org/data/nsidc-0722/versions/1)
-I put together a very [simple website for the entire project](https://gnss-reflections.org/maps). It does not have all the 
-functionality of the original website.
+our soil moisture estimates. **We are no longer running the PBO H2O network.** 
 
-The goal of this soil moisture module of <code>gnssrefl</code> is to help geoscientists to measure 
-soil moisture, but it currently requires the user to take responsibility for evaluating whether your site 
+- I put together a very [simple website for the project](https://gnss-reflections.org/maps). 
+It does not have all the searching functionality of the original website.
+- The official soil moisture products are available from the [ISMN](https://ismn.geo.tuwien.ac.at/en/networks/?id=PBO_H2O) 
+- The official snow products can be downloaded from the [NSIDC](https://nsidc.org/data/nsidc-0722/versions/1)
+- With support from NASA, the code that operated PBO H2O was successfully transferred to JPL. Questions about this code 
+should be directed to Sue Owen.
+
+The goal of this soil moisture module of <code>gnssrefl</code> is to help individual scientists to measure 
+soil moisture. It currently requires the user to take responsibility for evaluating whether your site 
 has snow effects. For the time being we are testing the code where it does not snow or it does not snow very often. 
 Regardless, you need to take these initial steps:
 
