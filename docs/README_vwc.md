@@ -44,12 +44,13 @@ The code currently only supports sites that are ~1-3 meters above the soil. We w
 
 Our soil moisture algorithm depends on initial reflector height values derived from 
 the [traditional reflector height method](gnssir.md). We need to use the average of the snow-free RH values
-for a given year. When this method was demonstrated for a large network in the western US, 
-[PBO H2O](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson-2016-WIRES_Water.pdf), we 
-were also estimating snow depth on a daily basis. This allowed us to easily identify and remove snow-contaminated values from
-our soil moisture estimates. **We are no longer running the PBO H2O network.** 
+for a given year. When this method was demonstrated for PBO H2O, a large GPS network in the western US, we 
+were also estimating snow depth on a daily basis. This allowed us to easily identify and 
+remove snow-contaminated values from our soil moisture estimates. **We are no longer running the PBO H2O network.** If 
+you are interested in learning more about PBO H2O: 
 
-- I put together a very [simple website for the project](https://gnss-reflections.org/maps). 
+- For an overview on the project, [please see this paper.](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson-2016-WIRES_Water.pdf)
+- [This simple website provides access to some information about the products](https://gnss-reflections.org/maps). 
 It does not have all the searching functionality of the original website.
 - The official soil moisture products are available from the [ISMN](https://ismn.geo.tuwien.ac.at/en/networks/?id=PBO_H2O) 
 - The official snow products can be downloaded from the [NSIDC](https://nsidc.org/data/nsidc-0722/versions/1)
