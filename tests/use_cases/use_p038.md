@@ -18,7 +18,7 @@
 
 [Google Maps Link](https://www.google.com/maps/place/34%C2%B008'50.1%22N+103%C2%B024'26.4%22W/@34.14725,-103.4073333,17z/data=!3m1!4b1!4m5!3m4!1s0x0:0x64e449f205085274!8m2!3d34.14725!4d-103.4073333) 
 
-<p align=""center>
+<p align="center">
 <img src="p038.png" width="500"/>
 </P>
  
@@ -49,7 +49,7 @@ Now we run <code>gnssir</code>. This will be needed for estimate a priori reflec
 
 #### Step 2: Soil Moisture
 
-[Please read the soil moisture user manual.](../../docs/README_vwc.md).  It is very short and has a lot of tips that will save you time.
+[Please read the soil moisture user manual.](../../docs/README_vwc.md) It is very short and has a lot of tips that will save you time.
 
 We need a list of satellite tracks to use:
 
