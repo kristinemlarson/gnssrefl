@@ -51,6 +51,24 @@ I am going to set my azimuth range to 70 to 180 and the amplitude to 2 (which is
 The quality control metric is the peak2noise ratio - and it is nominally set to 3. That is ok for now.
 Hit submit and wait ~5-10 seconds for results. 
 
+<p align=center>
+<img src=vlis-default.png width=600/>
+</p>
+
+So what's going on with the defaults? First, the most dominant reflections (which are colored) are coming
+from the west.  But this is where we should expect them. There is a large slab of concrete there. The area
+to the ocean is showing up in gray in the periodograms (and also gray in the azimuth plot below) as unsuccesful.
+But that is because the defaults (RH ranging from 0.5 to 6 meters) **does not include the right answer**.
+That is why we can't see it. 
+
+Second attempt. Now we explicitly set the RH range (5 to 18 meters) to include the right answer (10 meters) and the tidal range
+of plus/minus two meters. And we use elevation angles of 5 to 15 because those looked best when we ran the reflection zone app.
+
+<p align=center>
+<img src=vlis-better-choices.png width=600/>
+</p>
+
+IF YOU ARE USING THE GITHUB INSTALL
 
 ### Make SNR files
 
@@ -66,7 +84,7 @@ To make your own 15 second multi-GNSS VLIS files with <code>rinex2snr</code> you
 
 Begin by making an SNR file. 
 
-<code>rinex2snr vlis00nld 2020 153 -rate high -dec 15 -orb gnss -archive bkg</code>
+<code>rinex2snr vlis00nld 2020 171 -doy_end 184 -rate high -dec 15 -orb gnss -archive bkg</code>
 
 and relying on the peak2noise parameter for quality control
 turning off the amplitude constraint (to 1) and using only peak2noise for QC.  
@@ -76,9 +94,18 @@ turning off the amplitude constraint (to 1) and using only peak2noise for QC.
 Edit the json file and change the azimuth ranges 0-90 70-90 and  delete the western azimuths. Be careful
 when editing the file so that the commas and such are in the right places.
 
-Now run <code>gnssir</code> for these same dates:
+Now run <code>gnssir</code> for these same dates. This computes RH for each rising and setting arc:
 
-<code>gnssir vlis 2022 130 -doy_end 153 </code>
+<code>gnssir vlis 2022 171 -doy_end 184 </code>
+
+To put those results all together:
+
+<code>subdaily vlis 2022</code>
 
 
+<img src=vlis_3.png width=600>
+
+<img src=vlis_2.png width=600>
+
+<img src=vlis_1.png width=600>
 
