@@ -40,7 +40,7 @@ The bad news is that the sample rate is 1 second. And you do not need 1 second d
 second data would be fine. If you retain the 1 second data, all the <code>gnssrefl</code> programs will be pretty slow.
 
 To get you started, I have made some RINEX files for you. They are 
-available in this [tar file.](https://morefunwithgps.com/vlis_2022.tar)
+available in this [tar file.](https://morefunwithgps.com/public_html/vlis_2022.tar)
 After downloading, <code>tar -xvf vlis_tar.2022</code>. There should be 14 gzipped files in RINEX 2.11 format.
 Instead of using <code>gnssrefl</code> I am going to show you how to use the web app. Open a browser and 
 type in <code>gnss-reflections.org</code>. You will be using the RINEX upload option which is in the center.
