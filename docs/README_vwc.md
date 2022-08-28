@@ -155,5 +155,8 @@ Things we are planning to add:
 
 - the json used by gnssir will be explicitly integrated with the soil moisture code
 
+We currently have two use cases posted - 
+a shorter version of [p038](../tests/use_cases/use_p038.md) and [mchl](../tests/use_cases/use_mchl.md).
+
 Kristine M. Larson
 August 23, 2022
