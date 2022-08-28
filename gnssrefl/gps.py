@@ -93,6 +93,16 @@ def myfavoriteobs():
 
     return gobblygook
 
+def myfavoritegpsobs():
+    """
+    returns list of SNR obs needed for gfzrnx. 
+
+    """
+    # can't have non-GPS obs if you ask for only GPS signals 
+    gobblygook = 'G:S1C,S2X,S2L,S2S,S2X,S5I,S5Q,S5X'
+
+    return gobblygook
+
 def ydoych(year,doy):
     """
     Converts year and doy to various character strings
@@ -3545,7 +3555,7 @@ def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
                 else:
                     print('eek - I have run out of archives')
 
-def new_rinex3_rinex2(r3_filename,r2_filename,dec=1):
+def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     """
     assuming gfzrnx executable exists, the rinex 3 file is hatanaka
     uncompressed and translated into a rinex 2 file
@@ -3560,6 +3570,10 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1):
 
     dec : integer
         decimation factor. default is 0 or 1 which means none
+
+    gpsonly : boolean
+
+        whether you want only GPS signals. Default is false
 
     returns
     -----------
@@ -3586,6 +3600,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1):
         # now swap name
         r3_filename = r3_filename_new
     gobblygook = myfavoriteobs()
+    gobblygook_gps = myfavoritegpsobs()
     print('decimate value: ', dec)
     if not os.path.exists(gexe):
         print('gfzrnx executable does not exist and this file cannot be translated')
@@ -3594,13 +3609,19 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1):
         if os.path.isfile(r3_filename):
             try:
                 if (dec == 1) or (dec == 0):
-                    subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
+                    if (gpsonly):
+                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-f','-q'])
+                    else:
+                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
                     #'-sei','out','-smp',crate
                 else:
                     crate = str(dec)
                    #subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-sei','out','-smp',crate,'-f','-q'])
 
-                    subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
+                    if (gpsonly):
+                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-sei','out','-smp', crate, '-f','-q'])
+                    else:
+                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
                 if os.path.exists(r2_filename):
                     print('Look for the rinex 2.11 file here: ', r2_filename)
                     fexists = True
