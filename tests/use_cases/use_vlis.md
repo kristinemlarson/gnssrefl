@@ -82,12 +82,16 @@ To make your own 15 second multi-GNSS VLIS files with <code>rinex2snr</code> you
 
 ### Take a Quick Look at the Data
 
-Begin by making an SNR file. 
+Begin by making SNR files:
 
 <code>rinex2snr vlis00nld 2020 171 -doy_end 184 -rate high -dec 15 -orb gnss -archive bkg</code>
 
-and relying on the peak2noise parameter for quality control
-turning off the amplitude constraint (to 1) and using only peak2noise for QC.  
+Then use quickLook to make sure your strategy is a good one, where you should try 
+using different frequencies and the RH, elevation angle, and azimuth settings.
+
+<code>quickLook vlis 2020 171</code>
+
+This is the strategy I used:
 
 <code>make_json_input vlis 0 0 0 -h1 5 -h2 15 -e1 5 -e2 20 -peak2noise 3 -ampl 1 -allfreq T</code>
 
@@ -102,10 +106,16 @@ To put those results all together:
 
 <code>subdaily vlis 2022</code>
 
+Reports how many satellites were used in each constellation:
 
 <img src=vlis_3.png width=600>
 
+How the water levels look as a function of azimuth, constellation, and amplitude:
+
 <img src=vlis_2.png width=600>
 
-<img src=vlis_1.png width=600>
+Time series with large outliers removed.
 
+<img src=vlis-1.png width=600>
+
+Additional corrections can be made using the <code>rhdot T</code> setting
