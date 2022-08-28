@@ -63,7 +63,7 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 
 
 * execute docker run command (see above) in terminal window
-* Feeback from jupyter notebook user:
+* Feedback from jupyter notebook user:
 	* About folder permission: In the notebook environment test, the error prompted that the program could not write to the file.  This is remedied by changing the permissions of the folder from the command line.
 
 ## additional references:
