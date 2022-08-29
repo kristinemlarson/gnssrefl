@@ -30,7 +30,7 @@ you can get the tidal range without a colocated tide gauge sensor - e.g. there a
 GNSS-IR has a Nyquist.  While I won't discuss it here (see [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8) for details), it is an issue at VLIS. The easiest VLIS data to find are the 30 second data
 deposited by geodesists at various global archives. This sample rate would be fine for 
 an antenna 6 meters above the water e.g. But at VLIS - with the known tidal range - we are really too close to the L1 Nyquist to use 30 second data. You can use the 30 second data for L2/L5, but
-you are basically throwing away half your data if ignore L1.
+you are basically throwing away half your data if ignore L1. 
 
 So what *can* you do? The good news is that this site reliably reports high-rate GNSS data. 
 The bad news is that the sample rate is 1 second. And you do not need 1 second data for this site; 15 
@@ -43,21 +43,22 @@ After downloading, <code>tar -xvf vlis_tar.2022</code>. There should be 14 gzipp
 Instead of using <code>gnssrefl</code> I am going to show you how to use the web app. Open a browser and 
 type in <code>gnss-reflections.org</code>. You will be using the RINEX upload option which is in the center.
 Load one of the RINEX files and press the submit button.  Depending on your internet connection, your
-answer should pop up in about 10 seconds.
+answer should pop up in about 10 seconds. The writing in magenta are comments I have added to 
+point out various things.
 
 <p align=center>
 <img src=vlis-default.png width=800/>
 </p>
 
-So what's going on here? (If you have never used this site before,
-I recommend you give a 
-look to the [frequently asked questions page](http://gnss-reflections.org/overview readme file).)
+So what's going on here? (If you have never used this site before, I recommend you give a 
+look to the [frequently asked questions page](http://gnss-reflections.org/overview).)
 First, the most dominant reflections (which are colored) are coming
-from the west. But this is where we should expect them. There is a large slab of concrete there. The area
-pointing to the ocean is showing up in gray in 
+from the west. But this is where we should expect them. There is a large slab of concrete there and it 
+looks like it is about 6.5 meters below the antenna. The area pointing to the ocean is showing up in gray in 
 the periodograms (and also gray in the azimuth plot below) as unsuccesful.
-But that is because the defaults (RH ranging from 0.5 to 8 meters) **does not include the right answer**.
-That is why we can't see it. 
+That is because the defaults we used in our analysis 
+strategy (RH ranging from 0.5 to 8 meters) **does not include the right answer**.
+And that is why we can't see the tides. 
 
 Second attempt. Make the following changes:
 
@@ -74,12 +75,25 @@ Make sure your RINEX file is loaded and hit submit.
 <img src=vlis-better-choices.png width=800/>
 </p>
 
-The reflector height answers are written out to the text file provided.
+Now you can see a broad swath of "successful" retrievals in the azimuth range you chose. The RH 
+changes in the top plot (azimuth on the x-axis) are the tides. The reflector height 
+answers are written out to a text file. Use the link called **Numerical Results**.
+You will see L1, L2C, and L5 retrievals all together. The most retrievals are generally from
+L1 - because every GPS satellite has L1. The second most are L2C (at least 24 satellites) and 
+the fewest are L5 (I am not sure how many L5 transmitting satellites there are, but it is fewer than L2C).
 
 I also have [a bash script](https://github.com/kristinemlarson/gnssIR_api) that will allow you to 
 more automatically query the API. Generally people [install the python code or the docker instead](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md).
 
-IF YOU ARE USING THE GITHUB INSTALL and have Python 3.9: (the docker is not currently working)
+If you are using the github install of <code>gnssrefl</code> and 
+have Python 3.9: (the docker is not currently working), you 
+can do this on your local machine. The advantage of doing it on a local machine is mostly that you can use multi-GNSS 
+signals. The web app is GPS only. For applications with a daily average, such as snow accumulation, 
+GPS can be enough. But for tides you generally want as many measurements as 
+possible, and that means multi-GNSS. The other
+advantage of the using the <code>gnssrefl</code> package is that you can more easily use higher-rate data.
+The web app strictly controls the maximum RH you can estimate and it also limits how large your RINEX 
+file can be. <code>gnssrefl</code> also provides links to many more data archives.
 
 ### Make SNR files
 
@@ -109,7 +123,7 @@ This is the strategy I used:
 Edit the json file and change the azimuth ranges of 0-90 to 70-90 and  delete the western azimuths. Be careful
 when editing the file so that the commas and such are in the right places.
 
-Now run <code>gnssir</code> for these same dates. This computes RH for each rising and setting arc:
+Now run <code>gnssir</code> for these same dates. This computes RH for each rising and setting satellite arc:
 
 <code>gnssir vlis 2022 171 -doy_end 184 </code>
 
@@ -129,7 +143,6 @@ Time series with large outliers removed.
 
 <img src=vlis-1.png width=600>
 
-Additional corrections can be made using the <code>rhdot T</code> setting
-I will add more information here when I get a chance.
+Additional corrections can be made using the <code>rhdot T</code> setting. I will add more information here when I get a chance.
 
 Kristine M. Larson August 29, 2022
