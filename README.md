@@ -428,5 +428,14 @@ ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file
 
 ORBITS/YYYY/sp3/...  sp3 files of orbits. Generally we use multi-GNSS sp3 files, that are defined as:
 
+</PRE>
+<PRE>
 
+How to build your own docker image
+
+From your gnssrefl directory (that has the Dockerfile):
+docker build --no-cache -t <imagename> .
+docker run -it <imagename> /bin/bash
+
+If you want to mount volumes you could copy the -v syntax from the unavdocker/gnssrefl docker run command.
 </PRE>
