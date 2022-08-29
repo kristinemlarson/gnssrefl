@@ -1,5 +1,8 @@
 ## Installation
 
+**August 29, 2022 The docker image does not correctly read RINEX 3 files at this time. We 
+hope it will be fixed by tomorrow.**
+
 You can  access this package via Jupyter notebooks, Docker containers, or traditional
 github/pypi package installation.
 

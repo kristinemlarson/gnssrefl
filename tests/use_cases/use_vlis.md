@@ -8,67 +8,78 @@
 
 **Location:** Vlissingen, the Netherlands
 
-**Archive:** SONEL, BKG, BEV
+**Archives:** SONEL, BKG, BEV
 
 [Station Page at NGL](http://geodesy.unr.edu/NGLStationPages/stations/VLIS.sta)
 
-[EUREF Page](https://epncb.oma.be/_networkdata/siteinfo4onestation.php?station=VLIS00NLD)
 
 ### Take a Quick Look at the Site Reflection Zones
 
-The EUREF page has a lot of information about the GNSS site here. It is currently tracking multiple GNSS constellations.  
-If you are going to try and measure water levels, it is a good idea to find out whether 
-the "reflection zones" are on water. And which azimuths provide that.
+The [EUREF Page](https://epncb.oma.be/_networkdata/siteinfo4onestation.php?station=VLIS00NLD) page has a lot of information about the GNSS site here. It is currently tracking multiple GNSS constellations.  
+If you are going to try and measure water levels, it is important to look at the reflection zones 
+around the site. This will allow you to set a good mask.
 [Type VLIS into the station name and first use the defaults at this web site.](http://gnss-reflections.org/rzones)
 Try different azimuth constraints. I recommend only using 5-15 degree elevation angles.
-Note that the height of hte antenna above sea level is provided by the web app.
+Note that the height of the antenna above sea level is provided by the web app and returned on the right hand side.
 
-Another you can do is try to get an idea of what the tidal range will be.  Follow the link to see how big they are:
+Another thing you should try to do is get an idea of what the tidal range will be. At VLIS, there is a 
+colocated [tide gauge](http://www.ioc-sealevelmonitoring.org/station.php?code=vlis). There are other ways
+you can get the tidal range without a colocated tide gauge sensor - e.g. there are various web sites that will at least give you high and low tide predictions.
 
-[IOC Tide Gauge Site](http://www.ioc-sealevelmonitoring.org/station.php?code=vlis)
 
-
-While I won't discuss it here 
-(please read [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8) for details about 
-the Nyquist for GNSS-IR), it is an issue at VLIS. The easiest data to find are the 30 second data
-deposited by geodesists at various global archives. This sample rate would be fine for an antenna 8 meters above the water. But at VLIS - with 
-the known tidal range - we are really too close to the L1 Nyquist to use 30 second data. You can use the 30 second data for L2, but
-you are basically throwing away half your data if ignore L1 and only use L2 and L5. 
+GNSS-IR has a Nyquist.  While I won't discuss it here (see [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8) for details), it is an issue at VLIS. The easiest VLIS data to find are the 30 second data
+deposited by geodesists at various global archives. This sample rate would be fine for 
+an antenna 6 meters above the water e.g. But at VLIS - with the known tidal range - we are really too close to the L1 Nyquist to use 30 second data. You can use the 30 second data for L2/L5, but
+you are basically throwing away half your data if ignore L1.
 
 So what *can* you do? The good news is that this site reliably reports high-rate GNSS data. 
 The bad news is that the sample rate is 1 second. And you do not need 1 second data for this site; 15 
-second data would be fine. If you retain the 1 second data, all the <code>gnssrefl</code> programs will be pretty slow.
+second data is fine. If you retain the 1 second data, all the <code>gnssrefl</code> programs will be pretty slow.
 
-To get you started, I have made some RINEX files for you. They are 
+To get you started so that you don't have to download and manipulate 1 sec GNSS files (which come 
+in 96 separate files!), I have made some smaller 15 second RINEX files for you. They are 
 available in this [tar file.](https://morefunwithgps.com/public_html/vlis_2022.tar)
 After downloading, <code>tar -xvf vlis_tar.2022</code>. There should be 14 gzipped files in RINEX 2.11 format.
 Instead of using <code>gnssrefl</code> I am going to show you how to use the web app. Open a browser and 
 type in <code>gnss-reflections.org</code>. You will be using the RINEX upload option which is in the center.
-
-You should pick one of the RINEX files I've given you.  Pick the L1L2CL5 frequency option, and set the 
-elevation angles to range from 5 to 15.  Set the Reflector Heights to vary from 5 to 19 meters. 
-I am going to set my azimuth range to 70 to 180 and the amplitude to 2 (which is essentially turning it off).
-The quality control metric is the peak2noise ratio - and it is nominally set to 3. That is ok for now.
-Hit submit and wait ~5-10 seconds for results. 
+Load one of the RINEX files and press the submit button.  Depending on your internet connection, your
+answer should pop up in about 10 seconds.
 
 <p align=center>
-<img src=vlis-default.png width=600/>
+<img src=vlis-default.png width=800/>
 </p>
 
-So what's going on with the defaults? First, the most dominant reflections (which are colored) are coming
-from the west.  But this is where we should expect them. There is a large slab of concrete there. The area
-to the ocean is showing up in gray in the periodograms (and also gray in the azimuth plot below) as unsuccesful.
-But that is because the defaults (RH ranging from 0.5 to 6 meters) **does not include the right answer**.
+So what's going on here? (If you have never used this site before,
+I recommend you give a 
+look to the [frequently asked questions page](http://gnss-reflections.org/overview readme file).)
+First, the most dominant reflections (which are colored) are coming
+from the west. But this is where we should expect them. There is a large slab of concrete there. The area
+pointing to the ocean is showing up in gray in 
+the periodograms (and also gray in the azimuth plot below) as unsuccesful.
+But that is because the defaults (RH ranging from 0.5 to 8 meters) **does not include the right answer**.
 That is why we can't see it. 
 
-Second attempt. Now we explicitly set the RH range (5 to 18 meters) to include the right answer (10 meters) and the tidal range
-of plus/minus two meters. And we use elevation angles of 5 to 15 because those looked best when we ran the reflection zone app.
+Second attempt. Make the following changes:
+
+- the RH range (5 to 18 meters) to include the 
+right answer (10 meters) and the tidal range (plus/minus two meters). 
+- Use elevation angles of 5 to 15 because those looked best when we ran the reflection zone app.
+- Change the minimum amplitude to 2. 
+- Use the L1L2CL5 frequency option. (default was L1 only)
+- set the azimuth range to 70 to 180 
+
+Make sure your RINEX file is loaded and hit submit.
 
 <p align=center>
-<img src=vlis-better-choices.png width=600/>
+<img src=vlis-better-choices.png width=800/>
 </p>
 
-IF YOU ARE USING THE GITHUB INSTALL
+The reflector height answers are written out to the text file provided.
+
+I also have [a bash script](https://github.com/kristinemlarson/gnssIR_api) that will allow you to 
+more automatically query the API. Generally people [install the python code or the docker instead](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md).
+
+IF YOU ARE USING THE GITHUB INSTALL and have Python 3.9: (the docker is not currently working)
 
 ### Make SNR files
 
