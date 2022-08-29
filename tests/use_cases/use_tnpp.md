@@ -1,4 +1,4 @@
-### Puerto Peñasco, Sonora, Mexico
+### Puerto Penasco, Sonora, Mexico
 
 Station Name: tnpp
 
