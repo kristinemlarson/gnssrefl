@@ -4,9 +4,9 @@ Station Name: tnpp
 
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/TNPP)
 
-[Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/TNPP.sta)
-
+<p align=center>
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg" width=500>
+</p>
 
 **Archive:** [UNAVCO](http://www.unavco.org)
 
@@ -21,8 +21,7 @@ Station Name: tnpp
 - Height above sea level: 62.766 m 
 
 
-This is a high-rate site. There are multi-GNSS data including L2C starting on 2021 Oct 27.
-I will look at a small dataset from late 2021.  
+This is a high-rate site. There are multi-GNSS data including L2C starting on 2021 Oct 27. I will look at a small dataset from late 2021.  
 
 
 Use the reflection zone app to think about [RH and azimuth constraints](https://gnss-reflections.org/rzones)
@@ -53,7 +52,7 @@ Hand-edit the json file to only look at the azimuth region from 180 to 270 degre
 
 Now go back and make more SNR files:
 
-<code>rinex2snr tnpp 2021 301 -archive unavco -rate high -dec 3 -orb gnss -doy_end 316</code>
+<code>rinex2snr tnpp 2021 301 -archive unavco -rate high -dec 2 -orb gnss -doy_end 316</code>
 
 Estimate RH :
 
@@ -75,11 +74,12 @@ Initial RH values:
 
 <img src=subdaily_npp_1.png width=600>
 
-Setting the -rhdot flag, more corrections are applied:
+Setting the -rhdot flag:
 
 <code>subdaily tnpp 2021 -rhdot T</code>
 
-Estimating and applying the RH dot correction improves RH precision ([Larson et al., 2013](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf)).
+Estimating and applying the RH dot correction improves RH 
+precision ([Larson et al., 2013](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf)).
 
 <img src=tnpp_rhdot_2.png width=600>
 
@@ -88,3 +88,6 @@ Final series with antenna frequency biases removed compared to a spline fit:
 <img src=tnpp_rhdot_3.png width=600>
 
 The final precision for this site is 0.1 meters
+
+Kristine Larson 2022 August 29
+
