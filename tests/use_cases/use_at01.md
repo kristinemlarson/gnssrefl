@@ -98,10 +98,11 @@ Next estimate reflector height (RH) for the two month time period:
 
 <code>gnssir at01 2020 230 -doy_end 290</code>
 
-We have written some code to help you look at these subdaily files - it is not complete as yet, but you can 
-certainly give it a try. We have set an outlier criteria of 0.36 meters (one sigma 0.12 meters ==> 0.36 meters three sigma) to start with.  
+We have written some code to help you look at these subdaily files - it is a work in progress, but you can 
+certainly give it a try. **Note:** These figures were generated with an older
+version of the code and should be updated.
 
-<code>subdaily at01 2020 -doy1 230 -doy2 290 -outlier 0.36</code>
+<code>subdaily at01 2020 -doy1 230 -doy2 290 </code>
 
 The code concatenates the daily RH files for this period:
 
@@ -111,7 +112,13 @@ You can see that there are a very large number of RH retrievals per day:
 
 <img src=at01_nvals.png width=600>
 
-This preliminary version of the code removes outliers and makes an effort to compute the RH dot correction.  It uses a cubic spline to fit the RH data which allows a first order estimate for the surface rate of change. That, along with geometrical information as to the elevation angle rate of change, is used to make the RH dot correction ([for more information](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf). This term is **very important** for sites with large tidal ranges, but is of less importance at sites like at01. Nevertheless, you can see here that it does help a bit:
+This preliminary version of the code removes outliers and makes an effort 
+to compute the RH dot correction if <code>rhdot</code> is set to true. It  uses a cubic 
+spline to fit the RH data which allows a first order estimate for the 
+surface rate of change. That, along with geometrical information as to the elevation angle rate 
+of change, is used to make the RH dot correction ([for more information](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf). This term is **very important** for sites with 
+large tidal ranges, but is of less importance at sites like at01. Nevertheless, 
+you can see here that it does help a bit:
 
 <PRE>
 RMS no RHdot correction (m)  0.082
@@ -147,6 +154,6 @@ might want to change your azimuth mask.
 
 Files for both the raw RH estimates and the QC/RH corrected estimates are provided (file names come to the screen).
 
-I would like to include Simon Williams' RH retrieval/tidal estimation code in this package. Simon has been kind enough to make the Matlab code [open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous.
+I would like to include Simon Williams' RH retrieval/tidal estimation code 
+in this package. Simon has been kind enough to make the Matlab code [open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous.
  
-

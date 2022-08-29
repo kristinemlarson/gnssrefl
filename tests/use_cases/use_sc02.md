@@ -109,16 +109,21 @@ Once you have the json file set up, you can go ahead and analyze all the data wi
 This produces reflector heights for every rising and setting satellite track that meets the 
 quality control metrics that you have set. We have some preliminary code that will help you evaluate 
 these RH retrievals. It is a work in progress, so it does not do everything yet. It starts  
-by concatenating the daily results and applying a 3 sigma outlier criterion 
-using 0.12 meters as the standard deviation.
+by concatenating the daily results and applying a sigma outlier criterion . The default is set to 
+2.5 sigma, but you can enter on the command line a more or less stringent value:
 
-<code>subdaily sc02 2021 -outlier 0.36</code>
+<code>subdaily sc02 2021</code>
 
 <img src="raw_sc02.png"	width=600>
 
-The output is stored in a plain text or csv file. This code will also apply the RH dot correction. Outliers are identified and 
-removed and these new solutions are also written to a file in either plain text or csv format.
+The output is stored in a plain text or csv file. This code will 
+also apply the RH dot correction, but you have to 
+request it (<code>-rhdot T</code>). The spline_outlier optional input (in meters) 
+is only used in the rhdot section of the code.
+
 Below are shown the initial solutions with a spline fit and outliers identified.
+Note: These figures were generated from an earlier version of the code, and should be 
+updated.
 
 <img src="sc02-outliers.png" width=600>
 

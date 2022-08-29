@@ -88,8 +88,8 @@ To make your own 15 second multi-GNSS VLIS files with <code>rinex2snr</code> you
 - station vlis00nld (the longer station name will tell the code to find RINEX 3 instead of RINEX 2.11)
 - rate high
 - dec 15
-- archive BKG
-- orb of gnss
+- archive bkg
+- orb gnss
 
 ### Take a Quick Look at the Data
 
@@ -106,7 +106,7 @@ This is the strategy I used:
 
 <code>make_json_input vlis 0 0 0 -h1 5 -h2 15 -e1 5 -e2 20 -peak2noise 3 -ampl 1 -allfreq T</code>
 
-Edit the json file and change the azimuth ranges 0-90 70-90 and  delete the western azimuths. Be careful
+Edit the json file and change the azimuth ranges of 0-90 to 70-90 and  delete the western azimuths. Be careful
 when editing the file so that the commas and such are in the right places.
 
 Now run <code>gnssir</code> for these same dates. This computes RH for each rising and setting arc:
@@ -130,3 +130,6 @@ Time series with large outliers removed.
 <img src=vlis-1.png width=600>
 
 Additional corrections can be made using the <code>rhdot T</code> setting
+I will add more information here when I get a chance.
+
+Kristine M. Larson August 29, 2022
