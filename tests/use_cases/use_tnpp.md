@@ -30,9 +30,10 @@ Use the reflection zone app to think about [RH and azimuth constraints](https://
 
 ### Make SNR Files
 
-Let's start with one file. We are using the high-rate (1 second) data but are decimating it to 3 seconds to make the code run faster.
+Let's start with one file. We are using the high-rate (1 second) data but are decimating it to 2 seconds to make the code run faster.
+(my result plots below use the 1 second datastream, but you won't be able to tell the difference):
 
-<code>rinex2snr tnpp 2021 301 -archive unavco -rate high -dec 3 -orb gnss</code>
+<code>rinex2snr tnpp 2021 301 -archive unavco -rate high -dec 2 -orb gnss</code>
 
 To get started :
 
