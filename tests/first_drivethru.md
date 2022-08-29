@@ -7,7 +7,7 @@
 <TD>
 <B>Greenland/Antarctica</B>
 
-* [Lorne, Ross Ice Shelf, Antarctica](use_cases/use_lorg.md) (lorg)
+* [Lorne, Ross Ice Shelf](use_cases/use_lorg.md) (lorg)
 
 * [Dye2, Greenland Ice Sheet](use_cases/use_gls1.md) (gls1)
 
@@ -20,15 +20,15 @@
 <td>
 <B>Lakes and Rivers</B>
 
-* [Michipicoten, Lake Superior, Canada](use_cases/use_mchn.md) (mchn)
+* [Michipicoten, Canada](use_cases/use_mchn.md) (mchn)
 
 * [Lake Taupo, New Zealand](use_cases/use_tgho.md) (tgho)
 
-* [St Lawrence River, Montreal, Canada](use_cases/use_pmtl.md) (pmtl)
+* [St Lawrence River,Canada](use_cases/use_pmtl.md) (pmtl)
 
-* [Lake Mathews](use_cases/use_mat2.md) (mat2)
+* [Lake Mathews, Riverside](use_cases/use_mat2.md) (mat2)
 
-* [Lake Malawi](use_cases/use_mbbc.md) (mbbc)
+* [Lake Malawi, Tanzania](use_cases/use_mbbc.md) (mbbc)
 
 </TD>
 <TD>
@@ -38,9 +38,9 @@
 
 * [Mitchell, Queensland](use_cases/use_mchl.md) (mchl)
 
-* SCIA
+* [Victorville, CA](use_cases/use_scia.md) (scia)
 
-* MFLE
+* Boulder, CO (mfle)
 
 </TD>
 </TR>
@@ -65,6 +65,8 @@
 * [St Michael, Alaska](use_cases/use_at01.md) (at01)
 
 * [Vlissingen, the Netherlands](use_cases/use_vlis.md) (vlis)
+
+* [Puerto Penasco, Mexico](use_cases/use_tnpp.md) (tnpp)
 
 </TD>
 </TR>

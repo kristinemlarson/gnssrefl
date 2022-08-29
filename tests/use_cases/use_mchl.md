@@ -1,4 +1,4 @@
-### MCHL
+### Mitchell
 
 **Station Name:** 	mchl (mchl00aus)
 
