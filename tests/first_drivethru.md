@@ -31,7 +31,20 @@
 * [Lake Malawi](use_cases/use_mbbc.md) (mbbc)
 
 </TD>
+<TD>
+<B>Soil Moisture </B>
+
+* [Portales, New Mexico](use_cases/use_p038.md) (p038)
+
+* [Mitchell, Queensland](use_cases/use_mchl.md) (mchl)
+
+* SCIA
+
+* MFLE
+
+</TD>
 </TR>
+
 <TR>
 
 <TD>
@@ -50,6 +63,8 @@
 * [Friday Harbor, Washington](use_cases/use_sc02.md) (sc02) 
 
 * [St Michael, Alaska](use_cases/use_at01.md) (at01)
+
+* [Vlissingen, the Netherlands](use_cases/use_vlis.md) (vlis)
 
 </TD>
 </TR>
