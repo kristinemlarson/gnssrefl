@@ -327,13 +327,13 @@ Before you ask for help - a few things to ask yourself:
 
 Are you running the current software?
 
-- gnssrefl command line  - git pull 
+- gnssrefl command line  <code>git pull </code>
 
-- gnssrefl docker command line  - docker pull unavdocker/gnssrefl
+- gnssrefl docker command line  <code>docker pull unavdocker/gnssrefl</code>
 
-- gnssrefl jupyter notebook  - git pull
+- gnssrefl jupyter notebook  <code>git pull</code>
 
-- gnssrefl jupyter notebook docker- docker pull unavdocker/gnssrefl_jupyter   
+- gnssrefl jupyter notebook docker <code>docker pull unavdocker/gnssrefl_jupyter</code>
 
 You are encouraged to submit your concerns as an issue to 
 the [github repository](https://github.com/kristinemlarson/gnssrefl). If you are unfamiliar 
@@ -365,16 +365,17 @@ python/packaging questions and improved our docker distribution.
 - Joakim Strandberg provided python RINEX translators. 
 - Johannes Boehm provided source code for the refraction correction. 
 - At UNAVCO, Kelly Enloe made Jupyter notebooks and Tim Dittmann made docker builds. 
-- Makan Karegar added NMEA capability.
-- Dave Purnell added the <code>invsnr</code> capability.  
+- Makan Karegar added the NMEA capability.
+- Dave Purnell provided his inversion code, which is now running in the <code>invsnr</code> capability.  
 - Carolyn Roesler helped with the original Matlab codes.
 - Felipe Nievinski and Simon Williams have provided significant advice for this project.
+- Clara Chew and Eric Small developed the soil moisture algorithm; I ported it to python with Kelly's help.
 
 Kristine M. Larson
 
 [https://kristinelarson.net](https://kristinelarson.net)
 
-This documentation was updated on July 26, 2022.
+This documentation was updated on August 29, 2022
 
 
 <HR>
@@ -390,52 +391,45 @@ docker pull unavdocker/gnssrefl to install code.
 
 [Old quick link to Docker](https://hub.docker.com/r/unavdocker/gnssrefl)
 
+cddis links:
 
-highrate  data
+[highrate data](https://cddis.nasa.gov/archive/gnss/data/highrate/2019/150/19d/00/)
 
-https://cddis.nasa.gov/archive/gnss/data/highrate/2019/150/19d/00/
+[geodetic data rate](https://cddis.nasa.gov/archive/gnss/data/daily/2018/015/18d/)
 
-geodetic data
+[readme](https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html)
 
-https://cddis.nasa.gov/archive/gnss/data/daily/2018/015/18d/
+[how to get a listing of orbits on a given GPS week (but not multi-GNSS)...](https://cddis.nasa.gov/archive/gnss/products/2037/)
 
-https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html
-
-how to get a listing of orbits on a given GPS week (but not multi-GNSS)...
-
-https://cddis.nasa.gov/archive/gnss/products/2037/
-
-multi-GNSS
-
-https://cddis.nasa.gov/archive/gps/products/mgex/2037/
+[multi-GNSS](https://cddis.nasa.gov/archive/gps/products/mgex/2037/)
 
 
-<PRE>
-File structure for station abcd in the year YYYY (last two characters YY), doy DDD:
+**File structure for station abcd in the year YYYY (last two characters YY), doy DDD:**
 
-REFL_CODE/input/abcd.json - instructions for Lomb Scargle analysis
+- REFL_CODE/input/abcd.json - instructions for gnssir analysis, refraction files
 
-REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files 
+- REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files 
 
-REFL_CODE/YYYY/results/abcd/DDD.txt  Lomb Scargle analysis 
+- REFL_CODE/YYYY/results/abcd/DDD.txt  Lomb Scargle analysis 
 
-REFL_CODE/Files/ - various output files and plots will be placed here
+- REFL_CODE/YYYY/phase/abcd/DDD.txt  phase analysis 
 
-Rinex files are not stored by this code.   In fact, the opposite. If they are being translated, 
-they are deleted. Do not keep your only copy of Rinex files in your default directory.
+- REFL_CODE/Files/ - various output files and plots will be placed here
 
-ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file 
+- ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file 
 
-ORBITS/YYYY/sp3/...  sp3 files of orbits. Generally we use multi-GNSS sp3 files, that are defined as:
+- ORBITS/YYYY/sp3/ - sp3 files of orbits - these use names from the archives.
 
-</PRE>
-<PRE>
+RINEX files are not stored by this code. In fact, quite the opposite. If they are being translated, 
+they are deleted. Do not keep your only copy of RINEX files in your default directory.
 
-How to build your own docker image
+
+**How to build your own docker image**
 
 From your gnssrefl directory (that has the Dockerfile):
-docker build --no-cache -t <imagename> .
-docker run -it <imagename> /bin/bash
+
+<code>docker build --no-cache -t <imagename> .</code>
+
+<code>docker run -it <imagename> /bin/bash</code>
 
 If you want to mount volumes you could copy the -v syntax from the unavdocker/gnssrefl docker run command.
-</PRE>
