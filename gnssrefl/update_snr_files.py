@@ -17,7 +17,7 @@ def main():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="doy", type=int)
-    parser.add_argument("snrEnd", help="snr file ending", type=int)
+    parser.add_argument("snrEnd", help="snr file ending, e.g. 66", type=int)
     parser.add_argument("goal", help="which constellations(0,100,200,300)", type=int)
     parser.add_argument("dec_rate", help="decimation for RINEX file", type=int)
     parser.add_argument("sample_rate", help="low or high", type=str)

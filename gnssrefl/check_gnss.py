@@ -2,29 +2,56 @@
 import numpy as np
 import os
 import subprocess
-# my code
+# local gnssrefl code
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rnx
 
 
 
-def rerun_lsp(station, year, doy, snrEnd, mac):
+def rerun_lsp(station, year, doy, snrEnd, mac=False):
     """
     if an SNR file has been remade, this allows you to rerun the LSP code
     should change that code to a callable function, but hey, not there yet.
-    kristine larson
+    parameters
+    ---------
+    station : string
+        four character station name
+
+    year : integer
+
+    doy : integer
+        day of year
+    snrEnd : integer
+        SNR file ending, i.e. 66 or 99
+
+    mac : boolean
+        old input kept for ???
+
     """
     print('try to run the LSP code')
-    if (mac == True):
-        subprocess.call(['gnssir', station, str(year), str(doy), '-snr',str(snrEnd)])
-    else:
+    #if (mac == True):
+    #    subprocess.call(['gnssir', station, str(year), str(doy), '-snr',str(snrEnd)])
+    #else:
 # use digital ocean setup - change to new package
-        subprocess.call(['gnssir', station, str(year), str(doy), '-snr', str(snrEnd) ])
+    subprocess.call(['gnssir', station, str(year), str(doy), '-snr', str(snrEnd) ])
+
 
 def gnss_stats(ffull):
     """
-    send the filename and return the status, whihc is 0
-    for gps only, 100 for gps+glonass, 200 for gps+glonass+galileo etc
+    send the filename and return the constellation status
+    as defined below
+
+    parameters
+    ---------
+    ffull : string
+        SNR filename
+
+    returns
+    ---------
+    stat : integer
+        0 for gps only, 100 for gps+glonass, 200 for gps+glonass+galileo,
+        300 for gps+glonass+galileo+beidou 
+
     """
     # default 
     print('check the GNSS status of a file')
@@ -52,8 +79,32 @@ def gnss_stats(ffull):
 def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
     """
     input snr filename (without directory)
-    goal (as describedd in gnss_Stats), dec_rate (0 for nothing)
+    goal (as described in gnss_Stats), dec_rate (0 for nothing)
     and receiverrate ('low' or 'high')
+
+    parameters
+    -----------
+    station : string
+        four character station name
+    year : integer
+
+    doy : integer
+        day of year
+
+    snrEnd : integer
+        snr filename choice, i.e. 66
+
+    goal :
+
+    dec_rate : integer
+
+    receiverrate : string 
+        high or low 
+
+    returns
+    ------------
+    True for some unknown reason
+
     """
     exedir = os.environ['EXE']
     fortran = True # because it is me
@@ -62,24 +113,32 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
     nol = False
     overwrite = True
     mac = False
+
+    # no idea why this is here ...
     if exedir == '/Users/kristine/bin':
         mac = True
 
     fname,fname_xz = g.define_filename(station,year,doy,snrEnd)
-    print(fname,fname_xz)
+    fname_gz = fname_xz[:-3] + '.gz'
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
     f=fname
 
     print('decimation and receiver rate',dec_rate,receiverrate)
 
+    # check to see if you have the file somewhere
     xit = False
     if os.path.exists(fname):
         print('SNR file exists')
         xit = True
-    elif os.path.exists(fname_xz): 
+    if (not xit) and os.path.exists(fname_xz): 
         print('xz file exists -unxz it ')
         subprocess.call(['unxz',fname_xz])
         xit = True
+    if (not xit) and os.path.exists(fname_gz): 
+        print('gz file exists - unzip it ')
+        subprocess.call(['gunzip',fname_gz])
+        xit = True
+
     if xit:
         satstat = gnss_stats(fname) 
         print('Current File Status',orbch(satstat))

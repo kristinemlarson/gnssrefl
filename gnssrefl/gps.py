@@ -124,8 +124,7 @@ def ydoych(year,doy):
         2 character year
 
     cdoy : string
-        3 character year
-
+        3 character day of year
 
     """
     cyyyy = str(year)
@@ -201,7 +200,6 @@ def define_and_xz_snr(station,year,doy,snr):
 
     snre : boolean
         whether the file exists or not
-
 
     """
     xdir = os.environ['REFL_CODE']
@@ -462,13 +460,18 @@ def elev_angle(up, RecSat):
     computes satellite elevation angle
 
     parameters:
-    up - 3 vector float 
+    -------------------
+    up : 3 vector float 
         unit vector in the up direction
 
-    RecSat - 3 vector numpy 
-        Cartesian vector pointing from receiver to satellite 
-    to the satellite in meters
-    the output is elevation angle in radians
+    RecSat : 3 vector numpy 
+        Cartesian vector pointing from receiver to satellite in meters
+
+    returns
+    --------------
+    angle: float
+        elevation angle in radians
+
     """
     ang = np.arccos(np.dot(RecSat,up) / (norm(RecSat)))
     angle = np.pi/2.0 - ang
@@ -554,7 +557,7 @@ def sp3_interpolator(t, tow, x0, y0, z0, clock0):
  
 def dec31(year):
     """
-    Parameter :
+    Parameters 
     ---------
     input: integer
         year
@@ -572,18 +575,25 @@ def dec31(year):
 def ymd2doy(year,month,day):
     """
     Parameters
+    --------------
 
     year : integer
-        year
 
     month : integer
-        month
 
     day : integer
-        day
+        day of the month
 
-    returns day of year (doy)
-    string doy, string year and string (2ch) year
+    returns
+    ---------
+    doy : integer
+         day of year
+    cdoy : string 
+         three character day of year
+    cyyyy : string 
+         four character year
+    cyy : string 
+         two character year
     """
     today=datetime.datetime(year,month,day)
     doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
@@ -648,6 +658,7 @@ def hatanaka_warning():
 def rinex_cddis(station, year, month, day):
     """
     Picks up a 30 sec hatanaka RINEX 2.11 file from CDDIS - converts to an o RINEX file
+    This is likely obsolete
 
     Parameters
     --------------

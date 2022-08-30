@@ -11,6 +11,21 @@ from scipy.interpolate import interp1d
 import gnssrefl.gps as g
 
 def NMEA2SNR(locdir, fname, snrfile, csnr):
+    """
+    parameters
+    -----------
+    locdir : string
+        directory where your SNR files are kept
+    fname : string
+        NMEA filename 
+
+    snrfile : string
+        name of output file for SNR data
+
+    csnr : string
+        snr option, i.e. '66' or '99'
+
+    """
     
     missing = True
 
@@ -79,8 +94,29 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
 def read_nmea(fname):
     """
     read GPGGA sentence (includes snr data) in NMEA files    
-    Makan Karegar, Uni Bonn    
-    Dec, 2019
+    parameters
+    -----------
+    fname : string
+        NMEA filename
+
+
+    returns
+    ------------
+    t : list of integers
+        timetags in GPS seconds 
+
+    prn : list of integers
+        GPS satellite numbers
+
+    az : list of floats ??
+        azimuth values (degrees)
+
+    elv : list of floats ??
+        elevation angles (degrees)
+
+    snr : list of floats
+        snr values
+
     """
     
     f=open(fname, 'rb')
@@ -158,9 +194,27 @@ def read_nmea(fname):
 
 def fix_angle_azimuth(time, angle, azimuth):
     """
-    interpolare elevation angles and azimuth to retrieve decimal values thru time     
-    Makan Karegar, Uni Bonn    
-    Feb, 2020
+    interpolate elevation angles and azimuth to retrieve decimal values thru time     
+    this is for NMEA files.
+
+    parameters
+    ----------
+    time : list of floats
+        GPS seconds of the week
+    angle : list of floats
+        elevation angles  (degrees)
+
+    azimuth : list of floats
+        azimuth angles (degrees)
+
+    returns
+    ---------
+    angle_fixed : list of floats
+        interpolated elevation angles
+
+    azim_fixed : list of floats
+        interpolated azimuth angles
+
     """
     
 #delet nans
@@ -244,7 +298,14 @@ def quickname(station,year,cyy, cdoy, csnr):
     """
     given station name, year, doy, snr type
     returns snr file name and its path under REFL_CODE/year/snr/station/
-    author: Makan Karegar
+
+    parameters
+    ------------
+    station : string
+    year : integer
+    cdoy : integer
+    csnr : string
+        snr type, e.g. '66' 
     """
     
     xdir  = os.environ['REFL_CODE'] + '/'
