@@ -57,13 +57,15 @@ def newchip_hatanaka(exedir):
             sys.exit()
 
         sourcefile = 'crx2rnx.c'; sourceexe =  'crx2rnx.e'
+        print('local sourcefile ','docs/' + sourcefile)
         if os.path.exists('docs/' + sourcefile):
-            print('source code found locally')
+            print('Hatanaka source code found locally')
             s = 'docs/' + sourcefile
             subprocess.call(['gcc', s, '-o', sourceexe])
         else:
-            print('found source code at github')
-            cfile = 'https://github.com/kristinemlarson/gnssrefl/blob/master/docs/crx2rnx.c'
+            print('Hatanaka source code found at github')
+            cfile = 'https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/docs/crx2rnx.c'
+            print(cfile)
             wget.download(cfile, sourcefile)
             subprocess.call(['gcc', sourcefile, '-o', sourceexe])
         if os.path.exists(sourceexe):
