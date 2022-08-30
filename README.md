@@ -7,7 +7,7 @@
 
 **github version: 1.1.5** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
-**pypi updated August 30, 2022**
+**The pypi version is out of date. We are working to fix this.**
 
 ### Table of Contents
 
