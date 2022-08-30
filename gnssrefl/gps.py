@@ -3812,6 +3812,7 @@ def teqc_version():
 
 def snr_exist(station,year,doy,snrEnd):
     """
+    check to see if the SNR file already exists
 
     parameters
     -----------
@@ -3842,11 +3843,10 @@ def snr_exist(station,year,doy,snrEnd):
     # check for both
     if os.path.isfile(fname):
         snre = True
-    else:
-        if os.path.isfile(fname2):
-            snre = True # but needs to be uncompressed
-            subprocess.call(['unxz', fname2])
-        if os.path.isfile(fname3):
+    if os.path.isfile(fname2) and (not snre):
+        snre = True # but needs to be uncompressed
+        subprocess.call(['unxz', fname2])
+    if os.path.isfile(fname3) and (not snre):
             snre = True # but needs to be ungzipped 
             subprocess.call(['gunzip', fname3])
 

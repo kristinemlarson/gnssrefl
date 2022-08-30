@@ -171,7 +171,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             # now it unzips if that version exists
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
-                print('SNR file exists', fname)
+                print('SNR file already exists', fname)
                 if overwrite:
                     subprocess.call(['rm', fname])
                     snre = False
