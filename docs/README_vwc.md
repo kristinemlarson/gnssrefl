@@ -4,11 +4,24 @@
 </p>
 
 This soil moisture code is based on many years of experiments and model development by Eric Small, Clara Chew, John Braun, 
-Valery Zavorotny, Kristine Larson, and Felipe Nievinski. We cannot possibly describe all that work here - but we do attempt to 
-give you some confirmation of the various steps. Please look to the 
+Valery Zavorotny, Kristine Larson, and Felipe Nievinski. For more information on this, please look to the 
 soil moisture publications at my website [for additional details](https://www.kristinelarson.net/publications/).
 
-Some notes:
+We applied this soil moisture algorithm to more than 150 sites from the Plate Boundary Observatory (PBO); the 
+overall effort was called the PBO H2O network.
+PBO H2O operated from 2012-2017 and included data from 2007-2017. *We are no longer running the PBO H2O network.* If 
+you are interested in learning more about PBO H2O: 
+
+- For an overview on the project and products, [please see this paper.](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson-2016-WIRES_Water.pdf)
+- [This simple website provides access to some information about the products](https://gnss-reflections.org/maps). 
+It does not have all the searching functionality of the original website.
+- The PBO H2O soil moisture products were [validated in this paper.](https://www.kristinelarson.net/wp-content/uploads/2015/12/SmallLarson_etal2016.pdf). 
+- The official soil moisture products are available from the [ISMN](https://ismn.geo.tuwien.ac.at/en/networks/?id=PBO_H2O).
+- The official snow products can be downloaded from the [NSIDC](https://nsidc.org/data/nsidc-0722/versions/1).
+- With support from NASA, the code that operated PBO H2O was transferred to JPL in 2017. Questions about this code 
+should be directed to Sue Owen.
+
+Some comments:
 
 - This algorithm only uses GPS satellites. This is because we take advantage of the repeating GPS 
 ground track. There is no reason you can't use other GNSS satellites to measure soil moisture - 
@@ -32,37 +45,28 @@ to be unreliable for the PBO H2O soil moisture product and never used them. We h
 our soil moisture algorithms with the L1 data from newer receivers and still find the data 
 to be lacking. **We do not recommend you use this soil moisture code with L1 data.**
 
-- The PBO H2O algorithm was successfully validated for choke ring antennas. We were not funded to include other antennas 
-in this software package - but will try to do so if others can provide the necessary corrections.
+- Our algorithm was validated for choke ring antennas. We were not funded to include other antennas 
+in the <code>gnssrefl</code> software package - but will try to do so if others can provide the necessary corrections.
 
-- This software estimates soil moisture once per day. Can you measure soil moisture more often than once per day? Of course you can. We routinely
-measured it twice/day at PBO H2O when there were less than 10 satellites. Now that there are 24 L2C transmitting satellites, it would be straightforward to estimate VWC four times/day. 
+- This software estimates soil moisture once per day. Can you measure soil moisture more often than once per day? Yes. 
+We routinely measured it twice/day at PBO H2O when there were less than 10 satellites. Now that there are 24 L2C transmitting satellites, it would be straightforward to estimate VWC four times/day. 
 
-The code currently only supports sites that are ~1-3 meters above the soil. We will allow variable heights in a future version.
+- The code currently only supports sites that are ~1-3 meters above the soil. We will allow variable heights in a future version.
 
 ### 1. Analyze the reflection characteristics of your site
 
-Our soil moisture algorithm depends on initial reflector height values derived from 
-the [traditional reflector height method](gnssir.md). We need to use the average of the snow-free RH values
-for a given year. When this method was demonstrated for PBO H2O, a large GPS network in the western US, we 
-were also estimating snow depth on a daily basis. This allowed us to easily identify and 
-remove snow-contaminated values from our soil moisture estimates. **We are no longer running the PBO H2O network.** If 
-you are interested in learning more about PBO H2O: 
-
-- For an overview on the project, [please see this paper.](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson-2016-WIRES_Water.pdf)
-- [This simple website provides access to some information about the products](https://gnss-reflections.org/maps). 
-It does not have all the searching functionality of the original website.
-- The official soil moisture products are available from the [ISMN](https://ismn.geo.tuwien.ac.at/en/networks/?id=PBO_H2O) 
-- The official snow products can be downloaded from the [NSIDC](https://nsidc.org/data/nsidc-0722/versions/1)
-- With support from NASA, the code that operated PBO H2O was successfully transferred to JPL. Questions about this code 
-should be directed to Sue Owen.
+Our soil moisture algorithm depends on *a priori* reflector height values derived from 
+the [traditional reflector height (RH) method](gnssir.md). We need to use the average of the snow-free RH values
+for a given year. When this method was demonstrated for PBO H2O, we were also estimating snow depth on a 
+daily basis. This allowed us to easily identify and 
+remove snow-contaminated values from our soil moisture estimates. 
 
 The goal of this soil moisture module of <code>gnssrefl</code> is to help individual scientists to measure 
-soil moisture. It currently requires the user to take responsibility for evaluating whether your site 
+soil moisture. It currently requires the user to identify whether your site 
 has snow effects. For the time being we are testing the code where it does not snow or it does not snow very often. 
-Regardless, you need to take these initial steps:
+Regardless, you need to take these initial steps to get started:
 
-- [Generate the SNR files](rinex2snr.md) For the sample case given below you can use the "special" archive.
+- [Generate the SNR files](rinex2snr.md) 
 
 - [Take a quick look at the data](quickLook.md)
 
@@ -70,14 +74,16 @@ Regardless, you need to take these initial steps:
 
 ### 2. Estimate Phase 
 
+In making your SNR files, you need to make sure to use RINEX files with L2C data in them.  
+For the sample case used here, station p038, you can use the "special" archive option. Similarly, when analyzing 
+the data for RH (using <code>gnssir</code>), you should use the L2C frequency. 
+
 For reasons described by Clara Chew in her [first paper](https://www.kristinelarson.net/wp-content/uploads/2015/10/Chew_etal_Proof.pdf), 
 we use phase instead of RH or amplitude to derive soil moisture. We need to know which satellites to use. And we need 
 a starting solution for RH, i.e. *a priori* RH.
 
-You should use <code>vwc_input</code> to pick the best satellite tracks. 
-The default will be to use rising and setting L2C satellites arcs. 
-This is the signal we used for PBO H2O and we 
-have [extensively validated its results](https://www.kristinelarson.net/wp-content/uploads/2015/12/SmallLarson_etal2016.pdf). 
+Use <code>vwc_input</code> to pick the best satellite tracks. The default will be to all use rising and setting L2C satellites arcs. 
+
 The code also requires that you pick the year that you think has the most L2C satellites (by definition this will be the latest year).
 
 This creates a file that will go in <code>$REFL_CODE/input/ssss_phaseRH.txt</code> where ssss is your station name.
@@ -121,19 +127,18 @@ You can iterate to see if removing the satellite track improved things. You are 
 
 The second stage is to model and remove the vegetation effects:
 
-As described by Clara Chew in her follow up publications, vegetation will have a significant impact on the phase results 
-and that effect must be removed to achieve accurate soil moisture estimates. We follow a 
-multi-stage process:
+As described by Clara Chew in her follow up publications, vegetation will have a [significant impact on the phase results ](https://www.kristinelarson.net/wp-content/uploads/2015/10/Chew_TGRS_rev.pdf) and that effect must be removed to achieve accurate soil moisture estimates. 
+We follow a [multi-stage process](https://www.kristinelarson.net/wp-content/uploads/2015/10/ChewSmallLarson2015_withoutFront.pdf):
 
 - change units from phase (degrees) to VWC  
 
-- model and remove the vegetation effect from the spectral amplitudes 
+- model and remove the vegetation effect using the spectral amplitudes 
 
 - "level" the data using soil texture profiles for your site.
 
-- do not allow nonsense soil moisture values (e.g. negative soil moisture is not allowed)
+- do not allow nonsense soil moisture values (e.g. negative soil moisture is not allowed in our world)
 
-We level the VWC data to 5% but we will allow that to vary by site in future versions as that value should depend on 
+We currently level the VWC data to 5% but we will allow that to vary by site in future versions as that value should depend on 
 the soil texture at the site.
 
 <img src="p038_Figure_3.png" width="600">
@@ -147,16 +152,17 @@ Things we are planning to add:
 
 - override dates so that you can remove particular time periods for a site (snow)
 
-- help with identifying and removing snow contaminated data
+- more automated QC and help with identifying and removing snow contaminated data
 
-- more automated QC
+- soil texture values will be explicitly saved 
 
-- soil texture values will be saved in the json
+- the json used by gnssir will be integrated with the soil moisture code
 
-- the json used by gnssir will be explicitly integrated with the soil moisture code
+We currently have three use cases posted  
 
-We currently have two use cases posted - 
-a shorter version of [p038](../tests/use_cases/use_p038.md) and [mchl](../tests/use_cases/use_mchl.md).
+ - a shorter version of [p038](../tests/use_cases/use_p038.md) 
+ - [mchl](../tests/use_cases/use_mchl.md) 
+ - [scia](../tests/use_cases/use_scia.md)
 
 Kristine M. Larson
-August 23, 2022
+August 29, 2022
