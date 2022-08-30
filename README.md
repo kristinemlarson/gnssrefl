@@ -5,7 +5,9 @@
 
 ### gnssrefl
 
-**github version: 1.1.4** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
+**github version: 1.1.5** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
+
+**pypi updated August 30, 2022**
 
 ### Table of Contents
 
@@ -433,3 +435,12 @@ From your gnssrefl directory (that has the Dockerfile):
 <code>docker run -it <imagename> /bin/bash</code>
 
 If you want to mount volumes you could copy the -v syntax from the unavdocker/gnssrefl docker run command.
+
+<PRE>
+make a package for pypi
+
+python setup.py sdist bdist_wheel
+
+upload a package to pypi
+
+twine upload dist/*
