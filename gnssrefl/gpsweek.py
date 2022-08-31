@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-computers GPS week (and day of week) from y,m,d
-kristine larson
-Updated: April 3, 2019
+parameters
+-------
+year : integer
+
+month : integer
+
+day : integer
+
+
+computes GPS week (and day of week) 
 """
 import argparse
 import gnssrefl.gps as g

@@ -24,8 +24,9 @@ def parse_arguments():
 
 def vwc_input(station: str, year: int, year_end: int = None, fr: int = 20, min_tracks: int = 100):
     """
-    apriori picks up reflector height results for a given station and year-year end and computes the mean values
-    and returns a file with the mean values.
+    picks up reflector height results for a given station and year-year end and computes the mean values
+    and writes to a file with the mean values.
+
     Parameters
     __________
     station : string

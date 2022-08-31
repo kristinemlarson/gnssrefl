@@ -51,7 +51,6 @@ def gnss_stats(ffull):
     stat : integer
         0 for gps only, 100 for gps+glonass, 200 for gps+glonass+galileo,
         300 for gps+glonass+galileo+beidou 
-
     """
     # default 
     print('check the GNSS status of a file')

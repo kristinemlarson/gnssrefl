@@ -20,17 +20,29 @@ import gnssrefl.gps as g
 import gnssrefl.refraction as refr
 
 
-# all codes below written by David Purnell
-# https://github.com/purnelldj
-# modifications by kristine larson, december 2021
-
-
 def make_wavelength_column(nr,snrdata,signal):
     """
     returns column with nr rows that has the relevant GNSS wavelength for
     the satellites storeid in column zero of snrdata.
     signal is L1, L2 etc
     22feb10 added l6, l7
+
+    parameters
+    ------------
+    nr : integer
+        number of rows in snrdata
+
+    snrdata : numpy array
+        snrfile array
+
+    signal : string
+        frequency  'L1','L2, etc
+
+    returns
+    --------
+
+    onecolumn : one-d numpy array
+        snr data for the requested signal
     """
     onecolumn = np.ones((nr,1))
     if signal == 'L2':
@@ -63,7 +75,6 @@ def readklsnrtxt(snrfile, thedir, signal):
     5 - new column with wavelength in it, in meters.  might as well take care of that now
 
     if SNR data are zero for a given signal, the row is eliminated
-    
 
     """
     # do a straight load of the file
@@ -180,11 +191,18 @@ def readklsnrtxt(snrfile, thedir, signal):
 
 def glonasswlen(prn, signal):
     """
-    returns wavelength for glonass, meters
-    this only works for L1 and L2
-    this was written by david.  
-    KL: i need to move it to my gps.py listing
-    for now just use the speed of light constant variable
+    parameters
+    ---------
+    prn : integer
+        satellite number
+    signal : string
+         L1 or L2 for glonass
+
+    returns
+    ---------
+    wavelength : float
+        wavelength for the given signal
+
     """
     channel = [1, -4, 5, 6, 1, -4, 5, 6, -2, -7, 0, -1, -2, -7, 0, -1, 4, -3, 3, 2, 4, -3, 3, 2]
     offset = 101  # 101 onwards is glonass
@@ -205,6 +223,15 @@ def glonasswlen(prn, signal):
 
 
 def datetime2gps(dt):
+    """
+    parameter
+    ---------
+    dt : datetime 
+
+    returns  
+        gpstime : float
+    """
+
     timeobj = Time(dt, format='datetime')
     gpstime = timeobj.gps
     return gpstime
@@ -217,6 +244,16 @@ def gps2datetime(gt):
 
 
 def gps2datenum(gt):
+    """
+    parameter
+    ---------
+    gt :
+
+    return
+    dn : 
+
+    """
+
     timeobj = Time(gt, format='gps', scale='utc')
     dt = timeobj.datetime
     dn = date2num(dt)
@@ -247,15 +284,8 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     :return rh_arr: numpy array of reflector height estimtes and stats
     :return snrdt_arr: numpy array of detrended SNR data for inverse analysis
 
-    kl changed the pktnlim definition
-    kl made multi frequency for rh_arr
-    kl working on making snrdt_arr multi frequency
-    kl added l2c_only
-    kl 2022feb10 trying to add beidou
     """
-
-
-    # get a list for lateron
+    # get a list for late ron
     if 'l2c_only' in kwargs:
         l2c_only = kwargs.get('l2c_only')
     if l2c_only:
@@ -511,6 +541,21 @@ def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,
     this has to be modified for multi-frequency
     fspecdict and Nfreq
     22feb09 added beidou
+    parameter
+    ---------
+    inparam : 
+
+    knots : 
+
+    satconsts :
+
+    signal :
+
+    snrdt_arr :
+
+    final_list :
+
+    Nfreq :
     """
     if len(inparam) - Nfreq * 2 == len(knots):
         # then no roughness
@@ -607,6 +652,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     :parans kwargs: see below
     tempres: if want to use different temporal resolution to input data (in seconds)
     satconsts: default use all given, otherwise specify from ['G', 'R', 'E'] (gps / glonass / galileo)
+
     :return invout: dictionary with outputs from inverse analysis
 
     trying to add refraction
@@ -914,15 +960,24 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
 def invsnr_header(xdir, outfile_type,station,outfile_name):
     """
-    inputs: 
-    directory for the output file
-    type of output file (txt or csv)
-    station name, 4 char
-    outfile_name if you don't want to use the default.  default is if you send ''
-    returns:
-    fileID
-    usetxt - boolean for the code calling this function to use
-    if you write out special files, they go in the working directory
+    parameters
+    --------------
+    xdir : string 
+        directory for the output file
+    outfile_type : string
+        csv or txt
+    station : string
+        4 character name
+    outfile_name : string
+        name of output - if '', it uses default
+
+    returns 
+    --------
+    fileID : ? 
+        used for writing to file
+    usetxt : boolean
+        - boolean for the code calling this function to use
+        if you write out special files, they go in the working directory
     """
     if outfile_type == 'txt':
         usetxt = True; 
@@ -952,10 +1007,31 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
 
 def define_inputfile(station,year,doy,snr_ending):
     """
-    given station, year, day of year, returns
-    snr filename and directory and string version of year and doy
-    kl:
-    22feb01 added snr ending as required input
+    parameter
+    ----------
+    station : string
+        4 ch name of station 
+    year : integer
+
+    doy : integer
+        day of year 
+
+    snr_ending : integer
+        file ending, e.g. 66, 99
+
+    returns
+    --------
+    snrfile: string
+        name of snrfile 
+
+    snrdir : string
+        name of output directory
+
+    cyyyy : string
+        four character year
+
+    cdoy : string
+        three character day of year
     """
     cdoy = '{:03d}'.format(doy) ;
     cyy = '{:02d}'.format(year-2000)
@@ -977,6 +1053,12 @@ def define_inputfile(station,year,doy,snr_ending):
 def arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,azdesc):
     """
     moved these individual plots out of the way
+    lspfigs :
+    snrfigs :
+    reflh :
+    pgram : 
+    sat : 
+    datet :
     """
     if not os.path.isdir('plots'):
         print('make output directory for plots')

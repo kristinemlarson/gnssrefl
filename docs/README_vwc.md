@@ -9,8 +9,8 @@ soil moisture publications at my website [for additional details](https://www.kr
 
 We applied this soil moisture algorithm to more than 150 sites from the Plate Boundary Observatory (PBO); the 
 overall effort was called the PBO H2O network.
-PBO H2O operated from 2012-2017 and included data from 2007-2017. *We are no longer running the PBO H2O network.* If 
-you are interested in learning more about PBO H2O: 
+PBO H2O operated from 2012-2017 and included data from 2007-2017. We are no longer running the PBO H2O network. 
+If you are interested in learning more about PBO H2O: 
 
 - For an overview on the project and products, [please see this paper.](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson-2016-WIRES_Water.pdf)
 - [This simple website provides access to some information about the products](https://gnss-reflections.org/maps). 
@@ -30,9 +30,11 @@ but this code won't do it for you.
 - Will your site be a good soil moisture site?  This is almost entirely based on how flat your site is.
 Flat is good. You can use a DEM, if you have it, or a photograph.  
 
-- This algorithm is currently only recommended and validated for the L2C signal. It is **your responsibility** to make sure that 
-your files have L2C data in them. While this is trivial with the RINEX 3 format, it can be very challenging to 
-find L2C data in some older datasets and at some archives (e.g. UNAVCO). 
+- This algorithm is currently only recommended and validated for the L2C signal. 
+It is **your responsibility** to make sure that 
+your RINEX files have L2C data in them. While this is trivial with the RINEX 3 format, it can be very challenging to 
+find L2C data in some older datasets and at some archives (e.g. UNAVCO). If we know where to find 
+L2C data, we will do our best to let you know in the use cases.
 
 - For many PBO sites (but by no means all), you can find L2C data in the 
 high-rate RINEX 2.11 streams at UNAVCO. However, you don't need the high-rate data for estimating soil
@@ -40,8 +42,8 @@ moisture, so I recommend you decimate to 15 seconds when you translate the RINEX
 
 - I have generally found that people using Septentrio receivers archive the L2C data in their RINEX 2.11 files.
 
-- We have had good success using L1 data for water level, vegetation, and snow measurements. We found them
-to be unreliable for the PBO H2O soil moisture product and never used them. We have tested 
+- We have had good success using L1 SNR data for water level, vegetation, and snow measurements. 
+However, we found them to be unreliable for soil moisture products and never used them. We have tested 
 our soil moisture algorithms with the L1 data from newer receivers and still find the data 
 to be lacking. **We do not recommend you use this soil moisture code with L1 data.**
 
@@ -62,9 +64,9 @@ daily basis. This allowed us to easily identify and
 remove snow-contaminated values from our soil moisture estimates. 
 
 The goal of this soil moisture module of <code>gnssrefl</code> is to help individual scientists to measure 
-soil moisture. It currently requires the user to identify whether your site 
-has snow effects. For the time being we are testing the code where it does not snow or it does not snow very often. 
-Regardless, you need to take these initial steps to get started:
+soil moisture. For the time being we are testing the code where it does not snow or it does not snow very often. 
+As listed at the end of this page, we do have plans to help users flag snow contaminated days.
+With our without snow issues, you need to take these initial steps to get started:
 
 - [Generate the SNR files](rinex2snr.md) 
 
@@ -74,8 +76,8 @@ Regardless, you need to take these initial steps to get started:
 
 ### 2. Estimate Phase 
 
-In making your SNR files, you need to make sure to use RINEX files with L2C data in them.  
-For the sample case used here, station p038, you can use the "special" archive option. Similarly, when analyzing 
+Our algorithm uses L2C data. For the sample case used here, station p038, you should 
+use the "special" archive option when translating RINEX files. Similarly, when analyzing 
 the data for RH (using <code>gnssir</code>), you should use the L2C frequency. 
 
 For reasons described by Clara Chew in her [first paper](https://www.kristinelarson.net/wp-content/uploads/2015/10/Chew_etal_Proof.pdf), 
@@ -156,9 +158,9 @@ Things we are planning to add:
 
 - soil texture values will be explicitly saved 
 
-- the json used by gnssir will be integrated with the soil moisture code
+- the json used by <code>gnssir</code> will be integrated with the soil moisture code
 
-We currently have three use cases posted  
+We currently have three use cases posted:
 
  - a shorter version of [p038](../tests/use_cases/use_p038.md) 
  - [mchl](../tests/use_cases/use_mchl.md) 

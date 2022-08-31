@@ -1,13 +1,16 @@
 # command line tool to check a rinexfile for minimal
-# information, i.e. receiver coordinates, SNR data.
-# Kristine Larson August 30, 2021
 import argparse
 import os
 import sys
 
 def check_rinex_header(rinexfile):
     """
-    command tool to look at header information
+    commandline tool to look at header information in a RINEX file
+
+    parameter
+    --------
+    rinexfile : string
+        name of the file
     """
     # assume no coordinates in the file
     recx=0; recy = 0; recz = 0
