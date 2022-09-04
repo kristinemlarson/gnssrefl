@@ -5,7 +5,7 @@
 <table>
 <TR>
 <TD>
-<B>Greenland/Antarctica</B>
+<B>Ice Sheets</B>
 
 * [Lorne, Ross Ice Shelf](use_cases/use_lorg.md) (lorg)
 
@@ -55,6 +55,8 @@
 * [Niwot Ridge, Colorado](use_cases/use_nwot.md) (nwot)
 
 * [Half Island Park, Idaho](use_cases/use_p360.md) (p360)
+
+* [Utqiagvik, Alaska](use_cases/use_utqi.md) (utqi00usa)
 
 </TD>
 <TD>
