@@ -9,6 +9,11 @@
 
 **The pypi version is out of date. We are working to fix this.**
 
+Would you like to join our <code>gnssrefl</code> users email list?
+Send an email to gnss-ir-request@postal.unavco.org and put the word
+subscribe (or unsubscribe to leave) in your email subject.
+
+
 ### Table of Contents
 
 1. [Installation](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md)
@@ -352,14 +357,9 @@ If the string is long - please post the error string in a thread response to you
 
 - Please include the operating system of your computer.
 
-Would you like to join our <code>gnssrefl</code> users email list? 
-Send an email to gnss-ir-request@postal.unavco.org and put the word 
-subscribe (or unsubscribe to leave) in your email subject.
-
 <HR>
 
 **Acknowledgements**  
-
 
 - [Radon Rosborough](https://github.com/raxod502) helped with 
 python/packaging questions and improved our docker distribution. 
