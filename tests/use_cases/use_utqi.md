@@ -14,7 +14,8 @@
 <img src=http://gnss-reflections.org/static/images/UTQI.jpg width=500/>
 </p>
 
-UTQI was installed by and is supported by <a href=https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/overview>GFZ</a>.
+UTQI was installed by <a href=https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/overview>GFZ</a>; it is part 
+of their [global network](https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/infrastructure/gnss-station-network/).
 It is located at the <a href=https://gml.noaa.gov/obop/brw/>NOAA environmental facility</a>. It is also an <a href=https://igs.org>IGS site</a>.
 
 Use the <a href=https://gnss-reflections.org/rzones target="_blank">web app to get an idea of the reflection zones at this site.</a>
