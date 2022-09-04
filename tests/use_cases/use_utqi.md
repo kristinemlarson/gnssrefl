@@ -63,14 +63,14 @@ Set your analysis strategy:
 
 There don't appear to be Beidou data at this site, so you should hand-edit those frequencies out of the json file. 
 You should also set the final azimuth region. This was my [starter json file](utqi.json)
-In retrospect, I should have limited the azimuths a little more.
+In retrospect, I should have limited the azimuths a little more. Now run the main module for estimating reflector height.
 
 <code>gnssir utqi 2020 1 -year_end 2022 -doy_end 243</code>
 
 
 ###  Assess the results
 
-Use the <code>daily_avg</code> to consolidate your results and estimate snow accumulation. I am using 
+Use the <code>daily_avg</code> module to consolidate your results and estimate snow accumulation. I am using 
 a median value of 50 cm and a minimum of 50 retrievals. You can certainly play with those parameters.
 
 <code>daily_avg utqi 0.5 50</code>
