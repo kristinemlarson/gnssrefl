@@ -27,6 +27,8 @@ def parse_arguments():
     parser.add_argument("-year2", default=None, type=int, help="restrict to years ending with")
     parser.add_argument("-fr", default=0, type=int, help="frequency, default is to use all")
     parser.add_argument("-csv", default=None, type=str, help="True if you want csv instead of plain text")
+    parser.add_argument("-azim1", default=None, type=int, help="minimum azimuth (deg)")
+    parser.add_argument("-azim2", default=None, type=int, help="maximum azimuth (deg)")
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -37,8 +39,8 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True,
-              extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False):
+def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
+        extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360):
     """
         Parameters:
         ___________
@@ -94,6 +96,13 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
         csv : boolean, optional
             Whether you want csv instead of a plain text file.
             default is False (plain text).
+
+        azim1 : integer, optional
+            minimum azimuth, degrees
+            note: should be modified to allow negative azimuth
+
+        azim2 : integer, optional
+            maximum azimuth, degrees
     """
     plt2screen = plt # since variable was originally this name 
     # make surer environment variables are set
@@ -113,7 +122,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     else:
         alldatafile = txtdir + '/' + station + '_allRH.txt' 
 
-    tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, alldatafile, csv, medfilter, ReqTracks)
+    tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, alldatafile, csv, medfilter, ReqTracks,azim1,azim2)
 
     # default is to show the plots
     if plt2screen:

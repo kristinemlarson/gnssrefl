@@ -3,11 +3,13 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import subprocess
 
 
 import gnssrefl.gps as g
 import gnssrefl.read_snr_files as read_snr
 from gnssrefl.utils import FileManagement, FileTypes
+import gnssrefl.daily_avg_cl as da
 
 from functools import partial
 from scipy import optimize
@@ -16,6 +18,101 @@ from datetime import datetime
 from pathlib import Path
 
 xdir = Path(os.environ["REFL_CODE"])
+
+
+def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
+    """
+    parameters
+    -----------
+    station: string
+
+    fr : integer
+
+    datetime_dates: ...
+
+    tv : list of results
+
+    """
+    plt.figure(figsize=(10, 6))
+    plt.plot(datetime_dates, tv[:, 2], 'bo')
+    plt.ylabel('phase (degrees)')
+    if fr == 1:
+        plt.title(f"Daily L1 Phase Results: {station.upper()}")
+    else:
+        plt.title(f"Daily L2C Phase Results: {station.upper()}")
+    plt.grid()
+    plt.gcf().autofmt_xdate()
+
+    plot_path = f'{xdir}/Files/{station}_daily_phase.png'
+    print(f"Saving figure to {plot_path}")
+    plt.savefig(plot_path)
+
+
+
+def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
+    """
+    runs daily_avg code so you have some idea of when the soil moisture products are 
+    contaminated by snow. make a file with these years and doys saved
+
+    parameters
+    ---------
+    station : string
+        name, 4 ch
+
+    medfilter : float
+        how much you allow the individual tracks to deviate from the daily median (meters)
+
+    ReqTracks : integer
+        number of tracks to compute trustworthy daily average
+
+    year1 : integer
+        start year
+
+    year2 : integer
+        end year
+
+    creates output file into a file $REFL_CODE/Files/snowmask_{ssss}.txt
+
+    returns
+    ---------
+    snowmask_exists : boolean
+
+    """
+    myxdir = os.environ['REFL_CODE']
+    # l2c only
+    txtfile = 'test_' + station + '.txt'; 
+    pltit = False; extension = ''; fr = 20; csv = False
+
+    # writes out a daily average file. woudl be better if it returned the values, but this works
+    da.daily_avg(station, medfilter, ReqTracks, txtfile, pltit,
+              extension, year1, year2, fr, csv) 
+
+    avgf = myxdir + '/Files/' + txtfile
+    x = np.loadtxt(avgf, comments='%')
+    # delete the file!
+    rh = x[:,2]
+    medianvalue = np.median(rh);
+    print('Median RH value ', medianvalue)
+    # everything within 5 cm
+    ii = (rh -medianvalue) < -0.05
+    newx = x[ii,:] ; N=len(newx)
+    if (N > 0):
+        snowfile = myxdir + '/Files/snowmask_' + station + '.txt' 
+        print('Suspect snow values stored in : ', snowfile)
+        snow = open(snowfile, 'w+')
+        for i in range(0,N):
+            sv = -(newx[i,2]-medianvalue)
+            print('Suspect Snow Day : ', int(newx[i,0]), int(newx[i,1]))
+            snow.write("{0:4.0f}  {1:3.0f} {2:8.3f}  \n".format( newx[i,0], newx[i,1], sv))
+        snow.close()
+    # now that you saved what you need from daily average file, delete it.
+
+        snowmask_exists = True
+    else:
+        snowmask_exists = False
+    subprocess.call(['rm',avgf])
+
+    return snowmask_exists
 
 def vwc_plot(station,t_datetime, vwcdata, plot_path):
     """
@@ -528,7 +625,71 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
                 w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
 
 
+def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
 
+    """
+    parameters
+    --------
+    station : string
+
+    phase : numpy list of phase values 
+
+    fr : integer
+        frequency
+
+    year: integer
+
+    year_end : integer
+
+    minvalperday : integer
+        required number of satellite tracks to trust the daily average 
+
+    vxyz is from some other compilation
+
+    returns
+    --------
+    tv : numpy array with elements
+        year, doy, meanph, nvals 
+
+    """
+    myxdir = os.environ['REFL_CODE']
+    y1 = vxyz[:, 0]
+    d1 = vxyz[:, 1]
+    phase = vxyz[:, 2]
+    sat = vxyz[:, 3] # this is not used
+    az = vxyz[:, 4] # this is not used
+    rh = vxyz[:, 5] # this is not used
+    amp = vxyz[:, 6]
+
+    tv = np.empty(shape=[0, 4])
+
+    # ultimately would like to use kelly's code here
+    if (fr == 1):
+        fileout = myxdir + '/Files/' + station + '_phase_L1.txt'
+    else:
+        fileout = myxdir + '/Files/' + station + '_phase.txt'
+
+    print('Daily averaged phases will be written to : ', fileout)
+    with open(fileout, 'w') as fout:
+        fout.write("% Year DOY Ph Phsig NormA MM DD \n")
+        for requested_year in range(year, year_end + 1):
+            for doy in range(1, 367):
+            # put in amplitude criteria to keep out bad L2P results
+                ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
+                amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
+                if (len(ph1) > minvalperday):
+                    newl = [requested_year, doy, np.mean(ph1), len(ph1)]
+                # i think you normalize the individual satellites before this step
+                #namp = qp.normAmp(amp1,0.15)
+                    tv = np.append(tv, [newl], axis=0)
+                    rph1 = np.round(np.mean(ph1), 2)
+                    meanA = np.mean(amp1)
+                    rph1_std = np.std(ph1)
+                    yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                    fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
+
+        fout.close()
+    return tv
 # Old code.  SHould be deleted
 # why is this being done this way!
 #years = np.floor(fdate)

@@ -21,114 +21,112 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year_end", type=int)
     parser.add_argument("-fr", help="frequency", type=int)
-    parser.add_argument("-plt2screen", default=None, type=str, help="plot to screen")
-    parser.add_argument("-screenstats", default=None, type=str, help="plot statistics to screen")
+    parser.add_argument("-plt2screen", default=None, type=str, help="boolean for plotting to screen")
+    parser.add_argument("-screenstats", default=None, type=str, help="boolean for plotting statistics to screen")
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="minimum number of points for a track to be kept. Default is 50")
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
     parser.add_argument("-minvalperday", default=None, type=int, help="minimum number of satellite tracks needed each day. Default is 10")
+    parser.add_argument("-snow_filter", default=None, type=str, help="boolean for attempting to remove days contaminated by snow")
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt2screen','screenstats']
+    boolean_args = ['plt2screen','screenstats','snow_filter']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
-def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
 
+def filter_out_snow(station, year1, year2, fr,snowmask):
     """
+    only called if the snow filter file exists
+
     parameters
-    --------
+    ----------
     station : string
 
-    phase : numpy list of phase values 
+    year1 : integer
+
+    year2 : integer
 
     fr : integer
         frequency
 
-    year: integer
-
-    year_end : integer
-
-    minvalperday : integer
-        required number of satellite tracks to trust the daily average 
-
-    vxyz is from some other compilation
-
-    returns
-    --------
-    tv : numpy array with elements
-        year, doy, meanph, nvals 
+    snowmask : string
+        name/location of the snow mask file
 
     """
-    y1 = vxyz[:, 0]
-    d1 = vxyz[:, 1]
-    phase = vxyz[:, 2]
-    sat = vxyz[:, 3] # this is not used
-    az = vxyz[:, 4] # this is not used
-    rh = vxyz[:, 5] # this is not used
-    amp = vxyz[:, 6]
+    xdir = os.environ['REFL_CODE']
+    # a little redundant here 
+    found_override = False
+    if os.path.exists(snowmask):
+        print('found snow file')
+        override = np.loadtxt(snowmask, comments='%')
+        found_override = True
 
-    tv = np.empty(shape=[0, 4])
+#   now load the phase data??
+    newresults = []
+    results_trans = []
+    #vquad = np.vstack((vquad, newl))
+    vquad = np.empty(shape=[0, 16])
 
-    if (fr == 1):
-        fileout = xdir + '/Files/' + station + '_phase_L1.txt'
+    if found_override:
+        dataexist, year, doy, hr, ph, azdata, ssat, rh, amp,results = load_sat_phase(station, year1,year2, fr)
+        # results were transposed - so untransposing them LOL
+        results = results.T
+        for year in range(year1,year2+1):
+            ii = (results[:,0] == year) & (results[:,12] == fr)
+        # it is easier for me to do this year by year
+            y = results[ii,0];
+            d = results[ii,1]
+            ph = results[ii,3]
+            thisyear_results = results[ii,:]
+        # the goal is to find all the results that do not appear in the override list
+            jj = (override[:,0] == year) # find days when there are suspects points
+            targetdoys = override[jj,1]
+            #print(year, ' length of d', len(d))
+            # the mask asks when is d distinct from targetdoys
+            mask=np.logical_not(np.isin(d,targetdoys))
+            #print(year, ' length of dmasked', len(d[mask]))
+            masked_results = thisyear_results[mask]
+            newresults = np.append(newresults, masked_results)
+            #vquad = np.vstack((vquad, thisyear_results[mask] ) )
+            vquad = np.append(vquad, masked_results,axis=0)
+
+    # change to numpy?
+    nr,nc = np.shape(vquad)
+    print('Number of rows and columns now ', nr,nc)
+
+    # 
+    results_trans= np.transpose(vquad)
+
+    print(np.shape(results_trans))
+
+    if len(results_trans) == 0:
+        print('no data ')
+        dataexist = False
+        year = []; doy = []; hr = []; ph = []; azdata = []; ssat = []
+        rh = []; amp = []
     else:
-        fileout = xdir + '/Files/' + station + '_phase.txt'
+        dataexist = True
+        # save with new variable names
+        year = results_trans[0]
+        doy = results_trans[1]
+        hr = results_trans[2]
+        ph = results_trans[3]
+        azdata = results_trans[5]
+        ssat = results_trans[6]
+        rh = results_trans[13]
+        amp = results_trans[15]
 
-    print('Daily averaged phases will be written to : ', fileout)
-    with open(fileout, 'w') as fout:
-        fout.write("% Year DOY Ph Phsig NormA MM DD \n")
-        for requested_year in range(year, year_end + 1):
-            for doy in range(1, 367):
-            # put in amplitude criteria to keep out bad L2P results
-                ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                if (len(ph1) > minvalperday):
-                    newl = [requested_year, doy, np.mean(ph1), len(ph1)]
-                # i think you normalize the individual satellites before this step
-                #namp = qp.normAmp(amp1,0.15)
-                    tv = np.append(tv, [newl], axis=0)
-                    rph1 = np.round(np.mean(ph1), 2)
-                    meanA = np.mean(amp1)
-                    rph1_std = np.std(ph1)
-                    yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
-                    fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
-
-        fout.close()
-    return tv
-
-
-def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
-    """
-    parameters
-    -----------
-    station: string
-
-    fr : integer
-
-    datetime_dates: ...
-
-    tv : list of results
-
-    """
-    plt.figure(figsize=(10, 6))
-    plt.plot(datetime_dates, tv[:, 2], 'bo')
-    plt.ylabel('phase (degrees)')
-    if fr == 1:
-        plt.title(f"Daily L1 Phase Results: {station.upper()}")
-    else:
-        plt.title(f"Daily L2C Phase Results: {station.upper()}")
-    plt.grid()
-    plt.gcf().autofmt_xdate()
-
-    plot_path = f'{xdir}/Files/{station}_daily_phase.png'
-    print(f"Saving figure to {plot_path}")
-    plt.savefig(plot_path)
+# use same return command as in the original function
+    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results_trans
 
 
 def load_avg_phase(station,fr):
     """
+    loads a previously computed daily average phase solution.
+    this is NOT the same as the multi-track phase results.
+
     parameters
     -----------
     station : string
@@ -192,10 +190,11 @@ def load_sat_phase(station, year, year_end, freq):
 
     xfile = xdir + '/input/override/' + station + '_vwc' 
     found_override = False
+    # not implementing this yet
     if os.path.exists(xfile):
-        print('found override file')
-        override = np.loadtxt(xfile, comments='%')
-        found_override = True
+        print('found override file but not implementing at this time')
+    #    override = np.loadtxt(xfile, comments='%')
+    #    found_override = True
 
     dir = Path(os.environ["REFL_CODE"])
 
@@ -222,7 +221,9 @@ def load_sat_phase(station, year, year_end, freq):
 #    common_elements, ar1_i, ar2_i = np.intersect1d(ar1, ar2, return_indices=True)
     minyear = np.min(np.unique(results[:,0]))
     maxyear = np.max(np.unique(results[:,0]))
-    print(minyear,maxyear)
+    #print(minyear,maxyear)
+    nr,nc = np.shape(results)
+    print(nr, ' number of rows')
 
     results = results.T  # dumb, but i was using this convention.  easier to maintain
 
@@ -295,7 +296,7 @@ def do_quad(vquad, year, year_end):
 
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20,  
-        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10):
+        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, snow_filter: bool = False):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
     Parameters:
@@ -329,6 +330,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20,
         how many phase measurements are needed for each daily measurement
         default is 10
 
+    snow_filter: boolean 
+        whether you want to attempt to remove points contaminated by snow
+        default is False
+
+
     Returns
     _______
     Returns two files:
@@ -351,6 +357,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20,
     # this is leftover from the old code
     writeout = True
 
+    snow_file = xdir + '/Files/snowmask_' + station + '.txt'
+    snowfileexists = False
+    if snow_filter:
+        medf = 0.2
+        ReqTracks = 10
+        snowfileexists = qp.make_snow_filter(station, medf, ReqTracks, year, year_end)
+        plt.close ('all')# we do not want the plots to come to the screen for the daily average
+
+
     # azimuth list
     azlist = [270, 0, 180,90 ]
 
@@ -359,7 +374,13 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20,
     if not avg_exist:
         print('WARNING: the average phase file from a previous run does not exist as yet')
 
-    data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp,ext = load_sat_phase(station, year, year_end=year_end, freq=freq)
+    if snowfileexists and snow_filter :
+        print('using snow filter code')
+        # use same variables as existing code
+        data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp,ext = filter_out_snow(station, year, year_end, fr,snow_file)
+    else:
+        data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp,ext = load_sat_phase(station, year, year_end=year_end, freq=freq)
+
     if not data_exist:
         print('No data were found. Check your frequency request or station name')
         sys.exit()
@@ -375,8 +396,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20,
 
     # try removing these
     fig = plt.figure(figsize=(13, 10))
-    #ax=plt.subplots_adjust(hspace=0.2)
-    #plt.suptitle(f"Station: {station}", size=16)
+    ax=plt.subplots_adjust(hspace=0.2)
+    plt.suptitle(f"Station: {station}", size=16)
 
     # this is the number of points for a given satellite track
     reqNumpts = min_req_pts_track
@@ -488,6 +509,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20,
 
                     ax.plot(datetime_dates, new_phase, 'o', markersize=3)
                     ax.set_ylabel('Phase')
+                    #ax.set_ylimit((-20,60))
+                    plt.ylim((-20,60))
                     # ???
                     plt.gcf().autofmt_xdate()
 
@@ -511,7 +534,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20,
     #minvalperday = 10 - now an input
     if writeout:
 
-        tv = write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz)
+        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz)
         print('Number of daily phase measurements ', len(tv))
         if len(tv) < 1:
             print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
@@ -519,35 +542,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20,
 
         datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
 
-        daily_phase_plot(station, fr,datetime_dates, tv,xdir)
+        qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir)
 
         qp.convert_phase(station, year, year_end, plt2screen,fr,polyorder)
 
-#        if (fr == 1): 
-#            fileout = xdir + '/Files/' + station + '_phase_L1.txt'
-#        else:
-#            fileout = xdir + '/Files/' + station + '_phase.txt'
-#
-#        print('Daily averaged phases will be written to : ', fileout)
-#        with open(fileout, 'w') as fout:
-#            fout.write("% Year DOY Ph Phsig NormA MM DD \n")
-        #if False:
-        #    for requested_year in range(year, year_end + 1):
-        #        for doy in range(1, 367):
-                    # put in amplitude criteria to keep out bad L2P results
-        #            ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-        #            amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-        #            if (len(ph1) > minvalperday):
-        #                newl = [requested_year, doy, np.mean(ph1), len(ph1)]
-                        # i think you normalize the individual satellites before this step
-                        #namp = qp.normAmp(amp1,0.15)
-        #                tv = np.append(tv, [newl], axis=0)
-        #                rph1 = np.round(np.mean(ph1), 2)
-        #                meanA = np.mean(amp1)
-        #                rph1_std = np.std(ph1)
-        #                yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
-                        #fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
-            #fout.close()
 
 def main():
     args = parse_arguments()

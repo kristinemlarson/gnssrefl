@@ -22,6 +22,7 @@ def fbias_daily_avg(station):
     bias for all available frequencies which is printed to the screen
 
     parameter
+    -----------
     station : str
         station name - 4char - lowercase
     """
@@ -94,7 +95,7 @@ def fbias_daily_avg(station):
 
 
 
-def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks):
+def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks,azim1=0,azim2=360):
     """
     worker code for daily_avg_cl.py
     reads in daily files
@@ -111,7 +112,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
         first year
 
     year2 : integer
-        second year 
+        last year 
 
     fr : integer
         0 for all frequencies.  otherwise, it must be a legal frequency (101 for Glonass L1)
@@ -127,6 +128,12 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     ReqTracks : integer
         is the number of retrievals required per day
+
+    azim1 : integer
+        minimum azimuth, degrees
+
+    azim2 : integer
+        maximum azimuth, degrees
 
     returns
     ---------
@@ -150,6 +157,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 # putting the results in a np.array, with this ordering
 # [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday]
 # 2021 november 8, added amplitude, so now 8 columns
+# 2022 september 4, added azimuth limits
     tv = np.empty(shape=[0, 8])
     tvall = np.empty(shape=[0, 7])
     ngps = []; nglo = [] ; ngal = []; nbei = []
@@ -177,6 +185,10 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                             a = np.loadtxt(fname,skiprows=3,comments='%')
                         nr,nc=a.shape
                         if (nr > 0):
+                            # add the new azimuth constraint here ... 2022sep04
+                            www = (a[:,5] > azim1 ) & (a[:,5] < azim2 )
+                            a = a[www,:]
+
                             y = a[:,0] +a[:,1]/365.25; rh = a[:,2] ; 
                             frequency = a[:,10]; azimuth = a[:,5]; sat = a[:,3]; amplitude=a[:,6]
                             # added utc to the all RH file

@@ -12,7 +12,6 @@
 
 [Station Page at NGL](http://geodesy.unr.edu/NGLStationPages/stations/VLIS.sta)
 
-
 ### Take a Quick Look at the Site Reflection Zones
 
 The [EUREF Page](https://epncb.oma.be/_networkdata/siteinfo4onestation.php?station=VLIS00NLD) page has a lot of information about the GNSS site here. It is currently tracking multiple GNSS constellations.  
@@ -25,7 +24,6 @@ Note that the height of the antenna above sea level is provided by the web app a
 Another thing you should try to do is get an idea of what the tidal range will be. At VLIS, there is a 
 colocated [tide gauge](http://www.ioc-sealevelmonitoring.org/station.php?code=vlis). There are other ways
 you can get the tidal range without a colocated tide gauge sensor - e.g. there are various web sites that will at least give you high and low tide predictions.
-
 
 GNSS-IR has a Nyquist.  While I won't discuss it here (see [Roesler and Larson, 2018](https://link.springer.com/article/10.1007/s10291-018-0744-8) for details), it is an issue at VLIS. The easiest VLIS data to find are the 30 second data
 deposited by geodesists at various global archives. This sample rate would be fine for 
@@ -86,8 +84,8 @@ I also have [a bash script](https://github.com/kristinemlarson/gnssIR_api) that 
 more automatically query the API. Generally people [install the python code or the docker instead](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md).
 
 If you are using the github install of <code>gnssrefl</code> and 
-have Python 3.9: (the docker is not currently working), you 
-can do this on your local machine. The advantage of doing it on a local machine is mostly that you can use multi-GNSS 
+have Python 3.9 or the [docker image](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md) 
+installed, you can do this on your local machine. The advantage of doing it on a local machine is mostly that you can use multi-GNSS 
 signals. The web app is GPS only. For applications with a daily average, such as snow accumulation, 
 GPS can be enough. But for tides you generally want as many measurements as 
 possible, and that means multi-GNSS. The other
@@ -142,6 +140,10 @@ How the water levels look as a function of azimuth, constellation, and amplitude
 Time series with large outliers removed.
 
 <img src=vlis-1.png width=600>
+ 
+For comparisons with the local tide gauge you can use our utility <code>download_ioc</code>. The tide gauge name is ... vlis!
+You just provide the time periods (I think it is currently limited to 30 days). If you say <code>-plt T</code> it makes a crude
+plot for you.
 
 Additional corrections can be made using the <code>rhdot T</code> setting. I will add more information here when I get a chance.
 

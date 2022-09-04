@@ -8,20 +8,9 @@ Valery Zavorotny, Kristine Larson, and Felipe Nievinski. For more information on
 soil moisture publications at my website [for additional details](https://www.kristinelarson.net/publications/).
 
 We applied this soil moisture algorithm to more than 150 sites from the Plate Boundary Observatory (PBO); the 
-overall effort was called the PBO H2O network.
-PBO H2O operated from 2012-2017 and included data from 2007-2017. We are no longer running the PBO H2O network. 
-If you are interested in learning more about PBO H2O: 
+overall effort was called the PBO H2O network. PBO H2O operated from 2012-2017 
+and included data from 2007-2017 ([for more information](README_pboh2o.md).)
 
-- For an overview on the project and products, [please see this paper.](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson-2016-WIRES_Water.pdf)
-- [This simple website provides access to some information about the products](https://gnss-reflections.org/maps). 
-It does not have all the searching functionality of the original website.
-- The PBO H2O soil moisture products were [validated in this paper.](https://www.kristinelarson.net/wp-content/uploads/2015/12/SmallLarson_etal2016.pdf). 
-- The official soil moisture products are available from the [ISMN](https://ismn.geo.tuwien.ac.at/en/networks/?id=PBO_H2O).
-- The official snow products can be downloaded from the [NSIDC](https://nsidc.org/data/nsidc-0722/versions/1).
-- With support from NASA, the code that operated PBO H2O was transferred to JPL in 2017. Questions about this code 
-should be directed to Sue Owen.
-
-Some comments:
 
 - This algorithm only uses GPS satellites. This is because we take advantage of the repeating GPS 
 ground track. There is no reason you can't use other GNSS satellites to measure soil moisture - 
@@ -80,7 +69,8 @@ Our algorithm uses L2C data. For the sample case used here, station p038, you sh
 use the "special" archive option when translating RINEX files. Similarly, when analyzing 
 the data for RH (using <code>gnssir</code>), you should use the L2C frequency. 
 
-For reasons described by Clara Chew in her [first paper](https://www.kristinelarson.net/wp-content/uploads/2015/10/Chew_etal_Proof.pdf), 
+For reasons described by Clara Chew in 
+her [first paper](https://www.kristinelarson.net/wp-content/uploads/2015/10/Chew_etal_Proof.pdf), 
 we use phase instead of RH or amplitude to derive soil moisture. We need to know which satellites to use. And we need 
 a starting solution for RH, i.e. *a priori* RH.
 
