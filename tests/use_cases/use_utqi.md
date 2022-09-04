@@ -15,8 +15,7 @@
 </p>
 
 UTQI was installed by and is supported by <a href=https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/overview>GFZ</a>.
-It is located at the <a href=https://gml.noaa.gov/obop/brw/>NOAA environmental facility</a>. It is also an <a href=https://igs.net>IGS site</a>.
-
+It is located at the <a href=https://gml.noaa.gov/obop/brw/>NOAA environmental facility</a>. It is also an <a href=https://igs.org>IGS site</a>.
 
 Use the <a href=https://gnss-reflections.org/rzones target="_blank">web app to get an idea of the reflection zones at this site.</a>
 Remember that the default is the elevation of the site above sea level. That might be ok - but it might not. Check 
@@ -24,7 +23,7 @@ with the real data. What azimuths should you use?
 
 ### Look at the data
 
-First make a SNR file using the BKG archive:
+In order to have access to modern GNSS signals, we will use RINEX 3 files. First make a SNR file:
 
 <code>rinex2snr utqi00usa 2022 150 -orb rapid -archive bkg</code>
 
@@ -36,19 +35,18 @@ angles to 5-15 so as to avoid the building.  I will set the reflection zone on t
 
 <code>quickLook utqi 2022 150 -h1 2 -h2 12 -e1 5 -e2 15</code>
 
-
-<img src=utqi-quicklook1.png width=600</>
+<img src=utqi-quicklook1.png width=600/>
 
 I've outlined the "sweet spot" for reflections on the summary figure:
 
-<img src=utqi-quicklook.png width=600</>
+<img src=utqi-quicklook.png width=600/>
 
 The main take home message: the *a priori* reflector height is a bit more than 6 meters. You
 can use that value within the reflection zone app if you want to look at the reflection zones again.
 
 ### Make SNR files for multiple years
 
-The RINEX files are available from both CDDIS and BKG. Here we selected CDDIS and multi-GNSS orbits.
+RINEX 3 files are available from both CDDIS and BKG. Here we selected CDDIS and multi-GNSS orbits.
 Another orbit option is rapid (also from GFZ). These files only become available in 2021, and I want to 
 start the time series in 2020, so I opted to use gnss as the orbit source.
 
@@ -88,8 +86,10 @@ Finally, the daily average from 2020 to the present:
 
 <img src=utqi-f2.png width=600/>
 
-The values are written to a file - the location of the file is written to the screen.
-How do you turn this into snow accumulation? Set the fall values (before the first snow) as your 
+You can further restrict azimuths in <code>daily_avg</code> if you would like.
+
+The final RH values are written to a file and the location of the file is written to the screen.
+How do you turn these RH estimates into snow accumulation? Set the fall values (before the first snow) as your 
 zero point and then simply subtract. Why are RH values changing during the summer? This is related to 
 permafrost active layer changes. [Lin Liu](https://www.cuhk.edu.hk/sci/essc/people/liu.html)'s group at the 
 University of Hong Kong has pioneered the use 
