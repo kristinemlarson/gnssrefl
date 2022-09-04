@@ -6,9 +6,15 @@
 
 **Archives:** BKG, CDDIS
 
-<img src=http://gnss-reflections.org/static/images/UTQI.jpg width=500/>
+**[Nevada Reno](http://geodesy.unr.edu/NGLStationPages/stations/UTQI.sta)** 
 
-This station was installed by and is supported by <a href=https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/overview>GFZ</a>.
+**[IGS station log](https://files.igs.org/pub/station/log/utqi_20211028.log)**
+
+<p align=center>
+<img src=http://gnss-reflections.org/static/images/UTQI.jpg width=500/>
+</p>
+
+UTQI was installed by and is supported by <a href=https://www.gfz-potsdam.de/en/section/space-geodetic-techniques/overview>GFZ</a>.
 It is located at the <a href=https://gml.noaa.gov/obop/brw/>NOAA environmental facility</a>. It is also an <a href=https://igs.net>IGS site</a>.
 
 
@@ -38,7 +44,7 @@ I've outlined the "sweet spot" for reflections on the summary figure:
 <img src=utqi-quicklook.png width=600</>
 
 The main take home message: the *a priori* reflector height is a bit more than 6 meters. You
-can use that value within the reflection zone app.
+can use that value within the reflection zone app if you want to look at the reflection zones again.
 
 ### Make SNR files for multiple years
 
@@ -89,6 +95,12 @@ permafrost active layer changes. [Lin Liu](https://www.cuhk.edu.hk/sci/essc/peop
 University of Hong Kong has pioneered the use 
 of GNSS-IR to study this effect. There are a few papers on [my website](https://kristinelarson.net/publications) from this early work; more papers
 can be found on his website.
+
+Note:
+
+I found cases where the archived files are missing SNR data entirely. This will show up on the screen 
+as failure to translate the RINEX 3 file into RINEX 2. 
+
 
 Kristine M. Larson September 4, 2022
 
