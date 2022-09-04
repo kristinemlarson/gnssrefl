@@ -86,7 +86,6 @@ Finally, the daily average from 2020 to the present:
 
 <img src=utqi-f2.png width=600/>
 
-You can further restrict azimuths in <code>daily_avg</code> if you would like.
 
 The final RH values are written to a file and the location of the file is written to the screen.
 How do you turn these RH estimates into snow accumulation? Set the fall values (before the first snow) as your 
@@ -96,9 +95,10 @@ University of Hong Kong has pioneered the use
 of GNSS-IR to study this effect. There are a few papers on [my website](https://kristinelarson.net/publications) from this early work; more papers
 can be found on his website.
 
-Note:
+You can further restrict azimuths in <code>daily_avg</code> if you would like.
+And there is certainly no reason you can't download/translate the fall 2019 data to have the pre-snow level. 
 
-I found cases where the archived files are missing SNR data entirely. This will show up on the screen 
+**Warning:** I found cases where the archived files are missing SNR data entirely. This will show up on the screen 
 as failure to translate the RINEX 3 file into RINEX 2. 
 
 
