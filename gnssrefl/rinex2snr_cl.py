@@ -232,17 +232,20 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     if orb == 'gps+glo':
         orb = 'jax'
 
-    # default is to use hybrid for RINEX translator
+    # default is to use hybrid for RINEX translator - UNLESS You chose fortran
     if translator is None:
         # the case when someone sets fortran to true and doesn't set translator also
-        if fortran is not False:
+        # but i do not think this happens because Kelly has made hybrid the default
+        if fortran:
             translator = 'fortran'
         else:
             translator = 'hybrid'
     elif translator == 'hybrid':
-        fortran = False  # override
+        # override
+        if fortran:
+            translator = 'fortran'     
     elif translator == 'python':
-        fortran = False  # override - but this is sllllllooooowwww
+        fortran = False  
     elif translator == 'fortran':
         fortran = True
     translator_accepted = [None, 'fortran', 'hybrid', 'python']
@@ -257,7 +260,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
             if not os.path.isfile(snrexe):
                 print('You have selected the fortran and GPS only options.')
                 print('However, the fortran translator gpsSNR.e has not been properly installed.')
-                print('We are changing to the hybrid translator option.')
+                print('We are changing your choice to the hybrid translator option.')
                 fortran = False
                 translator = 'hybrid'
         else:
@@ -265,9 +268,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
             if not os.path.isfile(snrexe):
                 print('You have selected the fortran and GNSS options.')
                 print('However, the fortran translator gnssSNR.e has not been properly installed.')
-                print('We are changing to the python translator option (the hybrid is not yet working).')
+                print('We are changing your choice to hybrid option.')
                 fortran = False
-                translator = 'python'
+                translator = 'hybrid'
 
     # default is set to low.  pick high for 1sec files
     rate = rate.lower()
@@ -330,14 +333,14 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     year_list = list(range(year1, year2+1))
 
     # default is to use hybrid for RINEX translator
+    # why is this logic here?  there is earlier logic for the exact same questions
 
-    if translator == 'hybrid':
-        fortran = False  # override
-    if translator == 'python':
-        fortran = False  # override - but this is sllllllooooowwww
-
-    if fortran is True:
-        translator = 'fortran'
+    #if translator == 'hybrid':
+    #    fortran = False  # override
+    #if translator == 'python':
+    #    fortran = False  # override - but this is sllllllooooowwww
+    #if fortran is True:
+    #    translator = 'fortran'
 
     # the Makan option
     if mk:

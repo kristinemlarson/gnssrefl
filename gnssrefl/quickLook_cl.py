@@ -34,12 +34,12 @@ def parse_arguments():
     parser.add_argument("-sat", default=None, type=int, help="satellite")
     parser.add_argument("-screenstats", default=None, type=str, help="if True, Success and Failure info printed to the screen")
     parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio")
-    parser.add_argument("-fortran", default=None, type=str, help="Default is True: use Fortran translators")
+    #parser.add_argument("-fortran", default=None, type=str, help="Default is True: use Fortran translators")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['screenstats', 'fortran']
+    boolean_args = ['screenstats']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below

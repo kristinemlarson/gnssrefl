@@ -58,9 +58,10 @@ def swapRS(stream):
 def just_bkg(cyyyy, cdoy, file_name):
     """
 
-    looks for bkg files - 
+    looks for bkg files in two directories
 
     parameters
+    -----------------
 
     cyyyy:  string
         four character year
@@ -69,7 +70,7 @@ def just_bkg(cyyyy, cdoy, file_name):
         three character day of year
 
     file_name: string
-        expected filename
+        expected RINEX filename
     """
     dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cyyyy + '/' + cdoy + '/'
     dir2 = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/'

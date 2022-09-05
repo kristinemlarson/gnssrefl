@@ -1,6 +1,5 @@
 #!usr/bin/env python
 # -*- coding: utf-8 -*-
-# kristine larson, may 2019
 
 import datetime
 import matplotlib.pyplot as plt

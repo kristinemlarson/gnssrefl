@@ -1,5 +1,3 @@
-#!usr/bin/env python
-# -*- coding: utf-8 -*-
 # toolbox for GPS/GNSS data analysis
 import datetime
 from datetime import date
@@ -719,72 +717,6 @@ def rinex_cddis(station, year, month, day):
         okok = 1
         #print('successful RINEX 2.11 download from CDDIS')
 
-
-def rinex_bkg(station, year, month, day):
-    """
-    picks up low-rate RINEX 2.11 files from BKG 
-
-    parameters
-    ------------
-    station: string
-        4 char station name 
-
-    year: integer
-        year
-
-    month: integer
-        month 
-
-    day: integer
-        day. if zero, it means the month is day of year
-
-    """
-    crnxpath = hatanaka_version()
-    # if doy is input 
-    if day == 0:
-        doy=month
-        d = doy2ymd(year,doy);
-        month = d.month; day = d.day
-    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    gns = 'ftp://igs.bkg.bund.de/EUREF/obs/'
-    #https://igs.bkg.bund.de/root_ftp/IGS/obs/2021/019/
-    # changing to https and gzip
-    # there is also an IGS directory - which I should add
-    gns = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/'
-    # igs
-    gns2 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/'
-
-    oname,fname = rinex_name(station, year, month, day)
-    # they store hatanaka - compression must depend on year 
-    file1 = fname + '.Z'
-    file2 = fname + '.gz'
-    url = gns +  cyyyy + '/' + cdoy +  '/' + file1
-    url2 = gns2 +  cyyyy + '/' + cdoy +  '/' + file1
-
-    if os.path.exists(crnxpath):
-        print('try unix EUREF area ',url)
-        try:
-            wget.download(url,file1)
-            subprocess.call(['uncompress', file1])
-            subprocess.call([crnxpath, fname])
-            subprocess.call(['rm', '-f',fname])
-        except:
-            print('some kind of problem with BKG download',file1)
-            subprocess.call(['rm', '-f',file1])
-
-        print('try IGS area ',url2)
-        try:
-            wget.download(url2,file1)
-            subprocess.call(['uncompress', file1])
-            subprocess.call([crnxpath, fname])
-            subprocess.call(['rm', '-f',fname])
-        except:
-            print('some kind of problem with BKG download',file1)
-            subprocess.call(['rm', '-f',file1])
-
-
-    else:
-        print('You cannot use the BKG archive without installing CRX2RNX.')
 
 def getnavfile(year, month, day):
     """
@@ -2446,25 +2378,6 @@ def sp3_name(year,month,day,pCtr):
     sp3dir = os.environ['ORBITS'] + '/' + str(year) + '/sp3'
     return sp3name, sp3dir
 
-def rinex_unavco_obs(station, year, month, day):
-    """
-    author: kristine larson
-    picks up a RINEX file from unavco.  
-    normal observation file - not Hatanaka
-    new version i was testing out
-    """
-    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    rinexfile,rinexfiled = rinex_name(station, year, month, day) 
-    unavco= 'ftp://data-out.unavco.org' 
-    filename = rinexfile + '.Z'
-    url = unavco+ '/pub/rinex/obs/' + cyyyy + '/' + cdoy + '/' + filename
-    print(url)
-    try:
-        wget.download(url,filename)
-        subprocess.call(['uncompress',filename])
-    except:
-        print('some kind of problem with download',rinexfile)
-
 
 def rinex_unavco_highrate(station, year, month, day):
     """
@@ -3441,131 +3354,6 @@ def warn_and_exit(snrexe,fortran):
             print('Install it or use -fortran False. Exiting')
             sys.exit()
 
-
-def go_get_rinex(station,year,month,day,receiverrate):
-    """
-    function to do the dirty work of getting a rinex file
-    inputs station name, year, month, day
-
-    21mar17
-    cddis puts out very large screen outputs.  when trying to meld this
-    with jupyter notebooks, we had difficulties. cddis can still be 
-    accessed directly, but we are removing it from the "default" list
-    """
-    rinexfile,rinexfiled = rinex_name(station, year, month, day)
-    if (os.path.isfile(rinexfile) == True):
-        print('RINEX file exists')
-    else:
-        if receiverrate == 'low':
-            #print('seeking low rate at unavco')
-            rinex_unavco(station, year, month, day)
-        else:
-            #print('seeking high rate at unavco')
-            rinex_unavco_highrate(station, year, month, day)
-        if os.path.isfile(rinexfile):
-            okok = 1
-            #print('you now have the rinex file')
-        else:
-          # only keep looking if you are seeking lowrate data
-            if receiverrate == 'low':
-                try:
-                    rinex_sopac(station, year, month, day)
-                except:
-                    print('SOPAC did not work')
-                #if not os.path.isfile(rinexfile):
-                #    try:
-                #        rinex_cddis(station, year, month, day)
-                #    except:
-                #        print('CDDIS did not work')
-                if not os.path.isfile(rinexfile):
-                    try:
-                        rinex_sonel(station, year, month, day)
-                    except:
-                        print('SONEL did not work')
-                if not os.path.isfile(rinexfile):
-                    print('no RINEX')
-#
-def go_get_rinex_flex(station,year,month,day,receiverrate,archive):
-    """
-
-    this is old code - should be removed eventually  and replaced with karnak library
-
-    parameters
-    ----------
-    station : string
-        station name - 4 character
-
-    year : integer
-
-    month : integer
-
-    day : integer
-
-    receiverrate : string 
-        high or low (default) allowed
-
-    archive : string
-
-    returns
-    """
-    if (day == 0):
-        doy = month
-        year, month, day, cyyyy,cdoy, YMD = ydoy2useful(year,doy)
-        cyy = cyyyy[2:4]
-    else:
-        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-
-    rinexfile,rinexfiled = rinex_name(station, year, month, day)
-
-    if (os.path.isfile(rinexfile) == True):
-        ignoreFornow = 1
-        #print('RINEX file exists')
-    else:
-        if receiverrate == 'high':
-            if (archive == 'unavco') or (archive == 'all'):
-                rinex_unavco_highrate(station, year, month, day)
-            if not os.path.isfile(rinexfile):  
-                if (archive == 'nrcan') or (archive == 'all'):
-                    rinex_nrcan_highrate(station, year, month, day)
-            if not os.path.isfile(rinexfile):
-                if (archive == 'ga') or (archive == 'all'):
-                    rinex_ga_highrate(station, year, month, day)
-        else:
-          # lowrate data
-            if archive == 'all':
-                go_get_rinex(station,year,month,day,receiverrate) 
-            else:
-                if archive == 'unavco':
-                    rinex_unavco(station, year, month, day)
-                elif (archive == 'special'):
-                    rinex_special(station, year, month, day)
-                elif (archive == 'sopac'):
-                    rinex_sopac(station, year, month, day)
-                elif (archive == 'cddis'):
-                    rinex_cddis(station, year, month, day)
-                elif (archive == 'sonel'):
-                    rinex_sonel(station, year, month, day)
-                elif (archive == 'nz'):
-                    rinex_nz(station, year, month, day)
-                elif (archive == 'ga'):
-                    rinex_ga_lowrate(station,year,month,day)
-                elif (archive == 'bkg'):
-                    rinex_bkg(station,year,month,day)
-                elif (archive == 'nrcan'):
-                    rinex_nrcan(station,year,month,day)
-                elif (archive == 'jeff'):
-                    pickup_pbay(year,month,day)
-                elif (archive == 'ngs'):
-                    # changed 2021 august 28 to use https instead of ftp
-                    new_big_Disk_in_DC(station, year,month,day)
-                elif (archive == 'bev'):
-                    bev_rinex2(station, year, doy)
-                elif (archive == 'jp'):
-                    # thank you to naoya kadota for writing this 
-                    rinex_jp(station, year, month, day)
-                else:
-                    print('eek - I have run out of archives')
-
 def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     """
     assuming gfzrnx executable exists, the rinex 3 file is hatanaka
@@ -3612,7 +3400,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
         r3_filename = r3_filename_new
     gobblygook = myfavoriteobs()
     gobblygook_gps = myfavoritegpsobs()
-    print('decimate value: ', dec)
+    #print('decimate value: ', dec)
     if not os.path.exists(gexe):
         print('gfzrnx executable does not exist and this file cannot be translated')
     else:
@@ -3668,58 +3456,6 @@ def ign_orbits(filename, directory,year):
         foundit = False
 
     return foundit 
-
-
-
-def bev_rinex2(station, year, doy):
-    """
-    download rinex 2.11 from BEV
-    inputs: station name, year, day of year 
-    2022feb09 change to https
-    """
-    fexist = False
-    crnxpath = hatanaka_version()
-    cyyyy, cyy, cdoy = ydoych(year,doy)
-
-    url = 'ftp://gnss.bev.gv.at/pub/obs/' + cyyyy + '/' + cdoy + '/'
-    url = 'https://gnss.bev.gv.at/at.gv.bev.dc/data/obs/' + cyyyy + '/' + cdoy + '/'
-    ff_Z =  station + cdoy + '0.' + cyy + 'd' + '.Z'
-    ff_gz = station + cdoy + '0.' + cyy + 'd' + '.gz'
-    ff1 = station + cdoy + '0.' + cyy + 'd' 
-    ff2 = station + cdoy + '0.' + cyy + 'o' 
-    # if hatanaka decompression exe does not exist, exit early
-    if not os.path.exists(crnxpath):
-        hatanaka_warning()
-        return fexist
-
-    # illegal Z files ...  only look for gz files
-    #try:
-    #    this_url = url + ff_Z
-    #    wget.download(this_url,ff_Z)
-        # subprocess.call(['uncompress',ff_Z])
-        # subprocess.call([crnxpath,ff1])
-    #except:
-    #    print('no luck first try')
-
-
-    #if os.path.exists(ff_Z):
-    #    print('yippee')
-    try:
-        this_url = url + ff_gz
-        wget.download(this_url,ff_gz)
-        subprocess.call(['gunzip',ff_gz])
-        subprocess.call([crnxpath,ff1])
-    except:
-        print('no luck ')
-
-    # get rid of Hatanaka file
-    if os.path.exists(ff1):
-        subprocess.call(['rm','-f',ff1])
-
-    if os.path.exists(ff2):
-        fexist = True
-
-    return fexist
 
 
 def ign_rinex3(station9ch, year, doy,srate):

@@ -116,6 +116,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     """
     # 
+    print('Translator: ', translator)
     # do not allow illegal skipit values
     if skipit < 1:
         skipit = 1
@@ -251,10 +252,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                 if (not foundit): # try again
                                     file_name,foundit = k.universal_all(station9ch, year, doy, srate,k.swapRS(stream))
                             else:
-                                print('stream',stream)
+                                #print('stream',stream)
                                 file_name,foundit = k.universal(station9ch, year, doy, archive,srate,stream)
                                 if (not foundit): # try again
-                                    print('stream',stream)
+                                    #print('stream',stream)
                                     file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
                             if foundit: # version 3 found - now need to gzip, then hatanaka decompress
                                 translated, rnx_filename = go_from_crxgz_to_rnx(file_name)
@@ -1129,7 +1130,7 @@ def go_from_crxgz_to_rnx(c3gz):
             subprocess.call([crnxpath,c3])
     if os.path.exists(rnx): # file exists
         translated = True
-        print('remove Hatanaka compressed file')
+        #print('remove Hatanaka compressed file')
         subprocess.call(['rm','-f',c3])
 
     return translated, rnx
