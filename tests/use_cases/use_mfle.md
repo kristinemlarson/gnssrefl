@@ -33,9 +33,9 @@ Because our interest is soil moisture, we will only use GPS L2C signals.
 
 ### Take a Quick Look at the Data
 
-First make a SNR file:
+First make a SNR file. You don't need to specify the archive, but it never hurts ;-)
 
-<code>rinex2snr mfle 2019 150</code>
+<code>rinex2snr mfle 2019 150 -archive unavco</code>
 
 Then ask explicitly for the L2C data :
 
@@ -47,22 +47,24 @@ First the periodograms:
 
 You can see that the peak of the periodograms line up near to 3 meters.
 The summary plot shows that really all of the geographic regions are good. The 
-rejected tracks are primarily due to the satellite not rising high enough in the sky 
+rejected tracks (in gray) are primarily due to the satellite not rising high enough in the sky 
 to convince the software that the result should be kept:
 
 <img src=mfle_2.png width=600 />
 
 ### Estimate Reflector Heights
 
-Let's use the defaults, but ask for only the L2C data since this is a soil moisture example.
+Your first task is to set an analysis strategy using <code>make_json_input</code>.
+Let's use the defaults, but ask for only the L2C data since this is for soil moisture.
+If your site is known to our database, you can enter 0 0 0 for the expected latitude, longitude, and height.
 
 <code>make_json_input mfle 0 0 0 -l2c T</code>
 
-Then
+Then you need to make more SNR files: 
 
-<code>rinex2snr mfle 2016 1 -year_end 2019 -doy_end 366</code>
+<code>rinex2snr mfle 2016 1 -year_end 2019 -doy_end 366 -archive unavco</code>
 
-This should go pretty fast because the UNAVCO data files for this site are 30 sec sampling.
+This should go pretty fast because the UNAVCO data files for this site are at 30 sec sampling.
 However, please feel free to only look at one year of data if you have issues with telemetry.
 
 Before we look at soil moisture, let's get an idea of how often it snowed at this site:
@@ -108,10 +110,10 @@ Now let's invoke the snow filter:
 
 <img src=mfle_withsnowfilter.png width=600/>
 
-First, the snow filter definitely has remove that first suspect point in early 2016. 
+First, the snow filter definitely has removed that first suspect point in early 2016. 
 However, there are still two regions that may be showing snow effects (circled in red).
 From the geographic phase plots you can see quite a bit of scatter at the end of 2019 in
-one of the quadrants, that is likely reponsible for at least the last outliers.  However,
+the southeast quadrant; that is likely reponsible for at least the last outliers. However,
 overall, the code has done a good job of removing suspect points.
 
 <img src=mfle_multi.png width=600/>
