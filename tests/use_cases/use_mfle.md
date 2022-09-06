@@ -123,3 +123,5 @@ The final volumetric water content results:
 <img src=mfle_final_vwc.png width=600 />
 
 These soil moisture estimates are written to a file; its location is written to the screen.
+
+Kristine M. Larson September 6, 2022

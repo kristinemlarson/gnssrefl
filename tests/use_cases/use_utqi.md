@@ -102,12 +102,12 @@ And there is certainly no reason you can't download/translate the fall 2019 data
 **Warning:** I found cases where the archived files are missing SNR data entirely. This will show up on the screen 
 as failure to translate the RINEX 3 file into RINEX 2. 
 
-I found this plot online -
+I found this [NOAA plot online](https://gml.noaa.gov/news/snow_free_season_end.html):
 
 <img src=https://gml.noaa.gov/news/images/BRWWebAlbedo.png width=500 />
 
 
-Looks pretty good compared to our results ;-)
+Looks pretty good compared to our results. Don't tell JPL!
 
 <img src=utqi_just2021.png width=500 />
 
