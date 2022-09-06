@@ -150,11 +150,12 @@ Things we are planning to add:
 
 - the json used by <code>gnssir</code> will be integrated with the soil moisture code
 
-We currently have three use cases posted:
+We currently have four use cases posted:
 
  - a shorter version of [p038](../tests/use_cases/use_p038.md) 
  - [mchl](../tests/use_cases/use_mchl.md) 
  - [scia](../tests/use_cases/use_scia.md)
+ - [mfle](../tests/use_cases/use_mfle.md)
 
 Kristine M. Larson
 August 29, 2022
