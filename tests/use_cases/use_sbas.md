@@ -20,20 +20,21 @@ from UNAVCO are GPS only. So for now that is the use case we will discuss.
 ### Reflection Zones 
 
 Use the reflection zone web app to think about which azimuths and elevation angles ot use.
-Note the photograph!  **You are not 6 meters from the water.**
+Note the photograph!  **You are not 6 meters from the water.** You will not be able to test
+your reflector height value until you look at some real data. But you can get an idea of which
+RH values put you over the water.
 
 ### Evaluate the Data
 
-The defaults will only show reflector heights up to 6 meters. We need to be much bigger than that.
-And since we know that you can only see water reflections in the northeast quadrant, I am going
+We know that the reservoir will only be in the northeast quadrant, so I am going 
 to select those azimuths specifically. I will start with elevation angle limits of 5-12 degrees and 
 the superior L2C frequency.
 
-<code>quickLook sbas 2020 1 -e1 5 -e2 12 -h1 20 -h2 35 -azim1 0 -azim2 90 </code>
+<code>quickLook sbas 2020 1 -e1 5 -e2 12 -h1 20 -h2 35 -azim1 0 -azim2 90 -fr 20</code>
 
 <img src=sbas-quicklook2.png width=600 />
 
-You can see that last azimuth looks a bit lower than the others. If I run it again with 
+You can see that the last point looks a little bit lower than the others. If I run it again with 
 screenstats set to True, I will get a little more information that will help me figure out how 
 far we can go:
 
@@ -54,7 +55,7 @@ SUCCESS for Azimu  63.8 Satellite 31 UTC  4.96 RH  27.320
 
 </PRE>
 
-Looks like satellite 5 at an azimuth of 78.4 degrees is the onproblem, so we 
+Looks like satellite 5 at an azimuth of 78.4 degrees is the problem, so we 
 will further restrict our analysis to 78 degrees in the next section.
 
 ### Estimate Lake Level
@@ -67,25 +68,30 @@ Save your analysis strategy:
 
 <code>make_json_input sbas 0 0 0 -e1 5 -e2 12 -h1 15 -h2 35 -peak2noise 3</code>
 
-I am going to edit the json file to restrict azimuths to 0-78 degrees.
+Hand edit the json file to restrict azimuths to 0-78 degrees.
 
-Estimate reflector height :
-
-First do a single day:
+The next step is to estimate reflector heights. First do a single day using the plt option.
+I've added an arrow to show you what happens if you violate the Nyquist - double peaks!
+Luckily this is not prevalent in this dataset thanks to the help of TRIGNET 
+using a 15 second sample rate in the files.
 
 <code>gnssir sbas 2021 1 -plt T</code>
 
-<img src=sbas-l1.png width=600/>	
+<img src=sbas_gnssir_l1.png width=600/>	
+
+Notice that the L2C frequency - which has a longer wavelength - does not have a double peak.
+And that is what we should expect.
 
 <code>gnssir sbas 2021 1 -plt T -fr 20 </code>
 
-<img src=sbas-l2.png width=600 />
+<img src=sbas_gnssir_l2c.png width=600 />
 
-Then go ahead and do them all:
+Go ahead and estimate reflector height for all days:
 
 <code>gnssir sbas 2021 1 -doy_end 366</code>
 
-Compute a daily average:
+Compute a daily average. Since we only have reflections in one geographic quadrant, and are 
+only using GPS signals, we should not require as many points as we have done in other examples:
 
 <code>daily_avg sbas 0.25 10</code>
 
@@ -93,16 +99,14 @@ Number of available values per day:
 
 <img src=sbas_4.png width=600 />
 
+Daily averaged reflector height results 
+
 <img src=sbas_2.png width=600 />
 
-Compare with in situ data:
+Numerical values are saved in a file. The location of the file is printed to the screen.
 
-sbas_use.md
+### Compare with in situ data:
 
+[Current state of the reservoir](https://www.dws.gov.za/Hydrology/Weekly/ProvinceWeek.aspx?region=WC)
 
-
-
-https://www.dws.gov.za/Hydrology/Weekly/ProvinceWeek.aspx?region=WC
-
-
-https://www.dws.gov.za/Hydrology/Verified/HyData.aspx?Station=G4R001100.00&DataType=Point&StartDT=2020-01-01&EndDT=2020-12-31&SiteType=RES
+Simon Williams found this web app that will [provide 2020 data for a comparison](https://www.dws.gov.za/Hydrology/Verified/HyData.aspx?Station=G4R001100.00&DataType=Point&StartDT=2020-01-01&EndDT=2020-12-31&SiteType=RES)
