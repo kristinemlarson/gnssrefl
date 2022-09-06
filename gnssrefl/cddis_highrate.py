@@ -116,7 +116,7 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
             fexist = True
 
     s2=time.time()
-    print('That merging experience took ', int(s2-s1), ' seconds.')
+    print('That experience took ', int(s2-s1), ' seconds.')
     return rinexname,  fexist
 
 def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):

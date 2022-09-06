@@ -40,7 +40,7 @@
 
 * [Victorville, CA](use_cases/use_scia.md) (scia)
 
-* Boulder, CO (mfle)
+* [Boulder, CO](use_cases/use_mfle.md) (mfle)
 
 </TD>
 </TR>

@@ -295,8 +295,8 @@ def do_quad(vquad, year, year_end):
     return vout
 
 
-def vwc(station: str, year: int, year_end: int = None, fr: int = 20,  
-        plt2screen: bool = True, screenstats: bool = False, min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, snow_filter: bool = False):
+def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen: bool = True, screenstats: bool = False, 
+        min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, snow_filter: bool = False):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
     Parameters:
@@ -360,11 +360,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20,
     snow_file = xdir + '/Files/snowmask_' + station + '.txt'
     snowfileexists = False
     if snow_filter:
-        medf = 0.2
-        ReqTracks = 10
+        medf = 0.2 # this is meters
+        ReqTracks = 10 # have a pretty small number here
         snowfileexists = qp.make_snow_filter(station, medf, ReqTracks, year, year_end)
         plt.close ('all')# we do not want the plots to come to the screen for the daily average
-
 
     # azimuth list
     azlist = [270, 0, 180,90 ]
@@ -519,7 +518,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20,
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
 
-    # this is now down in a function. i believe this can be commented out
+    # this is now done in a function. i believe this can be commented out
     #tv = np.empty(shape=[0, 4])
     # year, day of year, phase, satellite, azimuth, RH, and RH amplitude
     y1 = vxyz[:, 0]

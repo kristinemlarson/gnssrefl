@@ -40,8 +40,18 @@ def vegplt(station, tv,winter):
 
 def sfilename(station, year, doy):
     """
-    input station name, year and day of year
-    and it returns the full filename on your local system
+    parameters
+    -----------
+    station : string
+        4 character station name 
+    year : integer
+
+    doy : integer
+        day of year
+    returns:
+    ------------
+    xfile : string
+        the full SNR filename on your local system
     """
     cdoy = '{:03d}'.format(doy)
     cyyyy = str(year)
@@ -52,12 +62,14 @@ def sfilename(station, year, doy):
 
     return xfile
 
-
-
 def ReadRecAnt(teqclog):
     """
-    input is the name of a teqc log 
     prints out Receiver and Antenna name
+    parameters
+    ---------------
+    teqclog : string
+        the name of a teqc log 
+
     """
     mp1 = 0
     mp2 = 0
@@ -122,8 +134,21 @@ def readoutmp(teqcfile,rcvtype):
 
 def run_teqc(teqc,navfile,rinexfile,foutname,mpdir):
     """
-    inputs: nav file, rinexfile, and output file name 
-    run teqc and store in the file called foutname
+    run teqcs and stores the output 
+
+    parameters
+    --------------
+    teqc : string
+        location of the teqc executable
+    navfile : string
+        name of the RINEX nav file
+    rinexfile : string
+        name of the RINEX observation file
+    foutname : string
+        name of the output file
+    mpdir : string
+        location of the multipath directory on your system
+
     """
     line = [teqc, '-nav', navfile, '+qc', rinexfile]
     subprocess.call(line)
@@ -135,9 +160,15 @@ def run_teqc(teqc,navfile,rinexfile,foutname,mpdir):
 
 def check_directories(station,year):
     """
-    inputs: station name and year
     checks that directories exist for teqc logs
-    author: kristine larson
+
+    parameters
+    ----------
+    station : string
+        4 character station name
+
+    year : integer
+
     """
     navfiledir = os.environ['ORBITS']  + '/' + str(year)
     if not os.path.isdir(navfiledir):
@@ -164,8 +195,26 @@ def check_directories(station,year):
 
 def get_files(station,year,doy,look):
     """
-    inputs station name, year, and day of year
+    parameters
+    --------
+    station : string
+    year : integer
+    doy : integer
+        day of year
+    look : boolean
+        whether you should get the file if it does not exist locally
+
     makes sure the files exist etc.
+    returns
+    ----------
+    navfile : string
+        navigation/orbit file
+    rinexfile : string
+        name of the obs file
+    foutname : full name of the teqc log output 
+    mpdir :  directory for MP results
+    goahead : boolean
+        whether you should go ahead and run teqc
     """
     goahead = False # means you found everything and can run teqc
 

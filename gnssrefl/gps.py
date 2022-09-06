@@ -4415,6 +4415,7 @@ def ultra_gfz_orbits(year,month,day,hour):
 
 def rinex_unavco(station, year, month, day):
     """
+    This is being used by the vegetaiton code!!!!!
     author: kristine larson
     picks up a RINEX file from default unavco area, i.e. not highrate.  
     it tries to pick up an o file,
