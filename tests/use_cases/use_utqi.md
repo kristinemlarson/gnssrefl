@@ -102,6 +102,14 @@ And there is certainly no reason you can't download/translate the fall 2019 data
 **Warning:** I found cases where the archived files are missing SNR data entirely. This will show up on the screen 
 as failure to translate the RINEX 3 file into RINEX 2. 
 
+I found this plot online -
+
+<img src=https://gml.noaa.gov/news/images/BRWWebAlbedo.png width=500 />
+
+
+Looks pretty good compared to our results ;-)
+
+<img src=utqi_just2021.png width=500 />
 
 Kristine M. Larson September 4, 2022
 
