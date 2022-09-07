@@ -114,6 +114,9 @@ Daily average reflector height results.
 Note the missing points - this has nothing to do with reflectometry. These are days when the station did not report data.
 Numerical values are saved in a file. The location of the file is printed to the screen.
 
+You should also go back and add some of those very northwestern tracks by setting a second azimuth region in your json file.
+Then rerun the <code>gnssir</code> and <code>daily_avg</code> codes.
+
 ### Compare with in situ data:
 
 [Current state of the lower Steenbras reservoir](https://www.dws.gov.za/Hydrology/Weekly/percentile.aspx?station=%20G4R001)
