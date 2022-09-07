@@ -67,6 +67,10 @@ Then you need to make more SNR files:
 This should go pretty fast because the UNAVCO data files for this site are at 30 sec sampling.
 However, please feel free to only look at one year of data if you have issues with telemetry.
 
+Then you need to estimate reflector heights:
+
+<code>gnssir mfle 2016 1 -year_end 2019 -doy_end 366 </code>
+
 Before we look at soil moisture, let's get an idea of how often it snowed at this site:
 
 <code>daily_avg mfle 0.2 10</code>
