@@ -1,34 +1,38 @@
 ## Steenbras Dam, Lower
 
-Station Name: sbas
+**Station Name:** sbas
 
-Latitude: -34.18704704
+**Latitude:** -34.18704704
 
-Longitude: 18.84986166
+**Longitude:** 18.84986166
 
-Ellipsoidal Height(m): 403.342
+**Ellipsoidal Height(m):** 403.342
 
-Network: TRIGNET
+**Network:** TRIGNET
 
-Archive: UNAVCO (use the special option)
+**Archive:** UNAVCO (use the special option)
 
 <img src=https://gnss-reflections.org/static/images/SBAS.jpg width=500>
 
-I am pretty sure that this site is now tracking Glonass, but the files currently available 
-from UNAVCO are GPS only. So for now that is the use case we will discuss.
+
+The data used here have been kindly provided by TRIGNET so that we could access L1 and L2C signals 
+at 15 second sampling. This sampling rate is needed to be able to see the reservoir.  
+However, they are in a proprietary Trimble binary format.  
+It is non-trivial to convert those to RINEX, so in this example we will rely on files translated 
+and archived by UNAVCO for this use case example. They can be used by specifying the "special" archive.
+Here we will only discuss GPS - but eventually Glonass will be added.
 
 ### Reflection Zones 
 
-Use the reflection zone web app to think about which azimuths and elevation angles ot use.
-Note the photograph!  **You are not 6 meters from the water.** You will not be able to test
-your reflector height value until you look at some real data. But you can get an idea of which
+Use the [reflection zone web app](https://gnss-reflections.org/rzones) to think about which azimuths and elevation angles to use.
+Note the photograph!  **You are not 6 meters (vertically) above the water.** You will not be able to fully test
+the reflector height value used in this web app until you look at some real data. But you can get an idea of which
 RH values put you over the water.
 
 ### Evaluate the Data
 
 We know that the reservoir will only be in the northeast quadrant, so I am going 
-to select those azimuths specifically. I will start with elevation angle limits of 5-12 degrees and 
-the superior L2C frequency.
+to select those azimuths specifically. I will start with elevation angle limits of 5-12 degrees and the superior L2C frequency.
 
 <code>quickLook sbas 2020 1 -e1 5 -e2 12 -h1 20 -h2 35 -azim1 0 -azim2 90 -fr 20</code>
 
@@ -57,6 +61,9 @@ SUCCESS for Azimu  63.8 Satellite 31 UTC  4.96 RH  27.320
 
 Looks like satellite 5 at an azimuth of 78.4 degrees is the problem, so we 
 will further restrict our analysis to 78 degrees in the next section.
+
+You might go back and use the reflection zone web app to make sure that your azimuth and 
+elevation angles look good for a RH of 28 meters. 
 
 ### Estimate Lake Level
 
@@ -99,7 +106,8 @@ Number of available values per day:
 
 <img src=sbas_4.png width=600 />
 
-Daily averaged reflector height results 
+Daily average reflector height results. Note the missing points - this has nothing 
+to do with reflectometry. These are days when the station did not report data.
 
 <img src=sbas_2.png width=600 />
 
@@ -107,6 +115,10 @@ Numerical values are saved in a file. The location of the file is printed to the
 
 ### Compare with in situ data:
 
-[Current state of the reservoir](https://www.dws.gov.za/Hydrology/Weekly/ProvinceWeek.aspx?region=WC)
+[Current state of the lower Steenbras reservoir](https://www.dws.gov.za/Hydrology/Weekly/percentile.aspx?station=%20G4R001)
+
+[This is a link for all reservoirs](https://www.dws.gov.za/Hydrology/Weekly/ProvinceWeek.aspx?region=WC)
 
 Simon Williams found this web app that will [provide 2020 data for a comparison](https://www.dws.gov.za/Hydrology/Verified/HyData.aspx?Station=G4R001100.00&DataType=Point&StartDT=2020-01-01&EndDT=2020-12-31&SiteType=RES)
+
+Kristine M. Larson September 6, 2022
