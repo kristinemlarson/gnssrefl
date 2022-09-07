@@ -386,6 +386,19 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
     
     tracks = qp.read_apriori_rh(station,freq)
+    nr = len(tracks[:,1])
+
+    if (minvalperday > nr ):
+        print('The code thinks you are using ', nr, ' satellite tracks but you are requiring', minvalperday, ' for each VWC point.')
+        print('Try lowering minvalperday at the command line')
+        sys.exit()
+    if (nr < 15 ) and (minvalperday==10):
+        print('The code thinks you are using ', nr, ' satellite tracks but you are requiring the default minvalperday.')
+        print('This could be problematic. Try lowering minvalperday at the command line')
+        sys.exit()
+
+
+
     atracks = tracks[:, 5]  # min azimuth values
     stracks = tracks[:, 2]  # satellite names
 
