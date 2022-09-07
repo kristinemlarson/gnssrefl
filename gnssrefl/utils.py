@@ -1,11 +1,11 @@
 import json
 import numpy as np
 import os
+import warnings
 
 from enum import Enum
 from typing import get_type_hints
 from pathlib import Path
-
 
 
 def validate_input_datatypes(obj, **kwargs):
@@ -134,21 +134,16 @@ def read_files_in_dir(directory, transpose=False):
                 result_files = list(dir_path.glob("???.txt"))
                 if result_files is not None:
                     for file in result_files:
-                        # need to find a better way than guessing file size but this removes the UserWarning when no data in file
-                        # removing this line KL -  2022 september 7
-                        # there are better ways to remove the UserWarning...
-                        # if file.stat().st_size > 500:
-                        if True:
+
+                        with warnings.catch_warnings():
+                            warnings.simplefilter("ignore")
                             file_data = np.genfromtxt(file, comments='%')
-                        # current code fails when there is a single line of results
-                            nr = np.shape(file_data); nr2 = np.shape(file_data.T)
-                            if (nr == nr2):
-                                print('found one line of results')
-                            # throwing out one row results for now.  Someone else needs to fix because
-                            # i am unfamiliar with extend. 
-                            else :
-                                if (len(file_data) > 0): 
-                                    data.extend(file_data)
+
+                        if (len(file_data) > 0):
+                            if len(np.shape(file_data)) == 1:
+                                data.append(file_data)
+                            else:
+                                data.extend(file_data)
                     if data is not None:
                         if transpose:
                             data = np.array(data)
