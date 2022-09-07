@@ -9,6 +9,7 @@
 
 **The pypi version is out of date. We are working to fix this.**
 
+*Please wait - We are confirming whether this information is correct.* 
 Would you like to join our <code>gnssrefl</code> users email list?
 Send an email to gnss-ir-request@postal.unavco.org and put the word
 subscribe (or unsubscribe to leave) in your email subject.
