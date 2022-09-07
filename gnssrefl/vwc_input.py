@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 import os
+import sys
 
 from pathlib import Path
 
@@ -12,7 +13,6 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
-    parser.add_argument("-year_end", default=None, help="year end", type=int)
     parser.add_argument("-min_tracks", default=None, help="minimum number of tracks needed to keep the mean RH", type=int)
     parser.add_argument("-fr", default=None, help="frequency", type=int)
 
@@ -22,7 +22,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def vwc_input(station: str, year: int, year_end: int = None, fr: int = 20, min_tracks: int = 100):
+def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100):
     """
     picks up reflector height results for a given station and year-year end and computes the mean values
     and writes to a file with the mean values.
@@ -34,9 +34,6 @@ def vwc_input(station: str, year: int, year_end: int = None, fr: int = 20, min_t
 
     year : integer
         Year
-
-    year_end : integer
-        Day of year
 
     fr : integer, optional
         GPS frequency. Currently only supports l2c, which is frequency 20.
@@ -55,26 +52,33 @@ def vwc_input(station: str, year: int, year_end: int = None, fr: int = 20, min_t
     # default l2c, but can ask for L1 and L2
     xdir = Path(os.environ["REFL_CODE"])
     myxdir = os.environ['REFL_CODE']
-    if not year_end:
-        year_end = year
 
     # not sure this is needed?
     if not min_tracks:
         min_tracks = 100
 
     print('Minimum number of tracks required ', min_tracks)
-    years = np.arange(year, year_end+1)
     gnssir_results = []
-    for y in years:
-        # where the results are stored
-        data_dir = xdir / str(y) / 'results' / station
-        result_files = read_files_in_dir(data_dir)
-        gnssir_results.extend(result_files)
-
-    gnssir_results = np.array(gnssir_results).T
-    if len(gnssir_results) == 0:
-        print('No results were found. Exiting')
+    # removed the ability to look at multiple years
+    # it failed and there is no need for it at this time
+    y = year
+    data_dir = xdir / str(y) / 'results' / station
+    result_files = read_files_in_dir(data_dir)
+    if result_files == None:
+        print('Exiting.')
         sys.exit()
+
+    gnssir_results = np.asarray(result_files)
+
+    # change it to a numpy array
+    #gi = np.asarray(gnssir_results)
+    # I transpose this because the original code did that.
+    gnssir_results = np.transpose(gnssir_results) 
+
+    # this should not be needed anymore
+    #if len(gnssir_results) == 0:
+    #    print('No results were found. Exiting')
+    #    sys.exit()
 
     # four quadrants
     azimuth_list = [0, 90, 180, 270]
@@ -85,8 +89,8 @@ def vwc_input(station: str, year: int, year_end: int = None, fr: int = 20, min_t
         satellite_list = l1_satellite_list
         apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
     else:
-        print('Using L2C satellite list for December 31 on ', years[-1])
-        l2c_sat, l5_sat = l2c_l5_list(years[-1], 365)
+        print('Using L2C satellite list for December 31 on ', year)
+        l2c_sat, l5_sat = l2c_l5_list(year, 365)
         satellite_list = l2c_sat
         apriori_path_f = myxdir + '/input/' + station + '_phaseRH.txt'
 

@@ -102,8 +102,17 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     if fr == 'all':
         fr_list = [1, 20]
+        ex = qp.apriori_file_exist(station,20)
+        if (not ex):
+            print('No apriori RH file exists. Run vwc_input')
+            sys.exit()
     else:
         fr_list = [int(fr)]
+        ex = qp.apriori_file_exist(station,int(fr))
+        if (not ex):
+            print('No apriori RH file exists. Run vwc_input')
+            sys.exit()
+
 
     # in case you want to analyze multiple days of data
     if not doy_end:

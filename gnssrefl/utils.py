@@ -135,11 +135,20 @@ def read_files_in_dir(directory, transpose=False):
                 if result_files is not None:
                     for file in result_files:
                         # need to find a better way than guessing file size but this removes the UserWarning when no data in file
-                        if file.stat().st_size > 500:
+                        # removing this line KL -  2022 september 7
+                        # there are better ways to remove the UserWarning...
+                        # if file.stat().st_size > 500:
+                        if True:
                             file_data = np.genfromtxt(file, comments='%')
-                            # Do not write to file with an empty result
-                            if len(file_data) > 0:
-                                data.extend(file_data)
+                        # current code fails when there is a single line of results
+                            nr = np.shape(file_data); nr2 = np.shape(file_data.T)
+                            if (nr == nr2):
+                                print('found one line of results')
+                            # throwing out one row results for now.  Someone else needs to fix because
+                            # i am unfamiliar with extend. 
+                            else :
+                                if (len(file_data) > 0): 
+                                    data.extend(file_data)
                     if data is not None:
                         if transpose:
                             data = np.array(data)

@@ -690,6 +690,33 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
 
         fout.close()
     return tv
+
+def apriori_file_exist(station,fr):
+    """
+
+    parameters
+    ---------
+    station : string
+
+    fr : integer
+        frequency
+        
+    returns
+    ----------
+    boolean as to whether the apriori file exists
+    """
+    # do not have time to use this
+    file_manager = FileManagement(station, FileTypes.apriori_rh_file)
+    # for l2c
+    myxdir = os.environ['REFL_CODE']
+    apriori_path_f = myxdir + '/input/' + station + '_phaseRH.txt'
+
+    if (fr == 1):
+        apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
+    
+    return os.path.exists(apriori_path_f) 
+
+
 # Old code.  SHould be deleted
 # why is this being done this way!
 #years = np.floor(fdate)
