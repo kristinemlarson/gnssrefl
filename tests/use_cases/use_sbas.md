@@ -1,4 +1,4 @@
-## Steenbras Dam, Lower
+## Steenbras Dam, South Africa
 
 **Station Name:** sbas
 
@@ -16,10 +16,9 @@
 
 
 The data used here have been kindly provided by TRIGNET so that we could access L1 and L2C signals 
-at 15 second sampling. This sampling rate is needed to be able to see the reservoir.  
-However, they are in a proprietary Trimble binary format.  
-It is non-trivial to convert those to RINEX, so in this example we will rely on files translated 
-and archived by UNAVCO for this use case example. They can be used by specifying the "special" archive.
+at 15 second sampling. This sampling rate is needed to be able to see the reservoir. However, they are in a proprietary Trimble binary format.  
+It is non-trivial to convert those to RINEX, so in this example we will rely on files translated and 
+archived by UNAVCO for this use case example. They can be used by specifying the "special" archive.
 Here we will only discuss GPS - but eventually Glonass will be added.
 
 ### Reflection Zones 
@@ -78,27 +77,29 @@ Save your analysis strategy:
 Hand edit the json file to restrict azimuths to 0-78 degrees.
 
 The next step is to estimate reflector heights. First do a single day using the plt option.
-I've added an arrow to show you what happens if you violate the Nyquist - double peaks!
-Luckily this is not prevalent in this dataset thanks to the help of TRIGNET 
-using a 15 second sample rate in the files.
 
 <code>gnssir sbas 2021 1 -plt T</code>
 
 <img src=sbas_gnssir_l1.png width=600/>	
 
-Notice that the L2C frequency - which has a longer wavelength - does not have a double peak.
-And that is what we should expect.
+I've added an arrow to show you what happens if you violate the Nyquist - double peaks!
+Luckily this is not prevalent in this dataset thanks to the help of TRIGNET 
+using a 15 second sample rate in the files.
 
-<code>gnssir sbas 2021 1 -plt T -fr 20 </code>
+The next plot will be L2C:
 
 <img src=sbas_gnssir_l2c.png width=600 />
 
-Go ahead and estimate reflector height for all days:
+Notice that the L2C frequency - which has a longer wavelength than L1 - does not have a double peak.
+And that is what we should expect.
+
+Go ahead and estimate reflector heights for all available days:
 
 <code>gnssir sbas 2021 1 -doy_end 366</code>
 
-Compute a daily average. Since we only have reflections in one geographic quadrant, and are 
-only using GPS signals, we should not require as many points as we have done in other examples:
+Compute a daily average. Since we only have reflections in one geographic quadrant and are 
+only using GPS signals, we should not require as many points as we have done in other examples. 
+I am going to start by requiring 10:
 
 <code>daily_avg sbas 0.25 10</code>
 
@@ -106,11 +107,11 @@ Number of available values per day:
 
 <img src=sbas_4.png width=600 />
 
-Daily average reflector height results. Note the missing points - this has nothing 
-to do with reflectometry. These are days when the station did not report data.
+Daily average reflector height results. 
 
 <img src=sbas_2.png width=600 />
 
+Note the missing points - this has nothing to do with reflectometry. These are days when the station did not report data.
 Numerical values are saved in a file. The location of the file is printed to the screen.
 
 ### Compare with in situ data:
@@ -120,5 +121,9 @@ Numerical values are saved in a file. The location of the file is printed to the
 [This is a link for all reservoirs](https://www.dws.gov.za/Hydrology/Weekly/ProvinceWeek.aspx?region=WC)
 
 Simon Williams found this web app that will [provide 2020 data for a comparison](https://www.dws.gov.za/Hydrology/Verified/HyData.aspx?Station=G4R001100.00&DataType=Point&StartDT=2020-01-01&EndDT=2020-12-31&SiteType=RES)
+
+As a final remark, there are lots of lake/reservoir/river gauges around the world. The beauty of using this GPS dataset to measure 
+the reservoir level is that you can combine these RH values with the [height estimates from "normal" GPS](http://geodesy.unr.edu/NGLStationPages/stations/SBAS.sta).
+This means your reservoir measurements are in ITRF and that is something **no other in situ lake level measuring system can do.**
 
 Kristine M. Larson September 6, 2022
