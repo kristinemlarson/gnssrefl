@@ -7,8 +7,6 @@
 
 **github version: 1.1.5** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
-**The pypi version is out of date. We are working to fix this.**
-
 *Please wait - We are confirming whether this information is correct.* 
 Would you like to join our <code>gnssrefl</code> users email list?
 Send an email to gnss-ir-request@postal.unavco.org and put the word
@@ -439,11 +437,18 @@ From your gnssrefl directory (that has the Dockerfile):
 
 If you want to mount volumes you could copy the -v syntax from the unavdocker/gnssrefl docker run command.
 
-<PRE>
-make a package for pypi
+**make a package for pypi**
 
 python setup.py sdist bdist_wheel
 
 upload a package to pypi
 
 twine upload dist/*
+
+
+**Issues with numpy**
+
+https://numpy.org/devdocs/reference/distutils_status_migration.html
+
+**When making pypi version**
+export SETUPTOOLS_USE_DISTUTILS=stdlib
