@@ -1,10 +1,10 @@
-import sys
 
-import gnssrefl.gps as g
 import argparse
 import numpy as np
+import sys
 
 
+import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
 from gnssrefl.utils import str2bool
 
@@ -21,22 +21,21 @@ def parse_arguments():
     parser.add_argument("-e1", default=None, type=int),
     parser.add_argument("-e2", default=None, type=int),
     parser.add_argument("-plot", default=None, type=str)
-    parser.add_argument("-screenstats", default=None, type=str)
-    parser.add_argument("-compute_lsp", default=None, type=str)
+    parser.add_argument("-screenstats", default=None, type=str, help="stats come to the screen")
+    parser.add_argument("-gzip", default=None, type=str, help="gzip SNR files" )
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plot', 'screenstats', 'compute_lsp']
+    boolean_args = ['plot', 'screenstats', 'gzip']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
 
-def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66,
-               fr: str = '20', e1: int = 5, e2: int = 30, plot: bool = False, screenstats: bool = False,
-               compute_lsp: bool = True):
+def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66, 
+        fr: str = '20', e1: int = 5, e2: int = 30, plot: bool = False, screenstats: bool = False, gzip:bool=False):
     """
     quickphase uses the apriori result file to restrict the number of satellite arcs that are used.
 
@@ -62,12 +61,12 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         Default is None.
 
     snr : integer, optional
-        SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
+        SNR format. This tells the code what elevation angles are in the SNR file
         value options:
-            66 (default) : saves all data with elevation angles less than 30 degrees
-            99 : saves all data with elevation angles between 5 and 30 degrees
-            88 : saves all data with elevation angles between 5 and 90 degrees
-            50 : saves all data with elevation angles less than 10 degrees
+            66 (default) : data with elevation angles less than 30 degrees
+            99 : data with elevation angles between 5 and 30 degrees
+            88 : data with elevation angles between 5 and 90 degrees
+            50 : data with elevation angles less than 10 degrees
 
     fr : string, optional
         GNSS frequency. Currently only supports L2C.
@@ -89,16 +88,14 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         Whether to print stats to the screen.
         Default is False
 
-    compute_lsp: boolean, optional
-        Whether to compute the LSP.
-        Default is True
-
     Returns
     _______
     Saves a file for each day in the doy-doy_end range: $REFL_CODE/<year>/phase/<station>/<doy>.txt'
     columns in files:
     year doy hour phase nv azimuth sat ampl emin emax delT aprioriRH freq estRH pk2noise LSPAmp
     """
+
+    compute_lsp = True # used to be an optional input
 
     if fr == 'all':
         fr_list = [1, 20]
@@ -143,11 +140,12 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
             for d in date_range:
                 print('Analyzing year/day of year ' + str(y) + '/' + str(d))
-                qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp)
+                qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp, gzip)
     else:
         for d in np.arange(doy, doy_end + 1):
-            print('Analyzing year/day of year ' + str(year) + '/' + str(d))
-            qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp)
+            # this is redundant
+            #print('Analyzing year/day of year ' + str(year) + '/' + str(d))
+            qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp, gzip)
 
 
 def main():

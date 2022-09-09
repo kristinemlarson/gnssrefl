@@ -19,7 +19,7 @@ The data used here have been kindly provided by TRIGNET so that we could access 
 at 15 second sampling. This sampling rate is needed to be able to see the reservoir. However, they are in a proprietary Trimble binary format.  
 It is non-trivial to convert those to RINEX, so in this example we will rely on files translated and 
 archived by UNAVCO for this use case example. They can be used by specifying the "special" archive.
-Here we will only discuss GPS - but eventually Glonass will be added.
+Here we will only discuss GPS - I would encourage you to also look at the Glonass data.
 
 ### Reflection Zones 
 
@@ -127,6 +127,6 @@ Simon Williams found this web app that will [provide 2020 data for a comparison]
 
 As a final remark, there are lots of lake/reservoir/river gauges around the world. The beauty of using this GPS dataset to measure 
 the reservoir level is that you can combine these RH values with the [height estimates from "normal" GPS](http://geodesy.unr.edu/NGLStationPages/stations/SBAS.sta).
-This means your reservoir measurements are in ITRF and that is something **no other in situ lake level measuring system can do.**
+This means your reservoir measurements are in ITRF and that is something *no other in situ lake level measuring system can do.*
 
 Kristine M. Larson September 6, 2022

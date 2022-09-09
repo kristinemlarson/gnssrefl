@@ -224,7 +224,7 @@ def test_func_new(x, a, b, rh_apriori,freq):
     return a * np.sin(freq_least_squares * x + b)
 
 
-def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp):
+def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip):
     """
     This does the main work of estimating phase and other parameters from the SNR files
     it uses tracks that were predefined by the apriori.py code
@@ -258,6 +258,9 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
     compute_lsp : boolean
         this is always true
+
+    gzip : boolean
+        whether you want SNR files gzipped after running the code
 
     only GPS frequencies are allowed
 
@@ -357,7 +360,9 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
                                 result = [[year, doy, utctime, phase, nv, avg_azim, sat_number, amp, min_el, max_el, del_t, rh_apriori, freq, max_f, obs_pk2noise, max_amp]]
                                 np.savetxt(my_file, result, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f", comments="%")
-
+        # gzip SNR file if requested
+        if gzip:
+            subprocess.call(['gzip', obsfile])
 
 
 def low_pct(amp, basepercent):
