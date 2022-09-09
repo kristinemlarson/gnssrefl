@@ -4,15 +4,23 @@
 
 **Location:** Elbe River, Germany
 
-**Archives:** Highest quality files are at the [BFG](https://www.bafg.de/EN/Home/homepage_en_node.html) 
+**Archives:** [BFG](https://www.bafg.de/EN/Home/homepage_en_node.html) 
 
 [Station Page at NGL](http://geodesy.unr.edu/NGLStationPages/stations/TGGO.sta)
 
+<p align=center>
+<img src=TGGO.JPG width=600</img>
+</p>
+
+TGGO is a station in 
+the [BfG-GNSS Monitoring Network](https://fig.net/resources/proceedings/fig_proceedings/fig2021/papers/ts05.4/TS05.4_esch_11010.pdf). It is located in the Elbe River. It is colocated with a tradtional 
+tide gauge. It has excellent visibilty of the water.  
+
 ### Reflection Zones for TGGO
 
-[Type tggo into the station name and first use the defaults at our reflection zone web site.](http://gnss-reflections.org/rzones)
+[Type tggo into the station name for our reflection zone web site.](http://gnss-reflections.org/rzones)
 Generally for water, I recommend using up to 15 degree elevation angles.
-Note that the height of the GNSS antenna above sea level is provided by the web app and returned on the right hand side.
+Note that the height of the GNSS antenna above sea level is returned on the right hand side.
 We will compare that value with the estimated reflector height.
 [It does look like there might be some kind of pier that we should avoid](http://gnss-reflections.org/rzones?station=tggo&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&freq=1&nyquist=0&srate=30&eang=1&azim1=-90&azim2=180&system=gps)
 
@@ -27,10 +35,11 @@ producing in summer 2022. Using <code>rinex2snr</code>, make the following choic
 - orb gnss (you can also use rapid after mid-2021)
 - samplerate 15
 
+<code>rinex2snr tggo00deu 2022 234 -archive bfg -orb rapid -samplerate 15</code>
+
 You will need a password for the BFG archive which is available upon request.
 While you can also find TGGO data at SONEL, it will likely be the 30 second data which is not 
 as useful as the 15 second data.
-
 
 ### First evaluation of the data for TGGO
 
@@ -56,7 +65,6 @@ where we saw the pier in the photograph.
 ### Analyze the data
 
 Go back and make SNR files for a longer time period:
-
 
 <code>rinex2snr tggo00deu 2022 226 -doy_end 240 -archive bfg -orb rapid -samplerate 15</code>
 
