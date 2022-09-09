@@ -30,6 +30,8 @@
 
 * [Lake Malawi, Tanzania](use_cases/use_mbbc.md) (mbbc)
 
+* [Elbe River, Germany](use_cases/use_tggo.md) (tggo)
+
 </TD>
 <TD>
 <B>Soil Moisture </B>

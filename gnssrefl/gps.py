@@ -4848,11 +4848,11 @@ def rinex_nrcan_highrate(station, year, month, day):
     gns = 'ftp://cacsa.nrcan.gc.ca/gps/data/hrdata/' +cyy + cdoy + '/' + cyy + 'd/'
 
     # no point downloading data if the teqc code is not there
-    if not os.path.isfile(teqcpath):
-        print('FATAL WARNING: You need to install teqc to use gnssrefl with highrate RINEX data from NRCAN.')
-        print('If you have time, please submit a pull request using gfzrnx instead of teqc for the file merge section.')
-        print('gfzrnx is supported; teqc is not.')
-        return
+    #if not os.path.isfile(teqcpath):
+    #    print('FATAL WARNING: You need to install teqc to use gnssrefl with highrate RINEX data from NRCAN.')
+    #    print('If you have time, please submit a pull request using gfzrnx instead of teqc for the file merge section.')
+    #    print('gfzrnx is supported; teqc is not.')
+    #    return
 
     foundFile = 0
     print('WARNING: downloading highrate RINEX data is a slow process')

@@ -239,9 +239,13 @@ mask and reflector height range. This is one of the reasons <code>quickLook</cod
 
 <code>download_rinex</code> can be useful if you want to 
 download RINEX v2.11 or 3 files (using the version flag) without using 
-the reflection-specific codes. Sample calls:
+the reflection-specific codes. As with <code>rinex2snr</code>, the default archive is 
+to check unavco, sopac, and sonel in that order. For other archives, you must specify their name.
+For a listing of supported archives, please see the documentation for [rinex2snr](docs/rinex2snr.md).
 
-- <CODE>download_rinex p041 2020 6 1</CODE> downloads the data from June 1, 2020
+Sample calls:
+
+- <CODE>download_rinex p041 2020 6 1</CODE> downloads the RINEX 2.11 data from June 1, 2020
 
 - <CODE>download_rinex p041 2020 150 0</CODE> downloads the data from day of year 150 in 2020
 
@@ -250,7 +254,8 @@ the reflection-specific codes. Sample calls:
 - <CODE>download_rinex onsa00swe 2020 150 0 -archive cddis</CODE> downloads the RINEX 3 data 
 from the cddis archive on day of year 150 in 2020
 
-<code>download_orbits</code> downloads orbit files and stores them in $ORBITS. See -h for more information.
+<code>download_orbits</code> downloads orbit files and stores them in $ORBITS. The list of orbits 
+we support changes regularly. Please see the [rinex2snr documentation](docs/rinex2snr.md).
 
 <code>ymd</code> translates year,month,day to day of year
 

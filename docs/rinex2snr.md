@@ -1,13 +1,11 @@
 ### rinex2snr - Extracting SNR data from RINEX/NMEA files <a name="module1"></a>
 
-The international standard for sharing GNSS data is called 
-the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt). (If you are using NMEA files, please see
-the bottom of this section). 
+The international standard for sharing GNSS data is called the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt). (If you are using NMEA files, please see the bottom of this section). 
 A RINEX file has extraneous information in it (which we will throw out) - and it 
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
 The first task you have in GNSS-IR is to translate from RINEX into what I will call 
-the SNR format. The latter will include azimuth and elevation angles. For the 
-latter you will need an **orbit** file. <code>rinex2snr</code> will go get an orbit file for you. It will save
+the **SNR format**. The latter will include azimuth and elevation angles. To compute these 
+angles you will need an **orbit** file. <code>rinex2snr</code> will try to get an orbit file for you. It will save
 those orbit files in case you want to use them at some later date. You can override the default orbit 
 choice by selections given below.
 
@@ -27,8 +25,7 @@ GPS satellites, on day of year 132 and year 2020 would be:
 <code>rinex2snr p041 2020 132</code>
 
 If the RINEX file for <code>p041</code> is in your local directory, it will translate it.  If not, 
-it will check three archives (unavco, sopac, and sonel) to find it. This uses the hybrid translator.  
-
+it will check three archives (unavco, sopac, and sonel) to find it. 
 
 **Examples for different translators:**
 
@@ -77,10 +74,12 @@ only uses four character statiion names, the last four values will be used as th
  
 **Examples using RINEX 3:**
 
-If your station name has 9 characters (lower case please), 
-the code assumes you are looking for a RINEX 3 file. However, my code will store the SNR data using the normal
-4 character name. *You must install the gfzrnx executable that translates 
-RINEX 3 to 2 to use RINEX 3 files in my code.* 
+If your station name has 9 characters (lower case please), the code assumes you are looking for 
+a RINEX 3 file. However, my code will store the SNR data using the normal
+4 character name. *You must install the gfzrnx executable that translates RINEX 3 to 2 to 
+use RINEX 3 files in this code.* If you followed the instructions for installation, this 
+is already taken care of.
+
 <code>rinex2snr</code> currently supports RINEX3 for 30 second data at :
 
 - unavco
@@ -89,6 +88,8 @@ RINEX 3 to 2 to use RINEX 3 files in my code.*
 - bkg
 - epn
 - ga
+- bfg
+- sonel
 
 The caveat is that UNAVCO is set to 15 sec because that is mostly what is there.
 If you don't know where your data are, you can try <code>-archive all</code>, 
@@ -109,7 +110,7 @@ annoying thing, I look for both files without you having to set it.
 The snr options are mostly based on the need to remove the "direct" signal. This is 
 not related to a specific site mask and that is why the most frequently used 
 options (99 and 66) have a maximum elevation angle of 30 degrees. The
-azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices are:
+azimuth-specific mask is decided later when you run <code>gnssir</code>.  The SNR choices are:
 
 - 66 is elevation angles less than 30 degrees (**this is the default**)
 - 99 is elevation angles of 5-30 degrees  
@@ -152,12 +153,17 @@ Just put the RINEX files in the same directory where you are running the code, u
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
-If you invoke this flag, you need to specify the archive.  Your choices are Rinex2 data from UNAVCO,
-CDDIS, or NRCAN OR Rinex3 data at CDDIS.
-<a href=https://www.ga.gov.au/>Geoscience Australia</a> has high-rate GNSS data - but they 
-are currently deleting modern GPS signals. This is a deal breaker for me. Until that is changed, I cannot 
-recommend you use high-rate GNSS data from Geoscience Australia for reflectometry. Access to high-rate data from 
-their archive is not provided in this software.
+If you invoke this flag, you need to specify the archive. Your choices for high-rate Rinex2 data are:
+
+- UNAVCO 
+- CDDIS
+- NRCAN  
+
+For RINEX 3 high-rate data:
+
+- CDDIS
+- GA 
+- BKG
 
 For high-rate data, you should **never** use the python translation option.
 
@@ -214,7 +220,7 @@ very long station file name are no doubt useful, but they are not recognized by 
 
 <code>rinex2snr onsa00swe 2021 305 -nolook True </code>
 
-If you have something other than 30 second sampling, it can be set with -srate.
+If you have something other than 30 second sampling, it can be set with -samplerate.
 
 The RINEX inputs are always deleted, so do not put your only copy of the files in the working directory.
 Please note: we are using the publicly available <code>gfzrnx</code> code to convert RINEX 3 files into RINEX 2.11 files. 
