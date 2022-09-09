@@ -49,7 +49,9 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
     gzip = lsp['gzip']
     # this had a bug in it.
+    #print('Number of azimuths', len(azval))
     for i in range(0,len(azval),2):
+        #print(i, azval[i], azval[i+1])
         if (azval[i+1] - azval[i]) > 100:
             print('FATAL WARNING: You are prohibited from having an azimuth range that is larger than 100 degrees.')
             print('Azimuth values:', azval[i], azval[i+1])

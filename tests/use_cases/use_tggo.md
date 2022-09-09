@@ -48,12 +48,17 @@ These are summarized below.
 
 <img src=tggo_ql2.png width=600>
 
+The "blue" retrievals here show that the GNSS antenna is indeed ~12 meters above the water. The variation 
+in reflector height (as seen in the periodograms and in this summary with respect to azimuth) are the tides.  
+I've outlined in red the azimuth region that shows consistently rejected retrievals.  This corresponds to 
+where we saw the pier in the photograph.  
+
 ### Analyze the data
 
 Go back and make SNR files for a longer time period:
 
 
-<code>rinex2snr tggo00deu 2022 230 -doy_end 244 -archive bfg -orb rapid -samplerate 15</code>
+<code>rinex2snr tggo00deu 2022 226 -doy_end 240 -archive bfg -orb rapid -samplerate 15</code>
 
 Since tggo is included in our global database, you can simply use 0,0,0 for the *a priori* station coordinates:
 I am using a slightly smaller reflector height zone.
@@ -65,7 +70,7 @@ the red box above.
 
 Now estimate reflector heights for these same dates: 
 
-<code>gnssir tggo 2022 230 -doy_end 244 </code>
+<code>gnssir tggo 2022 226 -doy_end 240 </code>
 
 To put those results all together:
 
@@ -79,7 +84,8 @@ retrievals will significantly improve.
 <img src=tggo_1.png width=600>
 
 The reflector heights are then plotted as a function of constellation (GPS, Glonass, Galileo), azimuth, and 
-amplitude of the periodogram:
+amplitude of the periodogram. These can be useful if you are trying to assess whether your azimuth mask 
+is working.
 
 <img src=tggo_2.png width=600>
 
