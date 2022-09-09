@@ -28,11 +28,11 @@ We will compare that value with the estimated reflector height.
 
 Because the GNSS station is ~12 meters above the water, we are too close to the L1 Nyquist 
 for a receiver that is sampling at 30 seconds.  I recommend using the 15 second files that BFG started 
-producing in summer 2022. Using <code>rinex2snr</code>, make the following choices:
+producing in summer 2022. Make the following choices:
 
 - station tggo00deu (the longer station name will tell the code to find RINEX 3 instead of RINEX 2.11)
 - archive bfg
-- orb gnss (you can also use rapid after mid-2021)
+- orb rapid (you can also use gnss if you prefer)
 - samplerate 15
 
 <code>rinex2snr tggo00deu 2022 234 -archive bfg -orb rapid -samplerate 15</code>
@@ -57,10 +57,7 @@ These are summarized below.
 
 <img src=tggo_ql2.png width=600>
 
-The "blue" retrievals here show that the GNSS antenna is indeed ~12 meters above the water. The variation 
-in reflector height (as seen in the periodograms and in this summary with respect to azimuth) are the tides.  
-I've outlined in red the azimuth region that shows consistently rejected retrievals.  This corresponds to 
-where we saw the pier in the photograph.  
+All three plots are with respect to azimuth in degrees. On the top plot, the "blue" retrievals show that the GNSS antenna is indeed ~12 meters above the water. The variation in reflector height (with respect to azimuth) are the tides. I've outlined in red the azimuth region that shows consistently rejected retrievals. This roughly corresponds to where we saw the pier in the photograph.  
 
 ### Analyze the data
 
@@ -68,8 +65,9 @@ Go back and make SNR files for a longer time period:
 
 <code>rinex2snr tggo00deu 2022 226 -doy_end 240 -archive bfg -orb rapid -samplerate 15</code>
 
-Since tggo is included in our global database, you can simply use 0,0,0 for the *a priori* station coordinates:
-I am using a slightly smaller reflector height zone.
+The next step is to write down your analyis strategy using <code>make_json_input</code>. Since tggo is 
+included in our global database, you can simply use 0,0,0 for the required *a priori* station coordinates:
+I am using a slightly smaller reflector height zone than I used with <code>quickLook</code>.
 
 <code>make_json_input tggo 0 0 0 -h1 6 -h2 20 -e1 5 -e2 15 -h1 6 -h2 18 -allfreq T</code>
 
@@ -85,14 +83,14 @@ To put those results all together:
 <code>subdaily tggo 2022</code>
 
 Multiple figures come to the screen. The first will summarize how much each
-constellation contributes. Because of restrictions for this particular receiver, the Galileo 
+constellation contributes. Because of restrictions for this particular receiver type, the Galileo 
 signals are degraded for reflections. When a new receiver is installed, the Galileo 
 retrievals will significantly improve.
 
 <img src=tggo_1.png width=600>
 
 The reflector heights are then plotted as a function of constellation (GPS, Glonass, Galileo), azimuth, and 
-amplitude of the periodogram. These can be useful if you are trying to assess whether your azimuth mask 
+amplitude of the reflector height periodogram. These can be useful if you are trying to assess whether your azimuth mask 
 is working.
 
 <img src=tggo_2.png width=800>
