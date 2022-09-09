@@ -95,7 +95,7 @@ The reflector heights are then plotted as a function of constellation (GPS, Glon
 amplitude of the periodogram. These can be useful if you are trying to assess whether your azimuth mask 
 is working.
 
-<img src=tggo_2.png width=600>
+<img src=tggo_2.png width=800>
 
 Time series with large outliers removed.
 
