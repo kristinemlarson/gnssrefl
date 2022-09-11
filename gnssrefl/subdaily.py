@@ -20,12 +20,21 @@ import math
 
 def print_badpoints(t,outliersize):
     """
-    ????
-    input: station name and lomb scargle result array of "bad points"
-    second input is the size of the outlier, in meters
-    author: kristine larson
+    parameters
+    -------------
+    t : numpy array
+        lomb scargle result array of "bad points". Format given below
+
+    outliersize: float
+        outlier criterion, in meters
+
+    returns
+    ----------
+    writes to a file called outliers.txt
 
     """
+# format of t 
+
 # (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)
 # year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS
 # (0)  (1)   (2) (3)  (4)     (5)   6 )    (7)    (8)   (9)  (10) (11) (12)    (13)     (14)    (15)  (16) ... 
@@ -48,18 +57,14 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     ----------------
     txtdir : str
         the directory where the results should be written out
-
     txtfile : str
         name of the output file
-        
     csvfile : boolean
         cl input whether the output file should be csv format
-
     jsonfile : boolean
         cl input for whether the output file should be in the json format
 
     default is plain txt file
-
 
     returns
     -----------
@@ -100,6 +105,8 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
 
 def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     """
+    writes out the results
+
     parameters
     -----------
     input: str
@@ -410,7 +417,12 @@ def quickTr(year, doy,frachours):
 
 def fract_to_obstimes(spl_x):
     """
-    this should be documented!
+    this does not seem to be used
+    spl_x : numpy array
+        fractional time 
+
+    obstimes : numpy array
+        datetime format
     """
     N=len(spl_x)
     obstimes = np.empty(shape=[0, 1])
@@ -1041,17 +1053,31 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
 
 def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     """
-    having calculated and applied RHdot corretion
-    AND applied the frequency biases
-    tnew is time in doy
-    ynew is rhdot corrected RH in meters (not currently used)
-    biasCorr_ynew has frequency biases removed (empirically defined)
-    pltit - boolean, for screen viewing
-    txtdir - where the plots will go ($REFL_CODE/Files
-    station - just for the title and name of plot
+    having calculated and applied RHdot correction
+    AND applied the frequency biases, create new plots
+
+    parameters
+    -------------
+    tnew : numpy array
+        day of year 
+    ynew : numpy array
+        float of reflector heights rhdot corrected (meters)
+    ynew : numpy array
+        float of reflector heights rhdot and freq bias corrected (meters)
+    pltit : boolean
+        plots to the screen
+    txtdir : string
+         directory for output (e.g. $REFL_CODE/Files)
+    station : string
+        station name used for the plot titles and filenames
+
+    returns
+    ---------
+    res : numpy array
+        residuals to spline fit, in meters
 
     """
-    fs = 10
+    fs = 10 # font size
     ynew = biasCorr_ynew
     # now sort them again ....
     ii = np.argsort(tnew)

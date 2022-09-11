@@ -5249,5 +5249,6 @@ def cddis_download_2022B(filename,directory):
     ftps.prot_p()
     ftps.cwd(directory)
     ftps.retrbinary("RETR " + filename, open(filename, 'wb').write)
-
+    #r=requests(filename)
+    #print('filesize ', r.size)
 

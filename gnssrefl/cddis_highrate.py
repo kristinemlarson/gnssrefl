@@ -93,6 +93,8 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
                             subprocess.call(['rm',crnx_name2])
                 except:
                     print('Failure using cddis_download_2022B')
+                    subprocess.call(['rm','-f',file_name])
+
                 if os.path.isfile(oname):
                     fileF = fileF + 1
     if version == 2:

@@ -391,31 +391,8 @@ Kristine M. Larson
 GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, EAR 1144221, AGS 1449554) and 
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was developed with support from NASA (80NSSC20K1731).
 
-This documentation was updated on August 29, 2022
+This documentation was updated on September 10, 2022
 <HR>
-
-Local notes:
-f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
-docker pull unavdocker/gnssrefl to install code. 
-
-[Quick link to the command line homeworks used in the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks). They are numbered homework0, homework1, etc.
-[Quick link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
-
-[Quick link to Docker](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)
-
-[Old quick link to Docker](https://hub.docker.com/r/unavdocker/gnssrefl)
-
-cddis links:
-
-[highrate data](https://cddis.nasa.gov/archive/gnss/data/highrate/2019/150/19d/00/)
-
-[geodetic data rate](https://cddis.nasa.gov/archive/gnss/data/daily/2018/015/18d/)
-
-[readme](https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html)
-
-[how to get a listing of orbits on a given GPS week (but not multi-GNSS)...](https://cddis.nasa.gov/archive/gnss/products/2037/)
-
-[multi-GNSS](https://cddis.nasa.gov/archive/gps/products/mgex/2037/)
 
 
 **File structure for station abcd in the year YYYY (last two characters YY), doy DDD:**
@@ -438,28 +415,3 @@ RINEX files are not stored by this code. In fact, quite the opposite. If they ar
 they are deleted. Do not keep your only copy of RINEX files in your default directory.
 
 
-**How to build your own docker image**
-
-From your gnssrefl directory (that has the Dockerfile):
-
-<code>docker build --no-cache -t <imagename> .</code>
-
-<code>docker run -it <imagename> /bin/bash</code>
-
-If you want to mount volumes you could copy the -v syntax from the unavdocker/gnssrefl docker run command.
-
-**make a package for pypi**
-
-python setup.py sdist bdist_wheel
-
-upload a package to pypi
-
-twine upload dist/*
-
-
-**Issues with numpy**
-
-https://numpy.org/devdocs/reference/distutils_status_migration.html
-
-**When making pypi version**
-export SETUPTOOLS_USE_DISTUTILS=stdlib
