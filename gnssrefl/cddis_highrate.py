@@ -61,10 +61,17 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
                 oname = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.rnx' # do we need this?
 
             new_way_dir = '/gnss/data/highrate/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/' + ch + '/'
-            print(station,new_way_dir,file_name)
             if os.path.isfile(oname):
+                print('Found it:', new_way_dir,file_name)
+                fileF = fileF + 1
+            elif os.path.isfile(file_name):
+                print('Found gzip/hatanaka file:', new_way_dir,file_name)
+                subprocess.call(['gunzip',file_name])
+                subprocess.call([crnxpath, crnx_name])
+                subprocess.call(['rm',crnx_name])
                 fileF = fileF + 1
             else:
+                print('Looking for:', new_way_dir,file_name)
                 try:
                     #g.cddis_download(file_name,new_way_dir)
                     g.cddis_download_2022B(file_name,new_way_dir)
@@ -85,7 +92,7 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
                             subprocess.call([crnxpath, crnx_name2])
                             subprocess.call(['rm',crnx_name2])
                 except:
-                    okok = 1
+                    print('Failure using cddis_download_2022B')
                 if os.path.isfile(oname):
                     fileF = fileF + 1
     if version == 2:
