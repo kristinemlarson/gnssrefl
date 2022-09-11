@@ -137,6 +137,7 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
 
         return file_name,foundit
 
+
     try:
         if (archive == 'ign'):
             dir1='ftp://igs.ensg.ign.fr/pub/igs/data/' + cyyyy + '/' + cdoy + '/'
@@ -172,7 +173,8 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
             wget.download(dir1+file_name,file_name)
         elif (archive == 'cddis'):
             new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/'
-            g.cddis_download(file_name,new_way_dir)
+            g.cddis_download_2022B(file_name,new_way_dir)
+            #g.cddis_download(file_name,new_way_dir)
         else:
             return '', ''
     except:
@@ -366,12 +368,14 @@ def universal_rinex2(station, year, doy, archive):
             foundit = True
         else:
             new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyyyy[2:4] + 'd/'
-            g.cddis_download(file_name,new_way_dir) ;
+            g.cddis_download_2022B(file_name,new_way_dir) ;
+            #g.cddis_download(file_name,new_way_dir) ;
             if os.path.exists(file_name):
                 foundit = True
             else:
                 file_name = dname + '.Z'
-                g.cddis_download(file_name,new_way_dir) ;
+                g.cddis_download_2022B(file_name,new_way_dir) ;
+                #g.cddis_download(file_name,new_way_dir) ;
                 if os.path.exists(file_name):
                     foundit = True
     elif (archive == 'ga'):

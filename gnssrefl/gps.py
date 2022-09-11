@@ -14,6 +14,7 @@ import sqlite3
 from urllib.parse import urlparse
 import time
 from ftplib import FTP #import FTP commands from python's built-in ftp library
+from ftplib import FTP_TLS
 
 
 import scipy.signal as spectral
@@ -698,7 +699,8 @@ def rinex_cddis(station, year, month, day):
 
 
     try:
-        cddis_download(file_secure,dir_secure)
+        #cddis_download(file_secure,dir_secure)
+        cddis_download_2022B(file_secure,dir_secure)
         if os.path.exists(file1):
             subprocess.call(['uncompress', file1])
     except:
@@ -707,7 +709,8 @@ def rinex_cddis(station, year, month, day):
             subprocess.call(['rm', '-f',file1])
     if not (os.path.exists(oname)):
         try:
-            cddis_download(file2,dir_secure)
+            cddis_download_2022B(file2,dir_secure)
+            #cddis_download(file2,dir_secure)
             if os.path.exists(file2):
                 subprocess.call(['gunzip', file2])
         except:
@@ -820,7 +823,8 @@ def getsp3file(year,month,day):
         sec_file = file1
         try:
             #wget.download(url,file1)
-            cddis_download(sec_file, sec_dir) 
+            cddis_download_2022B(sec_file, sec_dir) 
+            #cddis_download(sec_file, sec_dir) 
             subprocess.call(['uncompress',file1])
             store_orbitfile(name,year,'sp3') 
         except:
@@ -888,7 +892,8 @@ def getsp3file_flex(year,month,day,pCtr):
         cddis = 'ftp://cddis.nasa.gov'
         url = cddis + filename1 
         try:
-            cddis_download(sec_file, sec_dir) 
+            cddis_download_2022B(sec_file, sec_dir) 
+            #cddis_download(sec_file, sec_dir) 
             #wget.download(url,file1)
             subprocess.call(['uncompress',file1])
             store_orbitfile(name,year,'sp3') 
@@ -1005,7 +1010,8 @@ def getsp3file_mgex(year,month,day,pCtr):
             secure_file = file1
             name = file1[:-2]
             print('Try the old sp3 filename',file1)
-            cddis_download(secure_file, secure_dir)
+            cddis_download_2022B(secure_file, secure_dir)
+            #cddis_download(secure_file, secure_dir)
             if os.path.isfile(file1):
                 subprocess.call(['uncompress', file1])
                 store_orbitfile(name,year,'sp3') ; foundit = True
@@ -1014,7 +1020,8 @@ def getsp3file_mgex(year,month,day,pCtr):
                 print('Try the new sp3file name', file2)
                 name = file2[:-3]
                 secure_file = file2
-                cddis_download(secure_file, secure_dir)
+                cddis_download_2022B(secure_file, secure_dir)
+                #cddis_download(secure_file, secure_dir)
                 if os.path.isfile(secure_file):
                     subprocess.call(['gunzip', file2])
                     store_orbitfile(name,year,'sp3') ; foundit = True
@@ -1055,7 +1062,8 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     foundit = False
     print(secure_dir, secure_file)
     try:
-        cddis_download(secure_file, secure_dir)
+        cddis_download_2022B(secure_file, secure_dir)
+        #cddis_download(secure_file, secure_dir)
         if os.path.isfile(secure_file):
             subprocess.call(['gunzip', file2])
             store_orbitfile(name,year,'sp3') ; 
@@ -3640,7 +3648,8 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     mdir = '/gps/data/daily/' + cyyyy + '/' + cdoy + '/' +cyy + 'n/'
 
     try:
-        cddis_download(cddisfile_compressed,mdir)
+        cddis_download_2022B(cddisfile_compressed,mdir)
+        #cddis_download(cddisfile_compressed,mdir)
         if os.path.isfile(cddisfile_compressed):
             subprocess.call(['uncompress',cddisfile_compressed])
     except:
@@ -3649,7 +3658,8 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     #    print(err)
     if not os.path.isfile(cddisfile):
         print('going for the gzip version of the file')
-        cddis_download(cddisfile_gzip,mdir)
+        cddis_download_2022B(cddisfile_gzip,mdir)
+        #cddis_download(cddisfile_gzip,mdir)
         if os.path.isfile(cddisfile_gzip):
             subprocess.call(['gunzip',cddisfile_gzip])
     
@@ -4557,7 +4567,8 @@ def get_cddis_navfile_test(navfile,cyyyy,cyy,cdoy):
     mdir = '/gps/data/daily/' + cyyyy + '/' + cdoy + '/' +cyy + 'n/'
 
     try:
-        cddis_download(cddisfile_compressed,mdir)
+        cddis_download_2022B(cddisfile_compressed,mdir)
+        #cddis_download(cddisfile_compressed,mdir)
         if os.path.isfile(cddisfile_compressed):
             subprocess.call(['uncompress',cddisfile_compressed])
     except:
@@ -4566,7 +4577,8 @@ def get_cddis_navfile_test(navfile,cyyyy,cyy,cdoy):
     #    print(err)
     if not os.path.isfile(cddisfile):
         print('going for the gzip version of the file')
-        cddis_download(cddisfile_gzip,mdir)
+        cddis_download_2022B(cddisfile_gzip,mdir)
+        #cddis_download(cddisfile_gzip,mdir)
         if os.path.isfile(cddisfile_gzip):
             subprocess.call(['gunzip',cddisfile_gzip])
 
@@ -4729,7 +4741,8 @@ def rinex3_nav(year,month,day):
     bname = 'BRDC00IGS_R_' + str(year) + cdoy + '0000_01D_MN.rnx'
     filename = bname + '.gz'
     print(dir_secure, filename)
-    cddis_download(filename,dir_secure)
+    cddis_download_2022B(filename,dir_secure)
+    #cddis_download(filename,dir_secure)
     status = subprocess.call(['gunzip', filename])
     if os.path.exists(bname):
         foundit = True
@@ -5198,3 +5211,43 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
         cm ='rm -f ' + searchpath
         subprocess.call(cm,shell=True)
     return rinex2, fexist
+
+
+def cddis_download_2022(filename,url):
+    """
+https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html
+    """
+# Reads the URL from the command line argument
+
+# Makes request of URL, stores response in variable r
+    r = requests.get(url,timeout=2)
+
+# Opens a local file of same name as remote file for writing to
+    with open(filename, 'wb') as fd:
+        for chunk in r.iter_content(chunk_size=1000):
+            fd.write(chunk)
+
+# Closes local file
+    fd.close()
+
+
+def cddis_download_2022B(filename,directory):
+    """
+    rewrote because cddis_download was failing
+    parameter:
+
+    filename : string
+        name of the rinex file or orbit file
+
+    directory : string
+        where the file lives at CDDIS
+
+    """
+    ftps = FTP_TLS(host = 'gdc.cddis.eosdis.nasa.gov')
+    email = 'kristine.larson@colorado.edu'
+    ftps.login(user='anonymous', passwd=email)
+    ftps.prot_p()
+    ftps.cwd(directory)
+    ftps.retrbinary("RETR " + filename, open(filename, 'wb').write)
+
+

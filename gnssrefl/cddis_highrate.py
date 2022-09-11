@@ -41,6 +41,8 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
     #YYYY/DDD/YYt/HH/mmmmDDDHMM.YYt.gz
 
     s1=time.time()
+    print('WARNING: CDDIS has changed the directory structure of older datasets. ')
+    print('WARNING: Please help modify this code / submit a pull request. ')
     print('WARNING: Get yourself a cup of coffeee. Downloading 96 files takes a long time.')
     fileF = 0
     streamID  = '_' + stream + '_'
@@ -64,7 +66,8 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
                 fileF = fileF + 1
             else:
                 try:
-                    g.cddis_download(file_name,new_way_dir)
+                    #g.cddis_download(file_name,new_way_dir)
+                    g.cddis_download_2022B(file_name,new_way_dir)
                     if (version == 3):
                         if os.path.isfile(file_name): 
                             subprocess.call(['gunzip',file_name])
@@ -76,7 +79,8 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
                             subprocess.call([crnxpath, crnx_name])
                             subprocess.call(['rm',crnx_name])
                         else:
-                            g.cddis_download(file_name2,new_way_dir)
+                            g.cddis_download_2022B(file_name2,new_way_dir)
+                            #g.cddis_download(file_name2,new_way_dir)
                             subprocess.call([exe2,file_name2])
                             subprocess.call([crnxpath, crnx_name2])
                             subprocess.call(['rm',crnx_name2])
