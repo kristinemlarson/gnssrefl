@@ -207,20 +207,26 @@ The files should be named as follows:
 
 <code>rinex2snr algo 2021 50 -nolook True</code>
 
-If you have RINEX 3 files, you should name them as follows:
+If you have ss second RINEX 3 files, they should be all upper case (except for the extension).
 
-- upper case (except for the extension)
+* station name (9 characters where the last 3 characters are the country), underscore 
+* capital R or capital S , underscore
+* four character year 
+* three character day of year 
+* four zeroes, underscore, 
+* 01D, underscore
+* ssS, underscore, M0. 
+* followed by rnx (crx if it is Hatanaka format).
 
-- station name (9 characters where the last 3 characters are the country), underscore, capital R, 
-underscore, four character year, three character day of year, four zeroes, underscore, 01D_30S_M0. followed by rnx 
-30S means it is 30 second sampling. 01D means it is one day. Some of the other parts of the 
-very long station file name are no doubt useful, but they are not recognized by this code.
+01D means it is one day. Some of the other parts of the very long station file name are no 
+doubt useful, but they are not recognized by this code. By convention, these files may be 
+gzipped but not unix compressed.
 
-- Example: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
+Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 
 <code>rinex2snr onsa00swe 2021 305 -nolook True </code>
 
-If you have something other than 30 second sampling, it can be set with -samplerate.
+If you have something other than 30 second sampling, use <code>-samplerate</code>.
 
 The RINEX inputs are always deleted, so do not put your only copy of the files in the working directory.
 Please note: we are using the publicly available <code>gfzrnx</code> code to convert RINEX 3 files into RINEX 2.11 files. 
