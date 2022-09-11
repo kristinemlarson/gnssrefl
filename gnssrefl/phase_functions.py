@@ -114,7 +114,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
 
     return snowmask_exists
 
-def vwc_plot(station,t_datetime, vwcdata, plot_path):
+def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
     """
     parameters
     ----------
@@ -128,6 +128,9 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path):
 
     plot_path : string
         where to put the plot
+
+    circles: boolean
+        circles in the plot. default is a line (really .-)
     """
     # i think this would work???
     # data = [[1, 2, 3, 4], [0, 2, 3, 4], [0, 0 , 3, 4], [0, 0, 0, 4]] 
@@ -140,8 +143,11 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path):
             vwcdata[i] = np.nan
 
     plt.figure(figsize=(10, 6))
-    plt.plot(t_datetime, vwcdata, 'b-')
-    plt.plot(t_datetime, vwcdata, 'b.')
+    if circles:
+        plt.plot(t_datetime, vwcdata, 'bo')
+    else:
+        plt.plot(t_datetime, vwcdata, 'b-')
+        plt.plot(t_datetime, vwcdata, 'b.')
     plt.title('GNSS Station ' + station.upper())
     plt.ylim(0, 0.5)
     plt.ylabel('Vol. Soil Moisture')
@@ -385,7 +391,7 @@ def low_pct(amp, basepercent):
     return lowval
 
 
-def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=-99):
+def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=-99,circles=False):
     """
     conversion from phase to VWC. Using Clara Chew algorithm
     from Matlab write_vegcorrect_smc.m
@@ -409,6 +415,9 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
 
     polyorder : integer
         override on the polynomial order used in leveling
+
+    circles : boolean
+        final plot using circles (instead of line)
 
     """
 
@@ -604,7 +613,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
 
 
     plot_path = f'{xdir}/Files/{station}_vol_soil_moisture.png'
-    vwc_plot(station,t_datetime, nv, plot_path) 
+    vwc_plot(station,t_datetime, nv, plot_path,circles) 
 
     if plt2screen:
         plt.show()

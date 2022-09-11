@@ -27,10 +27,11 @@ def parse_arguments():
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
     parser.add_argument("-minvalperday", default=None, type=int, help="minimum number of satellite tracks needed each day. Default is 10")
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean for attempting to remove days contaminated by snow")
+    parser.add_argument("-circles", default=None, type=str, help="circles instead of lines for the final VWC plot ")
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt2screen','screenstats','snow_filter']
+    boolean_args = ['plt2screen','screenstats','snow_filter','circles']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
@@ -296,7 +297,7 @@ def do_quad(vquad, year, year_end):
 
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen: bool = True, screenstats: bool = False, 
-        min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, snow_filter: bool = False):
+        min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, snow_filter: bool = False, circles: bool=False):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
     Parameters:
@@ -334,6 +335,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         whether you want to attempt to remove points contaminated by snow
         default is False
 
+    circles : boolean
+        whether you want circles in the final plot (lines are default)
 
     Returns
     _______
@@ -556,7 +559,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
         qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir)
 
-        qp.convert_phase(station, year, year_end, plt2screen,fr,polyorder)
+        qp.convert_phase(station, year, year_end, plt2screen,fr,polyorder,circles)
 
 
 def main():
