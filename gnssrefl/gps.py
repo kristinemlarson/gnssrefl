@@ -1947,7 +1947,6 @@ def find_satlist_wdate(f,snrExist,year,doy):
     now includes date informaiton so that accurate lists of l2c and l5
     transmitting satellites are reasonable (previously it was a full list for 
     current day, that may or may not be correct in the past)
-    author: kristine m. larson
     june 24, 2021: updated for SVN78
     """
     # get list of relevant satellites
@@ -2027,7 +2026,6 @@ def open_outputfile(station,year,doy,extension):
     inputs: station name, year, doy, and station name
     opens output file in REFL_CODE/year/results/station directory
     return fileID
-    author kristine m. Larson
     if the results directory does not exist, it tries to make it. i think
     june 2019, added snrending to output name
     july 2020, no longer open frej file
@@ -2299,7 +2297,6 @@ def make_snrdir(year,station):
     """
     given a year and station name, it makes various directories needed
     for SNR file/analysis outputs
-    author: kristine larson
     """
     xdir = os.environ['REFL_CODE'] + '/' + str(year)
     # check that directories exist
@@ -2316,7 +2313,6 @@ def store_snrfile(filename,year,station):
     """
     simple code to move an snr file to the right place 
     inputs are the filename, the year, and the station name
-    author: kristine larson
     """
     xdir = os.environ['REFL_CODE'] + '/' + str(year)
     # check that directories exist
@@ -2335,7 +2331,6 @@ def store_snrfile(filename,year,station):
 
 def rinex_name(station, year, month, day):
     """
-    author: kristine larson
     given station (4 char), year, month, day, return rinexfile name
     and the hatanaka equivalent
     """
@@ -2351,20 +2346,49 @@ def rinex_name(station, year, month, day):
 
 def snr_name(station, year, month, day,option):
     """
-    author: kristine larson
-    given station (4 char), year, month, day, and snr option,
-    return snr filename (and directory) using my system
+    parameters
+    --------
+    station : string
+
+    year : integer
+
+    month : integer
+
+    day : integer
+
+    option : integer
+        snr filename delimeter
+
+    returns
+    -----------
+    fname : string
+        snr filename 
     """
     doy,cdoy,cyyy,cyy = ymd2doy(year,month,day)
 
     fname = station + cdoy + '0.' + cyy + '.snr' + str(option)
+
     return fname
 
 def nav_name(year, month, day):
     """
-    kristine m. larson
-    inputs are year month and day
-    returns nav file name and directory
+    returns the name and location of the navigation file
+
+    parameters
+    -------------
+    year : integer
+
+    month : integer
+
+    day : integer
+
+    returns
+    ----------
+    navfilename : string
+        name of the navigation file
+
+    navfiledir : string
+        local directory where navigation file will be stored
     """
     if (day == 0):
         cyyyy, cyy, cdoy = ydoych(year,doy)
@@ -2376,7 +2400,6 @@ def nav_name(year, month, day):
 
 def sp3_name(year,month,day,pCtr):
     """
-    kristine m. larson
     inputs are year month and day and processing center
     returns sp3 file name and directory
     """
@@ -2389,7 +2412,6 @@ def sp3_name(year,month,day,pCtr):
 
 def rinex_unavco_highrate(station, year, month, day):
     """
-    author: kristine larson
     picks up a RINEX file from unavco.  it tries to pick up an o file,
     but if it does not work, it tries the "d" version, which must be
     decompressed.  the location of this executable is defined in the crnxpath
@@ -2438,7 +2460,6 @@ def rinex_unavco_highrate(station, year, month, day):
 
 def new_big_Disk_in_DC(station, year, month, day):
     """
-    author: kristine larson
     21aug28 uses https instead of ftp
 
     picks up gzip o file 

@@ -348,6 +348,13 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
      - Returns the VWC results in a file at $$REFL_CODE/<year>/phase/<station>_vwc.txt
         with columns: FracYr Year DOY  VWC Month Day
     """
+    if (len(station) != 4):
+        print('station name must be four characters')
+        sys.exit()
+
+    if (len(str(year)) != 4):
+        print('Year must be four characters')
+        sys.exit()
 
     freq = fr # KE kept the other variable
 

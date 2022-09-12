@@ -288,7 +288,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
     this assumes you follow my definitions for where things go,
     i.e. REFL_CODE and ORBITS
     it currently checks Unavco, SOPAC, and SONEL. I should add CDDIS
-    author: kristine m. larson
     19may20, added decimation
     19sep12, I got tired of code crashing for files > 20 observables.  I am thus using teqc
     20apr15, xz compression added but also try to streamline it.
@@ -888,10 +887,18 @@ def extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp):
 
 def elev_limits(snroption):
     """
-    given Kristine's snr option, return min and max elevation angles
-    in degrees
-    author: kristine larson
-    2020 august 7
+    parameters
+    ------------
+    snroption : integer
+        snr file delimeter
+
+    returns
+    ----------
+    emin: float
+        minimum elevation angle (degrees)
+    emax: float
+        maximum elevation angle (degrees)
+
     """
 
     if (snroption == 99):

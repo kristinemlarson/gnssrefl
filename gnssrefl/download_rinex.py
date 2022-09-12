@@ -34,7 +34,7 @@ def parse_arguments():
     parser.add_argument("-samplerate", default=None, type=str, help="Sample rate in seconds. For RINEX3 only.")
     parser.add_argument("-strip_snr", default=None, type=str, help="Uses gfzrnx to strip out non-SNR data/default is False")
     parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
-    parser.add_argument("-dec_rate", default=None, type=int, help="Does not work for all options.")
+    parser.add_argument("-dec", default=None, type=int, help="decimation value (seconds). Only for RINEX 3.")
 
     args = parser.parse_args().__dict__
 
@@ -48,7 +48,7 @@ def parse_arguments():
 
 def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = None,
                    version: int = 2, strip: bool = False, doy_end: int = None, stream: str = 'R', samplerate: int = 30,
-                   strip_snr: bool = False, debug: bool = False, dec_rate: int = 1):
+                   strip_snr: bool = False, debug: bool = False, dec: int = 1):
     """
         command line interface for download_rinex.
         Parameters:
@@ -123,8 +123,8 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             provides screen output helpful for debugging
             Default is False
 
-        dec_rate : integer, optional
-            some highrate file downloads allow decimation 
+        dec : integer, optional
+            some highrate file downloads allow decimation. Default is 1 sec, i.e. no decimation
     """
 
 #   make sure environment variables exist.  set to current directory if not
@@ -224,11 +224,11 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                     ch.cddis_highrate(station, year, d, 0, stream, 1)
                 if archive == 'bkg':                               
                     print('seek highrate data at BKG')
-                    rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec_rate)
+                    rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec)
                 if archive == 'ga':
                     print('seek highrate data at GA')
                     deleteOld = True
-                    r2, foundit = g.ga_highrate(station,year,d,dec_rate,deleteOld)
+                    r2, foundit = g.ga_highrate(station,year,d,dec,deleteOld)
             else:
                 if archive == 'all':
                     file_name, foundit = k.universal_all(station, year, d, samplerate, stream)
