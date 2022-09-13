@@ -40,9 +40,9 @@
 
 * [Mitchell, Queensland](use_cases/use_mchl.md) (mchl)
 
-* [Victorville, CA](use_cases/use_scia.md) (scia)
+* [Victorville, California](use_cases/use_scia.md) (scia)
 
-* [Boulder, CO](use_cases/use_mfle.md) (mfle)
+* [Boulder, Colorado](use_cases/use_mfle.md) (mfle)
 
 </TD>
 </TR>
@@ -62,7 +62,7 @@
 
 </TD>
 <TD>
-<B>Ocean Tides</B>
+<B>Tides</B>
 
 * [Friday Harbor, Washington](use_cases/use_sc02.md) (sc02) 
 

@@ -14,7 +14,7 @@
 
 TGGO is a station in 
 the [BfG-GNSS Monitoring Network](https://fig.net/resources/proceedings/fig_proceedings/fig2021/papers/ts05.4/TS05.4_esch_11010.pdf). It is located in the Elbe River. It is colocated with a tradtional 
-tide gauge. It has excellent visibilty of the water.  
+tide gauge. It has excellent visibility of the water.  
 
 ### Reflection Zones for TGGO
 
@@ -37,9 +37,9 @@ producing in summer 2022. Make the following choices:
 
 <code>rinex2snr tggo00deu 2022 234 -archive bfg -orb rapid -samplerate 15</code>
 
-You will need a password for the BFG archive which is available upon request.
-While you can also find TGGO data at SONEL, it will likely be the 30 second data which is not 
-as useful as the 15 second data.
+You will need a password for the BFG archive. This is available upon request by sending an e-mail to gnss@bafg.de.
+You will only need to enter the password once as <code>gnssrefl</code> will save it to your local system.
+While you can also find TGGO data at SONEL, it will likely be the 30 second data which is not as useful as the 15 second data.
 
 ### First evaluation of the data for TGGO
 
