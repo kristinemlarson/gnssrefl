@@ -23,15 +23,15 @@
 Read the instructions for the [soil moisture code!](../../docs/README_vwc.md)!
 
 #### Step 1: GNSS-IR
-Begin by generating the SNR files.
-To be sure we can get the L2C data, we will use the RINEX 3 files.
+Begin by generating the SNR files. To be sure we can get the L2C data, we will use the RINEX 3 files.
 These require the longer station name (mchl00aus) and are available at either cddis or ga.
-Choose the one that is less slow for you. We are going to start 
-with two years of data:
+Choose the one that is less slow for you (In some cases we hae found the data are at cddis but not ga. We 
+are not sure why this is. If you have a way to access these files, just download them and put them in the local
+processing area and use the -nolook option). We are going to start with two years of data and using the default GPS orbit option:
 
 <code>rinex2snr mchl00aus 2017 1 -doy_end 365 -year_end 2018 -archive cddis </code>
 
-Use <code>quickLook</code> with the l2c frequency to give a look to the data quality.
+Use the <code>quickLook</code> with the l2c frequency to give a look to the data quality.
 Then set up your parameters with <code>make_json_input</code>
 
 <code>make_json_input mchl 0 0 0 -l2c true</code>
@@ -39,9 +39,8 @@ Then set up your parameters with <code>make_json_input</code>
 The location of the json file is printed to the screen. 
 The default behavior is to accept all azimuths.
 Modify the azimuths in the json if you feel that is needed.
-How can you tell if you have bad azimuths? Use <code>quickLook</code>.
-Do not worry excessively about this at this stage. Once you have a 
-VWC solution you can go back and easily/quickly iterate to remove bad 
+How can you tell if you have bad azimuths? Look back at the <code>quickLook</code> results.
+Do not worry excessively about this at this stage. Once you have a VWC solution you can go back and easily/quickly iterate to remove bad 
 azimuths and satellite tracks.
 
 Run the <code>gnssir</code> each day in 2017 and 2018:
@@ -90,3 +89,4 @@ It also produces plots which can help you assess your results:
 <img src="mchl_4.png" width="600">
 
 
+A big thank you to Lucas Holden for test driving this use case.

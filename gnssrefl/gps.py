@@ -5270,6 +5270,9 @@ def cddis_download_2022B(filename,directory):
     ftps.prot_p()
     ftps.cwd(directory)
     ftps.retrbinary("RETR " + filename, open(filename, 'wb').write)
-    #r=requests(filename)
-    #print('filesize ', r.size)
+    siz = os.path.getsize(filename)
+    print('Filesize ', siz)
+    if siz == 0:
+        print('No file found')
+        subprocess.call(['rm',filename])
 

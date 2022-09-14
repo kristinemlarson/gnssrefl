@@ -128,4 +128,7 @@ The final volumetric water content results:
 
 These soil moisture estimates are written to a file; its location is written to the screen.
 
+Thank you to Naoya Kadota for test driving this use case.
+
+
 Kristine M. Larson September 6, 2022

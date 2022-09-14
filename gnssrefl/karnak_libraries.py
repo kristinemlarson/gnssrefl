@@ -181,8 +181,13 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         okokok = 1
 
     if os.path.exists(file_name):
-        print('File exists: ', file_name, ' at ', archive)
-        foundit = True
+        siz = os.path.getsize(file_name)
+        if (siz == 0):
+            subprocess.call(['rm',file_name])
+            print('File was not found: ', file_name, ' at ', archive)
+        else:
+            print('File exists: ', file_name, ' at ', archive)
+            foundit = True
     else:
         print('File was not found: ', file_name, ' at ', archive)
 
@@ -362,22 +367,7 @@ def universal_rinex2(station, year, doy, archive):
         if not foundit:
             foundit, file_name = gogetit(dir1, dname, '.gz')
     elif (archive == 'cddis'):
-         # try gz, then Z.  so annoying
-        file_name = dname + '.gz'
-        if os.path.exists(file_name):
-            foundit = True
-        else:
-            new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyyyy[2:4] + 'd/'
-            g.cddis_download_2022B(file_name,new_way_dir) ;
-            #g.cddis_download(file_name,new_way_dir) ;
-            if os.path.exists(file_name):
-                foundit = True
-            else:
-                file_name = dname + '.Z'
-                g.cddis_download_2022B(file_name,new_way_dir) ;
-                #g.cddis_download(file_name,new_way_dir) ;
-                if os.path.exists(file_name):
-                    foundit = True
+        foundit,file_name = serial_cddis_files(dname,cyyyy,cdoy); 
     elif (archive == 'ga'):
         QUERY_PARAMS, headers = ga_stuff(station, year, doy)
         API_URL = 'https://data.gnss.ga.gov.au/api/rinexFiles/'
@@ -543,3 +533,52 @@ def ga_stuff_highrate(station, year, doy,rinexv=3):
 
     return QUERY_PARAMS, headers
 
+def serial_cddis_files(dname,cyyyy,cdoy):
+    """
+    only looks in the hatanaka decompression section of cddis
+    parameters
+    -------------
+    dname : string
+        rinex2 filename without compression extension
+    cyyyy : string
+        four character year
+    cdoy : string
+        three character day of yaer
+    """
+    foundit = False
+    f = ''
+    # try gz, then Z.  so annoying
+    gz_file_name = dname + '.gz'
+    Z_file_name = dname + '.Z'
+    new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyyyy[2:4] + 'd/'
+    print(gz_file_name, new_way_dir)
+    try:
+        g.cddis_download_2022B(gz_file_name,new_way_dir) ;
+    except:
+        okok = 1
+
+    if os.path.exists(gz_file_name):
+        siz = os.path.getsize(gz_file_name)
+        if siz == 0:
+            subprocess.call(['rm',gz_file_name])
+        else:
+            foundit = True
+            f = gz_file_name
+
+    if (not foundit):
+        print(Z_file_name, new_way_dir)
+        # look for Z compressed file
+        try:
+            g.cddis_download_2022B(Z_file_name,new_way_dir) ;
+        except:
+            okok = 1
+
+        if os.path.exists(Z_file_name):
+            siz = os.path.getsize(Z_file_name)
+            if siz == 0:
+                subprocess.call(['rm',Z_file_name])
+            else:
+                foundit = True
+                f = Z_file_name
+
+    return foundit, f
