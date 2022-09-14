@@ -61,7 +61,7 @@ def quickname(station,year,cyy, cdoy, csnr):
 
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk,skipit,stream='R'):
     """
-    main code to convert RINEX to SNR
+    main code to convert RINEX files into SNR
 
     Parameters:
     ----------
@@ -276,22 +276,36 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         # this is rinex version 2 - finds rinex and converts it
                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
 
-    #print('And I guess my work is done now!')
 
 def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,fortran,translator):
     """
-    inputs: year and day of year (integers) and station name
-    option is for the snr creation ??? integer or character?
-    orbtype can be nav or sp3.  if the former, then gpsSNR is used.
-    if the later, then gnssSNR
-    what are receiverrate and dec_rate defaults?
-    this assumes you follow my definitions for where things go,
-    i.e. REFL_CODE and ORBITS
-    it currently checks Unavco, SOPAC, and SONEL. I should add CDDIS
-    19may20, added decimation
-    19sep12, I got tired of code crashing for files > 20 observables.  I am thus using teqc
-    20apr15, xz compression added but also try to streamline it.
-    20jul10, added arvchive setting. default is 'all'
+    parameters
+    ------------
+    year : integer
+
+    doy : integer
+        day of year
+
+    option : integer
+        snr choice (66, 99 etc)
+
+    orbtype : string
+        orbit source (nav, gps, gnss, etc)
+
+    receiverrate : integer
+        sampling interval of the GPS receiver, e.g. 1, 30, 15
+
+    dec_rate : integer
+        decimation value to reduce file size
+
+    archive : string
+        location of the rinex files
+
+    fortran : boolean
+         whether fortran translator to be used.  this is here for backwards compatability
+
+    translator : string
+         hybrid, python, or fortran 
 
     """
     # define directory for the conversion executables

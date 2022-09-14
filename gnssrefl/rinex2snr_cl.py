@@ -335,12 +335,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     # default is to use hybrid for RINEX translator
     # why is this logic here?  there is earlier logic for the exact same questions
 
-    #if translator == 'hybrid':
-    #    fortran = False  # override
-    #if translator == 'python':
-    #    fortran = False  # override - but this is sllllllooooowwww
-    #if fortran is True:
-    #    translator = 'fortran'
 
     # the Makan option
     if mk:

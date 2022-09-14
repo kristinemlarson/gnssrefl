@@ -357,8 +357,7 @@ def xyz2llh(xyz, tol):
 
 def xyz2llhd(xyz):
     """
-    converts from cartesian to latitude,longitude,height
-
+    converts three vector from cartesian coordinates to latitude,longitude,height
 
     Parameters:
     --------------
@@ -421,16 +420,25 @@ def zenithdelay(h):
 
 def up(lat,lon):
     """
-    Parameters
+    returns the up unit vector, and local east and north unit vectors needed 
+    for azimuth calc.
 
+    Parameters
+    ----------
     latitude : float
         radians
 
     longitude : float
         radians
 
-    returns the up unit vector, and local east and north unit vectors needed 
-    for azimuth calc.
+    returns
+    ----------
+    East : three vector
+        local transformation unit vector
+
+    North : three vector
+        local transformation unit vector
+
     """
     xo = np.cos(lat)*np.cos(lon)
     yo = np.cos(lat)*np.sin(lon)
@@ -607,7 +615,6 @@ def rinex_sopac(station, year, month, day):
 
     Parameters: 
     -----------
-
     station : string
         4 char station name  
 
@@ -653,72 +660,6 @@ def hatanaka_warning():
     print('You are trying to convert Hatanaka files without having the proper')
     print('executable, CRX2RNX. See links in the gnssrefl documentation')
 
-
-def rinex_cddis(station, year, month, day):
-    """
-    Picks up a 30 sec hatanaka RINEX 2.11 file from CDDIS - converts to an o RINEX file
-    This is likely obsolete
-
-    Parameters
-    --------------
-    inputs: 
-
-    station : string
-        name 
-
-    year : integer
-
-    month : integer
-
-    day : integer
-
-
-    if day is zero, then month is assumed to be doy
-    
-    """
-    #print('try to find file at CDDIS')
-    crnxpath = hatanaka_version()
-    if (day == 0):
-        doy = month
-        year, month, day, cyyyy,cdoy, YMD = ydoy2useful(year,doy)
-        cyy = cyyyy[2:4]
-    else:
-        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-
-    cddis = 'ftp://ftp.cddis.eosdis.nasa.gov'
-    oname,fname = rinex_name(station, year, month, day)
-    file1 = oname + '.Z'
-    url = cddis + '/pub/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'o/' + file1
-
-    file2 = oname + '.gz'
-    url2 = cddis + '/pub/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'o/' + file2
-
-    # try new way using secure ftp
-    dir_secure = '/pub/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'o/'
-    file_secure = file1
-
-
-    try:
-        #cddis_download(file_secure,dir_secure)
-        cddis_download_2022B(file_secure,dir_secure)
-        if os.path.exists(file1):
-            subprocess.call(['uncompress', file1])
-    except:
-        print('some issue at CDDIS',file1)
-        if os.path.exists(file1):
-            subprocess.call(['rm', '-f',file1])
-    if not (os.path.exists(oname)):
-        try:
-            cddis_download_2022B(file2,dir_secure)
-            #cddis_download(file2,dir_secure)
-            if os.path.exists(file2):
-                subprocess.call(['gunzip', file2])
-        except:
-            print('some issue at CDDIS ',file2)
-
-    if os.path.exists(oname):
-        okok = 1
-        #print('successful RINEX 2.11 download from CDDIS')
 
 
 def getnavfile(year, month, day):
@@ -836,16 +777,10 @@ def getsp3file(year,month,day):
 
 def getsp3file_flex(year,month,day,pCtr):
     """
-    inputs are year, month, and day  (integers), and 
-    pCtr, the processing center  (3 characters)
-    returns the name of the file and its directory
-    20apr15 check for xz compression
+    returns the name of the orbit file and its directory from CDDIS
+    only gets the old-style filenames
 
-    20jun14 add CDDIS secure ftp
-
-    unfortunately this won't work with the long sp3 file names. use getsp3file_mgex instead
-
-    Parameters
+    parameters
     ----------
     year : integer
 
@@ -854,7 +789,7 @@ def getsp3file_flex(year,month,day,pCtr):
     day : integer
 
     pCtr : string
-        name of the orbit center
+        3 character orbit processing center
 
     returns
     -----------
@@ -868,6 +803,7 @@ def getsp3file_flex(year,month,day,pCtr):
         whether the orbit file was successfully found
 
     """
+    # really should use mgex version
     # returns name and the directory
     name, fdir = sp3_name(year,month,day,pCtr) 
     #print(name, fdir)
@@ -881,10 +817,8 @@ def getsp3file_flex(year,month,day,pCtr):
     sec_file = file1
 
     if (os.path.isfile(ofile ) == True):
-        #print('sp3file already exists online')
         foundit = True
     elif (os.path.isfile(ofile + '.xz') == True):
-        #print('xz compressed sp3file already exists online')
         subprocess.call(['unxz', ofile + '.xz'])
         foundit = True
     else:
@@ -893,25 +827,24 @@ def getsp3file_flex(year,month,day,pCtr):
         url = cddis + filename1 
         try:
             cddis_download_2022B(sec_file, sec_dir) 
-            #cddis_download(sec_file, sec_dir) 
-            #wget.download(url,file1)
             subprocess.call(['uncompress',file1])
             store_orbitfile(name,year,'sp3') 
             foundit = True
         except:
             print('some kind of problem-remove empty file, if it exists')
-            subprocess.call(['rm','-f',file1])
-#   return the name of the file so that if you want to store it
+        if os.path.isfile(sec_file):
+            siz = os.path.getsize(sec_file)
+            if (siz == 0):
+                subprocess.call(['rm','-f',sec_file])
+
     return name, fdir, foundit
 
 def getsp3file_mgex(year,month,day,pCtr):
     """
     retrieves MGEX sp3 orbit files 
-    inputs are year, month, and day  (integers), and 
-    pCtr, the processing center  (3 characters)
-    right now it checks for the "new" name, but in reality, it 
-    assumes you are going to use the GFZ product
 
+    parameters
+    ---------------
     year : integer
 
     month : integer
@@ -921,9 +854,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     pCtr : string
         name of the orbit center
 
-
     this is spaghetti code, i apologize
-
 
     """
     foundit = False
@@ -937,7 +868,6 @@ def getsp3file_mgex(year,month,day,pCtr):
     igps_week_at_cddis = 1 + int(gps_week)
     #print('GPS week', gps_week,igps_week)
     file1 = name + '.Z'
-    #print('first kind of filename', file1)
 
     # get the sp3 filename for the new format
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
@@ -960,7 +890,6 @@ def getsp3file_mgex(year,month,day,pCtr):
     # this is name without the gzip
     name2 = file2[:-3] 
 
-    #print('second kind of filename', file2)
      
     # this is the default setting - no file exists
     mgex = 0
@@ -992,41 +921,32 @@ def getsp3file_mgex(year,month,day,pCtr):
         name = name2
     if (mgex == 1):
         name = file1[:-2]
-    #print(mgex, igps_week)
+
+    print('Type 1 filename',file1)
+    print('Type 2 filename',file2)
     if (mgex == 0):
-        # this is to deal with the bug at CDDIS
         if (igps_week > 2137):
-            name = file2[:-3]
+            # filename without the compression ending
+            name = file2[:-3] 
             secure_file = file2
-            print('check the correct week like normal people use')
+            print('check the correct GPS week ')
             secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
             foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
+
             if not foundit:
                 print('use the wrong GPS week at CDDIS')
                 secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
                 foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
         else:
-            secure_dir = '/gps/products/mgex/' + str(gps_week) + '/'
-            secure_file = file1
+            secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
+            secure_file = file1 # Z compressed
             name = file1[:-2]
-            print('Try the old sp3 filename',file1)
-            cddis_download_2022B(secure_file, secure_dir)
-            #cddis_download(secure_file, secure_dir)
-            if os.path.isfile(file1):
-                subprocess.call(['uncompress', file1])
-                store_orbitfile(name,year,'sp3') ; foundit = True
-                foundit = True
-            if not foundit:
-                print('Try the new sp3file name', file2)
+            foundit = orbfile_cddis(name, year, secure_file, secure_dir, file1)
+            if (not foundit):
                 name = file2[:-3]
                 secure_file = file2
-                cddis_download_2022B(secure_file, secure_dir)
-                #cddis_download(secure_file, secure_dir)
-                if os.path.isfile(secure_file):
-                    subprocess.call(['gunzip', file2])
-                    store_orbitfile(name,year,'sp3') ; foundit = True
+                foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
 
-    print(name,fdir,foundit)
     return name, fdir, foundit
 
 def orbfile_cddis(name, year, secure_file, secure_dir, file2):
@@ -1049,27 +969,43 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
         where the file lives at CDDIS
 
     file2 : string
-        no idea - looks very silly
+        name without the compression???
 
     Returns:
 
     foundit : boolean
         whether the file was found
 
+    now checks that file size is not zero. allows old file name downloads
     ------------
 
     """
+    # assume file was not found
     foundit = False
     print(secure_dir, secure_file)
+    # Z or gz expected ...
+    if secure_file[-3:] == '.gz':
+        gzip = True
+    else:
+        gzip = False
     try:
         cddis_download_2022B(secure_file, secure_dir)
-        #cddis_download(secure_file, secure_dir)
-        if os.path.isfile(secure_file):
-            subprocess.call(['gunzip', file2])
-            store_orbitfile(name,year,'sp3') ; 
-            foundit = True
     except:
         ok = 1
+    # found a file
+    if os.path.isfile(secure_file):
+        siz = os.path.getsize(secure_file)
+        print('File size', siz)
+        if (siz == 0):
+            subprocess.call(['rm', secure_file])
+        else:
+            foundit = True
+            if gzip:
+                subprocess.call(['gunzip', secure_file])
+                store_orbitfile(name,year,'sp3') ; 
+            else:
+                subprocess.call(['uncompress', secure_file])
+                store_orbitfile(name,year,'sp3') ; 
 
     return foundit
 
@@ -2984,28 +2920,31 @@ def update_quick_plot(station, f):
 
 def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     """
-    inputs are navfile name and character strings for year, two character year, and 
-    day of year.
-    output: a boolean is returned if the file exists
-    the code tries to find a file at unavco first, then sopac, then cddis.  it checks for illegal
-    files at sopac. it stores the file as autoDDD0.YYn where DDD is day of year and YY
-    is two charadter year irregardless of what the original name is.
-    author: kristine larson, september 2019
-    CHANGED April 2, 2020  Should not use the Sc02 file from UNAVCO.  This was a poor
-    choice. Now will use CDDIS first, then SOPAC, 
-    I have removed unavco as they do not seem to provide global nav files
-    If they do, I do not know where they are kept.
+    retrieves navfile from either SOPAC or CDDIS
 
-    20jun14 added secure ftp for CDDIS
-    21jan05 gzip after december 1, 2020, because, you know, CDDIS
+    parameters 
+    ----------
+    navfile : string
+        name of the broadcast orbit file
+    cyyyy :  string
+        4 character yaer
+    cyy : string
+        2 character year
+    cdoy : string
+        3 character day of year
+
+    returns
+    -----------
+    FileExists : boolean
+        whether the file was found
+
     """
     navname = navfile
     FileExists = False
-    #print('try sopac')
     get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
 
     if not os.path.isfile(navfile):
-        print('sopac did not work, so try cddis')
+        print('SOPAC download did not work, so will try CDDIS')
         get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
 
     if os.path.isfile(navfile):
@@ -3284,29 +3223,39 @@ def highrate_nz(station, year, month, day):
 
 def get_orbits_setexe(year,month,day,orbtype,fortran):
     """
-    helper script to make snr files
-    takes year, month, day and orbit type
-    picks up and stores
+    picks up and stores orbits as needed
     also sets executable location (gpsonly vs gnss)
-    returns whether file was found, its name, the directory, and name of snrexe
-    20apr15:  check for xz compression
-    kristine larson
-    20sep04: fortran (boolean) sent as an input, so you know whether
-    to worry that the gpsSNR.e or gnssSNR.e executable does or does not exist
-    21nov05 added ultra
+    parameters
+    ---------
+    year : integer
+
+    month : integer
+
+    day : integer
+
+    orbtype : string
+        orbit source, e.g. nav, gps...
+
+    fortran : boolean
+        whether you are using forran code for translation
+
+    returns
+    -------------
+
+    foundit : boolean
+        whether orbit file was found
+    f : string
+        name of the orbit file
+    orbdir : string
+        location of the orbit file
+    snrexe : string 
+        location of SNR executable. only relevant for fortran users
     """
     #default values
     foundit = False
     f=''; orbdir=''
     # define directory for the conversion executables
     exedir = os.environ['EXE']
-    #warn_and_exit(snrexe)
-# removed Shanghai.  Something was amiss
-#    if orbtype == 'sha':
-#        # SHANGHAI multi gnss
-#        f,orbdir,foundit=getsp3file_mgex(year,month,day,'sha')
-#        snrexe = gnssSNR_version()
-#        warn_and_exit(snrexe,fortran)
     if (orbtype == 'grg'):
         # French multi gnss, but there are no Beidou results
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'grg')
@@ -3630,8 +3579,23 @@ def snr_exist(station,year,doy,snrEnd):
 
 def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     """
-    kristine larson
-    tries to download nav file from SOPAC 
+
+    downloads navigation file from SOPAC 
+
+    parameters
+    --------------
+    navfile : string
+        name of GPS broadcast orbit file
+    cyyyy : string
+        4 char year
+    cyy : string
+        2 char year
+    cdoy : string
+        3 char day of year
+
+    returns: 
+    ---------
+    navfile : string (which was sent)
 
     """
     sopac = 'ftp://garner.ucsd.edu'
@@ -3654,38 +3618,61 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
 
 def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     """
-    inputs navfile name with character string verisons of year, 2ch year and doy
-    tries to download from CDDIS archive
+    tries to download navigation file from CDDIS
 
-    20jun11, implemented new CDDIS security requirements
-    21jan06, gz instead of Z
+    parameters
+    -----------
+    navfile : string
+        name of GPS broadcast orbit file
+    cyyyy : string
+        4 char year
+    cyy : string
+        2 char year
+    cdoy : string
+        3 char day of year
+
+    returns
+    --------
+    navfile : string
     """
 
-    # new way
     cddisfile = 'brdc' + cdoy + '0.' +cyy  +'n'
     cddisfile_compressed = cddisfile + '.Z'
     cddisfile_gzip = cddisfile + '.gz'
     # where the file should be at CDDIS ....
     mdir = '/gps/data/daily/' + cyyyy + '/' + cdoy + '/' +cyy + 'n/'
 
+    foundit = False
+    print('First try the unix compressed version')
     try:
         cddis_download_2022B(cddisfile_compressed,mdir)
-        #cddis_download(cddisfile_compressed,mdir)
-        if os.path.isfile(cddisfile_compressed):
-            subprocess.call(['uncompress',cddisfile_compressed])
     except:
         okokok = 1
-    #except Exception as err:
-    #    print(err)
-    if not os.path.isfile(cddisfile):
-        print('going for the gzip version of the file')
-        cddis_download_2022B(cddisfile_gzip,mdir)
-        #cddis_download(cddisfile_gzip,mdir)
+
+    if os.path.isfile(cddisfile_compressed):
+        siz = os.path.getsize(cddisfile_compressed)
+        if (size == 0):
+            subprocess.call(['rm',cddisfile_compressed])
+        else:
+            subprocess.call(['uncompress',cddisfile_compressed])
+            foundit = True
+
+    print('Second: try the gzipped version')
+    if (not foundit):
+        try:
+            cddis_download_2022B(cddisfile_gzip,mdir)
+        except:
+            okokok = 1
         if os.path.isfile(cddisfile_gzip):
-            subprocess.call(['gunzip',cddisfile_gzip])
+            siz = os.path.getsize(cddisfile_gzip)
+            if (size == 0):
+                subprocess.call(['rm',cddisfile_gzip])
+            else:
+                subprocess.call(['gunzip',cddisfile_gzip])
+                foundit = True
     
     if os.path.isfile(cddisfile):
-        print('found it and change the name ')
+        print('Change the filename to what we use ', navfile)
         subprocess.call(['mv',cddisfile,navfile])
 
     return navfile
@@ -3701,6 +3688,8 @@ def cddis_download(filename, directory):
 
     was supposed to returns whether file was created but now it just returns true
 #   --no-check-certificate
+
+    this is no longer used
 
     """
     # make sure there is a logs directory
@@ -3727,12 +3716,24 @@ def ydoy2useful(year, doy):
     year : integer
 
     doy : integer
+        day of year
 
     returns
     ---------
-    inputs: year and day of year (doy), integers
-    returns: useful stuff, like month and day and character 
-    strings for year and doy and YMD as character string ....
+    year : integer
+
+    month : integer
+
+    day : integer
+
+    cyyyy : string
+        four character year
+    cdoy : string
+        three character day of year
+
+    YMD : string
+         date as in '19-12-01' for December 1, 2019
+
     """
 
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
@@ -3776,14 +3777,23 @@ def prevdoy(year,doy):
 
 def nextdoy(year,doy):
     """
+    given a year/doy returns the subsequent year/doy
+
     parameters
     ---------
     year : integer
 
     doy : integer
 
+    returns
+    ----------
 
-    given year and doy, return next year and doy
+    nyear : integer
+        next year
+
+    ndoy : integer
+        next day of year
+
     """
     dec31,cdoy,ctmp,ctmp2 = ymd2doy(year,12,31)
     if (doy == dec31):
@@ -3881,7 +3891,7 @@ def nicerTime(UTCtime):
 def big_Disk_work_hard(station,year,month,day):
     """
     attempts to pick up subdaily files from the NGS archive
-    returns a RINEX file
+    creates a single RINEX file
 
     parameters
 
@@ -3942,7 +3952,18 @@ def big_Disk_in_DC_hourly(station, year, month, day,idtag):
     """
     picks up a RINEX file from CORS. and gunzips it
     # updated for new access protocol, 2021 aug 28
-    idtag is a small case letter from a to x (i think)
+    parameters
+    ---------
+    station : string
+        
+    year : integer
+
+    month : integer
+
+    day : integer
+        day of the month. if zero, it means month is really day of year
+    idtag : character
+        small case letter from a to x (i think)
     """
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     #rinexfile,rinexfiled = rinex_name(station, year, month, day)
@@ -3978,6 +3999,14 @@ def check_environ_variables():
 def ftitle(freq):
     """
     frequency title for plots 
+    parameters
+    --------
+    freq : integer
+
+    returns:
+    -----------
+    returnf : string
+        nice string for the constellation/frequency for the title of a plot
     """
     f=str(freq)
     out = {}
@@ -4028,7 +4057,7 @@ def l2c_l5_list(year,doy):
     L2C and L5 transmitting satellites
 
     parameters
-
+    --------------
     year: integer
         year
 
@@ -4979,12 +5008,7 @@ def bfg_password():
     in your REFL_CODE/Files/passwords area
     If it does not exist, it asks you to input the values and stores them for you.
 
-
-    parameters : 
-    --------
-        none
-
-    returns : 
+    returns  
     --------
     userid : string
 
@@ -5092,6 +5116,7 @@ def inout(c3gz):
     Parameter
     -----------
     c3gz : string
+        name of a gzipped hatanaka compressed RINEX 3 filename
 
     Returns
     --------
@@ -5099,7 +5124,7 @@ def inout(c3gz):
         whether file was successfully translated or not 
 
     rnx : string
-        filename of RINEX file
+        filename of the uncompressed and de-Hatanaka'ed RINEX file
 
     """
 
@@ -5143,7 +5168,7 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
     deleteOld : boolean
         delete old rinex 3 files
 
-        returns 
+    returns 
     -----
     rinex2 : string
         rinex2 filename created by merging 96 files!
@@ -5237,6 +5262,8 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
 def cddis_download_2022(filename,url):
     """
 https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html
+
+this does not seem to work
     """
 # Reads the URL from the command line argument
 
@@ -5271,7 +5298,7 @@ def cddis_download_2022B(filename,directory):
     ftps.cwd(directory)
     ftps.retrbinary("RETR " + filename, open(filename, 'wb').write)
     siz = os.path.getsize(filename)
-    print('Filesize ', siz)
+    # i do not think this is ever seen...
     if siz == 0:
         print('No file found')
         subprocess.call(['rm',filename])
