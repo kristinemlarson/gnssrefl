@@ -1563,28 +1563,42 @@ def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
     strips snr data
     Parameters
     -----------
-    x : 
+    x : numpy array 
+        elevation angles in degrees
+    y : numpy array
+        SNR data 
 
-    y : 
-
-    cf : 
+    cf : float
+        scale factor for given frequency
 
     maxH : float
+        maximum reflector height in meters
 
     desiredP : float
+        precision of Lomb Scargle in meters
 
-    pfitV : 
+    pfitV : integer
+        polynomial order for DC model
 
     minH : float
+        minimum reflector height in meters
 
-
-    inputs; max reflector height, desiredP is desired precision in meters
-    pfitV is polynomial fit order
-    minH - do not allow LSP below this value
     returns 
-    max reflector height and its amplitude
-    min and max observed elevation angle
-    riseSet is 1 for rise and -1 for set
+    ----------
+    maxF : float
+        maximum Reflector height (meters)
+    maxAmp : float
+        amplitude of periodogram
+    eminObs : float
+        minimum observed elevation angle in degrees
+    emaxObs : float
+        maximum observed elevation angle in degrees
+    riseSet : integer
+        1 for rise and -1 for set
+    px : numpy array
+        periodogram, x-axis, RH, meters
+    pz : numpy array
+        periodogram, y-axis, volts/volts 
     """
     ofac,hifac = get_ofac_hifac(x,cf,maxH,desiredP)
 #   min and max observed elevation angles
@@ -1642,6 +1656,64 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     new: pele are the elevation angle limits for the polynomial fit. these are appplied
     before you start windowing the data
     20aug10 added screenstats boolean
+    parameters
+    -----------
+    s1 : numpy array 
+        SNR L1 data, floats
+    s2 : numpy array 
+        SNR L2 data, floats 
+    s5 : numpy array
+        SNR L5 data
+    s6 : numpy array
+        SNR L6 data
+    s7 : numpy array
+        SNR L7 data
+    s8 : numpy array
+        SNR L8 data
+    sat : numpy array
+        satellite number
+    ele : numpy array
+        elevation angle (Degrees)
+    azi : numpy array
+        azimuth angle (Degrees)
+    seconds : numpy array
+        seconds of the day (GPS time)
+    edot : numpy array
+    f : integer
+        requested frequency
+    az1 : float
+        minimum azimuth limit, degrees
+    az2 : float
+        maximum azimuth limit, degrees
+    e1 : float
+        minimum elevation angle limit, degrees
+    e2 : float
+        maximum elevation angle limit, degrees
+    satNu : integer
+        requested satellite number
+    pfitV : integer
+        polynomial order for DC fit
+    screenstats : boolean
+        Whether statistics come to the screen
+    returns
+    ---------
+    x : numpy array of 
+
+    y : numpy array of 
+
+    Nvv : integer
+        number of points in x
+    cf : float
+        scale factor
+    meanTime : float
+        UTC hour
+    avgAzim : float
+        average azimuth of the tracks
+    outFact1 : float
+    outFact2  : 
+    delT : float
+        track length in minutes (I think)
+
     """
     cunit = 1
     dat = []; x=[]; y=[]
@@ -1661,9 +1733,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     if (f == 208):
         dat = s8
 #   get the scaling factor for this frequency and satellite number
-    #print(f,satNu)
     cf = arc_scaleF(f,satNu)
-    #print(cf)
 
 #   if not, frequency does not exist, will be tripped by Nv
 #   this does remove the direct signal component - but gets you ready to do that
@@ -1676,6 +1746,8 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     meanTime = 0.0; avgAzim = 0.0; avgEdot = 1; Nvv = 0
     avgEdot_fit =1; delT = 0.0
 #   no longer have to look for specific satellites. some minimum number of points required 
+    if screenstats:
+        print('Starting Npts', Nv)
     if Nv > 30:
         model = np.polyfit(x,y,pfitV)
         fit = np.polyval(model,x)
@@ -1689,9 +1761,11 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         a =   azi[(ele > e1) & (ele < e2) & (azi > az1) & (azi < az2)]
         t = seconds[(ele > e1) & (ele < e2) & (azi > az1) & (azi < az2)]
         ifound = 0
+        if screenstats:
+            print('Windowed Npts', len(x))
         if len(x) > 0:
             ijkl = np.argmax(x)
-            if ijkl == 0:
+            if (ijkl == 0):
             #print('ok, at the beginning ')
                 ifound = 1;
             elif (ijkl == len(x)-1):
