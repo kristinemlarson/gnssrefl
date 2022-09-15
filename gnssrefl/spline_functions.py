@@ -1038,11 +1038,24 @@ def define_inputfile(station,year,doy,snr_ending):
     cyyyy = str(year)
     xdir = os.environ['REFL_CODE'] + '/' + cyyyy + '/snr/' + station + '/'
     snrfile = station + cdoy + '0.' + cyy + '.snr' + str(snr_ending)
+    gzfile = xdir + snrfile + '.gz'
+    xzfile = xdir + snrfile + '.xz'
     snrdir = ''
     if not os.path.isfile(snrfile):
         #print('SNR file does not exist in the local directory')
         if os.path.isfile(xdir + snrfile):
             #print('SNR file does exist in the REFL_CODE directory')
+            snrdir = xdir
+        # look for gzipped file
+        elif os.path.isfile(gzfile):
+            # unzip it, declare success
+            print('Found gzipped version', snrfile)
+            subprocess.call(['gunzip',gzfile])
+            snrdir = xdir
+        elif os.path.isfile(xzfile):
+            # unxz it, declare success
+            print('Found xz version', snrfile)
+            subprocess.call(['unxz',xzfile])
             snrdir = xdir
         else:
             print('No file found. Exiting')

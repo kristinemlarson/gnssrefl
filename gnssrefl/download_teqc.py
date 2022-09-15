@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-kristine larson
 download a year of teqc logs from unavco
 can do multiple years as well
+2022 september 15, updated to https access
 """
 import argparse
 import os
@@ -18,21 +18,47 @@ import gnssrefl.computemp1mp2 as veg
 def mpfile_unavco(station, year, doy):
     """
     picks up teqc log from unavco if it exists
+    stores it in $REFL_CODE / year / mp / station directory
+    does not check that directory exists.  Assumes you previously
+    ran check_directories from the veg library
+
+    parameters
+    ---------
+    station : string
+        four character station name
+
+    year : integer
+    doy : integer
+        day of year
+
     """
     cdoy = '{:03d}'.format(doy)
     cyyyy = str(year)
     cyy = cyyyy[2:4]
 
-    # info for unavco
-    fdir = 'ftp://data-out.unavco.org/pub/rinex/qc/'
+    # info for unavco 
+    # - changed to https 2022 september 15
+    fdir = 'https://data.unavco.org/archive/gnss/rinex/qc/'
+    #       https://data.unavco.org/archive/gnss/rinex/qc/2010/001/
+    # old way
+    #fdir = 'ftp://data-out.unavco.org/pub/rinex/qc/'
     fdir = fdir + cyyyy + '/' + cdoy + '/'
     fname = station + cdoy + '0.' + cyy + 'S'
     url = fdir + fname
 
     # local directory info
     ddir = os.environ['REFL_CODE'] + '/' + cyyyy + '/mp/' + station + '/'
+
+    if not os.path.isdir(ddir):
+        print('Required output directory does not exist. ', ddir)
+        print('This should have been created by download_teqc')
+        sys.exit()
+
+    print('Looking for: ', url)
+    print('Will store in: ', ddir)
+
     if os.path.isfile(ddir + fname):
-        print('file already exists', ddir+fname)
+        print('teqc log already exists', ddir+fname)
     else:
         try:
             wget.download(url,out=fname)

@@ -1,5 +1,7 @@
 #
 # various tests that gnssrefl build is still working
+# this only checks that the code does not crash. It does not currently
+# check that anything useful is created!
 
 ls -l $EXE/gfzrnx
 
@@ -9,7 +11,13 @@ ls -l $REFL_CODE/input/gpt_1wA.pickle
 
 ls -l $ORBITS
 
-exit
+make_json_input p041 0 0 0 
+
+# case where station should not exist in the database
+make_json_input xxxx 0 0 0 
+
+# case where station coordinates provided 
+make_json_input xxxx  40 -120 10  -h1 5 -h2 20 -e1 5 -e2 15
 
 rm $ORBITS/2010/nav/auto0010.10n
 
