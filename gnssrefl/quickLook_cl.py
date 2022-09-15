@@ -34,6 +34,8 @@ def parse_arguments():
     parser.add_argument("-sat", default=None, type=int, help="satellite")
     parser.add_argument("-screenstats", default=None, type=str, help="if True, Success and Failure info printed to the screen")
     parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio")
+    # want to add this - waiting for Kelly
+    #parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
     #parser.add_argument("-fortran", default=None, type=str, help="Default is True: use Fortran translators")
 
     args = parser.parse_args().__dict__
@@ -167,6 +169,7 @@ def quicklook(station: str, year: int, doy: int,
         print('this restriction is for quickLook only ')
         pele[0] = e1
 
+    #pltscreen = plt # just to keep things with old names .... 
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'f': fr[0], 'reqAmp': ampl, 'e1': e1,
             'e2': e2, 'minH': h1, 'maxH': h2, 'PkNoise': peak2noise, 'satsel': sat, 'fortran': fortran, 'pele': pele,
             'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2}

@@ -42,9 +42,19 @@ upload a package to pypi
 
 twine upload dist/*
 
-
 **Issues with numpy**
 
 https://numpy.org/devdocs/reference/distutils_status_migration.html
 
+**Versions**
 
+1.1.5 Officially added soil moisture module
+
+1.1.6 changed how CDDIS archive is used, from a wget subprocess call to using FTPS.
+
+This required checking that downloaded file was not zero size.  
+<PRE>
+    ftps.login(user='anonymous', passwd=email)
+    ftps.prot_p()
+    ftps.cwd(directory)
+</PRE>

@@ -1,0 +1,39 @@
+#
+# various tests that gnssrefl build is still working
+
+ls -l $EXE/gfzrnx
+
+ls -l $EXE/CRX2RNX
+
+ls -l $REFL_CODE/input/gpt_1wA.pickle
+
+ls -l $ORBITS
+
+exit
+
+rm $ORBITS/2010/nav/auto0010.10n
+
+download_orbits nav 2010 1 1
+
+rm $ORBITS/2010/sp3/igs15645.sp3
+
+download_orbits igs 2010 1 1
+
+download_orbits gbm 2018 1 1
+
+rinex2snr p041 2022 1 -archive unavco -overwrite T
+
+ls -l $REFL_CODE/2021/snr/p041/p0410010.snr66 
+
+rinex2snr p041 2022 1 -archive unavco -orb gnss -overwrite T
+
+rinex2snr p041 2022 1 -archive unavco -orb gnss -overwrite T
+
+# 
+rinex2snr pots00deu 2022 1 -archive bkg -orb rapid
+
+rinex2snr mchl00aus 2018 1 -archive cddis 
+
+rinex2snr p041 2018 1 -archive unavco -rate high -dec 15 -overwrite T
+
+quickLook p041 2018 1 
