@@ -5,11 +5,11 @@
 
 ### gnssrefl
 
-**github version: 1.1.5** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
+**github version: 1.1.6** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
 **WARNING: All access to UNAVCO data will end October 1, 2022 unless [you sign up for an account there](https://www.unavco.org/data/gps-gnss/file-server/file-server-access-examples.html)**
 
-**WARNING: CDDIS has changed their high-rate directory protocol. This means some of our download codes now fail.
+**WARNING: CDDIS has changed their high-rate directory protocol for older files. This means some of our download codes now fail.
 If someone wants to provide a pull request that addresses this issue, I would be happy to implement it.  I 
 am not willing to write such code myself.**
 

@@ -19,17 +19,27 @@
 <p align=center>
 <img src=MCHL.jpeg width=500>
 </p>
+
+**Archives:** CDDIS, BKG, GA
  
 Read the instructions for the [soil moisture code!](../../docs/README_vwc.md)!
 
 #### Step 1: GNSS-IR
 Begin by generating the SNR files. To be sure we can get the L2C data, we will use the RINEX 3 files.
 These require the longer station name (mchl00aus) and are available at either cddis or ga.
-Choose the one that is less slow for you (In some cases we hae found the data are at cddis but not ga. We 
-are not sure why this is. If you have a way to access these files, just download them and put them in the local
-processing area and use the -nolook option). We are going to start with two years of data and using the default GPS orbit option:
+Choose the one that is less slow for you. 
+In some cases we hae found the data are at cddis but not ga or vice versa. Apparently the data are also 
+available from BKG. We are not sure why this is. If you have a way to access 
+these files, just download them and put them in the local
+processing area and use the -nolook option). We are going to start with two years of data and 
+using the default GPS orbit option and the cddis archive:
 
 <code>rinex2snr mchl00aus 2017 1 -doy_end 365 -year_end 2018 -archive cddis </code>
+
+If you have any difficult downloading these RINEX 3 files, UNAVCO has kindly downloaded and converted 
+a few years of files into RINEX 2.11 that includes L2C data. There the command would be:
+
+<code>rinex2snr mchl 2017 1 -doy_end 365 -year_end 2018 -archive special</code>
 
 Use the <code>quickLook</code> with the l2c frequency to give a look to the data quality.
 Then set up your parameters with <code>make_json_input</code>

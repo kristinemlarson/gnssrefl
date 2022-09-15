@@ -46,7 +46,7 @@ For python (very slow!):
 - unavco
 - sonel (global sea level observing system)
 - sopac (Scripps Orbit and Permanent Array Center)
-- cddis
+- cddis (only Hatanaka compressed files)
 - ngs (National Geodetic Survey)
 - nrcan (Natural Resources Canada)
 - bkg (German Agency for Cartography and Geodesy)

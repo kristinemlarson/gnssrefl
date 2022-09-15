@@ -34,6 +34,8 @@ If you want to mount volumes you could copy the -v syntax from the unavdocker/gn
 
 **make a package for pypi**
 
+export SETUPTOOLS_USE_DISTUTILS=stdlib
+
 python setup.py sdist bdist_wheel
 
 upload a package to pypi
@@ -45,6 +47,4 @@ twine upload dist/*
 
 https://numpy.org/devdocs/reference/distutils_status_migration.html
 
-**When making pypi version**
-export SETUPTOOLS_USE_DISTUTILS=stdlib
 
