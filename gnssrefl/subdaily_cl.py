@@ -38,11 +38,12 @@ def parse_arguments():
     parser.add_argument("-h1", default=None, type=float, help="min RH (m)")
     parser.add_argument("-h2", default=None, type=float, help="max RH (m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="new peak2noise constraint")
+    parser.add_argument("-kplt", default=None, type=str, help="special plot for kristine")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing']
+    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -52,7 +53,7 @@ def parse_arguments():
 def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, plt: bool = True,
              spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = False,
              doy1: int = 1, doy2: int = 366, testing: bool = False, ampl: float = 0, 
-             h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, peak2noise: float = 0):
+             h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False):
     """
         Parameters:
             ___________
@@ -71,7 +72,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
                 default is False.
             plt : boolean, optional
                 To print plots to screen or not.
-                default is False.
+                default is TRUE.
             spline_outlier : float, optional
                 Outlier criterion used in splinefit (meters)
                 default is 1.0
@@ -114,6 +115,8 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             peak2noise: float, optional
                 New peak to noise constraint
                 default is 0.
+            kplt: boolean, optional
+                plot for kristine
     """
 
     # make surer environment variables are set
@@ -139,7 +142,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             print('Using ', txtfile)
         # if txtfile provided, you can use that as your starting dataset 
         ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, extension, sigma, writecsv,
-                                                            azim1, azim2, ampl, peak2noise, txtfile,h1,h2)
+                                                            azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt)
         haveObstimes = True
     else:
         haveObstimes = False

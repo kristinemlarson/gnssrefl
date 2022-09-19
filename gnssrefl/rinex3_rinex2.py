@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Translates rinex3 to rinex2 
-cares only about SNR data and reflections
-author: kristine larson
-Updated: March 24, 2021
+relies on gfzrnx
 """
 import argparse
 import os

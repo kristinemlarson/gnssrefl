@@ -282,6 +282,20 @@ def angle_range_positive(ang):
     return ang
 
 def azimuth_mean(azim1, azim2):
+    """
+    parameters
+    --------
+    azim1 : float
+         azimuth degrees
+
+    azim2 : float
+         azimuth degrees
+
+    returns
+    ---------
+    azim : float 
+        degrees
+    """
     azim = np.concatenate([azim1, azim2])
     if np.all(azim1 >= 0) and np.all(azim2 >= 0):
         azim1 = angle_range_positive(azim1)
@@ -292,6 +306,7 @@ def azimuth_mean(azim1, azim2):
         y1 = np.cos(azim1*np.pi/180);y2 = np.cos(azim2*np.pi/180) 
         x = ( (x1 + x2)/2.0 )[0];y = ( (y1 + y2)/2.0 )[0]
         azim = 180/np.pi * np.arctan2(x, y)
+
     return azim
 
 def quickname(station,year,cyy, cdoy, csnr):
@@ -302,8 +317,15 @@ def quickname(station,year,cyy, cdoy, csnr):
     parameters
     ------------
     station : string
+
     year : integer
+
+    cyy : string 
+        two character yar
+
     cdoy : integer
+        three character day of year
+
     csnr : string
         snr type, e.g. '66' 
     """
@@ -316,10 +338,18 @@ def quickname(station,year,cyy, cdoy, csnr):
 
 def elev_limits(snroption):
     """
-    given Kristine's snr option, return min and max elevation angles
-    in degrees
-    author: kristine larson
-    2020 august 7
+    parameters
+    ------------
+    snroption : integer
+        snrfile number
+
+    returns
+    ----------
+    emin : float
+        min elevation angle (degrees)
+    emax : float
+        max elevation angle (degrees)
+
     """
 
     if (snroption == 99):
@@ -338,13 +368,19 @@ def elev_limits(snroption):
 def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
     """
     runs the nmea2snr conversion
-    inputs:
-    station name 
-    year_list list of years to be analyzed
-    doy_list list of doy to be analyzed
-    isnr = integer file type choice
-    overwrite = boolean, make a new SNR file even if one already exists
-    Makan Karegar
+
+    parameters
+    ----------
+    station : string
+        name 
+    year_list : list of integers
+
+    doy_list : list of days of year
+
+    isnr : integer
+        snr file type
+    overwrite : boolean 
+        whether make a new SNR file even if one already exists
     """
     # loop over years and day of years
     for yr in year_list:

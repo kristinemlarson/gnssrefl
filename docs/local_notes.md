@@ -58,3 +58,6 @@ This required checking that downloaded file was not zero size.
     ftps.prot_p()
     ftps.cwd(directory)
 </PRE>
+
+1.1.7 fixed bug in invsnr that did not allow SNR files unless they were uncompressed.
+added xz and gz endings

@@ -44,6 +44,8 @@
 
 * [Boulder, Colorado](use_cases/use_mfle.md) (mfle)
 
+* [San Diego, California](use_cases/use_p475.md) (p475)
+
 </TD>
 </TR>
 

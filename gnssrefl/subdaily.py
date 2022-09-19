@@ -166,7 +166,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     fout.close()
 
 
-def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2):
+def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2,kplt):
     """
     reads in RH results and makes various plots to help users assess the quality of the solution
 
@@ -214,6 +214,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     h2 : float
         maximum reflector height (m)
+
+    kplt : boolean
+        special plot made 
 
     returns
     --------------
@@ -353,7 +356,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
         #print(d1,d2)
         two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2)
-        stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma)
+        stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt)
         plt.show()
 
     # this might work... and then again, it might not
@@ -938,16 +941,23 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     plt.savefig(plotname,dpi=300)
     print('png file saved as: ', plotname)
 
-def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
+def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     """
+    parameters
+    --------------
     otimes - datetime object
     tv - variable with the gnssrefl results
     ii - good data?
     jj - bad data?
-    station - for title
-    txtdir - where plots will be written
+    station : string
+        station name
+
+    txtdir : string
+        directory where plots will be written
     sigma is constraint used for the outlier detection
- poor man's outlier detector
+     poor man's outlier detector
+    kplt : boolean
+        make extra plot for kristine
     """
     fs = 10
     fig = plt.figure()
@@ -966,8 +976,8 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
     plt.plot(otimesarray[ii],tv[ii,2], 'r.',markersize=4,label='outliers')
     #plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
     plt.legend(loc="best",bbox_to_anchor=(0.95, 0.9),prop={"size":8})
-    plt.ylabel('meters',fontsize=8)
     plt.title(station.upper() + ' Reflector Heights', fontsize=8)
+    plt.ylabel('meters',fontsize=8)
     plt.gca().invert_yaxis()
     plt.xticks(rotation =45,fontsize=8); plt.yticks(fontsize=8)
     plt.grid() ; fig.autofmt_xdate()
@@ -986,6 +996,17 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma):
     plt.savefig(plotname,dpi=300)
     plt.ylim((savey1, savey2))
     print('png file saved as: ', plotname)
+    if kplt:
+        fig = plt.figure()
+        ax1 = fig.add_subplot(211)
+        ddd = - (tv[jj,2] - np.max(tv[jj,2]))
+        plt.plot(otimesarray[jj],ddd, '.',color='blue')
+        plt.title('Relative Sea Level Measured with Reflected GNSS Signals:' + station.upper(), fontsize=fs)
+        plt.ylabel('meters',fontsize=fs)
+        plt.xticks(rotation =45,fontsize=fs-1); plt.yticks(fontsize=fs-1)
+        plt.ylim((-0.1, 1.1*np.max(ddd)))
+        plt.suptitle(f"St Michael, Alaska ", size=12)
+        plt.grid()
 
 
 def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):

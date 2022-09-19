@@ -16,15 +16,23 @@ import gnssrefl.cddis_highrate as ch
 def gogetit(dir1, filename, ext):
     """
     the purpose of this function is to to download RINEX 2 files
-    inputs:
+    code will try to get the file and chck to see if it was successful
 
-    dir1 = the main directory address 
-    filename = name of the GNSS files
-    ext = kind of ending to the filename, (Z, gz etc)
-    This code will try to get the file and chck to see if it was successful
+    parameters
+    -------------
+    dir1 : string
+        the main https directory address 
+    filename : string
+        name of the GNSS files
+    ext : string
+        kind of ending to the filename, (Z, gz etc)
 
-    this code is used by the rinex2 code
-    returns boolean foundit and the filename
+    returns 
+    ---------
+    foundit : boolean
+        whether file was found
+    f : string
+        name of the file
     """
     foundit = False
     f= filename + ext
@@ -46,8 +54,12 @@ def gogetit(dir1, filename, ext):
 def swapRS(stream):
     """
     profound function that swaps R to S and vice versa
-    this is to faciliate checking whether an archive has your file in the R
-    file or the S file
+    parameters
+    -------
+    stream : string
+         RINEX 3 file streaming acronym (S or R)
+    newstream : string
+         the opposite of what was in stream
     """
     if stream == 'R':
         newstream = 'S'
@@ -91,11 +103,12 @@ def just_bkg(cyyyy, cdoy, file_name):
 
     return
 
-
 def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     """
     main code for seamless archive for rinex 3 files ... 
 
+    parameters
+    -----------
     station9ch: string
         nine character station name
 
@@ -113,6 +126,16 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
 
     stream: string
         one character: R or S
+
+    debug : boolean
+        whether debugging statements printed
+    returns
+    ----------
+    file_name : string
+        name of rinexfile
+
+    foundit : boolean
+        whether file was found
 
     """
     # define the file name
@@ -195,23 +218,27 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
 
 def filename_plus(station9ch,year,doy,srate,stream):
     """
-    function to create RINEX 3 filenames.
+    function to create RINEX 3 filenames for one day files.
 
     parameters:
+    -----------
+    station9ch : string
+         9 character station name
 
-    inputs:
-    station9ch - 9 character station name
+    year : integer
 
-    year - integer
+    doy : integer
+        day of year
 
-    doy - day of year, integer
+    srate : integer
+         receiver sample rate 
 
-    srate - receiver sample rate, integer
+    stream : string 
+         R or S ; latter means the file was streamed.
 
-    stream = character - either R or S. The latter means the file was streamed.
-
-    output: compliant filename with crx.gz on the end as this is how the files 
-    are stored at GNSS archives
+    output : string
+         compliant filename with crx.gz on the end as this is how the files 
+         are stored at GNSS archives as far as I know.
 
     """
     cyyyy = str(year)
@@ -228,6 +255,16 @@ def ga_stuff(station, year, doy,rinexv=3):
     """
     takes 9 ch station name and year and doy 
     and returns some things that GA wants to download a Rinex 3 file
+    parameters
+    -----------
+    station : string
+        9 character station name
+    year : integer
+        
+    doy : integer
+        day of year
+    rinexv : integer
+        rinex version        
     """
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
     month = int(d.month); day = int(d.day)
@@ -250,16 +287,29 @@ def ga_stuff(station, year, doy,rinexv=3):
 def universal_all(station9ch, year, doy, srate,stream):
     """
     function to check multiple archives for RINEX 3 data
-    inputs:
-    9 character station name
 
-    year - integer
+    parameters
+    ----------
+    station9ch : string
+        9 character station name
 
-    doy - doy of year, integer
+    year : integer
 
-    srate - receiver sample rate, integer
+    doy : integer
+        doy of year
 
-    stream -  R or S
+    srate : integer
+        receiver sample rate 
+
+    stream : string
+        R or S
+
+    returns
+    -------
+    file_name  : string
+        rinex filename
+
+    foundit : boolean
     """
     foundit = False
 
@@ -278,19 +328,29 @@ def universal_all(station9ch, year, doy, srate,stream):
 
 def rinex2names(station,year,doy):
     """
-    inputs: 
+    rinex2 filename 
 
-    station 
+    parameters
+    ----------
+    station : string
 
-    year 
+    year : integer
 
-    doy
+    doy : integer
+        day of year
 
-    outputs:
-    hatanaka rinex2 names  (ends in d)
-    normal rinex2 observation name (ends in o)
-    it also returns the year (4 characters) and the 
-    doy as a string (3 characters)
+    results
+    --------
+    f1 : string
+        hatanaka rinex filename
+    f2 : string
+        regular rinex filename
+    cyyyy : string
+        four character year 
+
+    cdoy : string
+        three character day of year
+
     """
     cyyyy = str(year)
     cdoy = '{:03d}'.format(doy)
@@ -303,7 +363,25 @@ def rinex2names(station,year,doy):
 def universal_rinex2(station, year, doy, archive):
     """
     seamless archive for rinex 2 files ...
-    inputs are 4 char station, yar, doy and archive name
+
+    parameters
+    -----------
+    station : string
+        four character station name
+    year : integer
+
+    doy : integer
+
+    archive : string
+        name of the GNSS archive
+
+    returns
+    ---------
+    file_name : string
+        filename that was downloaded
+
+    foundit : boolean
+
     """
     # define the file name
 
@@ -392,11 +470,20 @@ def universal_rinex2(station, year, doy, archive):
 
 def make_rinex2_ofiles(file_name):
     """
-    take a rinex2 file, decompress,hatanaka ...
+    take a rinex2 file gunzip or uncompress and 
+    then Hatanaka decompress it
 
-    Parameter:
-
+    parameters
+    ---------
     file_name: string
+        rinex2 filename
+
+    returns
+    --------
+    new_name : string
+        filename after multiple decompression processes
+    fexist : boolean
+        whether file was successfully created
 
     """
     if (file_name[-1:] == 'Z'):
@@ -429,6 +516,7 @@ def make_rinex2_ofiles(file_name):
 
 def strip_rinexfile(rinexfile):
     """
+    uses teqc - should be removed
     """
     print('use teqc to strip the RINEX 2 file')
     teqcv = g.teqc_version()
