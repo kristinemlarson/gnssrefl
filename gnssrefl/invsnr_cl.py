@@ -33,7 +33,7 @@ def parse_arguments():
     parser.add_argument("-doy_end", default=None, type=str, help="day of year to end analysis")
     parser.add_argument("-lspfigs", default=None, type=str, help="Make LSP plots, default False.")
     parser.add_argument("-snrfigs", default=None, type=str, help="Make SNR plots, default False.")
-    parser.add_argument("-knot_space", default=None, type=str, help="knot spacing in hours (default is 3)")
+    parser.add_argument("-knot_space", default=None, type=int, help="knot spacing in hours (default is 3)")
     parser.add_argument("-rough_in", default=None, type=str, help="Roughness (default is 0.1)")
     parser.add_argument("-risky", default=None, type=str,
                         help="Risky taker related to gaps/knot spacing, False is default)")
@@ -43,7 +43,7 @@ def parse_arguments():
     parser.add_argument("-outlier_limit", default=None, type=str, help="outliers plotted (meters)")
     parser.add_argument("-no_dots", default=None, type=str, help="no lomb scargle plotted")
     parser.add_argument("-delta_out", default=None, type=str, help="Output increment, in seconds (default is 300)")
-    parser.add_argument("-refraction", default=None, type=str, help="Set to True to turn on")
+    parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off")
     parser.add_argument("-json_override", default=None, type=str, help="Override json file name")
     args = parser.parse_args().__dict__
 
@@ -57,7 +57,7 @@ def parse_arguments():
 
 def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, constel: str = None,
            screenstats: bool = False, tempres: int = 1, polydeg: int = 2, snrfit: bool = True, doplot: bool = True,
-           doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: float = 3.0,
+           doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: int = 3,
            rough_in: float = 0.1, risky: bool = False, snr_ending: int = 66, outfile_type: str = 'txt',
            outfile_name: str = '', outlier_limit: float = 0.5, no_dots: bool = False, delta_out: int = 300,
            refraction: bool = True, json_override: bool = False):
@@ -139,7 +139,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
 
         knot_space : float, optional
             Knot spacing in hours
-            Default is 3.0
+            Default is 3
 
         rough_in : float, optional
             Roughness

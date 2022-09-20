@@ -655,7 +655,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     :return invout: dictionary with outputs from inverse analysis
 
-    trying to add refraction
+    This documentation was provided by the original author, David Purnell
     """
 
     imodel = 0 # no refraction
