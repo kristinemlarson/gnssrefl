@@ -61,6 +61,13 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 	* Problem: need to convert existing WSL environment into WSL 2 and associate with Docker
 	 	* Solution: follow [this documentation](https://docs.docker.com/desktop/windows/wsl/)
 
+* Docker run commands have slightly different syntax to accomodate windows directories in volume mounting:
+	* Windows Power Shell:
+
+<code>docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ -v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl unavdocker/gnssrefl:latest /bin/bash </code>
+	* Windows Command Line:
+
+<code>docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ -v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl unavdocker/gnssrefl:latest /bin/bash </code>
 
 * execute docker run command (see above) in terminal window
 * Feedback from jupyter notebook user:

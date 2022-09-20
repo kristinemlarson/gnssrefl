@@ -361,10 +361,9 @@ If the string is long - please post the error string in a thread response to you
 
 - Please include the operating system of your computer.
 
-*Please wait - We are confirming whether this information is correct.*
 Would you like to join our <code>gnssrefl</code> users email list?
-Send an email to gnss-ir-request@postal.unavco.org and put the word
-subscribe (or unsubscribe to leave) in your email subject.
+Send an email to community@unavco.org and put the words
+*subscribe (or unsubscribe to leave) to gnss-ir* in your email subject.
 
 
 <HR>
