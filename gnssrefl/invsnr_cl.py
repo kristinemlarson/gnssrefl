@@ -33,7 +33,7 @@ def parse_arguments():
     parser.add_argument("-doy_end", default=None, type=str, help="day of year to end analysis")
     parser.add_argument("-lspfigs", default=None, type=str, help="Make LSP plots, default False.")
     parser.add_argument("-snrfigs", default=None, type=str, help="Make SNR plots, default False.")
-    parser.add_argument("-knot_space", default=None, type=str, help="knot spacing in hours (default is 3)")
+    parser.add_argument("-knot_space", default=None, type=float, help="knot spacing in hours (default is 3)")
     parser.add_argument("-rough_in", default=None, type=str, help="Roughness (default is 0.1)")
     parser.add_argument("-risky", default=None, type=str,
                         help="Risky taker related to gaps/knot spacing, False is default)")
