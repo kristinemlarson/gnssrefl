@@ -516,11 +516,17 @@ def make_rinex2_ofiles(file_name):
 
 def strip_rinexfile(rinexfile):
     """
-    uses teqc - should be removed
+    uses either teqc or gfzrnx to reduce observables
+
+    parameters
+    ---------
+    rinexfile : string
+        name of the rinex2 file
     """
-    print('use teqc to strip the RINEX 2 file')
+    print('You chose the strip option to reduce the number of observables in the RINEX file')
     teqcv = g.teqc_version()
     if os.path.isfile(teqcv):
+        print('Use teqc to strip the RINEX 2 file')
         foutname = 'tmp.' + rinexfile
         fout = open(foutname,'w')
         subprocess.call([teqcv, '-O.obs','S1+S2+S5+S6+S7+S8', rinexfile],stdout=fout)
@@ -528,7 +534,13 @@ def strip_rinexfile(rinexfile):
         subprocess.call(['rm','-f',rinexfile])
         subprocess.call(['mv','-f',foutname, rinexfile])
     else:
-        print('I do not have the teqc executable, so nothing has been done')
+        gfzrnxpath = g.gfz_version()
+        if os.path.isfile(gfzrnxpath):
+            print('Use gfzrnx to strip the RINEX 2 file')
+            tempfile = rinexfile + '.tmp'
+            # save yourself heartache down the way cause those doppler data are just clogging up the works
+            subprocess.call([gfzrnxpath,'-finp', rinexfile, '-fout', tempfile, '-vo','2','-f', '-obs_types', 'S','-q'])
+            subprocess.call(['mv', '-f', tempfile, rinexfile])
 
 def gsi_data(station,year,doy):
     """
@@ -561,7 +573,6 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
     archive: string
 
     strip_snr: boolean
-
 
     """
     foundit = False

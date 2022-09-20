@@ -224,13 +224,13 @@ def pickup_from_noaa(station,date1,date2,datum, printmeta):
 
     return data, error
 
-def quickp(station,t,sealevel):
+def quickp(station,t,sealevel,noaa_name):
     """
     """
     fs = 10
     fig,ax=plt.subplots()
     ax.plot(t, sealevel, '-')
-    plt.title('Water Levels at ' + station)
+    plt.title('Water Levels at ' + noaa_name + ':' + station)
     plt.xticks(rotation =45,fontsize=fs);
     plt.ylabel('meters')
     plt.grid()
@@ -351,7 +351,8 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
 
     fout.close()
     if plt:
-        quickp(station,obstimes,slevel)
+        noaa_name = data['metadata']['name']
+        quickp(station,obstimes,slevel,noaa_name)
 
 def main():
     args = parse_arguments()

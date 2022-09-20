@@ -27,19 +27,18 @@ def parse_arguments():
                         help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan)", type=str)
     parser.add_argument("-version", default=None, metavar=2, type=int, help="rinex version (2 or 3)")
     parser.add_argument("-strip", default=None, type=str,
-                        help="set to True to strip to only SNR observables, teqc used")
+                        help="set to True to strip to only SNR observables, gfzrnx used")
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
     parser.add_argument("-stream", default=None, type=str,
                         help="set to True to get stream-defined Rinex3 filename. I know. I know. It is annoying.")
     parser.add_argument("-samplerate", default=None, type=str, help="Sample rate in seconds. For RINEX3 only.")
-    parser.add_argument("-strip_snr", default=None, type=str, help="Uses gfzrnx to strip out non-SNR data/default is False")
     parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
     parser.add_argument("-dec", default=None, type=int, help="decimation value (seconds). Only for RINEX 3.")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['strip', 'strip_snr','debug']
+    boolean_args = ['strip','debug']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -48,7 +47,7 @@ def parse_arguments():
 
 def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = None,
                    version: int = 2, strip: bool = False, doy_end: int = None, stream: str = 'R', samplerate: int = 30,
-                   strip_snr: bool = False, debug: bool = False, dec: int = 1):
+                   debug: bool = False, dec: int = 1):
     """
         command line interface for download_rinex.
         Parameters:
@@ -97,8 +96,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                 3 : Rinex 3
 
         strip : boolean, optional
-            Whether to strip only SNR observables. This requires Teqc.
+            Whether to strip only SNR observables.  Uses teqc or gfzrnx.
             Default is False.
+
 
         doy_end : int, optional
             End day of year to be downloaded. This is to create a range from doy to doy_end of days to get the snr files.
@@ -114,10 +114,6 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         samplerate : int, optional
             Sample rate in seconds for RINEX3 only.
             Default is 30.
-
-        strip_snr : boolean, optional
-            Uses gfzrnx to strip out non-SNR data
-            Default is False
 
         debug : boolean, optional
             provides screen output helpful for debugging
@@ -248,7 +244,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             # using new karnak code
             rinexfile, rinexfiled = g.rinex_name(station, year, d, 0)
             if rate == 'high':
-                rinexfile, foundit = k.rinex2_highrate(station, year, d, archive, strip_snr)
+                rinexfile, foundit = k.rinex2_highrate(station, year, d, archive, strip)
             else:
                 if archive == 'all':
                     foundit = False
