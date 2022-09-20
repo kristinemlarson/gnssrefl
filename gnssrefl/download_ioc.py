@@ -85,6 +85,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         output : string, optional
             Optional output filename
             default is None
+            The file will be written to REFL_CODE/Files
 
         plt: boolean, optional
             plot comes to the screen
@@ -112,7 +113,8 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
 
     xdir = os.environ['REFL_CODE']
     if not os.path.exists(xdir):
-        print('REFL_CODE environment variable must be set')
+        print('The REFL_CODE environment variable must be set')
+        print('This will tell the code where to put the output.')
         sys.exit()
     outdir = xdir  + '/Files/'
     if not os.path.exists(outdir) :
