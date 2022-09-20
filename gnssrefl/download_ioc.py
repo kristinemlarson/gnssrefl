@@ -53,7 +53,7 @@ def parse_arguments():
     parser.add_argument("-output", default=None, help="Optional output filename", type=str)
     parser.add_argument("-plt", default=None, help="Optional plot to screen", type=str)
     parser.add_argument("-outliers", default=None, help="attempt to remove outliers", type=str)
-    parser.add_argument("-sensor", default=None, help="flt, prs or rad, default is rad", type=str)
+    parser.add_argument("-sensor", default=None, help="Various: flt, prs or rad, default is rad. If there are multiple sensors, they are all written to the file.", type=str)
     args = parser.parse_args().__dict__
 
 
