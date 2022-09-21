@@ -89,7 +89,7 @@ This needs to be hand-edited in the json file.
 
 Now compute daily averages:
 
-<code>daily_avg pmtl 2020 0.25 50 -txtfile pmtl-rh.txt </code>
+<code>daily_avg pmtl 0.25 50 -txtfile pmtl-rh.txt </code>
 
 All tracks:
 
