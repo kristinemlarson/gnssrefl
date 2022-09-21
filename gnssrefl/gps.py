@@ -3724,7 +3724,7 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
         okokok = 1
 
     if os.path.isfile(cddisfile_compressed):
-        siz = os.path.getsize(cddisfile_compressed)
+        size = os.path.getsize(cddisfile_compressed)
         if (size == 0):
             subprocess.call(['rm',cddisfile_compressed])
         else:
@@ -3738,7 +3738,7 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
         except:
             okokok = 1
         if os.path.isfile(cddisfile_gzip):
-            siz = os.path.getsize(cddisfile_gzip)
+            size = os.path.getsize(cddisfile_gzip)
             if (size == 0):
                 subprocess.call(['rm',cddisfile_gzip])
             else:
