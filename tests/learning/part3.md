@@ -1,8 +1,7 @@
-### Homework 3  
+### Part 3  
 
-**Due date:** This homework is to be completed **before** the short course given on October 21. You need to make
-sure the software has been properly installed and you have successfully completed the "homework 0" assignment. You should 
-also read the [gnssrefl documentation provided on GitHub.](https://github.com/kristinemlarson/gnssrefl)
+You need to make sure the software has been properly installed, and you have successfully completed the "homework 0" assignment.
+You should also read the [gnssrefl documentation provided on GitHub.](https://github.com/kristinemlarson/gnssrefl)
 
 **Purpose:** Learn how to measure water level with <code>gnssrefl</code> using GNSS data 
 
@@ -109,7 +108,7 @@ you need to analyze a bit more data.
 
 * use <code>rinex2snr</code> to make SNR files for the same year, but now do doy 120 through 290. Remember to use <code>-doy_end</code> to
 do that in a single command.  And use <code>-weekly True</code> to make fewer files (which will make
-everything much faster).  Why did I pick those dates? Mostly to avoid snow (yeap, it snows up there!) 
+everything much faster).  Why did I pick those dates? Mostly to avoid snow (yep, it snows up there!) 
 
 * run <code>gnssir</code> for those dates.  You do not need the weekly option here - you can just
 specify 120 through 290. It will look for every day, but if it doesn't find it, it just looks for the 

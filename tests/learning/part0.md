@@ -1,6 +1,6 @@
-## Homework 0
+## Part 0
 
-**goal:** to make sure you have properly installed <code>gnssrefl</code>
+**Purpose:** to make sure you have properly installed <code>gnssrefl</code>
 
 [You are strongly encouraged to read the documentation.](https://github.com/kristinemlarson/gnssrefl)
 
@@ -9,14 +9,14 @@ Pick the method that you prefer to do your analysis in the course, or experiment
 
 ## **Jupyter Notebook version:**
 
-run the HW0 notebook from the [jupyter notebook repository, either via docker or to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).
+run the Part0 notebook from the [jupyter notebook repository, either via docker or to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).
 
 
 ## **Command line version options: [gitHub](#runs-locally-on-linux-or-macos-using-code-from-github) or [Docker image](#docker-gnssrefl-command-line-container-option)**
 
 ### GNSSREFL via GITHUB (local version)
 
-**NOTE** this setup requires system dependencies: **gcc** and **gfortran**.  To install:
+**NOTE** this setup requires system dependencies: **gcc** and **gfortran**. This installation method is **NOT** available for Windows.  To install:
 * if you are using a LINUX then simply run `apt-get install -y gcc` and `apt-get install -y gfortran` in your terminal (or <code>yum install -y gcc-gfortran</code> ).
 * if you are using a MacOS then you will need to install xcode. First, in your terminal, check if you have xcode by `xcode-select -p`.
 If it is installed, it should return a path. If it is not installed then run `xcode-select --install`.
@@ -30,7 +30,7 @@ If you don't have homebrew, then see [here](https://gcc.gnu.org/wiki/GFortranBin
 ([here is a helpful video covering this portion](https://www.youtube.com/watch?v=tdFi2OGIQwg))
 * cd to your desired working directory
 * create the following directories for gnssrefl: EXE, ORBITS and REFL_CODE [hint <code>mkdir</code> ]
-* set your gnssrefl [enviroment variables](https://en.wikipedia.org/wiki/Environment_variable), EXE, ORBITS and REFL_CODE to these respective paths
+* set your gnssrefl [environment variables](https://en.wikipedia.org/wiki/Environment_variable), EXE, ORBITS and REFL_CODE to these respective paths
   * hint: to check absolute path of a directory <code>pwd</code>
   * hint: to set environment variable in shell, <code>export VARNAME=path/to/directory</code>.  [To set an environment variable everytime you open the shell](https://unix.stackexchange.com/questions/117467/how-to-permanently-set-environmental-variables), use the same export command in the the appropriate initialization file for your shell).
 

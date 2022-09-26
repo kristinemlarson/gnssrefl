@@ -1,7 +1,6 @@
-## Homework 2
+## Part 2
 
-**Due date:** This homework is to be completed **before** the short course given on October 21. You need to make
-sure the software has been properly installed and you have successfully completed the "homework 0" assignment.
+You need to make sure the software has been properly installed, and you have successfully completed the "homework 0" assignment.
 
 **Purpose:** Learn how to measure snow depth levels with <code>gnssrefl</code> using GNSS data 
 
@@ -58,7 +57,7 @@ Note that it is normal to see 'Could not read the first SNR file:' because we on
 
 Now you can use the <code>daily_avg</code> tool to compute a daily average reflector height for gls1. 
 Try setting the median filter to 0.25 meters and individual tracks to 30. These numbers are used 
-by <code>daily_vg</code> to set QC in order to recover a trustwortth daily average [(there is more information here on these parameters)](https://github.com/kristinemlarson/gnssrefl#helper). A plain txt file 
+by <code>daily_avg</code> to set QC in order to recover a trustworthy daily average [(there is more information here on these parameters)](https://github.com/kristinemlarson/gnssrefl#helper). A plain txt file 
 with the RH outputs are created as well as several plots. 
 The data in the main RH plot show you long-term accumulation as well as relatively small snow 
 accumulation events. The overall plot is dominated by the large melt event in the summer of 2012.
