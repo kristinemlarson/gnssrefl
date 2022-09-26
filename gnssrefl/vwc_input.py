@@ -57,7 +57,7 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100):
         print('station name must be four characters. Exiting.')
         sys.exit()
     if (len(str(year)) != 4):
-        print('Year must be four characters.' Exiting.')
+        print('Year must be four characters. Exiting.')
         sys.exit()
 
     # not sure this is needed?
