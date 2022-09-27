@@ -6,16 +6,28 @@ labels: ''
 assignees: ''
 
 ---
+Screenshots If applicable, add screenshots to help explain your problem.
+
+System (please complete the following information):
+
+OS: [e.g. macOS, windows, etc...]
+
+
+Method you are running the code:
+Locally via github
+Docker (please first make sure you are running the current docker image before reporting bug)
+Jupyter notebook locally
+Jupyter notebook via docker
+
 
 **Describe the bug**
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+1. commands run up to point of bug
+2. command used when bug appeared
+3. include error
+4. Expected behavior A clear and concise description of what you expected to happen.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
@@ -23,16 +35,14 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**Method you are running the code**
+* Locally via github
+* Docker (please first make sure you are running the current docker image before reporting bug)
+* Jupyter notebook locally
+* Jupyter notebook via docker
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+**System (please complete the following information):**
+ - OS: macOS, Windows, etc...
 
 **Additional context**
 Add any other context about the problem here.
