@@ -15,7 +15,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("month", help="month (or day of year)", type=int)
     parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
-    parser.add_argument("-doy_end", help="doy end for multi-day download ", type=int)
+    parser.add_argument("-doy_end", default=None, help="doy end for multi-day download ", type=str)
 
     args = parser.parse_args().__dict__
 
@@ -23,7 +23,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_orbits(orbit: str, year: int, month: int, day: int):
+def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None ):
     """
         command line interface for download_orbits
         Parameters:
@@ -73,8 +73,8 @@ def download_orbits(orbit: str, year: int, month: int, day: int):
          day : integer
             day
 
-         doy_end : integer
-            day
+         doy_end : integer - optional
+            allow multiple download
 
     """
 
@@ -99,6 +99,10 @@ def download_orbits(orbit: str, year: int, month: int, day: int):
     else:
         doy, cdoy, cyyyy, cyy = g.ymd2doy(year, month, day)
 
+    if doy_end == None:
+        doy_end = doy 
+
+
     if pCtr not in orbit_list:
         print('You picked an orbit type - ', pCtr, ' - that I do not recognize')
         print(orbit_list)
@@ -119,39 +123,43 @@ def download_orbits(orbit: str, year: int, month: int, day: int):
     if pCtr == 'rapid':
         pCtr = 'gfr'
 
-    if pCtr == 'nav':
-        navname, navdir, foundit = g.getnavfile(year, month, day)
-        if foundit:
-            print('\n SUCCESS:', navdir+'/'+navname)
-    else:
-        if (pCtr == 'igs') or (pCtr == 'igr'):
-            filename, fdir, foundit = g.getsp3file_flex(year, month, day, pCtr)
+    d1= int(doy); d2 = int(doy_end) + 1
+    for d in range(d1, d2):
+
+        year,month,day= g.ydoy2ymd(year,d)
+        if pCtr == 'nav':
+            navname, navdir, foundit = g.getnavfile(year, month, day)
+            if foundit:
+                print('\n SUCCESS:', navdir+'/'+navname)
         else:
-            if pCtr == 'esa':
-                # this is ugly - but hopefully will work for now.
+            if (pCtr == 'igs') or (pCtr == 'igr'):
                 filename, fdir, foundit = g.getsp3file_flex(year, month, day, pCtr)
-            elif pCtr == 'gfr':
+            else:
+                if pCtr == 'esa':
+                # this is ugly - but hopefully will work for now.
+                    filename, fdir, foundit = g.getsp3file_flex(year, month, day, pCtr)
+                elif pCtr == 'gfr':
                 # rapid GFZ is available again ...
-                filename, fdir, foundit = g.rapid_gfz_orbits(year, month, day)
+                    filename, fdir, foundit = g.rapid_gfz_orbits(year, month, day)
             # also at GFZ
-            elif pCtr == 'ultra':
-                hour = 0 # for now
-                filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
-            elif pCtr == 'gnss2':
+                elif pCtr == 'ultra':
+                    hour = 0 # for now
+                    filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
+                elif pCtr == 'gnss2':
                 # use IGN instead of CDDIS
-                filename, fdir, foundit = g.avoid_cddis(year, month, day)
-            elif pCtr == 'brdc':
+                    filename, fdir, foundit = g.avoid_cddis(year, month, day)
+                #elif pCtr == 'brdc':
                 # https://cddis.nasa.gov/archive/gnss/data/daily/2021/brdc/
                 # test code to get rinex 3 broadcast file
                 # will not store it in ORBITS because it is not used explicitly
                 # this is not operational as yet
-                filename, fdir, foundit = g.rinex3_nav(year, month, day)
+                #    filename, fdir, foundit = g.rinex3_nav(year, month, day)
+                else:
+                    filename, fdir, foundit = g.getsp3file_mgex(year, month, day, pCtr)
+            if foundit:
+                print('SUCCESS:', fdir+'/'+filename)
             else:
-                filename, fdir, foundit = g.getsp3file_mgex(year, month, day, pCtr)
-        if foundit:
-            print('SUCCESS:', fdir+'/'+filename)
-        else:
-            print(filename, ' not found')
+                print(filename, ' not found')
 
 
 def main():

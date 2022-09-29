@@ -922,30 +922,31 @@ def getsp3file_mgex(year,month,day,pCtr):
     if (mgex == 1):
         name = file1[:-2]
 
-    print('Type 1 filename',file1)
-    print('Type 2 filename',file2)
-    if (mgex == 0):
-        if (igps_week > 2137):
+    if not foundit:
+        print('Type 1 filename',file1)
+        print('Type 2 filename',file2)
+        if (mgex == 0):
+            if (igps_week > 2137):
             # filename without the compression ending
-            name = file2[:-3] 
-            secure_file = file2
-            print('check the correct GPS week ')
-            secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
-            foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
-
-            if not foundit:
-                print('use the wrong GPS week at CDDIS')
-                secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
-                foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
-        else:
-            secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
-            secure_file = file1 # Z compressed
-            name = file1[:-2]
-            foundit = orbfile_cddis(name, year, secure_file, secure_dir, file1)
-            if (not foundit):
-                name = file2[:-3]
+                name = file2[:-3] 
                 secure_file = file2
+                print('check the correct GPS week ')
+                secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
                 foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
+
+                if not foundit:
+                    print('use the wrong GPS week at CDDIS')
+                    secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
+                    foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
+            else:
+                secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
+                secure_file = file1 # Z compressed
+                name = file1[:-2]
+                foundit = orbfile_cddis(name, year, secure_file, secure_dir, file1)
+                if (not foundit):
+                    name = file2[:-3]
+                    secure_file = file2
+                    foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
 
     return name, fdir, foundit
 
@@ -995,7 +996,7 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     # found a file
     if os.path.isfile(secure_file):
         siz = os.path.getsize(secure_file)
-        print('File size', siz)
+        #print('File size', siz)
         if (siz == 0):
             subprocess.call(['rm', secure_file])
         else:
@@ -3016,10 +3017,17 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     navname = navfile
     FileExists = False
     get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
-
-    if not os.path.isfile(navfile):
-        print('SOPAC download did not work, so will try CDDIS')
-        get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
+    
+    cddis_is_failing = True
+    cddis_is_failing = False
+    if not os.path.isfile(navfile) :
+        if not cddis_is_failing:
+            print('SOPAC download did not work, so will try CDDIS')
+            get_cddis_navfile(navfile,cyyyy,cyy,cdoy) 
+        else:
+            print('CDDIS is unreliable and is being blocked by us')
+    else:
+        print('found nav file at SOPAC')
 
     if os.path.isfile(navfile):
         FileExists = True

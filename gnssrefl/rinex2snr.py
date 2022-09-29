@@ -174,6 +174,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             if snre:
                 print('SNR file already exists', fname)
                 if overwrite:
+                    print('overwriting')
                     subprocess.call(['rm', fname])
                     snre = False
             illegal_day = False

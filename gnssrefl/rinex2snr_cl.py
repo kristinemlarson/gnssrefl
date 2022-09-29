@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-snr", default=None, help="snr file ending", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, gps, gps+glo, gnss, rapid or you can specify nav,igs,igr,jax,gbm,grg,wum,gfr,ultra")
-    parser.add_argument("-rate", default=None, metavar='low', type=str, help="sample rate: low or high")
+    parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX 2 sample rate: low or high. This parameter is only needed for archive searches.")
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
                         help="True means only use RINEX files on local machine")
@@ -47,11 +47,12 @@ def parse_arguments():
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
     parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
     parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
+    parser.add_argument("-cddis_offline", default=None, help="use True when CDDIS is offline", type=str)
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly']
+    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly','cddis_offline']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -61,7 +62,7 @@ def parse_arguments():
 def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav', rate: str = 'low', dec: int = 0,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
-              stream: str = 'R', mk: bool = False, weekly: bool = False):
+              stream: str = 'R', mk: bool = False, weekly: bool = False, cddis_offline: bool = False):
     """
         rinex2snr translates RINEX files to an SNR format. This function will fetch orbit files for you.
 
@@ -169,6 +170,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         weekly : boolean, optional
             Takes 1 out of every 7 days in the doy-doy_end range (one file per week) - used to save time.
             Default is False.
+
+        cddis_offline: boolean, optional
+            alert the system if CDDIS is failing
+
 
         """
     # validate parameter types
@@ -304,9 +309,14 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         # rinex2
         if rate == 'high':
             if archive not in highrate_list:
-                print(f'You have chosen highrate and {archive} but only unavco, bkg, cddis and nrcan are allowed. Exiting.')
-                print('Please help code up access to additional archives')
-                sys.exit()
+                if nolook:
+                    print('You have chosen nolook, so I will proceed assuming you have the RINEX file.')
+                    # change to lowrate since the code only uses low vs high for retrieving files from
+                    # an archive
+                    rate = 'low'
+                else:
+                    print('You have chosen highrate option.  But I do not support this archive: ',archive)
+                    sys.exit()
         else:
             if archive not in archive_list:
                 print('You picked an archive that is not allowed. Exiting')
