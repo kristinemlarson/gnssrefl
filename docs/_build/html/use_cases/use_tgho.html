@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lake Taupo &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Lake Taupo</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/use_tgho.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="lake-taupo">
+<h1>Lake Taupo<a class="headerlink" href="#lake-taupo" title="Permalink to this heading"></a></h1>
+<p><span class="raw-html-m2r"><p align="center"></span>
+<span class="raw-html-m2r"><img src="tgho_barker.jpg" width="500"></span><span class="raw-html-m2r"><BR></span>
+Photo credit: Simon Barker
+&lt;/P&gt;</p>
+<a class="reference external image-reference" href="tgho_barker.jpg"><img alt="" src="../_images/tgho_barker.jpg" /></a>
+<p><strong>Station Name:</strong> tgho</p>
+<p><strong>Location:</strong> North Island, New Zealand</p>
+<p><strong>Archive:</strong> <a class="reference external" href="https://www.geonet.org.nz/">Geonet</a></p>
+<p><strong>DOI:</strong>    N/A</p>
+<p><strong>Ellipsoidal Coordinates:</strong></p>
+<ul class="simple">
+<li><p>Latitude: -38.813</p></li>
+<li><p>Longitude: 175.996</p></li>
+<li><p>Height: -38.813 m</p></li>
+</ul>
+<p><a class="reference external" href="https://www.geonet.org.nz/data/network/mark/TGHO">Station Page at Geonet</a></p>
+<p><a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/TGHO.sta">Station Page at Nevada Geodetic Laboratory</a></p>
+<p><a class="reference external" href="https://goo.gl/maps/1zmgi6rRHPVPDAfV8">Google Map Link</a></p>
+<section id="data-summary">
+<h2>Data Summary<a class="headerlink" href="#data-summary" title="Permalink to this heading"></a></h2>
+<p>Station tgho is operated by <a class="reference external" href="https://www.gns.cri.nz">GNS</a>. The GNSS site is located
+on a platform in Lake Taupo. It records standard GPS and Glonass signals at a low sample rate (30 sec).
+The site could be significantly improved with a newer receiver that tracks modern signals at a higher sample rate.</p>
+</section>
+<section id="take-a-quick-look-at-the-data">
+<h2>Take a Quick Look at the Data<a class="headerlink" href="#take-a-quick-look-at-the-data" title="Permalink to this heading"></a></h2>
+<p>Begin by making an SNR file. Use both GPS and Glonass and set the archive to nz:</p>
+<p><span class="raw-html-m2r"><code>rinex2snr tgho 2020 300 -orb gnss -archive nz</code></span></p>
+<p><span class="raw-html-m2r"><code>quickLook tgho 2020 300 -e1 5 -e2 15</code></span></p>
+<p><span class="raw-html-m2r"><img src="tgho-default.png" width="600"></span></p>
+<a class="reference external image-reference" href="tgho-default.png"><img alt="" src="../_images/tgho-default.png" /></a>
+<p>The clutter near the monument produces noise at the small RH values.  A better result
+can be found if those values are eliminated by setting h1 to 2. We also extend h2 to 8.</p>
+<p><span class="raw-html-m2r"><code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8</code></span></p>
+<p><span class="raw-html-m2r"><img src="tgho-better.png" width="600"></span></p>
+<a class="reference external image-reference" href="tgho-better.png"><img alt="" src="../_images/tgho-better.png" /></a>
+<p>Now try looking at the periodogram for L2:</p>
+<p><span class="raw-html-m2r"><code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 2</code></span></p>
+<p><span class="raw-html-m2r"><img src="tgho-l2.png" width="600"/></span></p>
+<a class="reference external image-reference" href="tgho-l2.png"><img alt="" src="../_images/tgho-l2.png" /></a>
+<p>These results are not very compelling for a variety of reasons. The GPS L2 data
+will not be used in subsequent analysis. Next, check the two Glonass frequencies:</p>
+<p><span class="raw-html-m2r"><CODE></span>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 101&lt;/code&gt;</p>
+<p><span class="raw-html-m2r"><img src="tgho-glonass-l1.png" width="600"/></span></p>
+<a class="reference external image-reference" href="tgho-glonass-l1.png"><img alt="" src="../_images/tgho-glonass-l1.png" /></a>
+<p><span class="raw-html-m2r"><code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 102</code></span></p>
+<p><span class="raw-html-m2r"><img src="tgho-glonass-l2.png" width="600"/></span></p>
+<a class="reference external image-reference" href="tgho-glonass-l2.png"><img alt="" src="../_images/tgho-glonass-l2.png" /></a>
+<p>The QC metrics from Glonass 101 are helpful for setting the azimuth mask:</p>
+<p><span class="raw-html-m2r"><img src=tgho-glonss-qc.png width="600"></span></p>
+<a class="reference external image-reference" href="tgho-glonss-qc.png"><img alt="" src="../_images/tgho-glonss-qc.png" /></a>
+<p>We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 and a peak to noise ratio of 3.0.</p>
+</section>
+<section id="analyze-the-data">
+<h2>Analyze the Data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h2>
+<p>Use <span class="raw-html-m2r"><code>make_json_input</code></span> to set up the analysis parameters. Set the elevation and reflector heights as in <span class="raw-html-m2r"><code>quickLook</code></span>. The peak to noise ratio and required amplitude can be set on the command line.</p>
+<p><span class="raw-html-m2r"><code>make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9</code></span></p>
+<p>The azimuth mask has to be set by hand to exclude empty regions and azimiths with poor retrievals.
+Glonass signals (frequencies 101 and 102) were added and GPS L2/L5 were removed.<a class="reference external" href="tgho.json">Sample json</a></p>
+<p>Then make SNR files for ~six months:</p>
+<p><span class="raw-html-m2r"><code>rinex2snr tgho 2020 130 -archive nz -doy_end 319 -orb gnss</code></span></p>
+<p>The output SNR files are stored in $REFL_CODE/2020/snr/tgho.</p>
+<p>Now run <span class="raw-html-m2r"><code>gnssir</code></span> for these same dates:</p>
+<p><span class="raw-html-m2r"><code>gnssir tgho 2020 130 -doy_end 319 </code></span></p>
+<p>To look at daily averages, use the utility <span class="raw-html-m2r"><code>daily_avg</code></span>. The median filter is set to allow values within 0.25 meters of the
+median, and the minimum number of tracks required to calculate the average is set to 50 tracks.</p>
+<p><span class="raw-html-m2r"><CODE></span>daily_avg tgho .25 50 &lt;/code&gt;</p>
+<p>The number of retrievals each day is show here:</p>
+<p><span class="raw-html-m2r"><img src="tgho-numvals.png" width="600"></span></p>
+<a class="reference external image-reference" href="tgho-numvals.png"><img alt="" src="../_images/tgho-numvals.png" /></a>
+<p>All retrievals are shown here:</p>
+<p><span class="raw-html-m2r"><img src="tgho-all.png" width="600"></span></p>
+<a class="reference external image-reference" href="tgho-all.png"><img alt="" src="../_images/tgho-all.png" /></a>
+<p>Note in particular that there are quite a few data outages in this series, which means the RINEX files were missing
+from the NZ archive.</p>
+<p>Finally, the average RH plot:</p>
+<p><span class="raw-html-m2r"><img src="tgho-rhavg.png" width="600"></span></p>
+<a class="reference external image-reference" href="tgho-rhavg.png"><img alt="" src="../_images/tgho-rhavg.png" /></a>
+<p><a class="reference external" href="tgho_dailyRH.txt">Sample RH file</a></p>
+<p>Although Taupo is in a volcanic caldera, lake levels are determined by seasonal processes such
+as evaporation, precipitation, input from local drainages, and outflow. The Waikoto
+River is sole river draining the lake, and river flow is regulated by a series of hydroelectric dams.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

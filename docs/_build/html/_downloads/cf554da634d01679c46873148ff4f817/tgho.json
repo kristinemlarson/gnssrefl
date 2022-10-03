@@ -1,0 +1,51 @@
+{
+    "station": "tgho",
+    "lat": -38.813,
+    "lon": 175.996,
+    "ht": 385.99,
+    "minH": 2.0,
+    "maxH": 8.0,
+    "e1": 5,
+    "e2": 15,
+    "NReg": [
+        2.0,
+        8.0
+    ],
+    "PkNoise": 3.0,
+    "polyV": 4,
+    "pele": [
+        5,
+        30
+    ],
+    "ediff": 2,
+    "desiredP": 0.005,
+    "azval": [
+        0,
+        90,
+	90,
+        135,
+        225,
+        270,
+        270,
+        360
+    ],
+    "freqs": [
+        1,
+        101,
+        102
+    ],
+    "reqAmp": [
+        9.0,
+        9.0,
+        9.0
+    ],
+    "refraction": true,
+    "overwriteResults": true,
+    "seekRinex": false,
+    "wantCompression": false,
+    "plt_screen": false,
+    "onesat": null,
+    "screenstats": false,
+    "pltname": "tgho_lsp.png",
+    "delTmax": 75
+}

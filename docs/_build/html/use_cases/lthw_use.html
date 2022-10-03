@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lower Thwaites Glacier &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Lower Thwaites Glacier</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/lthw_use.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="lower-thwaites-glacier">
+<h1>Lower Thwaites Glacier<a class="headerlink" href="#lower-thwaites-glacier" title="Permalink to this heading"></a></h1>
+<p>Station lthw is operated by UNAVCO. The data are archived at UNAVCO.</p>
+<img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"/>
+<p><strong>Coordinates:</strong>
+Use the <a class="reference external" href="https://www.unavco.org/data/gps-gnss/data-access-methods/dai2/app/dai2.html#4Char=LTHW;scope=Station;sampleRate=both;4CharMod=contains">UNAVCO DAI</a> if you like. Or you can try the <a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta">Nevada Reno site</a>.
+The coordinates do not have to be super precise (within 100 meters is fine)</p>
+<p>Unfortunately the operators of this site set an elevation mask of 7 degrees. You need to
+acknowledge this when you set the data anlaysis
+parameters, i.e. set e1 to 7, because otherwise the lack of low elevation data will be
+interpreted as low data quality.</p>
+<p>To my knowledge the receiver only tracks L1, and it does not track L2C or L5.
+For that reason, only L1 data should be used. The reflector height changes
+significantly with time and the site must be dug out of the snow
+and reset fairly regularly. You can see this effect in the vertical position data compiled
+by <a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta">Nevada Reno</a>.</p>
+<img src="LTHW_UNR.png" width=500/>
+<p>Don’t pay attention to the red “model” as Nevada Reno is using a default model
+that is more relevant for crustal deformation than a glacier. The important
+data are in blue, and there are clear breaks
+that are correlated with when they changed the height of the antenna. We will
+focus on the period after January 1, 2018. Go ahead and make SNR files for the whole year.</p>
+<p><em>rinex2snr lthw 2018 1 -doy_end 365 -archive unavco</em></p>
+<p>Then take a look at January 1 in 2018:</p>
+<p><em>quickLook lthw 2018 1 -e1 7</em></p>
+<img src="lthw-day1-2018.png" width="500"/>
+<p>This is a bit of a mess really. If there are significant peaks, they are really
+close to the cutoff for the method (at 0.5 meters).  Now look a week later:</p>
+<p><em>quickLook lthw 2018 9 -e1 7</em></p>
+<img src="lthw-day9-2018.png" width="500"/>
+This is *much* better and clearly shows that a field crew reset the antenna to a little 
+less than 5 meters sometime between day 1 and day 9.
+If you like you can compare this to the first day of 2020 (if you make the SNR file):
+<img src="lthw-day1-2020.png" width=500/>
+<p>Now the peaks in the RH periodograms are ~2.2 meters - so that means ~2.5 meters of surface change
+from 2018 to 2020.</p>
+<p>Now let’s run <strong>gnssir</strong>. First we need to make json input,</p>
+<p><em>make_json_input lthw -76.458  -107.782 1011.0 -e1 7 -e2 25 -peak2noise 3.2</em></p>
+<p>Handedit the json file so that only L1 is used.</p>
+<p>Analyze the data for 2018 from day 1 to day 365:</p>
+<p><em>gnssir lthw 2018 1 -doy_end 365 -screenstats False</em></p>
+<p>Then compute daily averages requiring 50 satellite tracks and using a median filter of 0.25 meters:</p>
+<p><em>daily_avg lthw 0.25 50</em></p>
+<img src="lthw-req50.png" width="500"/>
+<p>You can tighten required number of tracks if you want:</p>
+<p><em>daily_avg lthw 0.25 40</em></p>
+<img src="lthw-req40.png" width="500"/>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

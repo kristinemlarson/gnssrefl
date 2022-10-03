@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>invsnr &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>invsnr</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pages/README_invsnr.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="invsnr">
+<h1>invsnr<a class="headerlink" href="#invsnr" title="Permalink to this heading"></a></h1>
+<p>This is a utility for analyzing time-varying smooth surfaces with GNSS interferometric reflectometry.
+The method was first introduced by <a class="reference external" href="https://github.com/Ydmir">Joakim Strandberg</a> and his colleagues. This implementation of the method was written by
+<a class="reference external" href="https://purnelldj.github.io/">David Purnell</a>. It reads the inputs from the <code>gnssrefl</code> package (SNR files).
+It analyzes L1, L2, and L5 signals and the GPS, Galileo, and Glonass constellations.</p>
+<p>You might notice that the Lomb Scargle Periodogram (LSP) results from this software are different
+than <code>gnssir</code>. In some locations you might see relatively large outliers. <em>This is to be expected.</em>
+This code uses the LSP results as a starting place - the quality control applied
+is entirely different than what was used in <code>gnssir</code>. Since the point of this code is to estimate smoothly
+varying sea level, I don’t think we need to make the LSP portion of it a clone of <code>gnssir</code>.</p>
+<p>Note:</p>
+<ul class="simple">
+<li><p>txt and csv output is now supported.</p></li>
+<li><p>You can specify the temporal sampling of the output.</p></li>
+<li><p>a simple refraction correction (elevation angle bending) has been included</p></li>
+</ul>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<p>The module is part of <code>gnssrefl</code>. Please see the installation instructions for
+<a class="reference external" href="https://github.com/kristinemlarson/gnssrefl#environment">the main package</a>. It is currently only available on gitHub.
+We will be making a docker and pypi version.</p>
+</section>
+<section id="running-the-code">
+<h2>Running the code<a class="headerlink" href="#running-the-code" title="Permalink to this heading"></a></h2>
+<p>The <code>gnssrefl</code> <strong>REFL_CODE</strong> environment variable must be set. This variable is used for storage of
+the SNR files and the inputs to the analysis strategy.</p>
+<p>I. Make SNR files as you would normally for the <code>gnssrefl</code> using <code>rinex2snr</code>. They will be stored in
+$REFL_CODE/yyyy/snr/ssss where yyyy is the year and ssss is the station name.</p>
+<p>II. Set up analysis instructions. These instructions are stored in $REFL_CODE/input.</p>
+<p>The required inputs are the station name (four characters lowercase), the reflector height limits (in meters)
+the elevation angle limits (in degrees).</p>
+<p><em>Example:</em></p>
+<p><code>invsnr_input p041 0.5 6 5 25 </code></p>
+<p>In this case the station coordinates for p041 will be retrieved from the UNR database. If you have a
+site that is not in the database, please use -lat, -lon, -height inputs.</p>
+<p>You can add an azimuth restriction using -a1 and -a2:</p>
+<p><code>invsnr_input p041 0.5 6 5 25 -a1 180 -a2 270</code></p>
+<p>Because this software identifies rising and setting arcs in a different way than <code>gnssir</code>, you
+can set a single range of azimuth ranges.</p>
+<p>III. Run invsnr</p>
+<p><em>Required inputs</em></p>
+<ul class="simple">
+<li><p>station name (4 characters, lowercase)</p></li>
+<li><p>year</p></li>
+<li><p>day of year</p></li>
+<li><p>frequency (e.g. L1, L2, L5, L6, L1+L2, L1+L2+L5). ALL means L1+L2+L5+L6+L7</p></li>
+</ul>
+<p>The code will attempt GPS, Galileo, Beidou and Glonass unless you tell it otherwise</p>
+<p><em>Optional inputs</em></p>
+<ul class="simple">
+<li><p>pktnlim peak2noise ratio for QC</p></li>
+<li><p>constel (G,E,R, or C which represent GPS, Galileo, Glonass, and Beidou)</p></li>
+<li><p>screenstats (True or False)</p></li>
+<li><p>tempres decimation value for the SNR file (seconds)</p></li>
+<li><p>polydeg polynomial degree for direct signal removal (default is 2)</p></li>
+<li><p>snrfit Do a invsnr fit? Default is True</p></li>
+<li><p>doplot Send a summary plot to the screen? Default is True</p></li>
+<li><p>doy_end day of year for multiday analysis</p></li>
+<li><p>lspfigs and -snrfigs make LSP and SNR plots, default False.</p></li>
+<li><p>knot_space value used for smoothing, in hours</p></li>
+<li><p>rough_in, roughness parameter as described in Strandberg et al (2016). Default is 0.1</p></li>
+<li><p>risky set to True means you will ignore the warrning telling you that you have a gap and should not do this.</p></li>
+</ul>
+<p>Please see <code>invsnr -h</code> for more options. Some are related to outputs (i.e. you can tell
+the code to write out smoothed RH values into a text or csv file.</p>
+<p><em>Output of the invsnr Code</em></p>
+<p>The code makes a first cut of LSP reflector height estimation. It also does
+a cubic spline fit and then the spline fit estimation.
+I am currently printing out the smoothed results to a plain txt file every five minutes.
+You can modify that temporal setting or change to a csv format at the command line.</p>
+<p>Warning: No phase center corrections are currently applied to the reflector heights.
+Nor are changes from material properties addressed (water, snow, ice).</p>
+<p><em>Example for station AT01</em></p>
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width=500>
+<ul class="simple">
+<li><p>Make SNR files <code>rinex2snr at01 2021 301 -doy_end 303 -orb gnss -archive unavco</code></p></li>
+<li><p>Save analysis strategy <code>invsnr_input at01 9 14 5 13 -a1 20 -a2 220</code></p></li>
+<li><p>Just one day of GPS on L1: <code>invsnr at01 2021 301 L1 -constel G</code></p></li>
+</ul>
+<img src="../_static/at01-ex1.png" width=500>
+<ul class="simple">
+<li><p>Two days with L1 and all constellations: <code>invsnr at01 2021 301 L1 -doy_end 302</code></p></li>
+</ul>
+<img src="../_static/at01-ex2.png" width=500>
+<ul class="simple">
+<li><p>Two days with L1+L2+L5 and all constellations: <code>invsnr at01 2021 301 L1+L2+L5 -doy_end 302</code></p></li>
+</ul>
+<img src="../_static/at01-ex3.png" width=500>
+<p><em>Example for station TNPP</em></p>
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg" width=500>
+<ul class="simple">
+<li><p>Make SNR files using <code>rinex2snr</code>, using high-rate data, UNAVCO archive, and GNSS orbits options</p></li>
+<li><p>Save analysis strategy <code>invsnr_input tnpp 58 67  5 12 -a1 180 -a2 270</code></p></li>
+<li><p>Two days with L1+L2+L5, all constellations, decimate to speed up the code (1-sec data will be very slow)</p></li>
+</ul>
+<p><code>invsnr tnpp 2021 315 L1+L2+L5 -doy_end 316 -tempres 2</code></p>
+<img src="../_static/tnpp-ex2.png" width=500>
+<p><em>Example for station SC02</em></p>
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/SC02.jpg" width=500>
+<ul class="simple">
+<li><p>Used default 15 second RINEX files from UNAVCO and -orb gnss option</p></li>
+<li><p>ranges: 3.5-8 meter RH, 5-13 elevation angle, 40-240 azimuth</p></li>
+<li><p>Multi-day, multi constellation, L1+L2 <code>invsnr sc02 2021 30 L1+L2 -doy_end 33 </code></p></li>
+</ul>
+<img src="../_static/sc02-ex1.png" width=500>
+</section>
+<section id="future-changes">
+<h2>Future Changes<a class="headerlink" href="#future-changes" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Currently assumes you are using full 24 hour SNR files.  This obviously is not very sensible
+if you have a large gap
+at the beginning or end of your analysis.</p></li>
+</ul>
+</section>
+<section id="further-reading">
+<h2>Further reading<a class="headerlink" href="#further-reading" title="Permalink to this heading"></a></h2>
+<p>J. Strandberg, T. Hobiger, and R. Haas (2016), Improving GNSS-R sea level determination through
+inverse modeling of SNR data, Radio Science, 51, 1286–1296
+<a class="reference external" href="https://publications.lib.chalmers.se/records/fulltext/241876/local_241876.pdf">pdf</a></p>
+<p>D. Purnell, N. Gomez,  et al. (2021) Precise water level measurements using low-cost GNSS antenna arrays, Earth Surf. Dynam., 9, 673–685 <a class="reference external" href="https://esurf.copernicus.org/articles/9/673/2021/">pdf</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

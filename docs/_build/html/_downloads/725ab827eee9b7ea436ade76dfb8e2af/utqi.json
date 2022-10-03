@@ -1,0 +1,61 @@
+{
+    "station": "utqi",
+    "lat": 71.322754676,
+    "lon": -156.6150158,
+    "ht": 12.0951747,
+    "minH": 2.0,
+    "maxH": 12.0,
+    "e1": 5,
+    "e2": 15,
+    "NReg": [
+        2.0,
+        12.0
+    ],
+    "PkNoise": 2.7,
+    "polyV": 4,
+    "pele": [
+        5,
+        30
+    ],
+    "ediff": 2,
+    "desiredP": 0.005,
+    "azval": [
+        90,
+        180,
+        180,
+        220
+    ],
+    "freqs": [
+        1,
+        20,
+        5,
+        101,
+        102,
+        201,
+        205,
+        207
+    ],
+    "reqAmp": [
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0
+    ],
+    "refraction": true,
+    "overwriteResults": true,
+    "seekRinex": false,
+    "wantCompression": false,
+    "plt_screen": false,
+    "onesat": null,
+    "screenstats": false,
+    "pltname": "utqi_lsp.png",
+    "delTmax": 75
+}

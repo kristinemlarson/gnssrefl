@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lake Superior &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Lake Superior</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/mchn_use.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="lake-superior">
+<h1>Lake Superior<a class="headerlink" href="#lake-superior" title="Permalink to this heading"></a></h1>
+<p><strong>Background:</strong> Station mchn is operated by NRCAN. The data are archived at SOPAC and NRCAN.</p>
+<p>Unfortunately only L1 data should be used at this site. Encourage the station operators to
+track L2C, L5 (and Galileo, Glonass, and Beidou !)</p>
+<p><a class="reference external" href="https://gnss-reflections.org/fancy6?example=mchn">You should use my web app to get a sense of what the site looks like. Please note that the app
+will be analyzing data in real-time, so please wait for the answers to “pop” up in the
+left hand side of the page. It takes about 5 seconds</a>
+The webapp provides you with a photograph, coordinates (make a note of them),
+a google Earth map. Save the periodogram so you can look at it more closely.</p>
+<p><strong>Coordinates:</strong> You can try the <a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/MCHN.sta">Nevada Reno site</a>.
+Or use the ones on my web app. They are the same.</p>
+<p><strong>Picking a mask:</strong>
+From the periodogram and google Earth map you should be able to come up with a pretty good
+azimuth mask.  Elevation angle might be a bit trickier, but in this case, go ahead and
+use what I did, which is in the title of the periodogram plot. For azimuth, I suggest that you
+use my web app. <a class="reference external" href="https://gnss-reflections.org/rzones?station=mchn&amp;msl=on&amp;RH=7&amp;eang=2&amp;azim1=80&amp;azim2=180">Here is a pretty good start on an elevation and azimuth angle mask.</a>.</p>
+<p><strong>Reproduce the web app results:</strong></p>
+<p><em>rinex2snr mchn 2019 205 -archive scripps</em></p>
+<p><em>quickLook mchn 2019 205</em></p>
+<img src="mchn-default.png" width="500">
+<p>Why does this not look like the results from my web app?? Look closely. Make some changes
+at the commandline for quickLook.</p>
+<img src="mchn-better.png" width="500">
+<p>Once you figure out what you need to do, go ahead and analyze the data from 2013.</p>
+<p><em>rinex2snr mchn 2013 1 -archive sopac -doy_end 365</em></p>
+<p>You need to use <strong>make_json_input</strong> to set up the analysis instructions.
+<a class="reference download internal" download="" href="../_downloads/a1c22b9b0f2aa9933bde6364490e0371/mchn.json"><span class="xref download myst">You will need to hand-edit it to only use L1 and to set the azimuth region.</span></a>
+You will notice that I have a pretty restricted azimuth region.  Although you can get
+good reflections beyond 180 degrees, there is clearly something funny in the water there
+(from google Earth), and if you look at the photograph, it is pretty obvious that there is something
+sticking out of the water. Of course feel free to try something
+different. But if you choose a mask that reflects off water and something
+else, you aren’t really measuring the height of the water.</p>
+<p><em>gnssir mchn 2013 1 -doy_end 365</em></p>
+<p><strong>Computing daily average</strong></p>
+<p>There are still outliers in your solutions - and in principle I encourage you to figure out better
+restrictions, i.e. increase the amplitude requirement or peak to noise restriction. If you don’t take this into
+account, you can see what I mean:</p>
+<p><em>daily_avg mchn 2 10</em></p>
+<p>This command says the median filter allows any value within 2 meters of the median. The input of 10 means the
+number of tracks needed to compute an average.</p>
+<img src="mchn_1.png" width="500">
+<p>You get something much more reasonable with a 0.25 meter median filter.</p>
+<p><em>daily_avg mchn 0.25 10</em></p>
+<img src="mchn_2.png" width="500">
+<p>and for the average</p>
+<img src="mchn_3.png" width="500">
+<p>The number of tracks you will require is going to depend on the site. Here the azimuth is restricted because
+we are on a coastline of a lake. On an ice sheet we can often use every azimuth, which means more tracks. And
+some of those sites also tracked multiple frequencies. Here we can only reliably use L1.
+Please note that these reflections are from ice in the winter and water during the summer. We
+will be implementing surface bias corrections (ice,snow) to our software. Until then, please take this
+into account when interpreting the results.</p>
+<p>Note: there is a tide gauge at this site. Please contact NRCAN for more information.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

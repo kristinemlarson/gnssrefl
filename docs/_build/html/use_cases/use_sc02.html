@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Friday Harbor &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Friday Harbor</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/use_sc02.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="friday-harbor">
+<h1>Friday Harbor<a class="headerlink" href="#friday-harbor" title="Permalink to this heading"></a></h1>
+<p align="center">
+<img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>
+</P>
+<p><strong>Station Name:</strong> sc02</p>
+<p><strong>Location:</strong> Friday Harbor, Washington, USA</p>
+<p><strong>Archive:</strong> <a class="reference external" href="http://www.unavco.org">UNAVCO</a></p>
+<p><strong>Ellipsoidal Coordinates:</strong></p>
+<ul class="simple">
+<li><p>Latitude: 48.546</p></li>
+<li><p>Longitude: -123.008</p></li>
+<li><p>Height: -15.049 m</p></li>
+</ul>
+<p><a class="reference external" href="https://www.unavco.org/instrumentation/networks/status/nota/overview/SC02">Station Page at UNAVCO</a></p>
+<p><a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/SC02.sta">Station Page at Nevada Geodetic Laboratory</a></p>
+<p><a class="reference external" href="https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880">Colocated NOAA tide gauge</a></p>
+<p><a class="reference external" href="https://www.google.com/maps/place/48%C2%B032'45.6%22N+123%C2%B000'28.8%22W/&#64;48.546,-123.010194,17z/data=!3m1!4b1!4m5!3m4!1s0x0:0x0!8m2!3d48.546!4d-123.008">Google Maps</a></p>
+</section>
+<section id="data-summary">
+<h1>Data Summary<a class="headerlink" href="#data-summary" title="Permalink to this heading"></a></h1>
+<p>There have been <em>a lot</em> of papers written about sc02. That being said, it is not an ideal GNSS reflections site. It is set
+back a bit too far from the shore - and it would have been far superior for reflections if the antenna were
+a bit taller. Furthermore, there are obstructions (docks). For further details, you are encouraged to read
+<a class="reference external" href="https://www.kristinelarson.net/wp-content/uploads/2015/12/LarsonRayWilliams-2017-FridayHarbor.pdf">this early paper</a>
+summarizing a comparison of 10 years of GNSS-IR results with the colocated tide gauge operated by NOAA. That paper only
+used the GPS L1 SNR data.  Since that time a multi-GNSS receiver has been installed and there is an order of
+magnitude increase in the number of useable signals. Here we will only use the low-rate (15 sec) data from this new receiver.
+If you are interested, UNAVCO does have a 1-sec dataset available for use.</p>
+<p>Take some time to look at the <a class="reference external" href="https://gnss-reflections.org/rzones?station=sc02">reflection zones webapp.</a>
+The goal is to play with the different elevation angle settings and azimuths. This screen
+shot shows clearly that not all azimuths are going to work. But it does not tell you which
+elevation angles will be over water and which will not. The default will use mean sea level -
+but keep in mind that the reflector heights will not always be at mean sea level. so you might
+try using different reflector heights to see how those reflection zones change. We have
+data from the site, so you can check later to see which ones are the limiting reflector
+heights.</p>
+<P align=center>
+<img src="sc02-google.png" width=400>
+</p>
+</section>
+<section id="take-a-quick-look-at-the-snr-data">
+<h1>Take a quick look at the SNR data<a class="headerlink" href="#take-a-quick-look-at-the-snr-data" title="Permalink to this heading"></a></h1>
+<p>Translate the GPS data for January 15 2021. First you need to make the SNR file:</p>
+<p><code>rinex2snr sc02 2021 15</code></p>
+<p>Use our utility <code>uickLook</code> with defaults <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For more details on quickLook output)</span></a>:</p>
+<p><code>quickLook sc02 2021 15 </code></p>
+<img src="sc02-default.png" width="600"/>
+<p>These results for reflector height in the top panel are pretty bad (gray means the retrieval does not pass QC). Why?
+The reflector height defaults are restricted to 0.5-6 meters, which includes part of
+the tidal range, but not all of it. Furthermore, the default elevation angles of 5 to 25 degrees are
+not acceptable here, as these elevation angles include rocks and soil in addition to the water.</p>
+<p>Now let’s make better choices. Following the suggestions of <em>Larson, Ray, and Williams</em> (2017), use
+elevation angle restrictions of 5 to 13 degrees and reflector height restrictions of 3 to 12 meters. And let’s
+use a modern GPS signal, L2C.</p>
+<p><code>quickLook sc02 2021 15 -e1 5 -e2 13 -h1 3 -h2 12 -fr 20</code></p>
+<img src="sc02-l2c.png" width=600>
+<p>Now instead of vast numbers of unsuccessful reflector height retrivals, you can begin to
+see where the acceptable azimuths will be, ~50 to 230 degrees. A peak to noise ratio
+of 3 works pretty well.  The Lomb Scargle periodograms show the
+retrievals in periodogram space. You can see here that the northwest
+is a dead zone for water reflections, and that was expected.</p>
+<img src="sc02-l2c-lsp.png" width=600>
+<p>We can also check the retrievals stats for L1 to make sure these look good too.</p>
+<img src="sc02-l1-qc.png" width="600">
+</section>
+<section id="measure-tides-with-gnss-ir">
+<h1>Measure Tides with GNSS-IR<a class="headerlink" href="#measure-tides-with-gnss-ir" title="Permalink to this heading"></a></h1>
+<p>We will not attempt to analyze a long time series, but instead focus here on
+the process. We will be using three+ weeks of GNSS data from 2021 as our sample dataset.</p>
+<p><code>rinex2snr sc02 2021 15 -doy_end 40</code></p>
+<p>Then you need to make the list of analysis inputs (stored in json format):</p>
+<p><code>make_json_input sc02  48.546  -123.008  -15.049 -e1 5 -e2 13 -h1 3 -h2 12 -peak2noise 3.0 -allfreq True</code></p>
+<p>Hand edit the json file to remove the unreliable azimuths and the Beidou signals because they are
+not in the RINEX 2.11 file <a class="reference download internal" download="" href="../_downloads/d7d74d4e728f01131addb06ef0d0878b/sc02.json"><span class="xref download myst">Example json file</span></a>.</p>
+<p>Once you have the json file set up, you can go ahead and analyze all the data with a single command:</p>
+<p><code>gnssir sc02 2021 15 -doy_end 40</code></p>
+<p>This produces reflector heights for every rising and setting satellite track that meets the
+quality control metrics that you have set. We have some preliminary code that will help you evaluate
+these RH retrievals. It is a work in progress, so it does not do everything yet. It starts<br />
+by concatenating the daily results and applying a sigma outlier criterion . The default is set to
+2.5 sigma, but you can enter on the command line a more or less stringent value:</p>
+<p><code>subdaily sc02 2021</code></p>
+<img src="raw_sc02.png"	width=600>
+<p>The output is stored in a plain text or csv file. This code will
+also apply the RH dot correction, but you have to
+request it (<code>-rhdot T</code>). The spline_outlier optional input (in meters)
+is only used in the rhdot section of the code.</p>
+<p>Below are shown the initial solutions with a spline fit and outliers identified.
+Note: These figures were generated from an earlier version of the code, and should be
+updated.</p>
+<img src="sc02-outliers.png" width=600>
+<p>Residuals to the spline fit with and without a RHdot correction:</p>
+<img src="sc02-rhdot.png" width=600>
+<p>A summary of the number of satellite arcs that are available:</p>
+<img src="sc02-nvals.png" width=600>
+<p>Some statistics come to the screen that give you some perspective
+on the performance of the different frequencies and constellations.
+Note that there <em>should</em> be biases because we have not yet applied
+<em>phase center corrections</em>. This also shows that the RHdot correction
+should be applied at this site, as it does reduce the scatter. Once
+the phase center corrections are made, the precision will be further
+improved.</p>
+<PRE>
+RMS no RHdot correction (m)  0.139
+RMS w/ RHdot correction (m)  0.106
+Freq  Bias  Sigma   NumObs
+       (m)   (m)
+  1   0.08   0.11   1025
+ 20  -0.02   0.09    803
+  5  -0.04   0.09    615
+101   0.06   0.09    613
+102  -0.03   0.10    667
+201   0.07   0.09    603
+205  -0.04   0.08    616
+207  -0.03   0.08    617
+208  -0.05   0.08    616
+</PRE>
+<p>This is a standard Lomb Scargle analysis of reflection data at sc02.
+Multiple authors have recommended using different analysis strategies, and
+you are most definitely encouraged to look at using these techniques. In most cases
+smoothness strategies are used to improve the retrievals.</p>
+<p>I have recently posted Simon Williams tidal estimation code to python. I will do my best to add it to this
+package.</p>
+<p>How well does this simple analyis compare
+to the <a class="reference external" href="https://tidesandcurrents.noaa.gov/stationhome.html?id=9449880">official NOAA tide gauge data stream?</a></p>
+<p>You can download the NOAA data yourselves or use our utility:</p>
+<p><code>download_tides 9449880 20210115 20210209</code></p>
+<p>We then compared the two series.</p>
+<img src="sc02-noaa.png" width=600>
+<HR>
+<p>Here is a list of some of the publications using data from sc02. If you would like me to add more, please send them via email.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.kristinelarson.net/wp-content/uploads/2015/10/Larson_TideGauge.pdf">Larson, Löfgren, Haas, Coastal Sea Level Measurements Using A Single Geodetic GPS Receiver, 2011</a></p></li>
+<li><p><a class="reference external" href="https://www.kristinelarson.net/wp-content/uploads/2015/12/LarsonRayWilliams-2017-FridayHarbor.pdf">Larson, Ray, and  Williams, A ten year comparison of water levels measured with a geodetic GPS receiver versus a conventional tide gauge, 2017</a></p></li>
+<li><p><a class="reference external" href="https://www.researchgate.net/publication/343091181_Quantifying_the_Uncertainty_in_Ground-Based_GNSS-Reflectometry_Sea_Level_Measurements">Purnell, Gomez, Chan, Strandberg, Hobiger, Quantifying the Uncertainty in Ground-Based GNSS-Reflectometry Sea Level Measurements, 2021</a></p></li>
+<li><p>Löfgren, Haas, and Scherneck, 2014 Sea level time series and ocean tide analysis from multipath signals at five GPS sites in different parts of the world</p></li>
+<li><p>Wang, Zhang and Zhang, 2018 Sea level estimation from SNR data of geodetic receivers using wavelet analysis</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Summit Camp, Greenland &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Summit Camp, Greenland</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/use_smm3.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="summit-camp-greenland">
+<h1>Summit Camp, Greenland<a class="headerlink" href="#summit-camp-greenland" title="Permalink to this heading"></a></h1>
+<p>Please note: this use case was originally written in late 2020. The dataset has been updated since that time.
+Sometimes Galileo is tracked; sometimes it is not tracked. There has also been an equipment
+change - so you should make sure that you do not interpret small vertical biases at that time.
+Please contact <a class="reference external" href="https://unavco.org">UNAVCO</a> if you need more information about the site.</p>
+<p><a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/SMM3.sta">University of Nevada Reno</a> continues to do a great job
+of providing geodetic coordinates for this site.
+Please note that there is an error in antenna height (16 meters) for the first few weeks of the site. This is because
+the offset was set wrong in the Rinex file.  Simply discard those data or put the antenna height back in the
+results. Ignore all attempts by Nevada Reno to fit a model to these data. That model is meant for tectonic
+sites; and it cannot properly deal with a 16 meter antenna height error. The results themselves are good.
+Please also keep in mind that the Nevada Reno analysis group is working 24/7, and does not necessarily go back and pick up data
+that are only telemetered 6 months after the fact, as they might be at an ice sheet site.</p>
+<p>Before attempting to update/analyze these data, I encourage you to read the refereed paper on the larger
+Greenland dataset.  It will save you time down the line.</p>
+<p><a class="reference external" href="https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf">Brief Communication: Update on the GPS reflection technique for measuring snow accumulation in Greenland</a></p>
+<p>Sincerely,</p>
+<p>Kristine M. Larson</p>
+<p>July 13, 2022</p>
+<HR>
+<p align=center>
+<img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
+</p>
+<p><strong>Station Name:</strong> smm3</p>
+<p><strong>Location:</strong> central Greenland</p>
+<p><strong>Archive:</strong> UNAVCO</p>
+<p><strong>Ellipsoidal Coordinates:</strong></p>
+<ul class="simple">
+<li><p>Latitude: 72.573 degrees</p></li>
+<li><p>Longitude: -38.470 degrees</p></li>
+<li><p>Height: 3252.453 meters</p></li>
+</ul>
+<p><a class="reference external" href="https://www.unavco.org/instrumentation/networks/status/nota/overview/SMM3">Station Page at UNAVCO</a></p>
+<p><a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/SMM3.sta">Station Page at Nevada Geodetic Laboratory</a></p>
+</section>
+<section id="data-summary">
+<h1>Data Summary<a class="headerlink" href="#data-summary" title="Permalink to this heading"></a></h1>
+<p>This site has been optimally set up to accommodate both positions and reflectometry. This means there is no elevation
+mask applied at the receiver and that it tracks modern GPS signals (L2C and L5) as
+well as Glonass. You can see from the photo at the top that it is NOT the typical 2-meter monument.</p>
+<p>Position time series for smm3 can easily be retrieved from <a class="reference external" href="http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/SMM3.tenv3">Nevada Reno</a>.
+Note that there is an antenna height blunder in the very early data for the site. It is straightforward to find and remove.</p>
+<p>You can use my webapp to get a sense of what the results for this site looks like. Please note that the app
+will be analyzing data in real-time, so please wait for the answers to “pop” up in the
+left hand side of the page. <a class="reference external" href="https://gnss-reflections.org/api?example=smm3">It takes about 10 seconds</a>.
+It also has a google map and photograph.</p>
+<p>Sadly, as of this writing (April 2021), smm3 is dead. It could be that the receiver is working but the telemetry is down.
+Please contact unavco.org for information about the site.</p>
+</section>
+<section id="a-quick-look-at-the-data">
+<h1>A Quick Look at the Data<a class="headerlink" href="#a-quick-look-at-the-data" title="Permalink to this heading"></a></h1>
+<p>First make a multi-GNSS SNR file:</p>
+<p><code>rinex2snr smm3 2020 106 -orb gnss </code></p>
+<p>Then run <code>quickLook</code>:</p>
+<p><code>quickLook smm3 2020 106</code></p>
+<img src="smm3-default.png" width="600" />
+<p>Why does this not look like the periodogram results from my web app? Look closely.
+On the web app smm3 is ~14 meters above the ice sheet - and this far exceeds the
+defaults of 6 meters used in quickLook. You need to reset the allowed reflector heights.
+Modify your call to <strong>quickLook</strong>, using RH mask of 8-20 meters. Also change the elevation angle mask to 5-15.</p>
+<p><code>quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15</code></p>
+<img src="smm3_l1.png" width="600" />
+<p>Notice that instead of strong peaks center at a single RH value,
+there is quite a bit of spread in the northwest and northeast quadrants. That is because the reflection
+area is more complex (and maybe also reflecting off things that are not snow).</p>
+<p>The QC metrics indicate that almost all azimuths produce “good” retrievals, but certainly the northern quadrants
+have much smaller amplitudes and peak to noise ratios (middle and bottom panel). At this particular site, we
+will use an azimuth mask recommended by the science team working at Summit Camp.</p>
+<img src="smm3_qc.png" width="600" />
+<p>Now let’s try L2C:</p>
+<img src="smm3_l2c.png" width="600" />
+<p>There is definitely some interesting stuff going on with double peaks, but it has nothing
+to do with the snow surface. It is related to the L2C GPS signal structure and the receiver tracking algorithm.
+The good news is that the primary peak is at the right place (!). I would bet that
+the location of the second peak is exactly 1.55/1.20 times the location of the first peak.</p>
+<p>Now L5 data:</p>
+<img src="smm3_l5.png" width="600" />
+<section id="steps-for-longer-analysis">
+<h2>Steps for Longer Analysis:<a class="headerlink" href="#steps-for-longer-analysis" title="Permalink to this heading"></a></h2>
+<p>Use <strong>make_json_input</strong> to set your analysis inputs. Instead of the defaults, set the special height and
+elevation angles, allfreq to True, peak to noise ratio to 3.5, and minimum amplitude to 15:</p>
+<p><code>make_json_input smm3 72.573 -38.470  3252.453 -peak2noise 3.5 -allfreq True  -ampl 15 -e1 5 -e2 15 -h1 8 -h2 20</code></p>
+<p>The azimuth mask had to be hand-edited. These azimuths are the “quiet” areas for making scientific
+measurements at Summit Camp. To keep the reflection
+zones quite large - I only opted to only use data from 5-15 degree elevation angles. This will make the amplitudes of the peaks
+in the periodogram larger. I also removed the Galileo signals from the json since they are not
+in the RINEX files I am using. <a class="reference download internal" download="" href="../_downloads/4b9ad2f9cf93292b1af054abb686bc77/smm3.json"><span class="xref download myst">Sample json</span></a></p>
+<p>Then make SNR files for ~6 months:</p>
+<p><code>rinex2snr smm3 2018 180 -orb gnss -doy_end 365</code></p>
+<p>Estimate reflector height:</p>
+<p><code>gnssir smm3 2018 180 -doy_end 365 </code></p>
+<p>Compute daily average of these results:</p>
+<p><code>daily_avg smm3 0.25 50 </code></p>
+<img src="smm3_RH.png" width="600" />
+<p>Notice that the <a class="reference download internal" download="" href="../_downloads/928a77afc48bb4aabd1f3489d8862294/smm3_RH.txt"><span class="xref download myst">daily average RH file</span></a> shows well over 150 measurements per day are being
+used in the average. So you could rerun the code to use a bigger value than 50. Here the observations are so
+robust it won’t make a difference.</p>
+<p>How should you interpret these results?<br />
+Please read <a class="reference external" href="https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf">this paper</a>.
+smm3 was one of the sites highlighted in this paper.</p>
+<p>If you decided to update/analyze this dataset and use our code, please cite the DOI given
+at the top of the <a class="reference external" href="https://github.com/kristinemlarson/gnssrefl">README</a>
+and the NASA grant (80NSSC20K1731) that was used to support it. Thanks!</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

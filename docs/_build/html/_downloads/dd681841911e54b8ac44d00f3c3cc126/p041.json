@@ -1,0 +1,51 @@
+{
+    "station": "p041",
+    "lat": 39.94949,
+    "lon": -105.19427,
+    "ht": 1728.842,
+    "minH": 0.5,
+    "maxH": 6.0,
+    "e1": 5,
+    "e2": 25,
+    "NReg": [
+        0.5,
+        6.0
+    ],
+    "PkNoise": 3.2,
+    "polyV": 4,
+    "pele": [
+        5,
+        30
+    ],
+    "ediff": 2,
+    "desiredP": 0.005,
+    "azval": [
+        0,
+        90,
+        90,
+        180,
+        180,
+        270,
+        270,
+        360
+    ],
+    "freqs": [
+        1,
+        20,
+        5
+    ],
+    "reqAmp": [
+        8.0,
+        8.0,
+        8.0
+    ],
+    "refraction": true,
+    "overwriteResults": true,
+    "seekRinex": false,
+    "wantCompression": false,
+    "plt_screen": false,
+    "onesat": null,
+    "screenstats": false,
+    "pltname": "p041_lsp.png",
+    "delTmax": 75
+}

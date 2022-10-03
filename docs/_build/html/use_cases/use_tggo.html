@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TGGO &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>TGGO</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/use_tggo.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="tggo">
+<h1>TGGO<a class="headerlink" href="#tggo" title="Permalink to this heading"></a></h1>
+<p><strong>Station Name:</strong> tggo  or TGGO00DEU</p>
+<p><strong>Location:</strong> Elbe River, Germany</p>
+<p><strong>Archives:</strong> <a class="reference external" href="https://www.bafg.de/EN/Home/homepage_en_node.html">BFG</a></p>
+<p><a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/TGGO.sta">Station Page at NGL</a></p>
+<p align=center>
+<img src=TGGO.JPG width=600</img>
+</p>
+<p>TGGO is a station in
+the <a class="reference external" href="https://fig.net/resources/proceedings/fig_proceedings/fig2021/papers/ts05.4/TS05.4_esch_11010.pdf">BfG-GNSS Monitoring Network</a>. It is located in the Elbe River. It is colocated with a tradtional
+tide gauge. It has excellent visibility of the water.</p>
+</section>
+<section id="reflection-zones-for-tggo">
+<h1>Reflection Zones for TGGO<a class="headerlink" href="#reflection-zones-for-tggo" title="Permalink to this heading"></a></h1>
+<p><a class="reference external" href="http://gnss-reflections.org/rzones">Type tggo into the station name for our reflection zone web site.</a>
+Generally for water, I recommend using up to 15 degree elevation angles.
+Note that the height of the GNSS antenna above sea level is returned on the right hand side.
+We will compare that value with the estimated reflector height.
+<a class="reference external" href="http://gnss-reflections.org/rzones?station=tggo&amp;lat=0.0&amp;lon=0.0&amp;height=0.0&amp;msl=msl&amp;RH=2&amp;freq=1&amp;nyquist=0&amp;srate=30&amp;eang=1&amp;azim1=-90&amp;azim2=180&amp;system=gps">It does look like there might be some kind of pier that we should avoid</a></p>
+</section>
+<section id="make-a-snr-file">
+<h1>Make a SNR file<a class="headerlink" href="#make-a-snr-file" title="Permalink to this heading"></a></h1>
+<p>Because the GNSS station is ~12 meters above the water, we are too close to the L1 Nyquist
+for a receiver that is sampling at 30 seconds.  I recommend using the 15 second files that BFG started
+producing in summer 2022. Make the following choices:</p>
+<ul class="simple">
+<li><p>station tggo00deu (the longer station name will tell the code to find RINEX 3 instead of RINEX 2.11)</p></li>
+<li><p>archive bfg</p></li>
+<li><p>orb rapid (you can also use gnss if you prefer)</p></li>
+<li><p>samplerate 15</p></li>
+</ul>
+<p><code>rinex2snr tggo00deu 2022 234 -archive bfg -orb rapid -samplerate 15</code></p>
+<p>You will need a password for the BFG archive. This is available upon request by sending an e-mail to gnss&#64;bafg.de.
+You will only need to enter the password once as <code>gnssrefl</code> will save it to your local system.
+While you can also find TGGO data at SONEL, it will likely be the 30 second data which is not as useful as the 15 second data.</p>
+</section>
+<section id="first-evaluation-of-the-data-for-tggo">
+<h1>First evaluation of the data for TGGO<a class="headerlink" href="#first-evaluation-of-the-data-for-tggo" title="Permalink to this heading"></a></h1>
+<p>I am going to use year 2022 and day of year 234 and frequency 20 (which means L2C). I will
+further restrict elevation angles to 5-15. In order to see the water, you need to set the reflector height
+limits to include the vertical distance to the water with the optional parameters h1 and h2.</p>
+<p><code>quickLook tggo 2022 234 -fr 20 -e1 5 -e2 15 -h1 6 -h2 20</code></p>
+<p>The first plot shows periodograms in the four geographic coordinates.</p>
+<img src=tggo_ql1.png width=600>
+<p>These are summarized below.</p>
+<img src=tggo_ql2.png width=600>
+<p>All three plots are with respect to azimuth in degrees. On the top plot, the “blue” retrievals show that the GNSS antenna is indeed ~12 meters above the water. The variation in reflector height (with respect to azimuth) are the tides. I’ve outlined in red the azimuth region that shows consistently rejected retrievals. This roughly corresponds to where we saw the pier in the photograph.</p>
+</section>
+<section id="analyze-the-data">
+<h1>Analyze the data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h1>
+<p>Go back and make SNR files for a longer time period:</p>
+<p><code>rinex2snr tggo00deu 2022 226 -doy_end 240 -archive bfg -orb rapid -samplerate 15</code></p>
+<p>The next step is to write down your analyis strategy using <code>make_json_input</code>. Since tggo is
+included in our global database, you can simply use 0,0,0 for the required <em>a priori</em> station coordinates:
+I am using a slightly smaller reflector height zone than I used with <code>quickLook</code>.</p>
+<p><code>make_json_input tggo 0 0 0 -h1 6 -h2 20 -e1 5 -e2 15 -h1 6 -h2 18 -allfreq T</code></p>
+<p>Edit the json file (location is printed to the screen) and remove the azimuth region in
+the red box above.</p>
+<p>Now estimate reflector heights for these same dates:</p>
+<p><code>gnssir tggo 2022 226 -doy_end 240 </code></p>
+<p>To put those results all together:</p>
+<p><code>subdaily tggo 2022</code></p>
+<p>Multiple figures come to the screen. The first will summarize how much each
+constellation contributes. Because of restrictions for this particular receiver type, the Galileo
+signals are degraded for reflections. When a new receiver is installed, the Galileo
+retrievals will significantly improve.</p>
+<img src=tggo_1.png width=600>
+<p>The reflector heights are then plotted as a function of constellation (GPS, Glonass, Galileo), azimuth, and
+amplitude of the reflector height periodogram. These can be useful if you are trying to assess whether your azimuth mask
+is working.</p>
+<img src=tggo_2.png width=800>
+<p>Time series with large outliers removed.</p>
+<img src=tggo_3.png width=600>
+<p>Additional corrections can be made using the <code>rhdot T</code> setting. I will add
+more information here when I get a chance.</p>
+<p>Kristine M. Larson September 9, 2022</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homework 0 &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Homework 0</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/homeworks/homework0.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="homework-0">
+<h1>Homework 0<a class="headerlink" href="#homework-0" title="Permalink to this heading"></a></h1>
+<p><strong>goal:</strong> to make sure you have properly installed <code>gnssrefl</code></p>
+<p><a class="reference external" href="https://github.com/kristinemlarson/gnssrefl">You are strongly encouraged to read the documentation.</a></p>
+<p>There are two versions of this homework: a Jupyter Notebook version and a command line version.<br />
+Pick the method that you prefer to do your analysis in the course, or experiment with both.</p>
+</section>
+<section id="jupyter-notebook-version">
+<h1><strong>Jupyter Notebook version:</strong><a class="headerlink" href="#jupyter-notebook-version" title="Permalink to this heading"></a></h1>
+<p>run the HW0 notebook from the <a class="reference external" href="https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter">jupyter notebook repository, either via docker or to clone and run locally on your machine</a>.</p>
+</section>
+<section id="command-line-version-options-github-or-docker-image">
+<h1><strong>Command line version options: <span class="xref myst">gitHub</span> or <span class="xref myst">Docker image</span></strong><a class="headerlink" href="#command-line-version-options-github-or-docker-image" title="Permalink to this heading"></a></h1>
+<section id="gnssrefl-via-github-local-version">
+<h2>GNSSREFL via GITHUB (local version)<a class="headerlink" href="#gnssrefl-via-github-local-version" title="Permalink to this heading"></a></h2>
+<p><strong>NOTE</strong> this setup requires system dependencies: <strong>gcc</strong> and <strong>gfortran</strong>.  To install:</p>
+<ul class="simple">
+<li><p>if you are using a LINUX then simply run <code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">-y</span> <span class="pre">gcc</span></code> and <code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">-y</span> <span class="pre">gfortran</span></code> in your terminal (or <code>yum install -y gcc-gfortran</code> ).</p></li>
+<li><p>if you are using a MacOS then you will need to install xcode. First, in your terminal, check if you have xcode by <code class="docutils literal notranslate"><span class="pre">xcode-select</span> <span class="pre">-p</span></code>.
+If it is installed, it should return a path. If it is not installed then run <code class="docutils literal notranslate"><span class="pre">xcode-select</span> <span class="pre">--install</span></code>.
+This should install gcc.You can check if you have gcc by <code class="docutils literal notranslate"><span class="pre">gcc</span> <span class="pre">--version</span></code>. Check if you have gfortran by <code class="docutils literal notranslate"><span class="pre">gfortran</span> <span class="pre">--version</span></code>.
+If you do not have gfortran, then you can use homebrew to install, if you have it <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">gfortran</span></code>.
+If you don’t have homebrew, then see <a class="reference external" href="https://gcc.gnu.org/wiki/GFortranBinariesMacOS">here</a>.</p>
+<ul>
+<li><p>If you are still experiencing trouble then it is recommended you try the <span class="xref myst">docker container version</span>.</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Assign environment variables and install gnssrefl</strong>
+(<a class="reference external" href="https://www.youtube.com/watch?v=tdFi2OGIQwg">here is a helpful video covering this portion</a>)</p>
+<ul class="simple">
+<li><p>cd to your desired working directory</p></li>
+<li><p>create the following directories for gnssrefl: EXE, ORBITS and REFL_CODE [hint <code>mkdir</code> ]</p></li>
+<li><p>set your gnssrefl <a class="reference external" href="https://en.wikipedia.org/wiki/Environment_variable">enviroment variables</a>, EXE, ORBITS and REFL_CODE to these respective paths</p>
+<ul>
+<li><p>hint: to check absolute path of a directory <code>pwd</code></p></li>
+<li><p>hint: to set environment variable in shell, <code>export VARNAME=path/to/directory</code>.  <a class="reference external" href="https://unix.stackexchange.com/questions/117467/how-to-permanently-set-environmental-variables">To set an environment variable everytime you open the shell</a>, use the same export command in the the appropriate initialization file for your shell).</p></li>
+</ul>
+</li>
+<li><p>git clone https://github.com/kristinemlarson/gnssrefl</p></li>
+<li><p>cd into that directory, set up a virtual environment, a la python3 -m venv env</p></li>
+<li><p>activate your virtual environment</p></li>
+<li><p>pip install .</p></li>
+</ul>
+<p>Finally, if you haven’t already installed required executables in $EXE (CRX2RNX, gfzrnx):</p>
+<ul class="simple">
+<li><p>install them using gnssrefl commandline installer</p>
+<ul>
+<li><p><code>installexe <em>OS_type</em></code>, where <em>OS_type</em> is either {<code>macos</code>, <code>linux64</code>}</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="gnssrefl-docker-container-version">
+<h2>GNSSREFL DOCKER (container version)<a class="headerlink" href="#gnssrefl-docker-container-version" title="Permalink to this heading"></a></h2>
+<p><a class="reference external" href="https://hub.docker.com/repository/docker/unavdocker/gnssrefl">docker hub image</a></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/timdittmann/gnssrefl/blob/docker_instructions/docs/docker_cl_instructions.md">see docker command line instructions</a></p></li>
+</ul>
+<p><em>NB:</em> if you use the <code>quicklook</code> function, the figures generated will <strong>not</strong> plot to the screen but will be available in the mounted refl_code/Files volume mounted locally.</p>
+<hr class="docutils" />
+</section>
+</section>
+<section id="command-line-version-homework">
+<h1><strong>Command line version homework:</strong><a class="headerlink" href="#command-line-version-homework" title="Permalink to this heading"></a></h1>
+<section id="check-environment-variables-are-set">
+<h2>1. Check environment variables are set:<a class="headerlink" href="#check-environment-variables-are-set" title="Permalink to this heading"></a></h2>
+<p><code>echo $EXE</code> <br />
+<code>echo $ORBITS</code> <br />
+<code>echo $REFL_CODE</code></p>
+<p>If you don’t get a response, these probably aren’t set correctly.</p>
+<p>You should get something like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">echo $EXE</span>
+<span class="go">/path/to/directory/EXE</span>
+</pre></div>
+</div>
+<p>If you’re running the docker gnssrefl,
+you should get:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">echo $EXE</span>
+<span class="go">/home/jovyan/gnssir/gnssrefl/EXE</span>
+</pre></div>
+</div>
+</section>
+<section id="check-that-exe-executables-are-present">
+<h2>2. Check that EXE executables are present:<a class="headerlink" href="#check-that-exe-executables-are-present" title="Permalink to this heading"></a></h2>
+<p>(these executables are case sensitive!)</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ls $EXE</span>
+<span class="go">CRX2RNX  gfzrnx  teqc</span>
+</pre></div>
+</div>
+</section>
+<section id="check-that-subprocess-dependencies-are-in-path">
+<h2>3. Check that subprocess dependencies are in path:<a class="headerlink" href="#check-that-subprocess-dependencies-are-in-path" title="Permalink to this heading"></a></h2>
+<p><code>which gunzip</code><br />
+<code>which unxz</code><br />
+<code>which uncompress</code></p>
+<p>If you don’t get a response, these dependencies are probably not installed in your path. <br />
+If you’re running the docker image,
+you should get:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">which gunzip</span>
+<span class="go">/usr/bin/gunzip</span>
+</pre></div>
+</div>
+</section>
+<section id="run-a-quick-test-of-rinex2snr">
+<h2>4. Run a quick test of rinex2snr:<a class="headerlink" href="#run-a-quick-test-of-rinex2snr" title="Permalink to this heading"></a></h2>
+<section id="a-simple-use-case-that-requires-hatanaka-decompression-and-broadcast-orbits">
+<h3>a. simple use case that requires Hatanaka decompression and broadcast orbits:<a class="headerlink" href="#a-simple-use-case-that-requires-hatanaka-decompression-and-broadcast-orbits" title="Permalink to this heading"></a></h3>
+<p><code>rinex2snr p042 2018 150</code></p>
+<p>If you get:</p>
+<p><em>SUCCESS: SNR file was created: …</em></p>
+<p>you’ve successfully run the rinex2snr program that:</p>
+<ul class="simple">
+<li><p>downloaded and uncompressed <a class="reference external" href="https://www.unavco.org/data/gps-gnss/hatanaka/hatanaka.html">Hatanaka</a> rinex for a single station (p042) for a single day (doy 150 in 2018)</p></li>
+<li><p>downloaded GPS broadcast orbits</p></li>
+<li><p>calculated azimuth and elevation for each satellite at each epoch given these orbits</p></li>
+<li><p>wrote this az/el, signal, time and CN0 information to a formatted snr output file
+for future analysis.
+Reminder, the .66 file name suffix refers to the
+<a class="reference external" href="https://github.com/kristinemlarson/gnssrefl#iv-rinex2snr---extracting-snr-data-from-rinex-files-">elevation masking options</a>.</p></li>
+</ul>
+<p>If the file is not created - check the logs directory for additional information.</p>
+</section>
+<section id="b-simple-use-case-that-requires-hatanaka-decompression-and-uses-sp3-orbits">
+<h3>b. simple use case that requires Hatanaka decompression and uses SP3 orbits:<a class="headerlink" href="#b-simple-use-case-that-requires-hatanaka-decompression-and-uses-sp3-orbits" title="Permalink to this heading"></a></h3>
+<p><code>rinex2snr p042 2018 150 -orb gnss</code></p>
+<p>If you get:
+<em>SNR file exists…</em><br />
+This is because the logic of gnssrefl checks for an snr file prior to processing.
+Remember this fact if you ever want to <strong>re</strong>process with different orbits!  (we’ll try again in part 2)</p>
+</section>
+<section id="b-2-simple-use-case-that-requires-crx2rnx-and-sp3-orbits">
+<h3>b-2.  simple use case that requires CRX2RNX and SP3 orbits: \<a class="headerlink" href="#b-2-simple-use-case-that-requires-crx2rnx-and-sp3-orbits" title="Permalink to this heading"></a></h3>
+<p>Now we will overwrite the previous SNR file to use the different orbits.</p>
+<p><code>rinex2snr p042 2018 150 -orb gnss -overwrite True</code></p>
+<p>If you get:
+<em>SUCCESS: SNR file was created: …</em><br />
+you’ve successfully:</p>
+<ul class="simple">
+<li><p>downloaded and uncompressed hatanaka rinex for a single station (p042)
+for a single day (doy 150 in 2018)</p></li>
+<li><p>downloaded SP3 format GNSS orbits from the GFZ archive</p></li>
+<li><p>calculated azimuth and elevation for each satellite at each epoch</p></li>
+<li><p>wrote this az/el, signal, time and CN0 information to a formatted
+snr output file for future analysis.</p></li>
+</ul>
+<p>If you get an error, we will need to address this.
+We will begin to compile a list of any additional common errors and solutions here.</p>
+</section>
+<section id="c-optional-but-encouraged-rinex-3-simple-use-case-that-requires-that-you-install-gfzrnx">
+<h3>c. (optional but encouraged) RINEX 3 simple use case that requires that you install gfzrnx<a class="headerlink" href="#c-optional-but-encouraged-rinex-3-simple-use-case-that-requires-that-you-install-gfzrnx" title="Permalink to this heading"></a></h3>
+<p>If you are interested in using RINEX version 3 data, please run this test: <br />
+<code>rinex2snr onsa00swe 2020 1 -archive cddis -orb gnss </code></p>
+<p>If you get:
+<em>SUCCESS: SNR file was created: …</em> <br />
+you’ve successfully:</p>
+<ul class="simple">
+<li><p>downloaded and uncompressed rinex 3 for a single station (onsa)
+for a single day (doy 298 in 2020) from the cddis archive</p></li>
+<li><p>converted rinex 3 to rinex 2 using gfzrnx executable</p></li>
+<li><p>downloaded SP3 format GNSS orbits from the GFZ archive</p></li>
+<li><p>calculated azimuth and elevation for each satellite at each epoch</p></li>
+<li><p>wrote this az/el, signal, time and CN0 information to a formatted
+snr output file for future analysis.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

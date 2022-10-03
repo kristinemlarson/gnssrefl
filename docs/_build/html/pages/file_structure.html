@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Files and File Formats &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><strong>Files and File Formats</strong></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pages/file_structure.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="files-and-file-formats">
+<h1><strong>Files and File Formats</strong><a class="headerlink" href="#files-and-file-formats" title="Permalink to this heading"></a></h1>
+<p><em>GPS/GNSS Data</em></p>
+<p>Input observation formats: the code only recognizes RINEX 2.11, RINEX 3+ and NMEA input files.</p>
+<p><em>We require that you use lower case filenames.</em> These are the standard at global archives.</p>
+<p>Warning: while we allow RINEX 3+, we do not read the file itself - we rely on the <code>gfzrnx</code>
+utility developed by Thomas Nischan at GFZ to translate from RINEX 3+ to RINEX 2.11</p>
+<p>Input orbit files: we have tried our best to make the orbit files relatively invisible to users.
+But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
+or precise orbits in the sp3 format.</p>
+<p><strong>Directory Structure for gnssrefl</strong></p>
+<p>File structure for a station called abcd:</p>
+<PRE>
+
+
+REFL_CODE/input/abcd.json - instructions for Lomb Scargle analysis
+
+For SNR data in the year YYYY (last two characters YY), doy DDD:
+
+REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files
+
+For Lomb Scargle (gnssir) results:
+
+REFL_CODE/YYYY/results/abcd/DDD.txt  
+
+Various output files and plots will be placed here:
+
+REFL_CODE/Files/ 
+
+</PRE>
+<p>Rinex files are not stored by this code - in fact, quite the opposite. If they are being translated,
+they are deleted. <strong>Do not keep your only copy of RINEX files in your default directory.</strong></p>
+<p>For orbits:</p>
+<PRE>
+
+
+ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file
+
+ORBITS/YYYY/sp3/...  sp3 files of orbits. 
+
+</PRE>
+<p>You do not need precise orbits to do GNSS-IR. We only use them as a convenience.
+Generally we use multi-GNSS sp3 files. that are defined as:</p>
+<p><strong>Details about the SNR data format:</strong></p>
+<p>The snr options are mostly based on the need to remove the “direct” signal. This is
+not related to a specific site mask and that is why the most frequently used
+options (99 and 66) have a maximum elevation angle of 30 degrees. The
+azimuth-specific mask is decided later when you run <strong>gnssir</strong>.  The SNR choices are:</p>
+<ul class="simple">
+<li><p>66 is elevation angles less than 30 degrees (<strong>this is the default</strong>)</p></li>
+<li><p>99 is elevation angles of 5-30 degrees</p></li>
+<li><p>88 is elevation angles of 5-90 degrees</p></li>
+<li><p>50 is elevation angles less than 10 degrees (good for very tall sites, high-rate applications)</p></li>
+</ul>
+<p>66,99, etc are not good names for files. And for this I apologize. It is too late to change them now.</p>
+<p>The columns in the SNR data are defined as:</p>
+<PRE>
+1. Satellite number (remember 100 is added for Glonass, etc)
+2. Elevation angle, degrees
+3. Azimuth angle, degrees
+4. Seconds of the day, GPS time
+5. elevation angle rate of change, degrees/sec.
+6.  S6 SNR on L6
+7.  S1 SNR on L1
+8.  S2 SNR on L2
+9.  S5 SNR on L5
+10. S7 SNR on L7
+11. S8 SNR on L8
+</PRE>
+<p>The unit for all SNR data is dB-Hz.</p>
+<p><strong>Our names for the GNSS frequencies</strong></p>
+<ul class="simple">
+<li><p>1,2,20, and 5 are GPS L1, L2, L2C, and L5</p></li>
+</ul>
+<p>L2 and L2C are the same frequency - but we use different numbers in this code so that
+one can <em>only</em> use L2C satellites if desired.</p>
+<ul class="simple">
+<li><p>101,102 are Glonass L1 and L2</p></li>
+<li><p>201, 205, 206, 207, 208: Galileo frequencies, which are
+set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz</p></li>
+<li><p>302, 306, 307 : Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gnssir &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><strong>gnssir</strong></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pages/gnssir.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="gnssir">
+<h1><strong>gnssir</strong><a class="headerlink" href="#gnssir" title="Permalink to this heading"></a></h1>
+<p><code>gnssir</code> is the main driver for the GNSS-IR code.</p>
+<p>You need a set of instructions which are made using <code>make_json_input</code>. The required inputs are:</p>
+<ul class="simple">
+<li><p>station name</p></li>
+<li><p>latitude (degrees)</p></li>
+<li><p>longitude (degrees)</p></li>
+<li><p>ellipsoidal height (meters).</p></li>
+</ul>
+<p>The station location <em>does not</em> have to be cm-level for the reflections code. Within a few hundred meters is
+sufficient. For example:</p>
+<p><CODE>make_json_input p101 41.692 -111.236 2016.1</CODE></p>
+<p>If you happen to have the Cartesian coordinates (in meters), you can
+set <code>-xyz True</code> and input those instead of lat, long, and height.</p>
+<p>If you are using a site that is in the UNR database, as of 2021/10/26 you can set
+the a priori values to zeros:</p>
+<p><CODE>make_json_input p101 0 0 0 </CODE></p>
+<p><code>gnssir</code> will use defaults for other parameters if you do not provide them. Those defaults
+tell the code an azimuth and elevation angle mask (i.e. which directions you want
+to allow reflections from), and which frequencies you want to use, and various quality control (QC) metrics.
+Right now the default frequencies are GPS only, e.g. L1, L2C and L5.
+The json file of instructions will be put in $REFL_CODE/input/p101.json. You should look at
+it to get an idea of the kinds of inputs the code uses.
+The default azimuths can be changed, but this needs to be done by hand. Some parameters can be set
+via the command line, as in:</p>
+<p><CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10</CODE></p>
+<p>This changes elevation angles to 5-10 degrees. The default is to only use GPS
+frequencies, specifically L1, L2C, and L5. If you want all GNSS frequencies:</p>
+<p><CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -allfreq True</CODE></p>
+<p>To only use GPS L1:</p>
+<p><CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l1 True </CODE></p>
+<p>To only use GPS L2C and require a spectral amplitude of 10:</p>
+<p><CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True -ampl 10</CODE></p>
+<p>To use GPS L2C, require a spectral amplitude of 10, and spectral peak to noise ratio of 3:</p>
+<p><CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True -ampl 10 -peak2noise 3</CODE></p>
+<p>Azimuth regions should not be larger than ~100 degrees. If for example you want to use the region from 0 to
+270 degrees, you should not set a region from 0 - 270, but instead a region from 0-90, 90-180, and the last
+from 180-270. This is necessary to make sure you don’t mix rising and setting satellite arcs from different
+times of day. I believe the code currently refuses to let you use a region larger than 100 degrees. The default
+is to allow four regions, each of 90 degrees.</p>
+<p>Other things that are helpful to know for the make_json_input inputs:</p>
+<ul class="simple">
+<li><p>Some json settings can be set at the command line.  run <code>make_json_input -h</code> to see these.<br />
+Otherwise, you will need to edit the json file.  Note that there are a few inconstencies between the command line names
+and the json file (for example, h1 and h2 on the command line become
+minH and maxH in the json file). I apologize for this.</p></li>
+</ul>
+<ul class="simple">
+<li><p>e1 and e2 are the min and max elevation angle, in degrees</p></li>
+<li><p>minH and maxH are the min and max allowed reflector height, in meters</p></li>
+<li><p>ediff, in degrees: restricts arcs to be within this range of input elevation angles e1 and e2</p></li>
+<li><p>desiredP, desired reflector height precision, in meters</p></li>
+<li><p>PkNoise is the periodogram peak divided by the periodogram noise ratio.</p></li>
+<li><p>reqAmp is the required periodogram amplitude value, in volts/volts</p></li>
+<li><p>polyV is the polynomial order used for removing the direct signal</p></li>
+<li><p>freqs are selected frequencies for analysis</p></li>
+<li><p>delTmax is the maximum length of allowed satellite arc, in minutes</p></li>
+<li><p>azval are the azimuth regions for study, in pairs (i.e. 0 90 270 360 means you want to evaluate 0 to 90 and 270 to 360).</p></li>
+<li><p>wantCompression, boolean, compress SNR files using xz</p></li>
+<li><p>screenstats, boolean, whether minimal periodogram results come to screen</p></li>
+<li><p>refraction, boolean, whether simple refraction model is applied.</p></li>
+<li><p>plt_screen: boolean, whether SNR data and periodogram are plotted to the screen</p></li>
+<li><p>NReg [min and max required] : define the RH region (in meters) where the “noise value” for the periodogram
+is computed. This is used to compute the peak to noise ratio used in QC.</p></li>
+<li><p>(<em>this option has been removed</em>) seekRinex: boolean, whether code looks for RINEX at an archive</p></li>
+</ul>
+<p>Simple examples for my favorite GPS site <a class="reference external" href="https://spotlight.unavco.org/station-pages/p042/eo/scientistPhoto.jpg">p041</a></p>
+<p><CODE>make_json_input p041 39.949 -105.194 1728.856</CODE> (use defaults and write out a json instruction file)</p>
+<p><CODE>rinex2snr p041 2020 150</CODE> (pick up and translate RINEX file for day of year 150 and year 2020 from unavco )</p>
+<p><CODE>gnssir p041 2020 150</CODE> (calculate the reflector heights)</p>
+<p><CODE>gnssir p041 2020 150 -fr 5 -plt True</CODE> (override defaults, only look at L5 SNR data, and periodogram plots come to the screen)</p>
+<p>Where would the code store the files for this example?</p>
+<ul class="simple">
+<li><p>json instructions are stored in $REFL_CODE/input/p041.json</p></li>
+<li><p>SNR files are stored in $REFL_CODE/2020/snr/p041</p></li>
+<li><p>Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041</p></li>
+</ul>
+<p>This is a snippet of what the result file would look like</p>
+<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/results-snippet.png" width="600">
+<ul class="simple">
+<li><p><em>Amp</em> is the amplitude of the most significant peak in the periodogram (i.e. the amplitude for the RH you estimated).</p></li>
+<li><p><em>DelT</em> is how long a given rising or setting satellite arc was, in minutes.</p></li>
+<li><p><em>emin0</em> and <em>emax0</em> are the min and max observed elevation angles in the arc.</p></li>
+<li><p><em>rise/set</em> tells you whether the satellite arc was rising (1) or setting (-1)</p></li>
+<li><p><em>Azim</em> is the average azimuth angle of the satellite arc</p></li>
+<li><p><em>sat</em> and <em>freq</em> are as defined in this document</p></li>
+<li><p>MJD is modified julian date</p></li>
+<li><p>PkNoise is the peak to noise ratio of the periodogram values</p></li>
+<li><p>last column is currently set to tell you whether the refraction correction has been applied</p></li>
+<li><p>EdotF is used in the RHdot correction needed for dynamic sea level sites. The units are hours/rad.
+When multiplied by RHdot (meters/hour), you will get a correction in units of meters. For further
+information, see <code>subdaily</code>.</p></li>
+</ul>
+<p>If you want a multi-GNSS solution, you need to:</p>
+<ul class="simple">
+<li><p>make sure your json file is set appropriately</p></li>
+<li><p>use a RINEX file with multi-GNSS data in it (i.e. use multi-GNSS orbits and in some cases rerun rinex2snr).</p></li>
+</ul>
+<p>In 2020 p041 had a multi-GNSS receiver operating, so we can look at some of the non-GPS signals.
+In this case, we will look at Galileo L1.</p>
+<p><CODE>make_json_input p041 39.949 -105.194 1728.856 -allfreq True</CODE></p>
+<p><CODE>rinex2snr p041 2020 151 -orb gnss -overwrite True</CODE></p>
+<p><CODE>gnssir p041 2020 151 -fr 201 -plt True</CODE></p>
+<p>Note that a failed satellite arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
+the azimuth and elevation angle mask), you won’t be looking at plots anymore.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>St Lawrence River &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>St Lawrence River</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/pmtl_use.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="st-lawrence-river">
+<h1>St Lawrence River<a class="headerlink" href="#st-lawrence-river" title="Permalink to this heading"></a></h1>
+<p>Station pmtl is operated by the Montreal Port Authority. The data are archived at NRCAN.</p>
+<p>Because I need to use high-rate data at this site, you need to have installed <strong>teqc</strong>.
+See the <a class="reference external" href="https://github.com/kristinemlarson/gnssrefl">main documentation for more information</a>.
+I also urge you to install the <strong>gnssSNR</strong> Fortran code, as it is MUCH faster
+than my python-only RINEX reader/orbit interpolator.</p>
+<p>GPS L1, Glonass L1 and L2 can be used at this site. Tracking L2C, L5, Galileo, and Beidou signals
+would significantly improve the site.</p>
+<p>Look at the <a class="reference external" href="https://webapp.geod.nrcan.gc.ca/geod/data-donnees/station/report-rapport.php?id=M0722900">NRCAN Site Description for pmtl</a></p>
+<img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500" />
+<p>The GNSS antenna is on the roof of grain terminal. Also
+note the ellipsoidal height (and geoid corrected height),
+<a class="reference external" href="https://gnss-reflections.org/geoid?station=pmtl">also provided at my geoid site</a></p>
+<p><strong>Picking a mask:</strong></p>
+<p>For reflections, you want to know the height above the water.
+This is easy for an ocean site - but a little trickier here. To start out, concentrate on the
+geographic mask appropriate for its location using my <a class="reference external" href="https://gnss-reflections.org/rzones">reflection zone webapp</a>.</p>
+<img src="pmtl_rzone.png" width="500" />
+<p>Make a SNR file using the -orb gps+glo, -archive nrcan, and -rate high options.
+Warning: downloading a high-rate GNSS file can take a while …</p>
+<ul class="simple">
+<li><p><em>rinex2snr pmtl 2020 330 -archive nrcan -rate high -orb gps+glo</em></p></li>
+</ul>
+<p>Run <strong>quickLook</strong> - but given the height of pmtl, you are going to need to change the RH values. If you aren’t
+sure how that should go, start out with a broad RH region:</p>
+<ul class="simple">
+<li><p><em>quickLook pmtl 2020 330 -h1 40 -h2 90 -e1 5 -e2 12</em></p></li>
+</ul>
+<img src="pmtl-first-try.png" width="500"/>
+<p>I have annotated this <strong>quickLook</strong> periodogram to point out that there is an outlier in the SW region.
+You can also see that the NW region is useless, which is what we should expect.
+You can try looking at a few more frequencies (such as Glonass) and using a more restricted RH region.</p>
+<p>For a final analysis, you need to use <strong>gnssir</strong>. First you set up a json of instructions using
+<strong>make_json_input</strong>:</p>
+<ul class="simple">
+<li><p><em>make_json_input pmtl 45.5571 -73.5204 54.073 -h1 70 -h2 90 -e1 5 -e2 12 -allfreq True</em></p></li>
+</ul>
+<p>You will need to hand-edit the json to remove GPS L2C, GPS L5, and Galileo data, and
+to set your azimuth region and amplitudes. <a class="reference download internal" download="" href="../_downloads/5da893fd1b023edbbc736cbf618a8af9/pmtl.json"><span class="xref download myst">Here is my json that you can compare to</span></a>.
+Note: I do not consider this to be the “final” mask. For a busy region
+like a harbor, you would want to examine multiple days and weeks of data before
+making final decisions. To run the <strong>gnssir</strong> code, you really only need to provide the station name,
+the year, and doy.  The rest of the inputs are in that json.</p>
+<ul class="simple">
+<li><p><em>gnssir pmtl 2020 330</em></p></li>
+</ul>
+<p>If you want to see some plots of different frequencies (they will not be like the quadrants you saw before):</p>
+<ul class="simple">
+<li><p><em>gnssir pmtl 2020 330 -plt True</em></p></li>
+</ul>
+<p>This is L1. The top plot is all the SNR data used in the periodograms. The plot below is the RH periodograms all on
+top of each other. Different colors are different satellites.</p>
+<img src="pmtl_l1.png" width="500" />
+<p>These are the results for Glonass L1</p>
+<img src="pmtl_l101.png" width="500" />
+<p>The RH results for a single day are written to $REFL_CODE/2020/results/pmtl/330.txt
+Once you are happy with how you have set your station mask (elevation and azimuth angles)
+and quality control metrics, you can analyze as much data as you like. This command would do all the data
+between day of year 300 and day of year 330 (assuming you had previously run <strong>rinex2snr</strong> for the same time period):</p>
+<ul class="simple">
+<li><p><em>gnssir pmtl 2020 300 -doy_end 330</em></p></li>
+</ul>
+<p>At this site you would most likely convert the results to a daily average using <strong>daily_avg</strong>.</p>
+<p>There is a tide gauge near this site. Please see NRCAN for more information.
+I downloaded this plot. You can see the expected height of the river on November 25, 2020, the day
+I used as an example. The St Lawrence River height is just where you would expect, given the difference between
+the RH analysis and the orthometric height of the GNSS antenna.</p>
+<img src="montreal.png" width="500">
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>St Michael Bay &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>St Michael Bay</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/use_at01.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="st-michael-bay">
+<h1>St Michael Bay<a class="headerlink" href="#st-michael-bay" title="Permalink to this heading"></a></h1>
+<p align="center">
+<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">
+</p>
+<p><strong>Station Name:</strong>  at01</p>
+<p><strong>Location:</strong>  St Michael, Alaska</p>
+<p><strong>Archive:</strong>  <a class="reference external" href="http://www.unavco.org">UNAVCO</a></p>
+<p><strong>Ellipsoidal Coordinates:</strong></p>
+<ul class="simple">
+<li><p>Latitude:  63.4840</p></li>
+<li><p>Longitude: -162.0064</p></li>
+<li><p>Height: 21.7 m</p></li>
+</ul>
+<p><a class="reference external" href="https://www.unavco.org/instrumentation/networks/status/nota/overview/AT01">Station Page at UNAVCO</a></p>
+<p><a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/AT01.sta">Station Page at Nevada Geodetic Laboratory</a></p>
+<p><a class="reference external" href="https://goo.gl/maps/uWyoNFf4DRjYLmfUA">Google Map Link</a></p>
+</section>
+<section id="data-summary">
+<h1>Data Summary<a class="headerlink" href="#data-summary" title="Permalink to this heading"></a></h1>
+<p><strong>at01 is the only tide gauge in this region of Alaska.</strong></p>
+<p>at01 observes all constellation signals and high-rate data are available. There is good visibility over a large azimuthal region. The monument is about a meter taller than normal geodetic monuments to improve visibility of the sea surface.  From the <a class="reference external" href="http://gnss-reflections.org/geoid?station=at01&amp;lat=0.0&amp;lon=0.0&amp;height=0.0">geoid app</a> you can see the general location of the antenna with respect to the coast. You will also note that it is at ~12 meters above sea level.</p>
+<p align=center>
+<img src=geoid-at01.png width=400>
+</p>
+<p>Use the gnss-reflections.org webapp to set a <a class="reference external" href="http://gnss-reflections.org/rzones?station=at01&amp;lat=0.0&amp;lon=0.0&amp;height=0.0&amp;msl=msl&amp;RH=2&amp;eang=3&amp;azim1=0&amp;azim2=240">possible mask.</a> In this example we used the option for elevation angles between 5 and 12 degrees.</p>
+</section>
+<section id="take-a-quick-look-at-the-data">
+<h1>Take a Quick Look at the Data<a class="headerlink" href="#take-a-quick-look-at-the-data" title="Permalink to this heading"></a></h1>
+<p>First examine the spectral characteristics of the SNR data. <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For details on quickLook output.)</span></a>. Make a SNR file:</p>
+<p><code>rinex2snr at01 2020 109 -archive unavco</code></p>
+<p>This will generate a SNR file at a sampling rate of 15 seconds. One second data are available if you would like to use them (-rate high).</p>
+<p>If you use the default settings with <code>quickLook</code> you will mistakenly think it is not a useful site. Nearly
+every single retrieval is set as bad (i.e. it is gray rather than blue):</p>
+<img src=at01_default_qc.png width=600>		
+<p>Remember that the site is 12 meters above sea level and the default restricts the reflector height
+region to &lt; 6 meters. Try again using a reflector height region that includes the water
+surface (h1 = 8 and h2 = 15) and better elevation angles 5 and 13 degrees:</p>
+<p><code> quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15</code></p>
+<img src=at01_day109.png width=600>		
+<p>Now you see good retrievals at azimuths sweeping from true north to about 220 degrees.<br />
+You will also see strong retrievals in the Lomb Scargle periodograms:</p>
+<img src=at01_lsp_109.png width=600>
+<p>This site has modern GPS signals, Galileo signal, and Glonass signals. Here are some sample results for L2C:</p>
+<p><code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 20</code></p>
+<img src=at01_l2c.png width=600>
+<p>Glonass:</p>
+<p><code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 101</code></p>
+<img src=at01_glonass.png width=600>
+<p>and Galileo:</p>
+<p><code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 205</code></p>
+<img src=at01_galileo.png width=600>
+</section>
+<section id="analyze-the-data">
+<h1>Analyze the Data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h1>
+<p>Next we analyze data for two months in the fall of 2020. First make the SNR files:</p>
+<p><code>rinex2snr at01 2020 230 -archive unavco -doy_end 290</code></p>
+<p>Now set up the analysis instructions:</p>
+<p><code>make_json_input at01 63.484 -162.006 21.565 -h1 8 -h2 15 -e1 5 -e2 13 -allfreq True </code></p>
+<p>You will need to hand-edit the file to restrict the azimuths per our QC output. I also removed the Beidou signals (frequencies &gt; 300)
+because they are not in the RINEX 2.11 file. We also removed frequency 208. <a class="reference download internal" download="" href="../_downloads/6e6bb08b083f431f2cf288121beb89af/at01.json"><span class="xref download myst">Sample json file.</span></a></p>
+<p>Next estimate reflector height (RH) for the two month time period:</p>
+<p><code>gnssir at01 2020 230 -doy_end 290</code></p>
+<p>We have written some code to help you look at these subdaily files - it is a work in progress, but you can
+certainly give it a try. <strong>Note:</strong> These figures were generated with an older
+version of the code and should be updated.</p>
+<p><code>subdaily at01 2020 -doy1 230 -doy2 290 </code></p>
+<p>The code concatenates the daily RH files for this period:</p>
+<img src=at01_raw.png width=600>
+<p>You can see that there are a very large number of RH retrievals per day:</p>
+<img src=at01_nvals.png width=600>
+<p>This preliminary version of the code removes outliers and makes an effort
+to compute the RH dot correction if <code>rhdot</code> is set to true. It  uses a cubic
+spline to fit the RH data which allows a first order estimate for the
+surface rate of change. That, along with geometrical information as to the elevation angle rate
+of change, is used to make the RH dot correction (<a class="reference external" href="https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf">for more information</a>. This term is <strong>very important</strong> for sites with
+large tidal ranges, but is of less importance at sites like at01. Nevertheless,
+you can see here that it does help a bit:</p>
+<PRE>
+RMS no RHdot correction (m)  0.082
+RMS w/ RHdot correction (m)  0.070
+</PRE>
+<img src=at01-spline.png width=600>
+<p>Final view of the surface estimates:</p>
+<img src=at01-final.png width=600>
+<p>There are some statistics here that indicate that the precision for an individual arc is ~ 5 cm.  Remember that since we have nearly 300 measurements per day,
+the ability to measure tides with this system is much much better than that.</p>
+<p>We are working on removing inter-frequency biases. Some of the bias is simply due to the phase center - but we also want to be be careful to take into account surface changes (ice to water, e.g.)</p>
+<PRE>
+Freq  Bias  Sigma   NumObs
+       (m)   (m)
+  1   0.07   0.06   2751
+ 20  -0.03   0.05   2208
+  5  -0.04   0.05   1592
+101   0.06   0.06   1803
+102  -0.03   0.05   2086
+201   0.07   0.05   1164
+205  -0.05   0.05   1880
+207  -0.04   0.04   1864
+</PRE>
+<p>The code also prints out a list of outliers (outliers.txt) so that you can assess whether you
+might want to change your azimuth mask.</p>
+<p>Files for both the raw RH estimates and the QC/RH corrected estimates are provided (file names come to the screen).</p>
+<p>I would like to include Simon Williams’ RH retrieval/tidal estimation code
+in this package. Simon has been kind enough to make the Matlab code <a class="reference external" href="https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m">open source.</a> If someone is willing to convert it to python, that would be fabulous.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

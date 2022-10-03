@@ -1,0 +1,63 @@
+{
+    "station": "at01",
+    "lat": 63.484,
+    "lon": -162.006,
+    "ht": 21.565,
+    "minH": 8.0,
+    "maxH": 15.0,
+    "e1": 5,
+    "e2": 13,
+    "NReg": [
+        8.0,
+        15.0
+    ],
+    "PkNoise": 2.7,
+    "polyV": 4,
+    "pele": [
+        5,
+        30
+    ],
+    "ediff": 2,
+    "desiredP": 0.005,
+    "azval": [
+        20,
+        90,
+        90,
+        180,
+        180,
+        220 
+    ],
+    "freqs": [
+        1,
+        20,
+        5,
+        101,
+        102,
+        201,
+        205,
+        206,
+        207
+    ],
+    "reqAmp": [
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0,
+        6.0
+    ],
+    "refraction": true,
+    "overwriteResults": true,
+    "seekRinex": false,
+    "wantCompression": false,
+    "plt_screen": false,
+    "onesat": null,
+    "screenstats": false,
+    "pltname": "at01_lsp.png",
+    "delTmax": 75
+}

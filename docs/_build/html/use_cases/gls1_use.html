@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test the code at Dye 2, Greenland &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Test the code at Dye 2, Greenland</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/gls1_use.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="test-the-code-at-dye-2-greenland">
+<h1>Test the code at Dye 2, Greenland<a class="headerlink" href="#test-the-code-at-dye-2-greenland" title="Permalink to this heading"></a></h1>
+<p>The site is called gls1.  Here we will only analyze the data from 2012.  The data are archived at UNAVCO.
+The dataset is discussed extensively in
+this <a class="reference external" href="https://tc.copernicus.org/articles/14/1985/2020/tc-14-1985-2020.pdf">open option paper</a>.</p>
+<p><strong>Exercise for the reader:</strong> find a photograph of the site at UNAVCO</p>
+<p><strong>Coordinates:</strong> Use the <a class="reference external" href="https://www.unavco.org/data/gps-gnss/data-access-methods/dai2/app/dai2.html#4Char=GLS1;scope=Station;sampleRate=both;4CharMod=contains">UNAVCO DAI</a> if you like.
+Or you can try the <a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/GLS1.sta">Nevada Reno site</a>.</p>
+<p>Position time series for gls1 can be retrieved from <a class="reference external" href="http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/GLS1.tenv3">Nevada Reno</a></p>
+<p>This site was originally installed with an elevation mask of 7 degrees. Later it was changed. To keep things the
+same, I strongly prefer that the same elevation angle mask is used
+throughout. Meaning I am going to set the minimum elevation angle to 7 at the analysis stage:</p>
+<p><em>make_json_input gls1 66.479 -46.310 2148.578 -h1 0.5 -h2 8 -e1 7 -e2 25</em></p>
+<p>The <strong>make_json_input</strong> defaults are to use all good GPS frequencies (1,20,5).
+However, the standard L2 data at gls1 are really not useful (and L2C was sometimes tracked and
+sometimes not tracked). L5 has never been tracked. Here it is better
+to simply use L1. Handedit the json to remove L2C and L5. It should look <a class="reference download internal" download="" href="../_downloads/2d9e94f3c085731184bb97e214c48bc0/gls1.json"><span class="xref download myst">like this.</span></a>
+Now make some SNR files for the year 2012:</p>
+<p><em>rinex2snr gls1 2012 1 -doy_end 365</em></p>
+<p>Look at the first one - make sure that the RH defaults are big enough to include the answer:</p>
+<p><em>quickLook gls1 2012 1 -e1 7 -e2 25</em></p>
+<img src="gls1-example.png" width="500"/>
+<p>Analyze all the 2012 data:</p>
+<p><em>gnssir gls1 2012 1 -doy_end 365</em></p>
+<p>Make a daily average (since you only have L1 at this site, I am requiring 30 tracks instead of 50)</p>
+<p><em>daily_avg gls1 0.25 30</em></p>
+<p>The plots:</p>
+<img src="gls1-1.png" width="500"/>
+<img src="gls1-2.png" width="500"/>
+<p>That is what I call a lot of melt! If you want the reflector height answers, set the requested txt
+output filename in <strong>daily_avg</strong>.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

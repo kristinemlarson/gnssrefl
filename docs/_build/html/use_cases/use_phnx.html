@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phoenix, Antarctica &mdash; gnssrefl  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> gnssrefl
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gnssrefl</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Phoenix, Antarctica</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/use_cases/use_phnx.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="phoenix-antarctica">
+<h1>Phoenix, Antarctica<a class="headerlink" href="#phoenix-antarctica" title="Permalink to this heading"></a></h1>
+<P align=center>
+<img src="https://gnss-reflections.org/static/images/PHNX.jpg" width="500">
+</p>
+<p><strong>Station Name:</strong>  phnx</p>
+<p><strong>Location:</strong>  Phoenix, Antarctica</p>
+<p><strong>Archive:</strong>  <a class="reference external" href="http://www.unavco.org">UNAVCO</a></p>
+<p><a class="reference external" href="https://www.unavco.org/instrumentation/networks/status/nota/overview/phnx">Station Page at UNAVCO</a></p>
+<p><a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/PHNX.sta">Station Page at Nevada Geodetic Laboratory</a></p>
+<p><a class="reference external" href="https://gnss-reflections.org/api?example=phnx&amp;ftype=txt">Webapp example using this site</a></p>
+</section>
+<section id="experiment">
+<h1>Experiment<a class="headerlink" href="#experiment" title="Permalink to this heading"></a></h1>
+<p>phnx was installed at the same time as a <a class="reference external" href="https://essd.copernicus.org/articles/13/5803/2021/">dedicated snow measurement experiment</a> called
+the Antarctic Precipitation System. We can see from this figure
+from <a class="reference external" href="https://essd.copernicus.org/articles/13/5803/2021/">their paper</a> that the other instruments
+around (and above) the GPS antenna would obstruct GPS reflections in some sense:</p>
+<P align=center>
+<img src=https://essd.copernicus.org/articles/13/5803/2021/essd-13-5803-2021-f02-web.png width="500">
+</P>
+<p>However, we will take this as an opportunity to see if we can see how the
+clutter impacts the GNSS-IR results. The paper says the Antarctic Precipitation System removed
+their instruments by 3 December 2019. The GPS receiver continues to
+<a class="reference external" href="http://gnss-reflections.org/api?station=phnx&amp;year=2022&amp;doy=73&amp;freq=L1&amp;amp=10&amp;h1=0.4&amp;h2=6.0&amp;e1=5.0&amp;e2=25.0&amp;pk2noise=3.0&amp;rinex=2.11&amp;azim1=0&amp;azim2=360&amp;archive=all&amp;ftype=txt">operate and produce good data as of March 14, 2022</a></p>
+</section>
+<section id="let-s-take-a-look-at-the-data">
+<h1>Let’s Take a Look at the Data<a class="headerlink" href="#let-s-take-a-look-at-the-data" title="Permalink to this heading"></a></h1>
+<p>First make a SNR file.</p>
+<p><code>rinex2snr phnx 2021 1</code></p>
+<p>This will download the data from UNAVCO, translate into a SNR format. The command only uses GPS satellites.
+At my request, UNAVCO tracked good GPS signals (L2C and L5). We will use both of those and L1.</p>
+<p>Now use <code>quickLook</code> to produce a periodogram similar to the one in
+the web app <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For details on quickLook output)</span></a>.
+<code>quickLook</code> is set to use the L1 frequency by default:</p>
+<p><code>quickLook phnx 2021 1</code></p>
+<p>First, the lomb scargle periodograms for each quadrant which indicate that things are looking pretty good.
+Remember that each color is a different satellite arc.</p>
+<img src="phnx_lsp_l1.png" width="600">
+<p>The summary plot shows consistent reflector height retrievals (top plot):</p>
+<img src="phnx_ql_l1.png" width="600">
+<p>Pretty sweet. It looks like all azimuths are pretty good. There are some low amplitudes and peak2noise ratios at
+certain azimuths. Some of these are caused by the way we have split the tracks into strict
+azimuths (0-90,90-180, and so on). <em>However</em>, these periodograms look a lot better than
+we saw on the gnss-reflections webapp example:</p>
+<img src="phnx_2019_200.png" width="600">
+<p>I have circled in bright yellow the parts of the periodograms that are noise. These
+are primarily bunched at a little less than one meter reflector height.
+Our theory is that this was created by the other sensors set out by the Antarctic Precipitation System.
+Let’s run <code>quickLook</code> again a few weeks after they removed their equipment:</p>
+<img src="phnx_2020_001.png" width="600">
+<p>You can see that that particular noise source is now gone. And the periodograms in general are more clearly
+showing a strong single peak. This is an indication that closely co-colocating all these
+sensors negatively impacted the GPS reflections sensor. However, the dominant GPS reflections are still be tracked.</p>
+</section>
+<section id="analyze-the-data">
+<h1>Analyze the Data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h1>
+<p>Now prepare to analyze the data using <code>gnssir</code>.
+First you need to create a set of analysis instructions.
+The default settings need the station name, latitude, longitude, and ellipsoidal height.
+Originally the software required you to input the coordinates. If you believe<br />
+that the Nevada Reno group has the site in its database, you can
+avoid that step, as so:</p>
+<p><code>make_json_input phnx 0 0 0 -query_unr True</code></p>
+<p>The json output will be stored in $REFL_CODE/input/phnx.json. <a class="reference download internal" download="" href="../_downloads/7d2dd45842cc432fe4f9297a9e3e8b62/phnx.json"><span class="xref download myst">Here is a sample json file.</span></a>
+The default peak to noise ratio is 2.7 - which is better for water. Since these are ice/snow reflections, I’m
+going to increase it a bit to 3.2 and require a larger amplitude.</p>
+<p><code>make_json_input phnx 0 0 0 -query_unr True -ampl 10 -peak2noise 3.2</code></p>
+<p>I also removed by hand the azimuths from 320-360 degrees in the final json file I used.</p>
+<p>Next we need to make some snr files. I am going to do most of 2019 thru 2021, but if you prefer, you can set
+the -weekly option to True and that will speed things up (it makes one file per week).
+This command will go from day 1 in 2019 to day 150 in the year 2021.</p>
+<p><code>rinex2snr phnx 2020 1 -doy_end 150 -year_end 2021</code></p>
+<p>Run the <code>gnssir</code>:</p>
+<p><code>gnssir phnx 2020 1 -year_end 2021 -doy_end 150</code></p>
+<p>It takes a couple seconds to run <code>gnssir</code> for one day of data - so you will have to wait
+five minutes or so for two and a half years of data to run. At that point you want to compute a daily
+average reflector height:</p>
+<p><code>daily_avg phnx 0.2 100 </code> will create a daily average reflector height using a
+median filter of 0.2 meters to remove outliers.  The 100 input says you require 100 arcs to have confidence
+in the average. You can vary these parameters to better see what is going on.</p>
+<P align=center>
+<img src=phnx_RH.png width=600>
+</P>
+<p>A file with the reflector height results is created by <code>daily_avg</code>; that is what
+you use to measure snow accumulation using GNSS-IR!</p>
+<p>A big thank you to Thomas Nylen for his efforts on installing and maintaining this site.
+I believe NSF funded the installation of this GPS site (PLR 1543377 and PLR 1543325). The GPS data
+are completely open. Please contact UNAVCO if you have difficulty finding them.</p>
+<p>Kristine M. Larson
+March 16, 2022</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Dr. Kristine Larson and UNAVCO.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
