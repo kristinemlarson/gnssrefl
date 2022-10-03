@@ -1,4 +1,4 @@
-### quickLook <a name="module2"></a>
+# quickLook <a name="module2"></a>
 
 Before using <code>gnssir</code>code, I recommend you use <code>quickLook</code>. This allows you
 to quickly test various options (elevation angles, frequencies, azimuths, and quality control 

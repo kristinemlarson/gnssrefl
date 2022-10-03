@@ -37,7 +37,7 @@ Now we run <code>gnssir</code>. This will be needed for estimate *a priori* refl
 
 #### Step 2: Soil Moisture
 
-[Please read the soil moisture user manual.](../../docs/README_vwc.md) It is very short and has a lot of tips that will save you time.
+[Please read the soil moisture user manual.](../pages/README_vwc.md) It is very short and has a lot of tips that will save you time.
 
 We need a list of satellite tracks to use:
 

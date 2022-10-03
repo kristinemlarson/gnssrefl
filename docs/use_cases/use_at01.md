@@ -38,7 +38,7 @@ Use the gnss-reflections.org webapp to set a [possible mask.](http://gnss-reflec
 
 ### Take a Quick Look at the Data
 
-First examine the spectral characteristics of the SNR data. [(For details on quickLook output.)](../../docs/quickLook_desc.md). Make a SNR file:
+First examine the spectral characteristics of the SNR data. [(For details on quickLook output.)](../pages/quickLook_desc.md). Make a SNR file:
 
 <code>rinex2snr at01 2020 109 -archive unavco</code>
 

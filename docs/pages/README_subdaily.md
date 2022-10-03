@@ -1,4 +1,4 @@
-### subdaily<a name="module6"></a>
+# subdaily<a name="module6"></a>
 
 This module is meant for RH measurements that have a subdaily component. It is not strictly 
 for water levels, but that is generally where it should be used. There are 

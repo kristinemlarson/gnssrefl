@@ -1,4 +1,4 @@
-### daily_avg<a name="module5"></a>
+# daily_avg<a name="module5"></a>
 
 <code>daily_avg</code> is a utility for people interested 
 in measuring snow accumulation via daily values. It can also 

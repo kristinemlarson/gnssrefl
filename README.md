@@ -55,9 +55,9 @@ The goal of the gnssrefl python repository is to help you compute (and evaluate)
 reflectometry parameters using geodetic data. This method is often
 called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modules:
 
-* [**rinex2snr**](docs/rinex2snr.md) translates RINEX files into SNR files needed for analysis.
+* [**rinex2snr**](docs/pages/rinex2snr.md) translates RINEX files into SNR files needed for analysis.
 
-* [**gnssir**](docs/gnssir.md) computes reflector heights (RH) from SNR files.
+* [**gnssir**](docs/pages/gnssir.md) computes reflector heights (RH) from SNR files.
 
 * [**quickLook**](quickLook.md) gives you a quick (visual) assessment of a file without dealing
 with the details associated with **gnssir**. It is not meant to be used for routine analysis.
@@ -241,7 +241,7 @@ mask and reflector height range. This is one of the reasons <code>quickLook</cod
 download RINEX v2.11 or 3 files (using the version flag) without using 
 the reflection-specific codes. As with <code>rinex2snr</code>, the default archive is 
 to check unavco, sopac, and sonel in that order. For other archives, you must specify their name.
-For a listing of supported archives, please see the documentation for [rinex2snr](docs/rinex2snr.md).
+For a listing of supported archives, please see the documentation for [rinex2snr](docs/pages/rinex2snr.md).
 
 Sample calls:
 
@@ -255,7 +255,7 @@ Sample calls:
 from the cddis archive on day of year 150 in 2020
 
 <code>download_orbits</code> downloads orbit files and stores them in $ORBITS. The list of orbits 
-we support changes regularly. Please see the [rinex2snr documentation](docs/rinex2snr.md).
+we support changes regularly. Please see the [rinex2snr documentation](docs/pages/rinex2snr.md).
 
 <code>ymd</code> translates year,month,day to day of year
 

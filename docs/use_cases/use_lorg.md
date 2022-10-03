@@ -41,7 +41,7 @@ First make a SNR file.
 
 <code>rinex2snr lorg 2019 205</code>
 
-Use <code>quickLook</code> to produce a periodogram similar to the one in the web app [(For details on quickLook output)](../../docs/quickLook_desc.md). quickLook is set to use the L1 frequency by default:
+Use <code>quickLook</code> to produce a periodogram similar to the one in the web app [(For details on quickLook output)](../pages/quickLook_desc.md). quickLook is set to use the L1 frequency by default:
 
 <code>quickLook lorg 2019 205</code>
 

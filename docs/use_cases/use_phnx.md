@@ -42,7 +42,7 @@ This will download the data from UNAVCO, translate into a SNR format. The comman
 At my request, UNAVCO tracked good GPS signals (L2C and L5). We will use both of those and L1.
 
 Now use <code>quickLook</code> to produce a periodogram similar to the one in 
-the web app [(For details on quickLook output)](../../docs/quickLook_desc.md). 
+the web app [(For details on quickLook output)](../pages/quickLook_desc.md). 
 <code>quickLook</code> is set to use the L1 frequency by default:
 
 <code>quickLook phnx 2021 1</code>

@@ -1,4 +1,4 @@
-### Quick Description of the quickLook Code 
+# Quick Description of the quickLook Code 
 
 <code>quickLook</code> is meant to give you a visual assessment of the reflection characteristics 
 of your GNSS site. It is **not** meant for routine analysis of your data - instead it is 
@@ -16,7 +16,7 @@ were limited to the region 0.5 to 6 meters. The GPS L1 frequency is the default.
 years it was a different receiver with poor data quality).
 
 <p align=center>
-<img src="../tests/use_cases/p041-l1.png" width=600>
+<img src="../use_cases/p041-l1.png" width=600>
 </p>
 
 The y-axis is the spectral amplitude in converted SNR units (volts/volts).  If you see a strong peak in the periodogram,
@@ -40,7 +40,7 @@ noise ratios than a day without wind. I generally use 3.5 for snow, 3.2 for lake
 signals differently. It also reflects how smooth the surface is and which elevation angle limits were used.
 
 <p align=center>
-<img src="../tests/use_cases/p041_l1_qc.png" width=600>
+<img src="../use_cases/p041_l1_qc.png" width=600>
 </p>
 
 **Common Questions:**

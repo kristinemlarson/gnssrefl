@@ -65,7 +65,7 @@ First make a SNR file:
 <code>rinex2snr p041 2020 132</code>
 
 
-Then use **quickLook** to analyze the reflection characteristics of the site [(For details on quickLook output)](../../docs/quickLook_desc.md).
+Then use **quickLook** to analyze the reflection characteristics of the site [(For details on quickLook output)](../pages/quickLook_desc.md).
 
 The default return is for the L1 frequency:
 

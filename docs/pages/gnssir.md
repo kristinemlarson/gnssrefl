@@ -1,4 +1,4 @@
-**gnssir**
+# **gnssir**
 
 <code>gnssir</code> is the main driver for the GNSS-IR code. 
 

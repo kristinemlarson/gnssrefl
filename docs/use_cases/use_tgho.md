@@ -1,9 +1,11 @@
-### Lake Taupo
+# Lake Taupo
 
 <p align="center">
 <img src="tgho_barker.jpg" width="500"><BR>
 Photo credit: Simon Barker
 </P>
+
+![](tgho_barker.jpg)
 
 **Station Name:** tgho 
 
@@ -28,13 +30,13 @@ Photo credit: Simon Barker
 [Google Map Link](https://goo.gl/maps/1zmgi6rRHPVPDAfV8)
 
 
-### Data Summary
+## Data Summary
 
 Station tgho is operated by [GNS](https://www.gns.cri.nz). The GNSS site is located 
 on a platform in Lake Taupo. It records standard GPS and Glonass signals at a low sample rate (30 sec).
 The site could be significantly improved with a newer receiver that tracks modern signals at a higher sample rate.
 
-### Take a Quick Look at the Data
+## Take a Quick Look at the Data
 
 Begin by making an SNR file. Use both GPS and Glonass and set the archive to nz:
 
@@ -44,6 +46,8 @@ Begin by making an SNR file. Use both GPS and Glonass and set the archive to nz:
 
 <img src="tgho-default.png" width="600">
 
+![](tgho-default.png)
+
 The clutter near the monument produces noise at the small RH values.  A better result 
 can be found if those values are eliminated by setting h1 to 2. We also extend h2 to 8.
 
@@ -51,11 +55,15 @@ can be found if those values are eliminated by setting h1 to 2. We also extend h
 
 <img src="tgho-better.png" width="600">
 
+![](tgho-better.png)
+
 Now try looking at the periodogram for L2:
 
 <code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 2</code>
 
 <img src="tgho-l2.png" width="600"/>
+
+![](tgho-l2.png)
 
 These results are not very compelling for a variety of reasons. The GPS L2 data 
 will not be used in subsequent analysis. Next, check the two Glonass frequencies:
@@ -64,17 +72,23 @@ will not be used in subsequent analysis. Next, check the two Glonass frequencies
 
 <img src="tgho-glonass-l1.png" width="600"/>
 
+![](tgho-glonass-l1.png)
+
 <code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 102</code>
 
 <img src="tgho-glonass-l2.png" width="600"/>
+
+![](tgho-glonass-l2.png)
 
 The QC metrics from Glonass 101 are helpful for setting the azimuth mask:
 
 <img src=tgho-glonss-qc.png width="600">
 
+![](tgho-glonss-qc.png)
+
 We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 and a peak to noise ratio of 3.0.
 
-### Analyze the Data
+## Analyze the Data
 
 Use <code>make_json_input</code> to set up the analysis parameters. Set the elevation and reflector heights as in <code>quickLook</code>. The peak to noise ratio and required amplitude can be set on the command line. 
 
@@ -102,9 +116,15 @@ The number of retrievals each day is show here:
 
 <img src="tgho-numvals.png" width="600">
 
+![](tgho-numvals.png)
+
+
 All retrievals are shown here:
 
 <img src="tgho-all.png" width="600">
+
+![](tgho-all.png)
+
 
 Note in particular that there are quite a few data outages in this series, which means the RINEX files were missing 
 from the NZ archive.
@@ -112,6 +132,9 @@ from the NZ archive.
 Finally, the average RH plot:
 
 <img src="tgho-rhavg.png" width="600">
+
+![](tgho-rhavg.png)
+
 
 [Sample RH file](tgho_dailyRH.txt)
 

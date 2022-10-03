@@ -1,4 +1,5 @@
-### rinex2snr - Extracting SNR data from RINEX/NMEA files <a name="module1"></a>
+# rinex2snr  
+Extracting SNR data from RINEX/NMEA files <a name="module1"></a>
 
 The international standard for sharing GNSS data is called the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt). (If you are using NMEA files, please see the bottom of this section). 
 A RINEX file has extraneous information in it (which we will throw out) - and it 

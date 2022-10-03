@@ -40,7 +40,7 @@ Set up (default) analysis stratgegy:
 <code>gnssir scia 2018 1 -doy_end 365 -year_end 2019</code>
 
 ## Estimate Soil Moisture
-[Please read the soil moisture user manual.](../../docs/README_vwc.md) 
+[Please read the soil moisture user manual.](../pages/README_vwc.md) 
 It is very short and has a lot of tips that will save you time.
 
 We need a list of satellite tracks to use:

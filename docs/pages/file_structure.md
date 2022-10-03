@@ -1,4 +1,4 @@
-**Files and File Formats**
+# **Files and File Formats**
 
 *GPS/GNSS Data*
 

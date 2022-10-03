@@ -1,4 +1,4 @@
-### Beta Release: Soil Moisture
+# Beta Release: Soil Moisture
 <p align=center>
 <img src=https://www.kristinelarson.net/wp-content/uploads/2015/10/famousFigure.png width=500>
 </p>
@@ -44,7 +44,7 @@ We routinely measured it twice/day at PBO H2O when there were less than 10 satel
 
 - The code currently only supports sites that are ~1-3 meters above the soil. We will allow variable heights in a future version.
 
-### 1. Analyze the reflection characteristics of your site
+## 1. Analyze the reflection characteristics of your site
 
 Our soil moisture algorithm depends on *a priori* reflector height values derived from 
 the [traditional reflector height (RH) method](gnssir.md). We need to use the average of the snow-free RH values
@@ -63,7 +63,7 @@ With our without snow issues, you need to take these initial steps to get starte
 
 - [Estimate reflector heights](gnssir.md)
 
-### 2. Estimate Phase 
+## 2. Estimate Phase 
 
 Our algorithm uses L2C data. For the sample case used here, station p038, you should 
 use the "special" archive option when translating RINEX files. Similarly, when analyzing 
@@ -90,7 +90,7 @@ need to rerun <code>phase</code>. If you forget about this, you will see offsets
 your phase - and ultimately - your VWC time series. On the plus side, the phase code 
 is fast - much faster than the time it took you to create SNR files.
 
-### 3. Estimate VWC
+## 3. Estimate VWC
 
 <code>vwc p038 2016 -year_end 2018</code>
 
@@ -107,14 +107,14 @@ There are three main parts to this code. The first stage is to give you "raw" ph
 for the four geographic regions (northwest, northeast, etc)
 
  <br />
-<img src="p038_Figure_1x.png" width="700">
+<img src="../_static/p038_Figure_1x.png" width="700">
  <br />
 
 If you have previously run the code it will attempt to warn you about bad satellite tracks.
 You can iterate to see if removing the satellite track improved things. You are also shown a daily average of the phase data. 
 
  <br />
-<img src="p038_Figure_2.png" width="600">
+<img src="../_static/p038_Figure_2.png" width="600">
  <br />
 
 The second stage is to model and remove the vegetation effects:
@@ -133,12 +133,12 @@ We follow a [multi-stage process](https://www.kristinelarson.net/wp-content/uplo
 We currently level the VWC data to 5% but we will allow that to vary by site in future versions as that value should depend on 
 the soil texture at the site.
 
-<img src="p038_Figure_3.png" width="600">
+<img src="../_static/p038_Figure_3.png" width="600">
  <br />
 
 Final stage - putting it all together. The data are also written to a text file and the location of that file is written to the screen:
 
-<img src="p038_Figure_4.png" width="600">
+<img src="../_static/p038_Figure_4.png" width="600">
 
 Things we are planning to add:
 
@@ -152,10 +152,10 @@ Things we are planning to add:
 
 We currently have four use cases posted:
 
- - a shorter version of [p038](../tests/use_cases/use_p038.md) 
- - [mchl](../tests/use_cases/use_mchl.md) 
- - [scia](../tests/use_cases/use_scia.md)
- - [mfle](../tests/use_cases/use_mfle.md)
+ - a shorter version of [p038](../use_cases/use_p038.md) 
+ - [mchl](../use_cases/use_mchl.md) 
+ - [scia](../use_cases/use_scia.md)
+ - [mfle](../use_cases/use_mfle.md)
 
 Kristine M. Larson
 August 29, 2022

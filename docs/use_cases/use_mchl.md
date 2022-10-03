@@ -22,7 +22,7 @@
 
 **Archives:** CDDIS, BKG, GA
  
-Read the instructions for the [soil moisture code!](../../docs/README_vwc.md)!
+Read the instructions for the [soil moisture code!](../pages/README_vwc.md)!
 
 #### Step 1: GNSS-IR
 Begin by generating the SNR files. To be sure we can get the L2C data, we will use the RINEX 3 files.
