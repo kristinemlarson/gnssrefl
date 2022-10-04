@@ -3,7 +3,7 @@
 <img src="https://morefunwithgps.com/public_html/gnssrefl-images-sm.jpg" width=600 />
 </p>
 
-### gnssrefl
+# gnssrefl
 
 **github version: 1.1.6** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495)
 
@@ -13,7 +13,7 @@
 If someone wants to provide a pull request that addresses this issue, I would be happy to implement it.  I 
 am not willing to write such code myself.**
 
-### Table of Contents
+## Table of Contents
 
 1. [Installation](docs/pages/README_install.md)
 2. Understanding the Code
@@ -33,6 +33,8 @@ am not willing to write such code myself.**
 9. [How can you help this project? How can you ask for help?](docs/pages/contributions_questions.md)
 
 <HR> 
+
+## [gnssrefl Documentation]()
 
 ### [gnssrefl Understanding <a name="understanding"></a>](docs/pages/understand.md): project goals, philosophy and methods.
 
