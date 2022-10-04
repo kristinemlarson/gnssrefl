@@ -101,7 +101,7 @@
 <section id="lower-thwaites-glacier">
 <h1>Lower Thwaites Glacier<a class="headerlink" href="#lower-thwaites-glacier" title="Permalink to this heading"></a></h1>
 <p>Station lthw is operated by UNAVCO. The data are archived at UNAVCO.</p>
-<img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"/>
+<a class="reference internal image-reference" href="http://gnss-reflections.org/static/images/LTHW.jpg"><img alt="http://gnss-reflections.org/static/images/LTHW.jpg" src="http://gnss-reflections.org/static/images/LTHW.jpg" style="width: 500px;" /></a>
 <p><strong>Coordinates:</strong>
 Use the <a class="reference external" href="https://www.unavco.org/data/gps-gnss/data-access-methods/dai2/app/dai2.html#4Char=LTHW;scope=Station;sampleRate=both;4CharMod=contains">UNAVCO DAI</a> if you like. Or you can try the <a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta">Nevada Reno site</a>.
 The coordinates do not have to be super precise (within 100 meters is fine)</p>
@@ -114,7 +114,6 @@ For that reason, only L1 data should be used. The reflector height changes
 significantly with time and the site must be dug out of the snow
 and reset fairly regularly. You can see this effect in the vertical position data compiled
 by <a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta">Nevada Reno</a>.</p>
-<img src="LTHW_UNR.png" width=500/>
 <p>Don’t pay attention to the red “model” as Nevada Reno is using a default model
 that is more relevant for crustal deformation than a glacier. The important
 data are in blue, and there are clear breaks
@@ -123,7 +122,7 @@ focus on the period after January 1, 2018. Go ahead and make SNR files for the w
 <p><em>rinex2snr lthw 2018 1 -doy_end 365 -archive unavco</em></p>
 <p>Then take a look at January 1 in 2018:</p>
 <p><em>quickLook lthw 2018 1 -e1 7</em></p>
-<img src="lthw-day1-2018.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/lthw-day1-2018.png"><img alt="../_images/lthw-day1-2018.png" src="../_images/lthw-day1-2018.png" style="width: 500px;" /></a>
 <p>This is a bit of a mess really. If there are significant peaks, they are really
 close to the cutoff for the method (at 0.5 meters).  Now look a week later:</p>
 <p><em>quickLook lthw 2018 9 -e1 7</em></p>
@@ -131,7 +130,6 @@ close to the cutoff for the method (at 0.5 meters).  Now look a week later:</p>
 This is *much* better and clearly shows that a field crew reset the antenna to a little 
 less than 5 meters sometime between day 1 and day 9.
 If you like you can compare this to the first day of 2020 (if you make the SNR file):
-<img src="lthw-day1-2020.png" width=500/>
 <p>Now the peaks in the RH periodograms are ~2.2 meters - so that means ~2.5 meters of surface change
 from 2018 to 2020.</p>
 <p>Now let’s run <strong>gnssir</strong>. First we need to make json input,</p>
@@ -141,10 +139,10 @@ from 2018 to 2020.</p>
 <p><em>gnssir lthw 2018 1 -doy_end 365 -screenstats False</em></p>
 <p>Then compute daily averages requiring 50 satellite tracks and using a median filter of 0.25 meters:</p>
 <p><em>daily_avg lthw 0.25 50</em></p>
-<img src="lthw-req50.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/lthw-req50.png"><img alt="../_images/lthw-req50.png" src="../_images/lthw-req50.png" style="width: 500px;" /></a>
 <p>You can tighten required number of tracks if you want:</p>
 <p><em>daily_avg lthw 0.25 40</em></p>
-<img src="lthw-req40.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/lthw-req40.png"><img alt="../_images/lthw-req40.png" src="../_images/lthw-req40.png" style="width: 500px;" /></a>
 </section>
 
 

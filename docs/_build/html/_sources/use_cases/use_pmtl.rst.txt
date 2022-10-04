@@ -1,3 +1,6 @@
+use_pmtl2
+================
+
 .. role:: raw-html-m2r(raw)
    :format: html
 
@@ -61,6 +64,7 @@ Note the `ellipsoidal height and geoid corrected height <https://gnss-reflection
 
 <img src="pmtl_rzone.png" width="500" >
 
+
 ```{image} pmtl_rzone.png
 :alt: fishy
 :class: bg-primary
@@ -71,6 +75,28 @@ Note the `ellipsoidal height and geoid corrected height <https://gnss-reflection
 ![image attrs](pmtl_rzone.png){#imgattr .bg-primary width="500" align=center}
 
 .. image:: pmtl_rzone.png
+  :width: 500
+  :alt: Alternative text
+
+
+.. raw:: html
+
+   <P align=center>
+   <img src="../_static/pmtl_rzone.png" width="500" />
+   </P>
+
+<img src="../_static/pmtl_rzone.png" width="500" >
+
+```{image} ../_static/pmtl_rzone.png
+:alt: fishy
+:class: bg-primary
+:width: 500
+:align: center
+```
+
+![image attrs](../_static/pmtl_rzone.png){#imgattr .bg-primary width="500" align=center}
+
+.. image:: ../_static/pmtl_rzone.png
   :width: 500
   :alt: Alternative text
 

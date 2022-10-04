@@ -131,17 +131,17 @@ The site was installed on November 27, 2018 and decommissioned on November 15, 2
 <p><code>rinex2snr lorg 2019 205</code></p>
 <p>Use <code>quickLook</code> to produce a periodogram similar to the one in the web app <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For details on quickLook output)</span></a>. quickLook is set to use the L1 frequency by default:</p>
 <p><code>quickLook lorg 2019 205</code></p>
-<img src="lorg-ql-l1.png" width="600">
+<a class="reference internal image-reference" href="../_images/lorg-ql-l1.png"><img alt="../_images/lorg-ql-l1.png" src="../_images/lorg-ql-l1.png" style="width: 600px;" /></a>
 <p>Compare the periodograms for other frequencies: L2C and L5. They should be similar to the L1 periodogram, except that there
 will be fewer satellite traces because only GPS satellites launched after 2005
 broadcast L2C and only satellites after 2010 broadcast L5.
 The northwest qudarant is the noisiest and one could certainly try to improve the results by restricting some azimuths there.
 This is for L2C:</p>
 <p><code>quickLook lorg 2019 205 -fr 20</code></p>
-<img src="lorg-ql-l2c.png" width="600">
+<a class="reference internal image-reference" href="../_images/lorg-ql-l2c.png"><img alt="../_images/lorg-ql-l2c.png" src="../_images/lorg-ql-l2c.png" style="width: 600px;" /></a>
 <p>This is for L5:</p>
 <p><code>quickLook lorg 2019 205 -fr 5</code></p>
-<img src="lorg-ql-l5.png" width="600">
+<a class="reference internal image-reference" href="../_images/lorg-ql-l5.png"><img alt="../_images/lorg-ql-l5.png" src="../_images/lorg-ql-l5.png" style="width: 600px;" /></a>
 </section>
 <section id="analyze-the-data">
 <h1>Analyze the Data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h1>
@@ -156,13 +156,13 @@ code run faster (otherwise it will check three other archives as well). The resu
 <p><code>gnssir lorg 2019 1 -doy_end 233</code></p>
 <p>The default does not send any plots to the screen. If you do want to see them, set <code>-plt True</code>:</p>
 <p><code>gnssir lorg 2019 1 -plt True </code></p>
-<img src="lorg-g-panels.png" width="800"/>
+<a class="reference internal image-reference" href="../_images/lorg-g-panels.png"><img alt="../_images/lorg-g-panels.png" src="../_images/lorg-g-panels.png" style="width: 800px;" /></a>
 <p>The results for a single day are stored in a folder for that year, i.e.  $REFL_CODE/2019/results/lorg. <a class="reference download internal" download="" href="../_downloads/d7e2dc734f10151e3f7bf00282d8becd/102.txt"><span class="xref download myst">Here is a sample for day of year 102.</span></a></p>
 <p>The <strong>daily_avg</strong> command will calculate the daily average reflector height from the daily output files.  To minimize outliers in these daily averages, a median filter is set to allow
 values within a given value of the median. The user is also asked to set a required minimum number of daily satellite tracks. Here we use 0.25 meters and 50 tracks.</p>
 <p><code>daily_avg lorg 0.25 50</code></p>
-<img src="lorg_1.png" width="600"/>
-<img src="lorg-dailyavg.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/lorg_1.png"><img alt="../_images/lorg_1.png" src="../_images/lorg_1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/lorg-dailyavg.png"><img alt="../_images/lorg-dailyavg.png" src="../_images/lorg-dailyavg.png" style="width: 600px;" /></a>
 <p><a class="reference download internal" download="" href="../_downloads/f9fd2b4c1e691e381c711deeedbd9521/lorgAll.txt.gz"><span class="xref download myst">All reflector heights (gzipped)</span></a></p>
 <p><a class="reference download internal" download="" href="../_downloads/eadcdcbffc547d308a712d3d57dfe5aa/lorg-dailyavg.txt"><span class="xref download myst">Daily average reflector height file.</span></a></p>
 </section>

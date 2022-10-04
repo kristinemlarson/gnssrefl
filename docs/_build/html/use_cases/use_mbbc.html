@@ -124,10 +124,10 @@ rate is required to see Lake Malawi), please click the appropriate button on the
 <p>Note that we do not have to select multi-GNSS orbits as this site is only collecting GPS data.</p>
 <p>Based on the reflection app, what kind of RH, azimuth, and elevation angle limits are appropriate?</p>
 <p><code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 </code></p>
-<img src=mbbc-50-70.png>
+<img alt="../_images/mbbc-50-70.png" src="../_images/mbbc-50-70.png" />
 <p>I have manually added a red box to show the good azimuths. Can you use the L2 data at this site? Let’s see:</p>
 <p><code> quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275 -fr 2</code></p>
-<img src=mbbc-l2.png>
+<img alt="../_images/mbbc-l2.png" src="../_images/mbbc-l2.png" />
 <p>So you can see there are good RH results at the same azimuths as with L1, but they
 are marked as bad (gray circles) because the amplitudes are so small. So you need to more or
 less turn off the amplitude restriction for L2. You are allowed to have different amplitude constraints

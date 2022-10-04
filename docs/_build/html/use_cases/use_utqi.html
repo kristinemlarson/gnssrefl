@@ -125,9 +125,7 @@ From the photograph, it looks that it is very possible the GNSS antenna is more 
 above the reflecting surface (the default in <code>quickLook</code>). And I will further restrict elevation
 angles to 5-15 so as to avoid the building.  I will set the reflection zone on the command line:</p>
 <p><code>quickLook utqi 2022 150 -h1 2 -h2 12 -e1 5 -e2 15</code></p>
-<img src=utqi-quicklook1.png width=600/>
 <p>I’ve outlined the “sweet spot” for reflections on the summary figure:</p>
-<img src=utqi-quicklook.png width=600/>
 <p>The main take home message: the <em>a priori</em> reflector height is a bit more than 6 meters. You
 can use that value within the reflection zone app if you want to look at the reflection zones again.</p>
 </section>
@@ -154,11 +152,8 @@ In retrospect, I should have limited the azimuths a little more. Now run the mai
 a median value of 50 cm and a minimum of 50 retrievals. You can certainly play with those parameters.</p>
 <p><code>daily_avg utqi 0.5 50</code></p>
 <p>This summary shows you how much each constellation is contributing to the daily average (GPS, Galileo, Glonass).</p>
-<img src=utqi_f4.png width=600/>
 <p>All the retrievals are shown here:</p>
-<img src=utqi-f1.png width=600/>
 <p>Finally, the daily average from 2020 to the present:</p>
-<img src=utqi-f2.png width=600/>
 <p>The final RH values are written to a file and the location of the file is written to the screen.
 How do you turn these RH estimates into snow accumulation? Set the fall values (before the first snow) as your
 zero point and then simply subtract. Why are RH values changing during the summer? This is related to
@@ -172,9 +167,9 @@ And there is certainly no reason you can’t download/translate the fall 2019 da
 as failure to translate the RINEX 3 file into RINEX 2.</p>
 <p>I found this <a class="reference external" href="https://gml.noaa.gov/news/snow_free_season_end.html">NOAA plot online</a> that
 detects the melt and snow-in dates:</p>
-<img src=https://gml.noaa.gov/news/images/BRWWebAlbedo.png width=500 />
+<a class="reference internal image-reference" href="https://gml.noaa.gov/news/images/BRWWebAlbedo.png"><img alt="https://gml.noaa.gov/news/images/BRWWebAlbedo.png" src="https://gml.noaa.gov/news/images/BRWWebAlbedo.png" style="width: 500px;" /></a>
 <p>Looks pretty good compared to our melt and snow-in results. Don’t tell JPL!</p>
-<img src=utqi_just2021.png width=500 />
+<a class="reference internal image-reference" href="../_images/utqi_just2021.png"><img alt="../_images/utqi_just2021.png" src="../_images/utqi_just2021.png" style="width: 500px;" /></a>
 <p>Kristine M. Larson September 4, 2022</p>
 </section>
 

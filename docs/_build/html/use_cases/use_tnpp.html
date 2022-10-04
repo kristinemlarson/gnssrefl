@@ -123,9 +123,9 @@
 <p><code>rinex2snr tnpp 2021 301 -archive unavco -rate high -dec 2 -orb gnss</code></p>
 <p>To get started :</p>
 <p><code>quickLook tnpp 2021 301 -fr 20 -e1 5 -e2 10 -h1 50 -h2 70 </code></p>
-<img src=tnpp_1.png width=600>
+<a class="reference internal image-reference" href="../_images/tnpp_1.png"><img alt="../_images/tnpp_1.png" src="../_images/tnpp_1.png" style="width: 600px;" /></a>
 <p>The periodograms show the tides in the southwest quadrant. That is further demonstrated in the summary plot:</p>
-<img src=tnpp_2.png width=600>
+<a class="reference internal image-reference" href="../_images/tnpp_2.png"><img alt="../_images/tnpp_2.png" src="../_images/tnpp_2.png" style="width: 600px;" /></a>
 <p>Set your analysis strategy (with some variations):</p>
 <p><code>make_json_input tnpp 0 0 0 -e1 5 -e2 12 -h1 55 -h2 70  -ampl 0 </code></p>
 <p>Hand-edit the json file to only look at the azimuth region from 180 to 270 degrees.</p>
@@ -136,18 +136,18 @@
 <p>Look at the sea level results for multiple weeks:</p>
 <p><code>subdaily tnpp 2021</code></p>
 <p>Number of measurements for each constellation:</p>
-<img src=subdaily_tnpp_3.png width=600>
+<a class="reference internal image-reference" href="../_images/subdaily_tnpp_3.png"><img alt="../_images/subdaily_tnpp_3.png" src="../_images/subdaily_tnpp_3.png" style="width: 600px;" /></a>
 <p>Azimuth vs. constellation, amplitude, and peak2noise:</p>
-<img src=subdaily_tnpp_2.png width=600>
+<a class="reference internal image-reference" href="../_images/subdaily_tnpp_2.png"><img alt="../_images/subdaily_tnpp_2.png" src="../_images/subdaily_tnpp_2.png" style="width: 600px;" /></a>
 <p>Initial RH values:</p>
-<img src=subdaily_npp_1.png width=600>
+<a class="reference internal image-reference" href="../_images/subdaily_npp_1.png"><img alt="../_images/subdaily_npp_1.png" src="../_images/subdaily_npp_1.png" style="width: 600px;" /></a>
 <p>Setting the -rhdot flag:</p>
 <p><code>subdaily tnpp 2021 -rhdot T</code></p>
 <p>Estimating and applying the RH dot correction improves RH
 precision (<a class="reference external" href="https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf">Larson et al., 2013</a>).</p>
-<img src=tnpp_rhdot_2.png width=600>
+<a class="reference internal image-reference" href="../_images/tnpp_rhdot_2.png"><img alt="../_images/tnpp_rhdot_2.png" src="../_images/tnpp_rhdot_2.png" style="width: 600px;" /></a>
 <p>Final series with antenna frequency biases removed compared to a spline fit:</p>
-<img src=tnpp_rhdot_3.png width=600>
+<a class="reference internal image-reference" href="../_images/tnpp_rhdot_3.png"><img alt="../_images/tnpp_rhdot_3.png" src="../_images/tnpp_rhdot_3.png" style="width: 600px;" /></a>
 <p>The final precision for this site is 0.1 meters</p>
 <p>Kristine Larson 2022 August 29</p>
 </section>

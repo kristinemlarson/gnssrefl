@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>St Lawrence River &mdash; gnssrefl  documentation</title>
+  <title>use_pmtl2 &mdash; gnssrefl  documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -64,7 +64,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>St Lawrence River</li>
+      <li>use_pmtl2</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/use_cases/use_pmtl.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -98,8 +98,10 @@
     text-align: unset;
 }
 </style>
+<section id="use-pmtl2">
+<h1>use_pmtl2<a class="headerlink" href="#use-pmtl2" title="Permalink to this heading"></a></h1>
 <section id="st-lawrence-river">
-<h1>St Lawrence River<a class="headerlink" href="#st-lawrence-river" title="Permalink to this heading"></a></h1>
+<h2>St Lawrence River<a class="headerlink" href="#st-lawrence-river" title="Permalink to this heading"></a></h2>
 <p>To the best of our knowledge, access to the current high-rate data streams
 needed to do reflectometry at this site are no longer allowed. Please contact NRCAN for further information.
 The data used in the test case described below <em>is</em> still available. However, the current code requires
@@ -121,7 +123,7 @@ modify the NRCNA high rate downloads function to use <em>gfzrnx</em>, which is s
 <p><a class="reference external" href="https://goo.gl/maps/FoJ68HDT2KZ6KnZc7">Google Map Link</a></p>
 </section>
 <section id="data-summary">
-<h1>Data Summary<a class="headerlink" href="#data-summary" title="Permalink to this heading"></a></h1>
+<h2>Data Summary<a class="headerlink" href="#data-summary" title="Permalink to this heading"></a></h2>
 <p>Station PMTL is located on the Viterra Montreal Terminal building on the St Lawrence River in Montreal, Canada. It is operated by the Montreal Port Authority.</p>
 <p>GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more than 60 meters above the water, you need to use high-rate GNSS data. Because of the way that NRCAN stores these data, you need to install <span class="raw-html-m2r"><code>teqc</code></span>.</p>
 <p>Note the <a class="reference external" href="https://gnss-reflections.org/geoid?station=pmtl">ellipsoidal height and geoid corrected height</a>. To pick an azimuth and elevation mask, try the <a class="reference external" href="https://gnss-reflections.org/rzones">reflection zone webapp</a> with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:</p>
@@ -136,9 +138,20 @@ modify the NRCNA high rate downloads function to use <em>gfzrnx</em>, which is s
 <span class="pre">`</span></code></p>
 <p>![image attrs](pmtl_rzone.png){#imgattr .bg-primary width=”500” align=center}</p>
 <a class="reference internal image-reference" href="../_images/pmtl_rzone.png"><img alt="Alternative text" src="../_images/pmtl_rzone.png" style="width: 500px;" /></a>
+<P align=center>
+<img src="../_static/pmtl_rzone.png" width="500" />
+</P><p>&lt;img src=”../_static/pmtl_rzone.png” width=”500” &gt;</p>
+<p><code class="docutils literal notranslate"><span class="pre">`{image}</span> <span class="pre">../_static/pmtl_rzone.png</span>
+<span class="pre">:alt:</span> <span class="pre">fishy</span>
+<span class="pre">:class:</span> <span class="pre">bg-primary</span>
+<span class="pre">:width:</span> <span class="pre">500</span>
+<span class="pre">:align:</span> <span class="pre">center</span>
+<span class="pre">`</span></code></p>
+<p>![image attrs](../_static/pmtl_rzone.png){#imgattr .bg-primary width=”500” align=center}</p>
+<a class="reference internal image-reference" href="../_images/pmtl_rzone1.png"><img alt="Alternative text" src="../_images/pmtl_rzone1.png" style="width: 500px;" /></a>
 </section>
 <section id="quicklook">
-<h1>quickLook<a class="headerlink" href="#quicklook" title="Permalink to this heading"></a></h1>
+<h2>quickLook<a class="headerlink" href="#quicklook" title="Permalink to this heading"></a></h2>
 <p>Make a SNR file for multi-GNSS and high-rate:</p>
 <p><span class="raw-html-m2r"><code>rinex2snr pmtl 2020 330 -archive nrcan -rate high -orb gnss</code></span></p>
 <p><span class="raw-html-m2r"><code>quickLook pmtl 2020 330 -h1 40 -h2 90 -e1 5 -e2 12</code></span></p>
@@ -152,7 +165,7 @@ Retrievals are not returned near 90 degrees because of the satellite inclination
 <p><span class="raw-html-m2r"><img src=pmtl-qc-75-85.png width=600></span></p>
 </section>
 <section id="analyze-the-data">
-<h1>Analyze the Data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h1>
+<h2>Analyze the Data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h2>
 <p>Set up analysis instructions, using a smaller RH region:</p>
 <p><span class="raw-html-m2r"><code>make_json_input pmtl 45.5571 -73.5204 54.073 -h1 75 -h2 85 -e1 5 -e2 12 -allfreq True -peak2noise 3 -ampl 7</code></span></p>
 <p>Hand-edit the json to remove GPS L2C, GPS L5, and Galileo data, and to set your azimuth region. <a class="reference external" href="pmtl.json">Sample json</a></p>
@@ -172,7 +185,7 @@ This needs to be hand-edited in the json file.</p>
 <p><a class="reference external" href="pmtl-rh.txt">Daily average RH file</a></p>
 </section>
 <section id="accuracy">
-<h1>Accuracy<a class="headerlink" href="#accuracy" title="Permalink to this heading"></a></h1>
+<h2>Accuracy<a class="headerlink" href="#accuracy" title="Permalink to this heading"></a></h2>
 <p>The Canadian Hydrographic Service within Fisheries and Ocean Canada operates tide gauges along the St Lawrence
 River, the closest of which is Montreal Jetee #1 (station 15520), about 1 km south of the GNSS site.
 Tide data can be <a class="reference external" href="https://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&amp;region=PAC&amp;tst=1&amp;no=15520">downloaded</a>. Use the daily mean water level and UTC when submitting a request and download the resulting csv file.</p>
@@ -182,6 +195,7 @@ plausible that the correlation will improve if using the subdaily RH and hourly 
 <p><span class="raw-html-m2r"><img src=pmtl-compare-time.png width=600></span></p>
 <p><span class="raw-html-m2r"><img src=pmtl-correlation.png width=600></span></p>
 <p><a class="reference external" href="pmtl_usecase.py">Code for comparison</a></p>
+</section>
 </section>
 
 

@@ -145,11 +145,11 @@ one day of RINEX data:</p>
 <p><code>quickLook gls1 2012 100</code></p>
 <p>This produces two plots. The first is a geographically oriented (northwest, northeast and so on)
 summary of the frequency content of the GPS data:</p>
-<img src=quicklook-gls1-lsp.png width=600>
+<a class="reference internal image-reference" href="../_images/quicklook-gls1-lsp.png"><img alt="../_images/quicklook-gls1-lsp.png" src="../_images/quicklook-gls1-lsp.png" style="width: 600px;" /></a>
 <p>The peaks in these periodograms tell us how high the GPS antenna is above the ice surface. The peaks are associated with a reflector height (RH) of ~2.5 meters. <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For more details on quickLook output)</span></a></p>
 <p>The next plot shows results with respect to azimuth angle.  The top plot is RH and the other
 two are quality control measures: peak amplitude and peak to noise ratio.</p>
-<img src=quicklook-gls1-qc.png width=600>
+<a class="reference internal image-reference" href="../_images/quicklook-gls1-qc.png"><img alt="../_images/quicklook-gls1-qc.png" src="../_images/quicklook-gls1-qc.png" style="width: 600px;" /></a>
 <p>In the top plot we see that the retrieved reflector heights are consistent at all azimuths.
 Retrievals for azimuths between 340 degrees and 40 degrees are consistently marked as not having
 met quality control settings.From the center plot we can see that a peak2noise QC metric of 3 is reasonable.
@@ -157,7 +157,7 @@ Similarly, the amplitudes (bottom plot) are generally larger than 10, so 8 is an
 <p>Compare that to its level when the site was installed in the year 2011:</p>
 <p><Code>rinex2snr gls1 2011 271 -archive unavco</code></p>
 <p><CODE>quickLook gls1 2014 271</CODE></p>
-<img src="gls1-2011.png">
+<img alt="../_images/gls1-2011.png" src="../_images/gls1-2011.png" />
 </section>
 <section id="measure-snow-accumulation-in-2012">
 <h1>Measure Snow Accumulation in 2012<a class="headerlink" href="#measure-snow-accumulation-in-2012" title="Permalink to this heading"></a></h1>
@@ -178,11 +178,11 @@ azimuths is more related to the GPS satellite inclination than local conditions 
 and 30 individual tracks are required in order to recover a daily average:</p>
 <p><code>daily_avg gls1 0.25 30</code></p>
 <p>Three plots are returned. The first is all tracks:</p>
-<img src="dailyavg-gls1-3.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/dailyavg-gls1-3.png"><img alt="../_images/dailyavg-gls1-3.png" src="../_images/dailyavg-gls1-3.png" style="width: 600px;" /></a>
 <p>The second shows the number of tracks used in the daily average:</p>
-<img src="dailyavg-gls1-1.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/dailyavg-gls1-1.png"><img alt="../_images/dailyavg-gls1-1.png" src="../_images/dailyavg-gls1-1.png" style="width: 600px;" /></a>
 <p>Finally, the average RH each day for the year 2012:</p>
-<img src="dailyavg-gls1-2.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/dailyavg-gls1-2.png"><img alt="../_images/dailyavg-gls1-2.png" src="../_images/dailyavg-gls1-2.png" style="width: 600px;" /></a>
 <p>This data shown in the last plot show you long-term accumulation as well as relatively small snow accumulation events. The overall
 plot is dominated by the large melt event in the summer.</p>
 <p><a class="reference download internal" download="" href="../_downloads/50cbec7ef536dbfd8a86a87edaaa6241/gls1_dailyRH.txt"><span class="xref download myst">A sample daily average RH file.</span></a></p>

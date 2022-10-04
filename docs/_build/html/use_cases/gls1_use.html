@@ -119,14 +119,14 @@ Now make some SNR files for the year 2012:</p>
 <p><em>rinex2snr gls1 2012 1 -doy_end 365</em></p>
 <p>Look at the first one - make sure that the RH defaults are big enough to include the answer:</p>
 <p><em>quickLook gls1 2012 1 -e1 7 -e2 25</em></p>
-<img src="gls1-example.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/gls1-example.png"><img alt="../_images/gls1-example.png" src="../_images/gls1-example.png" style="width: 500px;" /></a>
 <p>Analyze all the 2012 data:</p>
 <p><em>gnssir gls1 2012 1 -doy_end 365</em></p>
 <p>Make a daily average (since you only have L1 at this site, I am requiring 30 tracks instead of 50)</p>
 <p><em>daily_avg gls1 0.25 30</em></p>
 <p>The plots:</p>
-<img src="gls1-1.png" width="500"/>
-<img src="gls1-2.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/gls1-1.png"><img alt="../_images/gls1-1.png" src="../_images/gls1-1.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="../_images/gls1-2.png"><img alt="../_images/gls1-2.png" src="../_images/gls1-2.png" style="width: 500px;" /></a>
 <p>That is what I call a lot of melt! If you want the reflector height answers, set the requested txt
 output filename in <strong>daily_avg</strong>.</p>
 </section>

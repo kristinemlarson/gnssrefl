@@ -172,38 +172,38 @@ You can modify that temporal setting or change to a csv format at the command li
 <p>Warning: No phase center corrections are currently applied to the reflector heights.
 Nor are changes from material properties addressed (water, snow, ice).</p>
 <p><em>Example for station AT01</em></p>
-<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width=500>
+<a class="reference internal image-reference" href="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg"><img alt="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" style="width: 500px;" /></a>
 <ul class="simple">
 <li><p>Make SNR files <code>rinex2snr at01 2021 301 -doy_end 303 -orb gnss -archive unavco</code></p></li>
 <li><p>Save analysis strategy <code>invsnr_input at01 9 14 5 13 -a1 20 -a2 220</code></p></li>
 <li><p>Just one day of GPS on L1: <code>invsnr at01 2021 301 L1 -constel G</code></p></li>
 </ul>
-<img src="../_static/at01-ex1.png" width=500>
+<a class="reference internal image-reference" href="../_images/at01-ex1.png"><img alt="../_images/at01-ex1.png" src="../_images/at01-ex1.png" style="width: 500px;" /></a>
 <ul class="simple">
 <li><p>Two days with L1 and all constellations: <code>invsnr at01 2021 301 L1 -doy_end 302</code></p></li>
 </ul>
-<img src="../_static/at01-ex2.png" width=500>
+<a class="reference internal image-reference" href="../_images/at01-ex2.png"><img alt="../_images/at01-ex2.png" src="../_images/at01-ex2.png" style="width: 500px;" /></a>
 <ul class="simple">
 <li><p>Two days with L1+L2+L5 and all constellations: <code>invsnr at01 2021 301 L1+L2+L5 -doy_end 302</code></p></li>
 </ul>
-<img src="../_static/at01-ex3.png" width=500>
+<a class="reference internal image-reference" href="../_images/at01-ex3.png"><img alt="../_images/at01-ex3.png" src="../_images/at01-ex3.png" style="width: 500px;" /></a>
 <p><em>Example for station TNPP</em></p>
-<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg" width=500>
+<a class="reference internal image-reference" href="https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg"><img alt="https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg" src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg" style="width: 500px;" /></a>
 <ul class="simple">
 <li><p>Make SNR files using <code>rinex2snr</code>, using high-rate data, UNAVCO archive, and GNSS orbits options</p></li>
 <li><p>Save analysis strategy <code>invsnr_input tnpp 58 67  5 12 -a1 180 -a2 270</code></p></li>
 <li><p>Two days with L1+L2+L5, all constellations, decimate to speed up the code (1-sec data will be very slow)</p></li>
 </ul>
 <p><code>invsnr tnpp 2021 315 L1+L2+L5 -doy_end 316 -tempres 2</code></p>
-<img src="../_static/tnpp-ex2.png" width=500>
+<a class="reference internal image-reference" href="../_images/tnpp-ex2.png"><img alt="../_images/tnpp-ex2.png" src="../_images/tnpp-ex2.png" style="width: 500px;" /></a>
 <p><em>Example for station SC02</em></p>
-<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/SC02.jpg" width=500>
+<a class="reference internal image-reference" href="https://www.unavco.org/data/gps-gnss/lib/images/station_images/SC02.jpg"><img alt="https://www.unavco.org/data/gps-gnss/lib/images/station_images/SC02.jpg" src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/SC02.jpg" style="width: 500px;" /></a>
 <ul class="simple">
 <li><p>Used default 15 second RINEX files from UNAVCO and -orb gnss option</p></li>
 <li><p>ranges: 3.5-8 meter RH, 5-13 elevation angle, 40-240 azimuth</p></li>
 <li><p>Multi-day, multi constellation, L1+L2 <code>invsnr sc02 2021 30 L1+L2 -doy_end 33 </code></p></li>
 </ul>
-<img src="../_static/sc02-ex1.png" width=500>
+<a class="reference internal image-reference" href="../_images/sc02-ex1.png"><img alt="../_images/sc02-ex1.png" src="../_images/sc02-ex1.png" style="width: 500px;" /></a>
 </section>
 <section id="future-changes">
 <h2>Future Changes<a class="headerlink" href="#future-changes" title="Permalink to this heading"></a></h2>

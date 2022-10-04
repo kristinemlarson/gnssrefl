@@ -149,10 +149,10 @@ to this using these commands:</p>
 <p>Then use <strong>quickLook</strong> to analyze the reflection characteristics of the site <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For details on quickLook output)</span></a>.</p>
 <p>The default return is for the L1 frequency:</p>
 <p><code>quickLook p041 2020 132</code></p>
-<img src="p041-l1.x.png" width="600">
+<a class="reference internal image-reference" href="../_images/p041-l1.x.png"><img alt="../_images/p041-l1.x.png" src="../_images/p041-l1.x.png" style="width: 600px;" /></a>
 <p>The code also summarizes these RH retrievals in terms of
 azimuth (x-axis) and QC metrics:</p>
-<img src="new-qc-p041-l1.png" width="600">
+<a class="reference internal image-reference" href="../_images/new-qc-p041-l1.png"><img alt="../_images/new-qc-p041-l1.png" src="../_images/new-qc-p041-l1.png" style="width: 600px;" /></a>
 <p>Now try looking at the periodogram for L2C:</p>
 <p><code>quickLook p041 2020 132 -fr 20</code></p>
 <img src="p041-l2c.x.png" width="600">
@@ -162,7 +162,7 @@ azimuth (x-axis) and QC metrics:</p>
 the fact that there are more L1 satellites than L2C satellites.</p>
 <p>Now try L5:</p>
 <p><CODE>quickLook p041 2020 132 -fr 5</code></p>
-<img src="p041-l5.png" width="600">
+<a class="reference internal image-reference" href="../_images/p041-l5.png"><img alt="../_images/p041-l5.png" src="../_images/p041-l5.png" style="width: 600px;" /></a>
 <p>The L5 signal has only been available on satellites launched after 2010, so there are
 fewer satellite tracks than either L1 or L2C.</p>
 <p>The <strong>quickLook</strong> code has multiple options. For example, it is possible change the reflector height range:</p>
@@ -197,11 +197,8 @@ a median filter (meters) is used and a minimum number of tracks is required. Her
 In this particular example, I only used three GPS frequencies, L1, L2C, and L5.</p>
 <p><code>daily_avg p041 .15 80</code></p>
 <p>Three plots are created. All RH retrievals:</p>
-<img src=p041-RH-all.png width=600/>
 <p>A summary of how many values are being used in the daily average:</p>
-<img src=p041-numval.png width=600/>
 <p>And the daily RH average:</p>
-<img src=p041-RH.png width=600/>
 <p>The location of the output files are printed to the screen.</p>
 </section>
 

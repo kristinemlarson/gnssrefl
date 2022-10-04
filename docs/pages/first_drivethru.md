@@ -26,8 +26,6 @@
 
 * [St Lawrence River,Canada](../use_cases/use_pmtl.md) (pmtl)
 
-* [St Lawrence River,Canada RST TEST](../use_cases/use_pmtl.rst) (pmtl)
-
 * [Lake Mathews, Riverside](../use_cases/use_mat2.md) (mat2)
 
 * [Lake Malawi, Tanzania](../use_cases/use_mbbc.md) (mbbc)

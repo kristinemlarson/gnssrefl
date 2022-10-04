@@ -145,7 +145,7 @@ heights.</p>
 <p><code>rinex2snr sc02 2021 15</code></p>
 <p>Use our utility <code>uickLook</code> with defaults <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For more details on quickLook output)</span></a>:</p>
 <p><code>quickLook sc02 2021 15 </code></p>
-<img src="sc02-default.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/sc02-default.png"><img alt="../_images/sc02-default.png" src="../_images/sc02-default.png" style="width: 600px;" /></a>
 <p>These results for reflector height in the top panel are pretty bad (gray means the retrieval does not pass QC). Why?
 The reflector height defaults are restricted to 0.5-6 meters, which includes part of
 the tidal range, but not all of it. Furthermore, the default elevation angles of 5 to 25 degrees are
@@ -154,15 +154,15 @@ not acceptable here, as these elevation angles include rocks and soil in additio
 elevation angle restrictions of 5 to 13 degrees and reflector height restrictions of 3 to 12 meters. And let’s
 use a modern GPS signal, L2C.</p>
 <p><code>quickLook sc02 2021 15 -e1 5 -e2 13 -h1 3 -h2 12 -fr 20</code></p>
-<img src="sc02-l2c.png" width=600>
+<a class="reference internal image-reference" href="../_images/sc02-l2c.png"><img alt="../_images/sc02-l2c.png" src="../_images/sc02-l2c.png" style="width: 600px;" /></a>
 <p>Now instead of vast numbers of unsuccessful reflector height retrivals, you can begin to
 see where the acceptable azimuths will be, ~50 to 230 degrees. A peak to noise ratio
 of 3 works pretty well.  The Lomb Scargle periodograms show the
 retrievals in periodogram space. You can see here that the northwest
 is a dead zone for water reflections, and that was expected.</p>
-<img src="sc02-l2c-lsp.png" width=600>
+<a class="reference internal image-reference" href="../_images/sc02-l2c-lsp.png"><img alt="../_images/sc02-l2c-lsp.png" src="../_images/sc02-l2c-lsp.png" style="width: 600px;" /></a>
 <p>We can also check the retrievals stats for L1 to make sure these look good too.</p>
-<img src="sc02-l1-qc.png" width="600">
+<a class="reference internal image-reference" href="../_images/sc02-l1-qc.png"><img alt="../_images/sc02-l1-qc.png" src="../_images/sc02-l1-qc.png" style="width: 600px;" /></a>
 </section>
 <section id="measure-tides-with-gnss-ir">
 <h1>Measure Tides with GNSS-IR<a class="headerlink" href="#measure-tides-with-gnss-ir" title="Permalink to this heading"></a></h1>
@@ -181,7 +181,7 @@ these RH retrievals. It is a work in progress, so it does not do everything yet.
 by concatenating the daily results and applying a sigma outlier criterion . The default is set to
 2.5 sigma, but you can enter on the command line a more or less stringent value:</p>
 <p><code>subdaily sc02 2021</code></p>
-<img src="raw_sc02.png"	width=600>
+<a class="reference internal image-reference" href="../_images/raw_sc02.png"><img alt="../_images/raw_sc02.png" src="../_images/raw_sc02.png" style="width: 600px;" /></a>
 <p>The output is stored in a plain text or csv file. This code will
 also apply the RH dot correction, but you have to
 request it (<code>-rhdot T</code>). The spline_outlier optional input (in meters)
@@ -189,11 +189,11 @@ is only used in the rhdot section of the code.</p>
 <p>Below are shown the initial solutions with a spline fit and outliers identified.
 Note: These figures were generated from an earlier version of the code, and should be
 updated.</p>
-<img src="sc02-outliers.png" width=600>
+<a class="reference internal image-reference" href="../_images/sc02-outliers.png"><img alt="../_images/sc02-outliers.png" src="../_images/sc02-outliers.png" style="width: 600px;" /></a>
 <p>Residuals to the spline fit with and without a RHdot correction:</p>
-<img src="sc02-rhdot.png" width=600>
+<a class="reference internal image-reference" href="../_images/sc02-rhdot.png"><img alt="../_images/sc02-rhdot.png" src="../_images/sc02-rhdot.png" style="width: 600px;" /></a>
 <p>A summary of the number of satellite arcs that are available:</p>
-<img src="sc02-nvals.png" width=600>
+<a class="reference internal image-reference" href="../_images/sc02-nvals.png"><img alt="../_images/sc02-nvals.png" src="../_images/sc02-nvals.png" style="width: 600px;" /></a>
 <p>Some statistics come to the screen that give you some perspective
 on the performance of the different frequencies and constellations.
 Note that there <em>should</em> be biases because we have not yet applied
@@ -227,7 +227,7 @@ to the <a class="reference external" href="https://tidesandcurrents.noaa.gov/sta
 <p>You can download the NOAA data yourselves or use our utility:</p>
 <p><code>download_tides 9449880 20210115 20210209</code></p>
 <p>We then compared the two series.</p>
-<img src="sc02-noaa.png" width=600>
+<a class="reference internal image-reference" href="../_images/sc02-noaa.png"><img alt="../_images/sc02-noaa.png" src="../_images/sc02-noaa.png" style="width: 600px;" /></a>
 <HR>
 <p>Here is a list of some of the publications using data from sc02. If you would like me to add more, please send them via email.</p>
 <ul class="simple">

@@ -106,7 +106,7 @@
 <p><strong>Ellipsoidal Height(m):</strong> 403.342</p>
 <p><strong>Network:</strong> TRIGNET</p>
 <p><strong>Archive:</strong> UNAVCO (use the special option)</p>
-<img src=https://gnss-reflections.org/static/images/SBAS.jpg width=500>
+<a class="reference internal image-reference" href="https://gnss-reflections.org/static/images/SBAS.jpg"><img alt="https://gnss-reflections.org/static/images/SBAS.jpg" src="https://gnss-reflections.org/static/images/SBAS.jpg" style="width: 500px;" /></a>
 <p>The data used here have been kindly provided by TRIGNET so that we could access L1 and L2C signals
 at 15 second sampling. This sampling rate is needed to be able to see the reservoir. However, they are in a proprietary Trimble binary format.<br />
 It is non-trivial to convert those to RINEX, so in this example we will rely on files translated and
@@ -124,7 +124,7 @@ RH values put you over the water.</p>
 <p>We know that the reservoir will only be in the northeast quadrant, so I am going
 to select those azimuths specifically. I will start with elevation angle limits of 5-12 degrees and the superior L2C frequency.</p>
 <p><code>quickLook sbas 2020 1 -e1 5 -e2 12 -h1 20 -h2 35 -azim1 0 -azim2 90 -fr 20</code></p>
-<img src=sbas-quicklook2.png width=600 />
+<a class="reference internal image-reference" href="../_images/sbas-quicklook2.png"><img alt="../_images/sbas-quicklook2.png" src="../_images/sbas-quicklook2.png" style="width: 600px;" /></a>
 <p>You can see that the last point looks a little bit lower than the others. If I run it again with
 screenstats set to True, I will get a little more information that will help me figure out how
 far we can go:</p>
@@ -158,12 +158,11 @@ elevation angles look good for a RH of 28 meters.</p>
 <p>Hand edit the json file to restrict azimuths to 0-78 degrees.</p>
 <p>The next step is to estimate reflector heights. First do a single day using the plt option.</p>
 <p><code>gnssir sbas 2021 1 -plt T</code></p>
-<img src=sbas_gnssir_l1.png width=600/>	
 <p>I’ve added an arrow to show you what happens if you violate the Nyquist - double peaks!
 Luckily this is not prevalent in this dataset thanks to the help of TRIGNET
 using a 15 second sample rate in the files.</p>
 <p>The next plot will be L2C:</p>
-<img src=sbas_gnssir_l2c.png width=600 />
+<a class="reference internal image-reference" href="../_images/sbas_gnssir_l2c.png"><img alt="../_images/sbas_gnssir_l2c.png" src="../_images/sbas_gnssir_l2c.png" style="width: 600px;" /></a>
 <p>Notice that the L2C frequency - which has a longer wavelength than L1 - does not have a double peak.
 And that is what we should expect.</p>
 <p>Go ahead and estimate reflector heights for all available days:</p>
@@ -173,9 +172,9 @@ only using GPS signals, we should not require as many points as we have done in 
 I am going to start by requiring 10:</p>
 <p><code>daily_avg sbas 0.25 10</code></p>
 <p>Number of available values per day:</p>
-<img src=sbas_4.png width=600 />
+<a class="reference internal image-reference" href="../_images/sbas_4.png"><img alt="../_images/sbas_4.png" src="../_images/sbas_4.png" style="width: 600px;" /></a>
 <p>Daily average reflector height results.</p>
-<img src=sbas_2.png width=600 />
+<a class="reference internal image-reference" href="../_images/sbas_2.png"><img alt="../_images/sbas_2.png" src="../_images/sbas_2.png" style="width: 600px;" /></a>
 <p>Note the missing points - this has nothing to do with reflectometry. These are days when the station did not report data.
 Numerical values are saved in a file. The location of the file is printed to the screen.</p>
 <p>You should also go back and add some of those very northwestern tracks by setting a second azimuth region in your json file.

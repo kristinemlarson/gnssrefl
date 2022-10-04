@@ -108,7 +108,7 @@ than my python-only RINEX reader/orbit interpolator.</p>
 <p>GPS L1, Glonass L1 and L2 can be used at this site. Tracking L2C, L5, Galileo, and Beidou signals
 would significantly improve the site.</p>
 <p>Look at the <a class="reference external" href="https://webapp.geod.nrcan.gc.ca/geod/data-donnees/station/report-rapport.php?id=M0722900">NRCAN Site Description for pmtl</a></p>
-<img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500" />
+<a class="reference internal image-reference" href="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg"><img alt="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" style="width: 500px;" /></a>
 <p>The GNSS antenna is on the roof of grain terminal. Also
 note the ellipsoidal height (and geoid corrected height),
 <a class="reference external" href="https://gnss-reflections.org/geoid?station=pmtl">also provided at my geoid site</a></p>
@@ -116,7 +116,7 @@ note the ellipsoidal height (and geoid corrected height),
 <p>For reflections, you want to know the height above the water.
 This is easy for an ocean site - but a little trickier here. To start out, concentrate on the
 geographic mask appropriate for its location using my <a class="reference external" href="https://gnss-reflections.org/rzones">reflection zone webapp</a>.</p>
-<img src="pmtl_rzone.png" width="500" />
+<a class="reference internal image-reference" href="../_images/pmtl_rzone.png"><img alt="../_images/pmtl_rzone.png" src="../_images/pmtl_rzone.png" style="width: 500px;" /></a>
 <p>Make a SNR file using the -orb gps+glo, -archive nrcan, and -rate high options.
 Warning: downloading a high-rate GNSS file can take a while …</p>
 <ul class="simple">
@@ -127,7 +127,7 @@ sure how that should go, start out with a broad RH region:</p>
 <ul class="simple">
 <li><p><em>quickLook pmtl 2020 330 -h1 40 -h2 90 -e1 5 -e2 12</em></p></li>
 </ul>
-<img src="pmtl-first-try.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/pmtl-first-try.png"><img alt="../_images/pmtl-first-try.png" src="../_images/pmtl-first-try.png" style="width: 500px;" /></a>
 <p>I have annotated this <strong>quickLook</strong> periodogram to point out that there is an outlier in the SW region.
 You can also see that the NW region is useless, which is what we should expect.
 You can try looking at a few more frequencies (such as Glonass) and using a more restricted RH region.</p>
@@ -151,9 +151,9 @@ the year, and doy.  The rest of the inputs are in that json.</p>
 </ul>
 <p>This is L1. The top plot is all the SNR data used in the periodograms. The plot below is the RH periodograms all on
 top of each other. Different colors are different satellites.</p>
-<img src="pmtl_l1.png" width="500" />
+<a class="reference internal image-reference" href="../_images/pmtl_l1.png"><img alt="../_images/pmtl_l1.png" src="../_images/pmtl_l1.png" style="width: 500px;" /></a>
 <p>These are the results for Glonass L1</p>
-<img src="pmtl_l101.png" width="500" />
+<a class="reference internal image-reference" href="../_images/pmtl_l101.png"><img alt="../_images/pmtl_l101.png" src="../_images/pmtl_l101.png" style="width: 500px;" /></a>
 <p>The RH results for a single day are written to $REFL_CODE/2020/results/pmtl/330.txt
 Once you are happy with how you have set your station mask (elevation and azimuth angles)
 and quality control metrics, you can analyze as much data as you like. This command would do all the data
@@ -166,7 +166,7 @@ between day of year 300 and day of year 330 (assuming you had previously run <st
 I downloaded this plot. You can see the expected height of the river on November 25, 2020, the day
 I used as an example. The St Lawrence River height is just where you would expect, given the difference between
 the RH analysis and the orthometric height of the GNSS antenna.</p>
-<img src="montreal.png" width="500">
+<a class="reference internal image-reference" href="../_images/montreal.png"><img alt="../_images/montreal.png" src="../_images/montreal.png" style="width: 500px;" /></a>
 </section>
 
 

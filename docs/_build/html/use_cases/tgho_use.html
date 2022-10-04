@@ -101,7 +101,7 @@
 <section id="lake-taupo">
 <h1>Lake Taupo<a class="headerlink" href="#lake-taupo" title="Permalink to this heading"></a></h1>
 <p>Station tgho is operated by GNS in New Zealand.  It is on Lake Taupo.</p>
-<img src="http://gnss-reflections.org/static/images/TGHO.jpg"/>
+<img alt="http://gnss-reflections.org/static/images/TGHO.jpg" src="http://gnss-reflections.org/static/images/TGHO.jpg" />
 <p>The receiver does not track L2C and it is not clear to me that L5 data are available. However, Glonass L1 and L2 are
 tracked, which is a good thing. It uses a geodetic sampling rate - 30 sec - which is not great but acceptable for this
 reflector height, which appears to be ~ 4 meters.</p>
@@ -109,17 +109,17 @@ reflector height, which appears to be ~ 4 meters.</p>
 clutter at the site and the dielectric constant of water, I am going to emphasize the lower elevation angles.</p>
 <p><em>rinex2snr tgho 2020 300 -archive nz</em></p>
 <p><em>quickLook tgho 2020 300 -e1 5 -e2 15</em></p>
-<img src="tgho-default.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/tgho-default.png"><img alt="../_images/tgho-default.png" src="../_images/tgho-default.png" style="width: 500px;" /></a>
 <p>There is a lot of clutter at the small RH values.  So try again, windowing:</p>
 <p><em>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8</em></p>
-<img src="tgho-better.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/tgho-better.png"><img alt="../_images/tgho-better.png" src="../_images/tgho-better.png" style="width: 500px;" /></a>
 <p>Why don’t I like L2 data?</p>
-<img src="tgho-l2.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/tgho-l2.png"><img alt="../_images/tgho-l2.png" src="../_images/tgho-l2.png" style="width: 500px;" /></a>
 <p>Now make a SNR file that includes both GPS and Glonass:</p>
 <p><em>rinex2snr tgho 2020 303 -archive nz -orb gps+glo</em></p>
 <p>Look at the Glonass L1 results. Very nice.</p>
 <p><em>quickLook tgho 2020 303 -e1 5 -e2 15 -fr 101 -h1 2 -h2 8</em></p>
-<img src="tgho-glonass-l1.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/tgho-glonass-l1.png"><img alt="../_images/tgho-glonass-l1.png" src="../_images/tgho-glonass-l1.png" style="width: 500px;" /></a>
 <p>You need to set an azimuth mask at this site. I will rely on the work of
 Lucas Holden at RMIT. Currently this needs to be done by hand-editing the json.
 So, first make the standard json, but with some changes to reflector height, peak2noise
@@ -138,7 +138,7 @@ Make sure you ask for the NZ archive and the correct orbits:</p>
 <p>Remember, the RH results are in $REFL_CODE/2020/results/tgho. Since this is a lake, you can
 use <strong>daily_avg</strong> to give you a daily value. I used this command:</p>
 <p><em>daily_avg tgho 0.25 50</em></p>
-<img src="tgho-six-months.png" width="500"/>
+<a class="reference internal image-reference" href="../_images/tgho-six-months.png"><img alt="../_images/tgho-six-months.png" src="../_images/tgho-six-months.png" style="width: 500px;" /></a>
 <p>As noted by Lucas, the number of RH retrievals is significantly smaller on days when the wind speeds are high.
 High winds == rough surface == less specular. We are being conservative here and requiring 50 measurements/day for a daily average.</p>
 </section>

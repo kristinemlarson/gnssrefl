@@ -132,26 +132,25 @@ crew set this at the receiver when it was originally installed.</p>
 <p><code>rinex2snr lthw 2018 1</code></p>
 <p>Use our utility <strong>quickLook</strong> to look at these data <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For more details on quickLook output)</span></a>:</p>
 <p><code>quickLook lthw 2018 1 -e1 7</code></p>
-<img src="lthw-day1-2018.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/lthw-day1-2018.png"><img alt="../_images/lthw-day1-2018.png" src="../_images/lthw-day1-2018.png" style="width: 600px;" /></a>
 <p>This is a bit of a mess really. If there are significant peaks, they are really
 close to the cutoff for the method (at 0.5 meters). Let’s compare with about a week later.
 First make a SNR file:</p>
 <p><code>rinex2snr lthw 2018 9</code></p>
 <p>Now run quickLook:</p>
 <p><code>quickLook lthw 2018 9 -e1 7</code></p>
-<img src="qc-lthw-1.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/qc-lthw-1.png"><img alt="../_images/qc-lthw-1.png" src="../_images/qc-lthw-1.png" style="width: 600px;" /></a>
 <p>This is <em>much</em> better and clearly shows that a field crew reset the antenna to a little
 less than 5 meters sometime between day 1 and day 9 in the year 2018. You can also look
 at the second plot to get an idea of how well the method performs for various azimuths
 and QC parameters:</p>
-<img src="qc-lthw-2.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/qc-lthw-2.png"><img alt="../_images/qc-lthw-2.png" src="../_images/qc-lthw-2.png" style="width: 600px;" /></a>
 <p>Except for a region ~270-300 degrees in azimuth, and directly south, retrievals are consistently good.
 A peak to noise ratio of 3 appears to be appropriate. The rejected southern retrievals are unlikely to be
 of local origin, but rather related to the inclination of the satellite orbits at this latitude.</p>
 <p>If you like you can compare this to the first day of 2020, first make the SNR file:</p>
 <p><code>rinex2snr lthw 2020 1</code></p>
 <p>Again use quickLook:</p>
-<img src="qc-lthw-2020.png" width=600/>
 <p>Now the peaks in the reflector height (RH) periodograms are ~2.2 meters -
 so that means that there was ~2.5 meters of surface change from 2018 to 2020.</p>
 </section>
@@ -169,11 +168,11 @@ you prefer.</p>
 quality control selections.  In order to estimate snow accumulation, you will want to calculate
 the daily average. Using our <strong>daily_avg</strong> utility - and specifying 50 satellite tracks and median filter of 0.25 meters:</p>
 <p><code>daily_avg lthw 0.25 50</code></p>
-<img src="lthw-req50.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/lthw-req50.png"><img alt="../_images/lthw-req50.png" src="../_images/lthw-req50.png" style="width: 600px;" /></a>
 <p>You can loosen the required track number if you want, but in this case it does not change the
 overall character of the results:</p>
 <p><code>daily_avg lthw 0.25 40</code></p>
-<img src="lthw-req40.png" width="600"/>
+<a class="reference internal image-reference" href="../_images/lthw-req40.png"><img alt="../_images/lthw-req40.png" src="../_images/lthw-req40.png" style="width: 600px;" /></a>
 <p><a class="reference download internal" download="" href="../_downloads/c5e32103610c144f4162ef2693fa63bc/lthw_dailyRH.txt"><span class="xref download myst">Sample daily average RH file for 2018</span></a></p>
 <p>If you are feeling ambitious, try looking at the data for <a class="reference external" href="https://www.unavco.org/instrumentation/networks/status/nota/overview/UTHW">Upper Thwaites Glacier</a> :-)</p>
 </section>

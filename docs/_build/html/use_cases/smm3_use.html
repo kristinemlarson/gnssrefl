@@ -141,7 +141,7 @@ title of the periodogram plot. As are the elevation angle limits.</p>
 <li><p>First make the SNR file <em>rinex2snr smm3 2020 106</em></p></li>
 <li><p>Look at the results using default parameters: <em>quickLook smm3 2020 106</em></p></li>
 </ul>
-<img src="smm3-default.png" width="500" />
+<a class="reference internal image-reference" href="../_images/smm3-default.png"><img alt="../_images/smm3-default.png" src="../_images/smm3-default.png" style="width: 500px;" /></a>
 <p>Periodogram traces in gray means the code did not find a significant RH peak.<br />
 Why does this not look like the periodogram results from my web app? Look closely.
 smm3 is ~14 meters above the ice sheet - and this far exceeds the code default of 6 meters.
@@ -149,7 +149,7 @@ You need to reset the allowed reflector heights. Modify your call to <strong>qui
 <ul class="simple">
 <li><p><em>quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15</em></p></li>
 </ul>
-<img src="smm3-sensible.png" width="500" />
+<a class="reference internal image-reference" href="../_images/smm3-sensible.png"><img alt="../_images/smm3-sensible.png" src="../_images/smm3-sensible.png" style="width: 500px;" /></a>
 <p>Notice that instead of strong peaks center at a single RH value,
 there is quite a bit of spread in the northwest and northeast quadrants. That is because the reflection
 area is more complex (and maybe also reflecting off things that are not snow).</p>
@@ -178,7 +178,7 @@ the json since they are not in the RINEX files I am using. <a class="reference d
 <ul class="simple">
 <li><p><em>daily_avg smm3 0.25 50 -txtfile smm3_RH.txt</em></p></li>
 </ul>
-<img src="smm3_RH.png" width="500" />
+<a class="reference internal image-reference" href="../_images/smm3_RH.png"><img alt="../_images/smm3_RH.png" src="../_images/smm3_RH.png" style="width: 500px;" /></a>
 <p>Notice that the <a class="reference download internal" download="" href="../_downloads/928a77afc48bb4aabd1f3489d8862294/smm3_RH.txt"><span class="xref download myst">daily average RH file</span></a> shows well over 150 measurements per day are being
 used in the average.  So you could rerun the code to use a bigger value than 50.  Here the observations are so
 robust it won’t make a difference.</p>
