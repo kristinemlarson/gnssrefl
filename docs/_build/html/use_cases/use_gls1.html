@@ -43,7 +43,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl api reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
@@ -145,11 +145,11 @@ one day of RINEX data:</p>
 <p><code>quickLook gls1 2012 100</code></p>
 <p>This produces two plots. The first is a geographically oriented (northwest, northeast and so on)
 summary of the frequency content of the GPS data:</p>
-<a class="reference internal image-reference" href="../_images/quicklook-gls1-lsp.png"><img alt="../_images/quicklook-gls1-lsp.png" src="../_images/quicklook-gls1-lsp.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/quicklook-gls1-lsp.png"><img alt="use_cases/quicklook-gls1-lsp.png" src="use_cases/quicklook-gls1-lsp.png" style="width: 600px;" /></a>
 <p>The peaks in these periodograms tell us how high the GPS antenna is above the ice surface. The peaks are associated with a reflector height (RH) of ~2.5 meters. <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For more details on quickLook output)</span></a></p>
 <p>The next plot shows results with respect to azimuth angle.  The top plot is RH and the other
 two are quality control measures: peak amplitude and peak to noise ratio.</p>
-<a class="reference internal image-reference" href="../_images/quicklook-gls1-qc.png"><img alt="../_images/quicklook-gls1-qc.png" src="../_images/quicklook-gls1-qc.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/quicklook-gls1-qc.png"><img alt="use_cases/quicklook-gls1-qc.png" src="use_cases/quicklook-gls1-qc.png" style="width: 600px;" /></a>
 <p>In the top plot we see that the retrieved reflector heights are consistent at all azimuths.
 Retrievals for azimuths between 340 degrees and 40 degrees are consistently marked as not having
 met quality control settings.From the center plot we can see that a peak2noise QC metric of 3 is reasonable.
@@ -157,7 +157,7 @@ Similarly, the amplitudes (bottom plot) are generally larger than 10, so 8 is an
 <p>Compare that to its level when the site was installed in the year 2011:</p>
 <p><Code>rinex2snr gls1 2011 271 -archive unavco</code></p>
 <p><CODE>quickLook gls1 2014 271</CODE></p>
-<img alt="../_images/gls1-2011.png" src="../_images/gls1-2011.png" />
+<img alt="use_cases/gls1-2011.png" src="use_cases/gls1-2011.png" />
 </section>
 <section id="measure-snow-accumulation-in-2012">
 <h1>Measure Snow Accumulation in 2012<a class="headerlink" href="#measure-snow-accumulation-in-2012" title="Permalink to this heading"></a></h1>
@@ -168,7 +168,7 @@ reflector height values (0.4 and 6 meters). But for the reasons previously state
 of 7 degrees. We also specify that we only want to use the L1 data and set peak2noise and a mimimum
 amplitude for the periodograms. We use the utility <strong>make_json_input</strong> to set and store these analysis settings:</p>
 <p><code>make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -l1 True -peak2noise 3 -ampl 8</code></p>
-<p><a class="reference download internal" download="" href="../_downloads/2d9e94f3c085731184bb97e214c48bc0/gls1.json"><span class="xref download myst">Example json file.</span></a></p>
+<p><span class="xref myst">Example json file.</span></p>
 <p>We have also excluded a bit of the northern tracks by hand-editing the json. This is not required as
 the software appears to be appropriately removing these unreliable azimuths. Note: the removal of these
 azimuths is more related to the GPS satellite inclination than local conditions at gls1.</p>
@@ -178,11 +178,11 @@ azimuths is more related to the GPS satellite inclination than local conditions 
 and 30 individual tracks are required in order to recover a daily average:</p>
 <p><code>daily_avg gls1 0.25 30</code></p>
 <p>Three plots are returned. The first is all tracks:</p>
-<a class="reference internal image-reference" href="../_images/dailyavg-gls1-3.png"><img alt="../_images/dailyavg-gls1-3.png" src="../_images/dailyavg-gls1-3.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/dailyavg-gls1-3.png"><img alt="use_cases/dailyavg-gls1-3.png" src="use_cases/dailyavg-gls1-3.png" style="width: 600px;" /></a>
 <p>The second shows the number of tracks used in the daily average:</p>
-<a class="reference internal image-reference" href="../_images/dailyavg-gls1-1.png"><img alt="../_images/dailyavg-gls1-1.png" src="../_images/dailyavg-gls1-1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/dailyavg-gls1-1.png"><img alt="use_cases/dailyavg-gls1-1.png" src="use_cases/dailyavg-gls1-1.png" style="width: 600px;" /></a>
 <p>Finally, the average RH each day for the year 2012:</p>
-<a class="reference internal image-reference" href="../_images/dailyavg-gls1-2.png"><img alt="../_images/dailyavg-gls1-2.png" src="../_images/dailyavg-gls1-2.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/dailyavg-gls1-2.png"><img alt="use_cases/dailyavg-gls1-2.png" src="use_cases/dailyavg-gls1-2.png" style="width: 600px;" /></a>
 <p>This data shown in the last plot show you long-term accumulation as well as relatively small snow accumulation events. The overall
 plot is dominated by the large melt event in the summer.</p>
 <p><a class="reference download internal" download="" href="../_downloads/50cbec7ef536dbfd8a86a87edaaa6241/gls1_dailyRH.txt"><span class="xref download myst">A sample daily average RH file.</span></a></p>

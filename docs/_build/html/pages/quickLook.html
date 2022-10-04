@@ -43,7 +43,7 @@
 <li class="toctree-l1"><a class="reference internal" href="understand.html">Understanding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="README_install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="func_and_utils_doc.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl api reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="first_drivethru.html">gnssrefl use cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="news.html">News <a name="news"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
@@ -117,7 +117,7 @@ region that you define. For <code>quickLook</code> it uses the same RH region fo
 <p>We start with one of our <code>rinex2snr</code> examples, <code>p041</code></p>
 <p><code>quickLook p041 2020 132 </CODE></p>
 <p>That command will produce this periodogram summary:</p>
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l1.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l1.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/p041-l1.png"><img alt="../_images/p041-l1.png" src="../_images/p041-l1.png" style="width: 600px;" /></a>
 <p>By default, these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
 you have used the defaults. Furthermore, note that results on the x-axis begin at 0.5 meters.
 Since you are not able to resolve very small reflector heights with this method, this region
@@ -126,23 +126,23 @@ peaks in the periodograms bunch up around 2 meters means that at
 this site the antenna phase center is ~ 2 meters above the ground. The colors change as you try
 different satellites.  If the data are plotted in gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on.</p>
 <p><CODE>quickLook</code> also provides a summary of various quality control metrics:</p>
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041_l1_qc.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041_l1_qc.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041_l1_qc.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/p041_l1_qc.png"><img alt="../_images/p041_l1_qc.png" src="../_images/p041_l1_qc.png" style="width: 600px;" /></a>
 <p>The top plot shows the sucessful RH retrievals in blue and unsuccessful RH retrievals in gray.
 In the center panel are the peak to noise ratios. The last plot is the amplitude of the spectral peak. The dashed
 lines show you what QC metrics quickLook was using. You can control/change these on the command line.</p>
 <p>If you want to look at L2C data you just change the frequency on the command line. L2C is designated by
 frequency 20:</p>
 <p><CODE>quickLook p041 2020 132 -fr 20</CODE></p>
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l2c.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l2c.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l2c.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/p041-l2c.png"><img alt="../_images/p041-l2c.png" src="../_images/p041-l2c.png" style="width: 600px;" /></a>
 <p><strong>L2C results are always superior to L1 results.</strong> If you have any influence over a GNSS site, please
 ask the station operators to track modern GPS signals such as L2C and L5.</p>
 <p><strong>Check back for our site on Lake Superior:</strong></p>
 <p>Make a SNR file <code>rinex2snr ross 2020 170</code> and <code>quickLook ross 2020 170 -e1 5 -e2 15</code></p>
-<img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-qc.png width=600>
+<img src=../_static/ross-qc.png width=600>
 The good RH estimates (in blue in the top panel) are telling us that we were right when we assessed 
 reflection zones using 4 meters. We can also see that the best retrievals are in the southeast quadrant (azimuths 90-180 degrees).
 This is further emphasized in the next panel, that shows the actual periodograms.
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-lsp.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-lsp.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-lsp.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/ross-lsp.png"><img alt="../_images/ross-lsp.png" src="../_images/ross-lsp.png" style="width: 600px;" /></a>
 <p><a class="reference external" href="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_gls1.md"><strong>Example for a site on an ice sheet</strong></a></p>
 <p><a class="reference external" href="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md"><strong>Example for a tall site</strong></a></p>
 <p>In addition to the <strong>peak2noise</strong> and required amplitude (<strong>ampl</strong>) QC metrics, there is a

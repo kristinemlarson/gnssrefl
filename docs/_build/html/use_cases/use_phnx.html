@@ -43,7 +43,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl api reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
@@ -136,19 +136,19 @@ the web app <a class="reference internal" href="../pages/quickLook_desc.html"><s
 <p><code>quickLook phnx 2021 1</code></p>
 <p>First, the lomb scargle periodograms for each quadrant which indicate that things are looking pretty good.
 Remember that each color is a different satellite arc.</p>
-<a class="reference internal image-reference" href="../_images/phnx_lsp_l1.png"><img alt="../_images/phnx_lsp_l1.png" src="../_images/phnx_lsp_l1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/phnx_lsp_l1.png"><img alt="use_cases/phnx_lsp_l1.png" src="use_cases/phnx_lsp_l1.png" style="width: 600px;" /></a>
 <p>The summary plot shows consistent reflector height retrievals (top plot):</p>
-<a class="reference internal image-reference" href="../_images/phnx_ql_l1.png"><img alt="../_images/phnx_ql_l1.png" src="../_images/phnx_ql_l1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/phnx_ql_l1.png"><img alt="use_cases/phnx_ql_l1.png" src="use_cases/phnx_ql_l1.png" style="width: 600px;" /></a>
 <p>Pretty sweet. It looks like all azimuths are pretty good. There are some low amplitudes and peak2noise ratios at
 certain azimuths. Some of these are caused by the way we have split the tracks into strict
 azimuths (0-90,90-180, and so on). <em>However</em>, these periodograms look a lot better than
 we saw on the gnss-reflections webapp example:</p>
-<a class="reference internal image-reference" href="../_images/phnx_2019_200.png"><img alt="../_images/phnx_2019_200.png" src="../_images/phnx_2019_200.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/phnx_2019_200.png"><img alt="use_cases/phnx_2019_200.png" src="use_cases/phnx_2019_200.png" style="width: 600px;" /></a>
 <p>I have circled in bright yellow the parts of the periodograms that are noise. These
 are primarily bunched at a little less than one meter reflector height.
 Our theory is that this was created by the other sensors set out by the Antarctic Precipitation System.
 Let’s run <code>quickLook</code> again a few weeks after they removed their equipment:</p>
-<a class="reference internal image-reference" href="../_images/phnx_2020_001.png"><img alt="../_images/phnx_2020_001.png" src="../_images/phnx_2020_001.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/phnx_2020_001.png"><img alt="use_cases/phnx_2020_001.png" src="use_cases/phnx_2020_001.png" style="width: 600px;" /></a>
 <p>You can see that that particular noise source is now gone. And the periodograms in general are more clearly
 showing a strong single peak. This is an indication that closely co-colocating all these
 sensors negatively impacted the GPS reflections sensor. However, the dominant GPS reflections are still be tracked.</p>

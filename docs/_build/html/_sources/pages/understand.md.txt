@@ -80,8 +80,9 @@ in the SNR data. This represents the dual effects of the satellite power transmi
 gain pattern. We aren't interested in that so we will be removing it with a low order polynomial (and 
 we will convert to linear units on y-axis). 
 
+
 <p align=center>
-<img src="https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/docs/p041-snr.png" width="600"/>
+<img src="../_static/p041-snr.png" width="600"/>
 </p>
 
 After that polynomial is removed, we will concentrate on the *rising* 
@@ -102,7 +103,7 @@ significant. There are many ways to do this - we only use two quality control me
 * is the peak divided by a "noise" metric larger than a user-defined value. The code calls this the peak2noise.
 
 <p align=center>
-<img src="https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/for_the_web.png" width="600"/>
+<img src="../_static/for_the_web.png" width="600"/>
 </p>
 
 The Colorado SNR example is for a fairly planar field where the RH for the rising and setting arc 
@@ -112,7 +113,7 @@ frequency than during the setting arc (high tide). This gives you an idea of how
 used to measure tides. 
 
 <p align=center>
-<img src="https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/docs/pbay-snr.png" width="600"/>
+<img src="../_static/pbay-snr.png" width="600"/>
 </p>
 
 ### Considerations
@@ -145,8 +146,8 @@ one in the northern hemisphere and one in the southern hemisphere.
 <TD><img src=http://gnss-reflections.org/static/images/P038.jpg width=300></TD>
 </TR>
 <TR>
-<TD><img src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchl_google.jpg width=300></TD>
-<TD><img src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/p038_google.jpg width=300></TD>
+<TD><img src=../_static/mchl_google.jpg width=300></TD>
+<TD><img src=../_static/p038_google.jpg width=300></TD>
 </TR>
 </table>
 </p>
@@ -173,17 +174,17 @@ but not too tall. We will try 4 meters and then check later to make sure that wa
 <p align=center>
 <table align=center>
 <TR>
-<TD>A. <img src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/ross-google.jpg width=300> <BR>
+<TD>A. <img src=../_static/ross-google.jpg width=300> <BR>
 Map view of station ROSS </TD>
 <TD>B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> <BR>
 Photograph of station ROSS</TD>
 </TD>
 </TR>
 <Tr>
-<TD>C. <img src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/ross-first.jpg width=300><BR>
+<TD>C. <img src=../_static/ross-first.jpg width=300><BR>
 Reflection zones for GPS satellites at elevation <BR>angles of 5-25 degrees 
 for a reflector height of <BR>4 meters.</TD> 
-<TD>D. <img src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/ross-second.jpg width=300><BR>
+<TD>D. <img src=../_static/ross-second.jpg width=300><BR>
 Reflection zones for GPS satellites at elevation <BR>angles of 5-15 degrees 
 for a reflector height of <BR>4 meters.  </TD>
 </Tr>

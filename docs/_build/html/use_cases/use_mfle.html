@@ -43,7 +43,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl api reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
@@ -129,12 +129,12 @@ look at the data from 2016-2019. The latter period had far more L2C transmitting
 <p>Then ask explicitly for the L2C data :</p>
 <p><code>quickLook mfle 2019 150 -fr 20</code></p>
 <p>First the periodograms:</p>
-<a class="reference internal image-reference" href="../_images/mfle_1.png"><img alt="../_images/mfle_1.png" src="../_images/mfle_1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mfle_1.png"><img alt="use_cases/mfle_1.png" src="use_cases/mfle_1.png" style="width: 600px;" /></a>
 <p>You can see that the peak of the periodograms line up near to 3 meters.
 The summary plot shows that really all of the geographic regions are good. The
 rejected tracks (in gray) are primarily due to the satellite not rising high enough in the sky
 to convince the software that the result should be kept:</p>
-<a class="reference internal image-reference" href="../_images/mfle_2.png"><img alt="../_images/mfle_2.png" src="../_images/mfle_2.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mfle_2.png"><img alt="use_cases/mfle_2.png" src="use_cases/mfle_2.png" style="width: 600px;" /></a>
 </section>
 <section id="estimate-reflector-heights">
 <h1>Estimate Reflector Heights<a class="headerlink" href="#estimate-reflector-heights" title="Permalink to this heading"></a></h1>
@@ -151,8 +151,8 @@ However, please feel free to only look at one year of data if you have issues wi
 <p>Before we look at soil moisture, let’s get an idea of how often it snowed at this site:</p>
 <p><code>daily_avg mfle 0.2 10</code></p>
 <p>You can see that requiring 10 tracks could be increased:</p>
-<a class="reference internal image-reference" href="../_images/mfle_dailyavg4.png"><img alt="../_images/mfle_dailyavg4.png" src="../_images/mfle_dailyavg4.png" style="width: 600px;" /></a>
-<a class="reference internal image-reference" href="../_images/mfle_dailyavg2.png"><img alt="../_images/mfle_dailyavg2.png" src="../_images/mfle_dailyavg2.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mfle_dailyavg4.png"><img alt="use_cases/mfle_dailyavg4.png" src="use_cases/mfle_dailyavg4.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mfle_dailyavg2.png"><img alt="use_cases/mfle_dailyavg2.png" src="use_cases/mfle_dailyavg2.png" style="width: 600px;" /></a>
 <p>The large variations of the daily averages from the median value is showing snow effects.
 (The difference beteween the daily RH value and the long-term median value is snow depth).
 The soil moisture code does a pretty good job of removing snow effects because the effects don’t
@@ -177,7 +177,7 @@ From the geographic phase plots you can see quite a bit of scatter at the end of
 the southeast quadrant; that is likely reponsible for at least the last outliers. However,
 overall, the code has done a good job of removing suspect points.</p>
 <p>The final volumetric water content results:</p>
-<a class="reference internal image-reference" href="../_images/mfle_final_vwc.png"><img alt="../_images/mfle_final_vwc.png" src="../_images/mfle_final_vwc.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mfle_final_vwc.png"><img alt="use_cases/mfle_final_vwc.png" src="use_cases/mfle_final_vwc.png" style="width: 600px;" /></a>
 <p>These soil moisture estimates are written to a file; its location is written to the screen.</p>
 <p>Thank you to Naoya Kadota for test driving this use case.</p>
 <p>Kristine M. Larson September 6, 2022</p>

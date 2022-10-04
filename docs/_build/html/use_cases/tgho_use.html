@@ -43,7 +43,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl api reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
@@ -109,17 +109,17 @@ reflector height, which appears to be ~ 4 meters.</p>
 clutter at the site and the dielectric constant of water, I am going to emphasize the lower elevation angles.</p>
 <p><em>rinex2snr tgho 2020 300 -archive nz</em></p>
 <p><em>quickLook tgho 2020 300 -e1 5 -e2 15</em></p>
-<a class="reference internal image-reference" href="../_images/tgho-default.png"><img alt="../_images/tgho-default.png" src="../_images/tgho-default.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="use_cases/tgho-default.png"><img alt="use_cases/tgho-default.png" src="use_cases/tgho-default.png" style="width: 500px;" /></a>
 <p>There is a lot of clutter at the small RH values.  So try again, windowing:</p>
 <p><em>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8</em></p>
-<a class="reference internal image-reference" href="../_images/tgho-better.png"><img alt="../_images/tgho-better.png" src="../_images/tgho-better.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="use_cases/tgho-better.png"><img alt="use_cases/tgho-better.png" src="use_cases/tgho-better.png" style="width: 500px;" /></a>
 <p>Why don’t I like L2 data?</p>
-<a class="reference internal image-reference" href="../_images/tgho-l2.png"><img alt="../_images/tgho-l2.png" src="../_images/tgho-l2.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="use_cases/tgho-l2.png"><img alt="use_cases/tgho-l2.png" src="use_cases/tgho-l2.png" style="width: 500px;" /></a>
 <p>Now make a SNR file that includes both GPS and Glonass:</p>
 <p><em>rinex2snr tgho 2020 303 -archive nz -orb gps+glo</em></p>
 <p>Look at the Glonass L1 results. Very nice.</p>
 <p><em>quickLook tgho 2020 303 -e1 5 -e2 15 -fr 101 -h1 2 -h2 8</em></p>
-<a class="reference internal image-reference" href="../_images/tgho-glonass-l1.png"><img alt="../_images/tgho-glonass-l1.png" src="../_images/tgho-glonass-l1.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="use_cases/tgho-glonass-l1.png"><img alt="use_cases/tgho-glonass-l1.png" src="use_cases/tgho-glonass-l1.png" style="width: 500px;" /></a>
 <p>You need to set an azimuth mask at this site. I will rely on the work of
 Lucas Holden at RMIT. Currently this needs to be done by hand-editing the json.
 So, first make the standard json, but with some changes to reflector height, peak2noise
@@ -138,7 +138,7 @@ Make sure you ask for the NZ archive and the correct orbits:</p>
 <p>Remember, the RH results are in $REFL_CODE/2020/results/tgho. Since this is a lake, you can
 use <strong>daily_avg</strong> to give you a daily value. I used this command:</p>
 <p><em>daily_avg tgho 0.25 50</em></p>
-<a class="reference internal image-reference" href="../_images/tgho-six-months.png"><img alt="../_images/tgho-six-months.png" src="../_images/tgho-six-months.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="use_cases/tgho-six-months.png"><img alt="use_cases/tgho-six-months.png" src="use_cases/tgho-six-months.png" style="width: 500px;" /></a>
 <p>As noted by Lucas, the number of RH retrievals is significantly smaller on days when the wind speeds are high.
 High winds == rough surface == less specular. We are being conservative here and requiring 50 measurements/day for a daily average.</p>
 </section>

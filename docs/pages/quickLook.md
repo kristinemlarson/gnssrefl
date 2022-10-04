@@ -24,7 +24,7 @@ We start with one of our <code>rinex2snr</code> examples, <code>p041</code>
 
 That command will produce this periodogram summary:
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l1.png" width=600>
+<img src="../_static/p041-l1.png" width=600>
 
 By default, these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
 you have used the defaults. Furthermore, note that results on the x-axis begin at 0.5 meters.
@@ -36,7 +36,7 @@ different satellites.  If the data are plotted in gray that means you have a fai
 
 <CODE>quickLook</code> also provides a summary of various quality control metrics:
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041_l1_qc.png" width=600>
+<img src="../_static/p041_l1_qc.png" width=600>
 
 The top plot shows the sucessful RH retrievals in blue and unsuccessful RH retrievals in gray. 
 In the center panel are the peak to noise ratios. The last plot is the amplitude of the spectral peak. The dashed
@@ -47,7 +47,7 @@ frequency 20:
 
 <CODE>quickLook p041 2020 132 -fr 20</CODE>
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/p041-l2c.png" width=600>
+<img src="../_static/p041-l2c.png" width=600>
 
 **L2C results are always superior to L1 results.** If you have any influence over a GNSS site, please 
 ask the station operators to track modern GPS signals such as L2C and L5.
@@ -56,12 +56,12 @@ ask the station operators to track modern GPS signals such as L2C and L5.
 
 Make a SNR file <code>rinex2snr ross 2020 170</code> and <code>quickLook ross 2020 170 -e1 5 -e2 15</code>
 
-<img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-qc.png width=600>
+<img src=../_static/ross-qc.png width=600>
 The good RH estimates (in blue in the top panel) are telling us that we were right when we assessed 
 reflection zones using 4 meters. We can also see that the best retrievals are in the southeast quadrant (azimuths 90-180 degrees).
 This is further emphasized in the next panel, that shows the actual periodograms.
 
-<img src=https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/ross-lsp.png width=600>
+<img src=../_static/ross-lsp.png width=600>
 
 [**Example for a site on an ice sheet**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_gls1.md)
 

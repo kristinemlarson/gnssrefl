@@ -43,7 +43,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl api reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
@@ -138,13 +138,13 @@ Since the receiver only tracks GPS signals, there is no need to specify gnss orb
 <p>Examine the spectral characteristics of the SNR data for the default settings
 <a class="reference internal" href="../pages/quickLook_desc.html"><span class="doc std std-doc">(For details on quickLook output.)</span></a>:</p>
 <p><code>quickLook mchn 2019 205</code></p>
-<a class="reference internal image-reference" href="../_images/mchn-example.png"><img alt="../_images/mchn-example.png" src="../_images/mchn-example.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mchn-example.png"><img alt="use_cases/mchn-example.png" src="use_cases/mchn-example.png" style="width: 600px;" /></a>
 <p>Why does this not look like the results from the web app? Look closely at the station photo and the x-axis
 of the periodograms, then change the range of reflector heights at the command line for <strong>quickLook</strong>:</p>
 <p><code>quickLook mchn 2019 205 -h1 2 -h2 8</code></p>
-<a class="reference internal image-reference" href="../_images/qc-mchn-1.png"><img alt="../_images/qc-mchn-1.png" src="../_images/qc-mchn-1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/qc-mchn-1.png"><img alt="use_cases/qc-mchn-1.png" src="use_cases/qc-mchn-1.png" style="width: 600px;" /></a>
 <p>Also look at the QC metrics:</p>
-<a class="reference internal image-reference" href="../_images/qc-mchn-2.png"><img alt="../_images/qc-mchn-2.png" src="../_images/qc-mchn-2.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/qc-mchn-2.png"><img alt="use_cases/qc-mchn-2.png" src="use_cases/qc-mchn-2.png" style="width: 600px;" /></a>
 <p>The water is ~6.5 meters below the antenna. You can see from the top plot that the good retrievals (in blue)
 very clearly show you which azimuths are acceptable and which are not.  The middle plot shows the peak to noise
 ratio, which we would like to at least exceed 3. And here again, the bad retrievals are always below this level.
@@ -166,16 +166,16 @@ hand to be limited to 80-180 degrees. Although it is possible to get good reflec
 <p>The daily output files are stored in $REFL_CODE/2013/results/mchn. <span class="xref myst">Here is an example output for a single day.</span>
 Plots of SNR data can be seen with the -plt option.</p>
 <p><code>gnssir mchn 2013 195  -plt True</code></p>
-<a class="reference internal image-reference" href="../_images/mchn-g-l1.png"><img alt="../_images/mchn-g-l1.png" src="../_images/mchn-g-l1.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mchn-g-l1.png"><img alt="use_cases/mchn-g-l1.png" src="use_cases/mchn-g-l1.png" style="width: 500px;" /></a>
 <p>For a lake, it is appropriate to use the daily average. Our utility for computing a daily average requires a value
 for the median filter and a minimum number of tracks.  If the median value is set to the be large (2 meters), you can see
 large outliers:</p>
 <p><code>daily_avg mchn 2 10</code></p>
-<a class="reference internal image-reference" href="../_images/mchn_1.png"><img alt="../_images/mchn_1.png" src="../_images/mchn_1.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mchn_1.png"><img alt="use_cases/mchn_1.png" src="use_cases/mchn_1.png" style="width: 500px;" /></a>
 <p>A more reasonable result is obtained with a 0.25-meter median filter and the 12-track requirement. If you want to save
 the daily averages to a specific file, use the -txtfile option. Otherwise it will use a default location (which is printed to the screen)</p>
 <p><code>daily_avg mchn 0.25 12 -txtfile mchn-dailyavg.txt</code></p>
-<a class="reference internal image-reference" href="../_images/mchn_3.png"><img alt="../_images/mchn_3.png" src="../_images/mchn_3.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mchn_3.png"><img alt="use_cases/mchn_3.png" src="use_cases/mchn_3.png" style="width: 500px;" /></a>
 <p><a class="reference download internal" download="" href="../_downloads/358beec387886df5b3935145660723a1/mchn-dailyavg.txt"><span class="xref download myst">Sample daily average RH file.</span></a></p>
 <p>The number of tracks required will depend on the site. Here the azimuth is restricted because  of the location of the antenna.
 Please note that these reflections are from ice in the winter and water during the summer. Surface
@@ -186,10 +186,10 @@ downloaded from <a class="reference external" href="http://www.isdm-gdsi.gc.ca/i
 Please select the daily mean water level, as there are restrictions on hourly data (more information is available on the download page).
 We have downloaded <a class="reference download internal" download="" href="../_downloads/14945ad5127839d5a2fa646a32198508/10750-01-JAN-2013_slev.csv"><span class="xref download myst">the 2013 data</span></a>.</p>
 <p>The water levels measured by the traditional tide gauge and GNSS-IR are shown here:</p>
-<a class="reference internal image-reference" href="../_images/mchn-timeseries-tide-rh.png"><img alt="../_images/mchn-timeseries-tide-rh.png" src="../_images/mchn-timeseries-tide-rh.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mchn-timeseries-tide-rh.png"><img alt="use_cases/mchn-timeseries-tide-rh.png" src="use_cases/mchn-timeseries-tide-rh.png" style="width: 600px;" /></a>
 <p>The linear regression between the two series gives a slope m=-1.03. The rms of the
 residuals is very good, 0.025 m.</p>
-<a class="reference internal image-reference" href="../_images/mchn-linreg.png"><img alt="../_images/mchn-linreg.png" src="../_images/mchn-linreg.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="use_cases/mchn-linreg.png"><img alt="use_cases/mchn-linreg.png" src="use_cases/mchn-linreg.png" style="width: 600px;" /></a>
 <p>The <a class="reference download internal" download="" href="../_downloads/a94b173a0000685c12743bd71753152e/plotmchn.py"><span class="xref download myst">python script</span></a> used to generate these plots is provided.</p>
 </section>
 <section id="reference">

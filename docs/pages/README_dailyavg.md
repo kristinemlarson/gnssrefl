@@ -27,7 +27,7 @@ You can easily see the outliers.
 
 
 <p align=center>
-<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-A.png>
+<img width=500 src=../_static/mchn-A.png>
 </p>
 
 Next I have rerun the code with a better median filter constraint of 0.25 meters:
@@ -35,12 +35,12 @@ Next I have rerun the code with a better median filter constraint of 0.25 meters
 <code> daily_avg mchn 0.25 12 </code>
 
 <p align=center>
-<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-B.png>
+<img width=500 src=../_static/mchn-B.png>
 </p>
 
 A daily average plot is also made and a text file of the outputs is created.
 
 <p align=center>
-<img width=500 src=https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/tests/use_cases/mchn-C.png>
+<img width=500 src=../_static/mchn-C.png>
 </p>
 

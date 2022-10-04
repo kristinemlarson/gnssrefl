@@ -100,7 +100,7 @@ Where would the code store the files for this example?
 
 This is a snippet of what the result file would look like
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/tests/results-snippet.png" width="600">
+<img src="../_static/results-snippet.png" width="600">
 
 - *Amp* is the amplitude of the most significant peak in the periodogram (i.e. the amplitude for the RH you estimated).  
 - *DelT* is how long a given rising or setting satellite arc was, in minutes. 
