@@ -17,7 +17,7 @@
 [Google Maps Link](https://www.google.com/maps/place/26%C2%B021'32.4%22S+148%C2%B008'42.0%22E/@-26.359,148.145,11z/data=!4m5!3m4!1s0x0:0x9200f9ebb23ec5b1!8m2!3d-26.359!4d148.145?hl=en) 
 
 <p align=center>
-<img src=MCHL.jpeg width=500>
+<img src=../_static/MCHL.jpeg width=500>
 </p>
 
 **Archives:** CDDIS, BKG, GA
@@ -66,7 +66,7 @@ Pick the satellite tracks you are going to use:
 This creates a file that will go in $REFL_CODE/input/mchl_phaseRH.txt
 
 This file can be hand edited if you find out later that a 
-particularly satellite track is not working. To comment lines out you use %. 
+particular satellite track is not working. To comment lines out you use %. 
 
 Run the <code>phase</code> code:
 
@@ -83,20 +83,20 @@ It also produces plots which can help you assess your results:
 
 1. Raw phases in geographic quadrants
  <br />
-<img src="mchl_1.png" width="600">
+<img src="../_static/mchl_1.png" width="600">
  <br />
 2. Daily phase averages
  <br />
-<img src="mchl_2.png" width="500">
+<img src="../_static/mchl_2.png" width="500">
  <br />
 3. Modeling Results
  <br />
 
-<img src="mchl_3.png" width="600">
+<img src="../_static/mchl_3.png" width="600">
  <br />
  4. Final VWC:
  <br>
-<img src="mchl_4.png" width="600">
+<img src="../_static/mchl_4.png" width="600">
 
 
 A big thank you to Lucas Holden for test driving this use case.

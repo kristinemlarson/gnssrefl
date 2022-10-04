@@ -59,19 +59,19 @@ Then run <code>quickLook</code>:
 The default return is for L1. This plot confirms our concerns about the quality of the L1 data.
 It also suggests the southern quadrants are preferred to other quadrants.
 
-<img src="p360-qc1.png" width="600">
+<img src="../_static/p360-qc1.png" width="600">
 
 Now check L2C:
 
 <code>quickLook p360 2017 290 -fr 20</code>
 
-<img src="qc-p360-l2c.png" width="600">
+<img src="../_static/qc-p360-l2c.png" width="600">
 
 These reflector height retrievals are far superior to the L1 
 data. The southern quadrants give more consistent retrievals than for the 
 north. This is confirmed in the QC plot show here:
 
-<img src="p360-qc-l2c.png" width="600">
+<img src="../_static/p360-qc-l2c.png" width="600">
 
 ## Analyze the Data
 
@@ -105,7 +105,7 @@ and 0.25 meter median filter to remove large outliers:
 
 Here all RH retrievals are shown:
 
-<img src="p360-all.png" width="600">
+<img src="../_static/p360-all.png" width="600">
 
 This plot makes it clear that there are data outages at p360, particular in the winter months.
 This is due to the way the site was built. Power was provided by solar panels and batteries. When
@@ -115,7 +115,7 @@ the batteries ran down. When the snow on the panels melted, the site would track
 This next plot shows the number of reflector heights each day. While they are consistent 
 in the fall and later spring, there is significant variation in December, January, and February.
 
-<img src="p360-dailynums.png" width="600">
+<img src="../_static/p360-dailynums.png" width="600">
 
 The variation in retrievals in the winter is due to poor data retrieval in those winter months. 
 This next plot shows the number of total observations in the RINEX file each day. You can see the 
@@ -123,10 +123,10 @@ correlation between the number of tracks available for the daily average and the
 observations in the file. For sites with more reliable power, there will not be 
 data outages during the winter.
 
-<img src="p360-raw.png" width="600">
+<img src="../_static/p360-raw.png" width="600">
 
 Finally, the daily average RH for the water year: 
 
-<img src="p360-dailyavg.png" width="600">
+<img src="../_static/p360-dailyavg.png" width="600">
 
 [Sample daily average RH output](p360_dailyRH.txt)

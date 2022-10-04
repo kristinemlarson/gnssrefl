@@ -127,7 +127,7 @@ modify the NRCNA high rate downloads function to use <em>gfzrnx</em>, which is s
 <p>GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more than 60 meters above the water, you need to use high-rate GNSS data. Because of the way that NRCAN stores these data, you need to install <code>teqc</code>.</p>
 <p>Note the <a class="reference external" href="https://gnss-reflections.org/geoid?station=pmtl">ellipsoidal height and geoid corrected height</a>. To pick an azimuth and elevation mask, try the <a class="reference external" href="https://gnss-reflections.org/rzones">reflection zone webapp</a> with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:</p>
 <P align=center>
-<img src="pmtl_rzone.png" width="500" />
+<img src="../_static/pmtl_rzone.png" width="500" />
 </P>
 </section>
 <section id="quicklook">
@@ -135,14 +135,14 @@ modify the NRCNA high rate downloads function to use <em>gfzrnx</em>, which is s
 <p>Make a SNR file for multi-GNSS and high-rate:</p>
 <p><code>rinex2snr pmtl 2020 330 -archive nrcan -rate high -orb gnss</code></p>
 <p><code>quickLook pmtl 2020 330 -h1 40 -h2 90 -e1 5 -e2 12</code></p>
-<a class="reference internal image-reference" href="use_cases/pmtl-first-try.png"><img alt="use_cases/pmtl-first-try.png" src="use_cases/pmtl-first-try.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/pmtl-first-try.png"><img alt="../_images/pmtl-first-try.png" src="../_images/pmtl-first-try.png" style="width: 600px;" /></a>
 <p>I have annotated this <code>quickLook</code> periodogram to point out that there is an outlier in the SW region.
 You can also see that the NW region is useless, which is what we should expect.
 Windowing down the reflector region and using day of year 270:</p>
-<a class="reference internal image-reference" href="use_cases/pmtl-lsp-75-85.png"><img alt="use_cases/pmtl-lsp-75-85.png" src="use_cases/pmtl-lsp-75-85.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/pmtl-lsp-75-85.png"><img alt="../_images/pmtl-lsp-75-85.png" src="../_images/pmtl-lsp-75-85.png" style="width: 600px;" /></a>
 <p>The QC plot gives the azimuth windows - and help on setting the required amplitude and peak to noise ratio.
 Retrievals are not returned near 90 degrees because of the satellite inclination and the way the azimuth regions are defined in <code>quickLook</code>. It does not mean there are obstructions in that direction.</p>
-<a class="reference internal image-reference" href="use_cases/pmtl-qc-75-85.png"><img alt="use_cases/pmtl-qc-75-85.png" src="use_cases/pmtl-qc-75-85.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/pmtl-qc-75-85.png"><img alt="../_images/pmtl-qc-75-85.png" src="../_images/pmtl-qc-75-85.png" style="width: 600px;" /></a>
 </section>
 <section id="analyze-the-data">
 <h1>Analyze the Data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h1>
@@ -159,9 +159,9 @@ This needs to be hand-edited in the json file.</p>
 <p>Now compute daily averages:</p>
 <p><code>daily_avg pmtl 0.25 50 -txtfile pmtl-rh.txt </code></p>
 <p>All tracks:</p>
-<a class="reference internal image-reference" href="use_cases/pmtl-all.png"><img alt="use_cases/pmtl-all.png" src="use_cases/pmtl-all.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/pmtl-all.png"><img alt="../_images/pmtl-all.png" src="../_images/pmtl-all.png" style="width: 600px;" /></a>
 <p>The daily average:</p>
-<a class="reference internal image-reference" href="use_cases/pmtl_RH.png"><img alt="use_cases/pmtl_RH.png" src="use_cases/pmtl_RH.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/pmtl_RH.png"><img alt="../_images/pmtl_RH.png" src="../_images/pmtl_RH.png" style="width: 600px;" /></a>
 <p><a class="reference download internal" download="" href="../_downloads/66a3a5250c6fd398f2135bf129d46da8/pmtl-rh.txt"><span class="xref download myst">Daily average RH file</span></a></p>
 </section>
 <section id="accuracy">
@@ -172,8 +172,8 @@ Tide data can be <a class="reference external" href="https://www.isdm-gdsi.gc.ca
 <p>For this use case, the tidal data have already been <a class="reference download internal" download="" href="../_downloads/690a209ee2fe8162ecdbef7f8668c6bc/pmtl.csv"><span class="xref download myst">downloaded</span></a>.
 Given that there is quite drastic water level changes within a day, it is entirely
 plausible that the correlation will improve if using the subdaily RH and hourly tide gauge data.</p>
-<a class="reference internal image-reference" href="use_cases/pmtl-compare-time.png"><img alt="use_cases/pmtl-compare-time.png" src="use_cases/pmtl-compare-time.png" style="width: 600px;" /></a>
-<a class="reference internal image-reference" href="use_cases/pmtl-correlation.png"><img alt="use_cases/pmtl-correlation.png" src="use_cases/pmtl-correlation.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/pmtl-compare-time.png"><img alt="../_images/pmtl-compare-time.png" src="../_images/pmtl-compare-time.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/pmtl-correlation.png"><img alt="../_images/pmtl-correlation.png" src="../_images/pmtl-correlation.png" style="width: 600px;" /></a>
 <p><a class="reference download internal" download="" href="../_downloads/a38d3e4830c494af1023685b43f91a14/pmtl_usecase.py"><span class="xref download myst">Code for comparison</span></a></p>
 </section>
 

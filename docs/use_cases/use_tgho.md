@@ -44,45 +44,33 @@ Begin by making an SNR file. Use both GPS and Glonass and set the archive to nz:
 
 <img src="../_static/tgho-default.png" width="600">
 
-![](tgho-default.png =x250)
-
 The clutter near the monument produces noise at the small RH values.  A better result 
 can be found if those values are eliminated by setting h1 to 2. We also extend h2 to 8.
 
 <code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8</code>
 
-<img src="tgho-better.png" width="600">
-
-![](tgho-better.png)
+<img src="../_static/tgho-better.png" width="600">
 
 Now try looking at the periodogram for L2:
 
 <code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 2</code>
 
-<img src="tgho-l2.png" width="600"/>
-
-![](tgho-l2.png)
+<img src="../_static/tgho-l2.png" width="600"/>
 
 These results are not very compelling for a variety of reasons. The GPS L2 data 
 will not be used in subsequent analysis. Next, check the two Glonass frequencies:
 
 <CODE>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 101</code>
 
-<img src="tgho-glonass-l1.png" width="600"/>
-
-![](tgho-glonass-l1.png)
+<img src="../_static/tgho-glonass-l1.png" width="600"/>
 
 <code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 102</code>
 
-<img src="tgho-glonass-l2.png" width="600"/>
-
-![](tgho-glonass-l2.png)
+<img src="../_static/tgho-glonass-l2.png" width="600"/>
 
 The QC metrics from Glonass 101 are helpful for setting the azimuth mask:
 
-<img src=tgho-glonss-qc.png width="600">
-
-![](tgho-glonss-qc.png)
+<img src=../_static/tgho-glonss-qc.png width="600">
 
 We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 and a peak to noise ratio of 3.0.
 
@@ -112,16 +100,12 @@ median, and the minimum number of tracks required to calculate the average is se
 
 The number of retrievals each day is show here:
 
-<img src="tgho-numvals.png" width="600">
-
-![](tgho-numvals.png)
+<img src="../_static/tgho-numvals.png" width="600">
 
 
 All retrievals are shown here:
 
-<img src="tgho-all.png" width="600">
-
-![](tgho-all.png)
+<img src="../_static/tgho-all.png" width="600">
 
 
 Note in particular that there are quite a few data outages in this series, which means the RINEX files were missing 
@@ -129,9 +113,7 @@ from the NZ archive.
 
 Finally, the average RH plot:
 
-<img src="tgho-rhavg.png" width="600">
-
-![](tgho-rhavg.png)
+<img src="../_static/tgho-rhavg.png" width="600">
 
 
 [Sample RH file](tgho_dailyRH.txt)

@@ -129,27 +129,21 @@ The site could be significantly improved with a newer receiver that tracks moder
 <p><code>rinex2snr tgho 2020 300 -orb gnss -archive nz</code></p>
 <p><code>quickLook tgho 2020 300 -e1 5 -e2 15</code></p>
 <a class="reference internal image-reference" href="../_images/tgho-default.png"><img alt="../_images/tgho-default.png" src="../_images/tgho-default.png" style="width: 600px;" /></a>
-<p>![](tgho-default.png =x250)</p>
 <p>The clutter near the monument produces noise at the small RH values.  A better result
 can be found if those values are eliminated by setting h1 to 2. We also extend h2 to 8.</p>
 <p><code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8</code></p>
-<a class="reference internal image-reference" href="use_cases/tgho-better.png"><img alt="use_cases/tgho-better.png" src="use_cases/tgho-better.png" style="width: 600px;" /></a>
-<p><img alt="" src="use_cases/tgho-better.png" /></p>
+<a class="reference internal image-reference" href="../_images/tgho-better.png"><img alt="../_images/tgho-better.png" src="../_images/tgho-better.png" style="width: 600px;" /></a>
 <p>Now try looking at the periodogram for L2:</p>
 <p><code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 2</code></p>
-<a class="reference internal image-reference" href="use_cases/tgho-l2.png"><img alt="use_cases/tgho-l2.png" src="use_cases/tgho-l2.png" style="width: 600px;" /></a>
-<p><img alt="" src="use_cases/tgho-l2.png" /></p>
+<a class="reference internal image-reference" href="../_images/tgho-l2.png"><img alt="../_images/tgho-l2.png" src="../_images/tgho-l2.png" style="width: 600px;" /></a>
 <p>These results are not very compelling for a variety of reasons. The GPS L2 data
 will not be used in subsequent analysis. Next, check the two Glonass frequencies:</p>
 <p><CODE>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 101</code></p>
-<a class="reference internal image-reference" href="use_cases/tgho-glonass-l1.png"><img alt="use_cases/tgho-glonass-l1.png" src="use_cases/tgho-glonass-l1.png" style="width: 600px;" /></a>
-<p><img alt="" src="use_cases/tgho-glonass-l1.png" /></p>
+<a class="reference internal image-reference" href="../_images/tgho-glonass-l1.png"><img alt="../_images/tgho-glonass-l1.png" src="../_images/tgho-glonass-l1.png" style="width: 600px;" /></a>
 <p><code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 102</code></p>
-<a class="reference internal image-reference" href="use_cases/tgho-glonass-l2.png"><img alt="use_cases/tgho-glonass-l2.png" src="use_cases/tgho-glonass-l2.png" style="width: 600px;" /></a>
-<p><img alt="" src="use_cases/tgho-glonass-l2.png" /></p>
+<a class="reference internal image-reference" href="../_images/tgho-glonass-l2.png"><img alt="../_images/tgho-glonass-l2.png" src="../_images/tgho-glonass-l2.png" style="width: 600px;" /></a>
 <p>The QC metrics from Glonass 101 are helpful for setting the azimuth mask:</p>
-<a class="reference internal image-reference" href="use_cases/tgho-glonss-qc.png"><img alt="use_cases/tgho-glonss-qc.png" src="use_cases/tgho-glonss-qc.png" style="width: 600px;" /></a>
-<p><img alt="" src="use_cases/tgho-glonss-qc.png" /></p>
+<a class="reference internal image-reference" href="../_images/tgho-glonss-qc.png"><img alt="../_images/tgho-glonss-qc.png" src="../_images/tgho-glonss-qc.png" style="width: 600px;" /></a>
 <p>We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 and a peak to noise ratio of 3.0.</p>
 </section>
 <section id="analyze-the-data">
@@ -167,16 +161,13 @@ Glonass signals (frequencies 101 and 102) were added and GPS L2/L5 were removed.
 median, and the minimum number of tracks required to calculate the average is set to 50 tracks.</p>
 <p><CODE>daily_avg tgho .25 50 </code></p>
 <p>The number of retrievals each day is show here:</p>
-<a class="reference internal image-reference" href="use_cases/tgho-numvals.png"><img alt="use_cases/tgho-numvals.png" src="use_cases/tgho-numvals.png" style="width: 600px;" /></a>
-<p><img alt="" src="use_cases/tgho-numvals.png" /></p>
+<a class="reference internal image-reference" href="../_images/tgho-numvals.png"><img alt="../_images/tgho-numvals.png" src="../_images/tgho-numvals.png" style="width: 600px;" /></a>
 <p>All retrievals are shown here:</p>
-<a class="reference internal image-reference" href="use_cases/tgho-all.png"><img alt="use_cases/tgho-all.png" src="use_cases/tgho-all.png" style="width: 600px;" /></a>
-<p><img alt="" src="use_cases/tgho-all.png" /></p>
+<a class="reference internal image-reference" href="../_images/tgho-all.png"><img alt="../_images/tgho-all.png" src="../_images/tgho-all.png" style="width: 600px;" /></a>
 <p>Note in particular that there are quite a few data outages in this series, which means the RINEX files were missing
 from the NZ archive.</p>
 <p>Finally, the average RH plot:</p>
-<a class="reference internal image-reference" href="use_cases/tgho-rhavg.png"><img alt="use_cases/tgho-rhavg.png" src="use_cases/tgho-rhavg.png" style="width: 600px;" /></a>
-<p><img alt="" src="use_cases/tgho-rhavg.png" /></p>
+<a class="reference internal image-reference" href="../_images/tgho-rhavg.png"><img alt="../_images/tgho-rhavg.png" src="../_images/tgho-rhavg.png" style="width: 600px;" /></a>
 <p><a class="reference download internal" download="" href="../_downloads/06186d5fc58f42760ba092e6d8a0a2af/tgho_dailyRH.txt"><span class="xref download myst">Sample RH file</span></a></p>
 <p>Although Taupo is in a volcanic caldera, lake levels are determined by seasonal processes such
 as evaporation, precipitation, input from local drainages, and outflow. The Waikoto

@@ -1,7 +1,7 @@
 ### Dye2, Greenland 
 
 <p align=center>
-<img src="gls1.jpg" width="400"><br>
+<img src="../_static/gls1.jpg" width="400"><br>
 </p>
 
 **Station Name:** gls1
@@ -61,14 +61,14 @@ And then:
 This produces two plots. The first is a geographically oriented (northwest, northeast and so on) 
 summary of the frequency content of the GPS data:
 
-<img src=quicklook-gls1-lsp.png width=600>
+<img src=../_static/quicklook-gls1-lsp.png width=600>
 
 The peaks in these periodograms tell us how high the GPS antenna is above the ice surface. The peaks are associated with a reflector height (RH) of ~2.5 meters. [(For more details on quickLook output)](../pages/quickLook_desc.md)
 
 The next plot shows results with respect to azimuth angle.  The top plot is RH and the other 
 two are quality control measures: peak amplitude and peak to noise ratio.
 
-<img src=quicklook-gls1-qc.png width=600>
+<img src=../_static/quicklook-gls1-qc.png width=600>
 
 In the top plot we see that the retrieved reflector heights are consistent at all azimuths.
 Retrievals for azimuths between 340 degrees and 40 degrees are consistently marked as not having
@@ -82,7 +82,7 @@ Compare that to its level when the site was installed in the year 2011:
 
 <CODE>quickLook gls1 2014 271</CODE>
 
-<img src="gls1-2011.png">
+<img src="../_static/gls1-2011.png">
 
 ## Measure Snow Accumulation in 2012
 
@@ -114,15 +114,15 @@ and 30 individual tracks are required in order to recover a daily average:
 
 Three plots are returned. The first is all tracks:
 
-<img src="dailyavg-gls1-3.png" width="600"/>
+<img src="../_static/dailyavg-gls1-3.png" width="600"/>
 
 The second shows the number of tracks used in the daily average:
 
-<img src="dailyavg-gls1-1.png" width="600"/>
+<img src="../_static/dailyavg-gls1-1.png" width="600"/>
 
 Finally, the average RH each day for the year 2012:
 
-<img src="dailyavg-gls1-2.png" width="600"/>
+<img src="../_static/dailyavg-gls1-2.png" width="600"/>
 
 This data shown in the last plot show you long-term accumulation as well as relatively small snow accumulation events. The overall 
 plot is dominated by the large melt event in the summer.

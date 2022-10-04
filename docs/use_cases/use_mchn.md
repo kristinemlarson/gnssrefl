@@ -21,7 +21,7 @@
 [Google Maps Link](https://goo.gl/maps/mU5GbsvMsLfe5buQ7) 
 
 <p align=center>
-<img src="mchn_monu-cors.png" width="500"/>
+<img src="../_static/mchn_monu-cors.png" width="500"/>
 </P>
 
 
@@ -56,18 +56,18 @@ Examine the spectral characteristics of the SNR data for the default settings
 
 <code>quickLook mchn 2019 205</code>
 
-<img src="mchn-example.png" width="600">
+<img src="../_static/mchn-example.png" width="600">
 
 Why does this not look like the results from the web app? Look closely at the station photo and the x-axis 
 of the periodograms, then change the range of reflector heights at the command line for **quickLook**:
 
 <code>quickLook mchn 2019 205 -h1 2 -h2 8</code>
 
-<img src="qc-mchn-1.png" width="600">
+<img src="../_static/qc-mchn-1.png" width="600">
 
 Also look at the QC metrics:
 
-<img src="qc-mchn-2.png" width="600">
+<img src="../_static/qc-mchn-2.png" width="600">
 
 The water is ~6.5 meters below the antenna. You can see from the top plot that the good retrievals (in blue) 
 very clearly show you which azimuths are acceptable and which are not.  The middle plot shows the peak to noise 
@@ -100,7 +100,7 @@ Plots of SNR data can be seen with the -plt option.
 
 <code>gnssir mchn 2013 195  -plt True</code>
 
-<img src="mchn-g-l1.png" width="500">
+<img src="../_static/mchn-g-l1.png" width="500">
 
 For a lake, it is appropriate to use the daily average. Our utility for computing a daily average requires a value
 for the median filter and a minimum number of tracks.  If the median value is set to the be large (2 meters), you can see 
@@ -108,14 +108,14 @@ large outliers:
 
 <code>daily_avg mchn 2 10</code>
 
-<img src="mchn_1.png" width="500">
+<img src="../_static/mchn_1.png" width="500">
 
 A more reasonable result is obtained with a 0.25-meter median filter and the 12-track requirement. If you want to save 
 the daily averages to a specific file, use the -txtfile option. Otherwise it will use a default location (which is printed to the screen)
 
 <code>daily_avg mchn 0.25 12 -txtfile mchn-dailyavg.txt</code>
 
-<img src="mchn_3.png" width="500">
+<img src="../_static/mchn_3.png" width="500">
 
 [Sample daily average RH file.](mchn-dailyavg.txt)
 
@@ -131,12 +131,12 @@ We have downloaded [the 2013 data](10750-01-JAN-2013_slev.csv).
 
 The water levels measured by the traditional tide gauge and GNSS-IR are shown here:
 
-<img src="mchn-timeseries-tide-rh.png" width="600">
+<img src="../_static/mchn-timeseries-tide-rh.png" width="600">
 
 The linear regression between the two series gives a slope m=-1.03. The rms of the 
 residuals is very good, 0.025 m.  
 
-<img src="mchn-linreg.png" width="600">
+<img src="../_static/mchn-linreg.png" width="600">
 
 The [python script](plotmchn.py) used to generate these plots is provided.
 

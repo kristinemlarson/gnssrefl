@@ -12,7 +12,7 @@ This use case is not finished.
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/P475)
 
 <p align="center">
-<img src="p038.png" width="500"/>
+<img src="../_static/p038.png" width="500"/>
 </P>
  
 P475 was a PBO site. Soil moisture can be extracted, but it is a challenging case.  

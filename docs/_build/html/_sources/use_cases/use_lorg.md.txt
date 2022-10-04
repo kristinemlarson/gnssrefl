@@ -45,7 +45,7 @@ Use <code>quickLook</code> to produce a periodogram similar to the one in the we
 
 <code>quickLook lorg 2019 205</code>
 
-<img src="lorg-ql-l1.png" width="600">
+<img src="../_static/lorg-ql-l1.png" width="600">
  
 Compare the periodograms for other frequencies: L2C and L5. They should be similar to the L1 periodogram, except that there 
 will be fewer satellite traces because only GPS satellites launched after 2005 
@@ -55,13 +55,13 @@ This is for L2C:
 
 <code>quickLook lorg 2019 205 -fr 20</code>
 
-<img src="lorg-ql-l2c.png" width="600">
+<img src="../_static/lorg-ql-l2c.png" width="600">
 
 This is for L5:
 
 <code>quickLook lorg 2019 205 -fr 5</code>
 
-<img src="lorg-ql-l5.png" width="600">
+<img src="../_static/lorg-ql-l5.png" width="600">
 
 ### Analyze the Data
 
@@ -85,7 +85,7 @@ The default does not send any plots to the screen. If you do want to see them, s
 
 <code>gnssir lorg 2019 1 -plt True </code>
 
-<img src="lorg-g-panels.png" width="800"/>
+<img src="../_static/lorg-g-panels.png" width="800"/>
 
 The results for a single day are stored in a folder for that year, i.e.  $REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt)
 
@@ -95,10 +95,10 @@ values within a given value of the median. The user is also asked to set a requi
 <code>daily_avg lorg 0.25 50</code>
 
 
-<img src="lorg_1.png" width="600"/>
+<img src="../_static/lorg_1.png" width="600"/>
 
 
-<img src="lorg-dailyavg.png" width="600"/>
+<img src="../_static/lorg-dailyavg.png" width="600"/>
 
 [All reflector heights (gzipped)](lorgAll.txt.gz)
 

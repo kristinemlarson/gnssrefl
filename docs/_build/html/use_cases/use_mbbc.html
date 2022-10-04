@@ -101,7 +101,7 @@
 <p><strong>Mbamba Bay on Lake Malawi</strong></p>
 <p>Station name: MBBC</p>
 <P align=center>
-<img src=mbbc-three.png>
+<img src=../_static/mbbc-three.png>
 <P>
 <p><strong>Latitude:</strong> -11.2736 degrees</p>
 <p><strong>Longitude:</strong> 34.8002 degrees</p>
@@ -124,10 +124,10 @@ rate is required to see Lake Malawi), please click the appropriate button on the
 <p>Note that we do not have to select multi-GNSS orbits as this site is only collecting GPS data.</p>
 <p>Based on the reflection app, what kind of RH, azimuth, and elevation angle limits are appropriate?</p>
 <p><code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 </code></p>
-<img alt="use_cases/mbbc-50-70.png" src="use_cases/mbbc-50-70.png" />
+<img alt="../_images/mbbc-50-70.png" src="../_images/mbbc-50-70.png" />
 <p>I have manually added a red box to show the good azimuths. Can you use the L2 data at this site? Let’s see:</p>
 <p><code> quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275 -fr 2</code></p>
-<img alt="use_cases/mbbc-l2.png" src="use_cases/mbbc-l2.png" />
+<img alt="../_images/mbbc-l2.png" src="../_images/mbbc-l2.png" />
 <p>So you can see there are good RH results at the same azimuths as with L1, but they
 are marked as bad (gray circles) because the amplitudes are so small. So you need to more or
 less turn off the amplitude restriction for L2. You are allowed to have different amplitude constraints
@@ -152,7 +152,7 @@ not available in this dataset - either because the PIs did not track L2C or beca
 the inputs (median filter value, number of required RH to compute a reliable average) to make sure
 that you have a high quality results.</p>
 <p align=center>
-<img src=mbbc-rh.png>
+<img src=../_static/mbbc-rh.png>
 <p>
 <p><a class="reference external" href="https://www.psmsl.org/data/gnssir/site.php?id=10318">Simon Williams and the Permanent Service for Mean Sea Level have analyzed this full dataset</a></p>
 

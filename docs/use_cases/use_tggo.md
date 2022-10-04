@@ -9,7 +9,7 @@
 [Station Page at NGL](http://geodesy.unr.edu/NGLStationPages/stations/TGGO.sta)
 
 <p align=center>
-<img src=TGGO.JPG width=600</img>
+<img src=../_static/TGGO.JPG width=600</img>
 </p>
 
 TGGO is a station in 
@@ -51,11 +51,11 @@ limits to include the vertical distance to the water with the optional parameter
 
 The first plot shows periodograms in the four geographic coordinates. 
 
-<img src=tggo_ql1.png width=600>
+<img src=../_static/tggo_ql1.png width=600>
 
 These are summarized below.  
 
-<img src=tggo_ql2.png width=600>
+<img src=../_static/tggo_ql2.png width=600>
 
 All three plots are with respect to azimuth in degrees. On the top plot, the "blue" retrievals show that the GNSS antenna is indeed ~12 meters above the water. The variation in reflector height (with respect to azimuth) are the tides. I've outlined in red the azimuth region that shows consistently rejected retrievals. This roughly corresponds to where we saw the pier in the photograph.  
 
@@ -87,17 +87,17 @@ constellation contributes. Because of restrictions for this particular receiver 
 signals are degraded for reflections. When a new receiver is installed, the Galileo 
 retrievals will significantly improve.
 
-<img src=tggo_1.png width=600>
+<img src=../_static/tggo_1.png width=600>
 
 The reflector heights are then plotted as a function of constellation (GPS, Glonass, Galileo), azimuth, and 
 amplitude of the reflector height periodogram. These can be useful if you are trying to assess whether your azimuth mask 
 is working.
 
-<img src=tggo_2.png width=800>
+<img src=../_static/tggo_2.png width=800>
 
 Time series with large outliers removed.
 
-<img src=tggo_3.png width=600>
+<img src=../_static/tggo_3.png width=600>
  
 Additional corrections can be made using the <code>rhdot T</code> setting. I will add 
 more information here when I get a chance.

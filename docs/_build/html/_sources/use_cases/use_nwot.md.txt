@@ -55,14 +55,14 @@ reflector height (RH) retrievals. First L1:
 
 <code>quickLook nwot 2014 270 </code>
 
-<img src="nwot_L1.png" width="600"/>
+<img src="../_static/nwot_L1.png" width="600"/>
 
 These periodograms are a bit ratty in the low RH area. There are 
 nice strong peaks in the southern quadrants. Now try L2:
 
 <code>quickLook nwot 2014 270 -fr 2</code>
 
-<img src="nwot_L2.png" width="600"/>
+<img src="../_static/nwot_L2.png" width="600"/>
 
 This plot will have both L2C and non-L2C. But it is easy to see why I don't use non-L2C. They are
 the failed tracks in the gray that I have circled.
@@ -106,14 +106,14 @@ the dataset. The year inputs here are optional.
 
 produces this plot:
 
-<img src="nwot_RH.png" width="600"/>
+<img src="../_static/nwot_RH.png" width="600"/>
 
 and [this file](nwot_dailyRH.txt). The files will be stored in the $REFL_CODE/Files directory.
 
 You are also shown how many successful retrievals there are each day so that you can change that
 input if you prefer:
 
-<img src="retrievals_nwot.png" width="600"/>
+<img src="../_static/retrievals_nwot.png" width="600"/>
 
 ### Validation
 
@@ -134,7 +134,7 @@ as the Niwot Ridge *in situ* datafile, you can use
 
 <code>python nwot_usecase.py</code>
 
-<img src="nwot_usecase.png" width="600"/>
+<img src="../_static/nwot_usecase.png" width="600"/>
 
 We hae used the data from the fall to set the bare soil value 
 for reflector height (RH_baresoil). Snow depth is then defined as:

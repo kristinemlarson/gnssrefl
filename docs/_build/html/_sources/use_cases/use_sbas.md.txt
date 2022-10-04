@@ -1,4 +1,4 @@
-## Steenbras Dam, South Africa
+# Steenbras Dam, South Africa
 
 **Station Name:** sbas
 
@@ -35,7 +35,7 @@ to select those azimuths specifically. I will start with elevation angle limits 
 
 <code>quickLook sbas 2020 1 -e1 5 -e2 12 -h1 20 -h2 35 -azim1 0 -azim2 90 -fr 20</code>
 
-<img src=sbas-quicklook2.png width=600 />
+<img src=../_static/sbas-quicklook2.png width=600 />
 
 You can see that the last point looks a little bit lower than the others. If I run it again with 
 screenstats set to True, I will get a little more information that will help me figure out how 
@@ -80,7 +80,7 @@ The next step is to estimate reflector heights. First do a single day using the 
 
 <code>gnssir sbas 2021 1 -plt T</code>
 
-<img src=sbas_gnssir_l1.png width=600/>	
+<img src=../_static/sbas_gnssir_l1.png width=600/>	
 
 I've added an arrow to show you what happens if you violate the Nyquist - double peaks!
 Luckily this is not prevalent in this dataset thanks to the help of TRIGNET 
@@ -88,7 +88,7 @@ using a 15 second sample rate in the files.
 
 The next plot will be L2C:
 
-<img src=sbas_gnssir_l2c.png width=600 />
+<img src=../_static/sbas_gnssir_l2c.png width=600 />
 
 Notice that the L2C frequency - which has a longer wavelength than L1 - does not have a double peak.
 And that is what we should expect.
@@ -105,11 +105,11 @@ I am going to start by requiring 10:
 
 Number of available values per day:
 
-<img src=sbas_4.png width=600 />
+<img src=../_static/sbas_4.png width=600 />
 
 Daily average reflector height results. 
 
-<img src=sbas_2.png width=600 />
+<img src=../_static/sbas_2.png width=600 />
 
 Note the missing points - this has nothing to do with reflectometry. These are days when the station did not report data.
 Numerical values are saved in a file. The location of the file is printed to the screen.

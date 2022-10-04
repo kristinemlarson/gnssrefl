@@ -48,7 +48,7 @@ data from the site, so you can check later to see which ones are the limiting re
 heights.
 
 <P align=center>
-<img src="sc02-google.png" width=400>
+<img src="../_static/sc02-google.png" width=400>
 </p>
 
 ### Take a quick look at the SNR data
@@ -61,7 +61,7 @@ Use our utility <code>uickLook</code> with defaults [(For more details on quickL
 
 <code>quickLook sc02 2021 15 </code>
 
-<img src="sc02-default.png" width="600"/>
+<img src="../_static/sc02-default.png" width="600"/>
 
 These results for reflector height in the top panel are pretty bad (gray means the retrieval does not pass QC). Why? 
 The reflector height defaults are restricted to 0.5-6 meters, which includes part of 
@@ -74,7 +74,7 @@ use a modern GPS signal, L2C.
 
 <code>quickLook sc02 2021 15 -e1 5 -e2 13 -h1 3 -h2 12 -fr 20</code>
 
-<img src="sc02-l2c.png" width=600>
+<img src="../_static/sc02-l2c.png" width=600>
 
 Now instead of vast numbers of unsuccessful reflector height retrivals, you can begin to 
 see where the acceptable azimuths will be, ~50 to 230 degrees. A peak to noise ratio 
@@ -82,11 +82,11 @@ of 3 works pretty well.  The Lomb Scargle periodograms show the
 retrievals in periodogram space. You can see here that the northwest
 is a dead zone for water reflections, and that was expected.
 
-<img src="sc02-l2c-lsp.png" width=600>
+<img src="../_static/sc02-l2c-lsp.png" width=600>
 
 We can also check the retrievals stats for L1 to make sure these look good too.
 
-<img src="sc02-l1-qc.png" width="600">
+<img src="../_static/sc02-l1-qc.png" width="600">
 
 ### Measure Tides with GNSS-IR
 
@@ -114,7 +114,7 @@ by concatenating the daily results and applying a sigma outlier criterion . The 
 
 <code>subdaily sc02 2021</code>
 
-<img src="raw_sc02.png"	width=600>
+<img src="../_static/raw_sc02.png"	width=600>
 
 The output is stored in a plain text or csv file. This code will 
 also apply the RH dot correction, but you have to 
@@ -125,15 +125,15 @@ Below are shown the initial solutions with a spline fit and outliers identified.
 Note: These figures were generated from an earlier version of the code, and should be 
 updated.
 
-<img src="sc02-outliers.png" width=600>
+<img src="../_static/sc02-outliers.png" width=600>
 
 Residuals to the spline fit with and without a RHdot correction:
 
-<img src="sc02-rhdot.png" width=600>
+<img src="../_static/sc02-rhdot.png" width=600>
 
 A summary of the number of satellite arcs that are available:
 
-<img src="sc02-nvals.png" width=600>
+<img src="../_static/sc02-nvals.png" width=600>
 
 Some statistics come to the screen that give you some perspective 
 on the performance of the different frequencies and constellations.
@@ -176,7 +176,7 @@ You can download the NOAA data yourselves or use our utility:
 
 We then compared the two series. 
 
-<img src="sc02-noaa.png" width=600>
+<img src="../_static/sc02-noaa.png" width=600>
 
 <HR>
 

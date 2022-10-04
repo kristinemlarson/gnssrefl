@@ -38,11 +38,11 @@ To get started :
 
 <code>quickLook tnpp 2021 301 -fr 20 -e1 5 -e2 10 -h1 50 -h2 70 </code>  
 
-<img src=tnpp_1.png width=600>
+<img src=../_static/tnpp_1.png width=600>
 
 The periodograms show the tides in the southwest quadrant. That is further demonstrated in the summary plot:
 
-<img src=tnpp_2.png width=600>
+<img src=../_static/tnpp_2.png width=600>
 
 Set your analysis strategy (with some variations):
 
@@ -64,15 +64,15 @@ Look at the sea level results for multiple weeks:
 
 Number of measurements for each constellation:
 
-<img src=subdaily_tnpp_3.png width=600>
+<img src=../_static/subdaily_tnpp_3.png width=600>
 
 Azimuth vs. constellation, amplitude, and peak2noise:
 
-<img src=subdaily_tnpp_2.png width=600>
+<img src=../_static/subdaily_tnpp_2.png width=600>
 
 Initial RH values:
 
-<img src=subdaily_npp_1.png width=600>
+<img src=../_static/subdaily_npp_1.png width=600>
 
 Setting the -rhdot flag:
 
@@ -81,11 +81,11 @@ Setting the -rhdot flag:
 Estimating and applying the RH dot correction improves RH 
 precision ([Larson et al., 2013](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf)).
 
-<img src=tnpp_rhdot_2.png width=600>
+<img src=../_static/tnpp_rhdot_2.png width=600>
 
 Final series with antenna frequency biases removed compared to a spline fit:
 
-<img src=tnpp_rhdot_3.png width=600>
+<img src=../_static/tnpp_rhdot_3.png width=600>
 
 The final precision for this site is 0.1 meters
 

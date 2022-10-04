@@ -25,9 +25,9 @@ Take a quick look at the L2C data:
 
 <code>quickLook scia 2018 1 -fr 20</code>
 
-<img src=quicklook_scia.png width=600>
+<img src=../_static/quicklook_scia.png width=600>
 
-<img src=quicklook_scia2.png width=600>
+<img src=../_static/quicklook_scia2.png width=600>
 
 **These are Lovely reflections!**
 
@@ -57,15 +57,15 @@ Finally, convert the phase to volumetric water content:
 
 Phase results plotted in geographic coordinates:
 
-<img src="scia_1.png" width="600">
+<img src="../_static/scia_1.png" width="600">
 
 Daily average phase:
 
-<img src="scia_2.png" width="600">
+<img src="../_static/scia_2.png" width="600">
 
 What is going on at the end of 2019? A little googling:
 
-<img src="powerfulstorm.png" width="600">
+<img src="../_static/powerfulstorm.png" width="600">
 
 
 If it is just rain, that's ok. If it is snow, that last very high point in 2019 is contaminated.
@@ -73,8 +73,8 @@ If it is just rain, that's ok. If it is snow, that last very high point in 2019 
 
 Model inputs:
 
-<img src="scia_3.png" width="600">
+<img src="../_static/scia_3.png" width="600">
 
 Final results:
 
-<img src="scia_4.png" width="600">
+<img src="../_static/scia_4.png" width="600">

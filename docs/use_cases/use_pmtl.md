@@ -41,7 +41,7 @@ GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more t
 Note the [ellipsoidal height and geoid corrected height](https://gnss-reflections.org/geoid?station=pmtl). To pick an azimuth and elevation mask, try the [reflection zone webapp](https://gnss-reflections.org/rzones) with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:
 
 <P align=center>
-<img src="pmtl_rzone.png" width="500" />
+<img src="../_static/pmtl_rzone.png" width="500" />
 </P>
 
 ### quickLook
@@ -53,18 +53,18 @@ Make a SNR file for multi-GNSS and high-rate:
 
 <code>quickLook pmtl 2020 330 -h1 40 -h2 90 -e1 5 -e2 12</code>
 
-<img src="pmtl-first-try.png" width="600"/>
+<img src="../_static/pmtl-first-try.png" width="600"/>
 
 I have annotated this <code>quickLook</code> periodogram to point out that there is an outlier in the SW region. 
 You can also see that the NW region is useless, which is what we should expect. 
 Windowing down the reflector region and using day of year 270:
 
-<img src=pmtl-lsp-75-85.png width=600>
+<img src=../_static/pmtl-lsp-75-85.png width=600>
 
 The QC plot gives the azimuth windows - and help on setting the required amplitude and peak to noise ratio.
 Retrievals are not returned near 90 degrees because of the satellite inclination and the way the azimuth regions are defined in <code>quickLook</code>. It does not mean there are obstructions in that direction.
 
-<img src=pmtl-qc-75-85.png width=600>
+<img src=../_static/pmtl-qc-75-85.png width=600>
 
 
 ### Analyze the Data
@@ -93,11 +93,11 @@ Now compute daily averages:
 
 All tracks:
 
-<img src=pmtl-all.png width=600>
+<img src=../_static/pmtl-all.png width=600>
 
 The daily average:
 
-<img src=pmtl_RH.png width=600>
+<img src=../_static/pmtl_RH.png width=600>
 
 [Daily average RH file](pmtl-rh.txt)
 
@@ -111,9 +111,9 @@ For this use case, the tidal data have already been [downloaded](pmtl.csv).
 Given that there is quite drastic water level changes within a day, it is entirely
 plausible that the correlation will improve if using the subdaily RH and hourly tide gauge data.
 
-<img src=pmtl-compare-time.png width=600>
+<img src=../_static/pmtl-compare-time.png width=600>
 
-<img src=pmtl-correlation.png width=600>
+<img src=../_static/pmtl-correlation.png width=600>
 
 
 [Code for comparison](pmtl_usecase.py)

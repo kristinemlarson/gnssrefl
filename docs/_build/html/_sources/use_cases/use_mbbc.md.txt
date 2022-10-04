@@ -4,7 +4,7 @@
 Station name: MBBC
 
 <P align=center>
-<img src=mbbc-three.png>
+<img src=../_static/mbbc-three.png>
 <P>
 
 **Latitude:** -11.2736 degrees
@@ -41,13 +41,13 @@ Based on the reflection app, what kind of RH, azimuth, and elevation angle limit
 
 <code>quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 </code>
 
-<img src=mbbc-50-70.png>
+<img src=../_static/mbbc-50-70.png>
 
 I have manually added a red box to show the good azimuths. Can you use the L2 data at this site? Let's see:
 
 <code> quickLook mbbc 2021 1 -e1 4 -e2 10 -h1 50 -h2 70 -azim1 220 -azim2 275 -fr 2</code>
 
-<img src=mbbc-l2.png>
+<img src=../_static/mbbc-l2.png>
  
 So you can see there are good RH results at the same azimuths as with L1, but they 
 are marked as bad (gray circles) because the amplitudes are so small. So you need to more or 
@@ -80,7 +80,7 @@ the inputs (median filter value, number of required RH to compute a reliable ave
 that you have a high quality results. 
 
 <p align=center>
-<img src=mbbc-rh.png>
+<img src=../_static/mbbc-rh.png>
 <p>
 
 [Simon Williams and the Permanent Service for Mean Sea Level have analyzed this full dataset](https://www.psmsl.org/data/gnssir/site.php?id=10318)

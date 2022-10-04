@@ -140,11 +140,11 @@ the 1-sec data have been decimated to 15 seconds:</p>
 to the L1 data. Use this <strong>quickLook</strong> command to get a sense of the quality of the
 reflector height (RH) retrievals. First L1:</p>
 <p><code>quickLook nwot 2014 270 </code></p>
-<a class="reference internal image-reference" href="use_cases/nwot_L1.png"><img alt="use_cases/nwot_L1.png" src="use_cases/nwot_L1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/nwot_L1.png"><img alt="../_images/nwot_L1.png" src="../_images/nwot_L1.png" style="width: 600px;" /></a>
 <p>These periodograms are a bit ratty in the low RH area. There are
 nice strong peaks in the southern quadrants. Now try L2:</p>
 <p><code>quickLook nwot 2014 270 -fr 2</code></p>
-<a class="reference internal image-reference" href="use_cases/nwot_L2.png"><img alt="use_cases/nwot_L2.png" src="use_cases/nwot_L2.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/nwot_L2.png"><img alt="../_images/nwot_L2.png" src="../_images/nwot_L2.png" style="width: 600px;" /></a>
 <p>This plot will have both L2C and non-L2C. But it is easy to see why I don’t use non-L2C. They are
 the failed tracks in the gray that I have circled.</p>
 </section>
@@ -177,11 +177,11 @@ low because of the small number of L2C transmitting satellites in the early year
 the dataset. The year inputs here are optional.</p>
 <p><code>daily_avg nwot 0.25 10 -year1 2009 -year2 2015</code></p>
 <p>produces this plot:</p>
-<a class="reference internal image-reference" href="use_cases/nwot_RH.png"><img alt="use_cases/nwot_RH.png" src="use_cases/nwot_RH.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/nwot_RH.png"><img alt="../_images/nwot_RH.png" src="../_images/nwot_RH.png" style="width: 600px;" /></a>
 <p>and <a class="reference download internal" download="" href="../_downloads/a4180bd3ddddf0902f338c90ad76f3cb/nwot_dailyRH.txt"><span class="xref download myst">this file</span></a>. The files will be stored in the $REFL_CODE/Files directory.</p>
 <p>You are also shown how many successful retrievals there are each day so that you can change that
 input if you prefer:</p>
-<a class="reference internal image-reference" href="use_cases/retrievals_nwot.png"><img alt="use_cases/retrievals_nwot.png" src="use_cases/retrievals_nwot.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/retrievals_nwot.png"><img alt="../_images/retrievals_nwot.png" src="../_images/retrievals_nwot.png" style="width: 600px;" /></a>
 </section>
 <section id="validation">
 <h1>Validation<a class="headerlink" href="#validation" title="Permalink to this heading"></a></h1>
@@ -196,7 +196,7 @@ The relevant Niwot Ridge csv file is provided here:</p>
 as the Niwot Ridge <em>in situ</em> datafile, you can use
 <a class="reference download internal" download="" href="../_downloads/62a03e6cbb97b1e158ba9f382ffa6f0e/nwot_usecase.py"><span class="xref download myst">this python script</span></a> to visually compare them:</p>
 <p><code>python nwot_usecase.py</code></p>
-<a class="reference internal image-reference" href="use_cases/nwot_usecase.png"><img alt="use_cases/nwot_usecase.png" src="use_cases/nwot_usecase.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/nwot_usecase.png"><img alt="../_images/nwot_usecase.png" src="../_images/nwot_usecase.png" style="width: 600px;" /></a>
 <p>We hae used the data from the fall to set the bare soil value
 for reflector height (RH_baresoil). Snow depth is then defined as:</p>
 <p><code>snow depth = RH_baresoil - RH</code></p>

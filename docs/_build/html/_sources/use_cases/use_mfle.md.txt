@@ -43,14 +43,14 @@ Then ask explicitly for the L2C data :
 
 First the periodograms:
 
-<img src=mfle_1.png width=600 />
+<img src=../_static/mfle_1.png width=600 />
 
 You can see that the peak of the periodograms line up near to 3 meters.
 The summary plot shows that really all of the geographic regions are good. The 
 rejected tracks (in gray) are primarily due to the satellite not rising high enough in the sky 
 to convince the software that the result should be kept:
 
-<img src=mfle_2.png width=600 />
+<img src=../_static/mfle_2.png width=600 />
 
 ### Estimate Reflector Heights
 
@@ -77,9 +77,9 @@ Before we look at soil moisture, let's get an idea of how often it snowed at thi
 
 You can see that requiring 10 tracks could be increased:
 
-<img src=mfle_dailyavg4.png width=600 />
+<img src=../_static/mfle_dailyavg4.png width=600 />
 
-<img src=mfle_dailyavg2.png width=600 />
+<img src=../_static/mfle_dailyavg2.png width=600 />
 
 The large variations of the daily averages from the median value is showing snow effects.
 (The difference beteween the daily RH value and the long-term median value is snow depth).
@@ -104,7 +104,7 @@ And then finally:
 
 These are the daily averages for phase:
 
-<img src=mfle_phase_wo_snowfilter.png width=600/>
+<img src=../_static/mfle_phase_wo_snowfilter.png width=600/>
 
 At a minimum there does appear to be at least one point (circled in red) I do not believe.
 
@@ -112,7 +112,7 @@ Now let's invoke the snow filter:
 
 <code>vwc mfle 2016 -year_end 2019 -snow_filter T </code>
 
-<img src=mfle_withsnowfilter.png width=600/>
+<img src=../_static/mfle_withsnowfilter.png width=600/>
 
 First, the snow filter definitely has removed that first suspect point in early 2016. 
 However, there are still two regions that may be showing snow effects (circled in red).
@@ -120,11 +120,11 @@ From the geographic phase plots you can see quite a bit of scatter at the end of
 the southeast quadrant; that is likely reponsible for at least the last outliers. However,
 overall, the code has done a good job of removing suspect points.
 
-<img src=mfle_multi.png width=600/>
+<img src=../_static/mfle_multi.png width=600/>
 			
 The final volumetric water content results:
 
-<img src=mfle_final_vwc.png width=600 />
+<img src=../_static/mfle_final_vwc.png width=600 />
 
 These soil moisture estimates are written to a file; its location is written to the screen.
 

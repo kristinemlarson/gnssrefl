@@ -44,7 +44,7 @@ Use <code>quickLook</code> with elevation angles 4-8 degrees and RH 7-35 meters:
 
 <code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35</code>
 
-<img src=try1_mat2.png>
+<img src=../_static/try1_mat2.png>
 
 *How did I know to use a RH region of 7 to 35 meters?* I did not know this initially. I first tried a limit of 20 meters, 
 analyzed multiple years of data and realized that during the drought of 2015 the lake retrievals disappeared (i.e. 
@@ -57,7 +57,7 @@ reflection is so small. You can override that:
 
 <code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35 -ampl 0</code>
 
-<img src=try2_mat2.png>
+<img src=../_static/try2_mat2.png>
 
 If the amplitude limit is set to zero, the code will rely on the peak of the Lomb Scargle 
 retrieval relative to the noise (peak2noise) for quality control.
@@ -67,7 +67,7 @@ you see good strong returns in the peridograms:
 
 <code>quickLook mat2 2022 175 -e1 4 -e2 8 -h1 7 -h2 35 -ampl 0 -azim1 220 -azim2 275</code>:
 
-<img src=lsp-mat2.png>
+<img src=../_static/lsp-mat2.png>
 
 **Analyze a Fuller Dataset**
 
@@ -84,7 +84,7 @@ This command would analyze all the data from 2017-2021. Use <code>daily_avg</cod
 Play with the inputs (median filter value, number of required RH to compute a reliable average) to make sure 
 that you have a high quality results. My plot goes back to 2008 because I downloaded more RINEX data:
 
-<img src=mat2-avg.png>
+<img src=../_static/mat2-avg.png>
 
 Because there were only useful GPS L1 data in the earlier dataset, I only used it for the entire time series.
 In general you should use all the good frequenices that are available to you.
@@ -95,4 +95,4 @@ In general you should use all the good frequenices that are available to you.
 
 [CSV file](LAKE_MATHEWS_MHW.csv)
 
-<img src=mathews_cdec.png>
+<img src=../_static/mathews_cdec.png>

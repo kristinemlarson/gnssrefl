@@ -31,7 +31,7 @@
 at01 observes all constellation signals and high-rate data are available. There is good visibility over a large azimuthal region. The monument is about a meter taller than normal geodetic monuments to improve visibility of the sea surface.  From the [geoid app](http://gnss-reflections.org/geoid?station=at01&lat=0.0&lon=0.0&height=0.0) you can see the general location of the antenna with respect to the coast. You will also note that it is at ~12 meters above sea level.
 
 <p align=center>
-<img src=geoid-at01.png width=400>
+<img src=../_static/geoid-at01.png width=400>
 </p>
 
 Use the gnss-reflections.org webapp to set a [possible mask.](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240) In this example we used the option for elevation angles between 5 and 12 degrees. 
@@ -47,7 +47,7 @@ This will generate a SNR file at a sampling rate of 15 seconds. One second data 
 If you use the default settings with <code>quickLook</code> you will mistakenly think it is not a useful site. Nearly
 every single retrieval is set as bad (i.e. it is gray rather than blue):
 
-<img src=at01_default_qc.png width=600>		
+<img src=../_static/at01_default_qc.png width=600>		
 
 Remember that the site is 12 meters above sea level and the default restricts the reflector height
 region to < 6 meters. Try again using a reflector height region that includes the water 
@@ -55,31 +55,31 @@ surface (h1 = 8 and h2 = 15) and better elevation angles 5 and 13 degrees:
 
 <code> quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15</code>
 
-<img src=at01_day109.png width=600>		
+<img src=../_static/at01_day109.png width=600>		
 
 Now you see good retrievals at azimuths sweeping from true north to about 220 degrees.  
 You will also see strong retrievals in the Lomb Scargle periodograms:
 
-<img src=at01_lsp_109.png width=600>
+<img src=../_static/at01_lsp_109.png width=600>
 
 This site has modern GPS signals, Galileo signal, and Glonass signals. Here are some sample results for L2C:
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 20</code>
 
 
-<img src=at01_l2c.png width=600>
+<img src=../_static/at01_l2c.png width=600>
 
 Glonass:
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 101</code>
 
-<img src=at01_glonass.png width=600>
+<img src=../_static/at01_glonass.png width=600>
 
 and Galileo:
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 205</code>
 
-<img src=at01_galileo.png width=600>
+<img src=../_static/at01_galileo.png width=600>
 
 ### Analyze the Data
 
@@ -106,11 +106,11 @@ version of the code and should be updated.
 
 The code concatenates the daily RH files for this period:
 
-<img src=at01_raw.png width=600>
+<img src=../_static/at01_raw.png width=600>
 
 You can see that there are a very large number of RH retrievals per day:
 
-<img src=at01_nvals.png width=600>
+<img src=../_static/at01_nvals.png width=600>
 
 This preliminary version of the code removes outliers and makes an effort 
 to compute the RH dot correction if <code>rhdot</code> is set to true. It  uses a cubic 
@@ -125,11 +125,11 @@ RMS no RHdot correction (m)  0.082
 RMS w/ RHdot correction (m)  0.070
 </PRE>
 
-<img src=at01-spline.png width=600>
+<img src=../_static/at01-spline.png width=600>
 
 Final view of the surface estimates:
 
-<img src=at01-final.png width=600>
+<img src=../_static/at01-final.png width=600>
 
 There are some statistics here that indicate that the precision for an individual arc is ~ 5 cm.  Remember that since we have nearly 300 measurements per day, 
 the ability to measure tides with this system is much much better than that.  

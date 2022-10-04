@@ -45,7 +45,7 @@ answer should pop up in about 10 seconds. The writing in magenta are comments I 
 point out various things.
 
 <p align=center>
-<img src=vlis-default.png width=800/>
+<img src=../_static/vlis-default.png width=800/>
 </p>
 
 So what's going on here? (If you have never used this site before, I recommend you give a 
@@ -70,7 +70,7 @@ right answer (10 meters) and the tidal range (plus/minus two meters).
 Make sure your RINEX file is loaded and hit submit.
 
 <p align=center>
-<img src=vlis-better-choices.png width=800/>
+<img src=../_static/vlis-better-choices.png width=800/>
 </p>
 
 Now you can see a broad swath of "successful" retrievals in the azimuth range you chose. The RH 
@@ -131,15 +131,15 @@ To put those results all together:
 
 Reports how many satellites were used in each constellation:
 
-<img src=vlis_3.png width=600>
+<img src=../_static/vlis_3.png width=600>
 
 How the water levels look as a function of azimuth, constellation, and amplitude:
 
-<img src=vlis_2.png width=600>
+<img src=../_static/vlis_2.png width=600>
 
 Time series with large outliers removed.
 
-<img src=vlis-1.png width=600>
+<img src=../_static/vlis-1.png width=600>
  
 For comparisons with the local tide gauge you can use our utility <code>download_ioc</code>. The tide gauge name is ... vlis!
 You just provide the time periods (I think it is currently limited to 30 days). If you say <code>-plt T</code> it makes a crude

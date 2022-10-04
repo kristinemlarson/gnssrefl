@@ -121,7 +121,7 @@
 <p><strong>at01 is the only tide gauge in this region of Alaska.</strong></p>
 <p>at01 observes all constellation signals and high-rate data are available. There is good visibility over a large azimuthal region. The monument is about a meter taller than normal geodetic monuments to improve visibility of the sea surface.  From the <a class="reference external" href="http://gnss-reflections.org/geoid?station=at01&amp;lat=0.0&amp;lon=0.0&amp;height=0.0">geoid app</a> you can see the general location of the antenna with respect to the coast. You will also note that it is at ~12 meters above sea level.</p>
 <p align=center>
-<img src=geoid-at01.png width=400>
+<img src=../_static/geoid-at01.png width=400>
 </p>
 <p>Use the gnss-reflections.org webapp to set a <a class="reference external" href="http://gnss-reflections.org/rzones?station=at01&amp;lat=0.0&amp;lon=0.0&amp;height=0.0&amp;msl=msl&amp;RH=2&amp;eang=3&amp;azim1=0&amp;azim2=240">possible mask.</a> In this example we used the option for elevation angles between 5 and 12 degrees.</p>
 </section>
@@ -132,24 +132,24 @@
 <p>This will generate a SNR file at a sampling rate of 15 seconds. One second data are available if you would like to use them (-rate high).</p>
 <p>If you use the default settings with <code>quickLook</code> you will mistakenly think it is not a useful site. Nearly
 every single retrieval is set as bad (i.e. it is gray rather than blue):</p>
-<a class="reference internal image-reference" href="use_cases/at01_default_qc.png"><img alt="use_cases/at01_default_qc.png" src="use_cases/at01_default_qc.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01_default_qc.png"><img alt="../_images/at01_default_qc.png" src="../_images/at01_default_qc.png" style="width: 600px;" /></a>
 <p>Remember that the site is 12 meters above sea level and the default restricts the reflector height
 region to &lt; 6 meters. Try again using a reflector height region that includes the water
 surface (h1 = 8 and h2 = 15) and better elevation angles 5 and 13 degrees:</p>
 <p><code> quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15</code></p>
-<a class="reference internal image-reference" href="use_cases/at01_day109.png"><img alt="use_cases/at01_day109.png" src="use_cases/at01_day109.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01_day109.png"><img alt="../_images/at01_day109.png" src="../_images/at01_day109.png" style="width: 600px;" /></a>
 <p>Now you see good retrievals at azimuths sweeping from true north to about 220 degrees.<br />
 You will also see strong retrievals in the Lomb Scargle periodograms:</p>
-<a class="reference internal image-reference" href="use_cases/at01_lsp_109.png"><img alt="use_cases/at01_lsp_109.png" src="use_cases/at01_lsp_109.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01_lsp_109.png"><img alt="../_images/at01_lsp_109.png" src="../_images/at01_lsp_109.png" style="width: 600px;" /></a>
 <p>This site has modern GPS signals, Galileo signal, and Glonass signals. Here are some sample results for L2C:</p>
 <p><code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 20</code></p>
-<a class="reference internal image-reference" href="use_cases/at01_l2c.png"><img alt="use_cases/at01_l2c.png" src="use_cases/at01_l2c.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01_l2c.png"><img alt="../_images/at01_l2c.png" src="../_images/at01_l2c.png" style="width: 600px;" /></a>
 <p>Glonass:</p>
 <p><code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 101</code></p>
-<a class="reference internal image-reference" href="use_cases/at01_glonass.png"><img alt="use_cases/at01_glonass.png" src="use_cases/at01_glonass.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01_glonass.png"><img alt="../_images/at01_glonass.png" src="../_images/at01_glonass.png" style="width: 600px;" /></a>
 <p>and Galileo:</p>
 <p><code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 205</code></p>
-<a class="reference internal image-reference" href="use_cases/at01_galileo.png"><img alt="use_cases/at01_galileo.png" src="use_cases/at01_galileo.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01_galileo.png"><img alt="../_images/at01_galileo.png" src="../_images/at01_galileo.png" style="width: 600px;" /></a>
 </section>
 <section id="analyze-the-data">
 <h1>Analyze the Data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h1>
@@ -166,9 +166,9 @@ certainly give it a try. <strong>Note:</strong> These figures were generated wit
 version of the code and should be updated.</p>
 <p><code>subdaily at01 2020 -doy1 230 -doy2 290 </code></p>
 <p>The code concatenates the daily RH files for this period:</p>
-<a class="reference internal image-reference" href="use_cases/at01_raw.png"><img alt="use_cases/at01_raw.png" src="use_cases/at01_raw.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01_raw.png"><img alt="../_images/at01_raw.png" src="../_images/at01_raw.png" style="width: 600px;" /></a>
 <p>You can see that there are a very large number of RH retrievals per day:</p>
-<a class="reference internal image-reference" href="use_cases/at01_nvals.png"><img alt="use_cases/at01_nvals.png" src="use_cases/at01_nvals.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01_nvals.png"><img alt="../_images/at01_nvals.png" src="../_images/at01_nvals.png" style="width: 600px;" /></a>
 <p>This preliminary version of the code removes outliers and makes an effort
 to compute the RH dot correction if <code>rhdot</code> is set to true. It  uses a cubic
 spline to fit the RH data which allows a first order estimate for the
@@ -180,9 +180,9 @@ you can see here that it does help a bit:</p>
 RMS no RHdot correction (m)  0.082
 RMS w/ RHdot correction (m)  0.070
 </PRE>
-<a class="reference internal image-reference" href="use_cases/at01-spline.png"><img alt="use_cases/at01-spline.png" src="use_cases/at01-spline.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01-spline.png"><img alt="../_images/at01-spline.png" src="../_images/at01-spline.png" style="width: 600px;" /></a>
 <p>Final view of the surface estimates:</p>
-<a class="reference internal image-reference" href="use_cases/at01-final.png"><img alt="use_cases/at01-final.png" src="use_cases/at01-final.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/at01-final.png"><img alt="../_images/at01-final.png" src="../_images/at01-final.png" style="width: 600px;" /></a>
 <p>There are some statistics here that indicate that the precision for an individual arc is ~ 5 cm.  Remember that since we have nearly 300 measurements per day,
 the ability to measure tides with this system is much much better than that.</p>
 <p>We are working on removing inter-frequency biases. Some of the bias is simply due to the phase center - but we also want to be be careful to take into account surface changes (ice to water, e.g.)</p>

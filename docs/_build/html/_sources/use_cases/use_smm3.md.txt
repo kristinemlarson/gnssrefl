@@ -77,7 +77,7 @@ Then run <code>quickLook</code>:
 
 <code>quickLook smm3 2020 106</code>
 
-<img src="smm3-default.png" width="600" />
+<img src="../_static/smm3-default.png" width="600" />
 
 Why does this not look like the periodogram results from my web app? Look closely.
 On the web app smm3 is ~14 meters above the ice sheet - and this far exceeds the 
@@ -86,7 +86,7 @@ Modify your call to **quickLook**, using RH mask of 8-20 meters. Also change the
 
 <code>quickLook smm3 2020 106 -h1 8 -h2 20 -e1 5 -e2 15</code>
 
-<img src="smm3_l1.png" width="600" />
+<img src="../_static/smm3_l1.png" width="600" />
 
 Notice that instead of strong peaks center at a single RH value, 
 there is quite a bit of spread in the northwest and northeast quadrants. That is because the reflection 
@@ -96,11 +96,11 @@ The QC metrics indicate that almost all azimuths produce "good" retrievals, but 
 have much smaller amplitudes and peak to noise ratios (middle and bottom panel). At this particular site, we 
 will use an azimuth mask recommended by the science team working at Summit Camp.
 
-<img src="smm3_qc.png" width="600" />
+<img src="../_static/smm3_qc.png" width="600" />
 
 Now let's try L2C:
 
-<img src="smm3_l2c.png" width="600" />
+<img src="../_static/smm3_l2c.png" width="600" />
 
 There is definitely some interesting stuff going on with double peaks, but it has nothing
 to do with the snow surface. It is related to the L2C GPS signal structure and the receiver tracking algorithm.
@@ -109,7 +109,7 @@ the location of the second peak is exactly 1.55/1.20 times the location of the f
 
 Now L5 data:
 
-<img src="smm3_l5.png" width="600" />
+<img src="../_static/smm3_l5.png" width="600" />
 
 ### Steps for Longer Analysis: 
 
@@ -136,7 +136,7 @@ Compute daily average of these results:
 
 <code>daily_avg smm3 0.25 50 </code>
 
-<img src="smm3_RH.png" width="600" />
+<img src="../_static/smm3_RH.png" width="600" />
 
 Notice that the [daily average RH file](smm3_RH.txt) shows well over 150 measurements per day are being 
 used in the average. So you could rerun the code to use a bigger value than 50. Here the observations are so

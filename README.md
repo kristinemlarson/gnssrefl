@@ -34,11 +34,11 @@ am not willing to write such code myself.**
 
 <HR> 
 
-### [Understanding <a name="understanding"></a>](docs/pages/understand.md): goals, philosophy, methods.
+### [gnssrefl Understanding <a name="understanding"></a>](docs/pages/understand.md): goals, philosophy, methods.
 
 <HR>
 
-### [Utilities <a name="helper"></a>](docs/pages/utilities.md)
+### [gnssrefl Utilities <a name="helper"></a>](docs/pages/utilities.md): archive downloads and useful geodetic functions.
 
 <HR>
 

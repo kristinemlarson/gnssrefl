@@ -105,7 +105,7 @@
 <p><strong>Archives:</strong> <a class="reference external" href="https://www.bafg.de/EN/Home/homepage_en_node.html">BFG</a></p>
 <p><a class="reference external" href="http://geodesy.unr.edu/NGLStationPages/stations/TGGO.sta">Station Page at NGL</a></p>
 <p align=center>
-<img src=TGGO.JPG width=600</img>
+<img src=../_static/TGGO.JPG width=600</img>
 </p>
 <p>TGGO is a station in
 the <a class="reference external" href="https://fig.net/resources/proceedings/fig_proceedings/fig2021/papers/ts05.4/TS05.4_esch_11010.pdf">BfG-GNSS Monitoring Network</a>. It is located in the Elbe River. It is colocated with a tradtional
@@ -142,9 +142,9 @@ further restrict elevation angles to 5-15. In order to see the water, you need t
 limits to include the vertical distance to the water with the optional parameters h1 and h2.</p>
 <p><code>quickLook tggo 2022 234 -fr 20 -e1 5 -e2 15 -h1 6 -h2 20</code></p>
 <p>The first plot shows periodograms in the four geographic coordinates.</p>
-<a class="reference internal image-reference" href="use_cases/tggo_ql1.png"><img alt="use_cases/tggo_ql1.png" src="use_cases/tggo_ql1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/tggo_ql1.png"><img alt="../_images/tggo_ql1.png" src="../_images/tggo_ql1.png" style="width: 600px;" /></a>
 <p>These are summarized below.</p>
-<a class="reference internal image-reference" href="use_cases/tggo_ql2.png"><img alt="use_cases/tggo_ql2.png" src="use_cases/tggo_ql2.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/tggo_ql2.png"><img alt="../_images/tggo_ql2.png" src="../_images/tggo_ql2.png" style="width: 600px;" /></a>
 <p>All three plots are with respect to azimuth in degrees. On the top plot, the “blue” retrievals show that the GNSS antenna is indeed ~12 meters above the water. The variation in reflector height (with respect to azimuth) are the tides. I’ve outlined in red the azimuth region that shows consistently rejected retrievals. This roughly corresponds to where we saw the pier in the photograph.</p>
 </section>
 <section id="analyze-the-data">
@@ -165,13 +165,13 @@ the red box above.</p>
 constellation contributes. Because of restrictions for this particular receiver type, the Galileo
 signals are degraded for reflections. When a new receiver is installed, the Galileo
 retrievals will significantly improve.</p>
-<a class="reference internal image-reference" href="use_cases/tggo_1.png"><img alt="use_cases/tggo_1.png" src="use_cases/tggo_1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/tggo_1.png"><img alt="../_images/tggo_1.png" src="../_images/tggo_1.png" style="width: 600px;" /></a>
 <p>The reflector heights are then plotted as a function of constellation (GPS, Glonass, Galileo), azimuth, and
 amplitude of the reflector height periodogram. These can be useful if you are trying to assess whether your azimuth mask
 is working.</p>
-<a class="reference internal image-reference" href="use_cases/tggo_2.png"><img alt="use_cases/tggo_2.png" src="use_cases/tggo_2.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/tggo_2.png"><img alt="../_images/tggo_2.png" src="../_images/tggo_2.png" style="width: 800px;" /></a>
 <p>Time series with large outliers removed.</p>
-<a class="reference internal image-reference" href="use_cases/tggo_3.png"><img alt="use_cases/tggo_3.png" src="use_cases/tggo_3.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/tggo_3.png"><img alt="../_images/tggo_3.png" src="../_images/tggo_3.png" style="width: 600px;" /></a>
 <p>Additional corrections can be made using the <code>rhdot T</code> setting. I will add
 more information here when I get a chance.</p>
 <p>Kristine M. Larson September 9, 2022</p>
