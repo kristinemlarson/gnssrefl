@@ -1,16 +1,13 @@
 # Installation
 
-**August 29, 2022 The docker image does not correctly read RINEX 3 files at this time. We 
-hope it will be fixed by tomorrow.**
-
 You can  access this package via Jupyter notebooks, Docker containers, or traditional
 github/pypi package installation.
 
-* via [Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
+## [Jupyter Notebooks Install](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
+ 
+## [Docker container Install](docker_cl_instructions.md)
 
-* [via a Docker container](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)
-
-* github or pypi
+## Local Install (github or pypi)
 
 For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
 **If you are using linux** then simply type

@@ -39,12 +39,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl api reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl Use Cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/contributions_questions.html">Community and Questions</a></li>
@@ -114,9 +113,8 @@ It is located at the <a href=https://gml.noaa.gov/obop/brw/>NOAA environmental f
 <p>Use the <a href=https://gnss-reflections.org/rzones target="_blank">web app to get an idea of the reflection zones at this site.</a>
 Remember that the default is the elevation of the site above sea level. That might be ok - but it might not. Check
 with the real data. What azimuths should you use?</p>
-</section>
 <section id="look-at-the-data">
-<h1>Look at the data<a class="headerlink" href="#look-at-the-data" title="Permalink to this heading"></a></h1>
+<h2>Look at the data<a class="headerlink" href="#look-at-the-data" title="Permalink to this heading"></a></h2>
 <p>In order to have access to modern GNSS signals, we will use RINEX 3 files. First make a SNR file:</p>
 <p><code>rinex2snr utqi00usa 2022 150 -orb rapid -archive bkg</code></p>
 <p>This will return a multi-GNSS SNR file, but only 30 second data. This restricts
@@ -125,12 +123,14 @@ From the photograph, it looks that it is very possible the GNSS antenna is more 
 above the reflecting surface (the default in <code>quickLook</code>). And I will further restrict elevation
 angles to 5-15 so as to avoid the building.  I will set the reflection zone on the command line:</p>
 <p><code>quickLook utqi 2022 150 -h1 2 -h2 12 -e1 5 -e2 15</code></p>
+<a class="reference internal image-reference" href="../_images/utqi-quicklook1.png"><img alt="../_images/utqi-quicklook1.png" src="../_images/utqi-quicklook1.png" style="width: 600px;" /></a>
 <p>I’ve outlined the “sweet spot” for reflections on the summary figure:</p>
+<a class="reference internal image-reference" href="../_images/utqi-quicklook.png"><img alt="../_images/utqi-quicklook.png" src="../_images/utqi-quicklook.png" style="width: 600px;" /></a>
 <p>The main take home message: the <em>a priori</em> reflector height is a bit more than 6 meters. You
 can use that value within the reflection zone app if you want to look at the reflection zones again.</p>
 </section>
 <section id="make-snr-files-for-multiple-years">
-<h1>Make SNR files for multiple years<a class="headerlink" href="#make-snr-files-for-multiple-years" title="Permalink to this heading"></a></h1>
+<h2>Make SNR files for multiple years<a class="headerlink" href="#make-snr-files-for-multiple-years" title="Permalink to this heading"></a></h2>
 <p>RINEX 3 files are available from both CDDIS and BKG. Here we selected CDDIS and multi-GNSS orbits.
 Another orbit option is rapid (also from GFZ). These files only become available in 2021, and I want to
 start the time series in 2020, so I opted to use gnss as the orbit source.</p>
@@ -138,7 +138,7 @@ start the time series in 2020, so I opted to use gnss as the orbit source.</p>
 <p>This won’t take too long since the data files are relatively small.</p>
 </section>
 <section id="estimate-reflector-height">
-<h1>Estimate Reflector Height<a class="headerlink" href="#estimate-reflector-height" title="Permalink to this heading"></a></h1>
+<h2>Estimate Reflector Height<a class="headerlink" href="#estimate-reflector-height" title="Permalink to this heading"></a></h2>
 <p>Set your analysis strategy:</p>
 <p><code>make_json_input utqi 0 0 0 -h1 2 -h2 12 -e1 5 -e2 15 -allfreq T </code></p>
 <p>There don’t appear to be Beidou data at this site, so you should hand-edit those frequencies out of the json file.
@@ -147,13 +147,16 @@ In retrospect, I should have limited the azimuths a little more. Now run the mai
 <p><code>gnssir utqi 2020 1 -year_end 2022 -doy_end 243</code></p>
 </section>
 <section id="assess-the-results">
-<h1>Assess the results<a class="headerlink" href="#assess-the-results" title="Permalink to this heading"></a></h1>
+<h2>Assess the results<a class="headerlink" href="#assess-the-results" title="Permalink to this heading"></a></h2>
 <p>Use the <code>daily_avg</code> module to consolidate your results and estimate snow accumulation. I am using
 a median value of 50 cm and a minimum of 50 retrievals. You can certainly play with those parameters.</p>
 <p><code>daily_avg utqi 0.5 50</code></p>
 <p>This summary shows you how much each constellation is contributing to the daily average (GPS, Galileo, Glonass).</p>
+<a class="reference internal image-reference" href="../_images/utqi_f4.png"><img alt="../_images/utqi_f4.png" src="../_images/utqi_f4.png" style="width: 600px;" /></a>
 <p>All the retrievals are shown here:</p>
+<a class="reference internal image-reference" href="../_images/utqi-f1.png"><img alt="../_images/utqi-f1.png" src="../_images/utqi-f1.png" style="width: 600px;" /></a>
 <p>Finally, the daily average from 2020 to the present:</p>
+<a class="reference internal image-reference" href="../_images/utqi-f2.png"><img alt="../_images/utqi-f2.png" src="../_images/utqi-f2.png" style="width: 600px;" /></a>
 <p>The final RH values are written to a file and the location of the file is written to the screen.
 How do you turn these RH estimates into snow accumulation? Set the fall values (before the first snow) as your
 zero point and then simply subtract. Why are RH values changing during the summer? This is related to
@@ -169,8 +172,9 @@ as failure to translate the RINEX 3 file into RINEX 2.</p>
 detects the melt and snow-in dates:</p>
 <a class="reference internal image-reference" href="https://gml.noaa.gov/news/images/BRWWebAlbedo.png"><img alt="https://gml.noaa.gov/news/images/BRWWebAlbedo.png" src="https://gml.noaa.gov/news/images/BRWWebAlbedo.png" style="width: 500px;" /></a>
 <p>Looks pretty good compared to our melt and snow-in results. Don’t tell JPL!</p>
-<a class="reference internal image-reference" href="use_cases/utqi_just2021.png"><img alt="use_cases/utqi_just2021.png" src="use_cases/utqi_just2021.png" style="width: 500px;" /></a>
+<a class="reference internal image-reference" href="../_images/utqi_just2021.png"><img alt="../_images/utqi_just2021.png" src="../_images/utqi_just2021.png" style="width: 500px;" /></a>
 <p>Kristine M. Larson September 4, 2022</p>
+</section>
 </section>
 
 

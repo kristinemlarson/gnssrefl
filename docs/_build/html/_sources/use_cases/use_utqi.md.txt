@@ -1,4 +1,4 @@
-###  Utqiagvik, Alaska
+#  Utqiagvik, Alaska
 
 **Station Name:** utqi00usa
 
@@ -22,7 +22,7 @@ Use the <a href=https://gnss-reflections.org/rzones target="_blank">web app to g
 Remember that the default is the elevation of the site above sea level. That might be ok - but it might not. Check 
 with the real data. What azimuths should you use?
 
-### Look at the data
+## Look at the data
 
 In order to have access to modern GNSS signals, we will use RINEX 3 files. First make a SNR file:
 
@@ -36,16 +36,17 @@ angles to 5-15 so as to avoid the building.  I will set the reflection zone on t
 
 <code>quickLook utqi 2022 150 -h1 2 -h2 12 -e1 5 -e2 15</code>
 
-<img src=utqi-quicklook1.png width=600/>
+<img src=../_static/utqi-quicklook1.png width=600>
+
 
 I've outlined the "sweet spot" for reflections on the summary figure:
 
-<img src=utqi-quicklook.png width=600/>
+<img src=../_static/utqi-quicklook.png width=600>
 
 The main take home message: the *a priori* reflector height is a bit more than 6 meters. You
 can use that value within the reflection zone app if you want to look at the reflection zones again.
 
-### Make SNR files for multiple years
+## Make SNR files for multiple years
 
 RINEX 3 files are available from both CDDIS and BKG. Here we selected CDDIS and multi-GNSS orbits.
 Another orbit option is rapid (also from GFZ). These files only become available in 2021, and I want to 
@@ -55,7 +56,7 @@ start the time series in 2020, so I opted to use gnss as the orbit source.
 
 This won't take too long since the data files are relatively small.
 
-### Estimate Reflector Height
+## Estimate Reflector Height
 
 Set your analysis strategy:
 
@@ -68,7 +69,7 @@ In retrospect, I should have limited the azimuths a little more. Now run the mai
 <code>gnssir utqi 2020 1 -year_end 2022 -doy_end 243</code>
 
 
-###  Assess the results
+##  Assess the results
 
 Use the <code>daily_avg</code> module to consolidate your results and estimate snow accumulation. I am using 
 a median value of 50 cm and a minimum of 50 retrievals. You can certainly play with those parameters.
@@ -77,15 +78,15 @@ a median value of 50 cm and a minimum of 50 retrievals. You can certainly play w
 
 This summary shows you how much each constellation is contributing to the daily average (GPS, Galileo, Glonass).
 
-<img src=utqi_f4.png width=600/>
+<img src=../_static/utqi_f4.png width=600>
 
 All the retrievals are shown here:
 
-<img src=utqi-f1.png width=600/>
+<img src=../_static/utqi-f1.png width=600>
 
 Finally, the daily average from 2020 to the present:
 
-<img src=utqi-f2.png width=600/>
+<img src=../_static/utqi-f2.png width=600>
 
 
 The final RH values are written to a file and the location of the file is written to the screen.
@@ -110,7 +111,7 @@ detects the melt and snow-in dates:
 
 Looks pretty good compared to our melt and snow-in results. Don't tell JPL!
 
-<img src=utqi_just2021.png width=500 />
+<img src=../_static/utqi_just2021.png width=500 >
 
 Kristine M. Larson September 4, 2022
 

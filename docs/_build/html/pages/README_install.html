@@ -41,12 +41,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to gnssrefl documentation!</a></li>
 <li class="toctree-l1"><a class="reference internal" href="understand.html">Understanding</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#jupyter-notebooks-install">Jupyter Notebooks Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#docker-container-install"><span class="xref myst">Docker container Install</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#local-install-github-or-pypi">Local Install (github or pypi)</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="func_and_utils_doc.html">Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl api reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="first_drivethru.html">gnssrefl use cases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="first_drivethru.html">gnssrefl Use Cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="news.html">News <a name="news"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributions_questions.html">Community and Questions</a></li>
@@ -102,15 +106,16 @@
 </style>
 <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
-<p><strong>August 29, 2022 The docker image does not correctly read RINEX 3 files at this time. We
-hope it will be fixed by tomorrow.</strong></p>
 <p>You can  access this package via Jupyter notebooks, Docker containers, or traditional
 github/pypi package installation.</p>
-<ul class="simple">
-<li><p>via <a class="reference external" href="https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter">Notebooks</a></p></li>
-<li><p><a class="reference external" href="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md">via a Docker container</a></p></li>
-<li><p>github or pypi</p></li>
-</ul>
+<section id="jupyter-notebooks-install">
+<h2><a class="reference external" href="https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter">Jupyter Notebooks Install</a><a class="headerlink" href="#jupyter-notebooks-install" title="Permalink to this heading"></a></h2>
+</section>
+<section id="docker-container-install">
+<h2><a class="reference internal" href="docker_cl_instructions.html"><span class="doc std std-doc">Docker container Install</span></a><a class="headerlink" href="#docker-container-install" title="Permalink to this heading"></a></h2>
+</section>
+<section id="local-install-github-or-pypi">
+<h2>Local Install (github or pypi)<a class="headerlink" href="#local-install-github-or-pypi" title="Permalink to this heading"></a></h2>
 <p>For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
 <strong>If you are using linux</strong> then simply type</p>
 <p><code>apt-get install -y gcc</code></p>
@@ -170,6 +175,7 @@ community: CRX2RNX and gfzrnx. It currently works for linux, macos and mac-newch
 docker or Jupyter notebooks <strong>you do not need to run this.</strong></p>
 <p>We no longer encourage people to use <strong>teqc</strong> as it is not supported by UNAVCO. We try to install it
 in case you would like to use it on old files.</p>
+</section>
 </section>
 
 
