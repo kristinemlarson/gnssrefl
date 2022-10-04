@@ -34,21 +34,21 @@ am not willing to write such code myself.**
 
 <HR> 
 
-### [gnssrefl Understanding <a name="understanding"></a>](docs/pages/understand.md): goals, philosophy, methods.
+### [gnssrefl Understanding <a name="understanding"></a>](docs/pages/understand.md): project goals, philosophy and methods.
 
 <HR>
 
-### [gnssrefl Utilities <a name="helper"></a>](docs/pages/utilities.md): archive downloads and useful geodetic functions.
+### [gnssrefl Utilities <a name="helper"></a>](docs/pages/utilities.md): data retrieval and useful geodetic functions.
 
 <HR>
 
-### [GNSS-IR Community <a name="weneedhelp"></a>](docs/pages/contributions_questions.md): questions,  contributions and acknowledgements.
+### [GNSS-IR Community <a name="weneedhelp"></a>](docs/pages/contributions_questions.md): questions,  contributing and acknowledgements.
 
 
 GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, EAR 1144221, AGS 1449554) and 
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was developed with support from NASA (80NSSC20K1731).
 
-This documentation was updated on September 10, 2022
+This documentation was updated on October 4, 2022
 <HR>
 
 
