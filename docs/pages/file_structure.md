@@ -15,44 +15,25 @@ But for the sake of completeness, we are either using broadcast navigation files
 or precise orbits in the sp3 format.   
 
 
+**File structure for station abcd in the year YYYY (last two characters YY), doy DDD:**
 
-**Directory Structure for gnssrefl**
+- REFL_CODE/input/abcd.json - instructions for gnssir analysis, refraction files
 
-File structure for a station called abcd:
+- REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files 
 
-<PRE>
+- REFL_CODE/YYYY/results/abcd/DDD.txt  Lomb Scargle analysis 
 
+- REFL_CODE/YYYY/phase/abcd/DDD.txt  phase analysis 
 
-REFL_CODE/input/abcd.json - instructions for Lomb Scargle analysis
+- REFL_CODE/Files/ - various output files and plots will be placed here
 
-For SNR data in the year YYYY (last two characters YY), doy DDD:
+- ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file 
 
-REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files
+- ORBITS/YYYY/sp3/ - sp3 files of orbits - these use names from the archives.
 
-For Lomb Scargle (gnssir) results:
+RINEX files are not stored by this code. In fact, quite the opposite. If they are being translated, 
+they are deleted. Do not keep your only copy of RINEX files in your default directory.
 
-REFL_CODE/YYYY/results/abcd/DDD.txt  
-
-Various output files and plots will be placed here:
-
-REFL_CODE/Files/ 
-
-</PRE>
-
-Rinex files are not stored by this code - in fact, quite the opposite. If they are being translated,
-they are deleted. **Do not keep your only copy of RINEX files in your default directory.**
-
-
-For orbits:
-
-<PRE>
-
-
-ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file
-
-ORBITS/YYYY/sp3/...  sp3 files of orbits. 
-
-</PRE>
 
 You do not need precise orbits to do GNSS-IR. We only use them as a convenience.
 Generally we use multi-GNSS sp3 files. that are defined as:

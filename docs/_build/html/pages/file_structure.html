@@ -108,37 +108,18 @@ utility developed by Thomas Nischan at GFZ to translate from RINEX 3+ to RINEX 2
 <p>Input orbit files: we have tried our best to make the orbit files relatively invisible to users.
 But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
 or precise orbits in the sp3 format.</p>
-<p><strong>Directory Structure for gnssrefl</strong></p>
-<p>File structure for a station called abcd:</p>
-<PRE>
-
-
-REFL_CODE/input/abcd.json - instructions for Lomb Scargle analysis
-
-For SNR data in the year YYYY (last two characters YY), doy DDD:
-
-REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files
-
-For Lomb Scargle (gnssir) results:
-
-REFL_CODE/YYYY/results/abcd/DDD.txt  
-
-Various output files and plots will be placed here:
-
-REFL_CODE/Files/ 
-
-</PRE>
-<p>Rinex files are not stored by this code - in fact, quite the opposite. If they are being translated,
-they are deleted. <strong>Do not keep your only copy of RINEX files in your default directory.</strong></p>
-<p>For orbits:</p>
-<PRE>
-
-
-ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file
-
-ORBITS/YYYY/sp3/...  sp3 files of orbits. 
-
-</PRE>
+<p><strong>File structure for station abcd in the year YYYY (last two characters YY), doy DDD:</strong></p>
+<ul class="simple">
+<li><p>REFL_CODE/input/abcd.json - instructions for gnssir analysis, refraction files</p></li>
+<li><p>REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files</p></li>
+<li><p>REFL_CODE/YYYY/results/abcd/DDD.txt  Lomb Scargle analysis</p></li>
+<li><p>REFL_CODE/YYYY/phase/abcd/DDD.txt  phase analysis</p></li>
+<li><p>REFL_CODE/Files/ - various output files and plots will be placed here</p></li>
+<li><p>ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file</p></li>
+<li><p>ORBITS/YYYY/sp3/ - sp3 files of orbits - these use names from the archives.</p></li>
+</ul>
+<p>RINEX files are not stored by this code. In fact, quite the opposite. If they are being translated,
+they are deleted. Do not keep your only copy of RINEX files in your default directory.</p>
 <p>You do not need precise orbits to do GNSS-IR. We only use them as a convenience.
 Generally we use multi-GNSS sp3 files. that are defined as:</p>
 <p><strong>Details about the SNR data format:</strong></p>

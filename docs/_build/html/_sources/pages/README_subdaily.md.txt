@@ -24,9 +24,9 @@ by using a standard deviation test. This can be controlled at the command line. 
 
 Results are presented with azimuth and amplitude colors to help you modify QC choices or azimuth mask:
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-1.png" width="600"/>
+<img src="../_static/sc02-1.png" width="600"/>
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" width="600"/>
+<img src="../_static/sc02-2.png" width="600"/>
 
 Whle this code is meant to be used AFTER you have chosen an analysis strategy, you can 
 apply new azimuth and amplitude constraints on the commandline, <code>-azim1, azim2, ampl</code>.
@@ -66,24 +66,24 @@ Here are some results from the SC02 site again - but now from the second section
 In the bottom panel you can see that applying the RHdot correction at this site improves the 
 RMS fit from 0.15 to 0.11 meters.
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" width="600"/>
+<img src="../_static/sc02-3.png" width="600"/>
 
 After the RHdot correction has been applied, the code then estimates a new spline fit and 
 removes frequency-specific biases. Stats for this fit with respect to the spline fit 
 are printed to the screen. Three-sigma outliers with respect to the new fit are removed.
 In this example the RMS improves from 0.11 to 0.09 m. 
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" width="600"/>
+<img src="../_static/sc02-5.png" width="600"/>
 
 Here is an example of a site (TNPP) where the RHdot correction is 
 even more important (I apologize for color choice here. The 
 current code uses more color-blindness-friendly colors):
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_rhdot2.png" width="600"/>
+<img src="../_static/tnpp_rhdot2.png" width="600"/>
 
 After removing the RHdot effect and frequency biases, the RMS improves from 0.244 to 0.1 meters.
 
-<img src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_final.png" width="600"/>
+<img src="../_static/tnpp_final.png" width="600"/>
 
 Comment: if you have an existing file with results, you can just run the second part of the code. 
 If the input file is called test.txt, you would call it as:

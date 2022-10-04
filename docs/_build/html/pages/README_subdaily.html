@@ -118,8 +118,8 @@ look at a subset of days, you can set -doy1 and/or -doy2. The output file locati
 is sent to the screen. <code>subdaily</code> then tries to remove large outliers
 by using a standard deviation test. This can be controlled at the command line. Example figures:</p>
 <p>Results are presented with azimuth and amplitude colors to help you modify QC choices or azimuth mask:</p>
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-1.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-1.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-1.png" style="width: 600px;" /></a>
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-2.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/sc02-1.png"><img alt="../_images/sc02-1.png" src="../_images/sc02-1.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/sc02-2.png"><img alt="../_images/sc02-2.png" src="../_images/sc02-2.png" style="width: 600px;" /></a>
 <p>Whle this code is meant to be used AFTER you have chosen an analysis strategy, you can
 apply new azimuth and amplitude constraints on the commandline, <code>-azim1, azim2, ampl</code>.</p>
 <p>The second section of <code>subdaily</code> is related to the RHdot correction. You must explicitly ask for it.
@@ -154,18 +154,18 @@ with <code>-spline_outlier N</code>, where N is in meters. It also makes an atte
 <p>Here are some results from the SC02 site again - but now from the second section of the code.
 In the bottom panel you can see that applying the RHdot correction at this site improves the
 RMS fit from 0.15 to 0.11 meters.</p>
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-3.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/sc02-3.png"><img alt="../_images/sc02-3.png" src="../_images/sc02-3.png" style="width: 600px;" /></a>
 <p>After the RHdot correction has been applied, the code then estimates a new spline fit and
 removes frequency-specific biases. Stats for this fit with respect to the spline fit
 are printed to the screen. Three-sigma outliers with respect to the new fit are removed.
 In this example the RMS improves from 0.11 to 0.09 m.</p>
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/sc02-5.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/sc02-5.png"><img alt="../_images/sc02-5.png" src="../_images/sc02-5.png" style="width: 600px;" /></a>
 <p>Here is an example of a site (TNPP) where the RHdot correction is
 even more important (I apologize for color choice here. The
 current code uses more color-blindness-friendly colors):</p>
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_rhdot2.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_rhdot2.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_rhdot2.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/tnpp_rhdot2.png"><img alt="../_images/tnpp_rhdot2.png" src="../_images/tnpp_rhdot2.png" style="width: 600px;" /></a>
 <p>After removing the RHdot effect and frequency biases, the RMS improves from 0.244 to 0.1 meters.</p>
-<a class="reference internal image-reference" href="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_final.png"><img alt="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_final.png" src="https://github.com/kristinemlarson/gnssrefl/blob/master/docs/tnpp_final.png" style="width: 600px;" /></a>
+<a class="reference internal image-reference" href="../_images/tnpp_final.png"><img alt="../_images/tnpp_final.png" src="../_images/tnpp_final.png" style="width: 600px;" /></a>
 <p>Comment: if you have an existing file with results, you can just run the second part of the code.
 If the input file is called test.txt, you would call it as:</p>
 <p><code>subdaily sc02 2021 -splinefile test.txt -rhdot True</code></p>
