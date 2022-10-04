@@ -1,4 +1,4 @@
-gnssrefl api reference
+gnssrefl API Documentation
 ========
 
 .. toctree::
