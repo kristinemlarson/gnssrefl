@@ -43,6 +43,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../pages/understand.html">Understanding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/README_install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/func_and_utils_doc.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source/modules.html">gnssrefl</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/first_drivethru.html">gnssrefl use cases</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html">News <a name="news"></a></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pages/news.html#bugs-features-a-name-bugs-a">Bugs/Features <a name="bugs"></a></a></li>
@@ -65,7 +66,7 @@
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
       <li>St Lawrence River</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/use_cases/use_pmtl.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/use_cases/use_pmtl.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -106,8 +107,7 @@ you have the <em>teqc</em> executable, which is no longer supported by UNAVCO. W
 modify the NRCNA high rate downloads function to use <em>gfzrnx</em>, which is supported by GFZ.</p>
 <p align=center>
 <img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500"/>
-</p>
-<p><strong>Station Name:</strong>  pmtl</p>
+</p><p><strong>Station Name:</strong>  pmtl</p>
 <p><strong>Location:</strong> Port de Montreal, Montreal, Canada</p>
 <p><strong>Archive:</strong>  <a class="reference external" href="https://www.nrcan.gc.ca/home">NRCAN</a></p>
 <p><strong>Ellipsoidal Coordinates:</strong></p>
@@ -123,57 +123,65 @@ modify the NRCNA high rate downloads function to use <em>gfzrnx</em>, which is s
 <section id="data-summary">
 <h1>Data Summary<a class="headerlink" href="#data-summary" title="Permalink to this heading"></a></h1>
 <p>Station PMTL is located on the Viterra Montreal Terminal building on the St Lawrence River in Montreal, Canada. It is operated by the Montreal Port Authority.</p>
-<p>GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more than 60 meters above the water, you need to use high-rate GNSS data. Because of the way that NRCAN stores these data, you need to install <code>teqc</code>.</p>
+<p>GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more than 60 meters above the water, you need to use high-rate GNSS data. Because of the way that NRCAN stores these data, you need to install <span class="raw-html-m2r"><code>teqc</code></span>.</p>
 <p>Note the <a class="reference external" href="https://gnss-reflections.org/geoid?station=pmtl">ellipsoidal height and geoid corrected height</a>. To pick an azimuth and elevation mask, try the <a class="reference external" href="https://gnss-reflections.org/rzones">reflection zone webapp</a> with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:</p>
 <P align=center>
 <img src="pmtl_rzone.png" width="500" />
-</P>
+</P><p>&lt;img src=”pmtl_rzone.png” width=”500” &gt;</p>
+<p><code class="docutils literal notranslate"><span class="pre">`{image}</span> <span class="pre">pmtl_rzone.png</span>
+<span class="pre">:alt:</span> <span class="pre">fishy</span>
+<span class="pre">:class:</span> <span class="pre">bg-primary</span>
+<span class="pre">:width:</span> <span class="pre">500</span>
+<span class="pre">:align:</span> <span class="pre">center</span>
+<span class="pre">`</span></code></p>
+<p>![image attrs](pmtl_rzone.png){#imgattr .bg-primary width=”500” align=center}</p>
+<a class="reference internal image-reference" href="../_images/pmtl_rzone.png"><img alt="Alternative text" src="../_images/pmtl_rzone.png" style="width: 500px;" /></a>
 </section>
 <section id="quicklook">
 <h1>quickLook<a class="headerlink" href="#quicklook" title="Permalink to this heading"></a></h1>
 <p>Make a SNR file for multi-GNSS and high-rate:</p>
-<p><code>rinex2snr pmtl 2020 330 -archive nrcan -rate high -orb gnss</code></p>
-<p><code>quickLook pmtl 2020 330 -h1 40 -h2 90 -e1 5 -e2 12</code></p>
-<img src="pmtl-first-try.png" width="600"/>
-<p>I have annotated this <code>quickLook</code> periodogram to point out that there is an outlier in the SW region.
+<p><span class="raw-html-m2r"><code>rinex2snr pmtl 2020 330 -archive nrcan -rate high -orb gnss</code></span></p>
+<p><span class="raw-html-m2r"><code>quickLook pmtl 2020 330 -h1 40 -h2 90 -e1 5 -e2 12</code></span></p>
+<p><span class="raw-html-m2r"><img src="pmtl-first-try.png" width="600"/></span></p>
+<p>I have annotated this <span class="raw-html-m2r"><code>quickLook</code></span> periodogram to point out that there is an outlier in the SW region.
 You can also see that the NW region is useless, which is what we should expect.
 Windowing down the reflector region and using day of year 270:</p>
-<img src=pmtl-lsp-75-85.png width=600>
+<p><span class="raw-html-m2r"><img src=pmtl-lsp-75-85.png width=600></span></p>
 <p>The QC plot gives the azimuth windows - and help on setting the required amplitude and peak to noise ratio.
-Retrievals are not returned near 90 degrees because of the satellite inclination and the way the azimuth regions are defined in <code>quickLook</code>. It does not mean there are obstructions in that direction.</p>
-<img src=pmtl-qc-75-85.png width=600>
+Retrievals are not returned near 90 degrees because of the satellite inclination and the way the azimuth regions are defined in <span class="raw-html-m2r"><code>quickLook</code></span>. It does not mean there are obstructions in that direction.</p>
+<p><span class="raw-html-m2r"><img src=pmtl-qc-75-85.png width=600></span></p>
 </section>
 <section id="analyze-the-data">
 <h1>Analyze the Data<a class="headerlink" href="#analyze-the-data" title="Permalink to this heading"></a></h1>
 <p>Set up analysis instructions, using a smaller RH region:</p>
-<p><code>make_json_input pmtl 45.5571 -73.5204 54.073 -h1 75 -h2 85 -e1 5 -e2 12 -allfreq True -peak2noise 3 -ampl 7</code></p>
-<p>Hand-edit the json to remove GPS L2C, GPS L5, and Galileo data, and to set your azimuth region. <a class="reference download internal" download="" href="../_downloads/5da893fd1b023edbbc736cbf618a8af9/pmtl.json"><span class="xref download myst">Sample json</span></a></p>
+<p><span class="raw-html-m2r"><code>make_json_input pmtl 45.5571 -73.5204 54.073 -h1 75 -h2 85 -e1 5 -e2 12 -allfreq True -peak2noise 3 -ampl 7</code></span></p>
+<p>Hand-edit the json to remove GPS L2C, GPS L5, and Galileo data, and to set your azimuth region. <a class="reference external" href="pmtl.json">Sample json</a></p>
 <p>Make the SNR files (this takes a long long time):</p>
-<p><code>rinex2snr pmtl 2020 270 -doy_end 300 -archive nrcan -rate high -orb gnss</code></p>
+<p><span class="raw-html-m2r"><code>rinex2snr pmtl 2020 270 -doy_end 300 -archive nrcan -rate high -orb gnss</code></span></p>
 <p>This is also slow - though not as slow as translating RINEX files and computing orbits:</p>
-<p><code>gnssir pmtl 2020 270 -doy_end 300</code></p>
+<p><span class="raw-html-m2r"><code>gnssir pmtl 2020 270 -doy_end 300</code></span></p>
 <p>One way to make the gnssir code run faster would be to loosen up the RH precision.  Since you
 are using daily averages, it is not necessary to use the default of 5 mm.  10 mm would suffice.
 This needs to be hand-edited in the json file.</p>
 <p>Now compute daily averages:</p>
-<p><code>daily_avg pmtl 0.25 50 -txtfile pmtl-rh.txt </code></p>
+<p><span class="raw-html-m2r"><code>daily_avg pmtl 0.25 50 -txtfile pmtl-rh.txt </code></span></p>
 <p>All tracks:</p>
-<img src=pmtl-all.png width=600>
+<p><span class="raw-html-m2r"><img src=pmtl-all.png width=600></span></p>
 <p>The daily average:</p>
-<img src=pmtl_RH.png width=600>
-<p><a class="reference download internal" download="" href="../_downloads/66a3a5250c6fd398f2135bf129d46da8/pmtl-rh.txt"><span class="xref download myst">Daily average RH file</span></a></p>
+<p><span class="raw-html-m2r"><img src=pmtl_RH.png width=600></span></p>
+<p><a class="reference external" href="pmtl-rh.txt">Daily average RH file</a></p>
 </section>
 <section id="accuracy">
 <h1>Accuracy<a class="headerlink" href="#accuracy" title="Permalink to this heading"></a></h1>
 <p>The Canadian Hydrographic Service within Fisheries and Ocean Canada operates tide gauges along the St Lawrence
 River, the closest of which is Montreal Jetee #1 (station 15520), about 1 km south of the GNSS site.
 Tide data can be <a class="reference external" href="https://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&amp;region=PAC&amp;tst=1&amp;no=15520">downloaded</a>. Use the daily mean water level and UTC when submitting a request and download the resulting csv file.</p>
-<p>For this use case, the tidal data have already been <a class="reference download internal" download="" href="../_downloads/690a209ee2fe8162ecdbef7f8668c6bc/pmtl.csv"><span class="xref download myst">downloaded</span></a>.
+<p>For this use case, the tidal data have already been <a class="reference external" href="pmtl.csv">downloaded</a>.
 Given that there is quite drastic water level changes within a day, it is entirely
 plausible that the correlation will improve if using the subdaily RH and hourly tide gauge data.</p>
-<img src=pmtl-compare-time.png width=600>
-<img src=pmtl-correlation.png width=600>
-<p><a class="reference download internal" download="" href="../_downloads/a38d3e4830c494af1023685b43f91a14/pmtl_usecase.py"><span class="xref download myst">Code for comparison</span></a></p>
+<p><span class="raw-html-m2r"><img src=pmtl-compare-time.png width=600></span></p>
+<p><span class="raw-html-m2r"><img src=pmtl-correlation.png width=600></span></p>
+<p><a class="reference external" href="pmtl_usecase.py">Code for comparison</a></p>
 </section>
 
 

@@ -24,9 +24,9 @@
 
 * [Lake Taupo, New Zealand](../use_cases/use_tgho.md) (tgho)
 
-* [Lake Taupo, New Zealand RST](../use_cases/use_tgho.rst) (tgho)
-
 * [St Lawrence River,Canada](../use_cases/use_pmtl.md) (pmtl)
+
+* [St Lawrence River,Canada RST TEST](../use_cases/use_pmtl.rst) (pmtl)
 
 * [Lake Mathews, Riverside](../use_cases/use_mat2.md) (mat2)
 

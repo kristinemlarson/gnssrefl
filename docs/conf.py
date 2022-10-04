@@ -29,7 +29,10 @@ author = 'Dr. Kristine Larson and UNAVCO'
 # ones.
 extensions = ['myst_parser','nbsphinx','sphinx.ext.autodoc','sphinx.ext.autosummary']
 myst_heading_anchors = 3
-
+myst_enable_extensions = [
+    "html_image",
+    "attrs_image"
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
