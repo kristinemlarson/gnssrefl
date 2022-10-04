@@ -33,5 +33,6 @@ Welcome to gnssrefl documentation!
    pages/contributions_questions.md
 
 .. note::
+   GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, EAR 1144221, AGS 1449554) and NASA (NNX12AK21G and NNX13AF43G). 
    The python package development, docker distributions and jupyter notebooks are supported under NASA 80NSSC20K1731.
    For relevant citations, the code is citable via `doi <https://doi.org/10.5281/zenodo.5601495>`__, and the methods are covered in gnssrefl `publications <https://www.kristinelarson.net/publications>`__.
