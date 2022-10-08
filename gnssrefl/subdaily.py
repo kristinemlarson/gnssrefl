@@ -472,7 +472,6 @@ def write_out_header(fout,station,extraline,**kwargs):
     writes out header for results file ... 
     21may04 extra line for user
     changed this so that it is EXACTLY THE SAME as gnssir, with extra columns for m/d/h/m
-    author: kristine larson
     """
     extra_columns = kwargs.get('extra_columns',False)
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
@@ -564,14 +563,20 @@ def writejsonfile(ntv,station, outfile):
 
 def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     """
-    inputs:
-    station - 4 char
-    fname - input filename 
-    fname_new - output filename
-    pltit - boolean for plots to the screen
-    outlierV is meter outlier cutoff
+    parameters
+    -------
+    station : string
+        4 char station name
+    fname : string
+        input filename for results
+    fname_new : string
+        output filename for results
+    pltit : boolean 
+        whether you want plots to the screen
 
-    pltit is a boolean for plots to come to the screen
+    outlierV : float
+       outlier criterion, in meters 
+
     note: x was in units of years before but now is in days??
 
     2021april27 sending obstimes as kwarg input
@@ -579,8 +584,6 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     21may18 try to remove massive outliers
     21oct27 add usespline option because this code is not robust
     can also input knots per day 
-
-    author: kristine larson
 
     """
     outlierV = float(outlierV) #just to make sure - i think it was sending a string
@@ -844,7 +847,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     newt = tvd[:,1] + tvd[:,4]/24 ; 
     residual = redo_spline(newt, newRH, biasCorrected_RH,pltit,txtdir,station)
 
-    # this is just for kristine
+    # if kristine is set to true - write out a few more columns
     ntv = tvd
     dtime = False
     kristine = False
@@ -865,12 +868,26 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
 
 def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     """
-    otimes - datetime
-    tv = gnssrefl results variable
-    station - name just for the title
+    parameters
+    -----------
+    otimes : numpy array
+        datetime
+    tv : numpy array
+        gnssrefl results written into this variable using loadtxt
+
+    station : string
+        station name, only used for the title
+
     txtdir is where the plots will be written to
 
-    author: kristine larson
+    year: integer
+        what year is being analyzed
+
+    d1 : integer
+        minimum day of year
+    d2 : integer
+        maximum day of year
+
     """
     if d1 == 1 and d2 == 366:
         # these are the defaults
@@ -943,6 +960,7 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
 
 def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     """
+
     parameters
     --------------
     otimes - datetime object
@@ -954,8 +972,8 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
 
     txtdir : string
         directory where plots will be written
-    sigma is constraint used for the outlier detection
-     poor man's outlier detector
+    sigma : float
+        what kind of standard deviation is used for outliers (3sigma, 2.5 sigma etc)
     kplt : boolean
         make extra plot for kristine
     """

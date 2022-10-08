@@ -1,21 +1,51 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import numpy as np
 import os
 import subprocess 
 import sys
 
-import numpy as np
-
-# library for reading snr files - 
-# still learning python
-# 2019 kristine m. larson
-
 def read_snr_multiday(obsfile,obsfile2,twoDays):
     """
-    author: Kristine Larson
-    input: SNR observation filenames and a boolean for 
-    whether you want just the first day (twoDays)
-    output: contents of the SNR file, withe various other metrics
+    parameters
+    ---------
+    obsfile : string
+        name of first SNR input file
+
+    obsfile2 : string
+        name of second SNR input file
+
+    twoDays : boolean
+        False (default) for using only the first file
+
+    results
+    ----------
+    allGood1 : numpy array
+    sat : numpy array
+        satellite numbers 
+    ele : numpy array
+        elevation angle (degrees)
+    azi : numpy array
+        azimuth angles (degrees)
+    t : numpy array
+        time, seconds of the day, GPS time
+    edot : numpy array
+        derivative of elevation angle with respect to time
+    s1 : numpy array
+        SNR on L1 frequency
+    s2 : numpy array
+        SNR on L2 frequency
+    s5 : numpy array
+        SNR on L5 frequency
+    s6 : numpy array
+        SNR on L6 frequency
+    s7 : numpy array
+        SNR on L7 frequency
+    s8 : numpy array
+        SNR on L8 frequency
+    snrE : boolean
+        whether it exists
+
     """
 #   defaults so all returned vectors have something stored in them
     sat=[]; ele =[]; azi = []; t=[]; edot=[]; s1=[];
@@ -191,7 +221,6 @@ def read_one_snr(obsfile,ifile):
 
 def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays,gzip):
     """
-    author: kristine larson
     inputs boolean (whether you want to compress), whether you have two
     days (TwoDays) and file names
     nothing is returned

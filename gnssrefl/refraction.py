@@ -1,7 +1,6 @@
 """
 written in python from 
 from original TU Vienna codes for GMF
-kristine larson
 """
 import datetime
 import os
@@ -17,8 +16,31 @@ import gnssrefl.gps as g
 
 def read_4by5(station, dlat,dlon,hell):
     """
-    author: kristine m. larson
-    input station name (4 char), lat,long,elevation in deg/deg/meters
+    reads existing grid points for a given location
+    parameters
+    --------
+    station : string
+        name of station
+    dlat : float
+        latitude in degrees
+    dlon : float
+        longitude in degrees
+    hell : float
+        ellipsoidal height in meters
+
+    returns
+    -------------
+    pgrid : 4 by 5 numpy array
+    Tgrid : 4 by 5 numpy array 
+    Qgrid : 4 by 5 numpy array 
+    dTgrid : 4 by 5 numpy array  
+    u : 4 by 1 numpy array
+    Hs : 4 by 1 numpy array  
+    ahgrid : 4 by 5 numpy array
+    awgrid : 4 by 5 numpy array
+    lagrid : 4 by 5 numpy array
+    Tmgrid : 4 by 5 numpy array
+
     requires that an environment variable exists for REFL_CODE
     """
 #
@@ -27,6 +49,7 @@ def read_4by5(station, dlat,dlon,hell):
 #    if not os.path.isdir(inputpath): #if year folder doesn't exist, make it
 #        os.makedirs(inputpath)
 
+    # input file should be written here
     obsfile = inputpath + station + '_refr.txt'
     #print('reading from station refraction file: ', obsfile)
     x = np.genfromtxt(obsfile,comments='%')
@@ -61,15 +84,24 @@ def read_4by5(station, dlat,dlon,hell):
 #
 def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
     """
-    converted by kristine larson from posted TUVienna code
-    input parameters:
-    station: station name
-    dmjd:  modified Julian date (scalar, only one epoch per call is possible)
-    dlat:  ellipsoidal latitude in radians [-pi/2:+pi/2] (vector)
-    dlon:  longitude in radians [-pi:pi] or [0:2pi] (vector)
-    hell:  ellipsoidal height in m (vector)
-    it:    case 1: no time variation but static quantities
-           case 0: with time variation (annual and semiannual terms)
+    parameters
+    -----------
+    station : string
+        station name
+    dmjd:  float 
+        modified Julian date (scalar, only one epoch per call is possible)
+    dlat : float 
+        ellipsoidal latitude in radians [-pi/2:+pi/2] 
+    dlon : float
+        longitude in radians [-pi:pi] or [0:2pi] 
+    hell : float 
+        ellipsoidal height in m 
+    it: integer
+        case 1: no time variation but static quantities
+        case 0: with time variation (annual and semiannual terms)
+
+    returns
+    --------
     output parameters:
     p:    pressure in hPa
     T:    temperature in degrees Celsius 

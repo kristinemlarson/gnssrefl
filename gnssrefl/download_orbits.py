@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-downloads Orbit files
-author: kristine larson
-2020sep03 - modified environment variable requirement
+downloads Orbit files from various sources
 """
 import argparse
-import gnssrefl.gps as g
 import sys
+
+import gnssrefl.gps as g
 
 
 def parse_arguments():
@@ -16,6 +15,7 @@ def parse_arguments():
     parser.add_argument("month", help="month (or day of year)", type=int)
     parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
     parser.add_argument("-doy_end", default=None, help="doy end for multi-day download ", type=str)
+    parser.add_argument("-time_zone", default=None, help="time zone preference (noam, europe, asia)", type=str)
 
     args = parser.parse_args().__dict__
 
@@ -23,7 +23,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None ):
+def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None , time_zone: str = None):
     """
         command line interface for download_orbits
         Parameters:
@@ -75,6 +75,11 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
          doy_end : integer - optional
             allow multiple download
+
+         time_zone : string - optional
+            allow user to specify noam, europe, or asia to restrict archives
+            default is noam - and it checks sopac and cddis for nav message, e.g.
+            if europe is chosen, then esa is checked.  
 
     """
 
