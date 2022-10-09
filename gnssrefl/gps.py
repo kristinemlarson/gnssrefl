@@ -664,8 +664,7 @@ def hatanaka_warning():
 
 def getnavfile(year, month, day):
     """
-    picks up nav file
-    and stores it in the ORBITS directory
+    picks up nav file and stores it in the ORBITS directory
 
     parameters
     -----------
@@ -677,7 +676,7 @@ def getnavfile(year, month, day):
     day: integer
         day
 
-    returns:
+    returns
     ----------
     navname : string
         name of navigation file
@@ -3698,6 +3697,62 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
 
     return navfile
 
+def get_esa_navfile(cyyyy,cdoy):
+    """
+
+    downloads GPS broadcast navigation file from ESA
+    tries both Z and gz compressed
+
+    parameters
+    --------------
+    cyyyy : string
+        4 char year
+    cdoy : string
+        3 char day of year
+
+    returns
+    ---------
+    fstatus : boolean
+        whether file was found or not
+
+    """
+    fstatus = False
+    cyy = cyyyy[2:4]
+    esa = 'ftp://gssc.esa.int/gnss/data/daily/' + cyyyy + '/brdc/'
+    # what we want to find
+    navfile = 'brdc' + cdoy + '0.' + cyy + 'n' 
+    # have to check both Z and gz because ...
+    navfilegz = 'brdc' + cdoy + '0.' + cyy + 'n.gz' 
+    print(esa+navfilegz)
+    navfileZ = 'brdc' + cdoy + '0.' + cyy + 'n.Z' 
+
+    navfile_out = 'auto' + cdoy + '0.' + cyy + 'n' 
+
+    navfile_url =  esa + navfilegz
+    try:
+        wget.download(navfile_url,navfilegz)
+        subprocess.call(['gunzip',navfilegz])
+    except:
+        okokok = 1
+
+    if not os.path.exists(navfile):
+        navfile_url =  esa + navfileZ
+        try:
+            wget.download(navfile_url,navfileZ)
+            subprocess.call(['uncompress',navfileZ])
+        except:
+            okokok = 1
+
+    # rename it.
+    if os.path.exists(navfile):
+        print('mv the file to our naming convention')
+        subprocess.call(['mv',navfile, navfile_out])
+        fstatus = True
+    else:
+        print('No file was found at ESA')
+
+    return fstatus
+
 def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     """
     tries to download navigation file from CDDIS
@@ -5384,4 +5439,73 @@ def cddis_download_2022B(filename,directory):
     if siz == 0:
         print('No file found')
         subprocess.call(['rm',filename])
+
+
+
+def getnavfile_archive(year, month, day, archive):
+    """
+    picks up nav file and stores it in the ORBITS directory
+
+    parameters
+    -----------
+    year: integer
+
+    month: integer
+        if day is zero, the month value is really the day of year
+
+    day: integer
+        day
+
+    archive : string 
+        name of the GNSS archive
+
+    returns
+    ----------
+    navname : string
+        name of navigation file
+
+    navdir : string
+        location of where the file should be stored
+
+    foundit : boolean
+        whether the file was found
+
+    """
+    foundit = False
+    ann = make_nav_dirs(year)
+    if (day == 0):
+        doy = month
+        year, month, day, cyyyy,cdoy, YMD = ydoy2useful(year,doy)
+        cyy = cyyyy[2:4]
+    else:
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+
+    navname,navdir = nav_name(year, month, day)
+    nfile = navdir + '/' + navname
+    if not os.path.exists(navdir):
+        subprocess.call(['mkdir',navdir])
+    print('Looking for ', navname, navdir)
+
+    if os.path.exists(nfile):
+        foundit = True
+    if (not foundit) and (os.path.exists(nfile + '.xz' )):
+        subprocess.call(['unxz',nfile + '.xz'])
+        foundit = True
+    if (not foundit) and (os.path.exists(nfile + '.gz' )):
+        subprocess.call(['gunzip',nfile + '.gz'])
+        foundit = True
+
+    if not os.path.exists(nfile):
+        if (archive == 'esa'):
+            navstatus=get_esa_navfile(cyyyy,cdoy)
+        if (archive == 'sopac'):
+            get_sopac_navfile(navname,cyyyy,cyy,cdoy)
+
+        if os.path.exists(nfile):
+            subprocess.call(['mv',navname, navdir])
+            foundit = True
+        else:
+            print('No navfile found at ', archive)
+
+    return navname,navdir,foundit
 

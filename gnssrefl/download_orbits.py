@@ -15,7 +15,6 @@ def parse_arguments():
     parser.add_argument("month", help="month (or day of year)", type=int)
     parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
     parser.add_argument("-doy_end", default=None, help="doy end for multi-day download ", type=str)
-    parser.add_argument("-time_zone", default=None, help="time zone preference (noam, europe, asia)", type=str)
 
     args = parser.parse_args().__dict__
 
@@ -23,7 +22,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None , time_zone: str = None):
+def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None ):
     """
         command line interface for download_orbits
         Parameters:
@@ -76,17 +75,12 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
          doy_end : integer - optional
             allow multiple download
 
-         time_zone : string - optional
-            allow user to specify noam, europe, or asia to restrict archives
-            default is noam - and it checks sopac and cddis for nav message, e.g.
-            if europe is chosen, then esa is checked.  
-
     """
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 'gnss', 'gfr', 'esa', 'gnss2', 'brdc', 'ultra', 'rapid']
+    orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 'gnss', 'gfr', 'esa', 'gnss2', 'brdc', 'ultra', 'rapid','nav-esa', 'nav-sopac']
 
 
 #   assign to normal variables
@@ -132,8 +126,12 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
     for d in range(d1, d2):
 
         year,month,day= g.ydoy2ymd(year,d)
-        if pCtr == 'nav':
+        if (pCtr == 'nav'):
             navname, navdir, foundit = g.getnavfile(year, month, day)
+            if foundit:
+                print('\n SUCCESS:', navdir+'/'+navname)
+        elif (pCtr == 'nav-esa'):
+            navname, navdir, foundit = g.getnavfile_archive(year, month, day,'esa')
             if foundit:
                 print('\n SUCCESS:', navdir+'/'+navname)
         else:
