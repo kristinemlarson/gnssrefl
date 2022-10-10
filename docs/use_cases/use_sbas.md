@@ -105,11 +105,11 @@ I am going to start by requiring 10:
 
 Number of available values per day:
 
-<img src=../_static/sbas_4.png width=600 />
+<img src=../_static/sbas_4.png width=600 >
 
 Daily average reflector height results. 
 
-<img src=../_static/sbas_2.png width=600 />
+<img src=../_static/sbas_2.png width=600 >
 
 Note the missing points - this has nothing to do with reflectometry. These are days when the station did not report data.
 Numerical values are saved in a file. The location of the file is printed to the screen.

@@ -22,7 +22,7 @@ Lets look at the spectral characteristics of the SNR data for the default L1 set
 
 *quickLook p041 2020 132* 
 
-<img src="/p041-l1.png" width="500"/>
+<img src="../_static/p041-l1.png" width="500">
 
 The four subplots show you different regions around the antenna. The x-axis tells you 
 reflector height (RH) and the y-axis gives you the spectral amplitude of the SNR data.
@@ -39,7 +39,7 @@ Not all receivers produce L1 data that are as nice as these. Now try L2C:
 
 *quickLook p041 2020 132 -fr 20* 
 
-<img src="p041-l2c.png" width="500"/>
+<img src="../_static/p041-l2c.png" width="500">
 
 One thing you can notice here is that there are more colors in the L1 plots than in the L2C 
 plots. That is simply the result of the fact that there are more L1 satellites than L2C satellites.
