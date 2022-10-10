@@ -1,0 +1,105 @@
+# very simple code to pick up all the file sizes for SNR files in a given year
+# not very useful since it only looks for snr66, not gzipped files
+import argparse
+import datetime
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import sys
+
+from datetime import date
+
+# my code
+import gnssrefl.gps as g
+#
+# changes to output requested by Kelly Enloe for JN
+# two text files will now always made - but you can override the name of the average file via command line
+
+
+
+def main():
+#   make surer environment variables are set 
+    g.check_environ_variables()
+    xdir = os.environ['REFL_CODE'] 
+
+# must input start and end year
+    parser = argparse.ArgumentParser()
+    parser.add_argument("station", help="station name", type=str)
+    parser.add_argument("-year1", default=None, type=str, help="restrict to years starting with")
+    parser.add_argument("-year2", default=None, type=str, help="restrict to years ending with")
+    parser.add_argument("-doy1", default=None, type=str, help="restrict to after doy in year1")
+    parser.add_argument("-doy2", default=None, type=str, help="restrict to before doy in year2")
+    args = parser.parse_args()
+#   these are required
+    station = args.station
+
+    if args.year1 == None:
+        year1 = 2005
+    else:
+        year1=int(args.year1)
+
+    if args.year2 == None:
+        year2 = 2021
+    else:
+        year2=int(args.year2)
+
+    if args.doy1== None:
+        doy1=1
+    else:
+        doy1 = int(args.doy1)
+
+    if args.doy2== None:
+        doy2=366
+    else:
+        doy2 = int(args.doy2)
+
+    tstart = year1+ doy1/365.25
+    tend   = year2+ doy2/365.25
+
+    k=0
+# added standard deviation 2020 feb 14, changed n=6
+# now require it as an input
+# you can change this - trying out 80 for now
+#ReqTracks = 80
+# putting the results in a np.array, year, doy, RH, Nvalues, month, day
+    n=3
+    tv = np.empty(shape=[0, n])
+    obstimes = []; 
+    year_list = np.arange(year1, year2+1, 1)
+    for yr in year_list:
+        direc = xdir + '/' + str(yr) + '/snr/' + station + '/' 
+        for doy in range(0,367):
+            year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(yr,doy)
+            fname = direc + station + cdoy + '0.' + cyyyy[2:4]  + '.snr66'
+            print(fname)
+            t = yr+doy/365.25
+            if os.path.isfile(fname):
+                a = np.loadtxt(fname,skiprows=3,comments='%')
+                nr,nc=a.shape # nr is number of obs
+                filler = datetime.datetime(year=yr, month=month, day=day)
+                # this is for the daily average
+                newl = [yr, doy, nr]
+                if (t >= tstart) & (t <= tend):
+                    tv = np.append(tv, [newl],axis=0)
+                    obstimes.append(filler)
+            else:
+                if (t >= tstart) & (t <= tend):
+                    newl = [yr, doy, 0]
+                    tv = np.append(tv, [newl],axis=0)
+                    filler = datetime.datetime(year=yr, month=month, day=day)
+                    obstimes.append(filler)
+
+    fs = 12
+    fig,ax=plt.subplots()
+    plt.plot(obstimes, tv[:,2]/1000,'b.')
+    fig.autofmt_xdate()
+    plt.ylabel('nobs/1000',fontsize=fs)
+    plt.title('Observations for Station: ' + station,fontsize=fs)
+    plt.yticks(fontsize=fs)
+    plt.xticks(fontsize=fs)
+    plt.grid()
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
