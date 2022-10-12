@@ -13,7 +13,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../gnssrefl/'))
 
 
 # -- Project information -----------------------------------------------------
@@ -28,7 +28,7 @@ author = 'Dr. Kristine Larson and UNAVCO'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['myst_parser','nbsphinx','sphinx.ext.autodoc','sphinx.ext.autosummary','sphinx.ext.napoleon']
+extensions = ['myst_parser','nbsphinx','sphinx.ext.autodoc','sphinx.ext.autosummary'] #,'sphinx.ext.napoleon'
 myst_heading_anchors = 3
 myst_enable_extensions = [
     "html_image"

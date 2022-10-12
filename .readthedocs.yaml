@@ -13,7 +13,7 @@ build:
     python: "3.9" #"mambaforge-4.10"
 
 #conda:
-#  environment: docs/environment.yml
+  environment: docs/environment.yml
 
 # By default readthedocs does not checkout git submodules
 submodules:
@@ -27,10 +27,12 @@ sphinx:
 # formats:
 #    - pdf
 
-python:
+#python:
   # Install our python package before building the docs
-  install:
-    - method: pip
-      path: .
+#  install:
+#    - method: pip
+#      path: .
+#    - method: pip
+#        path: myst-parser
 
 

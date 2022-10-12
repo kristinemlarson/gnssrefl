@@ -14,5 +14,5 @@ dependencies:
 - pip:
      - myst_parser
      - nbsphinx
-#     - gnssrefl
+     - gnssrefl
 #     - git+https://github.com/kristinemlarson/gnssrefl.git
