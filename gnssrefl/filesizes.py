@@ -1,5 +1,3 @@
-# very simple code to pick up all the file sizes for SNR files in a given year
-# not very useful since it only looks for snr66, not gzipped files
 import argparse
 import datetime
 import matplotlib.pyplot as plt
@@ -12,12 +10,10 @@ from datetime import date
 # my code
 import gnssrefl.gps as g
 #
-# changes to output requested by Kelly Enloe for JN
-# two text files will now always made - but you can override the name of the average file via command line
-
-
 
 def main():
+# very simple code to pick up all the file sizes for SNR files in a given year
+# only checks for snr66 files
 #   make surer environment variables are set 
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE'] 
@@ -39,7 +35,7 @@ def main():
         year1=int(args.year1)
 
     if args.year2 == None:
-        year2 = 2021
+        year2 = 2030
     else:
         year2=int(args.year2)
 

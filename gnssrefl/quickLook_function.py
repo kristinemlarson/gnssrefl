@@ -21,7 +21,7 @@ def read_snr_simple(obsfile):
     """
     parameters
     ------------
-    obsfile : str
+    obsfile : string
         name of SNR file
 
     returns
@@ -85,7 +85,8 @@ def read_snr_simple(obsfile):
 
 def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,**kwargs):
     """
-    parameters:
+    parameters
+    -----------
     station : string
         name (4 char) 
 
@@ -115,7 +116,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
     pele is the elevation angle limits for the polynomial removal.  units: degrees
 
-    satsel
+    satsel : integer
+        satellite number?
 
     PkNoise : float
         peak to noise ratio for QC

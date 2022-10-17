@@ -27,7 +27,7 @@ def make_wavelength_column(nr,snrdata,signal):
     signal is L1, L2 etc
     22feb10 added l6, l7
 
-    parameters
+    Parameters
     ------------
     nr : integer
         number of rows in snrdata
@@ -38,9 +38,8 @@ def make_wavelength_column(nr,snrdata,signal):
     signal : string
         frequency  'L1','L2, etc
 
-    returns
+    Returns
     --------
-
     onecolumn : one-d numpy array
         snr data for the requested signal
     """
@@ -191,14 +190,15 @@ def readklsnrtxt(snrfile, thedir, signal):
 
 def glonasswlen(prn, signal):
     """
-    parameters
+
+    Parameters
     ---------
     prn : integer
         satellite number
     signal : string
          L1 or L2 for glonass
 
-    returns
+    Returns
     ---------
     wavelength : float
         wavelength for the given signal
@@ -224,7 +224,7 @@ def glonasswlen(prn, signal):
 
 def datetime2gps(dt):
     """
-    parameter
+    Parameters
     ---------
     dt : datetime 
 
@@ -1500,6 +1500,17 @@ def set_refraction_model(station, dmjd,lsp,imodel):
     """
     imodel is 1 for simple refraction model
     eventually will add other refraction models
+
+    Parameter
+    ----------
+    station : str
+        4 ch station name
+    dmjd : float
+        modified julian date
+    lsp : dictionary
+        station information including latitude and longitude
+    imodel : integer
+        set to 1 (time varying off) or 0 (time varying on)
 
     """
     xdir = os.environ['REFL_CODE']

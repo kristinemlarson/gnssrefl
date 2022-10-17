@@ -16,25 +16,26 @@ import gnssrefl.refraction as refr
 
 def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     """
-    my attempt to separate the inputs to the code and the guts of the code
-    inputs are station name, year, day of year (integers)
-    snr_type is an integer (99, 66, etc). lsp is a json
 
-    check to see if there were any results before sending a plot to the screen
+    computes lomb scargle periodograms for a given station, year, day of year etc.
 
     Parameters
+    ---------------
 
     station: string
 
     year : integer
 
     doy : integer
+        day of year
 
     snr_type : integer
+        snr file type
 
     extension : string
 
     lsp : dictionary
+        REQUIRES DESCRIPTION
         
     """
 
@@ -269,15 +270,20 @@ def plot2screen(station, f,ax1,ax2,pltname):
 
 def read_json_file(station, extension):
     """
-    picks up json instructions for periodogram
-    inputs are the station name and an extension (which can just be '')
+    picks up json instructions for calculation of lomb scargle periodogram
 
-    Parameter
-
+    Parameters
+    ------------
     station : string
         4 character station name
 
     extension : string
+        experimental directory - default is ''
+
+    Returns
+    -------
+    lsp : dictionary
+
         
     """
     lsp = {} # ???
@@ -300,15 +306,3 @@ def read_json_file(station, extension):
     return lsp
 
 
-# old code
-    #print(obsfile, 'snrexistence',snre,' and ', snr_type)
-    # removing this option
-    #if (not snre) and (not lsp['seekRinex']):
-    #    print('The SNR file does not exist and you have set the seekRinex variable to False')
-    #    print('Use rinex2snr.py to make SNR files')
-    #    #sys.exit()
-    #    allGood = 0
-    #if (not snre) and lsp['seekRinex']:
-    #    print('The SNR file does not exist. I will try to make a GPS only file using the Fortran option.')
-    #    rate = 'low'; dec_rate = 0; orbtype = 'nav'
-    #    g.quick_rinex_snrC(year, doy, station, snr_type, orbtype,rate, dec_rate)

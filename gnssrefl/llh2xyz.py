@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 converts latlonht to cartesian coordinates
-author: kristine larson
 """
 import argparse
 import sys

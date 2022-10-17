@@ -466,7 +466,7 @@ def elev_angle(up, RecSat):
     """
     computes satellite elevation angle
 
-    parameters:
+    Parameters
     -------------------
     up : 3 vector float 
         unit vector in the up direction
@@ -488,7 +488,7 @@ def sp3_interpolator(t, tow, x0, y0, z0, clock0):
     """
     author: originally from ryan hardy  
 
-    parameters
+    Parameters
     -------
     t : float
 
@@ -666,7 +666,7 @@ def getnavfile(year, month, day):
     """
     picks up nav file and stores it in the ORBITS directory
 
-    parameters
+    Parameters
     -----------
     year: integer
 
@@ -676,7 +676,7 @@ def getnavfile(year, month, day):
     day: integer
         day
 
-    returns
+    Returns
     ----------
     navname : string
         name of navigation file
@@ -779,7 +779,7 @@ def getsp3file_flex(year,month,day,pCtr):
     returns the name of the orbit file and its directory from CDDIS
     only gets the old-style filenames
 
-    parameters
+    Parameters
     ----------
     year : integer
 
@@ -790,7 +790,7 @@ def getsp3file_flex(year,month,day,pCtr):
     pCtr : string
         3 character orbit processing center
 
-    returns
+    Returns
     -----------
     name : string
         filename for the orbits
@@ -842,7 +842,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     """
     retrieves MGEX sp3 orbit files 
 
-    parameters
+    Parameters
     ---------------
     year : integer
 
@@ -1011,7 +1011,7 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
 
 def kgpsweek(year, month, day, hour, minute, second):
     """
-    parameters
+    Parameters
     ----------
     year : string
         4 char
@@ -1084,9 +1084,10 @@ def igsname(year,month,day):
     """
     returns the name of an IGS orbit file
 
-    parameters
+    Parameters
     -----------
     year : integer
+        four character year
 
     month : integer
 
@@ -1094,7 +1095,7 @@ def igsname(year,month,day):
 
     Returns
     ------------
-    name : string
+    name : str
         IGS orbit name
 
     clockname : string
@@ -1655,8 +1656,8 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     currently works for GPS, GLONASS, GALILEO, and Beidou
     new: pele are the elevation angle limits for the polynomial fit. these are appplied
     before you start windowing the data
-    20aug10 added screenstats boolean
-    parameters
+
+    Parameters
     -----------
     s1 : numpy array 
         SNR L1 data, floats
@@ -1695,12 +1696,13 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         polynomial order for DC fit
     screenstats : boolean
         Whether statistics come to the screen
-    returns
+
+    Returns
     ---------
     x : numpy array of 
-
+        float
     y : numpy array of 
-
+        float
     Nvv : integer
         number of points in x
     cf : float
@@ -1710,7 +1712,9 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     avgAzim : float
         average azimuth of the tracks
     outFact1 : float
-    outFact2  : 
+        TBD
+    outFact2 : float
+        TBD
     delT : float
         track length in minutes (I think)
 
@@ -1821,7 +1825,20 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
 
 def arc_scaleF(f,satNu):
     """
-    input a frequency and put out a scale factor cf which is wavelength*0.5 
+    calculates LSP scale factor cf 
+
+    Parameters
+    --------
+    f : integer
+        satellite frequency
+    satNu : integer
+        satellite number (1-400)
+
+    Returns
+    ----------
+    cf : float
+        wavelength/2 (meters)
+
     """ 
 #   default value for w so that if someone inputs an illegal frequency, it does not crash
     w = 0
@@ -1865,10 +1882,21 @@ def arc_scaleF(f,satNu):
 
 def freq_out(x,ofac,hifac):
     """
-    inputs: x 
-    ofac: oversamping factor
-    hifac
-    outputs: two sets of frequencies arrays
+
+    Parameters
+    ------------
+    x : numpy array
+        sine(elevation angle)
+    ofac: float
+        oversamping factor
+    hifac : float
+        how far to calculate RH frequencies  (in meters)
+
+    Returns
+    ------------
+    pd: float numpy arrays
+        frequencies 
+
     """
 #
 # number of points in input array
@@ -1896,11 +1924,19 @@ def freq_out(x,ofac,hifac):
 
 def find_satlist(f,snrExist):
     """
-    inputs: frequency and boolean numpy array that tells you 
-    if a signal is (potentially) legal
-    outputs: list of satellites to use 
+    DEPRECATED. DO NOT USE 
 
-    you should now use find_satlist_wdate
+    Parameters
+    ----------
+    f : integer
+        frequency 
+
+    snrExist : boolean numpy array
+        tells you if a signal is (potentially) legal
+
+    satlist: list of integers
+        satellites to use 
+
     """
 # set list of GPS satellites for now
 # 
@@ -1950,13 +1986,21 @@ def find_satlist(f,snrExist):
 
 def find_satlist_wdate(f,snrExist,year,doy):
     """
-    inputs: frequency and boolean numpy array that tells you
-    if a signal is (potentially) legal
-    outputs: list of satellites to use
+    find satellite list for a given frequency and date
 
-    now includes date informaiton so that accurate lists of l2c and l5
-    transmitting satellites are reasonable (previously it was a full list for 
-    current day, that may or may not be correct in the past)
+    parameters
+    -------------
+    f : integer
+        frequency
+
+    snrExist : boolean numpy array
+        tells you if a signal is (potentially) legal
+
+    returns
+    --------
+    satlist: list of integers
+        satellites to use
+
     june 24, 2021: updated for SVN78
     """
     # get list of relevant satellites
@@ -2517,7 +2561,6 @@ def new_big_Disk_in_DC(station, year, month, day):
 
 def big_Disk_in_DC(station, year, month, day):
     """
-    author: kristine larson
     picks up a RINEX file from CORS.  
     changed it to pick up gzip o file instead of d file.  Not sure why they have 
     both but the d file appears to be 30 sec, and that I do not want
@@ -2665,8 +2708,8 @@ def UNR_highrate(station,year,doy):
 
 def mjd_to_date(jd):
     """
-# KL converted from this reference
-# https://gist.github.com/jiffyclub/1294443
+    https://gist.github.com/jiffyclub/1294443
+
     Converts Modified Julian Day to y,m,d
     
     Algorithm from 'Practical Astronomy with your Calculator or Spreadsheet', 
@@ -4031,6 +4074,7 @@ def big_Disk_work_hard(station,year,month,day):
     creates a single RINEX file
 
     parameters
+    -----------
 
     station: string
         4 character id station name
@@ -4088,7 +4132,7 @@ def big_Disk_work_hard(station,year,month,day):
 def big_Disk_in_DC_hourly(station, year, month, day,idtag):
     """
     picks up a RINEX file from CORS. and gunzips it
-    # updated for new access protocol, 2021 aug 28
+
     parameters
     ---------
     station : string
@@ -4135,12 +4179,14 @@ def check_environ_variables():
 
 def ftitle(freq):
     """
-    frequency title for plots 
+    makes a frequency title for plots 
+
     parameters
     --------
     freq : integer
+        frequency
 
-    returns:
+    returns
     -----------
     returnf : string
         nice string for the constellation/frequency for the title of a plot
@@ -4175,6 +4221,16 @@ def cdate2nums(col1):
     """
     returns fractional year from ch date, e.g. 2012-02-15
     if time is blank, return 3000
+
+    parameters
+    ------------
+    col1 : string
+        date in yyyyy-mm-dd, 2012-02-15
+
+    returns
+    -----------
+    t : float
+        fractional date, year + doy/365.25
     """
     year = int(col1[0:4])
     if year == 0:
@@ -4201,10 +4257,6 @@ def l2c_l5_list(year,doy):
     doy: integer
         day of year
 
-    to update this numpy array, the data are stored in a simple triple of PRN number, launch year,
-    and launch date.  
-    date: march 27, 2021
-    june 24, 2021: updated for SVN78
     """
 
     # this numpy array has the satellite number, year, and doy of each launch of a L2C satellite
