@@ -2604,7 +2604,6 @@ def ydoy2ymd(year, doy):
     """
     inputs: year and day of year (doy)
     returns: year, month, day
-    author: kristine larson
     """
 
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
@@ -2619,7 +2618,6 @@ def rewrite_UNR_highrate(fname,station,year,doy):
     no header, but year, month, day, day of year, seconds vertical, east, north
     the latter three are in meters
     stores in $REFL_CODE/yyyy/pos/station
-    author: kristine larson
     """
 # make sure the various output directories  are there
     xdir = os.environ['REFL_CODE'] 
@@ -3110,7 +3108,6 @@ def check_inputs(station,year,doy,snr_type):
     inputs to Lomb Scargle and Rinex translation codes
     are checked for sensibility. Returns true or false to 
     code can exit. Error messages sent to the screen
-    author: kristine m. larson
     2019sep22
     """
     exitSys = False
@@ -3300,7 +3297,6 @@ def rinex_ga_highrate(station, year, month, day):
 
 def highrate_nz(station, year, month, day):
     """
-    author: kristine larson
     inputs: station name, year, month, day
     picks up a RINEX file from GNS New zealand
     you can input day =0 and it will assume month is day of year
@@ -3996,7 +3992,6 @@ def read_sp3file(file_path):
     x,y,z are in meters
     satnum has 0, 100, 200, 300 added for gps, glonass, galileo,beidou,
     respectively.  all other satellites are ignored
-    author: kristine larson
     some of this code came from joakim
 
     """
@@ -4333,7 +4328,6 @@ def get_obstimes(tvd):
     """
     send a LSP results, so the variable created when you read 
     in the results file.  return obstimes for plotting 
-    author: kristine larson
     """
     nr,nc = tvd.shape
     obstimes = []
@@ -4352,7 +4346,6 @@ def get_obstimes_plus(tvd):
     send a LSP results file, so the variable created when you read
     in the results file.  return obstimes for matplotlib plotting purposes
     2022jun10 - added MJD output
-    author: kristine larson
     """
     nr,nc = tvd.shape
     obstimes = []
@@ -4665,7 +4658,6 @@ def ultra_gfz_orbits(year,month,day,hour):
 def rinex_unavco(station, year, month, day):
     """
     This is being used by the vegetaiton code!!!!!
-    author: kristine larson
     picks up a RINEX file from default unavco area, i.e. not highrate.  
     it tries to pick up an o file,
     but if it does not work, it tries the "d" version, which must be
