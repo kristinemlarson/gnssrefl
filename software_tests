@@ -23,10 +23,6 @@ make_json_input xxxx  40 -120 10  -h1 5 -h2 20 -e1 5 -e2 15
 
 
 #
-invsnr_input tggo 8 20 5 15 -a1 30 -a2 330
-
-invsnr tggo 2022 200 L1+L2+L5 -doy_end 202 -constel G
-
 rm $ORBITS/2010/nav/auto0010.10n
 
 download_orbits nav 2010 1 1
@@ -36,9 +32,11 @@ rm $ORBITS/2010/sp3/igs15645.sp3
 
 download_orbits igs 2010 1 1
 
-rm $ORBITS/gbm19821.sp3
+rm $ORBITS/2018/sp3/gbm19821.sp3
 
 download_orbits gbm 2018 1 1
+
+rm $ORBITS/2022/nav/auto0010.22n
 
 rinex2snr p041 2022 1 -archive unavco -overwrite T
 
@@ -60,3 +58,8 @@ rinex2snr p041 2018 1 -archive unavco -rate high -dec 15 -overwrite T
 #
 #
 quickLook p041 2018 1 
+
+invsnr_input tggo 8 20 5 15 -a1 30 -a2 330
+
+invsnr tggo 2022 200 L1+L2+L5 -doy_end 202 -constel G
+

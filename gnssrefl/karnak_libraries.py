@@ -395,7 +395,7 @@ def universal_rinex2(station, year, doy, archive):
 
     dname, oname, cyyyy, cdoy = rinex2names(station,year,doy)
     if os.path.exists(oname):
-        print('RINEX o File is already on disk')
+        #print('RINEX o File is already on disk')
         return oname, True 
 
     print('Searching the ', archive, ' archive for ', station)

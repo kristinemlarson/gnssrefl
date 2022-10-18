@@ -67,7 +67,7 @@ def main():
         for doy in range(0,367):
             year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(yr,doy)
             fname = direc + station + cdoy + '0.' + cyyyy[2:4]  + '.snr66'
-            print(fname)
+            #print(fname)
             t = yr+doy/365.25
             if os.path.isfile(fname):
                 a = np.loadtxt(fname,skiprows=3,comments='%')
@@ -76,6 +76,7 @@ def main():
                 # this is for the daily average
                 newl = [yr, doy, nr]
                 if (t >= tstart) & (t <= tend):
+                    print(nr, year, doy)
                     tv = np.append(tv, [newl],axis=0)
                     obstimes.append(filler)
             else:

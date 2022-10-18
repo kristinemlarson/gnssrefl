@@ -22,15 +22,20 @@ xdir = Path(os.environ["REFL_CODE"])
 
 def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
     """
-    parameters
+    Parameters
     -----------
-    station: string
+    station: str
+        4 char station
 
-    fr : integer
+    fr : int
+        frequency
 
     datetime_dates: ...
 
     tv : list of results
+
+    xdir : str
+        location of the results (environment variable REFL_CODE)
 
     """
     plt.figure(figsize=(10, 6))
@@ -54,7 +59,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     runs daily_avg code so you have some idea of when the soil moisture products are 
     contaminated by snow. make a file with these years and doys saved
 
-    parameters
+    Parameters
     ---------
     station : string
         name, 4 ch
@@ -73,7 +78,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
 
     creates output file into a file $REFL_CODE/Files/snowmask_{ssss}.txt
 
-    returns
+    Peturns
     ---------
     snowmask_exists : boolean
 
@@ -116,7 +121,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
 
 def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
     """
-    parameters
+    Parameters
     ----------
     station : string
 
@@ -131,6 +136,9 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
 
     circles: boolean
         circles in the plot. default is a line (really .-)
+
+    Saves a plot to plot_path
+
     """
     # i think this would work???
     # data = [[1, 2, 3, 4], [0, 2, 3, 4], [0, 0 , 3, 4], [0, 0, 0, 4]] 
@@ -163,7 +171,8 @@ def read_apriori_rh(station,fr):
     """
     read the track dependent a prori reflector heights needed for
     phase & thus soil moisture.
-    parameters
+
+    Parameters
     ----------
     station : string
         four character ID, lowercase
@@ -171,9 +180,10 @@ def read_apriori_rh(station,fr):
     fr : integer
         frequency (e.g. 1,20)
 
-    returns
+    Returns
     ----------
     results : numpy array 
+        column 1 is ?
         column 2 is RH in meters
         column 3 is sat 
         column 4 is azimuth etc
@@ -235,7 +245,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
     This does the main work of estimating phase and other parameters from the SNR files
     it uses tracks that were predefined by the apriori.py code
 
-    parameters
+    Parameters
     -------------
     station name : string
         4 char id, lowercase
@@ -268,10 +278,9 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
     gzip : boolean
         whether you want SNR files gzipped after running the code
 
-    only GPS frequencies are allowed
+    Only GPS frequencies are allowed
 
     """
-   
 
     min_amp = 3 # should be much higher - but this is primarily to catch L2P data that
 
@@ -399,7 +408,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
 
     https://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
 
-    parameters
+    Parameters
     -----------
     station : string
 
@@ -642,28 +651,36 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
 def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
 
     """
-    parameters
-    --------
+    creates output file for average phase results
+
+    Parameters
+    ----------
     station : string
 
-    phase : numpy list of phase values 
+    phase : numpy list  (float)
+         phase values 
 
-    fr : integer
+    fr : int
         frequency
 
-    year: integer
+    year: int
+        first year evaluated
 
-    year_end : integer
+    year_end : int
+        last year evaluated
 
-    minvalperday : integer
+    minvalperday : int
         required number of satellite tracks to trust the daily average 
 
     vxyz is from some other compilation
 
-    returns
+    Returns
     --------
     tv : numpy array with elements
-        year, doy, meanph, nvals 
+        year 
+        doy  - day of year
+        meanph - mean phase value in degrees
+        nvals - number of values that went into the average
 
     """
     myxdir = os.environ['REFL_CODE']
@@ -708,7 +725,7 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
 def apriori_file_exist(station,fr):
     """
 
-    parameters
+    Parameters
     ---------
     station : string
 

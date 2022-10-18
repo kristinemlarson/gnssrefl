@@ -1750,8 +1750,8 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     meanTime = 0.0; avgAzim = 0.0; avgEdot = 1; Nvv = 0
     avgEdot_fit =1; delT = 0.0
 #   no longer have to look for specific satellites. some minimum number of points required 
-    if screenstats:
-        print('Starting Npts', Nv)
+    #if screenstats:
+    #    print('Starting Npts', Nv)
     if Nv > 30:
         model = np.polyfit(x,y,pfitV)
         fit = np.polyval(model,x)
@@ -1766,7 +1766,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         t = seconds[(ele > e1) & (ele < e2) & (azi > az1) & (azi < az2)]
         ifound = 0
         if screenstats:
-            print('Windowed Npts', len(x))
+            print('Starting/Windowed Npts', Nv, len(x))
         if len(x) > 0:
             ijkl = np.argmax(x)
             if (ijkl == 0):
@@ -4896,7 +4896,7 @@ def rinex_jp(station, year, month, day):
 
 def queryUNR_modern(station):
     """
-    queries the UNR database that has been stored in sql
+    queries the UNR database that has been stored in sql. downloads it if necessary
 
     parameters
     -----------
@@ -4989,78 +4989,6 @@ def rinex3_nav(year,month,day):
     return name, fdir, foundit
 
 
-def rinex_ga_highrate_rinex3(station9ch, year,doy,stream ):
-    """
-    author: kristine larson
-    inputs: station name, year, month, day
-
-    year : integer
-
-    doy : integer
-
-    stream : string
-    picks up a higrate RINEX file from Geoscience Australia
-    you can input day =0 and it will assume month is day of year
-    not sure if it merges them ...
-    2020 September 2 - moved to gz and new ftp site
-    ??? does not appear to have Rinex 2 files anymore ???
-    ??? goes they switched in 2020 .... ???
-
-    Remote working directory: /rinex/highrate/2021/002
-
-    ftp://ftp.data.gnss.ga.gov.au/highrate/2021/002/13/YULA00AUS_S_20210021300_15M_01S_MO.crx.gz"
-
-    """
-    s1=time.time()
-    crnxpath = hatanaka_version()
-    gexe = gfz_version()
-    if not os.path.isfile(crnxpath):
-        print('No CRX2RNX, so no files for you')
-        return
-    if not os.path.isfile(gexe):
-        print('No gfzrnx, so no files for you')
-        return
-    stationUp = station9ch.upper()
-    streamID = '_' + stream + '_'
-    # if doy is input
-    cyyyy = str(year)
-    cdoy = '{:03d}'.format(doy)
-    rinex2name = station9ch[0:4].lower() + cdoy + '0.' + cyyyy[2:4] + 'o'
-    print(rinex2name)
-    gobbleygook = myfavoriteobs()
-
-    #gns = 'ftp://ftp.data.gnss.ga.gov.au/highrate/' + cyyyy + '/' + cdoy + '/'
-    gns = 'sftp://sftp.data.gnss.ga.gov.au/highrate/' + cyyyy + '/' + cdoy + '/'
-    sftp.data.gnss.ga.gov.au
-    print('WARNING: Have some coffee, downloading high-rate GPS data takes a long time.')
-    fileF = 0
-    for h in range(0,24):
-        # subdirectory
-        cHH = '{:02d}'.format(h)
-        print('Hour: ', cHH)
-        for cMM in ['00', '15', '30', '45']:
-            dname = stationUp + streamID + cyyyy + cdoy + cHH + cMM + '_15M_01S_MO.crx.gz'
-            dname1 = dname[:-3]
-            #dname2 = dname1.replace('crx','rnx')
-            url = gns + cHH + '/' + dname
-            print(url)
-            try:
-                wget.download(url,dname)
-                subprocess.call(['gunzip',dname])
-                subprocess.call([crnxpath, dname1])
-                # delete the crx file
-                subprocess.call(['rm',dname1])
-                fileF = fileF + 1
-            except:
-                okok = 1
-    searchP = stationUp + streamID + cyyyy + cdoy + '*MO.rnx'
-    print(searchP)
-    outfile = stationUp + '.tmp'
-    if (fileF > 0): 
-        subprocess.call([gexe,'-finp', searchP, '-fout', outfile, '-vo','3','-f','-q'])
-        #subprocess.call([gexe,'-finp', searchP, '-fout', outfile, '-vo','3','-ot', gobbleygook, '-f','-q'])
-    s2 = time.time()
-    print('That took ', int(s2-s1), ' seconds')
 
 def rinex_nrcan_highrate(station, year, month, day):
     """

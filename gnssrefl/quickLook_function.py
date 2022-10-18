@@ -258,8 +258,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             for satNu in satlist:
                 x,y,Nv,cf,UTCtime,avgAzim,avgEdot,Edot2,delT= g.window_data(s1,s2,s5,s6,s7,s8,sat,ele,azi,t,edot,f,az1,az2,e1,e2,satNu,polyV,pele,screenstats) 
                 allpoints = allpoints + Nv
-                if screenstats:
-                    print('ALL tracks: Azim {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} Npts {3:3.0f} between Azimuths {4:3.0f}-{5:3.0f}'.format( avgAzim,satNu,UTCtime,Nv, az1, az2))
+                # if screenstats:
+                    #print('ALL tracks: Azim {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} Npts {3:3.0f} between Azimuths {4:3.0f}-{5:3.0f}'.format( avgAzim,satNu,UTCtime,Nv, az1, az2))
                 if Nv > minNumPts:
                     maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,desiredP,polyV,minH) 
                     nij =   pz[(px > NReg[0]) & (px < NReg[1])]
