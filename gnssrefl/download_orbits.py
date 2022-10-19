@@ -38,7 +38,11 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
                 gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days)
 
-                nav : GPS broadcast, adequate for reflectometry.
+                nav : GPS broadcast, adequate for reflectometry. Searches various places
+
+                nav-sopac : GPS broadcast, adequate for reflectometry. 
+
+                nav-esa : GPS broadcast, adequate for reflectometry. 
 
                 igs : IGS precise, GPS only
 
@@ -133,6 +137,10 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 print('\n SUCCESS:', navdir+'/'+navname)
         elif (pCtr == 'nav-esa'):
             navname, navdir, foundit = g.getnavfile_archive(year, month, day,'esa')
+            if foundit:
+                print('\n SUCCESS:', navdir+'/'+navname)
+        elif (pCtr == 'nav-sopac'):
+            navname, navdir, foundit = g.getnavfile_archive(year, month, day,'sopac')
             if foundit:
                 print('\n SUCCESS:', navdir+'/'+navname)
         else:

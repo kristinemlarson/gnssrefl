@@ -706,11 +706,14 @@ def getnavfile(year, month, day):
     if (not foundit) and (os.path.exists(nfile + '.xz' )):
         subprocess.call(['unxz',nfile + '.xz'])
         foundit = True
+    if (not foundit) and (os.path.exists(nfile + '.gz' )):
+        subprocess.call(['gunzip',nfile + '.gz'])
+        foundit = True
 
-    if not os.path.exists(nfile):
+    if (not foundit):
         navstatus = navfile_retrieve(navname, cyyyy,cyy,cdoy) 
         if navstatus:
-            #print('\n navfile being moved to online storage area')
+            print('\n navfile being moved to online storage area')
             subprocess.call(['mv',navname, navdir])
             foundit = True
         else:
@@ -3037,7 +3040,7 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     """
     retrieves navfile from either SOPAC or CDDIS
 
-    parameters 
+    Parameters 
     ----------
     navfile : string
         name of the broadcast orbit file
@@ -3048,8 +3051,8 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     cdoy : string
         3 character day of year
 
-    returns
-    -----------
+    Returns
+    ---------
     FileExists : boolean
         whether the file was found
 
@@ -3058,8 +3061,6 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     FileExists = False
     get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
     
-    cddis_is_failing = True
-    cddis_is_failing = False
     if not os.path.isfile(navfile) :
         if not cddis_is_failing:
             print('SOPAC download did not work, so will try CDDIS')
@@ -3345,7 +3346,8 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     """
     picks up and stores orbits as needed
     also sets executable location (gpsonly vs gnss)
-    parameters
+
+    Parameters
     ---------
     year : integer
 
@@ -3359,9 +3361,8 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     fortran : boolean
         whether you are using forran code for translation
 
-    returns
+    Returns
     -------------
-
     foundit : boolean
         whether orbit file was found
     f : string
@@ -3370,6 +3371,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         location of the orbit file
     snrexe : string 
         location of SNR executable. only relevant for fortran users
+
     """
     #default values
     foundit = False
@@ -3419,10 +3421,6 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=getsp3file_flex(year,month,day,'esa')
         snrexe = gnssSNR_version(); 
         warn_and_exit(snrexe,fortran)
-    elif orbtype == 'nav':
-        #print('getting nav orbits ... i hope')
-        f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
-        snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
     elif orbtype == 'test':
         # i can't even remember this ... 
         print('getting gFZ orbits from CDDIS using test protocol')
@@ -3433,7 +3431,19 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f, orbdir, foundit = ultra_gfz_orbits(year,month,day,0)
         snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     else:
-        print('I do not recognize the orbit type you tried to use: ', orbtype)
+        print('Requested a GPS only nav file')
+        if ('nav' in orbtype):
+            if orbtype == 'nav':
+                f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
+                snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
+            if orbtype == 'nav-sopac':
+                f,orbdir,foundit=getnavfile_archive(year, month, day,'sopac') # use default version, which is gps only
+                snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
+            if orbtype == 'nav-esa':
+                f,orbdir,foundit=getnavfile_archive(year, month, day,'esa') # use default version, which is gps only
+                snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
+        else:
+            print('I do not recognize the orbit type you tried to use: ', orbtype)
 
     return foundit, f, orbdir, snrexe
 
@@ -3699,10 +3709,9 @@ def snr_exist(station,year,doy,snrEnd):
 
 def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     """
-
     downloads navigation file from SOPAC 
 
-    parameters
+    Parameters
     --------------
     navfile : string
         name of GPS broadcast orbit file
@@ -3713,7 +3722,7 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     cdoy : string
         3 char day of year
 
-    returns: 
+    Returns: 
     ---------
     navfile : string (which was sent)
 
@@ -3727,12 +3736,18 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     navfile_sopac2 =  navfile
     url_sopac2 = sopac + '/pub/rinex/' + cyyyy + '/' + cdoy + '/' + navfile_sopac2
 
-
+    foundfile = False
     try:
         wget.download(url_sopac1,navfile_compressed)
         subprocess.call(['uncompress',navfile_compressed])
+        foundfile = True
     except:
         okokok = 1
+
+    if not foundfile:
+        print('Corrupted file/download failures at SOPAC')
+        subprocess.call(['rm','-f',navfile_compressed])
+        subprocess.call(['rm','-f',navfile])
 
     return navfile
 
@@ -3742,14 +3757,14 @@ def get_esa_navfile(cyyyy,cdoy):
     downloads GPS broadcast navigation file from ESA
     tries both Z and gz compressed
 
-    parameters
+    Parameters
     --------------
     cyyyy : string
         4 char year
     cdoy : string
         3 char day of year
 
-    returns
+    Returns
     ---------
     fstatus : boolean
         whether file was found or not
@@ -3757,23 +3772,33 @@ def get_esa_navfile(cyyyy,cdoy):
     """
     fstatus = False
     cyy = cyyyy[2:4]
+    year = int(cyyyy)
+    navfile_out = 'auto' + cdoy + '0.' + cyy + 'n' 
+
     esa = 'ftp://gssc.esa.int/gnss/data/daily/' + cyyyy + '/brdc/'
     # what we want to find
     navfile = 'brdc' + cdoy + '0.' + cyy + 'n' 
     # have to check both Z and gz because ...
     navfilegz = 'brdc' + cdoy + '0.' + cyy + 'n.gz' 
-    print(esa+navfilegz)
+    #print(esa+navfilegz)
     navfileZ = 'brdc' + cdoy + '0.' + cyy + 'n.Z' 
 
-    navfile_out = 'auto' + cdoy + '0.' + cyy + 'n' 
+    # this is when they switched to gzip... 
+    # brdc3350.20n.gz
+    tday = year + int(cdoy)/365.25
+    dday = 2020 + 335/365.25
 
     navfile_url =  esa + navfilegz
-    try:
-        wget.download(navfile_url,navfilegz)
-        subprocess.call(['gunzip',navfilegz])
-    except:
-        okokok = 1
 
+    # try gzip
+    if (tday >= dday):
+        try:
+            wget.download(navfile_url,navfilegz)
+            subprocess.call(['gunzip',navfilegz])
+        except:
+            print('Did not find gzip version')
+
+    # try Z veresion
     if not os.path.exists(navfile):
         navfile_url =  esa + navfileZ
         try:
@@ -3784,7 +3809,6 @@ def get_esa_navfile(cyyyy,cdoy):
 
     # rename it.
     if os.path.exists(navfile):
-        print('mv the file to our naming convention')
         subprocess.call(['mv',navfile, navfile_out])
         fstatus = True
     else:
@@ -4565,12 +4589,86 @@ def queryUNR(station):
     # lat and lon are in degrees
     return llat,llon,height
 
+def final_gfz_orbits(year,month,day):
+    """
+    downloads gfz final orbit and stores in $ORBITS
+
+    Parameters
+    --------------
+    year : int
+        full year
+    month : int
+        month or day of year if day is set to zero
+    day : int
+        day of month
+
+    Returns
+    ---------
+    littlename : str
+        orbit filename, fdir, foundit
+
+    fdir: str
+        directory where the orbit file is stored locally
+
+    foundit : boolean
+        whether the file was found
+    """
+    foundit = False
+    dday = 2021 + 137/365.25
+    wk,sec=kgpsweek(year,month,day,0,0,0)
+
+    gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/final/'
+    if day == 0:
+       doy=month
+       d = doy2ymd(year,doy);
+       month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+    fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
+    littlename = 'gbm' + str(wk) + str(int(sec/86400)) + '.sp3'
+    #GFZ0MGXRAP_20222740000_01D_05M_ORB.SP3
+    #GFZ0OPSFIN
+    # GFZ0MGXRAP_20222440000_01D_05M_ORB.SP3
+    littlename = 'GFZ0MGXRAP_' + str(year) + cdoy + '0000_01D_05M_ORB.SP3'
+
+    url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
+    print(url)
+
+    fullname = fdir + '/' + littlename + '.xz'
+    if os.path.isfile(fullname):
+        subprocess.call(['unxz', fullname])
+
+    fullname = fdir + '/' + littlename + '.gz'
+    if os.path.isfile(fullname):
+        subprocess.call(['gunzip', fullname])
+
+    if os.path.isfile(fdir + '/' + littlename):
+        print(littlename, ' already exists on disk')
+        return littlename, fdir, True 
+
+    try:
+        wget.download(url,littlename + '.gz')
+        subprocess.call(['gunzip', littlename + '.gz'])
+    except:
+        print('Problems downloading final multi-GNSS GFZ orbit from GFZ')
+
+    if os.path.isfile(littlename):
+       store_orbitfile(littlename,year,'sp3') ; foundit = True
+
+    return littlename, fdir, foundit
+
 def rapid_gfz_orbits(year,month,day):
     """
-    input year, month, day OR
-    year, doy, 0
-    downloads rapid GFZ sp3 file and stores in $ORBITS
-    november 5, 2021 fixed their ftp address
+    downloads gfz rapid orbit and stores in $ORBITS
+
+    Parameters
+    --------------
+    year : int
+        full year
+    month : int
+        month or day of year if day is set to zero
+    day : int
+        day of month
+
     """
     foundit = False
     dday = 2021 + 137/365.25
@@ -4611,13 +4709,23 @@ def rapid_gfz_orbits(year,month,day):
 
 def ultra_gfz_orbits(year,month,day,hour):
     """
-    input year, month, day OR
-    year, doy, 0
-    hour is needed to figur out which ultra file to pick up 
-    downloads rapid GFZ sp3 file and stores in $ORBITS
+    Parameters
+    -----------
+    year : int
+
+    month : int
+
+    day : int
+        if set to 0, then month is really day of year
+
+    hour : int
+
+    downloads rapid GFZ sp3 file and stores them in $ORBITS
+
     """
     foundit = False
     dday = 2021 + 137/365.25
+    # figure out the GPS week number
     wk,sec=kgpsweek(year,month,day,0,0,0)
     gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/ultra/'
     if day == 0:
@@ -4629,15 +4737,22 @@ def ultra_gfz_orbits(year,month,day,hour):
     # change the hour into two character string
     chr = '{:02d}'.format(hour)
     littlename = 'gfu' + str(wk) + str(int(sec/86400)) + '_' + chr + '.sp3'  
+
     url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
     print(url)
     if (year + doy/365.25) < dday:
         print('No rapid GFZ orbits until 2021/doy137')
         return '', '', foundit
 
+    # check to see if the file is there already
     fullname = fdir + '/' + littlename + '.xz'
     if os.path.isfile(fullname):
         subprocess.call(['unxz', fullname])
+
+    # check to see if the file is there already
+    fullname = fdir + '/' + littlename + '.gz'
+    if os.path.isfile(fullname):
+        subprocess.call(['gunzip', fullname])
 
     if os.path.isfile(fdir + '/' + littlename):
         print(littlename, ' already exists on disk')
@@ -5416,35 +5531,37 @@ def cddis_download_2022B(filename,directory):
 
 def getnavfile_archive(year, month, day, archive):
     """
-    picks up nav file and stores it in the ORBITS directory
+    picks up nav file from a specific archive and stores it in the ORBITS directory
 
-    parameters
+    Parameters
     -----------
     year: integer
 
-    month: integer
+    month: int
         if day is zero, the month value is really the day of year
 
-    day: integer
+    day: int
         day
 
-    archive : string 
-        name of the GNSS archive
+    archive : str
+        name of the GNSS archive. currently allow sopac and esa
 
-    returns
+    Returns
     ----------
-    navname : string
-        name of navigation file
+    navname : str
+        name of navigation file (should always be auto???0.yyn, so unclear to me 
+        why it is sent)
 
     navdir : string
-        location of where the file should be stored
+        location of where the file has been stored
 
     foundit : boolean
         whether the file was found
 
     """
-    foundit = False
+    # make sure directories exist for orbits
     ann = make_nav_dirs(year)
+    navname,navdir = nav_name(year, month, day)
     if (day == 0):
         doy = month
         year, month, day, cyyyy,cdoy, YMD = ydoy2useful(year,doy)
@@ -5452,11 +5569,49 @@ def getnavfile_archive(year, month, day, archive):
     else:
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
 
+    foundit = check_navexistence(year,month,day)
+    
+
+    if (not foundit):
+        if (archive == 'esa'):
+            foundit =get_esa_navfile(cyyyy,cdoy)
+        if (archive == 'sopac'):
+            xx = get_sopac_navfile(navname,cyyyy,cyy,cdoy)
+        # found it at one of the preferred archives
+        if os.path.exists(navname):
+            subprocess.call(['mv',navname, navdir])
+            foundit = True
+    if (not foundit):
+        print('No navfile found at ', archive)
+
+    return navname,navdir,foundit
+
+def check_navexistence(year,month,day):
+    """
+    Check to see if you already have the nav file. Uncompresses it 
+    if necessary
+
+    Parameters
+    ----------
+    year : int
+        full year
+    month : int
+        month or doy if day is zero
+    day : int
+        0 i you would to submit doy in month place
+
+
+    Returns 
+    -------
+    foundit : boolean
+        whether nav file has been found
+    """
+    foundit = False
     navname,navdir = nav_name(year, month, day)
     nfile = navdir + '/' + navname
     if not os.path.exists(navdir):
         subprocess.call(['mkdir',navdir])
-    print('Looking for ', navname, navdir)
+    #print('Looking for ', navname, navdir)
 
     if os.path.exists(nfile):
         foundit = True
@@ -5467,17 +5622,7 @@ def getnavfile_archive(year, month, day, archive):
         subprocess.call(['gunzip',nfile + '.gz'])
         foundit = True
 
-    if not os.path.exists(nfile):
-        if (archive == 'esa'):
-            navstatus=get_esa_navfile(cyyyy,cdoy)
-        if (archive == 'sopac'):
-            get_sopac_navfile(navname,cyyyy,cyy,cdoy)
+    if foundit:
+        print('Nav file exists online')
 
-        if os.path.exists(nfile):
-            subprocess.call(['mv',navname, navdir])
-            foundit = True
-        else:
-            print('No navfile found at ', archive)
-
-    return navname,navdir,foundit
-
+    return foundit
