@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 command line tool for the rinex2snr module
-pretty much what it sounds like - it translates rinex files and makes SNR files
-kristine larson
-2021aug01 added mk option for uppercase file names
+it translates rinex files and makes SNR files
 
 compile the fortran first
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
 
-2022feb15 added karnak_sub for rinex3
 """
 
 import argparse
@@ -31,7 +28,7 @@ def parse_arguments():
     parser.add_argument("-snr", default=None, help="snr file ending", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, gps, gps+glo, gnss, rapid or you can specify nav,igs,igr,jax,gbm,grg,wum,gfr,ultra")
-    parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX 2 sample rate: low or high. This parameter is only needed for archive searches.")
+    parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX sample rate: low or high. This parameter is only needed for archive searches.")
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
                         help="True means only use RINEX files on local machine")
@@ -117,7 +114,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
                 True : uses fortran to translate rinex
 
         nolook : boolean, optional
-            This parameter tells the code not to get the rinex files online if the files exist locally already.
+            This parameter tells the code not to retrieve RINEX files from your local machine.
             default is False.
 
         archive : string, optional
@@ -137,7 +134,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
                 bfg (German Agency for water research, only Rinex 3, requires password)
                 jp (GSI, requires password)
                 jeff (My good friend Professor Freymueller!)
-                special (set aside files at UNAVCO)
+                special (set aside files at UNAVCO for reflectometry users)
                 all
 
         doy_end : int, optional
@@ -194,9 +191,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         sys.exit()
 
     # currently allowed orbit types - shanghai removed 2020sep08
-    # added GFZ rapid, aka gfr 2021May19 but it does not work anymore.  point it to gbm
     #
-    # added ESA, thank you to Makan
     orbit_list = ['gps', 'gps+glo', 'gnss', 'nav', 'igs', 'igr', 'jax', 'gbm',
                   'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2','nav-sopac','nav-esa']
     if orb not in orbit_list:
@@ -328,7 +323,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 # the weekly option
     skipit = 1
     if weekly:
-        print('you have invoked the weekly option')
+        print('You have invoked the weekly option')
         skipit = 7
 
     # change skipit to be sent to rinex2snr.py
@@ -337,10 +332,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     # this makes the correct lists in the function
     doy_list = [doy, doy2]
     year_list = list(range(year1, year2+1))
-
-    # default is to use hybrid for RINEX translator
-    # why is this logic here?  there is earlier logic for the exact same questions
-
 
     # the Makan option
     if mk:

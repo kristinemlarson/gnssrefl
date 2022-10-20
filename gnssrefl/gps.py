@@ -106,15 +106,15 @@ def ydoych(year,doy):
     """
     Converts year and doy to various character strings
 
-    Parameters:
-    ---------
+    Parameters
+    ----------
     year : integer
         year
 
     doy : integer
         day of year
 
-    Returns:
+    Returns
     -------
     cyyyy : string
         4 character year
@@ -166,6 +166,7 @@ def define_filename(station,year,doy,snr):
     f= station + cdoy + '0.' + cyy + '.snr' + str(snr)
     fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f 
     fname2 = xdir + '/' + cyyyy  + '/snr/' + station + '/' + f  + '.xz'
+
     return fname, fname2
 
 def define_and_xz_snr(station,year,doy,snr):
@@ -244,8 +245,13 @@ def define_filename_prevday(station,year,doy,snr):
         SNR file type (66,88, etc)
 
     Returns:
-    ---------------
-    returns snr filename for the PREVIOUS day
+    ----------
+    fname : string
+        name of the SNR file
+
+    fname2 : string
+        no longer used but kept for backwards capability
+
 
     """
     xdir = os.environ['REFL_CODE']
@@ -276,20 +282,20 @@ def azimuth_angle(RecSat, East, North):
 
     Inputs:
     ------------
-    RecSat : 3-vector (numpy?) 
+    RecSat : 3-vector 
         meters
 
-    East : 
+    East : 3-vector
+        unit vector in east direction
 
-    North : 3-vector (numpy?)
+    North : 3-vector 
+        unit vector in north direction
 
-    inputs are receiver satellite vector (meters)
-    east and north unit vectors, computed with the up vector
-    returns 
-    ------
-
+    Returns 
+    -------
     azangle : float
         azimuth angle in degrees
+
     """
     staSatE = East[0]*RecSat[0] + East[1]*RecSat[1] + East[2]*RecSat[2]
     staSatN = North[0]*RecSat[0] + North[1]*RecSat[1] + North[2]*RecSat[2]
@@ -302,9 +308,15 @@ def azimuth_angle(RecSat, East, North):
 
 def rot3(vector, angle):
     """
-    input a vector (3) and output the same vector rotated by an angle
-    in radians apparently.
-    original code from ryan hardy
+    vector : 3 vector
+        float
+
+    angle : float
+        radians
+
+    vector2 : 3 vector
+        float, original vector rotated by angle 
+
     """
     rotmat = np.matrix([[ np.cos(angle), np.sin(angle), 0],
                         [-np.sin(angle), np.cos(angle), 0],
@@ -314,7 +326,7 @@ def rot3(vector, angle):
 
 def xyz2llh(xyz, tol):
     """
-    given xyz vector, computes latitude, longitude and height
+    Computes latitude, longitude and height from XYZ
 
     Parameters
     -----------
@@ -359,13 +371,13 @@ def xyz2llhd(xyz):
     """
     converts three vector from cartesian coordinates to latitude,longitude,height
 
-    Parameters:
-    --------------
+    Parameters
+    ----------
     xyz : three vector of floats
         Cartesian position in meters
 
-    Returns:
-    --------------
+    Returns
+    ----------
     lat : float
         latitude in degrees
 
@@ -395,8 +407,6 @@ def xyz2llhd(xyz):
         lat0 = lat
         i+=1
     return lat*180/np.pi, lon*180/np.pi, h
-
-
 
 def zenithdelay(h):
     """
@@ -457,7 +467,18 @@ def up(lat,lon):
 
 def norm(vect):
     """
-    given a three vector - return its norm
+    calculates magnitude of a vector
+
+    Parameters
+    ----------
+    vect : float
+        vector
+
+    Returns
+    --------
+    nv : float
+        norm of vect
+
     """  
     nv = np.sqrt(np.dot(vect,vect))
     return nv
@@ -474,7 +495,7 @@ def elev_angle(up, RecSat):
     RecSat : 3 vector numpy 
         Cartesian vector pointing from receiver to satellite in meters
 
-    returns
+    Returns
     --------------
     angle: float
         elevation angle in radians
@@ -506,10 +527,11 @@ def sp3_interpolator(t, tow, x0, y0, z0, clock0):
     inputs are??? tow is GPS seconds
     xyz are the precise satellite coordinates (in meters)
     clocks are likely satellite clock corrections (microseconds)
-    i believe n is the order fit, based on what i recall.
+    I believe n is the order fit, based on what i recall.
     these values do not agree with my test cases in matlab or fortran
     presumably there is an issue with the estimation of the coefficients.
     they are good enough for calculating an elevation angle used in reflectometry
+
     """
     # ryan set it to 7 - which is not recommended by the paper
     # ryan confirmed that he doesn't know why this doesn't work ...
@@ -564,12 +586,15 @@ def sp3_interpolator(t, tow, x0, y0, z0, clock0):
  
 def dec31(year):
     """
+    Calculates the day of year for December 31
+
     Parameters 
     ---------
     input: integer
         year
 
-    Returns :
+    Returns 
+    ---------
 
     doy : integer
         day of year for December 31
@@ -581,6 +606,8 @@ def dec31(year):
 
 def ymd2doy(year,month,day):
     """
+    Calculates day of year and other date strings
+    
     Parameters
     --------------
 
@@ -591,7 +618,7 @@ def ymd2doy(year,month,day):
     day : integer
         day of the month
 
-    returns
+    Returns
     ---------
     doy : integer
          day of year
@@ -601,56 +628,12 @@ def ymd2doy(year,month,day):
          four character year
     cyy : string 
          two character year
+
     """
     today=datetime.datetime(year,month,day)
     doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
     cyyyy, cyy, cdoy = ydoych(year,doy)
     return doy, cdoy, cyyyy, cyy
-
-
-def rinex_sopac(station, year, month, day):
-    """
-    picks up a hatanaka RINEX file from SOPAC - converts to o
-    can also be called as station, year, doy, 0
-
-    Parameters: 
-    -----------
-    station : string
-        4 char station name  
-
-    year : integer
-
-    month : integer
-
-    day : integer
-
-    """
-    if (day == 0):
-        doy = month
-        year, month, day, cyyyy,cdoy, YMD = ydoy2useful(year,doy)
-        cyy = cyyyy[2:4]
-    else:
-        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-
-    crnxpath = hatanaka_version()
-    if os.path.exists(crnxpath):
-        sopac = 'ftp://garner.ucsd.edu'
-        oname,fname = rinex_name(station, year, month, day) 
-        file1 = fname + '.Z'
-        path1 = '/pub/rinex/' + cyyyy + '/' + cdoy + '/' 
-        url1 = sopac + path1 + file1 
-
-        try:
-            wget.download(url1,file1)
-            subprocess.call(['uncompress', file1])
-            subprocess.call([crnxpath, fname])
-            subprocess.call(['rm', '-f',fname])
-        except:
-            subprocess.call(['rm', '-f',file1])
-            subprocess.call(['rm', '-f',fname])
-    else:
-        hatanaka_warning()
-
 
 def hatanaka_warning():
     """
@@ -856,7 +839,6 @@ def getsp3file_mgex(year,month,day,pCtr):
     pCtr : string
         name of the orbit center
 
-    this is spaghetti code, i apologize
 
     """
     foundit = False
@@ -867,11 +849,12 @@ def getsp3file_mgex(year,month,day,pCtr):
     name, fdir = sp3_name(year,month,day,pCtr) 
     gps_week = name[3:7]
     igps_week = int(gps_week)
+    # unfortunately the CDDIS archive was at one point computing the GPS week wrong
     igps_week_at_cddis = 1 + int(gps_week)
     #print('GPS week', gps_week,igps_week)
     file1 = name + '.Z'
 
-    # get the sp3 filename for the new format
+    # get the sp3 filename for the new format - which assumes it is gzipped
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
     if pCtr == 'gbm': # GFZ
         file2 = 'GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz'
@@ -3345,7 +3328,7 @@ def highrate_nz(station, year, month, day):
 def get_orbits_setexe(year,month,day,orbtype,fortran):
     """
     picks up and stores orbits as needed
-    also sets executable location (gpsonly vs gnss)
+    also sets executable location for translation (gpsonly vs multignss)
 
     Parameters
     ---------
@@ -3391,7 +3374,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igs')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gfz'):
-        print('using gfz sp3 file, GPS and GLONASS') # though I advocate gbm
+        print('using Final gfz sp3 file, GPS and GLONASS') # though I advocate gbm
         f,orbdir,foundit=getsp3file_flex(year,month,day,'gfz')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'igr'):
@@ -3403,7 +3386,8 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igs') # use default
         snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gbm'):
-        # this uses GFZ multi-GNSS and is rapid, but not super rapid
+        # this uses GFZ multi-GNSS and is rapid, but not super rapid - but from CDDIS ... 
+        # having it look first at GFZ for this file, which has a different name
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'gbm')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'wum'):
