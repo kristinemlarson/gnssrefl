@@ -62,11 +62,9 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
                 gnss2 : multi-GNSS, but uses IGN instead of CDDIS
 
-                brdc : rinex 3 broadcast file from CDDIS
+                ultra : ultra orbits directly from GFZ
 
-                ultra : ultra orbits from GFZ
-
-                rapid : rapid orbits from GFZ
+                rapid : rapid orbits directly from GFZ
 
          year : integer
             year
@@ -85,7 +83,7 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 'gnss', 'gfr', 'esa', 'gnss2', 'brdc', 'ultra', 'rapid','nav-esa', 'nav-sopac']
+    orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 'gnss', 'gfr', 'esa', 'gnss2', 'ultra', 'rapid','nav-esa', 'nav-sopac']
 
 
 #   assign to normal variables
@@ -153,19 +151,12 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 elif pCtr == 'gfr':
                 # rapid GFZ is available again ...
                     filename, fdir, foundit = g.rapid_gfz_orbits(year, month, day)
-            # also at GFZ
                 elif pCtr == 'ultra':
-                    hour = 0 # for now
+                    hour = 0 # for now only download hour 0 for ultra products
                     filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
                 elif pCtr == 'gnss2':
                 # use IGN instead of CDDIS
                     filename, fdir, foundit = g.avoid_cddis(year, month, day)
-                #elif pCtr == 'brdc':
-                # https://cddis.nasa.gov/archive/gnss/data/daily/2021/brdc/
-                # test code to get rinex 3 broadcast file
-                # will not store it in ORBITS because it is not used explicitly
-                # this is not operational as yet
-                #    filename, fdir, foundit = g.rinex3_nav(year, month, day)
                 else:
                     filename, fdir, foundit = g.getsp3file_mgex(year, month, day, pCtr)
             if foundit:

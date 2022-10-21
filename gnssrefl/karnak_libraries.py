@@ -259,8 +259,8 @@ def filename_plus(station9ch,year,doy,srate,stream):
 
 def ga_stuff(station, year, doy,rinexv=3):
     """
-    takes 9 ch station name and year and doy 
-    and returns some things that GA wants to download a Rinex 3 file
+    GA API requirements to download a Rinex 3 file
+
     parameters
     -----------
     station : string
