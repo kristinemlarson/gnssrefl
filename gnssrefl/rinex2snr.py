@@ -596,8 +596,9 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
 
 def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log):
     """
-    parameters : 
 
+    Parameters 
+    ---------
     navfile : string
 
     obstimes : ??
@@ -905,12 +906,14 @@ def extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp):
 
 def elev_limits(snroption):
     """
-    parameters
+    For given SNR option, returns elevation angle limits
+
+    Parameters
     ------------
     snroption : integer
         snr file delimeter
 
-    returns
+    Returns
     ----------
     emin: float
         minimum elevation angle (degrees)

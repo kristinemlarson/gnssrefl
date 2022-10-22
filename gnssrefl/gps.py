@@ -643,8 +643,6 @@ def hatanaka_warning():
     print('You are trying to convert Hatanaka files without having the proper')
     print('executable, CRX2RNX. See links in the gnssrefl documentation')
 
-
-
 def getnavfile(year, month, day):
     """
     picks up nav file and stores it in the ORBITS directory
@@ -679,19 +677,12 @@ def getnavfile(year, month, day):
     if not os.path.exists(navdir):
         subprocess.call(['mkdir',navdir])
 
-    if os.path.exists(nfile):
-        foundit = True
-    if (not foundit) and (os.path.exists(nfile + '.xz' )):
-        subprocess.call(['unxz',nfile + '.xz'])
-        foundit = True
-    if (not foundit) and (os.path.exists(nfile + '.gz' )):
-        subprocess.call(['gunzip',nfile + '.gz'])
-        foundit = True
+    foundit = check_navexistence(year,month,day)
 
     if (not foundit):
         navstatus = navfile_retrieve(navname, cyyyy,cyy,cdoy) 
         if navstatus:
-            print('\n navfile being moved to online storage area')
+            #print('\n navfile being moved to online storage area')
             subprocess.call(['mv',navname, navdir])
             foundit = True
         else:
@@ -2930,6 +2921,7 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     FileExists = False
     get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
     
+    cddis_is_failing = False
     if not os.path.isfile(navfile) :
         if not cddis_is_failing:
             print('SOPAC download did not work, so will try CDDIS')
@@ -3301,13 +3293,16 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f, orbdir, foundit = ultra_gfz_orbits(year,month,day,0)
         snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     else:
-        print('Requested a GPS only nav file')
         if ('nav' in orbtype):
+            print('Requested a GPS only nav file')
             if orbtype == 'nav':
                 f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
                 snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
             if orbtype == 'nav-sopac':
                 f,orbdir,foundit=getnavfile_archive(year, month, day,'sopac') # use default version, which is gps only
+                snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
+            if orbtype == 'nav-cddis':
+                f,orbdir,foundit=getnavfile_archive(year, month, day,'cddis') # use default version, which is gps only
                 snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
             if orbtype == 'nav-esa':
                 f,orbdir,foundit=getnavfile_archive(year, month, day,'esa') # use default version, which is gps only
@@ -3701,9 +3696,10 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     cdoy : string
         3 char day of year
 
-    returns
+    Returns
     --------
     navfile : string
+
     """
 
     cddisfile = 'brdc' + cdoy + '0.' +cyy  +'n'
@@ -3713,21 +3709,23 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     mdir = '/gps/data/daily/' + cyyyy + '/' + cdoy + '/' +cyy + 'n/'
 
     foundit = False
-    print('First try the unix compressed version')
-    try:
-        cddis_download_2022B(cddisfile_compressed,mdir)
-    except:
-        okokok = 1
+    # they used to use Z compression
+    if (int(cyyyy) < 2021):
+        print('Try the unix compressed version')
+        try:
+            cddis_download_2022B(cddisfile_compressed,mdir)
+        except:
+            okokok = 1
 
-    if os.path.isfile(cddisfile_compressed):
-        size = os.path.getsize(cddisfile_compressed)
-        if (size == 0):
-            subprocess.call(['rm',cddisfile_compressed])
-        else:
-            subprocess.call(['uncompress',cddisfile_compressed])
+        if os.path.isfile(cddisfile_compressed):
+            size = os.path.getsize(cddisfile_compressed)
+            if (size == 0):
+                subprocess.call(['rm',cddisfile_compressed])
+            else:
+                subprocess.call(['uncompress',cddisfile_compressed])
             foundit = True
 
-    print('Second: try the gzipped version')
+    print('Try the gzipped version')
     if (not foundit):
         try:
             cddis_download_2022B(cddisfile_gzip,mdir)
@@ -5347,8 +5345,6 @@ def cddis_download_2022B(filename,directory):
         print('No file found')
         subprocess.call(['rm',filename])
 
-
-
 def getnavfile_archive(year, month, day, archive):
     """
     picks up nav file from a specific archive and stores it in the ORBITS directory
@@ -5381,13 +5377,9 @@ def getnavfile_archive(year, month, day, archive):
     """
     # make sure directories exist for orbits
     ann = make_nav_dirs(year)
+    month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
     navname,navdir = nav_name(year, month, day)
-    if (day == 0):
-        doy = month
-        year, month, day, cyyyy,cdoy, YMD = ydoy2useful(year,doy)
-        cyy = cyyyy[2:4]
-    else:
-        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+
 
     foundit = check_navexistence(year,month,day)
     
@@ -5398,6 +5390,8 @@ def getnavfile_archive(year, month, day, archive):
         if (archive == 'sopac'):
             xx = get_sopac_navfile(navname,cyyyy,cyy,cdoy)
         # found it at one of the preferred archives
+        if (archive == 'cddis'):
+            get_cddis_navfile(navname,cyyyy,cyy,cdoy)
         if os.path.exists(navname):
             subprocess.call(['mv',navname, navdir])
             foundit = True
