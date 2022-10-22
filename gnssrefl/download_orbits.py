@@ -83,7 +83,7 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 'gnss', 'gfr', 'esa', 'gnss2', 'ultra', 'rapid','nav-esa', 'nav-sopac']
+    orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 'gnss', 'gfr', 'esa', 'gnss2', 'ultra', 'rapid','nav-esa', 'nav-sopac','nav-cddis']
 
 
 #   assign to normal variables
@@ -135,6 +135,10 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 print('\n SUCCESS:', navdir+'/'+navname)
         elif (pCtr == 'nav-esa'):
             navname, navdir, foundit = g.getnavfile_archive(year, month, day,'esa')
+            if foundit:
+                print('\n SUCCESS:', navdir+'/'+navname)
+        elif (pCtr == 'nav-cddis'):
+            navname, navdir, foundit = g.getnavfile_archive(year, month, day,'cddis')
             if foundit:
                 print('\n SUCCESS:', navdir+'/'+navname)
         elif (pCtr == 'nav-sopac'):

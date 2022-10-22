@@ -2919,7 +2919,7 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
     """
     navname = navfile
     FileExists = False
-    get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
+    xx=get_sopac_navfile(navfile,cyyyy,cyy,cdoy) 
     
     cddis_is_failing = False
     if not os.path.isfile(navfile) :
@@ -3592,24 +3592,22 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     navfile : string (which was sent)
 
     """
+    foundfile = False
     sopac = 'ftp://garner.ucsd.edu'
     navfile_sopac1 =  navfile   + '.Z' # regular nav file
     navfile_compressed = navfile_sopac1
     url_sopac1 = sopac + '/pub/rinex/' + cyyyy + '/' + cdoy + '/' + navfile_sopac1
 
-    # sometimes it is not compressed ... but I am going to ignore these times
-    navfile_sopac2 =  navfile
-    url_sopac2 = sopac + '/pub/rinex/' + cyyyy + '/' + cdoy + '/' + navfile_sopac2
 
-    foundfile = False
     try:
         wget.download(url_sopac1,navfile_compressed)
         subprocess.call(['uncompress',navfile_compressed])
-        foundfile = True
     except:
         okokok = 1
 
-    if not foundfile:
+    if os.path.exists(navfile):
+        foundfile = True
+    else:
         print('Corrupted file/download failures at SOPAC')
         subprocess.call(['rm','-f',navfile_compressed])
         subprocess.call(['rm','-f',navfile])
@@ -5395,6 +5393,9 @@ def getnavfile_archive(year, month, day, archive):
         if os.path.exists(navname):
             subprocess.call(['mv',navname, navdir])
             foundit = True
+        else:
+            foundit = False
+
     if (not foundit):
         print('No navfile found at ', archive)
 
