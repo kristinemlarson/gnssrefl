@@ -4400,66 +4400,6 @@ def get_noaa_obstimes_plus(t):
     return obstimes, modjulian
 
 
-def queryUNR(station):
-    """
-    use UNR database to get a priori lat/long in degrees
-    and ellipsoidal height (meters)
-    """
-    xdir = os.environ['REFL_CODE']
-    print('Check for the UNR station coordinate database')
-
-    lower = station
-    if len(lower) != 4:
-        print('No coordinates in the UNR database for ', lower)
-        print('The station name must be four characters long')
-        return
-    # if you used github and run the code from that directory
-    nfile = 'gnssrefl/Data.names'
-    pfile = 'gnssrefl/Data.pos'
-    if os.path.isfile(nfile) and os.path.isfile(pfile):
-       print('found the station database files in the gnssrefl directory')
-    else:
-        nfile = xdir + '/Files/Data.names'
-        pfile = xdir + '/Files/Data.pos'
-        if os.path.isfile(nfile) and os.path.isfile(pfile):
-            print('found the station database files in the REFL_CODE Files directory')
-        else:
-            print('try to download the station database files from github for you')
-            try:
-                url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/Data.names' 
-                url2= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/Data.pos' 
-                wget.download(url1,nfile)
-                wget.download(url2,pfile)
-            except:
-                print('failed to get the station database files')
-                return
-    if os.path.isfile(nfile) and os.path.isfile(pfile):
-        labels = np.genfromtxt(nfile, delimiter=' ', dtype=str)
-        raw_data = np.genfromtxt(pfile, delimiter=' ' )
-        data = {label: row for label, row in zip(labels, raw_data)}
-    # should put this in a try
-        station = station.upper()
-        llat = 0; llon = 0; height = 0;
-        try:
-            llh = data[station]
-            llat =llh[0]; llon =llh[1]; height =llh[2]
-        except:
-            print('nada-no coordinates in the database')
-
-        if (llat != 0):
-            print('\n', lower, llat, llon, height)
-            x,y,z=llh2xyz(llat,llon,height)
-            print("%15.4f %15.4f %15.4f "% (x,y,z) )
-        else:
-            print('No coordinates in the UNR database for ', lower)
-    else:
-        print('Cannot find the requesite UNR files, which usually live in the gnssrefl directory below')
-        print('where you installed the gnssrefl code or in $REFL_CODE/Files.')
-        return 0,0,0
-
-    # lat and lon are in degrees
-    return llat,llon,height
-
 def final_gfz_orbits(year,month,day):
     """
     downloads gfz final orbit and stores in $ORBITS

@@ -26,6 +26,7 @@ def download_prn_gps():
     """
     url='https://sideshow.jpl.nasa.gov/pub/gipsy_products/gipsy_params/PRN_GPS.gz'
     file_name='PRN_GPS.gz'
+    print('Downloading the file from JPL')
   
     try:
         urllib.request.urlretrieve(url, file_name)

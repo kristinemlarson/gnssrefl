@@ -146,6 +146,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     year_end = year_list[-1]
     doy_st = doy_list[0]
     doy_end = doy_list[-1]
+    print(doy_st, doy_end)
     # 2021 september 12 KL
     # i would like to put this in rinex2snr_cl.py - but I am trying to avoid increasing
     # the workload for the Notebook programmers before the short course.
@@ -179,13 +180,12 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                     subprocess.call(['rm', fname]); snre = False
                 else:
                     print('SNR file already exists', fname)
-                    return
 
             illegal_day = False
             if (doy > dec31):
                 illegal_day = True
 
-            if (not illegal_day):
+            if (not illegal_day) and (not snre):
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
                 if nol:

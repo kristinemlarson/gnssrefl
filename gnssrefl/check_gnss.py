@@ -81,7 +81,7 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
     goal (as described in gnss_Stats), dec_rate (0 for nothing)
     and receiverrate ('low' or 'high')
 
-    parameters
+    Parameters
     -----------
     station : string
         four character station name
@@ -100,7 +100,7 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
     receiverrate : string 
         high or low 
 
-    returns
+    Returns
     ------------
     True for some unknown reason
 

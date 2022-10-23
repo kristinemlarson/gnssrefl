@@ -1,7 +1,5 @@
 #
-# Author: Kristine M. Larson
-# Date: august 25, 2020
-# Purpose: help set up json input file needed for gnssIR_lomb.py
+# set up json input file needed for gnssir
 
 import argparse
 import json
