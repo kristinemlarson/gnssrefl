@@ -116,9 +116,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     """
     # 
-    print('Translator: ', translator)
-    print('Overwrite option: ', overwrite)
-
     # do not allow illegal skipit values
     if skipit < 1:
         skipit = 1
@@ -146,7 +143,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     year_end = year_list[-1]
     doy_st = doy_list[0]
     doy_end = doy_list[-1]
-    print(doy_st, doy_end)
+    #print(doy_st, doy_end)
     # 2021 september 12 KL
     # i would like to put this in rinex2snr_cl.py - but I am trying to avoid increasing
     # the workload for the Notebook programmers before the short course.

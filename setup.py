@@ -23,7 +23,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astro
 
 setup(
     name="gnssrefl",
-    version="1.1.7",
+    version="1.1.8",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -62,6 +62,7 @@ setup(
             'rinex3_rinex2= gnssrefl.rinex3_rinex2:main',
             'veg_multiyr= gnssrefl.veg_multiyr:main',
             'check_rinex= gnssrefl.check_rinex:main',
+            'check_rinex2= gnssrefl.check_rinex2:main',
             'rinex3_snr= gnssrefl.rinex3_snr:main',
             'filesizes= gnssrefl.filesizes:main',
             'invsnr= gnssrefl.invsnr_cl:main',
