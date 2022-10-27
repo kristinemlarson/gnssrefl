@@ -37,9 +37,9 @@ using the default GPS orbit option and the cddis archive:
 <code>rinex2snr mchl00aus 2017 1 -doy_end 365 -year_end 2018 -archive cddis </code>
 
 If you have any difficult downloading these RINEX 3 files, UNAVCO has kindly downloaded and converted 
-a few years of files into RINEX 2.11 that includes L2C data. There the command would be:
+2017 RINEX 2.11 files that include L2C data. For that year - and only that year - the command would be:
 
-<code>rinex2snr mchl 2017 1 -doy_end 365 -year_end 2018 -archive special</code>
+<code>rinex2snr mchl 2017 1 -doy_end 365 -archive special</code>
 
 Use the <code>quickLook</code> with the l2c frequency to give a look to the data quality.
 Then set up your parameters with <code>make_json_input</code>

@@ -15,4 +15,5 @@ dependencies:
      - myst_parser
      - nbsphinx
      - gnssrefl
+     - numpydoc
 #     - git+https://github.com/kristinemlarson/gnssrefl.git
