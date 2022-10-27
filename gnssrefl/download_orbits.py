@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-downloads Orbit files
-author: kristine larson
-2020sep03 - modified environment variable requirement
+downloads Orbit files from various sources
 """
 import argparse
-import gnssrefl.gps as g
 import sys
+
+import gnssrefl.gps as g
 
 
 def parse_arguments():
@@ -26,6 +25,7 @@ def parse_arguments():
 def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None ):
     """
         command line interface for download_orbits
+
         Parameters:
         ___________
         orbit : string
@@ -38,7 +38,11 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
                 gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days)
 
-                nav : GPS broadcast, adequate for reflectometry.
+                nav : GPS broadcast, adequate for reflectometry. Searches various places
+
+                nav-sopac : GPS broadcast, adequate for reflectometry. 
+
+                nav-esa : GPS broadcast, adequate for reflectometry. 
 
                 igs : IGS precise, GPS only
 
@@ -58,11 +62,9 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
                 gnss2 : multi-GNSS, but uses IGN instead of CDDIS
 
-                brdc : rinex 3 broadcast file from CDDIS
+                ultra : ultra orbits directly from GFZ
 
-                ultra : ultra orbits from GFZ
-
-                rapid : rapid orbits from GFZ
+                rapid : rapid orbits directly from GFZ
 
          year : integer
             year
@@ -81,7 +83,7 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 'gnss', 'gfr', 'esa', 'gnss2', 'brdc', 'ultra', 'rapid']
+    orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 'gnss', 'gfr', 'esa', 'gnss2', 'ultra', 'rapid','nav-esa', 'nav-sopac','nav-cddis']
 
 
 #   assign to normal variables
@@ -127,8 +129,20 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
     for d in range(d1, d2):
 
         year,month,day= g.ydoy2ymd(year,d)
-        if pCtr == 'nav':
+        if (pCtr == 'nav'):
             navname, navdir, foundit = g.getnavfile(year, month, day)
+            if foundit:
+                print('\n SUCCESS:', navdir+'/'+navname)
+        elif (pCtr == 'nav-esa'):
+            navname, navdir, foundit = g.getnavfile_archive(year, month, day,'esa')
+            if foundit:
+                print('\n SUCCESS:', navdir+'/'+navname)
+        elif (pCtr == 'nav-cddis'):
+            navname, navdir, foundit = g.getnavfile_archive(year, month, day,'cddis')
+            if foundit:
+                print('\n SUCCESS:', navdir+'/'+navname)
+        elif (pCtr == 'nav-sopac'):
+            navname, navdir, foundit = g.getnavfile_archive(year, month, day,'sopac')
             if foundit:
                 print('\n SUCCESS:', navdir+'/'+navname)
         else:
@@ -141,19 +155,12 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 elif pCtr == 'gfr':
                 # rapid GFZ is available again ...
                     filename, fdir, foundit = g.rapid_gfz_orbits(year, month, day)
-            # also at GFZ
                 elif pCtr == 'ultra':
-                    hour = 0 # for now
+                    hour = 0 # for now only download hour 0 for ultra products
                     filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
                 elif pCtr == 'gnss2':
                 # use IGN instead of CDDIS
                     filename, fdir, foundit = g.avoid_cddis(year, month, day)
-                #elif pCtr == 'brdc':
-                # https://cddis.nasa.gov/archive/gnss/data/daily/2021/brdc/
-                # test code to get rinex 3 broadcast file
-                # will not store it in ORBITS because it is not used explicitly
-                # this is not operational as yet
-                #    filename, fdir, foundit = g.rinex3_nav(year, month, day)
                 else:
                     filename, fdir, foundit = g.getsp3file_mgex(year, month, day, pCtr)
             if foundit:

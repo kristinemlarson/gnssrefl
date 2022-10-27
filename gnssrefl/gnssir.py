@@ -16,25 +16,26 @@ import gnssrefl.refraction as refr
 
 def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     """
-    my attempt to separate the inputs to the code and the guts of the code
-    inputs are station name, year, day of year (integers)
-    snr_type is an integer (99, 66, etc). lsp is a json
 
-    check to see if there were any results before sending a plot to the screen
+    Computes lomb scargle periodograms for a given station, year, day of year etc.
 
     Parameters
+    ---------------
 
     station: string
 
     year : integer
 
     doy : integer
+        day of year
 
     snr_type : integer
+        snr file type
 
     extension : string
 
     lsp : dictionary
+        REQUIRES DESCRIPTION
         
     """
 
@@ -194,8 +195,10 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
 
 def set_refraction_params(station, dmjd,lsp):
     """
-    Parameters
+    set values used in refraction correction
 
+    Parameters
+    ------------
     station: string
         4 character station name
 
@@ -204,7 +207,6 @@ def set_refraction_params(station, dmjd,lsp):
 
     lsp : dictionary
 
-    called from guts.  pick up refr info
     """
     xdir = os.environ['REFL_CODE']
     p = 0; T = 0; irefr = 0
@@ -221,6 +223,22 @@ def set_refraction_params(station, dmjd,lsp):
 
 def apply_refraction_corr(lsp,ele,p,T):
     """
+
+    Parameters
+    -----------
+    lsp : dictionary
+        info from make_json_input
+    ele : numpy array of floats
+        elevation angles  (deg)
+    p : float
+        pressure
+    T : float
+        temperature (C)
+
+    Returns
+    --------
+    ele : numpy array of floats
+         elevation angle (deg)
     """
     if lsp['refraction']:
         #print('<<<<<< apply refraction correction >>>>>>')
@@ -231,10 +249,26 @@ def apply_refraction_corr(lsp,ele,p,T):
 
 def local_update_plot(x,y,px,pz,ax1, ax2,failure):
     """
-    input plt_screen integer value from gnssIR_lomb.
-    (value of one means update the SNR and LSP plot)
-    and values of the SNR data (x,y) and LSP (px,pz)
-    added fail criterion to put out bad periodograms in gray
+
+    updates result plot
+
+    Parameters
+    ----------
+    x : numpy array
+        elevation angle (deg)
+    y : numpy array
+        SNR (volt/volt)
+    px : numpy array
+        reflector height (m)
+    pz : numpy array
+        spectral amplitude (volt/volt)
+    ax1 : matplotlib figure control
+        top plot
+    ax2 : matplotlib figure control
+        bottom plot
+    failure : boolean
+        whether periodogram fails QC 
+
     """
     if failure:
         ax1.plot(x,y,color='gray',linewidth=0.5)
@@ -246,8 +280,10 @@ def local_update_plot(x,y,px,pz,ax1, ax2,failure):
 
 def plot2screen(station, f,ax1,ax2,pltname):
     """
-    Parameter
+    Add axis information and Send the plot to the screen
 
+    Parameters
+    ----------
     station : string
         4 character station ID
 
@@ -269,16 +305,20 @@ def plot2screen(station, f,ax1,ax2,pltname):
 
 def read_json_file(station, extension):
     """
-    picks up json instructions for periodogram
-    inputs are the station name and an extension (which can just be '')
+    picks up json instructions for calculation of lomb scargle periodogram
 
-    Parameter
-
+    Parameters
+    ------------
     station : string
         4 character station name
 
     extension : string
-        
+        experimental directory - default is ''
+
+    Returns
+    -------
+    lsp : dictionary
+
     """
     lsp = {} # ???
     instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
@@ -300,15 +340,3 @@ def read_json_file(station, extension):
     return lsp
 
 
-# old code
-    #print(obsfile, 'snrexistence',snre,' and ', snr_type)
-    # removing this option
-    #if (not snre) and (not lsp['seekRinex']):
-    #    print('The SNR file does not exist and you have set the seekRinex variable to False')
-    #    print('Use rinex2snr.py to make SNR files')
-    #    #sys.exit()
-    #    allGood = 0
-    #if (not snre) and lsp['seekRinex']:
-    #    print('The SNR file does not exist. I will try to make a GPS only file using the Fortran option.')
-    #    rate = 'low'; dec_rate = 0; orbtype = 'nav'
-    #    g.quick_rinex_snrC(year, doy, station, snr_type, orbtype,rate, dec_rate)

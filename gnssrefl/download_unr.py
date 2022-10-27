@@ -2,7 +2,6 @@
 """
 downloads East North Vertical nevada reno position files
 IGS2014 frame
-author: kristine larson
 """
 import argparse
 import wget
@@ -23,8 +22,10 @@ def parse_arguments():
 def download_unr(station: str):
     """
     Command line interface for download_blewitt
+
     Parameters:
     ___________
+
     station : string
         4 character ID of the station name
     """

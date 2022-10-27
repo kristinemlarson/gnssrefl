@@ -53,13 +53,18 @@ def gogetit(dir1, filename, ext):
 
 def swapRS(stream):
     """
-    profound function that swaps R to S and vice versa
+    function that swaps R to S and vice versa for RINEX 3 files
+
     parameters
     -------
     stream : string
          RINEX 3 file streaming acronym (S or R)
+
+    returns
+    -----------
     newstream : string
          the opposite of what was in stream
+
     """
     if stream == 'R':
         newstream = 'S'
@@ -105,7 +110,7 @@ def just_bkg(cyyyy, cdoy, file_name):
 
 def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     """
-    main code for seamless archive for rinex 3 files ... 
+    main code for seamless archive for RINEX 3 files ... 
 
     parameters
     -----------
@@ -129,6 +134,7 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
 
     debug : boolean
         whether debugging statements printed
+
     returns
     ----------
     file_name : string
@@ -253,8 +259,8 @@ def filename_plus(station9ch,year,doy,srate,stream):
 
 def ga_stuff(station, year, doy,rinexv=3):
     """
-    takes 9 ch station name and year and doy 
-    and returns some things that GA wants to download a Rinex 3 file
+    GA API requirements to download a Rinex 3 file
+
     parameters
     -----------
     station : string
@@ -389,7 +395,7 @@ def universal_rinex2(station, year, doy, archive):
 
     dname, oname, cyyyy, cdoy = rinex2names(station,year,doy)
     if os.path.exists(oname):
-        print('RINEX o File is already on disk')
+        #print('RINEX o File is already on disk')
         return oname, True 
 
     print('Searching the ', archive, ' archive for ', station)

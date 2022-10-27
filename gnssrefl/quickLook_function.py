@@ -21,7 +21,7 @@ def read_snr_simple(obsfile):
     """
     parameters
     ------------
-    obsfile : str
+    obsfile : string
         name of SNR file
 
     returns
@@ -85,7 +85,8 @@ def read_snr_simple(obsfile):
 
 def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,**kwargs):
     """
-    parameters:
+    parameters
+    -----------
     station : string
         name (4 char) 
 
@@ -115,7 +116,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
     pele is the elevation angle limits for the polynomial removal.  units: degrees
 
-    satsel
+    satsel : integer
+        satellite number?
 
     PkNoise : float
         peak to noise ratio for QC
@@ -256,8 +258,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             for satNu in satlist:
                 x,y,Nv,cf,UTCtime,avgAzim,avgEdot,Edot2,delT= g.window_data(s1,s2,s5,s6,s7,s8,sat,ele,azi,t,edot,f,az1,az2,e1,e2,satNu,polyV,pele,screenstats) 
                 allpoints = allpoints + Nv
-                if screenstats:
-                    print('ALL tracks: Azim {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} Npts {3:3.0f} between Azimuths {4:3.0f}-{5:3.0f}'.format( avgAzim,satNu,UTCtime,Nv, az1, az2))
+                # if screenstats:
+                    #print('ALL tracks: Azim {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} Npts {3:3.0f} between Azimuths {4:3.0f}-{5:3.0f}'.format( avgAzim,satNu,UTCtime,Nv, az1, az2))
                 if Nv > minNumPts:
                     maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,desiredP,polyV,minH) 
                     nij =   pz[(px > NReg[0]) & (px < NReg[1])]
@@ -351,10 +353,32 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     """
     simple visualizer of "good" and "bad" azimuths
-    input is a filename, the station name, and the min and max RH
-    and the peak to noise, required amplitude criteria, and frequency used
-    should not even call this code if there are no data.  need to fix this
-    author: kristine larson
+
+    Parameters
+    -----------
+    fname : str
+        filename
+    station : str
+        4 char station name
+    year : int
+        full year
+    doy : int
+        day of year
+    h1 : float
+        minimum reflector height (m)
+    h2 : float
+        max reflector height (m)
+    PkNoise : float
+        peak 2 noise QC
+    reqAmp : float
+        required LSP amplitude
+    freq : int
+        frequency
+    e1 : float
+        minimum elevation angle (deg)
+    e2 : float
+        maximum elevation angle (deg)
+
     """
     try:
         # added this to get rid of the warning when the file has no bad points in it
@@ -362,11 +386,11 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
             warnings.simplefilter("ignore")
             a = np.loadtxt(fname,comments='%')
     except:
-        print('no results in the file')
+        print('No results in the file')
 
     #print(a.ndim, len(a))
     if (a.ndim == 1) or (len(a) == 0):
-        print('no results in the file')
+        print('No results in the file')
         return
 
     ij = (a[:,6] == 1) # good retrievals
@@ -423,13 +447,3 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     print('plot saved to ', f)
     plt.savefig(f)
 
-# old code
-#print('I will try to pick up a RINEX file ')
-#print('and translate it for you. This will be GPS only.')
-#print('For now I will check all the official archives for you.')
-#rate = 'low'; dec_rate = 0; archive = 'all'; 
-#rinex.conv2snr(year, doy, station, int(snr_type), 'nav',rate,dec_rate,archive,fortran)
-#if os.path.isfile(obsfile):
-#    print('the SNR file now exists')  
-#else:
-#    print('the RINEX file did not exist, had no SNR data, or failed to convert, so exiting.')

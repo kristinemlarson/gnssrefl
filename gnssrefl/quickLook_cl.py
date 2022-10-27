@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-author: kristine m. larson
 quickLook command line function 
-# 
 """
 import argparse
 import sys
 
-# my codes
+# internal codes
 import gnssrefl.gps as g
 import gnssrefl.quickLook_function as quick
 
@@ -34,7 +32,6 @@ def parse_arguments():
     parser.add_argument("-sat", default=None, type=int, help="satellite")
     parser.add_argument("-screenstats", default=None, type=str, help="if True, Success and Failure info printed to the screen")
     parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio")
-    # want to add this - waiting for Kelly
     #parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
     #parser.add_argument("-fortran", default=None, type=str, help="Default is True: use Fortran translators")
 

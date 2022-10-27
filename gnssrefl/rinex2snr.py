@@ -116,7 +116,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     """
     # 
-    print('Translator: ', translator)
     # do not allow illegal skipit values
     if skipit < 1:
         skipit = 1
@@ -144,6 +143,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     year_end = year_list[-1]
     doy_st = doy_list[0]
     doy_end = doy_list[-1]
+    #print(doy_st, doy_end)
     # 2021 september 12 KL
     # i would like to put this in rinex2snr_cl.py - but I am trying to avoid increasing
     # the workload for the Notebook programmers before the short course.
@@ -172,16 +172,16 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             # now it unzips if that version exists
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
-                print('SNR file already exists', fname)
                 if overwrite:
-                    print('overwriting')
-                    subprocess.call(['rm', fname])
-                    snre = False
+                    print('File exists, you requested overwriting, so will delete existing file')
+                    subprocess.call(['rm', fname]); snre = False
+                else:
+                    print('SNR file already exists', fname)
+
             illegal_day = False
             if (doy > dec31):
                 illegal_day = True
-                #print('illegal day',illegal_day, doy, dec31)
-            # combining these so i don't have to indent everything
+
             if (not illegal_day) and (not snre):
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
@@ -392,7 +392,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                     in6 = g.binary(errorlog)
                     log.write('SNR file {0:50s} \n will use hybrid of python and fortran to make \n'.format( snrname))
                     # these are calls to the fortran codes that have been ported to be called from python
-                    if (orbtype  == 'gps') or (orbtype == 'nav'):
+                    if (orbtype  == 'gps') or ('nav' in orbtype):
                         gpssnr.foo(in1,in2,in3,in4,in5,in6)
                     else:
                         if (orbtype == 'ultra') or (orbtype == 'wum'):
@@ -593,8 +593,9 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
 
 def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log):
     """
-    parameters : 
 
+    Parameters 
+    ---------
     navfile : string
 
     obstimes : ??
@@ -902,12 +903,14 @@ def extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp):
 
 def elev_limits(snroption):
     """
-    parameters
+    For given SNR option, returns elevation angle limits
+
+    Parameters
     ------------
     snroption : integer
         snr file delimeter
 
-    returns
+    Returns
     ----------
     emin: float
         minimum elevation angle (degrees)

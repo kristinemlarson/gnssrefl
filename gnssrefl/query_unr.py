@@ -2,10 +2,6 @@
 """
 extracts coordinates for stations that were in the UNR
 database (when I downloaded it ;-)
-input four character station name, lowercase
-
-2021 November 2
-modified to use UNR database. Downloads it if you don't have it.
 
 """
 import argparse
@@ -21,7 +17,7 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="station name - 4 char - lowercase ", type=str)
+    parser.add_argument("station", help="4 ch station name (lowercase)", type=str)
 
     args = parser.parse_args()
 

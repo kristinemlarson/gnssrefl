@@ -39,20 +39,22 @@ def parse_arguments():
 
 def filter_out_snow(station, year1, year2, fr,snowmask):
     """
-    only called if the snow filter file exists
+    attempt to remove outliers from snow. only called if the snow filter file exists
 
-    parameters
+    Parameters
     ----------
-    station : string
+    station : str
 
     year1 : integer
+        starting year
 
     year2 : integer
+        ending year
 
     fr : integer
         frequency
 
-    snowmask : string
+    snowmask : str
         name/location of the snow mask file
 
     """
@@ -128,12 +130,12 @@ def load_avg_phase(station,fr):
     loads a previously computed daily average phase solution.
     this is NOT the same as the multi-track phase results.
 
-    parameters
+    Parameters
     -----------
-    station : string
+    station : str
         4 character ID, lowercase
 
-    returns
+    Returns
     --------
     avg_exist : boolean
 
@@ -169,10 +171,10 @@ def load_avg_phase(station,fr):
 
 def load_sat_phase(station, year, year_end, freq):
     """
-    given station name and frequency, pick up the phase data from local results section
+    Picks up the phase data from local results section
     return to main code whether dataexist, and np arrays of year, doy, hr, phase, azdata, ssat
 
-    parameters
+    Parameters
     -------------
     station : string
         four character
@@ -184,7 +186,10 @@ def load_sat_phase(station, year, year_end, freq):
     freq : integer
         GPS frequency (1,20)
 
-    return reflector heights and amplitudes
+    Returns
+    -------
+    reflector heights and amplitudes
+
     """
     print('Requested frequency: ', freq)
     dataexist = False
@@ -272,30 +277,6 @@ def normAmp(amp, basepercent):
     return Namp
 
 
-def do_quad(vquad, year, year_end):
-    """
-    stacks all the phase results for a given quadrant
-    returns 3 vector (year, doy, phase)
-    requires 5 for an average
-
-    """
-    vout = np.empty(shape=[0, 3])
-    y1 = vquad[:, 0]
-    d1 = vquad[:, 1]
-    phq = vquad[:, 2]
-    for year in range(year, year_end+1):
-        for doy in range(1, 367):
-            ph1 = phq[(y1 == year) & (d1 == doy)]
-            if len(ph1) > 3:
-                meanphase = np.mean(ph1)
-                newl = np.hstack((year, doy, meanphase))
-                # in which kristine learns tha vertically stacking
-                # the transpose is the same as horizontally stacking ;-)
-                #newl = np.vstack((year,doy,meanphase)).T
-                vout = np.vstack((vout, newl))
-    return vout
-
-
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen: bool = True, screenstats: bool = False, 
         min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, snow_filter: bool = False, circles: bool=False):
     """
@@ -340,7 +321,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
     Returns
     _______
-    Returns two files:
 
     - Returns daily phase results in a file at $REFL_CODE/<year>/phase/<station>_phase.txt
         with columns: Year DOY Ph Phsig NormA MM DD

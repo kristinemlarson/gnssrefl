@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 command line tool for the rinex2snr module
-pretty much what it sounds like - it translates rinex files and makes SNR files
-kristine larson
-2021aug01 added mk option for uppercase file names
+it translates rinex files and makes SNR files
 
 compile the fortran first
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
 
-2022feb15 added karnak_sub for rinex3
 """
 
 import argparse
@@ -31,14 +28,14 @@ def parse_arguments():
     parser.add_argument("-snr", default=None, help="snr file ending", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, gps, gps+glo, gnss, rapid or you can specify nav,igs,igr,jax,gbm,grg,wum,gfr,ultra")
-    parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX 2 sample rate: low or high. This parameter is only needed for archive searches.")
+    parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX sample rate: low or high. This parameter is only needed for archive searches.")
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
                         help="True means only use RINEX files on local machine")
     parser.add_argument("-fortran", default=None, metavar='False', type=str,
                         help="True means use Fortran RINEX translators ")
     parser.add_argument("-archive", default=None, metavar='all',
-                        help="specify one archive: unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan,jp,bfg,jeff,special", type=str)
+                        help="specify one archive for RINEX obs files: unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan,jp,bfg,jeff,special", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
@@ -47,12 +44,11 @@ def parse_arguments():
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
     parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
     parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
-    parser.add_argument("-cddis_offline", default=None, help="use True when CDDIS is offline", type=str)
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly','cddis_offline']
+    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -62,7 +58,7 @@ def parse_arguments():
 def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav', rate: str = 'low', dec: int = 0,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
-              stream: str = 'R', mk: bool = False, weekly: bool = False, cddis_offline: bool = False):
+              stream: str = 'R', mk: bool = False, weekly: bool = False):
     """
         rinex2snr translates RINEX files to an SNR format. This function will fetch orbit files for you.
 
@@ -118,7 +114,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
                 True : uses fortran to translate rinex
 
         nolook : boolean, optional
-            This parameter tells the code not to get the rinex files online if the files exist locally already.
+            This parameter tells the code not to retrieve RINEX files from your local machine.
             default is False.
 
         archive : string, optional
@@ -138,7 +134,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
                 bfg (German Agency for water research, only Rinex 3, requires password)
                 jp (GSI, requires password)
                 jeff (My good friend Professor Freymueller!)
-                special (set aside files at UNAVCO)
+                special (set aside files at UNAVCO for reflectometry users)
                 all
 
         doy_end : int, optional
@@ -171,9 +167,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
             Takes 1 out of every 7 days in the doy-doy_end range (one file per week) - used to save time.
             Default is False.
 
-        cddis_offline: boolean, optional
-            alert the system if CDDIS is failing
-
 
         """
     # validate parameter types
@@ -198,11 +191,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         sys.exit()
 
     # currently allowed orbit types - shanghai removed 2020sep08
-    # added GFZ rapid, aka gfr 2021May19 but it does not work anymore.  point it to gbm
     #
-    # added ESA, thank you to Makan
     orbit_list = ['gps', 'gps+glo', 'gnss', 'nav', 'igs', 'igr', 'jax', 'gbm',
-                  'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2']
+                  'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2','nav-sopac','nav-esa','nav-cddis']
     if orb not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
@@ -332,7 +323,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 # the weekly option
     skipit = 1
     if weekly:
-        print('you have invoked the weekly option')
+        print('You have invoked the weekly option')
         skipit = 7
 
     # change skipit to be sent to rinex2snr.py
@@ -341,10 +332,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     # this makes the correct lists in the function
     doy_list = [doy, doy2]
     year_list = list(range(year1, year2+1))
-
-    # default is to use hybrid for RINEX translator
-    # why is this logic here?  there is earlier logic for the exact same questions
-
 
     # the Makan option
     if mk:

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 converts XYZ to latlonht
-kristine larson
 """
 import argparse
 import sys
