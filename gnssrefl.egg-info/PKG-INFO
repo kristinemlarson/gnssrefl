@@ -1,3 +1,17 @@
+Metadata-Version: 2.1
+Name: gnssrefl
+Version: 1.1.7
+Summary: A GNSS reflectometry software package 
+Home-page: https://github.com/kristinemlarson/gnssrefl/
+Author: Kristine Larson
+Author-email: kristinem.larson@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.9
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 
 <p align=center>
 <img src="https://morefunwithgps.com/public_html/gnssrefl-images-sm.jpg" width=600 />
@@ -53,6 +67,8 @@ NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was developed with suppo
 
 This documentation was updated on October 4, 2022
 <HR>
+
+
 
 
 
