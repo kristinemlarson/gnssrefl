@@ -18,6 +18,7 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
     downloads/writes data within one year
 
     Parameters
+    ------------
 
     station : string
 
@@ -42,12 +43,16 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
         True if csv output wanted
         default is False
 
+    Returns
+    ----------
+    tt : numpy array 
+        modified julian date for water measurements
 
-    fout - fileID for writing the results
-    year that you want to write out
-    month1 and month2 are the starting and ending months
-    metadata = boolean to decide whether to write the metadata to the screen
-    tt - MJD
+    obstimes : numpy array
+        datetime format, updated with new data
+
+    slevel : numpy array
+        sea level (m) updated with new data
 
     """
     cyyyy = str(year)
@@ -80,7 +85,6 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
     """
     downloads NOAA measurements > one month
 
-
     Parameters:
     -----------
     station : string
@@ -104,7 +108,7 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
     csv : boolean 
         whether output file is csv format
 
-    returns:
+    Returns:
     --------------
     tt : list of times 
         modified julian day
@@ -139,7 +143,7 @@ def noaa2me(date1):
     date1 : string
         time in format YYYYMMDD for year month and day
 
-    returns 
+    Returns 
     -------
     year1 : integer
 
@@ -264,7 +268,7 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
         Downloads NOAA tide gauge files
         Downloads a json and converts it to plain txt with columns!
 
-        Parameters:
+        Parameters 
         ___________
         station : string
             7 character ID of the station.

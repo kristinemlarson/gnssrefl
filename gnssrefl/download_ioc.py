@@ -15,11 +15,46 @@ import matplotlib.pyplot as plt
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
 
+def find_start_stop(year,m):
+    """
+    Parameters
+    ----------
+    year : int
+        full year
+    m : int
+        month number 
+
+    Returns
+    --------
+    d1 : str
+        yyyymmdd for first day of requested month
+    d2 : str
+        yyyymmdd for last day of requested month
+
+    """
+    cyyyy = str(year)
+    cmm = '{:02d}'.format(m)
+    d1 = cyyyy + cmm + '01'
+    if m in [1,3,5,7,8,10,12]:
+        d2 = cyyyy + cmm + '31'
+    else:
+        if m == 2:
+            if (g.dec31(year) == 366): # leap year
+                d2 = cyyyy + cmm + '29'
+            else:
+                d2 = cyyyy + cmm + '28'
+        else:
+            d2 = cyyyy + cmm + '30'
+
+    return d1, d2
+
+
 def quickp(station,t,sealevel):
     """
     makes a quick plot of sea level for station s
 
     Parameters
+    -----------
 
     station : string
         station name
@@ -102,12 +137,17 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
             you want
 
     """
+    # set up the address for the API call
+    url1 = 'http://www.ioc-sealevelmonitoring.org/service.php?query=data&code='
+    url2 = '&format=json'
 
     if len(date1) != 8:
         print('date1 must have 8 characters', date1); sys.exit()
     if len(date2) != 8:
         print('date2 must have 8 characters', date1); sys.exit()
     # should check for < 30 days
+    if (date1[0:4] != date2[0:4]):
+        print('This code does not collect data across different years.'); sys.exit()
 
     g.check_environ_variables()
 
@@ -116,25 +156,42 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         print('The REFL_CODE environment variable must be set')
         print('This will tell the code where to put the output.')
         sys.exit()
+
     outdir = xdir  + '/Files/'
     if not os.path.exists(outdir) :
         subprocess.call(['mkdir', outdir])
 
     csv = False
     if output is None:
-    # use the default
-        outfile = outdir + station + '_' + 'ioc.txt'
+        outfile = outdir + station + '_' + 'ioc.txt' # use the default
     else:
         outfile = outdir + output
         if output[-3:] == 'csv':
             csv = True
 
-    # set up the address for the API call
-    url1 = 'http://www.ioc-sealevelmonitoring.org/service.php?query=data&code='
-    url2 = '&format=json'
-    newurl = url1 + station + '&timestart=' + date1 + '&timestop=' + date2 + url2
-    print(newurl)
-    data = requests.get(newurl).json()
+
+    month1 = int(date1[4:6])
+    month2 = int(date2[4:6])
+    year = int(date1[0:4])
+
+    if (month1 == month2):
+        newurl = url1 + station + '&timestart=' + date1 + '&timestop=' + date2 + url2
+        print(newurl)
+        data = requests.get(newurl).json()
+    else: 
+        ij = 0
+        for m in range(month1, month2+1):
+            d1, d2 = find_start_stop(year, m)
+            newurl = url1 + station + '&timestart=' + d1 + '&timestop=' + d2 + url2
+            print(newurl)
+            tdata = requests.get(newurl).json()
+            if ij == 0:
+                data = tdata
+            else:
+            # ? https://www.askpython.com/python/dictionary/merge-dictionaries
+                data.extend(tdata)
+            ij = ij + 1
+
     NV = len(data)
     print('number of records', NV)
     if (NV < 2):
