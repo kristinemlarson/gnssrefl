@@ -21,7 +21,7 @@ def fbias_daily_avg(station):
     computes residuals and estimate the frequency
     bias for all available frequencies which is printed to the screen
 
-    parameter
+    Parameters
     -----------
     station : str
         station name - 4char - lowercase
@@ -98,9 +98,8 @@ def fbias_daily_avg(station):
 def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks,azim1=0,azim2=360):
     """
     worker code for daily_avg_cl.py
-    reads in daily files
 
-    parameters
+    Parameters
     ----------
     station : str
         station name, 4 ch, lowercase
@@ -135,7 +134,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     azim2 : integer
         maximum azimuth, degrees
 
-    returns
+    Returns
     ---------
     tv : numpy array
         with these values [year, doy, meanRHtoday, len(rh), month, day, stdRH, averageAmplitude]
@@ -315,8 +314,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
 def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei):
     """
-    make some plots of results - moved here to make it cleaner
-    parameters
+    plots of results for the daily avg code
+      
+    Parameters
     ----------
     obstimes : datetime object 
 
@@ -404,7 +404,7 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     """
     write out the daily average RH values 
 
-    parameters
+    Parameters
     ---------
     obstimes : datetime object
 
@@ -455,6 +455,11 @@ def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gam
     good :
     gazim : 
     gfreq : 
+    gsat :
+    gamp :
+    gpeak2noise :
+    gutcTime :
+    tvall : 
 
     """
     if (NG > 0):
@@ -473,18 +478,3 @@ def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gam
 
 
     return tvall
-                            #if False:
-                            #if (NG > 0):
-                                # don't really need MM and DD, but ...
-                            #    if csvformat:
-                            #        for ijk in range(0,NG):
-                            #            biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]] 
-                            #            tvall = np.append(tvall, [biggerline],axis=0)
-                            #            allrh.write(" {0:4.0f},  {1:3.0f},{2:7.3f}, {3:2.0f}, {4:2.0f},{5:6.1f},{6:4.0f},{7:4.0f},{8:6.2f},{9:6.2f},{10:6.2f}\n".format(yr, 
-                            #                doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk], gutcTime[ijk]))
-                            #    else:
-                            #        for ijk in range(0,NG):
-                            #            biggerline = [yr, doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk]] 
-                            #            tvall = np.append(tvall, [biggerline],axis=0)
-                            #            allrh.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:2.0f} {4:2.0f} {5:6.1f} {6:4.0f} {7:4.0f} {8:6.2f} {9:6.2f} {10:6.2f}\n".format(yr, 
-                            #                doy, good[ijk],d.month, d.day, gazim[ijk], gfreq[ijk], gsat[ijk],gamp[ijk],gpeak2noise[ijk],gutcTime[ijk]))

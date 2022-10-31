@@ -35,16 +35,23 @@ def find_start_stop(year,m):
     cyyyy = str(year)
     cmm = '{:02d}'.format(m)
     d1 = cyyyy + cmm + '01'
-    if m in [1,3,5,7,8,10,12]:
-        d2 = cyyyy + cmm + '31'
+    # IOC if you ask for data thru nov30, it stops at midnite nov29,
+    # which is not what NOAA does - so not much work here
+
+    if m == 12:
+        d2 = str(year+1) +  '0101'
     else:
-        if m == 2:
-            if (g.dec31(year) == 366): # leap year
-                d2 = cyyyy + cmm + '29'
-            else:
-                d2 = cyyyy + cmm + '28'
-        else:
-            d2 = cyyyy + cmm + '30'
+        cmm = '{:02d}'.format(m+1)
+        d2 = cyyyy + cmm + '01'
+    #if m in [1,3,5,7,8,10,12]:
+    #    d2 = cyyyy + cmm + '31'
+    #else:
+    #    if m == 2:
+    #        if (g.dec31(year) == 366): # leap year
+    #            d2 = cyyyy + cmm + '29'
+    #        else:
+    #            d2 = cyyyy + cmm + '28'
+    #    else:
 
     return d1, d2
 
@@ -173,6 +180,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     month1 = int(date1[4:6])
     month2 = int(date2[4:6])
     year = int(date1[0:4])
+    print(month1,month2)
 
     if (month1 == month2):
         newurl = url1 + station + '&timestart=' + date1 + '&timestop=' + date2 + url2
@@ -182,6 +190,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         ij = 0
         for m in range(month1, month2+1):
             d1, d2 = find_start_stop(year, m)
+            print(d1,d2)
             newurl = url1 + station + '&timestart=' + d1 + '&timestop=' + d2 + url2
             print(newurl)
             tdata = requests.get(newurl).json()
@@ -201,9 +210,9 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     fout = open(outfile,'w+')
     print('Writing IOC data to ', outfile)
     if csv:
-        fout.write("# YYYY,MM,DD,HH,MM, Water(m),DOY, MJD \n")
+        fout.write("# YYYY,MM,DD,HH,MM, SS, Water(m),DOY, MJD \n")
     else:
-        fout.write("%YYYY MM DD HH MM  Water(m) DOY  MJD \n")
+        fout.write("%YYYY MM DD HH MM SS  Water(m) DOY  MJD \n")
     i = 1
 
 #    All values X where abs(X – median) > tolerance are hidden.
@@ -237,19 +246,20 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         if ((np.abs(sl-medv)) < criteria) and ((sensor == None) or (instrument == sensor)):
             year = int(t[0:4]); mm = int(t[5:7]); dd = int(t[8:10])
             hh = int(t[11:13]); minutes = int(t[14:16])
-            #print(year, mm, dd, hh, minutes)
+            sec =  int(t[17:19]) # cannot assume seconds is zero ... cause
             today = datetime.datetime(year, mm, dd)
             doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
-            m, f = g.mjd(year, mm, dd, hh, minutes, 0)
+            m, f = g.mjd(year, mm, dd, hh, minutes, sec)
             mjd = m + f;
             thetime.append(mjd); sealevel.append(sl)
-            bigT = datetime.datetime(year=year, month=mm, day=dd, hour=hh, minute=minutes, second=0)
+            #print(year,mm,dd,hh,minutes,sec)
+            bigT = datetime.datetime(year=year, month=mm, day=dd, hour=hh, minute=minutes, second=sec)
             obstimes.append(bigT)
 
             if csv:
-                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
+                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:2.0f} {6:7.3f},{7:3.0f},{8:15.6f} \n".format(year, mm, dd, hh, minutes, sec, sl, doy, mjd))
             else:
-                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
+                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:7.3f} {7:3.0f} {8:15.6f} \n".format(year, mm, dd, hh, minutes, sec,sl, doy, mjd))
         else:
             pt = pt + 1
     fout.close()

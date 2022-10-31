@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Translates rinex3 to rinex2 
-relies on gfzrnx
+Translates rinex3 to rinex2. relies on gfzrnx
 """
 import argparse
 import os
@@ -9,6 +8,19 @@ import gnssrefl.gps as g
 import sys
 
 def main():
+    """
+    Parameters
+    ----------
+    rinex3 : str
+        filename for RINEX 3 file
+    rinex2 : str
+        filename for RINEX 2.11 file
+    dec : integer
+        optinoal decimation value (seconds)
+    gpsonly : boolean
+        remove everything except GPS. Default is False
+
+    """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("rinex3", help="rinex3 filename", type=str)

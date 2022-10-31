@@ -14,7 +14,7 @@ def newchip_gfzrnx(exedir):
     """
     installs the gfzrnx executable and stores in the EXE directory
 
-    parameters
+    Parameters
     ---------
     exedir : string
         location of the executable directory
@@ -39,7 +39,7 @@ def newchip_hatanaka(exedir):
     compiles hatanaka code if an existing executable is not there
     stores in EXE
 
-    parameters
+    Parameters
     ---------
     exedir : string
         location of the executable directory
@@ -80,7 +80,12 @@ def newchip_hatanaka(exedir):
 
 def checkexist(exe):
     """
-    exe - executable name to check
+    check to see if an executable exists
+
+    Parameters
+    exe : str
+        executable name to check
+
     """
 
     exists = which(exe)
@@ -90,7 +95,9 @@ def checkexist(exe):
 
 def download_chmod_move(url,savename,exedir):
     """
-    parameters
+    download an executable, chmod it, and store it locally
+
+    Parameters
     -----------
     url : string
         external location of the executable

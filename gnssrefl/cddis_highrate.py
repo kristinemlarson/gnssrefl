@@ -7,15 +7,34 @@ import time
 
 def cddis_highrate(station, year, month, day,stream,dec_rate):
     """
-    author: kristine larson
-    inputs: station name, year, month, day
-    picks up a higrate RINEX file from Geoscience Australia
-    you can input day =0 and it will assume month is day of year
-    not sure if it merges them ...
-    2020 September 2 - moved to gz and new ftp site
-    ??? does not appear to have Rinex 2 files anymore ???
-    ??? goes they switched in 2020 .... ???
-    added dec rate to make the code a tiny bit faster
+    picks up highrate RINEX files from CDDIS
+
+    Parameters
+    ---------
+    station : str
+        4 char or 9 char station name
+        Rinex 2.11 for the first and rinex 3 for the latter
+
+    year : int
+        full year
+
+    month : int
+
+    day : int 
+
+    stream : str
+
+    dec_rate : int
+
+    Returns
+    ---------
+    rinexname : str
+        name of the merged/uncompressed outputfile
+
+    fexist : boolean
+        whether the Rinex file was successfully retrieved
+
+    requires hatanaka code and gfzrnx
     """
     fexist  = False
     if len(station) == 4:
@@ -73,7 +92,6 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
             else:
                 print('Looking for:', new_way_dir,file_name)
                 try:
-                    #g.cddis_download(file_name,new_way_dir)
                     g.cddis_download_2022B(file_name,new_way_dir)
                     if (version == 3):
                         if os.path.isfile(file_name): 
@@ -87,7 +105,6 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
                             subprocess.call(['rm',crnx_name])
                         else:
                             g.cddis_download_2022B(file_name2,new_way_dir)
-                            #g.cddis_download(file_name2,new_way_dir)
                             subprocess.call([exe2,file_name2])
                             subprocess.call([crnxpath, crnx_name2])
                             subprocess.call(['rm',crnx_name2])
@@ -134,9 +151,44 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
 
 def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
     """
-    deal with the insanity at the CDDIS archives, where they change
-    things alllllll the time.
-    files were Z until they were gz.  And soon will be a tar file ....
+
+    Parameters
+    ------------
+    station : str
+
+    year : int
+
+    doy : int
+        day of year
+
+    cyyyy : str
+        4 ch year
+    cyy : str
+        two ch year
+    cdoy : str
+        3 ch day of year
+    chh : str
+        2 ch hour
+    cmm : str
+        2 ch minutes
+
+    Returns
+    ---------
+    file_name : str 
+        first filename to look for 
+    crnx_name : str
+        first hatanaka name 
+    file_name2 : str
+        second filename to look for
+
+    crnx_name2 : str
+        second hatanaka compressed name 
+    exe1 : str
+        uncompression executable to use for file_name
+
+    exe2 : str
+        uncompression executable to use for file_name2
+
     """
 # Before being merged into tar files, all Unix compressed RINEX V2 data with file 
 #  extension ".Z" will be switched to gzip compression with the file extension ".gz". This 
@@ -162,30 +214,35 @@ def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
 
     return file_name, crnx_name, file_name2, crnx_name2, exe1, exe2
 
-
-
 def bkg_highrate(station, year, month, day,stream,dec_rate):
     """
     picks up a highrate RINEX 3 file from BKG, merges and decimates it.
     requires gfzrnx
 
-    parameters
+    Parameters
     -------------
     inputs: string
         9 ch station name 
     year : integer
 
     month : integer
+        month or day of year if day set to 0
 
     day : integer
 
-    stream : string
+    stream : str
         R or S
 
     dec_rate : integer
+        decimation rate
 
-    returns
+    Returns
     ----------
+    file_name24 : str
+        name of merged rinex file
+
+    fexist : boolean
+        whether file exists
 
     """
     fexist  = False
@@ -263,4 +320,6 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
     cm = 'rm ' + station.upper() + streamID + cyyyy + cdoy + '*15M_01S_MO.rnx'
     if fexist:
         subprocess.call(cm,shell=True)
+
     return file_name24,  fexist
+

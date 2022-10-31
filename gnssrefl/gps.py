@@ -4275,6 +4275,28 @@ def confused_obstimes(tvd):
 
     return modifiedjulian
 
+def more_confused_obstimes(tvd):
+    """
+    takes lsp results - returns list of MJD values
+    """
+    nr,nc = tvd.shape
+    modifiedjulian = []
+    if nr > 0:
+        for ijk in range(0,nr):
+            #MM DD HH Min Sec
+            (18,19,20,21,22)
+            #dtime, iyear,imon,iday,ihour,imin,isec = ymd_hhmmss(tvd[ijk,0],tvd[ijk,1],tvd[ijk,4],True)
+            iyear = tvd[ijk,0]; imon = tvd[ijk,17]; iday = tvd[ijk,18]
+            ihour = tvd[ijk,19]; imin = tvd[ijk,20]
+            isec =  tvd[ijk,21]
+            m,f = mjd(iyear,imon,iday,ihour,imin,isec)
+            modifiedjulian = np.append(modifiedjulian, m+f)
+    else:
+        print('empty file')
+
+    return modifiedjulian
+
+
 
 def read_simon_williams(filename,outfilename):
     """
@@ -4366,7 +4388,9 @@ def get_noaa_obstimes(t):
     # if i read in the file better, would not have to change from float
     if nr > 0:
         for i in range(0,nr):
-            dtime = datetime.datetime(year=int(t[i,0]), month=int(t[i,1]), day=int(t[i,2]), hour=int(t[i,3]), minute=int(t[i,4]), second=0)
+            dtime = datetime.datetime(year=int(t[i,0]), month=int(t[i,1]), day=int(t[i,2]), hour=int(t[i,3]), minute=int(t[i,4]), second=int(t[i,5]) )
+            # changed oct 28 2022
+            #dtime = datetime.datetime(year=int(t[i,0]), month=int(t[i,1]), day=int(t[i,2]), hour=int(t[i,3]), minute=int(t[i,4]), second=0)
             obstimes.append(dtime)
     else:
         print('you sent me an empty variable')
@@ -4387,7 +4411,7 @@ def get_noaa_obstimes_plus(t):
     # if i read in the file better, would not have to change from float
     if nr > 0:
         for i in range(0,nr):
-            year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = 0
+            year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = int(t[i,5])
             dtime = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
             obstimes.append(dtime)
             imjd, fr = mjd(year,month,day,hour,minute,second)

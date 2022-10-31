@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-downloads Simon Williams GNSS-IR sea level files
+downloads Simon Williams PSMSL GNSS-IR sea level files
 
 """
 import argparse

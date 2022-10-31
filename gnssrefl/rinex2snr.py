@@ -59,7 +59,8 @@ def quickname(station,year,cyy, cdoy, csnr):
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
     return fname
 
-def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk,skipit,stream='R'):
+def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
+        mk,skipit,stream,strip):
     """
     main code to convert RINEX files into SNR
 
@@ -109,10 +110,15 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     srate: integer
         sample rate for RINEX 3 files
 
-    mk = makan option
+    mk : boolean
+        makan option
 
-    skipit = skips making files every day, so a value of 7 means weekly.  1 means do every day
+    skipit : boolean
+         skips making files every day, so a value of 7 means weekly.  1 means do every day
 
+    strip : boolean
+         reduces observables to only SNR (too many observables, particularly in RINEX 2 files
+         will break the RINEX translator)
 
     """
     # 
@@ -191,6 +197,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                     if version == 2:
                         the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
                         if os.path.exists(r):
+                            if strip:
+                                print('Testing out stripping the RINEX 2 file here')
+                                k.strip_rinexfile(r)
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator) 
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
@@ -1044,6 +1053,8 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
     crnxpath = g.hatanaka_version()  # where hatanaka will be
     r = station + cdoy + '0.' + cyy + 'o'
     rd = station + cdoy + '0.' + cyy + 'd'
+    print(r,rd)
+
     locdir= os.environ['REFL_CODE'] + '/rinex/' + station + '/' + cyyyy + '/'
     # 
     #locdir2= os.environ['RINEX'] + station + '/' + cyyyy + '/'

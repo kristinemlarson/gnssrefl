@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 to convert nmea files to snr files 
-Makan Karegar, Uni Bonn, Aug 05, 2021
 """
 from __future__ import division
 import numpy as np 
@@ -12,7 +11,8 @@ import gnssrefl.gps as g
 
 def NMEA2SNR(locdir, fname, snrfile, csnr):
     """
-    parameters
+
+    Parameters
     -----------
     locdir : string
         directory where your SNR files are kept
@@ -369,7 +369,7 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
     """
     runs the nmea2snr conversion
 
-    parameters
+    Parameters
     ----------
     station : string
         name 
@@ -381,6 +381,7 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
         snr file type
     overwrite : boolean 
         whether make a new SNR file even if one already exists
+
     """
     # loop over years and day of years
     for yr in year_list:

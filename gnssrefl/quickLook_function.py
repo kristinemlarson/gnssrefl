@@ -19,13 +19,39 @@ import gnssrefl.rinex2snr as rinex
 
 def read_snr_simple(obsfile):
     """
-    parameters
+    Parameters
     ------------
     obsfile : string
         name of SNR file
 
-    returns
+    Returns
     ----------
+    allGood :  
+    sat : numpy array of integers 
+        satelliet number 
+
+    ele  : numpy array of floats
+        elevation angle (deg)
+    azi : numpy array of float 
+        azimuth (deg)
+    t  : numpy array of floats
+        seconds of the day (no leap seconds)
+    edot : numpy array of floats
+        derivative of elevation angle wrt time deg/sec
+    s1: numpy array of floats
+        L1 SNR
+    s2: numpy array of floats 
+        L2 SNR
+    s5:  numpy array of floats 
+        L5 SNR
+    s6:  numpy array of floats
+        L6 SNR
+    s7:  numpy array of floats
+        L7 SNR 
+    s8:  numpy array of floats
+        L8 SNR
+    snrE : numpy array of booleans 
+        whether SNR exists 
 
     """
 #   defaults so all returned vectors have something stored in them
@@ -352,7 +378,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
 def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     """
-    simple visualizer of "good" and "bad" azimuths
+    makes a plot that shows "good" and "bad" refletor height retrievals as a 
+    function of azimuth
 
     Parameters
     -----------
@@ -378,6 +405,9 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
         minimum elevation angle (deg)
     e2 : float
         maximum elevation angle (deg)
+
+    plot is written to :
+    os.environ['REFL_CODE'] + '/Files/quickLook_summary.png'
 
     """
     try:
