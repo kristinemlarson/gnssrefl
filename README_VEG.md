@@ -89,30 +89,30 @@ For p208:
 
 *veg_multiyr p208 2008 2020*
 
-<img src="docs/_static/p208.png" width=450>
+<img src="docs/p208.png" width=450>
 
 p048 was highlighted in Larson and Small (2014). You can get a feel for the processing steps:
 
-<img src="docs/_static/p048-frompaper.png" width=450>
+<img src="docs/p048-frompaper.png" width=450>
 
 Let's try to reproduce some of this with the new software:
 
 *veg_multiyr p048 2008 2020*
 
-<img src="docs/_static/p048.png" width=450>
+<img src="docs/p048.png" width=450>
 
 At this site a snow filter is required. We only have a simple one:
 
 *veg_multiyr p048 2008 2020 -winter True*
 
-<img src="docs/_static/p048_winter.png" width=450>
+<img src="docs/p048_winter.png" width=450>
 
 the trend you see IS NOT VEGETATION. It is the long-term death of this receiver.
 You can see we got lucky that our original paper only had six years of data:
 
 *veg_multiyr p048 2008 2015 -winter True*
 
-<img src="docs/_static/p048_shorter.png" width=450>
+<img src="docs/p048_shorter.png" width=450>
 
 Note: I should have downloaded the year 2007 as well.
 
@@ -123,7 +123,7 @@ always been normalized against the receiver behavior when the vegetation is drie
 
 *veg_multiyr p537 2008 2020*
 
-<img src="docs/_static/p537.png" width=450>
+<img src="docs/p537.png" width=450>
 
 ### mp1mp2
 So the sort of bad news is I am hesitant to trust the multi-GNSS teqc logs
