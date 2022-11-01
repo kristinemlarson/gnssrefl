@@ -1,5 +1,4 @@
 # library for daily_avg_cl.py
-# 2022 june 16
 import argparse
 import datetime
 import matplotlib.pyplot as plt
@@ -95,7 +94,7 @@ def fbias_daily_avg(station):
 
 
 
-def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks,azim1=0,azim2=360):
+def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks,azim1,azim2,test):
     """
     worker code for daily_avg_cl.py
 
@@ -133,6 +132,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     azim2 : integer
         maximum azimuth, degrees
+
+    test: bool
 
     Returns
     ---------
@@ -277,7 +278,6 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     #meanRH = np.asarray(meanRH)
     s2 = time.time()
 
-    print('This step took ', round(s2-s1,2), ' seconds')
 
     fig.autofmt_xdate()
     plt.ylabel('meters',fontsize=fs)
@@ -308,11 +308,11 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     # plot the number of retrievals vs time
     txtdir =  xdir + '/Files'
-    daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei)
+    daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei,test)
 
     return tv, obstimes
 
-def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei):
+def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei,test):
     """
     plots of results for the daily avg code
       
@@ -326,10 +326,10 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
     meanAmp : numpy array
         daily average RH amplitude
 
-    station : string
-        4 character
+    station : str
+        4 character station name
 
-    txtdir : string
+    txtdir : str
         directory for the results
 
     tv : ??
@@ -346,6 +346,9 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
 
     nbei : numpy array
         number of beidou satellites each day
+
+    test : bool
+
     """
 #   new plot
     fs = 12 # fontsize
@@ -364,8 +367,23 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
     print('Daily average RH png file saved as: ', pltname)
 
 #   new plot of reflector amplitudes as of November 8, 2021
+    minyear = int(np.min(tv[:,0])); maxyear = int(np.max(tv[:,0]))
+    maxA = np.max(meanAmp); minA = np.min(meanAmp)
+    #print(minyear,maxyear,minA,maxA)
     fig,ax=plt.subplots()
-    ax.plot(obstimes,meanAmp,'b.')
+    ax.plot(obstimes,meanAmp,'b.',label='Amplitude')
+    
+    # 
+    if test:
+        for dy in range(minyear, maxyear+1):
+            d1 = datetime.datetime(year=dy, month =11, day = 1)
+            if dy == minyear:
+                ax.plot([d1, d1], [minA, maxA], 'k-',label='November 1')
+            else:
+                ax.plot([d1, d1], [minA, maxA], 'k-')
+
+        plt.legend(loc="upper left")
+
     fig.autofmt_xdate()
     plt.ylabel('Amplitude (v/v)',fontsize=fs)
     today = str(date.today())
@@ -415,6 +433,7 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
 
     csvformat : boolean
         true if you want csv format output
+
     """
     print('Daily average RH file written to: ', outfile)
     # sort the time tags
@@ -448,6 +467,8 @@ def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gam
     writing out all the RH retrievals to a single file: file ID is allrh)
     tvall had everything in it.  but it was slowing everything down, so i removed it
 
+    Parameters
+    --------
     NG :
     yr :
     doy :

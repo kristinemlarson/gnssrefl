@@ -5,7 +5,6 @@ import os
 
 # my code
 import gnssrefl.gps as g
-# this was originally all one file - now moving the computations to a library
 import gnssrefl.daily_avg as da
 
 from gnssrefl.utils import str2bool
@@ -29,10 +28,11 @@ def parse_arguments():
     parser.add_argument("-csv", default=None, type=str, help="True if you want csv instead of plain text")
     parser.add_argument("-azim1", default=None, type=int, help="minimum azimuth (deg)")
     parser.add_argument("-azim2", default=None, type=int, help="maximum azimuth (deg)")
+    parser.add_argument("-test", default=None, type=str, help="augmentation to plot")
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'csv']
+    boolean_args = ['plt', 'csv','test']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -40,7 +40,7 @@ def parse_arguments():
 
 
 def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
-        extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360):
+        extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360, test: bool = False):
     """
         Parameters:
         ___________
@@ -50,30 +50,30 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
         medfilter : float
             Median filter for daily reflector height (m). Start with 0.25
 
-        ReqTracks : integer
+        ReqTracks : int
             Required number of tracks.
 
-        txtfile : string, optional
+        txtfile : str, optional
             Use this parameter to set your own output filename.
             default is None.
 
-        plt : boolean, optional
+        plt : bool, optional
             whether to print plots to screen or not.
             default is True.
 
-        extension : string, optional
+        extension : str, optional
             extension for solution names.
             default is ''. (empty string)
 
-        year1 : integer, optional
+        year1 : int, optional
             restrict to years starting with.
             default is 2005.
 
-        year2 : integer, optional
+        year2 : int, optional
             restrict to years ending with.
             default is 2021.
 
-        fr : integer, optional
+        fr : int, optional
             GNSS frequency.
             value options:
                 0 (default) : all
@@ -97,15 +97,18 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
             Whether you want csv instead of a plain text file.
             default is False (plain text).
 
-        azim1 : integer, optional
+        azim1 : int, optional
             minimum azimuth, degrees
             note: should be modified to allow negative azimuth
 
-        azim2 : integer, optional
+        azim2 : int, optional
             maximum azimuth, degrees
+
+        test : bool
+            augmentations to the plot
     """
     plt2screen = plt # since variable was originally this name 
-    # make surer environment variables are set
+    # make sure environment variables are set
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']
 
@@ -122,7 +125,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     else:
         alldatafile = txtdir + '/' + station + '_allRH.txt' 
 
-    tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, alldatafile, csv, medfilter, ReqTracks,azim1,azim2)
+    tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, alldatafile, csv, medfilter, ReqTracks,azim1,azim2,test)
 
     # default is to show the plots
     if plt2screen:

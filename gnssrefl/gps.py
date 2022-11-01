@@ -441,7 +441,7 @@ def up(lat,lon):
     longitude : float
         radians
 
-    returns
+    Returns
     ----------
     East : three vector
         local transformation unit vector
@@ -697,15 +697,16 @@ def getsp3file(year,month,day):
     modified in 2019 to use wget 
     returns the name of the file and its directory
 
+    Parameters
+    -----------
     year : integer
 
     month : integer
 
     day : integer
 
-    20jun14 - add CDDIS secure ftp
 
-    returns
+    Returns
     -----------
     name : string
         filename for the orbits
@@ -996,7 +997,7 @@ def kgpsweek(year, month, day, hour, minute, second):
 
     second : integer?
 
-    returns
+    Returns
     --------
     GPS_wk : integer
         GPS week
@@ -1499,20 +1500,34 @@ def propagate(week, sec_of_week, ephem):
 
 def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
     """
-    computes two factors - ofac and hifac - that are inputs to the
+    Computes two factors - ofac and hifac - that are inputs to the
     Lomb-Scargle Periodogram code.
     We follow the terminology and discussion from Press et al. (1992)
     in their LSP algorithm description.
 
-    INPUT
-    elevAngles:  vector of satellite elevation angles in degrees 
-    cf:(L-band wavelength/2 ) in meters    
-    maxH:maximum LSP grid frequency in meters
-    desiredPrec:  the LSP frequency grid spacing in meters
-    i.e. how precise you want he LSP reflector height to be estimated
-    OUTPUT
-    ofac: oversampling factor
-    hifac: high-frequency factor
+    Parameters
+    ------------
+    elevAngles:  numpy of floats
+        vector of satellite elevation angles in degrees 
+
+    cf: float
+        (L-band wavelength/2 ) in meters    
+
+    maxH: int
+        maximum LSP grid frequency in meters
+
+    desiredPrec:  float
+        the LSP frequency grid spacing in meters 
+        i.e. how precise you want he LSP reflector height to be estimated
+
+    Returns
+    -------
+    ofac: float
+        oversampling factor
+
+    hifac: float
+        high-frequency factor
+
     """
 # in units of inverse meters
     X= np.sin(elevAngles*np.pi/180)/cf     
@@ -1541,6 +1556,7 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
 def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
     """
     strips snr data
+
     Parameters
     -----------
     x : numpy array 
@@ -1563,7 +1579,7 @@ def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
     minH : float
         minimum reflector height in meters
 
-    returns 
+    Returns 
     ----------
     maxF : float
         maximum Reflector height (meters)
@@ -1744,8 +1760,8 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         a =   azi[(ele > e1) & (ele < e2) & (azi > az1) & (azi < az2)]
         t = seconds[(ele > e1) & (ele < e2) & (azi > az1) & (azi < az2)]
         ifound = 0
-        if screenstats:
-            print('Starting/Windowed Npts', Nv, len(x))
+        #if screenstats:
+        #    print('Starting/Windowed Npts', Nv, len(x))
         if len(x) > 0:
             ijkl = np.argmax(x)
             if (ijkl == 0):
@@ -4110,7 +4126,7 @@ def cdate2nums(col1):
     col1 : string
         date in yyyyy-mm-dd, 2012-02-15
 
-    returns
+    Returns
     -----------
     t : float
         fractional date, year + doy/365.25
@@ -4189,15 +4205,28 @@ def ymd_hhmmss(year,doy,utc,dtime):
     doy : integer
 
     UTC : float
+        fractional hours
 
-    dtime : logical
+    dtime : bool
+        whether you want datetime object
+
+    Returns 
+    ---------
+    bigT : datetime
+
+    year : int
+
+    month : int
+
+    day : int
 
 
-    inputs: year, day of year, UTC (fractional hours)
-    dtime is a logical for whether you want a datetime object
-    since i save things in year, doy and UTC hours ...
-    this gives back datetime obj and the input for that
-    (year month day hour minute second, in integers i believe)
+    hour : int
+
+    minute: int
+
+    second : int
+
     """
     year = int(year) # just in case
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
@@ -4277,7 +4306,16 @@ def confused_obstimes(tvd):
 
 def more_confused_obstimes(tvd):
     """
-    takes lsp results - returns list of MJD values
+
+    Parameters
+    ----------
+    tvd : numpy file floats
+        lsp results from a loadtxt command
+
+    Returns
+    ----------
+    modifiedjulian : numpy array of floats
+        
     """
     nr,nc = tvd.shape
     modifiedjulian = []
@@ -4300,12 +4338,19 @@ def more_confused_obstimes(tvd):
 
 def read_simon_williams(filename,outfilename):
     """
-    input: filename of GNSS based water level measurements from 
-    the archived at PSMSL created by Simon Williams 
+    
+    Parameters
+    ---------
+    filename : str
+        datafile of GNSS based water level measurements from 
+        the archive at PSMSL created by Simon Williams 
 
-    return lists of datetime obstimes, MJD, and mod-water-level in meters
-    2022 july 4
-    also returns PRN, frequency, and azimuth numpy arrays
+    outfilename : str
+        where the rewritten data will go
+
+    Returns
+    -------
+
     """
 
     fout = open(outfilename,'w+')
@@ -4317,8 +4362,8 @@ def read_simon_williams(filename,outfilename):
     if csv:
         fout.write("# YYYY,MM,DD,HH,MM, Water(m),DOY, MJD, Seconds,Freq, Azim,PRN \n")
     else:
-        fout.write("%YYYY  MM  DD  HH  MM  Water(m) DOY    MJD    Sec   Freq  Azim    PRN  raw  fit-tide \n")
-        fout.write("% (1) (2) (3) (4)  (5)   (6)    (7)     (8)   (9)   (10)   (11)  (12)  (13)  (14) \n")
+        fout.write("%YYYY  MM  DD  HH  MM  Water(m) DOY    MJD    Sec   Freq  Azim    PRN  raw  fit-tide mod-raw \n")
+        fout.write("% (1) (2) (3) (4)  (5)   (6)    (7)     (8)   (9)   (10)   (11)  (12)  (13)  (14)     (15)\n")
 
 
 
@@ -4359,7 +4404,7 @@ def read_simon_williams(filename,outfilename):
         if csv:
             fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:2.0f},{9:1.0f},{10:8.3f},{11:2.0f},{12:6.3f},{13:6.3f} \n".format(year, mm, dd, hh, minutes, modraw, doy, imjd+frac, sec, fr[i], az[i],prn[i],raw,tidefit))
         else:
-            fout.write(" {0:4.0f} {1:3.0f} {2:3.0f} {3:3.0f} {4:3.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:2.0f} {9:1.0f} {10:8.3f} {11:2.0f} {12:6.3f} {13:6.3f}\n".format(year, mm, dd, hh, minutes, modraw, doy, imjd+frac, sec, fr[i], az[i], prn[i], raw,tidefit))
+            fout.write(" {0:4.0f} {1:3.0f} {2:3.0f} {3:3.0f} {4:3.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:2.0f} {9:1.0f} {10:8.3f} {11:2.0f} {12:6.3f} {13:6.3f}  \n".format(year, mm, dd, hh, minutes, modraw, doy, imjd+frac, sec, fr[i], az[i], prn[i], raw,tidefit))
 
         obstimes.append(dtime)
         modjulian.append(x)

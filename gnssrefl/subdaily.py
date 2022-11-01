@@ -20,7 +20,7 @@ import math
 
 def print_badpoints(t,outliersize):
     """
-    parameters
+    Parameters
     -------------
     t : numpy array
         lomb scargle result array of "bad points". Format given below
@@ -28,7 +28,7 @@ def print_badpoints(t,outliersize):
     outliersize: float
         outlier criterion, in meters
 
-    returns
+    Returns
     ----------
     writes to a file called outliers.txt
 
@@ -53,7 +53,8 @@ def print_badpoints(t,outliersize):
 
 def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
-    parameters
+
+    Parameters
     ----------------
     txtdir : str
         the directory where the results should be written out
@@ -66,13 +67,13 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
 
     default is plain txt file
 
-    returns
+    Returns
     -----------
-    writetxt : boolean
+    writetxt : bool
 
-    writecsv : boolean
+    writecsv : bool
 
-    writejson : boolean
+    writejson : bool
 
     outfile : str
         filename
@@ -107,7 +108,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     """
     writes out the results
 
-    parameters
+    Parameters
     -----------
     input: str
         output filename
@@ -170,20 +171,20 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     """
     reads in RH results and makes various plots to help users assess the quality of the solution
 
-    parameters
+    Parameters
     -------------
-    station : string
+    station : str
         4 character station name
 
-    year : integer
+    year : int
 
-    d1 : integer
+    d1 : int
         first day of year
 
-    d2 : integer 
+    d2 : int 
         last day of year
 
-    plt2screen : boolean
+    plt2screen : bool
         if True plots are displayed to the screen
 
     extension : str
@@ -192,7 +193,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     sigma : float
          how many standard deviations away from mean you allow.  
 
-    writecsv : boolean
+    writecsv : bool
 
     azim1 : float
         minimum azimuth value (degrees)
@@ -215,10 +216,10 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     h2 : float
         maximum reflector height (m)
 
-    kplt : boolean
+    kplt : bool
         special plot made 
 
-    returns
+    Returns
     --------------
 
     tv : numpy array
@@ -383,7 +384,10 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
 def quickTr(year, doy,frachours):
     """
-    parameters
+    takes timing from lomb scargle code (year, doy) and UTC hour (fractional)
+    and returns a date string
+
+    Parameters
     -----------
     year : integer
 
@@ -392,10 +396,9 @@ def quickTr(year, doy,frachours):
     frachours : float
         real-valued UTC hour 
 
-    inputs from the lomb scargle code (year, doy) and UTC hour (fractional)
-    returns
+    Peturns
     --------
-    datestr : string
+    datestring : str
          date ala YYYY-MM-DD HH-MM-SS
     """
     year = int(year); doy = int(doy); frachours = float(frachours)
@@ -451,6 +454,14 @@ def spline_in_out(x,y,knots_per_day):
     inputs are numpy arrays of time (in doy) and reflector heights (m)
     outputs are the spline fit
 
+    Parameters
+    ----------
+    x : numpy of floats
+
+    y : numpy of floats
+
+    knots_per_day : int
+
     note: i have to assume this does not work well with data outages
     """
     Ndays = round(x.max()-x.min())
@@ -470,8 +481,18 @@ def spline_in_out(x,y,knots_per_day):
 def write_out_header(fout,station,extraline,**kwargs):
     """
     writes out header for results file ... 
-    21may04 extra line for user
-    changed this so that it is EXACTLY THE SAME as gnssir, with extra columns for m/d/h/m
+
+    Parameters
+    ----------
+    fout : fileID
+
+    station : str
+        4 character station name
+
+    extraline : bool
+        not sure why this is here
+
+
     """
     extra_columns = kwargs.get('extra_columns',False)
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
@@ -492,8 +513,17 @@ def writejsonfile(ntv,station, outfile):
     """
     subdaily RH values written out in json format
     inputs: ntv is the variable with concatenated results
-    outfile is output file name
-    2021may05 fixed a ton of column definition errors
+
+    Parameters
+    -----------
+    ntv : numpy of LSP results
+
+    station : str
+        4 ch station name
+
+    outfile : str
+        filename for output
+
     """
     print('You picked the json output')
     # dictionary

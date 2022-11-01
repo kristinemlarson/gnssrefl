@@ -20,9 +20,8 @@ def quickp(station,t,sealevel):
     """
     makes quick plot of the tide gauge data
 
-    Parameters:
-    ___________
-
+    Parameters
+    -----------
     station: string
         4 character ID of the station
 
@@ -69,15 +68,15 @@ def download_simon(station: str, output: str = None, plt: bool = False):
     Downloads IOC tide gauge files in json format,
     converts it to plain txt or csv format
 
-    Parameters:
-    ___________
-    station : string
+    Parameters
+    ----------
+    station : str
 
-    output : string, optional
+    output : str, optional
         Optional output filename
         default is None
 
-    plt: boolean, optional
+    plt: bool, optional
         plot comes to the screen
         default is None
 

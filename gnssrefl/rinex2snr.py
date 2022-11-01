@@ -35,23 +35,28 @@ class constants:
 #
 def quickname(station,year,cyy, cdoy, csnr):
     """
-    returns location of a SNR file
-    parameters 
+    finds location of a SNR file
+
+    Parameters 
     ------------
-    station : string
+    station : str
         station name, 4 character
 
-    year : integer
+    year : int
+        full year
 
-    cyy : string 
+    cyy : str 
+        two character year
 
-    cdoy : string
+    cdoy : str
+        three character day of year
 
-    csnr : string
+    csnr : str
+        snr ending
 
-    returns
+    Returns
     ----------
-    fname : string
+    fname : str
         filename
 
     """
@@ -64,7 +69,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     """
     main code to convert RINEX files into SNR
 
-    Parameters:
+    Parameters
     ----------
 
     station: string
@@ -289,32 +294,34 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
 def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,fortran,translator):
     """
-    parameters
-    ------------
-    year : integer
+    convert RINEX to SNR
 
-    doy : integer
+    Parameters
+    ------------
+    year : int
+
+    doy : int
         day of year
 
-    option : integer
+    option : int
         snr choice (66, 99 etc)
 
-    orbtype : string
+    orbtype : str
         orbit source (nav, gps, gnss, etc)
 
-    receiverrate : integer
+    receiverrate : int
         sampling interval of the GPS receiver, e.g. 1, 30, 15
 
-    dec_rate : integer
+    dec_rate : int
         decimation value to reduce file size
 
-    archive : string
+    archive : str
         location of the rinex files
 
-    fortran : boolean
+    fortran : bool
          whether fortran translator to be used.  this is here for backwards compatability
 
-    translator : string
+    translator : str
          hybrid, python, or fortran 
 
     """
@@ -463,7 +470,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
 
 def satorb(week, sec_of_week, ephem):
     """
-    parameters
+
+    Parameters
     ---------
 
     week : integer
@@ -474,12 +482,11 @@ def satorb(week, sec_of_week, ephem):
 
     ephem : ephemeris block
 
-    returns 
+    Returns 
     -----------
     numpy array 
          the x,y,z, coordinates of the satellite in meters
-    and relativity correction (also in meters), so you add,
-    not subtract
+         and relativity correction (also in meters), so you add, not subtract
 
     """
 
@@ -536,7 +543,6 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
     no output - the output is the snrfile that is created
 
     This only works for rinex v2.11.  
-    Kristine M. Larson August 2020
     This relies on Joakim's rinex reading code
     """
     station = obsfile[0:4]
