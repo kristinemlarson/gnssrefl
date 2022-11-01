@@ -19,7 +19,7 @@ xdir = Path(os.environ["REFL_CODE"])
 
 def vwc_plot(station,t_datetime, vwcdata, plot_path):
     """
-    parameters
+    Parameters
     ----------
     station : string
 
@@ -60,7 +60,8 @@ def read_apriori_rh(station,fr):
     """
     read the track dependent a prori reflector heights needed for
     phase & thus soil moisture.
-    parameters
+
+    Parameters
     ----------
     station : string
         four character ID, lowercase
@@ -68,7 +69,7 @@ def read_apriori_rh(station,fr):
     fr : integer
         frequency (e.g. 1,20)
 
-    returns
+    Returns
     ----------
     results : numpy array 
         column 2 is RH in meters
@@ -132,16 +133,16 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
     This does the main work of estimating phase and other parameters from the SNR files
     it uses tracks that were predefined by the apriori.py code
 
-    parameters
+    Parameters
     -------------
-    station name : string
+    station name : str
         4 char id, lowercase
     year : integer
 
-    doy : integer
+    doy : int
         day of year
 
-    snr_type : integer
+    snr_type : int
         is the file extension (i.e. 99, 66 etc)
 
     fr_list : list of integers
@@ -291,21 +292,21 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
 
     https://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
 
-    parameters
+    Parameters
     -----------
-    station : string
+    station : str
 
-    year : integer
+    year : int
 
-    year_end : integer
+    year_end : int
 
-    plt2screen : boolean
+    plt2screen : bool
         plots come to the screen
 
-    fr : integer
+    fr : int
         frequency
 
-    polyorder : integer
+    polyorder : int
         override on the polynomial order used in leveling
 
     """
