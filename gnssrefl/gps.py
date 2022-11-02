@@ -596,7 +596,6 @@ def dec31(year):
 
     Returns 
     ---------
-
     doy : integer
         day of year for December 31
     """
@@ -2351,7 +2350,7 @@ def snr_name(station, year, month, day,option):
     """
     Defines SNR filename
 
-    parameters
+    Parameters
     --------
     station : string
 
@@ -2548,7 +2547,7 @@ def UNR_highrate(station,year,doy):
     """
     picks up the 5 minute time series from UNR website for a given station
 
-    parameters
+    Parameters
     -----------
     station : string
         4 character station name
@@ -2692,7 +2691,7 @@ def rewrite_tseries(station):
     given a station name, look at a daily blewitt position (ENV) 
     file and write a new file that is more human friendly
 
-    parameters
+    Parameters
     -----------
     station : string
         4 character station name
@@ -2756,7 +2755,7 @@ def llh2xyz(lat,lon,height):
     inputs lat,lon (in degrees) and ellipsoidal height (in meters)
     returns Cartesian values in meters.
 
-    parameters
+    Parameters
     -----------
     lat : float
         latitude in degrees
@@ -3089,7 +3088,7 @@ def rinex_ga_highrate(station, year, month, day):
     """
     no longer supported
 
-    parameters
+    Parameters
     ------------
     station : string
         4 character station ID, lowercase
@@ -3349,7 +3348,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     assuming gfzrnx executable exists, the rinex 3 file is hatanaka
     uncompressed and translated into a rinex 2 file
 
-    parameters
+    Parameters
     ----------
     r3_filename : string
          rinex 3 format filename. either Hatanaka compressed or uncompressed allowed
@@ -3535,7 +3534,7 @@ def gnssSNR_version():
 def teqc_version():
     """
 
-    return
+    Returns
     --------
     gpse : string 
         location of teqcexecutable
@@ -3551,7 +3550,7 @@ def snr_exist(station,year,doy,snrEnd):
     """
     check to see if the SNR file already exists
 
-    parameters
+    Parameters
     -----------
     station : string
         four character station name
@@ -3563,7 +3562,7 @@ def snr_exist(station,year,doy,snrEnd):
     snrEnd : string
         2 character snr type, i.e. 66, 99
 
-    returns
+    Returns
     ----------
     snre : boolean
         whether SNR file exists
@@ -3700,7 +3699,7 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     """
     tries to download navigation file from CDDIS
 
-    parameters
+    Parameters
     -----------
     navfile : string
         name of GPS broadcast orbit file
@@ -3794,14 +3793,14 @@ def cddis_download(filename, directory):
 def ydoy2useful(year, doy):
     """
 
-    parameters
+    Parameters
     ----------
     year : integer
 
     doy : integer
         day of year
 
-    returns
+    Returns
     ---------
     year : integer
 
@@ -3833,13 +3832,14 @@ def ydoy2useful(year, doy):
 def prevdoy(year,doy):
     """
     given year and doy, return previous year and doy
-    parameters
+
+    Parameters
     -------------
     year : integer
     
     doy : integer
 
-    returns
+    Returns
     ----------
     pyear : integer
         previous year
@@ -3862,7 +3862,7 @@ def nextdoy(year,doy):
     """
     given a year/doy returns the subsequent year/doy
 
-    parameters
+    Parameters
     ---------
     year : integer
 
@@ -3975,9 +3975,8 @@ def big_Disk_work_hard(station,year,month,day):
     attempts to pick up subdaily files from the NGS archive
     creates a single RINEX file
 
-    parameters
+    Parameters
     -----------
-
     station: string
         4 character id station name
 
@@ -4035,7 +4034,7 @@ def big_Disk_in_DC_hourly(station, year, month, day,idtag):
     """
     picks up a one hour RINEX file from CORS. and gunzips it
 
-    parameters
+    Parameters
     ---------
     station : string
         
@@ -4199,7 +4198,7 @@ def binary(string):
 
 def ymd_hhmmss(year,doy,utc,dtime):
     """
-    parameters
+    Parameters
     ---------
     year : integer
 
@@ -4829,23 +4828,24 @@ def rinex_jp(station, year, month, day):
 
 def queryUNR_modern(station):
     """
-    queries the UNR database that has been stored in sql. downloads it if necessary
+    Queries the UNR database for station coordinates that has been stored in sql. downloads it if necessary
 
-    parameters
+    Parameters
     -----------
-    station : string
+    station : str
         4 character station name
     
-    returns
+    Returns
+    -------
 
     lat : float
-        latitude in degrees
+        latitude in degrees (zero if not found)
 
     lon : float
-        longitude in degrees
+        longitude in degrees (zero if not found)
 
     ht : float
-        ellipsoidal ht in meters
+        ellipsoidal ht in meters (zzero if not found)
 
     """
     lat = 0; lon = 0; ht = 0
@@ -4928,9 +4928,8 @@ def rinex_nrcan_highrate(station, year, month, day):
     picks up 1-Hz RINEX 2.11 files from NRCAN
     requires gfzrnx or teqc
 
-    _________________________
-    parameters
-
+    Parameters
+    ----------
     station: string
         4 character station name
 
@@ -4943,9 +4942,6 @@ def rinex_nrcan_highrate(station, year, month, day):
     day: integer
         day
 
-
-
-    if day is 0, assume month slot is doy
     """
     crnxpath = hatanaka_version()
     teqcpath = teqc_version()
@@ -5203,7 +5199,9 @@ def inout(c3gz):
 
 def ga_highrate(station9,year,doy,dec,deleteOld=True):
     """
-    parameters
+    Attempts to download highrate RINEX from GA
+
+    Parameters
     -----------
     station9 : string
         nine character station name appropriate for rinex 3
@@ -5218,8 +5216,8 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
     deleteOld : boolean
         delete old rinex 3 files
 
-    returns 
-    -----
+    Returns 
+    -------
     rinex2 : string
         rinex2 filename created by merging 96 files!
 
@@ -5515,6 +5513,7 @@ def geoidCorrection(lat,lon):
 
 def checkEGM():
     """
+    this is not finished.  it should download the file
     """
     foundfile = False
     if 'REFL_CODE' in os.environ:
