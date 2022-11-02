@@ -377,10 +377,13 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
     if test:
         for dy in range(minyear, maxyear+1):
             d1 = datetime.datetime(year=dy, month =11, day = 1)
+            d2 = datetime.datetime(year=dy, month =6, day = 1)
             if dy == minyear:
-                ax.plot([d1, d1], [minA, maxA], 'k-',label='November 1')
+                ax.plot([d1, d1], [minA, maxA], 'k-',label='Nov 1')
+                ax.plot([d2, d2], [minA, maxA], 'k--',label='Jun 1')
             else:
                 ax.plot([d1, d1], [minA, maxA], 'k-')
+                ax.plot([d2, d2], [minA, maxA], 'k--')
 
         plt.legend(loc="upper left")
 

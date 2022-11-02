@@ -27,6 +27,7 @@ from numpy import array
 
 import gnssrefl.read_snr_files as snr
 import gnssrefl.karnak_libraries as k
+import gnssrefl.EGM96 as EGM96
 
 # for future ref
 #import urllib.request
@@ -5490,3 +5491,39 @@ def ymd2ch(year,month,day):
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
 
     return month, day, doy, cyyyy, cyy, cdoy
+
+def geoidCorrection(lat,lon):
+    """
+    Parameters
+    ----------
+    lat : float
+        latitude, units?
+
+    lon : float
+        longitude, units?
+
+    Returns
+    -------
+    geoidC : float
+        geoid correction in meters
+
+    """
+    egm = EGM96.EGM96geoid()
+    geoidC = egm.height(lat=lat,lon=lon)
+
+    return geoidC
+
+def checkEGM():
+    """
+    """
+    foundfile = False
+    if 'REFL_CODE' in os.environ:
+        xdir = os.environ['REFL_CODE']
+        egm = xdir + '/input/' + 'EGM96geoidDATA.mat'
+        if os.path.isfile(egm):
+            print('egm file exists')
+            foundfile = True
+        else:
+            print('EGM file does not exist. We will try to download it for you.')
+
+    return foundfile 
