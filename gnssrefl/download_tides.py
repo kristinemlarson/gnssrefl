@@ -188,19 +188,21 @@ def write_out_data(data,fout, tt,obstimes,slevel,csv):
             sl = float(data['data'][i]['v'])
             year = int(t[0:4]); mm = int(t[5:7]); dd = int(t[8:10])
             hh = int(t[11:13]); minutes = int(t[14:16])
+            # seconds are zero
+            ss = 0
             today = datetime.datetime(year, mm, dd)
             doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
-            m, f = g.mjd(year, mm, dd, hh, minutes, 0)
+            m, f = g.mjd(year, mm, dd, hh, minutes, ss)
             mjd = m + f;
             tt.append(mjd)
-            bigT = datetime.datetime(year=year, month=mm, day=dd, hour=hh, minute=minutes, second=0)
+            bigT = datetime.datetime(year=year, month=mm, day=dd, hour=hh, minute=minutes, second=ss)
             obstimes.append(bigT)
 
             slevel.append(sl)
             if csv:
-                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
+                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:2.0f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd,ss))
             else:
-                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd))
+                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:2.0f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd,ss))
 
     return tt,obstimes,slevel
 
@@ -330,10 +332,10 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
     print('Writing contents to: ', outfile)
     fout = open(outfile, 'w+')
     if csv:
-        fout.write("#YYYY,MM,DD,HH,MM, Water(m),DOY,   MJD\n")
+        fout.write("#YYYY,MM,DD,HH,MM, Water(m),DOY,   MJD, Seconds\n")
     else:
-        fout.write("%YYYY MM DD HH MM  Water(m) DOY    MJD\n")
-        fout.write("% 1    2  3  4  5    6       7       8\n")
+        fout.write("%YYYY MM DD HH MM  Water(m) DOY    MJD      Seconds\n")
+        fout.write("% 1    2  3  4  5    6       7       8         9\n")
 
 
     year1, month1, day1, doy1,modjul1 = noaa2me(date1)
@@ -366,39 +368,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-    #urlL = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?"
-    # add the datum - i think 
-    #endL = "&product=water_level&datum=" + datum + "&units=metric&time_zone=gmt&application=web_services&format=json"
-    #url = urlL + "begin_date=" + date1 + "&end_date=" + date2 + "&station=" + station + endL
-    #data = requests.get(url).json()
-    #if 'error' in data.keys():
-    #    print(data['error'])
-    #    sys.exit()
-    #else:
-    #    print(data['metadata'])
-    # number of records
-#        imeta = 0
-#        if (year1 != year2):
-#            print('I do not download across years. Exiting')
-#            sys.exit()
-#        for m in range(month1,month2+1):
-#            cmm = '{:02d}'.format(m)
-#            d1 = cyyyy + cmm + '01' 
-#            if m in [1,3,5,7,8,10,12]:
-#                d2 = cyyyy + cmm + '31' 
-#            else:
-#                if m == 2:
-#                    if (g.dec31(year1) == 366): # leap year
-#                        d2 = cyyyy + cmm + '29' 
-#                    else:
-#                        d2 = cyyyy + cmm + '28' 
-#                else:
-#                    d2 = cyyyy + cmm + '30' 
-#
-#            print(d1,d2)
-#            if imeta > 0:
-#                metadata = False
-#            data, error = pickup_from_noaa(station,d1,d2,datum,metadata)
-#            if not error:
-#                write_out_data(data,fout, tt,obstimes,slevel)
-#            imeta = imeta + 1

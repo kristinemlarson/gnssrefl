@@ -210,9 +210,9 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     fout = open(outfile,'w+')
     print('Writing IOC data to ', outfile)
     if csv:
-        fout.write("# YYYY,MM,DD,HH,MM, SS, Water(m),DOY, MJD \n")
+        fout.write("# YYYY,MM,DD,HH,MM,Water(m),DOY, MJD, SS \n")
     else:
-        fout.write("%YYYY MM DD HH MM SS  Water(m) DOY  MJD \n")
+        fout.write("%YYYY MM DD  HH MM   Water(m) DOY  MJD     SS \n")
     i = 1
 
 #    All values X where abs(X – median) > tolerance are hidden.
@@ -257,9 +257,9 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
             obstimes.append(bigT)
 
             if csv:
-                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:2.0f} {6:7.3f},{7:3.0f},{8:15.6f} \n".format(year, mm, dd, hh, minutes, sec, sl, doy, mjd))
+                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:3.0f}\n".format(year, mm, dd, hh, minutes, sl, doy, mjd,sec))
             else:
-                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:7.3f} {7:3.0f} {8:15.6f} \n".format(year, mm, dd, hh, minutes, sec,sl, doy, mjd))
+                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:3.0f}\n".format(year, mm, dd, hh, minutes, sl, doy, mjd,sec))
         else:
             pt = pt + 1
     fout.close()

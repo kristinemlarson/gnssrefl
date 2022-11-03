@@ -4350,11 +4350,22 @@ def read_simon_williams(filename,outfilename):
 
     Returns
     -------
+    outobstimes : datetime array
+    outmjd : numpy array of floats
+        modified julian day
+    outsealevel : numpy array of floats 
+        sea level, meters
+    prn : numpy array of integers
+        satellite numbers
+    fr : numpy array of integers
+        frequency
+    az : numpy array of floats
+        azimuth (degrees)
 
     """
 
     fout = open(outfilename,'w+')
-    print('Writing Simon Williams data to ', outfilename)
+    print('Writing PSMSL GNSS-IR data to ', outfilename)
     csv = False
     if outfilename[-3:] == 'csv':
         csv = True
@@ -4364,8 +4375,6 @@ def read_simon_williams(filename,outfilename):
     else:
         fout.write("%YYYY  MM  DD  HH  MM  Water(m) DOY    MJD    Sec   Freq  Azim    PRN  raw  fit-tide mod-raw \n")
         fout.write("% (1) (2) (3) (4)  (5)   (6)    (7)     (8)   (9)   (10)   (11)  (12)  (13)  (14)     (15)\n")
-
-
 
     # read the file three times because i am loadtxt impaired
     # string
@@ -4424,18 +4433,23 @@ def read_simon_williams(filename,outfilename):
 
 def get_noaa_obstimes(t):
     """
-    send a noaa file variable. returns datetime obstimes in a list.
-    i guess one could learn how to use pandas ... nah
+    Parameters
+    ----------
+    t : list of integers
+        with year, month, day, hour, minute, second 
+
+    Returns
+    -------
+    obstimes : datetime 
     """
     nr,nc = t.shape
     obstimes = []
 
     # if i read in the file better, would not have to change from float
+    # year mon day hour min sealevel doy mjd seconds
     if nr > 0:
         for i in range(0,nr):
-            dtime = datetime.datetime(year=int(t[i,0]), month=int(t[i,1]), day=int(t[i,2]), hour=int(t[i,3]), minute=int(t[i,4]), second=int(t[i,5]) )
-            # changed oct 28 2022
-            #dtime = datetime.datetime(year=int(t[i,0]), month=int(t[i,1]), day=int(t[i,2]), hour=int(t[i,3]), minute=int(t[i,4]), second=0)
+            dtime = datetime.datetime(year=int(t[i,0]), month=int(t[i,1]), day=int(t[i,2]), hour=int(t[i,3]), minute=int(t[i,4]), second=int(t[i,8]) )
             obstimes.append(dtime)
     else:
         print('you sent me an empty variable')
@@ -4444,9 +4458,21 @@ def get_noaa_obstimes(t):
 
 def get_noaa_obstimes_plus(t):
     """
-    send a noaa file variable. returns obstimes.
-    updated 2022June11
-    and relative gps time (in seconds)
+
+    Parameters
+    ----------
+    t : list of times 
+        our water level format
+        with year, month, day, hour, minute, second (all integers)
+
+    Returns
+    -------
+    obstimes : datetime
+
+    modjulian : numpy array of floats
+        modified julian array 
+
+    ??? and relative gps time (in seconds)
     """
     nr,nc = t.shape
     obstimes = []
@@ -4456,7 +4482,7 @@ def get_noaa_obstimes_plus(t):
     # if i read in the file better, would not have to change from float
     if nr > 0:
         for i in range(0,nr):
-            year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = int(t[i,5])
+            year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = int(t[i,8])
             dtime = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
             obstimes.append(dtime)
             imjd, fr = mjd(year,month,day,hour,minute,second)
