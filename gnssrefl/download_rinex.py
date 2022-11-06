@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 downloads RINEX files
-2020sep03 - modified environment variable requirement
-2022feb15 - updated rinex3 to use karnak.py
 """
 import argparse
 import gnssrefl.gps as g
@@ -50,6 +48,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                    debug: bool = False, dec: int = 1):
     """
         command line interface for download_rinex.
+
         Parameters:
         ___________
         station : string
@@ -65,8 +64,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             day
 
         rate : string, optional
-            sample rate.
-            value options:
+            sample rate. value options:
                 low (default) : standard rate data
                 high : high rate data
 
@@ -81,16 +79,16 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                 ngs (National Geodetic Survey)
                 nrcan (Natural Resources Canada)
                 bkg (German Agency for Cartography and Geodesy)
+                bfg (German Agency for water research, only Rinex 3)
                 nz (GNS, New Zealand)
                 ga (Geoscience Australia)
                 bev (Austria Federal Office of Metrology and Surveying)
                 jeff
-                special
+                special (reflectometry Rinex 2 files maintained by unavco)
                 all
 
         version : int, optional
-            Version of Rinex file.
-            Default is 2.
+            Version of Rinex file. Default is 2.
             value options:
                 2 : Rinex 2
                 3 : Rinex 3
@@ -106,8 +104,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
         stream : str, optional
             Whether to get stream defined filenames.
-            Default is 'R'.
-            value options:
+            Default is 'R'. value options:
                 R
                 S
 

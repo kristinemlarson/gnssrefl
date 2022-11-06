@@ -12,12 +12,13 @@ python/packaging questions and improved our docker distribution.
 - Carolyn Roesler helped with the original Matlab codes.
 - Felipe Nievinski and Simon Williams have provided significant advice for this project.
 - Clara Chew and Eric Small developed the soil moisture algorithm; I ported it to python with Kelly's help.
+- Sree Ram Radha Krishnan ported the rzones web app code.
 
 GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, EAR 1144221, AGS 1449554) and NASA (NNX12AK21G and NNX13AF43G).
 The python package development, docker distributions and jupyter notebooks are supported under NASA 80NSSC20K1731.
 For relevant citations, the code is citable via `doi <https://doi.org/10.5281/zenodo.5601495>`__, and the methods are covered in gnssrefl `publications <https://www.kristinelarson.net/publications>`__.
 
-Authors and maintainers: Dr. Kristine M. Larson, Kelly Enloe and Tim Dittmann
+Authors and maintainers: Kristine M. Larson, Kelly Enloe and Tim Dittmann
 
 [https://kristinelarson.net](https://kristinelarson.net)
 

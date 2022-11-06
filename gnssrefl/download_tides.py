@@ -15,7 +15,7 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 
 def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slevel,csv):
     """
-    downloads/writes data within one year
+    downloads/writes NOAA tidegauge data for one month
 
     Parameters
     ------------
@@ -83,7 +83,7 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
 
 def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
     """
-    downloads NOAA measurements > one month
+    downloads NOAA water level measurements > one month
 
     Parameters:
     -----------
@@ -109,7 +109,7 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
         whether output file is csv format
 
     Returns:
-    --------------
+    ---------
     tt : list of times 
         modified julian day
     obstimes : list of datetime objects 
@@ -138,7 +138,9 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
 
 def noaa2me(date1):
     """
-    parameters 
+    converts NOAA type of date string to simple integers
+
+    Parameters 
     --------
     date1 : string
         time in format YYYYMMDD for year month and day
@@ -146,15 +148,19 @@ def noaa2me(date1):
     Returns 
     -------
     year1 : integer
+        full year
 
     month1 : integer
+        month
 
     day1 : integer
+        day of the month
 
     doy : integer  
         day of year
 
     modjulday : float
+        modified julian date
 
     """
     year1 = int(date1[0:4]); 
@@ -169,11 +175,35 @@ def noaa2me(date1):
 
 def write_out_data(data,fout, tt,obstimes,slevel,csv):
     """
-    input: data record from NOAA API
-    tt - MJD 
-    obstimes - datetime
-    slevel - water level in meters
-    csv - whether csv format or not (boolean)
+    writes out the NOAA water level data to a file 
+
+    Parameters
+    ----------
+
+    data : dictionary from NOAA API
+
+    fout : file ID 
+        for output
+
+    tt : ??
+
+    obstimes : list of datetimes
+        times of water level measurements
+
+    slevel : numpy array of floats
+        water level in meters
+
+    csv : boolean
+        whether csv format or not 
+
+    Returns
+    -------
+    tt : 
+
+    obstimes :
+
+    slevel :
+
     """
     NV = len(data['data'])
 
@@ -232,6 +262,22 @@ def pickup_from_noaa(station,date1,date2,datum, printmeta):
 
 def quickp(station,t,sealevel,noaa_name):
     """
+    makes a quick plot to the screen
+
+    Parameters
+    ----------
+    station : str
+        NOAA station name
+
+    t : datetime
+        times of the water level measurements
+
+    sealevel : numpy array of floats
+        water level in meters
+
+    noaa_name : str
+        long name of the NOAA tide gauge site 
+
     """
     fs = 10
     fig,ax=plt.subplots()
@@ -321,8 +367,8 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
 
 
     csv = False
+    # use the default, which is plain text
     if output is None:
-        # use the default
         outfile = outdir + station + '_' + 'noaa.txt'
     else:
         if output[-3:] == 'csv':

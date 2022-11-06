@@ -44,6 +44,7 @@ def filter_out_snow(station, year1, year2, fr,snowmask):
     Parameters
     ----------
     station : str
+        four character station name
 
     year1 : integer
         starting year
@@ -59,14 +60,13 @@ def filter_out_snow(station, year1, year2, fr,snowmask):
 
     """
     xdir = os.environ['REFL_CODE']
-    # a little redundant here 
     found_override = False
     if os.path.exists(snowmask):
         print('found snow file')
         override = np.loadtxt(snowmask, comments='%')
         found_override = True
 
-#   now load the phase data??
+#   now load the phase data
     newresults = []
     results_trans = []
     #vquad = np.vstack((vquad, newl))
@@ -74,7 +74,7 @@ def filter_out_snow(station, year1, year2, fr,snowmask):
 
     if found_override:
         dataexist, year, doy, hr, ph, azdata, ssat, rh, amp,results = load_sat_phase(station, year1,year2, fr)
-        # results were transposed - so untransposing them LOL
+        # results were originally transposed - so untransposing them 
         results = results.T
         for year in range(year1,year2+1):
             ii = (results[:,0] == year) & (results[:,12] == fr)
@@ -133,7 +133,7 @@ def load_avg_phase(station,fr):
     Parameters
     -----------
     station : str
-        4 character ID, lowercase
+        4 character station ID, lowercase
 
     Returns
     --------
@@ -176,15 +176,17 @@ def load_sat_phase(station, year, year_end, freq):
 
     Parameters
     -------------
-    station : string
-        four character
+    station : str
+        four character station name
 
     year : integer
+        beginning year
 
     year_end : integer
+        ending year
 
     freq : integer
-        GPS frequency (1,20)
+        GPS frequency (1,20 allowed)
 
     Returns
     -------

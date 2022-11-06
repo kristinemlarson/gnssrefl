@@ -1,7 +1,7 @@
 ### Vlissingen
 
 <p align="center">
-<img src="VLIS.jpeg" width="500"><BR>
+<img src=../_static/VLIS.JPG width=600</img>
 </P>
 
 **Station Name:** vlsi  or VLSI00NLD

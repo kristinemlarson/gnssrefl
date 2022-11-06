@@ -61,3 +61,5 @@ This required checking that downloaded file was not zero size.
 
 1.1.7 fixed bug in invsnr that did not allow SNR files unless they were uncompressed.
 added xz and gz endings
+
+1.1.8 updated download_ioc
