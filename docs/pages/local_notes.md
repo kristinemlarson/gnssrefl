@@ -63,3 +63,5 @@ This required checking that downloaded file was not zero size.
 added xz and gz endings
 
 1.1.8 updated download_ioc
+added refl_zones
+added EGM96 to gps.py
