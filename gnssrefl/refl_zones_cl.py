@@ -73,7 +73,17 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=0, lon: flo
     """
 
     # check that you have the files for the orbits on your local system
-    rf.save_reflzone_orbits()    
+    foundfiles = rf.save_reflzone_orbits()    
+    if not foundfiles:
+        print('The orbit files needed for this code were either not found')
+        print('or not downloaded successfully. They should be in the REFL_CODE/Files directory') 
+        sys.exit()
+
+
+    # check that EGM96 file is in your local directory
+    foundfile = g.checkEGM()
+    if (RH == None) and (not foundfile):
+        print('EGM96 file is not online. It should be in the REFL_CODE/Files directory')
 
     # check the station coordinates in our database from the station name
     xlat, xlon, xel_height = g.queryUNR_modern(station)

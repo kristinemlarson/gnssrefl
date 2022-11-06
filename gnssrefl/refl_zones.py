@@ -473,6 +473,12 @@ def save_reflzone_orbits():
     """
     check that orbit files exist for reflection zone code.
     downloads to $REFL_CODE$/Files directory if needed
+
+    Returns
+    -------
+
+    foundfiles : bool
+        whether needed files were found
     """
     xdir = os.environ['REFL_CODE'] + '/Files/'
     githubdir = 'https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/docs/_static/'
@@ -484,4 +490,14 @@ def save_reflzone_orbits():
             print('download from github and put in local Files directory: ', otypes)
             wget.download(githubdir+orbfile, xdir + orbfile)
 
+    found = 0 
+    for otypes in ['GPS','GLONASS','GALILEO','BEIDOU']:
+        orbfile = otypes + 'orbits_21sep17.txt'
+        if os.path.exists(xdir + orbfile):
+            found = found + 1
 
+    foundfiles = False
+    if found == 4:
+        foundfiles = True
+
+    return foundfiles 
