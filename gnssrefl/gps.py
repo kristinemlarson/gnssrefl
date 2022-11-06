@@ -5539,7 +5539,8 @@ def geoidCorrection(lat,lon):
 
 def checkEGM():
     """
-    this is not finished.  it should download the file
+    this is not finished.  it should download the file from github
+    and put it into the Files directory. 
     """
     foundfile = False
     if 'REFL_CODE' in os.environ:

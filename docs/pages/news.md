@@ -1,5 +1,10 @@
 ### News <a name="news"></a>
 
+**WARNING: CDDIS has changed their high-rate directory protocol for older files. This means some 
+of our download codes now fail.
+If someone wants to provide a pull request that addresses this issue, I 
+would be happy to implement it.**
+
 Please note: <code>rinex2snr</code> and <code>download_rinex</code> have been substantially changed. Please
 let me know if I broke anything.
 

@@ -10,10 +10,6 @@
 
 **WARNING: All access to UNAVCO data will end October 1, 2022 unless [you sign up for an account there](https://www.unavco.org/data/gps-gnss/file-server/file-server-access-examples.html)**
 
-**WARNING: CDDIS has changed their high-rate directory protocol for older files. This means some of our download codes now fail.
-If someone wants to provide a pull request that addresses this issue, I would be happy to implement it.  I 
-am not willing to write such code myself.**
-
 ## Table of Contents
 
 We are [developing readthedocs documentation](https://gnssrefl.readthedocs.io/en/latest/): please check it out, we'd love feedback.
