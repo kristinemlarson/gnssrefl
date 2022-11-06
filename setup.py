@@ -19,7 +19,7 @@ ext3 = Extension(name='gnssrefl.gnsssnrbigger',
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
-requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy"]
+requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","simplekml"]
 
 setup(
     name="gnssrefl",
@@ -69,6 +69,7 @@ setup(
             'invsnr_input= gnssrefl.invsnr_input:main',
             'vwc_input= gnssrefl.vwc_input:main',
             'phase= gnssrefl.quickPhase:main',
+            'refl_zones= gnssrefl.refl_zones_cl:main',
             'vwc= gnssrefl.vwc:main',
             ], 
         },
