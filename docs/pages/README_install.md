@@ -9,7 +9,7 @@ github/pypi package installation.
 
 ## Local Install (github or pypi)
 
-** YOU MUST BE RUNNING python version 3.9 or lower. **
+**YOU MUST BE RUNNING python version 3.9 or lower.**
 
 For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
 **If you are using linux** then simply type
@@ -21,6 +21,7 @@ and
 <code>apt-get install -y gfortran</code> 
 
 in your terminal (or <code>yum install -y gcc-gfortran</code>).
+
 **If you are using a MacOS** then you will need to install <code>xcode</code>. First, in your
 terminal, check first to see if you already have it:
 
