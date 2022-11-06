@@ -9,6 +9,8 @@ github/pypi package installation.
 
 ## Local Install (github or pypi)
 
+** YOU MUST BE RUNNING python version 3.9 or lower. **
+
 For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
 **If you are using linux** then simply type
 
