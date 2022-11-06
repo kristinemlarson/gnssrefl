@@ -22,7 +22,8 @@ class EGM96geoid:
         #    'lons' = row vector of longitudes, deg (-2,362)
 
         xdir = os.environ['REFL_CODE']
-        egmfile = xdir + '/input/' + 'EGM96geoidDATA.mat'
+        # this may go better in the input directory - but using Files for now
+        egmfile = xdir + '/Files/' + 'EGM96geoidDATA.mat'
         matdata = scipy.io.loadmat(egmfile)
         names = matdata['geoid'].dtype.names
 

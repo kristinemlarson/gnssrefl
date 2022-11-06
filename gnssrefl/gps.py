@@ -5543,13 +5543,21 @@ def checkEGM():
     and put it into the Files directory. 
     """
     foundfile = False
+    xdir = os.environ['REFL_CODE']
+    matfile = 'EGM96geoidDATA.mat'
+    localdir = xdir + '/Files/'
+    egm = localdir + matfile
     if 'REFL_CODE' in os.environ:
-        xdir = os.environ['REFL_CODE']
-        egm = xdir + '/input/' + 'EGM96geoidDATA.mat'
+        egm = localdir + matfile
         if os.path.isfile(egm):
             print('egm file exists')
             foundfile = True
         else:
             print('EGM file does not exist. We will try to download it for you.')
+            githubdir = 'https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/docs/'   
+            wget.download(githubdir+matfile, localdir + matfile)
+            if os.path.isfile(egm):
+                print('successful download, egm file exists')
+                foundfile = True
 
     return foundfile 
