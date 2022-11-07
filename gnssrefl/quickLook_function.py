@@ -109,9 +109,10 @@ def read_snr_simple(obsfile):
     return allGood, sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE
 
 
-def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,**kwargs):
+def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,ediff,**kwargs):
     """
-    parameters
+
+    Parameters
     -----------
     station : string
         name (4 char) 
@@ -138,9 +139,11 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     maxH : float
         maximum allowed reflector height in meters
 
-    reqAmp is LSP amplitude significance criterion
+    reqAmp : float
+        is LSP amplitude significance criterion
 
-    pele is the elevation angle limits for the polynomial removal.  units: degrees
+    pele : list of floats
+        is the elevation angle limits for the polynomial removal.  units: degrees
 
     satsel : integer
         satellite number?
@@ -160,8 +163,12 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     azim2 : float
          maximum azimuth in degrees
 
-    returns
-    ------------
+    ediff : float
+         QC parameter - restricts length of arcs
+         degrees
+
+    Returns
+    -------
 
 
     """
@@ -201,7 +208,12 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     delTmax = 70
     polyV = 4 # polynomial order for the direct signal
     desiredP = 0.01 # 1 cm precision
-    ediff = 2 # this is a QC value, eliminates small arcs
+
+    # now trying to send this value
+
+    #ediff = 2 # this is a QC value, eliminates small arcs
+    print(ediff)
+
     #four_in_one = True # put the plots together
     minNumPts = 20 
     #noise region for LSP QC. these are meters

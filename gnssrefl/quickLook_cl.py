@@ -32,6 +32,7 @@ def parse_arguments():
     parser.add_argument("-sat", default=None, type=int, help="satellite")
     parser.add_argument("-screenstats", default=None, type=str, help="if True, Success and Failure info printed to the screen")
     parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio")
+    parser.add_argument("-ediff",  default=None, type=float, help="ediff Quality Control parameter (default 2 deg)")
     #parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
     #parser.add_argument("-fortran", default=None, type=str, help="Default is True: use Fortran translators")
 
@@ -49,92 +50,93 @@ def quicklook(station: str, year: int, doy: int,
               snr: int = 66, fr: int = 1, ampl: float = 7.,
               e1: int = 5, e2: int = 25, h1: float = 0.5, h2: float = 6., sat: int = None,
               peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
-              pltscreen: bool = True, azim1: float = 0., azim2: float = 360.):
+              pltscreen: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0):
     """
 
-        Parameters:
-        ___________
-        station : string
-            4 or 9 character ID of the station
+    Parameters
+    ----------
+    station : string
+        4 or 9 character ID of the station
 
-        year : integer
-            Year
+    year : integer
+        Year
 
-        doy : integer
-            Day of year
+    doy : integer
+        Day of year
 
-        snr : integer, optional
-            SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
-            value options:
-                66 (default) : saves all data with elevation angles less than 30 degress
-                99 : saves all data with elevation angles between 5 and 30 degrees
-                88 : saves all data with elevation angles between 5 and 90 degrees
-                50 : saves all data with elevation angles less than 10 degrees
-        f : integer, optional
-            GNSS frequency.
-            value options:
-                1 (default) : GPS L1
-                2 : GPS L2
-                20 : GPS L2C
-                5 : GPS L5
-                101 : GLONASS L1
-                102 : GLONASS L2
-                201 : GALILEO E1
-                205 : GALILEO E5a
-                206 : GALILEO E6
-                207 : GALILEO E5b
-                208 : GALILEO E5
-                302 : BEIDOU B1
-                306 : BEIDOU B3
-                307 : BEIDOU B2
+    snr : integer, optional
+        SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
+        value options:
+            66 (default) : saves all data with elevation angles less than 30 degress
+            99 : saves all data with elevation angles between 5 and 30 degrees
+            88 : saves all data with elevation angles between 5 and 90 degrees
+            50 : saves all data with elevation angles less than 10 degrees
+    f : integer, optional
+        GNSS frequency.
+        value options:
+            1 (default) : GPS L1
+            2 : GPS L2
+            20 : GPS L2C
+            5 : GPS L5
+            101 : GLONASS L1
+            102 : GLONASS L2
+            201 : GALILEO E1
+            205 : GALILEO E5a
+            206 : GALILEO E6
+            207 : GALILEO E5b
+            208 : GALILEO E5
+            302 : BEIDOU B1
+            306 : BEIDOU B3
+            307 : BEIDOU B2
 
-            reqAmp : array_like, optional
-                Lomb-Scargle Periodogram (LSP) amplitude significance criterion in volts/volts.
-                Default is [7].
+    reqAmp : array_like, optional
+        Lomb-Scargle Periodogram (LSP) amplitude significance criterion in volts/volts.
+        Default is 7 
 
-            e1 : integer, optional
-                elevation angle lower limit in degrees for the LSP.
-                default is 5.
+    e1 : integer, optional
+        elevation angle lower limit in degrees for the LSP.
+        default is 5.
 
-            e2: integer, optional
-                elevation angle upper limit in degrees for the LSP.
-                default is 25.
+    e2: integer, optional
+        elevation angle upper limit in degrees for the LSP.
+        default is 25.
 
-            h1 : float, optional
-                The allowed LSP reflector height lower limit in meters.
-                default is 0.5.
+    h1 : float, optional
+        The allowed LSP reflector height lower limit in meters.
+        default is 0.5.
 
-            h2 : float, optional
-                The allowed LSP reflector height upper limit in meters.
-                default is 6.
+    h2 : float, optional
+        The allowed LSP reflector height upper limit in meters.
+        default is 6.
 
-            sat : array_like, optional
-                list of satellites numbers
-                default is None.
-                array items: integer
+    sat : array_like, integers, optional
+        list of satellites numbers default is None.
 
-            peak2noise : integer, optional
-                 peak to noise ratio of the periodogram values (periodogram peak divided by the periodogram noise).
-                 peak to noise value is one way of defining that significance (not the only way).
-                 For snow and ice, 3.5 or greater, tides can be tricky if the water is rough (and thus
-                 you might go below 3 a bit, say 2.5-2.7
-                 default is 3.
+    peak2noise : integer, optional
+        peak to noise ratio of the periodogram values (periodogram peak divided by the periodogram noise).
+        peak to noise value is one way of defining that significance (not the only way).
+        For snow and ice, 3.5 or greater, tides can be tricky if the water is rough (and thus
+        you might go below 3 a bit, say 2.5-2.7 
+        default is 3.
 
-            screenstats : boolean, optional
-                 Whether to print stats to the screen.
-                 default is False.
+    screenstats : boolean, optional
+        Whether to print stats to the screen.
+        default is False.
 
-            pltscreen : boolean, optional
-                Whether to print plots to the screen.
-                default is True.
+    pltscreen : boolean, optional
+        Whether to print plots to the screen.
+        default is True.
 
-            azim1 : float, optional
-                minimum azimuth angle (deg)
-                default is 0.
+    azim1 : float, optional
+        minimum azimuth angle (deg)
+        default is 0.
 
-            azim2 : float, optional
-                maximum azimuth angle (deg)
-                default is 360.
+    azim2 : float, optional
+        maximum azimuth angle (deg)
+        default is 360.
+
+    ediff : float, optional
+        quality control parameter
 
 
     """
@@ -169,7 +171,7 @@ def quicklook(station: str, year: int, doy: int,
     #pltscreen = plt # just to keep things with old names .... 
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'f': fr[0], 'reqAmp': ampl, 'e1': e1,
             'e2': e2, 'minH': h1, 'maxH': h2, 'PkNoise': peak2noise, 'satsel': sat, 'fortran': fortran, 'pele': pele,
-            'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2}
+            'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2, 'ediff': ediff}
 
     return quick.quickLook_function(**args)
     # returns two variables: data, datakey = quick.quicklook_function(**args)

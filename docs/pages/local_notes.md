@@ -65,3 +65,4 @@ added xz and gz endings
 1.1.8 updated download_ioc
 added refl_zones
 added EGM96 to gps.py
+1.1.9 added ediff to quickLook
