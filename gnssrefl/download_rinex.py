@@ -49,7 +49,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     """
         command line interface for download_rinex.
 
-        Parameters:
+        Parameters
         ___________
         station : string
             4 or 9 character ID of the station.

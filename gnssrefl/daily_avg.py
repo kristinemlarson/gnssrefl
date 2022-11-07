@@ -21,7 +21,7 @@ def fbias_daily_avg(station):
     bias for all available frequencies which is printed to the screen
 
     Parameters
-    -----------
+    ----------
     station : str
         station name - 4char - lowercase
     """
@@ -426,7 +426,7 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     write out the daily average RH values 
 
     Parameters
-    ---------
+    ----------
     obstimes : datetime object
 
     tv : ?? 

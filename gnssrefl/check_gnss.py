@@ -2,18 +2,17 @@
 import numpy as np
 import os
 import subprocess
-# local gnssrefl code
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rnx
-
 
 
 def rerun_lsp(station, year, doy, snrEnd, mac=False):
     """
     if an SNR file has been remade, this allows you to rerun the LSP code
     should change that code to a callable function, but hey, not there yet.
-    parameters
-    ---------
+
+    Parameters
+    ----------
     station : string
         four character station name
 
@@ -41,13 +40,13 @@ def gnss_stats(ffull):
     send the filename and return the constellation status
     as defined below
 
-    parameters
-    ---------
+    Parameters
+    ----------
     ffull : string
         SNR filename
 
-    returns
-    ---------
+    Returns
+    -------
     stat : integer
         0 for gps only, 100 for gps+glonass, 200 for gps+glonass+galileo,
         300 for gps+glonass+galileo+beidou 
@@ -82,7 +81,7 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
     and receiverrate ('low' or 'high')
 
     Parameters
-    -----------
+    ----------
     station : string
         four character station name
     year : integer
@@ -101,7 +100,7 @@ def check_gnss(station,year,doy,snrEnd,goal,dec_rate,receiverrate):
         high or low 
 
     Returns
-    ------------
+    -------
     True for some unknown reason
 
     """

@@ -10,7 +10,7 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
     picks up highrate RINEX files from CDDIS
 
     Parameters
-    ---------
+    ----------
     station : str
         4 char or 9 char station name
         Rinex 2.11 for the first and rinex 3 for the latter
@@ -27,7 +27,7 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
     dec_rate : int
 
     Returns
-    ---------
+    -------
     rinexname : str
         name of the merged/uncompressed outputfile
 
@@ -153,7 +153,7 @@ def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
     """
 
     Parameters
-    ------------
+    ----------
     station : str
 
     year : int
@@ -173,7 +173,7 @@ def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
         2 ch minutes
 
     Returns
-    ---------
+    -------
     file_name : str 
         first filename to look for 
     crnx_name : str
@@ -220,7 +220,7 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
     requires gfzrnx
 
     Parameters
-    -------------
+    ----------
     inputs: string
         9 ch station name 
     year : integer
@@ -237,7 +237,7 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
         decimation rate
 
     Returns
-    ----------
+    -------
     file_name24 : str
         name of merged rinex file
 

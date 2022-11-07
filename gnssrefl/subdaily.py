@@ -593,27 +593,23 @@ def writejsonfile(ntv,station, outfile):
 
 def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     """
-    parameters
-    -------
+
+    Parameters
+    ----------
     station : string
         4 char station name
+
     fname : string
         input filename for results
+
     fname_new : string
         output filename for results
+
     pltit : boolean 
         whether you want plots to the screen
 
     outlierV : float
        outlier criterion, in meters 
-
-    note: x was in units of years before but now is in days??
-
-    2021april27 sending obstimes as kwarg input
-    2021may5 change file format back to original file format
-    21may18 try to remove massive outliers
-    21oct27 add usespline option because this code is not robust
-    can also input knots per day 
 
     """
     outlierV = float(outlierV) #just to make sure - i think it was sending a string
@@ -898,24 +894,27 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
 
 def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     """
-    parameters
-    -----------
+
+    Parameters
+    ----------
     otimes : numpy array
         datetime
+
     tv : numpy array
         gnssrefl results written into this variable using loadtxt
 
-    station : string
+    station : str
         station name, only used for the title
 
-    txtdir is where the plots will be written to
+    txtdir : str
+        where the plots will be written to
 
-    year: integer
+    year: int
         what year is being analyzed
 
-    d1 : integer
+    d1 : int
         minimum day of year
-    d2 : integer
+    d2 : int
         maximum day of year
 
     """
@@ -991,19 +990,25 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
 def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     """
 
-    parameters
-    --------------
+    Parameters
+    ----------
     otimes - datetime object
+
     tv - variable with the gnssrefl results
+
     ii - good data?
+
     jj - bad data?
+
     station : string
         station name
 
     txtdir : string
         directory where plots will be written
+
     sigma : float
         what kind of standard deviation is used for outliers (3sigma, 2.5 sigma etc)
+
     kplt : boolean
         make extra plot for kristine
     """
@@ -1067,6 +1072,7 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
     ampl is amplitude of the periodogram (volts/volts)
     d1 and d2 are days of year
     peak2noise 
+
     """
     nr,nc=tv.shape
     tvoriginal = tv
@@ -1125,8 +1131,8 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     having calculated and applied RHdot correction
     AND applied the frequency biases, create new plots
 
-    parameters
-    -------------
+    Parameters
+    ----------
     tnew : numpy array
         day of year 
     ynew : numpy array
@@ -1140,8 +1146,8 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     station : string
         station name used for the plot titles and filenames
 
-    returns
-    ---------
+    Returns
+    -------
     res : numpy array
         residuals to spline fit, in meters
 
@@ -1240,28 +1246,3 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
 
     return res
 
-#  should really just mirror it or remove data at the ends
-#   going to add more fake data ...
-#    first = tnew[0]
-#    last = tnew[-1]
-#    ii = (tnew <= first + 0.1)
-#    jj = (tnew >= last-0.1)
-#    first6hours = np.mean(ynew[ii])
-#    last6hours = np.mean(ynew[jj])
-#    for ii in range(1,6):
-#        tnew = np.append(tnew,first-ii/48)
-#        ynew = np.append(ynew, first6hours)
-#    for ii in range(1,6):
-#        tnew = np.append(tnew,last+ii/48)
-#        ynew = np.append(ynew, last6hours)
-
-
-    # now sort them again ....
-#   ii = np.argsort(tnew)
-#   tnew = tnew[ii]
-#   ynew = ynew[ii]
-
-    #ftest = open('testing.txt', 'w+')
-    #for i in range(0,len(knots)):
-    #    ftest.write('{0:9.4f} \n'.format( knots[i]))
-    #ftest.close()

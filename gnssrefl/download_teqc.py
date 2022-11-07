@@ -22,12 +22,13 @@ def mpfile_unavco(station, year, doy):
     does not check that directory exists.  Assumes you previously
     ran check_directories from the veg library
 
-    parameters
-    ---------
+    Parameters
+    ----------
     station : string
         four character station name
 
     year : integer
+
     doy : integer
         day of year
 
@@ -83,18 +84,19 @@ def parse_arguments():
 
 def download_teqc(station: str, year: int, year_end: int = None):
     """
-        Download teqc logs from UNAVCO per year.
-        Parameters:
-        ___________
-        station : string
-                4 character ID of the station
+    Download teqc logs from UNAVCO for one (or more) year.
+        
+    Parameters
+    ----------
+    station : string
+        4 character ID of the station
 
-        year : integer
-            Year
+    year : integer
+        Year
 
-        year_end : int, optional
-            end year. This is to create a range from year to year_end to get the snr files for more than one year.
-            Default is None.
+    year_end : int, optional
+        end year. 
+
     """
 
 #   make sure environment variables exist.  set to current directory if not

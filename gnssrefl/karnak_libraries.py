@@ -376,7 +376,7 @@ def universal_rinex2(station, year, doy, archive):
     """
     seamless archive for rinex 2 files ...
 
-    parameters
+    Parameters
     -----------
     station : string
         four character station name
@@ -387,8 +387,8 @@ def universal_rinex2(station, year, doy, archive):
     archive : string
         name of the GNSS archive
 
-    returns
-    ---------
+    Returns
+    -------
     file_name : string
         filename that was downloaded
 
@@ -485,13 +485,13 @@ def make_rinex2_ofiles(file_name):
     take a rinex2 file gunzip or uncompress and 
     then Hatanaka decompress it
 
-    parameters
-    ---------
+    Parameters
+    ----------
     file_name: string
         rinex2 filename
 
-    returns
-    --------
+    Returns
+    -------
     new_name : string
         filename after multiple decompression processes
     fexist : boolean
@@ -530,8 +530,8 @@ def strip_rinexfile(rinexfile):
     """
     uses either teqc or gfzrnx to reduce observables
 
-    parameters
-    ---------
+    Parameters
+    ----------
     rinexfile : string
         name of the rinex2 file
     """
@@ -647,14 +647,16 @@ def ga_stuff_highrate(station, year, doy,rinexv=3):
 def serial_cddis_files(dname,cyyyy,cdoy):
     """
     only looks in the hatanaka decompression section of cddis
-    parameters
-    -------------
+
+    Parameters
+    ----------
     dname : string
         rinex2 filename without compression extension
     cyyyy : string
         four character year
     cdoy : string
         three character day of yaer
+
     """
     foundit = False
     f = ''

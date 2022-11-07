@@ -42,8 +42,8 @@ def parse_arguments():
 def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
         extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360, test: bool = False):
     """
-        Parameters:
-        ___________
+        Parameters
+        __________
         station : string
             4 or 9 character ID of the station.
 
@@ -74,8 +74,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
             default is 2021.
 
         fr : int, optional
-            GNSS frequency.
-            value options:
+            GNSS frequency. Value options:
                 0 (default) : all
                 1 : GPS L1
                 2 : GPS L2
@@ -91,7 +90,6 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
                 302 : BEIDOU B1
                 306 : BEIDOU B3
                 307 : BEIDOU B2
-            default is 0. (all)
 
         csv : boolean, optional
             Whether you want csv instead of a plain text file.

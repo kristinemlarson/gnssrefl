@@ -112,32 +112,33 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     """
         Downloads IOC tide gauge files
 
-        Parameters:
-        ___________
-        station : string
+        Parameters
+        __________
+        station : str
+            IOC station name 
 
-        date1 : string
+        date1 : str
             begin date in yyyymmdd.
             Example value: 20150101
 
-        date2 : string
+        date2 : str
             end date in yyyymmdd.
             Example value: 20150101
 
-        output : string, optional
+        output : str, optional
             Optional output filename
             default is None
             The file will be written to REFL_CODE/Files
 
-        plt: boolean, optional
+        plt: bool, optional
             plot comes to the screen
             default is None
 
-        outliers: boolean, optional
+        outliers: bool, optional
             tried to remove outliers, but it doesn't work as yet
             default is No
 
-        sensor: string, optional
+        sensor: str, optional
             type of sensor, prs(for pressure), rad (for radar), flt (for float)
             default is None, which means it will print out what is there.
             if there is more than one sensor you should specifically ask for the one

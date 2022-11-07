@@ -21,7 +21,7 @@ def quickp(station,t,sealevel):
     makes quick plot of the tide gauge data
 
     Parameters
-    -----------
+    ----------
     station: string
         4 character ID of the station
 

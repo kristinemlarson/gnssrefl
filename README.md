@@ -37,7 +37,7 @@ We are [developing readthedocs documentation](https://gnssrefl.readthedocs.io/en
 GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, EAR 1144221, AGS 1449554) and 
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was developed with support from NASA (80NSSC20K1731).
 
-This documentation was updated on October 4, 2022
+This documentation was updated on November 7, 2022
 <HR>
 
 

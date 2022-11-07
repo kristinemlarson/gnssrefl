@@ -18,8 +18,7 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
     downloads/writes NOAA tidegauge data for one month
 
     Parameters
-    ------------
-
+    ----------
     station : string
 
     year : integer
@@ -44,7 +43,7 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
         default is False
 
     Returns
-    ----------
+    -------
     tt : numpy array 
         modified julian date for water measurements
 
@@ -85,8 +84,8 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
     """
     downloads NOAA water level measurements > one month
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     station : string
 
     datum : string
@@ -108,8 +107,8 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
     csv : boolean 
         whether output file is csv format
 
-    Returns:
-    ---------
+    Returns
+    -------
     tt : list of times 
         modified julian day
     obstimes : list of datetime objects 
@@ -141,7 +140,7 @@ def noaa2me(date1):
     converts NOAA type of date string to simple integers
 
     Parameters 
-    --------
+    ----------
     date1 : string
         time in format YYYYMMDD for year month and day
 
@@ -239,10 +238,23 @@ def write_out_data(data,fout, tt,obstimes,slevel,csv):
 
 def pickup_from_noaa(station,date1,date2,datum, printmeta):
     """
+    Parameters
+    ----------
     station: str
-    date1: str , beginning time, 20120101 is January 1, 2012
-    date2: str, end time , same format
+        station name
+    date1: str 
+        beginning time, 20120101 is January 1, 2012
+    date2: str
+        end time , same format
+
     datum: str
+
+    Returns
+    -------
+    data : dictionary in NOAA format
+
+    error : bool
+
     """
 
     error = False
