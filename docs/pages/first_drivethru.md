@@ -7,22 +7,22 @@
 <TD>
 <B>Ice Sheets</B>
 
-* [Lorne, Ross Ice Shelf](docs/pages/use_cases/use_lorg.md) (lorg)
+* [Lorne, Ross Ice Shelf](use_cases/use_lorg.md) (lorg)
 
-* [Dye2, Greenland Ice Sheet](docs/pages/use_cases/use_gls1.md) (gls1)
+* [Dye2, Greenland Ice Sheet](use_cases/use_gls1.md) (gls1)
 
-* [Thwaites Glacier, Antarctica](docs/pages/use_cases/use_lthw.md) (lthw)
+* [Thwaites Glacier, Antarctica](use_cases/use_lthw.md) (lthw)
 
-* [Summit Camp, Greenland](docs/pages/use_cases/use_smm3.md) (smm3)
+* [Summit Camp, Greenland](use_cases/use_smm3.md) (smm3)
 
-* [Phoenix, Antarctica](docs/pages/use_cases/use_phnx.md) (phnx)
+* [Phoenix, Antarctica](use_cases/use_phnx.md) (phnx)
 </TD>
 <td>
 <B>Lakes and Rivers</B>
 
-* [Michipicoten, Canada](use_cases/use_mchn.md) (mchn)
+* [Michipicoten, Canada](../use_cases/use_mchn.md) (mchn)
 
-* [Lake Taupo, New Zealand](use_cases/use_tgho.md) (tgho)
+* [Lake Taupo, New Zealand](../use_cases/use_tgho.md) (tgho)
 
 * [St Lawrence River,Canada](use_cases/use_pmtl.md) (pmtl)
 
