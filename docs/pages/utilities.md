@@ -4,7 +4,7 @@
 download RINEX v2.11 or 3 files (using the version flag) without using 
 the reflection-specific codes. As with <code>rinex2snr</code>, the default archive is 
 to check unavco, sopac, and sonel in that order. For other archives, you must specify their name.
-For a listing of supported archives, please see the documentation for [rinex2snr](#rinex2snr).
+For a listing of supported archives, please see the [rinex2snr documentation](rinex2snr.md).
 
 Sample calls:
 
@@ -18,7 +18,7 @@ Sample calls:
 from the cddis archive on day of year 150 in 2020
 
 <code>download_orbits</code> downloads orbit files and stores them in $ORBITS. The list of orbits 
-we support changes regularly. Please see the [rinex2snr documentation](docs/pages/rinex2snr.md).
+we support changes regularly. Please see the [rinex2snr documentation](rinex2snr.md).
 
 <code>ymd</code> translates year,month,day to day of year
 
