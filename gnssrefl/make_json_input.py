@@ -52,77 +52,71 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
               extension: str = None ):
     """
-            Parameters:
-            ___________
-            station : string
-                4 or 9 character ID of the station.
 
-            lat : float
-                latitude in degrees.
+    Parameters
+    ----------
+    station : string
+        4 or 9 character ID of the station.
 
-            long : float
-                longitude in degrees.
+    lat : float
+        latitude in degrees.
 
-            height : float
-                ellipsoidal height in meters.
+    long : float
+        longitude in degrees.
 
-            e1 : integer, optional
-                elevation angle lower limit in degrees.
-                default is 5.
+    height : float
+        ellipsoidal height in meters.
 
-            e2 : integer, optional
-                elevation angle upper limit in degrees.
-                default is 25.
+    e1 : integer, optional
+        elevation angle lower limit in degrees. default is 5.
 
-            h1 : float, optional
-                reflector height lower limit in meters.
-                default is 0.5.
+    e2 : integer, optional
+        elevation angle upper limit in degrees. default is 25.
 
-            h2 : float, optional
-                reflector height upper limit in meters.
-                default is 6.
+    h1 : float, optional
+        reflector height lower limit in meters. default is 0.5.
 
-            nr1 : float, optional
-                noise region lower limit for QC in meters.
-                default is None.
+    h2 : float, optional
+        reflector height upper limit in meters. default is 6.
 
-            nr2 : float, optional
-                noise region upper limit for QC in meters.
-                default is None.
+    nr1 : float, optional
+        noise region lower limit for QC in meters. default is None.
 
-            peak2noise : float, optional
-                peak to noise ratio used for QC.
-                default is 2.7 (just a starting point for water - should be 3 or 3.5 for snow ...)
+    nr2 : float, optional
+        noise region upper limit for QC in meters. default is None.
 
-            ampl : float, optional
-                spectral peak amplitude for QC.
-                default is 6.0
+    peak2noise : float, optional
+        peak to noise ratio used for QC.
+        default is 2.7 (just a starting point for water - should be 3 or 3.5 for snow or soil...)
 
-            allfreq : Boolean, optional
-                True requests all GNSS frequencies.
-                default is False (defaults to use GPS frequencies).
+    ampl : float, optional
+        spectral peak amplitude for QC. default is 6.0
+        this is receiver and elevation angle region dependent - so you need to change it based on your site 
 
-            l1 : boolean, optional
-                set to True to use only GPS L1 frequency.
-                default is False.
+    allfreq : Boolean, optional
+        True requests all GNSS frequencies.
+        default is False (defaults to use GPS frequencies).
 
-            l2c : boolean, optional
-                set to Trye to use only GPS L2C frequency.
-                default is False.
+    l1 : boolean, optional
+        set to True to use only GPS L1 frequency. default is False.
 
-            xyz : boolean, optional
-                set to True if using Cartesian coordinates.
-                default is False.
+    l2c : boolean, optional
+        set to use only GPS L2C frequency. default is False.
 
-            refraction : boolean, optional
-                set to False to turn off refraction correction.
-                default is True.
+    xyz : boolean, optional
+        set to True if using Cartesian coordinates instead of Lat/Long/Ht.
+        default is False.
 
-            extension : string, optional
-                provide extension name so you can try different strategies.
-                default is None
+    refraction : boolean, optional
+        set to False to turn off refraction correction.
+        default is True.
 
-        """
+    extension : string, optional
+        provide extension name so you can try different strategies. 
+        Results will then go into $REFL_CODE/YYYY/results/ssss/extension
+        Default is None
+
+    """
 
     # make sure environment variables exist
     g.check_environ_variables()
