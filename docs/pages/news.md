@@ -1,5 +1,10 @@
 ### News <a name="news"></a>
 
+November 8, 2022
+
+I fixed a bug in the download_ioc and download_noaa scripts. I had somehow failed to import the subprocess
+library - so output directories were not being made if needed.
+
 **WARNING: CDDIS has changed their high-rate directory protocol for older files. This means some 
 of our download codes now fail.
 If someone wants to provide a pull request that addresses this issue, I 
