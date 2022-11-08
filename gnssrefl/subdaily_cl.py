@@ -119,6 +119,10 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
                 plot for kristine
     """
 
+    if len(station) != 4:
+        print('station names must be four characters long')
+        sys.exit()
+
     # make surer environment variables are set
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']

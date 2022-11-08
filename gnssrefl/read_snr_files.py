@@ -5,7 +5,7 @@ import os
 import subprocess 
 import sys
 
-def read_snr_multiday(obsfile,obsfile2,twoDays):
+def read_snr_multiday(obsfile,obsfile2,twoDays,dec=1):
     """
     parameters
     ---------
@@ -17,6 +17,9 @@ def read_snr_multiday(obsfile,obsfile2,twoDays):
 
     twoDays : boolean
         False (default) for using only the first file
+
+    dec : int
+        decimation value. 1 means do nothing
 
     results
     ----------
@@ -65,6 +68,14 @@ def read_snr_multiday(obsfile,obsfile2,twoDays):
             print('compressed file exists, so uncompress it')
             subprocess.call(['unxz', compressedObs])
         sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE = read_one_snr(obsfile,1)
+        if dec != 1:
+            print('Invoking the decimation flag:')
+            rem_arr = np.remainder(t, [dec])
+            iss = (rem_arr==0)
+            sat=sat[iss] ; ele=ele[iss] ; azi=azi[iss]
+            t=t[iss] ; edot=edot[iss]
+            s1= s1[iss] ; s2= s2[iss] ; s5= s5[iss] ;
+            s6= s6[iss] ; s7= s7[iss] ; s8= s8[iss]
         allGood1 = 1
 #        g.print_file_stats(ele,sat,s1,s2,s5,s6,s7,s8,e1,e2)
     except:
@@ -124,11 +135,42 @@ def read_snr_multiday(obsfile,obsfile2,twoDays):
 
 def read_one_snr(obsfile,ifile):
     """
-    input: observation filename 
-    ifile: 1 (primary) or 2 (day before)
-    output: contents of the file, withe various other metrics
-    21apr18 eliminate negative elevation angles to be safe
-    (come from satellites set to bad by JAXa - should not have been written to SNR file)
+    reads a SNR file, changes units (linear) and stores as variables
+
+    Parameters
+    ----------
+    obsfile : str
+        SNR file name
+    ifile : int
+        1 for primary file or 2 for the day before the primary file
+
+    Returns
+    -------
+    sat: numpy array of int 
+        satellite number 
+    ele : numpy array of floats 
+        elevation angle in degrees
+    azi : numpy array of floats
+        azimuth in degrees
+    t:  numpy array of floats
+        time in seconds of the day
+    edot : numpy array of floats
+        elevation angle derivative (units?)
+    s1 : numpy array of floats
+        L1 SNR in dB-Hz
+    s2:  numpy array of floats 
+        L2 SNR in dB-Hz
+    s5 :  numpy array of floats 
+        L5 SNR in dB-Hz
+    s6 :  numpy array of floats 
+        L6 SNR in dB-Hz
+    s7 :  numpy array of floats 
+        L7 SNR in dB-Hz
+    s8 :  numpy array of floats 
+        L8 SNR in dB-Hz
+    snrE : bool list
+        whether the SNR exists for that Frequency 
+
     """
 
     sat=[]; ele=[]; az=[]; t=[]; edot=[]; s=[];  s2=[]; s5=[];  s6=[]; s7=[];  s8=[];

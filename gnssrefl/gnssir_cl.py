@@ -42,6 +42,7 @@ def parse_arguments():
     parser.add_argument("-e1", default=None, type=float, help="override min elev angle")
     parser.add_argument("-e2", default=None, type=float, help="override max elev angle")
     parser.add_argument("-mmdd", default=None, type=str, help="boolean, add columns for month,day,hour,minute")
+    parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
 
     args = parser.parse_args().__dict__
 
@@ -57,7 +58,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
            ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None,
            azim1: int = 0, azim2: int = 360, nooverwrite: bool = False, extension: str = '',
            compress: bool = False, screenstats: bool = False, delTmax: int = None,
-           e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False):
+           e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False, dec : int = 1):
     """
         This is the main driver for estimating Reflector Height using GNSS Interferometric Reflectometry.
 
@@ -168,6 +169,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             gzip compress SNR files after use.
             default is False.
 
+        dec : int, optional
+            decimate SNR file to this sampling period before the 
+            periodograms are computed. 1 sec is default (i.e. no decimating)
+
     """
 
 #   make sure environment variables exist.  set to current directory if not
@@ -195,6 +200,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # screenstats is True unless user changes
     lsp['screenstats'] = screenstats
 
+    # added this for people that have 1 sec files that do not need this resolution
+    # decimation is a bit slow but way faster than doing a gazillion periodograms with 
+    # 1 sec data
+
+    lsp['dec'] = dec
 
     # in case you want to analyze multiple days of data
     if doy_end is None:

@@ -49,7 +49,8 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     plot_screen = lsp['plt_screen'] 
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
     gzip = lsp['gzip']
-    # this had a bug in it.
+    # added 2022 nov 08
+    dec = lsp['dec']
     #print('Number of azimuths', len(azval))
     for i in range(0,len(azval),2):
         #print(i, azval[i], azval[i+1])
@@ -87,7 +88,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         # uncompress here so you should not have to do it in read_snr_multiday ...
         obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
 
-        allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays)
+        allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays,dec)
         # added gzip option.  first input is xz compression
         snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
     if (allGood == 1):
