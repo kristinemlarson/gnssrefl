@@ -43,15 +43,6 @@ def find_start_stop(year,m):
     else:
         cmm = '{:02d}'.format(m+1)
         d2 = cyyyy + cmm + '01'
-    #if m in [1,3,5,7,8,10,12]:
-    #    d2 = cyyyy + cmm + '31'
-    #else:
-    #    if m == 2:
-    #        if (g.dec31(year) == 366): # leap year
-    #            d2 = cyyyy + cmm + '29'
-    #        else:
-    #            d2 = cyyyy + cmm + '28'
-    #    else:
 
     return d1, d2
 
@@ -59,10 +50,10 @@ def find_start_stop(year,m):
 def quickp(station,t,sealevel):
     """
     makes a quick plot of sea level for station s
+    prints to the screen - does not save it.
 
     Parameters
     -----------
-
     station : string
         station name
 
@@ -214,6 +205,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         fout.write("# YYYY,MM,DD,HH,MM,Water(m),DOY, MJD, SS \n")
     else:
         fout.write("%YYYY MM DD  HH MM   Water(m) DOY  MJD     SS \n")
+        fout.write("% 1   2  3   4  5     6        7    8      9  \n")
     i = 1
 
 #    All values X where abs(X – median) > tolerance are hidden.

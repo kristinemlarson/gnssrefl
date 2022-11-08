@@ -178,7 +178,6 @@ def write_out_data(data,fout, tt,obstimes,slevel,csv):
 
     Parameters
     ----------
-
     data : dictionary from NOAA API
 
     fout : file ID 
@@ -197,11 +196,13 @@ def write_out_data(data,fout, tt,obstimes,slevel,csv):
 
     Returns
     -------
-    tt : 
+    tt :  same as input, but larger
 
-    obstimes :
+    obstimes : list of datetimes
+        times for waterlevels
 
-    slevel :
+    slevel : list of floats
+        water levels in meters
 
     """
     NV = len(data['data'])
@@ -238,6 +239,8 @@ def write_out_data(data,fout, tt,obstimes,slevel,csv):
 
 def pickup_from_noaa(station,date1,date2,datum, printmeta):
     """
+    pickup up NOAA data between date1 and date2, which can be 
+    longer than one month (NOAA API restriction) 
     Parameters
     ----------
     station: str
@@ -248,6 +251,10 @@ def pickup_from_noaa(station,date1,date2,datum, printmeta):
         end time , same format
 
     datum: str
+        what kind of datum is requested
+
+    printmeta : bool
+        print metadata to screen 
 
     Returns
     -------
@@ -274,7 +281,7 @@ def pickup_from_noaa(station,date1,date2,datum, printmeta):
 
 def quickp(station,t,sealevel,noaa_name):
     """
-    makes a quick plot to the screen
+    makes a quick plot to the screen of the NOAA tide gauge data
 
     Parameters
     ----------
