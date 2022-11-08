@@ -7,10 +7,11 @@ def check_rinex_header(rinexfile):
     """
     commandline tool to look at header information in a RINEX file
 
-    parameter
+    Parameters
     --------
-    rinexfile : string
+    rinexfile : str
         name of the file
+
     """
     # assume no coordinates in the file
     recx=0; recy = 0; recz = 0
@@ -75,7 +76,6 @@ def check_rinex_header(rinexfile):
 
 def main():
 
-# must input start and end year
     parser = argparse.ArgumentParser()
     parser.add_argument("rinexfile", help="rinexfile name", type=str)
     args = parser.parse_args()

@@ -61,8 +61,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     """
         This is the main driver for estimating Reflector Height using GNSS Interferometric Reflectometry.
 
-        parameters:
-        ___________
+        Parameters
+        ----------
         station : string
             4 or 9 character ID of the station
             lowercase please
@@ -301,20 +301,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# get instructions first - this should be a standalone function some day
-# instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
-# instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
-# if os.path.isfile(instructions_ext):
-#     print('using specific instructions for this extension')
-#     with open(instructions_ext) as f:
-#             lsp = json.load(f)
-# else:
-#    print('will use the default instructions')
-#    if os.path.isfile(instructions):
-#        with open(instructions) as f:
-#            lsp = json.load(f)
-#    else:
-#        print('Instruction file does not exist: ', instructions)
-#        print('Please make with make_json_input and run this code again.')
-#        sys.exit()
 

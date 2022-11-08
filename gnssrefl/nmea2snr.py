@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-to convert nmea files to snr files 
+convert nmea files to snr files 
 """
 from __future__ import division
 import numpy as np 
 import os
 import subprocess
 from scipy.interpolate import interp1d
+
 import gnssrefl.gps as g
 
 def NMEA2SNR(locdir, fname, snrfile, csnr):
@@ -14,15 +15,15 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
 
     Parameters
     -----------
-    locdir : string
+    locdir : str
         directory where your SNR files are kept
     fname : string
         NMEA filename 
 
-    snrfile : string
+    snrfile : str
         name of output file for SNR data
 
-    csnr : string
+    csnr : str
         snr option, i.e. '66' or '99'
 
     """
@@ -94,14 +95,14 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
 def read_nmea(fname):
     """
     read GPGGA sentence (includes snr data) in NMEA files    
-    parameters
-    -----------
+
+    Parameters
+    ----------
     fname : string
         NMEA filename
 
-
-    returns
-    ------------
+    Returns
+    -------
     t : list of integers
         timetags in GPS seconds 
 
@@ -197,7 +198,7 @@ def fix_angle_azimuth(time, angle, azimuth):
     interpolate elevation angles and azimuth to retrieve decimal values thru time     
     this is for NMEA files.
 
-    parameters
+    Parameters
     ----------
     time : list of floats
         GPS seconds of the week
@@ -207,8 +208,8 @@ def fix_angle_azimuth(time, angle, azimuth):
     azimuth : list of floats
         azimuth angles (degrees)
 
-    returns
-    ---------
+    Returns
+    -------
     angle_fixed : list of floats
         interpolated elevation angles
 
@@ -260,6 +261,12 @@ def azimuth_diff2(azim1, azim2):
     return diff
 
 def azimuth_diff1 (azim):
+    """
+    Parameters
+    ----------
+    azim: ??
+
+    """
     azim_a = azim[0:-1]
     azim_b = azim[1:]
     diff = azimuth_diff2 (azim_b, azim_a);
@@ -267,6 +274,14 @@ def azimuth_diff1 (azim):
     return diff
 
 def azimuth_diff(azim1, azim2):
+    """
+    Parameters
+    ----------
+    azim1 : ??
+
+    azim2 : ??
+
+    """
     if not(azim2.size):
         diff = azimuth_diff1 (azim1)
     else:
@@ -275,6 +290,13 @@ def azimuth_diff(azim1, azim2):
     return diff
      
 def angle_range_positive(ang):
+    """
+
+    Parameters
+    ----------
+    ang : ??
+
+    """
 #    idx1 = np.isfinite(ang)
     ang = np.angle(np.exp(1j*ang*np.pi/180))*180/np.pi  
     idx2 = (ang < 0)
@@ -283,15 +305,15 @@ def angle_range_positive(ang):
 
 def azimuth_mean(azim1, azim2):
     """
-    parameters
-    --------
-    azim1 : float
+    Parameters
+    ----------
+    azim1 : list of floats ? 
          azimuth degrees
 
-    azim2 : float
+    azim2 : list of floats
          azimuth degrees
 
-    returns
+    Returns
     ---------
     azim : float 
         degrees
@@ -314,19 +336,19 @@ def quickname(station,year,cyy, cdoy, csnr):
     given station name, year, doy, snr type
     returns snr file name and its path under REFL_CODE/year/snr/station/
 
-    parameters
-    ------------
-    station : string
+    Parameters
+    ----------
+    station : str
 
-    year : integer
+    year : int
 
-    cyy : string 
+    cyy : str 
         two character yar
 
-    cdoy : integer
+    cdoy : str
         three character day of year
 
-    csnr : string
+    csnr : str
         snr type, e.g. '66' 
     """
     
@@ -338,13 +360,16 @@ def quickname(station,year,cyy, cdoy, csnr):
 
 def elev_limits(snroption):
     """
-    parameters
-    ------------
-    snroption : integer
+
+    given snr option return the elevation angle limits
+
+    Parameters
+    ----------
+    snroption : int
         snrfile number
 
-    returns
-    ----------
+    Returns
+    -------
     emin : float
         min elevation angle (degrees)
     emax : float
@@ -367,19 +392,23 @@ def elev_limits(snroption):
   
 def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
     """
-    runs the nmea2snr conversion
+    runs the nmea2snr conversion code
 
     Parameters
     ----------
-    station : string
-        name 
+    station : str
+        name of station 
+
     year_list : list of integers
+        years 
 
     doy_list : list of days of year
+        days of years
 
-    isnr : integer
+    isnr : int
         snr file type
-    overwrite : boolean 
+
+    overwrite : bool
         whether make a new SNR file even if one already exists
 
     """
