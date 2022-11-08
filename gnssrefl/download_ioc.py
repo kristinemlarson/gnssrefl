@@ -9,6 +9,7 @@ import datetime
 import numpy as np
 import os
 import requests
+import subprocess
 import sys
 import gnssrefl.gps as g
 import matplotlib.pyplot as plt
@@ -87,6 +88,7 @@ def parse_arguments():
     parser.add_argument("-plt", default=None, help="Optional plot to screen", type=str)
     parser.add_argument("-outliers", default=None, help="attempt to remove outliers", type=str)
     parser.add_argument("-sensor", default=None, help="Various: flt, prs or rad, default is rad. If there are multiple sensors, they are all written to the file.", type=str)
+    parser.add_argument("-subdir", default=None, help="subdirectory for output file", type=str)
     args = parser.parse_args().__dict__
 
 
@@ -99,12 +101,12 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: bool = False, outliers: bool = False, sensor= None):
+def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: bool = False, outliers: bool = False, sensor= None, subdir: str=None):
     """
         Downloads IOC tide gauge files
 
         Parameters
-        __________
+        ----------
         station : str
             IOC station name 
 
@@ -160,6 +162,14 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     if not os.path.exists(outdir) :
         subprocess.call(['mkdir', outdir])
 
+    if subdir is None:
+        print('Using this output directory: ', outdir)
+    else:
+        outdir = xdir  + '/Files/' + subdir + '/'
+        print('Using this output directory: ', outdir)
+        if not os.path.exists(outdir) :
+            subprocess.call(['mkdir', outdir])
+
     csv = False
     if output is None:
         outfile = outdir + station + '_' + 'ioc.txt' # use the default
@@ -172,7 +182,6 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     month1 = int(date1[4:6])
     month2 = int(date2[4:6])
     year = int(date1[0:4])
-    print(month1,month2)
 
     if (month1 == month2):
         newurl = url1 + station + '&timestart=' + date1 + '&timestop=' + date2 + url2

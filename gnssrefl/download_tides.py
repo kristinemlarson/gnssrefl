@@ -8,6 +8,7 @@ import datetime
 import matplotlib.pyplot as plt
 import os
 import requests
+import subprocess
 import sys
 import gnssrefl.gps as g
 
@@ -319,6 +320,7 @@ def parse_arguments():
     parser.add_argument("-output", default=None, help="Optional output filename", type=str)
     parser.add_argument("-plt", default=None, help="quick plot to screen", type=str)
     parser.add_argument("-datum", default=None, help="datum (lwd for lakes?)", type=str)
+    parser.add_argument("-subdir", default=None, help="optional subdirectory name for output", type=str)
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -330,21 +332,21 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_tides(station: str, date1: str, date2: str, output: str = None, plt: bool = False, datum: str = 'mllw'):
+def download_tides(station: str, date1: str, date2: str, output: str = None, plt: bool = False, datum: str = 'mllw', subdir: str = None):
     """
         Downloads NOAA tide gauge files
         Downloads a json and converts it to plain txt with columns!
 
         Parameters 
-        ___________
-        station : string
+        ----------
+        station : str
             7 character ID of the station.
 
-        date1 : string
+        date1 : str
             start date.
             Example value: 20150101
 
-        date2 : string
+        date2 : str
             end date.
             Example value: 20150110
 
@@ -360,12 +362,15 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
             set to lwd for lakes?
             default is mllw
 
+        subdir : str, optional
+            subdirectory for output in the $REFL_CODE/Files area
+
         If you ask for 31 days of data or less, it will downlaod exactly what you ask for.
         But if you want a longer time series, this code needs to query the NOAA API every month.
         To make the code easier to write, I start with the first day of the first month you ask for and end with
         last day in the last month.
 
-        Output is written to REFL_CODE/Files/
+        Output is written to REFL_CODE/Files/ unless subdir optional input is set
 
     """
     g.check_environ_variables()
@@ -375,7 +380,13 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
     if not os.path.exists(outdir) :
         subprocess.call(['mkdir', outdir])
 
-
+    if (subdir is None):
+        print('Using regular output directory',outdir )
+    else:
+        outdir = xdir  + '/Files/' + subdir + '/'
+        print('User requested a subdirectory for output', outdir)
+        if not os.path.exists(outdir):
+            subprocess.call(['mkdir', outdir])
 
     if len(station) != 7:
         print('station must have 7 characters ', station); sys.exit()
