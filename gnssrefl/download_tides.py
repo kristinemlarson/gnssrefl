@@ -88,8 +88,10 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
     Parameters
     ----------
     station : string
+        NOAA station name
 
     datum : string
+        definition of water level datum
 
     fout - fileID for writing results
 
@@ -242,12 +244,15 @@ def pickup_from_noaa(station,date1,date2,datum, printmeta):
     """
     pickup up NOAA data between date1 and date2, which can be 
     longer than one month (NOAA API restriction) 
+
     Parameters
     ----------
     station: str
         station name
+
     date1: str 
         beginning time, 20120101 is January 1, 2012
+
     date2: str
         end time , same format
 

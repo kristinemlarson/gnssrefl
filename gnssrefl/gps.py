@@ -443,7 +443,7 @@ def up(lat,lon):
         radians
 
     Returns
-    ----------
+    -------
     East : three vector
         local transformation unit vector
 
@@ -609,17 +609,18 @@ def ymd2doy(year,month,day):
     Calculates day of year and other date strings
     
     Parameters
-    --------------
-
+    ----------
     year : integer
+        full year
 
     month : integer
+        month
 
     day : integer
         day of the month
 
     Returns
-    ---------
+    -------
     doy : integer
          day of year
     cdoy : string 
@@ -648,7 +649,7 @@ def getnavfile(year, month, day):
     picks up nav file and stores it in the ORBITS directory
 
     Parameters
-    -----------
+    ----------
     year: integer
 
     month: integer
@@ -658,7 +659,7 @@ def getnavfile(year, month, day):
         day
 
     Returns
-    ----------
+    -------
     navname : string
         name of navigation file
 
@@ -693,9 +694,6 @@ def getnavfile(year, month, day):
 def getsp3file(year,month,day):
     """
     retrieves IGS sp3 precise orbit file from CDDIS
-    inputs are year, month, and day 
-    modified in 2019 to use wget 
-    returns the name of the file and its directory
 
     Parameters
     -----------
@@ -705,13 +703,12 @@ def getsp3file(year,month,day):
 
     day : integer
 
-
     Returns
     -----------
-    name : string
+    name : str
         filename for the orbits
 
-    fdir : string
+    fdir : str
         directory for the orbits
 
     """
@@ -764,7 +761,7 @@ def getsp3file_flex(year,month,day,pCtr):
         3 character orbit processing center
 
     Returns
-    -----------
+    -------
     name : string
         filename for the orbits
 
@@ -816,7 +813,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     retrieves MGEX sp3 orbit files 
 
     Parameters
-    ---------------
+    ----------
     year : integer
 
     month : integer
@@ -926,8 +923,8 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     file2 is like this: GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz
     it then stores it the year directory (with a given name)
 
-    Parameters:
-    ------------
+    Parameters
+    ----------
     name : string
         the name of the orbit file you want to download from CDDIS
 
@@ -942,13 +939,12 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     file2 : string
         name without the compression???
 
-    Returns:
-
+    Returns
+    -------
     foundit : boolean
         whether the file was found
 
     now checks that file size is not zero. allows old file name downloads
-    ------------
 
     """
     # assume file was not found
@@ -982,6 +978,7 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
 
 def kgpsweek(year, month, day, hour, minute, second):
     """
+
     Parameters
     ----------
     year : string
@@ -1052,6 +1049,7 @@ def kgpsweekC(z):
     mi=np.int(z[13:15])
     sec=np.float(z[16:26])
     gpsw,gpss = kgpsweek(y+2000,m,d,hr,mi,sec)
+
     return gpsw, gpss
 
 def igsname(year,month,day):
@@ -1059,7 +1057,7 @@ def igsname(year,month,day):
     returns the name of an IGS orbit file
 
     Parameters
-    -----------
+    ----------
     year : integer
         four character year
 
@@ -1068,7 +1066,7 @@ def igsname(year,month,day):
     day : integer 
 
     Returns
-    ------------
+    -------
     name : str
         IGS orbit name
 
@@ -1118,7 +1116,11 @@ def read_sp3(file):
 
 def myreadnav(file):
     """
-    input is navfile name
+    Parameters
+    ----------
+    file : str
+        nav filename
+
     output is complicated - broadcast ephemeris blocks
     """
 # input is the nav file
@@ -1177,6 +1179,7 @@ def myreadnav(file):
         #print('This ephemeris file does not exist',file)
         ephem = []
     return ephem
+
 def myfindephem(week, sweek, ephem, prn):
     """
 # inputs are gps week, seconds of week
@@ -1223,7 +1226,7 @@ def findConstell(cc):
         C : Beidou
 
     Returns
-    ---------
+    -------
     out : integer
         value added to satellite number for our system,
         0 for GPS, 100 for Glonass, 200 for Galileo, 300 for everything else
@@ -3057,13 +3060,21 @@ def rewrite_tseries_wrapids(station):
 
 def back2thefuture(iyear, idoy):
     """
-    user inputs iyear and idoy
-    and the code checks that this is not a day in the future
-    also don't allow the dates to agree exactly because we 
-    do not have the current day's orbit file available (though
-    it could be chagned to allow it.
+    code checks that this is not a day in the future
+    also rejects data before the year 2000
 
-    reject data before the year 2000
+    Parameters
+    ----------
+    iyear : int
+        full year
+    idoy : int
+        day of year
+
+    Returns
+    --------
+    badDay : bool
+        whether your day exists (yet)
+
     """
     # find out today's date
     year = int(date.today().strftime("%Y"));
@@ -3086,10 +3097,10 @@ def back2thefuture(iyear, idoy):
 
 def rinex_ga_highrate(station, year, month, day):
     """
-    no longer supported
+    no longer supported - 
 
     Parameters
-    ------------
+    ----------
     station : string
         4 character station ID, lowercase
 
@@ -3099,14 +3110,6 @@ def rinex_ga_highrate(station, year, month, day):
 
     day : integer
 
-
-    inputs: station name, year, month, day
-    picks up a higrate RINEX file from Geoscience Australia
-    you can input day =0 and it will assume month is day of year
-    not sure if it merges them ...
-    2020 September 2 - moved to gz and new ftp site
-    ??? does not appear to have Rinex 2 files anymore ???
-    ??? goes they switched in 2020 .... ???
     """
     crnxpath = hatanaka_version()
     teqcpath = teqc_version()
@@ -3175,16 +3178,24 @@ def rinex_ga_highrate(station, year, month, day):
 
 def highrate_nz(station, year, month, day):
     """
+    picks up a high-rate RINEX 2.11 file from GNS New zealand
+    requires teqc to convert/merge the files
+
+    Parameters
+    ----------
+    station : str
+        station name
+    year : int
+        full year
+    month :  int
+        month or day of year
+    day : int
+        day or zero
     inputs: station name, year, month, day
-    picks up a RINEX file from GNS New zealand
-    you can input day =0 and it will assume month is day of year
-    you can also try this site - not coded up yet, but I think
-    the data stay there for a couple months for some sites.
-    ftp://ftp.geonet.org.nz/rtgps/rinex1Hz/PositioNZ/2021/062/
-    21sep02 - started to change from ftp to https - but did not finish
+
     """
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    gns = 'ftp://ftp.geonet.org.nz/gnss/event.highrate/1hz/raw/' + cyyyy +'/' + cdoy + '/'
+    #gns = 'ftp://ftp.geonet.org.nz/gnss/event.highrate/1hz/raw/' + cyyyy +'/' + cdoy + '/'
     gns = 'https://data.geonet.org.nz/gnss/event.highrate/1hz/raw/' + cyyyy +'/' + cdoy + '/'
     print(gns)
     stationU=station.upper()
@@ -3225,7 +3236,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     also sets executable location for translation (gpsonly vs multignss)
 
     Parameters
-    ---------
+    ----------
     year : integer
 
     month : integer
@@ -3239,7 +3250,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         whether you are using forran code for translation
 
     Returns
-    -------------
+    -------
     foundit : boolean
         whether orbit file was found
     f : string
@@ -3331,7 +3342,6 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
 def warn_and_exit(snrexe,fortran):
     """
     if snr executable does not exist, exit
-    2020sep04 - send it fortran boolean.  
     """
     if not fortran:
         ok = 1
@@ -3363,8 +3373,8 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
 
         whether you want only GPS signals. Default is false
 
-    returns
-    -----------
+    Returns
+    -------
     fexists : boolean
         whether rinex 2 file was created and exists
 
@@ -3428,7 +3438,20 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
 
 def ign_orbits(filename, directory,year):
     """
-    inputs are filename of MGEX sp3 and directory at IGN
+    Parameters
+    ----------
+    filename : str
+        name of the sp3 file
+    directory : str
+        location of orbits at the IGN
+    year : int
+        full year
+
+    Returns
+    -------
+    foundit : boolean
+        whether sp3 file was found
+
     """
     # without gz
     stripped_name = filename[0:-3]
@@ -3450,9 +3473,22 @@ def ign_orbits(filename, directory,year):
 def ign_rinex3(station9ch, year, doy,srate):
     """
     download rinex 3 from IGN
-    inputs: 9 character station name, year, day of year and srate
-    is sample rate in seconds
-    note: this code works - but it does not turn it into RINEX 2 for you
+
+    Parameters
+    ----------
+    station9ch : str
+        9 character station name
+    year : int
+        full year
+    doy : int
+        day of year 
+    srate : int
+        sample rate
+
+    Returns
+    -------
+    fexist : boolean
+        whether file was downloaded
     """
     fexist = False
     crnxpath = hatanaka_version()
@@ -3483,7 +3519,11 @@ def ign_rinex3(station9ch, year, doy,srate):
 
 def hatanaka_version():
     """
-    return string with location of hatanaka executable
+    Returns
+    -------
+    hatanakav : string 
+        name/location of hatanaka executable
+
     """
     exedir = os.environ['EXE']
     hatanakav = exedir + '/CRX2RNX'
@@ -3494,7 +3534,11 @@ def hatanaka_version():
 
 def gfz_version():
     """
-    return string with location of gfzrnx executable
+    Returns
+    -------
+    gfzv : str
+        name/location of gfzrnx executable
+
     """
     exedir = os.environ['EXE']
     gfzv = exedir + '/gfzrnx'
@@ -3505,8 +3549,9 @@ def gfz_version():
 
 def gpsSNR_version():
     """
-    returns
-    -----
+
+    Returns
+    -------
     gpse : string
         location of gpsSNR executable
     """
@@ -3519,10 +3564,11 @@ def gpsSNR_version():
 
 def gnssSNR_version():
     """
-    returns
-    ------
+    Returns
+    -------
     gpse : string 
         location of gnssSNR executable
+
     """
     exedir = os.environ['EXE']
     gpse = exedir + '/gnssSNR.e'
@@ -3537,7 +3583,8 @@ def teqc_version():
     Returns
     --------
     gpse : string 
-        location of teqcexecutable
+        location of teqc executable
+
     """
     exedir = os.environ['EXE']
     gpse = exedir + '/teqc'
@@ -3549,9 +3596,10 @@ def teqc_version():
 def snr_exist(station,year,doy,snrEnd):
     """
     check to see if the SNR file already exists
+    uncompresses if necessary (gz or xz)
 
     Parameters
-    -----------
+    ----------
     station : string
         four character station name
 
@@ -3563,9 +3611,9 @@ def snr_exist(station,year,doy,snrEnd):
         2 character snr type, i.e. 66, 99
 
     Returns
-    ----------
+    -------
     snre : boolean
-        whether SNR file exists
+        whether SNR file exists. 
 
     """
     xdir = os.environ['REFL_CODE']
@@ -3593,7 +3641,7 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     downloads navigation file from SOPAC 
 
     Parameters
-    --------------
+    ----------
     navfile : string
         name of GPS broadcast orbit file
     cyyyy : string
@@ -3603,9 +3651,10 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     cdoy : string
         3 char day of year
 
-    Returns: 
-    ---------
-    navfile : string (which was sent)
+    Returns 
+    -------
+    navfile : string 
+        should be the same name as input. not logical!
 
     """
     foundfile = False
@@ -3637,14 +3686,14 @@ def get_esa_navfile(cyyyy,cdoy):
     tries both Z and gz compressed
 
     Parameters
-    --------------
+    ----------
     cyyyy : string
         4 char year
     cdoy : string
         3 char day of year
 
     Returns
-    ---------
+    -------
     fstatus : boolean
         whether file was found or not
 
@@ -3677,7 +3726,7 @@ def get_esa_navfile(cyyyy,cdoy):
         except:
             print('Did not find gzip version')
 
-    # try Z veresion
+    # try Z version
     if not os.path.exists(navfile):
         navfile_url =  esa + navfileZ
         try:
@@ -3700,7 +3749,7 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     tries to download navigation file from CDDIS
 
     Parameters
-    -----------
+    ----------
     navfile : string
         name of GPS broadcast orbit file
     cyyyy : string
@@ -3801,7 +3850,7 @@ def ydoy2useful(year, doy):
         day of year
 
     Returns
-    ---------
+    -------
     year : integer
 
     month : integer
@@ -3834,13 +3883,13 @@ def prevdoy(year,doy):
     given year and doy, return previous year and doy
 
     Parameters
-    -------------
+    ----------
     year : integer
     
     doy : integer
 
     Returns
-    ----------
+    -------
     pyear : integer
         previous year
 
@@ -3863,14 +3912,13 @@ def nextdoy(year,doy):
     given a year/doy returns the subsequent year/doy
 
     Parameters
-    ---------
+    ----------
     year : integer
 
     doy : integer
 
-    returns
-    ----------
-
+    Returns
+    -------
     nyear : integer
         next year
 
@@ -4081,12 +4129,12 @@ def ftitle(freq):
     makes a frequency title for plots 
 
     Parameters
-    --------
+    ----------
     freq : integer
         frequency
 
     Returns
-    -----------
+    -------
     returnf : string
         nice string for the constellation/frequency for the title of a plot
     """
@@ -4122,12 +4170,12 @@ def cdate2nums(col1):
     if time is blank, return 3000
 
     Parameters
-    ------------
+    ----------
     col1 : string
         date in yyyyy-mm-dd, 2012-02-15
 
     Returns
-    -----------
+    -------
     t : float
         fractional date, year + doy/365.25
     """
@@ -4148,7 +4196,7 @@ def l2c_l5_list(year,doy):
     creates a satellite list of L2C and L5 transmitting satellites
 
     Parameters
-    --------------
+    ----------
     year: integer
         year
 
@@ -4156,7 +4204,7 @@ def l2c_l5_list(year,doy):
         day of year
 
     Returns
-    ----------
+    -------
     l2csatlist : numpy array (int)
         satellites  possibly transmittingL2C 
 
@@ -4199,7 +4247,7 @@ def binary(string):
 def ymd_hhmmss(year,doy,utc,dtime):
     """
     Parameters
-    ---------
+    ----------
     year : integer
 
     doy : integer
@@ -4211,7 +4259,7 @@ def ymd_hhmmss(year,doy,utc,dtime):
         whether you want datetime object
 
     Returns 
-    ---------
+    -------
     bigT : datetime
 
     year : int
@@ -4219,7 +4267,6 @@ def ymd_hhmmss(year,doy,utc,dtime):
     month : int
 
     day : int
-
 
     hour : int
 
@@ -4291,6 +4338,11 @@ def get_obstimes_plus(tvd):
 def confused_obstimes(tvd):
     """
     takes lsp results - returns list of MJD values
+
+    Returns
+    -------
+    modifiedjulian : numpy array of floats
+        modified julian values
     """
     nr,nc = tvd.shape
     modifiedjulian = []
@@ -4313,7 +4365,7 @@ def more_confused_obstimes(tvd):
         lsp results from a loadtxt command
 
     Returns
-    ----------
+    -------
     modifiedjulian : numpy array of floats
         
     """
@@ -4340,7 +4392,7 @@ def read_simon_williams(filename,outfilename):
     """
     
     Parameters
-    ---------
+    ----------
     filename : str
         datafile of GNSS based water level measurements from 
         the archive at PSMSL created by Simon Williams 
@@ -4351,14 +4403,20 @@ def read_simon_williams(filename,outfilename):
     Returns
     -------
     outobstimes : datetime array
+        time of observations
+
     outmjd : numpy array of floats
         modified julian day
+
     outsealevel : numpy array of floats 
         sea level, meters
+
     prn : numpy array of integers
         satellite numbers
+
     fr : numpy array of integers
         frequency
+
     az : numpy array of floats
         azimuth (degrees)
 

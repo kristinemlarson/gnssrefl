@@ -131,7 +131,7 @@ def load_avg_phase(station,fr):
     this is NOT the same as the multi-track phase results.
 
     Parameters
-    -----------
+    ----------
     station : str
         4 character station ID, lowercase
 
@@ -175,7 +175,7 @@ def load_sat_phase(station, year, year_end, freq):
     return to main code whether dataexist, and np arrays of year, doy, hr, phase, azdata, ssat
 
     Parameters
-    -------------
+    ----------
     station : str
         four character station name
 
@@ -283,9 +283,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, snow_filter: bool = False, circles: bool=False):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
-    Parameters:
-    ___________
-    station : string
+
+    Parameters
+    ----------
+    station : st
         4 character ID of the station
 
     year : integer
@@ -322,12 +323,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         whether you want circles in the final plot (lines are default)
 
     Returns
-    _______
+    -------
 
-    - Returns daily phase results in a file at $REFL_CODE/<year>/phase/<station>_phase.txt
+    Returns daily phase results in a file at $REFL_CODE/<year>/phase/<station>_phase.txt
         with columns: Year DOY Ph Phsig NormA MM DD
 
-     - Returns the VWC results in a file at $$REFL_CODE/<year>/phase/<station>_vwc.txt
+    Returns the VWC results in a file at $$REFL_CODE/<year>/phase/<station>_vwc.txt
         with columns: FracYr Year DOY  VWC Month Day
     """
     if (len(station) != 4):
@@ -388,8 +389,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         print('The code thinks you are using ', nr, ' satellite tracks but you are requiring the default minvalperday.')
         print('This could be problematic. Try lowering minvalperday at the command line')
         sys.exit()
-
-
 
     atracks = tracks[:, 5]  # min azimuth values
     stracks = tracks[:, 2]  # satellite names
