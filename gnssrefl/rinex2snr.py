@@ -153,12 +153,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     year_end = year_list[-1]
     doy_st = doy_list[0]
     doy_end = doy_list[-1]
-    #print(doy_st, doy_end)
-    # 2021 september 12 KL
-    # i would like to put this in rinex2snr_cl.py - but I am trying to avoid increasing
-    # the workload for the Notebook programmers before the short course.
 
-# this way we are overwriting the doy_list variable
 # loop thru years and days 
     for year in year_list:
         ann = g.make_nav_dirs(year)

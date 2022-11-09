@@ -76,37 +76,17 @@ def quicklook(station: str, year: int, doy: int,
 
             50 : saves all data with elevation angles less than 10 degrees
 
-    f : integer, optional
-        GNSS frequency.
+    f : integer, optional. 
+        GNSS frequency. Default is GPS L1
         value options:
 
-            1 (default) : GPS L1
+            1,2,20,5 : GPS L1,L2,L2C,L5 (1 is default)
 
-            2 : GPS L2
+            101,102 : GLONASS L1 and L2
 
-            20 : GPS L2C
+            201,205,206,207,208 : GALILEO E1 E5a E6,E5b,E5
 
-            5 : GPS L5
-
-            101 : GLONASS L1
-
-            102 : GLONASS L2
-
-            201 : GALILEO E1
-
-            205 : GALILEO E5a
-
-            206 : GALILEO E6
-
-            207 : GALILEO E5b
-
-            208 : GALILEO E5
-
-            302 : BEIDOU B1
-
-            306 : BEIDOU B3
-
-            307 : BEIDOU B2
+            302,306,207 : BEIDOU B1, B3, B2
 
     reqAmp : array_like, optional
         Lomb-Scargle Periodogram (LSP) amplitude significance criterion in volts/volts.
@@ -129,7 +109,7 @@ def quicklook(station: str, year: int, doy: int,
         default is 6.
 
     sat : array_like, integers, optional
-        list of satellites numbers default is None.
+        list of satellites numbers, default is None.
 
     peak2noise : integer, optional
         peak to noise ratio of the periodogram values (periodogram peak divided by the periodogram noise).
