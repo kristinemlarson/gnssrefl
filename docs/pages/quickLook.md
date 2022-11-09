@@ -63,9 +63,9 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 <img src=../_static/ross-lsp.png width=600>
 
-[**Example for a site on an ice sheet**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_gls1.md)
+[**Example for a site on an ice sheet**](../use_cases/use_gls1.md)
 
-[**Example for a tall site**](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_smm3.md)
+[**Example for a tall site**](../use_cases/use_smm3.md)
 
 In addition to the **peak2noise** and required amplitude (**ampl**) QC metrics, there is a 
 couple more QC metrics that are hardwired. One is the length of time 

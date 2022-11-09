@@ -35,10 +35,10 @@ class constants:
 #
 def quickname(station,year,cyy, cdoy, csnr):
     """
-    finds location of a SNR file
+    finds location/name of a SNR file
 
     Parameters 
-    ------------
+    ----------
     station : str
         station name, 4 character
 
@@ -55,7 +55,7 @@ def quickname(station,year,cyy, cdoy, csnr):
         snr ending
 
     Returns
-    ----------
+    -------
     fname : str
         filename
 
@@ -71,7 +71,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     Parameters
     ----------
-
     station: string
         4 or 9 character station name 
 
@@ -294,11 +293,12 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
 def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,fortran,translator):
     """
-    convert RINEX to SNR
+    convert RINEX files to SNR files
 
     Parameters
-    ------------
+    ----------
     year : int
+        full year
 
     doy : int
         day of year
@@ -533,17 +533,30 @@ def satorb(week, sec_of_week, ephem):
 
 def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
     """
-    inputs are obsfile - RINEX 2.11
-    navfile, which can be nav message or sp3 file
-    snrfile: where the results go
+    Converts rinex v2.11 using Joakim's rinex reading code
+
+    Parameters
+    ----------
+    obsfile : str
+        RINEX 2.11 filename
+    navfile : str
+        navigation file
+
+    snrfile : str 
+        SNR filename 
+
     snroption: integer
-    year,month,day:  what it sounds like, integer
-    dec_rate: integer I think, decimation rate. For fortran users, this is done with teqc
+        kind of SNR file requested
 
-    no output - the output is the snrfile that is created
+    year : int
 
-    This only works for rinex v2.11.  
-    This relies on Joakim's rinex reading code
+    month : int
+
+    day : int
+
+    dec_rate : integer 
+        decimation rate in seconds
+
     """
     station = obsfile[0:4]
     #logname = 'logs/' + station + 'python.txt'
@@ -608,6 +621,7 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
 
 def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log):
     """
+    Strandberg nav reading file?
 
     Parameters 
     ---------
@@ -684,11 +698,11 @@ def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfi
 
 def readSNRval(s1exist,s2exist,s5exist,observationdata,prntoidx,sat,i):
     """
-    what it looks like
-    only reads GPS data for now
+    what it looks like only reads GPS data for now
     interface between Joakim's code and mine ...
-    Parameters :
-    -----------
+
+    Parameters 
+    ----------
     s1exist : boolean
 
     s2exist : boolean
@@ -696,7 +710,10 @@ def readSNRval(s1exist,s2exist,s5exist,observationdata,prntoidx,sat,i):
     s5exist : boolean
 
     Returns 
-    -----------
+    -------
+    s1 : 
+    s2 :
+    s5 :
 
     """
     s1 = 0; s2 = 0; s5 = 0 # set defaults
@@ -722,7 +739,9 @@ def satorb_prop(week, secweek, prn, rrec0, closest_ephem):
     this assumes someone was nice enough to send you the closest ephemeris
     returns the satellite coordinates as well, so you can use htem
     in the A matrix
-    paramters :
+
+    Parameters
+    ----------
     week : integer
         GPS week
 
@@ -734,6 +753,11 @@ def satorb_prop(week, secweek, prn, rrec0, closest_ephem):
 
     rrec0 : 3vector
         receiver coordinates, meters
+
+    Returns
+    -------
+    SatOrbn : 3vector 
+        floats, Cartesian location of satellite in meters [x,y,z]
 
     """
     error = 1
@@ -768,14 +792,19 @@ def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij):
     for satellite number prn
     and receiver coordinates rrec0
     find the x,y,z coordinates at time secweek
-    parameters 
-    ------------
-    iX : float
-    iY : float
-    iZ : float
 
+    Parameters 
+    ----------
+    iX : float
+
+    iY : float
+
+    iZ : float
     recv : 3 vector, float
-        
+
+    Tp : 
+
+    ij : 
 
     sp3 has the orbit information in it
     """
