@@ -67,26 +67,45 @@ def quicklook(station: str, year: int, doy: int,
     snr : integer, optional
         SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
         value options:
+
             66 (default) : saves all data with elevation angles less than 30 degress
+
             99 : saves all data with elevation angles between 5 and 30 degrees
+
             88 : saves all data with elevation angles between 5 and 90 degrees
+
             50 : saves all data with elevation angles less than 10 degrees
+
     f : integer, optional
         GNSS frequency.
         value options:
+
             1 (default) : GPS L1
+
             2 : GPS L2
+
             20 : GPS L2C
+
             5 : GPS L5
+
             101 : GLONASS L1
+
             102 : GLONASS L2
+
             201 : GALILEO E1
+
             205 : GALILEO E5a
+
             206 : GALILEO E6
+
             207 : GALILEO E5b
+
             208 : GALILEO E5
+
             302 : BEIDOU B1
+
             306 : BEIDOU B3
+
             307 : BEIDOU B2
 
     reqAmp : array_like, optional
