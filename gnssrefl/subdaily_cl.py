@@ -27,7 +27,7 @@ def parse_arguments():
     parser.add_argument("-spline_outlier", default=None, type=float, help="outlier criterion used in splinefit (meters)")
     parser.add_argument("-knots", default=None, type=int, help="Knots per day, spline fit only (default is 8)")
     parser.add_argument("-sigma", default=None, type=float, help="simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)")
-    parser.add_argument("-extension", default=None, type=str, help="soln subdirectory")
+    parser.add_argument("-extension", default=None, type=str, help="solution subdirectory")
     parser.add_argument("-rhdot", default=None, type=str, help="set to True to turn on spline fitting for RHdot correction")
     parser.add_argument("-doy1", default=None, type=int, help="initial day of year")
     parser.add_argument("-doy2", default=None, type=int, help="end day of year")
@@ -39,6 +39,7 @@ def parse_arguments():
     parser.add_argument("-h2", default=None, type=float, help="max RH (m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="new peak2noise constraint")
     parser.add_argument("-kplt", default=None, type=str, help="special plot for kristine")
+    parser.add_argument("-subdir", default=None, type=str, help="name for subdirector for output")
 
     args = parser.parse_args().__dict__
 
@@ -53,70 +54,74 @@ def parse_arguments():
 def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, plt: bool = True,
              spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = False,
              doy1: int = 1, doy2: int = 366, testing: bool = False, ampl: float = 0, 
-             h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False):
+             h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, subdir: str = ''):
     """
-        Parameters:
-            ___________
-            station : string
-                4 or 9 character ID of the station.
-            year : integer
-                Year
-            txtfile : string, optional
-                File name.
-                default is None - will set name for you.
-            splinefile: string, optional
-                Input filename for rhdot/spline fitting
-                default is None
-            csvfile: boolean, optional
-                Set to True if you prefer csv to plain txt.
-                default is False.
-            plt : boolean, optional
-                To print plots to screen or not.
-                default is TRUE.
-            spline_outlier : float, optional
-                Outlier criterion used in splinefit (meters)
-                default is 1.0
-            knots : integer, optional
-                Knots per day, spline fit only.
-                default is 8.
-            sigma : float, optional
-                Simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)
-                default is 2.5
-            extension : string, optional
-                Solution subdirectory.
-                default is empty string.
-            rhdot : boolean, optional
-                Set to True to turn on spline fitting for RHdot correction.
-                default is False.
-            doy1 : integer, optional
-                Initial day of year
-                default is 1.
-            doy2 : integer, optional
-                End day of year.
-                default is 366.
-            testing : boolean, optional
-                Set to True for testing mode.
-                default is False.
-            ampl : float, optional
-                New amplitude constraint
-                default is 0.
-            azim1: int, optional
-                New min azimuth
-                default is 0.
-            azim2: int, optional
-                New max azimuth
-                default is 360.
-            h1: integer optional (should really be a float)
-                lowest allowed reflector height
-                default is 0
-            h2: integer optional (should really be a float)
-                highest allowed reflector height
-                default is 300
-            peak2noise: float, optional
-                New peak to noise constraint
-                default is 0.
-            kplt: boolean, optional
-                plot for kristine
+    Parameters
+    ----------
+
+    station : string
+        4 or 9 character ID of the station.
+    year : integer
+        Year
+    txtfile : string, optional
+        File name.
+        default is None - will set name for you.
+    splinefile: string, optional
+        Input filename for rhdot/spline fitting
+        default is None
+    csvfile: boolean, optional
+        Set to True if you prefer csv to plain txt.
+        default is False.
+    plt : boolean, optional
+        To print plots to screen or not.
+        default is TRUE.
+    spline_outlier : float, optional
+        Outlier criterion used in splinefit (meters)
+        default is 1.0
+    knots : integer, optional
+        Knots per day, spline fit only.
+        default is 8.
+    sigma : float, optional
+        Simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)
+        default is 2.5
+    extension : string, optional
+        Solution subdirectory.
+        default is empty string.
+    rhdot : boolean, optional
+        Set to True to turn on spline fitting for RHdot correction.
+        default is False.
+    doy1 : integer, optional
+        Initial day of year
+        default is 1.
+    doy2 : integer, optional
+        End day of year.
+        default is 366.
+    testing : boolean, optional
+        Set to True for testing mode.
+        default is False.
+    ampl : float, optional
+        New amplitude constraint
+        default is 0.
+    azim1: int, optional
+        New min azimuth
+        default is 0.
+    azim2: int, optional
+        New max azimuth
+        default is 360.
+    h1: integer optional (should really be a float)
+        lowest allowed reflector height
+        default is 0
+    h2: integer optional (should really be a float)
+        highest allowed reflector height
+        default is 300
+    peak2noise: float, optional
+        New peak to noise constraint
+        default is 0.
+    kplt: boolean, optional
+        plot for kristine
+    subdir : str, optional
+        name for output subdirectory in REFL_CODE/Files
+
     """
 
     if len(station) != 4:
@@ -130,6 +135,11 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     txtdir = xdir + '/Files'
     if not os.path.exists(txtdir):
         subprocess.call(['mkdir', txtdir])
+
+    if subdir != '':
+        txtdir = xdir + '/Files/' + subdir + '/'
+        if not os.path.exists(txtdir):
+            subprocess.call(['mkdir', txtdir])
 
 #   these are optional output options
     #create the subdaily file
@@ -146,7 +156,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             print('Using ', txtfile)
         # if txtfile provided, you can use that as your starting dataset 
         ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, extension, sigma, writecsv,
-                                                            azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt)
+                                                            azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt,txtdir)
         haveObstimes = True
     else:
         haveObstimes = False
@@ -165,18 +175,18 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             try:
                 if haveObstimes:
                     tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
-                                                  obstimes=obstimes,knots=knots)
+                                                  obstimes=obstimes,knots=knots,txtdir=txtdir)
                 else:
                     tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
-                                                  knots=knots)
+                                                  knots=knots,txtdir=txtdir)
             except: 
                 print('Exited the spline code for unknown reasons. Run with testing as True if you want more info')
         else:
             if haveObstimes:
                 tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
-                                              obstimes=obstimes, knots=knots)
+                                              obstimes=obstimes, knots=knots,txtdir=txtdir)
             else:
-                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, knots=knots)
+                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, knots=knots,txtdir=txtdir)
 
 
 def main():

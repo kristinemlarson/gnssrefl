@@ -167,12 +167,12 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     fout.close()
 
 
-def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2,kplt):
+def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2,kplt,txtdir):
     """
     reads in RH results and makes various plots to help users assess the quality of the solution
 
     Parameters
-    -------------
+    ----------
     station : str
         4 character station name
 
@@ -218,9 +218,11 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     kplt : bool
         special plot made 
+    txt : str
+        directory where the results will be written
 
     Returns
-    --------------
+    -------
 
     tv : numpy array
         LSP results (augmented)
@@ -239,7 +241,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     fs = 10
     xdir = os.environ['REFL_CODE']
     # output will go to REFL_CODE/Files
-    txtdir = xdir + '/Files'
+    # this is now sent
+    #txtdir = xdir + '/Files'
     print('Will remove daily outliers greater than ', sigma, ' sigma')
     if not os.path.exists(txtdir):
         os.makedirs(txtdir)
@@ -363,9 +366,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     # this might work... and then again, it might not
     print_badpoints(tv[ii,:],residuals[ii])
 
-    # now write things out
-    fname = xdir + '/Files/' + station + '_all.txt'
-    fname_new = xdir + '/Files/' + station + '_subdaily_edits.txt'
+    # now write things out - using txtdir variable sent 
+    fname =     txtdir  + '/' + station + '_all.txt'
+    fname_new = txtdir  + '/' + station + '_subdaily_edits.txt'
     extraline = ''
 
     editedtv = tv[jj,:]
@@ -616,6 +619,13 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     # output will go to REFL_CODE/Files
     xdir = os.environ['REFL_CODE']
     txtdir = xdir + '/Files'
+    val = kwargs.get('txtdir',[])
+    if len(val) == 0:
+        txtdir = xdir + '/Files/'
+    else:
+        txtdir = val
+    print('output directory: ', txtdir)
+
 
 #   how often do you want velocity computed (per day)
     perday = 24*20 # so every 3 minutes
