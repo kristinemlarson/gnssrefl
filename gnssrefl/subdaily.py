@@ -1656,6 +1656,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.plot(th[ii], (h-spline_at_GPS)[ii], '.',label='3sigma')
     print('Sigma with frequency bias taken out ', np.round(newsigma,3), len(h[ii]) )
     g.save_plot(txtdir + '/' + station + '_rhdot4.png')
+    if pltit:
+        plt.show()
 
     return tvd, correction
 
