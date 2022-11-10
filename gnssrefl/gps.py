@@ -489,7 +489,7 @@ def elev_angle(up, RecSat):
     computes satellite elevation angle
 
     Parameters
-    -------------------
+    ----------
     up : 3 vector float 
         unit vector in the up direction
 
@@ -497,7 +497,7 @@ def elev_angle(up, RecSat):
         Cartesian vector pointing from receiver to satellite in meters
 
     Returns
-    --------------
+    -------
     angle: float
         elevation angle in radians
 
@@ -508,30 +508,42 @@ def elev_angle(up, RecSat):
 
 def sp3_interpolator(t, tow, x0, y0, z0, clock0):
     """
-    author: originally from ryan hardy  
+    interpolator for SP3 satellite coordinates 
 
     Parameters
-    -------
+    ----------
     t : float
+        Time you want the orbits for (GPS seconds)
 
     tow :  float
+        GPS seconds for the satellite values
 
     x0 : float
+        X satellite coordinates (km)
 
     y0 : float
+        Y satellite coordinates (km)
 
     z0 : float
+        Z satellite coordinates (km)
 
     clock0 : float
+        clock correction in microseconds
 
+    Returns
+    -------
+    x : float
+        X satellite coordinate (m)
+     
+    y : float
+        Y satellite coordinate (m)
+    z : float
+        Z satellite coordinate (m)
 
-    inputs are??? tow is GPS seconds
-    xyz are the precise satellite coordinates (in meters)
-    clocks are likely satellite clock corrections (microseconds)
-    I believe n is the order fit, based on what i recall.
-    these values do not agree with my test cases in matlab or fortran
-    presumably there is an issue with the estimation of the coefficients.
-    they are good enough for calculating an elevation angle used in reflectometry
+    clock : float
+        microseconds?
+
+    Do not use this code for precise geodetic applications.
 
     """
     # ryan set it to 7 - which is not recommended by the paper
@@ -590,12 +602,12 @@ def dec31(year):
     Calculates the day of year for December 31
 
     Parameters 
-    ---------
+    ----------
     input: integer
         year
 
     Returns 
-    ---------
+    -------
     doy : integer
         day of year for December 31
     """
@@ -638,7 +650,10 @@ def ymd2doy(year,month,day):
 
 def hatanaka_warning():
     """
-    return warning about missing Hatanaka executable
+    Returns 
+    -------
+        warning about missing Hatanaka executable
+
     """
     print('WARNING WARNING WARNING WARNING')
     print('You are trying to convert Hatanaka files without having the proper')
@@ -696,7 +711,7 @@ def getsp3file(year,month,day):
     retrieves IGS sp3 precise orbit file from CDDIS
 
     Parameters
-    -----------
+    ----------
     year : integer
 
     month : integer
@@ -704,7 +719,7 @@ def getsp3file(year,month,day):
     day : integer
 
     Returns
-    -----------
+    -------
     name : str
         filename for the orbits
 
@@ -822,6 +837,16 @@ def getsp3file_mgex(year,month,day,pCtr):
 
     pCtr : string
         name of the orbit center
+
+    Returns
+    -------
+    name : str
+        orbit filename
+
+    fdir : str
+        file directory
+
+    foundit : bool
 
     """
     foundit = False
@@ -5576,13 +5601,15 @@ def ymd2ch(year,month,day):
 
 def geoidCorrection(lat,lon):
     """
+    Calculates the EGM96 geoid correction
+
     Parameters
     ----------
     lat : float
-        latitude, units?
+        latitude, degrees
 
     lon : float
-        longitude, units?
+        longitude, degrees
 
     Returns
     -------
@@ -5597,8 +5624,8 @@ def geoidCorrection(lat,lon):
 
 def checkEGM():
     """
-    this is not finished.  it should download the file from github
-    and put it into the Files directory. 
+    Downloads and stores EGM96 file for use in refl_zones 
+
     """
     foundfile = False
     xdir = os.environ['REFL_CODE']
@@ -5608,14 +5635,16 @@ def checkEGM():
     if 'REFL_CODE' in os.environ:
         egm = localdir + matfile
         if os.path.isfile(egm):
-            print('egm file exists')
+            print('EGM96 file exists')
             foundfile = True
         else:
-            print('EGM file does not exist. We will try to download it for you.')
+            print('EGM96 file does not exist. We will try to download it for you.')
             githubdir = 'https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/docs/'   
             wget.download(githubdir+matfile, localdir + matfile)
             if os.path.isfile(egm):
                 print('successful download, egm file exists')
                 foundfile = True
+     else:
+         print('The REFL_CODE environment variable has not been set.')
 
     return foundfile 

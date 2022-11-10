@@ -120,7 +120,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
 
     writecsv : boolean
 
-    writetxt : boolean
+    extraline: boolean
 
     this does not accommodate json as yet
     """
