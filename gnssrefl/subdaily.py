@@ -218,12 +218,11 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     kplt : bool
         special plot made 
-    txt : str
+    txtdir : str
         directory where the results will be written
 
     Returns
     -------
-
     tv : numpy array
         LSP results (augmented)
 
@@ -240,9 +239,6 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     # fontsize for plot labels and such
     fs = 10
     xdir = os.environ['REFL_CODE']
-    # output will go to REFL_CODE/Files
-    # this is now sent
-    #txtdir = xdir + '/Files'
     print('Will remove daily outliers greater than ', sigma, ' sigma')
     if not os.path.exists(txtdir):
         os.makedirs(txtdir)
@@ -618,7 +614,6 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     outlierV = float(outlierV) #just to make sure - i think it was sending a string
     # output will go to REFL_CODE/Files
     xdir = os.environ['REFL_CODE']
-    txtdir = xdir + '/Files'
     val = kwargs.get('txtdir',[])
     if len(val) == 0:
         txtdir = xdir + '/Files/'
