@@ -1,5 +1,37 @@
 # Utilities <a name="helper"></a>
 
+<code>refl_zones</code>
+This module allows you to create "stand-alone" Fresnel Zones maps for 
+google Earth. at a minimum it requires a four station character name
+
+<code>refl_zones sc02</code>
+
+The defaults are that it does all azimuths, elevation angles of 5-10-15, GPS L1,
+sea level reflections, and creates an output file called sc02.kml (and stored in $REFL_CODE/Files).
+
+You can modify those accordingly:
+
+-azim1 min azimuth (degrees)
+
+-azim2 min azimuth (degrees)
+
+-el_list 5 10 15 20 25 (for example)
+
+-lat latitude in degrees
+
+-lon longitude in degrees
+
+-el_height ellipsoidal height in meters
+
+-fr frequency (1,2,5 allowed)
+
+-RH reflector height in meters
+
+-system constellation (gps,glonass,galileo, beidou)
+
+-output base filename for the kml file
+
+
 <code>download_rinex</code> can be useful if you want to 
 download RINEX v2.11 or 3 files (using the version flag) without using 
 the reflection-specific codes. As with <code>rinex2snr</code>, the default archive is 
