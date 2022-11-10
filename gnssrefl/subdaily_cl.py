@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-rhdot", default=None, type=str, help="set to True to turn on spline fitting for RHdot correction")
     parser.add_argument("-doy1", default=None, type=int, help="initial day of year")
     parser.add_argument("-doy2", default=None, type=int, help="end day of year")
-    parser.add_argument("-testing", default=None, type=str, help="set to True for testing mode")
+    parser.add_argument("-testing", default=None, type=str, help="set to False for old code ")
     parser.add_argument("-ampl", default=None, type=float, help="new amplitude constraint")
     parser.add_argument("-azim1", default=None, type=int, help="new min azimuth")
     parser.add_argument("-azim2", default=None, type=int, help="new max azimuth")
@@ -53,7 +53,7 @@ def parse_arguments():
 
 def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, plt: bool = True,
              spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = False,
-             doy1: int = 1, doy2: int = 366, testing: bool = False, ampl: float = 0, 
+             doy1: int = 1, doy2: int = 366, testing: bool = True, ampl: float = 0, 
              h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, subdir: str = ''):
     """
     Parameters
@@ -97,8 +97,8 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
         End day of year.
         default is 366.
     testing : boolean, optional
-        Set to True for testing mode.
-        default is False.
+        Set to False for older code.
+        default is now True.
     ampl : float, optional
         New amplitude constraint
         default is 0.
