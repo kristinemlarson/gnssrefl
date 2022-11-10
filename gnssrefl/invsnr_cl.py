@@ -5,8 +5,6 @@ import json
 import os
 import sys
 
-# 22feb09 adding beidou
-# 22mar08 adding refraction
 
 # all the main functions used by the code are stored here
 import gnssrefl.spline_functions as spline_functions
@@ -63,125 +61,115 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
            refraction: bool = True, json_override: bool = False):
 
     """
-        Wrapper to call invsnr code.
-        Parameters:
-        ___________
-        station : string
-            Character ID of the station
+    Wrapper to call invsnr code.
 
-        year : integer
-            Year
+    Parameters
+    ----------
+    station : string
+        Character ID of the station
 
-        doy : integer
-            Day of year
+    year : integer
+        Year
 
-        signal : string
-            signal to use.
-            value options:
-            L1
-            L2
-            L5
-            L6
-            L7
-            L1+L2
-            L1+L2+L5
-            L1+L5
-            ALL
+    doy : integer
+        Day of year
 
-        pktnlim: float, optional
-            Peak2noise ratio limit for Quality Control.
-            Default is 4
+    signal : string
+        signal to use.
+        value options: L1 L2 L5 L6 L7 L1+L2 L1+L2+L5 L1+L5 ALL
 
-        constel: str, optional
-            Only a single constellation.
-            Default is None which is gps, glonass, and galileo.
-            value options:
+    pktnlim: float, optional
+        Peak2noise ratio limit for Quality Control.
+        Default is 4
+
+    constel: str, optional
+        Only a single constellation.
+        Default is None which is gps, glonass, and galileo.
+        value options:
                 G : GPS
                 E : Galileo
                 R : Glonass
                 C : Beidou
                 withBeidou : adds Beidou to the default.
 
-        screenstats: boolean, optional
-            Whether to print out stats to the screen.
-            Default is False
+    screenstats: boolean, optional
+        Whether to print out stats to the screen.
+        Default is False
 
-        tempres: integer, optional
-            SNR file decimator (seconds)
-            Default is 1 (everything)
+    tempres: integer, optional
+        SNR file decimator (seconds)
+        Default is 1 (everything)
 
 
-        polydeg : integer, optional
-            polynomial degree for direct signal removal
-            Default is 2
+    polydeg : integer, optional
+        polynomial degree for direct signal removal
+        Default is 2
 
-        snrfit : boolean, optional
-            Whether to do the inversion or not
-            Default is True
+    snrfit : boolean, optional
+        Whether to do the inversion or not
+        Default is True
 
-        doplot : boolean, optional
-            Whether to plot to the screen or not
-            Default is True
+    doplot : boolean, optional
+        Whether to plot to the screen or not
+        Default is True
 
-        doy_end : integer, optional
-            day of year to end analysis.
-            Default is None.
+    doy_end : integer, optional
+        day of year to end analysis.
+        Default is None.
 
-        lspfigs : boolean, optional
-            Whether or not to make LSP plots
-            Note: Don't turn these on unless you really need plots because it is slow to make one per satellite arc.
-            Default is False
+    lspfigs : boolean, optional
+        Whether or not to make LSP plots
+        Note: Don't turn these on unless you really need plots because it is 
+        slow to make one per satellite arc.
+        Default is False
 
-        snrfigs : boolean, optional
-            Whether or not to make SNR plots
-            Note: Don't turn these on unless you really need plots because it is slow to make one per satellite arc.
-            Default is False
+    snrfigs : boolean, optional
+        Whether or not to make SNR plots
+        Note: Don't turn these on unless you really need plots because it is slow to make one per satellite arc.
+        Default is False
 
-        knot_space : float, optional
-            Knot spacing in hours
-            Default is 3
+    knot_space : float, optional
+        Knot spacing in hours
+        Default is 3
 
-        rough_in : float, optional
-            Roughness
-            Default is 0.1
+    rough_in : float, optional
+        Roughness
+        Default is 0.1
 
-        risky : boolean, optional
-            Risky taker related to gaps/knot spacing
-            Default is False
+    risky : boolean, optional
+        Risky taker related to gaps/knot spacing
+        Default is False
 
-        snr_ending : integer, optional
-            SNR file ending.
-            Default is 66
+    snr_ending : integer, optional
+        SNR file ending.
+        Default is 66
 
-        outfile_type : string, optional
-            output file type.
-            Default is 'txt'
-            value options:
-                txt
-                csv
+    outfile_type : string, optional
+        output file type, txt or csv
+        Default is txt
 
-        outfile_name : string, optional
-            output file name.
-            Default is ''
+    outfile_name : string, optional
+        output file name.
+        Default is ''
 
-        outlier_limit : float, optional
-            Outliers plotted. (meters)
-            Default is 0.5
+    outlier_limit : float, optional
+        Outliers plotted. (meters)
+        Default is 0.5
 
-        no_dots : boolean, optional
-            To plot lombscargle or not.
-            Default is False
+    no_dots : boolean, optional
+        To plot lombscargle or not.
+        Default is False
 
-        delta_out : integer, optional
-            Output increment, in seconds.
-            Default is 300
+    delta_out : integer, optional
+        Output increment, in seconds.
+        Default is 300
 
-        refraction : boolean, optional
-            Default is True
+    refraction : boolean, optional
+        Default is True
 
-        json_override : boolean, optional
-            Override json file name
-            Default is False
+    json_override : boolean, optional
+        Override json file name
+        Default is False
     """
 
     if signal.upper() not in ['L1', 'L2', 'L5', 'L6', 'L7', 'L1+L2', 'L1+L2+L5', 'L1+L5', 'ALL']:
@@ -194,9 +182,11 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         print('Using all signals')
         signal = 'L1+L2+L5+L6+L7'
     print(signal)
+
     # build a dictionary with the analysis inputs
     # environment variable for the file inputs
     xdir = os.environ['REFL_CODE']
+
     # location of the analysis inputs, if it exists
     jsondir  = xdir + '/input/'
     instructions2 =  jsondir + station + '.inv.json'
@@ -219,8 +209,6 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
             print('Instruction file does not exist.', instructions2, ' Exiting.')
             sys.exit()
 
-
-# look into the refraction issue
 
 # save json inputs to variables
 # this is ridiculous - I should just send the dictionary!
@@ -258,9 +246,6 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         if (constel == 'C') and (signal == 'L1' or signal == 'L5'):
             print('illegal constellation/frequency choice', constel, '/', signal)
             sys.exit()
-        #if (args.constel == 'C') and (signal == 'L6' or signal == 'L7'):
-        #    print('Sorry - I have not added L6 and L7 to the code yet. Exiting.')
-        #    sys.exit()
 
     if (constel == 'withBeidou'):
         satconsts=['E', 'G', 'R', 'C'] # the default is gps, glonass, and galileo

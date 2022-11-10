@@ -21,7 +21,7 @@ import math
 def print_badpoints(t,outliersize):
     """
     Parameters
-    -------------
+    ----------
     t : numpy array
         lomb scargle result array of "bad points". Format given below
 
@@ -391,7 +391,7 @@ def quickTr(year, doy,frachours):
     and returns a date string
 
     Parameters
-    -----------
+    ----------
     year : integer
 
     doy : integer
@@ -399,8 +399,8 @@ def quickTr(year, doy,frachours):
     frachours : float
         real-valued UTC hour 
 
-    Peturns
-    --------
+    Returns
+    -------
     datestring : str
          date ala YYYY-MM-DD HH-MM-SS
     """
@@ -625,6 +625,9 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     else:
         txtdir = val
     print('output directory: ', txtdir)
+
+    # turns off try so you can see the error messages
+    testing = kwargs.get('testing',False)
 
 
 #   how often do you want velocity computed (per day)
@@ -881,7 +884,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     # doy
     newt = tvd[:,1] + tvd[:,4]/24 ; 
-    residual = redo_spline(newt, newRH, biasCorrected_RH,pltit,txtdir,station)
+    residual = redo_spline(newt, newRH, biasCorrected_RH,pltit,txtdir,station,testing)
 
     # if kristine is set to true - write out a few more columns
     ntv = tvd
@@ -1136,7 +1139,7 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
 
     return tv,t,rh,firstdoy,lastdoy
 
-def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
+def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station,testing):
     """
     having calculated and applied RHdot correction
     AND applied the frequency biases, create new plots
@@ -1155,6 +1158,8 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
          directory for output (e.g. $REFL_CODE/Files)
     station : string
         station name used for the plot titles and filenames
+    testing : boolean
+        turns off "try" so you can see the error messages
 
     Returns
     -------
@@ -1175,6 +1180,7 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     Ndays = tnew.max()-tnew.min()
     numKnots = int(knots_per_day*(Ndays))
     NV = len(ynew)
+    print('>>>>>>>>>>>>>>>>>>> Redo Spline <<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     print('First and last time values', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
     print('Number of RH obs', NV)
     print('Number of days of data: ', '{0:8.2f}'.format ( Ndays) )
@@ -1187,12 +1193,18 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station):
     # try this
     #
     knots =np.linspace(t1,t2,num=numKnots)
-    try:
+
+    # this crashes because I did not take care of the gaps.
+    if testing:
         t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
         spline = interpolate.BSpline(t, c, k, extrapolate=False)
-    except:
-        print('crashed on the interpolation stage')
-        sys.exit()
+    else: 
+        try:
+            t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
+            spline = interpolate.BSpline(t, c, k, extrapolate=False)
+        except:
+            print('crashed on the interpolation stage')
+            sys.exit()
 
     # user specifies how many values per day you want to send back to the user
 

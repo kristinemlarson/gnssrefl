@@ -4,7 +4,7 @@
 <img src=../_static/VLIS.jpeg width=600</img>
 </P>
 
-**Station Name:** vlsi  or VLSI00NLD
+**Station Name:** vlis  or VLSI00NLD
 
 **Location:** Vlissingen, the Netherlands
 

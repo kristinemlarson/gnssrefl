@@ -175,18 +175,18 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             try:
                 if haveObstimes:
                     tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
-                                                  obstimes=obstimes,knots=knots,txtdir=txtdir)
+                                                  obstimes=obstimes,knots=knots,txtdir=txtdir,testing=testing)
                 else:
                     tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
-                                                  knots=knots,txtdir=txtdir)
+                                                  knots=knots,txtdir=txtdir,testing=testing)
             except: 
                 print('Exited the spline code for unknown reasons. Run with testing as True if you want more info')
         else:
             if haveObstimes:
                 tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
-                                              obstimes=obstimes, knots=knots,txtdir=txtdir)
+                                              obstimes=obstimes, knots=knots,txtdir=txtdir,testing=testing)
             else:
-                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, knots=knots,txtdir=txtdir)
+                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, knots=knots,txtdir=txtdir,testing=testing)
 
 
 def main():
