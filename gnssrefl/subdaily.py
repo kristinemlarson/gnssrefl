@@ -1263,3 +1263,399 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station,testing):
 
     return res
 
+def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
+    """
+    make rhdot correction plots
+
+    Parameters
+    th : numpy array
+        time of obs, day of year
+    correction : numpy array
+        rhcorrections in meters
+    rhdot_at_th : numpy array of floats
+        spline fit for rhdot in meters
+    tvel : numpy array of floats
+        time for surface velocity in days of year
+    yvel : numpy array of floats
+        surface velocity in m/hr
+    fs : integer
+        fontsize 
+    station : str
+        station name
+    txtdir : str
+        file directory for output
+
+    """
+    fig=plt.figure(figsize=(10,6))
+    plt.subplot(2,1,1)
+    plt.plot(th, correction,'.')
+    plt.ylabel('meters',fontsize=fs);
+    plt.xlim((np.min(th), np.max(th)))
+    plt.grid()
+    plt.title('RH correction')
+    #plt.xlim((plot_begin, plot_end))
+
+    plt.subplot(2,1,2)
+    plt.plot(th, rhdot_at_th,'o')
+    plt.plot(tvel, yvel,'-')
+    plt.grid()
+    plt.title('surface velocity')
+    plt.ylim((-1,1))
+    plt.ylabel('meters/hour')
+    plt.xlabel('days of the year')
+    plt.xlim((np.min(th), np.max(th)))
+    g.save_plot(txtdir + '/' + station + '_rhdot3.png')
+
+
+
+def flipit(tvd,col):
+    """
+    take RH values from the first and last day and attaches
+    them as fake data to make the spline fit stable.  
+    Also fill the temporal gaps with fake data
+
+    Parameters
+    ----------
+    tvd : numpy array of floats
+        output of LSP runs
+
+    col : integer
+        column number (in normal speak) of the RH results
+
+    Returns
+    -------
+    tnew : numpy array of floats
+        time in days of year
+    ynew : numpy array
+        RH in meters 
+
+    """
+    nr,nc = np.shape(tvd)
+    print(nr,nc)
+    # sort it just to make sure ...
+    tnew = tvd[:,1] + tvd[:,4]/24
+    # change from normal columns to python columns
+    ynew = tvd[:,col-1]
+
+    # these are in days of the year
+    day0= np.floor(tnew[0]) # first day
+    dayN = np.ceil(np.max(tnew)) # last day
+
+    # these are the times relative to time zero
+    middle = tnew-day0
+
+    # use the first day
+    ii = tnew < (day0+1)
+    leftTime = -(tnew[ii]-day0)
+    leftY = ynew[ii]
+
+    # now use the last day
+    ii = tnew > (dayN-1)
+    rightY = np.flip(ynew[ii])
+    rightTime = tnew[ii] -day0 + 1 
+
+    tmp= np.hstack((leftTime,middle)) ; th = np.hstack((tmp,rightTime))
+
+    tmp = np.hstack((leftY, ynew )) ; h = np.hstack((tmp, rightY))
+
+    # and sort it ...
+    ii = np.argsort(th)
+    th = th[ii] ; h = h[ii]
+
+    th = th + day0 # add day0 back in
+
+    # now fill the gaps ... 
+    fillgap = 1/24 # one hour fake values
+    # ???
+    gap = 5/24 # up to five hour gap allowed before warning
+
+    tnew =[] ; ynew =[]; faket = [];
+    # fill in gaps using variables called tnew and ynew
+    Ngaps = 0
+    for i in range(1,len(th)):
+        d= th[i]-th[i-1] # delta in time in units of days ?
+        if (d > gap):
+            x0 = th[i-1:i+1] ; h0 = h[i-1:i+1]
+
+            # only print out the gap information the first time thru
+            if col == 3:
+                print('Gap on doy:', int(np.floor(x0[0])), ' lasting ', round(d*24,2), ' hours ')
+            #print(d,x0,h0)
+            Ngaps = Ngaps + 1
+            f = scipy.interpolate.interp1d(x0,h0)
+            # so this is fake data
+            ttnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
+            yynew = f(ttnew)
+            faket = np.append(faket, ttnew)
+            # now append it to your real data
+            tnew = np.append(tnew,ttnew)
+            ynew = np.append(ynew,yynew)
+        else:
+            tnew = np.append(tnew,th[i])
+            ynew = np.append(ynew,h[i])
+
+
+    if (Ngaps > 3) and (col == 3):
+        print('\nThis is a beta version of the rhdot/spline fit code - and does not')
+        print('work well with gaps. You have been warned!\n')
+
+    # sort again
+    ii = np.argsort( tnew) 
+    tnew = tnew[ii]
+    ynew = ynew[ii]
+
+    # this is what should be used for the spline.
+    return tnew, ynew
+
+
+def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
+    """
+    Improved code to compute rhdot correction and bias correction for subdaily
+
+    Parameters
+    ----------
+    station : string
+        4 char station name
+
+    fname : string
+        input filename for results
+
+    fname_new : string
+        output filename for results
+
+    pltit : boolean 
+        whether you want plots to the screen
+
+    outlierV : float
+       outlier criterion, in meters 
+
+    """
+    # this is not being used 
+    outlierV = float(outlierV) #just to make sure - i think it was sending a string
+    # by output will go to REFL_CODE/Files
+    xdir = os.environ['REFL_CODE']
+
+    val = kwargs.get('txtdir',[])
+    if len(val) == 0:
+        txtdir = xdir + '/Files/'
+    else:
+        txtdir = val
+    print('output directory: ', txtdir)
+
+#   how often do you want velocity computed (per day)
+    perday = 24*20 # so every 3 minutes
+    fs = 10 # fontsize
+    # making a knot every three hours ...
+    # knots_per_day = 8
+    knots_default = 8
+    knots_per_day= kwargs.get('knots',8)
+    print('>>>>>>>>>>>>>>>>>>>> Entering spline fit <<<<<<<<<<<<<<<<<<<<<<<<')
+    print('Input filename:', fname)
+    print('Output filename: ', fname_new)
+
+    # read in the lomb scargle values which are the output of gnssir
+    # i.e. the reflector heights
+    tvd = np.loadtxt(fname,comments='%')
+    if len(tvd) == 0:
+        print('empty input file')
+        return
+
+    # sort the data in time
+    ii = np.argsort( (tvd[:,1]+tvd[:,4]/24) ).T
+    tvd = tvd[ii,:]
+
+    # use day of year for the spline fits
+    th= tvd[:,1] + tvd[:,4]/24; 
+    h = tvd[:,2]
+
+    # this is the edot factor - 
+    # this was computed by gnssir as the mean of the tangent(eangles) over an arc,
+    # divided by edot (the time rate of change of elevation angle, initially rad/sec,
+    # but then converted to rad/hour).  Thus this parameter has units  rad/(rad/hour) >>>> hours
+    # it is multiplied by RHDot in meters/hour, which gives you a correction value in meters
+    xfac = tvd[:,12]
+
+    # these are not being used ... 
+    #obstimes = kwargs.get('obstimes',[])
+    #if len(obstimes) == 0:
+    #    obstimes = g.get_obstimes(tvd)
+
+   # try extending the time series to improve spline fit
+    tnew, ynew = flipit(tvd,3)
+
+    Ndays = tnew.max()-tnew.min()
+    numKnots = int(knots_per_day*(Ndays))
+    print('First and last time values in the spline', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
+    print('Number of RH obs and Days ', len(h), Ndays)
+    print('Average num of RH obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
+    print('Knots per day: ', knots_per_day, ' Number of knots: ', numKnots)
+    # currently using 3 sigma
+    #print('Outlier criterion with respect to spline fit (m): ', outlierV)
+    # 
+
+    firstKnot_in_minutes = 15
+    t1 = tnew.min()+firstKnot_in_minutes/60/24
+    t2 = tnew.max()-firstKnot_in_minutes/60/24
+    knots =np.linspace(t1,t2,num=numKnots)
+
+    t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
+
+
+    spline = interpolate.BSpline(t, c, k, extrapolate=False)
+    # this is to get  RHdot, evenly spaced data - units of days
+    N = int(Ndays*perday)
+    xx = np.linspace(tnew.min(), tnew.max(), N)
+    spl_x = xx; spl_y = spline(xx)
+    # these are spline values at the RH observation times
+    spl_at_GPS_times = spline(th) 
+
+    fig=plt.figure(figsize=(10,4))
+    plt.plot(tnew,ynew, '*', spl_x,spl_y,'-')
+    plt.title('mirrored obs and spline fit ')
+    plt.ylabel('meters')
+    plt.xlabel('days of the year')
+    plt.grid()
+    g.save_plot(txtdir + '/' + station + '_rhdot1.png')
+
+    plot_begin = np.floor(np.min(th))
+    plot_end =np.ceil(np.max(th)) 
+    print(plot_begin, plot_end)
+
+    obsPerHour= perday/24
+
+    fig=plt.figure(figsize=(10,6))
+    plt.subplot(2,1,1)
+    plt.plot(th, h, 'b.', label='Original points',markersize=4)
+    plt.plot(spl_x, spl_y, 'r--', label='spline')
+
+        
+    tvel = spl_x[1:N]
+    yvel = obsPerHour*np.diff(spl_y)
+    rhdot_at_th = np.interp(th, tvel, yvel)
+    correction = xfac*rhdot_at_th
+    correctedRH = h-correction
+    plt.plot(th,correctedRH,'m.',label='with RHdot corr',markersize=4)
+
+    plt.gca().invert_yaxis()
+    plt.legend(loc="upper left")
+    plt.ylabel('meters',fontsize=fs)
+    plt.title( station.upper() + ' Reflector Heights')
+    outlierstring = str(outlierV) + '(m) outliers'
+    plt.yticks(fontsize=fs); plt.xticks(fontsize=fs)
+    plt.xlabel('days',fontsize=fs)
+    plt.grid()
+    plt.xlim((plot_begin, plot_end))
+
+    #label1 = 'w/o RHdot ' + str( round(np.std(resid_spl),2)) + 'm'
+    #label2 = 'w/ RHdot ' + str(round(np.std(resid_spl-correction),2)) + 'm'
+
+    # this is RH with the RHdot correction
+    residual_before = h - spl_at_GPS_times
+    residual_after = correctedRH - spl_at_GPS_times
+    sigmaBefore = np.std(residual_before)
+    sigmaAfter  = np.std(residual_after)
+    print('RMS no RHdot correction (m)', '{0:6.3f}'.format ( sigmaBefore))
+    print('RMS w/ RHdot correction (m)', '{0:6.3f}'.format ( sigmaAfter ))
+
+    plt.subplot(2,1,2)
+    plt.plot(th, residual_after,'.',label='residuals')
+
+    # keep values within 3 sigma 
+    ii = np.abs(residual_after) < 3*sigmaAfter
+    tvd_new = tvd[ii,:]
+    correction_new = correction[ii]
+    correctedRH_new = correctedRH[ii]
+    NV = len(correctedRH)
+
+    plt.plot(th[ii], residual_after[ii],'.',label='edited')
+    plt.grid()
+    plt.title('Residuals to the spline fit')
+    plt.xlabel('days of the year')
+    plt.ylabel('meters')
+    plt.legend(loc="upper left")
+    plt.xlim((plot_begin, plot_end))
+
+    g.save_plot(txtdir + '/' + station + '_rhdot2.png')
+
+
+    # update the residual vector as well
+    residual_after = residual_after[ii]
+
+    # make this plot as well
+    rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir)
+
+    writecsv = False ; extraline = ''
+    # write out the new solutions with RHdot and without 3 sigma outliers
+    write_subdaily(fname_new,station,tvd_new,writecsv,extraline,newRH=correctedRH_new, RHdot_corr=correction_new)
+    nr,nc = tvd_new.shape
+    print('Percent of observations removed:', round(100*(NV-nr)/NV,2))
+
+    # now make yet another vector - this time to apply bias corrections
+    biasCorrected_RH = correctedRH_new
+
+    print('Check inter-frequency biases for GPS,Glonass, and Galileo')
+
+    print('Freq  Bias  Sigma   NumObs ')
+    print('       (m)   (m)       ')
+    for f in [1, 2, 20, 5, 101, 102, 201, 205,207,208]:
+        ff = (tvd_new[:,10] == f)
+        ret = residual_after[ff]
+        if len(ret) > 0:
+            bias = float(np.mean(ret))
+            biasCorrected_RH[ff] = biasCorrected_RH[ff] - bias 
+            sig = float(np.std(ret))
+            print('{0:3.0f} {1:6.2f} {2:6.2f} {3:6.0f}'.format (f, bias, sig, len(ret) ) )
+
+
+   # shoudl send it the one without outliers ... 
+   # try extending the time series to improve spline fit
+    tvd = np.loadtxt(fname_new,comments='%')
+
+    # now use the bias corrected value
+    th = tvd[:,1] + tvd[:,4]/24 # days of year, fractional
+    tvd[:,22] = biasCorrected_RH # save this here because flipit will expect it
+    h = biasCorrected_RH
+
+    # add mirror time series at beginning and end of series for spline
+    column = 23 # tells the code which column to use. 
+    tnew, ynew = flipit(tvd,column)
+
+    Ndays = tnew.max()-tnew.min()
+    numKnots = int(knots_per_day*(Ndays))
+    #
+
+    firstKnot_in_minutes = 15
+    t1 = tnew.min()+firstKnot_in_minutes/60/24
+    t2 = tnew.max()-firstKnot_in_minutes/60/24
+    knots =np.linspace(t1,t2,num=numKnots)
+
+    t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
+    # compute spline - use for times th
+    spline = interpolate.BSpline(t, c, k, extrapolate=False)
+    spline_at_GPS = spline(th)
+
+    fig=plt.figure(figsize=(10,6))
+    plt.subplot(2,1,1)
+    plt.plot(th, h, '.', label='RH with RHdot')
+    plt.plot(th, spline_at_GPS, '-',label='newspline')
+    plt.legend(loc="upper left")
+    plt.grid()
+    plt.gca().invert_yaxis()
+    plt.ylabel('meters')
+    plt.title('New spline with RHdot corr and initial outliers removed')
+
+    plt.subplot(2,1,2)
+    plt.plot(th, h-spline_at_GPS, '.',label='RH')
+    plt.title('Residuals to new spline fit with new 3sigma outliers identified')
+    plt.grid()
+    plt.ylabel('meters')
+    plt.xlabel('days of the year')
+    newsigma = np.std(h-spline_at_GPS)
+    # identify 3 sigma outliers
+    ii = np.abs(h-spline_at_GPS)/newsigma > 3
+    plt.plot(th[ii], (h-spline_at_GPS)[ii], '.',label='3sigma')
+    print('Sigma with frequency bias taken out ', np.round(newsigma,3), len(h[ii]) )
+    g.save_plot(txtdir + '/' + station + '_rhdot4.png')
+
+    return tvd, correction
+

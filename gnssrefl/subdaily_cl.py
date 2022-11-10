@@ -170,6 +170,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     # only allow plaint text?  i think that is what is really going on here
     input2spline = fname_new; output4spline = fname_new + '.withrhdot'
 
+    # not sure why tv and corr are being returned.
     if rhdot:
         if testing is None:
             try:
@@ -183,10 +184,12 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
                 print('Exited the spline code for unknown reasons. Run with testing as True if you want more info')
         else:
             if haveObstimes:
-                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
-                                              obstimes=obstimes, knots=knots,txtdir=txtdir,testing=testing)
+                print('trying out the new code')
+                tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
+                        obstimes=obstimes, knots=knots,txtdir=txtdir,testing=testing)
             else:
-                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, knots=knots,txtdir=txtdir,testing=testing)
+                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, 
+                        spline_outlier, knots=knots,txtdir=txtdir,testing=testing)
 
 
 def main():

@@ -5648,3 +5648,16 @@ def checkEGM():
         print('The REFL_CODE environment variable has not been set.')
 
     return foundfile 
+
+def save_plot(plotname):
+    """
+    save plot and send location info to the screen
+
+    Parameters
+    ----------
+    plotname : str
+        name of png file
+    """
+    plt.savefig(plotname,dpi=300)
+    print('png file saved as: ', plotname)
+
