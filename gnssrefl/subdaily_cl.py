@@ -171,25 +171,14 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     input2spline = fname_new; output4spline = fname_new + '.withrhdot'
 
     # not sure why tv and corr are being returned.
+    print('testing value', testing)
     if rhdot:
-        if testing is None:
-            try:
-                if haveObstimes:
-                    tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
-                                                  obstimes=obstimes,knots=knots,txtdir=txtdir,testing=testing)
-                else:
-                    tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier,
-                                                  knots=knots,txtdir=txtdir,testing=testing)
-            except: 
-                print('Exited the spline code for unknown reasons. Run with testing as True if you want more info')
-        else:
-            if haveObstimes:
-                print('trying out the new code')
-                tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
-                        obstimes=obstimes, knots=knots,txtdir=txtdir,testing=testing)
-            else:
-                tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, 
-                        spline_outlier, knots=knots,txtdir=txtdir,testing=testing)
+       if testing:
+            tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
+                   knots=knots,txtdir=txtdir,testing=testing)
+       else:
+            tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, 
+                    knots=knots,txtdir=txtdir,testing=testing)
 
 
 def main():

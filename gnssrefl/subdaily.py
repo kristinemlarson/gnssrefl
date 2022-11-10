@@ -18,6 +18,17 @@ import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
 
+def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station):
+    """
+    """
+    fig=plt.figure(figsize=(10,4))
+    plt.plot(tnew,ynew, '*', spl_x,spl_y,'-')
+    plt.title('mirrored obs and spline fit ')
+    plt.ylabel('meters')
+    plt.xlabel('days of the year')
+    plt.grid()
+    g.save_plot(txtdir + '/' + station + '_rhdot1.png')
+
 def print_badpoints(t,outliersize):
     """
     Parameters
@@ -126,12 +137,25 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     """
     # this is lazy - should use shape
     RHdot_corr= kwargs.get('RHdot_corr',[])
+
     newRH = kwargs.get('newRH',[])
-    if len(RHdot_corr) + len(newRH) == 0:
-        extra  = False
-    else:
-        print('extra columns are being written')
+
+    newRH_IF = kwargs.get('newRH_IF',[])
+
+    original = False
+    if len(RHdot_corr) + len(newRH) + len(newRH_IF) == 0:
+        original = True
+        print('Original version of LSP series being written')
+    # 
+    write_IF_corrected = False
+    if len(newRH_IF) > 0:
+        print('IF corrected values being written')
+        write_IF_corrected = True
+    extra = False
+    if len(RHdot_corr) > 0:
+        print('RH corrected values being written')
         extra = True
+
     N= len(ntv)
     nr,nc = ntv.shape
     if nr == 0:
@@ -143,7 +167,10 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     if extra:
         write_out_header(fout,station,extraline,extra_columns=True)
     else:
-        write_out_header(fout,station,extraline)
+        if write_IF_corrected:
+            write_out_header(fout,station,extraline, IF=True)
+        else:
+            write_out_header(fout,station,extraline)
     dtime = False
     for i in np.arange(0,N,1):
         year = int(ntv[i,0]); doy = int(ntv[i,1])
@@ -155,15 +182,23 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
         #minute = ctime[3:5]
         # you can either write a csv or text, but not both
         if writecsv:
-            fout.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
-                            ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
+            # this is not up to date
+            fout.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], 
+                ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
         else:
+            if write_IF_corrected:
+                fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:7.3f} {23:7.3f} {24:7.3f} \n".format(year, doy, rh,ntv[i,3], 
+                    UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], 
+                    ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day, hour,minute, 
+                    int(second), ntv[i,22], ntv[i,23], newRH_IF[i] ))
             if extra:
-                fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:6.3f} {23:6.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
-                            ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], RHdot_corr[i]))
-            else:
-                fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], \
-                            ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
+                    fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:6.3f} {23:6.3f} \n".format(year, doy, rh, ntv[i,3], 
+                        UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], 
+                        ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], RHdot_corr[i]))
+            if original:
+                fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],
+                    ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], 
+                    ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
     fout.close()
 
 
@@ -494,6 +529,7 @@ def write_out_header(fout,station,extraline,**kwargs):
 
     """
     extra_columns = kwargs.get('extra_columns',False)
+    IFcol = kwargs.get('IF',False)
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     fout.write('% Results for {0:4s} calculated on {1:20s} \n'.format(  station, xxx ))
     fout.write('% gnssrefl, https://github.com/kristinemlarson \n')
@@ -504,8 +540,12 @@ def write_out_header(fout,station,extraline,**kwargs):
         fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22) (23)    (24)\n")
         fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS  newRH  RHcorr\n")
     else:
-        fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)\n")
-        fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS \n")
+        if IFcol:
+            fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22) (23)    (24)   (25)\n")
+            fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS  newRH  RHcorr  IFcorr\n")
+        else:
+            fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)\n")
+            fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS \n")
 
 
 def writejsonfile(ntv,station, outfile):
@@ -623,6 +663,7 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     # turns off try so you can see the error messages
     testing = kwargs.get('testing',False)
+    print('testing ', testing)
 
 
 #   how often do you want velocity computed (per day)
@@ -881,20 +922,6 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
     newt = tvd[:,1] + tvd[:,4]/24 ; 
     residual = redo_spline(newt, newRH, biasCorrected_RH,pltit,txtdir,station,testing)
 
-    # if kristine is set to true - write out a few more columns
-    ntv = tvd
-    dtime = False
-    kristine = False
-    if kristine:
-        fout = open('ktest.txt','+w')
-        for i in range(0,nr):
-            year = int(ntv[i,0]); doy = int(ntv[i,1])
-            year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
-            rh = ntv[i,2]; UTCtime = ntv[i,4];
-            dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
-            fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:6.3f} {23:6.3f} {24:6.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], correction[i], residual[i]))
-               #ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], RHdot_corr[i]))
-        fout.close()
 
     return tvd, correction 
 
@@ -1509,17 +1536,11 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     # these are spline values at the RH observation times
     spl_at_GPS_times = spline(th) 
 
-    fig=plt.figure(figsize=(10,4))
-    plt.plot(tnew,ynew, '*', spl_x,spl_y,'-')
-    plt.title('mirrored obs and spline fit ')
-    plt.ylabel('meters')
-    plt.xlabel('days of the year')
-    plt.grid()
-    g.save_plot(txtdir + '/' + station + '_rhdot1.png')
+    mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station)
 
     plot_begin = np.floor(np.min(th))
     plot_end =np.ceil(np.max(th)) 
-    print(plot_begin, plot_end)
+    #print(plot_begin, plot_end)
 
     obsPerHour= perday/24
 
@@ -1593,7 +1614,14 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     # now make yet another vector - this time to apply bias corrections
     biasCorrected_RH = correctedRH_new
 
-    print('Check inter-frequency biases for GPS,Glonass, and Galileo')
+    print('Check inter-frequency biases for GPS,Glonass, and Galileo\n')
+
+    if 1 not in tvd_new[:,10]:
+        print('Biases are computed with respect to the average of all constellations')
+        L1exist = False
+    else:
+        print('Biases will be computed with respect to L1 GPS')
+        L1exist = True
 
     print('Freq  Bias  Sigma   NumObs ')
     print('       (m)   (m)       ')
@@ -1602,14 +1630,22 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
         ret = residual_after[ff]
         if len(ret) > 0:
             bias = float(np.mean(ret))
+            if f == 1: # save this bias
+                L1bias = bias
+            if L1exist: # apply L1bias so that everything is relative to L1
+                bias = bias - L1bias
+
             biasCorrected_RH[ff] = biasCorrected_RH[ff] - bias 
             sig = float(np.std(ret))
-            print('{0:3.0f} {1:6.2f} {2:6.2f} {3:6.0f}'.format (f, bias, sig, len(ret) ) )
+            print('{0:3.0f} {1:7.3f} {2:7.3f} {3:6.0f}'.format (f, bias, sig, len(ret) ) )
 
 
-   # shoudl send it the one without outliers ... 
    # try extending the time series to improve spline fit
     tvd = np.loadtxt(fname_new,comments='%')
+
+    # now try to write the bias corrected values
+    bias_corrected_filename = fname_new + 'IF'; extraline = ''; writecsv = False
+    write_subdaily(bias_corrected_filename,station,tvd, writecsv,extraline, newRH_IF=biasCorrected_RH)
 
     # now use the bias corrected value
     th = tvd[:,1] + tvd[:,4]/24 # days of year, fractional
@@ -1654,7 +1690,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     # identify 3 sigma outliers
     ii = np.abs(h-spline_at_GPS)/newsigma > 3
     plt.plot(th[ii], (h-spline_at_GPS)[ii], '.',label='3sigma')
-    print('Sigma with frequency bias taken out ', np.round(newsigma,3), len(h[ii]) )
+    print('RMS with frequency bias taken out (m) ', np.round(newsigma,3)  )
     g.save_plot(txtdir + '/' + station + '_rhdot4.png')
     if pltit:
         plt.show()
