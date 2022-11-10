@@ -5644,7 +5644,7 @@ def checkEGM():
             if os.path.isfile(egm):
                 print('successful download, egm file exists')
                 foundfile = True
-     else:
-         print('The REFL_CODE environment variable has not been set.')
+    else:
+        print('The REFL_CODE environment variable has not been set.')
 
     return foundfile 
