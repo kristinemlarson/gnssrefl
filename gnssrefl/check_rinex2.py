@@ -43,7 +43,7 @@ def check_l2(i,savebase,nsat_line1, lines,nlin,l2index,year,doy):
             foundGPS = foundGPS + 1
             GPSnum = int ( savebase[isat+1:isat+3] )
             if GPSnum in l2c_sat:
-                #print('found GPS satellite in L2C list ', GPSnum)
+                print('found GPS satellite in L2C list ', GPSnum)
                 l2cfound = l2cfound + 1
 
             for k in range(0,nlin):
@@ -54,12 +54,16 @@ def check_l2(i,savebase,nsat_line1, lines,nlin,l2index,year,doy):
                         l2psats = l2psats + 1
                         foundGPS = foundGPS - 1 # since there really was no obs
                     else: 
-                        if int(l2obs[14:15]) > 0:
-                            l2psats = l2psats + 1
+                        if l2obs[14:15] == ' ':
+                            #print('blank')
+                            okok = 1
+                        else:
+                            if int(l2obs[14:15]) > 0:
+                                l2psats = l2psats + 1
 
         isat = isat + 3
 
-    print('Found ', l2cfound, ' GPS satellites that could possibly be L2C in first epoch')
+    print('\nFound ', l2cfound, ' GPS satellites that could possibly be L2C in first epoch')
     print('Of those, your file has ', foundGPS-l2psats, ' valid L2C SNR observations')  
 
 def check_rinex_header(rinexfile):
@@ -97,7 +101,7 @@ def check_rinex_header(rinexfile):
                 savebase = lines[i+1][32:80].strip() 
 
                 nsat_line1 = int(base[28:31])
-                #print('Number of satellites ' , nsat_line1)
+                print('Number of satellites ' , nsat_line1)
                 base2 = ''
                 ii = i+2 # this is an index in the RINEX file
                 if 'L2' in observables:
