@@ -27,6 +27,10 @@ the a priori values to zeros:
 tell the code an azimuth and elevation angle mask (i.e. which directions you want 
 to allow reflections from), and which frequencies you want to use, and various quality control (QC) metrics. 
 Right now the default frequencies are GPS only, e.g. L1, L2C and L5. 
+
+
+
+
 The json file of instructions will be put in $REFL_CODE/input/p101.json. You should look at 
 it to get an idea of the kinds of inputs the code uses.
 The default azimuths can be changed, but this needs to be done by hand. Some parameters can be set

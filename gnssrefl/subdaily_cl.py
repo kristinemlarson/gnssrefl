@@ -132,7 +132,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']
 
-    txtdir = xdir + '/Files'
+    txtdir = xdir + '/Files/'
     if not os.path.exists(txtdir):
         subprocess.call(['mkdir', txtdir])
 
@@ -141,7 +141,6 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
         if not os.path.exists(txtdir):
             subprocess.call(['mkdir', txtdir])
 
-#   these are optional output options
     #create the subdaily file
     writecsv = False
     if (h1 > h2):
@@ -165,18 +164,14 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             print('Input subdaily RH file you provided does not exist:', fname_new)
             sys.exit()
 
-    # testing added so that if it crashes, only effects me.  and I get more useful error messages
-    # added spline input 2021 oct 27. It was not coded well enough for gaps etc.
-    # only allow plaint text?  i think that is what is really going on here
     input2spline = fname_new; output4spline = fname_new + '.withrhdot'
 
     # not sure why tv and corr are being returned.
-    print('testing value', testing)
     if rhdot:
-       if testing:
+       if testing: # new version
             tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
                    knots=knots,txtdir=txtdir,testing=testing)
-       else:
+       else: # old version
             tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, 
                     knots=knots,txtdir=txtdir,testing=testing)
 

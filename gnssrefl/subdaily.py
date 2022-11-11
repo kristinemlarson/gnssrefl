@@ -22,8 +22,10 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station):
     """
     """
     fig=plt.figure(figsize=(10,4))
-    plt.plot(tnew,ynew, '*', spl_x,spl_y,'-')
-    plt.title('mirrored obs and spline fit ')
+    plt.plot(tnew,ynew, '*', label='obs+fake obs')
+    plt.plot(spl_x,spl_y,'-', label='spline')
+    plt.title('Mirrored obs and spline fit ')
+    plt.legend(loc="upper left")
     plt.ylabel('meters')
     plt.xlabel('days of the year')
     plt.grid()
@@ -661,9 +663,8 @@ def rhdot_correction(station,fname,fname_new,pltit,outlierV,**kwargs):
         txtdir = val
     print('output directory: ', txtdir)
 
-    # turns off try so you can see the error messages
+    # this is the old version
     testing = kwargs.get('testing',False)
-    print('testing ', testing)
 
 
 #   how often do you want velocity computed (per day)
@@ -1319,12 +1320,14 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
     plt.ylabel('meters',fontsize=fs);
     plt.xlim((np.min(th), np.max(th)))
     plt.grid()
-    plt.title('RH correction')
+    plt.title('The RH correction from RHdot effect ')
     #plt.xlim((plot_begin, plot_end))
 
     plt.subplot(2,1,2)
-    plt.plot(th, rhdot_at_th,'o')
-    plt.plot(tvel, yvel,'-')
+    plt.plot(th, rhdot_at_th,'o',label='at GNSS obs')
+    plt.plot(tvel, yvel,'-', label='spline fit')
+    plt.legend(loc="upper left")
+
     plt.grid()
     plt.title('surface velocity')
     plt.ylim((-1,1))
@@ -1457,9 +1460,10 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
        outlier criterion, in meters 
 
     """
+    print('Improved code to compute rhdot correction and bias correction for subdaily')
     # this is not being used 
     outlierV = float(outlierV) #just to make sure - i think it was sending a string
-    # by output will go to REFL_CODE/Files
+    # output will go to REFL_CODE/Files unless txtdir provided
     xdir = os.environ['REFL_CODE']
 
     val = kwargs.get('txtdir',[])
@@ -1549,9 +1553,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.plot(th, h, 'b.', label='Original points',markersize=4)
     plt.plot(spl_x, spl_y, 'r--', label='spline')
 
-        
     tvel = spl_x[1:N]
     yvel = obsPerHour*np.diff(spl_y)
+
     rhdot_at_th = np.interp(th, tvel, yvel)
     correction = xfac*rhdot_at_th
     correctedRH = h-correction
@@ -1563,7 +1567,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.title( station.upper() + ' Reflector Heights')
     outlierstring = str(outlierV) + '(m) outliers'
     plt.yticks(fontsize=fs); plt.xticks(fontsize=fs)
-    plt.xlabel('days',fontsize=fs)
+    #plt.xlabel('days',fontsize=fs)
     plt.grid()
     plt.xlim((plot_begin, plot_end))
 
@@ -1579,7 +1583,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     print('RMS w/ RHdot correction (m)', '{0:6.3f}'.format ( sigmaAfter ))
 
     plt.subplot(2,1,2)
-    plt.plot(th, residual_after,'.',label='residuals')
+    plt.plot(th, residual_after,'.',label='all pts')
 
     # keep values within 3 sigma 
     ii = np.abs(residual_after) < 3*sigmaAfter
@@ -1588,7 +1592,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     correctedRH_new = correctedRH[ii]
     NV = len(correctedRH)
 
-    plt.plot(th[ii], residual_after[ii],'.',label='edited')
+    plt.plot(th[ii], residual_after[ii],'.',label='kept pts')
     plt.grid()
     plt.title('Residuals to the spline fit')
     plt.xlabel('days of the year')
@@ -1614,7 +1618,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     # now make yet another vector - this time to apply bias corrections
     biasCorrected_RH = correctedRH_new
 
-    print('Check inter-frequency biases for GPS,Glonass, and Galileo\n')
+    print('Check inter-frequency biases for GPS, Glonass, and Galileo\n')
 
     if 1 not in tvd_new[:,10]:
         print('Biases are computed with respect to the average of all constellations')
@@ -1669,11 +1673,14 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     # compute spline - use for times th
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
     spline_at_GPS = spline(th)
+    half_hourly = int(48*(th[-1] - th[0]))
+    th_even = np.linspace(th[0], th[-1],half_hourly );
+    spline_whole_time = spline(th_even)
 
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
     plt.plot(th, h, '.', label='RH with RHdot')
-    plt.plot(th, spline_at_GPS, '-',label='newspline')
+    plt.plot(th_even, spline_whole_time, '-',label='newspline')
     plt.legend(loc="upper left")
     plt.grid()
     plt.gca().invert_yaxis()
@@ -1681,15 +1688,16 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.title('New spline with RHdot corr and initial outliers removed')
 
     plt.subplot(2,1,2)
-    plt.plot(th, h-spline_at_GPS, '.',label='RH')
-    plt.title('Residuals to new spline fit with new 3sigma outliers identified')
+    plt.plot(th, h-spline_at_GPS, '.',label='all')
+    plt.title('Residuals to new spline fit')
     plt.grid()
     plt.ylabel('meters')
     plt.xlabel('days of the year')
     newsigma = np.std(h-spline_at_GPS)
     # identify 3 sigma outliers
     ii = np.abs(h-spline_at_GPS)/newsigma > 3
-    plt.plot(th[ii], (h-spline_at_GPS)[ii], '.',label='3sigma')
+    plt.plot(th[ii], (h-spline_at_GPS)[ii], '.',label='3 sigma')
+    plt.legend(loc="upper left")
     print('RMS with frequency bias taken out (m) ', np.round(newsigma,3)  )
     g.save_plot(txtdir + '/' + station + '_rhdot4.png')
     if pltit:
