@@ -66,3 +66,7 @@ added xz and gz endings
 added refl_zones
 added EGM96 to gps.py
 1.1.9 added ediff to quickLook
+
+1.1.10 fixed subdaily spline fit.  no longer cut off data at the 
+beginning and end.  also output files that are interfrequency bias corrected,
+relative to L1
