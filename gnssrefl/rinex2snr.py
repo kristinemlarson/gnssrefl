@@ -86,8 +86,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         
     rate : string 
         general sample rate. 
-            high: use 1-Hz area in the archive
-            low: use default area in the archive
+        high: use 1-Hz area in the archive
+        low: use default area in the archive
 
     dec_rate : integer
          decimation value
@@ -465,9 +465,10 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
 
 def satorb(week, sec_of_week, ephem):
     """
+    Calculate satellite orbits
 
     Parameters
-    ---------
+    ----------
 
     week : integer
         GPS week
@@ -528,7 +529,7 @@ def satorb(week, sec_of_week, ephem):
 
 def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
     """
-    Converts rinex v2.11 using Joakim's rinex reading code
+    Converts a rinex v2.11 obs file using Joakim's rinex reading code
 
     Parameters
     ----------

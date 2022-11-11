@@ -24,6 +24,7 @@ def fbias_daily_avg(station):
     ----------
     station : str
         station name - 4char - lowercase
+
     """
     xdir = os.environ['REFL_CODE']
 
@@ -122,7 +123,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
         whether you want output as csv format
 
     howBig : float
-        criterion for the median filter, i.e. how far in meters can a RH be from the median for that day, in meters
+        criterion for the median filter, i.e. how far in meters 
+        can a RH be from the median for that day, in meters
 
     ReqTracks : integer
         is the number of retrievals required per day
@@ -136,14 +138,15 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     test: bool
 
     Returns
-    ---------
+    -------
     tv : numpy array
         with these values [year, doy, meanRHtoday, len(rh), month, day, stdRH, averageAmplitude]
         len(rh) is the number of RH on a given day
         stdRH is the standard deviation of the RH values (meters)
         averageAmplitude is in volts/volts
 
-    obstimes : datetime objects for the times
+    obstimes : list of datetime objects 
+        observation times
 
     """
     xdir = os.environ['REFL_CODE']
@@ -154,10 +157,6 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     fs = 12
     NotEnough = 0
-# putting the results in a np.array, with this ordering
-# [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday]
-# 2021 november 8, added amplitude, so now 8 columns
-# 2022 september 4, added azimuth limits
     tv = np.empty(shape=[0, 8])
     tvall = np.empty(shape=[0, 7])
     ngps = []; nglo = [] ; ngal = []; nbei = []
@@ -246,30 +245,24 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                     ngal = np.append(ngal, len(gsat[ijk]))
 
                                 obstimes.append(datetime.datetime(year=yr, month=d.month, day=d.day, hour=12, minute=0, second=0))
-                                # ???
                                 medRH.append(medv)
                                 #medRH =np.append(medRH, medv)
-            # store the meanRH after the outliers are removed using simple median filter
+                                # store the meanRH after the outliers are removed using simple median filter
                                 meanRHtoday = np.mean(good)
 
                                 stdRHtoday = np.std(good)
                                 #meanRH =np.append(meanRH, meanRHtoday)
                                 #
                                 # july 7, 2022
-                                #
                                 meanRH.append(meanRHtoday)
-                                # added amplitude 2021 Nov 8 
                                 #meanAmp = np.append(meanAmp, np.mean(goodAmp))
-                                meanAmp.append(np.mean(goodAmp))
-            # add month and day just cause some people like that instead of doy
-            # added standard deviation feb14, 2020
                                 # updated this to include mean amplitude 2021 november 8
+                                meanAmp.append(np.mean(goodAmp))
                                 newl = [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday, np.mean(goodAmp)]
 
                                 tv = np.append(tv, [newl],axis=0)
                                 k += 1
                             else:
-                                #print('not enough retrievals on ', yr, d.month, d.day, len(good))
                                 NotEnough = NotEnough + 1
                     except:
                         okok = 1;
@@ -429,7 +422,8 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     ----------
     obstimes : datetime object
 
-    tv : ?? 
+    tv : numpy array
+        content of a LSP results file
 
     outfile : string
         name of output file
@@ -471,19 +465,44 @@ def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gam
     tvall had everything in it.  but it was slowing everything down, so i removed it
 
     Parameters
-    --------
-    NG :
-    yr :
-    doy :
-    d :
-    good :
-    gazim : 
-    gfreq : 
-    gsat :
-    gamp :
-    gpeak2noise :
-    gutcTime :
-    tvall : 
+    ----------
+    allrh : fileID for writing
+
+    csvformat : bool
+        whether you are writing to csv file
+
+    NG : int
+        number of lines of results
+
+    yr : int
+        year
+
+    doy : int
+        day of year
+
+    d : datetime object
+
+    good : float
+        reflector height - I think
+
+    gazim : numpy array of floats
+        azimuths
+    gfreq : numpy array of int
+        frequencies
+    gsat : numpy array of int
+        satellite numbers
+    gamp : numpy array of floats
+        amplitudes of periodograms
+    gpeak2noise : numpy array of floats
+        peak 2 noise for periodograms
+    gutcTime : numpy array of floats
+        time of day in hours 
+    tvall :  ??
+
+    Returns
+    -------
+    tvall : ??
+
 
     """
     if (NG > 0):

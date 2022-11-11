@@ -1,9 +1,8 @@
-import sys
-import os
-
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import subprocess
+import sys
 
 
 import gnssrefl.gps as g
@@ -22,8 +21,10 @@ xdir = Path(os.environ["REFL_CODE"])
 
 def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
     """
+    makes a plot of daily averaged phase
+
     Parameters
-    -----------
+    ----------
     station: str
         4 char station
 
@@ -60,9 +61,9 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     contaminated by snow. make a file with these years and doys saved
 
     Parameters
-    ---------
+    ----------
     station : string
-        name, 4 ch
+        4 ch station name
 
     medfilter : float
         how much you allow the individual tracks to deviate from the daily median (meters)
@@ -71,16 +72,16 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
         number of tracks to compute trustworthy daily average
 
     year1 : integer
-        start year
+        starting year
 
     year2 : integer
-        end year
+        ending year
+
+    Returns
+    -------
+    snowmask_exists : boolean
 
     creates output file into a file $REFL_CODE/Files/snowmask_{ssss}.txt
-
-    Peturns
-    ---------
-    snowmask_exists : boolean
 
     """
     myxdir = os.environ['REFL_CODE']
@@ -124,15 +125,16 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
     Parameters
     ----------
     station : string
+        4 ch station name
 
     t_datetime : datetime 
-        observations time
+        observation times
 
     vwcdata : numpy array of floats (I think)
         volumetric water content
 
     plot_path : string
-        where to put the plot
+        full name of the plot file 
 
     circles: boolean
         circles in the plot. default is a line (really .-)
@@ -181,7 +183,7 @@ def read_apriori_rh(station,fr):
         frequency (e.g. 1,20)
 
     Returns
-    ----------
+    -------
     results : numpy array 
         column 1 is ?
         column 2 is RH in meters
@@ -246,7 +248,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
     it uses tracks that were predefined by the apriori.py code
 
     Parameters
-    -------------
+    ----------
     station name : string
         4 char id, lowercase
     year : integer
@@ -278,7 +280,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
     gzip : boolean
         whether you want SNR files gzipped after running the code
 
-    Only GPS frequencies are allowed
+    Only GPS frequencies are allowed because this relies on the repeating ground track.
 
     """
 
@@ -386,6 +388,7 @@ def low_pct(amp, basepercent):
     inputs are the amplitudes  and a percentage
     used to define the bottom level. returns
     normalized amplitudes
+
     this is meant to be used by individual tracks (I think)
     in this case they are the top values, not the bottom ... ugh
     """
@@ -402,25 +405,28 @@ def low_pct(amp, basepercent):
 
 def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=-99,circles=False):
     """
-    conversion from phase to VWC. Using Clara Chew algorithm
-    from Matlab write_vegcorrect_smc.m
-    input is the station name
+    Convert GPS phase to VWC. Using Clara Chew's algorithm from 
+    Matlab write_vegcorrect_smc.m
 
     https://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
 
     Parameters
     -----------
     station : string
+        4 char station name
 
     year : integer
+        beginning year
 
     year_end : integer
+        last year
 
     plt2screen : boolean
         plots come to the screen
 
     fr : integer
         frequency
+        default is L2C (20)
 
     polyorder : integer
         override on the polynomial order used in leveling
@@ -675,7 +681,7 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
     vxyz is from some other compilation
 
     Returns
-    --------
+    -------
     tv : numpy array with elements
         year 
         doy  - day of year
@@ -724,17 +730,20 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
 
 def apriori_file_exist(station,fr):
     """
+    reads in the a priori RH results
 
     Parameters
-    ---------
+    ----------
     station : string
+        station name
 
     fr : integer
         frequency
         
-    returns
-    ----------
+    Returns
+    -------
     boolean as to whether the apriori file exists
+
     """
     # do not have time to use this
     file_manager = FileManagement(station, FileTypes.apriori_rh_file)

@@ -1,15 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-parameters
--------
+Parameters
+----------
 year : integer
+    full year
 
 month : integer
+     calendar month
 
 day : integer
+     day of the month
 
+Returns
+-------
+wk : int
+    GPS week
+day : int
+    GPS day of the week (0 to 6 used by the IGS)
 
-computes GPS week (and day of week) 
 """
 import argparse
 import gnssrefl.gps as g
