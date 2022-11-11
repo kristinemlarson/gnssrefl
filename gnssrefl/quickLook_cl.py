@@ -21,17 +21,17 @@ def parse_arguments():
     parser.add_argument("doy", help="day of year", type=int)
 # these are the optional inputs
     parser.add_argument("-snr", default=None, type=int, help="snr ending - default is 66")
-    parser.add_argument("-fr", default=None, type=int, help="try -fr 1 for GPS L1 only, or -fr 101 for Glonass L1")
+    parser.add_argument("-fr", default=None, type=int, help="e.g. -fr 1 for GPS L1  or -fr 101 for Glonass L1")
     parser.add_argument("-ampl", default=None, type=float, help="minimum spectral amplitude allowed")
-    parser.add_argument("-e1",  default=None, type=int, help="lower limit elevation angle (deg)")
-    parser.add_argument("-e2",  default=None, type=int, help="upper limit elevation angle (deg)")
-    parser.add_argument("-h1",  default=None, type=float, help="lower limit reflector height (m)")
-    parser.add_argument("-h2",  default=None, type=float, help="upper limit reflector height (m)")
-    parser.add_argument("-azim1",  default=None, type=float, help="lower limit azimuth (deg)")
-    parser.add_argument("-azim2",  default=None, type=float, help="upper limit azimuth (deg)")
+    parser.add_argument("-e1",  default=None, type=int, help="lower limit elevation angle (default is 5 deg) ")
+    parser.add_argument("-e2",  default=None, type=int, help="upper limit elevation angle (default is 25 deg)")
+    parser.add_argument("-h1",  default=None, type=float, help="lower limit reflector height (default is 0.5m) ")
+    parser.add_argument("-h2",  default=None, type=float, help="upper limit reflector height (default is 6 m)")
+    parser.add_argument("-azim1",  default=None, type=float, help="lower limit azimuth (default is 0 deg)")
+    parser.add_argument("-azim2",  default=None, type=float, help="upper limit azimuth (default is 360 deg)")
     parser.add_argument("-sat", default=None, type=int, help="satellite")
     parser.add_argument("-screenstats", default=None, type=str, help="if True, Success and Failure info printed to the screen")
-    parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio")
+    parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio (default is 3)")
     parser.add_argument("-ediff",  default=None, type=float, help="ediff Quality Control parameter (default 2 deg)")
     #parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
     #parser.add_argument("-fortran", default=None, type=str, help="Default is True: use Fortran translators")
@@ -136,7 +136,6 @@ def quicklook(station: str, year: int, doy: int,
 
     ediff : float, optional
         quality control parameter
-
 
     """
 
