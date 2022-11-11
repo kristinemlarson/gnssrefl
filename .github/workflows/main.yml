@@ -31,4 +31,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: unavdocker/gnssrefl_ci_test:latest
+          tags: unavdocker/gnssrefl:latest
