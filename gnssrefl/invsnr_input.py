@@ -42,41 +42,39 @@ def parse_arguments():
 def invsnr_input(station: str, h1: float, h2: float, e1: float, e2: float, a1: float = 0,
                  a2: float = 360, lat: float = None, lon: float = None, height: float = None):
     """
-        Parameters:
-        ___________
-        station : string
-            Character ID of the station
+    Parameters
+    ----------
+    station : string
+        Character ID of the station
 
-        h1 : float
-            Lower limit reflector height (m)
+    h1 : float
+        Lower limit reflector height (m)
 
-        h2 : float
-            Upper limit reflector height (m)
+    h2 : float
+        Upper limit reflector height (m)
 
-        e1 : float
-            Lower limit elev. angle (deg)
+    e1 : float
+        Lower limit elev. angle (deg)
 
-        e2 : float
-            Upper limit elev. angle (deg)
+    e2 : float
+        Upper limit elev. angle (deg)
 
-        a1 : float, optional
-            Lower limit azimuth angle (deg)
+    a1 : float, optional
+        Lower limit azimuth angle (deg)
 
-        a2 : float, optional
-            Upper limit azimuth angle (deg)
+    a2 : float, optional
+        Upper limit azimuth angle (deg)
 
-        lat : float, optional
-            Latitude (degrees)
+    lat : float, optional
+        Latitude (degrees)
 
-        lon : float, optional
-            Longitude (degrees)
+    lon : float, optional
+        Longitude (degrees)
 
-        height : float, optional
-            Ellipsoidal height (meters)
+    height : float, optional
+        Ellipsoidal height (meters)
 
     """
-
-# make sure environment variables exist
 
 # rename the user inputs into variables
 #

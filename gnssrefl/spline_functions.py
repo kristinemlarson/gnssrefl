@@ -22,10 +22,6 @@ import gnssrefl.refraction as refr
 
 def make_wavelength_column(nr,snrdata,signal):
     """
-    returns column with nr rows that has the relevant GNSS wavelength for
-    the satellites storeid in column zero of snrdata.
-    signal is L1, L2 etc
-    22feb10 added l6, l7
 
     Parameters
     ------------
@@ -57,21 +53,29 @@ def make_wavelength_column(nr,snrdata,signal):
 
 
 def readklsnrtxt(snrfile, thedir, signal):
-    """
-    :param snrfile: variable with the file contents
-    :directory where it is located
-    :param signal: 'L1', 'L2' etc.
-    :
-    parses the contents of a snrfile from #gnssrefl - 
+    parses the contents of a snrfile f
     the file itself is read in a separate function now, 
 
-    returns variable snrdata with columns
-    0 - satellite, usual (100 added for glonass, 200 added for galileo)
-    1 - elev angle, deg
-    2 - azimuth angle, deg
-    3 - time in seconds since GPS began
-    4 - SNR data in db-Hz
-    5 - new column with wavelength in it, in meters.  might as well take care of that now
+    """
+    Parameters
+    ----------
+    snrfile: str
+        variable with the file contents
+    thedir : str
+        directory where it is located
+    signal: str
+        'L1', 'L2' etc.
+
+    Returns
+    -------
+    snrdata : numpy array of floats 
+        columns 
+        0 - satellite, usual (100 added for glonass, 200 added for galileo)
+        1 - elev angle, deg
+        2 - azimuth angle, deg
+        3 - time in seconds since GPS began
+        4 - SNR data in db-Hz
+        5 - new column with wavelength in it, in meters.  might as well take care of that now
 
     if SNR data are zero for a given signal, the row is eliminated
 
@@ -190,16 +194,17 @@ def readklsnrtxt(snrfile, thedir, signal):
 
 def glonasswlen(prn, signal):
     """
+    returns glonass wavelength
 
     Parameters
-    ---------
+    ----------
     prn : integer
         satellite number
     signal : string
          L1 or L2 for glonass
 
     Returns
-    ---------
+    -------
     wavelength : float
         wavelength for the given signal
 
@@ -225,11 +230,13 @@ def glonasswlen(prn, signal):
 def datetime2gps(dt):
     """
     Parameters
-    ---------
+    ----------
     dt : datetime 
 
-    returns  
-        gpstime : float
+    Returns  
+    -------
+    gpstime : float
+
     """
 
     timeobj = Time(dt, format='datetime')
@@ -245,12 +252,14 @@ def gps2datetime(gt):
 
 def gps2datenum(gt):
     """
-    parameter
-    ---------
-    gt :
+    Parameters
+    ----------
+    gt : float
+        gps time 
 
-    return
-    dn : 
+    Returns
+    -------
+    dn : datetime?
 
     """
 
@@ -266,23 +275,56 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     """
     reads an array of snr data (output from readklsnrtxt) and organises into:
     reflector height estimates, stats and detrended snr data for inverse analysis
-    :param snrdata: array of organised SNR data
-    :param azilims: azimuth angle limits (e.g., [90, 270])
-    :param elvlims: elevation angle limits (e.g., [5, 30])
-    :param rhlims: upper and lower reflector height limits (in metres) for quality control
-    :param signal: default 'L1' (C/A), can also use L2...if want to use L5 or whatever else you need to make some edits
-    :param normalize: if you want to normalize the arcs so that they have the same amplitude
-    :param snrfigs: if you want to produce some figures of SNR arcs
-    :param lspfigs: if you want to produce some figures of Lomb-Scargle Periodograms
-    :param polydeg: degree of polynomial to fit and subtract from SNR data
-    :param gaptlim: if there is a gap in time bigger than [gaptlim] seconds in a particular arc then it will be ignored
-    :param pktnlim: peak to noise ratio qc condition = the peak of the LSP / mean of LSP within the range [rhlims]
-    :param savefile: if you want to save the output to a pickle file then use this parameter as the name (string)
-    :param kwargs: see below
+
+    Parameters
+    ---------
+    snrdata: numpy array 
+        contents of SNR datafile
+
+    azilims: list of floats
+        azimuth angle limits (e.g., [90, 270])
+
+    elvlims: list of floats
+        elevation angle limits (e.g., [5, 30])
+
+    rhlims: list of floats
+        upper and lower reflector height limits (in metres) for quality control
+
+    signal: str
+        default 'L1' (C/A), can also use L2...if want to use L5 or whatever else you need to make some edits
+
+    normalize: bool
+        if you want to normalize the arcs so that they have the same amplitude
+
+    snrfigs: bool
+        if you want to produce some figures of SNR arcs
+
+    lspfigs: bool
+        if you want to produce some figures of Lomb-Scargle Periodograms
+
+    polydeg: float
+        degree of polynomial to fit and subtract from SNR data
+
+    gaptlim: float
+        if there is a gap in time bigger than [gaptlim] seconds in a particular arc then it will be ignored
+
+    pktnlim: float
+        peak to noise ratio qc condition = the peak of the LSP / mean of LSP within the range [rhlims]
+
+    savefile: bool
+        if you want to save the output to a pickle file then use this parameter as the name (string)
+
+    kwargs: see below
+
     tempres: if want to use different temporal resolution to input data (in seconds)
+
     satconsts: default use all given, otherwise specify from ['G', 'R', 'E'] (gps / glonass / galileo)
-    :return rh_arr: numpy array of reflector height estimtes and stats
-    :return snrdt_arr: numpy array of detrended SNR data for inverse analysis
+
+    Returns
+    -------
+    rh_arr: numpy array of reflector height estimates and stats
+
+    snrdt_arr: numpy array of detrended SNR data for inverse analysis
 
     """
     # get a list for late ron
@@ -541,8 +583,9 @@ def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,
     this has to be modified for multi-frequency
     fspecdict and Nfreq
     22feb09 added beidou
-    parameter
-    ---------
+
+    Parameters
+    ----------
     inparam : 
 
     knots : 
@@ -632,25 +675,42 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     """
     function analyses a kristine larson 'gnssrefl' format snr file and outputs a fitted spline
     note that the file must be 24 hours long or it wont work
-    station, year, and doy
-    : azilims: azimuth angle limits (e.g., [90, 270])
-    : elvlims: elevation angle limits (e.g., [5, 30])
 
-    :params rhlims: upper and lower reflector height limits (in metres) for quality control e.g., [5, 10] is 5 and 10 m
-    : precision of the periodogram in meters
-    :params kdt: spline knot spacing in seconds
+    station : str
+        station name
+    year : int
+
+    doy : int
+
+    azilims: azimuth angle limits (e.g., [90, 270])
+
+    elvlims: elevation angle limits (e.g., [5, 30])
+
+    rhlims: upper and lower reflector height limits (in metres) for quality control e.g., [5, 10] is 5 and 10 m
+
+    precision : precision of the periodogram in meters
+
+    kdt: spline knot spacing in seconds
+
     knots are spaced evenly except for at the start and end of the day
     the idea is that you could piece together the outpt from different days to have a continuous spline
     if kdt = 2 * 60 * 60 (2 hours), then knots at 0h, 1h, 3h,... 21h, 23h, 24h
     The idea is that you would ignore the first and last knots and then you could have a continuous spline
     with knots every 2 hours over multiple days
-    :params snrfit: True or False if you want to do inverse modelling of the SNR data
-    :params signal: 'L1', 'L2', currently under development
-    :params savefile: set True if you want to save the output to a file
-    :params doplot: set True if you want to produce a plot with the output from the analysis
-    :params rough_in: 'roughness' parameter in the inverse modelling of SNR data (see Strandberg et al., 2016)
-    :parans kwargs: see below
+    snrfit: True or False if you want to do inverse modelling of the SNR data
+
+    signal: 'L1', 'L2', currently under development
+
+    savefile: set True if you want to save the output to a file
+
+    doplot: set True if you want to produce a plot with the output from the analysis
+
+    rough_in: 'roughness' parameter in the inverse modelling of SNR data (see Strandberg et al., 2016)
+
+    kwargs: see below
+
     tempres: if want to use different temporal resolution to input data (in seconds)
+
     satconsts: default use all given, otherwise specify from ['G', 'R', 'E'] (gps / glonass / galileo)
 
     :return invout: dictionary with outputs from inverse analysis
@@ -960,8 +1020,10 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
 def invsnr_header(xdir, outfile_type,station,outfile_name):
     """
-    parameters
-    --------------
+    Makes header for output of invsnr analysis
+
+    Parameters
+    ----------
     xdir : string 
         directory for the output file
     outfile_type : string
@@ -971,8 +1033,8 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
     outfile_name : string
         name of output - if '', it uses default
 
-    returns 
-    --------
+    Returns 
+    -------
     fileID : ? 
         used for writing to file
     usetxt : boolean
@@ -1007,7 +1069,8 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
 
 def define_inputfile(station,year,doy,snr_ending):
     """
-    parameter
+
+    Parameters
     ----------
     station : string
         4 ch name of station 
@@ -1019,8 +1082,8 @@ def define_inputfile(station,year,doy,snr_ending):
     snr_ending : integer
         file ending, e.g. 66, 99
 
-    returns
-    --------
+    Returns
+    -------
     snrfile: string
         name of snrfile 
 
@@ -1066,11 +1129,17 @@ def define_inputfile(station,year,doy,snr_ending):
 def arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,azdesc):
     """
     moved these individual plots out of the way
-    lspfigs :
-    snrfigs :
+
+    lspfigs : bool
+
+    snrfigs : bool
+
     reflh :
+
     pgram : 
+
     sat : 
+
     datet :
     """
     if not os.path.isdir('plots'):
