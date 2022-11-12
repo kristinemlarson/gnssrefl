@@ -400,8 +400,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     print_badpoints(tv[ii,:],residuals[ii])
 
     # now write things out - using txtdir variable sent 
-    fname =     txtdir  + '/' + station + '_all.txt'
-    fname_new = txtdir  + '/' + station + '_subdaily_edits.txt'
+    fname =     txtdir  + '/' + station + '_' + str(year) + '_subdaily_all.txt'
+    fname_new = txtdir  + '/' + station + '_' + str(year) + '_subdaily_edit.txt'
     extraline = ''
 
     editedtv = tv[jj,:]

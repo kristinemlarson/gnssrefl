@@ -154,8 +154,8 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
         else:
             print('Using ', txtfile)
         # if txtfile provided, you can use that as your starting dataset 
-        ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, extension, sigma, writecsv,
-                                                            azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt,txtdir)
+        ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, 
+                extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt,txtdir)
         haveObstimes = True
     else:
         haveObstimes = False
@@ -168,6 +168,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
 
     # not sure why tv and corr are being returned.
     if rhdot:
+       print(input2spline, output4spline)
        if testing: # new version
             tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
                    knots=knots,txtdir=txtdir,testing=testing)
