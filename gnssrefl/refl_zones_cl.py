@@ -119,6 +119,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=0, lon: flo
         print('Elevation angle list is very long - reducing to five.')
 
     obsfile = rf.set_system(system)
+    print('The code should use this orbit file: ', obsfile)
     x,y,z=g.llh2xyz(lat,lon,el_height)
     recv=np.array([x,y,z])
     # calculate rising and setting arcs for this site and the requested constellation

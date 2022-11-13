@@ -451,7 +451,13 @@ def set_system(system):
         orbit filename with Cartesian coordinates for one day 
 
     """
+    xdir = os.environ['REFL_CODE'] 
+    if not os.path.exists(xdir):
+        print('REFL_CODE environment variable must be set. Exiting.')
+        sys.exit()
     xdir = os.environ['REFL_CODE'] + '/Files/'
+    if not os.path.exists(xdir):
+        subprocess.call(['mkdir', xdir])
 
     if (system is None) or (system == 'gps'):
         system = 'gps'
@@ -480,7 +486,17 @@ def save_reflzone_orbits():
     foundfiles : bool
         whether needed files were found
     """
+    xdir = os.environ['REFL_CODE'] 
+
+    if not os.path.exists(xdir):
+        print('The REFL_CODE environment variable must be set. Exiting.')
+        sys.exit()
+
     xdir = os.environ['REFL_CODE'] + '/Files/'
+
+    if not os.path.exists(xdir):
+        subprocess.call(['mkdir', xdir])
+
     githubdir = 'https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/docs/_static/'
 
     for otypes in ['GPS','GLONASS','GALILEO','BEIDOU']:
