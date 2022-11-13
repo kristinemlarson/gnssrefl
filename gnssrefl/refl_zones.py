@@ -489,6 +489,8 @@ def save_reflzone_orbits():
         if not os.path.exists(xdir + orbfile):
             print('download from github and put in local Files directory: ', otypes)
             wget.download(githubdir+orbfile, xdir + orbfile)
+        else:
+            print('file already exists', otypes)
 
     found = 0 
     for otypes in ['GPS','GLONASS','GALILEO','BEIDOU']:
