@@ -18,10 +18,17 @@ import gnssrefl.gps as g
 
 def vegplt(station, tv,winter):
     """
-    input station name 
-    tv: np array (year, doy, mp1, mp2) 
-    and winter flag for wehther to throw out ~jan-apr
-    and ~oct-dec
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+
+    tv: np array 
+        (year, doy, mp1, mp2) 
+
+    winter : bool
+        whether to throw out ~jan-apr and ~oct-dec
+
     """
     if (winter == 'True'):
         cc = ((tv[:,1] > 105) & (tv[:,1] < 274))
@@ -40,16 +47,17 @@ def vegplt(station, tv,winter):
 
 def sfilename(station, year, doy):
     """
-    parameters
-    -----------
+    Parameters
+    ----------
     station : string
         4 character station name 
     year : integer
 
     doy : integer
         day of year
-    returns:
-    ------------
+
+    Returns
+    -------
     xfile : string
         the full SNR filename on your local system
     """
@@ -65,8 +73,9 @@ def sfilename(station, year, doy):
 def ReadRecAnt(teqclog):
     """
     prints out Receiver and Antenna name
-    parameters
-    ---------------
+
+    Parameters
+    ----------
     teqclog : string
         the name of a teqc log 
 
@@ -136,17 +145,17 @@ def run_teqc(teqc,navfile,rinexfile,foutname,mpdir):
     """
     run teqcs and stores the output 
 
-    parameters
-    --------------
-    teqc : string
+    Parameters
+    ----------
+    teqc : str
         location of the teqc executable
-    navfile : string
+    navfile : str
         name of the RINEX nav file
     rinexfile : string
         name of the RINEX observation file
-    foutname : string
+    foutname : str
         name of the output file
-    mpdir : string
+    mpdir : str
         location of the multipath directory on your system
 
     """
@@ -162,12 +171,12 @@ def check_directories(station,year):
     """
     checks that directories exist for teqc logs
 
-    parameters
+    Parameters
     ----------
-    station : string
+    station : str
         4 character station name
 
-    year : integer
+    year : int
 
     """
     navfiledir = os.environ['ORBITS']  + '/' + str(year)
@@ -195,26 +204,32 @@ def check_directories(station,year):
 
 def get_files(station,year,doy,look):
     """
-    parameters
-    --------
+    Phrameters
+    ----------
     station : string
+
     year : integer
+
     doy : integer
         day of year
-    look : boolean
-        whether you should get the file if it does not exist locally
 
-    makes sure the files exist etc.
-    returns
-    ----------
-    navfile : string
+    look : boolean
+        whether you should try to get the file from unavco 
+        if it does not exist locally
+
+    Returns
+    -------
+    navfile : str
         navigation/orbit file
-    rinexfile : string
+    rinexfile : str
         name of the obs file
-    foutname : full name of the teqc log output 
-    mpdir :  directory for MP results
+    foutname : str
+        full name of the teqc log output 
+    mpdir :  str
+        directory for MP results
     goahead : boolean
         whether you should go ahead and run teqc
+
     """
     goahead = False # means you found everything and can run teqc
 
@@ -264,6 +279,7 @@ def get_files(station,year,doy,look):
 def main():
     """
     computes MP1 MP2 stats using teqc or reads existing log
+
     """
 
     parser = argparse.ArgumentParser()
