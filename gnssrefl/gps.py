@@ -2197,8 +2197,18 @@ def diffraction_correction(el_deg, temp=20.0, press=1013.25):
 
 def fdoy2mjd(year,fdoy):
     """
-    input year and fractional doy??
-    returns MJD - maybe?
+    Parameters
+    ----------
+    year : int
+        full year
+
+    fdoy : float
+        fractional day of year
+
+    Returns
+    -------
+    mjd : float
+        modified julian day
     """
     doy = math.floor(fdoy)
     yy,mm,dd, cyyyy, cdoy, YMD = ydoy2useful(year,doy)
@@ -2208,12 +2218,32 @@ def fdoy2mjd(year,fdoy):
 
     return mjd
 
-
-
 def mjd(y,m,d,hour,minute,second):
     """
-    inputs: year, month, day, hour, minute,second
-    output: modified julian day
+    calculate the integer part of MJD and the fractional part.
+
+    Parameters
+    ----------
+    year : int
+
+    month : int
+
+    day : int
+
+    hour : int
+
+    minute : int
+        
+    second : int
+
+    Returns
+    -------
+    mjd : float
+        modified julian day of y-m-d
+
+    fracDay : float
+        fractional day 
+
     using information from http://infohost.nmt.edu/~shipman/soft/sidereal/ims/web/MJD-fromDatetime.html
     """
     if  (m <= 2):
@@ -2234,8 +2264,17 @@ def mjd(y,m,d,hour,minute,second):
 
 def doy2ymd(year, doy):
     """
-    inputs: year and day of year (doy)
-    returns: some kind of datetime construct which can be used to get MM and DD
+    Parameters
+    ----------
+    year : int
+
+    doy : int
+        day of year
+
+    Returns
+    -------
+    d : datetime object
+
     """
 
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
@@ -2244,8 +2283,22 @@ def doy2ymd(year, doy):
 
 def getMJD(year,month,day,fract_hour):
     """
-    inputs are year, month, day and fractional hour
-    return is modified julian day (real8)
+    Parameters
+    ----------
+    year : int
+
+    month : int
+
+    day : int
+
+    fract_hour : float
+        hour (fractional)
+
+    Returns 
+    -------
+    mjd : float
+        modified julian day
+
     """
 #   convert fract_hour to HH MM SS
 #   ignore fractional seconds for now
@@ -2270,6 +2323,7 @@ def update_plot(plt_screen,x,y,px,pz):
         #plt.title(station)
         plt.subplot(212)  
         plt.plot(px,pz)
+
 def open_plot(plt_screen):
     """
     simple code to open a figure, called by gnssIR_lomb
@@ -5625,6 +5679,11 @@ def geoidCorrection(lat,lon):
 def checkEGM():
     """
     Downloads and stores EGM96 file for use in refl_zones 
+
+    Returns
+    -------
+    foundfile : bool
+        whether EGM96 file was found (or installed) on your local machine
 
     """
     foundfile = False

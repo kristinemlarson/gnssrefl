@@ -68,7 +68,7 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
 
     Parameters
-    ----------------
+    ----------
     txtdir : str
         the directory where the results should be written out
     txtfile : str
@@ -81,15 +81,18 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     default is plain txt file
 
     Returns
-    -----------
+    -------
     writetxt : bool
+        whether output should be plain txt
 
     writecsv : bool
+        whether output should be csv format
 
     writejson : bool
+        whether output should be json format
 
     outfile : str
-        filename
+        output filename
 
     """
     writetxt = True
@@ -119,7 +122,7 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
 
 def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     """
-    writes out the results
+    writes out the subdaily results
 
     Parameters
     -----------

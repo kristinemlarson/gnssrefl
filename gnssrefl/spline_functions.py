@@ -53,10 +53,10 @@ def make_wavelength_column(nr,snrdata,signal):
 
 
 def readklsnrtxt(snrfile, thedir, signal):
+    """
     parses the contents of a snrfile f
     the file itself is read in a separate function now, 
 
-    """
     Parameters
     ----------
     snrfile: str
