@@ -633,7 +633,8 @@ def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfi
 
     gpssatlist :
 
-    snrfile : 
+    snrfile : str 
+        name of the output file
 
     s1exist :
 

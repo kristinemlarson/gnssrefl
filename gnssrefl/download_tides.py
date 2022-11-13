@@ -21,27 +21,34 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
     Parameters
     ----------
     station : string
+        station name
 
     year : integer
+        full year
 
     month1 : integer
+        starting month
 
     month2 : integer
+        ending month
 
     datum : string
+        water datum
 
     metadata : boolean
+        whether you want the metadata printed to the screen
 
     tt : numpy array 
         modified julian date for water measurements
 
-    obstimes : numpy array
+    obstimes : numpy array of datetimes
+        time of the measurements
 
-    slevel : numpy array
+    slevel : numpy array of floats
+        water level in meters
 
     csv : boolean
-        True if csv output wanted
-        default is False
+        True if csv output wanted (default is False)
 
     Returns
     -------
@@ -116,7 +123,7 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
         modified julian day
     obstimes : list of datetime objects 
 
-    slevel : list 
+    slevel : list or is it numpy ?? 
          water level in meters
 
     """
@@ -341,6 +348,7 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
     """
         Downloads NOAA tide gauge files
         Downloads a json and converts it to plain txt with columns!
+        (or csv)
 
         Parameters 
         ----------
