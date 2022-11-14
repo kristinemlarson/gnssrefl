@@ -1590,6 +1590,16 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     # keep values within 3 sigma 
     ii = np.abs(residual_after) < 3*sigmaAfter
+
+    tvd_bad = tvd[np.abs(residual_after) >  3*sigmaAfter, :]
+    nr,nc=tvd_bad.shape
+    print('outliers.spline.txt')
+    if nr > 0:
+        fout = open('outliers.spline.txt', 'w+')
+        for w in range(0,nr):
+            fout.write('sat {0:3.0f} azim {1:7.2f} delta {2:7.2f} \n'.format( tvd_bad[w,3], tvd_bad[w,5], tvd_bad[w,14]))
+        fout.close()
+
     tvd_new = tvd[ii,:]
     correction_new = correction[ii]
     correctedRH_new = correctedRH[ii]
