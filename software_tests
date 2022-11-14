@@ -1,15 +1,34 @@
 #
 # various tests that gnssrefl build is still working
 # this only checks that the code does not crash. It does not currently
-# check that anything useful is created!
+rm -rf /Users/kristine/testing_friday
+mkdir /Users/kristine/testing_friday
+## use new environment variables
+export ORBITS=/Users/kristine/testing_friday
+export REFL_CODE=/Users/kristine/testing_friday
+
+# do not overwrite EXE for now
 
 ls -l $EXE/gfzrnx
 
 ls -l $EXE/CRX2RNX
 
+# this is likely not there
 ls -l $REFL_CODE/input/gpt_1wA.pickle
 
 ls -l $ORBITS
+
+rinex2snr p103 2020 105 -doy_end 107
+
+refl_zones p041
+
+make_json_input p103 0 0 0 
+
+gnssir p103 2020 105  -doy_end 107
+
+daily_avg p103 0.5 10
+
+subdaily p103 2020
 
 
 vwc_input p033 2012

@@ -1,15 +1,22 @@
 # Utilities <a name="helper"></a>
 
 <code>refl_zones</code>
-This module allows you to create "stand-alone" Fresnel Zones maps for 
-google Earth. at a minimum it requires a four station character name
+This module creates "stand-alone" Fresnel Zones maps for 
+google Earth. At a minimum it requires a four station character name as input.
 
 <code>refl_zones sc02</code>
 
 The defaults are that it does all azimuths, elevation angles of 5-10-15, GPS L1,
 sea level reflections, and creates an output file called sc02.kml (and stored in $REFL_CODE/Files).
+It uses the station name to query oru station location database.  If your station
+is not in that database, you should use the optional lat,lon,el_height inputs.
 
-You can modify those accordingly:
+If you want to specify the reflector height instead of using sea level, set -RH.
+If you are making a file for an interior lake or river, you will need to use this option.
+Similarly, for a soil moisture or snow reflection zone map, you will want to set the RH value
+accordingly.
+
+The optional inputs (at this time):
 
 -azim1 min azimuth (degrees)
 
@@ -31,6 +38,13 @@ You can modify those accordingly:
 
 -output base filename for the kml file
 
+The output goes to $REFL_CODE/Files. The code relies on orbits stored on github. These
+will be downloaded and stored the first time you run the code. It also needs the EGM96 file 
+for calculating geoid corrections. It is downloaded and stored the first time you run the code.
+While ordinarily you do not need to have internet connection to run this module, you do need
+it the first time you run the code to get these files.
+
+<HR>
 
 <code>download_rinex</code> can be useful if you want to 
 download RINEX v2.11 or 3 files (using the version flag) without using 
