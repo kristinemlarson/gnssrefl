@@ -18,16 +18,48 @@ import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
 
-def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station):
+def writeout_spline_outliers(tvd_bad):
     """
+    """
+    nr,nc=tvd_bad.shape
+    if nr > 0:
+        print('Outliers written to: outliers.spline.txt')
+        fout = open('outliers.spline.txt', 'w+')
+        for w in range(0,nr):
+            fout.write('sat {0:3.0f} azim {1:7.2f} delta {2:7.2f} \n'.format( tvd_bad[w,3], tvd_bad[w,5], tvd_bad[w,14]))
+        fout.close()
+
+    return
+
+def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
+    """
+    tnew : numpy of floats
+        time in days of year, with faked data, used for splines
+
+    ynew : numpy of floats
+        RH in meters 
+    spl_t : numpy of floats
+        time in days of year
+    spl_y : numpy of floats
+        smooth RH, meters
+    station : str
+        name of station for title
+    beginT : float
+        first time (day of year) real RH measurement
+    endT : float
+        last time (day of year) for first real RH measurement
+
     """
     fig=plt.figure(figsize=(10,4))
+
     plt.plot(tnew,ynew, '*', label='obs+fake obs')
-    plt.plot(spl_x,spl_y,'-', label='spline')
+    i = (spl_x > beginT) & (spl_x < endT) # to avoid wonky points in spline
+    plt.plot(spl_x[i],spl_y[i],'-', label='spline')
     plt.title('Mirrored obs and spline fit ')
     plt.legend(loc="upper left")
     plt.ylabel('meters')
     plt.xlabel('days of the year')
+    plt.xlim((beginT, endT))
     plt.grid()
     g.save_plot(txtdir + '/' + station + '_rhdot1.png')
 
@@ -66,6 +98,7 @@ def print_badpoints(t,outliersize):
 
 def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
+    figures out what the names of the outputs are going to be
 
     Parameters
     ----------
@@ -187,7 +220,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
         #minute = ctime[3:5]
         # you can either write a csv or text, but not both
         if writecsv:
-            # this is not up to date
+            print('this is not up to date')
             fout.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], 
                 ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
         else:
@@ -1333,7 +1366,7 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
 
     plt.grid()
     plt.title('surface velocity')
-    plt.ylim((-1,1))
+    plt.ylim((-1.5,1.5))
     plt.ylabel('meters/hour')
     plt.xlabel('days of the year')
     plt.xlim((np.min(th), np.max(th)))
@@ -1463,7 +1496,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
        outlier criterion, in meters 
 
     """
-    print('Improved code to compute rhdot correction and bias correction for subdaily')
     # this is not being used 
     outlierV = float(outlierV) #just to make sure - i think it was sending a string
     # output will go to REFL_CODE/Files unless txtdir provided
@@ -1483,8 +1515,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     # knots_per_day = 8
     knots_default = 8
     knots_per_day= kwargs.get('knots',8)
-    print('>>>>>>>>>>>>>>>>>>>> Entering spline fit <<<<<<<<<<<<<<<<<<<<<<<<')
-    print('Input filename:', fname)
+    print('\n>>>>>>>>>>>>>>>>>>>> Entering spline fit <<<<<<<<<<<<<<<<<<<<<<<<')
+    print('Improved code to compute rhdot correction and bias correction for subdaily')
+    print('\nInput filename:', fname)
     print('Output filename: ', fname_new)
 
     # read in the lomb scargle values which are the output of gnssir
@@ -1543,18 +1576,15 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     # these are spline values at the RH observation times
     spl_at_GPS_times = spline(th) 
 
-    mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station)
+    mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,th[0],th[-1])
 
     plot_begin = np.floor(np.min(th))
     plot_end =np.ceil(np.max(th)) 
-    #print(plot_begin, plot_end)
 
     obsPerHour= perday/24
 
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
-    plt.plot(th, h, 'b.', label='Original points',markersize=4)
-    plt.plot(spl_x, spl_y, 'r--', label='spline')
 
     tvel = spl_x[1:N]
     yvel = obsPerHour*np.diff(spl_y)
@@ -1562,7 +1592,26 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     rhdot_at_th = np.interp(th, tvel, yvel)
     correction = xfac*rhdot_at_th
     correctedRH = h-correction
-    plt.plot(th,correctedRH,'m.',label='with RHdot corr',markersize=4)
+
+
+
+    # this is RH with the RHdot correction
+    residual_before = h - spl_at_GPS_times
+    residual_after = correctedRH - spl_at_GPS_times
+    sigmaBefore = np.std(residual_before)
+    sigmaAfter  = np.std(residual_after)
+
+    label1 = 'w/o RHdot ' + str(np.round(sigmaBefore,2)) + 'm'
+    label2 = 'w RHdot ' + str(np.round(sigmaAfter,2)) + 'm'
+
+    plt.plot(th, h, 'b.', label=label1,markersize=4)
+    iw = (spl_x > th[0]) & (spl_x < th[-1])
+    plt.plot(spl_x[iw], spl_y[iw], 'r--', label='spline') # otherwise wonky spline makes a goofy plot
+
+    plt.plot(th,correctedRH,'m.',label=label2,markersize=4)
+
+    print('\nRMS no RHdot correction (m)', '{0:6.3f}'.format ( sigmaBefore))
+    print('RMS w/ RHdot correction (m)', '{0:6.3f}'.format ( sigmaAfter ))
 
     plt.gca().invert_yaxis()
     plt.legend(loc="upper left")
@@ -1570,36 +1619,19 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.title( station.upper() + ' Reflector Heights')
     outlierstring = str(outlierV) + '(m) outliers'
     plt.yticks(fontsize=fs); plt.xticks(fontsize=fs)
-    #plt.xlabel('days',fontsize=fs)
     plt.grid()
     plt.xlim((plot_begin, plot_end))
 
-    #label1 = 'w/o RHdot ' + str( round(np.std(resid_spl),2)) + 'm'
-    #label2 = 'w/ RHdot ' + str(round(np.std(resid_spl-correction),2)) + 'm'
-
-    # this is RH with the RHdot correction
-    residual_before = h - spl_at_GPS_times
-    residual_after = correctedRH - spl_at_GPS_times
-    sigmaBefore = np.std(residual_before)
-    sigmaAfter  = np.std(residual_after)
-    print('RMS no RHdot correction (m)', '{0:6.3f}'.format ( sigmaBefore))
-    print('RMS w/ RHdot correction (m)', '{0:6.3f}'.format ( sigmaAfter ))
 
     plt.subplot(2,1,2)
     plt.plot(th, residual_after,'.',label='all pts')
 
-    # keep values within 3 sigma 
-    ii = np.abs(residual_after) < 3*sigmaAfter
 
     tvd_bad = tvd[np.abs(residual_after) >  3*sigmaAfter, :]
-    nr,nc=tvd_bad.shape
-    print('outliers.spline.txt')
-    if nr > 0:
-        fout = open('outliers.spline.txt', 'w+')
-        for w in range(0,nr):
-            fout.write('sat {0:3.0f} azim {1:7.2f} delta {2:7.2f} \n'.format( tvd_bad[w,3], tvd_bad[w,5], tvd_bad[w,14]))
-        fout.close()
+    writeout_spline_outliers(tvd_bad)
 
+    # keep values within 3 sigma 
+    ii = np.abs(residual_after) < 3*sigmaAfter
     tvd_new = tvd[ii,:]
     correction_new = correction[ii]
     correctedRH_new = correctedRH[ii]

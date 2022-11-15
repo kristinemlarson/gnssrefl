@@ -99,7 +99,25 @@ Time series with large outliers removed.
 
 <img src=../_static/tggo_3.png width=600>
  
-Additional corrections can be made using the <code>rhdot T</code> setting. I will add 
-more information here when I get a chance.
+Additional corrections can be made using the <code>rhdot T</code> setting. In order to 
+compute the RHdot correction, we use a spline fit to our initial RH estimates. And then
+we will use the Numpy algorithms to estimate RHdot anywhere from that:  
 
-Kristine M. Larson September 9, 2022
+<img src=../_static/tggo_rhdot3.png width=600>
+
+With the resulting time series where the 3 sigma outliers are being highlighted in the second panel:
+
+<img src=../_static/tggo_rhdot2.png width=600>
+
+The statistics for the fits are shown to the screen. In this case, without 
+the RHdot correction, the standard deviation of each RH value is 28.5 cm.
+WIth the RHdot correction it is 22.6 cm, so a significant improvement. Note that
+this is relative to the spline fit and without correcting for phase center offsets.
+
+In the next step the code attempts to remove the phase center offsets by
+defining everything relative to GPS L1.  
+
+Overall this is a very good reflections site - but it is hampered by the lack of Galileo observations.
+When this current receiver is upgraded to a newer model, I expect to see much better results.
+
+Kristine M. Larson November 9, 2022
