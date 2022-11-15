@@ -12,3 +12,4 @@
 #requires = ["setuptools", "wheel", "numpy==1.22.2"]
 requires = ["setuptools<60", "wheel", "numpy"]
 
+#requires-python="<3.10"
