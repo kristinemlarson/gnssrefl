@@ -35,6 +35,8 @@ def parse_arguments():
     parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     parser.add_argument("-extension", default=None, type=str, help="Provide extension name so you can try different strategies")
+#    parser.add_argument('-az_list', nargs="*",type=float,  help='azimuth min/max, e.g. 0 180  )')
+
 
     args = parser.parse_args().__dict__
 
@@ -50,7 +52,8 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               h1: float = 0.5, h2: float = 6.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.7, ampl: float = 6.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = None ):
+              extension: str = None  ):
+
     """
 
     Parameters
@@ -116,10 +119,16 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         Results will then go into $REFL_CODE/YYYY/results/ssss/extension
         Default is None
 
+    az_list : list of floats
+        azimuth min and max (for now)
+        default is 0 to 360
+
     """
 
     # make sure environment variables exist
     g.check_environ_variables()
+
+    #print(az_list)
 
     ns = len(station)
     if ns != 4:
@@ -194,7 +203,13 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     lsp['desiredP'] = 0.005 # precision of RH in meters
     # azimuth regions in degrees (in pairs)
     # you can of course have more subdivisions here
-    lsp['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
+    #if (az_list[0]) == 0 & (az_list[-1] == 360):
+    if True:
+        lsp['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
+    # leaving this so the notebooks are not broken
+    #else:
+    #    print('You have requested specific azimuth limits')
+    #    lsp['azval'] = g.make_azim_choices(az_list)
 
     # default frequencies to use - and their required amplitudes. The amplitudes are not set in stone
     # this is the case for only GPS, but the good L2 
@@ -241,6 +256,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     # how long can the arc be, in minutes
     lsp['delTmax'] = 75  # - this is appropriate for 5-30 degrees
  
+
     print('writing out to:', outputfile)
     with open(outputfile, 'w+') as outfile:
         json.dump(lsp, outfile, indent=4)

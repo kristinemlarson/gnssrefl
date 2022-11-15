@@ -44,6 +44,7 @@ def parse_arguments():
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
 
+
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans

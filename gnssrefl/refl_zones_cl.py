@@ -29,7 +29,7 @@ def parse_arguments():
 
     return {key: value for key, value in args.items() if value is not None}
 
-def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=0, lon: float=0, el_height: float=0, RH: str=None, fr: int = 1, el_list: int= [5, 10, 15],system: str = 'gps', output: str = None):
+def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=0, lon: float=0, el_height: float=0, RH: str=None, fr: int = 1, el_list: float= [5, 10, 15],system: str = 'gps', output: str = None):
     """
     creates KML file for reflection zones to be used in Google Earth
 

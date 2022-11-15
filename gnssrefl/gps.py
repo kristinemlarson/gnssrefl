@@ -5720,3 +5720,36 @@ def save_plot(plotname):
     plt.savefig(plotname,dpi=300)
     print('png file saved as: ', plotname)
 
+
+def make_azim_choices(alist):
+    """
+    """
+# want to make a list for make_json_input
+# lsp['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
+    if alist[0] < 0 | alist[-1] < 0 :
+        print('We do not currently allow negative azimuths')
+        sys.exit()
+
+    if len(alist) == 2:
+        deltaA = np.diff(alist)
+        if (deltaA < 100):
+            azval = alist
+        elif (deltaA >=100) & (deltaA <= 180):
+            # divide by two
+            d = int(deltaA/2)
+            azval = [alist[0], alist[0] + d, alist[0] + d,  alist[-1]]
+        elif (deltaA >=180) & (deltaA <= 270):
+            # divide by three
+            d = int(deltaA/3)
+            azval = [alist[0], alist[0] + d, alist[0] + d,  
+                    alist[0] + 2*d, alist[0]+2*d, alist[-1]]
+        else:
+            # divide by three
+            d = int(deltaA/4)
+            azval = [alist[0], alist[0] + d, alist[0] + d,  alist[0] + 2*d, 
+                    alist[0]+2*d, alist[0] + 3*d, alist[0]+3*d, alist[-1]]
+    else:
+        print('We only allow one set of azimuth ranges at the current time') ; sys.exit()
+
+    print('Input Azlist: ', alist, ' Output list ', azval)
+    return azval
