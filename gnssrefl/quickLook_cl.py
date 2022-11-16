@@ -113,9 +113,8 @@ def quicklook(station: str, year: int, doy: int,
 
     peak2noise : integer, optional
         peak to noise ratio of the periodogram values (periodogram peak divided by the periodogram noise).
-        peak to noise value is one way of defining that significance (not the only way).
         For snow and ice, 3.5 or greater, tides can be tricky if the water is rough (and thus
-        you might go below 3 a bit, say 2.5-2.7 
+        you might go below 3 a bit, say 2.7 
         default is 3.
 
     screenstats : boolean, optional
@@ -142,9 +141,6 @@ def quicklook(station: str, year: int, doy: int,
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    # not including ampl and fr in the data type validation since they are sometimes a list and sometimes a float/int
-    # validate_input_datatypes(quicklook, station=station, year=year, doy=doy, snr=snr, e1=e1, e2=e2,
-    #                          h1=h1, h2=h2, sat=sat, peak2noise=peak2noise, fortran=fortran, screenstats=screenstats)
 
     exitS = g.check_inputs(station, year, doy, snr)
 
