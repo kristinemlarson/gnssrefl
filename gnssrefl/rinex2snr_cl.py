@@ -89,22 +89,37 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         Which orbit files to download.
         value options:
             gps (default) : will use GPS broadcast orbit
+
             gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
             gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
+
             nav : GPS broadcast, perfectly adequate for reflectometry.
+
             igs : IGS precise, GPS only
+
             igr : IGS rapid, GPS only
+
             jax : JAXA, GPS + Glonass, within a few days, missing block III GPS satellites
+
             gbm : GFZ Potsdam, multi-GNSS, not rapid
+
             grg : French group, GPS, Galileo and Glonass, not rapid
+
             esa : ESA, multi-GNSS
+
             gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021
+
+            rapid : GFZ rapid, multi-GNSS
+
+            ultra: GFZ ultra-rapid, multi-GNSS
+
             wum : (disabled) Wuhan, multi-GNSS, not rapid
 
     rate : string, optional
         The data rate
         value options:
             low (default) : standard rate data
+
             high : high rate data
 
     dec : integer, optional
@@ -115,6 +130,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         Please see documentation at https://github.com/kristinemlarson/gnssrefl to see instructions to get these.
         value options:
             False (default) : does not use fortran to translate rinex
+
             True : uses fortran to translate rinex
 
     nolook : boolean, optional
@@ -126,19 +142,33 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         Default is None. None means that the code will search and find an archive with the data for you.
         value options:
             unavco (University Navstar Consortium)
+
             sonel (global sea level observing system)
+
             sopac (Scripps Orbit and Permanent Array Center)
+
             cddis (NASA's Archive of Space Geodesy Data)
+
             ngs (National Geodetic Survey)
+
             nrcan (Natural Resources Canada)
+
             bkg (German Agency for Cartography and Geodesy)
+
             nz (GNS, New Zealand)
+
             ga (Geoscience Australia)
+
             bev (Austria Federal Office of Metrology and Surveying)
+
             bfg (German Agency for water research, only Rinex 3, requires password)
+
             jp (GSI, requires password)
+
             jeff (My good friend Professor Freymueller!)
+
             special (set aside files at UNAVCO for reflectometry users)
+
             all (does unavco, sopac, and sonel)
 
     doy_end : int, optional
@@ -156,7 +186,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
     translator : string, optional
         hybrid (default) : uses a combination of python and fortran to translate the files.
-        fortran : uses fortran to translate (requires the fortran translator executable - see https://github.com/kristinemlarson/gnssrefl)
+
+        fortran : uses fortran to translate (requires the fortran translator executable)
+
         python : uses python to translate. (Warning: This can be very slow)
 
     srate : int, optional
