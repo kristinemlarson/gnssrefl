@@ -29,11 +29,19 @@ author = 'Kristine M. Larson and UNAVCO'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['myst_parser','nbsphinx','sphinx.ext.autodoc','sphinx.ext.autosummary'] #,'sphinx.ext.napoleon'
+extensions = ['myst_parser','nbsphinx','sphinx.ext.autodoc','sphinx.ext.autosummary',"sphinxcontrib.apidoc",'sphinx.ext.napoleon'] #,
 myst_heading_anchors = 3
 myst_enable_extensions = [
     "html_image"
 ]
+
+# APIDOC configuration 
+apidoc_module_dir = "../gnssrefl"
+apidoc_output_dir = "source"
+# apidoc_excluded_paths = ['tests']
+apidoc_separate_modules = True
+apidoc_toc_file = False
+apidoc_module_first = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
