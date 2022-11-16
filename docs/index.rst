@@ -26,7 +26,7 @@ Welcome to gnssrefl Documentation!
    pages/understand.md
    pages/README_install.md
    pages/func_and_utils_doc.md
-   source/modules.rst
+   source
    pages/first_drivethru.md
    pages/news.md
    pages/contributions_questions.md
