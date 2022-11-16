@@ -37,7 +37,7 @@ myst_enable_extensions = [
 
 # APIDOC configuration 
 apidoc_module_dir = "../gnssrefl"
-apidoc_output_dir = "source"
+apidoc_output_dir = "api"
 # apidoc_excluded_paths = ['tests']
 apidoc_separate_modules = True
 apidoc_toc_file = False
