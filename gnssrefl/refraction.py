@@ -17,8 +17,9 @@ import gnssrefl.gps as g
 def read_4by5(station, dlat,dlon,hell):
     """
     reads existing grid points for a given location
-    parameters
-    --------
+
+    Parameters
+    ----------
     station : string
         name of station
     dlat : float
@@ -28,18 +29,34 @@ def read_4by5(station, dlat,dlon,hell):
     hell : float
         ellipsoidal height in meters
 
-    returns
-    -------------
+    Returns
+    -------
     pgrid : 4 by 5 numpy array
+        pressure in hPa
+
     Tgrid : 4 by 5 numpy array 
+        temperature in C
+
     Qgrid : 4 by 5 numpy array 
+
     dTgrid : 4 by 5 numpy array  
+       temperature lapse rate in degrees per km 
+
     u : 4 by 1 numpy array
+        geoid undulation in meters
+
     Hs : 4 by 1 numpy array  
+
     ahgrid : 4 by 5 numpy array
+        hydrostatic mapping function coefficient at zero height (VMF1) 
+
     awgrid : 4 by 5 numpy array
+        wet mapping function coefficient (VMF1) 
+
     lagrid : 4 by 5 numpy array
+
     Tmgrid : 4 by 5 numpy array
+        mean temperature of the water vapor in degrees Kelvin 
 
     requires that an environment variable exists for REFL_CODE
     """
@@ -84,9 +101,9 @@ def read_4by5(station, dlat,dlon,hell):
 #
 def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
     """
-    parameters
-    -----------
-    station : string
+    Parameters
+    ----------
+    station : str
         station name
     dmjd:  float 
         modified Julian date (scalar, only one epoch per call is possible)
@@ -98,20 +115,29 @@ def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
         ellipsoidal height in m 
     it: integer
         case 1: no time variation but static quantities
+
         case 0: with time variation (annual and semiannual terms)
 
-    returns
-    --------
-    output parameters:
-    p:    pressure in hPa
-    T:    temperature in degrees Celsius 
-    dT:   temperature lapse rate in degrees per km 
-    Tm:   mean temperature of the water vapor in degrees Kelvin 
-    e:    water vapor pressure in hPa 
-    ah:   hydrostatic mapping function coefficient at zero height (VMF1) 
-    aw:   wet mapping function coefficient (VMF1) 
-    la:   water vapor decrease factor 
-    undu: geoid undulation in m 
+    Returns
+    -------
+    p : float
+        pressure in hPa
+    T:  float
+        temperature in degrees Celsius 
+    dT : float
+       temperature lapse rate in degrees per km 
+    Tm : float
+        mean temperature of the water vapor in degrees Kelvin 
+    e : float
+        water vapor pressure in hPa 
+    ah: float
+        hydrostatic mapping function coefficient at zero height (VMF1) 
+    aw: float
+        wet mapping function coefficient (VMF1) 
+    la: float
+        water vapor decrease factor 
+    undu: float
+        geoid undulation in m 
     """
 
 #  need to find diffpod and difflon
@@ -279,10 +305,18 @@ def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
 def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
     """
     makes a grid for refraction correction
-    xdir - directory for output
-    station name
-    lat and lon in degrees (NOT RADIANS)
-    kristine m. larson
+
+    Parameters
+    ----------
+    xdir : str
+        directory for output
+    station : str
+        station name, 4 ch
+    lat : float
+        latitude in degrees
+    lon : float 
+        longitude in degrees 
+
     """
     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(PROJECT_ROOT)
@@ -415,9 +449,20 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
 
 def corr_el_angles(el_deg, press, temp):
     """
-    inputs are elevation angles (in degrees)
-    Pressure in hPa and Temperature in degrees C.
-    outputs are corrected elevation angles (in degrees)
+    Corrects elevation angles for refraction using simple angle bending model
+    Parameters
+    ----------
+    el_deg : numpy array of floats
+        elevation angles in degrees
+    press : float
+        pressure in hPa
+    temp : float
+        temperature in degrees C
+
+    Returns
+    -------
+    corr_el_deg : numpy array of floats
+        corrected elevation angles (in degrees)
 
     """
 
@@ -431,7 +476,15 @@ def corr_el_angles(el_deg, press, temp):
 
 def look_for_pickle_file():
     """
-    latest attempt to solve this dilema
+    latest attempt to solve the dilemma of the pickle file needed for
+    the refraction correction
+
+    Returns
+    -------
+    foundit : bool
+        whether pickle file found
+    fullpname : str
+        full path to the pickle file
     """
 #   read VMF gridfile in pickle format
 
@@ -489,4 +542,5 @@ def look_for_pickle_file():
                 foundit = True
 
     print(foundit, fullpname)
+
     return foundit , fullpname
