@@ -16,4 +16,5 @@ dependencies:
      - nbsphinx
      - gnssrefl
      - numpydoc
+     - sphinxcontrib-apidoc
 #     - git+https://github.com/kristinemlarson/gnssrefl.git
