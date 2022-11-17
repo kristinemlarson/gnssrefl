@@ -22,13 +22,13 @@ def quickp(station,t,sealevel):
 
     Parameters
     ----------
-    station: string
+    station : string
         4 character ID of the station
 
-    t: datetime object array
+    t : datetime object array
         time
 
-    sealevel: numpy array
+    sealevel : numpy array
         water level in meters
     
     """
@@ -65,12 +65,13 @@ def parse_arguments():
 
 def download_simon(station: str, output: str = None, plt: bool = False):
     """
-    Downloads IOC tide gauge files in json format,
-    converts it to plain txt or csv format
+    Downloads IOC tide gauge files in json format, converts it to plain txt or csv format
 
     Parameters
     ----------
+
     station : str
+        4 ch station name
 
     output : str, optional
         Optional output filename

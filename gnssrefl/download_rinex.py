@@ -47,77 +47,77 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                    version: int = 2, strip: bool = False, doy_end: int = None, stream: str = 'R', samplerate: int = 30,
                    debug: bool = False, dec: int = 1):
     """
-        command line interface for download_rinex.
+    command line interface for download_rinex.
 
-        Parameters
-        ___________
-        station : string
-            4 or 9 character ID of the station.
+    Parameters
+    ----------
+    station : string
+        4 or 9 character ID of the station.
 
-        year : integer
-            Year
+    year : integer
+        Year
 
-         month : integer
-            month
+    month : integer
+        month
 
-         day : integer
-            day
+    day : integer
+        day
 
-        rate : string, optional
-            sample rate. value options:
-                low (default) : standard rate data
-                high : high rate data
+    rate : string, optional
+        sample rate. value options:
+        low (default) : standard rate data
+        high : high rate data
 
-        archive : str, optional
-            Select which archive to get the files from.
-            Default is None. None means that the code will search and find an archive with the data for you.
-            value options:
-                unavco
-                sonel (global sea level observing system)
-                sopac (Scripps Orbit and Permanent Array Center)
-                cddis (NASA's Archive of Space Geodesy Data)
-                ngs (National Geodetic Survey)
-                nrcan (Natural Resources Canada)
-                bkg (German Agency for Cartography and Geodesy)
-                bfg (German Agency for water research, only Rinex 3)
-                nz (GNS, New Zealand)
-                ga (Geoscience Australia)
-                bev (Austria Federal Office of Metrology and Surveying)
-                jeff
-                special (reflectometry Rinex 2 files maintained by unavco)
-                all
+    archive : str, optional
+        Select which archive to get the files from.
+        Default is None. 
+        value options:
+            unavco
+            sonel (global sea level observing system)
+            sopac (Scripps Orbit and Permanent Array Center)
+            cddis (NASA's Archive of Space Geodesy Data)
+            ngs (National Geodetic Survey)
+            nrcan (Natural Resources Canada)
+            bkg (German Agency for Cartography and Geodesy)
+            bfg (German Agency for water research, only Rinex 3)
+            nz (GNS, New Zealand)
+            ga (Geoscience Australia)
+            bev (Austria Federal Office of Metrology and Surveying)
+            jeff
+            special (reflectometry Rinex 2 files maintained by unavco)
+            all (searches sopac,sonel,and unavco)
 
-        version : int, optional
-            Version of Rinex file. Default is 2.
-            value options:
-                2 : Rinex 2
-                3 : Rinex 3
+    version : int, optional
+        Version of Rinex file. Default is 2.
+        value options:
+        2 : Rinex 2
+        3 : Rinex 3
 
-        strip : boolean, optional
-            Whether to strip only SNR observables.  Uses teqc or gfzrnx.
-            Default is False.
+    strip : boolean, optional
+        Whether to strip only SNR observables.  Uses teqc or gfzrnx.
+        Default is False.
 
 
-        doy_end : int, optional
-            End day of year to be downloaded. This is to create a range from doy to doy_end of days to get the snr files.
-            Default is None. (meaning only a single day using the doy parameter)
+    doy_end : int, optional
+        End day of year to be downloaded. This is to create a range from doy to doy_end of days to get the snr files.
+        Default is None. (meaning only a single day using the doy parameter)
 
-        stream : str, optional
-            Whether to get stream defined filenames.
-            Default is 'R'. value options:
+    stream : str, optional
+        Whether to get stream defined filenames.
+        Default is 'R'. value options:
                 R
                 S
 
-        samplerate : int, optional
-            Sample rate in seconds for RINEX3 only.
-            Default is 30.
+    samplerate : int, optional
+        Sample rate in seconds for RINEX3 only.
+        Default is 30.
 
-        debug : boolean, optional
-            provides screen output helpful for debugging
-            Default is False
+    debug : boolean, optional
+        provides screen output helpful for debugging
+        Default is False
 
-        dec : integer, optional
-            some highrate file downloads allow decimation. Default is 1 sec, i.e. no decimation
+    dec : integer, optional
+        some highrate file downloads allow decimation. Default is 1 sec, i.e. no decimation
     """
 
 #   make sure environment variables exist.  set to current directory if not

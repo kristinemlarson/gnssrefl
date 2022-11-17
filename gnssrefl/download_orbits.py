@@ -26,10 +26,10 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
     """
         command line interface for download_orbits
 
-        Parameters:
-        ___________
+        Parameters
+        ----------
+
         orbit : string
-        
             value options:
 
                 gps (default) : uses GPS broadcast orbit

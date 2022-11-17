@@ -7,8 +7,9 @@ import sys
 
 def read_snr_multiday(obsfile,obsfile2,twoDays,dec=1):
     """
-    parameters
+    Parameter
     ---------
+
     obsfile : string
         name of first SNR input file
 
@@ -21,31 +22,43 @@ def read_snr_multiday(obsfile,obsfile2,twoDays,dec=1):
     dec : int
         decimation value. 1 means do nothing
 
-    results
-    ----------
+    Results
+    -------
     allGood1 : numpy array
+
     sat : numpy array
         satellite numbers 
+
     ele : numpy array
         elevation angle (degrees)
+
     azi : numpy array
         azimuth angles (degrees)
+
     t : numpy array
         time, seconds of the day, GPS time
+
     edot : numpy array
         derivative of elevation angle with respect to time
+
     s1 : numpy array
         SNR on L1 frequency
+
     s2 : numpy array
         SNR on L2 frequency
+
     s5 : numpy array
         SNR on L5 frequency
+
     s6 : numpy array
         SNR on L6 frequency
+
     s7 : numpy array
         SNR on L7 frequency
+
     s8 : numpy array
         SNR on L8 frequency
+
     snrE : boolean
         whether it exists
 

@@ -138,26 +138,26 @@ def define_filename(station,year,doy,snr):
     """
     Return the SNR filename 
 
-    Parameters:
-    -----------
-    station : string
+    Parameters
+    ----------
+    station : str
         name  (4 char lowercase)
 
-    year : integer
+    year : int
         year
 
-    doy : integer
+    doy : int
         day of year
 
-    snr : integer
+    snr : int
         SNR file type (e.g. 99, 66)
 
-    Returns :
-    ---------
-    fname : string
+    Returns
+    -------
+    fname : str
         snrfile name to be used
 
-    fname2 : string
+    fname2 : str
         snrfile name to be used - with xz compression extension
 
     """
@@ -177,29 +177,27 @@ def define_and_xz_snr(station,year,doy,snr):
 
     Parameters
     ----------
-
-    station: string
+    station: str
         station name, 4 characters
 
-    year : integer
+    year : int
         year
 
-    doy : integer
+    doy : int
         day of year
 
-    snr : integer
+    snr : int
         kind of snr file (66,77, 88 etc)
 
     Returns
-    --------------
-
-    fname : string
+    -------
+    fname : str
         name of the SNR file
 
-    fname2 : string
+    fname2 : str
         no longer used but kept for backwards capability
 
-    snre : boolean
+    snre : bool
         whether the file exists or not
 
     """
@@ -231,28 +229,26 @@ def define_filename_prevday(station,year,doy,snr):
     finds filename for day before the input date
 
     Parameters
-    -------------
-
-    station: string
+    ----------
+    station: str
         4 character station name  
 
-    year: integer
+    year: int
         year
 
-    doy: integer
+    doy: int
         day of year
 
-    snr: integer
+    snr: int
         SNR file type (66,88, etc)
 
-    Returns:
-    ----------
-    fname : string
+    Returns
+    -------
+    fname : str
         name of the SNR file
 
-    fname2 : string
+    fname2 : str
         no longer used but kept for backwards capability
-
 
     """
     xdir = os.environ['REFL_CODE']
@@ -281,8 +277,8 @@ def azimuth_angle(RecSat, East, North):
     """
     computes azimuth angle 
 
-    Inputs:
-    ------------
+    Parameters
+    ----------
     RecSat : 3-vector 
         meters
 
@@ -309,12 +305,16 @@ def azimuth_angle(RecSat, East, North):
 
 def rot3(vector, angle):
     """
+    Parameters
+    ----------
     vector : 3 vector
         float
 
     angle : float
         radians
 
+    Returns
+    -------
     vector2 : 3 vector
         float, original vector rotated by angle 
 
@@ -330,7 +330,7 @@ def xyz2llh(xyz, tol):
     Computes latitude, longitude and height from XYZ
 
     Parameters
-    -----------
+    ----------
     xyz: list or np array 
         X,Y,Z in meters
 
@@ -338,7 +338,7 @@ def xyz2llh(xyz, tol):
         tolerance in meters for the calculation (1E-8 is good enough)
 
     Returns
-    --------------
+    -------
     lat : float
         latitude in radians
 
@@ -359,7 +359,7 @@ def xyz2llh(xyz, tol):
     error = 1
     a2=wgs84.a**2
     i=0 # make sure it doesn't go forever
-    while error > tol and i < 6:
+    while (error > tol) and (i < 6):
         n = a2/np.sqrt(a2*np.cos(lat0)**2+b**2*np.sin(lat0)**2)
         h = p/np.cos(lat0)-n
         lat = np.arctan((z/p)/(1-wgs84.e**2*n/(n+h)))
@@ -378,7 +378,7 @@ def xyz2llhd(xyz):
         Cartesian position in meters
 
     Returns
-    ----------
+    -------
     lat : float
         latitude in degrees
 
@@ -414,13 +414,13 @@ def zenithdelay(h):
     the output is a very simple zenith troposphere delay in meters
     this is NOT to be used for precise geodetic applications
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     h: float
         ellipsoidal (height) in meters
 
-    Returns:
-    -----------
+    Returns
+    -------
     zd : float
         simple zenith delay for the troposphere in meters
 
@@ -476,7 +476,7 @@ def norm(vect):
         vector
 
     Returns
-    --------
+    -------
     nv : float
         norm of vect
 
@@ -513,7 +513,7 @@ def sp3_interpolator(t, tow, x0, y0, z0, clock0):
     Parameters
     ----------
     t : float
-        Time you want the orbits for (GPS seconds)
+        Time you want the Cartesian orbit for (GPS seconds)
 
     tow :  float
         GPS seconds for the satellite values
@@ -652,7 +652,7 @@ def hatanaka_warning():
     """
     Returns 
     -------
-        warning about missing Hatanaka executable
+    warning about missing Hatanaka executable
 
     """
     print('WARNING WARNING WARNING WARNING')
@@ -1244,11 +1244,11 @@ def findConstell(cc):
     Parameters
     -----------
     cc : string  is one character (from rinex satellite line)
-        constellation definition
-        G : GPS
-        R : Glonass
-        E : Galileo
-        C : Beidou
+        constellation definition:
+            G : GPS
+            R : Glonass
+            E : Galileo
+            C : Beidou
 
     Returns
     -------
