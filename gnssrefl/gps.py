@@ -86,6 +86,7 @@ class wgs84:
 def myfavoriteobs():
     """
     returns list of SNR obs needed for gfzrnx. 
+    2022 nov 17
 
     """
     # not even sure why i have C here for beidou

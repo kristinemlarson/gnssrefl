@@ -48,6 +48,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                    debug: bool = False, dec: int = 1):
     """
     command line interface for download_rinex.
+    2022 nov 17
 
     Parameters
     ----------
@@ -65,6 +66,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     rate : string, optional
         sample rate. value options:
+
             low (default) : standard rate data
 
             high : high rate data
@@ -72,6 +74,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     archive : str, optional
         Select which archive to get the files from.
         Default is None. value options:
+
             unavco : now earthscope
 
             sonel : (global sea level observing system)
