@@ -465,11 +465,10 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
 
 def satorb(week, sec_of_week, ephem):
     """
-    Calculate satellite orbits
+    Calculate GPS satellite orbits
 
     Parameters
     ----------
-
     week : integer
         GPS week
 
@@ -479,7 +478,7 @@ def satorb(week, sec_of_week, ephem):
     ephem : ephemeris block
 
     Returns 
-    -----------
+    -------
     numpy array 
          the x,y,z, coordinates of the satellite in meters
          and relativity correction (also in meters), so you add, not subtract

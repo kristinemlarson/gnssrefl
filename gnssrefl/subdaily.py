@@ -74,7 +74,7 @@ def print_badpoints(t,outliersize):
         outlier criterion, in meters
 
     Returns
-    ----------
+    -------
     writes to a file called outliers.txt
 
     """
