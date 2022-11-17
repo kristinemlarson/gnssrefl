@@ -85,6 +85,19 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         
         50 : saves all data with elevation angles less than 10 degrees
 
+    test : str, optional.
+        value options:
+
+            gps or nav : GPS broadcast orbits 
+
+            igs : IGS precise orbits
+
+            igr : IGS rapid orbits
+            
+            201,205,206,207,208 : GALILEO E1 E5a E6,E5b,E5
+
+            302,306,207 : BEIDOU B1, B3, B2
+
     orb : string, optional
         Which orbit files to download.
         value options:
