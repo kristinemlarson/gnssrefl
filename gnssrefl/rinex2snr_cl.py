@@ -141,35 +141,35 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         Select which archive to get the files from.
         Default is None. None means that the code will search and find an archive with the data for you.
         value options:
-            unavco (University Navstar Consortium)
+            unavco : (University Navstar Consortium)
 
-            sonel (global sea level observing system)
+            sonel : (global sea level observing system)
 
-            sopac (Scripps Orbit and Permanent Array Center)
+            sopac : (Scripps Orbit and Permanent Array Center)
 
-            cddis (NASA's Archive of Space Geodesy Data)
+            cddis : (NASA's Archive of Space Geodesy Data)
 
-            ngs (National Geodetic Survey)
+            ngs : (National Geodetic Survey)
 
-            nrcan (Natural Resources Canada)
+            nrcan : (Natural Resources Canada)
 
-            bkg (German Agency for Cartography and Geodesy)
+            bkg : (German Agency for Cartography and Geodesy)
 
-            nz (GNS, New Zealand)
+            nz : (GNS, New Zealand)
 
-            ga (Geoscience Australia)
+            ga : (Geoscience Australia)
 
-            bev (Austria Federal Office of Metrology and Surveying)
+            bev : (Austria Federal Office of Metrology and Surveying)
 
-            bfg (German Agency for water research, only Rinex 3, requires password)
+            bfg : (German Agency for water research, only Rinex 3, requires password)
 
-            jp (GSI, requires password)
+            jp : (GSI, requires password)
 
-            jeff (My good friend Professor Freymueller!)
+            jeff : (My good friend Professor Freymueller!)
 
-            special (set aside files at UNAVCO for reflectometry users)
+            special : (set aside files at UNAVCO for reflectometry users)
 
-            all (does unavco, sopac, and sonel)
+            all : (does unavco, sopac, and sonel)
 
     doy_end : int, optional
         end day of year to be downloaded. This is to create a range from doy to doy_end of days to get the snr files.
