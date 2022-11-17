@@ -2848,13 +2848,16 @@ def llh2xyz(lat,lon,height):
     height : float
         ellipsoidal height in meters
 
-    returns
-    ---------
+    Returns
+    -------
     x : float
+        X coordinate (m)
 
     y : float
+        Y coordinate (m)
 
     z : float
+        Z coordinate (m)
 
     Ref: Decker, B. L., World Geodetic System 1984,
     Defense Mapping Agency Aerospace Center.
@@ -2879,11 +2882,24 @@ def llh2xyz(lat,lon,height):
 
 def LSPresult_name(station,year,doy,extension):
     """
-    given station name, year, doy, and extension
-    returns the location of the LSP result
-    also returns boolean if it already exists (so that
-    information can be used)
-    extension is now used
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+    year : int
+        full year
+    doy : int
+        day of year
+    extension : str
+        name of subdirectory for results
+
+    Returns
+    -------
+    filepath1 : str
+        where Lomb Scargle output goes
+    fileexists : bool
+        whether output already exists
+
     """
     # for testing
     xdir = os.environ['REFL_CODE']
@@ -2904,19 +2920,25 @@ def LSPresult_name(station,year,doy,extension):
 
     filepath1 =  filedirx + '/' + cdoy  + '.txt'
 
-    #print('output for this date will go to:', filepath1)
     if os.path.isfile(filepath1):
-        #print('A result file already exists')
         fileexists = True
     else:
-        #print('A result file does not exist')
         fileexists = False
+
     return filepath1, fileexists
 
 def result_directories(station,year,extension):
     """
-    inputs station, year, and extension
-    makes output directories for results
+    Creates directories for results
+
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+    year : int
+        full year
+    extension : str
+        subdirectory for results (used for analysis strategy)
 
     """
     xdir = os.environ['REFL_CODE']
@@ -2939,8 +2961,6 @@ def result_directories(station,year,extension):
         f1 = f1 + '/' + extension
         if not os.path.isdir(f1):
             subprocess.call(['mkdir',f1])
-    #else:
-        #print('no extension')
 
     f1 = xdir + '/' + cyear + '/phase'
     if not os.path.isdir(f1):
@@ -2953,6 +2973,33 @@ def result_directories(station,year,extension):
 def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp,tooclose2edge):
     """
     prints out various QC fails to the screen
+
+    Parameters
+    ----------
+    delT : float
+        how long the satellite arc is (minutes)
+    delTmax : float
+        max satellite arc allowed (minutes)
+    eminObs: float
+        minimum observed elev angle (Deg)
+    emaxObs : float
+        maximum observed elev angle (Deg)
+    e1 : float
+        minimum allowed elev angle (deg)
+    e2 : float
+        maximum allowed elev angle (deg)
+    ediff : float
+        allowed min/max elevation diff from obs min/max elev angle (deg) 
+    maxAmp : float
+        measured peak LSP 
+    Noise : float
+        measured noise value for the periodogram
+    PkNoise : float
+        required peak to noise
+    reqamp : float
+        require peak LSP
+    tooclose2edge : bool
+        wehther peak value is too close to begining or ending of the RH constraints
 
     """
     if tooclose2edge:
@@ -2981,15 +3028,17 @@ def define_quick_filename(station,year,doy,snr):
 
 def update_quick_plot(station, f):
     """
-    input plt_screen integer value from gnssIR_lomb.
-    (value of one means update the SNR and LSP plot)
-    and values of the SNR data (x,y) and LSP (px,pz)
+    Parameters
+    ----------
+    station : str
+        4 ch name
+    f : int
+        frequency
     """
     plt.subplot(212)
     plt.xlabel('reflector height (m)'); plt.title('SNR periodogram')
     plt.subplot(211)
     plt.xlabel('elev Angles (deg)')
-    #ftitle(freq)
     plt.title(station + ' SNR Data/' + ftitle(f) + ' Frequency') 
 
     return True
@@ -3010,7 +3059,7 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
         3 character day of year
 
     Returns
-    ---------
+    -------
     FileExists : boolean
         whether the file was found
 
@@ -3039,6 +3088,11 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
 def make_nav_dirs(yyyy):
     """
     input year and it makes sure output directories are created for orbits
+
+    Parameters
+    ----------
+    yyyy : int
+        year
     """
     n = os.environ['ORBITS']
     # if parent nav dir does not exist, exit
@@ -3067,8 +3121,24 @@ def check_inputs(station,year,doy,snr_type):
     """
     inputs to Lomb Scargle and Rinex translation codes
     are checked for sensibility. Returns true or false to 
-    code can exit. Error messages sent to the screen
-    2019sep22
+    code can exit. 
+
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+    year : int
+        full year
+    doy : int
+        day of year
+    snr_type : int
+        snr file type (e.g. 66)
+
+    Returns
+    -------
+    exitSys : bool
+        whether fatal error is trigger by a bad choice 
+
     """
     exitSys = False
     if len(station) != 4:
@@ -3150,7 +3220,7 @@ def back2thefuture(iyear, idoy):
         day of year
 
     Returns
-    --------
+    -------
     badDay : bool
         whether your day exists (yet)
 
@@ -3270,7 +3340,6 @@ def highrate_nz(station, year, month, day):
         month or day of year
     day : int
         day or zero
-    inputs: station name, year, month, day
 
     """
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
@@ -3421,6 +3490,11 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
 def warn_and_exit(snrexe,fortran):
     """
     if snr executable does not exist, exit
+
+    snrexe : str
+        name of the executable
+    fortran : bool
+        whether fortran is being used for translation
     """
     if not fortran:
         ok = 1
@@ -3598,6 +3672,7 @@ def ign_rinex3(station9ch, year, doy,srate):
 
 def hatanaka_version():
     """
+
     Returns
     -------
     hatanakav : string 

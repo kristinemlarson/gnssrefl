@@ -15,8 +15,8 @@ def newchip_gfzrnx(exedir):
     installs the gfzrnx executable and stores in the EXE directory
 
     Parameters
-    ---------
-    exedir : string
+    ----------
+    exedir : str
         location of the executable directory
 
     """
@@ -40,8 +40,8 @@ def newchip_hatanaka(exedir):
     stores in EXE
 
     Parameters
-    ---------
-    exedir : string
+    ----------
+    exedir : str
         location of the executable directory
 
     """
@@ -83,6 +83,7 @@ def checkexist(exe):
     check to see if an executable exists
 
     Parameters
+    ----------
     exe : str
         executable name to check
 
@@ -130,17 +131,15 @@ def parse_arguments():
 
 def installexe(opsys: str):
     """
-        Command line interface to install non-python executables, specifically
-        CRX2RNX and gfzrnx. downloading Teqc will be an added feature here in the future.
-        https://stackoverflow.com/questions/12791997/how-do-you-do-a-simple-chmod-x-from-within-python
+    Command line interface to install non-python executables, specifically
+    CRX2RNX and gfzrnx. 
+    https://stackoverflow.com/questions/12791997/how-do-you-do-a-simple-chmod-x-from-within-python
 
-        note: this code used to try to download fortran exe but this is no longer necessary
-        because we have the fortran code within gnssrefl
 
-        Parameters:
-        ___________
-        opsys : string
-            operating system (linux64 or macos)
+    Parameters
+    ----------
+    opsys : string
+        operating system (linux64 or macos)
     """
 
     exedir = os.environ['EXE']
