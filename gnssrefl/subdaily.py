@@ -1332,6 +1332,7 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
     make rhdot correction plots
 
     Parameters
+    ----------
     th : numpy array
         time of obs, day of year
     correction : numpy array

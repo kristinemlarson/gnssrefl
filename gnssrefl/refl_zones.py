@@ -78,6 +78,7 @@ def FresnelZone(f,e,h):
     based on GPS Tool Box Roesler and Larson (2018).
     Original source is Felipe Nievinski as published in the appendix of 
     Larson and Nievinski 2013
+    this code assumes a horizontal, untilted reflecting surface    
 
     Parameters
     ----------
@@ -90,12 +91,12 @@ def FresnelZone(f,e,h):
 
     Returns
     -------
-    firstF: [a, b, R ] in meters where:
-        a is the semi-major axis, aligned with the satellite azimuth 
-        b is the semi-minor axis
-        R locates the center of the ellispe on the satellite azimuth direction (theta)
+    firstF: list of floats 
+        [a, b, R ] in meters where:
+        a : is the semi-major axis, aligned with the satellite azimuth 
+        b : is the semi-minor axis
+        R : locates the center of the ellispe on the satellite azimuth direction (theta)
 
-    this code assumes a horizontal, untilted reflecting surface    
     """
 
 # SOME GPSCONSTANTS	

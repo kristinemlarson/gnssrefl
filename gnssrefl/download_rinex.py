@@ -65,33 +65,44 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     rate : string, optional
         sample rate. value options:
-        low (default) : standard rate data
-        high : high rate data
+            low (default) : standard rate data
+
+            high : high rate data
 
     archive : str, optional
         Select which archive to get the files from.
-        Default is None. 
-        value options:
-            unavco
-            sonel (global sea level observing system)
-            sopac (Scripps Orbit and Permanent Array Center)
-            cddis (NASA's Archive of Space Geodesy Data)
-            ngs (National Geodetic Survey)
-            nrcan (Natural Resources Canada)
-            bkg (German Agency for Cartography and Geodesy)
-            bfg (German Agency for water research, only Rinex 3)
-            nz (GNS, New Zealand)
-            ga (Geoscience Australia)
-            bev (Austria Federal Office of Metrology and Surveying)
-            jeff
-            special (reflectometry Rinex 2 files maintained by unavco)
-            all (searches sopac,sonel,and unavco)
+        Default is None. value options:
+            unavco : now earthscope
+
+            sonel : (global sea level observing system)
+
+            sopac : (Scripps Orbit and Permanent Array Center)
+
+            cddis : (NASA's Archive of Space Geodesy Data)
+
+            ngs : (National Geodetic Survey)
+
+            nrcan : (Natural Resources Canada)
+
+            bkg : (German Agency for Cartography and Geodesy)
+
+            bfg : (German Agency for water research, only Rinex 3)
+
+            nz : (GNS, New Zealand)
+
+            ga : (Geoscience Australia)
+
+            bev : (Austria Federal Office of Metrology and Surveying)
+
+            jeff : Jeff Freymueller
+
+            special : (reflectometry Rinex 2 files maintained by unavco)
+
+            all : (searches sopac,sonel,and unavco)
 
     version : int, optional
         Version of Rinex file. Default is 2.
-        value options:
-        2 : Rinex 2
-        3 : Rinex 3
+        Value options  2 or 3 
 
     strip : boolean, optional
         Whether to strip only SNR observables.  Uses teqc or gfzrnx.
@@ -103,10 +114,8 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         Default is None. (meaning only a single day using the doy parameter)
 
     stream : str, optional
-        Whether to get stream defined filenames.
-        Default is 'R'. value options:
-                R
-                S
+        Whether to get stream 'S' defined filenames.
+        Default is 'R'. 
 
     samplerate : int, optional
         Sample rate in seconds for RINEX3 only.

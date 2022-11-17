@@ -77,6 +77,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     snr : integer, optional
         SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
     value options:
+
         66 (default) : saves all data with elevation angles less than 30 degrees
 
         99 : saves all data with elevation angles between 5 and 30 degrees
@@ -101,9 +102,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     orb : string, optional
         Which orbit files to download.
         value options:
+
             gps (default) : will use GPS broadcast orbit
 
             gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
+
             gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
 
             nav : GPS broadcast, perfectly adequate for reflectometry.
@@ -152,8 +155,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
     archive : string, optional
         Select which archive to get the files from.
-        Default is None. None means that the code will search and find an archive with the data for you.
+        Default is None. None means that the code will search unavco,sopac and sonel.
         value options:
+
             unavco : (University Navstar Consortium)
 
             sonel : (global sea level observing system)

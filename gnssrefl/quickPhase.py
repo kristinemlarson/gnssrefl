@@ -39,8 +39,8 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     """
     quickphase uses the apriori result file to restrict the number of satellite arcs that are used.
 
-    Parmameters
-    ___________
+    Parameters
+    ----------
     station: string
         4 character ID of the station.
 
@@ -89,10 +89,11 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         Default is False
 
     Returns
-    _______
-    Saves a file for each day in the doy-doy_end range: $REFL_CODE/<year>/phase/<station>/<doy>.txt'
+    -------
+    Saves a file for each day in the doy-doy_end range: $REFL_CODE/<year>/phase/<station>/<doy>.txt
     columns in files:
     year doy hour phase nv azimuth sat ampl emin emax delT aprioriRH freq estRH pk2noise LSPAmp
+
     """
 
     compute_lsp = True # used to be an optional input
