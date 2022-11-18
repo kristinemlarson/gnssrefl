@@ -147,4 +147,4 @@ plot for you.
 
 Additional corrections can be made using the <code>rhdot T</code> setting. I will add more information here when I get a chance.
 
-Kristine M. Larson November 16, 2022
+Kristine M. Larson November 18, 2022
