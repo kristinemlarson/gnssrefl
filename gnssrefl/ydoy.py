@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 converts ymd to doy
-Updated: April 3, 2019
 """
 import argparse
 import sys

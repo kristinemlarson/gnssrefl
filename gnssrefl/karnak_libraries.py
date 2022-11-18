@@ -114,22 +114,22 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
 
     Parameters
     ----------
-    station9ch: str
+    station9ch : str
         nine character station name
 
-    year: int
+    year : int
         year 
 
-    doy: int
+    doy : int
         day of year
 
-    archive: str
+    archive : str
         archive name
 
-    srate: int
+    srate : int
         receiver samplerate
 
-    stream: str
+    stream : str
         one character: R or S
 
     debug : bool
@@ -317,6 +317,7 @@ def universal_all(station9ch, year, doy, srate,stream):
         9 character station name
 
     year : int
+        full year
 
     doy : int
         doy of year
@@ -329,7 +330,7 @@ def universal_all(station9ch, year, doy, srate,stream):
 
     Peturns
     -------
-    file_name  : str
+    file_name : str
         rinex filename
 
     foundit : bool
@@ -390,7 +391,7 @@ def universal_rinex2(station, year, doy, archive):
     seamless archive for rinex 2 files ...
 
     Parameters
-    -----------
+    ----------
     station : string
         four character station name
     year : integer
@@ -569,8 +570,17 @@ def strip_rinexfile(rinexfile):
 
 def gsi_data(station,year,doy):
     """
-# kluge  so i don't have to rewrite this code
-# calling the original rinex downloader
+    get data from GSI
+
+    Parameters
+    ----------
+    station : str
+        6 char station name
+    year : int
+        full year
+    doy : int
+        day of yare
+
     """
     d = g.doy2ymd(year,doy);
     month = d.month; day = d.day
@@ -583,21 +593,21 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
     strip_snr is boolean as to whether you want to strip out the non-SNR data
     it can be slow with highrate data. it requires gfzrnx
 
-    Parameters:
-    ___________
+    Parameters
+    ----------
 
-    station: string
+    station : string
          4 character station ID.  lowercase
 
-    year: integer
-        year
+    year : integer
+        full year
 
-    doy: integer
+    doy : integer
         day of year
 
-    archive: string
+    archive : string
 
-    strip_snr: boolean
+    strip_snr : boolean
 
     """
     foundit = False

@@ -113,7 +113,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     """
 
     Parameters
-    -----------
+    ----------
     station : string
         name (4 char) 
 
