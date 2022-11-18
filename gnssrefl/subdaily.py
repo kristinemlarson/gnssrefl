@@ -156,7 +156,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     writes out the subdaily results
 
     Parameters
-    -----------
+    ----------
     input : str
         output filename
     station : str
@@ -494,6 +494,9 @@ def quickTr(year, doy,frachours):
 def fract_to_obstimes(spl_x):
     """
     this does not seem to be used
+
+    Parameters
+    ----------
     spl_x : numpy array
         fractional time 
 
@@ -593,11 +596,11 @@ def write_out_header(fout,station,extraline,**kwargs):
 def writejsonfile(ntv,station, outfile):
     """
     subdaily RH values written out in json format
-    inputs: ntv is the variable with concatenated results
 
     Parameters
     -----------
-    ntv : numpy of LSP results
+    ntv : numpy of floats
+        LSP results
 
     station : str
         4 ch station name
@@ -990,6 +993,7 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
 
     d1 : int
         minimum day of year
+
     d2 : int
         maximum day of year
 
@@ -1142,13 +1146,40 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
     """
     cleaning up the main code. this sorts data and applies various "commandline" constraints
     tv is the full set of results from gnssrefl
-    t and rh are just time (in fractional doy) and reflector height
-    other inputs:
-    azim1-aimz2 - azimuth constraints in degrees
-    ampl is amplitude of the periodogram (volts/volts)
-    d1 and d2 are days of year
-    peak2noise 
 
+    Parameters
+    ----------
+    tv : numpy array
+        lsp results
+    azim1 : float
+        min azimuth (deg)
+    azim2 : float
+        max azimuth (deg)
+    ampl : float
+        required amplitude for periodogram
+    peak2noise : float
+        require peak2noise criterion
+    d1 : int
+        min day of year
+    d2 : int
+        max day of year
+    h1 : float
+        min reflector height (m)
+    h2 : float
+        max reflector height (m)
+
+    Returns
+    -------
+    tv : numpy array
+        edited from input
+    t : numpy of floats
+        crude time for obs, in fractional days
+    rh : numpy of floats
+        reflector heights (m)
+    firstdoy : int
+        first day of year
+    lastdoy : int 
+        last day of year
     """
     nr,nc=tv.shape
     tvoriginal = tv
