@@ -757,38 +757,3 @@ def apriori_file_exist(station,fr):
     return os.path.exists(apriori_path_f) 
 
 
-# Old code.  SHould be deleted
-# why is this being done this way!
-#years = np.floor(fdate)
-#??? why is this being done this way?
-#w.write(f"{fdate:10.4f} {years:4.0f} {doys:3.0f} {nv[iw]:8.3f} \n")
-    #if polyordernum > 0:
-    #    model = np.polyfit(t, vwc, polyordernum)
-    #    fit = np.polyval(model, t)
-        # plt.plot(t,fit,label='poly-vwc')
-        # this doesn't really help
-        # sm_vwc = seasonal_smoother(vwc, 90)
-        # plt.plot(t,sm_vwc,label='90 smoother')
-    # ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order
-    # Choosing the kind of fit based on the number of years requested to process
-    #fit_kind = {1: 'zero', 2: 'slinear', 3: 'quadratic', 4: 'cubic'}
-    # ????
-    #num_years = len(st)
-    #if num_years > 4:
-    #    num_years = 4
-    #kind = fit_kind[num_years]
-    # ignore the spline which was not to be used.
-    #st_interp = interp1d(st, sp, kind=kind, fill_value='extrapolate')
-    #new_level = st_interp(t)
-
-    # this was a kluge that was not meant to be used 
-
-    #ax.plot(t_datetime, new_level, '-', label='level')
-
-    # newl = [year[-1], doys[-1], newvwc[-1]]
-    # nodes = np.append(nodes, [newl],axis=0)
-
-                        # print(f"Year {year:4.0f} DOY {doy:3.0f} Hour {utctime:6.2f} Phase {phase:8.3f} Nv {nv:5.0f}"
-                        #       f" Azimuth {avg_azim:6.1f} Sat {sat_number:3.0f} Ampl {amp:5.2f} emin {min_el:5.2f} "
-                        #       f"emax {max_el:5.2f} DelT {del_t:6.2f} aprioriRH {rh_apriori:5.3f} freq {freq:2.0f}"
-                        #       f" estRH {max_f:6.3f} pk2noise {obs_pk2noise:6.2f} LSPAmp {max_amp:6.2f}")
