@@ -1293,20 +1293,24 @@ def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station,testing):
         
 
     plt.subplot(211)
+
+
+    rms = np.std(ynew-spline_at_tnew)
+    newrms = str(round(rms,3))
+    print('std (m)', newrms)
+    label1 = 'RMS w/IF & new spline ' + str(newrms ) + 'm'
+
+
     plt.plot(tnew,ynew,'k.')
-    plt.plot(tnew,biasCorr_ynew,'b.',label='with freq/rhdot corr')
+    plt.plot(tnew,biasCorr_ynew,'b.',label=label1)
     plt.plot(spl_x, spl_y,'-',color='orange',label='spline fit')
     plt.title(station + ' RH Obs and new spline fit after freq bias removed')
-
     plt.legend(loc="upper right")
     plt.xlabel('day of year'); 
     plt.ylabel('meters')
     plt.grid()
     plt.gca().invert_yaxis()
 
-    rms = np.std(ynew-spline_at_tnew)
-    newrms = str(round(rms,3))
-    print('std (m)', newrms)
     ii = np.abs(ynew-spline_at_tnew) > 3*rms
     jj = np.abs(ynew-spline_at_tnew) < 3*rms
     res = ynew-spline_at_tnew
@@ -1727,29 +1731,33 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     th_even = np.linspace(th[0], th[-1],half_hourly );
     spline_whole_time = spline(th_even)
 
+    newsigma = np.std(h-spline_at_GPS)
+
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
-    plt.plot(th, h, '.', label='RH with RHdot')
+    plt.plot(th, h, '.', label='RH with RHdot/IFcorr')
     plt.plot(th_even, spline_whole_time, '-',label='newspline')
     plt.legend(loc="upper left")
     plt.grid()
     plt.gca().invert_yaxis()
     plt.ylabel('meters')
-    plt.title('New spline with RHdot corr and initial outliers removed')
+    plt.title('New spline with RHdot corr/IF biases/initial 3sigma outliers removed')
 
     plt.subplot(2,1,2)
-    plt.plot(th, h-spline_at_GPS, '.',label='all')
+    label1 = 'newRMS ' + str(round(newsigma,3)) + '(m)'
+    plt.plot(th, h-spline_at_GPS, '.',label=label1)
     plt.title('Residuals to new spline fit')
     plt.grid()
     plt.ylabel('meters')
     plt.xlabel('days of the year')
-    newsigma = np.std(h-spline_at_GPS)
+
     # identify 3 sigma outliers
     ii = np.abs(h-spline_at_GPS)/newsigma > 3
     plt.plot(th[ii], (h-spline_at_GPS)[ii], '.',label='3 sigma')
     plt.legend(loc="upper left")
     print('RMS with frequency bias taken out (m) ', np.round(newsigma,3)  )
     g.save_plot(txtdir + '/' + station + '_rhdot4.png')
+
     if pltit:
         plt.show()
 
