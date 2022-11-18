@@ -19,7 +19,7 @@ def gogetit(dir1, filename, ext):
     code will try to get the file and chck to see if it was successful
 
     Parameters
-    -------------
+    ----------
     dir1 : str
         the main https directory address 
     filename : str
@@ -28,7 +28,7 @@ def gogetit(dir1, filename, ext):
         kind of ending to the filename, (Z, gz etc)
 
     Returns 
-    ---------
+    -------
     foundit : bool
         whether file was found
     f : str
@@ -56,12 +56,12 @@ def swapRS(stream):
     function that swaps R to S and vice versa for RINEX 3 files
 
     Parameters
-    -------
+    ----------
     stream : str
          RINEX 3 file streaming acronym (S or R)
 
     Returns
-    -----------
+    -------
     newstream : str
          the opposite of what was in stream
 
@@ -78,8 +78,7 @@ def just_bkg(cyyyy, cdoy, file_name):
     looks for bkg rinex files in two directories
 
     Parameters
-    -----------------
-
+    ----------
     cyyyy:  str
         four character year
 
@@ -88,6 +87,7 @@ def just_bkg(cyyyy, cdoy, file_name):
 
     file_name: str
         expected RINEX filename
+
     """
     dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cyyyy + '/' + cdoy + '/'
     dir2 = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
@@ -113,7 +113,7 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     main code for seamless archive for RINEX 3 files ... 
 
     Parameters
-    -----------
+    ----------
     station9ch: str
         nine character station name
 
@@ -136,7 +136,7 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         whether debugging statements printed
 
     Returns
-    ----------
+    -------
     file_name : str
         name of rinexfile
 
@@ -226,8 +226,8 @@ def filename_plus(station9ch,year,doy,srate,stream):
     """
     function to create RINEX 3 filenames for one day files.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     station9ch : str
          9 character station name
 
@@ -246,6 +246,15 @@ def filename_plus(station9ch,year,doy,srate,stream):
          compliant filename with crx.gz on the end as this is how the files 
          are stored at GNSS archives as far as I know.
 
+    Returns
+    -------
+    file_name : str
+        filename of the RINEX 3 file
+    cyyyy : str
+        4ch year 
+    cdoy : str
+        3ch day of year
+
     """
     cyyyy = str(year)
     cdoy = '{:03d}'.format(doy)
@@ -262,7 +271,7 @@ def ga_stuff(station, year, doy,rinexv=3):
     GA API requirements to download a Rinex 3 file
 
     Parameters
-    -----------
+    ----------
     station : str
         9 character station name
     year : integer
@@ -273,7 +282,11 @@ def ga_stuff(station, year, doy,rinexv=3):
         rinex version        
 
     Returns
-    ---------
+    -------
+    QUERY_PARAMS : json
+        I think
+    headers : json
+        I think
 
     """
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
@@ -622,8 +635,25 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
 
 def ga_stuff_highrate(station, year, doy,rinexv=3):
     """
-    takes 9 ch station name and year and doy
-    and returns some things that GA wants to download a Rinex 3 file
+    This should be merged with existing ga_stuff code
+
+    Parameters
+    ----------
+    station : str
+        4 or 9 ch station name
+    year : int
+        full year
+    doy : int
+        day of year
+    rinexv : int
+        rinex version
+
+    Returns
+    -------
+    QUERY_PARAMS : json
+        i think
+    headers : json
+        i think
     """
     d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
     month = int(d.month); day = int(d.day)
@@ -656,6 +686,13 @@ def serial_cddis_files(dname,cyyyy,cdoy):
         four character year
     cdoy : string
         three character day of yaer
+
+    Returns
+    -------
+    foundit : bool
+        whether file was found
+    f : str
+        filename
 
     """
     foundit = False

@@ -24,7 +24,7 @@ def make_wavelength_column(nr,snrdata,signal):
     """
 
     Parameters
-    ------------
+    ----------
     nr : integer
         number of rows in snrdata
 
@@ -277,7 +277,7 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     reflector height estimates, stats and detrended snr data for inverse analysis
 
     Parameters
-    ---------
+    ----------
     snrdata: numpy array 
         contents of SNR datafile
 
@@ -322,9 +322,11 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
 
     Returns
     -------
-    rh_arr: numpy array of reflector height estimates and stats
+    rh_arr: numpy array 
+        reflector height estimates and stats
 
-    snrdt_arr: numpy array of detrended SNR data for inverse analysis
+    snrdt_arr: numpy array 
+        detrended SNR data for inverse analysis
 
     """
     # get a list for late ron
@@ -557,6 +559,16 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
 def residuals_cubspl_spectral(kval, knots, rh_arr):
     """
     function needed for inverse analysis
+
+    Parameters
+    ----------
+    kval : ?
+
+    knots : numpy array
+
+    rh_arr : numpy array
+        reflector heights in meters
+
     """
     tfilter = np.logical_and(rh_arr[:, 0] >= knots[0], rh_arr[:, 0] <= knots[-1])
     rh_arr = rh_arr[tfilter]
@@ -578,7 +590,7 @@ def residuals_cubspl_spectral(kval, knots, rh_arr):
 def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,Nfreq):
     """
     function needed for snr-fitting inverse analysis
-    KL js must stand for joakim strandberg ???
+    js must stand for joakim strandberg ???
 
     this has to be modified for multi-frequency
     fspecdict and Nfreq
@@ -673,24 +685,34 @@ def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,
 
 def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit=True, signal='L1', savefile=False, doplot=False, rough_in=0.1, **kwargs):
     """
-    function analyses a kristine larson 'gnssrefl' format snr file and outputs a fitted spline
+    function analyses a 'gnssrefl' format snr file and outputs a fitted spline
     note that the file must be 24 hours long or it wont work
 
+    Parameters
+    ----------
     station : str
-        station name
+        4 ch station name
     year : int
+        full year
 
     doy : int
+        day of year
 
-    azilims: azimuth angle limits (e.g., [90, 270])
+    azilims: list of floats
+        azimuth angle limits (e.g., [90, 270])
 
-    elvlims: elevation angle limits (e.g., [5, 30])
+    elvlims: list of floats
+        elevation angle limits (e.g., [5, 30])
 
-    rhlims: upper and lower reflector height limits (in metres) for quality control e.g., [5, 10] is 5 and 10 m
+    rhlims: list of floats
+        upper and lower reflector height limits (in metres) for quality 
+        control e.g., [5, 10] is 5 and 10 m
 
-    precision : precision of the periodogram in meters
+    precision : float
+        precision of the periodogram in meters
 
-    kdt: spline knot spacing in seconds
+    kdt: float
+        spline knot spacing in seconds
 
     knots are spaced evenly except for at the start and end of the day
     the idea is that you could piece together the outpt from different days to have a continuous spline
@@ -713,7 +735,11 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     satconsts: default use all given, otherwise specify from ['G', 'R', 'E'] (gps / glonass / galileo)
 
-    :return invout: dictionary with outputs from inverse analysis
+    Returns
+    -------
+
+    invout: dictionary 
+        outputs from inverse analysis
 
     This documentation was provided by the original author, David Purnell
     """
@@ -1040,6 +1066,7 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
     usetxt : boolean
         - boolean for the code calling this function to use
         if you write out special files, they go in the working directory
+
     """
     if outfile_type == 'txt':
         usetxt = True; 
@@ -1134,13 +1161,19 @@ def arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,azdesc)
 
     snrfigs : bool
 
-    reflh :
+    reflh : numpy array
+        reflector heights (m)
 
-    pgram : 
+    pgram : numpy array
+        periodogram ? 
 
-    sat : 
+    sat : numpy array 
 
-    datet :
+    datet : datetime
+
+    elvlims : list of floats
+        min and max elev angle (deg)
+
     """
     if not os.path.isdir('plots'):
         print('make output directory for plots')
@@ -1173,6 +1206,11 @@ def signal2list(signal):
     """
     turns signal input (e.g. L1+L2) to a list
     22feb09 tried to add more frequencies ...
+
+    Returns
+    -------
+    signal_list : str
+
     """
     if (len(signal) == 2):
         signal_list = [signal]
@@ -1237,6 +1275,19 @@ def loadsnrfile(snrfile, thedir):
 
 
     do time modification here now. column 4 is time since GPS began, in seconds
+
+    Parameters
+    ----------
+    snrfile : str
+        name of the SNR file
+    thedir : str
+        location of the SNR file
+
+    Returns
+    -------
+    snrdata : numpy array
+        floats. Time (python col 3) is converted to fake gps time
+
     """
     snrin = thedir + snrfile
 
@@ -1259,6 +1310,14 @@ def plot_tracks(rh_arr, rh_dn):
     send the array of LSP results (rh_arr) with time variable for 
     plotting (rh_dn)
     kl feb09 adding beidou
+
+    Parameters
+    ----------
+    rh_arr : numpy array
+        data used by inverse code. Need to add desc
+    rh_dn : numpy array
+        data used by inverse code. Need to add desc
+
     """
     ms=4
     ii = (rh_arr[:,2] < 100) & (rh_arr[:,11] == 1)# GPS
@@ -1376,8 +1435,9 @@ def kristine_dictionary(alld,sat,xsignal):
 def smarterWay(a):
     """
     just want to know how many true values there are in the a dictionary 
-    and then write thtem to a list, as in ['G1','G2']
+    and then write them to a list, as in ['G1','G2']
     sure to be a better way - but this works for now
+
     """
     i=0
     final_list = []
@@ -1420,15 +1480,27 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
     We follow the terminology and discussion from Press et al. (1992)
     in their LSP algorithm description.
 
-    INPUT
-    elevAngles:  vector of satellite elevation angles in degrees
-    cf:(L-band wavelength/2 ) in meters
-    maxH:maximum LSP grid frequency in meters
-    desiredPrec:  the LSP frequency grid spacing in meters
-    i.e. how precise you want he LSP reflector height to be estimated
-    OUTPUT
-    ofac: oversampling factor
-    hifac: high-frequency factor
+    Parameters
+    ----------
+    elevAngles:  numpy array
+        satellite elevation angles in degrees
+
+    cf: float
+        L-band wavelength/2  in meters
+
+    maxH: float
+        maximum LSP grid frequency in meters
+
+    desiredPrec: float
+        the LSP frequency grid spacing in meters 
+
+    Returns
+    -------
+    ofac: float
+        oversampling factor
+
+    hifac: float
+        high-frequency factor
     """
 # in units of inverse meters
     X= np.sin(elevAngles*np.pi/180)/cf
@@ -1456,8 +1528,12 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
 
 def simpleLSP(rhlims, lcar, precision,elvt, sinelvt, snrdt,sat,xsignal,screenstats,fout,pktnlim):
     """
-    input rhlims from dave's code (rhmin and rhmax)
-    lcar is gnss wavelength in m
+    Parameters
+    ----------
+    input 
+
+    rhlims from dave's code (rhmin and rhmax)
+    lcar :  is gnss wavelength in m
     precision of the periodogram, in meters
     elvt - elevation angles in degrees
     sinelvt, sine elevation angle
@@ -1512,6 +1588,9 @@ def l2c_l5_list(year,doy):
     author: kristine larson
     date: march 27, 2021
     june 24, 2021: updated for SVN78
+
+    this should point to gps.py
+
     """
 
     # this numpy array

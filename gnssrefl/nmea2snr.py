@@ -314,9 +314,9 @@ def azimuth_mean(azim1, azim2):
          azimuth degrees
 
     Returns
-    ---------
-    azim : float 
-        degrees
+    -------
+    azim : list of floats ?
+        azimuths in degrees
     """
     azim = np.concatenate([azim1, azim2])
     if np.all(azim1 >= 0) and np.all(azim2 >= 0):
@@ -333,29 +333,37 @@ def azimuth_mean(azim1, azim2):
 
 def quickname(station,year,cyy, cdoy, csnr):
     """
-    given station name, year, doy, snr type
-    returns snr file name and its path under REFL_CODE/year/snr/station/
+    full name of the snr file name (incl path) 
 
     Parameters
     ----------
     station : str
+        4 ch station name
 
     year : int
+        full year
 
     cyy : str 
-        two character yar
+        two character year
 
     cdoy : str
         three character day of year
 
     csnr : str
         snr type, e.g. '66' 
+
+    Returns
+    -------
+    fname : str
+        output filename
+
     """
     
     xdir  = os.environ['REFL_CODE'] + '/'
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
     if not (os.path.exists(xdir + str(year) + '/snr/' + station+'/')):
         os.system('mkdir '+xdir + str(year) + '/snr/' + station+'/')
+
     return fname
 
 def elev_limits(snroption):
