@@ -81,7 +81,9 @@ rinex2snr p041 2018 1 -archive unavco -rate high -dec 15 -overwrite T
 #
 quickLook p041 2018 1 
 
-invsnr_input tggo 8 20 5 15 -a1 30 -a2 330
-
-invsnr tggo 2022 200 L1+L2+L5 -doy_end 202 -constel G
+# 
+# invsnr_input tggo 8 20 5 15 -a1 30 -a2 330
+# invsnr tggo 2022 200 L1+L2+L5 -doy_end 202 -constel G
+# invsnr_input vlsi 8 20 5 15 -a1 30 -a2 330
+# invsnr vlsi 2022 200 L1+L2+L5 -doy_end 202 -constel G
 

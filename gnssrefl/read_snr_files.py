@@ -7,9 +7,8 @@ import sys
 
 def read_snr_multiday(obsfile,obsfile2,twoDays,dec=1):
     """
-    Parameter
-    ---------
-
+    Parameters
+    ----------
     obsfile : string
         name of first SNR input file
 
@@ -276,10 +275,21 @@ def read_one_snr(obsfile,ifile):
 
 def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays,gzip):
     """
-    inputs boolean (whether you want to compress), whether you have two
-    days (TwoDays) and file names
-    nothing is returned
-    2022april15 allow gzip instead of xz
+    compresses SNR files
+
+    Parameters
+    ----------
+    wantCompression : bool
+        whether the file should be compressed again
+    obsfile : str
+        name of first SNR file
+    obsfile2 : str
+        name of second SNR file
+    TwoDays : bool
+        whether second file is being input
+    gzip : bool
+        whether you want to gzip/gunzip the file
+
     """
     if gzip:
         if (os.path.isfile(obsfile) == True):
