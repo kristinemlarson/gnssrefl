@@ -70,7 +70,7 @@ def print_badpoints(t,outliersize):
     t : numpy array
         lomb scargle result array of "bad points". Format given below
 
-    outliersize: float
+    outliersize : float
         outlier criterion, in meters
 
     Returns
@@ -105,13 +105,11 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     txtdir : str
         the directory where the results should be written out
     txtfile : str
-        name of the output file
+        name of the output file 
     csvfile : boolean
         cl input whether the output file should be csv format
     jsonfile : boolean
         cl input for whether the output file should be in the json format
-
-    default is plain txt file
 
     Returns
     -------
@@ -159,7 +157,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
 
     Parameters
     -----------
-    input: str
+    input : str
         output filename
     station : str
         4 character station name, lowercase
@@ -523,8 +521,6 @@ def fract_to_obstimes(spl_x):
 
 def spline_in_out(x,y,knots_per_day):
     """
-    inputs are numpy arrays of time (in doy) and reflector heights (m)
-    outputs are the spline fit
 
     Parameters
     ----------
@@ -533,8 +529,16 @@ def spline_in_out(x,y,knots_per_day):
     y : numpy of floats
 
     knots_per_day : int
+        number of knots per day
 
-    note: i have to assume this does not work well with data outages
+    Returns
+    -------
+    xx : numpy of floats
+        times
+
+    spline(xx): numpy of floats
+        spline value at those times
+
     """
     Ndays = round(x.max()-x.min())
     numKnots = int(knots_per_day*(Ndays))

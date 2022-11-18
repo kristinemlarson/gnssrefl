@@ -231,16 +231,16 @@ def define_filename_prevday(station,year,doy,snr):
 
     Parameters
     ----------
-    station: str
+    station : str
         4 character station name  
 
-    year: int
+    year : int
         year
 
-    doy: int
+    doy : int
         day of year
 
-    snr: int
+    snr : int
         SNR file type (66,88, etc)
 
     Returns
@@ -332,10 +332,10 @@ def xyz2llh(xyz, tol):
 
     Parameters
     ----------
-    xyz: list or np array 
+    xyz : list or np array 
         X,Y,Z in meters
 
-    tol: float
+    tol : float
         tolerance in meters for the calculation (1E-8 is good enough)
 
     Returns
@@ -499,7 +499,7 @@ def elev_angle(up, RecSat):
 
     Returns
     -------
-    angle: float
+    angle : float
         elevation angle in radians
 
     """
@@ -666,7 +666,7 @@ def getnavfile(year, month, day):
 
     Parameters
     ----------
-    year: integer
+    year : integer
 
     month: integer
         if day is zero, the month value is really the day of year

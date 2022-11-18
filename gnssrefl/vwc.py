@@ -136,7 +136,7 @@ def load_avg_phase(station,fr):
         4 character station ID, lowercase
 
     Returns
-    --------
+    -------
     avg_exist : boolean
 
     avg_date : ??

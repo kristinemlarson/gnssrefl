@@ -23,10 +23,9 @@ def download_unr(station: str):
     """
     Command line interface for download_blewitt
 
-    Parameters:
-    ___________
-
-    station : string
+    Parameters
+    ----------
+    station : str
         4 character ID of the station name
     """
 

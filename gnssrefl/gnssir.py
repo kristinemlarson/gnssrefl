@@ -20,9 +20,8 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     Computes lomb scargle periodograms for a given station, year, day of year etc.
 
     Parameters
-    ---------------
-
-    station: string
+    ----------
+    station : string
 
     year : integer
 
@@ -201,8 +200,8 @@ def set_refraction_params(station, dmjd,lsp):
     set values used in refraction correction
 
     Parameters
-    ------------
-    station: string
+    ----------
+    station : string
         4 character station name
 
     dmjd : float
@@ -228,7 +227,7 @@ def apply_refraction_corr(lsp,ele,p,T):
     """
 
     Parameters
-    -----------
+    ----------
     lsp : dictionary
         info from make_json_input
     ele : numpy array of floats
@@ -239,7 +238,7 @@ def apply_refraction_corr(lsp,ele,p,T):
         temperature (C)
 
     Returns
-    --------
+    -------
     ele : numpy array of floats
          elevation angle (deg)
     """
@@ -290,8 +289,8 @@ def plot2screen(station, f,ax1,ax2,pltname):
     station : string
         4 character station ID
 
-    painful painful
     https://www.semicolonworld.com/question/57658/matplotlib-adding-an-axes-using-the-same-arguments-as-a-previous-axes
+
     """
     ax2.set_xlabel('Reflector Height (m)'); 
     #ax2.set_title('SNR periodogram')
@@ -311,7 +310,7 @@ def read_json_file(station, extension):
     picks up json instructions for calculation of lomb scargle periodogram
 
     Parameters
-    ------------
+    ----------
     station : string
         4 character station name
 

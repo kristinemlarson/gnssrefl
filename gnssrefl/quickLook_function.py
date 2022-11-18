@@ -20,16 +20,16 @@ import gnssrefl.rinex2snr as rinex
 def read_snr_simple(obsfile):
     """
     Parameters
-    ------------
+    ----------
     obsfile : string
         name of SNR file
 
     Returns
-    ----------
-    allGood :  
-    sat : numpy array of integers 
-        satelliet number 
-
+    -------
+    allGood :  int
+        one for all is well, zero is for all is bad
+    sat : numpy array of floats
+        satellite numbers
     ele  : numpy array of floats
         elevation angle (deg)
     azi : numpy array of float 
@@ -38,17 +38,17 @@ def read_snr_simple(obsfile):
         seconds of the day (no leap seconds)
     edot : numpy array of floats
         derivative of elevation angle wrt time deg/sec
-    s1: numpy array of floats
+    s1 : numpy array of floats
         L1 SNR
-    s2: numpy array of floats 
+    s2 : numpy array of floats 
         L2 SNR
-    s5:  numpy array of floats 
+    s5 :  numpy array of floats 
         L5 SNR
-    s6:  numpy array of floats
+    s6 :  numpy array of floats
         L6 SNR
-    s7:  numpy array of floats
+    s7 :  numpy array of floats
         L7 SNR 
-    s8:  numpy array of floats
+    s8 :  numpy array of floats
         L8 SNR
     snrE : numpy array of booleans 
         whether SNR exists 
