@@ -169,12 +169,13 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     # not sure why tv and corr are being returned.
     if rhdot:
        print(input2spline, output4spline)
-       if testing: # new version
-            tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
+       tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
                    knots=knots,txtdir=txtdir,testing=testing)
-       else: # old version
-            tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, 
-                    knots=knots,txtdir=txtdir,testing=testing)
+
+# no longer linking to old version
+#       else: # old version
+#            tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, 
+#                    knots=knots,txtdir=txtdir,testing=testing)
 
 
 def main():
