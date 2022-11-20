@@ -29,6 +29,7 @@ def parse_arguments():
     parser.add_argument("-azim1", default=None, type=int, help="minimum azimuth (deg)")
     parser.add_argument("-azim2", default=None, type=int, help="maximum azimuth (deg)")
     parser.add_argument("-test", default=None, type=str, help="augmentation to plot")
+    parser.add_argument("-subdir", default=None, type=str, help="name of subdirectory for output ")
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -40,7 +41,7 @@ def parse_arguments():
 
 
 def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
-        extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360, test: bool = False):
+        extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None):
     """
         Parameters
         ----------
@@ -117,18 +118,24 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
 
         test : bool
             augmentations to the plot
+
+        subdir: str
+            subdirectory for Files output
+
     """
     plt2screen = plt # since variable was originally this name 
     # make sure environment variables are set
     g.check_environ_variables()
-    xdir = os.environ['REFL_CODE']
-
+    if subdir == None:
+        subdir = ''
+    g.set_subdir(subdir)
 # where the summary files will be written to
-    txtdir = xdir + '/Files' 
+    xdir = os.environ['REFL_CODE']
+    txtdir = xdir + '/Files/'  + subdir
 
-    if not os.path.exists(txtdir):
-        print('make an output directory', txtdir)
-        os.makedirs(txtdir)
+    #if not os.path.exists(txtdir):
+    #    print('make an output directory', txtdir)
+    #    os.makedirs(txtdir)
 
     # set the name of the output format
     if csv:
@@ -136,7 +143,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     else:
         alldatafile = txtdir + '/' + station + '_allRH.txt' 
 
-    tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, alldatafile, csv, medfilter, ReqTracks,azim1,azim2,test)
+    tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, alldatafile, csv, medfilter, ReqTracks,azim1,azim2,test,subdir)
 
     # default is to show the plots
     if plt2screen:

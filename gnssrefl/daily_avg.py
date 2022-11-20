@@ -95,7 +95,7 @@ def fbias_daily_avg(station):
 
 
 
-def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks,azim1,azim2,test):
+def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks,azim1,azim2,test,subdir):
     """
     worker code for daily_avg_cl.py
 
@@ -136,6 +136,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
         maximum azimuth, degrees
 
     test: bool
+
+    subdir : str
+        subdirectory for output files
 
     Returns
     -------
@@ -285,7 +288,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     if (NumFiles < 1):
         sys.exit()
 
-    pltname = xdir + '/Files/' + station + '_AllRH.png'
+    pltname = xdir + '/Files/' + subdir + '/' + station + '_AllRH.png'
     plt.savefig(pltname)
     print('All RH png file saved as: ', pltname)
 
@@ -300,7 +303,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
 
     # plot the number of retrievals vs time
-    txtdir =  xdir + '/Files'
+    txtdir =  xdir + '/Files/' + subdir 
+
     daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei,test)
 
     return tv, obstimes
@@ -426,7 +430,7 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
         content of a LSP results file
 
     outfile : string
-        name of output file
+        full name of output file
 
     csvformat : boolean
         true if you want csv format output
@@ -487,22 +491,27 @@ def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gam
 
     gazim : numpy array of floats
         azimuths
+
     gfreq : numpy array of int
         frequencies
+
     gsat : numpy array of int
         satellite numbers
+
     gamp : numpy array of floats
         amplitudes of periodograms
+
     gpeak2noise : numpy array of floats
         peak 2 noise for periodograms
+
     gutcTime : numpy array of floats
         time of day in hours 
+
     tvall :  ??
 
     Returns
     -------
     tvall : ??
-
 
     """
     if (NG > 0):
