@@ -251,7 +251,6 @@ def apply_refraction_corr(lsp,ele,p,T):
 
 def local_update_plot(x,y,px,pz,ax1, ax2,failure):
     """
-
     updates result plot
 
     Parameters
