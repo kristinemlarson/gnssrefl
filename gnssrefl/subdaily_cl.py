@@ -147,7 +147,12 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
         print('h1 must be less than h2. You submitted ', h1, ' and ', h2)
         sys.exit()
     if csvfile:
+        print('>>>> WARNING: csvfile option is currently turned off.  We are working to add it back.')
+        csvfile = False
+
+    if csvfile:
         writecsv = True
+
     if splinefile is None:
         if txtfile == '':
             print('Will pick up and concatenate daily result files')

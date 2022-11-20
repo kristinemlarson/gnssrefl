@@ -19,7 +19,7 @@ from pathlib import Path
 xdir = Path(os.environ["REFL_CODE"])
 
 
-def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
+def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir):
     """
     makes a plot of daily averaged phase
 
@@ -38,7 +38,11 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
     xdir : str
         location of the results (environment variable REFL_CODE)
 
+    subdir : str
+        subdirectory in Files
+
     """
+    outdir = xdir + '/Files/' + subdir
     plt.figure(figsize=(10, 6))
     plt.plot(datetime_dates, tv[:, 2], 'bo')
     plt.ylabel('phase (degrees)')
@@ -49,7 +53,8 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir):
     plt.grid()
     plt.gcf().autofmt_xdate()
 
-    plot_path = f'{xdir}/Files/{station}_daily_phase.png'
+    # maybe this works.  Maybe not.
+    plot_path = f'{outdir}/{station}_daily_phase.png'
     print(f"Saving figure to {plot_path}")
     plt.savefig(plot_path)
 
@@ -403,7 +408,7 @@ def low_pct(amp, basepercent):
     return lowval
 
 
-def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=-99,circles=False):
+def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=-99,circles=False,subdir=''):
     """
     Convert GPS phase to VWC. Using Clara Chew's algorithm from 
     Matlab write_vegcorrect_smc.m
@@ -433,6 +438,9 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
 
     circles : boolean
         final plot using circles (instead of line)
+
+    subdir : str
+        subdirector for $REFL_CODE/Files
 
     """
 
@@ -597,6 +605,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
     print('number of nodes', howmanynodes)
     if howmanynodes == 0:
         print('No summer nodes found. Exiting.')
+        if plt2screen:
+            plt.show()
         sys.exit()
     
     else:
@@ -622,12 +632,14 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
     ax.grid()
     plt.gcf().autofmt_xdate()
 
-    plot_path = f'{xdir}/Files/{station}_phase_vwc_result.png'
+    outdir = f'{xdir}/Files/{subdir}'
+
+    plot_path = f'{outdir}/{station}_phase_vwc_result.png'
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
 
 
-    plot_path = f'{xdir}/Files/{station}_vol_soil_moisture.png'
+    plot_path = f'{outdir}/{station}_vol_soil_moisture.png'
     vwc_plot(station,t_datetime, nv, plot_path,circles) 
 
     if plt2screen:

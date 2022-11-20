@@ -28,6 +28,7 @@ def parse_arguments():
     parser.add_argument("-minvalperday", default=None, type=int, help="minimum number of satellite tracks needed each day. Default is 10")
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean for attempting to remove days contaminated by snow")
     parser.add_argument("-circles", default=None, type=str, help="circles instead of lines for the final VWC plot ")
+    parser.add_argument("-subdir", default=None, type=str, help="use subdirectory for output files")
 
     args = parser.parse_args().__dict__
 
@@ -204,7 +205,7 @@ def load_sat_phase(station, year, year_end, freq):
     #    override = np.loadtxt(xfile, comments='%')
     #    found_override = True
 
-    dir = Path(os.environ["REFL_CODE"])
+    thedir = Path(os.environ["REFL_CODE"])
 
     if not year_end:
         year_end = year
@@ -212,7 +213,7 @@ def load_sat_phase(station, year, year_end, freq):
     results = []
     for year in np.arange(year, year_end+1):
         # where the results are stored
-        data_dir = dir / str(year) / 'phase' / station
+        data_dir = thedir / str(year) / 'phase' / station
         local_results = read_files_in_dir(data_dir)
         if local_results:
             results.extend(local_results)
@@ -280,7 +281,8 @@ def normAmp(amp, basepercent):
 
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen: bool = True, screenstats: bool = False, 
-        min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, snow_filter: bool = False, circles: bool=False):
+        min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, 
+        snow_filter: bool = False, circles: bool=False, subdir: str=None):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
 
@@ -322,6 +324,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
     circles : boolean
         whether you want circles in the final plot (lines are default)
 
+    subdir: str
+        subdirectory in $REFL_CODE/Files for plots and text file outputs
+
     Returns
     -------
 
@@ -343,6 +348,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
     if not year_end:
         year_end = year
+
+    if subdir == None:
+        subdir = ''
+
+    # make sure subdirectory exists
+    g.set_subdir(subdir)
 
     if not plt2screen:
         print('no plots will come to screen. Will only be saved.')
@@ -518,7 +529,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
                     plt.gcf().autofmt_xdate()
 
 
-    plot_path = f'{xdir}/Files/{station}_az_phase.png'
+    plot_path = f'{xdir}/Files/{subdir}/{station}_az_phase.png'
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
 
@@ -545,9 +556,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
         datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
 
-        qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir)
+        qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir)
 
-        qp.convert_phase(station, year, year_end, plt2screen,fr,polyorder,circles)
+        qp.convert_phase(station, year, year_end, plt2screen,fr,polyorder,circles,subdir)
 
 
 def main():

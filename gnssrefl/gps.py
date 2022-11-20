@@ -5829,3 +5829,27 @@ def make_azim_choices(alist):
 
     print('Input Azlist: ', alist, ' Output list ', azval)
     return azval
+
+def set_subdir(subdir):
+    """
+    """
+    xdir = os.environ['REFL_CODE']
+    if not os.path.exists(xdir):
+        print('The REFL_CODE environment variable must be set')
+        print('This will tell the code where to put the output.')
+        sys.exit()
+
+    outdir = xdir  + '/Files/'
+    if not os.path.exists(outdir) :
+        subprocess.call(['mkdir', outdir])
+
+    if subdir == '':
+        print('Using this output directory: ', outdir)
+    else:
+        outdir = xdir  + '/Files/' + subdir + '/'
+        print('Using this output directory: ', outdir)
+        if not os.path.exists(outdir) :
+            subprocess.call(['mkdir', outdir])
+
+    return
+
