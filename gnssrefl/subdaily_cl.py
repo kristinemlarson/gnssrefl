@@ -39,7 +39,7 @@ def parse_arguments():
     parser.add_argument("-h2", default=None, type=float, help="max RH (m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="new peak2noise constraint")
     parser.add_argument("-kplt", default=None, type=str, help="special plot for kristine")
-    parser.add_argument("-subdir", default=None, type=str, help="name for subdirector for output")
+    parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output")
 
     args = parser.parse_args().__dict__
 
@@ -54,7 +54,8 @@ def parse_arguments():
 def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, plt: bool = True,
              spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = False,
              doy1: int = 1, doy2: int = 366, testing: bool = True, ampl: float = 0, 
-             h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, subdir: str = ''):
+             h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, 
+             peak2noise: float = 0, kplt: bool = False, subdir: str = None):
     """
     Parameters
     ----------
@@ -132,14 +133,12 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']
 
-    txtdir = xdir + '/Files/'
-    if not os.path.exists(txtdir):
-        subprocess.call(['mkdir', txtdir])
+    # default subdirectory is the station name
+    if subdir == None:
+        subdir = station
+    g.set_subdir(subdir)
 
-    if subdir != '':
-        txtdir = xdir + '/Files/' + subdir + '/'
-        if not os.path.exists(txtdir):
-            subprocess.call(['mkdir', txtdir])
+    txtdir = xdir + '/Files/' + subdir
 
     #create the subdaily file
     writecsv = False
@@ -173,15 +172,8 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
 
     # not sure why tv and corr are being returned.
     if rhdot:
-       print(input2spline, output4spline)
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
                    knots=knots,txtdir=txtdir,testing=testing)
-
-# no longer linking to old version
-#       else: # old version
-#            tv, corr = t.rhdot_correction(station, input2spline, output4spline, plt, spline_outlier, 
-#                    knots=knots,txtdir=txtdir,testing=testing)
-
 
 def main():
     args = parse_arguments()

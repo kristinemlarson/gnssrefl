@@ -29,7 +29,7 @@ def parse_arguments():
     parser.add_argument("-azim1", default=None, type=int, help="minimum azimuth (deg)")
     parser.add_argument("-azim2", default=None, type=int, help="maximum azimuth (deg)")
     parser.add_argument("-test", default=None, type=str, help="augmentation to plot")
-    parser.add_argument("-subdir", default=None, type=str, help="name of subdirectory for output ")
+    parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output ")
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -120,14 +120,14 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
             augmentations to the plot
 
         subdir: str
-            subdirectory for Files output
+            non-default subdirectory for Files output
 
     """
     plt2screen = plt # since variable was originally this name 
     # make sure environment variables are set
     g.check_environ_variables()
     if subdir == None:
-        subdir = ''
+        subdir = station
     g.set_subdir(subdir)
 # where the summary files will be written to
     xdir = os.environ['REFL_CODE']

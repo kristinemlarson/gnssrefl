@@ -28,7 +28,7 @@ def parse_arguments():
     parser.add_argument("-minvalperday", default=None, type=int, help="minimum number of satellite tracks needed each day. Default is 10")
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean for attempting to remove days contaminated by snow")
     parser.add_argument("-circles", default=None, type=str, help="circles instead of lines for the final VWC plot ")
-    parser.add_argument("-subdir", default=None, type=str, help="use subdirectory for output files")
+    parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
 
     args = parser.parse_args().__dict__
 
@@ -349,8 +349,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
     if not year_end:
         year_end = year
 
+    # default is station name
     if subdir == None:
-        subdir = ''
+        subdir = station 
 
     # make sure subdirectory exists
     g.set_subdir(subdir)
