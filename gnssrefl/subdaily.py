@@ -432,7 +432,6 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
-        #print(d1,d2)
         two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2)
         stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt)
         plt.show()
