@@ -121,13 +121,18 @@ You can see now that the RHdot outliers are gone:
 <img src=../_static/tggo_delT_fixed.png width=600>
 
 The statistics for the fits are then printed to the screen. In this case, without 
-the RHdot correction, the standard deviation of each RH value is 28.5 cm.
-WIth the RHdot correction it is 22.6 cm, so a significant improvement. Note that
+the RHdot correction, the standard deviation of each RH value is 27.3 cm.
+WIth the RHdot correction it is 21.5 cm, so a significant improvement. Note that
 this is relative to the spline fit (i.e. it is not accuracy) and without correcting for phase center offsets.
+
+<img src=../_static/tggo_new.png width=600>
+
+
+The code will then remove interfrequency biases and recompute a spline:
 
 <img src=../_static/tggo_delT_fixed2.png width=600>
 
 Overall this is a very good reflections site - but it is hampered by the lack of Galileo observations.
 When this current receiver is upgraded to a newer model, I expect to see much better results.
 
-Kristine M. Larson November 9, 2022
+Kristine M. Larson November 21, 2022
