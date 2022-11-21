@@ -101,21 +101,31 @@ Time series with large outliers removed.
  
 Additional corrections can be made using the <code>rhdot T</code> setting. In order to 
 compute the RHdot correction, we use a spline fit to our initial RH estimates. And then
-we will use the Numpy algorithms to estimate RHdot anywhere from that:  
+we will use the numpy algorithms to estimate RHdot anywhere from that:  
 
 <img src=../_static/tggo_rhdot3.png width=600>
 
-With the resulting time series where the 3 sigma outliers are being highlighted in the second panel:
+The outliers in the RHdot correction plot above are disturbingly large. If you look at the file with
+the corrections in it (the name of the file is sent to the screen), and simply look 
+at which satellites have the largest outliers, you find that they have a 
+delT (length of the arc) of more than 60 minutes, whereas the vast 
+majority of the arcs are less than 30 minutes. Such a long arc is 
+perfectly fine for computing snow depth or lake heights - significant 
+subdaily behavior is not expected. For tides where tidal rates are 
+significant, the gnssrefl code is not going to be able to use a simple fit to find the RH dot
+correction. The best thing to do is to change the delT parameter in the json file to ignore these 
+long arcs. The default was 75; I changed mine to 35 minutes and 
+reran <code>gnssir</code> and then <code>subdaily</code>.
+You can see now that the RHdot outliers are gone:
 
-<img src=../_static/tggo_rhdot2.png width=600>
+<img src=../_static/tggo_delT_fixed.png width=600>
 
-The statistics for the fits are shown to the screen. In this case, without 
+The statistics for the fits are then printed to the screen. In this case, without 
 the RHdot correction, the standard deviation of each RH value is 28.5 cm.
 WIth the RHdot correction it is 22.6 cm, so a significant improvement. Note that
-this is relative to the spline fit and without correcting for phase center offsets.
+this is relative to the spline fit (i.e. it is not accuracy) and without correcting for phase center offsets.
 
-In the next step the code attempts to remove the phase center offsets by
-defining everything relative to GPS L1.  
+<img src=../_static/tggo_delT_fixed2.png width=600>
 
 Overall this is a very good reflections site - but it is hampered by the lack of Galileo observations.
 When this current receiver is upgraded to a newer model, I expect to see much better results.

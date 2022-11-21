@@ -1704,6 +1704,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     seconds : numpy array
         seconds of the day (GPS time)
     edot : numpy array
+        elev angle time rate of change (units?)
     f : integer
         requested frequency
     az1 : float
@@ -1736,7 +1737,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     avgAzim : float
         average azimuth of the tracks
     outFact1 : float
-        TBD
+        TBD 
     outFact2 : float
         TBD
     delT : float
