@@ -12,9 +12,11 @@ New Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities
 **WARNING: All access to UNAVCO data will end October 1, 2022 
 unless [you sign up for an account there](https://www.unavco.org/data/gps-gnss/file-server/file-server-access-examples.html)**
 
-## Table of Contents
+We are [developing readthedocs documentation](https://gnssrefl.readthedocs.io/en/latest/). Unfortunately, it is not 
+100% functional yet. On github you should be able to continue using the links shown below. On pypi, only the readthedocs
+links work. Please be patient as we work through this process.
 
-We are [developing readthedocs documentation](https://gnssrefl.readthedocs.io/en/latest/): please check it out, we'd love feedback.
+## Table of Contents
 
 1. [Installation](docs/pages/README_install.md)
 2. Understanding the Code
