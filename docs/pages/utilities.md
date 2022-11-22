@@ -18,25 +18,25 @@ accordingly.
 
 The optional inputs (at this time):
 
--azim1 min azimuth (degrees)
+- azim1 min azimuth (degrees)
 
--azim2 min azimuth (degrees)
+- azim2 min azimuth (degrees)
 
--el_list 5 10 15 20 25 (for example)
+- el_list 5 10 15 20 25 (for example)
 
--lat latitude in degrees
+- lat latitude in degrees
 
--lon longitude in degrees
+- lon longitude in degrees
 
--el_height ellipsoidal height in meters
+- el_height ellipsoidal height in meters
 
--fr frequency (1,2,5 allowed)
+- fr frequency (1,2,5 allowed)
 
--RH reflector height in meters
+- RH reflector height in meters
 
--system constellation (gps,glonass,galileo, beidou)
+- system constellation (gps,glonass,galileo, beidou)
 
--output base filename for the kml file
+- output base filename for the kml file
 
 The output goes to $REFL_CODE/Files. The code relies on orbits stored on github. These
 will be downloaded and stored the first time you run the code. It also needs the EGM96 file 
