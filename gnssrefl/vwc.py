@@ -191,7 +191,26 @@ def load_sat_phase(station, year, year_end, freq):
 
     Returns
     -------
-    reflector heights and amplitudes
+    dataexist : bool
+
+    year : numpy array of int
+       
+    doy : numpy array of int
+
+    hr : float
+        fractional day (UTC)
+    ph : float
+        phase (deg)
+    azdata : float
+        azimuth (deg)
+    ssat : int
+        satellite (deg)
+    rh : float
+        reflector height (m)
+    amp : float
+        amplitude of peak LSP 
+
+    results : ??
 
     """
     print('Requested frequency: ', freq)
@@ -251,6 +270,7 @@ def load_sat_phase(station, year, year_end, freq):
         ssat = results[6]
         rh = results[13]
         amp = results[15]
+
     return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results
 
 
@@ -549,7 +569,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
     #minvalperday = 10 - now an input
     if writeout:
 
-        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz)
+        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir)
         print('Number of daily phase measurements ', len(tv))
         if len(tv) < 1:
             print('No results - perhaps minvalperday or min_req_pts_track are too stringent')

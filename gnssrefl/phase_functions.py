@@ -476,9 +476,9 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
     # begging for a function ...
     # overriding KE for now
     if (fr == 1):
-        fileout = myxdir + '/Files/' + station + '_phase_L1.txt'
+        fileout = myxdir + '/Files/' + subdir + '/' + station + '_phase_L1.txt'
     else:
-        fileout = myxdir + '/Files/' + station + '_phase.txt'
+        fileout = myxdir + '/Files/' + subdir + '/' + station + '_phase.txt'
 
     if os.path.exists(fileout):
         avg_phase_results = np.loadtxt(fileout, comments='%')
@@ -646,6 +646,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
         plt.show()
 
     vwcfile = FileManagement(station, FileTypes.volumetric_water_content).get_file_path()
+
+    vwcfile = f'{outdir}/{station}_vwc.txt'
     print('>>> VWC results being written to ', vwcfile)
     with open(vwcfile, 'w') as w:
         N = len(nv)
@@ -666,7 +668,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
                 w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
 
 
-def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
+def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir):
 
     """
     creates output file for average phase results
@@ -692,6 +694,9 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
 
     vxyz is from some other compilation
 
+    subdir : str
+        subdirectory for results
+
     Returns
     -------
     tv : numpy array with elements
@@ -714,9 +719,9 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz):
 
     # ultimately would like to use kelly's code here
     if (fr == 1):
-        fileout = myxdir + '/Files/' + station + '_phase_L1.txt'
+        fileout = myxdir + '/Files/'  + subdir + '/' + station + '_phase_L1.txt'
     else:
-        fileout = myxdir + '/Files/' + station + '_phase.txt'
+        fileout = myxdir + '/Files/' + subdir + '/' + station + '_phase.txt'
 
     print('Daily averaged phases will be written to : ', fileout)
     with open(fileout, 'w') as fout:

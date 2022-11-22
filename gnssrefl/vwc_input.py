@@ -28,7 +28,7 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100):
     and writes to a file with the mean values.
 
     Parameters
-    __________
+    ----------
     station : string
         4 character ID of the station
 
@@ -42,7 +42,7 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100):
         number of minimum tracks needed in order to keep the average RH
 
     Returns
-    _______
+    -------
     File with columns
     index, mean reflector_heights, satellite, average_azimuth, number of reflector heights in average, min azimuth, max azimuth
 
@@ -82,10 +82,6 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100):
     # I transpose this because the original code did that.
     gnssir_results = np.transpose(gnssir_results) 
 
-    # this should not be needed anymore
-    #if len(gnssir_results) == 0:
-    #    print('No results were found. Exiting')
-    #    sys.exit()
 
     # four quadrants
     azimuth_list = [0, 90, 180, 270]
