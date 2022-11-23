@@ -33,13 +33,13 @@ def parse_arguments():
     parser.add_argument("-screenstats", default=None, type=str, help="if True, Success and Failure info printed to the screen")
     parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio (default is 3)")
     parser.add_argument("-ediff",  default=None, type=float, help="ediff Quality Control parameter (default 2 deg)")
-    #parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
+    parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
     #parser.add_argument("-fortran", default=None, type=str, help="Default is True: use Fortran translators")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['screenstats']
+    boolean_args = ['screenstats','plt']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -50,7 +50,7 @@ def quicklook(station: str, year: int, doy: int,
               snr: int = 66, fr: int = 1, ampl: float = 7.,
               e1: int = 5, e2: int = 25, h1: float = 0.5, h2: float = 6., sat: int = None,
               peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
-              pltscreen: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0):
+              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0):
     """
 
     Parameters
@@ -121,9 +121,9 @@ def quicklook(station: str, year: int, doy: int,
         Whether to print stats to the screen.
         default is False.
 
-    pltscreen : boolean, optional
+    plt : boolean, optional
         Whether to print plots to the screen.
-        default is True.
+        default is True. Regardless, png files are made
 
     azim1 : float, optional
         minimum azimuth angle (deg)
@@ -162,7 +162,7 @@ def quicklook(station: str, year: int, doy: int,
         print('this restriction is for quickLook only ')
         pele[0] = e1
 
-    #pltscreen = plt # just to keep things with old names .... 
+    pltscreen = plt
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'f': fr[0], 'reqAmp': ampl, 'e1': e1,
             'e2': e2, 'minH': h1, 'maxH': h2, 'PkNoise': peak2noise, 'satsel': sat, 'fortran': fortran, 'pele': pele,
             'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2, 'ediff': ediff}

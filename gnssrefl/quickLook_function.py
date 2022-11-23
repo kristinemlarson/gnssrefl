@@ -1,6 +1,6 @@
 """
 called by quickLook_cl.py
-quickLook functions - consolidated snr reader (previously in a separate file)
+quickLook functions 
 """
 import sys
 import os
@@ -114,18 +114,19 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
     Parameters
     ----------
-    station : string
+    station : str
         name (4 char) 
 
-    year : integer
+    year : int
+        full year
 
-    doy : integer
+    doy : int
         day of year  
 
-    snr_type : integer
+    snr_type : int
         snr file extension (i.e. 99, 66 etc)
 
-    f : integer
+    f : int
         frequency (1, 2, 5), etc
     e1 : float
         minimum elevation angle in degrees
@@ -145,16 +146,16 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     pele : list of floats
         is the elevation angle limits for the polynomial removal.  units: degrees
 
-    satsel : integer
+    satsel : int
         satellite number?
 
     PkNoise : float
         peak to noise ratio for QC
 
-    fortran : boolean
+    fortran : bool
          whether external fortran translator is being explicitly called. 
 
-    pltscreen : boolean
+    pltscreen : bool
         whether you want plots to the screen
 
     azim1 : float
@@ -216,7 +217,6 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     minNumPts = 20 
     #noise region for LSP QC. these are meters
     NReg = [minH, maxH]
-    #print('Refl. Ht. Noise Region used: ', NReg)
     # for quickLook, we use the four geographic quadrants - these are azimuth angles in degrees
     azval = [270, 360, 180, 270, 0, 90, 90, 180]
     # try adding 5 degrees at the quadrant edges, except for north
@@ -270,7 +270,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
         print('minimum elevation angle (degrees) for this dataset: ', minEdataset)
         if minEdataset > (e1+0.5):
-            print('It looks like the receiver had an elevation mask')
+            print('It looks like the receiver had an elevation mask. Overriding e1 to this value.')
             e1 = minEdataset
         if pltscreen:
             plt.figure(figsize=(10,6))
@@ -360,25 +360,24 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         # this file seems to have an empty line at the end.  i do not know why.
 
 
-        if pltscreen:
-            plt.suptitle(tt, fontsize=FS)
-            # make sure Files directory exists
-            fdir = os.environ['REFL_CODE'] + '/Files'
-            if not os.path.isdir(fdir):
-                subprocess.call(['mkdir', fdir])
+        # make sure directory exists for plots
+        g.set_subdir(station)
+        # where plots will go
+        fdir = os.environ['REFL_CODE'] + '/Files/' + station 
+        plt.suptitle(tt, fontsize=FS)
             # if you have no results, no point plotting them!
-            if (allpoints > 0):
-                filename = fdir + '/quickLook_lsp.png'
-                print('plot saved to ', filename)
-                plt.savefig(filename)
-            # sure - why not throw in another plot?
-                goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2)
-                plt.show()
-            else:
-                print('You made a selection that does not exist (i.e. frequency or satellite or constellation)')
+        if (allpoints > 0):
+            filename = fdir + '/quickLook_lsp.png'
+            print('plot saved to ', filename)
+            plt.savefig(filename)
+        # make second plot
+            goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2)
+        else:
+            print('You made a selection that does not exist (i.e. frequency or satellite or constellation)')
+        if pltscreen:
+            plt.show()
     else: 
         print('some kind of problem with SNR file, so I am exiting the code politely.')
-
 
     # returns multidimensional dictionary of lomb scargle results so 
     # that the jupyter notebook people can replot them
@@ -417,7 +416,7 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
         maximum elevation angle (deg)
 
     plot is written to :
-    os.environ['REFL_CODE'] + '/Files/quickLook_summary.png'
+    os.environ['REFL_CODE'] + '/Files/station/quickLook_summary.png'
 
     """
     try:
@@ -480,9 +479,8 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     plt.yticks(fontsize=fs)
     plt.xlim((0, 360))
 
-    fdir = os.environ['REFL_CODE'] + '/Files'
-    if not os.path.isdir(fdir):
-        subprocess.call(['mkdir', fdir])
+    # existence of the output directory is checked earlier
+    fdir = os.environ['REFL_CODE'] + '/Files/' + station 
     f = fdir + '/quickLook_summary.png'
     print('plot saved to ', f)
     plt.savefig(f)
