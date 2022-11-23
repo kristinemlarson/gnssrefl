@@ -5,21 +5,21 @@
 
 # gnssrefl
 
-**github version: 1.1.11** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+**github version: 1.1.12** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 New Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
 
-**WARNING: All access to UNAVCO data will end October 1, 2022 
-unless [you sign up for an account there](https://www.unavco.org/data/gps-gnss/file-server/file-server-access-examples.html)**
 
 We are [developing readthedocs documentation](https://gnssrefl.readthedocs.io/en/latest/). Unfortunately, it is not 
 100% functional yet. On github you should be able to continue using the links shown below. On pypi, only the readthedocs
 links work. Please be patient as we work through this process.
 
+All access to UNAVCO data will end October 1, 2022 unless [you sign up for an account there](https://www.unavco.org/data/gps-gnss/file-server/file-server-access-examples.html)**
+
 ## Table of Contents
 
 1. [Installation](docs/pages/README_install.md)
-2. Understanding the Code
+2. [Understanding the Code](docs/pages/understand.md)
     1. [rinex2snr: translating GNSS Data (RINEX, NMEA)](docs/pages/rinex2snr.md)
     2. [quickLook: assessing a GNSS site using SNR files](docs/pages/quickLook.md)
     3. [gnssir: estimating reflector heights from SNR data](docs/pages/gnssir.md)
@@ -36,7 +36,6 @@ links work. Please be patient as we work through this process.
 9. [How can you help this project? How can you ask for help?](docs/pages/contributions_questions.md)
 
 <HR> 
-
 
 GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, EAR 1144221, AGS 1449554) and 
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was developed with support from NASA (80NSSC20K1731).
