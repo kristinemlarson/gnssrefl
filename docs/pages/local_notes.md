@@ -70,3 +70,8 @@ added EGM96 to gps.py
 1.1.10 fixed subdaily spline fit.  no longer cut off data at the 
 beginning and end.  also output files that are interfrequency bias corrected,
 relative to L1
+
+1.1.12 subdir is pretty much the norm for output of downstream programs
+(vwc, daily_avg, subdaily) and the plots for quickLook
+added IF bias correction to subdaily (but csv not working)
+added refl_zones utility
