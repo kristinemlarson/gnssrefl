@@ -5709,9 +5709,9 @@ def ymd2ch(year,month,day):
     Returns
     -------
     month : int
-
+        numerical month of the year
     day : int
-
+        day of the month
     doy : int
         day of year
     cyyyy : str
@@ -5722,7 +5722,7 @@ def ymd2ch(year,month,day):
         4 ch yaer
 
     """
-    if day == 0:
+    if (day == 0):
        doy=month
        d = doy2ymd(year,doy);
        month = d.month; day = d.day

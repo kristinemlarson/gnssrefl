@@ -52,7 +52,7 @@ def quickname(station,year,cyy, cdoy, csnr):
         three character day of year
 
     csnr : str
-        snr ending
+        snr ending, i.e. '66' or '99'
 
     Returns
     -------
@@ -71,17 +71,18 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     Parameters
     ----------
-    station: string
+    station : string
         4 or 9 character station name 
 
-    year_list list of years to be analyzed
+    year_list : list of int 
+        years to be analyzed
 
     doy_list list of doy to be analyzed
 
-    isnr: integer 
+    isnr : integer 
         SNR file type choice
 
-    orbtype: string
+    orbtype : string
         3 character orbit type, e.g. nav
         
     rate : string 
@@ -111,7 +112,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         hybrid (default), fortran, or python
         hybrid uses fortran within the python code
 
-    srate: integer
+    srate : integer
         sample rate for RINEX 3 files
 
     mk : boolean
@@ -427,7 +428,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                             log.write('Problem with making SNR file, check fortran specific log {0:50s} \n'.format(flogname))
                         t2=time.time()
 #                        print(' Exec time:', '{0:4.2f}'.format(t2-t1) )
-# this is for people that want to use slow python code
+#                      this is for people that want to use slow python code
                     else:
                         log.write('SNR file {0:50s} \n will use python to make \n'.format( snrname))
                         log.write('Decimating will be done here instead of using teqc \n')
@@ -1061,15 +1062,6 @@ def testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,
     log.write('write SNR data to file \n')
     fout.close()
 
-                    # only do this for the older version
-                    #print('teqc executable exists, will use to eliminate unnecessary observables')
-                    #foutname = 'tmp.' + rinexfile
-                    #fout = open(foutname,'w')
-                    #subprocess.call([exc, '-O.obs','S1+S2+S5+S6+S7+S8', '-n_GLONASS', '27', rinexfile],stdout=fout)
-                    #fout.close()
-                # store it in the original rinex filename
-                    #subprocess.call(['rm','-f',rinexfile])
-                    #subprocess.call(['mv','-f',foutname, rinexfile])
 
 def the_makan_option(station,cyyyy,cyy,cdoy):
     """
@@ -1079,6 +1071,17 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
     
     turns whatever it finds into a regular RINEX file in the working directory
     that file WILL be deleted, but it will not delete those stored externally.
+
+    Parameters
+    ----------
+    station : str
+        station name (4 ch)
+    cyyyy : str
+        4 ch year
+    cyy : str
+        two ch year
+    cdoy : str
+        three ch day of year
     """
     missing = True
     crnxpath = g.hatanaka_version()  # where hatanaka will be
@@ -1177,9 +1180,22 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
 
 def go_from_crxgz_to_rnx(c3gz):
     """
-    sent a gzipped hatanaka file.  gunzip, hatanaka translate
-    checks to see if the rnx version exists and returns that
-    and the filename
+    checks ot see if rinex3 file exists, gunzip if necessary,
+    run hatanaka, if necessary
+
+    Parameters
+    ----------
+    c3gz : str
+        filename for a gzipped RINEX 3 Hatanaka file
+
+    Returns
+    -------
+    translated : bool
+        if file successfully found and available
+
+    rnx : str
+        name of gunzipped and decompressed RINEX 3
+
     """
     translated = False # assume failure
     c3 = c3gz[:-3] # crx filename

@@ -198,7 +198,21 @@ def ref_azel(satv,recv,up):
 
 def set_final_azlist(a1ang,a2ang,azlist):
     """
-    given azimuth limits (a1ang,a2ang in degrees) set azlist to accommodate
+    edits initial azlist to restrict to given azimuths
+
+    Parameters
+    ----------
+    a1ang : float
+        minimum azimuth (degrees)
+    a2ang : float
+        maximum azimuth (degrees)
+    azlist : list of floats 
+        list of tracks, [azimuth,  ]
+
+    Returns
+    -------
+    azlist : list of floats
+
     """
 # we convert the azimuth tracks to -180 to 180, sort of
     if (a1ang < 0):
@@ -221,17 +235,24 @@ def calcAzEl_new(prn, newf,recv,u,East,North):
 
     Parameters
     ----------
-    prn :
-    newf :
+    prn : int
+        satellite number
+    newf : 3 vector of floats
+        cartesian coordinates of the satellite (meters)
+    recv : 3 vector of floats
+        receiver coordinates (meters)
+    u : 3 vector
+        cartesian unit vector for up
+    East : 3 vector
+        cartesian unit vector for east direction
+    North : 3 vector
+        cartesian unit vector for north direction
 
-    inputs are prn number, cartesian orbits for that prn,
-    cartesian position of the receiver (both in meters),
-    up, east, and north are unit vectors needed to compute
-    elevation angle and azimuth angle
-    no longer subtracts five degrees?
-    now computes the number of values in the file so that you can use 
-    GPS, and other constellations
-    author: kristine larson
+    Returns
+    -------
+    tv : numpy array of floats
+        list of satellite tracks
+        [prn number, elevation angle, azimuth angle]
     """
     tv = np.empty(shape=[0, 3])
     # number of values
@@ -255,13 +276,22 @@ def calcAzEl_newish(prn, newf,recv,u,East,North):
     function to gather azel for all low elevation angle data
     this is used in the reflection zone mapping tool
 
-    inputs are prn number, cartesian orbits for that prn,
-    cartesian position of the receiver (both in meters),
-    up, east, and north are unit vectors needed to compute
-    elevation angle and azimuth angle
-    no longer subtracts five degrees?
-    now computes the number of values in the file so that you can use
-    GPS, and other constellations
+    is this used?
+
+    Parameters
+    ----------
+    prn : int
+        satellite number
+    newf : 3 vector of floats
+        cartesian coordinates of the satellite (meters)
+    recv : 3 vector of floats
+        receiver coordinates (meters)
+    u : 3 vector
+        cartesian unit vector for up
+    East : 3 vector
+        cartesian unit vector for east direction
+    North : 3 vector
+        cartesian unit vector for north direction
 
     """
     tv = np.empty(shape=[0, 4])
@@ -424,6 +454,8 @@ def make_FZ_kml(name,freq, el_list, h, lat,lng,azlist):
     #print('elevation angle for last one')
     #print(el_list[0])
     lng_el, lat_el = makeEllipse_latlon(freq,el,h,azim, lat,lng)
+    # i do not think this is needed so removed it
+
     if False:
         points = write_coords(lng_el, lat_el)
 
@@ -484,7 +516,6 @@ def save_reflzone_orbits():
 
     Returns
     -------
-
     foundfiles : bool
         whether needed files were found
     """

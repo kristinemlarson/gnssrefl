@@ -139,12 +139,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         print('Year must have four characters: ', year)
         sys.exit()
 
-    if (day == 0):
-        # then you are using day of year as input
-        doy = month
-        year, month, day = g.ydoy2ymd(year, doy)
-    else:
-        doy, cdoy, cyyyy, cyy = g.ymd2doy(year, month, day)
+    month, day, doy, cyyyy, cyy, cdoy = g.ymd2ch(year,month,day)
 
     # allowed archives, rinex 2.11
     archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 'bkg', 'jeff', 'ngs', 'nrcan', 'special', 'bev', 'all']

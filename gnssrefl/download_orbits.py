@@ -93,18 +93,10 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
     if len(str(year)) != 4:
         print('Year must have four characters: ', year)
         sys.exit()
-
-    if day == 0:
-        # then you are using day of year as input
-        doy = month
-        year, month, day = g.ydoy2ymd(year, doy)
-        doy, cdoy, cyyyy, cyy = g.ymd2doy(year, month, day)
-    else:
-        doy, cdoy, cyyyy, cyy = g.ymd2doy(year, month, day)
+    month, day, doy, cyyyy, cyy, cdoy = g.ymd2ch(year,month,day)
 
     if doy_end == None:
         doy_end = doy 
-
 
     if pCtr not in orbit_list:
         print('You picked an orbit type - ', pCtr, ' - that I do not recognize')
