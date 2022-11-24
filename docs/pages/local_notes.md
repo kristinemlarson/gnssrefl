@@ -1,3 +1,23 @@
+Possible one-week short short course:
+
+First Week - two hour max
+
+- Installation help session, Tim and Kelly
+(with hope that most people don't need this)
+
+- Basic Theory, How to Run the Code, How to make a good site?
+(the hope is that people would watch the videos, but whatever)
+
+Second Week Only do applications ? Two hour max?
+
+- Day 1 : Snow, ice sheets, lakes
+
+- Day 2 : sea level (anything water with subdaily signal)
+
+- Day 3 : soil moisture
+
+- Day 4 : q/a session? free for all? maybe how to make a good site done here?
+
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
 docker pull unavdocker/gnssrefl to install code.

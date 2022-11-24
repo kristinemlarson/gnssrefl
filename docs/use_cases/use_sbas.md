@@ -16,8 +16,7 @@
 
 
 The data used here have been kindly provided by TRIGNET so that we could access L1 and L2C signals 
-at 15 second sampling. This sampling rate is needed to be able to see the reservoir. However, they are in a proprietary Trimble binary format.  
-It is non-trivial to convert those to RINEX, so in this example we will rely on files translated and 
+at 15 second sampling. This sampling rate is needed to be able to see the reservoir. However, they are in a proprietary Trimble binary format. It is non-trivial to convert those to RINEX, so in this example we will rely on files translated and 
 archived by UNAVCO for this use case example. They can be used by specifying the "special" archive.
 Here we will only discuss GPS - I would encourage you to also look at the Glonass data.
 

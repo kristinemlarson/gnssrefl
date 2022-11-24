@@ -2,7 +2,7 @@
 
 **Station name:** MAT2
 <P align=center>
-<img src=south_mat2.jpg width=500>
+<img src=../_static/south_mat2.jpg width=500>
 <P>
 
 **Latitude:** 33.857 degrees
@@ -96,3 +96,18 @@ In general you should use all the good frequenices that are available to you.
 [CSV file](LAKE_MATHEWS_MHW.csv)
 
 <img src=../_static/mathews_cdec.png>
+
+<HR>
+
+I extended the time series to November 2022. Since the receiver early on only allowed GPS, and 
+the L2 data were "complicated," these results are not representative of what can be achieved with 
+a modern receiver. However, they are certainly good enough for the daily averages used for a reservoir.  
+
+<code>daily_avg mat2 0.25 5 -year1 2022</code>
+
+
+<img src=../_static/mat2_2022.png>
+
+
+
+Updated by Kristine M. Larson, November 24, 2022

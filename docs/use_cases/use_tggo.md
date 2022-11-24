@@ -13,7 +13,8 @@
 </p>
 
 TGGO is a station in 
-the [BfG-GNSS Monitoring Network](https://fig.net/resources/proceedings/fig_proceedings/fig2021/papers/ts05.4/TS05.4_esch_11010.pdf). It is located in the Elbe River. It is colocated with a tradtional 
+the [BfG-GNSS Monitoring Network](https://fig.net/resources/proceedings/fig_proceedings/fig2021/papers/ts05.4/TS05.4_esch_11010.pdf). 
+It is located in the Elbe River. It is colocated with a tradtional 
 tide gauge. It has excellent visibility of the water.  
 
 ### Reflection Zones for TGGO
@@ -134,5 +135,6 @@ The code will then remove interfrequency biases and recompute a spline:
 
 Overall this is a very good reflections site - but it is hampered by the lack of Galileo observations.
 When this current receiver is upgraded to a newer model, I expect to see much better results.
+If someone would like to provide "truth" data, I could add a comparison.
 
 Kristine M. Larson November 21, 2022

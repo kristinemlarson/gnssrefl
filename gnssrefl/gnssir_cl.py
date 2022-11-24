@@ -18,7 +18,7 @@ from gnssrefl.utils import str2bool
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="station name", type=str)
+    parser.add_argument("station", help="station name (4 ch)", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="day of year", type=int)
 
@@ -66,7 +66,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         Parameters
         ----------
         station : string
-            4 or 9 character ID of the station
+            4 character ID of the station
             lowercase please
 
         year : integer
@@ -175,7 +175,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-
     exitS = g.check_inputs(station, year, doy, snr)
 
     if exitS:
@@ -186,7 +185,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     # plt is False unless user changes
     lsp['plt_screen'] = plt
-
 
     if delTmax is not None:
         lsp['delTmax'] = delTmax

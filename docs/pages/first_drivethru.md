@@ -18,11 +18,13 @@
 * [Phoenix, Antarctica](../use_cases/use_phnx.md) (phnx)
 </TD>
 <td>
-<B>Lakes and Rivers</B>
+<B>Lakes, Reservoirs, and Rivers</B>
 
 * [Michipicoten, Canada](../use_cases/use_mchn.md) (mchn)
 
 * [Lake Taupo, New Zealand](../use_cases/use_tgho.md) (tgho)
+
+* [Steenbras Reservoir, South Africa](../use_cases/use_sbas.md) (tgho)
 
 * [St Lawrence River,Canada](../use_cases/use_pmtl.md) (pmtl)
 
