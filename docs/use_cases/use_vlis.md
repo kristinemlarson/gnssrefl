@@ -81,11 +81,11 @@ L1 - because every GPS satellite has L1. The second most are L2C (at least 24 sa
 the fewest are L5 (I am not sure how many L5 transmitting satellites there are, but it is fewer than L2C).
 
 I also have [a bash script](https://github.com/kristinemlarson/gnssIR_api) that will allow you to 
-more automatically query the API. Generally people [install the python code or the docker instead](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/README_install.md).
+more automatically query the API. 
 
-If you are using the github install of <code>gnssrefl</code> and 
-have Python 3.9 or the [docker image](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md) 
-installed, you can do this on your local machine. The advantage of doing it on a local machine is mostly that you can use multi-GNSS 
+If you are using the github or pypi install of <code>gnssrefl</code> and 
+have Python 3.9 or the [docker image](../pages/docker_cl_instructions.md) installed, you can 
+do this on your local machine. The advantage of doing it on a local machine is mostly that you can use multi-GNSS 
 signals. The web app is GPS only. For applications with a daily average, such as snow accumulation, 
 GPS can be enough. But for tides you generally want as many measurements as 
 possible, and that means multi-GNSS. The other

@@ -29,16 +29,17 @@ Results are presented with azimuth and amplitude colors to help you modify QC ch
 <img src="../_static/sc02-2.png" width="600"/>
 
 Whle this code is meant to be used AFTER you have chosen an analysis strategy, you can 
-apply new azimuth and amplitude constraints on the commandline, <code>-azim1, azim2, ampl</code>.
+apply new azimuth and amplitude constraints on the commandline, <code>-azim1, -azim2, -ampl</code>.
 
 The second section of <code>subdaily</code> is related to the RHdot correction. You must explicitly ask for it. 
 There are lots of ways to apply the RHdot correction - I am only providing a simple one at this point.  
 The RHdot correction requires you know 
-- the average of the tangent of the elevation angle during an arc, 
-- edot, elevation angle rate of change with respect to time) 
-- RHdot (RH rate of change with respect to time)  
 
-The first two are trivial to compute and are included in the results file in column 13 as the edotF. 
+- the average of the tangent of the elevation angle during an arc 
+- edot, the elevation angle rate of change with respect to time 
+- RHdot, the RH rate of change with respect to time  
+
+The first two are (fairly) trivial to compute and are included in the results file in column 13 as the edotF. 
 This edot factor has units of rad/(rad/hour), or hours. So if you know RHdot in units of meters/hour, 
 you can get the correction by simple multiplication. 
 
@@ -54,14 +55,14 @@ with <code>-spline_outlier N</code>, where N is in meters. It also makes an atte
 
 There are other ways to compute the RHdot correction:
 
-- computing tidal coefficients, and then iterating using the forward predictions of the tidal fit(Larson et al. 2013b)
-- estimating RHdot effect simultaneously with tidal coefficient (Larson et al. 2017). 
+- computing tidal coefficients, and then iterating using the forward predictions of the tidal fit (as in Larson et al. 2013b)
+- estimating RHdot effect simultaneously with tidal coefficient (as done in Larson et al. 2017). 
 - low-order tidal fit (Lofgren et al 2014)
 - direct inversion of the SNR data (Strandberg et al 2016 , Purnell et al. 2021)
 - estimate a rate and an acceleration term (Tabibi et al 2020)
 
-I am working to make some of these other methods available in this package.
-
+Because the spline is not very good at the beginning and end of the data, I was initially 
+removing ~6 hours of data from each end. I now use a pretty standard way to keep all the data.
 Here are some results from the SC02 site again - but now from the second section of the code. 
 In the bottom panel you can see that applying the RHdot correction at this site improves the 
 RMS fit from 0.15 to 0.11 meters.
@@ -69,8 +70,10 @@ RMS fit from 0.15 to 0.11 meters.
 <img src="../_static/sc02-3.png" width="600"/>
 
 After the RHdot correction has been applied, the code then estimates a new spline fit and 
-removes frequency-specific biases. Stats for this fit with respect to the spline fit 
-are printed to the screen. Three-sigma outliers with respect to the new fit are removed.
+attempts to remove frequency-specific biases **relative to GPS L1.** If GPS L1 is not being
+tracked, then it just uses the average of all frequencies. Stats 
+for this fit with respect to the spline fit are printed to the screen (and thus GPS L1 bias 
+should be zero). Three-sigma outliers with respect to the new fit are removed.
 In this example the RMS improves from 0.11 to 0.09 m. 
 
 <img src="../_static/sc02-5.png" width="600"/>
