@@ -32,13 +32,13 @@ nwot was also part of [PBO H2O](http://cires1.colorado.edu/portal/?station=nwot)
 The site has generally not been used by geodesists and there is very little useful information 
 about when data are available at either UNAVCO or Nevada Reno (i.e. no time series).
 After the original receiver failed in spring 2015, a new receiver was installed in late 2016 by 
-Mark Raleigh (then at CIRES, now at the University Oregon). Though the nwot receiver 
-may be tracking now, it has not been downloaded in some time and there is no working telemetry.
-We will focus on the data between 2009-2015.
+Mark Raleigh (then at CIRES, now at the University Oregon). The receiver stopped transmitting 
+in 2020 and was removed in 2022. We will focus on the data between 2009-2015.
 
 ### Make a SNR File and run quickLook
 
-We will start by making a single SNR file. Here there are two options. The main archive for this dataset only provides the high-quality
+We will start by making a single SNR file. Here there are two options. The main 
+archive for this dataset only provides the high-quality
 L2C data in the highrate (1-sec) area. We do not need this sample rate for GPS reflectometry,
 so to speed things up, we strongly encourage you to use the "special" archive option.  Here
 the 1-sec data have been decimated to 15 seconds:
@@ -47,7 +47,7 @@ the 1-sec data have been decimated to 15 seconds:
 
 If for any reason this command does not work, please use the direct command:
 
-*rinex2snr nwot 2014 270 -archive unavco -rate high -dec 15*
+<code>rinex2snr nwot 2014 270 -archive unavco -rate high -dec 15</code>
 
 Both L1 and L2C signals can be used at this site, though the L2C data are far superior in quality
 to the L1 data. Use this **quickLook** command to get a sense of the quality of the 

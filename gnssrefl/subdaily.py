@@ -197,7 +197,8 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     if nr == 0:
         print('No results in this file, so nothing to write out.')
         return
-    print(nr, ' observations will be written to ',outfile)
+    print(nr, ' observations will be written to:')
+    print(outfile)
     N= nr
     fout = open(outfile, 'w+')
     if extra:
@@ -950,138 +951,6 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
 
     return tv,t,rh,firstdoy,lastdoy
 
-def redo_spline(tnew,ynew,biasCorr_ynew,pltit,txtdir,station,testing):
-    """
-    having calculated and applied RHdot correction
-    AND applied the frequency biases, create new plots
-
-    Parameters
-    ----------
-    tnew : numpy array
-        day of year 
-    ynew : numpy array
-        float of reflector heights rhdot corrected (meters)
-    ynew : numpy array
-        float of reflector heights rhdot and freq bias corrected (meters)
-    pltit : boolean
-        plots to the screen
-    txtdir : string
-         directory for output (e.g. $REFL_CODE/Files)
-    station : string
-        station name used for the plot titles and filenames
-    testing : boolean
-        turns off "try" so you can see the error messages
-
-    Returns
-    -------
-    res : numpy array
-        residuals to spline fit, in meters
-
-    """
-    fs = 10 # font size
-    ynew = biasCorr_ynew
-    # now sort them again ....
-    ii = np.argsort(tnew)
-    tnew = tnew[ii]
-    ynew = ynew[ii]
-    outlierV = 0.5 # for now
-
-    # making a knot every three hours ...
-    knots_per_day = 8
-    Ndays = tnew.max()-tnew.min()
-    numKnots = int(knots_per_day*(Ndays))
-    NV = len(ynew)
-    print('>>>>>>>>>>>>>>>>>>> Redo Spline <<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-    print('First and last time values', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
-    print('Number of RH obs', NV)
-    print('Number of days of data: ', '{0:8.2f}'.format ( Ndays) )
-    print('Average obs per day', '{0:5.1f} '.format (NV/Ndays) )
-    print('Number of knots: ', numKnots)
-    # need the first and last knot to be inside the time series
-    firstKnot_in_minutes = 15
-    t1 = tnew.min()+firstKnot_in_minutes/60/24
-    t2 = tnew.max()-firstKnot_in_minutes/60/24
-    # try this
-    #
-    knots =np.linspace(t1,t2,num=numKnots)
-
-    # this crashes because I did not take care of the gaps.
-    if testing:
-        t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
-        spline = interpolate.BSpline(t, c, k, extrapolate=False)
-    else: 
-        try:
-            t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
-            spline = interpolate.BSpline(t, c, k, extrapolate=False)
-        except:
-            print('crashed on the interpolation stage')
-            sys.exit()
-
-    # user specifies how many values per day you want to send back to the user
-
-    # should i do extrapolate True? it is the default  - could make it periodic?
-    #spline = interpolate.BSpline(t, c, k, extrapolate=True)
-
-    # evenly spaced data - units of days
-    perday = 48 # so every 30 minutes in this case
-    N = int(Ndays*perday)
-    xx = np.linspace(tnew.min(), tnew.max(), N)
-    spl_x = xx; spl_y = spline(xx)
-    spline_at_tnew = spline(tnew)
-    N = len(spl_x)
-    kristine = False
-    if kristine:
-        ftest = open('Ktesting.txt', 'w+')
-        myyear = 2022
-        for i in range(0,N):
-            mjdish = g.fdoy2mjd(myyear,spl_x[i])
-            ftest.write('{0:9.4f} {1:7.3f} {2:12.6f} \n'.format( spl_x[i], spl_y[i], mjdish))
-
-        ftest.close()
-        
-
-    plt.subplot(211)
-
-
-    rms = np.std(ynew-spline_at_tnew)
-    newrms = str(round(rms,3))
-    print('std (m)', newrms)
-    label1 = 'RMS w/IF & new spline ' + str(newrms ) + 'm'
-
-
-    plt.plot(tnew,ynew,'k.')
-    plt.plot(tnew,biasCorr_ynew,'b.',label=label1)
-    plt.plot(spl_x, spl_y,'-',color='orange',label='spline fit')
-    plt.title(station + ' RH Obs and new spline fit after freq bias removed')
-    plt.legend(loc="upper right")
-    plt.xlabel('day of year'); 
-    plt.ylabel('meters')
-    plt.grid()
-    plt.gca().invert_yaxis()
-
-    ii = np.abs(ynew-spline_at_tnew) > 3*rms
-    jj = np.abs(ynew-spline_at_tnew) < 3*rms
-    res = ynew-spline_at_tnew
-    plt.subplot(212)
-    plt.plot(tnew,res,'b.', label='RH rms:' + newrms + ' m')
-    plt.plot(tnew[ii],res[ii],'r.',label='3sigma outliers')
-    #plt.title('residuals')
-    plt.xlabel('day of year'); 
-    plt.ylabel('meters')
-    plt.legend(loc="upper right")
-    plt.grid()
-    plt.gca().invert_yaxis()
-    Ntot = len(res)
-    Nout = len(res[ii])
-    print('Percentage of 3-sigma outliers', round(100*Nout/Ntot,2))
-    #
-    plotname = txtdir + '/' + station + '_final.png'
-    plt.savefig(plotname,dpi=300)
-    print('png file saved as: ', plotname)
-    if pltit:
-        plt.show()
-
-    return res
 
 def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
     """
@@ -1123,7 +992,7 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
 
     plt.grid()
     plt.title('surface velocity')
-    plt.ylim((-1.5,1.5))
+    #plt.ylim((-1.5,1.5))
     plt.ylabel('meters/hour')
     plt.xlabel('days of the year')
     plt.xlim((np.min(th), np.max(th)))
@@ -1310,7 +1179,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     Ndays = tnew.max()-tnew.min()
     numKnots = int(knots_per_day*(Ndays))
     print('First and last time values in the spline', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
-    print('Number of RH obs and Days ', len(h), Ndays)
+    print('Number of RH obs and Days ', len(h), np.round(Ndays,3))
     print('Average num of RH obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
     print('Knots per day: ', knots_per_day, ' Number of knots: ', numKnots)
     # currently using 3 sigma
@@ -1480,10 +1349,13 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     spline_whole_time = spline(th_even)
 
     newsigma = np.std(h-spline_at_GPS)
+    strsig = str(round(newsigma,3)) + '(m)'
+
+    # this is last plot -the one with new spline
 
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
-    plt.plot(th, h, '.', label='RH with RHdot/IFcorr')
+    plt.plot(th, h, '.', label='RH with RHdot/IFcorr ' + strsig)
     plt.plot(th_even, spline_whole_time, '-',label='newspline')
     plt.legend(loc="upper left")
     plt.grid()
@@ -1492,8 +1364,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.title('New spline with RHdot corr/IF biases/initial 3sigma outliers removed')
 
     plt.subplot(2,1,2)
-    label1 = 'newRMS ' + str(round(newsigma,3)) + '(m)'
-    plt.plot(th, h-spline_at_GPS, '.',label=label1)
+    plt.plot(th, h-spline_at_GPS, '.',label='all residuals')
     plt.title('Residuals to new spline fit')
     plt.grid()
     plt.ylabel('meters')
@@ -1505,6 +1376,15 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.legend(loc="upper left")
     print('RMS with frequency bias taken out (m) ', np.round(newsigma,3)  )
     g.save_plot(txtdir + '/' + station + '_rhdot4.png')
+
+    # was looking at issue of delT being too big
+    if  False:
+        plt.figure()
+        res = (h-spline_at_GPS)
+        plt.plot( tvd[ii,14],  res[ii], 'o', label='outlier')
+        plt.plot( tvd[:,14], res, '.',label='residuals')
+        plt.xlabel('delta Time (minutes)')
+
 
     if pltit:
         plt.show()
