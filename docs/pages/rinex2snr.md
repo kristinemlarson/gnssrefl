@@ -44,17 +44,20 @@ For python (very slow!):
 
 **Allowed GNSS Rinex 2.11 Data Archives:**
 
-- unavco
+- unavco (now Earthscope)
+- bev (Austria Federal Office of Metrology and Surveying)
+- bfg (German Water Research)
+- bkg (German Agency for Cartography and Geodesy)
+- cddis (only Hatanaka compressed files)
+- ga (Geoscience Australia)
+- jeff (Herr Professor Dr. Freymueller)
+- ngs (US National Geodetic Survey)
+- nrcan (Natural Resources Canada)
+- nz (GNS, New Zealand)
+- jp (Geospatial Information Authority of Japan)
 - sonel (global sea level observing system)
 - sopac (Scripps Orbit and Permanent Array Center)
-- cddis (only Hatanaka compressed files)
-- ngs (National Geodetic Survey)
-- nrcan (Natural Resources Canada)
-- bkg (German Agency for Cartography and Geodesy)
-- nz (GNS, New Zealand)
-- ga (Geoscience Australia)
-- bev (Austria Federal Office of Metrology and Surveying)
-- jp (Geospatial Information Authority of Japan)
+- special (set aside area at Unavco for GNSS-IR)
 
 **Example setting the archive:**
 
@@ -75,26 +78,30 @@ only uses four character statiion names, the last four values will be used as th
  
 **Examples using RINEX 3:**
 
-If your station name has 9 characters (lower case please), the code assumes you are looking for 
-a RINEX 3 file. However, my code will store the SNR data using the normal
-4 character name. *You must install the gfzrnx executable that translates RINEX 3 to 2 to 
-use RINEX 3 files in this code.* If you followed the instructions for installation, this 
+If your station name has 9 characters (lower case please), 
+the code assumes you are looking for a RINEX 3 file. 
+However, my code will store the SNR data using the normal
+4 character name. *You must install the gfzrnx executable 
+that translates RINEX 3 to 2 to use RINEX 3 files in 
+this code.* If you followed the instructions for installation, this 
 is already taken care of.
 
 <code>rinex2snr</code> currently supports RINEX3 for 30 second data at :
 
-- unavco
-- cddis
 - bev
 - bkg
+- bfg
+- cddis
 - epn
 - ga
-- bfg
 - sonel
+- unavco
 
-The caveat is that UNAVCO is set to 15 sec because that is mostly what is there.
-If you don't know where your data are, you can try <code>-archive all</code>, 
-which should try all archives in sequence. I believe the default archive is cddis.
+The caveat is that UNAVCO is set to 15 sec because that is 
+mostly what is there.
+If you don't know where your data are, you 
+can try <code>-archive all</code>, 
+which might try a few archives in sequence.
 
 <code>rinex2snr onsa00swe 2020 298</code>
 
@@ -104,7 +111,8 @@ which should try all archives in sequence. I believe the default archive is cddi
 
 <code>rinex2snr mchl00aus 2022 55 -archive ga</code>
 
-RINEX 3 has a file ID parameter that is a nuisance. If you know yours, you can set it 
+RINEX 3 has a file ID parameter that is a 
+nuisance. If you know yours, you can set it 
 with <code>-stream R</code> or <code>-stream S</code>. Because I think it is an 
 annoying thing, I look for both files without you having to set it. 
 
@@ -141,14 +149,17 @@ azimuth-specific mask is decided later when you run <code>gnssir</code>.  The SN
 - wum : Wuhan, multi-GNSS (precise+prediction, GPS,Galileo,Glonass,Beidou)
 - ultra : GFZ ultra rapid (GPS, Galileo, Glonass), since May 17, 2021 
 
-We are likely to add access to multi-GNSS broadcast orbits, but for now you can use the 
-ultra orbit option. Although it is provided every three hours, we currently only download the 
+We are likely to add access to multi-GNSS broadcast 
+orbits, but for now you can use the 
+ultra orbit option. Although it is provided every three 
+hours, we currently only download the 
 file from midnite (hour 0).
 
 **What if you are providing the RINEX files and you don't want the code to search for the files online?** 
 <code>-nolook True</code>
 
-Just put the RINEX files in the same directory where you are running the code, using my naming rules (lower case for RINEX 2.11).
+Just put the RINEX files in the same directory where 
+you are running the code, using my naming rules (lower case for RINEX 2.11).
 
 **What if you have high-rate (e.g. 1 sec) RINEX files, but you want 5 sec data?** <code>-dec 5</code>
 
@@ -156,15 +167,15 @@ Just put the RINEX files in the same directory where you are running the code, u
 
 If you invoke this flag, you need to specify the archive. Your choices for high-rate Rinex2 data are:
 
-- UNAVCO 
-- CDDIS
-- NRCAN  
+- unavco 
+- cddis
+- nrcan  
 
 For RINEX 3 high-rate data:
 
-- CDDIS
-- GA 
-- BKG
+- cddis
+- ga 
+- bkg
 
 For high-rate data, you should **never** use the python translation option.
 
