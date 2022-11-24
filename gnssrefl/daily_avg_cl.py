@@ -2,6 +2,7 @@
 import argparse
 import matplotlib.pyplot as matplt
 import os
+import sys
 
 # my code
 import gnssrefl.gps as g
@@ -9,14 +10,10 @@ import gnssrefl.daily_avg as da
 
 from gnssrefl.utils import str2bool
 
-# changes to output requested by Kelly Enloe for JN
-# two text files will now always made - but you can override the name of the average file via command line
-
-
 def parse_arguments():
     # must input start and end year
     parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="station name", type=str)
+    parser.add_argument("station", help="station name (4 ch only)", type=str)
     parser.add_argument("medfilter", help="Median filter for daily RH (m). Start with 0.25 ", type=float)
     parser.add_argument("ReqTracks", help="required number of tracks", type=int)
     parser.add_argument("-txtfile", default=None, type=str, help="Set your own output filename")
@@ -46,7 +43,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
         Parameters
         ----------
         station : string
-            4 or 9 character ID of the station.
+            4 ch station name 
 
         medfilter : float
             Median filter for daily reflector height (m). Start with 0.25
@@ -123,6 +120,10 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
             non-default subdirectory for Files output
 
     """
+    if len(station) != 4:
+        print('Station names must have four characters. Exiting.')
+        sys.exit()
+
     plt2screen = plt # since variable was originally this name 
     # make sure environment variables are set
     g.check_environ_variables()
