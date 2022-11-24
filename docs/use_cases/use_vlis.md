@@ -135,14 +135,31 @@ Reports how many satellites were used in each constellation:
 
 How the water levels look as a function of azimuth, constellation, and amplitude:
 
-<img src=../_static/vlis_2.png width=600>
+<img src=../_static/vlis_2.png width=800>
 
 Time series with large outliers removed.
 
 <img src=../_static/vlis-1.png width=600>
  
-For comparisons with the local tide gauge you can use our utility <code>download_ioc</code>. The tide gauge name is ... vlis!
-You just provide the time periods (I think it is currently limited to 30 days). If you say <code>-plt T</code> it makes a crude
+To make the RHdot correction:
+
+<code>subdaily vlis 2022 -rhdot T</code>
+
+<img src=../_static/vlis_rhdot3.png width=600>
+
+This compares with and without RHdot correction:
+
+<img src=../_static/vlis_rhdot2.png width=600>
+
+Then we remove an inter-frequency bias and refit a spline:
+
+<img src=../_static/vlis_rhdot4.png width=600>
+
+The RMS with respect to the spline fit starts over 0.325 m, improves to 0.276 m with RHdot,
+and finally 0.253 m with an IF bias removed.
+
+For comparisons with the local tide gauge you can use 
+our utility <code>download_ioc</code>. The tide gauge name is ... vlis! If you say <code>-plt T</code> it makes a crude
 plot for you.
 
 Additional corrections can be made using the <code>rhdot T</code> setting. I will add more information here when I get a chance.

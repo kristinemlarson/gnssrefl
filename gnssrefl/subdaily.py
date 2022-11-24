@@ -986,16 +986,15 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
     #plt.xlim((plot_begin, plot_end))
 
     plt.subplot(2,1,2)
+    A1 = np.min(th) ; A2 = np.max(th)
+    jj = (tvel >= A1) & (tvel <= A2)
     plt.plot(th, rhdot_at_th,'o',label='at GNSS obs')
-    plt.plot(tvel, yvel,'-', label='spline fit')
+    plt.plot(tvel[jj], yvel[jj],'-', label='spline fit')
     plt.legend(loc="upper left")
-
     plt.grid()
     plt.title('surface velocity')
-    #plt.ylim((-1.5,1.5))
-    plt.ylabel('meters/hour')
-    plt.xlabel('days of the year')
-    plt.xlim((np.min(th), np.max(th)))
+    plt.ylabel('meters/hour'); plt.xlabel('days of the year')
+    plt.xlim((A1,A2))
     g.save_plot(txtdir + '/' + station + '_rhdot3.png')
 
 

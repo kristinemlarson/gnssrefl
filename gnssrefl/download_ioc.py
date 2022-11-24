@@ -187,6 +187,10 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         newurl = url1 + station + '&timestart=' + date1 + '&timestop=' + date2 + url2
         print(newurl)
         data = requests.get(newurl).json()
+        NV = len(data)
+        if (len(data) <= 1):
+            print('No data. Exiting')
+            sys.exit()
     else: 
         ij = 0
         for m in range(month1, month2+1):
@@ -202,14 +206,15 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
                 data.extend(tdata)
             ij = ij + 1
 
-    NV = len(data)
-    print('number of records', NV)
-    if (NV < 2):
-        print('exiting')
-        sys.exit()
+        NV = len(data)
+        print('number of records', NV, ij)
+        if (NV <= ij):
+            print('No data. Could be station does not exist.  In any case, I am exiting')
+            sys.exit()
 
     fout = open(outfile,'w+')
     print('Writing IOC data to ', outfile)
+
     if csv:
         fout.write("# YYYY,MM,DD,HH,MM,Water(m),DOY, MJD, SS \n")
     else:
