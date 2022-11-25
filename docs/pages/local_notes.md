@@ -3,20 +3,19 @@ Possible one-week short short course:
 First Week - two hour max
 
 - Installation help session, Tim and Kelly
-(with hope that most people don't need this)
 
-- Basic Theory, How to Run the Code, How to make a good site?
-(the hope is that people would watch the videos, but whatever)
+- Basic Theory (Felipe) How to Run the Code (kristine), 
+(do we offer or make people watch the videos?)
 
-Second Week Only do applications ? Two hour max?
+Second Week Two hour max per day
 
-- Day 1 : Snow, ice sheets, lakes
+- Day 1 : Snow, ice sheets, lakes (me or Felipe?)
 
-- Day 2 : sea level (anything water with subdaily signal)
+- Day 2 : sea level (Simon)
 
-- Day 3 : soil moisture
+- Day 3 : soil moisture (me)
 
-- Day 4 : q/a session? free for all? maybe how to make a good site done here?
+- Day 4 : How to run your own site. good receiver (kristine) cheap sensors (Makan,Felipe,Simon)
 
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
