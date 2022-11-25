@@ -179,36 +179,33 @@ def load_sat_phase(station, year, year_end, freq):
     ----------
     station : str
         four character station name
-
     year : integer
         beginning year
-
     year_end : integer
         ending year
-
     freq : integer
         GPS frequency (1,20 allowed)
 
     Returns
     -------
     dataexist : bool
-
+        whether data found?
     year : numpy array of int
-       
+        full years
     doy : numpy array of int
-
+        days of year
     hr : float
         fractional day (UTC)
     ph : float
-        phase (deg)
+        phases (deg)
     azdata : float
-        azimuth (deg)
+        azimuths (deg)
     ssat : int
-        satellite (deg)
+        satellites (deg)
     rh : float
         reflector height (m)
     amp : float
-        amplitude of peak LSP 
+        amplitudes of peak LSP 
 
     results : ??
 
@@ -575,6 +572,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
             print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
             sys.exit()
 
+        # make datetime date array
         datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
 
         qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir)

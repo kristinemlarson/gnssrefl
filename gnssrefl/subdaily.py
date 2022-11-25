@@ -1209,6 +1209,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     obsPerHour= perday/24
 
     fig=plt.figure(figsize=(10,6))
+
     plt.subplot(2,1,1)
 
     tvel = spl_x[1:N]
@@ -1217,8 +1218,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     rhdot_at_th = np.interp(th, tvel, yvel)
     correction = xfac*rhdot_at_th
     correctedRH = h-correction
-
-
 
     # this is RH with the RHdot correction
     residual_before = h - spl_at_GPS_times
@@ -1276,7 +1275,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     # update the residual vector as well
     residual_after = residual_after[ii]
 
-    # make this plot as well
+    # make the RHdot plot as well
     rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir)
 
     writecsv = False ; extraline = ''
@@ -1314,7 +1313,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
             print('{0:3.0f} {1:7.3f} {2:7.3f} {3:6.0f}'.format (f, bias, sig, len(ret) ) )
 
 
-   # try extending the time series to improve spline fit
     tvd = np.loadtxt(fname_new,comments='%')
 
     # now try to write the bias corrected values

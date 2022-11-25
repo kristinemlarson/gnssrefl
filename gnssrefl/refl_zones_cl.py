@@ -13,8 +13,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('station', help='station', type=str)
-    parser.add_argument('-azim1', help='start azimuth (0-360) ', type=int)
-    parser.add_argument('-azim2', help='end azimuth (0-360) ', type=int)
+    parser.add_argument('-azim1', help='start azimuth (default is 0, negative values allowed) ', type=int)
+    parser.add_argument('-azim2', help='end azimuth (default is 360) ', type=int)
     parser.add_argument('-el_list', nargs="*",type=float,  help='elevation angle list, e.g. 5 10 15  (default)')
     parser.add_argument('-lat', help='Latitude (deg), if station not in database', type=float, default=None)
     parser.add_argument('-lon', help='Longitude (deg), if station not in database', type=float, default=None)

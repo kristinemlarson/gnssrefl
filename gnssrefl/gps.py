@@ -750,7 +750,6 @@ def getsp3file(year,month,day):
         try:
             #wget.download(url,file1)
             cddis_download_2022B(sec_file, sec_dir) 
-            #cddis_download(sec_file, sec_dir) 
             subprocess.call(['uncompress',file1])
             store_orbitfile(name,year,'sp3') 
         except:
@@ -3964,37 +3963,6 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
 
     return navfile
 
-def cddis_download(filename, directory):
-    """
-    https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html
-    attempt to use more secure download protocol that is CDDIS compliant
-
-    input: filename and directory (without leading location)
-
-    this will replace using wget.download when CDDIS turns off anonymous ftp
-
-    was supposed to returns whether file was created but now it just returns true
-#   --no-check-certificate
-
-    this is no longer used
-
-    """
-    # make sure there is a logs directory
-    if not os.path.isdir('logs'):
-        subprocess.call(['mkdir', 'logs'])
-    station = filename[0:4]
-    fn = 'logs/' + station + '_cddis.txt'
-    #cddislog = open(fn, 'w+') 
-    filename = 'ftps://gdc.cddis.eosdis.nasa.gov' + directory + filename 
-    callit = ['wget', '--ftp-user','anonymous','--ftp-password', 'kristine@colorado.edu', '-q','-nv','--no-check-certificate', filename]
-    subprocess.call(callit)
-    # try this new way - I am trying to send the messages to the file
-    #out = subprocess.run(callit, capture_output=True,text=True)
-    #cddislog.write(out.stderr)
-    #cddislog.close()
-    return True 
-
-
 def ydoy2useful(year, doy):
     """
 
@@ -5154,7 +5122,6 @@ def rinex3_nav(year,month,day):
     filename = bname + '.gz'
     print(dir_secure, filename)
     cddis_download_2022B(filename,dir_secure)
-    #cddis_download(filename,dir_secure)
     status = subprocess.call(['gunzip', filename])
     if os.path.exists(bname):
         foundit = True
@@ -5336,7 +5303,7 @@ def bfg_data(fstation, year, doy, samplerate=30,debug=False):
     """
     Picks up a RINEX3 file from BFG network
 
-    Parameters: 
+    Parameters 
     -----------
     fstation: string
         4 char station ID
@@ -5399,13 +5366,13 @@ def inout(c3gz):
     Takes a Hatanaka rinex3 file that has been gzipped
     gunzips it and decompresses it 
 
-    Parameter
-    -----------
+    Parameters
+    ----------
     c3gz : string
         name of a gzipped hatanaka compressed RINEX 3 filename
 
     Returns
-    --------
+    -------
     translated : boolean
         whether file was successfully translated or not 
 
@@ -5443,24 +5410,21 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
 
     Parameters
     -----------
-    station9 : string
+    station9 : str
         nine character station name appropriate for rinex 3
-    year : integer
-
-    doy : integer
+    year : int
+        full year
+    doy : int
         day of year
-
-    dec : integer
+    dec : int
         decimation value.  1 or 0 means no decimation
-
-    deleteOld : boolean
-        delete old rinex 3 files
+    deleteOld : bool
+        whether to delete old rinex 3 files
 
     Returns 
     -------
     rinex2 : string
         rinex2 filename created by merging 96 files!
-
     fexist : boolean
         whether a rinex2 file was successfully created
 
@@ -5547,31 +5511,11 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
     return rinex2, fexist
 
 
-def cddis_download_2022(filename,url):
-    """
-https://cddis.nasa.gov/Data_and_Derived_Products/CDDIS_Archive_Access.html
-
-this does not seem to work
-    """
-# Reads the URL from the command line argument
-
-# Makes request of URL, stores response in variable r
-    r = requests.get(url,timeout=2)
-
-# Opens a local file of same name as remote file for writing to
-    with open(filename, 'wb') as fd:
-        for chunk in r.iter_content(chunk_size=1000):
-            fd.write(chunk)
-
-# Closes local file
-    fd.close()
-
-
 def cddis_download_2022B(filename,directory):
     """
-    rewrote because cddis_download was failing
-    parameter:
-
+    allows downloads from CDDIS
+    Paramters
+    ---------
     filename : string
         name of the rinex file or orbit file
 
@@ -5586,7 +5530,6 @@ def cddis_download_2022B(filename,directory):
     ftps.cwd(directory)
     ftps.retrbinary("RETR " + filename, open(filename, 'wb').write)
     siz = os.path.getsize(filename)
-    # i do not think this is ever seen...
     if siz == 0:
         print('No file found')
         subprocess.call(['rm',filename])
@@ -5596,27 +5539,23 @@ def getnavfile_archive(year, month, day, archive):
     picks up nav file from a specific archive and stores it in the ORBITS directory
 
     Parameters
-    -----------
+    ----------
     year: integer
-
+        full year
     month: int
         if day is zero, the month value is really the day of year
-
     day: int
         day
-
     archive : str
         name of the GNSS archive. currently allow sopac and esa
 
     Returns
-    ----------
+    -------
     navname : str
         name of navigation file (should always be auto???0.yyn, so unclear to me 
         why it is sent)
-
     navdir : string
         location of where the file has been stored
-
     foundit : boolean
         whether the file was found
 
@@ -5626,9 +5565,7 @@ def getnavfile_archive(year, month, day, archive):
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
     navname,navdir = nav_name(year, month, day)
 
-
     foundit = check_navexistence(year,month,day)
-    
 
     if (not foundit):
         if (archive == 'esa'):
@@ -5661,8 +5598,7 @@ def check_navexistence(year,month,day):
     month : int
         month or doy if day is zero
     day : int
-        0 i you would to submit doy in month place
-
+        0 if you would to submit doy in month place
 
     Returns 
     -------

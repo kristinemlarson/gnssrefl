@@ -31,7 +31,7 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir):
     fr : int
         frequency
 
-    datetime_dates: ...
+    datetime_dates : ...
 
     tv : list of results
 
@@ -67,7 +67,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
 
     Parameters
     ----------
-    station : string
+    station : str
         4 ch station name
 
     medfilter : float
@@ -127,13 +127,15 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
 
 def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
     """
+    makes a plot of volumetric water content
+
     Parameters
     ----------
     station : string
         4 ch station name
 
     t_datetime : datetime 
-        observation times
+        observation times for measurements
 
     vwcdata : numpy array of floats (I think)
         volumetric water content
@@ -173,18 +175,17 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
 
-
 def read_apriori_rh(station,fr):
     """
-    read the track dependent a prori reflector heights needed for
+    read the track dependent a priori reflector heights needed for
     phase & thus soil moisture.
 
     Parameters
     ----------
-    station : string
+    station : str
         four character ID, lowercase
 
-    fr : integer
+    fr : int
         frequency (e.g. 1,20)
 
     Returns
@@ -238,6 +239,21 @@ def test_func(x, a, b, rh_apriori):
 def test_func_new(x, a, b, rh_apriori,freq):
     """
     This is least squares for estimating a sine wave given a fixed frequency, freqLS
+    now freq is input so it is not hardwired for L2
+
+    Parameters
+    ----------
+    x : numpy array of floats
+        sine(elevation angle) I think
+    a : float
+        amplitude  - estimated
+    b : float
+        phase  - estimated
+    rh_apriori : float
+        reflector height (m)
+    freq : int 
+        frequency
+
     """
     if (freq == 20) or (freq == 2):
         freq_least_squares = 2*np.pi*2*rh_apriori/g.constants.wL2
@@ -368,7 +384,10 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                                 #test_function_apriori = partial(test_func, rh_apriori=rh_apriori)
                                 params, params_covariance = optimize.curve_fit(test_function_apriori, x_data, y_data, p0=[2, 2])
     
+
+                                # change phase to degrees
                                 phase = params[1]*180/np.pi
+                                # calculate min and max elevation angle
                                 min_el = min(x); max_el = max(x)
                                 amp = np.absolute(params[0])
                                 raw_amp = params[0]
@@ -377,6 +396,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                                     if phase > 360:
                                         phase = phase - 360
 
+                                # do not allow negative amplitudes. 
                                 if raw_amp < 0:
                                     phase = phase + 180
 
@@ -417,28 +437,21 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
 
     Parameters
     -----------
-    station : string
+    station : str
         4 char station name
-
-    year : integer
+    year : int
         beginning year
-
-    year_end : integer
+    year_end : int
         last year
-
     plt2screen : boolean
         plots come to the screen
-
     fr : integer
         frequency
         default is L2C (20)
-
     polyorder : integer
         override on the polynomial order used in leveling
-
     circles : boolean
         final plot using circles (instead of line)
-
     subdir : str
         subdirector for $REFL_CODE/Files
 
