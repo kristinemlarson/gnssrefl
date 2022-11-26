@@ -35,6 +35,7 @@ def parse_arguments():
     parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     parser.add_argument("-extension", default=None, type=str, help="Provide extension name so you can try different strategies")
+    parser.add_argument("-ediff", default=None, type=str, help="ediff (degrees) default is 2")
 #    parser.add_argument('-az_list', nargs="*",type=float,  help='azimuth min/max, e.g. 0 180  )')
 
 
@@ -52,7 +53,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               h1: float = 0.5, h2: float = 6.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.7, ampl: float = 6.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = None  ):
+              extension: str = None, ediff: float=2.0  ):
 
     """
 
@@ -122,6 +123,10 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     az_list : list of floats
         azimuth min and max (for now)
         default is 0 to 360
+
+    ediff : float
+        quality control parameter (Degrees)
+        default is 2
 
     """
 
@@ -199,7 +204,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         lsp['pele'] = [usethis, 30] # elevation angles used for DC removal
     else:
         lsp['pele'] = [5, 30] # elevation angles used for DC removal
-    lsp['ediff'] = 2 # degrees
+    lsp['ediff'] = ediff # degrees
     lsp['desiredP'] = 0.005 # precision of RH in meters
     # azimuth regions in degrees (in pairs)
     # you can of course have more subdivisions here
