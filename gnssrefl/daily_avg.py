@@ -363,7 +363,6 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
     plt.savefig(pltname)
     print('Daily average RH png file saved as: ', pltname)
 
-#   new plot of reflector amplitudes as of November 8, 2021
     minyear = int(np.min(tv[:,0])); maxyear = int(np.max(tv[:,0]))
     maxA = np.max(meanAmp); minA = np.min(meanAmp)
     #print(minyear,maxyear,minA,maxA)

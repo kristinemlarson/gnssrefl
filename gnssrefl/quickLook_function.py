@@ -391,7 +391,7 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     function of azimuth
 
     Parameters
-    -----------
+    ----------
     fname : str
         filename
     station : str
@@ -415,8 +415,9 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     e2 : float
         maximum elevation angle (deg)
 
-    plot is written to :
-    os.environ['REFL_CODE'] + '/Files/station/quickLook_summary.png'
+    Returns
+    -------
+    plot is written $REFL_CODE/Files/station/quickLook_summary.png
 
     """
     try:
