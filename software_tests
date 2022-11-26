@@ -76,6 +76,7 @@ rinex2snr mchl00aus 2018 1 -archive cddis  -overwrite T
 
 rinex2snr p041 2018 1 -archive unavco -rate high -dec 15 -overwrite T
 
+exit
 # testing quickLook
 #
 #
