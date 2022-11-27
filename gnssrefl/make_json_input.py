@@ -36,6 +36,7 @@ def parse_arguments():
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     parser.add_argument("-extension", default=None, type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-ediff", default=None, type=str, help="ediff (degrees) default is 2")
+    parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75")
 #    parser.add_argument('-az_list', nargs="*",type=float,  help='azimuth min/max, e.g. 0 180  )')
 
 
@@ -53,7 +54,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               h1: float = 0.5, h2: float = 6.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.7, ampl: float = 6.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = None, ediff: float=2.0  ):
+              extension: str = None, ediff: float=2.0, delTmax: float=75.0  ):
 
     """
 
@@ -127,6 +128,11 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     ediff : float
         quality control parameter (Degrees)
         default is 2
+
+    delTmax : float
+        maximum allowed arc length (minutes)
+        default is 75, appropriate for snow or soil moisture
+        should be shorter (30 minutes or so) for tidal regimes
 
     """
 
@@ -259,7 +265,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     lsp['pltname'] = station + '_lsp.png'
 
     # how long can the arc be, in minutes
-    lsp['delTmax'] = 75  # - this is appropriate for 5-30 degrees
+    lsp['delTmax'] = delTmax  
  
 
     print('writing out to:', outputfile)
