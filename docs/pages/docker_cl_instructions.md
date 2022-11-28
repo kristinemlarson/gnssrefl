@@ -1,7 +1,6 @@
-# Assistance on deploying the gnssrefl [docker image from dockerhub](https://hub.docker.com/r/unavdocker/gnssrefl)
-April 27, 2022
+# Assistance on deploying the gnssrefl [docker image from GitHub Container Registry](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
 
-Please send your feedback on these instructions to Tim Dittmann at UNAVCO .
+Please send your feedback on these instructions to Tim Dittmann at UNAVCO, or better still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
 
 for jupyter notebook version, please see [gnssrefl_jupyter instructions](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 ## Install Docker
@@ -18,7 +17,7 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 
 ## Run gnssrefl Docker
 * cd into the local directory that you wish to keep your processed results
-* <code>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files --name gnssrefl unavdocker/gnssrefl:latest /bin/bash</code>
+* <code>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash</code>
 
 Description of the commands used:  
 
@@ -38,7 +37,7 @@ into <code>refl_code/rinex/station/yyyy/</code>, where station is the lowercase 
 You should then mount that directory in the docker run command as follows: 
 
 <code> docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ 
--v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl unavdocker/gnssrefl:latest /bin/bash </code>
+-v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
 
 
 ### Shutdown Docker <a name="Shutdown"></a>
@@ -64,10 +63,10 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 * Docker run commands have slightly different syntax to accomodate windows directories in volume mounting:
 	* Windows Power Shell:
 
-<code>docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ -v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl unavdocker/gnssrefl:latest /bin/bash </code>
+<code>docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ -v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
 	* Windows Command Line:
 
-<code>docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ -v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl unavdocker/gnssrefl:latest /bin/bash </code>
+<code>docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ -v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
 
 * execute docker run command (see above) in terminal window
 * Feedback from jupyter notebook user:
