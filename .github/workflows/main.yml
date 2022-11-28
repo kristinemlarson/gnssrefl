@@ -3,7 +3,7 @@ name: ci
 on:
   push:
     branches:
-      - 'github_container_cicd'
+      - 'master'
 
 jobs:
   build:
