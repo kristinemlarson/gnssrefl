@@ -541,8 +541,10 @@ def spline_in_out(x,y,knots_per_day):
     Parameters
     ----------
     x : numpy of floats
+        time of observations in fractional days
 
     y : numpy of floats
+        reflector heights in meters
 
     knots_per_day : int
         number of knots per day
@@ -550,7 +552,7 @@ def spline_in_out(x,y,knots_per_day):
     Returns
     -------
     xx : numpy of floats
-        times
+        regularly spaced observations
 
     spline(xx): numpy of floats
         spline value at those times
@@ -583,7 +585,6 @@ def write_out_header(fout,station,extraline,**kwargs):
 
     extraline : bool
         not sure why this is here
-
 
     """
     extra_columns = kwargs.get('extra_columns',False)
@@ -790,7 +791,8 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
 
     Parameters
     ----------
-    otimes - datetime object
+    otimes - numpy array of datetime objects ?
+        observation times
 
     tv - variable with the gnssrefl results
 

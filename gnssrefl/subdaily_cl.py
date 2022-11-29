@@ -109,10 +109,10 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     azim2: int, optional
         New max azimuth
         default is 360.
-    h1: integer optional (should really be a float)
+    h1: float optional 
         lowest allowed reflector height
         default is 0
-    h2: integer optional (should really be a float)
+    h2: float optional 
         highest allowed reflector height
         default is 300
     peak2noise: float, optional

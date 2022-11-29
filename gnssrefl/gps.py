@@ -86,7 +86,6 @@ class wgs84:
 def myfavoriteobs():
     """
     returns list of SNR obs needed for gfzrnx. 
-    2022 nov 17
 
     """
     # not even sure why i have C here for beidou
@@ -110,21 +109,21 @@ def ydoych(year,doy):
 
     Parameters
     ----------
-    year : integer
-        year
+    year : int
+        full year
 
-    doy : integer
+    doy : int
         day of year
 
     Returns
     -------
-    cyyyy : string
+    cyyyy : str
         4 character year
 
-    cyy : string
+    cyy : str
         2 character year
 
-    cdoy : string
+    cdoy : str
         3 character day of year
 
     """
@@ -235,7 +234,7 @@ def define_filename_prevday(station,year,doy,snr):
         4 character station name  
 
     year : int
-        year
+        full year
 
     doy : int
         day of year
@@ -310,7 +309,6 @@ def rot3(vector, angle):
     ----------
     vector : 3 vector
         float
-
     angle : float
         radians
 
@@ -371,7 +369,7 @@ def xyz2llh(xyz, tol):
 
 def xyz2llhd(xyz):
     """
-    converts three vector from cartesian coordinates to latitude,longitude,height
+    Converts cartesian coordinates to latitude,longitude,height
 
     Parameters
     ----------
@@ -412,7 +410,7 @@ def xyz2llhd(xyz):
 
 def zenithdelay(h):
     """
-    the output is a very simple zenith troposphere delay in meters
+    a very simple zenith troposphere delay in meters
     this is NOT to be used for precise geodetic applications
 
     Parameters
@@ -506,97 +504,6 @@ def elev_angle(up, RecSat):
     ang = np.arccos(np.dot(RecSat,up) / (norm(RecSat)))
     angle = np.pi/2.0 - ang
     return angle
-
-def sp3_interpolator(t, tow, x0, y0, z0, clock0):
-    """
-    interpolator for SP3 satellite coordinates 
-
-    Parameters
-    ----------
-    t : float
-        Time you want the Cartesian orbit for (GPS seconds)
-
-    tow :  float
-        GPS seconds for the satellite values
-
-    x0 : float
-        X satellite coordinates (km)
-
-    y0 : float
-        Y satellite coordinates (km)
-
-    z0 : float
-        Z satellite coordinates (km)
-
-    clock0 : float
-        clock correction in microseconds
-
-    Returns
-    -------
-    x : float
-        X satellite coordinate (m)
-     
-    y : float
-        Y satellite coordinate (m)
-    z : float
-        Z satellite coordinate (m)
-
-    clock : float
-        microseconds?
-
-    Do not use this code for precise geodetic applications.
-
-    """
-    # ryan set it to 7 - which is not recommended by the paper
-    # ryan confirmed that he doesn't know why this doesn't work ...
-    n = 7 # don't know why this was being sent before
-    coeffs = np.zeros((len(t), 3, n))
-    # whatever ryan was doing was not allowed here.  had to make
-    # sure these are treated as integers
-    s1 = int(-(n-1)/2)
-    s2 = int((n-1)/2+1)
-#    print(s1,s2)
-    
-    omega = 2*2*np.pi/(86164.090530833)
-    x = np.zeros(len(t))
-    y = np.zeros(len(t))
-    z = np.zeros(len(t))
-    clockf = interp1d(tow, clock0, bounds_error=False, fill_value=clock0[-1])
-    clock = clockf(t)
-    # looks like it computes it for a number of t values?
-    for i in range(len(t)):
-        # sets up a matrix with zeros in it - 7 by 7
-        independent = np.matrix(np.zeros((n, n)))
-        # no idea what this does ...
-        m = np.sort(np.argsort(np.abs(tow-t[i]))[:n])
-        tinterp = tow[m]-np.median(tow[m])
-        # set x, y, and z to zeros
-        xr = np.zeros(n)
-        yr = np.zeros(n)
-        zr = np.zeros(n)
-        # coefficients are before and after the time
-        for j in range(s1, s2):
-            independent[j] = np.cos(np.abs(j)*omega*tinterp-(j > 0)*np.pi/2)
-        for j in range(n):
-            xr[j], yr[j], zr[j] = rot3(np.array([x0[m], y0[m], z0[m]]).T[j], omega/2*tinterp[j])
- #           print(j, xr[j], yr[j], zr[j])
-			
-        independent = independent.T
-        eig =  np.linalg.eig(independent)
-        iinv  = (eig[1]*1/eig[0]*np.eye(n)*np.linalg.inv(eig[1]))
-# set up the coefficients
-        coeffs[i, 0] = np.array(iinv*np.matrix(xr).T).T[0]
-        coeffs[i, 1] = np.array(iinv*np.matrix(yr).T).T[0]
-        coeffs[i, 2] = np.array(iinv*np.matrix(zr).T).T[0]
-        
-        j = np.arange(s1, s2)
-        # time since median of the values?
-        tx = (t[i]-np.median(tow[m]))
-        r_inertial =  np.sum(coeffs[i][:, j]*np.cos(np.abs(j)*omega*tx-(j > 0)*np.pi/2), -1)
-
-        x[i], y[i], z[i] = rot3(r_inertial, -omega/2*tx)
-        # returns xyz, in meters ? and satellite clock in microseconds
-        return x*1e3, y*1e3, z*1e3, clock
  
 def dec31(year):
     """
@@ -1054,12 +961,12 @@ def kgpsweekC(z):
     converts RINEX timetag line into integers/float
 
     Parameters
-    ------------
+    ----------
     z : str
         timetag from rinex file (YY MM DD MM SS.SSSS )
 
     Returns
-    --------
+    -------
     gpsw : integer
         GPS week
 
@@ -2037,20 +1944,31 @@ def glonass_channels(f,prn):
     if (f == 102):
         l = lightSpeed/(L2 + ch*dL2)
     return l
+
 def open_outputfile(station,year,doy,extension):
     """
-    inputs: station name, year, doy, and station name
-    opens output file in REFL_CODE/year/results/station directory
-    return fileID
-    if the results directory does not exist, it tries to make it. i think
-    june 2019, added snrending to output name
-    july 2020, no longer open frej file
+    opens output file in 
+    REFL_CODE/year/results/station/extension directory
+
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+    year : int
+        full year
+    doy : int
+        day of year
+    extension : str
+        analysis extension name (for storage of results)
+
+    Returns
+    -------
+    fileID : ?
+
     """
     if os.path.isdir('logs'):
         skippingxist = True
-        #print('log directory exists')
     else:
-        #print('making log directory ')
         subprocess.call(['mkdir', 'logs'])
     fout = 0
 #   primary reflector height output goes to this directory
@@ -2058,13 +1976,8 @@ def open_outputfile(station,year,doy,extension):
     cdoy = '{:03d}'.format(doy)
 #   extra file with rejected arcs
     w = 'logs/reject.' + str(year) + '_' + cdoy  + station + '.txt'
-#    print('open output file for rejected arcs',w)
-    #frej=open(w,'w+')
-#    frej=open('reject.txt','w+')
-#   put a header in the file
-#    frej.write("%year, doy, maxF,sat,UTCtime, Azim, Amp,  eminO, emaxO,  Nv,freq,rise,Edot, PkNoise,  DelT,   MJD \n")
+
     filedir = xdir + '/' + str(year)  + '/results/' + station 
-#    filepath1 =  filedir + '/' + cdoy  + '.txt'
 #   changed to a function
     filepath1,fexit = LSPresult_name(station,year,doy,extension)
     #print('Output will go to:', filepath1)
@@ -2091,6 +2004,7 @@ def open_outputfile(station,year,doy,extension):
             print('problems opening the file')
             sys.exit()
     frej = 100
+
     return fout, frej
 
 def removeDC(dat,satNu, sat,ele, pele, azi,az1,az2,edot,seconds):
@@ -2775,7 +2689,7 @@ def rewrite_tseries(station):
     file and write a new file that is more human friendly
 
     Parameters
-    -----------
+    ----------
     station : string
         4 character station name
     """
@@ -2883,6 +2797,8 @@ def llh2xyz(lat,lon,height):
 
 def LSPresult_name(station,year,doy,extension):
     """
+    makes name for the Lomb Scargle output
+
     Parameters
     ----------
     station : str
@@ -3019,9 +2935,23 @@ def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNois
         
 def define_quick_filename(station,year,doy,snr):
     """
-    given station name, year, doy, snr type
-    returns snr filename but without default directory structure
-    19mar25: return compressed filename too
+
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+    year : int
+        full year
+    doy : int
+        day of year
+    snr : int
+        snr file type (66,88, etc)
+
+    Returns 
+    -------
+    f : str
+        filename
+
     """
     cyyyy, cyy, cdoy = ydoych(year,doy)
     f= station + str(cdoy) + '0.' + cyy + '.snr' + str(snr)
@@ -3029,6 +2959,8 @@ def define_quick_filename(station,year,doy,snr):
 
 def update_quick_plot(station, f):
     """
+    updates plot in quickLook
+
     Parameters
     ----------
     station : str
@@ -4857,27 +4789,24 @@ def ultra_gfz_orbits(year,month,day,hour):
 
 def rinex_unavco(station, year, month, day):
     """
-    This is being used by the vegetation code!!!!!
+    This is being used by the vegetation code
+    picks up a RINEX 2.11 file from unavco low-rate area
+    requires Hatanaka code
 
-    picks up a RINEX file from default unavco area, i.e. not highrate.  
-    it tries to pick up an o file,
-    but if it does not work, it tries the "d" version, which must be
-    decompressed.  the location of this executable is defined in the crnxpath
-    variable. 
-
-    station: string 
+    Parameters
+    ----------
+    station: str
+        4 ch station name
 
     year : integer
+        full year
 
     month : integer
+        month or day of year
 
     day: integer
+        day of month or zero
 
-    WARNING: only rinex version 2.11 in this world
-
-    if day is zero, assumes month is really doy
-
-    21sep01  changed from ftp to https
     """
     exedir = os.environ['EXE']
     crnxpath = hatanaka_version()  # where hatanaka will be
@@ -4971,19 +4900,26 @@ def avoid_cddis(year,month,day):
 
 def rinex_jp(station, year, month, day):
     """
-    author: Naoya Kadota
-    2021oct25
     Picks up RINEX file from Japanese GSI GeoNet archive
     URL : https://www.gsi.go.jp/ENGLISH/index.html
 
+    Parameters
+    ----------
     station : string
+        station name
 
     year : integer
+        full year
 
     month: integer
+        month or day of year
 
     day : integer
+        day of month or zero
     """
+    # allow it to be called with day of year
+    doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+
     fdir = os.environ['REFL_CODE']
     if not os.path.isdir(fdir):
         print('You need to define the REFL_CODE environment variable')
@@ -5513,13 +5449,14 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
 
 def cddis_download_2022B(filename,directory):
     """
-    allows downloads from CDDIS
-    Paramters
-    ---------
-    filename : string
+    download code for CDDIS
+
+    Parameters
+    ----------
+    filename : str
         name of the rinex file or orbit file
 
-    directory : string
+    directory : str
         where the file lives at CDDIS
 
     """
@@ -5543,9 +5480,9 @@ def getnavfile_archive(year, month, day, archive):
     year: integer
         full year
     month: int
-        if day is zero, the month value is really the day of year
+        calendar month, or day of year
     day: int
-        day
+        day of the month, or zero
     archive : str
         name of the GNSS archive. currently allow sopac and esa
 
@@ -5554,9 +5491,9 @@ def getnavfile_archive(year, month, day, archive):
     navname : str
         name of navigation file (should always be auto???0.yyn, so unclear to me 
         why it is sent)
-    navdir : string
+    navdir : str
         location of where the file has been stored
-    foundit : boolean
+    foundit : bool
         whether the file was found
 
     """
@@ -5598,7 +5535,7 @@ def check_navexistence(year,month,day):
     month : int
         month or doy if day is zero
     day : int
-        0 if you would to submit doy in month place
+        day of month or 0 
 
     Returns 
     -------
@@ -5691,7 +5628,7 @@ def geoidCorrection(lat,lon):
 
 def checkEGM():
     """
-    Downloads and stores EGM96 file for use in refl_zones 
+    Downloads and stores EGM96 file in REFL_CODE/Files for use in refl_zones
 
     Returns
     -------
@@ -5736,11 +5673,22 @@ def save_plot(plotname):
 
 def make_azim_choices(alist):
     """
+    not used yet
+
+    Parameters
+    ----------
+    alist : list of floats
+        azimuth pairs - must be even number of values, i.e.
+        [amin1, amax1, amin2, amax2]
+
+    azval : list of floats
+        azimuth regions for lomb scargle periodograms
+
     """
 # want to make a list for make_json_input
 # lsp['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
     if alist[0] < 0 | alist[-1] < 0 :
-        print('We do not currently allow negative azimuths')
+        print('We do not currently allow negative azimuths ')
         sys.exit()
 
     if len(alist) == 2:
@@ -5765,6 +5713,7 @@ def make_azim_choices(alist):
         print('We only allow one set of azimuth ranges at the current time') ; sys.exit()
 
     print('Input Azlist: ', alist, ' Output list ', azval)
+
     return azval
 
 def set_subdir(subdir):
