@@ -56,6 +56,7 @@ def readklsnrtxt(snrfile, thedir, signal):
     """
     parses the contents of a snrfile f
     the file itself is read in a separate function now, 
+    if SNR data are zero for a given signal, the row is eliminated
 
     Parameters
     ----------
@@ -68,16 +69,13 @@ def readklsnrtxt(snrfile, thedir, signal):
 
     Returns
     -------
-    snrdata : numpy array of floats 
-        columns 
-        0 - satellite, usual (100 added for glonass, 200 added for galileo)
-        1 - elev angle, deg
-        2 - azimuth angle, deg
-        3 - time in seconds since GPS began
-        4 - SNR data in db-Hz
-        5 - new column with wavelength in it, in meters.  might as well take care of that now
-
-    if SNR data are zero for a given signal, the row is eliminated
+    snrdata : numpy array of floats . Columns defined as:
+        0 : satellite, usual (100 added for glonass, 200 added for galileo)
+        1 : elev angle, deg
+        2 : azimuth angle, deg
+        3 : time in seconds since GPS began
+        4 : SNR data in db-Hz
+        5 : new column with wavelength in it, in meters.  
 
     """
     # do a straight load of the file
@@ -1615,14 +1613,30 @@ def save_lsp_results(datet,maxind,reflh_sub,sat,elvt,azit,pgram_sub,snrdt,pktn,i
     """
     just cleaning up - move the temp_arr definition to a function
     each column is defined below.
-    inputs are datet (seconds in GPSish time), 
-    reflh_sub (windowed rh?)
-    sat - satellite number
-    elvt - array of elevation angles(deg)
-    azit - array of azimuth angles (deg)
-    snrdt - is detrended SNR data (DC component removed)
-    pktn - peak 2 noise via Dave's definition
-    isignal - frequency, 1,2, or 5
+
+    Parameters
+    ----------
+    datet : float
+        seconds in GPSish time 
+    reflh_sub : numpy of floats?
+        windowed rh estimates
+    sat : int
+        satellite number
+    elvt : numpy array of floats 
+        elevation angles(deg)
+    azit : numpy array of floats
+        azimuth angles (deg)
+    snrdt : numpy array of floats
+        detrended SNR data (DC component removed)
+    pktn : float
+        peak 2 noise via Dave Purnell's definition
+    isignal : int
+        frequency, 1,2, or 5
+
+    Returns
+    -------
+    tmp_arr : numpy array (12 columns)
+
     """
 
     temp_arr = np.empty((1, 12), dtype=object)
@@ -1649,7 +1663,7 @@ def set_refraction_model(station, dmjd,lsp,imodel):
     imodel is 1 for simple refraction model
     eventually will add other refraction models
 
-    Parameter
+    Parameters
     ----------
     station : str
         4 ch station name
@@ -1659,6 +1673,15 @@ def set_refraction_model(station, dmjd,lsp,imodel):
         station information including latitude and longitude
     imodel : integer
         set to 1 (time varying off) or 0 (time varying on)
+
+    Returns
+    -------
+    p : float
+        pressure (units?)
+    T : float
+        temperature in deg C
+    irefr : int
+        number value written to output files to keep track of refraction model
 
     """
     xdir = os.environ['REFL_CODE']
@@ -1675,12 +1698,3 @@ def set_refraction_model(station, dmjd,lsp,imodel):
 
     return p,T,irefr
 
-            #if outfile_type == 'txt':
-            #    txt = True; ioutputfile= xdir + station + '_invsnr.txt'
-            #    iout = open(ioutputfile, 'w+')
-            #    iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('#'))
-            #else:
-            #    txt = False; ioutputfile= xdir + station + '_invsnr.csv'
-            #    iout = open(ioutputfile, 'w+')
-            #    iout.write("{0:s} YYYY MM DD HH MM SS   RH(m) doy  MJD \n".format('%'))
-            #print('invsnr output written to: ', ioutputfile)
