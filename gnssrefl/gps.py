@@ -2072,13 +2072,14 @@ def print_file_stats(ele,sat,s1,s2,s5,s6,s7,s8,e1,e2):
 
 
 def diffraction_correction(el_deg, temp=20.0, press=1013.25):
-    """ Computes and return the elevation correction for refraction in the atmosphere.
-
+    """ 
     Computes and return the elevation correction for refraction in the atmosphere such that the elevation of the
     satellite plus the correction is the observed angle of incidence.
 
     Based on an empirical model by G.G. Bennet.
     This code was provided by Chalmers Group, Joakim Strandberg and Thomas Hobiger
+    Bennett, G. G. The calculation of astronomical refraction in marine navigation.
+    Journal of Navigation 35.02 (1982): 255-259.
 
     Parameters
     ----------
@@ -2096,10 +2097,6 @@ def diffraction_correction(el_deg, temp=20.0, press=1013.25):
     corr_el_deg : 1d-array
         The elevation correction in degrees.
 
-    References:
-    ----------
-        Bennett, G. G. 'The calculation of astronomical refraction in marine navigation.'
-        Journal of Navigation 35.02 (1982): 255-259.
     """
     el_deg = np.array(el_deg)
 
@@ -2112,6 +2109,8 @@ def diffraction_correction(el_deg, temp=20.0, press=1013.25):
 
 def fdoy2mjd(year,fdoy):
     """
+    calculates modified julian day from year and fractional day of year
+
     Parameters
     ----------
     year : int
@@ -2140,16 +2139,17 @@ def mjd(y,m,d,hour,minute,second):
     Parameters
     ----------
     year : int
-
+        full year
     month : int
-
+        calendar month
     day : int
-
+        calendar day
     hour : int
-
+        hour of day
     minute : int
-        
+        minute of the day
     second : int
+        second of the day
 
     Returns
     -------
@@ -2228,9 +2228,19 @@ def getMJD(year,month,day,fract_hour):
 
 def update_plot(plt_screen,x,y,px,pz):
     """
-    input plt_screen integer value from gnssIR_lomb.
-    (value of one means update the SNR and LSP plot)
-    and values of the SNR data (x,y) and LSP (px,pz)
+    is this used?
+
+    plt_screen : int 
+        1 means update the plot
+    x : numpy array of floats 
+        elevation angles (deg)
+    y :  numpy array of floats
+        SNR data, volts/volts
+    px : numpy array of floats
+        periodogram, x-axis (meters)
+    pz : numpy array of floats 
+        periodogram, y-axis
+
     """
     if (plt_screen == 1):
         plt.subplot(211)  
@@ -2241,6 +2251,8 @@ def update_plot(plt_screen,x,y,px,pz):
 
 def open_plot(plt_screen):
     """
+    is this used?
+
     simple code to open a figure, called by gnssIR_lomb
     """
     if (plt_screen == 1):
@@ -2249,17 +2261,21 @@ def open_plot(plt_screen):
 
 def store_orbitfile(filename,year,orbtype):
     """
-    the function moves the file into the appropriate directory
+    Stores orbit files locally
 
-    inputs:
+    Parameters
+    ----------
+    filename : str
+        orbit filename
+    year : int 
+        full year
+    orbtype : str
+        kind of orbit (nav or sp3)
 
-    orbit filename 
-
-    year : integer 
-
-    orbtype : string 
-        (nav or sp3)
-
+    Returns
+    -------
+    xdir : str
+        local directory where the orbit belongs
 
     """
     # parent directory of the orbits for that year
@@ -2275,12 +2291,20 @@ def store_orbitfile(filename,year,orbtype):
         status = subprocess.call(['mv','-f', filename, xdir])
     else:
         print('The orbit file did not exist, so it was not stored')
+
     return xdir
 
 def make_snrdir(year,station):
     """
-    given a year and station name, it makes various directories needed
-    for SNR file/analysis outputs
+    makes various directories needed for SNR file/analysis outputs
+
+    Parameters
+    ----------
+    year : int
+        full year
+    station : str
+        4 ch station name
+
     """
     xdir = os.environ['REFL_CODE'] + '/' + str(year)
     # check that directories exist
@@ -2295,8 +2319,17 @@ def make_snrdir(year,station):
 
 def store_snrfile(filename,year,station):
     """
-    simple code to move an snr file to the right place 
-    inputs are the filename, the year, and the station name
+    move an snr file to the right place 
+
+    Parameters
+    ----------
+    filename  : str
+        name of SNR file
+    year : int
+        full year
+    station : str
+        4 ch station name
+
     """
     xdir = os.environ['REFL_CODE'] + '/' + str(year)
     # check that directories exist
@@ -2328,7 +2361,7 @@ def rinex_name(station, year, month, day):
     day : int 
 
     Returns
-    --------
+    -------
     fnameo : str
          RINEX 2.11 name
 
@@ -2349,19 +2382,20 @@ def snr_name(station, year, month, day,option):
 
     Parameters
     --------
-    station : string
+    station : str
+        4 ch station name
 
-    year : integer
+    year : int
 
-    month : integer
+    month : int
 
-    day : integer
+    day : int
 
-    option : integer
-        snr filename delimiter
+    option : int
+        snr filename delimiter, i.e. 66
 
     Returns
-    -----------
+    -------
     fname : string
         snr filename 
     """
@@ -2376,15 +2410,15 @@ def nav_name(year, month, day):
     returns the name and location of the navigation file
 
     Parameters
-    -------------
+    ----------
     year : integer
 
     month : integer
 
     day : integer
 
-    returns
-    ----------
+    Returns
+    -------
     navfilename : str
         name of the navigation file
 
@@ -2419,6 +2453,7 @@ def sp3_name(year,month,day,pCtr):
         old-style (lowercase) IGS name for sp3 file
     sp3dir : str
         where file is stored locally
+
     """
     name,clkn=igsname(year,month,day)
     gps_week = name[3:7]
