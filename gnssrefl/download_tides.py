@@ -109,7 +109,7 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
         month when first measurements will be downloaded
 
     year2 : integer
-        last yaer when measurements will be downloaded
+        last year when measurements will be downloaded
 
     month2 : integer 
         last month when measurements will be downloaded
@@ -346,44 +346,42 @@ def parse_arguments():
 
 def download_tides(station: str, date1: str, date2: str, output: str = None, plt: bool = False, datum: str = 'mllw', subdir: str = None):
     """
-        Downloads NOAA tide gauge files
-        Downloads a json and converts it to plain txt with columns!
-        (or csv)
+    Downloads NOAA tide gauge files and stores locally
+    If you ask for 31 days of data or less, it will download exactly what you ask for.
+    But if you want a longer time series, this code needs to query the NOAA API every month.
+    To make the code easier to write, I start with the first day of the first month you ask for and end with
+    last day in the last month.
 
-        Parameters 
-        ----------
-        station : str
-            7 character ID of the station.
+    Output is written to REFL_CODE/Files/ unless subdir optional input is set
+    Plot is sent to the screen if requested.
 
-        date1 : str
-            start date.
-            Example value: 20150101
+    Parameters 
+    ----------
+    station : str
+        7 character ID of the station.
 
-        date2 : str
-            end date.
-            Example value: 20150110
+    date1 : str
+        start date.
+        Example value: 20150101
 
-        output : string, optional
-            Optional output filename
-            default is None
+    date2 : str
+        end date.
+        Example value: 20150110
 
-        plt: boolean, optional
-            plot comes to the screen
-            default is None
+    output : string, optional
+        Optional output filename
+        default is None
 
-        datum: string, optional
-            set to lwd for lakes?
-            default is mllw
+    plt: boolean, optional
+        plot comes to the screen
+        default is None
 
-        subdir : str, optional
-            subdirectory for output in the $REFL_CODE/Files area
+    datum: string, optional
+        set to lwd for lakes?
+        default is mllw
 
-        If you ask for 31 days of data or less, it will downlaod exactly what you ask for.
-        But if you want a longer time series, this code needs to query the NOAA API every month.
-        To make the code easier to write, I start with the first day of the first month you ask for and end with
-        last day in the last month.
-
-        Output is written to REFL_CODE/Files/ unless subdir optional input is set
+    subdir : str, optional
+        subdirectory for output in the $REFL_CODE/Files area
 
     """
     g.check_environ_variables()
@@ -437,16 +435,17 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
     metadata = True
     if (deltad) > 31:
         tt,obstimes,slevel = multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv)
+        noaa_name = station # this is not hte right one ... but 
     else:
         tt = []; slevel = []; obstimes = []
         # 'data' are stored in the dictionary data
         data,error = pickup_from_noaa(station,date1,date2,datum,True)
         if not error:
+            noaa_name = data['metadata']['name']
             tt,obstimes,slevel = write_out_data(data,fout, tt,obstimes,slevel,csv)
 
     fout.close()
     if plt:
-        noaa_name = data['metadata']['name']
         quickp(station,obstimes,slevel,noaa_name)
 
 def main():
