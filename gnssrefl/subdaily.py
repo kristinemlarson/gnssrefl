@@ -1098,6 +1098,9 @@ def flipit(tvd,col):
     ynew = ynew[ii]
 
     # this is what should be used for the spline.
+    #plt.figure()
+    #plt.plot(tnew,ynew,'.')
+    #plt.show()
     return tnew, ynew
 
 
@@ -1287,6 +1290,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     print('Percent of observations removed:', round(100*(NV-nr)/NV,2))
 
     # now make yet another vector - this time to apply bias corrections
+    # this is horrible code and needs to be fixed
     biasCorrected_RH = correctedRH_new
 
     print('Check inter-frequency biases for GPS, Glonass, and Galileo\n')
@@ -1298,9 +1302,20 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
         print('Biases will be computed with respect to L1 GPS')
         L1exist = True
 
+    print(fname_new)
+    tvd_new = np.loadtxt(fname_new,comments='%')
+    nr,nc = tvd_new.shape
+    print('before', nr,nc)
+    onecol = np.zeros((nr,1)) # 
+
+    # add a column for the IF correction
+    tvd_new = np.hstack((tvd_new,onecol))
+    nr,nc = tvd_new.shape
+    print('now', nr,nc)
+
     print('Freq  Bias  Sigma   NumObs ')
     print('       (m)   (m)       ')
-    for f in [1, 2, 20, 5, 101, 102, 201, 205,207,208]:
+    for f in [1, 2, 20, 5, 20, 101, 102, 201, 205,206,207,208,302,306,307]:
         ff = (tvd_new[:,10] == f)
         ret = residual_after[ff]
         if len(ret) > 0:
@@ -1310,25 +1325,27 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
             if L1exist: # apply L1bias so that everything is relative to L1
                 bias = bias - L1bias
 
-            biasCorrected_RH[ff] = biasCorrected_RH[ff] - bias 
+            tvd_new[ff,24] = tvd_new[ff,22] - bias
+
+            # print stats to the screen
             sig = float(np.std(ret))
             print('{0:3.0f} {1:7.3f} {2:7.3f} {3:6.0f}'.format (f, bias, sig, len(ret) ) )
 
 
-    tvd = np.loadtxt(fname_new,comments='%')
-
     # now try to write the bias corrected values
-    bias_corrected_filename = fname_new + 'IF'; extraline = ''; writecsv = False
-    write_subdaily(bias_corrected_filename,station,tvd, writecsv,extraline, newRH_IF=biasCorrected_RH)
+    # first attempt was wrong because i forgot to sort the corrected column in biasCorrected_RH
+    #bias_corrected_filename = fname_new + 'IF'; extraline = ''; writecsv = False
+    biasCor_rh = tvd_new[:,24]
+    #write_subdaily(bias_corrected_filename,station,tvd_new, writecsv,extraline, newRH_IF=biasCor_rh)
 
+    #tvd = np.loadtxt(bias_corrected_filename,comments='%')
+    #tvd = tvd_new 
     # now use the bias corrected value
-    th = tvd[:,1] + tvd[:,4]/24 # days of year, fractional
-    tvd[:,22] = biasCorrected_RH # save this here because flipit will expect it
-    h = biasCorrected_RH
-
+    th = tvd_new[:,1] + tvd_new[:,4]/24 # days of year, fractional
+ 
     # add mirror time series at beginning and end of series for spline
-    column = 23 # tells the code which column to use. 
-    tnew, ynew = flipit(tvd,column)
+    column = 25 # tells the code which column to use. 
+    tnew, ynew = flipit(tvd_new,column)
 
     Ndays = tnew.max()-tnew.min()
     numKnots = int(knots_per_day*(Ndays))
@@ -1342,41 +1359,50 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
     # compute spline - use for times th
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
+
+
+    # calculate spline values at GPS time tags
     spline_at_GPS = spline(th)
     half_hourly = int(48*(th[-1] - th[0]))
+    # evenly spaced spline values
     th_even = np.linspace(th[0], th[-1],half_hourly );
     spline_whole_time = spline(th_even)
 
-    newsigma = np.std(h-spline_at_GPS)
+    newsigma = np.std(biasCor_rh-spline_at_GPS)
     strsig = str(round(newsigma,3)) + '(m)'
-
-    # this is last plot -the one with new spline
 
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
-    plt.plot(th, h, '.', label='RH with RHdot/IFcorr ' + strsig)
+    plt.plot(th, biasCor_rh, '.', label='RH with RHdot/IFcorr ' + strsig)
     plt.plot(th_even, spline_whole_time, '-',label='newspline')
     plt.legend(loc="upper left")
     plt.grid()
     plt.gca().invert_yaxis()
     plt.ylabel('meters')
-    plt.title('New spline with RHdot corr/IF biases/initial 3sigma outliers removed')
+    plt.title('New spline with RHdot corr/InterFreq corr/initial 3sigma outliers removed')
 
     plt.subplot(2,1,2)
-    plt.plot(th, h-spline_at_GPS, '.',label='all residuals')
+    plt.plot(th, biasCor_rh - spline_at_GPS, '.',label='all residuals')
     plt.title('Residuals to new spline fit')
     plt.grid()
     plt.ylabel('meters')
     plt.xlabel('days of the year')
 
     # identify 3 sigma outliers
-    ii = np.abs(h-spline_at_GPS)/newsigma > 3
-    plt.plot(th[ii], (h-spline_at_GPS)[ii], '.',label='3 sigma')
+    ii = np.abs(biasCor_rh -spline_at_GPS)/newsigma > 3
+    # points to keep
+    jj = np.abs(biasCor_rh -spline_at_GPS)/newsigma < 3
+    plt.plot(th[ii], (biasCor_rh -spline_at_GPS)[ii], '.',label='3 sigma')
     plt.legend(loc="upper left")
     print('RMS with frequency bias taken out (m) ', np.round(newsigma,3)  )
     g.save_plot(txtdir + '/' + station + '_rhdot4.png')
 
-    # was looking at issue of delT being too big
+    # bias corrected - and again without 3 sigma outliers
+    bias_corrected_filename = fname_new + 'IF'; extraline = ''; writecsv = False
+    biasCor_rh = tvd_new[jj,24]
+    write_subdaily(bias_corrected_filename,station,tvd_new[jj,:], writecsv,extraline, newRH_IF=biasCor_rh)
+
+    # I was looking at issue of delT being too big
     if  False:
         plt.figure()
         res = (h-spline_at_GPS)
