@@ -16,8 +16,19 @@ import wget
 import gnssrefl.gps as g
 import gnssrefl.computemp1mp2 as veg
 def in_winter(d):
-    """
+    """(td testing autodoc api generation)
+
     pretty silly winter screen tool
+
+    Parameters
+    ----------
+    d : int
+        day of year
+
+    Returns
+    -------
+    bool
+        True if doy is in winter, False if not considered "winter".
     """
     inwinter = False
     if (d < 105) or (d > 274):
