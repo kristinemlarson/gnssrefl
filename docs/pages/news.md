@@ -1,5 +1,11 @@
 ### News <a name="news"></a>
 
+December 1, 2022
+
+Fixed a bug in the new subdaily output file, (IF).  If you are using subdaily and want
+to use the interfrequency bias correction file created at the end, you need to download
+this version.
+
 November 8, 2022
 
 I fixed a bug in the download_ioc and download_noaa scripts. I had somehow failed to import the subprocess

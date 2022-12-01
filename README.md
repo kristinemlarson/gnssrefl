@@ -5,14 +5,13 @@
 
 # gnssrefl
 
-**github version: 1.1.12** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+**github version: 1.2.1** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 New Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
 
 
-We are [developing readthedocs documentation](https://gnssrefl.readthedocs.io/en/latest/). Unfortunately, it is not 
-100% functional yet. On github you should be able to continue using the links shown below. On pypi, only the readthedocs
-links work. Please be patient as we work through this process.
+We are [developing readthedocs documentation](https://gnssrefl.readthedocs.io/en/latest/). We are also creating 
+a new docker each time we upload the code to github. If you look to the right - see "Packages".
 
 All access to UNAVCO data will end October 1, 2022 unless [you sign up for an account there](https://www.unavco.org/data/gps-gnss/file-server/file-server-access-examples.html)**
 

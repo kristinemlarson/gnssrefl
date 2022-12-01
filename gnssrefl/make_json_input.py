@@ -61,7 +61,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     Parameters
     ----------
     station : string
-        4 or 9 character ID of the station.
+        4 character station ID.
 
     lat : float
         latitude in degrees.
