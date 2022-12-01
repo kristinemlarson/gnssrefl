@@ -35,7 +35,7 @@ class constants:
 #
 def quickname(station,year,cyy, cdoy, csnr):
     """
-    finds location/name of a SNR file
+    creates filename for a local SNR file
 
     Parameters 
     ----------
@@ -62,17 +62,18 @@ def quickname(station,year,cyy, cdoy, csnr):
     """
     xdir  = os.environ['REFL_CODE'] + '/'
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
+
     return fname
 
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
         mk,skipit,stream,strip):
     """
-    main code to convert RINEX files into SNR
+    main code to convert RINEX files into SNR files that are stored locally
 
     Parameters
     ----------
     station : string
-        4 or 9 character station name 
+        4 or 9 character station name. 6 ch allowed for japanese archive
 
     year_list : list of int 
         years to be analyzed
@@ -118,7 +119,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     mk : boolean
         makan option
 
-    skipit : boolean
+    skipit : int 
          skips making files every day, so a value of 7 means weekly.  1 means do every day
 
     strip : boolean
@@ -150,8 +151,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     else:
         print('Illegal station input - Station must have 4,6,or 9 characters. Exiting')
         sys.exit()
+
     year_st = year_list[0]
     year_end = year_list[-1]
+
     doy_st = doy_list[0]
     doy_end = doy_list[-1]
 
@@ -312,7 +315,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
         decimation value to reduce file size
 
     archive : str
-        location of the rinex files
+        external location (archive) of the rinex files
 
     fortran : bool
          whether fortran translator to be used.  this is here for backwards compatability

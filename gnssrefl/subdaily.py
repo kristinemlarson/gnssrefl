@@ -52,9 +52,9 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     """
     fig=plt.figure(figsize=(10,4))
 
-    plt.plot(tnew,ynew, '*', label='obs+fake obs')
+    plt.plot(tnew,ynew, 'b.', label='obs+fake obs')
     i = (spl_x > beginT) & (spl_x < endT) # to avoid wonky points in spline
-    plt.plot(spl_x[i],spl_y[i],'-', label='spline')
+    plt.plot(spl_x[i],spl_y[i],'c-', label='spline')
     plt.title('Mirrored obs and spline fit ')
     plt.legend(loc="upper left")
     plt.ylabel('meters')
@@ -980,7 +980,7 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
     """
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
-    plt.plot(th, correction,'.')
+    plt.plot(th, correction,'b.')
     plt.ylabel('meters',fontsize=fs);
     plt.xlim((np.min(th), np.max(th)))
     plt.grid()
@@ -990,8 +990,8 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
     plt.subplot(2,1,2)
     A1 = np.min(th) ; A2 = np.max(th)
     jj = (tvel >= A1) & (tvel <= A2)
-    plt.plot(th, rhdot_at_th,'o',label='at GNSS obs')
-    plt.plot(tvel[jj], yvel[jj],'-', label='spline fit')
+    plt.plot(th, rhdot_at_th,'bo',label='at GNSS obs')
+    plt.plot(tvel[jj], yvel[jj],'c-', label='spline fit')
     plt.legend(loc="upper left")
     plt.grid()
     plt.title('surface velocity')
@@ -1235,7 +1235,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     plt.plot(th, h, 'b.', label=label1,markersize=4)
     iw = (spl_x > th[0]) & (spl_x < th[-1])
-    plt.plot(spl_x[iw], spl_y[iw], 'r--', label='spline') # otherwise wonky spline makes a goofy plot
+    plt.plot(spl_x[iw], spl_y[iw], 'c--', label='spline') # otherwise wonky spline makes a goofy plot
 
     plt.plot(th,correctedRH,'m.',label=label2,markersize=4)
 
@@ -1253,7 +1253,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
 
     plt.subplot(2,1,2)
-    plt.plot(th, residual_after,'.',label='all pts')
+    plt.plot(th, residual_after,'r.',label='all pts')
 
 
     tvd_bad = tvd[np.abs(residual_after) >  3*sigmaAfter, :]
@@ -1266,7 +1266,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     correctedRH_new = correctedRH[ii]
     NV = len(correctedRH)
 
-    plt.plot(th[ii], residual_after[ii],'.',label='kept pts')
+    plt.plot(th[ii], residual_after[ii],'b.',label='kept pts')
     plt.grid()
     plt.title('Residuals to the spline fit')
     plt.xlabel('days of the year')
@@ -1302,16 +1302,13 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
         print('Biases will be computed with respect to L1 GPS')
         L1exist = True
 
-    print(fname_new)
     tvd_new = np.loadtxt(fname_new,comments='%')
     nr,nc = tvd_new.shape
-    print('before', nr,nc)
     onecol = np.zeros((nr,1)) # 
 
     # add a column for the IF correction
     tvd_new = np.hstack((tvd_new,onecol))
     nr,nc = tvd_new.shape
-    print('now', nr,nc)
 
     print('Freq  Bias  Sigma   NumObs ')
     print('       (m)   (m)       ')
@@ -1373,8 +1370,16 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
-    plt.plot(th, biasCor_rh, '.', label='RH with RHdot/IFcorr ' + strsig)
-    plt.plot(th_even, spline_whole_time, '-',label='newspline')
+    plt.plot(th, biasCor_rh, 'b.', label='RH with RHdot/IFcorr ' + strsig)
+    plt.plot(th_even, spline_whole_time, 'c-',label='newspline')
+
+    # identify 3 sigma outliers
+    ii = np.abs(biasCor_rh -spline_at_GPS)/newsigma > 3
+    # points to keep
+    jj = np.abs(biasCor_rh -spline_at_GPS)/newsigma < 3
+
+    plt.plot(th[ii], biasCor_rh[ii], 'rx', label='3-sig outliers' + strsig)
+
     plt.legend(loc="upper left")
     plt.grid()
     plt.gca().invert_yaxis()
@@ -1382,18 +1387,15 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.title('New spline with RHdot corr/InterFreq corr/initial 3sigma outliers removed')
 
     plt.subplot(2,1,2)
-    plt.plot(th, biasCor_rh - spline_at_GPS, '.',label='all residuals')
+    plt.plot(th, biasCor_rh - spline_at_GPS, 'b.',label='all residuals')
     plt.title('Residuals to new spline fit')
     plt.grid()
     plt.ylabel('meters')
     plt.xlabel('days of the year')
 
-    # identify 3 sigma outliers
-    ii = np.abs(biasCor_rh -spline_at_GPS)/newsigma > 3
-    # points to keep
-    jj = np.abs(biasCor_rh -spline_at_GPS)/newsigma < 3
-    plt.plot(th[ii], (biasCor_rh -spline_at_GPS)[ii], '.',label='3 sigma')
+    plt.plot(th[ii], (biasCor_rh -spline_at_GPS)[ii], 'r.',label='3-sig')
     plt.legend(loc="upper left")
+
     print('RMS with frequency bias taken out (m) ', np.round(newsigma,3)  )
     g.save_plot(txtdir + '/' + station + '_rhdot4.png')
 

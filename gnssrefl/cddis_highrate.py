@@ -1,9 +1,10 @@
-import gnssrefl.gps as g
-import sys
-import wget
-import subprocess
 import os 
+import subprocess
+import sys
 import time
+import wget
+
+import gnssrefl.gps as g
 
 def cddis_highrate(station, year, month, day,stream,dec_rate):
     """
@@ -151,16 +152,17 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
 
 def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
     """
+    creates rinex3 compliant file names and finds executables needed
+    to manipulate those files
 
     Parameters
     ----------
     station : str
-
+        9 ch station name
     year : int
-
+        full year
     doy : int
         day of year
-
     cyyyy : str
         4 ch year
     cyy : str
@@ -180,12 +182,10 @@ def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
         first hatanaka name 
     file_name2 : str
         second filename to look for
-
     crnx_name2 : str
         second hatanaka compressed name 
     exe1 : str
         uncompression executable to use for file_name
-
     exe2 : str
         uncompression executable to use for file_name2
 

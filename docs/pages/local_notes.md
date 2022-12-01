@@ -94,3 +94,5 @@ relative to L1
 (vwc, daily_avg, subdaily) and the plots for quickLook
 added IF bias correction to subdaily (but csv not working)
 added refl_zones utility
+
+1.2.1 fixed bug in subdaily. the output file of the IF correction was wrong
