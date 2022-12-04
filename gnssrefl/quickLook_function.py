@@ -188,12 +188,10 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     #  fontsize
     fs = 10
     # various defaults - ones the user doesn't change in this quick Look code
-    delTmax = 70
+    # changed this december 4, 2022
+    delTmax = 45 # this is how long an arc can be in minutes
     polyV = 4 # polynomial order for the direct signal
     desiredP = 0.01 # 1 cm precision
-
-
-    #ediff = 2 # this is a QC value, now explicitly sent from command line code
 
     #four_in_one = True # put the plots together
     minNumPts = 20 

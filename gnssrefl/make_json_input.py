@@ -36,7 +36,7 @@ def parse_arguments():
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     parser.add_argument("-extension", default=None, type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-ediff", default=None, type=str, help="ediff (degrees) default is 2")
-    parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75")
+    parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 45")
 #    parser.add_argument('-az_list', nargs="*",type=float,  help='azimuth min/max, e.g. 0 180  )')
 
 
@@ -54,9 +54,10 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               h1: float = 0.5, h2: float = 6.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.7, ampl: float = 6.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = None, ediff: float=2.0, delTmax: float=75.0  ):
+              extension: str = None, ediff: float=2.0, delTmax: float=45.0  ):
 
     """
+    Make a json file that describes the lomb scargle analysis strategy you will use in gnssrefl.
 
     Parameters
     ----------
@@ -131,15 +132,12 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
 
     delTmax : float
         maximum allowed arc length (minutes)
-        default is 75, appropriate for snow or soil moisture
-        should be shorter (30 minutes or so) for tidal regimes
+        default is 45, shorter than 75 it was before.
 
     """
 
     # make sure environment variables exist
     g.check_environ_variables()
-
-    #print(az_list)
 
     ns = len(station)
     if ns != 4:
@@ -148,6 +146,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
 
 # location of the site - does not have to be very good.  within 100 meters is fine
     query_unr = False
+# if you input lat and long as zero ...
     if lat + long == 0:
         print('Going to assume that you want to use the UNR database.')
         query_unr = True
