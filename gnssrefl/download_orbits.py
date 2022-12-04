@@ -25,7 +25,6 @@ def parse_arguments():
 def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None ):
     """
         command line interface for download_orbits
-        2022 nov 17
 
         Parameters
         ----------
@@ -41,9 +40,11 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
                 nav : GPS broadcast, adequate for reflectometry. Searches various places
 
-                nav-sopac : GPS broadcast, adequate for reflectometry. 
+                nav-sopac : GPS broadcast file from SOPAC, adequate for reflectometry. 
 
-                nav-esa : GPS broadcast, adequate for reflectometry. 
+                nav-esa : GPS broadcast file from ESA, adequate for reflectometry. 
+
+                nav-cddis : GPS broadcast file from CDDIS, very slow to download
 
                 igs : IGS precise, GPS only
 
@@ -77,7 +78,7 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
             day
 
          doy_end : integer - optional
-            allow multiple download
+            allow multiple day download
 
     """
 

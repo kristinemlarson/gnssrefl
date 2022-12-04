@@ -21,7 +21,7 @@ def parse_arguments():
     parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
     # optional arguments
     parser.add_argument("-rate", default='low', metavar='low', type=str, help="sample rate: low or high")
-    parser.add_argument("-archive", default=None, metavar='cddis',
+    parser.add_argument("-archive", default=None, 
                         help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan)", type=str)
     parser.add_argument("-version", default=None, metavar=2, type=int, help="rinex version (2 or 3)")
     parser.add_argument("-strip", default=None, type=str,
@@ -73,7 +73,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     archive : str, optional
         Select which archive to get the files from.
-        Default is None. value options:
+        Default is redirected to all, as defined below. Value options:
 
             unavco : now earthscope
 
@@ -99,9 +99,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
             jeff : Jeff Freymueller
 
-            special : (reflectometry Rinex 2 files maintained by unavco)
+            special : (reflectometry Rinex 2.11 files maintained by unavco)
 
-            all : (searches sopac,sonel,and unavco)
+            all : (searches unavco, sopac, and sonel in that order)
 
     version : int, optional
         Version of Rinex file. Default is 2.

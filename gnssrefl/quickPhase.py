@@ -41,10 +41,10 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     Parameters
     ----------
-    station: string
+    station: str
         4 character ID of the station.
 
-    year: integer
+    year: int
         Year to evaluate.
 
     doy: integer

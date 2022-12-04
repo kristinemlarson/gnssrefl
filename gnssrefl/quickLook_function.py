@@ -19,10 +19,12 @@ import gnssrefl.rinex2snr as rinex
 
 def read_snr_simple(obsfile):
     """
+    Loads the data from a SNR file into memory 
+
     Parameters
     ----------
     obsfile : string
-        name of SNR file
+        name of the SNR file
 
     Returns
     -------
@@ -111,66 +113,46 @@ def read_snr_simple(obsfile):
 
 def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,ediff,**kwargs):
     """
+    takes in all users inputs and calculates reflector heights. Makes png files.
 
     Parameters
     ----------
     station : str
-        name (4 char) 
-
+        station name (4 char) 
     year : int
         full year
-
     doy : int
         day of year  
-
     snr_type : int
         snr file extension (i.e. 99, 66 etc)
-
     f : int
         frequency (1, 2, 5), etc
     e1 : float
         minimum elevation angle in degrees
-
     e2 : float
         maximum elevation angle in degrees
-
     minH : float
         minimum allowed reflector height in meters
-
     maxH : float
         maximum allowed reflector height in meters
-
     reqAmp : float
         is LSP amplitude significance criterion
-
     pele : list of floats
         is the elevation angle limits for the polynomial removal.  units: degrees
-
     satsel : int
         satellite number?
-
     PkNoise : float
         peak to noise ratio for QC
-
     fortran : bool
          whether external fortran translator is being explicitly called. 
-
     pltscreen : bool
-        whether you want plots to the screen
-
+        whether you want plots sent to the terminal
     azim1 : float
          minimum azimuth in degrees
-
     azim2 : float
          maximum azimuth in degrees
-
     ediff : float
-         QC parameter - restricts length of arcs
-         degrees
-
-    Returns
-    -------
-
+         QC parameter - restricts length of arcs (degrees)
 
     """
     screenstats = kwargs.get('screenstats',False)
