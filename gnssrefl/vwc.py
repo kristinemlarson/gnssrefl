@@ -130,6 +130,7 @@ def load_avg_phase(station,fr):
     """
     loads a previously computed daily average phase solution.
     this is NOT the same as the multi-track phase results.
+    This file is now stored in station subdirectory in $REFL_CODE/Files/
 
     Parameters
     ----------
@@ -152,9 +153,9 @@ def load_avg_phase(station,fr):
     avg_exist = False
 
     if fr == 1:
-        xfile = f'{xdir}/Files/{station}_phase_L1.txt'
+        xfile = f'{xdir}/Files/{station}/{station}_phase_L1.txt'
     else:
-        xfile = f'{xdir}/Files/{station}_phase.txt'
+        xfile = f'{xdir}/Files/{station}/{station}_phase.txt'
 
     if os.path.exists(xfile):
         result = np.loadtxt(xfile, comments='%')

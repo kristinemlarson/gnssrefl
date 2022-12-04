@@ -98,7 +98,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     da.daily_avg(station, medfilter, ReqTracks, txtfile, pltit,
               extension, year1, year2, fr, csv) 
 
-    avgf = myxdir + '/Files/' + txtfile
+    avgf = myxdir + '/Files/' + station + '/' + txtfile
     x = np.loadtxt(avgf, comments='%')
     # delete the file!
     rh = x[:,2]
@@ -108,7 +108,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     ii = (rh -medianvalue) < -0.05
     newx = x[ii,:] ; N=len(newx)
     if (N > 0):
-        snowfile = myxdir + '/Files/snowmask_' + station + '.txt' 
+        snowfile = myxdir + '/Files/' + station + 'snowmask_' + station + '.txt' 
         print('Suspect snow values stored in : ', snowfile)
         snow = open(snowfile, 'w+')
         for i in range(0,N):
