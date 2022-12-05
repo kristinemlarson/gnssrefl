@@ -32,7 +32,7 @@
 
 * [Lake Malawi, Tanzania](../use_cases/use_mbbc.md) (mbbc)
 
-* [Elbe River, Germany](../use_cases/use_tggo.md) (tggo)
+* [Lake Yellowstone, USA](../use_cases/use_p709.md) (p709)
 
 </TD>
 <TD>
@@ -75,6 +75,8 @@
 * [Vlissingen, the Netherlands](../use_cases/use_vlis.md) (vlis)
 
 * [Puerto Penasco, Mexico](../use_cases/use_tnpp.md) (tnpp)
+
+* [Elbe River, Germany](../use_cases/use_tggo.md) (tggo)
 
 </TD>
 </TR>

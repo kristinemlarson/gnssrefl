@@ -1,11 +1,10 @@
-### P475
+### San Diego California
 
-**Station Name:** 	p475
+**Station Name:** p475
 
-**Location:** San Diego, CA, USA
+**Location:** Point Loma, CA, USA
 
 **Archive:** [UNAVCO](http://www.unavco.org)
-
 
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/P475)
 
@@ -17,7 +16,6 @@ P475 was a PBO site. Soil moisture can be extracted, but it is a challenging cas
 L2C from the original PBO datasets, 1-Hz data must be downloaded and decimated to 15 seconds. To avoid 
 having to do this, we will only use data from the Septentrio receiver (years 2020 thru 2022 ) where the UNAVCO archive 
 provides direct access to high-quality SNR data in 15 second files. 
-
 
 #### Step 0: Run quickLook
 

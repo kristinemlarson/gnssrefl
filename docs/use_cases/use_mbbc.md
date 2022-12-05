@@ -1,7 +1,6 @@
+### Lake Malawi
 
-**Mbamba Bay on Lake Malawi**
-
-Station name: MBBC
+**Station name:** MBBC
 
 <P align=center>
 <img src=../_static/mbbc-three.png>

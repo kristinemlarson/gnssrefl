@@ -172,6 +172,10 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         Default is False
     """
 
+    if len(station) != 4:
+        print('Stations must be four characters long. Exiting.')
+        sys.exit()
+
     if signal.upper() not in ['L1', 'L2', 'L5', 'L6', 'L7', 'L1+L2', 'L1+L2+L5', 'L1+L5', 'ALL']:
 
         print('Currently only allow L1,L2,L5,L6,L7 and various combinations')

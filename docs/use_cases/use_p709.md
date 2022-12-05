@@ -1,6 +1,6 @@
-**Lake Yellowstone**
+### Lake Yellowstone, Yellowstone National Park
 
-P709
+**Station Name:** p709
 
 <P align=center>
 <img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/P709.jpg width=500>
@@ -20,10 +20,17 @@ P709
 
 [Station Page at UNR](http://geodesy.unr.edu/NGLStationPages/stations/P709.sta)
 
-
 **Examine the Site**
 
 [Reflection Zone App](https://gnss-reflections.org/rzones?station=p709&lat=0.0&lon=0.0&height=0.0&msl=off&RH=30&freq=1&nyquist=0&srate=30&eang=6&azim1=0&azim2=90&system=gps)
+
+Note that I have restricted azimuths here and used a reflector height of 30 meters.
+
+**Background Information**
+
+This site was installed for tectonic purposes. The view of the lake from P709 is severely obstructed and it is relatively
+far from the shore. However, if you have access to the highrate (1-Hz) datastream **and** use low elevation data, you can easily
+detect the daily average lake level. Make sure that you use the reflection zone information when you make your json file.
 
 **Translate Data**
 
@@ -43,21 +50,13 @@ knows about the site, then you can input lat,lon,ht of 0,0,0.
 
 <code>gnssir 2021 1 -doy_end 180</code>
 
-
 Use <code>daily_avg </code> to calculate a daily reflector height. Various statistics also
 come to the screen. Here is the RH series:
-
 
 <img src=../_static/p709_RH.png width=500>
 
 I am *only* showing the data for the new multi-GNSS receiver. If you look at earlier data, you 
 are restricted to L1.
-
-Note that the amplitudes (of the RH periodograms) are also a bit interesting.
-
-<img src=../_static/p709_RHamp.png>
-
-Why do you think the amplitudes vary like this? What changes about Lake Yellowstone in the winter?
 
 **In Situ Data**
 
@@ -70,5 +69,14 @@ Why do you think the amplitudes vary like this? What changes about Lake Yellowst
 
 
 Living in the US - you get to see feet instead of meters!
+
+**Something to Think About**
+
+Note that the amplitudes (of the RH periodograms) are also a bit interesting.
+
+<img src=../_static/p709_RHamp.png>
+
+Why do you think the amplitudes vary like this? What changes about Lake Yellowstone in the winter?
+
 
 
