@@ -10,7 +10,7 @@ two main goals for this code:
 If you want to do your own QC, you can simply cat the files in your results area. As an example, after you have 
 run <code>gnssir</code> for a station called sc02 in the year 2021:
 
-<code>cat $REFL_CODE/2021/sc02/*.txt >sc02.txt</code>
+<code>cat $REFL_CODE/2021/results/sc02/*.txt >sc02.txt</code>
 
 If you would prefer to use our code, it is pretty straightforward. It has two sections.  The first 
 minimally requires the station name and year:
@@ -29,19 +29,21 @@ Results are presented with azimuth and amplitude colors to help you modify QC ch
 <img src="../_static/sc02-2.png" width="600"/>
 
 Whle this code is meant to be used AFTER you have chosen an analysis strategy, you can 
-apply new azimuth and amplitude constraints on the commandline, <code>-azim1, -azim2, -ampl</code>.
+apply new azimuth and amplitude constraints on the commandline, i.e. <code>-azim1, -azim2, -ampl</code>.
 
-The second section of <code>subdaily</code> is related to the RHdot correction. You must explicitly ask for it. 
-There are lots of ways to apply the RHdot correction - I am only providing a simple one at this point.  
-The RHdot correction requires you know 
+The second section of <code>subdaily</code> is related to the RHdot 
+correction. You must explicitly ask for it. There are lots of ways 
+to apply the RHdot correction - I am only providing a simple one at this point.  
+The RHdot correction requires you know :
 
 - the average of the tangent of the elevation angle during an arc 
 - edot, the elevation angle rate of change with respect to time 
 - RHdot, the RH rate of change with respect to time  
 
-The first two are (fairly) trivial to compute and are included in the results file in column 13 as the edotF. 
-This edot factor has units of rad/(rad/hour), or hours. So if you know RHdot in units of meters/hour, 
-you can get the correction by simple multiplication. 
+The first two are (fairly) trivial to compute and are included in 
+the results file in column 13 as the edotF. 
+This edot factor has units of rad/(rad/hour), or hours. So if you 
+know RHdot in units of meters/hour, you can get the correction by simple multiplication. 
 
 Computing RHdot is the trickiest part of calculating the RHdot correction.
 And multiple papers have been written about it. If you have a 
@@ -49,6 +51,7 @@ well-observed site (lots of arcs and minimal gaps), you can use the RH
 data themselves to estimate a smooth model for RH (via cubic splines) and 
 then just back out RHdot. This is what is done in <code>subdaily</code> (if and only if you invoke -rhdot True). 
 It will also make a second effort to remove outliers.  
+
 Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
 outliers in the first section of this code as this is really signal, not noise. You can set the outlier criterion 
 with <code>-spline_outlier N</code>, where N is in meters. It also makes an attempt to remove frequency biases. 
@@ -62,7 +65,7 @@ There are other ways to compute the RHdot correction:
 - estimate a rate and an acceleration term (Tabibi et al 2020)
 
 Because the spline is not very good at the beginning and end of the data, I was initially 
-removing ~6 hours of data from each end. I now use a pretty standard way to keep all the data.
+removing about 6 hours of data from each end. I now use a pretty standard way to keep all the data.
 Here are some results from the SC02 site again - but now from the second section of the code. 
 In the bottom panel you can see that applying the RHdot correction at this site improves the 
 RMS fit from 0.15 to 0.11 meters.
