@@ -22,8 +22,10 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     Parameters
     ----------
     station : string
+        4 character station name
 
     year : integer
+        full year
 
     doy : integer
         day of year
@@ -32,6 +34,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         snr file type
 
     extension : string
+        optional subdirectory to save results
 
     lsp : dictionary
         REQUIRES DESCRIPTION
@@ -281,14 +284,13 @@ def local_update_plot(x,y,px,pz,ax1, ax2,failure):
 
 def plot2screen(station, f,ax1,ax2,pltname):
     """
-    Add axis information and Send the plot to the screen
+    Add axis information and Send the plot to the screen.
+    https://www.semicolonworld.com/question/57658/matplotlib-adding-an-axes-using-the-same-arguments-as-a-previous-axes
 
     Parameters
     ----------
     station : string
         4 character station ID
-
-    https://www.semicolonworld.com/question/57658/matplotlib-adding-an-axes-using-the-same-arguments-as-a-previous-axes
 
     """
     ax2.set_xlabel('Reflector Height (m)'); 
@@ -310,18 +312,18 @@ def read_json_file(station, extension):
 
     Parameters
     ----------
-    station : string
+    station : str
         4 character station name
 
-    extension : string
-        experimental directory - default is ''
+    extension : str
+        experimental subdirectory - default is ''
 
     Returns
     -------
     lsp : dictionary
 
     """
-    lsp = {} # ???
+    lsp = {} # 
     instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
     instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
     if os.path.isfile(instructions_ext):

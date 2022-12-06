@@ -76,7 +76,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
     snr : integer, optional
         SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
-    value options:
+        value options:
 
         66 (default) : saves all data with elevation angles less than 30 degrees
 
@@ -86,22 +86,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         
         50 : saves all data with elevation angles less than 10 degrees
 
-    test : str, optional.
-        value options:
-
-            gps or nav : GPS broadcast orbits 
-
-            igs : IGS precise orbits
-
-            igr : IGS rapid orbits
-            
-            201,205,206,207,208 : GALILEO E1 E5a E6,E5b,E5
-
-            302,306,207 : BEIDOU B1, B3, B2
-
     orb : string, optional
         Which orbit files to download.
-        value options:
+        Value options:
 
             gps (default) : will use GPS broadcast orbit
 
@@ -134,9 +121,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     rate : string, optional
         The data rate
         value options:
-            low (default) : standard rate data
+            low (default) : standard rate data. Usually 30 sec, but sometimes 15 sec.
 
-            high : high rate data
+            high : high-rate data
 
     dec : integer, optional
         Decimation rate. 0 is default.
@@ -145,9 +132,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         Whether to use fortran to translate the rinex files. Note: This option requires Fortran RINEX translators.
         Please see documentation at https://github.com/kristinemlarson/gnssrefl to see instructions to get these.
         value options:
-            False (default) : does not use fortran to translate rinex
+            False (default) : do not use fortran to translate rinex
 
-            True : uses fortran to translate rinex
+            True : use fortran to translate rinex
 
     nolook : boolean, optional
         This parameter tells the code not to retrieve RINEX files from your local machine.
@@ -163,8 +150,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
             sonel : (global sea level observing system)
 
             sopac : (Scripps Orbit and Permanent Array Center)
-
-            cddis : (NASA's Archive of Space Geodesy Data)
 
             ngs : (National Geodetic Survey)
 
@@ -186,7 +171,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
             special : (set aside files at UNAVCO for reflectometry users)
 
-            all : (does unavco, sopac, and sonel)
+            cddis : (NASA's Archive of Space Geodesy Data)
+
+            all : (does unavco, sopac, and sonel in series)
 
     doy_end : int, optional
         end day of year to be downloaded. This is to create a range from doy to doy_end of days to get the snr files.

@@ -16,9 +16,9 @@ def main():
     rinex2 : str
         filename for RINEX 2.11 file
     dec : integer
-        optinoal decimation value (seconds)
+        optional decimation value (seconds)
     gpsonly : boolean
-        remove everything except GPS. Default is False
+        whether to remove everything except GPS. Default is False
 
     """
 

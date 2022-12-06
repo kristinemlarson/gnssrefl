@@ -64,8 +64,11 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         SNR format. This tells the code what elevation angles are in the SNR file
         value options:
             66 (default) : data with elevation angles less than 30 degrees
+
             99 : data with elevation angles between 5 and 30 degrees
+
             88 : data with elevation angles between 5 and 90 degrees
+
             50 : data with elevation angles less than 10 degrees
 
     fr : string, optional
@@ -91,8 +94,9 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     Returns
     -------
     Saves a file for each day in the doy-doy_end range: $REFL_CODE/<year>/phase/<station>/<doy>.txt
+
     columns in files:
-    year doy hour phase nv azimuth sat ampl emin emax delT aprioriRH freq estRH pk2noise LSPAmp
+        year doy hour phase nv azimuth sat ampl emin emax delT aprioriRH freq estRH pk2noise LSPAmp
 
     """
 
