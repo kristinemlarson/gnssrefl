@@ -131,6 +131,8 @@ Residuals to the spline fit with and without a RHdot correction:
 
 <img src="../_static/sc02-rhdot.png" width=600>
 
+**PLEASE NOTE: the RHdot corrected values are not written to column 3. Look into the file.**
+
 A summary of the number of satellite arcs that are available:
 
 <img src="../_static/sc02-nvals.png" width=600>
@@ -177,6 +179,12 @@ You can download the NOAA data yourselves or use our utility:
 We then compared the two series. 
 
 <img src="../_static/sc02-noaa.png" width=600>
+
+**PLEASE NOTE:**
+
+Since I originally wrote this use case, I have added an option to <code>subdaily</code> to 
+remove inter-frequency biases. The results of this analysis are written to a 
+new file and the corrected RH values are in a new column! Please look at the file.
 
 <HR>
 

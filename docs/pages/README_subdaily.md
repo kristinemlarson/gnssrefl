@@ -72,6 +72,8 @@ RMS fit from 0.15 to 0.11 meters.
 
 <img src="../_static/sc02-3.png" width="600"/>
 
+**THE NEW RH VALUES ARE NOT WRITTEN TO COLUMN 3!**  Please look at the file for more information.
+
 After the RHdot correction has been applied, the code then estimates a new spline fit and 
 attempts to remove frequency-specific biases **relative to GPS L1.** If GPS L1 is not being
 tracked, then it just uses the average of all frequencies. Stats 
@@ -80,6 +82,8 @@ should be zero). Three-sigma outliers with respect to the new fit are removed.
 In this example the RMS improves from 0.11 to 0.09 m. 
 
 <img src="../_static/sc02-5.png" width="600"/>
+
+**Again, the new RH values are not written to column 3. Please look at the file.**
 
 Here is an example of a site (TNPP) where the RHdot correction is 
 even more important (I apologize for color choice here. The 

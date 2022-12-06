@@ -1,4 +1,4 @@
-### TGGO
+### Grauerort-Reede
 
 **Station Name:** tggo  or TGGO00DEU
 
@@ -117,7 +117,7 @@ significant, the gnssrefl code is not going to be able to use a simple fit to fi
 correction. The best thing to do is to change the delT parameter in the json file to ignore these 
 long arcs. The default was 75; I changed mine to 35 minutes and 
 reran <code>gnssir</code> and then <code>subdaily</code>.
-You can see now that the RHdot outliers are gone:
+You can see now that those RHdot outliers are gone:
 
 <img src=../_static/tggo_delT_fixed.png width=600>
 
@@ -128,13 +128,21 @@ this is relative to the spline fit (i.e. it is not accuracy) and without correct
 
 <img src=../_static/tggo_new.png width=600>
 
+**Please note that the new RH values are being written to a new column!  Please look into the file.**
+
 
 The code will then remove interfrequency biases and recompute a spline:
 
 <img src=../_static/tggo_delT_fixed2.png width=600>
+
+**Please note that the IF corrected RH values are being written to a new column!  Please look into the file.**
 
 Overall this is a very good reflections site - but it is hampered by the lack of Galileo observations.
 When this current receiver is upgraded to a newer model, I expect to see much better results.
 If someone would like to provide "truth" data, I could add a comparison.
 
 Kristine M. Larson November 21, 2022
+
+[Current status for station at WSV](https://www.pegelonline.wsv.de/gast/stammdaten?pegelnr=5970020)
+
+[Another view](https://www.pegelonline.wsv.de/webservices/zeitreihe/visualisierung?parameter=WASSERSTAND%20ROHDATEN&pegelnummer=5970026&ansicht=einzeln)

@@ -116,7 +116,13 @@ This preliminary version of the code removes outliers and makes an effort
 to compute the RH dot correction if <code>rhdot</code> is set to true. It  uses a cubic 
 spline to fit the RH data which allows a first order estimate for the 
 surface rate of change. That, along with geometrical information as to the elevation angle rate 
-of change, is used to make the RH dot correction ([for more information](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf). This term is **very important** for sites with 
+of change, is used to make the RH dot 
+correction ([for more information](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf). 
+
+
+<img src=../_static/at01_rhdot2.png width=600>
+
+This term is **very important** for sites with 
 large tidal ranges, but is of less importance at sites like at01. Nevertheless, 
 you can see here that it does help a bit:
 
@@ -125,35 +131,19 @@ RMS no RHdot correction (m)  0.082
 RMS w/ RHdot correction (m)  0.070
 </PRE>
 
-<img src=../_static/at01-spline.png width=600>
 
-Final view of the surface estimates:
+<img src=../_static/at01_rhdot3.png width=600>
 
-<img src=../_static/at01-final.png width=600>
+**Please note: the correcdted RH value is not written to column 3. Please look into the file.**
 
-There are some statistics here that indicate that the precision for an individual arc is ~ 5 cm.  Remember that since we have nearly 300 measurements per day, 
-the ability to measure tides with this system is much much better than that.  
+Finally, we attempt to remove the inter-frequency biases and fit a new spline:
 
-We are working on removing inter-frequency biases. Some of the bias is simply due to the phase center - but we also want to be be careful to take into account surface changes (ice to water, e.g.)
+<img src=../_static/at01_rhdot4.png width=600>
 
-<PRE>
-Freq  Bias  Sigma   NumObs
-       (m)   (m)
-  1   0.07   0.06   2751
- 20  -0.03   0.05   2208
-  5  -0.04   0.05   1592
-101   0.06   0.06   1803
-102  -0.03   0.05   2086
-201   0.07   0.05   1164
-205  -0.05   0.05   1880
-207  -0.04   0.04   1864
-</PRE>
-
-The code also prints out a list of outliers (outliers.txt) so that you can assess whether you 
-might want to change your azimuth mask.
-
-Files for both the raw RH estimates and the QC/RH corrected estimates are provided (file names come to the screen).
+**Please note: the corrected RH values are written to new columns in the output files, not to column 3. Please look into the file.**
 
 I would like to include Simon Williams' RH retrieval/tidal estimation code 
-in this package. Simon has been kind enough to make the Matlab code [open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) If someone is willing to convert it to python, that would be fabulous.
+in this package. Simon has been kind enough to make the Matlab 
+code [open source.](https://git.noc.ac.uk/noc-tide-gauges/noc-tgqc/-/blob/bab322f9677bca47ecd8e1c7da099d5925c00b4d/NOCtidefit.m) 
+If someone is willing to convert it to python, that would be fabulous.
  
