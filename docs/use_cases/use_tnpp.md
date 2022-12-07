@@ -83,11 +83,14 @@ precision ([Larson et al., 2013](https://www.kristinelarson.net/wp-content/uploa
 
 <img src=../_static/tnpp_rhdot_2.png width=600>
 
+**PLEASE PAY ATTENTION - the corrected RH values are not written to column 3!**
+
 Final series with antenna frequency biases removed compared to a spline fit:
 
 <img src=../_static/tnpp_rhdot_3.png width=600>
 
 The final precision for this site is 0.1 meters
+**PLEASE PAY ATTENTION - the corrected RH values are not written to column 3!**
 
-Kristine Larson 2022 August 29
+Updated Kristine Larson 2022 December 6
 

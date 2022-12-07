@@ -151,17 +151,21 @@ This compares with and without RHdot correction:
 
 <img src=../_static/vlis_rhdot2.png width=600>
 
+**If you wish to access these new RH values, do not use column 3! The corrected values have 
+been written as a new column.**
+
 Then we remove an inter-frequency bias and refit a spline:
 
 <img src=../_static/vlis_rhdot4.png width=600>
 
 The RMS with respect to the spline fit starts over 0.325 m, improves to 0.276 m with RHdot,
-and finally 0.253 m with an IF bias removed.
+and finally 0.253 m with an IF bias removed. **If you wish to access these new 
+RH values, do not use column 3! The corrected values have been written as a new column.**
+
+The precisions calculated from the spline fit for this site are *very poor* - particularly for L1. 
 
 For comparisons with the local tide gauge you can use 
 our utility <code>download_ioc</code>. The tide gauge name is ... vlis! If you say <code>-plt T</code> it makes a crude
 plot for you.
-
-Additional corrections can be made using the <code>rhdot T</code> setting. I will add more information here when I get a chance.
 
 Kristine M. Larson November 18, 2022

@@ -110,37 +110,37 @@ The code concatenates the daily RH files for this period:
 
 You can see that there are a very large number of RH retrievals per day:
 
-<img src=../_static/at01_nvals.png width=600>
+<img src=../_static/at01_Subnvals.png  width=600>
 
 This preliminary version of the code removes outliers and makes an effort 
 to compute the RH dot correction if <code>rhdot</code> is set to true. It  uses a cubic 
 spline to fit the RH data which allows a first order estimate for the 
 surface rate of change. That, along with geometrical information as to the elevation angle rate 
 of change, is used to make the RH dot 
-correction ([for more information](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf). 
+correction [(for more information)](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf). 
 
 
-<img src=../_static/at01_rhdot2.png width=600>
+<img src=../_static/at01_rhdot3.png width=600>
 
 This term is **very important** for sites with 
 large tidal ranges, but is of less importance at sites like at01. Nevertheless, 
 you can see here that it does help a bit:
 
+<img src=../_static/at01_rhdot2.png width=600>
+
 <PRE>
-RMS no RHdot correction (m)  0.082
-RMS w/ RHdot correction (m)  0.070
+RMS no RHdot correction (m)  0.084
+RMS w/ RHdot correction (m)  0.071
 </PRE>
 
+**Please note: the corrected RH value is not written to column 3. Please look into the file.**
 
-<img src=../_static/at01_rhdot3.png width=600>
-
-**Please note: the correcdted RH value is not written to column 3. Please look into the file.**
-
-Finally, we attempt to remove the inter-frequency biases and fit a new spline:
+Finally, we attempt to remove the inter-frequency biases and fit a new spline, yielding a RMS agreement of about 5 cm with
+respect to the spline:
 
 <img src=../_static/at01_rhdot4.png width=600>
 
-**Please note: the corrected RH values are written to new columns in the output files, not to column 3. Please look into the file.**
+**Again: the corrected RH values are written to new columns in the output files, not to column 3. Please look into the file.**
 
 I would like to include Simon Williams' RH retrieval/tidal estimation code 
 in this package. Simon has been kind enough to make the Matlab 
