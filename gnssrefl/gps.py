@@ -5780,3 +5780,27 @@ def set_subdir(subdir):
 
     return
 
+
+def mjd_more(mmjd):
+    """
+    Parameters
+    ----------
+    mjd : float
+        mod julian date
+
+    Returns
+    -------
+    year : int
+        full year
+    mm : int
+        month
+    dd : int
+        day
+    doy : int
+        day of year
+    """
+    year,mm,dd = mjd_to_date(mmjd)
+    doy, cdoy, cyyyy, cyy = ymd2doy(year,mm,dd)
+
+    return year, mm, dd, doy 
+

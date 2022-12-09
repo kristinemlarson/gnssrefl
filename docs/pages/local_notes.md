@@ -1,3 +1,23 @@
+Dates:
+
+Geodesy for Climate Research (ICCC) March 28-30, 2023
+Earthscope : March 27-29 2023
+EGU 23–28 April 2023
+
+May 1-5 ?
+May 8-13 ?
+
+May 24-26 GNSS+R
+
+May 29-June 2 Pentecost
+
+June seems pretty open for Eruoep - but 
+very few American universities "open" 
+But does that matter?
+
+IUGG  - July 11-20
+
+
 Possible one-week short short course:
 
 First Week - two hour max

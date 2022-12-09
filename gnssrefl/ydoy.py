@@ -1,13 +1,27 @@
 # -*- coding: utf-8 -*-
-"""
-converts ymd to doy
-"""
 import argparse
 import sys
 
 import gnssrefl.gps as g
 
 def main():
+    """
+    converts ymd to day of year
+
+    Parameters
+    ----------
+    year : int
+        full year 
+    doy : int
+        day of year
+
+    Returns
+    -------
+    month : int
+
+    day : int
+
+    """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("year", help="year ", type=int)

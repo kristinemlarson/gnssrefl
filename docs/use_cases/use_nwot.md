@@ -1,5 +1,7 @@
 ### Niwot Ridge, Colorado, USA
 
+Unfortunately this site is no longer supported.
+
 **Station name:** nwot
 
 **Location:** [Niwot Ridge LTER](https://nwt.lternet.edu)

@@ -7,46 +7,46 @@
 <TD>
 <B>Ice Sheets</B>
 
-* [Lorne, Ross Ice Shelf](../use_cases/use_lorg.md) (lorg)
+* [Lorne, Ross Ice Shelf](../use_cases/use_lorg.md) 
 
-* [Dye2, Greenland Ice Sheet](../use_cases/use_gls1.md) (gls1)
+* [Dye2, Greenland Ice Sheet](../use_cases/use_gls1.md) 
 
-* [Thwaites Glacier, Antarctica](../use_cases/use_lthw.md) (lthw)
+* [Thwaites Glacier, Antarctica](../use_cases/use_lthw.md) 
 
-* [Summit Camp, Greenland](../use_cases/use_smm3.md) (smm3)
+* [Summit Camp, Greenland](../use_cases/use_smm3.md) 
 
-* [Phoenix, Antarctica](../use_cases/use_phnx.md) (phnx)
+* [Phoenix, Antarctica](../use_cases/use_phnx.md) 
 </TD>
 <td>
 <B>Lakes, Reservoirs, and Rivers</B>
 
-* [Michipicoten, Canada](../use_cases/use_mchn.md) (mchn)
+* [Michipicoten, Canada](../use_cases/use_mchn.md) 
 
-* [Lake Taupo, New Zealand](../use_cases/use_tgho.md) (tgho)
+* [Lake Taupo, New Zealand](../use_cases/use_tgho.md) 
 
-* [Steenbras Reservoir, South Africa](../use_cases/use_sbas.md) (tgho)
+* [Steenbras Reservoir, South Africa](../use_cases/use_sbas.md) 
 
-* [St Lawrence River,Canada](../use_cases/use_pmtl.md) (pmtl)
+* [St Lawrence River,Canada](../use_cases/use_pmtl.md) 
 
-* [Lake Mathews, Riverside](../use_cases/use_mat2.md) (mat2)
+* [Lake Mathews, Riverside, USA](../use_cases/use_mat2.md) 
 
-* [Lake Malawi, Tanzania](../use_cases/use_mbbc.md) (mbbc)
+* [Lake Malawi, Tanzania](../use_cases/use_mbbc.md) 
 
-* [Lake Yellowstone, USA](../use_cases/use_p709.md) (p709)
+* [Lake Yellowstone, USA](../use_cases/use_p709.md) 
 
 </TD>
 <TD>
 <B>Soil Moisture </B>
 
-* [Portales, New Mexico](../use_cases/use_p038.md) (p038)
+* [Portales, New Mexico USA](../use_cases/use_p038.md) 
 
-* [Mitchell, Queensland](../use_cases/use_mchl.md) (mchl)
+* [Mitchell, Australia](../use_cases/use_mchl.md) 
 
-* [Victorville, California](../use_cases/use_scia.md) (scia)
+* [Victorville, CA USA ](../use_cases/use_scia.md) 
 
-* [Boulder, Colorado](../use_cases/use_mfle.md) (mfle)
+* [Boulder, CO USA](../use_cases/use_mfle.md) 
 
-* [San Diego, California](../use_cases/use_p475.md) (p475)
+* [San Diego, CA USA ](../use_cases/use_p475.md) 
 
 </TD>
 </TR>
@@ -56,13 +56,13 @@
 <TD>
 <B>Seasonal Snow Accumulation</B>
 
-* [Marshall, Colorado](../use_cases/use_p041.md) (p041)
+* [Marshall, CO USA](../use_cases/use_p041.md) 
 
-* [Niwot Ridge, Colorado](../use_cases/use_nwot.md) (nwot)
+* [Niwot Ridge, CO USA](../use_cases/use_nwot.md) 
 
-* [Half Island Park, Idaho](../use_cases/use_p360.md) (p360)
+* [Half Island Park, ID USA](../use_cases/use_p360.md) 
 
-* [Utqiagvik, Alaska](../use_cases/use_utqi.md) (utqi00usa)
+* [Utqiagvik, AK USA](../use_cases/use_utqi.md) 
 
 </TD>
 <TD>

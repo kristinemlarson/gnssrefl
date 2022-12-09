@@ -61,7 +61,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     ----------
 
     station : string
-        4 or 9 character ID of the station.
+        4 character id of the station.
     year : integer
         Year
     txtfile : string, optional

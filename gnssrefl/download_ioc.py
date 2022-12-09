@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-downloads IOC tide gauge files
-
-originally used XML download. now uses json
-"""
 import argparse
 import datetime
 import numpy as np
@@ -16,68 +11,6 @@ import matplotlib.pyplot as plt
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
 
-def find_start_stop(year,m):
-    """
-    Parameters
-    ----------
-    year : int
-        full year
-    m : int
-        month number 
-
-    Returns
-    --------
-    d1 : str
-        yyyymmdd for first day of requested month
-    d2 : str
-        yyyymmdd for last day of requested month
-
-    """
-    cyyyy = str(year)
-    cmm = '{:02d}'.format(m)
-    d1 = cyyyy + cmm + '01'
-    # IOC if you ask for data thru nov30, it stops at midnite nov29,
-    # which is not what NOAA does - so not much work here
-
-    if m == 12:
-        d2 = str(year+1) +  '0101'
-    else:
-        cmm = '{:02d}'.format(m+1)
-        d2 = cyyyy + cmm + '01'
-
-    return d1, d2
-
-
-def quickp(station,t,sealevel):
-    """
-    makes a quick plot of sea level for station s
-    prints to the screen - does not save it.
-
-    Parameters
-    -----------
-    station : string
-        station name
-
-    t : numpy array in datetime format 
-        time of the sea level observations
-
-    sealevel : numpy array, float 
-        meters (relative - not defined in a datum)
-    
-    """
-    fs = 10
-    if (len(t) > 0):
-        fig,ax=plt.subplots()
-        ax.plot(t, sealevel, '-')
-        plt.title('Tides at ' + station)
-        plt.xticks(rotation =45,fontsize=fs);
-        plt.ylabel('meters')
-        plt.grid()
-        fig.autofmt_xdate()
-        plt.show()
-    else:
-        print('no data found - so no plot')
-    return
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -103,39 +36,39 @@ def parse_arguments():
 
 def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: bool = False, outliers: bool = False, sensor= None, subdir: str=None):
     """
-        Downloads IOC tide gauge files
+    Downloads and saves IOC tide gauge files
 
-        Parameters
-        ----------
-        station : str
-            IOC station name 
+    Parameters
+    ----------
+    station : str
+        IOC station name 
 
-        date1 : str
-            begin date in yyyymmdd.
-            Example value: 20150101
+    date1 : str
+        begin date in yyyymmdd.
+        Example value: 20150101
 
-        date2 : str
-            end date in yyyymmdd.
-            Example value: 20150101
+    date2 : str
+        end date in yyyymmdd.
+        Example value: 20150101
 
-        output : str, optional
-            Optional output filename
-            default is None
-            The file will be written to REFL_CODE/Files
+    output : str 
+        Optional output filename
+        default is None
+        The file will be written to REFL_CODE/Files
 
-        plt: bool, optional
-            plot comes to the screen
-            default is None
+    plt: bool, optional
+        plot comes to the screen
+        default is None
 
-        outliers: bool, optional
-            tried to remove outliers, but it doesn't work as yet
-            default is No
+    outliers: bool, optional
+        tried to remove outliers, but it doesn't work as yet
+        default is No
 
-        sensor: str, optional
-            type of sensor, prs(for pressure), rad (for radar), flt (for float)
-            default is None, which means it will print out what is there.
-            if there is more than one sensor you should specifically ask for the one
-            you want
+    sensor: str, optional
+        type of sensor, prs(for pressure), rad (for radar), flt (for float)
+        default is None, which means it will print out what is there.
+        if there is more than one sensor you should specifically ask for the one
+        you want
 
     """
     # set up the address for the API call
@@ -274,9 +207,71 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     if plt:
         quickp(station,obstimes,sealevel)
 
-    #for i in range(0,NV):
-    #    print(s[i], sortedvalues[i])
 
+def find_start_stop(year,m):
+    """
+    finds the start and stop times for each month of the IOC download
+
+    Parameters
+    ----------
+    year : int
+        full year
+    m : int
+        month number 
+
+    Returns
+    -------
+    d1 : str
+        yyyymmdd for first day of requested month
+    d2 : str
+        yyyymmdd for last day of requested month
+
+    """
+    cyyyy = str(year)
+    cmm = '{:02d}'.format(m)
+    d1 = cyyyy + cmm + '01'
+    # IOC if you ask for data thru nov30, it stops at midnite nov29,
+    # which is not what NOAA does - 
+
+    if m == 12:
+        d2 = str(year+1) +  '0101'
+    else:
+        cmm = '{:02d}'.format(m+1)
+        d2 = cyyyy + cmm + '01'
+
+    return d1, d2
+
+
+def quickp(station,t,sealevel):
+    """
+    makes a quick plot of sea level for station s
+    prints to the screen - does not save it.
+
+    Parameters
+    -----------
+    station : string
+        station name
+
+    t : numpy array in datetime format 
+        time of the sea level observations
+
+    sealevel : numpy array, float 
+        meters (relative - not defined in a datum)
+    
+    """
+    fs = 10
+    if (len(t) > 0):
+        fig,ax=plt.subplots()
+        ax.plot(t, sealevel, '-')
+        plt.title('Tides at ' + station)
+        plt.xticks(rotation =45,fontsize=fs);
+        plt.ylabel('meters')
+        plt.grid()
+        fig.autofmt_xdate()
+        plt.show()
+    else:
+        print('no data found - so no plot')
+    return
 
 def main():
     args = parse_arguments()

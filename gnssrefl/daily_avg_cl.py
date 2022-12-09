@@ -46,14 +46,15 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
             4 ch station name 
 
         medfilter : float
-            Median filter for daily reflector height (m). Start with 0.25
+            Median filter for daily reflector height (m). Start with 0.25 for surfaces where you expect no significant 
+            subdaily change (snow/lakes).
 
         ReqTracks : int
-            Required number of tracks.
+            Required number of daily satellite tracks to save the daily average value.
 
         txtfile : str, optional
             Use this parameter to set your own output filename.
-            default is None.
+            default is to let the code choose.
 
         plt : bool, optional
             whether to print plots to screen or not.
@@ -69,7 +70,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
 
         year2 : int, optional
             restrict to years ending with.
-            default is 2021.
+            default is 2030.
 
         fr : int, optional
             GNSS frequency. Value options:
@@ -86,6 +87,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
                 101 : GLONASS L1
 
                 102 : GLONASS L2
+
                 201 : GALILEO E1
 
                 205 : GALILEO E5a
@@ -104,7 +106,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
 
         csv : boolean, optional
             Whether you want csv instead of a plain text file.
-            default is False (plain text).
+            default is False.
 
         azim1 : int, optional
             minimum azimuth, degrees
@@ -134,9 +136,6 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     xdir = os.environ['REFL_CODE']
     txtdir = xdir + '/Files/'  + subdir
 
-    #if not os.path.exists(txtdir):
-    #    print('make an output directory', txtdir)
-    #    os.makedirs(txtdir)
 
     # set the name of the output format
     if csv:

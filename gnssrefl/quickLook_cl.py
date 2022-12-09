@@ -16,7 +16,7 @@ def parse_arguments():
 # user inputs the observation file information
     parser = argparse.ArgumentParser()
 # required arguments
-    parser.add_argument("station", help="station", type=str)
+    parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="day of year", type=int)
 # these are the optional inputs
@@ -56,14 +56,11 @@ def quicklook(station: str, year: int, doy: int,
     Parameters
     ----------
     station : string
-        4 or 9 character ID of the station
-
+        4 character ID of the station
     year : integer
         Year
-
     doy : integer
         Day of year
-
     snr : integer, optional
         SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
         value options:
@@ -134,7 +131,8 @@ def quicklook(station: str, year: int, doy: int,
         default is 360.
 
     ediff : float, optional
-        quality control parameter
+        elevation angle difference, quality control parameter 
+        default is 2 degrees.
 
     """
 
