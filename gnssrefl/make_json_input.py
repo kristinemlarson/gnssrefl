@@ -37,7 +37,7 @@ def parse_arguments():
     parser.add_argument("-extension", default=None, type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-ediff", default=None, type=str, help="ediff (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
-#    parser.add_argument('-az_list', nargs="*",type=float,  help='azimuth min/max, e.g. 0 180  )')
+    parser.add_argument('-azlist', nargs="*",type=float,  help='User defined azimuth zones, 0 90 90 180  for only the east. Must be an even number of values.')
 
 
     args = parser.parse_args().__dict__
@@ -54,10 +54,11 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               h1: float = 0.5, h2: float = 6.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.7, ampl: float = 6.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = None, ediff: float=2.0, delTmax: float=75.0  ):
+              extension: str = None, ediff: float=2.0, delTmax: float=75.0, azlist: float=[]  ):
 
     """
     Make a json file that describes the lomb scargle analysis strategy you will use in gnssrefl.
+
 
     Parameters
     ----------
@@ -134,6 +135,11 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         maximum allowed arc length (minutes)
         default is 75, which is a bit long for tides
 
+    azlist : list of floats
+        lets the user set the azzimuth regions, in degrees
+        each region must be < 100 degrees!
+        e.g. 0 90 90 180 would be all the east
+        90 180 180 270 would be all the south
     """
 
     # make sure environment variables exist
@@ -214,11 +220,19 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     # azimuth regions in degrees (in pairs)
     # you can of course have more subdivisions here
     #if (az_list[0]) == 0 & (az_list[-1] == 360):
-    if True:
+
+    N = len(azlist)
+    if N == 0:
+        print('User did not provide an azimuth list')
         lsp['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
-    # leaving this so the notebooks are not broken
-    #else:
-    #    print('You have requested specific azimuth limits')
+    else:
+        if (N % 2) == 0:
+            lsp['azval'] = azlist
+        else:
+            print('Illegal azimuth inputs. Must be an even number of azimuth pairs.')
+            sys.exit()
+
+    # a version I was working on
     #    lsp['azval'] = g.make_azim_choices(az_list)
 
     # default frequencies to use - and their required amplitudes. The amplitudes are not set in stone
