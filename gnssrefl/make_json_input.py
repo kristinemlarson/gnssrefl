@@ -201,6 +201,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     if not os.path.isdir(outputdir):
         subprocess.call(['mkdir', outputdir])
 
+    print('extension', extension)
     if extension is None:
         outputfile = outputdir + '/' + station + '.json'
     else:
@@ -258,6 +259,9 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     # write new RH results  each time you run the code
     lsp['overwriteResults'] = True
 
+    # write new RH results  each time you run the code
+    #lsp['nooverwrite'] = False
+
     # if snr file does not exist, try to make one
     lsp['seekRinex'] = False
 
@@ -280,6 +284,8 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     # how long can the arc be, in minutes
     lsp['delTmax'] = delTmax  
  
+    # gzip SNR files after running the code
+    lsp['gzip'] = False   
 
     print('writing out to:', outputfile)
     with open(outputfile, 'w+') as outfile:

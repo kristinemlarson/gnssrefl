@@ -118,3 +118,5 @@ added refl_zones utility
 1.2.1 fixed bug in subdaily. the output file of the IF correction was wrong
 1.2.2 had made delTmax to 45 minutes, but that is way too short for soil moisture.
 put it back to 75 minutes.
+
+1.2.3 added azlist to make_json_input. Craziness.
