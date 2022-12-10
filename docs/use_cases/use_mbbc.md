@@ -2,6 +2,8 @@
 
 **Station name:** MBBC
 
+Updated December 10, 2022
+
 <P align=center>
 <img src=../_static/mbbc-three.png>
 <P>
@@ -57,7 +59,7 @@ on L1 and L2. Note: the L2 amplitudes are smaller because the receiver lacks acc
 
 Step 1: Run <code>make_json_input</code> using the information I discussed earlier 
 
-- azimuth angle limits 
+- azimuth angle limits  **Try out -azlist 220  275**
 
 - elevation angle limits
 
@@ -67,7 +69,7 @@ Step 1: Run <code>make_json_input</code> using the information I discussed earli
 
 - amplitude limits to be small for L2 
 
-- allow L1 and L2 
+- allow L1 and L2 (the default is 1,20,5 but the simplest way to change this is to make it  1,2,5)
 
 - since MBBC is in the Nevada Reno database, you do not have to provide lat/lon/ht. Simply put 0,0,0 for those entries.
 

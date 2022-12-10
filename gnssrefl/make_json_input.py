@@ -37,7 +37,7 @@ def parse_arguments():
     parser.add_argument("-extension", default=None, type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-ediff", default=None, type=str, help="ediff (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
-    parser.add_argument('-azlist', nargs="*",type=float,  help='User defined azimuth zones, 0 90 90 180  for only the east. Must be an even number of values.')
+    parser.add_argument('-azlist', nargs="*",type=float,  help='User defined azimuth zones, i.e. 0 90 90 180 would mean only the east. Must be an even number of values.')
 
 
     args = parser.parse_args().__dict__
@@ -136,9 +136,8 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         default is 75, which is a bit long for tides
 
     azlist : list of floats
-        lets the user set the azzimuth regions, in degrees
-        each region must be < 100 degrees!
-        e.g. 0 90 90 180 would be all the east
+        lets the user set the azimuth regions, in degrees
+        each region must be < 100 degrees! e.g. 0 90 90 180 would be all the east
         90 180 180 270 would be all the south
     """
 

@@ -1,5 +1,7 @@
 #  Utqiagvik, Alaska
 
+Updated December 10, 2022 
+
 **Station Name:** utqi00usa
 
 **Location:** Utqiagvik (Barrow), Alaska, USA
@@ -60,11 +62,12 @@ This won't take too long since the data files are relatively small.
 
 Set your analysis strategy:
 
-<code>make_json_input utqi 0 0 0 -h1 2 -h2 12 -e1 5 -e2 15 -allfreq T </code>
+<code>make_json_input utqi 0 0 0 -h1 2 -h2 12 -e1 5 -e2 15 -allfreq T -azlist 90 180 180 220</code>
 
-There don't appear to be Beidou data at this site, so you should hand-edit those frequencies out of the json file. 
-You should also set the final azimuth region. This was my [starter json file](utqi.json)
-In retrospect, I should have limited the azimuths a little more. Now run the main module for estimating reflector height.
+There don't appear to be Beidou data at this site, so you could hand-edit those frequencies 
+out of the json file but it is not required. This was my [starter json file](utqi.json) In 
+retrospect, I should have limited the azimuths a 
+little more. Now run the main module for estimating reflector height.
 
 <code>gnssir utqi 2020 1 -year_end 2022 -doy_end 243</code>
 

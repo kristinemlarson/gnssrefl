@@ -1,4 +1,7 @@
 ### St Michael Bay
+
+Updated December 10, 2022
+
   
 <p align="center">
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">
@@ -89,10 +92,8 @@ Next we analyze data for two months in the fall of 2020. First make the SNR file
 
 Now set up the analysis instructions:
 
-<code>make_json_input at01 63.484 -162.006 21.565 -h1 8 -h2 15 -e1 5 -e2 13 -allfreq True </code>
-
-You will need to hand-edit the file to restrict the azimuths per our QC output. I also removed the Beidou signals (frequencies > 300) 
-because they are not in the RINEX 2.11 file. We also removed frequency 208. [Sample json file.](at01.json)
+<code>make_json_input at01 63.484 -162.006 21.565 -h1 8 -h2 15 -e1 5 -e2 13 -ampl 4 -allfreq T -azlist 20 90 90 180 180 220</code>
+I removed frequency 208 and the Beidou signals. [Sample json file.](at01.json)
 
 Next estimate reflector height (RH) for the two month time period:
 

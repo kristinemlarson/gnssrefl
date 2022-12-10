@@ -1,5 +1,7 @@
 ### San Diego California
 
+Updated December 10, 2022 
+
 **Station Name:** p475
 
 **Location:** Point Loma, CA, USA
@@ -43,10 +45,11 @@ The analysis parameters are set up with <code>make_json_input</code>. While ordi
 the station latitude, longitude, and ellipsoidal height for this code, if the station is in the <code>gnssrefl</code> database, you can 
 put zero values there instead. We only need the L2C data, so have set the parameter accordingly.
 
-<code>make_json_input p475 0 0 0 -l2c true</code>
+<code>make_json_input p475 0 0 0 -l2c true -azlist 140 180 170 270</code>
 
-Edit the json to emphasize the good reflection area. I started with 140 to 270.  I split it into two regions,
-one from 140-180 and the other from 170 to 270. There is a little overlap in the regions (to the south) so that I don't lose 
+The azlist input emphasizes the good reflection area. I chose 140 to 270. I split it into two regions,
+one from 140-180 and the other from 170 to 270. There is a little overlap 
+in the regions (to the south) so that I don't lose 
 any tracks. For sites that have more tracks, I don't usually bother with this. 
 
 Now we run <code>gnssir</code>. This will be needed for estimate *a priori* reflector heights for the soil moisture code.

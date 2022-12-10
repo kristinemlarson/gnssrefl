@@ -1,6 +1,8 @@
 ### Niwot Ridge, Colorado, USA
 
-Unfortunately this site is no longer supported.
+Updated December 10, 2022
+
+**Status:** this site is no longer supported and the equipment was removed.
 
 **Station name:** nwot
 
@@ -85,13 +87,14 @@ one line:
 
 Make a json file for your <code>gnssir</code> analysis:
 
-<code>make_json_input nwot 40.05539 -105.59053  3522.729 -e1 7 -e2 25 -peak2noise 3.2</code>
+<code>make_json_input nwot 0 0 0  -e1 7 -e2 25 -peak2noise 3.2 -azlist 90 180 180 270</code>
 
 I have opted to only use the southern quadrants (azimuths 90 through 270). Note that since
 L5 was not tracked at this site, it is not listed in the json file. I am using a minimum elevation
 angle of 7 degrees because this particular receiver had a limit on the number of satellites it 
 could track. In some cases this meant the low elevation data are not available and that triggers 
-QC restrictions. [A sample json file for this site.](nwot.json)
+QC restrictions. [A sample json file for this site.](nwot.json) No coordinates are input because
+the site is in our database.
 
 Once you have a json file set up, run <code>gnssir</code> for the years 2009-2015:
 

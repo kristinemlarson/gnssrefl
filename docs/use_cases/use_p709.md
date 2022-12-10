@@ -1,5 +1,7 @@
 ### Lake Yellowstone, Yellowstone National Park
 
+Updated December 10, 2022
+
 **Station Name:** p709
 
 <P align=center>
@@ -40,15 +42,15 @@ detect the daily average lake level. Make sure that you use the reflection zone 
 
 <code>quickLook p709 2022 1 -e1 5 -e2 10 -h1 20 -h2 40</code>
 
-
 **Estimate Reflector Height**
 
 Set your analysis strategy using <code>make_json_input</code>. Remember, if the UNR database
-knows about the site, then you can input lat,lon,ht of 0,0,0.
+knows about the site, then you can input lat,lon,ht of 0,0,0. You can input the azimuth limits using
+-azlist.
 
 <code>rinex2snr p709 2021 183 -dec 5 -archive unavco -rate high -orb gnss</code>
 
-<code>gnssir 2021 1 -doy_end 180</code>
+<code>gnssir p709 2021 1 -doy_end 180</code>
 
 Use <code>daily_avg </code> to calculate a daily reflector height. Various statistics also
 come to the screen. Here is the RH series:
