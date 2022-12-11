@@ -1,5 +1,7 @@
 ### Friday Harbor
 
+Updated December 11, 2022
+
 <p align="center">
 <img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>
 </P>
@@ -95,12 +97,12 @@ the process. We will be using three+ weeks of GNSS data from 2021 as our sample 
 
 <code>rinex2snr sc02 2021 15 -doy_end 40</code>
 
-Then you need to make the list of analysis inputs (stored in json format):
+Then you need to make the list of analysis inputs. Note the lat/lon/ht is not required if 
+the station is in our database, as this station is:
 
-<code>make_json_input sc02  48.546  -123.008  -15.049 -e1 5 -e2 13 -h1 3 -h2 12 -peak2noise 3.0 -allfreq True</code>
+<code>make_json_input sc02  0 0 0  -e1 5 -e2 13 -h1 3 -h2 12 -peak2noise 3 -allfreq T -azlist 60 90 90 180 180 220</code>
 
-Hand edit the json file to remove the unreliable azimuths and the Beidou signals because they are 
-not in the RINEX 2.11 file [Example json file](sc02.json). 
+I removed the Beidou signals, but it is not required. [Example json file](sc02.json). 
 
 Once you have the json file set up, you can go ahead and analyze all the data with a single command:
 

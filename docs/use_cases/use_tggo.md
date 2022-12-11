@@ -70,10 +70,7 @@ The next step is to write down your analyis strategy using <code>make_json_input
 included in our global database, you can simply use 0,0,0 for the required *a priori* station coordinates:
 I am using a slightly smaller reflector height zone than I used with <code>quickLook</code>.
 
-<code>make_json_input tggo 0 0 0 -h1 6 -h2 20 -e1 5 -e2 15 -h1 6 -h2 18 -allfreq T</code>
-
-Edit the json file (location is printed to the screen) and remove the azimuth region in
-the red box above.
+<code>make_json_input tggo 0 0 0 -h1 6 -h2 20 -e1 5 -e2 15 -h1 6 -h2 18 -allfreq T -azlist 30 90 90 180 270 330 </code>
 
 Now estimate reflector heights for these same dates: 
 

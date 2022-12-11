@@ -1,5 +1,7 @@
 ### Michipicoten, Lake Superior 
 
+Updated December 11, 2022
+
 **Station Name:** 	mchn
 
 **Location:** Michipicoten Harbor, Ontario, Canada
@@ -23,7 +25,6 @@
 <p align=center>
 <img src="../_static/mchn_monu-cors.png" width="500"/>
 </P>
-
 
 ### Data Summary
 
@@ -82,14 +83,14 @@ The data from 2013 will be analyzed here as a test case.  Begin by generating th
 
 The resulting SNR files are stored in $REFL_CODE/2013/snr/mchn.  
 
-Analysis parameters are set up with <code>make_json_input</code>
+Analysis parameters are set up with <code>make_json_input</code> using the default receiver location:
 
-<code>make_json_input mchn 47.961 -84.901 152.019 -h1 3 -h2 10 -e1 5 -e2 25 -l1 True -peak2noise 3 -ampl 8</code>
+<code>make_json_input mchn 0 0 0 -h1 3 -h2 10 -e1 5 -e2 25 -l1 T -peak2noise 3 -ampl 8 -azlist 80 180</code>
 
-[Sample json file](mchn.json) While most of the analysis settings can be done by the command 
-line, you can see that the azimuths have been set by
-hand to be limited to 80-180 degrees. Although it is possible to get good reflections beyond 
-180 degrees, the photographs suggest barriers are present in that region.  
+[Sample json file](mchn.json) 
+
+Although it is possible to get good reflections beyond an azimuth of 180 degrees, the 
+photographs suggest barriers are present in that region.  
 
 Now that the analysis parameters are set, run <code>gnssir</code> to save the reflector height (RH) output for each day in 2013.
 

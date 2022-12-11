@@ -1,5 +1,7 @@
 # Lake Taupo
 
+Updated December 11, 2022 
+
 <p align="center">
 <img src="../_static/tgho_barker.jpg" width="500"><BR>
 Photo credit: Simon Barker
@@ -36,7 +38,8 @@ The site could be significantly improved with a newer receiver that tracks moder
 
 ## Take a Quick Look at the Data
 
-Begin by making an SNR file. Use both GPS and Glonass and set the archive to nz:
+Begin by making an SNR file. Use both GPS and Glonass and set the archive to nz or sopac (downloading from nz tends to be 
+slow from Europe and the Americas):
 
 <code>rinex2snr tgho 2020 300 -orb gnss -archive nz</code>
 
@@ -76,12 +79,17 @@ We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 an
 
 ## Analyze the Data
 
-Use <code>make_json_input</code> to set up the analysis parameters. Set the elevation and reflector heights as in <code>quickLook</code>. The peak to noise ratio and required amplitude can be set on the command line. 
+Use <code>make_json_input</code> to set up the analysis parameters. 
+Set the elevation and reflector heights as in <code>quickLook</code>. 
+The peak to noise ratio and required amplitude can be set on the command line. 
+The receiver location does not have to be input as it is a well known station from
+the global GNSS network.
 
-<code>make_json_input tgho -38.8130   175.9960  385.990 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9</code>
- 
-The azimuth mask has to be set by hand to exclude empty regions and azimiths with poor retrievals. 
-Glonass signals (frequencies 101 and 102) were added and GPS L2/L5 were removed.[Sample json](tgho.json)
+<code>make_json_input tgho 0 0 0 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9 -allfreq T -azlist 0 90 90 135 225 270 270 360</code>
+
+There are no galileo or Beidou data at this site, so I hand-edited them out of the json file.  But it is 
+not required (the code will not crash). Similarly, I removed GPS L2, but the signals are of such poor 
+quality, they will be excluded because of the QC parameters. [Sample json](tgho.json)
 
 Then make SNR files for ~six months:
 
