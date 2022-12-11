@@ -29,7 +29,7 @@ def parse_arguments():
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
     parser.add_argument("-stream", default=None, type=str,
                         help="set to True to get stream-defined Rinex3 filename. I know. I know. It is annoying.")
-    parser.add_argument("-samplerate", default=None, type=str, help="Sample rate in seconds. For RINEX3 only.")
+    parser.add_argument("-samplerate", default=None, type=int, help="Sample rate in seconds. For RINEX3 only.")
     parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
     parser.add_argument("-dec", default=None, type=int, help="decimation value (seconds). Only for RINEX 3.")
 

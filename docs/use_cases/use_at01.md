@@ -90,9 +90,9 @@ Next we analyze data for two months in the fall of 2020. First make the SNR file
 
 <code>rinex2snr at01 2020 230 -archive unavco -doy_end 290</code>
 
-Now set up the analysis instructions:
+Now set up the analysis instructions (assume database receiver coordinates are correct):
 
-<code>make_json_input at01 63.484 -162.006 21.565 -h1 8 -h2 15 -e1 5 -e2 13 -ampl 4 -allfreq T -azlist 20 90 90 180 180 220</code>
+<code>make_json_input at01 0 0 0 -h1 8 -h2 15 -e1 5 -e2 13 -ampl 4 -allfreq T -azlist 20 90 90 180 180 220</code>
 I removed frequency 208 and the Beidou signals. [Sample json file.](at01.json)
 
 Next estimate reflector height (RH) for the two month time period:
