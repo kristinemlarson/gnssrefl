@@ -85,13 +85,12 @@ The peak to noise ratio and required amplitude can be set on the command line.
 The receiver location does not have to be input as it is a well known station from
 the global GNSS network.
 
-<code>make_json_input tgho 0 0 0 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9 -allfreq T -azlist 0 90 90 135 225 270 270 360</code>
+<code>make_json_input tgho 0 0 0 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9  -azlist 0 90 90 135 225 270 270 360 -frlist 1 101 102 </code>
 
-There are no galileo or Beidou data at this site, so I hand-edited them out of the json file.  But it is 
-not required (the code will not crash). Similarly, I removed GPS L2, but the signals are of such poor 
-quality, they will be excluded because of the QC parameters. [Sample json](tgho.json)
+Note the -frlist entries. I am asking for GPS L1 and Glonass L1 and L2. The GPS L2 are not high quality 
+and there are no Galileo or Beidou data. If you want all signals from all constellations you need to choose -allfreq T.
 
-Then make SNR files for ~six months:
+Then make SNR files for about six months:
 
 <code>rinex2snr tgho 2020 130 -archive nz -doy_end 319 -orb gnss</code>
 

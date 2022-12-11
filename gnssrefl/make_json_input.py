@@ -38,6 +38,7 @@ def parse_arguments():
     parser.add_argument("-ediff", default=None, type=str, help="ediff (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument('-azlist', nargs="*",type=float,  help='User defined azimuth zones, i.e. 0 90 90 180 would mean only the east. Must be an even number of values.')
+    parser.add_argument('-frlist', nargs="*",type=int,  help='User defined frequencies using our nomenclature.')
 
 
     args = parser.parse_args().__dict__
@@ -54,7 +55,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               h1: float = 0.5, h2: float = 6.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.7, ampl: float = 6.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = None, ediff: float=2.0, delTmax: float=75.0, azlist: float=[]  ):
+              extension: str = None, ediff: float=2.0, delTmax: float=75.0, azlist: float=[], frlist: float=[] ):
 
     """
     Make a json file that describes the lomb scargle analysis strategy you will use in gnssrefl.
@@ -139,6 +140,11 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         lets the user set the azimuth regions, in degrees
         each region must be < 100 degrees! e.g. 0 90 90 180 would be all the east
         90 180 180 270 would be all the south
+
+    frlist : list of integers
+        avoids all the booleans - if you know the frequencies, enter them.
+        e.g. 1 2 or 1 20 5 or 1 20 101 102
+
     """
 
     # make sure environment variables exist
@@ -248,6 +254,13 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
 
     if l2c is True:
         lsp['freqs'] = [20]
+
+    if len(frlist) == 0:
+        # this means you entered nothing
+        print('Using standard frequency choices.')
+    else:
+        print('Implementing user-provided frequency list.')
+        lsp['freqs'] = frlist
 
     # create a list with all values equal to reqA
     # but the length of the list depends on the length of the list of frequencies

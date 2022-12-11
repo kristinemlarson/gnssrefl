@@ -35,7 +35,9 @@ Day 2
 something on her youtube channel (KL)
 
 Day 3
-- Water : lakes (Rebecca) rivers, tides  (Simon)
+Richard Ray  ??? Overview on what is important ???
+
+- Water : lakes (Rebecca) rivers (Makan?), tides  (Simon)
 Zulfikar could give experience from Indonesia?
 
 Day 4
