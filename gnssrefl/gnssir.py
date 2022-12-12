@@ -327,11 +327,13 @@ def read_json_file(station, extension):
     instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
     instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
     if os.path.isfile(instructions_ext):
+        usefile = instructions_ext
         #print('using specific instructions for this extension')
         with open(instructions_ext) as f:
             lsp = json.load(f)
     else:
         #print('will use the default instruction file')
+        usefile = instructions
         if os.path.isfile(instructions):
             with open(instructions) as f:
                 lsp = json.load(f)
@@ -339,6 +341,13 @@ def read_json_file(station, extension):
             print('The json instruction file does not exist: ', instructions)
             print('Please make with make_json_input and run this code again.')
             sys.exit()
+
+    if len(lsp['reqAmp']) < len(lsp['freqs']) :
+        print('Number of frequencies found in json: ', len(lsp['freqs']))
+        print('Number of required amplitudes found in json: ', len(lsp['reqAmp']))
+        print('You need to have a required Amplitude for each frequency.')
+        print('Please fix your json file: ', usefile)
+        sys.exit()
 
     return lsp
 
