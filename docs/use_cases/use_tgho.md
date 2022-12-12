@@ -129,3 +129,4 @@ Although Taupo is in a volcanic caldera, lake levels are determined by seasonal 
 as evaporation, precipitation, input from local drainages, and outflow. The Waikoto 
 River is sole river draining the lake, and river flow is regulated by a series of hydroelectric dams.
 
+[See this paper by Lucas Holden for more information.](https://link.springer.com/article/10.1007/s00190-021-01523-7)
