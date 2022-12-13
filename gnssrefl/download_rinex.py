@@ -32,11 +32,12 @@ def parse_arguments():
     parser.add_argument("-samplerate", default=None, type=int, help="Sample rate in seconds. For RINEX3 only.")
     parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
     parser.add_argument("-dec", default=None, type=int, help="decimation value (seconds). Only for RINEX 3.")
+    parser.add_argument("-save_crx", default=None, type=str, help="Save crx version. Only for RINEX 3.")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['strip','debug']
+    boolean_args = ['strip','debug','save_crx']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -44,11 +45,11 @@ def parse_arguments():
 
 
 def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = None,
-                   version: int = 2, strip: bool = False, doy_end: int = None, stream: str = 'R', samplerate: int = 30,
-                   debug: bool = False, dec: int = 1):
+                   version: int = 2, strip: bool = False, doy_end: 
+                   int = None, stream: str = 'R', samplerate: int = 30, 
+                   debug: bool = False, dec: int = 1, save_crx: bool = False):
     """
     command line interface for download_rinex.
-    2022 nov 17
 
     Parameters
     ----------
@@ -113,7 +114,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
 
     doy_end : int, optional
-        End day of year to be downloaded. This is to create a range from doy to doy_end of days to get the snr files.
+        End day of year to be downloaded. 
         Default is None. (meaning only a single day using the doy parameter)
 
     stream : str, optional
@@ -130,6 +131,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     dec : integer, optional
         some highrate file downloads allow decimation. Default is 1 sec, i.e. no decimation
+
+    save_crx : boolean, option
+        saves crx version for Rinex3 downloads. Otherwise they are deleted.
     """
 
 #   make sure environment variables exist.  set to current directory if not
@@ -240,9 +244,11 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                         file_name, foundit = k.universal(station, year, d, archive, samplerate, k.swapRS(stream),debug)
                 if foundit: 
                     print('\n SUCCESS 1: ', file_name)
-                    translated, new_file_name = r.go_from_crxgz_to_rnx(file_name)
+                    deletecrx = not save_crx
+                    translated, new_file_name = r.go_from_crxgz_to_rnx(file_name,deletecrx)
                     if translated:
-                        subprocess.call(['rm', '-f', new_file_name.replace('rnx', 'crx')])  # delete crx file
+                        # i do not think this was doing what we thought it was doing ....
+                        #subprocess.call(['rm', '-f', new_file_name.replace('rnx', 'crx')])  # delete crx file
                         print('\n SUCCESS 2: ', new_file_name)
         else:  # RINEX VERSION 2
             # using new karnak code

@@ -61,7 +61,7 @@ Step 1: Run <code>make_json_input</code> using the information I discussed earli
 
 - azimuth angle limits  **Try out -azlist 220  275**
 
-- elevation angle limits
+- elevation angle limits  **Use -e1 and -e2**
 
 - RH limits. 
 
@@ -69,12 +69,13 @@ Step 1: Run <code>make_json_input</code> using the information I discussed earli
 
 - amplitude limits to be small for L2 
 
-- allow L1 and L2 (the default is 1,20,5 but the simplest way to change this is to make it  1,2,5)
+- allow L1 and L2 **Try out -frlist 1 2**
 
 - since MBBC is in the Nevada Reno database, you do not have to provide lat/lon/ht. Simply put 0,0,0 for those entries.
 
 Note: I usually tell people to use L2C instead of L2. This information is 
-not available in this dataset - either because the PIs did not track L2C or because it is not provided by UNAVCO.
+not available in this dataset - either because the PIs did not track L2C or because the data are not 
+provided by UNAVCO in the standard RINEX files.
 
 Step 2: Make SNR files using <code>rinex2snr</code>. 
 

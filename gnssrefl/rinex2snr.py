@@ -219,7 +219,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         if os.path.exists(r3cmpgz):
                             print('Try to translate', r3cmpgz)
-                            translated, rnx_filename = go_from_crxgz_to_rnx(r3cmpgz)
+                            deletecrx = True
+                            translated, rnx_filename = go_from_crxgz_to_rnx(r3cmpgz,deletecrx)
                         if os.path.exists(r3gz):
                             print('Try to gunzip ', r3gz)
                             subprocess.call(['gunzip', r3gz])
@@ -273,7 +274,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                     #print('stream',stream)
                                     file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
                             if foundit: # version 3 found - now need to gzip, then hatanaka decompress
-                                translated, rnx_filename = go_from_crxgz_to_rnx(file_name)
+                                deletecrx = True # no point keeping this around
+                                translated, rnx_filename = go_from_crxgz_to_rnx(file_name,deletecrx)
                             # now make rinex2
                                 if translated:
                                     print('The RINEX 3 file has been downloaded. Try to make ', r2)
@@ -1183,15 +1185,18 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
         else:
             g.hatanaka_warning()
 
-def go_from_crxgz_to_rnx(c3gz):
+def go_from_crxgz_to_rnx(c3gz,deletecrx=True):
     """
-    checks ot see if rinex3 file exists, gunzip if necessary,
+    checks to see if rinex3 file exists, gunzip if necessary,
     run hatanaka, if necessary
 
     Parameters
     ----------
     c3gz : str
         filename for a gzipped RINEX 3 Hatanaka file
+
+    deletecrx = bool
+        whether to delete the crx file
 
     Returns
     -------
@@ -1218,8 +1223,9 @@ def go_from_crxgz_to_rnx(c3gz):
             subprocess.call([crnxpath,c3])
     if os.path.exists(rnx): # file exists
         translated = True
-        #print('remove Hatanaka compressed file')
-        subprocess.call(['rm','-f',c3])
+        if deletecrx:
+            print('remove Hatanaka compressed file')
+            subprocess.call(['rm','-f',c3])
 
     return translated, rnx
 

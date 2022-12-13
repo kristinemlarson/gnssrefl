@@ -1,13 +1,28 @@
 # -*- coding: utf-8 -*-
-"""
-converts XYZ to latlonht
-"""
 import argparse
 import sys
 
 import gnssrefl.gps as g
 
 def main():
+"""
+Converts Cartesian coordinates to latitude, longitude, ellipsoidal height.
+
+Parameters
+----------
+x : float
+    X coordinate (m)
+y : float
+    Y coordinate (m)
+z : float
+    Z coordinate (m)
+
+Returns
+-------
+prints lat long  height to screen.
+
+
+"""
 
     parser = argparse.ArgumentParser()
     parser.add_argument("x", help="X coordinate (m) ", type=float)
