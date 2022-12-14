@@ -13,14 +13,14 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('station', help='station', type=str)
-    parser.add_argument('-azim1', help='start azimuth (default is 0, negative values allowed) ', type=int)
-    parser.add_argument('-azim2', help='end azimuth (default is 360) ', type=int)
-    parser.add_argument('-el_list', nargs="*",type=float,  help='elevation angle list, e.g. 5 10 15  (default)')
     parser.add_argument('-lat', help='Latitude (deg), if station not in database', type=float, default=None)
     parser.add_argument('-lon', help='Longitude (deg), if station not in database', type=float, default=None)
-    parser.add_argument('-el_height', help='Ellipsoidal height (m) if station not in database', type=float)
+    parser.add_argument('-el_height', help='Ellipsoidal height (m) if station not in database', type=float,default=None)
     parser.add_argument('-fr', help='1, 2, or 5 ', type=int)
     parser.add_argument('-RH', help='Reflector height (meters). Default is sea level', type=str, default=None)
+    parser.add_argument('-azim1', help='start azimuth (default is 0, negative values allowed) ', type=int,default=None)
+    parser.add_argument('-azim2', help='end azimuth (default is 360) ', type=int,default=None)
+    parser.add_argument('-el_list', nargs="*",type=float,  help='elevation angle list, e.g. 5 10 15  (default)')
     parser.add_argument('-system', help='default=gps, options are galileo, glonass, beidou', type=str)
     parser.add_argument('-output', help='default is the station name', type=str,default=None)
 
@@ -29,7 +29,7 @@ def parse_arguments():
 
     return {key: value for key, value in args.items() if value is not None}
 
-def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=0, lon: float=0, el_height: float=0, RH: str=None, fr: int = 1, el_list: float= [5, 10, 15],system: str = 'gps', output: str = None):
+def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, el_height: float=None, RH: str=None, fr: int = 1, el_list: float= [5, 10, 15],system: str = 'gps', output: str = None):
     """
     creates KML file for reflection zones to be used in Google Earth
 
@@ -71,7 +71,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=0, lon: flo
     Creates a KML file
 
     """
-
+    print(azim1,azim2)
     # check that you have the files for the orbits on your local system
     foundfiles = rf.save_reflzone_orbits()    
     if not foundfiles:
@@ -85,14 +85,12 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=0, lon: flo
     if (RH == None) and (not foundfile):
         print('EGM96 file is not online. It should be in the REFL_CODE/Files directory')
 
+    #print(lat,lon,el_height)
+    if (lat is None) & (lon is None):
     # check the station coordinates in our database from the station name
-    xlat, xlon, xel_height = g.queryUNR_modern(station)
-
-    # if none found, they will need to have been input on the command line
-    if (xlat == 0) and (xlon == 0):
-        print('Using the input from the command line')
+        lat, lon, el_height = g.queryUNR_modern(station)
     else:
-        lat = xlat; lon = xlon; el_height = xel_height
+        print('using inputs:', lat, lon, el_height)
 
     geoidC = g.geoidCorrection(lat,lon)
     # calculate height above sea level
@@ -107,9 +105,13 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=0, lon: flo
     else:
         h = float(RH)
 
+    if h < 0:
+        print('This is an illegal RH: ',h, ' Exiting.')
+        sys.exit()
+
     if h > 300:
-        h = 2;
-        print('This is a very large reflector height value. Reducing to 2.')
+        print('This is a very large reflector height value.', h, ' Exiting.')
+        sys.exit()
 
     print('Reflector height (m) ', np.round(h,3))
     
