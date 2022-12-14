@@ -191,13 +191,19 @@ def read_apriori_rh(station,fr):
     Returns
     -------
     results : numpy array 
-        column 1 is ?
+        column 1 is just a number (1,2,3,4, etc)
+
         column 2 is RH in meters
-        column 3 is sat 
-        column 4 is azimuth etc
+
+        column 3 is satellite number 
+
+        column 4 is azimuth of the track (degrees)
+
         column 5 is number of values used in average
-        column 6 is minimum azimuth degrees
-        column 7 is maximum azimuth degrees
+
+        column 6 is minimum azimuth degrees for the quadrant
+
+        column 7 is maximum azimuth degrees for the quadrant
     """
     result = []
     # do not have time to use this
