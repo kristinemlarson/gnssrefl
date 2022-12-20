@@ -267,7 +267,7 @@ def gps2datenum(gt):
     return dn
 
 
-def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1', normalize=False, 
+def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1', normalize=False, 
         snrfigs=False, lspfigs=False, polydeg=2, gaptlim=5*60, pktnlim=4, 
         savefile=False, screenstats=False, l2c_only=False,satconsts=['G','R','E'], **kwargs):
     """
@@ -276,6 +276,8 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
 
     Parameters
     ----------
+    station : str
+        4 ch station name
     snrdata: numpy array 
         contents of SNR datafile
 
@@ -416,7 +418,11 @@ def snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year,doy,signal='L1',
     alld = {}
     # initialize values?
     kristine_dictionary(alld,'','')
-    fout = open('my_lsp.txt', 'w+')
+
+    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/'
+
+    print('invsnr lsp results written to :', xdir + 'my_lsp.txt')
+    fout = open(xdir + 'my_lsp.txt', 'w+')
     for sat in satellite_list:
         # get the data for that satellite
         tfilter = (snrdata[:, 0] == sat)
@@ -801,10 +807,10 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             else:
                 snrdata = np.vstack((snrdata, snrtemp))
 
-    xdir = os.environ['REFL_CODE'] + '/Files/'
-    if not os.path.isdir(xdir):
-        print('make output directory for file')
-        subprocess.call(['mkdir',xdir])
+    # set output directory here
+    g.set_subdir(station)
+    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/'
+
 
     nr,nc = snrdata.shape
     print('Number of obs', nr, ' number of days', numdays)
@@ -837,7 +843,12 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     # arguments sent directly
     print('Begin Lomb Scargle analysis')
     s1=time.time()
-    rh_arr, snrdt_arr, fspecdict= snr2arcs(snrdata, azilims, elvlims, rhlims, precision, year, doy, signal=signal,**kwargs)
+    rh_arr, snrdt_arr, fspecdict= snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year, doy, signal=signal,**kwargs)
+    # should already exist
+    #xdir = os.environ['REFL_CODE'] + '/Files/'
+    #if not os.path.isdir(xdir):
+    #    print('make output directory for file')
+    #    subprocess.call(['mkdir',xdir])
     s2=time.time()
     print('Time spent: ',round(s2-s1,2), ' seconds')
     print(fspecdict)
@@ -980,7 +991,8 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             spl_at_lsp = cubspl_f(Xres)
             ab = rh_arr
 
-            iiout = open('outliers_lsp.txt', 'w+')
+            print('invsnr lsp outliers written to : ', xdir + 'outliers_lsp.txt')
+            iiout = open(xdir + 'outliers_lsp.txt', 'w+')
             for ijk in range(0,len(rh_arr)):
                 dd =  rh_arr[ijk,1]-spl_at_lsp[ijk]
                 if (abs(dd) > outlier_limit):
@@ -1026,7 +1038,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         ax.grid(True)
         ax.set_ylabel('RH meters')
         ax.invert_yaxis()
-        spng = str(os.environ['REFL_CODE'])+'/Files/spline_out.png'
+        spng = str(os.environ['REFL_CODE']) + '/Files/' + station + '/' + 'spline_out.png'
         print('Plot with results has been written to ', spng)
         plt.savefig(spng)
         if doplot:

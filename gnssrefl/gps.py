@@ -5754,11 +5754,13 @@ def make_azim_choices(alist):
 def set_subdir(subdir):
     """
     make sure that subdirectory exists for output files 
+    should return the directory name ... 
 
     Parameters
     ----------
     subdir : str
         subdirectory in $REFL_CODE/Files
+
     """
     xdir = os.environ['REFL_CODE']
     if not os.path.exists(xdir):
