@@ -18,13 +18,25 @@ import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
 
-def writeout_spline_outliers(tvd_bad):
+def writeout_spline_outliers(tvd_bad,txtdir):
     """
+
+    Write splinefit outliers to a file
+
+    Parameters
+    ----------
+    tvd_bad : numpy array
+        output of the lomb scargle calculations
+
+    txtdir : str
+        location for the output, i.e. $REFL_CODE/FiLes/station
+
     """
     nr,nc=tvd_bad.shape
     if nr > 0:
-        print('Outliers written to: outliers.spline.txt')
-        fout = open('outliers.spline.txt', 'w+')
+        f = txtdir + '/outliers.spline.txt'
+        print('Outliers written to: ', f)
+        fout = open(f, 'w+')
         for w in range(0,nr):
             fout.write('sat {0:3.0f} azim {1:7.2f} delta {2:7.2f} \n'.format( tvd_bad[w,3], tvd_bad[w,5], tvd_bad[w,14]))
         fout.close()
@@ -67,8 +79,10 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     plt.grid()
     g.save_plot(txtdir + '/' + station + '_rhdot1.png')
 
-def print_badpoints(t,outliersize):
+def print_badpoints(t,outliersize,txtdir):
     """
+    prints outliers to a file so you can look at them separately
+
     Parameters
     ----------
     t : numpy array
@@ -79,7 +93,7 @@ def print_badpoints(t,outliersize):
 
     Returns
     -------
-    writes to a file called outliers.txt
+    writes to a file called outliers.txt in the Files/station area
 
     """
 # format of t 
@@ -89,7 +103,7 @@ def print_badpoints(t,outliersize):
 # (0)  (1)   (2) (3)  (4)     (5)   6 )    (7)    (8)   (9)  (10) (11) (12)    (13)     (14)    (15)  (16) ... 
 
     m,n = t.shape
-    f = 'outliers.txt'
+    f = txtdir + '/outliers.txt'
     print('outliers written to file: ', f) 
     fout = open(f, 'w+')
     if (m > 0):
@@ -439,7 +453,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         plt.show()
 
     # this might work... and then again, it might not
-    print_badpoints(tv[ii,:],residuals[ii])
+    print_badpoints(tv[ii,:],residuals[ii],txtdir)
 
     # now write things out - using txtdir variable sent 
     if writecsv: 
@@ -1275,7 +1289,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
 
     tvd_bad = tvd[np.abs(residual_after) >  3*sigmaAfter, :]
-    writeout_spline_outliers(tvd_bad)
+    writeout_spline_outliers(tvd_bad,txtdir)
 
     # keep values within 3 sigma 
     ii = np.abs(residual_after) < 3*sigmaAfter
