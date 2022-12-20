@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-extracts coordinates for stations that were in the UNR
-database (when I downloaded it ;-)
-
-"""
 import argparse
 import wget
 import sys
@@ -13,7 +8,13 @@ import gnssrefl.gps as g
 
 def main():
     """
-    command line interface for query_unr
+    query_unr: extracts coordinates for stations that were in UNR database.
+    in late 2021.  
+
+    Parameters
+    ----------
+    station : str
+        four character station name
     """
 
     parser = argparse.ArgumentParser()

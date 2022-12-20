@@ -1,45 +1,10 @@
+
+pip install --force-reinstall .
+
 Documentation
 
 https://documentation.divio.com/
 
-Dates:
-
-Geodesy for Climate Research (ICCC) March 28-30, 2023
-Earthscope : March 27-29 2023
-EGU 23–28 April 2023
-
-May 1-5 ?
-May 8-13 ?
-
-May 24-26 GNSS+R
-
-May 29-June 2 Pentecost
-
-June seems pretty open for Eruoep - but 
-very few American universities "open" 
-But does that matter?
-
-IUGG  - July 11-20
-
-
-Possible one-week short short course:
-
-First Week - two hour max
-
-- Installation help session, Tim and Kelly
-
-- Basic Theory (Felipe) How to Run the Code (kristine), 
-(do we offer or make people watch the videos?)
-
-Second Week Two hour max per day
-
-- Day 1 : Snow, ice sheets, lakes (me or Felipe?)
-
-- Day 2 : sea level (Simon)
-
-- Day 3 : soil moisture (me)
-
-- Day 4 : How to run your own site. good receiver (kristine) cheap sensors (Makan,Felipe,Simon)
 
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
@@ -123,4 +88,5 @@ added refl_zones utility
 1.2.2 had made delTmax to 45 minutes, but that is way too short for soil moisture.
 put it back to 75 minutes.
 
-1.2.3 added azlist to make_json_input. Craziness.
+1.2.3 added azlist to make_json_input. Craziness. also frlist ... 
+1.2.4 subdaily writes out evenly sampled results if requsted 

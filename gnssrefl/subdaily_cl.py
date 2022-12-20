@@ -40,11 +40,13 @@ def parse_arguments():
     parser.add_argument("-peak2noise", default=None, type=float, help="new peak2noise constraint")
     parser.add_argument("-kplt", default=None, type=str, help="special plot for kristine")
     parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output")
+    parser.add_argument("-delta_out", default=None, type=int, help="Optional output interval, seconds")
+    parser.add_argument("-if_corr", default=None, type=str, help="Interfrequency correction applied, optional")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt']
+    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt','if_corr']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -55,7 +57,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
              spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = False,
              doy1: int = 1, doy2: int = 366, testing: bool = True, ampl: float = 0, 
              h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, 
-             peak2noise: float = 0, kplt: bool = False, subdir: str = None):
+             peak2noise: float = 0, kplt: bool = False, subdir: str = None, delta_out : int = 0, if_corr: bool = True):
     """
     Parameters
     ----------
@@ -173,7 +175,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     # not sure why tv and corr are being returned.
     if rhdot:
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
-                   knots=knots,txtdir=txtdir,testing=testing)
+                   knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,if_corr=if_corr)
 
 def main():
     args = parse_arguments()

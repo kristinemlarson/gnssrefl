@@ -33,9 +33,13 @@ def writeout_spline_outliers(tvd_bad):
 
 def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     """
-    tnew : numpy of floats
-        time in days of year, with faked data, used for splines
+    Makes a plot of the spline fit to the mirrored RH data
+    Plot is saved to txtdir  as  station_rhdot1.png
 
+    Parameters
+    ----------
+    tnew : numpy of floats
+        time in days of year, including the faked data, used for splines
     ynew : numpy of floats
         RH in meters 
     spl_t : numpy of floats
@@ -115,13 +119,10 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     -------
     writetxt : bool
         whether output should be plain txt
-
     writecsv : bool
         whether output should be csv format
-
     writejson : bool
         whether output should be json format
-
     outfile : str
         output filename
 
@@ -699,8 +700,8 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
 
     Parameters
     ----------
-    otimes : numpy array
-        datetime
+    otimes : numpy array of datetime objects
+        observations times
 
     tv : numpy array
         gnssrefl results written into this variable using loadtxt
@@ -795,14 +796,14 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
 
     Parameters
     ----------
-    otimes - numpy array of datetime objects ?
+    otimes : numpy array of datetime objects 
         observation times
 
-    tv - variable with the gnssrefl results
+    tv : variable with the gnssrefl results
 
-    ii - good data?
+    ii : good data?
 
-    jj - bad data?
+    jj : bad data?
 
     station : string
         station name
@@ -1140,7 +1141,20 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
         txtdir = xdir + '/Files/'
     else:
         txtdir = val
-    print('output directory: ', txtdir)
+
+    delta_out = kwargs.get('delta_out',0)
+    if (delta_out  == 0):
+        splineout = False
+    else:
+        splineout = True
+
+    if_corr = kwargs.get('if_corr',True)
+    if if_corr:
+        apply_corr = True
+    else:
+        apply_corr = False
+
+    #print('output directory: ', txtdir)
 
 #   how often do you want velocity computed (per day)
     perday = 24*20 # so every 3 minutes
@@ -1409,6 +1423,32 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     write_subdaily(bias_corrected_filename,station,tvd_new[jj,:], writecsv,extraline, newRH_IF=biasCor_rh)
 
     # I was looking at issue of delT being too big
+
+    if splineout:
+        if delta_out == 0:
+            print('no spline values are written')
+        else:
+            #
+            iyear = int(tvd_new[0,0])
+            firstpoint  = th[0]; lastpoint = th[-1]
+            s1 = math.floor(firstpoint) ; s2 = math.ceil(lastpoint)
+            ndays = s2-s1 # number of days
+            # how many values you want in the linspace world
+            numvals = 1 + int(ndays*86400/delta_out)
+            # this should be fractional doy
+            tplot = np.linspace(s1, s2, numvals)
+            spline_even = spline(tplot)
+            N = len(tplot)
+            # but you only want those values when we have data ....
+            splinefileout =  txtdir + '/' + station + '_spline_out.txt'
+            print('Writing evenly sampled file to: ', splinefileout)
+            fout = open(splinefileout,'w+')
+            for i in range(0,N):
+                modjul = g.fdoy2mjd(iyear,tplot[i])
+                if (tplot[i] > firstpoint) & (tplot[i] < lastpoint):
+                    fout.write('{0:15.7f}  {1:10.3f} \n'.format(modjul, spline_even[i]))
+            fout.close()
+
     if  False:
         plt.figure()
         res = (h-spline_at_GPS)
