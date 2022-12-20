@@ -316,7 +316,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                                 plt.plot(px,pz,'gray',linewidth=0.5)
                             if screenstats:
                                 print('FAILED QC for Azimuth {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:7.3f} '.format( avgAzim,satNu,UTCtime,maxF))
-                                g.write_QC_fails(delT,75,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose)
+                                g.write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose)
 
                             idc = 'f' + stitles[a]
                             data[idc][satNu] = [px,pz]

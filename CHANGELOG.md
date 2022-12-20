@@ -1,9 +1,7 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-The format is based on [Keep a Changelog].
-
-[keep a changelog]: https://keepachangelog.com/en/1.0.0/
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.2.4
 
@@ -12,6 +10,12 @@ Improvements:
 * Subdaily writes out evenly sampled results if requested. This is from 
 a spline fit - to the reflector height observations and thus is dependent 
 on the assumption that the water level is smooth.
+
+Bugfixes:
+
+* Fixed a bug for delTmax in quickLook that had been changed to 45 minutes - 
+returned it to 75 minutes to accommondate snow/soil moisture applications.
+I had fixed it in make_json_input, but not in quickLook.
 
 ## 1.2.3 
 
