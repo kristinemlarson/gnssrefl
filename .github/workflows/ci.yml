@@ -16,12 +16,15 @@ jobs:
       - name: Build Docker image
         run: |
           docker build . -t gnssrefl
+      - name: Create Docker container
+        run: |
+          docker run --name gnssrefl -d -v "$PWD:/src" gnssrefl tail -f /dev/null
       - name: Run smoke tests
         run: |
-          docker run -v "$PWD:/src" gnssrefl /src/software_tests
+          docker exec gnssrefl /src/software_tests
       - name: Install pytest
         run: |
-          pip3 install 'pytest~=7.2' 'pytest-mock~=3.10'
+          docker exec gnssrefl pip3 install 'pytest~=7.2' 'pytest-mock~=3.10'
       - name: Run unit tests
         run: |
-          pytest
+          docker exec gnssrefl pytest
