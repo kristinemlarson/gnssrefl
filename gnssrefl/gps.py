@@ -5785,6 +5785,8 @@ def set_subdir(subdir):
 
 def mjd_more(mmjd):
     """
+    This is not working yet.  
+
     Parameters
     ----------
     mmjd : float

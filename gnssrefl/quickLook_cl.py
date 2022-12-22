@@ -53,6 +53,8 @@ def quicklook(station: str, year: int, doy: int,
               plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0):
     """
 
+    Main code to setup the quickLook assessment of SNR reflectometry data
+
     Parameters
     ----------
     station : string
@@ -89,11 +91,11 @@ def quicklook(station: str, year: int, doy: int,
         Lomb-Scargle Periodogram (LSP) amplitude significance criterion in volts/volts.
         Default is 7 
 
-    e1 : integer, optional
+    e1 : int, optional
         elevation angle lower limit in degrees for the LSP.
         default is 5.
 
-    e2: integer, optional
+    e2: int, optional
         elevation angle upper limit in degrees for the LSP.
         default is 25.
 
@@ -108,7 +110,7 @@ def quicklook(station: str, year: int, doy: int,
     sat : array_like, integers, optional
         list of satellites numbers, default is None.
 
-    peak2noise : integer, optional
+    peak2noise : int, optional
         peak to noise ratio of the periodogram values (periodogram peak divided by the periodogram noise).
         For snow and ice, 3.5 or greater, tides can be tricky if the water is rough (and thus
         you might go below 3 a bit, say 2.7 

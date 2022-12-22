@@ -60,10 +60,9 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     """
     Make a json file that describes the lomb scargle analysis strategy you will use in gnssrefl.
 
-
     Parameters
     ----------
-    station : string
+    station : str
         4 character station ID.
 
     lat : float
@@ -75,10 +74,10 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     height : float
         ellipsoidal height in meters.
 
-    e1 : integer, optional
+    e1 : int, optional
         elevation angle lower limit in degrees. default is 5.
 
-    e2 : integer, optional
+    e2 : int, optional
         elevation angle upper limit in degrees. default is 25.
 
     h1 : float, optional
@@ -105,28 +104,24 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         True requests all GNSS frequencies.
         default is False (defaults to use GPS frequencies).
 
-    l1 : boolean, optional
+    l1 : bool, optional
         set to True to use only GPS L1 frequency. default is False.
 
-    l2c : boolean, optional
+    l2c : bool, optional
         set to use only GPS L2C frequency. default is False.
 
-    xyz : boolean, optional
+    xyz : bool, optional
         set to True if using Cartesian coordinates instead of Lat/Long/Ht.
         default is False.
 
-    refraction : boolean, optional
+    refraction : bool, optional
         set to False to turn off refraction correction.
         default is True.
 
-    extension : string, optional
+    extension : str, optional
         provide extension name so you can try different strategies. 
         Results will then go into $REFL_CODE/YYYY/results/ssss/extension
         Default is None
-
-    az_list : list of floats
-        azimuth min and max (for now)
-        default is 0 to 360
 
     ediff : float
         quality control parameter (Degrees)

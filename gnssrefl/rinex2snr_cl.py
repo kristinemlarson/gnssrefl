@@ -28,7 +28,7 @@ def parse_arguments():
     parser.add_argument("-snr", default=None, help="snr file ending", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, gps, gps+glo, gnss, rapid or you can specify nav,igs,igr,jax,gbm,grg,wum,gfr,ultra")
-    parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX sample rate: low or high. This parameter is only needed for archive searches.")
+    parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX sample rate: low or high. Only used for archive searches.")
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
                         help="True means only use RINEX files on local machine")
@@ -61,20 +61,21 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False):
     """
-    rinex2snr translates RINEX files to an SNR format. This function will fetch orbit files for you.
+    rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
+    RINEX obs files are provided by the user or fetched from a long list of archives.
 
     Parameters
     ----------
-    station : string
+    station : str
         4 or 9 character ID of the station
 
-    year : integer
+    year : int
         Year
 
-    doy : integer
+    doy : int
         Day of year
 
-    snr : integer, optional
+    snr : int, optional
         SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
         value options:
 
@@ -86,7 +87,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         
         50 : saves all data with elevation angles less than 10 degrees
 
-    orb : string, optional
+    orb : str, optional
         Which orbit files to download.
         Value options:
 
@@ -118,17 +119,17 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
             wum : (disabled) Wuhan, multi-GNSS, not rapid
 
-    rate : string, optional
+    rate : str, optional
         The data rate
         value options:
             low (default) : standard rate data. Usually 30 sec, but sometimes 15 sec.
 
             high : high-rate data
 
-    dec : integer, optional
+    dec : int, optional
         Decimation rate. 0 is default.
 
-    fortran : boolean, optional
+    fortran : bool, optional
         Whether to use fortran to translate the rinex files. Note: This option requires Fortran RINEX translators.
         Please see documentation at https://github.com/kristinemlarson/gnssrefl to see instructions to get these.
         value options:
@@ -136,11 +137,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
             True : use fortran to translate rinex
 
-    nolook : boolean, optional
+    nolook : bool, optional
         This parameter tells the code not to retrieve RINEX files from your local machine.
         default is False.
 
-    archive : string, optional
+    archive : str, optional
         Select which archive to get the files from.
         Default is None. None means that the code will search unavco,sopac and sonel.
         value options:
@@ -184,11 +185,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         end year. This is to create a range from year to year_end to get the snr files for more than one year.
         Default is None.
 
-    overwrite : boolean, optional
+    overwrite : bool, optional
         Make a new SNR file even if one already exists (overwrite existing file).
         Default is False.
 
-    translator : string, optional
+    translator : str, optional
         hybrid (default) : uses a combination of python and fortran to translate the files.
 
         fortran : uses fortran to translate (requires the fortran translator executable)
@@ -199,23 +200,19 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         sample rate for rinex 3 only
         Default is 30.
 
-    mk : boolean, optional
+    mk : bool, optional
         The Makan option. Use True for uppercase station names.
         Default is False.
 
-    weekly : boolean, optional
+    weekly : bool, optional
         Takes 1 out of every 7 days in the doy-doy_end range (one file per week) - used to save time.
         Default is False.
 
-    strip : boolean, optional
+    strip : bool, optional
         Reduces observables since the translator does not allow more than 25
         Default is False.
 
     """
-    # validate parameter types
-    # validate_input_datatypes(rinex2snr, station=station, year=year, doy=doy, snr=snr, orb=orb, rate=rate, dec=dec, fortran=fortran,
-    #                nolook=nolook, archive=archive, doy_end=doy_end, year_end=year_end, overwrite=overwrite,
-    #                translator=translator, srate=srate, mk=mk, weekly=weekly)
 
     # make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
