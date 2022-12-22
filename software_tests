@@ -1,13 +1,10 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
 #
 # various tests that gnssrefl build is still working
 # this only checks that the code does not crash. It does not currently
-rm -rf /Users/kristine/testing_friday
-mkdir /Users/kristine/testing_friday
-## use new environment variables
-export ORBITS=/Users/kristine/testing_friday
-export REFL_CODE=/Users/kristine/testing_friday
-
-# do not overwrite EXE for now
 
 ls -l $EXE/gfzrnx
 
@@ -22,7 +19,7 @@ rinex2snr p103 2020 105 -doy_end 107
 
 refl_zones p041
 
-make_json_input p103 0 0 0 
+make_json_input p103 0 0 0
 
 gnssir p103 2020 105  -doy_end 107
 
@@ -33,58 +30,37 @@ subdaily p103 2020
 
 vwc_input p033 2012
 
-make_json_input p041 0 0 0 
+make_json_input p041 0 0 0
 
 # case where station should not exist in the database
-make_json_input xxxx 0 0 0 
+make_json_input xxxx 0 0 0
 
-# case where station coordinates provided 
+# case where station coordinates provided
 make_json_input xxxx  40 -120 10  -h1 5 -h2 20 -e1 5 -e2 15
 
-#
-rm $ORBITS/2010/nav/auto0010.10n
-
 download_orbits nav 2010 1 1
-
-
-rm $ORBITS/2010/sp3/igs15645.sp3
-
 download_orbits igs 2010 1 1
-
-rm $ORBITS/2018/sp3/gbm19821.sp3
-
 download_orbits gbm 2018 1 1
 
-rm $ORBITS/2022/nav/auto0010.22n
-
 rinex2snr p041 2022 1 -archive unavco -overwrite T
-
-ls -l $REFL_CODE/2021/snr/p041/p0410010.snr66 
-
 rinex2snr p041 2022 1 -archive unavco -orb gnss -overwrite T
 
-ls -l $REFL_CODE/2022/snr/p041/p0410010.snr66 
-
 # try various RINEX 3 things
-# 
-rm /Users/kristine/Documents/Research/2022/snr/pots/pots0010.22.snr66
+#
 
-rinex2snr pots00deu 2022 1 -archive bkg -orb rapid -overwrite T
+# archive is currently unvailable
+# rinex2snr pots00deu 2022 1 -archive bkg -orb rapid -overwrite T
 
-#SNR file already exists /Users/kristine/Documents/Research/2018/snr/mchl/mchl0010.18.snr66
 rinex2snr mchl00aus 2018 1 -archive cddis  -overwrite T
-
 rinex2snr p041 2018 1 -archive unavco -rate high -dec 15 -overwrite T
 
-exit
 # testing quickLook
 #
 #
-quickLook p041 2018 1 
+quickLook p041 2018 1
 
-# 
+#
 # invsnr_input tggo 8 20 5 15 -a1 30 -a2 330
 # invsnr tggo 2022 200 L1+L2+L5 -doy_end 202 -constel G
 # invsnr_input vlsi 8 20 5 15 -a1 30 -a2 330
 # invsnr vlsi 2022 200 L1+L2+L5 -doy_end 202 -constel G
-
