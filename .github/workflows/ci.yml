@@ -21,10 +21,10 @@ jobs:
           docker run --name gnssrefl -d -v "$PWD:/src" gnssrefl tail -f /dev/null
       - name: Run smoke tests
         run: |
-          docker exec gnssrefl /src/software_tests
+          docker exec -i gnssrefl /src/software_tests
       - name: Install pytest
         run: |
-          docker exec gnssrefl pip3 install 'pytest~=7.2' 'pytest-mock~=3.10'
+          docker exec -i gnssrefl pip3 install 'pytest~=7.2' 'pytest-mock~=3.10'
       - name: Run unit tests
         run: |
-          docker exec gnssrefl pytest
+          docker exec -i gnssrefl pytest /src/test
