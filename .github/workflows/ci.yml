@@ -19,3 +19,9 @@ jobs:
       - name: Run smoke tests
         run: |
           docker run -v "$PWD:/src" gnssrefl /src/software_tests
+      - name: Install pytest
+        run: |
+          pip3 install 'pytest~=7.2'
+      - name: Run unit tests
+        run: |
+          pytest pytest-mock
