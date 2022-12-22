@@ -23,7 +23,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astro
 
 setup(
     name="gnssrefl",
-    version="1.2.4",
+    version="1.2.5",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -70,6 +70,7 @@ setup(
             'phase= gnssrefl.quickPhase:main',
             'refl_zones= gnssrefl.refl_zones_cl:main',
             'vwc= gnssrefl.vwc:main',
+            'quickplt= gnssrefl.qplt2:main',
             ], 
         },
     install_requires=requirements,

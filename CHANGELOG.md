@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.5
+
+New Feature:
+
+New command line tool - quickplt. It will plot plain text files, 
+presumably time series on x-axis - will convert to datetime, reverse sign 
+of the y-values etc.
+
 ## 1.2.4
 
 Improvements:

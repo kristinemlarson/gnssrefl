@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-downloads NOAA tide gauge files
-kristine larson
-"""
 import argparse
 import datetime
 import matplotlib.pyplot as plt
@@ -326,7 +322,7 @@ def quickp(station,t,sealevel,noaa_name):
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="station name", type=str)
+    parser.add_argument("station", help="station name, e.g. 8768094", type=str)
     parser.add_argument("date1", help="start-date, 20150101", type=str)
     parser.add_argument("date2", help="end-date, 20150110", type=str)
     parser.add_argument("-output", default=None, help="Optional output filename", type=str)

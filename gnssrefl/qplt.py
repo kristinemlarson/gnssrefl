@@ -1,29 +1,40 @@
-import os
-import matplotlib.pyplot as plt
-import sys
 import argparse
-import numpy as np
 import datetime
+import matplotlib.pyplot as plt
+import os
+import numpy as np
+import sys
 
 def main():
     """
-    command line interface for karnak.
-    functions moved to karnak_sub.py
-    kristine larson february 2022
+    Quick Plotter for txt file 
+
+    Parameters
+    ----------
+    filename : str
+        filename to be plotted
+    xcol : int
+        column number to plot on the x-axis
+    ycol : int
+        column number to plot on the y-axis
+    filename2 : str
+        optional second filename to be plotted
+
+
     """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", help="filename", type=str)
-    parser.add_argument("xcol", help="x-column", type=str)
-    parser.add_argument("ycol",   help="y-column", type=str)
-    parser.add_argument("-ymdh", help="set to True", type=str,default=None)
-    parser.add_argument("-hash", help="comment delimiter", type=str, default=None)
-    parser.add_argument("-reverse", help="set to True to reverse the sign", type=str,default=None)
-    parser.add_argument("-mjd", help="set to True ", type=str,default=None)
+    parser.add_argument("xcol", help="x-column", type=int)
+    parser.add_argument("ycol",   help="y-column", type=int)
     parser.add_argument("-filename2", help="filename2", type=str,default=None)
-
+    parser.add_argument("-hash", help="Comment delimiter in your file. Default is %", type=str, default=None)
+    parser.add_argument("-mjd", help="set to True/T if x-values are MJD", type=str,default=None)
+    parser.add_argument("-reverse", help="set to True/T to reverse the y-axis", type=str,default=None)
+    parser.add_argument("-ymdh", help="if True/T, columns 1-4 are year mon day hour ", type=str,default=None)
 
     args = parser.parse_args()
+
     filename = args.filename;
     if args.filename2 == None:
         secondFile = False
@@ -33,16 +44,14 @@ def main():
 
     xcol = int(args.xcol) - 1
     ycol = int(args.ycol) - 1
-    print(filename,xcol,ycol)
-    #x1 = float(args.x1)
-    #x2 = float(args.x2)
+    #print(filename,xcol,ycol)
 
     reverse_sign = False 
-    if args.reverse == 'True':
+    if (args.reverse == 'True') or (args.reverse == 'T'):
         reverse_sign = True
 
     ymd = False
-    if args.ymdh == 'True':
+    if (args.ymdh == 'True') or (args.ymdh == 'T'):
         ymd = True
 
     if (args.hash== None):
@@ -118,4 +127,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 

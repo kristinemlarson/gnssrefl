@@ -5787,7 +5787,7 @@ def mjd_more(mmjd):
     """
     Parameters
     ----------
-    mjd : float
+    mmjd : float
         mod julian date
 
     Returns
