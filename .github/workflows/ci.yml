@@ -21,7 +21,7 @@ jobs:
           docker run -v "$PWD:/src" gnssrefl /src/software_tests
       - name: Install pytest
         run: |
-          pip3 install 'pytest~=7.2'
+          pip3 install 'pytest~=7.2' 'pytest-mock~=3.10'
       - name: Run unit tests
         run: |
-          pytest pytest-mock
+          pytest
