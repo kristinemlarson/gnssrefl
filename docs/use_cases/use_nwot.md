@@ -141,7 +141,7 @@ as the Niwot Ridge *in situ* datafile, you can use
 
 <img src="../_static/nwot_usecase.png" width="600"/>
 
-We hae used the data from the fall to set the bare soil value 
+We have used the data from the fall to set the bare soil value 
 for reflector height (RH_baresoil). Snow depth is then defined as:
 
 <code>snow depth = RH_baresoil - RH</code>

@@ -55,6 +55,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         dec = lsp['dec']
     else:
         dec = 1 # so Jupyter notebooks do not need to be rewritten
+    print('Decimate:', dec)
     #print('Number of azimuths', len(azval))
     for i in range(0,len(azval),2):
         #print(i, azval[i], azval[i+1])

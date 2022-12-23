@@ -80,20 +80,26 @@ def read_snr_multiday(obsfile,obsfile2,twoDays,dec=1):
             print('compressed file exists, so uncompress it')
             subprocess.call(['unxz', compressedObs])
         sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE = read_one_snr(obsfile,1)
-        if dec != 1:
-            print('Invoking the decimation flag:')
-            rem_arr = np.remainder(t, [dec])
-            iss = (rem_arr==0)
-            sat=sat[iss] ; ele=ele[iss] ; azi=azi[iss]
-            t=t[iss] ; edot=edot[iss]
-            s1= s1[iss] ; s2= s2[iss] ; s5= s5[iss] ;
-            s6= s6[iss] ; s7= s7[iss] ; s8= s8[iss]
         allGood1 = 1
 #        g.print_file_stats(ele,sat,s1,s2,s5,s6,s7,s8,e1,e2)
     except:
         print('>>>>> Could not read the first SNR file:', obsfile)
 #
-#
+    if (dec != 1) & (allGood1 == 1):
+        print('Invoking the decimation flag:')
+        rem_arr = np.remainder(t, [dec])
+        iss = (rem_arr==0)
+        sat=sat[iss] ; ele=ele[iss] ; azi=azi[iss]
+        t=t[iss] ; edot=edot[iss]
+        s1= s1[iss] ; s2= s2[iss] ; 
+        if len(s5) > 0:
+            s5= s5[iss] ;
+        if len(s6) > 0:
+            s6= s6[iss] ; 
+        if len(s7) > 0:
+            s7= s7[iss] ; 
+        if len(s8) > 0:
+            s8= s8[iss]
 #
     if twoDays:
 #   restrict day one to first 21 hours.  will then merge iwth last three hours

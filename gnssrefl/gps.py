@@ -3758,6 +3758,50 @@ def snr_exist(station,year,doy,snrEnd):
 
     return snre 
 
+def get_sopac_navfile_cron(yyyy,doy):
+    """
+    downloads navigation file from SOPAC to be used in a cron job
+
+    Parameters
+    ----------
+    yyyy : int
+        full year
+    doy : int
+
+    Returns
+    -------
+    filefound : bool
+        whether file is found
+
+    """
+    filefound = False
+    cyyyy = str(yyyy)
+    cyy = cyyyy[2:4]
+    cdoy = '{:03d}'.format(doy)
+
+    sopac = 'ftp://garner.ucsd.edu'
+    # regular unix compressed file
+    navfile =  'auto' + cdoy + '0.' + cyy + 'n'
+    navfile_sopac1 =  navfile + '.Z' 
+
+    url_sopac1 = sopac + '/pub/rinex/' + cyyyy + '/' + cdoy + '/' + navfile_sopac1
+
+    try:
+        wget.download(url_sopac1,navfile_sopac1)
+        subprocess.call(['uncompress',navfile_sopac1])
+    except:
+        okokok = 1
+
+    if os.path.exists(navfile):
+        filefound = True
+    else:
+        print('Corrupted file/download failures at SOPAC')
+        subprocess.call(['rm','-f',navfile_sopac1])
+        subprocess.call(['rm','-f',navfile])
+
+    return filefound 
+
+
 def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     """
     downloads navigation file from SOPAC 
@@ -5134,12 +5178,6 @@ def rinex_nrcan_highrate(station, year, month, day):
     # NRCAN moving to new server names,
     gns = 'ftp://cacsa.nrcan.gc.ca/gps/data/hrdata/' +cyy + cdoy + '/' + cyy + 'd/'
 
-    # no point downloading data if the teqc code is not there
-    #if not os.path.isfile(teqcpath):
-    #    print('FATAL WARNING: You need to install teqc to use gnssrefl with highrate RINEX data from NRCAN.')
-    #    print('If you have time, please submit a pull request using gfzrnx instead of teqc for the file merge section.')
-    #    print('gfzrnx is supported; teqc is not.')
-    #    return
 
     foundFile = 0
     print('WARNING: downloading highrate RINEX data is a slow process')
