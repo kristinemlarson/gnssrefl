@@ -541,13 +541,13 @@ def ymd2doy(year,month,day):
 
     Returns
     -------
-    doy : integer
+    doy : int
          day of year
-    cdoy : string 
+    cdoy : str
          three character day of year
-    cyyyy : string 
+    cyyyy : str 
          four character year
-    cyy : string 
+    cyy : str 
          two character year
 
     """
@@ -573,12 +573,12 @@ def getnavfile(year, month, day):
 
     Parameters
     ----------
-    year : integer
+    year : int
 
-    month: integer
+    month: int
         if day is zero, the month value is really the day of year
 
-    day: integer
+    day: int
         day
 
     Returns
@@ -589,7 +589,7 @@ def getnavfile(year, month, day):
     navdir : string
         location of where the file should be stored
 
-    foundit : boolean
+    foundit : bool
         whether the file was found
 
     """

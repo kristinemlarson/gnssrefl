@@ -1,14 +1,12 @@
 env
+test.py
+dist
 build
 build.nowork
 __pycache__
 gnssrefl.egg-info
 gnssrefl/__init__.pyc
-play_with_jsons.py
-gnssrefl/outliers_lsp.txt
-gnssrefl/nmea2snr.py.nov2021
 sc02_usecase.py
-gnssrefl/nmea2snr_cl.py.nov2021
 trythis.py
 test_local.py
 spline_out.png
