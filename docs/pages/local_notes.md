@@ -1,4 +1,7 @@
 
+# thoug this does not work and i am not sure where to run it
+python -m unittest test_gps.py
+
 https://healthchecks.io/
 
 pip install --force-reinstall .
