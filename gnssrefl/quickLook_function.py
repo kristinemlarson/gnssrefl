@@ -156,7 +156,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
     """
 
-    print('ediff',ediff)
+    #print('ediff',ediff)
 
     screenstats = kwargs.get('screenstats',False)
     if screenstats:

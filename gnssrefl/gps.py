@@ -134,42 +134,6 @@ def ydoych(year,doy):
     return cyyyy,cyy,cdoy
 
 
-def define_filename(station,year,doy,snr):
-    """
-    Return the SNR filename 
-
-    Parameters
-    ----------
-    station : str
-        name  (4 char lowercase)
-
-    year : int
-        year
-
-    doy : int
-        day of year
-
-    snr : int
-        SNR file type (e.g. 99, 66)
-
-    Returns
-    -------
-    fname : str
-        snrfile name to be used
-
-    fname2 : str
-        snrfile name to be used - with xz compression extension
-
-    """
-    xdir = os.environ['REFL_CODE'] # main directory for SNR files
-    cyyyy, cyy, cdoy = ydoych(year,doy) 
-
-    f= station + cdoy + '0.' + cyy + '.snr' + str(snr)
-    fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f 
-    fname2 = xdir + '/' + cyyyy  + '/snr/' + station + '/' + f  + '.xz'
-
-    return fname, fname2
-
 def define_and_xz_snr(station,year,doy,snr):
     """
     finds and checks for existence of a SNR file
@@ -179,24 +143,19 @@ def define_and_xz_snr(station,year,doy,snr):
     ----------
     station: str
         station name, 4 characters
-
     year : int
-        year
-
+        full year
     doy : int
         day of year
-
     snr : int
         kind of snr file (66,77, 88 etc)
 
     Returns
     -------
     fname : str
-        name of the SNR file
-
+        full name of the SNR file
     fname2 : str
         no longer used but kept for backwards capability
-
     snre : bool
         whether the file exists or not
 
@@ -223,55 +182,6 @@ def define_and_xz_snr(station,year,doy,snr):
 
 #   return fname2 but only for backwards compatibility
     return fname, fname2, snre 
-
-def define_filename_prevday(station,year,doy,snr):
-    """
-    finds filename for day before the input date
-
-    Parameters
-    ----------
-    station : str
-        4 character station name  
-
-    year : int
-        full year
-
-    doy : int
-        day of year
-
-    snr : int
-        SNR file type (66,88, etc)
-
-    Returns
-    -------
-    fname : str
-        name of the SNR file
-
-    fname2 : str
-        no longer used but kept for backwards capability
-
-    """
-    xdir = os.environ['REFL_CODE']
-    year = int(year)
-    doy = int(doy)
-    if (doy == 1):
-        pyear = year -1
-        #print('found january 1, so previous day is december 31')
-        doyx,cdoyx,cyyyy,cyy = ymd2doy(pyear,12,31)
-        pdoy = doyx 
-    else:
-#       doy is decremented by one and year stays the same
-        pdoy = doy - 1
-        pyear = year
-
-    # change to characters 
-    cyyyy, cyy, cdoy = ydoych(pyear,pdoy)
-
-    f= station + cdoy + '0.' + cyy + '.snr' + str(snr)
-    fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f 
-    fname2 = xdir + '/' + cyyyy + '/snr/' + station + '/' + f + '.xz'
-
-    return fname, fname2
 
 def azimuth_angle(RecSat, East, North):
     """
@@ -574,21 +484,18 @@ def getnavfile(year, month, day):
     Parameters
     ----------
     year : int
-
+        full year
     month: int
         if day is zero, the month value is really the day of year
-
     day: int
-        day
+        day of the month
 
     Returns
     -------
     navname : string
         name of navigation file
-
     navdir : string
-        location of where the file should be stored
-
+        location of where the nav file should be stored
     foundit : bool
         whether the file was found
 
@@ -621,16 +528,16 @@ def getsp3file(year,month,day):
     Parameters
     ----------
     year : integer
-
+        full year
     month : integer
-
+        calendar month
     day : integer
+        calendar day
 
     Returns
     -------
     name : str
         filename for the orbits
-
     fdir : str
         directory for the orbits
 
@@ -663,7 +570,6 @@ def getsp3file(year,month,day):
             print('some kind of problem -remove empty file')
             subprocess.call(['rm',file1])
 
-#   return the name of the file so that if you want to store it
     return name, fdir
 
 def getsp3file_flex(year,month,day,pCtr):
@@ -861,6 +767,7 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
         the name of the orbit file you want to download from CDDIS
 
     year : integer
+        full year
 
     secure_file : string
         name of the file at CDDIS
@@ -3821,6 +3728,7 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     -------
     navfile : string 
         should be the same name as input. not logical!
+        i have no idea why i did it this way.
 
     """
     foundfile = False
@@ -5811,10 +5719,10 @@ def set_subdir(subdir):
         subprocess.call(['mkdir', outdir])
 
     if subdir == '':
-        print('Using this output directory: ', outdir)
+        #print('Using this output directory: ', outdir)
     else:
         outdir = xdir  + '/Files/' + subdir + '/'
-        print('Using this output directory: ', outdir)
+        #print('Using this output directory: ', outdir)
         if not os.path.exists(outdir) :
             subprocess.call(['mkdir', outdir])
 

@@ -21,7 +21,7 @@ import math
 def writeout_spline_outliers(tvd_bad,txtdir):
     """
 
-    Write splinefit outliers to a file
+    Write splinefit outliers to a file. 
 
     Parameters
     ----------
@@ -29,7 +29,7 @@ def writeout_spline_outliers(tvd_bad,txtdir):
         output of the lomb scargle calculations
 
     txtdir : str
-        location for the output, i.e. $REFL_CODE/FiLes/station
+        directory for the output, i.e. $REFL_CODE/FiLes/station
 
     """
     nr,nc=tvd_bad.shape
@@ -168,7 +168,7 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
 
 def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     """
-    writes out the subdaily results
+    writes out the subdaily results. currently only works for plain txt
 
     Parameters
     ----------
@@ -176,15 +176,13 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
         output filename
     station : str
         4 character station name, lowercase
-
     nvt : numpy multi-dimensional
         the variable with the LSP results read via np.loadtxt
-
     writecsv : boolean
-
+        whether the file output is csv
     extraline: boolean
+        whether the header has an extra line
 
-    this does not accommodate json as yet
     """
     # this is lazy - should use shape
     RHdot_corr= kwargs.get('RHdot_corr',[])
@@ -269,47 +267,34 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     ----------
     station : str
         4 character station name
-
     year : int
-
+        full year
     d1 : int
-        first day of year
-
+        first day of year evaluated
     d2 : int 
-        last day of year
-
+        last day of year evaluated
     plt2screen : bool
         if True plots are displayed to the screen
-
     extension : str
         allow user to specify an extension for results (i.e. gnssir was run using extension string)
-
     sigma : float
          how many standard deviations away from mean you allow.  
-
     writecsv : bool
-
+         whether output is written in csv format. 
     azim1 : float
         minimum azimuth value (degrees)
-
     azim2 : float
         maximum azimuth value (degrees)
-
     ampl : float
         minimum LSP amplitude allowed
-
     peak2noise : float
         minim peak2noise value to set solution good
-
     txtfile : str
-        name of output file
-
+        name of plain text output file
     h1 : float
         minimum reflector height (m)
-
     h2 : float
         maximum reflector height (m)
-
     kplt : bool
         special plot made 
     txtdir : str
@@ -319,13 +304,10 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     -------
     tv : numpy array
         LSP results (augmented)
-
     otimes : datetime object 
         times of observations 
-
     fname : str
-        result file
-
+        initial result file - collated
     fname_new : str
         result file with outliers removed
 

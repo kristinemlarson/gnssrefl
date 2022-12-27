@@ -96,10 +96,11 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         subprocess.call(['mkdir', outdir])
 
     if subdir is None:
-        print('Using this output directory: ', outdir)
+        #print('Using this output directory: ', outdir)
+        dkjflajsdf = 1
     else:
         outdir = xdir  + '/Files/' + subdir + '/'
-        print('Using this output directory: ', outdir)
+        #print('Using this output directory: ', outdir)
         if not os.path.exists(outdir) :
             subprocess.call(['mkdir', outdir])
 

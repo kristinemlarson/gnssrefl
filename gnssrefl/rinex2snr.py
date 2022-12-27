@@ -41,23 +41,19 @@ def quickname(station,year,cyy, cdoy, csnr):
     ----------
     station : str
         station name, 4 character
-
     year : int
         full year
-
     cyy : str
         two character year
-
     cdoy : str
         three character day of year
-
     csnr : str
         snr ending, i.e. '66' or '99'
 
     Returns
     -------
     fname : str
-        filename
+        full filename including the directory
 
     """
     xdir  = os.environ['REFL_CODE'] + '/'

@@ -1,4 +1,20 @@
 
+# december 27, 2022
+installed pytest and pytest-mock
+
+.github/worksflows has the information I need to see the pyttests
+that radon made
+
+radon is making a docker to run the tests
+ 
+to run locally
+
+pytest test
+
+On github look at Actions or the green checkmark by the build
+
+Radon is running my software tests and some not very good unit tests.
+
 # thoug this does not work and i am not sure where to run it
 python -m unittest test_gps.py
 

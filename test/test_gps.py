@@ -14,17 +14,19 @@ def test_get_sopac_navfile_working(mocker):
     mocker.patch("subprocess.call")
     os.path.exists.return_value = True
     assert (
-        get_sopac_navfile("p1031050.20.snr66", "2020", "20", "105")
-        == "p1031050.20.snr66"
+        get_sopac_navfile("auto1050.20n", "2020", "20", "105")
+        == "auto1050.20n"
     )
     wget.download.assert_called_once_with(
-        "ftp://garner.ucsd.edu/pub/rinex/2020/105/p1031050.20.snr66.Z",
-        "p1031050.20.snr66.Z",
+        "ftp://garner.ucsd.edu/pub/rinex/2020/105/auto1050.20n.Z",
+        "auto1050.20n.Z",
     )
-    os.path.exists.assert_called_once_with("p1031050.20.snr66")
-    subprocess.call.assert_called_once_with(["uncompress", "p1031050.20.snr66.Z"])
+    os.path.exists.assert_called_once_with("auto1050.20n")
+    subprocess.call.assert_called_once_with(["uncompress", "auto1050.20n.Z"])
 
 
+# this should be changed to run on january 1, 2021 which probably 
+# has a corrupt file on the sopac database
 def test_get_sopac_navfile_error(mocker):
     mocker.patch("wget.download")
     mocker.patch("os.path.exists")
