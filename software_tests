@@ -15,7 +15,7 @@ ls -l $REFL_CODE/input/gpt_1wA.pickle
 
 ls -l $ORBITS
 
-rinex2snr p103 2020 105 -doy_end 107
+rinex2snr p103 2020 105 -doy_end 107 -overwrite T
 
 refl_zones p041
 
@@ -23,12 +23,12 @@ make_json_input p103 0 0 0
 
 gnssir p103 2020 105  -doy_end 107
 
-daily_avg p103 0.5 10
+daily_avg p103 0.5 10 -plt F
 
-subdaily p103 2020
+subdaily p103 2020 -plt F -rhdot T
 
 
-vwc_input p033 2012
+vwc_input p033 2012 
 
 make_json_input p041 0 0 0
 
@@ -49,7 +49,7 @@ rinex2snr p041 2022 1 -archive unavco -orb gnss -overwrite T
 #
 
 # archive is currently unvailable
-# rinex2snr pots00deu 2022 1 -archive bkg -orb rapid -overwrite T
+rinex2snr pots00deu 2022 1 -archive bkg -orb rapid -overwrite T
 
 rinex2snr mchl00aus 2018 1 -archive cddis  -overwrite T
 rinex2snr p041 2018 1 -archive unavco -rate high -dec 15 -overwrite T
@@ -57,10 +57,10 @@ rinex2snr p041 2018 1 -archive unavco -rate high -dec 15 -overwrite T
 # testing quickLook
 #
 #
-quickLook p041 2018 1
+quickLook p041 2018 1 -plt F
 
 #
-# invsnr_input tggo 8 20 5 15 -a1 30 -a2 330
-# invsnr tggo 2022 200 L1+L2+L5 -doy_end 202 -constel G
+invsnr_input tggo 8 20 5 15 -a1 30 -a2 330
+invsnr tggo 2022 200 L1+L2+L5 -doy_end 201 -constel G -plt F
 # invsnr_input vlsi 8 20 5 15 -a1 30 -a2 330
 # invsnr vlsi 2022 200 L1+L2+L5 -doy_end 202 -constel G
