@@ -5719,6 +5719,7 @@ def set_subdir(subdir):
         subprocess.call(['mkdir', outdir])
 
     if subdir == '':
+        okokk = 1
         #print('Using this output directory: ', outdir)
     else:
         outdir = xdir  + '/Files/' + subdir + '/'
