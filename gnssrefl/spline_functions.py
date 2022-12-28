@@ -687,7 +687,7 @@ def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,
 
 
 
-def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit=True, signal='L1', savefile=False, doplot=False, rough_in=0.1, **kwargs):
+def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit=True, signal='L1', savefile=False, doplot=True, rough_in=0.1, **kwargs):
     """
     function analyses a 'gnssrefl' format snr file and outputs a fitted spline
     note that the file must be 24 hours long or it wont work
@@ -748,6 +748,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     This documentation was provided by the original author, David Purnell
     """
 
+    print(doplot, ' doplot setting')
     imodel = 0 # no refraction
     if 'lsp' in kwargs:
         lsp = kwargs.get('lsp')

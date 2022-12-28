@@ -27,7 +27,7 @@ def parse_arguments():
     parser.add_argument("-polydeg", default=None, type=int,
                         help="polynomial degree for direct signal removal (default is 2)")
     parser.add_argument("-snrfit", default=None, type=str, help="Do invsnr fit? True is the default ")
-    parser.add_argument("-doplot", default=None, type=str, help="Plot to the screen?  default is True")
+    parser.add_argument("-plt", default=None, type=str, help="Plot to the screen?  default is True")
     parser.add_argument("-doy_end", default=None, type=str, help="day of year to end analysis")
     parser.add_argument("-lspfigs", default=None, type=str, help="Make LSP plots, default False.")
     parser.add_argument("-snrfigs", default=None, type=str, help="Make SNR plots, default False.")
@@ -46,7 +46,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['screenstats', 'snrfit', 'doplot', 'lspfigs', 'snrfigs', 'risky', 'no_dots','refraction', 'json_override',]
+    boolean_args = ['screenstats', 'snrfit', 'plt', 'lspfigs', 'snrfigs', 'risky', 'no_dots','refraction', 'json_override',]
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -54,7 +54,7 @@ def parse_arguments():
 
 
 def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, constel: str = None,
-           screenstats: bool = False, tempres: int = 1, polydeg: int = 2, snrfit: bool = True, doplot: bool = True,
+           screenstats: bool = False, tempres: int = 1, polydeg: int = 2, snrfit: bool = True, plt: bool = True,
            doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: int = 3,
            rough_in: float = 0.1, risky: bool = False, snr_ending: int = 66, outfile_type: str = 'txt',
            outfile_name: str = '', outlier_limit: float = 0.5, no_dots: bool = False, delta_out: int = 300,
@@ -109,7 +109,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         Whether to do the inversion or not
         Default is True
 
-    doplot : boolean, optional
+    plt : boolean, optional
         Whether to plot to the screen or not
         Default is True
 
@@ -269,7 +269,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         lsp['refraction'] = True
 
     spline_functions.snr2spline(station, year, doy, azilims, elvlims, rhlims, precision, kdt, signal=signal,
-                                lspfigs=lspfigs, snrfigs=snrfigs, snrfit=snrfit, doplot=doplot, pktnlim=pktnlim,
+                                lspfigs=lspfigs, snrfigs=snrfigs, snrfit=snrfit, doplot=plt, pktnlim=pktnlim,
                                 satconsts=satconsts, screenstats=screenstats, tempres=tempres, doy_end=doy_end,
                                 l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr_ending,
                                 outfile_type=outfile_type, delta_out=delta_out, lsp=lsp, outfile_name=outfile_name,
