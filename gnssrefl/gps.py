@@ -1579,8 +1579,21 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
 
 #   if not, frequency does not exist, will be tripped by Nv
 #   this does remove the direct signal component - but gets you ready to do that
-    if (cf > 0):
-        x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds) 
+    #print('cf before removeDC', cf,' freq and sat ', f, satNu)
+    if (satNu > 300):
+        # check that there are even any data because this is crashing on files w/o SNR beidou data in them
+        if (f == 307):
+            if len(s7) > 0:
+                x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds) 
+            else:
+                # set to empty
+                x=[]; y=[]; sat=[];azi=[];seconds=[];edot =[]
+        else:
+            x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds) 
+
+    else:
+        if (cf > 0):
+            x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds) 
 
 #
     Nv = len(y); Nvv = 0 ; 
@@ -1920,9 +1933,45 @@ def removeDC(dat,satNu, sat,ele, pele, azi,az1,az2,edot,seconds):
     (az1,az2) constraints, return x,y as primary used data and windowed
     azimuth, time, and edot
 #   removed zero points, which 10^0 have value 1.  used 5 to be sure?
+
+    Parameters
+    ----------
+    dat : numpy array of floats 
+        SNR data
+    satNu : float
+        requested satellite number
+    sat : numpy array of floats
+        satellite numbers
+    ele : numpy array of floats
+        elevation angles, deg
+    pele : list of floats
+        min and max elevation angles (deg)
+    azi : numpy array of floats 
+        azimuth angle, deg
+    az1 : float
+        minimum azimuth angle (deg)
+    az2 : float
+        maximum azimuth angle (deg)
+    edot : numpy array of floats  
+        derivative elevation angle (deg/sec)
+    seconds : numpy array of floatas
+        seconds of the day
+
+    Returns
+    -------
+    x
+    y
+    sat
+    azi
+    seconds
+    edot
+
     """
     p1 = pele[0]; p2 = pele[1]
 #   look for data within these azimuth and elevation angle constraints
+    #ytest = dat[(sat == satNu)]
+    #print(len(ytest))
+
     x = ele[(sat == satNu) & (ele > p1) & (ele < p2) & (azi > az1) & (azi < az2) & (dat > 5)]
     y = dat[(sat == satNu) & (ele > p1) & (ele < p2) & (azi > az1) & (azi < az2) & (dat > 5)]
     edot = edot[(sat == satNu) & (ele > p1) & (ele < p2) & (azi > az1) & (azi < az2) & (dat > 5)]

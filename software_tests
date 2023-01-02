@@ -15,6 +15,15 @@ ls -l $REFL_CODE/input/gpt_1wA.pickle
 
 ls -l $ORBITS
 
+rinex2snr at0100usa 2022 350 -archive unavco -samplerate 15 -orb gnss
+
+make_json_input at01 0 0 0 -allfreq T
+gnssir at01 2022 350
+
+make_json_input at01 0 0 0 -frlist 1 20 5 101 102 201 306 307
+gnssir at01 2022 350
+
+
 rinex2snr p103 2020 105 -doy_end 107 -overwrite T
 
 refl_zones p041
