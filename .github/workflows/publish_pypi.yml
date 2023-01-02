@@ -18,10 +18,11 @@ jobs:
       run: >-
         python3 -m
         pip install
-        twine
+        twine numpy
         --user
     - name: Build a binary wheel and a source tarball
-      run: >-
+      run: |-
+        export SETUPTOOLS_USE_DISTUTILS=stdlib
         python3 setup.py sdist bdist_wheel
 
     - name: Publish distribution to PyPI
