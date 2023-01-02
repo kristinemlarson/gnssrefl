@@ -18,7 +18,7 @@ jobs:
       run: >-
         python3 -m
         pip install
-        twine numpy
+        twine numpy wheel
         --user
     - name: Build a binary wheel and a source tarball
       run: |-
