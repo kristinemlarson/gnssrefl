@@ -18,7 +18,7 @@ import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
 
-def writeout_spline_outliers(tvd_bad,txtdir):
+def writeout_spline_outliers(tvd_bad,txtdir,residual):
     """
 
     Write splinefit outliers to a file. 
@@ -31,14 +31,18 @@ def writeout_spline_outliers(tvd_bad,txtdir):
     txtdir : str
         directory for the output, i.e. $REFL_CODE/FiLes/station
 
+    residual : numpy array
+        outlier in units of sigma
     """
     nr,nc=tvd_bad.shape
     if nr > 0:
         f = txtdir + '/outliers.spline.txt'
         print('Outliers written to: ', f)
         fout = open(f, 'w+')
+        # put in a header
+        fout.write('{0:3s} sat azim deltT outlier \n'.format('%'))
         for w in range(0,nr):
-            fout.write('sat {0:3.0f} azim {1:7.2f} delta {2:7.2f} \n'.format( tvd_bad[w,3], tvd_bad[w,5], tvd_bad[w,14]))
+            fout.write('{0:3.0f} {1:7.2f} {2:7.2f} {3:7.2f} \n'.format( tvd_bad[w,3], tvd_bad[w,5], tvd_bad[w,14],residual[w] ))
         fout.close()
 
     return
@@ -693,6 +697,8 @@ def writejsonfile(ntv,station, outfile):
 
 def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     """
+    This actually makes three stacked plots - not two, LOL
+    It gives an overview for quality control
 
     Parameters
     ----------
@@ -735,7 +741,7 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     colors = tv[:,10]
     scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax1)
-    colorbar.set_label('Sat Numbers', fontsize=fs)
+    colorbar.set_label('Frequency', fontsize=fs)
     ax1.set_title('Constellation',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); 
     ax1.set_ylabel('meters',fontsize=fs)
@@ -846,7 +852,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     plt.xticks(rotation =45,fontsize=8); plt.yticks(fontsize=8)
     plt.title('Edited Reflector Heights', fontsize=8)
     plt.grid() ; fig.autofmt_xdate()
-    plotname = txtdir + '/' + station + '_outliers_hunting.png'
+    plotname = txtdir + '/' + station + '_outliers.png'
     plt.savefig(plotname,dpi=300)
     plt.ylim((savey1, savey2))
     print('png file saved as: ', plotname)
@@ -1271,7 +1277,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
 
     tvd_bad = tvd[np.abs(residual_after) >  3*sigmaAfter, :]
-    writeout_spline_outliers(tvd_bad,txtdir)
+    writeout_spline_outliers(tvd_bad,txtdir,residual_after)
 
     # keep values within 3 sigma 
     ii = np.abs(residual_after) < 3*sigmaAfter

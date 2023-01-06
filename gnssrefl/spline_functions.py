@@ -748,7 +748,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     This documentation was provided by the original author, David Purnell
     """
 
-    print(doplot, ' doplot setting')
+    #print(doplot, ' doplot setting')
     imodel = 0 # no refraction
     if 'lsp' in kwargs:
         lsp = kwargs.get('lsp')
@@ -1159,7 +1159,7 @@ def define_inputfile(station,year,doy,snr_ending):
             subprocess.call(['unxz',xzfile])
             snrdir = xdir
         else:
-            print('No file found. Exiting')
+            print(snrfile, ' not found. Exiting')
             sys.exit()
 
     return snrfile,snrdir, cyyyy, cdoy
