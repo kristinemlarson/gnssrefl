@@ -9,14 +9,15 @@ for jupyter notebook version, please see [gnssrefl_jupyter instructions](https:/
 * **Windows** - https://docs.docker.com/docker-for-windows/install/ 
 * **Ubuntu** - https://docs.docker.com/install/linux/docker-ce/ubuntu/ 
 
-*Once installed, type `docker run hello-world` in terminal to check if installed correctly.*
+Once installed, type `docker run hello-world` in terminal to check if installed correctly.
 
 More information on [getting started, testing your installation, and developing.](https://docs.docker.com/get-started/) 
 
 Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
 ## Run gnssrefl Docker
-* cd into the local directory that you wish to keep your processed results
+
+cd into the local directory that you wish to keep your processed results
 
 **PLEASE NOTE:** it should be "--name" not "-name". This is being rendered incorrectly in the readthedocs version of this documentation.
 
@@ -28,8 +29,8 @@ Testing
 
 Description of the commands used:  
 
-* <code>-it</code> calls interactive process (bin/bash shell) 
-* <code>-v</code> mounts external volumes to allow the user to keep their processing results and figures 
+<code>-it</code> calls interactive process (bin/bash shell) 
+<code>-v</code> mounts external volumes to allow the user to keep their processing results and figures 
 
 Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
 
@@ -59,7 +60,8 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 
 ## For WINDOWS USERS:
 (thank you Paul Wu and James Monaco @ Univ. of CO for this)
-* install [Docker for Windows](https://docs.docker.com/desktop/windows/install/)
+
+install [Docker for Windows](https://docs.docker.com/desktop/windows/install/)
 	* Problem: <code>WSL2 Installation is incomplete</code>.  
 		* Solution: Need to download and install [from step 4](https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package)
 	* Problem: Docker stuck at initial stage
@@ -67,7 +69,7 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 	* Problem: need to convert existing WSL environment into WSL 2 and associate with Docker
 	 	* Solution: follow [this documentation](https://docs.docker.com/desktop/windows/wsl/)
 
-* Docker run commands have slightly different syntax to accomodate windows directories in volume mounting:
+Docker run commands have slightly different syntax to accomodate windows directories in volume mounting:
 	* Windows Power Shell:
 
 <CODE>docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ -v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
@@ -76,9 +78,9 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 
 <CODE>docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ -v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
 
-* execute docker run command (see above) in terminal window
+execute docker run command (see above) in terminal window
 
-* Feedback from jupyter notebook user:
+Feedback from jupyter notebook user:
 	* About folder permission: In the notebook environment test, the error prompted that the program could not write to the file.  This is remedied by changing the permissions of the folder from the command line.
 
 ## additional references:
