@@ -25,7 +25,10 @@ cd into the local directory that you wish to keep your processed results
 
 Testing 
 
-<CODE>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files "--name" gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash</code>
+<PRE>
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files \
+--name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
+</PRE>
 
 Description of the commands used:  
 
