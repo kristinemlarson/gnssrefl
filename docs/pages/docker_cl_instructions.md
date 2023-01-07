@@ -18,7 +18,7 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 ## Run gnssrefl Docker
 * cd into the local directory that you wish to keep your processed results
 
-**PLEASE NOTE:** it should be dash dash name, not dash. This is being rendered incorrectly in the readthedocs version of this documentation.
+**PLEASE NOTE:** it should be dash dash name, not dash name. This is being rendered incorrectly in the readthedocs version of this documentation.
 
 * docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
 
@@ -39,8 +39,8 @@ If you have a lot of RINEX files and want to keep them organized, you should cop
 into <code>refl_code/rinex/station/yyyy/</code>, where station is the lowercase 4char ID and yyyy is the year. 
 You should then mount that directory in the docker run command as follows: 
 
-<code> docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ 
--v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ 
+-v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
 
 
 ### Shutdown Docker <a name="Shutdown"></a>
@@ -66,12 +66,14 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 * Docker run commands have slightly different syntax to accomodate windows directories in volume mounting:
 	* Windows Power Shell:
 
-<code>docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ -v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
+docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ -v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
+
 	* Windows Command Line:
 
-<code>docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ -v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
+docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ -v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
 
 * execute docker run command (see above) in terminal window
+
 * Feedback from jupyter notebook user:
 	* About folder permission: In the notebook environment test, the error prompted that the program could not write to the file.  This is remedied by changing the permissions of the folder from the command line.
 
