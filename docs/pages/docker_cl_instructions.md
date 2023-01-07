@@ -17,7 +17,8 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 
 ## Run gnssrefl Docker
 * cd into the local directory that you wish to keep your processed results
-* <code>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash</code>
+
+* docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
 
 Description of the commands used:  
 
