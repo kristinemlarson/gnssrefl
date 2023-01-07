@@ -30,6 +30,7 @@ docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ \
 Description of the commands used:  
 
 <code>-it</code> calls interactive process (bin/bash shell) 
+
 <code>-v</code> mounts external volumes to allow the user to keep their processing results and figures 
 
 Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
@@ -56,6 +57,7 @@ docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ \
 To shut down the container from the terminal, use `ctrl+c`
 
 To shut down the docker container run `docker stop gnssrefl`
+
 If you need to see the container(s) you have running you can use `docker ps`
 
 ### Update Docker Image to newest version <a name="Update Docker"></a>
@@ -74,7 +76,8 @@ install [Docker for Windows](https://docs.docker.com/desktop/windows/install/)
 	 	* Solution: follow [this documentation](https://docs.docker.com/desktop/windows/wsl/)
 
 Docker run commands have slightly different syntax to accomodate windows directories in volume mounting:
-	* Windows Power Shell:
+
+Windows Power Shell:
 
 <PRE>
 docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ \
@@ -82,7 +85,7 @@ docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ \
 --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
 </pre>
 
-	* Windows Command Line:
+Windows Command Line:
 
 <PRE>
 docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ \
@@ -93,7 +96,8 @@ docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ \
 execute docker run command (see above) in terminal window
 
 Feedback from jupyter notebook user:
-* About folder permission: In the notebook environment test, the error prompted that the program could not 
+
+About folder permission: In the notebook environment test, the error prompted that the program could not 
 write to the file.  This is remedied by changing the permissions of the folder from the command line.
 
 ## additional references:
