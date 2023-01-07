@@ -20,7 +20,11 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 
 **PLEASE NOTE:** it should be "--name" not "-name". This is being rendered incorrectly in the readthedocs version of this documentation.
 
-* docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
+<CODE>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash</code>
+
+Testing 
+
+<CODE>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files "--name" gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash</code>
 
 Description of the commands used:  
 
@@ -39,8 +43,8 @@ If you have a lot of RINEX files and want to keep them organized, you should cop
 into <code>refl_code/rinex/station/yyyy/</code>, where station is the lowercase 4char ID and yyyy is the year. 
 You should then mount that directory in the docker run command as follows: 
 
-docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ 
--v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
+<CODE>docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/ 
+-v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
 
 
 ### Shutdown Docker <a name="Shutdown"></a>
@@ -66,11 +70,11 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 * Docker run commands have slightly different syntax to accomodate windows directories in volume mounting:
 	* Windows Power Shell:
 
-docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ -v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
+<CODE>docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ -v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
 
 	* Windows Command Line:
 
-docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ -v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
+<CODE>docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ -v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash </code>
 
 * execute docker run command (see above) in terminal window
 
