@@ -19,8 +19,6 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 
 cd into the local directory that you wish to keep your processed results
 
-**PLEASE NOTE:** it should be "--name" not "-name". This is being rendered incorrectly in the readthedocs version of this documentation.
-
 <PRE>
 docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ \ 
 -v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files \
@@ -68,12 +66,19 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 (thank you Paul Wu and James Monaco @ Univ. of CO for this)
 
 install [Docker for Windows](https://docs.docker.com/desktop/windows/install/)
-	* Problem: <code>WSL2 Installation is incomplete</code>.  
-		* Solution: Need to download and install [from step 4](https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package)
-	* Problem: Docker stuck at initial stage
-		* Solution: restart the computer after docker installation
-	* Problem: need to convert existing WSL environment into WSL 2 and associate with Docker
-	 	* Solution: follow [this documentation](https://docs.docker.com/desktop/windows/wsl/)
+
+Problem: <code>WSL2 Installation is incomplete</code>.  
+
+* Solution: Need to download and install [from step 4](https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package)
+
+
+Problem: Docker stuck at initial stage
+
+* Solution: restart the computer after docker installation
+
+Problem: need to convert existing WSL environment into WSL 2 and associate with Docker
+
+* Solution: follow [this documentation](https://docs.docker.com/desktop/windows/wsl/)
 
 Docker run commands have slightly different syntax to accomodate windows directories in volume mounting:
 

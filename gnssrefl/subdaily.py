@@ -32,17 +32,21 @@ def writeout_spline_outliers(tvd_bad,txtdir,residual):
         directory for the output, i.e. $REFL_CODE/FiLes/station
 
     residual : numpy array
-        outlier in units of sigma
+        outlier in units of meters (!)
     """
     nr,nc=tvd_bad.shape
     if nr > 0:
         f = txtdir + '/outliers.spline.txt'
-        print('Outliers written to: ', f)
+        print(nr, ' Outliers written to: ', f)
         fout = open(f, 'w+')
         # put in a header
-        fout.write('{0:3s} sat azim deltT outlier \n'.format('%'))
+        fout.write('{0:3s} sat azim deltT-min outlier-m fracDOY MJD\n'.format('%'))
+        fout.write('{0:3s} (1) (2)   (3)        (4)      (5)    (6) D\n'.format('%'))
         for w in range(0,nr):
-            fout.write('{0:3.0f} {1:7.2f} {2:7.2f} {3:7.2f} \n'.format( tvd_bad[w,3], tvd_bad[w,5], tvd_bad[w,14],residual[w] ))
+            fy = tvd_bad[w,1] + tvd_bad[w,4]/24 # fractional day of year
+            deltaT = tvd_bad[w,14]
+            mjd = tvd_bad[w,15]
+            fout.write('{0:3.0f} {1:7.2f} {2:7.2f} {3:7.2f} {4:9.3f} {5:15.7f} \n'.format( tvd_bad[w,3], tvd_bad[w,5], deltaT,residual[w],fy,mjd ))
         fout.close()
 
     return
@@ -1277,7 +1281,11 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
 
     tvd_bad = tvd[np.abs(residual_after) >  3*sigmaAfter, :]
-    writeout_spline_outliers(tvd_bad,txtdir,residual_after)
+
+
+    kk = np.abs(residual_after) > 3*sigmaAfter
+    tvd_confused = tvd[kk,:]
+    writeout_spline_outliers(tvd_confused,txtdir,residual_after[kk])
 
     # keep values within 3 sigma 
     ii = np.abs(residual_after) < 3*sigmaAfter
