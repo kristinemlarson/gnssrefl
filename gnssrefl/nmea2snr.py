@@ -127,7 +127,7 @@ def read_nmea(fname):
     t = []; prn = []; az = []; elv = []; snr = []
     for i, line in enumerate(lines):
     
-        if b"GPGGA" in line: #read GPGGA sentence: Global Positioning System Fix Data 
+        if b"GGA" in line: #read GPGGA sentence: Global Positioning System Fix Data 
             hr = int(line.decode("utf-8").split(",")[1][0:2])
             mn = int(line.decode("utf-8").split(",")[1][2:4])
             sc = float(line.decode("utf-8").split(",")[1][4:8])
@@ -135,7 +135,7 @@ def read_nmea(fname):
             if (i > 100 and t_sec == 0):                   #set t to 86400 for the midnight data
                 t_sec = 86400
 
-        elif b"GPGSV" in line:                             #read GPGSV sentence: GPS Satellites in view in this cycle   
+        elif b"GSV" in line:                             #read GPGSV sentence: GPS Satellites in view in this cycle   
         
             sent = line.decode("utf-8").split(",")         #GPGSV sentence 
             ttl_ms = int(sent[1])                          #Total number of messages in the GPGSV sentence 
