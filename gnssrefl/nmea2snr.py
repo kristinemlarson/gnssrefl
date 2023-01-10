@@ -137,6 +137,14 @@ def read_nmea(fname):
 
         elif b"GSV" in line:                             #read GPGSV sentence: GPS Satellites in view in this cycle   
         
+            if b"GPGSV" in line:
+                prn_offset = 0
+            elif b"GLGSV" in line:
+                prn_offset = 100
+            elif b"GAGSV" in line:
+                prn_offset = 200
+            elif b"BDGSV" in line:
+                prn_offset = 300
             sent = line.decode("utf-8").split(",")         #GPGSV sentence 
             ttl_ms = int(sent[1])                          #Total number of messages in the GPGSV sentence 
             ms = int(sent[2])                              #Message number 
@@ -144,7 +152,7 @@ def read_nmea(fname):
             if (len(sent) == 20):                          #Case 1: 4 sat in view in this sentence 
                 cnt = 0
                 for j in range(0,4):
-                    prn.append(sent[4+cnt]) #field 4,8,12,16 :  SV PRN number
+                    prn.append(prn_offset + sent[4+cnt]) #field 4,8,12,16 :  SV PRN number
                     elv.append(sent[5+cnt]) #field 5,9,13,17 :  Elevation in degrees, 90 maximum
                     az.append(sent[6+cnt]) #field 6,10,14,18:  Azimuth in degrees
                     snr.append(sent[7+cnt].split("*")[0])  #field 7,11,15,19:  SNR, 00-99 dB (null when not tracking)
@@ -156,7 +164,7 @@ def read_nmea(fname):
             elif (len(sent) == 16):     #Case 2: 3 sat in view in this sentence    
                 cnt = 0
                 for j in range(0,3):
-                    prn.append(sent[4+cnt])               
+                    prn.append(prn_offset + sent[4+cnt])               
                     elv.append(sent[5+cnt])             
                     az.append(sent[6+cnt])                
                     snr.append(sent[7+cnt].split("*")[0]) 
@@ -168,7 +176,7 @@ def read_nmea(fname):
             elif (len(sent) == 12):   #Case 3: 2 sat in view in this sentence    
                 cnt = 0
                 for j in range(0,2):
-                    prn.append(sent[4+cnt])              
+                    prn.append(prn_offset + sent[4+cnt])              
                     elv.append(sent[5+cnt])                
                     az.append(sent[6+cnt])                 
                     snr.append(sent[7+cnt].split("*")[0]) 
@@ -180,7 +188,7 @@ def read_nmea(fname):
             elif (len(sent) == 8):  #Case 4: 1 sat in view in this sentence    
                 cnt = 0
                 for j in range(0,1):
-                    prn.append(sent[4+cnt])               
+                    prn.append(prn_offset + sent[4+cnt])               
                     elv.append(sent[5+cnt])                
                     az.append(sent[6+cnt])                
                     snr.append(sent[7].split("*")[0])  
