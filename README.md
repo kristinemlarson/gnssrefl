@@ -5,7 +5,7 @@
 
 # gnssrefl
 
-**github version: 1.2.9** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+**github version: 1.2.10** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 !!! Specific azimuth regions can now be added at the command line. Use -azlist in <code>make_json_input</code> !!!
 
@@ -22,7 +22,7 @@ All access to UNAVCO data will end October 1, 2022 unless [you sign up for an ac
 2. [Understanding the Code](docs/pages/understand.md)
     1. [rinex2snr: translating GNSS Data (RINEX, NMEA)](docs/pages/rinex2snr.md)
     2. [quickLook: assessing a GNSS site using SNR files](docs/pages/quickLook.md)
-    3. [gnssir: estimating reflector heights from SNR data](docs/pages/gnssir.md)
+    3. [gnssir and rh_plot: estimating reflector heights from SNR data](docs/pages/gnssir.md)
 3. Products:
     1. [daily_avg: daily average reflector heights](docs/pages/README_dailyavg.md)
     2. [subdaily: LSP quality control and RHdot for reflector height estimates](docs/pages/README_subdaily.md)

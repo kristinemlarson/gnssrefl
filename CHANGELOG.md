@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.10
+
+Added a new utility - rh_plot - which is basically a way to look at RH results before you start making 
+products (snow, sea level, etc). Uses libraries developed for subdaily and daily_avg
+
+
 ## 1.2.9
 
 Fixed bug for multi-freq json analysis instructions when there are no Beidou data.

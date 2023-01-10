@@ -267,7 +267,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     fout.close()
 
 
-def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2,kplt,txtdir):
+def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2,kplt,txtdir,default_usage):
     """
     reads in RH results and makes various plots to help users assess the quality of the solution
 
@@ -307,6 +307,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         special plot made 
     txtdir : str
         directory where the results will be written
+    default_usage : bool
+        flat as to whether you are using this code for subdaily or for rh_plot.
+        this changes the plots a bit.
 
     Returns
     -------
@@ -415,35 +418,21 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     ii = (np.absolute(residuals) > sigma) # data you like
     jj = (np.absolute(residuals) < sigma) # data you do not like ;-)
-    if plt2screen:
-        fig,ax=plt.subplots()
-        ax.plot(tval,nval,'ko',label='Total',markersize=3)
-        if (np.sum(Gval) > 0):
-            ax.plot(tval,Gval,'bo',label='GPS',markersize=3)
-        if (np.sum(Rval) > 0):
-            ax.plot(tval,Rval,'ro',label='GLO',markersize=3)
-        if (np.sum(Eval) > 0):
-            ax.plot(tval,Eval,'o',color='orange',label='GAL',markersize=3)
-        if (np.sum(Cval) > 0):
-            ax.plot(tval,Cval,'co',label='BEI',markersize=3)
-        plt.legend(loc="upper left")
-        plt.title(station + ': number of RH retrievals each day',fontsize=fs)
-        plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-        plt.grid()
-        fig.autofmt_xdate()
-        plotname = txtdir + '/' + station + '_Subnvals.png'
-        plt.savefig(plotname,dpi=300)
-        print('png file saved as: ', plotname)
 
+    if plt2screen:
 
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
-        two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2)
-        stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt)
+        if default_usage:
+            numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs)
+            two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2)
+            stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt)
+            print_badpoints(tv[ii,:],residuals[ii],txtdir)
+        else:
+            rh_plots(otimes,tv,station,txtdir,year,d1,d2)
+
         plt.show()
 
-    # this might work... and then again, it might not
-    print_badpoints(tv[ii,:],residuals[ii],txtdir)
 
     # now write things out - using txtdir variable sent 
     if writecsv: 
@@ -458,12 +447,15 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     editedtv = tv[jj,:]
     nr,nc = editedtv.shape
 
+    # write out the initial timeseries which are basically the concatenated values for multiple days
     write_subdaily(fname,station,tvoriginal,writecsv,extraline)
-    print('Edited observations',nr)
-    extraline = 'outliers removed/restrictions'
-    write_subdaily(fname_new,station,editedtv,writecsv,extraline)
-    NV = len(tvoriginal)
-    print('Percent of observations removed: ', round(100*(NV-nr)/NV,2))
+
+    if default_usage:
+        print('Edited observations',nr)
+        extraline = 'outliers removed/restrictions'
+        write_subdaily(fname_new,station,editedtv,writecsv,extraline)
+        NV = len(tvoriginal)
+        print('Percent of observations removed: ', round(100*(NV-nr)/NV,2))
     
     # now return the names of the output files ... 
 
@@ -708,22 +700,16 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     ----------
     otimes : numpy array of datetime objects
         observations times
-
     tv : numpy array
         gnssrefl results written into this variable using loadtxt
-
     station : str
         station name, only used for the title
-
     txtdir : str
         where the plots will be written to
-
     year: int
         what year is being analyzed
-
     d1 : int
         minimum day of year
-
     d2 : int
         maximum day of year
 
@@ -746,7 +732,7 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax1)
     colorbar.set_label('Frequency', fontsize=fs)
-    ax1.set_title('Constellation',fontsize=fs)
+    ax1.set_title('Signals',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); 
     ax1.set_ylabel('meters',fontsize=fs)
     plt.yticks(fontsize=fs)
@@ -756,8 +742,6 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     if setlimits:
         ax1.set_xlim((th1, th2))
     fig.autofmt_xdate()
-
-
 
     #fig,(ax1,ax2)=plt.subplots(2,1,sharex=True)
         # put some azimuth information on it
@@ -799,6 +783,7 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
 
 def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     """
+    makes a plot of the reflector heights before and after minimal editing
 
     Parameters
     ----------
@@ -1472,3 +1457,137 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     return tvd, correction
 
+
+def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
+    """
+    overview plots for rh_plot
+
+    Parameters
+    ----------
+    otimes : numpy array of datetime objects
+        observations times
+    tv : numpy array
+        gnssrefl results written into this variable using loadtxt
+    station : str
+        station name, only used for the title
+    txtdir : str
+        where the plots will be written to
+    year: int
+        what year is being analyzed
+    d1 : int
+        minimum day of year
+    d2 : int
+        maximum day of year
+
+    """
+    if d1 == 1 and d2 == 366:
+        # these are the defaults
+        setlimits = False
+    else:
+        setlimits = True
+        yyy,mm,dd = g.ydoy2ymd(year, d1)
+        th1 = datetime.datetime(year=year, month=mm, day=dd)
+        yyy,mm,dd = g.ydoy2ymd(year, d2)
+        th2 = datetime.datetime(year=year, month=mm, day=dd)
+    # this is not working, so just setting it to false, cause who cares!
+    setlimits = False
+    fs = 10
+    fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
+    i = (tv[:,10] < 100)
+    colors = tv[:,10]
+    scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax1)
+    colorbar.set_label('Frequency', fontsize=fs)
+    ax1.set_title('Constellation',fontsize=fs)
+    plt.xticks(rotation =45,fontsize=fs); 
+    ax1.set_ylabel('meters',fontsize=fs)
+    plt.yticks(fontsize=fs)
+    ax1.invert_yaxis()
+    ax1.grid(True)
+    fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
+    if setlimits:
+        ax1.set_xlim((th1, th2))
+    fig.autofmt_xdate()
+
+    #fig,(ax1,ax2)=plt.subplots(2,1,sharex=True)
+        # put some azimuth information on it
+    colors = tv[:,5]
+        # ax.plot( otimes, tv[:,2], '.')
+        # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
+    scatter = ax2.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax2)
+    colorbar.set_label('deg', fontsize=fs)
+    ax2.set_ylabel('meters',fontsize=fs)
+    ax2.set_title('Azimuth',fontsize=fs)
+    #ax1.title.set_text('Azimuth')
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    ax2.invert_yaxis()
+    ax2.grid(True)
+    if setlimits:
+        ax2.set_xlim((th1, th2))
+    fig.autofmt_xdate()
+
+# put some amplitude information on it
+    colors = tv[:,6]
+    # ax.plot( otimes, tv[:,2], '.')
+    # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
+    scatter = ax3.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax3)
+    ax3.set_ylabel('meters',fontsize=fs)
+    colorbar.set_label('v/v', fontsize=fs)
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    ax3.set_title('Amplitude',fontsize=fs)
+    ax3.invert_yaxis()
+    ax3.grid(True)
+    if setlimits:
+        ax3.set_xlim((th1, th2))
+    fig.autofmt_xdate()
+
+    plotname = txtdir + '/' + station + '_combined.png'
+    #plt.savefig(plotname,dpi=300)
+    print('png file saved as: ', plotname)
+
+def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
+    """
+    makes the plot that summarizes the number of satellites in each
+    constellation per epoch
+
+    station : str
+        name of the station
+    tval : numpy array
+        datetime objects?
+    nval : numpy array
+        number of total satellites at a given epoch
+    Gval : numpy array
+        number of galileo satellites at an epoch
+    Rval : numpy array
+        number of glonass satellites at an epoch
+    Eval : numpy array
+        number of galileo satellites at an epoch
+    Cval : numpy array
+        number of beidou satellites at an epoch
+    txtdir : str
+        where results are stored
+    fs : int
+        fontsize 
+
+    """
+
+    fig,ax=plt.subplots()
+    ax.plot(tval,nval,'ko',label='Total',markersize=3)
+    if (np.sum(Gval) > 0):
+        ax.plot(tval,Gval,'bo',label='GPS',markersize=3)
+    if (np.sum(Rval) > 0):
+        ax.plot(tval,Rval,'ro',label='GLO',markersize=3)
+    if (np.sum(Eval) > 0):
+        ax.plot(tval,Eval,'o',color='orange',label='GAL',markersize=3)
+    if (np.sum(Cval) > 0):
+        ax.plot(tval,Cval,'co',label='BEI',markersize=3)
+    plt.legend(loc="upper left")
+    plt.title(station + ': number of RH retrievals each day',fontsize=fs)
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    plt.grid()
+    fig.autofmt_xdate()
+    plotname = txtdir + '/' + station + '_Subnvals.png'
+    plt.savefig(plotname,dpi=300)
+    print('png file saved as: ', plotname)

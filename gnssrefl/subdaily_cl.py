@@ -160,8 +160,10 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
         else:
             print('Using ', txtfile)
         # if txtfile provided, you can use that as your starting dataset 
+        
+        default_usage = True
         ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, 
-                extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt,txtdir)
+                extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt,txtdir,default_usage)
         haveObstimes = True
     else:
         haveObstimes = False

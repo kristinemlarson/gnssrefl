@@ -138,3 +138,23 @@ In this case, we will look at Galileo L1.
 Note that a failed satellite arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
 the azimuth and elevation angle mask), you won't be looking at plots anymore.
 
+**New:**
+
+Before you start interpreting the results (using <code>daily_avg</code>, <code>subdaily</code>, <code>vwc</code>), and you just
+want to "see" the reflector height results, I have added a new utility: <code>rh_plot</code>
+It allows you to visualize results for up to a single year. It concantenates the RH results in case you 
+want  to use another program (e.g. Matlab) to do more assessment. It creates a single txt file and a plot 
+where the RH results are plotted with respect to time, color coded by signal frequency, azimuth, and periodogram amplitude.
+The azimuth plots in particular might help you see that you should change your azimuth mask.
+
+The required inputs are station name and year. Beyond that you can request:
+<PRE>
+  -doy1    initial day of year
+  -doy2    end day of year
+  -ampl    new amplitude constraint
+  -azim1   new min azimuth (deg)
+  -azim2   new max azimuth (deg)
+  -h1 H1   min RH (m)
+  -h2 H2   max RH (m)
+  -peak2noise new peak2noise constraint 
+</pre>
