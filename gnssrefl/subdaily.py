@@ -1519,9 +1519,9 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
 
 
     # get the 1-99 percentile 
-    yl = np.percentile(tv[:,2] ,[1 ,99])
-    if percent99:
-        ax2.set_ylim((yl[0], yl[1] ))
+#    yl = np.percentile(tv[:,2] ,[1 ,99])
+#    if percent99:
+#        ax2.set_ylim((yl[0], yl[1] ))
     ax2.invert_yaxis()
     ax2.grid(True)
 
@@ -1543,8 +1543,8 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     if setlimits:
         ax3.set_xlim((th1, th2))
 
-    if percent99:
-        ax3.set_ylim((yl[0], yl[1] ))
+#    if percent99:
+#        ax3.set_ylim((yl[0], yl[1] ))
     ax3.invert_yaxis()
     fig.autofmt_xdate()
 
