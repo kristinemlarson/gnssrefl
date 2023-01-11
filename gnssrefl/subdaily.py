@@ -430,7 +430,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             print_badpoints(tv[ii,:],residuals[ii],txtdir)
         else:
             # make both plots cause life is short
-            rh_plots(otimes,tv,station,txtdir,year,d1,d2,True)
+            #rh_plots(otimes,tv,station,txtdir,year,d1,d2,True)
             rh_plots(otimes,tv,station,txtdir,year,d1,d2,False)
 
         plt.show()
@@ -1523,8 +1523,8 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     # get the 1-99 percentile 
     # this crashed my docker build
 #    yl = np.percentile(tv[:,2] ,[1 ,99])
-    if percent99:
-        ax2.set_ylim((lowv,highv))
+    #if percent99:
+    #    ax2.set_ylim((lowv,highv))
     ax2.invert_yaxis()
     ax2.grid(True)
 
@@ -1544,8 +1544,8 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     if setlimits:
         ax3.set_xlim((th1, th2))
 
-    if percent99:
-        ax3.set_ylim((lowv, highv ))
+    #if percent99:
+    #    ax3.set_ylim((lowv, highv ))
     ax3.invert_yaxis()
     fig.autofmt_xdate()
 
