@@ -1492,24 +1492,7 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
     # this is not working, so just setting it to false, cause who cares!
     setlimits = False
     fs = 10
-    fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
-    i = (tv[:,10] < 100)
-    colors = tv[:,10]
-    scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
-    colorbar = fig.colorbar(scatter, ax=ax1)
-    colorbar.set_label('Frequency', fontsize=fs)
-    ax1.set_title('Constellation',fontsize=fs)
-    plt.xticks(rotation =45,fontsize=fs); 
-    ax1.set_ylabel('meters',fontsize=fs)
-    plt.yticks(fontsize=fs)
-    ax1.invert_yaxis()
-    ax1.grid(True)
-    fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
-    if setlimits:
-        ax1.set_xlim((th1, th2))
-    fig.autofmt_xdate()
-
-    #fig,(ax1,ax2)=plt.subplots(2,1,sharex=True)
+    fig,(ax2,ax3)=plt.subplots(2,1,sharex=True)
         # put some azimuth information on it
     colors = tv[:,5]
         # ax.plot( otimes, tv[:,2], '.')
@@ -1523,6 +1506,8 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
     ax2.invert_yaxis()
     ax2.grid(True)
+    fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
+
     if setlimits:
         ax2.set_xlim((th1, th2))
     fig.autofmt_xdate()
@@ -1531,6 +1516,8 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
     colors = tv[:,6]
     # ax.plot( otimes, tv[:,2], '.')
     # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
+    #fig=plt.figure(figsize=(10,4))
+
     scatter = ax3.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax3)
     ax3.set_ylabel('meters',fontsize=fs)
@@ -1543,8 +1530,7 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
         ax3.set_xlim((th1, th2))
     fig.autofmt_xdate()
 
-    plotname = txtdir + '/' + station + '_combined.png'
-    #plt.savefig(plotname,dpi=300)
+    plotname = txtdir + '/' + station + '_rh2.png'
     print('png file saved as: ', plotname)
 
 def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
