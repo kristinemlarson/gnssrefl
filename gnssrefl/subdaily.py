@@ -1517,21 +1517,22 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     if setlimits:
         ax2.set_xlim((th1, th2))
 
-
+    p1 = 0.01; p2 = 0.99
+    lowv, highv = my_percentile(tv[:,2],p1, p2)
+    print(lowv,highv)
     # get the 1-99 percentile 
+    # this crashed my docker build
 #    yl = np.percentile(tv[:,2] ,[1 ,99])
-#    if percent99:
-#        ax2.set_ylim((yl[0], yl[1] ))
+    if percent99:
+        ax2.set_ylim((lowv,highv))
     ax2.invert_yaxis()
     ax2.grid(True)
 
     fig.autofmt_xdate()
 
 # put some amplitude information on it
-    colors = tv[:,6]
-    # ax.plot( otimes, tv[:,2], '.')
     # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-    #fig=plt.figure(figsize=(10,4))
+    colors = tv[:,6]
 
     scatter = ax3.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax3)
@@ -1543,8 +1544,8 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     if setlimits:
         ax3.set_xlim((th1, th2))
 
-#    if percent99:
-#        ax3.set_ylim((yl[0], yl[1] ))
+    if percent99:
+        ax3.set_ylim((lowv, highv ))
     ax3.invert_yaxis()
     fig.autofmt_xdate()
 
@@ -1556,11 +1557,47 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     print('png file saved as: ', plotname)
     plt.savefig(plotname,dpi=150)
 
+def my_percentile(rh,p1, p2):
+    """
+    numpy percentile was crashing docker build
+    this is a quick work around
+
+    Parameters
+    ----------
+    rh : numpy array
+        reflector heights, but could be anything really
+    p1 : float
+        low percentage (from 0-1)
+    p2 : float
+        high percentage (from 0-1)
+
+    Returns
+    -------
+    low : float
+        low value (using input percentile)
+    highv : float
+        high value (using input percentile)
+
+    """
+
+    sorted_rh = np.sort(rh)
+    N = len(sorted_rh)
+    N1 = int(np.round(p1*N))
+    N2 = int(np.round(p2*N))
+
+    # calculate the low and high values at these percentiles
+    lowv = sorted_rh[N1] 
+    highv = sorted_rh[N2]
+
+    return  lowv, highv
+
 def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
     """
     makes the plot that summarizes the number of satellites in each
     constellation per epoch
 
+    Parameters
+    ----------
     station : str
         name of the station
     tval : numpy array
@@ -1600,3 +1637,4 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
     plotname = txtdir + '/' + station + '_Subnvals.png'
     plt.savefig(plotname,dpi=150)
     print('png file saved as: ', plotname)
+
