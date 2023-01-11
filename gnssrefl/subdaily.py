@@ -429,7 +429,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt)
             print_badpoints(tv[ii,:],residuals[ii],txtdir)
         else:
-            rh_plots(otimes,tv,station,txtdir,year,d1,d2)
+            # make both plots cause life is short
+            rh_plots(otimes,tv,station,txtdir,year,d1,d2,True)
+            rh_plots(otimes,tv,station,txtdir,year,d1,d2,False)
 
         plt.show()
 
@@ -1458,7 +1460,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     return tvd, correction
 
 
-def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
+def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     """
     overview plots for rh_plot
 
@@ -1478,6 +1480,8 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
         minimum day of year
     d2 : int
         maximum day of year
+    percent99 : bool
+        whether you want only the 1-99 percentile plotted
 
     """
     if d1 == 1 and d2 == 366:
@@ -1497,6 +1501,10 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
     colors = tv[:,5]
         # ax.plot( otimes, tv[:,2], '.')
         # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
+    # help from felipe nievinski
+    #tmp = numpy.percentile(tv[:,2], [1 99])
+    #matplotlib.pyplot.ylim(tmp[1], tmp[2])
+
     scatter = ax2.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax2)
     colorbar.set_label('deg', fontsize=fs)
@@ -1504,12 +1512,19 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
     ax2.set_title('Azimuth',fontsize=fs)
     #ax1.title.set_text('Azimuth')
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
-    ax2.invert_yaxis()
-    ax2.grid(True)
     fig.suptitle( station.upper() + ' Reflector Heights', fontsize=fs)
 
     if setlimits:
         ax2.set_xlim((th1, th2))
+
+
+    # get the 1-99 percentile 
+    yl = np.percentile(tv[:,2] ,[1 ,99])
+    if percent99:
+        ax2.set_ylim((yl[0], yl[1] ))
+    ax2.invert_yaxis()
+    ax2.grid(True)
+
     fig.autofmt_xdate()
 
 # put some amplitude information on it
@@ -1524,14 +1539,22 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2):
     colorbar.set_label('v/v', fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
     ax3.set_title('Amplitude',fontsize=fs)
-    ax3.invert_yaxis()
     ax3.grid(True)
     if setlimits:
         ax3.set_xlim((th1, th2))
+
+    if percent99:
+        ax3.set_ylim((yl[0], yl[1] ))
+    ax3.invert_yaxis()
     fig.autofmt_xdate()
 
-    plotname = txtdir + '/' + station + '_rh2.png'
+    if percent99:
+        plotname = txtdir + '/' + station + '_rh2_99.png'
+    else:
+        plotname = txtdir + '/' + station + '_rh2.png'
+
     print('png file saved as: ', plotname)
+    plt.savefig(plotname,dpi=150)
 
 def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
     """
@@ -1575,5 +1598,5 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
     plt.grid()
     fig.autofmt_xdate()
     plotname = txtdir + '/' + station + '_Subnvals.png'
-    plt.savefig(plotname,dpi=300)
+    plt.savefig(plotname,dpi=150)
     print('png file saved as: ', plotname)
