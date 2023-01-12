@@ -3,10 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## 1.2.10
+## 1.2.11
 
-Added a new utility - rh_plot - which is basically a way to look at RH results before you start making 
-products (snow, sea level, etc). Uses libraries developed for subdaily and daily_avg
+Added Glonass to <code>nmea2snr</code>. Thank you to Daniel Nowacki for helping on this one.
+
+## 1.2.10
+Added a new utility - <code>rh_plot</code> - which is basically a way to look at RH results before you start making 
+products (snow, sea level, etc). It uses libraries developed for subdaily and daily_avg
 
 
 ## 1.2.9

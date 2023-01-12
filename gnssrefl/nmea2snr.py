@@ -66,6 +66,12 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
     T = []; PRN = []; AZ = []; ELV = []; SNR = []
         
     for i_prn in prn_unique:
+        # the original code added 100 - but did not take into account the 
+        # satellite numbers have been shifted for glonass.
+        # also there is an illegal signal at satellite "48" 
+        # i do not know what that is, but i am ignoring it.
+        #if (i_prn > 32):
+        #    print(i_prn, 'looks like an illegal satellite number')
  #       print(i_prn)
         time = t[prn == i_prn];angle = elv[prn == i_prn];azimuth = az[prn == i_prn]
         Snr = snr[prn == i_prn];Prn = prn[prn == i_prn]
@@ -89,7 +95,14 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
     fout = open(snrfile, 'w')
     for i in range(len(T)):
         if (float(ELV[i]) >= emin) and (float(ELV[i]) <= emax):
-            fout.write("%2g %10.4f %10.4f %10g %4s %4s %7.2f %4s %4s\n" % (PRN[i], float(ELV[i]), float(AZ[i]), float(T[i]),'0', '0', float(SNR[i]),'0', '0')) 
+            if (PRN[i] > 100):
+                # names were translated incorrectly for Glonass records - so removing 65 from them all ;-)
+                p = float(PRN[i]) -65 + 1
+            else:
+                p = float(PRN[i])
+            # only allow glonass and correct GPS
+            if (p > 100) | (p < 33):
+                fout.write("%3g %10.4f %10.4f %10g %4s %4s %7.2f %4s %4s\n" % (p, float(ELV[i]), float(AZ[i]), float(T[i]),'0', '0', float(SNR[i]),'0', '0')) 
     fout.close()
     
 def read_nmea(fname):
