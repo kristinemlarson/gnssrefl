@@ -1,26 +1,34 @@
-Dates:
+Other things going on this spring 
 
-Geodesy for Climate Research (ICCC) March 28-30, 2023
-Earthscope : March 27-29 2023
-Easter  : April 9
-EGU 23–28 April 2023
-May 24-26 GNSS+R
-May 29-June 2 Pentecost Holidays
-IUGG  - July 11-20
+- Geodesy for Climate Research (ICCC) March 28-30, 2023
 
-Time : 8 am PDT 
-       11 am EDT 
-       4 pm UK
-       5 pm CDT 
+- Earthscope : March 27-29 2023
 
-Dates 
+- Easter  : April 9
 
-April - Makan in Iran
+- EGU 23–28 April 2023, Vienna
 
-May 1-5 ?
-May 8-13 
+- May 24-26 GNSS+R, Boulder
 
-Day 0?
+- May 29-June 2 Pentecost Holidays
+
+- July 11-20 IUGG, Berlin
+
+Time of the gnssrefl short course : 
+
+- 8 am PDT 
+- 11 am EDT 
+-4 pm UK
+- 5 pm CDT 
+
+Possible Dates for the lectures 
+
+May 1-4 
+
+May 8-12 
+
+Day 0? Week or two weeks before
+
 - Installation help session, Tim and Kelly
 
 Day 1?
@@ -29,16 +37,20 @@ Day 1?
 - How to Run the Code (KL)  and https://gnss-reflections.org Video??? 
 
 Day 2
-- Cryosphere: Snow accumulation (Felipe?), ice sheets (beg David Shean? Alison Banwell?), 
-- permafrost would need Lin Liu in the right time zone
-- Soil Moisture : could Clara provide some background ?  Maybe she has 
-something on her youtube channel (KL)
+- Cryosphere: Snow accumulation (I could do it), ice sheets (beg David Shean?), 
+- Soil Moisture : re-use her youtube channel video https://www.youtube.com/watch?v=ntnqD5O8LLo
 
 Day 3
-Richard Ray  ??? Overview on what is important ???
+Simon Williams, Richard Ray  ??? 
+Overview on what is important ??? What are the important corrections (Simon)
+What needs to be done. influence of antennas, L2C vs L2p (e.g.), receivers, multi-GNSS,
+H, Hdot, how long is the arc, etc.
 
-- Water : lakes (Rebecca) rivers (Makan?), tides  (Simon)
-Zulfikar could give experience from Indonesia?
+- Water : lakes (Rebecca) 
+- Rivers (Makan?) 
+- tides  (Simon)
+
+Maybe ?Zulfikar could give experience from Indonesia? 
 
 Day 4
 - What makes a good site?
@@ -47,9 +59,10 @@ https://gnss-reflections.org/rzones page and refl_zones utility in gnssrefl
 
 - Good geodetic site (examples from new sites in Greenland?)
 
-- Cheap equipment (Makan)
+- Cheap sensors: views from Makan, Purnell, Simon, Felipe?
 
 
-Curating the videos : UNAVCO
-Enrolling students : UNAVCO
+- Curating the videos : UNAVCO
+
+- Enrolling students : UNAVCO
 

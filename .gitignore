@@ -1,4 +1,5 @@
 env
+all.txt
 test.py
 dist
 build

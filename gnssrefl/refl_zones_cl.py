@@ -3,6 +3,7 @@
 import argparse
 import numpy as np
 import os
+import subprocess
 import sys
 
 import gnssrefl.gps as g
@@ -22,7 +23,7 @@ def parse_arguments():
     parser.add_argument('-azim2', help='end azimuth (default is 360) ', type=int,default=None)
     parser.add_argument('-el_list', nargs="*",type=float,  help='elevation angle list, e.g. 5 10 15  (default)')
     parser.add_argument('-system', help='default=gps, options are galileo, glonass, beidou', type=str)
-    parser.add_argument('-output', help='default is the station name', type=str,default=None)
+    parser.add_argument('-output', help='output filename. default is the station name with kml extension', type=str,default=None)
 
 
     args = parser.parse_args().__dict__
@@ -129,17 +130,30 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     azlist = rf.set_final_azlist(azim1,azim2,azlisttmp)
 
     # figure out where the output will go
-    xdir = os.environ['REFL_CODE']
+    # changed it so it  goes to a subdirectory called "kml" by default 
+
+
+    # if you set a filename, the output will be written there in the user directory
+    # you need to set the kml to the ending.
+    # if you use defaults, it is written in 
+
     if output == None: 
-        output = xdir + '/Files/' + station 
-    else:
-        output = xdir + '/Files/' + output 
+    # first check that the Files output directory exists
+        xdir = os.environ['REFL_CODE']
+        outputdir = xdir + '/Files' 
+        if not os.path.isdir(outputdir):
+            subprocess.call(['mkdir',outputdir])
+        outputdir = xdir + '/Files/kml'  
+        if not os.path.isdir(outputdir):
+            subprocess.call(['mkdir',outputdir])
+        output = outputdir  + '/' + station  + '.kml'
 
     # make the KML map file
-    fz_maps = rf.make_FZ_kml(output,fr, el_list, h, lat,lon,azlist)
+    # 2023jan19 add station location
+    fz_maps = rf.make_FZ_kml(station,output,fr, el_list, h, lat,lon,azlist)
 
     if fz_maps == True:
-        print('File is saved in ' , output + '.kml')
+        print('File is saved in ' , output)
     else:
         print('Something went wrong, and the kml file was not created')
 

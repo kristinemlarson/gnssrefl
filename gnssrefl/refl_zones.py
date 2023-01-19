@@ -384,15 +384,17 @@ def write_coords(lng, lat):
     return points
 
 
-def make_FZ_kml(name,freq, el_list, h, lat,lng,azlist):
+def make_FZ_kml(station, filename,freq, el_list, h, lat,lng,azlist):
     """
     makes fresnel zones for given azimuth and elevation angle 
     lists.  
 
     Parameters
     ----------
-    name : str
-        output filename (kml will be added to it)
+    station: str
+        four character station name
+    filename : str
+        output filename (the kml extension should already be there)
     freq : int
         frequency (1,2, or 5)
     el_list : list of floatss
@@ -466,8 +468,14 @@ def make_FZ_kml(name,freq, el_list, h, lat,lng,azlist):
         ls.style.linestyle.color = simplekml.Color.yellow
         ls.style.linestyle.width = 3
         ls.style.polystyle.color = simplekml.Color.changealphaint(50, simplekml.Color.yellow)
+
+    # try adding a point at the station
+    pnt = kml.newpoint(name=station)
+    pnt.coords = [(lng, lat)]
+    pnt.style.iconstyle.icon.href = 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png'
+
     # save to a file
-    kml.save(name +'.kml')
+    kml.save(filename)
     return True
 
 def set_system(system):

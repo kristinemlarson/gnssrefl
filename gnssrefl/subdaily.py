@@ -1517,20 +1517,20 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     if setlimits:
         ax2.set_xlim((th1, th2))
 
+    # now doing 1 and 99%
     p1 = 0.01; p2 = 0.99
     lowv, highv = my_percentile(tv[:,2],p1, p2)
-    print(lowv,highv)
-    # get the 1-99 percentile 
-    # this crashed my docker build
+    # this crashed my docker build - but it turned out to have nothing to do with it
 #    yl = np.percentile(tv[:,2] ,[1 ,99])
     if percent99:
         ax2.set_ylim((lowv,highv))
+
     ax2.invert_yaxis()
     ax2.grid(True)
 
     fig.autofmt_xdate()
 
-# put some amplitude information on it
+#    put some amplitude information on it
     # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
     colors = tv[:,6]
 
