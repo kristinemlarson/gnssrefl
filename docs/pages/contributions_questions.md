@@ -13,15 +13,15 @@ python/packaging questions and improved our docker distribution.
 - Felipe Nievinski and Simon Williams have provided significant advice for this project.
 - Clara Chew and Eric Small developed the soil moisture algorithm; I ported it to python with Kelly's help.
 - Sree Ram Radha Krishnan ported the rzones web app code.
+- Dan Nowacki added Glonass to the NMEA reader
 
-GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, EAR 1144221, AGS 1449554) and NASA (NNX12AK21G and NNX13AF43G).
+GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, 
+EAR 1144221, AGS 1449554) and NASA (NNX12AK21G and NNX13AF43G).
 The python package development, docker distributions and jupyter notebooks are supported under NASA 80NSSC20K1731.
-For relevant citations, the code is citable via `doi <https://doi.org/10.5281/zenodo.5601495>`__, and the methods are covered in gnssrefl `publications <https://www.kristinelarson.net/publications>`__.
+For relevant citations, the code is citable via [DOI 10.5281/zenodo.5601495](http://dx.doi.org/10.5281/zenodo.5601495). The 
+general methods we have used are covered in various publications [found here](https://www.kristinelarson.net/publications).
 
-Authors and maintainers: Kristine M. Larson, Kelly Enloe and Tim Dittmann
-
-[https://kristinelarson.net](https://kristinelarson.net)
-
+Authors and maintainers: [Kristine M. Larson](https://kristinelarson.net), Kelly Enloe, and Tim Dittmann
 
 ## We need help to maintain and improve this code. How can you help?
 
@@ -43,8 +43,6 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 - Write up a new [use case](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md).
 
 - Investigate surface related biases for polar tide gauge calculations (ice vs water).
-
-- I have ported NOCtide.m and will add it here when I get a chance.
 
 ## How to get help with your gnssrefl questions?
 
@@ -79,8 +77,7 @@ If the string is long - please post the error string in a thread response to you
 - Please include the operating system of your computer.
 
 ## Would you like to join our <code>gnssrefl</code> users email list?
-Send an email to community@unavco.org and put the words
-*subscribe (or unsubscribe to leave) to gnss-ir* in your email subject.
+This is currently operated by earthscope.org.  To join, please send Kristine an email.
 
 
-<HR>
+Updated January 21, 2023  by Kristine M. Larson
