@@ -1,5 +1,11 @@
 ### Summit Camp, Greenland
 
+Fixed azimuth region and frequency selection.
+Noted issues with Galileo data.
+
+Updated January 21, 2023 
+
+
 Please note: this use case was originally written in late 2020. The dataset has been updated since that time.
 Sometimes Galileo is tracked; sometimes it is not tracked. There has also been an equipment
 change - so you should make sure that you do not interpret small vertical biases at that time.
@@ -114,13 +120,25 @@ Now L5 data:
 ### Steps for Longer Analysis: 
 
 Use **make_json_input** to set your analysis inputs. Instead of the defaults, set the special height and 
-elevation angles, allfreq to True, peak to noise ratio to 3.5, and minimum amplitude to 15:
+elevation angles, peak to noise ratio to 3.5, and minimum amplitude to 15. 
 
-<code>make_json_input smm3 72.573 -38.470  3252.453 -peak2noise 3.5 -allfreq True  -ampl 15 -e1 5 -e2 15 -h1 8 -h2 20</code>
+Setting the azimuth region is a little more complicated. I have been told that the "quiet" region for scientific 
+measurements spans 70 to 270 degrees.  The code requires that your azimuth region be no longer than 100 degrees.
+So what you want to do is input three regions that are smaller than that, i.e. 70 120 120 180 180 270.
 
-The azimuth mask had to be hand-edited. These azimuths are the "quiet" areas for making scientific 
-measurements at Summit Camp. To keep the reflection 
-zones quite large - I only opted to only use data from 5-15 degree elevation angles. This will make the amplitudes of the peaks 
+
+I used to encourage people to use the allfreq selection when they have a multi-GNSS receiver. This can be complicated. 
+
+- for sites taller than 6 meters, DO NOT USE frequency 208
+- if you don't have Beidou data, there is no reason to set allfreq to true
+
+For this site, I would suggest this frequency list: 1 20 5 101 102 201 205 206 207
+
+
+<code>make_json_input smm3 72.573 -38.470  3252.453 -peak2noise 3.5 -frlist 1 20 5 101 102 201 205 206 207 -ampl 15 -e1 5 -e2 15 -h1 8 -h2 20 -azlist 70 120 120 180 180 270</code>
+
+To keep the reflection zones quite large - I only opted to only use data from 5-15 degree 
+elevation angles. This will make the amplitudes of the peaks 
 in the periodogram larger. I also removed the Galileo signals from the json since they are not 
 in the RINEX files I am using. [Sample json](smm3.json)
 

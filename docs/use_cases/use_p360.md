@@ -1,4 +1,8 @@
 ### Island Park, Idaho
+
+Updated by Kristine Larson on January 21, 2023
+
+<HR>
   
 <p align=center>
 <img src="https://gnss-reflections.org/static/images/P360.jpg" width="500">
@@ -78,10 +82,11 @@ north. This is confirmed in the QC plot show here:
 First we will set the analysis paramaters 
 using <code>make_json_input</code>. This analysis will use the L2C frequency and 
 will use QC metrics derived from the previous plot (for peak to noise ratio and amplitude).  
+We don't want to use the northeast quadrant, so will use -azlist 90 180 180 270 270 360:
 
-<code>make_json_input p360 44.31785 -111.45068 1857.861 -l2c True -peak2noise 3.2 -ampl 8 </code>
+<code>make_json_input p360 44.31785 -111.45068 1857.861 -l2c True -peak2noise 3.2 -ampl 8 -azlist 90 180 180 270 270 360</code>
 
-We will hand edit the json file to disallow 0-90 degrees in azimuth. [Sample json file](p360.json)
+[Sample json file](p360.json)
 
 We then make SNR files to encompass approximately one water year:
 

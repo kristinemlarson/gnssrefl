@@ -1,8 +1,8 @@
 {
     "station": "smm3",
-    "lat": 72.5729,
-    "lon": -38.4702,
-    "ht": 3267.0,
+    "lat": 72.573,
+    "lon": -38.47,
+    "ht": 3252.453,
     "minH": 8.0,
     "maxH": 20.0,
     "e1": 5,
@@ -17,27 +17,37 @@
         5,
         30
     ],
-    "ediff": 2,
+    "ediff": 2.0,
     "desiredP": 0.005,
     "azval": [
-        70,
-        180,
-        180,
-        270 
+        70.0,
+        120.0,
+        120.0,
+        180.0,
+        180.0,
+        270.0
     ],
     "freqs": [
         1,
         20,
         5,
         101,
-        102 
+        102,
+        201,
+        205,
+        206,
+        207
     ],
     "reqAmp": [
-        15,
-        15,
-        15,
-        15,
-        15
+        15.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0
     ],
     "refraction": true,
     "overwriteResults": true,
@@ -45,7 +55,8 @@
     "wantCompression": false,
     "plt_screen": false,
     "onesat": null,
-    "screenstats": true,
+    "screenstats": false,
     "pltname": "smm3_lsp.png",
-    "delTmax": 75
+    "delTmax": 75.0,
+    "gzip": false
 }

@@ -1,5 +1,11 @@
 ### St Lawrence River
 
+
+Updated by Kristine M. Larson to reflect code changes in make_json_input.
+
+January 21, 2023
+
+<HR>
 To the best of our knowledge, access to the current high-rate data streams
 needed to do reflectometry at this site are no longer allowed. Please contact NRCAN for further information.
 The data used in the test case described below *is* still available. However, the current code requires
@@ -36,7 +42,8 @@ modify the NRCNA high rate downloads function to use *gfzrnx*, which is supporte
 
 Station PMTL is located on the Viterra Montreal Terminal building on the St Lawrence River in Montreal, Canada. It is operated by the Montreal Port Authority.
 
-GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more than 60 meters above the water, you need to use high-rate GNSS data. Because of the way that NRCAN stores these data, you need to install <code>teqc</code>.
+GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more than 60 meters above the water, you need to 
+use high-rate GNSS data. Because of the way that NRCAN stores these data, you need to install <code>teqc</code>.
 
 Note the [ellipsoidal height and geoid corrected height](https://gnss-reflections.org/geoid?station=pmtl). To pick an azimuth and elevation mask, try the [reflection zone webapp](https://gnss-reflections.org/rzones) with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:
 
@@ -62,18 +69,21 @@ Windowing down the reflector region and using day of year 270:
 <img src=../_static/pmtl-lsp-75-85.png width=600>
 
 The QC plot gives the azimuth windows - and help on setting the required amplitude and peak to noise ratio.
-Retrievals are not returned near 90 degrees because of the satellite inclination and the way the azimuth regions are defined in <code>quickLook</code>. It does not mean there are obstructions in that direction.
+Retrievals are not returned near 90 degrees because of the satellite inclination and the way the 
+azimuth regions are defined in <code>quickLook</code>. It does not mean there are obstructions in that direction.
 
 <img src=../_static/pmtl-qc-75-85.png width=600>
 
 
 ### Analyze the Data
 
-Set up analysis instructions, using a smaller RH region: 
+Set up analysis instructions, using a smaller RH region. Since our database has the a priori location of PMTL, we 
+can use 0 0 0 for the latitude, longitude, and height values. Note that the frequency list has only GPS L1 and the two Glonass frequencies.
+The azimuth region has been cut up into three smaller regions as the code will not allow regions larger than 100 degrees:
 
-<code>make_json_input pmtl 45.5571 -73.5204 54.073 -h1 75 -h2 85 -e1 5 -e2 12 -allfreq True -peak2noise 3 -ampl 7</code>
+<code>make_json_input pmtl 0 0 0 -h1 75 -h2 85 -e1 5 -e2 12 -allfreq True -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist 45 90 90 180 180 205</code>
 
-Hand-edit the json to remove GPS L2C, GPS L5, and Galileo data, and to set your azimuth region. [Sample json](pmtl.json)
+[Sample json](pmtl.json)
 
 Make the SNR files (this takes a long long time):
 

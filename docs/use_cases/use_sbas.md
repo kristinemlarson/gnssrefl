@@ -71,9 +71,7 @@ Make the SNR files:
 
 Save your analysis strategy:
 
-<code>make_json_input sbas 0 0 0 -e1 5 -e2 12 -h1 15 -h2 35 -peak2noise 3</code>
-
-Hand edit the json file to restrict azimuths to 0-78 degrees.
+<code>make_json_input sbas 0 0 0 -e1 5 -e2 12 -h1 15 -h2 35 -peak2noise 3 -azlist 0 78 </code>
 
 The next step is to estimate reflector heights. First do a single day using the plt option.
 
