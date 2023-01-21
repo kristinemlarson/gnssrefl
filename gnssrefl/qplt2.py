@@ -41,9 +41,13 @@ def main():
     parser.add_argument("-ylabel", help="y-axis label ", type=str,default=None)
     parser.add_argument("-title", help="optional title", type=str,default=None)
     parser.add_argument("-outfile", help="optional filename for plot", type=str,default=None)
+    parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
 
 
     args = parser.parse_args()
+
+
+
 
     filename = args.filename
     xcol = int(args.xcol) - 1
@@ -134,6 +138,13 @@ def main():
         ax.set_title(args.title )
 
     plt.grid()
+
+
+    if args.ylimits is not None:
+        print('found y-axis limits')
+        ylimits = args.ylimits
+        print(ylimits)
+        plt.ylim((ylimits))
 
     if args.outfile is not None:
         plt.savefig(outfile,dpi=300)

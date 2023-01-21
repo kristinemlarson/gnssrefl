@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.12
+Slight changes to the behavior of refl_zones - it make a station icon and the output goes
+to a subdirectory now to decrease the clutter in $REFL_CODE/Files.
+
+Added more optional inputs to quickplt
+
 ## 1.2.11
 
 Added Glonass to <code>nmea2snr</code>. Thank you to Daniel Nowacki for helping on this one.
