@@ -383,7 +383,7 @@ def write_coords(lng, lat):
 
     return points
 
-
+# Function makes the fresnel zones to KML file
 def make_FZ_kml(station, filename,freq, el_list, h, lat,lng,azlist):
     """
     makes fresnel zones for given azimuth and elevation angle 
@@ -420,8 +420,7 @@ def make_FZ_kml(station, filename,freq, el_list, h, lat,lng,azlist):
         lng_el, lat_el = makeEllipse_latlon(freq,el,h,azim, lat,lng)
         points = write_coords(lng_el, lat_el)
         pname = 'ElevAngle {0}'.format(int(el))
-        ls = kml.newpolygon(name=pname, altitudemode='relativeToGround')
-        #ls = kml.newpolygon(name=pname)
+        ls = kml.newpolygon(name=pname, altitudemode='relativeToGround') # creating new polygon for each azimuth zone in azlist
         ls.outerboundaryis = points
         # print(points)
         if el ==el_list[0]:
