@@ -27,9 +27,10 @@ May 1-4
 
 May 8-12 
 
-Day 0? Week or two weeks before
+Day 0 
 
-- Installation help session, Tim and Kelly
+Week or two weeks before, 
+Installation help session, Tim and Kelly
 
 Day 1?
 - Intro/Overview KL
@@ -37,32 +38,36 @@ Day 1?
 - How to Run the Code (KL)  and https://gnss-reflections.org Video??? 
 
 Day 2
-- Cryosphere: Snow accumulation (I could do it), ice sheets (beg David Shean?), 
-- Soil Moisture : re-use her youtube channel video https://www.youtube.com/watch?v=ntnqD5O8LLo
+- Cryosphere: Snow accumulation (I would like not to do this,
+but I do not know really who else to ask), ice 
+sheets (beg David Shean?), 
+- Soil Moisture : I can show how to use the software. We 
+can re-use Clara's youtube channel video for some context, 
+https://www.youtube.com/watch?v=ntnqD5O8LLo
 
 Day 3
-Simon Williams, Richard Ray  ??? 
-Overview on what is important ??? What are the important corrections (Simon)
-What needs to be done. influence of antennas, L2C vs L2p (e.g.), receivers, multi-GNSS,
-H, Hdot, how long is the arc, etc.
 
-- Water : lakes (Rebecca) 
+Simon Williams, Overview on what is important, 
+What are the important corrections etc.
+
+- Lakes (Rebecca from the USGS, worked on Crater Lake) 
 - Rivers (Makan?) 
-- tides  (Simon)
-
-Maybe ?Zulfikar could give experience from Indonesia? 
+- Ocean sites (Simon)
 
 Day 4
-- What makes a good site?
-- I can help with explaining how to use the 
-https://gnss-reflections.org/rzones page and refl_zones utility in gnssrefl
 
-- Good geodetic site (examples from new sites in Greenland?)
+- What makes a good site? How to know this BEFORE you install it , 
+rzones webapp and refl_zones utility in gnssrefl
+
+- Good geodetic site (examples from new ocean 
+sites that DTU put in Greenland?)
+
+- Discussion about what do we need to improve the software , how 
+people can help us.
 
 - Cheap sensors: views from Makan, Purnell, Simon, Felipe?
 
+Curating the videos : Earthscope 
 
-- Curating the videos : UNAVCO
-
-- Enrolling students : UNAVCO
+Enrolling students : Earthscope
 
