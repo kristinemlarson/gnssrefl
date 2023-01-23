@@ -11,13 +11,13 @@ Originally installed for the Plate Boundary Observatory, it is a Trimble. The ar
 However, it does have the L2C data in the 1 second files. So that is how I am able to make 
 this comparison.  P038 is a very very very flat site.
 
-Here are the L2P retrivals:
+Here are the L2P retrievals:
 
 <img src="../_static/p038usingL2P.png" width="600"/>
 
 Now look at the L2C retrievals.
 
-<img src="../_static/p038usingL2C.png" width="600"/>
+<img src="../_static/p038usingL2c.png" width="600"/>
 
 If you were trying to find a periodic signal, which one 
 would you want to use?
@@ -28,7 +28,7 @@ to people that won't know why the signal quality improved over night.
 
 ## GPS L5
 
-Another great signal.  That is all.
+Another great signal.  I love it. That is all.
 
 ## Aliasing
 
@@ -43,22 +43,22 @@ I also using the -plt T option.
 
 This is 5 second GPS L1.
 
-<img src="../_static/thu2_l1_5sec.png" width="600"/>
+<img src="../_static/thule_l1.png" width="600"/>
 
 This is 15 second GPS L1. You see some funny stuff at 30 meters, and yes, the periodograms
 are noisier. But nothing insane.
 
-<img src="../_static/thu2_l1_15sec.png" width="600"/>
+<img src="../_static/thule_l1_15sec.png" width="600"/>
 
 Now do 5 second Glonass L1
 
-<img src="../_static/thu2_101_5sec.png" width="600"/>
+<img src="../_static/not_aliased_101.png" width="600"/>
 
 
 Contrast with the Glonass L1 results using 15 sec decimation!
-So yeah, this is a problem.
+So yeah, aliasing is a problem.
 
-<img src="../_static/thu2_101_15sec.png" width="600"/>
+<img src="../_static/aliased_101.png" width="600"/>
 
 
 ## E5
@@ -83,13 +83,16 @@ This is E5a
 
 <img src="../_static/at01_358_205.png" width="600"/>
 
-This is E5
+This is E5. Note that instead of nice clean peaks, it is 
+spread out. You can also see that the E5 retrievals degrades as elevation angle increases,
+which is exactly what you would expect with the multipath delay 
+increasing with elevation angle. I would just recommend only using
+this signal for RH < 5 meters. And even then, if you are tracking
+L8, you probably also have L5, L6, and L7, so there is not a ton gained 
+by also using L8.
 
 <img src="../_static/at01_358_208.png" width="600"/>
 
-You see that the E5 retrievals degrades as elevation angle increases,
-which is exactly what you would expect with the multipath delay 
-increasing with elevation angle.
 
 ##  What about L1C?
 
