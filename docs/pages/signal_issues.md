@@ -1,5 +1,34 @@
 ## Some comments about signals
 
+## GPS L2C
+
+Why do I like L2C? What's not to like? It is a modern **civilian** code without high chipping rate.
+That civilian part matters because it means the receiver knows the code and thus
+retrievals are far better than a receiver having to do extra processing to 
+extract the signal. Here is an example of a receiver that is tracking **both** L2P and L2C.
+Originally installed for the Plate Boundary Observatory, it is a Trimble. The archive 
+(unavco) chose to provide only L2P in the 15 second default RINEX file.
+However, it does have the L2C data in the 1 second files. So that is how I am able to make 
+this comparison.  P038 is a very very very flat site.
+
+Here are the L2P retrivals:
+
+<img src="../_static/p038usingL2P.png" width="600"/>
+
+Now look at the L2C retrievals.
+
+<img src="../_static/p038usingL2C.png" width="600"/>
+
+If you were trying to find a periodic signal, which one 
+would you want to use?
+
+To further confuse things, when the receiver was updated to a Septentrio, unavco began
+providing L2C data in the default 15 second files. This is a good thing - but it is confusing
+to people that won't know why the signal quality improved over night.
+
+## GPS L5
+
+Another great signal.  That is all.
 
 ## Aliasing
 
@@ -32,4 +61,53 @@ So yeah, this is a problem.
 <img src="../_static/thu2_101_15sec.png" width="600"/>
 
 
+## E5
+
+Now about RINEX L8 ... also known as E5. This is one of 
+the new Galileo signals. Despite the fact that it is near
+the frequencies of the other L5 signals, it is **not** the 
+same. You can see that 
+it in the multipath envelope work of Simsky et al. shown below.
+
+<img src="../_static/multipath-envelope.png" width="600"/>
+
+Most of you will not be familiar with multipath envelopes - 
+but for our purposes, we want those envelopes to be big - cause
+more multipath, better GNSS-IR. First thing, multipath delay 
+shown on the x-axis is NOT the reflector height (RH).  it is 
+2*RH*sin(elevation angle). So even a pretty tall RH will not 
+be obstructed by the new Galileo codes except for E5.
+
+
+This is E5a
+
+<img src="../_static/at01_358_205.png" width="600"/>
+
+This is E5
+
+<img src="../_static/at01_358_208.png" width="600"/>
+
+You see that the E5 retrievals degrades as elevation angle increases,
+which is exactly what you would expect with the multipath delay 
+increasing with elevation angle.
+
+##  What about L1C?
+
+I would be happy to host some results from L1C - please submit a pull request 
+with the needed figures and a description of what you are comparing. I imagine
+this would require making two snr files - one with L1C and one with L1 C/A. 
+And using only the small subset of satellites that transmit L1C.
+
+<HR>
+
+The multipath envelope figure is taken from:
+
+Title: Experimental Results for the Multipath Performance of Galileo 
+Signals Transmitted by GIOVE-A Satellite
+
+Authors: Andrew Simsky,David Mertens,Jean-Marie Sleewaegen,
+Martin Hollreiser, and Massimo Crisci
+
+International Journal of Navigation and Observation 
+Volume 2008, DOI 10.1155/2008/416380
 
