@@ -43,7 +43,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
     t = t[snr !=''];az = az[snr !=''];prn = prn[snr !=''];elv = elv[snr !=''];snr = snr[snr !='']
     t = t[prn !=''];az = az[prn !=''];elv = elv[prn !=''];snr = snr[prn !=''];prn = prn[prn !='']
     
-    az = az.astype(np.float);elv = elv.astype(np.float);snr = snr.astype(np.float);prn = prn.astype(np.int)
+    az = az.astype(float);elv = elv.astype(float);snr = snr.astype(float);prn = prn.astype(int)
 
     prn_unique = np.unique(prn) 
 
