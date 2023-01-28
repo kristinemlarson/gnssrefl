@@ -1,7 +1,7 @@
 # 2023 SHORT COURSE: GNSS INTERFEROMETRIC REFLECTOMETRY
 
 ### Basic Principles and an Introduction to the gnssrefl Software Package
-**Dates:** May 1-4, 2023 
+**Proposed Dates:** May 1-4, 2023 
 
 **Times:** 9-11 am Colorado Daylight Time
 
@@ -10,16 +10,18 @@
 ***
 
 **The goals for this short course are to:**
-1. introduce participants to the basic principles of the GNSS-IR method
-2. provide support for users installing and running gnssrefl (python, PyPi, Jupyter notebooks, Docker images, introduce use cases)
-3. demonstrate and discuss gnssrefl use in practical sessions on snow accumulation, soil moisture and water levels.
-4. provide guidance on gnss-ir site location selection, low-cost sensors and contributing to open-source scientific software. 
+
+- introduce participants to the basic principles of the GNSS-IR method
+- provide support for users installing and running gnssrefl (python, PyPi, Jupyter notebooks, Docker images, introduce use cases)
+- demonstrate and discuss gnssrefl use in practical sessions on snow accumulation, soil moisture and water levels.
+- provide guidance on GNSS-IR site location selection, low-cost sensors and contributing to open-source scientific software. 
 
 **Participants successfully completing this short course will:**
-1. understand the accuracy/precision and strengths/weaknesses of the GNSS-IR technique
-2. be able to measure snow accumulation and water levels using data from the global GNSS network. 
-Participants are encouraged to analyze their own GNSS data.
-3. understand what factors make for a good gnss-ir site and how to contribute to open-science software.
+
+- understand the accuracy/precision and strengths/weaknesses of the GNSS-IR technique
+- be able to use the gnssrefl software.
+- understand what factors make for a good GNSS-IR site 
+- know how to contribute to open-science software.
 
 |                    | Agenda                                                                                                                                                                                                                                                                                                                                                                                  |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
