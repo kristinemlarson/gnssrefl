@@ -1,6 +1,6 @@
 ### Island Park, Idaho
 
-Updated by Kristine Larson on January 21, 2023
+Updated by Kristine Larson on January 23, 2023
 
 <HR>
   
@@ -135,3 +135,17 @@ Finally, the daily average RH for the water year:
 <img src="../_static/p360-dailyavg.png" width="600">
 
 [Sample daily average RH output](p360_dailyRH.txt)
+
+<HR>
+
+As of January 28, 2023, there is a new snowdepth utility.
+It requires two inputs, the station name and the (northern hemisphere)
+water year:
+
+<code>snowdepth p360 2018</code>
+
+and produces a plaint text snowdepth file (the name of the file is sent to the screen) and a png file:
+
+<img src="../_static/p360_snowdepth.png" width="600">
+
+

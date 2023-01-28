@@ -7,6 +7,7 @@
 
 **github version: 1.2.13** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
+New [snowdepth utility](docs/pages/README_snowdepth.md).
 !!! Specific azimuth regions can now be added at the command line. Use -azlist in <code>make_json_input</code> !!!
 
 New Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
