@@ -23,7 +23,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astro
 
 setup(
     name="gnssrefl",
-    version="1.2.12",
+    version="1.2.13",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -71,6 +71,7 @@ setup(
             'refl_zones= gnssrefl.refl_zones_cl:main',
             'vwc= gnssrefl.vwc:main',
             'quickplt= gnssrefl.qplt2:main',
+            'snowdepth= gnssrefl.snow_depth:main',
             'rh_plot= gnssrefl.rh_plot:main',
             ], 
         },

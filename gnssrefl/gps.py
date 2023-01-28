@@ -842,11 +842,11 @@ def kgpsweek(year, month, day, hour, minute, second):
 
     """
 
-    year = np.int(year)
-    M = np.int(month)
-    D = np.int(day)
-    H = np.int(hour)
-    minute = np.int(minute)
+    year = int(year)
+    M = int(month)
+    D = int(day)
+    H = int(hour)
+    minute = int(minute)
     
     UT=H+minute/60.0 + second/3600. 
     if M > 2:
@@ -858,7 +858,7 @@ def kgpsweek(year, month, day, hour, minute, second):
         
     JD=np.floor(365.25*y) + np.floor(30.6001*(m+1)) + D + (UT/24.0) + 1720981.5
     GPS_wk=np.floor((JD-2444244.5)/7.0);
-    GPS_wk = np.int(GPS_wk)
+    GPS_wk = int(GPS_wk)
     GPS_sec_wk=np.rint( ( ((JD-2444244.5)/7)-GPS_wk)*7*24*3600)            
      
     return GPS_wk, GPS_sec_wk
@@ -881,12 +881,12 @@ def kgpsweekC(z):
         GPS seconds
 
     """
-    y= np.int(z[1:3])
-    m = np.int(z[4:6])
-    d=np.int(z[7:9])
-    hr=np.int(z[10:12])
-    mi=np.int(z[13:15])
-    sec=np.float(z[16:26])
+    y= int(z[1:3])
+    m = int(z[4:6])
+    d=int(z[7:9])
+    hr=int(z[10:12])
+    mi=int(z[13:15])
+    sec=float(z[16:26])
     gpsw,gpss = kgpsweek(y+2000,m,d,hr,mi,sec)
 
     return gpsw, gpss
@@ -932,7 +932,7 @@ def read_sp3(file):
         raw = f.read()
         f.close()
         lines  = raw.splitlines()
-        nprn = np.int(lines[2].split()[1])
+        nprn = int(lines[2].split()[1])
         lines  = raw.splitlines()[22:-1]
         epochs = lines[::(nprn+1)]
         nepoch =  len(lines[::(nprn+1)])
@@ -943,10 +943,10 @@ def read_sp3(file):
 				kgpsweek(year, month, day, hour, minute, second)
             for j in range(nprn):
                 prn[i*nprn+j] =  int(lines[i*(nprn+1)+j+1][2:4])
-                x[i*nprn+j] = np.float(lines[i*(nprn+1)+j+1][4:18])
-                y[i*nprn+j] = np.float(lines[i*(nprn+1)+j+1][18:32])
-                z[i*nprn+j] = np.float(lines[i*(nprn+1)+j+1][32:46])
-                clock[i*nprn+j] = np.float(lines[(i)*(nprn+1)+j+1][46:60])
+                x[i*nprn+j] = float(lines[i*(nprn+1)+j+1][4:18])
+                y[i*nprn+j] = float(lines[i*(nprn+1)+j+1][18:32])
+                z[i*nprn+j] = float(lines[i*(nprn+1)+j+1][32:46])
+                clock[i*nprn+j] = float(lines[(i)*(nprn+1)+j+1][46:60])
     except:
         print('sorry - the sp3file does not exist')
         week,tow,x,y,z,prn,clock=[0,0,0,0,0,0,0]
@@ -991,20 +991,20 @@ def myreadnav(file):
                     week, Toc = kgpsweek(year, month, day, hour, minute, second)
                     table[i, 1] =  week
                     table[i, 2] = Toc
-                    Af0 = np.float(lines[i*8][-3*19:-2*19].replace('D', 'E'))
-                    Af1 = np.float(lines[i*8][-2*19:-1*19].replace('D', 'E'))
-                    Af2 = np.float(lines[i*8][-19:].replace('D', 'E'))
+                    Af0 = float(lines[i*8][-3*19:-2*19].replace('D', 'E'))
+                    Af1 = float(lines[i*8][-2*19:-1*19].replace('D', 'E'))
+                    Af2 = float(lines[i*8][-19:].replace('D', 'E'))
                     table[i,3:6] = Af0, Af1, Af2
                 elif j != 7:
                     for k in range(4):
-                        value = np.float(lines[i*8+j][19*k+3:19*(k+1)+3].replace('D', 'E'))
+                        value = float(lines[i*8+j][19*k+3:19*(k+1)+3].replace('D', 'E'))
                         table[i,2+4*j+k] = value
                 elif j== 7:
-                    table[i,-2]= np.float(lines[i*8+j][3:19+3].replace('D', 'E'))
+                    table[i,-2]= float(lines[i*8+j][3:19+3].replace('D', 'E'))
                     if not lines[i*8+7][22:].replace('D', 'E').isalpha():
                         table[i,-1]= 0
                     else:
-                        table[i, -1] = np.float(lines[i*8+7][22:41].replace('D', 'E'))
+                        table[i, -1] = float(lines[i*8+7][22:41].replace('D', 'E'))
 # output is stored as:
 #
 # 0-10   prn, week, Toc, Af0, Af1, Af2, IODE, Crs, delta_n, M0, Cuc,\
@@ -1177,20 +1177,20 @@ def myscan(rinexfile):
                         gg = d*16
                         f=lines[i+1+2*k][gg:gg+14]
                         if not(f == '' or f.isspace()):
-                            val = np.float(lines[i+1+2*k][gg:gg+14])
+                            val = float(lines[i+1+2*k][gg:gg+14])
                             table[l+k, 3+d] = val
                     for d in range(numobs-5):
                         gg = d*16
                         f=lines[i+2+2*k][gg:gg+14]
                         if not (f == '' or f.isspace()):
-                            val = np.float(lines[i+2+2*k][gg:gg+14])
+                            val = float(lines[i+2+2*k][gg:gg+14])
                             table[l+k, 3+5+d] = val
                 else:
                     for d in range(numobs):
                         gg = d*16
                         f = lines[i+1+2*k][gg:gg+14]
                         if (f == '' or f.isspace()):
-                            val = np.float(lines[i+2+2*k][gg:gg+14])
+                            val = float(lines[i+2+2*k][gg:gg+14])
                             table[l+k, 3+d] = val
 
             i+=numsvs*int(np.ceil(header['# / TYPES OF OBSERV'][0]/5))+1
@@ -1754,7 +1754,7 @@ def freq_out(x,ofac,hifac):
     n=len(x)
 #
 # number of frequencies that will be used
-    nout=np.int(0.5*ofac*hifac*n)
+    nout=int(0.5*ofac*hifac*n)
 	 
     xmax = np.max(x) 
     xmin = np.min(x) 
@@ -5804,3 +5804,48 @@ def mjd_more(mmjd):
 
     return year, mm, dd, doy 
 
+
+def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit):
+    """
+    creates and displays snow depth plot 
+
+    Parameters
+    ----------
+    station : str
+        name of GNSS station
+    gobts : datetime object
+        time of measurements in datetime format
+    snowAccum : numpy array
+        snow depth (meters)
+    yerr : numpy array
+        snow depth error (meters)
+    left : datetime obj
+        min x-axis limit
+    right : datetime obj
+        max x-axis limit
+    minS : float
+        minimum snow depth (m)
+    maxS : float
+        maximum snow depth (m)
+    outputpng : str
+        name of output png file
+    pltit : bool
+        whether plot should be displayed to the screen
+    """
+    fig,ax=plt.subplots()
+    # try this
+    ax.errorbar(gobst, snowAccum, yerr=yerr, fmt='.', color='blue')
+#    plt.plot(gobst, snowAccum, 'b.',label='GPS-IR')
+    plt.title('Snow Depth: ' + station)
+    plt.ylabel('meters')
+    plt.grid()
+    plt.xlim((left, right))
+    fig.autofmt_xdate()
+    if (minS is not None) and (maxS is not None):
+        plt.ylim((-0.05+minS,maxS))
+
+    plt.savefig(outputpng, dpi=300)
+    if pltit:
+        plt.show()
+
+    return

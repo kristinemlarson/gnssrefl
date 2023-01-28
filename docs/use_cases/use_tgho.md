@@ -130,3 +130,5 @@ as evaporation, precipitation, input from local drainages, and outflow. The Waik
 River is sole river draining the lake, and river flow is regulated by a series of hydroelectric dams.
 
 [See this paper by Lucas Holden for more information.](https://link.springer.com/article/10.1007/s00190-021-01523-7)
+
+[New Zealand map of sites](https://www.geonet.org.nz/data/gnss/map)
