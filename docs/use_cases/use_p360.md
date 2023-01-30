@@ -144,7 +144,7 @@ water year:
 
 <code>snowdepth p360 2018</code>
 
-and produces a plaint text snowdepth file (the name of the file is sent to the screen) and a png file:
+and produces a plain text snowdepth file (the name of the file is sent to the screen) and a png file:
 
 <img src="../_static/p360_snowdepth.png" width="600">
 

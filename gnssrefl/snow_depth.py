@@ -15,6 +15,7 @@ def parse_arguments():
     parser.add_argument("year", help="Northern Hemisphere water year", type=int)
     parser.add_argument("-minS", help="y-axis minimum snow depth (m)", type=float,default=None)
     parser.add_argument("-maxS", help="y-axis maximum snow depth (m)", type=float,default=None)
+    parser.add_argument("-baresoil_year", help="year for bare soil definition", type=int, default=None)
     parser.add_argument("-doy1", help="min day of year for bare soil definition", type=int, default=None)
     parser.add_argument("-doy2", help="max day of year for bare soil definition", type=int, default=None)
     parser.add_argument("-longer", help="plot longer series", type=str, default=None)
@@ -30,7 +31,8 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def snow_depth(station: str, year: int, minS: float=None, maxS: float=None, doy1:int=None, doy2:int=None, longer:bool=False, plt:bool=True):
+def snow_depth(station: str, year: int, minS: float=None, maxS: float=None, 
+        doy1:int=None, doy2:int=None, longer:bool=False, plt:bool=True, baresoil_year:int=None):
     """
     Calculates snow depth for a given station and water year.
     Currently set for northern hemisphere constraints. This could easily be fixed for 
@@ -60,6 +62,8 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None, doy1
         whether you want to plot longer time series (useful for Alaskan sites)
     plt : bool
         whether you want the plot to come to the screen
+    baresoil_year: int
+        an override for bare soil definition (used when data are unavailable for default settings )
 
     """
 
@@ -88,12 +92,17 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None, doy1
 # for other sites, you might be able to use all of september ...
 # doy 213 through doy 258
 # RH is stored in column 2, doy is in column 1
-    ii = (gps[:,1] >= doy1) & ((gps[:,1] <= doy2) & (gps[:,0] == year-1))
+    if baresoil_year is None:
+        bs = year - 1
+    else:
+        bs = baresoil_year
+
+    ii = (gps[:,1] >= doy1) & ((gps[:,1] <= doy2) & (gps[:,0] == bs))
 
     baresoil = gps[ii,2]
     if len(baresoil) == 0:
         print('No values in the bare soil definition. Exiting')
-        print('Current settings are ', year-1, ' and ', doy1, doy2)
+        print('Current settings are ', bs, ' for days ', doy1, doy2)
         sys.exit()
 
     # require at least 15 values

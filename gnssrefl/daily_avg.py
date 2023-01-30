@@ -406,7 +406,8 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
     if (np.sum(nbei) > 0):
         plt.plot(obstimes, nbei,'.',label='BEI',color='green',markersize=3)
 
-    plt.legend(loc="upper left")
+    #plt.legend(loc="upper left")
+    ax.legend(bbox_to_anchor=(1.02, 1.02))
     fig.autofmt_xdate()
     plt.title(station.upper() + ': Number of values used in the daily average',fontsize=fs)
     plt.xticks(fontsize=fs)

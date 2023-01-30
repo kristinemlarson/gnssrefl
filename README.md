@@ -8,6 +8,7 @@
 **github version: 1.2.13** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 New [snowdepth utility](docs/pages/README_snowdepth.md).
+
 !!! Specific azimuth regions can now be added at the command line. Use -azlist in <code>make_json_input</code> !!!
 
 New Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
@@ -26,9 +27,10 @@ All access to UNAVCO data will end October 1, 2022 unless [you sign up for an ac
     3. [gnssir and rh_plot: estimating reflector heights from SNR data](docs/pages/gnssir.md)
 3. Products:
     1. [daily_avg: daily average reflector heights](docs/pages/README_dailyavg.md)
-    2. [subdaily: LSP quality control and RHdot for reflector height estimates](docs/pages/README_subdaily.md)
+    2. [subdaily: water level measurements](docs/pages/README_subdaily.md)
     3. [invsnr: SNR inversion for subdaily reflector height estimates](docs/pages/README_invsnr.md)
     4. [vwc: soil moisture module](docs/pages/README_vwc.md)
+    5. [snowdepth: utility for snowdepth calculation](docs/pages/README_snowdepth.md)
 4. [Examples](docs/pages/first_drivethru.md)
 5. [Utilities](docs/pages/utilities.md)
 6. [Notes about File structure and Formats](docs/pages/file_structure.md)
@@ -39,9 +41,13 @@ All access to UNAVCO data will end October 1, 2022 unless [you sign up for an ac
 <HR> 
 
 GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, EAR 1144221, AGS 1449554) and 
-NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was developed with support from NASA (80NSSC20K1731).
+NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was initially developed 
+as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
-This documentation was updated on December 20, 2022
+This documentation was updated on January 30, 2023
+
+Kristine M. Larson
+
 <HR>
 
 

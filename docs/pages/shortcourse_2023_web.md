@@ -1,6 +1,6 @@
 # 2023 SHORT COURSE: GNSS INTERFEROMETRIC REFLECTOMETRY
 
-### Basic Principles and an Introduction to the gnssrefl Software Package
+### Basic principles and an introduction to the gnssrefl software 
 **Proposed Dates:** May 1-4, 2023 
 
 **Times:** 9-11 am Colorado Daylight Time
@@ -25,9 +25,9 @@
 
 |                    | Agenda                                                                                                                                                                                                                                                                                                                                                                                  |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Day 0<br>date: TBD | Installation help session (Enloe and Dittmann)                                                                                                                                                                                                                                                                                                                                          |
+| Day 0<br>date: TBD | Installation help session (Enloe and Dittmann) different dates for Europe vs US time zones?                                                                                                                                                                                                                                                                                                                                          |
 | Day 1<br>May 1?    | - Intro/Overview KL<br>- Basic Theory (Felipe) <br>- How to Run the Code (KL)  and the API                                                                                                                                                                                                                                                                 |
-| Day 2              | - Cryosphere: Snow accumulation (likely KL), ice <br>sheets (?), <br>- Soil Moisture : KL, [Chew video](https://www.youtube.com/watch?v=ntnqD5O8LLo)                                                              |
+| Day 2              | - Cryosphere: Snow accumulation (KL), ice <br>sheets (?), <br>- Soil Moisture : KL, [Chew video](https://www.youtube.com/watch?v=ntnqD5O8LLo)                                                              |
 | Day 3              | Simon Williams, Overview on what is important, <br>What are the important corrections etc.<br>- Lakes (Rebecca from the USGS, worked on Crater Lake) <br>- Rivers (Makan?) <br>- Ocean sites (Simon)                                                                                                                                                                                    |
 | Day 4              | - What makes a good site? How to know this BEFORE you install it , rzones webapp and refl_zones utility in gnssrefl<br>- Good geodetic site (examples from new ocean sites that DTU put in Greenland?)<br>- Discussion about what do we need to improve the software , how people can help us. Open-science practices.<br>- low-cost sensors: views from Makan, Purnell, Simon, Felipe? |
 
@@ -39,24 +39,30 @@ on the exercises independently learn a lot and gain confidence. Those who do not
 * Bring results and questions to the live sessions.
 
 ## Computer Requisite and Operating Systems:
-Participants are expected to have their own computers which should be running linux or OSX.
-Motivated Windows users have successfully [run the docker images](https://gnssrefl.readthedocs.io/en/latest/pages/docker_cl_instructions.html#for-windows-users); the instructors are not able to offer guidance on this other than the existing readme.
+We provide dockers, pypi builds, and the python source code on github. PC users will only be 
+able to run the software via dockers. Linux and OSX users can use any of these choices.
+Jupyter Notebook users will need to install the docker.
 
-We have designed this short course to be an active learning exercise. Participants are expected to complete the assigned homework before the online course lectures begin. In the first session of the class, EarthScope staff will help participants set up and learn how to use Jupyter notebooks, python, and/or docker images.  
+We have designed this short course to be an active learning exercise. 
+Participants are expected to complete the assigned homework before the 
+online course lectures begin. 
 
-* gnssrefl source repo: https://github.com/kristinemlarson/gnssrefl
-* gnssrefl documentation: https://gnssrefl.readthedocs.io/en/latest/
-* gnssrefl pypi: https://pypi.org/project/gnssrefl/
-* gnssrefl jupyter notebook repo: https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter
-* This class will also introduce the GNSS reflectometry web app, https://gnss-reflections.org
+In the weeks before the live class is offered, 
+EarthScope staff will help participants set up and install Jupyter notebooks, python, and/or docker images.  
+
+* source repo: https://github.com/kristinemlarson/gnssrefl
+* pypi: https://pypi.org/project/gnssrefl/
+* jupyter notebook repo: https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter
+* GNSS-IR web app, https://gnss-reflections.org
+* readthedocs : https://gnssrefl.readthedocs.io/en/latest/
 
 ## Instructors, affiliation, and domain expertise:  
-* Kristine Larson (University of Colorado-Boulder, and Central Washington University) – GNSS, GNSS-IR, gnssrefl software
-* Felipe Nievinski (Uni. Federal do Rio Grande do Sul - Brazil)
-* Makan Karegar (Uni. Bonn- Germany)
-* Simon Williams (Nat. Ocean Ctr.- UK) 
-* David Purnell (Laval University - Canada)
-* Rebecca Kramer?- (USGS - USA)
+* Kristine Larson (University of Bonn) GNSS-IR, gnssrefl software
+* Felipe Nievinski (Uni. Federal do Rio Grande do Sul - Brazil) Theory, snow, water levels
+* Makan Karegar (Uni. Bonn- Germany) cheap GNSS-IR sensors, water levels 
+* Simon Williams (Nat. Ocean Ctr.- UK) water levels, tides, cheap GNSS-IR sensors
+* David Purnell (Laval University - Canada) water levels, cheap GNSS-IR sensors
+* Rebecca Kramer?- (USGS - USA) Lakes
 * Kelly Enloe (EarthScope - USA) – Jupyter notebooks, python, gnssrefl software
 * Tim Dittmann (EarthScope - USA) – python, gnssrefl software
 
