@@ -9,14 +9,17 @@
 
 New [snowdepth utility](docs/pages/README_snowdepth.md).
 
-!!! Specific azimuth regions can now be added at the command line. Use -azlist in <code>make_json_input</code> !!!
+Specific azimuth regions can now be added at the command line. Use -azlist in <code>make_json_input</code> 
 
-New Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
+There is a new Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
 
-We are [developing readthedocs documentation](https://gnssrefl.readthedocs.io/en/latest/). We are also creating 
-a new docker each time we upload the code to github. If you look to the right - see "Packages".
+We have developed [readthedocs style documentation](https://gnssrefl.readthedocs.io/en/latest/).
 
-All access to UNAVCO data will end October 1, 2022 unless [you sign up for an account there](https://www.unavco.org/data/gps-gnss/file-server/file-server-access-examples.html)**
+We create a new [docker](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/pages/docker_cl_instructions.md) every time we update this repository.
+
+We create a new [pypi version](https://pypi.python.org/pypi/gnssrefl) every time a new version is created.
+
+All access to UNAVCO data will end (unknown date) unless [you sign up for an account there](https://www.unavco.org/data/gps-gnss/file-server/file-server-access-examples.html)
 
 ## Table of Contents
 
