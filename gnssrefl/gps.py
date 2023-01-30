@@ -4283,6 +4283,33 @@ def cdate2nums(col1):
 
     return t
 
+def cdate2ydoy(col1):
+    """
+    returns year and day of year from character date, e.g. 2012-02-15
+
+    Parameters
+    ----------
+    col1 : string
+        date in yyyyy-mm-dd, 2012-02-15
+
+    Returns
+    -------
+    t : float
+        fractional date, year + doy/365.25
+    """
+    year = int(col1[0:4])
+    if year == 0:
+        t=3000 # made up very big time!
+    else:
+        month = int(col1[5:7])
+        day = int(col1[8:10])
+        #print(col1, year, month, day)
+        doy,cdoy,cyyyy,cyy = ymd2doy(year, month, day )
+        #t = year + doy/365.25
+
+    return year, doy
+
+
 def l2c_l5_list(year,doy):
     """
     creates a satellite list of L2C and L5 transmitting satellites

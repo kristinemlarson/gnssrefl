@@ -15,10 +15,9 @@ def parse_arguments():
     parser.add_argument("year", help="Northern Hemisphere water year", type=int)
     parser.add_argument("-minS", help="y-axis minimum snow depth (m)", type=float,default=None)
     parser.add_argument("-maxS", help="y-axis maximum snow depth (m)", type=float,default=None)
-    parser.add_argument("-baresoil_year", help="year for bare soil definition", type=int, default=None)
-    parser.add_argument("-doy1", help="min day of year for bare soil definition", type=int, default=None)
-    parser.add_argument("-doy2", help="max day of year for bare soil definition", type=int, default=None)
     parser.add_argument("-longer", help="plot longer series", type=str, default=None)
+    parser.add_argument("-bare_date1", help="bare soil start yyyy-mm-dd", type=str, default=None)
+    parser.add_argument("-bare_date2", help="bare soil end yyyy-mm-dd", type=str, default=None)
     parser.add_argument("-plt", help="whether you want the plot to come to the screen", type=str, default=None)
     args = parser.parse_args().__dict__
 
@@ -31,8 +30,8 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def snow_depth(station: str, year: int, minS: float=None, maxS: float=None, 
-        doy1:int=None, doy2:int=None, longer:bool=False, plt:bool=True, baresoil_year:int=None):
+def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
+        longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None):
     """
     Calculates snow depth for a given station and water year.
     Currently set for northern hemisphere constraints. This could easily be fixed for 
@@ -54,24 +53,22 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
         minimum snow depth for y-axis limit (m)
     maxS : float
         maximum snow depth for y-axis limit (m)
-    doy1 : int
-        minimum day of year used to set bare soil value
-    doy2 : int 
-        maximum day of year used to set bare soil value
     longer : bool
         whether you want to plot longer time series (useful for Alaskan sites)
     plt : bool
         whether you want the plot to come to the screen
-    baresoil_year: int
-        an override for bare soil definition (used when data are unavailable for default settings )
+    bare_date1: str
+        an override for start bare soil definition (used when data are unavailable for default settings )
+    bare_date2: str
+        an override for end bare soil definition (used when data are unavailable for default settings )
 
     """
 
     # default days of year used for bare soil
-    if doy1 is None:
-        doy1 = 244 
-    if doy2 is None:
-        doy2 = 274
+    # september from the fall
+    doy1 = 244 
+    doy2 = 274
+    bs = year - 1
 
     xdir = os.environ['REFL_CODE']
     direc = xdir + '/Files/' + station  + '/' 
@@ -87,15 +84,11 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
 
     gps = np.loadtxt(gpsfile,comments='%')
 
-
-# going to use august and mid-september to determine "no snow level"
-# for other sites, you might be able to use all of september ...
-# doy 213 through doy 258
-# RH is stored in column 2, doy is in column 1
-    if baresoil_year is None:
-        bs = year - 1
-    else:
-        bs = baresoil_year
+    # this overrides other ways of doing things.
+    if bare_date1 is not None:
+        bs, doy1 = g.cdate2ydoy(bare_date1)
+    if bare_date2 is not None:
+        rrrr, doy2 = g.cdate2ydoy(bare_date2)
 
     ii = (gps[:,1] >= doy1) & ((gps[:,1] <= doy2) & (gps[:,0] == bs))
 
