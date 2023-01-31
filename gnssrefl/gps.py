@@ -163,9 +163,12 @@ def define_and_xz_snr(station,year,doy,snr):
     xdir = os.environ['REFL_CODE']
     cyyyy, cyy, cdoy = ydoych(year,doy)
     f= station + cdoy + '0.' + cyy + '.snr' + str(snr)
+    fmakan = station.upper() + cdoy + '0.' + cyy + '.snr' + str(snr)
     fname = xdir + '/' + cyyyy + '/snr/' + station + '/' + f
     fname2 = xdir + '/' + cyyyy  + '/snr/' + station + '/' + f  + '.xz'
     fname3 = xdir + '/' + cyyyy  + '/snr/' + station + '/' + f  + '.gz'
+    # for makan
+    fname4 = xdir + '/' + cyyyy  + '/snr/' + station.upper() + '/' + fmakan  
     snre = False
     # add gzip
     if os.path.isfile(fname):
@@ -179,6 +182,12 @@ def define_and_xz_snr(station,year,doy,snr):
         # make sure the uncompression worked
         if os.path.isfile(fname):
             snre = True
+
+    if os.path.isfile(fname4):
+        print('found uppercase station name in a snr file')
+        fname = fname4
+        fname2 = fname4 # not needed
+        snre = True
 
 #   return fname2 but only for backwards compatibility
     return fname, fname2, snre 
