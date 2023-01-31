@@ -69,7 +69,7 @@ If you are using the version from gitHub:
 
 * <code>git clone https://github.com/kristinemlarson/gnssrefl </code>
 * cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code>
-* activate your virtual environment
+* activate your virtual environment <code>source env/bin/activate </code>
 * <code>pip install wheel</code> (we are working to remove this step)
 * <code>pip install .</code>
 * from what I understand, you should be able to use pip3 instead of pip
