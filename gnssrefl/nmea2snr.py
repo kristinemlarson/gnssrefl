@@ -59,7 +59,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
     t = t[snr !=''];az = az[snr !=''];prn = prn[snr !=''];elv = elv[snr !=''];snr = snr[snr !='']
     t = t[prn !=''];az = az[prn !=''];elv = elv[prn !=''];snr = snr[prn !=''];prn = prn[prn !='']
     
-    az = az.astype(np.float);elv = elv.astype(np.float);snr = snr.astype(np.float);prn = prn.astype(np.int)
+    az = az.astype(float);elv = elv.astype(float);snr = snr.astype(float);prn = prn.astype(int)
 
     prn_unique = np.unique(prn) 
 
@@ -383,7 +383,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     xdir  = os.environ['REFL_CODE'] + '/'
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
     if not (os.path.exists(xdir + str(year) + '/snr/' + station+'/')):
-        os.system('mkdir '+xdir + str(year) + '/snr/' + station+'/')
+        os.system('mkdir -p '+xdir + str(year) + '/snr/' + station+'/')
 
     return fname
 
