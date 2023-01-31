@@ -66,7 +66,8 @@ directories in year, followed by type, i.e. snr, results, sp3, nav, and then by 
 *Direct Python Install*
 
 If you are using the version from gitHub:
-
+* install the python3-venv package <code>apt-get install python3-venv</code>
+* <code>apt-get install git</code>
 * <code>git clone https://github.com/kristinemlarson/gnssrefl </code>
 * cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code>
 * activate your virtual environment <code>source env/bin/activate </code>
