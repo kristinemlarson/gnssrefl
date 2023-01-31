@@ -1,0 +1,20 @@
+name: gnssrefl
+channels:
+- conda-forge
+- defaults
+dependencies:
+- unzip
+- gfortran_linux-64
+- pip
+- wget
+- jupyter
+- numpy
+- pandas
+- seaborn
+- pip:
+     - myst_parser
+     - nbsphinx
+#     - gnssrefl
+     - numpydoc
+     - sphinxcontrib-apidoc
+     - git+https://github.com/kristinemlarson/gnssrefl.git

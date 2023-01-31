@@ -2,43 +2,64 @@
 """
 downloads East North Vertical nevada reno position files
 IGS2014 frame
-author: kristine larson
 """
 import argparse
 import wget
 import sys
 import os
+import gnssrefl.gps as g
 
 
-def main():
-    """
-    command line interface for download_blewitt
-    """
-
+def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
+    args = parser.parse_args().__dict__
 
-    args = parser.parse_args()
+    # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
+    return {key: value for key, value in args.items() if value is not None}
 
-    station = args.station
+
+def download_unr(station: str):
+    """
+    Command line interface for download_blewitt
+
+    Parameters
+    ----------
+    station : str
+        4 character ID of the station name
+    """
+
     if len(station) != 4:
         print('illegal station name-must be 4 characters')
         sys.exit()
-    # geoff blewitt likes upper case
     station = station.upper()
     url= 'http://geodesy.unr.edu/gps_timeseries/tenv3/IGS14/'
     fname = station + '.tenv3'
     stationL = station.lower() # lower case
     url = url + fname
-    # file will be stored here
-    myfname = stationL + '_igs14.tenv3'
+    # file will be stored in this directory
+    xdir = os.environ['REFL_CODE']
+    outdir = xdir  + '/Files/'
+    if not os.path.exists(outdir) :
+        subprocess.call(['mkdir', outdir])
+
+    g.check_environ_variables()
+
+    # store in Files subdirectory
+    myfname = xdir + '/Files/' + stationL + '_igs14.tenv3'
     try:
         wget.download(url, out=myfname)
     except:
         print('\n download failed:', url)
 
-    if os.path.exists(fname):
+    if os.path.exists(myfname):
         print('\n SUCCESS:', myfname)
+
+
+def main():
+    args = parse_arguments()
+    download_unr(**args)
+
 
 if __name__ == "__main__":
     main()

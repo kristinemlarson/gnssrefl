@@ -1,17 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-extracts coordinates for stations that were in the UNR
-database (when I downloaded it ;-)
-author: kristine larson
-input four character station name, lowercase
-
-2021 November 2
-modified to use UNR database. Downloads it if you don't have it.
-Hopefully
-2021 November 26
-prints out XYZ too cause why not!
-
-"""
 import argparse
 import wget
 import sys
@@ -21,11 +8,17 @@ import gnssrefl.gps as g
 
 def main():
     """
-    command line interface for query_unr
+    query_unr: extracts coordinates for stations that were in UNR database.
+    in late 2021.  
+
+    Parameters
+    ----------
+    station : str
+        four character station name
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="station name - 4 char - lowercase ", type=str)
+    parser.add_argument("station", help="4 ch station name (lowercase)", type=str)
 
     args = parser.parse_args()
 
@@ -34,9 +27,9 @@ def main():
         print('illegal station name-must be 4 characters')
         sys.exit()
     alat,alon,ht=g.queryUNR_modern(station)
-    x,y,z=g.llh2xyz(alat,alon,ht)
-    print('XYZ', round(x,4),round(y,4),round(z,4) )
-    #a,b,c=g.queryUNR(station)
+    if (alat+alon+ht) != 0:
+        x,y,z=g.llh2xyz(alat,alon,ht)
+        print('XYZ', round(x,4),round(y,4),round(z,4) )
 
 if __name__ == "__main__":
     main()

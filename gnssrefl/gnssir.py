@@ -16,11 +16,29 @@ import gnssrefl.refraction as refr
 
 def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     """
-    my attempt to separate the inputs to the code and the guts of the code
-    inputs are station name, year, day of year (integers)
-    snr_type is an integer (99, 66, etc). lsp is a json
 
-    check to see if there were any results before sending a plot to the screen
+    Computes lomb scargle periodograms for a given station, year, day of year etc.
+
+    Parameters
+    ----------
+    station : string
+        4 character station name
+
+    year : integer
+        full year
+
+    doy : integer
+        day of year
+
+    snr_type : integer
+        snr file type
+
+    extension : string
+        optional subdirectory to save results
+
+    lsp : dictionary
+        REQUIRES DESCRIPTION
+        
     """
 
     #   make sure environment variables exist.  set to current directory if not
@@ -32,7 +50,15 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp'] 
     plot_screen = lsp['plt_screen'] 
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
-    for i in range(0,naz):
+    gzip = lsp['gzip']
+    if 'dec' in lsp.keys():
+        dec = lsp['dec']
+    else:
+        dec = 1 # so Jupyter notebooks do not need to be rewritten
+    #print('Decimate:', dec)
+    #print('Number of azimuths', len(azval))
+    for i in range(0,len(azval),2):
+        #print(i, azval[i], azval[i+1])
         if (azval[i+1] - azval[i]) > 100:
             print('FATAL WARNING: You are prohibited from having an azimuth range that is larger than 100 degrees.')
             print('Azimuth values:', azval[i], azval[i+1])
@@ -58,27 +84,18 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
 
     #if (resultExist):
     #    print('Results already exist on disk')
-    if (lsp['overwriteResults'] == False) & (resultExist == True):
+    #if (lsp['overwriteResults'] == False) & (resultExist == True):
+    if (lsp['nooverwrite'] == True) & (resultExist == True):
         allGood = 0
         print('>>>>> The result file already exists for this day and you have selected the do not overwrite option')
         #sys.exit()
-    #print('go ahead and access SNR data - first define SNR filename')
     else:
+        # uncompress here so you should not have to do it in read_snr_multiday ...
         obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
-    #print(obsfile, 'snrexistence',snre,' and ', snr_type)
-    # removing this option
-    #if (not snre) and (not lsp['seekRinex']):
-    #    print('The SNR file does not exist and you have set the seekRinex variable to False')
-    #    print('Use rinex2snr.py to make SNR files')
-    #    #sys.exit()
-    #    allGood = 0
-    #if (not snre) and lsp['seekRinex']:
-    #    print('The SNR file does not exist. I will try to make a GPS only file using the Fortran option.')
-    #    rate = 'low'; dec_rate = 0; orbtype = 'nav'
-    #    g.quick_rinex_snrC(year, doy, station, snr_type, orbtype,rate, dec_rate)
 
-        allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays)
-        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays) 
+        allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays,dec)
+        # added gzip option.  first input is xz compression
+        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
     if (allGood == 1):
         print('Results will be written to:', fname)
 
@@ -123,11 +140,13 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                         if (len(nij) > 0):
                             Noise = np.mean(nij)
                         iAzim = int(avgAzim)
-                        okPk = True
+                        tooclose = False
                         if abs(maxF - minH) < 0.10: #  peak too close to min value
-                            okPk = False
-                            #print('found a peak too close to the edge of the restricted RH region')
-                        if okPk & (delT < lsp['delTmax']) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
+                            tooclose = True
+                        # KL added 2022 march 26
+                        if abs(maxF - maxH) < 0.10: #  peak too close to max value
+                            tooclose = True
+                        if (not tooclose) & (delT < lsp['delTmax']) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
                             # request from a tide gauge person for Month, Day, Hour, Minute
                             if lsp['mmdd']:
                                 ctime = g.nicerTime(UTCtime); ctime2 = ctime[0:2] + ' ' + ctime[3:5]
@@ -145,7 +164,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                             rj +=1
                             if screenstats:
                                 print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
-                                g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct])
+                                g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose)
                             if plot_screen:
                                 failed = True
                                 local_update_plot(x,y,px,pz,ax1,ax2,failed)
@@ -158,16 +177,42 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
 # close the output files
             ct += 1
             #'Yes' if fruit == 'Apple' else 'No'
+            # used to send the plot to the screen and user had to clear it before it would go to the next
+            #if found_results and plot_screen:
             if found_results and plot_screen:
-                plot2screen(station, f, ax1, ax2,lsp['pltname']) 
+                print('data found for this frequency: ',f)
+                ax1.set_xlabel('Elevation Angles (deg)')
+                ax1.grid(True, linestyle='-'); ax2.grid(True, linestyle='-')
+                ax1.set_title(station + ' Raw Data/Periodogram for ' + g.ftitle(f) + ' Frequency')
+                ax2.set_xlabel('Reflector Height (m)');
+                ax2.set_ylabel('volts/volts') ; ax1.set_ylabel('volts/volts')
+                plt.show()
+                #plot2screen(station, f, ax1, ax2,lsp['pltname']) 
+            else:
+                if plot_screen: 
+                    print('no data found for this frequency: ',f)
+                    #plt.close()
+
         fout.close() ; # these are the LSP results written to text file 
+        # try moving this
+        if found_results and plot_screen:
+            plot2screen(station, f, ax1, ax2,lsp['pltname']) 
 
 
 def set_refraction_params(station, dmjd,lsp):
     """
-    called from guts.  pick up refr info
-    inputs are station name, modified julian day, and the 
-    lsp dictionary
+    set values used in refraction correction
+
+    Parameters
+    ----------
+    station : string
+        4 character station name
+
+    dmjd : float
+        modified julian date
+
+    lsp : dictionary
+
     """
     xdir = os.environ['REFL_CODE']
     p = 0; T = 0; irefr = 0
@@ -184,6 +229,22 @@ def set_refraction_params(station, dmjd,lsp):
 
 def apply_refraction_corr(lsp,ele,p,T):
     """
+
+    Parameters
+    ----------
+    lsp : dictionary
+        info from make_json_input
+    ele : numpy array of floats
+        elevation angles  (deg)
+    p : float
+        pressure
+    T : float
+        temperature (C)
+
+    Returns
+    -------
+    ele : numpy array of floats
+         elevation angle (deg)
     """
     if lsp['refraction']:
         #print('<<<<<< apply refraction correction >>>>>>')
@@ -194,10 +255,25 @@ def apply_refraction_corr(lsp,ele,p,T):
 
 def local_update_plot(x,y,px,pz,ax1, ax2,failure):
     """
-    input plt_screen integer value from gnssIR_lomb.
-    (value of one means update the SNR and LSP plot)
-    and values of the SNR data (x,y) and LSP (px,pz)
-    added fail criterion to put out bad periodograms in gray
+    updates result plot
+
+    Parameters
+    ----------
+    x : numpy array
+        elevation angle (deg)
+    y : numpy array
+        SNR (volt/volt)
+    px : numpy array
+        reflector height (m)
+    pz : numpy array
+        spectral amplitude (volt/volt)
+    ax1 : matplotlib figure control
+        top plot
+    ax2 : matplotlib figure control
+        bottom plot
+    failure : boolean
+        whether periodogram fails QC 
+
     """
     if failure:
         ax1.plot(x,y,color='gray',linewidth=0.5)
@@ -209,10 +285,15 @@ def local_update_plot(x,y,px,pz,ax1, ax2,failure):
 
 def plot2screen(station, f,ax1,ax2,pltname):
     """
-    painful painful
+    Add axis information and Send the plot to the screen.
     https://www.semicolonworld.com/question/57658/matplotlib-adding-an-axes-using-the-same-arguments-as-a-previous-axes
+
+    Parameters
+    ----------
+    station : string
+        4 character station ID
+
     """
-    #print(pltname)
     ax2.set_xlabel('Reflector Height (m)'); 
     #ax2.set_title('SNR periodogram')
     ax2.set_ylabel('volts/volts')
@@ -228,18 +309,32 @@ def plot2screen(station, f,ax1,ax2,pltname):
 
 def read_json_file(station, extension):
     """
-    picks up json instructions for periodogram
-    inputs are the station name and an extension (which can just be '')
+    picks up json instructions for calculation of lomb scargle periodogram
+
+    Parameters
+    ----------
+    station : str
+        4 character station name
+
+    extension : str
+        experimental subdirectory - default is ''
+
+    Returns
+    -------
+    lsp : dictionary
+
     """
-    lsp = {} # ???
+    lsp = {} # 
     instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
     instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
     if os.path.isfile(instructions_ext):
+        usefile = instructions_ext
         #print('using specific instructions for this extension')
         with open(instructions_ext) as f:
             lsp = json.load(f)
     else:
         #print('will use the default instruction file')
+        usefile = instructions
         if os.path.isfile(instructions):
             with open(instructions) as f:
                 lsp = json.load(f)
@@ -248,4 +343,13 @@ def read_json_file(station, extension):
             print('Please make with make_json_input and run this code again.')
             sys.exit()
 
+    if len(lsp['reqAmp']) < len(lsp['freqs']) :
+        print('Number of frequencies found in json: ', len(lsp['freqs']))
+        print('Number of required amplitudes found in json: ', len(lsp['reqAmp']))
+        print('You need to have a required Amplitude for each frequency.')
+        print('Please fix your json file: ', usefile)
+        sys.exit()
+
     return lsp
+
+

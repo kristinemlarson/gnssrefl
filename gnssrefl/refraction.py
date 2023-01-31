@@ -1,7 +1,6 @@
 """
 written in python from 
 from original TU Vienna codes for GMF
-kristine larson
 """
 import datetime
 import os
@@ -17,8 +16,48 @@ import gnssrefl.gps as g
 
 def read_4by5(station, dlat,dlon,hell):
     """
-    author: kristine m. larson
-    input station name (4 char), lat,long,elevation in deg/deg/meters
+    reads existing grid points for a given location
+
+    Parameters
+    ----------
+    station : string
+        name of station
+    dlat : float
+        latitude in degrees
+    dlon : float
+        longitude in degrees
+    hell : float
+        ellipsoidal height in meters
+
+    Returns
+    -------
+    pgrid : 4 by 5 numpy array
+        pressure in hPa
+
+    Tgrid : 4 by 5 numpy array 
+        temperature in C
+
+    Qgrid : 4 by 5 numpy array 
+
+    dTgrid : 4 by 5 numpy array  
+       temperature lapse rate in degrees per km 
+
+    u : 4 by 1 numpy array
+        geoid undulation in meters
+
+    Hs : 4 by 1 numpy array  
+
+    ahgrid : 4 by 5 numpy array
+        hydrostatic mapping function coefficient at zero height (VMF1) 
+
+    awgrid : 4 by 5 numpy array
+        wet mapping function coefficient (VMF1) 
+
+    lagrid : 4 by 5 numpy array
+
+    Tmgrid : 4 by 5 numpy array
+        mean temperature of the water vapor in degrees Kelvin 
+
     requires that an environment variable exists for REFL_CODE
     """
 #
@@ -27,6 +66,7 @@ def read_4by5(station, dlat,dlon,hell):
 #    if not os.path.isdir(inputpath): #if year folder doesn't exist, make it
 #        os.makedirs(inputpath)
 
+    # input file should be written here
     obsfile = inputpath + station + '_refr.txt'
     #print('reading from station refraction file: ', obsfile)
     x = np.genfromtxt(obsfile,comments='%')
@@ -61,25 +101,44 @@ def read_4by5(station, dlat,dlon,hell):
 #
 def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
     """
-    converted by kristine larson from posted TUVienna code
-    input parameters:
-    station: station name
-    dmjd:  modified Julian date (scalar, only one epoch per call is possible)
-    dlat:  ellipsoidal latitude in radians [-pi/2:+pi/2] (vector)
-    dlon:  longitude in radians [-pi:pi] or [0:2pi] (vector)
-    hell:  ellipsoidal height in m (vector)
-    it:    case 1: no time variation but static quantities
-           case 0: with time variation (annual and semiannual terms)
-    output parameters:
-    p:    pressure in hPa
-    T:    temperature in degrees Celsius 
-    dT:   temperature lapse rate in degrees per km 
-    Tm:   mean temperature of the water vapor in degrees Kelvin 
-    e:    water vapor pressure in hPa 
-    ah:   hydrostatic mapping function coefficient at zero height (VMF1) 
-    aw:   wet mapping function coefficient (VMF1) 
-    la:   water vapor decrease factor 
-    undu: geoid undulation in m 
+    Parameters
+    ----------
+    station : str
+        station name
+    dmjd:  float 
+        modified Julian date (scalar, only one epoch per call is possible)
+    dlat : float 
+        ellipsoidal latitude in radians [-pi/2:+pi/2] 
+    dlon : float
+        longitude in radians [-pi:pi] or [0:2pi] 
+    hell : float 
+        ellipsoidal height in m 
+    it: integer
+        case 1: no time variation but static quantities
+
+        case 0: with time variation (annual and semiannual terms)
+
+    Returns
+    -------
+    p : float
+        pressure in hPa
+    T:  float
+        temperature in degrees Celsius 
+    dT : float
+       temperature lapse rate in degrees per km 
+    Tm : float
+        mean temperature of the water vapor in degrees Kelvin 
+    e : float
+        water vapor pressure in hPa 
+    ah: float
+        hydrostatic mapping function coefficient at zero height (VMF1) 
+    aw: float
+        wet mapping function coefficient (VMF1) 
+    la: float
+        water vapor decrease factor 
+    undu: float
+        geoid undulation in m 
+
     """
 
 #  need to find diffpod and difflon
@@ -247,10 +306,18 @@ def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
 def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
     """
     makes a grid for refraction correction
-    xdir - directory for output
-    station name
-    lat and lon in degrees (NOT RADIANS)
-    kristine m. larson
+
+    Parameters
+    ----------
+    xdir : str
+        directory for output
+    station : str
+        station name, 4 ch
+    lat : float
+        latitude in degrees
+    lon : float 
+        longitude in degrees 
+
     """
     PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(PROJECT_ROOT)
@@ -274,41 +341,14 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
 
 #   read VMF gridfile in pickle format 
         pname = xdir + '/input/' + 'gpt_1wA.pickle'
-        print('The large refraction file should be stored here:', pname)
-        foundit = False
-        if os.path.isfile(pname):
+        foundit, pname = look_for_pickle_file() 
+        if foundit:
             f = open(pname, 'rb')
             [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
             f.close()
-            foundit = True
-        if not foundit:
-            pname =  'gnssrefl/gpt_1wA.pickle'
-            print('2nd attempt: subdirectory gnssrefl of current working directory:', pname)
-            if os.path.isfile(pname):
-                f = open(pname, 'rb')
-                [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
-                f.close()
-                foundit = True
-        if not foundit:
-            pname = try3
-            print('3rd attempt try here: ',pname)
-            if os.path.isfile(pname):
-                f = open(pname, 'rb')
-                [All_pgrid, All_Tgrid, All_Qgrid, All_dTgrid, All_U, All_Hs, All_ahgrid, All_awgrid, All_lagrid, All_Tmgrid] = pickle.load(f)
-                f.close()
-                foundit = True
-        if not foundit:
-            print('fourth attempt - download from github')
-            try:
-                pfile = 'gpt_1wA.pickle'
-                url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/' + pfile
-                wget.download(url,pfile)
-                subprocess.call(['mv','-f',pfile, xdir + '/input/' ])
-                foundit = True
-            except:
-                print('download gpt_1wA.pickle from github and store in REFL_CODE/input')
-                sys.exit()
-
+        else:
+            print('You will need to download gpt_1wA.pickle MANUALLY from github and store it in REFL_CODE/input')
+            sys.exit()
 
 # really should e zero to four, but whatever
         indx = np.zeros(4,dtype=int)
@@ -410,9 +450,21 @@ def readWrite_gpt2_1w(xdir, station, site_lat, site_lon):
 
 def corr_el_angles(el_deg, press, temp):
     """
-    inputs are elevation angles (in degrees)
-    Pressure in hPa and Temperature in degrees C.
-    outputs are corrected elevation angles (in degrees)
+    Corrects elevation angles for refraction using simple angle bending model
+
+    Parameters
+    ----------
+    el_deg : numpy array of floats
+        elevation angles in degrees
+    press : float
+        pressure in hPa
+    temp : float
+        temperature in degrees C
+
+    Returns
+    -------
+    corr_el_deg : numpy array of floats
+        corrected elevation angles (in degrees)
 
     """
 
@@ -424,3 +476,73 @@ def corr_el_angles(el_deg, press, temp):
     return corr_el_deg
 
 
+def look_for_pickle_file():
+    """
+    latest attempt to solve the dilemma of the pickle file needed for
+    the refraction correction
+
+    Returns
+    -------
+    foundit : bool
+        whether pickle file found
+    fullpname : str
+        full path to the pickle file
+    """
+#   read VMF gridfile in pickle format
+
+    pfile = 'gpt_1wA.pickle'
+
+    # at one point i thought this was useful
+    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+    BASE_DIR = os.path.dirname(PROJECT_ROOT)
+    try3 = PROJECT_ROOT + '/' + pfile
+    # do i need str??
+    xdir = str(os.environ['REFL_CODE'])
+
+    fullpname = xdir + '/input/' + pfile
+
+    print('The large refraction file should be stored here:', fullpname)
+    foundit = False
+
+    if os.path.isfile(fullpname):
+        print('1st attempt: found in ', fullpname)
+        foundit = True
+    if not foundit:
+        pname =  'gnssrefl/gpt_1wA.pickle'
+        print('2nd attempt: subdirectory of current working directory:', pname)
+        if os.path.isfile(pname):
+            subprocess.call(['cp','-f',pname, fullpname  ])
+            foundit = True
+
+    if not foundit:
+        pname = try3
+        print('3rd attempt try here: ',pname)
+        if os.path.isfile(pname):
+            foundit = True
+            print('cp it')
+            subprocess.call(['cp','-f',pname, fullpname])
+
+    if not foundit:
+        print('4th attempt - download from github')
+        try:
+            url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/' + pfile
+            wget.download(url,fullpname)
+        except:
+            print('download failed')
+        if os.path.isfile(fullpname):
+            foundit = True
+
+    if not foundit:
+        print('5th attempt - this is getting ridiculous')
+        try:
+            url= 'https://morefunwithgps.com/public_html/' + pfile
+            wget.download(url,fullpname)
+        except:
+            print('Failed again.')
+
+        if os.path.isfile(fullpname):
+                foundit = True
+
+    print(foundit, fullpname)
+
+    return foundit , fullpname

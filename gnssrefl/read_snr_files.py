@@ -1,21 +1,66 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import numpy as np
 import os
 import subprocess 
 import sys
 
-import numpy as np
-
-# library for reading snr files - 
-# still learning python
-# 2019 kristine m. larson
-
-def read_snr_multiday(obsfile,obsfile2,twoDays):
+def read_snr_multiday(obsfile,obsfile2,twoDays,dec=1):
     """
-    author: Kristine Larson
-    input: SNR observation filenames and a boolean for 
-    whether you want just the first day (twoDays)
-    output: contents of the SNR file, withe various other metrics
+    Parameters
+    ----------
+    obsfile : string
+        name of first SNR input file
+
+    obsfile2 : string
+        name of second SNR input file
+
+    twoDays : boolean
+        False (default) for using only the first file
+
+    dec : int
+        decimation value. 1 means do nothing
+
+    Results
+    -------
+    allGood1 : numpy array
+
+    sat : numpy array
+        satellite numbers 
+
+    ele : numpy array
+        elevation angle (degrees)
+
+    azi : numpy array
+        azimuth angles (degrees)
+
+    t : numpy array
+        time, seconds of the day, GPS time
+
+    edot : numpy array
+        derivative of elevation angle with respect to time
+
+    s1 : numpy array
+        SNR on L1 frequency
+
+    s2 : numpy array
+        SNR on L2 frequency
+
+    s5 : numpy array
+        SNR on L5 frequency
+
+    s6 : numpy array
+        SNR on L6 frequency
+
+    s7 : numpy array
+        SNR on L7 frequency
+
+    s8 : numpy array
+        SNR on L8 frequency
+
+    snrE : boolean
+        whether it exists
+
     """
 #   defaults so all returned vectors have something stored in them
     sat=[]; ele =[]; azi = []; t=[]; edot=[]; s1=[];
@@ -40,7 +85,21 @@ def read_snr_multiday(obsfile,obsfile2,twoDays):
     except:
         print('>>>>> Could not read the first SNR file:', obsfile)
 #
-#
+    if (dec != 1) & (allGood1 == 1):
+        print('Invoking the decimation flag:')
+        rem_arr = np.remainder(t, [dec])
+        iss = (rem_arr==0)
+        sat=sat[iss] ; ele=ele[iss] ; azi=azi[iss]
+        t=t[iss] ; edot=edot[iss]
+        s1= s1[iss] ; s2= s2[iss] ; 
+        if len(s5) > 0:
+            s5= s5[iss] ;
+        if len(s6) > 0:
+            s6= s6[iss] ; 
+        if len(s7) > 0:
+            s7= s7[iss] ; 
+        if len(s8) > 0:
+            s8= s8[iss]
 #
     if twoDays:
 #   restrict day one to first 21 hours.  will then merge iwth last three hours
@@ -94,11 +153,42 @@ def read_snr_multiday(obsfile,obsfile2,twoDays):
 
 def read_one_snr(obsfile,ifile):
     """
-    input: observation filename 
-    ifile: 1 (primary) or 2 (day before)
-    output: contents of the file, withe various other metrics
-    21apr18 eliminate negative elevation angles to be safe
-    (come from satellites set to bad by JAXa - should not have been written to SNR file)
+    reads a SNR file, changes units (linear) and stores as variables
+
+    Parameters
+    ----------
+    obsfile : str
+        SNR file name
+    ifile : int
+        1 for primary file or 2 for the day before the primary file
+
+    Returns
+    -------
+    sat: numpy array of int 
+        satellite number 
+    ele : numpy array of floats 
+        elevation angle in degrees
+    azi : numpy array of floats
+        azimuth in degrees
+    t:  numpy array of floats
+        time in seconds of the day
+    edot : numpy array of floats
+        elevation angle derivative (units?)
+    s1 : numpy array of floats
+        L1 SNR in dB-Hz
+    s2:  numpy array of floats 
+        L2 SNR in dB-Hz
+    s5 :  numpy array of floats 
+        L5 SNR in dB-Hz
+    s6 :  numpy array of floats 
+        L6 SNR in dB-Hz
+    s7 :  numpy array of floats 
+        L7 SNR in dB-Hz
+    s8 :  numpy array of floats 
+        L8 SNR in dB-Hz
+    snrE : bool list
+        whether the SNR exists for that Frequency 
+
     """
 
     sat=[]; ele=[]; az=[]; t=[]; edot=[]; s=[];  s2=[]; s5=[];  s6=[]; s7=[];  s8=[];
@@ -107,7 +197,7 @@ def read_one_snr(obsfile,ifile):
 
     snrE = np.array([False, True, True,False,False,True,True,True,True],dtype = bool)
     f = np.genfromtxt(obsfile,comments='%')
-    print('reading from this snr file ',obsfile)
+    #print('reading from this snr file ',obsfile)
     r,c = f.shape
     if (r > 0) & (c > 0):
         #print('make sure no negative elevation angle data are used')
@@ -189,17 +279,33 @@ def read_one_snr(obsfile,ifile):
 
     return sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE
 
-def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays):
+def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays,gzip):
     """
-    author: kristine larson
-    inputs boolean (whether you want to compress), whether you have two
-    days (TwoDays) and file names
-    nothing is returned
+    compresses SNR files
+
+    Parameters
+    ----------
+    wantCompression : bool
+        whether the file should be compressed again
+    obsfile : str
+        name of first SNR file
+    obsfile2 : str
+        name of second SNR file
+    TwoDays : bool
+        whether second file is being input
+    gzip : bool
+        whether you want to gzip/gunzip the file
+
     """
-    if wantCompression:
+    if gzip:
         if (os.path.isfile(obsfile) == True):
-            #print('xz compressing first SNR day')
-            subprocess.call(['xz', obsfile])
+            subprocess.call(['gzip', obsfile])
         if (os.path.isfile(obsfile2) == True and twoDays == True):
-            #print('compressing second day')
-            subprocess.call(['xz', obsfile2])
+            subprocess.call(['gzip', obsfile2])
+    else:
+        # this is only for xz compression
+        if wantCompression:
+            if (os.path.isfile(obsfile) == True):
+                subprocess.call(['xz', obsfile])
+            if (os.path.isfile(obsfile2) == True and twoDays == True):
+                subprocess.call(['xz', obsfile2])

@@ -1,9 +1,0 @@
-pip
-wheel
-twine
-numpy
-scipy
-wget
-matplotlib
-requests
-progress

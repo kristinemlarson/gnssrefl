@@ -1,13 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Translates rinex3 to rinex2 to snr - 
-so saves some time .... 
-this is only for people that HAVE the files on disk
-author: kristine larson
-Updated: November 14, 2021
-This only works on a single file (no doy_end)
-It also uses my convention for naming (lowercase) and it does not 
-store the Rinex2 files
 """
 import argparse
 import os
@@ -16,6 +8,18 @@ import gnssrefl.rinex2snr as r
 import sys
 
 def main():
+    """
+
+    Creates SNR file from RINEX 3 file that is stored locally
+
+    Parameters
+    ----------
+    rinex3 : str
+        name of filename
+
+    orb : str
+        optional orbit choice.  default is gbm
+    """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("rinex3", help="rinex3 filename", type=str)

@@ -1193,11 +1193,32 @@ c       19jan09 changed to allow up to 60 satellites
           read(fileID,'(A80)', iostat=ios) inline
           read(inline(33:80),'(12(A1,I2))') (char, prn(i),i=49,numsat) 
           read(inline(33:80),'(12(A1,2x))') (satID(i),i=49,numsat)
+
+        elseif (numsat > 60 .and. numsat <= 72) then
+          read(fileID,'(A80)', iostat=ios) inline
+          read(inline(33:80),'(12(A1,I2))') (char, prn(i),i=13,24)
+          read(inline(33:80),'(12(A1,2x))') (satID(i),i=13,24)
+
+          read(fileID,'(A80)', iostat=ios) inline
+          read(inline(33:80),'(12(A1,I2))') (char, prn(i),i=25,36)
+          read(inline(33:80),'(12(A1,2x))') (satID(i),i=25,36)
+
+          read(fileID,'(A80)', iostat=ios) inline
+          read(inline(33:80),'(12(A1,I2))') (char, prn(i),i=37,48)
+          read(inline(33:80),'(12(A1,2x))') (satID(i),i=37,48)
+
+          read(fileID,'(A80)', iostat=ios) inline
+          read(inline(33:80),'(12(A1,I2))') (char, prn(i),i=49,60)
+          read(inline(33:80),'(12(A1,2x))') (satID(i),i=49,60)
+
+          read(fileID,'(A80)', iostat=ios) inline
+          read(inline(33:80),'(12(A1,I2))') (char, prn(i),i=61,numsat)
+          read(inline(33:80),'(12(A1,2x))') (satID(i),i=61,numsat)
         endif
         if (debug) then
 c         print*, 'made it past here'
         endif
-        if (numsat > 60) then
+        if (numsat > 72) then
           print*, 'I cannot read more than 60 satellites'
           print*, 'Please stop launching them!'
           call exit

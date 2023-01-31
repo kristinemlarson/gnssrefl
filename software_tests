@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+#
+# various tests that gnssrefl build is still working
+# this only checks that the code does not crash. It does not currently
+
+ls -l $EXE/gfzrnx
+
+ls -l $EXE/CRX2RNX
+
+# this is likely not there
+ls -l $REFL_CODE/input/gpt_1wA.pickle
+
+ls -l $ORBITS
+
+rinex2snr at0100usa 2022 350 -archive unavco -samplerate 15 -orb gnss
+
+make_json_input at01 0 0 0 -allfreq T
+gnssir at01 2022 350
+
+make_json_input at01 0 0 0 -frlist 1 20 5 101 102 201 306 307
+gnssir at01 2022 350
+
+
+rinex2snr p103 2020 105 -doy_end 107 -overwrite T
+
+refl_zones p041
+
+make_json_input p103 0 0 0
+
+gnssir p103 2020 105  -doy_end 107
+
+daily_avg p103 0.5 10 -plt F
+
+subdaily p103 2020 -plt F -rhdot T
+
+
+vwc_input p033 2012 
+
+make_json_input p041 0 0 0
+
+# case where station should not exist in the database
+make_json_input xxxx 0 0 0
+
+# case where station coordinates provided
+make_json_input xxxx  40 -120 10  -h1 5 -h2 20 -e1 5 -e2 15
+
+download_orbits nav 2010 1 1
+download_orbits igs 2010 1 1
+download_orbits gbm 2018 1 1
+
+rinex2snr p041 2022 1 -archive unavco -overwrite T
+rinex2snr p041 2022 1 -archive unavco -orb gnss -overwrite T
+
+# try various RINEX 3 things
+#
+
+# archive is currently unvailable
+rinex2snr pots00deu 2022 1 -archive bkg -orb rapid -overwrite T
+
+rinex2snr mchl00aus 2018 1 -archive cddis  -overwrite T
+rinex2snr p041 2018 1 -archive unavco -rate high -dec 15 -overwrite T
+
+# testing quickLook
+#
+#
+quickLook p041 2018 1 -plt F
+
+#
+invsnr_input tggo 8 20 5 15 -a1 30 -a2 330
+invsnr tggo 2022 200 L1+L2+L5 -doy_end 201 -constel G -plt F
+# invsnr_input vlsi 8 20 5 15 -a1 30 -a2 330
+# invsnr vlsi 2022 200 L1+L2+L5 -doy_end 202 -constel G

@@ -1,13 +1,17 @@
 # command line tool to check a rinexfile for minimal
-# information, i.e. receiver coordinates, SNR data.
-# Kristine Larson August 30, 2021
 import argparse
 import os
 import sys
 
 def check_rinex_header(rinexfile):
     """
-    command tool to look at header information
+    commandline tool to look at header information in a RINEX file
+
+    Parameters
+    --------
+    rinexfile : str
+        name of the file
+
     """
     # assume no coordinates in the file
     recx=0; recy = 0; recz = 0
@@ -21,6 +25,18 @@ def check_rinex_header(rinexfile):
             eoh+=1
             base = line[0:60].strip()
             if ("END OF HEADER" in line) or (eoh > 70):
+                #base = lines[i][0:60].strip()
+                #print(base)
+                base = lines[i+1][0:60].strip()
+                base2 = lines[i+2][0:60].strip()
+                if ('E' in base) or ('E' in base2):
+                    print('found Galileo')
+                if ('G' in base) or ('G' in base2):
+                    print('found GPS')
+                if ('R' in base) or ('R' in base2):
+                    print('found Glonass')
+                if ('C' in base) or ('C' in base2):
+                    print('found Beidou')
                 break
             else:
                 desc = line[60:80].strip()
@@ -47,7 +63,7 @@ def check_rinex_header(rinexfile):
                     obs = line[6:60]
                 else:
                     obs = obs + '     ' + thisline
-        print(obs)
+        print('Observables: ',obs)
         if ('S' not in obs):
             print('WARNING: no SNR observables in this file')
         else:
@@ -60,7 +76,6 @@ def check_rinex_header(rinexfile):
 
 def main():
 
-# must input start and end year
     parser = argparse.ArgumentParser()
     parser.add_argument("rinexfile", help="rinexfile name", type=str)
     args = parser.parse_args()

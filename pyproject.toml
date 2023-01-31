@@ -9,4 +9,7 @@
 #
 # [1]: https://www.python.org/dev/peps/pep-0518/#build-system-table
 # [2]: https://www.python.org/dev/peps/pep-0518/#rationale
-requires = ["setuptools", "wheel", "numpy"]
+#requires = ["setuptools", "wheel", "numpy==1.22.2"]
+requires = ["setuptools<60", "wheel", "numpy"]
+
+#requires-python="<3.10"

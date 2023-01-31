@@ -17,7 +17,7 @@ def getrinexversion(filename):
     """ Scan the file for RINEX version number.
 
     Parameters
-    ---------
+    ----------
     filename : str
         Filename of the rinex file
 
@@ -87,7 +87,6 @@ def _readheader(lines, rinexversion):
 
 def _readheader_v21x(lines):
     """ Read rinex version 2.10 and 2.11 
-    kristine larson added gps week and second of week outputs
     """
 
     header = {}
@@ -522,8 +521,6 @@ def processrinexfile(filename, savefile=None):
     obstimes : list[datetime.datetime]
         List of time of measurement for each measurement epoch.
 
-    kl august 4, 2020
-    add week and sow
     """
     rinexversion = getrinexversion(filename)
 

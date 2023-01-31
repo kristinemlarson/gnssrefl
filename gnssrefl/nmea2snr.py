@@ -1,16 +1,32 @@
 # -*- coding: utf-8 -*-
 """
-to convert nmea files to snr files 
-Makan Karegar, Uni Bonn, Aug 05, 2021
+convert nmea files to snr files 
 """
 from __future__ import division
 import numpy as np 
 import os
 import subprocess
 from scipy.interpolate import interp1d
+
 import gnssrefl.gps as g
 
 def NMEA2SNR(locdir, fname, snrfile, csnr):
+    """
+
+    Parameters
+    -----------
+    locdir : str
+        directory where your SNR files are kept
+    fname : string
+        NMEA filename 
+
+    snrfile : str
+        name of output file for SNR data
+
+    csnr : str
+        snr option, i.e. '66' or '99'
+
+    """
     
     missing = True
 
@@ -50,6 +66,12 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
     T = []; PRN = []; AZ = []; ELV = []; SNR = []
         
     for i_prn in prn_unique:
+        # the original code added 100 - but did not take into account the 
+        # satellite numbers have been shifted for glonass.
+        # also there is an illegal signal at satellite "48" 
+        # i do not know what that is, but i am ignoring it.
+        #if (i_prn > 32):
+        #    print(i_prn, 'looks like an illegal satellite number')
  #       print(i_prn)
         time = t[prn == i_prn];angle = elv[prn == i_prn];azimuth = az[prn == i_prn]
         Snr = snr[prn == i_prn];Prn = prn[prn == i_prn]
@@ -73,14 +95,42 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
     fout = open(snrfile, 'w')
     for i in range(len(T)):
         if (float(ELV[i]) >= emin) and (float(ELV[i]) <= emax):
-            fout.write("%2g %10.4f %10.4f %10g %4s %4s %7.2f %4s %4s\n" % (PRN[i], float(ELV[i]), float(AZ[i]), float(T[i]),'0', '0', float(SNR[i]),'0', '0')) 
+            if (PRN[i] > 100):
+                # names were translated incorrectly for Glonass records - so removing 65 from them all ;-)
+                p = float(PRN[i]) -65 + 1
+            else:
+                p = float(PRN[i])
+            # only allow glonass and correct GPS
+            if (p > 100) | (p < 33):
+                fout.write("%3g %10.4f %10.4f %10g %4s %4s %7.2f %4s %4s\n" % (p, float(ELV[i]), float(AZ[i]), float(T[i]),'0', '0', float(SNR[i]),'0', '0')) 
     fout.close()
     
 def read_nmea(fname):
     """
     read GPGGA sentence (includes snr data) in NMEA files    
-    Makan Karegar, Uni Bonn    
-    Dec, 2019
+
+    Parameters
+    ----------
+    fname : string
+        NMEA filename
+
+    Returns
+    -------
+    t : list of integers
+        timetags in GPS seconds 
+
+    prn : list of integers
+        GPS satellite numbers
+
+    az : list of floats ??
+        azimuth values (degrees)
+
+    elv : list of floats ??
+        elevation angles (degrees)
+
+    snr : list of floats
+        snr values
+
     """
     
     f=open(fname, 'rb')
@@ -90,7 +140,7 @@ def read_nmea(fname):
     t = []; prn = []; az = []; elv = []; snr = []
     for i, line in enumerate(lines):
     
-        if b"GPGGA" in line: #read GPGGA sentence: Global Positioning System Fix Data 
+        if b"GGA" in line: #read GPGGA sentence: Global Positioning System Fix Data 
             hr = int(line.decode("utf-8").split(",")[1][0:2])
             mn = int(line.decode("utf-8").split(",")[1][2:4])
             sc = float(line.decode("utf-8").split(",")[1][4:8])
@@ -98,8 +148,16 @@ def read_nmea(fname):
             if (i > 100 and t_sec == 0):                   #set t to 86400 for the midnight data
                 t_sec = 86400
 
-        elif b"GPGSV" in line:                             #read GPGSV sentence: GPS Satellites in view in this cycle   
+        elif b"GSV" in line:                             #read GPGSV sentence: GPS Satellites in view in this cycle   
         
+            if b"GPGSV" in line:
+                prn_offset = 0
+            elif b"GLGSV" in line:
+                prn_offset = 100
+            elif b"GAGSV" in line:
+                prn_offset = 200
+            elif b"BDGSV" in line:
+                prn_offset = 300
             sent = line.decode("utf-8").split(",")         #GPGSV sentence 
             ttl_ms = int(sent[1])                          #Total number of messages in the GPGSV sentence 
             ms = int(sent[2])                              #Message number 
@@ -107,7 +165,7 @@ def read_nmea(fname):
             if (len(sent) == 20):                          #Case 1: 4 sat in view in this sentence 
                 cnt = 0
                 for j in range(0,4):
-                    prn.append(sent[4+cnt]) #field 4,8,12,16 :  SV PRN number
+                    prn.append(str(prn_offset + int(sent[4+cnt]))) #field 4,8,12,16 :  SV PRN number
                     elv.append(sent[5+cnt]) #field 5,9,13,17 :  Elevation in degrees, 90 maximum
                     az.append(sent[6+cnt]) #field 6,10,14,18:  Azimuth in degrees
                     snr.append(sent[7+cnt].split("*")[0])  #field 7,11,15,19:  SNR, 00-99 dB (null when not tracking)
@@ -119,7 +177,7 @@ def read_nmea(fname):
             elif (len(sent) == 16):     #Case 2: 3 sat in view in this sentence    
                 cnt = 0
                 for j in range(0,3):
-                    prn.append(sent[4+cnt])               
+                    prn.append(str(prn_offset + int(sent[4+cnt])))               
                     elv.append(sent[5+cnt])             
                     az.append(sent[6+cnt])                
                     snr.append(sent[7+cnt].split("*")[0]) 
@@ -131,7 +189,7 @@ def read_nmea(fname):
             elif (len(sent) == 12):   #Case 3: 2 sat in view in this sentence    
                 cnt = 0
                 for j in range(0,2):
-                    prn.append(sent[4+cnt])              
+                    prn.append(str(prn_offset + int(sent[4+cnt])))              
                     elv.append(sent[5+cnt])                
                     az.append(sent[6+cnt])                 
                     snr.append(sent[7+cnt].split("*")[0]) 
@@ -143,7 +201,7 @@ def read_nmea(fname):
             elif (len(sent) == 8):  #Case 4: 1 sat in view in this sentence    
                 cnt = 0
                 for j in range(0,1):
-                    prn.append(sent[4+cnt])               
+                    prn.append(str(prn_offset + int(sent[4+cnt])))               
                     elv.append(sent[5+cnt])                
                     az.append(sent[6+cnt])                
                     snr.append(sent[7].split("*")[0])  
@@ -158,9 +216,27 @@ def read_nmea(fname):
 
 def fix_angle_azimuth(time, angle, azimuth):
     """
-    interpolare elevation angles and azimuth to retrieve decimal values thru time     
-    Makan Karegar, Uni Bonn    
-    Feb, 2020
+    interpolate elevation angles and azimuth to retrieve decimal values thru time     
+    this is for NMEA files.
+
+    Parameters
+    ----------
+    time : list of floats
+        GPS seconds of the week
+    angle : list of floats
+        elevation angles  (degrees)
+
+    azimuth : list of floats
+        azimuth angles (degrees)
+
+    Returns
+    -------
+    angle_fixed : list of floats
+        interpolated elevation angles
+
+    azim_fixed : list of floats
+        interpolated azimuth angles
+
     """
     
 #delet nans
@@ -206,6 +282,12 @@ def azimuth_diff2(azim1, azim2):
     return diff
 
 def azimuth_diff1 (azim):
+    """
+    Parameters
+    ----------
+    azim: ??
+
+    """
     azim_a = azim[0:-1]
     azim_b = azim[1:]
     diff = azimuth_diff2 (azim_b, azim_a);
@@ -213,6 +295,14 @@ def azimuth_diff1 (azim):
     return diff
 
 def azimuth_diff(azim1, azim2):
+    """
+    Parameters
+    ----------
+    azim1 : ??
+
+    azim2 : ??
+
+    """
     if not(azim2.size):
         diff = azimuth_diff1 (azim1)
     else:
@@ -221,6 +311,13 @@ def azimuth_diff(azim1, azim2):
     return diff
      
 def angle_range_positive(ang):
+    """
+
+    Parameters
+    ----------
+    ang : ??
+
+    """
 #    idx1 = np.isfinite(ang)
     ang = np.angle(np.exp(1j*ang*np.pi/180))*180/np.pi  
     idx2 = (ang < 0)
@@ -228,6 +325,20 @@ def angle_range_positive(ang):
     return ang
 
 def azimuth_mean(azim1, azim2):
+    """
+    Parameters
+    ----------
+    azim1 : list of floats ? 
+         azimuth degrees
+
+    azim2 : list of floats
+         azimuth degrees
+
+    Returns
+    -------
+    azim : list of floats ?
+        azimuths in degrees
+    """
     azim = np.concatenate([azim1, azim2])
     if np.all(azim1 >= 0) and np.all(azim2 >= 0):
         azim1 = angle_range_positive(azim1)
@@ -238,27 +349,61 @@ def azimuth_mean(azim1, azim2):
         y1 = np.cos(azim1*np.pi/180);y2 = np.cos(azim2*np.pi/180) 
         x = ( (x1 + x2)/2.0 )[0];y = ( (y1 + y2)/2.0 )[0]
         azim = 180/np.pi * np.arctan2(x, y)
+
     return azim
 
 def quickname(station,year,cyy, cdoy, csnr):
     """
-    given station name, year, doy, snr type
-    returns snr file name and its path under REFL_CODE/year/snr/station/
-    author: Makan Karegar
+    full name of the snr file name (incl path) 
+
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+
+    year : int
+        full year
+
+    cyy : str 
+        two character year
+
+    cdoy : str
+        three character day of year
+
+    csnr : str
+        snr type, e.g. '66' 
+
+    Returns
+    -------
+    fname : str
+        output filename
+
     """
     
     xdir  = os.environ['REFL_CODE'] + '/'
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
     if not (os.path.exists(xdir + str(year) + '/snr/' + station+'/')):
         os.system('mkdir '+xdir + str(year) + '/snr/' + station+'/')
+
     return fname
 
 def elev_limits(snroption):
     """
-    given Kristine's snr option, return min and max elevation angles
-    in degrees
-    author: kristine larson
-    2020 august 7
+
+    given snr option return the elevation angle limits
+
+    Parameters
+    ----------
+    snroption : int
+        snrfile number
+
+    Returns
+    -------
+    emin : float
+        min elevation angle (degrees)
+    emax : float
+        max elevation angle (degrees)
+
     """
 
     if (snroption == 99):
@@ -276,14 +421,25 @@ def elev_limits(snroption):
   
 def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
     """
-    runs the nmea2snr conversion
-    inputs:
-    station name 
-    year_list list of years to be analyzed
-    doy_list list of doy to be analyzed
-    isnr = integer file type choice
-    overwrite = boolean, make a new SNR file even if one already exists
-    Makan Karegar
+    runs the nmea2snr conversion code
+
+    Parameters
+    ----------
+    station : str
+        name of station 
+
+    year_list : list of integers
+        years 
+
+    doy_list : list of days of year
+        days of years
+
+    isnr : int
+        snr file type
+
+    overwrite : bool
+        whether make a new SNR file even if one already exists
+
     """
     # loop over years and day of years
     for yr in year_list:

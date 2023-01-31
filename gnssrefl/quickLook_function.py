@@ -1,7 +1,6 @@
 """
-author: kristine larson
 called by quickLook_cl.py
-quickLook functions - consolidated snr reader (previously in a separate file)
+quickLook functions 
 """
 import sys
 import os
@@ -9,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import subprocess
+import warnings
 
 import scipy.interpolate
 import scipy.signal
@@ -19,10 +19,42 @@ import gnssrefl.rinex2snr as rinex
 
 def read_snr_simple(obsfile):
     """
-    author: Kristine Larson
-    input: SNR observation filenames and a boolean for 
-    whether you want just the first day (twoDays)
-    output: contents of the SNR file, withe various other metrics
+    Loads the data from a SNR file into memory 
+
+    Parameters
+    ----------
+    obsfile : string
+        name of the SNR file
+
+    Returns
+    -------
+    allGood :  int
+        one for all is well, zero is for all is bad
+    sat : numpy array of floats
+        satellite numbers
+    ele  : numpy array of floats
+        elevation angle (deg)
+    azi : numpy array of float 
+        azimuth (deg)
+    t  : numpy array of floats
+        seconds of the day (no leap seconds)
+    edot : numpy array of floats
+        derivative of elevation angle wrt time deg/sec
+    s1 : numpy array of floats
+        L1 SNR
+    s2 : numpy array of floats 
+        L2 SNR
+    s5 :  numpy array of floats 
+        L5 SNR
+    s6 :  numpy array of floats
+        L6 SNR
+    s7 :  numpy array of floats
+        L7 SNR 
+    s8 :  numpy array of floats
+        L8 SNR
+    snrE : numpy array of booleans 
+        whether SNR exists 
+
     """
 #   defaults so all returned vectors have something stored in them
     sat=[]; ele =[]; azi = []; t=[]; edot=[]; s1=[];
@@ -79,24 +111,53 @@ def read_snr_simple(obsfile):
     return allGood, sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE
 
 
-def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,**kwargs):
+def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,ediff,**kwargs):
     """
-    inputs:
-    station name (4 char), year, day of year
-    snr_type is the file extension (i.e. 99, 66 etc)
-    f is frequency (1, 2, 5), etc
-    e1 and e2 are the elevation angle limits in degrees for the LSP
-    minH and maxH are the allowed LSP limits in meters
-    reqAmp is LSP amplitude significance criterion
-    pele is the elevation angle limits for the polynomial removal.  units: degrees
-    KL 20may10 pk2noise value is now sent from main function, which can be set online
-    KL 20aug07 added fortran boolean
-    KL 21feb06 return data from the plots so that Jupyter notebooks can use them.
-    also added pltscreen variable so that the default plots are not always displayed
-    KL 21mar25 added datakey dictionaries for the Jupyter notebook people
-    KL 21apr02 added error checking on whether requested datastreams exist. no data, no analysis
-    KL 21nov24 added screen stats, boolean, kwargs
+    takes in all users inputs and calculates reflector heights. Makes png files.
+
+    Parameters
+    ----------
+    station : str
+        station name (4 char) 
+    year : int
+        full year
+    doy : int
+        day of year  
+    snr_type : int
+        snr file extension (i.e. 99, 66 etc)
+    f : int
+        frequency (1, 2, 5), etc
+    e1 : float
+        minimum elevation angle in degrees
+    e2 : float
+        maximum elevation angle in degrees
+    minH : float
+        minimum allowed reflector height in meters
+    maxH : float
+        maximum allowed reflector height in meters
+    reqAmp : float
+        is LSP amplitude significance criterion
+    pele : list of floats
+        is the elevation angle limits for the polynomial removal.  units: degrees
+    satsel : int
+        satellite number?
+    PkNoise : float
+        peak to noise ratio for QC
+    fortran : bool
+         whether external fortran translator is being explicitly called. 
+    pltscreen : bool
+        whether you want plots sent to the terminal
+    azim1 : float
+         minimum azimuth in degrees
+    azim2 : float
+         maximum azimuth in degrees
+    ediff : float
+         QC parameter - restricts length of arcs (degrees)
+
     """
+
+    #print('ediff',ediff)
+
     screenstats = kwargs.get('screenstats',False)
     if screenstats:
         print('Some screen statistics will print to the screen')
@@ -127,18 +188,19 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     # define where the axes are located
     bx = [0,1,0,1]; by = [0,0,1,1]; bz = [1,3,2,4]
 
-    # 
-    fs = 12
+    #  fontsize
+    fs = 10
     # various defaults - ones the user doesn't change in this quick Look code
-    delTmax = 70
+    # changed this december 4, 2022
+    # changed it back on december 20, 2022
+    delTmax = 75 # this is how long an arc can be in minutes
     polyV = 4 # polynomial order for the direct signal
-    desiredP = 0.01 # 1 cm precision
-    ediff = 2 # this is a QC value, eliminates small arcs
+    desiredP = 0.01 # 1 cm precision for a "quick Look"
+
     #four_in_one = True # put the plots together
     minNumPts = 20 
     #noise region for LSP QC. these are meters
     NReg = [minH, maxH]
-    #print('Refl. Ht. Noise Region used: ', NReg)
     # for quickLook, we use the four geographic quadrants - these are azimuth angles in degrees
     azval = [270, 360, 180, 270, 0, 90, 90, 180]
     # try adding 5 degrees at the quadrant edges, except for north
@@ -155,17 +217,15 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         print('>>>> The snr file exists ',obsfile)
     else:
         if True:
-            #print('looking for the SNR file on disk')
             obsfile, obsfileCmp, snre =  g.define_and_xz_snr(station,year,doy,snr_type)
             if snre:
                 dkfjaklj = True
-                #print('file exists on disk')
             else:
-                print('>>>> The SNR the file does not exist ',obsfile)
-                #print('This code used to try and make one for you, but I have removed this option.')
+                print('>>>> The SNR the file needs does not exist ',obsfile)
                 print('Please us rinex2snr to make a SNR file')
                 sys.exit()
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)
+    # this just means the file existed ... not that it had the frequency you want to use
     if allGood == 1:
         # make output file for the quickLook RRH values, just so you can give them a quick look see
         quicklog = 'logs/rh_' + station + '.txt'
@@ -179,30 +239,32 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         if (f > 100) and (f < 200): # glonass
             b = sats[(sats>100) & (sats<200)]; # print('glonass',len(b))
             if len(b) == 0:
-                print('NO Glonass DATA') ; 
+                print('NO Glonass DATA in the file') ; 
                 return data, datakey
         elif (f > 200) & (f < 300): # galileo
             b = sats[(sats>200) & (sats<300)]; # print('galileo',len(b))
             if len(b) == 0:
-                print('NO Galileo data'); 
+                print('NO Galileo data in the file'); 
                 return data, datakey
         elif (f > 300): # beidou
             b = sats[(sats>300) & (sats<400)]; # print('beidou',len(b))
             if len(b) == 0:
-                print('NO Beidou data'); 
+                print('NO Beidou data in the file'); 
                 return data, datakey
 
         print('minimum elevation angle (degrees) for this dataset: ', minEdataset)
         if minEdataset > (e1+0.5):
-            print('It looks like the receiver had an elevation mask')
+            print('It looks like the receiver had an elevation mask. Overriding e1 to this value.')
             e1 = minEdataset
         if pltscreen:
             plt.figure(figsize=(10,6))
+        allpoints = 0
         for a in range(naz):
             if pltscreen:
                 plt.subplot(2,2,bz[a])
                 plt.title(titles[a],fontsize=fs)
             az1 = azval[(a*2)] ; az2 = azval[(a*2 + 1)]
+
             # this means no satellite list was given, so get them all
             if satsel == None:
                 #satlist = g.find_satlist(f,snrE)
@@ -215,16 +277,27 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
             for satNu in satlist:
                 x,y,Nv,cf,UTCtime,avgAzim,avgEdot,Edot2,delT= g.window_data(s1,s2,s5,s6,s7,s8,sat,ele,azi,t,edot,f,az1,az2,e1,e2,satNu,polyV,pele,screenstats) 
+                allpoints = allpoints + Nv
+                # if screenstats:
+                    #print('ALL tracks: Azim {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} Npts {3:3.0f} between Azimuths {4:3.0f}-{5:3.0f}'.format( avgAzim,satNu,UTCtime,Nv, az1, az2))
                 if Nv > minNumPts:
                     maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,desiredP,polyV,minH) 
                     nij =   pz[(px > NReg[0]) & (px < NReg[1])]
                     Noise = 0
                     iAzim = int(avgAzim)
+                    # 2022 march 26
+                    # introduce boolean for RH peaks that are too close to the edges of the RH periodogram
+                    tooclose = False
+                    if (abs(maxF - minH) < 0.05):
+                        tooclose = True
+                    if (abs(maxF - maxH) < 0.05):
+                        tooclose = True 
                     if (len(nij) > 0):
                         Noise = np.mean(nij)
                     else:
-                        Noise = 1; iAzim = 0 # made up numbers
-                    if (delT < delTmax) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise):
+                        Noise = 1;  iAzim = 0 # i think this is set to zero so something down the line doesn't fail
+                    # add azimuth constraints. default is 0-360
+                    if (not tooclose) & (delT < delTmax) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise) & (iAzim >= azim1) & (iAzim <= azim2):
                         T = g.nicerTime(UTCtime)
                         # az, RH, sat, amp, peak2noise, Time
                         rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,1))
@@ -234,20 +307,21 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         data[idc][satNu] = [px,pz]
                         datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
                         if screenstats:
-                            print('SUCCESS for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
+                            print('SUCCESS for Azimu {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:7.3f} '.format( avgAzim,satNu,UTCtime,maxF))
 
                     else:
                         # these are failed tracks
-                        if pltscreen:
-                            plt.plot(px,pz,'gray',linewidth=0.5)
-                        if screenstats:
-                            print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
-                            g.write_QC_fails(delT,75,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp)
+                        if (iAzim > azim1) & (iAzim < azim2):
+                            if pltscreen:
+                                plt.plot(px,pz,'gray',linewidth=0.5)
+                            if screenstats:
+                                print('FAILED QC for Azimuth {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:7.3f} '.format( avgAzim,satNu,UTCtime,maxF))
+                                g.write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose)
 
-                        idc = 'f' + stitles[a]
-                        data[idc][satNu] = [px,pz]
-                        datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
-                        rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,-1))
+                            idc = 'f' + stitles[a]
+                            data[idc][satNu] = [px,pz]
+                            datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
+                            rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,maxAmp,maxAmp/Noise,UTCtime,-1))
 
             # i do not know how to add a grid using these version of matplotlib
             tt = 'GNSS-IR: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy) + ' elev: ' + str(e1) + '-' +  str(e2)
@@ -257,33 +331,37 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 plt.grid()
                 amax = max(amax,  bbb) # do not know how to implement this ...
                 if (a == 3) or (a==1):
-                    plt.xlabel('reflector height (m)',fontsize=FS)
+                    plt.xlabel('reflector height (m)',fontsize=fs)
                 if (a == 1) or (a==0):
-                    plt.ylabel('volts/volts',fontsize=FS)
-                plt.xticks(fontsize=FS)
-                plt.yticks(fontsize=FS)
+                    plt.ylabel('volts/volts',fontsize=fs)
+                # try putting this label on all of them
+                #plt.xlabel('reflector height (m)',fontsize=fs)
+                plt.xticks(fontsize=fs)
+                plt.yticks(fontsize=fs)
 
         rhout.close()
         #print('preliminary reflector height results are stored in a file called logs/rh.txt')
         # this file seems to have an empty line at the end.  i do not know why.
 
 
-        if pltscreen:
-            plt.suptitle(tt, fontsize=FS)
-            # make sure Files directory exists
-            fdir = os.environ['REFL_CODE'] + '/Files'
-            if not os.path.isdir(fdir):
-                subprocess.call(['mkdir', fdir])
+        # make sure directory exists for plots
+        g.set_subdir(station)
+        # where plots will go
+        fdir = os.environ['REFL_CODE'] + '/Files/' + station 
+        plt.suptitle(tt, fontsize=FS)
+            # if you have no results, no point plotting them!
+        if (allpoints > 0):
             filename = fdir + '/quickLook_lsp.png'
             print('plot saved to ', filename)
             plt.savefig(filename)
-            # sure - why not throw in another plot?
+        # make second plot
             goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2)
+        else:
+            print('You made a selection that does not exist (i.e. frequency or satellite or constellation)')
+        if pltscreen:
             plt.show()
-          
     else: 
         print('some kind of problem with SNR file, so I am exiting the code politely.')
-
 
     # returns multidimensional dictionary of lomb scargle results so 
     # that the jupyter notebook people can replot them
@@ -293,20 +371,50 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
 def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     """
-    simple visualizer of "good" and "bad" azimuths
-    input is a filename, the station name, and the min and max RH
-    and the peak to noise, required amplitude criteria, and frequency used
-    should not even call this code if there are no data.  need to fix this
-    author: kristine larson
+    makes a plot that shows "good" and "bad" refletor height retrievals as a 
+    function of azimuth
+
+    Parameters
+    ----------
+    fname : str
+        filename
+    station : str
+        4 char station name
+    year : int
+        full year
+    doy : int
+        day of year
+    h1 : float
+        minimum reflector height (m)
+    h2 : float
+        max reflector height (m)
+    PkNoise : float
+        peak 2 noise QC
+    reqAmp : float
+        required LSP amplitude
+    freq : int
+        frequency
+    e1 : float
+        minimum elevation angle (deg)
+    e2 : float
+        maximum elevation angle (deg)
+
+    Returns
+    -------
+    plot is written $REFL_CODE/Files/station/quickLook_summary.png
+
     """
     try:
-        a = np.loadtxt(fname,comments='%')
+        # added this to get rid of the warning when the file has no bad points in it
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            a = np.loadtxt(fname,comments='%')
     except:
-        print('no results in the file')
+        print('No results in the file')
 
     #print(a.ndim, len(a))
     if (a.ndim == 1) or (len(a) == 0):
-        print('no results in the file')
+        print('No results in the file')
         return
 
     ij = (a[:,6] == 1) # good retrievals
@@ -356,20 +464,9 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     plt.yticks(fontsize=fs)
     plt.xlim((0, 360))
 
-    fdir = os.environ['REFL_CODE'] + '/Files'
-    if not os.path.isdir(fdir):
-        subprocess.call(['mkdir', fdir])
+    # existence of the output directory is checked earlier
+    fdir = os.environ['REFL_CODE'] + '/Files/' + station 
     f = fdir + '/quickLook_summary.png'
     print('plot saved to ', f)
     plt.savefig(f)
 
-# old code
-#print('I will try to pick up a RINEX file ')
-#print('and translate it for you. This will be GPS only.')
-#print('For now I will check all the official archives for you.')
-#rate = 'low'; dec_rate = 0; archive = 'all'; 
-#rinex.conv2snr(year, doy, station, int(snr_type), 'nav',rate,dec_rate,archive,fortran)
-#if os.path.isfile(obsfile):
-#    print('the SNR file now exists')  
-#else:
-#    print('the RINEX file did not exist, had no SNR data, or failed to convert, so exiting.')

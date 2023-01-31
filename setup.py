@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 from numpy.distutils.core import setup, Extension
 
+
 ext1 = Extension(name='gnssrefl.gpssnr', 
         sources=['gnssrefl/gpssnr.f'], 
         f2py_options=['--verbose'],
@@ -18,11 +19,11 @@ ext3 = Extension(name='gnssrefl.gnsssnrbigger',
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
-requirements = ["numpy","wget","scipy","matplotlib","requests","progress"]
+requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","simplekml"]
 
 setup(
     name="gnssrefl",
-    version="1.0.13",
+    version="1.2.13",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -46,9 +47,11 @@ setup(
             'llh2xyz = gnssrefl.llh2xyz:main',
             'prn2gps = gnssrefl.prn2gps:main',
             'download_tides = gnssrefl.download_tides:main',
+            'download_ioc = gnssrefl.download_ioc:main',
+            'download_psmsl = gnssrefl.download_simon:main',
+            'download_noaa = gnssrefl.download_tides:main',
             'subdaily= gnssrefl.subdaily_cl:main',
             'gpsweek = gnssrefl.gpsweek:main',
-            'update_snr_files = gnssrefl.update_snr_files:main',
             'nmea2snr= gnssrefl.nmea2snr_cl:main',
             'installexe= gnssrefl.installexe_cl:main',
             'download_unr = gnssrefl.download_unr:main',
@@ -58,14 +61,24 @@ setup(
             'rinex3_rinex2= gnssrefl.rinex3_rinex2:main',
             'veg_multiyr= gnssrefl.veg_multiyr:main',
             'check_rinex= gnssrefl.check_rinex:main',
+            'check_rinex2= gnssrefl.check_rinex2:main',
             'rinex3_snr= gnssrefl.rinex3_snr:main',
             'filesizes= gnssrefl.filesizes:main',
+            'invsnr= gnssrefl.invsnr_cl:main',
+            'invsnr_input= gnssrefl.invsnr_input:main',
+            'vwc_input= gnssrefl.vwc_input:main',
+            'phase= gnssrefl.quickPhase:main',
+            'refl_zones= gnssrefl.refl_zones_cl:main',
+            'vwc= gnssrefl.vwc:main',
+            'quickplt= gnssrefl.qplt2:main',
+            'snowdepth= gnssrefl.snow_depth:main',
+            'rh_plot= gnssrefl.rh_plot:main',
             ], 
         },
     install_requires=requirements,
     ext_modules = [ext1,ext2,ext3],
     classifiers=[
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
 )

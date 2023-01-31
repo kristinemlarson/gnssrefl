@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 command line tool for the nmea2snr module
-This translates the nmea files to SNR files
-Makan Karegar, Uni Bonn, Aug 05, 2021
+This translates NMEA files to SNR files
 """
 
 import argparse
