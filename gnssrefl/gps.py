@@ -83,6 +83,32 @@ class wgs84:
     f  =  1./298.257223563 # flattening factor
     e = np.sqrt(2*f-f**2) # 
 
+def is_it_legal(freq):
+    """
+    checks whether the frequency list set by the user in gnssir is legal
+
+    Parameters
+    ----------
+    freq : list of integers
+        frequencies you want to check
+
+    Returns:
+    --------
+    legal : bool
+        whether it is legal or not
+    """
+    # currently allowed
+    legal_list = [1,2,20,5,101,102,201,205,206,207,208,302,306,307]
+    # assume legal
+    legal = True
+
+    for f in freq:
+        if f not in legal_list:
+            print('This is not a legal gnssrefl frequency:', f)
+            legal = False
+
+    return legal
+
 def myfavoriteobs():
     """
     returns list of SNR obs needed for gfzrnx. 

@@ -48,6 +48,12 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     ediff = lsp['ediff']; NReg = lsp['NReg']  
     PkNoise = lsp['PkNoise']; azval = lsp['azval']; naz = int(len(azval)/2)
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp'] 
+
+    ok = g.is_it_legal(freqs)
+    if not ok:
+        print('Fix your json list of frequencies. Exiting')
+        sys.exit()
+
     plot_screen = lsp['plt_screen'] 
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
     gzip = lsp['gzip']
@@ -92,6 +98,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     else:
         # uncompress here so you should not have to do it in read_snr_multiday ...
         obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
+        print('Using: ', obsfile)
 
         allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays,dec)
         # added gzip option.  first input is xz compression

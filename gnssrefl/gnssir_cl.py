@@ -279,6 +279,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     year_list = list(range(year_st, year_end+1))
     # changed to better describe year and doy start/end
 
+    print('requested frequencies ', lsp['freqs'])
+
     for year in year_list:
         # edits made 2021Sep10 by Makan karegar
         if year != year_end:

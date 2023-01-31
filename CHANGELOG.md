@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.14
+Allow capital letter station names in quickLook and gnssir (mac does not distinguish
+between these two cases, but other machines do).
+
+Explicitly check that people are not using illegal frequencies when they run gnssir
+
+Fix bugs in nmea2snr related to how directories were created and discontinued numpy libraries
+
 ## 1.2.13
 
 Added initial snowdepth utility.

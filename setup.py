@@ -23,7 +23,7 @@ requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astro
 
 setup(
     name="gnssrefl",
-    version="1.2.13",
+    version="1.2.14",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
