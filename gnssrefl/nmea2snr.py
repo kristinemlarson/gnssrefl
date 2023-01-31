@@ -383,7 +383,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     xdir  = os.environ['REFL_CODE'] + '/'
     fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
     if not (os.path.exists(xdir + str(year) + '/snr/' + station+'/')):
-        os.system('mkdir '+xdir + str(year) + '/snr/' + station+'/')
+        os.system('mkdir -p '+xdir + str(year) + '/snr/' + station+'/')
 
     return fname
 
