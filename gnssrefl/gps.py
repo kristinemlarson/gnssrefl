@@ -182,12 +182,13 @@ def define_and_xz_snr(station,year,doy,snr):
         # make sure the uncompression worked
         if os.path.isfile(fname):
             snre = True
-
-    if os.path.isfile(fname4):
-        print('found uppercase station name in a snr file')
-        fname = fname4
-        fname2 = fname4 # not needed
-        snre = True
+        else:
+            print('did not find lowercase station snr file')
+            if os.path.isfile(fname4):
+                print('found uppercase station name in a snr file')
+                fname = fname4
+                fname2 = fname4 # not needed
+                snre = True
 
 #   return fname2 but only for backwards compatibility
     return fname, fname2, snre 
