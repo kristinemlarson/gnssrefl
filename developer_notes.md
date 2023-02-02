@@ -14,6 +14,18 @@ a description of the main changes in this new version.
 - git push --tags
 
 The latter will tell github to make a new pypi version.
+
 git push origin master will make a new docker.
+
+
+Install a new python:
+
+- sudo apt install python3.9
+
+Get a list of your outdated packages
+
+- pip list --outdated
+
+How to update them all? The horror, the horror
 
 

@@ -43,6 +43,8 @@ To only use GPS L1:
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l1 True </CODE>
 
+See below to learn the setting for setting specific frequencies.
+
 To only use GPS L2C and require a spectral amplitude of 10:
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True -ampl 10</CODE>
@@ -78,7 +80,6 @@ minH and maxH in the json file). I apologize for this.
 - polyV is the polynomial order used for removing the direct signal
 - freqs are selected frequencies for analysis
 - delTmax is the maximum length of allowed satellite arc, in minutes
-- azval are the azimuth regions for study, in pairs (i.e. 0 90 270 360 means you want to evaluate 0 to 90 and 270 to 360).
 - wantCompression, boolean, compress SNR files using xz
 - screenstats, boolean, whether minimal periodogram results come to screen
 - refraction, boolean, whether simple refraction model is applied.
@@ -87,6 +88,7 @@ minH and maxH in the json file). I apologize for this.
 is computed. This is used to compute the peak to noise ratio used in QC.
 - (*this option has been removed*) seekRinex: boolean, whether code looks for RINEX at an archive
 - azlist : pairs of azimuth regions, degrees, as described earlier
+- frlist : allows direct input of frequencies, i.e. <code>-frlist 1 2</code> or <code>-frlist 1 20 101 102</code>
 
 Simple examples for my favorite GPS site [p041](https://spotlight.unavco.org/station-pages/p042/eo/scientistPhoto.jpg)
 

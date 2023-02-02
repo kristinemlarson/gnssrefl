@@ -82,7 +82,14 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
     print('Output file: ',outputfile)
     print('Output png: ',outputpng)
 
-    gps = np.loadtxt(gpsfile,comments='%')
+    if os.path.exists(gpsfile):
+        gps = np.loadtxt(gpsfile,comments='%')
+    else:
+        print('Daily average file does not exist. Exiting')
+        print(gpsfile)
+        sys.exit()
+
+
 
     # this overrides other ways of doing things.
     if bare_date1 is not None:

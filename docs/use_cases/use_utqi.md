@@ -1,6 +1,8 @@
 #  Utqiagvik, Alaska
 
-Updated December 10, 2022 
+Note: this use case needs to be updated to use the snowdepth utility.
+
+<HR>
 
 **Station Name:** utqi00usa
 

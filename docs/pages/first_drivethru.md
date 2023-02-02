@@ -7,9 +7,9 @@
 <TD>
 <B>Ice Sheets</B>
 
-* [Lorne, Ross Ice Shelf](../use_cases/use_lorg.md) 
+* [Lorne, Antarctica](../use_cases/use_lorg.md) 
 
-* [Dye2, Greenland Ice Sheet](../use_cases/use_gls1.md) 
+* [Dye2, Greenland](../use_cases/use_gls1.md) 
 
 * [Thwaites Glacier, Antarctica](../use_cases/use_lthw.md) 
 
@@ -24,7 +24,7 @@
 
 * [Lake Taupo, New Zealand](../use_cases/use_tgho.md) 
 
-* [Steenbras Reservoir, South Africa](../use_cases/use_sbas.md) 
+* [Steenbras, South Africa](../use_cases/use_sbas.md) 
 
 * [St Lawrence River,Canada](../use_cases/use_pmtl.md) 
 
@@ -68,15 +68,15 @@
 <TD>
 <B>Tides</B>
 
-* [Friday Harbor, Washington](../use_cases/use_sc02.md) (sc02) 
+* [Friday Harbor, WA USA](../use_cases/use_sc02.md) 
 
-* [St Michael, Alaska](../use_cases/use_at01.md) (at01)
+* [St Michael, Alaska USA](../use_cases/use_at01.md)
 
-* [Vlissingen, the Netherlands](../use_cases/use_vlis.md) (vlis)
+* [Vlissingen, the Netherlands](../use_cases/use_vlis.md)
 
-* [Puerto Penasco, Mexico](../use_cases/use_tnpp.md) (tnpp)
+* [Puerto Penasco, Mexico](../use_cases/use_tnpp.md)
 
-* [Elbe River, Germany](../use_cases/use_tggo.md) (tggo)
+* [Elbe River, Germany](../use_cases/use_tggo.md)
 
 </TD>
 </TR>

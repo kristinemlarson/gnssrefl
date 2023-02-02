@@ -138,7 +138,7 @@ Finally, the daily average RH for the water year:
 
 <HR>
 
-As of January 28, 2023, there is a new snowdepth utility.
+As of January 28, 2023, there is a [new snowdepth utility](../pages/README_snowdepth.md).
 It requires two inputs, the station name and the (northern hemisphere)
 water year:
 
