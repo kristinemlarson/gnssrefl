@@ -259,9 +259,19 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         if pltscreen:
             plt.figure(figsize=(10,6))
         allpoints = 0
+
+
         for a in range(naz):
             if pltscreen:
-                plt.subplot(2,2,bz[a])
+                if a==0:
+                    ax1=plt.subplot(2,2,bz[a])
+                if a==1:
+                    ax2=plt.subplot(2,2,bz[a])
+                if a==2:
+                    ax3=plt.subplot(2,2,bz[a])
+                if a==3:
+                    ax4=plt.subplot(2,2,bz[a])
+
                 plt.title(titles[a],fontsize=fs)
             az1 = azval[(a*2)] ; az2 = azval[(a*2 + 1)]
 
@@ -340,9 +350,15 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 plt.yticks(fontsize=fs)
 
         rhout.close()
+        d1=ax1.get_ylim() ; d2=ax2.get_ylim() ; d3=ax3.get_ylim() ; d4=ax4.get_ylim()
+        minv = min([d1[0], d2[0], d3[0], d4[0]])
+        maxv = max([d1[1], d2[1], d3[1], d4[1]])
+        ax1.set_ylim(minv,maxv) ; ax2.set_ylim(minv,maxv) ;
+        ax3.set_ylim(minv,maxv) ; ax4.set_ylim(minv,maxv)
+
+
         #print('preliminary reflector height results are stored in a file called logs/rh.txt')
         # this file seems to have an empty line at the end.  i do not know why.
-
 
         # make sure directory exists for plots
         g.set_subdir(station)
@@ -358,6 +374,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2)
         else:
             print('You made a selection that does not exist (i.e. frequency or satellite or constellation)')
+
         if pltscreen:
             plt.show()
     else: 
@@ -469,4 +486,6 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     f = fdir + '/quickLook_summary.png'
     print('plot saved to ', f)
     plt.savefig(f)
+
+
 
