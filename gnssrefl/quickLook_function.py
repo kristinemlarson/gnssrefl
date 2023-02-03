@@ -350,12 +350,12 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 plt.yticks(fontsize=fs)
 
         rhout.close()
-        d1=ax1.get_ylim() ; d2=ax2.get_ylim() ; d3=ax3.get_ylim() ; d4=ax4.get_ylim()
-        minv = min([d1[0], d2[0], d3[0], d4[0]])
-        maxv = max([d1[1], d2[1], d3[1], d4[1]])
-        ax1.set_ylim(minv,maxv) ; ax2.set_ylim(minv,maxv) ;
-        ax3.set_ylim(minv,maxv) ; ax4.set_ylim(minv,maxv)
-
+        if pltscreen:
+            d1=ax1.get_ylim() ; d2=ax2.get_ylim() ; d3=ax3.get_ylim() ; d4=ax4.get_ylim()
+            minv = min([d1[0], d2[0], d3[0], d4[0]])
+            maxv = max([d1[1], d2[1], d3[1], d4[1]])
+            ax1.set_ylim(minv,maxv) ; ax2.set_ylim(minv,maxv) ;
+            ax3.set_ylim(minv,maxv) ; ax4.set_ylim(minv,maxv)
 
         #print('preliminary reflector height results are stored in a file called logs/rh.txt')
         # this file seems to have an empty line at the end.  i do not know why.
