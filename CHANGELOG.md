@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## 1.2.15
 
 Add newest L2C transmitting GPS satellite, PRN 28. Transmitting since January 31, 2023.
+I do not believe it is healthy.
+
+y-axis limits are now the same in quickLook periodograms.
+
+Add L1C (I think) to rinex3 reading code - but it is a backup signal to default L1 C/A (S1C).  
+But I would really need to see more receivers to see what is going on here.  
+
+Fixed persistent bugs that occur when trying to use gnssir to isolate problems with one satellite.
+Now checks that the requested satellite is available on the requested frequency.
+If not, it exits gracefully instead of crashing. This is when using -sat option, which is not
+relevant for routine processing.
 
 ## 1.2.14
 

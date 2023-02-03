@@ -107,8 +107,8 @@ def quicklook(station: str, year: int, doy: int,
         The allowed LSP reflector height upper limit in meters.
         default is 6.
 
-    sat : array_like, integers, optional
-        list of satellites numbers, default is None.
+    sat : integer, optional
+        specific satellite number, default is None.
 
     peak2noise : int, optional
         peak to noise ratio of the periodogram values (periodogram peak divided by the periodogram noise).

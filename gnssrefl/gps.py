@@ -115,7 +115,8 @@ def myfavoriteobs():
 
     """
     # not even sure why i have C here for beidou
-    gobblygook = 'G:S1C,S2X,S2L,S2S,S2X,S5I,S5Q,S5X+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
+    # 2023feb02 added L1C - back up to L1 C/A
+    gobblygook = 'G:S1C,S1X,S2X,S2L,S2S,S2X,S5I,S5Q,S5X+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
 
     return gobblygook
 
@@ -125,7 +126,8 @@ def myfavoritegpsobs():
 
     """
     # can't have non-GPS obs if you ask for only GPS signals 
-    gobblygook = 'G:S1C,S2X,S2L,S2S,S2X,S5I,S5Q,S5X'
+    # 2023feb02 added L1C which i believe to be S1X. But c/a still the default
+    gobblygook = 'G:S1C,S1X,S2X,S2L,S2S,S2X,S5I,S5Q,S5X'
 
     return gobblygook
 
@@ -1523,6 +1525,8 @@ def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
 def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satNu,pfitV,pele,screenstats):
     """
 
+    window the SNR data for a given satellite azimuth and elevation angle range
+
     also calculates the scale factor for various GNNS frequencies.  currently
     returns meanTime in UTC hours and mean azimuth in degrees
     cf, which is the wavelength/2
@@ -1538,11 +1542,11 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         SNR L2 data, floats 
     s5 : numpy array
         SNR L5 data
-    s6 : numpy array
+    s6 : numpy array floats
         SNR L6 data
-    s7 : numpy array
+    s7 : numpy array floats
         SNR L7 data
-    s8 : numpy array
+    s8 : numpy array floats
         SNR L8 data
     sat : numpy array
         satellite number
@@ -1597,6 +1601,8 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     dat = []; x=[]; y=[]
 #   get scale factor
 #   added glonass, 101 and 102
+    if False:
+        print('frequency and satellite', f,sat)
     if (f == 1) or (f==101) or (f==201) or (f==301):
         dat = s1
     if (f == 2) or (f == 20) or (f == 102) or (f==302):
@@ -1616,17 +1622,25 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
 #   if not, frequency does not exist, will be tripped by Nv
 #   this does remove the direct signal component - but gets you ready to do that
     #print('cf before removeDC', cf,' freq and sat ', f, satNu)
-    if (satNu > 300):
+    if (satNu > 100):
         # check that there are even any data because this is crashing on files w/o SNR beidou data in them
         if (f == 307):
             if len(s7) > 0:
                 x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds) 
             else:
-                # set to empty
+                x=[]; y=[]; sat=[];azi=[];seconds=[];edot =[]
+        elif (f == 207):
+            if len(s7) > 0:
+                x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds)
+            else:
+                x=[]; y=[]; sat=[];azi=[];seconds=[];edot =[]
+        elif (f == 208):
+            if len(s8) > 0:
+                x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds)
+            else:
                 x=[]; y=[]; sat=[];azi=[];seconds=[];edot =[]
         else:
             x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds) 
-
     else:
         if (cf > 0):
             x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds) 

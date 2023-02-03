@@ -140,7 +140,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     pele : list of floats
         is the elevation angle limits for the polynomial removal.  units: degrees
     satsel : int
-        satellite number?
+        satellite number
     PkNoise : float
         peak to noise ratio for QC
     fortran : bool

@@ -116,22 +116,18 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
             if plot_screen: 
                 # no idea if this will work
                 fig, (ax1, ax2) = plt.subplots(2, 1,figsize=(10,7))
-                #axes = fig.subplots(2, 2)
-                #fig = Figure(figsize=(10,6))
             rj = 0
             gj = 0
             if screenstats: 
                 print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
 #   get the list of satellites for this frequency
             if onesat == None:
-                #satlist = g.find_satlist(f,snrE)
                 # added time dependent L2c and L5 satellite lists
                 satlist = g.find_satlist_wdate(f,snrE,year,doy)
-
             else:
-                satlist = onesat
-                if (int(satlist[0]) < 100) and (f > 100):
-                    print('wrong satellite name for this frequency')
+                # check that your requested satellite is the right frequency
+                satlist = onesat_freq_check(onesat,f )
+
             for satNu in satlist:
                 #if screenstats: print('Satellite', satNu)
                 for a in range(naz):
@@ -360,3 +356,41 @@ def read_json_file(station, extension):
     return lsp
 
 
+def onesat_freq_check(satlist,f ):
+    """
+    for a given satellite name - tries to determine
+    if you have a compatible frequency
+
+    Parameters
+    ----------
+    satlist : list 
+        integer
+    f : integer
+        frequency
+
+    Returns
+    -------
+    satlist : list
+        integer 
+    """
+    isat = int(satlist[0])
+    if (isat < 100):
+        if (f > 100):
+            print('wrong satellite name for this frequency:', f)
+            satlist = [] # ???
+    elif (isat >= 101) & (isat < 200):
+        if (f < 101) | (f > 102):
+            print('wrong satellite name for this frequency:', f)
+            satlist = [] # ???
+    elif (isat > 201) & (isat < 300):
+        if (f < 201) | (f > 208):
+            print('wrong satellite name for this frequency:', f)
+            satlist = [] # ???
+    elif (isat > 300) & (isat < 400):
+        if (f < 302) | (f > 307):
+            print('wrong satellite name for this frequency:', f)
+            satlist = [] # ???
+    else:
+        satlist= []
+
+    return satlist
