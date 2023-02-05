@@ -122,7 +122,7 @@ def myfavoriteobs():
 
 def myfavoritegpsobs():
     """
-    returns list of SNR obs needed for gfzrnx. 
+    returns list of GPS only SNR obs needed for gfzrnx. 
 
     """
     # can't have non-GPS obs if you ask for only GPS signals 

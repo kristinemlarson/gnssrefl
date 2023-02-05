@@ -317,7 +317,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         data[idc][satNu] = [px,pz]
                         datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
                         if screenstats:
-                            print('SUCCESS for Azimu {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:7.3f} '.format( avgAzim,satNu,UTCtime,maxF))
+                            print('SUCCESS for Azimu {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:7.3f} PkNoise {4:6.2f}'.format( avgAzim,satNu,UTCtime,maxF,maxAmp/Noise))
 
                     else:
                         # these are failed tracks

@@ -28,7 +28,8 @@ to people that won't know why the signal quality improved over night.
 
 ## GPS L5
 
-Another great signal.  I love it. That is all.
+Another great signal.  I love it. It does have a high chipping rate, which is 
+relevant (i.e. bad) for reflectomtry from very tall sites.
 
 ## Aliasing
 
@@ -100,6 +101,8 @@ I would be happy to host some results from L1C - please submit a pull request
 with the needed figures and a description of what you are comparing. I imagine
 this would require making two snr files - one with L1C and one with L1 C/A. 
 And using only the small subset of satellites that transmit L1C.
+From what I have seen, it is not much better than L1 C/A - which surprisees me.
+But I have to imagine it is receiver dependent (some receivers have terrible C/A SNR).  
 
 <HR>
 

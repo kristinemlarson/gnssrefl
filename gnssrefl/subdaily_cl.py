@@ -40,7 +40,7 @@ def parse_arguments():
     parser.add_argument("-peak2noise", default=None, type=float, help="new peak2noise constraint")
     parser.add_argument("-kplt", default=None, type=str, help="special plot for kristine")
     parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output")
-    parser.add_argument("-delta_out", default=None, type=int, help="Optional output interval, seconds")
+    parser.add_argument("-delta_out", default=None, type=int, help="Optional output interval for spline fit, seconds")
     parser.add_argument("-if_corr", default=None, type=str, help="Interfrequency correction applied, optional")
 
     args = parser.parse_args().__dict__
