@@ -53,19 +53,19 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     Parameters
     ----------
-    station : string
+    station : str
         4 or 9 character ID of the station.
 
-    year : integer
+    year : int
         Year
 
-    month : integer
+    month : int
         month
 
-    day : integer
+    day : int
         day
 
-    rate : string, optional
+    rate : str, optional
         sample rate. value options:
 
             low (default) : standard rate data
@@ -108,7 +108,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         Version of Rinex file. Default is 2.
         Value options  2 or 3 
 
-    strip : boolean, optional
+    strip : bool, optional
         Whether to strip only SNR observables.  Uses teqc or gfzrnx.
         Default is False.
 

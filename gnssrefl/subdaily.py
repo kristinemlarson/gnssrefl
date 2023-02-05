@@ -87,7 +87,7 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     plt.grid()
     g.save_plot(txtdir + '/' + station + '_rhdot1.png')
 
-def print_badpoints(t,outliersize,txtdir):
+def print_badpoints(t,outliersize,txtdir,real_residuals):
     """
     prints outliers to a file so you can look at them separately
 
@@ -117,7 +117,7 @@ def print_badpoints(t,outliersize,txtdir):
     if (m > 0):
         for i in range(0,m):
             fout.write('doy {0:3.0f} sat {1:3.0f} azim {2:6.2f} fr {3:3.0f} pk2noise {4:5.1f} residual {5:5.2f} \n'.format( 
-                t[i,1], t[i,3],t[i,5], t[i,10], t[i,13], outliersize[i] ))
+                t[i,1], t[i,3],t[i,5], t[i,10], t[i,13], real_residuals[i] ))
         fout.close()
     else:
         print('no outlier points to write to a file')
@@ -379,6 +379,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     # make arrays to save number of RH retrievals on each day
     residuals = np.empty(shape=[0,1])
+    real_residuals = np.empty(shape=[0,1])
     nval = []; tval = []; y = tv[0,0];  
     # constellation spec number of values
     Cval=[]; Gval =[]; Rval=[]; Eval=[]
@@ -405,7 +406,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             newl = [dtime, rhavg, rhstd]
             stats = np.append(stats, [newl], axis=0)
             b = ( tv[ii,2] - rhavg*np.ones( len(tv[ii,2]) ))/ rhstd
+            bb =  tv[ii,2] - rhavg*np.ones( len(tv[ii,2]) )
             residuals = np.append(residuals, b)
+            real_residuals = np.append(real_residuals, bb)
             Gval = np.append(Gval, len(tmp[gi,1]))
             Eval = np.append(Eval, len(tmp[ei,1]))
             Rval = np.append(Rval, len(tmp[ri,1]))
@@ -427,7 +430,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs)
             two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2)
             stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt)
-            print_badpoints(tv[ii,:],residuals[ii],txtdir)
+            print_badpoints(tv[ii,:],residuals[ii],txtdir,real_residuals[ii])
         else:
             # make both plots cause life is short
             rh_plots(otimes,tv,station,txtdir,year,d1,d2,True)
@@ -811,12 +814,26 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
         make extra plot for kristine
     """
     fs = 10
+    otimesarray = np.asarray(otimes)
+    # new plot 
+    plt.figure()
+    plt.plot(tv[:,5],tv[:,2], '.',markersize=4,label='obs')
+    plt.plot(tv[ii,5],tv[ii,2], 'ro',markersize=4,label='outliers')
+    plt.xlabel('Azimuth (degrees)')
+    plt.ylabel('Reflector Height (m)')
+    plt.gca().invert_yaxis()
+    plt.legend(loc="best")
+    plt.grid()
+    plotname = txtdir + '/' + station + '_outliers_wrt_az.png'
+    plt.savefig(plotname,dpi=150)
+    print('png file saved as: ', plotname)
+
     fig = plt.figure()
     colors = tv[:,5]
 # put some amplitude information on it
 # ax.plot( otimes, tv[:,2], '.')
 # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
-    otimesarray = np.asarray(otimes)
+
 
     ax1 = fig.add_subplot(211)
     plt.plot(otimes,tv[:,2], '.',color='gray',label='arcs')

@@ -16,22 +16,22 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
 
     Parameters
     ----------
-    station : string
+    station : str
         station name
 
-    year : integer
+    year : int
         full year
 
-    month1 : integer
+    month1 : int
         starting month
 
-    month2 : integer
+    month2 : int
         ending month
 
-    datum : string
+    datum : str
         water datum
 
-    metadata : boolean
+    metadata : bool
         whether you want the metadata printed to the screen
 
     tt : numpy array 
@@ -43,7 +43,7 @@ def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slev
     slevel : numpy array of floats
         water level in meters
 
-    csv : boolean
+    csv : bool
         True if csv output wanted (default is False)
 
     Returns
@@ -90,15 +90,15 @@ def multimonthdownload(station,datum,fout,year1,year2,month1,month2,csv):
 
     Parameters
     ----------
-    station : string
+    station : str
         NOAA station name
 
-    datum : string
+    datum : str
         definition of water level datum
 
     fout - fileID for writing results
 
-    year1 : integer
+    year1 : int
         year when first measurements will be downloaded
 
     month1 : integer
