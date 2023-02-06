@@ -57,28 +57,30 @@ EarthScope staff will help participants set up and install Jupyter notebooks, py
 * readthedocs : https://gnssrefl.readthedocs.io/en/latest/
 
 ## Instructors, affiliation, and domain expertise:  
-* Kristine Larson (University of Bonn) GNSS-IR, gnssrefl software
-* Felipe Nievinski (Uni. Federal do Rio Grande do Sul - Brazil) Theory, snow, water levels
+* Kristine Larson (University of Bonn, Germany) GNSS-IR, gnssrefl software
+* Felipe Nievinski (Uni. Federal do Rio Grande do Sul - Brazil) Theory, water levels, sensors
 * Makan Karegar (Uni. Bonn- Germany) cheap GNSS-IR sensors, water levels 
 * Simon Williams (Nat. Ocean Ctr.- UK) water levels, tides, cheap GNSS-IR sensors
 * David Purnell (Laval University - Canada) water levels, cheap GNSS-IR sensors
-* Rebecca Kramer?- (USGS - USA) Lakes
+* Rebecca Kramer?- (USGS - USA) Lakes (to be confirmed)
 * Kelly Enloe (EarthScope - USA) – Jupyter notebooks, python, gnssrefl software
 * Tim Dittmann (EarthScope - USA) – python, gnssrefl software
-
-## Homework and Videos
-A GNSS-IR Instructional Playlist can be found [here](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n), including a 
-welcome and overview to the course from Kristine Larson, as well as instructions on how to install and run the software.
-
+* Thomas Nylen (Danish Technical University, Denmark) - installing GNSS sites for GNSS-IR
+* Sajad Tabibi (Luxembourg University) - snow (to be confirmed)
 
 **These must be revised**
 
-Homeworks – Command line version:
-https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks
+## Homework and Videos
+A GNSS-IR Instructional Playlist can be 
+found [here](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n), including a 
+some (out of date) videos on how to install and run the software.
 
-Homeworks – Jupyter notebook version:
+Getting Started – Command line version:
+
+add  link 
+
+Getting Started – Juptyer Notebook version:
+
 https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter
 
-## Questions
-Please contact **todo: whom?**
 

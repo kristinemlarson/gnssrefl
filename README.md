@@ -9,6 +9,8 @@
 
 New [snowdepth utility](docs/pages/README_snowdepth.md).
 
+New discussion page started about [modern GNSS signals](docs/pages/signal_issues.md).
+
 Specific azimuth regions can now be added at the command line. Use -azlist in <code>make_json_input</code> 
 
 There is a new Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
