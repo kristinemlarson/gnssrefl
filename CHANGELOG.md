@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## 1.2.16
 
 Added reflector height plot in subdaily that shows the results with respect to 
-azimuth. Should hopefully make it easier to track down azimuth issues.
+azimuth. Should hopefully make it easier to track down azimuth issues for a mask.
+
+Upon request, subdaily writes out evenly sampled RH values for the last spline fit.
 
 ## 1.2.15
 

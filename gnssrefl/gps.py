@@ -4452,7 +4452,9 @@ def ymd_hhmmss(year,doy,utc,dtime):
     day = int(d.day)
     hour = int(np.floor(utc))
     minute = int ( np.floor(60* ( utc- hour )))
-    second = int(utc*3600 - (hour*3600 + minute*60))
+    #second = int(utc*3600 - (hour*3600 + minute*60))
+    second = round(utc*3600 - (hour*3600 + minute*60))
+    #print(second, utc*3600 - (hour*3600 + minute*60))
     if second == 60:
         second = 0
         minute = minute + 1

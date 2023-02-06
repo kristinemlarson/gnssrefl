@@ -1450,17 +1450,23 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
             # how many values you want in the linspace world
             numvals = 1 + int(ndays*86400/delta_out)
             # this should be fractional doy
-            tplot = np.linspace(s1, s2, numvals)
+            tplot = np.linspace(s1, s2, numvals,endpoint=True)
+            #print(s1,s2,numvals)
             spline_even = spline(tplot)
             N = len(tplot)
             # but you only want those values when we have data ....
-            splinefileout =  txtdir + '/' + station + '_spline_out.txt'
+            splinefileout =  txtdir + '/' + station + '_' + str(iyear) + '_spline_out.txt'
             print('Writing evenly sampled file to: ', splinefileout)
             fout = open(splinefileout,'w+')
+            dtime = False
             for i in range(0,N):
                 modjul = g.fdoy2mjd(iyear,tplot[i])
+                doy = math.floor(tplot[i])
+                utc= 24*(tplot[i] - doy)
+                bigt,yy,mm,dd,hh,mi,ss = g.ymd_hhmmss(iyear,doy,utc,dtime)
                 if (tplot[i] > firstpoint) & (tplot[i] < lastpoint):
-                    fout.write('{0:15.7f}  {1:10.3f} \n'.format(modjul, spline_even[i]))
+                    fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} \n'.format(modjul, 
+                        spline_even[i], yy,mm,dd,hh,mi,ss))
             fout.close()
 
     if  False:
