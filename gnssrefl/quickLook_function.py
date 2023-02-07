@@ -17,103 +17,11 @@ import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rinex
 
 
-def read_snr_simple(obsfile):
-    """
-    Loads the data from a SNR file into memory 
-
-    Parameters
-    ----------
-    obsfile : string
-        name of the SNR file
-
-    Returns
-    -------
-    allGood :  int
-        one for all is well, zero is for all is bad
-    sat : numpy array of floats
-        satellite numbers
-    ele  : numpy array of floats
-        elevation angle (deg)
-    azi : numpy array of float 
-        azimuth (deg)
-    t  : numpy array of floats
-        seconds of the day (no leap seconds)
-    edot : numpy array of floats
-        derivative of elevation angle wrt time deg/sec
-    s1 : numpy array of floats
-        L1 SNR
-    s2 : numpy array of floats 
-        L2 SNR
-    s5 :  numpy array of floats 
-        L5 SNR
-    s6 :  numpy array of floats
-        L6 SNR
-    s7 :  numpy array of floats
-        L7 SNR 
-    s8 :  numpy array of floats
-        L8 SNR
-    snrE : numpy array of booleans 
-        whether SNR exists 
-
-    """
-#   defaults so all returned vectors have something stored in them
-    sat=[]; ele =[]; azi = []; t=[]; edot=[]; s1=[];
-    s2=[]; s5=[]; s6=[]; s7=[]; s8=[];
-    snrE = np.array([False, True, True,False,False,True,True,True,True],dtype = bool)
-#   
-    allGood = 1
-    try:
-        f = np.genfromtxt(obsfile,comments='%')
-        r,c = f.shape
-        # put in a positive elev mask
-        i= f[:,1] > 0
-        f=f[i,:]
-
-        #print('read_snr_simple, Number of rows:', r, ' Number of columns:',c)
-        sat = f[:,0]; ele = f[:,1]; azi = f[:,2]; t =  f[:,3]
-        edot =  f[:,4]; s1 = f[:,6]; s2 = f[:,7]; s6 = f[:,5]
-        # 
-        s1 = np.power(10,(s1/20))  
-        s2 = np.power(10,(s2/20))  
-        s6 = s6/20; s6 = np.power(10,s6)  
-#   make sure s5 has default value?
-        s5 = []
-        if c > 8:
-            s5 = f[:,8]
-            if (sum(s5) > 0):
-                s5 = s5/20; s5 = np.power(10,s5)  
-            #print(len(s5))
-        if c > 9:
-            s7 = f[:,9]
-            if (sum(s7) > 0):
-                s7 = np.power(10,(s7/20))  
-            else:
-                s7 = []
-        if c > 10:
-            s8 = f[:,10]
-            if (sum(s8) > 0):
-                s8 = np.power(10,(s8/20))  
-            else:
-                s8 = []
-        if (np.sum(s5) == 0):
-            snrE[5] = False; #print('no s5 data')
-        if (np.sum(s6) == 0):
-            #print('no s6 data'); 
-            snrE[6] = False
-        if (np.sum(s7) == 0):
-           # print('no s7 data'); 
-            snrE[7] = False
-        if (np.sum(s8) == 0):
-            snrE[8] = False; # print('no s8 data')
-    except:
-        print('problem reading the SNR file')
-        allGood = 0
-    return allGood, sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE
-
-
 def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,ediff,**kwargs):
     """
-    takes in all users inputs and calculates reflector heights. Makes png files.
+    This is the main function to compute spectral characteristics of a SNR file.
+    It takes in all user inputs and calculates reflector heights. It makes two png files to summarize
+    the data.
 
     Parameters
     ----------
@@ -155,8 +63,6 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
          QC parameter - restricts length of arcs (degrees)
 
     """
-
-    #print('ediff',ediff)
 
     screenstats = kwargs.get('screenstats',False)
     if screenstats:
@@ -487,5 +393,95 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
     print('plot saved to ', f)
     plt.savefig(f)
 
+def read_snr_simple(obsfile):
+    """
+    Loads the data from a SNR file into memory 
 
+    Parameters
+    ----------
+    obsfile : string
+        name of the SNR file
 
+    Returns
+    -------
+    allGood :  int
+        one for all is well, zero is for all is bad
+    sat : numpy array of floats
+        satellite numbers
+    ele  : numpy array of floats
+        elevation angle (deg)
+    azi : numpy array of float 
+        azimuth (deg)
+    t  : numpy array of floats
+        seconds of the day (no leap seconds)
+    edot : numpy array of floats
+        derivative of elevation angle wrt time deg/sec
+    s1 : numpy array of floats
+        L1 SNR
+    s2 : numpy array of floats 
+        L2 SNR
+    s5 :  numpy array of floats 
+        L5 SNR
+    s6 :  numpy array of floats
+        L6 SNR
+    s7 :  numpy array of floats
+        L7 SNR 
+    s8 :  numpy array of floats
+        L8 SNR
+    snrE : numpy array of booleans 
+        whether SNR exists 
+
+    """
+#   defaults so all returned vectors have something stored in them
+    sat=[]; ele =[]; azi = []; t=[]; edot=[]; s1=[];
+    s2=[]; s5=[]; s6=[]; s7=[]; s8=[];
+    snrE = np.array([False, True, True,False,False,True,True,True,True],dtype = bool)
+#   
+    allGood = 1
+    try:
+        f = np.genfromtxt(obsfile,comments='%')
+        r,c = f.shape
+        # put in a positive elev mask
+        i= f[:,1] > 0
+        f=f[i,:]
+
+        #print('read_snr_simple, Number of rows:', r, ' Number of columns:',c)
+        sat = f[:,0]; ele = f[:,1]; azi = f[:,2]; t =  f[:,3]
+        edot =  f[:,4]; s1 = f[:,6]; s2 = f[:,7]; s6 = f[:,5]
+        # 
+        s1 = np.power(10,(s1/20))  
+        s2 = np.power(10,(s2/20))  
+        s6 = s6/20; s6 = np.power(10,s6)  
+#   make sure s5 has default value?
+        s5 = []
+        if c > 8:
+            s5 = f[:,8]
+            if (sum(s5) > 0):
+                s5 = s5/20; s5 = np.power(10,s5)  
+            #print(len(s5))
+        if c > 9:
+            s7 = f[:,9]
+            if (sum(s7) > 0):
+                s7 = np.power(10,(s7/20))  
+            else:
+                s7 = []
+        if c > 10:
+            s8 = f[:,10]
+            if (sum(s8) > 0):
+                s8 = np.power(10,(s8/20))  
+            else:
+                s8 = []
+        if (np.sum(s5) == 0):
+            snrE[5] = False; #print('no s5 data')
+        if (np.sum(s6) == 0):
+            #print('no s6 data'); 
+            snrE[6] = False
+        if (np.sum(s7) == 0):
+           # print('no s7 data'); 
+            snrE[7] = False
+        if (np.sum(s8) == 0):
+            snrE[8] = False; # print('no s8 data')
+    except:
+        print('problem reading the SNR file')
+        allGood = 0
+    return allGood, sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE

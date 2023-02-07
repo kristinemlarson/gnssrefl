@@ -612,6 +612,7 @@ def getsp3file(year,month,day):
 
 def getsp3file_flex(year,month,day,pCtr):
     """
+    retrieves sp3files
     returns the name of the orbit file and its directory from CDDIS
     only gets the old-style filenames
 

@@ -1,5 +1,9 @@
 # quickLook <a name="module2"></a>
 
+*As of February 7, 2023: the default maximum Reflector Height has been changed to 8 meters (from 6 meters) since
+this documentation was written. The amplitudes of the four periodogram quadrants are also now set to the same limits.*
+
+
 Before using <code>gnssir</code>code, I recommend you use <code>quickLook</code>. This allows you
 to quickly test various options (elevation angles, frequencies, azimuths, and quality control 
 parameters). The required inputs are station name, year, and doy of year. **You must have 

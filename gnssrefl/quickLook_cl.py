@@ -26,7 +26,7 @@ def parse_arguments():
     parser.add_argument("-e1",  default=None, type=int, help="lower limit elevation angle (default is 5 deg) ")
     parser.add_argument("-e2",  default=None, type=int, help="upper limit elevation angle (default is 25 deg)")
     parser.add_argument("-h1",  default=None, type=float, help="lower limit reflector height (default is 0.5m) ")
-    parser.add_argument("-h2",  default=None, type=float, help="upper limit reflector height (default is 6 m)")
+    parser.add_argument("-h2",  default=None, type=float, help="upper limit reflector height (default is 8 m)")
     parser.add_argument("-azim1",  default=None, type=float, help="lower limit azimuth (default is 0 deg)")
     parser.add_argument("-azim2",  default=None, type=float, help="upper limit azimuth (default is 360 deg)")
     parser.add_argument("-sat", default=None, type=int, help="satellite")
@@ -48,7 +48,7 @@ def parse_arguments():
 
 def quicklook(station: str, year: int, doy: int,
               snr: int = 66, fr: int = 1, ampl: float = 7.,
-              e1: int = 5, e2: int = 25, h1: float = 0.5, h2: float = 6., sat: int = None,
+              e1: int = 5, e2: int = 25, h1: float = 0.5, h2: float = 8., sat: int = None,
               peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
               plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0):
     """
@@ -146,7 +146,6 @@ def quicklook(station: str, year: int, doy: int,
 
     if exitS:
         sys.exit()
-
 
     # set some reasonable default values for LSP (Reflector Height calculation).
     # most of these can be overriden at the command line

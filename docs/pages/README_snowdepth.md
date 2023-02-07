@@ -33,15 +33,16 @@ python, we would be happy to add it to this respository. Please contact us direc
 PBO H2O snow depth products were based on L2C data. This utility allows multi-GNSS retrievals.
 For further reading, [search for the word snow on this page](https://www.kristinelarson.net/publications/).
 
-If you are interested to compare your GNSS-IR results with SNODAS or SNOTEL, 
-I stumbled upon [this repository](https://github.com/dshean/snowtools) that 
-can help you download these data. **However**, there are no SNOTEL data that will agree with GNSS-IR because they do not 
-have the same footprint. Furthermore, the two sensors are rarely close enough to each other or in the same treecover. SNODAS is a 
-**model** - and for that reason alone you should never expect it to agree with GNSS-IR.
+You might be interested to compare your GNSS-IR results with 
+SNODAS or [SNOTEL](https://data.nal.usda.gov/dataset/snowpack-telemetry-network-snotel).
+**However**, there are no SNOTEL data that will agree with GNSS-IR because they do not 
+have the same footprint. Furthermore, the two sensors are rarely close enough to 
+each other or in the same treecover. SNODAS is a **model** - and for that reason alone 
+you should never expect it to agree with GNSS-IR.
 
 There are certainly other ways you can convert reflector heights to snow depth. And 
 some of the L1 reflector height retrievals from some receivers are extremely problematic.  
 When you see large gaps at PBO sites in winter this is most likely because the site was 
 not designed to operate when snow covers the solar panels. In other cases the GPS receiver failed and was 
-not repaired until the following spring. GPS/GNSS can of course operate throughout the winter - but it does 
-require that be a design goal. 
+not repaired until the following spring. GPS/GNSS instruments can of course operate throughout the winter - but it does 
+require that that be a design goal. 

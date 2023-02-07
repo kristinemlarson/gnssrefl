@@ -29,13 +29,13 @@ Right now the default frequencies are GPS only, e.g. L1, L2C and L5.
 
 The json file of instructions will be put in $REFL_CODE/input/p101.json. You should look at 
 it to get an idea of the kinds of inputs the code uses.
-The default azimuths can be changed, but this needs to be done by hand. Some parameters can be set
+The default azimuths can be changed. Some parameters can be set
 via the command line, as in:
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10</CODE>
 
 This changes elevation angles to 5-10 degrees. The default is to only use GPS 
-frequencies, specifically L1, L2C, and L5. If you want all GNSS frequencies:
+frequencies, specifically L1, L2C, and L5. If you want all GNSS frequencies (GPS, Glonass, Galileo, Beidou):
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -allfreq True</CODE>
 
@@ -55,13 +55,12 @@ To use GPS L2C, require a spectral amplitude of 10, and spectral peak to noise r
 
 Azimuth regions should not be larger than ~100 degrees. If for example you want to use the region from 0 to 
 270 degrees, you should not set a region from 0 - 270, but instead a region from 0-90, 90-180, and the last
-from 180-270. 
+from 180-270. I know this is a bit offputting for people, but having these smaller regions makes the code
+easier to maintain (i.e. you are less likely to have more than one rising and setting arc for a single satellite).
 
 <CODE>make_json_input p101 41.692 -111.236 2016.1 -e1 5 -e2 10 -l2c True -ampl 10 -peak2noise 3 -azlist 0 90 90 180 180 270</CODE>
 
-This is necessary to make sure you don't mix rising and setting satellite arcs from different 
-times of day. I believe the code currently refuses to let you use a region larger than 100 degrees. The default
-is to allow four regions, each of 90 degrees.  
+The default is to allow four regions, each of 90 degrees.  
 
 Other things that are helpful to know for the make_json_input inputs:
 
