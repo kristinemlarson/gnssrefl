@@ -20,8 +20,8 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 cd into the local directory that you wish to keep your processed results
 
 <PRE>
-docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ \ 
--v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files \
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  
+-v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files 
 --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
 </PRE>
 
@@ -44,9 +44,9 @@ into <code>refl_code/rinex/station/yyyy/</code>, where station is the lowercase 
 You should then mount that directory in the docker run command as follows: 
 
 <PRE>
-docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ \
--v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/  \
--v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ \
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ 
+-v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/  
+-v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ 
 --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
 </PRE>
 
