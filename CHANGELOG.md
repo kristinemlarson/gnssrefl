@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.17
+
+Require RH constraints (set in make_json_input or by hand) and then invoked 
+by gnssir **must** be at least 5 meters apart. These are used for the periodogram 
+and for quality control. Sometimes people think this setting is only for outliers.  Outliers can still be 
+removed in **subdaily** with RH constraints.  For now I am going to continue allowing this kind of 
+constraint in **quickLook**, but eventually I may remove it there too.  
+
 ## 1.2.16
 
 Added reflector height plot in subdaily that shows the results with respect to 
