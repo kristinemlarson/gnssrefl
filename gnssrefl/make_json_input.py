@@ -52,8 +52,8 @@ def parse_arguments():
 
 
 def make_json(station: str, lat: float, long: float, height: float, e1: int = 5, e2: int = 25,
-              h1: float = 0.5, h2: float = 6.0, nr1: float = None, nr2: float = None,
-              peak2noise: float = 2.7, ampl: float = 6.0, allfreq: bool = False,
+              h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None,
+              peak2noise: float = 2.8, ampl: float = 5.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
               extension: str = None, ediff: float=2.0, delTmax: float=75.0, azlist: float=[], frlist: float=[] ):
 
@@ -179,6 +179,10 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
 
     if h1 > h2:
         print(f'h1 cannot be greater than h2. You have set h1 to {h1} and h2 to {h2}. Exiting.')
+        sys.exit()
+
+    if ( (h2-h1)  < 5):
+        print(f'h2-h1 must be at least 5 meters apart. You have set h1 to {h1} and h2 to {h2}. Exiting.')
         sys.exit()
 
     lsp['minH'] = h1

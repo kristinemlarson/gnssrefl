@@ -189,6 +189,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     if delTmax is not None:
         lsp['delTmax'] = delTmax
 
+    if ((lsp['maxH'] - lsp['minH']) < 5):
+        print('Requested reflector heights (', lsp['minH'], ',', lsp['maxH'], ') are too close together. Exiting.')
+        print('They must be at least 5 meters apart - and preferably further than that.')
+        sys.exit()
+
     # compress is False unless user changes
     lsp['wantCompression'] = compress
 

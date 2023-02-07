@@ -1160,9 +1160,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     if_corr = kwargs.get('if_corr',True)
     if if_corr:
-        apply_corr = True
+        apply_if_corr = True
     else:
-        apply_corr = False
+        apply_if_corr = False
 
     #print('output directory: ', txtdir)
 
@@ -1360,6 +1360,10 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
             sig = float(np.std(ret))
             print('{0:3.0f} {1:7.3f} {2:7.3f} {3:6.0f}'.format (f, bias, sig, len(ret) ) )
 
+
+    if not apply_if_corr:
+        print('You chose not to correct for IF biases. Exiting')
+        return tvd_new, correction
 
     # now try to write the bias corrected values
     # first attempt was wrong because i forgot to sort the corrected column in biasCorrected_RH
