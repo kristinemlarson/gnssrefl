@@ -11,6 +11,8 @@ and for quality control. Sometimes people think this setting is only for outlier
 removed in **subdaily** with RH constraints.  For now I am going to continue allowing this kind of 
 constraint in **quickLook**, but eventually I may remove it there too.  
 
+Changed make_json_input default max RH to 8 meters.  Slight change to peak2noise default.
+
 ## 1.2.16
 
 Added reflector height plot in subdaily that shows the results with respect to 
