@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.18
+
+Changed default RH max in quickLook to 8 meters.
+
 ## 1.2.17
 
 Require RH constraints (set in make_json_input or by hand) and then invoked 

@@ -22,6 +22,7 @@ def parse_arguments():
     parser.add_argument('-azim1', help='start azimuth (default is 0, negative values allowed) ', type=int,default=None)
     parser.add_argument('-azim2', help='end azimuth (default is 360) ', type=int,default=None)
     parser.add_argument('-el_list', nargs="*",type=float,  help='elevation angle list, e.g. 5 10 15  (default)')
+    parser.add_argument('-az_sectors', nargs="*",type=float,  help='flexible azimuth angle list, e.g. 0 90 270 360, but must be positive ')
     parser.add_argument('-system', help='default=gps, options are galileo, glonass, beidou', type=str)
     parser.add_argument('-output', help='output filename. default is the station name with kml extension', type=str,default=None)
 
@@ -30,7 +31,8 @@ def parse_arguments():
 
     return {key: value for key, value in args.items() if value is not None}
 
-def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, el_height: float=None, RH: str=None, fr: int = 1, el_list: float= [5, 10, 15],system: str = 'gps', output: str = None):
+def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, el_height: float=None, 
+        RH: str=None, fr: int = 1, el_list: float= [5, 10, 15], az_sectors : float=[], system: str = 'gps', output: str = None):
     """
     creates KML file for reflection zones to be used in Google Earth
 
@@ -58,8 +60,11 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     fr : int
         frequency (1,2, or 5 allowed)
 
-    el_list : list of float 
+    el_list : list of floats
         elevation angles desired (deg)
+
+    az_sectors : list of floats (optional)
+        azimuth angle regions (deg) Must be in pairs, i.e. 0 90 180 270
 
     system : str
         name of constellation (gps,glonass,galileo, beidou allowed)
@@ -67,12 +72,14 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     output : str
         name for kml file, i.e. if you input test, the filename will be test.kml
 
+
     Returns
     -------
     Creates a KML file
 
     """
     print(azim1,azim2)
+    print(az_sectors)
     # check that you have the files for the orbits on your local system
     foundfiles = rf.save_reflzone_orbits()    
     if not foundfiles:
@@ -111,7 +118,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         sys.exit()
 
     if h > 300:
-        print('This is a very large reflector height value.', h, ' Exiting.')
+        print('This is a very large reflector height value:', round(h,2), '(m). Try setting RH. Exiting.')
         sys.exit()
 
     print('Reflector height (m) ', np.round(h,3))
@@ -127,7 +134,29 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     recv=np.array([x,y,z])
     # calculate rising and setting arcs for this site and the requested constellation
     azlisttmp= rf.rising_setting_new(recv,el_list,obsfile)
-    azlist = rf.set_final_azlist(azim1,azim2,azlisttmp)
+    if len(az_sectors) == 0:
+        print('Using one set of azimuths') 
+        azlist = rf.set_final_azlist(azim1,azim2,azlisttmp)
+    else:
+        NL = len(az_sectors)
+        if (np.mod(NL,2) != 0):
+            print('Your azimuth sector list does not have pairs of azimuths. Exiting')
+            sys.exit()
+        for ii in range(0,NL):
+            if (az_sectors[ii] < 0):
+                print('Negative azimuths not allowed. Exiting')
+                sys.exit()
+            if (az_sectors[ii] > 360):
+                print('Azimuths greater than 360 not allowed. Exiting')
+                sys.exit()
+
+        for ii in range(0,int(NL/2)):
+            if (az_sectors[ii*2] > az_sectors[ii*2+1]):
+                print('Sectors must have increasing azimuth values. Exiting')
+                sys.exit()
+
+        print('Using sectors')
+        azlist = rf.set_azlist_multi_regions(az_sectors,azlisttmp)
 
     # figure out where the output will go
     # changed it so it  goes to a subdirectory called "kml" by default 

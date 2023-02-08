@@ -183,19 +183,6 @@ def makeEllipse_latlon(freq,el,h,azim,latd,lngd):
 
     return lngnew, latnew
 
-
-def ref_azel(satv,recv,up):
-    """
-    send satv and recv as three vectors
-    up is a unit vector pointing up
-    need East and North as well apparently
-    """
-    r=np.subtract(satv,recv) # satellite minus receiver vector
-    eleA = g.elev_angle(up, r)*180/np.pi
-    azimA = g.azimuth_angle(r, East, North)
-    return True
-
-
 def set_final_azlist(a1ang,a2ang,azlist):
     """
     edits initial azlist to restrict to given azimuths
@@ -207,7 +194,7 @@ def set_final_azlist(a1ang,a2ang,azlist):
     a2ang : float
         maximum azimuth (degrees)
     azlist : list of floats 
-        list of tracks, [azimuth,  ]
+        list of tracks, [azimuth angle, satNumber, elevation angle ]
 
     Returns
     -------
@@ -227,6 +214,37 @@ def set_final_azlist(a1ang,a2ang,azlist):
         azlist = azlist[kk,:]
 
     return azlist
+
+
+def set_azlist_multi_regions(sectors,azlist):
+    """
+    edits initial azlist to restrict to given azimuth sectors.
+    assumes that illegal list of sectors have been checked (i.e.
+    no negative azimuths, they should be pairs, and increasing)
+
+    Parameters
+    ----------
+    sectors: list of floats
+        min and max azimuth (degrees). Must be in pairs, no negative numbers
+    azlist : list of floats
+        list of tracks, [azimuth angle, satNumber, elevation angle ]
+
+    Returns
+    -------
+    azlist2 : list of floats
+         same format as before, but with azimuths removed outside the restricted zones
+
+    """
+    npairs = int(len(sectors)/2)
+    azlist2 = np.empty(shape=[0, 3])
+    for n in range(0,npairs):
+        a1 = sectors[n*2] # min azim of sector
+        a2 = sectors[n*2+1] # max zzim of sector
+        kk = (azlist[:,0] > a1) & (azlist[:,0] < a2)
+        azlistsec = azlist[kk,:]
+        azlist2 = np.vstack((azlist2, azlistsec))
+
+    return azlist2
 
 def calcAzEl_new(prn, newf,recv,u,East,North):
     """
@@ -271,44 +289,6 @@ def calcAzEl_new(prn, newf,recv,u,East,North):
     nr,nc=tv.shape
     return tv
 
-def calcAzEl_newish(prn, newf,recv,u,East,North):
-    """
-    function to gather azel for all low elevation angle data
-    this is used in the reflection zone mapping tool
-
-    is this used?
-
-    Parameters
-    ----------
-    prn : int
-        satellite number
-    newf : 3 vector of floats
-        cartesian coordinates of the satellite (meters)
-    recv : 3 vector of floats
-        receiver coordinates (meters)
-    u : 3 vector
-        cartesian unit vector for up
-    East : 3 vector
-        cartesian unit vector for east direction
-    North : 3 vector
-        cartesian unit vector for north direction
-
-    """
-    tv = np.empty(shape=[0, 4])
-    # number of values
-    NV = len(newf)
-    for t in range(0,NV):
-        satv= [newf[t,2], newf[t,3],newf[t,4]]
-        etime = newf[t,1]
-        r=np.subtract(satv,recv) # satellite minus receiver vector
-        eleA = g.elev_angle(u, r)*180/np.pi
-        if ( (eleA >= 0) & (eleA <= 20)):
-            azimA = g.azimuth_angle(r, East, North)
-#            print(etime, eleA, azimA)
-            newl = [prn, eleA, azimA, etime]
-            tv = np.append(tv, [newl],axis=0)
-    nr,nc=tv.shape
-    return tv
 
 def rising_setting_new(recv,el_range,obsfile):
     """

@@ -28,8 +28,8 @@ We will compare that value with the estimated reflector height.
 ### Make a SNR file 
 
 Because the GNSS station is ~12 meters above the water, we are too close to the L1 Nyquist 
-for a receiver that is sampling at 30 seconds.  I recommend using the 15 second files that BFG started 
-producing in summer 2022. Make the following choices:
+for a receiver that is sampling at 30 seconds.  **I strongly urge you to use the 15 second files** that BFG started 
+producing in summer 2022. If you use the 30 second files, some of your solutions will be inaccurate. Make the following choices:
 
 - station tggo00deu (the longer station name will tell the code to find RINEX 3 instead of RINEX 2.11)
 - archive bfg
