@@ -78,8 +78,6 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     Creates a KML file
 
     """
-    print(azim1,azim2)
-    print(az_sectors)
     # check that you have the files for the orbits on your local system
     foundfiles = rf.save_reflzone_orbits()    
     if not foundfiles:

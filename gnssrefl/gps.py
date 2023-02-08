@@ -5122,7 +5122,10 @@ def queryUNR_modern(station):
     nfile2_exist = os.path.isfile(nfile2)
 
     if (nfile1_exist) or (nfile2_exist):
-        print('found the UNR database')
+        iii = 0
+        #print('found the UNR database')
+    else:
+        print('did not find the UNR database')
 
     if (not nfile1_exist) and (not nfile2_exist):
         url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/station_pos.db'
