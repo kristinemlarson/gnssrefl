@@ -85,16 +85,16 @@ Docker run commands have slightly different syntax to accomodate windows directo
 Windows Power Shell:
 
 <PRE>
-docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ \
--v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files \
+docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ `
+-v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files `
 --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
 </pre>
 
 Windows Command Line:
 
 <PRE>
-docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ \
--v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files \
+docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ ^
+-v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files ^
 --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
 </pre>
 
