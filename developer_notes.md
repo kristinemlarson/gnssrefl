@@ -4,6 +4,8 @@ Use 1.5.1 as an sample version number
 
 - change the version number in setup.py.  
 
+- change the version in the README.md
+
 - change the version number in CHANGELOG.md and provide 
 a description of the main changes in this new version.
 
