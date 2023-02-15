@@ -32,7 +32,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, el_height: float=None, 
-        RH: str=None, fr: int = 1, el_list: float= [5, 10, 15], az_sectors : float=[], system: str = 'gps', output: str = None):
+        RH: str=None, fr: int = 1, el_list: float= [], az_sectors : float=[], system: str = 'gps', output: str = None):
     """
     creates KML file for reflection zones to be used in Google Earth
 
@@ -120,11 +120,23 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         sys.exit()
 
     print('Reflector height (m) ', np.round(h,3))
+
+    # set the default
+    if len(el_list) == 0:
+        el_list = [5, 10, 15]
     
     if len(el_list) > 5:
         el_list = el_list[0:5]
-        #print('elevation angle is',el_list)
         print('Elevation angle list is very long - reducing to five.')
+
+    emax = 31 # degrees for now
+
+    print(all(x < 50 for x in el_list))
+
+    if not (all(x < emax for x in el_list)):
+        print('Right now we have an emax of 30 degrees. Resubmit your request.')
+        sys.exit()
+
 
     obsfile = rf.set_system(system)
     print('The code should use this orbit file: ', obsfile)

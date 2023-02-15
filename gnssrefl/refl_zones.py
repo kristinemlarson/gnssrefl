@@ -281,7 +281,9 @@ def calcAzEl_new(prn, newf,recv,u,East,North):
         etime = newf[t,1]
         r=np.subtract(satv,recv) # satellite minus receiver vector
         eleA = g.elev_angle(u, r)*180/np.pi
-        if ( (eleA >= 0) & (eleA <= 26)):
+        # change from 26 to 31 so at least 30 degrees is supported
+        #if ( (eleA >= 0) & (eleA <= 26)):
+        if ( (eleA >= 0) & (eleA <= 31)):
             azimA = g.azimuth_angle(r, East, North)
 #            print(etime, eleA, azimA)
             newl = [prn, eleA, azimA]
@@ -328,6 +330,7 @@ def rising_setting_new(recv,el_range,obsfile):
         tvsave=calcAzEl_new(prn, newf,recv,u,East,North)
         nr,nc=tvsave.shape
         for e in el_range:
+            #print('elevation angle: ', e)
             el = tvsave[:,1] - e
             for j in range(0,nr-1):
                 az = round(tvsave[j,2],2)
