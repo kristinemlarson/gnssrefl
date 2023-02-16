@@ -166,6 +166,16 @@ def quicklook(station: str, year: int, doy: int,
             'e2': e2, 'minH': h1, 'maxH': h2, 'PkNoise': peak2noise, 'satsel': sat, 'fortran': fortran, 'pele': pele,
             'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2, 'ediff': ediff}
 
+    deltaRH = h2-h1
+    if (deltaRH <= 0):
+        print('Your reflector height region is invalid (i.e. h1 is greater than h2). h1:', h1, ' h2: ',h2)
+        print('Exiting')
+        sys.exit()
+
+    if (deltaRH < 5.5):
+        print('The reflector height region must be at least 5.5 meters long. These values are used for computing ')
+        print('a valid periodogram and for quality control.  Change h1 or h2 or both. Exiting')
+        sys.exit()
     return quick.quickLook_function(**args)
     # returns two variables: data, datakey = quick.quicklook_function(**args)
 

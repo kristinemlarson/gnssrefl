@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.19
+Changed how the periodograms in quickLook are displayed. Initially tried to 
+set to the maximum used by matplotlib.  This can be dominated by bad tracks, so 
+now pick by maximum good track (times 1.1).  If there are not any good tracks at all 
+this can be tricky.  Now using a min value of 2 for that. 
+
+Restricting RH region to be at least 5.5 meters (consistent with gnssir). This is needed
+to stop people using RH region to remove outliers.  The RH region also determines whether
+the periodogram is valid.
+
+Fixing the refl_zones restriction of 25 degrees elevation angle.  Increasing to 30 degrees
+and providing error message.
+
+refl_zones now writes out satellite number and elevation angle in the kml file.
+Makes it easier for people to take out specific Fresnel zones if they wish.
+
 ## 1.2.18
 
 Changed default RH max in quickLook to 8 meters.
@@ -18,6 +34,7 @@ removed in **subdaily** with RH constraints.  For now I am going to continue all
 constraint in **quickLook**, but eventually I may remove it there too.  
 
 Changed make_json_input default max RH to 8 meters.  Slight change to peak2noise default.
+The first change will make peak2noise stats higher in general.
 
 ## 1.2.16
 
