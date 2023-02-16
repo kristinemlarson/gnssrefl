@@ -271,7 +271,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 if len(thisquad) > 0:
                     # found at least one good periodogram in this quadrant
                     setA = True
-                    maxv = max(1.1*max(thisquad), maxv)
+                    maxv = max(max(thisquad), maxv)
+            maxv = maxv*1.1
             if setA:
                 ax1.set_ylim(0,maxv) ; ax2.set_ylim(0,maxv) ;
                 ax3.set_ylim(0,maxv) ; ax4.set_ylim(0,maxv)
