@@ -34,6 +34,9 @@ make_json_input p103 0 0 0
 
 gnssir p103 2020 105  -doy_end 107
 
+quickLook p103 2020 105 -plt F
+quickLook p103 2020 107 -plt F -fr 2
+
 daily_avg p103 0.5 10 -plt F
 
 subdaily p103 2020 -plt F -rhdot T

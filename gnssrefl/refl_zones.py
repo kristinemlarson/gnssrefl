@@ -399,10 +399,13 @@ def make_FZ_kml(station, filename,freq, el_list, h, lat,lng,azlist):
     # this loop goes through all the Fresnel zone azimuths in azlist
     while (n < nr):
         azim = azlist[n,0]; el = azlist[n,2]
+        prn = int(azlist[n,1])
         k = el_list.index(el) ; # color index
         lng_el, lat_el = makeEllipse_latlon(freq,el,h,azim, lat,lng)
         points = write_coords(lng_el, lat_el)
-        pname = 'ElevAngle {0}'.format(int(el))
+        #pname = 'prn {0} elev'.format(prn)
+        pname = 'PRN:' + str(prn) + ' elev:' + str(int(el))
+        #pname = 'ElevAngle {0}'.format(int(el), prn)
         ls = kml.newpolygon(name=pname, altitudemode='relativeToGround') # creating new polygon for each azimuth zone in azlist
         ls.outerboundaryis = points
         # print(points)

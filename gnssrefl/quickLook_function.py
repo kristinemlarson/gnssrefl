@@ -166,6 +166,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             plt.figure(figsize=(10,6))
         allpoints = 0
 
+        # try to normalize the periodogram yaxes
+        axisSize =np.empty(shape=[0, 2])
 
         for a in range(naz):
             if pltscreen:
@@ -224,6 +226,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
                         if screenstats:
                             print('SUCCESS for Azimu {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:7.3f} PkNoise {4:6.2f}'.format( avgAzim,satNu,UTCtime,maxF,maxAmp/Noise))
+                        # try to track the maximum amplitude in each quadrant this way
+                        newl=[a,maxAmp]
+                        axisSize =np.append(axisSize,[newl], axis=0)
 
                     else:
                         # these are failed tracks
@@ -256,12 +261,29 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 plt.yticks(fontsize=fs)
 
         rhout.close()
+        setA = False # want to set the axes based on good retrieval amplitudes
+        # this boolean set when it finds such a quadrant
         if pltscreen:
-            d1=ax1.get_ylim() ; d2=ax2.get_ylim() ; d3=ax3.get_ylim() ; d4=ax4.get_ylim()
-            minv = min([d1[0], d2[0], d3[0], d4[0]])
-            maxv = max([d1[1], d2[1], d3[1], d4[1]])
-            ax1.set_ylim(minv,maxv) ; ax2.set_ylim(minv,maxv) ;
-            ax3.set_ylim(minv,maxv) ; ax4.set_ylim(minv,maxv)
+            maxv=2
+            for q in range(0,4):
+                ii = (axisSize[:,0] == q)
+                thisquad = axisSize[ii,1]
+                if len(thisquad) > 0:
+                    # found at least one good periodogram in this quadrant
+                    setA = True
+                    maxv = max(1.1*max(thisquad), maxv)
+            if setA:
+                ax1.set_ylim(0,maxv) ; ax2.set_ylim(0,maxv) ;
+                ax3.set_ylim(0,maxv) ; ax4.set_ylim(0,maxv)
+
+            else:
+            # old way was often dominated by bad retrievals
+            # but if no good retrievals ... 
+                d1=ax1.get_ylim() ; d2=ax2.get_ylim() ; d3=ax3.get_ylim() ; d4=ax4.get_ylim()
+                minv = min([d1[0], d2[0], d3[0], d4[0]])
+                maxv = max([d1[1], d2[1], d3[1], d4[1]])
+                ax1.set_ylim(minv,maxv) ; ax2.set_ylim(minv,maxv) ;
+                ax3.set_ylim(minv,maxv) ; ax4.set_ylim(minv,maxv)
 
         #print('preliminary reflector height results are stored in a file called logs/rh.txt')
         # this file seems to have an empty line at the end.  i do not know why.
