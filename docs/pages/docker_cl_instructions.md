@@ -65,7 +65,7 @@ To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
 ## For WINDOWS USERS:
 (thank you Paul Wu and James Monaco @ Univ. of CO for this)
 
-install [Docker for Windows](https://docs.docker.com/desktop/windows/install/)
+1. Install [Docker for Windows](https://docs.docker.com/desktop/windows/install/)
 
 Problem: <code>WSL2 Installation is incomplete</code>.  
 
@@ -80,9 +80,11 @@ Problem: need to convert existing WSL environment into WSL 2 and associate with 
 
 * Solution: follow [this documentation](https://docs.docker.com/desktop/windows/wsl/)
 
+2. Run gnssrefl Docker
+
 Docker run commands have slightly different syntax to accomodate windows directories in volume mounting:
 
-Windows Power Shell:
+Use either Windows Power Shell:
 
 <PRE>
 docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ `
@@ -90,7 +92,7 @@ docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ `
 --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
 </pre>
 
-Windows Command Line:
+Or Windows Command Line:
 
 <PRE>
 docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ ^
