@@ -64,6 +64,11 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
     """
 
+    if ((maxH - minH) < 5.5):
+        print('Requested reflector heights (', minH, ',', maxH, ') are too close together. ')
+        print('They must be at least 5.5 meters apart - and preferably further than that. Exiting')
+        return
+
     screenstats = kwargs.get('screenstats',False)
     if screenstats:
         print('Some screen statistics will print to the screen')
@@ -138,6 +143,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         rhout = open(quicklog,'w+')
         amax = 0
         minEdataset = np.min(ele)
+
         sats = sat 
         # very rare that no GPS data exist, so will not check it.  I will probably regret this
         #if (f < 6):
@@ -200,20 +206,24 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                     #print('ALL tracks: Azim {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} Npts {3:3.0f} between Azimuths {4:3.0f}-{5:3.0f}'.format( avgAzim,satNu,UTCtime,Nv, az1, az2))
                 if Nv > minNumPts:
                     maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,desiredP,polyV,minH) 
-                    nij =   pz[(px > NReg[0]) & (px < NReg[1])]
-                    Noise = 0
                     iAzim = int(avgAzim)
+                    Noise = 1
+                    if maxF == 0:
+                        print('invalid LSP')
+                        tooclose = True
+                    else:
+                        nij =   pz[(px > NReg[0]) & (px < NReg[1])]
                     # 2022 march 26
                     # introduce boolean for RH peaks that are too close to the edges of the RH periodogram
-                    tooclose = False
-                    if (abs(maxF - minH) < 0.05):
-                        tooclose = True
-                    if (abs(maxF - maxH) < 0.05):
-                        tooclose = True 
-                    if (len(nij) > 0):
-                        Noise = np.mean(nij)
-                    else:
-                        Noise = 1;  iAzim = 0 # i think this is set to zero so something down the line doesn't fail
+                        tooclose = False
+                        if (abs(maxF - minH) < 0.05):
+                            tooclose = True
+                        if (abs(maxF - maxH) < 0.05):
+                            tooclose = True 
+                        if (len(nij) > 0):
+                            Noise = np.mean(nij)
+                        else:
+                            Noise = 1;  iAzim = 0 # i think this is set to zero so something down the line doesn't fail
                     # add azimuth constraints. default is 0-360
                     if (not tooclose) & (delT < delTmax) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise) & (iAzim >= azim1) & (iAzim <= azim2):
                         T = g.nicerTime(UTCtime)
@@ -465,12 +475,14 @@ def read_snr_simple(obsfile):
         f = np.genfromtxt(obsfile,comments='%')
         r,c = f.shape
         # put in a positive elev mask
+        #print(np.min(f[:,1]))
         i= f[:,1] > 0
         f=f[i,:]
 
         #print('read_snr_simple, Number of rows:', r, ' Number of columns:',c)
         sat = f[:,0]; ele = f[:,1]; azi = f[:,2]; t =  f[:,3]
         edot =  f[:,4]; s1 = f[:,6]; s2 = f[:,7]; s6 = f[:,5]
+        #print(np.min(ele))
         # 
         s1 = np.power(10,(s1/20))  
         s2 = np.power(10,(s2/20))  
@@ -507,4 +519,5 @@ def read_snr_simple(obsfile):
     except:
         print('problem reading the SNR file')
         allGood = 0
+    #print('min e', min(ele))
     return allGood, sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE

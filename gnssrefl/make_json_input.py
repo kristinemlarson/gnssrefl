@@ -34,7 +34,7 @@ def parse_arguments():
     parser.add_argument("-l2c", default=None, type=str, help="set to True to only use GPS L2C")
     parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
-    parser.add_argument("-extension", default=None, type=str, help="Provide extension name so you can try different strategies")
+    parser.add_argument("-extension", type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-ediff", default=None, type=str, help="ediff (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument('-azlist', nargs="*",type=float,  help='User defined azimuth zones, i.e. 0 90 90 180 would mean only the east. Must be an even number of values.')
@@ -55,7 +55,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.8, ampl: float = 5.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = None, ediff: float=2.0, delTmax: float=75.0, azlist: float=[], frlist: float=[] ):
+              extension: str = '', ediff: float=2.0, delTmax: float=75.0, azlist: float=[], frlist: float=[] ):
 
     """
     Make a json file that describes the lomb scargle analysis strategy you will use in gnssrefl.
@@ -121,7 +121,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     extension : str, optional
         provide extension name so you can try different strategies. 
         Results will then go into $REFL_CODE/YYYY/results/ssss/extension
-        Default is None
+        Default is '' 
 
     ediff : float
         quality control parameter (Degrees)
@@ -206,7 +206,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         subprocess.call(['mkdir', outputdir])
 
     print('extension', extension)
-    if extension is None:
+    if len(extension) == 0:
         outputfile = outputdir + '/' + station + '.json'
     else:
         outputfile = outputdir + '/' + station + '.' + extension + '.json'
