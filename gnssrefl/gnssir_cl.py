@@ -33,8 +33,7 @@ def parse_arguments():
     parser.add_argument("-azim1", default=None, type=int, help="lower limit azimuth (deg)")
     parser.add_argument("-azim2", default=None, type=int, help="upper limit azimuth (deg)")
     parser.add_argument("-nooverwrite", default=None, type=str, help="default is False, i.e. you will overwrite")
-    parser.add_argument("-extension", default=None, type=str,
-                        help="extension for result file, useful for testing strategies")
+    parser.add_argument("-extension", type=str, help="extension for result file, useful for testing strategies")
     parser.add_argument("-compress", default=None, type=str, help="Boolean, xz compress SNR files after use")
     parser.add_argument("-gzip", default=None, type=str, help="Boolean, gzip SNR files after use")
     parser.add_argument("-screenstats", default=None, type=str, help="Boolean, some stats printed to screen(default is False)")

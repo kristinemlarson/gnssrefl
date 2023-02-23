@@ -44,6 +44,12 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
+    # this is also checked in the command line - but for people calling the code ...
+    if ((lsp['maxH'] - lsp['minH']) < 5):
+        print('Requested reflector heights (', lsp['minH'], ',', lsp['maxH'], ') are too close together. Exiting.')
+        print('They must be at least 5 meters apart - and preferably further than that.')
+        return
+
     e1=lsp['e1']; e2=lsp['e2']; minH = lsp['minH']; maxH = lsp['maxH']
     ediff = lsp['ediff']; NReg = lsp['NReg']  
     PkNoise = lsp['PkNoise']; azval = lsp['azval']; naz = int(len(azval)/2)
@@ -328,9 +334,17 @@ def read_json_file(station, extension):
 
     """
     lsp = {} # 
-    instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
+    # leftover from when i was using None
+    if len(extension) == 0:
+        useextension = False
+        instructions_ext = ''
+    else:
+        useextension = True 
+        instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
+
     instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
-    if os.path.isfile(instructions_ext):
+
+    if useextension and os.path.isfile(instructions_ext):
         usefile = instructions_ext
         #print('using specific instructions for this extension')
         with open(instructions_ext) as f:

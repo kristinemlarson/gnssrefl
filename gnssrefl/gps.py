@@ -28,6 +28,7 @@ from numpy import array
 import gnssrefl.read_snr_files as snr
 import gnssrefl.karnak_libraries as k
 import gnssrefl.EGM96 as EGM96
+import gnssrefl.rinex2snr as rnx
 
 # for future ref
 #import urllib.request
@@ -1418,6 +1419,9 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
 # observing Window length (or span)
 # units of inverse meters
     W = np.max(X) - np.min(X)         
+    if W == 0:
+        print('bad ofac/hifac calc')
+        return 0,0
 
 # characteristic peak width, meters
     cpw= 1/W
@@ -1478,6 +1482,13 @@ def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
         periodogram, y-axis, volts/volts 
     """
     ofac,hifac = get_ofac_hifac(x,cf,maxH,desiredP)
+    if np.isnan(ofac):
+        print("WARNING - bad ofac")
+        return 0, 0, 0, 0,0,0,0 
+    if ofac == 0:
+        print("WARNING - bad ofac")
+        return 0, 0, 0, 0,0, 0,0
+
 #   min and max observed elevation angles
     eminObs = min(x); emaxObs = max(x)
     if x[0] > x[1]:
@@ -1682,7 +1693,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
                 if screenstats:
                     iamok = True
                     print('Rising Setting Arc, length, and index ', len(x),ijkl )
-                    #print("Rising/Setting Arc, length: %5.0f eangles begin %6.2f end %6.2f peak %6.2f"% (len(x), x[0],x[-1], x[ijkl] ) )
+                    print("Rising/Setting Arc, length: %5.0f eangles begin %6.2f end %6.2f peak %6.2f"% (len(x), x[0],x[-1], x[ijkl] ) )
                 edif1 = x[ijkl] - x[0]
                 edif2 = x[ijkl] - x[-1]
                 if edif1 > edif2:
@@ -1805,11 +1816,22 @@ def freq_out(x,ofac,hifac):
     n=len(x)
 #
 # number of frequencies that will be used
-    nout=int(0.5*ofac*hifac*n)
-	 
     xmax = np.max(x) 
     xmin = np.min(x) 
+
+    #print('ofac hifac,n,xmin,xmax', ofac,hifac,n,xmin,xmax)
+
+    nout=int(0.5*ofac*hifac*n)
+	 
     xdif=xmax-xmin 
+
+    if xdif == 0:
+        return []
+    if nout == 0:
+        return []
+    if np.isnan(ofac ):
+        return []
+
 # starting frequency 
     pnow=1.0/(xdif*ofac) 
     pstart = pnow
@@ -5934,3 +5956,21 @@ def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit):
         plt.show()
 
     return
+
+
+def quickazel(gweek,gpss,sat, recv,ephemdata,localup,East,North):
+    """
+    assumes you have read in the broadcast ephemeris,
+    know where your receiver is and the time (gps week, second of week)
+    """
+    closest = myfindephem(gweek, gpss, ephemdata, sat)
+    eleA = 0; azimA = 0
+    if len(closest) > 0:
+        #print(gweek,gpss,sat)
+        satv = rnx.satorb_prop(gweek, gpss, sat, recv, closest)
+        r=np.subtract(satv,recv) # satellite minus receiver vector
+        eleA = elev_angle(localup, r)*180/np.pi
+        azimA = azimuth_angle(r, East, North)
+        #print('el/az',eleA, azimA)
+    return eleA, azimA
+

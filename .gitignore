@@ -1,11 +1,15 @@
 env
 all.txt
+jul01.txt
+felipe.py
 test.py
+test2.py
 dist
 build
 build.nowork
 __pycache__
 gnssrefl.egg-info
+gnssrefl/*.cpython-39-darwin.so
 gnssrefl/__init__.pyc
 sc02_usecase.py
 thu2*
