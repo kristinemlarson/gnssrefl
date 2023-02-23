@@ -5,6 +5,11 @@
 
 # gnssrefl
 
+The shortcourse dates have been tentatively set for May 2-5 (two hours each day). More information 
+will be sent out on Friday.
+
+<code>nmea2snr</code> has been updated to support multi-frequency-GNSS by community member Taylor Smith. 
+
 **github version: 1.2.19** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 New [snowdepth utility](docs/pages/README_snowdepth.md).
@@ -49,7 +54,7 @@ GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 09357
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was initially developed 
 as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
-This documentation was updated on January 30, 2023
+This documentation was updated on February 23, 2023
 
 Kristine M. Larson
 
