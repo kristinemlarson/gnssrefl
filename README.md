@@ -12,6 +12,8 @@ will be sent out on Friday.
 
 **github version: 1.2.19** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
+[Youtube videos for beginners](https://www.youtube.com/channel/UCC1NW5oS7liG7C8NBK148Bg).
+
 New [snowdepth utility](docs/pages/README_snowdepth.md).
 
 New discussion page started about [modern GNSS signals](docs/pages/signal_issues.md).
