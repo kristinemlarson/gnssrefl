@@ -22,26 +22,27 @@
 - understand what factors make for a good GNSS-IR site 
 - know how to contribute to open-science software.
 
-##Calendar 
-**TBD: Help Sessions**
+## Calendar 
 
-**May 2: Introduction/Theory/Software**
+### TBD: Help Sessions
+
+### May 2: Introduction/Theory/Software
 - Intro/Overview KL
 - Basic Theory (FN) 
 - How to Run the Code (KL) 
 - Using the API                                                                                                                                                                                                              
-**May 3: Hydrologic Applications**
+## May 3: Hydrologic Applications
 - Snow and ice sheets (KL) 
 - Soil Moisture (KL) [Chew video](https://www.youtube.com/watch?v=ntnqD5O8LLo)            
 
-**May 4: Water**
+### May 4: Water
 - overview (SW) 
 - invsnr method (DP) 
 - Lakes 
 - Rivers (MK)  
 - Tides (SW)                                                                           
 
-##May 5: Going Forward
+### May 5: Going Forward
 * Open source/science and how to contribute (TD)
 * Improvements needed for the software (KL,FN)
 * Best practices for new installations (TN)  
