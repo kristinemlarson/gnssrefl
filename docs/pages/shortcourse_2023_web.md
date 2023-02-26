@@ -35,7 +35,7 @@
 - Snow and ice sheets (KL) 
 - Soil Moisture (KL) [Chew video](https://www.youtube.com/watch?v=ntnqD5O8LLo)            
 
-### May 4: Water
+### May 4: Water Applications
 - overview (SW) 
 - invsnr method (DP) 
 - Lakes 
