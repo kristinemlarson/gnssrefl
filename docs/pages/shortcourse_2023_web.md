@@ -7,7 +7,6 @@
 
 **Venue:** virtual
 
-***
 
 **The goals for this short course are to:**
 
@@ -42,11 +41,11 @@
 - Rivers (MK)  
 - Tides (SW)                                                                           
 
-**May 5: Going Forward**
-- Open source/science and how to contribute (TD)
-- Improvements needed for the software (KL,FN)
-- Best practices for new installations (TN)  
-- Low-cost sensors: (MK, DP, SW, FN)
+##May 5: Going Forward
+* Open source/science and how to contribute (TD)
+* Improvements needed for the software (KL,FN)
+* Best practices for new installations (TN)  
+* Low-cost sensors: (MK, DP, SW, FN)
 
 ## Expectations
 * Make sure the gnssrefl code has been installed and is working properly prior to the class.
