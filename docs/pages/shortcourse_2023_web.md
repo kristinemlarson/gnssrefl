@@ -24,34 +24,29 @@
 - know how to contribute to open-science software.
 
 ##Calendar 
-**Dates TBD**
+**TBD: Help Sessions**
 
-- Help sessions (KE, TD)                                                                                                                                                                                      
 **May 2: Introduction/Theory/Software**
-
-* Intro/Overview KL
-* Basic Theory (FN) 
-* How to Run the Code (KL) 
-* Using the API                                                                                                                                                                                                              
+- Intro/Overview KL
+- Basic Theory (FN) 
+- How to Run the Code (KL) 
+- Using the API                                                                                                                                                                                                              
 **May 3: Hydrologic Applications**
+- Snow and ice sheets (KL) 
+- Soil Moisture (KL) [Chew video](https://www.youtube.com/watch?v=ntnqD5O8LLo)            
 
-* Snow and ice sheets (KL) 
-* Soil Moisture (KL) [Chew video](https://www.youtube.com/watch?v=ntnqD5O8LLo)            
-
-**May 4: Water **
-
-* overview (SW) 
-* invsnr method (DP) 
-* Lakes 
-* Rivers (MK)  
-* Tides (SW)                                                                           
+**May 4: Water**
+- overview (SW) 
+- invsnr method (DP) 
+- Lakes 
+- Rivers (MK)  
+- Tides (SW)                                                                           
 
 **May 5: Going Forward**
-
-* Open source/science and how to contribute (TD)
-* Improvements needed for the software (KL,FN)
-* Best practices for new installations (TN)  
-* Low-cost sensors: (MK, DP, SW, FN)
+- Open source/science and how to contribute (TD)
+- Improvements needed for the software (KL,FN)
+- Best practices for new installations (TN)  
+- Low-cost sensors: (MK, DP, SW, FN)
 
 ## Expectations
 * Make sure the gnssrefl code has been installed and is working properly prior to the class.
