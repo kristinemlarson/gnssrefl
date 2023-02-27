@@ -72,8 +72,10 @@ EarthScope staff will help participants set up and install Jupyter notebooks, py
 
 
 ## Sponsors
-<img src="Logo_DETECT_transparent_retina.png"> [Collaborative Research Center 1502 DETECT, University of Bonn](https://sfb1502.de/)
-<P>
-[Earthscope](https://earthscope.org)
+* [Earthscope](https://earthscope.org)
+
+* [Collaborative Research Center 1502 DETECT, University of Bonn](https://sfb1502.de/)
+
+<img src="Logo_DETECT_transparent_retina.png" width=40> 
 
 
