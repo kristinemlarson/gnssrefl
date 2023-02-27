@@ -17,13 +17,14 @@
 
 ## Calendar 
 
-### TBD: Help Sessions
+### Dates TBD: Installation Help Sessions
 
 ### May 2: Introduction/Theory/Software
-- Intro/Overview KL
+- Overview KL
 - Basic Theory (FN) 
 - How to Run the Code (KL) 
-- Using the API                                                                                                                                                                                                              
+- Using the API (KL)
+
 ### May 3: Hydrologic Applications
 - Snow and ice sheets (KL) 
 - Soil Moisture (KL) [Chew video](https://www.youtube.com/watch?v=ntnqD5O8LLo)            
