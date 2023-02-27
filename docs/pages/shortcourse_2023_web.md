@@ -1,4 +1,4 @@
-# 2023 SHORT COURSE: GNSS INTERFEROMETRIC REFLECTOMETRY
+# 2023 Short Course on GNSS Interferometric Reflectometry
 
 ### Basic principles and an introduction to the gnssrefl software 
 **Dates:** May 2-5, 2023 
@@ -7,7 +7,6 @@
 
 **Venue:** virtual
 
-
 **The goals for this short course are to:**
 
 - introduce participants to the basic principles of the GNSS-IR method
@@ -15,12 +14,6 @@
 - demonstrate and discuss gnssrefl use in practical sessions on snow accumulation, soil moisture and water levels.
 - provide guidance on GNSS-IR site location selection, use of low-cost sensors and contributing to open-source scientific software. 
 
-**Participants successfully completing this short course will:**
-
-- understand the accuracy/precision and strengths/weaknesses of the GNSS-IR technique
-- be able to use the gnssrefl software.
-- understand what factors make for a good GNSS-IR site 
-- know how to contribute to open-science software.
 
 ## Calendar 
 
@@ -76,5 +69,11 @@ EarthScope staff will help participants set up and install Jupyter notebooks, py
 * Thomas Nylen (Danish Technical University, Denmark) - installing GNSS sites for GNSS-IR
 * Kelly Enloe (EarthScope - USA) – Jupyter notebooks, python, gnssrefl software
 * Tim Dittmann (EarthScope - USA) – python, gnssrefl software
+
+
+## Sponsors
+<img src="Logo_DETECT_transparent_retina.png"> [Collaborative Research Center 1502 DETECT, University of Bonn](https://sfb1502.de/)
+<P>
+[Earthscope](https://earthscope.org)
 
 
