@@ -5,20 +5,18 @@
 
 # gnssrefl
 
-The shortcourse dates have been tentatively set for May 2-5 (two hours each day). More information 
-will be sent out on Friday.
+**github version: 1.2.20** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
-<code>nmea2snr</code> has been updated to support multi-frequency-GNSS by community member Taylor Smith. 
+The [shortcourse](docs/pages/shortcourse_2023_web.md) dates have been tentatively set for May 2-5 (two hours each day). 
+The registration page is not available as yet - but hopefully soon.
 
-**github version: 1.2.19** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+If you want to sign up for the GNSS-IR email list, please contact Kristine Larson.
+
+[Youtube videos for beginners](https://www.youtube.com/channel/UCC1NW5oS7liG7C8NBK148Bg).
 
 New [snowdepth utility](docs/pages/README_snowdepth.md).
 
 New discussion page started about [modern GNSS signals](docs/pages/signal_issues.md).
-
-Specific azimuth regions can now be added at the command line. Use -azlist in <code>make_json_input</code> 
-
-There is a new Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
 
 We have developed [readthedocs style documentation](https://gnssrefl.readthedocs.io/en/latest/).
 
@@ -42,11 +40,12 @@ All access to UNAVCO data will end (unknown date) unless [you sign up for an acc
     4. [vwc: soil moisture module](docs/pages/README_vwc.md)
     5. [snowdepth: utility for snowdepth calculation](docs/pages/README_snowdepth.md)
 4. [Examples](docs/pages/first_drivethru.md)
-5. [Utilities](docs/pages/utilities.md)
-6. [Notes about File structure and Formats](docs/pages/file_structure.md)
-7. [News/Bugs/Future Work](docs/pages/news.md)
-8. [Publications](https://kristinelarson.net/publications)
-9. [How can you help this project? How can you ask for help?](docs/pages/contributions_questions.md)
+5. [The Simulator](docs/pages/simulator.md)
+6. [Utilities](docs/pages/utilities.md)
+7. [Notes about File structure and Formats](docs/pages/file_structure.md)
+8. [News/Bugs/Future Work](docs/pages/news.md)
+9. [Some Publications](https://kristinelarson.net/publications)
+10. [How can you help this project? How can you ask for help?](docs/pages/contributions_questions.md)
 
 <HR> 
 

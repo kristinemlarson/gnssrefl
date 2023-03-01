@@ -89,7 +89,7 @@ PyPi version:
 
 *Non-Python Code:*
 
-<code>installexe</code> should download and install two key utilities used in teh GNSS 
+<code>installexe</code> should download and install two key utilities used in the GNSS 
 community: CRX2RNX and gfzrnx. It currently works for linux, macos and mac-newchip options. If you are using 
 docker or Jupyter notebooks **you do not need to run this.**
 

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.20
+
+Accommodated CDDIS file structure change for MGEX orbits.
+
 ## 1.2.19
 Changed how the periodograms in quickLook are displayed. Initially tried to 
 set to the maximum used by matplotlib.  This can be dominated by bad tracks, so 

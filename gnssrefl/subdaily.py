@@ -731,7 +731,8 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     # this is not working, so just setting it to false, cause who cares!
     setlimits = False
     fs = 10
-    fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
+    fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True,figsize=(10,8))
+    #fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
     i = (tv[:,10] < 100)
     colors = tv[:,10]
     scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
@@ -1363,6 +1364,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     if not apply_if_corr:
         print('You chose not to correct for IF biases. Exiting')
+        if pltit:
+            plt.show()
         return tvd_new, correction
 
     # now try to write the bias corrected values

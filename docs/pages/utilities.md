@@ -1,6 +1,7 @@
 # Utilities <a name="helper"></a>
 
-<code>refl_zones</code>
+## refl_zones
+
 This module creates "stand-alone" Fresnel Zones maps for 
 google Earth. At a minimum it requires a four station character name as input.
 
@@ -42,16 +43,17 @@ and they must be pairs of numbers that increase, i.e. you cannot say 90 50, you 
 
 - system constellation (gps,glonass,galileo, beidou)
 
-- output filename for the kml file
+- output filename for the kml file (if you do not like the default)
 
-The code relies on orbits stored on github. These
-will be downloaded and stored the first time you run the code. It also needs the EGM96 file 
+The code relies on orbits stored on github. These will be downloaded and stored the 
+first time you run the code. It also needs the EGM96 file 
 for calculating geoid corrections. It is downloaded and stored the first time you run the code.
 While ordinarily you do not need to have internet connection to run this module, you do need
 it the first time you run the code to get these files.
 
 <HR>
 
+## download_rinex
 <code>download_rinex</code> can be useful if you want to 
 download RINEX v2.11 or 3 files (using the version flag) without using 
 the reflection-specific codes. As with <code>rinex2snr</code>, the default archive is 
@@ -68,6 +70,8 @@ Sample calls:
 
 - <CODE>download_rinex onsa00swe 2020 150 0 -archive cddis</CODE> downloads the RINEX 3 data 
 from the cddis archive on day of year 150 in 2020
+
+## Miscellaneous
 
 <code>download_orbits</code> downloads orbit files and stores them in $ORBITS. The list of orbits 
 we support changes regularly. Please see the [rinex2snr documentation](rinex2snr.md).
