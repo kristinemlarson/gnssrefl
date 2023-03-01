@@ -780,8 +780,13 @@ def getsp3file_mgex(year,month,day,pCtr):
                 foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
 
                 if not foundit:
-                    print('use the wrong GPS week at CDDIS')
-                    secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
+                    #print('use the wrong GPS week at CDDIS')
+                    # test newest nonsense
+                    print('check a different directory week because CDDIS has changed their file structure')
+                    # kluge for a CDDIS screwup when they put the orbits in the wrong
+                    # GPS week directory
+                    #secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
+                    secure_dir = '/gps/products/' + str(igps_week) + '/'
                     foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
             else:
                 secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
