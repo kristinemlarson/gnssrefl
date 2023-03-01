@@ -44,11 +44,12 @@ All access to UNAVCO data will end (unknown date) unless [you sign up for an acc
     4. [vwc: soil moisture module](docs/pages/README_vwc.md)
     5. [snowdepth: utility for snowdepth calculation](docs/pages/README_snowdepth.md)
 4. [Examples](docs/pages/first_drivethru.md)
-5. [Utilities](docs/pages/utilities.md)
-6. [Notes about File structure and Formats](docs/pages/file_structure.md)
-7. [News/Bugs/Future Work](docs/pages/news.md)
-8. [Publications](https://kristinelarson.net/publications)
-9. [How can you help this project? How can you ask for help?](docs/pages/contributions_questions.md)
+5. [The Simulator](docs/pages/simulator.md)
+6. [Utilities](docs/pages/utilities.md)
+7. [Notes about File structure and Formats](docs/pages/file_structure.md)
+8. [News/Bugs/Future Work](docs/pages/news.md)
+9. [Some Publications](https://kristinelarson.net/publications)
+10. [How can you help this project? How can you ask for help?](docs/pages/contributions_questions.md)
 
 <HR> 
 
