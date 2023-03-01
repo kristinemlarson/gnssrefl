@@ -5,22 +5,18 @@
 
 # gnssrefl
 
-**github version: 1.2.19** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+**github version: 1.2.20** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
-The shortcourse dates have been tentatively set for May 2-5 (two hours each day). More information 
-will be sent out on Friday.
+The [shortcourse](docs/pages/shortcourse_2023_web.md) dates have been tentatively set for May 2-5 (two hours each day). 
+The registration page is not available as yet - but hopefully soon.
 
-<code>nmea2snr</code> has been updated to support multi-frequency-GNSS by community member Taylor Smith. 
+If you want to sign up for the GNSS-IR email list, please contact Kristine Larson.
 
 [Youtube videos for beginners](https://www.youtube.com/channel/UCC1NW5oS7liG7C8NBK148Bg).
 
 New [snowdepth utility](docs/pages/README_snowdepth.md).
 
 New discussion page started about [modern GNSS signals](docs/pages/signal_issues.md).
-
-Specific azimuth regions can now be added at the command line. Use -azlist in <code>make_json_input</code> 
-
-There is a new Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
 
 We have developed [readthedocs style documentation](https://gnssrefl.readthedocs.io/en/latest/).
 

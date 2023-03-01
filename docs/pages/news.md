@@ -1,5 +1,14 @@
 ### News <a name="news"></a>
 
+2023 News
+
+<code>nmea2snr</code> has been updated to support multi-frequency-GNSS by community member Taylor Smith.
+
+
+Specific azimuth regions can now be added at the command line. Use -azlist in <code>make_json_input</code>
+
+There is a new Google Earth utility for reflection zones: [refl_zones](docs/pages/utilities.md)
+
 December 1, 2022
 
 Fixed a bug in the new subdaily output file, (IF).  If you are using subdaily and want
