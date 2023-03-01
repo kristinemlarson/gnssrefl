@@ -240,6 +240,7 @@ def read_nmea(fname):
                 
             #This could be added if positioning info is interesting/needed. Via https://github.com/purnelldj/gnssr_lowcost
             #   row = line.split(',')
+            #   latt = float(row[2][0:2]) + float(row[2][2:])/60
             #   if row[3] == 'S': #Northern or southern hemisphere
             #        latt = -latt
             #   lont = float(row[4][0:3]) + float(row[4][3:])/60 #Longitude

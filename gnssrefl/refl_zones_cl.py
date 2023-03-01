@@ -25,6 +25,7 @@ def parse_arguments():
     parser.add_argument('-az_sectors', nargs="*",type=float,  help='flexible azimuth angle list, e.g. 0 90 270 360, but must be positive ')
     parser.add_argument('-system', help='default=gps, options are galileo, glonass, beidou', type=str)
     parser.add_argument('-output', help='output filename. default is the station name with kml extension', type=str,default=None)
+    parser.add_argument('-dem_path', help='path to DEM to check sightlines', type=str,default=None)
 
 
     args = parser.parse_args().__dict__
@@ -32,7 +33,8 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, el_height: float=None, 
-        RH: str=None, fr: int = 1, el_list: float= [], az_sectors : float=[], system: str = 'gps', output: str = None):
+        RH: str=None, fr: int = 1, el_list: float= [], az_sectors : float=[], system: str = 'gps', output: str = None, 
+        dem_path: str = None):
     """
     creates KML file for reflection zones to be used in Google Earth
 
@@ -84,7 +86,6 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         print('The orbit files needed for this code were either not found')
         print('or not downloaded successfully. They should be in the REFL_CODE/Files directory') 
         sys.exit()
-
 
     # check that EGM96 file is in your local directory
     foundfile = g.checkEGM()
@@ -143,7 +144,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     x,y,z=g.llh2xyz(lat,lon,el_height)
     recv=np.array([x,y,z])
     # calculate rising and setting arcs for this site and the requested constellation
-    azlisttmp= rf.rising_setting_new(recv,el_list,obsfile)
+    azlisttmp = rf.rising_setting_new(recv,el_list,obsfile)
     if len(az_sectors) == 0:
         print('Using one set of azimuths') 
         azlist = rf.set_final_azlist(azim1,azim2,azlisttmp)
@@ -177,7 +178,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     # if you use defaults, it is written in 
 
     if output == None: 
-    # first check that the Files output directory exists
+        # first check that the Files output directory exists
         xdir = os.environ['REFL_CODE']
         outputdir = xdir + '/Files' 
         if not os.path.isdir(outputdir):
@@ -195,8 +196,15 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         print('File is saved in ' , output)
     else:
         print('Something went wrong, and the kml file was not created')
-
-
+        
+    #Add additional check of sight lines
+    #This uses a default 25 km max search distance (d), and checks a given set of angles
+    #Could be limited to only a few chosen angles as well (e.g., angles = el_list, or angles = range(5,31)
+    #Could also be limited to a few chosen azimuths (e.g., azimuths=[0,45,90,etc])
+    rf.build_occluded_sightlines(station, lat, lon, el_height, azimuths=range(0,360,10), d=25,\
+                                     angles=[5,10,15,20,25,30], dem_path=dem_path, savedir=outputdir + '/')
+        
+    print('Checked sightlines against', dem_path)
 
 def main():
     args = parse_arguments()
