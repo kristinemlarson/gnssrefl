@@ -133,7 +133,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                 dkfjaklj = True
             else:
                 print('>>>> The SNR the file needs does not exist ',obsfile)
-                print('Please us rinex2snr to make a SNR file')
+                print('Please use rinex2snr to make a SNR file')
                 sys.exit()
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)
     # this just means the file existed ... not that it had the frequency you want to use

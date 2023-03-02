@@ -1470,7 +1470,7 @@ def freq_out(x,ofac,hifac):
     n=len(x)
 #
 # number of frequencies that will be used
-    nout=np.int(0.5*ofac*hifac*n)
+    nout=int(0.5*ofac*hifac*n)
 
     xmax = np.max(x)
     xmin = np.min(x)
