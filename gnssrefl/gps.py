@@ -4363,7 +4363,7 @@ def cdate2nums(col1):
 
 def cdate2ydoy(col1):
     """
-    returns year and day of year from character date, e.g. 2012-02-15
+    returns year and day of year from character date, e.g. '2012-02-15'
 
     Parameters
     ----------
@@ -4372,12 +4372,14 @@ def cdate2ydoy(col1):
 
     Returns
     -------
-    t : float
-        fractional date, year + doy/365.25
+    year : int 
+        full year
+    doy : int 
+        day of year
     """
     year = int(col1[0:4])
     if year == 0:
-        t=3000 # made up very big time!
+        t = 3000 # made up very big time!
     else:
         month = int(col1[5:7])
         day = int(col1[8:10])
@@ -5917,7 +5919,7 @@ def mjd_more(mmjd):
     return year, mm, dd, doy 
 
 
-def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit):
+def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit,end_dt):
     """
     creates and displays snow depth plot 
 
@@ -5943,6 +5945,9 @@ def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit):
         name of output png file
     pltit : bool
         whether plot should be displayed to the screen
+    end_dt : datetime
+        user provided override date for the end of the plot
+        if None, then ignore
     """
     fig,ax=plt.subplots()
     # try this
@@ -5951,7 +5956,12 @@ def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit):
     plt.title('Snow Depth: ' + station)
     plt.ylabel('meters')
     plt.grid()
-    plt.xlim((left, right))
+
+    if (end_dt is None):
+        plt.xlim((left, right))
+    else:
+        plt.xlim((left, end_dt))
+
     fig.autofmt_xdate()
     if (minS is not None) and (maxS is not None):
         plt.ylim((-0.05+minS,maxS))

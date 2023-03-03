@@ -157,6 +157,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     allrh = open(alldatafile, 'w+')
     # put in a header
     allrh.write(" {0:s}  \n".format('% year,doy, RH(m), Month, day, azimuth(deg),freq, satNu, LSP amp,pk2noise,UTC(hr)' ))
+    allrh.write(" {0:s}  \n".format('% (1), (2), (3),   (4),   (5),  (6),        (7),   (8),  (9),     (10),    (11)' ))
 
     fs = 12
     NotEnough = 0

@@ -18,6 +18,7 @@ def parse_arguments():
     parser.add_argument("-longer", help="plot longer series", type=str, default=None)
     parser.add_argument("-bare_date1", help="bare soil start yyyy-mm-dd", type=str, default=None)
     parser.add_argument("-bare_date2", help="bare soil end yyyy-mm-dd", type=str, default=None)
+    parser.add_argument("-plt_enddate", help="end date for the plot, yyyy-mm-dd", type=str, default=None)
     parser.add_argument("-plt", help="whether you want the plot to come to the screen", type=str, default=None)
     args = parser.parse_args().__dict__
 
@@ -31,7 +32,7 @@ def parse_arguments():
 
 
 def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
-        longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None):
+        longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None, plt_enddate:str=None):
     """
     Calculates snow depth for a given station and water year.
     Currently set for northern hemisphere constraints. This could easily be fixed for 
@@ -61,6 +62,8 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
         an override for start bare soil definition (used when data are unavailable for default settings )
     bare_date2: str
         an override for end bare soil definition (used when data are unavailable for default settings )
+    plt_enddate: str
+        an override for where you want the plot to end 
 
     """
 
@@ -90,6 +93,14 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
         sys.exit()
 
 
+    if plt_enddate is not None:
+        pyear = int(plt_enddate[0:4])
+        pmonth = int(plt_enddate[5:7])
+        pday = int(plt_enddate[8:10])
+
+        end_dt = datetime.datetime(year=pyear, month=pmonth, day = pday)
+    else:
+        end_dt = None
 
     # this overrides other ways of doing things.
     if bare_date1 is not None:
@@ -174,7 +185,7 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
     fout.close()
 
     # make a plot
-    g.snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,plt)
+    g.snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,plt,end_dt)
 
 def main():
     args = parse_arguments()
