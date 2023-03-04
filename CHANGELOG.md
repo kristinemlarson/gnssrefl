@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.2.21
+
+Docker is refusing to build with these libraries.
 Adding test version of refl_zones that looks for blocking signal azimuths.
 Requires adding geopandas, xarray, and rioxarray. This module is current undocumented.
 
