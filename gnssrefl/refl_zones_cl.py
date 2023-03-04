@@ -95,6 +95,11 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     if (lat is None) & (lon is None):
     # check the station coordinates in our database from the station name
         lat, lon, el_height = g.queryUNR_modern(station)
+        if (lat == 0) and (lon == 0):
+            print('Exiting.')
+            sys.exit()
+        else:
+            print('using inputs:', lat, lon, el_height)
     else:
         print('using inputs:', lat, lon, el_height)
 
