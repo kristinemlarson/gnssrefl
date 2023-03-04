@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.21
+Adding test version of refl_zones that looks for blocking signal azimuths.
+Requires adding geopandas, xarray, and rioxarray. This module is current undocumented.
+
+Fixed minor bug in refl_zones that did not properly act on information from UNR
+database query.
+
 ## 1.2.20
 
 Accommodated CDDIS file structure change for MGEX orbits.

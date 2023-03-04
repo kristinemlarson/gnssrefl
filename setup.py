@@ -19,11 +19,11 @@ ext3 = Extension(name='gnssrefl.gnsssnrbigger',
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
-requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","simplekml"]
+requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","simplekml","geopandas","xarray","rioxarray"]
 
 setup(
     name="gnssrefl",
-    version="1.2.20",
+    version="1.2.21",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
