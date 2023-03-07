@@ -30,6 +30,7 @@ Welcome to gnssrefl Documentation!
    pages/first_drivethru.md
    pages/news.md
    pages/contributions_questions.md
+   pages/new_station.md
 
 .. note::
-   These docs are still under development!
+   These docs are still under development; feedback is appreciated.
