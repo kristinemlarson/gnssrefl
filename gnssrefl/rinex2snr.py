@@ -203,15 +203,16 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
+                        locdir= os.environ['REFL_CODE'] + '/rinex/' + station[0:4] + '/' + cyyyy + '/'
                         if rate == 'high':
                             csrate = '01' # high rate assumes 1-sec
                         else:
                             csrate = '{:02d}'.format(srate)
                         streamid = '_' + stream  + '_'
                         # this can be done in a function now ...
-                        r3cmpgz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.crx.gz'
-                        r3 = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
-                        r3gz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
+                        r3cmpgz = locdir + station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.crx.gz'
+                        r3 = locdir + station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
+                        r3gz = locdir + station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         if os.path.exists(r3cmpgz):
                             print('Try to translate', r3cmpgz)
@@ -334,7 +335,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
     log.write("Archive: {0:10s} \n".format(archive))
     log.write("Orbits : {0:10s} \n".format(orbtype))
     exedir = os.environ['EXE']
-    snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
+    snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station[0:4],year,doy,option)
     if (snre == True):
         log.write("The snrfile already exists: {0:50s} \n".format(snrname_full))
         print("The snrfile already exists: ", snrname_full)
