@@ -62,7 +62,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
-        mk,skipit,stream,strip):
+        mk,skipit,stream,hrmn,fileperiod,strip):
     """
     main code to convert RINEX files into SNR files that are stored locally
 
@@ -173,9 +173,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             csnr = str(isnr)
             cdoy = '{:03d}'.format(doy) ; cyy = '{:02d}'.format(year-2000)
             # first, check to see if the SNR file exists
-            fname =  quickname(station,year,cyy,cdoy,csnr)
+            fname =  quickname(station[0:4],year,cyy,cdoy,csnr)
             # now it unzips if that version exists
-            snre = g.snr_exist(station,year,doy,csnr)
+            snre = g.snr_exist(station[0:4],year,doy,csnr)
             if snre:
                 if overwrite:
                     print('File exists, you requested overwriting, so will delete existing file')
@@ -209,9 +209,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             csrate = '{:02d}'.format(srate)
                         streamid = '_' + stream  + '_'
                         # this can be done in a function now ...
-                        r3cmpgz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.crx.gz'
-                        r3 = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
-                        r3gz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
+                        r3cmpgz = station9ch + streamid + str(year) + cdoy + hrmn + '_01' + fileperiod + '_' + csrate + 'S_MO.crx.gz'
+                        r3 = station9ch + streamid + str(year) + cdoy + hrmn + '_01' + fileperiod + '_' + csrate + 'S_MO.rnx'
+                        r3gz = station9ch + streamid + str(year) + cdoy + hrmn + '_01' + fileperiod + '_' + csrate + 'S_MO.rnx.gz'
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         if os.path.exists(r3cmpgz):
                             print('Try to translate', r3cmpgz)
