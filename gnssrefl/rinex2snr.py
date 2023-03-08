@@ -57,7 +57,7 @@ def quickname(station,year,cyy, cdoy, csnr):
 
     """
     xdir  = os.environ['REFL_CODE'] + '/'
-    fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
+    fname =  xdir + str(year) + '/snr/' + station[0:4] + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
 
     return fname
 
@@ -388,7 +388,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                 orbfile = orbdir + '/' + f
                 #print('translator',translator)
                 if translator == 'hybrid':
-                    g.make_snrdir(year,station) # make sure output directory exists
+                    g.make_snrdir(year,station[0:4]) # make sure output directory exists
                     in1 = g.binary(rinexfile)
                     in2 = g.binary(snrname) # this file is made locally and moved later
                     in3 = g.binary(orbfile)
@@ -453,7 +453,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         log.write('A SNR file was created: {0:50s}  \n'.format(snrname_full))
                         print('\n')
                         print('SUCCESS: SNR file was created:', snrname_full)
-                        g.store_snrfile(snrname,year,station)
+                        g.store_snrfile(snrname,year,station[0:4])
                 else:
                     print('No SNR file was created - check logs section for additional information')
             else:
