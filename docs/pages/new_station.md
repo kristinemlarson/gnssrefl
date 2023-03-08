@@ -66,3 +66,6 @@ defined for the SNR observations.
 * It doesn’t matter if you turn on multipath suppression algorithms or buy a fancy antenna. They don’t stop multipath.
 * Put SNR data in your RINEX 2.11 file.
 * Provide SNR data in the RINEX 3 format to ensure full access to multi-GNSS SNR data.
+
+## Further reading
+* ["Site guidelines for multi-purpose GNSS reflectometry stations"](https://doi.org/10.5281/zenodo.3660744)
