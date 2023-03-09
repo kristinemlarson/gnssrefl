@@ -3576,7 +3576,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
                     else:
                         subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
                 if os.path.exists(r2_filename):
-                    print('Look for the rinex 2.11 file here: ', r2_filename)
+#                    print('Look for the rinex 2.11 file here: ', r2_filename)
                     fexists = True
                 else:
                     sigh = 0
