@@ -245,7 +245,7 @@ Please note: we are using the publicly available <code>gfzrnx</code> code to con
 If you do not have <code>gfzrnx</code> installed, you will not be able to use RINEX 3 files.
 
 I believe it is also allowed to put your 
-RINEX files into $REFL_CODE/YYYY/rinex/ssss where YYYY is the year 
+RINEX files into $REFL_CODE/rinex/ssss/YYYY where YYYY is the year 
 and ssss is the four character station name. The advantage of doing 
 this is that your RINEX files will not be deleted.
 
