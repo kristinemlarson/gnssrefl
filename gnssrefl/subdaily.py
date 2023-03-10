@@ -1616,8 +1616,8 @@ def my_percentile(rh,p1, p2):
     N2 = int(np.round(p2*N))
 
     # calculate the low and high values at these percentiles
-    lowv = sorted_rh[N1] 
-    highv = sorted_rh[N2]
+    lowv = sorted_rh[N1-1] 
+    highv = sorted_rh[N2-1]
 
     return  lowv, highv
 
