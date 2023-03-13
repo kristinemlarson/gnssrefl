@@ -1,11 +1,7 @@
 
 ### gnssrefl use cases 
 
-
-<table>
-<TR>
-<TD>
-<B>Ice Sheets</B>
+#### Ice Sheets
 
 * [Lorne, Antarctica](../use_cases/use_lorg.md) 
 
@@ -16,9 +12,8 @@
 * [Summit Camp, Greenland](../use_cases/use_smm3.md) 
 
 * [Phoenix, Antarctica](../use_cases/use_phnx.md) 
-</TD>
-<td>
-<B>Lakes, Reservoirs, and Rivers</B>
+
+#### Lakes, Reservoirs, and Rivers
 
 * [Michipicoten, Canada](../use_cases/use_mchn.md) 
 
@@ -34,9 +29,7 @@
 
 * [Lake Yellowstone, USA](../use_cases/use_p709.md) 
 
-</TD>
-<TD>
-<B>Soil Moisture </B>
+#### Soil Moisture
 
 * [Portales, New Mexico USA](../use_cases/use_p038.md) 
 
@@ -48,13 +41,7 @@
 
 * [San Diego, CA USA ](../use_cases/use_p475.md) 
 
-</TD>
-</TR>
-
-<TR>
-
-<TD>
-<B>Seasonal Snow Accumulation</B>
+#### Seasonal Snow Accumulation
 
 * [Marshall, CO USA](../use_cases/use_p041.md) 
 
@@ -64,9 +51,7 @@
 
 * [Utqiagvik, AK USA](../use_cases/use_utqi.md) 
 
-</TD>
-<TD>
-<B>Tides</B>
+#### Tides
 
 * [Friday Harbor, WA USA](../use_cases/use_sc02.md) 
 
@@ -77,9 +62,3 @@
 * [Puerto Penasco, Mexico](../use_cases/use_tnpp.md)
 
 * [Elbe River, Germany](../use_cases/use_tggo.md)
-
-</TD>
-</TR>
-</Table>
-
-
