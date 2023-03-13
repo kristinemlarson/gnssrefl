@@ -63,6 +63,7 @@ setup(
             'check_rinex= gnssrefl.check_rinex:main',
             'check_rinex2= gnssrefl.check_rinex2:main',
             'rinex3_snr= gnssrefl.rinex3_snr:main',
+            'rt_rinex3_snr= gnssrefl.rt_rinex3_snr:main',
             'filesizes= gnssrefl.filesizes:main',
             'invsnr= gnssrefl.invsnr_cl:main',
             'invsnr_input= gnssrefl.invsnr_input:main',

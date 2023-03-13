@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.22
+
+Adding rt_rinex3_snr to allow real-time rinex3 generated files
+
 ## 1.2.21
 
 Docker is refusing to build with these libraries.
