@@ -3516,7 +3516,8 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     Parameters
     ----------
     r3_filename : string
-         rinex 3 format filename. either Hatanaka compressed or uncompressed allowed
+         rinex 3 format filename. either Hatanaka 
+         compressed or uncompressed allowed
 
     r2_filename : string
          rinex 2.11 file

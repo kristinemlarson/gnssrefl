@@ -144,6 +144,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         station9ch = station.upper()
         if not mk:
             station = station[0:4].lower()
+        else:
+            station = station[0:4].upper()
     else:
         print('Illegal station input - Station must have 4,6,or 9 characters. Exiting')
         sys.exit()
@@ -226,7 +228,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             print('Try to gunzip ', r3gz)
                             subprocess.call(['gunzip', r3gz])
                         if os.path.exists(r3):
-                            print('The RINEX 3 file exists locally')
+                            print('The RINEX 3 file exists locally', r3)
+                            # convert to RINEX 2.11
                             fexists = g.new_rinex3_rinex2(r3,r2,dec_rate)
                             if fexists:
                                 conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
