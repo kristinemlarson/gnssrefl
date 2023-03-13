@@ -190,11 +190,16 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             if (not illegal_day) and (not snre):
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
+                localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
                 if nol:
-                    print('Will assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is in the local directory')
+                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is in the local directory')
                     # this assumes RINEX file is in local directory or "nearby"
                     if version == 2:
-                        the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
+                        if mk:
+                            the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
+                        if not os.path.exists(r):
+                            # could try this way? - look for file in localpath2. gunzip if necessary
+                            allgood = get_local_rinexfile(r,localpath2)
                         if os.path.exists(r):
                             if strip:
                                 print('Testing out stripping the RINEX 2 file here')
@@ -1086,12 +1091,13 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
     rd = station + cdoy + '0.' + cyy + 'd'
     print(r,rd)
 
-    locdir= os.environ['REFL_CODE'] + '/rinex/' + station + '/' + cyyyy + '/'
+    locdir=  os.environ['REFL_CODE'] + '/rinex/' + station + '/' + cyyyy + '/'
+    locdir2= os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
     #
     #locdir2= os.environ['RINEX'] + station + '/' + cyyyy + '/'
     #locdir3= os.environ['RINEX'] + station.upper() + '/' + cyyyy + '/'
 
-    print('Will look for files in the working directory and ', locdir)
+    print('Will look for files in the working directory and ', locdir )
     # I was testing this ... but have not finished
     #so_many_permutations(r,rd,locdir, crnxpath)
 
@@ -1218,3 +1224,40 @@ def go_from_crxgz_to_rnx(c3gz,deletecrx=True):
             subprocess.call(['rm','-f',c3])
 
     return translated, rnx
+
+def get_local_rinexfile(rfile,localpath2):
+    """
+    look for a plain or gzipped version of the rinex 2.11 file in the year subdirectories
+    copies it to the local directory.  this method stops the code from deleting your rinex 
+    files
+
+    localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
+
+    Parameters
+    ----------
+    rfile : str
+        version2 rinexfile name
+
+    localpath2 : str
+        location of the file
+
+    Returns
+    -------
+    allgood : bool
+        whether file found
+    """
+    allgood = False
+    r = localpath2 + rfile
+    if os.path.exists(r):
+        allgood = True
+        # cp to the local directory
+        subprocess.call(['cp',r,'.'])
+    else:
+       # did not find noromal rinex, so look for gzip version
+        if os.path.exists(r + '.gz'):
+            subprocess.call(['gunzip', r + '.gz'])
+        if os.path.exists(r):
+            subprocess.call(['cp',r,'.'])
+            allgood = True
+
+    return allgood

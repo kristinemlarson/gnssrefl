@@ -1,7 +1,8 @@
 # rinex2snr  
 Extracting SNR data from RINEX/NMEA files <a name="module1"></a>
 
-The international standard for sharing GNSS data is called the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt). (If you are using NMEA files, please see the bottom of this section). 
+The international standard for sharing GNSS data is 
+called the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt). (If you are using NMEA files, please see the bottom of this section). 
 A RINEX file has extraneous information in it (which we will throw out) - and it 
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
 The first task you have in GNSS-IR is to translate from RINEX into what I will call 
@@ -13,8 +14,9 @@ choice by selections given below.
 There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
 angles. The default is to save all data with elevation lower than 30 degrees (this is called SNR format 66).
 Another SNR choice is 99, which saves elevation angle data between 5 and 30.  
+SNR choice 88 will save all data from 5 to 90 degrees.
 
-You can run <code>rinex2snr</code> at the command line. The required inputs are:
+You can run <code>rinex2snr</code> at the command line. The default version is RINEX 2.11. The required inputs are:
 
 - station name
 - year
@@ -80,9 +82,9 @@ only uses four character statiion names, the last four values will be used as th
 
 If your station name has 9 characters (lower case please), 
 the code assumes you are looking for a RINEX 3 file. 
-However, my code will store the SNR data using the normal
+Note: the code will store the SNR data using the normal
 4 character name. *You must install the gfzrnx executable 
-that translates RINEX 3 to 2 to use RINEX 3 files in 
+that translates RINEX 3 to RINEX 2.11 to use RINEX 3 files in 
 this code.* If you followed the instructions for installation, this 
 is already taken care of.
 
@@ -95,13 +97,11 @@ is already taken care of.
 - epn
 - ga
 - sonel
-- unavco
 
-The caveat is that UNAVCO is set to 15 sec because that is 
-mostly what is there.
-If you don't know where your data are, you 
-can try <code>-archive all</code>, 
-which might try a few archives in sequence.
+<code>rinex2snr</code> currently downloads 15 second RINEX3 at unavco.
+
+If you don't know where your data are, you can try <code>-archive all</code>, 
+which might try a few archives in sequence. Example calls:
 
 <code>rinex2snr onsa00swe 2020 298</code>
 
@@ -113,8 +113,8 @@ which might try a few archives in sequence.
 
 RINEX 3 has a file ID parameter that is a 
 nuisance. If you know yours, you can set it 
-with <code>-stream R</code> or <code>-stream S</code>. Because I think it is an 
-annoying thing, I look for both files without you having to set it. 
+with <code>-stream R</code> or <code>-stream S</code>. 
+I usually look for both files without you having to set it. 
 
 The snr options are mostly based on the need to remove the "direct" signal. This is 
 not related to a specific site mask and that is why the most frequently used 
@@ -126,7 +126,7 @@ azimuth-specific mask is decided later when you run <code>gnssir</code>.  The SN
 - 88 is elevation angles of 5-90 degrees
 - 50 is elevation angles less than 10 degrees (good for very tall sites, high-rate applications)
 
-**More options:**
+**More rinex2snr options:**
 
 *orbit file options for general users:*
 
@@ -155,17 +155,13 @@ ultra orbit option. Although it is provided every three
 hours, we currently only download the 
 file from midnite (hour 0).
 
-**What if you are providing the RINEX files and you don't want the code to search for the files online?** 
-<code>-nolook True</code>
 
-Just put the RINEX files in the same directory where 
-you are running the code, using my naming rules (lower case for RINEX 2.11).
 
 **What if you have high-rate (e.g. 1 sec) RINEX files, but you want 5 sec data?** <code>-dec 5</code>
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
-If you invoke this flag, you need to specify the archive. Your choices for high-rate Rinex2 data are:
+If you invoke this flag, you need to specify the archive. Your choices for high-rate RINEX 2.11 data are:
 
 - unavco 
 - cddis
@@ -206,23 +202,23 @@ one can *only* use L2C if wished)
 set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
 - 302, 306, 307 : Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz
 
-
 **What if you want to analyze your own data?**
 
 Put your RINEX 2.11 files in the directory where you are going to run the code.
-They must have SNR data in them (S1, S2, etc) and have the receiver coordinates in the header.
-The files should be named as follows:
 
-- lowercase
+They must have SNR data in them (S1, S2, etc) and have the receiver coordinates in the header.
+The files should follow these naming rules:
+
+- all lowercase
 - station name (4 characters) followed by day of year (3 characters) then 0.yyo where yy is the two character year.
 - Example: algo0500.21o where station name is algo on day of year 50 from the year 2021
 
 <code>rinex2snr algo 2021 50 -nolook True</code>
 
-If you have ss second RINEX 3 files, they should be all upper case (except for the extension).
+If you have ss second RINEX 3 files, they should be all upper case (except for the extension rnx or crx).
 
 * station name (9 characters where the last 3 characters are the country), underscore 
-* capital R or capital S , underscore
+* capital R or capital S , with underscore on either side
 * four character year 
 * three character day of year 
 * four zeroes, underscore, 
@@ -232,7 +228,8 @@ If you have ss second RINEX 3 files, they should be all upper case (except for t
 
 01D means it is one day. Some of the other parts of the very long station file name are no 
 doubt useful, but they are not recognized by this code. By convention, these files may be 
-gzipped but not unix compressed.
+gzipped but not unix compressed. You cannot use rinex2snr to translate RINEX 3 file unless they
+have the 01D naming convention. If you want a generic translation program, try rinex3_rinex2.
 
 Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 
@@ -244,10 +241,15 @@ The RINEX inputs are always deleted, so do not put your only copy of the files i
 Please note: we are using the publicly available <code>gfzrnx</code> code to convert RINEX 3 files into RINEX 2.11 files. 
 If you do not have <code>gfzrnx</code> installed, you will not be able to use RINEX 3 files.
 
-I believe it is also allowed to put your 
+It is also allowed to put your 
 RINEX files into $REFL_CODE/YYYY/rinex/ssss where YYYY is the year 
 and ssss is the four character station name. The advantage of doing 
 this is that your RINEX files will not be deleted.
+
+The makan option (-mk True) follows entirely different rules for file storage which I will not 
+describe here. 
+
+<HR>
 
 NMEA formats can be translated to SNR using <code>nmea2snr</code>.
 Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
