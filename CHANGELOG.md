@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.2.22
 
-Adding rt_rinex3_snr to allow real-time rinex3 generated files
+Added rt_rinex3_snr to allow real-time rinex3 generated files
+
+Fixed various documentation pages.
 
 ## 1.2.21
 
