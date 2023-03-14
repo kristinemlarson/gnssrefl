@@ -86,6 +86,7 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     plt.xlim((beginT, endT))
     plt.grid()
     g.save_plot(txtdir + '/' + station + '_rhdot1.png')
+    plt.close()
 
 def print_badpoints(t,outliersize,txtdir,real_residuals):
     """

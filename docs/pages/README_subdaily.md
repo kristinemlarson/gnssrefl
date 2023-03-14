@@ -2,8 +2,15 @@
 
 **Updated March 14, 2023**
 
--rhdot is now the default behavior.
+<code>rhdot</code> is now the default behavior.  You can turn it off by setting it to False.
 
+The code will compute (and remove) an InterFrequency (IF) bias. If you don't want it to 
+apply this IF, set <code>if_corr</code> to False.
+
+The code now writes out the spline fit at set intervals. The default is 30 minutes - but you 
+can set it to another interval using <code>delta_out</code>.
+
+<HR>
 
 This module is meant for RH measurements that have a subdaily component. It is not strictly 
 restricted for water levels, but that is generally where it should be used. There are 
@@ -27,31 +34,28 @@ Required Inputs:
 Optional arguments:
 
 * plt set to False to suppress plots
-* spline_outlier outlier criterion used in splinefit (meters)
-* knots Knots per day, spline fit only (default is 8)
-* sigma simple sigma outlier criterion used in first section (e.g. 1 for 1sigma, 3 for 3sigma)
+* spline_outlier is the outlier criterion used in the section section (meters)
+* knots defines how many knots are used per day, spline fit only (default is 8)
+* sigma is a simple outlier criterion used in first section (e.g. 1 for 1sigma, 3 for 3sigma)
 * extension solution subdirectory
 * rhdot whether rhdot correction is calculated. Now set to True as default
 
 
-Optional arguments that allow you to further constrain your solutions by various parameters
-
 * doy1 initial day of year
 * doy2 end day of year
 * ampl new amplitude constraint
-* azim1 new min azimuth
-* azim2 new max azimuth
-* h1 H1                min RH (m)
-* h2 H2                max RH (m)
-* peak2noise 
-* delta_out Output interval for spline fit, seconds (was originally not the default)
+* azim1 new minimum azimuth
+* azim2 new maximum azimuth
+* h1 minimum allowed RH (m)
+* h2 maximum allowed RH (m)
+* peak2noise requirement
+* delta_out is the output interval for written spline fit, in seconds 
 * if_corr whether you want the Interfrequency correction applied, default is True 
 
 
 Some examples:
 
 <code>subdaily sc02 2021 </code>
-
 
 It picks up all result files from 2021, sorts and concatenates them. If you only want to 
 look at a subset of days, you can set -doy1 and/or -doy2. The output file location
@@ -68,8 +72,7 @@ Whle this code is meant to be used AFTER you have chosen an analysis strategy, y
 apply new azimuth and amplitude constraints on the commandline, i.e. <code>-azim1, -azim2, -ampl</code>.
 
 The second section of <code>subdaily</code> is related to the RHdot 
-correction. You must explicitly ask for it. There are lots of ways 
-to apply the RHdot correction - I am only providing a simple one at this point.  
+correction. There are lots of ways to apply the RHdot correction - I am only providing a simple one at this point.  
 The RHdot correction requires you know :
 
 - the average of the tangent of the elevation angle during an arc 
@@ -85,12 +88,12 @@ Computing RHdot is the trickiest part of calculating the RHdot correction.
 And multiple papers have been written about it. If you have a 
 well-observed site (lots of arcs and minimal gaps), you can use the RH 
 data themselves to estimate a smooth model for RH (via cubic splines) and 
-then just back out RHdot. This is what is done in <code>subdaily</code> (if and only if you invoke -rhdot True). 
+then just back out RHdot. This is what is done in <code>subdaily</code> 
 It will also make a second effort to remove outliers.  
 
 Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
 outliers in the first section of this code as this is really signal, not noise. You can set the outlier criterion 
-with <code>-spline_outlier N</code>, where N is in meters. It also makes an attempt to remove frequency biases. 
+with <code>-spline_outlier N</code>, where N is in meters. 
 
 There are other ways to compute the RHdot correction:
 
