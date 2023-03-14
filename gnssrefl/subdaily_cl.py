@@ -28,7 +28,7 @@ def parse_arguments():
     parser.add_argument("-knots", default=None, type=int, help="Knots per day, spline fit only (default is 8)")
     parser.add_argument("-sigma", default=None, type=float, help="simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)")
     parser.add_argument("-extension", default=None, type=str, help="solution subdirectory")
-    parser.add_argument("-rhdot", default=None, type=str, help="set to True to turn on spline fitting for RHdot correction")
+    parser.add_argument("-rhdot", default=None, type=str, help="set to False if you want to stop after section 1 of the QC code")
     parser.add_argument("-doy1", default=None, type=int, help="initial day of year")
     parser.add_argument("-doy2", default=None, type=int, help="end day of year")
     parser.add_argument("-testing", default=None, type=str, help="set to False for old code ")
@@ -54,7 +54,7 @@ def parse_arguments():
 
 
 def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, plt: bool = True,
-             spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = False,
+             spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True,
              doy1: int = 1, doy2: int = 366, testing: bool = True, ampl: float = 0, 
              h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, 
              peak2noise: float = 0, kplt: bool = False, subdir: str = None, delta_out : int = 0, if_corr: bool = True):
@@ -92,7 +92,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
         default is empty string.
     rhdot : boolean, optional
         Set to True to turn on spline fitting for RHdot correction.
-        default is False.
+        default is True.
     doy1 : integer, optional
         Initial day of year
         default is 1.

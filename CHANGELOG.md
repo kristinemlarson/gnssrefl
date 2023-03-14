@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.23
+Changed RHdot calculation in subdaily to default behavior.
+
 ## 1.2.22
 
 Added rt_rinex3_snr to allow real-time rinex3 generated files

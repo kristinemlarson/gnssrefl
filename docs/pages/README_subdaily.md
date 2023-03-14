@@ -1,5 +1,10 @@
 # subdaily<a name="module6"></a>
 
+**Updated March 14, 2023**
+
+-rhdot is now the default behavior.
+
+
 This module is meant for RH measurements that have a subdaily component. It is not strictly 
 restricted for water levels, but that is generally where it should be used. There are 
 two main goals for this code:
@@ -12,10 +17,41 @@ run <code>gnssir</code> for a station called sc02 in the year 2021:
 
 <code>cat $REFL_CODE/2021/results/sc02/*.txt >sc02.txt</code>
 
-If you would prefer to use our code, it is pretty straightforward. It has two sections.  The first 
-minimally requires the station name and year:
+<HR>
+
+Required Inputs:
+
+* station               
+* year                  
+
+Optional arguments:
+
+* plt set to False to suppress plots
+* spline_outlier outlier criterion used in splinefit (meters)
+* knots Knots per day, spline fit only (default is 8)
+* sigma simple sigma outlier criterion used in first section (e.g. 1 for 1sigma, 3 for 3sigma)
+* extension solution subdirectory
+* rhdot whether rhdot correction is calculated. Now set to True as default
+
+
+Optional arguments that allow you to further constrain your solutions by various parameters
+
+* doy1 initial day of year
+* doy2 end day of year
+* ampl new amplitude constraint
+* azim1 new min azimuth
+* azim2 new max azimuth
+* h1 H1                min RH (m)
+* h2 H2                max RH (m)
+* peak2noise 
+* delta_out Output interval for spline fit, seconds (was originally not the default)
+* if_corr whether you want the Interfrequency correction applied, default is True 
+
+
+Some examples:
 
 <code>subdaily sc02 2021 </code>
+
 
 It picks up all result files from 2021, sorts and concatenates them. If you only want to 
 look at a subset of days, you can set -doy1 and/or -doy2. The output file location
