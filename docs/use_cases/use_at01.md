@@ -1,7 +1,8 @@
 ### St Michael Bay
 
-Updated December 10, 2022
+[Warning](warning.md)
 
+**Use Case Updated December 10, 2022**
   
 <p align="center">
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">

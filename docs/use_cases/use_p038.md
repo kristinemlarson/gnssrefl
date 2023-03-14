@@ -1,5 +1,7 @@
 ### Portales New Mexico
 
+[Warning](warning.md)
+
 <p align="center">
 <img src="../_static/p038.png" width="500"/>
 </P>

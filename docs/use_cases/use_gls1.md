@@ -1,6 +1,8 @@
 ### Dye2, Greenland 
 
-**This site is no longer functioning.**
+[Warning](warning.md)
+
+**This site has been retired.**
 
 <p align=center>
 <img src="../_static/gls1.jpg" width="400"><br>

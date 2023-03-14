@@ -1,6 +1,8 @@
 ### Island Park, Idaho
 
-Updated by Kristine Larson on January 23, 2023
+[Warning](warning.md)
+
+**Use Case Updated on January 23, 2023**
 
 <HR>
   

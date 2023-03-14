@@ -1,6 +1,8 @@
 ### Ross Ice Shelf, Antarctica
 
-This site has been removed by the project investigators.
+[Warning](warning.md)
+
+This GNSS site has been removed by the project investigators.
 
 <P align=center>
 <img src="https://gnss-reflections.org/static/images/LORG.jpg" width="500">

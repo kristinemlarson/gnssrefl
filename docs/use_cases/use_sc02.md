@@ -1,6 +1,8 @@
 ### Friday Harbor
 
-Updated December 11, 2022
+[Warning](warning.md)
+
+**Use Case Updated December 11, 2022**
 
 <p align="center">
 <img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>

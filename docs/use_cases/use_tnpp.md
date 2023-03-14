@@ -1,6 +1,8 @@
 ### Puerto Penasco, Sonora, Mexico
 
-Station Name: tnpp
+[Warning](warning.md)
+
+**Station Name:** tnpp
 
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/TNPP)
 
@@ -21,7 +23,8 @@ Station Name: tnpp
 - Height above sea level: 62.766 m 
 
 
-This is a high-rate site. There are multi-GNSS data including L2C starting on 2021 Oct 27. I will look at a small dataset from late 2021.  
+This is a high-rate site. There are multi-GNSS data including L2C starting on 
+2021 Oct 27. I will look at a small dataset from late 2021.  
 
 
 Use the reflection zone app to think about [RH and azimuth constraints](https://gnss-reflections.org/rzones)

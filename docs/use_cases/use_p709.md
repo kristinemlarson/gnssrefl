@@ -1,6 +1,8 @@
-### Lake Yellowstone, Yellowstone National Park
+### Lake Yellowstone 
 
-Updated December 10, 2022
+[Warning](warning.md)
+
+**Use Case Updated December 10, 2022**
 
 **Station Name:** p709
 

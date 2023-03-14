@@ -1,0 +1,12 @@
+## Warning
+
+[Earthscope](https://www.earthscope.org) (previously UNAVCO) now requires that you have a formal account
+to access their GNSS data. This use case was developed before that decision was made.
+
+
+[Your formal notice from Earthscope](https://www.unavco.org/data/gps-gnss/file-server/file-server-transition-notice.html)
+
+If you are comfortable with python, [this link](https://gitlab.com/earthscope/public/earthscope-cli) may be useful.
+
+
+All complaints and concerns should be directed to Earthscope: data-help@earthscope.org.

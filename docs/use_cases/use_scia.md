@@ -1,5 +1,7 @@
 ### Airport near Victorville, CA
 
+[Warning](warning.md)
+
 <p align="center">
 <img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/SCIA.jpg width="500"/>
 </P>

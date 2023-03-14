@@ -1,9 +1,11 @@
 ### Summit Camp, Greenland
 
+[Warning](warning.md)
+
+**Updated January 21, 2023**
+
 Fixed azimuth region and frequency selection.
 Noted issues with Galileo data.
-
-Updated January 21, 2023 
 
 
 Please note: this use case was originally written in late 2020. The dataset has been updated since that time.

@@ -1,10 +1,13 @@
 ### Niwot Ridge, Colorado, USA
 
+[Warning](warning.md)
+
 Please note: a [snowdepth utility](../pages/README_snowdepth.md) has been 
 developed since this use case was designed. It should be updated. If you would
-like to try to do so, submit a PR.
+like to try to do so, that would be great. Please submit a PR.
 
 <HR>
+
 **Status:** this site is no longer supported and the equipment was removed.
 
 **Station name:** nwot
