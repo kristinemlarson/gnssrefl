@@ -40,7 +40,7 @@ def parse_arguments():
     parser.add_argument("-peak2noise", default=None, type=float, help="new peak2noise constraint")
     parser.add_argument("-kplt", default=None, type=str, help="special plot for kristine")
     parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output")
-    parser.add_argument("-delta_out", default=None, type=int, help="Optional output interval for spline fit, seconds")
+    parser.add_argument("-delta_out", default=None, type=int, help="Output interval for spline fit, seconds (default is 1800)")
     parser.add_argument("-if_corr", default=None, type=str, help="Interfrequency correction applied, optional")
 
     args = parser.parse_args().__dict__
@@ -57,7 +57,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
              spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True,
              doy1: int = 1, doy2: int = 366, testing: bool = True, ampl: float = 0, 
              h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, 
-             peak2noise: float = 0, kplt: bool = False, subdir: str = None, delta_out : int = 0, if_corr: bool = True):
+             peak2noise: float = 0, kplt: bool = False, subdir: str = None, delta_out : int = 1800, if_corr: bool = True):
     """
     Parameters
     ----------

@@ -1447,7 +1447,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     if splineout:
         if delta_out == 0:
-            print('no spline values are written')
+            print('No spline values will be written')
         else:
             #
             iyear = int(tvd_new[0,0])
@@ -1465,6 +1465,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
             splinefileout =  txtdir + '/' + station + '_' + str(iyear) + '_spline_out.txt'
             print('Writing evenly sampled file to: ', splinefileout)
             fout = open(splinefileout,'w+')
+            fout.write('{0:1s}  {1:30s}  \n'.format('#','This is a spline fit - be careful when interpreting'))
+            fout.write('{0:1s}  {1:30s}  \n'.format('#','MJD, RH(m), YY,MM,DD,HH,MM,SS'))
             dtime = False
             for i in range(0,N):
                 modjul = g.fdoy2mjd(iyear,tplot[i])
