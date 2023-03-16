@@ -212,7 +212,7 @@ def define_and_xz_snr(station,year,doy,snr):
         if os.path.isfile(fname):
             snre = True
         else:
-            print('did not find lowercase station snr file but will look for uppercase')
+            #print('did not find lowercase station snr file but will look for uppercase')
             if os.path.isfile(fname4):
                 print('found uppercase station name in a snr file')
                 fname = fname4
