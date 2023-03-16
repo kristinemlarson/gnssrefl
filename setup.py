@@ -74,6 +74,7 @@ setup(
             'quickplt= gnssrefl.qplt2:main',
             'snowdepth= gnssrefl.snow_depth:main',
             'rh_plot= gnssrefl.rh_plot:main',
+            'make_json_meta= gnssrefl.make_json_meta:main'
             ], 
         },
     install_requires=requirements,
