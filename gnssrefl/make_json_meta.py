@@ -50,7 +50,8 @@ def parse_arguments():
 def make_json(
     station: str,
     read_offset: bool = False,
-    read_rnx: bool = False,
+    # read_es: bool = False,
+    # read_rnx: bool = False,
     man_input: bool = False,
     overwrite: bool = False,
 ):
@@ -63,6 +64,8 @@ def make_json(
         4 character station ID.
     read_offset : bool, optional
         set to True to parse GAGE offset file. default is False.
+    read_es : bool, optional
+        set to True to parse earthscope metadata DB. default is False.
     read_rnx : bool, optional
         set to True to read in user defined rinex header. default is False.
     man_input : bool, optional
@@ -93,10 +96,10 @@ def make_json(
     if read_offset:
         meta_dict = check_offsets(station, meta_dict)
 
-    # if read_rnx:
+    # if read_rnx: #TODO
     #    # read in rinex metadata
     #    meta_dict = check_rnx_header(station, meta_dict)
-    # if check_earthscope_api:
+    # if read_es: #TODO
     #   query es metadata db api
 
     if man_input:
