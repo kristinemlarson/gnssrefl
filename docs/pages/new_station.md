@@ -40,11 +40,12 @@ defined for the SNR observations.
 * Sampling interval should be commensurate with your reflection target area. You can generally get away with 30 sec for
   surfaces that are < 10 meters below the antenna, but I urge you to use **15 sec**. For reflectors larger than 50
   meters, I recommend 1 sec sampling. The bare minimum sampling rate numbers you need can be calculated using the code
-  in [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8). I will likely port this
-  to https://gnss-reflections.org.
+  in [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8). This code can also be run 
+  from [the GNSS-IR web app](https://gnss-reflections.org/rzones)
 * Make sure your antenna is surrounded by natural planar surfaces. No crashing waves. No outlet glaciers. No large ships
   coming and going.
-* Use the reflection zone app to make sure that you can sense the surface you want to measure. This is extremely
+* Use the [reflection zone app](https://gnss-reflections.org) or the python utility refl_zones to 
+make sure that you can sense the surface you want to measure. This is extremely
   important for water levels, as many groups think seeing the water in a photo means you can measure it. All you need to
   check this is the position of your site. The app will calculate the geoid correction for the ellipsoidal height. If
   you are trying to measure an interior water body (where mean sea level is not relevant), there is a manual override.
@@ -68,4 +69,4 @@ defined for the SNR observations.
 * Provide SNR data in the RINEX 3 format to ensure full access to multi-GNSS SNR data.
 
 ## Further reading
-* ["Site guidelines for multi-purpose GNSS reflectometry stations"](https://doi.org/10.5281/zenodo.3660744)
+* [Site guidelines for multi-purpose GNSS reflectometry stations](https://doi.org/10.5281/zenodo.3660744)
