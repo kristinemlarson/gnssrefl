@@ -4,6 +4,7 @@ import os
 import subprocess
 import datetime
 import csv
+import sys
 import urllib.request
 import numpy as np
 import collections
@@ -18,6 +19,12 @@ def parse_arguments():
     # required arguments
     parser.add_argument("station", help="station (lowercase)", type=str)
     # optional inputs
+    parser.add_argument(
+        "-man_input_loc",
+        default=False,
+        type=str,
+        help="manually input station location",
+    )
     parser.add_argument(
         "-read_offset",
         default=False,
@@ -40,7 +47,13 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ["read_offset", "read_rnx", "man_input", "overwrite"]
+    boolean_args = [
+        "man_input_loc",
+        "read_offset",
+        "read_rnx",
+        "man_input",
+        "overwrite",
+    ]
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -49,9 +62,9 @@ def parse_arguments():
 
 def make_json(
     station: str,
+    man_input_loc: bool = False,
     read_offset: bool = False,
-    # read_es: bool = False,
-    # read_rnx: bool = False,
+    read_rnx: bool = False,
     man_input: bool = False,
     overwrite: bool = False,
 ):
@@ -87,16 +100,19 @@ def make_json(
     # If no overwrite and a file already exists, read in existing meta information
     if (overwrite is False) and (os.path.isfile(outputfile)):
         with open(outputfile) as json_file:
-            meta_dict = json.load(json_file)
+            comp_dict = json.load(json_file)
+            meta_dict = comp_dict["meta"]
 
     else:  # initialize empty meta_dict
+        comp_dict = get_coords(station, man_input_loc)
         meta_dict = {}
 
     # read in gage metadata file
     if read_offset:
         meta_dict = check_offsets(station, meta_dict)
 
-    # if read_rnx: #TODO
+    if read_rnx:  # TODO
+        print("this module isnt added yet")
     #    # read in rinex metadata
     #    meta_dict = check_rnx_header(station, meta_dict)
     # if read_es: #TODO
@@ -108,8 +124,60 @@ def make_json(
     # sort by date
     meta_dict = collections.OrderedDict(sorted(meta_dict.items()))
 
+    # add metad to complete dictionary
+    comp_dict["meta"] = meta_dict
     with open(outputfile, "w+") as outfile:
-        json.dump(meta_dict, outfile, indent=3)
+        json.dump(comp_dict, outfile, indent=3)
+
+
+def get_coords(station, man_input_loc):
+    """
+    initializes metadata dictionary with lat lon ht keys, either from UNR database (default) or user entered
+    Parameters
+    ----------
+    station : str
+        4 character station ID.
+    man_input_loc : bool
+        set to true to manually input station coords (LLH or ECEF).
+        default is false, in which case they are pulled from unr db
+    Returns
+    ----------
+    comp_dict : dict
+        dictionary of metadata; keys 'lat','long','height' 'meta'.
+    """
+    if man_input_loc:
+
+        geod = input(
+            "You have chosen to manually enter the station location. \n Do you have geodetic coordinates? :"
+        )
+        g_dict = {"g": geod}
+        geod = str2bool(g_dict, "g")["g"]
+
+        if geod:
+            lat = float(input("Enter the latitude:"))
+            long = float(input("Enter the longitude of the station: "))
+            height = float(input("Enter the height of the station: "))
+
+        else:
+            x = float(input("Enter the ECEF X coordinate:"))
+            y = float(input("Enter the Y coordinate: "))
+            z = float(input("Enter the Z coordinate: "))
+            lat, long, height = g.xyz2llhd([x, y, z])
+    else:
+        lat, long, height = g.queryUNR_modern(station)
+        if lat == 0:
+            print(
+                "Tried to find coordinates in our UNR database. gnssrefl wont work without knowing this"
+            )
+            sys.exit()
+
+    comp_dict = {
+        "lat": "{:.4f}".format(lat),
+        "long": "{:.4f}".format(long),
+        "height": "{:.4f}".format(height),
+        "meta": {},
+    }
+    return comp_dict
 
 
 def check_offsets(station, meta_dict):
@@ -140,19 +208,15 @@ def check_offsets(station, meta_dict):
             year = int(row[0].split()[1])
             month = int(row[0].split()[2])
             day = int(row[0].split()[3])
-            hour = int(row[0].split()[4])
-            minute = int(row[0].split()[5])
 
             offset_meta_dates.append(
-                datetime.datetime(
-                    year=year, day=day, month=month, hour=hour, minute=minute
-                ).strftime("%Y-%m-%d %H:%M:%S")
+                datetime.datetime(year=year, day=day, month=month).strftime("%Y-%m-%d")
             )
 
             # Description
             ofs = row[0].split()[11]
             evt = row[0].split()[14]
-
+            # todo handle (rare) cases when order in file is swapped
             if evt == "AN":
                 tmp_dict = {}
                 rx_array = np.empty(2, dtype="S15")
@@ -202,8 +266,8 @@ def meta_man_input(meta_dict):
     month = input("Enter the month number: ")
     day = input("Enter the day of month number: ")
     date_str = datetime.datetime(
-        year=int(year), day=int(day), month=int(month), hour=0, minute=0
-    ).strftime("%Y-%m-%d %H:%M:%S")
+        year=int(year), day=int(day), month=int(month)
+    ).strftime("%Y-%m-%d")
     receiver = input(" Enter the receiver brand and model: ")
     antenna = input("Enter the antenna model: ")
     dome = input("Enter the radome 4 digit type or * if unknown: ")
