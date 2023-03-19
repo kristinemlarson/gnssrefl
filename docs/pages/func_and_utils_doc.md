@@ -12,15 +12,15 @@ estimating reflector heights from SNR data
 #### [daily_avg() ](../pages/README_dailyavg.md) 
 daily average reflector heights
 ##### [snowdepth() ](../pages/README_snowdepth.md) 
-Snow depth estimation using [daily_avg](../pages/README_dailyavg.md)  reflector heights
+Snow depth estimation 
 #### [subdaily() ](../pages/README_subdaily.md) 
-LSP quality control and RHdot for reflector height estimates
+Subdaily reflector height solutions (primarily for water levels)
 #### [invsnr() ](../pages/README_invsnr.md) 
-SNR inversion for subdaily reflector height estimates
+inverse SNR method
 #### [vwc() ](../pages/README_vwc.md) 
-Soil moisture algorithm using [gnssir](../pages/gnssir.md) 
+Soil moisture 
 
 
 ### gnssrefl [Utilities](../pages/utilities.md) 
-Additional useful functions
+Additional functions including refl_zones, download_rinex, ...
 

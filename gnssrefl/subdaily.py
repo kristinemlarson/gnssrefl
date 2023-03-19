@@ -203,7 +203,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     original = False
     if len(RHdot_corr) + len(newRH) + len(newRH_IF) == 0:
         original = True
-        print('Original version of LSP series being written')
+        print('LSP series being written')
     # 
     write_IF_corrected = False
     if len(newRH_IF) > 0:
@@ -335,6 +335,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     print('>>>>>>>>>>>>>>>>>>>>>>>> readin RH data <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     if txtfile == '':
         print('Read in the RH retrievals for ', year, ' and these days: ',d1,d2)
+        if len(extension) > 0:
+            print('Using the results in the ', extension , ' subdirectory.')
         if (d2 < d1):
             print('First day of year must be less than last day of year. Exiting')
             sys.exit()
@@ -823,6 +825,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     plt.plot(tv[ii,5],tv[ii,2], 'ro',markersize=4,label='outliers')
     plt.xlabel('Azimuth (degrees)')
     plt.ylabel('Reflector Height (m)')
+    plt.title('Quick Plot of RH with respect to Azimuth')
     plt.gca().invert_yaxis()
     plt.legend(loc="best")
     plt.grid()
