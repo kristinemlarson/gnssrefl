@@ -5920,60 +5920,6 @@ def mjd_more(mmjd):
     return year, mm, dd, doy 
 
 
-def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit,end_dt):
-    """
-    creates and displays snow depth plot 
-
-    Parameters
-    ----------
-    station : str
-        name of GNSS station
-    gobts : datetime object
-        time of measurements in datetime format
-    snowAccum : numpy array
-        snow depth (meters)
-    yerr : numpy array
-        snow depth error (meters)
-    left : datetime obj
-        min x-axis limit
-    right : datetime obj
-        max x-axis limit
-    minS : float
-        minimum snow depth (m)
-    maxS : float
-        maximum snow depth (m)
-    outputpng : str
-        name of output png file
-    pltit : bool
-        whether plot should be displayed to the screen
-    end_dt : datetime
-        user provided override date for the end of the plot
-        if None, then ignore
-    """
-    fig,ax=plt.subplots()
-    # try this
-    ax.errorbar(gobst, snowAccum, yerr=yerr, fmt='.', color='blue')
-#    plt.plot(gobst, snowAccum, 'b.',label='GPS-IR')
-    plt.title('Snow Depth: ' + station)
-    plt.ylabel('meters')
-    plt.grid()
-
-    if (end_dt is None):
-        plt.xlim((left, right))
-    else:
-        plt.xlim((left, end_dt))
-
-    fig.autofmt_xdate()
-    if (minS is not None) and (maxS is not None):
-        plt.ylim((-0.05+minS,maxS))
-
-    plt.savefig(outputpng, dpi=300)
-    if pltit:
-        plt.show()
-
-    return
-
-
 def quickazel(gweek,gpss,sat, recv,ephemdata,localup,East,North):
     """
     assumes you have read in the broadcast ephemeris,
