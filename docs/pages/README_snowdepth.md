@@ -15,6 +15,14 @@ The current required inputs are :
 - station name
 - water year
 
+You have two choices. The default model calculates an azimuth specific bare soil reflector height every 
+20 degrees in azimuth and removes that as the bare soil value for that azimuth range.  The "simple" algorithm simply treats
+them all the same (this was the first version released).  So if you were measuring RH from 90 to 270 degrees, 
+the simple version would average all the bare soil values together.  This would be perfectly fine if a site 
+is fairly horizontal. It would be perfectly fine to add more inputs (like setting 
+azimuth ranges to smaller or larger azimuth increments). I will leave that
+to the community to make as a PR.
+
 Optional inputs include:
 
 - set the y-axis limits for snow depth (minS, maxS) 
