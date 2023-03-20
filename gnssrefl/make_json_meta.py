@@ -23,7 +23,7 @@ def parse_arguments():
         "-man_input_loc",
         default=False,
         type=str,
-        help="manually input station location",
+        help="manually input station location (bool)",
     )
     parser.add_argument(
         "-read_offset",
@@ -97,7 +97,7 @@ def make_json(
         subprocess.call(["mkdir", outputdir])
     outputfile = outputdir + "/" + station + "_meta.json"
 
-    # If no overwrite and a file already exists, read in existing meta information
+    # If no overwrite and a file already exists, read in existing meta json
     if (overwrite is False) and (os.path.isfile(outputfile)):
         with open(outputfile) as json_file:
             comp_dict = json.load(json_file)
@@ -150,8 +150,7 @@ def get_coords(station, man_input_loc):
         geod = input(
             "You have chosen to manually enter the station location. \n Do you have geodetic coordinates? :"
         )
-        g_dict = {"g": geod}
-        geod = str2bool(g_dict, "g")["g"]
+        geod = str2bool({"g": geod}, "g")["g"]
 
         if geod:
             lat = float(input("Enter the latitude:"))
