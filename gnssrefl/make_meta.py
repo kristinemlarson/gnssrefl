@@ -75,6 +75,9 @@ def make_meta(
     ----------
     station : str
         4 character station ID.
+    man_input_loc : bool
+        set to true to manually input station coords (LLH or ECEF).
+        default is false, in which case they are pulled from unr db
     read_offset : bool, optional
         set to True to parse GAGE offset file. default is False.
     read_es : bool, optional
