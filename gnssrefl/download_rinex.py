@@ -136,7 +136,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         saves crx version for Rinex3 downloads. Otherwise they are deleted.
     """
 
-    print('starting a new tag')
+    #print('starting a new tag')
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
