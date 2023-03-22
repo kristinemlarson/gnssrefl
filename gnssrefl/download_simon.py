@@ -65,7 +65,8 @@ def parse_arguments():
 
 def download_simon(station: str, output: str = None, plt: bool = False):
     """
-    Downloads IOC tide gauge files in json format, converts it to plain txt or csv format
+    Downloads PSMSL tide gauge files created by Simon Williams 
+    in json format, converts it to plain txt or csv format
 
     Parameters
     ----------

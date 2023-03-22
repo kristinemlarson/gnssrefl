@@ -15,8 +15,8 @@ import gnssrefl.cddis_highrate as ch
 
 def gogetit(dir1, filename, ext):
     """
-    the purpose of this function is to to download RINEX 2 files
-    code will try to get the file and chck to see if it was successful
+    The purpose of this function is to to download RINEX 2 files.
+    The code will try to get the file and check to see if it was successful.
 
     Parameters
     ----------
@@ -58,12 +58,12 @@ def swapRS(stream):
     Parameters
     ----------
     stream : str
-         RINEX 3 file streaming acronym (S or R)
+        RINEX 3 filename streaming acronym (S or R)
 
     Returns
     -------
     newstream : str
-         the opposite of what was in stream
+        the opposite of what was in stream
 
     """
     if stream == 'R':
@@ -75,7 +75,7 @@ def swapRS(stream):
 def just_bkg(cyyyy, cdoy, file_name):
     """
 
-    looks for bkg rinex files in two directories
+    looks for RINEX files at BKG in two directories
 
     Parameters
     ----------
@@ -358,7 +358,7 @@ def universal_all(station9ch, year, doy, srate,stream):
 
 def rinex2names(station,year,doy):
     """
-    rinex2 filename 
+    Creates the expected filename for rinex2 version files
 
     Parameters
     ----------
@@ -411,6 +411,7 @@ def universal_rinex2(station, year, doy, archive):
         filename that was downloaded
 
     foundit : boolean
+        whether file was found
 
     """
     # define the file name
@@ -500,7 +501,7 @@ def universal_rinex2(station, year, doy, archive):
 
 def make_rinex2_ofiles(file_name):
     """
-    take a rinex2 file gunzip or uncompress and 
+    take a rinex2 file, gunzip or uncompress it, and 
     then Hatanaka decompress it
 
     Parameters
@@ -599,7 +600,6 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
 
     Parameters
     ----------
-
     station : string
          4 character station ID.  lowercase
 
@@ -610,8 +610,10 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
         day of year
 
     archive : string
+        name of GNSS archive
 
     strip_snr : boolean
+        whether you want to strip out the observables (leaving only SNR)
 
     """
     foundit = False
