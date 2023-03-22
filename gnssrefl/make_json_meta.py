@@ -60,7 +60,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def make_json(
+def make_meta(
     station: str,
     man_input_loc: bool = False,
     read_offset: bool = False,
@@ -171,6 +171,7 @@ def get_coords(station, man_input_loc):
             sys.exit()
 
     comp_dict = {
+        "station": station,
         "lat": "{:.4f}".format(lat),
         "long": "{:.4f}".format(long),
         "height": "{:.4f}".format(height),
@@ -280,7 +281,7 @@ def meta_man_input(meta_dict):
 
 def main():
     args = parse_arguments()
-    make_json(**args)
+    make_meta(**args)
 
 
 if __name__ == "__main__":
