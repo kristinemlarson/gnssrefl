@@ -10,8 +10,10 @@ import sys
 import subprocess
 import wget
 from urllib.parse import urlparse
+# local libraries
 import gnssrefl.gps as g
 import gnssrefl.cddis_highrate as ch
+import gnssrefl.kelly as kelly
 
 def gogetit(dir1, filename, ext):
     """
@@ -439,6 +441,14 @@ def universal_rinex2(station, year, doy, archive):
         foundit, file_name = gogetit(dir1, dname, '.Z'); 
         if not foundit:
             foundit, file_name = gogetit(dir1, oname, '.Z')
+    elif (archive == 'unavco2'):
+        print('testing out new protocol at unavco')
+        url1 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
+        foundit,file_name = kelly.the_kelly_simple_way(url1,dname + '.Z')
+        if not foundit:
+            url2 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
+            foundit,file_name = kelly.the_kelly_way(url2,oname + '.Z')
+
     elif (archive == 'special'):
         dir1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy
         foundit, file_name = gogetit(dir1, oname, '.gz'); 
@@ -468,8 +478,12 @@ def universal_rinex2(station, year, doy, archive):
         dir1 = 'https://gnss.bev.gv.at/at.gv.bev.dc/data/obs/' + cydoy
         foundit, file_name = gogetit(dir1, dname, '.gz');
     elif (archive == 'jeff'):
-        dir1 = 'ftp://gps.alaska.edu/pub/gpsdata/permanent/C2/' + cydoy
-        foundit, file_name = gogetit(dir1, oname, '.gz');
+        if station == 'pbay':
+            dir1 = 'ftp://gps.alaska.edu/pub/gpsdata/permanent/C2/' + cydoy
+            foundit, file_name = gogetit(dir1, oname, '.gz');
+        else:
+            dir1 = 'ftp://gps.alaska.edu/pub/gpsdata/CoopCORS/' + cydoy + '/' + station.upper() + '/'
+            foundit, file_name = gogetit(dir1, oname, '.gz');
     elif (archive == 'ngs'):
         dir1 = 'https://geodesy.noaa.gov/corsdata/rinex/' + cydoy + '/' + station + '/'
         foundit, file_name = gogetit(dir1, oname, '.gz');

@@ -148,7 +148,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     month, day, doy, cyyyy, cyy, cdoy = g.ymd2ch(year,month,day)
 
     # allowed archives, rinex 2.11
-    archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 'bkg', 'jeff', 'ngs', 'nrcan', 'special', 'bev', 'all']
+    # unavco2 is for testing
+    archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 
+            'bkg', 'jeff', 'ngs', 'nrcan', 'special', 'bev', 'all','unavco2']
 
 
     # removed the all archive

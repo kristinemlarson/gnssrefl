@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.24
+added unavco2 option to test new unavco download protocols
+requires earthscope-sdk import
+currently works - I believe - for RINEX 2.11
+users will need an account with Earthscope. [For more information on this](warning.md)
+
+Made minor changes to subdaily. outlier file is created on the second go-thru, e.g.
+
+Added alaska CORS sites if using the jeff archive.
+
+added a few option to quickplt (mostly label axes)
+
 ## 1.2.23
 Made a new option for snowdepth. Azimuth dependent bare soil correction is now
 the default.  

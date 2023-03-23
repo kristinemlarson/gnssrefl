@@ -320,9 +320,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     else:
         doy2 = doy_end
 
-    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all']
+    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2']
     archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 'bkg', 'jeff',
-                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all']
+                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2']
 
     # no longer allow the all option
     # unavco is only rinex2

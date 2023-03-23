@@ -18,7 +18,7 @@ import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
 
-def writeout_spline_outliers(tvd_bad,txtdir,residual):
+def writeout_spline_outliers(tvd_bad,txtdir,residual,filename):
     """
 
     Write splinefit outliers to a file. 
@@ -33,10 +33,13 @@ def writeout_spline_outliers(tvd_bad,txtdir,residual):
 
     residual : numpy array
         outlier in units of meters (!)
+
+    filename : str
+        name of file being written
     """
     nr,nc=tvd_bad.shape
     if nr > 0:
-        f = txtdir + '/outliers.spline.txt'
+        f = txtdir + '/' + filename
         print(nr, ' Outliers written to: ', f)
         fout = open(f, 'w+')
         # put in a header
@@ -1294,7 +1297,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     kk = np.abs(residual_after) > 3*sigmaAfter
     tvd_confused = tvd[kk,:]
-    writeout_spline_outliers(tvd_confused,txtdir,residual_after[kk])
+    writeout_spline_outliers(tvd_confused,txtdir,residual_after[kk],'outliers.spline.txt')
 
     # keep values within 3 sigma 
     ii = np.abs(residual_after) < 3*sigmaAfter
@@ -1421,7 +1424,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     # points to keep
     jj = np.abs(biasCor_rh -spline_at_GPS)/newsigma < 3
 
-    plt.plot(th[ii], biasCor_rh[ii], 'rx', label='3-sig outliers' + strsig)
+    plt.plot(th[ii], biasCor_rh[ii], 'rx', label='3-sig outliers')
 
     plt.legend(loc="upper left")
     plt.grid()
@@ -1437,6 +1440,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.xlabel('days of the year')
 
     plt.plot(th[ii], (biasCor_rh -spline_at_GPS)[ii], 'r.',label='3-sig')
+    # will write these residauls out to a file
+    badpoints2 =  (biasCor_rh -spline_at_GPS)[ii]
     plt.legend(loc="upper left")
 
     print('RMS with frequency bias taken out (m) ', np.round(newsigma,3)  )
@@ -1446,6 +1451,12 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     bias_corrected_filename = fname_new + 'IF'; extraline = ''; writecsv = False
     biasCor_rh = tvd_new[jj,24]
     write_subdaily(bias_corrected_filename,station,tvd_new[jj,:], writecsv,extraline, newRH_IF=biasCor_rh)
+
+    new_outliers = tvd_new[ii,:]
+
+    # write outliers again ... 
+    writeout_spline_outliers(new_outliers,txtdir,badpoints2,'outliers.spline2.txt')
+
 
     # I was looking at issue of delT being too big
 
@@ -1469,8 +1480,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
             splinefileout =  txtdir + '/' + station + '_' + str(iyear) + '_spline_out.txt'
             print('Writing evenly sampled file to: ', splinefileout)
             fout = open(splinefileout,'w+')
-            fout.write('{0:1s}  {1:30s}  \n'.format('#','This is a spline fit - be careful when interpreting'))
-            fout.write('{0:1s}  {1:30s}  \n'.format('#','MJD, RH(m), YY,MM,DD,HH,MM,SS'))
+            fout.write('{0:1s}  {1:30s}  \n'.format('%','This is a spline fit - be careful when interpreting'))
+            fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD, RH(m), YY,MM,DD,HH,MM,SS'))
             dtime = False
             for i in range(0,N):
                 modjul = g.fdoy2mjd(iyear,tplot[i])

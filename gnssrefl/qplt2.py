@@ -38,7 +38,9 @@ def main():
     parser.add_argument("-mjd", help="set to True/T if x-values are MJD", type=str,default=None)
     parser.add_argument("-reverse", help="set to True/T to reverse the y-axis", type=str,default=None)
     parser.add_argument("-ymdh", help="if True/T, columns 1-4 are year mon day hour ", type=str,default=None)
-    parser.add_argument("-ylabel", help="y-axis label ", type=str,default=None)
+    parser.add_argument("-xlabel", type=str, help="optional x-axis label", default=None)
+    parser.add_argument("-ylabel", type=str, help="optional y-axis label", default=None)
+    parser.add_argument("-symbol", help="plot symbol ", type=str,default=None)
     parser.add_argument("-title", help="optional title", type=str,default=None)
     parser.add_argument("-outfile", help="optional filename for plot", type=str,default=None)
     parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
@@ -58,6 +60,7 @@ def main():
         ylabel = 'Unknown'
     else:
         ylabel = args.ylabel
+
 
     secondFile = False
 
@@ -120,14 +123,21 @@ def main():
 
 
     fig,ax=plt.subplots()
-    ax.plot(tval, yval, 'b.')
+    if args.symbol is None:
+        ax.plot(tval, yval, 'b.')
+    else:
+        ax.plot(tval, yval, args.symbol)
 
     # second file is not currently supported
     if secondFile:
         ax.plot(tval2, yval2, 'r.')
 
     fig.autofmt_xdate()
+
     plt.ylabel(ylabel)
+
+    if args.xlabel is not None:
+        plt.xlabel(str(args.xlabel))
 
     if reverse_sign:
         ax.invert_yaxis()

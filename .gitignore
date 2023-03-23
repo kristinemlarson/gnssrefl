@@ -1,4 +1,5 @@
 env
+sso_tokens.json
 tmp
 all.txt
 jul01.txt
