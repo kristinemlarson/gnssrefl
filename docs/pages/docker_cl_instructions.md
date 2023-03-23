@@ -59,7 +59,15 @@ To shut down the docker container run `docker stop gnssrefl`
 If you need to see the container(s) you have running you can use `docker ps`
 
 ### Update Docker Image to newest version <a name="Update Docker"></a>
+
+
+**I believe this is wrong**
+
 To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
+
+Instead try
+
+docker pull ghcr.io/kristinemlarson/gnssrefl:latest
 
 
 ## For WINDOWS USERS:
