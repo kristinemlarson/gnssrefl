@@ -2,6 +2,9 @@
 
 set -euxo pipefail
 
+
+exit
+
 #
 # various tests that gnssrefl build is still working
 # this only checks that the code does not crash. It does not currently

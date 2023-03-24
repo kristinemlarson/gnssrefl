@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.2.25
-fixed bug in gnssir triggered by unphysical elevation angles in NMEA messages
+I have made good faith effort to institute the requirement for earthscope logins.
+I had to change rinex 2.11, rinex 3, and highrate rinex 2.11 file downloads in both
+rinex2snr and download_rinex. We will know on March 31 if I was successful.
+
+I fixed a bug in gnssir triggered by unphysical elevation angles in NMEA messages
 They peg at the same value - which makes LSP think that they have a window length
-of zero. A warning is sent to the screen and the satellite is skipped. 
+of zero. A warning is sent to the screen (if screenstats is set to True) and the satellite is skipped. 
 
 README.md now directs users to readthedocs. 
 
