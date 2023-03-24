@@ -167,7 +167,15 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
             print('File was not found: at bfg.')
 
         return file_name,foundit
+    cydoy =  cyyyy + '/' + cdoy + '/'
 
+    if (archive == 'unavco'):
+        # original dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
+        #url1 =      'https://data-idm.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
+        url1 =      'https://data.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
+        print('testing new unavco protocols:',url1)
+        foundit,file_name = kelly.the_kelly_simple_way(url1,file_name)
+        return file_name,foundit
 
     try:
         if (archive == 'ign'):
@@ -199,7 +207,7 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         elif (archive == 'nrcan'):
             dir1 = 'https://cacsa.nrcan.gc.ca/gps/data/gpsdata/' + cyy + cdoy  + '/' + cyy + 'd' + '/'
             wget.download(dir1+file_name,file_name)
-        elif (archive == 'unavco'):
+        elif (archive == 'unavco-old'):
             dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
         elif (archive == 'gfz'):
@@ -321,16 +329,12 @@ def universal_all(station9ch, year, doy, srate,stream):
     ----------
     station9ch : str
         9 character station name
-
     year : int
         full year
-
     doy : int
         doy of year
-
     srate : int
         receiver sample rate 
-
     stream : str
         R or S
 
@@ -338,7 +342,6 @@ def universal_all(station9ch, year, doy, srate,stream):
     -------
     file_name : str
         rinex filename
-
     foundit : bool
         whether rinex file was found
 
@@ -436,17 +439,19 @@ def universal_rinex2(station, year, doy, archive):
         file_name = oname
         if os.path.exists(file_name):
             foundit = True
-    elif (archive == 'unavco'):
+    elif (archive == 'unavco-old'):
         dir1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy
         foundit, file_name = gogetit(dir1, dname, '.Z'); 
         if not foundit:
             foundit, file_name = gogetit(dir1, oname, '.Z')
-    elif (archive == 'unavco2'):
+    elif (archive == 'unavco'):
         print('testing out new protocol at unavco')
-        url1 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
+        #url1 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
+        url1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
         foundit,file_name = kelly.the_kelly_simple_way(url1,dname + '.Z')
         if not foundit:
-            url2 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
+            url2 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
+            #url2 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
             foundit,file_name = kelly.the_kelly_way(url2,oname + '.Z')
 
     elif (archive == 'special'):

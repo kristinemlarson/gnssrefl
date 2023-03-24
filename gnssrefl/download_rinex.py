@@ -157,7 +157,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     archive_list_high = ['unavco', 'nrcan', 'cddis','ga','bkg']  # though it is confusing because some are rinex 2.11 and others 3
 
     # archive list for rinex3 lowrate files
-    archive_list_rinex3 = ['unavco', 'cddis', 'ga', 'bev', 'bkg', 'ign', 'epn', 'bfg','sonel','all']
+    archive_list_rinex3 = ['unavco', 'cddis', 'ga', 'bev', 'bkg', 'ign', 'epn', 'bfg','sonel','all','unavco2']
 
     if doy_end is None:
         doy_end = doy
@@ -202,6 +202,10 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             # override the sample rate here
             samplerate = 15
 
+        if archive == 'unavco2':
+            # override the sample rate here
+            samplerate = 15
+
         if archive not in archive_list_rinex3:
             print('You picked an archive that is not supported by my code. Exiting')
             print(archive_list_rinex3)
@@ -225,7 +229,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     for d in range(doy, doy_end+1):
         # RINEX Version 3
         if version == 3:
-            print(station, year, d, archive, samplerate, stream)
+            print('Request ', station, year, d, archive, samplerate, stream)
             if rate == 'high':
                 if archive == 'cddis':
                     print('seek highrate data at CDDIS')

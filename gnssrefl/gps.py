@@ -29,6 +29,7 @@ import gnssrefl.read_snr_files as snr
 import gnssrefl.karnak_libraries as k
 import gnssrefl.EGM96 as EGM96
 import gnssrefl.rinex2snr as rnx
+import gnssrefl.kelly as kelly
 
 # for future ref
 #import urllib.request
@@ -2516,29 +2517,39 @@ def rinex_unavco_highrate(station, year, month, day):
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
 
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
-    unavco= 'https://data.unavco.org/archive/gnss/highrate/1-Hz/rinex/'
+
+    print('Using new unavco protocols')
+    #unavco = 'https://data-idm.unavco.org/archive/gnss/highrate/1-Hz/rinex/' 
+    unavco = 'https://data.unavco.org/archive/gnss/highrate/1-Hz/rinex/'
+
 
     filename1 = rinexfile + '.Z'
     filename2 = rinexfiled + '.Z'
     url1 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename1
     url2 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename2
-    print(url1)
 
     # hatanaka executable has to exist
     s1 = time.time()
     if os.path.isfile(crnxpath): 
+        #print('try', url2, filename2)
+
         try:
-            wget.download(url2,filename2)
-            subprocess.call(['uncompress',filename2])
-            subprocess.call([crnxpath, rinexfiled])
-            subprocess.call(['rm','-f',rinexfiled])
+            #wget.download(url2,filename2) old way
+            foundit,file_name = kelly.the_kelly_simple_way(url2,filename2)
+            if foundit:
+                subprocess.call(['uncompress',filename2])
+                subprocess.call([crnxpath, rinexfiled])
+                subprocess.call(['rm','-f',rinexfiled])
         except:
             okok = 1
     if not os.path.isfile(rinexfile):
-        print('Did not find Hatanaka. Try for obs file')
+        #print('Did not find Hatanaka. Try for obs file')
+        #print('try', url1, filename1)
         try:
-            wget.download(url1,filename1)
-            subprocess.call(['uncompress',filename1])
+            #wget.download(url1,filename1) old way
+            foundit,file_name = kelly.the_kelly_simple_way(url1,filename1)
+            if foundit:
+                subprocess.call(['uncompress',filename1])
         except:
             okok = 1
     s2 = time.time()
