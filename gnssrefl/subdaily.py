@@ -1414,7 +1414,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     newsigma = np.std(biasCor_rh-spline_at_GPS)
     strsig = str(round(newsigma,3)) + '(m)'
 
-    fig=plt.figure(figsize=(10,6))
+    fig=plt.figure(figsize=(10,8))
     plt.subplot(2,1,1)
     plt.plot(th, biasCor_rh, 'b.', label='RH with RHdot/IFcorr ' + strsig)
     plt.plot(th_even, spline_whole_time, 'c-',label='newspline')
@@ -1431,6 +1431,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.gca().invert_yaxis()
     plt.ylabel('meters')
     plt.title('New spline with RHdot corr/InterFreq corr/initial 3sigma outliers removed')
+    plt.xlabel('days of the year')
 
     plt.subplot(2,1,2)
     plt.plot(th, biasCor_rh - spline_at_GPS, 'b.',label='all residuals')

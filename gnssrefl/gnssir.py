@@ -136,7 +136,8 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                 satlist = onesat_freq_check(onesat,f )
 
             for satNu in satlist:
-                #if screenstats: print('Satellite', satNu)
+                if screenstats: 
+                    print('Satellite', satNu)
                 for a in range(naz):
                     az1 = azval[(a*2)] ; az2 = azval[(a*2 + 1)]
                     x,y,Nv,cf,UTCtime,avgAzim,avgEdot,Edot2,delT= g.window_data(s1,s2,s5,s6,s7,s8,sat,ele,azi,t,edot,f,az1,az2,e1,e2,satNu,lsp['polyV'],lsp['pele'],screenstats) 
@@ -145,17 +146,21 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                         found_results = True
                         #print('length of x', len(x))
                         maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,lsp['desiredP'],lsp['polyV'],minH) 
-                        nij =   pz[(px > NReg[0]) & (px < NReg[1])]
-                        Noise = 0
-                        if (len(nij) > 0):
-                            Noise = np.mean(nij)
-                        iAzim = int(avgAzim)
-                        tooclose = False
-                        if abs(maxF - minH) < 0.10: #  peak too close to min value
-                            tooclose = True
+                        if (maxF ==0) & (maxAmp == 0):
+                            #print('you have tripped a warning')
+                            tooclose == True; Noise = 1; iAzim = 0;
+                        else:
+                            nij =   pz[(px > NReg[0]) & (px < NReg[1])]
+                            Noise = 1
+                            if (len(nij) > 0):
+                                Noise = np.mean(nij)
+                            iAzim = int(avgAzim)
+                            tooclose = False
+                            if abs(maxF - minH) < 0.10: #  peak too close to min value
+                                tooclose = True
                         # KL added 2022 march 26
-                        if abs(maxF - maxH) < 0.10: #  peak too close to max value
-                            tooclose = True
+                            if abs(maxF - maxH) < 0.10: #  peak too close to max value
+                                tooclose = True
                         if (not tooclose) & (delT < lsp['delTmax']) & (eminObs < (e1 + ediff)) & (emaxObs > (e2 - ediff)) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
                             # request from a tide gauge person for Month, Day, Hour, Minute
                             if lsp['mmdd']:

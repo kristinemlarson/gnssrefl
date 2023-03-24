@@ -1425,7 +1425,7 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
 # units of inverse meters
     W = np.max(X) - np.min(X)         
     if W == 0:
-        print('bad ofac/hifac calc')
+        print('bad window length - which will lead to illegal ofac/hifac calc')
         return 0,0
 
 # characteristic peak width, meters
