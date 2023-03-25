@@ -54,7 +54,7 @@ def parse_arguments():
 
 
 def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, plt: bool = True,
-             spline_outlier: float = 1.0, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True,
+             spline_outlier: float = None, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True,
              doy1: int = 1, doy2: int = 366, testing: bool = True, ampl: float = 0, 
              h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, 
              peak2noise: float = 0, kplt: bool = False, subdir: str = None, delta_out : int = 1800, if_corr: bool = True):

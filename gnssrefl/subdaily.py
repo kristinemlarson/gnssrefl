@@ -49,7 +49,8 @@ def writeout_spline_outliers(tvd_bad,txtdir,residual,filename):
             fy = tvd_bad[w,1] + tvd_bad[w,4]/24 # fractional day of year
             deltaT = tvd_bad[w,14]
             mjd = tvd_bad[w,15]
-            fout.write('{0:3.0f} {1:7.2f} {2:7.2f} {3:7.2f} {4:9.3f} {5:15.7f} \n'.format( tvd_bad[w,3], tvd_bad[w,5], deltaT,residual[w],fy,mjd ))
+            fout.write('{0:3.0f} {1:7.2f} {2:7.2f} {3:7.2f} {4:9.3f} {5:15.7f} {6:7.2f} \n'.format( 
+                tvd_bad[w,3], tvd_bad[w,5], deltaT,residual[w],fy,mjd,tvd_bad[w,2] ))
         fout.close()
 
     return
@@ -836,7 +837,8 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     plt.savefig(plotname,dpi=150)
     print('png file saved as: ', plotname)
 
-    fig = plt.figure()
+    #    fig=plt.figure(figsize=(10,6))
+    fig = plt.figure(figsize=(10,6))
     colors = tv[:,5]
 # put some amplitude information on it
 # ax.plot( otimes, tv[:,2], '.')
@@ -1147,10 +1149,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     outlierV : float
        outlier criterion, in meters 
+       if None, then use 3 sigma (which is the default)
 
     """
-    # this is not being used 
-    outlierV = float(outlierV) #just to make sure - i think it was sending a string
     # output will go to REFL_CODE/Files unless txtdir provided
     xdir = os.environ['REFL_CODE']
 
@@ -1223,8 +1224,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     print('Average num of RH obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
     print('Knots per day: ', knots_per_day, ' Number of knots: ', numKnots)
     # currently using 3 sigma
-    #print('Outlier criterion with respect to spline fit (m): ', outlierV)
-    # 
+    print('Outlier criterion provided by the user for the splinefit (m):', outlierV)
 
     firstKnot_in_minutes = 15
     t1 = tnew.min()+firstKnot_in_minutes/60/24
@@ -1291,16 +1291,27 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.subplot(2,1,2)
     plt.plot(th, residual_after,'r.',label='all pts')
 
+    if outlierV is None:
+    # use 3 sigma
+        OutlierLimit = 3*sigmaAfter
+        print('Using three sigma outlier criteria')
+    else:
+        OutlierLimit = float(outlierV)
+        print('User-defined splinefit outlier value (m): ', OutlierLimit)
 
-    tvd_bad = tvd[np.abs(residual_after) >  3*sigmaAfter, :]
+    tvd_bad = tvd[np.abs(residual_after) >  OutlierLimit, :]
+    #tvd_bad = tvd[np.abs(residual_after) >  3*sigmaAfter, :]
 
 
-    kk = np.abs(residual_after) > 3*sigmaAfter
+    #kk = np.abs(residual_after) > 3*sigmaAfter
+    kk = np.abs(residual_after) > OutlierLimit
     tvd_confused = tvd[kk,:]
+
     writeout_spline_outliers(tvd_confused,txtdir,residual_after[kk],'outliers.spline.txt')
 
     # keep values within 3 sigma 
-    ii = np.abs(residual_after) < 3*sigmaAfter
+    #ii = np.abs(residual_after) < 3*sigmaAfter
+    ii = np.abs(residual_after) <= OutlierLimit
     tvd_new = tvd[ii,:]
     correction_new = correction[ii]
     correctedRH_new = correctedRH[ii]
@@ -1567,9 +1578,12 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
 
     # now doing 1 and 99%
     p1 = 0.01; p2 = 0.99
-    lowv, highv = my_percentile(tv[:,2],p1, p2)
+    #lowv, highv = my_percentile(tv[:,2],p1, p2)
     # this crashed my docker build - but it turned out to have nothing to do with it
-#    yl = np.percentile(tv[:,2] ,[1 ,99])
+    yl = np.percentile(tv[:,2] ,[1 ,99])
+    print('percentile values',yl)
+    lowv = yl[0]; highv = y[1]
+    
     if percent99:
         ax2.set_ylim((lowv,highv))
 

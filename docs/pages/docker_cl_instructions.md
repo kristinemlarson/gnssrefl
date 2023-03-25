@@ -50,6 +50,15 @@ docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/
 --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
 </PRE>
 
+or 
+
+<PRE>
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  \
+-v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/   \
+-v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/  \
+--name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
+</PRE>
+
 
 ### Shutdown Docker <a name="Shutdown"></a>
 To shut down the container from the terminal, use `ctrl+c`
