@@ -443,7 +443,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             rh_plots(otimes,tv,station,txtdir,year,d1,d2,True)
             rh_plots(otimes,tv,station,txtdir,year,d1,d2,False)
 
-        plt.show()
+        #plt.show()
 
 
     # now write things out - using txtdir variable sent 
@@ -1129,7 +1129,7 @@ def flipit(tvd,col):
     return tnew, ynew
 
 
-def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
+def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs):
     """
     Improved code to compute rhdot correction and bias correction for subdaily
 
@@ -1148,7 +1148,10 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
         whether you want plots to the screen
 
     outlierV : float
-       outlier criterion, in meters 
+       outlier criterion, in meters  used in first go thru
+       if None, then use 3 sigma (which is the default)
+    outlierV2 : float
+       outlier criterion, in meters  used in second go thru
        if None, then use 3 sigma (which is the default)
 
     """
@@ -1224,7 +1227,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     print('Average num of RH obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
     print('Knots per day: ', knots_per_day, ' Number of knots: ', numKnots)
     # currently using 3 sigma
-    print('Outlier criterion provided by the user for the splinefit (m):', outlierV)
+    print('Outlier criterion for the first splinefit (m):', outlierV)
+    print('Outlier criterion for the second splinefit (m):', outlierV2)
 
     firstKnot_in_minutes = 15
     t1 = tnew.min()+firstKnot_in_minutes/60/24
@@ -1382,8 +1386,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
 
     if not apply_if_corr:
         print('You chose not to correct for IF biases. Exiting')
-        if pltit:
-            plt.show()
+        #if pltit:
+        #    plt.show()
         return tvd_new, correction
 
     # now try to write the bias corrected values
@@ -1430,18 +1434,30 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.plot(th, biasCor_rh, 'b.', label='RH with RHdot/IFcorr ' + strsig)
     plt.plot(th_even, spline_whole_time, 'c-',label='newspline')
 
-    # identify 3 sigma outliers
-    ii = np.abs(biasCor_rh -spline_at_GPS)/newsigma > 3
-    # points to keep
-    jj = np.abs(biasCor_rh -spline_at_GPS)/newsigma < 3
 
-    plt.plot(th[ii], biasCor_rh[ii], 'rx', label='3-sig outliers')
+
+    if outlierV2 is None:
+        # use 3 sigma to find outliers
+        OutlierLimit = 3*sigmaAfter
+        print('Using three sigma outlier criteria')
+        ii = np.abs(biasCor_rh -spline_at_GPS)/newsigma > 3
+        jj = np.abs(biasCor_rh -spline_at_GPS)/newsigma <= 3
+    else:
+        OutlierLimit = float(outlierV2)
+        print('User-defined splinefit outlier value (m): ', OutlierLimit)
+        # throw out
+        ii = np.abs(biasCor_rh -spline_at_GPS) > OutlierLimit
+        # points to keep
+        jj = np.abs(biasCor_rh -spline_at_GPS) <= OutlierLimit
+
+
+    plt.plot(th[ii], biasCor_rh[ii], 'rx', label='outliers')
 
     plt.legend(loc="upper left")
     plt.grid()
     plt.gca().invert_yaxis()
     plt.ylabel('meters')
-    plt.title('New spline with RHdot corr/InterFreq corr/initial 3sigma outliers removed')
+    plt.title('New spline with RHdot corr/InterFreq corr/initial outliers removed')
     plt.xlabel('days of the year')
 
     plt.subplot(2,1,2)
@@ -1451,12 +1467,12 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
     plt.ylabel('meters')
     plt.xlabel('days of the year')
 
-    plt.plot(th[ii], (biasCor_rh -spline_at_GPS)[ii], 'r.',label='3-sig')
+    plt.plot(th[ii], (biasCor_rh -spline_at_GPS)[ii], 'r.',label='outliers')
     # will write these residauls out to a file
     badpoints2 =  (biasCor_rh -spline_at_GPS)[ii]
     plt.legend(loc="upper left")
 
-    print('RMS with frequency bias taken out (m) ', np.round(newsigma,3)  )
+    print('RMS with frequency bias and RHdot taken out (m) ', np.round(newsigma,3)  )
     g.save_plot(txtdir + '/' + station + '_rhdot4.png')
 
     # bias corrected - and again without 3 sigma outliers
@@ -1513,8 +1529,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,**kwargs):
         plt.xlabel('delta Time (minutes)')
 
 
-    if pltit:
-        plt.show()
+    #if pltit:
+    #    plt.show()
 
     return tvd, correction
 

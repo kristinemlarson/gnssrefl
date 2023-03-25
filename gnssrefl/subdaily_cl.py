@@ -3,6 +3,8 @@
 # kristine larson, modified may 2021
 import argparse
 import numpy as np
+import matplotlib.pyplot as mplt
+
 import os
 import sys
 import subprocess
@@ -24,7 +26,8 @@ def parse_arguments():
     parser.add_argument("-splinefile", default=None, type=str, help="Input filename for rhdot/spline fitting (optional)") 
     parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt")
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
-    parser.add_argument("-spline_outlier", default=None, type=float, help="outlier criterion used in splinefit (meters)")
+    parser.add_argument("-spline_outlier1", default=None, type=float, help="outlier criterion used in first splinefit (meters)")
+    parser.add_argument("-spline_outlier2", default=None, type=float, help="outlier criterion used in second splinefit (meters)")
     parser.add_argument("-knots", default=None, type=int, help="Knots per day, spline fit only (default is 8)")
     parser.add_argument("-sigma", default=None, type=float, help="simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)")
     parser.add_argument("-extension", default=None, type=str, help="solution subdirectory")
@@ -53,11 +56,12 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, plt: bool = True,
-             spline_outlier: float = None, knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True,
-             doy1: int = 1, doy2: int = 366, testing: bool = True, ampl: float = 0, 
-             h1: float=0.0, h2: float=300.0, azim1: int=0, azim2: int = 360, 
-             peak2noise: float = 0, kplt: bool = False, subdir: str = None, delta_out : int = 1800, if_corr: bool = True):
+def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, 
+        plt: bool = True, spline_outlier1: float = None, spline_outlier2: float = None, 
+        knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True, doy1: int = 1, 
+        doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.0, h2: float=300.0, 
+        azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
+        subdir: str = None, delta_out : int = 1800, if_corr: bool = True):
     """
     Parameters
     ----------
@@ -78,9 +82,10 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     plt : boolean, optional
         To print plots to screen or not.
         default is TRUE.
-    spline_outlier : float, optional
-        Outlier criterion used in splinefit (meters)
-        default is 1.0
+    spline_outlier1 : float, optional
+        Outlier criterion used in first splinefit, before RHdot  (m)
+    spline_outlier2 : float, optional
+        Outlier criterion used in second splinefit, after IF & RHdot (meters)
     knots : integer, optional
         Knots per day, spline fit only.
         default is 8.
@@ -172,12 +177,17 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
             print('Input subdaily RH file you provided does not exist:', fname_new)
             sys.exit()
 
+    if not rhdot:
+        if plt:
+            mplt.show()
     input2spline = fname_new; output4spline = fname_new + '.withrhdot'
 
     # not sure why tv and corr are being returned.
     if rhdot:
-       tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier, 
+       tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier1, spline_outlier2, 
                    knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,if_corr=if_corr)
+       if plt:
+           mplt.show()
 
 def main():
     args = parse_arguments()

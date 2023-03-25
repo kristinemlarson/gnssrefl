@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.2.26
+subdaily now has a working spline_outlier input. This allows you to use an outlier
+criterion in meters instead of the default 3 sigma. The latter can be too restrictive.
+spline_outlier1 is for the first phase (RHdot) and spline_outlier2 is for the second 
+one, after Rhdot and interfrequency biases are removed. Units are meters.
+
 ## 1.2.25
 I have made good faith effort to institute the requirement for earthscope logins.
 I had to change rinex 2.11, rinex 3, and highrate rinex 2.11 file downloads in both
