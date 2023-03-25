@@ -125,8 +125,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     """
     #
     if archive == 'special':
-        print('The special option needs to be updated for new UNAVCO/Earthscope protocols. Please contact')
-        print('Tim Dittmann or Kelly Enloe at Earthscope if your file download does not work.')
+        print('The special option needs to be updated for new UNAVCO/Earthscope protocols. Please submit ')
+        print('an issue at https://github.com/kristinemlarson/gnssrefl.')
     # do not allow illegal skipit values
     if skipit < 1:
         skipit = 1

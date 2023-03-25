@@ -1,5 +1,13 @@
 # subdaily<a name="module6"></a>
 
+**Updated March 25, 2023**
+
+I have implemented user-defined spline outlier criteria. They are both in meters
+and can be different for the two phases of data analysis (spline_outlier1 and spline_outlier2)
+
+And plots all come to the screen at the same time - got tired of having them come up twice!
+
+
 **Updated March 14, 2023**
 
 <code>rhdot</code> is now the default behavior.  You can turn it off by setting it to False.

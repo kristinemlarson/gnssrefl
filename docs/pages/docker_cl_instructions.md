@@ -25,6 +25,14 @@ docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/
 --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
 </PRE>
 
+or 
+
+<PRE>
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/   \
+-v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files  \
+--name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
+</PRE>
+
 Description of the commands used:  
 
 <code>-it</code> calls interactive process (bin/bash shell) 
