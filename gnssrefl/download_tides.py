@@ -130,7 +130,7 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
 
     fout.close()
     if plt:
-        g.quickp(station,obstimes,slevel,noaa_name)
+        g.quickp(station,obstimes,slevel)
 
 def noaa_command(station,fout,year,month1,month2,datum,metadata,tt,obstimes,slevel,csv):
     """

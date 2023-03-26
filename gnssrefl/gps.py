@@ -5968,7 +5968,7 @@ def quickp(station,t,sealevel):
     if (len(t) > 0):
         fig,ax=plt.subplots()
         ax.plot(t, sealevel, 'b.')
-        plt.title('Tides at WSV: ' + station)
+        plt.title('Tides: ' + station)
         plt.xticks(rotation =45,fontsize=fs);
         plt.ylabel('meters')
         plt.grid()
