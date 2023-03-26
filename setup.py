@@ -48,6 +48,7 @@ setup(
             'prn2gps = gnssrefl.prn2gps:main',
             'download_tides = gnssrefl.download_tides:main',
             'download_ioc = gnssrefl.download_ioc:main',
+            'download_wsv = gnssrefl.download_wsv:main',
             'download_psmsl = gnssrefl.download_simon:main',
             'download_noaa = gnssrefl.download_tides:main',
             'subdaily= gnssrefl.subdaily_cl:main',

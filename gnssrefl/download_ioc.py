@@ -7,7 +7,6 @@ import requests
 import subprocess
 import sys
 import gnssrefl.gps as g
-import matplotlib.pyplot as plt
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
 
@@ -206,7 +205,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     fout.close()
 
     if plt:
-        quickp(station,obstimes,sealevel)
+        g.quickp(station,obstimes,sealevel)
 
 
 def find_start_stop(year,m):
@@ -242,37 +241,6 @@ def find_start_stop(year,m):
 
     return d1, d2
 
-
-def quickp(station,t,sealevel):
-    """
-    makes a quick plot of sea level for station s
-    prints to the screen - does not save it.
-
-    Parameters
-    -----------
-    station : string
-        station name
-
-    t : numpy array in datetime format 
-        time of the sea level observations
-
-    sealevel : numpy array, float 
-        meters (relative - not defined in a datum)
-    
-    """
-    fs = 10
-    if (len(t) > 0):
-        fig,ax=plt.subplots()
-        ax.plot(t, sealevel, '-')
-        plt.title('Tides at ' + station)
-        plt.xticks(rotation =45,fontsize=fs);
-        plt.ylabel('meters')
-        plt.grid()
-        fig.autofmt_xdate()
-        plt.show()
-    else:
-        print('no data found - so no plot')
-    return
 
 def main():
     args = parse_arguments()

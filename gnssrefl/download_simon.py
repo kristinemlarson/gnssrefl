@@ -16,39 +16,10 @@ import urllib
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
 
-def quickp(station,t,sealevel):
-    """
-    makes quick plot of the tide gauge data
-
-    Parameters
-    ----------
-    station : string
-        4 character ID of the station
-
-    t : datetime object array
-        time
-
-    sealevel : numpy array
-        water level in meters
-    
-    """
-    fs = 10
-    if (len(t) > 0):
-        fig,ax=plt.subplots()
-        ax.plot(t, sealevel, '-')
-        plt.title('Tides at ' + station)
-        plt.xticks(rotation =45,fontsize=fs);
-        plt.ylabel('meters')
-        plt.grid()
-        fig.autofmt_xdate()
-        plt.show()
-    else:
-        print('no data found - so no plot')
-    return
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="station name", type=str)
+    parser.add_argument("station", help="station name, e.g. 10313", type=str)
     parser.add_argument("-output", default=None, help="Optional output filename", type=str)
     parser.add_argument("-plt", default=None, help="Optional plot to screen variable, boolean", type=str)
     args = parser.parse_args().__dict__
@@ -136,8 +107,7 @@ def download_simon(station: str, output: str = None, plt: bool = False):
         sys.exit()
 
     if plt:
-        quickp('PSMSL ' + station,obs,sl)
-
+        g.quickp('PSMSL ' + station,obs,sl)
 
 def main():
     args = parse_arguments()

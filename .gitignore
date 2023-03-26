@@ -1,5 +1,6 @@
 env
 get_listing.py
+grauer*
 sso_tokens.json
 tmp
 all.txt

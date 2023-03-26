@@ -5947,3 +5947,34 @@ def quickazel(gweek,gpss,sat, recv,ephemdata,localup,East,North):
         #print('el/az',eleA, azimA)
     return eleA, azimA
 
+def quickp(station,t,sealevel):
+    """
+    makes a quick plot of sea level 
+    prints the plot to the screen - it does not save it.
+
+    Parameters
+    -----------
+    station : str
+        station name
+
+    t : numpy array in datetime format
+        time of the sea level observations UTC
+
+    sealevel : list,  float
+        meters (unknown datum)
+
+    """
+    fs = 10
+    if (len(t) > 0):
+        fig,ax=plt.subplots()
+        ax.plot(t, sealevel, 'b.')
+        plt.title('Tides at WSV: ' + station)
+        plt.xticks(rotation =45,fontsize=fs);
+        plt.ylabel('meters')
+        plt.grid()
+        fig.autofmt_xdate()
+        plt.show()
+    else:
+        print('no data found - so no plot')
+    return
+
