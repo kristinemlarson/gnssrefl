@@ -32,3 +32,6 @@ How to update them all? The horror, the horror
 
 
 $EXE/gfzrnx -finp rinex3 -fout  rinex2 -vo 2 -ot G:S1C
+
+
+git pull --rebase

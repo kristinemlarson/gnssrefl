@@ -20,7 +20,6 @@ inverse SNR method
 #### [vwc() ](../pages/README_vwc.md) 
 Soil moisture 
 
-
 ### gnssrefl [Utilities](../pages/utilities.md) 
-Additional functions including refl_zones, download_rinex, ...
+Additional functions including refl_zones, [tide gauge downloads](../pages/tides.md), download_rinex, ...
 
