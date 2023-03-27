@@ -27,8 +27,10 @@ def parse_arguments():
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
     parser.add_argument("-minvalperday", default=None, type=int, help="minimum number of satellite tracks needed each day. Default is 10")
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean for attempting to remove days contaminated by snow")
-    parser.add_argument("-circles", default=None, type=str, help="circles instead of lines for the final VWC plot ")
+    parser.add_argument("-circles", default=None, type=str, help="boolean for circles instead of lines for the final VWC plot ")
     parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
+    parser.add_argument("-tmin", default=None, type=str, help="minimum soil texture")
+    parser.add_argument("-tmax", default=None, type=str, help="maximum soil texture")
 
     args = parser.parse_args().__dict__
 
@@ -300,7 +302,7 @@ def normAmp(amp, basepercent):
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen: bool = True, screenstats: bool = False, 
         min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, 
-        snow_filter: bool = False, circles: bool=False, subdir: str=None):
+        snow_filter: bool = False, circles: bool=False, subdir: str=None, tmin: str=None, tmax: str=None):
     """
     Code to pick up phase results, make quadrant plots, daily average files and converts to volumetric water content (VWC).
 
@@ -344,6 +346,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
     subdir: str
         subdirectory in $REFL_CODE/Files for plots and text file outputs
+    tmin: str
+        minimum soil texture value, e.g. 0.05
+    tmax: str
+        maximum soil texture value, e.g. 0.45
 
     Returns
     -------
@@ -366,6 +372,17 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
     if not year_end:
         year_end = year
+
+    # save soil texture values
+    if tmin is None:
+        tmin = 0.05
+    else:
+        tmin = float(tmin)
+
+    if tmax is None:
+        tmax = 0.5
+    else:
+        tmax = float(tmax)
 
     # default is station name
     if subdir == None:
@@ -578,7 +595,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
         qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir)
 
-        qp.convert_phase(station, year, year_end, plt2screen,fr,polyorder,circles,subdir)
+        qp.convert_phase(station, year, year_end, plt2screen,fr,tmin,tmax,polyorder,circles,subdir)
 
 
 def main():

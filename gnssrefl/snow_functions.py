@@ -17,7 +17,7 @@ def time_limits(wateryear,longer):
         whether you want a longer plot
 
     Returns
-    ------
+    -------
     starting : float
         start time, fractional (year + doy/365.25)
     ending : float
@@ -66,8 +66,8 @@ def writeout_snowdepth_v0(station,outputfile, usegps, snowAccum,yerr):
     yerr: numpy array
         standard deviation of snow depth in meters
 
-    Returns:
-    --------
+    Returns
+    -------
     gobst : numpy array
         datetime useful for plotting
 
@@ -119,8 +119,8 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
     snowAccum: numpy array
         snow accumulation results in meters
 
-    Returns:
-    --------
+    Returns
+    -------
     gobst : numpy array 
         datetime useful for plotting
     snowAccum: numpy array 
@@ -254,7 +254,7 @@ def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outp
 
 def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit,end_dt):
     """
-    creates and displays snow depth plot
+    creates and displays snow depth plot. Saves to outputpng
 
     Parameters
     ----------

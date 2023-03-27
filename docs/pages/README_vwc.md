@@ -19,6 +19,9 @@ but this code won't do it for you.
 - Will your site be a good soil moisture site?  This is almost entirely based on how flat your site is.
 Flat is good. You can use a DEM, if you have it, or a photograph.  
 
+- **Be very careful** about analyzing data across receiver change boundaries. We are working to make a 
+database that will alow you to track this kind of thing, but it is not currently done. 
+
 - This algorithm is currently only recommended and validated for the L2C signal. 
 It is **your responsibility** to make sure that 
 your RINEX files have L2C data in them. While this is trivial with the RINEX 3 format, it can be very challenging to 

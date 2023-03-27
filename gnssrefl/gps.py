@@ -5742,11 +5742,11 @@ def ymd2ch(year,month,day):
     doy : int
         day of year
     cyyyy : str
-        4 ch yaer
+        4 ch year
     cyy : str
-        2 ch yaer
+        2 ch year
     cdoy : str
-        4 ch yaer
+        4 ch year
 
     """
     if (day == 0):

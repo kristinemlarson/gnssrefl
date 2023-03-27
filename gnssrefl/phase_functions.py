@@ -434,7 +434,7 @@ def low_pct(amp, basepercent):
     return lowval
 
 
-def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=-99,circles=False,subdir=''):
+def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,subdir=''):
     """
     Convert GPS phase to VWC. Using Clara Chew's algorithm from 
     Matlab write_vegcorrect_smc.m
@@ -460,6 +460,11 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
         final plot using circles (instead of line)
     subdir : str
         subdirector for $REFL_CODE/Files
+    tmin : float
+        soil texture minimum
+    tmax : float
+        soil texture maximum
+
 
     """
 
@@ -482,7 +487,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
         sys.exit()
 
     # for PBO H2O this was set using STATSGO. 5% is reasonable as a starting point for australia
-    tmin = 0.05  # for now
+    #tmin = 0.05  # for now
+    print('minimum texture value', tmin)
     residval = 2  # for now
 
     # daily average file of phase results

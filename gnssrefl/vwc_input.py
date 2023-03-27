@@ -22,7 +22,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100):
+def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100 ):
     """
     picks up reflector height results for a given station and year-year end and computes the mean values
     and writes to a file with the mean values.
@@ -31,13 +31,10 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100):
     ----------
     station : string
         4 character ID of the station
-
     year : integer
         Year
-
     fr : integer, optional
         GPS frequency. Currently only supports l2c, which is frequency 20.
-
     min_tracks : integer, optional
         number of minimum tracks needed in order to keep the average RH
 

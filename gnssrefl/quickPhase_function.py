@@ -1,3 +1,4 @@
+# I DO NOT THINK THIS IS USED. THIS SHOULD BE CONFIRMED AND IT SHOULD BE REMOVED
 import sys
 import os
 
@@ -287,10 +288,12 @@ def low_pct(amp, basepercent):
     return lowval
 
 
-def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=-99):
+def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin,tmax,polyorder=-99,circles,subdir):
     """
     Conversion from estimated phase to VWC. Using Clara Chew algorithm
     from Matlab write_vegcorrect_smc.m
+
+    qp.convert_phase(station, year, year_end, plt2screen,fr,tmin,tmax,polyorder,circles,subdir)
 
     Parameters
     ----------
@@ -304,8 +307,16 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
         whether plots come to the screen
     fr : int
         GNSS frequency used
+    tmin : float
+        soil texture minimum
+    tmax : float
+        soil texture maximum
     polyorder : int
         override on the polynomial order used in leveling
+    circles : bool
+        whether you want circles instead of dots?
+    subdir: str
+        directory to store files?
 
     """
 
@@ -328,6 +339,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,polyorder=
         sys.exit()
 
     # for PBO H2O this was set using STATSGO. 5% is reasonable as a starting point for australia
+    # this i sset earlier now
+    print(tmin)
     tmin = 0.05  # for now
     residval = 2  # for now
 

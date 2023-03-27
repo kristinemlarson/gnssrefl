@@ -1,6 +1,10 @@
 ### Portales New Mexico
 
-[Warning](warning.md)
+Warning: This codes does not currently check for equipment changes.
+This makes a big difference at P038 - you should not compute VWC 
+across equipment changes. This site's equipment was upgraded in March 2021.
+
+[Warning about Earthscope/UNAVCO](warning.md)
 
 <p align="center">
 <img src="../_static/p038.png" width="500"/>
