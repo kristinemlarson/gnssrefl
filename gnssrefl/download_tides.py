@@ -103,10 +103,13 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
     print('Writing contents to: ', outfile)
     fout = open(outfile, 'w+')
     if csv:
-        fout.write("#YYYY,MM,DD,HH,MM, Water(m),DOY,   MJD, Seconds\n")
+        fout.write("#YYYY,MM,DD,HH,MM, SS, Water(m),DOY,   MJD \n")
+        #fout.write("#YYYY,MM,DD,HH,MM, Water(m),DOY,   MJD, Seconds\n")
     else:
-        fout.write("%YYYY MM DD HH MM  Water(m) DOY    MJD      Seconds\n")
-        fout.write("% 1    2  3  4  5    6       7       8         9\n")
+        #fout.write("%YYYY MM DD HH MM  Water(m) DOY    MJD      Seconds\n")
+        #fout.write("% 1    2  3  4  5    6       7       8         9\n")
+        fout.write("%YYYY MM DD HH MM  SS Water(m) DOY    MJD  \n")
+        fout.write("% 1    2  3  4  5   6   7       8     9\n")
 
 
     year1, month1, day1, doy1,modjul1 = noaa2me(date1)
@@ -126,6 +129,7 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
         data,error = pickup_from_noaa(station,date1,date2,datum,True)
         if not error:
             noaa_name = data['metadata']['name']
+            print('WARNING: I have changed the format for this file.')
             tt,obstimes,slevel = write_out_data(data,fout, tt,obstimes,slevel,csv)
 
     fout.close()
@@ -303,6 +307,7 @@ def noaa2me(date1):
 def write_out_data(data,fout, tt,obstimes,slevel,csv):
     """
     writes out the NOAA water level data to a file 
+    20213-mar-27 using new format
 
     Parameters
     ----------
@@ -358,9 +363,13 @@ def write_out_data(data,fout, tt,obstimes,slevel,csv):
 
             slevel.append(sl)
             if csv:
-                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:2.0f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd,ss))
+                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:2.0f},{6:7.3f},{7:3.0f},{8:15.6f} \n".format(year, mm, dd, hh, minutes, ss, sl, doy, mjd))
             else:
-                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:2.0f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd,ss))
+                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:7.3f} {7:3.0f} {8:15.6f} \n".format(year, mm, dd, hh, minutes, ss, sl, doy, mjd))
+            #if csv:
+            #    fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:2.0f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd,ss))
+            #else:
+            #    fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:2.0f} \n".format(year, mm, dd, hh, minutes, sl, doy, mjd,ss))
 
     return tt,obstimes,slevel
 

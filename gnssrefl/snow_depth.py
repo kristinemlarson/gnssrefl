@@ -34,18 +34,23 @@ def parse_arguments():
 
 
 def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
-        longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None, plt_enddate:str=None,simple:bool=False):
+        longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None, 
+        plt_enddate:str=None,simple:bool=False):
     """
     Calculates snow depth for a given station and water year.
+
     Currently set for northern hemisphere constraints. This could easily be fixed for 
     the southern hemisphere by reading the json input file
 
     Default values use median of September to set "bare soil value"
-
-    Eventually this will be command line driven (or will use json settings)
+    These can be overriden with bare_date1 and bare_date2 (as one would do in Alaska)
 
     Output is currently written to a plain text file and a png file
     Both are located in the $REFL_CODE/Files/station directory
+
+    If simple is set to true, the algorithms computes bare soil (and thus snow depth), using
+    all values together.  The default defines bare soil values every 10 degrees in azimuth.  
+    Both require you to run daily_avg before running snow_depth/snowdepth
 
     Parameters
     ----------
