@@ -11,6 +11,7 @@ def main():
     """
 
     Creates SNR file from RINEX 3 file that is stored locally
+    Requires the gfzrnx executable to be available.
 
     Parameters
     ----------

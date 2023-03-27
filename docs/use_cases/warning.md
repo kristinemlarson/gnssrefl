@@ -3,6 +3,8 @@
 [Earthscope](https://www.earthscope.org) (previously UNAVCO) now requires that you have a formal account
 to access their GNSS data. This use case was developed before that decision was made.
 
+[Sign up for an account here.](https://data-idm.unavco.org/user/profile/login)
+
 
 [Your formal notice from Earthscope](https://www.unavco.org/data/gps-gnss/file-server/file-server-transition-notice.html)
 

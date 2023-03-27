@@ -1,6 +1,9 @@
 
 ### gnssrefl use cases 
 
+About 75% of these uses cases require access to the Earthscope/UNAVCO 
+archive. You need to [sign up for an account.](https://data-idm.unavco.org/user/profile/login)
+
 
 #### Ice Sheets
 

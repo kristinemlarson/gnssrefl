@@ -5,7 +5,7 @@
 
 # gnssrefl
 
-**github version: 1.2.25** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+**github version: 1.2.26** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 Our documentation is now available [here.](https://gnssrefl.readthedocs.io/en/latest/)
 
@@ -15,11 +15,7 @@ If you want to sign up for the GNSS-IR email list, please contact Kristine Larso
 
 [Youtube videos for beginners](https://www.youtube.com/channel/UCC1NW5oS7liG7C8NBK148Bg).
 
-
 New discussion page started about [modern GNSS signals](docs/pages/signal_issues.md).
-
-For the vast majority of our test cases you need access to the Earthscope/UNAVCO archive. 
-Please [sign up for an account.](https://www.unavco.org/data/gps-gnss/file-server/file-server-access-examples.html)
 
 <HR> 
 

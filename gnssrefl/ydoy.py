@@ -6,7 +6,7 @@ import gnssrefl.gps as g
 
 def main():
     """
-    converts ymd to day of year
+    converts year/day of year to month and day. prints to the screen
 
     Parameters
     ----------

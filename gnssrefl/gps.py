@@ -136,12 +136,12 @@ def myfavoritegpsobs():
 def ydoych(year,doy):
     """
     Converts year and doy to various character strings
+    (two char year, 4 char year, 3 char day of year)
 
     Parameters
     ----------
     year : int
         full year
-
     doy : int
         day of year
 
@@ -149,10 +149,8 @@ def ydoych(year,doy):
     -------
     cyyyy : str
         4 character year
-
     cyy : str
         2 character year
-
     cdoy : str
         3 character day of year
 

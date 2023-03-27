@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.2.26
+Added new tide gauge download (for WSV).  Added documentation for all of them (new page)
+
 subdaily now has a working spline_outlier input. This allows you to use an outlier
 criterion in meters instead of the default 3 sigma. The latter can be too restrictive.
 spline_outlier1 is for the first phase (RHdot) and spline_outlier2 is for the second 

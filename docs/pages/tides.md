@@ -1,4 +1,4 @@
-## Utilities for Downloding Tide Data
+## Utilities for Downloading Tide Data
 
 ### download_noaa
 
