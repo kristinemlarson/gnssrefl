@@ -59,7 +59,11 @@ def download_wsv(station: str, plt: bool = True, output: str = None):
         outfile = args.output
 
     # open the file
+    print('File written to :', outfile)
     fout = open(outfile,'w+')
+    fout.write("{0:s} \n".format('%' + ' WSV Station: ' + station ))
+    fout.write("%YYYY MM DD  HH MM SS  Water(m) DOY  MJD     \n")
+    fout.write("% 1   2  3   4  5  6     7      8     9  \n")
 
 
     for i in range(0, N):
@@ -79,45 +83,13 @@ def download_wsv(station: str, plt: bool = True, output: str = None):
         bigT = datetime.datetime(year=year, month=mm, day=dd, hour=hh, minute=minutes, second=sec)
         obstimes.append(bigT)
 
-        fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:3.0f}\n".format(year, 
-                mm, dd, hh, minutes, sl, doy, mjd,sec))
+        fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:7.3f} {7:3.0f} {8:16.7f} \n".format(year, 
+                mm, dd, hh, minutes, sec, sl, doy, mjd))
     # close the file
     fout.close()
 
     if plt:
         g.quickp(station,obstimes,sealevel)
-
-
-def quickp(station,t,sealevel):
-    """
-    makes a quick plot of sea level for input station 
-    prints to the screen - does not save it.
-
-    Parameters
-    -----------
-    station : str
-        station name
-
-    t : numpy array in datetime format 
-        time of the sea level observations UTC
-
-    sealevel : list,  float 
-        meters (unknown datum)
-    
-    """
-    fs = 10
-    if (len(t) > 0):
-        fig,ax=plt.subplots()
-        ax.plot(t, sealevel, 'b.')
-        plt.title('Tides at WSV: ' + station)
-        plt.xticks(rotation =45,fontsize=fs);
-        plt.ylabel('meters')
-        plt.grid()
-        fig.autofmt_xdate()
-        plt.show()
-    else:
-        print('no data found - so no plot')
-    return
 
 def main():
     args = parse_arguments()

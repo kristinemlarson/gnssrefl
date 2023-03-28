@@ -103,11 +103,13 @@ def download_tides(station: str, date1: str, date2: str, output: str = None, plt
     print('Writing contents to: ', outfile)
     fout = open(outfile, 'w+')
     if csv:
+        fout.write("{0:s} {1:s} \n".format('#', 'NOAA Station: ' + station ))
         fout.write("#YYYY,MM,DD,HH,MM, SS, Water(m),DOY,   MJD \n")
         #fout.write("#YYYY,MM,DD,HH,MM, Water(m),DOY,   MJD, Seconds\n")
     else:
         #fout.write("%YYYY MM DD HH MM  Water(m) DOY    MJD      Seconds\n")
         #fout.write("% 1    2  3  4  5    6       7       8         9\n")
+        fout.write("{0:s} \n".format('%' + ' NOAA Station: ' + station ))
         fout.write("%YYYY MM DD HH MM  SS Water(m) DOY    MJD  \n")
         fout.write("% 1    2  3  4  5   6   7       8     9\n")
 

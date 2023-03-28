@@ -111,7 +111,7 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
         if output[-3:] == 'csv':
             csv = True
 
-
+    print('WARNING: as of 2023 March 28 the output file format has changed')
     month1 = int(date1[4:6])
     month2 = int(date2[4:6])
     year = int(date1[0:4])
@@ -148,11 +148,14 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     fout = open(outfile,'w+')
     print('Writing IOC data to ', outfile)
 
+
     if csv:
-        fout.write("# YYYY,MM,DD,HH,MM,Water(m),DOY, MJD, SS \n")
+        fout.write("{0:s} {1:s} \n".format('#', 'IOC Station: ' + station ))
+        fout.write("# YYYY,MM,DD,HH,MM,SS,Water(m),DOY, MJD \n")
     else:
-        fout.write("%YYYY MM DD  HH MM   Water(m) DOY  MJD     SS \n")
-        fout.write("% 1   2  3   4  5     6        7    8      9  \n")
+        fout.write("{0:s} \n".format('%' + ' IOC Station: ' + station ))
+        fout.write("%YYYY MM DD  HH MM SS  Water(m) DOY  MJD     \n")
+        fout.write("% 1   2  3   4  5  6     7      8     9  \n")
     i = 1
 
 #    All values X where abs(X – median) > tolerance are hidden.
@@ -197,9 +200,17 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
             obstimes.append(bigT)
 
             if csv:
-                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:3.0f}\n".format(year, mm, dd, hh, minutes, sl, doy, mjd,sec))
+                fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:2.0f},{6:7.3f},{7:3.0f},{8:15.6f} \n".format(year, 
+                    mm, dd, hh, minutes, sec, sl, doy, mjd))
             else:
-                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:3.0f}\n".format(year, mm, dd, hh, minutes, sl, doy, mjd,sec))
+                fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:7.3f} {7:3.0f} {8:15.6f} \n".format(year, 
+                    mm, dd, hh, minutes, sec, sl, doy, mjd))
+
+            # change format so seconds is directly after ymdhm
+            #if csv:
+            #    fout.write(" {0:4.0f},{1:2.0f},{2:2.0f},{3:2.0f},{4:2.0f},{5:7.3f},{6:3.0f},{7:15.6f},{8:3.0f}\n".format(year, mm, dd, hh, minutes, sl, doy, mjd,sec))
+            #else:
+            #    fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:7.3f} {6:3.0f} {7:15.6f} {8:3.0f}\n".format(year, mm, dd, hh, minutes, sl, doy, mjd,sec))
         else:
             pt = pt + 1
     fout.close()
