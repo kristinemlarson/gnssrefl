@@ -45,6 +45,7 @@ def parse_arguments():
     parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
     parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
     parser.add_argument("-strip", default=None, help="use True to reduce number of obs", type=str)
+    parser.add_argument("-bkg", default=None, help="IGS or EUREF (default)", type=str)
 
     args = parser.parse_args().__dict__
 
@@ -59,7 +60,7 @@ def parse_arguments():
 def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav', rate: str = 'low', dec: int = 0,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
-              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False):
+              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, bkg: str = 'EUREF'):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives.
@@ -211,6 +212,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     strip : bool, optional
         Reduces observables since the translator does not allow more than 25
         Default is False.
+
+    bkg : str, optional
+        tells you which directory the files live in, EUREF or IGS 
+        Default is EUREF.
 
     """
 
@@ -383,7 +388,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     args = {'station': station, 'year_list': year_list, 'doy_list': doy_list, 'isnr': snr, 'orbtype': orb,
             'rate': rate, 'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook,
             'overwrite': overwrite, 'translator': translator, 'srate': samplerate, 'mk': mk,
-            'skipit': skipit, 'stream': stream, 'strip': strip}
+            'skipit': skipit, 'stream': stream, 'strip': strip, 'bkg': bkg}
 
     s1 = time.time()
     rnx.run_rinex2snr(**args)

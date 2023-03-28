@@ -214,7 +214,7 @@ def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
 
     return file_name, crnx_name, file_name2, crnx_name2, exe1, exe2
 
-def bkg_highrate(station, year, month, day,stream,dec_rate):
+def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
     """
     picks up a highrate RINEX 3 file from BKG, merges and decimates it.
     requires gfzrnx
@@ -224,17 +224,17 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
     inputs: string
         9 ch station name 
     year : integer
-
+        full year
     month : integer
         month or day of year if day set to 0
-
     day : integer
-
+        day of the month
     stream : str
         R or S
-
     dec_rate : integer
-        decimation rate
+        decimation rate in seconds
+    bkg : str
+        file directory at BKG
 
     Returns
     -------
@@ -265,9 +265,10 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
         return '', fexist
 
 #    https://igs.bkg.bund.de/root_ftp/EUREF/highrate/2022/233/a/VLIS00NLD_R_20222330000_15M_01S_MO.crx.gz
-    gns = 'https://igs.bkg.bund.de/root_ftp/EUREF/highrate/'
+    gns = 'https://igs.bkg.bund.de/root_ftp/' + bkg + '/highrate/'
     # base directory name
     gns = gns + cyyyy + '/'+ cdoy + '/' 
+    print('looking for files in: ', gns)
 
     s1=time.time()
     print('WARNING: Get yourself a cup of coffeee. Downloading 96 files takes a long time.')
@@ -280,6 +281,7 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
         print('Hour: ', ch)
         for e in ['00', '15', '30', '45']:
             file_name = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.crx.gz'
+            print('looking for', file_name)
             crnx_name = file_name[:-3] 
             oname = file_name[:-6] + 'rnx'
 
@@ -296,7 +298,7 @@ def bkg_highrate(station, year, month, day,stream,dec_rate):
                 except:
                     okok = 1
                 if os.path.isfile(oname):
-                    print('have downloaded ', oname)
+                    print('successful ', oname)
                     fileF = fileF + 1
 
     searchP = station.upper() + streamID + cyyyy + cdoy + '*15M*MO.rnx'

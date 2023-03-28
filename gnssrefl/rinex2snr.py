@@ -62,7 +62,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
-        mk,skipit,stream,strip):
+        mk,skipit,stream,strip,bkg):
     """
     main code to convert RINEX files into SNR files that are stored locally
 
@@ -121,6 +121,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     strip : boolean
          reduces observables to only SNR (too many observables, particularly in RINEX 2 files
          will break the RINEX translator)
+
+    bkg : str
+         location of bkg files, EUREF or IGS
 
     """
     #
@@ -264,7 +267,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                     print('The RINEX 3 file has been downloaded. Try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
                             if archive == 'bkg':
-                                rnx_filename,foundit = ch.bkg_highrate(station9ch, year, doy, 0,stream,dec_rate)
+                                rnx_filename,foundit = ch.bkg_highrate(station9ch, year, doy, 0,stream,dec_rate,bkg)
                                 if foundit:
                                     print('The RINEX 3 file has been downloaded and merged. Try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
