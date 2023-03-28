@@ -7,6 +7,22 @@ import argparse
 import gnssrefl.gps as g
 
 def main():
+    """
+    converts year month day to day of year and prints it to the screen
+
+    Parameters
+    ----------
+    year : int
+
+    month : int
+
+    day : int
+
+    Returns
+    -------
+    doy : str 
+        three character day of the year
+    """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("year", help="year ", type=int)
@@ -20,7 +36,6 @@ def main():
 
     doy,cdoy,cyyyy,cyy = g.ymd2doy(year, month, day )
     print(cdoy)
-
 
 if __name__ == "__main__":
     main()

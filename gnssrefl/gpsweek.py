@@ -5,16 +5,14 @@ import gnssrefl.gps as g
 
 def main():
     """
-    Calculates GPS week information
+    Calculates GPS week information and prints it to the screen
 
     Parameters
     ----------
     year : integer
         full year
-
     month : integer
         calendar month
-
     day : integer
         day of the month
 
@@ -22,6 +20,9 @@ def main():
     -------
     wk : int
         GPS week
+    dayofthewk : int
+        day of the week (from 0-6) used by the 
+        IGS and others for orbit filenames
 
     """
 

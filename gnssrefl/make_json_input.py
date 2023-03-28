@@ -84,7 +84,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         reflector height lower limit in meters. default is 0.5.
 
     h2 : float, optional
-        reflector height upper limit in meters. default is 6.
+        reflector height upper limit in meters. default is 8.
 
     nr1 : float, optional
         noise region lower limit for QC in meters. default is None.

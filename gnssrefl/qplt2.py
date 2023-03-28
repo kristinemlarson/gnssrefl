@@ -10,23 +10,32 @@ import sys
 
 def main():
     """
+    quick file plotting using matplotlib
 
     Parameters
     ----------
     filename : str
         name of file to be plotted 
     xcol : str
-        column number in the file of the x-axis parameter
+        column number in the file for the x-axis parameter
     ycol : str
-        column number in the file of the y-axis parameter
+        column number in the file for the y-axis parameter
     mjd : str
         T or True, code will convert MJD to datetime, optional
+    xlabel : str
+        label for x-axis, optional
+    ylabel : str
+        label for y-axis, optional
+    symbol : str
+        prescibe the marker used in the plot, optional
     reverse : str
         T or True, to reverse y-axis limits, optional
     title : str
         optional title for plot
     outfile : str
         name of png file to store plot
+    ylimits: str
+        pair of yaxis limits 
 
     """
 
@@ -35,7 +44,7 @@ def main():
     parser.add_argument("xcol", help="x-column", type=str)
     parser.add_argument("ycol",   help="y-column", type=str)
     #parser.add_argument("-filename2", help="filename2", type=str,default=None)
-    parser.add_argument("-mjd", help="set to True/T if x-values are MJD", type=str,default=None)
+    parser.add_argument("-mjd", help="set to True/T if x-values are MJD (should add MM/SS?", type=str,default=None)
     parser.add_argument("-reverse", help="set to True/T to reverse the y-axis", type=str,default=None)
     parser.add_argument("-ymdh", help="if True/T, columns 1-4 are year mon day hour ", type=str,default=None)
     parser.add_argument("-xlabel", type=str, help="optional x-axis label", default=None)
@@ -49,9 +58,8 @@ def main():
     args = parser.parse_args()
 
 
-
-
     filename = args.filename
+    # change column numbers to pythonese
     xcol = int(args.xcol) - 1
     ycol = int(args.ycol) - 1
 
@@ -60,7 +68,6 @@ def main():
         ylabel = 'Unknown'
     else:
         ylabel = args.ylabel
-
 
     secondFile = False
 
@@ -153,7 +160,6 @@ def main():
     if args.ylimits is not None:
         print('found y-axis limits')
         ylimits = args.ylimits
-        print(ylimits)
         plt.ylim((ylimits))
 
     if args.outfile is not None:
