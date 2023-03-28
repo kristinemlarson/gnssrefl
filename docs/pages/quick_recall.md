@@ -14,7 +14,8 @@
 
 ### Utilities
 
-make_json_input
+
+* [make_json_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
 
 * [download_ioc](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_ioc.html)
 * [download_noaa](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_noaa.html)

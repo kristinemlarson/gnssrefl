@@ -112,7 +112,6 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         Whether to strip only SNR observables.  Uses teqc or gfzrnx.
         Default is False.
 
-
     doy_end : int, optional
         End day of year to be downloaded. 
         Default is None. (meaning only a single day using the doy parameter)
@@ -125,18 +124,16 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         Sample rate in seconds for RINEX3 only.
         Default is 30.
 
-    debug : boolean, optional
+    debug : bool, optional
         provides screen output helpful for debugging
         Default is False
 
-    dec : integer, optional
+    dec : int, optional
         some highrate file downloads allow decimation. Default is 1 sec, i.e. no decimation
 
-    save_crx : boolean, option
+    save_crx : bool, option
         saves crx version for Rinex3 downloads. Otherwise they are deleted.
     """
-
-    #print('starting a new tag')
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
