@@ -30,7 +30,6 @@ Welcome to gnssrefl Documentation!
    pages/quick_recall.md
    api
    pages/first_drivethru.md
-   pages/news.md
    pages/contributions_questions.md
    pages/new_station.md
 
