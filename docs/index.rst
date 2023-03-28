@@ -27,6 +27,7 @@ Welcome to gnssrefl Documentation!
    pages/understand.md
    pages/README_install.md
    pages/func_and_utils_doc.md
+   pages/quick_recall.md
    api
    pages/first_drivethru.md
    pages/news.md

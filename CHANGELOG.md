@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.2.27
+
+add quick_recall documentation
+
+bkg option in rinex2snr specifically for highrate files, since BKG has two 
+directories(IGS and EUREF). For 30 sec files we will be kind and search both
+directories for users.
+
 Changed output format for download_noaa, ioc, and wsv
 
 Added tmin and tmax soil moisture properties inputs to vwc. Modified
