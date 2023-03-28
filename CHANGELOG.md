@@ -4,11 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.2.27
+Changed output format for download_noaa, ioc, and wsv
 
 Added tmin and tmax soil moisture properties inputs to vwc. Modified
 documentation.
 
-Changed output format for download_noaa
 
 ## 1.2.26
 Added new tide gauge download (for WSV).  Added documentation for all of them (new page)
