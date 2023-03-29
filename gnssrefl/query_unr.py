@@ -8,17 +8,18 @@ import gnssrefl.gps as g
 
 def main():
     """
-    query_unr: extracts coordinates for stations that were in UNR database.
-    in late 2021.  
+    Extracts coordinates for stations that were in UNR database.
+    in late 2021. Prints both geodetic and cartesian values.
 
     Parameters
     ----------
     station : str
         four character station name
+
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="4 ch station name (lowercase)", type=str)
+    parser.add_argument("station", help="4-ch station name (lowercase)", type=str)
 
     args = parser.parse_args()
 

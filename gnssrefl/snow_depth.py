@@ -45,7 +45,7 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
     Default values use median of September to set "bare soil value"
     These can be overriden with bare_date1 and bare_date2 (as one would do in Alaska)
 
-    Output is currently written to a plain text file and a png file
+    Output is currently written to a plain text file and a png file.
     Both are located in the $REFL_CODE/Files/station directory
 
     If simple is set to true, the algorithms computes bare soil (and thus snow depth), using

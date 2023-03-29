@@ -24,61 +24,61 @@ def parse_arguments():
 
 def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None ):
     """
-        command line interface for download_orbits
+    command line interface for download_orbits
 
-        Parameters
-        ----------
+    Parameters
+    ----------
 
-        orbit : string
-            value options:
+    orbit : string
+        value options:
 
-                gps (default) : uses GPS broadcast orbit
+            gps (default) : uses GPS broadcast orbit
 
-                gps+glo : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
+            gps+glo : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 
-                gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days)
+            gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days)
 
-                nav : GPS broadcast, adequate for reflectometry. Searches various places
+            nav : GPS broadcast, adequate for reflectometry. Searches various places
 
-                nav-sopac : GPS broadcast file from SOPAC, adequate for reflectometry. 
+            nav-sopac : GPS broadcast file from SOPAC, adequate for reflectometry. 
 
-                nav-esa : GPS broadcast file from ESA, adequate for reflectometry. 
+            nav-esa : GPS broadcast file from ESA, adequate for reflectometry. 
 
-                nav-cddis : GPS broadcast file from CDDIS, very slow to download
+            nav-cddis : GPS broadcast file from CDDIS, very slow to download
 
-                igs : IGS precise, GPS only
+            igs : IGS precise, GPS only
 
-                igr : IGS rapid, GPS only
+            igr : IGS rapid, GPS only
 
-                jax : JAXA, GPS + Glonass, within a few days, missing block III GPS satellites
+            jax : JAXA, GPS + Glonass, within a few days, missing block III GPS satellites
 
-                gbm : GFZ Potsdam, multi-GNSS, not rapid
+            gbm : GFZ Potsdam, multi-GNSS, not rapid
 
-                grg : French group, GPS, Galileo and Glonass, not rapid
+            grg : French group, GPS, Galileo and Glonass, not rapid
 
-                esa : ESA, multi-GNSS
+            esa : ESA, multi-GNSS
 
-                gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021
+            gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021
 
-                wum : (disabled) Wuhan, multi-GNSS, not rapid
+            wum : (disabled) Wuhan, multi-GNSS, not rapid
 
-                gnss2 : multi-GNSS, but uses IGN instead of CDDIS
+            gnss2 : multi-GNSS, but uses IGN instead of CDDIS
 
-                ultra : ultra orbits directly from GFZ
+            ultra : ultra orbits directly from GFZ
 
-                rapid : rapid orbits directly from GFZ
+            rapid : rapid orbits directly from GFZ
 
-         year : integer
-            year
+    year : integer
+        full year
 
-         month : integer
-            month
+    month : integer
+        calendar month
 
-         day : integer
-            day
+    day : integer
+        day of the month
 
-         doy_end : integer - optional
-            allow multiple day download
+    doy_end : integer 
+        optional, allows multiple day download
 
     """
 

@@ -38,40 +38,31 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
 
     Parameters
     ----------
-    station :  str
+    station : str
         station name
     azim1 : int
         min azimuth angle in deg
-
     azim2 : int
         max azimuth angle in deg
     lat : float 
         latitude  in deg
-
     lon : float
         longitude in deg
-
     el_height : float
         ellipsoidal height in m
-
     RH : str
         user input reflector height (m)
-
     fr : int
         frequency (1,2, or 5 allowed)
-
     el_list : list of floats
         elevation angles desired (deg)
-
     az_sectors : list of floats (optional)
         azimuth angle regions (deg) Must be in pairs, i.e. 0 90 180 270
-
     system : str
         name of constellation (gps,glonass,galileo, beidou allowed)
 
     output : str
         name for kml file, i.e. if you input test, the filename will be test.kml
-
 
     Returns
     -------

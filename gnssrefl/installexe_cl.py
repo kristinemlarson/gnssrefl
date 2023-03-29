@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-installs non-python executables for the gnssrefl code
-"""
 import argparse
 import wget
 import os
@@ -37,7 +34,7 @@ def newchip_gfzrnx(exedir):
 def newchip_hatanaka(exedir):
     """
     compiles hatanaka code if an existing executable is not there
-    stores in EXE
+    stores in EXE directory
 
     Parameters
     ----------
@@ -133,13 +130,17 @@ def installexe(opsys: str):
     """
     Command line interface to install non-python executables, specifically
     CRX2RNX and gfzrnx. 
+
     https://stackoverflow.com/questions/12791997/how-do-you-do-a-simple-chmod-x-from-within-python
 
 
     Parameters
     ----------
     opsys : string
-        operating system (linux64 or macos)
+        operating system. Allowed values are linux64,  macos, and mac-newchip 
+        PC users should use the docker, where these executables 
+        come pre-installed
+
     """
 
     exedir = os.environ['EXE']
@@ -222,6 +223,17 @@ def installexe(opsys: str):
 
 
 def main():
+    """
+    command line code that downloads helper GNSS codes: Hatanaka and gfzrnx
+
+    Parameters
+    ----------
+    opsys : string
+        operating system. Allowed values are linux64,  macos, and mac-newchip
+        PC users should use the docker, where these executables
+        come pre-installed
+
+    """
     args = parse_arguments()
     installexe(**args)
 

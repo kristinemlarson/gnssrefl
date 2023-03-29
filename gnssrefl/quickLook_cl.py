@@ -53,7 +53,14 @@ def quicklook(station: str, year: int, doy: int,
               plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0):
     """
 
-    Main code to setup the quickLook assessment of SNR reflectometry data
+    Command line code to setup the quickLook assessment of SNR reflectometry data
+
+    Example:
+
+    quickLook p041 2023 1 -h1 1 -h2 8
+
+    would analyze station p041 on day of year 1 in the year 2023.  The periodogram would be 
+    restricted to 1-8 meters.  
 
     Parameters
     ----------

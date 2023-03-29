@@ -40,86 +40,85 @@ def parse_arguments():
 def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
         extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None):
     """
-        Parameters
-        ----------
-        station : string
-            4 ch station name 
+    Parameters
+    ----------
+    station : string
+        4 ch station name 
 
-        medfilter : float
-            Median filter for daily reflector height (m). Start with 0.25 for surfaces where you expect no significant 
-            subdaily change (snow/lakes).
+    medfilter : float
+        Median filter for daily reflector height (m). Start with 0.25 for surfaces where you expect no significant 
+        subdaily change (snow/lakes).
 
-        ReqTracks : int
-            Required number of daily satellite tracks to save the daily average value.
+    ReqTracks : int
+        Required number of daily satellite tracks to save the daily average value.
 
-        txtfile : str, optional
-            Use this parameter to set your own output filename.
-            default is to let the code choose.
+    txtfile : str, optional
+        Use this parameter to set your own output filename.
+        default is to let the code choose.
 
-        plt : bool, optional
-            whether to print plots to screen or not.
-            default is True.
+    plt : bool, optional
+        whether to print plots to screen or not.
+        default is True.
 
-        extension : str, optional
-            extension for solution names.
-            default is ''. (empty string)
+    extension : str, optional
+        extension for solution names.
+        default is ''. (empty string)
 
-        year1 : int, optional
-            restrict to years starting with.
-            default is 2005.
+    year1 : int, optional
+        restrict to years starting with.
+        default is 2005.
 
-        year2 : int, optional
-            restrict to years ending with.
-            default is 2030.
+    year2 : int, optional
+        restrict to years ending with.
+        default is 2030.
 
-        fr : int, optional
-            GNSS frequency. Value options:
-                0 (default) : all
+    fr : int, optional
+        GNSS frequency. If none input, all are used. Value options:
 
-                1 : GPS L1
+            1 : GPS L1
 
-                2 : GPS L2
+            2 : GPS L2
 
-                20 : GPS L2C
+            20 : GPS L2C
 
-                5 : GPS L5
+            5 : GPS L5
 
-                101 : GLONASS L1
+            101 : GLONASS L1
 
-                102 : GLONASS L2
+            102 : GLONASS L2
 
-                201 : GALILEO E1
+            201 : GALILEO E1
 
-                205 : GALILEO E5a
+            205 : GALILEO E5a
 
-                206 : GALILEO E6
+            206 : GALILEO E6
 
-                207 : GALILEO E5b
+            207 : GALILEO E5b
 
-                208 : GALILEO E5
+            208 : GALILEO E5
 
-                302 : BEIDOU B1
+            302 : BEIDOU B1
 
-                306 : BEIDOU B3
+            306 : BEIDOU B3
 
-                307 : BEIDOU B2
+            307 : BEIDOU B2
 
-        csv : boolean, optional
-            Whether you want csv instead of a plain text file.
-            default is False.
+    csv : boolean, optional
+        Whether you want csv instead of a plain text file.
+        default is False.
 
-        azim1 : int, optional
-            minimum azimuth, degrees
-            note: should be modified to allow negative azimuth
+    azim1 : int, optional
+        minimum azimuth, degrees
+        note: should be modified to allow negative azimuth
 
-        azim2 : int, optional
-            maximum azimuth, degrees
+    azim2 : int, optional
+        maximum azimuth, degrees
 
-        test : bool
-            augmentations to the plot
+    test : bool
+        augmentations to the plot
 
-        subdir: str
-            non-default subdirectory for Files output
+    subdir: str
+        non-default subdirectory for Files output
 
     """
     if len(station) != 4:

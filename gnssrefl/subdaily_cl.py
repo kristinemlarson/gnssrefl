@@ -1,6 +1,3 @@
-# preliminary water analysis to apply RHdot correction
-# originally called prelim-tides - now subdaily_cl.py
-# kristine larson, modified may 2021
 import argparse
 import numpy as np
 import matplotlib.pyplot as mplt
@@ -9,8 +6,6 @@ import os
 import sys
 import subprocess
 
-
-# my code
 import gnssrefl.gps as g
 import gnssrefl.subdaily as t
 
@@ -18,7 +13,6 @@ from gnssrefl.utils import str2bool
 
 
 def parse_arguments():
-    # must input start and end year
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", default=None, type=int, help="for now one year at a time")

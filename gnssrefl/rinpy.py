@@ -8,7 +8,6 @@ import gnssrefl.gps as g
 # Joakim Strandberg wrote this code originally-
 # I made some small changes ???  Kristine M. Larson
 
-
 class RinexError(Exception):
     pass
 
