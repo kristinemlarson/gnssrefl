@@ -40,5 +40,5 @@
 * [query_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.query_unr.html)
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
 
-* [llhxyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llhxyz.html)
-* [xyzllh](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.xyzllh.html)
+* [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)
+* [xyz2llh](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.xyz2llh.html)
