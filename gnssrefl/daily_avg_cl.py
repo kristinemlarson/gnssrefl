@@ -40,6 +40,15 @@ def parse_arguments():
 def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
         extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None):
     """
+    The goal is to consolidate individual RH results into a single file consisting of daily averaged RH without outliers.
+
+    Currently called as : daily_avg p041 0.25 10 
+
+    where p041 is the station name, 0.25 is the median filter value in meters, and 10 is the number of values required to
+    trust the daily average.
+
+    There are multiple optional choices as discussed below. The code also creates a file with all the subdaily RH as well.
+
     Parameters
     ----------
     station : string

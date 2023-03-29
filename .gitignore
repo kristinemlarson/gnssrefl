@@ -1,5 +1,6 @@
 env
 get_listing.py
+WARN*
 grauer*
 allstations.json
 sso_tokens.json

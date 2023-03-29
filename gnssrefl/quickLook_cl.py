@@ -15,11 +15,9 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 def parse_arguments():
 # user inputs the observation file information
     parser = argparse.ArgumentParser()
-# required arguments
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="day of year", type=int)
-# these are the optional inputs
     parser.add_argument("-snr", default=None, type=int, help="snr ending - default is 66")
     parser.add_argument("-fr", default=None, type=int, help="e.g. -fr 1 for GPS L1  or -fr 101 for Glonass L1")
     parser.add_argument("-ampl", default=None, type=float, help="minimum spectral amplitude allowed")
@@ -34,7 +32,6 @@ def parse_arguments():
     parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio (default is 3)")
     parser.add_argument("-ediff",  default=None, type=float, help="ediff Quality Control parameter (default 2 deg)")
     parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
-    #parser.add_argument("-fortran", default=None, type=str, help="Default is True: use Fortran translators")
 
     args = parser.parse_args().__dict__
 
@@ -53,7 +50,10 @@ def quicklook(station: str, year: int, doy: int,
               plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0):
     """
 
-    Command line code to setup the quickLook assessment of SNR reflectometry data
+    quickLook assessment of SNR reflectometry data. It creates two plots: one with periodograms for
+    four different quadrants (northwest, northeast, southeast, southwest) and the other with the RH
+    results shown as a function of azimuth. This plot also summarizes why the RH retrievals were accepted
+    or rejected in terms of the quality control parameters.  
 
     Example:
 
@@ -61,6 +61,9 @@ def quicklook(station: str, year: int, doy: int,
 
     would analyze station p041 on day of year 1 in the year 2023.  The periodogram would be 
     restricted to 1-8 meters.  
+
+    No refraction correction is applied at this stage. For this reason, very low elevation angle data at 
+    very tall sites will appear to be of very poor quality.
 
     Parameters
     ----------
