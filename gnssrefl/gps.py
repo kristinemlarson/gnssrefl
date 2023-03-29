@@ -5170,6 +5170,7 @@ def queryUNR_modern(station):
         url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/station_pos.db'
         print('Try to download the station database from github for you:', url1)
         print('If you are not online, it will fail.')
+        print('If you are able to download the file, it should be stored in the $REFL_CODE/Files directory')
         try:
             #url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/station_pos.db'
             wget.download(url1,nfile2)

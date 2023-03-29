@@ -12,7 +12,7 @@ import wget
 from urllib.parse import urlparse
 # local libraries
 import gnssrefl.gps as g
-import gnssrefl.cddis_highrate as ch
+import gnssrefl.highrate as ch
 import gnssrefl.kelly as kelly
 
 def gogetit(dir1, filename, ext):

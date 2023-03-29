@@ -1,7 +1,33 @@
-# News and Questions
+# Community 
+
+## Acknowledgements
+
+- [Radon Rosborough](https://github.com/raxod502) helped with 
+python/packaging questions and improved our docker distribution. 
+- [Naoya Kadota](https://github.com/naoyakadota) added the GSI data archive. 
+- Joakim Strandberg provided python RINEX translators. 
+- Johannes Boehm provided source code for the refraction correction. 
+- At UNAVCO, Kelly Enloe made Jupyter notebooks and Tim Dittmann made docker builds. 
+- Makan Karegar added the NMEA capability.
+- Dave Purnell provided his inversion code, which is now running in the <code>invsnr</code> capability.  
+- Carolyn Roesler helped with the original Matlab codes.
+- Felipe Nievinski and Simon Williams have provided significant advice for this project.
+- Clara Chew and Eric Small developed the soil moisture algorithm; I ported it to python with Kelly's help.
+- Sree Ram Radha Krishnan ported the rzones web app code.
+- Dan Nowacki added Glonass to the NMEA reader
+
+GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, 
+EAR 1144221, AGS 1449554) and NASA (NNX12AK21G and NNX13AF43G).
+The python package development, docker distributions and jupyter notebooks are supported under NASA 80NSSC20K1731.
+For relevant citations, the code is citable via [DOI 10.5281/zenodo.5601495](http://dx.doi.org/10.5281/zenodo.5601495). The 
+general methods we have used are covered in various publications [found here](https://www.kristinelarson.net/publications).
+
+Authors and maintainers: [Kristine M. Larson](https://kristinelarson.net), Kelly Enloe, and Tim Dittmann
 
 
-### News 
+## News 
+
+This section will no longer be updated. Please see the CHANGELOG for further information.
 
 2023 News
 
@@ -137,31 +163,7 @@ at the <code>rinex2snr</code> level, but currently (I believe) the code simply r
 angles are all very negative (-51). JAXA also has an incomplete number of GPS satellites in its sp3 files (removing 
 the newer ones). It is unfortunate, but I cannot do anything about this.
 
-### Acknowledgements
-
-- [Radon Rosborough](https://github.com/raxod502) helped with 
-python/packaging questions and improved our docker distribution. 
-- [Naoya Kadota](https://github.com/naoyakadota) added the GSI data archive. 
-- Joakim Strandberg provided python RINEX translators. 
-- Johannes Boehm provided source code for the refraction correction. 
-- At UNAVCO, Kelly Enloe made Jupyter notebooks and Tim Dittmann made docker builds. 
-- Makan Karegar added the NMEA capability.
-- Dave Purnell provided his inversion code, which is now running in the <code>invsnr</code> capability.  
-- Carolyn Roesler helped with the original Matlab codes.
-- Felipe Nievinski and Simon Williams have provided significant advice for this project.
-- Clara Chew and Eric Small developed the soil moisture algorithm; I ported it to python with Kelly's help.
-- Sree Ram Radha Krishnan ported the rzones web app code.
-- Dan Nowacki added Glonass to the NMEA reader
-
-GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 0935725, 
-EAR 1144221, AGS 1449554) and NASA (NNX12AK21G and NNX13AF43G).
-The python package development, docker distributions and jupyter notebooks are supported under NASA 80NSSC20K1731.
-For relevant citations, the code is citable via [DOI 10.5281/zenodo.5601495](http://dx.doi.org/10.5281/zenodo.5601495). The 
-general methods we have used are covered in various publications [found here](https://www.kristinelarson.net/publications).
-
-Authors and maintainers: [Kristine M. Larson](https://kristinelarson.net), Kelly Enloe, and Tim Dittmann
-
-### How you can help improve this code
+## How you can help improve this code
 
 - Archives are *constantly* changing their file transfer protocols. If you 
 find one in <code>gnssrefl</code> that doesn't work anymore,
@@ -182,7 +184,7 @@ works on fitting the spectrum computed with detrended SNR data, please consider 
 
 - Investigate surface related biases for polar tide gauge calculations (ice vs water).
 
-### How to get help with your gnssrefl questions
+## How to get help with your gnssrefl questions
 
 If you are new to the software, you should consider watching the 
 [videos about GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)

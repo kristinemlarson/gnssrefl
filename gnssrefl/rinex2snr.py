@@ -18,7 +18,7 @@ from progress.bar import Bar
 import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
 import gnssrefl.karnak_libraries as k
-import gnssrefl.cddis_highrate as ch
+import gnssrefl.highrate as ch
 
 # fortran codes for translating RINEX
 import gnssrefl.gpssnr as gpssnr
