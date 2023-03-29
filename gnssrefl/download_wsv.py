@@ -14,7 +14,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name, e.g. 5970026", type=str)
     parser.add_argument("-plt", default=None, help="Optional plot to screen", type=str)
-    parser.add_argument("-output", default=None, help="Optional filename", type=str)
+    parser.add_argument("-output", default=None, help="Optional filename for wsv", type=str)
     args = parser.parse_args().__dict__
 
 
@@ -39,12 +39,17 @@ def download_wsv(station: str, plt: bool = True, output: str = None):
         plot comes to the screen
         default is None
     output: str, optional
-        output filename
+        output filename which is stored in $REFL_CODE/Files
         if not set, it uses station.txt
 
     """
     g.check_environ_variables()
     # set up the address for the API call
+    xdir = os.environ['REFL_CODE']
+    outputdir = xdir + '/Files'  
+    if not os.path.isdir(outputdir):
+        print('making ', outputdir)
+        subprocess.call(['mkdir',outputdir])
 
     newurl = 'https://www.pegelonline.wsv.de/webservices/rest-api/v2/stations/' + station + '/W/measurements.json?start=P15D'
 
@@ -53,10 +58,10 @@ def download_wsv(station: str, plt: bool = True, output: str = None):
     N= len(data)
     thetime = []; sealevel = [] ; obstimes = [] ; pt = 0
     if output is None:
-        outfile = station + '.txt'
-
+        # use default
+        outfile = outputdir + '/' + station + '.txt'
     else:
-        outfile = args.output
+        outfile = outputdir + '/' + output
 
     # open the file
     print('File written to :', outfile)

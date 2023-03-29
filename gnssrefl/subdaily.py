@@ -1429,12 +1429,10 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     newsigma = np.std(biasCor_rh-spline_at_GPS)
     strsig = str(round(newsigma,3)) + '(m)'
 
-    fig=plt.figure(figsize=(10,8))
-    plt.subplot(2,1,1)
+    fig=plt.figure(figsize=(10,5))
+    #plt.subplot(2,1,1)
     plt.plot(th, biasCor_rh, 'b.', label='RH with RHdot/IFcorr ' + strsig)
     plt.plot(th_even, spline_whole_time, 'c-',label='newspline')
-
-
 
     if outlierV2 is None:
         # use 3 sigma to find outliers
@@ -1457,12 +1455,14 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     plt.grid()
     plt.gca().invert_yaxis()
     plt.ylabel('meters')
-    plt.title('New spline with RHdot corr/InterFreq corr/initial outliers removed')
+    plt.title('Station: ' + station + ', new spline, RHdot corr/InterFreq corr/outliers removed')
     plt.xlabel('days of the year')
+    g.save_plot(txtdir + '/' + station + '_rhdot4.png')
 
-    plt.subplot(2,1,2)
+    fig=plt.figure(figsize=(10,5))
+    #plt.subplot(2,1,1)
     plt.plot(th, biasCor_rh - spline_at_GPS, 'b.',label='all residuals')
-    plt.title('Residuals to new spline fit')
+    plt.title('Station:' + station + ' Residuals to new spline fit')
     plt.grid()
     plt.ylabel('meters')
     plt.xlabel('days of the year')
@@ -1472,8 +1472,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     badpoints2 =  (biasCor_rh -spline_at_GPS)[ii]
     plt.legend(loc="upper left")
 
-    print('RMS with frequency bias and RHdot taken out (m) ', np.round(newsigma,3)  )
-    g.save_plot(txtdir + '/' + station + '_rhdot4.png')
+    print('RMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3)  )
+    g.save_plot(txtdir + '/' + station + '_rhdot5.png')
+    plt.close() # dont send this one to the screen
 
     # bias corrected - and again without 3 sigma outliers
     bias_corrected_filename = fname_new + 'IF'; extraline = ''; writecsv = False

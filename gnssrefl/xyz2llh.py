@@ -30,7 +30,7 @@ def main():
     x=args.x; y=args.y; z=args.z
     xyz = [x, y, z]
     lat,lon,h = g.xyz2llhd(xyz)
-    print("Lat Lon Ht (deg deg m) %12.7f %12.7f %9.3f " % (lat, lon, h) )
+    print("Lat Lon Ht (deg deg m) %14.9f %14.9f %9.3f " % (lat, lon, h) )
 
 if __name__ == "__main__":
     main()

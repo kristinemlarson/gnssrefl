@@ -4704,6 +4704,8 @@ def read_simon_williams(filename,outfilename):
 
 def get_noaa_obstimes(t):
     """
+    Needs to be be fixed for new file structure
+
     Parameters
     ----------
     t : list of integers
@@ -4729,21 +4731,23 @@ def get_noaa_obstimes(t):
 
 def get_noaa_obstimes_plus(t):
     """
+    Send it a list of time tags (y,m,d,h,m,s)
+
 
     Parameters
     ----------
-    t : list of times 
+    t : numpy array
         our water level format
-        with year, month, day, hour, minute, second (all integers)
+        where year, month, day, hour, minute, second are in the first columns
 
     Returns
     -------
-    obstimes : datetime
+    obstimes : datetime obj
+        timetags 
 
     modjulian : numpy array of floats
-        modified julian array 
+        modified julian date array 
 
-    ??? and relative gps time (in seconds)
     """
     nr,nc = t.shape
     obstimes = []
@@ -4753,12 +4757,11 @@ def get_noaa_obstimes_plus(t):
     # if i read in the file better, would not have to change from float
     if nr > 0:
         for i in range(0,nr):
-            year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = int(t[i,8])
+            year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = int(t[i,5])
             dtime = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
             obstimes.append(dtime)
             imjd, fr = mjd(year,month,day,hour,minute,second)
             x = [imjd+fr]
-            #modjulian = np.append( modjulian, [x], axis=0 ) 
             modjulian = np.append(modjulian, x)
     else:
         print('you sent me an empty variable')
