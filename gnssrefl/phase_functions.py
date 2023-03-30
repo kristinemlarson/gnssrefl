@@ -16,8 +16,34 @@ from scipy.interpolate import interp1d
 from datetime import datetime
 from pathlib import Path
 
+from gnssrefl.utils import str2bool, read_files_in_dir
+
 xdir = Path(os.environ["REFL_CODE"])
 
+def normAmp(amp, basepercent):
+    """
+    emulated amp_normK code from PBO H2O
+    inputs are the amplitudes  and a percentage
+    used to define the bottom level. returns
+    normalized amplitudes
+    this is meant to be used by individual tracks (I think)
+    in this case they are the top values, not the bottom ... ugh
+    """
+    Namp = amp
+    N=len(amp)
+    if (N > 0):
+        numx = int(np.round(N*basepercent) )
+
+        if (numx==0):
+            numx = N
+
+        sortA = -np.sort(-amp)
+        topavg = np.mean(sortA[0:numx])
+
+        # this comes from Clara's Recommendations, amp_normK.m
+        Namp = amp/topavg
+
+    return Namp
 
 def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir):
     """
@@ -798,4 +824,231 @@ def apriori_file_exist(station,fr):
     
     return os.path.exists(apriori_path_f) 
 
+def filter_out_snow(station, year1, year2, fr,snowmask):
+    """
+    attempt to remove outliers from snow. only called if the snow filter file exists
 
+    Parameters
+    ----------
+    station : str
+        four character station name
+
+    year1 : integer
+        starting year
+    year2 : integer
+        ending year
+    fr : integer
+        frequency, i.e. 1 or 20
+    snowmask : str
+        name/location of the snow mask file
+
+    """
+    xdir = os.environ['REFL_CODE']
+    found_override = False
+    if os.path.exists(snowmask):
+        print('found snow file')
+        override = np.loadtxt(snowmask, comments='%')
+        found_override = True
+
+#   now load the phase data
+    newresults = []
+    results_trans = []
+    #vquad = np.vstack((vquad, newl))
+    vquad = np.empty(shape=[0, 16])
+
+    if found_override:
+        dataexist, year, doy, hr, ph, azdata, ssat, rh, amp,results = load_sat_phase(station, year1,year2, fr)
+        # results were originally transposed - so untransposing them 
+        results = results.T
+        for year in range(year1,year2+1):
+            ii = (results[:,0] == year) & (results[:,12] == fr)
+        # it is easier for me to do this year by year
+            y = results[ii,0];
+            d = results[ii,1]
+            ph = results[ii,3]
+            thisyear_results = results[ii,:]
+        # the goal is to find all the results that do not appear in the override list
+            jj = (override[:,0] == year) # find days when there are suspects points
+            targetdoys = override[jj,1]
+            #print(year, ' length of d', len(d))
+            # the mask asks when is d distinct from targetdoys
+            mask=np.logical_not(np.isin(d,targetdoys))
+            #print(year, ' length of dmasked', len(d[mask]))
+            masked_results = thisyear_results[mask]
+            newresults = np.append(newresults, masked_results)
+            #vquad = np.vstack((vquad, thisyear_results[mask] ) )
+            vquad = np.append(vquad, masked_results,axis=0)
+
+    # change to numpy?
+    nr,nc = np.shape(vquad)
+    print('Number of rows and columns now ', nr,nc)
+
+    # 
+    results_trans= np.transpose(vquad)
+
+    print(np.shape(results_trans))
+
+    if len(results_trans) == 0:
+        print('no data ')
+        dataexist = False
+        year = []; doy = []; hr = []; ph = []; azdata = []; ssat = []
+        rh = []; amp = []
+    else:
+        dataexist = True
+        # save with new variable names
+        year = results_trans[0]
+        doy = results_trans[1]
+        hr = results_trans[2]
+        ph = results_trans[3]
+        azdata = results_trans[5]
+        ssat = results_trans[6]
+        rh = results_trans[13]
+        amp = results_trans[15]
+
+# use same return command as in the original function
+    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results_trans
+
+
+def load_avg_phase(station,fr):
+    """
+    loads a previously computed daily average phase solution.
+    this is NOT the same as the multi-track phase results.
+    This file is now stored in station subdirectory in $REFL_CODE/Files/
+
+    Parameters
+    ----------
+    station : str
+        4 character station ID, lowercase
+
+    Returns
+    -------
+    avg_exist : boolean
+
+    avg_date : ??
+
+    avg_phase : ??
+
+    """
+
+    avg_date = []
+    avg_phase = []
+    avg_exist = False
+
+    if fr == 1:
+        xfile = f'{xdir}/Files/{station}/{station}_phase_L1.txt'
+    else:
+        xfile = f'{xdir}/Files/{station}/{station}_phase.txt'
+
+    if os.path.exists(xfile):
+        result = np.loadtxt(xfile, comments='%')
+        if len(result) > 0:
+            year = result[:, 0]
+            day = result[:, 1].astype(int)
+            phase = result[:, 2]
+            # change to integers from float, though not necessary since i'm using float date...
+            avg_date = year + day/365.25
+            avg_phase = phase
+            avg_exist = True
+
+    return avg_exist, avg_date, avg_phase
+
+
+def load_sat_phase(station, year, year_end, freq):
+    """
+    Picks up the phase data from local results section
+    return to main code whether dataexist, and np arrays of year, doy, hr, phase, azdata, ssat
+
+    Parameters
+    ----------
+    station : str
+        four character station name
+    year : integer
+        beginning year
+    year_end : integer
+        ending year
+    freq : integer
+        GPS frequency (1,20 allowed)
+
+    Returns
+    -------
+    dataexist : bool
+        whether data found?
+    year : numpy array of int
+        full years
+    doy : numpy array of int
+        days of year
+    hr : float
+        fractional day (UTC)
+    ph : float
+        phases (deg)
+    azdata : float
+        azimuths (deg)
+    ssat : int
+        satellites (deg)
+    rh : float
+        reflector height (m)
+    amp : float
+        amplitudes of peak LSP 
+
+    results : ??
+
+    """
+    print('Requested frequency: ', freq)
+    dataexist = False
+
+    xfile = xdir + '/input/override/' + station + '_vwc' 
+    found_override = False
+    # not implementing this yet
+    if os.path.exists(xfile):
+        print('found override file but not implementing at this time')
+    #    override = np.loadtxt(xfile, comments='%')
+    #    found_override = True
+
+    thedir = Path(os.environ["REFL_CODE"])
+
+    if not year_end:
+        year_end = year
+
+    results = []
+    for year in np.arange(year, year_end+1):
+        # where the results are stored
+        data_dir = thedir / str(year) / 'phase' / station
+        local_results = read_files_in_dir(data_dir)
+        if local_results:
+            results.extend(local_results)
+
+    if not results:
+        print(f"No results were found for the year range you requested: ({year}-{year_end})")
+        sys.exit()
+
+    results = np.array(results)
+    freq_list = results[:, 12]
+    ii = (freq_list == freq)
+    results = results[ii, :]
+    print('Total phase measurements for this frequency: ', len(results))
+#    common_elements, ar1_i, ar2_i = np.intersect1d(ar1, ar2, return_indices=True)
+    minyear = np.min(np.unique(results[:,0]))
+    maxyear = np.max(np.unique(results[:,0]))
+    #print(minyear,maxyear)
+    nr,nc = np.shape(results)
+    print(nr, ' number of rows')
+
+    results = results.T  # dumb, but i was using this convention.  easier to maintain
+
+    if len(results) == 0:
+        print('no data at that frequency')
+        year = []; doy = []; hr = []; ph = []; azdata = []; ssat = []
+        rh = []; amp = []
+    else:
+        dataexist = True
+        # save with new variable names 
+        year = results[0]
+        doy = results[1]
+        hr = results[2]
+        ph = results[3]
+        azdata = results[5]
+        ssat = results[6]
+        rh = results[13]
+        amp = results[15]
+
+    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results

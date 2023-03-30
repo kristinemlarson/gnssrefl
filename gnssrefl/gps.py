@@ -1452,24 +1452,19 @@ def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
         elevation angles in degrees
     y : numpy array
         SNR data 
-
     cf : float
         scale factor for given frequency
-
     maxH : float
         maximum reflector height in meters
-
     desiredP : float
         precision of Lomb Scargle in meters
-
     pfitV : integer
         polynomial order for DC model
-
     minH : float
         minimum reflector height in meters
 
     Returns 
-    ----------
+    -------
     maxF : float
         maximum Reflector height (meters)
     maxAmp : float
@@ -1592,25 +1587,25 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         Whether statistics come to the screen
 
     Returns
-    ---------
-    x : numpy array of 
-        float
-    y : numpy array of 
-        float
+    -------
+    x : numpy array of floats 
+        elevation angle, deg
+    y : numpy array of floats
+        SNR, db-Hz
     Nvv : integer
         number of points in x
     cf : float
-        scale factor
+        refl scale factor (lambda/2)
     meanTime : float
-        UTC hour
+        UTC hour of the arc
     avgAzim : float
-        average azimuth of the tracks
+        average azimuth of the track (degrees)
     outFact1 : float
-        TBD 
+        tan(elev)/elevdot, hours, from SNR file
     outFact2 : float
-        TBD
+        tan(elev)/elevdot, hours, from linear fit
     delT : float
-        track length in minutes (I think)
+        track length in minutes
 
     """
     cunit = 1
@@ -1726,6 +1721,8 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
             avgEdot_fit = model[0]
             avgAzim = np.mean(a)
             meanTime = np.mean(t)/3600
+            # this is degrees/second? - but if the values are not in the file
+            # this will be zero
             avgEdot = np.mean(ed) 
 #  delta Time in minutes
             delT = (np.max(t) - np.min(t))/60 
@@ -1736,8 +1733,13 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     if avgEdot == 0:
         outFact1 = 0
     else:
-        outFact1 = cunit/(avgEdot*3600) 
+        # this was never implemented
+        #outFact1 = cunit/(avgEdot*3600) 
+        # rad/hour
+        outFact1 = cunit/((avgEdot*np.pi/180)*3600) 
+    # now change it to per hour ... 
     outFact2 = cunit/(avgEdot_fit*3600) 
+
     return x,y,Nvv,cf,meanTime,avgAzim,outFact1, outFact2, delT
 
 def arc_scaleF(f,satNu):

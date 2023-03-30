@@ -1,8 +1,6 @@
-# I DO NOT THINK THIS IS USED. THIS SHOULD BE CONFIRMED AND IT SHOULD BE REMOVED
 import argparse
 import numpy as np
 import sys
-
 
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
@@ -37,7 +35,20 @@ def parse_arguments():
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66, 
         fr: str = '20', e1: int = 5, e2: int = 30, plot: bool = False, screenstats: bool = False, gzip:bool=False):
     """
-    quickphase uses the apriori result file to restrict the number of satellite arcs that are used.
+    quickphase computes phase for the given inputs (station, years, doy, elevation angles)
+    These phase results are subquently used in vwc. The command line call is phase
+    (which maybe we should change).
+    
+    Examples:
+   
+    For one day
+
+    phase p038 2021 4
+
+    For the whole year
+
+    phase p038 2021 1 -doy_end 365 
+
 
     Parameters
     ----------
@@ -148,8 +159,6 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
                 qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp, gzip)
     else:
         for d in np.arange(doy, doy_end + 1):
-            # this is redundant
-            #print('Analyzing year/day of year ' + str(year) + '/' + str(d))
             qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp, gzip)
 
 

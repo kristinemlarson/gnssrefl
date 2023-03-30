@@ -24,8 +24,10 @@ def parse_arguments():
 
 def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100 ):
     """
-    picks up reflector height results for a given station and year-year end and computes the mean values
-    and writes to a file with the mean values.
+    Starts the analysis for volumetric water content.  
+    Picks up reflector height (RH) results for a given station and year-year end range and 
+    computes the RH mean values and writes them to a file. These will be used to compute a consistent
+    set of phase estimates.
 
     Parameters
     ----------
