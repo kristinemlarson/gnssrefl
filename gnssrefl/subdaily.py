@@ -272,7 +272,8 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     fout.close()
 
 
-def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,peak2noise,txtfile,h1,h2,kplt,txtdir,default_usage):
+def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,
+        peak2noise,txtfile,h1,h2,kplt,txtdir,default_usage):
     """
     reads in RH results and makes various plots to help users assess the quality of the solution
 
@@ -1164,6 +1165,12 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     else:
         txtdir = val
 
+    knots_test = kwargs.get('knots_test',0)
+    if (knots_test== 0):
+        knots_test = knots
+    else:
+        print('using knots_test')
+
     delta_out = kwargs.get('delta_out',0)
     if (delta_out  == 0):
         splineout = False
@@ -1406,6 +1413,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     tnew, ynew = flipit(tvd_new,column)
 
     Ndays = tnew.max()-tnew.min()
+    knots_per_day = knots_test
+    print('trying knots_test')
     numKnots = int(knots_per_day*(Ndays))
     #
 

@@ -64,6 +64,35 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives.
+    
+    Examples:
+
+    rinex2snr mchn 2022 15  -orb sopac
+
+    would translate station mchn for the year/doy 2022/15 using data from the sopac archive
+    and GPS orbits.
+
+    rinex2snr mchn 2022 15  -orb rapid -archive sopac
+
+    would do the same but using multi-GNSS orbits from GFZ 
+
+    RINEX 3 translation is triggered by the station name having 9 characters:
+
+    rinex2snr mchl00aus 2022 15  -orb rapid -archive ga 
+
+    would translate 30 second RINEX 3 files from mchl00aus and the Geoscience Australia archive
+
+    RINEX 3 files have optional -stream  and -samplerate options.  In reality, you are unlikely to find
+    RINEX 3 files at much beyond 1 and 30 seconds.  If you do not need 1 second data, you are strongly encouraged
+    to decimate to the rate you would like.  This example is for the station WARN in Germany.
+    You need to tell the code that it is highrate (and 1-second sample). It is a streamed file, so
+    the stream input must be set. And even further, must specify that it is in the bkg folder called IGS.
+
+    rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg -stream S -bkg IGS
+
+    Regardless of the fact that station names can have 9 characters now, this code stores than with 
+    four characters.
+
 
     Parameters
     ----------
@@ -147,7 +176,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         Default is None. None means that the code will search unavco,sopac and sonel.
         value options:
 
-            unavco : (University Navstar Consortium)
+            unavco : (University Navstar Consortium, now Earthscope)
 
             sonel : (global sea level observing system)
 
@@ -384,6 +413,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
     if stream not in ['R', 'S']:
         stream = 'R'
+    bkg = bkg.upper() # make sure it is using uppercase
 
     args = {'station': station, 'year_list': year_list, 'doy_list': doy_list, 'isnr': snr, 'orbtype': orb,
             'rate': rate, 'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook,

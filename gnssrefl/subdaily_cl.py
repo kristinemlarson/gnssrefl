@@ -39,6 +39,7 @@ def parse_arguments():
     parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output")
     parser.add_argument("-delta_out", default=None, type=int, help="Output interval for spline fit, seconds (default is 1800)")
     parser.add_argument("-if_corr", default=None, type=str, help="Interfrequency correction applied, optional")
+    parser.add_argument("-knots_test", default=None, type=int, help="test knots")
 
     args = parser.parse_args().__dict__
 
@@ -55,7 +56,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
         knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True, doy1: int = 1, 
         doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.0, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
-        subdir: str = None, delta_out : int = 1800, if_corr: bool = True):
+        subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0):
     """
     Parameters
     ----------
@@ -179,7 +180,7 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     # not sure why tv and corr are being returned.
     if rhdot:
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier1, spline_outlier2, 
-                   knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,if_corr=if_corr)
+                   knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,if_corr=if_corr,knots_test=knots_test)
        if plt:
            mplt.show()
 

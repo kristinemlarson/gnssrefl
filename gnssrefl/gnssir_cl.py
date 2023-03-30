@@ -60,7 +60,19 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
            compress: bool = False, screenstats: bool = False, delTmax: int = None,
            e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False, dec : int = 1):
     """
-        This is the main driver for estimating Reflector Height using GNSS Interferometric Reflectometry.
+        gnssir is the main driver for estimating Reflector Height using GNSS Interferometric Reflectometry.
+        The user is required to have set up an analysis strategy using "make_json_input" 
+        
+        To run the gnssir code,  you need 1) a SNR file and 2) the analysis strategy.   The required inputs
+        (station, year, doy) tell the code where to find the SNR file. The station name tells the code whre
+        to find the analysis strategy file.
+
+        Sample function call:
+
+        gnssir p041 2021 15 would analyze the data for station p041, year 2021 and day of year 15.
+
+        If gnssir is not working properly - or you do not understand why it is making various choices, you 
+        are encouraged to set screenstats to True.
 
         Parameters
         ----------

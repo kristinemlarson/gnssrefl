@@ -38,10 +38,11 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
         plt_enddate:str=None,simple:bool=False):
     """
     Calculates snow depth for a given station and water year.
+    Before you run this code you must have run gnssir for each day of interest.  
+    You then must run daily_avg to concatenate the results.  
 
     Currently set for northern hemisphere constraints. This could easily be fixed for 
-    the southern hemisphere by reading the json input file
-
+    the southern hemisphere by reading the json input file.
     Default values use median of September to set "bare soil value"
     These can be overriden with bare_date1 and bare_date2 (as one would do in Alaska)
 
@@ -51,6 +52,13 @@ def snow_depth(station: str, year: int, minS: float=None, maxS: float=None,
     If simple is set to true, the algorithms computes bare soil (and thus snow depth), using
     all values together.  The default defines bare soil values every 10 degrees in azimuth.  
     Both require you to run daily_avg before running snow_depth/snowdepth
+
+    Example:
+
+    snowdepth p101 2022
+
+    would create snowdepth results for the 2022 water year, which is from October 1, 2021 thru
+    end of the spring 2022. The bare soil would be based on data from September 1-30 2021.
 
     Parameters
     ----------
