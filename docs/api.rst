@@ -1,4 +1,4 @@
-API Documentation
+API documentation
 =================
 
 Information on specific functions, classes, and methods.
