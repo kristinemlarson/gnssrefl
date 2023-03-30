@@ -1165,11 +1165,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     else:
         txtdir = val
 
-    knots_test = kwargs.get('knots_test',0)
-    if (knots_test== 0):
-        knots_test = knots
-    else:
-        print('using knots_test')
 
     delta_out = kwargs.get('delta_out',0)
     if (delta_out  == 0):
@@ -1192,10 +1187,18 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # knots_per_day = 8
     knots_default = 8
     knots_per_day= kwargs.get('knots',8)
-    print('\n>>>>>>>>>>>>>>>>>>>> Entering spline fit <<<<<<<<<<<<<<<<<<<<<<<<')
-    print('Improved code to compute rhdot correction and bias correction for subdaily')
+
+
+    knots_test = kwargs.get('knots_test',0)
+    if (knots_test== 0):
+        knots_test = knots_per_day
+    else:
+        print('using knots_test')
+
+    print('\n>>>>>>>>>>>>>>>>>>>> Entering second section of subdaily code <<<<<<<<<<<<<<<<<<<<<<<<')
+    print('\nComputes rhdot correction and bias correction for subdaily')
     print('\nInput filename:', fname)
-    print('Output filename: ', fname_new)
+    print('\nOutput filename: ', fname_new)
 
     # read in the lomb scargle values which are the output of gnssir
     # i.e. the reflector heights

@@ -16,8 +16,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", default=None, type=int, help="for now one year at a time")
-    parser.add_argument("-txtfile", default=None, type=str, help="Filename for editing") 
-    parser.add_argument("-splinefile", default=None, type=str, help="Input filename for rhdot/spline fitting (optional)") 
+    parser.add_argument("-txtfile_part1", default=None, type=str, help="optional filename,first section of code (gross outlier detection), must be in gnssir output format") 
+    parser.add_argument("-txtfile_part2", default=None, type=str, help="optional filename,second section of code (Rhdot calculation, splines), must be gnssir output format ") 
     parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt")
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
     parser.add_argument("-spline_outlier1", default=None, type=float, help="outlier criterion used in first splinefit (meters)")
@@ -51,13 +51,46 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None, csvfile: bool = False, 
+def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: str = None, csvfile: bool = False, 
         plt: bool = True, spline_outlier1: float = None, spline_outlier2: float = None, 
         knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True, doy1: int = 1, 
         doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.0, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0):
     """
+    subdaily combines multiple day solutions and applies relevant corrections. 
+    It works on one year at a time, though you can restricts time periods within a year with -doy1 and -doy2
+
+    Example:
+
+    subdaily at01 2023
+
+    or 
+
+    subdaily at01 2023 -doy1 15 -doy2 45
+
+    would only look at the thirty days between days of year 15-45.
+
+    The code has two sections. 
+
+    I. Summarize the retrievals (how many retrievals per constellation), identify and remove gross outliers.
+    provide plots to allow a user to evaluate Quality Control parameters. The solutions can further be edited from
+    the command line (i.e. restrict the RH using -h1 and -h2, in meters, or azimuths using -azim1 and -azim2)
+
+    II. This section has the following goals:
+
+    - removes more outliers based on a spline fit to the RH retrievals
+
+    - calculates and applies RHdot
+
+    - removes an interfrequency (IF) bias. All solutions are then relative to GPS L1.
+
+
+    txtfile_part1 is optional input if you want to skip part 1 and use your own file (but in the same format).
+
+    txtfile_part2 is optional input to the second part of the code.
+
+
     Parameters
     ----------
 
@@ -65,10 +98,10 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
         4 character id of the station.
     year : integer
         Year
-    txtfile : string, optional
+    txtfile_part1 : string, optional
         File name.
         default is None - will set name for you.
-    splinefile: string, optional
+    txtfile_part2 : string, optional
         Input filename for rhdot/spline fitting
         default is None
     csvfile: boolean, optional
@@ -154,24 +187,25 @@ def subdaily(station: str, year: int, txtfile: str = '', splinefile: str = None,
     if csvfile:
         writecsv = True
 
-    if splinefile is None:
-        if txtfile == '':
+    if txtfile_part2 is None:
+        if txtfile_part1 == '':
             print('Will pick up and concatenate daily result files')
         else:
-            print('Using ', txtfile)
+            print('Using ', txtfile_part1)
         # if txtfile provided, you can use that as your starting dataset 
         
         default_usage = True
         ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, 
-                extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt,txtdir,default_usage)
+                extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile_part1,h1,h2,kplt,txtdir,default_usage)
         haveObstimes = True
     else:
         haveObstimes = False
-        fname_new = splinefile
+        fname_new = txtfile_part2
         if not os.path.isfile(fname_new):
             print('Input subdaily RH file you provided does not exist:', fname_new)
             sys.exit()
 
+    # if you are not going to the second part of the code, display the plots, if requested. 
     if not rhdot:
         if plt:
             mplt.show()

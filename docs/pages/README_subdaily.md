@@ -1,11 +1,32 @@
 # subdaily<a name="module6"></a>
 
-**Updated March 25, 2023**
+**Updated March 30, 2023**
 
-I have implemented user-defined spline outlier criteria. They are both in meters
-and can be different for the two phases of data analysis (spline_outlier1 and spline_outlier2)
+The code has two sections:
 
-And plots all come to the screen at the same time - got tired of having them come up twice!
+First section tries to summarize the data (which constellations where used, how do the 
+RH data look compared to various quality control parameters).  It also removes gross outliers.
+
+Second section tries to do a better job with outliers based on a spline fit. If the spline fit
+is not very good (which you control with -knots), then it will throw out too many points (or too few).
+Right now it uses three sigma. You can override this using -spline_outlier1 in meters.
+
+It then uses the spline fit to calculate and apply the RHdot correction. This is not the only way
+to make this correction, but it is the only way in the gnssrefl code. If you are in a high tidal 
+region, you should definitely see an improvement in the residuals. 
+
+After RH dot is applied, it makes a new spline and then calculates how well the different frequencies
+agree with this. It computes and applies a frequency dependent offset with respect to GPS L1.  
+This final version also removes three sigma outliers - though again, you can use -spline_outlier2 to set
+that to a better value for your data set.
+
+I have been concerned about overwriting the original RH value (in column 3). So these new values are 
+always added as new columns.
+
+
+If you have your own concatenated file of results you can set -txtfile_section1 to that filename.
+Similarly, if you want to skip section 1 and go right to section 2, you can set -txtfile_section to your filename.
+
 
 
 **Updated March 14, 2023**
