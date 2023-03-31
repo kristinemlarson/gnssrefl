@@ -74,13 +74,14 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     year_list : list of int
         years to be analyzed
 
-    doy_list list of doy to be analyzed
+    doy_list : list of integers
+        doys to be analyzed
 
     isnr : integer
         SNR file type choice
 
     orbtype : string
-        3 character orbit type, e.g. nav
+        orbit type, e.g. nav, rapid, gnss
 
     rate : string
         general sample rate.

@@ -3435,6 +3435,10 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
+    elif (orbtype == 'rapid'):
+        print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
+        f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
+        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
         print('uses default IGS orbits, so only GPS ?')
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igs')

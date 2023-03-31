@@ -33,6 +33,7 @@ def parse_arguments():
     parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
     parser.add_argument("-dec", default=None, type=int, help="decimation value (seconds). Only for RINEX 3.")
     parser.add_argument("-save_crx", default=None, type=str, help="Save crx version. Only for RINEX 3.")
+    parser.add_argument("-bkg", default=None, type=str, help="bkg directory, only for highrate RINEX 3.")
 
     args = parser.parse_args().__dict__
 
@@ -47,9 +48,25 @@ def parse_arguments():
 def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = None,
                    version: int = 2, strip: bool = False, doy_end: 
                    int = None, stream: str = 'R', samplerate: int = 30, 
-                   debug: bool = False, dec: int = 1, save_crx: bool = False):
+                   debug: bool = False, dec: int = 1, save_crx: bool = False, bkg: str = None ):
     """
-    command line interface for download_rinex.
+    Command line interface for downloading RINEX files from global archives.
+    Required inputs are station, year, month, and day.
+
+    Example:
+
+    download_rinex mfle 2015 1 1 
+
+    If you want to download using day of year instead of month/day:
+
+    download_rinex mfle 2015 52 0
+
+    If you want to specify an archive:
+
+    download_rinex p101 2015 52 0 -archive sopac
+
+    RINEX 3 files are complex.  
+
 
     Parameters
     ----------
@@ -133,10 +150,19 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     save_crx : bool, option
         saves crx version for Rinex3 downloads. Otherwise they are deleted.
+
+    bkg : str, optional
+        tells you which directory the files live in, EUREF or IGS
+        Default is EUREF.
     """
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
+
+    if bkg is None:
+        bkg = 'EUREF'
+    else:
+        bkg = bkg.upper()
 
     if len(str(year)) != 4:
         print('Year must have four characters: ', year)
@@ -148,7 +174,6 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     # unavco2 is for testing
     archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 
             'bkg', 'jeff', 'ngs', 'nrcan', 'special', 'bev', 'all','unavco2']
-
 
     # removed the all archive
     archive_list_high = ['unavco', 'nrcan', 'cddis','ga','bkg']  # though it is confusing because some are rinex 2.11 and others 3
@@ -233,7 +258,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                     ch.cddis_highrate(station, year, d, 0, stream, 1)
                 if archive == 'bkg':                               
                     print('seek highrate data at BKG')
-                    rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec)
+                    rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec,bkg)
                 if archive == 'ga':
                     print('seek highrate data at GA')
                     deleteOld = True

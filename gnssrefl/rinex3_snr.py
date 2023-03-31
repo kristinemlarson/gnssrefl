@@ -66,7 +66,10 @@ def main():
         isnr = 66;  rate = 30; idoy = int(cdoy); iyear = int(year)
         rate = '30'; dec_rate = 0; archive = 'unavco' ; fortran = False; translator = 'hybrid'
         year_list = [iyear]; doy_list = [idoy]; rate = 'low';   nol = True; overwrite = False; srate = 30; mk = False; skipit = 1
-        r.run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,mk,skipit)
+        strip = False; stream = 'S'  ; bkg = 'IGS' # many of these are fake values because the file has already been translated to rinex2
+        r.run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,
+                overwrite,translator,srate,mk,skipit,stream,strip,bkg)
+
 
 if __name__ == "__main__":
     main()
