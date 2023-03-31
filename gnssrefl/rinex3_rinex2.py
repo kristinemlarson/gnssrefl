@@ -9,6 +9,8 @@ import sys
 
 def main():
     """
+    Converts a RINEX 3 file into a RINEX 2.11 file. Uses gfzrnx.
+
     Parameters
     ----------
     rinex3 : str
