@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.22.28
+
+Fixed bugs related to bkg inputs for IGS/EUREF folders
+
+Updated various documentation.
+
 ## 1.2.27
 
 add quick_recall documentation
