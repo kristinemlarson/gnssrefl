@@ -179,7 +179,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     archive_list_high = ['unavco', 'nrcan', 'cddis','ga','bkg']  # though it is confusing because some are rinex 2.11 and others 3
 
     # archive list for rinex3 lowrate files
-    archive_list_rinex3 = ['unavco', 'cddis', 'ga', 'bev', 'bkg', 'ign', 'epn', 'bfg','sonel','all','unavco2']
+    archive_list_rinex3 = ['unavco', 'cddis', 'ga', 'bev', 'bkg', 'ign', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
 
     if doy_end is None:
         doy_end = doy

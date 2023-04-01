@@ -1087,7 +1087,7 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
             ioutputfile= outfile_name + '.txt'
 
         iout = open(ioutputfile, 'w+')
-        commentl = '#'
+        commentl = '%' # for now ... 
     else:
         usetxt = False; 
         if (len(outfile_name) == 0):

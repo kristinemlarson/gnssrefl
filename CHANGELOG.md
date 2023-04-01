@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.22.28
 
+Added nrcan and gfz to RINEX 3 archive list
+
 Fixed bugs related to bkg inputs for IGS/EUREF folders
 
 Updated various documentation.

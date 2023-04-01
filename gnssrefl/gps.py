@@ -223,7 +223,8 @@ def define_and_xz_snr(station,year,doy,snr):
 
 def azimuth_angle(RecSat, East, North):
     """
-    computes azimuth angle 
+    Given cartesian Receiver-Satellite vectors, and East and North
+    unit vectors, computes azimuth angle 
 
     Parameters
     ----------
@@ -274,7 +275,7 @@ def rot3(vector, angle):
 
 def xyz2llh(xyz, tol):
     """
-    Computes latitude, longitude and height from XYZ
+    Computes latitude, longitude and height from XYZ (meters)
 
     Parameters
     ----------
