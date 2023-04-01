@@ -94,7 +94,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
     
     T = T[inx];PRN = PRN[inx];ELV = ELV[inx];SNR = SNR[inx];AZ = AZ[inx]; FREQ=FREQ[inx]
                                
-    emin,emax = elev_limits(int(csnr))#select snr option 50, 66, 88, 99
+    emin,emax = elev_limits(int(csnr))#select snr option 50, 66, 77, 88, 99
     #write to an output file 
     with open(snrfile, 'w') as fout:
         for i in range(len(T)):
@@ -541,6 +541,8 @@ def elev_limits(snroption):
         emin = 0; emax = 30
     elif (snroption == 88):
         emin = 5; emax = 90
+    elif (snroption == 77):
+        emin = 0; emax = 90
     else:
         emin = 5; emax = 30
 
