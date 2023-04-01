@@ -9,6 +9,7 @@ import gnssrefl.gps as g
 def main():
     """
     converts year month day to day of year and prints it to the screen
+    Also does MJD for fun.
 
     Parameters
     ----------
@@ -36,6 +37,8 @@ def main():
 
     doy,cdoy,cyyyy,cyy = g.ymd2doy(year, month, day )
     print(cdoy)
+    mjd = g.getMJD(year,month,day,0)
+    print('MJD', mjd)
 
 if __name__ == "__main__":
     main()
