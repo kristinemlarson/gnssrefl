@@ -11,7 +11,8 @@ import gnssrefl.nmea2snr as nmea
 def main():
     """
     Documentation about the purpose of this code should be added here.
-    Along with a few examples.
+    Someone should clearly list the inputs to this code.
+    And provide examples. 
 
     """
     

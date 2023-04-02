@@ -19,12 +19,6 @@ Note:
 
 - a simple refraction correction (elevation angle bending) has been included
 
-## Installation 
-
-The module is part of <code>gnssrefl</code>. Please see the installation instructions for 
-[the main package](https://github.com/kristinemlarson/gnssrefl#environment). It is currently only available on gitHub.
-We will be making a docker and pypi version.
-
 ## Running the code
 
 The <code>gnssrefl</code> **REFL_CODE** environment variable must be set. This variable is used for storage of 
@@ -140,9 +134,8 @@ Nor are changes from material properties addressed (water, snow, ice).
 
 ## Future Changes
 
-- Currently assumes you are using full 24 hour SNR files.  This obviously is not very sensible 
-if you have a large gap 
-at the beginning or end of your analysis.  
+Currently assumes you are using full 24 hour SNR files.  This obviously is not very sensible 
+if you have a large gap at the beginning or end of your analysis.  
 
 ## Further reading
 
