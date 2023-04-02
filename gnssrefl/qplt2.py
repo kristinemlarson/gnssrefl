@@ -163,7 +163,7 @@ def main():
         plt.ylim((ylimits))
 
     if args.outfile is not None:
-        plt.savefig(outfile,dpi=300)
+        plt.savefig(args.outfile,dpi=300)
 
     plt.show()
 
