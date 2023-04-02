@@ -27,7 +27,7 @@ gnssir p103 2020 105 -extension TEST -doy_end 109
 
 refl_zones p103
 
-refl_zones p103 -az_sectors 90 180 270 360 -fr 2
+refl_zones p103 -azlist 90 180 270 360 -fr 2
 
 make_json_input p103 0 0 0
 
