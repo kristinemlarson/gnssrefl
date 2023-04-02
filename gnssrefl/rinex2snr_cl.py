@@ -113,7 +113,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
         99 : saves all data with elevation angles between 5 and 30 degrees
 
-        88 : saves all data with elevation angles between 5 and 90 degrees
+        88 : saves all data 
         
         50 : saves all data with elevation angles less than 10 degrees
 
@@ -204,7 +204,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
             cddis : (NASA's Archive of Space Geodesy Data)
 
-            all : (does unavco, sopac, and sonel in series)
+            all : (searches sopac, unavco, and sonel in that order)
 
     doy_end : int, optional
         end day of year to be downloaded. This is to create a range from doy to doy_end of days to get the snr files.

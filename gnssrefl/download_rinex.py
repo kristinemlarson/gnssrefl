@@ -61,12 +61,13 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     download_rinex mfle 2015 52 0
 
+    RINEX 2.11 Files
+
     If you want to specify an archive:
 
     download_rinex p101 2015 52 0 -archive sopac
 
-    RINEX 3 files are complex.  
-
+    RINEX 3 instructions need to be added.
 
     Parameters
     ----------
@@ -119,7 +120,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
             special : (reflectometry Rinex 2.11 files maintained by unavco)
 
-            all : (searches unavco, sopac, and sonel in that order)
+            all : (searches sopac, unavco, and sonel in that order)
 
     version : int, optional
         Version of Rinex file. Default is 2.
