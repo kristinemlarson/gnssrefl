@@ -367,7 +367,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
                             print('some issue with ',fname)
 
     else:
-        # using external file of concatenated results
+        print('using external file of concatenated results', txtfile)
         tv = np.loadtxt(txtfile,comments='%')
 
      

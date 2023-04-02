@@ -25,7 +25,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
     # optional arguments
-    parser.add_argument("-snr", default=None, help="snr file ending", type=int)
+    parser.add_argument("-snr", default=None, help="snr file ending, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg.", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, gps, gps+glo, gnss, rapid or you can specify nav,igs,igr,jax,gbm,grg,wum,gfr,ultra")
     parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX sample rate: low or high. Only used for archive searches.")
