@@ -1364,7 +1364,7 @@ c      try this ...
         endif
 c         asked for all data > 5
       elseif (prn_pick.eq.88) then
-        if (elev.ge.5) then
+        if (elev.ge.0) then
           write(outID, 112)
      .        prn, elev, az, tod, edot,s6, s1, s2,s5,s7,s8
         endif

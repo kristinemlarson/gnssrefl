@@ -1,5 +1,12 @@
-# WSV
 
+
+Local notes:
+f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
+
+docker pull unavdocker/gnssrefl to install code.
+
+
+# WSV
 https://github.com/bundesAPI/pegel-online-api/tree/main/python-client
 ## when you make a new version
 

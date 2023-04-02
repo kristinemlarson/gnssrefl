@@ -286,7 +286,7 @@ c     fortran write statement
         write(outID,'(i3,  2f10.4, f10.0, 2f7.2, 2f7.2)' )
      .    prn, elev, azimuth, tod, 0.d0,0.d0, s1, s2
 c     all data above 5 degrees
-      elseif ( prn_pick.eq.88 .and.  elev.gt.5 ) then
+      elseif ( prn_pick.eq.88 .and.  elev.gt.0 ) then
         write(outID,'(i3,  2f10.4, f10.0, 2f7.2, 3f7.2)' )
      .    prn, elev, azimuth, tod, x,y, s1, s2,s5
 c     everything < 30
