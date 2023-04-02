@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-command line tool for the nmea2snr module
-This translates NMEA files to SNR files
-"""
-
 import argparse
 import datetime
 import numpy as np
@@ -14,14 +9,18 @@ import gnssrefl.gps as g
 import gnssrefl.nmea2snr as nmea
 
 def main():
+    """
+    Documentation about the purpose of this code should be added here.
+    Along with a few examples.
+
+    """
     
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
 
-# optional arguments
-    parser.add_argument("-snr", default=66, help="snr file ending", type=str)
+    parser.add_argument("-snr", default='66', help="snr file ending, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
@@ -44,8 +43,6 @@ def main():
 
     isnr = args.snr
     isnr = int(isnr)
-    
-    
 
     doy= args.doy
     if args.doy_end == None:

@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.22.28
 
+tried to fix the software_tests so we can have smoke tests again. for now, I removed unavco
+tests.
+
+changed online doc for rinex2snr and nmea2snr for snr type 88.  
+
+for rinex2snr (and download_rinex), the default behavior will now search sopac before unavco
+for rinex2.11 files
+
 Added nrcan and gfz to RINEX 3 archive list
 
 Fixed bugs related to bkg inputs for IGS/EUREF folders

@@ -373,7 +373,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                 # added karnak librariies
                 if (archive == 'all'):
                     foundrinex = False
-                    for archivechoice in ['unavco','sopac','sonel']:
+                    # sopac put before unavco
+                    for archivechoice in ['sopac','unavco','sonel']:
                         if (not foundrinex):
                             file_name,foundrinex = k.universal_rinex2(station, year, doy, archivechoice)
                 else:
