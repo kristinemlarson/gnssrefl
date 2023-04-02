@@ -22,7 +22,7 @@ def parse_arguments():
     parser.add_argument('-azim1', help='start azimuth (default is 0, negative values allowed) ', type=int,default=None)
     parser.add_argument('-azim2', help='end azimuth (default is 360) ', type=int,default=None)
     parser.add_argument('-el_list', nargs="*",type=float,  help='elevation angle list, e.g. 5 10 15  (default)')
-    parser.add_argument('-az_sectors', nargs="*",type=float,  help='flexible azimuth angle list, e.g. 0 90 270 360, but must be positive ')
+    parser.add_argument('-azlist', nargs="*",type=float,  help='flexible azimuth angle list, e.g. 0 90 270 360, but must be positive ')
     parser.add_argument('-system', help='default=gps, options are galileo, glonass, beidou', type=str)
     parser.add_argument('-output', help='output filename. default is the station name with kml extension', type=str,default=None)
 
@@ -32,7 +32,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, el_height: float=None, 
-        RH: str=None, fr: int = 1, el_list: float= [], az_sectors : float=[], system: str = 'gps', output: str = None):
+        RH: str=None, fr: int = 1, el_list: float= [], azlist : float=[], system: str = 'gps', output: str = None):
     """
     creates KML file for reflection zones to be used in Google Earth
 
@@ -56,7 +56,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         frequency (1,2, or 5 allowed)
     el_list : list of floats
         elevation angles desired (deg)
-    az_sectors : list of floats (optional)
+    azlist : list of floats (optional)
         azimuth angle regions (deg) Must be in pairs, i.e. 0 90 180 270
     system : str
         name of constellation (gps,glonass,galileo, beidou allowed)
@@ -69,6 +69,8 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     Creates a KML file
 
     """
+    # changed name to be consistent with other codes
+    az_sectors = azlist
     # check that you have the files for the orbits on your local system
     foundfiles = rf.save_reflzone_orbits()    
     if not foundfiles:

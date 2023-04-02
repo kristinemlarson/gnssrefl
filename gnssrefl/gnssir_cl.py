@@ -93,7 +93,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
                 99 : saves all data with elevation angles between 5 and 30 degrees
 
-                88 : saves all data with elevation angles between 5 and 90 degrees
+                88 : saves all data 
 
                 50 : saves all data with elevation angles less than 10 degrees
 
@@ -104,9 +104,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         fr : integer, optional
             GNSS frequency.
             value options:
-                1,2,20,5 : GPS L1 L2, L2C, L5
+                1,2,20,5 : GPS L1, L2, L2C, L5
 
-                101,102 : GLONASS L1 and L2
+                101,102 : GLONASS L1, L2
 
                 201, 205,206,207,208 : GALILEO E1, E5a,E6,E5b,E5
 

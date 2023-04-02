@@ -27,7 +27,7 @@ The optional inputs (at this time):
 
 - el_list 5 10 15 20 25 (for example)
 
-- az_sectors can be used for azimuth regions that are more complicated than a single pair of values.
+- azlist can be used for azimuth regions that are more complicated than a single pair of values.
 example:  90 180 270 would be northeast and southwest. Azimuths cannot be negative, greater than 360,
 and they must be pairs of numbers that increase, i.e. you cannot say 90 50, you have to say 50 90.
 

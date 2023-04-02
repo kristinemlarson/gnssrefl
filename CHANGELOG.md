@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.22.28
 
+changed az_sectors to azlist in refl_zones to be consistent with other codes
+
+changed snr 88 for rinex2snr fortran codes.
+
 tried to fix the software_tests so we can have smoke tests again. for now, I removed unavco
 tests.
 
