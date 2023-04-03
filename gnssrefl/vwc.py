@@ -1,9 +1,9 @@
 import argparse
-import os
-import sys
-import subprocess
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+import subprocess
+import sys
 
 from datetime import datetime
 from pathlib import Path
@@ -44,12 +44,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, 
         snow_filter: bool = False, circles: bool=False, subdir: str=None, tmin: str=None, tmax: str=None):
     """
-    Computes VWC from phase estimates. It picks up the phase results,  
-    makes quadrant plots, daily average phase files before converting to volumetric water content (VWC).
+    Computes VWC from GNSS-IR phase estimates. It concatenates previously computed phase results,  
+    makes plots for the four geographic quadrants, computes daily average phase files before converting 
+    to volumetric water content (VWC).
+
+    IMO This should be moved into a driver so that the main functions are called separately.
 
     Parameters
     ----------
-    station : st
+    station : str
         4 character ID of the station
 
     year : integer
@@ -61,16 +64,16 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         GNSS frequency. Currently only supports l2c.
         Default is 20 (l2c)
 
-    plt2screen: boolean, optional
+    plt2screen: bool, optional
         Whether to produce plots to the screen.
         Default is True
 
-    min_req_pts_track : integer
+    min_req_pts_track : int, optional
         how many points needed to keep a satellite track
         default is 50
 
-    polyorder : integer
-        This is used for leveling.  Usually the code picks it but this allows to users to override. 
+    polyorder : int
+        polynomial order used for leveling.  Usually the code picks it but this allows to users to override. 
         Default is -99 which means let the code decide
 
     minvalperday: integer

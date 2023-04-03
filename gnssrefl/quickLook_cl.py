@@ -74,16 +74,8 @@ def quicklook(station: str, year: int, doy: int,
     doy : integer
         Day of year
     snr : integer, optional
-        SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
-        value options:
-
-            66 (default) : saves all data with elevation angles less than 30 degress
-
-            99 : saves all data with elevation angles between 5 and 30 degrees
-
-            88 : saves all data with elevation angles between 5 and 90 degrees
-
-            50 : saves all data with elevation angles less than 10 degrees
+        SNR format. This tells the code which SNR file to use.  66 is the default.
+        Other options: 50, 88, and 99.
 
     f : integer, optional. 
         GNSS frequency. Default is GPS L1
@@ -97,7 +89,7 @@ def quicklook(station: str, year: int, doy: int,
 
             302,306,207 : BEIDOU B1, B3, B2
 
-    reqAmp : array_like, optional
+    reqAmp : int or array_like, optional
         Lomb-Scargle Periodogram (LSP) amplitude significance criterion in volts/volts.
         Default is 7 
 
@@ -150,7 +142,6 @@ def quicklook(station: str, year: int, doy: int,
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
-
 
     exitS = g.check_inputs(station, year, doy, snr)
 

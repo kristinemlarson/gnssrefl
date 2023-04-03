@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-convert nmea files to snr files 
+This code is missing full documentation.
+
 """
 from __future__ import division
 import numpy as np 
@@ -21,10 +22,8 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
         directory where your SNR files are kept
     fname : string
         NMEA filename 
-
     snrfile : str
         name of output file for SNR data
-
     csnr : str
         snr option, i.e. '66' or '99'
         
@@ -540,7 +539,7 @@ def elev_limits(snroption):
     elif (snroption == 66):
         emin = 0; emax = 30
     elif (snroption == 88):
-        emin = 5; emax = 90
+        emin = 0; emax = 90
     else:
         emin = 5; emax = 30
 
