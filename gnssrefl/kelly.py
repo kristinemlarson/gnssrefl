@@ -110,11 +110,10 @@ def the_kelly_simple_way(url,filename):
         pat = 'path2'
         device_flow.do_flow()
 
-    print(pat)
     s1 = time.time()
     token = device_flow.access_token
     s2 = time.time()
-    print('Time for token: ', np.round(s2-s1, 2))
+    print('Time for token: ', np.round(s2-s1, 2), ' seconds')
 
     headers = {}
     headers['authorization'] = 'Bearer ' + token
@@ -122,7 +121,7 @@ def the_kelly_simple_way(url,filename):
     s1 = time.time()
     r = requests.get(url, headers=headers)
     s2 = time.time()
-    print('Time for unavco to answer request : ', np.round(s2-s1, 2))
+    print('Time for unavco to answer request : ', np.round(s2-s1, 2),' seconds')
     # Opens a local file of same name as remote file for writing to
     # check to see that the file exists
     if (r.status_code == requests.codes.ok):
