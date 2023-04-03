@@ -1,5 +1,7 @@
 ## snowdepth
 
+<img src="../_static/example_snow.png" width="500"/>
+
 The snow depth module follows the basic work scheme of PBO H2O snow depths. The assumptions are:
 
 - you set the "no snow" or "bare soil" values using data from the fall (in the northern hemisphere)

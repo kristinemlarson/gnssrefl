@@ -56,18 +56,6 @@ that translates RINEX 3 to RINEX 2.11 to use RINEX 3 files in
 this code.* If you followed the instructions for installation, this 
 is already taken care of.
 
-<code>rinex2snr</code> currently supports RINEX3 for 30 second data at :
-
-- bev
-- bkg
-- bfg
-- cddis
-- epn
-- ga
-- gfz
-- nrcan
-- sonel
-- unavco
 
 Example calls:
 

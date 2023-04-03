@@ -90,9 +90,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
     rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg -stream S -bkg IGS
 
-    Regardless of the fact that station names can have 9 characters now, this code stores than with 
+    Regardless of the fact that station names can have 9 characters now, this code stores the snr data with 
     four characters.
 
+    RINEX3 30 second archives supported include: bev, bfg, bkg, cddis, epn, ga, gz, nrcan, sonel, and unavco
 
     Parameters
     ----------
