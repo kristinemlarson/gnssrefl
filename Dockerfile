@@ -1,5 +1,5 @@
 FROM unavdocker/gnssrefl_base
-LABEL maintainer="UNAVCO"
+LABEL maintainer="EARTHSCOPE"
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
