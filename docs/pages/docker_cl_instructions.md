@@ -1,4 +1,4 @@
-# Assistance on deploying the gnssrefl [docker image from GitHub Container Registry](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
+# [Installing the gnssrefl docker image from the GitHub Container Registry](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
 
 Please send your feedback on these instructions to Tim Dittmann at UNAVCO, or better still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
 

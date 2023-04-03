@@ -4,10 +4,12 @@
 # this should replace the spaghetti code in gps.py
 import datetime
 import json
+import numpy as np
 import os
 import requests
 import sys
 import subprocess
+import time
 import wget
 from urllib.parse import urlparse
 # local libraries
@@ -168,13 +170,15 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
 
         return file_name,foundit
     cydoy =  cyyyy + '/' + cdoy + '/'
-
+    s1 = time.time()
     if (archive == 'unavco'):
         # original dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
         #url1 =      'https://data-idm.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
         url1 =      'https://data.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
-        print('testing new unavco protocols:',url1)
+        print('Testing new unavco protocols:',url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1,file_name)
+        s2 = time.time()
+        print('Download took ',np.round(s2-s1,2), ' seconds') 
         return file_name,foundit
 
     try:
@@ -223,7 +227,8 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
             return '', ''
     except:
         okokok = 1
-
+    s2 = time.time()
+    print('Download took ',np.round(s2-s1,2), ' seconds') 
     if os.path.exists(file_name):
         siz = os.path.getsize(file_name)
         if (siz == 0):
@@ -434,6 +439,7 @@ def universal_rinex2(station, year, doy, archive):
     cydoy = cyyyy + '/' + cdoy + '/'
     cyy = cyyyy[2:4]
 
+    s1 = time.time()
     if (archive == 'jp'):
         # i did not want to rewrite the code
         gsi_data(station, year, doy)
@@ -449,11 +455,10 @@ def universal_rinex2(station, year, doy, archive):
         print('testing out new protocol at unavco')
         #url1 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
         url1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
-        foundit,file_name = kelly.the_kelly_simple_way(url1,dname + '.Z')
+        foundit,file_name = kelly.the_kelly_simple_way(url1, dname + '.Z')
         if not foundit:
             url2 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
-            #url2 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
-            foundit,file_name = kelly.the_kelly_way(url2,oname + '.Z')
+            foundit,file_name = kelly.the_kelly_simple_way(url2, oname + '.Z')
 
     elif (archive == 'special'):
         dir1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy
@@ -514,6 +519,9 @@ def universal_rinex2(station, year, doy, archive):
         foundit, f = gogetit(dir1, dname, '.Z'); file_name = f
     else:
          print('I do not recognize your archive')
+
+    s2 = time.time()
+    print('Download took ', np.round(s2-s1,2),' seconds') 
 
     if not os.path.exists(file_name):
         print('Did not find the Rinex file')

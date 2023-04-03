@@ -1,5 +1,8 @@
+import numpy as np
 import requests
 import subprocess
+import time
+
 import gnssrefl.gps as g
 
 from pathlib import Path
@@ -40,12 +43,17 @@ def the_kelly_way(url,filename,o_or_d):
 
     try:
     # get access token from local path
+        ijk = 'unknown'
         device_flow.get_access_token_refresh_if_necessary()
     except:
     # if no token was found locally, do the device code flow
+        ijk = 'bad'
         device_flow.do_flow()
+    s1 = time.time()
     token = device_flow.access_token
-
+    s2 = time.time()
+    print('Token: ', np.round(s2-s1))
+    print(ijk)
     headers = {}
     headers['authorization'] = 'Bearer ' + token
 
@@ -95,24 +103,37 @@ def the_kelly_simple_way(url,filename):
 
     try:
     # get access token from local path
+        pat = 'path1'
         device_flow.get_access_token_refresh_if_necessary()
     except:
     # if no token was found locally, do the device code flow
+        pat = 'path2'
         device_flow.do_flow()
+
+    print(pat)
+    s1 = time.time()
     token = device_flow.access_token
+    s2 = time.time()
+    print('Time for token: ', np.round(s2-s1, 2))
 
     headers = {}
     headers['authorization'] = 'Bearer ' + token
 
+    s1 = time.time()
     r = requests.get(url, headers=headers)
+    s2 = time.time()
+    print('Time for unavco to answer request : ', np.round(s2-s1, 2))
     # Opens a local file of same name as remote file for writing to
     # check to see that the file exists
-    if (r.status_code == 200):
+    if (r.status_code == requests.codes.ok):
         print('File was found', filename)
-        with open(filename, 'wb') as fd:
-            for chunk in r.iter_content(chunk_size=1000):
-                fd.write(chunk)
-        fd.close()
+        s1 = time.time()
+        with open(filename, 'wb') as f:
+            for data in r:
+                f.write(data)
+        s2 = time.time()
+
+        print('Time for write the file : ', np.round(s2-s1, 2))
         foundit = True
     else:
         print('File was not found', filename)
