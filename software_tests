@@ -19,7 +19,7 @@ ls -l $REFL_CODE/input/gpt_1wA.pickle
 ls -l $ORBITS
 
 
-rinex2snr p103 2020 105 -doy_end 109  
+rinex2snr p103 2020 105 -doy_end 109   -archive sopac
 
 make_json_input p103 0 0 0 -frlist 1 20 5 101 102 201 306 307  -extension TEST
 
@@ -54,8 +54,8 @@ download_orbits igs 2010 1 1
 download_orbits gbm 2018 1 1
 
 # removed unavco - now will go to sopac first
-rinex2snr p041 2022 1  -overwrite T
-rinex2snr p041 2022 1 -orb gnss -overwrite T
+rinex2snr p041 2022 1  -overwrite T -archive sopac
+rinex2snr p041 2022 1 -orb gnss -overwrite T -archive sopac
 
 # try various RINEX 3 things
 #
@@ -69,7 +69,7 @@ rinex2snr mchl00aus 2018 1 -archive cddis  -overwrite T
 # testing quickLook
 #
 #
-rinex2snr p033 2022 1 -orb rapid -overwrite T
+rinex2snr p033 2022 1 -orb rapid -overwrite T -archive sopac
 make_json_input p033 0 0 0 
 quickLook p033 2022 1 -plt F
 
