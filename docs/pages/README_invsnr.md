@@ -55,25 +55,9 @@ III. Run invsnr
 - day of year 
 - frequency (e.g. L1, L2, L5, L6, L1+L2, L1+L2+L5). ALL means L1+L2+L5+L6+L7
 
-The code will attempt GPS, Galileo, Beidou and Glonass unless you tell it otherwise
+The code will attempt to use GPS, Galileo, and Glonass unless you tell it otherwise
 
-*Optional inputs*
-
-- pktnlim peak2noise ratio for QC
-- constel (G,E,R, or C which represent GPS, Galileo, Glonass, and Beidou)
-- screenstats (True or False)
-- tempres decimation value for the SNR file (seconds)
-- polydeg polynomial degree for direct signal removal (default is 2)
-- snrfit Do a invsnr fit? Default is True
-- doplot Send a summary plot to the screen? Default is True
-- doy_end day of year for multiday analysis
-- lspfigs and -snrfigs make LSP and SNR plots, default False. 
-- knot_space value used for smoothing, in hours 
-- rough_in, roughness parameter as described in Strandberg et al (2016). Default is 0.1
-- risky set to True means you will ignore the warrning telling you that you have a gap and should not do this.
-
-Please see <code>invsnr -h</code> for more options. Some are related to outputs (i.e. you can tell
-the code to write out smoothed RH values into a text or csv file.
+[Optional inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html)
 
 
 *Output of the invsnr Code*

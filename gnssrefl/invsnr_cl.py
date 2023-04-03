@@ -1,12 +1,9 @@
-# wrapper to call invsnr codes
-
 import argparse
 import json
 import os
 import sys
 
 
-# all the main functions used by the code are stored here
 import gnssrefl.spline_functions as spline_functions
 import gnssrefl.refraction as refr
 
@@ -35,14 +32,14 @@ def parse_arguments():
     parser.add_argument("-rough_in", default=None, type=str, help="Roughness (default is 0.1)")
     parser.add_argument("-risky", default=None, type=str,
                         help="Risky taker related to gaps/knot spacing, False is default)")
-    parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66)")
+    parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66")
     parser.add_argument("-outfile_type", default=None, type=str, help="Output file type (txt or csv)")
     parser.add_argument("-outfile_name", default=None, type=str, help="Output file name")
-    parser.add_argument("-outlier_limit", default=None, type=str, help="outliers plotted (meters)")
-    parser.add_argument("-no_dots", default=None, type=str, help="no lomb scargle plotted")
+    parser.add_argument("-outlier_limit", default=None, type=str, help="outliers limit (m)")
+    parser.add_argument("-no_dots", default=None, type=str, help="bool, no lomb scargle  results plotted")
     parser.add_argument("-delta_out", default=None, type=str, help="Output increment, in seconds (default is 300)")
-    parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off")
-    parser.add_argument("-json_override", default=None, type=str, help="Override json file name")
+    parser.add_argument("-refraction", default=None, type=str, help="bool, Set to False to turn off")
+    parser.add_argument("-json_override", default=None, type=str, help="bool, Override json file name")
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -63,10 +60,16 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
     """
     Wrapper to call invsnr code.
 
+    outfile_name and outfile_type are unnecessary. Consolidate them.
+    
+    Example:
+
+    invsnr sc02 2023 15 L1+L2+L5 
+
     Parameters
     ----------
     station : string
-        Character ID of the station
+        four character ID 
 
     year : integer
         Year
@@ -84,19 +87,23 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
 
     constel: str, optional
         Only a single constellation.
-        Default is None which is gps, glonass, and galileo.
+        Default is gps, glonass, and galileo.
         value options:
                 G : GPS
+
                 E : Galileo
+
                 R : Glonass
+
                 C : Beidou
+
                 withBeidou : adds Beidou to the default.
 
-    screenstats: boolean, optional
+    screenstats: bool, optional
         Whether to print out stats to the screen.
         Default is False
 
-    tempres: integer, optional
+    tempres: int, optional
         SNR file decimator (seconds)
         Default is 1 (everything)
 
@@ -105,19 +112,19 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         polynomial degree for direct signal removal
         Default is 2
 
-    snrfit : boolean, optional
+    snrfit : bool, optional
         Whether to do the inversion or not
         Default is True
 
-    plt : boolean, optional
+    plt : bool, optional
         Whether to plot to the screen or not
         Default is True
 
-    doy_end : integer, optional
+    doy_end : int, optional
         day of year to end analysis.
         Default is None.
 
-    lspfigs : boolean, optional
+    lspfigs : bool, optional
         Whether or not to make LSP plots
         Note: Don't turn these on unless you really need plots because it is 
         slow to make one per satellite arc.
@@ -125,7 +132,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
 
     snrfigs : boolean, optional
         Whether or not to make SNR plots
-        Note: Don't turn these on unless you really need plots because it is slow to make one per satellite arc.
+        Don't turn these on unless you really need plots because it is slow to make one per satellite arc.
         Default is False
 
     knot_space : float, optional
@@ -136,13 +143,12 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         Roughness
         Default is 0.1
 
-    risky : boolean, optional
+    risky : bool, optional
         Risky taker related to gaps/knot spacing
         Default is False
 
-    snr_ending : integer, optional
-        SNR file ending.
-        Default is 66
+    snr_ending : int, optional
+        SNR file ending. Default is 66
 
     outfile_type : string, optional
         output file type, txt or csv
@@ -156,18 +162,18 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         Outliers plotted. (meters)
         Default is 0.5
 
-    no_dots : boolean, optional
+    no_dots : bool, optional
         To plot lombscargle or not.
         Default is False
 
-    delta_out : integer, optional
+    delta_out : int, optional
         Output increment, in seconds.
         Default is 300
 
-    refraction : boolean, optional
+    refraction : bool, optional
         Default is True
 
-    json_override : boolean, optional
+    json_override : bool, optional
         Override json file name
         Default is False
     """

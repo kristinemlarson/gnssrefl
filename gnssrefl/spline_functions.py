@@ -22,6 +22,7 @@ import gnssrefl.refraction as refr
 
 def make_wavelength_column(nr,snrdata,signal):
     """
+    NEEDS DOCUMENTATION
 
     Parameters
     ----------
@@ -54,8 +55,8 @@ def make_wavelength_column(nr,snrdata,signal):
 
 def readklsnrtxt(snrfile, thedir, signal):
     """
-    parses the contents of a snrfile f
-    the file itself is read in a separate function now, 
+    parses the contents of a snrfile.
+    The file itself is read in a separate function now; 
     if SNR data are zero for a given signal, the row is eliminated
 
     Parameters
@@ -192,7 +193,7 @@ def readklsnrtxt(snrfile, thedir, signal):
 
 def glonasswlen(prn, signal):
     """
-    returns glonass wavelength
+    Given PRN, returns glonass wavelength
 
     Parameters
     ----------
@@ -243,6 +244,9 @@ def datetime2gps(dt):
 
 
 def gps2datetime(gt):
+    """
+    needs documentation
+    """
     timeobj = Time(gt, format='gps', scale='utc')
     dt = timeobj.datetime
     return dt
@@ -250,6 +254,8 @@ def gps2datetime(gt):
 
 def gps2datenum(gt):
     """
+    needs documentation
+
     Parameters
     ----------
     gt : float
@@ -303,7 +309,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
         if you want to produce some figures of Lomb-Scargle Periodograms
 
     polydeg: float
-        degree of polynomial to fit and subtract from SNR data
+        degree of polynomial for DC 
 
     gaptlim: float
         if there is a gap in time bigger than [gaptlim] seconds in a particular arc then it will be ignored
@@ -316,7 +322,8 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
 
     kwargs: see below
 
-    tempres: if want to use different temporal resolution to input data (in seconds)
+    tempres: int
+        if want to use different temporal resolution to input data (in seconds)
 
     satconsts: default use all given, otherwise specify from ['G', 'R', 'E'] (gps / glonass / galileo)
 
@@ -527,7 +534,8 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
 
                 # compute LSP with my code
 
-                    maxF, maxA,peak2noise = simpleLSP(rhlims, lcar, precision,elvt, sinelvt, snrdt,sat,xsignal,screenstats,fout,pktnlim)
+                    maxF, maxA,peak2noise = simpleLSP(rhlims, lcar, precision,
+                            elvt, sinelvt, snrdt,sat,xsignal,screenstats,fout,pktnlim)
 
                     if maxind != 0 and maxind != len(pgram_sub) - 1 and pktn > pktnlim:  # no peaks at either end of window
                         # KL moved this to a function/added a column to save frequency information
@@ -689,8 +697,9 @@ def residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,
 
 def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit=True, signal='L1', savefile=False, doplot=True, rough_in=0.1, **kwargs):
     """
-    function analyses a 'gnssrefl' format snr file and outputs a fitted spline
-    note that the file must be 24 hours long or it wont work
+    function analyzes a SNR file and outputs a fitted spline
+
+    note that the file must be 24 hours long or it will not work
 
     Parameters
     ----------
@@ -713,7 +722,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         control e.g., [5, 10] is 5 and 10 m
 
     precision : float
-        precision of the periodogram in meters
+        precision of the periodogram (m) 
 
     kdt: float
         spline knot spacing in seconds
@@ -741,7 +750,6 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     Returns
     -------
-
     invout: dictionary 
         outputs from inverse analysis
 
@@ -923,7 +931,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         print('Number of constellation specific frequencies', Nfreq)
         # consts = len(satconsts)
         #kval_0 = np.append(kval_0, np.zeros(consts * 2))
-        # this should be correct .... 
+        # this should be correct .... wont 
         kval_0 = np.append(kval_0, np.zeros(Nfreq* 2))
         print('Roughness', rough_in)
         kval_0 = np.append(kval_0, rough_in)

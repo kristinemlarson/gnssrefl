@@ -14,7 +14,7 @@ choice by selections given below.
 There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
 angles. The default is to save all data with elevation lower than 30 degrees (this is called SNR format 66).
 Another SNR choice is 99, which saves elevation angle data between 5 and 30.  
-SNR choice 88 will save all data from 5 to 90 degrees.
+SNR choice 88 will save all data and SNR choice 50 is all data below 10 degrees.
 
 You can run <code>rinex2snr</code> at the command line. The default version 
 is RINEX 2.11. The required inputs are:
@@ -72,16 +72,6 @@ nuisance. If you know yours, you can set it
 with <code>-stream R</code> or <code>-stream S</code>. 
 I usually look for both files without you having to set it. 
 
-The snr options are mostly based on the need to remove the "direct" signal. This is 
-not related to a specific site mask and that is why the most frequently used 
-options (99 and 66) have a maximum elevation angle of 30 degrees. The
-azimuth-specific mask is decided later when you run <code>gnssir</code>.  The SNR choices are:
-
-- 66 is elevation angles less than 30 degrees (**this is the default**)
-- 99 is elevation angles of 5-30 degrees  
-- 88 is elevation angles of 5-90 degrees
-- 50 is elevation angles less than 10 degrees (good for very tall sites, high-rate applications)
-
 **More rinex2snr options:**
 
 *orbit file options for general users:*
@@ -89,7 +79,7 @@ azimuth-specific mask is decided later when you run <code>gnssir</code>.  The SN
 - gps : will use GPS broadcast orbits (**this is the default**)
 - gps+glo : uses rapid GFZ orbits
 - gnss : uses GFZ orbits, which is multi-GNSS (available in 3-4 days?)
-- rapid : uses GFZ multi-GNSS rapid orbits, available in ~1 day
+- rapid : uses GFZ multi-GNSS rapid orbits, available since mid-2021 in ~1 day
 - ultra : since mid-2021, we can use multi-GNSS near realtime orbits from GFZ
 
 *orbit file options for experts:*
@@ -104,13 +94,6 @@ azimuth-specific mask is decided later when you run <code>gnssir</code>.  The SN
 - gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021 
 - wum : Wuhan, multi-GNSS (precise+prediction, GPS,Galileo,Glonass,Beidou)
 - ultra : GFZ ultra rapid (GPS, Galileo, Glonass), since May 17, 2021 
-
-We are likely to add access to multi-GNSS broadcast 
-orbits, but for now you can use the 
-ultra orbit option. Although it is provided every three 
-hours, we currently only download the 
-file from midnite (hour 0).
-
 
 
 **What if you have high-rate (e.g. 1 sec) RINEX files, but you want 5 sec data?** <code>-dec 5</code>

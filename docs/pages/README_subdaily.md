@@ -60,27 +60,7 @@ Required Inputs:
 * station               
 * year                  
 
-Optional arguments:
-
-* plt set to False to suppress plots
-* spline_outlier is the outlier criterion used in the section section (meters)
-* knots defines how many knots are used per day, spline fit only (default is 8)
-* sigma is a simple outlier criterion used in first section (e.g. 1 for 1sigma, 3 for 3sigma)
-* extension solution subdirectory
-* rhdot whether rhdot correction is calculated. Now set to True as default
-
-
-* doy1 initial day of year
-* doy2 end day of year
-* ampl new amplitude constraint
-* azim1 new minimum azimuth
-* azim2 new maximum azimuth
-* h1 minimum allowed RH (m)
-* h2 maximum allowed RH (m)
-* peak2noise requirement
-* delta_out is the output interval for written spline fit, in seconds 
-* if_corr whether you want the Interfrequency correction applied, default is True 
-
+[Optional arguments](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html)
 
 Some examples:
 
