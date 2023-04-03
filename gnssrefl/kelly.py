@@ -12,7 +12,7 @@ from earthscope_sdk.auth.device_code_flow import DeviceCodeFlowSimple
 from earthscope_sdk.auth.auth_flow import NoTokensError
 
 
-def the_kelly_way(url,filename,o_or_d):
+def do_not_usethe_kelly_way(url,filename,o_or_d):
     """
     new way to access rinex files at unavco
     using earthscope-sdk
@@ -113,7 +113,7 @@ def the_kelly_simple_way(url,filename):
     s1 = time.time()
     token = device_flow.access_token
     s2 = time.time()
-    print('Time for token: ', np.round(s2-s1, 2), ' seconds')
+    #print('Time for token: ', np.round(s2-s1, 2), ' seconds')
 
     headers = {}
     headers['authorization'] = 'Bearer ' + token
@@ -121,18 +121,18 @@ def the_kelly_simple_way(url,filename):
     s1 = time.time()
     r = requests.get(url, headers=headers)
     s2 = time.time()
-    print('Time for unavco to answer request : ', np.round(s2-s1, 2),' seconds')
+    #print('Time for unavco to answer request : ', np.round(s2-s1, 2),' seconds')
     # Opens a local file of same name as remote file for writing to
     # check to see that the file exists
     if (r.status_code == requests.codes.ok):
         print('File was found', filename)
-        s1 = time.time()
+        #s1 = time.time()
         with open(filename, 'wb') as f:
             for data in r:
                 f.write(data)
-        s2 = time.time()
+        #s2 = time.time()
 
-        print('Time for write the file : ', np.round(s2-s1, 2))
+        #print('Time for write the file : ', np.round(s2-s1, 2))
         foundit = True
     else:
         print('File was not found', filename)
