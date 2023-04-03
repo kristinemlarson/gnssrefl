@@ -16,50 +16,21 @@ angles. The default is to save all data with elevation lower than 30 degrees (th
 Another SNR choice is 99, which saves elevation angle data between 5 and 30.  
 SNR choice 88 will save all data from 5 to 90 degrees.
 
-You can run <code>rinex2snr</code> at the command line. The default version is RINEX 2.11. The required inputs are:
+You can run <code>rinex2snr</code> at the command line. The default version 
+is RINEX 2.11. The required inputs are:
 
 - station name
 - year
 - day of year
 
-A sample call for a station called <code>p041</code>, restricted to 
-GPS satellites, on day of year 132 and year 2020 would be:
+Examples:
 
 <code>rinex2snr p041 2020 132</code>
 
-If the RINEX file for <code>p041</code> is in your local directory, it will translate it.  If not, 
-it will check three archives (unavco, sopac, and sonel) to find it. 
+For up to date listings of approved archives and orbit sources, 
+[please see here](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
 
-**Examples for different translators:**
-
-Using hybrid (the default): 
-
-<code>rinex2snr gls1 2011 271</code>
-
-For a fortran translator, the command would be:
-
-<code>rinex2snr p041 2020 132 -translator fortran</code>
-
-For python (very slow!):
-
-<code>rinex2snr p041 2020 132 -translator python</CODE>
-
-**Allowed GNSS Rinex 2.11 Data Archives:**
-
-- unavco (now Earthscope)
-- bev (Austria Federal Office of Metrology and Surveying)
-- bfg (German Water Research)
-- bkg (German Agency for Cartography and Geodesy)
-- cddis (only Hatanaka compressed files)
-- ga (Geoscience Australia)
-- jeff (Herr Professor Dr. Freymueller)
-- ngs (US National Geodetic Survey)
-- nrcan (Natural Resources Canada)
-- nz (GNS, New Zealand)
-- jp (Geospatial Information Authority of Japan)
-- sonel (global sea level observing system)
-- sopac (Scripps Orbit and Permanent Array Center)
-- special (set aside area at Unavco for GNSS-IR)
+To analyze your own data, set -nol True
 
 **Example setting the archive:**
 
@@ -67,12 +38,9 @@ For python (very slow!):
 
 **Example using the Japanese GNSS archive:**
 
-The Geospatial Institute of Japan uses 6 numbers to specify 
-station names. You will be prompted for a username and password.
-This will be saved on your computer for future use. Since gnssrefl
-only uses four character statiion names, the last four values will be used as the station name.
-
 <code> rinex2snr 940050 2021 31 -archive jp </code>
+
+We use the last four characters as the station name.
 
 **Run the code for all the data for any year**
 
@@ -96,12 +64,12 @@ is already taken care of.
 - cddis
 - epn
 - ga
+- gfz
+- nrcan
 - sonel
+- unavco
 
-<code>rinex2snr</code> currently downloads 15 second RINEX3 at unavco.
-
-If you don't know where your data are, you can try <code>-archive all</code>, 
-which might try a few archives in sequence. Example calls:
+Example calls:
 
 <code>rinex2snr onsa00swe 2020 298</code>
 
@@ -173,7 +141,6 @@ For RINEX 3 high-rate data:
 - ga 
 - bkg
 
-For high-rate data, you should **never** use the python translation option.
 
 **Output SNR file format**
 

@@ -58,7 +58,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               extension: str = '', ediff: float=2.0, delTmax: float=75.0, azlist: float=[], frlist: float=[] ):
 
     """
-    Make a json file that describes the lomb scargle analysis strategy you will use in gnssrefl.
+    Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in a json file.
 
     Parameters
     ----------

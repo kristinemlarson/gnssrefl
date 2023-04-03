@@ -36,6 +36,9 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     """
     creates KML file for reflection zones to be used in Google Earth
 
+    If station is in the UNR database, those lat/lon/el_height values are used. You may override those values 
+    with the optional inputs.
+
     Parameters
     ----------
     station : str
@@ -44,25 +47,28 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         min azimuth angle in deg
     azim2 : int
         max azimuth angle in deg
-    lat : float 
-        latitude  in deg
+    lat : float
+        latitude in deg
     lon : float
         longitude in deg
     el_height : float
         ellipsoidal height in m
-    RH : str
-        user input reflector height (m)
-    fr : int
+    RH : str, optional
+        user-defined reflector height (m)
+        default is to use sea level as the RH
+    fr : int, optional
         frequency (1,2, or 5 allowed)
     el_list : list of floats
         elevation angles desired (deg)
+        default is 5, 10, 15
     azlist : list of floats (optional)
         azimuth angle regions (deg) Must be in pairs, i.e. 0 90 180 270
-    system : str
+    system : str, optional
         name of constellation (gps,glonass,galileo, beidou allowed)
+        default is gps
 
-    output : str
-        name for kml file, i.e. if you input test, the filename will be test.kml
+    output : str, optional
+        name for kml file 
 
     Returns
     -------

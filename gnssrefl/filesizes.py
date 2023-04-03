@@ -7,14 +7,13 @@ import sys
 
 from datetime import date
 
-# my code
 import gnssrefl.gps as g
-#
 
 def main():
-# very simple code to pick up all the file sizes for SNR files in a given year
-# only checks for snr66 files
-#   make surer environment variables are set 
+    """
+very simple code to pick up all the file sizes for SNR files in a given year
+only checks for snr66 files
+    """
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE'] 
 

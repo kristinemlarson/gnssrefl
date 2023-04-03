@@ -43,7 +43,6 @@ def main():
     parser.add_argument("filename", help="filename", type=str)
     parser.add_argument("xcol", help="x-column", type=str)
     parser.add_argument("ycol",   help="y-column", type=str)
-    #parser.add_argument("-filename2", help="filename2", type=str,default=None)
     parser.add_argument("-mjd", help="set to True/T if x-values are MJD (should add MM/SS?", type=str,default=None)
     parser.add_argument("-reverse", help="set to True/T to reverse the y-axis", type=str,default=None)
     parser.add_argument("-ymdh", help="if True/T, columns 1-4 are year mon day hour ", type=str,default=None)
@@ -54,9 +53,7 @@ def main():
     parser.add_argument("-outfile", help="optional filename for plot", type=str,default=None)
     parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
 
-
     args = parser.parse_args()
-
 
     filename = args.filename
     # change column numbers to pythonese
@@ -127,7 +124,6 @@ def main():
             x1 = min(tval) ; x2 = max(tval)
             if secondFile:
                 tval2 = tvd2[:,xcol] ; yval2 = tvd2[:,ycol]
-
 
     fig,ax=plt.subplots()
     if args.symbol is None:
