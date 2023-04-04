@@ -1,84 +1,61 @@
 # rinex2snr  
-Extracting SNR data from RINEX/NMEA files <a name="module1"></a>
 
-The international standard for sharing GNSS data is 
-called the [RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt). (If you are using NMEA files, please see the bottom of this section). 
-A RINEX file has extraneous information in it (which we will throw out) - and it 
+The goal of this code is to extract SNR data from a GNSS data file.
+
+RINEX is the standard format used by geodesists and surveyors. This file has extraneous 
+information in it (which we will throw out) - and it  
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
-The first task you have in GNSS-IR is to translate from RINEX into what I will call 
-the **SNR format**. The latter will include azimuth and elevation angles. To compute these 
-angles you will need an **orbit** file. <code>rinex2snr</code> will try to get an orbit file for you. It will save
-those orbit files in case you want to use them at some later date. You can override the default orbit 
-choice by selections given below.
+For the latter step, we need an **orbit** file. The code will pick that up for you.
 
-There is no reason to save ALL the RINEX data as the reflections are only useful at the lower elevation
-angles. The default is to save all data with elevation lower than 30 degrees (this is called SNR format 66).
-Another SNR choice is 99, which saves elevation angle data between 5 and 30.  
-SNR choice 88 will save all data and SNR choice 50 is all data below 10 degrees.
+- [Information on file formats](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html)
 
-You can run <code>rinex2snr</code> at the command line. The default version 
-is RINEX 2.11. The required inputs are:
+- [Information on rinex2snr inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
 
-- station name
-- year
-- day of year
 
-Examples:
+<code>rinex2snr</code> assumes the files are in the RINEX 2.11 format at one of the global archives. 
+The four character station name, year, and day of year must be specified.
+
+Example
 
 <code>rinex2snr p041 2020 132</code>
 
+The default archives checked are sopac and unavco. The default orbit file is GPS only.
 For up to date listings of approved archives and orbit sources, 
 [please see here](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
 
-To analyze your own data, set -nol True
+To analyze your own data, i.e. you have the RINEX file in your default directory, p0411320.20o
 
-**Example setting the archive:**
+<code>rinex2snr p041 2020 132 -nolook T</code>
+
+
+If you want to specify the archive:
 
 <code>rinex2snr tgho 2020 132 -archive nz</code>
 
-**Example using the Japanese GNSS archive:**
+Example for the Japanese GNSS archive:
 
 <code> rinex2snr 940050 2021 31 -archive jp </code>
 
-We use the last four characters as the station name.
 
-**Run the code for all the data for any year**
+Example for multi-day translation
 
 <code>rinex2snr tgho 2019 1  -archive nz -doy_end 365</code>
  
-**Examples using RINEX 3:**
 
-If your station name has 9 characters (lower case please), 
-the code assumes you are looking for a RINEX 3 file. 
-Note: the code will store the SNR data using the normal
-4 character name. *You must install the gfzrnx executable 
-that translates RINEX 3 to RINEX 2.11 to use RINEX 3 files in 
-this code.* If you followed the instructions for installation, this 
-is already taken care of.
-
-
-Example calls:
+RINEX 3 Example calls:
 
 <code>rinex2snr onsa00swe 2020 298</code>
-
-<code>rinex2snr at0100usa 2020 55</code>
 
 <code>rinex2snr pots00deu 2020 298 -archive bkg</code>
 
 <code>rinex2snr mchl00aus 2022 55 -archive ga</code>
 
-RINEX 3 has a file ID parameter that is a 
-nuisance. If you know yours, you can set it 
-with <code>-stream R</code> or <code>-stream S</code>. 
-I usually look for both files without you having to set it. 
-
-**More rinex2snr options:**
 
 **What if you have high-rate (e.g. 1 sec) RINEX files, but you want 5 sec data?** <code>-dec 5</code>
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
-*orbit file options for general users:*
+Generic orbit file options :*
 
 - gps : will use GPS broadcast orbits (**this is the default**)
 - gps+glo : uses rapid GFZ orbits
@@ -86,85 +63,10 @@ I usually look for both files without you having to set it.
 - rapid : uses GFZ multi-GNSS rapid orbits, available since mid-2021 in ~1 day
 - ultra : since mid-2021, we can use multi-GNSS near realtime orbits from GFZ
 
-
 [For more options](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
-
 
 [For more information on file formats, signals, conventions](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html)
 
-**Output SNR file format**
-
-To columns are defined as:
-
-1. Satellite number (remember 100 is added for Glonass, etc)
-2. Elevation angle, degrees
-3. Azimuth angle, degrees
-4. Seconds of the day, GPS time
-5. elevation angle rate of change, degrees/sec.
-6.  S6 SNR on L6
-7.  S1 SNR on L1
-8.  S2 SNR on L2
-9.  S5 SNR on L5
-10. S7 SNR on L7
-11. S8 SNR on L8
-
-The unit for all SNR data is dB-Hz.
-
-**Our names for the GNSS frequencies**
-
-- 1,2,20, and 5 are GPS L1, L2, L2C, and L5 (L2 and L2C are the same frequency - but we use different numbers in this code so that 
-one can *only* use L2C if wished)
-- 101,102 are Glonass L1 and L2
-- 201, 205, 206, 207, 208: Galileo frequencies, which are 
-set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
-- 302, 306, 307 : Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz
-
-**What if you want to analyze your own data?**
-
-Put your RINEX 2.11 files in the directory where you are going to run the code.
-
-They must have SNR data in them (S1, S2, etc) and have the receiver coordinates in the header.
-The files should follow these naming rules:
-
-- all lowercase
-- station name (4 characters) followed by day of year (3 characters) then 0.yyo where yy is the two character year.
-- Example: algo0500.21o where station name is algo on day of year 50 from the year 2021
-
-<code>rinex2snr algo 2021 50 -nolook True</code>
-
-If you have ss second RINEX 3 files, they should be all upper case (except for the extension rnx or crx).
-
-* station name (9 characters where the last 3 characters are the country), underscore 
-* capital R or capital S , with underscore on either side
-* four character year 
-* three character day of year 
-* four zeroes, underscore, 
-* 01D, underscore
-* ssS, underscore, M0. 
-* followed by rnx (crx if it is Hatanaka format).
-
-01D means it is one day. Some of the other parts of the very long station file name are no 
-doubt useful, but they are not recognized by this code. By convention, these files may be 
-gzipped but not unix compressed. You cannot use rinex2snr to translate RINEX 3 file unless they
-have the 01D naming convention. If you want a generic translation program, try rinex3_rinex2.
-
-Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
-
-<code>rinex2snr onsa00swe 2021 305 -nolook True </code>
-
-If you have something other than 30 second sampling, use <code>-samplerate</code>.
-
-The RINEX inputs are always deleted, so do not put your only copy of the files in the working directory.
-Please note: we are using the publicly available <code>gfzrnx</code> code to convert RINEX 3 files into RINEX 2.11 files. 
-If you do not have <code>gfzrnx</code> installed, you will not be able to use RINEX 3 files.
-
-It is also allowed to put your 
-RINEX files into $REFL_CODE/YYYY/rinex/ssss where YYYY is the year 
-and ssss is the four character station name. The advantage of doing 
-this is that your RINEX files will not be deleted.
-
-The makan option (-mk True) follows entirely different rules for file storage which I will not 
-describe here. 
 
 <HR>
 
@@ -178,4 +80,6 @@ for station ABCD in year 2021 and day of year 3.
 
 NMEA files may be gzipped.
 
+
+We need someone to document nmea2snr
 

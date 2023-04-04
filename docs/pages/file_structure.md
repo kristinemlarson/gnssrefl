@@ -4,6 +4,8 @@
 
 Input observation formats: the code only recognizes RINEX 2.11, RINEX 3 and NMEA input files.
 
+[RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt)
+
 RINEX 2.11
 
 *We require that you use lower case filenames.* These are the standard at global archives.
