@@ -5190,8 +5190,10 @@ def queryUNR_modern(station):
             return lat, lon, ht
     # if you used github and run the code from that directory
     if nfile1_exist:
+        print('Database was found at :', nfile1)
         conn = sqlite3.connect(nfile1)
     elif nfile2_exist:
+        print('Database was found at :', nfile2)
         conn = sqlite3.connect(nfile2)
     c=conn.cursor()
     c.execute("SELECT * FROM  stations WHERE station=:station",{'station': station})
