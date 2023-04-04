@@ -1,21 +1,19 @@
 # rinex2snr  
 
-The goal of this code is to extract SNR data from a GNSS data file.
-
-RINEX is the standard format used by geodesists and surveyors. This file has extraneous 
-information in it (which we will throw out) - and it  
+The goal of this code is to extract SNR data from a GNSS RINEX data file.
+A RINEX file has extraneous information in it (which we will throw out) - and it  
 does not provide some of the information needed for reflectometry (e.g. elevation and azimuth angles). 
 For the latter step, we need an **orbit** file. The code will pick that up for you.
 
 - [Information on file formats](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html)
 
-- [Information on rinex2snr inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
+- [Information on specific rinex2snr inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
 
 
 <code>rinex2snr</code> assumes the files are in the RINEX 2.11 format at one of the global archives. 
 The four character station name, year, and day of year must be specified.
 
-Example
+Example:
 
 <code>rinex2snr p041 2020 132</code>
 
@@ -46,10 +44,12 @@ RINEX 3 Example calls:
 
 <code>rinex2snr onsa00swe 2020 298</code>
 
-<code>rinex2snr pots00deu 2020 298 -archive bkg</code>
+<code>rinex2snr pots00deu 2020 298 -archive bkg -stream R</code>
 
 <code>rinex2snr mchl00aus 2022 55 -archive ga</code>
 
+
+**Frequently used options:**
 
 **What if you have high-rate (e.g. 1 sec) RINEX files, but you want 5 sec data?** <code>-dec 5</code>
 
@@ -67,19 +67,4 @@ Generic orbit file options :*
 
 [For more information on file formats, signals, conventions](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html)
 
-
-<HR>
-
-NMEA formats can be translated to SNR using <code>nmea2snr</code>.
-Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
-NMEA files are assumed to be stored as:
-
-$REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
-
-for station ABCD in year 2021 and day of year 3. 
-
-NMEA files may be gzipped.
-
-
-We need someone to document nmea2snr
 

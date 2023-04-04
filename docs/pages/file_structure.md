@@ -2,11 +2,10 @@
 
 ## GPS/GNSS Data Formats
 
-Input observation formats: the code only recognizes RINEX 2.11, RINEX 3 and NMEA input files.
+Input observation formats: the code only recognizes [RINEX 2.11](https://www.ngs.noaa.gov/CORS/RINEX211.txt), 
+RINEX 3 and NMEA input files.
 
-[RINEX format](https://www.ngs.noaa.gov/CORS/RINEX211.txt)
-
-RINEX 2.11
+**RINEX 2.11**
 
 *We require that you use lower case filenames.* These are the standard at global archives.
 They must have SNR data in them (S1, S2, etc) and have the receiver coordinates in the header.
@@ -18,7 +17,7 @@ The files should follow these naming rules:
 
 Example filename : onsa0500.22o
 
-RINEX 3
+**RINEX 3**
 
 While we allow RINEX 3 files, we do not read the file itself - we rely on the <code>gfzrnx</code> 
 utility developed by Thomas Nischan at GFZ to translate from RINEX 3+ to RINEX 2.11
@@ -40,7 +39,23 @@ have the 01D naming convention. If you want a generic translation program, try r
 
 Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 
-Input orbit files: we have tried our best to make the orbit files relatively invisible to users.
+**NMEA**
+
+NMEA formats can be translated to SNR using <code>nmea2snr</code>.
+Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
+NMEA files are assumed to be stored as:
+
+$REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
+
+for station ABCD in year 2021 and day of year 3.
+
+NMEA files may be gzipped.
+
+nmea2snr needs better in-code documentation.
+
+**Orbit files**
+
+We have tried our best to make the orbit files relatively invisible to users.
 But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
 or precise orbits in the sp3 format.   
 
@@ -48,7 +63,7 @@ or precise orbits in the sp3 format.
 
 You need two environment variables: REFL_CODE and ORBITS
 
-**File structure for station abcd in the year YYYY (last two characters YY), doy DDD:**
+File structure for station abcd in the year YYYY (last two characters YY), doy DDD:
 
 - REFL_CODE/input/abcd.json - instructions for gnssir analysis, refraction files
 
@@ -71,6 +86,9 @@ they are deleted. Do not keep your only copy of RINEX files in your default dire
 
 You do not need precise orbits to do GNSS-IR. We only use them as a convenience.
 Generally we use multi-GNSS sp3 files. that are defined as:
+
+Some of the utilities and environmental products code store files in REFL_CODE/Files
+The locations of these files are always provided in the screen output.
 
 ## The SNR data format
 
@@ -108,18 +126,11 @@ The unit for all SNR data is dB-Hz.
 
 - 1,2,20, and 5 are GPS L1, L2, L2C, and L5 
 
-L2 and L2C are the same frequency - but we use different numbers in this code so that
-one can *only* use L2C satellites if desired. 
-
 - 101,102 are Glonass L1 and L2
 
 - 201, 205, 206, 207, 208: Galileo frequencies, which are
 set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
 
 - 302, 306, 307 : Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz
-
-
-
-
 
 
