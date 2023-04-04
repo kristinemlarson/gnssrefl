@@ -73,7 +73,7 @@ setup(
             'refl_zones= gnssrefl.refl_zones_cl:main',
             'vwc= gnssrefl.vwc:main',
             'quickplt= gnssrefl.quickplt:main',
-            'snowdepth= gnssrefl.snow_depth:main',
+            'snowdepth= gnssrefl.snowdepth_cl:main',
             'rh_plot= gnssrefl.rh_plot:main',
             'pickle_dilemma= gnssrefl.pickle_dilemma:main',
             ], 

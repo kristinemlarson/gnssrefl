@@ -9,7 +9,7 @@
 * [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html)
 * [quickLook](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
 * [rinex2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
-* [snowdepth](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snow_depth.html)
+* [snowdepth](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html)
 * [subdaily](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html)
 * [vwc](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc.html#gnssrefl.vwc.vwc)
 
