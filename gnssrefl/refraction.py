@@ -508,6 +508,9 @@ def look_for_pickle_file():
     if os.path.isfile(fullpname):
         print('1st attempt: found in ', fullpname)
         foundit = True
+    else:
+        print('1st attempt: not found in ', fullpname)
+
     if not foundit:
         pname =  'gnssrefl/gpt_1wA.pickle'
         print('2nd attempt: subdirectory of current working directory:', pname)

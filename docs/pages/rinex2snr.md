@@ -74,6 +74,10 @@ I usually look for both files without you having to set it.
 
 **More rinex2snr options:**
 
+**What if you have high-rate (e.g. 1 sec) RINEX files, but you want 5 sec data?** <code>-dec 5</code>
+
+**What if you want to use high-rate data?**  <code>-rate high</code>
+
 *orbit file options for general users:*
 
 - gps : will use GPS broadcast orbits (**this is the default**)
@@ -82,36 +86,11 @@ I usually look for both files without you having to set it.
 - rapid : uses GFZ multi-GNSS rapid orbits, available since mid-2021 in ~1 day
 - ultra : since mid-2021, we can use multi-GNSS near realtime orbits from GFZ
 
-*orbit file options for experts:*
 
-- nav : GPS broadcast, perfectly adequate for reflectometry. 
-- igs : IGS precise, GPS only
-- igr : IGS rapid, GPS only
-- jax : JAXA, GPS + Glonass, reliably within a few days, missing block III GPS satellites
-- gbm : GFZ Potsdam, multi-GNSS, not rapid (GPS, Galileo,Glonass, Beidou)
-- grg: French group, GPS, Galileo and Glonass, not rapid
-- esa : ESA, multi-GNSS
-- gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021 
-- wum : Wuhan, multi-GNSS (precise+prediction, GPS,Galileo,Glonass,Beidou)
-- ultra : GFZ ultra rapid (GPS, Galileo, Glonass), since May 17, 2021 
+[For more options](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
 
 
-**What if you have high-rate (e.g. 1 sec) RINEX files, but you want 5 sec data?** <code>-dec 5</code>
-
-**What if you want to use high-rate data?**  <code>-rate high</code>
-
-If you invoke this flag, you need to specify the archive. Your choices for high-rate RINEX 2.11 data are:
-
-- unavco 
-- cddis
-- nrcan  
-
-For RINEX 3 high-rate data:
-
-- cddis
-- ga 
-- bkg
-
+[For more information on file formats, signals, conventions](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html)
 
 **Output SNR file format**
 

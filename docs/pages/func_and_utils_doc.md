@@ -1,5 +1,4 @@
 # Workflow
-*Functions and Utilities*
 ## Main codes 
 ### [rinex2snr()](../pages/rinex2snr.md) translating GNSS Data 
 ### [quickLook() ](../pages/quickLook.md) visual assessment of GNSS-IR
@@ -12,5 +11,5 @@
 
 ## Additional methods
 ### [invsnr() ](../pages/README_invsnr.md) inverse SNR 
-### [daily_avg() ](../pages/README_dailyavg.md) daily avg  RH
+### [daily_avg() ](../pages/README_dailyavg.md) daily avg RH
 

@@ -24,14 +24,15 @@ Welcome to gnssrefl Documentation!
    :maxdepth: 1
    :caption: Contents:
 
-   pages/understand.md
    pages/README_install.md
+   pages/understand.md
+   pages/file_structure.md
    pages/func_and_utils_doc.md
    pages/quick_recall.md
-   api
    pages/first_drivethru.md
    pages/contributions_questions.md
    pages/new_station.md
+   api
 
 .. note::
    These docs are still under development; feedback is appreciated.
