@@ -75,6 +75,7 @@ setup(
             'quickplt= gnssrefl.quickplt:main',
             'snowdepth= gnssrefl.snow_depth:main',
             'rh_plot= gnssrefl.rh_plot:main',
+            'pickle_dilemma= gnssrefl.pickle_dilemma:main',
             ], 
         },
     install_requires=requirements,
