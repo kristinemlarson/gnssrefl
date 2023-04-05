@@ -66,21 +66,21 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         4 character station name
     year : int
         water year (i.e. jan-june of that year and oct-dec of the previous year)
-    minS : float
+    minS : float, optional
         minimum snow depth for y-axis limit (m), optional
-    maxS : float
+    maxS : float, optional
         maximum snow depth for y-axis limit (m), optional
-    longer : bool
+    longer : bool, optional
         whether you want to plot longer time series (useful for Alaskan sites)
-    plt : bool
+    plt : bool, optional
         whether you want the plot to come to the screen
-    bare_date1: str
-        an override for start bare soil definition (used when data are unavailable for default settings )
-    bare_date2: str
-        an override for end bare soil definition (used when data are unavailable for default settings )
-    plt_enddate: str
-        an override for where you want the plot to end 
-    simple: bool
+    bare_date1: str, optional
+        an override for start bare soil definition 
+    bare_date2: str, optional
+        an override for end bare soil definition 
+    plt_enddate: str, optional
+        an override for where you want the plot to end earlier than default
+    simple: bool, optional
         whether you want to use simple algoirthm. Default is False
         which means you use azimuth corrected bare soil values
 

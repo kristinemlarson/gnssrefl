@@ -10,6 +10,7 @@
 ### [vwc() ](../pages/README_vwc.md) soil moisture
 
 ## Additional methods
-### [invsnr() ](../pages/README_invsnr.md) inverse SNR 
-### [daily_avg() ](../pages/README_dailyavg.md) daily avg RH
+### [invsnr() ](../pages/README_invsnr.md) inverse SNR method 
+### [daily_avg() ](../pages/README_dailyavg.md) daily average RH
+### [refl_zones() ](../pages/utilities.md) reflection zones for Google Earth
 

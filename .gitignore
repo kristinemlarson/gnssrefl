@@ -1,5 +1,10 @@
 env
+testing.py
+tggo.txt
 get_listing*.py
+uneven_smoother.py
+rhdot_compare.py
+tidegauge_compare.py
 WARN*
 grauer*
 allstations.json

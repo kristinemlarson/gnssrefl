@@ -1,9 +1,15 @@
 # Files and File Formats
 
+You need two environment variables: REFL_CODE and ORBITS. If you are using 
+the jupyter notebooks or the docker, they are defined for you. If you are working
+with pypi or github install, you must define them EVERY TIME YOU USE THE CODE.
+This is most easily done by setting them in your setup script, which on my machine
+is called .bashrc.
+
 ## GPS/GNSS Data Formats
 
-Input observation formats: the code only recognizes [RINEX 2.11](https://www.ngs.noaa.gov/CORS/RINEX211.txt), 
-RINEX 3 and NMEA input files.
+Input observation formats: the code only 
+recognizes [RINEX 2.11](https://www.ngs.noaa.gov/CORS/RINEX211.txt), RINEX 3 and NMEA input files.
 
 **RINEX 2.11**
 
@@ -56,12 +62,12 @@ nmea2snr needs better in-code documentation.
 **Orbit files**
 
 We have tried our best to make the orbit files relatively invisible to users.
-But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
+But for the sake of completeness, we are either using broadcast navigation files in 
+the RINEX 2.11 format
 or precise orbits in the sp3 format.   
 
 ## Where Files are Stored
 
-You need two environment variables: REFL_CODE and ORBITS
 
 File structure for station abcd in the year YYYY (last two characters YY), doy DDD:
 
@@ -89,6 +95,22 @@ Generally we use multi-GNSS sp3 files. that are defined as:
 
 Some of the utilities and environmental products code store files in REFL_CODE/Files
 The locations of these files are always provided in the screen output.
+
+The inputs to <code>gnssir</code> are generally stored in the REFL_CODE/input folder.
+This primarily means the Lomb Scargle data analysis inputs, i.e. 
+the "json" files, e.g. p041.json for station p041.
+It also includes the refraction file (p041_refr.txt) that is 
+created automatically. This calculation 
+requires a set of parameters stored in a "pickle" format, gpt_1wA.pickle. 
+It should be automatically stored for you.
+
+I don't know why - but the station_pos.db file is stored in REFL_CODE/Files
+As it is an input file, we should probably move it. This file should be required 
+for the code to work, but it is a time saving if you are using a station file
+that is in this database. It is based on a set of coordinates provided by the University 
+of Nevada Reno.  You can query it online with <code>query_unr</code>. It is entirely 
+possible that you are using a station name that is shared with another GNSS site. In 
+those cases you will need to input your lat, long, and ellipsoidal height yourself.
 
 ## The SNR data format
 

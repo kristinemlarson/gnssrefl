@@ -296,8 +296,10 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
                 except:
                     okok = 1
                 if os.path.isfile(oname):
-                    print('successful ', oname)
+                    print('successful download ', oname)
                     fileF = fileF + 1
+                else:
+                    print('unsuccessful download ', oname)
 
     searchP = station.upper() + streamID + cyyyy + cdoy + '*15M*MO.rnx'
     print('Found ', fileF,' 15 minute files')

@@ -98,16 +98,16 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         4 character id of the station.
     year : integer
         Year
-    txtfile_part1 : string, optional
+    txtfile_part1 : str, optional
         File name.
         default is None - will set name for you.
-    txtfile_part2 : string, optional
+    txtfile_part2 : str, optional
         Input filename for rhdot/spline fitting
         default is None
     csvfile: boolean, optional
         Set to True if you prefer csv to plain txt.
         default is False.
-    plt : boolean, optional
+    plt : bool, optional
         To print plots to screen or not.
         default is TRUE.
     spline_outlier1 : float, optional

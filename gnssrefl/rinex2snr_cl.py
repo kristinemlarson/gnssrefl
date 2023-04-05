@@ -67,14 +67,14 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     
     Examples:
 
-    rinex2snr mchn 2022 15  -orb sopac
+    rinex2snr mchn 2022 15  -archive sopac
 
     would translate station mchn for the year/doy 2022/15 using data from the sopac archive
     and GPS orbits.
 
     rinex2snr mchn 2022 15  -orb rapid -archive sopac
 
-    would do the same but using multi-GNSS orbits from GFZ 
+    would do the same but using multi-GNSS rapid orbits from GFZ 
 
     RINEX 3 translation is triggered by the station name having 9 characters:
 
@@ -90,7 +90,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
     rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg -stream S -bkg IGS
 
-    Regardless of the fact that station names can have 9 characters now, this code stores the snr data with 
+    Regardless of the fact that station names can have 9 characters now, this code stores the SNR data with 
     four characters.
 
     RINEX3 30 second archives supported include: bev, bfg, bkg, cddis, epn, ga, gz, nrcan, sonel, and unavco
@@ -119,7 +119,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         50 : saves all data with elevation angles less than 10 degrees
 
     orb : str, optional
-        Which orbit files to download.
+        Which orbit files to download. 
         Value options:
 
             gps (default) : will use GPS broadcast orbit
@@ -128,7 +128,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
             gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
 
-            nav : GPS broadcast, perfectly adequate for reflectometry.
+            nav : GPS broadcast, perfectly adequate for reflectometry. Same as gps.
 
             igs : IGS precise, GPS only
 
@@ -148,10 +148,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
             ultra: GFZ ultra-rapid, multi-GNSS
 
-            wum : (disabled) Wuhan, multi-GNSS, not rapid
-
     rate : str, optional
-        The data rate
+        The data rate. Rather than numerical value, this tells the code which folder to use
         value options:
             low (default) : standard rate data. Usually 30 sec, but sometimes 15 sec.
 
@@ -173,48 +171,44 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         default is False.
 
     archive : str, optional
-        Select which archive to get the files from.
-        Default is None. None means that the code will search unavco,sopac and sonel.
+        Select which archive to get the files from. Default is all
         value options:
-
-            unavco : (University Navstar Consortium, now Earthscope)
-
-            sonel : (global sea level observing system)
-
-            sopac : (Scripps Orbit and Permanent Array Center)
-
-            ngs : (National Geodetic Survey)
-
-            nrcan : (Natural Resources Canada)
-
-            bkg : (German Agency for Cartography and Geodesy)
-
-            nz : (GNS, New Zealand)
-
-            ga : (Geoscience Australia)
 
             bev : (Austria Federal Office of Metrology and Surveying)
 
             bfg : (German Agency for water research, only Rinex 3, requires password)
 
+            bkg : (German Agency for Cartography and Geodesy)
+
+            cddis : (NASA's Archive of Space Geodesy Data)
+
+            ga : (Geoscience Australia)
+
             jp : (GSI, requires password)
 
             jeff : (My good friend Professor Freymueller!)
 
+            ngs : (National Geodetic Survey)
+
+            nrcan : (Natural Resources Canada)
+
+            nz : (GNS, New Zealand)
+
+            sonel : (global sea level observing system)
+
+            sopac : (Scripps Orbit and Permanent Array Center)
+
             special : (set aside files at UNAVCO for reflectometry users)
 
-            cddis : (NASA's Archive of Space Geodesy Data)
+            unavco : (University Navstar Consortium, now Earthscope)
 
             all : (searches sopac, unavco, and sonel in that order)
 
     doy_end : int, optional
-        end day of year to be downloaded. This is to create a range from doy to doy_end of days to get the snr files.
-        If year_end parameter is used - then day_end will end in the day of the year_end.
-        Default is None. (meaning only a single day using the doy parameter)
+        end day of year to be downloaded. 
 
     year_end : int, optional
-        end year. This is to create a range from year to year_end to get the snr files for more than one year.
-        Default is None.
+        end year. Default is None.
 
     overwrite : bool, optional
         Make a new SNR file even if one already exists (overwrite existing file).
@@ -228,15 +222,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         python : uses python to translate. (Warning: This can be very slow)
 
     srate : int, optional
-        sample rate for rinex 3 only
-        Default is 30.
+        sample rate for RINEX 3 only. Default is 30.
 
     mk : bool, optional
-        The Makan option. Use True for uppercase station names.
-        Default is False.
+        The Makan option. Use True for uppercase station names. Default is False.
 
     weekly : bool, optional
-        Takes 1 out of every 7 days in the doy-doy_end range (one file per week) - used to save time.
+        Takes 1 out of every 7 days in the doy-doy_end range (one file per week) - used to save cpu time.
         Default is False.
 
     strip : bool, optional

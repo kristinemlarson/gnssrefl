@@ -1,4 +1,4 @@
-# Utilities <a name="helper"></a>
+# Utilities 
 
 ## refl_zones
 
