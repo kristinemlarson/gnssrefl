@@ -17,27 +17,17 @@ Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-de
 
 ## Run gnssrefl Docker
 
-cd into the local directory that you wish to keep your processed results
+change directory into the local directory that you wish to keep your processed results
 
-<PRE>
-docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  
--v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files 
---name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
-</PRE>
-
-or 
-
-<PRE>
-docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/   \
--v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files  \
---name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
-</PRE>
+```bash
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
+```
 
 Description of the commands used:  
 
-<code>-it</code> calls interactive process (bin/bash shell) 
+`-it` calls interactive process (bin/bash shell) 
 
-<code>-v</code> mounts external volumes to allow the user to keep their processing results and figures 
+`-v` mounts external volumes to allow the user to keep their processing results and figures 
 
 Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
 
@@ -45,46 +35,28 @@ Now you can start working with the [gnssrefl code.](https://github.com/kristinem
 docker has vim for editing text files (ie .json station config file)
 
 If you want to process RINEX files that are stored on your local machine, you can copy them into 
-<code>/refl_code/</code> local directory that is already mounted to the container given the previous run command.  
+`/refl_code/` local directory that is already mounted to the container given the previous run command.  
 
 If you have a lot of RINEX files and want to keep them organized, you should copy them 
-into <code>refl_code/rinex/station/yyyy/</code>, where station is the lowercase 4char ID and yyyy is the year. 
+into `refl_code/rinex/station/yyyy/`, where station is the lowercase 4char ID and yyyy is the year. 
 You should then mount that directory in the docker run command as follows: 
 
-<PRE>
-docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ 
--v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/  
--v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ 
---name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
-</PRE>
-
-or 
-
-<PRE>
-docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  \
--v $(pwd)/refl_code/Files:/etc/gnssrefl/refl_code/Files/   \
--v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/  \
---name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
-</PRE>
-
+```bash
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
+```
 
 ### Shutdown Docker <a name="Shutdown"></a>
-To shut down the container from the terminal, use `ctrl+c`
+To exit down the container from the terminal, type `exit`
 
 To shut down the docker container run `docker stop gnssrefl`
 
 If you need to see the container(s) you have running you can use `docker ps`
 
+If you need to see all container(s) you can use `docker container ls -a`
+
 ### Update Docker Image to newest version <a name="Update Docker"></a>
 
-
-**I believe this is wrong**
-
-To update your Image from our DockerHub. Run `docker pull unavdocker/gnssrefl`
-
-Instead try
-
-docker pull ghcr.io/kristinemlarson/gnssrefl:latest
+`docker pull ghcr.io/kristinemlarson/gnssrefl:latest`
 
 
 ## For WINDOWS USERS:
@@ -92,10 +64,9 @@ docker pull ghcr.io/kristinemlarson/gnssrefl:latest
 
 1. Install [Docker for Windows](https://docs.docker.com/desktop/windows/install/)
 
-Problem: <code>WSL2 Installation is incomplete</code>.  
+Problem: `WSL2 Installation is incomplete`.  
 
 * Solution: Need to download and install [from step 4](https://docs.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package)
-
 
 Problem: Docker stuck at initial stage
 
@@ -111,19 +82,15 @@ Docker run commands have slightly different syntax to accomodate windows directo
 
 Use either Windows Power Shell:
 
-<PRE>
-docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ `
--v ${pwd}\refl_code\Files:/etc/gnssrefl/refl_code/Files `
---name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
-</pre>
+```bash
+docker run -it -v ${pwd}\refl_code:/etc/gnssrefl/refl_code/ --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
+```
 
 Or Windows Command Line:
 
-<PRE>
-docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ ^
--v %cd%\refl_code\Files:/etc/gnssrefl/refl_code/Files ^
---name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
-</pre>
+```bash
+docker run -it -v %cd%\refl_code:/etc/gnssrefl/refl_code/ --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash 
+```
 
 execute docker run command (see above) in terminal window
 
