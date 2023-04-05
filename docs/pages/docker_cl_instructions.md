@@ -1,6 +1,6 @@
 # [Installing the gnssrefl docker image from the GitHub Container Registry](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
 
-Please send your feedback on these instructions to Tim Dittmann at UNAVCO, or better still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
+Please send your feedback on these instructions to Tim Dittmann at EarthScope, or better still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
 
 for jupyter notebook version, please see [gnssrefl_jupyter instructions](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 ## Install Docker
@@ -16,6 +16,8 @@ More information on [getting started, testing your installation, and developing.
 Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
 ## Run gnssrefl Docker
+
+Reminder: If you want to process EarthScope data, you will need to create [an EarthScope profile.](https://data.unavco.org/user/profile/info)
 
 change directory into the local directory that you wish to keep your processed results
 
