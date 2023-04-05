@@ -5,9 +5,9 @@ Please send your feedback on these instructions to Tim Dittmann at EarthScope, o
 for jupyter notebook version, please see [gnssrefl_jupyter instructions](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 ## Install Docker
 &ensp;&ensp; Pick your system and follow instructions on the Docker website. 
-* **Mac** - https://docs.docker.com/docker-for-mac/install/ 
-* **Windows** - https://docs.docker.com/docker-for-windows/install/ 
-* **Ubuntu** - https://docs.docker.com/install/linux/docker-ce/ubuntu/ 
+* [**Mac**](https://docs.docker.com/docker-for-mac/install/) 
+* [**Windows**](https://docs.docker.com/docker-for-windows/install/)
+* [**Ubuntu**](https://docs.docker.com/install/linux/docker-ce/ubuntu/) 
 
 Once installed, type `docker run hello-world` in terminal to check if installed correctly.
 
