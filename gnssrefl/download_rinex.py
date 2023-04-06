@@ -51,13 +51,14 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                    debug: bool = False, dec: int = 1, save_crx: bool = False, bkg: str = None ):
     """
     Command line interface for downloading RINEX files from global archives.
-    Required inputs are station, year, month, and day.
+    Required inputs are station, year, month, and day. If you want to use day of year,
+    call it as station, year, doy, 0.
 
     Example:
 
     download_rinex mfle 2015 1 1 
 
-    If you want to download using day of year instead of month/day:
+    Using day of year instead of month/day:
 
     download_rinex mfle 2015 52 0
 

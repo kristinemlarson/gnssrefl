@@ -1,10 +1,8 @@
 
 **Date**: |today|
 
-Welcome to gnssrefl Documentation!
+Welcome to the gnssrefl Documentation!
 =====================================
-
-.. image:: https://morefunwithgps.com/public_html/gnssrefl-images-sm.jpg
 
 ``gnssrefl`` (pronounced "gee / en / es / es / ref•le") is an open source, python version of GNSS interferometric reflectometry (GNSS-IR) code.
 

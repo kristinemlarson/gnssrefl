@@ -45,7 +45,7 @@ def parse_arguments():
     parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
     parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
     parser.add_argument("-strip", default=None, help="use True to reduce number of obs", type=str)
-    parser.add_argument("-bkg", default=None, help="IGS or EUREF (default)", type=str)
+    parser.add_argument("-bkg", default=None, help="Which folder to use for the BKG archive, IGS or EUREF (default)", type=str)
 
     args = parser.parse_args().__dict__
 
@@ -355,6 +355,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     # unavco is only rinex2
     # ga is only rinex3
     # bkg is only rinex 3
+    # i cannot remember for nrcan. it is probably rinex2
     highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  
 
     if ns == 9:
