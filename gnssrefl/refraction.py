@@ -499,8 +499,14 @@ def look_for_pickle_file():
     try3 = PROJECT_ROOT + '/' + pfile
     # do i need str??
     xdir = str(os.environ['REFL_CODE'])
+    inputdir = xdir + '/input/'
+    if os.path.isdir(inputdir):
+        print('found ', inputdir)
+    else:
+        print('make directory: ', inputdir)
+        subprocess.call(['mkdir',inputdir])
 
-    fullpname = xdir + '/input/' + pfile
+    fullpname = inputdir + pfile
 
     print('The large refraction file should be stored here:', fullpname)
     foundit = False
