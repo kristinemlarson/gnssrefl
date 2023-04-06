@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.22.29
+Fixed longstanding bug in where the refraction pickle file is stored.
+was working in the docker.  was working for github clone.  not working for pypi
+because it did not check for the input subdirectory existence.
+
 ## 1.22.28
 
 changed az_sectors to azlist in refl_zones to be consistent with other codes

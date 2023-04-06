@@ -506,6 +506,12 @@ def look_for_pickle_file():
         print('make directory: ', inputdir)
         subprocess.call(['mkdir',inputdir])
 
+    fdir = xdir + '/Files'
+    if not os.path.isdir(fdir):
+        print('make Files directory: ', fdir)
+        subprocess.call(['mkdir', fdir])
+
+    # where the file should be stored
     fullpname = inputdir + pfile
 
     print('The large refraction file should be stored here:', fullpname)
