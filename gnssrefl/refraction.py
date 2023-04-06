@@ -525,23 +525,25 @@ def look_for_pickle_file():
 
     if not foundit:
         pname =  'gnssrefl/gpt_1wA.pickle'
-        print('2nd attempt: subdirectory of current working directory:', pname)
+        print('2nd attempt: look in subdirectory of current working directory:', pname)
         if os.path.isfile(pname):
             subprocess.call(['cp','-f',pname, fullpname  ])
             foundit = True
 
     if not foundit:
         pname = try3
-        print('3rd attempt try here: ',pname)
+        print('3rd attempt try looking here: ',pname)
         if os.path.isfile(pname):
             foundit = True
             print('cp it to ', fullpname)
             subprocess.call(['cp','-f',pname, fullpname])
+        else:
+            print('that did not work')
 
+    url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/' + pfile
     if not foundit:
-        print('4th attempt - download from github')
+        print('4th attempt - download from github', url)
         try:
-            url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/' + pfile
             wget.download(url,fullpname)
         except:
             print('download or cp failed')
@@ -549,9 +551,9 @@ def look_for_pickle_file():
             foundit = True
 
     if not foundit:
-        print('5th attempt - this is getting ridiculous')
+        url= 'https://morefunwithgps.com/public_html/' + pfile
+        print('5th attempt - ',url)
         try:
-            url= 'https://morefunwithgps.com/public_html/' + pfile
             wget.download(url,fullpname)
         except:
             print('Failed again.')
