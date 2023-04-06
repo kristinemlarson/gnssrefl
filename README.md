@@ -1,8 +1,3 @@
-
-<p align=center>
-<img src="https://morefunwithgps.com/public_html/gnssrefl-images-sm.jpg" width=600 />
-</p>
-
 # gnssrefl
 
 **github version: 1.2.28** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)

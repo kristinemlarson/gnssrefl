@@ -39,6 +39,9 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     If station is in the UNR database, those lat/lon/el_height values are used. You may override those values 
     with the optional inputs.
 
+    The output file will be stored in REFL_CODE/Files/kml unless you specify an output name. In that case
+    it will go into your working directory
+
     Parameters
     ----------
     station : str
@@ -66,7 +69,6 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     system : str, optional
         name of constellation (gps,glonass,galileo, beidou allowed)
         default is gps
-
     output : str, optional
         name for kml file 
 
