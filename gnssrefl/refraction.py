@@ -529,7 +529,7 @@ def look_for_pickle_file():
         print('3rd attempt try here: ',pname)
         if os.path.isfile(pname):
             foundit = True
-            print('cp it')
+            print('cp it to ', fullpname)
             subprocess.call(['cp','-f',pname, fullpname])
 
     if not foundit:
@@ -538,7 +538,7 @@ def look_for_pickle_file():
             url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/' + pfile
             wget.download(url,fullpname)
         except:
-            print('download failed')
+            print('download or cp failed')
         if os.path.isfile(fullpname):
             foundit = True
 
@@ -551,8 +551,8 @@ def look_for_pickle_file():
             print('Failed again.')
 
         if os.path.isfile(fullpname):
-                foundit = True
-
-    print(foundit, fullpname)
+            foundit = True
+        else:
+            print('File should be stored in ', inputdir, ' but is not')
 
     return foundit , fullpname
