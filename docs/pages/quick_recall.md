@@ -17,12 +17,9 @@
 
 * installexe
 
-* [download_ioc](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_ioc.html)
-* [download_noaa](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_noaa.html)
-* [download_psmsl](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_simon.html)
-* [download_wsv](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_wsv.html)
-* [download_rinex](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_rinex.html)
 * [download_orbits](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_orbits.html)
+* [download_rinex](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_rinex.html)
+* [download_tides](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_tides.html)
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
 * [invsnr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 * [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)

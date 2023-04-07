@@ -61,83 +61,63 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in a json file which by default is saved
     in REFL_CODE/<station>.json.
 
-    Examples:
+    Examples
+    --------
 
     make_json_input p041 0 0 0 
-
-    uses only GPS frequencies and all azimuths and the coordinates in the UNR database
+        uses only GPS frequencies and all azimuths and the coordinates in the UNR database
 
     make_json_input p041 39.9494 -105.19426 1728.85  -azlist 0 90 90 180 -fr 1 101
-
-    uses input coordinates, GPS L1 and Glonass L1 frequencies, and azimuths between 0 and 180.
+        uses input coordinates, GPS L1 and Glonass L1 frequencies, and azimuths between 0 and 180.
 
     make_json_input p041 39.9494 -105.19426 1728.85  -l2c T -e1 5 -e2 15
-
-    uses only L2C GPS data between elevation angles of 5 and 15 degrees.
+        uses only L2C GPS data between elevation angles of 5 and 15 degrees.
 
     make_json_input p041 39.9494 -105.19426 1728.85  -h1 0.5 -h2 10 -e1 5 -e2 25
-
-    uses only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
+        uses only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
 
 
     Parameters
     ----------
     station : str
         4 character station ID.
-
     lat : float
         latitude in degrees.
-
     long : float
         longitude in degrees.
-
     height : float
         ellipsoidal height in meters.
-
     e1 : int, optional
         elevation angle lower limit in degrees. default is 5.
-
     e2 : int, optional
         elevation angle upper limit in degrees. default is 25.
-
     h1 : float, optional
         reflector height lower limit in meters. default is 0.5.
-
     h2 : float, optional
         reflector height upper limit in meters. default is 8.
-
     nr1 : float, optional
         noise region lower limit for QC in meters. default is None.
-
     nr2 : float, optional
         noise region upper limit for QC in meters. default is None.
-
     peak2noise : float, optional
         peak to noise ratio used for QC.
         default is 2.7 (just a starting point for water - should be 3 or 3.5 for snow or soil...)
-
     ampl : float, optional
         spectral peak amplitude for QC. default is 6.0
         this is receiver and elevation angle region dependent - so you need to change it based on your site 
-
-    allfreq : Boolean, optional
+    allfreq : bool, optional
         True requests all GNSS frequencies.
         default is False (defaults to use GPS frequencies).
-
     l1 : bool, optional
         set to True to use only GPS L1 frequency. default is False.
-
     l2c : bool, optional
         set to use only GPS L2C frequency. default is False.
-
     xyz : bool, optional
         set to True if using Cartesian coordinates instead of Lat/Long/Ht.
         default is False.
-
     refraction : bool, optional
         set to False to turn off refraction correction.
         default is True.
-
     extension : str, optional
         provide extension name so you can try different strategies. 
         Results will then go into $REFL_CODE/YYYY/results/ssss/extension

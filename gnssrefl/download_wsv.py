@@ -34,7 +34,7 @@ def download_wsv(station: str, plt: bool = True, output: str = None):
     Parameters
     ----------
     station : str
-        IOC station name 
+        station name 
     plt: bool, optional
         plot comes to the screen
         default is None
