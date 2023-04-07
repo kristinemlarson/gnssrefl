@@ -22,7 +22,7 @@ def parse_arguments():
     # optional arguments
     parser.add_argument("-rate", default='low', metavar='low', type=str, help="sample rate: low or high")
     parser.add_argument("-archive", default=None, 
-                        help="archive (unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan)", type=str)
+                        help="archive name", type=str)
     parser.add_argument("-version", default=None, metavar=2, type=int, help="rinex version (2 or 3)")
     parser.add_argument("-strip", default=None, type=str,
                         help="set to True to strip to only SNR observables, gfzrnx used")
@@ -95,33 +95,38 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         Select which archive to get the files from.
         Default is redirected to all, as defined below. Value options:
 
-            unavco : now earthscope
-
-            sonel : (global sea level observing system)
-
-            sopac : (Scripps Orbit and Permanent Array Center)
-
             cddis : (NASA's Archive of Space Geodesy Data)
 
-            ngs : (National Geodetic Survey)
 
-            nrcan : (Natural Resources Canada)
+            bev : (Austria Federal Office of Metrology and Surveying)
 
             bkg : (German Agency for Cartography and Geodesy)
 
             bfg : (German Agency for water research, only Rinex 3)
 
-            nz : (GNS, New Zealand)
-
             ga : (Geoscience Australia)
 
-            bev : (Austria Federal Office of Metrology and Surveying)
+            gfz : (GFZ)
+
+            jp : (Japan)
 
             jeff : Jeff Freymueller
 
+            nrcan : (Natural Resources Canada)
+
+            ngs : (National Geodetic Survey)
+
+            nz : (GNS, New Zealand)
+
+            sonel : (?)
+
+            sopac : (Scripps Orbit and Permanent Array Center)
+
             special : (reflectometry Rinex 2.11 files maintained by unavco)
 
-            all : (searches sopac, unavco, and sonel in that order)
+            unavco : now earthscope
+
+            all : (searches unavco, sopac, and sonel in that order)
 
     version : int, optional
         Version of Rinex file. Default is 2.
@@ -173,9 +178,8 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     month, day, doy, cyyyy, cyy, cdoy = g.ymd2ch(year,month,day)
 
     # allowed archives, rinex 2.11
-    # unavco2 is for testing
-    archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 
-            'bkg', 'jeff', 'ngs', 'nrcan', 'special', 'bev', 'all','unavco2']
+    # not really sure bev, gfz, bkg work ???
+    archive_list = ['bkg','bfg','bev','cddis', 'ga', 'gfz', 'jeff', 'ngs', 'nrcan', 'nz','sonel','sopac','special', 'unavco', 'all','unavco2']
 
     # removed the all archive
     archive_list_high = ['unavco', 'nrcan', 'cddis','ga','bkg']  # though it is confusing because some are rinex 2.11 and others 3

@@ -50,6 +50,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
     IMO This should be moved into a driver so that the main functions are called separately.
 
+    Examples
+    --------
+
+    one year for station p038 
+        vwc p038 2017
+
+    three years  for station p038 
+        vwc p038 2015 -year_end 207
+
     Parameters
     ----------
     station : str

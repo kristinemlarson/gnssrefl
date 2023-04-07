@@ -27,7 +27,7 @@ def parse_arguments():
     # optional arguments
     parser.add_argument("-snr", default=None, help="snr file ending, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg.", type=int)
     parser.add_argument("-orb", default=None, type=str,
-                        help="orbit type, gps, gps+glo, gnss, rapid or you can specify nav,igs,igr,jax,gbm,grg,wum,gfr,ultra")
+                        help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra")
     parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX sample rate: low or high. Only used for archive searches.")
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
@@ -35,7 +35,7 @@ def parse_arguments():
     parser.add_argument("-fortran", default=None, metavar='False', type=str,
                         help="True means use Fortran RINEX translators ")
     parser.add_argument("-archive", default=None, metavar='all',
-                        help="specify one archive for RINEX obs files: unavco,sopac,cddis,sonel,nz,ga,ngs,bkg,nrcan,jp,bfg,jeff,special", type=str)
+                        help="specify archive", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
@@ -104,7 +104,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
     rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg -stream S -bkg IGS
 
-    RINEX3 30 second archives supported include: bev, bfg, bkg, cddis, epn, ga, gz, nrcan, sonel, and unavco
+    RINEX3 30 second archives supported include: bev, bfg, bkg, cddis, epn, ga, gfz, nrcan, sonel, and unavco
 
     Parameters
     ----------
@@ -195,17 +195,19 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
             ga : (Geoscience Australia)
 
-            jp : (GSI, requires password)
+            gfz : (GFZ, Germany)
+
+            jp : (GSI, Japan requires password)
 
             jeff : (My good friend Professor Freymueller!)
 
-            ngs : (National Geodetic Survey)
+            ngs : (National Geodetic Survey, USA)
 
             nrcan : (Natural Resources Canada)
 
             nz : (GNS, New Zealand)
 
-            sonel : (global sea level observing system)
+            sonel : (?)
 
             sopac : (Scripps Orbit and Permanent Array Center)
 
@@ -213,7 +215,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
             unavco : (University Navstar Consortium, now Earthscope)
 
-            all : (searches sopac, unavco, and sonel in that order)
+            all : (searches unavco, sopac, and sonel in that order)
 
     doy_end : int, optional
         end day of year to be downloaded. 
@@ -405,9 +407,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         print('You have invoked the weekly option')
         skipit = 7
 
-    # change skipit to be sent to rinex2snr.py
-    #doy_list = list(range(doy, doy2+1))
-    #doy_list = list(range(doy, doy2+1,skipit))
     # this makes the correct lists in the function
     doy_list = [doy, doy2]
     year_list = list(range(year1, year2+1))

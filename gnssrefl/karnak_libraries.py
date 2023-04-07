@@ -407,21 +407,20 @@ def universal_rinex2(station, year, doy, archive):
 
     Parameters
     ----------
-    station : string
+    station : str
         four character station name
-    year : integer
-
-    doy : integer
-
-    archive : string
+    year : int
+        full year
+    doy : int
+        day of year
+    archive : str
         name of the GNSS archive
 
     Returns
     -------
-    file_name : string
+    file_name : str
         filename that was downloaded
-
-    foundit : boolean
+    foundit : bool
         whether file was found
 
     """
@@ -459,7 +458,6 @@ def universal_rinex2(station, year, doy, archive):
         if not foundit:
             url2 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
             foundit,file_name = kelly.the_kelly_simple_way(url2, oname + '.Z')
-
     elif (archive == 'special'):
         print('testing out new protocol at unavco')
         url1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy + oname + '.gz'

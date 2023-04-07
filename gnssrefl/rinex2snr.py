@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-"""
 import datetime
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,7 +20,6 @@ import gnssrefl.highrate as ch
 # fortran codes for translating RINEX
 import gnssrefl.gpssnr as gpssnr
 import gnssrefl.gnsssnr as gnsssnr
-
 import gnssrefl.gnsssnrbigger as gnsssnrbigger
 
 class constants:
@@ -64,7 +60,7 @@ def quickname(station,year,cyy, cdoy, csnr):
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
         mk,skipit,stream,strip,bkg):
     """
-    main code to convert RINEX files into SNR files that are stored locally
+    main code to convert RINEX files into SNR files 
 
     Parameters
     ----------
@@ -370,8 +366,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                 # added karnak librariies
                 if (archive == 'all'):
                     foundrinex = False
-                    # sopac put before unavco
-                    for archivechoice in ['sopac','unavco','sonel']:
+                    for archivechoice in ['unavco','sopac','sonel']:
                         if (not foundrinex):
                             file_name,foundrinex = k.universal_rinex2(station, year, doy, archivechoice)
                 else:
@@ -561,12 +556,12 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
         kind of SNR file requested
 
     year : int
-
+        full year
     month : int
-
+        calendar month
     day : int
-
-    dec_rate : integer
+        calendar day
+    dec_rate : int
         decimation rate in seconds
 
     """

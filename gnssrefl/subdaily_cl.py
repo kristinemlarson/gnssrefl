@@ -61,14 +61,17 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     subdaily combines multiple day gnssir solutions and applies relevant corrections. 
     It works on one year at a time; you can restricts time periods within a year with -doy1 and -doy2
 
-    Example for all solutions in 2023:
+    Examples
+    --------
 
-    subdaily at01 2023
+    for station at01, all solutions in 2023  but no plots to the screen
+        subdaily at01 2023 -plt F
 
-    example for all solutions in 2023 between days of year 15 through 45
+    for all solutions in 2023 between days of year 15 through 45
+        subdaily at01 2023 -doy1 15 -doy2 45
 
-    subdaily at01 2023 -doy1 15 -doy2 45
-
+    for all solutions in 2023 but with max RH set to 14 meters and interfrequency correction not applied 
+        subdaily at01 2023 -h2 14 -if_corr F
 
     The code has two sections. 
 
