@@ -113,9 +113,6 @@ detects the melt and snow-in dates:
 
 <img src=https://gml.noaa.gov/news/images/BRWWebAlbedo.png width=500 />
 
-
-Looks pretty good compared to our melt and snow-in results. Don't tell JPL!
-
 <img src=../_static/utqi_just2021.png width=500 >
 
 Kristine M. Larson September 4, 2022

@@ -63,22 +63,33 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, bkg: str = 'EUREF'):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
-    RINEX obs files are provided by the user or fetched from a long list of archives.
-    
-    :example:
+    RINEX obs files are provided by the user or fetched from a long list of archives. The default is RINEX 2.11 files
+
+    Examples
+    --------
 
     rinex2snr mchn 2022 15  -archive sopac
 
     would translate station mchn for the year/doy 2022/15 using data from the sopac archive
     and GPS orbits.
 
-    :example:
 
     rinex2snr mchn 2022 15  -orb rapid -archive sopac
 
     would do the same but using multi-GNSS rapid orbits from GFZ 
 
-    RINEX 3 translation is triggered by the station name having 9 characters:
+
+    rinex2snr p041 2022 15  -orb rapid -rate high -archive unavco
+
+    downloads and translates highrate data from UNAVCO. It uses rapid multi-GNSS orbits.
+
+    If you have your own data, e.g. p0410150.22o, use the nolook option:
+
+    rinex2snr p041 2022 15 -nolook T
+
+    RINEX 3
+
+    If you want to use RINEX 3 files you should provide a 9 character station name.
 
     rinex2snr mchl00aus 2022 15  -orb rapid -archive ga 
 
@@ -86,14 +97,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
     RINEX 3 files have optional -stream  and -samplerate options.  In reality, you are unlikely to find
     RINEX 3 files at much beyond 1 and 30 seconds.  If you do not need 1 second data, you are strongly encouraged
-    to decimate to the rate you would like.  This example is for the station WARN in Germany.
-    You need to tell the code that it is highrate (and 1-second sample). It is a streamed file, so
-    the stream input must be set. And even further, must specify that it is in the bkg folder called IGS.
+    to decimate to the rate you would like.  
+
+    For this example you must set highrate to True  and specify the samplerate of 1 second. You must also 
+    specify that the stream file is provided and that it is in the bkg folder called IGS
 
     rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg -stream S -bkg IGS
-
-    Regardless of the fact that station names can have 9 characters now, this code stores the SNR data with 
-    four characters.
 
     RINEX3 30 second archives supported include: bev, bfg, bkg, cddis, epn, ga, gz, nrcan, sonel, and unavco
 

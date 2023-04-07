@@ -1,6 +1,4 @@
-# **gnssir**
-
-Estimating Reflector Heights 
+# Estimating Reflector Heights 
 
 ## make_json_input 
 
@@ -41,9 +39,9 @@ Example:
 The default is to allow four regions, each of 90 degrees.  
 
 
-## running gnssir
+## gnssir
 
-<code>gnssir</code> assumes you have made SNR files and defined an analysis strategy.
+<code>gnssir</code> estimates reflector heights. It assumes you have made SNR files and defined an analysis strategy.
 The minimum inputs are the station name, year, and doy
 
 <CODE>gnssir p041 2020 150</CODE> 
@@ -58,10 +56,10 @@ Where would the code store the files for this example?
 
 For more information, set screenstats to True
 
-For plots, set -plt to T or True
+For plots, set -plt to T or True. 
 
-Note that a failed satellite arc is shown as gray in the periodogram plots. And once you know what you are doing (have picked
-the azimuth and elevation angle mask), you won't be looking at plots anymore.
+If you want to try different strategies, use multiple json files with the -extension input. Then use the same -extension command
+in gnssir.
 
 This is a snippet of what the result file would look like
 
