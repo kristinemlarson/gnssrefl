@@ -1,4 +1,5 @@
-
+# user guide
+https://buildmedia.readthedocs.org/media/pdf/gnssrefl/latest/gnssrefl.pdf
 
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f

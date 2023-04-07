@@ -1,4 +1,4 @@
-# Beta Release: Soil Moisture
+# Soil Moisture
 <p align=center>
 <img src=https://www.kristinelarson.net/wp-content/uploads/2015/10/famousFigure.png width=500>
 </p>
