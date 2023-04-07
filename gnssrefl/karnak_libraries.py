@@ -461,8 +461,12 @@ def universal_rinex2(station, year, doy, archive):
             foundit,file_name = kelly.the_kelly_simple_way(url2, oname + '.Z')
 
     elif (archive == 'special'):
-        dir1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy
-        foundit, file_name = gogetit(dir1, oname, '.gz'); 
+        print('testing out new protocol at unavco')
+        url1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy + oname + '.gz'
+        print(url1)
+        foundit,file_name = kelly.the_kelly_simple_way(url1, oname + '.gz')
+        # old way
+        #foundit, file_name = gogetit(dir1, oname, '.gz'); 
     elif archive == 'sopac':
         dir1 = 'ftp://garner.ucsd.edu/pub/rinex/' + cydoy
         foundit, file_name = gogetit(dir1, dname, '.Z');
