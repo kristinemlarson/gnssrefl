@@ -24,7 +24,6 @@ def parse_arguments():
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
-    # optional arguments
     parser.add_argument("-snr", default=None, help="snr file ending, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg.", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra")
@@ -69,42 +68,35 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     --------
 
     rinex2snr mchn 2022 15  -archive sopac
-
-    would translate station mchn for the year/doy 2022/15 using data from the sopac archive
-    and GPS orbits.
-
+        station mchn, year/doy 2022/15,sopac archive using GPS orbits
 
     rinex2snr mchn 2022 15  -orb rapid -archive sopac
-
-    would do the same but using multi-GNSS rapid orbits from GFZ 
-
-
+        now using multi-GNSS orbits
     rinex2snr p041 2022 15  -orb rapid -rate high -archive unavco
-
-    downloads and translates highrate data from UNAVCO. It uses rapid multi-GNSS orbits.
-
-    If you have your own data, e.g. p0410150.22o, use the nolook option:
+        now using high-rate data from unavco and multi-GNSS orbits
 
     rinex2snr p041 2022 15 -nolook T
+        using your own data stored as p0410150.22o in the working directory 
 
-    RINEX 3
+    RINEX 2.11 archives listed below
 
-    If you want to use RINEX 3 files you should provide a 9 character station name.
+    Examples
+    --------
 
     rinex2snr mchl00aus 2022 15  -orb rapid -archive ga 
-
-    would translate 30 second RINEX 3 files from mchl00aus and the Geoscience Australia archive
-
-    RINEX 3 files have optional -stream  and -samplerate options.  In reality, you are unlikely to find
-    RINEX 3 files at much beyond 1 and 30 seconds.  If you do not need 1 second data, you are strongly encouraged
-    to decimate to the rate you would like.  
-
-    For this example you must set highrate to True  and specify the samplerate of 1 second. You must also 
-    specify that the stream file is provided and that it is in the bkg folder called IGS
+        30 sec data for mchl00aus and Geoscience Australia
 
     rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg -stream S -bkg IGS
+        1 sec data for warn00deu, 1 sec decimated to 5 sec, multi-GNSS, bkg archive, streamed, in IGS folder
 
-    RINEX3 30 second archives supported include: bev, bfg, bkg, cddis, epn, ga, gfz, nrcan, sonel, and unavco
+    RINEX3 30 second archives supported  
+        bev, bkg, cddis, epn, ga, gfz, nrcan, sonel, and unavco
+
+    RINEX3 15 sec archives
+        bfg
+
+    RINEX3 1 sec 
+        cddis, bkg, maybe nrcan
 
     Parameters
     ----------
@@ -170,16 +162,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         Decimation rate. 0 is default.
 
     fortran : bool, optional
-        Whether to use fortran to translate the rinex files. Note: This option requires Fortran RINEX translators.
-        Please see documentation at https://github.com/kristinemlarson/gnssrefl to see instructions to get these.
-        value options:
-            False (default) : do not use fortran to translate rinex
-
-            True : use fortran to translate rinex
+        Whether to use fortran to translate the rinex files. 
 
     nolook : bool, optional
-        This parameter tells the code not to retrieve RINEX files from your local machine.
-        default is False.
+        tells the code to retrieve RINEX files from your local machine
 
     archive : str, optional
         Select which archive to get the files from. Default is all
@@ -221,7 +207,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         end day of year to be downloaded. 
 
     year_end : int, optional
-        end year. Default is None.
+        end year. 
 
     overwrite : bool, optional
         Make a new SNR file even if one already exists (overwrite existing file).

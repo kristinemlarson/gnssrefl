@@ -50,7 +50,6 @@ def download_tides(station: str, network : str, date1: str = None, date2: str = 
     download_tides thul ioc 20210101 20210131
 
     download_tides 5970026 wsv 
-        only downloads last two weeks
 
     download_tides 10313 psmsl
 
