@@ -1,4 +1,4 @@
-# Designing a GNSS Reflections Site
+# What is a good GNSS Reflections Site?
 
 ![img](http://www.kristinelarson.net/wp-content/uploads/2017/12/smm3_anim_new-1.gif)
 *Reflection zones at Summit Camp, Greenland, where the GNSS antenna is ~16 meters above the surface.*
@@ -55,7 +55,7 @@ make sure that you can sense the surface you want to measure. This is extremely
 * If you are trying to measure snow accumulation in polar regions, you should ensure that your antenna is always at
   least 1 meters above the highest snow level. This may mean you need to revisit your site to reset the pole vertically.
 
-## Operating a GNSS reflections site:
+## Operating a good GNSS reflections site:
 
 * Always remove the elevation mask on the receiver.
 * Set the sampling interval by evaluating reflection surfaces. The standard GNSS sampling interval of thirty seconds was

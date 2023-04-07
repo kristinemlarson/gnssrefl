@@ -65,12 +65,14 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives.
     
-    Examples:
+    :example:
 
     rinex2snr mchn 2022 15  -archive sopac
 
     would translate station mchn for the year/doy 2022/15 using data from the sopac archive
     and GPS orbits.
+
+    :example:
 
     rinex2snr mchn 2022 15  -orb rapid -archive sopac
 

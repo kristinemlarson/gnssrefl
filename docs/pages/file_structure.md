@@ -102,15 +102,7 @@ the "json" files, e.g. p041.json for station p041.
 It also includes the refraction file (p041_refr.txt) that is 
 created automatically. This calculation 
 requires a set of parameters stored in a "pickle" format, gpt_1wA.pickle. 
-It should be automatically stored for you.
-
-I don't know why - but the station_pos.db file is stored in REFL_CODE/Files
-As it is an input file, we should probably move it. This file should be required 
-for the code to work, but it is a time saving if you are using a station file
-that is in this database. It is based on a set of coordinates provided by the University 
-of Nevada Reno.  You can query it online with <code>query_unr</code>. It is entirely 
-possible that you are using a station name that is shared with another GNSS site. In 
-those cases you will need to input your lat, long, and ellipsoidal height yourself.
+This file should be automatically stored for you.
 
 ## The SNR data format
 

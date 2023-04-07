@@ -1,31 +1,18 @@
-# quickLook <a name="module2"></a>
+# quickLook 
 
-*As of February 7, 2023: the default maximum Reflector Height has been changed to 8 meters (from 6 meters) since
-this documentation was written. The amplitudes of the four periodogram quadrants are also now set to the same limits.*
+<CODE>quickLook</code> is meant to provide the user with a visual sense of the data 
+at a given site.  It has stored defaults that work for stations with reflectors that are 
+lower than 7 meters or so. 
+[You can change those defaults on the command line.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
 
-Before using <code>gnssir</code>code, I recommend you use <code>quickLook</code>. This allows you
-to quickly test various options (elevation angles, frequencies, azimuths, and quality control 
-parameters). The required inputs are station name, year, and doy of year. **You must have 
-previously translated a RINEX file using <code>rinex2snr</code> to use quickLook.**
+When we made these plots, the default maximum RH was 6 meters. That is why some of the 
+plots end at 6 meters.
 
-<CODE>quickLook</code> has stored defaults for analyzing the spectral characteristics of the SNR data. 
-**In general these defaults are meant to facilitate users where the antenna is less than 5 meters tall.**
-If your site is taller than that, you will need to override the defaults.
-Similarly, the default elevation angles are 5-25 degrees. If that mask includes a reflection region
-you don't want to use, you need to override them.  For more information, use <code>quickLook -h</CODE>
-
-As discussed earlier, there are two QC measures used in <Code>gnssrefl</code>. One is the peak
-value of the peak in the periodogram. Secondly it uses a very simple peak to noise ratio (pk2noise) 
-calculation. In this case the average periodogram amplitude value is calculated for a RH 
-region that you define. For <code>quickLook</code> it uses the same RH region for the the "noise" region.
-
-**Example from Boulder:**
-
-We start with one of our <code>rinex2snr</code> examples, <code>p041</code>
+## Example from Boulder
 
 <code>quickLook p041 2020 132 </CODE>
 
-That command will produce this periodogram summary:
+That command will produce this periodogram summary :
 
 <img src="../_static/p041-l1.png" width=600>
 
@@ -55,20 +42,21 @@ frequency 20:
 **L2C results are always superior to L1 results.** If you have any influence over a GNSS site, please 
 ask the station operators to track modern GPS signals such as L2C and L5.
 
-**Check back for our site on Lake Superior:**
+## Example for Lake Superior
 
-Make a SNR file <code>rinex2snr ross 2020 170</code> and <code>quickLook ross 2020 170 -e1 5 -e2 15</code>
+<code>quickLook ross 2020 170 -e1 5 -e2 15</code>
 
 <img src=../_static/ross-qc.png width=600>
+
 The good RH estimates (in blue in the top panel) are telling us that we were right when we assessed 
 reflection zones using 4 meters. We can also see that the best retrievals are in the southeast quadrant (azimuths 90-180 degrees).
 This is further emphasized in the next panel, that shows the actual periodograms.
 
 <img src=../_static/ross-lsp.png width=600>
 
-[**Example for a site on an ice sheet**](../use_cases/use_gls1.md)
+[Example for a site on an ice sheet](../use_cases/use_gls1.md)
 
-[**Example for a tall site**](../use_cases/use_smm3.md)
+[Example for a tall site](../use_cases/use_smm3.md)
 
 In addition to the **peak2noise** and required amplitude (**ampl**) QC metrics, there is a 
 couple more QC metrics that are hardwired. One is the length of time 
