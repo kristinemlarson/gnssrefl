@@ -9,7 +9,7 @@
 ### [snowdepth() ](https://gnssrefl.readthedocs.io/en/latest/pages/README_snowdepth.html) snowdepth
 ### [vwc() ](https://gnssrefl.readthedocs.io/en/latest/pages/README_vwc.html) soil moisture
 
-## Additional methods
+## Additional methods and utilities
 ### [invsnr() ](https://gnssrefl.readthedocs.io/en/latest/pages/README_invsnr.html) inverse SNR method 
 ### [daily_avg() ](https://gnssrefl.readthedocs.io/en/latest/pages/README_dailyavg.html) daily average RH
 ### [refl_zones() ](https://gnssrefl.readthedocs.io/en/latest/pages/utilities.html) reflection zones for Google Earth
