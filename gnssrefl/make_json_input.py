@@ -58,7 +58,27 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               extension: str = '', ediff: float=2.0, delTmax: float=75.0, azlist: float=[], frlist: float=[] ):
 
     """
-    Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in a json file.
+    Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in a json file which by default is saved
+    in REFL_CODE/<station>.json.
+
+    Examples:
+
+    make_json_input p041 0 0 0 
+
+    uses only GPS frequencies and all azimuths and the coordinates in the UNR database
+
+    make_json_input p041 39.9494 -105.19426 1728.85  -azlist 0 90 90 180 -fr 1 101
+
+    uses input coordinates, GPS L1 and Glonass L1 frequencies, and azimuths between 0 and 180.
+
+    make_json_input p041 39.9494 -105.19426 1728.85  -l2c T -e1 5 -e2 15
+
+    uses only L2C GPS data between elevation angles of 5 and 15 degrees.
+
+    make_json_input p041 39.9494 -105.19426 1728.85  -h1 0.5 -h2 10 -e1 5 -e2 25
+
+    uses only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
+
 
     Parameters
     ----------

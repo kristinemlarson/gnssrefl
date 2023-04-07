@@ -1,13 +1,14 @@
 # invsnr
 
 This is a utility for analyzing time-varying smooth surfaces with GNSS interferometric reflectometry.
-The method was first introduced by [Joakim Strandberg](https://github.com/Ydmir) and his colleagues. This implementation of the method was written by 
+The method was first introduced by [Joakim Strandberg](https://github.com/Ydmir) and 
+his colleagues. This implementation of the method was written by 
 [David Purnell](https://purnelldj.github.io/). It reads the inputs from the <code>gnssrefl</code> package (SNR files). 
-It analyzes L1, L2, and L5 signals and the GPS, Galileo, and Glonass constellations.
+It analyzes L1, L2, and L5 signals and the GPS, Galileo, Glonass, and Beidou constellations.
 
-You might notice that the Lomb Scargle Periodogram (LSP) results from this software are different 
-than <code>gnssir</code>. In some locations you might see relatively large outliers. *This is to be expected.* 
-This code uses the LSP results as a starting place - the quality control applied 
+You might notice that the Lomb Scargle Periodogram (LSP) results displayed from this software are different 
+than the <code>gnssir</code>. In some locations you might see relatively large outliers. *This is to be expected.* 
+This code uses the LSP results as a starting solution - the quality control applied 
 is entirely different than what was used in <code>gnssir</code>. Since the point of this code is to estimate smoothly
 varying sea level, I don't think we need to make the LSP portion of it a clone of <code>gnssir</code>. 
 
@@ -21,7 +22,7 @@ Note:
 
 ## Running the code
 
-The <code>gnssrefl</code> **REFL_CODE** environment variable must be set. This variable is used for storage of 
+The  **REFL_CODE** environment variable must be set. This variable is used for storage of 
 the SNR files and the inputs to the analysis strategy.
 
 I. Make SNR files as you would normally for the <code>gnssrefl</code> using <code>rinex2snr</code>. They will be stored in

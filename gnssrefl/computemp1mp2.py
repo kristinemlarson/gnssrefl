@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-computes mp1mp2 using teqc
-kristine larson
-2020sep03 - modified environment variable requirement
-"""
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,6 +12,8 @@ import gnssrefl.gps as g
 
 def vegplt(station, tv,winter):
     """
+    makes a plot of MP1 multipath metric. Sends to the screen
+
     Parameters
     ----------
     station : str
@@ -47,6 +43,8 @@ def vegplt(station, tv,winter):
 
 def sfilename(station, year, doy):
     """
+    Finds mp1 filename on your system
+
     Parameters
     ----------
     station : string
@@ -72,11 +70,11 @@ def sfilename(station, year, doy):
 
 def ReadRecAnt(teqclog):
     """
-    prints out Receiver and Antenna name
+    prints out Receiver and Antenna name from a teqc log
 
     Parameters
     ----------
-    teqclog : string
+    teqclog : str
         the name of a teqc log 
 
     """
@@ -177,6 +175,7 @@ def check_directories(station,year):
         4 character station name
 
     year : int
+        full year
 
     """
     navfiledir = os.environ['ORBITS']  + '/' + str(year)
@@ -204,16 +203,15 @@ def check_directories(station,year):
 
 def get_files(station,year,doy,look):
     """
-    Phrameters
+    Parameters
     ----------
-    station : string
-
-    year : integer
-
-    doy : integer
+    station : str
+        4 character station name
+    year : int
+        full year
+    doy : int
         day of year
-
-    look : boolean
+    look : bool
         whether you should try to get the file from unavco 
         if it does not exist locally
 
