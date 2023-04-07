@@ -4,7 +4,7 @@
 Welcome to the gnssrefl Documentation!
 =====================================
 
-``gnssrefl`` (pronounced "gee / en / es / es / ref•le") is an open source, python version of GNSS interferometric reflectometry (GNSS-IR) code.
+``gnssrefl`` is an open source python-based software package for GNSS interferometric reflectometry (GNSS-IR).
 
 .. image:: https://img.shields.io/pypi/v/gnssrefl.svg
 

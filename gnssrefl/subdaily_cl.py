@@ -58,18 +58,17 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0):
     """
-    subdaily combines multiple day solutions and applies relevant corrections. 
-    It works on one year at a time, though you can restricts time periods within a year with -doy1 and -doy2
+    subdaily combines multiple day gnssir solutions and applies relevant corrections. 
+    It works on one year at a time; you can restricts time periods within a year with -doy1 and -doy2
 
-    Example:
+    Example for all solutions in 2023:
 
     subdaily at01 2023
 
-    or 
+    example for all solutions in 2023 between days of year 15 through 45
 
     subdaily at01 2023 -doy1 15 -doy2 45
 
-    would only look at the thirty days between days of year 15-45.
 
     The code has two sections. 
 
@@ -85,7 +84,6 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
     - removes an interfrequency (IF) bias. All solutions are then relative to GPS L1.
 
-
     txtfile_part1 is optional input if you want to skip part 1 and use your own file (but in the same format).
 
     txtfile_part2 is optional input to the second part of the code.
@@ -94,16 +92,14 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     Parameters
     ----------
 
-    station : string
+    station : str
         4 character id of the station.
-    year : integer
-        Year
+    year : int
+        full year
     txtfile_part1 : str, optional
-        File name.
-        default is None - will set name for you.
+        input File name.
     txtfile_part2 : str, optional
         Input filename for rhdot/spline fitting
-        default is None
     csvfile: boolean, optional
         Set to True if you prefer csv to plain txt.
         default is False.

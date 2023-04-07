@@ -5788,6 +5788,8 @@ def geoidCorrection(lat,lon):
         geoid correction in meters
 
     """
+    # check that file exists
+    foundfile = checkEGM()
     egm = EGM96.EGM96geoid()
     geoidC = egm.height(lat=lat,lon=lon)
 
@@ -5807,6 +5809,10 @@ def checkEGM():
     xdir = os.environ['REFL_CODE']
     matfile = 'EGM96geoidDATA.mat'
     localdir = xdir + '/Files/'
+    if not os.path.isdir(localdir):
+        print('Making ', localdir)
+        subprocess.call('mkdir',localdir)
+
     egm = localdir + matfile
     if 'REFL_CODE' in os.environ:
         egm = localdir + matfile
@@ -5814,12 +5820,14 @@ def checkEGM():
             print('EGM96 file exists')
             foundfile = True
         else:
-            print('EGM96 file does not exist. We will try to download it for you.')
+            print('EGM96 file does not exist. We will try to download and store it in ',localdir)
             githubdir = 'https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/docs/'   
             wget.download(githubdir+matfile, localdir + matfile)
             if os.path.isfile(egm):
-                print('successful download, egm file exists')
+                print('successful download, EGM file exists')
                 foundfile = True
+            else:
+                print('unsuccessful download')
     else:
         print('The REFL_CODE environment variable has not been set.')
 

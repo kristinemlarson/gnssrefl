@@ -144,6 +144,7 @@ The columns in the SNR data are defined as:
 
 The unit for all SNR data is dB-Hz.
 
+
 ## GNSS frequencies
 
 - 1,2,20, and 5 are GPS L1, L2, L2C, and L5 
@@ -156,3 +157,10 @@ set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
 - 302, 306, 307 : Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz
 
 
+## Additional files
+
+- EGM96geoidDATA.mat is stored in REFL_CODE/Files
+- station_pos.db is stored in REFL_CODE/Files 
+- gpt_1wA.pickle is stored in REFL_CODE/input
+
+We will be moving these to a single place after our short course!
