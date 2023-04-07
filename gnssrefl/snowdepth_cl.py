@@ -6,6 +6,7 @@ import sys
 
 import gnssrefl.gps as g
 import gnssrefl.snow_functions as sf
+import gnssrefl.daily_avg_cl as da
 
 from gnssrefl.utils import str2bool
 
@@ -22,6 +23,9 @@ def parse_arguments():
     parser.add_argument("-plt_enddate", help="end date for the plot, yyyy-mm-dd", type=str, default=None)
     parser.add_argument("-plt", help="whether you want the plot to come to the screen", type=str, default=None)
     parser.add_argument("-simple", help="use simple algorithm (default is false)", type=str, default=None)
+    parser.add_argument("-medfilter", help="median filter for daily average(m)", type=float, default=None)
+    parser.add_argument("-ReqTracks", help="how many arcs needed for daily average)", type=int, default=None)
+
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -35,7 +39,7 @@ def parse_arguments():
 
 def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None, 
-        plt_enddate:str=None,simple:bool=False):
+        plt_enddate:str=None,simple:bool=False, medfilter:float = None, ReqTracks: int = None):
     """
     Calculates snow depth for a given station and water year.
     Before you run this code you must have run gnssir for each day of interest.  
@@ -83,8 +87,18 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
     simple: bool, optional
         whether you want to use simple algoirthm. Default is False
         which means you use azimuth corrected bare soil values
+    medfilter: float, optional
+        to avoid running daily_avg, you can set median filter in meters;
+        this is used to remove large outliers
+    ReqTracks: int, optional
+        to avoid running daily_avg, you can set required number of tracks 
+        to create a daily average RH
 
     """
+    if (medfilter is not None) and (ReqTracks is not None):
+        print('Running daily average')
+        txtfile=None; pltit = False
+        da.daily_avg(station, medfilter, ReqTracks,  txtfile,pltit,'',2005,2030,0,False,0,360,False,None)
 
     # default days of year used for bare soil
     # september from the fall

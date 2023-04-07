@@ -13,7 +13,7 @@ Once installed, type `docker run hello-world` in terminal to check if installed 
 
 More information on [getting started, testing your installation, and developing.](https://docs.docker.com/get-started/) 
 
-Useful tool to use is [Docker Desktop](https://www.docker.com/products/docker-desktop)
+[Docker Desktop](https://www.docker.com/products/docker-desktop) is a useful tool.
 
 ## Run gnssrefl Docker
 

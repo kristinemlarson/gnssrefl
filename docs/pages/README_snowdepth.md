@@ -23,8 +23,17 @@ is fairly horizontal. It would be perfectly fine to add more inputs (like settin
 azimuth ranges to smaller or larger azimuth increments). I will leave that
 to the community to make as a PR.
 
-Before you run the snowdepth module, you are required to run the <code>daily_avg</code> 
-module. This basically makes sure that gross outliers have been removed.  Depending on which algorithm choice
+Before you run the snowdepth module, you need to consolidate your RH results. You have two choices:
+
+- you can run the <code>daily_avg</code> module. 
+
+or 
+
+- you can set the -medfilter and -ReqTracks optional inputs to snowdetph.
+
+Either makes sure that gross outliers have been removed. Read the daily_avg documentation for more information.
+
+Depending on which algorithm choice
 you make (simple vs. azimuthal), the code will use either the full list of arc specific LSP files or the daily average.
 
 Optional inputs include:
