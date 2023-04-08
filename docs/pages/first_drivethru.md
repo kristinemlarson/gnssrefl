@@ -4,7 +4,7 @@
 About 75% of these uses cases require access to the Earthscope/UNAVCO 
 archive. You need to [sign up for an account.](https://data-idm.unavco.org/user/profile/login)
 
-Some of these use cases were created with an earlier version of the sfotware.
+Some of these use cases were created with an earlier version of the software.
 The plots might look slightly different and the defaults we used in the analysis might have changed.
 
 
