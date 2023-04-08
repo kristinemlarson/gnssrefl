@@ -39,6 +39,9 @@ Example for multi-day translation
 
 <code>rinex2snr tgho 2019 1  -archive nz -doy_end 365</code>
  
+Multi-GNSS: 
+
+<code>rinex2snr mchl00aus 2022 55 -archive ga -orb gnss</code>
 
 RINEX 3 Example calls:
 
@@ -55,15 +58,6 @@ RINEX 3 Example calls:
 
 **What if you want to use high-rate data?**  <code>-rate high</code>
 
-Generic orbit file options :*
-
-- gps : will use GPS broadcast orbits (**this is the default**)
-- gps+glo : uses rapid GFZ orbits
-- gnss : uses GFZ orbits, which is multi-GNSS (available in 3-4 days?)
-- rapid : uses GFZ multi-GNSS rapid orbits, available since mid-2021 in ~1 day
-- ultra : since mid-2021, we can use multi-GNSS near realtime orbits from GFZ
-
-[For more options](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
 
 [For more information on file formats, signals, conventions](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html)
 

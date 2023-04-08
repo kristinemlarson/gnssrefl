@@ -39,15 +39,14 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     These phase results are subquently used in vwc. The command line call is phase
     (which maybe we should change).
     
-    Examples:
-   
-    For one day
+    Examples
+    --------
 
     phase p038 2021 4
-
-    For the whole year
+        analyzes data from day of year 4
 
     phase p038 2021 1 -doy_end 365 
+        analyzes data for the whole year
 
 
     Parameters

@@ -2,8 +2,7 @@
 
 ## make_json_input 
 
-Before you estimate reflector heights, you need a set 
-of instructions. These are made using <code>make_json_input</code>. 
+Before you estimate reflector heights, you need a set of instructions. These are made using <code>make_json_input</code>. 
 The required inputs are: 
 
 * station name 
@@ -27,16 +26,15 @@ If you are using a site that is in the UNR station database, the *a priori* valu
 
 The json file of instructions will be put in $REFL_CODE/input/p101.json. 
 
-Warning: Azimuth regions should not be larger than ~100 degrees. If for example you want to use the region from 0 to 
+The default azimuth inputs are four regions, each of 90 degrees.  
+You set your preferred azimuth regions using -azlist. Azimuth regions should not be larger 
+than ~100 degrees. If for example you want to use the region from 0 to 
 270 degrees, you should not set a region from 0 - 270, but instead a region from 0-90, 90-180, and the last
-from 180-270. I know this is a bit offputting for people, but having these smaller regions makes the code
-easier to maintain (i.e. you are less likely to have more than one rising and setting arc for a single satellite).
+from 180-270. 
 
 Example:
 
 <CODE>make_json_input p101 0 0 0   -azlist 0 90 90 180 180 270</CODE>
-
-The default is to allow four regions, each of 90 degrees.  
 
 
 ## gnssir
@@ -46,7 +44,7 @@ The minimum inputs are the station name, year, and doy
 
 <CODE>gnssir p041 2020 150</CODE> 
 
-[Additional inputs.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html)
+[Additional inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html)
 
 Where would the code store the files for this example?
 
@@ -65,6 +63,8 @@ This is a snippet of what the result file would look like
 
 <img src="../_static/results-snippet.png" width="600">
 
+Note that the names of the columns (and units) are provided:
+
 - *Amp* is the amplitude of the most significant peak in the periodogram (i.e. the amplitude for the RH you estimated).  
 - *DelT* is how long a given rising or setting satellite arc was, in minutes. 
 - *emin0* and *emax0* are the min and max observed elevation angles in the arc.
@@ -77,6 +77,5 @@ This is a snippet of what the result file would look like
 - EdotF is used in the RHdot correction needed for dynamic sea level sites. The units are hours/rad.
 When multiplied by RHdot (meters/hour), you will get a correction in units of meters. For further
 information, see the <code>subdaily</code> code.
-
 
 
