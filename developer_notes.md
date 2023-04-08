@@ -1,4 +1,9 @@
-# user guide
+# but it will be here
+https://readthedocs.org/projects/gnssrefl/downloads/
+
+https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/
+
+# user guide not updated
 https://buildmedia.readthedocs.org/media/pdf/gnssrefl/latest/gnssrefl.pdf
 
 Local notes:
