@@ -10,76 +10,64 @@ The plots might look slightly different and the defaults we used in the analysis
 
 #### Ice Sheets
 
-* [Lorne, Antarctica](../use_cases/use_lorg.md) 
-[lorg](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lorg.html)
+* [Lorne, Antarctical](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lorg.html)
 
-* [Dye2, Greenland](../use_cases/use_gls1.md) 
-[gls1](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_gls1.html)
+* [Dye2, Greenland](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_gls1.html)
 
-* [Thwaites Glacier, Antarctica](../use_cases/use_lthw.md) 
-[lthw](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lthw.html)
+* [Thwaites Glacier, Antarctica](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lthw.html)
 
-* [Summit Camp, Greenland](../use_cases/use_smm3.md) 
-[smm3](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_smm3.html)
+* [Summit Camp, Greenland](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_smm3.html)
 
-* [Phoenix, Antarctica](../use_cases/use_phnx.md) 
-[phnx](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_phnx.html)
+* [Phoenix, Antarctica](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_phnx.html)
 
 #### Lakes, Reservoirs, and Rivers
 
-* [Michipicoten, Canada](../use_cases/use_mchn.md) 
-[mchn](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchn.html)
+* [Michipicoten, Canada](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchn.html)
 
-* [Lake Taupo, New Zealand](../use_cases/use_tgho.md) 
-[tgho](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tgho.html)
+* [Lake Taupo, New Zealand](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tgho.html)
 
-* [Steenbras, South Africa](../use_cases/use_sbas.md) 
-[sbas](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_sbas.html)
+* [Steenbras, South Africa](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_sbas.html)
 
-* [St Lawrence River,Canada](../use_cases/use_pmtl.md) 
-[sbas](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_pmtl.html)
+* [St Lawrence River,Canada](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_pmtl.html)
 
-* [Lake Mathews, Riverside, USA](../use_cases/use_mat2.md) 
-[sbas](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mat2.html)
+* [Lake Mathews, Riverside, USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mat2.html)
 
-* [Lake Malawi, Tanzania](../use_cases/use_mbbc.md) 
-[mbbc](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mbbc.html)
+* [Lake Malawi, Tanzania](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mbbc.html)
 
-* [Lake Yellowstone, USA](../use_cases/use_p709.md) 
-[p709](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p709.html)
+* [Lake Yellowstone, USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p709.html)
 
 #### Soil Moisture 
 
-* [Portales, New Mexico USA](../use_cases/use_p038.md) 
+* [Portales, New Mexico USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p038.html)
 
-* [Mitchell, Australia](../use_cases/use_mchl.md) 
+* [Mitchell, Australia](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchl.html)
 
-* [Victorville, CA USA ](../use_cases/use_scia.md) 
+* [Victorville, California USA ](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_scia.html)
 
-* [Boulder, CO USA](../use_cases/use_mfle.md) 
+* [Boulder, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mfle.html)
 
-* [San Diego, CA USA ](../use_cases/use_p475.md) 
+* [San Diego, California USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p475.html)
 
 #### Seasonal Snow Accumulation
 
-* [Marshall, CO USA](../use_cases/use_p041.md) 
+* [Marshall, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p041.html)
 
-* [Niwot Ridge, CO USA](../use_cases/use_nwot.md) 
+* [Niwot Ridge, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_nwot.html)
 
-* [Half Island Park, ID USA](../use_cases/use_p360.md) 
+* [Half Island Park, Idaho USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p360.html)
 
-* [Utqiagvik, AK USA](../use_cases/use_utqi.md) 
+* [Utqiagvik, Alaska USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_utqi.html)
 
 #### Tides 
 
-* [Friday Harbor, WA USA](../use_cases/use_sc02.md) 
+* [Friday Harbor, Washington USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_sc02.html)
 
-* [St Michael, Alaska USA](../use_cases/use_at01.md)
+* [St Michael, Alaska USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_at01.html)
 
-* [Vlissingen, the Netherlands](../use_cases/use_vlis.md)
+* [Vlissingen, the Netherlands](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_vlis.html)
 
-* [Puerto Penasco, Mexico](../use_cases/use_tnpp.md)
+* [Puerto Penasco, Mexico](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tnpp.html)
 
-* [Elbe River, Germany](../use_cases/use_tggo.md)
+* [Elbe River, Germany](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tggo.html)
 
 

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.2
+
+Fixed links in the online docs to eventually allow a pdf user guide.
+
 ## 1.3.1
 
 removed download_tides - now download_noaa explicitly. Will ultimately combine

@@ -34,7 +34,7 @@ def parse_arguments():
 def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, el_height: float=None, 
         RH: str=None, fr: int = 1, el_list: float= [], azlist : float=[], system: str = 'gps', output: str = None):
     """
-    creates KML file for reflection zones to be used in Google Earth
+    Creates a KML file for reflection zones to be used in Google Earth
 
     If station is in the UNR database, those lat/lon/el_height values are used. You may override those values 
     with the optional inputs.
@@ -42,19 +42,28 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     The output file will be stored in REFL_CODE/Files/kml unless you specify an output name. In that case
     it will go into your working directory
 
+    Examples
+    --------
+
+    refl_zones p041 -RH 2
+
+    refl_zones sc02 -fr 2 -azlist 40 240
+
+    refl_zones p041 -RH 2 -system galileo
+
     Parameters
     ----------
     station : str
         station name
-    azim1 : int
+    azim1 : int, optional
         min azimuth angle in deg
-    azim2 : int
+    azim2 : int, optional
         max azimuth angle in deg
-    lat : float
+    lat : float, optional
         latitude in deg
-    lon : float
+    lon : float, optional
         longitude in deg
-    el_height : float
+    el_height : float, optional
         ellipsoidal height in m
     RH : str, optional
         user-defined reflector height (m)
@@ -64,7 +73,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     el_list : list of floats
         elevation angles desired (deg)
         default is 5, 10, 15
-    azlist : list of floats (optional)
+    azlist : list of floats, optional
         azimuth angle regions (deg) Must be in pairs, i.e. 0 90 180 270
     system : str, optional
         name of constellation (gps,glonass,galileo, beidou allowed)

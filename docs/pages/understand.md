@@ -17,7 +17,7 @@ I had a [working matlab version on github](https://github.com/kristinemlarson/gn
 but I will not be updating it. You will very likely have to make changes to accommodate the recent
 change in security protocols at CDDIS.
 
-###  *Goals*
+## Goals
 
 The goal of the gnssrefl python repository is to help you compute (and evaluate) GNSS-based
 reflectometry parameters using geodetic data. This method is often
@@ -37,7 +37,7 @@ to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s1
 or similar. You can also watch some background videos 
 on GNSS-IR at [youtube](https://www.youtube.com/channel/UCC1NW5oS7liG7C8NBK148Bg).
 
-### *Philosophy*
+## Philosophy
 
 In geodesy, you don't really need to know much about what you are doing to 
 calculate a reasonably precise position from GPS data. That's just the way it is.
@@ -55,9 +55,7 @@ I encourage you to get to know your site. If it belongs to you, look at
 photographs. If you can't find photographs, use Google Earth.  You can also try using
 my [google maps web app interface](https://gnss-reflections.org/geoid?station=smm3).
 
-## Method
-
-### Signals and Sources
+## Signals and Sources
 
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
 an interference pattern that can be observed in GNSS Signal to Noise Ratio (SNR) data as a satellite rises or sets. 
@@ -116,7 +114,7 @@ used to measure tides.
 <img src="../_static/pbay-snr.png" width="600"/>
 </p>
 
-### Considerations
+## Considerations
 
 A couple common sense issues: one is that since you define the noise region, if you make it really large, that 
 will artificially make the peak2noise ratio larger. I have generally used a region of 6-8 meters for this 
@@ -202,6 +200,8 @@ in azimuth also looks it will be problematic. Panel D shows a smaller elevation 
 off azimuths at 160. These choices appear to be better than those from Panel C.  
 It is also worth noting that the GPS antenna has been attached to a pier - 
 and *boats dock at piers*. You might very well see outliers at this site when a boat is docked at the pier.
+
+Note: we now have a [refl_zones tool](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html) in the gnssrefl package.
 
 Once you have the code set up, it is important that you check the quality of data. This will also 
 allow you to check on your assumptions, such as the appropriate azimuth and elevation angle 
