@@ -3,8 +3,8 @@ https://readthedocs.org/projects/gnssrefl/downloads/
 
 https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/
 
-# user guide not updated
-https://buildmedia.readthedocs.org/media/pdf/gnssrefl/latest/gnssrefl.pdf
+# user guide not updated, so useless
+#https://buildmedia.readthedocs.org/media/pdf/gnssrefl/latest/gnssrefl.pdf
 
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f

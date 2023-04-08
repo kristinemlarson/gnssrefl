@@ -11,18 +11,24 @@ The plots might look slightly different and the defaults we used in the analysis
 #### Ice Sheets
 
 * [Lorne, Antarctica](../use_cases/use_lorg.md) 
+[lorg](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lorg.html)
 
 * [Dye2, Greenland](../use_cases/use_gls1.md) 
+[gls1](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_gls1.html)
 
 * [Thwaites Glacier, Antarctica](../use_cases/use_lthw.md) 
+[lthw](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lthw.html)
 
 * [Summit Camp, Greenland](../use_cases/use_smm3.md) 
+[smm3](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_smm3.html)
 
 * [Phoenix, Antarctica](../use_cases/use_phnx.md) 
+[phnx](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_phnx.html)
 
 #### Lakes, Reservoirs, and Rivers
 
 * [Michipicoten, Canada](../use_cases/use_mchn.md) 
+[mchn](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchn.html)
 
 * [Lake Taupo, New Zealand](../use_cases/use_tgho.md) 
 [tgho](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tgho.html)
@@ -31,12 +37,16 @@ The plots might look slightly different and the defaults we used in the analysis
 [sbas](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_sbas.html)
 
 * [St Lawrence River,Canada](../use_cases/use_pmtl.md) 
+[sbas](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_pmtl.html)
 
 * [Lake Mathews, Riverside, USA](../use_cases/use_mat2.md) 
+[sbas](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mat2.html)
 
 * [Lake Malawi, Tanzania](../use_cases/use_mbbc.md) 
+[mbbc](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mbbc.html)
 
 * [Lake Yellowstone, USA](../use_cases/use_p709.md) 
+[p709](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p709.html)
 
 #### Soil Moisture 
 
