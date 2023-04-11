@@ -26,7 +26,7 @@
 # Course Instructors
 
 * [Kristine Larson](https://github.com/kristinemlarson) (University of Bonn, Germany) GNSS-IR, gnssrefl software
-<image src = "https://gnss-reflections.org/static/images/tim_dittmann.jpg" width="50px"></image>
+
 * [Felipe Nievinski](https://github.com/fgnievinski) (Uni. Federal do Rio Grande do Sul - Brazil) Theory, water levels, sensors
 ![profile](https://github.com/fgnievinski.png)
 * [Makan Karegar](https://github.com/MakanAKaregar) (Uni. Bonn- Germany) cheap GNSS-IR sensors, water levels 
@@ -35,6 +35,6 @@
 * David Purnell (Laval University - Canada) water levels, cheap GNSS-IR sensors
 * Thomas Nylen (Danish Technical University, Denmark) - installing GNSS sites for GNSS-IR
 * [Kelly Enloe](https://github.com/k-enloe) (EarthScope - USA) – Jupyter notebooks, python, gnssrefl software
-![profile](https://github.com/k-enloe.png)
+<image src = "https://gnss-reflections.org/static/images/kellyenloe.jpg" width="100px"></image>
 * [Tim Dittmann](https://github.com/timdittmann) (EarthScope - USA) – python, gnssrefl software
-![profile](https://github.com/timdittmann.png)
+<image src = "https://gnss-reflections.org/static/images/tim_dittmann.jpg" width="100px"></image>
