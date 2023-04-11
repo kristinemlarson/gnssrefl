@@ -26,7 +26,7 @@
 # Course Instructors
 
 * [Kristine Larson](https://github.com/kristinemlarson) (University of Bonn, Germany) GNSS-IR, gnssrefl software
-![profile](https://gnss-reflections.org/static/images/tim_dittmann.jpg)
+<image src = "https://gnss-reflections.org/static/images/tim_dittmann.jpg" width="50px"></image>
 * [Felipe Nievinski](https://github.com/fgnievinski) (Uni. Federal do Rio Grande do Sul - Brazil) Theory, water levels, sensors
 ![profile](https://github.com/fgnievinski.png)
 * [Makan Karegar](https://github.com/MakanAKaregar) (Uni. Bonn- Germany) cheap GNSS-IR sensors, water levels 
