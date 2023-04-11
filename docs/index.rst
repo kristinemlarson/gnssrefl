@@ -32,5 +32,7 @@ Welcome to the gnssrefl Documentation!
    pages/new_station.md
    api
 
+   pages/sc_index
+
 .. note::
    These docs are still under development; feedback is appreciated.

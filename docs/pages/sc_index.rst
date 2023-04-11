@@ -3,8 +3,9 @@
 ########
 
 May 2-5, 2023 Virtual Short Course.
-
-GNSS-IR is a method for estimating environmental parameters using data from geodetic-quality GNSS sites.
+.. image:: _static/tnpp_rhdot_1.png
+   :width: 600
+   for estimating environmental parameters using data from geodetic-quality GNSS sites.
 
 **The goals for this short course are to:**
 
