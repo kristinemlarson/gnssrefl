@@ -25,6 +25,8 @@ def main():
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
+    parser.add_argument("-dec", default=0, type=int, help="decimate rate (seconds)")
+    parser.add_argument("-rate", default=None, type=int, help="NMEA original sampling rate (seconds)")
 
     args = parser.parse_args()
 
@@ -62,8 +64,11 @@ def main():
     overwrite = False
     if (args.overwrite == 'True'):
         overwrite = True
+    
+    if args.dec !=0 and args.dec <= args.rate:
+        sys.exit('decimate rate should be greater than samplig rate') 
         
-    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite)
+    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite, args.dec, args.rate)
 
 if __name__ == "__main__":
     main()
