@@ -8,4 +8,4 @@ Please use the search feature of Slack to try to avoid duplication, and **please
 
 For methodology-related questions, please email instructors or better still post a [GitHub issue](https://github.com/kristinemlarson/gnssrefl/issues).
 
-## FAQ
+## Installation FAQ

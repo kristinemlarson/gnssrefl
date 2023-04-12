@@ -31,7 +31,7 @@ Welcome to the gnssrefl Documentation!
    pages/contributions_questions.md
    pages/new_station.md
    api
-
+..
    pages/sc_index
 
 .. note::
