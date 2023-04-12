@@ -1,13 +1,17 @@
 #####################################################
 2023 GNSS Interferometric Reflectometry Short Course
 #####################################################
-
 May 2-5, 2023 Virtual Short Course.
 
-.. raw:: html
-   :url: https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg 
+.. toctree::
+   :maxdepth: 1
 
-.. image:: _static/tnpp_rhdot_1.png
+   sc_precourse.md
+   sc_questions.md
+   sc_agenda_and_instructors.md
+   sc_media.md
+
+.. image:: docs/_static/tnpp_rhdot_1.png
    :width: 600
 
 **The goals for this short course are to:**
@@ -17,16 +21,10 @@ May 2-5, 2023 Virtual Short Course.
 * demonstrate and discuss gnssrefl use in practical sessions on snow accumulation, soil moisture and water levels.
 * provide guidance on GNSS-IR site location selection, use of low-cost sensors and contributing to open-source scientific software. 
   
-.. toctree::
-   :maxdepth: 1
 
-   sc_precourse.md
-   sc_questions.md
-   sc_agenda_and_instructors.md
-   sc_media.md
+**Useful links**:
+`Earthscope Registration/Course page <https://www.earthscope.org/event/2023-gnss-ir-short-course/>`_ |
+`Software documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_ |
+`Software installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
-Key Links:
-* `Earthscope Course page <https://www.earthscope.org/event/2023-gnss-ir-short-course/>`_ with registration, learning objectives and prereqs.
-* `Software documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_
-* `Software installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
