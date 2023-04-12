@@ -1,17 +1,14 @@
-########
+#####################################################
 2023 GNSS Interferometric Reflectometry Short Course
-########
+#####################################################
 
 May 2-5, 2023 Virtual Short Course.
 
 .. raw:: html
-   <p align=center>
-   <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg" width=500>
-   </p>  
+   :url: https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg 
 
 .. image:: _static/tnpp_rhdot_1.png
    :width: 600
-   for estimating environmental parameters using data from geodetic-quality GNSS sites.
 
 **The goals for this short course are to:**
 
@@ -23,10 +20,10 @@ May 2-5, 2023 Virtual Short Course.
 .. toctree::
    :maxdepth: 1
 
-   pages/sc_precourse.md
-   pages/sc_questions.md
-   pages/sc_agenda_and_instructors.md
-   pages/sc_media.md
+   sc_precourse.md
+   sc_questions.md
+   sc_agenda_and_instructors.md
+   sc_media.md
 
 Key Links:
 * `Earthscope Course page <https://www.earthscope.org/event/2023-gnss-ir-short-course/>`_ with registration, learning objectives and prereqs.
