@@ -2,7 +2,7 @@
 2023 GNSS Interferometric Reflectometry Short Course
 #####################################################
 May 2-5, 2023 Virtual Short Course.
-**Useful links**:
+
 `Earthscope Registration/Course page <https://www.earthscope.org/event/2023-gnss-ir-short-course/>`_ |
 `Software documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_ |
 `Software installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
@@ -15,7 +15,7 @@ May 2-5, 2023 Virtual Short Course.
    sc_agenda_and_instructors.md
    sc_media.md
 
-.. image:: docs/_static/tnpp_rhdot_1.png
+.. image:: ../_static/tnpp_rhdot_1.png
    :width: 600
 
 **The goals for this short course are to:**
