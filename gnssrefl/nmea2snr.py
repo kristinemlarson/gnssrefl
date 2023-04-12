@@ -13,7 +13,7 @@ import gnssrefl.gps as g
 
 #Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
 
-def NMEA2SNR(locdir, fname, snrfile, csnr):
+def NMEA2SNR(locdir, fname, snrfile, csnr, dec, sample_rate):
     """
 
     Parameters
@@ -26,6 +26,10 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
         name of output file for SNR data
     csnr : str
         snr option, i.e. '66' or '99'
+    dec: int
+        decimation rate. 0 is default.    
+    rate: int    
+        NMEA original sampling rate.      
         
     """
     
@@ -167,7 +171,10 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
     
                 fout.write(outline + snrline + '\n')
                 #fout.write("%3g %10.4f %10.4f %10g %4s %4s %7.2f %4s %4s\n" % (p, float(ELV[i]), float(AZ[i]), float(T[i]),'0', '0', float(SNR[i]),'0', '0')) 
-    
+                    
+    if dec != 0:
+        decimate_snr(snrfile, dec, sample_rate)
+        
 def read_nmea(fname):
     """
     read GPGGA sentence (includes snr data) in NMEA files    
@@ -545,7 +552,7 @@ def elev_limits(snroption):
 
     return emin, emax
   
-def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
+def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, rate):
     """
     runs the nmea2snr conversion code
 
@@ -565,6 +572,12 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
 
     overwrite : bool
         whether make a new SNR file even if one already exists
+    
+    dec: int
+        decimation rate. 0 is default.    
+    
+    rate: int    
+        NMEA original sampling rate.      
 
     """
     # loop over years and day of years
@@ -592,7 +605,62 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
                 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z'):
                     print('Creating '+snrfile)
-                    NMEA2SNR(locdir, r, snrfile, csnr)
+                    NMEA2SNR(locdir, r, snrfile, csnr, dec, rate)
                     
                 else:
                     print('NMEA file '+ locdir + r +' does not exist')
+
+def decimate_snr(snrfile, dec, sample_rate):
+    """
+
+    given snrfile, decimate rate and sampling rate, returns decimated snr file
+
+    Parameters
+    ----------
+    snrfile : str
+        original snr file (its location and name). 
+
+    Returns
+    -------
+    snrfile : decimated snr file 
+
+    """
+      
+    data = np.loadtxt(snrfile)
+    
+    P_arry = data[:,0]; ELV_arry = data[:,1]; AZ_arry = data[:,2]; T_arry = data[:,3]; 
+    L6_arry = data[:,5]; L1_arry = data[:,6]; L2_arry = data[:,7]; L5_arry = data[:,8]
+    L7_arry = data[:,9]; L8_arry = data[:,10]
+    
+    samples_decimated = int(dec/sample_rate)
+
+    prn_dec = []; ELV_dec = []; AZ_dec = []; T_dec = []; L6_dec = []; L1_dec = []; L2_dec = []; L5_dec = []; L7_dec = []; L8_dec = []; 
+
+    prn_unique = np.unique(P_arry)
+    for i_prn in prn_unique:
+            t= T_arry[P_arry == i_prn]; elv = ELV_arry[P_arry == i_prn]; az = AZ_arry[P_arry == i_prn]; prn = P_arry[P_arry == i_prn];  
+            l6 = L6_arry[P_arry == i_prn]; l1 = L1_arry[P_arry == i_prn]; l2 = L2_arry[P_arry == i_prn]
+            l5 = L5_arry[P_arry == i_prn]; l7 = L7_arry[P_arry == i_prn]; l8 = L8_arry[P_arry == i_prn]
+                
+            ELV_dec.extend(elv[::samples_decimated]); AZ_dec.extend(az[::samples_decimated]); prn_dec.extend(prn[::samples_decimated]);    
+            L6_dec.extend(l6[::samples_decimated]); L1_dec.extend(l1[::samples_decimated]); L2_dec.extend(l2[::samples_decimated]);  
+            L5_dec.extend(l5[::samples_decimated]); L7_dec.extend(l7[::samples_decimated]); L8_dec.extend(l8[::samples_decimated]);  
+            T_dec.extend(t[::samples_decimated])
+        
+            del t, elv, az, prn, l6, l1, l2, l5, l7, l8
+
+    ELV_dec = np.array(ELV_dec); AZ_dec = np.array(AZ_dec); prn_dec = np.array(prn_dec); T_dec = np.array(T_dec);
+    L6_dec = np.array(L6_dec); L1_dec = np.array(L1_dec); L2_dec = np.array(L2_dec); 
+    L5_dec = np.array(L5_dec); L7_dec = np.array(L7_dec); L8_dec = np.array(L8_dec);
+
+    sort = np.argsort(T_dec)
+
+    ELV_dec = ELV_dec[sort]; AZ_dec = AZ_dec[sort]; prn_dec = prn_dec[sort]; T_dec = T_dec[sort]; 
+    L6_dec = L6_dec[sort]; L1_dec = L1_dec[sort]; L2_dec = L2_dec[sort]
+    L5_dec = L5_dec[sort]; L7_dec = L7_dec[sort]; L8_dec = L8_dec[sort]
+
+    with open(snrfile, 'w') as fout:
+        for k in range(len(T_dec)):
+            outline = "%3g %10.4f %10.4f %10g %4s " % (prn_dec[k], float(ELV_dec[k]), float(AZ_dec[k]), float(T_dec[k]), '0')
+            SNRline = "%7.2f %7.2f %7.2f %7.2f %7.2f %7.2f" % (L6_dec[k], L1_dec[k], L2_dec[k], L5_dec[k], L7_dec[k], L8_dec[k])
+            fout.write(outline + SNRline + '\n')                          
