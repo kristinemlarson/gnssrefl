@@ -3,6 +3,12 @@
 ########
 
 May 2-5, 2023 Virtual Short Course.
+
+.. raw:: html
+   <p align=center>
+   <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/TNPP.jpg" width=500>
+   </p>  
+
 .. image:: _static/tnpp_rhdot_1.png
    :width: 600
    for estimating environmental parameters using data from geodetic-quality GNSS sites.
