@@ -201,7 +201,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
 
             unavco : (University Navstar Consortium, now Earthscope)
 
-            all : (searches unavco, sopac, and sonel in that order)
+            all : (searches sopac, unavco, and sonel )
 
     doy_end : int, optional
         end day of year to be downloaded. 
