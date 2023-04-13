@@ -1,4 +1,5 @@
 import argparse
+import matplotlib.pyplot as matplt
 import numpy as np
 import datetime 
 import os
@@ -102,6 +103,8 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         print('Running daily average')
         txtfile=None; pltit = False
         da.daily_avg(station, medfilter, ReqTracks,  txtfile,pltit,'',2005,2030,0,False,0,360,False,None)
+        # do not display these plots
+        matplt.close ('all')
 
     # default days of year used for bare soil
     # september from the fall

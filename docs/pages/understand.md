@@ -66,13 +66,6 @@ a GNSS antenna. This is why GNSS-IR can be used as a snow sensor and tide gauge.
 used to measure soil moisture, but the code to estimate soil moisture is not as strongly related to RH as
 snow and water. We will be posting the code you need to measure soil moisture later in the year.
 
-<p align=center>
-<img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
-</p>
-
-
-Trying a different way
-
 ![](https://gnss-reflections.org/static/images/overview.png)
 
 This code is meant to be used with Signal to Noise Ratio (SNR) data. This is a SNR sample for a site in the 
