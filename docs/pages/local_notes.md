@@ -31,7 +31,9 @@ Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
 docker pull unavdocker/gnssrefl to install code.
 
-[Quick link to the command line homeworks used in the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks). They are numbered homework0, homework1, etc.
+[homeworks used in the October 21 GNSS-IR course](https://github.com/kristinemlarson/gnssrefl/tree/master/tests/homeworks). 
+They are numbered homework0, homework1, etc.
+
 [Quick link to the Jupyter Notebooks](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
 [Quick link to Docker](https://github.com/kristinemlarson/gnssrefl/blob/master/docs/docker_cl_instructions.md)

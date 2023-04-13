@@ -3,20 +3,26 @@
 ## Acknowledgements
 
 - [Radon Rosborough](https://github.com/raxod502) helped with 
-python/packaging questions and improved our docker distribution. 
+python/packaging questions, improved our docker distribution, and 
+set up smoke tests. 
 - [Naoya Kadota](https://github.com/naoyakadota) added the GSI data archive. 
-- Joakim Strandberg provided python RINEX translators. 
+- [Joakim Strandberg](https://github.com/Ydmir) provided 
+python RINEX translators and the EGM96 code. 
 - Johannes Boehm provided source code for the refraction correction. 
-- At UNAVCO, Kelly Enloe made Jupyter notebooks and Tim Dittmann made docker builds. 
-- Makan Karegar added the NMEA capability.
-- Dave Purnell provided his inversion code, which is now running in the <code>invsnr</code> capability.  
-- Carolyn Roesler helped with the original Matlab codes.
-- Felipe Nievinski and Simon Williams have provided significant advice for this project.
+- [Makan Karegar](https://github.com/MakanAKaregar) added the NMEA capability.
+- [Dave Purnell](https://github.com/purnelldj) provided his SNR 
+inversion code. 
+- Carolyn Roesler helped with the original GNSS-IR Matlab codes.
+- [Felipe Nievinski](https://github.com/fgnievinski) 
+and Simon Williams have provided significant advice for this project.
 - Clara Chew and Eric Small developed the soil moisture algorithm; I ported it to python with Kelly's help.
-- Sree Ram Radha Krishnan ported the rzones web app code.
-- Dan Nowacki added Glonass to the NMEA reader
+- [Sree Ram Radha Krishnan](https://github.com/sreeram-radhakrishnan) ported the rzones web app code.
+- [Dan Nowacki](https://github.com/dnowacki-usgs) added 
+Glonass to the NMEA reader
+- [Taylor Smith](https://github.com/tasmi) has worked on the NMEA reader and the refl_zones utility.
 
-Authors and maintainers: [Kristine M. Larson](https://kristinelarson.net), Kelly Enloe, and Tim Dittmann
+Authors and maintainers: [Kristine M. Larson](https://kristinelarson.net), 
+[Kelly Enloe](https://github.com/k-enloe), and [Tim Dittmann](https://github.com/timdittmann)
 
 
 ## How you can help improve this code
