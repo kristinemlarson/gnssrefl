@@ -175,7 +175,6 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         # original dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
         #url1 =      'https://data-idm.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
         url1 =      'https://data.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
-        print('Testing new unavco protocols:',url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1,file_name)
         s2 = time.time()
         print('Download took ',np.round(s2-s1,2), ' seconds') 
@@ -451,15 +450,16 @@ def universal_rinex2(station, year, doy, archive):
         if not foundit:
             foundit, file_name = gogetit(dir1, oname, '.Z')
     elif (archive == 'unavco'):
-        print('testing out new protocol at unavco')
         #url1 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
         url1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
+        print(url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1, dname + '.Z')
         if not foundit:
             url2 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
+            print(url2)
             foundit,file_name = kelly.the_kelly_simple_way(url2, oname + '.Z')
     elif (archive == 'special'):
-        print('testing out new protocol at unavco')
+        #print('testing out new protocol at unavco')
         url1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy + oname + '.gz'
         print(url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1, oname + '.gz')

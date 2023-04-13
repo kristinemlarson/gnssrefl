@@ -2519,7 +2519,7 @@ def rinex_unavco_highrate(station, year, month, day):
 
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
 
-    print('Using new unavco protocols')
+    #print('Using new unavco protocols')
     #unavco = 'https://data-idm.unavco.org/archive/gnss/highrate/1-Hz/rinex/' 
     unavco = 'https://data.unavco.org/archive/gnss/highrate/1-Hz/rinex/'
 

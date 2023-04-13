@@ -460,7 +460,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                     else:
                         log.write('A SNR file was created: {0:50s}  \n'.format(snrname_full))
                         print('\n')
-                        print('SUCCESS: SNR file was created:', snrname_full)
+                        print('SUCCESS: SNR file was created \n', snrname_full)
                         g.store_snrfile(snrname,year,station)
                 else:
                     print('No SNR file was created - check logs section for additional information')
