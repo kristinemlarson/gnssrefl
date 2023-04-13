@@ -1,27 +1,33 @@
 # Course Agenda
 
 ## May 2: Introduction/Theory/Software
-- Overview KL
+- Overview (KL)
 - Basic Theory (FN) 
+- Break (10 minutes)
 - How to Run the Code (KL) 
-- Using the API (KL)
 
 ## May 3: Hydrologic Applications
-- Snow and ice sheets (KL) 
-- Soil Moisture (KL) [Chew video](https://www.youtube.com/watch?v=ntnqD5O8LLo)            
+- Short Intro on Snow (KL)
+- Ice sheet example (KE) 
+- Snow accumulation example (KL)
+- Break (10 minutes)
+- Soil Moisture (KL) 
 
 ## May 4: Water Applications
-- overview (SW) 
+- Short Intro (KL) 
+- Background on water level models (SW)
+- Lake example (KL)
+- Break (10 minutes)
+- Tide example 1 (SW)
+- Tide example 2 (SW)
 - invsnr method (DP) 
-- Lakes 
-- Rivers (MK)  
-- Tides (SW)                                                                           
 
 ## May 5: Going Forward
-* Open source/science and how to contribute (TD)
-* Improvements needed for the software (KL,FN)
-* Best practices for new installations (TN)  
-* Low-cost sensors: (MK, DP, SW, FN)
+- How to report bugs, ask questions (TD)
+- New installations (TN) 10 minutes
+- Improvements (KL) 5 minutes
+- Break (10 minutes)
+- Low-cost sensors: (MK, SW, FN)
 
 # Course Instructors
 
