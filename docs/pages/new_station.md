@@ -1,30 +1,21 @@
 # What is a good GNSS Reflections Site?
 
-![img](http://www.kristinelarson.net/wp-content/uploads/2017/12/smm3_anim_new-1.gif)
-*Reflection zones at Summit Camp, Greenland, where the GNSS antenna is ~16 meters above the surface.*
 
-Your expected GNSS reflection zone is not a mystery. You can calculate it before you go in the field. In the animation
-above I have calculated the rising/setting reflection zones for all visible GPS satellites at Summit Camp, Greenland on
-January 1, 2017. The Fresnel (reflection) zones for satellites with elevation angles between 5-20 degrees are calculated
-and updated every minute, and the map view is saved at 30 minute intervals.
+Your expected GNSS reflection zone is not a mystery. 
 
 The only inputs needed are:
 
-* the approximate
-* position of the GPS site
-* the positions of the GPS satellite
+* the approximate position of the GNSS site
+* the positions of the GNSS satellites
 * the height of the antenna above the reflecting surface
-* GPS signal wavelength (~0.19 or 0.244 meters for L1 vs. L2)
+* the GNSS signal wavelength (~0.19 or 0.244 meters for L1 vs. L2)
 
-In this example I used the GPS broadcast message for the satellite orbits and assumed that the antenna at Summit Camp is
-16 meters above the ice. The equations you need for a Fresnel zone are given in the appendix for Larson and Nievinski (
-2013). Here are static examples for a 2 meter reflector height for L1 and L2.
+The equations you need for a Fresnel zone are given in the appendix for Larson and Nievinski (2013). 
+Here are static examples for a 2 meter reflector height for L1 and L2.
 
 L1             |  L2
 :-------------------------:|:-------------------------:
 ![](https://www.kristinelarson.net/wp-content/uploads/2018/01/p041_mapview_2m_l1-651x666.png)  |  ![](https://www.kristinelarson.net/wp-content/uploads/2018/01/p041_mapview_2m_l2-651x666.png)
-
-*First Fresnel zones for 2 meter reflector ht. Elevation angles are defined in the legend.*
 
 Compare with a 25 meter reflector height:
 

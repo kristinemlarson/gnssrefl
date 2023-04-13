@@ -62,12 +62,10 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
     -------
 
     snowdepth p101 2022
-
-    would use results from a previous run of daily_avg
+        would use results from a previous run of daily_avg
 
     snowdepth p101 2022 -medfilter 0.25 -ReqTracks 50
-    
-    would run daily_avg for you.
+        would run daily_avg for you using 50 tracks/0.25 meter median filter
 
     Parameters
     ----------

@@ -70,6 +70,11 @@ snow and water. We will be posting the code you need to measure soil moisture la
 <img src="https://gnss-reflections.org/static/images/overview.png" width="500" />
 </p>
 
+
+Trying a different way
+
+![](https://gnss-reflections.org/static/images/overview.png)
+
 This code is meant to be used with Signal to Noise Ratio (SNR) data. This is a SNR sample for a site in the 
 the northern hemisphere (Colorado) and a single GPS satellite. The SNR data are plotted with respect to time - however,
 we have also highlighted in red the data where elevation angles are less than 25 degrees. These are the data used in 
