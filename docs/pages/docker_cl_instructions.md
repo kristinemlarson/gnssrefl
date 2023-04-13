@@ -50,6 +50,8 @@ docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/
 ### Shutdown Docker <a name="Shutdown"></a>
 To exit down the container from the terminal, type `exit`
 
+After exitining, to re-enter this container, `docker start gnssrefl` followed by `docker exec -it gnssrefl /bin/bash`
+
 To shut down the docker container run `docker stop gnssrefl`
 
 If you need to see the container(s) you have running you can use `docker ps`
