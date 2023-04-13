@@ -28,7 +28,7 @@ please fix it and let us know. Please test that it works for both older and newe
 
 - Check the [issues section](https://github.com/kristinemlarson/gnssrefl/issues) of the repository and look for "help wanted."
 
-- Write up a new [use case](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/first_drivethru.md).
+- Write up a new [use case](https://gnssrefl.readthedocs.io/en/latest/pages/first_drivethru.html)
 
 - Investigate surface related biases.
 
@@ -69,5 +69,5 @@ This is currently operated by earthscope.org.  To join, please send Kristine an 
 
 Updated April 7, 2023  by Kristine M. Larson
 
-[Old news section from before we moved to readthedocs](docs/pages/old_news.md)
+[Old news section from before we moved to readthedocs](https://gnssrefl.readthedocs.io/en/latest/pages/old_news.html)
 

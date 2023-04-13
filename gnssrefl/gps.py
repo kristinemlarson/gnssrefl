@@ -3507,7 +3507,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
 
 def warn_and_exit(snrexe,fortran):
     """
-    if snr executable does not exist, exit
+    if the GNSS/GPS to SNR executable does not exist, exit
 
     snrexe : str
         name of the executable
@@ -3526,29 +3526,26 @@ def warn_and_exit(snrexe,fortran):
 
 def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     """
-    assuming gfzrnx executable exists, the rinex 3 file is hatanaka
-    uncompressed and translated into a rinex 2 file
+    This code translates a RINEX 3 file into a RINEX 2.11 file.
+    It is assumed that the gfzrnx exists and that the RINEX 3 file is 
+    Hatanaka uncompressed or compressed.
 
     Parameters
     ----------
-    r3_filename : string
-         rinex 3 format filename. either Hatanaka 
+    r3_filename : str
+         RINEX 3 format filename. Either Hatanaka 
          compressed or uncompressed allowed
-
-    r2_filename : string
-         rinex 2.11 file
-
+    r2_filename : str
+         RINEX 2.11 file
     dec : integer
-        decimation factor. default is 0 or 1 which means none
-
+        decimation factor. If 0 or 1, no decimation is done.
     gpsonly : boolean
-
         whether you want only GPS signals. Default is false
 
     Returns
     -------
     fexists : boolean
-        whether rinex 2 file was created and exists
+        whether the RINEX 2.11 file was created and exists
 
     """
     fexists = False
@@ -3610,6 +3607,8 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
 
 def ign_orbits(filename, directory,year):
     """
+    Downloads sp3 files from the IGN archive
+
     Parameters
     ----------
     filename : str
@@ -3644,7 +3643,7 @@ def ign_orbits(filename, directory,year):
 
 def ign_rinex3(station9ch, year, doy,srate):
     """
-    download rinex 3 from IGN
+    Downloads a RINEX 3 file from IGN
 
     Parameters
     ----------
@@ -3691,10 +3690,11 @@ def ign_rinex3(station9ch, year, doy,srate):
 
 def hatanaka_version():
     """
+    Finds the Hatanaka decompression executable
 
     Returns
     -------
-    hatanakav : string 
+    hatanakav : str 
         name/location of hatanaka executable
 
     """
@@ -3707,6 +3707,8 @@ def hatanaka_version():
 
 def gfz_version():
     """
+    Finds location of the gfzrnx executable
+
     Returns
     -------
     gfzv : str
@@ -3722,10 +3724,11 @@ def gfz_version():
 
 def gpsSNR_version():
     """
+    Finds location of the gps to SNR executable
 
     Returns
     -------
-    gpse : string
+    gpse : str
         location of gpsSNR executable
     """
     exedir = os.environ['EXE']
@@ -3737,9 +3740,11 @@ def gpsSNR_version():
 
 def gnssSNR_version():
     """
+    Finds location of the GNSS to SNR executable
+
     Returns
     -------
-    gpse : string 
+    gpse : str 
         location of gnssSNR executable
 
     """
@@ -3752,10 +3757,11 @@ def gnssSNR_version():
 
 def teqc_version():
     """
+    Finds location of the teqc executable
 
     Returns
-    --------
-    gpse : string 
+    -------
+    gpse : str
         location of teqc executable
 
     """
@@ -3773,14 +3779,13 @@ def snr_exist(station,year,doy,snrEnd):
 
     Parameters
     ----------
-    station : string
+    station : str
         four character station name
-
-    year : integer
-
-    doy : integer
-
-    snrEnd : string
+    year : int
+        full year
+    doy : int
+        day of year
+    snrEnd : str
         2 character snr type, i.e. 66, 99
 
     Returns
@@ -3964,22 +3969,24 @@ def get_esa_navfile(cyyyy,cdoy):
 
 def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
     """
-    tries to download navigation file from CDDIS
+    Tries to download navigation file from CDDIS
+    Renames it to my convention (auto0010.22n)
 
     Parameters
     ----------
-    navfile : string
+    navfile : str
         name of GPS broadcast orbit file
-    cyyyy : string
+    cyyyy : str
         4 char year
-    cyy : string
+    cyy : str
         2 char year
-    cdoy : string
+    cdoy : str
         3 char day of year
 
     Returns
-    --------
-    navfile : string
+    -------
+    navfile : str
+        full path of the stored navigation file
 
     """
 
@@ -4028,28 +4035,28 @@ def get_cddis_navfile(navfile,cyyyy,cyy,cdoy):
 
 def ydoy2useful(year, doy):
     """
+    Calculates various dates
 
     Parameters
     ----------
-    year : integer
-
-    doy : integer
+    year : int
+        full year
+    doy : int
         day of year
 
     Returns
     -------
-    year : integer
-
-    month : integer
-
+    year : int
+        full year
+    month : int
+        calendar month
     day : integer
-
-    cyyyy : string
+        calendar day
+    cyyyy : str
         four character year
-    cdoy : string
+    cdoy : str
         three character day of year
-
-    YMD : string
+    YMD : str
          date as in '19-12-01' for December 1, 2019
 
     """
@@ -4067,20 +4074,20 @@ def ydoy2useful(year, doy):
 
 def prevdoy(year,doy):
     """
-    given year and doy, return previous year and doy
+    Given year and doy, return previous year and doy
 
     Parameters
     ----------
-    year : integer
-    
-    doy : integer
+    year : int
+        full year
+    doy : int
+        day of year
 
     Returns
     -------
-    pyear : integer
+    pyear : int
         previous year
-
-    pdoy : integer 
+    pdoy : int
         previous day of year 
     """
     if (doy == 1):
@@ -4100,16 +4107,16 @@ def nextdoy(year,doy):
 
     Parameters
     ----------
-    year : integer
-
-    doy : integer
+    year : int
+        day of year
+    doy : int
+        day of year
 
     Returns
     -------
-    nyear : integer
+    nyear : int
         next year
-
-    ndoy : integer
+    ndoy : int
         next day of year
 
     """
@@ -4126,6 +4133,7 @@ def nextdoy(year,doy):
 def read_sp3file(file_path):
     """ 
     input: file_path is the sp3file name
+    I do not believe this is used
 
     Returns
     -------
@@ -4179,12 +4187,18 @@ def read_sp3file(file_path):
 
 def nicerTime(UTCtime):
     """
-    input float hour
-    output HH:MM string
-    2021 may 3, changed to deal with hour boundaries
-    since thsi only does hours and minutes, it rounds up or down
-    depending on seconds < or > 30
-    fails near midnite ... 
+    Converts fractional time (hours) to HH:MM
+
+    Parameters
+    ----------
+    UTCtime : float
+        fractional hours of the day 
+
+    Returns 
+    -------
+    T : str
+        output as HH:MM 
+
     """
     hour = int(np.floor(UTCtime))
     minute = int ( np.floor(60* ( UTCtime - hour )))
@@ -4207,23 +4221,23 @@ def nicerTime(UTCtime):
 
 def big_Disk_work_hard(station,year,month,day):
     """
-    attempts to pick up subdaily files from the NGS archive
+    Attempts to pick up subdaily RINEX 2.11 files from the NGS archive
     creates a single RINEX file
 
+    If day is 0, then month is presumed to be the day of year
+
+    Requires teqc
+
     Parameters
-    -----------
-    station: string
-        4 character id station name
-
-    year: integer
+    ----------
+    station: str
+        4 char station name
+    year: int
         year
-
-    month: integer
+    month: int
         month
-
     day: integer
         day
-        if day is 0, then month is presumed to be the day of year
 
     """
     if (day == 0):
@@ -4267,24 +4281,24 @@ def big_Disk_work_hard(station,year,month,day):
 
 def big_Disk_in_DC_hourly(station, year, month, day,idtag):
     """
-    picks up a one hour RINEX file from CORS. and gunzips it
+    Picks up a one hour RINEX file from CORS. and gunzips it
 
     Parameters
-    ---------
-    station : string
-        
-    year : integer
-
-    month : integer
-
+    ----------
+    station : str
+        4 ch station name
+    year : int
+        full year
+    month : int
+        calendar month
     day : integer
         day of the month. if zero, it means month is really day of year
-    idtag : character
-        small case letter from a to x (i think)
+    idtag : str
+        small case letter from a to x; tells the code which hour it is
+
     """
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-    #rinexfile,rinexfiled = rinex_name(station, year, month, day)
-    # compressed rinexfile
+    # define names
     crinexfile = station + cdoy + idtag + '.' + cyy + 'o.gz'
     rinexfile =  station + cdoy + idtag + '.' + cyy + 'o'
     # do not know if this works - but what the hey
@@ -4317,12 +4331,12 @@ def ftitle(freq):
 
     Parameters
     ----------
-    freq : integer
-        frequency
+    freq : int
+        GNSS frequency
 
     Returns
     -------
-    returnf : string
+    returnf : str
         nice string for the constellation/frequency for the title of a plot
     """
     f=str(freq)
@@ -4358,7 +4372,7 @@ def cdate2nums(col1):
 
     Parameters
     ----------
-    col1 : string
+    col1 : str
         date in yyyyy-mm-dd, 2012-02-15
 
     Returns
@@ -4384,7 +4398,7 @@ def cdate2ydoy(col1):
 
     Parameters
     ----------
-    col1 : string
+    col1 : str
         date in yyyyy-mm-dd, 2012-02-15
 
     Returns
@@ -4409,20 +4423,20 @@ def cdate2ydoy(col1):
 
 def l2c_l5_list(year,doy):
     """
-    creates a satellite list of L2C and L5 transmitting satellites
+    Creates a satellite list of L2C and L5 transmitting satellites
+    for a given year/doy
 
     Parameters
     ----------
-    year: integer
-        year
-
+    year: int
+        full year
     doy: integer
         day of year
 
     Returns
     -------
     l2csatlist : numpy array (int)
-        satellites  possibly transmittingL2C 
+        satellites possibly transmittingL2C 
 
     l5satlist : numpy array (int)
         satellites possibly transmitting L5 
@@ -4464,33 +4478,34 @@ def binary(string):
 
 def ymd_hhmmss(year,doy,utc,dtime):
     """
+
     Parameters
     ----------
-    year : integer
-
-    doy : integer
-
+    year : int
+        full year
+    doy : int
+        full year
     UTC : float
         fractional hours
-
     dtime : bool
         whether you want datetime object
 
     Returns 
     -------
-    bigT : datetime
+    bigT : datetime object
 
     year : int
-
+        full year
     month : int
-
+        calendar month
     day : int
-
+        calendar day
     hour : int
-
+        hour of the day
     minute: int
-
+        minutes of the day
     second : int
+        seconds
 
     """
     year = int(year) # just in case
@@ -4581,12 +4596,13 @@ def more_confused_obstimes(tvd):
 
     Parameters
     ----------
-    tvd : numpy file floats
+    tvd : numpy array of floats
         lsp results from a loadtxt command
 
     Returns
     -------
-    modifiedjulian : numpy array of floats
+    modifiedjulian : numpy array of floats 
+         mjd values
         
     """
     nr,nc = tvd.shape
@@ -4610,6 +4626,7 @@ def more_confused_obstimes(tvd):
 
 def read_simon_williams(filename,outfilename):
     """
+    Reads a PSMSL file and creates a new one 
     
     Parameters
     ----------
@@ -4721,6 +4738,7 @@ def get_noaa_obstimes(t):
     Returns
     -------
     obstimes : datetime 
+
     """
     nr,nc = t.shape
     obstimes = []

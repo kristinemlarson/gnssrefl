@@ -3,9 +3,11 @@
 """
 import argparse
 import os
+import subprocess 
+import sys
+
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as r
-import sys
 
 def main():
     """
@@ -25,9 +27,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("rinex3", help="rinex3 filename", type=str)
     parser.add_argument("-orb", help="orbit choice", default='gbm',type=str)
+    parser.add_argument("-snr", help="SNR file ending (default is 66)", default=None,type=str)
 
 
     args = parser.parse_args()
+    if args.snr is None:
+        snr = '66'
+    else:
+        snr = int(args.snr)
+
     rinex3 = args.rinex3
     station = rinex3[0:4].lower()
     STATION = rinex3[0:4]
@@ -56,13 +64,17 @@ def main():
     # first step will be to translate to rinex2
 
     if os.path.isfile(rinex3):
-        #print('found version 3 rinex')
+        print('Found version 3 input file ')
+        if (rinex3[-2::] == 'gz'):
+            print('Must gunzip version 3 rinex')
+            subprocess.call(['gunzip', rinex3])
+            rinex3 = rinex3[0:-3]
         g.new_rinex3_rinex2(rinex3,rinex2)
     else:
         print('ERROR: your input file does not exist:', rinex3)
         sys.exit()
     if os.path.isfile(rinex2):
-        #print('found version 2 rinex')
+        print('found version 2 rinex')
         isnr = 66;  rate = 30; idoy = int(cdoy); iyear = int(year)
         rate = '30'; dec_rate = 0; archive = 'unavco' ; fortran = False; translator = 'hybrid'
         year_list = [iyear]; doy_list = [idoy]; rate = 'low';   nol = True; overwrite = False; srate = 30; mk = False; skipit = 1

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import argparse
 import datetime
 import numpy as np
@@ -7,30 +6,6 @@ import requests
 import subprocess
 import sys
 import gnssrefl.gps as g
-
-from gnssrefl.utils import validate_input_datatypes, str2bool
-
-
-def parse_arguments():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("station", help="station name", type=str)
-    parser.add_argument("date1", help="first-date, 20150101", type=str)
-    parser.add_argument("date2", help="end-date, 20150101", type=str)
-    parser.add_argument("-output", default=None, help="Optional output filename", type=str)
-    parser.add_argument("-plt", default=None, help="Optional plot to screen", type=str)
-    parser.add_argument("-outliers", default=None, help="attempt to remove outliers", type=str)
-    parser.add_argument("-sensor", default=None, help="Various: flt, prs or rad, default is rad. If there are multiple sensors, they are all written to the file.", type=str)
-    parser.add_argument("-subdir", default=None, help="subdirectory for output file", type=str)
-    args = parser.parse_args().__dict__
-
-
-    # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt','outliers']
-    args = str2bool(args, boolean_args)
-
-
-    # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
-    return {key: value for key, value in args.items() if value is not None}
 
 
 def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: bool = False, outliers: bool = False, sensor= None, subdir: str=None):
@@ -251,11 +226,6 @@ def find_start_stop(year,m):
         d2 = cyyyy + cmm + '01'
 
     return d1, d2
-
-
-def main():
-    args = parse_arguments()
-    download_ioc(**args)
 
 
 if __name__ == "__main__":
