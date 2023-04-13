@@ -15,12 +15,12 @@
 
 ## Utilities
 
-* installexe
-
+* [check_rinex_file](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.check_rinex_file.html)
 * [download_orbits](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_orbits.html)
 * [download_rinex](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_rinex.html)
 * [download_tides](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_tides.html)
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
+* [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html)
 * [invsnr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 * [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)
 * [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr.html)

@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.5
+
+added check_rinex_file to the utilities section.  looks for L2C and returns other
+header information to the screen
+
 ## 1.3.4
 
 testing documentation
