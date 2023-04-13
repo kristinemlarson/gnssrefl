@@ -31,19 +31,19 @@
 
 # Course Instructors
 
-* [Kristine Larson](https://github.com/kristinemlarson) (University of Bonn, Germany) GNSS-IR, gnssrefl software
+* [Kristine Larson](https://github.com/kristinemlarson) (Bonn University, Germany)
 <image src = "https://gnss-reflections.org/static/images/Kristine-NYC-crop.jpg" width="100px"></image>
-* [Felipe Nievinski](https://github.com/fgnievinski) (Uni. Federal do Rio Grande do Sul - Brazil) Theory, water levels, sensors
+* [Felipe Nievinski](https://github.com/fgnievinski) (Uni. Federal do Rio Grande do Sul - Brazil) 
 <image src = "https://spotlight.unavco.org/station-pages/p360/eo/scientistPhoto.jpg" width="100px"></image>
-* [Makan Karegar](https://github.com/MakanAKaregar) (Uni. Bonn- Germany) cheap GNSS-IR sensors, water levels 
+* [Makan Karegar](https://github.com/MakanAKaregar) (Bonn University, Germany) 
 <image src = "https://gnss-reflections.org/static/images/makan.jpg" width="100px"></image>
-* Simon Williams (Nat. Ocean Ctr.- UK) water levels, tides, cheap GNSS-IR sensors
+* Simon Williams (Nat. Ocean Ctr.- UK) 
 <image src = "https://gnss-reflections.org/static/images/Simon_Williams12.jpg" width="100px"></image>
-* David Purnell (Laval University - Canada) water levels, cheap GNSS-IR sensors
+* David Purnell (Laval University - Canada) 
 <image src = "https://gnss-reflections.org/static/images/david_purnell2.jpg" width="100px"></image>
-* Thomas Nylen (Danish Technical University, Denmark) - installing GNSS sites for GNSS-IR
+* Thomas Nylen (Danish Technical University, Denmark) 
 <image src = "https://gnss-reflections.org/static/images/thomas_nylen.jpg" width="100px"></image>
-* [Kelly Enloe](https://github.com/k-enloe) (EarthScope - USA) – Jupyter notebooks, python, gnssrefl software
+* [Kelly Enloe](https://github.com/k-enloe) (EarthScope - USA) 
 <image src = "https://gnss-reflections.org/static/images/kellyenloe.jpg" width="100px"></image>
-* [Tim Dittmann](https://github.com/timdittmann) (EarthScope - USA) – python, gnssrefl software
+* [Tim Dittmann](https://github.com/timdittmann) (EarthScope - USA) 
 <image src = "https://gnss-reflections.org/static/images/tim_dittmann.jpg" width="100px"></image>
