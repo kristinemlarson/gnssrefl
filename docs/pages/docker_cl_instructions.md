@@ -36,6 +36,8 @@ Now you can start working with the [gnssrefl code.](https://github.com/kristinem
 ### Notes:
 docker has vim for editing text files (ie .json station config file)
 
+When running the software in the docker, plots/files will **not** print to the screen (think quickLook or daily_average utilities), but will be stored on the local machine in the directory that the docker run command was issued.
+
 If you want to process RINEX files that are stored on your local machine, you can copy them into 
 `/refl_code/` local directory that is already mounted to the container given the previous run command.  
 

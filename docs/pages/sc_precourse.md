@@ -33,7 +33,7 @@ with python to access the code. The examples are given as tutorials.
 
 At this point, if you are using the jupyter notebook installation, follow the [pre-course notebook](#todo Kelly add precourse notebook link) included in this repository.
 
-For command line users (Github/pypi/Docker):
+### For command line users (Github/pypi/Docker):
 
 4. **Check your environment variables**
 
