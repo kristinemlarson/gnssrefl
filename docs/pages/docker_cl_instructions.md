@@ -36,6 +36,8 @@ Now you can start working with the [gnssrefl code.](https://github.com/kristinem
 ### Notes:
 docker has vim for editing text files (ie .json station config file)
 
+When running the software in the docker, plots/files will **not** print to the screen (think quickLook or daily_average utilities), but will be stored on the local machine in the directory that the docker run command was issued.
+
 If you want to process RINEX files that are stored on your local machine, you can copy them into 
 `/refl_code/` local directory that is already mounted to the container given the previous run command.  
 
@@ -49,6 +51,8 @@ docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/
 
 ### Shutdown Docker <a name="Shutdown"></a>
 To exit down the container from the terminal, type `exit`
+
+After exitining, to re-enter this container, `docker start gnssrefl` followed by `docker exec -it gnssrefl /bin/bash`
 
 To shut down the docker container run `docker stop gnssrefl`
 
