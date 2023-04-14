@@ -45,15 +45,10 @@ If you are new to the software, you should consider watching the
 
 Before you ask for help - a few things to ask yourself:
 
-Are you running the current software?
+Are you running the current software? Please go to the install page for help on how to 
+update your latest docker/jupyter installs. For github/pypi, we recommend doing a clean
+and new install.
 
-- gnssrefl command line  <code>git pull </code>
-
-- gnssrefl docker command line  <code>docker pull unavdocker/gnssrefl</code>
-
-- gnssrefl jupyter notebook  <code>git pull</code>
-
-- gnssrefl jupyter notebook docker <code>docker pull unavdocker/gnssrefl_jupyter</code>
 
 You are encouraged to submit your concerns as an issue to 
 the [github repository](https://github.com/kristinemlarson/gnssrefl). If you are unfamiliar 

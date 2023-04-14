@@ -70,6 +70,8 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     RINEX 3 instructions need to be added.
 
+    decimate does not seem to do anything, at least not for RINEX 2.11 files
+
     Parameters
     ----------
     station : str
