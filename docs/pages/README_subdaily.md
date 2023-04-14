@@ -28,11 +28,6 @@ If you have your own concatenated file of results you can set -txtfile_section1 
 Similarly, if you want to skip section 1 and go right to section 2, you can set -txtfile_section to your filename.
 
 
-
-**Updated March 14, 2023**
-
-<code>rhdot</code> is now the default behavior.  You can turn it off by setting it to False.
-
 The code will compute (and remove) an InterFrequency (IF) bias. If you don't want it to 
 apply this IF, set <code>if_corr</code> to False.
 
@@ -102,7 +97,7 @@ It will also make a second effort to remove outliers.
 
 Note: if you have a site with a large RHdot correction, you should be cautious of removing too many
 outliers in the first section of this code as this is really signal, not noise. You can set the outlier criterion 
-with <code>-spline_outlier N</code>, where N is in meters. 
+with <code>-spline_outlier1 N</code>, where N is in meters. 
 
 There are other ways to compute the RHdot correction:
 

@@ -21,7 +21,7 @@ import math
 def writeout_spline_outliers(tvd_bad,txtdir,residual,filename):
     """
 
-    Write splinefit outliers to a file. 
+    Write splinefit outliers to a text file. 
 
     Parameters
     ----------
@@ -36,6 +36,7 @@ def writeout_spline_outliers(tvd_bad,txtdir,residual,filename):
 
     filename : str
         name of file being written
+
     """
     nr,nc=tvd_bad.shape
     if nr > 0:
@@ -275,7 +276,9 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
 def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,
         peak2noise,txtfile,h1,h2,kplt,txtdir,default_usage):
     """
-    reads in RH results and makes various plots to help users assess the quality of the solution
+    Reads in RH results and makes various plots to help users assess the quality of the solution
+
+    This is basically "section 1" of the code
 
     Parameters
     ----------
@@ -482,10 +485,10 @@ def quickTr(year, doy,frachours):
 
     Parameters
     ----------
-    year : integer
-
-    doy : integer
-
+    year : int
+        full year
+    doy : int
+        day of year
     frachours : float
         real-valued UTC hour 
 
