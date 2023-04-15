@@ -16,6 +16,7 @@
 - Short Intro on Snow (10 min, KL)
 - Ice sheet example (10-15 min, KE) 
   - Antarctica
+  - Greenland (if time) 
 - Snow accumulation examples (20 min, KL)
   - P360 or P101
   - Barrow
@@ -30,19 +31,20 @@
 - Short Intro (5 min, KL) 
 - Background on models needed/used for water monitoring (35, SW)
 - daily_avg vs. subdaily (5 min, KL)
-- Lake example (10 min, KL)
+- Lake example using daily_avg (10 min, KE)
   - TGHO
 - Break (10 minutes)
-- Tide example (10 min, SW)
-  - ?
-- Tide example (10 min, SW)
-  - ?
+- Using subdaily
+  - Tide example (10 min, SW)
+  - Tide example (10 min, SW)
+  - Tide example (10 min, SW)
 - invsnr method (15 min, DP) 
   - ?
 - Questions (10 min)
 
 ## May 5: Going Forward
 - Short Intro (5 min, KL)
+- https://gnss-reflections.org API (5 min, KL)
 - Improvements Needed (5 min, KL)  
   - Better refraction
   - SWH

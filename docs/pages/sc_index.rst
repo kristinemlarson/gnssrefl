@@ -10,12 +10,12 @@ May 2-5, 2023 Virtual Short Course.
 .. toctree::
    :maxdepth: 1
 
+   sc_agenda_and_instructors.md
    sc_precourse.md
    sc_questions.md
-   sc_agenda_and_instructors.md
    sc_media.md
 
-.. image:: ../_static/tnpp_rhdot_1.png
+.. image:: ../_static/snowdepth_p360.png
    :width: 600
 
 **The goals for this short course are to:**
