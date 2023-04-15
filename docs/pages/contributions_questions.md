@@ -43,12 +43,9 @@ please fix it and let us know. Please test that it works for both older and newe
 If you are new to the software, you should consider watching the 
 [videos about GNSS-IR](https://www.youtube.com/playlist?list=PL9KIPkLxL-c_d-NlNsaoGgScWqSxxUB5n)
 
-Before you ask for help - a few things to ask yourself:
-
-Are you running the current software? Please go to the install page for help on how to 
-update your latest docker/jupyter installs. For github/pypi, we recommend doing a clean
-and new install.
-
+Before you ask for help - you should check to see if you are running the current software.
+Please go to the install page for help on how to update your latest 
+docker/jupyter installs. For github/pypi, we recommend doing a clean download and new install.
 
 You are encouraged to submit your concerns as an issue to 
 the [github repository](https://github.com/kristinemlarson/gnssrefl). If you are unfamiliar 
@@ -68,7 +65,7 @@ If the string is long - please post the error string in a thread response to you
 Would you like to join our <code>gnssrefl</code> users email list?
 This is currently operated by earthscope.org.  To join, please send Kristine an email.
 
-Updated April 7, 2023  by Kristine M. Larson
+Updated April 13, 2023  by Kristine M. Larson
 
 [Old news section from before we moved to readthedocs](https://gnssrefl.readthedocs.io/en/latest/pages/old_news.html)
 

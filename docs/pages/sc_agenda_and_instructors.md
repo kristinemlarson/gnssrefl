@@ -1,33 +1,58 @@
 # Course Agenda
 
 ## May 2: Introduction/Theory/Software
-- Overview (KL)
-- Basic Theory (FN) 
-- Break (10 minutes)
-- How to Run the Code (KL) 
+- Overview and Welcome (10 min, KL)
+- Basic Theory incl Reflection Zones (40 min, FN) 
+- Break (10 min)
+- How to Run the Code, Questions (60 min, KL) 
+  - overall scheme, online codebase and where to find help
+  - main codes: rinex2snr, quickLook, gnssir
+  - how to compute reflection zones (5 min)
+  - products: vwc, snowdepth, subdaily
+
+- Questions (5 min)
 
 ## May 3: Hydrologic Applications
-- Short Intro on Snow (KL)
-- Ice sheet example (KE) 
-- Snow accumulation example (KL)
+- Short Intro on Snow (10 min, KL)
+- Ice sheet example (10-15 min, KE) 
+  - Antarctica
+- Snow accumulation examples (20 min, KL)
+  - P360 or P101
+  - Barrow
 - Break (10 minutes)
-- Soil Moisture (KL) 
+- Soil Moisture (50 min, KL) 
+  - PBO H2O approach
+  - P038
+  - p475
+- Questions (5 min)
 
 ## May 4: Water Applications
-- Short Intro (KL) 
-- Background on water level models (SW)
-- Lake example (KL)
+- Short Intro (5 min, KL) 
+- Background on models needed/used for water monitoring (35, SW)
+- daily_avg vs. subdaily (5 min, KL)
+- Lake example (10 min, KL)
+  - TGHO
 - Break (10 minutes)
-- Tide example 1 (SW)
-- Tide example 2 (SW)
-- invsnr method (DP) 
+- Tide example (10 min, SW)
+  - ?
+- Tide example (10 min, SW)
+  - ?
+- invsnr method (15 min, DP) 
+  - ?
+- Questions (10 min)
 
 ## May 5: Going Forward
-- How to report bugs, ask questions (TD)
-- New installations (TN) 10 minutes
-- Improvements (KL) 5 minutes
+- Short Intro (5 min, KL)
+- Improvements Needed (5 min, KL)  
+  - Better refraction
+  - SWH
+  - Adv models for SWE and soil moisture
+- How to report bugs, ask questions (10 min, TD)
+- How to make a good installation (10 min, TN) 
+  - Show how you picked new sites in Greenland
 - Break (10 minutes)
-- Low-cost sensors: (MK, SW, FN)
+- Low-cost sensors: (40 min, MK, SW, FN)
+- Questions: remainder of the time
 
 # Course Instructors
 

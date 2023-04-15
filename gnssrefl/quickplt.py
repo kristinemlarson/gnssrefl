@@ -45,7 +45,7 @@ def main():
     parser.add_argument("ycol",   help="y-column", type=str)
     parser.add_argument("-mjd", help="set to True/T if x-values are MJD (should add MM/SS?", type=str,default=None)
     parser.add_argument("-reverse", help="set to True/T to reverse the y-axis", type=str,default=None)
-    parser.add_argument("-ymdh", help="if True/T, columns 1-4 are year mon day hour ", type=str,default=None)
+    parser.add_argument("-ymdhm", help="if True/T, columns 1-4 are year mon day hour minute", type=str,default=None)
     parser.add_argument("-xlabel", type=str, help="optional x-axis label", default=None)
     parser.add_argument("-ylabel", type=str, help="optional y-axis label", default=None)
     parser.add_argument("-symbol", help="plot symbol ", type=str,default=None)
@@ -72,8 +72,9 @@ def main():
     if (args.reverse == 'True') or (args.reverse == 'T'):
         reverse_sign = True
 
+    # was previously ymdh
     ymd = False
-    if (args.ymdh == 'True') or (args.ymdh == 'T'):
+    if (args.ymdhm == 'True') or (args.ymdhm == 'T'):
         ymd = True
 
     convert_mjd = False
@@ -102,7 +103,7 @@ def main():
 
     if ymd == True:
         year = tvd[:,0]; month = tvd[:,1]; day = tvd[:,2];
-        hour = tvd[:,3]
+        hour = tvd[:,3] ; minute = tvd[:,4]
         for i in range(0,len(tvd)):
             if (tvd[i, 4]) > 0:
                 y = int(year[i]); m = int(month[i]); d = int(day[i])
@@ -110,8 +111,9 @@ def main():
                 today=datetime.datetime(y,m,d)
                 doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
                 h = int(hour[i])
-                tval.append(y + (doy +  h/24)/365.25);
-                yval.append( tvd[i,4]/1000)
+                mi = int(minute[i])
+                tval.append(y + (doy +  h/24 + mi/24/60)/365.25);
+                yval.append( tvd[i,ycol]/1000)
     else:
         if convert_mjd:
             t1 = Time(tvd[:,xcol],format='mjd')
