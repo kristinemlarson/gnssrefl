@@ -41,7 +41,7 @@ You can check to see if you have gfortran by typing
 
 If you do not have gfortran, then you can use homebrew to install (<code>brew install gfortran</code>).
 
-*Environment Variables*
+## Environment Variables
 
 You should define three environment variables:
 
@@ -63,9 +63,10 @@ you want everything to be (to be honest, I have not tested this in a while).
 The orbits, SNR files, and periodogram results are stored in
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
-*Direct Python Install*
+## Direct Python Install
 
 If you are using the version from gitHub:
+
 * install the python3-venv package <code>apt-get install python3-venv</code>
 * <code>apt-get install git</code>
 * <code>git clone https://github.com/kristinemlarson/gnssrefl </code>
@@ -77,7 +78,7 @@ If you are using the version from gitHub:
 * so please read below or type <code>installexe -h</code> 
 
 
-PyPi version:
+## PyPi Install 
 
 * make a directory, cd into that directory, set up a virtual environment
 * activate the virtual environment
@@ -87,7 +88,7 @@ PyPi version:
 * so please read below or type <code>installexe -h</code> 
 
 
-*Non-Python Code:*
+## Non-Python Code
 
 <code>installexe</code> should download and install two key utilities used in the GNSS 
 community: CRX2RNX and gfzrnx. It currently works for linux, macos and mac-newchip options. If you are using 

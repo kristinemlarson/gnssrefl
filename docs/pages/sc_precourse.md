@@ -41,7 +41,9 @@ check that they are active by typing these commands:
 If nothing comes back, you haven't set them. **They have to be set every time you run the code.**
 That is why we recommend you put them in your .bashrc file.
 
-[More on environment variables and file formats](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html)
+[More on environment variables and file formats](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html)
+
+[More on environment variables and file formats](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html#environment-variables)
 
 ## Running the Code 
 

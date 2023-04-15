@@ -15,7 +15,7 @@ May 2-5, 2023 Virtual Short Course.
    sc_questions.md
    sc_media.md
 
-.. image:: ../_static/snowdepth_p360.png
+.. image:: ../_static/snowdepth-p360.png
    :width: 600
 
 **The goals for this short course are to:**
