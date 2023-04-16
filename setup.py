@@ -67,6 +67,7 @@ setup(
             'phase= gnssrefl.quickPhase:main',
             'refl_zones= gnssrefl.refl_zones_cl:main',
             'vwc= gnssrefl.vwc:main',
+            'smoosh= gnssrefl.smoosh:main',
             'quickplt= gnssrefl.quickplt:main',
             'snowdepth= gnssrefl.snowdepth_cl:main',
             'rh_plot= gnssrefl.rh_plot:main',

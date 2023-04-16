@@ -134,21 +134,24 @@ and Galileo signals. [You can check here to remind yourself how the frequencies 
 Use the [refl_zones web site](https://gnss-reflections.org/rzones) to try and pick 
 reflection zones for station [ross](http://gnss-reflections.org/geoid?station=ross) 
 that was used in the examples. Should you use the default
-sea level reflector height or should you pick one? And if so, what value?
+sea level reflector height (RH) or should you pick one? And if so, what value should you use?
 From the picture, what value do you think is reasonable?
 
 
-Try to pick reflection zones for station [sc02](http://gnss-reflections.org/geoid?station=sc02). For this site 
-is it reasonable to use the mean sea level RH option in https://gnss-reflections.org/rzones ?
+Try to pick reflection zones for station [sc02](http://gnss-reflections.org/geoid?station=sc02). 
+Is it reasonable to use the mean sea level RH option in https://gnss-reflections.org/rzones ?
 
-**If you have time and would like to do more**
+## Additional Assignments
 
-The main module for estimating reflector height 
-is called [gnssir](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html).
-Before trying out one of [our examples](https://gnssrefl.readthedocs.io/en/latest/pages/first_drivethru.html), 
-you should read that documentation.
+We have some students who are taking this virtual course for university credit. And others 
+might be interested to get an early start with the software. If you are in either of these 
+categories, please work on one or more use cases:
 
-If you are interested in water levels, you should start with a lake. 
+The main module for estimating reflector height is 
+called [gnssir](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html).
+Try out one of [our examples](https://gnssrefl.readthedocs.io/en/latest/pages/first_drivethru.html). 
 
-If you are interested in snow accumulation, you should start with an ice sheet.  
+If you are primarily interested in water levels, you should start with a lake. 
+
+If you are primarily interested in snow accumulation, you should start with an ice sheet.  
 
