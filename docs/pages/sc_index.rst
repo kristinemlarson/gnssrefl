@@ -10,7 +10,7 @@ May 2-5, 2023 Virtual Short Course.
 .. toctree::
    :maxdepth: 1
 
-   sc_agenda_and_instructors.md
+   sc_agenda_instructors.md
    sc_precourse.md
    sc_questions.md
    sc_media.md

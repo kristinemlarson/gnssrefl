@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.6
+
+fixed bare soil bug in azimuth snow model.
+added optional input for bare soil to snowdepth_cl.py
+
 ## 1.3.5
 
 added check_rinex_file to the utilities section.  looks for L2C and returns other

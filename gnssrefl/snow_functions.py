@@ -149,6 +149,7 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
     yvals = np.unique(usegps[:,0])
     snow = []
     yerr = []
+    std= []
     for y in yvals:
         y=int(y) # make sure y is an integer
         for d in range(1,367): # life is short - just do all day of years
@@ -170,15 +171,18 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
 
                 gobst = np.append(gobst, datetime.datetime(year=y, month=mm, day=dd) )
                 fout.write("{0:4.0f} {1:3.0f}  {2:8.3f}  {3:8.3f}  {4:2.0f}  {5:2.0f}   {6:3.0f} \n".format(y, d, snowv, std, mm, dd,nvals))
+                #print(y,d,snowv)
 
     fout.close()
+    if len(snow) == 0:
+        print('Very likely this failed - and you do not have enough bare soil values')
     snow = np.asarray(snow)
     std = np.asarray(std)
 
     return gobst, snow, std
 
 
-def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS):
+def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days):
     """
     simple snow depth algorithm
 
@@ -211,6 +215,8 @@ def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outp
         minimum snowdepth for plot (m)
     maxS : float
         maximum snowdepth for plot (m)
+    barereq_days: int
+        min number of days to believe a bare soil average
 
     """
     ii = (gps[:,1] >= doy1) & ((gps[:,1] <= doy2) & (gps[:,0] == bs))
@@ -221,10 +227,12 @@ def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outp
         print('Current settings are ', bs, ' for days ', doy1, doy2)
         sys.exit()
 
-    # require at least 15 values
-    NB = 15
+    # require at least 15 values (set in snowdepth_cl.py)
+    NB = barereq_days
+    print('Found ', len(baresoil), ' daily bare soil values')
     if len(baresoil) < NB:
-        print('Not enough values to define baresoil: ', NB)
+        print('Current settings for bare soil are year/', bs, ' for days ', doy1, doy2)
+        print('Code requires: ', NB)
         sys.exit()
 
     noSnowRH = np.mean(baresoil)
@@ -306,9 +314,10 @@ def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit,e
 
     return
 
-def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS):
+def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days):
     """
     azimuthal snow depth algorithm
+    tries to determine the bare soil correction in 20 degree azimuth swaths
 
     Parameters
     ----------
@@ -339,6 +348,8 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
         minimum snowdepth for plot (m)
     maxS : float
         maximum snowdepth for plot (m)
+    barereq_days : int 
+        number of days required to trust a bare soil average
 
     """
     ii = (gps[:,1] >= doy1) & ((gps[:,1] <= doy2) & (gps[:,0] == bs))
@@ -351,7 +362,9 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
         sys.exit()
 
     # require at least 15 values (this is not very useful)
-    NB = 15
+    # this constraint is actually done later ...
+    # could be removed
+    NB = barereq_days
     if len(baresoil) < NB:
         print('Not enough values to define baresoil: ', NB)
         sys.exit()
@@ -371,6 +384,7 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
 
     rebase = np.empty(shape=[0, 12])
 
+    # how many degrees of azimuth are used in each "bare soil" correction
     delA = 20
     for az in range(0,360-delA,delA):
         # bare soil in the azimuth range
@@ -380,11 +394,12 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
 
         # all RH in the azimuth range
         kk = (usegps[:,5] > az) & (usegps[:,5] < (az+delA))
-
-        if nr > NB:
+        # number of unique days where a bare soil retrieval exists
+        ndoy = len(np.unique(pout[:,1]))
+        if ndoy > NB:
             # what is the average RH value for this azimuth bin for bare soil
             bsoil = np.mean(pout[:,2])
-            print('Bare soil in azimuth range ', az, az+delA, np.round(bsoil,2), '(m)')
+            print('In azim. range ', az, az+delA, np.round(bsoil,2), '(m), nvals:', len(pout[:,2]),ndoy)
 
             gps_in_azim = usegps[kk,:]
             nr,nc = np.shape(gps_in_azim)

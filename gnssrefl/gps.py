@@ -5428,16 +5428,12 @@ def bfg_data(fstation, year, doy, samplerate=30,debug=False):
     -----------
     fstation: string
         4 char station ID
-
     year: integer
         year
-
     doy: integer
         day of year
-
     samplerate: integer
         sample rate of the receiver (default is 30)
-
     debug: boolean
         directory file listing provided if true
         default is false

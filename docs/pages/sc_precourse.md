@@ -41,7 +41,6 @@ check that they are active by typing these commands:
 If nothing comes back, you haven't set them. **They have to be set every time you run the code.**
 That is why we recommend you put them in your .bashrc file.
 
-[More on environment variables and file formats](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html)
 
 [More on environment variables and file formats](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html#environment-variables)
 
@@ -56,7 +55,8 @@ For github, pypi, and docker users, type in a terminal window:
 On my machine this returns:
 
 <pre>
-SUCCESS: SNR file was created: /Users/kristine/Documents/Research/2023/snr/p038/p0380900.23.snr66
+SUCCESS: SNR file was created 
+/Users/kristine/Documents/Research/2023/snr/p038/p0380900.23.snr66
 </pre>
 
 This file was created using:
@@ -81,8 +81,8 @@ simplest request, which evaluates L1 GPS data using a standard azimuth/elevation
 
 This creates two png files. If you are using a direct github/pypi install, they will come to the screen.
 
-<img src="../_static/p038-1.png">
 <img src="../_static/p038-2.png">
+<img src="../_static/p038-1.png">
 
 If you are using a docker, the png files will **not** come to the screen but 
 will be stored. 
