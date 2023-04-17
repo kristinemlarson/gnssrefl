@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-"""
-downloads Orbit files from various sources
-"""
 import argparse
+import numpy as np
 import sys
+import time
 
 import gnssrefl.gps as g
 
@@ -24,7 +23,21 @@ def parse_arguments():
 
 def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None ):
     """
-    command line interface for download_orbits
+    command line interface for download_orbits. If day is zero, then it is assumed that 
+    the month record is day or year
+
+    Examples
+    --------
+    download_orbits nav 2020 50 0
+        downloads broadcast orbits for day of year 50 in the year 2020
+    download_orbits nav 2020 1 1 
+        downloads broadcast orbits for January 1, 2020
+    download_orbits gnss 2023 1 1 
+        multi-GNSS orbits from GFZ
+    download_orbits rapid 2023 1 1 
+        rapid multi-GNSS orbits from GFZ
+    download_orbits rapid 2023 1 0 -doy_end 10
+        rapid multi-GNSS orbits from GFZ for days of year 1 thru 10 in 2023
 
     Parameters
     ----------
@@ -70,13 +83,10 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
     year : integer
         full year
-
     month : integer
         calendar month
-
     day : integer
         day of the month
-
     doy_end : integer 
         optional, allows multiple day download
 
@@ -121,8 +131,10 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
     d1= int(doy); d2 = int(doy_end) + 1
     for d in range(d1, d2):
+        s1 = time.time()
 
         year,month,day= g.ydoy2ymd(year,d)
+        print('Looking for ', year, '/', d, ' mm/dd', month, day)
         if (pCtr == 'nav'):
             navname, navdir, foundit = g.getnavfile(year, month, day)
             if foundit:
@@ -161,6 +173,8 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 print('SUCCESS:', fdir+'/'+filename)
             else:
                 print(filename, ' not found')
+        s2 = time.time()
+        print('That download took ', np.round(s2-s1,2), ' seconds')
 
 
 def main():
