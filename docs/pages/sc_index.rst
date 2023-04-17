@@ -10,21 +10,18 @@ May 2-5, 2023 Virtual Short Course.
 .. image:: ../_static/snowdepth-p360.png
    :width: 600
   
-Agenda:
+Agenda
 =======
 **May 2.** Basic principles of GNSS-IR, How to run the gnssrefl software
-
 **May 3.** Hydrologic Applications: snow accumulation and soil moisture
-
 **May 4.** Water applications: lakes, rivers, tides
-
 **May 5:** Site installations: optimizing deployment of geodetic and low-cost sensors.  Contributing to gnssrefl.
 
-Pre-course Activities:
+Pre-course Activities
 ======================
 `Recommended steps <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse.html>`_
 
-Questions:
+Questions
 ==========
 For installation questions, please join the slack channel `here <#todo insert slack link>`_.
 
