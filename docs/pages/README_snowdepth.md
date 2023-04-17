@@ -36,13 +36,7 @@ Either makes sure that gross outliers have been removed. Read the daily_avg docu
 Depending on which algorithm choice
 you make (simple vs. azimuthal), the code will use either the full list of arc specific LSP files or the daily average.
 
-Optional inputs include:
-
-- set the y-axis limits for snow depth plots (minS, maxS) 
-- set the "bare soil" dates(-bare_date1, bare_date2). The defaults are September 1-September 30 
-from the fall. The format is year, numerical month, numerical day: 2020-09-01.
-- set longer to True for time series to span August 1 through June 30. Otherwise you see October 1-June 30.
-- set plt to False if you do not want the plot sent to the screen
+[More on optional inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html)
 
 The error bars are **over-estimates** and based on the standard deviation of the 
 reflector heights used in the average. These include terrain errors as well as snow depth errors.
@@ -62,7 +56,7 @@ you should never expect it to agree with GNSS-IR.
 
 There are certainly other ways you can convert reflector heights to snow depth. And 
 some of the L1 reflector height retrievals from some receivers are extremely problematic.  
-([we wrote an entire paper on this issue](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson_Small2016.pdf)).
+([We wrote an entire paper on this issue](https://www.kristinelarson.net/wp-content/uploads/2015/12/Larson_Small2016.pdf)).
 When you see large gaps at PBO sites in winter this is most likely because the site was 
 not designed to operate when snow covers the solar panels. In 
 other cases the GPS receiver failed and was 
