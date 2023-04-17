@@ -90,10 +90,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
         1 sec data for warn00deu, 1 sec decimated to 5 sec, multi-GNSS, bkg archive, streamed, in IGS folder
 
     RINEX3 30 second archives supported  
-        bev, bkg, cddis, epn, ga, gfz, nrcan, sonel, and unavco
+        bev, bkg, cddis, epn, ga, gfz, nrcan, sonel
 
     RINEX3 15 sec archives
-        bfg
+        bfg, unavco
 
     RINEX3 1 sec 
         cddis, bkg, maybe nrcan

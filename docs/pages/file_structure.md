@@ -1,6 +1,7 @@
 # Files and File Formats
 
-You need two environment variables: REFL_CODE and ORBITS. If you are using 
+You need three environment variables to run 
+this code: REFL_CODE, ORBITS, and EXE. If you are using 
 the jupyter notebooks or the docker, they are defined for you. If you are working
 with pypi or github install, you must define them EVERY TIME YOU USE THE CODE.
 This is most easily done by setting them in your setup script, which on my machine
@@ -9,11 +10,14 @@ is called .bashrc.
 ## GPS/GNSS Data Formats
 
 Input observation formats: the code only 
-recognizes [RINEX 2.11](https://www.ngs.noaa.gov/CORS/RINEX211.txt), RINEX 3 and NMEA input files.
+recognizes [RINEX 2.11](https://www.ngs.noaa.gov/CORS/RINEX211.txt), 
+[RINEX 3](https://files.igs.org/pub/data/format/rinex303.pdf) 
+and [NMEA](https://www.gpsworld.com/what-exactly-is-gps-nmea-data/) input files.
 
 **RINEX 2.11**
 
-*We require that you use lower case filenames.* These are the standard at global archives.
+*We strongly prefer that you use lower case filenames.* This is 
+the standard at global archives.
 They must have SNR data in them (S1, S2, etc) and have the receiver coordinates in the header.
 The files should follow these naming rules:
 
@@ -25,9 +29,13 @@ Example filename : onsa0500.22o
 
 **RINEX 3**
 
-While we allow RINEX 3 files, we do not read the file itself - we rely on the <code>gfzrnx</code> 
+While we support RINEX 3 files, we do not read the RINEX 3 
+file itself - we rely on the <code>gfzrnx</code> 
 utility developed by Thomas Nischan at GFZ to translate from RINEX 3+ to RINEX 2.11
-If you have ss second RINEX 3 files, they should be all upper case (except for the extension rnx or crx).
+If you have RINEX 3 files, they should be all 
+upper case (except for the extension rnx or crx).
+
+Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 
 * station name (9 characters where the last 3 characters are the country), underscore
 * capital R or capital S , with underscore on either side
@@ -38,12 +46,15 @@ If you have ss second RINEX 3 files, they should be all upper case (except for t
 * ssS, underscore, M0.
 * followed by rnx (crx if it is Hatanaka format).
 
-01D means it is one day. Some of the other parts of the very long station file name are no
-doubt useful, but they are not recognized by this code. By convention, these files may be
-gzipped but not unix compressed. You cannot use rinex2snr to translate RINEX 3 file unless they
-have the 01D naming convention. If you want a generic translation program, try rinex3_rinex2.
-
-Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
+01D means it is one day. Some of the other parts of the very 
+long station file name are no
+doubt useful, but they are not recognized by this code. By 
+convention, these files may be
+gzipped but not unix compressed. You cannot use rinex2snr 
+to translate RINEX 3 file unless they
+have the 01D naming convention. If you want a 
+generic translation program, you can try <code>rinex3_rinex2</code>.
+It has the requirement that you input the file names.
 
 **NMEA**
 
@@ -62,9 +73,16 @@ nmea2snr needs better in-code documentation.
 **Orbit files**
 
 We have tried our best to make the orbit files relatively invisible to users.
-But for the sake of completeness, we are either using broadcast navigation files in 
-the RINEX 2.11 format
+But for the sake of completeness, we are either using 
+broadcast navigation files in the RINEX 2.11 format
 or precise orbits in the sp3 format.   
+
+
+**Executables**
+
+There are two key executables: CRX2RNX and gfzrnx. For notebook and docker users, these 
+are installed for you.  pypi/github users must install them. The utility <code>installexe</code>
+should take care of this. They are stored in the directory defined by the EXE environment variable.
 
 ## Where Files are Stored
 

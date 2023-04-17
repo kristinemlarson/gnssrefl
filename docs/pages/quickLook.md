@@ -2,11 +2,7 @@
 
 <CODE>quickLook</code> is meant to provide the user with a visual sense of the data 
 at a given site.  It has stored defaults that work for stations with reflectors that are 
-lower than 7 meters or so. 
-[You can change those defaults on the command line.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
-
-When we made these plots, the default maximum RH was 6 meters. That is why some of the 
-plots end at 6 meters.
+lower than 8 meters or so. [You can change those defaults on the command line.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html). When we made these plots, the default maximum RH was 6 meters. That is why the plots shown below end at 6 meters.
 
 ## Example from Boulder
 
@@ -39,8 +35,9 @@ frequency 20:
 
 <img src="../_static/p041-l2c.png" width=600>
 
-**L2C results are always superior to L1 results.** If you have any influence over a GNSS site, please 
-ask the station operators to track modern GPS signals such as L2C and L5.
+**L2C results are always superior to L1 results. They are also superior to L2P data.** If you have 
+any influence over a GNSS site, please ask the station operators to 
+track modern GPS signals such as L2C and L5 **and** to include it in the archived RINEX file.
 
 ## Example for Lake Superior
 

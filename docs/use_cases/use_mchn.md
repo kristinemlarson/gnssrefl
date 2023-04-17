@@ -53,7 +53,7 @@ Since the receiver only tracks GPS signals, there is no need to specify gnss orb
 **Take a Quick Look at the Data**
 
 Examine the spectral characteristics of the SNR data for the default settings
-[(For details on quickLook output.)](../pages/quickLook_desc.md):
+[(For details on quickLook output.)](../pages/quickLook.md):
 
 <code>quickLook mchn 2019 205</code>
 

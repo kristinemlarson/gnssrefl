@@ -26,7 +26,6 @@ This GNSS site has been removed by the project investigators.
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/LORG.sta)
 
-[Google Maps Link](https://goo.gl/maps/bSAuLXLLMmzWqPdW9) 
 
 ### Data Summary
 
@@ -45,7 +44,7 @@ First make a SNR file.
 
 <code>rinex2snr lorg 2019 205</code>
 
-Use <code>quickLook</code> to produce a periodogram similar to the one in the web app [(For details on quickLook output)](../pages/quickLook_desc.md). quickLook is set to use the L1 frequency by default:
+Use <code>quickLook</code> to produce a periodogram similar to the one in the web app [(For details on quickLook output)](../pages/quickLook.md). quickLook is set to use the L1 frequency by default:
 
 <code>quickLook lorg 2019 205</code>
 

@@ -61,7 +61,7 @@ Translate the GPS data for January 15 2021. First you need to make the SNR file:
 
 <code>rinex2snr sc02 2021 15</code>
 
-Use our utility <code>uickLook</code> with defaults [(For more details on quickLook output)](../pages/quickLook_desc.md):
+Use our utility <code>uickLook</code> with defaults [(For more details on quickLook output)](../pages/quickLook.md):
 
 <code>quickLook sc02 2021 15 </code>
 

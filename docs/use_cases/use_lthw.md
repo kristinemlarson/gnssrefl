@@ -42,7 +42,7 @@ Translate the GPS data for January 1 in 2018. First you need to make the SNR fil
 
 <code>rinex2snr lthw 2018 1</code>
 
-Use our utility **quickLook** to look at these data [(For more details on quickLook output)](../pages/quickLook_desc.md):
+Use our utility **quickLook** to look at these data [(For more details on quickLook output)](../pages/quickLook.md):
 
 <code>quickLook lthw 2018 1 -e1 7</code>
 
