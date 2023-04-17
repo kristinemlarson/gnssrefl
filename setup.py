@@ -56,7 +56,6 @@ setup(
             'download_teqc = gnssrefl.download_teqc:main',
             'rinex3_rinex2= gnssrefl.rinex3_rinex2:main',
             'veg_multiyr= gnssrefl.veg_multiyr:main',
-            'check_rinex= gnssrefl.check_rinex:main',
             'check_rinex_file= gnssrefl.check_rinex_file:main',
             'rinex3_snr= gnssrefl.rinex3_snr:main',
             'rt_rinex3_snr= gnssrefl.rt_rinex3_snr:main',

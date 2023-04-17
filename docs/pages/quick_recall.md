@@ -2,16 +2,22 @@
 
 ## Main Functions
 
-* [daily_avg](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.daily_avg_cl.html)
-* [gnssir](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html)
-* [invsnr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html)
-* [make_json_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
-* [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html)
-* [quickLook](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
 * [rinex2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
+* [quickLook](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
+* [gnssir](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html)
+
+* [daily_avg](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.daily_avg_cl.html)
+* [invsnr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html)
 * [snowdepth](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html)
 * [subdaily](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html)
-* [vwc](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc.html#gnssrefl.vwc.vwc)
+* [vwc](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc.html)
+
+## Helper Codes 
+
+* [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html)
+* [invsnr_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
+* [make_json_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
+* [vwc_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwcr_input.html)
 
 ## Utilities
 
@@ -22,7 +28,6 @@
 * [download_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_unr.html)
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
 * [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html)
-* [invsnr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 * [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)
 * [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr.html)
 * [query_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.query_unr.html)

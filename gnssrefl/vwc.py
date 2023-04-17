@@ -23,9 +23,9 @@ def parse_arguments():
     parser.add_argument("-fr", help="frequency", type=int)
     parser.add_argument("-plt2screen", default=None, type=str, help="boolean for plotting to screen")
     parser.add_argument("-screenstats", default=None, type=str, help="boolean for plotting statistics to screen")
-    parser.add_argument("-min_req_pts_track", default=None, type=int, help="minimum number of points for a track to be kept. Default is 50")
+    parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 50")
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
-    parser.add_argument("-minvalperday", default=None, type=int, help="minimum number of satellite tracks needed each day. Default is 10")
+    parser.add_argument("-minvalperday", default=None, type=int, help="min number of satellite tracks needed each day. Default is 10")
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean for attempting to remove days contaminated by snow")
     parser.add_argument("-circles", default=None, type=str, help="boolean for circles instead of lines for the final VWC plot ")
     parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
@@ -48,14 +48,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
     makes plots for the four geographic quadrants, computes daily average phase files before converting 
     to volumetric water content (VWC).
 
-    IMO This should be moved into a driver so that the main functions are called separately.
 
     Examples
     --------
-
     one year for station p038 
         vwc p038 2017
-
     three years  for station p038 
         vwc p038 2015 -year_end 207
 
@@ -63,39 +60,30 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
     ----------
     station : str
         4 character ID of the station
-
-    year : integer
-        Year
-    year_end : integer
+    year : int
+        full Year
+    year_end : int, optional
         last year for analysis
-
     fr : integer, optional
         GNSS frequency. Currently only supports l2c.
         Default is 20 (l2c)
-
     plt2screen: bool, optional
         Whether to produce plots to the screen.
         Default is True
-
     min_req_pts_track : int, optional
         how many points needed to keep a satellite track
         default is 50
-
     polyorder : int
         polynomial order used for leveling.  Usually the code picks it but this allows to users to override. 
         Default is -99 which means let the code decide
-
     minvalperday: integer
         how many phase measurements are needed for each daily measurement
         default is 10
-
     snow_filter: boolean 
         whether you want to attempt to remove points contaminated by snow
         default is False
-
     circles : boolean
         whether you want circles in the final plot (lines are default)
-
     subdir: str
         subdirectory in $REFL_CODE/Files for plots and text file outputs
     tmin: str
