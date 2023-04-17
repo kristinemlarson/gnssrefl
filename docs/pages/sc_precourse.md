@@ -26,9 +26,10 @@ for mac and linux users that don't want to install python and/or
 manage dependencies or environment variables.
 
 - Jupyter notebooks. This is another great way for people that are unfamiliar 
-with python to access the code. The examples are given as tutorials.
+with python to access the code. The examples are given as tutorials, including 
+a pre-course activity notebook accomplishing the steps outlined below.
 
-**Check your environment variables (disregard this step if using dockers or notebooks)**
+**Check your environment variables** (disregard this step if using dockers or notebooks)
 
 Direct installers (github/pypi) need to set environment variables. In a terminal window, you should
 check that they are active by typing these commands:
