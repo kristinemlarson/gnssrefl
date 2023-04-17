@@ -9,6 +9,11 @@ def main():
     Converts Cartesian coordinates to latitude, longitude, ellipsoidal height.
     Prints to screen
 
+    Example
+    -------
+    xyz2llh -1283634.1615 -4726427.8931 4074798.0429
+        returns 39.949492042 -105.194266387  1728.856
+
     Parameters
     ----------
     x : float
