@@ -7,11 +7,6 @@ May 2-5, 2023 Virtual Short Course.
 `Software documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_ |
 `Software installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
-.. toctree::
-   :maxdepth: 1
-
-   sc_precourse.md
-
 .. image:: ../_static/snowdepth-p360.png
    :width: 600
   
@@ -25,15 +20,15 @@ Agenda:
 
 **May 5:** Site installations: optimizing deployment of geodetic and low-cost sensors.  Contributing to gnssrefl.
 
-Pre-course Work:
-================
-:doc:`sc_precourse.md`
+Pre-course Activities:
+======================
+`Recommended steps <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse.html>`_
 
 Questions:
 ==========
-For installation questions, please join the slack channel [here](#todo insert slack link).
+For installation questions, please join the slack channel `here <#todo insert slack link>`_.
 
-For methodology-related questions, please email instructors or better still post a [GitHub issue](https://github.com/kristinemlarson/gnssrefl/issues).
+For methodology-related questions, please email instructors or better still post a `GitHub issue <https://github.com/kristinemlarson/gnssrefl/issues>`_.
 
 
 
