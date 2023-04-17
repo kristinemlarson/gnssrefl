@@ -862,27 +862,35 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
 
 def kgpsweek(year, month, day, hour, minute, second):
     """
+    Calculates GPS week and GPS second of the week
+    There is another version that works on character string.
+    I think (kgpsweekC)
+    
+    Examples
+    --------
+    kgpsweek(2023,1,1,0,0,0)
+        returns 2243  and  0
 
     Parameters
     ----------
-    year : string
-        4 char
-    month : string 
-        2 char
-    day : string
-        2 char
-    hour: string
-        2 char
-    minute : string
-        2 char
-
-    second : integer?
+    year : int 
+        full year
+    month : int 
+        calendar month
+    day : int 
+        calendar day
+    hour: int
+        hour of the Day (gps time)
+    minute : int 
+        minutes 
+    second : int
+        seconds
 
     Returns
-    --------
-    GPS_wk : integer
+    -------
+    GPS_wk : int
         GPS week
-    GPS_sec_wk : intger
+    GPS_sec_wk : int
         GPS second of the week
 
     """
@@ -4866,7 +4874,7 @@ def rapid_gfz_orbits(year,month,day):
     downloads gfz rapid orbit and stores in $ORBITS
 
     Parameters
-    --------------
+    ----------
     year : int
         full year
     month : int
@@ -4914,7 +4922,7 @@ def ultra_gfz_orbits(year,month,day,hour):
     downloads rapid GFZ sp3 file and stores them in $ORBITS
 
     Parameters
-    -----------
+    ----------
     year : int
         full year
 
@@ -5986,7 +5994,7 @@ def quickp(station,t,sealevel):
     prints the plot to the screen - it does not save it.
 
     Parameters
-    -----------
+    ----------
     station : str
         station name
 

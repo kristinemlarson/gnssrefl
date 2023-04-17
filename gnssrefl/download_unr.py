@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-downloads East North Vertical nevada reno position files
-IGS2014 frame
-"""
 import argparse
 import wget
 import sys
@@ -21,12 +16,22 @@ def parse_arguments():
 
 def download_unr(station: str):
     """
-    Command line interface for download_blewitt
+    Command line interface for downloading time series from the 
+    University of Nevada Reno website
+
+    This code is not actively maintained.
+
+    Examples
+    --------
+    download_unr p041
+
+    download_unr sc02
 
     Parameters
     ----------
     station : str
         4 character ID of the station name
+
     """
 
     if len(station) != 4:

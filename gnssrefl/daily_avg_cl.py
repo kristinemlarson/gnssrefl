@@ -1,10 +1,8 @@
-# command line module that calls daily_avg.py
 import argparse
 import matplotlib.pyplot as matplt
 import os
 import sys
 
-# my code
 import gnssrefl.gps as g
 import gnssrefl.daily_avg as da
 
@@ -40,14 +38,21 @@ def parse_arguments():
 def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
         extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None):
     """
-    The goal is to consolidate individual RH results into a single file consisting of daily averaged RH without outliers.
-
-    Currently called as : daily_avg p041 0.25 10 
-
-    where p041 is the station name, 0.25 is the median filter value in meters, and 10 is the number of values required to
-    trust the daily average.
+    The goal of this code is to consolidate individual RH results into a single file consisting of daily averaged RH without outliers.
 
     There are multiple optional choices as discussed below. The code also creates a file with all the subdaily RH as well.
+
+    Examples
+    -------- 
+    daily_avg p041 0.25 10 
+        consolidates results for p041 with median filter of 0.25 meters and at least 10 solutions per day
+    daily_avg p041 0.25 10  -year1 2015 -year2 2020
+        consolidates results for p041 with median filter of 0.25 meters and at least 10 solutions per day
+        and restricts it to years between 2015 and 2020
+    daily_avg p041 0.25 10  -year1 2015 -year2 2020 -azim1 0 -azim2 180
+        consolidates results for p041 with median filter of 0.25 meters and at least 10 solutions per day
+        and restricts it to years between 2015 and 2020 and azimuths between 0 and 180 degrees
+
 
     Parameters
     ----------

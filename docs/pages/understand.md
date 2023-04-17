@@ -9,17 +9,15 @@
 
 I recommend you use [this web app](https://gnss-reflections.org). It 
 can show you representative results with minimal constraints. It should provide 
-results in less than 10 seconds.
+results in less than 10 seconds. 
 
-*If you prefer Matlab*
+We do not support Matlab users.
 
-I had a [working matlab version on github](https://github.com/kristinemlarson/gnssIR_matlab_v3), 
-but I will not be updating it. You will very likely have to make changes to accommodate the recent
-change in security protocols at CDDIS.
 
 ## Goals
 
-The goal of the gnssrefl python repository is to help you compute (and evaluate) GNSS-based
+The goal of the gnssrefl python repository is to help you 
+compute (and evaluate) GNSS-based
 reflectometry parameters using geodetic data. This method is often
 called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modules:
 

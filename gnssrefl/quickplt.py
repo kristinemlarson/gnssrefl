@@ -12,6 +12,25 @@ def main():
     """
     quick file plotting using matplotlib
 
+    Examples
+    --------
+
+    quickplt txtfile 1 16
+        would plot column 1 on the x-axis and column 16 on the y-axis
+
+    quickplt txtfile 1 16 -xlabel Time
+        would plot column 1 on the x-axis and column 16 on the y-axis
+        and add Time on the x-axis label
+
+    quickplt txtfile 1 16 -reverse T
+        would plot column 1 on the x-axis and column 16 on the y-axis
+        it would reverse the y-axis parameter as you might want if 
+        you are ploting RH but want it to have the same sense as a tide gauge.
+
+    quickplt txtfile 1 16 -ylimits 0 2
+        would restrict y-axis to be between 0 and 2
+
+
     Parameters
     ----------
     filename : str
@@ -22,20 +41,20 @@ def main():
         column number in the file for the y-axis parameter
     mjd : str
         T or True, code will convert MJD to datetime, optional
-    xlabel : str
-        label for x-axis, optional
+    xlabel : str, optional
+        label for x-axis 
     ylabel : str
-        label for y-axis, optional
-    symbol : str
-        prescibe the marker used in the plot, optional
-    reverse : str
-        T or True, to reverse y-axis limits, optional
-    title : str
-        optional title for plot
-    outfile : str
-        name of png file to store plot
-    ylimits: str
-        pair of yaxis limits 
+        label for y-axis 
+    symbol : str, optional
+        prescibe the marker used in the plot 
+    reverse : str, optional
+        T or True, to reverse y-axis limits
+    title : str, optional
+        title for plot 
+    outfile : str, optional
+        name of png file to store plot 
+    ylimits: float, optional
+        pair of yaxis limits  
 
     """
 

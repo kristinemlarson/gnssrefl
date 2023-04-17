@@ -1,5 +1,7 @@
 # Files and File Formats
 
+## Environment Variables
+
 You need three environment variables to run 
 this code: REFL_CODE, ORBITS, and EXE. If you are using 
 the jupyter notebooks or the docker, they are defined for you. If you are working

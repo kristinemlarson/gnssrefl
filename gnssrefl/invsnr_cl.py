@@ -58,33 +58,36 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
            refraction: bool = True, json_override: bool = False):
 
     """
-    Wrapper to call invsnr code.
+    Calls invsnr code.
 
-    outfile_name and outfile_type are unnecessary. Consolidate them.
+    Note: outfile_name and outfile_type are unnecessary. Consolidate them.
     
-    Example:
-
+    Examples
+    -------
     invsnr sc02 2023 15 L1+L2+L5 
+        would analyze day of year 15 and the L1, L2, and L5 signals
+    invsnr sc02 2023 15 ALL
+        would analyze day of year 15 and all signals
+    invsnr sc02 2023 15 L1+L2
+        would analyze day of year 15 and just L1 and L2
+    invsnr sc02 2023 15 L1+L2  -doy_end 18
+        would analyze day of years 15 through 18 and L1 and L2 signals
 
     Parameters
     ----------
-    station : string
+    station : str
         four character ID 
-
-    year : integer
+    year : int
         Year
-
-    doy : integer
+    doy : int
         Day of year
-
-    signal : string
+    signal : str
         signal to use.
-        value options: L1 L2 L5 L6 L7 L1+L2 L1+L2+L5 L1+L5 ALL
-
+        value options: 
+            L1  L2 L5 L6 L7 L1+L2 L1+L2+L5 L1+L5 ALL
     pktnlim: float, optional
         Peak2noise ratio limit for Quality Control.
         Default is 4
-
     constel: str, optional
         Only a single constellation.
         Default is gps, glonass, and galileo.
@@ -102,80 +105,63 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
     screenstats: bool, optional
         Whether to print out stats to the screen.
         Default is False
-
     tempres: int, optional
         SNR file decimator (seconds)
         Default is 1 (everything)
-
-
     polydeg : integer, optional
         polynomial degree for direct signal removal
         Default is 2
-
     snrfit : bool, optional
         Whether to do the inversion or not
         Default is True
-
     plt : bool, optional
         Whether to plot to the screen or not
         Default is True
-
     doy_end : int, optional
         day of year to end analysis.
         Default is None.
-
     lspfigs : bool, optional
         Whether or not to make LSP plots
         Note: Don't turn these on unless you really need plots because it is 
         slow to make one per satellite arc.
         Default is False
-
     snrfigs : boolean, optional
         Whether or not to make SNR plots
-        Don't turn these on unless you really need plots because it is slow to make one per satellite arc.
+        Don't turn these on unless you really need plots because it is 
+        slow to make one per satellite arc.
         Default is False
-
     knot_space : float, optional
         Knot spacing in hours
         Default is 3
-
     rough_in : float, optional
         Roughness
         Default is 0.1
-
     risky : bool, optional
         Risky taker related to gaps/knot spacing
         Default is False
-
     snr_ending : int, optional
         SNR file ending. Default is 66
-
     outfile_type : string, optional
         output file type, txt or csv
         Default is txt
-
     outfile_name : string, optional
         output file name.
-        Default is ''
-
+        Default is ??
     outlier_limit : float, optional
         Outliers plotted. (meters)
         Default is 0.5
-
     no_dots : bool, optional
         To plot lombscargle or not.
         Default is False
-
     delta_out : int, optional
         Output increment, in seconds.
         Default is 300
-
     refraction : bool, optional
         Default is True
-
     json_override : bool, optional
         Override json file name
         Default is False
+
     """
 
     if len(station) != 4:
