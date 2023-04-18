@@ -10,10 +10,26 @@ RH data look compared to various quality control parameters).  It also removes g
 outliers by looking a very crude daily standard deviation (i.e. with 2.5 sigma, which you 
 can control on the commandline).
 
+Results are presented with azimuth and amplitude colors to help you modify QC choices or azimuth mask:
+
+
+<img src="../_static/sc02_Figure1.png" width="600"/>
+<img src="../_static/sc02_Figure2.png" width="600"/>
+<img src="../_static/sc02_Figure3.png" width="600"/>
+<img src="../_static/sc02_Figure4.png" width="600"/>
+
+
+
+
 You can also apply new limits to RH, azimuths, and QC parameters.
 
 ## Section II
 
+<img src="../_static/sc02_Figure5.png" width="600"/>
+
+<img src="../_static/sc02_Figure6.png" width="600"/>
+
+<img src="../_static/sc02_Figure7.png" width="600"/>
 
 Second section tries to do a better job with outliers based on a spline fit. If the spline fit
 is not very good (which you control with -knots), then it will throw out too many points (or too few).
@@ -74,11 +90,6 @@ look at a subset of days, you can set -doy1 and/or -doy2. The output file locati
 is sent to the screen. <code>subdaily</code> then tries to remove large outliers 
 by using a standard deviation test. This can be controlled at the command line. Example figures:
 
-Results are presented with azimuth and amplitude colors to help you modify QC choices or azimuth mask:
-
-<img src="../_static/sc02-1.png" width="600"/>
-
-<img src="../_static/sc02-2.png" width="600"/>
 
 Whle this code is meant to be used AFTER you have chosen an analysis strategy, you can 
 apply new azimuth and amplitude constraints on the commandline, i.e. <code>-azim1, -azim2, -ampl</code>.
