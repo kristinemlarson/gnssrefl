@@ -1,11 +1,19 @@
-# subdaily<a name="module6"></a>
+# subdaily
 
-**Updated March 30, 2023**
+The subdaily code has two sections:
 
-The code has two sections:
+## Section I
 
-First section tries to summarize the data (which constellations where used, how do the 
-RH data look compared to various quality control parameters).  It also removes gross outliers.
+The goal of this section is to summarize the RH data previously computed using gnssir, i.e. 
+were constellations where used, how do the 
+RH data look compared to various quality control parameters).  It also removes gross 
+outliers by looking a very crude daily standard deviation (i.e. with 2.5 sigma, which you 
+can control on the commandline).
+
+You can also apply new limits to RH, azimuths, and QC parameters.
+
+## Section II
+
 
 Second section tries to do a better job with outliers based on a spline fit. If the spline fit
 is not very good (which you control with -knots), then it will throw out too many points (or too few).
