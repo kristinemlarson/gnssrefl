@@ -6,8 +6,8 @@
 `Documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_ |
 `Installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
-.. image:: ../_static/snowdepth-p360.png
-   :width: 600
+.. image:: ../_static/sc02_rhdot4.png
+   :width: 500
 
   
 Agenda
@@ -20,7 +20,7 @@ Agenda
 
 **May 5:** Optimizing site installations, improving the software
 
-The course meetings from 09:00-11:00 MDT/17:00-19:00 CET
+The course meets each day from 09:00-11:00 MDT/17:00-19:00 CET. There will be a short break at the midpoint.
 
 Before the Class Begins
 =======================
