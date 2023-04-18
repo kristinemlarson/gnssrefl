@@ -171,6 +171,7 @@ What comes back?
 
 Try to pick reflection zones for station [sc02](http://gnss-reflections.org/rzones?station=sc02). 
 Is it reasonable to use the mean sea level RH option in https://gnss-reflections.org/rzones for this station?
+Which azimuths and elevation angles look best to you?
 
 If you use the <code>refl_zones</code> module in gnssrefl, you can make a KML file that can 
 be read directly into Google Earth. This way will let you pick the satellite image.

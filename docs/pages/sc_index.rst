@@ -31,4 +31,13 @@ Questions
 For software installation questions, please join the slack channel sent to you with the course invitation.
 
 
+Course Instructors
+==================
+* [Kristine Larson](https://github.com/kristinemlarson) (Bonn University, Germany)
+* Simon Williams (Nat. Ocean Ctr.- UK)
+* [Felipe Nievinski](https://github.com/fgnievinski) (Uni. Federal do Rio Grande do Sul - Brazil)
+* David Purnell (Laval University - Canada)
+* Thomas Nylen (Danish Technical University, Denmark)
+* [Kelly Enloe](https://github.com/k-enloe) (EarthScope - USA)
+* [Tim Dittmann](https://github.com/timdittmann) (EarthScope - USA)
 
