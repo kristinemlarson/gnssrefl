@@ -44,7 +44,7 @@ That is why we recommend you put them in your .bashrc file. [More on environment
 
 ## Run the Code 
 
-- Translate a Single GNSS File
+**Translate a Single GNSS File**
 
 For github, pypi, and docker users, type in a terminal window:
 
@@ -70,7 +70,7 @@ If you have any trouble with this command or do not have an Earthscope account, 
 
 <code>rinex2snr p038 2022 90 -orb rapid -archive sopac</code>
 
-- Next Step: Look at the reflection data for a single GNSS station
+**Next Step: Look at the reflection data for a single GNSS station**
 
 <code>quickLook</code> is a module for assesing the reflections data from GNSS-IR site. We 
 will start by using the simplest request, which evaluates L1 GPS data 
