@@ -10,7 +10,6 @@
 .. image:: ../_static/sc02_rhdot4.png
    :width: 500
 
-  
 Agenda
 ======
 **May 2.** Basic principles of GNSS-IR, How to run the gnssrefl software
@@ -48,7 +47,7 @@ David Purnell,Laval University - Canada
 
 Thomas Nylen, Danish Technical University, Denmark
 
-[Kelly Enloe, EarthScope - USA
+Kelly Enloe, EarthScope - USA
 
 Tim Dittmann, EarthScope - USA
 

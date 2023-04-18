@@ -11,9 +11,6 @@ I recommend you use [this web app](https://gnss-reflections.org). It
 can show you representative results with minimal constraints. It should provide 
 results in less than 10 seconds. 
 
-We do not support Matlab users.
-
-
 ## Goals
 
 The goal of the gnssrefl python repository is to help you 

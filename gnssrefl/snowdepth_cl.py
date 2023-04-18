@@ -61,8 +61,7 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
     all values together.  The default defines bare soil values every 10 degrees in azimuth.  
 
     Examples
-    -------
-
+    --------
     snowdepth p101 2022
         would use results from a previous run of daily_avg
 

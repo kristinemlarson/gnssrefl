@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-# kristine M. larson
-# command line for gnssir.py module
-# 2022 April 15 added gzip boolean input
-
 
 import argparse
 import os
@@ -60,33 +55,31 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
            compress: bool = False, screenstats: bool = False, delTmax: int = None,
            e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False, dec : int = 1):
     """
-        gnssir is the main driver for estimating Reflector Height using GNSS Interferometric Reflectometry.
+        gnssir is the main driver for estimating Reflector Heights
         The user is required to have set up an analysis strategy using "make_json_input" 
         
-        To run the gnssir code,  you need 1) a SNR file and 2) the analysis strategy.   The required inputs
-        (station, year, doy) tell the code where to find the SNR file. The station name tells the code whre
-        to find the analysis strategy file.
-
-        Sample function call:
-
-        gnssir p041 2021 15 would analyze the data for station p041, year 2021 and day of year 15.
-
-        If gnssir is not working properly - or you do not understand why it is making various choices, you 
-        are encouraged to set screenstats to True.
+        Examples
+        --------
+        gnssir p041 2021 15 
+            analyzes the data for station p041, year 2021 and day of year 15.
+        gnssir p041 2021 15  -snr 99
+            uses SNR files with a 99 suffix
+        gnssir p041 2021 15  -snr 99 -screenstats T
+            sends debugging information to the screen
+        gnssir p041 2021 15  -nooverwrite T 
+            only runs gnssir if there isn't a previous solution
+        gnssir p041 2021 15  -doy_end 20 
+            Analyzes data from day of year 15 to day of year 20
 
         Parameters
         ----------
-        station : string
-            4 character ID of the station
-            lowercase please
-
-        year : integer
-            Year
-
+        station : str
+            lowercase 4 character ID of the station
+        year : int
+            full Year
         doy : integer
             Day of year
-
-        snr : integer, optional
+        snr : int, optional
             SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
             value options:
                 66 (default) : saves all data with elevation angles less than 30 degress
@@ -97,13 +90,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
                 50 : saves all data with elevation angles less than 10 degrees
 
-        plt : boolean, optional
-            Send plots to screen or not.
-            Default is False.
-
-        fr : integer, optional
-            GNSS frequency.
-            value options:
+        plt : bool, optional
+            Send plots to screen or not. Default is False.
+        fr : int, optional
+            GNSS frequency. Value options:
                 1,2,20,5 : GPS L1, L2, L2C, L5
 
                 101,102 : GLONASS L1, L2
@@ -116,7 +106,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             minimum spectral peak amplitude.
             default is None
 
-        sat : integer, optional
+        sat : int, optional
             satellite number to only look at that single satellite.
             default is None.
 
@@ -130,53 +120,40 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             doy_end will be for year_end.
             Default is None.
 
-        azim1 : integer, optional
+        azim1 : int, optional
             lower limit azimuth.
             If the azimuth angles are changed in the json (using 'azval' key) and not here, then the json overrides these.
             If changed here, then it overrides what you requested in the json.
             default is 0.
-
-        azim2 : integer, optional
+        azim2 : int, optional
             upper limit azimuth.
             If the azimuth angles are changed in the json (using 'azval' key) and not changed here, then the json overrides these.
             If changed here, then it overrides what you requested in the json.
             default is 360.
-
-        nooverwrite : boolean, optional
+        nooverwrite : bool, optional
             Use to overwrite lomb scargle result files or not.
             Default is True (do not overwrite files).
-
         extension : string, optional
             extension for result file, useful for testing strategies.
             default is ''. (empty string)
-
         compress : boolean, optional
             xz compress SNR files after use.
             default is False.
-
-        screenstats : boolean, optional
+        screenstats : bool, optional
             whether to print stats to the screen or not.
             default is True.
-
-        delTmax : integer, optional
-            satellite arc length in minutes.
-            default is None.
-
+        delTmax : int, optional
+            maximum satellite arc length in minutes. Set in make_json_input
         e1 : float, optional
             use to override the minimum elevation angle.
-            default is None.
-
         e2 : float, optional
             use to override the maximum elevation angle.
-            default is None.
-
         mmdd : boolean, optional
             adds columns in results for month, day, hour, and minute.
             default is False.
         gzip : boolean, optional
             gzip compress SNR files after use.
             default is False.
-
         dec : int, optional
             decimate SNR file to this sampling period before the 
             periodograms are computed. 1 sec is default (i.e. no decimating)
