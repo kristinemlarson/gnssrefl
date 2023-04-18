@@ -1,9 +1,9 @@
-import numpy as np
 from astropy.time import Time
 from astropy.timeseries import LombScargle
 import datetime
 import math
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 import pickle
 from scipy import interpolate

@@ -101,29 +101,25 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     Parameters
     ----------
     station : str
-        4 or 9 character ID of the station
-
+        4 or 9 character ID of the station, preferably lowercase
     year : int
         Year
-
     doy : int
         Day of year
-
     snr : int, optional
         SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
         value options:
 
-        66 (default) : saves all data with elevation angles less than 30 degrees
+            66 (default) : saves all data with elevation angles less than 30 degrees
 
-        99 : saves all data with elevation angles between 5 and 30 degrees
+            99 : saves all data with elevation angles between 5 and 30 degrees
 
-        88 : saves all data 
+            88 : saves all data 
         
-        50 : saves all data with elevation angles less than 10 degrees
+            50 : saves all data with elevation angles less than 10 degrees
 
     orb : str, optional
-        Which orbit files to download. 
-        Value options:
+        Which orbit files to download. Value options:
 
             gps (default) : will use GPS broadcast orbit
 
