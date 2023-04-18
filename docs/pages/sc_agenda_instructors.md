@@ -15,8 +15,8 @@
 ## May 3: Hydrologic Applications
 - Short Intro on Snow and Ice (10 min, KL)
 - Ice sheet example (10-15 min, KE) 
-  - Antarctica
-  - Greenland 
+  - Antarctica (LTHW)
+  - Greenland  (GLS1, if time)
 - Snow accumulation examples (20 min, KL)
   - P360 or P101
   - Barrow ?

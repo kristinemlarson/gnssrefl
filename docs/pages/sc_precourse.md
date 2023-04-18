@@ -4,49 +4,47 @@ While it is possible to simply listen to the lecturers in the short
 course, we think that this is a far better learning experience if 
 you are able to follow along with the examples. And for this we recommend the following:
 
-## Software Installation
+## Getting Started 
 
-[**Please sign up for an Earthscope account**](https://data-idm.unavco.org/user/profile/login)
+- [Sign up for an Earthscope account](https://data-idm.unavco.org/user/profile/login)
 
-**Questions?:** 
+- Join the slack channel. Use the link from the course invite.
 
-Check out the slack channel. This will be the main avenue used for asking questions.
-
-**Please install the gnssrefl software.**
-
-We have [installation instructions](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html) 
+- Install the software. We have 
+[installation instructions](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html) 
 for three different ways to access our code. 
 
-- The github or pypi install requires you are running linux and 
+  - The github or pypi install requires you are running linux and 
 have python 3.8+ on your system and feel comfortable
 installing python packages.  
 
-- Dockers. PC users should use this path, but it is also a good way 
+  - Dockers. PC users should use this path, but it is also a good way 
 for mac and linux users that don't want to install python and/or 
 manage dependencies or environment variables.
 
-- Jupyter notebooks. This is another great way for people that are unfamiliar 
+  - Jupyter notebooks. This is another great way for people that are unfamiliar 
 with python to access the code. The examples are given as tutorials, including 
 a pre-course activity notebook accomplishing the steps outlined below.
 
-**Check your environment variables** (disregard this step if using dockers or notebooks)
+- Check your environment variables (disregard this step if using dockers or notebooks)
 
 Direct installers (github/pypi) need to set environment variables. In a terminal window, you should
 check that they are active by typing these commands:
 
-<code>printenv REFL_CODE</code>
+<pre>
+    printenv REFL_CODE
 
-<code>printenv EXE</code>
+    printenv EXE
+
+    printenv ORBITS
+</PRE>
 
 If nothing comes back, you haven't set them. **They have to be set every time you run the code.**
-That is why we recommend you put them in your .bashrc file.
+That is why we recommend you put them in your .bashrc file. [More on environment variables and file formats](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html#environment-variables)
 
+## Run the Code 
 
-[More on environment variables and file formats](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html#environment-variables)
-
-## Running the Code 
-
-**Getting Started: Translate a Single GNSS File**
+- Translate a Single GNSS File
 
 For github, pypi, and docker users, type in a terminal window:
 
@@ -72,10 +70,12 @@ If you have any trouble with this command or do not have an Earthscope account, 
 
 <code>rinex2snr p038 2022 90 -orb rapid -archive sopac</code>
 
-**Next Step: Look at the reflection data for a single GNSS station**
+- Next Step: Look at the reflection data for a single GNSS station
 
-<code>quickLook</code> is a valuable tool for assesing a GNSS-IR site. We will start by using the 
-simplest request, which evaluates L1 GPS data using a standard azimuth/elevation angle mask:
+<code>quickLook</code> is a module for assesing the reflections data from GNSS-IR site. We 
+will start by using the simplest request, which evaluates L1 GPS data 
+using a standard azimuth/elevation angle mask (i.e. all azimuths and elevation angles from 
+5-25 degrees:
 
 <code>quickLook p038 2022 90</code>
 
@@ -127,19 +127,37 @@ What happens when you change the inputs to quickLook? (h1, h2, e1, e2). Try usin
 frequencies. Since we used the rapid multi-GNSS orbit from GFZ, we have access to GPS, Glonass,
 and Galileo signals. [You can check here to remind yourself how the frequencies are named in this software](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html)
 
-**What is a Reflection Zone**
+## What is a Reflection Zone 
 
 [Watch this video](https://www.youtube.com/watch?v=sygZMeCHHDg&t=23s)
 
 Use the [refl_zones web site](https://gnss-reflections.org/rzones) to try and pick 
-reflection zones for station [ross](http://gnss-reflections.org/geoid?station=ross) 
-that was used in the examples. Should you use the default
-sea level reflector height (RH) or should you pick one? And if so, what value should you use?
-From the picture, what value do you think is reasonable?
+reflection zones for station [ross](https://gnss-reflections.org/geoid?station=ross) 
+that was used in the introduction section. The web 
+app tells you the mean sea level for this site. But 
+that is not the reflector height you want to use for the reflection zone.  What value should
+you use?  Try a few different values.
+
+Now translate a GNSS file to see if you made a good choice.
+
+<code>rinex2snr ross 2020 211 -archive sopac </code>
+
+Then run quickLook:
+
+<code>quickLook ross 2020 211</code>
+
+What is the RH associated with the lake? Do the good azimuths in the periodogram summary
+agree with the google map image? (note: google earth is now using an image from winter, so it 
+is quite challenging to see what is going on - so you might look 
+back at the [earlier discussion](https://gnssrefl.readthedocs.io/en/latest/pages/understand.html)).
 
 
-Try to pick reflection zones for station [sc02](http://gnss-reflections.org/geoid?station=sc02). 
-Is it reasonable to use the mean sea level RH option in https://gnss-reflections.org/rzones ?
+Try to pick reflection zones for station [sc02](http://gnss-reflections.org/rzones?station=sc02). 
+Is it reasonable to use the mean sea level RH option in https://gnss-reflections.org/rzones for this station?
+
+If you use the <code>refl_zones</code> module in gnssrefl, you can make a KML file that can 
+be read directly into Google Earth. This way will let you pick the satellite image.
+
 
 ## Additional Assignments
 
@@ -151,7 +169,9 @@ The main module for estimating reflector height is
 called [gnssir](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html).
 Try out one of [our examples](https://gnssrefl.readthedocs.io/en/latest/pages/first_drivethru.html). 
 
-If you are primarily interested in water levels, you should start with a lake. 
+If you are primarily interested in water levels, you should start with a lake.  We are covering
+TGHO in class. 
 
 If you are primarily interested in snow accumulation, you should start with an ice sheet.  
+We are covering LTHW (and possibly GLS1) in class.
 
