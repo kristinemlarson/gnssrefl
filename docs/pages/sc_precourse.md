@@ -131,6 +131,8 @@ and Galileo signals. [You can check here to remind yourself how the frequencies 
 
 [Watch this video](https://www.youtube.com/watch?v=sygZMeCHHDg&t=23s)
 
+**First example: ross**
+
 Use the [refl_zones web site](https://gnss-reflections.org/rzones) to try and pick 
 reflection zones for station [ross](https://gnss-reflections.org/geoid?station=ross) 
 that was used in the introduction section. The web 
@@ -151,6 +153,21 @@ agree with the google map image? (note: google earth is now using an image from 
 is quite challenging to see what is going on - so you might look 
 back at the [earlier discussion](https://gnssrefl.readthedocs.io/en/latest/pages/understand.html)).
 
+Change the frequency on the command line to L2 (-fr 2). Note how the periodogram plots 
+have two peaks instead of one. This is a problem!
+
+Now try to look at the Glonass data. You need multi-GNSS orbits
+
+<code>rinex2snr ross 2020 211 -archive sopac -overwrite T -orb gnss</code>
+
+
+Rerun quickLook:
+
+<code>quickLook ross 2020 211 -fr 101</code>
+
+What comes back?
+
+**Second example: sc02**
 
 Try to pick reflection zones for station [sc02](http://gnss-reflections.org/rzones?station=sc02). 
 Is it reasonable to use the mean sea level RH option in https://gnss-reflections.org/rzones for this station?
@@ -170,8 +187,10 @@ called [gnssir](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html).
 Try out one of [our examples](https://gnssrefl.readthedocs.io/en/latest/pages/first_drivethru.html). 
 
 If you are primarily interested in water levels, you should start with a lake.  We are covering
-TGHO in class. 
+TGHO in class, so choose other sites. 
 
 If you are primarily interested in snow accumulation, you should start with an ice sheet.  
-We are covering LTHW (and possibly GLS1) in class.
+We are covering LTHW (and possibly GLS1) in class, so choose other sites.
 
+For students primarily interested in soil moisture, I recommend that you do a snow depth case.
+This will help you understand better how the soil moisture code works.

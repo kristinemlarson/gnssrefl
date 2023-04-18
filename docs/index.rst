@@ -29,9 +29,9 @@ Welcome to the gnssrefl Documentation!
    pages/quick_recall.md
    pages/first_drivethru.md
    pages/contributions_questions.md
+   pages/sc_index
    pages/new_station.md
    api
-   pages/sc_index
 
 .. note::
    These docs are still under development; feedback is appreciated.

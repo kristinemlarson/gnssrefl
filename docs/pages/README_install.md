@@ -67,7 +67,7 @@ directories in year, followed by type, i.e. snr, results, sp3, nav, and then by 
 
 If you are using the version from gitHub:
 
-* install the python3-venv package <code>apt-get install python3-venv</code>
+* You may want to install the python3-venv package <code>apt-get install python3-venv</code>
 * <code>apt-get install git</code>
 * <code>git clone https://github.com/kristinemlarson/gnssrefl </code>
 * cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code>
@@ -80,13 +80,12 @@ If you are using the version from gitHub:
 
 ## PyPi Install 
 
-* make a directory, cd into that directory, set up a virtual environment
-* activate the virtual environment
+* make a directory, cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code>
+* activate the virtual environment, <code>source env/bin/activate </code>
 * <code>pip install wheel</code> (we are working to remove this step)
 * <code>pip install gnssrefl</code>
 * from what I understand, you should be able to use pip3 instead of pip
-* so please read below or type <code>installexe -h</code> 
-
+* Please read below or type <code>installexe -h</code> 
 
 ## Non-Python Code
 

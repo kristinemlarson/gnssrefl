@@ -20,7 +20,7 @@ Agenda
 
 **May 5:** Optimizing site installations, improving the software
 
-09:00-11:00 MDT, 17:00-19:00 CET
+The course meetings from 09:00-11:00 MDT/17:00-19:00 CET
 
 Before the Class Begins
 =======================
@@ -28,7 +28,7 @@ Before the Class Begins
 
 Questions
 =========
-For software installation questions, please join the slack channel.
+For software installation questions, please join the slack channel sent to you with the course invitation.
 
 
 
