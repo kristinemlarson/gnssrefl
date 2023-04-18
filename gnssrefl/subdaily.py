@@ -95,7 +95,7 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
 
 def print_badpoints(t,outliersize,txtdir,real_residuals):
     """
-    prints outliers to a file so you can look at them separately
+    prints outliers to a file.
 
     Parameters
     ----------
@@ -1158,6 +1158,14 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
        outlier criterion, in meters  used in second go thru
        if None, then use 3 sigma (which is the default)
 
+    delta_out : float, optional
+        seconds for smooth output
+    txtdir : str
+        if wanting to set your own output directory
+    apply_if_corr : bool, optional
+        whether you want to apply the IF correction
+        default is true
+
     """
     # output will go to REFL_CODE/Files unless txtdir provided
     xdir = os.environ['REFL_CODE']
@@ -1711,7 +1719,7 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
     txtdir : str
         where results are stored
     fs : int
-        fontsize 
+        fontsize for the plots
 
     """
 
