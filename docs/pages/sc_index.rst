@@ -18,7 +18,7 @@ Agenda
 
 **May 4.** Water applications: lakes, rivers, tides
 
-**May 5:** Optimizing site installations, improving the software
+**May 5:** Optimizing site installations, GNSS-IR API, improving the software, low-cost sensors
 
 The course meets each day from 09:00-11:00 MDT/17:00-19:00 CET. There will be a short break at the midpoint.
 
@@ -33,14 +33,12 @@ For software installation questions, please accept the slack channel invitation 
 Videos
 ======
 We will be posting videos about GNSS-IR and gnssrefl to help users. 
-[Some older videos](https://www.youtube.com/@funwithgps/videos) are already available. Please check this section for updates.
+`Some older videos <https://www.youtube.com/@funwithgps/videos>`_ are already available. Please check this section for updates.
 
 Course Instructors
 ==================
 Kristine Larson, Bonn University, Germany
-
 Simon Williams, Nat. Ocean Ctr.- United Kingdom
-
 Felipe Nievinski, Uni. Federal do Rio Grande do Sul - Brazil
 
 David Purnell,Laval University - Canada
