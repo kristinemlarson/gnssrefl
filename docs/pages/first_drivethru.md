@@ -1,10 +1,11 @@
 
 ### gnssrefl use cases 
 
-About 75% of these uses cases require access to the Earthscope/UNAVCO 
-archive. You need to [sign up for an account.](https://data-idm.unavco.org/user/profile/login)
+About 75% of these use cases use access to the Earthscope/UNAVCO 
+archive. In some cases, sopac can be used as an alternate archive. If at all 
+possible, you should [sign up for an EarthScope account.](https://data-idm.unavco.org/user/profile/login)
 
-Some of these use cases were created with an earlier version of the software.
+Some of these use cases were created with an earlier version of the gnssrefl software.
 The plots might look slightly different and the defaults we used in the analysis might have changed.
 
 
