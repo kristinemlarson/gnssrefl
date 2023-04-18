@@ -31,47 +31,30 @@
 - Short Intro (5 min, KL) 
 - Background on models needed/used for water monitoring (35, SW)
 - daily_avg vs. subdaily (5 min, KL)
-- alas, all data are not created equally (KL)
 - Lake example using daily_avg (10 min, KE)
   - TGHO
 - Break (10 minutes)
 - Using subdaily
-  - Tide example (10 min, SW)
-  - Tide example (10 min, SW)
-  - Tide example (10 min, SW)
+  - Tide example (10 min, SC02 SW)
+  - Tide example (10 min, AC12 SW)
+  - Tide example (10 min, TGGO SW)
 - invsnr method (15 min, DP) 
-  - ?
 - Questions (5 min)
 
 ## May 5: Going Forward
 - Short Intro (5 min, KL)
-- https://gnss-reflections.org API (5 min, KL)
-- Improvements Needed (5 min, KL)  
+- https://gnss-reflections.org API (10 min, KL)
+- Why is it so hard to find good GNSS data? (10 min, KL)
+- Improvements (10 min, KL)  
   - Better refraction
+  - SWH calculation
+  - ITRF
   - Equipment database
   - Community: Adv models for SWE and soil moisture
+- Break (10 minutes)
 - How to report bugs, ask questions (10 min, TD)
 - How to make a good installation (10 min, TN) 
   - Show how you picked new sites in Greenland
-- Break (10 minutes)
-- Low-cost sensors: (40 min, MK, SW, FN)
+- Low-cost sensors: (10-15 min, SW)
 - Questions: remainder of the time
 
-# Course Instructors
-
-* [Kristine Larson](https://github.com/kristinemlarson) (Bonn University, Germany)
-<image src = "https://gnss-reflections.org/static/images/Kristine-NYC-crop.jpg" width="100px"></image>
-* [Felipe Nievinski](https://github.com/fgnievinski) (Uni. Federal do Rio Grande do Sul - Brazil) 
-<image src = "https://spotlight.unavco.org/station-pages/p360/eo/scientistPhoto.jpg" width="100px"></image>
-* [Makan Karegar](https://github.com/MakanAKaregar) (Bonn University, Germany) 
-<image src = "https://gnss-reflections.org/static/images/makan.jpg" width="100px"></image>
-* Simon Williams (Nat. Ocean Ctr.- UK) 
-<image src = "https://gnss-reflections.org/static/images/Simon_Williams12.jpg" width="100px"></image>
-* David Purnell (Laval University - Canada) 
-<image src = "https://gnss-reflections.org/static/images/david_purnell2.jpg" width="100px"></image>
-* Thomas Nylen (Danish Technical University, Denmark) 
-<image src = "https://gnss-reflections.org/static/images/thomas_nylen.jpg" width="100px"></image>
-* [Kelly Enloe](https://github.com/k-enloe) (EarthScope - USA) 
-<image src = "https://gnss-reflections.org/static/images/kellyenloe.jpg" width="100px"></image>
-* [Tim Dittmann](https://github.com/timdittmann) (EarthScope - USA) 
-<image src = "https://gnss-reflections.org/static/images/tim_dittmann.jpg" width="100px"></image>
