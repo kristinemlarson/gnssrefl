@@ -30,14 +30,24 @@ Questions
 =========
 For software installation questions, please join the slack channel sent to you with the course invitation.
 
+Videos
+======
+We will be posting videos about GNSS-IR and gnssrefl to help users. [Some older videos](https://www.youtube.com/@funwithgps/videos) are 
+already available. Please check this section for updates.
 
 Course Instructors
 ==================
-* [Kristine Larson](https://github.com/kristinemlarson) (Bonn University, Germany)
-* Simon Williams (Nat. Ocean Ctr.- UK)
-* [Felipe Nievinski](https://github.com/fgnievinski) (Uni. Federal do Rio Grande do Sul - Brazil)
-* David Purnell (Laval University - Canada)
-* Thomas Nylen (Danish Technical University, Denmark)
-* [Kelly Enloe](https://github.com/k-enloe) (EarthScope - USA)
-* [Tim Dittmann](https://github.com/timdittmann) (EarthScope - USA)
+[Kristine Larson](https://github.com/kristinemlarson) (Bonn University, Germany)
+
+Simon Williams (Nat. Ocean Ctr.- United Kingdom)
+
+[Felipe Nievinski](https://github.com/fgnievinski) (Uni. Federal do Rio Grande do Sul - Brazil)
+
+David Purnell (Laval University - Canada)
+
+Thomas Nylen (Danish Technical University, Denmark)
+
+[Kelly Enloe](https://github.com/k-enloe) (EarthScope - USA)
+
+[Tim Dittmann](https://github.com/timdittmann) (EarthScope - USA)
 
