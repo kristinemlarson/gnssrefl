@@ -38,7 +38,9 @@ We will be posting videos about GNSS-IR and gnssrefl to help users.
 Course Instructors
 ==================
 Kristine Larson, Bonn University, Germany
+
 Simon Williams, Nat. Ocean Ctr.- United Kingdom
+
 Felipe Nievinski, Uni. Federal do Rio Grande do Sul - Brazil
 
 David Purnell,Laval University - Canada
