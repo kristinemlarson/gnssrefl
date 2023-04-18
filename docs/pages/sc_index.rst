@@ -4,6 +4,7 @@
 
 `Earthscope <https://www.earthscope.org/event/2023-gnss-ir-short-course/>`_ |
 `Documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_ |
+`Videos <https://www.youtube.com/@funwithgps/videos>`_ |
 `Installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
 .. image:: ../_static/sc02_rhdot4.png
@@ -28,26 +29,26 @@ Before the Class Begins
 
 Questions
 =========
-For software installation questions, please join the slack channel sent to you with the course invitation.
+For software installation questions, please accept the slack channel invitation sent to you by Earthscope.
 
 Videos
 ======
-We will be posting videos about GNSS-IR and gnssrefl to help users. [Some older videos](https://www.youtube.com/@funwithgps/videos) are 
-already available. Please check this section for updates.
+We will be posting videos about GNSS-IR and gnssrefl to help users. 
+[Some older videos](https://www.youtube.com/@funwithgps/videos) are already available. Please check this section for updates.
 
 Course Instructors
 ==================
-[Kristine Larson](https://github.com/kristinemlarson) (Bonn University, Germany)
+Kristine Larson, Bonn University, Germany
 
-Simon Williams (Nat. Ocean Ctr.- United Kingdom)
+Simon Williams, Nat. Ocean Ctr.- United Kingdom
 
-[Felipe Nievinski](https://github.com/fgnievinski) (Uni. Federal do Rio Grande do Sul - Brazil)
+Felipe Nievinski, Uni. Federal do Rio Grande do Sul - Brazil
 
-David Purnell (Laval University - Canada)
+David Purnell,Laval University - Canada
 
-Thomas Nylen (Danish Technical University, Denmark)
+Thomas Nylen, Danish Technical University, Denmark
 
-[Kelly Enloe](https://github.com/k-enloe) (EarthScope - USA)
+[Kelly Enloe, EarthScope - USA
 
-[Tim Dittmann](https://github.com/timdittmann) (EarthScope - USA)
+Tim Dittmann, EarthScope - USA
 
