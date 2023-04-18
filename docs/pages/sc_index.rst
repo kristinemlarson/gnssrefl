@@ -28,7 +28,7 @@ Before the Class Begins
 
 Questions
 =========
-For software installation questions, please accept the slack channel invitation sent to you by Earthscope.
+For software installation questions, please use our Slack channel. `To join the GNSS-IR Slack <https://23-gnss-irshortcourse.slack.com/ssb/redirect>`_
 
 Videos
 ======
