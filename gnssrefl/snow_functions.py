@@ -6,7 +6,7 @@ import sys
 
 import gnssrefl.gps as g
 
-def time_limits(wateryear,longer):
+def time_limits(wateryear,longer,end_doy):
     """
     pick up some time values for windowing RH/snow depth data
 
@@ -16,6 +16,8 @@ def time_limits(wateryear,longer):
         water year
     longer : bool
         whether you want a longer plot
+    end_doy : int
+        last day of the year in the water year you want snow depth calculated for 
 
     Returns
     -------
@@ -39,9 +41,15 @@ def time_limits(wateryear,longer):
         left = datetime.datetime(year=year-1, month=10, day = 1)
 
     # xaxis limit for the plot
-    right = datetime.datetime(year=year, month=6, day = 30)
+    if end_doy is None: 
+        right = datetime.datetime(year=year, month=6, day = 30)
+        enddoy, cdoy, cyyyy, cyy = g.ymd2doy(year,6,30)
+    else:
+        # doy to mmdd and vice versa.  grrr
+        yy,mm,dd, cyyyy, cdoy, YMD = g.ydoy2useful(year,end_doy)
 
-    enddoy, cdoy, cyyyy, cyy = g.ymd2doy(year,6,30)
+        right = datetime.datetime(year=year, month=mm, day = dd)
+        enddoy, cdoy, cyyyy, cyy = g.ymd2doy(year,mm,dd)
 
     # simple minded extracting the data for given limits
     starting = year-1 + startdoy/365.25
@@ -182,7 +190,7 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
     return gobst, snow, std
 
 
-def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days):
+def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days,end_doy):
     """
     simple snow depth algorithm
 
@@ -217,6 +225,8 @@ def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outp
         maximum snowdepth for plot (m)
     barereq_days: int
         min number of days to believe a bare soil average
+    end_doy : int
+        last day of year you want a snow depth value for
 
     """
     ii = (gps[:,1] >= doy1) & ((gps[:,1] <= doy2) & (gps[:,0] == bs))
@@ -238,7 +248,7 @@ def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outp
     noSnowRH = np.mean(baresoil)
     print('Bare Soil RH: ', '{0:7.3f}'.format( noSnowRH),'(m)' )
 
-    starting, ending, left, right = time_limits(year, longer)
+    starting, ending, left, right = time_limits(year, longer,end_doy)
 
     t = gps[:,0] + gps[:,1]/365.25
     ii = (t >= starting) & (t <=ending)
@@ -314,7 +324,7 @@ def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit,e
 
     return
 
-def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days):
+def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days,end_doy):
     """
     azimuthal snow depth algorithm
     tries to determine the bare soil correction in 20 degree azimuth swaths
@@ -350,6 +360,8 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
         maximum snowdepth for plot (m)
     barereq_days : int 
         number of days required to trust a bare soil average
+    end_doy : int
+        last day of year you want to compute snow depth for
 
     """
     ii = (gps[:,1] >= doy1) & ((gps[:,1] <= doy2) & (gps[:,0] == bs))
@@ -369,7 +381,7 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
         print('Not enough values to define baresoil: ', NB)
         sys.exit()
 
-    starting, ending, left, right = time_limits(year, longer)
+    starting, ending, left, right = time_limits(year, longer,end_doy)
 
     # window current water year's data to within time limits
     t = gps[:,0] + gps[:,1]/365.25

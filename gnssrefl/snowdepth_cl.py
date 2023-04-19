@@ -21,7 +21,7 @@ def parse_arguments():
     parser.add_argument("-longer", help="plot longer series", type=str, default=None)
     parser.add_argument("-bare_date1", help="bare soil start yyyy-mm-dd", type=str, default=None)
     parser.add_argument("-bare_date2", help="bare soil end yyyy-mm-dd", type=str, default=None)
-    parser.add_argument("-plt_enddate", help="end date for the plot, yyyy-mm-dd", type=str, default=None)
+    parser.add_argument("-plt_enddate", help="end date for the plot/snow solns, yyyy-mm-dd", type=str, default=None)
     parser.add_argument("-plt", help="whether you want the plot to come to the screen", type=str, default=None)
     parser.add_argument("-simple", help="use simple algorithm (default is false)", type=str, default=None)
     parser.add_argument("-medfilter", help="median filter for daily average(m)", type=float, default=None)
@@ -142,9 +142,11 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         pyear = int(plt_enddate[0:4])
         pmonth = int(plt_enddate[5:7])
         pday = int(plt_enddate[8:10])
+        yend, end_doy = g.cdate2ydoy(plt_enddate)
 
         end_dt = datetime.datetime(year=pyear, month=pmonth, day = pday)
     else:
+        end_doy = None
         end_dt = None
 
     # this overrides other ways of doing things.
@@ -154,9 +156,11 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         rrrr, doy2 = g.cdate2ydoy(bare_date2)
 
     if simple:
-        sf.snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days)
+        sf.snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,
+                outputfile,minS,maxS,barereq_days,end_doy)
     else:
-        sf.snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days)
+        sf.snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,
+                outputpng,outputfile,minS,maxS,barereq_days,end_doy)
 
 def main():
     args = parse_arguments()
