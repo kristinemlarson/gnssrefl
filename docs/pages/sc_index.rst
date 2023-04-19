@@ -29,7 +29,7 @@ Before the Class Begins
 Questions
 =========
 For software installation questions, please use our Slack channel. 
-`To join please use this link.<https://join.slack.com/t/23-gnss-irshortcourse/shared_invite/zt-1tbf5eh5i-HSoFhlSaSV8RwIV8TrZ0TA`_
+`To join please use this link.<https://join.slack.com/t/23-gnss-irshortcourse/shared_invite/zt-1tbf5eh5i-HSoFhlSaSV8RwIV8TrZ0TA>`_
 
 Videos
 ======
