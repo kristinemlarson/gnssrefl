@@ -36,6 +36,8 @@ Videos
 We will be posting videos about GNSS-IR and gnssrefl to help users. 
 `Some older videos <https://www.youtube.com/@funwithgps/videos>`_ are already available. Please check this section for updates.
 
+`Welcome video posted April 19 <https://www.youtube.com/watch?v=yijolYWXSQc>`_
+
 Course Instructors
 ==================
 Kristine Larson, Bonn University, Germany
