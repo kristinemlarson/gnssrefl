@@ -1,9 +1,17 @@
 # What is a good GNSS Reflections Site?
 
+A good GNSS reflection site has:
 
-Your expected GNSS reflection zone is not a mystery. 
+- a large reflection zone
+- good receiver tracking multiple GNSS signals and modern (L2C,L5) GPS signals
+- sampling rate that is commensurate with what you are trying to measure (i.e. 
+30 second sampling rate won't work for stations that are more than 8-9 meters 
+above the reflecting surface).
+- RINEX files with positions in the header and (preferably float) SNR data 
 
-The only inputs needed are:
+## Reflection Zones
+
+The only inputs needed to calculate your reflection zones are:
 
 * the approximate position of the GNSS site
 * the positions of the GNSS satellites
@@ -26,7 +34,7 @@ Compare with a 25 meter reflector height:
 Similarly, the sampling rate you need to use is not unknown – you just need to understand how the Nyquist frequency is
 defined for the SNR observations.
 
-## Designing a GNSS Reflections Site:
+## Designing a good GNSS Reflections Site:
 
 * Sampling interval should be commensurate with your reflection target area. You can generally get away with 30 sec for
   surfaces that are < 10 meters below the antenna, but I urge you to use **15 sec**. For reflectors larger than 50
@@ -56,8 +64,8 @@ make sure that you can sense the surface you want to measure. This is extremely
 * Track all GPS signals! (L1 and L1C, L2P and L2C, L5). If you can track GLONASS, Galileo, Beidou without costing a lot
   of money, I strongly recommend it.
 * It doesn’t matter if you turn on multipath suppression algorithms or buy a fancy antenna. They don’t stop multipath.
-* Put SNR data in your RINEX 2.11 file.
-* Provide SNR data in the RINEX 3 format to ensure full access to multi-GNSS SNR data.
+* Put SNR data in your RINEX file. RINEX 3 is generally preferred because it makes it easy to include all signals, but 
+RINEX 2.11 is fine as long as you make sure the file has L2C and L5 in it.
 
 ## Further reading
 * [Site guidelines for multi-purpose GNSS reflectometry stations](https://doi.org/10.5281/zenodo.3660744)
