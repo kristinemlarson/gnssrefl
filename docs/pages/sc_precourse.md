@@ -25,6 +25,9 @@ manage dependencies or environment variables.
   - Jupyter notebooks. This is another great way for people that are unfamiliar 
 with python to access the code. The examples are given as tutorials, including 
 a pre-course activity notebook accomplishing the steps outlined below.
+Once you have installed the Notebooks, please run [2023-GNSS-IR-Short-Course.ipynb notebook](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter/-/tree/master/notebooks)
+
+
 
 - Check your environment variables (disregard this step if using dockers or notebooks)
 
