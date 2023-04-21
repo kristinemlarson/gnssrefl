@@ -44,8 +44,11 @@ def main():
 
     crate = str(dec)
     iall = 'GRE'
-    sig = 'S1,S2C,S2,S5'
+    sig = 'S1,S2C,S2,S5,S6,S7'
     subprocess.call([gexe,'-finp', rinexfile, '-fout', rinexfile2, '-vo','2','-ot', sig, '-smp', crate, '-satsys',iall,'-f'])
+    # move new file to original name
+    subprocess.call(['rm','-f', rinexfile])
+    subprocess.call(['mv','-f', rinexfile2, rinexfile])
 
     #if os.path.isfile(rinex2):
     #    print('SUCCESS: new file created', rinex2)
