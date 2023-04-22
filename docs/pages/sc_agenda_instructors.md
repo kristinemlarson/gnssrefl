@@ -1,8 +1,8 @@
 # Course Agenda
 
 ## May 2: Introduction/Theory/Software
-- Overview and Welcome (10 min, KL)
-- Basic Theory incl Reflection Zones (40 min, FN) 
+- Overview and Welcome (5 min, KL)
+- Basic Theory incl Reflection Zones (45 min, FN) 
 - Break (10 min)
 - How to Run the Code, Questions (60 min, KL) 
   - big picture, how to find our codebase and answer your own questions
@@ -18,8 +18,8 @@
   - Antarctica (LTHW)
   - Greenland  (GLS1, if time)
 - Snow accumulation examples (20 min, KL)
+  - P041
   - P360 or P101
-  - Barrow ?
 - Break (10 minutes)
 - Soil Moisture (40 min, KL) 
   - PBO H2O approach (20 min)
@@ -45,16 +45,18 @@
 - Short Intro (5 min, KL)
 - https://gnss-reflections.org API (10 min, KL)
 - Why is it so hard to find good GNSS data? (10 min, KL)
-- Improvements (10 min, KL)  
-  - Better refraction
+- How to make a good installation (10-15 min, TN) 
+  - in particular, the issues you faced when you picked new sites in Greenland
+
+- Break (10 minutes)
+
+- Low-cost sensors: (10-15 min, SW)
+- How to report bugs, ask questions (10 min, TD)
+- Improvements (20 min, TD)  
+  - Better refraction (in progress)
   - SWH calculation
   - ITRF
   - Equipment database
   - Community: Adv models for SWE and soil moisture
-- Break (10 minutes)
-- How to report bugs, ask questions (10 min, TD)
-- How to make a good installation (10 min, TN) 
-  - Show how you picked new sites in Greenland
-- Low-cost sensors: (10-15 min, SW)
 - Questions: remainder of the time
 
