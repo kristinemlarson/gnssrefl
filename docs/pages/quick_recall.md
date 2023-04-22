@@ -36,6 +36,7 @@
 * [refl_zones](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html)
 * [rinex3_rinex2](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex3_rinex2.html)
 * [rinex3_snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex3_snr.html)
+* [soosh](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.smoosh.html)
 * [xyz2llh](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.xyz2llh.html)
 * [ymd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ymd.html)
 * [ydoy](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ydoy.html)
