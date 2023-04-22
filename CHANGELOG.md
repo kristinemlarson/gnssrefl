@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.6
+
+fixed bug in soil moisture code.  code crashed
+
 ## 1.3.5
 
 fixed bare soil bug in azimuth snow model.

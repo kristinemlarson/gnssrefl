@@ -13,8 +13,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
-    parser.add_argument("-min_tracks", default=None, help="minimum number of tracks needed to keep the mean RH", type=int)
-    parser.add_argument("-fr", default=None, help="frequency", type=int)
+    parser.add_argument("-min_tracks", default=None, help="min number of tracks to keep mean RH (default is 100)", type=int)
+    parser.add_argument("-fr", default=None, help="frequency (default is L2C)", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -28,6 +28,13 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100 ):
     Picks up reflector height (RH) results for a given station and year-year end range and 
     computes the RH mean values and writes them to a file. These will be used to compute a consistent
     set of phase estimates.
+
+    Examples
+    --------
+    vwc_input p038 2018
+         
+    vwc_input p038 2018 -min_tracks 10
+        allow fewer values to accept a satellite track
 
     Parameters
     ----------

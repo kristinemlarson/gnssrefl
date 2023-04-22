@@ -41,9 +41,8 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     
     Examples
     --------
-
     phase p038 2021 4
-        analyzes data from day of year 4
+        analyzes data for year 2021 and day of year 4
 
     phase p038 2021 1 -doy_end 365 
         analyzes data for the whole year
@@ -77,7 +76,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
             99 : data with elevation angles between 5 and 30 degrees
 
-            88 : data with elevation angles between 5 and 90 degrees
+            88 : data with all elevation angles 
 
             50 : data with elevation angles less than 10 degrees
 

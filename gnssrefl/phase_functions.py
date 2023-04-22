@@ -995,7 +995,7 @@ def load_sat_phase(station, year, year_end, freq):
     """
     print('Requested frequency: ', freq)
     dataexist = False
-
+    xdir = os.environ['REFL_CODE']
     xfile = xdir + '/input/override/' + station + '_vwc' 
     found_override = False
     # not implementing this yet
