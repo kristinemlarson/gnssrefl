@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.3.6
 
-fixed bug in soil moisture code.  code crashed
+fixed bug in soil moisture code.  code was crashing. have tried to improve how
+it detects and removes bad tracks.
 
 ## 1.3.5
 

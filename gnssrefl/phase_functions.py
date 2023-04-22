@@ -70,7 +70,7 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir):
     """
     outdir = xdir + '/Files/' + subdir
     plt.figure(figsize=(10, 6))
-    plt.plot(datetime_dates, tv[:, 2], 'bo')
+    plt.plot(datetime_dates, tv[:, 2], 'b-')
     plt.ylabel('phase (degrees)')
     if fr == 1:
         plt.title(f"Daily L1 Phase Results: {station.upper()}")

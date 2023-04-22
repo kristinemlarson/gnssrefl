@@ -1,5 +1,5 @@
 import argparse
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as matplt
 import numpy as np
 import os
 import subprocess
@@ -21,7 +21,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year_end", type=int)
     parser.add_argument("-fr", help="frequency", type=int)
-    parser.add_argument("-plt2screen", default=None, type=str, help="boolean for plotting to screen")
+    parser.add_argument("-plt", default=None, type=str, help="boolean for plotting to screen")
     parser.add_argument("-screenstats", default=None, type=str, help="boolean for plotting statistics to screen")
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 50")
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
@@ -31,18 +31,20 @@ def parse_arguments():
     parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
     parser.add_argument("-tmin", default=None, type=str, help="minimum soil texture")
     parser.add_argument("-tmax", default=None, type=str, help="maximum soil texture")
+    parser.add_argument("-warning_value", default=None, type=float, help="What threshold for bad tracks (default is 5.5 )")
+    parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False)")
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt2screen','screenstats','snow_filter','circles']
+    boolean_args = ['plt','screenstats','snow_filter','circles','auto_removal']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
 
-def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen: bool = True, screenstats: bool = False, 
+def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool = True, screenstats: bool = False, 
         min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, 
-        snow_filter: bool = False, circles: bool=False, subdir: str=None, tmin: str=None, tmax: str=None):
+        snow_filter: bool = False, circles: bool=False, subdir: str=None, tmin: str=None, tmax: str=None, warning_value : float=5.5, auto_removal : bool=False):
     """
     Computes VWC from GNSS-IR phase estimates. It concatenates previously computed phase results,  
     makes plots for the four geographic quadrants, computes daily average phase files before converting 
@@ -51,10 +53,14 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
     Examples
     --------
-    one year for station p038 
-        vwc p038 2017
-    three years  for station p038 
-        vwc p038 2015 -year_end 207
+    vwc p038 2017
+        one year for station p038 
+    vwc p038 2015 -year_end 2017
+        three years  for station p038 
+    vwc p038 2015 -year_end 2017 -warning_value 6
+        warns you about tracks greater than 6 %
+    vwc p038 2015 -year_end 2017 -warning_value 6 -auto_removal
+        makes new list of tracks based on your new warning value
 
     Parameters
     ----------
@@ -67,7 +73,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
     fr : integer, optional
         GNSS frequency. Currently only supports l2c.
         Default is 20 (l2c)
-    plt2screen: bool, optional
+    plt: bool, optional
         Whether to produce plots to the screen.
         Default is True
     min_req_pts_track : int, optional
@@ -90,6 +96,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         minimum soil texture value, e.g. 0.05
     tmax: str
         maximum soil texture value, e.g. 0.45
+    warning_value : float
+         screen warning about bad tracks (percent VWC).
+         default is 5.5 
+    auto_removal : boolean, optional
+         whether to automatically remove tracks that hit your bad track threshold
+         default value is false
 
     Returns
     -------
@@ -101,6 +113,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         with columns: FracYr Year DOY  VWC Month Day
 
     """
+
+    remove_bad_tracks = auto_removal
+
     if (len(station) != 4):
         print('station name must be four characters')
         sys.exit()
@@ -132,7 +147,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
     # make sure subdirectory exists
     g.set_subdir(subdir)
 
-    if not plt2screen:
+    if not plt:
         print('no plots will come to screen. Will only be saved.')
 
     # this is leftover from the old code
@@ -144,7 +159,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         medf = 0.2 # this is meters
         ReqTracks = 10 # have a pretty small number here
         snowfileexists = qp.make_snow_filter(station, medf, ReqTracks, year, year_end)
-        plt.close ('all')# we do not want the plots to come to the screen for the daily average
+        matplt.close ('all')# we do not want the plots to come to the screen for the daily average
 
     # azimuth list
     azlist = [270, 0, 180,90 ]
@@ -188,14 +203,22 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
     vxyz = np.empty(shape=[0, 7]) 
 
     # try removing these
-    fig = plt.figure(figsize=(13, 10))
-    ax=plt.subplots_adjust(hspace=0.2)
-    plt.suptitle(f"Station: {station}", size=16)
+    fig = matplt.figure(figsize=(13, 10))
+    ax=matplt.subplots_adjust(hspace=0.2)
+    matplt.suptitle(f"Station: {station}", size=16)
 
     # this is the number of points for a given satellite track
     reqNumpts = min_req_pts_track
 
     # checking each geographic quadrant
+    k4 = 1
+    # list of tracks
+    newlist = station + '_tmp.txt'
+    oldlist = xdir + '/input/' + station + '_phaseRH.txt'
+    print(newlist,oldlist)
+    ftmp = open(newlist,'w+')
+    ftmp.write("{0:s} \n".format( '% station ' + station) )
+    ftmp.write("{0:s} \n".format( '% TrackN  RefH SatNu MeanAz  Nval  Azimuths'))
     for index, az in enumerate(azlist):
         b = 0
         k += 1
@@ -206,7 +229,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
         # pick up the sat list from the actual list
         satlist = stracks[atracks == amin]
 
-        ax = plt.subplot(2, 2, index + 1)
+
+        ax = matplt.subplot(2, 2, index + 1)
         ax.set_title(f'Azimuth {str(amin)}-{str(amax)} deg.')
         ax.grid()
         #ax.autofmt_xdate()
@@ -225,6 +249,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
             s = ssat[ii]
             amps = amp[ii]
             rhs = rh[ii]
+            iikk  = (atracks == amin) & (stracks == satellite) 
+            rhtrack = float(tracks[iikk,1])
+            meanaztrack = float(tracks[iikk,3])
+            nvalstrack = float(tracks[iikk,4])
 
             if len(x) > reqNumpts:
                 b += 1
@@ -285,8 +313,17 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
                         if len(aa) > 0:
                             res = np.round(np.std(aa - bb), 2)
                             addit = ''
-                            if res > 5.5:
+                            keepit = True
+                            if (res > warning_value ) :
+                                # warning
                                 addit = '>>>>>  Consider Removing This Track <<<<<'
+                                if remove_bad_tracks:
+                                    addit = '>>>>>  Removing This Track - rerun to see effect <<<<<'
+                                    keepit = False
+                            if keepit:
+                                ftmp.write("{0:3.0f} {1:7.2f} {2:3.0f} {3:7.1f} {4:7.0f} {5:4.0f} {6:4.0f} \n".format(k4,rhtrack, satellite,meanaztrack,nvalstrack,amin,amax))
+                                k4 = k4 + 1
+
                             print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} Amp {max(normAmps):4.2f} {addit:20s} ")
                         else:
                             print('No QC assessment could be made for this satellite track')
@@ -302,15 +339,21 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
                     ax.plot(datetime_dates, new_phase, 'o', markersize=3)
                     ax.set_ylabel('Phase')
-                    #ax.set_ylimit((-20,60))
-                    plt.ylim((-20,60))
+                    matplt.ylim((-20,60))
                     # ???
-                    plt.gcf().autofmt_xdate()
+                    matplt.gcf().autofmt_xdate()
 
+
+    ftmp.close()
+    if remove_bad_tracks:
+        print('Writing out a new list of good satellite tracks to ', oldlist)
+        subprocess.call(['mv','-f', newlist, oldlist])
+    else:
+        subprocess.call(['rm','-f', newlist ])
 
     plot_path = f'{xdir}/Files/{subdir}/{station}_az_phase.png'
     print(f"Saving to {plot_path}")
-    plt.savefig(plot_path)
+    matplt.savefig(plot_path)
 
     # this is now done in a function. i believe this can be commented out
     #tv = np.empty(shape=[0, 4])
@@ -338,7 +381,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt2screen:
 
         qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir)
 
-        qp.convert_phase(station, year, year_end, plt2screen,fr,tmin,tmax,polyorder,circles,subdir)
+        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir)
 
 
 def main():
