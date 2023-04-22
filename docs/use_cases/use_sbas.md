@@ -75,7 +75,7 @@ Save your analysis strategy:
 
 The next step is to estimate reflector heights. First do a single day using the plt option.
 
-<code>gnssir sbas 2021 1 -plt T</code>
+<code>gnssir sbas 2020 1 -plt T</code>
 
 <img src=../_static/sbas_gnssir_l1.png width=600/>	
 
@@ -92,7 +92,7 @@ And that is what we should expect.
 
 Go ahead and estimate reflector heights for all available days:
 
-<code>gnssir sbas 2021 1 -doy_end 366</code>
+<code>gnssir sbas 2020 1 -doy_end 366</code>
 
 Compute a daily average. Since we only have reflections in one geographic quadrant and are 
 only using GPS signals, we should not require as many points as we have done in other examples. 
