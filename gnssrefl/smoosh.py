@@ -8,16 +8,28 @@ import gnssrefl.gps as g
 
 def main():
     """
-    Decimates and strips out SNR data
+    Decimates and strips out SNR data from a RINEX 2.11 file. 
+    Only RINEX, no Hatanaka RINEX or gzipped files allowed. If you would like to add
+    these features, please submit a PR.
+
+    Examples
+    --------
+
+    smoosh p0410010.22o 5
+        decimates a highrate rinex 2.11 file to 5 seconds
+
+    smoosh p0410010.22o 5 -snr T
+        also eliminates all observation types except for SNR
 
     Parameters
     ----------
     rinex : str
-        filename
+        rinex 2.11 filename
     dec : int
         decimation value in seconds
     snr : bool, optional
         whether you want only SNR observables
+        helpful when you have too many observables in your file.
 
     """
 
@@ -50,8 +62,6 @@ def main():
     subprocess.call(['rm','-f', rinexfile])
     subprocess.call(['mv','-f', rinexfile2, rinexfile])
 
-    #if os.path.isfile(rinex2):
-    #    print('SUCCESS: new file created', rinex2)
 
 if __name__ == "__main__":
     main()
