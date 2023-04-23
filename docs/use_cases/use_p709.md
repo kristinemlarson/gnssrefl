@@ -9,6 +9,8 @@
 <P align=center>
 <img src=https://www.unavco.org/data/gps-gnss/lib/images/station_images/P709.jpg width=500>
 <P>
+Why does this photograph suggest that GNSS-IR should not work?
+<p>
 
 **Archive:** [UNAVCO](http://www.unavco.org)
 

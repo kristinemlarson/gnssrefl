@@ -194,7 +194,9 @@ If you are primarily interested in water levels, you should start with a lake.  
 TGHO in class, so choose other sites. 
 
 If you are primarily interested in snow accumulation, you should start with an ice sheet.  
-We are covering LTHW (and possibly GLS1) in class, so choose other sites.
+We are covering LTHW (and possibly GLS1) in class, so choose other sites. For seasonal snow, I will mostly be 
+showing results for P101.
 
-For students primarily interested in soil moisture, I recommend that you do a snow depth case.
-This will help you understand better how the soil moisture code works.
+For students primarily interested in soil moisture, I recommend that you do a snow depth case. 
+This will help you understand better how the soil moisture code works. I will be doing examples 
+for P038 and MCHL for soil moisture in class.

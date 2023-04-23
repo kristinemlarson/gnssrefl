@@ -58,7 +58,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     vwc p038 2015 -year_end 2017
         three years  for station p038 
     vwc p038 2015 -year_end 2017 -warning_value 6
-        warns you about tracks greater than 6 %
+        warns you about tracks greater than 6 degrees rms 
     vwc p038 2015 -year_end 2017 -warning_value 6 -auto_removal
         makes new list of tracks based on your new warning value
 
@@ -97,7 +97,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     tmax: str
         maximum soil texture value, e.g. 0.45
     warning_value : float
-         screen warning about bad tracks (percent VWC).
+         screen warning about bad tracks (phase rms, in degrees).
          default is 5.5 
     auto_removal : boolean, optional
          whether to automatically remove tracks that hit your bad track threshold

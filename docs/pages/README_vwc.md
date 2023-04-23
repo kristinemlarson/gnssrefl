@@ -1,5 +1,8 @@
 # Soil Moisture
 <p align=center>
+
+[Latest options for the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc.html)
+
 <img src=https://www.kristinelarson.net/wp-content/uploads/2015/10/famousFigure.png width=500>
 </p>
 
@@ -26,7 +29,8 @@ database that will alow you to track this kind of thing, but it is not currently
 It is **your responsibility** to make sure that 
 your RINEX files have L2C data in them. While this is trivial with the RINEX 3 format, it can be very challenging to 
 find L2C data in some older datasets and at some archives (e.g. UNAVCO). If we know where to find 
-L2C data, we will do our best to let you know in the use cases.
+L2C data, we will do our best to let you know in the use cases. <code>check_rinex_file</code> will try to tell
+you whether your RINEX 2.11 file has L2C data in it.
 
 - For many PBO sites (but by no means all), you can find L2C data in the 
 high-rate RINEX 2.11 streams at UNAVCO. However, you don't need the high-rate data for estimating soil
@@ -133,7 +137,7 @@ We follow a [multi-stage process](https://www.kristinelarson.net/wp-content/uplo
 
 - do not allow nonsense soil moisture values (e.g. negative soil moisture is not allowed in our world)
 
-We currently level the VWC data to 5% but we will allow that to vary by site in future versions as that value should depend on 
+We currently level the VWC data to 5% but you can change this on the command line. This will vary by site as that value should depend on 
 the soil texture at the site.
 
 <img src="../_static/p038_Figure_3.png" width="600">
@@ -153,6 +157,9 @@ Things we are planning to add:
 
 - the json used by <code>gnssir</code> will be integrated with the soil moisture code
 
+We have recently (April 23, 2023) automated a way to update the list of satellite tracks to use. 
+See the *warning_value* and *auto_removal* inputs.
+
 We currently have four use cases posted:
 
  - a shorter version of [p038](../use_cases/use_p038.md) 
@@ -161,4 +168,5 @@ We currently have four use cases posted:
  - [mfle](../use_cases/use_mfle.md)
 
 Kristine M. Larson
-August 29, 2022
+
+Updated April 23, 2023

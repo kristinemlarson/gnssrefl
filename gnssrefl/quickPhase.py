@@ -18,14 +18,14 @@ def parse_arguments():
     parser.add_argument("-year_end", "-year_end", default=None, type=int, help="year end")
     parser.add_argument("-e1", default=None, type=int),
     parser.add_argument("-e2", default=None, type=int),
-    parser.add_argument("-plot", default=None, type=str)
+    parser.add_argument("-pl", default=None, type=str)
     parser.add_argument("-screenstats", default=None, type=str, help="stats come to the screen")
     parser.add_argument("-gzip", default=None, type=str, help="gzip SNR files" )
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plot', 'screenstats', 'gzip']
+    boolean_args = ['plt', 'screenstats', 'gzip']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -33,7 +33,7 @@ def parse_arguments():
 
 
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66, 
-        fr: str = '20', e1: int = 5, e2: int = 30, plot: bool = False, screenstats: bool = False, gzip:bool=False):
+        fr: str = '20', e1: int = 5, e2: int = 30, plt: bool = False, screenstats: bool = False, gzip:bool=False):
     """
     quickphase computes phase for the given inputs (station, years, doy, elevation angles)
     These phase results are subquently used in vwc. The command line call is phase
@@ -54,22 +54,21 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         4 character ID of the station.
 
     year: int
-        Year to evaluate.
+        full Year to evaluate.
 
-    doy: integer
+    doy: int
         day of year to evaluate.
-        Default is None.
 
-    year_end: integer, optional
+    year_end: int, optional
         year to end analysis. Using this option will create a range from year-year_end.
         Default is None.
 
-    doy_end: integer, optional
+    doy_end: int, optional
         Day of year to end analysis. Using this option will create a range of doy-doy_end.
         If also using year_end, then this will be the day to end analysis in the year_end requested.
         Default is None.
 
-    snr : integer, optional
+    snr : int, optional
         SNR format. This tells the code what elevation angles are in the SNR file
         value options:
             66 (default) : data with elevation angles less than 30 degrees
@@ -80,23 +79,23 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
             50 : data with elevation angles less than 10 degrees
 
-    fr : string, optional
+    fr : str, optional
         GNSS frequency. Currently only supports L2C.
         Default is 20 (l2c)
 
-    e1 : integer, optional
+    e1 : int, optional
         Elevation angle lower limit in degrees for the LSP.
         default is 5
 
-    e2: integer, optional
+    e2: int, optional
         Elevation angle upper limit in degrees for the LSP.
         default is 30
 
-    plot: boolean, optional
+    plt: bool, optional
         Whether to plot results.
         Default is False
 
-    screenstats: boolean, optional
+    screenstats: bool, optional
         Whether to print stats to the screen.
         Default is False
 
@@ -154,10 +153,10 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
             for d in date_range:
                 print('Analyzing year/day of year ' + str(y) + '/' + str(d))
-                qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp, gzip)
+                qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip)
     else:
         for d in np.arange(doy, doy_end + 1):
-            qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plot, screenstats, compute_lsp, gzip)
+            qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip)
 
 
 def main():

@@ -32,19 +32,21 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100 ):
     Examples
     --------
     vwc_input p038 2018
+        standard usage, station and year inputs
          
-    vwc_input p038 2018 -min_tracks 10
+    vwc_input p038 2018 -min_tracks 50
         allow fewer values to accept a satellite track
+        default is 100
 
     Parameters
     ----------
-    station : string
+    station : str
         4 character ID of the station
-    year : integer
-        Year
-    fr : integer, optional
+    year : int
+        full year
+    fr : int, optional
         GPS frequency. Currently only supports l2c, which is frequency 20.
-    min_tracks : integer, optional
+    min_tracks : int, optional
         number of minimum tracks needed in order to keep the average RH
 
     Returns
