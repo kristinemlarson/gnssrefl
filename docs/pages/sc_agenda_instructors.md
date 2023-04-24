@@ -9,6 +9,7 @@
   - main modules : rinex2snr, quickLook, gnssir
   - how to compute reflection zones (5 min)
   - brief outline of products: vwc, snowdepth, subdaily
+  - if have time, could show the API, but right now it is on Day 4
 
 - Questions (5 min)
 
@@ -19,18 +20,19 @@
   - Greenland  (GLS1, if time)
 - Snow accumulation examples (20 min, KL)
   - P041
-  - P360 or P101
+  - P101
 - Break (10 minutes)
 - Soil Moisture (40 min, KL) 
   - PBO H2O approach (20 min)
   - P038 (10 min)
-  - MCHL? (10 min)
+  - MCHL (10 min)
 - Questions (5 min)
 
 ## May 4: Water Applications
 - Short Intro (5 min, KL) 
 - Background on models needed/used for water monitoring (35, SW)
-- daily_avg vs. subdaily (5 min, KL)
+- make sure to tell them to use daily_avg for lakes and usually rivers
+subdaily is for tides.  uses a spline etc
 - Lake example using daily_avg (10 min, KE)
   - TGHO
 - Break (10 minutes)
@@ -39,6 +41,9 @@
   - Tide example (10 min, AC12 SW)
   - Tide example (10 min, TGGO SW)
 - invsnr method (15 min, DP) 
+make sure they understand the differences from the LSP approach.
+LSP used as starting solution, smooth assumption.
+
 - Questions (5 min)
 
 ## May 5: Going Forward
@@ -47,10 +52,10 @@
 - Why is it so hard to find good GNSS data? (10 min, KL)
 - How to make a good installation (10-15 min, TN) 
   - in particular, the issues you faced when you picked new sites in Greenland
+  - how tall, receiver sampling rates, which frequenciesS? which receiver and antenna to buy? which side of the building, avoiding ships as much as you can.  
 
 - Break (10 minutes)
 
-- Low-cost sensors: (10-15 min, SW)
 - How to report bugs, ask questions (10 min, TD)
 - Improvements (20 min, TD)  
   - Better refraction (in progress)
@@ -58,5 +63,6 @@
   - ITRF
   - Equipment database
   - Community: Adv models for SWE and soil moisture
+- Low-cost sensors: (10-15 min, SW)
 - Questions: remainder of the time
 
