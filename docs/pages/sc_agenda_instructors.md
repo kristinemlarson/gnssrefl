@@ -59,7 +59,8 @@ LSP used as starting solution, smooth assumption.
 - How to report bugs, ask questions (10 min, TD)
 - Improvements (20 min, TD)  
   - Better refraction (in progress)
-  - SWH calculation
+  - SWH calculation and **correction**
+  - surface slopes
   - ITRF
   - Equipment database
   - Community: Adv models for SWE and soil moisture

@@ -2,6 +2,7 @@
 
 [Warning](warning.md)
 
+
 **Use Case Updated December 11, 2022**
 
 <p align="center">
@@ -178,7 +179,7 @@ to the [official NOAA tide gauge data stream?](https://tidesandcurrents.noaa.gov
 
 You can download the NOAA data yourselves or use our utility:
 
-<code>download_tides 9449880 20210115 20210209</code>
+<code>download_tides 9449880 noaa -date1 20210115 -date2 20210209</code>
 
 We then compared the two series. 
 

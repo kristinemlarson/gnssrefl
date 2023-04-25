@@ -49,9 +49,7 @@ The periodograms show the tides in the southwest quadrant. That is further demon
 
 Set your analysis strategy (with some variations):
 
-<code>make_json_input tnpp 0 0 0 -e1 5 -e2 12 -h1 55 -h2 70  -ampl 0 </code>
-
-Hand-edit the json file to only look at the azimuth region from 180 to 270 degrees.
+<code>make_json_input tnpp 0 0 0 -e1 5 -e2 12 -h1 55 -h2 70  -ampl 0 -azlist 180 270</code>
 
 Now go back and make more SNR files:
 
@@ -76,10 +74,6 @@ Azimuth vs. constellation, amplitude, and peak2noise:
 Initial RH values:
 
 <img src=../_static/subdaily_npp_1.png width=600>
-
-Setting the -rhdot flag:
-
-<code>subdaily tnpp 2021 -rhdot T</code>
 
 Estimating and applying the RH dot correction improves RH 
 precision ([Larson et al., 2013](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf)).

@@ -8,7 +8,7 @@
 
 **Location:** Vlissingen, the Netherlands
 
-**Archives:** SONEL, BKG, BEV
+**Archives:** BKG, BEV
 
 [Station Page at NGL](http://geodesy.unr.edu/NGLStationPages/stations/VLIS.sta)
 
@@ -141,9 +141,7 @@ Time series with large outliers removed.
 
 <img src=../_static/vlis-1.png width=600>
  
-To make the RHdot correction:
-
-<code>subdaily vlis 2022 -rhdot T</code>
+In the next section, it will compute and try to remove the RHdot correction:
 
 <img src=../_static/vlis_rhdot3.png width=600>
 
@@ -163,9 +161,12 @@ and finally 0.253 m with an IF bias removed. **If you wish to access these new
 RH values, do not use column 3! The corrected values have been written as a new column.**
 
 The precisions calculated from the spline fit for this site are *very poor* - particularly for L1. 
-
-For comparisons with the local tide gauge you can use 
-our utility <code>download_ioc</code>. The tide gauge name is ... vlis! If you say <code>-plt T</code> it makes a crude
+But this is not really precision - it is how well your RH agree with a spline. To really assess
+this site you shold compare with a traditional tide gauge. You can try using our 
+utility <code>download_tides</code>. The tide gauge network is ioc and the 
+name of the tide gauge is ... vlis! If you say <code>-plt T</code> it makes a crude
 plot for you.
 
-Kristine M. Larson November 18, 2022
+Updated:
+
+Kristine M. Larson April 25, 2023

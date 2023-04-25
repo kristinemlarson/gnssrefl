@@ -7,10 +7,11 @@ January 21, 2023
 
 <HR>
 To the best of our knowledge, access to the current high-rate data streams
-needed to do reflectometry at this site are no longer allowed. Please contact NRCAN for further information.
-The data used in the test case described below *is* still available. However, the current code requires
-you have the *teqc* executable, which is no longer supported by UNAVCO. We would be grateful if someone would
-modify the NRCNA high rate downloads function to use *gfzrnx*, which is supported by GFZ.
+needed to do reflectometry at this site is no longer allowed. Please contact NRCAN for further information.
+
+The data used in the test case described below *are* still available. Originally we used *teqc*
+to merge the hourly files required, but this code is no longer supported by UNAVCO. We have 
+replaced it with *gfzrnx* which is supported by GFZ.
 
 <p align=center>
 <img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500"/>
@@ -40,12 +41,14 @@ modify the NRCNA high rate downloads function to use *gfzrnx*, which is supporte
 
 ### Data Summary
 
-Station PMTL is located on the Viterra Montreal Terminal building on the St Lawrence River in Montreal, Canada. It is operated by the Montreal Port Authority.
+Station PMTL is located on the Viterra Montreal Terminal building on the St Lawrence River in 
+Montreal, Canada. It is operated by the Montreal Port Authority.
 
 GPS L1 and Glonass L1 and L2 can be used for this site. Since the site is more than 60 meters above the water, you need to 
-use high-rate GNSS data. Because of the way that NRCAN stores these data, you need to install <code>teqc</code>.
+use high-rate GNSS data. 
 
-Note the [ellipsoidal height and geoid corrected height](https://gnss-reflections.org/geoid?station=pmtl). To pick an azimuth and elevation mask, try the [reflection zone webapp](https://gnss-reflections.org/rzones) with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:
+Note the [ellipsoidal height and geoid corrected height](https://gnss-reflections.org/geoid?station=pmtl). To pick an 
+azimuth and elevation mask, try the [reflection zone webapp](https://gnss-reflections.org/rzones) with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:
 
 <P align=center>
 <img src="../_static/pmtl_rzone.png" width="500" />
@@ -78,10 +81,11 @@ azimuth regions are defined in <code>quickLook</code>. It does not mean there ar
 ### Analyze the Data
 
 Set up analysis instructions, using a smaller RH region. Since our database has the a priori location of PMTL, we 
-can use 0 0 0 for the latitude, longitude, and height values. Note that the frequency list has only GPS L1 and the two Glonass frequencies.
-The azimuth region has been cut up into three smaller regions as the code will not allow regions larger than 100 degrees:
+can use 0 0 0 for the latitude, longitude, and height values. Note that the frequency list has 
+only GPS L1 and the two Glonass frequencies. The azimuth region has been cut up into three smaller regions as the 
+code will not allow regions larger than 100 degrees:
 
-<code>make_json_input pmtl 0 0 0 -h1 75 -h2 85 -e1 5 -e2 12 -allfreq True -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist 45 90 90 180 180 205</code>
+<code>make_json_input pmtl 0 0 0 -h1 75 -h2 85 -e1 5 -e2 12 -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist 45 90 90 180 180 205</code>
 
 [Sample json](pmtl.json)
 
