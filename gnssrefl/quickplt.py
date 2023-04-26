@@ -71,6 +71,7 @@ def main():
     parser.add_argument("-title", help="optional title", type=str,default=None)
     parser.add_argument("-outfile", help="optional filename for plot", type=str,default=None)
     parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
+    parser.add_argument("-ydoy", help="if True/T, columns 1-2 are year and doy", type=str,default=None)
 
     args = parser.parse_args()
 
@@ -95,6 +96,10 @@ def main():
     ymd = False
     if (args.ymdhm == 'True') or (args.ymdhm == 'T'):
         ymd = True
+
+    ydoy = False
+    if (args.ydoy == 'True') or (args.ydoy == 'T'):
+        ydoy = True
 
     convert_mjd = False
     if (args.mjd== 'True') or (args.mjd == 'T'):
@@ -140,6 +145,11 @@ def main():
             # probably can be done in one step!
             tval =  t1_utc.datetime # change to datetime
             yval = tvd[:,ycol] # save the y values
+        elif ydoy:
+            tval = tvd[:,0]  + tvd[:,1]/365.25
+            yval = tvd[:,ycol]
+            ii = np.argsort( tval)
+            tval = tval[ii]; yval=yval[ii]
         else:
             tval = tvd[:,xcol] ; yval = tvd[:,ycol]
             x1 = min(tval) ; x2 = max(tval)
