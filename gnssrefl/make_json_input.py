@@ -35,7 +35,7 @@ def parse_arguments():
     parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     parser.add_argument("-extension", type=str, help="Provide extension name so you can try different strategies")
-    parser.add_argument("-ediff", default=None, type=str, help="ediff (degrees) default is 2")
+    parser.add_argument("-ediff", default=None, type=str, help="Allowed min/max elevation diff from obs min/max elev angle (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument('-azlist', nargs="*",type=float,  help='User defined azimuth zones, i.e. 0 90 90 180 would mean only the east. Must be an even number of values.')
     parser.add_argument('-frlist', nargs="*",type=int,  help='User defined frequencies using our nomenclature.')
