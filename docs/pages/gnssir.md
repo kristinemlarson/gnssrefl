@@ -36,6 +36,10 @@ Example:
 
 <CODE>make_json_input p101 0 0 0   -azlist 0 90 90 180 180 270</CODE>
 
+We try to enforce homogenous track lengths by using a quality control factor called *ediff*. Its 
+default value is 2 degrees, which means your arc should be within 2 degrees of the requested elevation angle inputs.
+So if you ask for 5 and 25 degrees, your arcs should at least be from 7 to 23 degrees.  To tell 
+<code>gnssir</code> you want to allow more arcs, just set ediff to a much larger value.
 
 ## gnssir
 
@@ -52,7 +56,7 @@ Where would the code store the files for this example?
 - SNR files are stored in $REFL_CODE/2020/snr/p041
 - Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041/150.txt
 
-For more information, set screenstats to True
+For more information, set **-screenstats T**
 
 For plots, set -plt to T or True. 
 

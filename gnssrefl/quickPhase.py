@@ -16,9 +16,9 @@ def parse_arguments():
     parser.add_argument("-fr", default=None, help="frequency (use all if you want both 1 and 20)", type=str)
     parser.add_argument("-doy_end", "-doy_end", default=None, type=int, help="doy end")
     parser.add_argument("-year_end", "-year_end", default=None, type=int, help="year end")
-    parser.add_argument("-e1", default=None, type=int),
-    parser.add_argument("-e2", default=None, type=int),
-    parser.add_argument("-pl", default=None, type=str)
+    parser.add_argument("-e1", default=None, type=float),
+    parser.add_argument("-e2", default=None, type=float),
+    parser.add_argument("-plt", default=None, type=str, help="plots come to the screen - which you do not want!")
     parser.add_argument("-screenstats", default=None, type=str, help="stats come to the screen")
     parser.add_argument("-gzip", default=None, type=str, help="gzip SNR files" )
 
@@ -33,7 +33,7 @@ def parse_arguments():
 
 
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66, 
-        fr: str = '20', e1: int = 5, e2: int = 30, plt: bool = False, screenstats: bool = False, gzip:bool=False):
+        fr: str = '20', e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip:bool=False):
     """
     quickphase computes phase for the given inputs (station, years, doy, elevation angles)
     These phase results are subquently used in vwc. The command line call is phase
@@ -83,11 +83,11 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         GNSS frequency. Currently only supports L2C.
         Default is 20 (l2c)
 
-    e1 : int, optional
+    e1 : float, optional
         Elevation angle lower limit in degrees for the LSP.
         default is 5
 
-    e2: int, optional
+    e2: float, optional
         Elevation angle upper limit in degrees for the LSP.
         default is 30
 

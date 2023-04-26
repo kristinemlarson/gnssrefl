@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.7
+Fixed bug in phase code. Caused by my inability to type the word "plt."
+Updated a lot of documentation and use cases.
+
 ## 1.3.6
 
 fixed bug in soil moisture code.  code was crashing. have tried to improve how

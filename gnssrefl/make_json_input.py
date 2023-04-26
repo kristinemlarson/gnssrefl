@@ -25,8 +25,8 @@ def parse_arguments():
     parser.add_argument("-e2", default=None, type=int, help="upper limit elevation angle (deg)")
     parser.add_argument("-h1", default=None, type=float, help="lower limit reflector height (m)")
     parser.add_argument("-h2", default=None, type=float, help="upper limit reflector height (m)")
-    parser.add_argument("-nr1",default=None, type=float, help="lower limit noise region for QC(m)")
-    parser.add_argument("-nr2",default=None, type=float, help="upper limit noise region for QC(m)")
+    parser.add_argument("-nr1",default=None, type=float, help="lower limit RH used for noise region in QC(m)")
+    parser.add_argument("-nr2",default=None, type=float, help="upper limit RH used for noise region in QC(m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="peak to noise ratio used for QC")
     parser.add_argument("-ampl", default=None, type=float, help="required spectral peak amplitude for QC")
     parser.add_argument("-allfreq", default=None, type=str, help="set to True to include all GNSS")
@@ -58,7 +58,8 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               extension: str = '', ediff: float=2.0, delTmax: float=75.0, azlist: float=[], frlist: float=[] ):
 
     """
-    Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in a json file which by default is saved
+    Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in 
+    a json file which by default is saved
     in REFL_CODE/<station>.json.
 
     Examples
@@ -76,6 +77,9 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     make_json_input p041 39.9494 -105.19426 1728.85  -h1 0.5 -h2 10 -e1 5 -e2 25
         uses only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
 
+    make_json_input p041 0 0 0 -ediff 2
+        uses only GPS data, default station coordinates, enforces elevation angles to be 
+        within 2 degrees of default limits (5-25)
 
     Parameters
     ----------
@@ -122,20 +126,16 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         provide extension name so you can try different strategies. 
         Results will then go into $REFL_CODE/YYYY/results/ssss/extension
         Default is '' 
-
     ediff : float
         quality control parameter (Degrees)
         default is 2
-
     delTmax : float
         maximum allowed arc length (minutes)
         default is 75, which is a bit long for tides
-
     azlist : list of floats
         lets the user set the azimuth regions, in degrees
         each region must be < 100 degrees! e.g. 0 90 90 180 would be all the east
         90 180 180 270 would be all the south
-
     frlist : list of integers
         avoids all the booleans - if you know the frequencies, enter them.
         e.g. 1 2 or 1 20 5 or 1 20 101 102
