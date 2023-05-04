@@ -128,6 +128,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         Default is '' 
     ediff : float
         quality control parameter (Degrees)
+        Allowed min/max elevation angle diff from requested min/max elev angle
         default is 2
     delTmax : float
         maximum allowed arc length (minutes)

@@ -8,6 +8,9 @@ import os
 import sys
 
 
+import gnssrefl.quicklib as q
+
+
 def main():
     """
     quick file plotting using matplotlib
@@ -72,6 +75,7 @@ def main():
     parser.add_argument("-outfile", help="optional filename for plot", type=str,default=None)
     parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
     parser.add_argument("-ydoy", help="if True/T, columns 1-2 are year and doy", type=str,default=None)
+    parser.add_argument("-filename2", help="second filename", type=str, default=None)
 
     args = parser.parse_args()
 
@@ -118,43 +122,26 @@ def main():
         print('input file does not exist')
         sys.exit()
 
-    if secondFile:
-        tvd2 = np.loadtxt(filename2,comments=commentsign)
-        if len(tvd2) == 0:
-            print('empty input file number 2')
-            return
-
-
-    if ymd == True:
-        year = tvd[:,0]; month = tvd[:,1]; day = tvd[:,2];
-        hour = tvd[:,3] ; minute = tvd[:,4]
-        for i in range(0,len(tvd)):
-            if (tvd[i, 4]) > 0:
-                y = int(year[i]); m = int(month[i]); d = int(day[i])
-                # i am sure there is a better way to do this
-                today=datetime.datetime(y,m,d)
-                doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
-                h = int(hour[i])
-                mi = int(minute[i])
-                tval.append(y + (doy +  h/24 + mi/24/60)/365.25);
-                yval.append( tvd[i,ycol]/1000)
-    else:
-        if convert_mjd:
-            t1 = Time(tvd[:,xcol],format='mjd')
-            t1_utc = t1.utc # change to UTC
-            # probably can be done in one step!
-            tval =  t1_utc.datetime # change to datetime
-            yval = tvd[:,ycol] # save the y values
-        elif ydoy:
-            tval = tvd[:,0]  + tvd[:,1]/365.25
-            yval = tvd[:,ycol]
-            ii = np.argsort( tval)
-            tval = tval[ii]; yval=yval[ii]
+    tvd2=[]
+    secondFile = False
+    if args.filename2 is not None:
+        filename2 = args.filename2
+        if os.path.isfile(filename2):
+            tvd2 = np.loadtxt(filename2,comments=commentsign)
+            if len(tvd2) == 0:
+                print('empty input for filenumber 2')
+                return
+            else:
+                secondFile = True
         else:
-            tval = tvd[:,xcol] ; yval = tvd[:,ycol]
-            x1 = min(tval) ; x2 = max(tval)
-            if secondFile:
-                tval2 = tvd2[:,xcol] ; yval2 = tvd2[:,ycol]
+            print('second filename does not exist')
+
+
+    tval,yval = q.trans_time(tvd, ymd, convert_mjd, ydoy,xcol,ycol)
+    if secondFile:
+        tval2,yval2 = q.trans_time(tvd2, ymd, convert_mjd, ydoy,xcol,ycol)
+
+
 
     fig,ax=plt.subplots()
     if args.symbol is None:

@@ -775,21 +775,17 @@ def getsp3file_mgex(year,month,day,pCtr):
             # filename without the compression ending
                 name = file2[:-3] 
                 secure_file = file2
-                print('check the correct GPS week ')
                 secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
                 foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
 
                 if not foundit:
-                    #print('use the wrong GPS week at CDDIS')
-                    # test newest nonsense
                     print('check a different directory week because CDDIS has changed their file structure')
-                    # kluge for a CDDIS screwup when they put the orbits in the wrong
-                    # GPS week directory
                     #secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
                     secure_dir = '/gps/products/' + str(igps_week) + '/'
                     foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
             else:
-                secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
+                # changing
+                secure_dir = '/gps/products/' + str(igps_week) + '/'
                 secure_file = file1 # Z compressed
                 name = file1[:-2]
                 foundit = orbfile_cddis(name, year, secure_file, secure_dir, file1)
@@ -797,6 +793,14 @@ def getsp3file_mgex(year,month,day,pCtr):
                     name = file2[:-3]
                     secure_file = file2
                     foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
+                    # not sure this is needed 
+                    if (not foundit):
+                        secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
+                        secure_file = file1 # Z compressed
+                        name = file1[:-2]
+                        foundit = orbfile_cddis(name, year, secure_file, secure_dir, file1)
+
+
 
     return name, fdir, foundit
 
