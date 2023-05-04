@@ -771,36 +771,22 @@ def getsp3file_mgex(year,month,day,pCtr):
         print('Type 1 filename',file1)
         print('Type 2 filename',file2)
         if (mgex == 0):
-            if (igps_week > 2137):
-            # filename without the compression ending
+            if not foundit:
                 name = file2[:-3] 
                 secure_file = file2
                 secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
                 foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
-
-                if not foundit:
-                    print('check a different directory week because CDDIS has changed their file structure')
-                    #secure_dir = '/gps/products/mgex/' + str(igps_week_at_cddis) + '/'
-                    secure_dir = '/gps/products/' + str(igps_week) + '/'
-                    foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
-            else:
-                # changing
+            if not foundit:
                 secure_dir = '/gps/products/' + str(igps_week) + '/'
+                foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
+            if not foundit:
+                secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
                 secure_file = file1 # Z compressed
                 name = file1[:-2]
                 foundit = orbfile_cddis(name, year, secure_file, secure_dir, file1)
-                if (not foundit):
-                    name = file2[:-3]
-                    secure_file = file2
-                    foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
-                    # not sure this is needed 
-                    if (not foundit):
-                        secure_dir = '/gps/products/mgex/' + str(igps_week) + '/'
-                        secure_file = file1 # Z compressed
-                        name = file1[:-2]
-                        foundit = orbfile_cddis(name, year, secure_file, secure_dir, file1)
-
-
+            if (not foundit):
+                secure_dir = '/gps/products/' + str(igps_week) + '/'
+                foundit = orbfile_cddis(name, year, secure_file, secure_dir, file2)
 
     return name, fdir, foundit
 
