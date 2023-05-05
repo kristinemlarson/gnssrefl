@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-knot_space", default=None, type=int, help="knot spacing in hours (default is 3)")
     parser.add_argument("-rough_in", default=None, type=str, help="Roughness (default is 0.1)")
     parser.add_argument("-risky", default=None, type=str,
-                        help="Risky taker related to gaps/knot spacing, False is default)")
+                        help="Risky taker related to gaps/knot spacing, False is default.")
     parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66")
     parser.add_argument("-outfile_type", default=None, type=str, help="Output file type (txt or csv)")
     parser.add_argument("-outfile_name", default=None, type=str, help="Output file name")
