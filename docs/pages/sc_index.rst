@@ -2,11 +2,11 @@
 2023 GNSS-IR Short Course
 #####################################################
 
-`Earthscope <https://www.earthscope.org/event/2023-gnss-ir-short-course/>`_ |
 `Documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_ |
 `KL Videos <https://www.youtube.com/@funwithgps/videos>`_ |
-`Course Materials<https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html>`_ |
+`Course Materials <https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html>`_ |
 `Installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
+`Earthscope <https://www.earthscope.org/event/2023-gnss-ir-short-course/>`_ |
 
 .. image:: ../_static/sc02_rhdot4.png
    :width: 500
