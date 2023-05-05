@@ -5,7 +5,7 @@
 `Earthscope <https://www.earthscope.org/event/2023-gnss-ir-short-course/>`_ |
 `Documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_ |
 `KL Videos <https://www.youtube.com/@funwithgps/videos>`_ |
-`Course Materials<https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html)`_ |
+`Course Materials<https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html>`_ |
 `Installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
 .. image:: ../_static/sc02_rhdot4.png
@@ -38,7 +38,7 @@ Videos
 
 `Welcome video posted April 19 <https://www.youtube.com/watch?v=yijolYWXSQc>`_
 
-Links to the course `lectures https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html>`_ 
+`Links to the lectures materials and the videos <https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html>`_ 
 
 
 Course Instructors
@@ -57,3 +57,4 @@ Kelly Enloe, EarthScope - USA
 
 Tim Dittmann, EarthScope - USA
 
+This short course is co-sponsored by the Collaborative Research Center 1502 DETECT, Bonn University and EarthScope
