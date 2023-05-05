@@ -4,7 +4,8 @@
 
 `Earthscope <https://www.earthscope.org/event/2023-gnss-ir-short-course/>`_ |
 `Documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_ |
-`Videos <https://www.youtube.com/@funwithgps/videos>`_ |
+`KL Videos <https://www.youtube.com/@funwithgps/videos>`_ |
+`Course Materials<https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html)`_ |
 `Installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
 .. image:: ../_static/sc02_rhdot4.png
@@ -33,10 +34,12 @@ For software installation questions, please use our Slack channel.
 
 Videos
 ======
-We will be posting videos about GNSS-IR and gnssrefl to help users. 
-`Some older videos <https://www.youtube.com/@funwithgps/videos>`_ are already available. Please check this section for updates.
+`Some older videos <https://www.youtube.com/@funwithgps/videos>`_ about GNSS-IR are already available. 
 
 `Welcome video posted April 19 <https://www.youtube.com/watch?v=yijolYWXSQc>`_
+
+Links to the course `lectures https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html>`_ 
+
 
 Course Instructors
 ==================
