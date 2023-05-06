@@ -21,7 +21,9 @@
 
 ## Day 4
 - Finding Good Data, Kristine Larson
+- [GNSS-IR API](https://gnss-reflections.org)
 - Deploying a good GNSS-IR site, Thomas Nylen
 - Contributing to gnssrefl, Tim Dittmann 
 - Cheap Sensors, Simon Williams
+- [video](https://youtu.be/jpXfaF7F1yo)
 

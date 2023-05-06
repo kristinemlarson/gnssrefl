@@ -49,23 +49,21 @@ docker/jupyter installs. For github/pypi, we recommend doing a clean download an
 
 You are encouraged to submit your concerns as an issue to 
 the [github repository](https://github.com/kristinemlarson/gnssrefl). If you are unfamiliar 
-with github, you can also email Kelly (enloe@unavco.org ) about Jupyter 
-NoteBooks or Tim (dittmann@unavco.org) for commandline/docker issues.
+with github, you can also email Kelly (enloe@earthscope.org ) about Jupyter 
+NoteBooks or Tim (dittmann@earthscope.org) for commandline/docker issues. Please include
 
-Please
+* the exact command or section of code you were running that prompted your question.
 
-- include the exact command or section of code you were running that prompted your question.
-
-- Include details such as the error message or behavior you are getting. 
+* details such as the error message or behavior you are getting. 
 Please copy and paste (this is preferred over a screenshot) the error string. 
 If the string is long - please post the error string in a thread response to your question.
 
-- Please include the operating system of your computer.
+* the operating system of your computer.
 
 Would you like to join our <code>gnssrefl</code> users email list?
-This is currently operated by earthscope.org.  To join, please send Kristine an email.
+This is currently operated by earthscope.org. To join, please send Kristine an email.
 
-Updated April 13, 2023  by Kristine M. Larson
+Updated May 5, 2023  by Kristine M. Larson
 
 [Old news section from before we moved to readthedocs](https://gnssrefl.readthedocs.io/en/latest/pages/old_news.html)
 
