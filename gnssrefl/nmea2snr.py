@@ -224,7 +224,10 @@ def read_nmea(fname):
         if 'RMC' in line: #Get timing info
             row = line.split(',')
             #sect = int(float(row[1][0:2]) * 60 * 60 + float(row[1][2:4]) * 60 + float(row[1][4:])) #Time in seconds
-            curdt = datetime.datetime(int(row[9][4:6])+2000,int(row[9][2:4]),int(row[9][0:2])) #Current date
+            try:
+                curdt = datetime.datetime(int(row[9][4:6])+2000,int(row[9][2:4]),int(row[9][0:2])) #Current date
+            except:
+                pass
         
         if not curdt: #Skip forward until the first 'RMC' instance which gives a proper date to store
             continue
