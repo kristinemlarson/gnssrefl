@@ -1,11 +1,6 @@
 # subdaily
 
-Required Inputs:
-
-* station               
-* year                  
-
-[Optional inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html).
+[Inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html).
 
 This code applies models that improve the initial RH values. **THE NEW RH VALUES ARE 
 NOT WRITTEN TO COLUMN 3!**  Please look at 

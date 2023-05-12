@@ -41,6 +41,13 @@ Videos
 `Links to the lectures materials and the videos <https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html>`_ 
 
 
+Sponsors
+========
+`Collaborative Research Center 1502 DETECT, Bonn University <https://sfb1502.de>`_
+
+EarthScope
+
+
 Course Instructors
 ==================
 Kristine Larson, Bonn University, Germany
@@ -57,4 +64,3 @@ Kelly Enloe, EarthScope - USA
 
 Tim Dittmann, EarthScope - USA
 
-This short course is co-sponsored by the Collaborative Research Center 1502 DETECT, Bonn University and EarthScope

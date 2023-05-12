@@ -1,8 +1,8 @@
 # daily_avg<a name="module5"></a>
 
 <code>daily_avg</code> is a utility for people interested 
-in measuring snow accumulation via daily values. It can also 
-be used for lake levels. *It is not to be used for tides!*
+in daily averaged reflector heights, such as are used for measuring 
+snow accumulation or water levels in lakes/rivers. *It is not to be used for tides!*
 The goal is to make a valid daily average - for this reason, we have two required inputs 
 for quality control. 
 
@@ -24,7 +24,6 @@ I have set the median filter value to 2 meters and the required number of tracks
 <code> daily_avg mchn 2 12 </code>
 
 You can easily see the outliers. 
-
 
 <p align=center>
 <img width=500 src=../_static/mchn-A.png>
