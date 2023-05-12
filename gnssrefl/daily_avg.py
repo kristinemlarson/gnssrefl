@@ -305,8 +305,11 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     # plot the number of retrievals vs time
     txtdir =  xdir + '/Files/' + subdir 
-
-    daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei,test)
+    nr,nc = tv.shape
+    if nr > 0:
+        daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei,test)
+    else:
+        print('No results that met your criteria were found, so no need to make a plot')
 
     return tv, obstimes
 
@@ -349,6 +352,7 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
 
     """
 #   new plot
+
     fs = 12 # fontsize
     fig,ax=plt.subplots()
     ax.plot(obstimes,meanRH,'b.')
@@ -437,8 +441,12 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
         true if you want csv format output
 
     """
-    print('Daily average RH file written to: ', outfile)
     # sort the time tags
+    nr,nc = tv.shape
+    # nothing to write 
+    if (nr < 1):
+        return
+    print('Daily average RH file written to: ', outfile)
     ii = np.argsort(obstimes)
     # apply time tags to a new variable
     ntv = tv[ii,:]

@@ -10,8 +10,8 @@
 
 ## Day 2
 - [Intro to Snow](https://morefunwithgps.com/public_html/Day2-intro.pdf), Kristine Larson
-- Ice Sheets, Kelly Enloe
-- [Seasonal Snow](https://morefunwithgps.com/public_html/Day2-seasonalSnow.pdf)
+- Ice Sheets, Dye 2, Kelly Enloe
+- [Seasonal Snow](https://morefunwithgps.com/public_html/Day2-seasonalSnow.pdf), Kristine Larson
 - [Soil Moisture](https://morefunwithgps.com/public_html/Day2-May2023-SoilMoisture.pdf), Kristine Larson
 - [Video](https://youtu.be/ueItqAtN2sg)
 
@@ -29,5 +29,5 @@
 - [Deploying a good GNSS-IR site](https://morefunwithgps.com/public_html/Day4-Nylen-Install.pdf), Thomas Nylen
 - [Contributing to gnssrefl](https://morefunwithgps.com/public_html/Day4-Dittmann-contribute.pdf), Tim Dittmann
 - [Cheap Sensors](https://morefunwithgps.com/public_html/Day4-Low_Cost_Systems.pdf), Simon Williams
-- [video](https://youtu.be/jpXfaF7F1yo)
+- [Video](https://youtu.be/jpXfaF7F1yo)
 

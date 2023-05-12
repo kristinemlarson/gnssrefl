@@ -8,6 +8,10 @@ New version of nmea2snr - doesn't crash on bad files
 
 Updated short course materials in sc_media.md
 
+Fixed a bug in daily_avg that was unhappy when no results were found. Now it more politely exits.
+
+renamed vwc.py to vwc_cl.py
+
 ## 1.3.8
 hopefully check multiple directories at CDDIS because of inconsistencies
 in how they name/store files

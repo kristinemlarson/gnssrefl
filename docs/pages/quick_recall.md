@@ -10,7 +10,7 @@
 * [invsnr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html)
 * [snowdepth](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html)
 * [subdaily](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html)
-* [vwc](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc.html)
+* [vwc](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_cl.html)
 
 ## Helper Codes 
 

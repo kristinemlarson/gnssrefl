@@ -36,7 +36,8 @@ def parse_arguments():
 
 
 def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
-        extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None):
+        extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, 
+        azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None):
     """
     The goal of this code is to consolidate individual RH results into a single file consisting of daily averaged RH without outliers.
 
@@ -159,7 +160,8 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, alldatafile, csv, medfilter, ReqTracks,azim1,azim2,test,subdir)
 
     # default is to show the plots
-    if plt2screen:
+    nr,nc = tv.shape
+    if plt2screen & (nr > 0):
         matplt.show()
 
     # now write out the result file:
@@ -174,7 +176,8 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
         # use filename provided by the user
         outfile = txtdir + '/' + txtfile
 
-    da.write_out_RH_file(obstimes, tv, outfile, csv)
+    if (nr > 0):
+        da.write_out_RH_file(obstimes, tv, outfile, csv)
 
 
 def main():
