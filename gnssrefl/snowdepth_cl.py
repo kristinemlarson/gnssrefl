@@ -31,7 +31,6 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    #boolean_args = ['plt', 'csv','test']
     boolean_args = ['longer','plt','simple']
     args = str2bool(args, boolean_args)
 

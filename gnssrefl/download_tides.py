@@ -39,19 +39,22 @@ def download_tides(station: str, network : str, date1: str = None, date2: str = 
     """
     Downloads tide gauge data from four different networks (see below)
 
-    Output is written to REFL_CODE/Files/ unless subdir optional input is set
-    Plot is sent to the screen if requested.
+    Output is written to REFL_CODE/Files/ unless subdir optional input is set. Plot is sent to the screen if requested.
 
     Examples
     --------
 
     download_tides 8768094 noaa 20210101 20210131
+        NOAA station 876094
 
     download_tides thul ioc 20210101 20210131
+        IOC station thul
 
     download_tides 5970026 wsv 
+        WSV station 5970026
 
     download_tides 10313 psmsl
+        PSMSL station 10313 (downloads one file)
 
     Parameters 
     ----------
@@ -64,9 +67,9 @@ def download_tides(station: str, network : str, date1: str = None, date2: str = 
 
             ioc : UNESCO
 
-            wsv : Germany
+            wsv : Germany, Wasserstrassen-und Schifffahrtsverwaltung
 
-            psmsl : Perm Service Mean Sea Level
+            psmsl : Permanent Service Mean Sea Level
 
     date1 : str, optional
         start date, 20150101, needed for NOAA/IOC

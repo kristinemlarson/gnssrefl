@@ -630,13 +630,11 @@ def getsp3file_flex(year,month,day,pCtr):
 
     Returns
     -------
-    name : string
+    name : str
         filename for the orbits
-
-    fdir : string
+    fdir : str
         directory for the orbits
-
-    fexist : boolean
+    fexist : bool
         whether the orbit file was successfully found
 
     """
@@ -798,24 +796,20 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
 
     Parameters
     ----------
-    name : string
+    name : str
         the name of the orbit file you want to download from CDDIS
-
-    year : integer
+    year : int
         full year
-
-    secure_file : string
+    secure_file : str
         name of the file at CDDIS
- 
-    secure_dir : string
+    secure_dir : str
         where the file lives at CDDIS
-
-    file2 : string
+    file2 : str
         name without the compression???
 
     Returns
     -------
-    foundit : boolean
+    foundit : bool
         whether the file was found
 
     now checks that file size is not zero. allows old file name downloads
@@ -1545,7 +1539,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     before you start windowing the data
 
     Parameters
-    -----------
+    ----------
     s1 : numpy array 
         SNR L1 data, floats
     s2 : numpy array 
@@ -1568,7 +1562,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         seconds of the day (GPS time)
     edot : numpy array
         elev angle time rate of change (units?)
-    f : integer
+    f : int
         requested frequency
     az1 : float
         minimum azimuth limit, degrees
@@ -1578,11 +1572,11 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         minimum elevation angle limit, degrees
     e2 : float
         maximum elevation angle limit, degrees
-    satNu : integer
+    satNu : int
         requested satellite number
-    pfitV : integer
+    pfitV : int
         polynomial order for DC fit
-    screenstats : boolean
+    screenstats : bool
         Whether statistics come to the screen
 
     Returns
@@ -1591,7 +1585,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         elevation angle, deg
     y : numpy array of floats
         SNR, db-Hz
-    Nvv : integer
+    Nvv : int
         number of points in x
     cf : float
         refl scale factor (lambda/2)
@@ -1856,19 +1850,23 @@ def find_satlist_wdate(f,snrExist,year,doy):
     find satellite list for a given frequency and date
 
     Parameters
-    -------------
+    ----------
     f : integer
         frequency
-
-    snrExist : boolean numpy array
+    snrExist : numpy array, bool
         tells you if a signal is (potentially) legal
+    year : int
+        full year
+    doy : int
+        day of year
 
     Returns
-    --------
+    -------
     satlist: numpy list of integers
         satellites to use
 
     june 24, 2021: updated for SVN78
+
     """
     # get list of relevant satellites
     l2c_sat, l5_sat = l2c_l5_list(year,doy)
@@ -1911,11 +1909,21 @@ def find_satlist_wdate(f,snrExist,year,doy):
 
 def glonass_channels(f,prn):
     """
-    inputs frequency and prn number
-    returns wavelength for glonass satellite in meters
-    logic from Simon Williams, matlab
-    converted to function by KL, 2017 November
-    converted to python by KL 2018 September
+    Retrieves appropriate wavelength for a given Glonass satellite
+
+    Parameters
+    ----------
+    f : int
+        frequency( 101 or 102)
+    prn : int
+        satellite number
+
+    Returns
+    -------
+    l : float
+        wavelength for glonass satellite in meters
+
+    logic from Simon Williams 
     """
 #   we define glonass by adding 100.  remove this for definition of the wavelength
     if (prn > 100):

@@ -29,10 +29,10 @@ def parse_arguments():
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean for attempting to remove days contaminated by snow")
     parser.add_argument("-circles", default=None, type=str, help="boolean for circles instead of lines for the final VWC plot ")
     parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
-    parser.add_argument("-tmin", default=None, type=str, help="minimum soil texture")
+    parser.add_argument("-tmin", default=None, type=str, help="minimum soil texture. Default is 0.05")
     parser.add_argument("-tmax", default=None, type=str, help="maximum soil texture")
-    parser.add_argument("-warning_value", default=None, type=float, help="What threshold for bad tracks (default is 5.5 )")
-    parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False)")
+    parser.add_argument("-warning_value", default=None, type=float, help="Phase RMS (deg) threshold for bad tracks, default is 5.5 ")
+    parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False")
 
     args = parser.parse_args().__dict__
 
@@ -57,10 +57,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     vwc p038 2017
         one year for station p038 
     vwc p038 2015 -year_end 2017
-        three years  for station p038 
+        three years of analysis for station p038 
     vwc p038 2015 -year_end 2017 -warning_value 6
-        warns you about tracks greater than 6 degrees rms 
-    vwc p038 2015 -year_end 2017 -warning_value 6 -auto_removal
+        warns you about tracks with phase RMS greater than 6 degrees rms 
+    vwc p038 2015 -year_end 2017 -warning_value 6 -auto_removal T 
         makes new list of tracks based on your new warning value
 
     Parameters
@@ -71,7 +71,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         full Year
     year_end : int, optional
         last year for analysis
-    fr : integer, optional
+    fr : int, optional
         GNSS frequency. Currently only supports l2c.
         Default is 20 (l2c)
     plt: bool, optional
@@ -86,10 +86,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     minvalperday: integer
         how many phase measurements are needed for each daily measurement
         default is 10
-    snow_filter: boolean 
+    snow_filter: bool
         whether you want to attempt to remove points contaminated by snow
         default is False
-    circles : boolean
+    circles : bool
         whether you want circles in the final plot (lines are default)
     subdir: str
         subdirectory in $REFL_CODE/Files for plots and text file outputs

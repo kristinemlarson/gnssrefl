@@ -54,7 +54,7 @@ def parse_arguments():
 def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: str = None, csvfile: bool = False, 
         plt: bool = True, spline_outlier1: float = None, spline_outlier2: float = None, 
         knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True, doy1: int = 1, 
-        doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.0, h2: float=300.0, 
+        doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.4, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0):
     """
@@ -119,40 +119,32 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     sigma : float, optional
         Simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)
         default is 2.5
-    extension : string, optional
+    extension : str, optional
         Solution subdirectory.
         default is empty string.
-    rhdot : boolean, optional
+    rhdot : bool, optional
         Set to True to turn on spline fitting for RHdot correction.
         default is True.
-    doy1 : integer, optional
-        Initial day of year
-        default is 1.
-    doy2 : integer, optional
-        End day of year.
-        default is 366.
-    testing : boolean, optional
+    doy1 : int, optional
+        Initial day of year, default is 1.
+    doy2 : int, optional
+        End day of year. Default is 366.
+    testing : bool, optional
         Set to False for older code.
         default is now True.
     ampl : float, optional
-        New amplitude constraint
-        default is 0.
+        New amplitude constraint. Default is 0.
     azim1: int, optional
-        New min azimuth
-        default is 0.
+        minimum azimuth. Default is 0.
     azim2: int, optional
-        New max azimuth
-        default is 360.
-    h1: float optional 
-        lowest allowed reflector height
-        default is 0
-    h2: float optional 
-        highest allowed reflector height
-        default is 300
+        Max azimuth. Default is 360.
+    h1: float, optional 
+        lowest allowed reflector height in meters. Default is 0.4
+    h2: float, optional 
+        highest allowed reflector height in meters. Default is 300
     peak2noise: float, optional
-        New peak to noise constraint
-        default is 0.
-    kplt: boolean, optional
+        New peak to noise constraint. Default is 0.
+    kplt: bool, optional
         plot for kristine
     subdir : str, optional
         name for output subdirectory in REFL_CODE/Files

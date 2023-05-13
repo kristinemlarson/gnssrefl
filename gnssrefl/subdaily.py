@@ -138,9 +138,9 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
         the directory where the results should be written out
     txtfile : str
         name of the output file 
-    csvfile : boolean
+    csvfile : bool
         cl input whether the output file should be csv format
-    jsonfile : boolean
+    jsonfile : bool
         cl input for whether the output file should be in the json format
 
     Returns
@@ -192,9 +192,9 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
         4 character station name, lowercase
     nvt : numpy multi-dimensional
         the variable with the LSP results read via np.loadtxt
-    writecsv : boolean
+    writecsv : bool
         whether the file output is csv
-    extraline: boolean
+    extraline: bool
         whether the header has an extra line
 
     """
@@ -806,23 +806,19 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     ----------
     otimes : numpy array of datetime objects 
         observation times
-
-    tv : variable with the gnssrefl results
-
-    ii : good data?
-
-    jj : bad data?
-
-    station : string
+    tv : numpy array
+        variable with the gnssrefl LSP results
+    ii : numpy array
+        indices of good data
+    jj : numpy array
+        indices of bad data
+    station : str
         station name
-
-    txtdir : string
+    txtdir : str
         directory where plots will be written
-
     sigma : float
         what kind of standard deviation is used for outliers (3sigma, 2.5 sigma etc)
-
-    kplt : boolean
+    kplt : bool
         make extra plot for kristine
     """
     fs = 10
@@ -1139,25 +1135,20 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     Parameters
     ----------
-    station : string
+    station : str
         4 char station name
-
-    fname : string
+    fname : str
         input filename for results
-
-    fname_new : string
+    fname_new : str
         output filename for results
-
-    pltit : boolean 
+    pltit : bool
         whether you want plots to the screen
-
     outlierV : float
        outlier criterion, in meters  used in first go thru
        if None, then use 3 sigma (which is the default)
     outlierV2 : float
        outlier criterion, in meters  used in second go thru
        if None, then use 3 sigma (which is the default)
-
     delta_out : float, optional
         seconds for smooth output
     txtdir : str
