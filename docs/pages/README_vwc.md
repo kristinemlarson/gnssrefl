@@ -1,7 +1,7 @@
 # Soil Moisture
 <p align=center>
 
-[Latest options for the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc.html)
+[Latest options for the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_cl.html)
 
 <img src=https://www.kristinelarson.net/wp-content/uploads/2015/10/famousFigure.png width=500>
 </p>

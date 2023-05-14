@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.10
+Changed inputs to invsnr_input. They are now optional - you don't have to memorize
+the order of RH, elevation angles and azimuth angles as it was before.  Am using
+my variable for azimuth, i.e. azim1, azim2.
+
 ## 1.3.9
 New version of nmea2snr - doesn't crash on bad files
 

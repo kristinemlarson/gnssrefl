@@ -21,13 +21,13 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
 # required arguments
     parser.add_argument("station", help="station name", type=str)
-    parser.add_argument("h1", default=None, type=float, help="Lower limit reflector height (m)")
-    parser.add_argument("h2", default=None, type=float, help="Upper limit reflector height (m)")
-    parser.add_argument("e1", default=None, type=float, help="Lower limit elev. angle (deg)")
-    parser.add_argument("e2", default=None, type=float, help="Upper limit elev. angle (deg)")
+    parser.add_argument("-h1", default=None, type=float, help="Lower limit reflector height (m), default 1")
+    parser.add_argument("-h2", default=None, type=float, help="Upper limit reflector height (m), default 8")
+    parser.add_argument("-e1", default=None, type=float, help="Lower limit elev. angle (deg), default 5")
+    parser.add_argument("-e2", default=None, type=float, help="Upper limit elev. angle (deg), default 15")
 
-    parser.add_argument("-a1", default=None, type=float, help="Lower limit azimuth angle (deg)")
-    parser.add_argument("-a2", default=None, type=float, help="Upper limit azimuth angle (deg)")
+    parser.add_argument("-azim1", default=None, type=float, help="Lower limit azimuth angle (deg), default 0")
+    parser.add_argument("-azim2", default=None, type=float, help="Upper limit azimuth angle (deg), default 360")
 
     parser.add_argument("-lat", help="Latitude (degrees)", type=str, default=None)
     parser.add_argument("-lon", help="Longitude (degrees)", type=str, default=None)
@@ -39,38 +39,42 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def invsnr_input(station: str, h1: float, h2: float, e1: float, e2: float, a1: float = 0,
-                 a2: float = 360, lat: float = None, lon: float = None, height: float = None):
+def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=15, azim1: float = 0,
+                 azim2: float = 360, lat: float = None, lon: float = None, height: float = None):
     """
+    Sets some of the analysis parameters for invnsr. Values are stored in a json in $REFL_CODE/input
+    Note: this code was written independently of gnssrefl. The Quality Control parametesr are thus quite 
+    different from how gnssrefl is done. The LSP RH retrievals are not - and should not - be the same.
+
+    Examples
+    --------
+    invsnr_input sc02 -h1 3 -h2 12 -e1 5 -e2 13 -azim1 40 -azim2 220
+        general Friday Harbor inputs
+    invsnr_input at01 -h1 9 -h2 14 -e1 5 -e2 13 -azim1 20 -azim2 22
+        St Michael inputs 
+
+
+
     Parameters
     ----------
-    station : string
-        Character ID of the station
-
-    h1 : float
+    station : str
+        four ch ID of the station
+    h1 : float, optional
         Lower limit reflector height (m)
-
-    h2 : float
+    h2 : float, optional
         Upper limit reflector height (m)
-
-    e1 : float
+    e1 : float, optional
         Lower limit elev. angle (deg)
-
     e2 : float
         Upper limit elev. angle (deg)
-
-    a1 : float, optional
+    azim1 : float 
         Lower limit azimuth angle (deg)
-
-    a2 : float, optional
+    azim2 : float 
         Upper limit azimuth angle (deg)
-
     lat : float, optional
         Latitude (degrees)
-
     lon : float, optional
         Longitude (degrees)
-
     height : float, optional
         Ellipsoidal height (meters)
 
@@ -78,6 +82,9 @@ def invsnr_input(station: str, h1: float, h2: float, e1: float, e2: float, a1: f
 
 # rename the user inputs into variables
 #
+    # use old variable names
+    a1=azim1
+    a2=azim2
     NS = len(station)
     if (NS != 4):
         print('station name must be four characters long. Exiting.')
@@ -130,8 +137,8 @@ def invsnr_input(station: str, h1: float, h2: float, e1: float, e2: float, a1: f
     lsp['l2c_only'] = True
 
     outputfile = outputdir + '/' + station + '.inv.json'
-    print('writing json file to:', outputfile)
-    print(lsp)
+    print('Writing json file to:', outputfile)
+    #print(lsp)
     with open(outputfile, 'w+') as outfile:
         json.dump(lsp, outfile, indent=4)
 

@@ -58,12 +58,13 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
            refraction: bool = True, json_override: bool = False):
 
     """
-    Calls invsnr code.
+    You must have run invsnr_input before using this code. This is the wrapper code that does the 
+    invsnr modelling.
 
     Note: outfile_name and outfile_type are unnecessary. Consolidate them.
     
     Examples
-    -------
+    --------
     invsnr sc02 2023 15 L1+L2+L5 
         would analyze day of year 15 and the L1, L2, and L5 signals
     invsnr sc02 2023 15 ALL

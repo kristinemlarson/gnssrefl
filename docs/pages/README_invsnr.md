@@ -30,22 +30,27 @@ $REFL_CODE/yyyy/snr/ssss where yyyy is the year and ssss is the station name.
 
 II. Set up analysis instructions. These instructions are stored in $REFL_CODE/input.
 
-The required inputs are the station name (four characters lowercase), the reflector height limits (in meters)
-the elevation angle limits (in degrees). 
+The only required input is the station name (four characters lowercase). The defaults can be viewed by 
+typing <code>invsnr_input -h</code> or using the documentation.
 
 *Example:*
 
-<code>invsnr_input p041 0.5 6 5 25 </code>
+<code>invsnr_input p041 </code>
 
 In this case the station coordinates for p041 will be retrieved from the UNR database. If you have a 
 site that is not in the database, please use -lat, -lon, -height inputs.
 
-You can add an azimuth restriction using -a1 and -a2:
+For almost all tide gauge sites you will need to add an azimuth restriction using -azim1 and -azim2. Here we will
+continue using p041 as the example
 
-<code>invsnr_input p041 0.5 6 5 25 -a1 180 -a2 270</code>
+<code>invsnr_input p041 -azim1 180 -azim2 270</code>
+
+Please note the default elevation angle ranges. They can be changed on the command line.
 
 Because this software identifies rising and setting arcs in a different way than <code>gnssir</code>, you 
-can set a single range of azimuth ranges.
+can set a single range of azimuth ranges. But as it was written by the original author, there is no way to have 
+two distinct sets of azimuth regions. I do not think this will be hard to change - so feel free to give it a look 
+and submit a pull request.
 
 III. Run invsnr
 
@@ -77,7 +82,7 @@ Nor are changes from material properties addressed (water, snow, ice).
 
 - Make SNR files <code>rinex2snr at01 2021 301 -doy_end 303 -orb gnss -archive unavco</code>
 
-- Save analysis strategy <code>invsnr_input at01 9 14 5 13 -a1 20 -a2 220</code>
+- Save analysis strategy <code>invsnr_input at01 -h1 9 -h2 14 -e1 5 -e2 13 -azim1 20 -azim2 220</code>
 
 - Just one day of GPS on L1: <code>invsnr at01 2021 301 L1 -constel G</code> 
 
@@ -97,7 +102,7 @@ Nor are changes from material properties addressed (water, snow, ice).
 
 - Make SNR files using <code>rinex2snr</code>, using high-rate data, UNAVCO archive, and GNSS orbits options 
 
-- Save analysis strategy <code>invsnr_input tnpp 58 67  5 12 -a1 180 -a2 270</code>
+- Save analysis strategy <code>invsnr_input tnpp -h1 58 -h2 67  -e1 5 -e2 12 -azim1 180 -azim2 270</code>
 
 - Two days with L1+L2+L5, all constellations, decimate to speed up the code (1-sec data will be very slow)
 
