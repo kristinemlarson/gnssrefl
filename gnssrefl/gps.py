@@ -3596,7 +3596,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
                     else:
                         subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
                 if os.path.exists(r2_filename):
-                    print('Look for the rinex 2.11 file here: ', r2_filename)
+                    #print('Look for the rinex 2.11 file here: ', r2_filename)
                     fexists = True
                 else:
                     sigh = 0
@@ -5227,7 +5227,7 @@ def queryUNR_modern(station):
         # if longitude is ridiculous, as it often is in the Nevada Reno database make it less so
         if (lon < -180):
             lon = lon + 360
-        print(lat,lon,ht)
+        #print(lat,lon,ht)
     else:
         print('Did not find the station in the database:', station)
         # this returns 0 values
@@ -5520,7 +5520,6 @@ def inout(c3gz):
             subprocess.call([crnxpath,c3])
     if os.path.exists(rnx): # file exists
         translated = True
-        #print('remove Hatanaka compressed file')
         subprocess.call(['rm','-f',c3])
 
     return translated, rnx
@@ -5837,7 +5836,7 @@ def checkEGM():
     if 'REFL_CODE' in os.environ:
         egm = localdir + matfile
         if os.path.isfile(egm):
-            print('EGM96 file exists')
+            #print('EGM96 file exists')
             foundfile = True
         else:
             print('EGM96 file does not exist. We will try to download and store it in ',localdir)

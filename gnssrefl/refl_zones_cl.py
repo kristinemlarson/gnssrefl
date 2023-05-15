@@ -17,7 +17,7 @@ def parse_arguments():
     parser.add_argument('-lat', help='Latitude (deg), if station not in database', type=float, default=None)
     parser.add_argument('-lon', help='Longitude (deg), if station not in database', type=float, default=None)
     parser.add_argument('-el_height', help='Ellipsoidal height (m) if station not in database', type=float,default=None)
-    parser.add_argument('-fr', help='1, 2, or 5 ', type=int)
+    parser.add_argument('-fr', help='1, 2, or 5 ', type=int,default=None)
     parser.add_argument('-RH', help='Reflector height (meters). Default is sea level', type=str, default=None)
     parser.add_argument('-azim1', help='start azimuth (default is 0, negative values allowed) ', type=int,default=None)
     parser.add_argument('-azim2', help='end azimuth (default is 360) ', type=int,default=None)
@@ -26,8 +26,8 @@ def parse_arguments():
     parser.add_argument('-system', help='default=gps, options are galileo, glonass, beidou', type=str)
     parser.add_argument('-output', help='output filename. default is the station name with kml extension', type=str,default=None)
 
-
     args = parser.parse_args().__dict__
+
 
     return {key: value for key, value in args.items() if value is not None}
 
@@ -44,12 +44,14 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
 
     Examples
     --------
-
     refl_zones p041 -RH 2
+        standard Fresnel zones for all azimuths, GPS and L1 frequency, RH of 2 meters
 
     refl_zones sc02 -fr 2 -azlist 40 240
+        Fresnel zones for limited azimuths, GPS and L2 frequency. RH is mean sea level
 
-    refl_zones p041 -RH 2 -system galileo
+    refl_zones p041 -RH 5 -system galileo
+        Fresnel zones for reflector height of 5 meters and Galileo L1
 
     Parameters
     ----------
@@ -69,7 +71,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         user-defined reflector height (m)
         default is to use sea level as the RH
     fr : int, optional
-        frequency (1,2, or 5 allowed)
+        frequency (only 1,2, or 5 allowed)
     el_list : list of floats
         elevation angles desired (deg)
         default is 5, 10, 15
@@ -86,6 +88,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     Creates a KML file
 
     """
+
     # changed name to be consistent with other codes
     az_sectors = azlist
     # check that you have the files for the orbits on your local system
@@ -99,7 +102,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     # check that EGM96 file is in your local directory
     foundfile = g.checkEGM()
     if (RH == None) and (not foundfile):
-        print('EGM96 file is not online. It should be in the REFL_CODE/Files directory')
+        print('EGM96 file has not been found. It should be in the REFL_CODE/Files directory')
 
     #print(lat,lon,el_height)
     if (lat is None) & (lon is None):
@@ -109,9 +112,9 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
             print('Exiting.')
             sys.exit()
         else:
-            print('using inputs:', lat, lon, el_height)
+            print('Using inputs:', lat, lon, el_height)
     else:
-        print('using inputs:', lat, lon, el_height)
+        print('Using inputs:', lat, lon, el_height)
 
     geoidC = g.geoidCorrection(lat,lon)
     # calculate height above sea level
@@ -120,6 +123,16 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     if fr not in [1,2,5]:
         print('Illegal frequency chosen: ',fr)
         return
+    else:
+        if (system == 'galileo') & (fr == 2):
+            print('Galileo does not have a L2 frequency.')
+            sys.exit()
+        elif (system == 'glonass') & (fr == 5):
+            print('Glonass does not have a L5 frequency.')
+            sys.exit()
+        else:
+            print('Using frequency: ', fr)
+
     # default is to use sea level as reflector height.  if RH is set, use that instead
     if RH == None:
         h = sealevel
@@ -153,8 +166,8 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         sys.exit()
 
 
-    obsfile = rf.set_system(system)
-    print('The code should use this orbit file: ', obsfile)
+    obsfile, it  = rf.set_system(system)
+    print('The code should use this orbit file: ', obsfile, it)
     x,y,z=g.llh2xyz(lat,lon,el_height)
     recv=np.array([x,y,z])
     # calculate rising and setting arcs for this site and the requested constellation
@@ -212,9 +225,9 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         print('Something went wrong, and the kml file was not created')
 
 
-
 def main():
     args = parse_arguments()
+    print(args)
     data = reflzones(**args)
 
 

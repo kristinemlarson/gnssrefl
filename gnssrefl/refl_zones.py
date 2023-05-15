@@ -472,6 +472,8 @@ def set_system(system):
     ----------
     system : str
         gps,glonass,beidou, or galileo
+    it : int
+        simple pointer from former code. 1 is GPS, 2 is Glonass etc
 
     Returns
     -------
@@ -479,6 +481,7 @@ def set_system(system):
         orbit filename with Cartesian coordinates for one day 
 
     """
+    it = 1
     xdir = os.environ['REFL_CODE'] 
     if not os.path.exists(xdir):
         print('REFL_CODE environment variable must be set. Exiting.')
@@ -490,18 +493,23 @@ def set_system(system):
     if (system is None) or (system == 'gps'):
         system = 'gps'
         orbfile = xdir + 'GPSorbits_21sep17.txt'
+        it = 1
     elif (system == 'galileo'):
         orbfile = xdir + 'GALILEOorbits_21sep17.txt'
+        it = 3
     elif (system == 'glonass'):
         orbfile = xdir + 'GLONASSorbits_21sep17.txt'
+        it = 2
     elif (system == 'beidou'):
         orbfile = xdir + 'BEIDOUorbits_21sep17.txt'
+        it = 4
     else:
        print('Using GPS')
        system = 'gps'
+       it = 1
        orbfile = xdir + 'GPSorbits_21sep17.txt'
 
-    return orbfile
+    return orbfile, it 
 
 def save_reflzone_orbits():
     """
@@ -532,8 +540,8 @@ def save_reflzone_orbits():
         if not os.path.exists(xdir + orbfile):
             print('download from github and put in local Files directory: ', otypes)
             wget.download(githubdir+orbfile, xdir + orbfile)
-        else:
-            print('file already exists', otypes)
+        #else:
+        #    print('file already exists', otypes)
 
     found = 0 
     for otypes in ['GPS','GLONASS','GALILEO','BEIDOU']:

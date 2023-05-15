@@ -161,9 +161,18 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     # put this outside the try because I think there is one in the function
     if archive == 'bfg':
         station = station9ch[0:4] ; samplerate = srate; stream = 'R'
+        debug = False
         g.bfg_data(station, year, doy, samplerate,debug)
+        zip_file_name = file_name[0:-2] + 'zip'
         if os.path.exists(file_name):
             print('File was found: ', file_name )
+            foundit = True
+        elif os.path.exists(zip_file_name):
+            print('From zip to gz: ', zip_file_name )
+            subprocess.call(['unzip', zip_file_name])
+            subprocess.call(['gzip', file_name[0:-3]])
+            # cleaning up
+            subprocess.call(['rm', zip_file_name])
             foundit = True
         else:
             print('File was not found: at bfg.')

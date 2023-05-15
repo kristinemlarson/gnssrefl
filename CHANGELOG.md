@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.11
+Fixed bug in refl_zones - caused it to crash
+
+Allowed bfg to have zip as well as gz files
+
 ## 1.3.10
 Changed inputs to invsnr_input. They are now optional - you don't have to memorize
 the order of RH, elevation angles and azimuth angles as it was before.  Am using

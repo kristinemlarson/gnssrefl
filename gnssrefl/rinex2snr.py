@@ -1223,7 +1223,7 @@ def go_from_crxgz_to_rnx(c3gz,deletecrx=True):
     if os.path.exists(rnx): # file exists
         translated = True
         if deletecrx:
-            print('remove Hatanaka compressed file')
+            #print('remove Hatanaka compressed file')
             subprocess.call(['rm','-f',c3])
 
     return translated, rnx
