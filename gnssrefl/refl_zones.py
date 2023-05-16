@@ -1,3 +1,4 @@
+from scipy.interpolate import interp1d
 import math
 import numpy as np
 import os
@@ -554,3 +555,96 @@ def save_reflzone_orbits():
         foundfiles = True
 
     return foundfiles 
+
+def nyquist_simple(t,elev,azims, emin,emax,azriseset,reqsamplerate):
+    """
+    given numpy array of elevation angles (elev)
+    and limtis (emin,emax) and azriseset, reqsamplerate
+
+    Parameters
+    ----------
+    t : ??
+        cannot remember
+    elev : numpy array of floats
+        elevation angle of rising/setting arcs
+    azims : numpy array of floats
+        azimuths of rising/setting arcs
+    emin : float
+        minimum elevation angle, degrees
+    emax : float
+        maximum elevation angle, degrees
+    azriseset : ??
+        cannot remember
+    reqsamplerate : float
+        requested receiver sampling rate
+
+    """
+    # sample rate used for primary orbit calculation.  will scale by requested sample rate
+    samplerate = 30
+    # t is every five minutes
+    ie= interp1d(t, elev, kind='quadratic',bounds_error=False,fill_value='extrapolate')
+    ia= interp1d(t, azims, kind='quadratic',bounds_error=False,fill_value='extrapolate')
+    tnew = np.arange(t[0], t[-1], samplerate)
+    # interporlate el and az
+    enew = ie(tnew)
+    anew = ia(tnew)
+    # window it
+    i = (np.abs(anew-azriseset) < 20); enew = enew[i]
+    i = (enew >= emin) & (enew <= emax); enew = enew[i]
+    # scale factor for L1
+    cf = 0.1902936/2
+    N = len(enew)
+    if (N > 2):
+        maxe = max(enew); mine = min(enew)
+    # highest observation has to be within 0.5 degrees of requested
+        if ( maxe < (emax-0.5)):
+        #print(azriseset, 'max ele ', round(maxe,2), ' Not a significant arc')
+            nyq = np.nan
+        else:
+            diffT = (np.sin( maxe*np.pi/180) - np.sin(mine*np.pi/180) ) /cf
+    # we do 30 sec and then multiple by ratio of requested sample rate
+            nyq = round(N/(2*diffT),2)*(samplerate/reqsamplerate)
+    else:
+        nyq = np.nan
+
+    return nyq
+
+
+def calcAzEl_newish(prn, newf,recv,u,East,North):
+    """
+    should be consolidated with the other function.but who has the time!
+
+    Parameters
+    ----------
+    prn : int
+        satellite number ?
+
+    newf : 
+
+    u : numpy array
+        up unit vector
+    East: 
+
+    North : 
+
+    Returns
+    -------
+    tv : numpy array
+
+    """
+    tv = np.empty(shape=[0, 4])
+    # number of values
+    NV = len(newf)
+    for t in range(0,NV):
+        satv= [newf[t,2], newf[t,3],newf[t,4]]
+        etime = newf[t,1]
+        r=np.subtract(satv,recv) # satellite minus receiver vector
+        eleA = g.elev_angle(u, r)*180/np.pi
+        if ( (eleA >= 0) & (eleA <= 20)):
+            azimA = g.azimuth_angle(r, East, North)
+#            print(etime, eleA, azimA)
+            newl = [prn, eleA, azimA, etime]
+            tv = np.append(tv, [newl],axis=0)
+    nr,nc=tv.shape
+    return tv
+

@@ -1,0 +1,141 @@
+import numpy as np
+import os
+
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+
+
+import gnssrefl.gps as g
+import gnssrefl.refl_zones as rz
+
+def pickup_files_nyquist(station,recv,obsfile,constel,e1,e2,reqsamplerate):
+    """
+
+    Parameters
+    ----------
+    station : str
+        lowercase four character station name
+    recv : numpy array
+         Cartesian coordinates of station (m)
+    obsfile : str
+        name of orbit file
+    constel : int
+        requested constellation (1-4)
+    e1 : float
+        min elevation angle (deg)
+    e2 : float
+        max elevation angle (deg)
+    reqsamplerate : float
+        sample rate of receiver
+
+    """
+    # for rising and setting arcs
+    azlist = np.empty(shape=[0, 3])
+    # max number of satellites in each constellation
+    # blank,gps, glonass, galileo, beidou
+    LV = [0,32,26,36,46]
+
+    # these are in degrees and meters
+    lat, lon, nelev = g.xyz2llhd(recv)
+    # unit vectors for up, East, and North
+    u, East,North = g.up(np.pi*lat/180,np.pi*lon/180)
+
+    f = read_the_orbits(obsfile,constel)
+
+#   examine all satellites - allN will have the nyquists in a list
+    allN = np.empty(shape=[0, 2])
+    e5 = 5.0
+    lv = LV[constel] + 1
+    for prn in range(1,lv):
+        azlist = np.empty(shape=[0, 3])
+        # find the orbit data for that prn number
+        newf = f[ (f[:,0] == prn) ]
+        if len(newf) > 0:
+        # use this to get rising and setting first
+            tvsave=rz.calcAzEl_newish(prn, newf,recv,u,East,North)
+            nr,nc=tvsave.shape
+            #print('shape of tvsave', nr,nc)
+            el = tvsave[:,1] - e5
+            for j in range(0,nr-1):
+                az = round(tvsave[j,2],2)
+                newl = [az, prn, e5]
+                if ( (el[j] > 0) & (el[j+1] < 0) ) :
+                    azlist = np.append(azlist, [newl], axis=0)
+                if ( (el[j] < 0) & (el[j+1] > 0) ) :
+                    azlist = np.append(azlist, [newl], axis=0)
+            # so now you have a list of azimuths
+            nrr,ncc = azlist.shape
+
+            # for each rising or setting arc
+            for k in range(0,nrr):
+                azriseset = azlist[k,0]
+                elev = tvsave[:,1]; azims = tvsave[:,2]; t = tvsave[:,3]
+                # figure out the nyquist
+                nq=rz.nyquist_simple(t,elev,azims, e1,e2,azriseset,reqsamplerate)
+                # and then save it
+                if not np.isnan(nq):
+                    newl=[float(azriseset), float(nq)]
+                    allN = np.append(allN, [newl], axis=0);
+    info = str(reqsamplerate) + ' sec sample rate/elev angles '  + str(e1) + '-' + str(e2)
+    pngfile = ny_plot(station,allN,info)
+
+    return pngfile
+
+
+def ny_plot(station,allN, info):
+    """
+    allN is a numpy array of azimuth(deg)/nyquist(m)
+    info is only needed for the title
+
+    Parameters
+    ----------
+    station : str
+
+    allN : numpy array ?
+        azimuth and nyquist answers
+
+    Returns
+    -------
+    pngfile : str
+        name of plot file
+
+    """
+    l2 = 0.24421
+    l5 = 0.254828048
+    l1 = 0.19029360
+    fig = Figure(figsize=(8,4),dpi=360)
+    ax = fig.subplots()
+    ax.plot(allN[:,0],allN[:,1],'bo',label='L1')
+    ax.plot(allN[:,0],l2*allN[:,1]/l1,'ro',label='L2')
+    ax.plot(allN[:,0],l5*allN[:,1]/l1,'co',label='L5')
+    ax.set_title(station + ' RH Nyquist/' + info, fontsize=14)
+    ax.grid()
+    ax.set_xlabel('Azimuth (deg)')
+    ax.set_ylabel('meters')
+    ax.set_xlim(0,360)
+    ax.legend(loc="upper right")
+    if ("REFL_CODE" in os.environ):
+        xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/'
+    else:
+        xdir = './'
+    pngfile = xdir + station + '_nyquist.png'
+    fig.savefig(pngfile, format="png")
+    print('pngfile stored in: ', pngfile)
+
+
+def read_the_orbits(obsfile,constel):
+    """
+    Parameters
+    ----------
+    obsfile : str
+        name of the orbit file to be read
+    constel : int
+        which constellation (1-4), 1 for gps, 2 for glonass etc
+    """
+    f = np.genfromtxt(obsfile,comments='%')
+    if (constel == 4):
+        #print('found beidou')
+        i = (f[:,0] < 38) | (f[:,0] > 40)
+        f=f[i,:]
+    return f
+

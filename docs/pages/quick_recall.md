@@ -32,6 +32,7 @@
 * [check_rinex_file](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.check_rinex_file.html)
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
 * [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)
+* [nyquist](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nyquist_cl.html)
 * [query_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.query_unr.html)
 * [quickplt](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickplt.html)
 * [refl_zones](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html)

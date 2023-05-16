@@ -22,7 +22,7 @@ with open("README.md", "r") as readme_file:
 requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","simplekml","earthscope-sdk"]
 setup(
     name="gnssrefl",
-    version="1.3.11",
+    version="1.3.12",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -70,6 +70,7 @@ setup(
             'quickplt= gnssrefl.quickplt:main',
             'snowdepth= gnssrefl.snowdepth_cl:main',
             'rh_plot= gnssrefl.rh_plot:main',
+            'nyquist= gnssrefl.nyquist_cl:main',
             'pickle_dilemma= gnssrefl.pickle_dilemma:main',
             ], 
         },

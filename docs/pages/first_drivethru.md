@@ -11,7 +11,7 @@ The plots might look slightly different and the defaults we used in the analysis
 
 #### Ice Sheets
 
-* [Lorne, Antarctical](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lorg.html)
+* [Lorne, Antarctica](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lorg.html)
 
 * [Dye2, Greenland](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_gls1.html)
 
