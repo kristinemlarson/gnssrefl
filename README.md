@@ -16,7 +16,7 @@ GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 09357
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was initially developed 
 as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
-This documentation was updated on March 24, 2023
+This documentation was updated on May 17, 2023
 
 Kristine M. Larson
 
