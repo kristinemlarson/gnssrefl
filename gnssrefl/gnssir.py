@@ -171,7 +171,7 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
                                 fout.write(" {0:4.0f} {1:3.0f} {2:6.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} \n".format(year,doy,maxF,satNu, UTCtime, avgAzim,maxAmp,eminObs,emaxObs,Nv, f,riseSet, Edot2, maxAmp/Noise, delT, MJD,irefr)) 
                             gj +=1
                             if screenstats:
-                                print('Writing out ', np.round(Edot2,3), np.round(avgEdot,3))
+                                #print('Writing out ', np.round(Edot2,3), np.round(avgEdot,3))
                                 T = g.nicerTime(UTCtime)
                                 print('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} '.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
                             if plot_screen:
