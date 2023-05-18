@@ -15,7 +15,7 @@ import gnssrefl.decipher_argt as gt
 
 #Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
 
-def NMEA2SNR(locdir, fname, snrfile, csnr,dec):
+def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
     """
 
     Parameters
@@ -30,6 +30,14 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec):
         snr option, i.e. '66' or '99'
     dec : int
         decimation value in seconds
+    year : int
+        full year
+    doy : int
+        day of year
+    llh : list of floats
+        lat (d), lon(d), height (m)
+    myway : bool
+        whether you use my code to do azel calculations
         
     """
     
@@ -37,13 +45,20 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec):
     missing = True
     station = fname.lower()
     station = station[0:4]
+    yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
+    if (llh[0] != 0):
+        x,y,z = g.llh2xyz(llh[0],llh[1],llh[2])
+        recv = [x,y,z]
+        print(recv)
+        xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
+        orbfile = orbdir + '/' + xf # hopefully
+    else:
+        if myway:
+            print('This code requires lat/lon/ht inputs. Exiting')
+            return
 
     if station == 'argt':
-        year = 2022; month = 7; day = 1
-        xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
-        orbfile = orbdir + xf # hopefully
-        recv = [2755329.5821 , -4478525.1290 , -3597870.0755]
-        gt.decipher_argt(station,'jul01.txt','jul01.snr',idec,snrfile,orbfile,recv,csnr)
+        gt.decipher_argt(station,'jul01.txt',idec,snrfile,orbfile,recv,csnr,year,month,day)
         if os.path.isfile(snrfile):
             print('File made, ignoring the rest of the code')
             return
@@ -73,7 +88,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec):
         missing = False
         
 
-    # why all the going back and forth between lists and np arrays?
+    # why is there all this going back and forth between lists and np arrays?
 
     t = np.array(t);az = np.array(az);elv = np.array(elv);snr = np.array(snr);prn = np.array(prn); freq=np.array(freq)
     #remove empty records
@@ -89,10 +104,9 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec):
     elv = elv.astype(float)
     snr = snr.astype(float)
     prn = prn.astype(int)
-    #print(len(az), len(t), len(elv),len(snr),len(prn) )
 
     prn_unique = np.unique(prn) 
-    print(prn_unique)
+    #print(prn_unique)
 
     T = []; PRN = []; AZ = []; ELV = []; SNR = []; FREQ = []        
     for i_prn in prn_unique:
@@ -104,7 +118,6 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec):
         #    print(i_prn, 'looks like an illegal satellite number')
         time = t[prn == i_prn];angle = elv[prn == i_prn];azimuth = az[prn == i_prn]; frequency = freq[prn == i_prn]
         Snr = snr[prn == i_prn];Prn = prn[prn == i_prn]
-        #print(Snr)
         
         angle_fixed, azim_fixed = fix_angle_azimuth(time, angle, azimuth)#fix the angles 
         if (len(angle_fixed) == 0 and len(azim_fixed) == 0):
@@ -114,6 +127,26 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec):
         
         del  time, angle, azimuth, Snr, Prn, angle_fixed, azim_fixed, frequency
         
+    if myway:
+        tmpfile =  station + 'tmp.txt'
+        print('Opening temporary file : ', tmpfile)
+        fout = open(tmpfile, 'w+')
+        fout.write('{0:15.4f}{1:15.4f}{2:15.4f} \n'.format(recv[0], recv[1],recv[2]) )
+        fout.write('{0:6.0f}{1:6.0f}{2:6.0f} \n'.format(year, month, day) )
+        #(t[i], prn[i], snr[i],freq[i])
+        for i in range(0,len(T)):
+            if ( (int(t[i]) % idec) == 0):
+                sat = PRN[i]
+                # glonass
+                if (sat > 100) & (sat < 200):
+                    sat = sat - 64
+                fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:s} \n'.format(T[i], sat, SNR[i], freq[i]) )
+        fout.close()
+        # make the snrfile
+        gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
+        return
+
+
     inx = np.argsort(T)  #Sort data by time
     
     T = np.array(T);PRN = np.array(PRN);ELV = np.array(ELV);SNR = np.array(SNR);AZ = np.array(AZ); FREQ=np.array(FREQ)
@@ -580,7 +613,7 @@ def elev_limits(snroption):
 
     return emin, emax
   
-def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,lat,lon,height):
+def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,myway):
     """
     runs the nmea2snr conversion code
 
@@ -598,12 +631,10 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,lat,lon,heigh
         whether make a new SNR file even if one already exists
     dec : int
         decimation in seconds
-    lat : float
-        deg
-    lon : float
-        deg
-     height : float
-        m
+    llh : list of floats
+        lat and lon (deg) and ellipsoidal ht (m)
+    myway : bool
+        whether you want to use my code for the orbits
 
     """
     # loop over years and day of years
@@ -617,11 +648,10 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,lat,lon,heigh
             snrfile =  quickname(station,yr,cyy,cdoy,csnr)#snr filename
             snre = g.snr_exist(station,yr,dy,csnr)#check if snrfile already sxists
             if snre:
+                print('SNR file already exists', snrfile)
                 if overwrite:
                     subprocess.call(['rm', snrfile])
                     snre = False
-            else:
-                print('SNR file already exists', snrfile)
         
             illegal_day = False
             if (float(dy) > g.dec31(yr)):
@@ -631,7 +661,7 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,lat,lon,heigh
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
                     print('Creating '+snrfile)
-                    NMEA2SNR(locdir, r, snrfile, csnr,dec)
+                    NMEA2SNR(locdir, r, snrfile, csnr,dec,yr,dy,llh,myway)
                     
                 else:
                     print('NMEA file '+ locdir + r +' does not exist')

@@ -29,6 +29,7 @@ def main():
     parser.add_argument("-lat", default=None, help="latitude, degrees", type=float)
     parser.add_argument("-lon", default=None, help="longitude, degrees", type=float)
     parser.add_argument("-height", default=None, help="ellipsoid height,m", type=float)
+    parser.add_argument("-myway", default=None, help="boolean", type=str)
 
     args = parser.parse_args()
 
@@ -65,11 +66,15 @@ def main():
     year_list = list(range(year1, year2+1))
     
     overwrite = False
-    if (args.overwrite == 'True'):
+    if (args.overwrite == 'True') or (args.overwrite == 'T'):
         overwrite = True
+
     dec = 1
     if (args.dec is not None):
         dec = args.dec
+    myway = False
+    if (args.myway is not None):
+        myway = True
 
     # for now set to zero as Makan's code does not need LLH
     lat = 0; lon = 0; height = 0;
@@ -79,8 +84,8 @@ def main():
         lon = args.lon
     if args.height is not None:
         height = args.height
-        
-    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,lat,lon,height)
+    llh = [lat,lon,height]    
+    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,myway)
 
 if __name__ == "__main__":
     main()

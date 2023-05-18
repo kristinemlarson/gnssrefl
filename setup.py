@@ -15,6 +15,10 @@ ext3 = Extension(name='gnssrefl.gnsssnrbigger',
         sources=['gnssrefl/gnsssnrbigger.f'], 
         f2py_options=['--verbose'],
         )
+ext4 = Extension(name='gnssrefl.xnmeasnr', 
+        sources=['gnssrefl/xnmeasnr.f'], 
+        f2py_options=['--verbose'],
+        )
 
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
@@ -75,7 +79,7 @@ setup(
             ], 
         },
     install_requires=requirements,
-    ext_modules = [ext1,ext2,ext3],
+    ext_modules = [ext1,ext2,ext3,ext4],
     classifiers=[
         "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

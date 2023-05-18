@@ -1,4 +1,4 @@
-C FILE: NMEA_SNR.F 
+C FILE: XNMEASNR.F 
       SUBROUTINE FOO(rawf,outf,sp3file,snrtype,errf) 
       implicit none
       character*128 rawfilename, outfilename, sp3file,
@@ -11,8 +11,6 @@ Cf2py intent(in) snrtype
 Cf2py intent(in) errf
 c     Kristine Larson 15jul27
 c 
-c     allow sp3 files that are longer than 23 hr 45 minutes
-c     21feb22 port to python f2py so it can be used in gnssrefl
 
       integer maxsat, maxob, maxGNSS, np
       parameter (maxsat = 200)
@@ -45,11 +43,9 @@ c     character*2  key(maxsat)
       logical haveorbit(maxGNSS), debug
       debug = .false.
 
-c      file id for error log
+c     file id for error log
       errid = 53
-c     set some defaults
-c     if you want edot, set this to true
-      fileIN = 12
+      fileIN = 51
       fileOUT = 55
       pi = 4.0*datan(1.d0)
 c     shorter filenames
@@ -57,16 +53,24 @@ c     shorter filenames
       outfilename = outf
       open(errid,file=errf,status='unknown',iostat=ios)
       write(errid,*) 'sp3file :',sp3file
-      write(errid,*) 'RINEX file:',rawf
+      write(errid,*) 'input observations:',rawf
       write(errid,*) 'Output file:',outf
-      write(errid,*) 'Selection:',snrtype
+      write(errid,*) 'SNR File Selection:',snrtype
+
+c     open output file
+      open(fileOUT,file=outfilename, status='unknown')
+c     open input file
+      open(fileIN,file=rawf, status='unknown')
 
       prn_pickc = snrtype
 c
-c     comment out for now
 c     figure out which option is being requested
       READ (prn_pickc, '(I2)')  prn_pick
       write(errid, *) 'Selection ', prn_pick
+      read(fileIN,222) xrec,yrec,zrec
+      read(fileIN,223) year, month,day
+
+      write(errid, *) xrec, yrec, zrec, year, month, day
 c     read in the sp3file
       call read_sp3_200sats(sp3file, sp3_gps_weeks, sp3_gps_seconds,
      .   sp3_nsat, sp3_satnames, sp3_XYZ,haveorbit,
@@ -86,8 +90,6 @@ c     interpolate (much) beyond your last point
       edot = 0.d0
 c     isntead receiver position will be read from the obsfile
 
-      read(fileIN,*, iostat=ios) xrec,yrec,zrec
-      read(fileIN,*, iostat=ios) year, month,day
 c     so pathetic i have to use 2ch rinex year
       itime(1) = year - 2000 
       itime(2) = month
@@ -97,20 +99,21 @@ c     so pathetic i have to use 2ch rinex year
       s5 = 0.d0
 
       call envTrans(xrec,yrec,zrec,staXYZ,Lat,Long,Ht,North,East,Up)
-c     open output file
-      open(fileOUT,file=outfilename, status='unknown')
       eof = .false.
       do while (.not.eof)
         read(fileIN,*, iostat=ios) tod, iprn, s1, freq
+c       write(fileOUT,*, iostat=ios) tod, iprn, s1, freq
         if (ios.ne.0) goto 99
 c       hours and minutes
         itime(4) = tod/3600
         itime(5) = (tod - 3600*itime(4))/60
 c       seconds
         sec = tod - 3600*itime(4) - 60*itime(5)
+c       write(fileOUT,*) itime(4), itime(5), sec 
 
 c       find out gpsweek and gpsseconds (tc)
         call convert_time(itime,sec, msec, gpsweek, tc)
+c       write(fileOUT,*) gpsweek, tc
 c         then convert it to relative time to first sp3 point 
         call rel_time(gpsweek, tc, FirstWeek,FirstSecond, rt)
 c         check that it is within 20 minutes of the first and last sp3 points
@@ -129,11 +132,11 @@ c             x9,y9,z9 are in meters pick 9 points closest to observation time
            call pick_9points(sp3_nsat, sp3_satnames, sp3_gps_weeks,
      .     sp3_gps_seconds, sp3_XYZ, iprn, gpsweek,tc,itime(4),
      .          t9,x9, y9,z9,ipointer,nepochs,sp3_rel_secs,rt)
-               
+c          write(fileOUT, *) 'later on', tod, azimuth, elev, s1
            if ( nint(  (x9(1)/1000))  .eq. 1000000) then
 c               print*,iprn,' bad orbit'
            else
-             write(errid,*) iprn, tod,azimuth, elev, s1
+c            write(errid,*) iprn, tod,azimuth, elev, s1
              call get_azel_sp3(rt, iprn, staXYZ,East,North,Up,
      .              azimuth,elev,t9,x9,y9,z9)
              call write_gnss_to_file(fileOUT, iprn, tod,
@@ -146,7 +149,9 @@ c     close log, input and output files
       close(errid)
       close(fileIN)
       close(fileOUT)
-202       format(a10,i6,f10.0)
+202   format(a10,i6,f10.0)
+222   format(f15.4, f15.4, f15.4)
+223   format(i6,i6,i6)
       end
 
       subroutine read_sp3_200sats(inputfile, gps_weeks, 
