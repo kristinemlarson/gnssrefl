@@ -39,11 +39,16 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec):
     station = station[0:4]
 
     if station == 'argt':
-        t,prn,az,elv,snr,freq = gt.decipher_argt('jul01.txt')
-        if len(t) > 0:
-            missing = False
+        year = 2022; month = 7; day = 1
+        xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
+        orbfile = orbdir + xf # hopefully
+        recv = [2755329.5821 , -4478525.1290 , -3597870.0755]
+        gt.decipher_argt(station,'jul01.txt','jul01.snr',idec,snrfile,orbfile,recv,csnr)
+        if os.path.isfile(snrfile):
+            print('File made, ignoring the rest of the code')
+            return
         else:
-            print('exiting'); sys.exit()
+            print('translation was unsuccessful'); return
 
 
     #check whether the input file is a uncompressed or compressed     
@@ -611,11 +616,12 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,lat,lon,heigh
             cyy = '{:02d}'.format(yr-2000)
             snrfile =  quickname(station,yr,cyy,cdoy,csnr)#snr filename
             snre = g.snr_exist(station,yr,dy,csnr)#check if snrfile already sxists
-            #if snre:
-            #    print('SNR file exists', snrfile)
-            if overwrite and snre:
-                subprocess.call(['rm', snrfile])
-                snre = False
+            if snre:
+                if overwrite:
+                    subprocess.call(['rm', snrfile])
+                    snre = False
+            else:
+                print('SNR file already exists', snrfile)
         
             illegal_day = False
             if (float(dy) > g.dec31(yr)):
