@@ -14,7 +14,7 @@
 
 ## Helper Codes 
 
-* [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html)
+* [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 * [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html)
 * [invsnr_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 * [make_json_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)

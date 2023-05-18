@@ -11,7 +11,7 @@ import gnssrefl.nmea2snr as nmea
 def main():
     """
     Documentation about the purpose of this code should be added here.
-    Someone should clearly list the inputs to this code.
+    It should clearly list the inputs to this code.
     And provide examples. 
 
     """
@@ -25,11 +25,16 @@ def main():
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
+    parser.add_argument("-dec", default=None, help="decimation, seconds", type=int)
+    parser.add_argument("-lat", default=None, help="latitude, degrees", type=float)
+    parser.add_argument("-lon", default=None, help="longitude, degrees", type=float)
+    parser.add_argument("-height", default=None, help="ellipsoid height,m", type=float)
 
     args = parser.parse_args()
 
 #make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
+
 
     station = args.station; 
     NS = len(station)
@@ -62,8 +67,20 @@ def main():
     overwrite = False
     if (args.overwrite == 'True'):
         overwrite = True
+    dec = 1
+    if (args.dec is not None):
+        dec = args.dec
+
+    # for now set to zero as Makan's code does not need LLH
+    lat = 0; lon = 0; height = 0;
+    if args.lat is not None:
+        lat = args.lat
+    if args.lon is not None:
+        lon = args.lon
+    if args.height is not None:
+        height = args.height
         
-    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite)
+    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,lat,lon,height)
 
 if __name__ == "__main__":
     main()

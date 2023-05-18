@@ -7,13 +7,15 @@ from __future__ import division
 import numpy as np 
 import os, datetime, traceback
 import subprocess
+import sys
 from scipy.interpolate import interp1d
 
 import gnssrefl.gps as g
+import gnssrefl.decipher_argt as gt
 
 #Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
 
-def NMEA2SNR(locdir, fname, snrfile, csnr):
+def NMEA2SNR(locdir, fname, snrfile, csnr,dec):
     """
 
     Parameters
@@ -26,10 +28,23 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
         name of output file for SNR data
     csnr : str
         snr option, i.e. '66' or '99'
+    dec : int
+        decimation value in seconds
         
     """
     
+    idec = int(dec)
     missing = True
+    station = fname.lower()
+    station = station[0:4]
+
+    if station == 'argt':
+        t,prn,az,elv,snr,freq = gt.decipher_argt('jul01.txt')
+        if len(t) > 0:
+            missing = False
+        else:
+            print('exiting'); sys.exit()
+
 
     #check whether the input file is a uncompressed or compressed     
     if os.path.exists(locdir + fname):
@@ -52,21 +67,27 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
         subprocess.call(['rm',fname])
         missing = False
         
-    t = np.array(t);az = np.array(az);elv = np.array(elv);snr = np.array(snr);prn = np.array(prn); freq=np.array(freq)
 
+    # why all the going back and forth between lists and np arrays?
+
+    t = np.array(t);az = np.array(az);elv = np.array(elv);snr = np.array(snr);prn = np.array(prn); freq=np.array(freq)
     #remove empty records
-    t = t[az !=''];snr = snr[az !=''];prn = prn[az !=''];elv = elv[az !=''];freq = freq[az != ''];az = az[az !=''];
-    t = t[elv !=''];az = az[elv !=''];snr = snr[elv !=''];prn = prn[elv !=''];freq = freq[elv != ''];elv = elv[elv !='']
-    t = t[snr !=''];az = az[snr !=''];prn = prn[snr !=''];elv = elv[snr !=''];freq = freq[snr != ''];snr = snr[snr !='']
-    t = t[prn !=''];az = az[prn !=''];elv = elv[prn !=''];snr = snr[prn !=''];freq = freq[prn != ''];prn = prn[prn !=''] 
-    t = t[freq !=''];az = az[freq !=''];elv = elv[freq !=''];snr = snr[freq !=''];prn = prn[freq !='']; freq = freq[freq != '']
+    if (station != 'argt'):
+        #????
+        t = t[az !=''];snr = snr[az !=''];prn = prn[az !=''];elv = elv[az !=''];freq = freq[az != ''];az = az[az !=''];
+        t = t[elv !=''];az = az[elv !=''];snr = snr[elv !=''];prn = prn[elv !=''];freq = freq[elv != ''];elv = elv[elv !='']
+        t = t[snr !=''];az = az[snr !=''];prn = prn[snr !=''];elv = elv[snr !=''];freq = freq[snr != ''];snr = snr[snr !='']
+        t = t[prn !=''];az = az[prn !=''];elv = elv[prn !=''];snr = snr[prn !=''];freq = freq[prn != ''];prn = prn[prn !=''] 
+        t = t[freq !=''];az = az[freq !=''];elv = elv[freq !=''];snr = snr[freq !=''];prn = prn[freq !='']; freq = freq[freq != '']
     
     az = az.astype(float)
     elv = elv.astype(float)
     snr = snr.astype(float)
     prn = prn.astype(int)
+    #print(len(az), len(t), len(elv),len(snr),len(prn) )
 
     prn_unique = np.unique(prn) 
+    print(prn_unique)
 
     T = []; PRN = []; AZ = []; ELV = []; SNR = []; FREQ = []        
     for i_prn in prn_unique:
@@ -78,6 +99,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
         #    print(i_prn, 'looks like an illegal satellite number')
         time = t[prn == i_prn];angle = elv[prn == i_prn];azimuth = az[prn == i_prn]; frequency = freq[prn == i_prn]
         Snr = snr[prn == i_prn];Prn = prn[prn == i_prn]
+        #print(Snr)
         
         angle_fixed, azim_fixed = fix_angle_azimuth(time, angle, azimuth)#fix the angles 
         if (len(angle_fixed) == 0 and len(azim_fixed) == 0):
@@ -144,6 +166,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
                 #S7 SNR on L7
                 #S8 SNR on L8        
                 
+                # it is not necessary to write out l7 and l8.  or l6. zero can be put there.
                 l1 = 0; l2 = 0; l5 = 0; l6 = 0; l7 = 0; l8 = 0
                 
                 #Check what frequency we are at to know where to write each line
@@ -154,18 +177,22 @@ def NMEA2SNR(locdir, fname, snrfile, csnr):
                     l2 = float(SNR[i])
                 elif f_store == '5':
                     l5 = float(SNR[i])
-                elif f_store == '6':
-                    l6 = float(SNR[i])
-                elif f_store == '8':
-                    l8 = float(SNR[i])
+                # remove l6 and l7 ...
+                #elif f_store == '6':
+                #    l6 = float(SNR[i])
+                #elif f_store == '8':
+                #    l8 = float(SNR[i])
                     
-                #NOTE -- All satellites have a 'mixed/undefined' frequency 0 for NMEA 4.11 (https://gpsd.gitlab.io/gpsd/NMEA.html#_nmea_4_11_system_id_and_signal_id)
+                #NOTE -- All satellites have a 'mixed/undefined' frequency 0 for 
+                # NMEA 4.11 (https://gpsd.gitlab.io/gpsd/NMEA.html#_nmea_4_11_system_id_and_signal_id)
                 #This is never used here so could leave blank snr lines!
                 
                 outline = "%3g %10.4f %10.4f %10g %4s " % (p, float(ELV[i]), float(AZ[i]), float(T[i]), '0')
-                snrline = "%7.2f %7.2f %7.2f %7.2f %7.2f %7.2f" % (l6, l1, l2, l5, l7, l8)
-    
-                fout.write(outline + snrline + '\n')
+                snrline = "%7.2f %7.2f %7.2f %7.2f " % (l6, l1, l2, l5 )
+                 
+                # apply decimating here
+                if ( (int(T[i]) % idec) == 0):
+                    fout.write(outline + snrline + '\n')
                 #fout.write("%3g %10.4f %10.4f %10g %4s %4s %7.2f %4s %4s\n" % (p, float(ELV[i]), float(AZ[i]), float(T[i]),'0', '0', float(SNR[i]),'0', '0')) 
     
 def read_nmea(fname):
@@ -548,7 +575,7 @@ def elev_limits(snroption):
 
     return emin, emax
   
-def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
+def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,lat,lon,height):
     """
     runs the nmea2snr conversion code
 
@@ -556,18 +583,22 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
     ----------
     station : str
         name of station 
-
     year_list : list of integers
         years 
-
     doy_list : list of days of year
         days of years
-
     isnr : int
         snr file type
-
     overwrite : bool
         whether make a new SNR file even if one already exists
+    dec : int
+        decimation in seconds
+    lat : float
+        deg
+    lon : float
+        deg
+     height : float
+        m
 
     """
     # loop over years and day of years
@@ -580,9 +611,9 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
             cyy = '{:02d}'.format(yr-2000)
             snrfile =  quickname(station,yr,cyy,cdoy,csnr)#snr filename
             snre = g.snr_exist(station,yr,dy,csnr)#check if snrfile already sxists
-            if snre:
-                print('SNR file exists', snrfile)
-            if overwrite:
+            #if snre:
+            #    print('SNR file exists', snrfile)
+            if overwrite and snre:
                 subprocess.call(['rm', snrfile])
                 snre = False
         
@@ -592,10 +623,9 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite):
         
             if (not illegal_day) and (not snre):
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
-                
-                if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z'):
+                if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
                     print('Creating '+snrfile)
-                    NMEA2SNR(locdir, r, snrfile, csnr)
+                    NMEA2SNR(locdir, r, snrfile, csnr,dec)
                     
                 else:
                     print('NMEA file '+ locdir + r +' does not exist')
