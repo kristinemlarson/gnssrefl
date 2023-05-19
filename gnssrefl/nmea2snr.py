@@ -52,8 +52,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
     
     idec = int(dec)
     missing = True
-    station = fname.lower()
-    station = station[0:4]
+    station = fname.lower() ; station = station[0:4]
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
 
     foundcoords = False
@@ -70,9 +69,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
             with open(jfile, 'r') as my_json:
                 fcont = json.load(my_json)
 
-            llh[0] = fcont['lat']
-            llh[1] = fcont['lon']
-            llh[2] = fcont['ht']
+            llh[0] = fcont['lat']; llh[1] = fcont['lon'] ; llh[2] = fcont['ht']
             x,y,z = g.llh2xyz(llh[0],llh[1],llh[2])
             recv = [x,y,z]
             foundcoords = True
@@ -161,7 +158,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
         
     if myway:
         tmpfile =  station + 'tmp.txt'
-        print('Opening temporary file : ', tmpfile)
+        #print('Opening temporary file : ', tmpfile)
         fout = open(tmpfile, 'w+')
         fout.write('{0:15.4f}{1:15.4f}{2:15.4f} \n'.format(recv[0], recv[1],recv[2]) )
         fout.write('{0:6.0f}{1:6.0f}{2:6.0f} \n'.format(year, month, day) )
@@ -169,7 +166,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
         for i in range(0,len(T)):
             if ( (int(t[i]) % idec) == 0):
                 sat = PRN[i]
-                # glonass
+                # glonass satellites are misnamed by the code
                 if (sat > 100) & (sat < 200):
                     sat = sat - 64
                 fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:s} \n'.format(T[i], sat, SNR[i], freq[i]) )
@@ -247,7 +244,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
                     l2 = float(SNR[i])
                 elif f_store == '5':
                     l5 = float(SNR[i])
-                # remove l6 and l7 ...
+                # remove l6 and l7 ... we can add back in if a cheap instrument ever produces these obs
                 #elif f_store == '6':
                 #    l6 = float(SNR[i])
                 #elif f_store == '8':
@@ -580,7 +577,7 @@ def azimuth_mean(azim1, azim2):
 
 def quickname(station,year,cyy, cdoy, csnr):
     """
-    full name of the snr file name (incl path) 
+    Creates a full name of the snr file name (i.e. including the path) 
 
     Parameters
     ----------

@@ -10,15 +10,42 @@ import gnssrefl.nmea2snr as nmea
 
 def main():
     """
-    Documentation about the purpose of this code should be added here.
-    It should clearly list the inputs to this code.
-    And provide examples. 
+    nmea2snr conversion code
 
-    If using "myway" option, you are required to input the station latitude
-    longitude, and ellipsoid height (params lat, lon, height). This option
-    computes azimuth and elevation angles from SP3 files, whereas default behavior
-    fits polynomials to the low precision NMEA records.
+    Looks for NMEA files in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023.
+    I prefer lowercase station names, but I believe the code allows both upper and lower
+    case.
 
+    Files are named:  SSSS1520.23.A
+
+    where SSSS is station name, day of year 152 and
+    the last two characters of the 2023 as the middle value.
+
+    The SNR files are stored with upper case if given upper case, lower case if given lower case.
+
+    Parameters
+    ----------
+    station : str
+        4 ch name of station
+    year : int
+        full year
+    doy : int
+        day of year
+    snr : str, optional
+        snr file type, default is 66
+    overwrite : bool, optional
+        whether make a new SNR file even if one already exists
+    dec : int, optional
+        decimation in seconds
+    lat: float, optional
+        latitude, deg, only required for myway option
+    lon: float, optional
+        longitude, deg, only required for myway option
+    height: float, optional
+        height, m, only required for myway option
+    myway : bool
+        rather than interpolated low quality NMEA values, it 
+        uses multi-GNSS SP3 file for azimuth and elevation angle computations
 
     """
     
@@ -39,9 +66,7 @@ def main():
 
     args = parser.parse_args()
 
-#make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
-
 
     station = args.station; 
     NS = len(station)
