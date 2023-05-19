@@ -225,7 +225,7 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         elif (archive == 'gfz'):
             # no idea
             dir1 = 'ftp://isdcftp.gfz-potsdam.de/gnss/data/daily/' + cyyyy + '/' + cdoy + '/'
-            print(dir1+file_name)
+            #print(dir1+file_name)
             wget.download(dir1+file_name,file_name)
         elif (archive == 'cddis'):
             new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/'

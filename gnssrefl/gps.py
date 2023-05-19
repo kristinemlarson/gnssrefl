@@ -4842,7 +4842,7 @@ def final_gfz_orbits(year,month,day):
     littlename = 'GFZ0MGXRAP_' + str(year) + cdoy + '0000_01D_05M_ORB.SP3'
 
     url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
-    print(url)
+    #print(url)
 
     fullname = fdir + '/' + littlename + '.xz'
     if os.path.isfile(fullname):
@@ -4948,7 +4948,7 @@ def ultra_gfz_orbits(year,month,day,hour):
     littlename = 'gfu' + str(wk) + str(int(sec/86400)) + '_' + chr + '.sp3'  
 
     url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
-    print(url)
+    #print(url)
     if (year + doy/365.25) < dday:
         print('No rapid GFZ orbits until 2021/doy137')
         return '', '', foundit

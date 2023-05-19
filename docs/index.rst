@@ -25,7 +25,6 @@ Welcome to the gnssrefl Documentation!
    pages/README_install.md
    pages/understand.md
    pages/file_structure.md
-   pages/func_and_utils_doc.md
    pages/quick_recall.md
    pages/first_drivethru.md
    pages/contributions_questions.md

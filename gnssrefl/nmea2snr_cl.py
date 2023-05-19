@@ -14,6 +14,12 @@ def main():
     It should clearly list the inputs to this code.
     And provide examples. 
 
+    If using "myway" option, you are required to input the station latitude
+    longitude, and ellipsoid height (params lat, lon, height). This option
+    computes azimuth and elevation angles from SP3 files, whereas default behavior
+    fits polynomials to the low precision NMEA records.
+
+
     """
     
     parser = argparse.ArgumentParser()

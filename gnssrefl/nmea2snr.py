@@ -17,11 +17,19 @@ import gnssrefl.decipher_argt as gt
 
 def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
     """
+    Reads and translates the NMEA file stored in locdir + fname
+
+    Naming convention assumed for NMEA files :  SSSS1520.23.A
+
+    where SSSS is station name, day of year 152 and
+    the last two characters of the 2023 as the middle value.
+
+    (I believe) The SNR files are stored with upper case if given upper case, lower case if given lower case.
 
     Parameters
     -----------
     locdir : str
-        directory where your SNR files are kept
+        directory where your NMEA files are kept
     fname : string
         NMEA filename 
     snrfile : str
@@ -35,9 +43,9 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
     doy : int
         day of year
     llh : list of floats
-        lat (d), lon(d), height (m)
+        station location, lat (d), lon(d), height (m)
     myway : bool
-        whether you use my code to do azel calculations
+        whether you use my code to do azimuth elevation angle calculations
         
     """
     
@@ -47,23 +55,28 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
     station = station[0:4]
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
     if (llh[0] != 0):
+        # compute Cartesian receiver coordinates in meters
         x,y,z = g.llh2xyz(llh[0],llh[1],llh[2])
         recv = [x,y,z]
-        print(recv)
         xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
-        orbfile = orbdir + '/' + xf # hopefully
+        if not foundit: 
+            print('Could not find the rapid orbits. Exiting')
+            return
+        else:
+            orbfile = orbdir + '/' + xf # hopefully
     else:
         if myway:
             print('This code requires lat/lon/ht inputs. Exiting')
             return
 
+    # this is to help a colleague 
     if station == 'argt':
         gt.decipher_argt(station,'jul01.txt',idec,snrfile,orbfile,recv,csnr,year,month,day)
         if os.path.isfile(snrfile):
             print('File made, ignoring the rest of the code')
             return
         else:
-            print('translation was unsuccessful'); return
+            print('Translation was unsuccessful'); return
 
 
     #check whether the input file is a uncompressed or compressed     
@@ -617,10 +630,21 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,myway):
     """
     runs the nmea2snr conversion code
 
+    Looks for NMEA files in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023.
+    I prefer lowercase station names, but I believe the code allows both upper and lower
+    case. 
+
+    Files are named:  SSSS1520.23.A 
+
+    where SSSS is station name, day of year 152 and 
+    the last two characters of the 2023 as the middle value.
+
+    The SNR files are stored with upper case if given upper case, lower case if given lower case.
+
     Parameters
     ----------
     station : str
-        name of station 
+        4 ch name of station 
     year_list : list of integers
         years 
     doy_list : list of days of year
@@ -648,10 +672,12 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,myway):
             snrfile =  quickname(station,yr,cyy,cdoy,csnr)#snr filename
             snre = g.snr_exist(station,yr,dy,csnr)#check if snrfile already sxists
             if snre:
-                print('SNR file already exists', snrfile)
                 if overwrite:
+                    print('SNR file exists, but you requested it be overwritten')
                     subprocess.call(['rm', snrfile])
                     snre = False
+                else:
+                    print('SNR file already exists', snrfile)
         
             illegal_day = False
             if (float(dy) > g.dec31(yr)):
@@ -660,8 +686,9 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,myway):
             if (not illegal_day) and (not snre):
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
-                    print('Creating '+snrfile)
+                    #print('Creating '+snrfile)
                     NMEA2SNR(locdir, r, snrfile, csnr,dec,yr,dy,llh,myway)
-                    
+                    if os.path.isfile(snrfile):
+                        print('SUCCESS: SNR file created', snrfile)
                 else:
                     print('NMEA file '+ locdir + r +' does not exist')

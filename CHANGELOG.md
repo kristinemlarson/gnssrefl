@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## 1.3.13
+Major changes to nmea2snr. Allows azimuth, elevation angle inputs from SP3 files.
+And decimation.
+
+Updated the readthedocs
+
 ## 1.3.12
 Added nyquist utility code (was previously living at https://gnss-reflections.org)
 
