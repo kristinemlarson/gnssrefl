@@ -22,7 +22,7 @@ Part of the [2023 GNSS-IR Short Course](https://gnssrefl.readthedocs.io/en/lates
 - Lake Taupo, Kelly Enloe
 - [Examples using gnssrefl](https://morefunwithgps.com/public_html/Day3-waterExamples.pdf), Simon Williams
 - [PSMSL](https://psmsl.org/data/gnssir/map.php), Simon Williams
-- Inverse SNR Methods, David Purnell
+- [Inverse SNR Methods](https://morefunwithgps.com/public_html/gnssrefl_invsnr_slides.pdf), David Purnell
 - [Video](https://youtu.be/z-gG3g6rrX4)(1:40)
 
 ## Day 4

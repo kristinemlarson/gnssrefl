@@ -1,9 +1,4 @@
-# Quick Links
-
-
-
-
-
+# Quick Links to the Code
 
 ## Main Functions
 
@@ -42,10 +37,10 @@
 
 ## Helper Codes 
 
-* [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 * [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html)
 * [invsnr_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 * [make_json_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
+* [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 * [phase](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickPhase.html)
 * [vwc_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwcr_input.html)
 
@@ -57,6 +52,7 @@
 * [download_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_unr.html)
 
 ## Utilities
+
 * [check_rinex_file](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.check_rinex_file.html)
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
 * [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)
