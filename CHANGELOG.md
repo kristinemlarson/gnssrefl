@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.3.13
 Major changes to nmea2snr. Allows azimuth, elevation angle inputs from SP3 files.
-And decimation.
+And decimation. LLH can be input on the command line or it can be read from the 
+$REFL_CODE/input/station.json file
 
 Updated the readthedocs
 

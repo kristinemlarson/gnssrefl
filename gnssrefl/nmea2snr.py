@@ -4,6 +4,7 @@ This code is missing full documentation.
 
 """
 from __future__ import division
+import json
 import numpy as np 
 import os, datetime, traceback
 import subprocess
@@ -54,20 +55,38 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
     station = fname.lower()
     station = station[0:4]
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
+
+    foundcoords = False
     if (llh[0] != 0):
         # compute Cartesian receiver coordinates in meters
         x,y,z = g.llh2xyz(llh[0],llh[1],llh[2])
         recv = [x,y,z]
+        foundcoords = True
+
+    if myway and (not foundcoords):
+        # try to get the LLH from json file
+        jfile  = os.environ['REFL_CODE'] + '/input/' + station + '.json'
+        if os.path.isfile(jfile):
+            with open(jfile, 'r') as my_json:
+                fcont = json.load(my_json)
+
+            llh[0] = fcont['lat']
+            llh[1] = fcont['lon']
+            llh[2] = fcont['ht']
+            x,y,z = g.llh2xyz(llh[0],llh[1],llh[2])
+            recv = [x,y,z]
+            foundcoords = True
+        else:
+            print('This code requires lat/lon/ht inputs. Exiting')
+            return
+
+    if myway:
         xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
         if not foundit: 
             print('Could not find the rapid orbits. Exiting')
             return
         else:
             orbfile = orbdir + '/' + xf # hopefully
-    else:
-        if myway:
-            print('This code requires lat/lon/ht inputs. Exiting')
-            return
 
     # this is to help a colleague 
     if station == 'argt':

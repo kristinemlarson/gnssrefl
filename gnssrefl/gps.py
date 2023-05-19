@@ -4891,7 +4891,7 @@ def rapid_gfz_orbits(year,month,day):
     fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
     littlename = 'gfz' + str(wk) + str(int(sec/86400)) + '.sp3'
     url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
-    print(url)
+    #print(url)
     if (year + doy/365.25) < dday:
         print('No rapid GFZ orbits until 2021/doy137')
         return '', '', foundit
