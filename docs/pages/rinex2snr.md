@@ -9,6 +9,8 @@ For the latter step, we need an **orbit** file. The code will pick that up for y
 
 - [Information on specific rinex2snr inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
 
+- [If you want to translate a NMEA file](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
+
 
 <code>rinex2snr</code> assumes the files are in the RINEX format.  We support two kinds of RINEX 
 files, which we discuss separately:
@@ -22,7 +24,13 @@ Example:
 
 <code>rinex2snr p041 2020 132</code>
 
-The default archives checked are sopac and unavco. The default orbit file is GPS only.
+The default archives checked are sopac and unavco. 
+
+**Changed 2023 May 20**
+Before day of year 137, year 2021, the default orbit file used was GPS only.
+After that date, the multi-GNSS orbit product from GFZ is used. If you would like to continue
+using GPS only, you should set -orb to gps.
+
 For up to date listings of approved archives and orbit sources, 
 [please see here](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html)
 
