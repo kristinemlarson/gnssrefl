@@ -6016,3 +6016,49 @@ def quickp(station,t,sealevel):
         print('no data found - so no plot')
     return
 
+
+def cddis_restriction(iyear, idoy):
+    """
+    CDDIS has announced a restructuring of their archive.
+    After 6 months files are tarred. It would be ok for the code
+    to accommodate this change, but it will have to come from the community.
+    If six months has passed since you ran the code, a warning will come to the 
+    screen and the code will exit.
+
+    Parameters
+    ----------
+    iyear : int
+        year you want to download from CDDIS
+    idoy : int
+        day of year you want to download from CDDIS
+
+    Returns
+    -------
+    bad_day : bool
+        if bad_day is true, you cannot access high-rate data from CDDIS
+
+    """
+# find out today's date
+    year = int(date.today().strftime("%Y"));
+    month = int(date.today().strftime("%m"));
+    day = int(date.today().strftime("%d"));
+
+    today=datetime.datetime(year,month,day)
+    doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
+    tdate = year + doy/365.25
+
+    # input date
+    idate = iyear + idoy/365.25
+
+    if (tdate - idate) > 0.5:
+        # i.e. half a year is six months
+        bad_day =  True
+        print('CDDIS does not allow direct access to their high-rate data for this day and year. ')
+        print('They now tar files six months after the data archived. If you are willing to ')
+        print('submit a pull request to fix this issue, we would be very willing to host it.')
+
+    else:
+        bad_day = False
+
+
+    return bad_day

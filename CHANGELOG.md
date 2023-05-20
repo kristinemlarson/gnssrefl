@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## 1.3.14
 Default rinex2snr orbit is GPS only before doy 137, 2021 and multi-GNSS from GFZ after that.
 
+tried smoke test for NMEA using wget
+
+Check whether someone tries to download CDDIS highrate data that are too old.
+
 ## 1.3.13
 Major changes to nmea2snr. Allows azimuth, elevation angle inputs from SP3 files.
 And decimation. LLH can be input on the command line or it can be read from the 

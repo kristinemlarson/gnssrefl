@@ -18,14 +18,14 @@ ls -l $REFL_CODE/input/gpt_1wA.pickle
 
 ls -l $ORBITS
 
-#curl -O https://morefunwithgps.com/public_html/BEUL0050.23.A.gz
-#mkdir $REFL_CODE/nmea/BEUL/2023/
-#gunzip BEUL0050.23.A.gz
-#mv BEUL0050.23.A $REFL_CODE/nmea/BEUL/2023
+wget https://morefunwithgps.com/public_html/BEUL0050.23.A.gz
+mkdir $REFL_CODE/nmea/BEUL/2023/
+gunzip BEUL0050.23.A.gz
+mv BEUL0050.23.A $REFL_CODE/nmea/BEUL/2023
 
-#nmea2snr BEUL 2023 5 -dec 5 -overwrite  T
-#nmea2snr BEUL 2023 5 -dec 5 -overwrite  T -lat 50.038894 -lon 8.198476 -height 105.0 -myway T
-#rm $REFL_CODE/nmea/BEUL/2023/BEUL*snr66
+nmea2snr BEUL 2023 5 -dec 5 -overwrite  T
+nmea2snr BEUL 2023 5 -dec 5 -overwrite  T -lat 50.038894 -lon 8.198476 -height 105.0 -myway T
+rm $REFL_CODE/nmea/BEUL/2023/BEUL*snr66
 
 
 

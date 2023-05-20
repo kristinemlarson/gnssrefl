@@ -60,8 +60,6 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
     #YYYY/DDD/YYt/HH/mmmmDDDHMM.YYt.gz
 
     s1=time.time()
-    print('WARNING: CDDIS has changed the directory structure of older datasets. ')
-    print('WARNING: Please help modify this code / submit a pull request. ')
     print('WARNING: Get yourself a cup of coffeee. Downloading 96 files takes a long time.')
     fileF = 0
     streamID  = '_' + stream + '_'

@@ -256,7 +256,12 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                 if foundit:
                                     print('rinex2 file should now exist:', r2)
                             if archive == 'cddis':
-                                rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
+                                bad_day = g.cddis_restriction(year, doy)
+                                if not bad_day:
+                                    rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
+                                else: 
+                                    print('No high-rate RINEX data will be downloaded')
+                                    foundit = False; fexists = False; rnx_file = ''
                                 if foundit:
                                     print('The RINEX 3 file has been downloaded. Try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
