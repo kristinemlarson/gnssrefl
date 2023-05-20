@@ -56,7 +56,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav', rate: str = 'low', dec: int = 0,
+def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None, rate: str = 'low', dec: int = 0,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, bkg: str = 'EUREF'):
@@ -64,19 +64,30 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. The default is RINEX 2.11 files
 
+    Default is GPS only until day of year 137, 2021 when rapid GFZ orbits became available.  If you still want to use
+    the nav message, i.e. GPS only, you can request it.
+
     Examples
     --------
+    rinex2snr mchn 2018 15  -archive sopac
+        station mchn, year/doy 2022/15,sopac archive using GPS orbits
 
     rinex2snr mchn 2022 15  -archive sopac
+        station mchn, year/doy 2022/15,sopac archive using multi-GNSS GFZ orbits
+
+    rinex2snr mchn 2022 15  -archive sopac -orb gps
         station mchn, year/doy 2022/15,sopac archive using GPS orbits
 
     rinex2snr mchn 2022 15  -orb rapid -archive sopac
-        now using multi-GNSS orbits
+        now explicitly using multi-GNSS orbits
+
     rinex2snr p041 2022 15  -orb rapid -rate high -archive unavco
         now using high-rate data from unavco and multi-GNSS orbits
 
     rinex2snr p041 2022 15 -nolook T
         using your own data stored as p0410150.22o in the working directory 
+
+
 
     RINEX 2.11 archives listed below
 
@@ -239,8 +250,17 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = 'nav'
     # make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
     #
-    # rename the user inputs as variables
-    #
+
+    # when multi-GNSS orbits are reliably available
+    gfz_avail = 2021 + 137/365.25
+
+    if orb is None:
+        # you asked for default
+        if ((year + doy/365.25) > gfz_avail):
+            orb = 'rapid'
+        else:
+            orb = 'nav'
+
     ns = len(station)
     if (ns == 4) or (ns == 6) or (ns == 9):
         pass
