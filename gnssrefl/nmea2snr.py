@@ -578,6 +578,7 @@ def azimuth_mean(azim1, azim2):
 def quickname(station,year,cyy, cdoy, csnr):
     """
     Creates a full name of the snr file name (i.e. including the path) 
+    >>>> Checks that directories exist.
 
     Parameters
     ----------
@@ -604,9 +605,17 @@ def quickname(station,year,cyy, cdoy, csnr):
     """
     
     xdir  = os.environ['REFL_CODE'] + '/'
-    fname =  xdir + str(year) + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
-    if not (os.path.exists(xdir + str(year) + '/snr/' + station+'/')):
-        os.system('mkdir -p '+xdir + str(year) + '/snr/' + station+'/')
+    cyyyy = str(year)
+    fname =  xdir + cyyyy + '/snr/' + station + '/' + station + cdoy + '0.' + cyy + '.snr' + csnr
+    d = xdir + cyyyy
+    if not os.path.isdir(d):
+        subprocess.call(['mkdir', d])
+    d = xdir + cyyyy + '/snr'
+    if not os.path.isdir(d):
+        subprocess.call(['mkdir', d])
+    d = xdir + cyyyy + '/snr/' + station
+    if not os.path.isdir(d):
+        subprocess.call(['mkdir', d])
 
     return fname
 
