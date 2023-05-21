@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-This code is missing full documentation.
-
-"""
 from __future__ import division
 import json
 import numpy as np 
@@ -22,8 +18,9 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
 
     Naming convention assumed for NMEA files :  SSSS1520.23.A
 
-    where SSSS is station name, day of year 152 and
-    the last two characters of the 2023 as the middle value.
+    where SSSS is station name, day of year is 152 and year is 2023
+
+    I believe lowercase is also allowed, but the A at the end is still set to be upper case
 
     (I believe) The SNR files are stored with upper case if given upper case, lower case if given lower case.
 
