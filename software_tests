@@ -38,8 +38,6 @@ mv BEUL0050.23.A $REFL_CODE/nmea/BEUL/2023
 
 nmea2snr BEUL 2023 5 -dec 5 -overwrite  T
 nmea2snr BEUL 2023 5 -dec 5 -overwrite  T -lat 50.038894 -lon 8.198476 -height 105.0 -myway T
-rm $REFL_CODE/nmea/BEUL/2023/BEUL*snr66
-
 
 
 rinex2snr p103 2020 105 -doy_end 109   -archive sopac
@@ -95,5 +93,6 @@ rinex2snr mchl00aus 2018 1 -archive cddis  -overwrite T
 rinex2snr p033 2022 1 -orb rapid -overwrite T -archive sopac
 make_json_input p033 0 0 0 
 quickLook p033 2022 1 -plt F
+
 
 
