@@ -109,6 +109,9 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     """
 
     compute_lsp = True # used to be an optional input
+    if len(station) != 4:
+        print('Station name must be four characters long. Exiting.')
+        sys.exit()
 
     if fr == 'all':
         fr_list = [1, 20]

@@ -348,6 +348,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
     # get the SNR filename
     obsfile, obsfilecmp, snrexist = g.define_and_xz_snr(station, year, doy, snr_type)
+    #print(obsfile,obsfilecmp,snrexit)
 
     # noise region - hardwired for normal sites ~ 2-3 meters tall
     noise_region = [0.5, 8]

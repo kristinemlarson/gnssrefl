@@ -16,8 +16,19 @@ ls -l $EXE/CRX2RNX
 # this is likely not there
 ls -l $REFL_CODE/input/gpt_1wA.pickle
 
-ls -l $ORBITS
+# smoke tests for invsnr and subdaily
 
+rinex2snr sc02 2023 120 -archive sopac -doy_end 123 -orb rapid -overwrite T
+make_json_input sc02 0 0 0 -azlist 60 90 90 180 180 220 -e1 5 -e2 13 -h1 2.5 -h2 12 -frlist 1 5 20 101 102 -extension docker -delTmax 40
+gnssir sc02 2023 120 -doy_end 123 -extension docker
+
+subdaily sc02 2023 -extension docker -plt F -doy1 120
+
+invsnr_input sc02 -h1 2.5 -h2 10 -e1 5 -e2 13 -azim1 60 -azim2 220
+invsnr sc02 2023 120 L1+L2+L5 -plt F
+
+
+# smoke test for nmea2snr
 wget https://morefunwithgps.com/public_html/BEUL0050.23.A.gz
 mkdir $REFL_CODE/nmea
 mkdir $REFL_CODE/nmea/BEUL
@@ -25,9 +36,9 @@ mkdir $REFL_CODE/nmea/BEUL/2023/
 gunzip BEUL0050.23.A.gz
 mv BEUL0050.23.A $REFL_CODE/nmea/BEUL/2023
 
-#nmea2snr BEUL 2023 5 -dec 5 -overwrite  T
-#nmea2snr BEUL 2023 5 -dec 5 -overwrite  T -lat 50.038894 -lon 8.198476 -height 105.0 -myway T
-#rm $REFL_CODE/nmea/BEUL/2023/BEUL*snr66
+nmea2snr BEUL 2023 5 -dec 5 -overwrite  T
+nmea2snr BEUL 2023 5 -dec 5 -overwrite  T -lat 50.038894 -lon 8.198476 -height 105.0 -myway T
+rm $REFL_CODE/nmea/BEUL/2023/BEUL*snr66
 
 
 
@@ -86,8 +97,3 @@ make_json_input p033 0 0 0
 quickLook p033 2022 1 -plt F
 
 
-#
-#invsnr_input tggo 8 20 5 15 -a1 30 -a2 330
-#invsnr tggo 2022 200 L1+L2+L5 -doy_end 201 -constel G -plt F
-# invsnr_input vlsi 8 20 5 15 -a1 30 -a2 330
-# invsnr vlsi 2022 200 L1+L2+L5 -doy_end 202 -constel G

@@ -12,16 +12,18 @@ def main():
     """
     nmea2snr conversion code
 
-    Looks for NMEA files in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023.
-    I prefer lowercase station names, but I believe the code allows both upper and lower
-    case.
+    Looks for NMEA files in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023
+    or $REFL_CODE/nmea/SSSS/2023 for station SSSS. Personally I prefer lowercase station 
+    names, but I believe the code allows you to do either.
 
-    Files are named:  SSSS1520.23.A
+    Files are named:  SSSS1520.23.A or ssss1520.23.A
 
-    where SSSS is station name, day of year 152 and
-    the last two characters of the 2023 as the middle value.
+    where SSSS or ssss is station name, day of year is 152 and year is 2023
 
     The SNR files are stored with upper case if given upper case, lower case if given lower case.
+    Currently I have left the last character in the file name as it was given to me - capital A.
+    If this should be lower case for people that use lowercase station names, please let me know.
+
 
     Parameters
     ----------

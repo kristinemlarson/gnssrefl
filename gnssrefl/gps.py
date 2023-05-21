@@ -2642,11 +2642,10 @@ def UNR_highrate(station,year,doy):
 
     returns
     -----------
-    filename : string
+    filename : str
         output filename
-
-    goodDownload : boolean
-        whether you were successful
+    goodDownload : bool
+        whether your download was successful
 
     """
     yy,mm,dd, cyyyy, cdoy, YMD = ydoy2useful(year,doy)
@@ -3069,18 +3068,18 @@ def navfile_retrieve(navfile,cyyyy,cyy,cdoy):
 
     Parameters 
     ----------
-    navfile : string
+    navfile : str
         name of the broadcast orbit file
-    cyyyy :  string
+    cyyyy :  str
         4 character yaer
     cyy : string
         2 character year
-    cdoy : string
+    cdoy : str
         3 character day of year
 
     Returns
     -------
-    FileExists : boolean
+    FileExists : bool
         whether the file was found
 
     """
@@ -3405,27 +3404,26 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
 
     Parameters
     ----------
-    year : integer
-
-    month : integer
-
-    day : integer
-
-    orbtype : string
+    year : int
+        full year
+    month : int
+        calendar month
+    day : int
+        calendar day
+    orbtype : str
         orbit source, e.g. nav, gps...
-
-    fortran : boolean
-        whether you are using forran code for translation
+    fortran : bool
+        whether you are using fortran code for translation
 
     Returns
     -------
-    foundit : boolean
+    foundit : bool
         whether orbit file was found
-    f : string
+    f : str
         name of the orbit file
-    orbdir : string
+    orbdir : str
         location of the orbit file
-    snrexe : string 
+    snrexe : str 
         location of SNR executable. only relevant for fortran users
 
     """
@@ -3515,6 +3513,8 @@ def warn_and_exit(snrexe,fortran):
     """
     if the GNSS/GPS to SNR executable does not exist, exit
 
+    Parameters
+    ----------
     snrexe : str
         name of the executable
     fortran : bool
@@ -3545,12 +3545,12 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
          RINEX 2.11 file
     dec : integer
         decimation factor. If 0 or 1, no decimation is done.
-    gpsonly : boolean
+    gpsonly : bool
         whether you want only GPS signals. Default is false
 
     Returns
     -------
-    fexists : boolean
+    fexists : bool
         whether the RINEX 2.11 file was created and exists
 
     """
@@ -3829,6 +3829,7 @@ def get_sopac_navfile_cron(yyyy,doy):
     yyyy : int
         full year
     doy : int
+        day of year
 
     Returns
     -------
@@ -3883,7 +3884,7 @@ def get_sopac_navfile(navfile,cyyyy,cyy,cdoy):
     -------
     navfile : string 
         should be the same name as input. not logical!
-        i have no idea why i did it this way.
+        I have no idea why i did it this way.
 
     """
     foundfile = False
@@ -3916,14 +3917,14 @@ def get_esa_navfile(cyyyy,cdoy):
 
     Parameters
     ----------
-    cyyyy : string
+    cyyyy : str
         4 char year
-    cdoy : string
+    cdoy : str
         3 char day of year
 
     Returns
     -------
-    fstatus : boolean
+    fstatus : bool
         whether file was found or not
 
     """
@@ -4139,7 +4140,9 @@ def nextdoy(year,doy):
 def read_sp3file(file_path):
     """ 
     input: file_path is the sp3file name
-    I do not believe this is used
+    this code is from Joakim Strandberg I believe.
+    It is for the python only version of the translator, which 
+    should be deprecated
 
     Returns
     -------
@@ -4148,7 +4151,6 @@ def read_sp3file(file_path):
     x,y,z are in meters
     satnum has 0, 100, 200, 300 added for gps, glonass, galileo,beidou,
     respectively.  all other satellites are ignored
-    some of this code came from joakim
 
     """
     ignorePoint = False
