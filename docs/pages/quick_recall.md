@@ -2,47 +2,45 @@
 
 ## Main Functions
 
-* rinex2snr [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html), 
+* [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html), 
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/rinex2snr.html)
 
-* quickLook [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html),
+* [quickLook code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/quickLook.html)
 
-* gnssir [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html),
+* [gnssir code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html), 
-input for gnssir, [make_json_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
+[setting inputs for gnssir](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
 
 
 ## Additional Utilities
 
-* [phase](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickPhase.html), used for vwc
 
 * [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 
-* daily_avg [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.daily_avg_cl.html),
+* [daily_avg code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.daily_avg_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_dailyavg.html)
 
-* main invsnr [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html),
+* [invsnr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_invsnr.html),
 [invsnr_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 
 * refl_zones [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html),
 [discusssion](https://gnssrefl.readthedocs.io/en/latest/pages/utilities.html)
 
+
 ## Environmental Products
 
-* main snowdepth [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html),
+* [snowdepth code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_snowdepth.html)
 
-* main tides [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html),
+* [tides code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_subdaily.html)
 
-* main vwc [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_cl.html),
+* [vwc code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_vwc.html),
-[vwc_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwcr_input.html)
-
-
-
+[vwc_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwcr_input.html),
+[phase](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickPhase.html), used for vwc
 
 ## Download Scripts 
 

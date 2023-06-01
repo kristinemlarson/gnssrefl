@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.15
+added smoosh_snr for decimating snr files
+
+added some missing stations to the UNR database function
+
+print out lat/lon/ht and XYZ for query_unr
+
+added azlist2 to make_json_input to get ready for new way of identifying arcs
+
+
 ## 1.3.14
 Default rinex2snr orbit is GPS only before doy 137, 2021 and multi-GNSS from GFZ after that.
 

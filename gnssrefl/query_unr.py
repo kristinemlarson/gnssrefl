@@ -31,6 +31,7 @@ def main():
     if (alat+alon+ht) != 0:
         x,y,z=g.llh2xyz(alat,alon,ht)
         print('XYZ', round(x,4),round(y,4),round(z,4) )
+        print('LLH', round(alat,6),round(alon,6),round(ht,3) )
 
 if __name__ == "__main__":
     main()

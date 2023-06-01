@@ -26,7 +26,7 @@ with open("README.md", "r") as readme_file:
 requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","simplekml","earthscope-sdk"]
 setup(
     name="gnssrefl",
-    version="1.3.14",
+    version="1.3.15",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -71,6 +71,7 @@ setup(
             'refl_zones= gnssrefl.refl_zones_cl:main',
             'vwc= gnssrefl.vwc_cl:main',
             'smoosh= gnssrefl.smoosh:main',
+            'smoosh_snr= gnssrefl.smoosh_snr:main',
             'quickplt= gnssrefl.quickplt:main',
             'snowdepth= gnssrefl.snowdepth_cl:main',
             'rh_plot= gnssrefl.rh_plot:main',

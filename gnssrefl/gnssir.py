@@ -37,7 +37,14 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         optional subdirectory to save results
 
     lsp : dictionary
-        REQUIRES DESCRIPTION
+        e1 : float
+            min elev angle, deg
+        e2 : float
+            max elev angle, deg
+        NReg : list of floats
+            noise region for RH peak2noise , meters
+        azval : list of floats
+            pairs of azimuth regions, i.e. [0 90 90 180]
         
     """
 

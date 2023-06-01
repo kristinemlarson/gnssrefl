@@ -1,6 +1,6 @@
 # gnssrefl
 
-**github version: 1.3.14** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+**github version: 1.3.15** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 Our documentation is now available [here.](https://gnssrefl.readthedocs.io/en/latest/)
 
@@ -16,7 +16,7 @@ GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 09357
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was initially developed 
 as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
-This documentation was updated on May 17, 2023
+This documentation was updated on June 1, 2023
 
 Kristine M. Larson
 

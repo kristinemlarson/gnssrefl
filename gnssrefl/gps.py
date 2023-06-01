@@ -5216,10 +5216,10 @@ def queryUNR_modern(station):
             return lat, lon, ht
     # if you used github and run the code from that directory
     if nfile1_exist:
-        print('Database was found at :', nfile1)
+        #print('Database was found at :', nfile1)
         conn = sqlite3.connect(nfile1)
     elif nfile2_exist:
-        print('Database was found at :', nfile2)
+        #print('Database was found at :', nfile2)
         conn = sqlite3.connect(nfile2)
     c=conn.cursor()
     c.execute("SELECT * FROM  stations WHERE station=:station",{'station': station})
@@ -5231,11 +5231,22 @@ def queryUNR_modern(station):
             lon = lon + 360
         #print(lat,lon,ht)
     else:
-        print('Did not find the station in the database:', station)
-        # this returns 0 values
+            print('Did not find the station in the database:', station)
 
     # close the database
     conn.close()
+    if (station == 'moss'):
+        lat= -16.434464800 ;lon = 145.403622520 ; ht = 71.418
+    elif (station == 'mnis'):
+        lat = -16.667810553; lon  = 139.170597267; ht = 60.367;  
+    elif (station == 'glbx'):
+        lat = 58.455146633; lon  = -135.888483766 ; ht = 12.559;  
+    elif (station == 'ugar'):
+        lat = -9.50477824; lon = 143.54686680 ; ht =  81.2
+    elif (station == 'whla'):
+        lat = -33.01640186 ; lon = 137.59157111 ; ht = 7.856
+    elif (station == 'kubn'):
+        lat =-10.23608303 ; lon =142.21446068; ht = 78.2
 
     return lat,lon,ht
 

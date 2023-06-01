@@ -39,6 +39,7 @@ def parse_arguments():
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument('-azlist', nargs="*",type=float,  help='User defined azimuth zones, i.e. 0 90 90 180 would mean only the east. Must be an even number of values.')
     parser.add_argument('-frlist', nargs="*",type=int,  help='User defined frequencies using our nomenclature.')
+    parser.add_argument('-azlist2', nargs="*",type=float,  help='test azimuth list') 
 
 
     args = parser.parse_args().__dict__
@@ -55,12 +56,12 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.8, ampl: float = 5.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = '', ediff: float=2.0, delTmax: float=75.0, azlist: float=[], frlist: float=[] ):
+              extension: str = '', ediff: float=2.0, delTmax: float=75.0, azlist: float=[], 
+              frlist: float=[],azlist2: float=[] ):
 
     """
     Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in 
-    a json file which by default is saved
-    in REFL_CODE/<station>.json.
+    a json file which by default is saved in REFL_CODE/<station>.json.
 
     Examples
     --------
@@ -140,6 +141,8 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     frlist : list of integers
         avoids all the booleans - if you know the frequencies, enter them.
         e.g. 1 2 or 1 20 5 or 1 20 101 102
+    azlist2 : list of floats
+        temporary azimuth list being used for testing a new arc strategy
 
     """
 
@@ -206,7 +209,6 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     if not os.path.isdir(outputdir):
         subprocess.call(['mkdir', outputdir])
 
-    print('extension', extension)
     if len(extension) == 0:
         outputfile = outputdir + '/' + station + '.json'
     else:
@@ -228,12 +230,22 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     #if (az_list[0]) == 0 & (az_list[-1] == 360):
 
     N = len(azlist)
+    N2 = len(azlist2)
     if N == 0:
         print('User did not provide an azimuth list')
         lsp['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
     else:
         if (N % 2) == 0:
             lsp['azval'] = azlist
+        else:
+            print('Illegal azimuth inputs. Must be an even number of azimuth pairs.')
+            sys.exit()
+    if N2 == 0:
+        print('User did not provide an azimuth list')
+        lsp['azval2'] = [0, 90, 90, 180, 180, 270, 270, 360]
+    else:
+        if (N2 % 2) == 0:
+            lsp['azval2'] = azlist2
         else:
             print('Illegal azimuth inputs. Must be an even number of azimuth pairs.')
             sys.exit()
