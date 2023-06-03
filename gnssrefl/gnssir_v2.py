@@ -817,13 +817,13 @@ def rewrite_azel(azval2):
         sys.exit()
     if (N2 == 2) & (a1 < 0):
         azelout = [a1+360, 360, 0,  a2]
-    elif (N2 == 4) & (a1 < 0):
+    if (N2 == 4) & (a1 < 0):
         azelout = [a1+360, 360, 0,  a2, int(azval2[2]), int(azval2[3])]
-    elif (N2 == 6) & (a1 < 0):
+    if (N2 == 6) & (a1 < 0):
         azelout = [a1+360, 360, 0,  a2, int(azval2[2]), int(azval2[3]), int(azval2[4]), int(azval2[5])]
-    elif (N2 == 8) & (a1 < 0):
+    if (N2 == 8) & (a1 < 0):
         azelout = [a1+360, 360, 0,  a2, azval2[2], azval2[3], azval2[4], azval2[5], azval2[6], azval2[7]]
-    else:
+    if N2 > 8:
         print('Not going to allow more than four azimuth regions ...')
         sys.exit()
 

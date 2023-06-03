@@ -176,6 +176,21 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     lsp = guts.read_json_file(station, extension)
     # now check the overrides to the json instructions
 
+    if newarcs:
+        if 'azval2' in lsp:
+            print('azval2 found')
+        else:
+            print('azval2 variable not found in your json. Exiting')
+            sys.exit()
+
+    else:
+        if 'azval' in lsp:
+            print('azval variable found in your json.')
+        else:
+            print('You chose the old way of setting arcs, but azval is not defined in your json. Exiting')
+            sys.exit()
+
+
     # plt is False unless user changes
     lsp['plt_screen'] = plt
 
