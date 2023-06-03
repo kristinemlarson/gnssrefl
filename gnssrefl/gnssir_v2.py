@@ -47,8 +47,6 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             max reflector height, m 
         NReg : list of floats
             noise region for RH peak2noise , meters
-        azval : list of floats
-            pairs of azimuth regions, i.e. [0 90 90 180]
         azval2 : list of floats
             new pairs of azimuth regions, i.e. [0 180 270 360]
         delTmax : float
@@ -77,7 +75,13 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     ediff = lsp['ediff']; NReg = lsp['NReg']  
     PkNoise = lsp['PkNoise']; prec = lsp['desiredP']
     delTmax = lsp['delTmax']
-    azval2 = lsp['azval2']; naz = int(len(azval2)/2)
+    if 'azval2' in lsp:
+        azval2 = lsp['azval2']; 
+        naz = int(len(azval2)/2)
+    else:
+        print('This module requires azval2 to be set in gnssir_input. This record is not present in your json.')
+        sys.exit()
+
     pele = lsp['pele'] ; pfitV = lsp['polyV']
 
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp'] 

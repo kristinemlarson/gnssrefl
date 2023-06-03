@@ -58,8 +58,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
            e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False, 
            dec : int = 1, newarcs : bool = False):
     """
-        gnssir is the main driver for estimating Reflector Heights
-        The user is required to have set up an analysis strategy using "make_json_input" 
+        gnssir is the main driver for estimating reflector heights. The user is required to 
+        have set up an analysis strategy using either "make_json_input" or "gnssir_input". The 
+        latter will ultimately become the default.
         
         Examples
         --------
