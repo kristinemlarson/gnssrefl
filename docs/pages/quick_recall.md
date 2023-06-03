@@ -11,6 +11,8 @@
 * [gnssir code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html), 
 [setting inputs for gnssir](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
+[new code for setting gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
+(This version no longer requires multiple azimuth zones of 90 degrees.)
 
 
 ## Additional Utilities
@@ -61,6 +63,7 @@
 * [rinex3_rinex2](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex3_rinex2.html)
 * [rinex3_snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex3_snr.html)
 * [smoosh](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.smoosh.html)
+* [smoosh_snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.smoosh_snr.html)
 * [xyz2llh](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.xyz2llh.html)
 * [ymd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ymd.html)
 * [ydoy](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ydoy.html)

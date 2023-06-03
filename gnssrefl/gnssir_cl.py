@@ -73,6 +73,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             only runs gnssir if there isn't a previous solution
         gnssir p041 2021 15  -doy_end 20 
             Analyzes data from day of year 15 to day of year 20
+        gnssir p041 2021 15  -newarcs T
+            uses new way of picking arcs. gnssir_input is used to make the json for this.
+            Eventually we will make this the default.
 
         Parameters
         ----------
@@ -108,21 +111,17 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl : float, optional
             minimum spectral peak amplitude.
             default is None
-
         sat : int, optional
             satellite number to only look at that single satellite.
             default is None.
-
         doy_end : int, optional
             end day of year. This is to create a range from doy to doy_end of days.
             If year_end parameter is used - then day_end will end in the day of the year_end.
             Default is None. (meaning only a single day using the doy parameter)
-
         year_end : int, optional
             end year. This is to create a range from year to year_end to get the snr files for more than one year.
             doy_end will be for year_end.
             Default is None.
-
         azim1 : int, optional
             lower limit azimuth.
             If the azimuth angles are changed in the json (using 'azval' key) and not here, then the json overrides these.
@@ -161,8 +160,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             decimate SNR file to this sampling period before the 
             periodograms are computed. 1 sec is default (i.e. no decimating)
         newarcs : bool, optional
-            testing out new way to do rising and setting arcs
-
+            uses new way to do rising and setting arcs.
 
     """
 
@@ -301,6 +299,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
                 print('Using the New Way of Selecting Arcs')
                 guts2.gnssir_guts_v2(**args)
             else:
+                print('Using the Old Way of Selecting Arcs')
                 guts.gnssir_guts(**args)
 
 

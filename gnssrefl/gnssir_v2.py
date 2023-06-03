@@ -39,6 +39,12 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             min elev angle, deg
         e2 : float
             max elev angle, deg
+        freqs: list of floats
+            list of frequencies to use 
+        minH : float
+            min reflector height, m
+        maxH : float
+            max reflector height, m 
         NReg : list of floats
             noise region for RH peak2noise , meters
         azval : list of floats
@@ -543,7 +549,7 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
 
 def read_snr(obsfile):
     """
-    Simple function to load the contents of a SNR file
+    Simple function to load the contents of a SNR file into a numpy array
 
     Parameters
     ----------
@@ -621,7 +627,7 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     Nvv :  int
         number of points in x/y array
     cf : float
-        scale factor for requested frequency
+        scale factor for requested frequency (used in LSP)
     meanTime : float
         UTC hour of the day (GPS time)
     avgAzim : float
