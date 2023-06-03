@@ -24,6 +24,8 @@ def main():
     Currently I have left the last character in the file name as it was given to me - capital A.
     If this should be lower case for people that use lowercase station names, please let me know.
 
+    As far as I can tell, the necessary fields in the NMEA files are GPGGA and GPGSV.
+
 
     Parameters
     ----------

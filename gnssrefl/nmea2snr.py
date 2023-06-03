@@ -516,11 +516,17 @@ def azimuth_diff1 (azim):
 
 def azimuth_diff(azim1, azim2):
     """
+    someone should document this
+
     Parameters
     ----------
     azim1 : ??
 
     azim2 : ??
+
+    Returns
+    -------
+    ???
 
     """
     if not(azim2.size):
@@ -532,6 +538,7 @@ def azimuth_diff(azim1, azim2):
      
 def angle_range_positive(ang):
     """
+    someone should document this
 
     Parameters
     ----------
@@ -546,6 +553,8 @@ def angle_range_positive(ang):
 
 def azimuth_mean(azim1, azim2):
     """
+    someone should document this
+
     Parameters
     ----------
     azim1 : list of floats ? 
@@ -619,7 +628,7 @@ def quickname(station,year,cyy, cdoy, csnr):
 def elev_limits(snroption):
     """
 
-    given snr option return the elevation angle limits
+    Given a snr option, return the elevation angle limits
 
     Parameters
     ----------
