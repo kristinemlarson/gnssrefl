@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.16
+
+delTmax allowed as input to quickLook
+
+added azlist2 to gnssir - in testing phase - seems to work so far.  use gnssir -newarcs T
+
+made gnssir_input - this will be the new make_json_input. coordinates no longer required
+meaning UNR database is the default.
+
 ## 1.3.15
 added smoosh_snr for decimating snr files
 
@@ -11,6 +20,7 @@ added some missing stations to the UNR database function
 print out lat/lon/ht and XYZ for query_unr
 
 added azlist2 to make_json_input to get ready for new way of identifying arcs
+
 
 
 ## 1.3.14

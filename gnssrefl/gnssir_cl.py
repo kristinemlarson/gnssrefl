@@ -6,6 +6,7 @@ import sys
 import wget
 
 import gnssrefl.gnssir as guts
+import gnssrefl.gnssir_v2 as guts2
 import gnssrefl.gps as g
 
 from gnssrefl.utils import str2bool
@@ -37,12 +38,13 @@ def parse_arguments():
     parser.add_argument("-e2", default=None, type=float, help="max elev angle (deg)")
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
+    parser.add_argument("-newarcs", default=None, type=str, help="implement new rising/setting arc method")
 
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd','gzip']
+    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd','gzip','newarcs']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -53,7 +55,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
            ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None,
            azim1: int = 0, azim2: int = 360, nooverwrite: bool = False, extension: str = '',
            compress: bool = False, screenstats: bool = False, delTmax: int = None,
-           e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False, dec : int = 1):
+           e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False, 
+           dec : int = 1, newarcs : bool = False):
     """
         gnssir is the main driver for estimating Reflector Heights
         The user is required to have set up an analysis strategy using "make_json_input" 
@@ -157,6 +160,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         dec : int, optional
             decimate SNR file to this sampling period before the 
             periodograms are computed. 1 sec is default (i.e. no decimating)
+        newarcs : bool, optional
+            testing out new way to do rising and setting arcs
+
 
     """
 
@@ -274,6 +280,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     print('requested frequencies ', lsp['freqs'])
 
+
     for year in year_list:
         # edits made 2021Sep10 by Makan karegar
         if year != year_end:
@@ -290,7 +297,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         args['year'] = year
         for doy in doy_list:
             args['doy'] = doy
-            guts.gnssir_guts(**args)
+            # testing out a new way to do arcs
+            if newarcs:
+                print('New Way')
+                guts2.gnssir_guts_v2(**args)
+            else:
+                guts.gnssir_guts(**args)
 
 
 def main():

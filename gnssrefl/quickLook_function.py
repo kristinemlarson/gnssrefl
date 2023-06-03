@@ -1,7 +1,3 @@
-"""
-called by quickLook_cl.py
-quickLook functions 
-"""
 import sys
 import os
 import numpy as np
@@ -17,7 +13,8 @@ import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rinex
 
 
-def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,pltscreen,azim1,azim2,ediff,**kwargs):
+def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,
+        pltscreen,azim1,azim2,ediff, delTmax,**kwargs):
     """
     This is the main function to compute spectral characteristics of a SNR file.
     It takes in all user inputs and calculates reflector heights. It makes two png files to summarize
@@ -61,6 +58,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
          maximum azimuth in degrees
     ediff : float
          QC parameter - restricts length of arcs (degrees)
+    delTmax : float
+         maximum arc length in minutes
 
     """
 
@@ -104,7 +103,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     # various defaults - ones the user doesn't change in this quick Look code
     # changed this december 4, 2022
     # changed it back on december 20, 2022
-    delTmax = 75 # this is how long an arc can be in minutes
+    #delTmax = 75 # this is how long an arc can be in minutes
     polyV = 4 # polynomial order for the direct signal
     desiredP = 0.01 # 1 cm precision for a "quick Look"
 

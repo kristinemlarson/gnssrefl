@@ -7,6 +7,11 @@ import sys
 
 def read_snr_multiday(obsfile,obsfile2,twoDays,dec=1):
     """
+    originally meant to make snr arrays longer than a day to take care
+    of midnight crossing.  not currently invoked.
+
+    Snr data have units changed to linear units I believed.
+
     Parameters
     ----------
     obsfile : string

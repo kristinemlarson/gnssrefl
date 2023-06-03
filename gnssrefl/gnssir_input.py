@@ -14,28 +14,27 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     # required arguments
     parser.add_argument("station", help="station (lowercase)", type=str)
-    parser.add_argument("lat", help="latitude (degrees)", type=float)
-    parser.add_argument("long", help="longitude (degrees)", type=float)
-    parser.add_argument("height", help="ellipsoidal height (meters)", type=float)
-    # optional inputs
-    parser.add_argument("-e1", default=None, type=int, help="lower limit elevation angle (deg)")
-    parser.add_argument("-e2", default=None, type=int, help="upper limit elevation angle (deg)")
-    parser.add_argument("-h1", default=None, type=float, help="lower limit reflector height (m)")
-    parser.add_argument("-h2", default=None, type=float, help="upper limit reflector height (m)")
-    parser.add_argument("-nr1",default=None, type=float, help="lower limit RH used for noise region in QC(m)")
-    parser.add_argument("-nr2",default=None, type=float, help="upper limit RH used for noise region in QC(m)")
+    parser.add_argument("-lat", help="Latitude (degrees)", type=float)
+    parser.add_argument("-lon", help="Longitude (degrees)", type=float)
+    parser.add_argument("-height", help="Ellipsoidal height (meters)", type=float)
+    parser.add_argument("-e1", default=None, type=int, help="Lower limit elevation angle (deg),default 5")
+    parser.add_argument("-e2", default=None, type=int, help="Upper limit elevation angle (deg), default 25")
+    parser.add_argument("-h1", default=None, type=float, help="Lower limit reflector height (m), default 0.5")
+    parser.add_argument("-h2", default=None, type=float, help="Upper limit reflector height (m), default 8")
+    parser.add_argument("-nr1",default=None, type=float, help="Lower limit RH used for noise region in QC(m)")
+    parser.add_argument("-nr2",default=None, type=float, help="Upper limit RH used for noise region in QC(m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="peak to noise ratio used for QC")
-    parser.add_argument("-ampl", default=None, type=float, help="required spectral peak amplitude for QC")
-    parser.add_argument("-allfreq", default=None, type=str, help="set to True to include all GNSS")
-    parser.add_argument("-l1", default=None, type=str, help="set to True to only use GPS L1")
-    parser.add_argument("-l2c", default=None, type=str, help="set to True to only use GPS L2C")
-    parser.add_argument("-xyz", default=None, type=str, help="set to True if using Cartesian coordinates")
+    parser.add_argument("-ampl", default=None, type=float, help="Required spectral peak amplitude for QC")
+    parser.add_argument("-allfreq", default=None, type=str, help="Set to True to include all GNSS")
+    parser.add_argument("-l1", default=None, type=str, help="Only use GPS L1")
+    parser.add_argument("-l2c", default=None, type=str, help="Only use GPS L2C")
+    parser.add_argument("-xyz", default=None, type=str, help="True if using Cartesian coordinates")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     parser.add_argument("-extension", type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-ediff", default=None, type=str, help="Allowed min/max elevation diff from obs min/max elev angle (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
-    parser.add_argument('-azlist', nargs="*",type=float,  help='User defined azimuth zones, i.e. 0 90 90 180 would mean only the east. Must be an even number of values.')
-    parser.add_argument('-frlist', nargs="*",type=int,  help='User defined frequencies using our nomenclature.')
+    parser.add_argument('-frlist', nargs="*",type=int,  help="User defined frequencies using our nomenclature.")
+    parser.add_argument('-azlist2', nargs="*",type=float,  help="Azimuth list, default 0-360") 
 
 
     args = parser.parse_args().__dict__
@@ -48,12 +47,11 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def make_json(station: str, lat: float, long: float, height: float, e1: int = 5, e2: int = 25,
+def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0, e1: int = 5, e2: int = 25,
               h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.8, ampl: float = 5.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = '', ediff: float=2.0, delTmax: float=75.0, azlist: float=[], 
-              frlist: float=[]):
+              extension: str = '', ediff: float=2.0, delTmax: float=75.0, frlist: float=[],azlist2: float=[0,360] ):
 
     """
     Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in 
@@ -62,31 +60,32 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     Examples
     --------
 
-    make_json_input p041 0 0 0 
+    gnssir_input p041 
         uses only GPS frequencies and all azimuths and the coordinates in the UNR database
 
-    make_json_input p041 39.9494 -105.19426 1728.85  -azlist 0 90 90 180 -fr 1 101
-        uses input coordinates, GPS L1 and Glonass L1 frequencies, and azimuths between 0 and 180.
+    gnssir_input p041   -azlist2 0 180 -fr 1 101
+        uses UNR coordinates, GPS L1 and Glonass L1 frequencies, and azimuths between 0 and 180.
 
-    make_json_input p041 39.9494 -105.19426 1728.85  -l2c T -e1 5 -e2 15
+    gnssir_input p041 -lat 39.9494 -lon -105.19426 -height 1728.85  -l2c T -e1 5 -e2 15
         uses only L2C GPS data between elevation angles of 5 and 15 degrees.
+        user input lat/long/height
 
-    make_json_input p041 39.9494 -105.19426 1728.85  -h1 0.5 -h2 10 -e1 5 -e2 25
-        uses only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
+    gnssir_input p041  -h1 0.5 -h2 10 -e1 5 -e2 25
+        uses UNR database, only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
 
-    make_json_input p041 0 0 0 -ediff 2
-        uses only GPS data, default station coordinates, enforces elevation angles to be 
+    gnssir_input p041 -ediff 2
+        uses UNR database, only GPS data, default station coordinates, enforces elevation angles to be 
         within 2 degrees of default limits (5-25)
 
     Parameters
     ----------
     station : str
         4 character station ID.
-    lat : float
+    lat : float, optional
         latitude in degrees.
-    long : float
+    lon : float, optional
         longitude in degrees.
-    height : float
+    height : float, optional
         ellipsoidal height in meters.
     e1 : int, optional
         elevation angle lower limit in degrees. default is 5.
@@ -129,14 +128,12 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         default is 2
     delTmax : float
         maximum allowed arc length (minutes)
-        default is 75, which is a bit long for tides
-    azlist : list of floats
-        lets the user set the azimuth regions, in degrees
-        each region must be < 100 degrees! e.g. 0 90 90 180 would be all the east
-        90 180 180 270 would be all the south
+        default is 75, which can be a bit long for tides
     frlist : list of integers
         avoids all the booleans - if you know the frequencies, enter them.
         e.g. 1 2 or 1 20 5 or 1 20 101 102
+    azlist2 : list of floats
+        Default is 0 to 360. subquadrants no longer required , but can be used if necessary
 
     """
 
@@ -151,17 +148,17 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
 # location of the site - does not have to be very good.  within 100 meters is fine
     query_unr = False
 # if you input lat and long as zero ...
-    if lat + long == 0:
-        print('Going to assume that you want to use the UNR database.')
+    if lat + lon == 0:
+        print('Assume you want to use the UNR database.')
         query_unr = True
 
     if xyz:
-        xyz = [lat, long, height]
+        xyz = [lat, lon, height]
         lat, long, height = g.xyz2llhd(xyz)
 
     if query_unr:
         # try to find the coordinates  at UNR
-        lat, long, height = g.queryUNR_modern(station)
+        lat, lon, height = g.queryUNR_modern(station)
         if lat == 0:
             print('Tried to find coordinates in our UNR database. Not found so exiting')
             sys.exit()
@@ -172,7 +169,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     lsp = {}
     lsp['station'] = station.lower()
     lsp['lat'] = lat
-    lsp['lon'] = long
+    lsp['lon'] = lon
     lsp['ht'] = height
 
     if h1 > h2:
@@ -183,10 +180,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         print(f'h2-h1 must be at least 5 meters apart. You have set h1 to {h1} and h2 to {h2}. Exiting.')
         sys.exit()
 
-    lsp['minH'] = h1
-    lsp['maxH'] = h2
-    lsp['e1'] = e1
-    lsp['e2'] = e2
+    lsp['minH'] = h1 ; lsp['maxH'] = h2 ; lsp['e1'] = e1 ; lsp['e2'] = e2
 
 # the default noise region will the same as the RH exclusion area for now
     if nr1 is None:
@@ -223,19 +217,12 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
     # you can of course have more subdivisions here
     #if (az_list[0]) == 0 & (az_list[-1] == 360):
 
-    N = len(azlist)
-    if N == 0:
-        print('User did not provide an azimuth list')
-        lsp['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
+    N2 = len(azlist2)
+    if (N2 % 2) == 0:
+        lsp['azval2'] = azlist2
     else:
-        if (N % 2) == 0:
-            lsp['azval'] = azlist
-        else:
-            print('Illegal azimuth inputs. Must be an even number of azimuth pairs.')
-            sys.exit()
-
-    # a version I was working on
-    #    lsp['azval'] = g.make_azim_choices(az_list)
+        print('Illegal azimuth inputs. Must be an even number of azimuth pairs.')
+        sys.exit()
 
     # default frequencies to use - and their required amplitudes. The amplitudes are not set in stone
     # this is the case for only GPS, but the good L2 
@@ -252,7 +239,6 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
         lsp['freqs'] = [20]
 
     if len(frlist) == 0:
-        # this means you entered nothing
         print('Using standard frequency choices.')
     else:
         print('Implementing user-provided frequency list.')
@@ -266,9 +252,6 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
 
     # write new RH results  each time you run the code
     lsp['overwriteResults'] = True
-
-    # write new RH results  each time you run the code
-    #lsp['nooverwrite'] = False
 
     # if snr file does not exist, try to make one
     lsp['seekRinex'] = False
@@ -302,7 +285,7 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
 
 def main():
     args = parse_arguments()
-    make_json(**args)
+    make_gnssir_input(**args)
 
 
 if __name__ == "__main__":

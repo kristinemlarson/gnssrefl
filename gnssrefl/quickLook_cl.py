@@ -31,6 +31,7 @@ def parse_arguments():
     parser.add_argument("-screenstats", default=None, type=str, help="if True, Success and Failure info printed to the screen")
     parser.add_argument("-peak2noise",  default=None, type=float, help="Quality Control ratio (default is 3)")
     parser.add_argument("-ediff",  default=None, type=float, help="ediff Quality Control parameter (default 2 deg)")
+    parser.add_argument("-delTmax",  default=None, type=float, help="maximum arc length, in minutes, (default is 75 )")
     parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
 
     args = parser.parse_args().__dict__
@@ -47,7 +48,7 @@ def quicklook(station: str, year: int, doy: int,
               snr: int = 66, fr: int = 1, ampl: float = 7.,
               e1: int = 5, e2: int = 25, h1: float = 0.5, h2: float = 8., sat: int = None,
               peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
-              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0):
+              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, delTmax : float=75.0):
     """
 
     quickLook assessment of SNR reflectometry data. It creates two plots: one with periodograms for
@@ -138,6 +139,10 @@ def quicklook(station: str, year: int, doy: int,
         elevation angle difference, quality control parameter 
         default is 2 degrees.
 
+    delTmax: float, optional
+        maximum allowed arc length, in minutes
+        default is 75 minutes.
+
     """
 
 #   make sure environment variables exist.  set to current directory if not
@@ -165,7 +170,7 @@ def quicklook(station: str, year: int, doy: int,
     pltscreen = plt
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'f': fr[0], 'reqAmp': ampl, 'e1': e1,
             'e2': e2, 'minH': h1, 'maxH': h2, 'PkNoise': peak2noise, 'satsel': sat, 'fortran': fortran, 'pele': pele,
-            'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2, 'ediff': ediff}
+            'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2, 'ediff': ediff, 'delTmax': delTmax}
 
     deltaRH = h2-h1
     if (deltaRH <= 0):

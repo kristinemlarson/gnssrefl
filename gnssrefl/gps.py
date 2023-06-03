@@ -1531,7 +1531,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
 
     window the SNR data for a given satellite azimuth and elevation angle range
 
-    also calculates the scale factor for various GNNS frequencies.  currently
+    also calculates the scale factor for various GNSS frequencies.  currently
     returns meanTime in UTC hours and mean azimuth in degrees
     cf, which is the wavelength/2
     currently works for GPS, GLONASS, GALILEO, and Beidou
@@ -2045,12 +2045,18 @@ def removeDC(dat,satNu, sat,ele, pele, azi,az1,az2,edot,seconds):
 
     Returns
     -------
-    x
-    y
-    sat
-    azi
-    seconds
-    edot
+    x : numpy array of floats
+        sine of elevation angle ( i believed)
+    y : numpy array of floats
+        SNR data in lineer units with DC component removed
+    sat : ??
+        not sure why  this is sent and returned
+    azi : numpy array of flaots
+        azimuth angles
+    seconds : numpy array of flaots
+        seconds of the day
+    edot : numpy array of floats
+        derivative of elevation angle
 
     """
     p1 = pele[0]; p2 = pele[1]

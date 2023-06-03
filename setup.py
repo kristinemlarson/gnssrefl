@@ -26,7 +26,7 @@ with open("README.md", "r") as readme_file:
 requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","simplekml","earthscope-sdk"]
 setup(
     name="gnssrefl",
-    version="1.3.15",
+    version="1.3.16",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -44,6 +44,7 @@ setup(
             'download_rinex = gnssrefl.download_rinex:main',
             'download_orbits = gnssrefl.download_orbits:main',
             'make_json_input = gnssrefl.make_json_input:main',
+            'gnssir_input = gnssrefl.gnssir_input:main',
             'ymd = gnssrefl.ymd:main',
             'ydoy = gnssrefl.ydoy:main',
             'xyz2llh = gnssrefl.xyz2llh:main',
