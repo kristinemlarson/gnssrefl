@@ -11,8 +11,8 @@
 * [gnssir code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html), 
 [setting inputs for gnssir](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
-[new code for setting gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
-(This version no longer requires multiple azimuth zones of 90 degrees.)
+
+* [new code for setting gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
 
 
 ## Additional Utilities

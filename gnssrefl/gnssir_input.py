@@ -54,12 +54,21 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
               extension: str = '', ediff: float=2.0, delTmax: float=75.0, frlist: float=[],azlist2: float=[0,360] ):
 
     """
-    Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in 
+    This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
     a json file which by default is saved in REFL_CODE/<station>.json.
+
+    This version no longer requires you to have azimuth regions of 90-100 degrees. You can set a single set of 
+    azimuths in the command line variable azlist2, i.e. -azlist2 0 270 would accommodate all rising and setting arcs 
+    between 0 and 270 degrees. If you have multiple distinct regions, that is also acceptable, i.e. -azlist2 0 150 180 360  
+    would use all azimuths between 0 and 360 except for 150 to 180
+
+    Your first azimuth constraint can be negative, i.e. -azlist2 -90 90, is allowed.
+
+    Latitude, longitude, and height are assumed to be stored in the UNR database.  If they are not, you should
+    set them manually.
 
     Examples
     --------
-
     gnssir_input p041 
         uses only GPS frequencies and all azimuths and the coordinates in the UNR database
 
