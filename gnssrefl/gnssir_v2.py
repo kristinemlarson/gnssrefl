@@ -579,7 +579,7 @@ def read_snr(obsfile):
     else:
         print('No SNR file found')
         allGood = 0
-        return allGood, f, 0, 0
+        return allGood, 0, 0, 0
     r,c = f.shape
     if (r > 0) & (c > 0):
         i= f[:,1] > 0
