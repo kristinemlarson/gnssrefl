@@ -297,9 +297,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         args['year'] = year
         for doy in doy_list:
             args['doy'] = doy
-            # testing out a new way to do arcs
             if newarcs:
-                print('New Way')
+                print('Using the New Way of Selecting Arcs')
                 guts2.gnssir_guts_v2(**args)
             else:
                 guts.gnssir_guts(**args)

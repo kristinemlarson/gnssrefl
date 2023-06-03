@@ -45,7 +45,16 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             pairs of azimuth regions, i.e. [0 90 90 180]
         azval2 : list of floats
             new pairs of azimuth regions, i.e. [0 180 270 360]
-        pele: 
+        delTmax : float
+            max allowed arc length in minutes
+        pele: list of floats 
+            min and max elev angle in DC removal
+        PkNoise : float
+            peak to noise value for QC
+        ediff : float
+            elev angle difference for arc length, QC
+        reqAmp : float
+            required periodogram amplitude for QC
         
     """
 
@@ -64,9 +73,11 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     delTmax = lsp['delTmax']
     azval2 = lsp['azval2']; naz = int(len(azval2)/2)
     pele = lsp['pele'] ; pfitV = lsp['polyV']
-    azim1 = azval2[0] ; azim2 = azval2[1]
 
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp'] 
+
+    # allows negatiev az value for first pair
+    azvalues = rewrite_azel(azval2)
 
     ok = g.is_it_legal(freqs)
     if not ok:
@@ -172,7 +183,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                         d2 = np.array(thissat[sind:eind, :], dtype=float)
                         # window the data - which also removes DC 
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT= window_new(d2, f, 
-                                satNu,ncols,pele, lsp['polyV'],e1,e2,azim1,azim2,screenstats)
+                                satNu,ncols,pele, lsp['polyV'],e1,e2,azvalues,screenstats)
                         Nv = Nvv # number of points
                         UTCtime = meanTime
 
@@ -573,7 +584,7 @@ def read_snr(obsfile):
     return allGood, f, r, c
 
 
-def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azim1,azim2,screenstats):
+def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     """
     retrieves SNR arcs for a given satellite. returns elevation angle and 
     detrended linear SNR
@@ -596,10 +607,8 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azim1,azim2,screenstats):
         min elev angle (deg)
     e2 : float
         max elev angle (deg)
-    azim1 : float
-        min azim angle (deg)
-    azim2 : float
-        max azim angle (deg)
+    azlist : list of floats (deg)
+        non-continguous azimuth regions, correted for negative regions
     screenstats : bool
         whether you want debugging information
 
@@ -616,6 +625,7 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azim1,azim2,screenstats):
     meanTime : float
         UTC hour of the day (GPS time)
     avgAzim : float
+        azimuth of the arc (deg)
     outFact1: float
         kept for backwards compatibility.  set to zero
     outFact2 : float
@@ -681,14 +691,15 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azim1,azim2,screenstats):
                     ie = np.argmin(ele[i])
                     # find the azimuth of that first elevation angle 
                     initA = azm[i][ie]
-                    if (initA>= azim1) & (initA <= azim2):
+                    keeparc = check_azim_compliance(initA,azlist)
+                    if keeparc :
                         x = ele[i] ; y = data[i]
                         edot = edot[i]
                         sat = sat[i] ; azm = azm[i]
                         seconds = seconds[i]
                     else:
                         if screenstats:
-                            print('not in the requested azimuth region')
+                            print('This azimuth is not in the azimuth region', initA, '(deg)')
                         good = False
     else:
         if screenstats:
@@ -735,7 +746,6 @@ def find_mgnss_satlist(f,year,doy):
     satlist: numpy list of integers
         satellites to use
 
-
     """
     # get list of relevant satellites
     l2c_sat, l5_sat = g.l2c_l5_list(year,doy)
@@ -767,4 +777,72 @@ def find_mgnss_satlist(f,year,doy):
 
     return satlist
 
+
+
+def rewrite_azel(azval2):
+    """
+    Trying to allow regions that cross zero degrees azimuth
+
+    Parameters
+    ----------
+    azval2 : list of floats
+        input azimuth regions
+
+    Returns
+    -------
+    azelout : list of floats
+        azimuth regions without negative numbers ... 
+
+    """
+
+    # if nothing changes
+    azelout = azval2
+    print('Requested azimuths: ', azval2)
+
+    # check for negative beginning azimuths
+    N2 = len(azval2) ; a1 = int(azval2[0]); a2 = int(azval2[1])
+
+    if (N2 % 2) != 0:
+        print('Azimuth regions must be in pairs. Please check the azval2 variable in your json input file')
+        sys.exit()
+    if (N2 == 2) & (a1 < 0):
+        azelout = [a1+360, 360, 0,  a2]
+    elif (N2 == 4) & (a1 < 0):
+        azelout = [a1+360, 360, 0,  a2, int(azval2[2]), int(azval2[3])]
+    elif (N2 == 6) & (a1 < 0):
+        azelout = [a1+360, 360, 0,  a2, int(azval2[2]), int(azval2[3]), int(azval2[4]), int(azval2[5])]
+    elif (N2 == 8) & (a1 < 0):
+        azelout = [a1+360, 360, 0,  a2, azval2[2], azval2[3], azval2[4], azval2[5], azval2[6], azval2[7]]
+    else:
+        print('Not going to allow more than four azimuth regions ...')
+        sys.exit()
+
+    print('Using azimuths: ', azelout)
+    return azelout
+
+def check_azim_compliance(initA,azlist):
+    """
+    Check to see if your arc is in one of the requested regions
+
+    Parameters
+    ----------
+    initA : float
+        azimuth of selected arc (deg)
+    azlist : list of floats
+        list of acceptable azimuth regions
+
+    Returns
+    -------
+    keeparc : bool
+        whether the arc is in a selected azimuth range
+    """
+    keeparc = False
+    N = int(len(azlist)/2)
+    for a in range(0,N):
+        azim1 = azlist[2*a]; azim2 = azlist[2*a+1]
+        if (initA>= azim1) & (initA <= azim2):
+            keeparc = True
+            #print('found one in requested region', azim1, azim2)
+
+    return keeparc
 
