@@ -17,9 +17,6 @@ Data archive: [UNAVCO](https://www.unavco.org/instrumentation/networks/status/no
 <P>
 <a href=http://gnss-reflections.org/rzones?station=mat2&lat=0.0&lon=0.0&height=0.0&msl=off&RH=20&freq=1&nyquist=0&srate=30&eang=4&azim1=140&azim2=220&system=gps target="_blank">Reflection zones</a>
 
-
-
-
 **Pick Up Some Data**
 
 This site has a lot of history. It is 1-Hz and multi-GNSS since ~2016. 
@@ -72,13 +69,12 @@ you see good strong returns in the peridograms:
 **Analyze a Fuller Dataset**
 
 Once you have the elevation and azimuth angles set (along with details like the required amplitude,
-which we are not using here), you really just need to turn the crank. Run <code>make_json_input</code> using 
-the information I discussed earlier (i.e. set azimuth and elevation angles limits, RH limits. Set the NReg to be
-the same as the RH limits). 
+which we are not using here), you really just need to turn the crank. Run <code>gnssir_input</code> using 
+the information I discussed earlier (i.e. set azimuth and elevation angles limits, RH limits). 
 
 Make SNR files using <code>rinex2snr</code>. Then compute reflector heights:
 
-<code>gnssir mat2 2017 1 -year_end 2021 -doy_end 365</code> 
+<code>gnssir mat2 2017 1 -year_end 2021 -doy_end 365 -newarcs T</code> 
 
 This command would analyze all the data from 2017-2021. Use <code>daily_avg</code> to create a daily average.
 Play with the inputs (median filter value, number of required RH to compute a reliable average) to make sure 
@@ -107,7 +103,6 @@ a modern receiver. However, they are certainly good enough for the daily average
 
 
 <img src=../_static/mat2_2022.png>
-
 
 
 Updated by Kristine M. Larson, November 24, 2022

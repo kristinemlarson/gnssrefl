@@ -80,14 +80,24 @@ azimuth regions are defined in <code>quickLook</code>. It does not mean there ar
 
 ### Analyze the Data
 
-Set up analysis instructions, using a smaller RH region. Since our database has the a priori location of PMTL, we 
+Set up analysis instructions.
+
+You can use our new method :
+
+<code>gnssir_input pmtl -h1 75 -h2 85 -e1 5 -e2 12 -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist 45 205</code>
+
+
+Or our old method: 
+
+Since our database has the a priori location of PMTL, we 
 can use 0 0 0 for the latitude, longitude, and height values. Note that the frequency list has 
 only GPS L1 and the two Glonass frequencies. The azimuth region has been cut up into three smaller regions as the 
 code will not allow regions larger than 100 degrees:
 
-<code>make_json_input pmtl 0 0 0 -h1 75 -h2 85 -e1 5 -e2 12 -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist 45 90 90 180 180 205</code>
 
+<code>make_json_input pmtl 0 0 0 -h1 75 -h2 85 -e1 5 -e2 12 -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist 45 90 90 180 180 205</code>
 [Sample json](pmtl.json)
+
 
 Make the SNR files (this takes a long long time):
 

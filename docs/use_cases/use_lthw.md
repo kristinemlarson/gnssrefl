@@ -92,14 +92,12 @@ Translate the GPS data for the year of 2018:
 
 Then you need to make the list of analysis inputs (stored in json format):
 
-<code>make_json_input lthw -76.458  -107.782 1011.0 -e1 7 -e2 25 -peak2noise 3.2 -l1 True</code>
+<code>gnssir_input lthw -e1 7 -e2 25 -peak2noise 3.2 -l1 T</code>
 
-[Example json file](lthw.json). It is fine to hand edit the json file to remove the unreliable azimuths if 
-you prefer.
 
 Now analyze the data for 2018 from day 1 to day 365 using **gnssir**:
 
-<code>gnssir lthw 2018 1 -doy_end 365</code>
+<code>gnssir lthw 2018 1 -doy_end 365 -newarcs T </code>
 
 This produces reflector heights for every rising and setting satellite track that meets your 
 quality control selections.  In order to estimate snow accumulation, you will want to calculate

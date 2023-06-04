@@ -1,8 +1,10 @@
 ### St Michael Bay
 
+**Use Case Updated June 4, 2023**
+
 [Warning](warning.md)
 
-**Use Case Updated December 10, 2022**
+I have added the use of <code>gnss_input</code>. This requires -newarcs T when running <code>gnssir</code>
   
 <p align="center">
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">
@@ -92,14 +94,14 @@ Next we analyze data for two months in the fall of 2020. First make the SNR file
 
 <code>rinex2snr at01 2020 230 -archive unavco -doy_end 290</code>
 
-Now set up the analysis instructions (assume database receiver coordinates are correct):
+Now set up the analysis instructions (assume database receiver coordinates are correct)
+using our new utility:
 
-<code>make_json_input at01 0 0 0 -h1 8 -h2 15 -e1 5 -e2 13 -ampl 4 -allfreq T -azlist 20 90 90 180 180 220</code>
-I removed frequency 208 and the Beidou signals. [Sample json file.](at01.json)
+<code>gnssir_input at01 -h1 8 -h2 15 -e1 5 -e2 13 -ampl 4 -allfreq 1 20 5 101 102 201 205 206 207 -azlist 20 220</code>
 
 Next estimate reflector height (RH) for the two month time period:
 
-<code>gnssir at01 2020 230 -doy_end 290</code>
+<code>gnssir at01 2020 230 -doy_end 290 -newarcs T </code>
 
 We have written some code to help you look at these subdaily files - it is a work in progress, but you can 
 certainly give it a try. **Note:** These figures were generated with an older

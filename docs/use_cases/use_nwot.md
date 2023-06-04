@@ -93,6 +93,12 @@ one line:
 
 Make a json file for your <code>gnssir</code> analysis:
 
+The new method:
+
+<code>gnssir_input nwot -e1 7 -e2 25 -peak2noise 3.2 -azlist2 90 270 -frlist 1 20 </code>
+
+The old method:
+
 <code>make_json_input nwot 0 0 0  -e1 7 -e2 25 -peak2noise 3.2 -azlist 90 180 180 270 -frlist 1 20 </code>
 
 I have opted to only use the southern quadrants (azimuths 90 through 270). Note that since

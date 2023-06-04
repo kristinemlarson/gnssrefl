@@ -187,8 +187,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                     # instead of az bins now go through each arc 
                     for a in range(0,nr):
                         sind = int(arclist[a,0]) ; eind = int(arclist[a,1])
-                        if screenstats:
-                            print('Indices for this arc', a, sind, eind)
+                        #if screenstats:
+                        #    print('Indices for this arc', a, sind, eind)
                         # create array for the requested arc
                         d2 = np.array(thissat[sind:eind, :], dtype=float)
                         # window the data - which also removes DC 
@@ -533,19 +533,34 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
         maxObse = max(nelv)
 
         nogood = False
+        verysmall = False
+        ediff_violation = False
         if (minObse - e1) > ediff:
             nogood = True
+            ediff_violation = True 
         if (maxObse - e2) < -ediff:
             nogood = True
+            ediff_violation = True
         if (eind-sind) == 1:
             nogood = True
+            verysmall = True
         if ((maxObse - minObse) < min_deg):
             nogood = True
 
+        if screenstats:
+            if nogood:
+                # do not write out warning for these tiny arcs which should not even be there.
+                # i am likely reading the code incorrectly
+                add = ''
+                if ediff_violation:
+                    add = ' violates ediff'
+                if not verysmall:
+                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), add)
+            else:
+                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2))
+
         if not nogood :
             iarc = iarc + 1
-            if screenstats:
-                print('sat/arc',sat,iarc, sind,eind,np.round(minObse,2), np.round(maxObse,2))
             newl = [sind, eind, int(sat), iarc]
             tv = np.append(tv, [newl],axis=0)
 

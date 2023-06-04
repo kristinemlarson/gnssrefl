@@ -57,7 +57,7 @@ on L1 and L2. Note: the L2 amplitudes are smaller because the receiver lacks acc
 
 **Analyze a Multi-year Dataset**
 
-Step 1: Run <code>make_json_input</code> using the information I discussed earlier 
+Step 1: Run <code>gnssir_input</code> using the information I discussed earlier 
 
 - azimuth angle limits  **Try out -azlist 220  275**
 

@@ -14,14 +14,6 @@
 
 **DOI:**  	[https://doi.org/10.7283/T5R49NQQ](https://doi.org/10.7283/T5R49NQQ)
 
-**Ellipsoidal Coordinates:**
-
-- Latitude: 39.94949
-
-- Longitude: -105.19427
-
-- Height: 1728.842 m
-
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/P041)
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/P041.sta)
@@ -118,16 +110,18 @@ They are very likely available in the RINEX 3 file, so you are encouraged to loo
 
 We will start by setting up the analysis parameters. These are stored 
 in a json file. In this case, the p041 RINEX data are multi-gnss, so you could 
-set the options to allow all frequencies from all constellations:
-
-<code>make_json_input p041 39.94949 -105.19427 1728.842 -allfreq True -e1 5 -e2 25</code>
- 
-
-We are going to concentrate on GPS-only, which is the default. We have set stricter QC values by 
+set the options to allow all frequencies from all constellations.
+Here we are going to concentrate on GPS-only, which is the default. We have set stricter QC values by 
 setting the amplitude minimum to 8 and the peak 2 noise ratio to 3.2:
+
+Original code:
 
 <code>make_json_input p041 39.94949 -105.19427 1728.842 -e1 5 -e2 25 -peak2noise 3.2 -ampl 8 </code>
 [Here is a sample json file](p041.json).
+
+Recommended code:
+
+<code>gnssir_input p041 -allfreq True -peak2noise 3.2 -ampl 8 </code>
 
 We are going to look at a subset of p041 data from 2019/2020 to look at changes due to 
 snow accumulation. The series will begin doy 245 (2019) and end on doy 70 (2020).  
@@ -138,7 +132,7 @@ snow accumulation. The series will begin doy 245 (2019) and end on doy 70 (2020)
 
 Now run **gnssir** for 2019/2020:
 
-<code>gnssir p041 2019 1 -doy_end 366 -year_end 2020</code>
+<code>gnssir p041 2019 1 -doy_end 366 -year_end 2020 -newarcs T</code>
 
 The RH results from **gnssir** are stored in $REFL_CODE/2019/results/p041 and $REFL_CODE/2020/results/p041. 
 

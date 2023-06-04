@@ -64,6 +64,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     Your first azimuth constraint can be negative, i.e. -azlist2 -90 90, is allowed.
 
+    Note: you can keep using your old json files - you just need to add this new -azlist2 setting manually.
+
     Latitude, longitude, and height are assumed to be stored in the UNR database.  If they are not, you should
     set them manually.
 

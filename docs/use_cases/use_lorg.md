@@ -69,9 +69,8 @@ This is for L5:
 ### Analyze the Data
 
 Now prepare to analyze the data using <code>gnssir</code>.  First you need to create a set of analysis instructions. 
-The default settings only need the station name, latitude, longitude, and ellipsoidal height. 
 
-<code>make_json_input lorg -78.18365 170.03361 -7.778 -e1 5 -e2 25</code>
+<code>gnssir_input lorg</code>
 
 The json output will be stored in $REFL_CODE/input/lorg.json. [Here is a sample json file.](lorg.json)
 
@@ -82,18 +81,21 @@ code run faster (otherwise it will check three other archives as well). The resu
 
 Run <code>gnssir</code> for all the SNR files:
 
-<code>gnssir lorg 2019 1 -doy_end 233</code>
+<code>gnssir lorg 2019 1 -doy_end 233 -newarcs T </code>
 
 The default does not send any plots to the screen. If you do want to see them, set <code>-plt True</code>:
 
-<code>gnssir lorg 2019 1 -plt True </code>
+<code>gnssir lorg 2019 1 -plt True -newarcs T</code>
 
 <img src="../_static/lorg-g-panels.png" width="800"/>
 
-The results for a single day are stored in a folder for that year, i.e.  $REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt)
+The results for a single day are stored in a folder for that 
+year, i.e.  $REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt)
 
-The **daily_avg** command will calculate the daily average reflector height from the daily output files.  To minimize outliers in these daily averages, a median filter is set to allow 
-values within a given value of the median. The user is also asked to set a required minimum number of daily satellite tracks. Here we use 0.25 meters and 50 tracks. 
+The **daily_avg** command will calculate the daily average reflector height from the daily 
+output files.  To minimize outliers in these daily averages, a median filter is set to allow 
+values within a given value of the median. The user is also asked to 
+set a required minimum number of daily satellite tracks. Here we use 0.25 meters and 50 tracks. 
 
 <code>daily_avg lorg 0.25 50</code>
 

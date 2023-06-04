@@ -81,20 +81,18 @@ sensors negatively impacted the GPS reflections sensor. However, the dominant GP
 
 Now prepare to analyze the data using <code>gnssir</code>. 
 First you need to create a set of analysis instructions. 
-The default settings need the station name, latitude, longitude, and ellipsoidal height. 
-Originally the software required you to input the coordinates. If you believe  
-that the Nevada Reno group has the site in its database, you can 
-avoid that step, as so:
+The default settings only need the station name. Originally the software required you to 
+input the station coordinates. If you believe that the Nevada Reno group has the site in its database, you can 
+avoid that step:
 
-<code>make_json_input phnx 0 0 0 -query_unr True</code>
+<code>gnssir_input phnx</code>
 
-The json output will be stored in $REFL_CODE/input/phnx.json. [Here is a sample json file.](phnx.json)
+The json output will be stored in $REFL_CODE/input/phnx.json.
 The default peak to noise ratio is 2.7 - which is better for water. Since these are ice/snow reflections, I'm
-going to increase it a bit to 3.2 and require a larger amplitude.
+going to increase it a bit to 3.2 and require a larger amplitude. I am also selecting the azimuth region from 0 to 320.
 
-<code>make_json_input phnx 0 0 0 -query_unr True -ampl 10 -peak2noise 3.2</code>
+<code>gnssir_input phnx -ampl 10 -peak2noise 3.2 -azlist2 0 320</code>
 
-I also removed by hand the azimuths from 320-360 degrees in the final json file I used.
 
 Next we need to make some snr files. I am going to do most of 2019 thru 2021, but if you prefer, you can set
 the -weekly option to True and that will speed things up (it makes one file per week).
