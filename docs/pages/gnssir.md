@@ -1,52 +1,57 @@
 # Estimating Reflector Heights 
 
-## make_json_input 
+We have changed how arcs are selected. We now recommend the following procedure.
 
-Before you estimate reflector heights, you need a set of instructions. These are made using <code>make_json_input</code>. 
-The required inputs are: 
+## gnssir_input
 
-* station name 
-* latitude (degrees)  
-* longitude (degrees) 
-* ellipsoidal height (meters). 
 
-The station location *does not* have to be cm-level for the reflections code. Within a few hundred meters is 
-sufficient. For example: 
+If the station is in our database:
 
-<CODE>make_json_input p101 41.692 -111.236 2016.1</CODE>
+<CODE>gnssir_input p101</CODE>
 
 If you happen to have the Cartesian coordinates (in meters), you can 
 set <code>-xyz True</code> and input those instead of lat, long, and height.
 
-If you are using a site that is in the UNR station database, the *a priori* values can be set to zeros:
 
-<CODE>make_json_input p101 0 0 0 </CODE>
-
-[A full listing of the possible inputs and examples for make_json_input can be found here.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
+[A full listing of the possible inputs and examples for gnssir_input can be found here.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
 
 The json file of instructions will be put in $REFL_CODE/input/p101.json. 
 
-The default azimuth inputs are four regions, each of 90 degrees.  
-You set your preferred azimuth regions using -azlist. Azimuth regions should not be larger 
-than ~100 degrees. If for example you want to use the region from 0 to 
-270 degrees, you should not set a region from 0 - 270, but instead a region from 0-90, 90-180, and the last
-from 180-270. 
+The default azimuth inputs are from 0 to 360 degrees.
+You can set your preferred azimuth regions using -azlist2. Previously you were required to use multiple
+azimuth regions < 100 degrees. That is no longer required. However, if you do need multiple distinct regions, that is allowed.
 
-Example:
 
-<CODE>make_json_input p101 0 0 0   -azlist 0 90 90 180 180 270</CODE>
+<CODE>gnssir_input p101  -azlist2 0 90 180 270</CODE>
+
+If you wanted all southern quadrants:
+
+<CODE>gnssir_input p101  -azlist2 90 270</CODE>
 
 We try to enforce homogenous track lengths by using a quality control factor called *ediff*. Its 
 default value is 2 degrees, which means your arc should be within 2 degrees of the requested elevation angle inputs.
 So if you ask for 5 and 25 degrees, your arcs should at least be from 7 to 23 degrees.  To tell 
 <code>gnssir</code> you want to allow more arcs, just set ediff to a much larger value.
 
+[The old way of setting the strategy, using make_json_input](old_way.md)
+
 ## gnssir
 
 <code>gnssir</code> estimates reflector heights. It assumes you have made SNR files and defined an analysis strategy.
-The minimum inputs are the station name, year, and doy
+The minimum inputs are the station name, year, and doy. 
+ 
 
-<CODE>gnssir p041 2020 150</CODE> 
+New - recommended - protocol:
+
+<CODE>gnssir p041 2020 150 -newarcs T</CODE> 
+
+Old protocol:
+
+<CODE>gnssir p041 2020 150 </CODE> 
+
+**Warning: eventually the newarc method will become the default.**  I am allowing both to exist for a while so that 
+users aren't faced with non-working analysis strategies.  The azimuth limits have different names so that you can
+have a single json file.
 
 [Additional inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html)
 
