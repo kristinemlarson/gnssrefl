@@ -35,11 +35,11 @@ Take a quick look at the L2C data:
 
 Set up (default) analysis stratgegy:
 
-<code>make_json_input scia 0 0 0 -l2c T</code>
+<code>gnssir_input scia -l2c T</code>
 
 **Estimate reflector heights:**
 
-<code>gnssir scia 2018 1 -doy_end 365 -year_end 2019</code>
+<code>gnssir scia 2018 1 -doy_end 365 -year_end 2019 -newarcs T</code>
 
 ## Estimate Soil Moisture
 [Please read the soil moisture user manual.](../pages/README_vwc.md) 

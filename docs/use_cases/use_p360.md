@@ -81,14 +81,11 @@ north. This is confirmed in the QC plot show here:
 
 ## Analyze the Data
 
-First we will set the analysis paramaters 
-using <code>make_json_input</code>. This analysis will use the L2C frequency and 
+First we will set the analysis paramaters. This analysis will use the L2C frequency and 
 will use QC metrics derived from the previous plot (for peak to noise ratio and amplitude).  
 We don't want to use the northeast quadrant, so will use -azlist2 definition:
 
 <code>gnssir_input p360 -l2c True -peak2noise 3.2 -ampl 8 -azlist2 90 360</code>
-
-[Sample json file](p360.json)
 
 We then make SNR files to encompass approximately one water year:
 

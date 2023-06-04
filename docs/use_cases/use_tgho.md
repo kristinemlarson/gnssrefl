@@ -79,16 +79,12 @@ We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 an
 
 ## Analyze the Data
 
-Use <code>make_json_input</code> to set up the analysis parameters. 
-Set the elevation and reflector heights as in <code>quickLook</code>. 
-The peak to noise ratio and required amplitude can be set on the command line. 
-The receiver location does not have to be input as it is a well known station from
-the global GNSS network.
+Set the analysis parameters using what you learned from quickLook.
 
-<code>make_json_input tgho 0 0 0 -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9  -azlist 0 90 90 135 225 270 270 360 -frlist 1 101 102 </code>
+<code>gnssir_input tgho  -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9  -azlist2 0 135 225 360 -frlist 1 101 102 </code>
 
 Note the -frlist entries. I am asking for GPS L1 and Glonass L1 and L2. The GPS L2 are not high quality 
-and there are no Galileo or Beidou data. If you want all signals from all constellations you need to choose -allfreq T.
+and there are no Galileo or Beidou data. 
 
 Then make SNR files for about six months:
 
@@ -98,10 +94,11 @@ The output SNR files are stored in $REFL_CODE/2020/snr/tgho.
 
 Now run <code>gnssir</code> for these same dates:
 
-<code>gnssir tgho 2020 130 -doy_end 319 </code>
+<code>gnssir tgho 2020 130 -doy_end 319 -newarcs T</code>
 
-To look at daily averages, use the utility <code>daily_avg</code>. The median filter is set to allow values within 0.25 meters of the 
-median, and the minimum number of tracks required to calculate the average is set to 50 tracks.  
+To look at daily averages, use the utility <code>daily_avg</code>. The median filter is set 
+to allow values within 0.25 meters of the median, and the minimum number of tracks required to 
+calculate the average is set to 50 tracks.  
 
 <CODE>daily_avg tgho .25 50 </code>
 

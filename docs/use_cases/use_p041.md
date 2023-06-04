@@ -114,13 +114,6 @@ set the options to allow all frequencies from all constellations.
 Here we are going to concentrate on GPS-only, which is the default. We have set stricter QC values by 
 setting the amplitude minimum to 8 and the peak 2 noise ratio to 3.2:
 
-Original code:
-
-<code>make_json_input p041 39.94949 -105.19427 1728.842 -e1 5 -e2 25 -peak2noise 3.2 -ampl 8 </code>
-[Here is a sample json file](p041.json).
-
-Recommended code:
-
 <code>gnssir_input p041 -allfreq True -peak2noise 3.2 -ampl 8 </code>
 
 We are going to look at a subset of p041 data from 2019/2020 to look at changes due to 

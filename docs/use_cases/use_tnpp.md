@@ -1,5 +1,7 @@
 ### Puerto Penasco, Sonora, Mexico
 
+**Updated June 4, 2023 for gnssir_input**
+
 [Warning](warning.md)
 
 **Station Name:** tnpp
@@ -49,7 +51,7 @@ The periodograms show the tides in the southwest quadrant. That is further demon
 
 Set your analysis strategy (with some variations):
 
-<code>make_json_input tnpp 0 0 0 -e1 5 -e2 12 -h1 55 -h2 70  -ampl 0 -azlist 180 270</code>
+<code>gnssir_input tnpp  -e1 5 -e2 12 -h1 55 -h2 70  -ampl 0 -azlist2 180 270</code>
 
 Now go back and make more SNR files:
 
@@ -57,7 +59,7 @@ Now go back and make more SNR files:
 
 Estimate RH :
 
-<code>gnssir tnpp 2021 301 -doy_end 316 </code>
+<code>gnssir tnpp 2021 301 -doy_end 316 -newarcs T</code>
 
 Look at the sea level results for multiple weeks:
 

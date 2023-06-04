@@ -93,24 +93,17 @@ one line:
 
 Make a json file for your <code>gnssir</code> analysis:
 
-The new method:
-
 <code>gnssir_input nwot -e1 7 -e2 25 -peak2noise 3.2 -azlist2 90 270 -frlist 1 20 </code>
-
-The old method:
-
-<code>make_json_input nwot 0 0 0  -e1 7 -e2 25 -peak2noise 3.2 -azlist 90 180 180 270 -frlist 1 20 </code>
 
 I have opted to only use the southern quadrants (azimuths 90 through 270). Note that since
 L5 was not tracked at this site, only 1 and 20 are set in the frequency list. I am using a minimum elevation
 angle of 7 degrees because this particular receiver had a limit on the number of satellites it 
 could track. In some cases this meant the low elevation data are not available and that triggers 
-QC restrictions. [A sample json file for this site.](nwot.json) No receiver coordinates are input because
-the location of the site is in our database.
+QC restrictions. 
 
 Once you have a json file set up, run <code>gnssir</code> for the years 2009-2015:
 
-<code>gnssir nwot 2009 1 -doy_end 366 -year_end 2015</code>
+<code>gnssir nwot 2009 1 -doy_end 366 -year_end 2015 -newarcs T</code>
 
 ### Compute daily average RH values
 

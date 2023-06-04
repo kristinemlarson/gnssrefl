@@ -71,11 +71,11 @@ Make the SNR files:
 
 Save your analysis strategy:
 
-<code>make_json_input sbas 0 0 0 -e1 5 -e2 12 -h1 15 -h2 35 -peak2noise 3 -azlist 0 78 </code>
+<code>gnssir_input sbas  -e1 5 -e2 12 -h1 15 -h2 35 -peak2noise 3 -azlist2 0 78 </code>
 
 The next step is to estimate reflector heights. First do a single day using the plt option.
 
-<code>gnssir sbas 2020 1 -plt T</code>
+<code>gnssir sbas 2020 1 -plt T -newarcs T</code>
 
 <img src=../_static/sbas_gnssir_l1.png width=600/>	
 
@@ -92,7 +92,8 @@ And that is what we should expect.
 
 Go ahead and estimate reflector heights for all available days:
 
-<code>gnssir sbas 2020 1 -doy_end 366</code>
+<code>gnssir sbas 2020 1 -doy_end 366 -newarcs T</code>
+ 
 
 Compute a daily average. Since we only have reflections in one geographic quadrant and are 
 only using GPS signals, we should not require as many points as we have done in other examples. 

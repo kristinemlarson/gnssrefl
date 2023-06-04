@@ -83,23 +83,21 @@ The data from 2013 will be analyzed here as a test case.  Begin by generating th
 
 The resulting SNR files are stored in $REFL_CODE/2013/snr/mchn.  
 
-Analysis parameters are set up with <code>make_json_input</code> using the default receiver location:
+Analysis parameters are set up with <code>gnssir_input</code> using the default receiver location:
 
-<code>make_json_input mchn 0 0 0 -h1 3 -h2 10 -e1 5 -e2 25 -l1 T -peak2noise 3 -ampl 8 -azlist 80 180</code>
-
-[Sample json file](mchn.json) 
+<code>gnssir_input mchn  -h1 3 -h2 10 -e1 5 -e2 25 -l1 T -peak2noise 3 -ampl 8 -azlist2 80 180</code>
 
 Although it is possible to get good reflections beyond an azimuth of 180 degrees, the 
 photographs suggest barriers are present in that region.  
 
 Now that the analysis parameters are set, run <code>gnssir</code> to save the reflector height (RH) output for each day in 2013.
 
-<code>gnssir mchn 2013 1 -doy_end 365</code>
+<code>gnssir mchn 2013 1 -doy_end 365 -newarcs T</code>
 
 The daily output files are stored in $REFL_CODE/2013/results/mchn. [Here is an example output for a single day.](195.txt) 
 Plots of SNR data can be seen with the -plt option.
 
-<code>gnssir mchn 2013 195  -plt True</code>
+<code>gnssir mchn 2013 195  -plt True -newarcs T</code>
 
 <img src="../_static/mchn-g-l1.png" width="500">
 

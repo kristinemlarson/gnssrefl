@@ -58,7 +58,7 @@ to convince the software that the result should be kept:
 
 ### Estimate Reflector Heights
 
-Your first task is to set an analysis strategy using <code>make_json_input</code>.
+Your first task is to set an analysis strategy.
 Let's use the defaults, but ask for only the L2C data since this is for soil moisture.
 
 <code>gnssir_input mfle -l2c T</code>

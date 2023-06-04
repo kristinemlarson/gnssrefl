@@ -97,19 +97,14 @@ The first step is to make SNR files for the year 2012:
 We will next analyze a year of L1 GPS reflection data from this site. We will use the default minimum and maximum 
 reflector height values (0.4 and 6 meters). But for the reasons previously stated, we will set a minimum elevation angle 
 of 7 degrees. We also specify that we only want to use the L1 data and set peak2noise and a mimimum
-amplitude for the periodograms. We use the utility **make_json_input** to set and store these analysis settings:
+amplitude for the periodograms.  We excluded the northernmost azimuths.
 
-<code>make_json_input gls1 66.479 -46.310 2148.578 -e1 7 -l1 True -peak2noise 3 -ampl 8</code>
+<code>gnssir_input gls1  -e1 7 -l1 True -peak2noise 3 -ampl 8 -azlist2 40 330</code>
 
-[Example json file.](gls1.json)
-
-We have also excluded a bit of the northern tracks by hand-editing the json. This is not required as 
-the software appears to be appropriately removing these unreliable azimuths. Note: the removal of these
-azimuths is more related to the GPS satellite inclination than local conditions at gls1.
 
 Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012:
 
-<code>gnssir gls1 2012 1 -doy_end 366</code>
+<code>gnssir gls1 2012 1 -doy_end 366 -newarcs T</code>
 
 We will use the **daily_avg** tool to compute a daily average RH. A median filter is set to 0.25 meters 
 and 30 individual tracks are required in order to recover a daily average:

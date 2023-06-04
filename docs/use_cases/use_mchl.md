@@ -42,9 +42,9 @@ If you have any difficult downloading these RINEX 3 files, UNAVCO has kindly dow
 <code>rinex2snr mchl 2017 1 -doy_end 365 -archive special</code>
 
 Use the <code>quickLook</code> with the l2c frequency to give a look to the data quality.
-Then set up your parameters with <code>make_json_input</code>
+Then set up your analysis parameters:
 
-<code>make_json_input mchl 0 0 0 -l2c true</code>
+<code>gnssir_input mchl -l2c true</code>
 
 The location of the json file is printed to the screen. 
 The default behavior is to accept all azimuths.
@@ -55,7 +55,7 @@ azimuths and satellite tracks.
 
 Run the <code>gnssir</code> each day in 2017 and 2018:
 
-<code>gnssir mchl 2017 1 -doy_end 365 -year_end 2018</code>
+<code>gnssir mchl 2017 1 -doy_end 365 -year_end 2018 -newarcs T</code>
 
 #### Step 2: Soil Moisture
 

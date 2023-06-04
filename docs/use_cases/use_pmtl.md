@@ -1,10 +1,5 @@
 ### St Lawrence River
 
-
-Updated by Kristine M. Larson to reflect code changes in make_json_input.
-
-January 21, 2023
-
 <HR>
 To the best of our knowledge, access to the current high-rate data streams
 needed to do reflectometry at this site is no longer allowed. Please contact NRCAN for further information.
@@ -80,23 +75,9 @@ azimuth regions are defined in <code>quickLook</code>. It does not mean there ar
 
 ### Analyze the Data
 
-Set up analysis instructions.
-
-You can use our new method :
+Set up analysis instructions, using only GPS L1, and Glonass.  
 
 <code>gnssir_input pmtl -h1 75 -h2 85 -e1 5 -e2 12 -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist 45 205</code>
-
-
-Or our old method: 
-
-Since our database has the a priori location of PMTL, we 
-can use 0 0 0 for the latitude, longitude, and height values. Note that the frequency list has 
-only GPS L1 and the two Glonass frequencies. The azimuth region has been cut up into three smaller regions as the 
-code will not allow regions larger than 100 degrees:
-
-
-<code>make_json_input pmtl 0 0 0 -h1 75 -h2 85 -e1 5 -e2 12 -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist 45 90 90 180 180 205</code>
-[Sample json](pmtl.json)
 
 
 Make the SNR files (this takes a long long time):
@@ -105,7 +86,7 @@ Make the SNR files (this takes a long long time):
 
 This is also slow - though not as slow as translating RINEX files and computing orbits:
 
-<code>gnssir pmtl 2020 270 -doy_end 300</code>
+<code>gnssir pmtl 2020 270 -doy_end 300 -newarcs T</code>
 
 One way to make the gnssir code run faster would be to loosen up the RH precision.  Since you 
 are using daily averages, it is not necessary to use the default of 5 mm.  10 mm would suffice.

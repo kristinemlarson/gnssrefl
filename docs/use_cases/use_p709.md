@@ -48,9 +48,7 @@ detect the daily average lake level. Make sure that you use the reflection zone 
 
 **Estimate Reflector Height**
 
-Set your analysis strategy using <code>make_json_input</code>. Remember, if the UNR database
-knows about the site, then you can input lat,lon,ht of 0,0,0. You can input the azimuth limits using
--azlist.
+Set your analysis strategy using <code>gnssir_input</code>. 
 
 <code>rinex2snr p709 2021 183 -dec 5 -archive unavco -rate high -orb gnss</code>
 

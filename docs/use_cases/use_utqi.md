@@ -2,6 +2,8 @@
 
 Note: this use case needs to be updated to use the snowdepth utility.
 
+Updated gnssir_input on June 4, 2023
+
 <HR>
 
 **Station Name:** utqi00usa
@@ -62,16 +64,13 @@ This won't take too long since the data files are relatively small.
 
 ## Estimate Reflector Height
 
-Set your analysis strategy:
+Set your analysis strategy.  I am using the main GPS signals, Glonass, and three Galileo frequencies:
 
-<code>make_json_input utqi 0 0 0 -h1 2 -h2 12 -e1 5 -e2 15 -allfreq T -azlist 90 180 180 220</code>
+<code>gnssir_input utqi -h1 2 -h2 12 -e1 5 -e2 15 -frlist 1 20 5 101 102 201  205 207 T -azlist2 90 220</code>
 
-There don't appear to be Beidou data at this site, so you could hand-edit those frequencies 
-out of the json file but it is not required. This was my [starter json file](utqi.json) In 
-retrospect, I should have limited the azimuths a 
-little more. Now run the main module for estimating reflector height.
+In retrospect, I should have limited the azimuths a little more. Now run the main module for estimating reflector height.
 
-<code>gnssir utqi 2020 1 -year_end 2022 -doy_end 243</code>
+<code>gnssir utqi 2020 1 -year_end 2022 -doy_end 243 -newarcs T </code>
 
 
 ##  Assess the results
