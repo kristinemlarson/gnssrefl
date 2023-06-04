@@ -41,17 +41,15 @@ so that people can test out this code.
 
 If you want to remind yourself why the L2C data are superior to the L1 data recorded for this receiver, use <code>quickLook</code>.
 
-The analysis parameters are set up with <code>make_json_input</code>. While ordinarily you need to input 
-the station latitude, longitude, and ellipsoidal height for this code, if the station is in the <code>gnssrefl</code> database, you can 
-put zero values there instead. We only need the L2C data, so have set the parameter accordingly.
+We only need the L2C data, so have set the parameter accordingly.
 
-<code>make_json_input p038 0 0 0 -l2c true</code>
+<code>gnssir_input p038  -l2c true</code>
 
 The json file is saved at $REFL_CODE/input/p038.json
 
 Now we run <code>gnssir</code>. This will be needed for estimate a priori reflector heights for the soil moisture code.
 
-<code>gnssir p038 2017 1 -doy_end 365 </code>
+<code>gnssir p038 2017 1 -doy_end 365 -newarcs T</code>
 
 
 #### Step 2: Soil Moisture

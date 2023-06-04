@@ -2,8 +2,8 @@
 
 [Warning](warning.md)
 
-
-**Use Case Updated December 11, 2022**
+**Use Case Updated June 4, 2023 to use gnssir_input. Your outputs will be slightly 
+different than those shown here.**
 
 <p align="center">
 <img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>
@@ -100,16 +100,13 @@ the process. We will be using three+ weeks of GNSS data from 2021 as our sample 
 
 <code>rinex2snr sc02 2021 15 -doy_end 40</code>
 
-Then you need to make the list of analysis inputs. Note the lat/lon/ht is not required if 
-the station is in our database, as this station is:
+Then you need to make the list of analysis inputs. 
 
-<code>make_json_input sc02  0 0 0  -e1 5 -e2 13 -h1 3 -h2 12 -peak2noise 3 -allfreq T -azlist 60 90 90 180 180 220</code>
-
-I removed the Beidou signals, but it is not required. [Example json file](sc02.json). 
+<code>gnssir_input sc02   -e1 5 -e2 13 -h1 3 -h2 12 -peak2noise 3 -frlist 1 20 5 101 102 201 205 207 -azlist2 60  220</code>
 
 Once you have the json file set up, you can go ahead and analyze all the data with a single command:
 
-<code>gnssir sc02 2021 15 -doy_end 40</code>
+<code>gnssir sc02 2021 15 -doy_end 40 -newarcs T</code>
 
 This produces reflector heights for every rising and setting satellite track that meets the 
 quality control metrics that you have set. We have some preliminary code that will help you evaluate 

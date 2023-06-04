@@ -1,5 +1,7 @@
 ### Vlissingen
 
+**Updated June 4, 2023 to use gnssir_input**
+
 <p align="center">
 <img src=../_static/VLIS.jpeg width=600</img>
 </P>
@@ -109,21 +111,19 @@ Begin by making SNR files:
 
 <code>rinex2snr vlis00nld 2020 171 -doy_end 184 -rate high -dec 15 -orb gnss -archive bkg</code>
 
-Then use quickLook to make sure your strategy is a good one, where you should try 
+Then use <code>quickLook</code> to make sure your strategy is a good one, where you should try 
 using different frequencies and the RH, elevation angle, and azimuth settings.
 
 <code>quickLook vlis 2020 171</code>
 
 This is the strategy I used:
 
-<code>make_json_input vlis 0 0 0 -h1 5 -h2 15 -e1 5 -e2 20 -peak2noise 3 -ampl 1 -allfreq T</code>
+<code>gnssir_input vlis -h1 5 -h2 15 -e1 5 -e2 20 -peak2noise 3 -ampl 1 -frlist 1 20 5 101 102 201 205 207 -azel2 70 180 </code>
 
-Edit the json file and change the azimuth ranges of 0-90 to 70-90 and  delete the western azimuths. Be careful
-when editing the file so that the commas and such are in the right places.
 
 Now run <code>gnssir</code> for these same dates. This computes RH for each rising and setting satellite arc:
 
-<code>gnssir vlis 2022 171 -doy_end 184 </code>
+<code>gnssir vlis 2022 171 -doy_end 184 -newarcs T</code>
 
 To put those results all together:
 

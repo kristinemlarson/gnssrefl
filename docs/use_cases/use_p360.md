@@ -2,7 +2,7 @@
 
 [Warning](warning.md)
 
-**Use Case Updated on January 23, 2023**
+**Use Case Updated on June 4, 2023 for gnssir_input**
 
 <HR>
   
@@ -84,9 +84,9 @@ north. This is confirmed in the QC plot show here:
 First we will set the analysis paramaters 
 using <code>make_json_input</code>. This analysis will use the L2C frequency and 
 will use QC metrics derived from the previous plot (for peak to noise ratio and amplitude).  
-We don't want to use the northeast quadrant, so will use -azlist 90 180 180 270 270 360:
+We don't want to use the northeast quadrant, so will use -azlist2 definition:
 
-<code>make_json_input p360 44.31785 -111.45068 1857.861 -l2c True -peak2noise 3.2 -ampl 8 -azlist 90 180 180 270 270 360</code>
+<code>gnssir_input p360 -l2c True -peak2noise 3.2 -ampl 8 -azlist2 90 360</code>
 
 [Sample json file](p360.json)
 
@@ -101,7 +101,7 @@ SNR files are stored in $REFL_CODE/$year/snr/p360, where $year = 2017 or 2018.
 Then we run <code>gnssir</code> to calculate the reflector heights for 2017/2018. Because the code
 only creates results if the SNR file exists, we can use the year_end and doy_end settings.
 
-<code>gnssir p360 2017 1 -year_end 2018 -doy_end 366</code>
+<code>gnssir p360 2017 1 -year_end 2018 -doy_end 366 -newarcs T</code>
 
 ## Derive Snow Accumulation from Reflector Heights
 

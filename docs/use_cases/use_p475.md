@@ -43,21 +43,17 @@ easy up on the number of good arcs the code will expect to see.
 
 <code>rinex2snr p475 2020 1 -year_end 2022 -doy_end 254 -archive unavco </code>
 
-The analysis parameters are set up with <code>make_json_input</code>. While ordinarily you need to input 
-the station latitude, longitude, and ellipsoidal height for this code, if the station is in the <code>gnssrefl</code> database, you can 
-put zero values there instead. We only need the L2C data, so have set the parameter accordingly.
+The analysis parameters are set up with <code>gnssir_input</code>. 
+We only need the L2C data, so have set the parameter accordingly.
+The azlist2 input emphasizes the good reflection area. 
 
-<code>make_json_input p475 0 0 0 -l2c true -azlist 140 180 170 270</code>
+<code>gnssir_input p475 -l2c T -azlist2 140 270</code>
 
-The azlist input emphasizes the good reflection area. I chose 140 to 270. I split it into two regions,
-one from 140-180 and the other from 170 to 270. There is a little overlap 
-in the regions (to the south) so that I don't lose 
-any tracks. For sites that have more tracks, I don't usually bother with this. 
 
 Now we run <code>gnssir</code>. This will be needed for estimate *a priori* reflector heights for the soil moisture code.
+The newarcs setting chooses the new way of selecting satellite arcs.
 
-<code>gnssir p475 2020 1 -year_end 2022 -doy_end 254 </code>
-
+<code>gnssir p475 2020 1 -year_end 2022 -doy_end 254 -newarcs T</code>
 
 #### Step 2: Soil Moisture
 

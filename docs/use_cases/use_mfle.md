@@ -1,5 +1,7 @@
 ### Marshall, Colorado, USA
 
+**Updated June 4, 2023 to use gnssir_input**
+
 [Warning](warning.md)
 
 <p align="center">
@@ -58,9 +60,8 @@ to convince the software that the result should be kept:
 
 Your first task is to set an analysis strategy using <code>make_json_input</code>.
 Let's use the defaults, but ask for only the L2C data since this is for soil moisture.
-If your site is known to our database, you can enter 0 0 0 for the expected latitude, longitude, and height.
 
-<code>make_json_input mfle 0 0 0 -l2c T</code>
+<code>gnssir_input mfle -l2c T</code>
 
 Then you need to make more SNR files: 
 
@@ -71,7 +72,7 @@ However, please feel free to only look at one year of data if you have issues wi
 
 Then you need to estimate reflector heights:
 
-<code>gnssir mfle 2016 1 -year_end 2019 -doy_end 366 </code>
+<code>gnssir mfle 2016 1 -year_end 2019 -doy_end 366 -newarcs T</code>
 
 Before we look at soil moisture, let's get an idea of how often it snowed at this site:
 

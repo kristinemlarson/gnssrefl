@@ -58,7 +58,10 @@ These are summarized below.
 
 <img src=../_static/tggo_ql2.png width=600>
 
-All three plots are with respect to azimuth in degrees. On the top plot, the "blue" retrievals show that the GNSS antenna is indeed ~12 meters above the water. The variation in reflector height (with respect to azimuth) are the tides. I've outlined in red the azimuth region that shows consistently rejected retrievals. This roughly corresponds to where we saw the pier in the photograph.  
+All three plots are with respect to azimuth in degrees. On the top plot, the "blue" retrievals show 
+that the GNSS antenna is indeed ~12 meters above the water. The variation in reflector 
+height (with respect to azimuth) are the tides. I've outlined in red the azimuth 
+region that shows consistently rejected retrievals. This roughly corresponds to where we saw the pier in the photograph.  
 
 ### Analyze the data
 
@@ -66,15 +69,13 @@ Go back and make SNR files for a longer time period:
 
 <code>rinex2snr tggo00deu 2022 226 -doy_end 240 -archive bfg -orb rapid -samplerate 15</code>
 
-The next step is to write down your analyis strategy using <code>make_json_input</code>. Since tggo is 
-included in our global database, you can simply use 0,0,0 for the required *a priori* station coordinates:
-I am using a slightly smaller reflector height zone than I used with <code>quickLook</code>.
+The next step is to save your analyis strategy using <code>gnssir_input</code>. 
 
-<code>make_json_input tggo 0 0 0 -h1 6 -h2 20 -e1 5 -e2 15 -h1 6 -h2 18 -allfreq T -azlist 30 90 90 180 270 330 </code>
+<code>gnssir_input tggo  -h1 6 -h2 20 -e1 5 -e2 15 -h1 6 -h2 18 -allfreq T -azlist2 30 180 270 330 </code>
 
 Now estimate reflector heights for these same dates: 
 
-<code>gnssir tggo 2022 226 -doy_end 240 </code>
+<code>gnssir tggo 2022 226 -doy_end 240 -newarcs T </code>
 
 To put those results all together:
 

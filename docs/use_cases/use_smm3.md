@@ -2,11 +2,10 @@
 
 [Warning](warning.md)
 
-**Updated January 21, 2023**
+**Updated June 4 2023 to use gnssir_input**
 
 Fixed azimuth region and frequency selection.
 Noted issues with Galileo data.
-
 
 Please note: this use case was originally written in late 2020. The dataset has been updated since that time.
 Sometimes Galileo is tracked; sometimes it is not tracked. There has also been an equipment
@@ -121,28 +120,22 @@ Now L5 data:
 
 ### Steps for Longer Analysis: 
 
-Use **make_json_input** to set your analysis inputs. Instead of the defaults, set the special height and 
+Use **gnssir_input** to set your analysis inputs. Instead of the defaults, set the special height and 
 elevation angles, peak to noise ratio to 3.5, and minimum amplitude to 15. 
 
 Setting the azimuth region is a little more complicated. I have been told that the "quiet" region for scientific 
-measurements spans 70 to 270 degrees.  The code requires that your azimuth region be no longer than 100 degrees.
-So what you want to do is input three regions that are smaller than that, i.e. 70 120 120 180 180 270.
-
+measurements spans 70 to 270 degrees.  
 
 I used to encourage people to use the allfreq selection when they have a multi-GNSS receiver. This can be complicated. 
 
 - for sites taller than 6 meters, DO NOT USE frequency 208
 - if you don't have Beidou data, there is no reason to set allfreq to true
 
-For this site, I would suggest this frequency list: 1 20 5 101 102 201 205 206 207
-
-
-<code>make_json_input smm3 72.573 -38.470  3252.453 -peak2noise 3.5 -frlist 1 20 5 101 102 201 205 206 207 -ampl 15 -e1 5 -e2 15 -h1 8 -h2 20 -azlist 70 120 120 180 180 270</code>
+<code>gnssir_input smm3 -peak2noise 3.5 -frlist 1 20 5 101 102  -ampl 15 -e1 5 -e2 15 -h1 8 -h2 20 -azlist2 70 270</code>
 
 To keep the reflection zones quite large - I only opted to only use data from 5-15 degree 
-elevation angles. This will make the amplitudes of the peaks 
-in the periodogram larger. I also removed the Galileo signals from the json since they are not 
-in the RINEX files I am using. [Sample json](smm3.json)
+elevation angles. This will make the amplitudes of the peaks in the periodogram larger. I removed the Galileo 
+signals from the json since they are not in the RINEX files I am using. 
 
 Then make SNR files for ~6 months:
 
@@ -150,7 +143,7 @@ Then make SNR files for ~6 months:
 
 Estimate reflector height:
 
-<code>gnssir smm3 2018 180 -doy_end 365 </code>
+<code>gnssir smm3 2018 180 -doy_end 365 -newarcs T</code>
 
 Compute daily average of these results:
 
