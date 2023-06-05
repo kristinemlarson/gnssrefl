@@ -184,6 +184,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                         goahead = False
 
                 if goahead:
+                    found_results = True
                     # instead of az bins now go through each arc 
                     for a in range(0,nr):
                         sind = int(arclist[a,0]) ; eind = int(arclist[a,1])
