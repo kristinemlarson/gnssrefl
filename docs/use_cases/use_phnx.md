@@ -102,7 +102,7 @@ This command will go from day 1 in 2019 to day 150 in the year 2021.
 
 Run the <code>gnssir</code>:
 
-<code>gnssir phnx 2020 1 -year_end 2021 -doy_end 150</code>
+<code>gnssir phnx 2020 1 -year_end 2021 -doy_end 150 -newarcs T</code>
 
 It takes a couple seconds to run <code>gnssir</code> for one day of data - so you will have to wait 
 five minutes or so for two and a half years of data to run. At that point you want to compute a daily 

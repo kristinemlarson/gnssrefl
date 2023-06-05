@@ -5,6 +5,8 @@
 [Warning](warning.md)
 
 I have added the use of <code>gnss_input</code>. This requires -newarcs T when running <code>gnssir</code>
+
+**at01 is the only tide gauge in this region of Alaska.** 
   
 <p align="center">
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">
@@ -32,9 +34,10 @@ I have added the use of <code>gnss_input</code>. This requires -newarcs T when r
 
 ### Data Summary
 
-**at01 is the only tide gauge in this region of Alaska.** 
-
-at01 observes all constellation signals and high-rate data are available. There is good visibility over a large azimuthal region. The monument is about a meter taller than normal geodetic monuments to improve visibility of the sea surface.  From the [geoid app](http://gnss-reflections.org/geoid?station=at01&lat=0.0&lon=0.0&height=0.0) you can see the general location of the antenna with respect to the coast. You will also note that it is at ~12 meters above sea level.
+at01 observes all constellation signals and high-rate data are available. There is good visibility over a large azimuthal 
+region. The monument is about a meter taller than normal geodetic monuments to 
+improve visibility of the sea surface.  From the [geoid app](http://gnss-reflections.org/geoid?station=at01&lat=0.0&lon=0.0&height=0.0) you can see 
+the general location of the antenna with respect to the coast. You will also note that it is at ~12 meters above sea level.
 
 <p align=center>
 <img src=../_static/geoid-at01.png width=400>
@@ -97,9 +100,9 @@ Next we analyze data for two months in the fall of 2020. First make the SNR file
 Now set up the analysis instructions (assume database receiver coordinates are correct)
 using our new utility:
 
-<code>gnssir_input at01 -h1 8 -h2 15 -e1 5 -e2 13 -ampl 4 -allfreq 1 20 5 101 102 201 205 206 207 -azlist 20 220</code>
+<code>gnssir_input at01 -h1 8 -h2 15 -e1 5 -e2 13 -ampl 4 -allfreq 1 20 5 101 102 201 205 206 207 -azlist2 20 220</code>
 
-Next estimate reflector height (RH) for the two month time period:
+Next estimate reflector height (RH) for the two month time period (newarcs is to make sure you use the new azimuth capability):
 
 <code>gnssir at01 2020 230 -doy_end 290 -newarcs T </code>
 

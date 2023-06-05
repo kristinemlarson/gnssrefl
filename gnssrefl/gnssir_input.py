@@ -55,7 +55,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
-    a json file which by default is saved in REFL_CODE/<station>.json.
+    to a json file which by default is saved in REFL_CODE/<station>.json. This code is meant to be a replacement
+    for make_json_input.
 
     This version no longer requires you to have azimuth regions of 90-100 degrees. You can set a single set of 
     azimuths in the command line variable azlist2, i.e. -azlist2 0 270 would accommodate all rising and setting arcs 
@@ -68,6 +69,10 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     Latitude, longitude, and height are assumed to be stored in the UNR database.  If they are not, you should
     set them manually.
+
+    You MUST set -newarcs T when running gnssir to use this new way of selecting rising and setting arcs.
+    This allows people to use the old code and the new code, and in principle, the same json file.
+    Once the dust has settled, I'll make this way the default.
 
     Examples
     --------
@@ -84,9 +89,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     gnssir_input p041  -h1 0.5 -h2 10 -e1 5 -e2 25
         uses UNR database, only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
 
-    gnssir_input p041 -ediff 2
+    gnssir_input p041 -ediff 1
         uses UNR database, only GPS data, default station coordinates, enforces elevation angles to be 
-        within 2 degrees of default limits (5-25)
+        within 1 degrees of default elevation angle limits (5-25)
 
     Parameters
     ----------

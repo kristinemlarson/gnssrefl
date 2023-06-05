@@ -4,34 +4,35 @@ We have changed how arcs are selected. We now recommend the following procedure.
 
 ## gnssir_input
 
+[A full listing of the possible inputs and examples for gnssir_input can be found here.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
 
-If the station is in our database:
+Your first task is to define your analysis strategy. If the station location is in our database:
 
 <CODE>gnssir_input p101</CODE>
 
+If you have your own site, you should use -lat, -lon, -height as inputs.  
 If you happen to have the Cartesian coordinates (in meters), you can 
-set <code>-xyz True</code> and input those instead of lat, long, and height.
+set <code>-xyz True</code> and input those instead.
 
 
-[A full listing of the possible inputs and examples for gnssir_input can be found here.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
-
-The json file of instructions will be put in $REFL_CODE/input/p101.json. 
+The json file of instructions will be stored in $REFL_CODE/input/p101.json. 
 
 The default azimuth inputs are from 0 to 360 degrees.
 You can set your preferred azimuth regions using -azlist2. Previously you were required to use multiple
-azimuth regions < 100 degrees. That is no longer required. However, if you do need multiple distinct regions, that is allowed.
-
+azimuth regions, none of which could be larger than 100 degrees. That is no longer required. However, if 
+you do need multiple distinct regions, that is allowed, e.g.
 
 <CODE>gnssir_input p101  -azlist2 0 90 180 270</CODE>
 
-If you wanted all southern quadrants:
+If you wanted all southern quadrants, since these are contiguous, you just need to give the starting and ending 
+azimuth.
 
 <CODE>gnssir_input p101  -azlist2 90 270</CODE>
 
-We try to enforce homogenous track lengths by using a quality control factor called *ediff*. Its 
-default value is 2 degrees, which means your arc should be within 2 degrees of the requested elevation angle inputs.
-So if you ask for 5 and 25 degrees, your arcs should at least be from 7 to 23 degrees.  To tell 
-<code>gnssir</code> you want to allow more arcs, just set ediff to a much larger value.
+You should also set the prefrred reflector height region (h1 and h2) and elevation angle mask (e1 and e2).
+Note: the reflector height region should not be too small, as it is also used to set the region for your periodogram.
+If you use tiny RH constraints, your periodogram will not make any sense and your work will fail the quality control metrics.
+
 
 [The old way of setting the strategy, using make_json_input](old_way.md)
 
@@ -40,7 +41,6 @@ So if you ask for 5 and 25 degrees, your arcs should at least be from 7 to 23 de
 <code>gnssir</code> estimates reflector heights. It assumes you have made SNR files and defined an analysis strategy.
 The minimum inputs are the station name, year, and doy. 
  
-
 New - recommended - protocol:
 
 <CODE>gnssir p041 2020 150 -newarcs T</CODE> 
@@ -50,8 +50,8 @@ Old protocol:
 <CODE>gnssir p041 2020 150 </CODE> 
 
 **Warning: eventually the newarc method will become the default.**  I am allowing both to exist for a while so that 
-users aren't faced with non-working analysis strategies.  The azimuth limits have different names so that you can
-have a single json file.
+users aren't faced with non-working analysis strategies.  The azimuth limits have different variable names so that you can
+store them in a single json file.
 
 [Additional inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html)
 
@@ -61,12 +61,12 @@ Where would the code store the files for this example?
 - SNR files are stored in $REFL_CODE/2020/snr/p041
 - Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041/150.txt
 
-For more information, set **-screenstats T**
+For more information about the decisions made in <code>gnssir</code>, set **-screenstats T**
 
 For plots, set -plt to T or True. 
 
 If you want to try different strategies, use multiple json files with the -extension input. Then use the same -extension command
-in gnssir.
+in <code>gnssir</code>.
 
 This is a snippet of what the result file would look like
 
@@ -86,5 +86,9 @@ Note that the names of the columns (and units) are provided:
 - EdotF is used in the RHdot correction needed for dynamic sea level sites. The units are hours/rad.
 When multiplied by RHdot (meters/hour), you will get a correction in units of meters. For further
 information, see the <code>subdaily</code> code.
+- ediff QC metric
 
-
+Warning: We try to enforce homogenous track lengths by using a quality control factor called *ediff*. Its 
+default value is 2 degrees, which means your arc should be within 2 degrees of the requested elevation angle inputs.
+So if you ask for 5 and 25 degrees, your arcs should at least be from 7 to 23 degrees.  To tell 
+<code>gnssir</code> you want to allow smaller arcs, just set ediff to a much larger value.

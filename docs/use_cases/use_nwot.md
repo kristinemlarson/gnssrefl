@@ -79,19 +79,14 @@ the failed tracks in the gray that I have circled.
 
 ### Make multiple years of SNR files 
 
-We are going to look at the data from installation (Fall 2009) through Spring 2015. To speed things
-up I will run 2009 and 2015 separately, while the year 2010 through 2014 can be analyzed in 
-one line:
+We are going to look at the data from installation (Fall 2009) through Spring 2015 :
 
-<code>rinex2snr nwot 2009 240 -doy_end 365 -archive special</code>
+<code>rinex2snr nwot 2009 240 -year_end 2015 -doy_end 120 -archive special</code>
 
-<code>rinex2snr nwot 2010 1 -doy_end 366 -archive special -year_end 2014</code>
-
-<code>rinex2snr nwot 2015 1 -doy_end 120 -archive special</code>
 
 ### Run gnssir for multiple years
 
-Make a json file for your <code>gnssir</code> analysis:
+Save your <code>gnssir</code> analysis strategy:
 
 <code>gnssir_input nwot -e1 7 -e2 25 -peak2noise 3.2 -azlist2 90 270 -frlist 1 20 </code>
 
@@ -101,7 +96,7 @@ angle of 7 degrees because this particular receiver had a limit on the number of
 could track. In some cases this meant the low elevation data are not available and that triggers 
 QC restrictions. 
 
-Once you have a json file set up, run <code>gnssir</code> for the years 2009-2015:
+Once you have a strategy set up, run <code>gnssir</code> for the years 2009-2015:
 
 <code>gnssir nwot 2009 1 -doy_end 366 -year_end 2015 -newarcs T</code>
 
