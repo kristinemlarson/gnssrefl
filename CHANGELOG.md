@@ -3,8 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## 1.3.16
+## 1.3.17
 
+New version of quickLook.  Uses a better algorithm for extracting rising and setting arcs.
+Should be transparent to the user - but let me know.
+
+## 1.3.16
 
 delTmax allowed as input to quickLook
 

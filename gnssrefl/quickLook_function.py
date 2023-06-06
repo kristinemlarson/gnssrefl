@@ -128,10 +128,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     else:
         if True:
             obsfile, obsfileCmp, snre =  g.define_and_xz_snr(station,year,doy,snr_type)
-            if snre:
-                dkfjaklj = True
-            else:
-                print('>>>> The SNR the file needs does not exist ',obsfile)
+            if not snre:
+                print('>>>> The SNR file this code needs does not exist ',obsfile)
                 print('Please use rinex2snr to make a SNR file')
                 sys.exit()
     allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = read_snr_simple(obsfile)
@@ -190,11 +188,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
             # this means no satellite list was given, so get them all
             if satsel == None:
-                #satlist = g.find_satlist(f,snrE)
-                #march 29, 2021 made l2c and l5 time dependent
                 satlist = g.find_satlist_wdate(f,snrE,year,doy)
-                #print(f,year,doy)
-                #print(satlist)
             else:
                 satlist = [satsel]
 

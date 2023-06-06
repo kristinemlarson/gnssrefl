@@ -8,6 +8,7 @@ import sys
 # internal codes
 import gnssrefl.gps as g
 import gnssrefl.quickLook_function as quick
+import gnssrefl.quickLook_function2 as quick2
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
 
@@ -48,7 +49,7 @@ def quicklook(station: str, year: int, doy: int,
               snr: int = 66, fr: int = 1, ampl: float = 7.,
               e1: int = 5, e2: int = 25, h1: float = 0.5, h2: float = 8., sat: int = None,
               peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
-              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, delTmax : float=75.0):
+              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, delTmax : float=75.0 ):
     """
 
     quickLook assessment of SNR reflectometry data. It creates two plots: one with periodograms for
@@ -182,7 +183,11 @@ def quicklook(station: str, year: int, doy: int,
         print('The reflector height region must be at least 5.5 meters long. These values are used for computing ')
         print('a valid periodogram and for quality control.  Change h1 or h2 or both. Exiting')
         sys.exit()
-    return quick.quickLook_function(**args)
+
+    if True:
+        return quick2.quickLook_function(**args)
+#    else:
+#        return quick.quickLook_function(**args)
     # returns two variables: data, datakey = quick.quicklook_function(**args)
 
     # the key is saved wth the same keys as the data dictionary, in this order 
