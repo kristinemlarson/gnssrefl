@@ -57,6 +57,8 @@ This will generate a SNR file at a sampling rate of 15 seconds. One second data 
 If you use the default settings with <code>quickLook</code> you will mistakenly think it is not a useful site. Nearly
 every single retrieval is set as bad (i.e. it is gray rather than blue):
 
+<code>quickLook  at01 2020 109</code>
+
 <img src=../_static/at01_default_qc.png width=600>		
 
 Remember that the site is 12 meters above sea level and the default restricts the reflector height
