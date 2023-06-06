@@ -1,5 +1,8 @@
 # quickLook 
 
+Note: this was updated June 6, 2023 to use a better way of picking rising and setting arcs.
+It also reflects the defaults in the code on that date.
+
 <CODE>quickLook</code> is meant to provide the user with a visual sense of the data 
 at a given site.  It has stored defaults that work for stations with reflectors that are 
 lower than 8 meters or so. [You can change those defaults on the command line.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html). When we made these plots, the default maximum RH was 6 meters. That is why the plots shown below end at 6 meters.

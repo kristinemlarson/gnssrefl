@@ -2,6 +2,8 @@
 
 **github version: 1.3.17** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
+We have updated the way the code chooses satellite arcs.
+
 Our documentation is now available [here.](https://gnssrefl.readthedocs.io/en/latest/)
 
 If you want to sign up for the GNSS-IR email list, please contact Kristine Larson.
