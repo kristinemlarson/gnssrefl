@@ -74,6 +74,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     This allows people to use the old code and the new code, and in principle, the same json file.
     Once the dust has settled, I'll make this way the default.
 
+    Example of a json file that has both the old and new ways. The arrays within the json file are called azval and azval2.
+        https://morefunwithgps.com/public_html/sc02.json
+
     Examples
     --------
     gnssir_input p041 

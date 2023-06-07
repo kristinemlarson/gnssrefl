@@ -1,10 +1,8 @@
 ### St Michael Bay
 
-**Use Case Updated June 4, 2023**
+**2023 June 6, I am still working to update this use case with the new code."
 
 [Warning](warning.md)
-
-I have added the use of <code>gnss_input</code>. This requires -newarcs T when running <code>gnssir</code>
 
 **at01 is the only tide gauge in this region of Alaska.** 
   
@@ -100,9 +98,9 @@ Next we analyze data for two months in the fall of 2020. First make the SNR file
 <code>rinex2snr at01 2020 230 -archive unavco -doy_end 290</code>
 
 Now set up the analysis instructions (assume database receiver coordinates are correct)
-using our new utility:
+using our new utility (extending h2 a bit):
 
-<code>gnssir_input at01 -h1 8 -h2 15 -e1 5 -e2 13 -ampl 4 -allfreq 1 20 5 101 102 201 205 206 207 -azlist2 20 220</code>
+<code>gnssir_input at01 -h1 8 -h2 17 -e1 5 -e2 13 -ampl 4 -allfreq 1 20 5 101 102 201 205 206 207 -azlist2 20 220</code>
 
 Next estimate reflector height (RH) for the two month time period (newarcs is to make sure you use the new azimuth capability):
 
@@ -116,11 +114,13 @@ version of the code and should be updated.
 
 The code concatenates the daily RH files for this period:
 
-<img src=../_static/at01_raw.png width=600>
-
 You can see that there are a very large number of RH retrievals per day:
 
 <img src=../_static/at01_Subnvals.png  width=600>
+
+There are a few outliers - so I run again and set h1 to 7 on the command line.
+
+<code>subdaily at01 2020 -doy1 230 -doy2 290 -h1 7</code>
 
 This preliminary version of the code removes outliers and makes an effort 
 to compute the RH dot correction if <code>rhdot</code> is set to true. It  uses a cubic 
