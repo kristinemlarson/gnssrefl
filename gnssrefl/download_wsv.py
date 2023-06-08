@@ -56,6 +56,9 @@ def download_wsv(station: str, plt: bool = True, output: str = None):
     data = requests.get(newurl).json()
 
     N= len(data)
+    if (N <= 2) :
+        print(data)
+        sys.exit()
     thetime = []; sealevel = [] ; obstimes = [] ; pt = 0
     if output is None:
         # use default
