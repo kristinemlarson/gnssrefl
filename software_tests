@@ -37,7 +37,7 @@ gunzip BEUL0050.23.A.gz
 mv BEUL0050.23.A $REFL_CODE/nmea/BEUL/2023
 
 nmea2snr BEUL 2023 5 -dec 5 -overwrite  T
-nmea2snr BEUL 2023 5 -dec 5 -overwrite  T -lat 50.038894 -lon 8.198476 -height 105.0 -myway T
+nmea2snr BEUL 2023 5 -dec 5 -overwrite  T -lat 50.038894 -lon 8.198476 -height 105.0 -sp3 T
 
 
 rinex2snr p103 2020 105 -doy_end 109   -archive sopac
