@@ -47,9 +47,9 @@ def main():
         longitude, deg, only required for myway option
     height: float, optional
         height, m, only required for myway option
-    myway : bool
+    sp3 : bool
         rather than interpolated low quality NMEA values, it 
-        uses multi-GNSS SP3 file for azimuth and elevation angle computations
+        uses multi-GNSS SP3 file from the GFZ for azimuth and elevation angle computations
 
     """
     
@@ -66,7 +66,7 @@ def main():
     parser.add_argument("-lat", default=None, help="latitude, degrees", type=float)
     parser.add_argument("-lon", default=None, help="longitude, degrees", type=float)
     parser.add_argument("-height", default=None, help="ellipsoid height,m", type=float)
-    parser.add_argument("-myway", default=None, help="boolean", type=str)
+    parser.add_argument("-sp3", default=None, help="boolean for whether sp3 orbits are used", type=str)
 
     args = parser.parse_args()
 
@@ -107,9 +107,9 @@ def main():
     dec = 1
     if (args.dec is not None):
         dec = args.dec
-    myway = False
-    if (args.myway is not None):
-        myway = True
+    sp3 = False
+    if (args.sp3 is not None):
+        sp3 = True
 
     # for now set to zero as Makan's code does not need LLH
     lat = 0; lon = 0; height = 0;
@@ -120,7 +120,7 @@ def main():
     if args.height is not None:
         height = args.height
     llh = [lat,lon,height]    
-    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,myway)
+    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,sp3)
 
 if __name__ == "__main__":
     main()

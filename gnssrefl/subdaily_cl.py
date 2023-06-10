@@ -58,8 +58,19 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0):
     """
-    subdaily combines multiple day gnssir solutions and applies relevant corrections. 
-    It works on one year at a time; you can restricts time periods within a year with -doy1 and -doy2
+    Subdaily combines multiple day gnssir solutions and applies relevant corrections. 
+    It only works for one year at a time; you can restricts time periods within a year with -doy1 and -doy2
+
+    WARNING: this code is meant to be used at sites with tidal signals. If you have a site without it, you 
+    should probably use daily_avg instead. If you insist on using this code on such sites (rivers and lakes),
+    you should think about how this code is implemented - it is using splines with 8 knots as the default 
+    (i.e. knot every three hours).  This is very unlikely to be acceptable for a lake or non-tidal river.
+    You should change the knot setting.
+
+    WARNING: this code calculates and applies various corrections. New Reflector Height values are added 
+    to the output files as new columns. If you run the code but continue to assume the "good answers" are
+    in column 2, you are essentially not using the code at all.
+
 
     Examples
     --------

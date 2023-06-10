@@ -212,11 +212,11 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     # 
     write_IF_corrected = False
     if len(newRH_IF) > 0:
-        print('IF corrected values being written')
+        print('IF corrected values being written - make sure you use the correct column!')
         write_IF_corrected = True
     extra = False
     if len(RHdot_corr) > 0:
-        print('RH corrected values being written')
+        print('RHdot corrected values being written - make sure you use the correct column')
         extra = True
 
     N= len(ntv)

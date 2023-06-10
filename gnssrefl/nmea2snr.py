@@ -12,7 +12,7 @@ import gnssrefl.decipher_argt as gt
 
 #Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
 
-def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
+def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
     """
     Reads and translates the NMEA file stored in locdir + fname
 
@@ -42,8 +42,9 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
         day of year
     llh : list of floats
         station location, lat (d), lon(d), height (m)
-    myway : bool
-        whether you use my code to do azimuth elevation angle calculations
+    sp3 : bool
+        whether you use multi-GNSS sp3 file to do azimuth elevation angle calculations
+        currently this only uses the GFZ rapid orbit.  
         
     """
     
@@ -59,7 +60,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
         recv = [x,y,z]
         foundcoords = True
 
-    if myway and (not foundcoords):
+    if sp3 and (not foundcoords):
         # try to get the LLH from json file
         jfile  = os.environ['REFL_CODE'] + '/input/' + station + '.json'
         if os.path.isfile(jfile):
@@ -74,7 +75,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
             print('This code requires lat/lon/ht inputs. Exiting')
             return
 
-    if myway:
+    if sp3:
         xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
         if not foundit: 
             print('Could not find the rapid orbits. Exiting')
@@ -153,7 +154,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,myway):
         
         del  time, angle, azimuth, Snr, Prn, angle_fixed, azim_fixed, frequency
         
-    if myway:
+    if sp3:
         tmpfile =  station + 'tmp.txt'
         #print('Opening temporary file : ', tmpfile)
         fout = open(tmpfile, 'w+')
@@ -657,7 +658,7 @@ def elev_limits(snroption):
 
     return emin, emax
   
-def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,myway):
+def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,sp3):
     """
     runs the nmea2snr conversion code
 
@@ -688,8 +689,8 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,myway):
         decimation in seconds
     llh : list of floats
         lat and lon (deg) and ellipsoidal ht (m)
-    myway : bool
-        whether you want to use my code for the orbits
+    sp3 : bool
+        whether you want to use GFZ rapid sp3 file for the orbits
 
     """
     # loop over years and day of years
@@ -718,7 +719,7 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,myway):
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
                     #print('Creating '+snrfile)
-                    NMEA2SNR(locdir, r, snrfile, csnr,dec,yr,dy,llh,myway)
+                    NMEA2SNR(locdir, r, snrfile, csnr,dec,yr,dy,llh,sp3)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
                 else:
