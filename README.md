@@ -2,7 +2,10 @@
 
 **github version: 1.3.17** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
-We have updated the way the code chooses satellite arcs.
+We have improved the way the code chooses rising and setting satellite arcs. 
+Please use the <code>gnssir_input</code> instead of <code>make_json_input</code> when setting an analysis 
+strategy, and <code>-newarcs T</code> when 
+running <code>gnssir</code>. If you prefer to use the old way, it should continue to work.
 
 Our documentation is now available [here.](https://gnssrefl.readthedocs.io/en/latest/)
 
