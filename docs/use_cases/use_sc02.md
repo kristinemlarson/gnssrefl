@@ -62,7 +62,7 @@ Translate the GPS data for January 15 2021. First you need to make the SNR file:
 
 <code>rinex2snr sc02 2021 15</code>
 
-Use our utility <code>uickLook</code> with defaults [(For more details on quickLook output)](../pages/quickLook.md):
+Use our utility <code>quickLook</code> with defaults [(For more details on quickLook output)](../pages/quickLook.md):
 
 <code>quickLook sc02 2021 15 </code>
 
@@ -118,10 +118,7 @@ by concatenating the daily results and applying a sigma outlier criterion . The 
 
 <img src="../_static/raw_sc02.png"	width=600>
 
-The output is stored in a plain text or csv file. This code will 
-also apply the RH dot correction, but you have to 
-request it (<code>-rhdot T</code>). The spline_outlier optional input (in meters) 
-is only used in the rhdot section of the code.
+The output is stored in a plain text or csv file. This code will also apply the RH dot correction. 
 
 Below are shown the initial solutions with a spline fit and outliers identified.
 Note: These figures were generated from an earlier version of the code, and should be 

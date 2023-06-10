@@ -31,10 +31,13 @@ Because the GNSS station is ~12 meters above the water, we are too close to the 
 for a receiver that is sampling at 30 seconds.  **I strongly urge you to use the 15 second files** that BFG started 
 producing in summer 2022. If you use the 30 second files, some of your solutions will be inaccurate. Make the following choices:
 
-- station tggo00deu (the longer station name will tell the code to find RINEX 3 instead of RINEX 2.11)
-- archive bfg
-- orb rapid (you can also use gnss if you prefer)
-- samplerate 15
+station : tggo00deu (the longer station name will tell the code to find RINEX 3 instead of RINEX 2.11)
+
+archive : bfg
+
+orb : rapid (you can also use gnss if you prefer)
+
+samplerate : 15 (this is VERY IMPORTANT!!!!)
 
 <code>rinex2snr tggo00deu 2022 234 -archive bfg -orb rapid -samplerate 15</code>
 
@@ -123,6 +126,7 @@ The statistics for the fits are then printed to the screen. In this case, withou
 the RHdot correction, the standard deviation of each RH value is 27.3 cm.
 WIth the RHdot correction it is 21.5 cm, so a significant improvement. Note that
 this is relative to the spline fit (i.e. it is not accuracy) and without correcting for phase center offsets.
+In comparisons with a tide gauge, the RMS is a bit better, 16-17 cm.  
 
 <img src=../_static/tggo_new.png width=600>
 

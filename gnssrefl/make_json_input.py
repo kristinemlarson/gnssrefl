@@ -56,7 +56,9 @@ def make_json(station: str, lat: float, long: float, height: float, e1: int = 5,
               frlist: float=[]):
 
     """
-    Saves the lomb scargle analysis strategy you will use in gnssrefl. Store in 
+    WE NO LONGER RECOMEND USING THIS CODE. Please see the gnssir_input.py code instead.
+
+    This code saves the Lomb Scargle analysis strategy you will use in gnssrefl. Store in 
     a json file which by default is saved in REFL_CODE/<station>.json.
 
     Examples
