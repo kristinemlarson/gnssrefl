@@ -62,8 +62,17 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
 
     if sp3 and (not foundcoords):
         # try to get the LLH from json file
-        jfile  = os.environ['REFL_CODE'] + '/input/' + station + '.json'
-        if os.path.isfile(jfile):
+        jfile1  = os.environ['REFL_CODE'] + '/input/' + station.upper() + '.json'
+        jfile2  = os.environ['REFL_CODE'] + '/input/' + station.lower() + '.json'
+        fexists = False
+        if os.path.isfile(jfile1):
+            jfile = jfile1 ; fexists = True
+            print('json file found ',jfile1)
+        elif os.path.isfile(jfile2):
+            jfile = jfile2 ; fexists = True
+            print('json file found ',jfile2)
+
+        if fexists:
             with open(jfile, 'r') as my_json:
                 fcont = json.load(my_json)
 
@@ -72,7 +81,8 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
             recv = [x,y,z]
             foundcoords = True
         else:
-            print('This code requires lat/lon/ht inputs. Exiting')
+            print('This code requires lat/lon/ht inputs. Provide on the command line or')
+            print('make a json file using gnssir_input.  Exiting')
             return
 
     if sp3:

@@ -26,6 +26,11 @@ def main():
 
     As far as I can tell, the necessary fields in the NMEA files are GPGGA and GPGSV.
 
+    The default orbits are interpolations of the az and el NMEA fields. You can override this with -sp3 T 
+    and it will use the multi-GNSS sp3 file from GFZ. If you use the -sp3 option, the code needs to 
+    know the a priori station coordinates.  You can submit those on the command line or it will read 
+    them from the $REFL_CODE/input/ssss.json file (for station ssss) if it exists.
+
 
     Parameters
     ----------
@@ -42,12 +47,12 @@ def main():
     dec : int, optional
         decimation in seconds
     lat: float, optional
-        latitude, deg, only required for myway option
+        latitude, deg, only required for sp3 option
     lon: float, optional
-        longitude, deg, only required for myway option
+        longitude, deg, only required for sp3 option
     height: float, optional
-        height, m, only required for myway option
-    sp3 : bool
+        height, m, only required for sp3 option
+    sp3 : bool, optional
         rather than interpolated low quality NMEA values, it 
         uses multi-GNSS SP3 file from the GFZ for azimuth and elevation angle computations
 
