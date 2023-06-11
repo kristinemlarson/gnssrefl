@@ -4761,7 +4761,7 @@ def get_noaa_obstimes(t):
     # year mon day hour min sealevel doy mjd seconds
     if nr > 0:
         for i in range(0,nr):
-            dtime = datetime.datetime(year=int(t[i,0]), month=int(t[i,1]), day=int(t[i,2]), hour=int(t[i,3]), minute=int(t[i,4]), second=int(t[i,8]) )
+            dtime = datetime.datetime(year=int(t[i,0]), month=int(t[i,1]), day=int(t[i,2]), hour=int(t[i,3]), minute=int(t[i,4]), second=int(t[i,5]) )
             obstimes.append(dtime)
     else:
         print('you sent me an empty variable')
