@@ -634,7 +634,7 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     e2 : float
         max elev angle (deg)
     azlist : list of floats (deg)
-        non-continguous azimuth regions, correted for negative regions
+        non-continguous azimuth regions, corrected for negative regions
     screenstats : bool
         whether you want debugging information
 
@@ -734,20 +734,31 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     
     # now calculate edot factor
     if good:
-        dd = np.diff(seconds)
-#       edot, in radians/sec
-        model = np.polyfit(seconds,x*np.pi/180,1)
-        avgEdot_fit = model[0]
-        avgAzim = np.mean(azm)
-        meanTime = np.mean(seconds)/3600
-#  delta Time in minutes
-        delT = (np.max(seconds) - np.min(seconds))/60
-# average tan(elev)
-        cunit =np.mean(np.tan(np.pi*x/180))
-#       return tan(e)/edot, in units of one over (radians/hour) now. used for RHdot correction
-#       so when multiplyed by RHdot - which would be meters/hours ===>>> you will get a meter correction
-
-        outFact2 = cunit/(avgEdot_fit*3600)
+        if len(x) > 0:
+            #Taylor Smith - Chasing down error:
+            #...site-packages/gnssrefl/gnssir_v2.py", line 741, in window_new
+                #model = np.polyfit(seconds,x*np.pi/180,1)
+                #TypeError: can't multiply sequence by non-int of type 'float'
+            #NOTE: FAILS ON EMPTY X -- Breaks any loops
+    
+            #sec_float = [float(x) for x in seconds]
+            #model = np.polyfit(sec_float,x*np.pi/180,1)
+        
+            #dd = np.diff(seconds)
+            # edot, in radians/sec
+            model = np.polyfit(seconds,x*np.pi/180,1)
+        
+            avgEdot_fit = model[0]
+            avgAzim = np.mean(azm)
+            meanTime = np.mean(seconds)/3600
+    #  delta Time in minutes
+            delT = (np.max(seconds) - np.min(seconds))/60
+    # average tan(elev)
+            cunit = np.mean(np.tan(np.pi*x/180))
+    #       return tan(e)/edot, in units of one over (radians/hour) now. used for RHdot correction
+    #       so when multiplyed by RHdot - which would be meters/hours ===>>> you will get a meter correction
+    
+            outFact2 = cunit/(avgEdot_fit*3600)
 
     return x,y, Nvv, cf, meanTime,avgAzim,outFact1, outFact2, delT
 
