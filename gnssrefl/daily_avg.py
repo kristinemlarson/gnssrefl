@@ -412,7 +412,8 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
         plt.plot(obstimes, nbei,'.',label='BEI',color='green',markersize=3)
 
     #plt.legend(loc="upper left")
-    ax.legend(bbox_to_anchor=(1.02, 1.02))
+    #ax.legend(bbox_to_anchor=(1.02, 1.02))
+    plt.legend(loc="upper right")
     fig.autofmt_xdate()
     plt.title(station.upper() + ': Number of values used in the daily average',fontsize=fs)
     plt.xticks(fontsize=fs)
