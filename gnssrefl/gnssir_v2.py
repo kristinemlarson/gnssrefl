@@ -59,6 +59,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             elev angle difference for arc length, QC
         reqAmp : float
             required periodogram amplitude for QC
+        ellist: list of floats
+            added 23jun16, allow multiple elevation angle regions
         
     """
 

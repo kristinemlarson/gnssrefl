@@ -35,6 +35,7 @@ def parse_arguments():
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument('-frlist', nargs="*",type=int,  help="User defined frequencies using our nomenclature.")
     parser.add_argument('-azlist2', nargs="*",type=float,  help="Azimuth list, default 0-360") 
+    parser.add_argument('-ellist', nargs="*",type=float,  help="elevation list to allow more complex analysis scenarios") 
 
 
     args = parser.parse_args().__dict__
@@ -51,7 +52,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
               h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.8, ampl: float = 5.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = '', ediff: float=2.0, delTmax: float=75.0, frlist: float=[],azlist2: float=[0,360] ):
+              extension: str = '', ediff: float=2.0, delTmax: float=75.0, frlist: float=[],azlist2: float=[0,360], ellist : float=[] ):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -152,7 +153,11 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         avoids all the booleans - if you know the frequencies, enter them.
         e.g. 1 2 or 1 20 5 or 1 20 101 102
     azlist2 : list of floats
-        Default is 0 to 360. subquadrants no longer required , but can be used if necessary
+        Default is 0 to 360. list of azimuth limits as subquadrants are no longer required.
+    ellist: list of floats
+        min and max elevation angles to be used with the azimuth regions you listed, i.e.
+        [5 10 6 11 7 12 8 13] would allow overlapping regions - all five degrees long 
+        Default is empty list. 
 
     """
 
@@ -296,6 +301,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
  
     # gzip SNR files after running the code
     lsp['gzip'] = False   
+
+    lsp['ellist'] = ellist
 
     print('writing out to:', outputfile)
     with open(outputfile, 'w+') as outfile:

@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.18 
+Problems making the docs - keying on os.environ['ORBITS'] in felipe.py ???
+
 ## 1.3.17
 
 New version of quickLook.  Uses a better algorithm for extracting rising and setting arcs.
