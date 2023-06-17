@@ -42,7 +42,7 @@
 * [vwc code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_vwc.html),
 [vwc_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwcr_input.html),
-[phase](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickPhase.html), used for vwc
+phase, not sure which link should go here.
 
 ## Download Scripts 
 
