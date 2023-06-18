@@ -1,4 +1,6 @@
-### Friday Harbor
+# Friday Harbor
+
+## sc02
 
 [Warning](warning.md)
 

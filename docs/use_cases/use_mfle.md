@@ -1,4 +1,4 @@
-### Marshall, Colorado, USA
+# Marshall, Colorado, USA
 
 **Updated June 4, 2023 to use gnssir_input**
 
@@ -7,6 +7,8 @@
 <p align="center">
 <img src="https://gnss-reflections.org/static/images/MFLE.jpg" width="500">
 </P>
+
+## metadata
 
 **Station Name:** mfle 
 

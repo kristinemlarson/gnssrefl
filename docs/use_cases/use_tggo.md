@@ -1,6 +1,8 @@
-### Grauerort-Reede
+# Grauerort-Reede
 
-**Station Name:** tggo  or TGGO00DEU
+## tggo 
+
+**RINEX 3 name:** TGGO00DEU
 
 **Location:** Elbe River, Germany
 

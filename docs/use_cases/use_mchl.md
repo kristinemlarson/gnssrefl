@@ -1,5 +1,6 @@
-### Mitchell
+# Mitchell
 
+## metadata
 **Station Name:** 	mchl (mchl00aus)
 
 **Location:** Walhallow, Queensland, Austalia
@@ -49,8 +50,10 @@ Then set up your analysis parameters:
 The location of the json file is printed to the screen. 
 The default behavior is to accept all azimuths.
 Modify the azimuths in the json if you feel that is needed.
-How can you tell if you have bad azimuths? Look back at the <code>quickLook</code> results.
-Do not worry excessively about this at this stage. Once you have a VWC solution you can go back and easily/quickly iterate to remove bad 
+How can you tell if you have bad azimuths? Look back 
+at the <code>quickLook</code> results.
+Do not worry excessively about this at this stage. Once you have a VWC 
+solution you can go back and easily/quickly iterate to remove bad 
 azimuths and satellite tracks.
 
 Run the <code>gnssir</code> each day in 2017 and 2018:
