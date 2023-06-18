@@ -1069,21 +1069,21 @@ def invsnr_header(xdir, outfile_type,station,outfile_name):
 
     Parameters
     ----------
-    xdir : string 
+    xdir : str
         directory for the output file
-    outfile_type : string
+    outfile_type : str
         csv or txt
-    station : string
+    station : str
         4 character name
-    outfile_name : string
-        name of output - if '', it uses default
+    outfile_name : str
+        name of output - if empty string, it uses default
 
     Returns 
     -------
-    fileID : ? 
+    fileID : file
         used for writing to file
-    usetxt : boolean
-        - boolean for the code calling this function to use
+    usetxt : bool
+        boolean for the code calling this function to use
         if you write out special files, they go in the working directory
 
     """

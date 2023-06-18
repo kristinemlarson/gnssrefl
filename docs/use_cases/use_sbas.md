@@ -1,5 +1,6 @@
 # Steenbras Dam, South Africa
 
+## metadata
 **Station Name:** sbas
 
 **Latitude:** -34.18704704
@@ -20,21 +21,21 @@ at 15 second sampling. This sampling rate is needed to be able to see the reserv
 archived by UNAVCO for this use case example. They can be used by specifying the "special" archive.
 Here we will only discuss GPS - I would encourage you to also look at the Glonass data.
 
-### Reflection Zones 
+## Reflection Zones 
 
 Use the [reflection zone web app](https://gnss-reflections.org/rzones) to think about which azimuths and elevation angles to use.
 Note the photograph!  **You are not 6 meters (vertically) above the water.** You will not be able to fully test
 the reflector height value used in this web app until you look at some real data. But you can get an idea of which
 RH values put you over the water.
 
-### Evaluate the Data
+## Evaluate the Data
 
 We know that the reservoir will only be in the northeast quadrant, so I am going 
 to select those azimuths specifically. I will start with elevation angle limits of 5-12 degrees and the superior L2C frequency.
 
 <code>quickLook sbas 2020 1 -e1 5 -e2 12 -h1 20 -h2 35 -azim1 0 -azim2 90 -fr 20</code>
 
-<img src=../_static/sbas-quicklook2.png width=600 />
+<img src=../_static/sbas-quicklook2.png width=600>
 
 You can see that the last point looks a little bit lower than the others. If I run it again with 
 screenstats set to True, I will get a little more information that will help me figure out how 
@@ -63,7 +64,7 @@ will further restrict our analysis to 78 degrees in the next section.
 You might go back and use the reflection zone web app to make sure that your azimuth and 
 elevation angles look good for a RH of 28 meters. 
 
-### Estimate Lake Level
+## Estimate Lake Level
 
 Make the SNR files:
 
@@ -115,7 +116,7 @@ Numerical values are saved in a file. The location of the file is printed to the
 You should also go back and add some of those very northwestern tracks by setting a second azimuth region in your json file.
 Then rerun the <code>gnssir</code> and <code>daily_avg</code> codes.
 
-### Compare with in situ data:
+## Compare with in situ data:
 
 [Current state of the lower Steenbras reservoir](https://www.dws.gov.za/Hydrology/Weekly/percentile.aspx?station=%20G4R001)
 

@@ -88,6 +88,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     snr : int, optional
         SNR format. This tells the code what elevation angles to save data for. Input is the snr file ending.
         Value options:
+
             66 (default) : saves all data with elevation angles less than 30 degress
 
             99 : saves all data with elevation angles between 5 and 30 degrees
@@ -100,6 +101,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         Send plots to screen or not. Default is False.
     fr : int, optional
         GNSS frequency. Value options:
+
             1,2,20,5 : GPS L1, L2, L2C, L5
 
             101,102 : GLONASS L1, L2

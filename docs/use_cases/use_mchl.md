@@ -25,7 +25,7 @@
  
 Read the instructions for the [soil moisture code!](../pages/README_vwc.md)!
 
-#### Step 1: GNSS-IR
+## Step 1: GNSS-IR
 Begin by generating the SNR files. To be sure we can get the L2C data, we will use the RINEX 3 files.
 These require the longer station name (mchl00aus) and are available at either cddis or ga.
 Choose the one that is less slow for you. 
@@ -60,7 +60,7 @@ Run the <code>gnssir</code> each day in 2017 and 2018:
 
 <code>gnssir mchl 2017 1 -doy_end 365 -year_end 2018 -newarcs T</code>
 
-#### Step 2: Soil Moisture
+## Step 2: Soil Moisture
 
 Pick the satellite tracks you are going to use:
 

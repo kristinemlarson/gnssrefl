@@ -69,6 +69,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     snr : int, optional
         SNR format. This tells the code what elevation angles are in the SNR file
         value options:
+
             66 (default) : data with elevation angles less than 30 degrees
 
             99 : data with elevation angles between 5 and 30 degrees
@@ -78,24 +79,19 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
             50 : data with elevation angles less than 10 degrees
 
     fr : str, optional
-        GNSS frequency. Currently only supports L2C.
-        Default is 20 (l2c)
+        GNSS frequency. Currently only supports L2C. Default is 20 (l2c)
 
     e1 : float, optional
-        Elevation angle lower limit in degrees for the LSP.
-        default is 5
+        Elevation angle lower limit in degrees for the LSP. default is 5
 
     e2: float, optional
-        Elevation angle upper limit in degrees for the LSP.
-        default is 30
+        Elevation angle upper limit in degrees for the LSP. default is 30
 
     plt: bool, optional
-        Whether to plot results.
-        Default is False
+        Whether to plot results. Default is False
 
     screenstats: bool, optional
-        Whether to print stats to the screen.
-        Default is False
+        Whether to print stats to the screen. Default is False
 
     Returns
     -------

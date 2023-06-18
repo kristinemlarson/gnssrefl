@@ -15,7 +15,7 @@
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/P475)
 
 <p align="center">
-<img src="../_static/P475.jpg" width="500"/>
+<img src="../_static/P475.jpg" width="500">
 </P>
  
 P475 was a PBO site. Soil moisture can be extracted, but it is a challenging case. To access 
@@ -34,7 +34,7 @@ Run quickLook:
 <code>quickLook p475 2020 5 -fr 20</code>
 
 <p align="center">
-<img src="../_static/p475_quick.png" width=500/>
+<img src="../_static/p475_quick.png" width=500>
 </p>
 
 There is only a limited region with good reflections.  This means we will also need to 
@@ -81,7 +81,7 @@ or at least you should lower the requirement. Try again ...
 
 Phase results plotted in geographic coordinates:
 
-<img src="../_static/p475_phase.png" width=500/>
+<img src="../_static/p475_phase.png" width=500>
 
 I have circled a pretty bad track (the satellite in pink) - so I would
 tell you to consider to removing it. The lilac satellite in the southwest quadrant 
@@ -90,10 +90,10 @@ from the statistics that are sent to the screen.
 
 Daily phase average:
 
-<img src="../_static/p475_daily_phase.png" width=500/>
+<img src="../_static/p475_daily_phase.png" width=500>
 
 Finally : 
 
-<img src="../_static/p475_vwc.png"/>
+<img src="../_static/p475_vwc.png">
 
 Kristine M. Larson November 23, 2022

@@ -1,5 +1,4 @@
-
-### gnssrefl use cases 
+# gnssrefl use cases 
 
 About 75% of these use cases use access to the Earthscope/UNAVCO 
 archive. In some cases, sopac can be used as an alternate archive. If at all 
@@ -9,7 +8,7 @@ Some of these use cases were created with an earlier version of the gnssrefl sof
 The plots might look slightly different and the defaults we used in the analysis might have changed.
 
 
-#### Ice Sheets
+## Ice Sheets
 
 * [Lorne, Antarctica](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lorg.html)
 
@@ -21,7 +20,7 @@ The plots might look slightly different and the defaults we used in the analysis
 
 * [Phoenix, Antarctica](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_phnx.html)
 
-#### Lakes, Reservoirs, and Rivers
+## Lakes, Reservoirs, and Rivers
 
 * [Michipicoten, Canada](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchn.html)
 
@@ -37,7 +36,7 @@ The plots might look slightly different and the defaults we used in the analysis
 
 * [Lake Yellowstone, USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p709.html)
 
-#### Soil Moisture 
+## Soil Moisture 
 
 * [Portales, New Mexico USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p038.html)
 
@@ -49,7 +48,7 @@ The plots might look slightly different and the defaults we used in the analysis
 
 * [San Diego, California USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p475.html)
 
-#### Seasonal Snow Accumulation
+## Seasonal Snow Accumulation
 
 * [Marshall, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p041.html)
 
@@ -59,7 +58,7 @@ The plots might look slightly different and the defaults we used in the analysis
 
 * [Utqiagvik, Alaska USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_utqi.html)
 
-#### Tides 
+## Tides 
 
 * [Friday Harbor, Washington USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_sc02.html)
 

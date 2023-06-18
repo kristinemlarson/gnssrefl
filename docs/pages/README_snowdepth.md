@@ -1,4 +1,4 @@
-## snowdepth
+# snowdepth
 
 <img src="../_static/example_snow.png" width="500"/>
 

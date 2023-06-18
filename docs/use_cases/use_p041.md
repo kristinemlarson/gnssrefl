@@ -5,7 +5,7 @@
 [Warning](warning.md)
 
 <p align="center">
-<img src="https://gnss-reflections.org/static/images/P041.jpg" width="500">
+<img src="https://gnss-reflections.org/static/images/P041.jpg" width="500px">
 </P>
 
 **Station Name:** p041 
@@ -23,7 +23,7 @@
 [Google Map Link](https://goo.gl/maps/GwGV8PS4CQVQzYHC7) 
 
 
-### Data Summary
+## Data Summary
 
 The p041 antenna is ~2 meters above the soil surface. It is located at Marshall Mesa, Colorado.
 The site is relatively planar and free of obstructions. Since October 2018 the site has 
@@ -40,7 +40,7 @@ check the [Reflection Zone Mapping in the web app](https://gnss-reflections.org/
 In the linked page, the reflection zones from 5 to 25 degree elevation angles are plotted as 
 colored ellipses surrounding the station.  
 
-### Reproduce the Web App 
+## Reproduce the Web App 
 
 p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=p041) 
 You can see from the title of the plot that the web app reproduces 
@@ -54,7 +54,7 @@ and
 <code>quickLook p041 2019 150</code>
 
 
-### Take a Quick Look at the Data
+## Take a Quick Look at the Data
 
 First make a SNR file:
 
@@ -108,7 +108,7 @@ They are very likely available in the RINEX 3 file, so you are encouraged to loo
 
 **quickLook** is meant to be a visual assessment of the spectral characteristics at a given site on a given day. For routine analysis, one must use **gnssir**.
 
-### Analyze the Data
+## Analyze the Data
 
 We will start by setting up the analysis parameters. These are stored 
 in a json file. In this case, the p041 RINEX data are multi-gnss, so you could 
@@ -140,14 +140,14 @@ In this particular example, I only used three GPS frequencies, L1, L2C, and L5.
 
 Three plots are created. All RH retrievals:
 
-<img src=../_static/p041-RH-all.png width=600/>
+<img src=../_static/p041-RH-all.png width="600px">
 
 A summary of how many values are being used in the daily average:
 
-<img src=../_static/p041-numval.png width=600/>
+<img src=../_static/p041-numval.png width="600px">
 
 And the daily RH average:
 
-<img src=../_static/p041-RH.png width=600/>
+<img src=../_static/p041-RH.png width="600px">
 
 The location of the output files are printed to the screen.

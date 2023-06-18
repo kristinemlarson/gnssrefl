@@ -3,7 +3,7 @@
 ## metadata
 
 <p align=center>
-<img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"/><BR>
+<img src="http://gnss-reflections.org/static/images/LTHW.jpg" width="500"><BR>
 </p>
 
 **Station Name:** lthw
@@ -25,7 +25,7 @@
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/LTHW.sta)
 
 
-### Data Summary
+## Data Summary
 
 The receiver only tracks legacy GPS signals, so only L1 should be used for reflectometry. The pole
 is set in the snow/ice and routinely (every few years) reset. Please 
@@ -38,7 +38,7 @@ crew set this at the receiver when it was originally installed.
 
 lthw is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=lthw)
 
-### Take a quick look at the SNR data
+## Take a quick look at the SNR data
 
 Translate the GPS data for January 1 in 2018. First you need to make the SNR file:
 
@@ -48,7 +48,7 @@ Use our utility **quickLook** to look at these data [(For more details on quickL
 
 <code>quickLook lthw 2018 1 -e1 7</code>
 
-<img src="../_static/lthw-day1-2018.png" width="600"/>
+<img src="../_static/lthw-day1-2018.png" width="600">
 
 This is a bit of a mess really. If there are significant peaks, they are really 
 close to the cutoff for the method (at 0.5 meters). Let's compare with about a week later.
@@ -60,7 +60,7 @@ Now run quickLook:
 
 <code>quickLook lthw 2018 9 -e1 7</code>
 
-<img src="../_static/qc-lthw-1.png" width="600"/>
+<img src="../_static/qc-lthw-1.png" width="600">
 
 This is *much* better and clearly shows that a field crew reset the antenna to a little 
 less than 5 meters sometime between day 1 and day 9 in the year 2018. You can also look 
@@ -68,7 +68,7 @@ at the second plot to get an idea of how well the method performs for various az
 and QC parameters:
 
 
-<img src="../_static/qc-lthw-2.png" width="600"/>
+<img src="../_static/qc-lthw-2.png" width="600">
 
 Except for a region ~270-300 degrees in azimuth, and directly south, retrievals are consistently good.
 A peak to noise ratio of 3 appears to be appropriate. The rejected southern retrievals are unlikely to be 
@@ -81,7 +81,7 @@ If you like you can compare this to the first day of 2020, first make the SNR fi
 
 Again use quickLook:
 
-<img src="../_static/qc-lthw-2020.png" width=600/>
+<img src="../_static/qc-lthw-2020.png" width=600>
 
 Now the peaks in the reflector height (RH) periodograms are ~2.2 meters - 
 so that means that there was ~2.5 meters of surface change from 2018 to 2020.
@@ -107,14 +107,14 @@ the daily average. Using our **daily_avg** utility - and specifying 50 satellite
 
 <code>daily_avg lthw 0.25 50</code>
 
-<img src="../_static/lthw-req50.png" width="600"/>
+<img src="../_static/lthw-req50.png" width="600">
 
 You can loosen the required track number if you want, but in this case it does not change the 
 overall character of the results:
 
 <code>daily_avg lthw 0.25 40</code>
 
-<img src="../_static/lthw-req40.png" width="600"/>
+<img src="../_static/lthw-req40.png" width="600">
 
 [Sample daily average RH file for 2018](lthw_dailyRH.txt)
 

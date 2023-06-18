@@ -34,7 +34,7 @@ P038 was a PBO site and a [PBO H2O site](https://gnss-reflections.org/pboh2o?sta
 from 2017 will be analyzed here as a test case. We will start by analyzing the data 
 using the normal reflector height (GNSS-IR) processing. Then we will use those results to run the soil moisture code.
 
-#### Step 1: GNSS-IR
+## Step 1: GNSS-IR
 Begin by generating the SNR files. Although typically PBO sites do not have L2C 
 data in their low-rate RINEX files, UNAVCO is providing these data in the "special" archive section
 so that people can test out this code.
@@ -54,7 +54,7 @@ Now we run <code>gnssir</code>. This will be needed for estimate a priori reflec
 <code>gnssir p038 2017 1 -doy_end 365 -newarcs T</code>
 
 
-#### Step 2: Soil Moisture
+## Step 2: Soil Moisture
 
 [Please read the soil moisture user manual.](../pages/README_vwc.md) It is very short and has a lot of tips that will save you time.
 
