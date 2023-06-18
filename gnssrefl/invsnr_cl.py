@@ -48,18 +48,15 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, constel: str = None,
-           screenstats: bool = False, tempres: int = 1, polydeg: int = 2, snrfit: bool = True, plt: bool = True,
-           doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: int = 3,
-           rough_in: float = 0.1, risky: bool = False, snr_ending: int = 66, outfile_type: str = 'txt',
-           outfile_name: str = '', outlier_limit: float = 0.5, no_dots: bool = False, delta_out: int = 300,
-           refraction: bool = True, json_override: bool = False):
-
+def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, constel: str = None, 
+        screenstats: bool = False, tempres: int = 1, polydeg: int = 2, snrfit: bool = True, plt: bool = True,
+        doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: int = 3, 
+        rough_in: float = 0.1, risky: bool = False, snr_ending: int = 66, outfile_type: str = 'txt', 
+        outfile_name: str = '', outlier_limit: float = 0.5, no_dots: bool = False, delta_out: int = 300, 
+        refraction: bool = True, json_override: bool = False):
     """
     You must have run invsnr_input before using this code. This is the wrapper code that does the 
-    invsnr modelling.
-
-    Note: outfile_name and outfile_type are unnecessary. Consolidate them.
+    invsnr modelling. Note: outfile_name and outfile_type are unnecessary. Consolidate them.
     
     Examples
     --------
@@ -81,9 +78,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
     doy : int
         Day of year
     signal : str
-        signal to use.
-        value options: 
-            L1  L2 L5 L6 L7 L1+L2 L1+L2+L5 L1+L5 ALL
+        signal to use, L1  L2 L5 L6 L7 L1+L2 L1+L2+L5 L1+L5 ALL
     pktnlim: float, optional
         Peak2noise ratio limit for Quality Control.
         Default is 4
@@ -91,15 +86,16 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         Only a single constellation.
         Default is gps, glonass, and galileo.
         value options:
-                G : GPS
 
-                E : Galileo
+            G : GPS
 
-                R : Glonass
+            E : Galileo
 
-                C : Beidou
+            R : Glonass
 
-                withBeidou : adds Beidou to the default.
+            C : Beidou
+
+            withBeidou : adds Beidou to the default.
 
     screenstats: bool, optional
         Whether to print out stats to the screen.

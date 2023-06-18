@@ -87,13 +87,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     rinex2snr p041 2022 15 -nolook T
         using your own data stored as p0410150.22o in the working directory 
 
-
-
-    RINEX 2.11 archives listed below
-
-    Examples
-    --------
-
     rinex2snr mchl00aus 2022 15  -orb rapid -archive ga 
         30 sec data for mchl00aus and Geoscience Australia
 
@@ -161,6 +154,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     rate : str, optional
         The data rate. Rather than numerical value, this tells the code which folder to use
         value options:
+
             low (default) : standard rate data. Usually 30 sec, but sometimes 15 sec.
 
             high : high-rate data
