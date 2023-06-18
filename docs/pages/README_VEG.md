@@ -1,4 +1,4 @@
-## Vegetation Statistic
+# Vegetation Statistic
 
 This is an unofficial part of the [gnssrefl package](README.md). 
 The best way to learn about this technique is to read 
@@ -29,7 +29,7 @@ study the [2012-2014 California drought.](https://www.kristinelarson.net/wp-cont
 Vegetation Response to the 2012-2014 California Drought from GPS and Optical Measurements
 
 
-### Installing the Code
+## Installing the Code
 
 Install gnssrefl using git clone https://github.com/kristinemlarson/gnssrefl
 
@@ -55,7 +55,7 @@ mac with the new chip - so you are out of luck there.
 
 *For the most part I live in a lowercase world.*
 
-### Utilities
+## Utilities
 
 **download_teqc**
 
@@ -146,7 +146,7 @@ The utility recognizes that sometimes you will want to do multiple days of this,
 *mp1mp2 p537 2020 1 -look True -doy_end 366*
 
 
-### Receiver/Antenna Information
+## Receiver/Antenna Information
 
 If you have teqc logs for a site and you just want to check the receiver and antenna type:
 
@@ -159,7 +159,7 @@ Receiver type           : SEPT POLARX5 (# = 3012343) (fw = 5
 Antenna type            : TRM59800.00     SCIT (# = 52113544
 
 
-### Download RINEX files from UNACVCO
+## Download RINEX files from UNACVCO
 
 For December 2, 2010 and station p537:
 
@@ -170,7 +170,7 @@ If you prefer to use day of year, leave the last input as zero.  So for year 201
 *download_rinex p537 2010 2 0* 
 
 
-### Reflection Zone
+## Reflection Zone
 
 The reflection zone depends on the height of the antenna over the reflecting surface. While
 for snow and soil moisture we used the SNR data down to 5 degrees, the vegetation statistic only

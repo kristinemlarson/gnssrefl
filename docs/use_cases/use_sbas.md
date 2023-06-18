@@ -78,7 +78,7 @@ The next step is to estimate reflector heights. First do a single day using the 
 
 <code>gnssir sbas 2020 1 -plt T -newarcs T</code>
 
-<img src=../_static/sbas_gnssir_l1.png width=600/>	
+<img src=../_static/sbas_gnssir_l1.png width=600>	
 
 I've added an arrow to show you what happens if you violate the Nyquist - double peaks!
 Luckily this is not prevalent in this dataset thanks to the help of TRIGNET 
@@ -86,7 +86,7 @@ using a 15 second sample rate in the files.
 
 The next plot will be L2C:
 
-<img src=../_static/sbas_gnssir_l2c.png width=600 />
+<img src=../_static/sbas_gnssir_l2c.png width=600>
 
 Notice that the L2C frequency - which has a longer wavelength than L1 - does not have a double peak.
 And that is what we should expect.

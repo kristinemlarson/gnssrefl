@@ -1,6 +1,6 @@
 # 2023 Short Course on GNSS Interferometric Reflectometry
 
-### Basic principles and an introduction to the gnssrefl software 
+## Basic principles and an introduction to the gnssrefl software 
 **Dates:** May 2-5, 2023 
 
 **Times:** 9:00-11:00 Mountain Time, 17:00-19:00 Central European Time

@@ -1,6 +1,6 @@
-### News 
+# News 
 
-2023 News
+## 2023 News
 
 <code>nmea2snr</code> has been updated to support multi-frequency-GNSS by community member Taylor Smith.
 
@@ -77,7 +77,7 @@ webapp tells you [how high your site is above sea level.](https://gnss-reflectio
 
 
 
-### Bugs/Features <a name="bugs"></a>
+## Bugs/Features <a name="bugs"></a>
 
 Bug Diary
 

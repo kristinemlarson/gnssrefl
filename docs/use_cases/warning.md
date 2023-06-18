@@ -1,4 +1,4 @@
-## Warning
+# Warning
 
 We have updated our arc selection algoirthm. Most of hte uses cases were computed with our old algorithm.
 We have edited the prose in most use cases, but have not remade the figures.

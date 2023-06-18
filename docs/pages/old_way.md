@@ -1,4 +1,4 @@
-## make_json_input
+# make_json_input
 
 Before you estimate reflector heights, you need a set of instructions. These are made using <code>make_json_input</code>.
 The required inputs are:

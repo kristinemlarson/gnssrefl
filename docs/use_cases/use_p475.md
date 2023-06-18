@@ -23,7 +23,7 @@ L2C from the original PBO datasets, 1-Hz data must be downloaded and decimated t
 having to do this, we will only use data from the Septentrio receiver (years 2020 thru 2022 ) where the UNAVCO archive 
 provides direct access to high-quality SNR data in 15 second files. 
 
-#### Step 0: Run quickLook
+## Step 0: Run quickLook
 
 Make one SNR file:
 
@@ -40,7 +40,7 @@ Run quickLook:
 There is only a limited region with good reflections.  This means we will also need to 
 easy up on the number of good arcs the code will expect to see.
 
-#### Step 1: GNSS-IR
+## Step 1: GNSS-IR
 
 
 <code>rinex2snr p475 2020 1 -year_end 2022 -doy_end 254 -archive unavco </code>
@@ -57,7 +57,7 @@ The newarcs setting chooses the new way of selecting satellite arcs.
 
 <code>gnssir p475 2020 1 -year_end 2022 -doy_end 254 -newarcs T</code>
 
-#### Step 2: Soil Moisture
+## Step 2: Soil Moisture
 
 [Please read the soil moisture user manual.](../pages/README_vwc.md) It is very short and 
 has a lot of tips that will save you time.
