@@ -41,8 +41,8 @@
 
 * [vwc code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_vwc.html),
-[vwc_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwcr_input.html),
-phase, not sure which link should go here.
+[vwc_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_input.html),
+phasecode, TBD
 
 ## Download Scripts 
 
