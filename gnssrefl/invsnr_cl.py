@@ -21,8 +21,7 @@ def parse_arguments():
     parser.add_argument("-constel", default=None, type=str, help="Only a single constellation (G,E, or R)")
     parser.add_argument("-screenstats", default=None, type=str, help="screen stats, False is default")
     parser.add_argument("-tempres", default=None, type=int, help="SNR file decimator (seconds)")
-    parser.add_argument("-polydeg", default=None, type=int,
-                        help="polynomial degree for direct signal removal (default is 2)")
+    parser.add_argument("-polydeg", default=None, type=int, help="polynomial degree for direct signal removal (default is 2)")
     parser.add_argument("-snrfit", default=None, type=str, help="Do invsnr fit? True is the default ")
     parser.add_argument("-plt", default=None, type=str, help="Plot to the screen?  default is True")
     parser.add_argument("-doy_end", default=None, type=str, help="day of year to end analysis")
@@ -30,8 +29,7 @@ def parse_arguments():
     parser.add_argument("-snrfigs", default=None, type=str, help="Make SNR plots, default False.")
     parser.add_argument("-knot_space", default=None, type=int, help="knot spacing in hours (default is 3)")
     parser.add_argument("-rough_in", default=None, type=str, help="Roughness (default is 0.1)")
-    parser.add_argument("-risky", default=None, type=str,
-                        help="Risky taker related to gaps/knot spacing, False is default.")
+    parser.add_argument("-risky", default=None, type=str, help="Risky taker related to gaps/knot spacing, False is default.")
     parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66")
     parser.add_argument("-outfile_type", default=None, type=str, help="Output file type (txt or csv)")
     parser.add_argument("-outfile_name", default=None, type=str, help="Output file name")

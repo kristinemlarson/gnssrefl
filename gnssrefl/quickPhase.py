@@ -33,10 +33,9 @@ def parse_arguments():
 
 
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66, 
-        fr: str = '20', e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip:bool=False):
+        fr: str = '20', e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip: bool = False):
     """
-    quickphase computes phase for the given inputs (station, years, doy, elevation angles)
-    These phase results are subquently used in vwc. The command line call is phase
+    quickphase computes phase, which are subquently used in vwc. The command line call is phase
     (which maybe we should change).
     
     Examples
@@ -46,7 +45,6 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     phase p038 2021 1 -doy_end 365 
         analyzes data for the whole year
-
 
     Parameters
     ----------

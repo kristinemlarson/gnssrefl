@@ -790,8 +790,7 @@ def getsp3file_mgex(year,month,day,pCtr):
 
 def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     """
-    tries to download a file from a directory at CDDIS
-    file2 is like this: GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz
+    tries to download a file from a directory at CDDIS which 
     it then stores it the year directory (with a given name)
 
     Parameters
@@ -2015,10 +2014,10 @@ def open_outputfile(station,year,doy,extension):
 
 def removeDC(dat,satNu, sat,ele, pele, azi,az1,az2,edot,seconds):
     """
-#   remove direct signal using given elevation angle (pele) and azimuth 
+    remove direct signal using given elevation angle (pele) and azimuth 
     (az1,az2) constraints, return x,y as primary used data and windowed
     azimuth, time, and edot
-#   removed zero points, which 10^0 have value 1.  used 5 to be sure?
+    removed zero points, which 10^0 have value 1.  used 5 to be sure?
 
     Parameters
     ----------
