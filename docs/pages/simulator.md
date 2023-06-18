@@ -1,4 +1,4 @@
-## The Simulator
+# The Simulator
 
 The GNSS-IR simulator was written by Felipe Nievinski.
 The Matlab/octave code is hosted on [github](https://github.com/fgnievinski/mpsim).

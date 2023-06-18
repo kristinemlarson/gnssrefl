@@ -1,4 +1,4 @@
-### Summit Camp, Greenland
+# Summit Camp, Greenland
 
 [Warning](warning.md)
 
@@ -38,6 +38,8 @@ July 13, 2022
 <p align=center>
 <img src="https://gnss-reflections.org/static/images/SMM3.jpg" width=400>
 </p>
+
+## metadata
 
 **Station Name:** smm3
 

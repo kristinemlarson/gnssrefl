@@ -1,4 +1,6 @@
-###Lake Mathews, Southern California
+#Lake Mathews, Southern California
+
+## metadata
 
 **Station name:** mat2
 <P align=center>

@@ -51,117 +51,106 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, fr: int = None,
-           ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None,
-           azim1: int = 0, azim2: int = 360, nooverwrite: bool = False, extension: str = '',
-           compress: bool = False, screenstats: bool = False, delTmax: int = None,
-           e1: float = None, e2: float = None, mmdd: bool = False, gzip: bool = False, 
-           dec : int = 1, newarcs : bool = False):
+def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, fr: int = None, 
+        ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
+        azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
+        screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
+        mmdd: bool = False, gzip: bool = False, dec : int = 1, newarcs : bool = False):
     """
-        gnssir is the main driver for estimating reflector heights. The user is required to 
-        have set up an analysis strategy using either make_json_input or gnssir_input. The 
-        latter will ultimately become the default.
+    gnssir is the main driver for estimating reflector heights. The user is required to 
+    have set up an analysis strategy using either make_json_input or gnssir_input. The 
+    latter will ultimately become the default.
         
-        Examples
-        --------
-        gnssir p041 2021 15 
-            analyzes the data for station p041, year 2021 and day of year 15.
-        gnssir p041 2021 15  -snr 99
-            uses SNR files with a 99 suffix
-        gnssir p041 2021 15  -snr 99 -screenstats T
-            sends debugging information to the screen
-        gnssir p041 2021 15  -nooverwrite T 
-            only runs gnssir if there isn't a previous solution
-        gnssir p041 2021 15  -doy_end 20 
-            Analyzes data from day of year 15 to day of year 20
-        gnssir p041 2021 15  -newarcs T
-            uses new way of picking arcs. gnssir_input is used to make the json for this.
-            Eventually we will make this the default.
+    Examples
+    --------
+    gnssir p041 2021 15 
+        analyzes the data for station p041, year 2021 and day of year 15.
+    gnssir p041 2021 15  -snr 99
+        uses SNR files with a 99 suffix
+    gnssir p041 2021 15  -snr 99 -screenstats T
+        sends debugging information to the screen
+    gnssir p041 2021 15  -nooverwrite T 
+        only runs gnssir if there isn't a previous solution
+    gnssir p041 2021 15  -doy_end 20 
+        Analyzes data from day of year 15 to day of year 20
+    gnssir p041 2021 15  -newarcs T
+        uses new way of picking arcs. gnssir_input is used to make the json for this.
+        Eventually we will make this the default.
 
-        Parameters
-        ----------
-        station : str
-            lowercase 4 character ID of the station
-        year : int
-            full Year
-        doy : integer
-            Day of year
-        snr : int, optional
-            SNR format. This tells the code what elevation angles to save data for. Will be the snr file ending.
-            value options:
-                66 (default) : saves all data with elevation angles less than 30 degress
+    Parameters
+    ----------
+    station : str
+        lowercase 4 character ID of the station
+    year : int
+        full Year
+    doy : integer
+        Day of year
+    snr : int, optional
+        SNR format. This tells the code what elevation angles to save data for. Input is the snr file ending.
+        Value options:
+            66 (default) : saves all data with elevation angles less than 30 degress
 
-                99 : saves all data with elevation angles between 5 and 30 degrees
+            99 : saves all data with elevation angles between 5 and 30 degrees
 
-                88 : saves all data 
+            88 : saves all data 
 
-                50 : saves all data with elevation angles less than 10 degrees
+            50 : saves all data with elevation angles less than 10 degrees
 
-        plt : bool, optional
-            Send plots to screen or not. Default is False.
-        fr : int, optional
-            GNSS frequency. Value options:
-                1,2,20,5 : GPS L1, L2, L2C, L5
+    plt : bool, optional
+        Send plots to screen or not. Default is False.
+    fr : int, optional
+        GNSS frequency. Value options:
+            1,2,20,5 : GPS L1, L2, L2C, L5
 
-                101,102 : GLONASS L1, L2
+            101,102 : GLONASS L1, L2
 
-                201, 205,206,207,208 : GALILEO E1, E5a,E6,E5b,E5
+            201, 205,206,207,208 : GALILEO E1, E5a,E6,E5b,E5
 
-                302,306,307 : BEIDOU B1, B3, B2
+            302,306,307 : BEIDOU B1, B3, B2
 
-        ampl : float, optional
-            minimum spectral peak amplitude.
-            default is None
-        sat : int, optional
-            satellite number to only look at that single satellite.
-            default is None.
-        doy_end : int, optional
-            end day of year. This is to create a range from doy to doy_end of days.
-            If year_end parameter is used - then day_end will end in the day of the year_end.
-            Default is None. (meaning only a single day using the doy parameter)
-        year_end : int, optional
-            end year. This is to create a range from year to year_end to get the snr files for more than one year.
-            doy_end will be for year_end.
-            Default is None.
-        azim1 : int, optional
-            lower limit azimuth.
-            If the azimuth angles are changed in the json (using 'azval' key) and not here, then the json overrides these.
-            If changed here, then it overrides what you requested in the json.
-            default is 0.
-        azim2 : int, optional
-            upper limit azimuth.
-            If the azimuth angles are changed in the json (using 'azval' key) and not changed here, then the json overrides these.
-            If changed here, then it overrides what you requested in the json.
-            default is 360.
-        nooverwrite : bool, optional
-            Use to overwrite lomb scargle result files or not.
-            Default is True (do not overwrite files).
-        extension : string, optional
-            extension for result file, useful for testing strategies.
-            default is ''. (empty string)
-        compress : boolean, optional
-            xz compress SNR files after use.
-            default is False.
-        screenstats : bool, optional
-            whether to print stats to the screen or not.
-            default is True.
-        delTmax : int, optional
-            maximum satellite arc length in minutes. Set in make_json_input
-        e1 : float, optional
-            use to override the minimum elevation angle.
-        e2 : float, optional
-            use to override the maximum elevation angle.
-        mmdd : boolean, optional
-            adds columns in results for month, day, hour, and minute.
-            default is False.
-        gzip : boolean, optional
-            gzip compress SNR files after use.
-            default is False.
-        dec : int, optional
-            decimate SNR file to this sampling period before the 
-            periodograms are computed. 1 sec is default (i.e. no decimating)
-        newarcs : bool, optional
-            uses new way to do rising and setting arcs.
+    ampl : float, optional
+        minimum spectral peak amplitude. default is None
+    sat : int, optional
+        satellite number to only look at that single satellite. default is None.
+    doy_end : int, optional
+        end day of year. This is to create a range from doy to doy_end of days.
+        If year_end parameter is used - then day_end will end in the day of the year_end.
+        Default is None. (meaning only a single day using the doy parameter)
+    year_end : int, optional
+        end year. This is to create a range from year to year_end to get the snr files for more than one year.
+        doy_end will be for year_end. Default is None.
+    azim1 : int, optional
+        lower limit azimuth.
+        If the azimuth angles are changed in the json (using 'azval' key) and not here, then the json overrides these.
+        If changed here, then it overrides what you requested in the json. default is 0.
+    azim2 : int, optional
+        upper limit azimuth.
+        If the azimuth angles are changed in the json (using 'azval' key) and not changed here, then the json overrides these.
+        If changed here, then it overrides what you requested in the json. default is 360.
+    nooverwrite : bool, optional
+        Use to overwrite lomb scargle result files or not.
+        Default is True (do not overwrite files).
+    extension : string, optional
+        extension for result file, useful for testing strategies. default is empty string
+    compress : boolean, optional
+        xz compress SNR files after use. default is False.
+    screenstats : bool, optional
+        whether to print stats to the screen or not. default is True.
+    delTmax : int, optional
+        maximum satellite arc length in minutes. Set in make_json_input
+    e1 : float, optional
+        use to override the minimum elevation angle.
+    e2 : float, optional
+        use to override the maximum elevation angle.
+    mmdd : boolean, optional
+        adds columns in results for month, day, hour, and minute. default is False.
+    gzip : boolean, optional
+        gzip compress SNR files after use. default is False.
+    dec : int, optional
+        decimate SNR file to this sampling period before the 
+        periodograms are computed. 1 sec is default (i.e. no decimating)
+    newarcs : bool, optional
+        uses new way to do rising and setting arcs.
 
     """
 
