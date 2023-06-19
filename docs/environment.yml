@@ -1,4 +1,4 @@
-name: gnssrefl
+name: gnssrefl_rtd
 channels:
 - conda-forge
 - defaults
