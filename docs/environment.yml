@@ -6,7 +6,7 @@ dependencies:
 - sphinx<7
 - sphinx_rtd_theme
 - unzip
-- gfortran_linux-64
+#- gfortran_linux-64
 - pip
 - wget
 - jupyter
