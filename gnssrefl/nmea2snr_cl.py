@@ -26,10 +26,12 @@ def main():
 
     As far as I can tell, the necessary fields in the NMEA files are GPGGA and GPGSV.
 
-    The default orbits are interpolations of the az and el NMEA fields. You can override this with -sp3 T 
-    and it will use the multi-GNSS sp3 file from GFZ. If you use the -sp3 option, the code needs to 
-    know the a priori station coordinates.  You can submit those on the command line or it will read 
-    them from the $REFL_CODE/input/ssss.json file (for station ssss) if it exists.
+    Originally this code used interpolations of the az and el NMEA fields. I have decided this 
+    is DANGEROUS. If you really want to use those low-quality measurements, you 
+    can use them by saying -sp3 F. Otherwise, if your data were collected after 
+    day of year 137 and year 2021, it will use the multi-GNSS sp3 file from GFZ. 
+    This means you have to provide a priori station coordinates. You can submit those on the 
+    command line or it will read them from the $REFL_CODE/input/ssss.json file (for station ssss) if it exists.
 
 
     Parameters
@@ -53,8 +55,7 @@ def main():
     height: float, optional
         height, m, only required for sp3 option
     sp3 : bool, optional
-        rather than interpolated low quality NMEA values, it 
-        uses multi-GNSS SP3 file from the GFZ for azimuth and elevation angle computations
+        set to False to use low quality NMEA values for az and el angles.
 
     """
     
@@ -112,9 +113,28 @@ def main():
     dec = 1
     if (args.dec is not None):
         dec = args.dec
-    sp3 = False
+
+    # 
+    gfz_date = 2021 + 137/365.25
+    # assume people are sensible until proven otherwise
+    sp3 = True
+
     if (args.sp3 is not None):
-        sp3 = True
+        if (args.sp3 == 'False') or (args.sp3 == 'F'):
+            sp3 = False
+
+
+    if (year+doy/365.25 >= gfz_date):
+        if not sp3:
+            print('You insist on using low quality az-el NMEA values')
+    else:
+        print('Your data were collected before my code knows how to pick up GFZ rapid orbits')
+        print('We are therefore using the original code which relies on NMEA az-el values. If you would like to ')
+        print('use reliable orbits, please submit a PR pointing to other sp3 files')
+        sp3 = False
+
+    if sp3 :
+        print('Using GFZ multi-GNSS sp3 file for orbits')
 
     # for now set to zero as Makan's code does not need LLH
     lat = 0; lon = 0; height = 0;

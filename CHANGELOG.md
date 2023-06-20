@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.3.18 
-Problems making the docs - keying on os.environ['ORBITS'] in felipe.py ???
+Problems making the readthedocs - So many problems.... downgraded sphinx version
+in the build.
+
+added hires_figs to subdaily - makes eps file instead of png.
+
+nmea2snr uses sp3 file as default now. Low quality azel records in the NMEA files 
+for some sensors.
+
 
 ## 1.3.17
 
