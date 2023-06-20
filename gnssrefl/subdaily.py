@@ -274,7 +274,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
 
 
 def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,
-        peak2noise,txtfile,h1,h2,kplt,txtdir,default_usage):
+        peak2noise,txtfile,h1,h2,kplt,txtdir,default_usage,hires_figs):
     """
     Reads in RH results and makes various plots to help users assess the quality of the solution
 
@@ -319,6 +319,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     default_usage : bool
         flat as to whether you are using this code for subdaily or for rh_plot.
         this changes the plots a bit.
+    hires_figs: bool
+        whether to switch from png to eps
 
     Returns
     -------
@@ -438,9 +440,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
         if default_usage:
-            numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs)
-            two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2)
-            stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt)
+            numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs)
+            two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs)
+            stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt,hires_figs)
             print_badpoints(tv[ii,:],residuals[ii],txtdir,real_residuals[ii])
         else:
             # make both plots cause life is short
@@ -707,7 +709,7 @@ def writejsonfile(ntv,station, outfile):
     return True
 
 
-def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
+def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
     """
     This actually makes three stacked plots - not two, LOL
     It gives an overview for quality control
@@ -728,6 +730,8 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
         minimum day of year
     d2 : int
         maximum day of year
+    hires_figs : bool
+        true for eps instead of png
 
     """
     if d1 == 1 and d2 == 366:
@@ -795,10 +799,14 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2):
     fig.autofmt_xdate()
 
     plotname = txtdir + '/' + station + '_combined.png'
-    plt.savefig(plotname,dpi=300)
-    print('png file saved as: ', plotname)
+    if hires_figs:
+        plotname = txtdir + '/' + station + '_combined.eps'
+        plt.savefig(plotname,dpi=300)
+    else:
+        plt.savefig(plotname,dpi=300)
+    print('Plot file saved as: ', plotname)
 
-def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
+def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs):
     """
     makes a plot of the reflector heights before and after minimal editing
 
@@ -871,7 +879,12 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     plt.title('Edited ' + station.upper() + ' Reflector Heights', fontsize=8)
     plt.grid() ; fig.autofmt_xdate()
     plotname = txtdir + '/' + station + '_outliers.png'
-    plt.savefig(plotname,dpi=300)
+    if hires_figs:
+        plotname = txtdir + '/' + station + '_outliers.png'
+        plt.savefig(plotname,dpi=300)
+    else:
+        plt.savefig(plotname,dpi=300)
+
     plt.ylim((savey1, savey2))
     print('png file saved as: ', plotname)
     if kplt:
@@ -1180,6 +1193,14 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     else:
         apply_if_corr = False
 
+    # probably a better way - but this is it for now ....
+    gotit = kwargs.get('hires_figs',True)
+    if gotit:
+        hires_figs = True
+        print('Requested high resolution figures')
+    else:
+        hires_figs = False
+
     #print('output directory: ', txtdir)
 
 #   how often do you want velocity computed (per day)
@@ -1471,7 +1492,11 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     plt.ylabel('meters')
     plt.title('Station: ' + station + ', new spline, RHdot corr/InterFreq corr/outliers removed')
     plt.xlabel('days of the year')
-    g.save_plot(txtdir + '/' + station + '_rhdot4.png')
+    # put hires_figs boolean here
+    if hires_figs:
+        g.save_plot(txtdir + '/' + station + '_rhdot4.eps')
+    else:
+        g.save_plot(txtdir + '/' + station + '_rhdot4.png')
 
     fig=plt.figure(figsize=(10,5))
     #plt.subplot(2,1,1)
@@ -1649,6 +1674,7 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     else:
         plotname = txtdir + '/' + station + '_rh2.png'
 
+
     print('png file saved as: ', plotname)
     plt.savefig(plotname,dpi=300)
 
@@ -1686,7 +1712,7 @@ def my_percentile(rh,p1, p2):
 
     return  lowv, highv
 
-def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
+def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs):
     """
     makes the plot that summarizes the number of satellites in each
     constellation per epoch
@@ -1711,6 +1737,8 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
         where results are stored
     fs : int
         fontsize for the plots
+    hires_figs : bool
+        try to plot high resolution
 
     """
 
@@ -1730,6 +1758,10 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
     plt.grid()
     fig.autofmt_xdate()
     plotname = txtdir + '/' + station + '_Subnvals.png'
-    plt.savefig(plotname,dpi=300)
+    if hires_figs:
+        plotname = txtdir + '/' + station + '_Subnvals.eps'
+        plt.savefig(plotname,dpi=300)
+    else:
+        plt.savefig(plotname,dpi=300)
     print('png file saved as: ', plotname)
 

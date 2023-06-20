@@ -40,11 +40,12 @@ def parse_arguments():
     parser.add_argument("-delta_out", default=None, type=int, help="Output interval for spline fit, seconds (default is 1800)")
     parser.add_argument("-if_corr", default=None, type=str, help="Interfrequency correction applied, optional")
     parser.add_argument("-knots_test", default=None, type=int, help="test knots")
+    parser.add_argument("-hires_figs", default=None, type=str, help="hi-res figures")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt','if_corr']
+    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt','if_corr','hires_figs']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -56,7 +57,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True, doy1: int = 1, 
         doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.4, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
-        subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0):
+        subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0, hires_figs : bool=False):
     """
     Subdaily combines multiple day gnssir solutions and applies relevant corrections. 
     It only works for one year at a time; you can restricts time periods within a year with -doy1 and -doy2
@@ -159,6 +160,14 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         plot for kristine
     subdir : str, optional
         name for output subdirectory in REFL_CODE/Files
+    delta_out : int, optional
+        how frequently - in seconds - you want smooth spline model output written
+        default is 1800 seconds
+    if_corr : bool, option
+        whether you want the inter-frequency removed
+        default is true
+    hires_figs : bool, optional
+        whether high resolution figures are made
 
     """
 
@@ -198,7 +207,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         
         default_usage = True
         ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, 
-                extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile_part1,h1,h2,kplt,txtdir,default_usage)
+                extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile_part1, 
+                h1,h2,kplt,txtdir,default_usage,hires_figs)
         haveObstimes = True
     else:
         haveObstimes = False
@@ -216,7 +226,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     # not sure why tv and corr are being returned.
     if rhdot:
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier1, spline_outlier2, 
-                   knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,if_corr=if_corr,knots_test=knots_test)
+                   knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,
+                   if_corr=if_corr,knots_test=knots_test,hires_figs=hires_figs)
        if plt:
            mplt.show()
 
