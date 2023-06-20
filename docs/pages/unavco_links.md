@@ -1,7 +1,11 @@
 # Useful links for UNAVCO data accounts
 
 ## User Profile Login
-#### **Note: will just be https://data.unavco.org/user/profile/login in future
+
+will be https://data.unavco.org/user/profile/login 
+
+or 
+
 https://data-idm.unavco.org/user/profile/login
 
 

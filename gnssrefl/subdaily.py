@@ -834,7 +834,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt):
     plt.legend(loc="best")
     plt.grid()
     plotname = txtdir + '/' + station + '_outliers_wrt_az.png'
-    plt.savefig(plotname,dpi=150)
+    plt.savefig(plotname,dpi=300)
     print('png file saved as: ', plotname)
 
     #    fig=plt.figure(figsize=(10,6))
@@ -1650,7 +1650,7 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
         plotname = txtdir + '/' + station + '_rh2.png'
 
     print('png file saved as: ', plotname)
-    plt.savefig(plotname,dpi=150)
+    plt.savefig(plotname,dpi=300)
 
 def my_percentile(rh,p1, p2):
     """
@@ -1730,6 +1730,6 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs):
     plt.grid()
     fig.autofmt_xdate()
     plotname = txtdir + '/' + station + '_Subnvals.png'
-    plt.savefig(plotname,dpi=150)
+    plt.savefig(plotname,dpi=300)
     print('png file saved as: ', plotname)
 
