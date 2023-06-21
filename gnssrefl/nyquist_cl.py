@@ -35,7 +35,9 @@ def nyquist(station: str, lat: float=None, lon: float=None, el_height: float=Non
     --------
     nyquist sc02 -e1 5 -e2 15
         typical case for most geodetic sites, 30 seconds, elevation angles 5-15 degrees
-        uses mean sea level
+
+    nyquist sc02 -samplerate 15 -system galileo
+        receiver sampling rate of 15 seconds and galileo
 
     Parameters
     ----------

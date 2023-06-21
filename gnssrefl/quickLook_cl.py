@@ -14,7 +14,6 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 
 
 def parse_arguments():
-# user inputs the observation file information
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
@@ -57,29 +56,32 @@ def quicklook(station: str, year: int, doy: int,
     results shown as a function of azimuth. This plot also summarizes why the RH retrievals were accepted
     or rejected in terms of the quality control parameters.  
 
-    Example:
+    Examples
+    --------
+    quickLook p041 2023 1 
+        analyzes station p041 on day of year 1 in the year 2023 with defaults (L1, e1=5, e2=25)
 
-    quickLook p041 2023 1 -h1 1 -h2 8
+    quickLook p041 2023 1 -h1 1 -h2 10
+        analyzes station p041 on day of year 1 in the year 2023.  
+        The periodogram would be restricted to RH of 1-10 meters.  
 
-    would analyze station p041 on day of year 1 in the year 2023.  The periodogram would be 
-    restricted to 1-8 meters.  
 
     No refraction correction is applied at this stage. For this reason, very low elevation angle data at 
     very tall sites will appear to be of very poor quality.
 
     Parameters
     ----------
-    station : string
+    station : str
         4 character ID of the station
-    year : integer
+    year : int
         Year
-    doy : integer
+    doy : int
         Day of year
-    snr : integer, optional
+    snr : int, optional
         SNR format. This tells the code which SNR file to use.  66 is the default.
         Other options: 50, 88, and 99.
 
-    f : integer, optional. 
+    f : int, optional. 
         GNSS frequency. Default is GPS L1
         value options:
 
@@ -164,8 +166,8 @@ def quicklook(station: str, year: int, doy: int,
         ampl = [ampl]  # this is arbitrary  - but often true for L1 obs
 
     if e1 < 5:
-        print('have to change the polynomial limits because you went below 5 degrees')
-        print('this restriction is for quickLook only ')
+        print('We have to change the polynomial limits because you went below 5 degrees.')
+        print('This restriction is for quickLook only ')
         pele[0] = e1
 
     pltscreen = plt

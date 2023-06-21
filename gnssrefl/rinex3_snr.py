@@ -18,10 +18,12 @@ def main():
     Parameters
     ----------
     rinex3 : str
-        name of filename
-
+        name of RINEX3 file
     orb : str
         optional orbit choice.  default is gbm
+    snr : int
+        snr file choice. default is 66
+
     """
 
     parser = argparse.ArgumentParser()

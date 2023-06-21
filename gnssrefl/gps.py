@@ -2628,6 +2628,17 @@ def month_converter(month):
 def char_month_converter(month):
     """
     integer month to 3 character month
+
+    Parameters 
+    ----------
+    month : int
+        integer month (1-12)
+
+    Returns 
+    ----------
+    month : str
+        three char month, uppercase
+
     """
     months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
     return months[(month-1)]
@@ -2637,16 +2648,16 @@ def UNR_highrate(station,year,doy):
     picks up the 5 minute time series from UNR website for a given station
 
     Parameters
-    -----------
-    station : string
+    ----------
+    station : str
         4 character station name
+    year : int
+        full year
+    doy : int
+        day of year
 
-    year : integer
-
-    doy : integer
-
-    returns
-    -----------
+    Returns
+    -------
     filename : str
         output filename
     goodDownload : bool
@@ -2677,7 +2688,7 @@ def mjd_to_date(jd):
 
     Converts Modified Julian Day to y,m,d
     
-    Algorithm from 'Practical Astronomy with your Calculator or Spreadsheet', 
+    Algorithm from Practical Astronomy with your Calculator or Spreadsheet 
         4th ed., Duffet-Smith and Zwart, 2011.
     
     Parameters
@@ -2781,7 +2792,7 @@ def rewrite_tseries(station):
 
     Parameters
     ----------
-    station : string
+    station : str
         4 character station name
     """
     siteid = station.upper()
@@ -2840,8 +2851,7 @@ def rewrite_tseries_igs(station):
 
 def llh2xyz(lat,lon,height):
     """
-    inputs lat,lon (in degrees) and ellipsoidal height (in meters)
-    returns Cartesian values in meters.
+    converts llh to Cartesian values
 
     Parameters
     -----------
@@ -3026,6 +3036,7 @@ def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNois
         
 def define_quick_filename(station,year,doy,snr):
     """
+    defines SNR File name
 
     Parameters
     ----------
@@ -3041,7 +3052,7 @@ def define_quick_filename(station,year,doy,snr):
     Returns 
     -------
     f : str
-        filename
+        SNR filename
 
     """
     cyyyy, cyy, cdoy = ydoych(year,doy)
@@ -3274,14 +3285,14 @@ def rinex_ga_highrate(station, year, month, day):
 
     Parameters
     ----------
-    station : string
+    station : str
         4 character station ID, lowercase
-
-    year : integer
-
-    month : integer
-
+    year : int
+        full year
+    month : int
+        calendar month
     day : integer
+        day of the month
 
     """
     crnxpath = hatanaka_version()
@@ -3351,6 +3362,7 @@ def rinex_ga_highrate(station, year, month, day):
 
 def highrate_nz(station, year, month, day):
     """
+    NO LONGER SUPPORTED 
     picks up a high-rate RINEX 2.11 file from GNS New zealand
     requires teqc to convert/merge the files
 
@@ -3631,7 +3643,7 @@ def ign_orbits(filename, directory,year):
 
     Returns
     -------
-    foundit : boolean
+    foundit : bool
         whether sp3 file was found
 
     """
@@ -3669,7 +3681,7 @@ def ign_rinex3(station9ch, year, doy,srate):
 
     Returns
     -------
-    fexist : boolean
+    fexist : bool
         whether file was downloaded
     """
     fexist = False

@@ -12,8 +12,8 @@ def main():
     Command line tool that converts latitude, longitude, and 
     ellipsoidal ht to Cartesian coordinates  and prints to the screen
 
-    Example
-    -------
+    Examples
+    --------
     llh2xyz  39.949492042 -105.194266387  1728.856
         returns  -1283634.1616   -4726427.8934    4074798.0432
 

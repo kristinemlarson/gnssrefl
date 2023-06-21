@@ -54,23 +54,19 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     Required inputs are station, year, month, and day. If you want to use day of year,
     call it as station, year, doy, 0.
 
-    Example:
+    decimate does not seem to do anything, at least not for RINEX 2.11 files
+
+    Examples
+    --------
 
     download_rinex mfle 2015 1 1 
-
-    Using day of year instead of month/day:
+        downloads January 1, 2015
 
     download_rinex mfle 2015 52 0
-
-    RINEX 2.11 Files
-
-    If you want to specify an archive:
+        Using day of year instead of month/day:
 
     download_rinex p101 2015 52 0 -archive sopac
-
-    RINEX 3 instructions need to be added.
-
-    decimate does not seem to do anything, at least not for RINEX 2.11 files
+        checks only sopac archive
 
     Parameters
     ----------
@@ -78,13 +74,13 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         4 or 9 character ID of the station.
 
     year : int
-        Year
+        full Year
 
     month : int
         month
 
     day : int
-        day
+        day of month
 
     rate : str, optional
         sample rate. value options:
@@ -97,8 +93,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         Select which archive to get the files from.
         Default is redirected to all, as defined below. Value options:
 
-            cddis : (NASA's Archive of Space Geodesy Data)
-
+            cddis : (NASA)
 
             bev : (Austria Federal Office of Metrology and Surveying)
 
@@ -132,7 +127,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     version : int, optional
         Version of Rinex file. Default is 2.
-        Value options  2 or 3 
+        Value options 2 or 3 
 
     strip : bool, optional
         Whether to strip only SNR observables.  Uses teqc or gfzrnx.
