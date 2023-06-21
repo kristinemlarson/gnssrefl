@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.19
+
+Time sorted daily_avg output
+Added x-axis limits to quickplt
+
 ## 1.3.18 
 Problems making the readthedocs - So many problems.... downgraded sphinx version
 in the build.

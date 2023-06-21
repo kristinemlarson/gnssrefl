@@ -55,7 +55,6 @@ def fbias_daily_avg(station):
 # list of hte frequencies used
 
     flist = np.unique(tvall[:,6])
-    print(flist)
 
     if len(flist) == 0:
         print('There are no results.')
@@ -105,7 +104,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
         station name, 4 ch, lowercase
 
     extension : str
-        folder extension - usually ''
+        folder extension - usually empty string 
 
     year1 : integer
         first year
@@ -172,12 +171,14 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     for yr in year_list:
         direc = xdir + '/' + str(yr) + '/results/' + station + '/' + extension + '/'
         if os.path.isdir(direc):
+            # i understand why python people like this - but then the results are not sorted ...
             all_files = os.listdir(direc)
+            all_files = np.sort(all_files)
             #print('Number of files in ', yr, len(all_files))
             for f in all_files:
                 fname = direc + f
                 L = len(f)
-        # file names must have 7 characters in them ... 
+        # file names must have 7 characters in them ...  and end in txt for that matter
                 if (L == 7):
                     NumFiles +=  1
         # check that it is a file and not a directory and that it has something/anything in it

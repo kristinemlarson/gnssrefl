@@ -58,6 +58,8 @@ def main():
         name of png file to store plot 
     ylimits: float, optional
         pair of yaxis limits  
+    xlimits: float, optional
+        pair of xaxis limits  
 
     """
 
@@ -74,6 +76,7 @@ def main():
     parser.add_argument("-title", help="optional title", type=str,default=None)
     parser.add_argument("-outfile", help="optional filename for plot", type=str,default=None)
     parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
+    parser.add_argument("-xlimits", nargs="*",type=float, help="optional xlimits", default=None)
     parser.add_argument("-ydoy", help="if True/T, columns 1-2 are year and doy", type=str,default=None)
     parser.add_argument("-filename2", help="second filename", type=str, default=None)
 
@@ -175,6 +178,10 @@ def main():
         print('found y-axis limits')
         ylimits = args.ylimits
         plt.ylim((ylimits))
+    if args.xlimits is not None:
+        print('found x-axis limits')
+        xlimits = args.xlimits
+        plt.xlim((xlimits))
 
     if args.outfile is not None:
         plt.savefig(args.outfile,dpi=300)
