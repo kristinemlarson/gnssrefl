@@ -20,15 +20,18 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
 
     where SSSS is station name, day of year is 152 and year is 2023
 
+    locdir is generally $REFL_CODE/nmea/SSSS/yyyy where yyyy is the year number and SSSS is the station name
+
     I believe lowercase is also allowed, but the A at the end is still set to be upper case
 
     (I believe) The SNR files are stored with upper case if given upper case, lower case if given lower case.
+
 
     Parameters
     -----------
     locdir : str
         directory where your NMEA files are kept
-    fname : string
+    fname : str
         NMEA filename 
     snrfile : str
         name of output file for SNR data
@@ -41,7 +44,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
     doy : int
         day of year
     llh : list of floats
-        station location, lat (d), lon(d), height (m)
+        station location, lat (deg), lon(deg), height (m)
     sp3 : bool
         whether you use multi-GNSS sp3 file to do azimuth elevation angle calculations
         currently this only uses the GFZ rapid orbit.  

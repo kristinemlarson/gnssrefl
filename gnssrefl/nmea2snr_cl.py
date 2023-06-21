@@ -10,7 +10,7 @@ import gnssrefl.nmea2snr as nmea
 
 def main():
     """
-    nmea2snr conversion code
+    main script for the nmea2snr conversion code
 
     Looks for NMEA files in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023
     or $REFL_CODE/nmea/SSSS/2023 for station SSSS. Personally I prefer lowercase station 
@@ -18,7 +18,7 @@ def main():
 
     Files are named:  SSSS1520.23.A or ssss1520.23.A
 
-    where SSSS or ssss is station name, day of year is 152 and year is 2023
+    day of year is 152 and year is 2023 in this example
 
     The SNR files are stored with upper case if given upper case, lower case if given lower case.
     Currently I have left the last character in the file name as it was given to me - capital A.
@@ -31,7 +31,7 @@ def main():
     can use them by saying -sp3 F. Otherwise, if your data were collected after 
     day of year 137 and year 2021, it will use the multi-GNSS sp3 file from GFZ. 
     This means you have to provide a priori station coordinates. You can submit those on the 
-    command line or it will read them from the $REFL_CODE/input/ssss.json file (for station ssss) if it exists.
+    command line or it will read them from the $REFL_CODE/input/ssss.json file (for station ssss or SSSS) if it exists.
 
 
     Parameters
@@ -49,13 +49,25 @@ def main():
     dec : int, optional
         decimation in seconds
     lat: float, optional
-        latitude, deg, only required for sp3 option
+        latitude, deg, required for sp3file if json file not available
     lon: float, optional
-        longitude, deg, only required for sp3 option
+        longitude, deg, required for sp3file if json file not available
     height: float, optional
-        height, m, only required for sp3 option
+        height, m, required for sp3file if json file not available
     sp3 : bool, optional
         set to False to use low quality NMEA values for az and el angles.
+
+    Examples
+    --------
+
+    nmea2snr wesl 2023 8 -dec 5
+         makes SNR file with decimation of 5 seconds
+
+    nmea2snr wesl 2023 8 
+         makes SNR file with original sampling rate 
+
+    nmea2snr xyz2 2023 8 -lat 40.2342 -lon -120.32424 -height 12
+         makes SNR file with user provided station coordinates
 
     """
     

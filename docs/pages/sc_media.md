@@ -1,6 +1,6 @@
 # Slides and Videos 
 
-Part of the [2023 GNSS-IR Short Course](https://gnssrefl.readthedocs.io/en/latest/pages/sc_index.html).
+Return to [2023 GNSS-IR Short Course](https://gnssrefl.readthedocs.io/en/latest/pages/sc_index.html).
 
 ## Class Introduction
 - [Video](https://www.youtube.com/watch?v=yijolYWXSQc)(8 minutes)
