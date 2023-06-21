@@ -70,7 +70,8 @@ for station ABCD in year 2021 and day of year 3.
 
 NMEA files may be gzipped.
 
-nmea2snr needs better in-code documentation.
+nmea2snr needs better documentation. Hopefully the authors will provide it. My 
+best effort to help [is in the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 
 **Orbit files**
 

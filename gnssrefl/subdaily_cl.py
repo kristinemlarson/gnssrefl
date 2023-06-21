@@ -41,11 +41,12 @@ def parse_arguments():
     parser.add_argument("-if_corr", default=None, type=str, help="Interfrequency correction applied, optional")
     parser.add_argument("-knots_test", default=None, type=int, help="test knots")
     parser.add_argument("-hires_figs", default=None, type=str, help="hi-res figures")
+    parser.add_argument("-apply_rhdot", default=None, type=str, help="apply rhdot, default is True")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt','if_corr','hires_figs']
+    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt','if_corr','hires_figs','apply_rhdot']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -57,7 +58,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True, doy1: int = 1, 
         doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.4, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
-        subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0, hires_figs : bool=False):
+        subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0, 
+        hires_figs : bool=False, apply_rhdot : bool=True):
     """
     Subdaily combines multiple day gnssir solutions and applies relevant corrections. 
     It only works for one year at a time; you can restricts time periods within a year with -doy1 and -doy2
@@ -106,7 +108,6 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
     Parameters
     ----------
-
     station : str
         4 character id of the station.
     year : int
@@ -168,6 +169,9 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         default is true
     hires_figs : bool, optional
         whether high resolution figures are made
+    apply_rhdot : bool, optional
+        whether you want the RH dot correction applied
+        for a lake or river you would not want it to be.
 
     """
 
@@ -227,7 +231,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     if rhdot:
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier1, spline_outlier2, 
                    knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,
-                   if_corr=if_corr,knots_test=knots_test,hires_figs=hires_figs)
+                   if_corr=if_corr,knots_test=knots_test,hires_figs=hires_figs,apply_rhdot=apply_rhdot)
        if plt:
            mplt.show()
 

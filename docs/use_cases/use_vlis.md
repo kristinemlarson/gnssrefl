@@ -120,8 +120,7 @@ using different frequencies and the RH, elevation angle, and azimuth settings.
 
 This is the strategy I used:
 
-<code>gnssir_input vlis -h1 5 -h2 15 -e1 5 -e2 20 -peak2noise 3 -ampl 1 -frlist 1 20 5 101 102 201 205 207 -azel2 70 180 </code>
-
+<code>gnssir_input vlis -h1 5 -h2 15 -e1 5 -e2 20 -peak2noise 3 -ampl 1 -frlist 1 20 5 101 102 201 205 207 -azlist2 70 180 </code>
 
 Now run <code>gnssir</code> for these same dates. This computes RH for each rising and setting satellite arc:
 
@@ -169,6 +168,3 @@ utility <code>download_tides</code>. The tide gauge network is ioc and the
 name of the tide gauge is ... vlis! If you say <code>-plt T</code> it makes a crude
 plot for you.
 
-Updated:
-
-Kristine M. Larson April 25, 2023

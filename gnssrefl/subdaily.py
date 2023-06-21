@@ -1169,6 +1169,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     apply_if_corr : bool, optional
         whether you want to apply the IF correction
         default is true
+    apply_rhdot : bool, optional
+        whether you want to apply the rhdot correction
+        default is true
 
     """
     # output will go to REFL_CODE/Files unless txtdir provided
@@ -1192,6 +1195,12 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         apply_if_corr = True
     else:
         apply_if_corr = False
+
+    apply_rhdot  = kwargs.get('apply_rhdot',True)
+    if apply_rhdot:
+        apply_rhdot_corr = True
+    else:
+        apply_rhdot_corr = False
 
     # probably a better way - but this is it for now ....
     gotit = kwargs.get('hires_figs',True)
@@ -1373,6 +1382,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     writecsv = False ; extraline = ''
     # write out the new solutions with RHdot and without 3 sigma outliers
+    # this should be changed to take into account apply_rhdot_corr
     write_subdaily(fname_new,station,tvd_new,writecsv,extraline,newRH=correctedRH_new, RHdot_corr=correction_new)
     nr,nc = tvd_new.shape
     print('Percent of observations removed:', round(100*(NV-nr)/NV,2))

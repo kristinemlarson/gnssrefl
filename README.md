@@ -2,6 +2,9 @@
 
 **github version: 1.3.18** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
+**I am ripping off the bandaid on or about July 1. From then on, the newarcs option will be the default for
+<code>gnssir</code>.**
+
 We have improved the way the code chooses rising and setting satellite arcs. 
 Please use the <code>gnssir_input</code> instead of <code>make_json_input</code> when setting an analysis 
 strategy, and <code>-newarcs T</code> when 
@@ -21,9 +24,11 @@ GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 09357
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was initially developed 
 as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
-This documentation was updated on June 1, 2023
+Our funding ends August 31. Please help us in maintaining this code. 
 
 Kristine M. Larson
+
+June 21, 2023
 
 <HR>
 
