@@ -1,5 +1,7 @@
 # Community 
 
+## [Publications](https://gnssrefl.readthedocs.io/en/latest/pages/community.html)
+
 ## Acknowledgements
 
 - [Radon Rosborough](https://github.com/raxod502) helped with 
@@ -27,10 +29,11 @@ Authors and maintainers: [Kristine M. Larson](https://kristinelarson.net),
 
 ## How you can help improve this code
 
-- Archives frequently change their file transfer protocols. If you find one in <code>gnssrefl</code> that doesn't work anymore,
+- Archives frequently change their file transfer protocols. If you find one 
+in <code>gnssrefl</code> that doesn't work anymore,
 please fix it and let us know. Please test that it works for both older and newer data.
 
-- If you would like to add an archive, please do so. Use the existing code in gps.py as a starting point. 
+- If you would like to add an archive, please do so. Use the existing code as a starting point. 
 
 - Check the [issues section](https://github.com/kristinemlarson/gnssrefl/issues) of the repository and look for "help wanted."
 
@@ -63,7 +66,7 @@ If the string is long - please post the error string in a thread response to you
 Would you like to join our <code>gnssrefl</code> users email list?
 This is currently operated by earthscope.org. To join, please send Kristine an email.
 
-Updated May 5, 2023  by Kristine M. Larson
+Updated June 22, 2023  by Kristine M. Larson
 
 [Old news section from before we moved to readthedocs](https://gnssrefl.readthedocs.io/en/latest/pages/old_news.html)
 
