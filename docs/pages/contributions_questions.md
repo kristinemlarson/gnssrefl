@@ -1,6 +1,7 @@
 # Community 
 
-## [Publications](https://gnssrefl.readthedocs.io/en/latest/pages/community.html)
+## Publications
+- [One Receiver, Zenith Pointing](https://gnssrefl.readthedocs.io/en/latest/pages/community.html)
 
 ## Acknowledgements
 
@@ -35,7 +36,8 @@ please fix it and let us know. Please test that it works for both older and newe
 
 - If you would like to add an archive, please do so. Use the existing code as a starting point. 
 
-- Check the [issues section](https://github.com/kristinemlarson/gnssrefl/issues) of the repository and look for "help wanted."
+- Check the [issues section](https://github.com/kristinemlarson/gnssrefl/issues) of the 
+repository and look for "help wanted."
 
 - Write up a new [use case](https://gnssrefl.readthedocs.io/en/latest/pages/first_drivethru.html)
 
