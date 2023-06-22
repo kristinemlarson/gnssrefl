@@ -7,10 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Time sorted daily_avg output
 Added x-axis limits to quickplt
+Snowdepth can be limited to a single frequency (useful for earlier datasets that only 
+had useful L2C)
+
+Added community pubication page to docs/pages/community.md
 
 ## 1.3.18 
 Problems making the readthedocs - So many problems.... downgraded sphinx version
-in the build.
+in the build. fixed it.
 
 added hires_figs to subdaily - makes eps file instead of png.
 
