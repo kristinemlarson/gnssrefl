@@ -26,6 +26,7 @@ def parse_arguments():
     parser.add_argument("-simple", help="use simple algorithm (default is false)", type=str, default=None)
     parser.add_argument("-medfilter", help="median filter for daily average(m)", type=float, default=None)
     parser.add_argument("-ReqTracks", help="how many arcs needed for daily average)", type=int, default=None)
+    parser.add_argument("-fr", help="if you want to restrict to a single frequency", type=int, default=None)
     parser.add_argument("-barereq_days", help="how many bare soil values req (default is 15)", type=int, default=None)
 
     args = parser.parse_args().__dict__
@@ -40,7 +41,8 @@ def parse_arguments():
 
 def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None, 
-        plt_enddate:str=None,simple:bool=False, medfilter:float = None, ReqTracks: int = None, barereq_days: int = 15):
+        plt_enddate:str=None,simple:bool=False, medfilter:float = None, ReqTracks: int = None, 
+        barereq_days: int = 15, fr: int = None):
     """
     Calculates snow depth for a given station and water year.
     Before you run this code you must have run gnssir for each day of interest.  
@@ -98,12 +100,17 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         to create a daily average RH
     barereq_days: int, optional
         how many bare soil days are required to trust the result, default is 15
+    fr : int, optional
+        if you want to restrict to a single frequency at the daily-avg stage (1, 20, etc)
 
     """
     if (medfilter is not None) and (ReqTracks is not None):
         print('Running daily average')
         txtfile=None; pltit = False
-        da.daily_avg(station, medfilter, ReqTracks,  txtfile,pltit,'',2005,2030,0,False,0,360,False,None)
+        if fr is not None:
+            da.daily_avg(station, medfilter, ReqTracks,  txtfile,pltit,'',2005,2030,fr,False,0,360,False,None)
+        else:
+            da.daily_avg(station, medfilter, ReqTracks,  txtfile,pltit,'',2005,2030,0,False,0,360,False,None)
         # do not display these plots
         matplt.close ('all')
 
