@@ -100,7 +100,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         bfg, unavco
 
     RINEX3 1 sec 
-        cddis, bkg, maybe nrcan
+        bkg, maybe nrcan (cddis was removed because it is glacial)
 
     Parameters
     ----------
@@ -357,26 +357,30 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         doy2 = doy_end
 
     archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
-    # cddis removed 2023 6 23
-    archive_list_rinex3 = ['unavco', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
-                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2']
+                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
 
     # no longer allow the all option
     # unavco is only rinex2
     # ga is only rinex3
     # bkg is only rinex 3
     # i cannot remember for nrcan. it is probably rinex2
-    highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  
-    # removed cddis
+    #highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  
+    # removed cddis because it is toooooooo slow
     highrate_list = ['unavco', 'nrcan', 'ga','bkg']  
 
     if ns == 9:
         # rinex3
-        if archive not in archive_list_rinex3:
-            print('You have chosen an archive not supported by the code.')
-            print(archive_list_rinex3)
-            sys.exit()
+        if rate == 'high':
+            if archive not in highrate_list:
+                print('You have chosen an archive not supported by the code.')
+                print(highrate_list)
+                sys.exit()
+        else:
+            if archive not in archive_list_rinex3:
+                print('You have chosen an archive not supported by the code.')
+                print(archive_list_rinex3)
+                sys.exit()
     else:
         # rinex2
         if rate == 'high':

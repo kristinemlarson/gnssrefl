@@ -78,6 +78,7 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
                 oname = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.rnx' # do we need this?
 
             new_way_dir = '/gnss/data/highrate/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/' + ch + '/'
+            #print(new_way_dir)
             if os.path.isfile(oname):
                 print('Found it:', new_way_dir,file_name)
                 fileF = fileF + 1

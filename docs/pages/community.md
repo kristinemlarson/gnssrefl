@@ -19,17 +19,17 @@ Changes to this file will only be allowed thru a pull request on github.
 - [Nievinski, F.G. and K.M. Larson, Inverse Modeling of GPS Multipath for Snow Depth Estimation, Part II: Application and Validation, IEEE TGRS, Vol. 52(10), 6564-6573, doi:10.1109/TGRS.2013.2297688, 2014](https://morefunwithgps.com/public_html/Inverse_Modeling_of_GPS_Multipath_for_Snow_Depth_EstimationPart_II_Application_and_Validation.pdf)
 - [Altuntas, C., M.C. Iban, E. Şentürk, U.M. Durdag, and N. Tunalioglu, Machine learning-based snow depth retrieval using GNSS signal-to-noise ratio data, GPS Solutions, Vol. 26(117), 1-12, doi:10.1007/s10291-022-01307-2, 2022](https://link.springer.com/article/10.1007/s10291-022-01307-2)
 
--[McCreight, E.E. Small, and K.M. Larson, Snow Depth, Density, and SWE estimates Derived from GPS Reflection Data: Validation in the Western U.S., Water Resources Research,Vol. 50(8), doi:10.1002/2014WR015561, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/McCreightSmallLarson.pdf)
+- [McCreight, E.E. Small, and K.M. Larson, Snow Depth, Density, and SWE estimates Derived from GPS Reflection Data: Validation in the Western U.S., Water Resources Research,Vol. 50(8), doi:10.1002/2014WR015561, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/McCreightSmallLarson.pdf)
 
 ## Tides 
 
-- [Larson, K.M., J. Lofgren, and R. Haas, Coastal Sea Level Measurements Using A Single Geodetic GPS Receiver, Adv. Space Res., Vol. 51(8), 1301-1310, 2013, doi:10.1016/j.asr.2012.04.017, 2013](https://www.kristinelarson.net/wp-content/uploads/2015/10/Larson_TideGauge.pdf)
+- [Larson, K.M., J. L&ouml;fgren, and R. Haas, Coastal Sea Level Measurements Using A Single Geodetic GPS Receiver, Adv. Space Res., Vol. 51(8), 1301-1310, 2013, doi:10.1016/j.asr.2012.04.017, 2013](https://www.kristinelarson.net/wp-content/uploads/2015/10/Larson_TideGauge.pdf)
 
 - [Larson, K.M., R. Ray, F. Nievinski, and J. Freymueller, The Accidental Tide Gauge: A Case Study of GPS Reflections from Kachemak Bay, Alaska, IEEE GRSL, Vol 10(5), 1200-1205, doi:10.1109/LGRS.2012.2236075, 2013](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf)
 
 - [Larson, K.M., R.D. Ray, and  S.P. Williams, A ten year comparison of water levels measured with a geodetic GPS receiver versus a conventional tide gauge, J. Atmos. Ocean Tech, Vol. 34(2), 295-307, doi: 10.1175/JTECH-D-16-0101.1, 2017](https://www.kristinelarson.net/wp-content/uploads/2015/12/LarsonRayWilliams-2017-FridayHarbor.pdf)
 
--[Peng, D., L. Feng,  K.M. Larson, and E. Hill, Measuring Coastal Absolute Sea-Level Changes Using GNSS Interferometric Reflectometry, Remote Sens. 13(21), 4319, 2021](https://www.mdpi.com/2072-4292/13/21/4319)
+- [Peng, D., L. Feng,  K.M. Larson, and E. Hill, Measuring Coastal Absolute Sea-Level Changes Using GNSS Interferometric Reflectometry, Remote Sens. 13(21), 4319, 2021](https://www.mdpi.com/2072-4292/13/21/4319)
 
 ## Lakes and Rivers
 

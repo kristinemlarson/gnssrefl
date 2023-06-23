@@ -5115,16 +5115,16 @@ def rinex_jp(station, year, month, day):
 
     Parameters
     ----------
-    station : string
+    station : str
         station name
 
-    year : integer
+    year : int
         full year
 
-    month: integer
+    month: int
         month or day of year
 
-    day : integer
+    day : int
         day of month or zero
     """
     # allow it to be called with day of year
@@ -5418,11 +5418,11 @@ def bfg_password():
     in your REFL_CODE/Files/passwords area
     If it does not exist, it asks you to input the values and stores them for you.
 
-    returns  
-    --------
-    userid : string
+    Returns  
+    -------
+    userid : str
 
-    password : string 
+    password : str 
 
     """
 
@@ -5662,10 +5662,9 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
         subprocess.call(cm,shell=True)
     return rinex2, fexist
 
-
-def cddis_download_2022B(filename,directory):
+def cddis_download_2022B_close_but_not_yet(filename,directory):
     """
-    download code for CDDIS
+    download code for CDDIS using https and password
 
     Parameters
     ----------
@@ -5676,6 +5675,60 @@ def cddis_download_2022B(filename,directory):
         where the file lives at CDDIS
 
     """
+    basename = 'https://cddis.nasa.gov/archive'
+    url = basename + directory + filename
+    subprocess.call(['curl','-n', '-O', url])
+
+
+def cddis_download_2022B(filename,directory):
+    """
+    download code for CDDIS using https and password
+
+    Parameters
+    ----------
+    filename : str
+        name of the rinex file or orbit file
+
+    directory : str
+        where the file lives at CDDIS
+
+    """
+    basename = 'https://cddis.nasa.gov/archive'
+    url = basename + directory + filename
+    print(url)
+    # Makes request of URL, stores response in variable r
+    user,passw = cddis_password()
+
+# requests.get('https://httpbin.org/basic-auth/user/pass', auth=('user', 'pass'))
+    r = requests.get(url,auth=('user','passw'))
+
+    if (r.status_code == 200):
+# Opens a local file of same name as remote file for writing to
+        with open(filename, 'wb') as fd:
+            for chunk in r.iter_content(chunk_size=1000):
+                fd.write(chunk)
+
+# Closes local file
+        fd.close()
+    else:
+        print('File does not exist')
+
+def cddis_download_2022B_old(filename,directory):
+    """
+    Nth iteration of download code for CDDIS
+
+    Parameters
+    ----------
+    filename : str
+        name of the rinex file or orbit file
+
+    directory : str
+        where the file lives at CDDIS
+
+    """
+    print('Apologies. We no longer support downloads from CDDIS')
+    return
+
     ftps = FTP_TLS(host = 'gdc.cddis.eosdis.nasa.gov')
     email = 'kristine.larson@colorado.edu'
     ftps.login(user='anonymous', passwd=email)
@@ -6092,3 +6145,53 @@ def cddis_restriction(iyear, idoy):
 
 
     return bad_day
+
+
+def cddis_password():
+    """
+    Picks up cddis userid and password that is stored in a pickle file
+    in your REFL_CODE/Files/passwords area
+    If it does not exist, it asks you to input the values and stores them for you.
+
+    Returns
+    -------
+    userid : str
+        cddis username
+
+    password : str
+        cddis password
+
+    """
+
+    fdir = os.environ['REFL_CODE']
+    if not os.path.isdir(fdir):
+        print('You need to define the REFL_CODE environment variable')
+        return
+
+    # make sure the directory exists to store passwords
+    if not os.path.isdir(fdir + '/Files'):
+        subprocess.call(['mkdir',fdir + '/Files'])
+    if not os.path.isdir(fdir + '/Files/passwords'):
+        subprocess.call(['mkdir',fdir + '/Files/passwords'])
+
+    userinfo_file = fdir + '/Files/passwords/' + 'cddis.pickle'
+    #print('user information file', userinfo_file)
+
+    #print('Will try to pick up BFG account information',userinfo_file)
+    if os.path.exists(userinfo_file):
+        with open(userinfo_file, 'rb') as client_info:
+            login_info = pickle.load(client_info)
+            user_id = login_info[0]
+            passport = login_info[1]
+    else:
+        print('You need a earthdata account to access NASA data.')
+        print('https://urs.earthdata.nasa.gov/')
+        user_id = getpass.getpass(prompt='Userid: ', stream=None)
+        passport= getpass.getpass(prompt='Password: ', stream=None)
+        # save to a file
+        with open(userinfo_file, 'wb') as client_info:
+            pickle.dump((user_id,passport) , client_info)
+        print('User id and password saved to', userinfo_file)
+
+    return user_id, passport
+

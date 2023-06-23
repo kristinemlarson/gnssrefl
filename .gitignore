@@ -1,4 +1,7 @@
 env
+cddis.py
+qcddis.py
+.netrc
 jul01.snr
 jul01.txt
 convert_argt.py
