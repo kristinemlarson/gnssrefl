@@ -17,6 +17,7 @@ Changes to this file will only be allowed thru a pull request on github.
 - [Nievinski, F.G. and K.M. Larson, Inverse Modeling of GPS Multipath for Snow Depth Estimation, Part I: Formulation and Simulations, IEEE TGRS, Vol. 52(10), 6555-6563, doi:10.1109/TGRS.2013.2297681, 2014](https://morefunwithgps.com/public_html/Inverse_Modeling_of_GPS_Multipath_for_Snow_Depth_EstimationPart_I_Formulation_and_Simulations.pdf)
 
 - [Nievinski, F.G. and K.M. Larson, Inverse Modeling of GPS Multipath for Snow Depth Estimation, Part II: Application and Validation, IEEE TGRS, Vol. 52(10), 6564-6573, doi:10.1109/TGRS.2013.2297688, 2014](https://morefunwithgps.com/public_html/Inverse_Modeling_of_GPS_Multipath_for_Snow_Depth_EstimationPart_II_Application_and_Validation.pdf)
+- [Altuntas, C., M.C. Iban, E. Şentürk, U.M. Durdag, and N. Tunalioglu, Machine learning-based snow depth retrieval using GNSS signal-to-noise ratio data, GPS Solutions, Vol. 26(117), 1-12, doi:10.1007/s10291-022-01307-2, 2022](https://link.springer.com/article/10.1007/s10291-022-01307-2)
 
 -[McCreight, E.E. Small, and K.M. Larson, Snow Depth, Density, and SWE estimates Derived from GPS Reflection Data: Validation in the Western U.S., Water Resources Research,Vol. 50(8), doi:10.1002/2014WR015561, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/McCreightSmallLarson.pdf)
 
@@ -44,6 +45,10 @@ Changes to this file will only be allowed thru a pull request on github.
 ## Simulator
 
 - [Nievinski, F.G. and K.M. Larson, An Open Source GPS Multipath Simulator in Matlab/Octave Nievinski, GPS Solutions, Vol 18(3), 473-481, doi:10.1007/s10291-014-0370-z, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/Nievinski_Simulator.pdf)
+
+## Software
+
+- [Altuntas, C. and N. Tunalioglu, GIRAS: an open-source MATLAB-based software for GNSS-IR analysis, GPS Solutions, Vol 26(16), 1-8, doi:10.1007/s10291-021-01201-3, 2022](https://link.springer.com/article/10.1007/s10291-021-01201-3)
 
 
 ## Vegetation
