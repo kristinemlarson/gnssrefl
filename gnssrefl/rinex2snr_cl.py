@@ -357,7 +357,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         doy2 = doy_end
 
     archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
-    archive_list = ['sopac', 'unavco', 'sonel', 'cddis', 'nz', 'ga', 'bkg', 'jeff',
+    # cddis removed 2023 6 23
+    archive_list_rinex3 = ['unavco', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
+    archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2']
 
     # no longer allow the all option
