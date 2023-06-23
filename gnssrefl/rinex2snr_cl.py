@@ -368,6 +368,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # bkg is only rinex 3
     # i cannot remember for nrcan. it is probably rinex2
     highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  
+    # removed cddis
+    highrate_list = ['unavco', 'nrcan', 'ga','bkg']  
 
     if ns == 9:
         # rinex3
