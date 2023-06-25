@@ -33,7 +33,6 @@ def parse_arguments():
     parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
     parser.add_argument("-dec", default=None, type=int, help="decimation value (seconds). Only for RINEX 3.")
     parser.add_argument("-save_crx", default=None, type=str, help="Save crx version. Only for RINEX 3.")
-    parser.add_argument("-bkg", default=None, type=str, help="bkg directory, only for highrate RINEX 3.")
 
     args = parser.parse_args().__dict__
 
@@ -48,13 +47,15 @@ def parse_arguments():
 def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = None,
                    version: int = 2, strip: bool = False, doy_end: 
                    int = None, stream: str = 'R', samplerate: int = 30, 
-                   debug: bool = False, dec: int = 1, save_crx: bool = False, bkg: str = None ):
+                   debug: bool = False, dec: int = 1, save_crx: bool = False ):
     """
     Command line interface for downloading RINEX files from global archives.
     Required inputs are station, year, month, and day. If you want to use day of year,
     call it as station, year, doy, 0.
 
     decimate does not seem to do anything, at least not for RINEX 2.11 files
+
+    bkg option is changed.  now must specify bkg-igs or bkg-euref
 
     Examples
     --------
@@ -97,7 +98,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
             bev : (Austria Federal Office of Metrology and Surveying)
 
-            bkg : (German Agency for Cartography and Geodesy)
+            bkg-igs : igs folder of BKG (German Agency for Cartography and Geodesy)
+
+            bkg-euref : Euref folder of BKG (German Agency for Cartography and Geodesy)
 
             bfg : (German Agency for water research, only Rinex 3)
 
@@ -155,18 +158,22 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     save_crx : bool, option
         saves crx version for Rinex3 downloads. Otherwise they are deleted.
 
-    bkg : str, optional
-        tells you which directory the files live in, EUREF or IGS
-        Default is EUREF.
     """
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
-    if bkg is None:
-        bkg = 'EUREF'
-    else:
-        bkg = bkg.upper()
+    if 'bkg' in archive:
+        if (archive == 'bkg'):
+            print('You have not specified which BKG archive you want.')
+            print('You must select bkg-igs or bkg-euref.')
+            sys.exit()
+        if 'euref' in archive:
+            bkg = 'EUREF'
+        else:
+            bkg = 'IGS'
+        # change archive name back to original
+        archive = 'bkg'
 
     if len(str(year)) != 4:
         print('Year must have four characters: ', year)
@@ -176,13 +183,15 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     # allowed archives, rinex 2.11
     # not really sure bev, gfz, bkg work ???
-    archive_list = ['bkg','bfg','bev','cddis', 'ga', 'gfz', 'jeff', 'ngs', 'nrcan', 'nz','sonel','sopac','special', 'unavco', 'all','unavco2']
+    archive_list = ['bkg','bfg','bev','cddis', 'ga', 'gfz', 'jeff', 'ngs', 
+            'nrcan', 'nz','sonel','sopac','special', 'unavco', 'all','unavco2']
 
     # removed the all archive
-    archive_list_high = ['unavco', 'nrcan', 'cddis','ga','bkg']  # though it is confusing because some are rinex 2.11 and others 3
+    # removed cddis because it is too slow
+    archive_list_high = ['bkg','unavco', 'nrcan', 'ga']  # though it is confusing because some are rinex 2.11 and others 3
 
     # archive list for rinex3 lowrate files
-    archive_list_rinex3 = ['unavco', 'cddis', 'ga', 'bev', 'bkg', 'ign', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
+    archive_list_rinex3 = ['unavco', 'bkg','cddis', 'ga', 'bev', 'ign', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
 
     if doy_end is None:
         doy_end = doy
@@ -245,7 +254,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             sys.exit()
 
     if (rate == 'high') and (version == 3):
-        if ((archive == 'cddis') or (archive == 'bkg')) or (archive == 'ga'):
+        if (archive == 'bkg') or (archive == 'ga'):
             print('Highrate RINEX 3 is supported - but it is very slow. Pick up a cup of coffee.')
         else:
             print('I do not support RINEX 3 high rate downloads from your selected archive.')

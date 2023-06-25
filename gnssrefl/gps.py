@@ -3454,15 +3454,15 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'grg')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gfr'):
-        print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
+        #print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'rapid'):
-        print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
+        #print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
-        print('uses default IGS orbits, so only GPS ?')
+        #print('uses default IGS orbits, so only GPS ?')
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igs')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gfz'):
@@ -6100,13 +6100,15 @@ def quickp(station,t,sealevel):
     return
 
 
-def cddis_restriction(iyear, idoy):
+def cddis_restriction(iyear, idoy,archive):
     """
     CDDIS has announced a restructuring of their archive.
     After 6 months files are tarred. It would be ok for the code
     to accommodate this change, but it will have to come from the community.
     If six months has passed since you ran the code, a warning will come to the 
     screen and the code will exit.
+
+    updated now that i realize BKG does the same thing
 
     Parameters
     ----------
@@ -6115,10 +6117,13 @@ def cddis_restriction(iyear, idoy):
     idoy : int
         day of year you want to download from CDDIS
 
+    archive : str
+        name of archive
+
     Returns
     -------
     bad_day : bool
-        if bad_day is true, you cannot access high-rate data from CDDIS
+        if bad_day is true, you cannot access high-rate data from CDDIS or BKG
 
     """
 # find out today's date
@@ -6136,7 +6141,7 @@ def cddis_restriction(iyear, idoy):
     if (tdate - idate) > 0.5:
         # i.e. half a year is six months
         bad_day =  True
-        print('CDDIS does not allow direct access to their high-rate data for this day and year. ')
+        print(archive.upper() + ' does not allow direct access to their high-rate data for this day and year. ')
         print('They now tar files six months after the data archived. If you are willing to ')
         print('submit a pull request to fix this issue, we would be very willing to host it.')
 

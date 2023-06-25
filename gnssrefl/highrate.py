@@ -278,11 +278,11 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
         print('Hour: ', ch)
         for e in ['00', '15', '30', '45']:
             file_name = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.crx.gz'
-            print('looking for', file_name)
+            dirname = gns + '/' + alpha[h] + '/'
+            print('looking for', dirname + file_name)
             crnx_name = file_name[:-3] 
             oname = file_name[:-6] + 'rnx'
 
-            dirname = gns + '/' + alpha[h] + '/'
             if os.path.isfile(oname):
                 fileF = fileF + 1
                 print('already have ', oname)

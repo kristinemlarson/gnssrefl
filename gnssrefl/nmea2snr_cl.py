@@ -54,20 +54,20 @@ def main():
         longitude, deg, required for sp3file if json file not available
     height: float, optional
         height, m, required for sp3file if json file not available
-    sp3 : bool, optional
-        set to False to use low quality NMEA values for az and el angles.
+    sp3 : str, optional
+        set to False or F to use low quality NMEA values for az and el angles.
+        this is changed to a boolean in the nmea2snr command line tool.
 
     Examples
     --------
-
     nmea2snr wesl 2023 8 -dec 5
-         makes SNR file with decimation of 5 seconds
+         makes SNR file with decimation of 5 seconds with good orbits
 
     nmea2snr wesl 2023 8 
-         makes SNR file with original sampling rate 
+         makes SNR file with original sampling rate  and good orbits
 
     nmea2snr xyz2 2023 8 -lat 40.2342 -lon -120.32424 -height 12
-         makes SNR file with user provided station coordinates
+         makes SNR file with user provided station coordinates and good orbits
 
     """
     
@@ -134,7 +134,6 @@ def main():
     if (args.sp3 is not None):
         if (args.sp3 == 'False') or (args.sp3 == 'F'):
             sp3 = False
-
 
     if (year+doy/365.25 >= gfz_date):
         if not sp3:

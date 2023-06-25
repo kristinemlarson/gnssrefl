@@ -10,6 +10,14 @@ Changes to this file will only be allowed thru a pull request on github.
 
 - [Chew, C.C., E.E. Small, K.M. Larson, and V. Zavorotny, Effects of Near-Surface Soil Moisture on GPS SNR Data: Development of a Retrieval Algorithm for Volumetric Soil Moisture, IEEE TGRS, Vol. 52(1), 537-543, doi:10.1109/TGRS.2013.2242332, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/Chew_etal_Proof.pdf)
 
+- Chew, C.C., E.E. Small, and K.M. Larson, An Algorithm for Soil Moisture Estimation Using 
+GPS Interferometric Reflectometry for Bare and Vegetated Soil, GPS Solutions, 
+Vol. 20(3), 525-537, doi:10.1007/s10291-015-0462-4, 2016
+
+- Chew, C.C., E.E. Small, K.M. Larson, and V. Zavorotny, Vegetation Sensing Using 
+GPS interferometric reflectometry: Theoretical Effects of  Canopy Parameters on Signal to 
+Noise Ratio Data, IEEE TGRS,Vol. 53(5), 2755-2763, doi: 10.1109/TGRS.2014.2364513, 2015
+
 ## Snow
 
 - [Larson, K.M., E. Gutmann, V. Zavorotny, J. Braun, M. Williams, and F. G. Nievinski, Can we measure snow depth with GPS receivers?, Geophys. Res. Lett., Vol. 36, L17502, doi:10.1029/2009GL039430, 2009](https://www.kristinelarson.net/wp-content/uploads/2015/10/larsonetal_snow_2009.pdf)
@@ -23,6 +31,13 @@ Changes to this file will only be allowed thru a pull request on github.
 
 ## Tides 
 
+- L&ouml;fgren, J., R. Haas, and H.-G. Scherneck,2014: Sea level time series and ocean tide 
+analysis from multipath signals at five GPS sites in different parts of the world. 
+J. Geodyn., 80, 66–80, doi:10.1016/ j.jog.2014.02.012, 2014
+
+- Strandberg, J., T. Hobiger, and R. Haas, 2016: Improving GNSS-R sea level 
+determination through inverse modeling of SNR data. Radio Sci., 51, 1286–1296, doi:10.1002/2016RS006057, 2016.
+
 - [Larson, K.M., J. L&ouml;fgren, and R. Haas, Coastal Sea Level Measurements Using A Single Geodetic GPS Receiver, Adv. Space Res., Vol. 51(8), 1301-1310, 2013, doi:10.1016/j.asr.2012.04.017, 2013](https://www.kristinelarson.net/wp-content/uploads/2015/10/Larson_TideGauge.pdf)
 
 - [Larson, K.M., R. Ray, F. Nievinski, and J. Freymueller, The Accidental Tide Gauge: A Case Study of GPS Reflections from Kachemak Bay, Alaska, IEEE GRSL, Vol 10(5), 1200-1205, doi:10.1109/LGRS.2012.2236075, 2013](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonIEEE_2013.pdf)
@@ -31,10 +46,18 @@ Changes to this file will only be allowed thru a pull request on github.
 
 - [Peng, D., L. Feng,  K.M. Larson, and E. Hill, Measuring Coastal Absolute Sea-Level Changes Using GNSS Interferometric Reflectometry, Remote Sens. 13(21), 4319, 2021](https://www.mdpi.com/2072-4292/13/21/4319)
 
+- Larson, K. M., Lay, T., Yamazaki, Y., Cheung, K. F., Ye, L., Williams, S. D. P., & Davis, J. L., Dynamic sea 
+level variation from GNSS: 2020 Shumagin earthquake tsunami resonance and Hurricane Laura. Geophysical 
+Research Letters, 48, e2020GL091378. https://doi. org/10.1029/2020GL091378, 2021.
+
 ## Lakes and Rivers
 
 - [Holden, L. and K.M. Larson, Ten Years of Lake Taupo Surface Height Estimates Using the GNSS Interferometric Reflectometry, Journal of Geodesy. Vol 95(74),10.1007/s00190-021-01523-7, 2021](https://www.kristinelarson.net/wp-content/uploads/2021/05/Holden-May2021.pdf)
 
+## Permafrost
+
+- Liu, L. and K.M. Larson, Decadal changes of surface elevation over permafrost area estimated using 
+reflected GPS signals, The Cryosphere, Vol 12, 477–489, doi:10.5194/tc-12-477-2018, 2018
 
 ## Ice
 
@@ -42,9 +65,21 @@ Changes to this file will only be allowed thru a pull request on github.
 
 - [Shean, D., K. Christianson, K.M. Larson, S.R.M. Ligtenberg, I.R. Joughin, B. E. Smith, C.M. Stevens, M. Bushuk, and D.M. Holland, GPS-derived estimates of surface mass balance and ocean-induced basal melt for Pine Island Glacier ice shelf, Antarctica, The Cryosphere Vol. 11, 2655-2674, doi:10.5194/tc-11-2655, 2017](https://tc.copernicus.org/articles/11/2655/2017/tc-11-2655-2017.pdf)
 
-## Simulator
+- Pinat,E.;Defraigne,P.; Bergeot, N.; Chevalier, J.-M.; Bertrand, B. Long-Term 
+Snow Height Variations in Antarctica from GNSS Interferometric Reflectometry. 
+Remote Sens. 13, 1164. https:// doi.org/10.3390/rs13061164, 2021
+
+- Larson, K.M., M. MacFerrin, and T. Nylen, Brief Communication: Update on the GPS 
+Reflection Technique for Measuring Snow Accumulation in Greenland, The Cryosphere, Vol. 14, 
+1985–1988, doi:10.5194/tc-2019-303, 2020.
+
+## Models and Simulators
 
 - [Nievinski, F.G. and K.M. Larson, An Open Source GPS Multipath Simulator in Matlab/Octave Nievinski, GPS Solutions, Vol 18(3), 473-481, doi:10.1007/s10291-014-0370-z, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/Nievinski_Simulator.pdf)
+
+- Zavorotny, V., K.M. Larson, J. Braun, E.E. Small, E. Gutmann, and A. 
+Bilich, A physical model of GPS multipath caused by land reflections: toward bare soil moisture 
+retrievals, IEEE J-STARS, Vol. 3 (1), pp. 100-110, 10.1109/JSTARS.2009.2033608, 2010
 
 ## Software
 

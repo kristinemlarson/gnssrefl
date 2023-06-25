@@ -44,7 +44,6 @@ def parse_arguments():
     parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
     parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
     parser.add_argument("-strip", default=None, help="use True to reduce number of obs", type=str)
-    parser.add_argument("-bkg", default=None, help="Which folder to use for the BKG archive, IGS or EUREF (default)", type=str)
 
     args = parser.parse_args().__dict__
 
@@ -59,13 +58,15 @@ def parse_arguments():
 def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None, rate: str = 'low', dec: int = 0,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
-              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, bkg: str = 'EUREF'):
+              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. The default is RINEX 2.11 files
 
     Default is GPS only until day of year 137, 2021 when rapid GFZ orbits became available.  If you still want to use
     the nav message, i.e. GPS only, you can request it.
+
+    bkg no longer a boolean input - must be specified with archive name, i.e. bkg-igs or bkg-euref
 
     Examples
     --------
@@ -94,13 +95,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         1 sec data for warn00deu, 1 sec decimated to 5 sec, multi-GNSS, bkg archive, streamed, in IGS folder
 
     RINEX3 30 second archives supported  
-        bev, bkg, cddis, epn, ga, gfz, nrcan, sonel
+        bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel
 
     RINEX3 15 sec archives
         bfg, unavco
 
     RINEX3 1 sec 
-        bkg, maybe nrcan (cddis was removed because it is glacial)
+        bkg-igs, bkg-euref, maybe nrcan (cddis was removed because it is glacial). cddis removed
 
     Parameters
     ----------
@@ -176,7 +177,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             bfg : (German Agency for water research, only Rinex 3, requires password)
 
-            bkg : (German Agency for Cartography and Geodesy)
+            bkg-igs : EUREF for (German Agency for Cartography and Geodesy)
+
+            bkg-euref : IGS for (German Agency for Cartography and Geodesy)
 
             cddis : (NASA's Archive of Space Geodesy Data)
 
@@ -234,10 +237,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     strip : bool, optional
         Reduces observables since the translator does not allow more than 25
         Default is False.
-
-    bkg : str, optional
-        tells you which directory the files live in, EUREF or IGS 
-        Default is EUREF.
 
     """
 
@@ -355,6 +354,19 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         doy2 = doy
     else:
         doy2 = doy_end
+
+
+    if 'bkg' in archive:
+        if (archive == 'bkg'):
+            print('You have not specified which BKG archive you want.')
+            print('You must select bkg-igs or bkg-euref.')
+            sys.exit()
+        if 'euref' in archive:
+            bkg = 'EUREF'
+        else:
+            bkg = 'IGS'
+        # change archive name back to original name
+        archive = 'bkg'
 
     archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',

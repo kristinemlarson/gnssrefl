@@ -248,7 +248,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
                         if (rate == 'high'):
-                            print('This code only accesses 1-Hz Rinex 3 data at CDDIS, BKG, and GA')
+                            print('This code only accesses 1-Hz Rinex 3 data at BKG, and GA')
                             if archive == 'ga':
                                 deleteOld = True
                                 # cold should return the new name of the rinex 2 file
@@ -256,7 +256,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                 if foundit:
                                     print('rinex2 file should now exist:', r2)
                             if archive == 'cddis':
-                                bad_day = g.cddis_restriction(year, doy)
+                                bad_day = g.cddis_restriction(year, doy,'cddis')
                                 if not bad_day:
                                     rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
                                 else: 
@@ -266,7 +266,12 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                     print('The RINEX 3 file has been downloaded. Try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
                             if archive == 'bkg':
-                                rnx_filename,foundit = ch.bkg_highrate(station9ch, year, doy, 0,stream,dec_rate,bkg)
+                                bad_day = g.cddis_restriction(year, doy,'bkg')
+                                if not bad_day:
+                                    rnx_filename,foundit = ch.bkg_highrate(station9ch, year, doy, 0,stream,dec_rate,bkg)
+                                else:
+                                    print('No high-rate RINEX data will be downloaded')
+                                    foundit = False; fexists = False; rnx_file = ''
                                 if foundit:
                                     print('The RINEX 3 file has been downloaded and merged. Try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
