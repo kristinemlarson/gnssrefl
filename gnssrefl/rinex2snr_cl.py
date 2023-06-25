@@ -356,6 +356,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         doy2 = doy_end
 
 
+    bkg = 'EUREF' # just so the code doesn't crash later on when variable
+    # is sent to rinex2snr
     if 'bkg' in archive:
         if (archive == 'bkg'):
             print('You have not specified which BKG archive you want.')
@@ -433,7 +435,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     if stream not in ['R', 'S']:
         stream = 'R'
-    bkg = bkg.upper() # make sure it is using uppercase
 
     args = {'station': station, 'year_list': year_list, 'doy_list': doy_list, 'isnr': snr, 'orbtype': orb,
             'rate': rate, 'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook,
