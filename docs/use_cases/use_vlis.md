@@ -111,7 +111,7 @@ To make your own 15 second multi-GNSS VLIS files with <code>rinex2snr</code> you
 
 Begin by making SNR files:
 
-<code>rinex2snr vlis00nld 2020 171 -doy_end 184 -rate high -dec 15 -orb gnss -archive bkg</code>
+<code>rinex2snr vlis00nld 2020 171 -doy_end 184 -rate high -dec 15 -orb gnss -archive bkg-euref</code>
 
 Then use <code>quickLook</code> to make sure your strategy is a good one, where you should try 
 using different frequencies and the RH, elevation angle, and azimuth settings.

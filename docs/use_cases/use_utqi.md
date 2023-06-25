@@ -34,7 +34,7 @@ with the real data. What azimuths should you use?
 
 In order to have access to modern GNSS signals, we will use RINEX 3 files. First make a SNR file:
 
-<code>rinex2snr utqi00usa 2022 150 -orb rapid -archive bkg</code>
+<code>rinex2snr utqi00usa 2022 150 -orb rapid -archive bkg-igs</code>
 
 This will return a multi-GNSS SNR file, but only 30 second data. This restricts 
 the possible reflector heights, but is good enough for a start.
