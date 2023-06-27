@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 added gnss3 orbit option for testing. eventually will use this for gnss.
 it downloads multi-GNSS sp3files directly from GFZ instead of from CDDIS.
 
+gnss now points to rapid when appropriate. hopefully.
+
 
 ## 1.3.22
 allows gzip RINEX 2.11 files in local directory
