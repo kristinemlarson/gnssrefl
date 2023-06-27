@@ -203,6 +203,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             # could try this way? - look for file in localpath2. gunzip if necessary
                             allgood = get_local_rinexfile(r,localpath2)
                         if os.path.exists(r):
+                            print('Found the RINEX 2.11 file', r)
                             if strip:
                                 print('Testing out stripping the RINEX 2 file here')
                                 k.strip_rinexfile(r)
@@ -248,7 +249,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
                         if (rate == 'high'):
-                            print('This code only accesses 1-Hz Rinex 3 data at BKG, and GA')
+                            print('This code only accesses 1-Hz Rinex 3 data at BKG, CDDIS, and GA')
                             if archive == 'ga':
                                 deleteOld = True
                                 # cold should return the new name of the rinex 2 file
@@ -1260,17 +1261,23 @@ def get_local_rinexfile(rfile,localpath2):
         whether file found
     """
     allgood = False
-    r = localpath2 + rfile
-    if os.path.exists(r):
+    # look for gzip veresion in local directory first
+    if os.path.exists(rfile + '.gz'):
+        subprocess.call(['gunzip', rfile + '.gz'])
         allgood = True
-        # cp to the local directory
-        subprocess.call(['cp',r,'.'])
-    else:
-       # did not find noromal rinex, so look for gzip version
-        if os.path.exists(r + '.gz'):
-            subprocess.call(['gunzip', r + '.gz'])
+
+    if not allgood:
+        r = localpath2 + rfile
         if os.path.exists(r):
-            subprocess.call(['cp',r,'.'])
             allgood = True
+        # cp to the local directory
+            subprocess.call(['cp',r,'.'])
+        else:
+       # did not find normal rinex, so look for gzip version
+            if os.path.exists(r + '.gz'):
+                subprocess.call(['gunzip', r + '.gz'])
+            if os.path.exists(r):
+                subprocess.call(['cp',r,'.'])
+                allgood = True
 
     return allgood

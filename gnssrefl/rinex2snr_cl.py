@@ -101,7 +101,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         bfg, unavco
 
     RINEX3 1 sec 
-        bkg-igs, bkg-euref, maybe nrcan (cddis was removed because it is glacial). cddis removed
+        bkg-igs, bkg-euref, cddis, maybe nrcan 
 
     Parameters
     ----------
@@ -380,8 +380,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # bkg is only rinex 3
     # i cannot remember for nrcan. it is probably rinex2
     #highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  
-    # removed cddis because it is toooooooo slow
-    highrate_list = ['unavco', 'nrcan', 'ga','bkg']  
+    highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis']  
 
     if ns == 9:
         # rinex3

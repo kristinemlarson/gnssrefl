@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.22
+allows gzip RINEX 2.11 files in local directory
+
+went back to original CDDIS access. apparently there was something wrong with their sftp access
+?  in any case, we now have two ways to access CDDIS, and eventually we will likely need 
+the other one.
+
 ## 1.3.21
 
 new version number to synch pypi and github versions

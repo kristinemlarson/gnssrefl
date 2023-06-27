@@ -418,8 +418,14 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             rhstd = np.std(tv[ii,2]); 
             newl = [dtime, rhavg, rhstd]
             stats = np.append(stats, [newl], axis=0)
+            #print(newl)
+            #??
+            if rhstd == 0:
+                rhstd = 1
+                
             b = ( tv[ii,2] - rhavg*np.ones( len(tv[ii,2]) ))/ rhstd
             bb =  tv[ii,2] - rhavg*np.ones( len(tv[ii,2]) )
+            
             residuals = np.append(residuals, b)
             real_residuals = np.append(real_residuals, bb)
             Gval = np.append(Gval, len(tmp[gi,1]))

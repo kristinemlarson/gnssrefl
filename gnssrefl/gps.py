@@ -5662,7 +5662,8 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
         subprocess.call(cm,shell=True)
     return rinex2, fexist
 
-def cddis_download_2022B_close_but_not_yet(filename,directory):
+
+def cddis_download_2022B_new(filename,directory):
     """
     download code for CDDIS using https and password
 
@@ -5675,24 +5676,7 @@ def cddis_download_2022B_close_but_not_yet(filename,directory):
         where the file lives at CDDIS
 
     """
-    basename = 'https://cddis.nasa.gov/archive'
-    url = basename + directory + filename
-    subprocess.call(['curl','-n', '-O', url])
-
-
-def cddis_download_2022B(filename,directory):
-    """
-    download code for CDDIS using https and password
-
-    Parameters
-    ----------
-    filename : str
-        name of the rinex file or orbit file
-
-    directory : str
-        where the file lives at CDDIS
-
-    """
+    print('New way of CDDIS downloads')
     basename = 'https://cddis.nasa.gov/archive'
     url = basename + directory + filename
     print(url)
@@ -5713,7 +5697,7 @@ def cddis_download_2022B(filename,directory):
     else:
         print('File does not exist')
 
-def cddis_download_2022B_old(filename,directory):
+def cddis_download_2022B(filename,directory):
     """
     Nth iteration of download code for CDDIS
 
@@ -5726,8 +5710,7 @@ def cddis_download_2022B_old(filename,directory):
         where the file lives at CDDIS
 
     """
-    print('Apologies. We no longer support downloads from CDDIS')
-    return
+    print('Original way of accessing CDDIS ')
 
     ftps = FTP_TLS(host = 'gdc.cddis.eosdis.nasa.gov')
     email = 'kristine.larson@colorado.edu'
