@@ -26,7 +26,7 @@ def parse_arguments():
     parser.add_argument("doy", help="start day of year", type=int)
     parser.add_argument("-snr", default=None, help="snr file ending, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg.", type=int)
     parser.add_argument("-orb", default=None, type=str,
-                        help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra")
+                        help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra, gnss3")
     parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX sample rate: low or high. Only used for archive searches.")
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
@@ -131,6 +131,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
             gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 
             gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
+
+            gnss3 : test case for GFZ orbits downloaded from GFZ instead of CDDIS
 
             nav : GPS broadcast, perfectly adequate for reflectometry. Same as gps.
 
@@ -268,7 +270,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # currently allowed orbit types - shanghai removed 2020sep08
     #
     orbit_list = ['gps', 'gps+glo', 'gnss', 'nav', 'igs', 'igr', 'jax', 'gbm',
-                  'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2','nav-sopac','nav-esa','nav-cddis']
+                  'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2','nav-sopac','nav-esa','nav-cddis','gnss3']
     if orb not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
@@ -287,6 +289,18 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if orb == 'gnss':
         orb = 'gbm'
 
+    # get orbit directly from GFZ
+    if orb == 'gnss3':
+        # this code wants year month day....
+        year, month, day = g.ydoy2ymd(year, doy)
+        filename, fdir, foundit = g.gbm_orbits_direct(year,month,day)
+
+        if not foundit:
+            print('You picked a backup multi-GNSS option.')
+            print('I tried to get the file from GFZ and failed. Exiting')
+            sys.exit()
+
+    # get orbit from IGS
     if orb == 'gnss2':
         # this code wants year month day....
         year, month, day = g.ydoy2ymd(year, doy)

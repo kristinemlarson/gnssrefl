@@ -3461,6 +3461,9 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         #print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
+    elif (orbtype == 'gnss3'):
+        f,orbdir,foundit=gbm_orbits_direct(year,month,day)
+        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
         #print('uses default IGS orbits, so only GPS ?')
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igs')
@@ -6182,4 +6185,90 @@ def cddis_password():
         print('User id and password saved to', userinfo_file)
 
     return user_id, passport
+
+
+
+def gbm_orbits_direct(year,month,day):
+    """
+    downloads gfz multi-gnss orbits, aka gbm orbits, directly from GFZ.
+    thus avoids CDDIS
+
+    Parameters
+    ----------
+    year : int
+        full year
+    month : int
+        month number or day of year if day is set to zero
+    day : int
+        calendar day of month
+
+    """
+    foundit = False
+    return_name = ''
+
+    month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
+    gpsweek,sec=kgpsweek(year,month,day,0,0,0)
+    cgpsweek = str(gpsweek)
+
+    gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/mgex/' + cgpsweek + '/'
+
+    fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
+    littlename = 'gbm' + str(gpsweek) + str(int(sec/86400)) + '.sp3'
+    bigname = 'GBM0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
+
+
+    # first, do you have it locally?  
+    # look for compressed file
+    fullname = fdir + '/' + littlename 
+    if os.path.isfile(fullname):
+        foundit = True
+        return_name = littlename
+    elif os.path.isfile(fullname + '.gz'):
+        subprocess.call(['gunzip', fullname + '.gz'])
+        foundit = True; 
+        return_name = littlename
+
+    if not foundit:
+        fullname = fdir + '/' + bigname 
+        if os.path.isfile(fullname):
+            foundit = True
+            return_name = bigname
+        elif os.path.isfile(fullname + '.gz'):
+            subprocess.call(['gunzip', fullname + '.gz'])
+            foundit = True; 
+            return_name = littlename
+
+    if not foundit:
+        url = gns + littlename + '.Z'
+        print(url)
+        try:
+            wget.download(url,littlename + '.Z')
+            subprocess.call(['uncompress', littlename + '.Z'])
+        except:
+            okok = 1
+        if os.path.isfile(littlename):
+            foundit = True ; return_name = littlename
+        else:
+            url = gns + bigname + '.gz'
+            print(url)
+            try:
+                wget.download(url,bigname + '.gz')
+                subprocess.call(['gunzip', bigname + '.gz'])
+                foundit = True ; return_name = bigname
+            except:
+                okok = 1
+
+
+    # store the file
+    if os.path.isfile(littlename):
+        store_orbitfile(littlename,year,'sp3') ; 
+    elif os.path.isfile(bigname):
+        store_orbitfile(bigname,year,'sp3') ; 
+
+    if not foundit:
+        print('Orbit was not found at GFZ or in a local directory')
+    else:
+        print('Orbit found')
+
+    return return_name, fdir, foundit
 
