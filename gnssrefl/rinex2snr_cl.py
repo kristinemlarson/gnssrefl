@@ -281,7 +281,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if orb == 'gps':
         orb = 'nav'
 
-    # if you choose ultra , you get the GFZ rapid 
     if orb == 'rapid':
         orb = 'gfr'
 
@@ -289,16 +288,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if orb == 'gnss':
         orb = 'gbm'
 
+    # this does not really work if you are using doy_end and year_end ....
     # get orbit directly from GFZ
-    if orb == 'gnss3':
-        # this code wants year month day....
-        year, month, day = g.ydoy2ymd(year, doy)
-        filename, fdir, foundit = g.gbm_orbits_direct(year,month,day)
+    #if orb == 'gnss3':
+    #    # this code wants year month day....
+    #    year, month, day = g.ydoy2ymd(year, doy)
+    #    filename, fdir, foundit = g.gbm_orbits_direct(year,month,day)
 
-        if not foundit:
-            print('You picked a backup multi-GNSS option.')
-            print('I tried to get the file from GFZ and failed. Exiting')
-            sys.exit()
 
     # get orbit from IGS
     if orb == 'gnss2':

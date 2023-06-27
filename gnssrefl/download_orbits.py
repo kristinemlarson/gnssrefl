@@ -120,9 +120,12 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
     if pCtr == 'gps':
         pCtr = 'nav'
 
-    # this is picked up from CDDIS
+    # try to avoid CDDIS. after 2022, just go to rapid. before that, more nuanced ....
     if pCtr == 'gnss':
-        pCtr = 'gbm'
+        if year >= 2022:
+            pCtr = 'gfr'
+        else:
+            pCtr = 'gnss3'
 
     if pCtr == 'gps+glo':
         pCtr = 'jax'

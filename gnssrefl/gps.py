@@ -3445,6 +3445,14 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
 
     """
     #default values
+    # if they ask for gnss or gnss3, always use rapid.
+    # at least for years 2022 and after
+    if year >= 2022:
+        if (orbtype == 'gnss') or (orbtype == 'gnss3'):
+            orbtype = 'rapid'
+        if orbtype == 'gbm':
+            orbtype = 'rapid'
+
     foundit = False
     f=''; orbdir=''
     # define directory for the conversion executables
@@ -3454,11 +3462,9 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'grg')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gfr'):
-        #print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'rapid'):
-        #print('uses rapid GFZ orbits, avail as of 2021/137, now pointing to local GFZ directory ')
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gnss3'):
@@ -6191,7 +6197,8 @@ def cddis_password():
 def gbm_orbits_direct(year,month,day):
     """
     downloads gfz multi-gnss orbits, aka gbm orbits, directly from GFZ.
-    thus avoids CDDIS
+    thus avoids CDDIS.  it first checks to see if you have the files online.
+    both version of the long name.
 
     Parameters
     ----------
@@ -6214,8 +6221,9 @@ def gbm_orbits_direct(year,month,day):
 
     fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
     littlename = 'gbm' + str(gpsweek) + str(int(sec/86400)) + '.sp3'
-    bigname = 'GBM0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
+    bigname = 'GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
 
+    bigname2 = 'GBM0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
 
     # first, do you have it locally?  
     # look for compressed file
@@ -6238,9 +6246,11 @@ def gbm_orbits_direct(year,month,day):
             foundit = True; 
             return_name = littlename
 
+    # checked for the first kind of name because that is how it was stored on CDDIS.
+    # now use the name as how it is stored at GFZ.  I think
+    bigname = bigname2 
     if not foundit:
         url = gns + littlename + '.Z'
-        print(url)
         try:
             wget.download(url,littlename + '.Z')
             subprocess.call(['uncompress', littlename + '.Z'])
@@ -6250,7 +6260,6 @@ def gbm_orbits_direct(year,month,day):
             foundit = True ; return_name = littlename
         else:
             url = gns + bigname + '.gz'
-            print(url)
             try:
                 wget.download(url,bigname + '.gz')
                 subprocess.call(['gunzip', bigname + '.gz'])
