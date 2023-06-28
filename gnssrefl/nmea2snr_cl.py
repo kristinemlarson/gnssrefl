@@ -85,6 +85,7 @@ def main():
     parser.add_argument("-lon", default=None, help="longitude, degrees", type=float)
     parser.add_argument("-height", default=None, help="ellipsoid height,m", type=float)
     parser.add_argument("-sp3", default=None, help="boolean for whether sp3 orbits are used", type=str)
+    parser.add_argument("-risky", default=None, help="boolean for whether sp3 orbits are used", type=str)
 
     args = parser.parse_args()
 
@@ -103,6 +104,15 @@ def main():
 
     isnr = args.snr
     isnr = int(isnr)
+
+    if args.risky == None:
+        risky = False
+    else:
+        if (args.risky == 'T') or (args.risky == 'True'):
+            risky = True
+        else:
+            risky = False
+        
 
     doy= args.doy
     if args.doy_end == None:
@@ -137,11 +147,20 @@ def main():
 
     if (year+doy/365.25 >= gfz_date):
         if not sp3:
-            print('You insist on using low quality az-el NMEA values')
+            if risky:
+                print('You insist on using low quality az-el NMEA values but have set the risky option to True')
+            else:
+                print('You insist on using low quality az-el NMEA values.  You must set risky to T or True to proceed.')
+                sys.exit()
+            
     else:
         print('Your data were collected before my code knows how to pick up GFZ rapid orbits')
-        print('We are therefore using the original code which relies on NMEA az-el values. If you would like to ')
-        print('use reliable orbits, please submit a PR pointing to other sp3 files')
+        print('If you would like to use reliable orbits, please submit a PR pointing to other sp3 files.')
+        if risky:
+            print('You set risky to True. Proceeding.')
+        else:
+            print('You must set risky to T or True to proceed using the unreliable orbits.')
+            sys.exit()
         sp3 = False
 
     if sp3 :

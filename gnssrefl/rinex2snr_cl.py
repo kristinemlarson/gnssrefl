@@ -285,15 +285,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         orb = 'gfr'
 
     # if you choose GNSS, you get the GFZ sp3 file  (precise)
+    # I think gbm should be changed to 'gnss3' though perhaps not here
     if orb == 'gnss':
         orb = 'gbm'
-
-    # this does not really work if you are using doy_end and year_end ....
-    # get orbit directly from GFZ
-    #if orb == 'gnss3':
-    #    # this code wants year month day....
-    #    year, month, day = g.ydoy2ymd(year, doy)
-    #    filename, fdir, foundit = g.gbm_orbits_direct(year,month,day)
 
 
     # get orbit from IGS

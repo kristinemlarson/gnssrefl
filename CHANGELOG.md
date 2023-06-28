@@ -10,6 +10,9 @@ it downloads multi-GNSS sp3files directly from GFZ instead of from CDDIS.
 
 gnss now points to rapid when appropriate. hopefully.
 
+added risky option to nmea2snr for people that do not read the screen output warning
+them they are doing a bad thing.
+
 
 ## 1.3.22
 allows gzip RINEX 2.11 files in local directory
