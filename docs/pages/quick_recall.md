@@ -10,9 +10,8 @@
 
 * [gnssir code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html), 
- [new code for setting gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
+ [setting gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
 
-* [Old way of setting inputs for gnssir](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
 
 
 ## Additional Utilities

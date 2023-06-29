@@ -50,6 +50,9 @@ determination through inverse modeling of SNR data. Radio Sci., 51, 1286–1296,
 level variation from GNSS: 2020 Shumagin earthquake tsunami resonance and Hurricane Laura. Geophysical 
 Research Letters, 48, e2020GL091378. https://doi. org/10.1029/2020GL091378, 2021.
 
+- Purnell, D. Gomez, N., Chan, NH, Strandberg, J., Hobiger, T. Quantifying the Uncertainty in Ground-Based GNSS-Reflectometry 
+Sea Level Measurements, IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, DOI:10.1109/JSTARS.2020.3010413, 2021
+
 ## Lakes and Rivers
 
 - [Holden, L. and K.M. Larson, Ten Years of Lake Taupo Surface Height Estimates Using the GNSS Interferometric Reflectometry, Journal of Geodesy. Vol 95(74),10.1007/s00190-021-01523-7, 2021](https://www.kristinelarson.net/wp-content/uploads/2021/05/Holden-May2021.pdf)

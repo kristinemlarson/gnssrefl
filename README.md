@@ -17,7 +17,6 @@ If you want to sign up for the GNSS-IR email list, please contact Kristine Larso
 
 [Youtube videos for beginners](https://www.youtube.com/channel/UCC1NW5oS7liG7C8NBK148Bg).
 
-New discussion page started about [modern GNSS signals](docs/pages/signal_issues.md).
 
 <HR> 
 
@@ -25,11 +24,11 @@ GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 09357
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was initially developed 
 as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
-Our funding ends August 31. Please help us in maintaining this code. 
+As of August 31, 2023, we will be an independent (unfunded) software package. Please help us maintain/improve this code. 
 
 Kristine M. Larson
 
-June 21, 2023
+June 29, 2023
 
 <HR>
 
