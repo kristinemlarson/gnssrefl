@@ -145,7 +145,7 @@ Then make SNR files for ~6 months:
 
 Estimate reflector height:
 
-<code>gnssir smm3 2018 180 -doy_end 365 -newarcs T</code>
+<code>gnssir smm3 2018 180 -doy_end 365 </code>
 
 Compute daily average of these results:
 

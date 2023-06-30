@@ -124,7 +124,7 @@ This is the strategy I used:
 
 Now run <code>gnssir</code> for these same dates. This computes RH for each rising and setting satellite arc:
 
-<code>gnssir vlis 2022 171 -doy_end 184 -newarcs T</code>
+<code>gnssir vlis 2022 171 -doy_end 184 </code>
 
 To put those results all together:
 

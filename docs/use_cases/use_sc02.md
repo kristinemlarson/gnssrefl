@@ -108,7 +108,7 @@ Then you need to make the list of analysis inputs.
 
 Once you have the json file set up, you can go ahead and analyze all the data with a single command:
 
-<code>gnssir sc02 2021 15 -doy_end 40 -newarcs T</code>
+<code>gnssir sc02 2021 15 -doy_end 40 </code>
 
 This produces reflector heights for every rising and setting satellite track that meets the 
 quality control metrics that you have set. We have some preliminary code that will help you evaluate 

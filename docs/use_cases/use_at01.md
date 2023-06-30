@@ -104,9 +104,9 @@ using our new utility (extending h2 a bit):
 
 <code>gnssir_input at01 -h1 8 -h2 17 -e1 5 -e2 13 -ampl 4 -frlist 1 20 5 101 102 201 205 206 207 -azlist2 20 220</code>
 
-Next estimate reflector height (RH) for the two month time period (newarcs is to make sure you use the new azimuth capability):
+Next estimate reflector height (RH) for the two month time period 
 
-<code>gnssir at01 2020 230 -doy_end 290 -newarcs T </code>
+<code>gnssir at01 2020 230 -doy_end 290 </code>
 
 We have written some code to help you look at these subdaily files - it is a work in progress, but you can 
 certainly give it a try. **Note:** These figures were generated with an older version of the code and should be updated.

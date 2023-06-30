@@ -100,7 +100,7 @@ SNR files are stored in $REFL_CODE/$year/snr/p360, where $year = 2017 or 2018.
 Then we run <code>gnssir</code> to calculate the reflector heights for 2017/2018. Because the code
 only creates results if the SNR file exists, we can use the year_end and doy_end settings.
 
-<code>gnssir p360 2017 1 -year_end 2018 -doy_end 366 -newarcs T</code>
+<code>gnssir p360 2017 1 -year_end 2018 -doy_end 366 </code>
 
 ## Derive Snow Accumulation from Reflector Heights
 

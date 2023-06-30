@@ -53,9 +53,8 @@ The azlist2 input emphasizes the good reflection area.
 
 
 Now we run <code>gnssir</code>. This will be needed for estimate *a priori* reflector heights for the soil moisture code.
-The newarcs setting chooses the new way of selecting satellite arcs.
 
-<code>gnssir p475 2020 1 -year_end 2022 -doy_end 254 -newarcs T</code>
+<code>gnssir p475 2020 1 -year_end 2022 -doy_end 254 </code>
 
 ## Step 2: Soil Moisture
 

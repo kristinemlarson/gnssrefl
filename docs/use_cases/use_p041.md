@@ -127,7 +127,7 @@ snow accumulation. The series will begin doy 245 (2019) and end on doy 70 (2020)
 
 Now run **gnssir** for 2019/2020:
 
-<code>gnssir p041 2019 1 -doy_end 366 -year_end 2020 -newarcs T</code>
+<code>gnssir p041 2019 1 -doy_end 366 -year_end 2020 </code>
 
 The RH results from **gnssir** are stored in $REFL_CODE/2019/results/p041 and $REFL_CODE/2020/results/p041. 
 

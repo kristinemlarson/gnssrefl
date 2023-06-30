@@ -51,7 +51,7 @@ The json file is saved at $REFL_CODE/input/p038.json
 
 Now we run <code>gnssir</code>. This will be needed for estimate a priori reflector heights for the soil moisture code.
 
-<code>gnssir p038 2017 1 -doy_end 365 -newarcs T</code>
+<code>gnssir p038 2017 1 -doy_end 365 </code>
 
 
 ## Step 2: Soil Moisture

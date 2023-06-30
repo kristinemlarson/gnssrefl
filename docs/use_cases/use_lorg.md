@@ -83,11 +83,11 @@ code run faster (otherwise it will check three other archives as well). The resu
 
 Run <code>gnssir</code> for all the SNR files:
 
-<code>gnssir lorg 2019 1 -doy_end 233 -newarcs T </code>
+<code>gnssir lorg 2019 1 -doy_end 233  </code>
 
 The default does not send any plots to the screen. If you do want to see them, set <code>-plt True</code>:
 
-<code>gnssir lorg 2019 1 -plt True -newarcs T</code>
+<code>gnssir lorg 2019 1 -plt True </code>
 
 <img src="../_static/lorg-g-panels.png" width="800"/>
 

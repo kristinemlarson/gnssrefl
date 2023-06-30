@@ -58,7 +58,7 @@ azimuths and satellite tracks.
 
 Run the <code>gnssir</code> each day in 2017 and 2018:
 
-<code>gnssir mchl 2017 1 -doy_end 365 -year_end 2018 -newarcs T</code>
+<code>gnssir mchl 2017 1 -doy_end 365 -year_end 2018 </code>
 
 ## Step 2: Soil Moisture
 

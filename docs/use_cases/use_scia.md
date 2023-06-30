@@ -41,7 +41,7 @@ Set up (default) analysis stratgegy:
 
 **Estimate reflector heights:**
 
-<code>gnssir scia 2018 1 -doy_end 365 -year_end 2019 -newarcs T</code>
+<code>gnssir scia 2018 1 -doy_end 365 -year_end 2019 </code>
 
 ## Estimate Soil Moisture
 [Please read the soil moisture user manual.](../pages/README_vwc.md) 

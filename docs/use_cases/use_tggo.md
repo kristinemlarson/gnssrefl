@@ -84,7 +84,7 @@ The next step is to save your analyis strategy using <code>gnssir_input</code>.
 
 Now estimate reflector heights for these same dates: 
 
-<code>gnssir tggo 2022 226 -doy_end 240 -newarcs T </code>
+<code>gnssir tggo 2022 226 -doy_end 240 </code>
 
 To put those results all together:
 

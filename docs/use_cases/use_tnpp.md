@@ -61,7 +61,7 @@ Now go back and make more SNR files:
 
 Estimate RH :
 
-<code>gnssir tnpp 2021 301 -doy_end 316 -newarcs T</code>
+<code>gnssir tnpp 2021 301 -doy_end 316 </code>
 
 Look at the sea level results for multiple weeks:
 

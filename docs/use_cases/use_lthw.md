@@ -99,7 +99,7 @@ Then you need to make the list of analysis inputs (stored in json format):
 
 Now analyze the data for 2018 from day 1 to day 365 using **gnssir**:
 
-<code>gnssir lthw 2018 1 -doy_end 365 -newarcs T </code>
+<code>gnssir lthw 2018 1 -doy_end 365 </code>
 
 This produces reflector heights for every rising and setting satellite track that meets your 
 quality control selections.  In order to estimate snow accumulation, you will want to calculate

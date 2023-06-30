@@ -88,7 +88,7 @@ Make the SNR files (this takes a long long time):
 
 This is also slow - though not as slow as translating RINEX files and computing orbits:
 
-<code>gnssir pmtl 2020 270 -doy_end 300 -newarcs T</code>
+<code>gnssir pmtl 2020 270 -doy_end 300 </code>
 
 One way to make the gnssir code run faster would be to loosen up the RH precision.  Since you 
 are using daily averages, it is not necessary to use the default of 5 mm.  10 mm would suffice.
