@@ -5216,6 +5216,7 @@ def queryUNR_modern(station):
         print('The station name must be four characters long')
         return lat, lon, ht
 
+    not_in_database = False
     xdir = os.environ['REFL_CODE']
     nfile1 = 'gnssrefl/station_pos.db'
     nfile1_exist = os.path.isfile(nfile1)
@@ -5255,9 +5256,8 @@ def queryUNR_modern(station):
         # if longitude is ridiculous, as it often is in the Nevada Reno database make it less so
         if (lon < -180):
             lon = lon + 360
-        #print(lat,lon,ht)
     else:
-            print('Did not find the station in the database:', station)
+        not_in_database = True
 
     # close the database
     conn.close()
@@ -5265,6 +5265,8 @@ def queryUNR_modern(station):
         lat= -16.434464800 ;lon = 145.403622520 ; ht = 71.418
     elif (station == 'mnis'):
         lat = -16.667810553; lon  = 139.170597267; ht = 60.367;  
+    elif (station == 'boig'):
+        lat =  -9.24365375 ; lon  = 142.253961217; ht = 82.5;  
     elif (station == 'glbx'):
         lat = 58.455146633; lon  = -135.888483766 ; ht = 12.559;  
     elif (station == 'ugar'):
@@ -5273,6 +5275,9 @@ def queryUNR_modern(station):
         lat = -33.01640186 ; lon = 137.59157111 ; ht = 7.856
     elif (station == 'kubn'):
         lat =-10.23608303 ; lon =142.21446068; ht = 78.2
+
+    if (not_in_database) and (lat == 0):
+        print('Did not find station coordinates :', station)
 
     return lat,lon,ht
 

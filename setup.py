@@ -43,7 +43,6 @@ setup(
             'quickLook= gnssrefl.quickLook_cl:main',
             'download_rinex = gnssrefl.download_rinex:main',
             'download_orbits = gnssrefl.download_orbits:main',
-            'make_json_input = gnssrefl.make_json_input:main',
             'gnssir_input = gnssrefl.gnssir_input:main',
             'ymd = gnssrefl.ymd:main',
             'ydoy = gnssrefl.ydoy:main',

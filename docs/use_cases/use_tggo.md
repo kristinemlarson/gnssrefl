@@ -141,9 +141,9 @@ The code will then remove interfrequency biases and recompute a spline:
 
 **Please note that the IF corrected RH values are being written to a new column!  Please look into the file.**
 
-Overall this is a very good reflections site - but it is hampered by the lack of Galileo observations.
-When this current receiver is upgraded to a newer model, I expect to see much better results.
-If someone would like to provide "truth" data, I could add a comparison.
+From the limited comparisons I have done with truth data from the WSV, the precision for each track is about 16 cm at this site.
+This site would be better if it could track more Galileo satellites. When this 
+current receiver is upgraded to a newer model, I expect to see much better results.
 
 Updated 
 

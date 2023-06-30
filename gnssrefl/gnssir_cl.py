@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument("-e2", default=None, type=float, help="max elev angle (deg)")
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
-    parser.add_argument("-newarcs", default=None, type=str, help="implement new rising/setting arc method")
+    parser.add_argument("-newarcs", default=None, type=str, help="Default is true. set to F to use old way of defining arcs")
 
 
     args = parser.parse_args().__dict__
@@ -55,27 +55,31 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
-        mmdd: bool = False, gzip: bool = False, dec : int = 1, newarcs : bool = False):
+        mmdd: bool = False, gzip: bool = False, dec : int = 1, newarcs : bool = True):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
-    have set up an analysis strategy using either make_json_input or gnssir_input. The 
-    latter will ultimately become the default.
+    have set up an analysis strategy using gnssir_input. Older json versions created by make_json_input 
+    will be allowed as long as you set -newarcs F
         
     Examples
     --------
     gnssir p041 2021 15 
         analyzes the data for station p041, year 2021 and day of year 15.
+        uses new way of defining arcs
     gnssir p041 2021 15  -snr 99
         uses SNR files with a 99 suffix
+        uses new way of defining arcs
     gnssir p041 2021 15  -snr 99 -screenstats T
         sends debugging information to the screen
+        uses new way of defining arcs
     gnssir p041 2021 15  -nooverwrite T 
         only runs gnssir if there isn't a previous solution
+        uses new way of defining arcs
     gnssir p041 2021 15  -doy_end 20 
         Analyzes data from day of year 15 to day of year 20
-    gnssir p041 2021 15  -newarcs T
-        uses new way of picking arcs. gnssir_input is used to make the json for this.
-        Eventually we will make this the default.
+        uses new way of defining arcs
+    gnssir p041 2021 15  -newarcs F
+        uses old way of picking arcs 
 
     Parameters
     ----------
@@ -153,6 +157,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         periodograms are computed. 1 sec is default (i.e. no decimating)
     newarcs : bool, optional
         uses new way to do rising and setting arcs.
+        default is True.
 
     """
 
@@ -168,17 +173,18 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # now check the overrides to the json instructions
 
     if newarcs:
-        if 'azval2' in lsp:
-            print('azval2 found')
-        else:
-            print('azval2 variable not found in your json. Exiting')
+        if 'azval2' not in lsp:
+            print('An azval2 variable was not found in your json. Fix your json ')
+            print('and/or use gnssir_input to make a new one. Exiting')
             sys.exit()
 
     else:
         if 'azval' in lsp:
-            print('azval variable found in your json.')
+            print('An azval variable was found in your json. I will use the old way of defining arcs.')
         else:
-            print('You chose the old way of setting arcs, but azval is not defined in your json. Exiting')
+            print('You chose the old way of setting arcs, but you do not have valid input in your json.')
+            print('I recommend you use gnssir_input to create your json file. Azimuth regions are no ')
+            print('longer required to be regions less than 100 degrees. Exiting.')
             sys.exit()
 
 
