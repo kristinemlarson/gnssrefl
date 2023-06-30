@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.24
+
+newarcs is now the default for gnssir
+
+removed make_json_input, command line no longer generated.
+
+updated software_tests and use cases for these changes
+
 ## 1.3.23
 
 added gnss3 orbit option for testing. eventually will use this for gnss.

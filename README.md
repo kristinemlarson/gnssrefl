@@ -2,14 +2,9 @@
 
 **github version: 1.3.23** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
-If you want to access any part of CDDIS, including orbits, you will need to make an earthdata account.
 
-**On or about July 1, the newarcs option will be the default for the <code>gnssir</code>.**
-
-We have improved the way the code chooses rising and setting satellite arcs. 
-Please use the <code>gnssir_input</code> instead of <code>make_json_input</code> when setting an analysis 
-strategy, and <code>-newarcs T</code> when 
-running <code>gnssir</code>. If you prefer to use the old way, it should continue to work.
+** newarcs option is now the default for the <code>gnssir</code>.
+<code>make_json_input</code> has been removed.  You are asked to use <code>gnssir_input</code> **
 
 Our documentation is now available [here.](https://gnssrefl.readthedocs.io/en/latest/)
 
@@ -17,6 +12,7 @@ If you want to sign up for the GNSS-IR email list, please contact Kristine Larso
 
 [Youtube videos for beginners](https://www.youtube.com/channel/UCC1NW5oS7liG7C8NBK148Bg).
 
+If you want to access any part of CDDIS, including orbits, you should make an earthdata account.
 
 <HR> 
 

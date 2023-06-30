@@ -149,6 +149,7 @@ def main():
         if not sp3:
             if risky:
                 print('You insist on using low quality az-el NMEA values but have set the risky option to True')
+                sp3 = False
             else:
                 print('You insist on using low quality az-el NMEA values.  You must set risky to T or True to proceed.')
                 sys.exit()
