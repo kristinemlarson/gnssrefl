@@ -44,11 +44,12 @@ def parse_arguments():
     parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
     parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
     parser.add_argument("-strip", default=None, help="use True to reduce number of obs", type=str)
+    parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly','strip']
+    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly','strip','screenstats']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -58,7 +59,7 @@ def parse_arguments():
 def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None, rate: str = 'low', dec: int = 0,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
-              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False):
+              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, screenstats : bool = False):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. The default is RINEX 2.11 files
@@ -239,6 +240,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     strip : bool, optional
         Reduces observables since the translator does not allow more than 25
         Default is False.
+
+    screenstats: bool, optional
+        if true, prints more information to the screen
 
     """
 
@@ -442,7 +446,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     args = {'station': station, 'year_list': year_list, 'doy_list': doy_list, 'isnr': snr, 'orbtype': orb,
             'rate': rate, 'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook,
             'overwrite': overwrite, 'translator': translator, 'srate': samplerate, 'mk': mk,
-            'skipit': skipit, 'stream': stream, 'strip': strip, 'bkg': bkg}
+            'skipit': skipit, 'stream': stream, 'strip': strip, 'bkg': bkg, 'screenstats': screenstats}
 
     s1 = time.time()
     rnx.run_rinex2snr(**args)

@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.3.24
 
+added azimuth limits to quickLook (they were missing from when I updated it)
+
 newarcs is now the default for gnssir
 
 removed make_json_input, command line no longer generated.

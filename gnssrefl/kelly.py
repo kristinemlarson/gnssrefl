@@ -56,7 +56,7 @@ def the_kelly_simple_way(url,filename):
     # Opens a local file of same name as remote file for writing to
     # check to see that the file exists
     if (r.status_code == requests.codes.ok):
-        print('File was found', filename)
+        #print('File was found', filename)
         with open(filename, 'wb') as f:
             for data in r:
                 f.write(data)

@@ -700,6 +700,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     foundit : bool
 
     """
+    screenstats = False # for now
     foundit = False
     # this returns sp3 orbit product name
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
@@ -739,11 +740,13 @@ def getsp3file_mgex(year,month,day,pCtr):
     n1 = os.path.isfile(fdir + '/' + name)
     n1c = os.path.isfile(fdir + '/' + name + '.xz')
     if (n1 == True):
-        print('first kind of MGEX sp3file already exists online')
+        if screenstats:
+            print('first kind of MGEX sp3file already exists online')
         mgex = 1
         foundit = True
     elif (n1c  == True): 
-        print('xz first kind of MGEX sp3file already exists online-unxz it')
+        if screenstats:
+            print('xz first kind of MGEX sp3file already exists online-unxz it')
         fx =  fdir + '/' + name + '.xz'
         subprocess.call(['unxz', fx])
         mgex = 1
@@ -752,10 +755,12 @@ def getsp3file_mgex(year,month,day,pCtr):
     n2 = os.path.isfile(fdir + '/' + name2)
     n2c = os.path.isfile(fdir + '/' + name2 + '.xz')
     if (n2 == True):
-        print('MGEX sp3file already exists online')
+        if screenstats:
+            print('MGEX sp3file already exists online')
         mgex = 2 ; foundit = True
     elif (n2c == True):
-        print('MGEX sp3file already exists online')
+        if screenstats:
+            print('MGEX sp3file already exists online')
         mgex = 2 ; foundit = True
         fx =  fdir + '/' + name2 + '.xz'
         subprocess.call(['unxz', fx])
@@ -766,8 +771,9 @@ def getsp3file_mgex(year,month,day,pCtr):
         name = file1[:-2]
 
     if not foundit:
-        print('Type 1 filename',file1)
-        print('Type 2 filename',file2)
+        if screenstats:
+            print('Type 1 filename',file1)
+            print('Type 2 filename',file2)
         if (mgex == 0):
             if not foundit:
                 name = file2[:-3] 
@@ -3631,7 +3637,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
         else:
             print('RINEX 3 file does not exist', r3_filename)
         s2=time.time()
-        print('gfzrnx rinex3 to rinex 2:', round(s2-s1,2), ' seconds')
+        #print('gfzrnx rinex3 to rinex 2:', round(s2-s1,2), ' seconds')
 
 
     return fexists
@@ -4881,7 +4887,7 @@ def final_gfz_orbits(year,month,day):
         subprocess.call(['gunzip', fullname])
 
     if os.path.isfile(fdir + '/' + littlename):
-        print(littlename, ' already exists on disk')
+        #print(littlename, ' already exists on disk')
         return littlename, fdir, True 
 
     try:
@@ -4929,7 +4935,7 @@ def rapid_gfz_orbits(year,month,day):
         subprocess.call(['unxz', fullname])
 
     if os.path.isfile(fdir + '/' + littlename):
-        print(littlename, ' already exists on disk')
+        #print(littlename, ' already exists on disk')
         return littlename, fdir, True 
     try:
         wget.download(url,littlename + '.gz')
@@ -4992,7 +4998,7 @@ def ultra_gfz_orbits(year,month,day,hour):
         subprocess.call(['gunzip', fullname])
 
     if os.path.isfile(fdir + '/' + littlename):
-        print(littlename, ' already exists on disk')
+        #print(littlename, ' already exists on disk')
         return littlename, fdir, True
 
     try:
@@ -5045,9 +5051,7 @@ def rinex_unavco(station, year, month, day):
     except:
         okokok =1
 
-    #print('try hatanaka RINEX at unavco')
     if not os.path.exists(rinexfile):
-        #print('look for hatanaka version')
         if os.path.exists(crnxpath):
             try:
                 wget.download(url2,filename2)
@@ -5076,11 +5080,13 @@ def avoid_cddis(year,month,day):
     filenameZ = 'gbm' + cwk + cday + '.sp3.Z'
     filename = 'gbm' + cwk + cday + '.sp3'
     if os.path.isfile(fdir + filename):
-        print(filename,' orbit file already exists on disk'); foundit = True
+        #print(filename,' orbit file already exists on disk'); 
+        foundit = True
         return filename, fdir, foundit
     if os.path.isfile(fdir + filename + '.xz'):
         subprocess.call(['unxz',fdir + filename + '.xz'])
-        print(filename, ' orbit file already exists on disk'); foundit = True
+        #print(filename, ' orbit file already exists on disk'); 
+        foundit = True
         return filename, fdir, foundit
 
     # only use this for weeks < 2050
@@ -5098,11 +5104,13 @@ def avoid_cddis(year,month,day):
         filenamegz = 'GFZ0MGXRAP_' + cyyyy  + cdoy + '0000_01D_05M_ORB.SP3.gz'
 
         if os.path.isfile(fdir + filename):
-            print(filename, ' orbit file already exists on disk'); foundit = True
+            #print(filename, ' orbit file already exists on disk'); 
+            foundit = True
             return filename, fdir, foundit
         if os.path.isfile(fdir + filename + '.xz'):
             subprocess.call(['unxz',fdir + filename + '.xz'])
-            print(filename, ' orbit file already exists on disk'); foundit = True
+            #print(filename, ' orbit file already exists on disk'); 
+            foundit = True
             return filename, fdir, foundit
 
         url = 'ftp://igs.ensg.ign.fr/pub/igs/products/mgex/' + cwk +  '/' + filenamegz

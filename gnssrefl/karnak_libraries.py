@@ -149,7 +149,8 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
 
     """
     # define the file name
-    print('Searching the ', archive, ' archive with rate/filetype', srate, stream)
+    if debug:
+        print('Searching the ', archive, ' archive with rate/filetype', srate, stream)
     foundit = False
 
     file_name,cyyyy,cdoy = filename_plus(station9ch,year,doy,srate,stream)
@@ -165,10 +166,12 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         g.bfg_data(station, year, doy, samplerate,debug)
         zip_file_name = file_name[0:-2] + 'zip'
         if os.path.exists(file_name):
-            print('File was found: ', file_name )
+            if debug:
+                print('File was found: ', file_name )
             foundit = True
         elif os.path.exists(zip_file_name):
-            print('From zip to gz: ', zip_file_name )
+            if debug:
+                print('From zip to gz: ', zip_file_name )
             subprocess.call(['unzip', zip_file_name])
             subprocess.call(['gzip', file_name[0:-3]])
             # cleaning up
@@ -186,7 +189,8 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         url1 =      'https://data.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
         foundit,file_name = kelly.the_kelly_simple_way(url1,file_name)
         s2 = time.time()
-        print('Download took ',np.round(s2-s1,2), ' seconds') 
+        if debug:
+            print('Download took ',np.round(s2-s1,2), ' seconds') 
         return file_name,foundit
 
     try:
@@ -230,13 +234,13 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         elif (archive == 'cddis'):
             new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/'
             g.cddis_download_2022B(file_name,new_way_dir)
-            #g.cddis_download(file_name,new_way_dir)
         else:
             return '', ''
     except:
         okokok = 1
     s2 = time.time()
-    print('Download took ',np.round(s2-s1,2), ' seconds') 
+    if debug: 
+        print('Download took ',np.round(s2-s1,2), ' seconds') 
     if os.path.exists(file_name):
         siz = os.path.getsize(file_name)
         if (siz == 0):
@@ -335,7 +339,7 @@ def ga_stuff(station, year, doy,rinexv=3):
 
     return QUERY_PARAMS, headers
 
-def universal_all(station9ch, year, doy, srate,stream):
+def universal_all(station9ch, year, doy, srate,stream,screenstats):
     """
     check multiple archives for RINEX 3 data
 
@@ -351,6 +355,8 @@ def universal_all(station9ch, year, doy, srate,stream):
         receiver sample rate 
     stream : str
         R or S
+    screenstats : bool
+        print statements
 
     Peturns
     -------
@@ -409,7 +415,7 @@ def rinex2names(station,year,doy):
     return f1, f2, cyyyy, cdoy
 
 
-def universal_rinex2(station, year, doy, archive):
+def universal_rinex2(station, year, doy, archive,screenstats):
     """
     seamless archive for rinex 2 files ...
 
@@ -423,6 +429,8 @@ def universal_rinex2(station, year, doy, archive):
         day of year
     archive : str
         name of the GNSS archive
+    screenstats : bool
+        whether print statements come to scree
 
     Returns
     -------
@@ -441,7 +449,8 @@ def universal_rinex2(station, year, doy, archive):
         #print('RINEX o File is already on disk')
         return oname, True 
 
-    print('Searching the ', archive, ' archive for ', station)
+    if screenstats:
+        print('Searching the ', archive, ' archive for ', station)
 
     cydoy = cyyyy + '/' + cdoy + '/'
     cyy = cyyyy[2:4]
@@ -470,7 +479,8 @@ def universal_rinex2(station, year, doy, archive):
     elif (archive == 'special'):
         #print('testing out new protocol at unavco')
         url1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy + oname + '.gz'
-        print(url1)
+        if screenstats:
+            print(url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1, oname + '.gz')
         # old way
         #foundit, file_name = gogetit(dir1, oname, '.gz'); 
@@ -529,13 +539,15 @@ def universal_rinex2(station, year, doy, archive):
         dir1 = 'ftp://cacsa.nrcan.gc.ca/gps/data/gpsdata/' + cyy + cdoy  + '/' + cyy + 'd' + '/'
         foundit, f = gogetit(dir1, dname, '.Z'); file_name = f
     else:
-         print('I do not recognize your archive')
+         print('I do not recognize your archive', archive)
 
     s2 = time.time()
-    print('Download took ', np.round(s2-s1,2),' seconds') 
+    if screenstats:
+        print('Download took ', np.round(s2-s1,2),' seconds') 
 
-    if not os.path.exists(file_name):
+    if not os.path.exists(file_name) and screenstats:
         print('Did not find the Rinex file')
+
     return file_name,foundit
 
 def make_rinex2_ofiles(file_name):
@@ -596,7 +608,7 @@ def strip_rinexfile(rinexfile):
     print('You chose the strip option to reduce the number of observables in the RINEX file')
     teqcv = g.teqc_version()
     if os.path.isfile(teqcv):
-        print('Use teqc to strip the RINEX 2 file')
+        #print('Use teqc to strip the RINEX 2 file')
         foutname = 'tmp.' + rinexfile
         fout = open(foutname,'w')
         subprocess.call([teqcv, '-O.obs','S1+S2+S5+S6+S7+S8', rinexfile],stdout=fout)
@@ -606,7 +618,7 @@ def strip_rinexfile(rinexfile):
     else:
         gfzrnxpath = g.gfz_version()
         if os.path.isfile(gfzrnxpath):
-            print('Use gfzrnx to strip the RINEX 2 file')
+            #print('Use gfzrnx to strip the RINEX 2 file')
             tempfile = rinexfile + '.tmp'
             # save yourself heartache down the way cause those doppler data are just clogging up the works
             subprocess.call([gfzrnxpath,'-finp', rinexfile, '-fout', tempfile, '-vo','2','-f', '-obs_types', 'S','-q'])
@@ -731,7 +743,7 @@ def ga_stuff_highrate(station, year, doy,rinexv=3):
 
 def serial_cddis_files(dname,cyyyy,cdoy):
     """
-    only looks in the hatanaka decompression section of cddis
+    Looks for rinex files in the hatanaka decompression section of cddis
 
     Parameters
     ----------
