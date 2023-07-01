@@ -5,11 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.3.24
 
+try to reduce print statements by using screenstats in rinex2snr and download_rinex
+
 added azimuth limits to quickLook (they were missing from when I updated it)
 
 newarcs is now the default for gnssir
 
-removed make_json_input, command line no longer generated.
+removed make_json_input, command line version is no longer generated.
 
 updated software_tests and use cases for these changes
 

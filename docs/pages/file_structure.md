@@ -70,8 +70,7 @@ for station ABCD in year 2021 and day of year 3.
 
 NMEA files may be gzipped.
 
-nmea2snr needs better documentation. Hopefully the authors will provide it. My 
-best effort to help [is in the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
+Additional information about nmea2snr [is in the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 
 **Orbit files**
 
@@ -194,11 +193,11 @@ this comparison.  P038 is a very very very flat site.
 
 Here are the L2P retrievals:
 
-<img src="../_static/p038usingL2P.png" width="600"/>
+<img src="../_static/p038usingL2P.png" width="600">
 
 Now look at the L2C retrievals.
 
-<img src="../_static/p038usingL2c.png" width="600"/>
+<img src="../_static/p038usingL2c.png" width="600">
 
 If you were trying to find a periodic signal, which one 
 would you want to use?

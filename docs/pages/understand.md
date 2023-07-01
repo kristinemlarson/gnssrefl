@@ -72,9 +72,7 @@ gain pattern. We aren't interested in that so we will be removing it with a low 
 we will convert to linear units on y-axis). 
 
 
-<p align=center>
-<img src="../_static/p041-snr.png" width="600"/>
-</p>
+<img src="../_static/p041-snr.png" width="600">
 
 After that polynomial is removed, we will concentrate on the *rising* 
 and *setting* satellite arcs. That is the red parts on the left and right.  
@@ -93,9 +91,7 @@ significant. There are many ways to do this - we only use two quality control me
 
 * is the peak divided by a "noise" metric larger than a user-defined value. The code calls this the peak2noise.
 
-<p align=center>
-<img src="../_static/for_the_web.png" width="600"/>
-</p>
+<img src="../_static/for_the_web.png" width="600">
 
 The Colorado SNR example is for a fairly planar field where the RH for the rising and setting arc 
 should be very close to the same name. What does the SNR data look like for a more extreme case? 
