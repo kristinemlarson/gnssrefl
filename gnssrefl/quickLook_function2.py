@@ -235,7 +235,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                             if abs(maxF - maxH) < 0.10: #  peak too close to max value
                                 tooclose = True
 
-                            if (not tooclose) & (delT < delTmax) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise):
+                            if (not tooclose) & (delT < delTmax) & (maxAmp > requireAmp) & (maxAmp/Noise > PkNoise) & (iAzim >= azim1) & (iAzim <= azim2):
                                 rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,satNu,
                                     maxAmp,maxAmp/Noise,UTCtime,1))
                                 lw=1.5 ; colorful(a,px,pz,lw,True,saxis)
@@ -248,16 +248,17 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                                 newl=[a,maxAmp]; axisSize =np.append(axisSize,[newl], axis=0)
 
                             else:
-                                lw = 0.5 ; colorful(a,px,pz,lw,False,saxis)
-                                if screenstats:
-                                    print('FAILED QC for Azimuth {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:7.3f} '.format( avgAzim,satNu,UTCtime,maxF))
-                                    g.write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose)
+                                if (iAzim > azim1) & (iAzim < azim2):
+                                    lw = 0.5 ; colorful(a,px,pz,lw,False,saxis) # add to the plot
+                                    if screenstats:
+                                        print('FAILED QC for Azimuth {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:7.3f} '.format( avgAzim,satNu,UTCtime,maxF))
+                                        g.write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose)
 
-                                idc = 'f' + stitles[a]
-                                data[idc][satNu] = [px,pz]
-                                datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
-                                rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,
-                                    satNu,maxAmp,maxAmp/Noise,UTCtime,-1))
+                                    idc = 'f' + stitles[a]
+                                    data[idc][satNu] = [px,pz]
+                                    datakey[idc][satNu] = [avgAzim, maxF, satNu,f,maxAmp,maxAmp/Noise, UTCtime]
+                                    rhout.write('{0:3.0f} {1:6.3f} {2:3.0f} {3:4.1f} {4:3.1f} {5:6.2f} {6:2.0f} \n '.format(iAzim,maxF,
+                                        satNu,maxAmp,maxAmp/Noise,UTCtime,-1))
 
         rhout.close()
 
