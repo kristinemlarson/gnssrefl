@@ -6289,8 +6289,8 @@ def gbm_orbits_direct(year,month,day):
 
     if not foundit:
         print('Orbit was not found at GFZ or in a local directory')
-    else:
-        print('Orbit found')
+    #else:
+    #    print('Orbit found')
 
     return return_name, fdir, foundit
 

@@ -76,7 +76,9 @@ def pickup_files_nyquist(station,recv,obsfile,constel,e1,e2,reqsamplerate):
                 if not np.isnan(nq):
                     newl=[float(azriseset), float(nq)]
                     allN = np.append(allN, [newl], axis=0);
-    info = str(reqsamplerate) + ' sec sample rate/elev angles '  + str(e1) + '-' + str(e2)
+    nm = ['','GPS','GLONASS','GALILEO','BEIDOU']
+    info = str(reqsamplerate) + ' sec sample rate/elev angles '  + str(e1) + '-' + str(e2) + ' ' + nm[constel]
+
     pngfile = ny_plot(station,allN,info)
 
     return pngfile
@@ -90,6 +92,7 @@ def ny_plot(station,allN, info):
     Parameters
     ----------
     station : str
+        4 char station name
 
     allN : numpy array ?
         azimuth and nyquist answers
@@ -103,8 +106,9 @@ def ny_plot(station,allN, info):
     l2 = 0.24421
     l5 = 0.254828048
     l1 = 0.19029360
-    fig = Figure(figsize=(8,4),dpi=360)
-    ax = fig.subplots()
+    #fig = Figure(figsize=(8,4),dpi=360)
+    #fig,ax = fig.subplots()
+    fig, ax = plt.subplots(figsize=(10,6))
     ax.plot(allN[:,0],allN[:,1],'bo',label='L1')
     ax.plot(allN[:,0],l2*allN[:,1]/l1,'ro',label='L2')
     ax.plot(allN[:,0],l5*allN[:,1]/l1,'co',label='L5')
@@ -119,6 +123,9 @@ def ny_plot(station,allN, info):
     else:
         xdir = './'
     pngfile = xdir + station + '_nyquist.png'
+    plt.show()
+
+
     fig.savefig(pngfile, format="png")
     print('pngfile stored in: ', pngfile)
 

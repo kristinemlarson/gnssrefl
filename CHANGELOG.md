@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.25
+
+nyquist plots to the screen
+
 ## 1.3.24
 
 try to reduce print statements by using screenstats in rinex2snr and download_rinex

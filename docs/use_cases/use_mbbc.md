@@ -61,19 +61,15 @@ on L1 and L2. Note: the L2 amplitudes are smaller because the receiver lacks acc
 
 Step 1: Run <code>gnssir_input</code> using the information I discussed earlier 
 
-- azimuth angle limits  **Try out -azlist 220  275**
+- azimuth angle limits  **Try out -azlist2 220  275**
 
 - elevation angle limits  **Use -e1 and -e2**
 
 - RH limits. 
 
-- the NReg to be the same as the RH limits 
-
 - amplitude limits to be small for L2 
 
 - allow L1 and L2 **Try out -frlist 1 2**
-
-- since MBBC is in the Nevada Reno database, you do not have to provide lat/lon/ht. Simply put 0,0,0 for those entries.
 
 Note: I usually tell people to use L2C instead of L2. This information is 
 not available in this dataset - either because the PIs did not track L2C or because the data are not 

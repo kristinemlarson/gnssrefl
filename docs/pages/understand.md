@@ -99,9 +99,7 @@ Shown below is the SNR data for [Peterson Bay](https://gnss-reflections.org/stat
 frequency than during the setting arc (high tide). This gives you an idea of how the code can be 
 used to measure tides. 
 
-<p align=center>
-<img src="../_static/pbay-snr.png" width="600"/>
-</p>
+<img src="../_static/pbay-snr.png" width="600">
 
 ## Considerations
 
@@ -121,23 +119,17 @@ What do these satellite reflection zones look like? Below are
 photographs and [reflection zone maps](https://gnss-reflections.org/rzones) for two standard GNSS-IR sites, 
 one in the northern hemisphere and one in the southern hemisphere.
 
-<p align=center>
-<table align=center>
-<TR>
-<TH>Mitchell, Queensland, Australia</TH>
-<TH>Portales, New Mexico, USA</TH>
-</TR>
-<TR>
-<TD><img src=http://gnss-reflections.org/static/images/MCHL.jpg width=300></TD>
+**Mitchell, Queensland, Australia**
 
-<TD><img src=http://gnss-reflections.org/static/images/P038.jpg width=300></TD>
-</TR>
-<TR>
-<TD><img src=../_static/mchl_google.jpg width=300></TD>
-<TD><img src=../_static/p038_google.jpg width=300></TD>
-</TR>
-</table>
-</p>
+<img src=https://gnss-reflections.org/static/images/MCHL.jpg width=300>
+
+<img src="../_static/mchl_google.jpg" width=300>
+
+**Portales, New Mexico, USA**
+
+<img src=https://gnss-reflections.org/static/images/P038.jpg width="300">
+
+<img src="../_static/p038_google.jpg" width=300>
 
 Each one of the yellow/blue/red/green/cyan clusters represents the reflection zone
 for a single rising or setting GPS satellite arc. The colors represent different elevation angles - 
@@ -148,35 +140,23 @@ antenna above the surface - so a height of 2 meters gives an ellipse that is sma
 that is 10 meters. In this case we used 2 meters for both sites - and these are pretty 
 simple GNSS-IR sites. The surfaces below the GPS antennas are fairly smooth soil and that 
 will generate coherent reflections. In general, you can use all azimuths at these sites.  
-<P>
-<P>
+
 Now let's look at a more complex case, station <code>ross</code> on Lake Superior. Here the goal 
 is to measure water level. The map image (panel A) makes it clear
 that unlike Mitchell and Portales, we cannot use all azimuths to measure the lake. To understand our reflection 
 zones, we need to know the approximate lake level. That is a bit tricky to know, but the 
 photograph (panel B) suggests it is more than the 2 meters we used at Portales - 
 but not too tall. We will try 4 meters and then check later to make sure that was a good assumption.  
-</P>
 
-<p align=center>
-<table align=center>
-<TR>
-<TD>A. <img src=../_static/ross-google.jpg width=300> <BR>
-Map view of station ROSS </TD>
-<TD>B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> <BR>
-Photograph of station ROSS</TD>
-</TD>
-</TR>
-<Tr>
-<TD>C. <img src=../_static/ross-first.jpg width=300><BR>
-Reflection zones for GPS satellites at elevation <BR>angles of 5-25 degrees 
-for a reflector height of <BR>4 meters.</TD> 
-<TD>D. <img src=../_static/ross-second.jpg width=300><BR>
-Reflection zones for GPS satellites at elevation <BR>angles of 5-15 degrees 
-for a reflector height of <BR>4 meters.  </TD>
-</Tr>
-</table>
-</p>
+A. <img src="../_static/ross-google.jpg" width=300> Map view of station ROSS 
+
+B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> Photograph of station ROSS
+
+C. <img src="../_static/ross-first.jpg" width=300>Reflection zones for GPS satellites at 
+elevation angles of 5-25 degrees for a reflector height of 4 meters.
+
+D. <img src="../_static/ross-second.jpg" width=300> Reflection zones for GPS satellites at 
+elevation angles of 5-15 degrees for a reflector height of 4 meters.  
 
 Again using the reflection zone web app, we can plot up the appropriate reflection zones for various options.
 Since <code>ross</code> has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) has its coordinates in a 

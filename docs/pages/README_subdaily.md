@@ -23,19 +23,19 @@ outliers by looking a very crude daily standard deviation (i.e. with 2.5 sigma, 
 can control on the commandline). The main results are visual.
 
 
-<img src="../_static/sc02_Figure1.png" width="600"/>
+<img src="../_static/sc02_Figure1.png" width="600">
 
 Allows you see which constellations are contributing to your solution
 
-<img src="../_static/sc02_Figure2.png" width="600"/>
+<img src="../_static/sc02_Figure2.png" width="600">
 
 RH plotted with respect to time for three color-coded metrics: frequency, amplitude, and peak2noise.
 
-<img src="../_static/sc02_Figure3.png" width="600"/>
+<img src="../_static/sc02_Figure3.png" width="600">
 
 RH plotted with respect to azimuth.
 
-<img src="../_static/sc02_Figure4.png" width="600"/>
+<img src="../_static/sc02_Figure4.png" width="600">
 
 Bottom panel is the final RH series with gross outliers removed. These data are written to a new file.
 
@@ -60,15 +60,15 @@ Similarly, if you want to skip section 1 and go right to section 2, you can set 
 
 These figures are created and summarize the steps being taken
 
-<img src="../_static/sc02_Figure5.png" width="600"/>
+<img src="../_static/sc02_Figure5.png" width="600">
 
 Initial spline fit to RH data - three sigma outliers removed.
 
-<img src="../_static/sc02_Figure6.png" width="600"/>
+<img src="../_static/sc02_Figure6.png" width="600">
 
 Surface velocity derived from the spline fit and the corresponding RHdot correction (in meters)
 
-<img src="../_static/sc02_Figure7.png" width="600"/>
+<img src="../_static/sc02_Figure7.png" width="600">
 
 Final result: 
 
@@ -116,11 +116,11 @@ There are other ways to compute the RHdot correction:
 Here is an example of a site (TNPP) where the RHdot correction is important (I apologize for color choice here. The 
 current code uses more color-blindness-friendly colors):
 
-<img src="../_static/tnpp_rhdot2.png" width="600"/>
+<img src="../_static/tnpp_rhdot2.png" width="600">
 
 After removing the RHdot effect and frequency biases, the RMS with respect to the spline improves from 0.244 to 0.1 meters.
 
-<img src="../_static/tnpp_final.png" width="600"/>
+<img src="../_static/tnpp_final.png" width="600">
 
 
 If you want to do your own quality control, you can simply cat the files in your results area. As an example, after you have 

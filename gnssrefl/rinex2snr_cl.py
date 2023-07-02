@@ -88,12 +88,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     rinex2snr p041 2022 15 -nolook T
         using your own data stored as p0410150.22o in the working directory 
+        your RINEX o file may also be gzipped.  
 
     rinex2snr mchl00aus 2022 15  -orb rapid -archive ga 
         30 sec data for mchl00aus and Geoscience Australia
 
-    rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg -stream S -bkg IGS
-        1 sec data for warn00deu, 1 sec decimated to 5 sec, multi-GNSS, bkg archive, streamed, in IGS folder
+    rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg-igs -stream S 
+        1 sec data for warn00deu, 1 sec decimated to 5 sec, multi-GNSS, bkg IGS archive, streamed
 
     RINEX3 30 second archives supported  
         bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel

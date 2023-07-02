@@ -79,7 +79,7 @@ azimuth regions are defined in <code>quickLook</code>. It does not mean there ar
 
 Set up analysis instructions, using only GPS L1, and Glonass.  
 
-<code>gnssir_input pmtl -h1 75 -h2 85 -e1 5 -e2 12 -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist 45 205</code>
+<code>gnssir_input pmtl -h1 75 -h2 85 -e1 5 -e2 12 -peak2noise 3 -ampl 7 -frlist 1 101 102 -azlist2 45 205</code>
 
 
 Make the SNR files (this takes a long long time):
