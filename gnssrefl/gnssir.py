@@ -74,6 +74,12 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         dec = lsp['dec']
     else:
         dec = 1 # so Jupyter notebooks do not need to be rewritten
+    if 'ellist' in lsp.keys():
+        print('elevation angle list', ellist)
+    else:
+        ellist = [];
+        print('no augmented elevation angle list')
+
     #print('Decimate:', dec)
     #print('Number of azimuths', len(azval))
     for i in range(0,len(azval),2):

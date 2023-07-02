@@ -35,7 +35,7 @@ def parse_arguments():
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument('-frlist', nargs="*",type=int,  help="User defined frequencies using our nomenclature.")
     parser.add_argument('-azlist2', nargs="*",type=float,  help="Azimuth list, default 0-360") 
-    parser.add_argument('-ellist', nargs="*",type=float,  help="elevation list to allow more complex analysis scenarios") 
+    parser.add_argument('-ellist', nargs="*",type=float,  help="elevation list to allow more complex analysis scenarios-advanced users only!") 
 
 
     args = parser.parse_args().__dict__
@@ -96,6 +96,13 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     gnssir_input p041 -ediff 1
         uses UNR database, only GPS data, default station coordinates, enforces elevation angles to be 
         within 1 degrees of default elevation angle limits (5-25)
+
+    gnssir_input sc02 -ellist 5 10 7 12
+        let's say you want to compute smaller arcs than just a single set of elevation angles.
+        you can use this to set this up, so instead of 5 and 12, you could set it up to 
+        do two arcs, one for 5-10 degrees and the other for 7-12.
+        WARNING: you need to pay attention to QC metrics (amplitude and peak2noise).  You likely need to lower them since 
+        your periodogram for fewer data will be less robust than with the longer elevation angle region.
 
     Parameters
     ----------

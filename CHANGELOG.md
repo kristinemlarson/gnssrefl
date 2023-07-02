@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 nyquist plots to the screen
 
+Allow multiple elev ranges  - see gnssir_input for information about setting it up.
+required changeds to gnssir as well - let me know if something seems not
+to work anymore.
+
 ## 1.3.24
 
 try to reduce print statements by using screenstats in rinex2snr and download_rinex

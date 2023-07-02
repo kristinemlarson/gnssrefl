@@ -67,6 +67,14 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
+    if 'ellist' in lsp.keys():
+        ellist = lsp['ellist']
+        print('Augmented elevation angle list', ellist)
+    else:
+        ellist = [];
+        print('no augmented elevation angle list')
+
+
     # this is also checked in the command line - but for people calling the code ...
     if ((lsp['maxH'] - lsp['minH']) < 5):
         print('Requested reflector heights (', lsp['minH'], ',', lsp['maxH'], ') are too close together. Exiting.')
@@ -178,7 +186,19 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
                 if len(thissat) > 0:
                     # if there are data for this satellite, find all the arcs
-                    arclist = new_rise_set(thissat[:,1],thissat[:,2],thissat[:,3],e1, e2,ediff,satNu,screenstats)
+                    # separate numpy array of elevation angles .... 
+
+                    # allow more than one set of elevation angles
+                    if len(ellist) > 0:
+                        arclist = np.empty(shape=[0,6])
+                        for ij in range(0,len(ellist),2):
+                            te1 = ellist[ij]; te2 = ellist[ij+1]; newl = [te1,te2]
+                            tarclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],te1, te2,ediff,satNu,screenstats)
+                            arclist = np.append(arclist, tarclist,axis=0)
+
+                    else:
+                        arclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],e1, e2,ediff,satNu,screenstats)
+
                     nr,nc = arclist.shape
                     if nr > 0:
                         goahead = True
@@ -195,6 +215,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                         # create array for the requested arc
                         d2 = np.array(thissat[sind:eind, :], dtype=float)
                         # window the data - which also removes DC 
+                        # try this ... 
+                        e1 = arclist[a,4]; e2 = arclist[a,5]
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT= window_new(d2, f, 
                                 satNu,ncols,pele, lsp['polyV'],e1,e2,azvalues,screenstats)
                         Nv = Nvv # number of points
@@ -885,3 +907,96 @@ def check_azim_compliance(initA,azlist):
 
     return keeparc
 
+def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
+    """
+    This provides a list of rising and setting arcs 
+    for a given satellite in a SNR file
+    based on using changes in elevation angle
+
+    Parameters
+    ----------
+    elv : numpy array  of floats
+        elevation angles from SNR file
+    azm : numpy array  of floats
+        azimuth angles from SNR file
+    dates : numpy array  of floats
+        seconds of the day from SNR file
+    e1 : float
+        min eval
+    e2 : float
+        max eval
+    ediff : float
+        el angle difference QC
+    sat : int
+        satellite number
+
+    Returns
+    -------
+    tv : numpy array
+        beginning and ending indices of the arc
+        satellite number, arc number, elev min, elev max
+
+    """
+    # require arcs to be this length in elev angle
+    min_deg = (e2-ediff)   - (e1 + ediff)
+
+#   time limit in seconds - taken from david
+    gaptlim = 5*60 # seems awfully small
+    #newf = np.array(f[i, :], dtype=float)
+    iarc = 0
+    ddate = np.ediff1d(dates)
+    delv = np.ediff1d(elv)
+    bkpt = len(ddate)
+    bkpt = np.append(bkpt, np.where(ddate > gaptlim)[0])
+    bkpt = np.append(bkpt,  np.where(np.diff(np.sign(delv)))[0])
+    bkpt = np.unique(bkpt)
+    bkpt = np.sort(bkpt)
+    N=len(bkpt)
+    tv = np.empty(shape=[0,6])
+
+    for ii in range(N):
+        if ii == 0:
+            sind = 0
+        else:
+            sind = bkpt[ii - 1] + 1
+        eind = bkpt[ii] + 1
+        nelv = np.array(elv[sind:eind], dtype=float)
+        nazm = np.array(azm[sind:eind], dtype=float)
+        nt = np.array(dates[sind:eind], dtype=float)
+        #nazm = azm[sind:eind]
+        minObse = min(nelv)
+        maxObse = max(nelv)
+
+        nogood = False
+        verysmall = False
+        ediff_violation = False
+        if (minObse - e1) > ediff:
+            nogood = True
+            ediff_violation = True 
+        if (maxObse - e2) < -ediff:
+            nogood = True
+            ediff_violation = True
+        if (eind-sind) == 1:
+            nogood = True
+            verysmall = True
+        if ((maxObse - minObse) < min_deg):
+            nogood = True
+
+        if screenstats:
+            if nogood:
+                # do not write out warning for these tiny arcs which should not even be there.
+                # i am likely reading the code incorrectly
+                add = ''
+                if ediff_violation:
+                    add = ' violates ediff'
+                if not verysmall:
+                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), add)
+            else:
+                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2))
+
+        if not nogood :
+            iarc = iarc + 1
+            newl = [sind, eind, int(sat), iarc,e1,e2]
+            tv = np.append(tv, [newl],axis=0)
+
+    return tv 

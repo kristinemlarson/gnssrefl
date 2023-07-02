@@ -55,11 +55,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
-        mmdd: bool = False, gzip: bool = False, dec : int = 1, newarcs : bool = True):
+        mmdd: bool = False, gzip: bool = False, dec : int = 1, newarcs : bool = True ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
-    have set up an analysis strategy using gnssir_input. Older json versions created by make_json_input 
-    will be allowed as long as you set -newarcs F
+    have set up an analysis strategy using gnssir_input. 
+
+    Older json versions created by make_json_input will be allowed as long as you set -newarcs F
         
     Examples
     --------
