@@ -21,8 +21,8 @@ def parse_arguments():
     parser.add_argument("-snr", default=None, type=int, help="snr ending - default is 66")
     parser.add_argument("-fr", default=None, type=int, help="e.g. -fr 1 for GPS L1  or -fr 101 for Glonass L1")
     parser.add_argument("-ampl", default=None, type=float, help="minimum spectral amplitude allowed")
-    parser.add_argument("-e1",  default=None, type=int, help="lower limit elevation angle (default is 5 deg) ")
-    parser.add_argument("-e2",  default=None, type=int, help="upper limit elevation angle (default is 25 deg)")
+    parser.add_argument("-e1",  default=None, type=float, help="lower limit elevation angle (default is 5 deg) ")
+    parser.add_argument("-e2",  default=None, type=float, help="upper limit elevation angle (default is 25 deg)")
     parser.add_argument("-h1",  default=None, type=float, help="lower limit reflector height (default is 0.5m) ")
     parser.add_argument("-h2",  default=None, type=float, help="upper limit reflector height (default is 8 m)")
     parser.add_argument("-azim1",  default=None, type=float, help="lower limit azimuth (default is 0 deg)")
@@ -46,7 +46,7 @@ def parse_arguments():
 
 def quicklook(station: str, year: int, doy: int,
               snr: int = 66, fr: int = 1, ampl: float = 7.,
-              e1: int = 5, e2: int = 25, h1: float = 0.5, h2: float = 8., sat: int = None,
+              e1: float = 5, e2: float = 25, h1: float = 0.5, h2: float = 8., sat: int = None,
               peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
               plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, delTmax : float=75.0 ):
     """
