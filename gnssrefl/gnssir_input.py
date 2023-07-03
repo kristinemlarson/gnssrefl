@@ -17,8 +17,8 @@ def parse_arguments():
     parser.add_argument("-lat", help="Latitude (degrees)", type=float)
     parser.add_argument("-lon", help="Longitude (degrees)", type=float)
     parser.add_argument("-height", help="Ellipsoidal height (meters)", type=float)
-    parser.add_argument("-e1", default=None, type=int, help="Lower limit elevation angle (deg),default 5")
-    parser.add_argument("-e2", default=None, type=int, help="Upper limit elevation angle (deg), default 25")
+    parser.add_argument("-e1", default=None, type=float, help="Lower limit elevation angle (deg),default 5")
+    parser.add_argument("-e2", default=None, type=float, help="Upper limit elevation angle (deg), default 25")
     parser.add_argument("-h1", default=None, type=float, help="Lower limit reflector height (m), default 0.5")
     parser.add_argument("-h2", default=None, type=float, help="Upper limit reflector height (m), default 8")
     parser.add_argument("-nr1",default=None, type=float, help="Lower limit RH used for noise region in QC(m)")
@@ -34,8 +34,8 @@ def parse_arguments():
     parser.add_argument("-ediff", default=None, type=str, help="Allowed min/max elevation diff from obs min/max elev angle (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument('-frlist', nargs="*",type=int,  help="User defined frequencies using our nomenclature.")
-    parser.add_argument('-azlist2', nargs="*",type=float,  help="Azimuth list, default 0-360") 
-    parser.add_argument('-ellist', nargs="*",type=float,  help="elevation list to allow more complex analysis scenarios-advanced users only!") 
+    parser.add_argument('-azlist2', nargs="*",type=float,  help="list of azimuth regions, default 0-360") 
+    parser.add_argument('-ellist', nargs="*",type=float,  help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
 
 
     args = parser.parse_args().__dict__
@@ -48,7 +48,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0, e1: int = 5, e2: int = 25,
+def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0, e1: float = 5.0, e2: float = 25.0,
               h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.8, ampl: float = 5.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
@@ -56,8 +56,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
-    to a json file which by default is saved in REFL_CODE/<station>.json. This code is meant to be a replacement
-    for make_json_input.
+    to a json file which by default is saved in REFL_CODE/<station>.json. This code replaces make_json_input.
 
     This version no longer requires you to have azimuth regions of 90-100 degrees. You can set a single set of 
     azimuths in the command line variable azlist2, i.e. -azlist2 0 270 would accommodate all rising and setting arcs 
@@ -70,10 +69,6 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     Latitude, longitude, and height are assumed to be stored in the UNR database.  If they are not, you should
     set them manually.
-
-    You MUST set -newarcs T when running gnssir to use this new way of selecting rising and setting arcs.
-    This allows people to use the old code and the new code, and in principle, the same json file.
-    Once the dust has settled, I'll make this way the default.
 
     Example of a json file that has both the old and new ways. The arrays within the json file are called azval and azval2.
         https://morefunwithgps.com/public_html/sc02.json
@@ -114,9 +109,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         longitude in degrees.
     height : float, optional
         ellipsoidal height in meters.
-    e1 : int, optional
+    e1 : float, optional
         elevation angle lower limit in degrees. default is 5.
-    e2 : int, optional
+    e2 : float, optional
         elevation angle upper limit in degrees. default is 25.
     h1 : float, optional
         reflector height lower limit in meters. default is 0.5.
@@ -149,11 +144,11 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         provide extension name so you can try different strategies. 
         Results will then go into $REFL_CODE/YYYY/results/ssss/extension
         Default is '' 
-    ediff : float
+    ediff : float, optional
         quality control parameter (Degrees)
         Allowed min/max elevation angle diff from requested min/max elev angle
         default is 2
-    delTmax : float
+    delTmax : float, optional
         maximum allowed arc length (minutes)
         default is 75, which can be a bit long for tides
     frlist : list of integers

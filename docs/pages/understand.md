@@ -20,13 +20,14 @@ called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modu
 
 * [**rinex2snr**](rinex2snr.md) translates RINEX files into SNR files needed for analysis.
 
+
+* [**quickLook**](quickLook.md) gives you a quick (visual) assessment of aSNR  file without dealing
+with the details associated with **gnssir**. It is not meant to be used for routine analysis.
+It also helps you pick an appropriate azimuth mask and quality control settings.
+
 * [**gnssir**](gnssir.md) computes reflector heights (RH) from SNR files.
 
-* [**quickLook**](quickLook.md) gives you a quick (visual) assessment of a file without dealing
-with the details associated with **gnssir**. It is not meant to be used for routine analysis.
-It also helps you pick an appropriate azimtuh mask and quality control settings.
-
-There are also various [utilities](utilities.md) you might find to be useful.
+There are also various [utilities](quick_recall.md) you might find to be useful.
 If you are unsure about why various restrictions are being applied, it is really useful 
 to read [Roesler and Larson (2018)](https://link.springer.com/article/10.1007/s10291-018-0744-8) 
 or similar. You can also watch some background videos 

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.3.27
+
+changed WSV to 30 day downloads instead of 15
+
+gnssir_input incorrectly defined e1 and e2 as integers ... fixed.
+
 ## 1.3.26
 
 fixed major bug in gnssir for old arc selection
