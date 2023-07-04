@@ -95,7 +95,8 @@ significant. There are many ways to do this - we only use two quality control me
 <img src="../_static/for_the_web.png" width="600">
 
 The Colorado SNR example is for a fairly planar field where the RH for the rising and setting arc 
-should be very close to the same name. What does the SNR data look like for a more extreme case? 
+should be very close to the same value. What does the SNR data 
+look like for a more dynamic case? 
 Shown below is the SNR data for [Peterson Bay](https://gnss-reflections.org/static/images/PBAY.jpg), where the rising arc (at low tide) has a very different
 frequency than during the setting arc (high tide). This gives you an idea of how the code can be 
 used to measure tides. 
@@ -149,32 +150,47 @@ zones, we need to know the approximate lake level. That is a bit tricky to know,
 photograph (panel B) suggests it is more than the 2 meters we used at Portales - 
 but not too tall. We will try 4 meters and then check later to make sure that was a good assumption.  
 
-A. <img src="../_static/ross-google.jpg" width=300> Map view of station ROSS 
+<img src="../_static/ross-google.jpg" width=300> 
 
-B. <img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> Photograph of station ROSS
+A. Google Map of station ROSS 
 
-C. <img src="../_static/ross-first.jpg" width=300>Reflection zones for GPS satellites at 
-elevation angles of 5-25 degrees for a reflector height of 4 meters.
+<img src=https://gnss-reflections.org/static/images/ROSS.jpg width=300> 
 
-D. <img src="../_static/ross-second.jpg" width=300> Reflection zones for GPS satellites at 
+B. Photograph of station ROSS
+
+<img src="../_static/ross-first.jpg" width=300>
+
+C. Reflection zones for GPS satellites at elevation 
+angles of 5-25 degrees for a reflector height of 4 meters.
+
+<img src="../_static/ross-second.jpg" width=300> 
+
+D. Reflection zones for GPS satellites at 
 elevation angles of 5-15 degrees for a reflector height of 4 meters.  
 
 Again using the reflection zone web app, we can plot up the appropriate reflection zones for various options.
 Since <code>ross</code> has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) has its coordinates in a 
 database. You can just plug in <code>ross</code> for the station name and leave 
-latitude/longitude/height blank. You *do* need to plug in a RH of 4 since mean 
-sea level would not be an appropriate reflector height value for this 
-case. Start out with an azimuth range of 90 to 180 degrees.
-Using 5-25 degree elevation angles (panel C) looks like it won't quite work - and going all the way to 180 degrees
-in azimuth also looks it will be problematic. Panel D shows a smaller elevation angle range (5-15) and cuts 
+latitude/longitude/height blank. You *do* need to plug in a 
+RH of 4 since mean sea level would not be an appropriate 
+reflector height value for this 
+case. 
+
+Start out with an azimuth range of 90 to 180 degrees.
+Using 5-25 degree elevation angles (panel C) looks like it won't 
+quite work - and going all the way to 180 degrees
+in azimuth also looks it will be problematic. Panel D shows a 
+smaller elevation angle range (5-15) and cuts 
 off azimuths at 160. These choices appear to be better than those from Panel C.  
 It is also worth noting that the GPS antenna has been attached to a pier - 
 and *boats dock at piers*. You might very well see outliers at this site when a boat is docked at the pier.
 
 Note: we now have a [refl_zones tool](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html) in the gnssrefl package.
 
-Once you have the code set up, it is important that you check the quality of data. This will also 
-allow you to check on your assumptions, such as the appropriate azimuth and elevation angle 
-mask and reflector height range. This is one of the reasons <code>quickLook</code> was developed. 
+Once you have the code set up, it is important that 
+you check the quality of data. This will also 
+allow you to check on your assumptions, such as the 
+appropriate azimuth and elevation angle 
+mask and reflector height range. This is the main reason 
+<code>quickLook</code> was developed. 
 
-<HR>
