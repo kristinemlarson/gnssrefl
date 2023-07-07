@@ -1,4 +1,4 @@
-# gnssrefl use cases 
+# Use Cases 
 
 About 75% of these use cases use access to the Earthscope/UNAVCO 
 archive. In some cases, sopac can be used as an alternate archive. If at all 
