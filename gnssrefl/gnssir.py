@@ -95,7 +95,8 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
     p,T,irefr = set_refraction_params(station, dmjd, lsp)
-    #print(p,T)
+    print('refraction ', irefr)
+    print(p,T)
 
 # only doing one day at a time for now - but have started defining the needed inputs for using it
     twoDays = False

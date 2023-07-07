@@ -3,7 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## 1.3.27
+## 1.4.1
+
+I incorrectly implemented the refraction correction when I wrote the newarcs
+option of gnssir.  This has been fixed with this version. I will be removing all
+pypi versions that have the bug in it.  Effectively, the refraction correction
+was not being implemented at all.  this will cause a bias between series computed before
+and after.  It has no impact on the SNR data files. Only on gnssir output (and the programs
+that use those outputs, like subdaily, snowdepth, phase, and vwc).
 
 
 changed WSV to 30 day downloads instead of 15

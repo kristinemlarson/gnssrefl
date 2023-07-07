@@ -61,6 +61,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     have set up an analysis strategy using gnssir_input. 
 
     Older json versions created by make_json_input will be allowed as long as you set -newarcs F
+
         
     Examples
     --------
@@ -157,8 +158,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         decimate SNR file to this sampling period before the 
         periodograms are computed. 1 sec is default (i.e. no decimating)
     newarcs : bool, optional
-        uses new way to do rising and setting arcs.
-        default is True.
+        default is to use new way to do rising and setting arcs.
+        if you want to use old way, set newarcs to False
 
     """
 

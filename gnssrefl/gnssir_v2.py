@@ -122,7 +122,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
     p,T,irefr = set_refraction_params(station, dmjd, lsp)
-    #print(p,T)
+    print('Refraction parameters ',p,T,irefr)
 
 # only doing one day at a time for now - but have started defining the needed inputs for using it
     twoDays = False
@@ -154,6 +154,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         ele = ele[i]
         snrD = snrD[i,:]
         sats = snrD[:,0]
+        # make sure the snrD array has elevation angles fixed
+        snrD[:,1] = ele # ????
 
         # open output file
         fout,frej = g.open_outputfile(station,year,doy,extension) 
@@ -193,6 +195,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                         arclist = np.empty(shape=[0,6])
                         for ij in range(0,len(ellist),2):
                             te1 = ellist[ij]; te2 = ellist[ij+1]; newl = [te1,te2]
+                            # poorly named inputs - elev, azimuth, seconds of the day, ...
                             tarclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],te1, te2,ediff,satNu,screenstats)
                             arclist = np.append(arclist, tarclist,axis=0)
 
