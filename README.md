@@ -2,6 +2,12 @@
 
 **github version: 1.4.1** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
+July 7, 2023: The newarcs option had a bug in it: the refraction correction was not being applied.
+While the refraction correction is not very important for some applications (snow, soil moisture), using it sometimes and not
+using it other times IS NOT GOOD.  You will see a bias in time series when you switched. This bug is fixed as of version 1.4.1
+I will be removing all versions (1.3.16 up to 1.4.1) from pypi that have this bug. If you were 
+using the newarcs option, you need to rerun gnssir and any downstream codes (subdaily, daily_avg etc). This bug has 
+no impact on the data translation codes (rinex2snr, nmea2snr).  
 
 Our documentation is available [here.](https://gnssrefl.readthedocs.io/en/latest/)
 
@@ -23,7 +29,7 @@ As of August 31, 2023, we will be an independent (unfunded) software package. Pl
 
 Kristine M. Larson
 
-July 2, 2023
+July 7, 2023
 
 <HR>
 
