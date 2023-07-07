@@ -36,6 +36,8 @@ The plots might look slightly different and the defaults we used in the analysis
 
 * [Lake Yellowstone, USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p709.html)
 
+* [Wesel, Germany](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_wesl.html)
+
 ## Soil Moisture 
 
 * [Portales, New Mexico USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p038.html)
