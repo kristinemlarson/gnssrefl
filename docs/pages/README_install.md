@@ -1,13 +1,17 @@
 # Installation
 
-You can  access this package via Jupyter notebooks, Docker containers, or traditional
+You can access this package via Jupyter notebooks, Docker containers, or traditional
 github/pypi package installation.
 
-## [Jupyter Notebooks Install](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
- 
-## [Docker container Install](docker_cl_instructions.md)
+## Jupyter Notebooks 
 
-## Local Install (github or pypi)
+[Install Instructions](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
+
+## Docker Container
+
+[Install Instructions](docker_cl_instructions.md)
+
+## Local Python Install 
 
 **YOU MUST BE RUNNING python version 3.9 or lower.**
 
@@ -41,7 +45,7 @@ You can check to see if you have gfortran by typing
 
 If you do not have gfortran, then you can use homebrew to install (<code>brew install gfortran</code>).
 
-## Environment Variables
+### Environment Variables
 
 You should define three environment variables:
 
@@ -63,7 +67,7 @@ you want everything to be (to be honest, I have not tested this in a while).
 The orbits, SNR files, and periodogram results are stored in
 directories in year, followed by type, i.e. snr, results, sp3, nav, and then by station name.
 
-## Direct Python Install
+### Direct Python Install
 
 If you are using the version from gitHub:
 
@@ -78,7 +82,7 @@ If you are using the version from gitHub:
 * so please read below or type <code>installexe -h</code> 
 
 
-## PyPi Install 
+### PyPi Install 
 
 * make a directory, cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code>
 * activate the virtual environment, <code>source env/bin/activate </code>
@@ -87,7 +91,7 @@ If you are using the version from gitHub:
 * from what I understand, you should be able to use pip3 instead of pip
 * Please read below or type <code>installexe -h</code> 
 
-## Non-Python Code
+### Non-Python Code
 
 <code>installexe</code> should download and install two key utilities used in the GNSS 
 community: CRX2RNX and gfzrnx. It currently works for linux, macos and mac-newchip options. If you are using 

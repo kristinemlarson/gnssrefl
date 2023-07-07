@@ -34,8 +34,7 @@ Example filename : onsa0500.22o
 While we support RINEX 3 files, we do not read the RINEX 3 
 file itself - we rely on the <code>gfzrnx</code> 
 utility developed by Thomas Nischan at GFZ to translate from RINEX 3+ to RINEX 2.11
-If you have RINEX 3 files, they should be all 
-upper case (except for the extension rnx or crx).
+If you have RINEX 3 files, they should be all upper case (except for the extension rnx or crx).
 
 Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 
@@ -52,11 +51,12 @@ Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 long station file name are no
 doubt useful, but they are not recognized by this code. By 
 convention, these files may be
-gzipped but not unix compressed. You cannot use rinex2snr 
-to translate RINEX 3 file unless they
-have the 01D naming convention. If you want a 
+gzipped but not unix compressed. If you want a 
 generic translation program, you can try <code>rinex3_rinex2</code>.
-It has the requirement that you input the file names.
+It has the requirement that you input the input and output file names.
+
+For a few archives, we allow 1 sample per second files (which are all 15 minutes long).  
+Please see the rinex2snr documentation page.
 
 **NMEA**
 
@@ -75,10 +75,8 @@ Additional information about nmea2snr [is in the code.](https://gnssrefl.readthe
 **Orbit files**
 
 We have tried our best to make the orbit files relatively invisible to users.
-But for the sake of completeness, we are either using 
-broadcast navigation files in the RINEX 2.11 format
+But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
 or precise orbits in the sp3 format.   
-
 
 **Executables**
 
