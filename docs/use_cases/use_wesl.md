@@ -189,7 +189,7 @@ The Rhine experienced winter flooding period in mid-February followed by heavy r
 Water level fluctuations during annual flooding can be substantial and reach levels of 8 m, which causes overbank flooding. This is a site photo I took in March 2020 during an annual flood. 
 
 <p align=center>
-<img src="../_static/WESL_sitePhoto.JPG" width="800">
+<img src="../_static/WESL_sitePhoto.jpg" width="800">
 </p>
 
 The vertical red dash line in plots (a) and (b) is Aug. 20, 2023 (doy 232) of RPR antenna orientation change from upright to sideways.

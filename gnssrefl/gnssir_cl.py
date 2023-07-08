@@ -145,7 +145,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     screenstats : bool, optional
         whether to print stats to the screen or not. default is True.
     delTmax : int, optional
-        maximum satellite arc length in minutes. Set in make_json_input
+        maximum satellite arc length in minutes. found in the json
     e1 : float, optional
         use to override the minimum elevation angle.
     e2 : float, optional
@@ -173,6 +173,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     lsp = guts.read_json_file(station, extension)
     # now check the overrides to the json instructions
+    print(lsp)
 
     if newarcs:
         if 'azval2' not in lsp:
