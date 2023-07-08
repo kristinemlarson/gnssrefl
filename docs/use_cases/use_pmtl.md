@@ -8,9 +8,7 @@ The data used in the test case described below *are* still available. Originally
 to merge the hourly files required, but this code is no longer supported by UNAVCO. We have 
 replaced it with *gfzrnx* which is supported by GFZ.
 
-<p align=center>
-<img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500"/>
-</p>
+<img src="https://webapp.geod.nrcan.gc.ca/cacs/PMTL_MONU.jpg" width="500">
 
 
 ## metadata
@@ -47,9 +45,7 @@ use high-rate GNSS data.
 Note the [ellipsoidal height and geoid corrected height](https://gnss-reflections.org/geoid?station=pmtl). To pick an 
 azimuth and elevation mask, try the [reflection zone webapp](https://gnss-reflections.org/rzones) with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:
 
-<P align=center>
-<img src="../_static/pmtl_rzone.png" width="500" />
-</P>
+<img src="../_static/pmtl_rzone.png" width="500">
 
 ### quickLook
 
@@ -60,13 +56,13 @@ Make a SNR file for multi-GNSS and high-rate:
 
 <code>quickLook pmtl 2020 330 -h1 40 -h2 90 -e1 5 -e2 12</code>
 
-<img src="../_static/pmtl-first-try.png" width="600"/>
+<img src="../_static/pmtl-first-try.png" width="600">
 
 I have annotated this <code>quickLook</code> periodogram to point out that there is an outlier in the SW region. 
 You can also see that the NW region is useless, which is what we should expect. 
 Windowing down the reflector region and using day of year 270:
 
-<img src=../_static/pmtl-lsp-75-85.png width=600>
+<img src=../_static/pmtl-lsp-75-85.png width="600">
 
 The QC plot gives the azimuth windows - and help on setting the required amplitude and peak to noise ratio.
 Retrievals are not returned near 90 degrees because of the satellite inclination and the way the 
