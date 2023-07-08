@@ -6,8 +6,11 @@ July 7, 2023: The newarcs option had a bug in it: the refraction correction was 
 While the refraction correction is not very important for some applications (snow, soil moisture), using it sometimes and not
 using it other times IS NOT GOOD.  You will see a bias in time series when you switched. This bug is fixed as of version 1.4.1
 I will be removing all versions (1.3.16 up to 1.4.1) from pypi that have this bug. If you were 
-using the newarcs option, you need to rerun gnssir and any downstream codes (subdaily, daily_avg etc). This bug has 
+using the newarcs option in the last month, you need to rerun gnssir and any 
+downstream codes (subdaily, daily_avg etc). This bug has 
 no impact on the data translation codes (rinex2snr, nmea2snr).  
+
+How do you find out which version are you running? Type <code>pip list | grep gnssrefl</code>
 
 Our documentation is available [here.](https://gnssrefl.readthedocs.io/en/latest/)
 
