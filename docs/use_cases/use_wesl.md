@@ -1,7 +1,6 @@
-# Water level measurements in the Rhine river using low-cost GPS (Raspberry Pi Reflector)
+# Rhine River, Wesel, Germany
 
-
-The NMEA data collected here is from a [Raspberry Pi Reflector](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2021WR031713). Detailed instructions for RPR setup are provided [here.](https://github.com/MakanAKaregar/RPR)
+The data collected here is from a [Raspberry Pi Reflector](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2021WR031713). Detailed instructions for RPR setup are provided [here.](https://github.com/MakanAKaregar/RPR)
 
 This RPR is operating next to the Rhine in Wesel, Germany. We collected NMEA data from 23 March 2020 to 20 August 2021 using upright-pointing antenna and since then with sideways-looking antenna facing the river (tilting the antenna 90° from the vertical direction toward the river). In this example we also show impact of antenna set-up orientation.
 

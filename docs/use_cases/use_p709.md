@@ -1,4 +1,4 @@
-# Lake Yellowstone 
+# Lake Yellowstone, USA
 
 [Warning](warning.md)
 
