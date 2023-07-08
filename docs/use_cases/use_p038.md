@@ -7,7 +7,7 @@ across equipment changes. This site's equipment was upgraded in March 2021.
 [Warning about Earthscope/UNAVCO](warning.md)
 
 <p align="center">
-<img src="../_static/p038.png" width="500"/>
+<img src="../_static/p038low.jpg" width="500"/>
 </P>
 
 ## metadata
