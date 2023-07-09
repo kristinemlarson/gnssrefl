@@ -5226,6 +5226,10 @@ def queryUNR_modern(station):
 
     not_in_database = False
     xdir = os.environ['REFL_CODE']
+    fdir = xdir + '/Files'
+    if not os.path.isdir(fdir):
+        subprocess.call(['mkdir', fdir])
+
     nfile1 = 'gnssrefl/station_pos.db'
     nfile1_exist = os.path.isfile(nfile1)
     nfile2 = xdir + '/Files/station_pos.db'

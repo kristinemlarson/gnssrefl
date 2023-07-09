@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.4.2
+
+Fixed bug in query_modern in gps.py that did not check to see if Files subdirectory existed before
+downloading station_pos.db. 
+
+I do not know WHY the docker does not provide the necessary file, as it should.
+
 ## 1.4.1
 
 I incorrectly implemented the refraction correction when I wrote the newarcs
@@ -13,7 +20,7 @@ and after.  It has no impact on the SNR data files. Only on gnssir output (and t
 that use those outputs, like subdaily, snowdepth, phase, and vwc).
 
 
-changed WSV to 30 day downloads instead of 15
+changed WSV water level to 30 day downloads instead of 15
 
 gnssir_input incorrectly defined e1 and e2 as integers ... fixed.
 

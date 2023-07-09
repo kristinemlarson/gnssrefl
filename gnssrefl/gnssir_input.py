@@ -34,8 +34,8 @@ def parse_arguments():
     parser.add_argument("-ediff", default=None, type=str, help="Allowed min/max elevation diff from obs min/max elev angle (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument('-frlist', nargs="*",type=int,  help="User defined frequencies using our nomenclature.")
-    parser.add_argument('-azlist2', nargs="*",type=float,  help="list of azimuth regions, default 0-360") 
-    parser.add_argument('-ellist', nargs="*",type=float,  help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
+    parser.add_argument('-azlist2', nargs="*",type=float,  default=None,help="list of azimuth regions, default 0-360") 
+    parser.add_argument('-ellist', nargs="*",type=float,  default=None,help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
 
 
     args = parser.parse_args().__dict__
@@ -313,6 +313,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
 def main():
     args = parse_arguments()
+    print(args)
     make_gnssir_input(**args)
 
 
