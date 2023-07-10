@@ -66,6 +66,8 @@ reflected GPS signals, The Cryosphere, Vol 12, 477–489, doi:10.5194/tc-12-477-
 
 - [Karegar, M.A., Larson, K.M., Kusche, J., & Dixon, T.H. Novel quantification of shallow sediment compaction by GPS interferometric reflectometry and implications for flood susceptibility. Geophysical Research Letters, 47(14), e2020GL087807, 2020.](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020GL087807)
 
+ - [Karegar, M.A., & Kusche, J. Imprints of COVID‐19 lockdown on GNSS observations: An initial demonstration using GNSS interferometric reflectometry. Geophysical Research Letters, 47(19), e2020GL089647. 2020](https://agupubs.onlinelibrary.wiley.com/doi/epdf/10.1029/2020GL089647) 
+
 ## Ice
 
 - [Larson, K.M., J. Wahr, and P. Kuipers Munneke, Constraints on Snow Accumulation and Firn Density in Greenland Using GPS Receivers, J. Glaciology, Vol. 61, No. 225, doi:10.3189/2015JoG14J130, 2015](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonWahrKuipers_2015.pdf)
