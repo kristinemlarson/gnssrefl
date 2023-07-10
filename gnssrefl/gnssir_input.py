@@ -25,7 +25,7 @@ def parse_arguments():
     parser.add_argument("-nr2",default=None, type=float, help="Upper limit RH used for noise region in QC(m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="peak to noise ratio used for QC")
     parser.add_argument("-ampl", default=None, type=float, help="Required spectral peak amplitude for QC")
-    parser.add_argument("-allfreq", default=None, type=str, help="Set to True to include all GNSS")
+    parser.add_argument("-allfreq", default=None, type=str, help="Include all GNSS")
     parser.add_argument("-l1", default=None, type=str, help="Only use GPS L1")
     parser.add_argument("-l2c", default=None, type=str, help="Only use GPS L2C")
     parser.add_argument("-xyz", default=None, type=str, help="True if using Cartesian coordinates")
@@ -33,9 +33,12 @@ def parse_arguments():
     parser.add_argument("-extension", type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-ediff", default=None, type=str, help="Allowed min/max elevation diff from obs min/max elev angle (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
-    parser.add_argument('-frlist', nargs="*",type=int,  help="User defined frequencies using our nomenclature.")
-    parser.add_argument('-azlist2', nargs="*",type=float,  default=None,help="list of azimuth regions, default 0-360") 
-    parser.add_argument('-ellist', nargs="*",type=float,  default=None,help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
+    parser.add_argument("-frlist", nargs="*",type=int,  help="User defined frequencies using our nomenclature.")
+    parser.add_argument("-azlist2", nargs="*",type=float,  default=None,help="list of azimuth regions, default 0-360") 
+    parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
+
+    #print(parser.parse_args())
+
 
 
     args = parser.parse_args().__dict__
