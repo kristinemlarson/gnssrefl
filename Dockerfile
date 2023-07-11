@@ -40,7 +40,7 @@ ENV ORBITS=/etc/gnssrefl/orbits
 ENV REFL_CODE=/etc/gnssrefl/refl_code
 
 RUN mkdir -p /etc/gnssrefl/refl_code/input/
-RUN mv /usr/src/gnssrefl/gnssrefl/gpt_1wA.pickle /etc/gnssrefl/refl_code/input/
-RUN mv /usr/src/gnssrefl/gnssrefl/station_pos.db /etc/gnssrefl/refl_code/Files/
+RUN cp /usr/src/gnssrefl/gnssrefl/gpt_1wA.pickle /etc/gnssrefl/refl_code/input/
+RUN cp /usr/src/gnssrefl/gnssrefl/station_pos.db /etc/gnssrefl/refl_code/Files/
 
 WORKDIR /usr/src/gnssrefl
