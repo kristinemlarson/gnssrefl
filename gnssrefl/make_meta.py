@@ -71,7 +71,7 @@ def make_meta(
     el_height: float = None,
     man_input: bool = True,
     read_offset: bool = False,
-    overwrite: bool = False,git 
+    overwrite: bool = False,
 ):
     """
     Make a json file that includes equipment metadata information.
@@ -80,10 +80,10 @@ def make_meta(
     If station is in the UNR database, those lat/lon/el_height values are used. You may override those values
     with the optional inputs.
 
-    The default is for the user to enter these values; multiple calls will append entries to the metadata array, 
+    The default is for the user to enter these values; multiple calls will append entries to the metadata array,
     unless the user sets overwrite to True.
     The user can attempt to extract some of this information from the GAGE offset file.
-    [A caveat: this file is comprehensive for antennas changed by stations included in GAGE processing (n=~3k).  
+    [A caveat: this file is comprehensive for antennas changed by stations included in GAGE processing (n=~3k).
     Receivers are included, but incomplete.]
 
     Parameters
