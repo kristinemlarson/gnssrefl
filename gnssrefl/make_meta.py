@@ -20,10 +20,22 @@ def parse_arguments():
     parser.add_argument("station", help="station (lowercase)", type=str)
     # optional inputs
     parser.add_argument(
-        "-man_input_loc",
-        default=False,
-        type=str,
-        help="manually input station location (bool)",
+        "-lat",
+        help="Latitude (deg), if station not in database",
+        type=float,
+        default=None,
+    )
+    parser.add_argument(
+        "-lon",
+        help="Longitude (deg), if station not in database",
+        type=float,
+        default=None,
+    )
+    parser.add_argument(
+        "-el_height",
+        help="Ellipsoidal height (m) if station not in database",
+        type=float,
+        default=None,
     )
     parser.add_argument(
         "-read_offset",
@@ -32,7 +44,7 @@ def parse_arguments():
         help="append meta from GAGE offset file",
     )
     parser.add_argument(
-        "-man_input", default=False, type=str, help="append meta from manual input"
+        "-man_input", default=True, type=str, help="append meta from manual input"
     )
     parser.add_argument(
         "-overwrite", default=False, type=str, help="create new meta file"
@@ -42,7 +54,6 @@ def parse_arguments():
 
     # convert all expected boolean inputs from strings to booleans
     boolean_args = [
-        "man_input_loc",
         "read_offset",
         "man_input",
         "overwrite",
@@ -55,14 +66,19 @@ def parse_arguments():
 
 def make_meta(
     station: str,
-    man_input_loc: bool = False,
-    read_offset: bool = False,
+    lat: float = None,
+    lon: float = None,
+    el_height: float = None,
     man_input: bool = True,
+    read_offset: bool = False,
     overwrite: bool = False,
 ):
     """
     Make a json file that includes equipment metadata information.
     It saves your inputs to a json file which by default is saved in REFL_CODE/input/<station>_meta.json.
+
+    If station is in the UNR database, those lat/lon/el_height values are used. You may override those values
+    with the optional inputs.
 
     The default is for the user to enter these values; multiple calls will append entries to the metadata array, unless the user sets overwrite to False.
     The user can attempt to pull some of this information from the GAGE offset file.
@@ -72,9 +88,12 @@ def make_meta(
     ----------
     station : str
         4 character station ID.
-    man_input_loc : bool
-        set to true to manually input station coords (LLH or ECEF).
-        default is false, in which case they are pulled from unr db
+    lat : float, optional
+        latitude in deg
+    lon : float, optional
+        longitude in deg
+    el_height : float, optional
+        ellipsoidal height in m
     read_offset : bool, optional
         set to True to parse GAGE offset file. default is False.
     man_input : bool, optional
@@ -100,7 +119,7 @@ def make_meta(
             meta_dict = comp_dict["meta"]
 
     else:  # initialize empty meta_dict
-        comp_dict = get_coords(station, man_input_loc)
+        comp_dict = get_coords(station, lat, lon, el_height)
         meta_dict = {}
 
     # read in gage metadata file
@@ -119,20 +138,36 @@ def make_meta(
         json.dump(comp_dict, outfile, indent=3)
 
 
-def get_coords(station, man_input_loc):
+def get_coords(station, lat, lon, el_height):
     """
     initializes metadata dictionary with lat lon ht keys, either from UNR database (default) or user entered
     Parameters
     ----------
     station : str
         4 character station ID.
-    man_input_loc : bool
-        set to true to manually input station coords (LLH or ECEF).
-        default is false, in which case they are pulled from unr db
+    lat : float, optional, default is None
+        latitude in deg
+    lon : float, optional, default is None
+        longitude in deg
+    el_height : float, optional, default is None
+        ellipsoidal height in m
     Returns
     ----------
     comp_dict : dict
-        dictionary of metadata; keys 'lat','long','height' 'meta'.
+        dictionary of metadata; keys 'lat','long','el_height' 'meta'.
+    """
+
+    if (lat is None) & (lon is None):
+        # check the station coordinates in our database from the station name
+        lat, lon, el_height = g.queryUNR_modern(station)
+        if (lat == 0) and (lon == 0):
+            print("Exiting.")
+            sys.exit()
+        else:
+            print("Using inputs:", lat, lon, el_height)
+    else:
+        print("Using inputs:", lat, lon, el_height)
+
     """
     if man_input_loc:
         geod = input(
@@ -157,12 +192,12 @@ def get_coords(station, man_input_loc):
                 "Tried to find coordinates in our UNR database. gnssrefl wont work without knowing this"
             )
             sys.exit()
-
+    """
     comp_dict = {
         "station": station,
         "lat": "{:.4f}".format(lat),
-        "long": "{:.4f}".format(long),
-        "height": "{:.4f}".format(height),
+        "long": "{:.4f}".format(lon),
+        "el_height": "{:.4f}".format(el_height),
         "meta": {},
     }
     return comp_dict
