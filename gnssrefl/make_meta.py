@@ -75,7 +75,7 @@ def make_meta(
 ):
     """
     Make a json file that includes equipment metadata information.
-    It saves your inputs to a json file which by default is saved in REFL_CODE/input/<station>_meta.json.
+    It saves your inputs to a json file saved in REFL_CODE/input/<station>_meta.json.
 
     If station is in the UNR database, those lat/lon/el_height values are used. You may override those values
     with the optional inputs.
@@ -170,31 +170,6 @@ def get_coords(station, lat, lon, el_height):
     else:
         print("Using inputs:", lat, lon, el_height)
 
-    """
-    if man_input_loc:
-        geod = input(
-            "You have chosen to manually enter the station location. \n Do you have geodetic coordinates? :"
-        )
-        geod = str2bool({"g": geod}, "g")["g"]
-
-        if geod:
-            lat = float(input("Enter the latitude:"))
-            long = float(input("Enter the longitude of the station: "))
-            height = float(input("Enter the height of the station: "))
-
-        else:
-            x = float(input("Enter the ECEF X coordinate:"))
-            y = float(input("Enter the Y coordinate: "))
-            z = float(input("Enter the Z coordinate: "))
-            lat, long, height = g.xyz2llhd([x, y, z])
-    else:
-        lat, long, height = g.queryUNR_modern(station)
-        if lat == 0:
-            print(
-                "Tried to find coordinates in our UNR database. gnssrefl wont work without knowing this"
-            )
-            sys.exit()
-    """
     comp_dict = {
         "station": station,
         "lat": "{:.4f}".format(lat),
