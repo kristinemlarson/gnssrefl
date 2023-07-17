@@ -132,9 +132,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 
-            gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?), but from CDDIS archive
+            gnss : use GFZ final orbits, which is multi-GNSS (available in 3-4 days?), but from CDDIS archive
 
-            gnss3 : test case for GFZ orbits downloaded from GFZ instead of CDDIS
+            gnss3 : GFZ orbits downloaded from GFZ instead of CDDIS, but do they include beidou?
 
             nav : GPS broadcast, perfectly adequate for reflectometry. Same as gps.
 
@@ -144,7 +144,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             jax : JAXA, GPS + Glonass, within a few days, missing block III GPS satellites
 
-            gbm : GFZ Potsdam, multi-GNSS, not rapid
+            gbm : GFZ Potsdam, multi-GNSS, not rapid, via CDDIS 
 
             grg : French group, GPS, Galileo and Glonass, not rapid
 

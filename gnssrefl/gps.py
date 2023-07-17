@@ -3454,11 +3454,11 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     #default values
     # if they ask for gnss or gnss3, always use rapid.
     # at least for years 2022 and after
-    if year >= 2022:
-        if (orbtype == 'gnss') or (orbtype == 'gnss3'):
-            orbtype = 'rapid'
-        if orbtype == 'gbm':
-            orbtype = 'rapid'
+    #if year >= 2022:
+    #    if (orbtype == 'gnss') or (orbtype == 'gnss3'):
+    #        orbtype = 'rapid'
+        #if orbtype == 'gbm':
+        #    orbtype = 'rapid'
 
     foundit = False
     f=''; orbdir=''
