@@ -3474,7 +3474,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     elif (orbtype == 'rapid'):
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
-    elif (orbtype == 'gnss3'):
+    elif (orbtype == 'gnss3') or (orbtype == 'gnss-gfz'):
         f,orbdir,foundit=gbm_orbits_direct(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
@@ -6244,6 +6244,7 @@ def gbm_orbits_direct(year,month,day):
     bigname = 'GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
 
     bigname2 = 'GBM0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
+    print(bigname, bigname2)
 
     # first, do you have it locally?  
     # look for compressed file
@@ -6271,15 +6272,18 @@ def gbm_orbits_direct(year,month,day):
     bigname = bigname2 
     if not foundit:
         url = gns + littlename + '.Z'
+        print(url)
         try:
             wget.download(url,littlename + '.Z')
             subprocess.call(['uncompress', littlename + '.Z'])
         except:
             okok = 1
+
         if os.path.isfile(littlename):
             foundit = True ; return_name = littlename
         else:
             url = gns + bigname + '.gz'
+            print(url)
             try:
                 wget.download(url,bigname + '.gz')
                 subprocess.call(['gunzip', bigname + '.gz'])

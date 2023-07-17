@@ -134,7 +134,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             gnss : use GFZ final orbits, which is multi-GNSS (available in 3-4 days?), but from CDDIS archive
 
-            gnss3 : GFZ orbits downloaded from GFZ instead of CDDIS, but do they include beidou?
+            gnss-gfz : GFZ orbits downloaded from GFZ instead of CDDIS, but do they include beidou?. Same as gnss3?
 
             nav : GPS broadcast, perfectly adequate for reflectometry. Same as gps.
 
@@ -275,7 +275,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # currently allowed orbit types - shanghai removed 2020sep08
     #
     orbit_list = ['gps', 'gps+glo', 'gnss', 'nav', 'igs', 'igr', 'jax', 'gbm',
-                  'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2','nav-sopac','nav-esa','nav-cddis','gnss3']
+                  'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2','nav-sopac','nav-esa','nav-cddis','gnss3','gnss-gfz']
     if orb not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
@@ -293,7 +293,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # I think gbm should be changed to 'gnss3' though perhaps not here
     if orb == 'gnss':
         orb = 'gbm'
-        print('Using GBM orbit')
+        print('Using GBM orbit archived at CDDIS')
 
 
     # get orbit from IGS
