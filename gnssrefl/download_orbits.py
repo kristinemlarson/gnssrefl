@@ -49,7 +49,7 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
             gps+glo : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 
-            gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days)
+            gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days). but taken from CDDIS archive
 
             nav : GPS broadcast, adequate for reflectometry. Searches various places
 
@@ -120,12 +120,9 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
     if pCtr == 'gps':
         pCtr = 'nav'
 
-    # try to avoid CDDIS. after 2022, just go to rapid. before that, more nuanced ....
+    # send to CDDIS to get final GFZ orbits
     if pCtr == 'gnss':
-        if year >= 2022:
-            pCtr = 'gfr'
-        else:
-            pCtr = 'gnss3'
+        pCtr = 'gbm'
 
     if pCtr == 'gps+glo':
         pCtr = 'jax'

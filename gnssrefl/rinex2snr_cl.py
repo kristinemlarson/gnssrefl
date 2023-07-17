@@ -132,7 +132,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 
-            gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
+            gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?), but from CDDIS archive
 
             gnss3 : test case for GFZ orbits downloaded from GFZ instead of CDDIS
 

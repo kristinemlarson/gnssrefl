@@ -706,6 +706,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
 
     name, fdir = sp3_name(year,month,day,pCtr) 
+    print('sp3 filename ',name)
     gps_week = name[3:7]
     igps_week = int(gps_week)
     # unfortunately the CDDIS archive was at one point computing the GPS week wrong
