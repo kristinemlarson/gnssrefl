@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.4.3
+
+Changed gnss back to its original setting, which is getting the multi-GNSS final 
+GFZ orbits from CDDIS.  I was trying to get them from GFZ - but have thus far failed.
+Sending gnss to the rapid choice inadvertently removed Beidou satellites.
+
 ## 1.4.2
 
 Fixed bug in query_modern in gps.py that did not check to see if Files subdirectory existed before
