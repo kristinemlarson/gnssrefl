@@ -293,6 +293,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # I think gbm should be changed to 'gnss3' though perhaps not here
     if orb == 'gnss':
         orb = 'gbm'
+        print('Using GBM orbit')
 
 
     # get orbit from IGS

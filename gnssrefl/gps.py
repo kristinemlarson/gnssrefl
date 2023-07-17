@@ -5739,7 +5739,7 @@ def cddis_download_2022B(filename,directory):
         where the file lives at CDDIS
 
     """
-    print('Original way of accessing CDDIS ')
+    #print('Original way of accessing CDDIS ')
 
     ftps = FTP_TLS(host = 'gdc.cddis.eosdis.nasa.gov')
     email = 'kristine.larson@colorado.edu'
