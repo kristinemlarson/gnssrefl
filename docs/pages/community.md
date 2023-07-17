@@ -57,6 +57,8 @@ Sea Level Measurements, IEEE Journal of Selected Topics in Applied Earth Observa
 
 - [Holden, L. and K.M. Larson, Ten Years of Lake Taupo Surface Height Estimates Using the GNSS Interferometric Reflectometry, Journal of Geodesy. Vol 95(74),10.1007/s00190-021-01523-7, 2021](https://www.kristinelarson.net/wp-content/uploads/2021/05/Holden-May2021.pdf)
 
+- [Fagundes, M.A.R., Mendonça-Tinti, I., Iescheck, A.L., Akos, D.M., & Geremia-Nievinski, F. An open-source low-cost sensor for SNR-based GNSS reflectometry: Design and long-term validation towards sea-level altimetry. GPS Solutions, 25(2), 73, 2021](https://link.springer.com/article/10.1007/s10291-021-01087-1)
+
 ## Permafrost
 
 - Liu, L. and K.M. Larson, Decadal changes of surface elevation over permafrost area estimated using 
