@@ -5071,6 +5071,25 @@ def avoid_cddis(year,month,day):
     """
     work around for people that can't use CDDIS ftps
     this will get multi-GNSS files for GFZ from the IGN
+    hopefully
+
+    Parameters
+    ----------
+    year : int 
+        full year
+    month : int
+        month of the year
+    day : int
+        calendar day
+    Returns
+    -------
+    filename : str
+        name of the orbit file
+    fdir : str
+        where the orbit file is stored
+    foundit : bool
+        whether it was found or not
+
     """
     fdir = os.environ['ORBITS'] + '/' + str(year) + '/sp3/'
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
@@ -6237,7 +6256,11 @@ def gbm_orbits_direct(year,month,day):
     gpsweek,sec=kgpsweek(year,month,day,0,0,0)
     cgpsweek = str(gpsweek)
 
-    gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/mgex/' + cgpsweek + '/'
+    # they changed during 2245 ... 
+    if (gpsweek < 2245):
+        gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/mgex/' + cgpsweek + '/'
+    else:
+        gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/mgex/' + cgpsweek + '_IGS20/'
 
     fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
     littlename = 'gbm' + str(gpsweek) + str(int(sec/86400)) + '.sp3'

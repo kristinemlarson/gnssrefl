@@ -6,8 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## 1.4.3
 
 Changed gnss back to its original setting, which is getting the multi-GNSS final 
-GFZ orbits from CDDIS.  I was trying to get them from GFZ - but have thus far failed.
-Sending gnss to the rapid choice inadvertently removed Beidou satellites.
+GFZ orbits from CDDIS.  I had sent those queries to rapid, not remembering that rapid
+GFZ does not have beidou. 
+
+gnss-gfz directly downloads multi-GNSS orbits from GFZ.  this is equivalent to gnss3 option.
+
+for all four constellations, use gnss-gfz or gnss options.
 
 ## 1.4.2
 

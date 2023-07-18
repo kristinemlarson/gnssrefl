@@ -75,9 +75,9 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
 
             wum : (disabled) Wuhan, multi-GNSS, not rapid
 
-            gnss2 : multi-GNSS, but uses IGN instead of CDDIS
+            gnss2 : multi-GNSS, but uses IGN instead of CDDIS. does not work
 
-            gnss3 : multi-GNSS, but uses GFZ archive instead of CDDIS
+            gnss3 : multi-GNSS, but uses GFZ archive instead of CDDIS. same as gnss-gfz
 
             ultra : ultra orbits directly from GFZ
 
@@ -98,7 +98,7 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
     g.check_environ_variables()
 
     orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 
-            'gnss', 'gfr', 'esa', 'gnss2', 'gnss3','ultra', 'rapid','nav-esa', 'nav-sopac','nav-cddis']
+            'gnss', 'gfr', 'esa', 'gnss2', 'gnss3','gnss-gfz','ultra', 'rapid','nav-esa', 'nav-sopac','nav-cddis']
 
 #   assign to normal variables
     pCtr = orbit
@@ -166,11 +166,12 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 elif pCtr == 'ultra':
                     hour = 0 # for now only download hour 0 for ultra products
                     filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
-                elif pCtr == 'gnss3':
+                elif (pCtr == 'gnss3') or (pCtr == 'gnss-gfz'):
                 # use GFZ archive instead of CDDIS
                     filename, fdir, foundit = g.gbm_orbits_direct(year, month, day)
                 elif pCtr == 'gnss2':
                 # use IGN instead of CDDIS
+                    print('To my knowledge, this option no longer works')
                     filename, fdir, foundit = g.avoid_cddis(year, month, day)
                 else:
                     filename, fdir, foundit = g.getsp3file_mgex(year, month, day, pCtr)
