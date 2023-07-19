@@ -78,6 +78,7 @@ def download_wsv(station: str, plt: bool = True, output: str = None):
         sl = float(data[i]['value'])/100 # change to meters
         t = data[i]['timestamp']
         o=datetime.datetime.fromisoformat(t)
+        #print(o)
         ts = datetime.datetime.utctimetuple(o)
         #    print(ts.tm_year, ts.tm_mon, ts.tm_mday, ts.tm_hour, ts.tm_min, ts.tm_sec, ts.tm_yday)
         year = ts.tm_year ; mm  = ts.tm_mon ; dd =  ts.tm_mday

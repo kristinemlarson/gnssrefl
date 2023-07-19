@@ -181,7 +181,17 @@ def main():
     if args.xlimits is not None:
         print('found x-axis limits')
         xlimits = args.xlimits
-        plt.xlim((xlimits))
+        if convert_mjd:
+            t1 = Time(xlimits[0],format='mjd')
+            t1_utc = t1.utc # change to UTC
+            tval1 =  t1_utc.datetime # change to datetime
+            t2 = Time(xlimits[1],format='mjd')
+            t2_utc = t2.utc # change to UTC
+            tval2 =  t2_utc.datetime # change to datetime
+            plt.xlim((tval1,tval2))
+
+        else:
+            plt.xlim((xlimits))
 
     if args.outfile is not None:
         plt.savefig(args.outfile,dpi=300)

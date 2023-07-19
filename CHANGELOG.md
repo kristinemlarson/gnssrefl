@@ -13,6 +13,10 @@ gnss-gfz directly downloads multi-GNSS orbits from GFZ.  this is equivalent to g
 
 for all four constellations, use gnss-gfz or gnss options.
 
+Added script to download tide gauge data from Queensland ... download_qld.py
+
+quickplt allows xaxis limits in MJD (i.e. it will use datetimes to make a nicer x-axis)
+
 ## 1.4.2
 
 Fixed bug in query_modern in gps.py that did not check to see if Files subdirectory existed before

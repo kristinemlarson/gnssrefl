@@ -247,6 +247,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                             if abs(maxF - maxH) < 0.10: #  peak too close to max value
                                 tooclose = True
 
+                            if False:
+                                print(avgAzim, satNu, e1, e2)
+
                             if (not tooclose) & (delT < delTmax) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
                             # request from a tide gauge person for Month, Day, Hour, Minute
 
@@ -678,7 +681,8 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     meanTime : float
         UTC hour of the day (GPS time)
     avgAzim : float
-        azimuth of the arc (deg)
+        average azimuth of the arc (deg) 
+        ### this will not be entirely consistent with other metric
     outFact1: float
         kept for backwards compatibility.  set to zero
     outFact2 : float
@@ -744,6 +748,7 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
                     ie = np.argmin(ele[i])
                     # find the azimuth of that first elevation angle 
                     initA = azm[i][ie]
+                    #print('initial azimuth ostensibly for min eangle',initA)
                     keeparc = check_azim_compliance(initA,azlist)
                     if keeparc :
                         x = ele[i] ; y = data[i]
