@@ -96,6 +96,8 @@ def ny_plot(station,allN, info):
 
     allN : numpy array ?
         azimuth and nyquist answers
+    info : str
+        information for the title
 
     Returns
     -------
@@ -103,6 +105,7 @@ def ny_plot(station,allN, info):
         name of plot file
 
     """
+    # wavelengths in meters, being lazy
     l2 = 0.24421
     l5 = 0.254828048
     l1 = 0.19029360
@@ -124,11 +127,19 @@ def ny_plot(station,allN, info):
         xdir = './'
     pngfile = xdir + station + '_nyquist.png'
     plt.show()
-
-
-    fig.savefig(pngfile, format="png")
     print('pngfile stored in: ', pngfile)
+    fig.savefig(pngfile, format="png")
 
+    txtfile = xdir + station + '_nyquist.txt'
+    print(txtfile)
+    nr,nc = allN.shape
+    N = len(allN)
+    fout = open(txtfile, 'w+')
+    fout.write('{0:s}  {1:s} \n'.format('%', station + ' ' + info ))
+    for i in range(0,N):
+        fout.write('{0:7.2f}  {1:7.2f} \n'.format(allN[i,0], allN[i,1]))
+    fout.close()
+    print('Writing txtfile to ', txtfile)
 
 def read_the_orbits(obsfile,constel):
     """
