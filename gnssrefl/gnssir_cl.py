@@ -137,7 +137,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         If changed here, then it overrides what you requested in the json. default is 360.
     nooverwrite : bool, optional
         Use to overwrite lomb scargle result files or not.
-        Default is True (do not overwrite files).
+        Default is False, i.e., it will overwrite.
     extension : string, optional
         extension for result file, useful for testing strategies. default is empty string
     compress : boolean, optional
