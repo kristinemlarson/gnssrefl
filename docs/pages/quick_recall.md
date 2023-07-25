@@ -26,7 +26,7 @@
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_invsnr.html),
 [invsnr_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 
-* refl_zones [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html),
+* [refl_zones code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html),
 [discusssion](https://gnssrefl.readthedocs.io/en/latest/pages/utilities.html)
 
 

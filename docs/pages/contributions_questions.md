@@ -2,7 +2,7 @@
 
 ## Publications
 - [One Receiver, Zenith Pointing](https://gnssrefl.readthedocs.io/en/latest/pages/community.html)
-- [Non-Zenith Antennas](https://gnssrefl.readthedocs.io/en/latest/pages/tilted.html)
+- [Non-Zenith Pointing Antenna Examples](https://gnssrefl.readthedocs.io/en/latest/pages/tilted.html)
 
 ## Acknowledgements
 

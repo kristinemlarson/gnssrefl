@@ -109,7 +109,8 @@ RINEX files downloaded from archives are not stored by this code. In fact, quite
 they are deleted. Do not keep your only copy of RINEX files in your default directory.
 
 You do not need precise orbits to do GNSS-IR. We only use them as a convenience.
-Generally we use multi-GNSS sp3 files. that are defined as:
+Generally we use multi-GNSS sp3 files. See the <code>rinex2snr</code> documentation for more details on 
+the orbits you can use. 
 
 Some of the utilities and environmental products code store files in REFL_CODE/Files
 The locations of these files are always provided in the screen output.
@@ -138,22 +139,19 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 
 The columns in the SNR data are defined as:
 
-<PRE>
-1. Satellite number (remember 100 is added for Glonass, etc)
-2. Elevation angle, degrees
-3. Azimuth angle, degrees
-4. Seconds of the day, GPS time
-5. elevation angle rate of change, degrees/sec.
-6.  S6 SNR on L6
-7.  S1 SNR on L1
-8.  S2 SNR on L2
-9.  S5 SNR on L5
-10. S7 SNR on L7
-11. S8 SNR on L8
-</PRE>
+- Satellite number (remember 100 is added for Glonass, 200 for Galileo etc)
+- Elevation angle, degrees
+- Azimuth angle, degrees
+- Seconds of the day, GPS time
+- elevation angle rate of change, degrees/sec.
+-  S6 SNR on L6
+-  S1 SNR on L1
+-  S2 SNR on L2
+-  S5 SNR on L5
+-  S7 SNR on L7
+-  S8 SNR on L8
 
 The unit for all SNR data is dB-Hz.
-
 
 ## GNSS frequencies
 
@@ -170,11 +168,8 @@ set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
 ## Additional files
 
 - EGM96geoidDATA.mat is stored in REFL_CODE/Files
-- station_pos.db is stored in REFL_CODE/Files 
-- gpt_1wA.pickle is stored in REFL_CODE/input
-
-We will be moving these to a single place after our short course!
-
+- station_pos.db is stored in REFL_CODE/Files. This is a compilation of station coordinates from Nevada Reno.
+- gpt_1wA.pickle is stored in REFL_CODE/input. This file is used in the refraction correction.
 
 ## Some comments about signals
 
