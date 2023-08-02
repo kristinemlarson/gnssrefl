@@ -700,6 +700,7 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     """
     x=[]; y=[]; azi=[]; seconds = []; edot = [] ; sat = []
     Nvv= 0; meanTime = 0; avgAzim = 0 ; outFact2 = 0 ; delT = 0
+    initA = 0;
     cf = g.arc_scaleF(f,satNu)
     outFact1 = 0 # backwards compatability
     good = True
