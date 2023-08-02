@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.4.4
+I updated gnssir and quickLook so that it now reports the azimuth of the lowest
+elevation angle in the arc. Previously it used the average azimuth over the 
+entire rising or setting arc.
+
 ## 1.4.3
 
 Changed gnss back to its original setting, which is getting the multi-GNSS final 

@@ -21,6 +21,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     Arcs are determined differently than in the first version of the code, which
     was quadrant based. This identifies arcs and applies azimuth constraints after the fact.
 
+    2023-aug-02 trying to fix the issue with azimuth print out being different than
+    azimuth at lowest elevation angle
+
     Parameters
     ----------
     station : string
@@ -196,6 +199,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                         for ij in range(0,len(ellist),2):
                             te1 = ellist[ij]; te2 = ellist[ij+1]; newl = [te1,te2]
                             # poorly named inputs - elev, azimuth, seconds of the day, ...
+                            # te1 and te2 are the requested elevation angles I believe
+                            # satNu is the requested satellite number
                             tarclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],te1, te2,ediff,satNu,screenstats)
                             arclist = np.append(arclist, tarclist,axis=0)
 
@@ -218,7 +223,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                         # create array for the requested arc
                         d2 = np.array(thissat[sind:eind, :], dtype=float)
                         # window the data - which also removes DC 
-                        # try this ... 
+                        # this is saying that these are the min and max elev angles you should be using
                         e1 = arclist[a,4]; e2 = arclist[a,5]
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT= window_new(d2, f, 
                                 satNu,ncols,pele, lsp['polyV'],e1,e2,azvalues,screenstats)
@@ -645,6 +650,8 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     retrieves SNR arcs for a given satellite. returns elevation angle and 
     detrended linear SNR
 
+    2023-aug02 updated to improve azimuth calculation reported
+
     Parameters
     ----------
     snrD : numpy array (multiD)
@@ -660,9 +667,9 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     pfitV : float
         polynomial order
     e1 : float
-        min elev angle (deg)
+        requested min elev angle (deg)
     e2 : float
-        max elev angle (deg)
+        requested max elev angle (deg)
     azlist : list of floats (deg)
         non-continguous azimuth regions, corrected for negative regions
     screenstats : bool
@@ -792,7 +799,11 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     
             outFact2 = cunit/(avgEdot_fit*3600)
 
-    return x,y, Nvv, cf, meanTime,avgAzim,outFact1, outFact2, delT
+    # This originally returned the average azimuth.
+    # I think you can return the initA instead of avgAzim here
+    #    return x,y, Nvv, cf, meanTime,avgAzim,outFact1, outFact2, delT
+    #print('new ', initA, ' old ', avgAzim)
+    return x,y, Nvv, cf, meanTime,initA, outFact1, outFact2, delT
 
 
 def find_mgnss_satlist(f,year,doy):
@@ -930,13 +941,15 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
     dates : numpy array  of floats
         seconds of the day from SNR file
     e1 : float
-        min eval
+        min elevation angle (deg)
     e2 : float
-        max eval
+        max elevation angle (deg)
     ediff : float
-        el angle difference QC
+        el angle difference required, deg, QC
     sat : int
         satellite number
+    screenstats : bool
+        whether you want info printed to the screen
 
     Returns
     -------
@@ -948,7 +961,7 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
     # require arcs to be this length in elev angle
     min_deg = (e2-ediff)   - (e1 + ediff)
 
-#   time limit in seconds - taken from david
+#   time limit in seconds - taken from david purnell
     gaptlim = 5*60 # seems awfully small
     #newf = np.array(f[i, :], dtype=float)
     iarc = 0
@@ -974,6 +987,8 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
         #nazm = azm[sind:eind]
         minObse = min(nelv)
         maxObse = max(nelv)
+        #print('min/max obs e ', minObse, maxObse)
+        # how to get the azimuth?
 
         nogood = False
         verysmall = False
@@ -1005,6 +1020,8 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
         if not nogood :
             iarc = iarc + 1
             newl = [sind, eind, int(sat), iarc,e1,e2]
+            #print('indices ',sind, eind, elv[sind], elv[eind] )
+            #print('indices ',sind, eind, elv[sind], elv[eind], azm[sind], azm[eind])
             tv = np.append(tv, [newl],axis=0)
 
     return tv 
