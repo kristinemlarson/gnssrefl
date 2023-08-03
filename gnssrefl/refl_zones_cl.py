@@ -16,7 +16,7 @@ def parse_arguments():
     parser.add_argument('station', help='station', type=str)
     parser.add_argument('-lat', help='Latitude (deg), if station not in database', type=float, default=None)
     parser.add_argument('-lon', help='Longitude (deg), if station not in database', type=float, default=None)
-    parser.add_argument('-el_height', help='Ellipsoidal height (m) if station not in database', type=float,default=None)
+    parser.add_argument('-height', help='Ellipsoidal height (m) if station not in database', type=float,default=None)
     parser.add_argument('-fr', help='1, 2, or 5 ', type=int,default=None)
     parser.add_argument('-RH', help='Reflector height (meters). Default is sea level', type=str, default=None)
     parser.add_argument('-azim1', help='start azimuth (default is 0, negative values allowed) ', type=int,default=None)
@@ -31,7 +31,7 @@ def parse_arguments():
 
     return {key: value for key, value in args.items() if value is not None}
 
-def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, el_height: float=None, 
+def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, height: float=None, 
         RH: str=None, fr: int = 1, el_list: float= [], azlist : float=[], system: str = 'gps', output: str = None):
     """
     Creates a KML file for reflection zones to be used in Google Earth
@@ -65,7 +65,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         latitude in deg
     lon : float, optional
         longitude in deg
-    el_height : float, optional
+    height : float, optional
         ellipsoidal height in m
     RH : str, optional
         user-defined reflector height (m)
@@ -88,6 +88,8 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     Creates a KML file
 
     """
+
+    el_height = height # changed name to be consistent with gnssir_input
 
     # changed name to be consistent with other codes
     az_sectors = azlist
@@ -159,7 +161,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
 
     emax = 31 # degrees for now
 
-    print(all(x < 50 for x in el_list))
+    #print(all(x < 50 for x in el_list))
 
     if not (all(x < emax for x in el_list)):
         print('Right now we have an emax of 30 degrees. Resubmit your request.')
