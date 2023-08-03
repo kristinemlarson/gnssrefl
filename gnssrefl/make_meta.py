@@ -35,7 +35,7 @@ def parse_arguments():
         default=None,
     )
     parser.add_argument(
-        "-ht",
+        "-height",
         help="Ellipsoidal height (m) if station not in database",
         type=float,
         default=None,
@@ -71,7 +71,7 @@ def make_meta(
     station: str,
     lat: float = None,
     lon: float = None,
-    ht: float = None,
+    height: float = None,
     man_input: bool = True,
     read_offset: bool = False,
     overwrite: bool = False,
@@ -96,7 +96,7 @@ def make_meta(
         makes json meta file for p038; uses UNR coords and will request user manually populate meta info.
         If meta json already exists for p038, will append to existing file.
 
-    make_meta test -lat 39.7417583 -lon -105.0706972 -ht 1655
+    make_meta test -lat 39.7417583 -lon -105.0706972 -height 1655
         makes json meta file for test; uses manually input coords and will request ueser manually populate meta info
 
     make_meta p038 -man_input False -read_offset True -overwrite True
@@ -115,7 +115,7 @@ def make_meta(
     lon : float, optional
         longitude in deg
 
-    ht : float, optional
+    height : float, optional
         ellipsoidal height in m
 
     read_offset : bool, optional
@@ -146,7 +146,7 @@ def make_meta(
             meta_dict = comp_dict["meta"]
 
     else:  # initialize empty meta_dict
-        comp_dict = get_coords(station, lat, lon, ht)
+        comp_dict = get_coords(station, lat, lon, height)
         meta_dict = {}
 
     # read in gage metadata file
@@ -165,7 +165,7 @@ def make_meta(
         json.dump(comp_dict, outfile, indent=3)
 
 
-def get_coords(station, lat, lon, ht):
+def get_coords(station, lat, lon, height):
     """
     initializes metadata dictionary with lat lon ht keys, either from UNR database (default) or user entered
 
@@ -180,7 +180,7 @@ def get_coords(station, lat, lon, ht):
     lon : float, optional, default is None
         longitude in deg
 
-    ht : float, optional, default is None
+    height : float, optional, default is None
         ellipsoidal height in m
 
     Returns
@@ -192,22 +192,22 @@ def get_coords(station, lat, lon, ht):
 
     if (lat is None) & (lon is None):
         # check the station coordinates in our database from the station name
-        lat, lon, ht = g.queryUNR_modern(station)
+        lat, lon, height = g.queryUNR_modern(station)
         if (lat == 0) and (lon == 0):
             print(
                 "Manually input coords using -lat -lon -ht args for make_meta. \n Exiting."
             )
             sys.exit()
         else:
-            print("Using inputs:", lat, lon, ht)
+            print("Using inputs:", lat, lon, height)
     else:
-        print("Using inputs:", lat, lon, ht)
+        print("Using inputs:", lat, lon, height)
 
     comp_dict = {
         "station": station,
         "lat": "{:.4f}".format(lat),
         "lon": "{:.4f}".format(lon),
-        "ht": "{:.4f}".format(ht),
+        "ht": "{:.4f}".format(height),
         "meta": {},
     }
     return comp_dict
