@@ -45,7 +45,7 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
       
       - name: Add develop tag
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         uses: akhilerm/tag-push-action@v2.1.0
         with:
           src: ghcr.io/${{ env.REPO }}:${{ env.GNSSREFL_VERSION }}
