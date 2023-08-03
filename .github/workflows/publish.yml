@@ -3,7 +3,7 @@ name: publish
 on:
   push:
     branches:
-      - "master"
+      - "td_docker-dev_issue164"
 
 jobs:
   build:
