@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.4.6
+pushed Tim Dittmann's changes to make_meta. 
+Still some issues that need to be fixed.
+
+Changed input on refl_zones for ellipsoidal height to be consistent with gnssir_input
+Commandl line variable shoud be height, not el_height.
+
+## 1.4.5
+Fixed unset variable in the data windowing function so it always has a value (iAzim).
+
 ## 1.4.4
 I updated gnssir and quickLook so that it now reports the azimuth of the lowest
 elevation angle in the arc. Previously it used the average azimuth over the 
