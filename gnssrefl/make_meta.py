@@ -161,9 +161,10 @@ def make_meta(
 
     # add metad to complete dictionary
     comp_dict["meta"] = meta_dict
+    
+    print('writing meta json out to:', outputfile)
     with open(outputfile, "w+") as outfile:
         json.dump(comp_dict, outfile, indent=3)
-
 
 def get_coords(station, lat, lon, height):
     """
