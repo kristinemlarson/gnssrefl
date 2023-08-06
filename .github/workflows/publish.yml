@@ -3,7 +3,12 @@ name: publish
 on:
   push:
     branches:
-      - "master"
+      - 'master'
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - 'master'
 
 jobs:
   build:
@@ -26,7 +31,6 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           flavor: latest=true
           tags: |
-            type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             
