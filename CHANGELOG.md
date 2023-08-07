@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.4.7
+
+August 7, 2023
+
+I am trying a new build with Tim Dittmann's changes to the docker build.
+This should allow us to define versions with tag numbers that are aligned
+with the verion.
+
+
 ## 1.4.6
 pushed Tim Dittmann's changes to make_meta. 
 Still some issues that need to be fixed.
