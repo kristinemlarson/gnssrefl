@@ -6,7 +6,6 @@ on:
       - 'master'
     tags:
       - '*'
-
 jobs:
   build:
     name: "Publish"
