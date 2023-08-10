@@ -47,16 +47,17 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
 
     There are two required parameters - medfilter and ReqTracks. These are quality control parameters.
     They are applied in two steps. The code first calculates the median value each day - and keeps
-    only the RH that are within medfilter (meters) of this median value.  
+    only the RH that are within medfilter (meters) of this median value. If there are at least "ReqTracks"
+    number of RH left after that step, a daily average is computed for that day.
 
-    If you are unfamiliar with a median filter, please see 
+    If you are unfamiliar with what a median filter does in this code, please see 
     https://gnssrefl.readthedocs.io/en/latest/pages/README_dailyavg.html
 
     The outputs are stored in $REFL_CODE/Files/station by default.  If you want to specify a new
     subdirectory, I believe that is an allowed option.  You can also specify specific years to analyze 
     and apply fairly simple azimuth constraints.
     
-    Three text files are created
+    In summary, three text files are created
 
     1. individual RH values with no QC applied
     
