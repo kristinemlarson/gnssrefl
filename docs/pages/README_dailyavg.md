@@ -26,15 +26,18 @@ Notes:
 - If you are interested in looking at subdaily variations of reflector height, you should
 be using subdaily.
 
+- No frequency biases are removed in this module. This is done in subdaily.
+
 
 The outputs:
 
-- completely raw RH that have been concatenated into a single file.  The location of the file
-is printed to the screen and a plot is created.
+- completely raw RH that have been concatenated into a single file.  
 
 - all RH that meet the QC criteria
 
 - daily average RH that meet the QC criteria
+
+The locations of the files and various plots are printed to the screen. 
 
 
 I illustrate the steps you might take with station MCHN. The antenna is very close to the water, so that is good.  
@@ -55,11 +58,10 @@ I start out with almost no QC (outliers with 2 meters of the median value, only 
 
 
 You can easily see the outliers - and that you need to use something more 
-useful than 2 meters for the median filter.  I will use 0.25 meters.  I am also going to 
-change the required tracks to 10:
+useful than 2 meters for the median filter.  I will use 0.25 meters instead.  I am also going to 
+change the required tracks to 10 :
 
 <p align=center>
-<img width=500 src=../_static/mchn_04.png>
 <img width=500 src=../_static/mchn_05.png>
 <img width=500 src=../_static/mchn_06.png>
 </p>
@@ -70,7 +72,8 @@ the measurements is with respect to your choices. I will also tighten the median
 
 <code> daily_avg mchn 0.20 10 -plot_limits T </code>
 
-You can see that at least visually, this makes no change in the daily averages.
+You can see that at least visually, this makes no change in the daily averages and suggests one could
+make it even smaller.  
 
 <p align=center>
 <img width=500 src=../_static/mchn_07.png>
@@ -81,3 +84,5 @@ You can see that at least visually, this makes no change in the daily averages.
 I hope this module is helpful for you. If it is not, there is certainly nothing 
 wrong with doing your own QC using another software tool such as Matlab.
 
+There is a [use case for this site](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchn.html) that was 
+done a very long time ago. But in general I think it is consistent with what is shown here.
