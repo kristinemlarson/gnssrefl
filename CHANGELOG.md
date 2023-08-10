@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 1.5.0
+August 10, 2023
+
+Updated daily_avg to have three sections.  raw arcs, arcs with QC, daily average with QC.
+Updated the discussion page.
+
 ## 1.4.9
 August 10, 2023
 
