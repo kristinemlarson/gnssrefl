@@ -80,20 +80,20 @@ shown on the x-axis is NOT the reflector height (RH).  it is
 be obstructed by the new Galileo codes except for E5.
 
 
-This is E5a
 
 <img src="../_static/at01_358_205.png" width="600"/>
+This is E5a (in our software it is called frequency 205; in RINEX it is called L5)
 
-This is E5. Note that instead of nice clean peaks, it is 
+<img src="../_static/at01_358_208.png" width="600"/>
+
+This is E5. In our software it is called frequency 208 and in RINEX it is called L8).
+Note that instead of nice clean peaks, it is 
 spread out. You can also see that the E5 retrievals degrades as elevation angle increases,
 which is exactly what you would expect with the multipath delay 
 increasing with elevation angle. I would just recommend only using
 this signal for RH < 5 meters. And even then, if you are tracking
 L8, you probably also have L5, L6, and L7, so there is not a ton gained 
 by also using L8.
-
-<img src="../_static/at01_358_208.png" width="600"/>
-
 
 ##  What about L1C?
 

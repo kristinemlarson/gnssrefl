@@ -18,6 +18,9 @@ varies a lot depending on the azimuth mask and the number of frequencies availab
 If you are not sure what values to use at your GNSS site, run it once with very minimal constraints.
 The code provides some feedback plots that will let you pick better values.
 
+Note: the computed daily average value should be associated with 12:00 UTC, not midnight.   
+
+
 Here is an example from one of our use cases where there are a few large outliers.  
 I have set the median filter value to 2 meters and the required number of tracks to 12:
 
@@ -29,6 +32,17 @@ You can easily see the outliers.
 <img width=500 src=../_static/mchn-A.png>
 </p>
 
+Is 12 a good choice?  The code also prints out a plot telling you how many
+tracks are available each day:
+
+<p align=center>
+<img width=500 src=../_static/mchn_nvals.png>
+</p>
+
+These can vary quite a bit by year as the station operators change receivers and/or 
+tracking strategies. You should pick the values that are best for your experiment.
+
+
 Next I have rerun the code with a better median filter constraint of 0.25 meters:
 
 <code> daily_avg mchn 0.25 12 </code>
@@ -37,9 +51,34 @@ Next I have rerun the code with a better median filter constraint of 0.25 meters
 <img width=500 src=../_static/mchn-B.png>
 </p>
 
-A daily average plot is also made and a text file of the outputs is created.
+Since this documentation was written, I have added the median value to the plots:
+
+<p align=center>
+<img width=500 src=../_static/mchn_tighter.png>
+</p>
+
+If you still are finding it challenging to see the variations from the median value, you
+can try setting the plot_limits option:
+
+
+<code> daily_avg mchn 0.25 12 -plot_limits T </code>
+
+<p align=center>
+<img width=500 src=../_static/mchn_wlimits.png>
+</p>
+
+
+The daily average plot:
 
 <p align=center>
 <img width=500 src=../_static/mchn-C.png>
 </p>
+
+Two txt files are created. One has all the tracks that fit the QC. The other has the desired daily
+average.  The location of the files is printed to the screen. You are welcome to generate your 
+own quality control codes for the daily average if you find this one does not meet your purposes.
+
+Updated August 10, 2023
+
+Kristine M. Larson
 

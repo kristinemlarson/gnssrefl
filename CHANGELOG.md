@@ -3,10 +3,19 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+
+## 1.4.9
+August 10, 2023
+
+New option on daily_avg that plots the median value and the limits from that 
+median value that are used to filter outliers before the daily average is computed.
+
+More documentation about daily_avg has been added online.
+
+
 ## 1.4.8
 
 Another version to get it on pypi
-
 ## 1.4.7
 
 August 7, 2023

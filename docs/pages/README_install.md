@@ -9,7 +9,7 @@ github/pypi package installation.
 
 ## Docker Container
 
-[Install Instructions](docker_cl_instructions.md)
+[Install Instructions](https://gnssrefl.readthedocs.io/en/latest/pages/docker_cl_instructions.html)
 
 ## Local Python Install 
 

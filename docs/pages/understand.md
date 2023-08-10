@@ -7,14 +7,13 @@
 
 *If you would like to try out reflectometry without installing the code*
 
-I recommend you use [this web app](https://gnss-reflections.org). It 
-can show you representative results with minimal constraints. It should provide 
-results in less than 10 seconds. 
+I recommend you use [the GNSS-IR web app](https://gnss-reflections.org/api). It 
+can show you representative results in less than 10 seconds. There are also some 
+[examples](https://gnss-reflections.org/overview).
 
 ## Goals
 
-The goal of the gnssrefl python repository is to help you 
-compute (and evaluate) GNSS-based
+The goal of the gnssrefl python repository is to help you compute (and evaluate) GNSS-based
 reflectometry parameters using geodetic data. This method is often
 called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modules:
 

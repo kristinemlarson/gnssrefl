@@ -25,10 +25,11 @@ def parse_arguments():
     parser.add_argument("-azim2", default=None, type=int, help="maximum azimuth (deg)")
     parser.add_argument("-test", default=None, type=str, help="augmentation to plot")
     parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output ")
+    parser.add_argument("-plot_limits", default=None, type=str, help="add median value and limits to plot, default is False ")
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'csv','test']
+    boolean_args = ['plt', 'csv','test','plot_limits']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -37,28 +38,55 @@ def parse_arguments():
 
 def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
         extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, 
-        azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None):
+        azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None,plot_limits: bool=False):
     """
-    The goal of this code is to consolidate individual RH results into a single file consisting of daily averaged RH without outliers.
+    The goal of this code is to consolidate individual RH results into a single file consisting of 
+    daily averaged RH without outliers. These daily average values are nominally associated 
+    with the time of 12 hours UTC.
 
-    There are multiple optional choices as discussed below. The code also creates a file with all the subdaily RH as well.
+    There are multiple optional choices as discussed below. The code also creates a file with all 
+    the subdaily RH as well. 
+
+    The two required parameters - medfilter and ReqTracks. These are quality control parameters.
+    They are applied in two steps. The code first calculates the median value each day - and keeps
+    only the RH that are within medfilter (meters) of this median value.  All these RH are written out
+    to a file.  The location of the file is written to the screen.
+
+    If you are unfamiliar with a median filter, please see the discussion on the issues page 
+    of github.
+
+    In the next step the code checks that a reasonable number of RH values are 
+    available on each day to warrant making a daily average. You could have occasions when
+    there are 100 RH values one day and 5 another. If you blindly compute daily averages you
+    might consider those to be of the same quality.   
+
+    The other constraints are more practical. Like limiting the years you want to evaluate.
+    Or the min and max azimuths.
+
+    The outputs are stored in $REFL_CODE/Files/station by default.  If you want to specify a new
+    subdirectory, I believe that is an allowed option. 
+    
 
     Examples
     -------- 
     daily_avg p041 0.25 10 
         consolidates results for p041 with median filter of 0.25 meters and at least 10 solutions per day
+    daily_avg p041 0.25 10 -plot_limits T
+        the same as above but with plot_limits to help you see where the median filter is applied
     daily_avg p041 0.25 10  -year1 2015 -year2 2020
         consolidates results for p041 with median filter of 0.25 meters and at least 10 solutions per day
         and restricts it to years between 2015 and 2020
     daily_avg p041 0.25 10  -year1 2015 -year2 2020 -azim1 0 -azim2 180
         consolidates results for p041 with median filter of 0.25 meters and at least 10 solutions per day
         and restricts it to years between 2015 and 2020 and azimuths between 0 and 180 degrees
+    daily_avg p041 0.25 10 -extension NV
+        consolidates results which were created using the extension NV when you ran gnssir.
 
 
     Parameters
     ----------
-    station : string
-        4 ch station name 
+    station : str
+        4 ch station name, generally lowercase
 
     medfilter : float
         Median filter for daily reflector height (m). Start with 0.25 for surfaces where you expect no significant 
@@ -129,11 +157,15 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     azim2 : int, optional
         maximum azimuth, degrees
 
-    test : bool
-        augmentations to the plot
+    test : bool, optional
+        not sure what this does
 
-    subdir: str
+    subdir: str, optional
         non-default subdirectory for Files output
+
+    plot_limits: bool, optional
+        adds the median value and median filter limits to the plot.
+        default is False
 
     """
     if len(station) != 4:
@@ -143,7 +175,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     plt2screen = plt # since variable was originally this name 
     # make sure environment variables are set
     g.check_environ_variables()
-    if subdir == None:
+    if subdir is None:
         subdir = station
     g.set_subdir(subdir)
 # where the summary files will be written to
@@ -157,7 +189,9 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     else:
         alldatafile = txtdir + '/' + station + '_allRH.txt' 
 
-    tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, alldatafile, csv, medfilter, ReqTracks,azim1,azim2,test,subdir)
+    # read in the files
+    tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, 
+            alldatafile, csv, medfilter, ReqTracks,azim1,azim2,test,subdir,plot_limits)
 
     # default is to show the plots
     nr,nc = tv.shape

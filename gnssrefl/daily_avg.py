@@ -94,9 +94,13 @@ def fbias_daily_avg(station):
 
 
 
-def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks,azim1,azim2,test,subdir):
+def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
+        howBig,ReqTracks,azim1,azim2,test,subdir,plot_limits):
     """
     worker code for daily_avg_cl.py
+
+    It reads in RH files created by gnssir. Applies median filter and saves average results 
+    for further analysis
 
     Parameters
     ----------
@@ -139,6 +143,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     subdir : str
         subdirectory for output files
 
+    subdir : bool
+        whether plot limits for the median filter are shown
+
     Returns
     -------
     tv : numpy array
@@ -152,7 +159,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     """
     xdir = os.environ['REFL_CODE']
-    print('All RH retrievals will be written to: ', alldatafile)
+    print('All RH retrievals that meet your QC criteria will be written to: ' )
+    print(alldatafile)
     allrh = open(alldatafile, 'w+')
     # put in a header
     allrh.write(" {0:s}  \n".format('% year,doy, RH(m), Month, day, azimuth(deg),freq, satNu, LSP amp,pk2noise,UTC(hr)' ))
@@ -161,17 +169,22 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     fs = 12
     NotEnough = 0
     tv = np.empty(shape=[0, 8])
+    tv_median = np.empty(shape=[0, 9])
     tvall = np.empty(shape=[0, 7])
+    #
     ngps = []; nglo = [] ; ngal = []; nbei = []
     obstimes = []; medRH = []; meanRH = [] ; alltimes = []; meanAmp = []
+    tttimes = []
     fig,ax=plt.subplots()
     year_list = np.arange(year1, year2+1, 1)
     NumFiles = 0
     s1 = time.time()
     for yr in year_list:
         direc = xdir + '/' + str(yr) + '/results/' + station + '/' + extension + '/'
+        # counter for the legends
+        nle = 0
+        # i understand why python people like this - but then the results are not sorted ...
         if os.path.isdir(direc):
-            # i understand why python people like this - but then the results are not sorted ...
             all_files = os.listdir(direc)
             all_files = np.sort(all_files)
             #print('Number of files in ', yr, len(all_files))
@@ -189,6 +202,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                             a = np.loadtxt(fname,skiprows=3,comments='%')
                         nr,nc=a.shape
                         if (nr > 0):
+                            nle = nle + 1
                             # add the new azimuth constraint here ... 2022sep04
                             www = (a[:,5] > azim1 ) & (a[:,5] < azim2 )
                             a = a[www,:]
@@ -203,6 +217,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
                             medv = np.median(rh)
                             # 0 means use all frequencies.  otherwise, you can specify 
+                            # this is applying the medial filter
                             if fr == 0:
                                 cc = (rh < (medv+howBig))  & (rh > (medv-howBig))
                             else:
@@ -249,7 +264,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                     ijk = (gsat > 200) * (gsat < 300); # galileo
                                     ngal = np.append(ngal, len(gsat[ijk]))
 
+                                medv_obstime = datetime.datetime(year=yr, month=d.month, day=d.day, hour=12, minute=0, second=0)
                                 obstimes.append(datetime.datetime(year=yr, month=d.month, day=d.day, hour=12, minute=0, second=0))
+
                                 medRH.append(medv)
                                 #medRH =np.append(medRH, medv)
                                 # store the meanRH after the outliers are removed using simple median filter
@@ -264,8 +281,12 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                 # updated this to include mean amplitude 2021 november 8
                                 meanAmp.append(np.mean(goodAmp))
                                 newl = [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday, np.mean(goodAmp)]
+                                # a new variable is not really needed - but I did not want to oerwrite working code
+                                newl_plus_median = [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday, np.mean(goodAmp),medv]
 
                                 tv = np.append(tv, [newl],axis=0)
+                                tv_median = np.append(tv_median, [newl_plus_median],axis=0)
+
                                 k += 1
                             else:
                                 NotEnough = NotEnough + 1
@@ -276,13 +297,31 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     #meanRH = np.asarray(meanRH)
     s2 = time.time()
 
+    # not sure you can sort obstimes
+    dumb_time = tv_median[:,0] + tv_median[:,1]/365.25
+    # sort it ...
+    ii = np.argsort(dumb_time)
+    tv_median = tv_median[ii,:]
+    for www in range(0,len(tv_median)):
+        filler = datetime.datetime(year=int(tv_median[www,0]), 
+                month=int(tv_median[www,4]), day=int(tv_median[www,5]), hour = 12, minute=0, second = 0)
+        tttimes.append(filler)
 
-    fig.autofmt_xdate()
+    # plot the median 
+    ax.plot(tttimes, tv_median[:,8],'ks',markerfacecolor='white',label='median value')
+    # if requested, also show the limits for the median filter
+    if plot_limits:
+        ax.plot(tttimes, tv_median[:,8]+howBig,'-',color='gray',label='median+limit')
+        ax.plot(tttimes, tv_median[:,8]-howBig,'-',color='gray',label='median-limit')
+
     plt.ylabel('meters',fontsize=fs)
     plt.title('All Reflector Heights for Station: ' + station.upper(),fontsize=fs)
     plt.xticks(fontsize=fs)
     plt.yticks(fontsize=fs)
     plt.gca().invert_yaxis()
+    # this command changes the x-axis
+    fig.autofmt_xdate()
+    plt.legend(loc="upper right")
     plt.grid()
 #   new plot
     print('A total of ', NumFiles, ' days were evaluated.')
@@ -460,8 +499,9 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     # 2021 november 8 added another column that has mean amplitude
     fout.write("{0:28s} \n".format( '% calculated on ' + xxx ))
     fout.write("% Daily average reflector heights (RH) calculated using the gnssrefl software \n")
+    fout.write("% Nominally you should assume this average is associated with 12:00 UTC hours \n")
     fout.write("% year doy   RH    numval month day RH-sigma RH-amp\n")
-    fout.write("% year doy   (m)                      (m)    (v/v)\n")
+    fout.write("%            (m)                       (m)    (v/v)\n")
     fout.write("% (1)  (2)   (3)    (4)    (5)  (6)   (7)     (8) \n")
     if csvformat:
         for i in np.arange(0,N,1):
