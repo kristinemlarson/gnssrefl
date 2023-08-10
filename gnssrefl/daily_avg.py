@@ -386,6 +386,10 @@ def quick_raw(alldatafile2,xdir,station,subdir):
     """
     if os.path.exists(alldatafile2):
        raw = np.loadtxt(alldatafile2,comments='%')
+       if len(raw) == 0:
+           print('There are no RH data.  At all.  Exiting')
+           sys.exit()
+
        ns= len(raw.shape)
        if ns == 2:
            nr,nc = raw.shape

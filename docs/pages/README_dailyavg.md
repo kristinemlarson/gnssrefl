@@ -37,42 +37,30 @@ is printed to the screen and a plot is created.
 - daily average RH that meet the QC criteria
 
 
-I illustrate the steps you might take with station MCHN. The antenna is very close to the water, so that is 
+I illustrate the steps you might take with station MCHN. The antenna is very close to the water, so that is good.  
 But the receiver itself is operated suboptimally and only L1 GPS data can be used here.
 This severely limits the number of tracks that can be used. 
 
-I start out with almost no QC (outliers with 2 meters of the median value, only 5 satelliet arcs required per day):
-
+I start out with almost no QC (outliers with 2 meters of the median value, only 5 satellite arcs required per day):
 
 <code> daily_avg mchn 2 5 </code>
 
 <p align=center>
 <img width=500 src=../_static/mchn_01.png>
-</p>
 
-<p align=center>
 <img width=500 src=../_static/mchn_02.png>
-</p>
 
-<p align=center>
 <img width=500 src=../_static/mchn_03.png>
 </p>
 
 
 You can easily see the outliers - and that you need to use something more 
 useful than 2 meters for the median filter.  I will use 0.25 meters.  I am also going to 
-change the required tracks to 10
+change the required tracks to 10:
 
 <p align=center>
 <img width=500 src=../_static/mchn_04.png>
-</p>
-
-<p align=center>
 <img width=500 src=../_static/mchn_05.png>
-</p>
-
-
-<p align=center>
 <img width=500 src=../_static/mchn_06.png>
 </p>
 
@@ -86,10 +74,10 @@ You can see that at least visually, this makes no change in the daily averages.
 
 <p align=center>
 <img width=500 src=../_static/mchn_07.png>
-</p>
-
-<p align=center>
 <img width=500 src=../_static/mchn_08.png>
 </p>
 
+
+I hope this module is helpful for you. If it is not, there is certainly nothing 
+wrong with doing your own QC using another software tool such as Matlab.
 
