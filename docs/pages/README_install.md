@@ -97,7 +97,7 @@ If you are using the version from gitHub:
 community: CRX2RNX and gfzrnx. It currently works for linux, macos and mac-newchip options. If you are using 
 docker or Jupyter notebooks **you do not need to run this.**
 
-We no longer encourage people to use **teqc** as it is not supported by UNAVCO. We try to install it 
+We no longer encourage people to use **teqc** as it is not supported by EarthScope/UNAVCO. We try to install it 
 in case you would like to use it on old files.
 
 ### Homework 0: Test installation.

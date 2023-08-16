@@ -1,7 +1,7 @@
 
 ## Homework 1
 
-**Due date:** This homework is to be completed **before** the short course given on October 21. You need to make
+**Prerequisite:** You need to make
 sure the software has been properly installed and you have successfully completed the "homework 0" assignment.
 
 **Purpose:** Practice setting your azimuth and elevation angle mask  

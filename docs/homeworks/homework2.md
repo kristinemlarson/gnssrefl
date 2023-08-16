@@ -1,6 +1,6 @@
 ## Homework 2
 
-**Due date:** This homework is to be completed **before** the short course given on October 21. You need to make
+**Prerequisite:** You need to make
 sure the software has been properly installed and you have successfully completed the "homework 0" assignment.
 
 **Purpose:** Learn how to measure snow depth levels with <code>gnssrefl</code> using GNSS data 
@@ -36,7 +36,7 @@ because there was a large melt event on the ice sheet. In order to set the prope
 
 First you need to translate one day of RINEX data.  Use the year 2012 and day of year 100.
 Once you have successfully created a SNR file, run <code>quickLook</code>.
-[For more details on translating RINEX files and quicklook output](https://github.com/kristinemlarson/gnssrefl).
+[For more details on translating RINEX files and quicklook output](https://gnssrefl.readthedocs.io/en/latest/pages/quick_recall.html).
 
 Looking at the QC metrics plots created by <code>quickLook</code>, do you have some ideas on how to change the azimuth mask angles?
 
@@ -45,20 +45,14 @@ Now make SNR files for gls1 for the all of 2012. Use the <code>-weekly True</cod
 We will next analyze a year of L1 GPS reflection data from gls1. We will use the default minimum and maximum 
 reflector height values (0.5 and 6 meters). But for the reasons previously stated, you will want to 
 set a minimum elevation angle of 7 degrees. We also specify that we only want to use the L1 data.
-Use the utility <code>make_json_input</code> to set and store the analysis settings.
-
-Hand-edit the azimuths in the json file to:
-
-```
-"azval": [ 40, 90, 90, 180, 180, 270, 270, 330 ],
-```
+Use the utility <code>gnssir_input</code> to set and store the analysis settings.  (Hint: we recommend the argument `-azlist2 40 330`.)
     
 Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012 using <code>gnssir</code>.
 Note that it is normal to see 'Could not read the first SNR file:' because we only created SNR files once a week.
 
 Now you can use the <code>daily_avg</code> tool to compute a daily average reflector height for gls1. 
 Try setting the median filter to 0.25 meters and individual tracks to 30. These numbers are used 
-by <code>daily_avg</code> to set QC in order to recover a trustworthy daily average [(there is more information here on these parameters)](https://github.com/kristinemlarson/gnssrefl#helper). A plain txt file 
+by <code>daily_avg</code> to set QC in order to recover a trustworthy daily average [(there is more information here on these parameters)](https://gnssrefl.readthedocs.io/en/latest/pages/README_snowdepth.html). A plain txt file 
 with the RH outputs are created as well as several plots. 
 The data in the main RH plot show you long-term accumulation as well as relatively small snow 
 accumulation events. The overall plot is dominated by the large melt event in the summer of 2012.
