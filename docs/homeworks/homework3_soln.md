@@ -13,25 +13,21 @@ station name (ross), the year (2020) and day of year (150)*
 
 <code>quickLook ross 2020 150</code> 
 
-<img src=ross_1.png width=500 />
+<img src="../_static/ross_1.png" width="500">
 
-<img src=ross_2.png width=500 />
+<img src="../_static/ross_2.png" width="500">
 
 *From these plots, how does the correct *RH* value compare with the one you assumed earlier when you 
 were trying out the webapp?  How about the azimuths?  Go back to the reflection zone webapp and 
 make sure you are happy with your azimuth and elevation angle selections.*
 
-Please see the [gnssrefl README](https://github.com/kristinemlarson/gnssrefl) as ross is used an example.
-
 *Next we need to save our <code>gnssir</code> analysis strategy*
 
 I shifted the min and max RH to better accommodate the main signal from ~4.5 meters. I also limited 
-elevation angles to 5-15 and used the peak2noise from the quickLook (which is 3).
+elevation angles to 5-15 and used the peak2noise from the quickLook (which is 3).  I use azimuths 
+from the southeast region and get coordinates from UNR.
 
-<code>make_json_input ross 48.833729447 -87.519598801 149.8350237 -l1 True -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3</code>
-
-
-[My json was hand edited for the southeast azimuths.](ross.json)
+<code>gnssir_input ross -l1 True -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -azlist2 90 180</code>
 
 *Now analyze data for the year 2020. First you need to make the snr files:*
 
@@ -47,11 +43,11 @@ Then create a daily average RH:
 
 The daily_avg code produces multiple plots. Individual RH estimates:
 
-<img src=ross_all.png width=500 />
+<img src="../_static/ross_all.png" width="500">
 
 The daily average for RH:
 
-<img src=ross-dailyavg.png width=500  />
+<img src="../_static/ross-dailyavg.png" width="500">
 
 You can compare these retrievals with the [NRCAN](https://www.nrcan.gc.ca/home) 
 tide gauge data for Rossport.

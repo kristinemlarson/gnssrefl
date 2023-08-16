@@ -89,3 +89,4 @@ The plots might look slightly different and the defaults we used in the analysis
 
 * [Homework 3](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework3.html): Learn how to measure water level with `gnssrefl` using GNSS data
 
+    * [Homework 3 Solution](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework3_soln.html)
