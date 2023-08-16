@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.5.2
+August 14, 2023
+
+Added IGN for Spain for rinex2snr, RINEX 3 and 30 second only
+These data are likely already available from SONEL.
+archive is called ignes
+
+Save output from quickplt even if someone doesn't ask for it.
+
+Improve discussion of QC in the understanding section of readthedocs.
+
 ## 1.5.1
 August 10, 2023
 

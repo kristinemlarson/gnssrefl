@@ -344,21 +344,20 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
     plt.legend(loc="best")
     plt.grid()
 
+    print('A total of ', NumFiles, ' days were evaluated.')
+    print( NotEnough, ' days did not meet the threshold set for a dependable daily average')
     if NumFiles > 1:
         pltname = xdir + '/Files/' + subdir + '/' + station + '_AllRH.png'
         print('All RH png file saved as: ', pltname)
         plt.savefig(pltname)
-#   new plot
-    print('A total of ', NumFiles, ' days were evaluated.')
 
-    print( NotEnough, ' days did not meet the threshold set for a dependable daily average')
+
+    # close the all RH output files
     allrh.close()
     noqc.close()
 
+    # quick plot of the results without QC
     quick_raw(alldatafile2,xdir, station,subdir)
-
-    # save daily average plot ... 
-
 
     # plot the number of retrievals vs time
     txtdir =  xdir + '/Files/' + subdir 
@@ -385,7 +384,10 @@ def quick_raw(alldatafile2,xdir,station,subdir):
 
     """
     if os.path.exists(alldatafile2):
-       raw = np.loadtxt(alldatafile2,comments='%')
+       # turn off warning
+       with warnings.catch_warnings():
+           warnings.simplefilter("ignore")
+           raw = np.loadtxt(alldatafile2,comments='%')
        if len(raw) == 0:
            print('There are no RH data.  At all.  Exiting')
            sys.exit()
@@ -510,7 +512,7 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
 
     #plt.legend(loc="upper left")
     #ax.legend(bbox_to_anchor=(1.02, 1.02))
-    plt.legend(loc="upper right")
+    plt.legend(loc="best")
     fig.autofmt_xdate()
     plt.title(station.upper() + ': Number of values used in the daily average',fontsize=fs)
     plt.xticks(fontsize=fs)
@@ -544,7 +546,7 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     # nothing to write 
     if (nr < 1):
         return
-    print('Daily average RH file written to: ', outfile)
+    print('\nDaily average RH file written to: ', outfile)
     ii = np.argsort(obstimes)
     # apply time tags to a new variable
     ntv = tv[ii,:]

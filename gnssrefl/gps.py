@@ -1743,7 +1743,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
 
 def arc_scaleF(f,satNu):
     """
-    calculates LSP scale factor cf 
+    calculates LSP scale factor cf , the wavelength divided by 2
 
     Parameters
     --------
@@ -1753,9 +1753,9 @@ def arc_scaleF(f,satNu):
         satellite number (1-400)
 
     Returns
-    ----------
+    -------
     cf : float
-        wavelength/2 (meters)
+        GNSS wavelength/2 (meters)
 
     """ 
 #   default value for w so that if someone inputs an illegal frequency, it does not crash
@@ -3423,8 +3423,8 @@ def highrate_nz(station, year, month, day):
 
 def get_orbits_setexe(year,month,day,orbtype,fortran):
     """
-    picks up and stores orbits as needed
-    also sets executable location for translation (gpsonly vs multignss)
+    picks up and stores orbits as needed.
+    It also sets executable location for translation (gpsonly vs multignss)
 
     Parameters
     ----------
@@ -4519,6 +4519,8 @@ def binary(string):
 
 def ymd_hhmmss(year,doy,utc,dtime):
     """
+    translates year, day of year and UTC hours 
+    into various other time parameters
 
     Parameters
     ----------
@@ -4573,8 +4575,19 @@ def ymd_hhmmss(year,doy,utc,dtime):
 
 def get_obstimes(tvd):
     """
-    send a LSP results, so the variable created when you read 
-    in the results file.  return obstimes for plotting 
+    Calculates datetime objects for times associated with 
+    LSP results file contents, i.e. the variable created when you read 
+    in the results file.  
+
+    Parameters
+    ----------
+    tvd : numpy array
+        results of LSP results
+
+    Returns
+    ------
+    obstimes : numpy array
+        datetime objects
     """
     nr,nc = tvd.shape
     obstimes = []
@@ -4593,6 +4606,10 @@ def get_obstimes_plus(tvd):
     send a LSP results file, so the variable created when you read
     in the results file.  return obstimes for matplotlib plotting purposes
     2022jun10 - added MJD output
+
+    See get_obstimes 
+
+
     """
     nr,nc = tvd.shape
     obstimes = []
@@ -4613,12 +4630,16 @@ def get_obstimes_plus(tvd):
 
 def confused_obstimes(tvd):
     """
-    takes lsp results - returns list of MJD values
+
+    Parameters
+    ----------
+    tvd : numpy array
+        results of LSP results
 
     Returns
     -------
     modifiedjulian : numpy array of floats
-        modified julian values
+        modified julian date values
     """
     nr,nc = tvd.shape
     modifiedjulian = []
@@ -4667,7 +4688,8 @@ def more_confused_obstimes(tvd):
 
 def read_simon_williams(filename,outfilename):
     """
-    Reads a PSMSL file and creates a new one 
+    Reads a PSMSL file and creates a new file in the 
+    standard format I use for tide gauge data in gnssrefl
     
     Parameters
     ----------
@@ -4774,7 +4796,7 @@ def get_noaa_obstimes(t):
     Parameters
     ----------
     t : list of integers
-        with year, month, day, hour, minute, second 
+        year, month, day, hour, minute, second 
 
     Returns
     -------
@@ -4797,8 +4819,8 @@ def get_noaa_obstimes(t):
 
 def get_noaa_obstimes_plus(t):
     """
-    Send it a list of time tags (y,m,d,h,m,s)
-
+    given a list of time tags (y,m,d,h,m,s), it calculates datetime
+    objects and modified julian days
 
     Parameters
     ----------
@@ -4840,7 +4862,7 @@ def final_gfz_orbits(year,month,day):
     downloads gfz final orbit and stores in $ORBITS
 
     Parameters
-    --------------
+    ----------
     year : int
         full year
     month : int
@@ -4849,14 +4871,12 @@ def final_gfz_orbits(year,month,day):
         day of month
 
     Returns
-    ---------
+    -------
     littlename : str
         orbit filename, fdir, foundit
-
     fdir: str
         directory where the orbit file is stored locally
-
-    foundit : boolean
+    foundit : bool
         whether the file was found
     """
     foundit = False
@@ -4904,7 +4924,7 @@ def final_gfz_orbits(year,month,day):
 
 def rapid_gfz_orbits(year,month,day):
     """
-    downloads gfz rapid orbit and stores in $ORBITS
+    downloads gfz rapid orbit and stores in $ORBITS locally
 
     Parameters
     ----------
@@ -4914,6 +4934,15 @@ def rapid_gfz_orbits(year,month,day):
         month or day of year if day is set to zero
     day : int
         day of month
+
+    Returns
+    -------
+    littlename : str
+        name of the orbit file
+    fdir: str
+        name of the file directory where orbit is stored
+    foundit : bool
+        whether file was found
 
     """
     foundit = False
@@ -4958,15 +4987,21 @@ def ultra_gfz_orbits(year,month,day,hour):
     ----------
     year : int
         full year
-
     month : int
         month or day of year
-
     day : int
         day or if set to 0, then month is really day of year
-
     hour : int
+        hour of the day
 
+    Returns
+    -------
+    littlename : str
+        name of the orbit file
+    fdir: str
+        name of the file directory where orbit is stored
+    foundit : bool
+        whether file was found
     """
     foundit = False
     # when they changed over?
@@ -5081,6 +5116,7 @@ def avoid_cddis(year,month,day):
         month of the year
     day : int
         calendar day
+
     Returns
     -------
     filename : str
@@ -5228,13 +5264,10 @@ def queryUNR_modern(station):
     
     Returns
     -------
-
     lat : float
         latitude in degrees (zero if not found)
-
     lon : float
         longitude in degrees (zero if not found)
-
     ht : float
         ellipsoidal ht in meters (zzero if not found)
 
@@ -5317,6 +5350,8 @@ def queryUNR_modern(station):
 
 def rinex3_nav(year,month,day):
     """
+    not sure what this does!
+
     """
     foundit = False
     fdir = ''
@@ -5344,21 +5379,19 @@ def rinex3_nav(year,month,day):
 def rinex_nrcan_highrate(station, year, month, day):
     """
     picks up 1-Hz RINEX 2.11 files from NRCAN
-    requires gfzrnx or teqc
+    requires gfzrnx or teqc to merge the 15 minute files
 
     Parameters
     ----------
     station: string
         4 character station name
-
     year: integer
         year
-
     month: integer
         month or day of year if day is set to zero
-
     day: integer
         day
+
 
     """
     crnxpath = hatanaka_version()
@@ -5444,9 +5477,8 @@ def rinex_nrcan_highrate(station, year, month, day):
 
 def translate_dates(year,month,day):
     """
-    input integer year month and day
-    output???
     i do not think this is used
+
     """
     if (day == 0):
         doy=month
@@ -5469,9 +5501,9 @@ def bfg_password():
     Returns  
     -------
     userid : str
-
+        BFG username
     password : str 
-
+        BFG password
     """
 
     fdir = os.environ['REFL_CODE']
@@ -5609,7 +5641,7 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
     Attempts to download highrate RINEX from GA
 
     Parameters
-    -----------
+    ----------
     station9 : str
         nine character station name appropriate for rinex 3
     year : int
@@ -5911,7 +5943,6 @@ def geoidCorrection(lat,lon):
     ----------
     lat : float
         latitude, degrees
-
     lon : float
         longitude, degrees
 
@@ -6108,11 +6139,9 @@ def quickp(station,t,sealevel):
     ----------
     station : str
         station name
-
     t : numpy array in datetime format
         time of the sea level observations UTC
-
-    sealevel : list,  float
+    sealevel : list of floats
         meters (unknown datum)
 
     """

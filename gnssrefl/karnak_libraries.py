@@ -152,6 +152,9 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     if debug:
         print('Searching the ', archive, ' archive with rate/filetype', srate, stream)
     foundit = False
+    dtmp, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
+    cmm = '{:02d}'.format(month)
+    cdd = '{:02d}'.format(day)
 
     file_name,cyyyy,cdoy = filename_plus(station9ch,year,doy,srate,stream)
     print('Filename:', file_name)
@@ -208,6 +211,12 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         elif (archive == 'epn'):
             dir1 = 'https://epncb.oma.be/ftp/obs/' + cyyyy + '/' + cdoy + '/'
             print(dir1)
+            wget.download(dir1+file_name,file_name)
+        elif (archive == 'ignes'):
+           # if someone wanted to help by adding this to the high rate
+           # https://datos-geodesia.ign.es/ERGNSS/horario_1s/YYYYMMDD/HH/file
+            dir1 = 'https://datos-geodesia.ign.es/ERGNSS/diario_30s/' + cyyyy + '/' + cyyyy + cmm + cdd + '/'
+            #print(dir1)
             wget.download(dir1+file_name,file_name)
         elif (archive == 'ga'):
             QUERY_PARAMS, headers = ga_stuff(station9ch, year, doy)
@@ -395,7 +404,7 @@ def rinex2names(station,year,doy):
         day of year
 
     Results
-    --------
+    -------
     f1 : str
         hatanaka rinex filename
     f2 : str
@@ -598,7 +607,8 @@ def make_rinex2_ofiles(file_name):
 
 def strip_rinexfile(rinexfile):
     """
-    uses either teqc or gfzrnx to reduce observables
+    uses either teqc or gfzrnx to reduce observables,
+    i.e. only SNR data.
 
     Parameters
     ----------

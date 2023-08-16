@@ -74,7 +74,7 @@ def main():
     parser.add_argument("-ylabel", type=str, help="optional y-axis label", default=None)
     parser.add_argument("-symbol", help="plot symbol ", type=str,default=None)
     parser.add_argument("-title", help="optional title", type=str,default=None)
-    parser.add_argument("-outfile", help="optional filename for plot", type=str,default=None)
+    parser.add_argument("-outfile", help="optional filename for plot. Must end in png", type=str,default=None)
     parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
     parser.add_argument("-xlimits", nargs="*",type=float, help="optional xlimits", default=None)
     parser.add_argument("-ydoy", help="if True/T, columns 1-2 are year and doy", type=str,default=None)
@@ -193,8 +193,17 @@ def main():
         else:
             plt.xlim((xlimits))
 
-    if args.outfile is not None:
-        plt.savefig(args.outfile,dpi=300)
+    out = args.outfile
+    if out is None:
+        out = 'temp.png'
+        print('plotfile saved to: ', out)
+        plt.savefig(out,dpi=300)
+    else:
+        if out[-3:] == 'png':
+            print('plotfile saved to: ', out)
+            plt.savefig(out,dpi=300)
+        else:
+            print('Output filename must end in png.')
 
     plt.show()
 

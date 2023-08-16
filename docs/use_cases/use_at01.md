@@ -62,7 +62,7 @@ every single retrieval is set as bad (i.e. it is gray rather than blue):
 <img src=../_static/at01_default_qc.png width=600>		
 
 Remember that the site is 12 meters above sea level and the default restricts the reflector height
-region to < 6 meters. Try again using a reflector height region that includes the water 
+region to < 8 meters. Try again using a reflector height region that includes the water 
 surface (h1 = 8 and h2 = 15) and better elevation angles 5 and 13 degrees:
 
 <code> quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15</code>
@@ -109,19 +109,15 @@ Next estimate reflector height (RH) for the two month time period
 <code>gnssir at01 2020 230 -doy_end 290 </code>
 
 We have written some code to help you look at these subdaily files - it is a work in progress, but you can 
-certainly give it a try. **Note:** These figures were generated with an older version of the code and should be updated.
+certainly give it a try. (**Note:** These figures were generated with an older version of the code and should be updated.)
+Concatenates the RH files for this period:
 
 <code>subdaily at01 2020 -doy1 230 -doy2 290 </code>
-
-The code concatenates the daily RH files for this period:
 
 You can see that there are a very large number of RH retrievals per day:
 
 <img src=../_static/at01_Subnvals.png  width=600>
 
-There are a few outliers - so I run again and set h1 to 7 on the command line.
-
-<code>subdaily at01 2020 -doy1 230 -doy2 290 -h1 7</code>
 
 This preliminary version of the code removes outliers and makes an effort 
 to compute the RH dot correction if <code>rhdot</code> is set to true. It  uses a cubic 

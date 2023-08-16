@@ -85,36 +85,71 @@ units changed to reflector height. In a nutshell, that is what this code does. I
 rising and setting satellite arcs in all the azimuth regions you have said are acceptable. It does a 
 simple analysis (removes the polynomial, changes units) and uses a periodogram to look at the 
 frequency content of the data. You only want to report RH when you think the peak on the periodogram is 
-significant. There are many ways to do this - we only use two quality control metrics:
+significant. There are many ways to do this - we use three quality control metrics:
 
 * is the peak larger than a user-defined value  (amplitude of the dominant peak in your periodogram)
 
 * is the peak divided by a "noise" metric larger than a user-defined value. The code calls this the peak2noise.
 
+* is the data arc sufficiently "long"
+
+The first two are shown and defined in in the figure below.  
+
 <img src="../_static/for_the_web.png" width="600">
 
-The Colorado SNR example is for a fairly planar field where the RH for the rising and setting arc 
-should be very close to the same value. What does the SNR data 
-look like for a more dynamic case? 
-Shown below is the SNR data for [Peterson Bay](https://gnss-reflections.org/static/images/PBAY.jpg), where the rising arc (at low tide) has a very different
+It is important that you set the "noise region" in your peak to noise calculation in a sensible way.
+That measurement will definitely depend on how large you make that region. You should not assume 
+that the default peak2 noise or amplitude values are correct for your experiment. Since this code
+is meant to be used for various applications, it is all but impossible to have one set of defaults that 
+work for everyone. The peak2noise parameter in particular is extremely dependent on how you define
+your noise region. The amplitude parameter depends very much on your receiver and 
+the kind of surface you are sensing.
+
+
+The code uses a parameter called **ediff.** to test whether the data arc is sufficiently "long"
+in an elevation angle sense. ediff has units of degrees.
+If you set your desired elevation angle limits to 5 and 20 degrees, and ediff was 2, which is 
+the default, then the code will require all arcs to be at least 7-18 degrees long.  If you had a 
+very short elevation angle range, i.e. 5-10 degrees, you might want to make that a little stricter,
+6-9 degrees, so an ediff of 1.  If you don't want to enforce this, just set it to something big.
+But you can't turn off all quality control.  Since the amplitude can be influenced by the kind of 
+receiver you are using, if you aren't sure what a good value would be, you can set that to zero.
+And you can use quickLook to get an idea of what it should be.  
+
+One more warning: if you tell the code that you want to use elevation angles of 5 to 25 degrees and it 
+turns out that your receiver was using an elevation mask of 10 degrees, you will almost certainly
+end up with no useful results. Why?  Because the best you will do is have a min elevation angle of 10 degrees,
+and the code will expect them to start at 7 degrees (i.e. 5 + 2). Some cryosphere community members use
+7 degree masks on their receivers for no reason that I can understand - so that situation would
+also end up with a lot of arcs thrown out.
+
+Another way of thinking about how long an arc is measured in time units.  The parameter 
+is called delTmax in the code and is defined in minutes. The default is very long - 75 minutes - 
+as this code is meant to be useable for soil moisture, snow, and tides. This will get you into
+trouble if you are measuring tides and the tide rates of change are large. In those cases, you might
+wish to reduce delTmax. 
+See [Grauerort](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tggo.html) for an example of this problem. 
+
+
+## Dynamic SNR Data Arcs
+
+The Colorado SNR example shown earlier is for a fairly planar field where the RH for the rising and setting arc 
+should be very close to the same value. What does the SNR data look like for a more dynamic case? 
+Shown below is the SNR data for [Peterson Bay](https://gnss-reflections.org/static/images/PBAY.jpg), where 
+the rising arc (at low tide) has a very different
 frequency than during the setting arc (high tide). This gives you an idea of how the code can be 
 used to measure tides. 
 
 <img src="../_static/pbay-snr.png" width="600">
 
-## Considerations
-
-A couple common sense issues: one is that since you define the noise region, if you make it really large, that 
-will artificially make the peak2noise ratio larger. I have generally used a region of 6-8 meters for this 
-calculation. So in the figure above the region was for 0-6 meters. The amplitude can be tricky because 
-some receivers report low SNR values, which then leads to lower amplitudes. The default amplitude values are 
-for the most commonly used signals in GNSS-IR (L1, L2C, L5, Glonass, Galileo, Beidou). The L2P data
-used by geodesists are generally not useable for reasons to be discussed later.
-
-Even though we analyze the data as a function of sine of elevation angle, each satellite arc
+Note: even though we analyze the data as a function of sine of elevation angle, each satellite arc
 is associated with a specific time period. The code keeps track of that and reports it in the final answers.
-It also keeps track of the average azimuth for each rising and setting satellite arc that passes quality 
-control tests.
+Each track is associated with an azimuth. In the initial versions of the code this was the average azimuth
+for all the data in your track.  From version 1.4.5 and on, it is the azimuth of the lowest elevation angle
+in your arc.
+
+
+## Reflection Zones
 
 What do these satellite reflection zones look like? Below are 
 photographs and [reflection zone maps](https://gnss-reflections.org/rzones) for two standard GNSS-IR sites, 
@@ -184,7 +219,8 @@ off azimuths at 160. These choices appear to be better than those from Panel C.
 It is also worth noting that the GPS antenna has been attached to a pier - 
 and *boats dock at piers*. You might very well see outliers at this site when a boat is docked at the pier.
 
-Note: we now have a [refl_zones tool](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html) in the gnssrefl package.
+Note: we now have a [refl_zones tool](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html) 
+in the gnssrefl package. 
 
 Once you have the code set up, it is important that 
 you check the quality of data. This will also 
@@ -193,3 +229,4 @@ appropriate azimuth and elevation angle
 mask and reflector height range. This is the main reason 
 <code>quickLook</code> was developed. 
 
+## Nyquist

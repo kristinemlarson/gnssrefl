@@ -20,7 +20,11 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 
 
 def parse_arguments():
+
+    msg = rnx.print_archives()
+
     parser = argparse.ArgumentParser()
+    #parser = argparse.ArgumentParser(epilog=msg)
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
@@ -41,9 +45,9 @@ def parse_arguments():
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-samplerate", default=None, help="sample rate in sec (RINEX 3 only)", type=int)
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
-    parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
-    parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
-    parser.add_argument("-strip", default=None, help="use True to reduce number of obs", type=str)
+    parser.add_argument("-mk", default=None, help="use T for uppercase station names ", type=str)
+    parser.add_argument("-weekly", default=None, help="use T for weekly data translation", type=str)
+    parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
 
     args = parser.parse_args().__dict__
@@ -59,7 +63,8 @@ def parse_arguments():
 def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None, rate: str = 'low', dec: int = 0,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
-              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, screenstats : bool = False):
+              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
+              screenstats : bool = False ):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. The default is RINEX 2.11 files
@@ -191,6 +196,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             gfz : (GFZ, Germany)
 
+            ignes : IGN in Spain, only RINEX 3
+
             jp : (GSI, Japan requires password)
 
             jeff : (My good friend Professor Freymueller!)
@@ -245,7 +252,17 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     screenstats: bool, optional
         if true, prints more information to the screen
 
+
     """
+    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
+    archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
+                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
+
+    if False:
+        print('RINEX 3 archives \n', archive_list_rinex3)
+        print('\n')
+        print('RINEX 2.11 archives \n', archive_list)
+        sys.exit()
 
     # make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
@@ -380,9 +397,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         # change archive name back to original name
         archive = 'bkg'
 
-    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
-    archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
-                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
 
     # no longer allow the all option
     # unavco is only rinex2

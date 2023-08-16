@@ -1,7 +1,5 @@
 # Community GNSS-IR Publications
 
-**Rules for posting : one receiver, one zenith-pointing antenna!**
-
 Changes to this file will only be allowed thru a pull request on github.
 
 ## Soil Moisture
