@@ -99,3 +99,6 @@ docker or Jupyter notebooks **you do not need to run this.**
 
 We no longer encourage people to use **teqc** as it is not supported by UNAVCO. We try to install it 
 in case you would like to use it on old files.
+
+### Homework 0: Test installation.
+For some of the shortcourses, we compiled a [**Homework 0**](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework0.html) that walks a new user through a few simple tests for validating successful gnssrefl installation.  

@@ -2,56 +2,26 @@
 
 **goal:** to make sure you have properly installed <code>gnssrefl</code>
 
-[You are strongly encouraged to read the documentation.](https://github.com/kristinemlarson/gnssrefl)
+[You are strongly encouraged to read the documentation.](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html)
 
 There are two versions of this homework: a Jupyter Notebook version and a command line version.  
 Pick the method that you prefer to do your analysis in the course, or experiment with both.
 
 ## **Jupyter Notebook version:**
 
-run the HW0 notebook from the [jupyter notebook repository, either via docker or to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).
+run the [HW0 notebook](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter/-/blob/master/notebooks/learn-the-code/part_0.ipynb) from the [jupyter notebook repository, either via docker or to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).
 
 
-## **Command line version options: [gitHub](#runs-locally-on-linux-or-macos-using-code-from-github) or [Docker image](#docker-gnssrefl-command-line-container-option)**
+## **Command line version options: **
 
 ### GNSSREFL via GITHUB (local version)
+[Installation instructions.](https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html#local-python-install)
 
-**NOTE** this setup requires system dependencies: **gcc** and **gfortran**.  To install:
-* if you are using a LINUX then simply run `apt-get install -y gcc` and `apt-get install -y gfortran` in your terminal (or <code>yum install -y gcc-gfortran</code> ).
-* if you are using a MacOS then you will need to install xcode. First, in your terminal, check if you have xcode by `xcode-select -p`.
-If it is installed, it should return a path. If it is not installed then run `xcode-select --install`.
-This should install gcc.You can check if you have gcc by `gcc --version`. Check if you have gfortran by `gfortran --version`.
-If you do not have gfortran, then you can use homebrew to install, if you have it `brew install gfortran`.
-If you don't have homebrew, then see [here](https://gcc.gnu.org/wiki/GFortranBinariesMacOS).
+### GNSSREFL DOCKER (containerized version)
 
-  * If you are still experiencing trouble then it is recommended you try the [docker container version](#docker-gnssrefl-command-line-container-option).
-
-**Assign environment variables and install gnssrefl**
-([here is a helpful video covering this portion](https://www.youtube.com/watch?v=tdFi2OGIQwg))
-* cd to your desired working directory
-* create the following directories for gnssrefl: EXE, ORBITS and REFL_CODE [hint <code>mkdir</code> ]
-* set your gnssrefl [enviroment variables](https://en.wikipedia.org/wiki/Environment_variable), EXE, ORBITS and REFL_CODE to these respective paths
-  * hint: to check absolute path of a directory <code>pwd</code>
-  * hint: to set environment variable in shell, <code>export VARNAME=path/to/directory</code>.  [To set an environment variable everytime you open the shell](https://unix.stackexchange.com/questions/117467/how-to-permanently-set-environmental-variables), use the same export command in the the appropriate initialization file for your shell).
-
-
-* git clone https://github.com/kristinemlarson/gnssrefl
-* cd into that directory, set up a virtual environment, a la python3 -m venv env
-* activate your virtual environment
-* pip install .
-
-Finally, if you haven't already installed required executables in $EXE (CRX2RNX, gfzrnx):
-* install them using gnssrefl commandline installer
-  * <code>installexe *OS_type*</code>, where *OS_type* is either {<code>macos</code>, <code>linux64</code>}
-
-### GNSSREFL DOCKER (container version)
-
-[docker hub image](https://hub.docker.com/repository/docker/unavdocker/gnssrefl)
-
-* [see docker command line instructions](https://github.com/timdittmann/gnssrefl/blob/docker_instructions/docs/docker_cl_instructions.md)
+[Docker command line instructions](https://gnssrefl.readthedocs.io/en/latest/pages/docker_cl_instructions.html) for [Docker image](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
 
 *NB:* if you use the <code>quicklook</code> function, the figures generated will **not** plot to the screen but will be available in the mounted refl_code/Files volume mounted locally.
-
 
 ---
 
