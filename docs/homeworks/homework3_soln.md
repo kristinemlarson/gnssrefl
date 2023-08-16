@@ -51,4 +51,4 @@ The daily average for RH:
 
 You can compare these retrievals with the [NRCAN](https://www.nrcan.gc.ca/home) 
 tide gauge data for Rossport.
-To see another Canadian lake level example, see the [use case for mchn.](https://github.com/kristinemlarson/gnssrefl/blob/master/tests/use_cases/use_mchn.md)
+To see another Canadian lake level example, see the [use case for mchn.](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchn.html)
