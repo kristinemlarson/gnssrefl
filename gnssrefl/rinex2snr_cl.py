@@ -20,7 +20,11 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 
 
 def parse_arguments():
+
+    msg = rnx.print_archives()
+
     parser = argparse.ArgumentParser()
+    #parser = argparse.ArgumentParser(epilog=msg)
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
@@ -41,14 +45,15 @@ def parse_arguments():
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-samplerate", default=None, help="sample rate in sec (RINEX 3 only)", type=int)
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
-    parser.add_argument("-mk", default=None, help="use True for uppercase station names ", type=str)
-    parser.add_argument("-weekly", default=None, help="use True for weekly data translation", type=str)
-    parser.add_argument("-strip", default=None, help="use True to reduce number of obs", type=str)
+    parser.add_argument("-mk", default=None, help="use T for uppercase station names ", type=str)
+    parser.add_argument("-weekly", default=None, help="use T for weekly data translation", type=str)
+    parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
+    parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly','strip']
+    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly','strip','screenstats']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -58,7 +63,8 @@ def parse_arguments():
 def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None, rate: str = 'low', dec: int = 0,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
-              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False):
+              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
+              screenstats : bool = False ):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. The default is RINEX 2.11 files
@@ -87,12 +93,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     rinex2snr p041 2022 15 -nolook T
         using your own data stored as p0410150.22o in the working directory 
+        your RINEX o file may also be gzipped.  
 
     rinex2snr mchl00aus 2022 15  -orb rapid -archive ga 
         30 sec data for mchl00aus and Geoscience Australia
 
-    rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg -stream S -bkg IGS
-        1 sec data for warn00deu, 1 sec decimated to 5 sec, multi-GNSS, bkg archive, streamed, in IGS folder
+    rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg-igs -stream S 
+        1 sec data for warn00deu, 1 sec decimated to 5 sec, multi-GNSS, bkg IGS archive, streamed
 
     RINEX3 30 second archives supported  
         bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel
@@ -130,9 +137,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 
-            gnss : will use GFZ orbits, which is multi-GNSS (available in 3-4 days?)
+            gnss : use GFZ final orbits, which is multi-GNSS (available in 3-4 days?), but from CDDIS archive
 
-            gnss3 : test case for GFZ orbits downloaded from GFZ instead of CDDIS
+            gnss-gfz : GFZ orbits downloaded from GFZ instead of CDDIS, but do they include beidou?. Same as gnss3?
 
             nav : GPS broadcast, perfectly adequate for reflectometry. Same as gps.
 
@@ -142,7 +149,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             jax : JAXA, GPS + Glonass, within a few days, missing block III GPS satellites
 
-            gbm : GFZ Potsdam, multi-GNSS, not rapid
+            gbm : GFZ Potsdam, multi-GNSS, not rapid, via CDDIS 
 
             grg : French group, GPS, Galileo and Glonass, not rapid
 
@@ -188,6 +195,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
             ga : (Geoscience Australia)
 
             gfz : (GFZ, Germany)
+
+            ignes : IGN in Spain, only RINEX 3
 
             jp : (GSI, Japan requires password)
 
@@ -240,7 +249,20 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         Reduces observables since the translator does not allow more than 25
         Default is False.
 
+    screenstats: bool, optional
+        if true, prints more information to the screen
+
+
     """
+    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
+    archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
+                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
+
+    if False:
+        print('RINEX 3 archives \n', archive_list_rinex3)
+        print('\n')
+        print('RINEX 2.11 archives \n', archive_list)
+        sys.exit()
 
     # make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
@@ -270,7 +292,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # currently allowed orbit types - shanghai removed 2020sep08
     #
     orbit_list = ['gps', 'gps+glo', 'gnss', 'nav', 'igs', 'igr', 'jax', 'gbm',
-                  'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2','nav-sopac','nav-esa','nav-cddis','gnss3']
+                  'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2','nav-sopac','nav-esa','nav-cddis','gnss3','gnss-gfz']
     if orb not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
@@ -288,6 +310,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # I think gbm should be changed to 'gnss3' though perhaps not here
     if orb == 'gnss':
         orb = 'gbm'
+        print('Using GBM orbit archived at CDDIS')
 
 
     # get orbit from IGS
@@ -374,9 +397,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         # change archive name back to original name
         archive = 'bkg'
 
-    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
-    archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
-                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
 
     # no longer allow the all option
     # unavco is only rinex2
@@ -442,7 +462,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     args = {'station': station, 'year_list': year_list, 'doy_list': doy_list, 'isnr': snr, 'orbtype': orb,
             'rate': rate, 'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook,
             'overwrite': overwrite, 'translator': translator, 'srate': samplerate, 'mk': mk,
-            'skipit': skipit, 'stream': stream, 'strip': strip, 'bkg': bkg}
+            'skipit': skipit, 'stream': stream, 'strip': strip, 'bkg': bkg, 'screenstats': screenstats}
 
     s1 = time.time()
     rnx.run_rinex2snr(**args)

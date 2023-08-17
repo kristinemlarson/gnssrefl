@@ -162,12 +162,14 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
         y=int(y) # make sure y is an integer
         for d in range(1,367): # life is short - just do all day of years
             i = (usegps[:,0] == y) & (usegps[:,1]== d)
+            # get all the results for a given day and year
             nvals = len(usegps[i,0])
             if (nvals >  0):
                 snowv = np.mean(snowAccum[i])
                 # std never lower than 2.5 cm
                 std = max(0.025, np.std(snowAccum[i]))
-        # this is what we did in pboh2o - 
+                #print(y,d,snowv,' nvals ',len(snowAccum[i]))
+        # this is what we did in pboh2o - though not really.  that was for the plots ...
                 if snowv < 0.05:
                     snowv = 0
                 # month and day
@@ -411,7 +413,9 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
         if ndoy > NB:
             # what is the average RH value for this azimuth bin for bare soil
             bsoil = np.mean(pout[:,2])
-            print('In azim. range ', az, az+delA, np.round(bsoil,2), '(m), nvals:', len(pout[:,2]),ndoy)
+            # standard deviation
+            bsoilsigma = np.std(pout[:,2])
+            print('In azim. range ', az, az+delA, np.round(bsoil,2), '(m), nvals:', len(pout[:,2]),ndoy, 'bare sigma ',np.round(bsoilsigma,3))
 
             gps_in_azim = usegps[kk,:]
             nr,nc = np.shape(gps_in_azim)

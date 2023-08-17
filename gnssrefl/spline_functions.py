@@ -521,7 +521,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                 # frequency, and thus RH
                     snrdt = snrt - p(sinelvt)
                     pgram = LombScargle(sinelvt, snrdt, normalization='psd').power(f)
-
+                    pgram = 2 * np.sqrt(pgram/len(sinelvt))
                 # converting it into the proper units of RH (meters)
                     reflh = 0.5 * f * lcar
                 # this is a very simplistic outlier detector

@@ -74,7 +74,7 @@ However, please feel free to only look at one year of data if you have issues wi
 
 Then you need to estimate reflector heights:
 
-<code>gnssir mfle 2016 1 -year_end 2019 -doy_end 366 -newarcs T</code>
+<code>gnssir mfle 2016 1 -year_end 2019 -doy_end 366 </code>
 
 Before we look at soil moisture, let's get an idea of how often it snowed at this site:
 

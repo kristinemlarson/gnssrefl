@@ -96,7 +96,7 @@ The output SNR files are stored in $REFL_CODE/2020/snr/tgho.
 
 Now run <code>gnssir</code> for these same dates:
 
-<code>gnssir tgho 2020 130 -doy_end 319 -newarcs T</code>
+<code>gnssir tgho 2020 130 -doy_end 319 </code>
 
 To look at daily averages, use the utility <code>daily_avg</code>. The median filter is set 
 to allow values within 0.25 meters of the median, and the minimum number of tracks required to 

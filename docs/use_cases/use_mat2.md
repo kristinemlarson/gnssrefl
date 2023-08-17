@@ -76,7 +76,7 @@ the information I discussed earlier (i.e. set azimuth and elevation angles limit
 
 Make SNR files using <code>rinex2snr</code>. Then compute reflector heights:
 
-<code>gnssir mat2 2017 1 -year_end 2021 -doy_end 365 -newarcs T</code> 
+<code>gnssir mat2 2017 1 -year_end 2021 -doy_end 365 </code> 
 
 This command would analyze all the data from 2017-2021. Use <code>daily_avg</code> to create a daily average.
 Play with the inputs (median filter value, number of required RH to compute a reliable average) to make sure 

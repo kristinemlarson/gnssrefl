@@ -106,7 +106,7 @@ amplitude for the periodograms.  We excluded the northernmost azimuths.
 
 Now that you have SNR files and json inputs, you can go ahead and estimate reflector heights for the year 2012:
 
-<code>gnssir gls1 2012 1 -doy_end 366 -newarcs T</code>
+<code>gnssir gls1 2012 1 -doy_end 366 </code>
 
 We will use the **daily_avg** tool to compute a daily average RH. A median filter is set to 0.25 meters 
 and 30 individual tracks are required in order to recover a daily average:

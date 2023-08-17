@@ -7,7 +7,7 @@ across equipment changes. This site's equipment was upgraded in March 2021.
 [Warning about Earthscope/UNAVCO](warning.md)
 
 <p align="center">
-<img src="../_static/p038.png" width="500"/>
+<img src="../_static/p038low.jpg" width="500"/>
 </P>
 
 ## metadata
@@ -51,7 +51,7 @@ The json file is saved at $REFL_CODE/input/p038.json
 
 Now we run <code>gnssir</code>. This will be needed for estimate a priori reflector heights for the soil moisture code.
 
-<code>gnssir p038 2017 1 -doy_end 365 -newarcs T</code>
+<code>gnssir p038 2017 1 -doy_end 365 </code>
 
 
 ## Step 2: Soil Moisture

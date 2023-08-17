@@ -700,11 +700,13 @@ def getsp3file_mgex(year,month,day,pCtr):
     foundit : bool
 
     """
+    screenstats = False # for now
     foundit = False
     # this returns sp3 orbit product name
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
 
     name, fdir = sp3_name(year,month,day,pCtr) 
+    print('sp3 filename ',name)
     gps_week = name[3:7]
     igps_week = int(gps_week)
     # unfortunately the CDDIS archive was at one point computing the GPS week wrong
@@ -739,11 +741,13 @@ def getsp3file_mgex(year,month,day,pCtr):
     n1 = os.path.isfile(fdir + '/' + name)
     n1c = os.path.isfile(fdir + '/' + name + '.xz')
     if (n1 == True):
-        print('first kind of MGEX sp3file already exists online')
+        if screenstats:
+            print('first kind of MGEX sp3file already exists online')
         mgex = 1
         foundit = True
     elif (n1c  == True): 
-        print('xz first kind of MGEX sp3file already exists online-unxz it')
+        if screenstats:
+            print('xz first kind of MGEX sp3file already exists online-unxz it')
         fx =  fdir + '/' + name + '.xz'
         subprocess.call(['unxz', fx])
         mgex = 1
@@ -752,10 +756,12 @@ def getsp3file_mgex(year,month,day,pCtr):
     n2 = os.path.isfile(fdir + '/' + name2)
     n2c = os.path.isfile(fdir + '/' + name2 + '.xz')
     if (n2 == True):
-        print('MGEX sp3file already exists online')
+        if screenstats:
+            print('MGEX sp3file already exists online')
         mgex = 2 ; foundit = True
     elif (n2c == True):
-        print('MGEX sp3file already exists online')
+        if screenstats:
+            print('MGEX sp3file already exists online')
         mgex = 2 ; foundit = True
         fx =  fdir + '/' + name2 + '.xz'
         subprocess.call(['unxz', fx])
@@ -766,8 +772,9 @@ def getsp3file_mgex(year,month,day,pCtr):
         name = file1[:-2]
 
     if not foundit:
-        print('Type 1 filename',file1)
-        print('Type 2 filename',file2)
+        if screenstats:
+            print('Type 1 filename',file1)
+            print('Type 2 filename',file2)
         if (mgex == 0):
             if not foundit:
                 name = file2[:-3] 
@@ -1736,7 +1743,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
 
 def arc_scaleF(f,satNu):
     """
-    calculates LSP scale factor cf 
+    calculates LSP scale factor cf , the wavelength divided by 2
 
     Parameters
     --------
@@ -1746,9 +1753,9 @@ def arc_scaleF(f,satNu):
         satellite number (1-400)
 
     Returns
-    ----------
+    -------
     cf : float
-        wavelength/2 (meters)
+        GNSS wavelength/2 (meters)
 
     """ 
 #   default value for w so that if someone inputs an illegal frequency, it does not crash
@@ -3416,8 +3423,8 @@ def highrate_nz(station, year, month, day):
 
 def get_orbits_setexe(year,month,day,orbtype,fortran):
     """
-    picks up and stores orbits as needed
-    also sets executable location for translation (gpsonly vs multignss)
+    picks up and stores orbits as needed.
+    It also sets executable location for translation (gpsonly vs multignss)
 
     Parameters
     ----------
@@ -3447,11 +3454,11 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     #default values
     # if they ask for gnss or gnss3, always use rapid.
     # at least for years 2022 and after
-    if year >= 2022:
-        if (orbtype == 'gnss') or (orbtype == 'gnss3'):
-            orbtype = 'rapid'
-        if orbtype == 'gbm':
-            orbtype = 'rapid'
+    #if year >= 2022:
+    #    if (orbtype == 'gnss') or (orbtype == 'gnss3'):
+    #        orbtype = 'rapid'
+        #if orbtype == 'gbm':
+        #    orbtype = 'rapid'
 
     foundit = False
     f=''; orbdir=''
@@ -3467,7 +3474,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     elif (orbtype == 'rapid'):
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
-    elif (orbtype == 'gnss3'):
+    elif (orbtype == 'gnss3') or (orbtype == 'gnss-gfz'):
         f,orbdir,foundit=gbm_orbits_direct(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
@@ -3631,7 +3638,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
         else:
             print('RINEX 3 file does not exist', r3_filename)
         s2=time.time()
-        print('gfzrnx rinex3 to rinex 2:', round(s2-s1,2), ' seconds')
+        #print('gfzrnx rinex3 to rinex 2:', round(s2-s1,2), ' seconds')
 
 
     return fexists
@@ -4512,6 +4519,8 @@ def binary(string):
 
 def ymd_hhmmss(year,doy,utc,dtime):
     """
+    translates year, day of year and UTC hours 
+    into various other time parameters
 
     Parameters
     ----------
@@ -4566,8 +4575,19 @@ def ymd_hhmmss(year,doy,utc,dtime):
 
 def get_obstimes(tvd):
     """
-    send a LSP results, so the variable created when you read 
-    in the results file.  return obstimes for plotting 
+    Calculates datetime objects for times associated with 
+    LSP results file contents, i.e. the variable created when you read 
+    in the results file.  
+
+    Parameters
+    ----------
+    tvd : numpy array
+        results of LSP results
+
+    Returns
+    ------
+    obstimes : numpy array
+        datetime objects
     """
     nr,nc = tvd.shape
     obstimes = []
@@ -4586,6 +4606,10 @@ def get_obstimes_plus(tvd):
     send a LSP results file, so the variable created when you read
     in the results file.  return obstimes for matplotlib plotting purposes
     2022jun10 - added MJD output
+
+    See get_obstimes 
+
+
     """
     nr,nc = tvd.shape
     obstimes = []
@@ -4606,12 +4630,16 @@ def get_obstimes_plus(tvd):
 
 def confused_obstimes(tvd):
     """
-    takes lsp results - returns list of MJD values
+
+    Parameters
+    ----------
+    tvd : numpy array
+        results of LSP results
 
     Returns
     -------
     modifiedjulian : numpy array of floats
-        modified julian values
+        modified julian date values
     """
     nr,nc = tvd.shape
     modifiedjulian = []
@@ -4660,7 +4688,8 @@ def more_confused_obstimes(tvd):
 
 def read_simon_williams(filename,outfilename):
     """
-    Reads a PSMSL file and creates a new one 
+    Reads a PSMSL file and creates a new file in the 
+    standard format I use for tide gauge data in gnssrefl
     
     Parameters
     ----------
@@ -4767,7 +4796,7 @@ def get_noaa_obstimes(t):
     Parameters
     ----------
     t : list of integers
-        with year, month, day, hour, minute, second 
+        year, month, day, hour, minute, second 
 
     Returns
     -------
@@ -4790,8 +4819,8 @@ def get_noaa_obstimes(t):
 
 def get_noaa_obstimes_plus(t):
     """
-    Send it a list of time tags (y,m,d,h,m,s)
-
+    given a list of time tags (y,m,d,h,m,s), it calculates datetime
+    objects and modified julian days
 
     Parameters
     ----------
@@ -4833,7 +4862,7 @@ def final_gfz_orbits(year,month,day):
     downloads gfz final orbit and stores in $ORBITS
 
     Parameters
-    --------------
+    ----------
     year : int
         full year
     month : int
@@ -4842,14 +4871,12 @@ def final_gfz_orbits(year,month,day):
         day of month
 
     Returns
-    ---------
+    -------
     littlename : str
         orbit filename, fdir, foundit
-
     fdir: str
         directory where the orbit file is stored locally
-
-    foundit : boolean
+    foundit : bool
         whether the file was found
     """
     foundit = False
@@ -4881,7 +4908,7 @@ def final_gfz_orbits(year,month,day):
         subprocess.call(['gunzip', fullname])
 
     if os.path.isfile(fdir + '/' + littlename):
-        print(littlename, ' already exists on disk')
+        #print(littlename, ' already exists on disk')
         return littlename, fdir, True 
 
     try:
@@ -4897,7 +4924,7 @@ def final_gfz_orbits(year,month,day):
 
 def rapid_gfz_orbits(year,month,day):
     """
-    downloads gfz rapid orbit and stores in $ORBITS
+    downloads gfz rapid orbit and stores in $ORBITS locally
 
     Parameters
     ----------
@@ -4907,6 +4934,15 @@ def rapid_gfz_orbits(year,month,day):
         month or day of year if day is set to zero
     day : int
         day of month
+
+    Returns
+    -------
+    littlename : str
+        name of the orbit file
+    fdir: str
+        name of the file directory where orbit is stored
+    foundit : bool
+        whether file was found
 
     """
     foundit = False
@@ -4929,7 +4965,7 @@ def rapid_gfz_orbits(year,month,day):
         subprocess.call(['unxz', fullname])
 
     if os.path.isfile(fdir + '/' + littlename):
-        print(littlename, ' already exists on disk')
+        #print(littlename, ' already exists on disk')
         return littlename, fdir, True 
     try:
         wget.download(url,littlename + '.gz')
@@ -4951,15 +4987,21 @@ def ultra_gfz_orbits(year,month,day,hour):
     ----------
     year : int
         full year
-
     month : int
         month or day of year
-
     day : int
         day or if set to 0, then month is really day of year
-
     hour : int
+        hour of the day
 
+    Returns
+    -------
+    littlename : str
+        name of the orbit file
+    fdir: str
+        name of the file directory where orbit is stored
+    foundit : bool
+        whether file was found
     """
     foundit = False
     # when they changed over?
@@ -4992,7 +5034,7 @@ def ultra_gfz_orbits(year,month,day,hour):
         subprocess.call(['gunzip', fullname])
 
     if os.path.isfile(fdir + '/' + littlename):
-        print(littlename, ' already exists on disk')
+        #print(littlename, ' already exists on disk')
         return littlename, fdir, True
 
     try:
@@ -5045,9 +5087,7 @@ def rinex_unavco(station, year, month, day):
     except:
         okokok =1
 
-    #print('try hatanaka RINEX at unavco')
     if not os.path.exists(rinexfile):
-        #print('look for hatanaka version')
         if os.path.exists(crnxpath):
             try:
                 wget.download(url2,filename2)
@@ -5066,6 +5106,26 @@ def avoid_cddis(year,month,day):
     """
     work around for people that can't use CDDIS ftps
     this will get multi-GNSS files for GFZ from the IGN
+    hopefully
+
+    Parameters
+    ----------
+    year : int 
+        full year
+    month : int
+        month of the year
+    day : int
+        calendar day
+
+    Returns
+    -------
+    filename : str
+        name of the orbit file
+    fdir : str
+        where the orbit file is stored
+    foundit : bool
+        whether it was found or not
+
     """
     fdir = os.environ['ORBITS'] + '/' + str(year) + '/sp3/'
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
@@ -5076,11 +5136,13 @@ def avoid_cddis(year,month,day):
     filenameZ = 'gbm' + cwk + cday + '.sp3.Z'
     filename = 'gbm' + cwk + cday + '.sp3'
     if os.path.isfile(fdir + filename):
-        print(filename,' orbit file already exists on disk'); foundit = True
+        #print(filename,' orbit file already exists on disk'); 
+        foundit = True
         return filename, fdir, foundit
     if os.path.isfile(fdir + filename + '.xz'):
         subprocess.call(['unxz',fdir + filename + '.xz'])
-        print(filename, ' orbit file already exists on disk'); foundit = True
+        #print(filename, ' orbit file already exists on disk'); 
+        foundit = True
         return filename, fdir, foundit
 
     # only use this for weeks < 2050
@@ -5098,11 +5160,13 @@ def avoid_cddis(year,month,day):
         filenamegz = 'GFZ0MGXRAP_' + cyyyy  + cdoy + '0000_01D_05M_ORB.SP3.gz'
 
         if os.path.isfile(fdir + filename):
-            print(filename, ' orbit file already exists on disk'); foundit = True
+            #print(filename, ' orbit file already exists on disk'); 
+            foundit = True
             return filename, fdir, foundit
         if os.path.isfile(fdir + filename + '.xz'):
             subprocess.call(['unxz',fdir + filename + '.xz'])
-            print(filename, ' orbit file already exists on disk'); foundit = True
+            #print(filename, ' orbit file already exists on disk'); 
+            foundit = True
             return filename, fdir, foundit
 
         url = 'ftp://igs.ensg.ign.fr/pub/igs/products/mgex/' + cwk +  '/' + filenamegz
@@ -5200,13 +5264,10 @@ def queryUNR_modern(station):
     
     Returns
     -------
-
     lat : float
         latitude in degrees (zero if not found)
-
     lon : float
         longitude in degrees (zero if not found)
-
     ht : float
         ellipsoidal ht in meters (zzero if not found)
 
@@ -5216,7 +5277,12 @@ def queryUNR_modern(station):
         print('The station name must be four characters long')
         return lat, lon, ht
 
+    not_in_database = False
     xdir = os.environ['REFL_CODE']
+    fdir = xdir + '/Files'
+    if not os.path.isdir(fdir):
+        subprocess.call(['mkdir', fdir])
+
     nfile1 = 'gnssrefl/station_pos.db'
     nfile1_exist = os.path.isfile(nfile1)
     nfile2 = xdir + '/Files/station_pos.db'
@@ -5255,9 +5321,8 @@ def queryUNR_modern(station):
         # if longitude is ridiculous, as it often is in the Nevada Reno database make it less so
         if (lon < -180):
             lon = lon + 360
-        #print(lat,lon,ht)
     else:
-            print('Did not find the station in the database:', station)
+        not_in_database = True
 
     # close the database
     conn.close()
@@ -5265,6 +5330,8 @@ def queryUNR_modern(station):
         lat= -16.434464800 ;lon = 145.403622520 ; ht = 71.418
     elif (station == 'mnis'):
         lat = -16.667810553; lon  = 139.170597267; ht = 60.367;  
+    elif (station == 'boig'):
+        lat =  -9.24365375 ; lon  = 142.253961217; ht = 82.5;  
     elif (station == 'glbx'):
         lat = 58.455146633; lon  = -135.888483766 ; ht = 12.559;  
     elif (station == 'ugar'):
@@ -5273,11 +5340,18 @@ def queryUNR_modern(station):
         lat = -33.01640186 ; lon = 137.59157111 ; ht = 7.856
     elif (station == 'kubn'):
         lat =-10.23608303 ; lon =142.21446068; ht = 78.2
+    elif (station == 'smm4'):
+        lat =72.57369139 ; lon =-38.470709199 ; ht = 3262
+
+    if (not_in_database) and (lat == 0):
+        print('Did not find station coordinates :', station)
 
     return lat,lon,ht
 
 def rinex3_nav(year,month,day):
     """
+    not sure what this does!
+
     """
     foundit = False
     fdir = ''
@@ -5305,21 +5379,19 @@ def rinex3_nav(year,month,day):
 def rinex_nrcan_highrate(station, year, month, day):
     """
     picks up 1-Hz RINEX 2.11 files from NRCAN
-    requires gfzrnx or teqc
+    requires gfzrnx or teqc to merge the 15 minute files
 
     Parameters
     ----------
     station: string
         4 character station name
-
     year: integer
         year
-
     month: integer
         month or day of year if day is set to zero
-
     day: integer
         day
+
 
     """
     crnxpath = hatanaka_version()
@@ -5405,9 +5477,8 @@ def rinex_nrcan_highrate(station, year, month, day):
 
 def translate_dates(year,month,day):
     """
-    input integer year month and day
-    output???
     i do not think this is used
+
     """
     if (day == 0):
         doy=month
@@ -5430,9 +5501,9 @@ def bfg_password():
     Returns  
     -------
     userid : str
-
+        BFG username
     password : str 
-
+        BFG password
     """
 
     fdir = os.environ['REFL_CODE']
@@ -5570,7 +5641,7 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
     Attempts to download highrate RINEX from GA
 
     Parameters
-    -----------
+    ----------
     station9 : str
         nine character station name appropriate for rinex 3
     year : int
@@ -5719,7 +5790,7 @@ def cddis_download_2022B(filename,directory):
         where the file lives at CDDIS
 
     """
-    print('Original way of accessing CDDIS ')
+    #print('Original way of accessing CDDIS ')
 
     ftps = FTP_TLS(host = 'gdc.cddis.eosdis.nasa.gov')
     email = 'kristine.larson@colorado.edu'
@@ -5872,7 +5943,6 @@ def geoidCorrection(lat,lon):
     ----------
     lat : float
         latitude, degrees
-
     lon : float
         longitude, degrees
 
@@ -6069,11 +6139,9 @@ def quickp(station,t,sealevel):
     ----------
     station : str
         station name
-
     t : numpy array in datetime format
         time of the sea level observations UTC
-
-    sealevel : list,  float
+    sealevel : list of floats
         meters (unknown datum)
 
     """
@@ -6217,13 +6285,18 @@ def gbm_orbits_direct(year,month,day):
     gpsweek,sec=kgpsweek(year,month,day,0,0,0)
     cgpsweek = str(gpsweek)
 
-    gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/mgex/' + cgpsweek + '/'
+    # they changed during 2245 ... 
+    if (gpsweek < 2245):
+        gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/mgex/' + cgpsweek + '/'
+    else:
+        gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/mgex/' + cgpsweek + '_IGS20/'
 
     fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
     littlename = 'gbm' + str(gpsweek) + str(int(sec/86400)) + '.sp3'
     bigname = 'GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
 
     bigname2 = 'GBM0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
+    print(bigname, bigname2)
 
     # first, do you have it locally?  
     # look for compressed file
@@ -6251,15 +6324,18 @@ def gbm_orbits_direct(year,month,day):
     bigname = bigname2 
     if not foundit:
         url = gns + littlename + '.Z'
+        print(url)
         try:
             wget.download(url,littlename + '.Z')
             subprocess.call(['uncompress', littlename + '.Z'])
         except:
             okok = 1
+
         if os.path.isfile(littlename):
             foundit = True ; return_name = littlename
         else:
             url = gns + bigname + '.gz'
+            print(url)
             try:
                 wget.download(url,bigname + '.gz')
                 subprocess.call(['gunzip', bigname + '.gz'])
@@ -6276,8 +6352,8 @@ def gbm_orbits_direct(year,month,day):
 
     if not foundit:
         print('Orbit was not found at GFZ or in a local directory')
-    else:
-        print('Orbit found')
+    #else:
+    #    print('Orbit found')
 
     return return_name, fdir, foundit
 

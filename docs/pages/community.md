@@ -1,7 +1,5 @@
 # Community GNSS-IR Publications
 
-**Rules for posting : one receiver, one zenith-pointing antenna!**
-
 Changes to this file will only be allowed thru a pull request on github.
 
 ## Soil Moisture
@@ -50,14 +48,24 @@ determination through inverse modeling of SNR data. Radio Sci., 51, 1286–1296,
 level variation from GNSS: 2020 Shumagin earthquake tsunami resonance and Hurricane Laura. Geophysical 
 Research Letters, 48, e2020GL091378. https://doi. org/10.1029/2020GL091378, 2021.
 
+- Purnell, D. Gomez, N., Chan, NH, Strandberg, J., Hobiger, T. Quantifying the Uncertainty in Ground-Based GNSS-Reflectometry 
+Sea Level Measurements, IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, DOI:10.1109/JSTARS.2020.3010413, 2021
+
 ## Lakes and Rivers
 
 - [Holden, L. and K.M. Larson, Ten Years of Lake Taupo Surface Height Estimates Using the GNSS Interferometric Reflectometry, Journal of Geodesy. Vol 95(74),10.1007/s00190-021-01523-7, 2021](https://www.kristinelarson.net/wp-content/uploads/2021/05/Holden-May2021.pdf)
+
+- [Fagundes, M.A.R., Mendonça-Tinti, I., Iescheck, A.L., Akos, D.M., & Geremia-Nievinski, F. An open-source low-cost sensor for SNR-based GNSS reflectometry: Design and long-term validation towards sea-level altimetry. GPS Solutions, 25(2), 73, 2021](https://link.springer.com/article/10.1007/s10291-021-01087-1)
 
 ## Permafrost
 
 - Liu, L. and K.M. Larson, Decadal changes of surface elevation over permafrost area estimated using 
 reflected GPS signals, The Cryosphere, Vol 12, 477–489, doi:10.5194/tc-12-477-2018, 2018
+
+## Coastal Subsidence 
+
+- [Karegar, M.A., Larson, K.M., Kusche, J., & Dixon, T.H. Novel quantification of shallow sediment compaction by GPS interferometric reflectometry and implications for flood susceptibility. Geophysical Research Letters, 47(14), e2020GL087807, 2020.](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020GL087807)
+
 
 ## Ice
 
@@ -69,9 +77,7 @@ reflected GPS signals, The Cryosphere, Vol 12, 477–489, doi:10.5194/tc-12-477-
 Snow Height Variations in Antarctica from GNSS Interferometric Reflectometry. 
 Remote Sens. 13, 1164. https:// doi.org/10.3390/rs13061164, 2021
 
-- Larson, K.M., M. MacFerrin, and T. Nylen, Brief Communication: Update on the GPS 
-Reflection Technique for Measuring Snow Accumulation in Greenland, The Cryosphere, Vol. 14, 
-1985–1988, doi:10.5194/tc-2019-303, 2020.
+- [Larson, K.M., M. MacFerrin, and T. Nylen, Brief Communication: Update on the GPS Reflection Technique for Measuring Snow Accumulation in Greenland, The Cryosphere, Vol. 14, 1985–1988, doi:10.5194/tc-2019-303, 2020.](https://tc.copernicus.org/articles/14/1985/2020/)
 
 ## Models and Simulators
 
@@ -80,6 +86,9 @@ Reflection Technique for Measuring Snow Accumulation in Greenland, The Cryospher
 - Zavorotny, V., K.M. Larson, J. Braun, E.E. Small, E. Gutmann, and A. 
 Bilich, A physical model of GPS multipath caused by land reflections: toward bare soil moisture 
 retrievals, IEEE J-STARS, Vol. 3 (1), pp. 100-110, 10.1109/JSTARS.2009.2033608, 2010
+
+- Nievinski, F.G. and K.M. Larson, Forward modeling of multipath for near-surface reflectometry 
+and positioning applications, GPS Solutions,Vol 18(2), 309-322,10.1007/s10291-013-0331-y, 2014
 
 ## Software
 
@@ -93,3 +102,7 @@ retrievals, IEEE J-STARS, Vol. 3 (1), pp. 100-110, 10.1109/JSTARS.2009.2033608, 
 - [Jones, M.O., J.S. Kimball, E.E. Small, and K.M. Larson, Comparing Land Surface Phenology Derived from Satellite and GPS Network Microwave Remote Sensing, Int. Journ. Biometeor., Vol. 58(6), 1305-1315, doi:10.1007/s00484-013-0726-z, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/JonesMJ_etal_2013.pdf)
 
 - [Evans, S.G., E.E. Small, and K.M. Larson, Comparison of vegetation phenology in the western United States from reflected GPS microwave signals and NDVI, Int. Journal Remote Sensing, Vol. 35(9), 2996-3017, doi:10.1080/01431161.2014.894660, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/Evans_NMRI.pdf)
+
+## Miscellaneous
+
+ - [Karegar, M.A., & Kusche, J. Imprints of COVID‐19 lockdown on GNSS observations: An initial demonstration using GNSS interferometric reflectometry. Geophysical Research Letters, 47(19), e2020GL089647. 2020](https://agupubs.onlinelibrary.wiley.com/doi/epdf/10.1029/2020GL089647) 

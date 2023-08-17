@@ -95,12 +95,12 @@ photographs suggest barriers are present in that region.
 
 Now that the analysis parameters are set, run <code>gnssir</code> to save the reflector height (RH) output for each day in 2013.
 
-<code>gnssir mchn 2013 1 -doy_end 365 -newarcs T</code>
+<code>gnssir mchn 2013 1 -doy_end 365 </code>
 
 The daily output files are stored in $REFL_CODE/2013/results/mchn. [Here is an example output for a single day.](195.txt) 
 Plots of SNR data can be seen with the -plt option.
 
-<code>gnssir mchn 2013 195  -plt True -newarcs T</code>
+<code>gnssir mchn 2013 195  -plt True </code>
 
 <img src="../_static/mchn-g-l1.png" width="500">
 

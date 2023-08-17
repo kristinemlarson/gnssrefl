@@ -44,14 +44,15 @@ def writeout_spline_outliers(tvd_bad,txtdir,residual,filename):
         print(nr, ' Outliers written to: ', f)
         fout = open(f, 'w+')
         # put in a header
-        fout.write('{0:3s} sat azim deltT-min outlier-m fracDOY MJD\n'.format('%'))
-        fout.write('{0:3s} (1) (2)   (3)        (4)      (5)    (6) D\n'.format('%'))
+        fout.write('{0:3s} sat azim deltT-min outlier-m fracDOY MJD  OrigRH meanE PkNoise \n'.format('%'))
+        fout.write('{0:3s} (1) (2)   (3)        (4)      (5)    (6)   (7)    (8)   (9)\n'.format('%'))
         for w in range(0,nr):
             fy = tvd_bad[w,1] + tvd_bad[w,4]/24 # fractional day of year
             deltaT = tvd_bad[w,14]
             mjd = tvd_bad[w,15]
-            fout.write('{0:3.0f} {1:7.2f} {2:7.2f} {3:7.2f} {4:9.3f} {5:15.7f} {6:7.2f} \n'.format( 
-                tvd_bad[w,3], tvd_bad[w,5], deltaT,residual[w],fy,mjd,tvd_bad[w,2] ))
+            elAv = 0.5*(tvd_bad[w,8] + tvd_bad[w,7])
+            fout.write('{0:3.0f} {1:7.2f} {2:7.2f} {3:7.2f} {4:9.3f} {5:15.7f} {6:7.2f} {7:7.2f} {8:5.2f}\n'.format( 
+                tvd_bad[w,3], tvd_bad[w,5], deltaT,residual[w],fy,mjd,tvd_bad[w,2],elAv,tvd_bad[w,13]))
         fout.close()
 
     return

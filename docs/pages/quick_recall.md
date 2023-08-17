@@ -10,9 +10,8 @@
 
 * [gnssir code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html), 
- [new code for setting gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
+ [setting gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
 
-* [Old way of setting inputs for gnssir](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.make_json_input.html)
 
 
 ## Additional Utilities
@@ -27,7 +26,7 @@
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_invsnr.html),
 [invsnr_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 
-* refl_zones [code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html),
+* [refl_zones code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html),
 [discusssion](https://gnssrefl.readthedocs.io/en/latest/pages/utilities.html)
 
 

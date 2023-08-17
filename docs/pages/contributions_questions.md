@@ -2,6 +2,7 @@
 
 ## Publications
 - [One Receiver, Zenith Pointing](https://gnssrefl.readthedocs.io/en/latest/pages/community.html)
+- [Non-Zenith Pointing Antenna Examples](https://gnssrefl.readthedocs.io/en/latest/pages/tilted.html)
 
 ## Acknowledgements
 
@@ -13,8 +14,7 @@ set up smoke tests.
 python RINEX translators and the EGM96 code. 
 - Johannes Boehm provided source code for the refraction correction. 
 - [Makan Karegar](https://github.com/MakanAKaregar) added the NMEA capability.
-- [Dave Purnell](https://github.com/purnelldj) provided his SNR 
-inversion code. 
+- [Dave Purnell](https://github.com/purnelldj) provided his SNR inversion code. 
 - Carolyn Roesler helped with the original GNSS-IR Matlab codes.
 - [Felipe Nievinski](https://github.com/fgnievinski) 
 and Simon Williams have provided significant advice for this project.
@@ -23,6 +23,7 @@ and Simon Williams have provided significant advice for this project.
 - [Dan Nowacki](https://github.com/dnowacki-usgs) added 
 Glonass to the NMEA reader
 - [Taylor Smith](https://github.com/tasmi) has worked on the NMEA reader and the refl_zones utility.
+- Surui Xie was instrumental in finding a bug in the newarcs version
 
 Authors and maintainers: [Kristine M. Larson](https://kristinelarson.net), 
 [Kelly Enloe](https://github.com/k-enloe), and [Tim Dittmann](https://github.com/timdittmann)

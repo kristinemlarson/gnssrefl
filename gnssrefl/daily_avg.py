@@ -94,9 +94,16 @@ def fbias_daily_avg(station):
 
 
 
-def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,howBig,ReqTracks,azim1,azim2,test,subdir):
+def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
+        howBig,ReqTracks,azim1,azim2,test,subdir,plot_limits):
     """
     worker code for daily_avg_cl.py
+
+    It reads in RH files created by gnssir. Applies median filter and saves average results 
+    for further analysis
+
+    if there is only one RH on a given day - there is no median value and thus nothing will 
+    be saved for that day.  
 
     Parameters
     ----------
@@ -139,6 +146,9 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     subdir : str
         subdirectory for output files
 
+    subdir : bool
+        whether plot limits for the median filter are shown
+
     Returns
     -------
     tv : numpy array
@@ -152,7 +162,19 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
     """
     xdir = os.environ['REFL_CODE']
-    print('All RH retrievals will be written to: ', alldatafile)
+    print('All RH retrievals - including bad ones - will be written to: ' )
+    alldatafile2 = alldatafile + '.noqc'
+    print(alldatafile2, '\n')
+
+    noqc = open(alldatafile2, 'w+')
+    # put in a header
+    noqc.write(" {0:s}  \n".format('% NO QUALITY CONTROL AT ALL' ))
+    noqc.write(" {0:s}  \n".format('% year,doy, RH(m), Month, day, azimuth(deg),freq, satNu, LSP amp,pk2noise,UTC(hr)' ))
+    noqc.write(" {0:s}  \n".format('% (1), (2), (3),   (4),   (5),  (6),        (7),   (8),  (9),     (10),    (11)' ))
+
+
+    print('All RH retrievals that meet your median filter and ReqTracks criteria will be written to: ' )
+    print(alldatafile, '\n')
     allrh = open(alldatafile, 'w+')
     # put in a header
     allrh.write(" {0:s}  \n".format('% year,doy, RH(m), Month, day, azimuth(deg),freq, satNu, LSP amp,pk2noise,UTC(hr)' ))
@@ -161,17 +183,22 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     fs = 12
     NotEnough = 0
     tv = np.empty(shape=[0, 8])
+    tv_median = np.empty(shape=[0, 9])
     tvall = np.empty(shape=[0, 7])
+    #
     ngps = []; nglo = [] ; ngal = []; nbei = []
     obstimes = []; medRH = []; meanRH = [] ; alltimes = []; meanAmp = []
+    tttimes = []
     fig,ax=plt.subplots()
     year_list = np.arange(year1, year2+1, 1)
     NumFiles = 0
     s1 = time.time()
     for yr in year_list:
         direc = xdir + '/' + str(yr) + '/results/' + station + '/' + extension + '/'
+        # counter for the legends
+        nle = 0
+        # i understand why python people like this - but then the results are not sorted ...
         if os.path.isdir(direc):
-            # i understand why python people like this - but then the results are not sorted ...
             all_files = os.listdir(direc)
             all_files = np.sort(all_files)
             #print('Number of files in ', yr, len(all_files))
@@ -189,6 +216,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                             a = np.loadtxt(fname,skiprows=3,comments='%')
                         nr,nc=a.shape
                         if (nr > 0):
+                            nle = nle + 1
                             # add the new azimuth constraint here ... 2022sep04
                             www = (a[:,5] > azim1 ) & (a[:,5] < azim2 )
                             a = a[www,:]
@@ -203,6 +231,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
 
                             medv = np.median(rh)
                             # 0 means use all frequencies.  otherwise, you can specify 
+                            # this is applying the medial filter
                             if fr == 0:
                                 cc = (rh < (medv+howBig))  & (rh > (medv-howBig))
                             else:
@@ -212,14 +241,20 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                             gfreq = frequency[cc]
                             # added 21may14
                             gutcTime = utcTime[cc]
+
+                            # write out everyting including bad retrievals
+                            dumb= write_out_all(noqc, csvformat, len(rh), yr, doy, d, rh, azimuth, frequency, sat,amplitude,peak2noise,utcTime,[])
                             
-                            NG = len(good)
                             # tvall no longer being used as a variable but still sending it to the function.
                             # unfortunately the info is not sorted - because of the way the directory listing works....
-                            tvall = write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gamp,gpeak2noise,gutcTime,tvall)
+                            NG = len(good)
 
         # only save if there are some minimal number of values
                             if (len(good) >= ReqTracks):
+
+                                # write out the individual tracks that made your met your QC metrics ...
+                                tvall = write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gamp,gpeak2noise,gutcTime,tvall)
+
                                 rh = good
                                 # this is the plot with all the data -not the daily average
                                 alltimes = []
@@ -250,6 +285,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                     ngal = np.append(ngal, len(gsat[ijk]))
 
                                 obstimes.append(datetime.datetime(year=yr, month=d.month, day=d.day, hour=12, minute=0, second=0))
+
                                 medRH.append(medv)
                                 #medRH =np.append(medRH, medv)
                                 # store the meanRH after the outliers are removed using simple median filter
@@ -264,8 +300,12 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
                                 # updated this to include mean amplitude 2021 november 8
                                 meanAmp.append(np.mean(goodAmp))
                                 newl = [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday, np.mean(goodAmp)]
+                                # a new variable is not really needed - but I did not want to oerwrite working code
+                                newl_plus_median = [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday, np.mean(goodAmp),medv]
 
                                 tv = np.append(tv, [newl],axis=0)
+                                tv_median = np.append(tv_median, [newl_plus_median],axis=0)
+
                                 k += 1
                             else:
                                 NotEnough = NotEnough + 1
@@ -276,43 +316,99 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,how
     #meanRH = np.asarray(meanRH)
     s2 = time.time()
 
+    # not sure you can sort obstimes
+    dumb_time = tv_median[:,0] + tv_median[:,1]/365.25
+    # sort it ...
+    ii = np.argsort(dumb_time)
+    tv_median = tv_median[ii,:]
+    for www in range(0,len(tv_median)):
+        filler = datetime.datetime(year=int(tv_median[www,0]), 
+                month=int(tv_median[www,4]), day=int(tv_median[www,5]), hour = 12, minute=0, second = 0)
+        tttimes.append(filler)
 
-    fig.autofmt_xdate()
+    # plot the median 
+    ax.plot(tttimes, tv_median[:,8],'ks',markerfacecolor='white',label='median value')
+    # if requested, also show the limits for the median filter
+    if plot_limits:
+        ax.plot(tttimes, tv_median[:,8]+howBig,'-',color='gray',label='median+limit')
+        ax.plot(tttimes, tv_median[:,8]-howBig,'-',color='gray',label='median-limit')
+
     plt.ylabel('meters',fontsize=fs)
-    plt.title('All Reflector Heights for Station: ' + station.upper(),fontsize=fs)
+    plt.title('All Reflector Heights for ' + station.upper() + ' when QC is applied: ' ,fontsize=fs)
     plt.xticks(fontsize=fs)
     plt.yticks(fontsize=fs)
     plt.gca().invert_yaxis()
+    # this command changes the x-axis
+    fig.autofmt_xdate()
+    #plt.legend(loc="upper right")
+    plt.legend(loc="best")
     plt.grid()
-#   new plot
+
     print('A total of ', NumFiles, ' days were evaluated.')
     print( NotEnough, ' days did not meet the threshold set for a dependable daily average')
-    if (NumFiles < 1):
-        sys.exit()
+    if NumFiles > 1:
+        pltname = xdir + '/Files/' + subdir + '/' + station + '_AllRH.png'
+        print('All RH png file saved as: ', pltname)
+        plt.savefig(pltname)
 
-    pltname = xdir + '/Files/' + subdir + '/' + station + '_AllRH.png'
-    plt.savefig(pltname)
-    print('All RH png file saved as: ', pltname)
 
-    #nr,nc = tv.shape
-    # calculate frequency biases and print to the screen
-    # turnning this off because tvall was slowing it down
-    #fbias_daily_avg(station)
-    #print(nr,nc)
-
-    # close the file with all the RH values 
+    # close the all RH output files
     allrh.close()
+    noqc.close()
 
+    # quick plot of the results without QC
+    quick_raw(alldatafile2,xdir, station,subdir)
 
     # plot the number of retrievals vs time
     txtdir =  xdir + '/Files/' + subdir 
     nr,nc = tv.shape
-    if nr > 0:
+    if (nr > 0) & (NumFiles > 1):
         daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei,test)
-    else:
-        print('No results that met your criteria were found, so no need to make a plot')
 
     return tv, obstimes
+
+def quick_raw(alldatafile2,xdir,station,subdir):
+    """
+    quick plot of the raw RH data.  No QC
+
+    Parameters
+    ----------
+    alldatafile2 : str
+        name of the raw file to be read
+    xdir : str
+        code environ variable (I think)
+    station : str
+        4 ch station name
+    subdir : str
+        subdirectory name for results in xdir/Files
+
+    """
+    if os.path.exists(alldatafile2):
+       # turn off warning
+       with warnings.catch_warnings():
+           warnings.simplefilter("ignore")
+           raw = np.loadtxt(alldatafile2,comments='%')
+       if len(raw) == 0:
+           print('There are no RH data.  At all.  Exiting')
+           sys.exit()
+
+       ns= len(raw.shape)
+       if ns == 2:
+           nr,nc = raw.shape
+       elif ns == 1:
+           nr = 1
+
+       if ns > 0:
+           plt.figure()
+           plt.plot(raw[:,0] + raw[:,1]/365.25, raw[:,2], 'b.')
+           plt.grid()
+           plt.xlabel('year')
+           plt.ylabel('reflector height (m)')
+           plt.title(station + ': Completely raw RH data ... no QC applied ')
+           pltname = xdir + '/Files/' + subdir + '/' + station + '_AllRH_noQC.png'
+           plt.savefig(pltname)
+           print('All RH png file without QC saved as: ', pltname)
+
 
 def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei,test):
     """
@@ -360,7 +456,8 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
     fig.autofmt_xdate()
     plt.ylabel('Reflector Height (m)',fontsize=fs)
     today = str(date.today())
-    plt.title(station.upper() + ': Daily Mean Reflector Height, Computed ' + today,fontsize=fs)
+    #plt.title(station.upper() + ': Daily Mean Reflector Height, Computed ' + today,fontsize=fs)
+    plt.title(station.upper() + ': Daily Mean Reflector Height',fontsize=fs)
     plt.grid()
     plt.xticks(fontsize=fs); plt.yticks(fontsize=fs)
 
@@ -392,7 +489,8 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
     fig.autofmt_xdate()
     plt.ylabel('Amplitude (v/v)',fontsize=fs)
     today = str(date.today())
-    plt.title(station.upper() + ': Daily Mean Reflection Amplitude, Computed ' + today,fontsize=fs)
+    #plt.title(station.upper() + ': Daily Mean Reflection Amplitude, Computed ' + today,fontsize=fs)
+    plt.title(station.upper() + ': Daily Mean Reflection Amplitude', fontsize=fs)
     plt.grid()
     plt.xticks(fontsize=fs); plt.yticks(fontsize=fs)
     pltname = txtdir + '/' + station + '_RHamp.png'
@@ -414,7 +512,7 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
 
     #plt.legend(loc="upper left")
     #ax.legend(bbox_to_anchor=(1.02, 1.02))
-    plt.legend(loc="upper right")
+    plt.legend(loc="best")
     fig.autofmt_xdate()
     plt.title(station.upper() + ': Number of values used in the daily average',fontsize=fs)
     plt.xticks(fontsize=fs)
@@ -448,7 +546,7 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     # nothing to write 
     if (nr < 1):
         return
-    print('Daily average RH file written to: ', outfile)
+    print('\nDaily average RH file written to: ', outfile)
     ii = np.argsort(obstimes)
     # apply time tags to a new variable
     ntv = tv[ii,:]
@@ -460,8 +558,9 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     # 2021 november 8 added another column that has mean amplitude
     fout.write("{0:28s} \n".format( '% calculated on ' + xxx ))
     fout.write("% Daily average reflector heights (RH) calculated using the gnssrefl software \n")
+    fout.write("% Nominally you should assume this average is associated with 12:00 UTC hours \n")
     fout.write("% year doy   RH    numval month day RH-sigma RH-amp\n")
-    fout.write("% year doy   (m)                      (m)    (v/v)\n")
+    fout.write("%            (m)                       (m)    (v/v)\n")
     fout.write("% (1)  (2)   (3)    (4)    (5)  (6)   (7)     (8) \n")
     if csvformat:
         for i in np.arange(0,N,1):
@@ -477,7 +576,7 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
 def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gamp,gpeak2noise,gutcTime,tvall ):
     """
     writing out all the RH retrievals to a single file: file ID is allrh)
-    tvall had everything in it.  but it was slowing everything down, so i removed it
+    tvall had everything in it,  but it was slowing everything down, so i do not do anything with it.
 
     Parameters
     ----------

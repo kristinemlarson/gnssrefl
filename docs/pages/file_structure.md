@@ -1,4 +1,4 @@
-# Files and File Formats
+# Files, Formats, Frequencies
 
 ## Environment Variables
 
@@ -34,8 +34,7 @@ Example filename : onsa0500.22o
 While we support RINEX 3 files, we do not read the RINEX 3 
 file itself - we rely on the <code>gfzrnx</code> 
 utility developed by Thomas Nischan at GFZ to translate from RINEX 3+ to RINEX 2.11
-If you have RINEX 3 files, they should be all 
-upper case (except for the extension rnx or crx).
+If you have RINEX 3 files, they should be all upper case (except for the extension rnx or crx).
 
 Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 
@@ -52,11 +51,12 @@ Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 long station file name are no
 doubt useful, but they are not recognized by this code. By 
 convention, these files may be
-gzipped but not unix compressed. You cannot use rinex2snr 
-to translate RINEX 3 file unless they
-have the 01D naming convention. If you want a 
+gzipped but not unix compressed. If you want a 
 generic translation program, you can try <code>rinex3_rinex2</code>.
-It has the requirement that you input the file names.
+It has the requirement that you input the input and output file names.
+
+For a few archives, we allow 1 sample per second files (which are all 15 minutes long).  
+Please see the rinex2snr documentation page.
 
 **NMEA**
 
@@ -70,16 +70,13 @@ for station ABCD in year 2021 and day of year 3.
 
 NMEA files may be gzipped.
 
-nmea2snr needs better documentation. Hopefully the authors will provide it. My 
-best effort to help [is in the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
+Additional information about nmea2snr [is in the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 
 **Orbit files**
 
 We have tried our best to make the orbit files relatively invisible to users.
-But for the sake of completeness, we are either using 
-broadcast navigation files in the RINEX 2.11 format
+But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
 or precise orbits in the sp3 format.   
-
 
 **Executables**
 
@@ -112,7 +109,8 @@ RINEX files downloaded from archives are not stored by this code. In fact, quite
 they are deleted. Do not keep your only copy of RINEX files in your default directory.
 
 You do not need precise orbits to do GNSS-IR. We only use them as a convenience.
-Generally we use multi-GNSS sp3 files. that are defined as:
+Generally we use multi-GNSS sp3 files. See the <code>rinex2snr</code> documentation for more details on 
+the orbits you can use. 
 
 Some of the utilities and environmental products code store files in REFL_CODE/Files
 The locations of these files are always provided in the screen output.
@@ -141,22 +139,19 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 
 The columns in the SNR data are defined as:
 
-<PRE>
-1. Satellite number (remember 100 is added for Glonass, etc)
-2. Elevation angle, degrees
-3. Azimuth angle, degrees
-4. Seconds of the day, GPS time
-5. elevation angle rate of change, degrees/sec.
-6.  S6 SNR on L6
-7.  S1 SNR on L1
-8.  S2 SNR on L2
-9.  S5 SNR on L5
-10. S7 SNR on L7
-11. S8 SNR on L8
-</PRE>
+- Satellite number (remember 100 is added for Glonass, 200 for Galileo etc)
+- Elevation angle, degrees
+- Azimuth angle, degrees
+- Seconds of the day, GPS time
+- elevation angle rate of change, degrees/sec.
+-  S6 SNR on L6
+-  S1 SNR on L1
+-  S2 SNR on L2
+-  S5 SNR on L5
+-  S7 SNR on L7
+-  S8 SNR on L8
 
 The unit for all SNR data is dB-Hz.
-
 
 ## GNSS frequencies
 
@@ -173,7 +168,125 @@ set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
 ## Additional files
 
 - EGM96geoidDATA.mat is stored in REFL_CODE/Files
-- station_pos.db is stored in REFL_CODE/Files 
-- gpt_1wA.pickle is stored in REFL_CODE/input
+- station_pos.db is stored in REFL_CODE/Files. This is a compilation of station coordinates from Nevada Reno.
+- gpt_1wA.pickle is stored in REFL_CODE/input. This file is used in the refraction correction.
 
-We will be moving these to a single place after our short course!
+## Some comments about signals
+
+### GPS L2C
+
+Why do I like L2C? What's not to like? It is a modern **civilian** code without high chipping rate.
+That civilian part matters because it means the receiver knows the code and thus
+retrievals are far better than a receiver having to do extra processing to 
+extract the signal. Here is an example of a receiver that is tracking **both** L2P and L2C.
+Originally installed for the Plate Boundary Observatory, it is a Trimble. The archive 
+(unavco) chose to provide only L2P in the 15 second default RINEX file.
+However, it does have the L2C data in the 1 second files. So that is how I am able to make 
+this comparison.  P038 is a very very very flat site.
+
+Here are the L2P retrievals:
+
+<img src="../_static/p038usingL2P.png" width="600">
+
+Now look at the L2C retrievals.
+
+<img src="../_static/p038usingL2c.png" width="600">
+
+If you were trying to find a periodic signal, which one 
+would you want to use?
+
+To further confuse things, when the receiver was updated to a Septentrio, unavco began
+providing L2C data in the default 15 second files. This is a good thing - but it is confusing
+to people that won't know why the signal quality improved over night.
+
+### GPS L5
+
+Another great signal.  I love it. It does have a high chipping rate, which is 
+relevant (i.e. bad) for reflectomtry from very tall sites.
+
+### Aliasing
+
+While it will show up in GPS results too - there seems to be a particularly
+bad problem with Glonass L1.  I used an example from Thule. The RH is significant -
+~20 meters. So you absolutely have to have at least 15 sec at the site or you violate
+the Nyquist. Personally I prefer to use 5 sec - which means I have to download
+1 sec and decimate. This is extremely annoying because of how long it takes to 
+ftp those files to my local machine. Let's look at L1 solutions using a 5 second file - 
+but where I invoke the -dec option for gnssir. That way I can see the impact of the sampling.
+I also using the -plt T option. 
+
+This is 5 second GPS L1.
+
+<img src="../_static/thule_l1.png" width="600"/>
+
+This is 15 second GPS L1. You see some funny stuff at 30 meters, and yes, the periodograms
+are noisier. But nothing insane.
+
+<img src="../_static/thule_l1_15sec.png" width="600"/>
+
+Now do 5 second Glonass L1
+
+<img src="../_static/not_aliased_101.png" width="600"/>
+
+
+Contrast with the Glonass L1 results using 15 sec decimation!
+So yeah, aliasing is a problem.
+
+<img src="../_static/aliased_101.png" width="600"/>
+
+
+### E5
+
+Now about RINEX L8 ... also known as E5. This is one of 
+the new Galileo signals. Despite the fact that it is near
+the frequencies of the other L5 signals, it is **not** the 
+same. You can see that 
+it in the multipath envelope work of Simsky et al. shown below.
+
+<img src="../_static/multipath-envelope.png" width="600"/>
+
+Most of you will not be familiar with multipath envelopes - 
+but for our purposes, we want those envelopes to be big - cause
+more multipath, better GNSS-IR. First thing, multipath delay 
+shown on the x-axis is NOT the reflector height (RH).  it is 
+2*RH*sin(elevation angle). So even a pretty tall RH will not 
+be obstructed by the new Galileo codes except for E5.
+
+
+This is E5a
+
+<img src="../_static/at01_358_205.png" width="600"/>
+
+This is E5. Note that instead of nice clean peaks, it is 
+spread out. You can also see that the E5 retrievals degrades as elevation angle increases,
+which is exactly what you would expect with the multipath delay 
+increasing with elevation angle. I would just recommend only using
+this signal for RH < 5 meters. And even then, if you are tracking
+L8, you probably also have L5, L6, and L7, so there is not a ton gained 
+by also using L8.
+
+<img src="../_static/at01_358_208.png" width="600"/>
+
+
+###  What about L1C?
+
+I would be happy to host some results from L1C - please submit a pull request 
+with the needed figures and a description of what you are comparing. I imagine
+this would require making two snr files - one with L1C and one with L1 C/A. 
+And using only the small subset of satellites that transmit L1C.
+From what I have seen, it is not much better than L1 C/A - which surprisees me.
+But I have to imagine it is receiver dependent (some receivers have terrible C/A SNR).  
+
+<HR>
+
+The multipath envelope figure is taken from:
+
+Title: Experimental Results for the Multipath Performance of Galileo 
+Signals Transmitted by GIOVE-A Satellite
+
+Authors: Andrew Simsky,David Mertens,Jean-Marie Sleewaegen,
+Martin Hollreiser, and Massimo Crisci
+
+International Journal of Navigation and Observation 
+Volume 2008, DOI 10.1155/2008/416380
+

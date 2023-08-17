@@ -21,33 +21,29 @@ def parse_arguments():
     parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
     # optional arguments
     parser.add_argument("-rate", default='low', metavar='low', type=str, help="sample rate: low or high")
-    parser.add_argument("-archive", default=None, 
-                        help="archive name", type=str)
+    parser.add_argument("-archive", default=None, help="archive name", type=str)
     parser.add_argument("-version", default=None, metavar=2, type=int, help="rinex version (2 or 3)")
-    parser.add_argument("-strip", default=None, type=str,
-                        help="set to True to strip to only SNR observables, gfzrnx used")
+    parser.add_argument("-strip", default=None, type=str, help="set to True to strip to only SNR observables, gfzrnx used")
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
-    parser.add_argument("-stream", default=None, type=str,
-                        help="set to True to get stream-defined Rinex3 filename. I know. I know. It is annoying.")
+    parser.add_argument("-stream", default=None, type=str, help="set to True to get stream-defined Rinex3 filename. I know. I know. It is annoying.")
     parser.add_argument("-samplerate", default=None, type=int, help="Sample rate in seconds. For RINEX3 only.")
-    parser.add_argument("-debug", default=None, type=str, help="debugging flag for printout. default is False")
+    parser.add_argument("-screenstats", default=None, type=str, help="debugging flag for printout. default is False")
     parser.add_argument("-dec", default=None, type=int, help="decimation value (seconds). Only for RINEX 3.")
     parser.add_argument("-save_crx", default=None, type=str, help="Save crx version. Only for RINEX 3.")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['strip','debug','save_crx']
+    boolean_args = ['strip','screenstats','save_crx']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = None,
-                   version: int = 2, strip: bool = False, doy_end: 
-                   int = None, stream: str = 'R', samplerate: int = 30, 
-                   debug: bool = False, dec: int = 1, save_crx: bool = False ):
+def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = 'all',
+                   version: int = 2, strip: bool = False, doy_end: int = None, stream: str = 'R', samplerate: int = 30, 
+                   screenstats : bool = False, dec: int = 1, save_crx: bool = False ):
     """
     Command line interface for downloading RINEX files from global archives.
     Required inputs are station, year, month, and day. If you want to use day of year,
@@ -148,7 +144,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         Sample rate in seconds for RINEX3 only.
         Default is 30.
 
-    debug : bool, optional
+    screenstats : bool, optional
         provides screen output helpful for debugging
         Default is False
 
@@ -161,7 +157,10 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     """
 
 #   make sure environment variables exist.  set to current directory if not
+
     g.check_environ_variables()
+    debug = screenstats
+
 
     if 'bkg' in archive:
         if (archive == 'bkg'):
@@ -266,20 +265,23 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             print('Request ', station, year, d, archive, samplerate, stream)
             if rate == 'high':
                 if archive == 'cddis':
-                    print('seek highrate data at CDDIS')
+                    if debug:
+                        print('seek highrate data at CDDIS')
                     ch.cddis_highrate(station, year, d, 0, stream, 1)
                 if archive == 'bkg':                               
-                    print('seek highrate data at BKG')
+                    if debug:
+                        print('seek highrate data at BKG')
                     rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec,bkg)
                 if archive == 'ga':
-                    print('seek highrate data at GA')
+                    if debug:
+                        print('seek highrate data at GA')
                     deleteOld = True
                     r2, foundit = g.ga_highrate(station,year,d,dec,deleteOld)
             else:
                 if archive == 'all':
-                    file_name, foundit = k.universal_all(station, year, d, samplerate, stream)
+                    file_name, foundit = k.universal_all(station, year, d, samplerate, stream,debug)
                     if not foundit:
-                        file_name, foundit = k.universal_all(station, year, d, samplerate, k.swapRS(stream))
+                        file_name, foundit = k.universal_all(station, year, d, samplerate, k.swapRS(stream),debug)
                 else:
                     file_name, foundit = k.universal(station, year, d, archive, samplerate, stream,debug)
                     if not foundit:
@@ -300,12 +302,13 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             else:
                 if archive == 'all':
                     foundit = False
-                    print('cycle thru unavco,sopac,sonel archives')
+                    if debug:
+                        print('cycle thru unavco,sopac,sonel archives')
                     for archiveinput in ['unavco', 'sopac', 'sonel']:
                         if not foundit:
-                            file_name, foundit = k.universal_rinex2(station, year, d, archiveinput)
+                            file_name, foundit = k.universal_rinex2(station, year, d, archiveinput,debug)
                 else:
-                    file_name, foundit = k.universal_rinex2(station, year, d, archive)
+                    file_name, foundit = k.universal_rinex2(station, year, d, archive, debug)
                 if foundit:  # uncompress and make o files ...
                     rinexfile, foundit = k.make_rinex2_ofiles(file_name)  # translate
 

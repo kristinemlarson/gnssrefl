@@ -1,4 +1,4 @@
-# Lake Yellowstone 
+# Lake Yellowstone, USA
 
 [Warning](warning.md)
 
@@ -54,7 +54,7 @@ Set your analysis strategy using the <code>gnssir_input</code>.
 
 <code>rinex2snr p709 2021 183 -dec 5 -archive unavco -rate high -orb gnss</code>
 
-<code>gnssir p709 2021 1 -doy_end 180 -newarcs T </code>
+<code>gnssir p709 2021 1 -doy_end 180 </code>
 
 Use <code>daily_avg </code> to calculate a daily reflector height. Various statistics also
 come to the screen. Here is the RH series:

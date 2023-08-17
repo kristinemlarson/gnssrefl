@@ -83,13 +83,7 @@ code run faster (otherwise it will check three other archives as well). The resu
 
 Run <code>gnssir</code> for all the SNR files:
 
-<code>gnssir lorg 2019 1 -doy_end 233 -newarcs T </code>
-
-The default does not send any plots to the screen. If you do want to see them, set <code>-plt True</code>:
-
-<code>gnssir lorg 2019 1 -plt True -newarcs T</code>
-
-<img src="../_static/lorg-g-panels.png" width="800"/>
+<code>gnssir lorg 2019 1 -doy_end 233  </code>
 
 The results for a single day are stored in a folder for that 
 year, i.e.  $REFL_CODE/2019/results/lorg. [Here is a sample for day of year 102.](102.txt)
@@ -102,10 +96,10 @@ set a required minimum number of daily satellite tracks. Here we use 0.25 meters
 <code>daily_avg lorg 0.25 50</code>
 
 
-<img src="../_static/lorg_1.png" width="600"/>
+<img src="../_static/lorg_1.png" width="600">
 
 
-<img src="../_static/lorg-dailyavg.png" width="600"/>
+<img src="../_static/lorg-dailyavg.png" width="600">
 
 [All reflector heights (gzipped)](lorgAll.txt.gz)
 

@@ -74,7 +74,7 @@ def main():
     parser.add_argument("-ylabel", type=str, help="optional y-axis label", default=None)
     parser.add_argument("-symbol", help="plot symbol ", type=str,default=None)
     parser.add_argument("-title", help="optional title", type=str,default=None)
-    parser.add_argument("-outfile", help="optional filename for plot", type=str,default=None)
+    parser.add_argument("-outfile", help="optional filename for plot. Must end in png", type=str,default=None)
     parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
     parser.add_argument("-xlimits", nargs="*",type=float, help="optional xlimits", default=None)
     parser.add_argument("-ydoy", help="if True/T, columns 1-2 are year and doy", type=str,default=None)
@@ -181,10 +181,29 @@ def main():
     if args.xlimits is not None:
         print('found x-axis limits')
         xlimits = args.xlimits
-        plt.xlim((xlimits))
+        if convert_mjd:
+            t1 = Time(xlimits[0],format='mjd')
+            t1_utc = t1.utc # change to UTC
+            tval1 =  t1_utc.datetime # change to datetime
+            t2 = Time(xlimits[1],format='mjd')
+            t2_utc = t2.utc # change to UTC
+            tval2 =  t2_utc.datetime # change to datetime
+            plt.xlim((tval1,tval2))
 
-    if args.outfile is not None:
-        plt.savefig(args.outfile,dpi=300)
+        else:
+            plt.xlim((xlimits))
+
+    out = args.outfile
+    if out is None:
+        out = 'temp.png'
+        print('plotfile saved to: ', out)
+        plt.savefig(out,dpi=300)
+    else:
+        if out[-3:] == 'png':
+            print('plotfile saved to: ', out)
+            plt.savefig(out,dpi=300)
+        else:
+            print('Output filename must end in png.')
 
     plt.show()
 

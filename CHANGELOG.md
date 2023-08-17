@@ -3,6 +3,128 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.5.2
+August 14, 2023
+
+Added IGN for Spain for rinex2snr, RINEX 3 and 30 second only
+These data are likely already available from SONEL.
+archive is called ignes
+
+Save output from quickplt even if someone doesn't ask for it.
+
+Improve discussion of QC in the understanding section of readthedocs.
+
+## 1.5.1
+August 10, 2023
+
+New version
+
+## 1.5.0
+August 10, 2023
+
+Updated daily_avg to have three sections.  raw arcs, arcs with QC, daily average with QC.
+Updated the discussion page.
+
+## 1.4.9
+August 10, 2023
+
+New option on daily_avg that plots the median value and the limits from that 
+median value that are used to filter outliers before the daily average is computed.
+
+More documentation about daily_avg has been added online.
+
+
+## 1.4.8
+
+Another version to get it on pypi
+## 1.4.7
+
+August 7, 2023
+
+I am trying a new build with Tim Dittmann's changes to the docker build.
+This should allow us to define versions with tag numbers that are aligned
+with the verion.
+
+
+## 1.4.6
+pushed Tim Dittmann's changes to make_meta. 
+Still some issues that need to be fixed.
+
+Changed input on refl_zones for ellipsoidal height to be consistent with gnssir_input
+Commandl line variable shoud be height, not el_height.
+
+## 1.4.5
+Fixed unset variable in the data windowing function so it always has a value (iAzim).
+
+## 1.4.4
+I updated gnssir and quickLook so that it now reports the azimuth of the lowest
+elevation angle in the arc. Previously it used the average azimuth over the 
+entire rising or setting arc.
+
+## 1.4.3
+
+Changed gnss back to its original setting, which is getting the multi-GNSS final 
+GFZ orbits from CDDIS.  I had sent those queries to rapid, not remembering that rapid
+GFZ does not have beidou. 
+
+gnss-gfz directly downloads multi-GNSS orbits from GFZ.  this is equivalent to gnss3 option.
+
+for all four constellations, use gnss-gfz or gnss options.
+
+Added script to download tide gauge data from Queensland ... download_qld.py
+
+quickplt allows xaxis limits in MJD (i.e. it will use datetimes to make a nicer x-axis)
+
+## 1.4.2
+
+Fixed bug in query_modern in gps.py that did not check to see if Files subdirectory existed before
+downloading station_pos.db. 
+
+I do not know WHY the docker does not provide the necessary file, as it should.
+
+## 1.4.1
+
+I incorrectly implemented the refraction correction when I wrote the newarcs
+option of gnssir.  This has been fixed with this version. I will be removing all
+pypi versions that have the bug in it.  Effectively, the refraction correction
+was not being implemented at all.  this will cause a bias between series computed before
+and after.  It has no impact on the SNR data files. Only on gnssir output (and the programs
+that use those outputs, like subdaily, snowdepth, phase, and vwc).
+
+
+changed WSV water level to 30 day downloads instead of 15
+
+gnssir_input incorrectly defined e1 and e2 as integers ... fixed.
+
+quickLook also incorrectly defined e1 and e2 as integers ... fixed
+
+added more columns to subdaily outlier file...
+
+## 1.3.26
+
+fixed major bug in gnssir for old arc selection
+
+
+## 1.3.25
+
+nyquist plots to the screen
+
+Allow multiple elev ranges  - see gnssir_input for information about setting it up.
+required changeds to gnssir as well - let me know if something seems not
+to work anymore.
+
+## 1.3.24
+
+try to reduce print statements by using screenstats in rinex2snr and download_rinex
+
+added azimuth limits to quickLook (they were missing from when I updated it)
+
+newarcs is now the default for gnssir
+
+removed make_json_input, command line version is no longer generated.
+
+updated software_tests and use cases for these changes
+
 ## 1.3.23
 
 added gnss3 orbit option for testing. eventually will use this for gnss.

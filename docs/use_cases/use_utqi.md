@@ -72,7 +72,7 @@ Set your analysis strategy.  I am using the main GPS signals, Glonass, and three
 
 In retrospect, I should have limited the azimuths a little more. Now run the main module for estimating reflector height.
 
-<code>gnssir utqi 2020 1 -year_end 2022 -doy_end 243 -newarcs T </code>
+<code>gnssir utqi 2020 1 -year_end 2022 -doy_end 243  </code>
 
 
 ##  Assess the results

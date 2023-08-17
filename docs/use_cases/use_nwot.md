@@ -100,7 +100,7 @@ QC restrictions.
 
 Once you have a strategy set up, run <code>gnssir</code> for the years 2009-2015:
 
-<code>gnssir nwot 2009 1 -doy_end 366 -year_end 2015 -newarcs T</code>
+<code>gnssir nwot 2009 1 -doy_end 366 -year_end 2015 </code>
 
 ### Compute daily average RH values
 
