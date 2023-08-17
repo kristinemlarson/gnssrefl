@@ -76,3 +76,17 @@ The plots might look slightly different and the defaults we used in the analysis
 ## GPS Tool Box Demonstration
 
 * [MNIS](https://gnssrefl.readthedocs.io/en/latest/use_cases/gpstoolbox.html)
+
+## Homeworks from Previous Shortcourses:
+
+* [Homework 0](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework0.html): Make sure you have properly installed `gnssrefl`.
+
+* [Homework 1](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework1.html): Practice setting your azimuth and elevation angle mask.
+
+* [Homework 2](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework2.html): Learn how to measure snow depth levels with `gnssrefl` using GNSS data.
+
+    * [Homework 2 Solution](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework2_soln.html)
+
+* [Homework 3](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework3.html): Learn how to measure water level with `gnssrefl` using GNSS data
+
+    * [Homework 3 Solution](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework3_soln.html)

@@ -1,8 +1,7 @@
 ### Homework 3  
 
-**Due date:** This homework is to be completed **before** the short course given on October 21. You need to make
-sure the software has been properly installed and you have successfully completed the "homework 0" assignment. You should 
-also read the [gnssrefl documentation provided on GitHub.](https://github.com/kristinemlarson/gnssrefl)
+**Prerequisite:** You need to make sure the software has been properly installed and you have successfully completed the "homework 0" assignment. You should 
+also read the [gnssrefl documentation.](gnssrefl.rtfd.io)
 
 **Purpose:** Learn how to measure water level with <code>gnssrefl</code> using GNSS data 
 
@@ -80,8 +79,7 @@ were trying out the webapp?  How about the azimuths?  Go back to the reflection 
 make sure you are happy with your azimuth and elevation angle selections.
 
 Next we need to save our <code>gnssrefl</code> analysis strategy using 
-<code>make_json_input</code>. At a minimum you need to know 
-the latitude, longitude, and height for the station. However, your analysis strategy can and should
+<code>gnssir_input</code>. Your analysis strategy can and should
 be improved by setting some parameters on the command line.
 
 *Hints:*
@@ -90,10 +88,7 @@ be improved by setting some parameters on the command line.
 
 *  Since we can only use L1 data, you should use the <code>-l1 True</code> flag.
 
-* You will need to hand edit the azimuths in the json file. You want
-to cut up your azimuth range in 60-90 degree chunks.  So if you wanted to use the region 
-for 90-270 degrees, you should say 90-180
-and 180-270. You can use smaller chunks, but I generally do not use less than 45 degree azimuth chunks.
+* You will need to estimate the azimuth mask using the `-azlist2` argument
 
 Now run <code>gnssir</code> for the year 2020/doy 150. 
 This module is meant for *routine analysis* and thus there are not a lot
