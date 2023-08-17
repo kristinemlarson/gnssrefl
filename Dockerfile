@@ -31,6 +31,8 @@ ENV PATH="/etc/gnssrefl/exe:$PATH"
 RUN pip install numpy --upgrade --ignore-installed
 COPY pyproject.toml README.md setup.py /usr/src/gnssrefl/
 COPY gnssrefl /usr/src/gnssrefl/gnssrefl
+COPY notebooks /usr/src/gnssrefl/notebooks
+COPY docs /usr/src/gnssrefl/docs
 RUN pip3 install --no-cache-dir /usr/src/gnssrefl
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
@@ -38,6 +40,7 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV EXE=/etc/gnssrefl/exe
 ENV ORBITS=/etc/gnssrefl/orbits
 ENV REFL_CODE=/etc/gnssrefl/refl_code
+ENV DOCKER=true
 
 RUN mkdir -p /etc/gnssrefl/refl_code/input/
 RUN mv /usr/src/gnssrefl/gnssrefl/gpt_1wA.pickle /etc/gnssrefl/refl_code/input/

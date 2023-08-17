@@ -23,7 +23,7 @@ ext4 = Extension(name='gnssrefl.xnmeasnr',
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
-requirements = ["numpy","wget","scipy","matplotlib","requests","progress","astropy","simplekml","earthscope-sdk", "jupyterlab"]
+requirements = ["numpy", "wget", "scipy", "matplotlib", "requests", "progress", "astropy", "simplekml", "earthscope-sdk", "jupyterlab", "ipywidgets"]
 setup(
     name="gnssrefl",
     version="1.3.23",
@@ -81,7 +81,7 @@ setup(
             ], 
         },
     install_requires=requirements,
-    ext_modules = [ext1,ext2,ext3,ext4],
+    ext_modules=[ext1, ext2, ext3, ext4],
     classifiers=[
         "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
