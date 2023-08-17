@@ -1,5 +1,7 @@
 ## Homework 2 Solution
 
+(Solutions and figures were generated using gnssrefl [v1.5.3](https://pypi.org/project/gnssrefl/1.5.3/))
+
 *Make SNR file for gls1, 2012, doy 100*  quickLook*
 
 <code>rinex2snr gls1 2012 100 -archive unavco </code>

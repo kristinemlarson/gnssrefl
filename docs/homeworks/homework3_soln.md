@@ -1,5 +1,6 @@
 ### Homework 3 Solution
 
+(Solutions and figures were generated using gnssrefl [v1.5.3](https://pypi.org/project/gnssrefl/1.5.3/))
 
 *Make SNR data. The only required inputs are the 
 station name (ross), the year (2020) and day of year (150)*
