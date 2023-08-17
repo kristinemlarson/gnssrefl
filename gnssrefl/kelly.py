@@ -1,9 +1,6 @@
-import numpy as np
+import os
 import requests
-import subprocess
 import time
-
-import gnssrefl.gps as g
 
 from pathlib import Path
 
@@ -30,7 +27,7 @@ def the_kelly_simple_way(url,filename):
     foundit : bool
         whether file was found
     """
-    token_path = './'
+    token_path = os.environ['REFL_CODE']
     device_flow = DeviceCodeFlowSimple(Path(token_path))
 
     print('Seeking permission from Earthscope to use their archive')

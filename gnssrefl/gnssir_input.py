@@ -52,7 +52,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
               h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None,
               peak2noise: float = 2.8, ampl: float = 5.0, allfreq: bool = False,
               l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = '', ediff: float=2.0, delTmax: float=75.0, frlist: float=[],azlist2: float=[0,360], ellist : float=[] ):
+              extension: str = '', ediff: float=2.0, delTmax: float=75.0, frlist: list=[],azlist2: list=[0,360], ellist : list=[] ):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
