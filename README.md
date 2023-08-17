@@ -1,6 +1,6 @@
 # gnssrefl
 
-**github version: 1.5.2** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+**github version: 1.5.3** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 
 August 2, 2023: Updated azimuth outputs for gnssir and quickLook so that the azimuth of the 
@@ -32,11 +32,11 @@ GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 09357
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was initially developed 
 as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
-As of August 31, 2023, we will be an independent (unfunded) software package. Please help us maintain/improve this code. 
+As of August 31, 2023, we will be an independent software package. Please help us maintain/improve this code. 
 
 Kristine M. Larson
 
-July 7, 2023
+Updated: August 17, 2023
 
 <HR>
 

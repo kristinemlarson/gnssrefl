@@ -50,7 +50,7 @@ I encourage you to get to know your site. If it belongs to you, look at
 photographs. If you can't find photographs, use Google Earth.  You can also try using
 my [google maps web app interface](https://gnss-reflections.org/geoid?station=smm3).
 
-## Signals and Sources
+## Reflected Signal Geometry
 
 To summarize, direct (blue) and reflected (red) GNSS signals interfere and create
 an interference pattern that can be observed in GNSS Signal to Noise Ratio (SNR) data as a satellite rises or sets. 
@@ -64,54 +64,100 @@ snow and water. We will be posting the code you need to measure soil moisture la
 ![](https://gnss-reflections.org/static/images/overview.png)
 
 This code is meant to be used with Signal to Noise Ratio (SNR) data. This is a SNR sample for a site in the 
-the northern hemisphere (Colorado) and a single GPS satellite. The SNR data are plotted with respect to time - however,
+the northern hemisphere (Colorado) and a single GPS satellite. The SNR data 
+are plotted with respect to time - however,
 we have also highlighted in red the data where elevation angles are less than 25 degrees. These are the data used in 
 GNSS Interferometric Reflectometry GNSS-IR. You can also see that there is an overall smooth polynomial signature
 in the SNR data. This represents the dual effects of the satellite power transmission level and the antenna 
 gain pattern. We aren't interested in that so we will be removing it with a low order polynomial (and 
 we will convert to linear units on y-axis). 
+After the direct signal polynomial is removed, we will concentrate on the *rising* 
+and *setting* satellite arcs. These are shown in red.
 
 
 <img src="../_static/p041-snr.png" width="600">
 
-After that polynomial is removed, we will concentrate on the *rising* 
-and *setting* satellite arcs. That is the red parts on the left and right.  
+For a more dynamic example, look at these SNR data from [Kachemak Bay](../_static/pbay-snr.png)
 
-Below you can see those next two steps. On the top is the "straightened" SNR data. Instead of time,
-it is plotted with respect to sine of the elevation angle. It was shown a long time ago by Penina 
-Axelrad that the frequency extracted from these data is representative of the reflector height.
-Here a periodogram was used to extract this frequency, and that is shown below, with the x-axis 
-units changed to reflector height. In a nutshell, that is what this code does. It figures out the 
-rising and setting satellite arcs in all the azimuth regions you have said are acceptable. It does a 
-simple analysis (removes the polynomial, changes units) and uses a periodogram to look at the 
-frequency content of the data. You only want to report RH when you think the peak on the periodogram is 
-significant. There are many ways to do this - we use three quality control metrics:
 
-* is the peak larger than a user-defined value  (amplitude of the dominant peak in your periodogram)
-
-* is the peak divided by a "noise" metric larger than a user-defined value. The code calls this the peak2noise.
-
-* is the data arc sufficiently "long"
-
-The first two are shown and defined in in the figure below.  
+Once the direct signal is removed (and units changed), you will have a dataset as shown below.
+The x-axis is now in sine(elevation angle) instead of time, as this is the easiest way to 
+analyze the spectral characteristics of the data. Below the SNR data is the periodogram associated 
+with it. This periodogram is what allows us to estimate the reflector height of the antenna.
 
 <img src="../_static/for_the_web.png" width="600">
 
-It is important that you set the "noise region" in your peak to noise calculation in a sensible way.
-That measurement will definitely depend on how large you make that region. You should not assume 
-that the default peak2 noise or amplitude values are correct for your experiment. Since this code
-is meant to be used for various applications, it is all but impossible to have one set of defaults that 
-work for everyone. The peak2noise parameter in particular is extremely dependent on how you define
-your noise region. The amplitude parameter depends very much on your receiver and 
-the kind of surface you are sensing.
+
+In a nutshell, that is what this code does - it tries to find the rising and setting arcs 
+for all GNSS satellites in a datafile, computes periodograms to find the dominant frequencies 
+which can be related to reflector heights, and ultimately defines environmental characteristics from them.
 
 
-The code uses a parameter called **ediff.** to test whether the data arc is sufficiently "long"
+There are three big issues :
+
+1. You need to make sure that dominant frequency is meaningful (**Quality Control**).  
+
+2. You need to make sure that the reflected signals are actually coming 
+from where you want them (**Reflection Zones**)
+
+3. Your receiver must be collecting data at sufficient rate so that your GNSS-IR results 
+are not violating the Nyquist frequency (**Nyquist**).
+
+
+
+## Quality Control 
+
+It is easy to compute a periodogram and pick the maximum value so as to find the reflector height. It is 
+more difficult to determine whether it is one you should trust.
+
+* is the peak larger than a user-defined value  (amplitude of the dominant peak in your periodogram)
+
+* is the peak divided by a "noise" metric larger than a user-defined value. (peak2noise).
+
+* is the data arc sufficiently "long"
+
+The amplitude and peak2noise ratio are influenced by choices you make, i.e. the elevation angle limits 
+and the noise region used to compute peak2 noise.  And they are also 
+influenced by the kind of experiment you do and receiver you use.  
+Some examples follow:
+
+
+Here we show a SNR series - outlining two different elevation angle regions in colors.
+
+<img src="../_static/qc1.png" width="600">
+
+We should expect that the periodograms will look different for these two regions and they are.
+The peak amplitudes are larger when you only use the lower elevation angle data.  But the periodograms
+are wider (why?).
+
+<img src="../_static/qc2.png" width="600">
+
+
+Peak2noise depends on the noise region. In <code>quickLook</code> it uses the same RH limits for noise as for computing
+the periodogram. You can eaisly see that if you said you wanted all H values below 20 meters, the noise region
+is much much larger, which means the peak value dividied by the noise values will be much much bigger.
+
+
+<img src="../_static/qc3.png" width="600">
+
+This is an example where two different stations with different surfaces are shown. The peak amplitudes of the 
+periodograms are different.  This simply means that the ice has 
+a different dielectric constant than soil.  You can verify this using the Nievinski simulator.
+
+<img src="../_static/qc4.png" width="600">
+
+Here is an example where the same station is used in both periodograms - but the surface itself changed. 
+
+<img src="../_static/qc6.png" width="600">
+
+
+In addition to amplitude and peak2noise, the code uses a quality control 
+parameter called **ediff.** to test whether the data arc is sufficiently "long"
 in an elevation angle sense. ediff has units of degrees.
 If you set your desired elevation angle limits to 5 and 20 degrees, and ediff was 2, which is 
-the default, then the code will require all arcs to be at least 7-18 degrees long.  If you had a 
+the default, then the code will require all arcs to track from at least 7 degrees and go up to 18 degrees. If you had a 
 very short elevation angle range, i.e. 5-10 degrees, you might want to make that a little stricter,
-6-9 degrees, so an ediff of 1.  If you don't want to enforce this, just set it to something big.
+minimum of 6 and at least go up to 9 degrees, so an ediff of 1. If you don't want to enforce this, just set it to something big.
 But you can't turn off all quality control.  Since the amplitude can be influenced by the kind of 
 receiver you are using, if you aren't sure what a good value would be, you can set that to zero.
 And you can use quickLook to get an idea of what it should be.  
@@ -131,18 +177,7 @@ wish to reduce delTmax.
 See [Grauerort](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tggo.html) for an example of this problem. 
 
 
-## Dynamic SNR Data Arcs
-
-The Colorado SNR example shown earlier is for a fairly planar field where the RH for the rising and setting arc 
-should be very close to the same value. What does the SNR data look like for a more dynamic case? 
-Shown below is the SNR data for [Peterson Bay](https://gnss-reflections.org/static/images/PBAY.jpg), where 
-the rising arc (at low tide) has a very different
-frequency than during the setting arc (high tide). This gives you an idea of how the code can be 
-used to measure tides. 
-
-<img src="../_static/pbay-snr.png" width="600">
-
-Note: even though we analyze the data as a function of sine of elevation angle, each satellite arc
+Even though we analyze the data as a function of sine of elevation angle, each satellite arc
 is associated with a specific time period. The code keeps track of that and reports it in the final answers.
 Each track is associated with an azimuth. In the initial versions of the code this was the average azimuth
 for all the data in your track.  From version 1.4.5 and on, it is the azimuth of the lowest elevation angle
@@ -230,3 +265,8 @@ mask and reflector height range. This is the main reason
 <code>quickLook</code> was developed. 
 
 ## Nyquist
+
+Please see the [Roesler and Larson paper](https://link.springer.com/article/10.1007/s10291-018-0744-8) for a 
+discussion of Nyquist. I have ported the Matlab code provided in that paper 
+to [gnssrefl](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nyquist_cl.html) 
+
