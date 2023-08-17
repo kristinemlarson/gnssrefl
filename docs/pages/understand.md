@@ -77,9 +77,12 @@ and *setting* satellite arcs. These are shown in red.
 
 <img src="../_static/p041-snr.png" width="600">
 
+(For a more dynamic example, look at these SNR data from <a href="../_static/pbay-snr.png">Kachemak Bay</a>.)
+
+
 Once the direct signal is removed (and units changed), you will have a dataset as shown below.
 The x-axis is now in sine(elevation angle) instead of time, as this is the easiest way to 
-analyze the spectral characteristics of the data. Below the SNR data is the periodogram assocaited 
+analyze the spectral characteristics of the data. Below the SNR data is the periodogram associated 
 with it. This periodogram is what allows us to estimate the reflector height of the antenna.
 
 <img src="../_static/for_the_web.png" width="600">
@@ -89,7 +92,8 @@ In a nutshell, that is what this code does - it tries to find the rising and set
 for all GNSS satellites in a datafile, computes periodograms to find the dominant frequencies 
 which can be related to reflector heights, and ultimately defines environmental characteristics from them.
 
-There are three big issues:
+
+There are three big issues :
 
 1. You need to make sure that dominant frequency is meaningful (Quality Control).  
 
@@ -101,6 +105,8 @@ are not violating the Nyquist frequency (Nyquist).
 
 We will talk about these issues in turn.
 
+
+## Quality Control 
 
 * is the peak larger than a user-defined value  (amplitude of the dominant peak in your periodogram)
 
@@ -125,7 +131,7 @@ are wider (why?).
 <img src="../_static/qc2.png" width="600">
 
 
-Peak2noise depends on the noise region. In quickLook it uses the same RH limits for noise as for computing
+Peak2noise depends on the noise region. In <code>quickLook</code> it uses the same RH limits for noise as for computing
 the periodogram. You can eaisly see that if you said you wanted all H values below 20 meters, the noise region
 is much much larger, which means the peak value dividied by the noise values will be much much bigger.
 
@@ -169,18 +175,7 @@ wish to reduce delTmax.
 See [Grauerort](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tggo.html) for an example of this problem. 
 
 
-## Dynamic SNR Data Arcs
-
-The Colorado SNR example shown earlier is for a fairly planar field where the RH for the rising and setting arc 
-should be very close to the same value. What does the SNR data look like for a more dynamic case? 
-Shown below is the SNR data for [Peterson Bay](https://gnss-reflections.org/static/images/PBAY.jpg), where 
-the rising arc (at low tide) has a very different
-frequency than during the setting arc (high tide). This gives you an idea of how the code can be 
-used to measure tides. 
-
-<img src="../_static/pbay-snr.png" width="600">
-
-Note: even though we analyze the data as a function of sine of elevation angle, each satellite arc
+Even though we analyze the data as a function of sine of elevation angle, each satellite arc
 is associated with a specific time period. The code keeps track of that and reports it in the final answers.
 Each track is associated with an azimuth. In the initial versions of the code this was the average azimuth
 for all the data in your track.  From version 1.4.5 and on, it is the azimuth of the lowest elevation angle
@@ -270,6 +265,6 @@ mask and reflector height range. This is the main reason
 ## Nyquist
 
 Please see the [Roesler and Larson paper](https://link.springer.com/article/10.1007/s10291-018-0744-8) for a 
-discussion of Nyquist. I have ported the Matlab code 
-provided in that paper to [gnssrefl](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nyquist.html) 
+discussion of Nyquist. I have ported the Matlab code provided in that paper 
+to [gnssrefl](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nyquist_cl.html) 
 
