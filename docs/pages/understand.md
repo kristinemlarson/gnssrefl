@@ -77,7 +77,7 @@ and *setting* satellite arcs. These are shown in red.
 
 <img src="../_static/p041-snr.png" width="600">
 
-(For a more dynamic example, look at these SNR data from <a href="../_static/pbay-snr.png">Kachemak Bay</a>.)
+For a more dynamic example, look at these SNR data from [Kachemak Bay](../_static/pbay-snr.png)
 
 
 Once the direct signal is removed (and units changed), you will have a dataset as shown below.
@@ -95,18 +95,20 @@ which can be related to reflector heights, and ultimately defines environmental 
 
 There are three big issues :
 
-1. You need to make sure that dominant frequency is meaningful (Quality Control).  
+1. You need to make sure that dominant frequency is meaningful (**Quality Control**).  
 
 2. You need to make sure that the reflected signals are actually coming 
-from where you want them (Reflection Zones)
+from where you want them (**Reflection Zones**)
 
 3. Your receiver must be collecting data at sufficient rate so that your GNSS-IR results 
-are not violating the Nyquist frequency (Nyquist).
+are not violating the Nyquist frequency (**Nyquist**).
 
-We will talk about these issues in turn.
 
 
 ## Quality Control 
+
+It is easy to compute a periodogram and pick the maximum value so as to find the reflector height. It is 
+more difficult to determine whether it is one you should trust.
 
 * is the peak larger than a user-defined value  (amplitude of the dominant peak in your periodogram)
 
