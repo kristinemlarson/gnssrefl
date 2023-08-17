@@ -43,7 +43,7 @@ Looking at the QC metrics plots created by <code>quickLook</code>, do you have s
 Now make SNR files for gls1 for the all of 2012. Use the <code>-weekly True</code> setting to save time.
 
 We will next analyze a year of L1 GPS reflection data from gls1. We will use the default minimum and maximum 
-reflector height values (0.5 and 6 meters). But for the reasons previously stated, you will want to 
+reflector height values. But for the reasons previously stated, you will want to 
 set a minimum elevation angle of 7 degrees. We also specify that we only want to use the L1 data.
 Use the utility <code>gnssir_input</code> to set and store the analysis settings.  (Hint: we recommend the argument `-azlist2 40 330`.)
     
@@ -52,7 +52,7 @@ Note that it is normal to see 'Could not read the first SNR file:' because we on
 
 Now you can use the <code>daily_avg</code> tool to compute a daily average reflector height for gls1. 
 Try setting the median filter to 0.25 meters and individual tracks to 30. These numbers are used 
-by <code>daily_avg</code> to set QC in order to recover a trustworthy daily average [(there is more information here on these parameters)](https://gnssrefl.readthedocs.io/en/latest/pages/README_snowdepth.html). A plain txt file 
+by <code>daily_avg</code> to set QC in order to recover a trustworthy daily average [(there is more information here on these parameters)](https://gnssrefl.readthedocs.io/en/latest/pages/README_dailyavg.html). A plain txt file 
 with the RH outputs are created as well as several plots. 
 The data in the main RH plot show you long-term accumulation as well as relatively small snow 
 accumulation events. The overall plot is dominated by the large melt event in the summer of 2012.
