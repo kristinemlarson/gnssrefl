@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.5.5
+
+2023 August 18
+
+fixed bug in gnssir_input when ediff is set.  it was incorrectly thinking it was a 
+string, when it is a float.
+
 ## 1.5.4.
 
 Added dittmann edits to "homeworks"

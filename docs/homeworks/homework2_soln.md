@@ -19,10 +19,6 @@ This makes two plots.
 
 *Looking at the QC metrics plots created by <code>quickLook</code>, do you have some ideas on how to change the azimuth mask angles?*
 
-I've outlined in red the areas that consistently produce unsuccessful 
-retrievals.  Even though it seesm the software is reliably removing them, we can remove 
-them in the analysis strategy file. Note that the default 
-peak2noise is 3 in <code>quickLook</code>. This is a bit higher than the gnssir default.
 
 *Now make SNR files for gls1 for the all of 2012.*
 

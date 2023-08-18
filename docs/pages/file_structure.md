@@ -72,13 +72,13 @@ NMEA files may be gzipped.
 
 Additional information about nmea2snr [is in the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 
-**Orbit files**
+**ORBITS**
 
 We have tried our best to make the orbit files relatively invisible to users.
 But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
 or precise orbits in the sp3 format.   
 
-**Executables**
+**EXECUTABLES**
 
 There are two key executables: CRX2RNX and gfzrnx. For notebook and docker users, these 
 are installed for you.  pypi/github users must install them. The utility <code>installexe</code>
