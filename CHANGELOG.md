@@ -3,12 +3,20 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.5.7
+
+2023 August 19
+
+Try try again
+
 ## 1.5.6
 
 2023 August 19
 
 Subdaily outputs are written to the extension subdirectory. This allows the user
 to test out different strategies without worrying about renaming them, etc.
+
+This build failed based on some advice on how to push the tags at the same time.
 
 ## 1.5.5
 
