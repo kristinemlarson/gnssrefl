@@ -72,10 +72,10 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
     if 'ellist' in lsp.keys():
         ellist = lsp['ellist']
-        print('Augmented elevation angle list', ellist)
+        print('Using an augmented elevation angle list', ellist)
     else:
         ellist = [];
-        print('no augmented elevation angle list')
+        #print('no augmented elevation angle list')
 
 
     # this is also checked in the command line - but for people calling the code ...
@@ -125,7 +125,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
     p,T,irefr = set_refraction_params(station, dmjd, lsp)
-    print('Refraction parameters ',p,T,irefr)
+    #print('Refraction parameters ',p,T,irefr)
 
 # only doing one day at a time for now - but have started defining the needed inputs for using it
     twoDays = False
@@ -878,7 +878,7 @@ def rewrite_azel(azval2):
 
     # if nothing changes
     azelout = azval2
-    print('Requested azimuths: ', azval2)
+    #print('Requested azimuths: ', azval2)
 
     # check for negative beginning azimuths
     N2 = len(azval2) ; a1 = int(azval2[0]); a2 = int(azval2[1])

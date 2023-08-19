@@ -33,7 +33,7 @@ def the_kelly_simple_way(url,filename):
     token_path = './'
     device_flow = DeviceCodeFlowSimple(Path(token_path))
 
-    print('Seeking permission from Earthscope to use their archive')
+    #print('Seeking permission from Earthscope to use their archive')
     try:
     # get access token from local path
         pat = 'path1'

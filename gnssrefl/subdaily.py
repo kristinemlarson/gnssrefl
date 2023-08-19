@@ -78,6 +78,8 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
         first time (day of year) real RH measurement
     endT : float
         last time (day of year) for first real RH measurement
+    extension : str
+        name of testing strategy (used in gnssir)
 
     """
     fig=plt.figure(figsize=(10,4))
@@ -1510,6 +1512,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     plt.title('Station: ' + station + ', new spline, RHdot corr/InterFreq corr/outliers removed')
     plt.xlabel('days of the year')
     # put hires_figs boolean here
+    print(txtdir)
     if hires_figs:
         g.save_plot(txtdir + '/' + station + '_rhdot4.eps')
     else:

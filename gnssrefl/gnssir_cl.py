@@ -173,7 +173,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     lsp = guts.read_json_file(station, extension)
     # now check the overrides to the json instructions
-    print(lsp)
 
     if newarcs:
         if 'azval2' not in lsp:
@@ -312,10 +311,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         for doy in doy_list:
             args['doy'] = doy
             if newarcs:
-                print('Using the New Way of Selecting Arcs')
+                #print('Using the New Way of Selecting Arcs')
                 guts2.gnssir_guts_v2(**args)
             else:
-                print('Using the Old Way of Selecting Arcs')
+                print('Using the Old Way of Selecting Arcs. You should upgrade ')
+                print('your code as you will not be able to use this option indefinitely.')
                 guts.gnssir_guts(**args)
 
 
