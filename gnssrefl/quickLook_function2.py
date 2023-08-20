@@ -15,7 +15,7 @@ import gnssrefl.gnssir_v2 as gnssir_v2
 
 
 def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,
-        pltscreen,azim1,azim2,ediff, delTmax,**kwargs):
+        pltscreen,azim1,azim2,ediff, delTmax,hires_figs,**kwargs):
     """
     This is the main function to compute spectral characteristics of a SNR file.
     It takes in all user inputs and calculates reflector heights. It makes two png files to summarize
@@ -65,6 +65,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
          QC parameter - restricts length of arcs (degrees)
     delTmax : float
          maximum arc length in minutes
+    hires_figs: bool
+         whether to use eps instead of png
 
     """
     if f not in [1, 2, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302,306]:
@@ -272,18 +274,22 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         tt = 'GNSS-IR: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy) + ' elev: ' + str(e1) + '-' +  str(e2)
         fig.suptitle(tt, fontsize=FS)
         # if you have no results, no point plotting them!
-        filename = fdir + '/quickLook_lsp.png'
-        print('plot saved to ', filename)
+        if hires_figs:
+            filename = fdir + '/quickLook_lsp.eps'
+        else:
+            filename = fdir + '/quickLook_lsp.png'
+        print('Plot saved to ', filename)
+
         plt.savefig(filename)
         # now make second plot
-        goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2)
+        goodbad(quicklog,station,year,doy,minH,maxH,PkNoise,reqAmp,f,e1,e2,hires_figs)
 
         if pltscreen:
             plt.show()
 
     return data,datakey
 
-def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
+def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2,hires_figs):
     """
     makes a plot that shows "good" and "bad" refletor height retrievals as a 
     function of azimuth
@@ -312,6 +318,8 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
         minimum elevation angle (deg)
     e2 : float
         maximum elevation angle (deg)
+    hires_figs : bool
+        whether to use eps instead of png
 
     Returns
     -------
@@ -380,8 +388,12 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2):
 
     # existence of the output directory is checked earlier
     fdir = os.environ['REFL_CODE'] + '/Files/' + station 
-    f = fdir + '/quickLook_summary.png'
-    print('plot saved to ', f)
+    if hires_figs:
+        f = fdir + '/quickLook_summary.eps'
+    else:
+        f = fdir + '/quickLook_summary.png'
+
+    print('Plot saved to ', f)
     plt.savefig(f)
 
 def colorful(a,px,pz,lw,fullcolor,ax):

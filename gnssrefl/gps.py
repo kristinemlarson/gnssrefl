@@ -6004,10 +6004,10 @@ def save_plot(plotname):
     Parameters
     ----------
     plotname : str
-        name of png file
+        name of output figure file
     """
     plt.savefig(plotname,dpi=300)
-    print('png file saved as: ', plotname)
+    print('Plot file saved as: ', plotname)
 
 
 def make_azim_choices(alist):

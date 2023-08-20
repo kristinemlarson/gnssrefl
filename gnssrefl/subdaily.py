@@ -850,9 +850,13 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     plt.gca().invert_yaxis()
     plt.legend(loc="best")
     plt.grid()
-    plotname = txtdir + '/' + station + '_outliers_wrt_az.png'
+    if hires_figs:
+        plotname = txtdir + '/' + station + '_outliers_wrt_az.eps'
+    else:
+        plotname = txtdir + '/' + station + '_outliers_wrt_az.png'
+
     plt.savefig(plotname,dpi=300)
-    print('png file saved as: ', plotname)
+    print('Plot file saved as: ', plotname)
 
     #    fig=plt.figure(figsize=(10,6))
     fig = plt.figure(figsize=(10,6))
@@ -887,15 +891,15 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     plt.xticks(rotation =45,fontsize=8); plt.yticks(fontsize=8)
     plt.title('Edited ' + station.upper() + ' Reflector Heights', fontsize=8)
     plt.grid() ; fig.autofmt_xdate()
-    plotname = txtdir + '/' + station + '_outliers.png'
     if hires_figs:
-        plotname = txtdir + '/' + station + '_outliers.png'
+        plotname = txtdir + '/' + station + '_outliers.eps'
         plt.savefig(plotname,dpi=300)
     else:
+        plotname = txtdir + '/' + station + '_outliers.png'
         plt.savefig(plotname,dpi=300)
 
     plt.ylim((savey1, savey2))
-    print('png file saved as: ', plotname)
+    print('Plot file saved as: ', plotname)
     if kplt:
         fig = plt.figure()
         ax1 = fig.add_subplot(211)
@@ -1001,7 +1005,7 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
     return tv,t,rh,firstdoy,lastdoy
 
 
-def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
+def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs):
     """
     make rhdot correction plots
 
@@ -1023,6 +1027,8 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
         station name
     txtdir : str
         file directory for output
+    hires_figs : bool
+        whether you want eps instead of png 
 
     """
     fig=plt.figure(figsize=(10,6))
@@ -1044,7 +1050,10 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir):
     plt.title('surface velocity')
     plt.ylabel('meters/hour'); plt.xlabel('days of the year')
     plt.xlim((A1,A2))
-    g.save_plot(txtdir + '/' + station + '_rhdot3.png')
+    if hires_figs:
+        g.save_plot(txtdir + '/' + station + '_rhdot3.eps')
+    else:
+        g.save_plot(txtdir + '/' + station + '_rhdot3.png')
 
 
 
@@ -1380,14 +1389,17 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     plt.legend(loc="upper left")
     plt.xlim((plot_begin, plot_end))
 
-    g.save_plot(txtdir + '/' + station + '_rhdot2.png')
+    if hires_figs:
+        g.save_plot(txtdir + '/' + station + '_rhdot2.eps')
+    else:
+        g.save_plot(txtdir + '/' + station + '_rhdot2.png')
 
 
     # update the residual vector as well
     residual_after = residual_after[ii]
 
     # make the RHdot plot as well
-    rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir)
+    rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs)
 
     writecsv = False ; extraline = ''
     # write out the new solutions with RHdot and without 3 sigma outliers
@@ -1532,7 +1544,11 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     plt.legend(loc="upper left")
 
     print('RMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3)  )
-    g.save_plot(txtdir + '/' + station + '_rhdot5.png')
+    if hires_figs:
+        g.save_plot(txtdir + '/' + station + '_rhdot5.eps')
+    else:
+        g.save_plot(txtdir + '/' + station + '_rhdot5.png')
+
     plt.close() # dont send this one to the screen
 
     # bias corrected - and again without 3 sigma outliers
@@ -1783,5 +1799,5 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs):
         plt.savefig(plotname,dpi=300)
     else:
         plt.savefig(plotname,dpi=300)
-    print('png file saved as: ', plotname)
+    print('Plot file saved as: ', plotname)
 

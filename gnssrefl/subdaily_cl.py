@@ -40,7 +40,7 @@ def parse_arguments():
     parser.add_argument("-delta_out", default=None, type=int, help="Output interval for spline fit, seconds (default is 1800)")
     parser.add_argument("-if_corr", default=None, type=str, help="Interfrequency correction applied, optional")
     parser.add_argument("-knots_test", default=None, type=int, help="test knots")
-    parser.add_argument("-hires_figs", default=None, type=str, help="hi-res figures")
+    parser.add_argument("-hires_figs", default=None, type=str, help="hi-resolution eps figures, default is False")
     parser.add_argument("-apply_rhdot", default=None, type=str, help="apply rhdot, default is True")
 
     args = parser.parse_args().__dict__
