@@ -72,7 +72,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
     if 'ellist' in lsp.keys():
         ellist = lsp['ellist']
-        print('Using an augmented elevation angle list', ellist)
+        if len(ellist) > 0:
+            print('Using an augmented elevation angle list', ellist)
     else:
         ellist = [];
         #print('no augmented elevation angle list')

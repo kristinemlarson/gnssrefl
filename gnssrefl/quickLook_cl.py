@@ -153,7 +153,11 @@ def quicklook(station: str, year: int, doy: int,
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
+    # checks for output
+    g.checkFiles(station, '')
+
     exitS = g.check_inputs(station, year, doy, snr)
+
 
     if exitS:
         sys.exit()

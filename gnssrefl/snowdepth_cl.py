@@ -121,6 +121,7 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
     bs = year - 1
 
     xdir = os.environ['REFL_CODE']
+    g.checkFiles(station,'')
     direc = xdir + '/Files/' + station  + '/' 
 
 #   read input file

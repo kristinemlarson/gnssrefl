@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.6.0
+
+Added height above sea level to query_unr
+
+Too many functions were assuming that REFL_CODE/Files existed.  
+Too many functions were assuming that REFL_CODE/Files/station existed.
+
+
 ## 1.5.9
 
 2023 August 21

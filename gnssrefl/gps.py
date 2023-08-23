@@ -823,7 +823,7 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
     """
     # assume file was not found
     foundit = False
-    print(secure_dir, secure_file)
+    #print(secure_dir, secure_file)
     # Z or gz expected ...
     if secure_file[-3:] == '.gz':
         gzip = True
@@ -6356,4 +6356,40 @@ def gbm_orbits_direct(year,month,day):
     #    print('Orbit found')
 
     return return_name, fdir, foundit
+
+
+def checkFiles(station, extension):
+    """
+    apparently no one consistently checks for the Files directory existence.
+    this is an attempt to fix that.
+
+    Parameters
+    ----------
+    station : str
+        4 ch station ID
+
+    extension : str
+        subdirectory for results in $REFL_CODE/Files/station
+
+    """
+    xdir = os.environ['REFL_CODE']
+    if not os.path.isdir(xdir):
+        print('REFL_CODE environment variable has not been set. Exiting')
+        sys.exit()
+
+    txtdir = xdir + '/Files/' 
+    if not os.path.exists(txtdir) :
+        subprocess.call(['mkdir', txtdir])
+        print(txtdir , ' has been created.')
+    txtdir = xdir + '/Files/'  + station
+    if not os.path.exists(txtdir) :
+        subprocess.call(['mkdir', txtdir])
+        print(txtdir , ' has been created.')
+
+    if (len(extension) > 0):
+        txtdir = xdir + '/Files/'  + station + '/' + extension
+        if not os.path.exists(txtdir) :
+            subprocess.call(['mkdir', txtdir])
+            print(txtdir , ' has been created')
+
 

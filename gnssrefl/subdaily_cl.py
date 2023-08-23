@@ -189,13 +189,16 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     # this makes sure the directory exists
     g.set_subdir(subdir)
 
+    g.checkFiles(station, extension)
+
+    # this should no longer be needed
     if extension == '':
         txtdir = xdir + '/Files/' + subdir
     else:
         txtdir = xdir + '/Files/' + subdir + '/' + extension
-        if not os.path.exists(txtdir) :
-            subprocess.call(['mkdir', txtdir])
+
     print('Using this directory for output: ', txtdir)
+
 
     #create the subdaily file
     writecsv = False
