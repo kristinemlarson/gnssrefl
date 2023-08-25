@@ -274,7 +274,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                             else:
                                 rj +=1
                                 if screenstats:
-                                    print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
+                                    print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f}'.format( iAzim,satNu,UTCtime,maxF))
                                     g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose)
                                 if plot_screen:
                                     failed = True
@@ -445,13 +445,13 @@ def read_json_file(station, extension):
 
     if useextension and os.path.isfile(instructions_ext):
         usefile = instructions_ext
-        #print('using specific instructions for this extension')
+        print('Using these instructions ', usefile)
         with open(instructions_ext) as f:
             lsp = json.load(f)
     else:
-        #print('will use the default instruction file')
         usefile = instructions
         if os.path.isfile(instructions):
+            print('Using these instructions ', usefile)
             with open(instructions) as f:
                 lsp = json.load(f)
         else:

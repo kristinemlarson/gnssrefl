@@ -294,6 +294,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                         # i do not think this was doing what we thought it was doing ....
                         #subprocess.call(['rm', '-f', new_file_name.replace('rnx', 'crx')])  # delete crx file
                         print('\n SUCCESS 2: ', new_file_name)
+                else:
+                    print('Unsuccessful RINEX 3 retrieval')
+
         else:  # RINEX VERSION 2
             # using new karnak code
             rinexfile, rinexfiled = g.rinex_name(station, year, d, 0)

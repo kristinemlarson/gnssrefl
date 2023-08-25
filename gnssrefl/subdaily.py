@@ -1246,7 +1246,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         print('using knots_test')
 
     print('\n>>>>>>>>>>>>>>>>>>>> Entering second section of subdaily code <<<<<<<<<<<<<<<<<<<<<<<<')
-    print('\nComputes rhdot correction and bias correction for subdaily')
+    print('\nComputes rhdot correction and interfrequency bias correction for subdaily')
     print('\nInput filename:', fname)
     print('\nOutput filename: ', fname_new)
 
@@ -1321,8 +1321,16 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     yvel = obsPerHour*np.diff(spl_y)
 
     rhdot_at_th = np.interp(th, tvel, yvel)
+    # RH dot correction
     correction = xfac*rhdot_at_th
-    correctedRH = h-correction
+
+    # 2023 august 25
+    if not apply_rhdot :
+        print('You requested RHdot correction NOT be applied.')
+        correctedRH = h
+    else:
+    # corrected reflector height
+        correctedRH = h-correction
 
     # this is RH with the RHdot correction
     residual_before = h - spl_at_GPS_times

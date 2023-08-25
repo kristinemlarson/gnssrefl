@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.6.2
+2023 August 25
+
+added option to NOT apply RHdot correction in subdaily.
+This would make the code easier to use for lakes and rivers.
+It is NOT recommended to use this for tidal regions.
+
+gnssir now requires "new" way of selecting arcs.  newarcs optional cl input has no meaning.
+
+added GPS Tool Box testcase instructions in docs/use_cases
+
 ## 1.6.1
+
+2023 August 25
 
 minor changes to documentation
 
