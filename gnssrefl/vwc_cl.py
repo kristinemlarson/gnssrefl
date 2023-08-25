@@ -33,10 +33,11 @@ def parse_arguments():
     parser.add_argument("-tmax", default=None, type=str, help="maximum soil texture")
     parser.add_argument("-warning_value", default=None, type=float, help="Phase RMS (deg) threshold for bad tracks, default is 5.5 ")
     parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False")
+    parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt','screenstats','snow_filter','circles','auto_removal']
+    boolean_args = ['plt','screenstats','snow_filter','circles','auto_removal','hires_figs']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
@@ -44,7 +45,8 @@ def parse_arguments():
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool = True, screenstats: bool = False, 
         min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, 
-        snow_filter: bool = False, circles: bool=False, subdir: str=None, tmin: str=None, tmax: str=None, warning_value : float=5.5, auto_removal : bool=False):
+        snow_filter: bool = False, circles: bool=False, subdir: str=None, tmin: str=None, tmax: str=None, 
+        warning_value : float=5.5, auto_removal : bool=False, hires_figs : bool=False):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
     It concatenates previously computed phase results, makes plots for the four geographic quadrants, computes daily 
@@ -102,6 +104,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
          default is 5.5 
     auto_removal : boolean, optional
          whether to automatically remove tracks that hit your bad track threshold
+         default value is false
+    hires_figs: boolean, optional
+         whether to make eps instead of png files
          default value is false
 
     Returns
@@ -380,9 +385,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         # make datetime date array
         datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
 
-        qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir)
+        qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs)
 
-        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir)
+        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir,hires_figs)
 
 
 def main():

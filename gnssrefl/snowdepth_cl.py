@@ -28,11 +28,12 @@ def parse_arguments():
     parser.add_argument("-ReqTracks", help="how many arcs needed for daily average)", type=int, default=None)
     parser.add_argument("-fr", help="if you want to restrict to a single frequency", type=int, default=None)
     parser.add_argument("-barereq_days", help="how many bare soil values req (default is 15)", type=int, default=None)
+    parser.add_argument("-hires_figs", help="if you want eps instead of png plots", type=str, default=None)
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['longer','plt','simple']
+    boolean_args = ['longer','plt','simple','hires_figs']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -42,7 +43,7 @@ def parse_arguments():
 def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None, 
         plt_enddate:str=None,simple:bool=False, medfilter:float = None, ReqTracks: int = None, 
-        barereq_days: int = 15, fr: int = None):
+        barereq_days: int = 15, fr: int = None, hires_figs : bool = False):
     """
     Calculates snow depth for a given station and water year.
     Before you run this code you must have run gnssir for each day of interest.  
@@ -102,6 +103,8 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         how many bare soil days are required to trust the result, default is 15
     fr : int, optional
         if you want to restrict to a single frequency at the daily-avg stage (1, 20, etc)
+    hires_figs :  bool, optional
+        whether you want eps instead of png plots
 
     """
     if (medfilter is not None) and (ReqTracks is not None):
@@ -132,7 +135,10 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
 
 #   define output files
     outputfile = direc + 'SnowAvg_' + str(year) +'.txt'
-    outputpng = direc + 'water_' + str(year) +'AV.png'
+    if hires_figs : 
+        outputpng = direc + 'water_' + str(year) +'AV.eps'
+    else:
+        outputpng = direc + 'water_' + str(year) +'AV.png'
     print('Input file',gpsfile)
     print('Output file: ',outputfile)
     print('Output png: ',outputpng)
