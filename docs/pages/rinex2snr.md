@@ -16,7 +16,7 @@ For the latter step, we need an **orbit** file. The code will pick that up for y
 files, which we discuss separately:
 
 
-## RINEX 2.11
+**RINEX 2.11**
 
 The four character lowercase station name, year, and day of year must be specified.
 
@@ -53,7 +53,7 @@ Example for multi-day translation
 
 <code>rinex2snr tgho 2019 1  -archive nz -doy_end 365</code>
  
-## RINEX 3
+**RINEX 3**
 
 RINEX 3 files have 9 character station names:
 
@@ -71,7 +71,7 @@ Other examples:
 <code>rinex2snr mchl00aus 2022 55 -archive ga</code>
 
 
-## Frequently asked questions
+**Frequently asked questions**
 
 What is the difference between -rate and -srate? The rate input is a string that tells the 
 code which folder you want to use at the archive, as the data are almost always segregated in some way.

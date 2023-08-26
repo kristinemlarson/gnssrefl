@@ -19,8 +19,7 @@ called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modu
 
 * [**rinex2snr**](rinex2snr.md) translates RINEX files into SNR files needed for analysis.
 
-
-* [**quickLook**](quickLook.md) gives you a quick (visual) assessment of aSNR  file without dealing
+* [**quickLook**](quickLook.md) gives you a quick (visual) assessment of SNR file without dealing
 with the details associated with **gnssir**. It is not meant to be used for routine analysis.
 It also helps you pick an appropriate azimuth mask and quality control settings.
 
@@ -103,18 +102,33 @@ from where you want them (**Reflection Zones**)
 3. Your receiver must be collecting data at sufficient rate so that your GNSS-IR results 
 are not violating the Nyquist frequency (**Nyquist**).
 
-
-
 ## Quality Control 
+
+This code uses a Lomb Scargle periodogram. This type of periodogram allows the input 
+data to be sampled at uneven periods. The primary inputs are 
+
+* how precise (in reflector height units) do you want the periodogram calculated at?
+
+* how far (in reflector height units) do you want the periodogram calculated for?
+
+In other words, how densely sampled on the x-axis will your periodogram be and how 
+far along the x-axis will it be?  The first parameter should not set to something that 
+makes no sense (i.e. so small the code takes forever to run). In this code the second
+parameter is the max reflector height (h2). The minimum reflector height is always zero, and then
+the values lower than the minimum reflector height (h1) are thrown out.
+
 
 It is easy to compute a periodogram and pick the maximum value so as to find the reflector height. It is 
 more difficult to determine whether it is one you should trust.
 
+
 * is the peak larger than a user-defined value  (amplitude of the dominant peak in your periodogram)
 
-* is the peak divided by a "noise" metric larger than a user-defined value. (peak2noise).
+* is the peak divided by a "noise" metric larger than a user-defined value. This noise metric is defined 
+over a user defined reflector height region. (peak2noise). 
 
-* is the data arc sufficiently "long"
+
+* is the data arc sufficiently "long" (ediff)
 
 The amplitude and peak2noise ratio are influenced by choices you make, i.e. the elevation angle limits 
 and the noise region used to compute peak2 noise.  And they are also 
@@ -269,4 +283,159 @@ mask and reflector height range. This is the main reason
 Please see the [Roesler and Larson paper](https://link.springer.com/article/10.1007/s10291-018-0744-8) for a 
 discussion of Nyquist. I have ported the Matlab code provided in that paper 
 to [gnssrefl](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nyquist_cl.html) 
+
+## quickLook
+
+<CODE>quickLook</code> is meant to provide the user with a visual sense of the data 
+at a given site.  It has stored defaults that work for stations with reflectors that are 
+lower than 8 meters. [You can change those defaults on the command line.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html) 
+
+**Example from Boulder**
+
+<code>quickLook p041 2020 132 </CODE>
+
+That command will produce this periodogram summary :
+
+<img src="../_static/p041-l1.png" width=600>
+
+By default, these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
+you have used the defaults. Furthermore, note that results on the x-axis begin at 0.5 meters.
+Since you are not able to resolve very small reflector heights with this method, this region 
+is not allowed. These periodograms give you a sense of whether there is a planar reflector below your antenna. The fact that the 
+peaks in the periodograms bunch up around 2 meters means that at 
+this site the antenna phase center is ~ 2 meters above the ground. The colors change as you try 
+different satellites.  If the data are plotted in gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
+
+<CODE>quickLook</code> also provides a summary of various quality control metrics:
+
+<img src="../_static/p041_l1_qc.png" width=600>
+
+The top plot shows the sucessful RH retrievals in blue and unsuccessful RH retrievals in gray. 
+In the center panel are the peak to noise ratios. The last plot is the amplitude of the spectral peak. The dashed
+lines show you what QC metrics quickLook was using. You can control/change these on the command line.
+
+If you want to look at L2C data you just change the frequency on the command line. L2C is designated by 
+frequency 20: 
+
+<CODE>quickLook p041 2020 132 -fr 20</CODE>
+
+<img src="../_static/p041-l2c.png" width=600>
+
+**L2C results are always superior to L1 results. They are also superior to L2P data.** If you have 
+any influence over a GNSS site, please ask the station operators to 
+track modern GPS signals such as L2C and L5 **and** to include it in the archived RINEX file.
+
+**Example for Lake Superior**
+
+<code>quickLook ross 2020 170 -e1 5 -e2 15</code>
+
+<img src=../_static/ross-qc.png width=600>
+
+The good RH estimates (in blue in the top panel) are telling us that we were right when we assessed 
+reflection zones using 4 meters. We can also see that the best retrievals are in the southeast quadrant (azimuths 90-180 degrees).
+This is further emphasized in the next panel, that shows the actual periodograms.
+
+<img src=../_static/ross-lsp.png width=600>
+
+[Example for a site on an ice sheet](../use_cases/use_gls1.md)
+
+[Example for a tall site](../use_cases/use_smm3.md)
+
+
+Warning: <code>quickLook</code> calculates the minimum observed elevation 
+angle in your file and prints that to the screen so you know 
+what it is. It also uses that as your emin
+value (e1) if the default is smaller. It does this so you don't see all arcs as rejected.
+Let's say your file had a receiver-imposed elevation cutoff 
+of 10 degrrees. The default minimum elevation angle in <code>quickLook</code> is 5 degrees. 
+With the default **ediff** value of 2, not a single arc would reach the minimum 
+required value of 7 (5 + 2); everything 
+would be rejected. <code>quickLook</code> instead sees that
+you have a receiver-imposed minimum of 10 and would substitute that for the default emin. 
+<code>gnssir</code> does not do this because at that point you 
+are supposed to have chosen a strategy, which is stored in the json file.
+
+<code>quickLook -screenstats True</code> provides more information to the screen 
+about why arcs have been rejected.
+
+## gnssir
+
+
+**gnssir_input**
+
+[A full listing of the possible inputs and examples for gnssir_input can be found here.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
+
+Your first task is to define your analysis strategy. We use station p101 as an example.
+If the station location is in our database:
+
+<CODE>gnssir_input p101</CODE>
+
+If you have your own site, you should use -lat, -lon, -height as inputs.  
+If you happen to have the Cartesian coordinates (in meters), you can 
+set <code>-xyz True</code> and input those instead.
+
+
+The json file of instructions will be stored in $REFL_CODE/input/p101.json. 
+
+The default azimuth inputs are from 0 to 360 degrees.
+You can set your preferred azimuth regions using -azlist2. Previously you were required to use multiple
+azimuth regions, none of which could be larger than 100 degrees. That is no longer required. However, if 
+you do need multiple distinct regions, that is allowed, e.g.
+
+<CODE>gnssir_input p101  -azlist2 0 90 180 270</CODE>
+
+If you wanted all southern quadrants, since these are contiguous, you just need to give the starting and ending 
+azimuth.
+
+<CODE>gnssir_input p101  -azlist2 90 270</CODE>
+
+You should also set the prefrred reflector height region (h1 and h2) and elevation angle mask (e1 and e2).
+Note: the reflector height region should not be too small, as it is also used to set the region for your periodogram.
+If you use tiny RH constraints, your periodogram will not make any sense and your work will fail the quality control metrics.
+
+
+**gnssir**
+
+<code>gnssir</code> estimates reflector heights. It assumes you have made SNR files and 
+defined an analysis strategy.
+The minimum inputs are the station name, year, and doy. 
+ 
+<CODE>gnssir p041 2020 150 </CODE> 
+
+
+[Additional inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html)
+
+Where would the code store the files for this example?
+
+- analysis instructions are stored in $REFL_CODE/input/p041.json
+- SNR files are stored in $REFL_CODE/2020/snr/p041
+- Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041/150.txt
+
+For more information about the decisions made in <code>gnssir</code>, set **-screenstats T**
+
+To have plots come to the screen, set -plt to T or True. 
+
+If you want to try different strategies, make multiple json files with 
+the -extension input. Then use the same -extension command in <code>gnssir</code>.
+
+This is a snippet of what the result file would look like
+
+<img src="../_static/results-snippet.png" width="600">
+
+Note that the names of the columns (and units) are provided
+(this may be out of date):
+
+- *Amp* is the amplitude of the most significant peak in the periodogram (i.e. the amplitude for the RH you estimated).  
+- *DelT* is how long a given rising or setting satellite arc was, in minutes. 
+- *emin0* and *emax0* are the min and max observed elevation angles in the arc.
+- *rise/set* tells you whether the satellite arc was rising (1) or setting (-1)
+- *Azim* is the average azimuth angle of the satellite arc
+- *sat* and *freq* are as defined in this document
+- MJD is modified julian date
+- PkNoise is the peak to noise ratio of the periodogram values
+- last column is currently set to tell you whether the refraction correction has been applied 
+- EdotF is used in the RHdot correction needed for dynamic sea level sites. The units are hours/rad.
+When multiplied by RHdot (meters/hour), you will get a correction in units of meters. For further
+information, see the <code>subdaily</code> code.
+- ediff QC metric
 
