@@ -70,6 +70,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
+    # make sure REFL_CODE/Files/station directory exists ... 
+    g.checkFiles(station, '')
+
     if 'ellist' in lsp.keys():
         ellist = lsp['ellist']
         if len(ellist) > 0:
@@ -294,6 +297,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                 ax1.set_title(station + ' Raw Data/Periodogram for ' + g.ftitle(f) + ' Frequency')
                 ax2.set_xlabel('Reflector Height (m)');
                 ax2.set_ylabel('volts/volts') ; ax1.set_ylabel('volts/volts')
+                plotname = xdir + '/Files/' + station + '/gnssir_freq' + str(f) + '.png'
+                g.save_plot(plotname)
                 plt.show()
                 #plot2screen(station, f, ax1, ax2,lsp['pltname']) 
             else:

@@ -57,6 +57,10 @@ def main():
     sp3 : str, optional
         set to False or F to use low quality NMEA values for az and el angles.
         this is changed to a boolean in the nmea2snr command line tool.
+    risky : str, optional
+        T or True if you want to use the NMEA az-el values instead of sp3 values. 
+        NMEA-based az-el values cannot be trusted, and thus the code is asking you to 
+        confirm that you know you are doing something that is risky.
     compress: str
         add compression to the snrfiles. Start with just '.gz' compression, can extend. 
 
