@@ -2,7 +2,7 @@
 from __future__ import division
 import json
 import numpy as np 
-import os, datetime, traceback
+import os, datetime, traceback, gzip
 import subprocess
 import sys
 from scipy.interpolate import interp1d
@@ -12,7 +12,7 @@ import gnssrefl.decipher_argt as gt
 
 #Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
 
-def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
+def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
     """
     Reads and translates the NMEA file stored in locdir + fname
 
@@ -48,6 +48,8 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
     sp3 : bool
         whether you use multi-GNSS sp3 file to do azimuth elevation angle calculations
         currently this only uses the GFZ rapid orbit.  
+    compress: str
+        add compression to the snrfiles. Start with just '.gz' compression, can extend. 
         
     """
     
@@ -55,7 +57,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
     missing = True
     station = fname.lower() ; station = station[0:4]
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
-
+    
     foundcoords = False
     if (llh[0] != 0):
         # compute Cartesian receiver coordinates in meters
@@ -115,7 +117,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
 
     if os.path.exists(locdir + fname + '.gz') and missing:
         subprocess.call(['cp', '-f',locdir + fname + '.gz' ,'.'])
-        subprocess.call(['gunzip', fname + '.gz'])
+        subprocess.call(['gunzip', '-f', fname + '.gz'])
         t, prn, az, elv, snr, freq = read_nmea(fname)#read nmea files
         subprocess.call(['rm',fname])
         missing = False
@@ -184,9 +186,9 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
         fout.close()
         # make the snrfile
         gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
+        print('Az/El Updated...')
         return
-
-
+    
     inx = np.argsort(T)  #Sort data by time
     
     T = np.array(T);PRN = np.array(PRN);ELV = np.array(ELV);SNR = np.array(SNR);AZ = np.array(AZ); FREQ=np.array(FREQ)
@@ -272,7 +274,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr,dec,year,doy,llh,sp3):
                 if ( (int(T[i]) % idec) == 0):
                     fout.write(outline + snrline + '\n')
                 #fout.write("%3g %10.4f %10.4f %10g %4s %4s %7.2f %4s %4s\n" % (p, float(ELV[i]), float(AZ[i]), float(T[i]),'0', '0', float(SNR[i]),'0', '0')) 
-    
+        
 def read_nmea(fname):
     """
     read GPGGA sentence (includes snr data) in NMEA files    
@@ -671,7 +673,7 @@ def elev_limits(snroption):
 
     return emin, emax
   
-def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,sp3):
+def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, compress):
     """
     runs the nmea2snr conversion code
 
@@ -704,6 +706,8 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,sp3):
         lat and lon (deg) and ellipsoidal ht (m)
     sp3 : bool
         whether you want to use GFZ rapid sp3 file for the orbits
+    compress: str
+        add compression to the snrfiles. Start with just '.gz' compression, can extend. 
 
     """
     # loop over years and day of years
@@ -732,8 +736,12 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,sp3):
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
                     #print('Creating '+snrfile)
-                    NMEA2SNR(locdir, r, snrfile, csnr,dec,yr,dy,llh,sp3)
+                    NMEA2SNR(locdir, r, snrfile, csnr, dec, yr, dy, llh, sp3, compress)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
+                    if compress == '.gz':
+                        if not snrfile.endswith('.gz'):
+                            subprocess.call(['gzip', snrfile])
+                            print('SNR Compressed')
                 else:
                     print('NMEA file '+ locdir + r +' does not exist')

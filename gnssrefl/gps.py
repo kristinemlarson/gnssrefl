@@ -207,6 +207,7 @@ def define_and_xz_snr(station,year,doy,snr):
         else:
             if os.path.isfile(fname3):
                 subprocess.call(['gunzip', fname3])
+                fname2 = fname3 #Switch file names for .xz to .gz, for returning proper name below
         # make sure the uncompression worked
         if os.path.isfile(fname):
             snre = True
@@ -3848,8 +3849,9 @@ def snr_exist(station,year,doy,snrEnd):
         snre = True # but needs to be uncompressed
         subprocess.call(['unxz', fname2])
     if os.path.isfile(fname3) and (not snre):
-            snre = True # but needs to be ungzipped 
-            subprocess.call(['gunzip', fname3])
+        snre = True # but needs to be ungzipped 
+        #subprocess.call(['gunzip', fname3])
+        #TS - Removed this line Aug 2023 to stop unecessary decompression in nmea2snr
 
     return snre 
 
