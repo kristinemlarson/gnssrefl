@@ -45,7 +45,7 @@ def parse_arguments():
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-samplerate", default=None, help="sample rate in sec (RINEX 3 only)", type=int)
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
-    parser.add_argument("-mk", default=None, help="use T for uppercase station names or when your local RINEX data is stored in hatanaka format", type=str)
+    parser.add_argument("-mk", default=None, help="use T for uppercase station names or when your local RINEX data is stored in Hatanaka format", type=str)
     parser.add_argument("-weekly", default=None, help="use T for weekly data translation", type=str)
     parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
@@ -73,6 +73,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     the nav message, i.e. GPS only, you can request it.
 
     bkg no longer a boolean input - must be specified with archive name, i.e. bkg-igs or bkg-euref
+
+    For the nolook option (i.e. you have the RINEX 2.11 file), the file should be normal RINEX (ends in o) or 
+    gzipped normal RINEX.  If you have something other than that, you can try the -mk option.  
+    For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endiings.
 
     Examples
     --------
@@ -239,7 +243,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         sample rate for RINEX 3 only. Default is 30.
 
     mk : bool, optional
-        The Makan option. Use True for uppercase station names. Default is False.
+        Default is False.
+        Use True for uppercase station names and for the non-standard file structure preferred 
+        by some users. Look at the function the_makan_option in rinex2snr.py for more information.  
+        The general requirement is that your RINEX 2.11 file should be normal RINEX or 
+        gzipped normal RINEX. This flag allows access to Hatanaka/compressed files 
+        stored locally and in $REFL_CODE/YYYY/snr/ssss where YYYY is the year and 
+        ssss is station name
 
     weekly : bool, optional
         Takes 1 out of every 7 days in the doy-doy_end range (one file per week) - used to save cpu time.
