@@ -1129,17 +1129,21 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
     #so_many_permutations(r,rd,locdir, crnxpath)
 
     if os.path.exists(r):
+        #print('type 1')
         missing = False
 
     if os.path.exists(r + '.gz') and missing:
+        #print('type 2')
         subprocess.call(['gunzip', r + '.gz'])
         missing = False
 
     if os.path.exists(r + '.Z') and missing:
+        #print('type 3')
         subprocess.call(['uncompress', r + '.Z'])
         missing = False
 
     if os.path.exists(rd) and missing:
+        #print('type 4')
         if os.path.exists(crnxpath):
             subprocess.call([crnxpath,rd])
             subprocess.call(['rm',rd])
@@ -1148,6 +1152,7 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
             g.hatanaka_warning(); return
 
     if os.path.exists(rd + '.gz') and missing:
+        #print('type 5')
         subprocess.call(['gunzip', rd + '.gz'])
         if os.path.exists(crnxpath):
             subprocess.call([crnxpath,rd])
@@ -1157,6 +1162,7 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
             g.hatanaka_warning();
 
     if os.path.exists(rd + '.Z') and missing:
+        #print('type 6')
         subprocess.call(['uncompress', rd + '.Z'])
         if os.path.exists(crnxpath):
             subprocess.call([crnxpath,rd])
@@ -1166,10 +1172,12 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
             g.hatanaka_warning()
 
     if os.path.exists(locdir + r) and missing:
+        #print('type 7')
         subprocess.call(['cp', '-f',locdir + r,'.'])
         missing = False
 
     if os.path.exists(locdir + r + '.gz') and missing:
+        #print('type 8')
         subprocess.call(['cp', '-f',locdir + r + '.gz' ,'.'])
         subprocess.call(['gunzip', r + '.gz'])
         missing = False
@@ -1189,6 +1197,7 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
             g.hatanaka_warning();
 
     if os.path.exists(locdir + rd + '.Z') and missing:
+        print('here?')
         subprocess.call(['cp','-f',locdir + rd + '.Z','.'])
         subprocess.call(['uncompress', rd + '.Z'])
         if os.path.exists(crnxpath):

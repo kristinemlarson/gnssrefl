@@ -573,6 +573,8 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
         #nazm = azm[sind:eind]
         minObse = min(nelv)
         maxObse = max(nelv)
+        minA = min(nazm)
+        maxA = max(nazm)
 
         nogood = False
         verysmall = False
@@ -597,9 +599,9 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
                 if ediff_violation:
                     add = ' violates ediff'
                 if not verysmall:
-                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), add)
+                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), minA,maxA,add)
             else:
-                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2))
+                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2),minA,maxA)
 
         if not nogood :
             iarc = iarc + 1
@@ -996,6 +998,9 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
         maxObse = max(nelv)
         #print('min/max obs e ', minObse, maxObse)
         # how to get the azimuth?
+        minA = min(nazm)
+        maxA = max(nazm)
+
 
         nogood = False
         verysmall = False
@@ -1020,9 +1025,9 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
                 if ediff_violation:
                     add = ' violates ediff'
                 if not verysmall:
-                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), add)
+                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), minA,maxA,add)
             else:
-                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2))
+                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2),minA,maxA)
 
         if not nogood :
             iarc = iarc + 1
