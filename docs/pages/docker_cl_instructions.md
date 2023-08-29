@@ -17,7 +17,7 @@ More information on [getting started, testing your installation, and developing.
 
 ## Run gnssrefl Docker
 
-Reminder: If you want to process EarthScope data, you will need to create [an EarthScope profile.](https://data.unavco.org/user/profile/info)
+Reminder: If you want to process EarthScope data, you will need to create [an EarthScope profile.](https://data.unavco.org/user/profile/info).
 
 change directory into the local directory that you wish to keep your processed results
 
@@ -33,7 +33,13 @@ Description of the commands used:
 
 Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
 
+### Update Docker Image to newest version <a name="Update Docker"></a>
+
+`docker pull ghcr.io/kristinemlarson/gnssrefl:latest`
+
 ### Notes:
+The first time you run this container from a specific path, the Earthscope token will be installed once in the container at `` and locally at `/localpath_of_dockerrun/refl_zones` (the volume you mounted with the `-v` command)
+
 docker has vim for editing text files (ie .json station config file)
 
 When running the software in the docker, plots/files will **not** print to the screen (think quickLook or daily_average utilities), but will be stored on the local machine in the directory that the docker run command was issued.
@@ -59,10 +65,6 @@ To shut down the docker container run `docker stop gnssrefl`
 If you need to see the container(s) you have running you can use `docker ps`
 
 If you need to see all container(s) you can use `docker container ls -a`
-
-### Update Docker Image to newest version <a name="Update Docker"></a>
-
-`docker pull ghcr.io/kristinemlarson/gnssrefl:latest`
 
 
 ## For WINDOWS USERS:
