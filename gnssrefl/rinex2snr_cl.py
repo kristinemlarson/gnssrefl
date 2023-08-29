@@ -45,7 +45,7 @@ def parse_arguments():
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-samplerate", default=None, help="sample rate in sec (RINEX 3 only)", type=int)
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
-    parser.add_argument("-mk", default=None, help="use T for uppercase station names ", type=str)
+    parser.add_argument("-mk", default=None, help="use T for uppercase station names or when your local RINEX data is stored in hatanaka format", type=str)
     parser.add_argument("-weekly", default=None, help="use T for weekly data translation", type=str)
     parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
