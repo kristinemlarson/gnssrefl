@@ -5,28 +5,23 @@ es sso login
 
 es sso access --token > sso_token.json
 
-cp sso_token.json "../notebooks/learn-the-code"
-cp sso_token.json "../notebooks/use-cases/Ice_Sheets"
-cp sso_token.json "../notebooks/use-cases/Lakes_and_Rivers"
-cp sso_token.json "../notebooks/use-cases/Seasonal_Snow_Accumulation"
-cp sso_token.json "../notebooks/use-cases/Soil_Moisture"
-cp sso_token.json "../notebooks/use-cases/Tides"
+cp sso_token.json "../notebooks/"
 
-echo running learn-the-code notebooks pass/fail
-pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/learn-the-code"
+#echo running learn-the-code notebooks pass/fail
+#pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/learn-the-code"
 
-#echo testing ice sheet cases:
-#pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/use-cases/Ice_Sheets"
-#
-#echo testing lakes and river cases:
-#pytest --nbmake --nbmake-timeout=3000 -n=auto  "../notebooks/use-cases/Lakes_and_Rivers"
-#
-#echo testing snow accumulation cases:
-#pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/use-cases/Seasonal_Snow_Accumulation"
-#
-#echo testing soil moisture cases
-#pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/use-cases/Soil_Moisture"
-#
-#echo testing tides cases
-#pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/use-cases/Tides"
+echo testing ice sheet cases:
+pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/use-cases/Ice_Sheets"
+
+echo testing lakes and river cases:
+pytest --nbmake --nbmake-timeout=3000 -n=auto  "../notebooks/use-cases/Lakes_and_Rivers"
+
+echo testing snow accumulation cases:
+pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/use-cases/Seasonal_Snow_Accumulation"
+
+echo testing soil moisture cases
+pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/use-cases/Soil_Moisture"
+
+echo testing tides cases
+pytest --nbmake --nbmake-timeout=3000 -n=auto "../notebooks/use-cases/Tides"
 
