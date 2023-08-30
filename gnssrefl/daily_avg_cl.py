@@ -176,10 +176,10 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     if subdir is None:
         subdir = station
     g.set_subdir(subdir)
+
 # where the summary files will be written to
     xdir = os.environ['REFL_CODE']
     txtdir = xdir + '/Files/'  + subdir
-
 
     # set the name of the output format
     if csv:

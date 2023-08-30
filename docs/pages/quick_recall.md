@@ -5,12 +5,10 @@
 * [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html), 
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/rinex2snr.html)
 
-* [quickLook code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html),
-[discussion](https://gnssrefl.readthedocs.io/en/latest/pages/quickLook.html)
+* [quickLook code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
 
 * [gnssir code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html),
-[discussion](https://gnssrefl.readthedocs.io/en/latest/pages/gnssir.html), 
- [setting gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
+ [gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
 
 
 

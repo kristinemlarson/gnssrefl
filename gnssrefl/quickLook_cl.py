@@ -33,11 +33,12 @@ def parse_arguments():
     parser.add_argument("-ediff",  default=None, type=float, help="ediff Quality Control parameter (default 2 deg)")
     parser.add_argument("-delTmax",  default=None, type=float, help="maximum arc length, in minutes, (default is 75 )")
     parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
+    parser.add_argument("-hires_figs", default=None, type=str, help="Set to true to make eps instead of png.")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['screenstats','plt']
+    boolean_args = ['screenstats','plt','hires_figs']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -45,10 +46,9 @@ def parse_arguments():
 
 
 def quicklook(station: str, year: int, doy: int,
-              snr: int = 66, fr: int = 1, ampl: float = 7.,
-              e1: float = 5, e2: float = 25, h1: float = 0.5, h2: float = 8., sat: int = None,
-              peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
-              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, delTmax : float=75.0 ):
+              snr: int = 66, fr: int = 1, ampl: float = 7., e1: float = 5, e2: float = 25, h1: float = 0.5, 
+              h2: float = 8., sat: int = None, peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
+              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, delTmax : float=75.0, hires_figs : bool=False ):
     """
 
     quickLook assessment of SNR reflectometry data. It creates two plots: one with periodograms for
@@ -146,12 +146,18 @@ def quicklook(station: str, year: int, doy: int,
         maximum allowed arc length, in minutes
         default is 75 minutes.
 
+    hires_figs : bool, optional
+        eps instead of png files
     """
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
+    # checks for output
+    g.checkFiles(station, '')
+
     exitS = g.check_inputs(station, year, doy, snr)
+
 
     if exitS:
         sys.exit()
@@ -173,7 +179,8 @@ def quicklook(station: str, year: int, doy: int,
     pltscreen = plt
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'f': fr[0], 'reqAmp': ampl, 'e1': e1,
             'e2': e2, 'minH': h1, 'maxH': h2, 'PkNoise': peak2noise, 'satsel': sat, 'fortran': fortran, 'pele': pele,
-            'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2, 'ediff': ediff, 'delTmax': delTmax}
+            'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2, 'ediff': ediff, 
+            'delTmax': delTmax, 'hires_figs': hires_figs}
 
     deltaRH = h2-h1
     if (deltaRH <= 0):

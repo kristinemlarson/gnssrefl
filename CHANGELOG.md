@@ -3,6 +3,83 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.6.3
+2023 August 28
+
+Added Taylor Smith's changes to nmea2snr. Allows gzip before/after
+
+
+## 1.6.2
+2023 August 25
+
+added option to NOT apply RHdot correction in subdaily.
+This would make the code easier to use for lakes and rivers.
+It is NOT recommended to use this for tidal regions.
+
+gnssir now requires "new" way of selecting arcs.  newarcs optional cl input has no meaning.
+
+added GPS Tool Box testcase instructions in docs/use_cases
+
+## 1.6.1
+
+2023 August 25
+
+minor changes to documentation
+
+## 1.6.0
+
+Added height above sea level to query_unr
+
+Too many functions were assuming that REFL_CODE/Files existed.  
+Too many functions were assuming that REFL_CODE/Files/station existed.
+
+
+## 1.5.9
+
+2023 August 21
+
+testing why readthedocs versions 1.5.6 , 1.5.7, and 1.5.8 were not created
+(thought the latter was in latest)
+
+## 1.5.8
+
+2023 August 20
+
+allow highres_figs in other functions
+
+code now expects earthscope token to be stored in $REFL_CODE
+
+
+## 1.5.7
+
+2023 August 19
+
+Try try again
+
+## 1.5.6
+
+2023 August 19
+
+Subdaily outputs are written to the extension subdirectory. This allows the user
+to test out different strategies without worrying about renaming them, etc.
+
+This build failed based on some advice on how to push the tags at the same time.
+
+## 1.5.5
+
+2023 August 18
+
+fixed bug in gnssir_input when ediff is set.  it was incorrectly thinking it was a 
+string, when it is a float.
+
+## 1.5.4.
+
+Added dittmann edits to "homeworks"
+
+## 1.5.3
+
+Updated understanding
+
 ## 1.5.2
 August 14, 2023
 

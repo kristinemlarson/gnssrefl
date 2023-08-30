@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 import gnssrefl.gps as g
 import gnssrefl.refl_zones as rz
 
-def pickup_files_nyquist(station,recv,obsfile,constel,e1,e2,reqsamplerate):
+def pickup_files_nyquist(station,recv,obsfile,constel,e1,e2,reqsamplerate,hires_figs):
     """
 
     Parameters
@@ -27,6 +27,8 @@ def pickup_files_nyquist(station,recv,obsfile,constel,e1,e2,reqsamplerate):
         max elevation angle (deg)
     reqsamplerate : float
         sample rate of receiver
+    hires_figs : bool
+        whether you want eps instead of png 
 
     """
     # for rising and setting arcs
@@ -79,12 +81,10 @@ def pickup_files_nyquist(station,recv,obsfile,constel,e1,e2,reqsamplerate):
     nm = ['','GPS','GLONASS','GALILEO','BEIDOU']
     info = str(reqsamplerate) + ' sec sample rate/elev angles '  + str(e1) + '-' + str(e2) + ' ' + nm[constel]
 
-    pngfile = ny_plot(station,allN,info)
-
-    return pngfile
+    ny_plot(station,allN,info,hires_figs)
 
 
-def ny_plot(station,allN, info):
+def ny_plot(station,allN, info,hires_figs):
     """
     allN is a numpy array of azimuth(deg)/nyquist(m)
     info is only needed for the title
@@ -98,6 +98,8 @@ def ny_plot(station,allN, info):
         azimuth and nyquist answers
     info : str
         information for the title
+    hires_figs : bool
+        whether you want eps instead of png
 
     Returns
     -------
@@ -121,14 +123,22 @@ def ny_plot(station,allN, info):
     ax.set_ylabel('meters')
     ax.set_xlim(0,360)
     ax.legend(loc="upper right")
-    if ("REFL_CODE" in os.environ):
-        xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/'
+
+    # checks that directory exists
+    g.checkFiles(station, '')
+
+    xdir = os.environ['REFL_CODE'] + '/Files/' + station + '/'
+
+
+    # a little backwards ... 
+    if hires_figs : 
+        pngfile = xdir + station + '_nyquist.eps'
+        fig.savefig(pngfile, format="eps")
     else:
-        xdir = './'
-    pngfile = xdir + station + '_nyquist.png'
+        pngfile = xdir + station + '_nyquist.png'
+        fig.savefig(pngfile, format="png")
     plt.show()
-    print('pngfile stored in: ', pngfile)
-    fig.savefig(pngfile, format="png")
+    print('Plot file stored in: ', pngfile)
 
     txtfile = xdir + station + '_nyquist.txt'
     print(txtfile)

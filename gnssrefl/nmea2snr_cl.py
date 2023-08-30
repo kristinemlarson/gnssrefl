@@ -57,6 +57,8 @@ def main():
     sp3 : str, optional
         set to False or F to use low quality NMEA values for az and el angles.
         this is changed to a boolean in the nmea2snr command line tool.
+    compress: str
+        add compression to the snrfiles. Start with just '.gz' compression, can extend. 
 
     Examples
     --------
@@ -86,6 +88,7 @@ def main():
     parser.add_argument("-height", default=None, help="ellipsoid height,m", type=float)
     parser.add_argument("-sp3", default=None, help="boolean for whether sp3 orbits are used", type=str)
     parser.add_argument("-risky", default=None, help="boolean for whether sp3 orbits are used", type=str)
+    parser.add_argument("-compress", default=None, help="type of compression (.gz)", type=str)
 
     args = parser.parse_args()
 
@@ -112,7 +115,12 @@ def main():
             risky = True
         else:
             risky = False
-        
+            
+    if args.compress == None:
+        compress = None
+    else:
+        compress = args.compress
+    print('Compression:', compress)
 
     doy= args.doy
     if args.doy_end == None:
@@ -176,7 +184,7 @@ def main():
     if args.height is not None:
         height = args.height
     llh = [lat,lon,height]    
-    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite,dec,llh,sp3)
+    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, compress)
 
 if __name__ == "__main__":
     main()

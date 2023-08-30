@@ -1,5 +1,6 @@
 import numpy as np
 import datetime as datetime
+import sys
 from astropy.time import Time
 
 
@@ -25,10 +26,10 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol):
         time is datetime obj
 
     xcol : int
-        column number for x-axis
+        column number for x-axis in python speak
 
     ycol : int
-        column number for y-axis
+        column number for y-axis in python speak
 
     Returns
     -------
@@ -43,6 +44,15 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol):
 
     tval = []
     yval = []
+
+    nr,nc = tvd.shape
+    print('rows and columns ', nr,nc)
+    if (ycol+1 > nc):
+        print('You asked to plot column', ycol+1, ' and that column does not exist in the file')
+        sys.exit()
+    if (xcol+1 > nc):
+        print('You asked to plot column', xcol+1, ' and that column does not exist in the file')
+        sys.exit()
 
     if ymd == True:
         year = tvd[:,0]; month = tvd[:,1]; day = tvd[:,2];

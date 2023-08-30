@@ -6,6 +6,9 @@
 
 ## Acknowledgements
 
+- [Kristine M. Larson](https://kristinelarson.net) Overall 
+- [Kelly Enloe](https://github.com/k-enloe) Jupyter Notebooks
+- [Tim Dittmann](https://github.com/timdittmann) Access to Dockers
 - [Radon Rosborough](https://github.com/raxod502) helped with 
 python/packaging questions, improved our docker distribution, and 
 set up smoke tests. 
@@ -24,10 +27,6 @@ and Simon Williams have provided significant advice for this project.
 Glonass to the NMEA reader
 - [Taylor Smith](https://github.com/tasmi) has worked on the NMEA reader and the refl_zones utility.
 - Surui Xie was instrumental in finding a bug in the newarcs version
-
-Authors and maintainers: [Kristine M. Larson](https://kristinelarson.net), 
-[Kelly Enloe](https://github.com/k-enloe), and [Tim Dittmann](https://github.com/timdittmann)
-
 
 ## How you can help improve this code
 
@@ -69,7 +68,10 @@ If the string is long - please post the error string in a thread response to you
 Would you like to join our <code>gnssrefl</code> users email list?
 This is currently operated by earthscope.org. To join, please send Kristine an email.
 
-Updated June 22, 2023  by Kristine M. Larson
 
 [Old news section from before we moved to readthedocs](https://gnssrefl.readthedocs.io/en/latest/pages/old_news.html)
+
+**Updated August 17, 2023**
+
+Kristine M. Larson
 

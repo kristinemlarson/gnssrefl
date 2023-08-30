@@ -1,5 +1,7 @@
 ## Homework 2 Solution
 
+(Solutions and figures were generated using gnssrefl [v1.5.3](https://pypi.org/project/gnssrefl/1.5.3/))
+
 *Make SNR file for gls1, 2012, doy 100*  quickLook*
 
 <code>rinex2snr gls1 2012 100 -archive unavco </code>
@@ -10,43 +12,24 @@
 
 This makes two plots.  
 
-<img src=hw2_period.png width=500/>
+<img src="../_static/hw2_period.png" width="500">
 <P>
-<img src=hw2_summary.png width=500/>
+<img src="../_static/hw2_summary.png" width="500">
 
 
 *Looking at the QC metrics plots created by <code>quickLook</code>, do you have some ideas on how to change the azimuth mask angles?*
 
-I've outlined in red the areas that consistently produce unsuccessful 
-retrievals.  Even though it seesm the software is reliably removing them, we can remove 
-them in the analysis strategy file. Note that the default 
-peak2noise is 3 in <code>quickLook</code>. This is a bit higher than the gnssir default.
 
 *Now make SNR files for gls1 for the all of 2012.*
 
 <code>rinex2snr gls1 2012 1 -archive unavco -doy_end 366 -weekly True</code>
 
 *We will next analyze a year of L1 GPS reflection data from gls1. We will use the default minimum and maximum 
-reflector height values (0.5 and 6 meters). But for the reasons previously stated, you will want to 
-set a minimum elevation angle of 7 degrees. We also specify that we only want to use the L1 data.*
+reflector height values (0.5 and 8 meters). But for the reasons previously stated, you will want to 
+set a minimum elevation angle of 7 degrees. We also specify that we only want to use the L1 data.  We will 
+get the coordinates from UNR and specify the azimuth mask*
 
-If you cannot remember the coordinates of gls1, you can try:
-
-<code>query_unr gls1</code>
-
-Note: the query_unr code was recently updated to include more precision 
-for coordinates. This precision is *not* needed for make_json_input.
-Although it is not required, I am going to override the dfeaults for peak2noise and reqamp to mimic what is used by quickLook.
-
-<code>make_json_input gls1 66.479391272 -46.310152753 2148.5783167 -l1 True -e1 7 -peak2noise 3 -ampl 8 </code>
-
-*Hand-edit the azimuths in the json file to:*
-
-```
-"azval": [ 40, 90, 90, 180, 180, 270, 270, 330 ],
-```
-
-[Here is my json file](gls1.json)
+<code>gnssir_input gls1 -l1 True -e1 7 -peak2noise 3 -ampl 8 -azlist2 40 330</code>
     
 *Now that you have SNR files and json inputs, you can go ahead and 
 estimate reflector heights for the year 2012 using <code>gnssir</code>.
@@ -60,21 +43,19 @@ Try setting the median filter to 0.25 meters and individual tracks to 30.*
 
 <code>daily_avg gls1 0.25 30</code>
 
-This code produces three plots and a daily average (txt or csv) file. My plots have 
-every day of 2012 shown beacuse I made SNR files for each day of the year. Yours 
-will only have one point per week.
+This code produces three plots and a daily average (txt or csv) file. 
 
 This is all the individual RH:
 
-<img src=gls1-av.png width=500/>
+<img src="../_static/gls1-av.png" width="500">
 
 This is the daily average after outliers have been removed:
 
-<img src=gls1-av2.png width=500/>
+<img src="../_static/gls1-av2.png" width="500">
 
 This lets you know how many arcs went into each day's average:
 
-<img src=gls1-av3.png width=500/>
+<img src="../_static/gls1-av3.png" width="500">
 
 *Note that RH is plotted on the y-axis with RH decreasing rather than increasing. Why do you think we did that?*
 

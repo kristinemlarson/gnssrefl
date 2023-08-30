@@ -72,10 +72,11 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
     if 'ellist' in lsp.keys():
         ellist = lsp['ellist']
-        print('Augmented elevation angle list', ellist)
+        if len(ellist) > 0:
+            print('Using an augmented elevation angle list', ellist)
     else:
         ellist = [];
-        print('no augmented elevation angle list')
+        #print('no augmented elevation angle list')
 
 
     # this is also checked in the command line - but for people calling the code ...
@@ -125,7 +126,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
     p,T,irefr = set_refraction_params(station, dmjd, lsp)
-    print('Refraction parameters ',p,T,irefr)
+    #print('Refraction parameters ',p,T,irefr)
 
 # only doing one day at a time for now - but have started defining the needed inputs for using it
     twoDays = False
@@ -273,7 +274,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                             else:
                                 rj +=1
                                 if screenstats:
-                                    print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f}'.format( iAzim,satNu,UTCtime))
+                                    print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f}'.format( iAzim,satNu,UTCtime,maxF))
                                     g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose)
                                 if plot_screen:
                                     failed = True
@@ -444,13 +445,13 @@ def read_json_file(station, extension):
 
     if useextension and os.path.isfile(instructions_ext):
         usefile = instructions_ext
-        #print('using specific instructions for this extension')
+        print('Using these instructions ', usefile)
         with open(instructions_ext) as f:
             lsp = json.load(f)
     else:
-        #print('will use the default instruction file')
         usefile = instructions
         if os.path.isfile(instructions):
+            print('Using these instructions ', usefile)
             with open(instructions) as f:
                 lsp = json.load(f)
         else:
@@ -878,7 +879,7 @@ def rewrite_azel(azval2):
 
     # if nothing changes
     azelout = azval2
-    print('Requested azimuths: ', azval2)
+    #print('Requested azimuths: ', azval2)
 
     # check for negative beginning azimuths
     N2 = len(azval2) ; a1 = int(azval2[0]); a2 = int(azval2[1])

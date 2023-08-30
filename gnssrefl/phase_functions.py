@@ -45,27 +45,26 @@ def normAmp(amp, basepercent):
 
     return Namp
 
-def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir):
+def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs):
     """
     makes a plot of daily averaged phase
 
     Parameters
     ----------
     station: str
-        4 char station
-
+        4 char station name
     fr : int
-        frequency
-
+        frequency of signal
     datetime_dates : ...
-
+        datetime values for phase points
     tv : list of results
-
+        cannot remember the format
     xdir : str
         location of the results (environment variable REFL_CODE)
-
     subdir : str
         subdirectory in Files
+    hires_figs: bool
+        whether you want eps instead of png files
 
     """
     outdir = xdir + '/Files/' + subdir
@@ -80,8 +79,12 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir):
     plt.gcf().autofmt_xdate()
 
     # maybe this works.  Maybe not.
-    plot_path = f'{outdir}/{station}_daily_phase.png'
+    if hires_figs:
+        plot_path = f'{outdir}/{station}_daily_phase.eps'
+    else:
+        plot_path = f'{outdir}/{station}_daily_phase.png'
     print(f"Saving figure to {plot_path}")
+
     plt.savefig(plot_path)
 
 
@@ -461,7 +464,8 @@ def low_pct(amp, basepercent):
     return lowval
 
 
-def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,subdir=''):
+def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
+        subdir='',hires_figs=False):
     """
     Convert GPS phase to VWC. Using Clara Chew's algorithm from 
     Matlab write_vegcorrect_smc.m
@@ -481,16 +485,18 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     fr : integer
         frequency
         default is L2C (20)
+    tmin : float
+        soil texture minimum
+    tmax : float
+        soil texture maximum
     polyorder : integer
         override on the polynomial order used in leveling
     circles : boolean
         final plot using circles (instead of line)
     subdir : str
-        subdirector for $REFL_CODE/Files
-    tmin : float
-        soil texture minimum
-    tmax : float
-        soil texture maximum
+        subdirectory for $REFL_CODE/Files
+    hires_figs : bool
+        whether you want eps instead of png files created
 
 
     """
@@ -686,12 +692,19 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     outdir = f'{xdir}/Files/{subdir}'
 
-    plot_path = f'{outdir}/{station}_phase_vwc_result.png'
+    if hires_figs:
+        plot_path = f'{outdir}/{station}_phase_vwc_result.eps'
+    else:
+        plot_path = f'{outdir}/{station}_phase_vwc_result.png'
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
 
 
-    plot_path = f'{outdir}/{station}_vol_soil_moisture.png'
+    if hires_figs:
+        plot_path = f'{outdir}/{station}_vol_soil_moisture.eps'
+    else:
+        plot_path = f'{outdir}/{station}_vol_soil_moisture.png'
+
     vwc_plot(station,t_datetime, nv, plot_path,circles) 
 
     if plt2screen:

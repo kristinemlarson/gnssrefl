@@ -8,6 +8,8 @@ import gnssrefl.gps as g
 import gnssrefl.refl_zones as rz
 import gnssrefl.nyquist_libs as nl
 
+from gnssrefl.utils import validate_input_datatypes, str2bool
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -20,14 +22,19 @@ def parse_arguments():
     parser.add_argument('-e2', help='max elevation angle (deg), default 25', type=float,default=None)
     parser.add_argument('-samplerate', help='receiver sample rate (sec), default 30', type=float,default=None)
     parser.add_argument('-system', help='default=gps, other options : galileo, glonass, beidou', type=str)
+    parser.add_argument('-hires_figs', default=None,help='whether you want eps instead of png plots', type=str)
 
     args = parser.parse_args().__dict__
+
+    # convert all expected boolean inputs from strings to booleans
+    boolean_args = ['hires_figs']
+    args = str2bool(args, boolean_args)
 
 
     return {key: value for key, value in args.items() if value is not None}
 
 def nyquist(station: str, lat: float=None, lon: float=None, el_height: float=None, e1: float=5, e2: float=25, 
-        samplerate : float = 30, system: str = 'gps'):
+        samplerate : float = 30, system: str = 'gps', hires_figs : bool = False):
     """
     Creates nyquist plot
 
@@ -58,10 +65,12 @@ def nyquist(station: str, lat: float=None, lon: float=None, el_height: float=Non
     system : str, optional
         name of constellation (gps,glonass,galileo, beidou allowed)
         default is gps
+    hires_figs : bool
+        whether you want eps files instead of png 
 
     Returns
     -------
-    Creates a png file, stores in $REFL_CODE/Files/station
+    Creates a figure file, stored in $REFL_CODE/Files/station
 
     """
     foundfiles = rz.save_reflzone_orbits()
@@ -88,7 +97,7 @@ def nyquist(station: str, lat: float=None, lon: float=None, el_height: float=Non
     xx,yy,zz = g.llh2xyz(lat,lon,el_height);
     recv=np.array([xx,yy,zz])
     # main code that does everything
-    nl.pickup_files_nyquist(station,recv,orbfile,it,e1,e2,samplerate)
+    nl.pickup_files_nyquist(station,recv,orbfile,it,e1,e2,samplerate,hires_figs)
 
 
 def main():

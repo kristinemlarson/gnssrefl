@@ -1,6 +1,10 @@
+import numpy as np
 import os
 import requests
+import subprocess
 import time
+
+import gnssrefl.gps as g
 
 from pathlib import Path
 
@@ -15,6 +19,8 @@ def the_kelly_simple_way(url,filename):
     using earthscope-sdk
     downloads file  - does not translate or uncompress
 
+    Updated 2023 august 20 to place and expect the token in REFL_CODE
+
     Parameters
     ----------
     url : string
@@ -26,11 +32,14 @@ def the_kelly_simple_way(url,filename):
     -------
     foundit : bool
         whether file was found
+
     """
-    token_path = os.environ['REFL_CODE']
+    token_path = './'
+    thedir = os.environ['REFL_CODE']
+    token_path = thedir
     device_flow = DeviceCodeFlowSimple(Path(token_path))
 
-    print('Seeking permission from Earthscope to use their archive')
+    #print('Seeking permission from Earthscope to use their archive')
     try:
     # get access token from local path
         pat = 'path1'
@@ -61,7 +70,7 @@ def the_kelly_simple_way(url,filename):
 
         foundit = True
     else:
-        print('File was not found', filename)
+        #print('File was not found', filename)
         foundit = False
 
     return foundit, filename

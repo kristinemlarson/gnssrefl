@@ -15,6 +15,13 @@ def main():
     """
     quick file plotting using matplotlib
 
+    a png file is saved in REFL_CODE/Files in temp.png or to oyur preferred
+    filename if outfile is given
+
+    Allows you to set x and y-axis limits with a title and various axes labels
+
+    a different symbol can also be set
+
     Examples
     --------
 
@@ -194,13 +201,19 @@ def main():
             plt.xlim((xlimits))
 
     out = args.outfile
+
+    # make sure output directory exists.
+    xdir = os.environ['REFL_CODE']  + '/Files/' 
+    if not os.path.exists(xdir) :
+        subprocess.call(['mkdir', xdir])
+
     if out is None:
         out = 'temp.png'
-        print('plotfile saved to: ', out)
+        print('Plotfile saved to: ', xdir +  out)
         plt.savefig(out,dpi=300)
     else:
         if out[-3:] == 'png':
-            print('plotfile saved to: ', out)
+            print('Plotfile saved to: ', xdir  + out)
             plt.savefig(out,dpi=300)
         else:
             print('Output filename must end in png.')

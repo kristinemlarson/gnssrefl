@@ -40,7 +40,7 @@ def parse_arguments():
     parser.add_argument("-delta_out", default=None, type=int, help="Output interval for spline fit, seconds (default is 1800)")
     parser.add_argument("-if_corr", default=None, type=str, help="Interfrequency correction applied, optional")
     parser.add_argument("-knots_test", default=None, type=int, help="test knots")
-    parser.add_argument("-hires_figs", default=None, type=str, help="hi-res figures")
+    parser.add_argument("-hires_figs", default=None, type=str, help="hi-resolution eps figures, default is False")
     parser.add_argument("-apply_rhdot", default=None, type=str, help="apply rhdot, default is True")
 
     args = parser.parse_args().__dict__
@@ -186,9 +186,19 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     # default subdirectory is the station name
     if subdir == None:
         subdir = station
+    # this makes sure the directory exists
     g.set_subdir(subdir)
 
-    txtdir = xdir + '/Files/' + subdir
+    g.checkFiles(station, extension)
+
+    # this should no longer be needed
+    if extension == '':
+        txtdir = xdir + '/Files/' + subdir
+    else:
+        txtdir = xdir + '/Files/' + subdir + '/' + extension
+
+    print('Using this directory for output: ', txtdir)
+
 
     #create the subdaily file
     writecsv = False

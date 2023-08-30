@@ -158,8 +158,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         decimate SNR file to this sampling period before the 
         periodograms are computed. 1 sec is default (i.e. no decimating)
     newarcs : bool, optional
-        default is to use new way to do rising and setting arcs.
-        if you want to use old way, set newarcs to False
+        this input no longer has any meaning, as everyone is rquired to use the  "new" way
+        of choosing arcs
 
     """
 
@@ -171,24 +171,24 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     if exitS:
         sys.exit()
 
-    lsp = guts.read_json_file(station, extension)
+    lsp = guts2.read_json_file(station, extension)
     # now check the overrides to the json instructions
-    print(lsp)
 
-    if newarcs:
-        if 'azval2' not in lsp:
-            print('An azval2 variable was not found in your json. Fix your json ')
-            print('and/or use gnssir_input to make a new one. Exiting')
-            sys.exit()
+    # requiring people use the new code
+    if 'azval2' not in lsp:
+        print('An azval2 variable was not found in your json input file. Fix your json ')
+        print('and/or use gnssir_input to make a new one. Exiting')
+        sys.exit()
 
-    else:
-        if 'azval' in lsp:
-            print('An azval variable was found in your json. I will use the old way of defining arcs.')
-        else:
-            print('You chose the old way of setting arcs, but you do not have valid input in your json.')
-            print('I recommend you use gnssir_input to create your json file. Azimuth regions are no ')
-            print('longer required to be regions less than 100 degrees. Exiting.')
-            sys.exit()
+    #if newarcs:
+    #else:
+    #if 'azval' in lsp:
+    #    print('An azval variable was found in your json. I will use the old way of defining arcs.')
+    #else:
+    #    print('You chose the old way of setting arcs, but you do not have valid input in your json.')
+    #    print('I recommend you use gnssir_input to create your json file. Azimuth regions are no ')
+    #    print('longer required to be regions less than 100 degrees. Exiting.')
+    #        sys.exit()
 
 
     # plt is False unless user changes
@@ -289,6 +289,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp}
 
+    # should make sure there are directories for the results ... 
+    g.checkFiles(station.lower(), extension)
+
     year_list = list(range(year_st, year_end+1))
     # changed to better describe year and doy start/end
 
@@ -311,12 +314,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         args['year'] = year
         for doy in doy_list:
             args['doy'] = doy
-            if newarcs:
-                print('Using the New Way of Selecting Arcs')
-                guts2.gnssir_guts_v2(**args)
-            else:
-                print('Using the Old Way of Selecting Arcs')
-                guts.gnssir_guts(**args)
+            guts2.gnssir_guts_v2(**args)
+            #else:
+            #    print('You are trying to use the Old Way of Selecting Arcs.')
+            #    print('This is no longer supported. Update your code')
+            #guts.gnssir_guts(**args)
 
 
 def main():
