@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument("-e2", default=None, type=float, help="max elev angle (deg)")
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
-    parser.add_argument("-newarcs", default=None, type=str, help="Default is true. set to F to use old way of defining arcs")
+    parser.add_argument("-newarcs", default=None, type=str, help="This no longer has any meaning")
 
 
     args = parser.parse_args().__dict__
@@ -60,28 +60,27 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
 
-    Older json versions created by make_json_input will be allowed as long as you set -newarcs F
-
         
     Examples
     --------
     gnssir p041 2021 15 
         analyzes the data for station p041, year 2021 and day of year 15.
-        uses new way of defining arcs
     gnssir p041 2021 15  -snr 99
         uses SNR files with a 99 suffix
-        uses new way of defining arcs
-    gnssir p041 2021 15  -snr 99 -screenstats T
+    gnssir p041 2021 15  -plt T
+        plots of SNR data and periodograms come to the screen. Each frequency gets its own plot.
+    gnssir p041 2021 15  -screenstats T
         sends debugging information to the screen
-        uses new way of defining arcs
     gnssir p041 2021 15  -nooverwrite T 
         only runs gnssir if there isn't a previous solution
-        uses new way of defining arcs
+    gnssir p041 2021 15  -extension strategy1
+        runs gnssir using json file called p041.strategy1.json
     gnssir p041 2021 15  -doy_end 20 
         Analyzes data from day of year 15 to day of year 20
-        uses new way of defining arcs
-    gnssir p041 2021 15  -newarcs F
-        uses old way of picking arcs 
+    gnssir p041 2021 15 -dec 5
+        before computing periodograms, decimates the SNR file contents to 5 seconds
+    gnssir p041 2021 15 -gzip T
+        gzips the SNR file after you run the code. Big space saver
 
     Parameters
     ----------
@@ -114,7 +113,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
             201, 205,206,207,208 : GALILEO E1, E5a,E6,E5b,E5
 
-            302,306,307 : BEIDOU B1, B3, B2
+            302,306,307 : BEIDOU B1, B3, B2 (not sure we do 307)
 
     ampl : float, optional
         minimum spectral peak amplitude. default is None
@@ -158,8 +157,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         decimate SNR file to this sampling period before the 
         periodograms are computed. 1 sec is default (i.e. no decimating)
     newarcs : bool, optional
-        this input no longer has any meaning, as everyone is rquired to use the  "new" way
-        of choosing arcs
+        this input no longer has any meaning 
 
     """
 

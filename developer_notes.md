@@ -1,3 +1,27 @@
+
+https://realpython.com/pypi-publish-python-package/#version-your-package
+
+you'll run the init command,
+
+then add this section into your pyproject.toml (the file_patterns section is where you will add all the places where the version is)
+[tool.bumpver]
+current_version = "1.0.0"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message  = "Bump version {old_version} -> {new_version}"
+commit          = true
+tag             = true
+push            = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = ['current_version = "{version}"', 'version = "{version}"']
+
+
+
+# kelly provided this example of bumpver
+
+https://gitlab.com/earthscope/public/earthscope-sdk/-/blob/main/pyproject.toml?ref_type=heads
+
+
 Country codes
 
 https://www.iban.com/country-codes
@@ -59,3 +83,4 @@ Cause it would be useful to know ...
 
 
 git pull --rebase
+

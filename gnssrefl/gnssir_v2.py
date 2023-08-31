@@ -70,6 +70,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
+    # make sure REFL_CODE/Files/station directory exists ... 
+    g.checkFiles(station, '')
+
     if 'ellist' in lsp.keys():
         ellist = lsp['ellist']
         if len(ellist) > 0:
@@ -294,6 +297,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                 ax1.set_title(station + ' Raw Data/Periodogram for ' + g.ftitle(f) + ' Frequency')
                 ax2.set_xlabel('Reflector Height (m)');
                 ax2.set_ylabel('volts/volts') ; ax1.set_ylabel('volts/volts')
+                plotname = xdir + '/Files/' + station + '/gnssir_freq' + str(f) + '.png'
+                g.save_plot(plotname)
                 plt.show()
                 #plot2screen(station, f, ax1, ax2,lsp['pltname']) 
             else:
@@ -568,6 +573,8 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
         #nazm = azm[sind:eind]
         minObse = min(nelv)
         maxObse = max(nelv)
+        minA = min(nazm)
+        maxA = max(nazm)
 
         nogood = False
         verysmall = False
@@ -592,9 +599,9 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
                 if ediff_violation:
                     add = ' violates ediff'
                 if not verysmall:
-                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), add)
+                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), minA,maxA,add)
             else:
-                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2))
+                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2),minA,maxA)
 
         if not nogood :
             iarc = iarc + 1
@@ -991,6 +998,9 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
         maxObse = max(nelv)
         #print('min/max obs e ', minObse, maxObse)
         # how to get the azimuth?
+        minA = min(nazm)
+        maxA = max(nazm)
+
 
         nogood = False
         verysmall = False
@@ -1015,9 +1025,9 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
                 if ediff_violation:
                     add = ' violates ediff'
                 if not verysmall:
-                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), add)
+                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), minA,maxA,add)
             else:
-                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2))
+                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2),minA,maxA)
 
         if not nogood :
             iarc = iarc + 1

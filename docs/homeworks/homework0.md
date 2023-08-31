@@ -7,6 +7,8 @@
 There are two versions of this homework: a Jupyter Notebook version and a command line version.  
 Pick the method that you prefer to do your analysis in the course, or experiment with both.
 
+To access Earthscope data, [an account is required](https://data-idm.unavco.org/user/profile/login).
+
 ## **Jupyter Notebook version:**
 
 run the [HW0 notebook](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter/-/blob/master/notebooks/learn-the-code/part_0.ipynb) from the [jupyter notebook repository, either via docker or to clone and run locally on your machine](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter).

@@ -298,13 +298,14 @@ That command will produce this periodogram summary :
 
 <img src="../_static/p041-l1.png" width=600>
 
-By default, these are L1 data only. Note that the x-axis does not go beyond 6 meters. This is because
-you have used the defaults. Furthermore, note that results on the x-axis begin at 0.5 meters.
+By default, these are L1 data only. Note that the x-axis does not go beyond 8 meters. This is because
+we have used the defaults. Furthermore, note that results on the x-axis begin at 0.5 meters.
 Since you are not able to resolve very small reflector heights with this method, this region 
 is not allowed. These periodograms give you a sense of whether there is a planar reflector below your antenna. The fact that the 
 peaks in the periodograms bunch up around 2 meters means that at 
-this site the antenna phase center is ~ 2 meters above the ground. The colors change as you try 
-different satellites.  If the data are plotted in gray that means you have a failed reflection. The quadrants are Northwest, Northeast and so on. 
+this site the antenna phase center is ~ 2 meters above the ground. The colors represent different 
+satellites.  If the data are plotted in gray that means you have a failed reflection. The quadrants 
+are Northwest, Northeast and so on. 
 
 <CODE>quickLook</code> also provides a summary of various quality control metrics:
 
@@ -389,7 +390,7 @@ azimuth.
 
 <CODE>gnssir_input p101  -azlist2 90 270</CODE>
 
-You should also set the prefrred reflector height region (h1 and h2) and elevation angle mask (e1 and e2).
+You should also set the preferred reflector height region (h1 and h2) and elevation angle mask (e1 and e2).
 Note: the reflector height region should not be too small, as it is also used to set the region for your periodogram.
 If you use tiny RH constraints, your periodogram will not make any sense and your work will fail the quality control metrics.
 
@@ -430,12 +431,11 @@ Note that the names of the columns (and units) are provided
 - *emin0* and *emax0* are the min and max observed elevation angles in the arc.
 - *rise/set* tells you whether the satellite arc was rising (1) or setting (-1)
 - *Azim* is the average azimuth angle of the satellite arc
-- *sat* and *freq* are as defined in this document
+- *sat* and *freq* are as defined for gnssrefl (i.e. 101 is Glonass L1) 
 - MJD is modified julian date
 - PkNoise is the peak to noise ratio of the periodogram values
 - last column is currently set to tell you whether the refraction correction has been applied 
 - EdotF is used in the RHdot correction needed for dynamic sea level sites. The units are hours/rad.
 When multiplied by RHdot (meters/hour), you will get a correction in units of meters. For further
 information, see the <code>subdaily</code> code.
-- ediff QC metric
 

@@ -3,11 +3,32 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.6.6
+2023 August 29
+
+accepted two PR
+
+https://github.com/kristinemlarson/gnssrefl/pull/184
+
+https://github.com/kristinemlarson/gnssrefl/pull/183
+
+
+## 1.6.5
+2023 August 28
+
+plots saved in gnssir for docker users
+
+improved documentation
+
+## 1.6.4
+2023 August 28
+
+pypi failed last time ... trying again
+
 ## 1.6.3
 2023 August 28
 
-Added Taylor Smith's changes to nmea2snr. Allows gzip before/after
-
+Added Taylor Smith's changes to nmea2snr. Allows gzip after the translation. 
 
 ## 1.6.2
 2023 August 25
