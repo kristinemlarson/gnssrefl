@@ -27,7 +27,11 @@ paths_to_clear = [notebook_path,
                   notebook_path / "orbits",
                   notebook_path / "exe",
                   notebook_path / "learn-the-code",
-                  notebook_path / "use-cases" / "Ice_Sheets"]
+                  notebook_path / "use-cases" / "Ice_Sheets",
+                  notebook_path / "use-cases" / "Lakes_and_Rivers",
+                  notebook_path / "use-cases" / "Seasonal_Snow_Accumulation",
+                  notebook_path / "use-cases" / "Soil_Moisture",
+                  notebook_path / "use-cases" / "Tides"]
 
 if __name__ == "__main__":
     move_forward = input(f"Is this the directory you would like to remove data from?: {notebook_path} (y/n)")
