@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import os
+import platform
 import warnings
 
 from enum import Enum
@@ -65,7 +66,6 @@ class FileManagement:
     Required parameters include station and file_type from FileTypes class.
     Optional parameters are year, doy, and file_not_found_ok.
     """
-    xdir = Path(os.environ["REFL_CODE"])
 
     def __init__(self, station, file_type: FileTypes, year: int = None, doy: int = None, file_not_found_ok: bool = False):
         self.station = station
@@ -73,6 +73,8 @@ class FileManagement:
         self.year = year
         self.doy = doy
         self.file_not_found_ok = file_not_found_ok
+
+        self.xdir = Path(os.environ["REFL_CODE"])
 
     def get_file_path(self):
         """
@@ -160,3 +162,36 @@ def read_files_in_dir(directory, transpose=False):
             print(f"Directory does not exist: {dir_path}")
     else:
         raise ValueError(f"path is not absolute. Please provide an absolute path: {dir_path}")
+
+def check_environment():
+    try:
+        os.environ['ORBITS']
+        os.environ['REFL_CODE']
+        os.environ['EXE']
+
+        environment_set = True
+    except KeyError:
+        environment_set = False
+
+    return environment_set
+
+
+def set_environment(refl_code, orbits, exe):
+    os.environ['ORBITS'] = str(Path(orbits))
+    os.environ['REFL_CODE'] = str(Path(refl_code))
+    os.environ['EXE'] = str(Path(exe))
+    print('environment variable ORBITS set to path', os.environ['ORBITS'],
+          '\nenvironment variable REFL_CODE set to path', os.environ['REFL_CODE'],
+          '\nenvironment variable EXE set to path', os.environ['EXE'])
+
+
+def get_sys():
+    system = platform.platform().lower()
+    valid_os = ['linux64', 'macos']
+
+    for os in valid_os:
+        if os in system:
+            if os == 'macos':
+                if platform.processor() == 'arm':
+                    os = 'mac-newchip'
+            return os

@@ -37,6 +37,8 @@ requirements = [
     "astropy",
     "simplekml",
     "earthscope-sdk",
+    "jupyterlab",
+    "ipywidgets"
 ]
 setup(
     name="gnssrefl",
