@@ -32,7 +32,7 @@ RUN pip install numpy --upgrade --ignore-installed
 COPY pyproject.toml README.md setup.py /usr/src/gnssrefl/
 COPY gnssrefl /usr/src/gnssrefl/gnssrefl
 COPY notebooks /usr/src/gnssrefl/notebooks
-COPY docs /usr/src/gnssrefl/docs
+COPY docs/_static /usr/src/gnssrefl/docs/_static
 RUN pip3 install --no-cache-dir /usr/src/gnssrefl
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
