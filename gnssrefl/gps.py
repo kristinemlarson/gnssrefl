@@ -1,6 +1,8 @@
 # toolbox for GPS/GNSS data analysis
 import datetime
-from datetime import date
+from datetime import date, datetime, timedelta
+#from datetime import datetime,timedelta
+
 import getpass
 import json
 import math
@@ -2230,6 +2232,24 @@ def mjd(y,m,d,hour,minute,second):
     s = hour*3600 + minute*60 + second
     fracDay = s/86400
     return mjd, fracDay
+
+def mjd_to_datetime(mjd):
+    """
+    Parameters
+    ----------
+    mjd : float
+        modified julian date
+
+    Returns
+    -------
+    dt : datetime object
+
+    """
+    base_date=datetime(1858,11,17)
+    delta=timedelta(days=mjd)
+    dt = base_date+delta
+
+    return dt
 
 
 def doy2ymd(year, doy):

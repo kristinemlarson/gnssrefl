@@ -1,4 +1,9 @@
 env
+noaa.txt
+idalia.py
+sso_tokens.json.save
+temp.png
+mnis*gz
 awk.in
 get_ign_listing.py
 argentina

@@ -75,7 +75,7 @@ The plots might look slightly different and the defaults we used in the analysis
 
 ## GPS Tool Box Demonstration
 
-* [MNIS](https://gnssrefl.readthedocs.io/en/latest/use_cases/gpstoolbox.html)
+* [MNIS (not finished)](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mnis.html)
 
 ## Homeworks from Previous Shortcourses:
 

@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.6.7
+
+Accepted Kelly Enloe PR, mostly Jupyter notebooks stuff
+
+https://github.com/kristinemlarson/gnssrefl/pull/185
+
+
 ## 1.6.6
 2023 August 29
 
