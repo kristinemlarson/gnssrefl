@@ -1,7 +1,8 @@
 # toolbox for GPS/GNSS data analysis
 import datetime
-from datetime import date, datetime, timedelta
-#from datetime import datetime,timedelta
+from datetime import date
+from datetime import timedelta
+#from datetime import datetime
 
 import getpass
 import json
@@ -2245,8 +2246,8 @@ def mjd_to_datetime(mjd):
     dt : datetime object
 
     """
-    base_date=datetime(1858,11,17)
-    delta=timedelta(days=mjd)
+    base_date=datetime.datetime(1858,11,17)
+    delta=datetime.timedelta(days=mjd)
     dt = base_date+delta
 
     return dt
