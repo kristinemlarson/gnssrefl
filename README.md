@@ -4,7 +4,7 @@
 
 
 August 2, 2023: Updated azimuth outputs for gnssir and quickLook so that the azimuth of the 
-rising or setting part of the arc is reported rather than the average average, as was done in the older versions.
+rising or setting part of the arc is reported rather than the average azimuth, as was done in the older versions.
 
 July 7, 2023: The newarcs option had a bug in it: the refraction correction was not being applied.
 While the refraction correction is not very important for some applications (snow, soil moisture), using it sometimes and not
