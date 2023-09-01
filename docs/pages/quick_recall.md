@@ -54,6 +54,7 @@ phasecode, TBD
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
 * [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html)
 * [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)
+* [mjd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.mjd.html)
 * [nyquist](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nyquist_cl.html)
 * [query_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.query_unr.html)
 * [quickplt](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickplt.html)

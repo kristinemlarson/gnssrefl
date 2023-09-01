@@ -1,0 +1,24 @@
+import argparse
+import gnssrefl.gps as g
+
+def main():
+    """
+    converts MJD
+
+    Parameters
+    ----------
+    mjd : float
+
+    """
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("mjd", help="Modified Julian Date", type=float)
+
+    args = parser.parse_args()
+    the_mjd= args.mjd
+
+    filler = g.mjd_to_datetime(the_mjd)
+    print(filler)
+
+if __name__ == "__main__":
+    main()

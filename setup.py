@@ -42,7 +42,7 @@ requirements = [
 ]
 setup(
     name="gnssrefl",
-    version="1.6.7",
+    version="1.6.8",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -93,6 +93,7 @@ setup(
             "rh_plot= gnssrefl.rh_plot:main",
             "nyquist= gnssrefl.nyquist_cl:main",
             "pickle_dilemma= gnssrefl.pickle_dilemma:main",
+            "mjd= gnssrefl.mjd:main",
             "make_meta= gnssrefl.make_meta:main",
         ],
     },
