@@ -187,7 +187,6 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
         # make the snrfile
         gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
         print('Az/El Updated...')
-        return
     
     inx = np.argsort(T)  #Sort data by time
     
