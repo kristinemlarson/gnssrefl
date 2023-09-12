@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.6.8
+
+added mjd utility
+
+chagned nmea2snr so it allows signals other than L1. this required changing the fortran
+code that does the orbits for you. It is a slow module - maybe it always was. something to keep an eye on.
+
+fixed some documentation in download_rinex that misdescribed the stream input as boolean, which it is not.
+
+added tall site use case, ac59
+
 ## 1.6.7
 
 Accepted Kelly Enloe PR, mostly Jupyter notebooks stuff

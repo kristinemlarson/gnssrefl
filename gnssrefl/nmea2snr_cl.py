@@ -117,6 +117,7 @@ def main():
     else:
         if (args.risky == 'T') or (args.risky == 'True'):
             risky = True
+            print('You have set the risky option')
         else:
             risky = False
             
@@ -156,8 +157,12 @@ def main():
     if (args.sp3 is not None):
         if (args.sp3 == 'False') or (args.sp3 == 'F'):
             sp3 = False
+        if (args.sp3 == 'True') or (args.sp3 == 'T'):
+            sp3 = True
 
-    if (year+doy/365.25 >= gfz_date):
+#    if (year+doy/365.25 >= gfz_date):
+    # removed date constraint since it also allow precise GNSS orbits now
+    if True:
         if not sp3:
             if risky:
                 print('You insist on using low quality az-el NMEA values but have set the risky option to True')

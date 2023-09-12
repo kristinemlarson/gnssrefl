@@ -84,3 +84,17 @@ Cause it would be useful to know ...
 
 git pull --rebase
 
+##
+
+def mjd_to_datetime(mjd):
+    """
+    """
+    base_date=datetime(1858,11,17)
+    delta=timedelta(days=mjd)
+    return base_date + delta
+
+mjd_dates = [60183 , 60184, 60185]
+
+tv = [1, 5, 3]
+datetime_objects = [mjd_to_datetime(mjd) for mjd in mjd_dates]
+

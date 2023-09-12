@@ -101,7 +101,8 @@ c     so pathetic i have to use 2ch rinex year
       call envTrans(xrec,yrec,zrec,staXYZ,Lat,Long,Ht,North,East,Up)
       eof = .false.
       do while (.not.eof)
-        read(fileIN,*, iostat=ios) tod, iprn, s1, freq
+c      2023 September 11 - added L2 and L5
+        read(fileIN,*, iostat=ios) tod, iprn, s1, s2, s5
 c       write(fileOUT,*, iostat=ios) tod, iprn, s1, freq
         if (ios.ne.0) goto 99
 c       hours and minutes

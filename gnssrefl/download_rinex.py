@@ -25,7 +25,7 @@ def parse_arguments():
     parser.add_argument("-version", default=None, metavar=2, type=int, help="rinex version (2 or 3)")
     parser.add_argument("-strip", default=None, type=str, help="set to True to strip to only SNR observables, gfzrnx used")
     parser.add_argument("-doy_end", default=None, type=int, help="last day of year to be downloaded")
-    parser.add_argument("-stream", default=None, type=str, help="set to True to get stream-defined Rinex3 filename. I know. I know. It is annoying.")
+    parser.add_argument("-stream", default=None, type=str, help="set to S get stream-defined Rinex3 filename. Default is R. ")
     parser.add_argument("-samplerate", default=None, type=int, help="Sample rate in seconds. For RINEX3 only.")
     parser.add_argument("-screenstats", default=None, type=str, help="debugging flag for printout. default is False")
     parser.add_argument("-dec", default=None, type=int, help="decimation value (seconds). Only for RINEX 3.")
@@ -137,8 +137,8 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         Default is None. (meaning only a single day using the doy parameter)
 
     stream : str, optional
-        Whether to get stream 'S' defined filenames.
-        Default is 'R'. 
+        Receiver or stream file, for RINEX3 only
+        Default is 'R' but you can set to 'S' to get streamed version
 
     samplerate : int, optional
         Sample rate in seconds for RINEX3 only.
