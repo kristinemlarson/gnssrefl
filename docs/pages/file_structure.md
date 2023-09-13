@@ -125,6 +125,9 @@ This file should be automatically stored for you.
 
 ## The SNR data format
 
+**Reminder:** UTC does not exist in our world. Everything should be GPS time, which is
+UTC without leap seconds. 
+
 The snr options are mostly based on the need to remove the "direct" signal. This is
 not related to a specific site mask and that is why the most frequently used
 options (99 and 66) have a maximum elevation angle of 30 degrees. The
@@ -142,7 +145,7 @@ The columns in the SNR data are defined as:
 - Satellite number (remember 100 is added for Glonass, 200 for Galileo etc)
 - Elevation angle, degrees
 - Azimuth angle, degrees
-- Seconds of the day, GPS time
+- **Seconds of the day, GPS time**
 - elevation angle rate of change, degrees/sec.
 -  S6 SNR on L6
 -  S1 SNR on L1

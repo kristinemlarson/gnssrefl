@@ -6416,3 +6416,54 @@ def checkFiles(station, extension):
             print(txtdir , ' has been created')
 
 
+def read_leapsecond_file(mjd):
+    """
+    reads leap second file and tries to figure out the UTC-GPS time offset
+    needed for NMEA file users for the input MJD value
+
+    Parameters
+    ----------
+    mjd : float
+        Modified Julian Day
+
+    Returns
+    -------
+    offset : int
+        time offset in seconds. This should be added to UTC to get GPS
+
+    """
+    offset = 0
+    xdir = os.environ['REFL_CODE']
+    if not os.path.isdir(xdir):
+        print('REFL_CODE environment variable has not been set. Exiting')
+        sys.exit()
+
+    # leap second file
+    xdir = xdir + '/input/leapseconds.txt' 
+    # if file is not on your system, download it
+    if not os.path.isfile(xdir):
+        print('Trying to download leapsecond file')
+        url = 'https://morefunwithgps.com/public_html/leapseconds.txt'
+        print(url)
+        wget.download(url,xdir)
+    if not os.path.isfile(xdir):
+        print('Could not find the leap second file. Exiting.')
+        sys.exit()
+
+    tv = np.loadtxt(xdir,usecols=(1),comments='%')
+    N = len(tv)
+    # these leap seconds are set to dec 31 or june 30 but are applied at midnight
+    # so add one day ...
+    tv = tv + 1
+    # add a value to an end point
+    for i in range(0,N):
+        #print(i,tv[i], mjd)
+        if (i == (N-1)):
+            #print('found the correct leap second ',i+1)
+            offset = i+1
+        elif (mjd > tv[i] ) & (mjd < tv[i+1]):
+            #print('found the correct leap second ',i+1)
+            offset = i+1
+            break
+
+    return offset

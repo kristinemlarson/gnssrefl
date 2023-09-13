@@ -72,10 +72,10 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
         fexists = False
         if os.path.isfile(jfile1):
             jfile = jfile1 ; fexists = True
-            print('json file found ',jfile1)
+            print('json file found (using for station coordinates)',jfile1)
         elif os.path.isfile(jfile2):
             jfile = jfile2 ; fexists = True
-            print('json file found ',jfile2)
+            print('json file found (using for station coordinates)',jfile2)
 
         if fexists:
             with open(jfile, 'r') as my_json:
@@ -176,6 +176,11 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
     # It is easier for the sp3 option to write out the time, satellite, and SNR data into a plain file.
     # then the fortran can read that file and calculate the orbits from teh SP3 file and write out a new 
     # file with the correct azimuth and elevation angle.
+    leap_mjd = g.getMJD(year,month,day,0)
+
+    offset = g.read_leapsecond_file(leap_mjd)
+    print('Leap second offset ', offset)
+
     if sp3 :
         tmpfile =  station + 'tmp.txt'
         timetags = np.unique(T)
@@ -228,7 +233,8 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
                         elif (frdata[iugh] == '5'):
                             s5 = snrdata[iugh]
                     #print(timetags[i], sat, s1, s2, s5)
-                    fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:6.2f} {4:6.2f} \n'.format(timetags[i], sat, s1, s2, s5) )
+                    # testing for leap seconds, not good for all time
+                    fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:6.2f} {4:6.2f} \n'.format(timetags[i]+offset, sat, s1, s2, s5) )
                     
         fout.close()
         gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
