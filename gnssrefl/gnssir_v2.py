@@ -82,6 +82,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         #print('no augmented elevation angle list')
 
 
+
     # this is also checked in the command line - but for people calling the code ...
     if ((lsp['maxH'] - lsp['minH']) < 5):
         print('Requested reflector heights (', lsp['minH'], ',', lsp['maxH'], ') are too close together. Exiting.')

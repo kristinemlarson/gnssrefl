@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.7.0
+Attempted to add leap second corrections to SNR files created by non-compliant nmea2snr
+code.  Added small function to gps.py that installs a leap second file - and reads it.
+Returns the hopefully proper offset, which is applied when writing out the timetag in nmea2snr.
+Feedback appreciated.
+
 ## 1.6.8
 
 added mjd utility

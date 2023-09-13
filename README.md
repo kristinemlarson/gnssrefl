@@ -1,6 +1,15 @@
 # gnssrefl
 
-**github version: 1.6.8** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+**github version: 1.7.0** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+
+
+A long time ago - and in a galaxy far, far away - Bob King told a group of graduate students why he 
+liked GPS observation files. His answer:
+
+*There are no leap seconds.*
+
+I agree with Bob King. This software is meant to be used with GPS time. All files should be in GPS time.
+Conversion to UTC is something you should do on your own. 
 
 
 September 12, 2023: Updated nmea2snr to allow signals other than L1.

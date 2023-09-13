@@ -268,6 +268,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # added 2022apr15
     lsp['gzip'] = gzip
 
+
     xdir = str(os.environ['REFL_CODE'])
     picklefile = 'gpt_1wA.pickle'
     pname = xdir + '/input/' + picklefile
