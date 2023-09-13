@@ -6419,17 +6419,21 @@ def checkFiles(station, extension):
 def read_leapsecond_file(mjd):
     """
     reads leap second file and tries to figure out the UTC-GPS time offset
-    needed for NMEA file users for the input MJD value
+    needed for NMEA file users for the given MJD value
+
+    It will download and store the leap second file in REFL_CODE/Files if 
+    you don't already have it.
 
     Parameters
     ----------
     mjd : float
-        Modified Julian Day
+        Modified Julian Day for when you want to know the leap seconds since
+        GPS began
 
     Returns
     -------
     offset : int
-        time offset in seconds. This should be added to UTC to get GPS
+        UTC-GPS time offset in seconds. This should be added to UTC to get GPS
 
     """
     offset = 0
@@ -6437,9 +6441,18 @@ def read_leapsecond_file(mjd):
     if not os.path.isdir(xdir):
         print('REFL_CODE environment variable has not been set. Exiting')
         sys.exit()
+    # Fire currently loaded here
+    xdir = os.environ['REFL_CODE'] + '/input'
+    if not os.path.isdir(xdir):
+         subprocess.call(['mkdir', xdir])
 
-    # leap second file
-    xdir = xdir + '/input/leapseconds.txt' 
+    # in case you decide to put it here
+    xdir = os.environ['REFL_CODE'] + '/Files'
+    if not os.path.isdir(xdir):
+         subprocess.call(['mkdir', xdir])
+
+    # I changed it to look for leap second file in Files
+    xdir = os.environ['REFL_CODE'] + '/Files/leapseconds.txt' 
     # if file is not on your system, download it
     if not os.path.isfile(xdir):
         print('Trying to download leapsecond file')
