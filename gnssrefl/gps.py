@@ -6455,7 +6455,12 @@ def read_leapsecond_file(mjd):
     xdir = os.environ['REFL_CODE'] + '/Files/leapseconds.txt' 
     # if file is not on your system, download it
     if not os.path.isfile(xdir):
-        print('Trying to download leapsecond file')
+        print('Trying to download leapsecond file from github')
+        url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/leapseconds.txt'
+        print(url)
+        wget.download(url,xdir)
+    if not os.path.isfile(xdir):
+        print('Trying to download leapsecond file from morefunwithgps')
         url = 'https://morefunwithgps.com/public_html/leapseconds.txt'
         print(url)
         wget.download(url,xdir)

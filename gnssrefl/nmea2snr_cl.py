@@ -28,11 +28,17 @@ def main():
 
     Originally this code used interpolations of the az and el NMEA fields. I have decided this 
     is DANGEROUS. If you really want to use those low-quality measurements, you 
-    can use them by saying -sp3 F. Otherwise, if your data were collected after 
-    day of year 137 and year 2021, it will use the multi-GNSS sp3 file from GFZ. 
-    This means you have to provide a priori station coordinates. You can submit those on the 
-    command line or it will read them from the $REFL_CODE/input/ssss.json file (for station ssss or SSSS) if it exists.
+    can use them by saying -sp3 F. 
 
+    The default usage is to use multi-GNSS orbits from GFZ.  To compute az-el, you need to 
+    provide a priori station coordinates. You can submit those on the 
+    command line or it will read them from the $REFL_CODE/input/ssss.json file 
+    (for station ssss or SSSS) if it exists.
+
+    As of 2023 September 14, the SNR files are defined in GPS time, which is how the file is defined.
+    Prior to version 1.7.0, if you used the sp3 option, the SNR files were written in UTC. This led to 
+    the orbits being propagated to the wrong time and thus az-el values are biased. The impact on RH 
+    is not necessarily large - but you should be aware. The best thing to do is remake your SNR files.  
 
     Parameters
     ----------
@@ -160,12 +166,12 @@ def main():
         if (args.sp3 == 'True') or (args.sp3 == 'T'):
             sp3 = True
 
+#    removed date constraint since it also allow precise GNSS orbits now
 #    if (year+doy/365.25 >= gfz_date):
-    # removed date constraint since it also allow precise GNSS orbits now
     if True:
         if not sp3:
             if risky:
-                print('You insist on using low quality az-el NMEA values but have set the risky option to True')
+                print('You insist on using low quality az-el NMEA values and have set the risky option to True.')
                 sp3 = False
             else:
                 print('You insist on using low quality az-el NMEA values.  You must set risky to T or True to proceed.')

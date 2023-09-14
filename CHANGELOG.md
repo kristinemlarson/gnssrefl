@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.7.2 
+2023 September 14
+
+leap second file picked up from github repository for pypi and git clone users.  Tim will take care of shipping 
+it in the docker
+
+add documentation to nmea2snr
+
+
 ## 1.7.1
 2023 September 13
 
