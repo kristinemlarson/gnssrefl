@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-nooverwrite", default=None, type=str, help="default is False, i.e. you will overwrite")
     parser.add_argument("-extension", type=str, help="extension for result file, useful for testing strategies")
     parser.add_argument("-compress", default=None, type=str, help="Boolean, xz compress SNR files after use")
-    parser.add_argument("-gzip", default=None, type=str, help="Boolean, gzip SNR files after use")
+    parser.add_argument("-gzip", default=None, type=str, help="Boolean, gzip SNR files after use. Default is True")
     parser.add_argument("-screenstats", default=None, type=str, help="Boolean, some stats printed to screen(default is False)")
     parser.add_argument("-delTmax", default=None, type=int, help="Allowed satellite arc length (minutes)")
     parser.add_argument("-e1", default=None, type=float, help="min elev angle (deg)")
@@ -55,7 +55,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
-        mmdd: bool = False, gzip: bool = False, dec : int = 1, newarcs : bool = True ):
+        mmdd: bool = False, gzip: bool = True, dec : int = 1, newarcs : bool = True ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
@@ -80,7 +80,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     gnssir p041 2021 15 -dec 5
         before computing periodograms, decimates the SNR file contents to 5 seconds
     gnssir p041 2021 15 -gzip T
-        gzips the SNR file after you run the code. Big space saver
+        gzips the SNR file after you run the code. Big space saver (now the default)
 
     Parameters
     ----------
@@ -152,7 +152,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     mmdd : boolean, optional
         adds columns in results for month, day, hour, and minute. default is False.
     gzip : boolean, optional
-        gzip compress SNR files after use. default is False.
+        gzip compress SNR files after use. default is True (as of 2023 Sep 17).
     dec : int, optional
         decimate SNR file to this sampling period before the 
         periodograms are computed. 1 sec is default (i.e. no decimating)
