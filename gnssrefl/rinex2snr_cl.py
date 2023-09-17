@@ -478,7 +478,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     rnx.run_rinex2snr(**args)
     s2 = time.time()
     print('That took ', round(s2-s1,2), ' seconds')
-    print('Feedback written to subdirectory logs')
+    #print('Feedback written to subdirectory logs')
 
 
 def main():

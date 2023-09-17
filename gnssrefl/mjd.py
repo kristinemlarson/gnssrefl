@@ -3,7 +3,8 @@ import gnssrefl.gps as g
 
 def main():
     """
-    converts MJD
+    converts MJD to year, month, day, hour, minute, second
+    and prints that to the screen
 
     Parameters
     ----------

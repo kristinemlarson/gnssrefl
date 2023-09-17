@@ -17,13 +17,13 @@ def parse_arguments():
     parser.add_argument('-lat', help='Latitude (deg), if station not in database', type=float, default=None)
     parser.add_argument('-lon', help='Longitude (deg), if station not in database', type=float, default=None)
     parser.add_argument('-height', help='Ellipsoidal height (m) if station not in database', type=float,default=None)
-    parser.add_argument('-fr', help='1, 2, or 5 ', type=int,default=None)
+    parser.add_argument('-fr', help='1, 2, or 5 (default is 1)', type=int,default=None)
     parser.add_argument('-RH', help='Reflector height (meters). Default is sea level', type=str, default=None)
-    parser.add_argument('-azim1', help='start azimuth (default is 0, negative values allowed) ', type=int,default=None)
-    parser.add_argument('-azim2', help='end azimuth (default is 360) ', type=int,default=None)
+    parser.add_argument('-azim1', help='start azimuth (default is 0 deg, negative values allowed) ', type=int,default=None)
+    parser.add_argument('-azim2', help='end azimuth (default is 360 deg) ', type=int,default=None)
     parser.add_argument('-el_list', nargs="*",type=float,  help='elevation angle list, e.g. 5 10 15  (default)')
     parser.add_argument('-azlist', nargs="*",type=float,  help='flexible azimuth angle list, e.g. 0 90 270 360, but must be positive ')
-    parser.add_argument('-system', help='default=gps, options are galileo, glonass, beidou', type=str)
+    parser.add_argument('-system', help='default is gps, options are galileo, glonass, beidou', type=str)
     parser.add_argument('-output', help='output filename. default is the station name with kml extension', type=str,default=None)
 
     args = parser.parse_args().__dict__

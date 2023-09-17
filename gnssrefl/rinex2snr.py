@@ -487,7 +487,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         print('SUCCESS: SNR file was created \n', snrname_full)
                         g.store_snrfile(snrname,year,station)
                 else:
-                    print('No SNR file was created - check logs section for additional information')
+                    logfile = 'logs/' + station + '_hybrid_error.txt'
+                    print('No SNR file created - check ', logfile, ' for why it failed.')
             else:
                 print('Either the RINEX file or orbit file does not exist, so there is nothing to convert')
                 log.write('Either the RINEX file or orbit file does not exist, so there is nothing to convert \n')

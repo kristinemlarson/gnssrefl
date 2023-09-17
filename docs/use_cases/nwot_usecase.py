@@ -8,6 +8,7 @@ import datetime
 import matplotlib.pyplot as plt
 import sys
 
+hires = True
 
 # in situ data for Niwot Ridge LTER
 # https://portal.edirepository.org/nis/mapbrowse?scope=knb-lter-nwt&identifier=34
@@ -64,6 +65,14 @@ left = datetime.datetime(year=2009, month=9, day = 1)
 right = datetime.datetime(year=2015, month=5, day = 1)
 plt.xlim((left, right))
 plt.ylim((-0.05, 3.25))
+
+if hires:
+    plot_path = 'nwot_usecase.eps'
+else:
+    plot_path = 'nwot_usecase.png'
+
+print('writing file to ', plot_path)
+plt.savefig(plot_path)
 plt.show()
 # GPS receiver failed in spring 2015
 

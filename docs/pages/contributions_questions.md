@@ -12,7 +12,7 @@
 - [Radon Rosborough](https://github.com/raxod502) helped with 
 python/packaging questions, improved our docker distribution, and 
 set up smoke tests. 
-- [Naoya Kadota](https://github.com/naoyakadota) added the GSI data archive. 
+- [Naoya Kadota](https://github.com/naoyakadota) added the GSI data archive and helped find a bug in nmea2snr. 
 - [Joakim Strandberg](https://github.com/Ydmir) provided 
 python RINEX translators and the EGM96 code. 
 - Johannes Boehm provided source code for the refraction correction. 
