@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.7.3
+2023 September 17
+
+rinex2snr SNR file creation fails are written to the log file. And users are told this on the screen. 
+This does not seem to be helping people. This version writes the log file's explicit name to the screen
+
+Various docs were hopefully improved.
+
+gzipping the SNR files is now the default when running gnssir. Should save space
+and I don't think it will be a huge time sink.  If it is, users can set gzip to False
+on the command line.
+
 ## 1.7.2 
 2023 September 14
 
