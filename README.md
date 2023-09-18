@@ -2,7 +2,6 @@
 
 **github version: 1.7.3** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
-
 A long time ago - and in a galaxy far, far away - Bob King told a group of graduate students why he 
 liked GPS observation files. His answer:
 
@@ -46,9 +45,7 @@ as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
 Kristine M. Larson
 
-Updated: August 24, 2023
-
-<HR>
+Updated: September 18, 2023
 
 
 
