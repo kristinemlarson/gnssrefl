@@ -1264,11 +1264,13 @@ def go_from_crxgz_to_rnx(c3gz,deletecrx=True):
 
 def get_local_rinexfile(rfile,localpath2):
     """
-    look for a plain or gzipped version of the rinex 2.11 file in the year subdirectories
+    look for a plain or gzipped version of the RINEX 2.11 file in the year subdirectories
     copies it to the local directory.  this method stops the code from deleting your rinex 
-    files
+    files. As of 2023 September 19, it should also look for Hatanaka files.
 
     localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
+
+    This is unlikely to work for uppercase RINEX files. Try the mk option
 
     Parameters
     ----------
@@ -1276,32 +1278,77 @@ def get_local_rinexfile(rfile,localpath2):
         version2 rinexfile name
 
     localpath2 : str
-        location of the file
+        another location of the file (meant to be as defined above)
 
     Returns
     -------
     allgood : bool
         whether file found
     """
+    crnxpath = g.hatanaka_version()
     allgood = False
-    # look for gzip veresion in local directory first
+    # hatanaka filename has d at end instead of o
+    rd = rfile[0:-1] + 'd'
+
+    # look for gzip version in local directory first
     if os.path.exists(rfile + '.gz'):
         subprocess.call(['gunzip', rfile + '.gz'])
         allgood = True
 
+
+    # then look for unix compressed version local directory 
+    if os.path.exists(rfile + '.Z') and not allgood:
+        subprocess.call(['uncompress', rfile + '.Z'])
+        allgood = True 
+
+    # then look for hatanaka compressed version local directory 
+    if os.path.exists(rd) and not allgood:
+        if os.path.exists(crnxpath):
+            subprocess.call([crnxpath,rd])
+            if os.path.exists(rfile):
+                allgood = True
+                subprocess.call(['rm',rd])
+
+    # then look for hatanaka compressed and unix compressed version local directory 
+    if os.path.exists(rd + '.Z') and not allgood:
+        if os.path.exists(crnxpath):
+            subprocess.call(['uncompress', rd + '.Z'])
+            subprocess.call([crnxpath,rd])
+            if os.path.exists(rfile):
+                allgood = True
+                subprocess.call(['rm',rd])
+
+    # now check in $REFL_CODE/YYYY/rinex/ssss
     if not allgood:
         r = localpath2 + rfile
+        # hatanaka version in REFL_CODE
+        rdd = localpath2 + rd
+
         if os.path.exists(r):
             allgood = True
         # cp to the local directory
+            print('copying RINEX file to local area')
             subprocess.call(['cp',r,'.'])
         else:
        # did not find normal rinex, so look for gzip version
             if os.path.exists(r + '.gz'):
                 subprocess.call(['gunzip', r + '.gz'])
-            if os.path.exists(r):
-                subprocess.call(['cp',r,'.'])
-                allgood = True
+                if os.path.exists(r):
+                    print('copying RINEX file to local area')
+                    subprocess.call(['cp',r,'.'])
+                    # now gzip the original file ...
+                    subprocess.call(['gzip', r ])
+                    allgood = True
+            # if hatanaka is stored locally
+            if os.path.exists(rdd) and not allgood:
+                # copy from REFL_CODE to local dir
+                # and convert
+                print('copying Hatanaka file to local area')
+                subprocess.call(['cp',rdd,'.'])
+                subprocess.call([crnxpath,rd])
+                if os.path.exists(rfile):
+                    allgood = True
+                    subprocess.call(['rm',rd])
 
     return allgood
 

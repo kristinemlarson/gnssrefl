@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.8.0
+2023 September 19
+
+Allow Hatanaka and Hatanaka + unix compressed files (.Z) in the local directory
+for the nolook option. Hatanaka files also allowed in $REFL_CODE/YYYY/rinex/ station directory
+
+Write out error message when people inadvertently throw out all data because
+they did not take into account that their receiver had an elevation mask and
+used e1 that is too small.
+
 ## 1.7.3
 2023 September 17
 

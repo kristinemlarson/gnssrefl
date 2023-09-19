@@ -45,7 +45,7 @@ def parse_arguments():
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-samplerate", default=None, help="sample rate in sec (RINEX 3 only)", type=int)
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
-    parser.add_argument("-mk", default=None, help="use T for uppercase station names or when your local RINEX data is stored in Hatanaka format", type=str)
+    parser.add_argument("-mk", default=None, help="use T for uppercase station names ", type=str)
     parser.add_argument("-weekly", default=None, help="use T for weekly data translation", type=str)
     parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
@@ -74,9 +74,31 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     bkg no longer a boolean input - must be specified with archive name, i.e. bkg-igs or bkg-euref
 
-    For the nolook option (i.e. you have the RINEX 2.11 file), the file should be normal RINEX (ends in o) or 
-    gzipped normal RINEX.  If you have something other than that, you can try the -mk option.  
-    For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endiings.
+    For the nolook option :
+
+    If you have the RINEX 2.11 file), the file was originally required to be normal RINEX (ends in o) or 
+    gzipped normal RINEX. It can be in the local directory or in the $REFL_CODE/YYYY/rinex directory for your station. It now
+    allows RINEX 2.11 files that are Hatanaka compressed, Hatanaka compressed + unix compressed,  for 
+    the local directory. It also allows Hatanaka compressed in the REFL_CODE directory.  
+    Beyond that, you can try the -mk T option which searches other places.
+
+    For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory.
+
+    FAQ: what is rate anad srate?  rate is telling the code which folder to use because archives always have 
+    files in different directories depending on sample rate.  srate is for RINEX 3 files only because RINEX 3 
+    has the sample rate on the filename itself (not just the directory).  
+
+    What is the stream parameter? This is for RINEX 3 only. File types are either S or R.  I believe S stands for 
+    streamed.
+
+    RINEX3 30 second archives supported  
+        bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel
+
+    RINEX3 15 sec archives
+        bfg, unavco  - you may need to specify 15 second sample rate
+
+    RINEX3 1 sec 
+        bkg-igs, bkg-euref, cddis, maybe nrcan 
 
     Examples
     --------
@@ -90,29 +112,32 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         station mchn, year/doy 2022/15,sopac archive using GPS orbits
 
     rinex2snr mchn 2022 15  -orb rapid -archive sopac
-        now explicitly using multi-GNSS orbits
+        now explicitly using rapid multi-GNSS orbits 
+
+    rinex2snr mchn 2022 15  -orb rapid -archive sopac
+        now explicitly using final multi-GNSS orbits (includes Beidou)
+
+    rinex2snr mchn 2022 15  -orb rapid -archive sopac -overwrite T
+        have an SNR file, but you want to make a new one
 
     rinex2snr p041 2022 15  -orb rapid -rate high -archive unavco
         now using high-rate data from unavco and multi-GNSS orbits
 
     rinex2snr p041 2022 15 -nolook T
         using your own data stored as p0410150.22o in the working directory 
-        your RINEX o file may also be gzipped.  
+        your RINEX o file may also be gzipped. I believe Hatanaka compressed is also allowed. 
+
+    rinex2snr 940050 2021 31 -archive jp
+        GSI archive in Japan - password required. Station names are six characters
 
     rinex2snr mchl00aus 2022 15  -orb rapid -archive ga 
-        30 sec data for mchl00aus and Geoscience Australia
+        30 sec RINEX3 data for mchl00aus and Geoscience Australia
 
     rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg-igs -stream S 
         1 sec data for warn00deu, 1 sec decimated to 5 sec, multi-GNSS, bkg IGS archive, streamed
 
-    RINEX3 30 second archives supported  
-        bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel
-
-    RINEX3 15 sec archives
-        bfg, unavco
-
-    RINEX3 1 sec 
-        bkg-igs, bkg-euref, cddis, maybe nrcan 
+    rinex2snr tgho  2019 1 -doy_end 365 -archive nz
+        example for multiday SNR file creation
 
     Parameters
     ----------
