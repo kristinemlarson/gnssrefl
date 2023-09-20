@@ -37,6 +37,8 @@ https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/
 
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
+f2py -c -m gnssrefl.gnsssnr gnssrefl/gnsssnr.f
+f2py -c -m gnssrefl.gnsssnrbigger gnssrefl/gnsssnrbigger.f
 
 docker pull unavdocker/gnssrefl to install code.
 
