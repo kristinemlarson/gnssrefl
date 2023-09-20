@@ -18,7 +18,7 @@ def parse_arguments():
     parser.add_argument('-lon', help='Longitude (deg), if station not in database', type=float, default=None)
     parser.add_argument('-height', help='Ellipsoidal height (m) if station not in database', type=float,default=None)
     parser.add_argument('-fr', help='1, 2, or 5 (default is 1)', type=int,default=None)
-    parser.add_argument('-RH', help='Reflector height (meters). Default is sea level', type=str, default=None)
+    parser.add_argument('-RH', help='Reflector height (meters). Default is height above sea level', type=float, default=None)
     parser.add_argument('-azim1', help='start azimuth (default is 0 deg, negative values allowed) ', type=int,default=None)
     parser.add_argument('-azim2', help='end azimuth (default is 360 deg) ', type=int,default=None)
     parser.add_argument('-el_list', nargs="*",type=float,  help='elevation angle list, e.g. 5 10 15  (default)')
@@ -32,15 +32,23 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: float=None, height: float=None, 
-        RH: str=None, fr: int = 1, el_list: float= [], azlist : float=[], system: str = 'gps', output: str = None):
+        RH: float=None, fr: int = 1, el_list: float= [], azlist : float=[], system: str = 'gps', output: str = None):
     """
-    Creates a KML file for reflection zones to be used in Google Earth
+    This module creates “stand-alone” Fresnel Zones maps for google Earth. At a minimum 
+    it requires a four station character name as input. The output is a KML file.
 
-    If station is in the UNR database, those lat/lon/el_height values are used. You may override those values 
-    with the optional inputs.
+    If the station is in the UNR database, those latitude, longitude, and ellipsoidal 
+    height values are used. You may override those values with the optional inputs.
 
     The output file will be stored in REFL_CODE/Files/kml unless you specify an output name. In that case
     it will go into your working directory
+
+    The defaults are that it does all azimuths, elevation angles of 5-10-15, GPS L1, and uses the height
+    of the station above sea level to use for the RH. If you want to specify the reflector height, set -RH. 
+    If you are making a file for an interior lake or river, you will need to use this option. Similarly, 
+    for a soil moisture or snow reflection zone map, where height above sea level is not important, 
+    you will want to set the RH value accordingly.
+
 
     Examples
     --------
@@ -52,6 +60,10 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
 
     refl_zones p041 -RH 5 -system galileo
         Fresnel zones for reflector height of 5 meters and Galileo L1
+
+    refl_zones xxxx -RH 5 -lat 40 -lon 120 -height 10
+        Using a station not in the UNR database, so station position given
+        Note that this is the ellipsoidal height.
 
     Parameters
     ----------
@@ -67,12 +79,12 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         longitude in deg
     height : float, optional
         ellipsoidal height in m
-    RH : str, optional
+    RH : float, optional
         user-defined reflector height (m)
         default is to use sea level as the RH
     fr : int, optional
         frequency (only 1,2, or 5 allowed)
-    el_list : list of floats
+    el_list : list of floats, optional 
         elevation angles desired (deg)
         default is 5, 10, 15
     azlist : list of floats, optional
@@ -85,7 +97,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
 
     Returns
     -------
-    Creates a KML file
+    Creates a KML file for Google Earth
 
     """
 
@@ -103,7 +115,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
 
     # check that EGM96 file is in your local directory
     foundfile = g.checkEGM()
-    if (RH == None) and (not foundfile):
+    if (RH is None) and (not foundfile):
         print('EGM96 file has not been found. It should be in the REFL_CODE/Files directory')
 
     #print(lat,lon,el_height)
@@ -135,11 +147,12 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         else:
             print('Using frequency: ', fr)
 
+    # set the reflector height
     # default is to use sea level as reflector height.  if RH is set, use that instead
-    if RH == None:
+    if RH is None:
         h = sealevel
     else:
-        h = float(RH)
+        h = RH
 
     if h < 0:
         print('This is an illegal RH: ',h, ' Exiting.')

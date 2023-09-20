@@ -117,12 +117,12 @@ def ny_plot(station,allN, info,hires_figs):
     ax.plot(allN[:,0],allN[:,1],'bo',label='L1')
     ax.plot(allN[:,0],l2*allN[:,1]/l1,'ro',label='L2')
     ax.plot(allN[:,0],l5*allN[:,1]/l1,'co',label='L5')
-    ax.set_title(station + ' RH Nyquist/' + info, fontsize=14)
+    ax.set_title(station + ': Maximum Resolvable RH /' + info, fontsize=14)
     ax.grid()
     ax.set_xlabel('Azimuth (deg)')
     ax.set_ylabel('meters')
     ax.set_xlim(0,360)
-    ax.legend(loc="upper right")
+    ax.legend(loc="best")
 
     # checks that directory exists
     g.checkFiles(station, '')
@@ -132,20 +132,21 @@ def ny_plot(station,allN, info,hires_figs):
 
     # a little backwards ... 
     if hires_figs : 
-        pngfile = xdir + station + '_nyquist.eps'
+        pngfile = xdir + station + '_maxRH.eps'
         fig.savefig(pngfile, format="eps")
     else:
-        pngfile = xdir + station + '_nyquist.png'
+        pngfile = xdir + station + '_maxRH.png'
         fig.savefig(pngfile, format="png")
     plt.show()
     print('Plot file stored in: ', pngfile)
 
-    txtfile = xdir + station + '_nyquist.txt'
+    txtfile = xdir + station + '_maxRH.txt'
     print(txtfile)
     nr,nc = allN.shape
     N = len(allN)
     fout = open(txtfile, 'w+')
     fout.write('{0:s}  {1:s} \n'.format('%', station + ' ' + info ))
+    fout.write('{0:s}  {1:s} \n'.format('%', 'Maximum Resolvable Reflector Height' ))
     for i in range(0,N):
         fout.write('{0:7.2f}  {1:7.2f} \n'.format(allN[i,0], allN[i,1]))
     fout.close()

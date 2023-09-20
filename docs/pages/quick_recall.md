@@ -2,8 +2,7 @@
 
 ## Main Functions
 
-* [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html), 
-[discussion](https://gnssrefl.readthedocs.io/en/latest/pages/rinex2snr.html)
+* [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html) 
 
 * [quickLook code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
 
@@ -24,8 +23,7 @@
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_invsnr.html),
 [invsnr_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 
-* [refl_zones code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html),
-[discusssion](https://gnssrefl.readthedocs.io/en/latest/pages/utilities.html)
+* [refl_zones code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html)
 
 
 ## Environmental Products
@@ -54,8 +52,8 @@ phasecode, TBD
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
 * [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html)
 * [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)
+* [max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_cl.html)
 * [mjd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.mjd.html)
-* [nyquist](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nyquist_cl.html)
 * [query_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.query_unr.html)
 * [quickplt](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickplt.html)
 * [rinex3_rinex2](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex3_rinex2.html)

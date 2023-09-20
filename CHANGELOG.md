@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.8.1
+2023 September 20
+
+Added plot changes to subdaily (e.g. allow fontsize choice from command line)
+
+Fixed a weirdness where GNSS files with no SNR data would create a file with
+all zeros data.  Which is technically correct, but not terribly friendly.  The 
+GPS orbit option exited with a message. Now GNSS files also exit with a message.
+
+changed nyquist to max_resolve_RH so it makes more sense to learners. i.e. this is the max
+resolvable RH you can expect for a given station location.
+
 ## 1.8.0
 2023 September 19
 

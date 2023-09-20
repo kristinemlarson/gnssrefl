@@ -33,17 +33,19 @@ def parse_arguments():
 
     return {key: value for key, value in args.items() if value is not None}
 
-def nyquist(station: str, lat: float=None, lon: float=None, el_height: float=None, e1: float=5, e2: float=25, 
+def max_resolve_RH(station: str, lat: float=None, lon: float=None, el_height: float=None, e1: float=5, e2: float=25, 
         samplerate : float = 30, system: str = 'gps', hires_figs : bool = False):
     """
-    Creates nyquist plot
+    Calculates the Maximum Resolvable Reflector Height. This is analogous to a Nyquist
+    frequency for GNSS-IR.  It creates a plot and makes a plain txt file in case you 
+    want to look at the numbers.
 
     Examples
     --------
-    nyquist sc02 -e1 5 -e2 15
+    max_resolve_RH sc02 -e1 5 -e2 15
         typical case for most geodetic sites, 30 seconds, elevation angles 5-15 degrees
 
-    nyquist sc02 -samplerate 15 -system galileo
+    max_resolve_RH sc02 -samplerate 15 -system galileo
         receiver sampling rate of 15 seconds and galileo
 
     Parameters
@@ -102,7 +104,7 @@ def nyquist(station: str, lat: float=None, lon: float=None, el_height: float=Non
 
 def main():
     args = parse_arguments()
-    data = nyquist(**args)
+    data = max_resolve_RH(**args)
 
 
 if __name__ == "__main__":

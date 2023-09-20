@@ -100,7 +100,7 @@ There are three big issues :
 from where you want them (**Reflection Zones**)
 
 3. Your receiver must be collecting data at sufficient rate so that your GNSS-IR results 
-are not violating the Nyquist frequency (**Nyquist**).
+are not violating the Nyquist frequency (**Maximum Resolvable Reflector Height**).
 
 ## Quality Control 
 
@@ -278,11 +278,17 @@ appropriate azimuth and elevation angle
 mask and reflector height range. This is the main reason 
 <code>quickLook</code> was developed. 
 
-## Nyquist
+## Maximum Resolvable Reflector Height
 
-Please see the [Roesler and Larson paper](https://link.springer.com/article/10.1007/s10291-018-0744-8) for a 
-discussion of Nyquist. I have ported the Matlab code provided in that paper 
-to [gnssrefl](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nyquist_cl.html) 
+The "Nyquist" is complicated for GNSS-IR for various reasons - one being the units 
+are not the same as the units of what we care about,
+the Reflector Height. So I am going to call it the Maximum Resolvable Reflector Height,
+which is a mouthfull, but at least you have some idea what it means.  
+If you are interested in the details of this calculation, please 
+see the [Roesler and Larson paper](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
+If you want to compute it for your site, please use 
+[max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_RH_cl.html) 
+That's all I am going to say on the matter.
 
 ## quickLook
 
