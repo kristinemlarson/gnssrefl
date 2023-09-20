@@ -277,7 +277,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
 
 
 def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,
-        peak2noise,txtfile,h1,h2,kplt,txtdir,default_usage,hires_figs):
+        peak2noise,txtfile,h1,h2,kplt,txtdir,default_usage,hires_figs,fs):
     """
     Reads in RH results and makes various plots to help users assess the quality of the solution
 
@@ -324,6 +324,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         this changes the plots a bit.
     hires_figs: bool
         whether to switch from png to eps
+    fs : int
+        fontsize for figure axes
 
     Returns
     -------
@@ -338,7 +340,6 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     """
     # fontsize for plot labels and such
-    fs = 10
     xdir = os.environ['REFL_CODE']
     print('Will remove daily outliers greater than ', sigma, ' sigma')
     if not os.path.exists(txtdir):
@@ -754,7 +755,7 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
         th2 = datetime.datetime(year=year, month=mm, day=dd)
     # this is not working, so just setting it to false, cause who cares!
     setlimits = False
-    fs = 10
+    fs = 12
     fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True,figsize=(10,8))
     #fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
     i = (tv[:,10] < 100)
@@ -874,11 +875,11 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     plt.plot(stats[:,0], stats[:,1]+sigma*stats[:,2], '--',color='black')
     plt.plot(otimesarray[ii],tv[ii,2], 'r.',markersize=4,label='outliers')
     #plt.plot(otimesarray[ii],tv[ii,2], '.',color='red',label='outliers',markersize=12)
-    plt.legend(loc="best",bbox_to_anchor=(0.95, 0.9),prop={"size":8})
-    plt.title('Raw ' + station.upper() + ' Reflector Heights', fontsize=8)
-    plt.ylabel('meters',fontsize=8)
+    plt.legend(loc="best",bbox_to_anchor=(0.95, 0.9),prop={"size":fs-2})
+    plt.title('Raw ' + station.upper() + ' Reflector Heights', fontsize=fs)
+    plt.ylabel('meters',fontsize=fs)
     plt.gca().invert_yaxis()
-    plt.xticks(rotation =45,fontsize=8); plt.yticks(fontsize=8)
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
     plt.grid() ; fig.autofmt_xdate()
     # get the limits so you can use thme on the next plot
     #aaa, bbb = plt.ylim()
@@ -887,9 +888,10 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     ax2 = fig.add_subplot(212)
     plt.plot(otimesarray[jj],tv[jj,2], '.',color='green',label='arcs')
     plt.gca().invert_yaxis()
-    plt.ylabel('meters',fontsize=8)
-    plt.xticks(rotation =45,fontsize=8); plt.yticks(fontsize=8)
-    plt.title('Edited ' + station.upper() + ' Reflector Heights', fontsize=8)
+    plt.ylabel('meters',fontsize=fs)
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    plt.title('Edited ' + station.upper() + ' Reflector Heights', fontsize=fs)
+
     plt.grid() ; fig.autofmt_xdate()
     if hires_figs:
         plotname = txtdir + '/' + station + '_outliers.eps'
@@ -1228,11 +1230,13 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     else:
         hires_figs = False
 
+    fs = kwargs.get('fs',12)
+    print('Using fontsize: ', fs)
+
     #print('output directory: ', txtdir)
 
 #   how often do you want velocity computed (per day)
     perday = 24*20 # so every 3 minutes
-    fs = 10 # fontsize
     # making a knot every three hours ...
     # knots_per_day = 8
     knots_default = 8
@@ -1391,10 +1395,10 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     plt.plot(th[ii], residual_after[ii],'b.',label='kept pts')
     plt.grid()
-    plt.title('Residuals to the spline fit')
-    plt.xlabel('days of the year')
-    plt.ylabel('meters')
-    plt.legend(loc="upper left")
+    plt.title('Residuals to the spline fit',fontsize=fs)
+    plt.xlabel('days of the year',fontsize=fs)
+    plt.ylabel('meters',fontsize=fs)
+    plt.legend(loc="upper left",fontsize=fs)
     plt.xlim((plot_begin, plot_end))
 
     if hires_figs:
@@ -1505,8 +1509,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     fig=plt.figure(figsize=(10,5))
     #plt.subplot(2,1,1)
-    plt.plot(th, biasCor_rh, 'b.', label='RH with RHdot/IFcorr ' + strsig)
-    plt.plot(th_even, spline_whole_time, 'c-',label='newspline')
+    plt.plot(th, biasCor_rh, 'b.', label='RH ' + strsig)
+    plt.plot(th_even, spline_whole_time, 'c-',label='spline')
 
     if outlierV2 is None:
         # use 3 sigma to find outliers
@@ -1525,12 +1529,12 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     plt.plot(th[ii], biasCor_rh[ii], 'rx', label='outliers')
 
-    plt.legend(loc="upper left")
+    plt.legend(loc="best",fontsize=fs)
     plt.grid()
     plt.gca().invert_yaxis()
-    plt.ylabel('meters')
-    plt.title('Station: ' + station + ', new spline, RHdot corr/InterFreq corr/outliers removed')
-    plt.xlabel('days of the year')
+    plt.ylabel('meters',fontsize=fs)
+    plt.title(station.upper() + ' RH with RHdot and InterFrequency Corrections Applied',fontsize=fs)
+    plt.xlabel('days of the year',fontsize=fs)
     # put hires_figs boolean here
     print(txtdir)
     if hires_figs:
@@ -1541,15 +1545,15 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     fig=plt.figure(figsize=(10,5))
     #plt.subplot(2,1,1)
     plt.plot(th, biasCor_rh - spline_at_GPS, 'b.',label='all residuals')
-    plt.title('Station:' + station + ' Residuals to new spline fit')
+    plt.title('Station:' + station + ' Residuals to new spline fit',fontsize=fs)
     plt.grid()
-    plt.ylabel('meters')
-    plt.xlabel('days of the year')
+    plt.ylabel('meters',fontsize=fs)
+    plt.xlabel('days of the year',fontsize=fs)
 
     plt.plot(th[ii], (biasCor_rh -spline_at_GPS)[ii], 'r.',label='outliers')
     # will write these residauls out to a file
     badpoints2 =  (biasCor_rh -spline_at_GPS)[ii]
-    plt.legend(loc="upper left")
+    plt.legend(loc="upper left",fontsize=fs)
 
     print('RMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3)  )
     if hires_figs:
@@ -1791,12 +1795,13 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs):
     if (np.sum(Gval) > 0):
         ax.plot(tval,Gval,'bo',label='GPS',markersize=3)
     if (np.sum(Rval) > 0):
-        ax.plot(tval,Rval,'ro',label='GLO',markersize=3)
+        ax.plot(tval,Rval,'ro',label='GLONASS',markersize=3)
     if (np.sum(Eval) > 0):
-        ax.plot(tval,Eval,'o',color='orange',label='GAL',markersize=3)
+        ax.plot(tval,Eval,'o',color='orange',label='GALILEO',markersize=3)
     if (np.sum(Cval) > 0):
-        ax.plot(tval,Cval,'co',label='BEI',markersize=3)
-    plt.legend(loc="upper left")
+        ax.plot(tval,Cval,'co',label='BEIDOU',markersize=3)
+    plt.legend(loc="best",fontsize=fs)
+    #ax.legend(loc='best')
     plt.title(station + ': number of RH retrievals each day',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
     plt.grid()
