@@ -398,7 +398,7 @@ def read_nmea(fname):
     t = []; prn = []; az = []; elv = []; snr = []; freq = []
     
     curdt = None #Empty starting date to ensure only get data with proper timing
-    
+    t_sec = None #Empty starting time
     for i, line in enumerate(lines):
         line = line.decode('utf-8')
         
@@ -423,13 +423,16 @@ def read_nmea(fname):
             continue
         
         if 'GGA' in line: #read GPGGA sentence: Global Positioning System Fix Data 
-            hr = int(line.split(",")[1][0:2])
-            mn = int(line.split(",")[1][2:4])
-            sc = float(line.split(",")[1][4:8])
-            t_sec = hr*3600 + mn*60 + sc
-            if (i > 100 and t_sec == 0):                   #set t to 86400 for the midnight data
-                t_sec = 86400
-                
+            try:
+                hr = int(line.split(",")[1][0:2])
+                mn = int(line.split(",")[1][2:4])
+                sc = float(line.split(",")[1][4:8])
+                t_sec = hr*3600 + mn*60 + sc
+                if (i > 100 and t_sec == 0):                   #set t to 86400 for the midnight data
+                    t_sec = 86400
+            except:
+                t_sec = None
+                continue # skip invalid GGA sentence
             #This could be added if positioning info is interesting/needed. Via https://github.com/purnelldj/gnssr_lowcost
             #   row = line.split(',')
             #   if row[3] == 'S': #Northern or southern hemisphere
@@ -442,6 +445,8 @@ def read_nmea(fname):
         #Read Satellite positions (GSV) - The GSV message string identifies the number of SVs in view, the PRN numbers, 
         #elevations, azimuths, and SNR values.
         elif 'GSV' in line:                    #read GPGSV sentence: GPS Satellites in view in this cycle   
+            if t_sec is None: # Discard line if there's no valid timestamp
+                continue
             try:
                 sent = line.split(",")         #GSV sentence 
                 #ttl_ms = int(sent[1])          #Total number of messages in the GPGSV sentence 
