@@ -6416,3 +6416,72 @@ def checkFiles(station, extension):
             print(txtdir , ' has been created')
 
 
+def read_leapsecond_file(mjd):
+    """
+    reads leap second file and tries to figure out the UTC-GPS time offset
+    needed for NMEA file users for the given MJD value
+
+    It will download and store the leap second file in REFL_CODE/Files if 
+    you don't already have it.
+
+    Parameters
+    ----------
+    mjd : float
+        Modified Julian Day for when you want to know the leap seconds since
+        GPS began
+
+    Returns
+    -------
+    offset : int
+        UTC-GPS time offset in seconds. This should be added to UTC to get GPS
+
+    """
+    offset = 0
+    xdir = os.environ['REFL_CODE']
+    if not os.path.isdir(xdir):
+        print('REFL_CODE environment variable has not been set. Exiting')
+        sys.exit()
+    # Fire currently loaded here
+    xdir = os.environ['REFL_CODE'] + '/input'
+    if not os.path.isdir(xdir):
+         subprocess.call(['mkdir', xdir])
+
+    # in case you decide to put it here
+    xdir = os.environ['REFL_CODE'] + '/Files'
+    if not os.path.isdir(xdir):
+         subprocess.call(['mkdir', xdir])
+
+    # I changed it to look for leap second file in Files
+    xdir = os.environ['REFL_CODE'] + '/Files/leapseconds.txt' 
+    # if file is not on your system, download it
+    if not os.path.isfile(xdir):
+        print('Trying to download leapsecond file from github')
+        url= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/leapseconds.txt'
+        print(url)
+        wget.download(url,xdir)
+    if not os.path.isfile(xdir):
+        print('Trying to download leapsecond file from morefunwithgps')
+        url = 'https://morefunwithgps.com/public_html/leapseconds.txt'
+        print(url)
+        wget.download(url,xdir)
+    if not os.path.isfile(xdir):
+        print('Could not find the leap second file. Exiting.')
+        sys.exit()
+
+    tv = np.loadtxt(xdir,usecols=(1),comments='%')
+    N = len(tv)
+    # these leap seconds are set to dec 31 or june 30 but are applied at midnight
+    # so add one day ...
+    tv = tv + 1
+    # add a value to an end point
+    for i in range(0,N):
+        #print(i,tv[i], mjd)
+        if (i == (N-1)):
+            #print('found the correct leap second ',i+1)
+            offset = i+1
+        elif (mjd > tv[i] ) & (mjd < tv[i+1]):
+            #print('found the correct leap second ',i+1)
+            offset = i+1
+            break
+
+    return offset

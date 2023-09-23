@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.8.1
+2023 September 20
+
+Added plot changes to subdaily (e.g. allow fontsize choice from command line)
+
+Fixed a weirdness where GNSS files with no SNR data would create a file with
+all zeros data.  Which is technically correct, but not terribly friendly.  The 
+GPS orbit option exited with a message. Now GNSS files also exit with a message.
+
+changed nyquist to max_resolve_RH so it makes more sense to learners. i.e. this is the max
+resolvable RH you can expect for a given station location.
+
+## 1.8.0
+2023 September 19
+
+Allow Hatanaka and Hatanaka + unix compressed files (.Z) in the local directory
+for the nolook option. Hatanaka files also allowed in $REFL_CODE/YYYY/rinex/ station directory
+
+Write out error message when people inadvertently throw out all data because
+they did not take into account that their receiver had an elevation mask and
+used e1 that is too small.
+
+## 1.7.3
+2023 September 17
+
+rinex2snr SNR file creation fails are written to the log file. And users are told this on the screen. 
+This does not seem to be helping people. This version writes the log file's explicit name to the screen
+
+Various docs were hopefully improved.
+
+gzipping the SNR files is now the default when running gnssir. Should save space
+and I don't think it will be a huge time sink.  If it is, users can set gzip to False
+on the command line.
+
+## 1.7.2 
+2023 September 14
+
+leap second file picked up from github repository for pypi and git clone users.  Tim will take care of shipping 
+it in the docker
+
+add documentation to nmea2snr
+
+
+## 1.7.1
+2023 September 13
+
+moved leap second file location to REFL_CODE/Files to accommodate docker users
+
+## 1.7.0
+2023 September 13
+
+Attempted to add leap second corrections to SNR files created by non-compliant nmea2snr
+code.  Added small function to gps.py that installs a leap second file - and reads it.
+Returns the hopefully proper offset, which is applied when writing out the timetag in nmea2snr.
+Feedback appreciated.
+
+## 1.6.8
+
+added mjd utility
+
+chagned nmea2snr so it allows signals other than L1. this required changing the fortran
+code that does the orbits for you. It is a slow module - maybe it always was. something to keep an eye on.
+
+fixed some documentation in download_rinex that misdescribed the stream input as boolean, which it is not.
+
+added tall site use case, ac59
+
 ## 1.6.7
 
 Accepted Kelly Enloe PR, mostly Jupyter notebooks stuff

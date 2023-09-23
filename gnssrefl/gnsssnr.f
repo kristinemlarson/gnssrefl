@@ -60,7 +60,7 @@ c     character*2  key(maxsat)
       integer sp3_gps_weeks(np),sp3_nsat,sp3_satnames(maxsat)
       real*8 sp3_XYZ(maxsat,np,3), sp3_gps_seconds(np),
      .  t9(9), x9(9), y9(9), z9(9), sp3_rel_secs(np)
-      integer ipointer(maxGNSS),errid,itod
+      integer ipointer(maxGNSS),errid,itod, iuseful,k
       logical haveorbit(maxGNSS), debug
       debug = .false.
 c      file id for error log
@@ -119,6 +119,17 @@ c     and an observable array and nobs, number of observables
 
       call read_header_25obs(fileIN,rawfilename, xrec,yrec,zrec,
      .  iobs,nobs,iymd, station,errid)
+      iuseful = 0
+      do k = 6, 11
+         if (iobs(k) .gt. 0) then
+            iuseful = iuseful + 1
+         endif
+      enddo
+      if (iuseful .eq. 0) then
+        write(errid,*) 'Your file had no useful SNR observables'
+        write(errid,*) 'in it. Look at the header of your file'
+        return
+      endif 
       if (xrec.eq.0.d0) then
         write(errid,*) 'you need real station coords '
         return

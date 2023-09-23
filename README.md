@@ -1,7 +1,18 @@
 # gnssrefl
 
-**github version: 1.6.7** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+**github version: 1.8.1** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
+Our documentation is available [here.](https://gnssrefl.readthedocs.io/en/latest/)
+
+A long time ago - and in a galaxy far, far away - Bob King told a group of graduate students why he 
+liked GPS observation files. His answer:
+
+*There are no leap seconds.*
+
+I agree with Bob King. This software is meant to be used with GPS time. All files should be in GPS time.
+Conversion to UTC is something you should do on your own. 
+
+September 12, 2023: Updated nmea2snr to allow signals other than L1.
 
 August 2, 2023: Updated azimuth outputs for gnssir and quickLook so that the azimuth of the 
 rising or setting part of the arc is reported rather than the average azimuth, as was done in the older versions.
@@ -15,8 +26,6 @@ downstream codes (subdaily, daily_avg etc). This bug has
 no impact on the data translation codes (rinex2snr, nmea2snr).  
 
 How do you find out which version are you running? Type <code>pip list | grep gnssrefl</code>
-
-Our documentation is available [here.](https://gnssrefl.readthedocs.io/en/latest/)
 
 If you want to sign up for the GNSS-IR email list, please contact Kristine Larson.
 
@@ -35,9 +44,6 @@ as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
 Kristine M. Larson
 
-Updated: August 24, 2023
-
-<HR>
 
 
 

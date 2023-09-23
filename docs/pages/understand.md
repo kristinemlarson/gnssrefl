@@ -100,7 +100,7 @@ There are three big issues :
 from where you want them (**Reflection Zones**)
 
 3. Your receiver must be collecting data at sufficient rate so that your GNSS-IR results 
-are not violating the Nyquist frequency (**Nyquist**).
+are not violating the Nyquist frequency (**Maximum Resolvable Reflector Height**).
 
 ## Quality Control 
 
@@ -278,11 +278,17 @@ appropriate azimuth and elevation angle
 mask and reflector height range. This is the main reason 
 <code>quickLook</code> was developed. 
 
-## Nyquist
+## Maximum Resolvable Reflector Height
 
-Please see the [Roesler and Larson paper](https://link.springer.com/article/10.1007/s10291-018-0744-8) for a 
-discussion of Nyquist. I have ported the Matlab code provided in that paper 
-to [gnssrefl](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nyquist_cl.html) 
+The "Nyquist" is complicated for GNSS-IR for various reasons - one being the units 
+are not the same as the units of what we care about,
+the Reflector Height. So I am going to call it the Maximum Resolvable Reflector Height,
+which is a mouthfull, but at least you have some idea what it means.  
+If you are interested in the details of this calculation, please 
+see the [Roesler and Larson paper](https://link.springer.com/article/10.1007/s10291-018-0744-8). 
+If you want to compute it for your site, please use 
+[max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_RH_cl.html) 
+That's all I am going to say on the matter.
 
 ## quickLook
 
@@ -338,9 +344,9 @@ This is further emphasized in the next panel, that shows the actual periodograms
 
 <img src=../_static/ross-lsp.png width=600>
 
-[Example for a site on an ice sheet](../use_cases/use_gls1.md)
+[Example for a site on an ice sheet](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_gls1.html)
 
-[Example for a tall site](../use_cases/use_smm3.md)
+[Example for a taller site on an ice sheet](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_smm3.html)
 
 
 Warning: <code>quickLook</code> calculates the minimum observed elevation 
@@ -361,7 +367,6 @@ about why arcs have been rejected.
 
 ## gnssir
 
-
 **gnssir_input**
 
 [A full listing of the possible inputs and examples for gnssir_input can be found here.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
@@ -369,7 +374,7 @@ about why arcs have been rejected.
 Your first task is to define your analysis strategy. We use station p101 as an example.
 If the station location is in our database:
 
-<CODE>gnssir_input p101</CODE>
+<code>gnssir_input p101</code>
 
 If you have your own site, you should use -lat, -lon, -height as inputs.  
 If you happen to have the Cartesian coordinates (in meters), you can 
@@ -383,12 +388,12 @@ You can set your preferred azimuth regions using -azlist2. Previously you were r
 azimuth regions, none of which could be larger than 100 degrees. That is no longer required. However, if 
 you do need multiple distinct regions, that is allowed, e.g.
 
-<CODE>gnssir_input p101  -azlist2 0 90 180 270</CODE>
+<code>gnssir_input p101  -azlist2 0 90 180 270</code>
 
 If you wanted all southern quadrants, since these are contiguous, you just need to give the starting and ending 
 azimuth.
 
-<CODE>gnssir_input p101  -azlist2 90 270</CODE>
+<code>gnssir_input p101  -azlist2 90 270</code>
 
 You should also set the preferred reflector height region (h1 and h2) and elevation angle mask (e1 and e2).
 Note: the reflector height region should not be too small, as it is also used to set the region for your periodogram.

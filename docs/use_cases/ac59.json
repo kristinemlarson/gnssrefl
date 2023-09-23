@@ -1,0 +1,52 @@
+{
+    "station": "ac59",
+    "lat": 59.56719883,
+    "lon": -153.58520038,
+    "ht": 308.5462937,
+    "minH": 285.0,
+    "maxH": 305.0,
+    "e1": 4,
+    "e2": 8,
+    "NReg": [
+        285.0,
+        300.0
+    ],
+    "PkNoise": 2.4,
+    "polyV": 4,
+    "pele": [
+        4,
+        10
+    ],
+    "ediff": 2,
+    "desiredP": 0.005,
+    "azval2": [
+        40,
+        180 
+    ],
+    "freqs": [ 1, 20, 101,201],
+    "reqAmp": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "refraction": true,
+    "overwriteResults": true,
+    "seekRinex": false,
+    "wantCompression": false,
+    "plt_screen": false,
+    "onesat": null,
+    "screenstats": false,
+    "pltname": "ac59_lsp.png",
+    "delTmax": 75
+}

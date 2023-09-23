@@ -72,10 +72,10 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
         fexists = False
         if os.path.isfile(jfile1):
             jfile = jfile1 ; fexists = True
-            print('json file found ',jfile1)
+            print('json file found (using for station coordinates)',jfile1)
         elif os.path.isfile(jfile2):
             jfile = jfile2 ; fexists = True
-            print('json file found ',jfile2)
+            print('json file found (using for station coordinates)',jfile2)
 
         if fexists:
             with open(jfile, 'r') as my_json:
@@ -91,9 +91,13 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
             return
 
     if sp3:
-        xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
+        # first try to find precise because they have beidou
+        xf,orbdir,foundit=g.gbm_orbits_direct(year,month,day)
         if not foundit: 
-            print('Could not find the rapid orbits. Exiting')
+            print('Could not find the precise GNSS orbits from GFZ. ')
+            xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
+            if not foundit: 
+                print('Could not find the rapid orbits from GFZ. Exiting')
             return
         else:
             orbfile = orbdir + '/' + xf # hopefully
@@ -169,9 +173,79 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
         
         del  time, angle, azimuth, Snr, Prn, angle_fixed, azim_fixed, frequency
         
-    if sp3:
+    # It is easier for the sp3 option to write out the time, satellite, and SNR data into a plain file.
+    # then the fortran can read that file and calculate the orbits from teh SP3 file and write out a new 
+    # file with the correct azimuth and elevation angle.
+    leap_mjd = g.getMJD(year,month,day,0)
+
+    offset = g.read_leapsecond_file(leap_mjd)
+    print('Leap second offset ', offset)
+
+    if sp3 :
         tmpfile =  station + 'tmp.txt'
-        #print('Opening temporary file : ', tmpfile)
+        timetags = np.unique(T)
+
+        xT = np.asarray(T)
+        xPRN = np.asarray(PRN)
+        xSNR = np.asarray(SNR)
+        xfreq = np.asarray(FREQ)
+
+        print('Opening temporary file : ', tmpfile)
+        fout = open(tmpfile, 'w+')
+        fout.write('{0:15.4f}{1:15.4f}{2:15.4f} \n'.format(recv[0], recv[1],recv[2]) )
+        fout.write('{0:6.0f}{1:6.0f}{2:6.0f} \n'.format(year, month, day) )
+        #(t[i], prn[i], snr[i],freq[i])
+        # look thru the unique time tags
+        for i in range(0,len(timetags)):
+            if ( (timetags[i] % idec) == 0):
+                # for this timetag and if pass decimation test
+                jj = (xT == timetags[i])
+                # satellites at the epoch
+                unique_sats_epoch = np.unique(xPRN[jj])
+                epoch_sat = xPRN[jj]
+                # snr data at the epoch
+                epoch_snr = xSNR[jj]
+                # fr data at the epoch
+                epoch_freq = xfreq[jj]
+                # go thru the unique satellite numbers at this epoch... 
+                for ij in range(0,len(unique_sats_epoch)):
+                    # pick out that satellite number
+                    sat = int(unique_sats_epoch[ij])
+                    # find all data that go with this 
+                    ijk = (sat == epoch_sat)
+                    # store the SNR data ..
+                    snrdata = epoch_snr[ijk]
+                    # store the freq data ..
+                    frdata = epoch_freq[ijk]
+                    # to fix the long-lived glonass mistake
+                    if (sat > 100) & (sat < 200):
+                        sat = sat - 64
+
+                    #print(timetags[i], sat, snrdata, frdata)
+                    # now write them out ... first assume all SNR data are zero
+                    # then reassign based on frequency
+                    s1=0; s2=0; s5=0  
+                    for iugh in range(0,len(frdata)):
+                        if (frdata[iugh] == '1'):
+                            s1 = snrdata[iugh]
+                        elif (frdata[iugh] == '2'):
+                            s2 = snrdata[iugh]
+                        elif (frdata[iugh] == '5'):
+                            s5 = snrdata[iugh]
+                    #print(timetags[i], sat, s1, s2, s5)
+                    # testing for leap seconds, not good for all time
+                    fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:6.2f} {4:6.2f} \n'.format(timetags[i]+offset, sat, s1, s2, s5) )
+                    
+        fout.close()
+        gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
+        print('Az/El Updated...')
+        return # translation has taken place in new_azel, so return to main code 
+
+    # this was my first effort.  It only allowed L1 data. I am not deleting it - but
+    # it is no longer valid.
+    if sp3 and False:
+        tmpfile =  station + 'tmp.txt'
+        print('Opening temporary file : ', tmpfile)
         fout = open(tmpfile, 'w+')
         fout.write('{0:15.4f}{1:15.4f}{2:15.4f} \n'.format(recv[0], recv[1],recv[2]) )
         fout.write('{0:6.0f}{1:6.0f}{2:6.0f} \n'.format(year, month, day) )
@@ -183,10 +257,14 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
                 if (sat > 100) & (sat < 200):
                     sat = sat - 64
                 fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:s} \n'.format(T[i], sat, SNR[i], freq[i]) )
+                newl = [T[i], sat, SNR[i], int(freq[i])]
         fout.close()
+        #subprocess.call(['cp', tmpfile,'k_debug.txt']) 
         # make the snrfile
         gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
         print('Az/El Updated...')
+
+        return # - in theory the fortran called in new_azel took care of everything
     
     inx = np.argsort(T)  #Sort data by time
     
@@ -250,6 +328,8 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
                 
                 #Check what frequency we are at to know where to write each line
                 f_store = FREQ[i]
+                # this will create extremely large files ...
+                #print(t[i], f_store, SNR[i])
                 if f_store == '1':
                     l1 = float(SNR[i])
                 elif f_store == '2':
@@ -276,7 +356,8 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
         
 def read_nmea(fname):
     """
-    read GPGGA sentence (includes snr data) in NMEA files    
+    reads a NMEA file.
+    it only reads the GPGGA sentence (includes snr data) in NMEA files    
 
     Parameters
     ----------
@@ -299,6 +380,9 @@ def read_nmea(fname):
 
     snr : list of floats
         snr values
+
+    freq : list of ???
+        apparently frequency values - 
 
     """
     

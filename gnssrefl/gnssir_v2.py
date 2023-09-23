@@ -82,6 +82,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         #print('no augmented elevation angle list')
 
 
+
     # this is also checked in the command line - but for people calling the code ...
     if ((lsp['maxH'] - lsp['minH']) < 5):
         print('Requested reflector heights (', lsp['minH'], ',', lsp['maxH'], ') are too close together. Exiting.')
@@ -151,6 +152,17 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
     if (allGood == 1):
         print('Results will be written to:', fname)
+        minObsE = min(snrD[:,1])
+        print('minimum observed elevation angle in this file ', minObsE, '/requested e1 and e2 ', e1,e2)
+        # only apply this test for simple e1 and e2
+        if len(ellist) == 0:
+            if minObsE > (e1 + ediff):
+                print('You literally have no data above the minimum elevation angle setting')
+                print('which is e1 + ediff: ', e1 + ediff, ' If you do not like')
+                print('this QC constraint, then set ediff to be very large (10 degrees) in the json or use ')
+                print('the minimum elevation angle your receiver used. Exiting.')
+                sys.exit()
+
 
         # apply simple refraction correction
         ele = snrD[:,1]

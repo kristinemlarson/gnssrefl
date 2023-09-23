@@ -75,6 +75,12 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
     else:
         dec = 1 # so Jupyter notebooks do not need to be rewritten
 
+    if 'leapsec' in lsp.keys():
+        leapsec = lsp['leapsec']
+        print('Using leap seconds ', leapsec)
+    else:
+        leapsec = 0
+
     #print('Decimate:', dec)
     #print('Number of azimuths', len(azval))
     for i in range(0,len(azval),2):
@@ -117,6 +123,9 @@ def gnssir_guts(station,year,doy, snr_type, extension,lsp):
         print('Using: ', obsfile)
 
         allGood,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE = snr.read_snr_multiday(obsfile,obsfile2,twoDays,dec)
+        if leapsec != 0:
+            print('adding leap seconds')
+            t = t + leapsec
         # added gzip option.  first input is xz compression
         snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
     if (allGood == 1):

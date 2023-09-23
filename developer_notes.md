@@ -37,6 +37,8 @@ https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/
 
 Local notes:
 f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
+f2py -c -m gnssrefl.gnsssnr gnssrefl/gnsssnr.f
+f2py -c -m gnssrefl.gnsssnrbigger gnssrefl/gnsssnrbigger.f
 
 docker pull unavdocker/gnssrefl to install code.
 
@@ -83,4 +85,18 @@ Cause it would be useful to know ...
 
 
 git pull --rebase
+
+##
+
+def mjd_to_datetime(mjd):
+    """
+    """
+    base_date=datetime(1858,11,17)
+    delta=timedelta(days=mjd)
+    return base_date + delta
+
+mjd_dates = [60183 , 60184, 60185]
+
+tv = [1, 5, 3]
+datetime_objects = [mjd_to_datetime(mjd) for mjd in mjd_dates]
 
