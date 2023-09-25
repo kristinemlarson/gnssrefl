@@ -410,7 +410,9 @@ def make_FZ_kml(station, filename,freq, el_list, h, lat,lng,azlist):
         #pname = 'ElevAngle {0}'.format(int(el), prn)
         ls = kml.newpolygon(name=pname, altitudemode='relativeToGround') # creating new polygon for each azimuth zone in azlist
         ls.outerboundaryis = points
+        # wont work ...
         # print(points)
+        #ls.labelstyle.scale = 5
         if el ==el_list[0]:
             ls.style.linestyle.color = simplekml.Color.yellow
             ls.style.linestyle.width = 3
@@ -458,6 +460,7 @@ def make_FZ_kml(station, filename,freq, el_list, h, lat,lng,azlist):
 
     # try adding a point at the station
     pnt = kml.newpoint(name=station)
+    #pnt.labelstyle.scale = 3
     pnt.coords = [(lng, lat)]
     pnt.style.iconstyle.icon.href = 'http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png'
 
