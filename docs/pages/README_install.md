@@ -5,6 +5,8 @@ github/pypi package installation.
 
 ## Jupyter Notebooks 
 
+This link is dead. This has been reported and should be fixed shortly.
+
 [Install Instructions](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
 
 ## Docker Container

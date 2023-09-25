@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.8.2
+2023 September 25
+added nmea2snr changes from naoyakadota.  Invalid lines no longer crash the code.
+
+https://github.com/kristinemlarson/gnssrefl/pull/194
+
 ## 1.8.1
 2023 September 20
 
