@@ -451,6 +451,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
         if default_usage:
             numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs)
+            # was testing some things out
+            #testing_nvals(Gval, Rval, Eval, Cval)
+
             two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs)
             stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt,hires_figs)
             print_badpoints(tv[ii,:],residuals[ii],txtdir,real_residuals[ii])
@@ -1795,16 +1798,33 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs):
     if (np.sum(Gval) > 0):
         ax.plot(tval,Gval,'bo',label='GPS',markersize=3)
     if (np.sum(Rval) > 0):
-        ax.plot(tval,Rval,'ro',label='GLONASS',markersize=3)
+        ax.plot(tval,Rval,'ro',label='GLO',markersize=3)
     if (np.sum(Eval) > 0):
-        ax.plot(tval,Eval,'o',color='orange',label='GALILEO',markersize=3)
+        ax.plot(tval,Eval,'o',color='orange',label='GAL',markersize=3)
     if (np.sum(Cval) > 0):
-        ax.plot(tval,Cval,'co',label='BEIDOU',markersize=3)
+        ax.plot(tval,Cval,'co',label='BEI',markersize=3)
+
     plt.legend(loc="best",fontsize=fs)
     #ax.legend(loc='best')
     plt.title(station + ': number of RH retrievals each day',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
     plt.grid()
+
+    # was trying to do this, but life is short
+    #if hires_figs:
+#        https://stackoverflow.com/questions/4700614/how-to-put-the-legend-outside-the-plot
+    # Shrink current axis's height by 10% on the bottom
+        #box = ax.get_position()
+
+        #ax.set_position([box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
+        #ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
+
+    # Put a legend below current axis
+        #ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=4)
+        #ax.set_position([box.x0, box.y0 + box.height * 0.5, box.width, box.height ])
+        #ax.legend(loc='center left', bbox_to_anchor=(1, 0.3))
+
+
     fig.autofmt_xdate()
     plotname = txtdir + '/' + station + '_Subnvals.png'
     if hires_figs:
@@ -1813,4 +1833,29 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs):
     else:
         plt.savefig(plotname,dpi=300)
     print('Plot file saved as: ', plotname)
+
+
+def testing_nvals(Gval, Rval, Eval, Cval):
+    """
+    writing the number of observations per constellation as a test. not currently used
+
+    Parameters
+    Gval: numpy array
+        GPS RH values
+    Rval : numpy array
+        GLONASS RH values
+    Eval : numpy array
+        Galileo RH values
+    Cval : numpy
+        Beidou RH values
+
+    writes to a file - kristine.txt returns nothing
+
+    """
+    fouting = open('kristine.txt','w+')
+    for i in range(0,len(Gval)):
+        fouting.write(' {0:3.0f} {1:4.0f} {2:4.0f} {3:4.0f} {4:4.0f} \n'.format(i, Gval[i], Rval[i], Eval[i], Cval[i]))
+    fouting.close()
+
+    return
 
