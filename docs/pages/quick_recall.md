@@ -1,10 +1,15 @@
 # Quick Links to the Code
 
+I originally made special documentation pages for different modules. I am now trying to
+put all documentation INTO the code itselsf using readthedocs. That includes example calls. While 
+I still have some discussion pages (so a link to the code and a link to a discussion page),
+those discussion links will likely go away in the not very distant future.
+
 ## Main Functions
 
-* [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html) 
+* [rinex2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html) 
 
-* [quickLook code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
+* [quickLook](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
 
 * [gnssir code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html),
  [gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
@@ -23,7 +28,7 @@
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_invsnr.html),
 [invsnr_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 
-* [refl_zones code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html)
+* [refl_zones](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html)
 
 
 ## Environmental Products

@@ -747,20 +747,33 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     icol = column - 1
     #print('using frequency ', f, ' columns ', ncols)
 
-    sat = snrD[:,0]
-    ele = snrD[:,1]
-    azm = snrD[:,2]
-    seconds = snrD[:,3]
-    edot = snrD[:,4] # but does not have to exist?
 
     if (column <= ncols) : 
         # at least there is a column where there should be
-        data = snrD[:,icol]
-        if (np.sum(data)) < 1:
-            if screenstats:
-                print('no useful data, all zeros')
+        # sep 26, 2023
+        # these definitions used to be outside the if, but putting them inside now
+        datatest = snrD[:,icol]
+        ijk = (datatest == 0)
+        nzero = len(datatest[ijk])
+        if np.sum(datatest) < 1:
+            print('No useful data on frequency ', f , ': all zeros')
             good = False
         else:
+            if nzero > 0:
+                #print('removing ', nzero, ' zero points on frequency ', f )
+                # indices you are keeping ... 
+                nn = (datatest > 0) ; 
+                snrD = snrD[nn,:]
+
+        sat = snrD[:,0]
+        ele = snrD[:,1]
+        azm = snrD[:,2]
+        seconds = snrD[:,3]
+        edot = snrD[:,4] # but does not have to exist?
+        data = snrD[:,icol]
+
+        # not really good - but at least the zeros have been removed
+        if good:
             # change to linear units
             data = np.power(10,(data/20))
             if len(ele) > 20:
