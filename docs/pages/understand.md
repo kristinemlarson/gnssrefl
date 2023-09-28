@@ -58,7 +58,7 @@ center above the reflecting surface, or reflector height RH (purple). *The prima
 is to measure RH.* This parameter is directly related to changes in snow height and water levels below
 a GNSS antenna. This is why GNSS-IR can be used as a snow sensor and tide gauge. GNSS-IR can also be 
 used to measure soil moisture, but the code to estimate soil moisture is not as strongly related to RH as
-snow and water. We will be posting the code you need to measure soil moisture later in the year.
+snow and water. 
 
 ![](https://gnss-reflections.org/static/images/overview.png)
 

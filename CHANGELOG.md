@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.8.4
+
+Added refraction model number (refr_model) to gnssir_input and thus station analysis json.
+on the way to implementing more than one refraction model. Default will remain refr_model = 1.
+0 is no model.
+
 ## 1.8.3
 2023 September 26
 

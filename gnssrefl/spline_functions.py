@@ -763,8 +763,8 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         if lsp['refraction']:
             imodel = 1 #
         dmjd = 59580 # fake number
-        p,T,irefr = set_refraction_model(station, dmjd,lsp,imodel)
-        print('refraction parameters ', p,T,irefr)
+        p,T,irefr,humidity = set_refraction_model(station, dmjd,lsp,imodel)
+        print('refraction parameters ', p,T,humidity,irefr)
 
     if 'rough_in' in kwargs:
         rough_in  = kwargs.get('rough_in')
@@ -1684,6 +1684,9 @@ def set_refraction_model(station, dmjd,lsp,imodel):
     imodel is 1 for simple refraction model
     eventually will add other refraction models
 
+    Looks like this was copied from other code and should be
+    consolidated ...
+
     Parameters
     ----------
     station : str
@@ -1703,6 +1706,8 @@ def set_refraction_model(station, dmjd,lsp,imodel):
         temperature in deg C
     irefr : int
         number value written to output files to keep track of refraction model
+    e : float
+        water vapor pressure, hPa
 
     """
     xdir = os.environ['REFL_CODE']
@@ -1717,5 +1722,5 @@ def set_refraction_model(station, dmjd,lsp,imodel):
         p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
         #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
 
-    return p,T,irefr
+    return p,T,irefr, e
 

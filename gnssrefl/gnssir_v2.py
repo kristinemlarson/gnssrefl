@@ -129,8 +129,14 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
    # this defines the minimum number of points in an arc.  This depends entirely on the sampling
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
-    p,T,irefr = set_refraction_params(station, dmjd, lsp)
-    #print('Refraction parameters ',p,T,irefr)
+    p,T,irefr,humidity = set_refraction_params(station, dmjd, lsp)
+    print('Refraction parameters (press, temp, humidity, ModelNum',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
+
+    if (irefr == 3) or (irefr == 4):
+        TempK = T + 273.15 # T is in celsius ... I think.
+        # N_ant is the refraction index
+        N_ant=refr.refrc_Rueger(p,humidity,TempK)[0]    #
+
 
 # only doing one day at a time for now - but have started defining the needed inputs for using it
     twoDays = False
@@ -163,10 +169,23 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                 print('the minimum elevation angle your receiver used. Exiting.')
                 sys.exit()
 
-
-        # apply simple refraction correction
-        ele = snrD[:,1]
-        ele=apply_refraction_corr(lsp,ele,p,T)
+        if (irefr == 3) or (irefr == 4):
+            # elev refraction, lsp, pres, temp, time, sat
+            if irefr == 3:
+                print('Ulich refraction correction')
+            else:
+                print('Ulich refraction correction, time-varying')
+            ele=refr.Ulich_Bending_Angle(snrD[:,1],N_ant,lsp,p,T,snrD[:,3],snrD[:,0])
+        elif irefr == 0:
+            print('No refraction correction applied ')
+            ele = snrD[:,1]
+        else :
+            if irefr == 1:
+                print('Standard Bennett refraction correction')
+            else:
+                print('Standard Bennett refraction correction, time-varying')
+            ele = snrD[:,1]
+            ele=apply_refraction_corr(lsp,ele,p,T)
 
         # apply an elevation mask for all the data for the polynomial fit
         i= (ele >= pele[0]) & (ele < pele[1])
@@ -336,21 +355,50 @@ def set_refraction_params(station, dmjd,lsp):
     dmjd : float
         modified julian date
 
-    lsp : dictionary
+    lsp : dictionary with information about the station
+        lat : float
+            latitude, deg
+        lon : float
+            longitude, deg
+        ht : float
+            height, ellipsoidal
+
+    Returns
+    -------
+    p : float
+        pressure, hPa
+    T : float
+        temperature, Celsius
+    irefr : int
+        refraction model number I believe, which is also sent, so not needed
+    e : float
+        water vapor pressure, hPa
 
     """
+    if 'refr_model' not in lsp.keys():
+        refraction_model = 1
+    else:
+        refraction_model = lsp['refr_model']
+
+
     xdir = os.environ['REFL_CODE']
     p = 0; T = 0; irefr = 0
     if lsp['refraction']:
-        irefr = 1
+        irefr = refraction_model
         refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
-# time varying is set to no for now (it = 1)
-        it = 1
+        # time varying was originally set to no for now (it = 1)
+        # now allows time varying for models 2 and 4
+        if (refraction_model == 2) or (refraction_model == 4):
+            it = 0
+        else:
+            it = 1
         dlat = lsp['lat']*np.pi/180; dlong = lsp['lon']*np.pi/180; ht = lsp['ht']
         p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
+        # e is water vapor pressure, so humidity ??
         #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
 
-    return p,T,irefr
+    #print('refraction model', refraction_model,irefr)
+    return p,T,irefr, e
 
 def apply_refraction_corr(lsp,ele,p,T):
     """
@@ -358,7 +406,7 @@ def apply_refraction_corr(lsp,ele,p,T):
     Parameters
     ----------
     lsp : dictionary
-        info from make_json_input
+        info from make_json_input such as station lat and lon
     ele : numpy array of floats
         elevation angles  (deg)
     p : float
@@ -756,7 +804,8 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
         ijk = (datatest == 0)
         nzero = len(datatest[ijk])
         if np.sum(datatest) < 1:
-            print('No useful data on frequency ', f , ': all zeros')
+            if screenstats:
+                print('No useful data on frequency ', f , 'and sat ', satNu, ': all zeros')
             good = False
         else:
             if nzero > 0:

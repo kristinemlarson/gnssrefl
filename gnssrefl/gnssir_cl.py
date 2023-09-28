@@ -268,14 +268,16 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # added 2022apr15
     lsp['gzip'] = gzip
 
+    # if refraction model is not assigned, set it to 1
+    if 'refr_model' not in lsp.keys():
+        lsp['refr_model'] = 1
 
     xdir = str(os.environ['REFL_CODE'])
     picklefile = 'gpt_1wA.pickle'
     pname = xdir + '/input/' + picklefile
 
-    if os.path.isfile(pname):
-        print('refraction file exists')
-    else:
+    #    print('refraction file exists')
+    if not os.path.isfile(pname):
         local_copy = 'gnssrefl/' + picklefile
         if os.path.isfile(local_copy):
             print('found local copy of refraction file')

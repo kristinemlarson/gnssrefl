@@ -3,6 +3,7 @@ written in python from
 from original TU Vienna codes for GMF
 """
 import datetime
+import math
 import os
 import pickle
 import subprocess
@@ -564,3 +565,83 @@ def look_for_pickle_file():
             print('File should be stored in ', inputdir, ' but is not')
 
     return foundit , fullpname
+
+
+def Ulich_Bending_Angle(ele, N0,lsp,p,T,ttime,sat):   #UBA
+    """
+    Ulich, B. L. "Millimeter wave radio telescopes: Gain and pointing characteristics." (1981)
+
+    Author: 20220629, fengpeng
+    modified to use numpy so I can do arrays
+
+    currently writes out corrections to a file for testing
+
+    Parameters
+    ----------
+    ele : numpy array of floats
+        true elevation angle, degrees
+
+    N0 : float
+        antenna refractivity in ppm
+
+    Returns
+    -------
+    De : numpy array of floats
+        corrected elevation angle, deg
+        
+    """
+    e_simple_corr = corr_el_angles(ele, p,T)
+    deg2rad = np.pi/180
+
+    # change to radians
+    ele_rad = deg2rad*(ele)
+    r = N0/1000000.
+    f = np.cos(ele_rad) / (np.sin(ele_rad) + 0.00175 * np.tan(deg2rad*(87.5) - ele_rad))
+    dE = (r * f)/deg2rad
+    fout = open('ulich.txt', 'w+')
+    for i in range(0,len(ele)):
+        fout.write(" {0:8.5f} {1:8.5f} {2:8.5f} {3:10.0f} {4:5.0f} \n ".format( 
+            ele[i], ele[i]+dE[i], e_simple_corr[i], ttime[i], sat[i]))
+
+    fout.close()
+
+    return dE + ele
+
+def refrc_Rueger(drypress,vpress,temp):
+    """
+    Obtains refractivity index suitable for GNSS-IR
+
+    Rüeger, Jean M. "Refractive index formulae for radio waves." Proceedings of the 
+    FIG XXII International Congress, Washington, DC, USA. Vol. 113. 2002.
+
+    Parameters
+    ----------
+    drypress : float
+        dry pressure hPa
+    vpress : float
+        vapor pressure in hPa
+    temp : float
+        temperature in Kelvin
+
+    Returns 
+    -------
+    ref : list of floats
+         [Ntotal, Nhydro, Nwet], which are total, hydrostatic and wet refractivity in ppm
+
+    """
+
+    [K1r,K2r,K3r]=[77.689 ,71.2952 ,375463.]     # Rüeger's "best average", for 375 ppm CO2, 77.690 for 392 ppm CO2
+
+    Nrueger = K1r * drypress / temp + K2r * vpress / temp + K3r * vpress / (temp ** 2)  # Rueger,IAG recommend, in ppm
+
+    [Rgas,Md,Mw] = [8.31446261815324,0.0289644,0.01801528]   # gas constant (SI exact), molar masses of dry air and water, kg/mol
+    drydensity=(drypress*100.)*Md/(Rgas*temp)    #density in kg/m^3
+    vdensity=(vpress*100.)*Mw/(Rgas*temp)   #in PV=nRT, P in Pa, V in m^3, n in g/mol, T in K, R=8.314 Pa*m^3/(k*mol)
+    totaldensity=drydensity+vdensity
+
+    Nhydro=(K1r*Rgas*totaldensity/Md)/100.   #divide 100 because hPa in Rueger formula, result in ppm
+    K2rr=K2r-K1r*(Mw/Md)
+    Nwet=K2rr * vpress / temp + K3r * vpress / (temp ** 2)
+    ref=[round(Nrueger,4),round(Nhydro,4),round(Nwet,4)]    # in ppm
+    return ref
+

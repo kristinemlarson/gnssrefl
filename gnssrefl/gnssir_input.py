@@ -36,9 +36,7 @@ def parse_arguments():
     parser.add_argument("-frlist", nargs="*",type=int,  help="User defined frequencies using our nomenclature")
     parser.add_argument("-azlist2", nargs="*",type=float,  default=None,help="list of azimuth regions, default is 0-360") 
     parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
-
-    #print(parser.parse_args())
-
+    parser.add_argument("-refr_model", default=1, type=int, help="refraction model. default is 1, zero turns it off)")
 
 
     args = parser.parse_args().__dict__
@@ -52,10 +50,11 @@ def parse_arguments():
 
 
 def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0, e1: float = 5.0, e2: float = 25.0,
-              h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None,
-              peak2noise: float = 2.8, ampl: float = 5.0, allfreq: bool = False,
-              l1: bool = False, l2c: bool = False, xyz: bool = False, refraction: bool = True,
-              extension: str = '', ediff: float=2.0, delTmax: float=75.0, frlist: list=[],azlist2: list=[0,360], ellist : list=[] ):
+       h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None, peak2noise: float = 2.8, 
+       ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
+       xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
+       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], 
+       ellist : list=[], refr_model : int=1 ):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -75,6 +74,24 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     Example of a json file that has both the old and new ways. The arrays within the json file are called azval and azval2.
         https://morefunwithgps.com/public_html/sc02.json
+
+    Refraction  
+    ----------
+        originally we had refraction as a boolean, i.e. on or off. This is stored in the json.  The code however,
+        uses an integer 1 (for a simple non-time-varying Bennett correction) and integer 0 for no correction.
+        From version 1.8.4 we begin to implement more refraction models.  1 (and Bennett) will continue to be 
+        the default.  The "1" is written to the LSP results file so that people can keep track easily of whether
+        they are inadvertently mixing files with different strategies. And that is why it is an integer, because
+        all results in the LSP results files are numbers.  Going forward, we are adding a time-varying capability.
+
+            Model 1: Bennett, static
+            Model 2: Bennett and time-varying
+            Model 3: Ulich, static
+            Model 4: Ulich, time-varying
+
+            gnssir_input will have a new parameter for the json output, refr_model. If it is not set, i.e. you 
+            have an old json, it is assumed to be 1. You can change it be hand if you like. And you can certainly 
+            test out the impact by using -extension option.
 
     Examples
     --------
@@ -163,6 +180,11 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         min and max elevation angles to be used with the azimuth regions you listed, i.e.
         [5 10 6 11 7 12 8 13] would allow overlapping regions - all five degrees long 
         Default is empty list. 
+    refr_model : int
+        refraction model. we are keeping this as integer as it is written to a file withonly
+        numbers in it.  1 is the default simple refraction (just correct elevation angles
+        using standard bending models).  0 is no refraction correction.  As we add more
+        models, they will receiver their own number. 
 
     """
 
@@ -277,6 +299,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     # but the length of the list depends on the length of the list of frequencies
     lsp['reqAmp'] = [reqA]*len(lsp['freqs'])
 
+    # this is true or false.  I think
     lsp['refraction'] = refraction
 
     # write new RH results  each time you run the code
@@ -309,14 +332,16 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     lsp['ellist'] = ellist
 
+    lsp['refr_model'] = refr_model
+
     print('writing out to:', outputfile)
+    print(lsp)
     with open(outputfile, 'w+') as outfile:
         json.dump(lsp, outfile, indent=4)
 
 
 def main():
     args = parse_arguments()
-    print(args)
     make_gnssir_input(**args)
 
 
