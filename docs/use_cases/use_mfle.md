@@ -131,7 +131,9 @@ The final volumetric water content results:
 
 <img src=../_static/mfle_final_vwc.png width=600 >
 
-These soil moisture estimates are written to a file; its location is written to the screen.
+These soil moisture estimates are written to a file; its location is written to the screen. The default location is :
+
+$REFL_CODE/Files/mfle/mfle_vwc.txt
 
 Thank you to Naoya Kadota for test driving this use case.
 

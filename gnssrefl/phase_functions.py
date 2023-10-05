@@ -537,6 +537,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         fileout = myxdir + '/Files/' + subdir + '/' + station + '_phase_L1.txt'
     else:
         fileout = myxdir + '/Files/' + subdir + '/' + station + '_phase.txt'
+    print(subdir)
 
     if os.path.exists(fileout):
         avg_phase_results = np.loadtxt(fileout, comments='%')

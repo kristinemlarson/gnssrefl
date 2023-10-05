@@ -2,7 +2,8 @@
 
 **github version: 1.8.4** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
-Our documentation is available [here.](https://gnssrefl.readthedocs.io/en/latest/)
+Our online documentation is available [here.](https://gnssrefl.readthedocs.io/en/latest/)
+[A pdf version of this documentation](https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/)
 
 See documentation for gnssir_input for new refraction models.
 

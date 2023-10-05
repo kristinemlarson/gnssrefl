@@ -82,3 +82,7 @@ Model inputs:
 Final results:
 
 <img src="../_static/scia_4.png" width="600">
+
+Final VWC results are written to:
+
+$REFL_CODE/Files/scia/scia_vwc.txt

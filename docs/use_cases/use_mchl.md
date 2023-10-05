@@ -101,6 +101,13 @@ It also produces plots which can help you assess your results:
  <br>
 <img src="../_static/mchl_4.png" width="600">
 
+
+
+Final VWC results are saved to:
+
+$REFL_CODE/Files/mchl/mchl_vwc.txt
+
+
 A big thank you to Lucas Holden for test driving this use case.
 
 [GA map of sites](https://gnss.ga.gov.au/network)

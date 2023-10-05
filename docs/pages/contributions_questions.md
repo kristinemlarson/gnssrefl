@@ -27,6 +27,8 @@ and Simon Williams have provided significant advice for this project.
 Glonass to the NMEA reader
 - [Taylor Smith](https://github.com/tasmi) has worked on the NMEA reader and the refl_zones utility.
 - Surui Xie was instrumental in finding a bug in the newarcs version
+- Peng Feng, Rudiger Haas, and Gunnar Elgered have helped us 
+improve refraction models.
 
 ## How you can help improve this code
 

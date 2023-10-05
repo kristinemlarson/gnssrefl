@@ -88,6 +88,13 @@ Final results:
 
 <img src="../_static/p038_4.png" width="600">
 
+
+
+By default the final VWC results go to:
+
+$REFL_CODE/Files/p038/p038_vwc.txt
+
+
 Thank you to Naoya Kadota for test driving this use case.
 
 Kristine M. Larson September 14, 2022

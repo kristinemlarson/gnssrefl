@@ -121,6 +121,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     """
 
     remove_bad_tracks = auto_removal
+    # make sure directories exist - although it looks to me like this
+    # is checked further on
+    g.checkFiles(station, '')
 
     if (len(station) != 4):
         print('station name must be four characters')

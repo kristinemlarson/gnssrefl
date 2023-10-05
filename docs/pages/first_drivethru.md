@@ -48,7 +48,6 @@ The plots might look slightly different and the defaults we used in the analysis
 
 * [Boulder, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mfle.html)
 
-* [San Diego, California USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p475.html)
 
 ## Seasonal Snow Accumulation
 
