@@ -7,7 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Added refraction model number (refr_model) to gnssir_input and thus station analysis json.
 on the way to implementing more than one refraction model. Default will remain refr_model = 1.
-0 is no model.
+0 is no model.  All information about the rerraction models are in the code for gnssir_input
+
+Double-checked that vwc code is creating a txt output file.  
 
 ## 1.8.3
 2023 September 26
