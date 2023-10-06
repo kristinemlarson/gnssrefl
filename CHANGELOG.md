@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.8.5
+
+Added a small utility - rinex_coords - that will grep out the a priori coordinates in RINEX file
+and print those and the Lat/Lon/Ht to the screen.  
+
+
 ## 1.8.4
 
 Added refraction model number (refr_model) to gnssir_input and thus station analysis json.

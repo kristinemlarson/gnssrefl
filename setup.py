@@ -42,7 +42,7 @@ requirements = [
 ]
 setup(
     name="gnssrefl",
-    version="1.8.4",
+    version="1.8.5",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -85,6 +85,7 @@ setup(
             "vwc_input= gnssrefl.vwc_input:main",
             "phase= gnssrefl.quickPhase:main",
             "refl_zones= gnssrefl.refl_zones_cl:main",
+            "rinex_coords= gnssrefl.rinex_coords:main",
             "vwc= gnssrefl.vwc_cl:main",
             "smoosh= gnssrefl.smoosh:main",
             "smoosh_snr= gnssrefl.smoosh_snr:main",

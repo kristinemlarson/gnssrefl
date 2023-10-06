@@ -15,12 +15,14 @@ def main():
     """
     quick file plotting using matplotlib
 
-    a png file is saved in REFL_CODE/Files in temp.png or to oyur preferred
-    filename if outfile is given
+    A png file is saved as temp.png or to your preferred
+    filename if outfile is given. In either case, it goes to REFL_CODE/Files
 
     Allows you to set x and y-axis limits with a title and various axes labels
 
     a different symbol can also be set
+    
+    Someone could easily update this to include different filetypes (e.g. jpeg)
 
     Examples
     --------
@@ -32,6 +34,11 @@ def main():
         would plot column 1 on the x-axis and column 16 on the y-axis
         and add Time on the x-axis label
 
+    quickplt txtfile 1 16 -xlabel "Time (sec)"
+        would plot column 1 on the x-axis and column 16 on the y-axis
+        and add Time (sec) on the x-axis label, but need quote marks since you 
+        have spaces in the x-axis labe.
+
     quickplt txtfile 1 16 -reverse T
         would plot column 1 on the x-axis and column 16 on the y-axis
         it would reverse the y-axis parameter as you might want if 
@@ -39,6 +46,9 @@ def main():
 
     quickplt txtfile 1 16 -ylimits 0 2
         would restrict y-axis to be between 0 and 2
+
+    quickplt txtfile 1 16 -outfile myfile.png
+        would save png file to $REFL_CODE/Files/myfile.png
 
 
     Parameters
@@ -209,12 +219,12 @@ def main():
 
     if out is None:
         out = 'temp.png'
-        print('Plotfile saved to: ', xdir +  out)
-        plt.savefig(out,dpi=300)
+        print('Plotfile saved to: ', xdir + out)
+        plt.savefig(xdir + out ,dpi=300)
     else:
         if out[-3:] == 'png':
             print('Plotfile saved to: ', xdir  + out)
-            plt.savefig(out,dpi=300)
+            plt.savefig(xdir + out,dpi=300)
         else:
             print('Output filename must end in png.')
 
