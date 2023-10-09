@@ -375,14 +375,18 @@ def set_refraction_params(station, dmjd,lsp):
         water vapor pressure, hPa
 
     """
+
     if 'refr_model' not in lsp.keys():
+        # default is always to use refraction model 1
+        # if for some reason it is missing ...
         refraction_model = 1
     else:
         refraction_model = lsp['refr_model']
 
 
     xdir = os.environ['REFL_CODE']
-    p = 0; T = 0; irefr = 0
+    # default values
+    p = 0; T = 0; irefr = 0; e=0
     if lsp['refraction']:
         irefr = refraction_model
         refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
