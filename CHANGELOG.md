@@ -5,15 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.8.5
 
+2023 October 9
+
 Added a small utility - rinex_coords - that will grep out the a priori coordinates in RINEX file
 and print those and the Lat/Lon/Ht to the screen.  
+
+removed p475 as suggested use case for soil moisture
 
 
 ## 1.8.4
 
 Added refraction model number (refr_model) to gnssir_input and thus station analysis json.
 on the way to implementing more than one refraction model. Default will remain refr_model = 1.
-0 is no model.  All information about the rerraction models are in the code for gnssir_input
+0 is no model.  All information about the refraction models are in the code for gnssir_input
 
 Double-checked that vwc code is creating a txt output file.  
 
