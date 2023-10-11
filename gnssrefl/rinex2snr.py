@@ -58,7 +58,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
-        mk,skipit,stream,strip,bkg,screenstats):
+        mk,skipit,stream,strip,bkg,screenstats,gzip):
     """
     main code to convert RINEX files into SNR files 
 
@@ -125,6 +125,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     screenstats: bool
          whether print statements come to screen
 
+    gzip: bool
+         whether SNR files are gzipped after creation
     """
     #
     # do not allow illegal skipit values
@@ -183,7 +185,11 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             if snre:
                 if overwrite:
                     print('File exists, you requested overwriting, so will delete existing file')
-                    subprocess.call(['rm', fname]); snre = False
+                    if os.path.isfile(fname):
+                        subprocess.call(['rm', fname]); 
+                    if os.path.isfile(fname + '.gz'):
+                        subprocess.call(['rm', fname + '.gz']); 
+                    snre = False
                 else:
                     print('SNR file already exists', fname)
 
@@ -482,10 +488,12 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         log.write('bad exe, bad snr option, do not really have the orbit file \n')
                         status = subprocess.call(['rm','-f', snrname ])
                     else:
-                        log.write('A SNR file was created: {0:50s}  \n'.format(snrname_full))
+                        log.write('A SNR file was created and gzipped: {0:50s}  \n'.format(snrname_full))
                         print('\n')
-                        print('SUCCESS: SNR file was created \n', snrname_full)
+                        print('SUCCESS: SNR file was created and gzipped \n', snrname_full)
                         g.store_snrfile(snrname,year,station)
+                        subprocess.call(['gzip', snrname_full])
+
                 else:
                     logfile = 'logs/' + station + '_hybrid_error.txt'
                     print('No SNR file created - check ', logfile, ' for why it failed.')
