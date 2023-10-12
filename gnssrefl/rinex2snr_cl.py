@@ -68,9 +68,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               screenstats : bool = False, gzip : bool = True ):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
-    RINEX obs files are provided by the user or fetched from a long list of archives. The default is RINEX 2.11 files
+    RINEX obs files are provided by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
+    the default is RINEX 2.11 files
 
-    Default is GPS only until day of year 137, 2021 when rapid GFZ orbits became available.  If you still want to use
+    Default orbits are GPS only until day of year 137, 2021 when rapid GFZ orbits became available.  If you still want to use
     the nav message, i.e. GPS only, you can request it.
 
     bkg no longer a boolean input - must be specified with archive name, i.e. bkg-igs or bkg-euref
@@ -83,7 +84,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     the local directory. It also allows Hatanaka compressed in the REFL_CODE directory.  
     Beyond that, you can try the -mk T option which searches other places.
 
-    For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory.
+    For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory. It does NOT 
+    check the $REFL_CODE/YYYY/rinex directory. If someone would like to add that capability, that would be great.
 
     FAQ: what is rate anad srate?  rate is telling the code which folder to use because archives always have 
     files in different directories depending on sample rate.  srate is for RINEX 3 files only because RINEX 3 
@@ -133,6 +135,16 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     rinex2snr mchl00aus 2022 15  -orb rapid -archive ga 
         30 sec RINEX3 data for mchl00aus and Geoscience Australia
+
+    rinex2snr mchl00aus 2022 15  -orb rapid -samplerate 30 -nolook T
+        This should analyze a RINEX 3 file if it exists in your local working directory.
+        it will not search anywhere else for the file.  It should be a 30 sec, 1 day file 
+        for this example
+
+    rinex2snr mchl00aus 2022 15  -orb rapid -samplerate 1 -nolook T -stream S
+        This should analyze a RINEX 3 file if it exists in your local working directory.
+        it will not search anywhere else for the file.  It should be a 1 sec, 1 day file 
+        for this example with S being set for streaming in the filename.
 
     rinex2snr warn00deu 2023 87 -dec 5 -rate high -samplerate 1 -orb rapid -archive bkg-igs -stream S 
         1 sec data for warn00deu, 1 sec decimated to 5 sec, multi-GNSS, bkg IGS archive, streamed
@@ -447,7 +459,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if ns == 9:
         # rinex3
         if rate == 'high':
-            if archive not in highrate_list:
+            if (archive not in highrate_list) and (nolook == False):
                 print('You have chosen an archive not supported by the code.')
                 print(highrate_list)
                 sys.exit()

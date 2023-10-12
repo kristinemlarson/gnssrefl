@@ -4840,7 +4840,7 @@ def get_noaa_obstimes(t):
 
     return obstimes
 
-def get_noaa_obstimes_plus(t):
+def get_noaa_obstimes_plus(t,**kwargs):
     """
     given a list of time tags (y,m,d,h,m,s), it calculates datetime
     objects and modified julian days
@@ -4860,6 +4860,12 @@ def get_noaa_obstimes_plus(t):
         modified julian date array 
 
     """
+    time_format = kwargs.get('time_format','new')
+    if time_format == 'new':
+        tt = True
+    else:
+        tt = False
+
     nr,nc = t.shape
     obstimes = []
     modjulian = np.empty(shape=[0,1])
@@ -4868,7 +4874,12 @@ def get_noaa_obstimes_plus(t):
     # if i read in the file better, would not have to change from float
     if nr > 0:
         for i in range(0,nr):
-            year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = int(t[i,5])
+            # new fileformat
+            if tt:
+                year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = int(t[i,5])
+            else:
+                year = int(t[i,0]); month=int(t[i,1]); day=int(t[i,2]); hour=int(t[i,3]); minute=int(t[i,4]); second = int(t[i,8])
+
             dtime = datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
             obstimes.append(dtime)
             imjd, fr = mjd(year,month,day,hour,minute,second)
