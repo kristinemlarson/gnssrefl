@@ -290,6 +290,16 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp}
 
+    print(lsp['pele'], 'direct signal eangle limits')
+    if 'ellist' in lsp:
+        print('found ellist')
+        
+    else:
+        print('did not find ellist')
+        if float(lsp['e1']) < float(lsp['pele'][0]):
+            print('emin is smaller than the minimum eangle (pele) used for direct signal removed. This is Forbidden')
+            sys.exit()
+
     # should make sure there are directories for the results ... 
     g.checkFiles(station.lower(), extension)
 

@@ -122,6 +122,8 @@ def myfavoriteobs():
     # not even sure why i have C here for beidou
     # 2023feb02 added L1C - back up to L1 C/A
     gobblygook = 'G:S1C,S1X,S2X,S2L,S2S,S2X,S5I,S5Q,S5X+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
+    # testing C vs P for glonass
+    #gobblygook = 'G:S1C,S1X,S2X,S2L,S2S,S2X,S5I,S5Q,S5X+R:S1C,S1P,S2C,S2P+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
 
     return gobblygook
 

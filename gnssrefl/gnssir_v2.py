@@ -116,9 +116,11 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
     gzip = lsp['gzip']
     if 'dec' in lsp.keys():
-        dec = lsp['dec']
+        dec = int(lsp['dec'])
     else:
         dec = 1 # so Jupyter notebooks do not need to be rewritten
+
+    print('Using decimation value: ', dec)
 
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
     dmjd, fracS = g.mjd(year,month,day,0,0,0)
@@ -155,6 +157,18 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
         allGood, snrD, nrows, ncols = read_snr(obsfile)
         # added gzip option.  first input is xz compression
+        if allGood and (dec != 1):
+            print('Invoking decimation option')
+            # does dec need to be a list??? was in original code
+            # get the indices
+            rem_arr = np.remainder( snrD[:,3], dec)
+            # find out where they are zero
+            iss =  (rem_arr == 0)
+            # and apply
+            snrD = snrD[iss,:]
+            # not sure nrows and ncols is being used ... so not redoing it
+
+
         snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
     if (allGood == 1):
         print('Results will be written to:', fname)

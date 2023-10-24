@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.8.8
+
+decimation does not seem to be properly working in gnssir.  I have fixed it.
+
+fixed so that the minimum of the polynomial values to remove DC 
+is not higher than e1 selected by user in the json analysis instructions
+
+
 ## 1.8.7
 
 Default now to gzip SNR files upon creation
