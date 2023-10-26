@@ -19,7 +19,8 @@ import time
 from ftplib import FTP #import FTP commands from python's built-in ftp library
 from ftplib import FTP_TLS
 
-from importlib.metadata import version
+# remove for now
+#from importlib.metadata import version
 
 
 
@@ -2004,7 +2005,8 @@ def open_outputfile(station,year,doy,extension):
 #   changed to a function
     filepath1,fexit = LSPresult_name(station,year,doy,extension)
     #print('Output will go to:', filepath1)
-    versionNumber = version('gnssrefl')
+    #versionNumber = version('gnssrefl')
+    versionNumber = 'working'
     tem = '% gnssrefl, https://github.com/kristinemlarson, ' + versionNumber + ' \n'
     try:
         fout=open(filepath1,'w+')

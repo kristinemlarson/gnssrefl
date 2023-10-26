@@ -7,7 +7,7 @@ import argparse
 import gnssrefl.gps as g
 
 # this requires python 3.8
-from importlib.metadata import version
+#from importlib.metadata import version
 
 def main():
     """
@@ -39,7 +39,8 @@ def main():
     day = args.day
     # testing out version thing
     # https://stackoverflow.com/questions/3524168/how-do-i-get-a-python-modules-version-number-through-code
-    print('Version number ', version('gnssrefl'))
+    # am not able to install this currenlty in the docker
+    #print('Version number ', version('gnssrefl'))
 
     doy,cdoy,cyyyy,cyy = g.ymd2doy(year, month, day )
     print(cdoy)
