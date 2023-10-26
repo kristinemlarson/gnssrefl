@@ -177,7 +177,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
         for doy in doy_list:
             csnr = str(isnr)
-            cdoy = '{:03d}'.format(doy) ; cyy = '{:02d}'.format(year-2000)
+            if (year<2000):
+                cyy = '{:02d}'.format(year-1900)
+            else:
+                cyy = '{:02d}'.format(year-2000)
             # first, check to see if the SNR file exists
             fname =  quickname(station,year,cyy,cdoy,csnr)
             # now it unzips if that version exists
