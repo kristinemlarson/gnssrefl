@@ -38,8 +38,8 @@ requirements = [
     "simplekml",
     "earthscope-sdk",
     "jupyterlab",
-    "importlib",
-    "ipywidgets"
+    "ipywidgets",
+    "importlib"
 ]
 setup(
     name="gnssrefl",
