@@ -19,6 +19,9 @@ import time
 from ftplib import FTP #import FTP commands from python's built-in ftp library
 from ftplib import FTP_TLS
 
+from importlib.metadata import version
+
+
 
 import scipy.signal as spectral
 from scipy.interpolate import interp1d
@@ -1982,6 +1985,8 @@ def open_outputfile(station,year,doy,extension):
     Returns
     -------
     fileID : ?
+        I don't know the proper name of this - but what comes out
+        when you open a file so you can keep writing to it
 
     """
     if os.path.isdir('logs'):
@@ -1999,10 +2004,12 @@ def open_outputfile(station,year,doy,extension):
 #   changed to a function
     filepath1,fexit = LSPresult_name(station,year,doy,extension)
     #print('Output will go to:', filepath1)
+    versionNumber = version('gnssrefl')
+    tem = '% gnssrefl, https://github.com/kristinemlarson, ' + versionNumber + ' \n'
     try:
         fout=open(filepath1,'w+')
 #       put a header in the output file
-        fout.write("% gnssrefl, https://github.com/kristinemlarson \n")
+        fout.write(tem)
         fout.write("% Phase Center corrections have NOT been applied \n")
         fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD   refr-appl\n")
         fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16)   (17)\n")

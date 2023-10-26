@@ -120,7 +120,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     else:
         dec = 1 # so Jupyter notebooks do not need to be rewritten
 
-    print('Using decimation value: ', dec)
+    # no need to print to screen if default
+    if (dec != 1):
+        print('Using decimation value: ', dec)
 
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
     dmjd, fracS = g.mjd(year,month,day,0,0,0)

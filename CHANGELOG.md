@@ -3,7 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.8.9
+October 26, 2023
+
+Add version number to gnssir output (files stored in results directory)
+
+
 ## 1.8.8
+October 25, 2023
 
 decimation does not seem to be properly working in gnssir.  I have fixed it.
 
@@ -13,7 +20,7 @@ is not higher than e1 selected by user in the json analysis instructions
 
 ## 1.8.7
 
-Default now to gzip SNR files upon creation
+Default now is to gzip SNR files upon creation
 
 ## 1.8.6
 

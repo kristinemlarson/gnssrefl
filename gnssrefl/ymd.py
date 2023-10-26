@@ -6,6 +6,9 @@ Updated: April 3, 2019
 import argparse
 import gnssrefl.gps as g
 
+# this requires python 3.8
+from importlib.metadata import version
+
 def main():
     """
     converts year month day to day of year and prints it to the screen
@@ -34,6 +37,9 @@ def main():
     year = args.year
     month = args.month
     day = args.day
+    # testing out version thing
+    # https://stackoverflow.com/questions/3524168/how-do-i-get-a-python-modules-version-number-through-code
+    print('Version number ', version('gnssrefl'))
 
     doy,cdoy,cyyyy,cyy = g.ymd2doy(year, month, day )
     print(cdoy)
