@@ -107,6 +107,8 @@ Feedback from jupyter notebook user:
 About folder permission: In the notebook environment test, the error prompted that the program could not 
 write to the file.  This is remedied by changing the permissions of the folder from the command line.
 
+Docker folder /etc/gnssrefl/refl_code will be visible in Windows under C:\Users\yourlogin\refl_code
+
 ## additional references:
 * [gnssrefl base image dockerfile](https://gitlab.com/gnss_reflectometry/gnssrefl_docker_base_img/-/blob/master/Dockerfile)
 * [gnssrefl docker file](https://github.com/kristinemlarson/gnssrefl/blob/master/Dockerfile)
