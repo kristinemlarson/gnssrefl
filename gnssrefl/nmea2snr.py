@@ -805,7 +805,10 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, c
         for dy in doy_list:
             csnr = str(isnr)
             cdoy = '{:03d}'.format(dy)
-            cyy = '{:02d}'.format(yr-2000)
+            if (yr < 2000):
+                cyy = '{:02d}'.format(yr-1900)
+            else:
+                cyy = '{:02d}'.format(yr-2000)
             snrfile =  quickname(station,yr,cyy,cdoy,csnr)#snr filename
             snre = g.snr_exist(station,yr,dy,csnr)#check if snrfile already sxists
             if snre:

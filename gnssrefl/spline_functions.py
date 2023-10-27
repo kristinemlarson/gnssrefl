@@ -1118,33 +1118,34 @@ def define_inputfile(station,year,doy,snr_ending):
 
     Parameters
     ----------
-    station : string
+    station : str
         4 ch name of station 
     year : integer
 
-    doy : integer
+    doy : int
         day of year 
 
-    snr_ending : integer
+    snr_ending : int
         file ending, e.g. 66, 99
 
     Returns
     -------
-    snrfile: string
+    snrfile: str
         name of snrfile 
 
-    snrdir : string
+    snrdir : str
         name of output directory
 
-    cyyyy : string
+    cyyyy : str
         four character year
 
-    cdoy : string
+    cdoy : str
         three character day of year
     """
     cdoy = '{:03d}'.format(doy) ;
-    cyy = '{:02d}'.format(year-2000)
     cyyyy = str(year)
+    cyy = cyyyy[2:4]
+
     xdir = os.environ['REFL_CODE'] + '/' + cyyyy + '/snr/' + station + '/'
     snrfile = station + cdoy + '0.' + cyy + '.snr' + str(snr_ending)
     gzfile = xdir + snrfile + '.gz'
