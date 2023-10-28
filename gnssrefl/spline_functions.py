@@ -59,6 +59,8 @@ def readklsnrtxt(snrfile, thedir, signal):
     The file itself is read in a separate function now; 
     if SNR data are zero for a given signal, the row is eliminated
 
+    As of Oct 28, 2023, gzip after reading SNR file
+
     Parameters
     ----------
     snrfile: str
@@ -81,6 +83,7 @@ def readklsnrtxt(snrfile, thedir, signal):
     """
     # do a straight load of the file
     snrall = loadsnrfile(snrfile, thedir)
+    subprocess.call(['gzip', thedir + snrfile])
 
     nr,nc = snrall.shape
     # this is for the frequency information
@@ -279,6 +282,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     """
     reads an array of snr data (output from readklsnrtxt) and organises into:
     reflector height estimates, stats and detrended snr data for inverse analysis
+
 
     Parameters
     ----------
