@@ -3,10 +3,21 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.9.0
+October 28,2023
+
+Fixed bug in default peak to nosie ratio limit assumed for invsnr.  Was 4, but when
+the calculation of peak to noise was changed, the default limit was left the same.
+It is now 2.5, which is better than 4, but one is warned that this is not done the same
+as gnssir.  The RH limits mean something different to invsnr than they do to gnssir.
+
+
 ## 1.8.9
 October 26, 2023
 
-Add version number to gnssir output (files stored in results directory)
+Tried and failed to add version number to gnssir output (files stored in results directory)
+docker would not allow import of importlib. 
+
 
 
 ## 1.8.8

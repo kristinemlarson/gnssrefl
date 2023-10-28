@@ -537,6 +537,8 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                     maxF, maxA,peak2noise = simpleLSP(rhlims, lcar, precision,
                             elvt, sinelvt, snrdt,sat,xsignal,screenstats,fout,pktnlim)
 
+
+                    #print('new', pktn, 'limit',pktnlim, 'old',np.max(pgram_sub) / np.mean(pgram))
                     if maxind != 0 and maxind != len(pgram_sub) - 1 and pktn > pktnlim:  # no peaks at either end of window
                         # KL moved this to a function/added a column to save frequency information
                         temp_arr = save_lsp_results(datet,maxind,reflh_sub,sat,elvt,azit,pgram_sub,snrdt,pktn,isignal)

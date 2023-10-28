@@ -17,7 +17,7 @@ def parse_arguments():
     parser.add_argument("doy", default=None, type=int, help="doy")
     parser.add_argument("signal", default=None, type=str, help="L1, L2, L5, L1+L2, L1+L2+L5, etc")
 
-    parser.add_argument("-pktnlim", default=None, type=float, help="Peak2noise ratio for Quality Control")
+    parser.add_argument("-pktnlim", default=None, type=float, help="Peak2noise ratio for Quality Control, default now 2.5")
     parser.add_argument("-constel", default=None, type=str, help="Only a single constellation (G,E, or R)")
     parser.add_argument("-screenstats", default=None, type=str, help="screen stats, False is default")
     parser.add_argument("-tempres", default=None, type=int, help="SNR file decimator (seconds)")
@@ -48,7 +48,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, constel: str = None, 
+def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5, constel: str = None, 
         screenstats: bool = False, tempres: int = 1, polydeg: int = 2, snrfit: bool = True, plt: bool = True,
         doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: int = 3, 
         rough_in: float = 0.1, risky: bool = False, snr_ending: int = 66, outfile_type: str = 'txt', 
@@ -57,6 +57,11 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
     """
     You must have run invsnr_input before using this code. This is the wrapper code that does the 
     invsnr modelling. Note: outfile_name and outfile_type are unnecessary. Consolidate them.
+
+    In an earlier version of the code the pk2nlim was set to 4.  Later the definition of the metric was changed,
+    and this made the default setting far too stringent. In short, no arcs were being found.  As of 2023/10/28 it
+    is set to 2.5.  This may not be optimal, but it is not as bad as 4.  Please set it yourself as you prefer.
+    Note: it will not the same as gnssir as this code was written separately and for a different purpose.
     
     Examples
     --------
@@ -66,6 +71,8 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         would analyze day of year 15 and all signals
     invsnr sc02 2023 15 L1+L2
         would analyze day of year 15 and just L1 and L2
+    invsnr sc02 2023 15 L1+L2 -pk2nlim 2
+        would analyze day of year 15 and just L1 and L2, lower peak to noise limit ratio
     invsnr sc02 2023 15 L1+L2  -doy_end 18
         would analyze day of years 15 through 18 and L1 and L2 signals
 
@@ -81,7 +88,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 4, c
         signal to use, L1  L2 L5 L6 L7 L1+L2 L1+L2+L5 L1+L5 ALL
     pktnlim: float, optional
         Peak2noise ratio limit for Quality Control.
-        Default is 4
+        Default is 2.5
     constel: str, optional
         Only a single constellation.
         Default is gps, glonass, and galileo.
