@@ -4,8 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.9.1
+October 29, 2023
 
-SNR files gzipped after use by invsnr
+SNR files gzipped after use by invsnr. Input changed to boolean (compress
+removed as option and gzip added. Default is true)
 
 Help added to Docker use for PCs
 
