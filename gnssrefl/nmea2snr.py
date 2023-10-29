@@ -12,7 +12,7 @@ import gnssrefl.decipher_argt as gt
 
 #Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
 
-def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
+def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, gzip):
     """
     Reads and translates the NMEA file stored in locdir + fname
 
@@ -48,8 +48,9 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, compress):
     sp3 : bool
         whether you use multi-GNSS sp3 file to do azimuth elevation angle calculations
         currently this only uses the GFZ rapid orbit.  
-    compress: str
-        add compression to the snrfiles. Start with just '.gz' compression, can extend. 
+    gzip: bool
+        gzip compress snrfiles. No idea if it is used here ...
+        as this compression should happen in the calling function, not here
         
     """
     
@@ -761,7 +762,7 @@ def elev_limits(snroption):
 
     return emin, emax
   
-def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, compress):
+def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, gzip):
     """
     runs the nmea2snr conversion code
 
@@ -794,8 +795,8 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, c
         lat and lon (deg) and ellipsoidal ht (m)
     sp3 : bool
         whether you want to use GFZ rapid sp3 file for the orbits
-    compress: str
-        add compression to the snrfiles. Start with just '.gz' compression, can extend. 
+    gzip : bool
+        whether snrfiles are gzipped after creation
 
     """
     # loop over years and day of years
@@ -814,8 +815,13 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, c
             if snre:
                 if overwrite:
                     print('SNR file exists, but you requested it be overwritten')
-                    subprocess.call(['rm', snrfile])
-                    snre = False
+                    # just in case you have a previously gunzipped version
+                    if os.path.exists(snrfile):
+                        subprocess.call(['rm', snrfile])
+                        snre = False
+                    if os.path.exists(snrfile + '.gz'):
+                        subprocess.call(['rm', snrfile + '.gz'])
+                        snre = False
                 else:
                     print('SNR file already exists', snrfile)
         
@@ -827,12 +833,12 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, c
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
                     #print('Creating '+snrfile)
-                    NMEA2SNR(locdir, r, snrfile, csnr, dec, yr, dy, llh, sp3, compress)
+                    NMEA2SNR(locdir, r, snrfile, csnr, dec, yr, dy, llh, sp3, gzip)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
-                    if compress == '.gz':
+                    if gzip:
                         if not snrfile.endswith('.gz'):
                             subprocess.call(['gzip', snrfile])
-                            print('SNR Compressed')
+                            print('SNR file gzip compressed')
                 else:
                     print('NMEA file '+ locdir + r +' does not exist')

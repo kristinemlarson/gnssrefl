@@ -38,8 +38,9 @@ def main():
         sys.exit()
 
     year,month,day=g.ydoy2ymd(year, doy)
+    mjd = g.getMJD(year,month,day,0)
 
-    print('month ', month, ' day ', day)
+    print('Month ', month, ' Day ', day, ' MJD ', mjd)
 
 
 if __name__ == "__main__":

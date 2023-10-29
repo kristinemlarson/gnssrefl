@@ -9,7 +9,7 @@ SNR files gzipped after use by invsnr
 
 Help added to Docker use for PCs
 
-
+Version number now written in the LSP results file (see v 1.8.9)
 
 
 ## 1.9.0

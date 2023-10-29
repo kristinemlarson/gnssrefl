@@ -67,8 +67,8 @@ def main():
         T or True if you want to use the NMEA az-el values instead of sp3 values. 
         NMEA-based az-el values cannot be trusted, and thus the code is asking you to 
         confirm that you know you are doing something that is risky.
-    compress: str
-        add compression to the snrfiles. Start with just '.gz' compression, can extend. 
+    gzip : bool, opt
+        compress SNR files after creation.  Default is true
 
     Examples
     --------
@@ -98,7 +98,7 @@ def main():
     parser.add_argument("-height", default=None, help="ellipsoid height,m", type=float)
     parser.add_argument("-sp3", default=None, help="boolean for whether sp3 orbits are used", type=str)
     parser.add_argument("-risky", default=None, help="boolean for whether sp3 orbits are used", type=str)
-    parser.add_argument("-compress", default=None, help="type of compression (.gz)", type=str)
+    parser.add_argument("-gzip", default=None, help="Gzip SNR file after creation. Default is true.", type=str)
 
     args = parser.parse_args()
 
@@ -127,11 +127,14 @@ def main():
         else:
             risky = False
             
-    if args.compress == None:
-        compress = None
+    if args.gzip == None:
+        gzip = True
     else:
-        compress = args.compress
-    print('Compression:', compress)
+        # submitted code did not use our standard way to allow booleans, so this is a workaround
+        if (args.gzip== 'F') or (args.gzip== 'False'):
+            gzip = False
+        else:
+            gzip = True
 
     doy= args.doy
     if args.doy_end == None:
@@ -199,7 +202,7 @@ def main():
     if args.height is not None:
         height = args.height
     llh = [lat,lon,height]    
-    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, compress)
+    nmea.run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, gzip)
 
 if __name__ == "__main__":
     main()
