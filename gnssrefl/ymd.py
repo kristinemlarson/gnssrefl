@@ -39,7 +39,7 @@ def main():
     parser.add_argument("month", help="month", type=int)
     parser.add_argument("day", help="day", type=int)
     # this is not our normal way to input booleans but I am busy ...!
-    parser.add_argument("-mjd", help="Print mjd to the screen. Default is F", type=str,default='F')
+    parser.add_argument("-mjd", help="Print MJD to the screen. Default is F", type=str,default=None)
 
     args = parser.parse_args()
     year = args.year
@@ -48,9 +48,10 @@ def main():
 
     doy,cdoy,cyyyy,cyy = g.ymd2doy(year, month, day )
     print(cdoy)
-    mjd = g.getMJD(year,month,day,0)
-    if (args.mjd == 'T') or (args.mjd == 'True'):
-        print('MJD', mjd)
+    if args.mjd is not None:
+        if (args.mjd == 'T') or (args.mjd == 'True'):
+            mjd = g.getMJD(year,month,day,0)
+            print('MJD', mjd)
 
 if __name__ == "__main__":
     main()
