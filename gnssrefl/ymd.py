@@ -7,7 +7,7 @@ import argparse
 import gnssrefl.gps as g
 
 # this requires python 3.8
-from importlib.metadata import version
+#from importlib.metadata import version
 
 def main():
     """
@@ -17,10 +17,16 @@ def main():
     Parameters
     ----------
     year : int
+        4 ch year
 
     month : int
+        calendar month
 
     day : int
+        calendar day
+
+    mjd : str
+        input T or True to get MJD printed to the screen
 
     Returns
     -------
@@ -32,20 +38,19 @@ def main():
     parser.add_argument("year", help="year ", type=int)
     parser.add_argument("month", help="month", type=int)
     parser.add_argument("day", help="day", type=int)
+    # this is not our normal way to input booleans but I am busy ...!
+    parser.add_argument("-mjd", help="Print mjd to the screen. Default is F", type=str,default='F')
 
     args = parser.parse_args()
     year = args.year
     month = args.month
     day = args.day
-    # testing out version thing
-    # https://stackoverflow.com/questions/3524168/how-do-i-get-a-python-modules-version-number-through-code
-    # am not able to install this currenlty in the docker
-    print('Version number ', version('gnssrefl'))
 
     doy,cdoy,cyyyy,cyy = g.ymd2doy(year, month, day )
     print(cdoy)
     mjd = g.getMJD(year,month,day,0)
-    print('MJD', mjd)
+    if (args.mjd == 'T') or (args.mjd == 'True'):
+        print('MJD', mjd)
 
 if __name__ == "__main__":
     main()

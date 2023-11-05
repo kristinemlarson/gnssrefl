@@ -3,11 +3,23 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.9.2
+November 5, 2023
+
+Trying to chase down a data issue in invsnr. Added more screenstats output.
+
+Made MJD output from ymd an option rather than required in response to user issue.
+
 ## 1.9.1
 October 29, 2023
 
-SNR files gzipped after use by invsnr. Input changed to boolean (compress
-removed as option and gzip added. Default is true)
+SNR files gzipped after use by invsnr. 
+
+SNR files are now gzip compressed after use by nmea2snr.
+If you don't want that to happen, there is a flag to turn it off.
+A previous version of the code had a flag called compress, and that 
+was removed. This was done to make nmea2snr consistent with gnssir
+and rinex2snr.
 
 Help added to Docker use for PCs
 

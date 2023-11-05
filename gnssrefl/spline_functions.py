@@ -340,11 +340,13 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
         detrended SNR data for inverse analysis
 
     """
+    print('screen stats', screenstats)
     # get a list for late ron
     if 'l2c_only' in kwargs:
         l2c_only = kwargs.get('l2c_only')
-    if l2c_only:
-        print('For L2, only use L2c ')
+    # no need to print to screen
+    #if l2c_only:
+    #    print('For L2, only use L2c ')
 
     # get the list
     l2clist,l5list = l2c_l5_list(year,doy)
@@ -442,7 +444,8 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
         # added this so i can loop through more than one frequency.  hopefully
         for xsignal in signal_list:
             isignal = int(xsignal[1:2]) # integer version of frequency
-            #print('Working on satellite/signal:', int(sat),xsignal,isignal)
+            if screenstats:
+                print('Working on satellite/signal:', int(sat),xsignal,isignal)
 
             # frequency (integer) should be in column "5"
             sfilter = (first_tempd[:, 5] == isignal)
@@ -497,10 +500,17 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                 ddate = np.ediff1d(date_tosort)
                 delv = np.ediff1d(elv_tosort)
                 bkpt = len(ddate)
+
                 bkpt = np.append(bkpt, np.where(ddate > gaptlim)[0])  # gaps bigger than gaptlim
+                if screenstats:
+                    print('gaps',len(bkpt))
                 bkpt = np.append(bkpt, np.where(np.diff(np.sign(delv)))[0])  # elevation rate changes direction
+                if screenstats:
+                    print('gaps from ostensible elevation rate changes',len(bkpt))
                 bkpt = np.unique(bkpt)
                 bkpt = np.sort(bkpt)
+                if screenstats:
+                    print('Number of arcs for this satellite?', len(bkpt))
                 for ii in range(len(bkpt)):
                     if ii == 0:
                         sind = 0
@@ -512,7 +522,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                         continue
                     elvt = np.array(tempd[sind:eind, 1], dtype=float)
                     if len(np.unique(elvt)) == 1:
-                #print('unchanging elevation')
+                        print('unchanging elevation')
                         continue
                     azit = np.array(tempd[sind:eind, 2], dtype=float) # azimuth array
                     sinelvt = np.sin(elvt / 180 * np.pi) # sine elevation angle array
@@ -536,7 +546,6 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                 # KL pktn = np.max(pgram_sub) / np.mean(pgram)
                     pktn = np.max(pgram_sub) / np.mean(pgram_sub)
 
-                # compute LSP with my code
 
                     maxF, maxA,peak2noise = simpleLSP(rhlims, lcar, precision,
                             elvt, sinelvt, snrdt,sat,xsignal,screenstats,fout,pktnlim)
@@ -931,7 +940,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         s1=time.time()
         print('Now doing Joakim Strandberg SNR fitting inversion')
         kval_0 = kval_spectral
-        print('kval_0', kval_0)
+        #print('kval_0', kval_0) dont need to print htis out
         final_list, Nfreq = smarterWay(fspecdict)
         print(final_list)
         print('Number of constellation specific frequencies', Nfreq)
