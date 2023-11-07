@@ -6,8 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## 1.9.3
 November 7, 2023
 
-Unfortunately readthedocs is still down - so the online help is not being 
-updated.
+readthedocs appears to be alive again. We are now hardwiring python 3.11 in readthedocs creation 
+via the file docs/environment.yml.
 
 Added Hortho to gnssir_input. This is station orthometric height (altitude) in meters. If not provided 
 on the command line it is calculated from the given station coordinates (either online
