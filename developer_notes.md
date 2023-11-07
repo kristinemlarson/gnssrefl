@@ -100,3 +100,9 @@ mjd_dates = [60183 , 60184, 60185]
 tv = [1, 5, 3]
 datetime_objects = [mjd_to_datetime(mjd) for mjd in mjd_dates]
 
+a suggestion for the future: https://semver.org/
+
+Given a version number MAJOR.MINOR.PATCH, increment the:
+MAJOR version when you make incompatible API changes
+MINOR version when you add functionality in a backward compatible manner
+PATCH version when you make backward compatible bug fixes
