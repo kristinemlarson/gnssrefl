@@ -37,6 +37,7 @@ def parse_arguments():
     parser.add_argument("-azlist2", nargs="*",type=float,  default=None,help="list of azimuth regions, default is 0-360") 
     parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
     parser.add_argument("-refr_model", default=1, type=int, help="refraction model. default is 1, zero turns it off)")
+    parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height, meters")
 
 
     args = parser.parse_args().__dict__
@@ -53,8 +54,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
        h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None, peak2noise: float = 2.8, 
        ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
-       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], 
-       ellist : list=[], refr_model : int=1 ):
+       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : int=1, Hortho : float = None ):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -185,6 +185,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         numbers in it.  1 is the default simple refraction (just correct elevation angles
         using standard bending models).  0 is no refraction correction.  As we add more
         models, they will receiver their own number. 
+    Hortho : float
+        station orthometric height, in meters. Currently only used in subdaily.  If not provided on the command line, 
+        it will use ellipsoidal height and EGM96 to compute.
 
     """
 
@@ -216,6 +219,11 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
             print('Tried to find coordinates in our UNR database. Not found so exiting')
             sys.exit()
 
+    # calculate Hortho using EGM96 if none provided
+    if Hortho is None:
+        geoidC = g.geoidCorrection(lat,lon)
+        Hortho = height - geoidC
+
 # start the lsp dictionary
     reqA = ampl
 
@@ -224,6 +232,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['lat'] = lat
     lsp['lon'] = lon
     lsp['ht'] = height
+    lsp['Hortho'] = round(Hortho,4) # no point having it be so many decimal points
+    
 
     if h1 > h2:
         print(f'h1 cannot be greater than h2. You have set h1 to {h1} and h2 to {h2}. Exiting.')

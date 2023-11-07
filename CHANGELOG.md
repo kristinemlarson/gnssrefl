@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.9.3
+November 7, 2023
+
+Unfortunately readthedocs is still down - so the online help is not being 
+updated.
+
+Added Hortho to gnssir_input. This is station orthometric height (altitude) in meters. If not provided 
+on the command line it is calculated from the given station coordinates (either online
+or via the Nevada Reno database) and EGM96.
+
+Hortho is also added to subdaily, and the final spline fit is now plotted using it.
+
 ## 1.9.2
 November 5, 2023
 
