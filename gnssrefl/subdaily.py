@@ -1592,43 +1592,11 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # write outliers again ... 
     writeout_spline_outliers(new_outliers,txtdir,badpoints2,'outliers.spline2.txt')
 
-
     # I was looking at issue of delT being too big
 
-    if splineout:
-        if delta_out == 0:
-            print('No spline values will be written')
-        else:
-            #
-            iyear = int(tvd_new[0,0])
-            firstpoint  = th[0]; lastpoint = th[-1]
-            s1 = math.floor(firstpoint) ; s2 = math.ceil(lastpoint)
-            ndays = s2-s1 # number of days
-            # how many values you want in the linspace world
-            numvals = 1 + int(ndays*86400/delta_out)
-            # this should be fractional doy
-            tplot = np.linspace(s1, s2, numvals,endpoint=True)
-            #print(s1,s2,numvals)
-            spline_even = spline(tplot)
-            N = len(tplot)
-            # but you only want those values when we have data ....
-            splinefileout =  txtdir + '/' + station + '_' + str(iyear) + '_spline_out.txt'
-            print('Writing evenly sampled file to: ', splinefileout)
-            fout = open(splinefileout,'w+')
-            fout.write('{0:1s}  {1:30s}  \n'.format('%','This is NOT observational data - be careful when interpreting it.'))
-            fout.write('{0:1s}  {1:30s}  \n'.format('%','If the data are not well represented by the spline functions, you will '))
-            fout.write('{0:1s}  {1:30s}  \n'.format('%','have a very poor representation of the data. '))
-            fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD, RH(m), YY,MM,DD,HH,MM,SS'))
-            dtime = False
-            for i in range(0,N):
-                modjul = g.fdoy2mjd(iyear,tplot[i])
-                doy = math.floor(tplot[i])
-                utc= 24*(tplot[i] - doy)
-                bigt,yy,mm,dd,hh,mi,ss = g.ymd_hhmmss(iyear,doy,utc,dtime)
-                if (tplot[i] > firstpoint) & (tplot[i] < lastpoint):
-                    fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} \n'.format(modjul, 
-                        spline_even[i], yy,mm,dd,hh,mi,ss))
-            fout.close()
+    year = int(tvd[0,0]);
+    write_spline_output(splineout, year, th, spline, delta_out,station,txtdir,H0)
+
 
     if  False:
         plt.figure()
@@ -1637,9 +1605,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         plt.plot( tvd[:,14], res, '.',label='residuals')
         plt.xlabel('delta Time (minutes)')
 
-
-    #if pltit:
-    #    plt.show()
 
     return tvd, correction
 
@@ -1906,3 +1871,67 @@ def find_ortho_height(station,extension):
         Hortho = lsp['ht']- geoidC
 
     return Hortho
+
+
+def write_spline_output(splineout, iyear, th, spline, delta_out, station, txtdir,Hortho):
+    """
+    Writing the output of the spline fit to the final RH time series.
+    No output other than this text file.
+
+    Parameters
+    ----------
+    splineout : bool
+        whether file should be created
+    iyear : int
+        full year
+    th : numpy array
+        time values of some kind ... maybe fractional day of years?
+    spline: fit
+        needs doc
+    delta_out : int
+        how often you want the splinefit water level written, in seconds
+    station : str
+        station name
+    txtdir : str
+        output directory
+    Hortho : float
+        orthometric height used to convert RH to something more sea level like
+        meters
+    """
+
+    if splineout:
+        if delta_out == 0:
+            print('No spline values will be written because the interval is set to zero.')
+        else:
+            firstpoint  = th[0]; lastpoint = th[-1]
+            s1 = math.floor(firstpoint) ; s2 = math.ceil(lastpoint)
+            ndays = s2-s1 # number of days
+            # how many values you want in the linspace world
+            numvals = 1 + int(ndays*86400/delta_out)
+            # this should be evenly defined fractional doy
+            tplot = np.linspace(s1, s2, numvals,endpoint=True)
+            # then fit it
+            spline_even = spline(tplot)
+            N = len(tplot)
+
+            # but you only want those values when we have data ....
+            splinefileout =  txtdir + '/' + station + '_' + str(iyear) + '_spline_out.txt'
+            print('Writing evenly sampled file to: ', splinefileout)
+            fout = open(splinefileout,'w+')
+            fout.write('{0:1s}  {1:30s}  \n'.format('%','This is NOT observational data - be careful when interpreting it.'))
+            fout.write('{0:1s}  {1:30s}  \n'.format('%','If the data are not well represented by the spline functions, you will '))
+            fout.write('{0:1s}  {1:30s}  \n'.format('%','have a very poor representation of the data. I am also writing out station '))
+            fout.write('{0:1s}  {1:30s}  {2:8.3f} \n'.format('%','orthometric height minus RH, where Hortho (m) is ', Hortho  ))
+            fout.write('{0:1s}  {1:30s}  \n'.format('%','This assumes RH is measured relative to the L1 phase center.  '))
+            fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD, RH(m), YY,MM,DD,HH,MM,SS, quasi-sea-level(m)'))
+
+            dtime = False
+            for i in range(0,N):
+                modjul = g.fdoy2mjd(iyear,tplot[i])
+                doy = math.floor(tplot[i])
+                utc= 24*(tplot[i] - doy)
+                bigt,yy,mm,dd,hh,mi,ss = g.ymd_hhmmss(iyear,doy,utc,dtime)
+                if (tplot[i] > firstpoint) & (tplot[i] < lastpoint):
+                    fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} {8:10.3f} \n'.format(modjul, 
+                        spline_even[i], yy,mm,dd,hh,mi,ss, Hortho-spline_even[i]))
+            fout.close()

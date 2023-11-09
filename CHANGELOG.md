@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.9.4
+TBD
+
+Added Hortho -RH column to the spline fit file created by subdaily.
+Will likely rewrite this to be consistent with the output of the in situ tide gauge files
+For now it uses the past column definition convention.
+
 ## 1.9.3
 November 7, 2023
 
