@@ -20,7 +20,7 @@ from ftplib import FTP #import FTP commands from python's built-in ftp library
 from ftplib import FTP_TLS
 
 # remove for now
-#from importlib.metadata import version
+from importlib.metadata import version
 
 import scipy.signal as spectral
 from scipy.interpolate import interp1d
@@ -2003,9 +2003,9 @@ def open_outputfile(station,year,doy,extension):
 #   changed to a function
     filepath1,fexit = LSPresult_name(station,year,doy,extension)
     #print('Output will go to:', filepath1)
-    #versionNumber = version('gnssrefl')
-    versionNumber = 'working-on-it'
-    tem = '% gnssrefl, https://github.com/kristinemlarson, ' + versionNumber + ' \n'
+    versionNumber = version('gnssrefl')
+    #versionNumber = 'working-on-it'
+    tem = '% gnssrefl, https://github.com/kristinemlarson, ' + str(versionNumber) + ' \n'
     try:
         fout=open(filepath1,'w+')
 #       put a header in the output file
