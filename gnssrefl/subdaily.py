@@ -10,6 +10,7 @@ import sys
 from datetime import date
 
 # support code
+import gnssrefl.gnssir_v2 as guts2
 import gnssrefl.gps as g
 
 
@@ -1539,11 +1540,26 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     plt.title(station.upper() + ' RH with RHdot and InterFrequency Corrections Applied',fontsize=fs)
     plt.xlabel('days of the year',fontsize=fs)
     # put hires_figs boolean here
-    print(txtdir)
     if hires_figs:
         g.save_plot(txtdir + '/' + station + '_rhdot4.eps')
     else:
         g.save_plot(txtdir + '/' + station + '_rhdot4.png')
+
+
+    # add figure for Felipe
+    fig=plt.figure(figsize=(10,5))
+    H0 = find_ortho_height(station,'')
+    plt.plot(th_even, H0 - spline_whole_time, 'c-')
+    plt.grid()
+    plt.xlabel('Time (days)',fontsize=fs)
+    # would like to add year, but it is not currently sent to this code, alas
+    # 
+    #plt.xlabel('Time (days)/' + str(year) ,fontsize=fs)
+    plt.ylabel('meters',fontsize=fs)
+    plt.title(station.upper() + ' Water Level ', fontsize=fs)
+    pfile = txtdir + '/' + station + '_H0.png'
+    print('Plot file saved to : ', pfile)
+    g.save_plot(pfile)
 
     fig=plt.figure(figsize=(10,5))
     #plt.subplot(2,1,1)
@@ -1859,3 +1875,34 @@ def testing_nvals(Gval, Rval, Eval, Cval):
 
     return
 
+
+def find_ortho_height(station,extension):
+    """
+    find orthometric (sea level) height used in plots
+
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+    extension : str
+        gnssir analysis, extension mode
+
+    Returns
+    -------
+    Hortho : float
+        orthometric height from gnssir json analysis file.  calculates 
+        it if not in the file
+
+    """
+
+    lsp = guts2.read_json_file(station, extension)
+
+    if 'Hortho' in lsp:
+        # found in the lsp file
+        Hortho = lsp['Hortho']
+    else:
+        # calculate from EGM96
+        geoidC = g.geoidCorrection(lsp['lat'],lsp['lon'])
+        Hortho = lsp['ht']- geoidC
+
+    return Hortho

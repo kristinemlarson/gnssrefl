@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-converts ymd to doy
-Updated: April 3, 2019
-"""
 import argparse
 import gnssrefl.gps as g
 
@@ -12,7 +8,8 @@ import gnssrefl.gps as g
 def main():
     """
     converts year month day to day of year and prints it to the screen
-    Also does MJD for fun.
+
+    MJD is an optional output
 
     Parameters
     ----------
@@ -26,7 +23,7 @@ def main():
         calendar day
 
     mjd : str
-        input T or True to get MJD printed to the screen
+        use T or True to get MJD printed to the screen
 
     Returns
     -------
