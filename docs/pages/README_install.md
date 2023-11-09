@@ -5,7 +5,7 @@ github/pypi package installation.
 
 ## Jupyter Notebooks 
 
-[Install Instructions](https://gnssrefl.readthedocs.io/en/latest/pages/jupyter_notebook_instructions.htm)
+[Install Instructions](https://gnssrefl.readthedocs.io/en/latest/pages/jupyter_notebook_instructions.html)
 
 ## Docker Container
 
