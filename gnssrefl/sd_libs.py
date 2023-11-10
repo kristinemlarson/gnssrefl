@@ -702,7 +702,6 @@ def RH_ortho_plot( station, H0, th_even, spline_whole_time,txtdir, fs):
     plt.ylabel('meters',fontsize=fs)
     plt.title(station.upper() + ' Water Level ', fontsize=fs)
     pfile = txtdir + '/' + station + '_H0.png'
-    print('Plot file saved to : ', pfile)
     g.save_plot(pfile)
 
 def find_ortho_height(station,extension):
@@ -734,3 +733,80 @@ def find_ortho_height(station,extension):
         Hortho = lsp['ht']- geoidC
 
     return Hortho
+
+def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
+    """
+    Makes a plot of the spline fit to the mirrored RH data
+    Plot is saved to txtdir as  station_rhdot1.png
+
+    Parameters
+    ----------
+    tnew : numpy of floats
+        time in days of year, including the faked data, used for splines
+    ynew : numpy of floats
+        RH in meters 
+    spl_x : numpy of floats
+        time in days of year
+    spl_y : numpy of floats
+        smooth RH, meters
+    txtdir : str
+        directory for plot
+    station : str
+        name of station for title
+    beginT : float
+        first time (day of year) real RH measurement
+    endT : float
+        last time (day of year) for first real RH measurement
+
+    """
+    fig=plt.figure(figsize=(10,4))
+
+    plt.plot(tnew,ynew, 'b.', label='obs+fake obs')
+    i = (spl_x > beginT) & (spl_x < endT) # to avoid wonky points in spline
+    plt.plot(spl_x[i],spl_y[i],'c-', label='spline')
+    plt.title('Mirrored obs and spline fit ')
+    plt.legend(loc="upper left")
+    plt.ylabel('meters')
+    plt.xlabel('days of the year')
+    plt.xlim((beginT, endT))
+    plt.grid()
+    g.save_plot(txtdir + '/' + station + '_rhdot1.png')
+    plt.close()
+
+def quickTr(year, doy,frachours):
+    """
+    takes timing from lomb scargle code (year, doy) and UTC hour (fractional)
+    and returns a date string
+
+    Parameters
+    ----------
+    year : int
+        full year
+    doy : int
+        day of year
+    frachours : float
+        real-valued UTC hour 
+
+    Returns
+    -------
+    datestring : str
+         date ala YYYY-MM-DD HH-MM-SS
+    """
+    year = int(year); doy = int(doy); frachours = float(frachours)
+    # convert doy to get month and day
+    d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
+    month = int(d.month)
+    day = int(d.day)
+
+    hours = int(np.floor(frachours))
+    leftover = 60*(frachours - hours)
+    minutes = int(np.floor(leftover))
+    leftover_hours  = frachours - (hours + minutes/60)
+    seconds = int(leftover_hours*3600)
+    #print(frachours, hours,minutes,leftover_seconds)
+
+    jd = datetime.datetime(year,month, day,hours,minutes,seconds)
+    datestring = jd.strftime("%Y-%m-%d %H:%M:%S")
+
+
+    return datestring

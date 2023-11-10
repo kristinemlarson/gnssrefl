@@ -24,46 +24,6 @@ import math
 #KL trying to move plots and output files to sd_libs.py
 
 
-def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
-    """
-    Makes a plot of the spline fit to the mirrored RH data
-    Plot is saved to txtdir  as  station_rhdot1.png
-
-    Parameters
-    ----------
-    tnew : numpy of floats
-        time in days of year, including the faked data, used for splines
-    ynew : numpy of floats
-        RH in meters 
-    spl_t : numpy of floats
-        time in days of year
-    spl_y : numpy of floats
-        smooth RH, meters
-    station : str
-        name of station for title
-    beginT : float
-        first time (day of year) real RH measurement
-    endT : float
-        last time (day of year) for first real RH measurement
-    extension : str
-        name of testing strategy (used in gnssir)
-
-    """
-    fig=plt.figure(figsize=(10,4))
-
-    plt.plot(tnew,ynew, 'b.', label='obs+fake obs')
-    i = (spl_x > beginT) & (spl_x < endT) # to avoid wonky points in spline
-    plt.plot(spl_x[i],spl_y[i],'c-', label='spline')
-    plt.title('Mirrored obs and spline fit ')
-    plt.legend(loc="upper left")
-    plt.ylabel('meters')
-    plt.xlabel('days of the year')
-    plt.xlim((beginT, endT))
-    plt.grid()
-    g.save_plot(txtdir + '/' + station + '_rhdot1.png')
-    plt.close()
-
-
 def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
     figures out what the names of the outputs are going to be
@@ -120,6 +80,8 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     """
     writes out the subdaily results. currently only works for plain txt
 
+    >> this code should be moved to the library
+
     Parameters
     ----------
     input : str
@@ -148,11 +110,11 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     # 
     write_IF_corrected = False
     if len(newRH_IF) > 0:
-        print('IF corrected values being written - make sure you use the correct column!')
+        print('\n IF corrected values being written - make sure you use the correct column! \n')
         write_IF_corrected = True
     extra = False
     if len(RHdot_corr) > 0:
-        print('RHdot corrected values being written - make sure you use the correct column')
+        print('\n RHdot corrected values being written - make sure you use the correct column \n')
         extra = True
 
     N= len(ntv)
@@ -425,45 +387,6 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     # now return the names of the output files ... 
 
     return tv,otimes, fname, fname_new
-
-
-def quickTr(year, doy,frachours):
-    """
-    takes timing from lomb scargle code (year, doy) and UTC hour (fractional)
-    and returns a date string
-
-    Parameters
-    ----------
-    year : int
-        full year
-    doy : int
-        day of year
-    frachours : float
-        real-valued UTC hour 
-
-    Returns
-    -------
-    datestring : str
-         date ala YYYY-MM-DD HH-MM-SS
-    """
-    year = int(year); doy = int(doy); frachours = float(frachours)
-    # convert doy to get month and day
-    d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
-    month = int(d.month)
-    day = int(d.day)
-
-    hours = int(np.floor(frachours))
-    leftover = 60*(frachours - hours)
-    minutes = int(np.floor(leftover))
-    leftover_hours  = frachours - (hours + minutes/60)
-    seconds = int(leftover_hours*3600)
-    #print(frachours, hours,minutes,leftover_seconds)
-
-    jd = datetime.datetime(year,month, day,hours,minutes,seconds)
-    datestring = jd.strftime("%Y-%m-%d %H:%M:%S")
-
-
-    return datestring
 
 
 def fract_to_obstimes(spl_x):
@@ -838,7 +761,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         hires_figs = False
 
     fs = kwargs.get('fs',12)
-    print('Using fontsize: ', fs)
+    #print('Using fontsize: ', fs)
 
     #print('output directory: ', txtdir)
 
@@ -853,8 +776,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     knots_test = kwargs.get('knots_test',0)
     if (knots_test== 0):
         knots_test = knots_per_day
-    else:
-        print('using knots_test')
+    #else:
+    #    print('using knots_test')
 
     print('\n>>>>>>>>>>>>>>>>>>>> Entering second section of subdaily code <<<<<<<<<<<<<<<<<<<<<<<<')
     print('\nComputes rhdot correction and interfrequency bias correction for subdaily')
@@ -917,7 +840,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # these are spline values at the RH observation times
     spl_at_GPS_times = spline(th) 
 
-    mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,th[0],th[-1])
+    sd.mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,th[0],th[-1])
 
     plot_begin = np.floor(np.min(th))
     plot_end =np.ceil(np.max(th)) 
@@ -959,7 +882,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     plt.plot(th,correctedRH,'m.',label=label2,markersize=4)
 
     print('\nRMS no RHdot correction (m)', '{0:6.3f}'.format ( sigmaBefore))
-    print('RMS w/ RHdot correction (m)', '{0:6.3f}'.format ( sigmaAfter ))
+    print('RMS w/ RHdot correction (m)', '{0:6.3f} \n'.format ( sigmaAfter ))
 
     plt.gca().invert_yaxis()
     plt.legend(loc="upper left")
@@ -1090,7 +1013,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     Ndays = tnew.max()-tnew.min()
     knots_per_day = knots_test
-    print('trying knots_test')
+    #print('trying knots_test')
     numKnots = int(knots_per_day*(Ndays))
     #
 
@@ -1103,7 +1026,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # compute spline - use for times th
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
 
-
     # calculate spline values at GPS time tags
     spline_at_GPS = spline(th)
     half_hourly = int(48*(th[-1] - th[0]))
@@ -1115,7 +1037,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     strsig = str(round(newsigma,3)) + '(m)'
 
     fig=plt.figure(figsize=(10,5))
-    #plt.subplot(2,1,1)
     plt.plot(th, biasCor_rh, 'b.', label='RH ' + strsig)
     plt.plot(th_even, spline_whole_time, 'c-',label='spline')
 
@@ -1150,7 +1071,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
 
     H0 = sd.find_ortho_height(station,'')
-    # add figure for Felipe
     sd.RH_ortho_plot( station, H0, th_even, spline_whole_time,txtdir, fs)
     
 
@@ -1173,7 +1093,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     else:
         g.save_plot(txtdir + '/' + station + '_rhdot5.png')
 
-    plt.close() # dont send this one to the screen
+    plt.close() # dont send this figure to the screen
 
     # bias corrected - and again without 3 sigma outliers
     bias_corrected_filename = fname_new + 'IF'; extraline = ''; writecsv = False
@@ -1189,7 +1109,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     year = int(tvd[0,0]);
     sd.write_spline_output(splineout, year, th, spline, delta_out,station,txtdir,H0)
-
 
     if  False:
         plt.figure()
@@ -1235,7 +1154,4 @@ def my_percentile(rh,p1, p2):
     highv = sorted_rh[N2]
 
     return  lowv, highv
-
-
-
 
