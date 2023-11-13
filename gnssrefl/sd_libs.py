@@ -230,7 +230,9 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     # this crashed my docker build - but it turned out to have nothing to do with it
     yl = np.percentile(tv[:,2] ,[1 ,99])
     print('percentile values',yl)
-    lowv = yl[0]; highv = y[1]
+    # I think this is a typo?
+    #lowv = yl[0]; highv = y[1]
+    lowv = yl[0]; highv = yl[1]
     
     if percent99:
         ax2.set_ylim((lowv,highv))

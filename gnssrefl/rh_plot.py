@@ -112,8 +112,9 @@ def rh_plot(station: str, year: int, csvfile: bool = False, plt: bool = True,
     # these are things not needed by rh_plot - but the code expects it
     sigma = 3; txtfile = ''; kplt=False
     default_usage = False
+    hires_figs = True ; fs = 12
     ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, extension, sigma,
-            writecsv, azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt,txtdir,default_usage)
+            writecsv, azim1, azim2, ampl, peak2noise, txtfile,h1,h2,kplt,txtdir,default_usage, hires_figs,fs)
 
 def main():
     args = parse_arguments()

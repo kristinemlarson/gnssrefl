@@ -6,23 +6,16 @@
 on in that translation.  It is better to let gnssrefl to do that conversion for you.  rinex2snr allows RINEX 3
 files!**
 
-Our online documentation is available [here.](https://gnssrefl.readthedocs.io/en/latest/)
-[(pdf version)](https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/)
+Documentation:
+
+- [online](https://gnssrefl.readthedocs.io/en/latest/)
+
+- [pdf](https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/)
 
 pktnlim in invsnr was out of synch with new definition installed last summer. Please set pk2nlim manually,
 or use new version (1.9.0)
 
 See documentation for gnssir_input for new refraction models.
-
-A long time ago - and in a galaxy far, far away - Bob King told a group of graduate students why he 
-liked GPS observation files. His answer:
-
-*There are no leap seconds.*
-
-I agree with Bob King. This software is meant to be used with GPS time. All files should be in GPS time.
-Conversion to UTC is something you should do on your own. 
-
-September 12, 2023: Updated nmea2snr to allow signals other than L1.
 
 August 2, 2023: Updated azimuth outputs for gnssir and quickLook so that the azimuth of the 
 rising or setting part of the arc is reported rather than the average azimuth, as was done in the older versions.

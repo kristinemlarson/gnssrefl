@@ -106,7 +106,7 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     original = False
     if len(RHdot_corr) + len(newRH) + len(newRH_IF) == 0:
         original = True
-        print('LSP series being written')
+        #print('LSP series being written')
     # 
     write_IF_corrected = False
     if len(newRH_IF) > 0:

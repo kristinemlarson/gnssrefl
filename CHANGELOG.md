@@ -13,6 +13,13 @@ Will likely rewrite this to be consistent with the output of the in situ tide ga
 For now it uses the past column definition convention.  This is not useful until someone writes
 documentation about what Hortho means in terms of comparing with tide gauges.
 
+fixed bug(s) in rh_plots, which is not meant for general use. Thank you to Felipe Nievinski for finding this.
+
+cleaned up subdaily, i.e. made sd_libs.py and tried to limit subdaily.py to 
+the major pieces of code.  sd_libs.py has the plotting and some of the writing routines.  Eventually
+I will try to move the rest of the file writing codes as well.
+
+
 ## 1.9.3
 November 7, 2023
 
@@ -109,6 +116,8 @@ Remove zero points from SNR traces in window_new.py in gnssir_v2.py
 ## 1.8.2
 2023 September 25
 added nmea2snr changes from naoyakadota.  Invalid lines no longer crash the code.
+
+multiple frequencies allowed
 
 https://github.com/kristinemlarson/gnssrefl/pull/194
 

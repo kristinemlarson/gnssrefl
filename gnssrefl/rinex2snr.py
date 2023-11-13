@@ -492,9 +492,9 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         log.write('bad exe, bad snr option, do not really have the orbit file \n')
                         status = subprocess.call(['rm','-f', snrname ])
                     else:
-                        log.write('A SNR file was created and gzipped: {0:50s}  \n'.format(snrname_full))
+                        log.write('A SNR file was created : {0:50s}  \n'.format(snrname_full))
                         print('\n')
-                        print('SUCCESS: SNR file was created and gzipped \n', snrname_full)
+                        print('SUCCESS: SNR file was created \n', snrname_full)
                         g.store_snrfile(snrname,year,station)
                         subprocess.call(['gzip', snrname_full])
 
