@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.9.5
+November 13, 2023
+
+fixed bug(s) in rh_plots, which is not meant for general use. Thank you to Felipe Nievinski for finding this.
+
+cleaned up subdaily, i.e. made sd_libs.py and tried to limit subdaily.py to 
+the major pieces of code.  sd_libs.py has the plotting and some of the writing routines.  Eventually
+I will try to move the rest of the file writing codes as well.
+
 ## 1.9.4
 November 9, 2023
 
@@ -13,11 +22,6 @@ Will likely rewrite this to be consistent with the output of the in situ tide ga
 For now it uses the past column definition convention.  This is not useful until someone writes
 documentation about what Hortho means in terms of comparing with tide gauges.
 
-fixed bug(s) in rh_plots, which is not meant for general use. Thank you to Felipe Nievinski for finding this.
-
-cleaned up subdaily, i.e. made sd_libs.py and tried to limit subdaily.py to 
-the major pieces of code.  sd_libs.py has the plotting and some of the writing routines.  Eventually
-I will try to move the rest of the file writing codes as well.
 
 
 ## 1.9.3
