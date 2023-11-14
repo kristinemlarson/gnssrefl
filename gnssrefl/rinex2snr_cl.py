@@ -101,7 +101,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         bfg, unavco  - you may need to specify 15 second sample rate
 
     RINEX3 1 sec 
-        bkg-igs, bkg-euref, cddis, maybe nrcan 
+        bkg-igs, bkg-euref, cddis, ignes (spain), maybe nrcan 
 
     Examples
     --------
@@ -454,7 +454,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # bkg is only rinex 3
     # i cannot remember for nrcan. it is probably rinex2
     #highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  
-    highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis']  
+    # adding spanish
+    highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes']  
 
     if ns == 9:
         # rinex3

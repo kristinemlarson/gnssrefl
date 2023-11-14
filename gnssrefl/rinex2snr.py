@@ -283,7 +283,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                     foundit = False; fexists = False; rnx_file = ''
                                 if foundit:
                                     if screenstats:
-                                        print('The RINEX 3 file has been downloaded. Try to make ', r2)
+                                        print('The RINEX 3 file has been downloaded from CDDIS . Try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
                             if archive == 'bkg':
                                 bad_day = g.cddis_restriction(year, doy,'bkg')
@@ -294,7 +294,18 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                     foundit = False; fexists = False; rnx_file = ''
                                 if foundit:
                                     if screenstats:
-                                        print('The RINEX 3 file has been downloaded and merged. Try to make ', r2)
+                                        print('The RINEX 3 file has been downloaded from the BKG and merged. Try to make ', r2)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
+                            if archive == 'ignes':
+                                bad_day = g.cddis_restriction(year, doy,'bkg')
+                                if not bad_day:
+                                    rnx_filename,foundit = ch.esp_highrate(station9ch, year, doy, 0,stream,dec_rate)
+                                else:
+                                    print('No high-rate RINEX data will be downloaded')
+                                    foundit = False; fexists = False; rnx_file = ''
+                                if foundit:
+                                    if screenstats:
+                                        print('The RINEX 3 file has been downloaded from IGN ES and merged. Try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
 
                         else:

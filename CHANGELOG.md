@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.9.6
+November 15, 2023
+
+Added highrate (1-sec) GNSS archive from Spain, IGN ES.  RINEX 3 only. 
+For this archive, use ignes and make sure to say -rate high -samplerate 1 . 
+And -orb gnss because there are very likely to be good multi-GNSS data.
+
 ## 1.9.5
 November 13, 2023
 

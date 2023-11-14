@@ -77,6 +77,8 @@ def main():
         pair of yaxis limits  
     xlimits: float, optional
         pair of xaxis limits  
+    freq: integer, optional
+        use column 11 to find (and extract) a single frequency
 
     """
 
@@ -96,6 +98,7 @@ def main():
     parser.add_argument("-xlimits", nargs="*",type=float, help="optional xlimits", default=None)
     parser.add_argument("-ydoy", help="if True/T, columns 1-2 are year and doy", type=str,default=None)
     parser.add_argument("-filename2", help="second filename", type=str, default=None)
+    parser.add_argument("-freq", help="spec freq, column 11 ", type=int,default=None)
 
     args = parser.parse_args()
 
@@ -136,6 +139,15 @@ def main():
         if len(tvd) == 0:
             print('empty input file number 1')
             return
+        else:
+            if (args.freq is not None):
+                print('restricting frequency',args.freq)
+                ii = (tvd[:,10] == args.freq)
+                if (len(tvd[ii,10]) == 0):
+                    print('nothing for that frequency')
+                    return
+                else:
+                    tvd = tvd[ii,:]
         tval = []
         yval = []
     else:

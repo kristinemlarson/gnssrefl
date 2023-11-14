@@ -324,3 +324,114 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
 
     return file_name24,  fexist
 
+
+def esp_highrate(station, year, month, day,stream,dec_rate):
+    """
+    picks up a highrate RINEX 3 file from Spanish Geodeic Center, merges and decimates it.
+    requires gfzrnx
+
+    Parameters
+    ----------
+    inputs: string
+        9 ch station name 
+    year : integer
+        full year
+    month : integer
+        month or day of year if day set to 0
+    day : integer
+        day of the month
+    stream : str
+        R or S
+    dec_rate : integer
+        decimation rate in seconds
+
+    Returns
+    -------
+    file_name24 : str
+        name of merged rinex file
+    fexist : boolean
+        whether file exists
+
+    """
+    fexist  = False
+    version = 3
+    crnxpath = g.hatanaka_version()
+    gexe = g.gfz_version()
+    # if doy is input
+    if day == 0:
+        doy=month
+        d = g.doy2ymd(year,doy);
+        month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = g.ymd2doy(year,month,day); 
+
+    if not os.path.isfile(crnxpath):
+        g.hatanaka_warning(); return
+
+    if not os.path.isfile(gexe):
+        print('You need to install gfzrnx to use high-rate RINEX data in my code.')
+        return '', fexist
+
+    fileid = str(year) + '{:02d}'.format(month) + '{:02d}'.format(day)
+
+#    https://igs.bkg.bund.de/root_ftp/EUREF/highrate/2022/233/a/VLIS00NLD_R_20222330000_15M_01S_MO.crx.gz
+#   https://datos-geodesia.ign.es/ERGNSS/horario_1s/20231110/00/
+    gns = 'https://datos-geodesia.ign.es/ERGNSS/horario_1s/' + fileid + '/' 
+    # base directory name
+    print('looking for files in: ', gns)
+
+    s1=time.time()
+    print('WARNING: Downloading and merging 24 one hour files.')
+    fileF = 0
+    streamID  = '_' + stream + '_'
+    s1 = time.time()
+    for h in range(0,23):
+        # subdirectory
+        ch = '{:02d}'.format(h)
+        print('Hour: ', ch)
+        file_name = station.upper() + streamID + cyyyy + cdoy + ch + '00_01H_01S_MO.crx.gz'
+        dirname = gns + '/' + ch + '/'
+        print('looking for', dirname + file_name)
+        crnx_name = file_name[:-3] 
+        oname = file_name[:-6] + 'rnx'
+        if os.path.isfile(oname):
+            fileF = fileF + 1
+            print('already have ', oname)
+        else:
+            try:
+                wget.download(dirname+file_name,file_name)
+                subprocess.call(['gunzip',file_name]) # gunzip
+                subprocess.call([crnxpath, crnx_name]) # hatanaka
+                subprocess.call(['rm',crnx_name]) # remove old file
+            except:
+                okok = 1
+            if os.path.isfile(oname):
+                print('successful download ', oname)
+                fileF = fileF + 1
+            else:
+                print('unsuccessful download ', oname)
+
+    searchP = station.upper() + streamID + cyyyy + cdoy + '*01H*MO.rnx'
+    print(searchP)
+    print('Found ', fileF,' one hour files')
+
+    outfile = station.upper() + '.tmp'
+    crate = '{:02d}'.format(dec_rate)
+
+    file_name24 = ''
+
+    file_name24 = station.upper() + streamID + cyyyy + cdoy + '0000_01D_' + crate + 'S_MO.rnx'
+    print(file_name24,outfile)
+    if (fileF > 0):
+        subprocess.call([gexe,'-finp', searchP, '-fout', outfile, '-vo','3', '-smp', crate, '-f','-q'])
+        subprocess.call(['mv',outfile, file_name24]) # remove old file
+        fexist = True
+
+    s2=time.time()
+    print('That download and merging experience took ', int(s2-s1), ' seconds.')
+
+    # remove one hour files
+    cm = 'rm ' + station.upper() + streamID + cyyyy + cdoy + '*01H_01S_MO.rnx'
+    if fexist:
+        subprocess.call(cm,shell=True)
+
+    return file_name24,  fexist
