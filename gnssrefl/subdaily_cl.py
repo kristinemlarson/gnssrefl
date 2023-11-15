@@ -23,7 +23,7 @@ def parse_arguments():
     parser.add_argument("-spline_outlier1", default=None, type=float, help="outlier criterion used in first splinefit (meters)")
     parser.add_argument("-spline_outlier2", default=None, type=float, help="outlier criterion used in second splinefit (meters)")
     parser.add_argument("-knots", default=None, type=int, help="Knots per day, spline fit only (default is 8)")
-    parser.add_argument("-sigma", default=None, type=float, help="simple sigma outlier criterion (e.g. 1 for 1sigma, 3 for 3sigma)")
+    parser.add_argument("-sigma", default=None, type=float, help="simple sigma outlier criterion, evaluated on a daily basis for LSP RH (e.g. 1 for 1sigma, 3 for 3sigma)")
     parser.add_argument("-extension", default=None, type=str, help="solution subdirectory")
     parser.add_argument("-rhdot", default=None, type=str, help="set to False if you want to stop after section 1 of the QC code")
     parser.add_argument("-doy1", default=None, type=int, help="initial day of year")
