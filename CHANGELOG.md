@@ -10,6 +10,11 @@ Added highrate (1-sec) GNSS archive from Spain, IGN ES.  RINEX 3 only.
 For this archive, use ignes and make sure to say -rate high -samplerate 1 . 
 And -orb gnss because there are very likely to be good multi-GNSS data.
 
+quickplt will let you pick out a particular frequency if you give it is standard LSP
+output file where frequency is being written in column 11.
+
+Updated sc02 usecase and notebook install instructions.
+
 ## 1.9.5
 November 13, 2023
 

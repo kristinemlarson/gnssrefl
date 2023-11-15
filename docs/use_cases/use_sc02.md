@@ -99,12 +99,13 @@ We can also check the retrievals stats for L1 to make sure these look good too.
 
 We will not attempt to analyze a long time series, but instead focus here on 
 the process. We will be using three+ weeks of GNSS data from 2021 as our sample dataset.
+The orbit option is used to make sure that multi-GNSS signals can be used.  
 
-<code>rinex2snr sc02 2021 15 -doy_end 40</code>
+<code>rinex2snr sc02 2021 15 -doy_end 40 -orb gnss</code>
 
 Then you need to make the list of analysis inputs. 
 
-<code>gnssir_input sc02   -e1 5 -e2 13 -h1 3 -h2 12 -peak2noise 3 -frlist 1 20 5 101 102 201 205 207 -azlist2 60  220</code>
+<code>gnssir_input sc02   -e1 5 -e2 13 -h1 3 -h2 12 -peak2noise 3 -frlist 1 20 5 101 102 201 205 207 208 -azlist2 60  220</code>
 
 Once you have the json file set up, you can go ahead and analyze all the data with a single command:
 

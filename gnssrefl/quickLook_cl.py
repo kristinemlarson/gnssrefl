@@ -7,7 +7,7 @@ import sys
 
 # internal codes
 import gnssrefl.gps as g
-import gnssrefl.quickLook_function as quick
+#import gnssrefl.quickLook_function as quick
 import gnssrefl.quickLook_function2 as quick2
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
@@ -193,11 +193,11 @@ def quicklook(station: str, year: int, doy: int,
         print('a valid periodogram and for quality control.  Change h1 or h2 or both. Exiting')
         sys.exit()
 
-    if True:
-        return quick2.quickLook_function(**args)
+    # returns two variables: data, datakey = quick.quicklook_function(**args)
+    return quick2.quickLook_function(**args)
+#    if True:
 #    else:
 #        return quick.quickLook_function(**args)
-    # returns two variables: data, datakey = quick.quicklook_function(**args)
 
     # the key is saved wth the same keys as the data dictionary, in this order 
     # [avgAzim, RH, satNumber,frequency,maxAmplitude,Peak2Noise, UTChour]

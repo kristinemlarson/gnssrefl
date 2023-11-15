@@ -1,8 +1,20 @@
 # Jupyter Notebook Installation Instructions
 
-Please send your feedback on these instructions to Kelly Enloe at EarthScope, or better still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
+Please send your feedback on these instructions to Kelly Enloe at EarthScope, or 
+better still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
+
+Please keep in mind that the notebooks could very well be out of date. For example, the notebook might
+tell you to analyze multi-GNSS data - but at the same time the notebook tells the code 
+to translate the GNSS files with GPS only orbit files. So the notebook example won't crash, but it also will not give
+you multi-GNSS water level results. There are similar issues in the command line use cases - as it is difficult
+to keep the examples up to date. We welcome your help on keeping the notebooks up to date. You could also 
+submit your corrections to the notebooks to Kelly Enloe as an issue or as a pull request.  Please make it clear 
+that you are directing your request to her (there is a pull down tab to do so).
 
 Listed below are instructions for running jupyter notebooks with Docker (recommended) or on your local machine.
+
+If you have run the notebooks in the past, the first thing you should do is update your docker. Look below to the **Update 
+Docker Image**.
 
 ## Run Jupyter Notebooks with Docker (Recommended method)
 ### Install Docker
