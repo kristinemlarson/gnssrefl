@@ -443,11 +443,18 @@ def spline_in_out(x,y,knots_per_day):
         spline value at those times
 
     """
-    Ndays = round(x.max()-x.min())
+    Ndaysfrac = x.max()-x.min()
+    Ndaysint = round(Ndaysfrac)
+    Ndays = Ndaysfrac
     numKnots = int(knots_per_day*(Ndays))
     #print('xmin, xmax',x.min(), x.max(), 'knots', numKnots,Ndays )
     x1 = x.min()+0.1/365.25
     x2 = x.max()-0.1/365.25
+    # make knot locations more stable with increasing time series duration:
+    knot_spacing = 1/knots_per_day
+    x1 = floor(x1/knot_spacing)*knot_spacing
+    x2 =  ceil(x2/knot_spacing)*knot_spacing
+    numKnots = round((x2-x1)/knot_spacing)
     knots =np.linspace(x1,x2,num=numKnots)
     t, c, k = interpolate.splrep(x, y, s=0, k=3,t=knots,task=-1)
 #   calculate water level hourly for now
