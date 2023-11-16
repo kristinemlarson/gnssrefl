@@ -109,6 +109,9 @@ write to the file.  This is remedied by changing the permissions of the folder f
 
 Docker folder /etc/gnssrefl/refl_code will be visible in Windows under C:\Users\yourlogin\refl_code
 
+If you modify the source code, you'll need to make the installation [editable](https://pip.pypa.io/en/stable/cli/pip_install/#cmdoption-e):
+`cd /usr/src/gnssrefl; pip install -e .`
+
 ## additional references:
 * [gnssrefl base image dockerfile](https://gitlab.com/gnss_reflectometry/gnssrefl_docker_base_img/-/blob/master/Dockerfile)
 * [gnssrefl docker file](https://github.com/kristinemlarson/gnssrefl/blob/master/Dockerfile)
