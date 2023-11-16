@@ -313,8 +313,12 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         #print( len(tmp[ri,1])) print( len(tmp[ei,1]))
 
         if (n > 0):
-            rhavg = np.mean(tv[ii,2]); 
-            rhstd = np.std(tv[ii,2]); 
+            #rhavg = np.mean(tv[ii,2]); 
+            #rhstd = np.std(tv[ii,2]); 
+            # make sigma clipping more robust against outliers:
+            # https://en.wikipedia.org/wiki/Median_absolute_deviation#Relation_to_standard_deviation
+            rhavg = np.median(tv[ii,2]); 
+            rhstd = np.median(abs(tv[ii,2]-rhavg))/0.6745;            
             newl = [dtime, rhavg, rhstd]
             stats = np.append(stats, [newl], axis=0)
             #print(newl)
