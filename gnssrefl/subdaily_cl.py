@@ -23,7 +23,7 @@ def parse_arguments():
     parser.add_argument("-spline_outlier1", default=None, type=float, help="outlier criterion used in first splinefit (meters)")
     parser.add_argument("-spline_outlier2", default=None, type=float, help="outlier criterion used in second splinefit (meters)")
     parser.add_argument("-knots", default=None, type=int, help="Knots per day, spline fit only (default is 8)")
-    parser.add_argument("-sigma", default=None, type=float, help="simple sigma outlier criterion, evaluated on a daily basis for LSP RH (e.g. 1 for 1sigma, 3 for 3sigma)")
+    parser.add_argument("-sigma", default=None, type=float, help="simple sigma outlier criterion, float, evaluated on a daily basis for LSP RH (e.g. 1 for 1sigma, 3 for 3sigma). default is 2.5 sigma")
     parser.add_argument("-extension", default=None, type=str, help="solution subdirectory")
     parser.add_argument("-rhdot", default=None, type=str, help="set to False if you want to stop after section 1 of the QC code")
     parser.add_argument("-doy1", default=None, type=int, help="initial day of year")
@@ -43,11 +43,12 @@ def parse_arguments():
     parser.add_argument("-hires_figs", default=None, type=str, help="hi-resolution eps figures, default is False")
     parser.add_argument("-apply_rhdot", default=None, type=str, help="apply rhdot, default is True")
     parser.add_argument("-fs", default=None, type=int, help="fontsize for figures. default is 12")
+    parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate sigma definition. default is False")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt','if_corr','hires_figs','apply_rhdot']
+    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt','if_corr','hires_figs','apply_rhdot','alt_sigma']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -60,7 +61,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.4, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0, 
-             hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 12):
+             hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 12, alt_sigma: bool= False):
     """
     Subdaily combines multiple day gnssir solutions and applies relevant corrections. 
     It only works for one year at a time; you can restricts time periods within a year with -doy1 and -doy2
@@ -175,6 +176,9 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         for a lake or river you would not want it to be.
     fs : int, optional
         fontsize for Figures. default is 12 for now.
+    alt_sigma : bool, optional
+        whether you want to use Nievinski definition for outlier criterion.
+        will change to kwargs when I get a chance.
 
     """
 
@@ -225,7 +229,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         default_usage = True
         ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, 
                 extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile_part1, 
-                h1,h2,kplt,txtdir,default_usage,hires_figs,fs)
+                h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma)
         haveObstimes = True
     else:
         haveObstimes = False
