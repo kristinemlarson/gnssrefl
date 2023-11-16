@@ -530,9 +530,9 @@ def print_badpoints(t,outliersize,txtdir,real_residuals):
 
     m,n = t.shape
     f = txtdir + '/outliers.txt'
-    print('Outliers written to file: ', f) 
-    fout = open(f, 'w+')
     if (m > 0):
+        print(m, ' Outliers written to file: ', f)        
+        fout = open(f, 'w+')
         for i in range(0,m):
             fout.write('doy {0:3.0f} sat {1:3.0f} azim {2:6.2f} fr {3:3.0f} pk2noise {4:5.1f} residual {5:5.2f} \n'.format( 
                 t[i,1], t[i,3],t[i,5], t[i,10], t[i,13], real_residuals[i] ))
