@@ -206,12 +206,16 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
                 localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
                 if nol:
-                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is in the local directory')
+                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is in this directory:')
+                    current_local = os.getcwd()
+                    print(current_local)
                     # this assumes RINEX file is in local directory or "nearby"
                     if version == 2:
+
                         if mk:
                             the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
                         if not os.path.exists(r):
+                            print('Unsuccessful, so how trying other directories')
                             # could try this way? - look for file in localpath2. gunzip if necessary
                             allgood = get_local_rinexfile(r,localpath2)
                         if os.path.exists(r):
@@ -1341,7 +1345,8 @@ def get_local_rinexfile(rfile,localpath2):
                 allgood = True
                 subprocess.call(['rm',rd])
 
-    # now check in $REFL_CODE/YYYY/rinex/ssss
+    # now check in 
+    print('Checking for the file in : ', localpath2)
     if not allgood:
         r = localpath2 + rfile
         # hatanaka version in REFL_CODE

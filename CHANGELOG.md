@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.9.6
-November 15, 2023
+November 18, 2023
 
 Added highrate (1-sec) GNSS archive from Spain, IGN ES.  RINEX 3 only. 
 For this archive, use ignes and make sure to say -rate high -samplerate 1 . 
@@ -14,6 +14,16 @@ quickplt will let you pick out a particular frequency if you give it is standard
 output file where frequency is being written in column 11.
 
 Updated sc02 usecase and notebook install instructions.
+
+Provided more feedback to people using nolook option in rinex2snr. Changed "local directory"
+printed to the screen to the actual directory.
+
+Substantially changed plots in subdaily to use datetime instead of day of year.  Ultimately 
+all of subdaily should be changed to MJD so as to allow datasets crossing year boundaries.
+It also removes gaps from the last spline output plot, but it has not been implemented in the output
+txt file as yet (nor in the second to last plot)
+
+
 
 ## 1.9.5
 November 13, 2023

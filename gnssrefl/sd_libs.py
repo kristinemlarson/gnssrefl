@@ -3,9 +3,31 @@ import datetime
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.time import Time
 
+# my code
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
+
+def mjd_to_obstimes(mjd):
+    """
+    takes mjd array and converts to datetime for plotting.
+
+    Parameters
+    ----------
+    mjd : numpy array of floats
+        mod julian date
+
+    Returns
+    -------
+    dt : numpy array of datetime objects
+
+    """
+
+    dt = Time(mjd,format='mjd').utc.datetime; 
+
+    return dt
+
 
 def write_spline_output(splineout, iyear, th, spline, delta_out, station, txtdir,Hortho):
     """
@@ -394,7 +416,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     fs = 10
     otimesarray = np.asarray(otimes)
     # new plot 
-    plt.figure()
+    plt.figure(figsize=(10,5))
     plt.plot(tv[:,5],tv[:,2], '.',markersize=4,label='obs')
     plt.plot(tv[ii,5],tv[ii,2], 'ro',markersize=4,label='outliers')
     plt.xlabel('Azimuth (degrees)')
@@ -624,9 +646,9 @@ def writejsonfile(ntv,station, outfile):
 
     return True
 
-def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs):
+def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs,year):
     """
-    make rhdot correction plots
+    makes the rhdot correction plots
 
     Parameters
     ----------
@@ -648,8 +670,15 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_fig
         file directory for output
     hires_figs : bool
         whether you want eps instead of png 
+    year : int
+        calendar year
 
     """
+    mjd0 = g.fdoy2mjd(year, th[0] ) # MJD of first point
+    # not being used
+    #th_obs = mjd_to_obstimes(th+mjd0)
+
+
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
     plt.plot(th, correction,'b.')
@@ -657,32 +686,45 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_fig
     plt.xlim((np.min(th), np.max(th)))
     plt.grid()
     plt.title('The RH correction from RHdot effect ')
-    #plt.xlim((plot_begin, plot_end))
+    #plt.xlim((th_obs[0], th_obs[-1])) #fig.autofmt_xdate()
 
     plt.subplot(2,1,2)
-    A1 = np.min(th) ; A2 = np.max(th)
+    #mjd1 = g.fdoy2mjd(year, tvel[0] ) # MJD of first point
+    #tvel_obs = mjd_to_obstimes(tvel+mjd1)
+
+    # ???
+    A1 = np.min(th)  ; A2 = np.max(th) 
     jj = (tvel >= A1) & (tvel <= A2)
-    plt.plot(th, rhdot_at_th,'bo',label='at GNSS obs')
+
+    plt.plot(th, rhdot_at_th,'b.',label='at GNSS obs')
+    # disaster - did not work
+    #plt.plot(tvel_obs, yvel,'c-', label='spline fit')
     plt.plot(tvel[jj], yvel[jj],'c-', label='spline fit')
     plt.legend(loc="upper left")
     plt.grid()
     plt.title('surface velocity')
-    plt.ylabel('meters/hour'); plt.xlabel('days of the year')
+    plt.ylabel('meters/hour'); plt.xlabel('days of the year') 
     plt.xlim((A1,A2))
+    #plt.xlim((th[0], th[-1])) #fig.autofmt_xdate()
+
     if hires_figs:
         g.save_plot(txtdir + '/' + station + '_rhdot3.eps')
     else:
         g.save_plot(txtdir + '/' + station + '_rhdot3.png')
 
 
-def RH_ortho_plot( station, H0, th_even, spline_whole_time,txtdir, fs):
+def RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, time_rh, rh, gap_min_val):
     """
+    Makes a plot of the final spline fit to the data. Output time interval controlled by the user.
+
     Parameters
     ----------
     station : str
         name of station, 4 ch
     H0 : float
         datum correction (orthometric height) to convert RH to MSL data, in meters
+    year : int
+        year of the time series (ultimately should not be needed)
     th_even : numpy of floats
         time in fractional days of of year, I think
     spline_whole_time : numpy of floats
@@ -691,18 +733,55 @@ def RH_ortho_plot( station, H0, th_even, spline_whole_time,txtdir, fs):
        location of plot
     fs : int
         fontsize
+    time_rh : numpy of floats
+        time of rh values, in fractional doy I believe
+    rh : numpy of floats
+        refl hgt in meters
+    gap_min_val : float
+        minimum length gap allowed, in day of year units
     """
 
+
+    # difference function to find time between all rh measurements
+    gdiff = np.diff( time_rh )
+    mjdx = g.fdoy2mjd(year, time_rh[0] ) # 
+    mjdt = mjdx + (time_rh - time_rh[0])
+    mjd = mjdt[0:-1]
+
+    # MJD of the gdiff values
+    # mjd = time_rh[0:-1] + mjdx
+    #print('base value ', year, time_rh[0], mjdx, mjd[-1])
+
+    # find indices of gaps  that are larger than a certain value
+    ii = (gdiff > gap_min_val)
+    N = len(mjd[ii])
+    Ngdiff = len(gdiff)
+
+    # figure out mjd of the first point
+    mjd0 = g.fdoy2mjd(year, th_even[0])
+    mjd_even = mjd0 + (th_even - th_even[0])  
+    mjd_even_obstimes = mjd_to_obstimes(mjd_even)
+
+
+    if (Ngdiff > 0):
+        for i in range(0,Ngdiff):
+            if ii[i]:
+                e0 = mjd[i] ; e1 = mjd[i+1] # beginning and ending of the gap
+                #newl = [ e0, e1 ]
+                #print('gap', mjd[i],mjd[i+1])
+                bad_indices = (mjd_even > e0) & (mjd_even < e1 )
+                #mjd_even[bad_indices] = np.nan
+                mjd_even_obstimes[bad_indices] = np.datetime64("NaT")
+
+
     fig=plt.figure(figsize=(10,5))
-    #H0 = find_ortho_height(station,'')
-    plt.plot(th_even, H0 - spline_whole_time, 'c-')
+    plt.plot(mjd_even_obstimes, H0 -spline_whole_time, 'c')
+    #plt.plot(mjd_even, H0 -spline_whole_time, 'c')
     plt.grid()
-    plt.xlabel('Time (days)',fontsize=fs)
-    # would like to add year, but it is not currently sent to this code, alas
-    # 
-    #plt.xlabel('Time (days)/' + str(year) ,fontsize=fs)
     plt.ylabel('meters',fontsize=fs)
     plt.title(station.upper() + ' Water Level ', fontsize=fs)
+    fig.autofmt_xdate()
+
     pfile = txtdir + '/' + station + '_H0.png'
     g.save_plot(pfile)
 
@@ -812,3 +891,93 @@ def quickTr(year, doy,frachours):
 
 
     return datestring
+
+
+def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs, strsig, hires_figs, 
+                               txtdir, ii, jj, th_even,spline_whole_time):
+    """
+    Makes the final residual plot for subdaily (after RHdot and IF correction made).
+    Returns the bad points ...
+
+
+    Parameters
+    ----------
+    station : str
+        4 character station name
+    year : int
+        calendar year
+    th : numpy array of ??
+        time variable of some kind, fractional day of year ?
+    biasCor_rh : numpy array of floats
+        refl hgts that have been corrected for RHdot and IF
+    spline_at_GPS : numpy array of floats
+        RH derived From the spline fit and calculated at GPS time tags
+    fs : int
+        font size
+    strsig : str
+        sigma string to go on the legend
+    hires_figs : bool
+        whether to save the plots with better resolution
+    txtdir : str
+        directory where the plot will be saved
+    ii : numpy array
+        indices of the outliers?
+    jj : numpy array
+        indices of the values to keep?
+    th_even : numpy array
+        evenly spaced time values, day of year
+    spline_whole_time : numpy array of flots
+        splinefit for ???
+
+    Returns
+    -------
+    badpoints2 : numpy array of floats
+         RH residuals
+    """
+    # convert to mjd and then obstimes
+    mjd0 = g.fdoy2mjd(year, th[0])
+    th_obs = mjd_to_obstimes(mjd0 + th - th[0])
+    mjd1 = g.fdoy2mjd(year, th_even[0])
+    th_even_obs = mjd_to_obstimes(mjd1 + th_even - th_even[0])
+
+
+    fig=plt.figure(figsize=(10,5))
+    plt.plot(th_obs, biasCor_rh, 'b.', label='RH ' + strsig)
+    plt.plot(th_even_obs, spline_whole_time, 'c-',label='spline')
+    plt.plot(th_obs[ii], biasCor_rh[ii], 'rx', label='outliers')
+
+    plt.legend(loc="best",fontsize=fs)
+    plt.grid() ; plt.gca().invert_yaxis()
+    plt.ylabel('meters',fontsize=fs); 
+    #plt.xlabel('days of the year',fontsize=fs)
+    plt.title(station.upper() + ' RH with RHdot and InterFrequency Corrections Applied',fontsize=fs)
+    fig.autofmt_xdate()
+
+    # put hires_figs boolean here
+    if hires_figs:
+        g.save_plot(txtdir + '/' + station + '_rhdot4.eps')
+    else:
+        g.save_plot(txtdir + '/' + station + '_rhdot4.png')
+
+    fig=plt.figure(figsize=(10,5))
+    plt.plot(th_obs, biasCor_rh - spline_at_GPS, 'b.',label='all residuals')
+    plt.title('Station:' + station + ' Residuals to new spline fit',fontsize=fs)
+    plt.grid()
+    plt.ylabel('meters',fontsize=fs)
+    #plt.xlabel('days of the year',fontsize=fs)
+
+    plt.plot(th_obs[ii], (biasCor_rh -spline_at_GPS)[ii], 'r.',label='outliers')
+    # will write these residauls out to a file
+    badpoints2 =  (biasCor_rh -spline_at_GPS)[ii]
+    plt.legend(loc="upper left",fontsize=fs)
+    fig.autofmt_xdate()
+
+    # print('\n RMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
+    if hires_figs:
+        g.save_plot(txtdir + '/' + station + '_rhdot5.eps')
+    else:
+        g.save_plot(txtdir + '/' + station + '_rhdot5.png')
+
+    plt.close() # dont send this figure to the screen
+
+    return badpoints2

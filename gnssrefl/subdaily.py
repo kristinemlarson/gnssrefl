@@ -693,16 +693,14 @@ def flipit(tvd,col):
     tnew = tnew[ii]
     ynew = ynew[ii]
 
-    # this is what should be used for the spline.
-    #plt.figure()
-    #plt.plot(tnew,ynew,'.')
-    #plt.show()
     return tnew, ynew
 
 
 def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs):
     """
-    Improved code to compute rhdot correction and bias correction for subdaily
+    Improved code to compute rhdot correction and interfrequency bias correction for subdaily
+    this assumes you have at least removed crude outliers in the previous section of the 
+    subdaily code.
 
     Parameters
     ----------
@@ -730,17 +728,26 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     apply_rhdot : bool, optional
         whether you want to apply the rhdot correction
         default is true
+    gap_min_val : float, optional
+        gap allowed in last spline, in hours
+    year : int
+        hopefully this will go away ...
+
 
     """
     # output will go to REFL_CODE/Files unless txtdir provided
     xdir = os.environ['REFL_CODE']
+    gap_min_val = kwargs.get('gap_min_val',6.0)
+    gap_min_val = gap_min_val/24 # change to DOY units
 
     val = kwargs.get('txtdir',[])
+
     if len(val) == 0:
         txtdir = xdir + '/Files/'
     else:
         txtdir = val
 
+    year = kwargs.get('year',0)
 
     delta_out = kwargs.get('delta_out',0)
     if (delta_out  == 0):
@@ -791,6 +798,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     print('\nComputes rhdot correction and interfrequency bias correction for subdaily')
     print('\nInput filename:', fname)
     print('\nOutput filename: ', fname_new)
+    print('\nMinimum gap allowed in spline output, in day units', gap_min_val)
 
     # read in the lomb scargle values which are the output of gnssir
     # i.e. the reflector heights
@@ -829,8 +837,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     print('Average num of RH obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
     print('Knots per day: ', knots_per_day, ' Number of knots: ', numKnots)
     # currently using 3 sigma
-    print('Outlier criterion for the first splinefit (m):', outlierV)
-    print('Outlier criterion for the second splinefit (m):', outlierV2)
+    print('Outlier criterion provided by user for the first splinefit (m):', outlierV)
+    print('Outlier criterion provided by user for the second splinefit (m):', outlierV2)
 
     firstKnot_in_minutes = 15
     t1 = tnew.min()+firstKnot_in_minutes/60/24
@@ -855,9 +863,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     obsPerHour= perday/24
 
-    fig=plt.figure(figsize=(10,6))
-
-    plt.subplot(2,1,1)
 
     tvel = spl_x[1:N]
     yvel = obsPerHour*np.diff(spl_y)
@@ -883,11 +888,21 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     label1 = 'w/o RHdot ' + str(np.round(sigmaBefore,3)) + 'm'
     label2 = 'w RHdot ' + str(np.round(sigmaAfter,3)) + 'm'
 
-    plt.plot(th, h, 'b.', label=label1,markersize=4)
-    iw = (spl_x > th[0]) & (spl_x < th[-1])
-    plt.plot(spl_x[iw], spl_y[iw], 'c--', label='spline') # otherwise wonky spline makes a goofy plot
+    # start the figure, convert from doy to MJD to obstime
+    mjd0 = g.fdoy2mjd(year,th[0])
+    th_obs = sd.mjd_to_obstimes(mjd0 + th-th[0])
 
-    plt.plot(th,correctedRH,'m.',label=label2,markersize=4)
+    fig=plt.figure(figsize=(10,6))
+    plt.subplot(2,1,1)
+    plt.plot(th_obs, h, 'b.', label=label1,markersize=4)
+    iw = (spl_x > th[0]) & (spl_x < th[-1])
+
+    # change to datetime
+    tm_mjd = g.fdoy2mjd(year, spl_x[iw][0])
+    spl_x_obs = sd.mjd_to_obstimes(tm_mjd + spl_x[iw] - spl_x[iw][0] )
+    plt.plot(spl_x_obs, spl_y[iw], 'c--', label='spline') # otherwise wonky spline makes a goofy plot
+
+    plt.plot(th_obs,correctedRH,'m.',label=label2,markersize=4)
 
     print('\nRMS no RHdot correction (m)', '{0:6.3f}'.format ( sigmaBefore))
     print('RMS w/ RHdot correction (m)', '{0:6.3f} \n'.format ( sigmaAfter ))
@@ -895,15 +910,16 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     plt.gca().invert_yaxis()
     plt.legend(loc="upper left")
     plt.ylabel('meters',fontsize=fs)
-    plt.title( station.upper() + ' Reflector Heights')
+    plt.title( station.upper() + ' Reflector Heights',fontsize=fs)
     outlierstring = str(outlierV) + '(m) outliers'
     plt.yticks(fontsize=fs); plt.xticks(fontsize=fs)
     plt.grid()
-    plt.xlim((plot_begin, plot_end))
+    fig.autofmt_xdate()
+    #plt.xlim((plot_begin, plot_end))
 
 
     plt.subplot(2,1,2)
-    plt.plot(th, residual_after,'r.',label='all pts')
+    plt.plot(th_obs, residual_after,'r.',label='all pts')
 
     if outlierV is None:
     # use 3 sigma
@@ -931,13 +947,15 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     correctedRH_new = correctedRH[ii]
     NV = len(correctedRH)
 
-    plt.plot(th[ii], residual_after[ii],'b.',label='kept pts')
+    plt.plot(th_obs[ii], residual_after[ii],'b.',label='kept pts')
     plt.grid()
-    plt.title('Residuals to the spline fit',fontsize=fs)
-    plt.xlabel('days of the year',fontsize=fs)
+    #plt.title('Residuals to the spline fit',fontsize=fs)
+    #plt.xlabel('days of the year',fontsize=fs)
     plt.ylabel('meters',fontsize=fs)
     plt.legend(loc="upper left",fontsize=fs)
-    plt.xlim((plot_begin, plot_end))
+    plt.yticks(fontsize=fs); plt.xticks(fontsize=fs)
+    #plt.xlim((plot_begin, plot_end))
+    fig.autofmt_xdate()
 
     if hires_figs:
         g.save_plot(txtdir + '/' + station + '_rhdot2.eps')
@@ -949,7 +967,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     residual_after = residual_after[ii]
 
     # make the RHdot plot as well
-    sd.rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs)
+    sd.rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs,year)
 
     writecsv = False ; extraline = ''
     # write out the new solutions with RHdot and without 3 sigma outliers
@@ -962,6 +980,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # this is horrible code and needs to be fixed
     biasCorrected_RH = correctedRH_new
 
+    print('----------------------------------------------------------\n')
     print('Check inter-frequency biases for GPS, Glonass, and Galileo\n')
 
     if 1 not in tvd_new[:,10]:
@@ -1003,6 +1022,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         #if pltit:
         #    plt.show()
         return tvd_new, correction
+    print('----------------------------------------------------------\n')
 
     # now try to write the bias corrected values
     # first attempt was wrong because i forgot to sort the corrected column in biasCorrected_RH
@@ -1044,9 +1064,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     newsigma = np.std(biasCor_rh-spline_at_GPS)
     strsig = str(round(newsigma,3)) + '(m)'
 
-    fig=plt.figure(figsize=(10,5))
-    plt.plot(th, biasCor_rh, 'b.', label='RH ' + strsig)
-    plt.plot(th_even, spline_whole_time, 'c-',label='spline')
 
     if outlierV2 is None:
         # use 3 sigma to find outliers
@@ -1062,68 +1079,29 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         # points to keep
         jj = np.abs(biasCor_rh -spline_at_GPS) <= OutlierLimit
 
-
-    plt.plot(th[ii], biasCor_rh[ii], 'rx', label='outliers')
-
-    plt.legend(loc="best",fontsize=fs)
-    plt.grid()
-    plt.gca().invert_yaxis()
-    plt.ylabel('meters',fontsize=fs)
-    plt.title(station.upper() + ' RH with RHdot and InterFrequency Corrections Applied',fontsize=fs)
-    plt.xlabel('days of the year',fontsize=fs)
-    # put hires_figs boolean here
-    if hires_figs:
-        g.save_plot(txtdir + '/' + station + '_rhdot4.eps')
-    else:
-        g.save_plot(txtdir + '/' + station + '_rhdot4.png')
-
-
-    H0 = sd.find_ortho_height(station,'')
-    sd.RH_ortho_plot( station, H0, th_even, spline_whole_time,txtdir, fs)
     
+    # make the plot externally now
+    badpoints2 = sd.subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, 
+                                               fs, strsig, hires_figs,txtdir, ii,jj,th_even, spline_whole_time)
+    H0 = sd.find_ortho_height(station,'')
+    sd.RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val)
+    print('\nRMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
 
-    fig=plt.figure(figsize=(10,5))
-    #plt.subplot(2,1,1)
-    plt.plot(th, biasCor_rh - spline_at_GPS, 'b.',label='all residuals')
-    plt.title('Station:' + station + ' Residuals to new spline fit',fontsize=fs)
-    plt.grid()
-    plt.ylabel('meters',fontsize=fs)
-    plt.xlabel('days of the year',fontsize=fs)
 
-    plt.plot(th[ii], (biasCor_rh -spline_at_GPS)[ii], 'r.',label='outliers')
-    # will write these residauls out to a file
-    badpoints2 =  (biasCor_rh -spline_at_GPS)[ii]
-    plt.legend(loc="upper left",fontsize=fs)
-
-    print('\n RMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
-    if hires_figs:
-        g.save_plot(txtdir + '/' + station + '_rhdot5.eps')
-    else:
-        g.save_plot(txtdir + '/' + station + '_rhdot5.png')
-
-    plt.close() # dont send this figure to the screen
-
-    # bias corrected - and again without 3 sigma outliers
+    # write out the files with RH dot and IF bias corrected - and again without 3 sigma outliers
     bias_corrected_filename = fname_new + 'IF'; extraline = ''; writecsv = False
     biasCor_rh = tvd_new[jj,24]
     write_subdaily(bias_corrected_filename,station,tvd_new[jj,:], writecsv,extraline, newRH_IF=biasCor_rh)
 
     new_outliers = tvd_new[ii,:]
 
-    # write outliers again ... 
+    # write outliers to a file ... again ... 
     sd.writeout_spline_outliers(new_outliers,txtdir,badpoints2,'outliers.spline2.txt')
 
     # I was looking at issue of delT being too big
 
     year = int(tvd[0,0]);
     sd.write_spline_output(splineout, year, th, spline, delta_out,station,txtdir,H0)
-
-    if  False:
-        plt.figure()
-        res = (h-spline_at_GPS)
-        plt.plot( tvd[ii,14],  res[ii], 'o', label='outlier')
-        plt.plot( tvd[:,14], res, '.',label='residuals')
-        plt.xlabel('delta Time (minutes)')
 
 
     return tvd, correction

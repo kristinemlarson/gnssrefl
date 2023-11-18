@@ -42,8 +42,9 @@ def parse_arguments():
     parser.add_argument("-knots_test", default=None, type=int, help="test knots")
     parser.add_argument("-hires_figs", default=None, type=str, help="hi-resolution eps figures, default is False")
     parser.add_argument("-apply_rhdot", default=None, type=str, help="apply rhdot, default is True")
-    parser.add_argument("-fs", default=None, type=int, help="fontsize for figures. default is 12")
+    parser.add_argument("-fs", default=None, type=int, help="fontsize for figures. default is 10")
     parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate sigma definition. default is False")
+    parser.add_argument("-gap_min_val", default=None, type=float, help="min gap allowed in splinefit output file. default is 6 hours")
 
     args = parser.parse_args().__dict__
 
@@ -61,7 +62,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.4, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0, 
-             hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 12, alt_sigma: bool= False):
+             hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0):
     """
     Subdaily combines multiple day gnssir solutions and applies relevant corrections. 
     It only works for one year at a time; you can restricts time periods within a year with -doy1 and -doy2
@@ -175,10 +176,14 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         whether you want the RH dot correction applied
         for a lake or river you would not want it to be.
     fs : int, optional
-        fontsize for Figures. default is 12 for now.
+        fontsize for Figures. default is 10 for now.
     alt_sigma : bool, optional
         whether you want to use Nievinski definition for outlier criterion.
-        will change to kwargs when I get a chance.
+        in part 1 of the code (the crude outlier detector)
+
+    gap_min_val : float, optional
+        removes splinefit values from output txt and plot for gaps 
+        bigger than this value, in hours
 
     """
 
@@ -248,7 +253,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     if rhdot:
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier1, spline_outlier2, 
                    knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,
-                   if_corr=if_corr,knots_test=knots_test,hires_figs=hires_figs,apply_rhdot=apply_rhdot,fs=fs)
+                   if_corr=if_corr,knots_test=knots_test,hires_figs=hires_figs,
+                   apply_rhdot=apply_rhdot,fs=fs,gap_min_val=gap_min_val,year=year)
        if plt:
            mplt.show()
 
