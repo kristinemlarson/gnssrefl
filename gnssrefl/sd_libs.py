@@ -87,7 +87,7 @@ def write_spline_output(splineout, iyear, th, spline, delta_out, station, txtdir
                 doy = math.floor(tplot[i])
                 utc= 24*(tplot[i] - doy)
                 bigt,yy,mm,dd,hh,mi,ss = g.ymd_hhmmss(iyear,doy,utc,dtime)
-                if (tplot[i] > firstpoint) & (tplot[i] < lastpoint):
+                if (tplot[i] >= firstpoint) & (tplot[i] <= lastpoint):
                     fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} {8:10.3f} \n'.format(modjul, 
                         spline_even[i], yy,mm,dd,hh,mi,ss, Hortho-spline_even[i]))
             fout.close()
@@ -741,6 +741,9 @@ def RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, tim
         minimum length gap allowed, in day of year units
     """
 
+    # looks like I identified the gaps in day of year units - 
+    # but then did the implementation in mjd and then datetime ...
+
 
     # difference function to find time between all rh measurements
     gdiff = np.diff( time_rh )
@@ -934,13 +937,15 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
     badpoints2 : numpy array of floats
          RH residuals
     """
-    # convert to mjd and then obstimes
+    # convert obs to mjd and then obstimes
     mjd0 = g.fdoy2mjd(year, th[0])
     th_obs = mjd_to_obstimes(mjd0 + th - th[0])
+    # convert the spline to mjd and then obstimes
     mjd1 = g.fdoy2mjd(year, th_even[0])
     th_even_obs = mjd_to_obstimes(mjd1 + th_even - th_even[0])
 
 
+    # these are now plotted in datetime via mjd translation
     fig=plt.figure(figsize=(10,5))
     plt.plot(th_obs, biasCor_rh, 'b.', label='RH ' + strsig)
     plt.plot(th_even_obs, spline_whole_time, 'c-',label='spline')
@@ -949,7 +954,6 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
     plt.legend(loc="best",fontsize=fs)
     plt.grid() ; plt.gca().invert_yaxis()
     plt.ylabel('meters',fontsize=fs); 
-    #plt.xlabel('days of the year',fontsize=fs)
     plt.title(station.upper() + ' RH with RHdot and InterFrequency Corrections Applied',fontsize=fs)
     fig.autofmt_xdate()
 
@@ -959,12 +963,12 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
     else:
         g.save_plot(txtdir + '/' + station + '_rhdot4.png')
 
+    # this figure is not sent to the screen
     fig=plt.figure(figsize=(10,5))
     plt.plot(th_obs, biasCor_rh - spline_at_GPS, 'b.',label='all residuals')
     plt.title('Station:' + station + ' Residuals to new spline fit',fontsize=fs)
     plt.grid()
     plt.ylabel('meters',fontsize=fs)
-    #plt.xlabel('days of the year',fontsize=fs)
 
     plt.plot(th_obs[ii], (biasCor_rh -spline_at_GPS)[ii], 'r.',label='outliers')
     # will write these residauls out to a file
@@ -978,6 +982,6 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
     else:
         g.save_plot(txtdir + '/' + station + '_rhdot5.png')
 
-    plt.close() # dont send this figure to the screen
+    plt.close() # 
 
     return badpoints2
