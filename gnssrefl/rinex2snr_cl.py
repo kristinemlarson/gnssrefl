@@ -79,10 +79,21 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     For the nolook option :
 
     If you have the RINEX 2.11 file), the file was originally required to be normal RINEX (ends in o) or 
-    gzipped normal RINEX. It can be in the local directory or in the $REFL_CODE/YYYY/rinex directory for your station. It now
-    allows RINEX 2.11 files that are Hatanaka compressed, Hatanaka compressed + unix compressed,  for 
+    gzipped normal RINEX. It can be in the local directory  
+
+    which is where you are running the code 
+
+    or
+
+    $REFL_CODE/YYYY/rinex/ssss 
+
+    where ssss is the lowercase directory name for your station. 
+
+    nolook now allows RINEX 2.11 files that are Hatanaka compressed, Hatanaka compressed + unix compressed,  for 
     the local directory. It also allows Hatanaka compressed in the REFL_CODE directory.  
-    Beyond that, you can try the -mk T option which searches other places.
+
+    Beyond that, you can try the -mk T option which searches other places, i.e. $REFL_CODE/rinex/ etc. I do not recommend
+    that you use this option, but it is there.
 
     For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory. It does NOT 
     check the $REFL_CODE/YYYY/rinex directory. If someone would like to add that capability, that would be great.
@@ -91,8 +102,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     files in different directories depending on sample rate.  srate is for RINEX 3 files only because RINEX 3 
     has the sample rate on the filename itself (not just the directory).  
 
-    What is the stream parameter? This is for RINEX 3 only. File types are either S or R.  I believe S stands for 
-    streamed.
+    What is the stream parameter? It is a naming convention that is only used by RINEX 3 people. The allowed 
+    file types are S or R.  I believe S stands for streamed.
 
     RINEX3 30 second archives supported  
         bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel
