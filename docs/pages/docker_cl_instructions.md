@@ -33,6 +33,93 @@ Description of the commands used:
 
 Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
 
+
+### Kristine's Docker advice 
+
+I find Docker confusing!  I am sure if I used it more often, it would be easier. But here goes:
+
+Open a window. You will be using linux commands. Make sure that you hit the return key after typing a command.
+
+ensure that you are using the latest docker 
+
+`docker pull ghcr.io/kristinemlarson/gnssrefl:latest`
+
+make a directory where you plan to run the docker. I will call it local, i.e. `mkdir local`
+
+cd into that directory, i.e. `cd local`
+
+
+If you are new to linux, make sure you know the full name of this directory.  type `pwd` and see what
+come back.  I will pretend that what came back is `/usr/kristine/local` for this example
+
+If you want to use GNSS data that are stored in archives, you can go ahead and run the relevant commands provided above.
+If you want to use your own GNSS data, you have some options. For convenience, here I will only cover RINEX 2.11 users.  You have two choices:
+
+Your RINEX files can be in the so-called local directory. They will be deleted after you translate them.
+You will want to your RINEX files in 
+
+`/usr/kristine/local/refl_code`. 
+
+
+That means you should first make that directory and only then move or copy your RINEX files there.
+
+`mkdir refl_code` 
+
+
+or
+
+Your RINEX files can be stored in a the standard storage areas.  These will not be deleted after you translate them.
+For a RINEX file from the year 2023 and with a station name of abcd, these files should be stored in 
+
+`/usr/kristine/local/refl_code/2023/rinex/abcd` 
+
+This means you have to create the 2023 directory, the rinex directory and the abcd directory before you copy or move files.
+
+Now start your docker.   
+
+```bash
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
+```
+
+Yes, the command started the Docker, but it also told it to associate internally a directory it calls 
+
+`/etc/gnssrefl/refl_code` 
+
+with a physical directory on your machine called 
+
+`/usr/kristine/local/refl_code`
+
+Now you should be able to run the rinex2snr code with your own files. Example:
+
+`rinex2snr abcd 2023 305 -nolook T`
+
+This should translate a file a RINEX file for you.  It will be stored in your Docker bucket as 
+
+`/etc/gnssrefl/refl_code/2023/snr/abcd` 
+
+on your local machine it will live in 
+
+`/usr/kristine/local/refl_code/2023/snr/abcd`
+
+When you run `quickLook` 
+
+`quickLook abcd 2023 305`
+
+It should put the files in 
+
+`/usr/kristine/local/refl_code/Files/abcd`
+
+The names of the specific png files it created should be printed to the screen.
+
+You can change to different directories using two naming conventions.  
+
+`cd /etc/gnssrefl/refl_code/Files/abcd`
+
+or
+
+`cd $REFL_CODE/Files/abcd`
+
+
 ### Update Docker Image to newest version <a name="Update Docker"></a>
 
 `docker pull ghcr.io/kristinemlarson/gnssrefl:latest`
