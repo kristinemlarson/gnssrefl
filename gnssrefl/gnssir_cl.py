@@ -1,4 +1,4 @@
-
+import warnings
 import argparse
 import os
 import subprocess
@@ -325,7 +325,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         args['year'] = year
         for doy in doy_list:
             args['doy'] = doy
-            guts2.gnssir_guts_v2(**args)
+            try:
+                guts2.gnssir_guts_v2(**args)
+            except:
+                warnings.warn(f'error processing {year} {doy}');                
             #else:
             #    print('You are trying to use the Old Way of Selecting Arcs.')
             #    print('This is no longer supported. Update your code')
