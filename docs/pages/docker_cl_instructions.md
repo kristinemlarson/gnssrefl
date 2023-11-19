@@ -54,6 +54,8 @@ come back.  I will pretend that what came back is `/usr/kristine/local` for my e
 
 If you want to use GNSS data that are stored in archives, you can stop reading and just run the relevant commands provided above.
 If you want to use your own GNSS data, you have some options. For convenience, here I will only cover RINEX 2.11 users. 
+The [naming conventions for RINEX files](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html) are 
+the same whether you run gnssrefl using a regular python install or the Docker. 
 You first need to create the *local directory*, `mkdir refl_code` . Then you have two choices: 
 
 1. Your RINEX files can be stored in `/usr/kristine/local/refl_code`. They will be deleted after translation, so don't 
@@ -61,6 +63,11 @@ put your only copy there.
 
 2. Your RINEX files can be stored in a the standard gnssrefl storage areas. Your RINEX files will *not* be deleted after you translate them.
 For a RINEX file from the year 2023 and with a station name of abcd, these files should be stored in the directory called `/usr/kristine/local/refl_code/2023/rinex/abcd`. This means you have to create those additional directories.  You can do that with an additional flag to the mkdir command, `mkdir -p refl_code/2023/rinex/abcd`.
+
+The code should recognize various RINEX types - gzip, Hatanaka compression, unix compression and so on.  
+Please check the [rinex2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html) 
+documentation to see what endings are allowed or when capitalization of filenames is allowed. There is also
+information there on how to store your RINEX 3 files.
 
 Now start your docker.   
 
@@ -85,7 +92,7 @@ This creates two png files (`quickLook_summary.png` and `quickLook_lsp.png`) tha
 stored in `/usr/kristine/local/refl_code/Files/abcd`. The code should always print the location of 
 output files so you don't have to remember all these details.
 
-When you run `gnssir` the output txt or csv files will go in `/etc/gnssrefl/refl_code/2023/results/abcd`
+When you run `gnssir` the output txt or csv files will be stored locally in `/usr/kristine/local/refl_code/2023/results/abcd`
 
 You can change to different directories using either naming conventions.  
 

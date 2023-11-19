@@ -12,7 +12,7 @@ Documentation:
 
 - [pdf](https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/)
 
-See documentation for gnssir_input for new refraction models.
+See documentation for [gnssir_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html) for new refraction models.
 
 August 2, 2023: Updated azimuth outputs for gnssir and quickLook so that the azimuth of the 
 rising or setting part of the arc is reported rather than the average azimuth, as was done in the older versions.
