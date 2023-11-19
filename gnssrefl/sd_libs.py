@@ -32,7 +32,9 @@ def mjd_to_obstimes(mjd):
 def write_spline_output(splineout, iyear, th, spline, delta_out, station, txtdir,Hortho):
     """
     Writing the output of the spline fit to the final RH time series.
-    No output other than this text file.
+    No output other than this text file for year 2023 and station name ssss:
+
+    $REFL_CODE/Files/ssss/ssss_2023_spline_out.txt
 
     Parameters
     ----------
