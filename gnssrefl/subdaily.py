@@ -1060,12 +1060,12 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # is used for the final output.  Might as well have them be the same
     half_hourly = int(48*(th[-1] - th[0]))
     # evenly spaced spline values for the plot
+    # I do not think these variables are used anymore
     th_even = np.linspace(th[0], th[-1],half_hourly ); 
     spline_whole_time = spline(th_even)
 
     newsigma = np.std(biasCor_rh-spline_at_GPS)
     strsig = str(round(newsigma,3)) + '(m)'
-
 
     if outlierV2 is None:
         # use 3 sigma to find outliers
@@ -1102,8 +1102,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # write outliers to a file ... again ... 
     sd.writeout_spline_outliers(new_outliers,txtdir,badpoints2,'outliers.spline2.txt')
 
-    # this is done earlier now
-    # I was looking at issue of delT being too big
+    # this is done in RH_ortho_plot2 now
     #year = int(tvd[0,0]);
     #if splineout:
     #    sd.write_spline_output(year, th, spline, delta_out,station,txtdir,H0)

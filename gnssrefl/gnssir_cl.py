@@ -291,13 +291,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp}
 
     print(lsp['pele'], 'direct signal eangle limits')
-    if 'ellist' in lsp:
-        print('found ellist')
-        
-    else:
+    if 'ellist' not in lsp:
         print('did not find ellist')
         if float(lsp['e1']) < float(lsp['pele'][0]):
-            print('emin is smaller than the minimum eangle (pele) used for direct signal removed. This is Forbidden')
+            print('emin is smaller than the minimum eangle (pele) used for direct signal removed.')
+            print('This is Forbidden. Fix the records set in the json created by gnssir_analysis')
             sys.exit()
 
     # should make sure there are directories for the results ... 
@@ -306,7 +304,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     year_list = list(range(year_st, year_end+1))
     # changed to better describe year and doy start/end
 
-    print('requested frequencies ', lsp['freqs'])
+    print('Requested frequencies ', lsp['freqs'])
 
 
     for year in year_list:

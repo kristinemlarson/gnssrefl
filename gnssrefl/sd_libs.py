@@ -1079,7 +1079,6 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     spline_new = spline(tp)
     N_new = len(mjd_new_obstimes)
 
-
     # looks like I identified the gaps in day of year units - 
     # but then did the implementation in mjd and then datetime ...
     splinefileout =  txtdir + '/' + station + '_' + str(year) + '_spline_out.txt'
@@ -1104,8 +1103,6 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     ii = (gdiff > gap_min_val)
     N = len(mjd[ii])
     Ngdiff = len(gdiff)
-    print(Ngdiff)
-
 
     dlist = mjd_new_obstimes.tolist()
 
@@ -1122,9 +1119,8 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
                 bad_indices = (mjd_new > e0) & (mjd_new < e1 )
                 spline_new[bad_indices] = np.nan
                 mjd_new_obstimes[bad_indices] = np.datetime64("NaT")
-                #print('found values in the gap'  )
 
-    # write to a file
+    # write the spline values to a file, with gaps removed
     for i in range(0,N_new):
         if not np.isnan(spline_new[i]):
             rhout = spline_new[i]
