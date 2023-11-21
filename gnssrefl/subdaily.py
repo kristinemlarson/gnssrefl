@@ -1087,10 +1087,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
                                                fs, strsig, hires_figs,txtdir, ii,jj,th_even, spline_whole_time)
     H0 = sd.find_ortho_height(station,'')
     # new version that writes out file and makes plot .... 
-    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, 
-                     th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
-    #sd.RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, 
-    #                 th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
+    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
+    #sd.RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
     print('\nRMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
 
 

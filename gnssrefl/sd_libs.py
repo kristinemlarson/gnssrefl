@@ -1035,7 +1035,7 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
 
     return badpoints2
 
-def RH_ortho_plot2( station, H0, year, th_even, spline_whole_time,txtdir, fs, time_rh, rh, gap_min_val,th,spline,delta_out):
+def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,spline,delta_out):
     """
 
     Makes a plot of the final spline fit to the data. Output time interval controlled by the user.
@@ -1077,7 +1077,7 @@ def RH_ortho_plot2( station, H0, year, th_even, spline_whole_time,txtdir, fs, ti
     mjd_new = mjd1 + (tp - tp[0])
     mjd_new_obstimes = mjd_to_obstimes(mjd_new)
     spline_new = spline(tp)
-    N = len(mjd_new_obstimes)
+    N_new = len(mjd_new_obstimes)
 
 
     # looks like I identified the gaps in day of year units - 
@@ -1104,6 +1104,7 @@ def RH_ortho_plot2( station, H0, year, th_even, spline_whole_time,txtdir, fs, ti
     ii = (gdiff > gap_min_val)
     N = len(mjd[ii])
     Ngdiff = len(gdiff)
+    print(Ngdiff)
 
 
     dlist = mjd_new_obstimes.tolist()
@@ -1121,14 +1122,14 @@ def RH_ortho_plot2( station, H0, year, th_even, spline_whole_time,txtdir, fs, ti
                 bad_indices = (mjd_new > e0) & (mjd_new < e1 )
                 spline_new[bad_indices] = np.nan
                 mjd_new_obstimes[bad_indices] = np.datetime64("NaT")
+                #print('found values in the gap'  )
 
     # write to a file
-    for i in range(0,N):
+    for i in range(0,N_new):
         if not np.isnan(spline_new[i]):
-            # need mjd 
-            rh = spline_new[i]
+            rhout = spline_new[i]
             fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} {8:10.3f} \n'.format(
-                mjd_new[i], rh, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], H0-rh))
+                mjd_new[i], rhout, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], H0-rhout))
 
     fout.close()
 
