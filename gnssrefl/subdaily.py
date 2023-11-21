@@ -1056,9 +1056,11 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     # calculate spline values at GPS time tags
     spline_at_GPS = spline(th)
+    # for the plot I did 30 minutes - but that is not the same as what
+    # is used for the final output.  Might as well have them be the same
     half_hourly = int(48*(th[-1] - th[0]))
-    # evenly spaced spline values
-    th_even = np.linspace(th[0], th[-1],half_hourly );
+    # evenly spaced spline values for the plot
+    th_even = np.linspace(th[0], th[-1],half_hourly ); 
     spline_whole_time = spline(th_even)
 
     newsigma = np.std(biasCor_rh-spline_at_GPS)
@@ -1084,7 +1086,11 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     badpoints2 = sd.subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, 
                                                fs, strsig, hires_figs,txtdir, ii,jj,th_even, spline_whole_time)
     H0 = sd.find_ortho_height(station,'')
-    sd.RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val)
+    # new version that writes out file and makes plot .... 
+    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, 
+                     th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
+    #sd.RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, 
+    #                 th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
     print('\nRMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
 
 
@@ -1098,11 +1104,11 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # write outliers to a file ... again ... 
     sd.writeout_spline_outliers(new_outliers,txtdir,badpoints2,'outliers.spline2.txt')
 
+    # this is done earlier now
     # I was looking at issue of delT being too big
-
-    year = int(tvd[0,0]);
-    sd.write_spline_output(splineout, year, th, spline, delta_out,station,txtdir,H0)
-
+    #year = int(tvd[0,0]);
+    #if splineout:
+    #    sd.write_spline_output(year, th, spline, delta_out,station,txtdir,H0)
 
     return tvd, correction
 
