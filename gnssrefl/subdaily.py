@@ -24,6 +24,92 @@ import math
 #KL trying to move plots and output files to sd_libs.py
 
 
+def get_knot_loc(tmin, tmax, knots_per_day, original=False, quantized=True, interior=True):
+    """
+    Calculate knot locations
+ 
+    Parameters
+    ----------
+    tmin : float (decimal days)
+        minimum time
+    tmax : float (decimal days)
+        maximum time
+    knots_per_day : int (dimensionless)
+        knot frequency (in days^-1)
+    original : bool
+        use original code?
+    quantized : bool
+        force knot locations to coincide with beginning of day (BOD) or with an integer multiple of knot spacings ellapsed since BOD
+    interior: bool
+        force knots to be contained by observations?
+ 
+    Returns
+    -------
+    knot_loc : float (decimal days)
+        The knot locations.
+    """  
+    if original:
+        tnew = np.array([tmin, tmax])  # to keep code inaltered
+        Ndays = tnew.max()-tnew.min()
+        numKnots = int(knots_per_day*(Ndays))
+        firstKnot_in_minutes = 15
+        t1 = tnew.min()+firstKnot_in_minutes/60/24
+        t2 = tnew.max()-firstKnot_in_minutes/60/24
+        knots =np.linspace(t1,t2,num=numKnots)
+        return knots
+        # - the last knot coincides with t2 (linspace defaults to endpoint=True)
+        # - knot spacing may be different than 1/knots_per_day
+        
+    knot_spacing = 1/knots_per_day
+    if not quantized:
+        kmin = tmin
+        if interior:
+            kmax = tmin + math.floor((tmax-tmin)/knot_spacing)*knot_spacing
+        else:
+            kmax = tmin + math.ceil((tmax-tmin)/knot_spacing)*knot_spacing
+    else:
+        # knots are forced to coincide with beginning of day (BOD) or
+        # with an integer multiple of knot spacings ellapsed since BOD
+        if interior:
+            # first and last knots will be contained by first and last obs
+            kmin =  math.ceil(tmin/knot_spacing)*knot_spacing  # kmin > tmin
+            kmax = math.floor(tmax/knot_spacing)*knot_spacing  # kmax < tmax
+        else:
+            # first and last knots will contain all obs
+            kmin = math.floor(tmin/knot_spacing)*knot_spacing  # kmin < tmin
+            kmax =  math.ceil(tmax/knot_spacing)*knot_spacing  # kmax > tmax
+
+    num_knots = round(knots_per_day*(kmax-kmin))
+    num_knots += 1  # very first knot
+    knot_loc = np.linspace(kmin, kmax, num_knots, endpoint=True)
+    #num_knots = knot_loc.num()
+        
+    return knot_loc
+
+#"""
+# Tests:
+print(get_knot_loc(0.0, 2.0, 2, original=True))
+print(get_knot_loc(0.0, 2.0, 2, quantized=False, interior=True))
+print(get_knot_loc(0.0, 2.0, 2, quantized=False, interior=False))
+print(get_knot_loc(0.1, 2.2, 2, quantized=False, interior=True))
+print(get_knot_loc(0.1, 2.2, 2, quantized=False, interior=False))
+print(get_knot_loc(0.0, 2.0, 2, quantized=True, interior=True))
+print(get_knot_loc(0.0, 2.0, 2, quantized=True, interior=False))
+print(get_knot_loc(0.1, 2.2, 2, quantized=True, interior=True))
+print(get_knot_loc(0.1, 2.2, 2, quantized=True, interior=False))
+
+#Results:
+#[0.01041667 0.67013889 1.32986111 1.98958333]
+#[0.  0.5 1.  1.5 2. ]
+#[0.  0.5 1.  1.5 2. ]
+#[0.1 0.6 1.1 1.6 2.1]
+#[0.1 0.6 1.1 1.6 2.1 2.6]
+#[0.  0.5 1.  1.5 2. ]
+#[0.  0.5 1.  1.5 2. ]
+#[0.5 1.  1.5 2. ]
+#[0.  0.5 1.  1.5 2.  2.5]
+#"""
+
 def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
     figures out what the names of the outputs are going to be
@@ -785,7 +871,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # making a knot every three hours ...
     # knots_per_day = 8
     knots_default = 8
-    knots_per_day= kwargs.get('knots',8)
+    knots_per_day= kwargs.get('knots',knots_default)
 
 
     knots_test = kwargs.get('knots_test',0)
@@ -831,22 +917,19 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     tnew, ynew = flipit(tvd,3)
 
     Ndays = tnew.max()-tnew.min()
-    numKnots = int(knots_per_day*(Ndays))
     print('First and last time values in the spline', '{0:8.3f} {1:8.3f} '.format (tnew.min(), tnew.max()) )
     print('Number of RH obs and Days ', len(h), np.round(Ndays,3))
     print('Average num of RH obs per day', '{0:5.1f} '.format (len(h)/Ndays) )
-    print('Knots per day: ', knots_per_day, ' Number of knots: ', numKnots)
+    print('Knots per day: ', knots_per_day, ' Knot spacing: ', 24*60/knots_per_day, ' min')
     # currently using 3 sigma
     print('Outlier criterion provided by user for the first splinefit (m):', outlierV)
     print('Outlier criterion provided by user for the second splinefit (m):', outlierV2)
 
-    firstKnot_in_minutes = 15
-    t1 = tnew.min()+firstKnot_in_minutes/60/24
-    t2 = tnew.max()-firstKnot_in_minutes/60/24
-    knots =np.linspace(t1,t2,num=numKnots)
-
+    original_knots = kwargs.get('original_knots',false)
+    quantized_knots = kwargs.get('quantized_knots',false)
+    interior_knots = kwargs.get('interior_knots',false)
+    knots = get_knot_loc(tnew.min(), tnew.max(), knots_per_day, original=original_knots, quantized=quantized_knots, interior=interior_knots)
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
-
 
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
     # this is to get  RHdot, evenly spaced data - units of days
@@ -1042,13 +1125,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     Ndays = tnew.max()-tnew.min()
     knots_per_day = knots_test
     #print('trying knots_test')
-    numKnots = int(knots_per_day*(Ndays))
-    #
-
-    firstKnot_in_minutes = 15
-    t1 = tnew.min()+firstKnot_in_minutes/60/24
-    t2 = tnew.max()-firstKnot_in_minutes/60/24
-    knots =np.linspace(t1,t2,num=numKnots)
+    knots = get_knot_loc(tnew.min(), tnew.max(), knots_per_day, original=original_knots, quantized=quantized_knots, interior=interior_knots)
 
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
     # compute spline - use for times th
@@ -1108,7 +1185,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     #    sd.write_spline_output(year, th, spline, delta_out,station,txtdir,H0)
 
     return tvd, correction
-
 
 def my_percentile(rh,p1, p2):
     """
