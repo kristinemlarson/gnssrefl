@@ -1018,7 +1018,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
 
     if not apply_if_corr:
-        print('You chose not to correct for IF biases. Exiting')
+        print('You chose not to correct for IF biases.')
+        print('Since the spline fit is written out after this stage of the ')
+        print('code, please submit a pull request to changes the logic. Exiting')
         #if pltit:
         #    plt.show()
         return tvd_new, correction

@@ -36,7 +36,7 @@ Now you can start working with the [gnssrefl code.](https://github.com/kristinem
 
 ### Kristine's Docker advice 
 
-I find Docker confusing!  I am sure if I used it more often, it would be easier. But here goes my recommendations:
+Here are my recommendations on how to use the code in the Docker, with special advice for using the nolook option.
 
 Open a window. You will be using linux commands. Make sure that you hit the return key after typing a command.
 
@@ -92,9 +92,10 @@ This creates two png files (`quickLook_summary.png` and `quickLook_lsp.png`) tha
 stored in `/usr/kristine/local/refl_code/Files/abcd`. The code should always print the location of 
 output files so you don't have to remember all these details.
 
-When you run `gnssir` the output txt or csv files will be stored locally in `/usr/kristine/local/refl_code/2023/results/abcd`
+When you run `gnssir` the output txt files will be stored locally in `/usr/kristine/local/refl_code/2023/results/abcd`
+while your Docker will define it as being stored in `/etc/gnssrefl/refl_code/2023/results/abcd`
 
-You can change to different directories using either naming conventions.  
+You can change to different directories using either the environment variable name or the Docker names  
 
 `cd /etc/gnssrefl/refl_code/Files/abcd`
 

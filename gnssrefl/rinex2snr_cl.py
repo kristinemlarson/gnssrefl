@@ -78,19 +78,16 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     For the nolook option :
 
-    If you have the RINEX 2.11 file), the file was originally required to be normal RINEX (ends in o) or 
-    gzipped normal RINEX. It can be in the local directory  
+    If you have the RINEX 2.11 file, the file was originally required to be normal RINEX (ends in o) or 
+    gzipped normal RINEX. It can be in the local directory which is where you are running the code 
+    or it can be in $REFL_CODE/YYYY/rinex/ssss, where ssss is the lowercase directory name for your station. 
 
-    which is where you are running the code 
-
-    or
-
-    $REFL_CODE/YYYY/rinex/ssss 
-
-    where ssss is the lowercase directory name for your station. 
 
     nolook now allows RINEX 2.11 files that are Hatanaka compressed, Hatanaka compressed + unix compressed,  for 
     the local directory. It also allows Hatanaka compressed in the REFL_CODE directory.  
+
+    If you are running the Docker, it can be a bit confusing to figure out where to put the files.  Please 
+    see the discussion in the Docker installation section, as this is my best effort to help you with this.
 
     Beyond that, you can try the -mk T option which searches other places, i.e. $REFL_CODE/rinex/ etc. I do not recommend
     that you use this option, but it is there.
@@ -229,7 +226,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         Whether to use fortran to translate the rinex files. 
 
     nolook : bool, optional
-        tells the code to retrieve RINEX files from your local machine
+        tells the code to retrieve RINEX files from your local machine. default is False
 
     archive : str, optional
         Select which archive to get the files from. Default is all
@@ -261,7 +258,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             nz : (GNS, New Zealand)
 
-            sonel : (?)
+            sonel : (GLOSS archive for GNSS data)
 
             sopac : (Scripps Orbit and Permanent Array Center)
 
