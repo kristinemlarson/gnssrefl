@@ -86,7 +86,7 @@ def get_knot_loc(tmin, tmax, knots_per_day, original=False, quantized=True, inte
         
     return knot_loc
 
-#"""
+"""
 # Tests:
 print(get_knot_loc(0.0, 2.0, 2, original=True))
 print(get_knot_loc(0.0, 2.0, 2, quantized=False, interior=True))
