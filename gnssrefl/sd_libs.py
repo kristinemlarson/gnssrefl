@@ -146,7 +146,7 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs):
 
     """
 
-    fig,ax=plt.subplots()
+    fig,ax=plt.subplots(figsize=(10,5))
     ax.plot(tval,nval,'ko',label='Total',markersize=3)
     if (np.sum(Gval) > 0):
         ax.plot(tval,Gval,'bo',label='GPS',markersize=3)
@@ -827,7 +827,7 @@ def RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, tim
     fout.close()
 
     fig=plt.figure(figsize=(10,5))
-    plt.plot(mjd_even_obstimes, H0 -spline_whole_time, 'c')
+    plt.plot(mjd_even_obstimes, H0 -spline_whole_time, 'b-')
     #plt.plot(mjd_even, H0 -spline_whole_time, 'c')
     plt.grid()
     plt.ylabel('meters',fontsize=fs)
@@ -1130,7 +1130,7 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     fout.close()
 
     fig=plt.figure(figsize=(10,5))
-    plt.plot(mjd_new_obstimes, H0 -spline_new, 'c')
+    plt.plot(mjd_new_obstimes, H0 -spline_new, 'b-',linewidth=2)
     plt.grid()
     plt.ylabel('meters',fontsize=fs)
     plt.title(station.upper() + ' Water Level ', fontsize=fs)

@@ -749,6 +749,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     year = kwargs.get('year',0)
 
+    # extension now input
+    extension = kwargs.get('extension','')
+
     delta_out = kwargs.get('delta_out',0)
     if (delta_out  == 0):
         splineout = False
@@ -1087,7 +1090,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # make the plot externally now
     badpoints2 = sd.subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, 
                                                fs, strsig, hires_figs,txtdir, ii,jj,th_even, spline_whole_time)
-    H0 = sd.find_ortho_height(station,'')
+    H0 = sd.find_ortho_height(station,extension)
     # new version that writes out file and makes plot .... 
     sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
     #sd.RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)

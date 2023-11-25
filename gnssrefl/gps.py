@@ -2562,6 +2562,7 @@ def rinex_unavco_highrate(station, year, month, day):
     day : int
 
     """
+    #print('in rinex_unavco_highrate')
     crnxpath = hatanaka_version()
     # added this for people that submit doy instead of month and day
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
@@ -2577,6 +2578,8 @@ def rinex_unavco_highrate(station, year, month, day):
     filename2 = rinexfiled + '.Z'
     url1 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename1
     url2 = unavco+  cyyyy + '/' + cdoy + '/' + station + '/' + filename2
+    #print(url1)
+    #print(url2)
 
     # hatanaka executable has to exist
     s1 = time.time()
@@ -2603,7 +2606,7 @@ def rinex_unavco_highrate(station, year, month, day):
         except:
             okok = 1
     s2 = time.time()
-    print('That took ', int(s2-s1), ' seconds.')
+    print('That download experience took ', int(s2-s1), ' seconds.')
 
 
 def ydoy2ymd(year, doy):
@@ -6190,9 +6193,9 @@ def quickp(station,t,sealevel):
     """
     fs = 10
     if (len(t) > 0):
-        fig,ax=plt.subplots()
-        ax.plot(t, sealevel, 'b.')
-        plt.title('Tides: ' + station)
+        fig,ax=plt.subplots(figsize=(10,5))
+        ax.plot(t, sealevel, 'b-')
+        plt.title('Water Levels: ' + station.upper())
         plt.xticks(rotation =45,fontsize=fs);
         plt.ylabel('meters')
         plt.grid()

@@ -79,6 +79,9 @@ def main():
         pair of xaxis limits  
     freq: integer, optional
         use column 11 to find (and extract) a single frequency
+    utc_offset: integer, optional
+        offset time axis by this number of hours (for local time)
+        this only is used when the mjd option is used  
 
     """
 
@@ -99,6 +102,7 @@ def main():
     parser.add_argument("-ydoy", help="if True/T, columns 1-2 are year and doy", type=str,default=None)
     parser.add_argument("-filename2", help="second filename", type=str, default=None)
     parser.add_argument("-freq", help="spec freq, column 11 ", type=int,default=None)
+    parser.add_argument("-utc_offset", help="offset from UTC, hours  ", type=int,default=None)
 
     args = parser.parse_args()
 
@@ -127,6 +131,11 @@ def main():
     ydoy = False
     if (args.ydoy == 'True') or (args.ydoy == 'T'):
         ydoy = True
+
+    if args.utc_offset is not None:
+        utc_offset = args.utc_offset
+    else:
+        utc_offset = None
 
     convert_mjd = False
     if (args.mjd== 'True') or (args.mjd == 'T'):
@@ -169,9 +178,9 @@ def main():
             print('second filename does not exist')
 
 
-    tval,yval = q.trans_time(tvd, ymd, convert_mjd, ydoy,xcol,ycol)
+    tval,yval = q.trans_time(tvd, ymd, convert_mjd, ydoy,xcol,ycol,utc_offset)
     if secondFile:
-        tval2,yval2 = q.trans_time(tvd2, ymd, convert_mjd, ydoy,xcol,ycol)
+        tval2,yval2 = q.trans_time(tvd2, ymd, convert_mjd, ydoy,xcol,ycol,utc_offset)
 
 
 
@@ -218,7 +227,12 @@ def main():
             t2_utc = t2.utc # change to UTC
             tval2 =  t2_utc.datetime # change to datetime
             plt.xlim((tval1,tval2))
-
+            if utc_offset is not None:
+                cc = '{:02d}'.format(abs(utc_offset)) + ':00'
+                if utc_offset < 0:
+                    plt.xlabel('UTC-' + cc)
+                else:
+                    plt.xlabel('UTC+' + cc)
         else:
             plt.xlim((xlimits))
 

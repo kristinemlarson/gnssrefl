@@ -341,7 +341,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         else:
                             print('Unsuccessful RINEX 3 retrieval/translation', year, doy)
                     else:
-                        print(station, ' year:', year, ' doy:', doy, 'from: ', archive)
+                        print(station, ' year:', year, ' doy:', doy, ' from: ', archive, ' rate:', rate, ' orb:', orbtype)
                         # this is rinex version 2 - finds rinex and converts it
                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
 
@@ -410,6 +410,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
             # an archive preference
             if receiverrate == 'high':
                 strip_snr = False # for now -
+                #print('trying to find highrate file')
                 file_name, foundit = k.rinex2_highrate(station, year, doy,archive,strip_snr)
             else:
                 # added karnak librariies

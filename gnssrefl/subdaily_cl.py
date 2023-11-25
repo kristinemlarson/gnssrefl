@@ -254,7 +254,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier1, spline_outlier2, 
                    knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,
                    if_corr=if_corr,knots_test=knots_test,hires_figs=hires_figs,
-                   apply_rhdot=apply_rhdot,fs=fs,gap_min_val=gap_min_val,year=year)
+                   apply_rhdot=apply_rhdot,fs=fs,gap_min_val=gap_min_val,year=year,extension=extension)
        if plt:
            mplt.show()
 

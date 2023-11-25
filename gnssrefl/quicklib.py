@@ -4,7 +4,7 @@ import sys
 from astropy.time import Time
 
 
-def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol):
+def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol,utc_offset):
     """
     translates time for quickplt
 
@@ -30,6 +30,8 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol):
 
     ycol : int
         column number for y-axis in python speak
+    utc_offset : int
+        offst in hours from UTC/GPS time.  None means do not use
 
     Returns
     -------
@@ -69,8 +71,15 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol):
                 yval.append( tvd[i,ycol]/1000)
     else:
         if convert_mjd:
-            t1 = Time(tvd[:,xcol],format='mjd')
+            mm = tvd[:,xcol]
+            if utc_offset is not None :
+                if utc_offset != 0:
+                    print('Apply local time offset')
+                    mm = mm + utc_offset*3600/86400
+            t1 = Time(mm,format='mjd')
             t1_utc = t1.utc # change to UTC
+            #if utc_offset is not None:
+
             # probably can be done in one step!
             tval =  t1_utc.datetime # change to datetime
             yval = tvd[:,ycol] # save the y values

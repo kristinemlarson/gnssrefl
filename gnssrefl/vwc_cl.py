@@ -119,6 +119,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         with columns: FracYr Year DOY  VWC Month Day
 
     """
+    by=[0,1,0,1]
+    bx=[0,0,1,1]
 
     remove_bad_tracks = auto_removal
     # make sure directories exist - although it looks to me like this
@@ -212,9 +214,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     vxyz = np.empty(shape=[0, 7]) 
 
     # try removing these
-    fig = matplt.figure(figsize=(13, 10))
-    ax=matplt.subplots_adjust(hspace=0.2)
-    matplt.suptitle(f"Station: {station}", size=16)
+    #fig,ax = matplt.figure(figsize=(13, 10))
+    #ax=matplt.subplots_adjust(hspace=0.2)
 
     # this is the number of points for a given satellite track
     reqNumpts = min_req_pts_track
@@ -228,21 +229,24 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     ftmp = open(newlist,'w+')
     ftmp.write("{0:s} \n".format( '% station ' + station) )
     ftmp.write("{0:s} \n".format( '% TrackN  RefH SatNu MeanAz  Nval  Azimuths'))
+    fig,ax = matplt.subplots(2, 2, figsize=(10,10))
+    matplt.suptitle(f"Station: {station}", size=14)
     for index, az in enumerate(azlist):
         b = 0
         k += 1
         amin = az
         amax = az + 90
+        print(index,amin,amax)
         # make a quadrant average for plotting purposes
         vquad = np.empty(shape=[0, 4])
         # pick up the sat list from the actual list
         satlist = stracks[atracks == amin]
 
 
-        ax = matplt.subplot(2, 2, index + 1)
-        ax.set_title(f'Azimuth {str(amin)}-{str(amax)} deg.')
-        ax.grid()
-        #ax.autofmt_xdate()
+        #fig,ax = matplt.subplots(2, 2, index + 1)
+        ax[bx[index],by[index]].set_title(f'Azimuth {str(amin)}-{str(amax)} deg.')
+        ax[bx[index],by[index]].grid()
+        fig.autofmt_xdate()
 
         # this satellite list is really satellite TRACKS
         for satellite in satlist:
@@ -346,11 +350,13 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     for yr, d in zip(y, t):
                         datetime_dates.append(datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j'))
 
-                    ax.plot(datetime_dates, new_phase, 'o', markersize=3)
-                    ax.set_ylabel('Phase')
+                    ax[bx[index],by[index]].plot(datetime_dates, new_phase, 'o', markersize=3)
+                    if (index == 0 ) or (index == 2):
+                        ax[bx[index],by[index]].set_ylabel('Phase')
                     matplt.ylim((-20,60))
                     # ???
-                    matplt.gcf().autofmt_xdate()
+                    #matplt.gcf().autofmt_xdate()
+                    fig.autofmt_xdate()
 
 
     ftmp.close()

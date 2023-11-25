@@ -37,21 +37,27 @@ def the_kelly_simple_way(url,filename):
     token_path = './'
     thedir = os.environ['REFL_CODE']
     token_path = thedir
+    #print(token_path)
     device_flow = DeviceCodeFlowSimple(Path(token_path))
 
-    #print('Seeking permission from Earthscope to use their archive')
-    try:
+    print('Seeking permission from Earthscope to use their archive')
+    # had turned this off when nothing worked
+    if True:
+        try:
     # get access token from local path
-        pat = 'path1'
-        device_flow.get_access_token_refresh_if_necessary()
-    except:
+            pat = 'path1'
+            device_flow.get_access_token_refresh_if_necessary()
+        except:
     # if no token was found locally, do the device code flow
-        pat = 'path2'
-        device_flow.do_flow()
+            pat = 'path2'
+            device_flow.do_flow()
+
+    device_flow.get_access_token_refresh_if_necessary()
 
     s1 = time.time()
     token = device_flow.access_token
     s2 = time.time()
+    #print('Time it took doing whatever ', s2-s1)
 
     headers = {}
     headers['authorization'] = 'Bearer ' + token

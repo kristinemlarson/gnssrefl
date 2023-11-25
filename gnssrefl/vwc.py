@@ -1,3 +1,4 @@
+# Is thiS useD?I DO NOT THINK SO
 import argparse
 import matplotlib.pyplot as matplt
 import numpy as np
@@ -203,9 +204,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     vxyz = np.empty(shape=[0, 7]) 
 
     # try removing these
-    fig = matplt.figure(figsize=(13, 10))
-    ax=matplt.subplots_adjust(hspace=0.2)
-    matplt.suptitle(f"Station: {station}", size=16)
+    ##fig,ax = matplt.figure(figsize=(13, 10))
+    #fig,ax=matplt.subplots((2,2))
+    #matplt.suptitle(f"Station: {station}", size=16)
 
     # this is the number of points for a given satellite track
     reqNumpts = min_req_pts_track
@@ -230,10 +231,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         satlist = stracks[atracks == amin]
 
 
-        ax = matplt.subplot(2, 2, index + 1)
+        fig,ax = matplt.subplot(2, 2, index + 1)
         ax.set_title(f'Azimuth {str(amin)}-{str(amax)} deg.')
         ax.grid()
-        #ax.autofmt_xdate()
+        fig.autofmt_xdate()
 
         # this satellite list is really satellite TRACKS
         for satellite in satlist:
@@ -341,7 +342,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     ax.set_ylabel('Phase')
                     matplt.ylim((-20,60))
                     # ???
-                    matplt.gcf().autofmt_xdate()
+                    #matplt.gcf().autofmt_xdate()
 
 
     ftmp.close()

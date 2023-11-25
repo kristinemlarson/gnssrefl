@@ -541,7 +541,7 @@ def read_json_file(station, extension):
                 lsp = json.load(f)
         else:
             print('The json instruction file does not exist: ', instructions)
-            print('Please make with make_json_input and run this code again.')
+            print('Please make with gnssir_input and run this code again.')
             sys.exit()
 
     if len(lsp['reqAmp']) < len(lsp['freqs']) :
