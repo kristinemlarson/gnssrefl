@@ -9,6 +9,7 @@ import gnssrefl.gps as g
 import gnssrefl.read_snr_files as read_snr
 from gnssrefl.utils import FileManagement, FileTypes
 import gnssrefl.daily_avg_cl as da
+import gnssrefl.gnssir_v2 as gnssir
 
 from functools import partial
 from scipy import optimize
@@ -516,12 +517,12 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         southern = True
 
     else:
-        print(f"the required json file created from the make_json step could not be found: {station_file.get_file_path()}")
+        print(f"the required json file created gnssir_input could not be found: {station_file.get_file_path()}")
         sys.exit()
 
     # for PBO H2O this was set using STATSGO. 5% is reasonable as a starting point for australia
     #tmin = 0.05  # for now
-    print('minimum texture value', tmin)
+    #print('minimum texture value', tmin)
     residval = 2  # for now
 
     # daily average file of phase results
@@ -532,7 +533,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
 
     # begging for a function ...
-    # overriding KE for now
+    # overriding Kelly's code for now
     if (fr == 1):
         fileout = myxdir + '/Files/' + subdir + '/' + station + '_phase_L1.txt'
     else:
@@ -857,6 +858,30 @@ def filter_out_snow(station, year1, year2, fr,snowmask):
     snowmask : str
         name/location of the snow mask file
 
+    Returns
+    -------
+    dataexist : bool
+
+    year:
+
+    doy :
+
+    hr :
+
+    ph :
+
+    azdata :
+
+    ssat  :
+
+    rh :
+
+    amp : 
+
+    results_trans :
+
+    amp_ls :
+
     """
     xdir = os.environ['REFL_CODE']
     found_override = False
@@ -872,7 +897,7 @@ def filter_out_snow(station, year1, year2, fr,snowmask):
     vquad = np.empty(shape=[0, 16])
 
     if found_override:
-        dataexist, year, doy, hr, ph, azdata, ssat, rh, amp,results = load_sat_phase(station, year1,year2, fr)
+        dataexist, year, doy, hr, ph, azdata, ssat, rh, amp,results,amp_ls = load_sat_phase(station, year1,year2, fr)
         # results were originally transposed - so untransposing them 
         results = results.T
         for year in range(year1,year2+1):
@@ -907,7 +932,7 @@ def filter_out_snow(station, year1, year2, fr,snowmask):
         print('no data ')
         dataexist = False
         year = []; doy = []; hr = []; ph = []; azdata = []; ssat = []
-        rh = []; amp = []
+        rh = []; amp = []; amp_ls=[]
     else:
         dataexist = True
         # save with new variable names
@@ -919,9 +944,10 @@ def filter_out_snow(station, year1, year2, fr,snowmask):
         ssat = results_trans[6]
         rh = results_trans[13]
         amp = results_trans[15]
+        amp_ls = results_trans[7]
 
 # use same return command as in the original function
-    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results_trans
+    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results_trans, amp_ls
 
 
 def load_avg_phase(station,fr):
@@ -934,14 +960,17 @@ def load_avg_phase(station,fr):
     ----------
     station : str
         4 character station ID, lowercase
+    fr : int
+        frequency
 
     Returns
     -------
     avg_exist : boolean
-
-    avg_date : ??
-
-    avg_phase : ??
+        whether the necessary file exists
+    avg_date : list of floats
+        fractional year, i.e. year + doy/365.25
+    avg_phase : list of floats
+        average phase for a given day
 
     """
 
@@ -970,8 +999,8 @@ def load_avg_phase(station,fr):
 
 def load_sat_phase(station, year, year_end, freq):
     """
-    Picks up the phase data from local results section
-    return to main code whether dataexist, and np arrays of year, doy, hr, phase, azdata, ssat
+    Picks up the phase estimates from local (REFL_CODE) results section
+    and returns most information from those files
 
     Parameters
     ----------
@@ -1000,12 +1029,15 @@ def load_sat_phase(station, year, year_end, freq):
         azimuths (deg)
     ssat : int
         satellites (deg)
-    rh : float
+    rh : numpy array of floats
         reflector height (m)
-    amp : float
+    amp : numpy array of floats
         amplitudes of peak LSP 
-
     results : ??
+        not sure what this is
+    amp_ls : numpy array of floats
+        amplitudes of least squares fit used for phase
+
 
     """
     print('Requested frequency: ', freq)
@@ -1053,7 +1085,7 @@ def load_sat_phase(station, year, year_end, freq):
     if len(results) == 0:
         print('no data at that frequency')
         year = []; doy = []; hr = []; ph = []; azdata = []; ssat = []
-        rh = []; amp = []
+        rh = []; amp = []; amp_ls
     else:
         dataexist = True
         # save with new variable names 
@@ -1065,5 +1097,85 @@ def load_sat_phase(station, year, year_end, freq):
         ssat = results[6]
         rh = results[13]
         amp = results[15]
+        amp_ls = results[7]
 
-    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results
+    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results, amp_ls
+
+
+def set_parameters(station, minvalperday,tmin,tmax,fr, year, year_end,subdir,plt):
+    """
+
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+
+    Returns
+    -------
+    minvalperday : int
+        number of phase values required each day
+    tmin : float
+        min soil texture
+    tmax : float
+        max soil texture
+
+    freq : int
+        frequency to use (1,20 allowed)
+    year_end : int
+        last year to analyze
+
+    subdir : str
+        name for subdirectory used in subdirectory of REFL_CODE/Files
+    plt : bool
+        whether you want plots to come to the screen
+
+    """
+
+    g.checkFiles(station, '')
+
+    # not using extension
+    lsp = gnssir.read_json_file(station, '')
+    # pick up values in json, if available
+    if 'vwc_min_soil_texture' in lsp:
+        tmin = lsp['vwc_min_soil_texture']
+    if 'vwc_max_soil_texture' in lsp:
+        tmax = lsp['vwc_max_soil_texture']
+    if 'vwc_minvalperday' in lsp:
+        minvalperday = lsp['vwc_minvalperday']
+
+
+    if (len(station) != 4):
+        print('station name must be four characters')
+        sys.exit()
+
+    if (len(str(year)) != 4):
+        print('Year must be four characters')
+        sys.exit()
+
+    freq = fr # KE kept the other variable
+
+    if not year_end:
+        year_end = year
+
+    # originally was making people input these on the command line
+    # now first try to read from json.  if not there they will be set here
+
+    if tmin is None:
+        tmin = 0.05
+
+    if tmax is None:
+        tmax = 0.5
+
+    # default is station name
+    if subdir == None:
+        subdir = station 
+
+    # make sure subdirectory exists
+    g.set_subdir(subdir)
+
+    if not plt:
+        print('no plots will come to screen. Will only be saved.')
+
+    print('minvalperday/tmin/tmax', minvalperday, tmin, tmax)
+
+    return minvalperday, tmin, tmax, freq, year_end, subdir, plt

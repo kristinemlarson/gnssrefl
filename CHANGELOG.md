@@ -4,10 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 1.9.8
+November 26, 2023
 
-utc time offset (in hours) for quickplt
+utc time offset (in hours) for quickplt.  first version had a mistake (did not set
+default for utc_offset to zero as I should have )
 
-minor updates to plots
+minor updates to various plots in subdaily
+
+tried to fix the phase plots in vwc.  
+
+added vwc inputs (soil texture min/max and min number of values per day) 
+to the gnssir json file.  see documentation for vwc. added satellite legend information
+
+adding advanced option - in progress.  cannot be used operationally.
 
 ## 1.9.7
 

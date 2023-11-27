@@ -91,8 +91,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
     e1=lsp['e1']; e2=lsp['e2']; minH = lsp['minH']; maxH = lsp['maxH']
     ediff = lsp['ediff']; NReg = lsp['NReg']  
-    PkNoise = lsp['PkNoise']; prec = lsp['desiredP']
-    delTmax = lsp['delTmax']
+    PkNoise = lsp['PkNoise']; prec = lsp['desiredP']; delTmax = lsp['delTmax']
     if 'azval2' in lsp:
         azval2 = lsp['azval2']; 
         naz = int(len(azval2)/2)
