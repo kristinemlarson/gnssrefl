@@ -77,21 +77,22 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     Refraction  
     ----------
-        originally we had refraction as a boolean, i.e. on or off. This is stored in the json.  The code however,
-        uses an integer 1 (for a simple non-time-varying Bennett correction) and integer 0 for no correction.
-        From version 1.8.4 we begin to implement more refraction models.  1 (and Bennett) will continue to be 
-        the default.  The "1" is written to the LSP results file so that people can keep track easily of whether
-        they are inadvertently mixing files with different strategies. And that is why it is an integer, because
-        all results in the LSP results files are numbers.  Going forward, we are adding a time-varying capability.
+    Originally we had refraction as a boolean, i.e. on or off. This was stored in the gnssir analysis json. The code however,
+    uses an integer 1 (for a simple non-time-varying Bennett correction) and integer 0 for no correction.
+    From version 1.8.4 we begin to implement more refraction models.  1 (and Bennett) will continue to be 
+    the default.  The "1" is written to the LSP results file so that people can keep track easily of whether
+    they are inadvertently mixing files with different strategies. And that is why it is an integer, because
+    all results in the LSP results files are numbers.  Going forward, we are adding a time-varying capability.
 
-            Model 1: Bennett, static
-            Model 2: Bennett and time-varying
-            Model 3: Ulich, static
-            Model 4: Ulich, time-varying
+        Model 1: Bennett, static
+        Model 2: Bennett and time-varying
+        Model 3: Ulich, static
+        Model 4: Ulich, time-varying
+        Model 5: NITE, Feng et al. 2023 DOI: 10.1109/TGRS.2023.3332422
 
-            gnssir_input will have a new parameter for the json output, refr_model. If it is not set, i.e. you 
-            have an old json, it is assumed to be 1. You can change it be hand if you like. And you can certainly 
-            test out the impact by using -extension option.
+    gnssir_input will have a new parameter for the json output, refr_model. If it is not set, i.e. you 
+    have an old json, it is assumed to be 1. You can change the refraction model by 
+    hand editting the file if you like. And you can certainly test out the impact by using -extension option.
 
     Examples
     --------

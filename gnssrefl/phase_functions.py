@@ -965,7 +965,7 @@ def load_avg_phase(station,fr):
 
     Returns
     -------
-    avg_exist : boolean
+    avg_exist : bool
         whether the necessary file exists
     avg_date : list of floats
         fractional year, i.e. year + doy/365.25
@@ -993,6 +993,9 @@ def load_avg_phase(station,fr):
             avg_date = year + day/365.25
             avg_phase = phase
             avg_exist = True
+
+    if not avg_exist:
+        print('WARNING The average phase file used from a previous run for QC does not exist as yet')
 
     return avg_exist, avg_date, avg_phase
 

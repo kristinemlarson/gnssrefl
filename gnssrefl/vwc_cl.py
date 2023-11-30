@@ -139,6 +139,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
 
     """
+    fs =10 # fontsize
     colors = 'mrgbcykmrgbcykmrbcykmrgbcykmrgbcykmrbcyk'
     # plotting indices for phase data
     by=[0,1,0,1]; bx=[0,0,1,1]
@@ -149,53 +150,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         minvalperday,tmin,tmax,fr, year, year_end,subdir,plt)
 
     remove_bad_tracks = auto_removal
-    # make sure directories exist - although it looks to me like this
-    # is checked further on
-    #g.checkFiles(station, '')
-
-    # not using extension
-    #lsp = gnssir.read_json_file(station, '')
-    # pick up values in json, if available
-    #if 'vwc_min_soil_texture' in lsp:
-    #    tmin = lsp['vwc_min_soil_texture']
-    #if 'vwc_max_soil_texture' in lsp:
-    #    tmax = lsp['vwc_max_soil_texture']
-    #if 'vwc_minvalperday' in lsp:
-    #    minvalperday = lsp['vwc_minvalperday']
-
-
-    #if (len(station) != 4):
-    #    print('station name must be four characters')
-    #    sys.exit()
-
-    #if (len(str(year)) != 4):
-    #    print('Year must be four characters')
-    #    sys.exit()
-
-    #freq = fr # KE kept the other variable
-
-    #if not year_end:
-    #    year_end = year
-
-    # originally was making people input these on the command line
-    # now first try to read from json.  if not there they will be set here
-    #if tmin is None:
-    #    tmin = 0.05
-    #if tmax is None:
-    #    tmax = 0.5
-
-    # default is station name
-    #if subdir == None:
-    #    subdir = station 
-
-    # make sure subdirectory exists
-    #g.set_subdir(subdir)
-
-    #if not plt:
-    #    print('no plots will come to screen. Will only be saved.')
-
-    # this is leftover from the old code
-    writeout = True
 
     snow_file = xdir + '/Files/snowmask_' + station + '.txt'
     snowfileexists = False
@@ -206,10 +160,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         matplt.close ('all')# we do not want the plots to come to the screen for the daily average
 
 
-    # load past analysis  for QC
+    # load past VWC analysis  for QC
     avg_exist, avg_date, avg_phase = qp.load_avg_phase(station,freq)
-    if not avg_exist:
-        print('WARNING: the average phase file from a previous run does not exist as yet')
 
     # this is where it loads the data and outputs the results into variables.  currently picks ou 
     # amplitude (amp), but it should also pick out ampRH for consistency.
@@ -246,10 +198,16 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     stracks = tracks[:, 2]  # satellite names
 
     k = 1
+    # define the contents of this variable HERE
     vxyz = np.empty(shape=[0, 7]) 
 
     # this is the number of points for a given satellite track
     reqNumpts = min_req_pts_track
+
+    # disclosure
+    # this code was written as a quick port between matlab and python
+    # it does use many of the nice features of python variables. 
+    # and i was new to numpy, which did not help
 
     # checking each geographic quadrant
     k4 = 1
@@ -274,16 +232,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         ww = 0
         amin = az
         amax = az + 90
-        #print(index,amin,amax)
         # make a quadrant average for plotting purposes
         vquad = np.empty(shape=[0, 4])
         # pick up the sat list from the actual list
         satlist = stracks[atracks == amin]
 
         # set the titles
-        ax[bx[index],by[index]].set_title(f'Azimuth {str(amin)}-{str(amax)} deg.')
+        ax[bx[index],by[index]].set_title(f'Azimuth {str(amin)}-{str(amax)} deg.',fontsize=fs)
         if advanced:
-            ax2[bx[index],by[index]].set_title(f'Azimuth {str(amin)}-{str(amax)} deg.')
+            ax2[bx[index],by[index]].set_title(f'Azimuth {str(amin)}-{str(amax)} deg.',fontsize=fs)
 
         for satellite in satlist:
             if screenstats:
@@ -298,6 +255,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
             azd = azdata[ii]
             s = ssat[ii]
             amps = amp[ii] # this amplitude is RH amplitude 
+            amps_ls = amp_ls[ii] # this amplitude is phase amplitude 
             rhs = rh[ii]
             iikk  = (atracks == amin) & (stracks == satellite) 
             rhtrack = float(tracks[iikk,1])
@@ -322,6 +280,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                 s = s[ii]
                 amps = amps[ii]
                 rhs = rhs[ii]
+                amps_ls = amps_ls[ii]
 
                 if len(t) == 0:
                     print('you should consider removing this satellite track', sat, amin)
@@ -338,6 +297,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     azd = azd[ii]
                     s = s[ii]
                     amps = amps[ii]
+                    amps_ls = amps_ls[ii]
                     rhs = rhs[ii]
                     sortY = np.sort(new_phase)
                     # bottom 20% ???
@@ -354,7 +314,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     normAmps = qp.normAmp(amps, basepercent)
                     newl = np.vstack((y, t, new_phase, azd, s, rhs, normAmps)).T
 
-                    # this is a kind of quality control
+                    # this is a kind of quality control -use previous solution to have 
+                    # better feel for whether current solution works. defintely needs to go in a function
                     if (len(newl) > 0) and (avg_exist):
                         # quadrant results for this satellite track
                         satdate = y + t/365.25
@@ -417,7 +378,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         ax[bx[index],by[index]].set_ylim((-20,60))
         ax[bx[index],by[index]].grid()
         if sat_legend:
-            ax[bx[index],by[index]].legend()
+            ax[bx[index],by[index]].legend(loc='upper right',fontsize=fs-2)
 
         fig.autofmt_xdate() # set for datetime
 
@@ -425,7 +386,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         if advanced:
             ax2[bx[index],by[index]].grid()
             if sat_legend:
-                ax2[bx[index],by[index]].legend()
+                ax2[bx[index],by[index]].legend(loc='upper right',fontsize=fs-2)
 
 
     ftmp.close()
@@ -443,21 +404,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         print(f"Saving to {plot_path2}")
         fig2.savefig(plot_path2, format="png")
 
-    # this is now done in a function. i believe this can be commented out
-    #tv = np.empty(shape=[0, 4])
-    # year, day of year, phase, satellite, azimuth, RH, and RH amplitude
-    #y1 = vxyz[:, 0]
-    #d1 = vxyz[:, 1]
-    #phase = vxyz[:, 2]
-    #sat = vxyz[:, 3] # TODO this is not used
-    #az = vxyz[:, 4] # TODO this is not used
-    #rh = vxyz[:, 5] # TODO this is not used
-    #amp = vxyz[:, 6]
 
-    #Define clearly the stored values in vxyz
+    #Need to Define clearly the stored values in vxyz
 
-    if writeout:
-
+    if advanced:
+        print('Still working on the advanced option. Exiting.')
+        if plt:
+            matplt.show()
+        sys.exit()
+    else:
         tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir)
         print('Number of daily phase measurements ', len(tv))
         if len(tv) < 1:
