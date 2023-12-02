@@ -338,12 +338,13 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     norm_ampsLS= qp.normAmp(amps_ls, basepercent)
                     newl = np.vstack((y, t, new_phase, azd, s, rhs, normAmps,norm_ampsLS,h,amps,amps_ls)).T
                     # write latest values for advanced option ... 
-                    if advanced:
-                        qp.write_all_phase(newl,'',allph,2, rhtrack)
 
                     # this is a kind of quality control -use previous solution to have 
                     # better feel for whether current solution works. defintely needs to go in a function
                     if (len(newl) > 0) and (avg_exist):
+                        if advanced:
+                            qp.write_all_phase(newl,'',allph,2, rhtrack)
+
                         # quadrant results for this satellite track
                         satdate = y + t/365.25
                         satphase = new_phase
@@ -366,7 +367,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                                 ftmp.write("{0:3.0f} {1:7.2f} {2:3.0f} {3:7.1f} {4:7.0f} {5:4.0f} {6:4.0f} \n".format(k4,rhtrack, satellite,meanaztrack,nvalstrack,amin,amax))
                                 k4 = k4 + 1
 
-                            print(qp.old_quad(float(np.mean(azd))))
+                            #print(qp.old_quad(float(np.mean(azd))))
 
                             print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} Amp {max(normAmps):4.2f} {addit:20s} ")
                         else:
