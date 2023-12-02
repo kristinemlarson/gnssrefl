@@ -145,6 +145,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     by=[0,1,0,1]; bx=[0,0,1,1]
     # azimuth list
     azlist = [270, 0, 180,90 ]
+    oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for 
+    # consistency with old adv vegetation code
 
     minvalperday, tmin, tmax, freq, year_end, subdir, plt = qp.set_parameters(station, 
         minvalperday,tmin,tmax,fr, year, year_end,subdir,plt)
@@ -156,7 +158,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     if snow_filter:
         medf = 0.2 # this is meters
         ReqTracks = 10 # have a pretty small number here
-        snowfileexists = qp.make_snow_filter(station, medf, ReqTracks, year, year_end)
+        print('You have chosen the snow filter option')
+        snowfileexists = qp.make_snow_filter(station, medf, ReqTracks, year, year_end+1)
         matplt.close ('all')# we do not want the plots to come to the screen for the daily average
 
 
@@ -199,7 +202,19 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     k = 1
     # define the contents of this variable HERE
-    vxyz = np.empty(shape=[0, 7]) 
+    # newl = np.vstack((y, t, new_phase, azd, s, rhs, normAmps)).T
+    # year
+    # doy ?
+    # phase : degrees
+    # azimuth
+    # satellite
+    # reflector height
+    # LSP amplitude
+    # LS amplitude, added
+    # hour of day, UTC
+    # raw LSP
+    # raw LS amp
+    vxyz = np.empty(shape=[0, 11]) 
 
     # this is the number of points for a given satellite track
     reqNumpts = min_req_pts_track
@@ -223,15 +238,19 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     # open up a second plot for the amplitudes
     if advanced: 
+        # open file , write the header
+        fname_phase = f'{xdir}/Files/{subdir}/{station}_all_phase.txt'
+        print('Writing interim phase values to ', fname_phase)
+        allph = qp.write_all_phase(vxyz,fname_phase,[],1,[])
+
         fig2,ax2 = matplt.subplots(2, 2, figsize=(10,10))
-        matplt.suptitle(f"Station: {station}", size=12)
+        matplt.suptitle(f"Lomb Scargle amplitudes: {station}", size=12)
 
     for index, az in enumerate(azlist):
         b = 0
         k += 1
         ww = 0
-        amin = az
-        amax = az + 90
+        amin = az ; amax = az + 90
         # make a quadrant average for plotting purposes
         vquad = np.empty(shape=[0, 4])
         # pick up the sat list from the actual list
@@ -249,15 +268,17 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
             ii = (ssat == satellite) & (azdata > amin) & (azdata < amax) & (phase < 360)
             x = phase[ii]
             t = doy[ii]
-            h = hr[ii] # this is fractional hour but this is not currently used/saved below.  
+            h = hr[ii] # this is fractional hour of the day, GPS time 
             # should be so we could do subdaily VWC
             y = year_sat_phase[ii]
-            azd = azdata[ii]
-            s = ssat[ii]
+            azd = azdata[ii] # azimuth, in degrees
+            s = ssat[ii] # array of satellites numbers
             amps = amp[ii] # this amplitude is RH amplitude 
             amps_ls = amp_ls[ii] # this amplitude is phase amplitude 
-            rhs = rh[ii]
+            rhs = rh[ii] # estimated RH
+
             iikk  = (atracks == amin) & (stracks == satellite) 
+            # i believe this is the a priori RH, which is good to know for Chew model
             rhtrack = float(tracks[iikk,1])
             meanaztrack = float(tracks[iikk,3])
             nvalstrack = float(tracks[iikk,4])
@@ -275,6 +296,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                 ii = (new_phase > -20)
                 t = t[ii]
                 y = y[ii]
+                h = h[ii]
                 new_phase = new_phase[ii]
                 azd = azd[ii]
                 s = s[ii]
@@ -293,6 +315,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     ii = (new_phase > -20) & (new_phase < 60)
                     t = t[ii]
                     y = y[ii]
+                    h = h[ii]
                     new_phase = new_phase[ii]
                     azd = azd[ii]
                     s = s[ii]
@@ -312,7 +335,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
                     basepercent = 0.15
                     normAmps = qp.normAmp(amps, basepercent)
-                    newl = np.vstack((y, t, new_phase, azd, s, rhs, normAmps)).T
+                    norm_ampsLS= qp.normAmp(amps_ls, basepercent)
+                    newl = np.vstack((y, t, new_phase, azd, s, rhs, normAmps,norm_ampsLS,h,amps,amps_ls)).T
+                    # write latest values for advanced option ... 
+                    if advanced:
+                        qp.write_all_phase(newl,'',allph,2, rhtrack)
 
                     # this is a kind of quality control -use previous solution to have 
                     # better feel for whether current solution works. defintely needs to go in a function
@@ -338,6 +365,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                             if keepit:
                                 ftmp.write("{0:3.0f} {1:7.2f} {2:3.0f} {3:7.1f} {4:7.0f} {5:4.0f} {6:4.0f} \n".format(k4,rhtrack, satellite,meanaztrack,nvalstrack,amin,amax))
                                 k4 = k4 + 1
+
+                            print(qp.old_quad(float(np.mean(azd))))
 
                             print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} Amp {max(normAmps):4.2f} {addit:20s} ")
                         else:
@@ -409,6 +438,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     if advanced:
         print('Still working on the advanced option. Exiting.')
+        # close the "allthephase" file
+        allph.close()
+
         if plt:
             matplt.show()
         sys.exit()

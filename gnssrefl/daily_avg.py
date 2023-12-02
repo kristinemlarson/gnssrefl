@@ -161,6 +161,7 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
         observation times
 
     """
+    print('Median Filter', howBig, ' Required number of tracks/day ', ReqTracks)
     xdir = os.environ['REFL_CODE']
     print('All RH retrievals - including bad ones - will be written to: ' )
     alldatafile2 = alldatafile + '.noqc'

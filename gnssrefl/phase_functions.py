@@ -121,7 +121,8 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     """
     myxdir = os.environ['REFL_CODE']
     # l2c only
-    txtfile = 'test_' + station + '.txt'; 
+    #txtfile = 'test_' + station + '.txt'; 
+    txtfile = station + '_allRH.txt'; 
     pltit = False; extension = ''; fr = 20; csv = False
 
     # writes out a daily average file. woudl be better if it returned the values, but this works
@@ -129,6 +130,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
               extension, year1, year2, fr, csv) 
 
     avgf = myxdir + '/Files/' + station + '/' + txtfile
+    print('Looking in ', avgf)
     x = np.loadtxt(avgf, comments='%')
     # delete the file!
     rh = x[:,2]
@@ -510,14 +512,14 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     json_data = station_file.read_file()
 
     if json_data['lat'] >= 0:
-        print('northern hemisphere summer')
+        print('Northern hemisphere summer')
         southern = False
     elif json_data['lat'] < 0:
-        print('southern hemisphere summer')
+        print('Southern hemisphere summer')
         southern = True
 
     else:
-        print(f"the required json file created gnssir_input could not be found: {station_file.get_file_path()}")
+        print(f"the required json file created by gnssir_input could not be found: {station_file.get_file_path()}")
         sys.exit()
 
     # for PBO H2O this was set using STATSGO. 5% is reasonable as a starting point for australia
@@ -1158,7 +1160,7 @@ def set_parameters(station, minvalperday,tmin,tmax,fr, year, year_end,subdir,plt
     freq = fr # KE kept the other variable
 
     if not year_end:
-        year_end = year
+        year_end = year 
 
     # originally was making people input these on the command line
     # now first try to read from json.  if not there they will be set here
@@ -1182,3 +1184,74 @@ def set_parameters(station, minvalperday,tmin,tmax,fr, year, year_end,subdir,plt
     print('minvalperday/tmin/tmax', minvalperday, tmin, tmax)
 
     return minvalperday, tmin, tmax, freq, year_end, subdir, plt
+
+def write_all_phase(v,fname,allrh,filestatus,rhtrack):
+    """
+    writes out preliminary phase values and other metrics for advanced vegetation
+    option.  This is in the hope that it can be used in clara chew's
+    dissertation algorithm.
+
+    File is written to $REFL_CODE/Files/station/station_all_phase.txt I think
+
+    Parameters
+    ----------
+    v : numpy of floats as defined in vwc_cl
+        year, doy, phase, azimuth, satellite number
+        estimated RH, LSP amplitude, LS amplitude, UTC hours
+        raw LSP amp, raw LS amp
+    fname : str
+        name of the output file
+    allrh : fileID 
+        not sure of the python name for this
+    filestatus : int
+        1, open file
+        2, write to file (well, really any value)
+    rh: float
+        apriori reflector height, meters
+
+    Returns
+    -------
+    allrh : fileID
+
+    """
+
+    if filestatus == 1:
+        allrh = open(fname, 'w+')
+        allrh.write(" {0:s}  \n".format('% year doy  phase azim  satNu   RH   LSPamp LSamp  quad  UTC  rawAmpLSP  rawAmpLS' ))
+        allrh.write(" {0:s}  \n".format('% (1)  (2)   (3)   (4)   (5)    (6)   (7)   (8)    (9)  (10)    (11)       (12)' ))
+        return allrh
+
+    nr,nc = v.shape
+    # sort by time
+    ii = np.argsort(v[:,0] + v[:,1]/365.25)
+    v = v[ii,:]
+
+    for i in range(0,nr):
+        q = old_quad(v[i,3])
+        allrh.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:7.1f} {4:2.0f} {5:7.3f} {6:7.3f} {7:7.3f} {8:2.0f} {9:7.2f} {10:7.2f} {11:7.2f} {12:7.3f}\n".format(v[i,0], v[i,1], v[i,2],v[i,3],
+            v[i,4], v[i,5],v[i,6],v[i,7], q, v[i,8], v[i,9],v[i,10], rhtrack ))
+
+    return allrh
+
+def old_quad(azim):
+    """
+    calc oldstyle quadrants from PBO H2O
+
+    Parameters
+    ----------
+    azim : float
+        azimuth, dgrees
+    q : int
+        old quadrant system used in pboh2o
+    """
+    q = 1
+    if azim < 90:
+        q= 1
+    elif (azim >= 90) and (azim < 180):
+        q = 4 
+    elif (azim >= 180) and (azim < 270):
+        q = 3
+    elif (azim >= 270) and (azim <= 360):
+        q =2
+
+    return q
