@@ -6508,3 +6508,34 @@ def read_leapsecond_file(mjd):
             break
 
     return offset
+
+def ydoy2datetime(y,doy):
+    """
+    translates year/day of year numpy array into datetimes for plotting
+
+    Parameters
+    ----------
+    y : numpy array of floats
+        full year
+    doy : numpy array of floats
+        day of year
+
+    Returns
+    -------
+    bigT : numpy array
+        datetime objects
+
+    """
+    obstimes = []
+    N = len(y)
+    print(N)
+    for i in range (0,N):
+        yy = int( y[i] );
+        ddoy = int(doy[i])
+        d = datetime.datetime(yy, 1, 1) + datetime.timedelta(days=(ddoy-1))
+        #print(yy,ddoy,d.month,d.day)
+        bigT = datetime.datetime(year=yy, month=d.month, day=d.day)
+        obstimes = np.append(obstimes,bigT)
+
+    return obstimes
+
