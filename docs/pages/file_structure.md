@@ -4,12 +4,42 @@
 
 You need three environment variables to run 
 this code: REFL_CODE, ORBITS, and EXE. If you are using 
-the jupyter notebooks or the docker, they are defined for you. If you are working
-with pypi or github install, you must define them EVERY TIME YOU USE THE CODE.
-This is most easily done by setting them in your setup script, which on my machine
-is called .bashrc.
+the jupyter notebooks or the docker, they are defined for you. 
 
-## GPS/GNSS Data Formats
+If you are working with pypi or github clone install, you must define them EVERY TIME YOU USE THE CODE.
+This is most easily done by setting them in your setup script, which on my machine is called .bashrc.
+
+If you are working with the docker, these should all be set up for you. But knowing that they 
+exist can be helpful in looking for files, etc.
+
+## How do I analyze my own data?
+
+We do not have instructions within this software package for how you can operate your own receiver for GNSS-IR.
+Currently we request that you save your observation data as Rinex 2.11, Rinex 3, or NMEA formats (see below).  
+At a minimum you **must** save the SNR data - and we strongly urge you to track/save GPS L2C and L5.
+
+The naming conventions for observation files are given below. If you are working with the 
+docker, I have made some notes in the [docker install section](docker_cl_instructions.md) 
+that might be helpful to you about where to store your files.
+
+If you are working with git clone or pypi install, you should be able to have the RINEX files 
+in the directory you are currently working in. Or you should put them in the rinex directory as defined 
+below in the *Where Files are Stored* section. Examples are given 
+in the [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html).
+Documentation can always be improved, so if you would like to add more examples or find the 
+current documentation confusing, please submit a pull request.
+
+If you are using the notebooks, we do not currently have a notebook for this option.
+Please contact Kelly.Enloe@earthscope.org for guidance.
+
+If you have questions about converting NMEA files, the best I can offer is that you read
+the next section on that specific format.
+
+Many file conversion programs produce orbit files as well as observation files. These files
+are unnecessary in this software package. The code is set up to find the appropriate orbit files.
+
+
+## GPS/GNSS Observation Data Formats
 
 Input observation formats: the code only 
 recognizes [RINEX 2.11](https://www.ngs.noaa.gov/CORS/RINEX211.txt), 
