@@ -9,6 +9,7 @@ import sys
 
 
 import gnssrefl.quicklib as q
+import gnssrefl.gps as g
 
 
 def main():
@@ -73,10 +74,16 @@ def main():
         title for plot 
     outfile : str, optional
         name of png file to store plot 
-    ylimits: float, optional
-        pair of yaxis limits  
     xlimits: float, optional
         pair of xaxis limits  
+    ylimits: float, optional
+        pair of yaxis limits  
+    ydoy : bool, optional
+        if columns 1 and 2 are year and doy, the x-axis will be plotted in obstimes
+        you should select column 1 to plot
+    filename2 : str
+        in principle this allows you to make plots from two files with identical formatting
+        not sure that it works
     freq: integer, optional
         use column 11 to find (and extract) a single frequency
     utc_offset: integer, optional
@@ -97,8 +104,8 @@ def main():
     parser.add_argument("-symbol", help="plot symbol ", type=str,default=None)
     parser.add_argument("-title", help="optional title", type=str,default=None)
     parser.add_argument("-outfile", help="optional filename for plot. Must end in png", type=str,default=None)
-    parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
     parser.add_argument("-xlimits", nargs="*",type=float, help="optional xlimits", default=None)
+    parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
     parser.add_argument("-ydoy", help="if True/T, columns 1-2 are year and doy", type=str,default=None)
     parser.add_argument("-filename2", help="second filename", type=str, default=None)
     parser.add_argument("-freq", help="spec freq, column 11 ", type=int,default=None)
@@ -149,6 +156,7 @@ def main():
             print('empty input file number 1')
             return
         else:
+
             if (args.freq is not None):
                 print('restricting frequency',args.freq)
                 ii = (tvd[:,10] == args.freq)
@@ -162,6 +170,7 @@ def main():
     else:
         print('input file does not exist')
         sys.exit()
+
 
     tvd2=[]
     secondFile = False
@@ -182,19 +191,24 @@ def main():
     if secondFile:
         tval2,yval2 = q.trans_time(tvd2, ymd, convert_mjd, ydoy,xcol,ycol,utc_offset)
 
+    # supercedes previous trans_time ... 
+    if ydoy:
+        print('Making obstimes for ydoy x-axis')
+        tval = g.ydoy2datetime(tvd[:,0], tvd[:,1])
 
 
     fig,ax=plt.subplots()
+
     if args.symbol is None:
         ax.plot(tval, yval, 'b.')
     else:
         ax.plot(tval, yval, args.symbol)
 
-    # second file is not currently supported
+    # is second file currently supported???
     if secondFile:
         ax.plot(tval2, yval2, 'r.')
 
-    fig.autofmt_xdate()
+    plt.grid()
 
     plt.ylabel(ylabel)
 
@@ -209,7 +223,7 @@ def main():
     else:
         ax.set_title(args.title )
 
-    plt.grid()
+    fig.autofmt_xdate()
 
 
     if args.ylimits is not None:
@@ -234,7 +248,10 @@ def main():
                 else:
                     plt.xlabel('UTC+' + cc)
         else:
-            plt.xlim((xlimits))
+            if ydoy:
+                print('you cannot have xlimits with ydoy option - but feel free to submit a PR!')
+            else:
+                plt.xlim((xlimits))
 
     out = args.outfile
 
