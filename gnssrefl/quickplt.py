@@ -2,8 +2,9 @@
 import argparse
 from astropy.time import Time
 import datetime
-import numpy as np
+import math
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 import sys
 
@@ -215,15 +216,12 @@ def main():
     if args.xlabel is not None:
         plt.xlabel(str(args.xlabel))
 
-    if reverse_sign:
-        ax.invert_yaxis()
 
     if args.title is None:
         ax.set_title(os.path.basename(filename) )
     else:
         ax.set_title(args.title )
 
-    fig.autofmt_xdate()
 
 
     if args.ylimits is not None:
@@ -250,8 +248,30 @@ def main():
         else:
             if ydoy:
                 print('you cannot have xlimits with ydoy option - but feel free to submit a PR!')
+                year1 = math.floor(xlimits[0])
+                doy1= math.floor(365.25*(xlimits[0]-year1))
+                if doy1 == 0:
+                    doy1 = 1
+                yy, mm, dd = g.ydoy2ymd(year1,doy1)
+                t1 = datetime.datetime(year=yy, month=mm, day=dd)
+                print(year1,doy1)
+
+                year2 = math.floor(xlimits[1])
+                doy2= math.floor(365.25*(xlimits[1]-year2))
+                print(year2,doy2)
+                if doy2 == 0:
+                    doy2 = 1
+
+                yy, mm, dd  = g.ydoy2ymd(year2,doy2)
+                t2 = datetime.datetime(year=yy, month=mm, day=dd)
+
+                plt.xlim((t1,t2))
             else:
                 plt.xlim((xlimits))
+
+    if reverse_sign:
+        ax.invert_yaxis()
+    fig.autofmt_xdate() # obstimes
 
     out = args.outfile
 
@@ -269,7 +289,8 @@ def main():
             print('Plotfile saved to: ', xdir  + out)
             plt.savefig(xdir + out,dpi=300)
         else:
-            print('Output filename must end in png.')
+            print('Output filename must end in png. No file is written')
+
 
     plt.show()
 
