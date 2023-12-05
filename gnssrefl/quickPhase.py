@@ -20,7 +20,7 @@ def parse_arguments():
     parser.add_argument("-e2", default=None, type=float),
     parser.add_argument("-plt", default=None, type=str, help="plots come to the screen - which you do not want!")
     parser.add_argument("-screenstats", default=None, type=str, help="stats come to the screen")
-    parser.add_argument("-gzip", default=None, type=str, help="gzip SNR files" )
+    parser.add_argument("-gzip", default=None, type=str, help="gzip SNR files after use, default is True" )
 
     args = parser.parse_args().__dict__
 
@@ -33,7 +33,7 @@ def parse_arguments():
 
 
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66, 
-        fr: str = '20', e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip: bool = False):
+        fr: str = '20', e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip: bool = True):
     """
     quickphase computes phase, which are subquently used in vwc. The command line call is phase
     (which maybe we should change).
@@ -92,6 +92,9 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     screenstats: bool, optional
         Whether to print stats to the screen. Default is False
+
+    gzip : bool, optional
+        gzip the SNR file after use.  Default is True
 
     Returns
     -------
