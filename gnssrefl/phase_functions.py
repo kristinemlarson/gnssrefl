@@ -1062,9 +1062,10 @@ def load_sat_phase(station, year, year_end, freq):
         year_end = year
 
     results = []
-    for year in np.arange(year, year_end+1):
+    for yyyy in range(year, year_end+1):
+        print('reading in year', yyyy)
         # where the results are stored
-        data_dir = thedir / str(year) / 'phase' / station
+        data_dir = thedir / str(yyyy) / 'phase' / station
         local_results = read_files_in_dir(data_dir)
         if local_results:
             results.extend(local_results)
@@ -1107,7 +1108,7 @@ def load_sat_phase(station, year, year_end, freq):
     return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results, amp_ls
 
 
-def set_parameters(station, minvalperday,tmin,tmax,fr, year, year_end,subdir,plt):
+def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,subdir,plt):
     """
 
     Parameters
@@ -1123,12 +1124,12 @@ def set_parameters(station, minvalperday,tmin,tmax,fr, year, year_end,subdir,plt
         min soil texture
     tmax : float
         max soil texture
-
+    min_req_pts_track: int 
+        minimum number of phase values per year per track
     freq : int
         frequency to use (1,20 allowed)
     year_end : int
         last year to analyze
-
     subdir : str
         name for subdirectory used in subdirectory of REFL_CODE/Files
     plt : bool
@@ -1147,7 +1148,8 @@ def set_parameters(station, minvalperday,tmin,tmax,fr, year, year_end,subdir,plt
         tmax = lsp['vwc_max_soil_texture']
     if 'vwc_minvalperday' in lsp:
         minvalperday = lsp['vwc_minvalperday']
-
+    if 'vwc_min_req_pts_track' in lsp:
+        min_req_pts_track = lsp['vwc_min_req_pts_track']
 
     if (len(station) != 4):
         print('station name must be four characters')
@@ -1181,9 +1183,9 @@ def set_parameters(station, minvalperday,tmin,tmax,fr, year, year_end,subdir,plt
     if not plt:
         print('no plots will come to screen. Will only be saved.')
 
-    print('minvalperday/tmin/tmax', minvalperday, tmin, tmax)
+    print('minvalperday/tmin/tmax/min_req_tracks', minvalperday, tmin, tmax, min_req_pts_track)
 
-    return minvalperday, tmin, tmax, freq, year_end, subdir, plt
+    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt
 
 def write_all_phase(v,fname,allrh,filestatus,rhtrack):
     """
@@ -1255,3 +1257,89 @@ def old_quad(azim):
         q =2
 
     return q
+
+
+def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase, avg_date,avg_phase,warning_value,ftmp,remove_bad_tracks,k4,avg_exist):
+    """
+    Parameters
+    ----------
+    satellite : int
+        satellite number
+    rhtrack: float
+        a priori reflector height 
+    meanaztrack : float
+        I think it is the azimuth of the track, degrees
+    nvalstrack : int
+        not sure?
+    amin : int
+        min az of this quadrant
+    amax : int
+        max az of this quadrant
+    y : numpy array of ints
+        year
+    t : numpy array of ints
+        day of year
+    new_phase : numpy array of floats
+        phase values for a given satellite track ??
+    avg_date : numpy array of floats
+        y + doy/365.25 I think
+    avg_phase : numpy array of floats
+        average phase, in degrees
+    warning_value : float
+        phase noise value
+    ftmp : file ID 
+        for writing
+    remove_bad_tracks : bool
+        whether you write out new tracks with bad ones removed
+    k4 : int
+        number of tracks?
+    avg_exist : bool
+        whether you have previous solution to compare to
+    
+        
+    """
+    # this is a kind of quality control -use previous solution to have 
+    # better feel for whether current solution works. defintely needs to go in a function
+    if avg_exist:
+        # quadrant results for this satellite track
+        satdate = y + t/365.25
+        satphase = new_phase
+        keepit=False
+
+        # figure out intersection with "good" results
+        inter, id1, id2 = np.intersect1d(avg_date, satdate, assume_unique=True, return_indices=True)
+        aa = avg_phase[id1]
+        bb = satphase[id2]
+        if len(aa) > 0:
+            res = np.round(np.std(aa - bb), 2)
+            addit = ''
+            keepit = True
+            if (res > warning_value ) :
+                addit = '>>>>>  Consider Removing This Track <<<<<'
+                if remove_bad_tracks:
+                    addit = '>>>>>  Removing This Track - rerun to see effect <<<<<'
+                    keepit = False
+            if keepit:
+                ftmp.write("{0:3.0f} {1:7.2f} {2:3.0f} {3:7.1f} {4:7.0f} {5:4.0f} {6:4.0f} \n".format(k4,rhtrack, 
+                       satellite,meanaztrack,nvalstrack,amin,amax))
+                k4 = k4 + 1
+                print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} {addit:20s} ")
+
+    else:
+        print('You do not have a previous solution to compare to so I cannot compute QC stats. Rerun vwc')
+
+    return k4
+
+def save_vwc_plot(fig, pngfile):
+    """
+    Parameters
+    ----------
+    fig : matplotlib figure
+        the figure definition you define when you open a figure
+    pngfile : str
+        name of the png file to be saved
+    """
+    fig.savefig(pngfile,format="png")
+    print('Saving to ', pngfile)
+
+    return

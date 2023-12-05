@@ -50,7 +50,7 @@ def parse_arguments():
 
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool = True, screenstats: bool = False, 
-        min_req_pts_track: int = 50, polyorder: int = -99, minvalperday: int = 10, 
+        min_req_pts_track: int = 150, polyorder: int = -99, minvalperday: int = 10, 
         snow_filter: bool = False, circles: bool=False, subdir: str=None, tmin: float=None, tmax: float=None, 
         warning_value : float=5.5, auto_removal : bool=False, hires_figs : bool=False, advanced : bool=False, 
         sat_legend : bool=True):
@@ -93,8 +93,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         Default is True
     min_req_pts_track : int, optional
         how many points needed to keep a satellite track
-        default is 50. This is an issue when a satellite has recently been launched. You don't
-        really have enough information to trust it for several months (and in some cases longer)
+        default is now set to 150 (was previously 50). This is an issue when a satellite has recently 
+        been launched. You don't really have enough information to trust it for several months (and in some cases longer)
+        this can now be set in the gnssir_input created analysis json (vwc_min_req_pts_track)
     polyorder : int
         polynomial order used for leveling.  Usually the code picks it but this allows to users to override. 
         Default is -99 which means let the code decide
@@ -109,9 +110,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     subdir: str
         subdirectory in $REFL_CODE/Files for plots and text file outputs
     tmin: float
-        minimum soil texture value, default 0.05
+        minimum soil texture value, default 0.05. This can now be set in the gnssir_input json (with vwc_ added)
     tmax: float
-        maximum soil texture value, default 0.5
+        maximum soil texture value, default 0.5. This can now be set in the gnssir_input json (with vwc_ added)
     warning_value : float
          screen warning about bad tracks (phase rms, in degrees).
          default is 5.5 
@@ -148,8 +149,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for 
     # consistency with old adv vegetation code
 
-    minvalperday, tmin, tmax, freq, year_end, subdir, plt = qp.set_parameters(station, 
-        minvalperday,tmin,tmax,fr, year, year_end,subdir,plt)
+    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt = qp.set_parameters(station, 
+        minvalperday,tmin,tmax,min_req_pts_track, fr, year, year_end,subdir,plt)
 
     remove_bad_tracks = auto_removal
 
@@ -210,13 +211,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     # satellite
     # reflector height
     # LSP amplitude
-    # LS amplitude, added
+    # LS amplitude, 
     # hour of day, UTC
-    # raw LSP
-    # raw LS amp
+    # raw LSP, for advanced setting
+    # raw LS amp, for advanced setting
+    #
     vxyz = np.empty(shape=[0, 11]) 
 
     # this is the number of points for a given satellite track
+    # just reassigning hte variable name
     reqNumpts = min_req_pts_track
 
     # disclosure
@@ -229,6 +232,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     # two list of tracks - lets you compare an old run with a new run
     newlist = station + '_tmp.txt'
     oldlist = xdir + '/input/' + station + '_phaseRH.txt'
+
     ftmp = open(newlist,'w+')
     ftmp.write("{0:s} \n".format( '% station ' + station) )
     ftmp.write("{0:s} \n".format( '% TrackN  RefH SatNu MeanAz  Nval  Azimuths'))
@@ -239,7 +243,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     # open up a second plot for the amplitudes
     if advanced: 
         # open file , write the header
-        fname_phase = f'{xdir}/Files/{subdir}/{station}_all_phase.txt'
+        fname_phase = f'{xdir}/Files/{subdir}/{station}_{str(year)}_all_phase.txt'
         print('Writing interim phase values to ', fname_phase)
         allph = qp.write_all_phase(vxyz,fname_phase,[],1,[])
 
@@ -263,7 +267,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
         for satellite in satlist:
             if screenstats:
-                print(satellite, amin, amax)
+                print('Looking at ', int(satellite), amin, amax)
             # indices for the track you want to look at here
             ii = (ssat == satellite) & (azdata > amin) & (azdata < amax) & (phase < 360)
             x = phase[ii]
@@ -283,6 +287,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
             meanaztrack = float(tracks[iikk,3])
             nvalstrack = float(tracks[iikk,4])
 
+            #print(len(x),satellite, amin,amax,reqNumpts)
             if len(x) > reqNumpts:
                 b += 1
                 sortY = np.sort(x)
@@ -294,9 +299,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                 medv = np.median(sortY[(N-NN):(N-1)])
                 new_phase = -(x-medv)
                 ii = (new_phase > -20)
-                t = t[ii]
+                t = t[ii] # i do not know why this variable (doy) is stored as t
                 y = y[ii]
-                h = h[ii]
+                h = h[ii] # hours
                 new_phase = new_phase[ii]
                 azd = azd[ii]
                 s = s[ii]
@@ -305,7 +310,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                 amps_ls = amps_ls[ii]
 
                 if len(t) == 0:
-                    print('you should consider removing this satellite track', sat, amin)
+                    print('you should consider removing this satellite track as there are no results', satellite, amin)
 
                 if (len(t) > reqNumpts):
                     ww = ww + 1 # index for plotting
@@ -323,7 +328,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     amps_ls = amps_ls[ii]
                     rhs = rhs[ii]
                     sortY = np.sort(new_phase)
-                    # bottom 20% ???
+                    # looks like I am using the bottom 20% 
                     NN = int(np.round(0.2*len(sortY)))
                     mv = np.median(sortY[0:NN])
                     new_phase = new_phase - mv
@@ -334,50 +339,24 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     vquad = np.vstack((vquad, newl))
 
                     basepercent = 0.15
-                    normAmps = qp.normAmp(amps, basepercent)
-                    norm_ampsLS= qp.normAmp(amps_ls, basepercent)
+                    normAmps = qp.normAmp(amps, basepercent) ; norm_ampsLS= qp.normAmp(amps_ls, basepercent)
                     newl = np.vstack((y, t, new_phase, azd, s, rhs, normAmps,norm_ampsLS,h,amps,amps_ls)).T
+
                     # write latest values for advanced option ... 
+                    if (len(newl) > reqNumpts) and advanced:
+                        qp.write_all_phase(newl,'',allph,2, rhtrack)
 
                     # this is a kind of quality control -use previous solution to have 
                     # better feel for whether current solution works. defintely needs to go in a function
-                    if (len(newl) > 0) and (avg_exist):
-                        if advanced:
-                            qp.write_all_phase(newl,'',allph,2, rhtrack)
 
-                        # quadrant results for this satellite track
-                        satdate = y + t/365.25
-                        satphase = new_phase
-
-                        # figure out intersection with "good" results
-                        inter, id1, id2 = np.intersect1d(avg_date, satdate, assume_unique=True, return_indices=True)
-                        aa = avg_phase[id1]
-                        bb = satphase[id2]
-                        if len(aa) > 0:
-                            res = np.round(np.std(aa - bb), 2)
-                            addit = ''
-                            keepit = True
-                            if (res > warning_value ) :
-                                # warning
-                                addit = '>>>>>  Consider Removing This Track <<<<<'
-                                if remove_bad_tracks:
-                                    addit = '>>>>>  Removing This Track - rerun to see effect <<<<<'
-                                    keepit = False
-                            if keepit:
-                                ftmp.write("{0:3.0f} {1:7.2f} {2:3.0f} {3:7.1f} {4:7.0f} {5:4.0f} {6:4.0f} \n".format(k4,rhtrack, satellite,meanaztrack,nvalstrack,amin,amax))
-                                k4 = k4 + 1
-
-                            #print(qp.old_quad(float(np.mean(azd))))
-
-                            print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} Amp {max(normAmps):4.2f} {addit:20s} ")
-                        else:
-                            print('No QC assessment could be made for this satellite track')
+                    if (len(newl) > reqNumpts): 
+                        k4 = qp.kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase, 
+                                         avg_date,avg_phase,warning_value,ftmp,remove_bad_tracks,k4,avg_exist )
                     else:
-                        print('No average , so no QC. You should iterate.')
-
+                        print('No previous solution or not enough points for this satellite.', satellite)
 
                     adv_color = colors[ww:ww+1] # sets color for below
-                    # cumulative values
+                    # stack this latest set of values to vxyz
                     vxyz = np.vstack((vxyz, newl))
                     datetime_dates = []
                     csat = str(int(satellite))
@@ -391,9 +370,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
                     # per clara chew paper in GPS Solutions 2016
                     if advanced:
+
                         # sort for the smoothing ... cause ... you can imagine 
                         ik = np.argsort( fracyear)
                         smoothAmps = scipy.signal.savgol_filter(normAmps[ik], window_length=31,polyorder=2 )
+                        print('Satellite ', satellite, ' Npts ', len(smoothAmps), amin,amax)
                         ax2[bx[index],by[index]].plot(fracyear[ik], smoothAmps, '-',color=adv_color)
                         ax2[bx[index],by[index]].plot(fracyear[ik], normAmps[ik], '.',color=adv_color,label=csat)
 
@@ -420,19 +401,17 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
 
     ftmp.close()
+
     if remove_bad_tracks:
         print('Writing out a new list of good satellite tracks to ', oldlist)
         subprocess.call(['mv','-f', newlist, oldlist])
     else:
         subprocess.call(['rm','-f', newlist ])
 
-    plot_path = f'{xdir}/Files/{subdir}/{station}_az_phase.png'
-    print(f"Saving to {plot_path}")
-    fig.savefig(plot_path, format="png")
+    qp.save_vwc_plot(fig,  f'{xdir}/Files/{subdir}/{station}_az_phase.png')
+
     if advanced:
-        plot_path2 = f'{xdir}/Files/{subdir}/{station}_az_normamp.png'
-        print(f"Saving to {plot_path2}")
-        fig2.savefig(plot_path2, format="png")
+        qp.save_vwc_plot(fig2,  f'{xdir}/Files/{subdir}/{station}_az_normamp.png')
 
 
     #Need to Define clearly the stored values in vxyz
