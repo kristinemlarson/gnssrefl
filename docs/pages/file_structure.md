@@ -14,11 +14,9 @@ exist can be helpful in looking for files, etc.
 
 ## How do I analyze my own data?
 
-We do not have instructions within this software package for how you can operate your own receiver for GNSS-IR.
-Currently we request that you save your observation data as Rinex 2.11, Rinex 3, or NMEA formats (see below).  
-At a minimum you **must** save the SNR data - and we strongly urge you to track/save GPS L2C and L5.
+We do not have instructions within this software package for how you can operate your own receiver for GNSS-IR. Currently we need you to save your observation data as Rinex 2.11, Rinex 3, or NMEA formats (see below). At a minimum you **must** save the SNR data; we strongly urge you to track/save GPS L2C and L5.
 
-The naming conventions for observation files are given below. If you are working with the 
+The naming conventions for GNSS observation files that we expect are given below. If you are working with the 
 docker, I have made some notes in the [docker install section](docker_cl_instructions.md) 
 that might be helpful to you about where to store your files.
 

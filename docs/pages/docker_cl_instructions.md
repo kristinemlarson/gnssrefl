@@ -111,11 +111,17 @@ release of the software.
 `docker pull ghcr.io/kristinemlarson/gnssrefl:latest`
 
 ### Notes:
-The first time you run this container from a specific path, the Earthscope token will be installed once in the container at `` and locally at `/localpath_of_dockerrun/refl_zones` (the volume you mounted with the `-v` command)
+
+KL: To the best of my knowledge, this advice is wrong. I believe it is refl_code.
+
+The first time you run this container from a specific path, the Earthscope token 
+will be installed once in the container at `` and locally 
+at `/localpath_of_dockerrun/refl_zones` (the volume you mounted with the `-v` command)
 
 docker has vim for editing text files (ie .json station config file)
 
-When running the software in the docker, plots/files will **not** print to the screen (think quickLook or daily_average utilities), but will be stored on the local machine in the directory that the docker run command was issued.
+When running the software in the docker, plots/files will **not** print to the screen (think 
+quickLook or daily_average utilities), but will be stored on the local machine in the directory that the docker run command was issued.
 
 If you want to process RINEX files that are stored on your local machine, you can copy them into 
 `/refl_code/` local directory that is already mounted to the container given the previous run command.  
