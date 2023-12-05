@@ -1,8 +1,13 @@
-import numpy as np
 import datetime as datetime
+import math
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+import subprocess
 import sys
 from astropy.time import Time
 
+import gnssrefl.gps as g
 
 def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol,utc_offset):
     """
@@ -94,3 +99,63 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol,utc_offset):
 
 
     return tval, yval 
+
+def set_xlimits_ydoy(xlimits):
+    """
+    translate command line xlimits into datetime for nicer plots
+
+    Parameters
+    ----------
+    xlimits : list of floats
+         year (fractional, i.e. 2015.5)
+
+    Returns 
+    -------
+    t1 : datetime
+         beginning date for x-axis
+    t2 : datetime
+         end date for x-axis
+    """
+    year1 = math.floor(xlimits[0])
+    doy1= math.floor(365.25*(xlimits[0]-year1))
+    if doy1 == 0:
+        doy1 = 1
+    yy, mm, dd = g.ydoy2ymd(year1,doy1)
+    t1 = datetime.datetime(year=yy, month=mm, day=dd)
+
+    year2 = math.floor(xlimits[1])
+    doy2= math.floor(365.25*(xlimits[1]-year2))
+    if doy2 == 0:
+        doy2 = 1
+
+    yy, mm, dd  = g.ydoy2ymd(year2,doy2)
+    t2 = datetime.datetime(year=yy, month=mm, day=dd)
+
+    return t1, t2
+
+
+def save_plot(out):
+    """
+    Makes a png plot and saves it in REFL_CODE/Files
+
+    Parameters
+    ----------
+    out : str
+        name of output file (or None)
+
+    """
+    # make sure output directory exists.
+    xdir = os.environ['REFL_CODE']  + '/Files/' 
+    if not os.path.exists(xdir) :
+        subprocess.call(['mkdir', xdir])
+
+    if out is None:
+        out = 'temp.png'
+        print('Plotfile saved to: ', xdir + out)
+        plt.savefig(xdir + out ,dpi=300)
+    else:
+        if out[-3:] == 'png':
+            print('Plotfile saved to: ', xdir  + out)
+            plt.savefig(xdir + out,dpi=300)
+        else:
+            print('Output filename must end in png. No file is being written')

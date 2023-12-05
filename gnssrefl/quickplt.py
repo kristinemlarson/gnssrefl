@@ -2,7 +2,6 @@
 import argparse
 from astropy.time import Time
 import datetime
-import math
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -247,24 +246,7 @@ def main():
                     plt.xlabel('UTC+' + cc)
         else:
             if ydoy:
-                print('you cannot have xlimits with ydoy option - but feel free to submit a PR!')
-                year1 = math.floor(xlimits[0])
-                doy1= math.floor(365.25*(xlimits[0]-year1))
-                if doy1 == 0:
-                    doy1 = 1
-                yy, mm, dd = g.ydoy2ymd(year1,doy1)
-                t1 = datetime.datetime(year=yy, month=mm, day=dd)
-                print(year1,doy1)
-
-                year2 = math.floor(xlimits[1])
-                doy2= math.floor(365.25*(xlimits[1]-year2))
-                print(year2,doy2)
-                if doy2 == 0:
-                    doy2 = 1
-
-                yy, mm, dd  = g.ydoy2ymd(year2,doy2)
-                t2 = datetime.datetime(year=yy, month=mm, day=dd)
-
+                t1,t2 = q.set_xlimits_ydoy(xlimits)
                 plt.xlim((t1,t2))
             else:
                 plt.xlim((xlimits))
@@ -275,7 +257,10 @@ def main():
 
     out = args.outfile
 
-    # make sure output directory exists.
+    q.save_plot(out)
+    plt.show()
+    return
+
     xdir = os.environ['REFL_CODE']  + '/Files/' 
     if not os.path.exists(xdir) :
         subprocess.call(['mkdir', xdir])
@@ -292,7 +277,6 @@ def main():
             print('Output filename must end in png. No file is written')
 
 
-    plt.show()
 
 
 if __name__ == "__main__":
