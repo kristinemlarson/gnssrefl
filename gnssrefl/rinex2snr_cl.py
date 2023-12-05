@@ -94,6 +94,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory. It does NOT 
     check the $REFL_CODE/YYYY/rinex directory. If someone would like to add that capability, that would be great.
+    And it looks like I do not delete the RINEX 3 files (though I do delete the RINEX 2.11 files).
 
     FAQ: what is rate anad srate?  rate is telling the code which folder to use because archives always have 
     files in different directories depending on sample rate.  srate is for RINEX 3 files only because RINEX 3 
