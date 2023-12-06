@@ -1108,7 +1108,7 @@ def load_sat_phase(station, year, year_end, freq):
     return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results, amp_ls
 
 
-def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,subdir,plt):
+def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,subdir,plt,auto_removal):
     """
 
     Parameters
@@ -1134,8 +1134,12 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         name for subdirectory used in subdirectory of REFL_CODE/Files
     plt : bool
         whether you want plots to come to the screen
+    auto_removal : bool
+        whther tracks should be removed when they fail QC
 
     """
+    # originally this was for command line interface ... 
+    remove_bad_tracks = auto_removal # ??
 
     g.checkFiles(station, '')
 
@@ -1185,7 +1189,7 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
 
     print('minvalperday/tmin/tmax/min_req_tracks', minvalperday, tmin, tmax, min_req_pts_track)
 
-    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt
+    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks
 
 def write_all_phase(v,fname,allrh,filestatus,rhtrack):
     """
@@ -1259,7 +1263,8 @@ def old_quad(azim):
     return q
 
 
-def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase, avg_date,avg_phase,warning_value,ftmp,remove_bad_tracks,k4,avg_exist):
+def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase, 
+             avg_date,avg_phase,warning_value,ftmp,remove_bad_tracks,k4,avg_exist):
     """
     Parameters
     ----------
@@ -1343,3 +1348,22 @@ def save_vwc_plot(fig, pngfile):
     print('Saving to ', pngfile)
 
     return
+
+def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp, amp_ls, rh, ii):
+    """
+    this is just trying to clean up vwc.py  
+    send indices ii - and return renamed variables.  
+
+    """
+    y = year_sat_phase[ii]
+    t = doy[ii]
+    h = hr[ii] # this is fractional hour of the day, GPS time 
+    x = phase[ii]
+    # should be so we could do subdaily VWC
+    azd = azdata[ii] # azimuth, in degrees
+    s = ssat[ii] # array of satellites numbers
+    amps = amp[ii] # this amplitude is RH amplitude 
+    amps_ls = amp_ls[ii] # this amplitude is phase amplitude 
+    rhs = rh[ii] # estimated RH
+
+    return y,t,h,x,azd,s,amps,amps_ls,rhs

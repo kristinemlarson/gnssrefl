@@ -149,12 +149,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for 
     # consistency with old adv vegetation code
 
-    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt = qp.set_parameters(station, 
-        minvalperday,tmin,tmax,min_req_pts_track, fr, year, year_end,subdir,plt)
+    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks = qp.set_parameters(station, 
+        minvalperday,tmin,tmax,min_req_pts_track, fr, year, year_end,subdir,plt, auto_removal)
 
-    remove_bad_tracks = auto_removal
-
-    snow_file = xdir + '/Files/snowmask_' + station + '.txt'
     snowfileexists = False
     if snow_filter:
         medf = 0.2 # this is meters
@@ -203,7 +200,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     k = 1
     # define the contents of this variable HERE
-    # newl = np.vstack((y, t, new_phase, azd, s, rhs, normAmps)).T
+    vxyz = np.empty(shape=[0, 11]) 
     # year
     # doy ?
     # phase : degrees
@@ -216,17 +213,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     # raw LSP, for advanced setting
     # raw LS amp, for advanced setting
     #
-    vxyz = np.empty(shape=[0, 11]) 
 
     # this is the number of points for a given satellite track
     # just reassigning hte variable name
     reqNumpts = min_req_pts_track
 
-    # disclosure
+    # KL disclosure
     # this code was written as a quick port between matlab and python
     # it does use many of the nice features of python variables. 
-    # and i was new to numpy, which did not help
-
+    
     # checking each geographic quadrant
     k4 = 1
     # two list of tracks - lets you compare an old run with a new run
@@ -268,72 +263,52 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         for satellite in satlist:
             if screenstats:
                 print('Looking at ', int(satellite), amin, amax)
-            # indices for the track you want to look at here
+            # indices for the satellite and quadrant you want to look at here
             ii = (ssat == satellite) & (azdata > amin) & (azdata < amax) & (phase < 360)
-            x = phase[ii]
-            t = doy[ii]
-            h = hr[ii] # this is fractional hour of the day, GPS time 
-            # should be so we could do subdaily VWC
-            y = year_sat_phase[ii]
-            azd = azdata[ii] # azimuth, in degrees
-            s = ssat[ii] # array of satellites numbers
-            amps = amp[ii] # this amplitude is RH amplitude 
-            amps_ls = amp_ls[ii] # this amplitude is phase amplitude 
-            rhs = rh[ii] # estimated RH
+            y,t,h,x,azd,s,amps,amps_ls,rhs = qp.rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp, amp_ls, rh, ii)
 
             iikk  = (atracks == amin) & (stracks == satellite) 
-            # i believe this is the a priori RH, which is good to know for Chew model
-            rhtrack = float(tracks[iikk,1])
+            rhtrack = float(tracks[iikk,1]) # a priori RH
             meanaztrack = float(tracks[iikk,3])
             nvalstrack = float(tracks[iikk,4])
 
-            #print(len(x),satellite, amin,amax,reqNumpts)
             if len(x) > reqNumpts:
-                b += 1
+                b += 1 # is b used?
                 sortY = np.sort(x)
-
                 N = len(sortY)
                 NN = int(np.round(0.20*N))
-
                 # use median value instead
                 medv = np.median(sortY[(N-NN):(N-1)])
                 new_phase = -(x-medv)
                 ii = (new_phase > -20)
-                t = t[ii] # i do not know why this variable (doy) is stored as t
-                y = y[ii]
-                h = h[ii] # hours
-                new_phase = new_phase[ii]
-                azd = azd[ii]
-                s = s[ii]
-                amps = amps[ii]
-                rhs = rhs[ii]
-                amps_ls = amps_ls[ii]
+
+                y,t,h,new_phase,azd,s,amps,amps_ls,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amps, amps_ls, rhs, ii)
 
                 if len(t) == 0:
                     print('you should consider removing this satellite track as there are no results', satellite, amin)
 
                 if (len(t) > reqNumpts):
-                    ww = ww + 1 # index for plotting
+                    ww = ww + 1 # index for plotting in a quadrant
+
+                    # not sure why this is done in a loop
                     for l in range(0, len(t)-1):
                         if new_phase[l] > 340:
                             new_phase[l] = new_phase[l] - 360
+
+                    # this is ok for regular model - not so good for big vegetation sites
                     ii = (new_phase > -20) & (new_phase < 60)
-                    t = t[ii]
-                    y = y[ii]
-                    h = h[ii]
-                    new_phase = new_phase[ii]
-                    azd = azd[ii]
-                    s = s[ii]
-                    amps = amps[ii]
-                    amps_ls = amps_ls[ii]
-                    rhs = rhs[ii]
+                    # just wondering
+                    if advanced:
+                        ii = (new_phase > -30) & (new_phase < 100)
+
+                    y,t,h,new_phase,azd,s,amps,amps_ls,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amps, amps_ls, rhs, ii)
+
                     sortY = np.sort(new_phase)
                     # looks like I am using the bottom 20% 
                     NN = int(np.round(0.2*len(sortY)))
                     mv = np.median(sortY[0:NN])
                     new_phase = new_phase - mv
                     fracyear = y + t/365.25
-                    # probably should take out median value again
 
                     newl = np.vstack((y, t, new_phase, azd)).T
                     vquad = np.vstack((vquad, newl))
@@ -370,11 +345,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
                     # per clara chew paper in GPS Solutions 2016
                     if advanced:
-
                         # sort for the smoothing ... cause ... you can imagine 
                         ik = np.argsort( fracyear)
                         smoothAmps = scipy.signal.savgol_filter(normAmps[ik], window_length=31,polyorder=2 )
-                        print('Satellite ', satellite, ' Npts ', len(smoothAmps), amin,amax)
+                        #print('Satellite ', satellite, ' Npts ', len(smoothAmps), amin,amax)
                         ax2[bx[index],by[index]].plot(fracyear[ik], smoothAmps, '-',color=adv_color)
                         ax2[bx[index],by[index]].plot(fracyear[ik], normAmps[ik], '.',color=adv_color,label=csat)
 
@@ -387,8 +361,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
         # for phase
         ax[bx[index],by[index]].set_ylim((-20,60))
+        if advanced:
+            ax[bx[index],by[index]].set_ylim((-20,80))
         ax[bx[index],by[index]].grid()
-        if sat_legend:
+        if sat_legend and (ww > 0):
             ax[bx[index],by[index]].legend(loc='upper right',fontsize=fs-2)
 
         fig.autofmt_xdate() # set for datetime
@@ -396,9 +372,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         # for normalized amplitude
         if advanced:
             ax2[bx[index],by[index]].grid()
-            if sat_legend:
+            if sat_legend and (ww > 0):
                 ax2[bx[index],by[index]].legend(loc='upper right',fontsize=fs-2)
-
 
     ftmp.close()
 
