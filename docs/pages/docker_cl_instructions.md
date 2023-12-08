@@ -1,4 +1,4 @@
-# [Installing the gnssrefl docker image from the GitHub Container Registry](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
+# [Installing and Running the gnssrefl docker image](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
 
 Contents/shortcuts:
 * [Install Docker](#Install-Docker)
