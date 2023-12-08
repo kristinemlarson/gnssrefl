@@ -64,8 +64,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     Parameters
     ----------
-    station : string
+    station : str
         4 or 9 character station name. 6 ch allowed for japanese archive
+        9 means it is a RINEX 3 file
 
     year_list : list of int
         years to be analyzed
@@ -73,13 +74,13 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     doy_list : list of integers
         doys to be analyzed
 
-    isnr : integer
+    isnr : int
         SNR file type choice
 
-    orbtype : string
+    orbtype : str
         orbit type, e.g. nav, rapid, gnss
 
-    rate : string
+    rate : str
         general sample rate.
         high: use 1-Hz area in the archive
         low: use default area in the archive
@@ -87,26 +88,26 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     dec_rate : integer
          decimation value
 
-    archive : string
+    archive : str
         choice of GNSS archive
 
-    fortran : boolean
+    fortran : bool
         whether the fortran rinex translator is to be used
         default: false
 
-    nol: boolean
+    nol: bool
         True: assumes RINEX files are in local directory
         False (default): will look at multiple - or specific archive
 
-    overwrite: boolean
+    overwrite: bool
         False (default): if SNR file exists, SNR file not made
         True: make a new SNR file
 
-    translator : string
+    translator : str
         hybrid (default), fortran, or python
         hybrid uses fortran within the python code
 
-    srate : integer
+    srate : int
         sample rate for RINEX 3 files
 
     mk : boolean
@@ -115,7 +116,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     skipit : int
          skips making files every day, so a value of 7 means weekly.  1 means do every day
 
-    strip : boolean
+    strip : bool
          reduces observables to only SNR (too many observables, particularly in RINEX 2 files
          will break the RINEX translator)
 
@@ -206,19 +207,24 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
                 localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
                 if nol:
-                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is in this directory:')
                     current_local = os.getcwd()
-                    print(current_local)
+                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is :', current_local)
                     # this assumes RINEX file is in local directory or "nearby"
                     if version == 2:
 
                         if mk:
                             the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
                         if not os.path.exists(r):
-                            print('Unsuccessful, so how trying other directories')
+                            print('Did not find the plain observation file, so now trying other names/directories')
                             # could try this way? - look for file in localpath2. gunzip if necessary
                             allgood = get_local_rinexfile(r,localpath2)
                         if os.path.exists(r):
+                            rinext =float(np.loadtxt(r,usecols=0,dtype='str',max_rows=1))
+                            print('Apparent Rinex version', rinext)
+                            if (rinext != 2.11):
+                                print('Your file is not RINEX v2.11 which is what you told the code it was. Exiting')
+                                sys.exit()
+
                             if screenstats:
                                 print('Found the RINEX 2.11 file', r)
                             if strip:
@@ -249,6 +255,11 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                 print('Try to gunzip ', r3gz)
                             subprocess.call(['gunzip', r3gz])
                         if os.path.exists(r3):
+                            rinext =float(np.loadtxt(r3,usecols=0,dtype='str',max_rows=1))
+                            print('Apparent Rinex version', rinext)
+                            if (rinext < 3):
+                                print('Your file is not RINEX v3 or higher which is I was expecting. Exiting.')
+                                sys.exit()
                             if screenstats: 
                                 print('The RINEX 3 file exists locally', r3)
                             # convert to RINEX 2.11
@@ -1320,17 +1331,20 @@ def get_local_rinexfile(rfile,localpath2):
 
     # look for gzip version in local directory first
     if os.path.exists(rfile + '.gz'):
+        print('found ', rfile + '.gz')
         subprocess.call(['gunzip', rfile + '.gz'])
         allgood = True
 
 
     # then look for unix compressed version local directory 
     if os.path.exists(rfile + '.Z') and not allgood:
+        print('found ', rfile + '.Z')
         subprocess.call(['uncompress', rfile + '.Z'])
         allgood = True 
 
     # then look for hatanaka compressed version local directory 
     if os.path.exists(rd) and not allgood:
+        print('found ', rd)
         if os.path.exists(crnxpath):
             subprocess.call([crnxpath,rd])
             if os.path.exists(rfile):
@@ -1339,6 +1353,7 @@ def get_local_rinexfile(rfile,localpath2):
 
     # then look for hatanaka compressed and unix compressed version local directory 
     if os.path.exists(rd + '.Z') and not allgood:
+        print('found ', rd + '.Z')
         if os.path.exists(crnxpath):
             subprocess.call(['uncompress', rd + '.Z'])
             subprocess.call([crnxpath,rd])
@@ -1347,8 +1362,8 @@ def get_local_rinexfile(rfile,localpath2):
                 subprocess.call(['rm',rd])
 
     # now check in 
-    print('Checking for the file in : ', localpath2)
     if not allgood:
+        print('Checking for the file in : ', localpath2)
         r = localpath2 + rfile
         # hatanaka version in REFL_CODE
         rdd = localpath2 + rd

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.9.9
+December 8, 2023
+
+A fair number of changes in vwc that are related to a new advanced option vwc. But you should not invoke
+this advanced option because it does not currently produce vwc.
+
+I now have rinex2snr check to see if you have a compliant file, i.e. you say it is Rinex 2.11 
+(because you input a 4 character station name), but inside the code, it is Rinex 3 file. And vice versa,
+you say it is Rinex 3, but it is really Rinex 2.11. It now exits.
+
 ## 1.9.8
 November 26, 2023
 

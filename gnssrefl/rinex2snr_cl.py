@@ -81,8 +81,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     If you have the RINEX 2.11 file, the file was originally required to be normal RINEX (ends in o) or 
     gzipped normal RINEX. It can be in the local directory which is where you are running the code 
     or it can be in $REFL_CODE/YYYY/rinex/ssss, where ssss is the lowercase directory name for your station. 
-
-
     nolook now allows RINEX 2.11 files that are Hatanaka compressed, Hatanaka compressed + unix compressed,  for 
     the local directory. It also allows Hatanaka compressed in the REFL_CODE directory.  
 

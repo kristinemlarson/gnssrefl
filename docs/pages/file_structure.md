@@ -14,7 +14,9 @@ exist can be helpful in looking for files, etc.
 
 ## How do I analyze my own data?
 
-We do not have instructions within this software package for how you can operate your own receiver for GNSS-IR. Currently we need you to save your observation data as Rinex 2.11, Rinex 3, or NMEA formats (see below). At a minimum you **must** save the SNR data; we strongly urge you to track/save GPS L2C and L5.
+We do not have instructions within this software package for how you can operate your own receiver 
+for GNSS-IR. Currently we need you to save your observation data as Rinex 2.11, Rinex 3, or 
+NMEA formats (see below). At a minimum you **must** save the SNR data; we strongly urge you to track/save GPS L2C and L5.
 
 The naming conventions for GNSS observation files that we expect are given below. If you are working with the 
 docker, I have made some notes in the [docker install section](docker_cl_instructions.md) 
@@ -27,17 +29,34 @@ in the [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.r
 Documentation can always be improved, so if you would like to add more examples or find the 
 current documentation confusing, please submit a pull request.
 
-If you are using the notebooks, we do not currently have a notebook for this option.
+If you are using the notebooks, there is currently no notebook for this option.
 Please contact Kelly.Enloe@earthscope.org for guidance.
 
 If you have questions about converting NMEA files, the best I can offer is that you read
 the next section on that specific format.
 
-Many file conversion programs produce orbit files as well as observation files. These files
-are unnecessary in this software package. The code is set up to find the appropriate orbit files.
+Many file conversion programs produce orbit files as well as observation files. These orbit files
+are unnecessary in this software package. The code is set up to find the appropriate orbit files for you.
 
 
 ## GPS/GNSS Observation Data Formats
+
+Please keep in mind that there are multiple issues here:
+
+- Are your observation files stored in what gnssrefl considers to be a compliant format?
+
+- Are your observation files properly named?  
+
+- Are your observation files stored where the code expects to find them?
+
+- Do your observation files include the data we need for GNSS-IR (the SNR observables)
+
+- Did you compress you file in some way - and does gnssrefl recognize this kind of compression?
+(Hatanaka, gzip, Z, etc etc)
+
+Unfortunately all of these issues come into play, and it can be confusing 
+to figure out where the problem is. We have tried as best we can to make screen
+output that will help you with your problem.
 
 Input observation formats: the code only 
 recognizes [RINEX 2.11](https://www.ngs.noaa.gov/CORS/RINEX211.txt), 
@@ -46,8 +65,8 @@ and [NMEA](https://www.gpsworld.com/what-exactly-is-gps-nmea-data/) input files.
 
 **RINEX 2.11**
 
-*We strongly prefer that you use lower case filenames.* This is 
-the standard at global archives.
+*We strongly prefer that you use lower case filenames.* I cannot promise you 
+that the code will find files that are stored in uppercase. Lowercase filenames are the standard at global archives.
 They must have SNR data in them (S1, S2, etc) and have the receiver coordinates in the header.
 The files should follow these naming rules:
 
@@ -56,6 +75,20 @@ The files should follow these naming rules:
 - Example: algo0500.21o where station name is algo on day of year 50 from the year 2021
 
 Example filename : onsa0500.22o
+
+It is also standard to use the Hatanaka files. 
+
+Example filename : onsa0500.22d
+
+We also generally allow two kinds of compression, unix compression and gzip:
+
+Unix compression example filename : onsa0500.22d.Z
+
+gzip example filename : onsa0500.22o.gz
+
+We do not make any effort to find files with the zip ending. If your files have this ending,
+you must unzip them before running gnssrefl.
+
 
 **RINEX 3**
 
@@ -73,7 +106,7 @@ Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 * four zeroes, underscore,
 * 01D, underscore
 * ssS, underscore, M0.
-* followed by rnx (crx if it is Hatanaka format).
+* followed by rnx (crx if it is Hatanaka format). Note: these are lowercase
 
 01D means it is one day. Some of the other parts of the very 
 long station file name are no
@@ -83,8 +116,18 @@ gzipped but not unix compressed. If you want a
 generic translation program, you can try <code>rinex3_rinex2</code>.
 It has the requirement that you input the input and output file names.
 
-For a few archives, we allow 1 sample per second files (which are all 15 minutes long).  
-Please see the rinex2snr documentation page.
+For a few archives, we allow 1 sample per second files. Following the protocol of the 
+IGS, these files are unfortunately 15 minutes long, which means you have to download
+96 of them. UNAVCO/Earthscope is much friendlier about providing 1 sample per second files,
+and returns a single file, at least for RINEX 2.11.  
+
+If you want the code to be able to find those highrate files, you must tell the code you 
+want to use the -rate high files and provide -samplerate 1. Why two inputs?  Because the 
+-rate high option tells the code to look in a particular folder. The samplerate is related
+to the name of the file itself.  
+
+Please see the rinex2snr documentation page for more examples.
+
 
 **NMEA**
 
