@@ -6,7 +6,6 @@ Contents/shortcuts:
 * [gnssrefl Processing with Docker and your own data](#gnssrefl-Processing-with-Docker-and-your-own-data)
 * [About the Docker volume mount](#About-the-Docker-volume-mount)
 * [Update Docker Image to newest version](#Update-Docker-Image-to-newest-version)
-* [Notes:](#Notes)
 * [Shutdown Docker](#Shutdown-Docker)
 * [For WINDOWS Users](#For-WINDOWS-Users)
 
@@ -109,19 +108,15 @@ or
 
 `cd $REFL_CODE/Files/abcd`
 
+The first time you run this container from a specific path, the Earthscope token 
+will be installed once in the container at `/etc/gnssrefl/refl_code` and locally 
+at `/localpath_of_dockerrun/refl_code` (the volume you mounted with the `-v` command)
+
 I hope this helps. Post an issue on github if you have further confusion or clarifications.
 
 ### Update Docker Image to newest version
 
 `docker pull ghcr.io/kristinemlarson/gnssrefl:latest`
-
-### Notes
-
-The first time you run this container from a specific path, the Earthscope token 
-will be installed once in the container at `/etc/gnssrefl/refl_code` and locally 
-at `/localpath_of_dockerrun/refl_code` (the volume you mounted with the `-v` command)
-
-docker has vim for editing text files (ie .json station config file)
 
 ### Shutdown Docker 
 To exit down the container from the terminal, type `exit`
