@@ -29,7 +29,8 @@ Description of the commands used:
 
 `-it` calls interactive process (bin/bash shell) 
 
-`-v` mounts external volumes to allow the user to keep their processing results and figures 
+`-v` mounts external volumes to allow the user to keep their processing results and figures ([for more information on this](#About-the-volume-mount)
+ 
 
 Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
 
@@ -53,7 +54,7 @@ If you are new to linux, make sure you know the full name of this directory.  ty
 come back.  I will pretend that what came back is `/usr/kristine/local` for my example
 
 If you want to use GNSS data that are stored in archives, you can stop reading and just run the relevant commands provided above.
-If you want to use your own GNSS data with the docker, follow these steps. For convenience, here I will only cover RINEX 2.11 users. 
+If you want to use your own GNSS data with Docker, follow these steps. For convenience, here I will only cover RINEX 2.11 users. 
 The [naming conventions for RINEX files](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html) are 
 the same whether you run gnssrefl using a regular python install or the Docker. 
 
@@ -72,9 +73,11 @@ information there on how to store your RINEX 3 files.
 docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
 ```
 
+### About the volume mount:
+
 In addition to starting the Docker, it also associates a virtual directory 
 it calls `/etc/gnssrefl/refl_code` with a physical directory on your machine called `/usr/kristine/local/refl_code`.  This "mount" 
-results in a 1:1 mapping of files and folders in that path prefex.
+results in a 1:1 mapping of files and folders in that path prefix.
 
 Now that that is set up, you should be able to run different `gnssrefl` commands. Example:
 
