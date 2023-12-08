@@ -1,5 +1,16 @@
 # [Installing the gnssrefl docker image from the GitHub Container Registry](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
 
+Contents:
+1. [Install Docker](#Install-Docker)
+2. [Run Docker](#Run-gnssrefl-Docker)
+ a. [gnssrefl Processing with Docker and your own data](#gnssrefl-Processing-with-Docker-and-your-own-data)
+ b. [About the Docker volume mount](#About-the-Docker-volume-mount)
+ c. [Update Docker Image to newest version](#Update-Docker-Image-to-newest-version)
+ d. [Notes:](#Notes)
+ e. [Shutdown Docker](#Shutdown-Docker)
+3. [For WINDOWS Users](#For-WINDOWS-Users)
+
+
 Please send your feedback on these instructions to Tim Dittmann at EarthScope, or better still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
 
 for jupyter notebook version, please see [gnssrefl_jupyter instructions](https://www.unavco.org/gitlab/gnss_reflectometry/gnssrefl_jupyter)
@@ -16,30 +27,10 @@ More information on [getting started, testing your installation, and developing.
 [Docker Desktop](https://www.docker.com/products/docker-desktop) is a useful tool.
 
 ## Run gnssrefl Docker
+| :memo:        | To use EarthScope data, create [an EarthScope profile.](https://data.unavco.org/user/profile/info) |
+|---------------|:---------------------------------------------------------------------------------------------------|
 
-Reminder: If you want to process EarthScope data, you will need to create [an EarthScope profile.](https://data.unavco.org/user/profile/info).
-
-change directory into the local directory that you wish to keep your processed results
-
-```bash
-docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
-```
-
-Description of the commands used:  
-
-`-it` calls interactive process (bin/bash shell) 
-
-`-v` mounts external volumes to allow the user to keep their processing results and figures ([for more information on this](#About-the-volume-mount)
- 
-
-Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
-
-
-### Kristine's Docker advice 
-
-Here are my recommendations on how to use the code in the Docker, with special advice for using the nolook option.
-
-Open a window. You will be using linux commands. Make sure that you hit the return key after typing a command.
+1. Open a window. You will be using linux commands. Make sure that you hit the return key after typing a command.
 
 Ensure that you are using the latest docker : 
 
@@ -49,12 +40,26 @@ Make a directory where you plan to run the docker. I will call mine local, i.e. 
 
 Change into that directory,  `cd local`
 
-
 If you are new to linux, make sure you know the full name of this directory.  type `pwd` and see what
 come back.  I will pretend that what came back is `/usr/kristine/local` for my example
 
+2. Start the Docker container
+```bash
+docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
+```
+
+Description of the commands used:  
+
+`-it` calls interactive process (bin/bash shell) 
+
+`-v` mounts external volumes to allow the user to keep their processing results and figures ([for more information](#About-the-volume-mount))
+ 
+Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
+
 If you want to use GNSS data that are stored in archives, you can stop reading and just run the relevant commands provided above.
-If you want to use your own GNSS data with Docker, follow these steps. For convenience, here I will only cover RINEX 2.11 users. 
+
+### gnssrefl Processing with Docker and your own data
+If you want to use your own GNSS data with Docker, follow these additional steps prior to step 2) `docker run`. For convenience, here I will only cover RINEX 2.11 users. 
 The [naming conventions for RINEX files](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html) are 
 the same whether you run gnssrefl using a regular python install or the Docker. 
 
@@ -73,7 +78,7 @@ information there on how to store your RINEX 3 files.
 docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
 ```
 
-### About the volume mount:
+### About the Docker volume mount
 
 In addition to starting the Docker, it also associates a virtual directory 
 it calls `/etc/gnssrefl/refl_code` with a physical directory on your machine called `/usr/kristine/local/refl_code`.  This "mount" 
@@ -108,11 +113,11 @@ or
 
 I hope this helps. Post an issue on github if you have further confusion or clarifications.
 
-### Update Docker Image to newest version <a name="Update Docker"></a>
+### Update Docker Image to newest version
 
 `docker pull ghcr.io/kristinemlarson/gnssrefl:latest`
 
-### Notes:
+### Notes
 
 The first time you run this container from a specific path, the Earthscope token 
 will be installed once in the container at `/etc/gnssrefl/refl_code` and locally 
@@ -120,7 +125,7 @@ at `/localpath_of_dockerrun/refl_code` (the volume you mounted with the `-v` com
 
 docker has vim for editing text files (ie .json station config file)
 
-### Shutdown Docker <a name="Shutdown"></a>
+### Shutdown Docker 
 To exit down the container from the terminal, type `exit`
 
 After exiting, to re-enter this container, `docker start gnssrefl` followed by `docker exec -it gnssrefl /bin/bash`
@@ -132,7 +137,7 @@ If you need to see the container(s) you have running you can use `docker ps`
 If you need to see all container(s) you can use `docker container ls -a`
 
 
-## For WINDOWS USERS:
+## For WINDOWS Users
 (thank you Paul Wu and James Monaco @ Univ. of CO for this)
 
 1. Install [Docker for Windows](https://docs.docker.com/desktop/windows/install/)
@@ -178,7 +183,6 @@ If you modify the source code, you'll need to make the installation [editable](h
 `cd /usr/src/gnssrefl; pip install -e .`
 
 ## additional references:
-* [gnssrefl base image dockerfile](https://gitlab.com/gnss_reflectometry/gnssrefl_docker_base_img/-/blob/master/Dockerfile)
 * [gnssrefl docker file](https://github.com/kristinemlarson/gnssrefl/blob/master/Dockerfile)
 
 
