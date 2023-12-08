@@ -1,14 +1,14 @@
 # [Installing the gnssrefl docker image from the GitHub Container Registry](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
 
-Contents:
-1. [Install Docker](#Install-Docker)
-2. [Run Docker](#Run-gnssrefl-Docker)
- a. [gnssrefl Processing with Docker and your own data](#gnssrefl-Processing-with-Docker-and-your-own-data)
- b. [About the Docker volume mount](#About-the-Docker-volume-mount)
- c. [Update Docker Image to newest version](#Update-Docker-Image-to-newest-version)
- d. [Notes:](#Notes)
- e. [Shutdown Docker](#Shutdown-Docker)
-3. [For WINDOWS Users](#For-WINDOWS-Users)
+Contents/shortcuts:
+* [Install Docker](#Install-Docker)
+* [Run Docker](#Run-gnssrefl-Docker)
+* [gnssrefl Processing with Docker and your own data](#gnssrefl-Processing-with-Docker-and-your-own-data)
+* [About the Docker volume mount](#About-the-Docker-volume-mount)
+* [Update Docker Image to newest version](#Update-Docker-Image-to-newest-version)
+* [Notes:](#Notes)
+* [Shutdown Docker](#Shutdown-Docker)
+* [For WINDOWS Users](#For-WINDOWS-Users)
 
 
 Please send your feedback on these instructions to Tim Dittmann at EarthScope, or better still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
@@ -30,7 +30,7 @@ More information on [getting started, testing your installation, and developing.
 | :memo:        | To use EarthScope data, create [an EarthScope profile.](https://data.unavco.org/user/profile/info) |
 |---------------|:---------------------------------------------------------------------------------------------------|
 
-1. Open a window. You will be using linux commands. Make sure that you hit the return key after typing a command.
+Open a window. You will be using linux commands. Make sure that you hit the return key after typing a command.
 
 Ensure that you are using the latest docker : 
 
@@ -43,7 +43,7 @@ Change into that directory,  `cd local`
 If you are new to linux, make sure you know the full name of this directory.  type `pwd` and see what
 come back.  I will pretend that what came back is `/usr/kristine/local` for my example
 
-2. Start the Docker container
+Start the Docker container:
 ```bash
 docker run -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/  --name gnssrefl ghcr.io/kristinemlarson/gnssrefl:latest /bin/bash
 ```
@@ -54,9 +54,7 @@ Description of the commands used:
 
 `-v` mounts external volumes to allow the user to keep their processing results and figures ([for more information](#About-the-volume-mount))
  
-Now you can start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding)
-
-If you want to use GNSS data that are stored in archives, you can stop reading and just run the relevant commands provided above.
+If you want to use GNSS data that are stored in archives, you can stop reading and start working with the [gnssrefl code.](https://github.com/kristinemlarson/gnssrefl#understanding).
 
 ### gnssrefl Processing with Docker and your own data
 If you want to use your own GNSS data with Docker, follow these additional steps prior to step 2) `docker run`. For convenience, here I will only cover RINEX 2.11 users. 
