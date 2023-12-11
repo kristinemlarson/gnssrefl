@@ -8,14 +8,14 @@
 different than those shown here.**
 
 <p align="center">
-<img src="https://www.unavco.org/lib/images/dims/main.php?g2_view=core.DownloadItem&g2_itemId=449171" width="500"/>
+<img  src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/SC02.jpg" width="500"/>
 </P>
 
 **Station Name:** sc02
 
 **Location:** Friday Harbor, Washington, USA 
 
-**Archive:** [UNAVCO](http://www.unavco.org)
+**Archive:** UNAVCO
 
 **Ellipsoidal Coordinates:**
 

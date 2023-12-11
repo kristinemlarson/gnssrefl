@@ -12,8 +12,6 @@
 
 **Location:** Boulder, CO, USA
 
-**Archive:** [UNAVCO](http://www.unavco.org)
-
 **DOI:**  	[https://doi.org/10.7283/T5R49NQQ](https://doi.org/10.7283/T5R49NQQ)
 
 [Station Page at UNAVCO](https://www.unavco.org/instrumentation/networks/status/nota/overview/P041)

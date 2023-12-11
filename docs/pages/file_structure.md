@@ -132,7 +132,7 @@ Please see the rinex2snr documentation page for more examples.
 **NMEA**
 
 NMEA formats can be translated to SNR using <code>nmea2snr</code>.
-Inputs are similar to <code>rinex2snr</code>: 4char station name, year, and day of year
+Inputs are similar to be the 4char station name, year, and day of year
 NMEA files are assumed to be stored as:
 
 $REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
@@ -140,6 +140,11 @@ $REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
 for station ABCD in year 2021 and day of year 3.
 
 NMEA files may be gzipped.
+
+This is different that used for RINEX files and is entirely due to the wishes of the 
+people that contributed this code.  If you would like the code to also allow a traditional
+folder location ($REFL_CODE/2021/nmea/abcd or $REFL_CODE/2021/nmea/ABCD), I am fine with that. I ask 
+that you please submit a pull request.
 
 Additional information about nmea2snr [is in the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 

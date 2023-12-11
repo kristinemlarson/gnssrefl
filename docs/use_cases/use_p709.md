@@ -14,7 +14,7 @@
 Why does this photograph suggest that GNSS-IR should not work?
 <p>
 
-**Archive:** [UNAVCO](http://www.unavco.org)
+**Archive:** unavco
 
 **Ellipsoidal Coordinates:**
 

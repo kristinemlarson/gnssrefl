@@ -16,7 +16,7 @@
 
 **Location:**  Island Park, Idaho
 
-**Archive:**  [UNAVCO](http://www.unavco.org)
+**Archive:**  unavco
 
 **DOI:**  [https://doi.org/10.7283/T5DB7ZR3](https://doi.org/10.7283/T5DB7ZR3)
 

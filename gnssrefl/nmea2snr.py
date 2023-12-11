@@ -836,6 +836,11 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, g
                     NMEA2SNR(locdir, r, snrfile, csnr, dec, yr, dy, llh, sp3, gzip)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
+                    if os.path.isfile(locdir + r ):
+                        # gzip the NMEA file now
+                        print('gzip the NMEA file', locdir + r)
+                        subprocess.call(['gzip', locdir + r])
+                        # otherwise it is already gzipped?
                     if gzip:
                         if not snrfile.endswith('.gz'):
                             subprocess.call(['gzip', snrfile])

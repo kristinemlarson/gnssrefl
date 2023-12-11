@@ -325,10 +325,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     # better feel for whether current solution works. defintely needs to go in a function
 
                     if (len(newl) > reqNumpts): 
-                        k4 = qp.kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase, 
+                        k4= qp.kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase, 
                                          avg_date,avg_phase,warning_value,ftmp,remove_bad_tracks,k4,avg_exist )
                     else:
-                        print('No previous solution or not enough points for this satellite.', satellite)
+                        print('No previous solution or not enough points for this satellite.', int(satellite), amin, amax,len(newl))
 
                     adv_color = colors[ww:ww+1] # sets color for below
                     # stack this latest set of values to vxyz
@@ -347,9 +347,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     if advanced:
                         # sort for the smoothing ... cause ... you can imagine 
                         ik = np.argsort( fracyear)
-                        smoothAmps = scipy.signal.savgol_filter(normAmps[ik], window_length=31,polyorder=2 )
+                        try:
+                            smoothAmps = scipy.signal.savgol_filter(normAmps[ik], window_length=31,polyorder=2 )
                         #print('Satellite ', satellite, ' Npts ', len(smoothAmps), amin,amax)
-                        ax2[bx[index],by[index]].plot(fracyear[ik], smoothAmps, '-',color=adv_color)
+                            ax2[bx[index],by[index]].plot(fracyear[ik], smoothAmps, '-',color=adv_color)
+                        except:
+                            print('some issue with the smoothing')
                         ax2[bx[index],by[index]].plot(fracyear[ik], normAmps[ik], '.',color=adv_color,label=csat)
 
 
