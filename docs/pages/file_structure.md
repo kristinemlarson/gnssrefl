@@ -141,8 +141,8 @@ for station ABCD in year 2021 and day of year 3.
 
 NMEA files may be gzipped.
 
-This is different that used for RINEX files and is entirely due to the wishes of the 
-people that contributed this code.  If you would like the code to also allow a traditional
+This is different than the file structure we used for RINEX files and is entirely due to the wishes of the 
+people that contributed this code. If you would like the code to also allow a traditional
 folder location ($REFL_CODE/2021/nmea/abcd or $REFL_CODE/2021/nmea/ABCD), I am fine with that. I ask 
 that you please submit a pull request.
 

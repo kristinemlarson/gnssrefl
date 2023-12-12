@@ -1,11 +1,5 @@
-# Use Cases 
+# Example Use Cases 
 
-About 75% of these use cases use access to the Earthscope/UNAVCO 
-archive. In some cases, sopac can be used as an alternate archive. If at all 
-possible, you should [sign up for an EarthScope account.](https://data-idm.unavco.org/user/profile/login)
-
-Some of these use cases were created with an earlier version of the gnssrefl software.
-The plots might look slightly different and the defaults we used in the analysis might have changed.
 
 
 ## Ice Sheets
@@ -71,6 +65,12 @@ The plots might look slightly different and the defaults we used in the analysis
 
 * [Elbe River, Germany](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tggo.html)
 
+About 75% of these use cases use access to the Earthscope/UNAVCO 
+archive. In some cases, sopac can be used as an alternate archive. If at all 
+possible, you should [sign up for an EarthScope account.](https://data-idm.unavco.org/user/profile/login)
+
+Some of these use cases were created with an earlier version of the gnssrefl software.
+The plots might look slightly different and the defaults we used in the analysis might have changed.
 
 ## GPS Tool Box Demonstration
 
