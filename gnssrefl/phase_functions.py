@@ -1108,7 +1108,7 @@ def load_sat_phase(station, year, year_end, freq):
     return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results, amp_ls
 
 
-def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,subdir,plt,auto_removal):
+def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,subdir,plt,auto_removal,warning_value):
     """
 
     Parameters
@@ -1136,6 +1136,8 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         whether you want plots to come to the screen
     auto_removal : bool
         whther tracks should be removed when they fail QC
+    warning_value : float
+        phase RMS needed to trigger warning
 
     """
     # originally this was for command line interface ... 
@@ -1152,6 +1154,8 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         tmax = lsp['vwc_max_soil_texture']
     if 'vwc_minvalperday' in lsp:
         minvalperday = lsp['vwc_minvalperday']
+    if 'vwc_warning_value' in lsp:
+        warning_value = lsp['vwc_warning_value']
     if 'vwc_min_req_pts_track' in lsp:
         min_req_pts_track = lsp['vwc_min_req_pts_track']
 
@@ -1189,7 +1193,7 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
 
     print('minvalperday/tmin/tmax/min_req_tracks', minvalperday, tmin, tmax, min_req_pts_track)
 
-    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks
+    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks, warning_value
 
 def write_all_phase(v,fname,allrh,filestatus,rhtrack):
     """

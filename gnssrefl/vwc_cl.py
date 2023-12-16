@@ -149,8 +149,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for 
     # consistency with old adv vegetation code
 
-    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks = qp.set_parameters(station, 
-        minvalperday,tmin,tmax,min_req_pts_track, fr, year, year_end,subdir,plt, auto_removal)
+    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks, warning_value = \
+            qp.set_parameters(station, minvalperday, tmin,tmax, min_req_pts_track, 
+                              fr, year, year_end,subdir,plt, auto_removal,warning_value)
 
     snowfileexists = False
     if snow_filter:
