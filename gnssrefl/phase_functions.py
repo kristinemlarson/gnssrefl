@@ -99,36 +99,40 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     ----------
     station : str
         4 ch station name
-
     medfilter : float
         how much you allow the individual tracks to deviate from the daily median (meters)
-
-    ReqTracks : integer
+    ReqTracks : int
         number of tracks to compute trustworthy daily average
-
-    year1 : integer
+    year1 : int
         starting year
-
-    year2 : integer
+    year2 : int
         ending year
 
     Returns
     -------
-    snowmask_exists : boolean
+    snowmask_exists : bool
+        whether file was created
+    snow_file : str
+        name of the snow mask file
 
-    creates output file into a file $REFL_CODE/Files/snowmask_{ssss}.txt
+    creates output file into a file $REFL_CODE/Files/{ssss}/snowmask_{ssss}.txt
+    where ssss is the station name
 
     """
     myxdir = os.environ['REFL_CODE']
+    snowfile = myxdir + '/Files/' + station + '/snowmask_' + station + '.txt' 
+    if os.path.exists(snowfile):
+        print('Using existing snow filter file, ', snowfile)
+        snowmask_exists = True
+        return snowmask_exists,snowfile
+
     # l2c only
-    #txtfile = 'test_' + station + '.txt'; 
     txtfile = station + '_allRH.txt'; 
     pltit = False; extension = ''; fr = 20; csv = False
 
     # writes out a daily average file. woudl be better if it returned the values, but this works
     da.daily_avg(station, medfilter, ReqTracks, txtfile, pltit,
               extension, year1, year2, fr, csv) 
-
     avgf = myxdir + '/Files/' + station + '/' + txtfile
     print('Looking in ', avgf)
     x = np.loadtxt(avgf, comments='%')
@@ -140,7 +144,6 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     ii = (rh -medianvalue) < -0.05
     newx = x[ii,:] ; N=len(newx)
     if (N > 0):
-        snowfile = myxdir + '/Files/' + station + 'snowmask_' + station + '.txt' 
         print('Suspect snow values stored in : ', snowfile)
         snow = open(snowfile, 'w+')
         for i in range(0,N):
@@ -148,14 +151,11 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
             print('Suspect Snow Day : ', int(newx[i,0]), int(newx[i,1]))
             snow.write("{0:4.0f}  {1:3.0f} {2:8.3f}  \n".format( newx[i,0], newx[i,1], sv))
         snow.close()
-    # now that you saved what you need from daily average file, delete it.
-
-        snowmask_exists = True
-    else:
+    subprocess.call(['rm','-f',avgf])
+    if not os.path.exists(snowfile):
         snowmask_exists = False
-    subprocess.call(['rm',avgf])
 
-    return snowmask_exists
+    return snowmask_exists, snowfile
 
 def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
     """
@@ -1158,6 +1158,10 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         warning_value = lsp['vwc_warning_value']
     if 'vwc_min_req_pts_track' in lsp:
         min_req_pts_track = lsp['vwc_min_req_pts_track']
+    if 'vwc_min_norm_amp' in lsp:
+        min_norm_amp = lsp['vwc_min_norm_amp']
+    else:
+        min_norm_amp = 0.5  # trying this out
 
     if (len(station) != 4):
         print('station name must be four characters')
@@ -1193,7 +1197,8 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
 
     print('minvalperday/tmin/tmax/min_req_tracks', minvalperday, tmin, tmax, min_req_pts_track)
 
-    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks, warning_value
+    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, \
+            plt, remove_bad_tracks, warning_value, min_norm_amp
 
 def write_all_phase(v,fname,allrh,filestatus,rhtrack):
     """

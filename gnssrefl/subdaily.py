@@ -229,7 +229,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     otimes : datetime object 
         times of observations 
     fname : str
-        initial result file - collated
+        initial result file - colated
     fname_new : str
         result file with outliers removed
 
@@ -610,6 +610,7 @@ def flipit(tvd,col):
 
     col : integer
         column number (in normal speak) of the RH results
+        in python-speak, this has one subtracted
 
     Returns
     -------
@@ -811,6 +812,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         return
 
     # sort the data in time
+    # change to use MJD
     ii = np.argsort( (tvd[:,1]+tvd[:,4]/24) ).T
     tvd = tvd[ii,:]
 
@@ -984,7 +986,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     biasCorrected_RH = correctedRH_new
 
     print('----------------------------------------------------------\n')
-    print('Check inter-frequency biases for GPS, Glonass, and Galileo\n')
+    print('Check inter-frequency biases for GPS, Glonass, Galileo, and Beidou \n')
 
     if 1 not in tvd_new[:,10]:
         print('Biases are computed with respect to the average of all constellations')
@@ -1091,9 +1093,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     badpoints2 = sd.subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, 
                                                fs, strsig, hires_figs,txtdir, ii,jj,th_even, spline_whole_time)
     H0 = sd.find_ortho_height(station,extension)
-    # new version that writes out file and makes plot .... 
+    # this writes out spline file and makes plot .... 
     sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
-    #sd.RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
     print('\nRMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
 
 
@@ -1107,10 +1108,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # write outliers to a file ... again ... 
     sd.writeout_spline_outliers(new_outliers,txtdir,badpoints2,'outliers.spline2.txt')
 
-    # this is done in RH_ortho_plot2 now
-    #year = int(tvd[0,0]);
-    #if splineout:
-    #    sd.write_spline_output(year, th, spline, delta_out,station,txtdir,H0)
 
     return tvd, correction
 

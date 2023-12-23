@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as mplt
 
 import os
-import sys
 import subprocess
+import sys
 
 import gnssrefl.gps as g
 import gnssrefl.subdaily as t
@@ -45,6 +45,7 @@ def parse_arguments():
     parser.add_argument("-fs", default=None, type=int, help="fontsize for figures. default is 10")
     parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate sigma definition. default is False")
     parser.add_argument("-gap_min_val", default=None, type=float, help="min gap allowed in splinefit output file. default is 6 hours")
+    parser.add_argument("-year_end", default=None, type=int, help="testing implementation of multi-year inputs")
 
     args = parser.parse_args().__dict__
 
@@ -62,7 +63,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.4, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0, 
-             hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0):
+             hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0,
+             year_end: int=None):
     """
     Subdaily combines multiple day gnssir solutions and applies relevant corrections. 
     It only works for one year at a time; you can restricts time periods within a year with -doy1 and -doy2
@@ -180,10 +182,11 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     alt_sigma : bool, optional
         whether you want to use Nievinski definition for outlier criterion.
         in part 1 of the code (the crude outlier detector)
-
     gap_min_val : float, optional
         removes splinefit values from output txt and plot for gaps 
         bigger than this value, in hours
+    year_end : int, optional
+        testing allowing multiple year inputs
 
     """
 
@@ -221,8 +224,12 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         print('>>>> WARNING: csvfile option is currently turned off.  We are working to add it back.')
         csvfile = False
 
+    outputs = [] # this is for multiple years
+
     if csvfile:
         writecsv = True
+    if year_end is None: 
+        year_end = year
 
     if txtfile_part2 is None:
         if txtfile_part1 == '':
@@ -232,9 +239,14 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         # if txtfile provided, you can use that as your starting dataset 
         
         default_usage = True
-        ntv, obstimes, fname, fname_new = t.readin_and_plot(station, year, doy1, doy2, plt, 
-                extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile_part1, 
-                h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma)
+
+        for y in range(year,year_end+1):
+            print(y)
+            ntv, obstimes, fname, fname_new = t.readin_and_plot(station, y, doy1, doy2, plt, \
+                    extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile_part1, \
+                    h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma)
+            outputs.append(fname_new)
+
         haveObstimes = True
     else:
         haveObstimes = False
@@ -247,7 +259,13 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     if not rhdot:
         if plt:
             mplt.show()
-    input2spline = fname_new; output4spline = fname_new + '.withrhdot'
+    # if mutli-year, this could be concatenated ...
+    if year_end == year:
+        input2spline = fname_new; output4spline = fname_new + '.withrhdot'
+    else:
+        print(outputs)
+        sys.exit()
+
 
     # not sure why tv and corr are being returned.
     if rhdot:

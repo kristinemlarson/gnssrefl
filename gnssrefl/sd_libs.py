@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from astropy.time import Time
 
-# my code
+# gnssrefl specific code
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
 
@@ -516,6 +516,7 @@ def writeout_spline_outliers(tvd_bad,txtdir,residual,filename):
             fy = tvd_bad[w,1] + tvd_bad[w,4]/24 # fractional day of year
             deltaT = tvd_bad[w,14]
             mjd = tvd_bad[w,15]
+            # average elevation angle
             elAv = 0.5*(tvd_bad[w,8] + tvd_bad[w,7])
             fout.write('{0:3.0f} {1:7.2f} {2:7.2f} {3:7.2f} {4:9.3f} {5:15.7f} {6:7.2f} {7:7.2f} {8:5.2f}\n'.format( 
                 tvd_bad[w,3], tvd_bad[w,5], deltaT,residual[w],fy,mjd,tvd_bad[w,2],elAv,tvd_bad[w,13]))

@@ -183,6 +183,9 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100,
     # read in existing information
     lsp = guts2.read_json_file(station, extension)
 
+    # new one for minimum normalized amplitude
+    lsp['vwc_min_norm_amp'] = 0.5;
+
     # save the vwc specific values that might be useful
     lsp['vwc_warning_value'] = warning_value
     lsp['vwc_min_soil_texture'] = tmin

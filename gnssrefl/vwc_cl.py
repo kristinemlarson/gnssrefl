@@ -149,7 +149,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for 
     # consistency with old adv vegetation code
 
-    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks, warning_value = \
+    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks, warning_value,min_norm_amp = \
             qp.set_parameters(station, minvalperday, tmin,tmax, min_req_pts_track, 
                               fr, year, year_end,subdir,plt, auto_removal,warning_value)
 
@@ -158,7 +158,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         medf = 0.2 # this is meters
         ReqTracks = 10 # have a pretty small number here
         print('You have chosen the snow filter option')
-        snowfileexists = qp.make_snow_filter(station, medf, ReqTracks, year, year_end+1)
+        snowfileexists,snow_file = qp.make_snow_filter(station, medf, ReqTracks, year, year_end+1)
         matplt.close ('all')# we do not want the plots to come to the screen for the daily average
 
 
@@ -168,13 +168,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     # this is where it loads the data and outputs the results into variables.  currently picks ou 
     # amplitude (amp), but it should also pick out ampRH for consistency.
 
+    # using variable called amp is too confusing - explicitly saying amp_lsp and amp_ls for the 
+    # two methods, lomb scargle periodogram and least squares
     if snowfileexists and snow_filter :
         print('using snow filter code')
         # use same variables as existing code
-        data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp,ext,amp_ls = qp.filter_out_snow(station, 
+        data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp,ext,amp_ls = qp.filter_out_snow(station, 
                 year, year_end, fr,snow_file)
     else:
-        data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp,ext,amp_ls = qp.load_sat_phase(station, 
+        data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp,ext,amp_ls = qp.load_sat_phase(station, 
                 year, year_end=year_end, freq=freq)
 
     if not data_exist:
@@ -202,17 +204,18 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     k = 1
     # define the contents of this variable HERE
     vxyz = np.empty(shape=[0, 11]) 
-    # year
-    # doy ?
-    # phase : degrees
-    # azimuth
-    # satellite
-    # reflector height
-    # LSP amplitude
-    # LS amplitude, 
-    # hour of day, UTC
-    # raw LSP, for advanced setting
-    # raw LS amp, for advanced setting
+    # column, contents of this variable
+    # 0 year
+    # 1 doy 
+    # 2 phase : degrees
+    # 3 azimuth
+    # 4 satellite
+    # 5 reflector height
+    # 6 LSP amplitude
+    # 7 LS amplitude, 
+    # 8 hour of day, UTC
+    # 9 raw LSP, for advanced setting
+    # 10 raw LS amp, for advanced setting
     #
 
     # this is the number of points for a given satellite track
@@ -266,7 +269,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                 print('Looking at ', int(satellite), amin, amax)
             # indices for the satellite and quadrant you want to look at here
             ii = (ssat == satellite) & (azdata > amin) & (azdata < amax) & (phase < 360)
-            y,t,h,x,azd,s,amps,amps_ls,rhs = qp.rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp, amp_ls, rh, ii)
+            y,t,h,x,azd,s,amp_lsps,amp_lss,rhs = qp.rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp_lsp, amp_ls, rh, ii)
 
             iikk  = (atracks == amin) & (stracks == satellite) 
             rhtrack = float(tracks[iikk,1]) # a priori RH
@@ -283,7 +286,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                 new_phase = -(x-medv)
                 ii = (new_phase > -20)
 
-                y,t,h,new_phase,azd,s,amps,amps_ls,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amps, amps_ls, rhs, ii)
+                y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amp_lsps, amp_lss, rhs, ii)
 
                 if len(t) == 0:
                     print('you should consider removing this satellite track as there are no results', satellite, amin)
@@ -302,7 +305,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     if advanced:
                         ii = (new_phase > -30) & (new_phase < 100)
 
-                    y,t,h,new_phase,azd,s,amps,amps_ls,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amps, amps_ls, rhs, ii)
+                    y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amp_lsps, amp_lss, rhs, ii)
 
                     sortY = np.sort(new_phase)
                     # looks like I am using the bottom 20% 
@@ -314,9 +317,22 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     newl = np.vstack((y, t, new_phase, azd)).T
                     vquad = np.vstack((vquad, newl))
 
+                    # this is to normalize the amplitudes. use base 15% to set it
                     basepercent = 0.15
-                    normAmps = qp.normAmp(amps, basepercent) ; norm_ampsLS= qp.normAmp(amps_ls, basepercent)
-                    newl = np.vstack((y, t, new_phase, azd, s, rhs, normAmps,norm_ampsLS,h,amps,amps_ls)).T
+                    # these are?
+                    norm_ampLSP = qp.normAmp(amp_lsps, basepercent) ; 
+                    # these are?
+                    norm_ampLS= qp.normAmp(amp_lss, basepercent)
+
+                    # sort of an ad hoc snow filter
+                    ii = (norm_ampLSP > 0.5)
+                    y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amp_lsps, amp_lss, rhs, ii)
+                    norm_ampLSP = norm_ampLSP[ii]
+                    norm_ampLS = norm_ampLS[ii]
+                    fracyear = fracyear[ii]
+
+                    newl = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss)).T
+
 
                     # write latest values for advanced option ... 
                     if (len(newl) > reqNumpts) and advanced:
@@ -349,12 +365,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                         # sort for the smoothing ... cause ... you can imagine 
                         ik = np.argsort( fracyear)
                         try:
-                            smoothAmps = scipy.signal.savgol_filter(normAmps[ik], window_length=31,polyorder=2 )
+                            smoothAmps = scipy.signal.savgol_filter(norm_ampLSP[ik], window_length=31,polyorder=2 )
                         #print('Satellite ', satellite, ' Npts ', len(smoothAmps), amin,amax)
                             ax2[bx[index],by[index]].plot(fracyear[ik], smoothAmps, '-',color=adv_color)
                         except:
                             print('some issue with the smoothing')
-                        ax2[bx[index],by[index]].plot(fracyear[ik], normAmps[ik], '.',color=adv_color,label=csat)
+                        ax2[bx[index],by[index]].plot(fracyear[ik], norm_ampLSP[ik], '.',color=adv_color,label=csat)
 
 
         # now add things to the plots for the whole quadrant, like labels and grid lines
