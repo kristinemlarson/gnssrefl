@@ -30,8 +30,7 @@ def parse_arguments():
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 50")
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
     parser.add_argument("-minvalperday", default=None, type=int, help="min number of satellite tracks needed each day. Default is 10")
-    parser.add_argument("-snow_filter", default=None, type=str, help="boolean for attempting to remove days contaminated by snow")
-    parser.add_argument("-circles", default=None, type=str, help="boolean for circles instead of lines for the final VWC plot ")
+    parser.add_argument("-snow_filter", default=None, type=str, help="boolean, try to remove snow contaminated points.")
     parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
     parser.add_argument("-tmin", default=None, type=float, help="minimum soil texture. Default is 0.05.")
     parser.add_argument("-tmax", default=None, type=float, help="maximum soil texture. Defafult is 0.50.")
@@ -39,11 +38,10 @@ def parse_arguments():
     parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
     parser.add_argument("-advanced", default=None, type=str, help="Whether you want to implement advanced veg model (in development)")
-    parser.add_argument("-sat_legend", default=None, type=str, help="Whether you want PRN numbers displayed") 
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt','screenstats','snow_filter','circles','auto_removal','hires_figs','advanced','sat_legend']
+    boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
@@ -51,9 +49,8 @@ def parse_arguments():
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool = True, screenstats: bool = False, 
         min_req_pts_track: int = 150, polyorder: int = -99, minvalperday: int = 10, 
-        snow_filter: bool = False, circles: bool=False, subdir: str=None, tmin: float=None, tmax: float=None, 
-        warning_value : float=5.5, auto_removal : bool=False, hires_figs : bool=False, advanced : bool=False, 
-        sat_legend : bool=True):
+        snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None, 
+        warning_value : float=5.5, auto_removal : bool=False, hires_figs : bool=False, advanced : bool=False ):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
     It concatenates previously computed phase results, makes plots for the four geographic quadrants, computes daily 
@@ -105,8 +102,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     snow_filter: bool
         whether you want to attempt to remove points contaminated by snow
         default is False
-    circles : bool
-        whether you want circles in the final plot (lines are default)
     subdir: str
         subdirectory in $REFL_CODE/Files for plots and text file outputs
     tmin: float
@@ -124,10 +119,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
          default value is false
     advanced : bool, optional
          advanced veg model implmentation. Currently in testing
-    sat_legend: bool, optional
-         whether you want PRN numbers displayed on the phase results.
-         makes it a bit easier to figure out the so-called bad satellites
-         currently only on the advanced option
 
     Returns
     -------
@@ -141,19 +132,23 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     """
     fs =10 # fontsize
+    snow_file = None
     colors = 'mrgbcykmrgbcykmrbcykmrgbcykmrgbcykmrbcyk'
     # plotting indices for phase data
     by=[0,1,0,1]; bx=[0,0,1,1]
-    # azimuth list
+    # azimuth list, starting point only (i.e. 270 means 270 thru 360)
     azlist = [270, 0, 180,90 ]
-    oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for 
     # consistency with old adv vegetation code
+    oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for 
 
-    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, remove_bad_tracks, warning_value,min_norm_amp = \
+    # pick up the parameters used for this code
+    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, \
+            remove_bad_tracks, warning_value,min_norm_amp,sat_legend,circles= \
             qp.set_parameters(station, minvalperday, tmin,tmax, min_req_pts_track, 
                               fr, year, year_end,subdir,plt, auto_removal,warning_value)
 
     snowfileexists = False
+    # if you have requested snow filtering
     if snow_filter:
         medf = 0.2 # this is meters
         ReqTracks = 10 # have a pretty small number here
@@ -161,27 +156,23 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         snowfileexists,snow_file = qp.make_snow_filter(station, medf, ReqTracks, year, year_end+1)
         matplt.close ('all')# we do not want the plots to come to the screen for the daily average
 
-
     # load past VWC analysis  for QC
     avg_exist, avg_date, avg_phase = qp.load_avg_phase(station,freq)
 
-    # this is where it loads the data and outputs the results into variables.  currently picks ou 
-    # amplitude (amp), but it should also pick out ampRH for consistency.
-
     # using variable called amp is too confusing - explicitly saying amp_lsp and amp_ls for the 
     # two methods, lomb scargle periodogram and least squares
-    if snowfileexists and snow_filter :
-        print('using snow filter code')
-        # use same variables as existing code
-        data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp,ext,amp_ls = qp.filter_out_snow(station, 
-                year, year_end, fr,snow_file)
-    else:
-        data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp,ext,amp_ls = qp.load_sat_phase(station, 
-                year, year_end=year_end, freq=freq)
+    # use same variables as existing code
+    data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp,amp_ls,ap_rh, results = \
+            qp.load_phase_filter_out_snow(station, year, year_end, fr,snow_file)
+
 
     if not data_exist:
         print('No data were found. Check your frequency request or station name')
         sys.exit()
+
+    print('try using unwrapped phase')
+    phase = results[17,:]
+    print(results.shape)
 
     
     # pick up the tracks you will use to compute phase.  THis was previously
@@ -216,7 +207,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     # 8 hour of day, UTC
     # 9 raw LSP, for advanced setting
     # 10 raw LS amp, for advanced setting
-    #
+    # need to add
+    # 11 apriori RH
 
     # this is the number of points for a given satellite track
     # just reassigning hte variable name
@@ -228,7 +220,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     
     # checking each geographic quadrant
     k4 = 1
-    # two list of tracks - lets you compare an old run with a new run
+    # two list of tracks - lets you compare an old run with a new run as a form of QC
     newlist = station + '_tmp.txt'
     oldlist = xdir + '/input/' + station + '_phaseRH.txt'
 
@@ -239,12 +231,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     fig,ax = matplt.subplots(2, 2, figsize=(10,10))
     matplt.suptitle(f"Station: {station}", size=12)
 
-    # open up a second plot for the amplitudes
+    # open up a second plot for the amplitudes in the advanced option
     if advanced: 
-        # open file , write the header
+        # opens the file , writes a header
         fname_phase = f'{xdir}/Files/{subdir}/{station}_{str(year)}_all_phase.txt'
-        print('Writing interim phase values to ', fname_phase)
-        allph = qp.write_all_phase(vxyz,fname_phase,[],1,[])
+        #allph = qp.write_all_phase(vxyz,fname_phase,[],1,[])
 
         fig2,ax2 = matplt.subplots(2, 2, figsize=(10,10))
         matplt.suptitle(f"Lomb Scargle amplitudes: {station}", size=12)
@@ -259,17 +250,17 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         # pick up the sat list from the actual list
         satlist = stracks[atracks == amin]
 
-        # set the titles
+        # set the titles for the two plots
         ax[bx[index],by[index]].set_title(f'Azimuth {str(amin)}-{str(amax)} deg.',fontsize=fs)
         if advanced:
             ax2[bx[index],by[index]].set_title(f'Azimuth {str(amin)}-{str(amax)} deg.',fontsize=fs)
 
         for satellite in satlist:
-            if screenstats:
-                print('Looking at ', int(satellite), amin, amax)
-            # indices for the satellite and quadrant you want to look at here
+            # set the indices for the satellite and quadrant you want to look at here
             ii = (ssat == satellite) & (azdata > amin) & (azdata < amax) & (phase < 360)
             y,t,h,x,azd,s,amp_lsps,amp_lss,rhs = qp.rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp_lsp, amp_ls, rh, ii)
+            if screenstats:
+                print('Looking at ', int(satellite), amin, amax,' Num vals', len(y))
 
             iikk  = (atracks == amin) & (stracks == satellite) 
             rhtrack = float(tracks[iikk,1]) # a priori RH
@@ -284,6 +275,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                 # use median value instead
                 medv = np.median(sortY[(N-NN):(N-1)])
                 new_phase = -(x-medv)
+                if screenstats:
+                   print('here99')
+                # this might be a problem ????
                 ii = (new_phase > -20)
 
                 y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amp_lsps, amp_lss, rhs, ii)
@@ -294,7 +288,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                 if (len(t) > reqNumpts):
                     ww = ww + 1 # index for plotting in a quadrant
 
-                    # not sure why this is done in a loop
+                    # not sure why this is done in a loop - and why it is even here????
                     for l in range(0, len(t)-1):
                         if new_phase[l] > 340:
                             new_phase[l] = new_phase[l] - 360
@@ -316,6 +310,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
                     newl = np.vstack((y, t, new_phase, azd)).T
                     vquad = np.vstack((vquad, newl))
+                    if screenstats:
+                        print('here0')
 
                     # this is to normalize the amplitudes. use base 15% to set it
                     basepercent = 0.15
@@ -324,19 +320,23 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     # these are?
                     norm_ampLS= qp.normAmp(amp_lss, basepercent)
 
-                    # sort of an ad hoc snow filter
-                    ii = (norm_ampLSP > 0.5)
-                    y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amp_lsps, amp_lss, rhs, ii)
-                    norm_ampLSP = norm_ampLSP[ii]
-                    norm_ampLS = norm_ampLS[ii]
-                    fracyear = fracyear[ii]
+                    # sort of an ad hoc snow filter - was trying it out.
+                    adhoc_snow = False
+                    if adhoc_snow:
+                        ii = (norm_ampLSP > 0.5)
+                        y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs = qp.rename_vals(y, t, h, new_phase, azd, s, amp_lsps, amp_lss, rhs, ii)
+                        norm_ampLSP = norm_ampLSP[ii]
+                        norm_ampLS = norm_ampLS[ii]
+                        fracyear = fracyear[ii]
 
                     newl = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss)).T
 
 
                     # write latest values for advanced option ... 
-                    if (len(newl) > reqNumpts) and advanced:
-                        qp.write_all_phase(newl,'',allph,2, rhtrack)
+                    #if (len(newl) > reqNumpts) and advanced:
+                    #    qp.write_all_phase(newl,'',allph,2, rhtrack)
+                    if screenstats:
+                        print('here1')
 
                     # this is a kind of quality control -use previous solution to have 
                     # better feel for whether current solution works. defintely needs to go in a function
@@ -367,10 +367,13 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                         try:
                             smoothAmps = scipy.signal.savgol_filter(norm_ampLSP[ik], window_length=31,polyorder=2 )
                         #print('Satellite ', satellite, ' Npts ', len(smoothAmps), amin,amax)
-                            ax2[bx[index],by[index]].plot(fracyear[ik], smoothAmps, '-',color=adv_color)
+                            # turn off for now
+                            #ax2[bx[index],by[index]].plot(fracyear[ik], smoothAmps, '-',color=adv_color)
                         except:
                             print('some issue with the smoothing')
-                        ax2[bx[index],by[index]].plot(fracyear[ik], norm_ampLSP[ik], '.',color=adv_color,label=csat)
+                        # not sure this will work
+                        ax2[bx[index],by[index]].plot(datetime_dates, norm_ampLSP, '.',color=adv_color,label=csat)
+                        #ax2[bx[index],by[index]].plot(fracyear[ik], norm_ampLSP[ik], '.',color=adv_color,label=csat)
 
 
         # now add things to the plots for the whole quadrant, like labels and grid lines
@@ -391,6 +394,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
         # for normalized amplitude
         if advanced:
+            fig2.autofmt_xdate() # set for datetime
             ax2[bx[index],by[index]].grid()
             if sat_legend and (ww > 0):
                 ax2[bx[index],by[index]].legend(loc='upper right',fontsize=fs-2)
@@ -414,7 +418,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     if advanced:
         print('Still working on the advanced option. Exiting.')
         # close the "allthephase" file
-        allph.close()
+        #allph.close()
 
         if plt:
             matplt.show()

@@ -92,8 +92,13 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs):
 
 def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     """
-    runs daily_avg code so you have some idea of when the soil moisture products are 
-    contaminated by snow. make a file with these years and doys saved
+    Runs daily_avg code to make a snow mask file.  This is 
+    so you have some idea of when the soil moisture products are 
+    contaminated by snow. Make a file with these years and doys saved. The user can
+    edit if they feel the suggestsions are poor (i.e. days in the summer might show up
+    as "snow")
+
+    If snow mask file exists, it does not overwrite it.
 
     Parameters
     ----------
@@ -115,14 +120,15 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     snow_file : str
         name of the snow mask file
 
-    creates output file into a file $REFL_CODE/Files/{ssss}/snowmask_{ssss}.txt
+    Creates output file into a file $REFL_CODE/Files/{ssss}/snowmask_{ssss}.txt
     where ssss is the station name
 
     """
+    snowmask_exists = False
     myxdir = os.environ['REFL_CODE']
     snowfile = myxdir + '/Files/' + station + '/snowmask_' + station + '.txt' 
     if os.path.exists(snowfile):
-        print('Using existing snow filter file, ', snowfile)
+        print('Using existing snow mask file, ', snowfile)
         snowmask_exists = True
         return snowmask_exists,snowfile
 
@@ -152,8 +158,13 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
             snow.write("{0:4.0f}  {1:3.0f} {2:8.3f}  \n".format( newx[i,0], newx[i,1], sv))
         snow.close()
     subprocess.call(['rm','-f',avgf])
-    if not os.path.exists(snowfile):
-        snowmask_exists = False
+    if os.path.exists(snowfile):
+        snowmask_exists = True
+    else:
+        print('I tried to make a snow mask file for you - but it did not work. This is most likely because ')
+        print('this is a limited site, i.e. fewer tracks than the code wants. Go ahead and make one by hand,')
+        print('plain text of year,doy is all you need ', snowfile)
+        snowfile = None
 
     return snowmask_exists, snowfile
 
@@ -310,35 +321,26 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
     ----------
     station name : string
         4 char id, lowercase
-    year : integer
-
-    doy : integer
+    year : int
+        calendar year
+    doy : int
         day of year
-
-    snr_type : integer
-        is the file extension (i.e. 99, 66 etc)
-
+    snr_type : int
+        SNR file extension (i.e. 99, 66 etc)
     fr_list : list of integers
         frequency, [1], [20] or [1,20] 
-
     e1 : float
         min elevation angle (degrees)
-
     e2 : float 
         max elevation angle (degrees)
-
     pele : list of floats 
         elevation angle limits for the polynomial removal.  units: degrees
-
-    screenstats : boolean
+    screenstats : bool
         whether statistics are printed to the screen
-
-    compute_lsp : boolean
-        this is always true
-
-    gzip : boolean
+    compute_lsp : bool
+        this is always true for now
+    gzip : bool
         whether you want SNR files gzipped after running the code
-
     Only GPS frequencies are allowed because this relies on the repeating ground track.
 
     """
@@ -358,7 +360,6 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
     # noise region - hardwired for normal sites ~ 2-3 meters tall
     noise_region = [0.5, 8]
-
 
     if not snrexist:
         print('No SNR file on this day.')
@@ -842,66 +843,73 @@ def apriori_file_exist(station,fr):
     
     return os.path.exists(apriori_path_f) 
 
-def filter_out_snow(station, year1, year2, fr,snowmask):
+def load_phase_filter_out_snow(station, year1, year2, fr,snowmask):
     """
-    attempt to remove outliers from snow. only called if the snow filter file exists
+    Attempt to remove outliers from snow if snowmask provided. 
 
     Parameters
     ----------
     station : str
         four character station name
 
-    year1 : integer
+    year1 : int
         starting year
-    year2 : integer
+    year2 : int
         ending year
-    fr : integer
+    fr : int
         frequency, i.e. 1 or 20
     snowmask : str
         name/location of the snow mask file
+        None if this value is not going to be used
 
     Returns
     -------
     dataexist : bool
-
-    year:
-
-    doy :
-
-    hr :
-
-    ph :
-
-    azdata :
-
-    ssat  :
-
-    rh :
-
-    amp : 
-
-    results_trans :
-
-    amp_ls :
+        whether phase data were found
+    year : numpy array of int
+        calendar years
+    doy : numpy array of int
+        day of year
+    hr : numpy array of floats
+        UTC hour of measurement
+    ph : numpy array of floats
+        LS phase estimates
+    azdata : numpy array of floats
+        average azimuth, degrees
+    ssat  : numpy array of int
+        satellite number
+    rh : numpy array of floats
+        reflector height, meters
+    amp_lsp : numpy array of floats
+        lomb scargle periodogram amplitude
+    amp_ls : numpy array of floats
+        least squares amplitude
+    ap_rh : numpy array of floats
+        apriori rh
+    results_trans : numpy array
+        all phase results concatenated into numpy array
+        plus column for quadrant and unwrapped phase
 
     """
-    xdir = os.environ['REFL_CODE']
-    found_override = False
-    if os.path.exists(snowmask):
-        print('found snow file')
-        override = np.loadtxt(snowmask, comments='%')
-        found_override = True
-
 #   now load the phase data
     newresults = []
     results_trans = []
-    #vquad = np.vstack((vquad, newl))
     vquad = np.empty(shape=[0, 16])
+    xdir = os.environ['REFL_CODE']
+    # output will go to 
+    fname = xdir + '/Files/' + station + '/raw.phase'  
 
-    if found_override:
-        dataexist, year, doy, hr, ph, azdata, ssat, rh, amp,results,amp_ls = load_sat_phase(station, year1,year2, fr)
+    dataexist, results = load_sat_phase(station, year1,year2, fr)
+    results = results.T # backwards for consistency
+    if snowmask == None:
+        nr,nc = np.shape(results)
+        if nr > 0:
+            print('Number of rows and columns ', nr,nc)
+            raw = write_out_raw_phase(results,fname)
+    else:
+        print('Snow mask should exist')
+        override = np.loadtxt(snowmask, comments='%')
         # results were originally transposed - so untransposing them 
-        results = results.T
         for year in range(year1,year2+1):
             ii = (results[:,0] == year) & (results[:,12] == fr)
         # it is easier for me to do this year by year
@@ -920,36 +928,59 @@ def filter_out_snow(station, year1, year2, fr,snowmask):
             newresults = np.append(newresults, masked_results)
             #vquad = np.vstack((vquad, thisyear_results[mask] ) )
             vquad = np.append(vquad, masked_results,axis=0)
+    #  
+        nr,nc = np.shape(vquad)
+        if nr > 0:
+            print('Number of rows and columns after snow filter ', nr,nc)
+            raw = write_out_raw_phase(vquad,fname)
 
-    # change to numpy?
-    nr,nc = np.shape(vquad)
-    print('Number of rows and columns now ', nr,nc)
+    #  raw should have two extra columns
+    rtrans= np.transpose(raw)
 
-    # 
-    results_trans= np.transpose(vquad)
-
-    print(np.shape(results_trans))
-
-    if len(results_trans) == 0:
-        print('no data ')
+    if len(rtrans) == 0:
+        print('no results ')
         dataexist = False
         year = []; doy = []; hr = []; ph = []; azdata = []; ssat = []
-        rh = []; amp = []; amp_ls=[]
+        rh = []; amp_lsp = []; amp_ls=[]; ap_rh = []
     else:
         dataexist = True
         # save with new variable names
-        year = results_trans[0]
-        doy = results_trans[1]
-        hr = results_trans[2]
-        ph = results_trans[3]
-        azdata = results_trans[5]
-        ssat = results_trans[6]
-        rh = results_trans[13]
-        amp = results_trans[15]
-        amp_ls = results_trans[7]
+        year = rtrans[0]
+        doy = rtrans[1]
+        hr = rtrans[2]
+        ph = rtrans[3]
+        azdata = rtrans[5]
+        ssat = rtrans[6]
+        amp_ls = rtrans[7]
+        ap_rh = rtrans[11]
+        rh = rtrans[13]
+        amp_lsp = rtrans[15]
 
-# use same return command as in the original function
-    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results_trans, amp_ls
+    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp_lsp, amp_ls, ap_rh, rtrans
+
+
+def help_debug(rt,xdir, station):
+    """
+    Takes the input of phase files, read by other functions, and writes out a 
+    file to help with debugging  (comparion of matlab and python codes)
+
+    rt : numpy array of floats
+        contents of the phase files stored in a numpy array 
+    xdir : str
+        where the otuput should be written
+    station : str
+        name of the station
+
+    """
+    fname = xdir + '/Files/' + station +'/tmp.' + station
+    # don't have a priori rh values at this point
+    rhtrack = 0
+    #if True:
+        # open the file
+        #debug = write_all_phase(rt,fname,None,1,rhtrack)
+        # write to the file
+    #    debug = write_all_phase(rt,fname,debug,2,rhtrack)
+    #    debug.close()
 
 
 def load_avg_phase(station,fr):
@@ -1005,7 +1036,7 @@ def load_avg_phase(station,fr):
 def load_sat_phase(station, year, year_end, freq):
     """
     Picks up the phase estimates from local (REFL_CODE) results section
-    and returns most information from those files
+    and returns most of the information from those files
 
     Parameters
     ----------
@@ -1022,27 +1053,8 @@ def load_sat_phase(station, year, year_end, freq):
     -------
     dataexist : bool
         whether data found?
-    year : numpy array of int
-        full years
-    doy : numpy array of int
-        days of year
-    hr : float
-        fractional day (UTC)
-    ph : float
-        phases (deg)
-    azdata : float
-        azimuths (deg)
-    ssat : int
-        satellites (deg)
-    rh : numpy array of floats
-        reflector height (m)
-    amp : numpy array of floats
-        amplitudes of peak LSP 
-    results : ??
-        not sure what this is
-    amp_ls : numpy array of floats
-        amplitudes of least squares fit used for phase
-
+    results : numpy array of floats
+        basically one variable with everything in the original columns from the daily phase files
 
     """
     print('Requested frequency: ', freq)
@@ -1080,32 +1092,17 @@ def load_sat_phase(station, year, year_end, freq):
     results = results[ii, :]
     print('Total phase measurements for this frequency: ', len(results))
 #    common_elements, ar1_i, ar2_i = np.intersect1d(ar1, ar2, return_indices=True)
-    minyear = np.min(np.unique(results[:,0]))
-    maxyear = np.max(np.unique(results[:,0]))
-    #print(minyear,maxyear)
+    #minyear = np.min(np.unique(results[:,0]))
+    #maxyear = np.max(np.unique(results[:,0]))
     nr,nc = np.shape(results)
     print(nr, ' number of rows')
 
     results = results.T  # dumb, but i was using this convention.  easier to maintain
 
-    if len(results) == 0:
-        print('no data at that frequency')
-        year = []; doy = []; hr = []; ph = []; azdata = []; ssat = []
-        rh = []; amp = []; amp_ls
-    else:
-        dataexist = True
-        # save with new variable names 
-        year = results[0]
-        doy = results[1]
-        hr = results[2]
-        ph = results[3]
-        azdata = results[5]
-        ssat = results[6]
-        rh = results[13]
-        amp = results[15]
-        amp_ls = results[7]
+    if len(results) > 0:
+        dataexist = True 
 
-    return dataexist, year, doy, hr, ph, azdata, ssat, rh, amp, results, amp_ls
+    return dataexist, results
 
 
 def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,subdir,plt,auto_removal,warning_value):
@@ -1114,7 +1111,7 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     Parameters
     ----------
     station : str
-        4 ch station name
+        4 character station name
 
     Returns
     -------
@@ -1138,10 +1135,14 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         whther tracks should be removed when they fail QC
     warning_value : float
         phase RMS needed to trigger warning
+    plot_legend : bool
+        whether to plot PRN numbers on the phase & amplitude results
 
     """
     # originally this was for command line interface ... 
     remove_bad_tracks = auto_removal # ??
+    plot_legend = True # default is to use them
+    circles = False
 
     g.checkFiles(station, '')
 
@@ -1158,6 +1159,10 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         warning_value = lsp['vwc_warning_value']
     if 'vwc_min_req_pts_track' in lsp:
         min_req_pts_track = lsp['vwc_min_req_pts_track']
+    if 'vwc_plot_legend' in lsp:
+        plot_legend = lsp['vwc_plot_legend']
+    if 'vwc_circles' in lsp:
+        circles = lsp['vwc_circles']
     if 'vwc_min_norm_amp' in lsp:
         min_norm_amp = lsp['vwc_min_norm_amp']
     else:
@@ -1198,9 +1203,9 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     print('minvalperday/tmin/tmax/min_req_tracks', minvalperday, tmin, tmax, min_req_pts_track)
 
     return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, \
-            plt, remove_bad_tracks, warning_value, min_norm_amp
+            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles
 
-def write_all_phase(v,fname,allrh,filestatus,rhtrack):
+def write_all_phase(v,fname):
     """
     writes out preliminary phase values and other metrics for advanced vegetation
     option.  This is in the hope that it can be used in clara chew's
@@ -1211,18 +1216,17 @@ def write_all_phase(v,fname,allrh,filestatus,rhtrack):
     Parameters
     ----------
     v : numpy of floats as defined in vwc_cl
+        TBD
         year, doy, phase, azimuth, satellite number
         estimated RH, LSP amplitude, LS amplitude, UTC hours
         raw LSP amp, raw LS amp
     fname : str
         name of the output file
-    allrh : fileID 
-        not sure of the python name for this
     filestatus : int
-        1, open file
+        1, open the file
         2, write to file (well, really any value)
-    rh: float
-        apriori reflector height, meters
+    rhtrack: float
+        apriori reflector height for the given track, meters
 
     Returns
     -------
@@ -1230,27 +1234,41 @@ def write_all_phase(v,fname,allrh,filestatus,rhtrack):
 
     """
 
-    if filestatus == 1:
-        allrh = open(fname, 'w+')
-        allrh.write(" {0:s}  \n".format('% year doy  phase azim  satNu   RH   LSPamp LSamp  quad  UTC  rawAmpLSP  rawAmpLS' ))
-        allrh.write(" {0:s}  \n".format('% (1)  (2)   (3)   (4)   (5)    (6)   (7)   (8)    (9)  (10)    (11)       (12)' ))
-        return allrh
+    #if filestatus == 1:
+    if True:
+        print('Writing interim phase values to ', fname)
+        header1=  'Year DOY Hour   Phase   Nv  Azimuth  Sat  Ampl emin emax  DelT aprioriRH  freq estRH  pk2noise LSPAmp'
+        header2 = '(1)  (2)  (3)    (4)   (5)    (6)    (7)  (8)  (9)  (10)  (11)   (12)     (13)  (14)    (15)    (16)'
+
+        #allrh.write(" {0:s}  \n".format(header1))
+        #allrh.write(" {0:s}  \n".format(header2))
+
+        #return allrh
 
     nr,nc = v.shape
     # sort by time
     ii = np.argsort(v[:,0] + v[:,1]/365.25)
     v = v[ii,:]
 
-    for i in range(0,nr):
-        q = old_quad(v[i,3])
-        allrh.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:7.1f} {4:2.0f} {5:7.3f} {6:7.3f} {7:7.3f} {8:2.0f} {9:7.2f} {10:7.2f} {11:7.2f} {12:7.3f}\n".format(v[i,0], v[i,1], v[i,2],v[i,3],
-            v[i,4], v[i,5],v[i,6],v[i,7], q, v[i,8], v[i,9],v[i,10], rhtrack ))
+    with open(fname, 'w') as my_file:
+        np.savetxt(my_file, [], header=header1, comments='%')
+        #np.savetxt(my_file, [], header=header2, comments='%')
+    #result = [[year, doy, utctime, phase, nv, avg_azim, sat_number, amp, min_el, max_el, del_t, rh_apriori, freq, max_f, obs_pk2noise, max_amp]]
+    #np.savetxt(my_file, result, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f", comments="%")
 
-    return allrh
+
+    #for i in range(0,nr):
+    #    q = old_quad(v[i,3])
+    #    a = v[i,5] ; sat = v[i,6]; amp_lsp = v[i,15]
+    #    amp_ls = v[i,7] ; rh = v[i,13]
+    #    allrh.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:7.1f} {4:2.0f} {5:7.3f} {6:7.3f} {7:7.3f} {8:2.0f} \
+    #            {9:7.2f} {10:7.2f} {11:7.2f} {12:7.3f}\n".format(v[i,0], v[i,1], v[i,3],a, sat,rh,amp_lsp,amp_ls,\
+    #            q, v[i,2],v[i,10], rhtrack ))
+
 
 def old_quad(azim):
     """
-    calc oldstyle quadrants from PBO H2O
+    calculates oldstyle quadrants from PBO H2O
 
     Parameters
     ----------
@@ -1376,3 +1394,70 @@ def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp, amp_ls, rh, i
     rhs = rh[ii] # estimated RH
 
     return y,t,h,x,azd,s,amps,amps_ls,rhs
+
+
+def write_out_raw_phase(v,fname):
+    """
+    write daily phase values used in vwc to a new consolidated file
+    add columns for quadrant and unwrapped phase
+
+
+    Parameters
+    ----------
+    v : numpy array
+        phase results read for multiple years. 
+        could be with snow filter applied
+    fname : str
+        filename for output
+
+    Returns
+    -------
+    newv : numpy array
+        original variable v with columns added for
+        quadrant and unwrapped phase 
+    """
+
+    print('Writing to ', fname)
+    # make sure v is numpy 
+    v = np.asarray(v)
+    nr,nc = v.shape; 
+# sort by time
+    ii = np.argsort(v[:,0] + v[:,1]/365.25)
+    v = v[ii,:]
+# calculate quadrants cause it makes life easier
+    q = np.zeros((nr,1)) #
+    for i in range(nr):
+        q[i] = old_quad(v[i,5])
+
+    # make a column full of zeros to store unwrapped phase
+    unwrapped = np.zeros((nr,1)) #
+
+    # add quadrant column
+    newv = np.hstack((v,q))
+    # add unwrapped column
+    newv = np.hstack((newv,unwrapped))
+
+    # get a list of possible satellites
+    sat_list = np.unique(v[:,6])
+    # discontinuity used in phase wrapping
+    discont = 270
+
+    # make a variable to return
+    tnewv = np.zeros((nr,18)) #
+    for ql in [1,2,3,4]:
+        for s in sat_list:
+            iw = (newv[:,16] == ql) & (newv[:,6] == s)
+            tnewv = newv[iw,:]
+            if (len(tnewv) > 0):
+                doy = tnewv[:,1]; phase = tnewv[:,3]
+                unwrap_phase = np.unwrap(phase,period=360,discont=discont)
+                newv[iw,17] = unwrap_phase
+
+    # headers for output file
+    h1 = "Year DOY Hour   Phase   Nv  Azim   Sat  Ampl emin emax   DelT aprRH  fr  estRH  pk2n  LSPAmp  quad  unphase\n"   
+    h2 = "(1)  (2)  (3)    (4)   (5)   (6)   (7)  (8)  (9)  (10)  (11)   (12)  (13)  (14)   (15)   (16)  (17)  (18) "
+
+    with open(fname, 'w') as my_file:
+        np.savetxt(my_file, newv, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f %2.0f %8.3f ",header=h1+h2,comments='%')
+
+    return newv
