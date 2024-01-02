@@ -18,8 +18,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name, e.g. 8768094", type=str)
     parser.add_argument("network", help="tidegauge network (noaa,ioc,psmsl,wsv)", type=str)
-    parser.add_argument("-date1", help="start-date, 20150101", type=str)
-    parser.add_argument("-date2", help="end-date, 20150110", type=str)
+    parser.add_argument("-date1", help="start-date, 20150101", type=str, default=None)
+    parser.add_argument("-date2", help="end-date, 20150110", type=str, default=None)
     parser.add_argument("-output", default=None, help="Optional output filename", type=str)
     parser.add_argument("-plt", default=None, help="quick plot to screen", type=str)
     parser.add_argument("-datum", default=None, help="datum for NOAA", type=str)
@@ -93,7 +93,11 @@ def download_tides(station: str, network : str, date1: str = None, date2: str = 
     outdir = xdir  + '/Files/'
     if not os.path.exists(outdir) :
         subprocess.call(['mkdir', outdir])
-    if (network == 'nooa') or (network == 'ioc'):
+    if (network == 'noaa') or (network == 'ioc'):
+        if (date1 is None):
+            print('You need to enter a starting date YYYYMMDD') ; sys.exit()
+        if (date2 is None):
+            print('You need to enter a ending date YYYYMMDD'); sys.exit()
         if len(date1) != 8:
             print('date1 must have 8 characters', date1); sys.exit()
         if len(date2) != 8:
