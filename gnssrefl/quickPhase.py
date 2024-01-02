@@ -50,22 +50,17 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     ----------
     station: str
         4 character ID of the station.
-
     year: int
         full Year to evaluate.
-
     doy: int
         day of year to evaluate.
-
     year_end: int, optional
         year to end analysis. Using this option will create a range from year-year_end.
         Default is None.
-
     doy_end: int, optional
         Day of year to end analysis. Using this option will create a range of doy-doy_end.
         If also using year_end, then this will be the day to end analysis in the year_end requested.
         Default is None.
-
     snr : int, optional
         SNR format. This tells the code what elevation angles are in the SNR file
         value options:
@@ -80,19 +75,14 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     fr : str, optional
         GNSS frequency. Currently only supports L2C. Default is 20 (l2c)
-
     e1 : float, optional
         Elevation angle lower limit in degrees for the LSP. default is 5
-
     e2: float, optional
         Elevation angle upper limit in degrees for the LSP. default is 30
-
     plt: bool, optional
         Whether to plot results. Default is False
-
     screenstats: bool, optional
         Whether to print stats to the screen. Default is False
-
     gzip : bool, optional
         gzip the SNR file after use.  Default is True
 

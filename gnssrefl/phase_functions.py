@@ -48,7 +48,7 @@ def normAmp(amp, basepercent):
 
 def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs):
     """
-    makes a plot of daily averaged phase
+    makes a plot of daily averaged phase for vwc code
 
     Parameters
     ----------
@@ -356,10 +356,11 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
     # get the SNR filename
     obsfile, obsfilecmp, snrexist = g.define_and_xz_snr(station, year, doy, snr_type)
-    #print(obsfile,obsfilecmp,snrexit)
 
     # noise region - hardwired for normal sites ~ 2-3 meters tall
     noise_region = [0.5, 8]
+
+    l2c_list, l5_sat = g.l2c_l5_list(year,doy)
 
     if not snrexist:
         print('No SNR file on this day.')
@@ -383,7 +384,9 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                 rows, columns = np.shape(apriori_results)
 
                 for i in range(0, rows):
+                    compute_lsp = True # will set to false for non-compliant L2C requests
                     azim = apriori_results[i, 3]
+                    # this will be the satellite number you are working on 
                     sat_number = apriori_results[i, 2]
                     az1 = apriori_results[i, 5]
                     az2 = apriori_results[i, 6]
@@ -392,13 +395,17 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                     x, y, nv, cf, utctime, avg_azim, avg_edot, edot2, del_t = g.window_data(s1, s2, s5, s6, s7, s8, sat, ele, azi,
                                                                                         t, edot, freq, az1, az2, e1, e2,
                                                                                         sat_number, poly_v, pele, screenstats)
+                    if (freq == 20) and (sat_number not in l2c_list) :
+                        if screenstats: 
+                            print('Asked for L2C but this is not L2C transmitting on this day: ', int(sat_number))
+                        compute_lsp = False
+
                     if screenstats:
                         print(f'Track {i:2.0f} Sat {sat_number:3.0f} Azimuth {azim:5.1f} RH {rh_apriori:6.2f} {nv:5.0f}')
 
-                    if compute_lsp and nv > min_num_pts:
-                        min_height = 0.5
-                        max_height = 8
-                        desired_p = 0.01
+                    if compute_lsp and (nv > min_num_pts):
+                        # this is the same every track, so no reason to be in the loop
+                        min_height = 0.5 ; max_height = 8 ; desired_p = 0.01
 
                         max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(x, y, cf, max_height,
                                                                                            desired_p, poly_v, min_height)
@@ -845,7 +852,7 @@ def apriori_file_exist(station,fr):
 
 def load_phase_filter_out_snow(station, year1, year2, fr,snowmask):
     """
-    Attempt to remove outliers from snow if snowmask provided. 
+    Load all phase data and attempt to remove outliers from snow if snowmask provided. 
 
     Parameters
     ----------
@@ -934,7 +941,6 @@ def load_phase_filter_out_snow(station, year1, year2, fr,snowmask):
             print('Number of rows and columns after snow filter ', nr,nc)
             raw = write_out_raw_phase(vquad,fname)
 
-    #  raw should have two extra columns
     rtrans= np.transpose(raw)
 
     if len(rtrans) == 0:
@@ -1376,10 +1382,46 @@ def save_vwc_plot(fig, pngfile):
 
     return
 
-def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp, amp_ls, rh, ii):
+def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp_lsp, amp_ls, rh, ap_rh,ii):
     """
     this is just trying to clean up vwc.py  
     send indices ii - and return renamed variables.  
+
+    Parameters
+    ----------
+    year_sat_sat
+    doy : 
+    hr : 
+    phase : 
+    azdata : 
+    ssat : 
+    amp_lsp : 
+    amp_ls
+    rh : 
+    ap_rh :
+    ii :
+
+    Returns
+    -------
+    y : numpy array of int
+        year
+    t : numpy array of int
+        day of year 
+    h : numpy array of floats
+        hour of the day (UTC)
+    x : numpy array of floats
+        phase, degrees
+    azd: numpy array of floats
+        azimuth for the track
+    s : numpy array of int
+    amps_lsp : numpy array of floats
+        LSP amplitude
+    amps_ls : numpy array of floats
+        least squares amplitude
+    rhs : numpy array of floats
+        estimated RH (m)
+    ap_rhs : numpy array of floats
+        a priori RH (m)
 
     """
     y = year_sat_phase[ii]
@@ -1389,18 +1431,18 @@ def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp, amp_ls, rh, i
     # should be so we could do subdaily VWC
     azd = azdata[ii] # azimuth, in degrees
     s = ssat[ii] # array of satellites numbers
-    amps = amp[ii] # this amplitude is RH amplitude 
+    amps_lsp = amp_lsp[ii] # this amplitude is RH amplitude 
     amps_ls = amp_ls[ii] # this amplitude is phase amplitude 
     rhs = rh[ii] # estimated RH
+    ap_rhs = ap_rh[ii] # apriori RH
 
-    return y,t,h,x,azd,s,amps,amps_ls,rhs
+    return y,t,h,x,azd,s,amps_lsp,amps_ls,rhs, ap_rhs
 
 
 def write_out_raw_phase(v,fname):
     """
     write daily phase values used in vwc to a new consolidated file
-    add columns for quadrant and unwrapped phase
-
+    I added columns for quadrant and unwrapped phase
 
     Parameters
     ----------
@@ -1414,7 +1456,8 @@ def write_out_raw_phase(v,fname):
     -------
     newv : numpy array
         original variable v with columns added for
-        quadrant and unwrapped phase 
+        quadrant (1-4) and unwrapped phase 
+
     """
 
     print('Writing to ', fname)
