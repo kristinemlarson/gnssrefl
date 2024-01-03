@@ -241,7 +241,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         default_usage = True
 
         for y in range(year,year_end+1):
-            print(y)
+            print('reading year: ', y)
             ntv, obstimes, fname, fname_new = t.readin_and_plot(station, y, doy1, doy2, plt, \
                     extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile_part1, \
                     h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma)
@@ -259,13 +259,15 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     if not rhdot:
         if plt:
             mplt.show()
-    # if mutli-year, this could be concatenated ...
+    # only read in one year
     if year_end == year:
-        input2spline = fname_new; output4spline = fname_new + '.withrhdot'
-    else:
-        print(outputs)
-        sys.exit()
+        input2spline = [fname_new]; output4spline = fname_new + '.withrhdot'
 
+    # this is for multiyaer
+    else:
+        # this is a bit of a kluge - send it names of the yearly files
+        input2spline = outputs 
+        output4spline = txtdir + '/multiyear.withrhdot'
 
     # not sure why tv and corr are being returned.
     if rhdot:

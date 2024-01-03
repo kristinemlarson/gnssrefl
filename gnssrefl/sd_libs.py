@@ -116,7 +116,7 @@ def testing_nvals(Gval, Rval, Eval, Cval):
     return
 
 
-def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs):
+def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year):
     """
     makes the plot that summarizes the number of satellites in each
     constellation per epoch
@@ -143,6 +143,8 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs):
         fontsize for the plots
     hires_figs : bool
         try to plot high resolution
+    year : int
+        calendar year
 
     """
 
@@ -179,12 +181,11 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs):
 
 
     fig.autofmt_xdate()
-    plotname = txtdir + '/' + station + '_Subnvals.png'
+    plotname = txtdir + '/' + station + '_' + str(year) + '_Subnvals.png'
     if hires_figs:
-        plotname = txtdir + '/' + station + '_Subnvals.eps'
-        plt.savefig(plotname,dpi=300)
-    else:
-        plt.savefig(plotname,dpi=300)
+        plotname = txtdir + '/' + station + '_' + str(year) +'_Subnvals.eps'
+
+    plt.savefig(plotname,dpi=300)
     print('Plot file saved as: ', plotname)
 
 
@@ -381,15 +382,15 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
         ax3.set_xlim((th1, th2))
     fig.autofmt_xdate()
 
-    plotname = txtdir + '/' + station + '_combined.png'
+    plotname = txtdir + '/' + station + '_' + str(year) + '_combined.png'
     if hires_figs:
-        plotname = txtdir + '/' + station + '_combined.eps'
+        plotname = txtdir + '/' + station + '_' + str(year) + '_combined.eps'
         plt.savefig(plotname,dpi=300)
     else:
         plt.savefig(plotname,dpi=300)
     print('Plot file saved as: ', plotname)
 
-def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs):
+def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs,year):
     """
     makes a plot of the reflector heights before and after minimal editing
 
@@ -411,6 +412,8 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
         what kind of standard deviation is used for outliers (3sigma, 2.5 sigma etc)
     kplt : bool
         make extra plot for kristine
+    year : int 
+        calendar year
     """
     fs = 10
     otimesarray = np.asarray(otimes)
@@ -424,10 +427,11 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     plt.gca().invert_yaxis()
     plt.legend(loc="best")
     plt.grid()
+    plotname_stem = txtdir + '/' + station + '_' + str(year) + '_outliers_wrt_az'
     if hires_figs:
-        plotname = txtdir + '/' + station + '_outliers_wrt_az.eps'
+        plotname = plotname_stem + '.eps'
     else:
-        plotname = txtdir + '/' + station + '_outliers_wrt_az.png'
+        plotname = plotname_stem + '.png'
 
     plt.savefig(plotname,dpi=300)
     print('Plot file saved as: ', plotname)
@@ -466,11 +470,12 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     plt.title('Edited ' + station.upper() + ' Reflector Heights', fontsize=fs)
 
     plt.grid() ; fig.autofmt_xdate()
+    plotstem = txtdir + '/' + station + '_' + str(year) + '_outliers'
     if hires_figs:
-        plotname = txtdir + '/' + station + '_outliers.eps'
+        plotname = plotstem + '.eps'
         plt.savefig(plotname,dpi=300)
     else:
-        plotname = txtdir + '/' + station + '_outliers.png'
+        plotname = plotstem + '.png'
         plt.savefig(plotname,dpi=300)
 
     plt.ylim((savey1, savey2))
@@ -901,7 +906,10 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     plt.title('Mirrored obs and spline fit ')
     plt.legend(loc="upper left")
     plt.ylabel('meters')
-    plt.xlabel('days of the year')
+    if (beginT > 380):
+        plt.xlabel('MJD')
+    else:
+        plt.xlabel('days of the year')
     plt.xlim((beginT, endT))
     plt.grid()
     g.save_plot(txtdir + '/' + station + '_rhdot1.png')
@@ -953,6 +961,9 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
     Returns the bad points ...
 
 
+    Allows either the original or multiyear option..
+
+
     Parameters
     ----------
     station : str
@@ -987,12 +998,17 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
     badpoints2 : numpy array of floats
          RH residuals
     """
-    # convert obs to mjd and then obstimes
-    mjd0 = g.fdoy2mjd(year, th[0])
-    th_obs = mjd_to_obstimes(mjd0 + th - th[0])
+    # this means you are already in MJD ... 
+    if (th[0] > 400):
+        th_obs = mjd_to_obstimes(th)
+        th_even_obs = mjd_to_obstimes(th_even)
+    else:
+        # convert obs to mjd and then obstimes
+        mjd0 = g.fdoy2mjd(year, th[0])
+        th_obs = mjd_to_obstimes(mjd0 + th - th[0])
     # convert the spline to mjd and then obstimes
-    mjd1 = g.fdoy2mjd(year, th_even[0])
-    th_even_obs = mjd_to_obstimes(mjd1 + th_even - th_even[0])
+        mjd1 = g.fdoy2mjd(year, th_even[0])
+        th_even_obs = mjd_to_obstimes(mjd1 + th_even - th_even[0])
 
 
     # these are now plotted in datetime via mjd translation
@@ -1074,15 +1090,25 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     ndays = s2-s1 # number of days
     numvals = 1 + int(ndays*86400/delta_out)
     tp=np.linspace(s1,s2,numvals,endpoint= True)
-    mjd1 = g.fdoy2mjd(year, tp[0] ) # 
-    mjd_new = mjd1 + (tp - tp[0])
-    mjd_new_obstimes = mjd_to_obstimes(mjd_new)
-    spline_new = spline(tp)
+    # this means it is alreayd in MJD
+
+    if (th[0] > 400): 
+        multiyear = True
+        mjd_new = tp
+        mjd_new_obstimes = mjd_to_obstimes(mjd_new)
+        spline_new = spline(tp)
+    else:
+        multiyear = False
+        mjd1 = g.fdoy2mjd(year, tp[0] ) # 
+        mjd_new = mjd1 + (tp - tp[0])
+        mjd_new_obstimes = mjd_to_obstimes(mjd_new)
+        spline_new = spline(tp)
     N_new = len(mjd_new_obstimes)
 
     # looks like I identified the gaps in day of year units - 
     # but then did the implementation in mjd and then datetime ...
     splinefileout =  txtdir + '/' + station + '_' + str(year) + '_spline_out.txt'
+    splinefileout =  txtdir + '/' + station +  '_spline_out.txt'
     print('Writing evenly sampled file to: ', splinefileout)
     fout = open(splinefileout,'w+')
     fout.write('{0:1s}  {1:30s}  \n'.format('%','This is NOT observational data - be careful when interpreting it.'))
@@ -1095,9 +1121,13 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
 
     # difference function to find time between all rh measurements
     gdiff = np.diff( time_rh )
-    mjdx = g.fdoy2mjd(year, time_rh[0] ) # 
-    mjdt = mjdx + (time_rh - time_rh[0])
-    mjd = mjdt[0:-1]
+    if multiyear:
+        mjdt = time_rh
+        mjd = mjdt[0:-1]
+    else:
+        mjdx = g.fdoy2mjd(year, time_rh[0] ) # 
+        mjdt = mjdx + (time_rh - time_rh[0])
+        mjd = mjdt[0:-1]
 
 
     # find indices of gaps  that are larger than a certain value
@@ -1107,26 +1137,31 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
 
     dlist = mjd_new_obstimes.tolist()
 
-    # get the integer values to write out  to the text file ...
-    theyear = [y.year for y in dlist ]
-    xm = [y.month for y in dlist]; xd = [y.day for y in dlist]
-    xh = [y.hour for y in dlist]; xmin = [y.minute for y in dlist]
-    xs = [y.second for y in dlist]
 
-    if (Ngdiff > 0):
-        for i in range(0,Ngdiff):
-            if ii[i]:
-                e0 = mjd[i] ; e1 = mjd[i+1] # beginning and ending of the gap
-                bad_indices = (mjd_new > e0) & (mjd_new < e1 )
-                spline_new[bad_indices] = np.nan
-                mjd_new_obstimes[bad_indices] = np.datetime64("NaT")
+    # i have not figured this one out yet ... the horror
+    #if not multiyear:
+    if True:
+    # get the integer values to write out  to the text file ...
+        theyear = [y.year for y in dlist ]
+        xm = [y.month for y in dlist]; xd = [y.day for y in dlist]
+        xh = [y.hour for y in dlist]; xmin = [y.minute for y in dlist]
+        xs = [y.second for y in dlist]
+
+        if (Ngdiff > 0):
+            for i in range(0,Ngdiff):
+                if ii[i]:
+                    e0 = mjd[i] ; e1 = mjd[i+1] # beginning and ending of the gap
+                    bad_indices = (mjd_new > e0) & (mjd_new < e1 )
+                    spline_new[bad_indices] = np.nan
+                    mjd_new_obstimes[bad_indices] = np.datetime64("NaT")
 
     # write the spline values to a file, with gaps removed
-    for i in range(0,N_new):
-        if not np.isnan(spline_new[i]):
-            rhout = spline_new[i]
-            fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} {8:10.3f} \n'.format(
-                mjd_new[i], rhout, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], H0-rhout))
+        for i in range(0,N_new):
+            if not np.isnan(spline_new[i]):
+                rhout = spline_new[i]
+                fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} {8:10.3f} \n'.format(
+                    mjd_new[i], rhout, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], H0-rhout))
+
 
     fout.close()
 
@@ -1139,3 +1174,5 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
 
     pfile = txtdir + '/' + station + '_H0.png'
     g.save_plot(pfile)
+
+    return

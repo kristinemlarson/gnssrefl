@@ -4962,6 +4962,7 @@ def final_gfz_orbits(year,month,day):
         subprocess.call(['gunzip', littlename + '.gz'])
     except:
         print('Problems downloading final multi-GNSS GFZ orbit from GFZ')
+        print(url)
 
     if os.path.isfile(littlename):
        store_orbitfile(littlename,year,'sp3') ; foundit = True
@@ -5018,6 +5019,7 @@ def rapid_gfz_orbits(year,month,day):
         subprocess.call(['gunzip', littlename + '.gz'])
     except:
         print('Problems downloading Rapid GFZ orbit')
+        print(url)
 
     if os.path.isfile(littlename):
        store_orbitfile(littlename,year,'sp3') ; foundit = True

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import sys
+import warnings
 
 from datetime import date
 
@@ -110,11 +111,11 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     # 
     write_IF_corrected = False
     if len(newRH_IF) > 0:
-        print('\n IF corrected values being written - make sure you use the correct column! \n')
+        print('\nIF corrected values being written - make sure you use the correct column! \n')
         write_IF_corrected = True
     extra = False
     if len(RHdot_corr) > 0:
-        print('\n RHdot corrected values being written - make sure you use the correct column \n')
+        print('\nRHdot corrected values being written - make sure you use the correct column \n')
         extra = True
 
     N= len(ntv)
@@ -263,11 +264,12 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             # only evaluate txt files
                 if (len(f) ==  7) and (f[4:7] == 'txt'):
                     day = int(f[0:3])
-                #print('looking at file: ', day)
                     if (day >= d1) & (day <= d2):
                         fname = direc + f
                         try:
-                            a = np.loadtxt(fname,comments='%')
+                            with warnings.catch_warnings():
+                                warnings.simplefilter("ignore")
+                                a = np.loadtxt(fname,comments='%')
                             if len(a) > 0:
                                 tv = np.append(tv, a,axis=0)
                         except:
@@ -353,12 +355,12 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
         if default_usage:
-            sd.numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs)
+            sd.numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year)
             # was testing some things out
             #testing_nvals(Gval, Rval, Eval, Cval)
 
             sd.two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs)
-            sd.stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt,hires_figs)
+            sd.stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt,hires_figs,year)
             sd.print_badpoints(tv[ii,:],residuals[ii],txtdir,real_residuals[ii])
         else:
             # make both plots cause life is short
@@ -606,8 +608,7 @@ def flipit(tvd,col):
     Parameters
     ----------
     tvd : numpy array of floats
-        output of LSP runs
-
+        output of LSP runs. 
     col : integer
         column number (in normal speak) of the RH results
         in python-speak, this has one subtracted
@@ -644,9 +645,11 @@ def flipit(tvd,col):
     rightY = np.flip(ynew[ii])
     rightTime = tnew[ii] -day0 + 1 
 
-    tmp= np.hstack((leftTime,middle)) ; th = np.hstack((tmp,rightTime))
+    tmp= np.hstack((leftTime,middle)) ; 
+    th = np.hstack((tmp,rightTime))
 
-    tmp = np.hstack((leftY, ynew )) ; h = np.hstack((tmp, rightY))
+    tmp = np.hstack((leftY, ynew )) ; 
+    h = np.hstack((tmp, rightY))
 
     # and sort it ...
     ii = np.argsort(th)
@@ -699,16 +702,16 @@ def flipit(tvd,col):
 
 def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs):
     """
-    Improved code to compute rhdot correction and interfrequency bias correction for subdaily
-    this assumes you have at least removed crude outliers in the previous section of the 
+    Part two of subdaily.  It computes rhdot correction and interfrequency bias correction for RH 
+    time series. This code assumes you have at least removed crude outliers in the previous section of the 
     subdaily code.
 
     Parameters
     ----------
     station : str
         4 char station name
-    fname : str
-        input filename for results
+    fname : list of str
+        input filename(s) 
     fname_new : str
         output filename for results
     pltit : bool
@@ -780,7 +783,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         hires_figs = False
 
     fs = kwargs.get('fs',12)
-    #print('Using fontsize: ', fs)
 
     #print('output directory: ', txtdir)
 
@@ -800,25 +802,45 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     print('\n>>>>>>>>>>>>>>>>>>>> Entering second section of subdaily code <<<<<<<<<<<<<<<<<<<<<<<<')
     print('\nComputes rhdot correction and interfrequency bias correction for subdaily')
-    print('\nInput filename:', fname)
-    print('\nOutput filename: ', fname_new)
-    print('\nMinimum gap allowed in spline output, in day units', gap_min_val)
 
-    # read in the lomb scargle values which are the output of gnssir
-    # i.e. the reflector heights
-    tvd = np.loadtxt(fname,comments='%')
+    # read in the lomb scargle values which are the output of gnssir i.e. the reflector heights
+    nfiles = len(fname)
+    if nfiles == 1:
+        multiyear = False
+        print('\nInput filename:', fname[0])
+        tvd = np.loadtxt(fname[0],comments='%')
+    else:
+        multiyear = True
+        for i in range(0,nfiles):
+            print('\nInput filename:', fname[i])
+            newl = np.loadtxt(fname[i], comments='%')
+            if i == 0:
+                tvd = newl
+            else:
+                tvd = np.vstack((tvd, newl))
+
     if len(tvd) == 0:
         print('empty input file')
         return
 
+    print('\nOutput filename: ', fname_new)
+    print('\nMinimum gap allowed in spline output, in day units', gap_min_val)
+
     # sort the data in time
-    # change to use MJD
-    ii = np.argsort( (tvd[:,1]+tvd[:,4]/24) ).T
+    # 2024-jan-3 change to use MJD
+    #ii = np.argsort( (tvd[:,1]+tvd[:,4]/24) ).T
+    ii = np.argsort( tvd[:,15] ).T
     tvd = tvd[ii,:]
 
-    # use day of year for the spline fits
-    th= tvd[:,1] + tvd[:,4]/24; 
-    h = tvd[:,2]
+
+    if multiyear : 
+        # use MJD
+        th= tvd[:,15] ; h = tvd[:,2]
+        tnew, ynew = flipit2(tvd,3)
+    else:
+        # use day of year for the spline fits
+        th= tvd[:,1] + tvd[:,4]/24; h = tvd[:,2]
+        tnew, ynew = flipit(tvd,3)
 
     # this is the edot factor - 
     # this was computed by gnssir as the mean of the tangent(eangles) over an arc,
@@ -827,13 +849,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # it is multiplied by RHDot in meters/hour, which gives you a correction value in meters
     xfac = tvd[:,12]
 
-    # these are not being used ... 
-    #obstimes = kwargs.get('obstimes',[])
-    #if len(obstimes) == 0:
-    #    obstimes = g.get_obstimes(tvd)
 
-   # try extending the time series to improve spline fit
-    tnew, ynew = flipit(tvd,3)
 
     Ndays = tnew.max()-tnew.min()
     numKnots = int(knots_per_day*(Ndays))
@@ -844,6 +860,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # currently using 3 sigma
     print('Outlier criterion provided by user for the first splinefit (m):', outlierV)
     print('Outlier criterion provided by user for the second splinefit (m):', outlierV2)
+
 
     firstKnot_in_minutes = 15
     t1 = tnew.min()+firstKnot_in_minutes/60/24
@@ -862,6 +879,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     spl_at_GPS_times = spline(th) 
 
     sd.mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,th[0],th[-1])
+
+
 
     plot_begin = np.floor(np.min(th))
     plot_end =np.ceil(np.max(th)) 
@@ -897,15 +916,23 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     mjd0 = g.fdoy2mjd(year,th[0])
     th_obs = sd.mjd_to_obstimes(mjd0 + th-th[0])
 
+    if multiyear :
+        print('exiting')
+        th_obs = sd.mjd_to_obstimes(th)
+
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
     plt.plot(th_obs, h, 'b.', label=label1,markersize=4)
     iw = (spl_x > th[0]) & (spl_x < th[-1])
 
     # change to datetime
-    tm_mjd = g.fdoy2mjd(year, spl_x[iw][0])
-    spl_x_obs = sd.mjd_to_obstimes(tm_mjd + spl_x[iw] - spl_x[iw][0] )
-    plt.plot(spl_x_obs, spl_y[iw], 'c--', label='spline') # otherwise wonky spline makes a goofy plot
+    if multiyear:
+        spl_x_obs = sd.mjd_to_obstimes(spl_x[iw])
+        plt.plot(spl_x_obs, spl_y[iw], 'c--', label='spline') # otherwise wonky spline makes a goofy plot
+    else:
+        tm_mjd = g.fdoy2mjd(year, spl_x[iw][0])
+        spl_x_obs = sd.mjd_to_obstimes(tm_mjd + spl_x[iw] - spl_x[iw][0] )
+        plt.plot(spl_x_obs, spl_y[iw], 'c--', label='spline') # otherwise wonky spline makes a goofy plot
 
     plt.plot(th_obs,correctedRH,'m.',label=label2,markersize=4)
 
@@ -920,7 +947,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     plt.yticks(fontsize=fs); plt.xticks(fontsize=fs)
     plt.grid()
     fig.autofmt_xdate()
-    #plt.xlim((plot_begin, plot_end))
 
 
     plt.subplot(2,1,2)
@@ -954,12 +980,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     plt.plot(th_obs[ii], residual_after[ii],'b.',label='kept pts')
     plt.grid()
-    #plt.title('Residuals to the spline fit',fontsize=fs)
-    #plt.xlabel('days of the year',fontsize=fs)
     plt.ylabel('meters',fontsize=fs)
     plt.legend(loc="upper left",fontsize=fs)
     plt.yticks(fontsize=fs); plt.xticks(fontsize=fs)
-    #plt.xlim((plot_begin, plot_end))
     fig.autofmt_xdate()
 
     if hires_figs:
@@ -967,12 +990,12 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     else:
         g.save_plot(txtdir + '/' + station + '_rhdot2.png')
 
-
     # update the residual vector as well
     residual_after = residual_after[ii]
 
-    # make the RHdot plot as well
-    sd.rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs,year)
+    # make the RHdot plot as well. if multiyear, Skip for now
+    if not multiyear:
+        sd.rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs,year)
 
     writecsv = False ; extraline = ''
     # write out the new solutions with RHdot and without 3 sigma outliers
@@ -1037,14 +1060,18 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     biasCor_rh = tvd_new[:,24]
     #write_subdaily(bias_corrected_filename,station,tvd_new, writecsv,extraline, newRH_IF=biasCor_rh)
 
-    #tvd = np.loadtxt(bias_corrected_filename,comments='%')
-    #tvd = tvd_new 
     # now use the bias corrected value
-    th = tvd_new[:,1] + tvd_new[:,4]/24 # days of year, fractional
+
  
     # add mirror time series at beginning and end of series for spline
-    column = 25 # tells the code which column to use. 
-    tnew, ynew = flipit(tvd_new,column)
+    if multiyear:
+        th = tvd_new[:,15] # use MJD now
+        column = 25 # tells the code which column to use. 
+        tnew, ynew = flipit2(tvd_new,column)
+    else:
+        th = tvd_new[:,1] + tvd_new[:,4]/24 # days of year, fractional
+        column = 25 # tells the code which column to use. 
+        tnew, ynew = flipit(tvd_new,column)
 
     Ndays = tnew.max()-tnew.min()
     knots_per_day = knots_test
@@ -1068,6 +1095,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     half_hourly = int(48*(th[-1] - th[0]))
     # evenly spaced spline values for the plot
     # I do not think these variables are used anymore
+
+    #print(th[0], th[-1], half_hourly)
     th_even = np.linspace(th[0], th[-1],half_hourly ); 
     spline_whole_time = spline(th_even)
 
@@ -1145,4 +1174,108 @@ def my_percentile(rh,p1, p2):
     highv = sorted_rh[N2]
 
     return  lowv, highv
+
+def flipit2(tvd,col):
+    """
+    take RH values from the first and last day and attaches
+    them as fake data to make the spline fit stable.  
+    Also fill the temporal gaps with fake data
+
+    This version uses MJD rather than day of year for x-axis
+
+    Parameters
+    ----------
+    tvd : numpy array of floats
+        output of LSP runs. 
+    col : integer
+        column number (in normal speak) of the RH results
+        in python-speak, this has one subtracted
+
+    Returns
+    -------
+    tnew : numpy array of floats
+        time in days of year
+    ynew : numpy array
+        RH in meters 
+
+    """
+    nr,nc = np.shape(tvd)
+    #print(nr,nc)
+    # sort it just to make sure ...
+    #tnew = tvd[:,1] + tvd[:,4]/24
+    # use MJD
+    tnew = tvd[:,15]
+    # change from normal columns to python columns
+    ynew = tvd[:,col-1]
+
+    # these are in days of the year
+    day0= np.floor(tnew[0]) # first day
+    dayN = np.ceil(np.max(tnew)) # last day
+
+    # these are the times relative to time zero
+    middle = tnew-day0
+
+    # use the first day
+    ii = tnew < (day0+1)
+    leftTime = -(tnew[ii]-day0)
+    leftY = ynew[ii]
+
+    # now use the last day
+    ii = tnew > (dayN-1)
+    rightY = np.flip(ynew[ii])
+    rightTime = tnew[ii] -day0 + 1 
+
+    tmp= np.hstack((leftTime,middle)) ; 
+    th = np.hstack((tmp,rightTime))
+
+    tmp = np.hstack((leftY, ynew )) ; 
+    h = np.hstack((tmp, rightY))
+
+    # and sort it ...
+    ii = np.argsort(th)
+    th = th[ii] ; h = h[ii]
+
+    th = th + day0 # add day0 back in
+
+    # now fill the gaps ... 
+    fillgap = 1/24 # one hour fake values
+    # ???
+    gap = 5/24 # up to five hour gap allowed before warning
+
+    tnew =[] ; ynew =[]; faket = [];
+    # fill in gaps using variables called tnew and ynew
+    Ngaps = 0
+    for i in range(1,len(th)):
+        d= th[i]-th[i-1] # delta in time in units of days ?
+        if (d > gap):
+            x0 = th[i-1:i+1] ; h0 = h[i-1:i+1]
+
+            # only print out the gap information the first time thru
+            if col == 3:
+                print('Gap on MJD:', int(np.floor(x0[0])), ' lasting ', round(d*24,2), ' hours ')
+            #print(d,x0,h0)
+            Ngaps = Ngaps + 1
+            f = scipy.interpolate.interp1d(x0,h0)
+            # so this is fake data
+            ttnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
+            yynew = f(ttnew)
+            faket = np.append(faket, ttnew)
+            # now append it to your real data
+            tnew = np.append(tnew,ttnew)
+            ynew = np.append(ynew,yynew)
+        else:
+            tnew = np.append(tnew,th[i])
+            ynew = np.append(ynew,h[i])
+
+
+    if (Ngaps > 3) and (col == 3):
+        print('\nThis is a beta version of the rhdot/spline fit code - and does not')
+        print('work well with gaps. You have been warned!\n')
+
+    # sort again
+    ii = np.argsort( tnew) 
+    tnew = tnew[ii]
+    ynew = ynew[ii]
+
+    return tnew, ynew
 
