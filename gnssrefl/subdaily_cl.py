@@ -15,7 +15,8 @@ from gnssrefl.utils import str2bool
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
-    parser.add_argument("year", default=None, type=int, help="for now one year at a time")
+    parser.add_argument("year", default=None, type=int, help="year of data")
+    parser.add_argument("-year_end", default=None, type=int, help="Allow multiple years of inputs by specifying last year")
     parser.add_argument("-txtfile_part1", default=None, type=str, help="optional filename,first section of code (gross outlier detection), must be in gnssir output format") 
     parser.add_argument("-txtfile_part2", default=None, type=str, help="optional filename,second section of code (Rhdot calculation, splines), must be gnssir output format ") 
     parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt")
@@ -45,7 +46,6 @@ def parse_arguments():
     parser.add_argument("-fs", default=None, type=int, help="fontsize for figures. default is 10")
     parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate sigma definition. default is False")
     parser.add_argument("-gap_min_val", default=None, type=float, help="min gap allowed in splinefit output file. default is 6 hours")
-    parser.add_argument("-year_end", default=None, type=int, help="testing implementation of multi-year inputs")
 
     args = parser.parse_args().__dict__
 
@@ -267,7 +267,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     else:
         # this is a bit of a kluge - send it names of the yearly files
         input2spline = outputs 
-        output4spline = txtdir + '/multiyear.withrhdot'
+        output4spline = txtdir + '/' + station + '_' + str(year) + '_' + str(year_end) + '.withrhdot'
 
     # not sure why tv and corr are being returned.
     if rhdot:
