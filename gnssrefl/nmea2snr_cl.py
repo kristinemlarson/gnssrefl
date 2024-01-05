@@ -12,12 +12,10 @@ def main():
     """
     main script for the nmea2snr conversion code
 
-    This code looks for NMEA files in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023
-    or $REFL_CODE/nmea/SSSS/2023 for station SSSS. Personally I prefer lowercase station 
-    names, but I believe the code allows you to do either.
+    This code creates SNR files from for NMEA files.  
 
-    This directory structure was ONLY created to accommodate certain NMEA file users. RINEX file
-    users should use $REFL_CODE/YYYY/rinex/ssss
+    NMEA files should be stored in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023
+    or $REFL_CODE/nmea/SSSS/2023 for station SSSS. 
 
     NMEA Files should be named:  SSSS1520.23.A or ssss1520.23.A
 

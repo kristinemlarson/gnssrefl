@@ -1,9 +1,8 @@
 # Jupyter Notebook Installation Instructions
 
 Please send your feedback on these instructions or anything related to Notebooks 
-to Kelly Enloe at EarthScope, kelly.enloe@earthscope.org or better 
-still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
-Please assign the issue to Kelly(there is a pull down tab on the right hand side).
+to Kelly Enloe at EarthScope, kelly.enloe@earthscope.org.
+You can also submit a GitHub issue.
 
 Listed below are instructions for running jupyter notebooks with Docker (recommended) or on your local machine.
 
@@ -63,17 +62,17 @@ If you desire to create your own notebook or want to persist the changes you've 
 
 ### Notes:
 
-If you want to process RINEX files that are stored on your local machine, you can copy them into the local directory you chose to mount your volume.
-They will then appear in the `/etc/gnssrefl/refl_code` directory in the container.  
-
-If you have a lot of RINEX files and want to keep them organized, you should copy them 
-into `refl_code/rinex/station/yyyy/`, where station is the lowercase 4char ID and yyyy is the year. 
-You should then mount that directory in the docker run command as follows: 
+If you want to process RINEX files that are stored on your local machine, you can copy 
+them into the local directory associated with your mounted volume, i.e.
+`refl_code/yyyy/rinex/abcd`, where station is abcd and yyyy is the year. 
+There is an alternate directory structure you can also try, but it requires the use of 
+the makan option when running rinex2snr. I cannot promise that it works. Please note below that
+instead of mounting the one volume, you are mounting two. Please direct all questions about this 
+to Kelly Enloe.
 
 ```bash
 docker run -p 8888:8888 -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl_jupyter ghcr.io/kristinemlarson/gnssrefl:latest jupyter lab --allow-root --port=8888 --ip=0.0.0.0 
 ```
-
 ### Shutdown Docker <a name="Shutdown"></a>
 To exit the container and stop the jupyter instance, press `ctrl+c`. This will shut down jupyter lab as well as stop the docker containter.
 

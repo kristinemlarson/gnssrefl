@@ -12,20 +12,31 @@ This is most easily done by setting them in your setup script, which on my machi
 If you are working with the docker, these should all be set up for you. But knowing that they 
 exist can be helpful in looking for files, etc.
 
-## How do I analyze my own data?
+## How do I collect my own GNSS data?
 
-We do not have instructions within this software package for how you can operate your own receiver 
+We do not have instructions in this software package for how you can operate your own receiver 
 for GNSS-IR. Currently we need you to save your observation data as Rinex 2.11, Rinex 3, or 
-NMEA formats (see below). At a minimum you **must** save the SNR data; we strongly urge you to track/save GPS L2C and L5.
+NMEA formats (see below). At a minimum you **must** save the SNR data; we strongly urge 
+you to track/save **modern GPS signals**, whicha are L2C and L5. If you have multi-GNSS capabilities,
+we strongly encourage you to use them. And never use an elevation mask on your receiver. They are 
+completely unncessary for positioning (which allows masking to be done at the software level) and 
+are extremely harmful to GNSS-IR.
 
-The naming conventions for GNSS observation files that we expect are given below. If you are working with the 
-docker, I have made some notes in the [docker install section](docker_cl_instructions.md) 
+## How do I analyze my own GNSS data?
+
+To analyze your own GNSS data you must comply with the software expectations for how the 
+files should be named. The naming conventions for GNSS observation files are given below. 
+
+
+If you are working with the docker, I have made some notes in the [docker install section](docker_cl_instructions.md) 
 that might be helpful to you about where to store your files.
+
 
 If you are working with git clone or pypi install, you should be able to have the RINEX files 
 in the directory you are currently working in. Or you should put them in the rinex directory as defined 
-below in the *Where Files are Stored* section. Examples are given 
-in the [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html).
+below in the *Where Files are Stored* section, i.e. $REFL_CODE/YYYY/rinex/abcd where abcd is the station name. 
+
+Examples are given in the [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html).
 Documentation can always be improved, so if you would like to add more examples or find the 
 current documentation confusing, please submit a pull request.
 
@@ -74,9 +85,7 @@ The files should follow these naming rules:
 - station name (4 characters) followed by day of year (3 characters) then 0.yyo where yy is the two character year.
 - Example: algo0500.21o where station name is algo on day of year 50 from the year 2021
 
-Example filename : onsa0500.22o
-
-It is also standard to use the Hatanaka files. 
+It is also standard to use the Hatanaka files. Instead of ending in an o the Hatanaka files end in a d.
 
 Example filename : onsa0500.22d
 
@@ -108,31 +117,35 @@ Example filename: ONSA00SWE_R_20213050000_01D_30S_MO.rnx
 * ssS, underscore, M0.
 * followed by rnx (crx if it is Hatanaka format). Note: these are lowercase
 
-01D means it is one day. Some of the other parts of the very 
-long station file name are no
-doubt useful, but they are not recognized by this code. By 
-convention, these files may be
+01D means it is one day. Some of the other parts of the very long station file name are no
+doubt useful, but they are not recognized by this code. By convention, these files may be
 gzipped but not unix compressed. If you want a 
 generic translation program, you can try <code>rinex3_rinex2</code>.
-It has the requirement that you input the input and output file names.
+It has the requirement that you input the input and output RINEX file names.
 
 For a few archives, we allow 1 sample per second files. Following the protocol of the 
-IGS, these files are unfortunately 15 minutes long, which means you have to download
-96 of them. UNAVCO/Earthscope is much friendlier about providing 1 sample per second files,
-and returns a single file, at least for RINEX 2.11.  
+IGS, these files are unfortunately 15 minutes long, which means **you have to download
+96 of them.** UNAVCO/Earthscope is much more sensible about providing 1 sample per second files,
+and returns a single file, at least for the RINEX 2.11 format.  
 
 If you want the code to be able to find those highrate files, you must tell the code you 
 want to use the -rate high files and provide -samplerate 1. Why two inputs?  Because the 
 -rate high option tells the code to look in a particular folder. The samplerate is related
 to the name of the file itself.  
 
-Please see the rinex2snr documentation page for more examples.
+Unfortunately IGS archives have refused to change the standard storage format of 96 files per day.
+And after six months, they tar the files. This code does not currently have the capability to 
+recover those tarred files.  I am happy to host it - but someone else needs to do it. Please
+look at the existing code and make a new python function with similar inputs/outputs and submit a pull request.
+Keep in mind that you should be able to use the existing code base once you have downloaded and untarred 
+the IGS archived file.
 
+Please see the rinex2snr documentation page for more examples.
 
 **NMEA**
 
 NMEA formats can be translated to SNR using <code>nmea2snr</code>.
-Inputs are similar to be the 4char station name, year, and day of year
+Inputs are similar to that used by rinex2snr: the 4char station name, the year, and day of year.
 NMEA files are assumed to be stored as:
 
 $REFL_CODE + /nmea/ABCD/2021/ABCD0030.21.A
@@ -152,7 +165,8 @@ Additional information about nmea2snr [is in the code.](https://gnssrefl.readthe
 
 We have tried our best to make the orbit files relatively invisible to users.
 But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
-or precise orbits in the sp3 format.   
+or precise orbits in the sp3 format.  If you have nav files for your station, we recommend you delete them.
+They are not useful in this code.
 
 **EXECUTABLES**
 
@@ -169,7 +183,7 @@ File structure for station abcd in the year YYYY (last two characters YY), doy D
 
 - REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files 
 
-- REFL_CODE/YYYY/rinex/abcd/  - RINEX files can be stored here
+- REFL_CODE/YYYY/rinex/abcd/  - RINEX files of various flavors can be stored here
 
 - REFL_CODE/YYYY/results/abcd/DDD.txt  Lomb Scargle analysis goes here
 
