@@ -71,14 +71,15 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
     WARNING: this code is meant to be used at sites with tidal signals. If you have a site without it, you 
     should probably use daily_avg instead. If you insist on using this code on such sites (rivers and lakes),
-    you should think about how this code is implemented - it is using splines with 8 knots as the default 
-    (i.e. knot every three hours).  This is very unlikely to be acceptable for a lake or non-tidal river.
+    you should think about how this code is implemented - it is using splines with 8 knots per day as the default 
+    (i.e. a knot every three hours).  This is very unlikely to be acceptable for a lake or non-tidal river.
     You should change the knot setting.
 
     WARNING: this code calculates and applies various corrections. New Reflector Height values are added 
     to the output files as new columns. If you run the code but continue to assume the "good answers" are
     in column 2, you are essentially not using the code at all.
 
+    Subdaily now allows multiple years.
 
     Examples
     --------
@@ -91,6 +92,12 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
     subdaily at01 2023 -h2 14 -if_corr F
         for all solutions in 2023 but with max RH set to 14 meters and interfrequency correction not applied 
+
+    subdaily at01 2022 -year_end 2023
+        analyze all data for years 2022 and 2023
+
+    subdaily at03 2022 -azim1 180 -azim2 270
+        restrict solutions to azimuths between 180 and 270
 
     The code has two sections. 
 
@@ -186,7 +193,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         removes splinefit values from output txt and plot for gaps 
         bigger than this value, in hours
     year_end : int, optional
-        testing allowing multiple year inputs
+        last year of analysis period.  
 
     """
 

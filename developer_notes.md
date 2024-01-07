@@ -1,3 +1,4 @@
+https://stackoverflow.com/questions/7053996/how-do-i-install-imagemagick-with-homebrew
 
 https://realpython.com/pypi-publish-python-package/#version-your-package
 

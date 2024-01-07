@@ -12,19 +12,15 @@ def main():
     """
     main script for the nmea2snr conversion code
 
-    This code creates SNR files from for NMEA files.  
+    This code creates SNR files from NMEA files.  
 
-    NMEA files should be stored in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023
-    or $REFL_CODE/nmea/SSSS/2023 for station SSSS. 
+    The NMEA files should be stored in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023
+    or $REFL_CODE/nmea/SSSS/2023 for station SSSS. The NMEA files should be named 
+    SSSS1520.23.A or ssss1520.23.A, where the day of year is 152 and year is 2023 in this example.
 
-    NMEA Files should be named:  SSSS1520.23.A or ssss1520.23.A
-
-    day of year is 152 and year is 2023 in this example
-
-    The SNR files are stored with upper case if given upper case, lower case if given lower case.
+    The SNR files created are stored with upper case if given upper case, lower case if given lower case.
     Currently I have left the last character in the file name as it was given to me - capital A.
     If this should be lower case for people that use lowercase station names, please let me know.
-
     As far as I can tell, the necessary fields in the NMEA files are GPGGA and GPGSV.
 
     Originally this code used interpolations of the az and el NMEA fields. I have decided this 

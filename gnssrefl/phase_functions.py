@@ -509,7 +509,6 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     hires_figs : bool
         whether you want eps instead of png files created
 
-
     """
 
     if not year_end:
@@ -728,9 +727,9 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     print('>>> VWC results being written to ', vwcfile)
     with open(vwcfile, 'w') as w:
         N = len(nv)
-        w.write("% Soil Moisture Results for GPS Station {0:4s} \n".format(station))
+        w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
         w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
-        w.write("% FracYr Year  DOY  VWC Month Day \n")
+        w.write("% FracYr    Year   DOY   VWC Month Day \n")
         for iw in range(0, N):
             whydoys = np.round(365.25 * (t[iw] - years))
 
@@ -802,7 +801,9 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir):
 
     print('Daily averaged phases will be written to : ', fileout)
     with open(fileout, 'w') as fout:
-        fout.write("% Year DOY Ph Phsig NormA MM DD \n")
+        # Year DOY Ph Phsig NormA MM DD
+          #            2012   1  10.00   2.60  0.962  0.00    1  1
+        fout.write("% Year DOY   Ph    Phsig NormA  empty  Mon Day \n")
         for requested_year in range(year, year_end + 1):
             for doy in range(1, 367):
             # put in amplitude criteria to keep out bad L2P results
@@ -1504,3 +1505,38 @@ def write_out_raw_phase(v,fname):
         np.savetxt(my_file, newv, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f %2.0f %8.3f ",header=h1+h2,comments='%')
 
     return newv
+
+def write_phase_for_advanced(filename, vxyz):
+    """
+    Writes out a file of interim phase results for advanced models
+    developed by Clara Chew
+
+    File generally written to $REFL_CODE/Files/<station>/all_phase.txt
+
+    Parameters
+    ----------
+    filename : str
+        name for output file
+    vxyz : numpy array of floats
+        as defined in vwc_cl.py
+    """
+    # do a quick sort as they are likely quadrant sorted now
+    ii = np.argsort(vxyz[:,0] + vxyz[:,1]/365.25)
+    vxyz = vxyz[ii,:]
+    #headers for output file - these are not correct BTW
+    print('writing interim file for advanced model ', filename)
+    h1 = "Year DOY Phase  Azim Sat    RH    nLSPA nLSA    Hour   LSPA   LS  apRH  quad\n"
+    h2 = "(1)  (2)  (3)   (4)  (5)    (6)    (7)   (8)     (9)   (10)  (11)  (12)  (13)   "
+    #2012   1   9.19  315.6  1   1.850   0.97   0.98  0.59 19.80 19.79  1.85  2
+    with open(filename, 'w') as my_file:
+        np.savetxt(my_file, vxyz, fmt="%4.0f %3.0f %6.2f %6.1f %2.0f %7.3f %6.2f %6.2f %5.2f %6.2f %6.2f %6.2f %2.0f   ",header=h1+h2,comments='%')
+
+    return
+#                   if adhoc_snow:
+#                        ii = (norm_ampLSP > 0.5)
+#                        y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs,ap_rhs = \
+#                                qp.rename_vals(y, t, h, new_phase, azd, s, amp_lsps, amp_lss, rhs, ap_rhs,ii)
+#                        norm_ampLSP = norm_ampLSP[ii]
+#                        norm_ampLS = norm_ampLS[ii]
+#                        fracyear = fracyear[ii]
+

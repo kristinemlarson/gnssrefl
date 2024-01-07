@@ -2,12 +2,13 @@
 
 A good GNSS reflection site has:
 
-- a large reflection zone
-- good receiver tracking multiple GNSS signals and modern (L2C,L5) GPS signals
-- sampling rate that is commensurate with what you are trying to measure (i.e. 
+- A reflection zone that extends to a wide range of azimuths
+- A good receiver tracking multiple GNSS signals and modern (L2C,L5) GPS signals
+- A sampling rate that is commensurate with what you are trying to measure (i.e. 
 30 second sampling rate won't work for stations that are more than 8-9 meters 
 above the reflecting surface).
 - RINEX files with positions in the header and (preferably float) SNR data 
+- There is no elevation mask on the receiver
 
 ## Reflection Zones
 
@@ -43,7 +44,7 @@ defined for the SNR observations.
   from [the GNSS-IR web app](https://gnss-reflections.org/rzones)
 * Make sure your antenna is surrounded by natural planar surfaces. No crashing waves. No outlet glaciers. No large ships
   coming and going.
-* Use the [reflection zone app](https://gnss-reflections.org) or the python utility refl_zones to 
+* Use the [reflection zone app](https://gnss-reflections.org) or the python utility `refl_zones` to 
 make sure that you can sense the surface you want to measure. This is extremely
   important for water levels, as many groups think seeing the water in a photo means you can measure it. All you need to
   check this is the position of your site. The app will calculate the geoid correction for the ellipsoidal height. If
@@ -56,7 +57,7 @@ make sure that you can sense the surface you want to measure. This is extremely
 
 ## Operating a good GNSS reflections site:
 
-* Always remove the elevation mask on the receiver.
+* Always remove the elevation mask on the receiver!
 * Set the sampling interval by evaluating reflection surfaces. The standard GNSS sampling interval of thirty seconds was
   selected over thirty years ago before the internet existed!  Collect (and archive) more data.
 * Take photographs of your site.

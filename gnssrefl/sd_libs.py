@@ -718,131 +718,6 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_fig
         g.save_plot(txtdir + '/' + station + '_rhdot3.png')
 
 
-def RH_ortho_plot( station, H0, year, th_even, spline_whole_time,txtdir, fs, time_rh, rh, gap_min_val,th,spline,delta_out):
-    """
-
-    Makes a plot of the final spline fit to the data. Output time interval controlled by the user.
-
-    It also now writes out the file with the spline fit
-
-    Parameters
-    ----------
-    station : str
-        name of station, 4 ch
-    H0 : float
-        datum correction (orthometric height) to convert RH to MSL data, in meters
-    year : int
-        year of the time series (ultimately should not be needed)
-    th_even : numpy of floats
-        time in fractional days of of year, I think
-    spline_whole_time : numpy of floats
-        RH values (m)
-    txtdir : str
-       location of plot
-    fs : int
-        fontsize
-    time_rh : numpy of floats
-        time of rh values, in fractional doy I believe
-    rh : numpy of floats
-        refl hgt in meters
-    gap_min_val : float
-        minimum length gap allowed, in day of year units
-    th : numpy floats
-        time values in day of year units
-    spline : output of interpolate.BSpline
-        used for fitting 
-    delta_out : int
-        how often spline is printed, in seconds
-    """
-
-    firstpoint = float(th[0]); lastpoint = float(th[-1])
-    s1 = math.floor(firstpoint); s2 = math.ceil(lastpoint)
-    ndays = s2-s1 # number of days
-    numvals = 1 + int(ndays*86400/delta_out)
-    tp=np.linspace(s1,s2,numvals,endpoint= True)
-    mjd1 = g.fdoy2mjd(year, tp[0] ) # 
-    mjd_new = mjd1 + (tp - tp[0])
-    mjd_new_obstimes = mjd_to_obstimes(mjd_new)
-    spline_new = spline(tp)
-
-
-    # looks like I identified the gaps in day of year units - 
-    # but then did the implementation in mjd and then datetime ...
-    splinefileout =  txtdir + '/' + station + '_' + str(year) + '_spline_out.txt'
-    print('Writing evenly sampled file to: ', splinefileout)
-    fout = open(splinefileout,'w+')
-    fout.write('{0:1s}  {1:30s}  \n'.format('%','This is NOT observational data - be careful when interpreting it.'))
-    fout.write('{0:1s}  {1:30s}  \n'.format('%','If the data are not well represented by the spline functions, you will '))
-    fout.write('{0:1s}  {1:30s}  \n'.format('%','have a very poor representation of the data. I am also writing out station '))
-    fout.write('{0:1s}  {1:30s}  {2:8.3f} \n'.format('%','orthometric height minus RH, where Hortho (m) is ', H0  ))
-    fout.write('{0:1s}  {1:30s}  \n'.format('%','This assumes RH is measured relative to the L1 phase center.  '))
-    fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD, RH(m), YY,MM,DD,HH,MM,SS, quasi-sea-level(m)'))
-
-
-    # difference function to find time between all rh measurements
-    gdiff = np.diff( time_rh )
-    mjdx = g.fdoy2mjd(year, time_rh[0] ) # 
-    mjdt = mjdx + (time_rh - time_rh[0])
-    mjd = mjdt[0:-1]
-
-    # MJD of the gdiff values
-    # mjd = time_rh[0:-1] + mjdx
-    #print('base value ', year, time_rh[0], mjdx, mjd[-1])
-
-    # find indices of gaps  that are larger than a certain value
-    ii = (gdiff > gap_min_val)
-    N = len(mjd[ii])
-    Ngdiff = len(gdiff)
-
-    # figure out mjd of the first point
-    mjd0 = g.fdoy2mjd(year, th_even[0])
-    mjd_even = mjd0 + (th_even - th_even[0])  
-    mjd_even_obstimes = mjd_to_obstimes(mjd_even)
-    N = len(mjd_even_obstimes)
-
-    dlist = mjd_even_obstimes.tolist()
-
-    # get the integer values to write out 
-    theyear = [y.year for y in dlist ]
-    xm = [y.month for y in dlist]
-    xd = [y.day for y in dlist]
-    xh = [y.hour for y in dlist]
-    xmin = [y.minute for y in dlist]
-    xs = [y.second for y in dlist]
-
-    if (Ngdiff > 0):
-        for i in range(0,Ngdiff):
-            if ii[i]:
-                e0 = mjd[i] ; e1 = mjd[i+1] # beginning and ending of the gap
-                #newl = [ e0, e1 ]
-                #print('gap', mjd[i],mjd[i+1])
-                bad_indices = (mjd_even > e0) & (mjd_even < e1 )
-                #mjd_even[bad_indices] = np.nan
-                spline_whole_time[bad_indices] = np.nan
-                mjd_even_obstimes[bad_indices] = np.datetime64("NaT")
-
-
-    for i in range(0,N):
-        if not np.isnan(spline_whole_time[i]):
-            # need mjd 
-            rh = spline_whole_time[i]
-            fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} {8:10.3f} \n'.format(mjd_even[i], rh, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], H0-rh))
-        #else:
-        #    print('This point removed ', xm[i], xd[i],xmin[i], xs[i])
-
-    fout.close()
-
-    fig=plt.figure(figsize=(10,5))
-    plt.plot(mjd_even_obstimes, H0 -spline_whole_time, 'b-')
-    #plt.plot(mjd_even, H0 -spline_whole_time, 'c')
-    plt.grid()
-    plt.ylabel('meters',fontsize=fs)
-    plt.title(station.upper() + ' Water Level ', fontsize=fs)
-    fig.autofmt_xdate()
-
-    pfile = txtdir + '/' + station + '_H0.png'
-    g.save_plot(pfile)
-
 def find_ortho_height(station,extension):
     """
     find orthometric (sea level) height used in plots
@@ -1169,7 +1044,7 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     plt.plot(mjd_new_obstimes, H0 -spline_new, 'b-',linewidth=2)
     plt.grid()
     plt.ylabel('meters',fontsize=fs)
-    plt.title(station.upper() + ' Water Level ', fontsize=fs)
+    plt.title(station.upper() + ' Water Level from GNSS-IR', fontsize=fs)
     fig.autofmt_xdate()
 
     pfile = txtdir + '/' + station + '_H0.png'

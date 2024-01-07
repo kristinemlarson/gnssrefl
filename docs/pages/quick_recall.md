@@ -1,7 +1,7 @@
 # Quick Links to the Code
 
 I originally made special documentation pages for different modules. I am now trying to
-put all documentation INTO the code itselsf using readthedocs. That includes example calls. While 
+put all documentation INTO the code intself using readthedocs since the format allows for example calls. While 
 I still have some discussion pages (so a link to the code and a link to a discussion page),
 those discussion links will likely go away in the not very distant future.
 
@@ -12,12 +12,11 @@ those discussion links will likely go away in the not very distant future.
 * [quickLook](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickLook_cl.html)
 
 * [gnssir code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html),
- [gnssir inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
+ [inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html)
 
 
 
-## Additional Utilities
-
+## Important Helper Functions 
 
 * [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 
@@ -26,7 +25,7 @@ those discussion links will likely go away in the not very distant future.
 
 * [invsnr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_invsnr.html),
-[invsnr_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
+[input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.invsnr_input.html)
 
 * [refl_zones](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html)
 
@@ -51,7 +50,7 @@ phasecode, TBD
 * [download_tides](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_tides.html)
 * [download_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.download_unr.html)
 
-## Utilities
+## Various Utilities
 
 * [check_rinex_file](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.check_rinex_file.html)
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)

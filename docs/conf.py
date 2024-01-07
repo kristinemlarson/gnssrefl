@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('../gnssrefl'))
 # -- Project information -----------------------------------------------------
 
 project = 'gnssrefl'
-copyright = '2023, Kristine M. Larson and GNSS-IR community'
+copyright = '2024, Kristine M. Larson and GNSS-IR community'
 author = 'Kristine M. Larson and GNSS-IR community'
 
 
