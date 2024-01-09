@@ -15,24 +15,19 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol,utc_offset):
 
     Parameters
     ----------
-    tvd : str
-        plain text file
-
+    tvd : numpy array 
+        contents of whatever file was read by loadtxt in quickplt
     ymd : bool
         first three columns are year,month,day, hour,
         minute,second
-
     convert_mjd : bool
         convert from MJD (column 1 designation)
         time is datetime obj
-
     ydoy : bool
         first two columns are year and day of year
         time is datetime obj
-
     xcol : int
         column number for x-axis in python speak
-
     ycol : int
         column number for y-axis in python speak
     utc_offset : int
@@ -41,12 +36,10 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol,utc_offset):
     Returns
     -------
 
-    tval : list
-         floats or datetime
-
-    yval : list
-         floats ?
-        
+    tval : numpy array
+         time, via floats or datetime, depending on what was requested
+    yval : numpy array
+         floats  - whatever is being plotted on the yaxis
     """
 
     tval = []

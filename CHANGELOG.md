@@ -10,6 +10,9 @@ Added multiyear option to subdaily
 
 Various changes to vwc
 
+Updated quickplt to use proper boolean argument inputs
+Added errorbar option
+
 ## 1.9.9
 December 8, 2023
 

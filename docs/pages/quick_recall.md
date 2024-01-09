@@ -41,7 +41,7 @@ those discussion links will likely go away in the not very distant future.
 * [vwc code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_vwc.html),
 [vwc_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_input.html),
-phasecode, TBD
+[phasecode](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickPhase.html)
 
 ## Download Scripts 
 

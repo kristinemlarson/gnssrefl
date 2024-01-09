@@ -21,7 +21,7 @@ from gnssrefl.utils import validate_input_datatypes, str2bool
 
 def parse_arguments():
 
-    msg = rnx.print_archives()
+    #msg = rnx.print_archives()
 
     parser = argparse.ArgumentParser()
     #parser = argparse.ArgumentParser(epilog=msg)

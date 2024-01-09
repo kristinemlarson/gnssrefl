@@ -139,16 +139,17 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
         outputpng = direc + 'water_' + str(year) +'AV.eps'
     else:
         outputpng = direc + 'water_' + str(year) +'AV.png'
-    print('Input file',gpsfile)
-    print('Output file: ',outputfile)
-    print('Output png: ',outputpng)
 
     if os.path.exists(gpsfile):
         gps = np.loadtxt(gpsfile,comments='%')
     else:
-        print('Input file does not exist. Exiting')
-        print(gpsfile)
+        print('The input file needed for this code does not exist', gpsfile)
+        print('You either need to run daily_avg manually or provide optional inputs here for medfilter and ReqTracks. Exiting')
         sys.exit()
+
+    print('Input file',gpsfile)
+    print('Output file: ',outputfile)
+    print('Output png: ',outputpng)
 
 
     if plt_enddate is not None:

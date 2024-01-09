@@ -29,14 +29,16 @@ Before you run the snowdepth module, you need to consolidate your RH results. Yo
 
 or 
 
-- you can set the -medfilter and -ReqTracks optional inputs to snowdetph.
+- you can set the -medfilter and -ReqTracks optional inputs to snowdepth.
 
-Either makes sure that gross outliers have been removed. Read the daily_avg documentation for more information.
+Either makes sure that gross outliers have been removed. 
+Read the [daily_avg](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.daily_avg_cl.html) 
+documentation for more information.
 
 Depending on which algorithm choice
 you make (simple vs. azimuthal), the code will use either the full list of arc specific LSP files or the daily average.
 
-[More on optional inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html)
+[More on optional snowdepth inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html)
 
 The error bars are **over-estimates** and based on the standard deviation of the 
 reflector heights used in the average. These include terrain errors as well as snow depth errors.

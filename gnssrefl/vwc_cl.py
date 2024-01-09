@@ -188,7 +188,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     k = 1
     # define the contents of this variable HERE
-    vxyz = np.empty(shape=[0, 13]) 
+    vxyz = np.empty(shape=[0, 15]) 
     # newl = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,qs)).T
     # column, contents of this variable
     # 0 year
@@ -204,6 +204,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     # 10 raw LS amp, for advanced setting
     # 11 apriori RH
     # 12 quadrant (pboh2o style)
+    # 13 delRH (for adv model)
+    # 14 vegMask (for adv model)
 
 
     # this is the number of points for a given satellite track
@@ -318,9 +320,16 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
                     # these are normalized LS amplitudes
                     norm_ampLS= qp.normAmp(amp_lss, basepercent)
 
-                    # should add quadrant to make life easier...
-                    qs = oldquads[index]*np.ones(shape=[1,len(amp_lsps)])
-                    newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs,qs)).T
+                    # adding three new columns to use in Clara Chew algorithm
+                    NN = len(amp_lsps)
+                    qs = oldquads[index]*np.ones(shape=[1,NN])
+                    delRH = rhs-ap_rhs
+                    i = (norm_ampLSP < 0.8)
+                    vegMask = np.zeros(shape=[NN,1])
+                    vegMask[i] = 1
+
+                    newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs,qs,delRH,vegMask.T)).T
+                    #newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs,qs)).T
 
                     newl = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs)).T
 
