@@ -23,7 +23,10 @@ Noise Ratio Data, IEEE TGRS,Vol. 53(5), 2755-2763, doi: 10.1109/TGRS.2014.236451
 - [Nievinski, F.G. and K.M. Larson, Inverse Modeling of GPS Multipath for Snow Depth Estimation, Part I: Formulation and Simulations, IEEE TGRS, Vol. 52(10), 6555-6563, doi:10.1109/TGRS.2013.2297681, 2014](https://morefunwithgps.com/public_html/Inverse_Modeling_of_GPS_Multipath_for_Snow_Depth_EstimationPart_I_Formulation_and_Simulations.pdf)
 
 - [Nievinski, F.G. and K.M. Larson, Inverse Modeling of GPS Multipath for Snow Depth Estimation, Part II: Application and Validation, IEEE TGRS, Vol. 52(10), 6564-6573, doi:10.1109/TGRS.2013.2297688, 2014](https://morefunwithgps.com/public_html/Inverse_Modeling_of_GPS_Multipath_for_Snow_Depth_EstimationPart_II_Application_and_Validation.pdf)
+
 - [Altuntas, C., M.C. Iban, E. Şentürk, U.M. Durdag, and N. Tunalioglu, Machine learning-based snow depth retrieval using GNSS signal-to-noise ratio data, GPS Solutions, Vol. 26(117), 1-12, doi:10.1007/s10291-022-01307-2, 2022](https://link.springer.com/article/10.1007/s10291-022-01307-2)
+
+- [Altuntas, C. and N. Tunalioglu, Enhancing snow depth estimations through iterative satellite elevation range selection in GNSS-IR to account for terrain variation, IEEE TGRS, Vol. 61, Article no: 5802309, 1-9, doi:10.1109/TGRS.2023.3312925, 2023](https://ieeexplore.ieee.org/abstract/document/10243156) 
 
 - [McCreight, E.E. Small, and K.M. Larson, Snow Depth, Density, and SWE estimates Derived from GPS Reflection Data: Validation in the Western U.S., Water Resources Research,Vol. 50(8), doi:10.1002/2014WR015561, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/McCreightSmallLarson.pdf)
 
@@ -50,6 +53,8 @@ Research Letters, 48, e2020GL091378. https://doi. org/10.1029/2020GL091378, 2021
 
 - Purnell, D. Gomez, N., Chan, NH, Strandberg, J., Hobiger, T. Quantifying the Uncertainty in Ground-Based GNSS-Reflectometry 
 Sea Level Measurements, IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, DOI:10.1109/JSTARS.2020.3010413, 2021
+
+- [Altuntas, C. and N. Tunalioglu, A systematic approach for identifying optimal azimuth and elevation angle masks in GNSS-IR: validation through a sea level experiment, GPS Solutions, Vol 27(4), 198, doi:10.1007/s10291-023-01535-0, 2023](https://link.springer.com/article/10.1007/s10291-023-01535-0)
 
 ## Lakes and Rivers
 
