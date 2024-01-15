@@ -9,7 +9,7 @@ from astropy.time import Time
 
 import gnssrefl.gps as g
 
-def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol,utc_offset):
+def trans_time(tvd, ymd, ymdhm, convert_mjd, ydoy ,xcol,ycol,utc_offset):
     """
     translates time for quickplt
 
@@ -20,6 +20,8 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol,utc_offset):
     ymd : bool
         first three columns are year,month,day, hour,
         minute,second
+    ymdhm : bool
+        first five columns are year,month,day, hour, minut,
     convert_mjd : bool
         convert from MJD (column 1 designation)
         time is datetime obj
@@ -54,19 +56,17 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol,utc_offset):
         print('You asked to plot column', xcol+1, ' and that column does not exist in the file')
         sys.exit()
 
-    if ymd == True:
-        year = tvd[:,0]; month = tvd[:,1]; day = tvd[:,2];
-        hour = tvd[:,3] ; minute = tvd[:,4]
+    if ymd :
         for i in range(0,len(tvd)):
-            if (tvd[i, 4]) > 0:
-                y = int(year[i]); m = int(month[i]); d = int(day[i])
-                # i am sure there is a better way to do this
-                today=datetime.datetime(y,m,d)
-                doy = (today - datetime.datetime(today.year, 1, 1)).days + 1
-                h = int(hour[i])
-                mi = int(minute[i])
-                tval.append(y + (doy +  h/24 + mi/24/60)/365.25);
-                yval.append( tvd[i,ycol]/1000)
+            bigT = datetime.datetime(year=int(tvd[i,0]), month=int(tvd[i,1]), day=int(tvd[i,2]) )
+            tval.append(bigT)
+            yval.append( tvd[i,ycol])
+    elif ymdhm:
+        for i in range(0,len(tvd)):
+            bigT = datetime.datetime(year=int(tvd[i,0]), month=int(tvd[i,1]), 
+                                     day=int(tvd[i,2]), hour=int(tvd[i,3]), minute=int(tvd[i,4]), second=0)
+            tval.append(bigT)
+            yval.append( tvd[i,ycol])
     else:
         if convert_mjd:
             mm = tvd[:,xcol]
@@ -89,7 +89,6 @@ def trans_time(tvd, ymd, convert_mjd, ydoy ,xcol,ycol,utc_offset):
         else:
             tval = tvd[:,xcol] ; yval = tvd[:,ycol]
             x1 = min(tval) ; x2 = max(tval)
-
 
     return tval, yval 
 

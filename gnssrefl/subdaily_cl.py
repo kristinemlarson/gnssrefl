@@ -17,14 +17,14 @@ def parse_arguments():
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", default=None, type=int, help="year of data")
     parser.add_argument("-year_end", default=None, type=int, help="Allow multiple years of inputs by specifying last year")
-    parser.add_argument("-txtfile_part1", default=None, type=str, help="optional filename,first section of code (gross outlier detection), must be in gnssir output format") 
-    parser.add_argument("-txtfile_part2", default=None, type=str, help="optional filename,second section of code (Rhdot calculation, splines), must be gnssir output format ") 
+    parser.add_argument("-txtfile_part1", default=None, type=str, help="optional filename (part1), must be in gnssir output format") 
+    parser.add_argument("-txtfile_part2", default=None, type=str, help="optional filename (part2), must be gnssir output format ") 
     parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt")
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
     parser.add_argument("-spline_outlier1", default=None, type=float, help="outlier criterion used in first splinefit (meters)")
     parser.add_argument("-spline_outlier2", default=None, type=float, help="outlier criterion used in second splinefit (meters)")
     parser.add_argument("-knots", default=None, type=int, help="Knots per day, spline fit only (default is 8)")
-    parser.add_argument("-sigma", default=None, type=float, help="simple sigma outlier criterion, float, evaluated on a daily basis for LSP RH (e.g. 1 for 1sigma, 3 for 3sigma). default is 2.5 sigma")
+    parser.add_argument("-sigma", default=None, type=float, help="part1 outlier criterion, float, default is 2.5 (sigma)")
     parser.add_argument("-extension", default=None, type=str, help="solution subdirectory")
     parser.add_argument("-rhdot", default=None, type=str, help="set to False if you want to stop after section 1 of the QC code")
     parser.add_argument("-doy1", default=None, type=int, help="initial day of year")
@@ -38,13 +38,13 @@ def parse_arguments():
     parser.add_argument("-peak2noise", default=None, type=float, help="new peak2noise constraint")
     parser.add_argument("-kplt", default=None, type=str, help="special plot for kristine")
     parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output")
-    parser.add_argument("-delta_out", default=None, type=int, help="Output interval for spline fit, seconds (default is 1800)")
-    parser.add_argument("-if_corr", default=None, type=str, help="Interfrequency correction applied, optional")
+    parser.add_argument("-delta_out", default=None, type=int, help="Output interval for final spline fit, seconds (default is 1800)")
+    parser.add_argument("-if_corr", default=None, type=str, help="Whether interfrequency correction is applied, optional")
     parser.add_argument("-knots_test", default=None, type=int, help="test knots")
     parser.add_argument("-hires_figs", default=None, type=str, help="hi-resolution eps figures, default is False")
     parser.add_argument("-apply_rhdot", default=None, type=str, help="apply rhdot, default is True")
     parser.add_argument("-fs", default=None, type=int, help="fontsize for figures. default is 10")
-    parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate sigma definition. default is False")
+    parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate Nievinski sigma definition. default is False")
     parser.add_argument("-gap_min_val", default=None, type=float, help="min gap allowed in splinefit output file. default is 6 hours")
 
     args = parser.parse_args().__dict__
@@ -66,24 +66,52 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
              hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0,
              year_end: int=None):
     """
-    Subdaily combines multiple day gnssir solutions and applies relevant corrections. 
-    It only works for one year at a time; you can restricts time periods within a year with -doy1 and -doy2
+    Subdaily combines gnssir solutions and applies relevant corrections needed to measure water levels (tides). 
+    As of January 2024, it will allow multiple years. Within a single year, you can further restrict it to 
+    specific days of year (-doy1 and -doy2).
 
-    WARNING: this code is meant to be used at sites with tidal signals. If you have a site without it, you 
-    should probably use daily_avg instead. If you insist on using this code on such sites (rivers and lakes),
-    you should think about how this code is implemented - it is using splines with 8 knots per day as the default 
-    (i.e. a knot every three hours).  This is very unlikely to be acceptable for a lake or non-tidal river.
-    You should change the knot setting.
+    In general this code is meant to be used at sites with tidal signals. If you have a site 
+    without tidal signals, you should consider using daily_avg instead. If you would still 
+    like to use this code for rivers and lakes, you should change the defaults for the spline 
+    fits. For tidal sites, 8 knots per day is the default. For nearly stationary surfaces, as you 
+    would expect for a lake or river, you should use many fewer knots per day.
 
-    WARNING: this code calculates and applies various corrections. New Reflector Height values are added 
+    This code calculates and applies various corrections. New Reflector Height values are added 
     to the output files as new columns. If you run the code but continue to assume the "good answers" are
-    in column 2, you are essentially not using the code at all.
+    in still in column 3, you are essentially not using the code at all.
 
-    Subdaily now allows multiple years.
+    As of version 2.0.0:
+
+    The final output of subdaily is a smooth spline fit to reflector heights (RH) which has been 
+    adjusted to mean sea level (meters). The user is asked to provide the orthometric height
+    of the L1 GPS phase center. This value should be stored as Hortho in the gnssir analysis strategy file
+    (ssss.json where ssss is the 4 character station name). The output water levels are then defined as Hortho minus RH. 
+    If the user does not provide Hortho, one is computed from the station ellipsoidal height stored in the gnssir 
+    analysis strategy file and EGM96.
+
+    The subdaily code has two main sections. 
+
+    I. Summarize the retrievals (how many retrievals per constellation), identify and remove 
+    gross outliers, provide plots to allow a user to evaluate Quality Control parameters. The 
+    solutions can further be edited from the command line (i.e. restrict the RH using 
+    -h1 and -h2, in meters, or azimuths using -azim1 and -azim2)
+
+    II. This section has the following goals:
+
+    - removes more outliers based on a spline fit to the RH retrievals
+
+    - calculates and applies RHdot correction
+
+    - removes an interfrequency (IF) bias. All solutions are then relative to GPS L1.
+
+    txtfile_part1 is optional input if you want to skip concatenating daily gnssir output files 
+    and use your own file. Make sure results are in the same format.
+
+    txtfile_part2 is optional input that skips part 1 and uses this file as input to 
+    the second part of the code.
 
     Examples
     --------
-
     subdaily at01 2023 -plt F
         for station at01, all solutions in 2023  but no plots to the screen
 
@@ -99,25 +127,6 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     subdaily at03 2022 -azim1 180 -azim2 270
         restrict solutions to azimuths between 180 and 270
 
-    The code has two sections. 
-
-    I. Summarize the retrievals (how many retrievals per constellation), identify and remove gross outliers.
-    provide plots to allow a user to evaluate Quality Control parameters. The solutions can further be edited from
-    the command line (i.e. restrict the RH using -h1 and -h2, in meters, or azimuths using -azim1 and -azim2)
-
-    II. This section has the following goals:
-
-    - removes more outliers based on a spline fit to the RH retrievals
-
-    - calculates and applies RHdot
-
-    - removes an interfrequency (IF) bias. All solutions are then relative to GPS L1.
-
-    txtfile_part1 is optional input if you want to skip part 1 and use your own file (but in the same format).
-
-    txtfile_part2 is optional input to the second part of the code.
-
-
     Parameters
     ----------
     station : str
@@ -125,9 +134,9 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     year : int
         full year
     txtfile_part1 : str, optional
-        input File name.
+        input File name for part 1.
     txtfile_part2 : str, optional
-        Input filename for rhdot/spline fitting
+        Input filename for part 2.
     csvfile: boolean, optional
         Set to True if you prefer csv to plain txt.
         default is False.

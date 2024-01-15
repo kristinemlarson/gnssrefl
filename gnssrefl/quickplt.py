@@ -22,6 +22,7 @@ def parse_arguments():
     parser.add_argument("-errorcol",   help="error bar for y-values", type=int,default=None)
     parser.add_argument("-mjd", help="if x-values are MJD ", type=str,default=None)
     parser.add_argument("-reverse", help="reverse the y-axis", type=str,default=None)
+    parser.add_argument("-ymd", help="columns 1-3 are year mon day ", type=str,default=None)
     parser.add_argument("-ymdhm", help="columns 1-5 are year mon day hour minute", type=str,default=None)
     parser.add_argument("-xlabel", type=str, help="optional x-axis label", default=None)
     parser.add_argument("-ylabel", type=str, help="optional y-axis label", default=None)
@@ -39,7 +40,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['mjd', 'reverse', 'ymdhm', 'ydoy']
+    boolean_args = ['mjd', 'reverse', 'ymdhm', 'ydoy','ymd']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -48,7 +49,7 @@ def parse_arguments():
 
 def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: bool=False, xlabel: str=None, 
                   ylabel: str=None, symbol: str=None, reverse:bool=False,title:str=None,outfile: str=None,
-                  xlimits: float=[], ylimits: float=[], ydoy:bool=False, ymdhm:bool=False, filename2: str=None, freq:int=None, utc_offset: int=None):
+                  xlimits: float=[], ylimits: float=[], ydoy:bool=False, ymd:bool=False, ymdhm:bool=False, filename2: str=None, freq:int=None, utc_offset: int=None):
 
     """
     quick file plotting using matplotlib
@@ -131,6 +132,9 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
     ydoy : bool, optional
         if columns 1 and 2 are year and doy, the x-axis will be plotted in obstimes
         you should select column 1 to plot
+    ymd : bool, optional
+        if columns 1,2,3 are year, month, date. So meant for plots with daily measurements -
+        not subdaily.
     ymdhm : bool, optional
         if columns 1-5 are Y,M,D,H,M then x-axis will be plotted in obstimes
     filename2 : str
@@ -159,8 +163,6 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
     secondFile = False
 
     reverse_sign = reverse
-
-    ymd = ymdhm
 
     convert_mjd = mjd
 
@@ -202,11 +204,11 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
             print('second filename does not exist')
 
 
-    tval,yval = q.trans_time(tvd, ymd, convert_mjd, ydoy,xcol,ycol,utc_offset)
+    tval,yval = q.trans_time(tvd, ymd, ymdhm, convert_mjd, ydoy,xcol,ycol,utc_offset)
     if secondFile:
-        tval2,yval2 = q.trans_time(tvd2, ymd, convert_mjd, ydoy,xcol,ycol,utc_offset)
+        tval2,yval2 = q.trans_time(tvd2, ymd, ymdhm, convert_mjd, ydoy,xcol,ycol,utc_offset)
 
-    # supercedes previous trans_time ... 
+    # supercedes previous trans_time ... ??? 
     if ydoy:
         #print('Making obstimes for ydoy x-axis')
         tval = g.ydoy2datetime(tvd[:,0], tvd[:,1])

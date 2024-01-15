@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import argparse
 import datetime
+import numpy as np
 import os
 import requests
 import subprocess
 import sys
+import wget
 import gnssrefl.gps as g
 
 #from gnssrefl.utils import validate_input_datatypes, str2bool
@@ -401,6 +403,78 @@ def pickup_from_noaa(station,date1,date2,datum, printmeta):
             print(data['metadata'])
 
     return data, error
+
+def download_qld(station,year,plt):
+    """
+    Parameters
+    ----------
+    station : str
+        tide gauge station name
+    year : int
+        calendar year
+    plt : bool
+        whether you want a plot to the screen
+    """
+    # unfortunately hardwired for 2022 now
+    #https://www.qld.gov.au/environment/coasts-waterways/beach/storm/storm-sites
+    # last seven days
+    # https://www.data.qld.gov.au/dataset/coastal-data-system-near-real-time-storm-tide-data
+    if year is None:
+        print('Year is required for the Queensland option')
+        sys.exit()
+    else:
+        url = 'https://www.data.qld.gov.au/dataset/179c7cc5-26a7-4f57-9e1e-3ec2ed5dd4de/resource/cacc9e98-be38-44f7-a535-07acd22a3b91/'
+        url2 = 'download/h071004a_' + str(year) + '_' + station + '_10min.csv'
+        tmpfile = station + '_' + str(year) + '_10min.csv'
+        wget.download(url+url2, tmpfile)
+
+    xdir = os.environ['REFL_CODE']
+    outdir = xdir  + '/Files/'
+    if not os.path.exists(outdir) :
+        subprocess.call(['mkdir', outdir])
+    outfile = outdir + station + '_' + str(year) + '.txt'
+
+    fout = open(outfile, 'w+')
+    print('Queensland Tide file written to :', outfile)
+
+    obstimes=[]
+    sl = []
+    fout.write("{0:s} \n".format('%' + ' QLD Station: ' + station ))
+    fout.write("%YYYY MM DD HH MM  SS Water(m) DOY    MJD  \n")
+    fout.write("% 1    2  3  4  5   6   7       8     9\n")
+
+    if os.path.isfile(tmpfile):
+        x=np.loadtxt(tmpfile,usecols=(0,1,3),skiprows=40,dtype='str',delimiter=',')
+        nr,nc=np.shape(x)
+        for i in range(0,nr):
+            sealevel = float(x[i,2])
+            sl.append(sealevel)
+            d = int(x[i,0][0:2]) ; m = int(x[i,0][3:5])
+            y = int(x[i,0][6:10])
+            hr = int(x[i,1][1:3]); mm = int(x[i,1][4:6])
+            bigT = datetime.datetime(year=y, month=m, day=d,hour=hr,minute=mm,second=0)
+            obstimes.append(bigT)
+            modjul, fr = g.mjd(y,m,d,hr,mm,0)
+            mjd = modjul+fr
+            doy,cdoy,cyyyy,cyy = g.ymd2doy(y, m, d )
+            fout.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:7.3f} {7:3.0f} {8:15.6f} \n".format(y, m, d, hr, mm, 0, sealevel, doy, mjd))
+
+        fout.close()
+    else:
+        print('No file was downloaded')
+        sys.exit()
+
+    if plt:
+        g.quickp(station,obstimes,sl)
+
+    # clean up - remove csv file
+    subprocess.call(['rm','-f',tmpfile])
+
+# this is more direct API call for last seven days ... I think 
+#urlL = 'https://www.data.qld.gov.au/api/3/action/datastore_search?resource_id=7afe7233-fae0-4024-bc98-3a72f05675bd'
+#endL = '&q=' + station + '&limit=' + str(NV)
+
+# https://www.data.qld.gov.au/dataset/coastal-data-system-near-real-time-storm-tide-data
 
 
 if __name__ == "__main__":

@@ -1,29 +1,21 @@
 # Understanding
 
-
-## Overview
-
 **gnssrefl** is an open source/python version of my GNSS interferometric reflectometry (GNSS-IR) code. 
-
-*If you would like to try out reflectometry without installing the code*
-
-I recommend you use [the GNSS-IR web app](https://gnss-reflections.org/api). It 
-can show you representative results in less than 10 seconds. There are also some 
-[examples](https://gnss-reflections.org/overview).
 
 ## Goals
 
 The goal of the gnssrefl python repository is to help you compute (and evaluate) GNSS-based
-reflectometry parameters using geodetic data. This method is often
-called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main modules:
+reflectometry parameters using standard GNSS data. This method is often
+called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main sections:
 
-* [**rinex2snr**](rinex2snr.md) translates RINEX files into SNR files needed for analysis.
+* Translation: Use either [**rinex2snr**] or [**nmea2snr**] to translate native 
+GNSS formats to what gnssrefl needs. The output is called a *SNR* file.
 
-* [**quickLook**](quickLook.md) gives you a quick (visual) assessment of SNR file without dealing
+* [**quickLook**] gives you a quick (visual) assessment of a SNR file without dealing
 with the details associated with **gnssir**. It is not meant to be used for routine analysis.
 It also helps you pick an appropriate azimuth mask and quality control settings.
 
-* [**gnssir**](gnssir.md) computes reflector heights (RH) from SNR files.
+* [**gnssir**] computes reflector heights (RH) from SNR files.
 
 There are also various [utilities](quick_recall.md) you might find to be useful.
 If you are unsure about why various restrictions are being applied, it is really useful 
@@ -104,8 +96,8 @@ are not violating the Nyquist frequency (**Maximum Resolvable Reflector Height**
 
 ## Quality Control 
 
-This code uses a Lomb Scargle periodogram. This type of periodogram allows the input 
-data to be sampled at uneven periods. The primary inputs are 
+This code uses a Lomb Scargle periodogram (LSP). This type of periodogram allows the input 
+data to be sampled at uneven periods. The primary inputs are :
 
 * how precise (in reflector height units) do you want the periodogram calculated at?
 
@@ -117,10 +109,8 @@ makes no sense (i.e. so small the code takes forever to run). In this code the s
 parameter is the max reflector height (h2). The minimum reflector height is always zero, and then
 the values lower than the minimum reflector height (h1) are thrown out.
 
-
 It is easy to compute a periodogram and pick the maximum value so as to find the reflector height. It is 
 more difficult to determine whether it is one you should trust.
-
 
 * is the peak larger than a user-defined value  (amplitude of the dominant peak in your periodogram)
 
@@ -252,8 +242,8 @@ D. Reflection zones for GPS satellites at
 elevation angles of 5-15 degrees for a reflector height of 4 meters.  
 
 Again using the reflection zone web app, we can plot up the appropriate reflection zones for various options.
-Since <code>ross</code> has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) has its coordinates in a 
-database. You can just plug in <code>ross</code> for the station name and leave 
+Since <code>ross</code> has been around a long time, [http://gnss-reflections.org](https://gnss-reflections.org) 
+has its coordinates in a database. You can just plug in <code>ross</code> for the station name and leave 
 latitude/longitude/height blank. You *do* need to plug in a 
 RH of 4 since mean sea level would not be an appropriate 
 reflector height value for this 
@@ -444,3 +434,6 @@ Note that the names of the columns (and units) are provided
 When multiplied by RHdot (meters/hour), you will get a correction in units of meters. For further
 information, see the <code>subdaily</code> code.
 
+Kristine M. Larson
+
+January 11, 2024

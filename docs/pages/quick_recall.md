@@ -56,7 +56,7 @@ those discussion links will likely go away in the not very distant future.
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
 * [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html)
 * [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)
-* [max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_cl.html)
+* [max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_RH_cl.html)
 * [mjd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.mjd.html)
 * [query_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.query_unr.html)
 * [quickplt](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickplt.html)

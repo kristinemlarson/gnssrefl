@@ -108,15 +108,29 @@ def ny_plot(station,allN, info,hires_figs):
 
     """
     # wavelengths in meters, being lazy
+    l1 = 0.19029360
     l2 = 0.24421
     l5 = 0.254828048
-    l1 = 0.19029360
+    # defaults
+    plot_l2 = True
+    plot_l5 = True
+    if 'GALILEO' in info:
+        plot_l2 = False
+    if 'GLONASS' in info:
+        plot_l5 = False
+    if 'BEIDOU' in info:
+        # the beidou signal names are all messed up
+        # but that is how they are stored in the RINEX files...
+        plot_l5 = False
+
     #fig = Figure(figsize=(8,4),dpi=360)
     #fig,ax = fig.subplots()
     fig, ax = plt.subplots(figsize=(10,6))
     ax.plot(allN[:,0],allN[:,1],'bo',label='L1')
-    ax.plot(allN[:,0],l2*allN[:,1]/l1,'ro',label='L2')
-    ax.plot(allN[:,0],l5*allN[:,1]/l1,'co',label='L5')
+    if plot_l2:
+        ax.plot(allN[:,0],l2*allN[:,1]/l1,'ro',label='L2')
+    if plot_l5: 
+        ax.plot(allN[:,0],l5*allN[:,1]/l1,'co',label='L5')
     ax.set_title(station + ': Maximum Resolvable RH /' + info, fontsize=14)
     ax.grid()
     ax.set_xlabel('Azimuth (deg)')

@@ -46,7 +46,7 @@ def max_resolve_RH(station: str, lat: float=None, lon: float=None, el_height: fl
         typical case for most geodetic sites, 30 seconds, elevation angles 5-15 degrees
 
     max_resolve_RH sc02 -samplerate 15 -system galileo
-        receiver sampling rate of 15 seconds and galileo
+        Assume receiver sampling rate of 15 seconds and the Galileo constellation
 
     Parameters
     ----------

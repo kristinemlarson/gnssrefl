@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 import datetime
+import wget
 import os
 import requests
 import subprocess
@@ -17,7 +18,7 @@ import gnssrefl.download_psmsl as download_psmsl
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name, e.g. 8768094", type=str)
-    parser.add_argument("network", help="tidegauge network (noaa,ioc,psmsl,wsv)", type=str)
+    parser.add_argument("network", help="tidegauge network (noaa,ioc,psmsl,wsv,qld)", type=str)
     parser.add_argument("-date1", help="start-date, 20150101", type=str, default=None)
     parser.add_argument("-date2", help="end-date, 20150110", type=str, default=None)
     parser.add_argument("-output", default=None, help="Optional output filename", type=str)
@@ -25,6 +26,7 @@ def parse_arguments():
     parser.add_argument("-datum", default=None, help="datum for NOAA", type=str)
     parser.add_argument("-sensor", default=None, help="sensor type for IOC", type=str)
     parser.add_argument("-subdir", default=None, help="optional subdirectory name for output", type=str)
+    parser.add_argument("-year", default=None, help="year for archive QLD data", type=str)
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -35,7 +37,7 @@ def parse_arguments():
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
-def download_tides(station: str, network : str, date1: str = None, date2: str = None, output: str = None, plt: bool = False, datum: str = 'mllw', subdir: str = None):
+def download_tides(station: str, network : str, date1: str = None, date2: str = None, output: str = None, plt: bool = False, datum: str = 'mllw', subdir: str = None, year: int=None):
     """
     Downloads tide gauge data from four different networks (see below)
 
@@ -114,8 +116,11 @@ def download_tides(station: str, network : str, date1: str = None, date2: str = 
         download_wsv.download_wsv(station, plt, output)
     elif network == 'psmsl':
         download_psmsl.download_psmsl(station, output,plt )
+    elif network == 'qld':
+        download_noaa.download_qld(station,year,plt)
     else:
         print('I do not recognize your tide gauge network')
+
 
 def main():
     args = parse_arguments()

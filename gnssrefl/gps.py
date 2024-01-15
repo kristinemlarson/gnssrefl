@@ -5303,7 +5303,8 @@ def rinex_jp(station, year, month, day):
 
 def queryUNR_modern(station):
     """
-    Queries the UNR database for station coordinates that has been stored in sql. downloads it if necessary
+    Queries the UNR database for station coordinates that has been stored in sql. downloads 
+    the sql file and stores it locally if necessary
 
     Parameters
     -----------
@@ -5374,6 +5375,8 @@ def queryUNR_modern(station):
 
     # close the database
     conn.close()
+    # some of the Nevada Reno stations have the same names as stations used in GNSS-IR.
+
     if (station == 'moss'):
         lat= -16.434464800 ;lon = 145.403622520 ; ht = 71.418
     elif (station == 'mnis'):

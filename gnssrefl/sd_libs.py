@@ -720,7 +720,9 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_fig
 
 def find_ortho_height(station,extension):
     """
-    find orthometric (sea level) height used in plots
+    Find orthometric (sea level) height used in final subdaily spline output 
+    and plots. This value should be defined for the GPS L1 phase center of 
+    the GNSS antenna as this is what is assumed in the subdaily code.
 
     Parameters
     ----------
@@ -732,8 +734,11 @@ def find_ortho_height(station,extension):
     Returns
     -------
     Hortho : float
-        orthometric height from gnssir json analysis file.  calculates 
-        it if not in the file
+        orthometric height from gnssir json analysis file as 
+        defined as Hortho, in meters. If your preferred value 
+        for Hortho is not present, it is calculated from the  
+        ellipsoidal height and EGM96. 
+
     """
 
     lsp = guts2.read_json_file(station, extension)
