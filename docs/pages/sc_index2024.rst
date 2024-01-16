@@ -17,9 +17,9 @@ The course meets each day from 12:00-14:00 CET. There will be a short break at t
 
 Before the Class Begins
 =======================
-`Installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`
+`Installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
-`Getting Started <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse.html>`
+`Getting Started <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse.html>`_
 
 
 
