@@ -83,8 +83,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     As of version 2.0.0:
 
     The final output of subdaily is a smooth spline fit to reflector heights (RH) which has been 
-    adjusted to mean sea level (meters). The user is asked to provide the orthometric height
-    of the L1 GPS phase center. This value should be stored as Hortho in the gnssir analysis strategy file
+    adjusted to mean sea level (meters). For this to be accurate, the user is asked to provide the orthometric height
+    of the L1 GPS antenna phase center. This value should be stored as Hortho in the gnssir analysis strategy file
     (ssss.json where ssss is the 4 character station name). The output water levels are then defined as Hortho minus RH. 
     If the user does not provide Hortho, one is computed from the station ellipsoidal height stored in the gnssir 
     analysis strategy file and EGM96.

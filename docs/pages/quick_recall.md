@@ -35,7 +35,7 @@ those discussion links will likely go away in the not very distant future.
 * [snowdepth code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_snowdepth.html)
 
-* [tides code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html),
+* [tides (subdaily) code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.subdaily_cl.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/README_subdaily.html)
 
 * [vwc code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_cl.html),

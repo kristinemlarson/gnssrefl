@@ -114,3 +114,5 @@ Things to do:
 
 - finish up advanced model vwc
 
+2024 short course
+

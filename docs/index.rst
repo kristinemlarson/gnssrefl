@@ -22,6 +22,7 @@ Welcome to the gnssrefl Documentation!
    pages/first_drivethru.md
    pages/contributions_questions.md
    pages/sc_index
+   pages/sc_index2024
    pages/new_station.md
    api
 
