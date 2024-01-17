@@ -9,6 +9,7 @@ def main():
     Parameters
     ----------
     mjd : float
+        modified julian date
 
     """
 

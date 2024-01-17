@@ -812,7 +812,7 @@ def quickTr(year, doy,frachours):
     Returns
     -------
     datestring : str
-         date ala YYYY-MM-DD HH-MM-SS
+         date ala YYYY-MM-DD HH:MM:SS
     """
     year = int(year); doy = int(doy); frachours = float(frachours)
     # convert doy to get month and day

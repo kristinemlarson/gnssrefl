@@ -1,3 +1,5 @@
+# I do not think this is used anymore
+# 
 import sys
 import os
 import numpy as np

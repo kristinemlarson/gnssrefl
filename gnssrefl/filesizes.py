@@ -11,8 +11,29 @@ import gnssrefl.gps as g
 
 def main():
     """
-very simple code to pick up all the file sizes for SNR files in a given year
-only checks for snr66 files
+    very simple code to pick up all the file sizes for SNR files in a given year
+    only checks for snr66 files.  
+
+    this is too slow - instead of using numpy array - use a list - and then change to
+    numpy array at the end
+
+    It makes a plot - not very useful now that files are nominal gzipped.
+
+    Parameters
+    ----------
+    station : str
+        4 character station name
+    year1 : int, optional
+        beginning year
+    year2 : int, optional
+        ending year
+    doy1 : int, optional
+        beginning day of year
+    doy2 : int, optional
+        ending day of year
+    gz : bool, optional
+        say T or True to search for gzipped files
+
     """
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE'] 
@@ -24,9 +45,11 @@ only checks for snr66 files
     parser.add_argument("-year2", default=None, type=str, help="restrict to years ending with")
     parser.add_argument("-doy1", default=None, type=str, help="restrict to after doy in year1")
     parser.add_argument("-doy2", default=None, type=str, help="restrict to before doy in year2")
+    parser.add_argument("-gz", default=None, type=str, help="Boolean to search for gz files")
     args = parser.parse_args()
 #   these are required
     station = args.station
+    gz = args.gz
 
     if args.year1 == None:
         year1 = 2005
@@ -51,6 +74,10 @@ only checks for snr66 files
     tstart = year1+ doy1/365.25
     tend   = year2+ doy2/365.25
 
+    gzadd = ''
+    if (gz == 'T') or (gz == 'True'):
+        gzadd = '.gz'
+
     k=0
 # added standard deviation 2020 feb 14, changed n=6
 # now require it as an input
@@ -65,7 +92,8 @@ only checks for snr66 files
         direc = xdir + '/' + str(yr) + '/snr/' + station + '/' 
         for doy in range(0,367):
             year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(yr,doy)
-            fname = direc + station + cdoy + '0.' + cyyyy[2:4]  + '.snr66'
+
+            fname = direc + station + cdoy + '0.' + cyyyy[2:4]  + '.snr66' + gzadd
             #print(fname)
             t = yr+doy/365.25
             if os.path.isfile(fname):
@@ -75,7 +103,7 @@ only checks for snr66 files
                 # this is for the daily average
                 newl = [yr, doy, nr]
                 if (t >= tstart) & (t <= tend):
-                    print(nr, year, doy)
+                    #print(nr, year, doy)
                     tv = np.append(tv, [newl],axis=0)
                     obstimes.append(filler)
             else:
