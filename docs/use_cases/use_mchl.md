@@ -21,7 +21,7 @@
 <img src=../_static/MCHL.jpeg width=500>
 </p>
 
-**Archives:** CDDIS, BKG, GA
+**Archives:** CDDIS, BKG-IGS, GA
  
 Read the instructions for the [soil moisture code!](../pages/README_vwc.md)!
 

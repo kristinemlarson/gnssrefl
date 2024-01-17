@@ -1,5 +1,9 @@
 # Marshall, Colorado, USA
 
+This use case needs to be updated to include the use of the 
+[snowdepth](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.snowdepth_cl.html) module.
+Please improve this use case by making a pull request with the relevant software calls.
+
 ## metadata
 
 [Warning](warning.md)
@@ -38,28 +42,16 @@ check the [Reflection Zone Mapping in the web app](https://gnss-reflections.org/
 In the linked page, the reflection zones from 5 to 25 degree elevation angles are plotted as 
 colored ellipses surrounding the station.  
 
-## Reproduce the Web App 
-
-p041 is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=p041) 
-You can see from the title of the plot that the web app reproduces 
-results for the year 2019, day of year 150, and L1 frequency. You can make something that looks similar
-to this using these commands:
-
-<code>rinex2snr p041 2019 150</code>
-
-and
-
-<code>quickLook p041 2019 150</code>
-
 
 ## Take a Quick Look at the Data
 
-First make a SNR file:
+Translate a RINEX file:
 
 <code>rinex2snr p041 2020 132</code>
 
 
-Then use **quickLook** to analyze the reflection characteristics of the site [(For details on quickLook output)](../pages/quickLook.md).
+Then use **quickLook** to analyze the reflection characteristics of 
+the site [(For details on quickLook output)](../pages/quickLook.md).
 
 The default return is for the L1 frequency:
 
@@ -72,7 +64,7 @@ azimuth (x-axis) and QC metrics:
 
 <img src="../_static/new-qc-p041-l1.png" width="600">
 
-Now try looking at the periodogram for L2C:
+Now try looking at the periodogram for L2C by specifying frequency 20:
 
 <code>quickLook p041 2020 132 -fr 20</code>
 
@@ -80,8 +72,8 @@ Now try looking at the periodogram for L2C:
 <P>
 <img src="../_static/new-qc-p041-l2c.png" width="600">
 
-Note that there are more colors in the L1 plots than in the L2C plots. That is the result of 
-the fact that there are more L1 satellites than L2C satellites.
+Note that there are more colors in the L1 plots than in the L2C plots. That is 
+the result of there being more L1 transmitting satellite than L2C transmitting satellites.
 
 Now try L5:
 
@@ -89,7 +81,7 @@ Now try L5:
 
 <img src="../_static/p041-l5.png" width="600">
 
-The L5 signal has only been available on satellites launched after 2010, so there are 
+The L5 signal has only been available on satellites launched after 2010, so there are even 
 fewer satellite tracks than either L1 or L2C.
 
 The **quickLook** code has multiple options. For example, it is possible change the reflector height range:
@@ -101,10 +93,13 @@ If you have already made a file using only the GPS data, you will need the overw
 
 <code>rinex2snr p041 2020 132 -orb gnss -overwrite True</code>
 
-Beidou signals are tracked at this site, but unfortunately the data are not available in the RINEX 2.11 file.
-They are very likely available in the RINEX 3 file, so you are encouraged to look there.
+Beidou signals are tracked at this site, but unfortunately the data 
+are not available in the RINEX 2.11 file. They are very likely available in the 
+RINEX 3 file, so you are encouraged to look there. Contact Earthscope if you have 
+any trouble accessing data for this site.
 
-**quickLook** is meant to be a visual assessment of the spectral characteristics at a given site on a given day. For routine analysis, one must use **gnssir**.
+**quickLook** is meant to be a visual assessment of the 
+spectral characteristics at a given site on a given day. For routine analysis, one must use **gnssir**.
 
 ## Analyze the Data
 

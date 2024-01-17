@@ -1,6 +1,6 @@
 # Warning
 
-We have updated our arc selection algoirthm. Most of hte uses cases were computed with our old algorithm.
+We have updated our arc selection algoirthm. Most of the uses cases were computed with our old algorithm.
 We have edited the prose in most use cases, but have not remade the figures.
 
 [Earthscope](https://www.earthscope.org) (previously UNAVCO) now requires that you have a formal account

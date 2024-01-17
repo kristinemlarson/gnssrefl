@@ -10,7 +10,8 @@ like to try to do so, that would be great. Please submit a PR.
 
 <HR>
 
-**Status:** this site is no longer supported and the equipment was removed.
+**Status:** The equipment has been installed and removed multiple times. As of spring 2020,
+it is no longer available.
 
 **Station name:** nwot
 
@@ -32,27 +33,26 @@ like to try to do so, that would be great. Please submit a PR.
 
 Station nwot was originally installed/designed by Jim Normandeau (UNAVCO) to support GPS reflections research 
 by Kristine Larson, Eric Small, Ethan Gutmann, Felipe Nievinski, and Mark Williams at the University of Colorado. 
-The site was hosted by the Niwot Ridge LTER. 
 
 nwot was deliberately made to be taller than the typical geodetic antenna so that it would never be 
-buried by snow. It is approximately 3 meters above 
-the bare soil surface.  Because it was installed to support testing GPS reflections, nwot has always tracked L2C.
+buried by snow. It is approximately 3 meters above the bare soil surface. Because it was 
+installed to support testing GPS reflections, nwot has always tracked L2C.
 nwot was also part of [PBO H2O](http://cires1.colorado.edu/portal/?station=nwot).
 
 <img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/NWOT.jpg" width=500>
 
-The site has generally not been used by geodesists and there is very little useful information 
+The site has not generally been used by geodesists and there is very little useful information 
 about when data are available at either UNAVCO or Nevada Reno (i.e. no time series).
 After the original receiver failed in spring 2015, a new receiver was installed in late 2016 by 
-Mark Raleigh (then at CIRES, now at the University Oregon). The receiver stopped transmitting 
+Mark Raleigh (then at CIRES, now at the University of Oregon). The receiver stopped transmitting 
 in 2020 and was removed in 2022. We will focus on the data between 2009-2015.
 
 ### Make a SNR File and run quickLook
 
 We will start by making a single SNR file. Here there are two options. The main 
 archive for this dataset only provides the high-quality
-L2C data in the highrate (1-sec) area. We do not need this sample rate for GPS reflectometry,
-so to speed things up, we strongly encourage you to use the "special" archive option.  Here
+L2C data in the highrate (1-sec) area. We do not need this sample rate for a GPS site that is 
+three meters tall. To speed things up, we strongly encourage you to use the "special" archive option.  Here
 the 1-sec data have been decimated to 15 seconds:
 
 <code>rinex2snr nwot 2014 270 -archive special</code>
@@ -61,7 +61,7 @@ If for any reason this command does not work, please use the direct command:
 
 <code>rinex2snr nwot 2014 270 -archive unavco -rate high -dec 15</code>
 
-Both L1 and L2C signals can be used at this site, though the L2C data are far superior in quality
+Both L1 and L2C signals can be used at this site, though the L2C data are **far superior** in quality
 to the L1 data. Use this **quickLook** command to get a sense of the quality of the 
 reflector height (RH) retrievals. First L1:
 

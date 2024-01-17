@@ -124,68 +124,92 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     ----------
     station : str
         4 character station ID.
+
     lat : float, optional
         latitude in degrees.
+
     lon : float, optional
         longitude in degrees.
+
     height : float, optional
         ellipsoidal height in meters.
+
     e1 : float, optional
         elevation angle lower limit in degrees. default is 5.
+
     e2 : float, optional
         elevation angle upper limit in degrees. default is 25.
+
     h1 : float, optional
         reflector height lower limit in meters. default is 0.5.
+
     h2 : float, optional
         reflector height upper limit in meters. default is 8.
+
     nr1 : float, optional
         noise region lower limit for QC in meters. default is None.
+
     nr2 : float, optional
         noise region upper limit for QC in meters. default is None.
+
     peak2noise : float, optional
         peak to noise ratio used for QC.
         default is 2.7 (just a starting point for water - should be 3 or 3.5 for snow or soil...)
+
     ampl : float, optional
         spectral peak amplitude for QC. default is 6.0
         this is receiver and elevation angle region dependent - so you need to change it based on your site 
+
     allfreq : bool, optional
         True requests all GNSS frequencies.
         default is False (defaults to use GPS frequencies).
+
     l1 : bool, optional
         set to True to use only GPS L1 frequency. default is False.
+
     l2c : bool, optional
         set to use only GPS L2C frequency. default is False.
+
     xyz : bool, optional
         set to True if using Cartesian coordinates instead of Lat/Long/Ht.
         default is False.
+
     refraction : bool, optional
         set to False to turn off refraction correction.
         default is True.
+
     extension : str, optional
         provide extension name so you can try different strategies. 
         Results will then go into $REFL_CODE/YYYY/results/ssss/extension
         Default is '' 
+
     ediff : float, optional
         quality control parameter (Degrees)
         Allowed min/max elevation angle diff from requested min/max elev angle
         default is 2
+
     delTmax : float, optional
         maximum allowed arc length (minutes)
         default is 75, which can be a bit long for tides
+
     frlist : list of integers
         avoids all the booleans - if you know the frequencies, enter them.
         e.g. 1 2 or 1 20 5 or 1 20 101 102
+
     azlist2 : list of floats
         Default is 0 to 360. list of azimuth limits as subquadrants are no longer required.
+
     ellist: list of floats
         min and max elevation angles to be used with the azimuth regions you listed, i.e.
         [5 10 6 11 7 12 8 13] would allow overlapping regions - all five degrees long 
         Default is empty list. 
+
     refr_model : int
         refraction model. we are keeping this as integer as it is written to a file withonly
         numbers in it.  1 is the default simple refraction (just correct elevation angles
         using standard bending models).  0 is no refraction correction.  As we add more
         models, they will receiver their own number. 
+
     Hortho : float
         station orthometric height, in meters. Currently only used in subdaily.  If not provided on the command line, 
         it will use ellipsoidal height and EGM96 to compute.
