@@ -72,13 +72,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     Latitude, longitude, and height are assumed to be stored in the UNR database.  If they are not, you should
     set them manually.
 
-    Example of a json file that has both the old and new ways. The arrays within the json file are called azval and azval2.
-        https://morefunwithgps.com/public_html/sc02.json
-
-    Refraction  
-    ----------
-    Originally we had refraction as a boolean, i.e. on or off. This was stored in the gnssir analysis json. The code however,
-    uses an integer 1 (for a simple non-time-varying Bennett correction) and integer 0 for no correction.
+    Originally we had refraction as a boolean, i.e. on or off. This was stored in the gnssir 
+    analysis json. The code however, uses an integer 1 (for a simple non-time-varying 
+    Bennett correction) and integer 0 for no correction.
     From version 1.8.4 we begin to implement more refraction models.  1 (and Bennett) will continue to be 
     the default.  The "1" is written to the LSP results file so that people can keep track easily of whether
     they are inadvertently mixing files with different strategies. And that is why it is an integer, because
@@ -108,7 +104,6 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     gnssir_input p041  -h1 0.5 -h2 10 -e1 5 -e2 25
         uses UNR database, only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
-
     gnssir_input p041 -ediff 1
         uses UNR database, only GPS data, default station coordinates, enforces elevation angles to be 
         within 1 degrees of default elevation angle limits (5-25)
