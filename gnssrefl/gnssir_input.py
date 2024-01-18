@@ -38,6 +38,7 @@ def parse_arguments():
     parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
     parser.add_argument("-refr_model", default=1, type=int, help="refraction model. default is 1, zero turns it off)")
     parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height, meters")
+    parser.add_argument("-pele", nargs="*", type=float, help="min and max elev angle in DC removal, default is 5-30")
 
 
     args = parser.parse_args().__dict__
@@ -54,7 +55,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
        h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None, peak2noise: float = 2.8, 
        ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
-       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : int=1, Hortho : float = None ):
+       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : int=1, Hortho : float = None, pele: list=[5,30]):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -288,12 +289,12 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['polyV'] = 4 # polynomial order for DC removal
     # change this so the min elevation angle for polynomial removal is the same as the 
     # requested analysis region. previously it was hardwired to 5-30
-    #lsp['pele'] = [5, 30] # elevation angles used for DC removal
-    if (lsp['e1']) < 5:
-        usethis = lsp['e1']
-        lsp['pele'] = [usethis, 30] # elevation angles used for DC removal
+    lsp['pele'] = pele # elevation angles used for DC removal
+    if ((lsp['e1'] < 5 or lsp['e2'] > 30) and (lsp['pele'][0] >= 5 and lsp['pele'][1] <= 30)):## Check if the elevation angle limits for DC removal are outside the default range
+        print('Change the pele (elevation angle limits) for DC removal')
+        sys.exit()
     else:
-        lsp['pele'] = [5, 30] # elevation angles used for DC removal
+        lsp['pele'] = pele # elevation angles used for DC removal
     lsp['ediff'] = ediff # degrees
     lsp['desiredP'] = 0.005 # precision of RH in meters
     # azimuth regions in degrees (in pairs)
