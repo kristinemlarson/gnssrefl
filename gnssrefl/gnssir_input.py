@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
     parser.add_argument("-refr_model", default=1, type=int, help="refraction model. default is 1, zero turns it off)")
     parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height, meters")
-    parser.add_argument("-pele", nargs="*", type=float, help="min and max elev angle in DC removal, default is 5-30")
+    parser.add_argument("-pele", nargs="*", type=float, help="min and max elevation angle in direct signal removal, default is 5-30")
 
 
     args = parser.parse_args().__dict__
@@ -209,6 +209,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     Hortho : float
         station orthometric height, in meters. Currently only used in subdaily.  If not provided on the command line, 
         it will use ellipsoidal height and EGM96 to compute.
+
+    pele : float
+        min and max elevation angles in direct signal removal, i.e. 3 40. Default is 5 30. 
 
     """
 
