@@ -6,9 +6,9 @@
 .. image:: ../_static/sc02_rhdot4.png
    :width: 500
 
-Agenda
-======
-A course sign-up page is under construction. Once it goes live, I will
+Registration
+============
+A course registration page is under construction. Once it goes live, I will
 put a link to it here.
 
 Agenda
