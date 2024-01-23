@@ -8,10 +8,14 @@
 
 Agenda
 ======
+A course sign-up page is under construction. Once it goes live, I will
+put a link to it here.
+
+Agenda
+======
 **Date TBD** Basic principles of GNSS-IR, How to run the gnssrefl software
 
-**Date TBD** Principles and Applications for Water Level Measurements: Lakes, Rivers, Tides
-
+**Date TBD** GNSS-IR for Water Level Measurements: Lakes, Rivers, Tides
 
 The course meets each day from 12:00-14:00 CET. There will be a short break at the midpoint.
 
@@ -19,7 +23,7 @@ Before the Class Begins
 =======================
 `Installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
-`Getting Started <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse.html>`_
+`Information from the last class <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse.html>`_
 
 
 
