@@ -10,7 +10,7 @@ Agenda
 ======
 **Date TBD** Basic principles of GNSS-IR, How to run the gnssrefl software
 
-**Date TBD** Hydrologic Applications: snow accumulation and soil moisture
+**Date TBD** Principles and Applications for Water Level Measurements: Lakes, Rivers, Tides
 
 
 The course meets each day from 12:00-14:00 CET. There will be a short break at the midpoint.
