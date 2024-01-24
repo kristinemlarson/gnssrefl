@@ -1,5 +1,5 @@
 #####################################################
-2023 GNSS-IR Short Course
+2023 Short Course on GNSS-IR
 #####################################################
 
 `Documentation <https://gnssrefl.readthedocs.io/en/latest/index.html>`_ |
