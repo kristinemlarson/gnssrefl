@@ -67,8 +67,9 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
              year_end: int=None):
     """
     Subdaily combines gnssir solutions and applies relevant corrections needed to measure water levels (tides). 
-    As of January 2024, it will allow multiple years. Within a single year, you can further restrict it to 
-    specific days of year (-doy1 and -doy2).
+    As of January 2024, it will allow multiple years. You can also specify which day of year to start with, i.e.
+    -doy1 300 and -doy2 330 will do that range in a single year, or you could specific doy1 and doy2 as linked to 
+    the start and stop year (year and year_end)
 
     In general this code is meant to be used at sites with tidal signals. If you have a site 
     without tidal signals, you should consider using daily_avg instead. If you would still 
@@ -247,6 +248,14 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     if year_end is None: 
         year_end = year
 
+    year_start = year
+
+    multiyear = True
+    if year_start == year_end:
+        multiyear = False
+
+    year_list = list(range(year, year_end+1))
+
     if txtfile_part2 is None:
         if txtfile_part1 == '':
             print('Will pick up and concatenate daily result files')
@@ -257,8 +266,25 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         default_usage = True
 
         for y in range(year,year_end+1):
-            print('reading year: ', y)
-            ntv, obstimes, fname, fname_new = t.readin_and_plot(station, y, doy1, doy2, plt, \
+            dec31 = g.dec31(y)  # find doy for dec 31
+            if not multiyear:
+                doy_st = doy1
+                doy_en = doy2
+            else:
+                if (y == year_end):
+                    doy_st = 1
+                    doy_en = doy2
+                elif (y == year_start): 
+                    doy_st = doy1
+                    doy_en = dec31
+                else:
+                # in between year
+                    doy_st = 1
+                    doy_en = dec31
+
+            print('Reading in the results for year: ', y, ' and doys ',  doy_st, ':', doy_en)
+
+            ntv, obstimes, fname, fname_new = t.readin_and_plot(station, y, doy_st, doy_en, plt, \
                     extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile_part1, \
                     h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma)
             outputs.append(fname_new)

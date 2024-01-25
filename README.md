@@ -2,7 +2,7 @@
 
 **github version: 2.0.1** [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601495.svg)](http://dx.doi.org/10.5281/zenodo.5601495) [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
-2024 January 4: subdaily now allows multiple years of data. An orthometric height correction can also be applied.
+2024 January 4: subdaily now allows multiple years of results. An orthometric height correction can also be applied.
 
 **For those of you trying to convert RINEX 3 files to RINEX 2.11, be careful. There are a lot of things going
 on in that translation.  It is better to let gnssrefl to do that conversion for you.  rinex2snr allows RINEX 3
