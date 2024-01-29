@@ -290,12 +290,25 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp}
 
-    print(lsp['pele'], 'direct signal eangle limits')
+    print(lsp['pele'], ' direct signal elevation angle limits')
+    print(lsp['e1'], lsp['e2'], ' min and max elevation angles')
+    # added this because ellist is a new option and was not necessarily created in old json files
     if 'ellist' not in lsp:
         print('did not find ellist')
         if float(lsp['e1']) < float(lsp['pele'][0]):
             print('emin is smaller than the minimum eangle (pele) used for direct signal removed.')
             print('This is Forbidden. Fix the records set in the json created by gnssir_analysis')
+            sys.exit()
+    else:
+        if float(lsp['e1']) < float(lsp['pele'][0]):
+            print('Your requested emin is lower than the minimum elevation angle used ')
+            print('for direct signal removal. This is stored in the variable pele.')
+            print('This is Forbidden. Fix the pele records set in the json created by gnssir_analysis')
+            sys.exit()
+        if float(lsp['e2']) > float(lsp['pele'][1]):
+            print('Your requested emax is higher than the maximum elevation angle used ')
+            print('for direct signal removal. This is stored in the variable pele.')
+            print('This is Forbidden. Fix the pele records set in the json created by gnssir_analysis')
             sys.exit()
 
     # should make sure there are directories for the results ... 
