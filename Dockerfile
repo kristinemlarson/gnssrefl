@@ -19,12 +19,11 @@ RUN if [ "$TARGETARCH" = "arm64" ] ; then \
 
 RUN chmod +x /etc/gnssrefl/exe/gfzrnx
 
-RUN cd /tmp && \
-  wget https://terras.gsi.go.jp/ja/crx2rnx/RNXCMP_4.1.0_src.tar.gz \
-  && tar -xf RNXCMP_4.1.0_src.tar.gz \
-  && gcc -ansi -O2 RNXCMP_4.1.0_src/source/crx2rnx.c -o CRX2RNX \
-  && cp CRX2RNX /etc/gnssrefl/exe/ \
-  && rm -rf RNXCMP*
+COPY vendor/crx2rnx.c /etc/gnssrefl/exe/
+COPY vendor/rnx2crx.c /etc/gnssrefl/exe/
+RUN cd /etc/gnssrefl/exe && \
+  gcc -ansi -O2 crx2rnx.c -o CRX2RNX \
+  && gcc -ansi -O2 rnx2crx.c -o RNX2CRX
 
 ENV PATH="/etc/gnssrefl/exe:$PATH" 
 
