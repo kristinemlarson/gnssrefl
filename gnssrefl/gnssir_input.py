@@ -227,7 +227,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     query_unr = False
 # if you input lat and long as zero ...
     if lat + lon == 0:
-        print('Assume you want to use the UNR database.')
+        print('Assume you want to use the UNR database for a priori receiver coordinates.')
         query_unr = True
 
     if xyz:
@@ -292,12 +292,33 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['polyV'] = 4 # polynomial order for DC removal
     # change this so the min elevation angle for polynomial removal is the same as the 
     # requested analysis region. previously it was hardwired to 5-30
+
     lsp['pele'] = pele # elevation angles used for DC removal
-    if ((lsp['e1'] < 5 or lsp['e2'] > 30) and (lsp['pele'][0] >= 5 and lsp['pele'][1] <= 30)):## Check if the elevation angle limits for DC removal are outside the default range
-        print('Change the pele (elevation angle limits) for DC removal')
-        sys.exit()
+
+    default_pele1 = 5; default_pele2 = 30
+    if (pele[0] == default_pele1) & (pele[1] == default_pele2):
+        print('Using default DC removal elevation angle limits,', default_pele1, default_pele2)
+        print('Checking that they are sensible')
+        usethis1 = default_pele1; usethis2 = default_pele2 
+        if (lsp['e1']) < default_pele1:
+            usethis1 = lsp['e1']
+        if (lsp['e2']) > default_pele2:
+            usethis2 = lsp['e2']
+        lsp['pele'] = [usethis1, usethis2] # modified elevation angles 
     else:
-        lsp['pele'] = pele # elevation angles used for DC removal
+        print('You manually set the DC removal elevation angle limits ', pele)
+        print('We will respect your wishes. For future reference, ')
+        print('they do not need to be the same as the requested elevation ')
+        print('angle range - but they cannot be outside of them. For example,')
+        print('pele min cannot be greater than e1 and pele max cannot be less than e2.')
+
+    #if ((lsp['e1'] < 5 or lsp['e2'] > 30) and (lsp['pele'][0] >= 5 and lsp['pele'][1] <= 30)):
+    ## Check if the elevation angle limits for DC removal are outside the default range
+    #    print('Change the pele (elevation angle limits) for DC removal')
+    #    sys.exit()
+    #else:
+    #    lsp['pele'] = pele # elevation angles used for DC removal
+
     lsp['ediff'] = ediff # degrees
     lsp['desiredP'] = 0.005 # precision of RH in meters
     # azimuth regions in degrees (in pairs)
