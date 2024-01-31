@@ -35,12 +35,16 @@ Sponsor
 
 Course Instructors
 ==================
-Kristine Larson, Bonn University, Germany
+Kristine M. Larson, Bonn University, Germany
 
 Simon Williams, National Oceanography Centre, United Kingdom
 
 Felipe Nievinski, Uni. Federal do Rio Grande do Sul, Brazil
 
 Interested in Sponsoring a GNSS-IR Short Course?
-==========================================
-Identify Instructors and Contact Kristine
+================================================
+It takes support from our GNSS-IR community members to offer short courses.  
+If you are interested to have a short course on the gnssrefl 
+software and a specific application, it is important that you find  
+people that are willing to help teach it. Please feel free to contact
+Kristine Larson if you are interested in pursuing this.
