@@ -16,7 +16,8 @@ Agenda
 
 **March 7** Using gnssrefl for Water Level Measurements: Lakes, Rivers, Tides
 
-The course meets each day from 12:00-14:00 CET. There will be a short break at the midpoint.
+The course meets each day from 12:00-14:00 Central European Time. 
+There will be a short break at the midpoint.
 
 Before the Class Begins
 =======================
