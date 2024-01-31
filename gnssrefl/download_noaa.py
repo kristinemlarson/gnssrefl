@@ -415,7 +415,7 @@ def download_qld(station,year,plt):
     plt : bool
         whether you want a plot to the screen
     """
-    # unfortunately hardwired for 2022 now
+    # unfortunately hardwired for 2022 now, so it does not work for other years ...
     #https://www.qld.gov.au/environment/coasts-waterways/beach/storm/storm-sites
     # last seven days
     # https://www.data.qld.gov.au/dataset/coastal-data-system-near-real-time-storm-tide-data
