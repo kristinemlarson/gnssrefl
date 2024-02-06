@@ -3061,11 +3061,13 @@ def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNois
         wehther peak value is too close to begining or ending of the RH constraints
 
     """
+    print('delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp,tooclose2edge')
+    print(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp,tooclose2edge)
     if tooclose2edge:
         print('     Retrieved reflector height too close to the edge of the RH space')
 
-    if delT > delTmax:
-        print('     Obs delT {0:.1f} minutes vs {1:.1f} requested limit '.format(delT,delTmax ))
+    if delT >= delTmax:
+        print('     Obs delT {0:.3f} minutes vs {1:.1f} requested limit '.format(delT,delTmax ))
     if eminObs  > (e1 + ediff):
         print('     Obs emin {0:.1f} is higher than {1:.1f} +- {2:.1f} degrees '.format(eminObs, e1, ediff ))
     if emaxObs  < (e2 - ediff):

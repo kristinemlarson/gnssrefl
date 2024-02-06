@@ -1,5 +1,10 @@
 # Community 
 
+## E-mail list
+Would you like to join our <code>gnssrefl</code> users email list?
+This is currently maintained by earthscope.org. To join, please e-mail 
+melissa.weber@earthscope.org or Kristine Larson.
+
 ## Publications
 - [One Receiver, Zenith Pointing](https://gnssrefl.readthedocs.io/en/latest/pages/community.html)
 - [Non-Zenith Pointing Antenna Examples](https://gnssrefl.readthedocs.io/en/latest/pages/tilted.html)
@@ -67,13 +72,9 @@ If the string is long - please post the error string in a thread response to you
 
 * the operating system of your computer.
 
-Would you like to join our <code>gnssrefl</code> users email list?
-This is currently operated by earthscope.org. To join, please send Kristine an email.
-
-
 [Old news section from before we moved to readthedocs](https://gnssrefl.readthedocs.io/en/latest/pages/old_news.html)
 
-**Updated August 17, 2023**
+**Updated February 1, 2024**
 
 Kristine M. Larson
 

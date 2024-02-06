@@ -3,7 +3,7 @@
 #########################################################
 
 
-.. image:: ../_static/sc02_rhdot4.png
+.. image:: ../_static/mnis_H0.png
    :width: 500
 
 Registration
@@ -21,7 +21,7 @@ There will be a short break at the midpoint.
 
 Before the Class Begins
 =======================
-`Installation <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
+`Install gnssrefl <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
 `Information from the last class <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse.html>`_
 
@@ -29,9 +29,8 @@ Videos
 ======
 `Some older videos <https://www.youtube.com/@funwithgps/videos>`_ about GNSS-IR are available on youtube. 
 
-
 Sponsor
-========
+=======
 `Collaborative Research Center 1502 DETECT, Bonn University <https://sfb1502.de>`_
 
 Course Instructors
@@ -42,6 +41,10 @@ Simon Williams, National Oceanography Centre, United Kingdom
 
 Felipe Nievinski, Uni. Federal do Rio Grande do Sul, Brazil
 
+Summary Paper
+=============
+`More Information on Water Levels and gnssefl <https://ihr.iho.int/wp-content/uploads/2023/11/IHR-29-2-A30.pdf>`_
+
 Interested in Sponsoring a GNSS-IR Short Course?
 ================================================
 It takes support from our GNSS-IR community members to offer short courses.  
@@ -49,3 +52,9 @@ If you are interested to have a short course on the gnssrefl
 software and a specific application, it is important that you find  
 people that are willing to help teach it. Please feel free to contact
 Kristine Larson if you are interested in pursuing this.
+
+GNSS-IR e-mail list
+===================
+If you would like to receive e-mail about GNSS-IR and gnssrefl software updates please
+contact Kristine Larson.
+

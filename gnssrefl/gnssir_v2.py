@@ -323,6 +323,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                             else:
                                 rj +=1
                                 if screenstats:
+                                    #print(delT, tooclose,Noise,PkNoise)
+                                    #35.0 False 3.682862189099345 2.8
+
                                     print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f}'.format( iAzim,satNu,UTCtime,maxF))
                                     g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose)
                                 if plot_screen:

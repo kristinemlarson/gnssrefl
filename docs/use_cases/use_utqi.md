@@ -100,14 +100,16 @@ How do you turn these RH estimates into snow accumulation? Set the fall values (
 zero point and then simply subtract. Why are RH values changing during the summer? This is related to 
 permafrost active layer changes. [Lin Liu](https://www.cuhk.edu.hk/sci/essc/people/liu.html)'s group at the 
 University of Hong Kong has pioneered the use 
-of GNSS-IR to study this effect. There are a few papers on [my website](https://kristinelarson.net/publications) from this early work; more papers
+of GNSS-IR to study this effect. There are a few papers 
+on [my website](https://kristinelarson.net/publications) from this early work; more papers
 can be found on his website.
 
 You can further restrict azimuths in <code>daily_avg</code> if you would like.
-And there is certainly no reason you can't download/translate the fall 2019 data to have the pre-snow level. 
+And there is certainly no reason you can't download/translate the fall 2019 
+data to have the pre-snow level. 
 
-**Warning:** I found cases where the archived files are missing SNR data entirely. This will show up on the screen 
-as failure to translate the RINEX 3 file into RINEX 2. 
+**Warning:** I found cases where the archived files are missing SNR data 
+entirely. This will show up on the screen as failure to translate the RINEX 3 file into RINEX 2. 
 
 I found this [NOAA plot online](https://gml.noaa.gov/news/snow_free_season_end.html) that 
 detects the melt and snow-in dates:
