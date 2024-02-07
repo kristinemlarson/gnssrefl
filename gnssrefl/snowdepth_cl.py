@@ -41,9 +41,9 @@ def parse_arguments():
 
 
 def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
-        longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None, 
-        plt_enddate:str=None,simple:bool=False, medfilter:float = None, ReqTracks: int = None, 
-        barereq_days: int = 15, fr: int = None, hires_figs : bool = False):
+        longer:bool=False, plt:bool=True, bare_date1:str=None, bare_date2:str=None, plt_enddate:str=None, simple:bool=False, 
+              medfilter:float = None, ReqTracks: int = None, barereq_days: int = 15, 
+              fr: int = None, hires_figs : bool = False):
     """
     Calculates snow depth for a given station and water year.
     Before you run this code you must have run gnssir for each day of interest.  
@@ -61,6 +61,10 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
 
     If simple is set to true, the algorithms computes bare soil (and thus snow depth), using
     all values together.  The default defines bare soil values every 10 degrees in azimuth.  
+
+    2024 Feb 6 : stopped the code from setting snowdepth values < 5 cm to zero. This means that
+    "negative" snowdepth will be in the files, but it should not be interpreted to be a new
+    form of snow.
 
     Examples
     --------
@@ -151,7 +155,6 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
     print('Output file: ',outputfile)
     print('Output png: ',outputpng)
 
-
     if plt_enddate is not None:
         pyear = int(plt_enddate[0:4])
         pmonth = int(plt_enddate[5:7])
@@ -162,6 +165,7 @@ def snowdepth(station: str, year: int, minS: float=None, maxS: float=None,
     else:
         end_doy = None
         end_dt = None
+
 
     # this overrides other ways of doing things.
     if bare_date1 is not None:

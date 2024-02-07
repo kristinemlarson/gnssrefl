@@ -83,11 +83,10 @@ def writeout_snowdepth_v0(station,outputfile, usegps, snowAccum,yerr):
     """
     fout = open(outputfile, 'w+')
     line1 = '% snow depth for station ' + station
-    line1a = '% values < 0.05 meters set to zero. bare soil based on average of all values.'
     line2 = '% year   doy  snowD(m) Std(m) Month Day   Nvals'
     line3 = '%  (1)   (2)    (3)     (4)   (5)   (6)    (7)'
     fout.write("{0:s}  \n".format(line1))
-    fout.write("{0:s}  \n".format(line1a))
+    #fout.write("{0:s}  \n".format(line1a))
     fout.write("{0:s}  \n".format(line2))
     fout.write("{0:s}  \n".format(line3))
 
@@ -101,9 +100,11 @@ def writeout_snowdepth_v0(station,outputfile, usegps, snowAccum,yerr):
         doy=int(usegps[i,1])
         # number of values in the average
         nvals =int(usegps[i,3])
+        # comment: not true - it is what you did in the graphs
         # this is what we did in pboh2o
-        if snowAccum[i] < 0.05:
-            snowAccum[i] = 0
+        # turning this off 2024 feb 5
+        #if snowAccum[i] < 0.05:
+        #    snowAccum[i] = 0
 
         gobst = np.append(gobst, datetime.datetime(year=y, month=m, day=d) )
         fout.write("{0:4.0f} {1:3.0f}  {2:8.3f}  {3:8.3f}  {4:2.0f}  {5:2.0f}   {6:3.0f} \n".format(y,doy,snowAccum[i], yerr[i], m, d, nvals))
@@ -116,6 +117,10 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
     """
     writes plain txt file with snow depth results
     this is for the azimuth leveling version
+
+    February 6 2024 no longer setting snowdepth to zero when it is below 5 cm
+    So there will be values above and below zero when there is no snow on the
+    ground but THIS SHOULD NOT be interpreted as negative snow!
 
     Parameters
     ----------
@@ -144,11 +149,11 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
     # open file and make a header
     fout = open(outputfile, 'w+')
     line0 = '% gnssrefl snow depth for station ' + station
-    line1 = '% values < 0.05 meters set to zero. bare soil based on azimuth averages.'
+    #line1 = '% values < 0.05 meters set to zero. bare soil based on azimuth averages.'
     line2 = '% year   doy  snowD(m) Std(m) Month Day   Nvals'
     line3 = '%  (1)   (2)    (3)     (4)   (5)   (6)   (7) '
     fout.write("{0:s}  \n".format(line0))
-    fout.write("{0:s}  \n".format(line1))
+    #fout.write("{0:s}  \n".format(line1))
     fout.write("{0:s}  \n".format(line2))
     fout.write("{0:s}  \n".format(line3))
 
@@ -158,6 +163,7 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
     snow = []
     yerr = []
     std= []
+    #confused = open('confused.txt', 'w+')
     for y in yvals:
         y=int(y) # make sure y is an integer
         for d in range(1,367): # life is short - just do all day of years
@@ -165,13 +171,21 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
             # get all the results for a given day and year
             nvals = len(usegps[i,0])
             if (nvals >  0):
+                #for w in range(0,nvals):
+                #    confused.write("{0:4.0f} {1:3.0f}  {2:8.3f} \n".format(y, d, snowAccum[i][w]))
+                 
+                #print(d,snowAccum[i])
+                # so computing the average here of the azimuth values...
                 snowv = np.mean(snowAccum[i])
-                # std never lower than 2.5 cm
-                std = max(0.025, np.std(snowAccum[i]))
-                #print(y,d,snowv,' nvals ',len(snowAccum[i]))
-        # this is what we did in pboh2o - though not really.  that was for the plots ...
-                if snowv < 0.05:
-                    snowv = 0
+                # std never lower than 2.5 cm 
+                # changed this to properly reflect that an average should be better than
+                # the RMS value previously used.  could propagate these ... 
+                std = max(0.025, np.std(snowAccum[i])/np.sqrt(nvals))
+
+                # this is what we did in pboh2o - though not really.  that was for the plots ...
+                #if snowv < 0.05:
+                #    snowv = 0
+
                 # month and day
                 mm = int(np.unique(usegps[i,3]))
                 dd = int(np.unique(usegps[i,4]))
@@ -181,9 +195,11 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
 
                 gobst = np.append(gobst, datetime.datetime(year=y, month=mm, day=dd) )
                 fout.write("{0:4.0f} {1:3.0f}  {2:8.3f}  {3:8.3f}  {4:2.0f}  {5:2.0f}   {6:3.0f} \n".format(y, d, snowv, std, mm, dd,nvals))
+                #print(y, d, snowv, std, mm, dd,nvals)
                 #print(y,d,snowv)
 
     fout.close()
+    #confused.close()
     if len(snow) == 0:
         print('Very likely this failed - and you do not have enough bare soil values')
     snow = np.asarray(snow)
@@ -192,7 +208,8 @@ def writeout_azim(station, outputfile,usegps,snowAccum):
     return gobst, snow, std
 
 
-def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days,end_doy):
+def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile, 
+                minS,maxS,barereq_days,end_doy):
     """
     simple snow depth algorithm
 
@@ -235,13 +252,13 @@ def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outp
 
     baresoil = gps[ii,2]
     if len(baresoil) == 0:
-        print('No values in the bare soil definition. Exiting')
+        print('No RH values in the dates used to define bare soil value. Exiting')
         print('Current settings are ', bs, ' for days ', doy1, doy2)
         sys.exit()
 
     # require at least 15 values (set in snowdepth_cl.py)
     NB = barereq_days
-    print('Found ', len(baresoil), ' daily bare soil values')
+    print('Found ', len(baresoil), ' daily bare soil RH values')
     if len(baresoil) < NB:
         print('Current settings for bare soil are year/', bs, ' for days ', doy1, doy2)
         print('Code requires: ', NB)
@@ -252,6 +269,7 @@ def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outp
 
     starting, ending, left, right = time_limits(year, longer,end_doy)
 
+    # crudely extract data from the correct time period
     t = gps[:,0] + gps[:,1]/365.25
     ii = (t >= starting) & (t <=ending)
     usegps = gps[ii,:]
@@ -261,11 +279,20 @@ def snow_simple(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outp
 
     snowAccum = noSnowRH - usegps[:,2]
     # we do not allow negative snow depth ... or at least not < -0.025
-    ii = (snowAccum > -0.025)
+    #ii = (snowAccum > -0.025)
+    # changed feb 7 2024
+    ii = (snowAccum > -0.075)
     usegps = usegps[ii,:]
     snowAccum = snowAccum[ii]
-    # error bar is just the std about the mean.  so it is likely bigger than needed.
-    yerr = usegps[:,6]
+    # error bar was originally set to the std about the mean.  
+    # which is incorrect.
+    # yerr = usegps[:,6]
+    nvals = usegps[:,3]
+    # new error bar for simple model
+    # part from the data
+    rpt = usegps[:,6]/np.sqrt(nvals) 
+    # make sure it is not too small by adding in 0.025
+    yerr = np.sqrt(0.025*0.025 + rpt*rpt)
 
     gobst = writeout_snowdepth_v0(station,outputfile, usegps, snowAccum,yerr)
 
@@ -311,14 +338,17 @@ def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit,e
     plt.ylabel('meters')
     plt.grid()
 
-    if (end_dt is None):
+    if (end_dt is None) :
         plt.xlim((left, right))
     else:
         plt.xlim((left, end_dt))
 
     fig.autofmt_xdate()
-    if (minS is not None) and (maxS is not None):
-        plt.ylim((-0.05+minS,maxS))
+
+    #if (minS is not None) and (maxS is not None):
+    #    plt.ylim((-0.05+minS,maxS))
+
+    plt.ylim((minS, maxS))
 
     plt.savefig(outputpng, dpi=300)
     if pltit:
@@ -326,7 +356,8 @@ def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit,e
 
     return
 
-def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,outputfile,minS,maxS,barereq_days,end_doy):
+def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,
+                   outputfile,minS,maxS,barereq_days,end_doy):
     """
     azimuthal snow depth algorithm
     tries to determine the bare soil correction in 20 degree azimuth swaths
@@ -371,8 +402,9 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
     baresoilAll = gps[ii,:]
     baresoil = gps[ii,2] # 
     if len(baresoil) == 0:
-        print('No values in the bare soil definition. Exiting')
-        print('Current settings are ', bs, ' for days ', doy1, doy2)
+        print('No RH values are available for the bare soil definition.')
+        print('Try running daily_avg or setting medfilter and ReqTracks on the command line.')
+        print('Current settings are ', bs, ' for days ', doy1, doy2, ' Exiting')
         sys.exit()
 
     # require at least 15 values (this is not very useful)
@@ -380,7 +412,8 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
     # could be removed
     NB = barereq_days
     if len(baresoil) < NB:
-        print('Not enough values to define baresoil: ', NB)
+        print('Not enough RH data were provided to define the baresoil correction, which is set to ', NB)
+        print('You only provided ', len(baresoil))
         sys.exit()
 
     starting, ending, left, right = time_limits(year, longer,end_doy)
@@ -402,12 +435,12 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
     delA = 20
     for az in range(0,360-delA,delA):
         # bare soil in the azimuth range
-        jj = ( baresoilAll[:,5] >= az)  & (baresoilAll[:,5] <= (az+delA))
+        jj = ( baresoilAll[:,5] >= az)  & (baresoilAll[:,5] < (az+delA))
         pout = baresoilAll[jj,:]
         nr,nc=np.shape(pout)
 
         # all RH in the azimuth range
-        kk = (usegps[:,5] > az) & (usegps[:,5] < (az+delA))
+        kk = (usegps[:,5] >= az) & (usegps[:,5] < (az+delA))
         # number of unique days where a bare soil retrieval exists
         ndoy = len(np.unique(pout[:,1]))
         if ndoy > NB:
@@ -430,8 +463,9 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
 
     # calculate snow accumulation, remove negative values
     snowAccum = rebase[:,11]-rebase[:,2]
-    # do not allow negative snow depth
-    ii = (snowAccum > -0.025)
+    # do not allow very negative snow depth
+    # chnage from 2.5 to 7.5 cm 2024 feb 6
+    ii = (snowAccum > -0.075)
     rebase = rebase[ii,:]
     snowAccum = snowAccum[ii]
 
@@ -443,3 +477,29 @@ def snow_azimuthal(station,gps,year,longer, doy1,doy2,bs,plt, end_dt,outputpng,o
 
 
 
+def unused(plot_begindate, plot_enddate):
+    """
+    """
+    if plt_enddate is not None:
+        pyear = int(plt_enddate[0:4])
+        pmonth = int(plt_enddate[5:7])
+        pday = int(plt_enddate[8:10])
+        yend, end_doy = g.cdate2ydoy(plt_enddate)
+
+        end_dt = datetime.datetime(year=pyear, month=pmonth, day = pday)
+    else:
+        end_doy = None
+        end_dt = None
+
+    if plt_begindate is not None:
+        byear = int(plt_begindate[0:4])
+        bmonth = int(plt_begindate[5:7])
+        bday = int(plt_begindate[8:10])
+        ybegin, begin_doy = g.cdate2ydoy(plt_begindate)
+
+        begin_dt = datetime.datetime(year=byear, month=bmonth, day = bday)
+    else:
+        begin_doy = None
+        begin_dt = None
+
+    return end_dt, end_doy, begin_dt, begin_doy
