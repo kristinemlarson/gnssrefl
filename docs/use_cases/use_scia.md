@@ -47,18 +47,19 @@ Set up (default) analysis stratgegy:
 [Please read the soil moisture user manual.](../pages/README_vwc.md) 
 It is very short and has a lot of tips that will save you time.
 
-We need a list of satellite tracks to use:
+We need a list of satellite tracks to use. We'll use 2019 for now as the 
+year:
 
 <code>vwc_input scia 2019</code>
 
 Estimate the phase for each satellite track on each day:
 
-<code>phase scia 2018 1 -doy_end 365 -year_end 2020</code>
+<code>phase scia 2018 1 -doy_end 366 -year_end 2020</code>
 
 Finally, convert the phase to volumetric water content. To make it easier to 
-look at the plots, I'll just show one year:
+look at the plots, I'll just show the first two years:
 
-<code>vwc scia 2019</code>
+<code>vwc scia 2018 -year_end 2019 </code>
 
 Phase results plotted in geographic coordinates:
 
@@ -80,7 +81,7 @@ Final plot:
 
 <img src="../_static/scia_4.png" width="600">
 
-Final VWC results are written to:
+VWC results are written to:
 
 $REFL_CODE/Files/scia/scia_vwc.txt
 
@@ -95,17 +96,17 @@ So I went ahead and made that file with one line in it, 2019 361
 
 Then I ran the vwc code again:
 
-<code>vwc scia 2019 -snow_filter T</code>
+<code>vwc scia 2018 -year_end 2019 -snow_filter T</code>
 
 Produces:
 
-<img src="../_static/scia_vol_soil_moisture.png" width=600>
+<img src="../_static/scia_2years.png" width=600>
 
-Now let's look at two years:
+Now let's look at three years:
 
-<code>vwc scia 2019 -year_end 2020 -snow_filter T</code>
+<code>vwc scia 2018 -year_end 2020 -snow_filter T</code>
 
-<img src="../_static/scia-twoyears.png" width=600>
+<img src="../_static/scia_3years.png" width=600>
 
 There is what appears to be a big precipitation event followed by a drydown in April 2020.
 [What does the weather station say?](https://weatherspark.com/h/s/1975/2020/0/Historical-Weather-Spring-2020-in-Victorville-California-United-States)
