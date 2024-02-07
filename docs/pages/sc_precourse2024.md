@@ -21,7 +21,7 @@ for mac and linux users that don't want to install python and/or
 manage dependencies or environment variables.
 
  - Notebooks for GNSS-IR were created and are supported by Earthscope. Please send all questions 
- about the notebooks to Kelly Enloe at Earthscope.
+ about the notebooks to Kelly Enloe at Earthscope. Her email address is kelly.enloe@earthscope.org
 
 - Check your environment variables (disregard this step if using dockers or notebooks)
 
@@ -45,7 +45,7 @@ That is why we recommend you put them in your .bashrc file. [More on environment
 
 For github, pypi, and docker users, type in a terminal window:
 
-<code>rinex2snr p038 2022 90 -orb rapid</code>
+<code>rinex2snr p038 2022 90 </code>
 
 On my machine this returns:
 
@@ -65,7 +65,7 @@ If we knew we only wanted to look at GPS signals, we could have typed:
 
 If you have any trouble with this command or do not have an Earthscope account, please try:
 
-<code>rinex2snr p038 2022 90 -orb rapid -archive sopac</code>
+<code>rinex2snr p038 2022 90 -archive sopac</code>
 
 **Next Step: Look at the reflection data for a single GNSS station**
 
@@ -140,7 +140,8 @@ back at the [earlier discussion](https://gnssrefl.readthedocs.io/en/latest/pages
 Change the frequency on the command line to L2 (-fr 2). Note how the periodogram plots 
 have two peaks instead of one. This is a problem!
 
-Now try to look at the Glonass data. You need multi-GNSS orbits
+Now try to look at the Glonass data. You need multi-GNSS orbits. For data in 2020, you must
+specify multi-gnss orbits.
 
 <code>rinex2snr ross 2020 211 -archive sopac -overwrite T -orb gnss</code>
 
@@ -150,6 +151,5 @@ Rerun quickLook:
 <code>quickLook ross 2020 211 -fr 101</code>
 
 What comes back?
-
 
 

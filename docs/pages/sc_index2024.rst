@@ -23,7 +23,7 @@ Before the Class Begins
 =======================
 `Install gnssrefl <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
-`Information from the last class <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse.html>`_
+`Information from the last class <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse2024.html>`_
 
 Videos
 ======
@@ -43,7 +43,7 @@ Felipe Nievinski, Uni. Federal do Rio Grande do Sul, Brazil
 
 Summary Paper
 =============
-`More Information on Water Levels and gnssefl <https://ihr.iho.int/wp-content/uploads/2023/11/IHR-29-2-A30.pdf>`_
+`More information on measuring water levels using gnssefl <https://ihr.iho.int/wp-content/uploads/2023/11/IHR-29-2-A30.pdf>`_
 
 Interested in Sponsoring a GNSS-IR Short Course?
 ================================================
