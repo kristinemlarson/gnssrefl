@@ -23,7 +23,7 @@ L2C data are available at UNAVCO in the standard RINEX files for this site start
 
 ## Translate the SNR data/Estimate RH
 
-<code>rinex2snr scia 2018 1 -archive unavco -doy_end 366 -year_end 2019</code>
+<code>rinex2snr scia 2018 1 -archive unavco -doy_end 366 -year_end 2020</code>
 
 Take a quick look at the L2C data:
 
@@ -41,7 +41,7 @@ Set up (default) analysis stratgegy:
 
 **Estimate reflector heights:**
 
-<code>gnssir scia 2018 1 -doy_end 365 -year_end 2019 </code>
+<code>gnssir scia 2018 1 -doy_end 365 -year_end 2020 </code>
 
 ## Estimate Soil Moisture
 [Please read the soil moisture user manual.](../pages/README_vwc.md) 
@@ -53,9 +53,10 @@ We need a list of satellite tracks to use:
 
 Estimate the phase for each satellite track on each day:
 
-<code>phase scia 2018 1 -doy_end 365 -year_end 2019</code>
+<code>phase scia 2018 1 -doy_end 365 -year_end 2020</code>
 
-Finally, convert the phase to volumetric water content:
+Finally, convert the phase to volumetric water content. To make it easier to 
+look at the plots, I'll just show one year:
 
 <code>vwc scia 2019</code>
 
@@ -86,3 +87,29 @@ Final results:
 Final VWC results are written to:
 
 $REFL_CODE/Files/scia/scia_vwc.txt
+
+Let's try to get rid of that snow outlier. I could look in the vwc file to see 
+what day has a very large value. Or you can also try setting -snow_filter to True.
+When I ran it, it did not create a snow outlier file - but it did tell me where it is stored
+and what format it needed (year and day of year).  
+
+<code>$REFL_CODE/Files/scia/snowmask_scia.txt</code>
+
+So I went ahead and made that file with one line in it, 2019 361
+
+Then I ran the vwc code again:
+
+<code>vwc scia 2019 -snow_filter T</code>
+
+Produces:
+
+<img src="../_static/scia_vol_soil_moisture.png" width=600>
+
+Now let's look at two years:
+
+<code>vwc scia 2019 -year_end 2020 -snow_filter T</code>
+
+<img src="../_static/scia-twoyears.png" width=600>
+
+There is what appears to be a big precipitation event followed by a drydown in April 2020.
+[What does the weather station say?](https://weatherspark.com/h/s/1975/2020/0/Historical-Weather-Spring-2020-in-Victorville-California-United-States)

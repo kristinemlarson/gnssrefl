@@ -917,7 +917,10 @@ def load_phase_filter_out_snow(station, year1, year2, fr,snowmask):
     else:
         print('Snow mask should exist')
         override = np.loadtxt(snowmask, comments='%')
-        # results were originally transposed - so untransposing them 
+        # adding nonsense because it doesn't like having only one value
+        #  which is a kluge i know
+        blah = np.array([[1, 2], [3, 4]])
+        override = np.vstack((override, blah))
         for year in range(year1,year2+1):
             ii = (results[:,0] == year) & (results[:,12] == fr)
         # it is easier for me to do this year by year

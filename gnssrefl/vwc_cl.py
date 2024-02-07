@@ -148,7 +148,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     # if you have requested snow filtering
     if snow_filter:
-        medf = 0.2 # this is meters ; 
+        medf = 0.2 # this is meters , so will only see big snow 
         ReqTracks = 10 # have a pretty small number here
         print('You have chosen the snow filter option')
         snowfileexists,snow_file = qp.make_snow_filter(station, medf, ReqTracks, year, year_end+1)
