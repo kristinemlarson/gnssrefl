@@ -76,11 +76,7 @@ What is going on at the end of 2019? A little googling:
 If it is just rain, that's ok. If it is snow, that last very high point in 2019 is contaminated.
 [This site says it was snow!](https://weatherspark.com/h/s/1975/2019/3/Historical-Weather-Winter-2019-in-Victorville-California-United-States#Figures-ObservedWeather)
 
-Model inputs:
-
-<img src="../_static/scia_3.png" width="600">
-
-Final results:
+Final plot:
 
 <img src="../_static/scia_4.png" width="600">
 
