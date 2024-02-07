@@ -334,7 +334,7 @@ def snowplot(station,gobst,snowAccum,yerr,left,right,minS,maxS,outputpng,pltit,e
     # try this
     ax.errorbar(gobst, snowAccum, yerr=yerr, fmt='.', color='blue')
 #    plt.plot(gobst, snowAccum, 'b.',label='GPS-IR')
-    plt.title('Snow Depth: ' + station)
+    plt.title('Snow Accumulation: ' + station)
     plt.ylabel('meters')
     plt.grid()
 

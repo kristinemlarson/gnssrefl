@@ -30,7 +30,7 @@ def parse_arguments():
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 50")
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
     parser.add_argument("-minvalperday", default=None, type=int, help="min number of satellite tracks needed each day. Default is 10")
-    parser.add_argument("-snow_filter", default=None, type=str, help="boolean, try to remove snow contaminated points. Defeault is F")
+    parser.add_argument("-snow_filter", default=None, type=str, help="boolean, try to remove snow contaminated points. Default is F")
     parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
     parser.add_argument("-tmin", default=None, type=float, help="minimum soil texture. Default is 0.05.")
     parser.add_argument("-tmax", default=None, type=float, help="maximum soil texture. Defafult is 0.50.")

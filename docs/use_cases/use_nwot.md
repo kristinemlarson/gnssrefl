@@ -4,12 +4,6 @@
 
 [Warning](warning.md)
 
-Please note: a [snowdepth utility](../pages/README_snowdepth.md) has been 
-developed since this use case was designed. It should be updated. If you would
-like to try to do so, that would be great. Please submit a PR.
-
-<HR>
-
 **Status:** The equipment has been installed and removed multiple times. As of spring 2020,
 it is no longer available.
 
@@ -43,9 +37,9 @@ nwot was also part of [PBO H2O](http://cires1.colorado.edu/portal/?station=nwot)
 
 The site has not generally been used by geodesists and there is very little useful information 
 about when data are available at either UNAVCO or Nevada Reno (i.e. no time series).
-After the original receiver failed in spring 2015, a new receiver was installed in late 2016 by 
-Mark Raleigh (then at CIRES, now at the University of Oregon). The receiver stopped transmitting 
-in 2020 and was removed in 2022. We will focus on the data between 2009-2015.
+After the original receiver failed in spring 2015, a new receiver was installed sometime in 2017 by 
+Mark Raleigh (now at the University of Oregon). The receiver failed in 2020 and was removed two years later.
+We will focus here on the data between 2009-2015.
 
 ### Make a SNR File and run quickLook
 
@@ -150,8 +144,25 @@ for reflector height (RH_baresoil). Snow depth is then defined as:
 
 Please keep in mind that the pole measurements are not representative of the same
 footprint as the GPS measurements. The latter cover an average over a much larger region.
-We do not pursue a quantitative comparison at this site as there are at least two 
-publications in refereed journals and a PhD Dissertation:
+
+## snowdepth utility
+
+After this use case was first written the <code>snowdepth</code> module was developed.
+It requires an input of station name and (North American) water year. It requires that you 
+run <code>daily_avg</code> prior to running <code>snowdepth</code> OR you input that module's 
+required parameters on the command line. Assuming I have run <code>daily_avg</code>:
+
+<code>snowdepth nwot 2014</code>
+
+produces:
+
+<img src="../_static/water_2014AV.png" width=600>
+
+and a plain text list of daily snow accumulation values. 
+The bare soil dates are configurable - here I used the defaults (which are to use September 1-30).
+
+## Publications about nwot
+Please see the following for a lengthier discussion of this site:
 
 [Gutmann, E., K. M. Larson, M. Williams, F.G. Nievinski, and V. Zavorotny, 
 Snow measurement by GPS interferometric reflectometry: an evaluation at Niwot Ridge, Colorado, Hydrologic Processes, Vol. 26, 2951-2961, 2012](https://www.kristinelarson.net/wp-content/uploads/2015/10/GutmannEtAl_2012.pdf)
