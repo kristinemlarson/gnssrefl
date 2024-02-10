@@ -8,14 +8,14 @@ The goal of the gnssrefl python repository is to help you compute (and evaluate)
 reflectometry parameters using standard GNSS data. This method is often
 called GNSS-IR, or GNSS Interferometric Reflectometry. There are three main sections:
 
-* Translation: Use either [**rinex2snr**] or [**nmea2snr**] to translate native 
+* Translation: Use either **rinex2snr** or **nmea2snr** to translate native 
 GNSS formats to what gnssrefl needs. The output is called a *SNR* file.
 
-* [**quickLook**] gives you a quick (visual) assessment of a SNR file without dealing
+* **quickLook** gives you a quick (visual) assessment of a SNR file without dealing
 with the details associated with **gnssir**. It is not meant to be used for routine analysis.
 It also helps you pick an appropriate azimuth mask and quality control settings.
 
-* [**gnssir**] computes reflector heights (RH) from SNR files.
+* **gnssir** computes reflector heights (RH) from SNR files.
 
 There are also various [utilities](quick_recall.md) you might find to be useful.
 If you are unsure about why various restrictions are being applied, it is really useful 

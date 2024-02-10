@@ -1,0 +1,13 @@
+cff-version: 1.0.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Larson
+    given-names: Kristine
+    orcid: https://orcid.org/0000-0003-4666-8885
+title: "gnssrefl: an open source python software package 
+for environmental GNSS interferometric reflectometry 
+applications"
+version: 2.2.0
+date-released: 2024-02-10
+doi: 10.5281/zenodo.10644225
+url: "https://github.com/kristinemlarson/gnssrefl"
