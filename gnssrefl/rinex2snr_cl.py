@@ -206,6 +206,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             gfr : GFZ rapid, GPS, Galileo and Glonass, since May 17 2021
 
+            wum : Wuhan ultra-rapid, from CDDIS
+
+            wum2 : Wuhan ultra-rapid, from Wuhan FTP
+
             rapid : GFZ rapid, multi-GNSS
 
             ultra: GFZ ultra-rapid, multi-GNSS
@@ -349,7 +353,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # currently allowed orbit types - shanghai removed 2020sep08
     #
     orbit_list = ['gps', 'gps+glo', 'gnss', 'nav', 'igs', 'igr', 'jax', 'gbm',
-                  'grg', 'wum', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2','nav-sopac','nav-esa','nav-cddis','gnss3','gnss-gfz']
+                  'grg', 'wum', 'wum2', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2',
+                  'nav-sopac', 'nav-esa', 'nav-cddis', 'gnss3', 'gnss-gfz']
     if orb not in orbit_list:
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)

@@ -479,7 +479,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                     if (orbtype  == 'gps') or ('nav' in orbtype):
                         gpssnr.foo(in1,in2,in3,in4,in5,in6)
                     else:
-                        if (orbtype == 'ultra') or (orbtype == 'wum'):
+                        if orbtype in ['ultra', 'wum', 'wum2']:
                             print('Using an ultrarapid orbit', orbtype)
                             gnsssnrbigger.foo(in1,in2,in3,in4,in5,in6)
                         else:
