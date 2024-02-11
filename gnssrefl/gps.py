@@ -3539,6 +3539,11 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         # but only hour 00:00
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'wum')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
+    elif (orbtype == 'wum2'):
+        # Wuhan ultra-rapid orbit from the Wuhan FTP
+        # but only hour 00:00
+        f,orbdir,foundit=get_wuhan_orbits(year,month,day)
+        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif orbtype == 'jax':
         # this uses JAXA, has GPS and GLONASS and appears to be quick and reliable
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'jax')
@@ -5097,6 +5102,51 @@ def ultra_gfz_orbits(year,month,day,hour):
         store_orbitfile(littlename,year,'sp3') ; foundit = True
 
     return littlename, fdir, foundit
+
+
+def get_wuhan_orbits(year: int, month: int, day: int) -> [str, str, bool]:
+    """
+    Downloads ultra-rapid Wuhan sp3 file and stores them in $ORBITS
+
+    Parameters
+    ----------
+    year : int
+        full year
+    month : int
+        month or day of year
+    day : int
+        day or if set to 0, then month is really day of year
+
+    Returns
+    -------
+    unzipped_filename : str
+        name of the sp3 orbit file
+    orbit_dir: str
+        name of the file directory where orbit is stored
+    foundit : bool
+        whether file was found
+    """
+    foundit = False
+    gps_week, _ = kgpsweek(year, month, day, 0, 0, 0)
+    _, _, doy, _, _, _ = ymd2ch(year, month, day)
+
+    url_base = f'ftp://igs.gnsswhu.cn/pub/gnss/products/mgex/{gps_week}/'
+    filename = f'WUM0MGXULT_{year}{doy:03}0000_01D_05M_ORB.SP3.gz'
+    unzipped_filename = filename[:-3]
+    orbit_dir = f'{os.environ["ORBITS"]}/{year}/sp3'
+    if not os.path.isfile(f'{orbit_dir}/{unzipped_filename}'):
+        try:
+            wget.download(f'{url_base}{filename}', filename)
+            subprocess.call(['gunzip', filename])
+        except:
+            print('Problems downloading ultra-rapid Wuhan orbit')
+            print(f'{url_base}{filename}')
+        if os.path.isfile(unzipped_filename):
+            store_orbitfile(unzipped_filename, year, 'sp3')
+            foundit = True
+
+    return unzipped_filename, orbit_dir, foundit
+
 
 def rinex_unavco(station, year, month, day):
     """
