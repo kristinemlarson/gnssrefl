@@ -731,6 +731,8 @@ def getsp3file_mgex(year,month,day,pCtr):
         #nyear, ndoy = nextdoy(year,doy)
         #cndoy = '{:03d}'.format(ndoy); cnyear = '{:03d}'.format(nyear)
         file2 = 'WUM0MGXULA_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz'
+        file2 = 'WUM0MGXULT_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3.gz'
+        print(file2,screenstats)
     if pCtr == 'grg': # french group
         file2 = 'GRG0MGXFIN_' + cyyyy + cdoy + '0000_01D_15M_ORB.SP3.gz'
     if pCtr == 'sha': # shanghai observatory
@@ -779,10 +781,10 @@ def getsp3file_mgex(year,month,day,pCtr):
     if (mgex == 1):
         name = file1[:-2]
 
+    print('Type 1 filename',file1)
+    print('Type 2 filename',file2)
+
     if not foundit:
-        if screenstats:
-            print('Type 1 filename',file1)
-            print('Type 2 filename',file2)
         if (mgex == 0):
             if not foundit:
                 name = file2[:-3] 

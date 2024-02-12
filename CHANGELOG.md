@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Added wuhan rapid orbit downloads from wuhan (community PR).
 Updated gnsssnrbigger.f to allow three days with five minute orbits
+This is activated from the wum2 orb flag
+
+checked wum, which was pointing to ULA not ULT, i.e. 
+
+WUM0MGXULT_20240050000_01D_05M_ORB.SP3
+
+not sure if they changed the name or if it was always wrong.  
 
 
 ## 2.2.0
