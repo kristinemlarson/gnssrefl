@@ -5144,6 +5144,9 @@ def get_wuhan_orbits(year: int, month: int, day: int) -> [str, str, bool]:
         if os.path.isfile(unzipped_filename):
             store_orbitfile(unzipped_filename, year, 'sp3')
             foundit = True
+    else:
+        #print('Wuhan orbit wum2 is stored locally')
+        foundit = True
 
     return unzipped_filename, orbit_dir, foundit
 

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2.2.1
+
+Added wuhan rapid orbit downloads from wuhan (community PR).
+Updated gnsssnrbigger.f to allow three days with five minute orbits
+
+
+## 2.2.0
+
+Had problems with docker because I was not using proper version names
+
 ## 2.1
 Changed sigma on snowdepth to better reflect true errors. Previous 
 value was gross overestimate

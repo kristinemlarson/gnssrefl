@@ -35,7 +35,9 @@ c     21feb22 port to python f2py so it can be used in gnssrefl
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 576)
+c     parameter (np= 576)
+c     increased dimension for 3 days of 5 minute data
+      parameter (np= 864)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -277,7 +279,9 @@ c     19mar25 changed filename of sp3 to be really really long
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 576)
+c     changed february 12, 2024
+      parameter (np= 864)
+c     parameter (np= 576)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -477,7 +481,8 @@ c             ipointer tells you where it is in the sp3 file
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 576)
+      parameter (np= 864)
+c     parameter (np= 576)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -515,7 +520,8 @@ c     print*, gps_second, rt
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 576)
+      parameter (np= 864)
+c     parameter (np= 576)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -661,7 +667,8 @@ c    19feb04 - I am assuming we should use sp3_rel_seconds and relTime now
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 576)
+      parameter (np= 864)
+c     parameter (np= 576)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -782,7 +789,8 @@ c     kl 2021 feb 24
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 576)
+      parameter (np= 864)
+c     parameter (np= 576)
 
       real*8 c 
 
@@ -1088,7 +1096,8 @@ c     returns s1,s2,s5 etc
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 576)
+      parameter (np= 864)
+c     parameter (np= 576)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -1128,7 +1137,8 @@ c     returns s1,s2,s5 etc
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 576)
+      parameter (np= 864)
+c     parameter (np= 576)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -1334,7 +1344,8 @@ c     20mar02 added msec to the output, sent from main code
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 576)
+      parameter (np= 864)
+c     parameter (np= 576)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 

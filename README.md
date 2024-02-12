@@ -1,6 +1,6 @@
 # gnssrefl
 
-**github version: 2.2.0** 
+**Version: 2.2.1** 
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
