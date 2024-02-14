@@ -235,7 +235,7 @@ def define_and_xz_snr(station,year,doy,snr):
                 snre = True
 
     if not os.path.isfile(fname):
-        print('looked everywhere and could not find it')
+        print('I looked everywhere for that SNR file and could not find it')
         print(fname); print(fname2) ; 
         print(fname3); print(fname4); print(fname5)
 

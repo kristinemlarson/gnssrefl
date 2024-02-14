@@ -154,7 +154,6 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     else:
         # uncompress here so you should not have to do it in read_snr_multiday ...
         obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
-        print('Using: ', obsfile)
 
         allGood, snrD, nrows, ncols = read_snr(obsfile)
         # added gzip option.  first input is xz compression
@@ -172,9 +171,10 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
         snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
     if (allGood == 1):
+        print('Reading from: ', obsfile)
         print('Results will be written to:', fname)
         minObsE = min(snrD[:,1])
-        print('minimum observed elevation angle in this file ', minObsE, '/requested e1 and e2 ', e1,e2)
+        print('Minimum observed elevation angle in this file ', minObsE, '/requested e1 and e2 ', e1,e2)
         # only apply this test for simple e1 and e2
         if len(ellist) == 0:
             if minObsE > (e1 + ediff):

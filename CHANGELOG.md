@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2.3.0
+Fixed bug for SNR files that used non-compliant filenames that
+are allowed by nmea2snr.  routine that picks up the SNR file failed
+to check for gzipped files for these cases and it should have.
+For historical reasons it is called define_and_xz_snr, though now
+I am only using gz, not xz.
+
 ## 2.2.1
 
 Added wuhan rapid orbit downloads from wuhan (community PR).
