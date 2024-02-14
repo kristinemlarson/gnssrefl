@@ -204,6 +204,9 @@ def define_and_xz_snr(station,year,doy,snr):
     fname3 = xdir + '/' + cyyyy  + '/snr/' + station + '/' + f  + '.gz'
     # for makan
     fname4 = xdir + '/' + cyyyy  + '/snr/' + station.upper() + '/' + fmakan  
+    # yet another makan option
+    fname5 = xdir + '/' + cyyyy  + '/snr/' + station.upper() + '/' + fmakan   + '.gz'
+
     snre = False
     # add gzip
     if os.path.isfile(fname):
@@ -224,7 +227,17 @@ def define_and_xz_snr(station,year,doy,snr):
                 print('found uppercase station name in a snr file')
                 fname = fname4
                 fname2 = fname4 # not needed
+            elif os.path.isfile(fname5):
+                print('found gzipped uppercase station name')
+                subprocess.call(['gunzip', fname5])
+                fname = fname4
+                fname2 = fname4 # not needed
                 snre = True
+
+    if not os.path.isfile(fname):
+        print('looked everywhere and could not find it')
+        print(fname); print(fname2) ; 
+        print(fname3); print(fname4); print(fname5)
 
 #   return fname2 but only for backwards compatibility
     return fname, fname2, snre 
