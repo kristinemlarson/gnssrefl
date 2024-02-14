@@ -205,12 +205,13 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
 
 
     tval,yval = q.trans_time(tvd, ymd, ymdhm, convert_mjd, ydoy,xcol,ycol,utc_offset)
+
     if secondFile:
         tval2,yval2 = q.trans_time(tvd2, ymd, ymdhm, convert_mjd, ydoy,xcol,ycol,utc_offset)
 
     # supercedes previous trans_time ... ??? 
     if ydoy:
-        #print('Making obstimes for ydoy x-axis')
+        print('Making obstimes for ydoy x-axis')
         tval = g.ydoy2datetime(tvd[:,0], tvd[:,1])
 
     fig,ax=plt.subplots()

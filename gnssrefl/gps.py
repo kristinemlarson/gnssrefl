@@ -6588,6 +6588,9 @@ def ydoy2datetime(y,doy):
     """
     translates year/day of year numpy array into datetimes for plotting
 
+    this was running slow for large datasets.  changing to use lists
+    and then asarray to numpy
+
     Parameters
     ----------
     y : numpy array of floats
@@ -6602,15 +6605,18 @@ def ydoy2datetime(y,doy):
 
     """
     obstimes = []
+    obstimes_list = []
     N = len(y)
-    print(N)
     for i in range (0,N):
         yy = int( y[i] );
         ddoy = int(doy[i])
         d = datetime.datetime(yy, 1, 1) + datetime.timedelta(days=(ddoy-1))
         #print(yy,ddoy,d.month,d.day)
         bigT = datetime.datetime(year=yy, month=d.month, day=d.day)
-        obstimes = np.append(obstimes,bigT)
+        #obstimes = np.append(obstimes,bigT)
+        obstimes_list.append(bigT)
+
+    obstimes = np.asarray(obstimes_list)
 
     return obstimes
 
