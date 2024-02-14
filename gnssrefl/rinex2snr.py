@@ -197,6 +197,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                     snre = False
                 else:
                     print('SNR file already exists', fname)
+            else:
+                print('SNR file does not already exist. Which means I will try to make it.')
+
 
             illegal_day = False
             if (doy > dec31):
