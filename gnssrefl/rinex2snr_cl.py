@@ -47,6 +47,7 @@ def parse_arguments():
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
     parser.add_argument("-mk", default=None, help="use T for uppercase station names and non-standaard archives", type=str)
     parser.add_argument("-weekly", default=None, help="use T for weekly data translation", type=str)
+    parser.add_argument("-monthly", default=None, help="use T for monthly data translation", type=str)
     parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
     parser.add_argument("-gzip", default=None, help="boolean, default is SNR files are gzipped after creation", type=str)
@@ -54,7 +55,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip']
+    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip','monthly']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -65,7 +66,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
-              screenstats : bool = False, gzip : bool = True ):
+              screenstats : bool = False, gzip : bool = True, monthly : bool = False ):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
@@ -316,6 +317,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     gzip: bool, optional
         default is true, SNR files are gzipped after creation.
 
+    monthly : bool, optional
+        default is false. snr files created every 30 days instead of every day
+
     """
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
@@ -512,6 +516,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if weekly:
         print('You have invoked the weekly option')
         skipit = 7
+    if monthly:
+        print('You have invoked the monthly option')
+        skipit = 30
 
     # this makes the correct lists in the function
     doy_list = [doy, doy2]
