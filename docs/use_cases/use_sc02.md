@@ -8,7 +8,7 @@
 different than those shown here.**
 
 <p align="center">
-<img  src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/SC02.jpg" width="500"/>
+<img  src="https://gnss-reflections.org/static/images/SC02.jpg" width="500"/>
 </P>
 
 **Station Name:** sc02

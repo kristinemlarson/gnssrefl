@@ -7,7 +7,7 @@
 **at01 is the only tide gauge in this region of Alaska.** 
   
 <p align="center">
-<img src="https://www.unavco.org/data/gps-gnss/lib/images/station_images/AT01.jpg" width="500">
+<img src="https://gnss-reflections.org/static/images/AT01.jpg" width="500">
 </p>
 
 ## metadata

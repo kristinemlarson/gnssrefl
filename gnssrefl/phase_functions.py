@@ -208,9 +208,9 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
     else:
         plt.plot(t_datetime, vwcdata, 'b-')
         plt.plot(t_datetime, vwcdata, 'b.')
-    plt.title('GNSS Station ' + station.upper())
+    plt.title('GNSS-IR Soil Moisture Station ' + station.upper())
     plt.ylim(0, 0.5)
-    plt.ylabel('Vol. Soil Moisture')
+    plt.ylabel('Volumetric Soil Moisture')
     plt.grid()
     plt.gcf().autofmt_xdate()
 

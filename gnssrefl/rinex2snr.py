@@ -405,6 +405,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
     log.write("Archive: {0:10s} \n".format(archive))
     log.write("Orbits : {0:10s} \n".format(orbtype))
     exedir = os.environ['EXE']
+    print('Checking again to make sure the SNR file does not exist')
     snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
     if (snre == True):
         log.write("The snrfile already exists: {0:50s} \n".format(snrname_full))

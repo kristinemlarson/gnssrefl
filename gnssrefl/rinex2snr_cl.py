@@ -245,6 +245,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             cddis : (NASA's Archive of Space Geodesy Data)
 
+            epn : Belgium
+
             ga : (Geoscience Australia)
 
             gfz : (GFZ, Germany)
@@ -315,7 +317,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         default is true, SNR files are gzipped after creation.
 
     """
-    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
+    archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
 
