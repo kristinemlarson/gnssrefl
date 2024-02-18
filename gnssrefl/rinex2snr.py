@@ -189,14 +189,14 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
                 if overwrite:
-                    print('File exists, you requested overwriting, so will delete existing file')
+                    print('File exists, ', fname, ' and you requested overwriting, so will delete existing file')
                     if os.path.isfile(fname):
                         subprocess.call(['rm', fname]); 
                     if os.path.isfile(fname + '.gz'):
                         subprocess.call(['rm', fname + '.gz']); 
                     snre = False
                 else:
-                    print('SNR file already exists', fname)
+                    print('SNR file already exists', fname, '\n')
             else:
                 print('SNR file does not already exist. Which means I will try to make it.')
 
@@ -405,8 +405,16 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
     log.write("Archive: {0:10s} \n".format(archive))
     log.write("Orbits : {0:10s} \n".format(orbtype))
     exedir = os.environ['EXE']
-    print('Checking again to make sure the SNR file does not exist')
-    snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
+    csnr = str(option)
+    cdoy = '{:03d}'.format(doy)
+    cyy = str(year)[2:4]
+    snrname_full =  quickname(station,year,cyy,cdoy,csnr)
+    print('Creating ', snrname_full)
+    snrname_compressed = ''
+
+    # if it exists, you should not have gotten to this code...
+    snre = False
+    #snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
     if (snre == True):
         log.write("The snrfile already exists: {0:50s} \n".format(snrname_full))
         print("The snrfile already exists: ", snrname_full)
