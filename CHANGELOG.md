@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Made quickplt faster with large datasets.  I was using numpy append when
 i should have used a list and converted at the end.
 
+Fixed a place where I was checking snr existence (twice) in rinex2snr when
+I really should not have been.
+
+quickplot allows y-offsets.
+
 ## 2.3.0
 Fixed bug for SNR files that used non-compliant filenames that
 are allowed by nmea2snr.  routine that picks up the SNR file failed

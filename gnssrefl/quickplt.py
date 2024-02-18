@@ -35,6 +35,7 @@ def parse_arguments():
     parser.add_argument("-filename2", help="second filename", type=str, default=None)
     parser.add_argument("-freq", help="spec freq, column 11 ", type=int,default=None)
     parser.add_argument("-utc_offset", help="offset from UTC, hours  ", type=int,default=None)
+    parser.add_argument("-yoffset", help="offset for y-axis values", type=float,default=None)
 
 
     args = parser.parse_args().__dict__
@@ -49,7 +50,8 @@ def parse_arguments():
 
 def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: bool=False, xlabel: str=None, 
                   ylabel: str=None, symbol: str=None, reverse:bool=False,title:str=None,outfile: str=None,
-                  xlimits: float=[], ylimits: float=[], ydoy:bool=False, ymd:bool=False, ymdhm:bool=False, filename2: str=None, freq:int=None, utc_offset: int=None):
+                  xlimits: float=[], ylimits: float=[], ydoy:bool=False, ymd:bool=False, ymdhm:bool=False, 
+                  filename2: str=None, freq:int=None, utc_offset: int=None, yoffset: float=None):
 
     """
     quick file plotting using matplotlib
@@ -145,6 +147,8 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
     utc_offset: int, optional
         offset time axis by this number of hours (for local time)
         this only is used when the mjd option is used  
+    yoffset : float
+        add or subtract to the y-axis values
 
     """
 
@@ -161,6 +165,9 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
         ylabel = 'Unknown'
 
     secondFile = False
+
+    if yoffset is None:
+        yoffset = 0
 
     reverse_sign = reverse
 
@@ -206,8 +213,11 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
 
     tval,yval = q.trans_time(tvd, ymd, ymdhm, convert_mjd, ydoy,xcol,ycol,utc_offset)
 
+    yval = yval + yoffset
+
     if secondFile:
         tval2,yval2 = q.trans_time(tvd2, ymd, ymdhm, convert_mjd, ydoy,xcol,ycol,utc_offset)
+        yval2 = yval2 + yoffset
 
     # supercedes previous trans_time ... ??? 
     if ydoy:
