@@ -5413,7 +5413,7 @@ def queryUNR_modern(station):
 
     haveit,usedatabase = unr_database(nfile0, nfile00, 'station_pos_2024.db')
     if (not haveit):
-        haveit,usedatabasea = unr_database(nfile2, nfile1, 'station_pos.db')
+        haveit,usedatabase = unr_database(nfile2, nfile1, 'station_pos.db')
 
     if not haveit:
         print('No station database was found.')
@@ -6622,16 +6622,16 @@ def unr_database(file1, file2, database_file):
     file1 : str
         full name of database in $REFL_CODE/Files
     file2 : str
-        full name of database in gnssrefl
+        full name of database in local gnssrefl directory
     database_file : str
         database file name
 
     Returns
     -------
     exists_now : bool
-        whether the database exists in the end
+        whether you were successful in finding the database 
     database_location : str
-        full name of the database you found and want to use
+        full name of the database you found and want to use going on
 
     """
     # get the new database
