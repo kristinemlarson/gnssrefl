@@ -5402,36 +5402,26 @@ def queryUNR_modern(station):
     if not os.path.isdir(fdir):
         subprocess.call(['mkdir', fdir])
 
+    # new database locations 
+    nfile00 = 'gnssrefl/station_pos_2024.db'
+    nfile0 = xdir + '/Files/station_pos_2024.db'
+
+    # old database locations
     nfile1 = 'gnssrefl/station_pos.db'
-    nfile1_exist = os.path.isfile(nfile1)
     nfile2 = xdir + '/Files/station_pos.db'
-    nfile2_exist = os.path.isfile(nfile2)
 
-    if (nfile1_exist) or (nfile2_exist):
-        iii = 0
-        #print('found the UNR database')
+
+    haveit,usedatabase = unr_database(nfile0, nfile00, 'station_pos_2024.db')
+    if (not haveit):
+        haveit,usedatabasea = unr_database(nfile2, nfile1, 'station_pos.db')
+
+    if not haveit:
+        print('No station database was found.')
+        return 0, 0, 0
     else:
-        print('did not find the UNR database')
+        print('Using database ', usedatabase)
+        conn = sqlite3.connect(usedatabase)
 
-    if (not nfile1_exist) and (not nfile2_exist):
-        url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/station_pos.db'
-        print('Try to download the station database from github for you:', url1)
-        print('If you are not online, it will fail.')
-        print('If you are able to download the file, it should be stored in the $REFL_CODE/Files directory')
-        try:
-            #url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/station_pos.db'
-            wget.download(url1,nfile2)
-            nfile2_exist = True
-        except:
-            print('Could not download the database for you')
-            return lat, lon, ht
-    # if you used github and run the code from that directory
-    if nfile1_exist:
-        #print('Database was found at :', nfile1)
-        conn = sqlite3.connect(nfile1)
-    elif nfile2_exist:
-        #print('Database was found at :', nfile2)
-        conn = sqlite3.connect(nfile2)
     c=conn.cursor()
     c.execute("SELECT * FROM  stations WHERE station=:station",{'station': station})
     w = c.fetchall()
@@ -5445,7 +5435,9 @@ def queryUNR_modern(station):
 
     # close the database
     conn.close()
+
     # some of the Nevada Reno stations have the same names as stations used in GNSS-IR.
+    # here we override them
 
     if (station == 'moss'):
         lat= -16.434464800 ;lon = 145.403622520 ; ht = 71.418
@@ -6619,4 +6611,58 @@ def ydoy2datetime(y,doy):
     obstimes = np.asarray(obstimes_list)
 
     return obstimes
+
+def unr_database(file1, file2, database_file):
+    """
+    Checks to see if the database lives in either file1 or file2
+    locations. Stem of the filename is third input, database_file
+
+    Parameters
+    ----------
+    file1 : str
+        full name of database in $REFL_CODE/Files
+    file2 : str
+        full name of database in gnssrefl
+    database_file : str
+        database file name
+
+    Returns
+    -------
+    exists_now : bool
+        whether the database exists in the end
+    database_location : str
+        full name of the database you found and want to use
+
+    """
+    # get the new database
+    exists_now = True
+    exist1 = os.path.isfile(file1)
+    exist2 = os.path.isfile(file2)
+
+    if (not exist1) & (not exist2):
+        url1= 'https://github.com/kristinemlarson/gnssrefl/raw/master/gnssrefl/' + database_file
+        print('Try to download the station database from github for you:', url1)
+        print('If you are not online, it will fail.')
+        print('If you are able to manually download the file')
+        print('it should be stored in the $REFL_CODE/Files directory')
+        try:
+            wget.download(url1,file1)
+            exists_now = True
+        except:
+            print('Could not download the new UNR database for you')
+            exists_now = False
+
+    exist1 = os.path.isfile(file1)
+    exist2 = os.path.isfile(file2)
+
+    if (not exist1) & exist2:
+        print('cp from local directory to Files directory because that is where it goes')
+        subprocess.call(['cp', file2, file1])
+
+    # just to be sure
+    if (not exist1) & (not exist2):
+        exists_now = False
+
+    return exists_now , file1
+
 
