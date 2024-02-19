@@ -12,6 +12,9 @@ I really should not have been.
 
 quickplot allows y-offsets.
 
+added station_pos_2024.db - includes more station coordinates from
+nevada reno group.  
+
 ## 2.3.0
 Fixed bug for SNR files that used non-compliant filenames that
 are allowed by nmea2snr.  routine that picks up the SNR file failed
