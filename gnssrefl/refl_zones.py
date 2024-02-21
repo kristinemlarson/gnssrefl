@@ -283,9 +283,8 @@ def calcAzEl_new(prn, newf,recv,u,East,North):
         etime = newf[t,1]
         r=np.subtract(satv,recv) # satellite minus receiver vector
         eleA = g.elev_angle(u, r)*180/np.pi
-        # change from 26 to 31 so at least 30 degrees is supported
-        #if ( (eleA >= 0) & (eleA <= 26)):
-        if ( (eleA >= 0) & (eleA <= 31)):
+        #Check if the elevation angle is within the allowed range
+        if ( (eleA >= 0) & (eleA <= 61)):
             azimA = g.azimuth_angle(r, East, North)
 #            print(etime, eleA, azimA)
             newl = [prn, eleA, azimA]
