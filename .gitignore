@@ -1,4 +1,7 @@
 env
+llh.csv
+llh.txt
+make_unr_database.py
 gnssrefl/gnssir_old.py
 list_bfg.py
 noaa.txt
@@ -17,8 +20,6 @@ gfzrnxQC_osxarm.out
 cddis.py
 qcddis.py
 .netrc
-jul01.snr
-jul01.txt
 convert_argt.py
 testing.py
 tggo.txt

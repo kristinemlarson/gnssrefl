@@ -286,6 +286,7 @@ def calcAzEl_new(prn, newf,recv,u,East,North):
         # change from 26 to 31 so at least 30 degrees is supported
         #if ( (eleA >= 0) & (eleA <= 26)):
         if ( (eleA >= 0) & (eleA <= 31)):
+        #if ( (eleA >= 0) & (eleA <= 51)):
             azimA = g.azimuth_angle(r, East, North)
 #            print(etime, eleA, azimA)
             newl = [prn, eleA, azimA]
