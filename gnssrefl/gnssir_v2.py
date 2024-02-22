@@ -133,7 +133,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
     p,T,irefr,humidity = set_refraction_params(station, dmjd, lsp)
-    print('Refraction parameters (press, temp, humidity, ModelNum',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
+    print('Refraction parameters (press, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
 
     if (irefr == 3) or (irefr == 4):
         TempK = T + 273.15 # T is in celsius ... I think.

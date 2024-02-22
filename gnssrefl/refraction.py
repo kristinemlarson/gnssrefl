@@ -630,18 +630,441 @@ def refrc_Rueger(drypress,vpress,temp):
 
     """
 
-    [K1r,K2r,K3r]=[77.689 ,71.2952 ,375463.]     # Rüeger's "best average", for 375 ppm CO2, 77.690 for 392 ppm CO2
+    # Rüeger's "best average", for 375 ppm CO2, 77.690 for 392 ppm CO2
+    [K1r,K2r,K3r]=[77.689 ,71.2952 ,375463.]     
 
-    Nrueger = K1r * drypress / temp + K2r * vpress / temp + K3r * vpress / (temp ** 2)  # Rueger,IAG recommend, in ppm
+    # Rueger,IAG recommend, in ppm
+    Nrueger = K1r * drypress / temp + K2r * vpress / temp + K3r * vpress / (temp ** 2)  
 
-    [Rgas,Md,Mw] = [8.31446261815324,0.0289644,0.01801528]   # gas constant (SI exact), molar masses of dry air and water, kg/mol
-    drydensity=(drypress*100.)*Md/(Rgas*temp)    #density in kg/m^3
-    vdensity=(vpress*100.)*Mw/(Rgas*temp)   #in PV=nRT, P in Pa, V in m^3, n in g/mol, T in K, R=8.314 Pa*m^3/(k*mol)
+    # gas constant (SI exact), molar masses of dry air and water, kg/mol
+    [Rgas,Md,Mw] = [8.31446261815324,0.0289644,0.01801528]   
+
+    #density in kg/m^3
+    drydensity=(drypress*100.)*Md/(Rgas*temp)    
+    #in PV=nRT, P in Pa, V in m^3, n in g/mol, T in K, R=8.314 Pa*m^3/(k*mol)
+    vdensity=(vpress*100.)*Mw/(Rgas*temp)   
     totaldensity=drydensity+vdensity
 
-    Nhydro=(K1r*Rgas*totaldensity/Md)/100.   #divide 100 because hPa in Rueger formula, result in ppm
+    #divide 100 because hPa in Rueger formula, result in ppm
+    Nhydro=(K1r*Rgas*totaldensity/Md)/100.   
     K2rr=K2r-K1r*(Mw/Md)
     Nwet=K2rr * vpress / temp + K3r * vpress / (temp ** 2)
-    ref=[round(Nrueger,4),round(Nhydro,4),round(Nwet,4)]    # in ppm
+    # in ppm
+    ref=[round(Nrueger,4),round(Nhydro,4),round(Nwet,4)]    
     return ref
+
+
+def Equvilent_Angle_Corr_NITE(Hr_apr, e_T, N_ant, ztd_ant, mpf_tot, dmpf_de_tot):
+    """
+    NITE formula equvilent angle correction and forward model
+    From Peng et al. 2023
+
+    Parameters
+    ----------
+    Hr_apr : float
+        a priori reflector height, meters
+
+    e_T : float
+        elevation angle - units!!!!!
+
+    N_ant : float
+        antenna refractivity
+
+    ztd_ant : float
+        total zenith tropo delay, meters
+
+    mpf_tot : float
+
+    dmpf_de_tot : float
+
+
+    Returns
+    -------
+    new_elev : float
+        new elevation angle, units?
+
+    """
+    e_A = e_T+Ulich_Bending_Angle_original(e_T, N_ant)
+    sita_E = sita_Earth(Hr_apr, e_A)
+    sita_S = sita_Satellite(Hr_apr, e_A)
+    e_A_r = e_A+sita_E +sita_S
+    Hv_ratio = Hv_Hr_ratio(Hr_apr, 6378137., e_A)
+    sin_eqv_geo = 0.5 * Hv_ratio / np.sin(np.radians(e_A_r + sita_E)) * (1. - np.cos(np.radians(e_T + e_A_r + sita_E)))
+    Nl = N_layer(N_ant, Hr_apr)
+    dsin_up = Hv_ratio*(Nl / 1000000.)/np.sin(np.radians(e_A_r + sita_E))
+    ddele_T_dh = np.tan(np.radians(e_A))
+    dsin_down = Nl / 1000000.*mpf_tot-ztd_ant*(dmpf_de_tot*(1. / (6378137. *ddele_T_dh ))+dmpf_dh(e_T, dhgt=1.))
+    dsin = 0.5*(dsin_up + dsin_down)
+    ele_eqv = np.degrees(np.arcsin(sin_eqv_geo + dsin))
+    new_elev = ele_eqv - e_T
+    return new_elev
+
+
+def gmf_deriv(dmjd,dlat,dlon,dhgt,zd):
+    """
+    This subroutine determines the Global Mapping Functions GMF  and derivative.
+    Translated from https://vmf.geo.tuwien.ac.at/codes/gmf_deriv.f by Peng Feng in March, 2023.
+
+    Johannes Boehm, 2005 August 30
+    
+    ref 2006 Aug. 14: derivatives (U. Hugentobler)
+    ref 2006 Aug. 14: recursions for Legendre polynomials (O. Montenbruck)
+    ref 2011 Jul. 21: latitude -> ellipsoidal latitude
+
+    Parameters
+    ----------
+    dmjd: float
+        modified julian date
+    dlat: float
+        ellipsoidal latitude in radians
+    dlon: float
+        longitude in radians
+    dhgt: float
+        height in m
+    zd: float
+        zenith distance in radians ??? ( is this really what you mean??
+
+    Returns
+    -------
+    gmfh(2): floats
+        hydrostatic mapping function and derivative wrt z
+
+    gmfw(2): floats
+        wet mapping function and derivative wrt z
+    
+    """
+
+    ah_mean=[+1.2517e+02, +8.503e-01, +6.936e-02, -6.760e+00, +1.771e-01,
+             +1.130e-02, +5.963e-01, +1.808e-02, +2.801e-03, -1.414e-03,
+             -1.212e+00, +9.300e-02, +3.683e-03, +1.095e-03, +4.671e-05,
+             +3.959e-01, -3.867e-02, +5.413e-03, -5.289e-04, +3.229e-04,
+             +2.067e-05, +3.000e-01, +2.031e-02, +5.900e-03, +4.573e-04,
+             -7.619e-05, +2.327e-06, +3.845e-06, +1.182e-01, +1.158e-02,
+             +5.445e-03, +6.219e-05, +4.204e-06, -2.093e-06, +1.540e-07,
+             -4.280e-08, -4.751e-01, -3.490e-02, +1.758e-03, +4.019e-04,
+             -2.799e-06, -1.287e-06, +5.468e-07, +7.580e-08, -6.300e-09,
+             -1.160e-01, +8.301e-03, +8.771e-04, +9.955e-05, -1.718e-06,
+             -2.012e-06, +1.170e-08, +1.790e-08, -1.300e-09, +1.000e-10]
+
+    bh_mean=[+0.000e+00, +0.000e+00, +3.249e-02, +0.000e+00, +3.324e-02,
+             +1.850e-02, +0.000e+00, -1.115e-01, +2.519e-02, +4.923e-03,
+             +0.000e+00, +2.737e-02, +1.595e-02, -7.332e-04, +1.933e-04,
+             +0.000e+00, -4.796e-02, +6.381e-03, -1.599e-04, -3.685e-04,
+             +1.815e-05, +0.000e+00, +7.033e-02, +2.426e-03, -1.111e-03,
+             -1.357e-04, -7.828e-06, +2.547e-06, +0.000e+00, +5.779e-03,
+             +3.133e-03, -5.312e-04, -2.028e-05, +2.323e-07, -9.100e-08,
+             -1.650e-08, +0.000e+00, +3.688e-02, -8.638e-04, -8.514e-05,
+             -2.828e-05, +5.403e-07, +4.390e-07, +1.350e-08, +1.800e-09,
+             +0.000e+00, -2.736e-02, -2.977e-04, +8.113e-05, +2.329e-07,
+             +8.451e-07, +4.490e-08, -8.100e-09, -1.500e-09, +2.000e-10]
+
+    ah_amp=[ -2.738e-01, -2.837e+00, +1.298e-02, -3.588e-01, +2.413e-02,
+            +3.427e-02, -7.624e-01, +7.272e-02, +2.160e-02, -3.385e-03,
+            +4.424e-01, +3.722e-02, +2.195e-02, -1.503e-03, +2.426e-04,
+            +3.013e-01, +5.762e-02, +1.019e-02, -4.476e-04, +6.790e-05,
+            +3.227e-05, +3.123e-01, -3.535e-02, +4.840e-03, +3.025e-06,
+            -4.363e-05, +2.854e-07, -1.286e-06, -6.725e-01, -3.730e-02,
+            +8.964e-04, +1.399e-04, -3.990e-06, +7.431e-06, -2.796e-07,
+            -1.601e-07, +4.068e-02, -1.352e-02, +7.282e-04, +9.594e-05,
+            +2.070e-06, -9.620e-08, -2.742e-07, -6.370e-08, -6.300e-09,
+            +8.625e-02, -5.971e-03, +4.705e-04, +2.335e-05, +4.226e-06,
+            +2.475e-07, -8.850e-08, -3.600e-08, -2.900e-09, +0.000e+00]
+
+    bh_amp=[+0.000e+00, +0.000e+00, -1.136e-01, +0.000e+00, -1.868e-01,
+            -1.399e-02, +0.000e+00, -1.043e-01, +1.175e-02, -2.240e-03,
+            +0.000e+00, -3.222e-02, +1.333e-02, -2.647e-03, -2.316e-05,
+            +0.000e+00, +5.339e-02, +1.107e-02, -3.116e-03, -1.079e-04,
+            -1.299e-05, +0.000e+00, +4.861e-03, +8.891e-03, -6.448e-04,
+            -1.279e-05, +6.358e-06, -1.417e-07, +0.000e+00, +3.041e-02,
+            +1.150e-03, -8.743e-04, -2.781e-05, +6.367e-07, -1.140e-08,
+            -4.200e-08, +0.000e+00, -2.982e-02, -3.000e-03, +1.394e-05,
+            -3.290e-05, -1.705e-07, +7.440e-08, +2.720e-08, -6.600e-09,
+            +0.000e+00, +1.236e-02, -9.981e-04, -3.792e-05, -1.355e-05,
+            +1.162e-06, -1.789e-07, +1.470e-08, -2.400e-09, -4.000e-10]
+
+    aw_mean=[+5.640e+01, +1.555e+00, -1.011e+00, -3.975e+00, +3.171e-02,
+             +1.065e-01, +6.175e-01, +1.376e-01, +4.229e-02, +3.028e-03,
+             +1.688e+00, -1.692e-01, +5.478e-02, +2.473e-02, +6.059e-04,
+             +2.278e+00, +6.614e-03, -3.505e-04, -6.697e-03, +8.402e-04,
+             +7.033e-04, -3.236e+00, +2.184e-01, -4.611e-02, -1.613e-02,
+             -1.604e-03, +5.420e-05, +7.922e-05, -2.711e-01, -4.406e-01,
+             -3.376e-02, -2.801e-03, -4.090e-04, -2.056e-05, +6.894e-06,
+             +2.317e-06, +1.941e+00, -2.562e-01, +1.598e-02, +5.449e-03,
+             +3.544e-04, +1.148e-05, +7.503e-06, -5.667e-07, -3.660e-08,
+             +8.683e-01, -5.931e-02, -1.864e-03, -1.277e-04, +2.029e-04,
+             +1.269e-05, +1.629e-06, +9.660e-08, -1.015e-07, -5.000e-10]
+
+    bw_mean=[+0.000e+00, +0.000e+00, +2.592e-01, +0.000e+00, +2.974e-02,
+             -5.471e-01, +0.000e+00, -5.926e-01, -1.030e-01, -1.567e-02,
+             +0.000e+00, +1.710e-01, +9.025e-02, +2.689e-02, +2.243e-03,
+             +0.000e+00, +3.439e-01, +2.402e-02, +5.410e-03, +1.601e-03,
+             +9.669e-05, +0.000e+00, +9.502e-02, -3.063e-02, -1.055e-03,
+             -1.067e-04, -1.130e-04, +2.124e-05, +0.000e+00, -3.129e-01,
+             +8.463e-03, +2.253e-04, +7.413e-05, -9.376e-05, -1.606e-06,
+             +2.060e-06, +0.000e+00, +2.739e-01, +1.167e-03, -2.246e-05,
+             -1.287e-04, -2.438e-05, -7.561e-07, +1.158e-06, +4.950e-08,
+             +0.000e+00, -1.344e-01, +5.342e-03, +3.775e-04, -6.756e-05,
+             -1.686e-06, -1.184e-06, +2.768e-07, +2.730e-08, +5.700e-09]
+
+    aw_amp=[+1.023e-01, -2.695e+00, +3.417e-01, -1.405e-01, +3.175e-01,
+            +2.116e-01, +3.536e+00, -1.505e-01, -1.660e-02, +2.967e-02,
+            +3.819e-01, -1.695e-01, -7.444e-02, +7.409e-03, -6.262e-03,
+            -1.836e+00, -1.759e-02, -6.256e-02, -2.371e-03, +7.947e-04,
+            +1.501e-04, -8.603e-01, -1.360e-01, -3.629e-02, -3.706e-03,
+            -2.976e-04, +1.857e-05, +3.021e-05, +2.248e+00, -1.178e-01,
+            +1.255e-02, +1.134e-03, -2.161e-04, -5.817e-06, +8.836e-07,
+            -1.769e-07, +7.313e-01, -1.188e-01, +1.145e-02, +1.011e-03,
+            +1.083e-04, +2.570e-06, -2.140e-06, -5.710e-08, +2.000e-08,
+            -1.632e+00, -6.948e-03, -3.893e-03, +8.592e-04, +7.577e-05,
+            +4.539e-06, -3.852e-07, -2.213e-07, -1.370e-08, +5.800e-09]
+
+    bw_amp=[+0.000e+00, +0.000e+00, -8.865e-02, +0.000e+00, -4.309e-01,
+            +6.340e-02, +0.000e+00, +1.162e-01, +6.176e-02, -4.234e-03,
+            +0.000e+00, +2.530e-01, +4.017e-02, -6.204e-03, +4.977e-03,
+            +0.000e+00, -1.737e-01, -5.638e-03, +1.488e-04, +4.857e-04,
+            -1.809e-04, +0.000e+00, -1.514e-01, -1.685e-02, +5.333e-03,
+            -7.611e-05, +2.394e-05, +8.195e-06, +0.000e+00, +9.326e-02,
+            -1.275e-02, -3.071e-04, +5.374e-05, -3.391e-05, -7.436e-06,
+            +6.747e-07, +0.000e+00, -8.637e-02, -3.807e-03, -6.833e-04,
+            -3.861e-05, -2.268e-05, +1.454e-06, +3.860e-07, -1.068e-07,
+            +0.000e+00, -2.658e-02, -1.947e-03, +7.131e-04, -3.506e-05,
+            +1.885e-07, +5.792e-07, +3.990e-08, +2.000e-08, -5.700e-09]
+
+
+    pi = 3.141592653590000
+
+#   reference day is 28 January
+#   this is taken from Niell (1996) to be consistent
+    doy = dmjd  - 44239.0 + 1 - 28
+
+#   degree n and order m
+    nmax = 9
+    mmax = 9
+
+#   unit vector
+    x = math.cos(dlat)*math.cos(dlon)
+    y = math.cos(dlat)*math.sin(dlon)
+    z = math.sin(dlat)
+  
+# Legendre polynomials (Cunningham)
+
+    V=[[0. for j in range(nmax+1) ] for i in range(nmax+1)]
+    W = [[0. for j in range(mmax + 1)] for i in range(mmax + 1)]
+
+    V[0][0]=1.0
+    W[0][0]=0.0
+    V[1][0]=z*V[0][0]
+    W[1][0]=0.0
+    # print(z)
+
+
+    for n in range(2,nmax+1):
+        V[n][0]=((2*n-1) * z * V[n-1][0] - (n-1) * V[n-2][0])  / n
+        W[n][0]=0.0
+
+
+    for m in range(1,nmax+1):
+        V[m][m] = (2 * m - 1) * (x * V[m - 1][m - 1] - y * W[m - 1][m - 1])
+        W[m][m] = (2 * m - 1) * (x * W[m - 1][m - 1] + y * V[m - 1][m - 1])
+
+        if m<nmax:
+            V[m + 1][m] = (2 * m + 1) * z * V[m][m]
+            W[m + 1][m] = (2 * m + 1) * z * W[m][m]
+        for n in range(m+2,nmax+1):
+            V[n][m] = ((2 * n - 1) * z * V[n-1][m] - (n + m - 1) * V[n-2][m]) / (n - m)
+            W[n][m] = ((2 * n - 1) * z * W[n-1][m] - (n + m - 1) * W[n-2][m]) / (n - m)
+    # print(V)
+    # print(W)
+
+
+    #hydrostatic
+    bh = 0.0029
+    c0h = 0.062
+    if dlat <0.: # southern hemisphere
+        phh = pi
+        c11h = 0.007
+        c10h = 0.002
+    else: # northern hemisphere
+        phh = 0
+        c11h = 0.005
+        c10h = 0.001
+    ch = c0h + ((math.cos(doy / 365.25 * 2. * pi + phh) + 1) * c11h / 2. + c10h) *(1. - math.cos(dlat))
+
+    ahm = 0.
+    aha = 0.
+    i = 0
+    for n in range(0,nmax+1):
+        for m in range(0,n+1):
+            ahm = ahm + (ah_mean[i] * V[n][m] + bh_mean[i] * W[n][m])
+            # print('ahm',i,n,m,ahm,ah_mean[i] , V[n][m] , bh_mean[i],W[n][m])
+            aha = aha + (ah_amp[i] * V[n][m]+ bh_amp[i] * W[n][m])
+            # print('aha', i, n, m, aha, ah_amp[i], V[n][m], bh_amp[i], W[n][m])
+            i=i+1
+    ah=(ahm + aha*math.cos(doy/365.250*2.0*pi))*1.e-5
+    # print('ah',ah,ahm,aha,i)
+    # print(V)
+    # print(W)
+    # print(ah_mean)
+
+
+    sine = math.sin(pi / 2 - zd)
+    cose = math.cos(pi / 2 - zd)
+    beta = bh / (sine + ch)
+    gamma = ah / (sine + beta)
+    topcon = (1.0 + ah / (1.0 + bh / (1.0 + ch)))
+    gmfh=[0.,0.]
+    gmfh[0] = topcon / (sine + gamma)
+#   derivative
+    gmfh[1] = gmfh[0] ** 2 / topcon * cose * (1 - gamma ** 2 / ah * (1 - beta ** 2 / bh))
+
+#    height correction for hydrostatic mapping function from Niell (1996)
+    a_ht = 2.53e-5
+    b_ht = 5.49e-3
+    c_ht = 1.14e-3
+    hs_km = dhgt / 1000.0
+
+    beta = b_ht / (sine + c_ht)
+    gamma = a_ht / (sine + beta)
+    topcon = (1.0 + a_ht / (1.0 + b_ht / (1.0 + c_ht)))
+    ht_corr_coef = 1 / sine - topcon / (sine + gamma)
+    ht_corr = ht_corr_coef * hs_km
+    gmfh[0] = gmfh[0] + ht_corr
+
+#   derivative
+    gmfh[1]= gmfh[1] + (cose/sine**2 - topcon*cose/(sine+gamma)**2*(1-gamma**2/a_ht*(1-beta**2/b_ht))) * hs_km
+
+
+#   wet
+    bw = 0.00146
+    cw = 0.04391
+    awm = 0.0
+    awa = 0.0
+    i=0
+    for n in range(0,nmax+1):
+        for m in range(0,n+1):
+            awm = awm + (aw_mean[i] * V[n][m] + bw_mean[i] * W[n][m])
+            awa = awa + (aw_amp[i] * V[n][m] + bw_amp[i] * W[n][m])
+            i=i+1
+
+    aw = (awm + awa * math.cos(doy / 365.250 * 2 * pi))*1e-5
+    beta = bw / (sine + cw)
+    gamma = aw / (sine + beta)
+    topcon = (1.0 + aw / (1.0 + bw / (1.0 + cw)))
+
+    gmfw = [0., 0.]
+    gmfw[0] = topcon / (sine + gamma)
+
+#   derivative
+    gmfw[1] = gmfw[0] ** 2 / topcon * cose * (1 - gamma ** 2 / aw * (1 - beta ** 2 / bw))
+    return [gmfh[0],gmfh[1],gmfw[0],gmfw[1]]
+
+
+def sita_Earth(Hr, e_A):                                   
+    """
+    no documentation
+    # in meter, in degree
+
+
+    """
+
+    # earth center angle between the reflection point and the GNSS antenna
+    sita_E = Hr / (6378137. * np.tan(np.radians(e_A)))
+    return round(np.degrees(sita_E), 6)                              # in degree
+
+def sita_Satellite(Hr, e_A):                               
+    """
+    no documentation 
+    # in meter, in degree
+    # satellite angle between the reflection point and the GNSS antenna
+
+    """
+
+    ant2satell = 4.*6378137.    # assume satellite distance 4 times earth radius
+    sita_S = 2 * Hr * np.cos(np.radians(e_A)) / ant2satell
+    return round(np.degrees(sita_S), 6)    # in degree, small for MEO satellites
+
+def dH_curve(Hr, Re, e_A):                       
+    """
+    no documentation provided
+    # in meter, in meter, in degree
+    #vertial displacement of the reflection point vs. a "plane reflection"
+    """
+    dH = Re * (1. - np.cos(Hr / np.tan(np.radians(e_A)) / Re))
+    return round(dH, 6)    # in meters
+
+def Hv_Hr_ratio(Hr, Re, e_A):
+    """
+    no documentation provided
+    # in meter, in meter, in degree
+    """
+    dH = Re * (1. - np.cos(Hr / np.tan(np.radians(e_A)) / Re))
+    return (Hr+dH) /Hr    #ratio, allways bigger than 1
+
+def N_layer(N_antenna, Hr):
+    """
+    no documentation 
+
+    #in ppm, in meter
+    # average refractivity in the layer between GNSS antenna and sea surface
+    """
+    Nl = N_antenna *(1+np.exp(Hr/8000.)) /2
+    return round(Nl, 4)     #in ppm
+
+def saastam2(press, lat, height):
+    """
+    no documentation
+    in hPa,  in degree, in meter
+    Saastamion model with updated refractivity equation from Rüeger (2002)
+
+    as best i understand this it is the dry delay
+    """
+    phi = lat / 180 * 3.14159265359
+    height = height / 1000.
+    f = 1. - 0.0026 * np.cos(2. * phi) - 0.00028 * height
+    # ZHD in meter
+    return round(2.2794 * press / f / 1000., 6)                   
+
+def mpf_tot(gmf_h, gmf_w, zhd, zwd):  
+    """
+    no documentation
+    #convert seperate wet&dry MPF to total MPF
+
+    guessing
+
+    gmf_h : float
+        ?
+    gmf_w : float
+        ?
+    zhd : float
+        zenith hydrostatic delay
+    zwd : float
+        zenith wet delay
+    """
+    mpf_tot1=(gmf_h*zhd+gmf_w*zwd)/(zhd+zwd)
+
+    return mpf_tot1
+
+def dmpf_dh(ele, dhgt):    
+    """
+    no documentation
+    # mapping function height correction by (Niell, 1996)
+    """
+    sine = np.sin(np.radians(ele))
+    [a_ht, b_ht, c_ht] = [0.0000253, 0.00549, 0.00114]
+    hs_km = dhgt / 1000.
+    beta = b_ht / (sine + c_ht)
+    topcon = (1. + a_ht / (1. + b_ht / (1. + c_ht)))
+    ht_corr_coef = 1 / sine - topcon / (sine + a_ht / (sine + beta))
+    return ht_corr_coef * hs_km
+
+
+def Ulich_Bending_Angle_original(ele, N0):   
+    """
+    no documentation
+    # input degree, ppm
+    """
+    ele = np.radians(ele)
+    r = N0/1000000.
+    f = np.cos(ele) / (np.sin(ele) + 0.00175 * np.tan(np.radians(87.5) - ele))
+    return np.degrees(r * f)
 
