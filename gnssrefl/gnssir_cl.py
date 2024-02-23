@@ -4,6 +4,8 @@ import os
 import subprocess
 import sys
 import wget
+import multiprocessing
+from functools import partial
 
 #import gnssrefl.gnssir as guts
 import gnssrefl.gnssir_v2 as guts2
