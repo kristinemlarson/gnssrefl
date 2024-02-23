@@ -51,7 +51,7 @@ def parse_arguments():
     parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
     parser.add_argument("-gzip", default=None, help="boolean, default is SNR files are gzipped after creation", type=str)
-    parser.add_argument("-par", default=1, help="int, set number of parallel processes to run when downloading data", type=int)
+    parser.add_argument("-par", default=None, help="int, set number of parallel processes to run when downloading data", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -67,7 +67,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
-              screenstats : bool = False, gzip : bool = True, monthly : bool = False, par : int = 1):
+              screenstats : bool = False, gzip : bool = True, monthly : bool = False, par : int = None):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. Although RINEX 3 is supported, 

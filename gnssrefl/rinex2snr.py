@@ -194,7 +194,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         "version": version
         }
 
-    if (par == 1): 
+    if not par: 
         for year in year_list:
             process_year(year, **additional_args)
     else:
