@@ -166,40 +166,18 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     doy_st = doy_list[0]
     doy_end = doy_list[-1]
 
-    # max_parallel = 10
-    additional_args = {
-        "station": station,
-        "doy_list": doy_list,
-        "isnr": isnr,
-        "orbtype": orbtype,
-        "rate": rate,
-        "dec_rate": dec_rate,
-        "archive": archive,
-        "fortran": fortran,
-        "nol": nol,
-        "overwrite": overwrite,
-        "translator": translator,
-        "srate": srate,
-        "mk": mk,
-        "skipit": skipit,
-        "stream": stream,
-        "strip": strip,
-        "bkg": bkg,
-        "screenstats": screenstats,
-        "gzip": gzip,
-        "year_st": year_st,
-        "year_end": year_end,
-        "doy_st": doy_st,
-        "doy_end": doy_end,
-        "version": version
-        }
+    args = { "station": station, "doy_list": doy_list, "isnr": isnr, "orbtype": orbtype, "rate": rate, 
+            "dec_rate": dec_rate, "archive": archive, "fortran": fortran, "nol": nol, 
+            "overwrite": overwrite, "translator": translator, "srate": srate, "mk": mk, "skipit": skipit, 
+            "stream": stream, "strip": strip, "bkg": bkg, "screenstats": screenstats, "gzip": gzip, 
+            "year_st": year_st, "year_end": year_end, "doy_st": doy_st, "doy_end": doy_end, "version": version }
 
     if not par: 
         for year in year_list:
-            process_year(year, **additional_args)
+            process_year(year, **args)
     else:
         pool = multiprocessing.Pool(processes=par) 
-        partial_process_year = partial(process_year, **additional_args)
+        partial_process_year = partial(process_year, **args)
 
         pool.map(partial_process_year, year_list)
         pool.close()
@@ -207,6 +185,77 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
 def process_year(year, station, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate, 
 mk, skipit, stream, strip, bkg, screenstats, gzip, year_st, year_end, doy_st, doy_end, version):
+    """
+    Code that does the analyzing for a specific year. Refactored to seperate function to allow for parallel processes
+
+    Parameters
+    ----------
+    year : int
+        the year to be analyzed
+
+    station : str
+        4 or 9 character station name. 6 ch allowed for japanese archive
+        9 means it is a RINEX 3 file
+
+    doy_list : list of integers
+        doys to be analyzed
+
+    isnr : int
+        SNR file type choice
+
+    orbtype : str
+        orbit type, e.g. nav, rapid, gnss
+
+    rate : str
+        general sample rate.
+        high: use 1-Hz area in the archive
+        low: use default area in the archive
+
+    dec_rate : integer
+         decimation value
+
+    archive : str
+        choice of GNSS archive
+
+    fortran : bool
+        whether the fortran rinex translator is to be used
+        default: false
+
+    nol: bool
+        True: assumes RINEX files are in local directory
+        False (default): will look at multiple - or specific archive
+
+    overwrite: bool
+        False (default): if SNR file exists, SNR file not made
+        True: make a new SNR file
+
+    translator : str
+        hybrid (default), fortran, or python
+        hybrid uses fortran within the python code
+
+    srate : int
+        sample rate for RINEX 3 files
+
+    mk : boolean
+        makan option
+
+    skipit : int
+         skips making files every day, so a value of 7 means weekly.  1 means do every day
+
+    strip : bool
+         reduces observables to only SNR (too many observables, particularly in RINEX 2 files
+         will break the RINEX translator)
+
+    bkg : str
+         location of bkg files, EUREF or IGS
+
+    screenstats: bool
+         whether print statements come to screen
+
+    gzip: bool
+         whether SNR files are gzipped after creation
+    """
+
     ann = g.make_nav_dirs(year)
     cyyyy = str(year)
     dec31 = g.dec31(year)
