@@ -60,7 +60,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
-        mk,skipit,stream,strip,bkg,screenstats,gzip):
+        mk,skipit,stream,strip,bkg,screenstats,gzip,par):
     """
     main code to convert RINEX files into SNR files 
 
@@ -130,6 +130,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     gzip: bool
          whether SNR files are gzipped after creation
+        
+    par: int
+         amount of parallel processes to run 
     """
     #
     # do not allow illegal skipit values
@@ -163,7 +166,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     doy_st = doy_list[0]
     doy_end = doy_list[-1]
 
-    max_parallel = 10
+    # max_parallel = 10
     additional_args = {
         "station": station,
         "doy_list": doy_list,
@@ -191,14 +194,19 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         "version": version
         }
 
-    pool = multiprocessing.Pool(processes=max_parallel) 
-    partial_process_year = partial(process_year, **additional_args)
+    if (par == 1): 
+        for year in year_list:
+            process_year(year, **additional_args)
+    else:
+        pool = multiprocessing.Pool(processes=par) 
+        partial_process_year = partial(process_year, **additional_args)
 
-    pool.map(partial_process_year, year_list)
-    pool.close()
-    pool.join()
+        pool.map(partial_process_year, year_list)
+        pool.close()
+        pool.join()
 
-def process_year(year, station, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
+def process_year(year, station, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate, 
+mk, skipit, stream, strip, bkg, screenstats, gzip, year_st, year_end, doy_st, doy_end, version):
     ann = g.make_nav_dirs(year)
     cyyyy = str(year)
     dec31 = g.dec31(year)
