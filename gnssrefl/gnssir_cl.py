@@ -162,7 +162,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     newarcs : bool, optional
         this input no longer has any meaning 
     par : int, optional
-        default is 1 process. can increase it to allow for parallel processing of data retrieval
+        default is 1 process. can increase it to allow for parallel processing of data retrieval. 
+        only useful when processing more than 1 year at once using -year_end argument
 
     """
 
@@ -339,6 +340,27 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
 
 def process_year(year, year_end, year_st, doy, doy_end, args):
+    """
+    Code that does the processing for a specific year. Refactored to seperate function to allow for parallel processes
+
+    Parameters
+    ----------
+    year : int
+        full Year
+    year_end : int
+        end year. This is to create a range from year to year_end to get the snr files for more than one year.
+        doy_end will be for year_end. Default is None.
+    year_st: int 
+        TODO what is this?    
+    doy : integer
+        Day of year
+    doy_end : int
+        end day of year. This is to create a range from doy to doy_end of days.
+        If year_end parameter is used - then day_end will end in the day of the year_end.
+        Default is None. (meaning only a single day using the doy parameter)
+    args : dict
+        arguments passed into gnssir through terminal
+    """
     # edits made 2021Sep10 by Makan karegar
     if year != year_end:
         doy_en = 366

@@ -186,7 +186,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 def process_year(year, station, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate, 
 mk, skipit, stream, strip, bkg, screenstats, gzip, year_st, year_end, doy_st, doy_end, version):
     """
-    Code that does the analyzing for a specific year. Refactored to seperate function to allow for parallel processes
+    Code that does the processing for a specific year. Refactored to seperate function to allow for parallel processes
 
     Parameters
     ----------
