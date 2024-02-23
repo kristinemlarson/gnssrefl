@@ -15,6 +15,7 @@ import sys
 
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rnx
+import rinex2snr as rnx2
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
 
@@ -541,7 +542,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
             'skipit': skipit, 'stream': stream, 'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'par' : par}
 
     s1 = time.time()
-    rnx.run_rinex2snr(**args)
+    rnx2.run_rinex2snr(**args)
     s2 = time.time()
     print('That took ', round(s2-s1,2), ' seconds')
     #print('Feedback written to subdirectory logs')
