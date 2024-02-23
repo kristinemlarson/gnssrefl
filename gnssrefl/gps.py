@@ -6093,8 +6093,13 @@ def checkEGM():
     egm = localdir + matfile
     if 'REFL_CODE' in os.environ:
         egm = localdir + matfile
+        interiorfile = 'gnssrefl/' + matfile
         if os.path.isfile(egm):
             #print('EGM96 file exists')
+            foundfile = True
+        elif os.path.isfile(interiorfile):
+            print('cp EGM96 file to where it belongs')
+            subprocess.call(['cp',interiorfile, localdir])
             foundfile = True
         else:
             print('EGM96 file does not exist. We will try to download and store it in ',localdir)
