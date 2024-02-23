@@ -39,6 +39,7 @@ def parse_arguments():
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
     parser.add_argument("-newarcs", default=None, type=str, help="This no longer has any meaning")
+    parser.add_argument("-par", default=None, help="int, set number of parallel processes to run when processing data", type=int)
 
 
     args = parser.parse_args().__dict__
@@ -55,7 +56,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
-        mmdd: bool = False, gzip: bool = True, dec : int = 1, newarcs : bool = True ):
+        mmdd: bool = False, gzip: bool = True, dec : int = 1, newarcs : bool = True, par : int = None):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
@@ -158,6 +159,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         periodograms are computed. 1 sec is default (i.e. no decimating)
     newarcs : bool, optional
         this input no longer has any meaning 
+    par : int, optional
+        default is 1 process. can increase it to allow for parallel processing of data retrieval
 
     """
 
@@ -319,31 +322,44 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     print('Requested frequencies ', lsp['freqs'])
 
+    additional_args = { "year_end": year_end, "year_st": year_st, "doy": doy, "doy_end": doy_end, "args": args }
 
-    for year in year_list:
-        # edits made 2021Sep10 by Makan karegar
-        if year != year_end:
-            doy_en = 366
-        else:
-            doy_en = doy_end
+    if not par: 
+        for year in year_list:
+            process_year(year, **additional_args)
+    else:
+        pool = multiprocessing.Pool(processes=par) 
+        partial_process_year = partial(process_year, **additional_args)
 
-        # edits made 2021Sep10 by Makan karegar
-        if year == year_st:
-            doy_list = list(range(doy, doy_en+1))
-        else:
-            doy_list = list(range(1, doy_en+1))
+        pool.map(partial_process_year, year_list)
+        pool.close()
+        pool.join()
 
-        args['year'] = year
-        for doy in doy_list:
-            args['doy'] = doy
-            try:
-                guts2.gnssir_guts_v2(**args)
-            except:
-                warnings.warn(f'error processing {year} {doy}');                
-            #else:
-            #    print('You are trying to use the Old Way of Selecting Arcs.')
-            #    print('This is no longer supported. Update your code')
-            #guts.gnssir_guts(**args)
+
+def process_year(year, year_end, year_st, doy, doy_end, args):
+    # edits made 2021Sep10 by Makan karegar
+    if year != year_end:
+        doy_en = 366
+    else:
+        doy_en = doy_end
+
+    # edits made 2021Sep10 by Makan karegar
+    if year == year_st:
+        doy_list = list(range(doy, doy_en+1))
+    else:
+        doy_list = list(range(1, doy_en+1))
+
+    args['year'] = year
+    for doy in doy_list:
+        args['doy'] = doy
+        try:
+            guts2.gnssir_guts_v2(**args)
+        except:
+            warnings.warn(f'error processing {year} {doy}');                
+        #else:
+        #    print('You are trying to use the Old Way of Selecting Arcs.')
+        #    print('This is no longer supported. Update your code')
+        #guts.gnssir_guts(**args)
 
 
 def main():
