@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2.5.0
+
+Did some changes to how files (EGM96, station position database) were loaded so that they could be 
+more easily installed with the docker. Currently they were being
+downloaded from github when they were already available locally in the source code area.
+They were not being installed as I thought from the Dockerfile.  
+
+Makan Karegar changed the elevation angle limits in refl_zones
+
 ## 2.4.0
 Made quickplt faster with large datasets.  I was using numpy append when
 i should have used a list and converted at the end.
