@@ -37,10 +37,12 @@ RUN pip3 install --no-cache-dir /usr/src/gnssrefl
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
 ENV EXE=/etc/gnssrefl/exe
-ENV ORBITS=/etc/gnssrefl/orbits
+ENV ORBITS=/etc/gnssrefl/refl_code
+#ENV ORBITS=/etc/gnssrefl/orbits
 ENV REFL_CODE=/etc/gnssrefl/refl_code
 ENV DOCKER=true
 
+# i don't believe these commands do anything useful.
 RUN mkdir -p /etc/gnssrefl/refl_code/input/
 RUN cp /usr/src/gnssrefl/gnssrefl/gpt_1wA.pickle /etc/gnssrefl/refl_code/input/
 RUN cp /usr/src/gnssrefl/gnssrefl/station_pos.db /etc/gnssrefl/refl_code/Files/

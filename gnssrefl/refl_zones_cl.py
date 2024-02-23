@@ -172,12 +172,12 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
         el_list = el_list[0:5]
         print('Elevation angle list is very long - reducing to five.')
 
-    emax = 31 # degrees for now
+    emax = 61 #max allowed elevation angle  
 
     #print(all(x < 50 for x in el_list))
 
     if not (all(x < emax for x in el_list)):
-        print('Right now we have an emax of 30 degrees. Resubmit your request.')
+        print('emax must be lower than 60 degrees. Resubmit your request.')
         sys.exit()
 
 
