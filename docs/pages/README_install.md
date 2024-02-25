@@ -13,10 +13,10 @@ github/pypi package installation.
 
 ## Local Python Install 
 
-**YOU SHOULD BE RUNNING python version 3.9 or 3.8.**  Maybe version 3.10 will work, but absolutely 3.11 will not.
-This has to do with our using the fortran reading features in one of the libraries. That is being
+**YOU SHOULD BE RUNNING python version 3.8, 3.9 or 3.10.**  Absolutely versions >= 3.11 will not work.
+This has to do with our using the fortran reading features in the numpy library. That feature is being
 deprecated and we are aware that long-term, we need to find a solution for it. It could be that 
-we will simply compile that code for the users and call the fortran module using <code>subprocess</code>.
+we will simply compile the existing code for the users and call the fortran module using <code>subprocess</code>.
 
 For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
 **If you are using linux** then simply type
