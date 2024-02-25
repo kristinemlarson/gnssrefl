@@ -211,7 +211,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
                 if nol:
                     current_local = os.getcwd()
-                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is :', current_local)
+                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is located here :', current_local)
                     # this assumes RINEX file is in local directory or "nearby"
                     if version == 2:
 
@@ -273,7 +273,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                 print('Something about the RINEX 3-2 conversion did not work')
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX3 file.')
-                            print('I assumed its name was ', r3)
+                            print('I assumed its name was ', r3, ' and that it was in the local directory.')
+                            print('Unfortunately the code does not currently search $REFL_CODE/YYYY/rinex for RINEX 3 files.')
+                            print('This would be a good option to add - please submit a PR.')
 
                 else:
                     if screenstats:
