@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2.5.1
+
+Added important verbiage about not allow python 3.11 for people with
+local python installations
+
+Warnings for Rinex 3 conversions using no look
+
+Checked that pypi and docker install works
+
 ## 2.5.0
 
 Did some changes to how files (EGM96, station position database) were loaded so that they could be 

@@ -13,7 +13,10 @@ github/pypi package installation.
 
 ## Local Python Install 
 
-**YOU MUST BE RUNNING python version 3.9 or lower.**
+**YOU SHOULD BE RUNNING python version 3.9 or 3.8.**  Maybe version 3.10 will work, but absolutely 3.11 will not.
+This has to do with our using the fortran reading features in one of the libraries. That is being
+deprecated and we are aware that long-term, we need to find a solution for it. It could be that 
+we will simply compile that code for the users and call the fortran module using <code>subprocess</code>.
 
 For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
 **If you are using linux** then simply type
@@ -74,7 +77,9 @@ If you are using the version from gitHub:
 * You may want to install the python3-venv package <code>apt-get install python3-venv</code>
 * <code>apt-get install git</code>
 * <code>git clone https://github.com/kristinemlarson/gnssrefl </code>
-* cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code>
+* cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code> **make sure you are running 
+the correction of python, as discussed at the top of the page** You can have two versions of python on
+your machine. To have it run 3.9 instead of 3.11 (for example), type <code>python3.9 -m venv env</code>
 * activate your virtual environment <code>source env/bin/activate </code>
 * <code>pip install wheel</code> (we are working to remove this step)
 * <code>pip install .</code>
@@ -85,6 +90,7 @@ If you are using the version from gitHub:
 ### PyPi Install 
 
 * make a directory, cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code>
+**Make sure you are running the correct version of python as discussed at the top of the page**
 * activate the virtual environment, <code>source env/bin/activate </code>
 * <code>pip install wheel</code> (we are working to remove this step)
 * <code>pip install gnssrefl</code>

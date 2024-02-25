@@ -273,7 +273,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                                 print('Something about the RINEX 3-2 conversion did not work')
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX3 file.')
-                            print('I assumed its name was ', r3, ' and that it was in the local directory.')
+                            print('I checked the rnx, rnx.gz, and crx.gz file endings that were in the local directory')
+                            print('Which would be ', r3, ' when gunzipped and translated.')
                             print('Unfortunately the code does not currently search $REFL_CODE/YYYY/rinex for RINEX 3 files.')
                             print('This would be a good option to add - please submit a PR.')
 
