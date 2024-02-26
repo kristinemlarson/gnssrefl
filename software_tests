@@ -14,7 +14,7 @@ ls -l $EXE/gfzrnx
 ls -l $EXE/CRX2RNX
 
 # this is likely not there
-ls -l $REFL_CODE/input/gpt_1wA.pickle
+# ls -l $REFL_CODE/input/gpt_1wA.pickle 
 
 # smoke tests for invsnr and subdaily
 
