@@ -106,7 +106,7 @@ Those values will not agree with the daily median value within 0.25 meters, so w
 This is not too bad - but I think maybe a bit too much noise.  I am going to require more tracks
 and rerun it.
 
-<code>daily_avg mchn 0.25 12</code>
+<code>daily_avg mchn 0.25 20</code>
 
 Daily average results:
 
@@ -115,8 +115,8 @@ Daily average results:
 The number of tracks required will depend on the site. Here the azimuth is restricted because  of the location of the antenna.
 Please note that these reflections are from ice in the winter and water during the summer. This should be take into 
 account when interpreting the results. How do I know this? The biggest clue is related to the daily average amplitude
-plot.  In the winter months the amplitudes are much larger. This is what we expect for ice/snow based on 
-a GNSS-IR simulator developed by Felipe Nievinski.
+plot. In the winter months the amplitudes are much larger. This is what we expect for ice/snow based on 
+a GNSS-IR simulator developed by [Felipe Nievinski](https://www.kristinelarson.net/wp-content/uploads/2015/10/Nievinski_Simulator.pdf).
 
 <img src="../_static/mchn_Figure_4.png" width="500">
 
