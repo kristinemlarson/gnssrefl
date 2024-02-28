@@ -34,7 +34,11 @@ Before the Class Begins
 =======================
 `Install gnssrefl <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
-`Information from the last class <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse2024.html>`_
+`Beginner with GNSS-IR and python <https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchn.html>`_ try this
+
+`If you are familiar with GNSS-IR and python installs <https://morefunwithgps.com/public_html/gps_toolbox/SupplementFeb26.pdf>`_ try this
+
+`Some comments from the last short course<https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse2024.html>`_
 
 Videos
 ======

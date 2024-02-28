@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2.5.2
+
+Mostly updating use cases
+
 ## 2.5.1
 
 Added important verbiage about not allow python 3.11 for people with

@@ -1,7 +1,7 @@
 # Michipicoten, Lake Superior 
 
 
-Updated December 11, 2022
+Updated February 28, 2024 by Kristine Larson
 
 ## metadata
 
