@@ -103,6 +103,8 @@ Those values will not agree with the daily median value within 0.25 meters, so w
 
 <img src="../_static/mchn_Figure_1.png" width="500">
 
+<img src="../_static/mchn_Figure_3.png" width="500">
+
 This is not too bad - but I think maybe a bit too much noise.  I am going to require more tracks
 and rerun it.
 
@@ -110,9 +112,11 @@ and rerun it.
 
 Daily average results:
 
-<img src="../_static/mchn_Figure_3.png" width="500">
+<img src="../_static/mchn_Figure_3new.png" width="500">
 
 The number of tracks required will depend on the site. Here the azimuth is restricted because  of the location of the antenna.
+One could also allow fewer tracks, but impose a stricter median filter.
+
 Please note that these reflections are from ice in the winter and water during the summer. This should be take into 
 account when interpreting the results. How do I know this? The biggest clue is related to the daily average amplitude
 plot. In the winter months the amplitudes are much larger. This is what we expect for ice/snow based on 
@@ -122,13 +126,11 @@ a GNSS-IR simulator developed by [Felipe Nievinski](https://www.kristinelarson.n
 
 ### Comparison
 
-Christine Puskas did a comparison of the reflector heights and an in situ gauge several years ago.  
+Christine Puskas did a comparison of the reflector heights and an in situ tide gauge several years ago.  
 
-There is a tide gauge at this site. The data for various time periods can be downloaded from [this link](http://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&region=CA&tst=1&no=10750). 
+* [The traditional tide gauge data for 2013](10750-01-JAN-2013_slev.csv).
 
-[The traditional tide gauge data for 2013](10750-01-JAN-2013_slev.csv).
-
-[A previous analysis of RH for mchn for 2013](mchn-dailyavg.txt)
+* [A previous analysis of RH for mchn for 2013](mchn-dailyavg.txt)
 
 A comparison of the water levels measured by the two methods:
 
@@ -146,3 +148,4 @@ The [python script](plotmchn.py) used to generate these plots is provided.
 DFO (2021). Institute of Ocean Sciences Data Archive. Ocean Sciences Division. Department of Fisheries and Oceans 
 Canada. http://www.pac.dfo-mpo.gc.ca/science/oceans/data-donnees/index-eng.html. Data obtained on 2021-01-28.
 
+[link to gauge download](http://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&region=CA&tst=1&no=10750). 
