@@ -34,7 +34,7 @@ The azimuths are chosen to ensure that the reflected signals reflect off the sur
 This site is a bit tricky, as it is not obvious how high the antenna is above the lake, so we can't just
 plug in an a priori reflector height.
 
-### First Look
+### Evaluate the SNR Data
 
 **Make SNR File** 
 
@@ -90,34 +90,45 @@ reflector height (RH) output for each day in the year 2013.
 <code>gnssir mchn 2013 1 -doy_end 365 </code>
 
 For a lake, it is appropriate to use the daily average. Our utility for computing a daily average requires a value
-for the median filter and a minimum number of tracks.  If the median value is set to the be large (2 meters), you can see 
-large outliers. We will start out with a relatively small number of minimum tracks since this site only has L1 GPS data.
+for the median filter and a minimum number of tracks. We will start out with a relatively small number of 
+minimum tracks since this site only has L1 GPS data. But we will update as that value if we like. I often start with
+0.25 meters as my "median filter" but it is not a rule!
 
-<code>daily_avg mchn 2 10</code>
+<code>daily_avg mchn 0.25 10</code>
 
-<img src="../_static/mchn_1.png" width="500">
+<img src="../_static/mchn_Figure_2.png" width="500">
 
-A more reasonable result is obtained with a 0.25-meter median filter and the 12-track requirement. Here the results are 
-saved with a specific name:
+You can see RH values near 2 meters which are not reasonable. We don't want them to ruin our average. 
+Those values will not agree with the daily median value within 0.25 meters, so will be thrown out.  
 
-<code>daily_avg mchn 0.25 12 -txtfile mchn-dailyavg.txt</code>
+<img src="../_static/mchn_Figure_1.png" width="500">
 
-<img src="../_static/mchn_3.png" width="500">
+This is not too bad - but I think maybe a bit too much noise.  I am going to require more tracks
+and rerun it.
+
+<code>daily_avg mchn 0.25 12</code>
+
+Daily average results:
+
+<img src="../_static/mchn_Figure_3.png" width="500">
 
 The number of tracks required will depend on the site. Here the azimuth is restricted because  of the location of the antenna.
 Please note that these reflections are from ice in the winter and water during the summer. This should be take into 
-account when interpreting the results.
+account when interpreting the results. How do I know this? The biggest clue is related to the daily average amplitude
+plot.  In the winter months the amplitudes are much larger. This is what we expect for ice/snow based on 
+a GNSS-IR simulator developed by Felipe Nievinski.
+
+<img src="../_static/mchn_Figure_4.png" width="500">
 
 ### Comparison
 
 Christine Puskas did a comparison of the reflector heights and an in situ gauge several years ago.  
 
-There is a [tide gauge](https://tides.gc.ca/eng/Station/Month?sid=10750) at this site. The data can be 
-downloaded from [this link](http://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&region=CA&tst=1&no=10750). 
+There is a tide gauge at this site. The data for various time periods can be downloaded from [this link](http://www.isdm-gdsi.gc.ca/isdm-gdsi/twl-mne/inventory-inventaire/interval-intervalle-eng.asp?user=isdm-gdsi&region=CA&tst=1&no=10750). 
 
-[The traditional tide gauge data](10750-01-JAN-2013_slev.csv).
+[The traditional tide gauge data for 2013](10750-01-JAN-2013_slev.csv).
 
-[A previous analysis of RH for mchn](mchn-dailyavg.txt)
+[A previous analysis of RH for mchn for 2013](mchn-dailyavg.txt)
 
 A comparison of the water levels measured by the two methods:
 
