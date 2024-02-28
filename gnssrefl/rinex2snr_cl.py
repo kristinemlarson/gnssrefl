@@ -240,9 +240,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             bfg : (German Agency for water research, only Rinex 3, requires password)
 
-            bkg-igs : EUREF for (German Agency for Cartography and Geodesy)
+            bkg-igs : IGS data at the BKG (German Agency for Cartography and Geodesy)
 
-            bkg-euref : IGS for (German Agency for Cartography and Geodesy)
+            bkg-euref : EUREF data at the BKG (German Agency for Cartography and Geodesy)
 
             cddis : (NASA's Archive of Space Geodesy Data)
 

@@ -41,7 +41,7 @@ where mchn is one of the test cases.
 
 For GNSS reflectometry, you need to set an azimuth and elevation angle mask.
 The azimuths are chosen to ensure that the reflected signals reflect off the surface of interest.
-[Here is a good start on an elevation and azimuth angle mask](https://gnss-reflections.org/rzones?station=mchn&msl=on&RH=7&eang=2&azim1=80&azim2=180). 
+[Here is a good start on an elevation and azimuth angle mask](https://gnss-reflections.org/rzones?station=mchn&msl=off&RH=7&eang=2&azim1=80&azim2=180). 
 
 
 ### Reproduce the Web App
