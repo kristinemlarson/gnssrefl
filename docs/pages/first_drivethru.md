@@ -1,85 +1,91 @@
-
-### gnssrefl use cases 
-
-
-<table>
-<TR>
-<TD>
-<B>Ice Sheets</B>
-
-* [Lorne, Ross Ice Shelf](../use_cases/use_lorg.md) 
-
-* [Dye2, Greenland Ice Sheet](../use_cases/use_gls1.md) 
-
-* [Thwaites Glacier, Antarctica](../use_cases/use_lthw.md) 
-
-* [Summit Camp, Greenland](../use_cases/use_smm3.md) 
-
-* [Phoenix, Antarctica](../use_cases/use_phnx.md) 
-</TD>
-<td>
-<B>Lakes, Reservoirs, and Rivers</B>
-
-* [Michipicoten, Canada](../use_cases/use_mchn.md) 
-
-* [Lake Taupo, New Zealand](../use_cases/use_tgho.md) 
-
-* [Steenbras Reservoir, South Africa](../use_cases/use_sbas.md) 
-
-* [St Lawrence River,Canada](../use_cases/use_pmtl.md) 
-
-* [Lake Mathews, Riverside, USA](../use_cases/use_mat2.md) 
-
-* [Lake Malawi, Tanzania](../use_cases/use_mbbc.md) 
-
-* [Lake Yellowstone, USA](../use_cases/use_p709.md) 
-
-</TD>
-<TD>
-<B>Soil Moisture </B>
-
-* [Portales, New Mexico USA](../use_cases/use_p038.md) 
-
-* [Mitchell, Australia](../use_cases/use_mchl.md) 
-
-* [Victorville, CA USA ](../use_cases/use_scia.md) 
-
-* [Boulder, CO USA](../use_cases/use_mfle.md) 
-
-* [San Diego, CA USA ](../use_cases/use_p475.md) 
-
-</TD>
-</TR>
-
-<TR>
-
-<TD>
-<B>Seasonal Snow Accumulation</B>
-
-* [Marshall, CO USA](../use_cases/use_p041.md) 
-
-* [Niwot Ridge, CO USA](../use_cases/use_nwot.md) 
-
-* [Half Island Park, ID USA](../use_cases/use_p360.md) 
-
-* [Utqiagvik, AK USA](../use_cases/use_utqi.md) 
-
-</TD>
-<TD>
-<B>Tides</B>
-
-* [Friday Harbor, Washington](../use_cases/use_sc02.md) (sc02) 
-
-* [St Michael, Alaska](../use_cases/use_at01.md) (at01)
-
-* [Vlissingen, the Netherlands](../use_cases/use_vlis.md) (vlis)
-
-* [Puerto Penasco, Mexico](../use_cases/use_tnpp.md) (tnpp)
-
-* [Elbe River, Germany](../use_cases/use_tggo.md) (tggo)
-
-</TD>
-</TR>
-</Table>
+# Example Use Cases 
 
 
+
+## Ice Sheets
+
+* [Lorne, Antarctica](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lorg.html)
+
+* [Dye2, Greenland](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_gls1.html)
+
+* [Thwaites Glacier, Antarctica](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_lthw.html)
+
+* [Summit Camp, Greenland](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_smm3.html)
+
+* [Phoenix, Antarctica](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_phnx.html)
+
+## Lakes, Reservoirs, and Rivers
+
+* [Michipicoten, Canada](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchn.html)
+
+* [Lake Taupo, New Zealand](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tgho.html)
+
+* [Steenbras, South Africa](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_sbas.html)
+
+* [St Lawrence River,Canada](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_pmtl.html)
+
+* [Lake Mathews, Riverside, USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mat2.html)
+
+* [Lake Malawi, Tanzania](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mbbc.html)
+
+* [Lake Yellowstone, USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p709.html)
+
+* [Wesel, Germany](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_wesl.html)
+
+## Soil Moisture 
+
+* [Portales, New Mexico USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p038.html)
+
+* [Mitchell, Australia](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchl.html)
+
+* [Victorville, California USA ](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_scia.html)
+
+* [Boulder, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mfle.html)
+
+
+## Seasonal Snow Accumulation
+
+* [Marshall, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p041.html)
+
+* [Niwot Ridge, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_nwot.html)
+
+* [Half Island Park, Idaho USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p360.html)
+
+* [Utqiagvik, Alaska USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_utqi.html)
+
+## Tides 
+
+* [Friday Harbor, Washington USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_sc02.html)
+
+* [St Michael, Alaska USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_at01.html)
+
+* [Vlissingen, the Netherlands](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_vlis.html)
+
+* [Puerto Penasco, Mexico](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tnpp.html)
+
+* [Elbe River, Germany](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_tggo.html)
+
+About 75% of these use cases use access to the Earthscope/UNAVCO 
+archive. In some cases, sopac can be used as an alternate archive. If at all 
+possible, you should [sign up for an EarthScope account.](https://data-idm.unavco.org/user/profile/login)
+
+Some of these use cases were created with an earlier version of the gnssrefl software.
+The plots might look slightly different and the defaults we used in the analysis might have changed.
+
+## GPS Tool Box Demonstration
+
+* [MNIS (not finished)](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mnis.html)
+
+## Homeworks from Previous Shortcourses:
+
+* [Homework 0](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework0.html): Make sure you have properly installed the software
+
+* [Homework 1](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework1.html): Practice setting your azimuth and elevation angle mask
+
+* [Homework 2](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework2.html): Learn how to measure snow surface variations 
+
+    * [Homework 2 Solution](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework2_soln.html)
+
+* [Homework 3](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework3.html): Learn how to measure water levels 
+
+    * [Homework 3 Solution](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework3_soln.html)
