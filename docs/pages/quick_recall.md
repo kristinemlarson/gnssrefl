@@ -29,6 +29,8 @@ those discussion links will likely go away in the not very distant future.
 
 * [refl_zones](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.refl_zones_cl.html)
 
+* [max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_RH_cl.html)
+
 
 ## Environmental Products
 

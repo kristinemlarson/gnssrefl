@@ -43,10 +43,14 @@ def max_resolve_RH(station: str, lat: float=None, lon: float=None, el_height: fl
     Examples
     --------
     max_resolve_RH sc02 -e1 5 -e2 15
-        typical case for most geodetic sites, 30 seconds, elevation angles 5-15 degrees
+        typical case for sites over water (5-15 degrees) but otherwise using defaults (GPS, 30 seconds)
 
     max_resolve_RH sc02 -samplerate 15 -system galileo
         Assume receiver sampling rate of 15 seconds and the Galileo constellation
+
+    max_resolve_RH xxxx -lat 40 -lon 100 -el_height 20
+        test your own site (xxxx) by inputting coordinates
+    
 
     Parameters
     ----------
