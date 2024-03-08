@@ -1,7 +1,8 @@
 # Installation
 
 You can access this package via Jupyter notebooks, Docker containers, or traditional
-github/pypi package installation.
+github/pypi package installation. We only support Windows users via dockers. I believe
+you can also use a linux emulator and follow instructions for linux.
 
 ## Jupyter Notebooks 
 

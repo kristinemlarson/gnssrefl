@@ -2,6 +2,11 @@
 
 Changes to this file will only be allowed thru a pull request on github.
 
+
+## Software
+
+Larson K.M., gnssrefl: an open source python software package for environmental GNSS interferometric reflectometry applications, GPS Solutions, in review.
+
 ## Soil Moisture
 
 - [Larson, K.M., E.E. Small, E. Gutmann, A. Bilich, J. Braun, V. Zavorotny, Use of GPS receivers as a soil moisture network for water cycle studies, Geophys. Res. Lett., 35, L24405, doi:10.1029/2008GL036013, 2008](https://www.kristinelarson.net/wp-content/uploads/2015/10/larson_soil_grl2008.pdf)
@@ -56,7 +61,12 @@ Sea Level Measurements, IEEE Journal of Selected Topics in Applied Earth Observa
 
 - [Altuntas, C. and N. Tunalioglu, A systematic approach for identifying optimal azimuth and elevation angle masks in GNSS-IR: validation through a sea level experiment, GPS Solutions, Vol 27(4), 198, doi:10.1007/s10291-023-01535-0, 2023](https://link.springer.com/article/10.1007/s10291-023-01535-0)
 
+- [Larson, K.M. and S.D.P. Williams, Water level measurements using reflected GNSS signals](https://ihr.iho.int/articles/water-level-measurements-using-reflected-gnss-signals/)
+
+
 ## Lakes and Rivers
+
+- [Purnell, D., Gomez N., Minarik, W., Langston, G., Real-Time Water Levels using GNSS-IR: a potential tool for flood monitoring](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GL105039)
 
 - [Holden, L. and K.M. Larson, Ten Years of Lake Taupo Surface Height Estimates Using the GNSS Interferometric Reflectometry, Journal of Geodesy. Vol 95(74),10.1007/s00190-021-01523-7, 2021](https://www.kristinelarson.net/wp-content/uploads/2021/05/Holden-May2021.pdf)
 

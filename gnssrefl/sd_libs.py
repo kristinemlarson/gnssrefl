@@ -894,7 +894,7 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
     # these are now plotted in datetime via mjd translation
     fig=plt.figure(figsize=(10,5))
     plt.plot(th_obs, biasCor_rh, 'b.', label='RH ' + strsig)
-    plt.plot(th_even_obs, spline_whole_time, 'c-',label='spline')
+    plt.plot(th_even_obs, spline_whole_time, '-',color='orange',label='spline')
     plt.plot(th_obs[ii], biasCor_rh[ii], 'rx', label='outliers')
 
     plt.legend(loc="best",fontsize=fs)

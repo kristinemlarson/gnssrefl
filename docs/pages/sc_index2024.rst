@@ -40,9 +40,10 @@ Before the Class Begins
 
 `Some comments from the last short course <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse2024.html>`_
 
-Videos
-======
-`Some older videos <https://www.youtube.com/@funwithgps/videos>`_ about GNSS-IR are available on youtube. 
+Lecture Material
+================
+
+`Links to videos and lecture files <https://gnssrefl.readthedocs.io/en/latest/pages/sc_media2024.html>`_ 
 
 Sponsor
 =======
