@@ -9,7 +9,7 @@ Return to [2024 GNSS-IR Short Course](https://gnssrefl.readthedocs.io/en/latest/
 - [Q & A](https://morefunwithgps.com/public_html/sc2024/Day1-QAReport.csv)
 
 ## Day 2
-- Theory for Water Levels, Simon Williams 
+- [Theory for Water Levels](https://morefunwithgps.com/public_html/sc2024/Day2-Williams.pdf), Simon Williams
 - [Examples using gnssrefl](https://morefunwithgps.com/public_html/sc2024/Day2-Examples.pdf), Kristine Larson
 - [invsnr technique](https://morefunwithgps.com/public_html/sc2024/Day2-invsnr_slides.pdf), Kristine Larson
 - [IAG working group](https://morefunwithgps.com/public_html/sc2024/Day2-WG.pdf), Makan Karegar

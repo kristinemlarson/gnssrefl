@@ -105,7 +105,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     translator : str
         hybrid (default), fortran, or python
-        hybrid uses fortran within the python code
+        hybrid uses fortran within he python code
 
     srate : int
         sample rate for RINEX 3 files
@@ -257,6 +257,20 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             if screenstats: 
                                 print('Try to gunzip ', r3gz)
                             subprocess.call(['gunzip', r3gz])
+
+                        # have not found the rinex 3 file
+                        if not os.path.exists(r3):
+                            local_rinex3_dir  = os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
+                            print('try looking for RINEX 3 in ', local_rinex3_dir)
+                            lrinex3 = local_rinex3_dir+r3
+                            if os.path.exists(lrinex3):
+                                subprocess.call(['cp', lrinex3, '.'])
+                            else:
+                                lrinex3 = local_rinex3_dir+r3cmpgz
+                                if os.path.exists(lrinex3):
+                                    subprocess.call(['cp', lrinex3, '.']); 
+                                    deletecrx = True
+                                    translated, rnx_filename = go_from_crxgz_to_rnx(r3cmpgz,deletecrx)
                         if os.path.exists(r3):
                             rinext =float(np.loadtxt(r3,usecols=0,dtype='str',max_rows=1))
                             print('Apparent Rinex version', rinext)
@@ -272,11 +286,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             else:
                                 print('Something about the RINEX 3-2 conversion did not work')
                         else:
-                            print('You Chose the No Look Option, but did not provide the needed RINEX3 file.')
-                            print('I checked the rnx, rnx.gz, and crx.gz file endings that were in the local directory')
-                            print('Which would be ', r3, ' when gunzipped and translated.')
-                            print('Unfortunately the code does not currently search $REFL_CODE/YYYY/rinex for RINEX 3 files.')
-                            print('This would be a good option to add - please submit a PR.')
+                            print('You Chose the No Look Option, but did not provide the needed RINEX3 file ', r3)
+                            print('I looked for files ending with rnx, rnx.gz, and crx.gz in the local directory')
+                            print('I looked for files ending with rnx and crx.gz in $REFL_CODE/YYYY/rinex for your station')
 
                 else:
                     if screenstats:

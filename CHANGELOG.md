@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 
+added RINEX 3 pickups from $REFL_CODE/YYYY/rinex
+
 ## 2.5.2
 
 Mostly updating use cases

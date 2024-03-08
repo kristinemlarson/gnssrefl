@@ -31,6 +31,11 @@ those discussion links will likely go away in the not very distant future.
 
 * [max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_RH_cl.html)
 
+* [quickplt](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickplt.html)
+
+* [ymd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ymd.html), [ydoy](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ydoy.html)
+
+* [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html) Installs executables for pip clone/pip install users
 
 ## Environmental Products
 
@@ -56,17 +61,12 @@ those discussion links will likely go away in the not very distant future.
 
 * [check_rinex_file](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.check_rinex_file.html)
 * [gpsweek](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gpsweek.html)
-* [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html)
 * [llh2xyz](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.llh2xyz.html)
-* [max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_RH_cl.html)
 * [mjd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.mjd.html)
 * [query_unr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.query_unr.html)
-* [quickplt](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickplt.html)
 * [rinex3_rinex2](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex3_rinex2.html)
 * [rinex3_snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex3_snr.html)
 * [rinex_coords](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex_coords.html)
 * [smoosh](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.smoosh.html)
 * [smoosh_snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.smoosh_snr.html)
 * [xyz2llh](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.xyz2llh.html)
-* [ymd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ymd.html)
-* [ydoy](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ydoy.html)
