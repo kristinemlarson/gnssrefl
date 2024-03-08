@@ -6,9 +6,8 @@
 .. image:: ../_static/mnis_H0.png
    :width: 500
 
-Registration
-============
-`Course Registration <https://sfb1502.de/news-events/events/external-events/gnss-ir-2024/gnss-ir-short-course-registration>`_
+Registration is Closed
+======================
 
 Agenda
 ======
@@ -17,16 +16,6 @@ Agenda
 **March 7** Using gnssrefl for Water Level Measurements: Lakes, Rivers, Tides
 
 The course meets each day from 12:00-14:00 Central European Time. 
-
-Other Local Times
-
-08:00-10:00 Rio de Janeiro, Buenos Aires
-
-11:00-12:00 London, Reykjavik
-
-14:00-16:00 Istanbul
-
-19:00-21:00 Singapore, Wuhan 
 
 There will be a short break at the midpoint.
 
