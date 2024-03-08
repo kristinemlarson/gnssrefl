@@ -2,7 +2,9 @@
 
 Manuella Fagundes and Felipe Geremia-Nievinski
 
-![PXL_20240229_205617104](https://github.com/fgnievinski/gnssrefl/assets/5018500/6bff17a0-127f-4a34-9626-fcc5b8ab624d)
+<p align=center>
+<img src="../_static/sph1-1.jpg"</img>
+</p>
 
 ## 1\. Introduction
 
@@ -77,14 +79,18 @@ You can see the generated images at:
 
 C:\\Users\\login\\Documents\\Docker\\refl_code\\Files\\sph1
 
-![image](https://github.com/fgnievinski/gnssrefl/assets/5018500/c3b6cbb8-d9db-4582-a082-e1a1fe0725e6)
-![image](https://github.com/fgnievinski/gnssrefl/assets/5018500/4c0960ce-a44d-43ba-87d6-976a39bdfb06)
+<p align=center>
+<img src="../_static/sph1-2.png"</img>
+<img src="../_static/sph1-3.png"</img>
+</p>
 
 #### 2.4.1 Discussion
 
 The quicklook results, QC metric and Lomb-Scargle Periodogram (LSP) can be explained based on Fresnel zones for the location. To the south, between approximately 150 and 210 degrees of azimuth, there is a gap due to the orbits of the GPS satellite constellation, resulting in no height retrievals in that interval. To the north, northwest, and a major part of the southwest, reflections result from the water. In the northeast and southeast, reflections come from the ground. At low elevation angles, reflections may even bounce off nearby structures to the southeast.
 
-![image](https://github.com/fgnievinski/gnssrefl/assets/5018500/6bda4fa1-4db0-4d6a-9c47-c1044073b538)
+<p align=center>
+<img src="../_static/sph1-4.png"</img>
+</p>
 
 ### 2.5 Check precise water level retrievals
 
@@ -104,7 +110,9 @@ You can see the generated images at:
 
 C:\\Users\\login\\Documents\\Docker\\refl_code\\Files\\sph1\\
 
-![image](https://github.com/fgnievinski/gnssrefl/assets/5018500/aeb90cc5-c820-4c05-ab82-eff109dff84f)
+<p align=center>
+<img src="../_static/sph1-5.png"</img>
+</p>
 
 #### 2.5.1 Discussion
 
@@ -149,7 +157,9 @@ To plot water level results to each satellite
 
 `rh_plot sph1 2022`
 
-![image](https://github.com/fgnievinski/gnssrefl/assets/5018500/6aa02203-e5d6-4fad-8edb-29372e8d43d6)
+<p align=center>
+<img src="../_static/sph1-6.png"</img>
+</p>
 
 Calculate the hourly moving average
 
@@ -159,7 +169,9 @@ For hourly smooth output, use delta_out parameter (in seconds). To apply vertica
 
 Plot of regularly spaced water level, hourly moving average data:
 
-![image](https://github.com/fgnievinski/gnssrefl/assets/5018500/7d5e329e-849a-442c-952a-0031981ac35e)
+<p align=center>
+<img src="../_static/sph1-7.png"</img>
+</p>
 
 ## References
 
