@@ -3,13 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## 
+## 2.5.3
+
 added RINEX 3 pickups from $REFL_CODE/YYYY/rinex for gzipped crx and rnx files
 
-store peak2noise in invsnr_input
+Store peak2noise in invsnr_input
 
 removed gazillion print statements from invsnr
 
+Changed inputs pktnlim to peak2noise, tempres to dec and snr_ending to snr in invsnr to be consistent with
+other codes.  I kept the interior variable names that David Purnell had used.
 
 
 ## 2.5.2
