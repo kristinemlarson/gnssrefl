@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 
-added RINEX 3 pickups from $REFL_CODE/YYYY/rinex
+added RINEX 3 pickups from $REFL_CODE/YYYY/rinex for gzipped crx and rnx files
+
+store peak2noise in invsnr_input
+
+removed gazillion print statements from invsnr
+
+
 
 ## 2.5.2
 
