@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 2.5.3
 
+download_tides puts the request command behind a try so that there is a polite 
+error message when it crashes for any reason.
+
 added RINEX 3 pickups from $REFL_CODE/YYYY/rinex for gzipped crx and rnx files
 
 Store peak2noise in invsnr_input
