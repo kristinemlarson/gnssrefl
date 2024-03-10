@@ -12,6 +12,7 @@ from datetime import date
 
 # my code
 import gnssrefl.gps as g
+import gnssrefl.sd_libs as sd
 #
 
 def fbias_daily_avg(station):
@@ -524,24 +525,28 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
     print('Number of values used in average RH file saved as: ', pltname)
 
 
-def write_out_RH_file(obstimes,tv,outfile,csvformat):
+def write_out_RH_file(obstimes,tv,outfile,csvformat,station,extension):
     """
     write out the daily average RH values 
 
     Parameters
     ----------
     obstimes : datetime object
-
+        time of observation
     tv : numpy array
         content of a LSP results file
-
     outfile : string
         full name of output file
-
     csvformat : boolean
         true if you want csv format output
+    station : str
+        4 ch station name
+    extension : str, optional
+        analysis extension name
 
     """
+    # ignore extension for now
+    Hortho = sd.find_ortho_height(station,extension)
     # sort the time tags
     nr,nc = tv.shape
     # nothing to write 
@@ -557,20 +562,25 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat):
     #  header of a sorts
     # change comment value from # to %
     # 2021 november 8 added another column that has mean amplitude
-    fout.write("{0:28s} \n".format( '% calculated on ' + xxx ))
+    # 2024 march 10 added a column with orthometric height
+    fout.write("{0:48s} \n".format( '% station:' + station + ' calculated on ' + xxx ))
     fout.write("% Daily average reflector heights (RH) calculated using the gnssrefl software \n")
     fout.write("% Nominally you should assume this average is associated with 12:00 UTC hours \n")
-    fout.write("% year doy   RH    numval month day RH-sigma RH-amp\n")
-    fout.write("%            (m)                       (m)    (v/v)\n")
-    fout.write("% (1)  (2)   (3)    (4)    (5)  (6)   (7)     (8) \n")
+    fout.write("% year doy   RH    numval month day RH-sigma RH-amp  Hortho-RH\n")
+    fout.write("%            (m)                       (m)    (v/v)     (m) \n")
+    fout.write("% (1)  (2)   (3)    (4)    (5)  (6)   (7)     (8)       (9) \n")
+
+    # these print statements could be much smarter
     if csvformat:
         for i in np.arange(0,N,1):
-            fout.write(" {0:4.0f},  {1:3.0f},{2:7.3f},{3:3.0f},{4:4.0f},{5:4.0f},{6:7.3f},{7:6.2f} \n".format(ntv[i,0], 
-                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6],ntv[i,7]))
+            dv = Hortho - ntv[i,2]
+            fout.write(" {0:4.0f},  {1:3.0f},{2:7.3f},{3:3.0f},{4:4.0f},{5:4.0f},{6:7.3f},{7:6.2f},{8:7.3f} \n".format(ntv[i,0], 
+                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6],ntv[i,7],dv ))
     else:
         for i in np.arange(0,N,1):
-            fout.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:3.0f} {4:4.0f} {5:4.0f} {6:7.3f} {7:6.2f} \n".format(ntv[i,0], 
-                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6], ntv[i,7]))
+            dv = Hortho - ntv[i,2]
+            fout.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:3.0f} {4:4.0f} {5:4.0f} {6:7.3f} {7:6.2f} {8:7.3f} \n".format(ntv[i,0], 
+                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6], ntv[i,7],dv))
     fout.close()
 
 

@@ -36,6 +36,9 @@ def write_spline_output(iyear, th, spline, delta_out, station, txtdir,Hortho):
 
     $REFL_CODE/Files/ssss/ssss_2023_spline_out.txt
 
+
+    I do not think this is used anymore. It has been consolidated with the plot code.
+
     Parameters
     ----------
     iyear : int
@@ -72,13 +75,17 @@ def write_spline_output(iyear, th, spline, delta_out, station, txtdir,Hortho):
         # but you only want those values when we have data ....
         splinefileout =  txtdir + '/' + station + '_' + str(iyear) + '_spline_out_orig.txt'
         print('Writing evenly sampled file to: ', splinefileout)
+        vn = ' gnssrefl v' + str(g.version('gnssrefl'))
         fout = open(splinefileout,'w+')
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','station: ' + station + vn))
         fout.write('{0:1s}  {1:30s}  \n'.format('%','This is NOT observational data - be careful when interpreting it.'))
         fout.write('{0:1s}  {1:30s}  \n'.format('%','If the data are not well represented by the spline functions, you will '))
         fout.write('{0:1s}  {1:30s}  \n'.format('%','have a very poor representation of the data. I am also writing out station '))
         fout.write('{0:1s}  {1:30s}  {2:8.3f} \n'.format('%','orthometric height minus RH, where Hortho (m) is ', Hortho  ))
         fout.write('{0:1s}  {1:30s}  \n'.format('%','This assumes RH is measured relative to the L1 phase center.  '))
-        fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD, RH(m), YY,MM,DD,HH,MM,SS, quasi-sea-level(m)'))
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD             RH(m) YYYY MM DD  HH  MM  SS   quasi-sea-level(m)'))
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','(1)              (2)  (3) (4) (5) (6) (7) (8)    (9)'))
+
 
         dtime = False
         for i in range(0,N):
@@ -87,7 +94,7 @@ def write_spline_output(iyear, th, spline, delta_out, station, txtdir,Hortho):
             utc= 24*(tplot[i] - doy)
             bigt,yy,mm,dd,hh,mi,ss = g.ymd_hhmmss(iyear,doy,utc,dtime)
             if (tplot[i] >= firstpoint) & (tplot[i] <= lastpoint):
-                fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} {8:10.3f} \n'.format(
+                fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:3.0f} {4:3.0f} {5:3.0f} {6:3.0f} {7:3.0f} {8:10.3f} \n'.format(
                     modjul, spline_even[i], yy,mm,dd,hh,mi,ss, Hortho-spline_even[i]))
         fout.close()
 
@@ -991,12 +998,16 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     splinefileout =  txtdir + '/' + station +  '_spline_out.txt'
     print('Writing evenly sampled file to: ', splinefileout)
     fout = open(splinefileout,'w+')
+    vn = station + ' gnssrefl v' + str(g.version('gnssrefl'))
+    fout.write('{0:1s}  {1:30s}  \n'.format('%','station ' + vn))
     fout.write('{0:1s}  {1:30s}  \n'.format('%','This is NOT observational data - be careful when interpreting it.'))
     fout.write('{0:1s}  {1:30s}  \n'.format('%','If the data are not well represented by the spline functions, you will '))
     fout.write('{0:1s}  {1:30s}  \n'.format('%','have a very poor representation of the data. I am also writing out station '))
     fout.write('{0:1s}  {1:30s}  {2:8.3f} \n'.format('%','orthometric height minus RH, where Hortho (m) is ', H0  ))
-    fout.write('{0:1s}  {1:30s}  \n'.format('%','This assumes RH is measured relative to the L1 phase center.  '))
-    fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD, RH(m), YY,MM,DD,HH,MM,SS, quasi-sea-level(m)'))
+    #fout.write('{0:1s}  {1:30s}  \n'.format('%','This assumes RH is measured relative to the L1 phase center.  '))
+    #fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD, RH(m), YY,MM,DD,HH,MM,SS, quasi-sea-level(m)'))
+    fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD              RH(m)  YYYY  MM  DD  HH  MM  SS   quasi-sea-level(m)'))
+    fout.write('{0:1s}  {1:30s}  \n'.format('%','(1)               (2)   (3)  (4) (5)  (6) (7) (8)    (9)'))
 
 
     # difference function to find time between all rh measurements
@@ -1039,7 +1050,7 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
         for i in range(0,N_new):
             if not np.isnan(spline_new[i]):
                 rhout = spline_new[i]
-                fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:2.0f} {4:2.0f} {5:2.0f} {6:2.0f} {7:2.0f} {8:10.3f} \n'.format(
+                fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:3.0f} {4:3.0f} {5:3.0f} {6:3.0f} {7:3.0f} {8:10.3f} \n'.format(
                     mjd_new[i], rhout, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], H0-rhout))
 
 

@@ -1982,8 +1982,9 @@ def glonass_channels(f,prn):
 
 def open_outputfile(station,year,doy,extension):
     """
-    opens output file in 
-    REFL_CODE/year/results/station/extension directory
+    opens an output file in 
+    $REFL_CODE/year/results/station/extension directory
+    for lomb scargle periodogram results
 
     Parameters
     ----------
@@ -2018,9 +2019,9 @@ def open_outputfile(station,year,doy,extension):
 #   changed to a function
     filepath1,fexit = LSPresult_name(station,year,doy,extension)
     #print('Output will go to:', filepath1)
-    versionNumber = version('gnssrefl')
+    versionNumber = 'v' + str(version('gnssrefl'))
     #versionNumber = 'working-on-it'
-    tem = '% gnssrefl, https://github.com/kristinemlarson, ' + str(versionNumber) + ' \n'
+    tem = '% station ' + station + ' https://github.com/kristinemlarson/gnssrefl ' + versionNumber  + '\n'
     try:
         fout=open(filepath1,'w+')
 #       put a header in the output file

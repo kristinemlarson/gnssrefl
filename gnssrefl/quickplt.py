@@ -223,6 +223,9 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
     if ydoy:
         print('Making obstimes for ydoy x-axis')
         tval = g.ydoy2datetime(tvd[:,0], tvd[:,1])
+    if ydoy & secondFile:
+        print('Making obstimes for second ydoy x-axis')
+        tval2 = g.ydoy2datetime(tvd2[:,0], tvd2[:,1])
 
     fig,ax=plt.subplots()
 
