@@ -3,6 +3,7 @@ import argparse
 import os
 import subprocess
 import sys
+import time
 import wget
 import multiprocessing
 from functools import partial
@@ -41,6 +42,7 @@ def parse_arguments():
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
     parser.add_argument("-newarcs", default=None, type=str, help="This no longer has any meaning")
+    parser.add_argument("-par", default=None, type=int, help="Number of processes ?")
 
 
     args = parser.parse_args().__dict__
@@ -57,7 +59,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
-           mmdd: bool = False, gzip: bool = True, dec : int = 1, newarcs : bool = True ):
+           mmdd: bool = False, gzip: bool = True, dec : int = 1, newarcs : bool = True, par : int = None ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
@@ -180,15 +182,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         print('and/or use gnssir_input to make a new one. Exiting')
         sys.exit()
 
-    #if newarcs:
-    #else:
-    #if 'azval' in lsp:
-    #    print('An azval variable was found in your json. I will use the old way of defining arcs.')
-    #else:
-    #    print('You chose the old way of setting arcs, but you do not have valid input in your json.')
-    #    print('I recommend you use gnssir_input to create your json file. Azimuth regions are no ')
-    #    print('longer required to be regions less than 100 degrees. Exiting.')
-    #        sys.exit()
 
 
     # plt is False unless user changes
@@ -320,32 +313,69 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # changed to better describe year and doy start/end
 
     print('Requested frequencies ', lsp['freqs'])
+    additional_args = { "year_end": year_end, "year_st": year_st, "doy": doy, "doy_end": doy_end, "args": args }
 
 
-    for year in year_list:
-        # edits made 2021Sep10 by Makan karegar
-        if year != year_end:
-            doy_en = 366
-        else:
-            doy_en = doy_end
+    t1 = time.time()
+    if not par: 
+        for year in year_list:
+            process_year(year, **additional_args)
+    else:
+        print('Using process year with pools')
+        pool = multiprocessing.Pool(processes=par) 
+        partial_process_year = partial(process_year, **additional_args)
 
-        # edits made 2021Sep10 by Makan karegar
-        if year == year_st:
-            doy_list = list(range(doy, doy_en+1))
-        else:
-            doy_list = list(range(1, doy_en+1))
+        pool.map(partial_process_year, year_list)
+        pool.close()
+        pool.join()
 
-        args['year'] = year
-        for doy in doy_list:
-            args['doy'] = doy
-            try:
-                guts2.gnssir_guts_v2(**args)
-            except:
-                warnings.warn(f'error processing {year} {doy}');                
-            #else:
-            #    print('You are trying to use the Old Way of Selecting Arcs.')
-            #    print('This is no longer supported. Update your code')
-            #guts.gnssir_guts(**args)
+    t2 = time.time()
+    print('Time to compute ', round(t2-t1,2))
+
+def process_year(year, year_end, year_st, doy, doy_end, args):
+    """
+    Code that does the processing for a specific year. Refactored to separate 
+    function to allow for parallel processes
+
+    Parameters
+    ----------
+    year : int
+        full Year
+    year_end : int
+        end year. This is to create a range from year to year_end to get the snr files for more than one year.
+        doy_end will be for year_end. Default is None.
+    year_st: int 
+        starting year, which helps figure out the end of day
+    doy : integer
+        Day of year
+        POOR VARIABLE NAME. SHOULD BE CHANGED.
+    doy_end : int
+        end day of year. This is to create a range from doy to doy_end of days.
+        If year_end parameter is used - then day_end will end in the day of the year_end.
+        Default is None. (meaning only a single day using the doy parameter)
+    args : dict
+        arguments passed into gnssir through commandline (or python)
+
+    """
+    if year != year_end:
+        doy_en = 366
+    else:
+        doy_en = doy_end
+
+    # edits made 2021Sep10 by Makan karegar
+    if year == year_st:
+        doy_list = list(range(doy, doy_en+1))
+    else:
+        doy_list = list(range(1, doy_en+1))
+
+    args['year'] = year
+    for doy in doy_list:
+        args['doy'] = doy
+        try:
+            guts2.gnssir_guts_v2(**args)
+        except:
+            warnings.warn(f'error processing {year} {doy}');                
+
 
 
 def main():

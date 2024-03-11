@@ -1,15 +1,13 @@
-# gnssrefl
-
-**Version: 2.5.3** 
+# gnssrefl v2.5.3 
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.10644225.svg)](http://dx.doi.org/10.5281/zenodo.10644225) 
 
+
+![](docs/tokachi_rupture.gif)
+
 [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
-
-
-Documentation:
 
 - [online](https://gnssrefl.readthedocs.io/en/latest/)
 

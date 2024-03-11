@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-snr", default=None, help="snr file ending, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg.", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra, gnss3")
-    parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX sample rate: low or high. Only used for archive searches.")
+    parser.add_argument("-rate", default=None, metavar='low', type=str, help="low or high (tells code which folder to search).  If samplerate is 1, this is set automatically to high.") 
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
                         help="True means only use RINEX files on local machine")
@@ -295,7 +295,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         python : uses python to translate. (Warning: This can be very slow)
 
     srate : int, optional
-        sample rate for RINEX 3 only. Default is 30.
+        sample rate for RINEX 3 files only. Default is 30.
 
     mk : bool, optional
         Default is False.
@@ -441,9 +441,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
                 fortran = False
                 translator = 'hybrid'
 
-    # default is set to low.  pick high for 1sec files
     rate = rate.lower()
+    # default is set to low.  set to high for 1sec files so the user doesn't have to
+    if samplerate == 1:
+        rate = 'high'
     rate_accepted = ['low', 'high']
+
     if rate not in rate_accepted:
         print('rate not set to either "low" or "high". Exiting')
         sys.exit()
