@@ -12,7 +12,7 @@ you can also use a linux emulator and follow instructions for linux.
 
 [Install Instructions](https://gnssrefl.readthedocs.io/en/latest/pages/docker_cl_instructions.html)
 
-## Local Python Install 
+## Local Python Install for Linux/MacOS
 
 **YOU SHOULD BE RUNNING python version 3.8, 3.9 or 3.10.**  Absolutely versions >= 3.11 will not work.
 This has to do with our using the fortran reading features in the numpy library. That feature is being
@@ -20,7 +20,7 @@ deprecated and we are aware that long-term, we need to find a solution for it. I
 we will simply compile the existing code for the users and call the fortran module using <code>subprocess</code>.
 
 For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
-**If you are using linux** then simply type
+To check please type:
 
 <code>apt-get install -y gcc</code>
 

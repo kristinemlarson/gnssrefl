@@ -35,7 +35,7 @@ those discussion links will likely go away in the not very distant future.
 
 * [ymd](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ymd.html), [ydoy](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.ydoy.html)
 
-* [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe.html) Installs executables for pip clone/pip install users
+* [installexe](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.installexe_cl.html) Installs executables for pip clone/pip install users. This is for Linux and MacOS users only.
 
 ## Environmental Products
 
