@@ -1,6 +1,7 @@
 import sys
 import os
 import numpy as np
+import math
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import subprocess
@@ -10,6 +11,7 @@ import scipy.interpolate
 import scipy.signal
 
 import gnssrefl.gps as g
+import gnssrefl.refraction as refr
 import gnssrefl.rinex2snr as rinex
 import gnssrefl.gnssir_v2 as gnssir_v2
 
@@ -103,6 +105,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     if not os.path.isdir('logs'):
         subprocess.call(['mkdir', 'logs'])
 
+    # if it finds the station coordinates, it will return irefr as 1
+    quick_p,quick_T,irefr, quick_e = quick_refraction(station)
+
     webapp = False 
     # orbit directories
     ann = g.make_nav_dirs(year)
@@ -147,8 +152,15 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
             print('It looks like the receiver had an elevation mask. Overriding e1 to this value.')
             e1 = minEdataset
 
+        # apply elevation angle correction for simple refraction here
+        if irefr == 1:
+            print('found simple refraction parameters')
+            lsp={}; lsp['refraction'] = True
+            snrD[:,1] = gnssir_v2.apply_refraction_corr(lsp,snrD[:,1],quick_p,quick_T)
         # restrict to DC limits 
         ele = snrD[:,1]
+
+
         i= (ele >= pele[0]) & (ele < pele[1])
         ele = ele[i]
         snrD = snrD[i,:]
@@ -483,3 +495,41 @@ def whichquad(iaz):
         a =3
 
     return a
+
+def quick_refraction(station):
+    """
+    refraction correction used in quickLook. no time dependence.
+
+    Parameters
+    ----------
+    station : string
+        4 character station name
+
+    Returns
+    -------
+    p : float
+        pressure, hPa
+    T : float
+        temperature, Celsius
+    irefr : int
+        refraction model number I believe, which is also sent, so not needed
+    e : float
+        water vapor pressure, hPa
+
+    """
+
+    refraction_model = 1
+    lat,lon,ht=g.queryUNR_modern(station.lower())
+    # default values
+    p = 0; T = 0; irefr = 1; e=0 ; it = 1 #?
+    dmjd = 0
+    if (lat == 0) & (lon == 0):
+        #print('no coordinates found')
+        irefr = 0
+        return p,T,irefr, e
+
+    dlat = lat*math.pi/180; dlong = lon*math.pi/180;
+    p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
+
+    return p,T,irefr, e
+

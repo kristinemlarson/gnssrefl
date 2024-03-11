@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 2.5.3
 
+quickLook will use a very simple refraction orrection in quickLook, but only
+if the coordinates are in the UNR database. This can be updated by someone to use
+the coordinates in the gnssir_input created file - as in nmea2snr - but I am
+not going to do that. This is important for VERY tall sites - but mostly irrelevant
+otherwise as quickLook is not an operational piece of software - it is for looking!
+
 download_tides puts the request command behind a try so that there is a polite 
 error message when it crashes for any reason.
 

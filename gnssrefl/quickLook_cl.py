@@ -52,7 +52,7 @@ def quicklook(station: str, year: int, doy: int,
               plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, delTmax : float=75.0, hires_figs : bool=False ):
     """
 
-    quickLook assessment of SNR reflectometry data. It creates two plots: one with periodograms for
+    quickLook assessment of GNSS-IR results using SNR data. It creates two plots: one with periodograms for
     four different quadrants (northwest, northeast, southeast, southwest) and the other with the RH
     results shown as a function of azimuth. This plot also summarizes why the RH retrievals were accepted
     or rejected in terms of the quality control parameters.  
@@ -66,9 +66,13 @@ def quicklook(station: str, year: int, doy: int,
         analyzes station p041 on day of year 1 in the year 2023.  
         The periodogram would be restricted to RH of 1-10 meters.  
 
+    If your site name is in the GNSS-IR database (which is generated from the Nevada Reno geodesy group), 
+    a standard refraction correction is applied. If not, it does not.  This is most relevant for very very
+    tall sites, i.e. > 200 meters. Refraction models are always applied in the gnssir module.
 
-    No refraction correction is applied at this stage. For this reason, very low elevation angle data at 
-    very tall sites will appear to be of very poor quality.
+    If users would like the refraction correction to be applied here for stations that are not in the standard database,
+    they need to submit a pull request making that possible. One option is to read from an existing gnssir_input 
+    json file. That is what is done in nmea2snr and invsnr_input.
 
     Parameters
     ----------
@@ -196,12 +200,6 @@ def quicklook(station: str, year: int, doy: int,
 
     # returns two variables: data, datakey = quick.quicklook_function(**args)
     return quick2.quickLook_function(**args)
-#    if True:
-#    else:
-#        return quick.quickLook_function(**args)
-
-    # the key is saved wth the same keys as the data dictionary, in this order 
-    # [avgAzim, RH, satNumber,frequency,maxAmplitude,Peak2Noise, UTChour]
 
 
 def main():

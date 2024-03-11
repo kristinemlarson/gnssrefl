@@ -74,7 +74,7 @@ recognizes [RINEX 2.11](https://www.ngs.noaa.gov/CORS/RINEX211.txt),
 [RINEX 3](https://files.igs.org/pub/data/format/rinex303.pdf) 
 and [NMEA](https://www.gpsworld.com/what-exactly-is-gps-nmea-data/) input files.
 
-**RINEX 2.11**
+### RINEX 2.11
 
 *We strongly prefer that you use lower case filenames.* I cannot promise you 
 that the code will find files that are stored in uppercase. Lowercase filenames are the standard at global archives.
@@ -99,7 +99,7 @@ We do not make any effort to find files with the zip ending. If your files have 
 you must unzip them before running gnssrefl.
 
 
-**RINEX 3**
+### RINEX 3
 
 While we support RINEX 3 files, we do not read the RINEX 3 
 file itself - we rely on the <code>gfzrnx</code> 
@@ -142,7 +142,7 @@ the IGS archived file.
 
 Please see the rinex2snr documentation page for more examples.
 
-**NMEA**
+### NMEA
 
 NMEA formats can be translated to SNR using <code>nmea2snr</code>.
 Inputs are similar to that used by rinex2snr: the 4char station name, the year, and day of year.
@@ -161,14 +161,14 @@ that you please submit a pull request.
 
 Additional information about nmea2snr [is in the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 
-**ORBITS**
+## ORBITS
 
 We have tried our best to make the orbit files relatively invisible to users.
 But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
 or precise orbits in the sp3 format.  If you have nav files for your station, we recommend you delete them.
 They are not useful in this code.
 
-**EXECUTABLES**
+## EXECUTABLES
 
 There are two key executables: CRX2RNX and gfzrnx. For notebook and docker users, these 
 are installed for you.  pypi/github users must install them. The utility <code>installexe</code>
@@ -189,14 +189,18 @@ File structure for station abcd in the year YYYY (last two characters YY), doy D
 
 - REFL_CODE/YYYY/phase/abcd/DDD.txt  phase analysis 
 
-- REFL_CODE/Files/ - various output files and plots will be placed here
+- REFL_CODE/Files/ - various output files and plots will be placed here. For water levels, 
+everything is stored with an additional folder with the station name
 
-- ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file 
+- ORBITS/YYYY/nav/autoDDD0.YYn - GPS broadcast orbit file
 
 - ORBITS/YYYY/sp3/ - sp3 files of orbits - these use names from the archives.
 
-RINEX files downloaded from archives are not stored by this code. In fact, quite the opposite. If they are being translated, 
-they are deleted. Do not keep your only copy of RINEX files in your default directory.
+The RINEX files downloaded from archives are not stored by this code. Or at least not deliberately. 
+If they are being translated, they are deleted. 
+
+If translating your own files, you should take care to not keep your only copy in your default directory.
+If they are stored in $REFL_CODE/YYYY/rinex/abcd you will be fine.
 
 You do not need precise orbits to do GNSS-IR. We only use them as a convenience.
 Generally we use multi-GNSS sp3 files. See the <code>rinex2snr</code> documentation for more details on 
@@ -258,11 +262,13 @@ set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
 - 302, 306, 307 : Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz
 
 
-## Additional files
+## Additional files 
 
 - EGM96geoidDATA.mat is stored in REFL_CODE/Files
-- station_pos.db is stored in REFL_CODE/Files. This is a compilation of station coordinates from Nevada Reno.
+- station_pos2024.db is stored in REFL_CODE/Files. This is an updated compilation of station coordinates from Nevada Reno.
 - gpt_1wA.pickle is stored in REFL_CODE/input. This file is used in the refraction correction.
+- GPSorbits_21sep17.txt, GALILEOorbits_21sep17.txt, etc are stored in REFL_CODE/Files. These are used for refl_zones and max_resolve_RH
+- leapsecond file, ONLY for nmea2snr, REFL_CODE/Files/leapseconds.txt
 
 ## Some comments about signals
 
