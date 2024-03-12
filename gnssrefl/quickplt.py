@@ -36,12 +36,14 @@ def parse_arguments():
     parser.add_argument("-freq", help="spec freq, column 11 ", type=int,default=None)
     parser.add_argument("-utc_offset", help="offset from UTC, hours  ", type=int,default=None)
     parser.add_argument("-yoffset", help="offset for y-axis values", type=float,default=None)
+    parser.add_argument("-keepzeros", help="keep zeros (default is to remove)", type=str,default=None)
+    parser.add_argument("-sat", help="print only this satellite (only for SNR file)", type=int,default=None)
 
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['mjd', 'reverse', 'ymdhm', 'ydoy','ymd']
+    boolean_args = ['mjd', 'reverse', 'ymdhm', 'ydoy','ymd','keepzeros']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -51,7 +53,8 @@ def parse_arguments():
 def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: bool=False, xlabel: str=None, 
                   ylabel: str=None, symbol: str=None, reverse:bool=False,title:str=None,outfile: str=None,
                   xlimits: float=[], ylimits: float=[], ydoy:bool=False, ymd:bool=False, ymdhm:bool=False, 
-                  filename2: str=None, freq:int=None, utc_offset: int=None, yoffset: float=None):
+                  filename2: str=None, freq:int=None, utc_offset: int=None, yoffset: float=None, 
+                  keepzeros: bool=False, sat: int=None):
 
     """
     quick file plotting using matplotlib
@@ -101,6 +104,22 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
     quickplt txtfile 1 16 -outfile myfile.png
         would save png file to $REFL_CODE/Files/myfile.png
 
+    quickplt snrfile 4 7 
+        Assuming you submitted a standard SNR file, it would plot the 
+        L1 data (column 7) vs time (seconds of the day in column 4). Zeroes would
+        be removed, but you can toggle that to keep it.
+
+    quickplt snrfile 2 7 
+        Assuming you submitted a standard SNR file, it would plot the 
+        L1 data (column 7) vs elevation angle (degrees in column 2). 
+
+    quickplt snrfile 4 8 -sat 25
+        Assuming you submitted a standard SNR file, it would plot the 
+        data for satellite 25 for L2 data (column 8) vs time (seconds of the day in column 4). 
+
+    quickplt snrfile 4 8 -sat 22
+        Assuming you submitted a standard SNR file, it would plot the 
+        data for Glonass satellite 22 for L2 data (column 8) vs time (seconds of the day in column 4). 
 
     Parameters
     ----------
@@ -149,6 +168,10 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
         this only is used when the mjd option is used  
     yoffset : float
         add or subtract to the y-axis values
+    keepzeros: bool, optional
+        keep/remove zeros, default is to remove
+    sat : int
+        satellite number for SNR file plotting (i.e. column 1)
 
     """
 
@@ -190,6 +213,18 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
                     return
                 else:
                     tvd = tvd[ii,:]
+            if not keepzeros:
+                print('Remove zero values')
+                ii = (tvd[:,ycol] != 0)
+                tvd = tvd[ii,:]
+            if (sat is not None):
+                print('Only show satellite ', sat)
+                ii = (tvd[:,0] == sat)
+                tvd = tvd[ii,:]
+            if len(tvd) == 0:
+                print('No data are left. Exiting')
+                sys.exit()
+
         tval = []
         yval = []
     else:

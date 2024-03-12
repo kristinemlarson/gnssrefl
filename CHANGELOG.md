@@ -3,9 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## 2.5.3
 
-quickLook will use a very simple refraction orrection in quickLook, but only
+## 2.5.4
+
+started experimenting with parallel processing. NOT official yet.
+
+added some features to quickplt , relevant for SNR data. allow specific satellite 
+to be shown (if standard SNR file).  removes zeros to make it all more useful.
+
+quickLook will use a very simple refraction correction in quickLook, but only
 if the coordinates are in the UNR database. This can be updated by someone to use
 the coordinates in the gnssir_input created file - as in nmea2snr - but I am
 not going to do that. This is important for VERY tall sites - but mostly irrelevant
@@ -13,6 +19,10 @@ otherwise as quickLook is not an operational piece of software - it is for looki
 
 download_tides puts the request command behind a try so that there is a polite 
 error message when it crashes for any reason.
+
+New documentation, various.
+
+## 2.5.3
 
 added RINEX 3 pickups from $REFL_CODE/YYYY/rinex for gzipped crx and rnx files
 

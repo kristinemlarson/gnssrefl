@@ -318,6 +318,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     t1 = time.time()
     if not par: 
+        # analyze one year at a time in the current code
         for year in year_list:
             process_year(year, **additional_args)
     else:
@@ -340,19 +341,17 @@ def process_year(year, year_end, year_st, doy, doy_end, args):
     Parameters
     ----------
     year : int
-        full Year
+        the year you are currently analyzing
     year_end : int
-        end year. This is to create a range from year to year_end to get the snr files for more than one year.
-        doy_end will be for year_end. Default is None.
+        end year. This was the last year you plan to analyze
     year_st: int 
-        starting year, which helps figure out the end of day
+        This is starting year you were planning to analyze
     doy : integer
         Day of year
-        POOR VARIABLE NAME. SHOULD BE CHANGED.
+        POOR VARIABLE NAME. SHOULD BE CHANGED. i believe it is the start doy on the start year.
     doy_end : int
-        end day of year. This is to create a range from doy to doy_end of days.
-        If year_end parameter is used - then day_end will end in the day of the year_end.
-        Default is None. (meaning only a single day using the doy parameter)
+        end day of year on the last year you plan to analyze
+        Default is None. 
     args : dict
         arguments passed into gnssir through commandline (or python)
 
@@ -362,12 +361,13 @@ def process_year(year, year_end, year_st, doy, doy_end, args):
     else:
         doy_en = doy_end
 
-    # edits made 2021Sep10 by Makan karegar
     if year == year_st:
         doy_list = list(range(doy, doy_en+1))
     else:
         doy_list = list(range(1, doy_en+1))
 
+    # so really this is looking at only a single year
+    # looping through day of year. I think? 
     args['year'] = year
     for doy in doy_list:
         args['doy'] = doy

@@ -1,4 +1,4 @@
-# gnssrefl v2.5.3 
+# gnssrefl v2.5.4 
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
@@ -6,6 +6,8 @@
 
 
 ![](docs/tokachi_rupture.gif)
+
+Playing with having a demo here - for now it is an earthquake rupture.
 
 [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
