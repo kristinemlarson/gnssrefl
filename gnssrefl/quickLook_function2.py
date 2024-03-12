@@ -518,6 +518,7 @@ def quick_refraction(station):
 
     """
 
+    xdir = os.environ['REFL_CODE']
     refraction_model = 1
     lat,lon,ht=g.queryUNR_modern(station.lower())
     # default values
@@ -528,6 +529,7 @@ def quick_refraction(station):
         irefr = 0
         return p,T,irefr, e
 
+    refr.readWrite_gpt2_1w(xdir, station, lat, lon)
     dlat = lat*math.pi/180; dlong = lon*math.pi/180;
     p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
 
