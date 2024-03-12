@@ -33,7 +33,7 @@ def parse_arguments():
     parser.add_argument("-ylimits", nargs="*",type=float, help="optional ylimits", default=None)
     parser.add_argument("-ydoy", help="if True/T, columns 1-2 are year and doy", type=str,default=None)
     parser.add_argument("-filename2", help="second filename", type=str, default=None)
-    parser.add_argument("-freq", help="spec freq, column 11 ", type=int,default=None)
+    parser.add_argument("-freq", help="spec freq, column 11 in a LSP file ", type=int,default=None)
     parser.add_argument("-utc_offset", help="offset from UTC, hours  ", type=int,default=None)
     parser.add_argument("-yoffset", help="offset for y-axis values", type=float,default=None)
     parser.add_argument("-keepzeros", help="keep zeros (default is to remove)", type=str,default=None)
