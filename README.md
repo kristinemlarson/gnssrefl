@@ -4,16 +4,18 @@
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.10644225.svg)](http://dx.doi.org/10.5281/zenodo.10644225) 
 
+gnssrefl is an open source software package for GNSS interferometric reflectometry (GNSS-IR). 
 
-![](docs/tokachi_rupture.gif)
+![](docs/myAnimation.gif)
 
-Playing with having a demo here - for now it is an earthquake rupture.
 
-[![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
+Documentation:
 
 - [online](https://gnssrefl.readthedocs.io/en/latest/)
 
 - [pdf](https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/)
+
+- [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 See documentation for [gnssir_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html) for new refraction models.
 
