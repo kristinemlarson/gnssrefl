@@ -337,20 +337,14 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         if par > 10:
             print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
             sys.exit()
-        if (par == -99):
-            print('Using pools with multiple lists of dates. For now only one year can be accommodating')
-            if (year != year_end):
-                print('Submit within one year for now')
-                sys.exit()
-            numproc = 10
-            # hardwire for five processes now
-            # try sending this instead of just args 
-            #d = { 0: [2020, 251, 260], 1:[2020, 261, 270], 2: [2020, 271, 280], 3:[2020, 281, 290], 4:[2020,291,300] }
-            # may end up using fewer processes ... so return numproc for that
-            d,numproc=guts2.make_parallel_proc_lists(year, doy, doy_end, numproc)
-            print(numproc)
+        else:
+            numproc = par
+            d,numproc=guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
             print(d)
 
+            #d,numproc=guts2.make_parallel_proc_lists(year, doy, doy_end, numproc)
+
+            # make a list of process IDs
             index_list = list(range(numproc))
 
             pool = multiprocessing.Pool(processes=numproc) 
@@ -360,7 +354,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             pool.close()
             pool.join()
 
-        else:
+        if False:
+            # I think we can get rid of this now and use MJD for both parts ...
             print('Using process year with pools')
             pool = multiprocessing.Pool(processes=par) 
             partial_process_year = partial(process_year, **additional_args)
@@ -437,15 +432,16 @@ def process_year_dictionary(index,args,datelist):
     """
 
 
-    year = datelist[index][0]; d1 = datelist[index][1] ; d2 = datelist[index][2]
+    d1 = datelist[index][0]; d2 = datelist[index][1] 
 
-    doy_list = list(range(d1, d2+1))
+    mjd_list = list(range(d1, d2+1))
 
     # now store year and doy in args dictionary, which is somewhat silly
-    args['year'] = year
-    for doy in doy_list:
-        print(f'processing {year} {doy}');
+    for MJD in mjd_list:
+        year, doy = g.modjul_to_ydoy(MJD)
+        args['year'] = year
         args['doy']=doy
+        print(f'Processing MJD {MJD} Year {year} DOY {doy}');
 
         guts2.gnssir_guts_v2(**args)
 

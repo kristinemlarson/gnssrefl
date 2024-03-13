@@ -1138,6 +1138,52 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
             tv = np.append(tv, [newl],axis=0)
 
     return tv 
+def make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, nproc):
+    """
+    make lists of dates for parallel processing to spawn multiple jobs
+
+    Parameters
+    ==========
+    year : int
+        year processing begins
+    doy : int
+        start day of year
+    year_end : int
+        year end of processing 
+    doy_end  : int
+        end day of year
+    nproc : int
+        requested number of processes to spawn
+
+    Returns
+    =======
+    datelist : dict
+        list of MJD 
+    numproc : int
+        number of datelists, thus number of processes to be used
+
+    """
+#   d = { 0: [2020, 251, 260], 1:[2020, 261, 270], 2: [2020, 271, 280], 3:[2020, 281, 290], 4:[2020,291,300] }
+    # number of days for spacing ... 
+    MJD1 = int(g.ydoy2mjd(year,doy))
+    MJD2 = int(g.ydoy2mjd(year_end,doy_end))
+
+    Ndays  = math.ceil((MJD2-MJD1)/nproc) 
+    #print(Ndays)
+    d = {}
+    i=0
+    for day in range(MJD1, MJD2+1, Ndays):
+        end_day = day + Ndays - 1
+        if (end_day > MJD2):
+            l = [day, MJD2 ]
+        else:
+            l = [day, end_day]
+        d[i] = l
+        i=i+1
+
+    datelist = d
+    numproc = i
+    return datelist, numproc
 
 def make_parallel_proc_lists(year, doy1, doy2, nproc):
     """
@@ -1178,3 +1224,4 @@ def make_parallel_proc_lists(year, doy1, doy2, nproc):
     datelist = d
     numproc = i
     return datelist, numproc
+
