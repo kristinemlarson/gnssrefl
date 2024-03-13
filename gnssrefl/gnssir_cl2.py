@@ -402,25 +402,28 @@ def process_year(year, year_end, year_st, doy, doy_end, args, error_queue):
         arguments passed into gnssir through commandline (or python)
 
     """
-    if year != year_end:
-        doy_en = 366
-    else:
-        doy_en = doy_end
+    try:
+        if year != year_end:
+            doy_en = 366
+        else:
+            doy_en = doy_end
 
-    if year == year_st:
-        doy_list = list(range(doy, doy_en+1))
-    else:
-        doy_list = list(range(1, doy_en+1))
+        if year == year_st:
+            doy_list = list(range(doy, doy_en+1))
+        else:
+            doy_list = list(range(1, doy_en+1))
 
-    # so really this is looking at only a single year
-    # looping through day of year. I think? 
-    args['year'] = year
-    for doy in doy_list:
-        args['doy'] = doy
-        try:
-            guts2.gnssir_guts_v2(**args)
-        except:
-            warnings.warn(f'error processing {year} {doy}');                
+        # so really this is looking at only a single year
+        # looping through day of year. I think? 
+        args['year'] = year
+        for doy in doy_list:
+            args['doy'] = doy
+            try:
+                guts2.gnssir_guts_v2(**args)
+            except:
+                warnings.warn(f'error processing {year} {doy}');                
+    except Exception as e:
+        error_queue.put(e)
 
 def process_year_dictionary(index,args,datelist,error_queue):
     """
