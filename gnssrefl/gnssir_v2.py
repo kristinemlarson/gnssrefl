@@ -10,8 +10,7 @@ import subprocess
 import sys
 import warnings
 
-#import gnssrefl.gps as g
-import gps as g
+import gnssrefl.gps as g
 import gnssrefl.read_snr_files as snr
 import gnssrefl.refraction as refr
 
