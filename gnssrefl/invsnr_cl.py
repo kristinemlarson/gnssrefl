@@ -17,10 +17,10 @@ def parse_arguments():
     parser.add_argument("doy", default=None, type=int, help="doy")
     parser.add_argument("signal", default=None, type=str, help="L1, L2, L5, L1+L2, L1+L2+L5, etc")
 
-    parser.add_argument("-pktnlim", default=None, type=float, help="Peak2noise ratio for Quality Control, default now 2.5")
+    parser.add_argument("-peak2noise", default=None, type=float, help="Peak2noise ratio for Quality Control, default now 2.5")
     parser.add_argument("-constel", default=None, type=str, help="Only a single constellation (G,E, or R)")
     parser.add_argument("-screenstats", default=None, type=str, help="screen stats, False is default")
-    parser.add_argument("-tempres", default=None, type=int, help="SNR file decimator (seconds)")
+    parser.add_argument("-dec", default=None, type=int, help="SNR file decimator (seconds)")
     parser.add_argument("-polydeg", default=None, type=int, help="polynomial degree for direct signal removal (default is 2)")
     parser.add_argument("-snrfit", default=None, type=str, help="Do invsnr fit? True is the default ")
     parser.add_argument("-plt", default=None, type=str, help="Plot to the screen?  default is True")
@@ -30,7 +30,7 @@ def parse_arguments():
     parser.add_argument("-knot_space", default=None, type=int, help="knot spacing in hours (default is 3)")
     parser.add_argument("-rough_in", default=None, type=str, help="Roughness (default is 0.1)")
     parser.add_argument("-risky", default=None, type=str, help="Risky taker related to gaps/knot spacing, False is default.")
-    parser.add_argument("-snr_ending", default=None, type=str, help="SNR file ending. Default is 66")
+    parser.add_argument("-snr", default=None, type=int, help="SNR file ending. Default is 66")
     parser.add_argument("-outfile_type", default=None, type=str, help="Output file type (txt or csv)")
     parser.add_argument("-outfile_name", default=None, type=str, help="Output file name")
     parser.add_argument("-outlier_limit", default=None, type=str, help="outliers limit (m)")
@@ -48,10 +48,10 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5, constel: str = None, 
-        screenstats: bool = False, tempres: int = 1, polydeg: int = 2, snrfit: bool = True, plt: bool = True,
+def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2.5, constel: str = None, 
+        screenstats: bool = False, dec: int = 1, polydeg: int = 2, snrfit: bool = True, plt: bool = True,
         doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: int = 3, 
-        rough_in: float = 0.1, risky: bool = False, snr_ending: int = 66, outfile_type: str = 'txt', 
+        rough_in: float = 0.1, risky: bool = False, snr: int = 66, outfile_type: str = 'txt', 
         outfile_name: str = '', outlier_limit: float = 0.5, no_dots: bool = False, delta_out: int = 300, 
         refraction: bool = True, json_override: bool = False):
     """
@@ -62,6 +62,8 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5,
     and this made the default setting far too stringent. In short, no arcs were being found.  As of 2023/10/28 it
     is set to 2.5.  This may not be optimal, but it is not as bad as 4.  Please set it yourself as you prefer.
     Note: it will not the same as gnssir as this code was written separately and for a different purpose.
+
+    pktnlim is now known externally as peak2noise
     
     Examples
     --------
@@ -86,7 +88,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5,
         Day of year
     signal : str
         signal to use, L1  L2 L5 L6 L7 L1+L2 L1+L2+L5 L1+L5 ALL
-    pktnlim: float, optional
+    peak2noise: float, optional
         Peak2noise ratio limit for Quality Control.
         Default is 2.5
     constel: str, optional
@@ -107,7 +109,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5,
     screenstats: bool, optional
         Whether to print out stats to the screen.
         Default is False
-    tempres: int, optional
+    dec : int, optional
         SNR file decimator (seconds)
         Default is 1 (everything)
     polydeg : integer, optional
@@ -141,7 +143,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5,
     risky : bool, optional
         Risky taker related to gaps/knot spacing
         Default is False
-    snr_ending : int, optional
+    snr : int, optional
         SNR file ending. Default is 66
     outfile_type : string, optional
         output file type, txt or csv
@@ -191,7 +193,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5,
 
     if json_override is False:
         if os.path.isfile(instructions2):
-            print('using:', instructions2)
+            #print('using:', instructions2)
             with open(instructions2) as f:
                 lsp = json.load(f)
         else:
@@ -200,7 +202,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5,
     else:
         instructions2 = json_override
         if os.path.isfile(instructions2):
-            print('using:', instructions2)
+            #print('using:', instructions2)
             with open(instructions2) as f:
                 lsp = json.load(f)
         else:
@@ -215,6 +217,9 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5,
     elvlims = lsp['elvlims']
     rhlims = lsp['rhlims']
     l2c_only = lsp['l2c_only']
+    if 'pktnlim' in lsp:
+        print('use peak2noise from json')
+        peak2noise = lsp['pktnlim']
 
 
 # multi doy listing
@@ -263,9 +268,9 @@ def invsnr(station: str, year: int, doy: int, signal: str, pktnlim: float = 2.5,
         lsp['refraction'] = True
 
     spline_functions.snr2spline(station, year, doy, azilims, elvlims, rhlims, precision, kdt, signal=signal,
-                                lspfigs=lspfigs, snrfigs=snrfigs, snrfit=snrfit, doplot=plt, pktnlim=pktnlim,
-                                satconsts=satconsts, screenstats=screenstats, tempres=tempres, doy_end=doy_end,
-                                l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr_ending,
+                                lspfigs=lspfigs, snrfigs=snrfigs, snrfit=snrfit, doplot=plt, pktnlim=peak2noise,
+                                satconsts=satconsts, screenstats=screenstats, tempres=dec, doy_end=doy_end,
+                                l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr,
                                 outfile_type=outfile_type, delta_out=delta_out, lsp=lsp, outfile_name=outfile_name,
                                 outlier_limit=outlier_limit, no_dots=no_dots)
 

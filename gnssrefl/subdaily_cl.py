@@ -46,6 +46,7 @@ def parse_arguments():
     parser.add_argument("-fs", default=None, type=int, help="fontsize for figures. default is 10")
     parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate Nievinski sigma definition. default is False")
     parser.add_argument("-gap_min_val", default=None, type=float, help="min gap allowed in splinefit output file. default is 6 hours")
+    parser.add_argument("-knots2", default=None, type=int, help="Secondary knots value for final fit. default is to use original knots value.")
 
     args = parser.parse_args().__dict__
 
@@ -64,7 +65,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0, 
              hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0,
-             year_end: int=None):
+             year_end: int=None, knots2 : int=None):
     """
     Subdaily combines gnssir solutions and applies relevant corrections needed to measure water levels (tides). 
     As of January 2024, it will allow multiple years. You can also specify which day of year to start with, i.e.
@@ -316,7 +317,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier1, spline_outlier2, 
                    knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,
                    if_corr=if_corr,knots_test=knots_test,hires_figs=hires_figs,
-                   apply_rhdot=apply_rhdot,fs=fs,gap_min_val=gap_min_val,year=year,extension=extension)
+                   apply_rhdot=apply_rhdot,fs=fs,gap_min_val=gap_min_val,year=year,extension=extension,knots2=knots2)
        if plt:
            mplt.show()
 

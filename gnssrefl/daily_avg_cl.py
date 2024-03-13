@@ -209,7 +209,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
         outfile = txtdir + '/' + txtfile
 
     if (nr > 0):
-        da.write_out_RH_file(obstimes, tv, outfile, csv)
+        da.write_out_RH_file(obstimes, tv, outfile, csv,station,extension)
 
 
 def main():

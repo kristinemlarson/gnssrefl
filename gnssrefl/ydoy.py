@@ -24,7 +24,7 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("year", help="year ", type=int)
+    parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="doy", type=int)
 
     args = parser.parse_args()

@@ -394,7 +394,13 @@ def pickup_from_noaa(station,date1,date2,datum, printmeta):
     # add the datum - i think
     endL = "&product=water_level&datum=" + datum + "&units=metric&time_zone=gmt&application=web_services&format=json"
     url = urlL + "begin_date=" + date1 + "&end_date=" + date2 + "&station=" + station + endL
-    data = requests.get(url).json()
+
+    try:
+        data = requests.get(url).json()
+    except: 
+        print('There was a major problem with your download.  Maybe internet is off?')
+        sys.exit()
+
     if 'error' in data.keys():
         print(data['error'])
         error = True

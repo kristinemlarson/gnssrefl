@@ -48,7 +48,7 @@ def trans_time(tvd, ymd, ymdhm, convert_mjd, ydoy ,xcol,ycol,utc_offset):
     yval = []
 
     nr,nc = tvd.shape
-    print('rows and columns ', nr,nc)
+    #print('rows and columns ', nr,nc)
     if (ycol+1 > nc):
         print('You asked to plot column', ycol+1, ' and that column does not exist in the file')
         sys.exit()

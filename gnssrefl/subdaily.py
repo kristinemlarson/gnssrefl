@@ -734,13 +734,16 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         default is true
     gap_min_val : float, optional
         gap allowed in last spline, in hours
-    year : int
-        hopefully this will go away ...
+    knots2 : int, optional
+        a secondary knot value if you want the final output 
+        to use a different one than the one used for outliers and 
+        RH dot
 
 
     """
     # output will go to REFL_CODE/Files unless txtdir provided
     xdir = os.environ['REFL_CODE']
+
     gap_min_val = kwargs.get('gap_min_val',6.0)
     gap_min_val = gap_min_val/24 # change to DOY units
 
@@ -794,11 +797,17 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     knots_per_day= kwargs.get('knots',8)
 
 
+    knots2 = kwargs.get('knots2',knots_per_day)
+    if knots2 is None:
+        knots2_per_day = knots_per_day
+    else:
+        knots2_per_day = knots2
+
+    print('knots2 ', knots2_per_day) 
+
     knots_test = kwargs.get('knots_test',0)
     if (knots_test== 0):
         knots_test = knots_per_day
-    #else:
-    #    print('using knots_test')
 
     print('\n>>>>>>>>>>>>>>>>>>>> Entering second section of subdaily code <<<<<<<<<<<<<<<<<<<<<<<<')
     print('\nComputes rhdot correction and interfrequency bias correction for subdaily')
@@ -1074,8 +1083,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         tnew, ynew = flipit(tvd_new,column)
 
     Ndays = tnew.max()-tnew.min()
-    knots_per_day = knots_test
-    #print('trying knots_test')
+    print('trying knots2')
+    knots_per_day = knots2_per_day
+
     numKnots = int(knots_per_day*(Ndays))
     #
 
@@ -1083,6 +1093,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     t1 = tnew.min()+firstKnot_in_minutes/60/24
     t2 = tnew.max()-firstKnot_in_minutes/60/24
     knots =np.linspace(t1,t2,num=numKnots)
+
 
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
     # compute spline - use for times th

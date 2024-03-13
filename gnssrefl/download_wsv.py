@@ -53,7 +53,11 @@ def download_wsv(station: str, plt: bool = True, output: str = None):
 
     newurl = 'https://www.pegelonline.wsv.de/webservices/rest-api/v2/stations/' + station + '/W/measurements.json?start=P30D'
 
-    data = requests.get(newurl).json()
+    try:
+        data = requests.get(newurl).json()
+    except:
+        print('Major issue with download. Is the internet off?')
+        sys.exit()
 
     N= len(data)
     if (N <= 2) :

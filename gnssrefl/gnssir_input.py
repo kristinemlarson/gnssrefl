@@ -39,6 +39,8 @@ def parse_arguments():
     parser.add_argument("-refr_model", default=1, type=int, help="refraction model. default is 1, zero turns it off)")
     parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height, meters")
     parser.add_argument("-pele", nargs="*", type=float, help="min and max elevation angle in direct signal removal, default is 5-30")
+    parser.add_argument("-daily_medfilter", default=None, type=float, help="daily_avg, median filter, meters")
+    parser.add_argument("-subdaily_knots", default=None, type=float, help="subdaily, knots")
 
 
     args = parser.parse_args().__dict__
