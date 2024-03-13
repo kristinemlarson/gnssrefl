@@ -329,7 +329,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     print('Requested frequencies ', lsp['freqs'])
 
     # queue which handles any exceptions any of the processes encounter
-    error_queue = multiprocessing.Queue()
+    manager = multiprocessing.Manager()
+    error_queue = manager.Queue()
     additional_args = { "year_end": year_end, "year_st": year_st, "doy": doy, "doy_end": doy_end, "args": args, "error_queue": error_queue }
 
     t1 = time.time()
