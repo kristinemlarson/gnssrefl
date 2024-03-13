@@ -170,7 +170,7 @@ For hourly smooth output, use delta_out parameter (in seconds). To apply vertica
 Plot of regularly spaced water level, hourly moving average data:
 
 <p align=center>
-<img src="../_static/sph1-9.png"</img>
+<img src="../_static/sph1-10.png"</img>
 </p>
 
 ## References
