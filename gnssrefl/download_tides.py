@@ -18,7 +18,7 @@ import gnssrefl.download_psmsl as download_psmsl
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name, e.g. 8768094", type=str)
-    parser.add_argument("network", help="tidegauge network (noaa,ioc,psmsl,wsv,qld)", type=str)
+    parser.add_argument("network", help="tidegauge network (noaa,ioc,psmsl,wsv)", type=str)
     parser.add_argument("-date1", help="start-date, 20150101", type=str, default=None)
     parser.add_argument("-date2", help="end-date, 20150110", type=str, default=None)
     parser.add_argument("-output", default=None, help="Optional output filename", type=str)

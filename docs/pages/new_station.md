@@ -6,7 +6,8 @@ A good GNSS reflection site has:
 - A good receiver tracking multiple GNSS signals and modern (L2C,L5) GPS signals
 - A sampling rate that is commensurate with what you are trying to measure (i.e. 
 30 second sampling rate won't work for stations that are more than 8-9 meters 
-above the reflecting surface).
+above the reflecting surface). You should find out the proper sampling rate for your 
+station before you install it! Use [max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_RH_cl.html)
 - RINEX files with positions in the header and (preferably float) SNR data 
 - There is no elevation mask on the receiver
 

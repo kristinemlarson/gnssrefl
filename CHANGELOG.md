@@ -3,6 +3,55 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+
+## 2.6.0
+
+beta version of multi-processing for gnssir. It is called gnssir2 for now. I will
+merge with gnssir after more testing.
+
+## 2.5.4
+
+started experimenting with parallel processing. NOT official yet.
+
+added some features to quickplt , relevant for SNR data. allow specific satellite 
+to be shown (if standard SNR file).  removes zeros to make it all more useful.
+
+quickLook will use a very simple refraction correction in quickLook, but only
+if the coordinates are in the UNR database. This can be updated by someone to use
+the coordinates in the gnssir_input created file - as in nmea2snr - but I am
+not going to do that. This is important for VERY tall sites - but mostly irrelevant
+otherwise as quickLook is not an operational piece of software - it is for looking!
+
+download_tides puts the request command behind a try so that there is a polite 
+error message when it crashes for any reason.
+
+New documentation, various.
+
+## 2.5.3
+
+added RINEX 3 pickups from $REFL_CODE/YYYY/rinex for gzipped crx and rnx files
+
+Store peak2noise in invsnr_input
+
+removed gazillion print statements from invsnr
+
+Changed inputs pktnlim to peak2noise, tempres to dec and snr_ending to snr in invsnr to be consistent with
+other codes.  I kept the interior variable names that David Purnell had used.
+
+
+## 2.5.2
+
+Mostly updating use cases
+
+## 2.5.1
+
+Added important verbiage about not allow python 3.11 for people with
+local python installations
+
+Warnings for Rinex 3 conversions using no look
+
+Checked that pypi and docker install works
+
 ## 2.5.0
 
 Did some changes to how files (EGM96, station position database) were loaded so that they could be 

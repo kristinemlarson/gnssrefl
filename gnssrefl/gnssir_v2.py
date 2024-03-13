@@ -1,6 +1,7 @@
 import datetime
 import json
 import matplotlib.pyplot as plt
+import math
 import numpy as np
 import os
 import scipy.interpolate
@@ -133,7 +134,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
     p,T,irefr,humidity = set_refraction_params(station, dmjd, lsp)
-    print('Refraction parameters (press, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
+    # removing print statement for now.  should add screenstats parameter
+    if screenstats:
+        print('Refraction parameters (press, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
 
     if (irefr == 3) or (irefr == 4):
         TempK = T + 273.15 # T is in celsius ... I think.
@@ -174,7 +177,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         print('Reading from: ', obsfile)
         print('Results will be written to:', fname)
         minObsE = min(snrD[:,1])
-        print('Minimum observed elevation angle in this file ', minObsE, '/requested e1 and e2 ', e1,e2)
+        print('Min observed elev. angle ', station, year, doy, minObsE, '/requested e1 and e2 ', e1,e2)
         # only apply this test for simple e1 and e2
         if len(ellist) == 0:
             if minObsE > (e1 + ediff):
@@ -196,9 +199,11 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             ele = snrD[:,1]
         else :
             if irefr == 1:
-                print('Standard Bennett refraction correction')
+                if screenstats:
+                    print('Standard Bennett refraction correction')
             else:
-                print('Standard Bennett refraction correction, time-varying')
+                if screenstats:
+                    print('Standard Bennett refraction correction, time-varying')
             ele = snrD[:,1]
             ele=apply_refraction_corr(lsp,ele,p,T)
 
@@ -1002,7 +1007,7 @@ def rewrite_azel(azval2):
         print('Not going to allow more than four azimuth regions ...')
         sys.exit()
 
-    print('Using azimuths: ', azelout)
+    #print('Using azimuths: ', azelout)
     return azelout
 
 def check_azim_compliance(initA,azlist):
@@ -1133,3 +1138,90 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
             tv = np.append(tv, [newl],axis=0)
 
     return tv 
+def make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, nproc):
+    """
+    make lists of dates for parallel processing to spawn multiple jobs
+
+    Parameters
+    ==========
+    year : int
+        year processing begins
+    doy : int
+        start day of year
+    year_end : int
+        year end of processing 
+    doy_end  : int
+        end day of year
+    nproc : int
+        requested number of processes to spawn
+
+    Returns
+    =======
+    datelist : dict
+        list of MJD 
+    numproc : int
+        number of datelists, thus number of processes to be used
+
+    """
+#   d = { 0: [2020, 251, 260], 1:[2020, 261, 270], 2: [2020, 271, 280], 3:[2020, 281, 290], 4:[2020,291,300] }
+    # number of days for spacing ... 
+    MJD1 = int(g.ydoy2mjd(year,doy))
+    MJD2 = int(g.ydoy2mjd(year_end,doy_end))
+
+    Ndays  = math.ceil((MJD2-MJD1)/nproc) 
+    #print(Ndays)
+    d = {}
+    i=0
+    for day in range(MJD1, MJD2+1, Ndays):
+        end_day = day + Ndays - 1
+        if (end_day > MJD2):
+            l = [day, MJD2 ]
+        else:
+            l = [day, end_day]
+        d[i] = l
+        i=i+1
+
+    datelist = d
+    numproc = i
+    return datelist, numproc
+
+def make_parallel_proc_lists(year, doy1, doy2, nproc):
+    """
+    make lists of dates for parallel processing to spawn multiple jobs
+
+    Parameters
+    ==========
+    year : int
+        year of processing
+    doy1 : int
+        start day of year
+    doy 2 : int
+        end day of year
+
+    Returns
+    =======
+    datelist : dict
+        list of dates formatted as year doy1 doy2
+    numproc : int
+        number of datelists, thus number of processes to be used
+
+    """
+#   d = { 0: [2020, 251, 260], 1:[2020, 261, 270], 2: [2020, 271, 280], 3:[2020, 281, 290], 4:[2020,291,300] }
+    # number of days for spacing ... 
+    Ndays  = math.ceil((doy2-doy1)/nproc) 
+    #print(Ndays)
+    d = {}
+    i=0
+    for day in range(doy1, doy2+1, Ndays):
+        end_day = day+Ndays-1
+        if (end_day > doy2):
+            l = [year, day, doy2] 
+        else:
+            l = [year, day, end_day] 
+        d[i] = l
+        i=i+1
+
+    datelist = d
+    numproc = i
+    return datelist, numproc
+

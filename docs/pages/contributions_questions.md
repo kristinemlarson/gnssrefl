@@ -1,5 +1,9 @@
 # Community 
 
+## 2023 Short Course  on GNSS-IR
+- [overview](https://gnssrefl.readthedocs.io/en/latest/pages/sc_index.html)
+- [videos/lectures](https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html)
+
 ## E-mail list
 Would you like to join our <code>gnssrefl</code> users email list?
 This is currently maintained by earthscope.org. To join, please e-mail 
@@ -18,8 +22,7 @@ melissa.weber@earthscope.org or Kristine Larson.
 python/packaging questions, improved our docker distribution, and 
 set up smoke tests. 
 - [Naoya Kadota](https://github.com/naoyakadota) added the GSI data archive and helped find a bug in nmea2snr. 
-- [Joakim Strandberg](https://github.com/Ydmir) provided 
-python RINEX translators and the EGM96 code. 
+- [Joakim Strandberg](https://github.com/Ydmir) provided python RINEX translators and the EGM96 code. 
 - Johannes Boehm provided source code for the refraction correction. 
 - [Makan Karegar](https://github.com/MakanAKaregar) added the NMEA capability.
 - [Dave Purnell](https://github.com/purnelldj) provided his SNR inversion code. 
@@ -31,9 +34,8 @@ and Simon Williams have provided significant advice for this project.
 - [Dan Nowacki](https://github.com/dnowacki-usgs) added 
 Glonass to the NMEA reader
 - [Taylor Smith](https://github.com/tasmi) has worked on the NMEA reader and the refl_zones utility.
-- Surui Xie was instrumental in finding a bug in the newarcs version
-- Peng Feng, Rudiger Haas, and Gunnar Elgered have helped us 
-improve refraction models.
+- Surui Xie and Thomas Nylen were instrumental in finding a bug in the newarcs version
+- Peng Feng, Rudiger Haas, and Gunnar Elgered have helped us improve refraction models.
 
 ## How you can help improve this code
 

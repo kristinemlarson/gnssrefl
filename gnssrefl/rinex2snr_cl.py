@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-snr", default=None, help="snr file ending, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg.", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra, gnss3")
-    parser.add_argument("-rate", default=None, metavar='low', type=str, help="RINEX sample rate: low or high. Only used for archive searches.")
+    parser.add_argument("-rate", default=None, metavar='low', type=str, help="low or high (tells code which folder to search).  If samplerate is 1, this is set automatically to high.") 
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
                         help="True means only use RINEX files on local machine")
@@ -91,9 +91,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     Beyond that, you can try the -mk T option which searches other places, i.e. $REFL_CODE/rinex/ etc. I do not recommend
     that you use this option, but it is there.
 
-    For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory. It does NOT 
-    check the $REFL_CODE/YYYY/rinex directory. If someone would like to add that capability, that would be great.
-    And it looks like I do not delete the RINEX 3 files (though I do delete the RINEX 2.11 files).
+    For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory. It 
+    checks the $REFL_CODE/YYYY/rinex directory for the crx.gz and rnx versions. 
+    It looks like I do not delete the RINEX 3 files (though I do delete the RINEX 2.11 files).
 
     FAQ: what is rate anad srate?  rate is telling the code which folder to use because archives always have 
     files in different directories depending on sample rate.  srate is for RINEX 3 files only because RINEX 3 
@@ -143,6 +143,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     rinex2snr mchl00aus 2022 15  -orb rapid -archive ga 
         30 sec RINEX3 data for mchl00aus and Geoscience Australia
+
+    rinex2snr mchl00aus 2022 15  -orb rapid -nolook T
+        works if the RINEX 3 crx.gz or rnx files are in $REFL_CODE/2022/rinex/mchl
 
     rinex2snr mchl00aus 2022 15  -orb rapid -samplerate 30 -nolook T
         This should analyze a RINEX 3 file if it exists in your local working directory.
@@ -240,9 +243,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             bfg : (German Agency for water research, only Rinex 3, requires password)
 
-            bkg-igs : EUREF for (German Agency for Cartography and Geodesy)
+            bkg-igs : IGS data at the BKG (German Agency for Cartography and Geodesy)
 
-            bkg-euref : IGS for (German Agency for Cartography and Geodesy)
+            bkg-euref : EUREF data at the BKG (German Agency for Cartography and Geodesy)
 
             cddis : (NASA's Archive of Space Geodesy Data)
 
@@ -292,7 +295,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         python : uses python to translate. (Warning: This can be very slow)
 
     srate : int, optional
-        sample rate for RINEX 3 only. Default is 30.
+        sample rate for RINEX 3 files only. Default is 30.
 
     mk : bool, optional
         Default is False.
@@ -438,9 +441,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
                 fortran = False
                 translator = 'hybrid'
 
-    # default is set to low.  pick high for 1sec files
     rate = rate.lower()
+    # default is set to low.  set to high for 1sec files so the user doesn't have to
+    if samplerate == 1:
+        rate = 'high'
     rate_accepted = ['low', 'high']
+
     if rate not in rate_accepted:
         print('rate not set to either "low" or "high". Exiting')
         sys.exit()
