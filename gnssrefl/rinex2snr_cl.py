@@ -15,7 +15,6 @@ import sys
 
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rnx
-import rinex2snr as rnx2
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
 
@@ -52,7 +51,6 @@ def parse_arguments():
     parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
     parser.add_argument("-gzip", default=None, help="boolean, default is SNR files are gzipped after creation", type=str)
-    parser.add_argument("-par", default=None, help="int, set number of parallel processes to run when downloading data", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -68,7 +66,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
-              screenstats : bool = False, gzip : bool = True, monthly : bool = False, par : int = None):
+              screenstats : bool = False, gzip : bool = True, monthly : bool = False ):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
@@ -322,9 +320,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     monthly : bool, optional
         default is false. snr files created every 30 days instead of every day
 
-	par : int, optional
-		default is 1 process. can increase it to allow for parallel processing of data retrieval
-
     """
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
@@ -539,10 +534,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     args = {'station': station, 'year_list': year_list, 'doy_list': doy_list, 'isnr': snr, 'orbtype': orb,
             'rate': rate, 'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook,
             'overwrite': overwrite, 'translator': translator, 'srate': samplerate, 'mk': mk,
-            'skipit': skipit, 'stream': stream, 'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'par' : par}
+            'skipit': skipit, 'stream': stream, 'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip}
 
     s1 = time.time()
-    rnx2.run_rinex2snr(**args)
+    rnx.run_rinex2snr(**args)
     s2 = time.time()
     print('That took ', round(s2-s1,2), ' seconds')
     #print('Feedback written to subdirectory logs')

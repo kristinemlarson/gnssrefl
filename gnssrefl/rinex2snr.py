@@ -6,8 +6,6 @@ from scipy.interpolate import interp1d
 import subprocess
 import sys
 import time
-import multiprocessing
-from functools import partial
 
 
 # progress bar for RINEX translation/orbits
@@ -60,7 +58,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
-        mk,skipit,stream,strip,bkg,screenstats,gzip,par):
+        mk,skipit,stream,strip,bkg,screenstats,gzip):
     """
     main code to convert RINEX files into SNR files 
 
@@ -130,9 +128,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     gzip: bool
          whether SNR files are gzipped after creation
-        
-    par: int
-         amount of parallel processes to run 
     """
     #
     # do not allow illegal skipit values
@@ -166,291 +161,204 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     doy_st = doy_list[0]
     doy_end = doy_list[-1]
 
-    args = { "station": station, "doy_list": doy_list, "isnr": isnr, "orbtype": orbtype, "rate": rate, 
-            "dec_rate": dec_rate, "archive": archive, "fortran": fortran, "nol": nol, 
-            "overwrite": overwrite, "translator": translator, "srate": srate, "mk": mk, "skipit": skipit, 
-            "stream": stream, "strip": strip, "bkg": bkg, "screenstats": screenstats, "gzip": gzip, 
-            "year_st": year_st, "year_end": year_end, "doy_st": doy_st, "doy_end": doy_end, "version": version }
-
-    if not par: 
-        for year in year_list:
-            process_year(year, **args)
-    else:
-        pool = multiprocessing.Pool(processes=par) 
-        partial_process_year = partial(process_year, **args)
-
-        pool.map(partial_process_year, year_list)
-        pool.close()
-        pool.join()
-
-def process_year(year, station, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate, 
-mk, skipit, stream, strip, bkg, screenstats, gzip, year_st, year_end, doy_st, doy_end, version):
-    """
-    Code that does the processing for a specific year. Refactored to seperate function to allow for parallel processes
-
-    Parameters
-    ----------
-    year : int
-        the year to be analyzed
-
-    station : str
-        4 or 9 character station name. 6 ch allowed for japanese archive
-        9 means it is a RINEX 3 file
-
-    doy_list : list of integers
-        doys to be analyzed
-
-    isnr : int
-        SNR file type choice
-
-    orbtype : str
-        orbit type, e.g. nav, rapid, gnss
-
-    rate : str
-        general sample rate.
-        high: use 1-Hz area in the archive
-        low: use default area in the archive
-
-    dec_rate : integer
-         decimation value
-
-    archive : str
-        choice of GNSS archive
-
-    fortran : bool
-        whether the fortran rinex translator is to be used
-        default: false
-
-    nol: bool
-        True: assumes RINEX files are in local directory
-        False (default): will look at multiple - or specific archive
-
-    overwrite: bool
-        False (default): if SNR file exists, SNR file not made
-        True: make a new SNR file
-
-    translator : str
-        hybrid (default), fortran, or python
-        hybrid uses fortran within the python code
-
-    srate : int
-        sample rate for RINEX 3 files
-
-    mk : boolean
-        makan option
-
-    skipit : int
-         skips making files every day, so a value of 7 means weekly.  1 means do every day
-
-    strip : bool
-         reduces observables to only SNR (too many observables, particularly in RINEX 2 files
-         will break the RINEX translator)
-
-    bkg : str
-         location of bkg files, EUREF or IGS
-
-    screenstats: bool
-         whether print statements come to screen
-
-    gzip: bool
-         whether SNR files are gzipped after creation
-    """
-
-    ann = g.make_nav_dirs(year)
-    cyyyy = str(year)
-    dec31 = g.dec31(year)
-    if year != year_end:
-        doy_en = dec31
-    else:
-        doy_en = doy_end
-
-    if year == year_st:
-        doy_list = list(range(doy_st, doy_en+1,skipit))
-    else:
-        doy_list = list(range(1, doy_en+1,skipit))
-
-    for doy in doy_list:
-        csnr = str(isnr)
-        cdoy = '{:03d}'.format(doy)
-        if (year<2000):
-            cyy = '{:02d}'.format(year-1900)
+# loop thru years and days
+    for year in year_list:
+        ann = g.make_nav_dirs(year)
+        cyyyy = str(year)
+        dec31 = g.dec31(year)
+        if year != year_end:
+            doy_en = dec31
         else:
-            cyy = '{:02d}'.format(year-2000)
-        # first, check to see if the SNR file exists
-        fname =  quickname(station,year,cyy,cdoy,csnr)
-        # now it unzips if that version exists
-        snre = g.snr_exist(station,year,doy,csnr)
-        if snre:
-            if overwrite:
-                print('File exists, ', fname, ' and you requested overwriting, so will delete existing file')
-                if os.path.isfile(fname):
-                    subprocess.call(['rm', fname]); 
-                if os.path.isfile(fname + '.gz'):
-                    subprocess.call(['rm', fname + '.gz']); 
-                snre = False
+            doy_en = doy_end
+
+        if year == year_st:
+            doy_list = list(range(doy_st, doy_en+1,skipit))
+        else:
+            doy_list = list(range(1, doy_en+1,skipit))
+
+        for doy in doy_list:
+            csnr = str(isnr)
+            cdoy = '{:03d}'.format(doy)
+            if (year<2000):
+                cyy = '{:02d}'.format(year-1900)
             else:
-                print('SNR file already exists', fname, '\n')
-        else:
-            print('SNR file does not already exist. Which means I will try to make it.')
+                cyy = '{:02d}'.format(year-2000)
+            # first, check to see if the SNR file exists
+            fname =  quickname(station,year,cyy,cdoy,csnr)
+            # now it unzips if that version exists
+            snre = g.snr_exist(station,year,doy,csnr)
+            if snre:
+                if overwrite:
+                    print('File exists, ', fname, ' and you requested overwriting, so will delete existing file')
+                    if os.path.isfile(fname):
+                        subprocess.call(['rm', fname]); 
+                    if os.path.isfile(fname + '.gz'):
+                        subprocess.call(['rm', fname + '.gz']); 
+                    snre = False
+                else:
+                    print('SNR file already exists', fname, '\n')
+            else:
+                print('SNR file does not already exist. Which means I will try to make it.')
 
 
-        illegal_day = False
-        if (doy > dec31):
-            illegal_day = True
+            illegal_day = False
+            if (doy > dec31):
+                illegal_day = True
 
-        if (not illegal_day) and (not snre):
-            r = station + cdoy + '0.' + cyy + 'o'
-            rgz = station + cdoy + '0.' + cyy + 'o.gz'
-            localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
-            if nol:
-                current_local = os.getcwd()
-                print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is :', current_local)
-                # this assumes RINEX file is in local directory or "nearby"
-                if version == 2:
+            if (not illegal_day) and (not snre):
+                r = station + cdoy + '0.' + cyy + 'o'
+                rgz = station + cdoy + '0.' + cyy + 'o.gz'
+                localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
+                if nol:
+                    current_local = os.getcwd()
+                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is :', current_local)
+                    # this assumes RINEX file is in local directory or "nearby"
+                    if version == 2:
 
-                    if mk:
-                        the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
-                    if not os.path.exists(r):
-                        print('Did not find the plain observation file, so now trying other names/directories')
-                        # could try this way? - look for file in localpath2. gunzip if necessary
-                        allgood = get_local_rinexfile(r,localpath2)
-                    if os.path.exists(r):
-                        rinext =float(np.loadtxt(r,usecols=0,dtype='str',max_rows=1))
-                        print('Apparent Rinex version', rinext)
-                        if (rinext != 2.11):
-                            print('Your file is not RINEX v2.11 which is what you told the code it was. Exiting')
-                            sys.exit()
+                        if mk:
+                            the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
+                        if not os.path.exists(r):
+                            print('Did not find the plain observation file, so now trying other names/directories')
+                            # could try this way? - look for file in localpath2. gunzip if necessary
+                            allgood = get_local_rinexfile(r,localpath2)
+                        if os.path.exists(r):
+                            rinext =float(np.loadtxt(r,usecols=0,dtype='str',max_rows=1))
+                            print('Apparent Rinex version', rinext)
+                            if (rinext != 2.11):
+                                print('Your file is not RINEX v2.11 which is what you told the code it was. Exiting')
+                                sys.exit()
 
-                        if screenstats:
-                            print('Found the RINEX 2.11 file', r)
-                        if strip:
                             if screenstats:
-                                print('Testing out stripping the RINEX 2 file here')
-                            k.strip_rinexfile(r)
-                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
-                    else:
-                        print('You Chose the No Look Option, but did not provide the needed RINEX file.')
-                if version == 3:
-                    if rate == 'high':
-                        csrate = '01' # high rate assumes 1-sec
-                    else:
-                        csrate = '{:02d}'.format(srate)
-                    streamid = '_' + stream  + '_'
-                    # this can be done in a function now ...
-                    r3cmpgz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.crx.gz'
-                    r3 = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
-                    r3gz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
-                    r2 = station + cdoy + '0.' + cyy + 'o'
-                    if os.path.exists(r3cmpgz):
-                        if screenstats: 
-                            print('Try to translate', r3cmpgz)
-                        deletecrx = True
-                        translated, rnx_filename = go_from_crxgz_to_rnx(r3cmpgz,deletecrx)
-                    if os.path.exists(r3gz):
-                        if screenstats: 
-                            print('Try to gunzip ', r3gz)
-                        subprocess.call(['gunzip', r3gz])
-                    if os.path.exists(r3):
-                        rinext =float(np.loadtxt(r3,usecols=0,dtype='str',max_rows=1))
-                        print('Apparent Rinex version', rinext)
-                        if (rinext < 3):
-                            print('Your file is not RINEX v3 or higher which is I was expecting. Exiting.')
-                            sys.exit()
-                        if screenstats: 
-                            print('The RINEX 3 file exists locally', r3)
-                        # convert to RINEX 2.11
-                        fexists = g.new_rinex3_rinex2(r3,r2,dec_rate)
-                        if fexists:
+                                print('Found the RINEX 2.11 file', r)
+                            if strip:
+                                if screenstats:
+                                    print('Testing out stripping the RINEX 2 file here')
+                                k.strip_rinexfile(r)
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
                         else:
-                            print('Something about the RINEX 3-2 conversion did not work')
-                    else:
-                        print('You Chose the No Look Option, but did not provide the needed RINEX3 file.')
-                        print('I assumed its name was ', r3)
-
-            else:
-                if screenstats:
-                    print('Will seek the RINEX file from an external archive')
-                if version == 3:
-                    fexists = False
-                    rnx_filename = '' # just in  case?
-                    print(station9ch, ' year:', year, ' doy:', doy, 'from: ', archive)
-                    r2 = station + cdoy + '0.' + cyy + 'o'
-                    rinex2exists = False; rinex3name = '';
-                    if (rate == 'high'):
-                        print('This code only accesses 1-Hz Rinex 3 data at BKG, CDDIS, and GA')
-                        if archive == 'ga':
-                            deleteOld = True
-                            # cold should return the new name of the rinex 2 file
-                            r2, foundit = g.ga_highrate(station9ch,year,doy,dec_rate,deleteOld)
-                            if foundit and screenstats:
-                                print('rinex2 file should now exist:', r2)
-                        if archive == 'cddis':
-                            bad_day = g.cddis_restriction(year, doy,'cddis')
-                            if not bad_day:
-                                rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
-                            else: 
-                                print('No high-rate RINEX data will be downloaded')
-                                foundit = False; fexists = False; rnx_file = ''
-                            if foundit:
-                                if screenstats:
-                                    print('The RINEX 3 file has been downloaded from CDDIS . Try to make ', r2)
-                                fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
-                        if archive == 'bkg':
-                            bad_day = g.cddis_restriction(year, doy,'bkg')
-                            if not bad_day:
-                                rnx_filename,foundit = ch.bkg_highrate(station9ch, year, doy, 0,stream,dec_rate,bkg)
-                            else:
-                                print('No high-rate RINEX data will be downloaded')
-                                foundit = False; fexists = False; rnx_file = ''
-                            if foundit:
-                                if screenstats:
-                                    print('The RINEX 3 file has been downloaded from the BKG and merged. Try to make ', r2)
-                                fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
-                        if archive == 'ignes':
-                            bad_day = g.cddis_restriction(year, doy,'bkg')
-                            if not bad_day:
-                                rnx_filename,foundit = ch.esp_highrate(station9ch, year, doy, 0,stream,dec_rate)
-                            else:
-                                print('No high-rate RINEX data will be downloaded')
-                                foundit = False; fexists = False; rnx_file = ''
-                            if foundit:
-                                if screenstats:
-                                    print('The RINEX 3 file has been downloaded from IGN ES and merged. Try to make ', r2)
-                                fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
-
-                    else:
-                        if (archive == 'all'):
-                            file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream,screenstats)
-                            if (not foundit): # try again
-                                file_name,foundit = k.universal_all(station9ch, year, doy, srate,k.swapRS(stream),screenstats)
+                            print('You Chose the No Look Option, but did not provide the needed RINEX file.')
+                    if version == 3:
+                        if rate == 'high':
+                            csrate = '01' # high rate assumes 1-sec
                         else:
-                            #print('stream',stream)
-                            file_name,foundit = k.universal(station9ch, year, doy, archive,srate,stream)
-                            if (not foundit): # try again
-                                #print('stream',stream)
-                                file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
-                        if foundit: # version 3 found - now need to gzip, then hatanaka decompress
-                            deletecrx = True # no point keeping this around
-                            translated, rnx_filename = go_from_crxgz_to_rnx(file_name,deletecrx)
-                        # now make rinex2
-                            if translated:
-                                if screenstats:
-                                    print('The RINEX 3 file has been downloaded. Try to make ', r2)
-                                fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
-                                #subprocess.call(['rm', '-f',rnx_filename]) # rnx
-                    # this means the rinex 2 version exists
-                    if fexists:
-                         if screenstats:
-                             print('RINEX 2 created from v3', year, doy, ' Now remove RINEX 3 files and convert')
-                         subprocess.call(['rm', '-f',rnx_filename]) # rnx
-                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
-                    else:
-                        print('Unsuccessful RINEX 3 retrieval/translation', year, doy)
+                            csrate = '{:02d}'.format(srate)
+                        streamid = '_' + stream  + '_'
+                        # this can be done in a function now ...
+                        r3cmpgz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.crx.gz'
+                        r3 = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx'
+                        r3gz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.rnx.gz'
+                        r2 = station + cdoy + '0.' + cyy + 'o'
+                        if os.path.exists(r3cmpgz):
+                            if screenstats: 
+                                print('Try to translate', r3cmpgz)
+                            deletecrx = True
+                            translated, rnx_filename = go_from_crxgz_to_rnx(r3cmpgz,deletecrx)
+                        if os.path.exists(r3gz):
+                            if screenstats: 
+                                print('Try to gunzip ', r3gz)
+                            subprocess.call(['gunzip', r3gz])
+                        if os.path.exists(r3):
+                            rinext =float(np.loadtxt(r3,usecols=0,dtype='str',max_rows=1))
+                            print('Apparent Rinex version', rinext)
+                            if (rinext < 3):
+                                print('Your file is not RINEX v3 or higher which is I was expecting. Exiting.')
+                                sys.exit()
+                            if screenstats: 
+                                print('The RINEX 3 file exists locally', r3)
+                            # convert to RINEX 2.11
+                            fexists = g.new_rinex3_rinex2(r3,r2,dec_rate)
+                            if fexists:
+                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
+                            else:
+                                print('Something about the RINEX 3-2 conversion did not work')
+                        else:
+                            print('You Chose the No Look Option, but did not provide the needed RINEX3 file.')
+                            print('I assumed its name was ', r3)
+
                 else:
-                    print(station, ' year:', year, ' doy:', doy, ' from: ', archive, ' rate:', rate, ' orb:', orbtype)
-                    # this is rinex version 2 - finds rinex and converts it
-                    conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
+                    if screenstats:
+                        print('Will seek the RINEX file from an external archive')
+                    if version == 3:
+                        fexists = False
+                        rnx_filename = '' # just in  case?
+                        print(station9ch, ' year:', year, ' doy:', doy, 'from: ', archive)
+                        r2 = station + cdoy + '0.' + cyy + 'o'
+                        rinex2exists = False; rinex3name = '';
+                        if (rate == 'high'):
+                            print('This code only accesses 1-Hz Rinex 3 data at BKG, CDDIS, and GA')
+                            if archive == 'ga':
+                                deleteOld = True
+                                # cold should return the new name of the rinex 2 file
+                                r2, foundit = g.ga_highrate(station9ch,year,doy,dec_rate,deleteOld)
+                                if foundit and screenstats:
+                                    print('rinex2 file should now exist:', r2)
+                            if archive == 'cddis':
+                                bad_day = g.cddis_restriction(year, doy,'cddis')
+                                if not bad_day:
+                                    rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
+                                else: 
+                                    print('No high-rate RINEX data will be downloaded')
+                                    foundit = False; fexists = False; rnx_file = ''
+                                if foundit:
+                                    if screenstats:
+                                        print('The RINEX 3 file has been downloaded from CDDIS . Try to make ', r2)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
+                            if archive == 'bkg':
+                                bad_day = g.cddis_restriction(year, doy,'bkg')
+                                if not bad_day:
+                                    rnx_filename,foundit = ch.bkg_highrate(station9ch, year, doy, 0,stream,dec_rate,bkg)
+                                else:
+                                    print('No high-rate RINEX data will be downloaded')
+                                    foundit = False; fexists = False; rnx_file = ''
+                                if foundit:
+                                    if screenstats:
+                                        print('The RINEX 3 file has been downloaded from the BKG and merged. Try to make ', r2)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
+                            if archive == 'ignes':
+                                bad_day = g.cddis_restriction(year, doy,'bkg')
+                                if not bad_day:
+                                    rnx_filename,foundit = ch.esp_highrate(station9ch, year, doy, 0,stream,dec_rate)
+                                else:
+                                    print('No high-rate RINEX data will be downloaded')
+                                    foundit = False; fexists = False; rnx_file = ''
+                                if foundit:
+                                    if screenstats:
+                                        print('The RINEX 3 file has been downloaded from IGN ES and merged. Try to make ', r2)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
+
+                        else:
+                            if (archive == 'all'):
+                                file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream,screenstats)
+                                if (not foundit): # try again
+                                    file_name,foundit = k.universal_all(station9ch, year, doy, srate,k.swapRS(stream),screenstats)
+                            else:
+                                #print('stream',stream)
+                                file_name,foundit = k.universal(station9ch, year, doy, archive,srate,stream)
+                                if (not foundit): # try again
+                                    #print('stream',stream)
+                                    file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
+                            if foundit: # version 3 found - now need to gzip, then hatanaka decompress
+                                deletecrx = True # no point keeping this around
+                                translated, rnx_filename = go_from_crxgz_to_rnx(file_name,deletecrx)
+                            # now make rinex2
+                                if translated:
+                                    if screenstats:
+                                        print('The RINEX 3 file has been downloaded. Try to make ', r2)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
+                                    #subprocess.call(['rm', '-f',rnx_filename]) # rnx
+                        # this means the rinex 2 version exists
+                        if fexists:
+                             if screenstats:
+                                 print('RINEX 2 created from v3', year, doy, ' Now remove RINEX 3 files and convert')
+                             subprocess.call(['rm', '-f',rnx_filename]) # rnx
+                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
+                        else:
+                            print('Unsuccessful RINEX 3 retrieval/translation', year, doy)
+                    else:
+                        print(station, ' year:', year, ' doy:', doy, ' from: ', archive, ' rate:', rate, ' orb:', orbtype)
+                        # this is rinex version 2 - finds rinex and converts it
+                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
+
 
 def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,fortran,translator):
     """
