@@ -192,9 +192,10 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     if not error_queue.empty():
         print("One (or more) of the processes encountered errors. Will not proceed until errors are fixed.")
+        i = 1
         while not error_queue.empty():
             e = error_queue.get()
-            print(e)
+            print(f"Error {i} type: {type(e)}. Error {i} message: {e}")
         sys.exit(1)
 
 def process_year(year, station, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate, 
