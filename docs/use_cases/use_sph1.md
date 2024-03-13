@@ -89,7 +89,7 @@ C:\\Users\\login\\Documents\\Docker\\refl_code\\Files\\sph1
 The quicklook results, QC metric and Lomb-Scargle Periodogram (LSP) can be explained based on Fresnel zones for the location. To the south, between approximately 150 and 210 degrees of azimuth, there is a gap due to the orbits of the GPS satellite constellation, resulting in no height retrievals in that interval. To the north, northwest, and a major part of the southwest, reflections result from the water. In the northeast and southeast, reflections come from the ground. At low elevation angles, reflections may even bounce off nearby structures to the southeast.
 
 <p align=center>
-<img src="../_static/sph1-11.png"</img>
+<img src="../_static/sph1-12.png"</img>
 </p>
 
 ### 2.5 Check precise water level retrievals
