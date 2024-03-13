@@ -196,6 +196,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         while not error_queue.empty():
             e = error_queue.get()
             print(f"Error {i} type: {type(e)}. Error {i} message: {e}")
+            i += 1
         sys.exit(1)
 
 def process_year(year, station, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate, 
