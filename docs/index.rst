@@ -18,10 +18,10 @@ Welcome to the gnssrefl Documentation!
    pages/README_install.md
    pages/understand.md
    pages/file_structure.md
+   pages/mydata.md
    pages/quick_recall.md
    pages/first_drivethru.md
    pages/contributions_questions.md
-   pages/sc_index
    pages/sc_index2024
    pages/new_station.md
    api

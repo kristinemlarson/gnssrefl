@@ -190,7 +190,7 @@ new file and the corrected RH values are in a new column! Please look at the fil
 
 <HR>
 
-Here is a list of some of the publications using data from sc02. If you would like me to add more, please send them via email.
+Here is a list of some of the publications using data from sc02. If you would like me to add more, submit a pull request.
 
 * [Larson, L&ouml;fgren, Haas, Coastal Sea Level Measurements Using A Single Geodetic GPS Receiver, 2011](https://www.kristinelarson.net/wp-content/uploads/2015/10/Larson_TideGauge.pdf)
 
@@ -198,7 +198,8 @@ Here is a list of some of the publications using data from sc02. If you would li
 
 * [Purnell, Gomez, Chan, Strandberg, Hobiger, Quantifying the Uncertainty in Ground-Based GNSS-Reflectometry Sea Level Measurements, 2021](https://www.researchgate.net/publication/343091181_Quantifying_the_Uncertainty_in_Ground-Based_GNSS-Reflectometry_Sea_Level_Measurements)
 
-* L&ouml;fgren, Haas, and Scherneck, 2014 Sea level time series and ocean tide analysis from multipath signals at five GPS sites in different parts of the world
+* L&ouml;fgren, Haas, and Scherneck, 2014 Sea level time series and ocean tide analysis from 
+multipath signals at five GPS sites in different parts of the world.
 
 * Wang, Zhang and Zhang, 2018 Sea level estimation from SNR data of geodetic receivers using wavelet analysis
 

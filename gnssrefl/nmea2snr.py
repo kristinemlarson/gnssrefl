@@ -89,7 +89,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, gzip):
         else:
             print('This code requires lat/lon/ht inputs. Provide on the command line or')
             print('make a json file using gnssir_input.  Exiting')
-            return
+            sys.exit()
 
     if sp3:
         # first try to find precise because they have beidou

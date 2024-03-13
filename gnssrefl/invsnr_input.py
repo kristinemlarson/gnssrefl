@@ -28,6 +28,7 @@ def parse_arguments():
 
     parser.add_argument("-azim1", default=None, type=float, help="Lower limit azimuth angle (deg), default 0")
     parser.add_argument("-azim2", default=None, type=float, help="Upper limit azimuth angle (deg), default 360")
+    parser.add_argument("-peak2noise", default=None, type=float, help="Peak2noise QC criterion")
 
     parser.add_argument("-lat", help="Latitude (degrees)", type=str, default=None)
     parser.add_argument("-lon", help="Longitude (degrees)", type=str, default=None)
@@ -40,7 +41,7 @@ def parse_arguments():
 
 
 def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=15, azim1: float = 0,
-                 azim2: float = 360, lat: float = None, lon: float = None, height: float = None):
+                 azim2: float = 360, lat: float = None, lon: float = None, height: float = None, peak2noise: float=3):
     """
     Sets some of the analysis parameters for invnsr. Values are stored in a json in $REFL_CODE/input
     Note: this code was written independently of gnssrefl. The Quality Control parametesr are thus quite 
@@ -77,6 +78,8 @@ def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=
         Longitude (degrees)
     height : float, optional
         Ellipsoidal height (meters)
+    peak2noise : float, optional
+        peak to noise 
 
     """
 
@@ -121,6 +124,8 @@ def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=
     lsp['rhlims'] = [h1, h2]
     lsp['elvlims'] = [e1, e2]
     lsp['azilims'] = [a1, a2]
+    # use david's naming convention for this
+    lsp['pktnlim'] = peak2noise
 
 # where the instructions will be written eventually. for now in the current directory
     if 'REFL_CODE' not in os.environ:

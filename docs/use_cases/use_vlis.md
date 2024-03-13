@@ -2,6 +2,8 @@
 
 ## vlsi
 
+**Unfortunately I had to turn off the web app in late 2023. When I get a chance I will update this document.**
+
 **Updated June 4, 2023 to use gnssir_input**
 
 <p align="center">

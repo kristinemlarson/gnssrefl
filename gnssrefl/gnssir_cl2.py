@@ -3,6 +3,7 @@ import argparse
 import os
 import subprocess
 import sys
+import time
 import wget
 import multiprocessing
 from functools import partial
@@ -41,6 +42,7 @@ def parse_arguments():
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
     parser.add_argument("-newarcs", default=None, type=str, help="This no longer has any meaning")
+    parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
 
 
     args = parser.parse_args().__dict__
@@ -57,11 +59,17 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
-           mmdd: bool = False, gzip: bool = True, dec : int = 1, newarcs : bool = True ):
+           mmdd: bool = False, gzip: bool = True, dec : int = 1, newarcs : bool = True, par : int = None ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
 
+    beta version of parallel processing is now onine. If you set -par to an integer >=2, it will do processing across years, i.e. you
+    won't see any improvement unless you are trying to analyze two years of data - in which case it will
+    be twice as fast, three years of data, three times as fast.  I have added an option par=-99 which
+    only works for now on a single year. but it will create up to 10 simultaneous processes, so very slick.  
+    Ultimately of course I will put these together and make this the official version.  Huge thank you to
+    Aaryan Rampal for getting this up and running.
         
     Examples
     --------
@@ -160,6 +168,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         periodograms are computed. 1 sec is default (i.e. no decimating)
     newarcs : bool, optional
         this input no longer has any meaning 
+    par : int
+        parallel processing parameter. If an integer from 2-10, it sets up
+        2-10 processes for years, i.e. you should add at least the same number of 
+        processes as you have years. For par = -99, it sets
+        up 10 processes for jobs within that single year. Ultimately these modes will be 
+        merged so that the -99 option goes away.
 
     """
 
@@ -180,15 +194,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         print('and/or use gnssir_input to make a new one. Exiting')
         sys.exit()
 
-    #if newarcs:
-    #else:
-    #if 'azval' in lsp:
-    #    print('An azval variable was found in your json. I will use the old way of defining arcs.')
-    #else:
-    #    print('You chose the old way of setting arcs, but you do not have valid input in your json.')
-    #    print('I recommend you use gnssir_input to create your json file. Azimuth regions are no ')
-    #    print('longer required to be regions less than 100 degrees. Exiting.')
-    #        sys.exit()
 
 
     # plt is False unless user changes
@@ -320,32 +325,128 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # changed to better describe year and doy start/end
 
     print('Requested frequencies ', lsp['freqs'])
+    additional_args = { "year_end": year_end, "year_st": year_st, "doy": doy, "doy_end": doy_end, "args": args }
 
 
-    for year in year_list:
-        # edits made 2021Sep10 by Makan karegar
-        if year != year_end:
-            doy_en = 366
+    t1 = time.time()
+    if not par: 
+        # analyze one year at a time in the current code
+        for year in year_list:
+            process_year(year, **additional_args)
+    else:
+        if par > 10:
+            print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
+            sys.exit()
         else:
-            doy_en = doy_end
+            numproc = par
+            d,numproc=guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
+            print(d)
 
-        # edits made 2021Sep10 by Makan karegar
-        if year == year_st:
-            doy_list = list(range(doy, doy_en+1))
-        else:
-            doy_list = list(range(1, doy_en+1))
+            #d,numproc=guts2.make_parallel_proc_lists(year, doy, doy_end, numproc)
 
+            # make a list of process IDs
+            index_list = list(range(numproc))
+
+            pool = multiprocessing.Pool(processes=numproc) 
+            partial_process_yearD = partial(process_year_dictionary, args=args,datelist=d)
+            pool.map(partial_process_yearD,index_list)
+
+            pool.close()
+            pool.join()
+
+        if False:
+            # I think we can get rid of this now and use MJD for both parts ...
+            print('Using process year with pools')
+            pool = multiprocessing.Pool(processes=par) 
+            partial_process_year = partial(process_year, **additional_args)
+            print(year_list)
+            type(partial_process_year)
+
+            pool.map(partial_process_year, year_list)
+            pool.close()
+            pool.join()
+
+    t2 = time.time()
+    print('Time to compute ', round(t2-t1,2))
+
+def process_year(year, year_end, year_st, doy, doy_end, args):
+    """
+    Code that does the processing for a specific year. Refactored to separate 
+    function to allow for parallel processes
+
+    Parameters
+    ----------
+    year : int
+        the year you are currently analyzing
+    year_end : int
+        end year. This was the last year you plan to analyze
+    year_st: int 
+        This is starting year you were planning to analyze
+    doy : integer
+        Day of year
+        POOR VARIABLE NAME. SHOULD BE CHANGED. i believe it is the start doy on the start year.
+    doy_end : int
+        end day of year on the last year you plan to analyze
+        Default is None. 
+    args : dict
+        arguments passed into gnssir through commandline (or python)
+
+    """
+    if year != year_end:
+        doy_en = 366
+    else:
+        doy_en = doy_end
+
+    if year == year_st:
+        doy_list = list(range(doy, doy_en+1))
+    else:
+        doy_list = list(range(1, doy_en+1))
+
+    # so really this is looking at only a single year
+    # looping through day of year. I think? 
+    args['year'] = year
+    for doy in doy_list:
+        args['doy'] = doy
+        try:
+            guts2.gnssir_guts_v2(**args)
+        except:
+            warnings.warn(f'error processing {year} {doy}');                
+
+def process_year_dictionary(index,args,datelist):
+    """
+    Code that does the processing for a specific year. Refactored to separate
+    function to allow for parallel processes
+
+    Parameters
+    ----------
+    index: int
+        value from '0' to '4', telling you which element of args to use 
+    args : dict
+        arguments passed into gnssir through commandline (or python)
+        should have the new arguments for sublists
+    datelist : dict
+        list of dates you want to analyze in simple year, doy1, doy2 format
+        should have up to 10 sets of dates, from 0 to 9, e.g. for five processes
+        dd = { 0: [2020, 251, 260], 1:[2020, 261, 270], 2: [2020, 271, 280], 3:[2020, 281, 290], 4:[2020,291,300] }
+
+    """
+
+
+    d1 = datelist[index][0]; d2 = datelist[index][1] 
+
+    mjd_list = list(range(d1, d2+1))
+
+    # now store year and doy in args dictionary, which is somewhat silly
+    for MJD in mjd_list:
+        year, doy = g.modjul_to_ydoy(MJD)
         args['year'] = year
-        for doy in doy_list:
-            args['doy'] = doy
-            try:
-                guts2.gnssir_guts_v2(**args)
-            except:
-                warnings.warn(f'error processing {year} {doy}');                
-            #else:
-            #    print('You are trying to use the Old Way of Selecting Arcs.')
-            #    print('This is no longer supported. Update your code')
-            #guts.gnssir_guts(**args)
+        args['doy']=doy
+        print(f'Processing MJD {MJD} Year {year} DOY {doy}');
+
+        guts2.gnssir_guts_v2(**args)
+
+#        warnings.warn(f'error processing {year} {doy}');
+
 
 
 def main():

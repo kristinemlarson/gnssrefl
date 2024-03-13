@@ -42,7 +42,7 @@ requirements = [
 ]
 setup(
     name="gnssrefl",
-    version="2.5.0",
+    version="2.6.0",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",
@@ -54,6 +54,7 @@ setup(
     entry_points={
         "console_scripts": [
             "gnssir = gnssrefl.gnssir_cl:main",
+            "gnssir2 = gnssrefl.gnssir_cl2:main",
             "rinex2snr = gnssrefl.rinex2snr_cl:main",
             "daily_avg = gnssrefl.daily_avg_cl:main",
             "quickLook= gnssrefl.quickLook_cl:main",

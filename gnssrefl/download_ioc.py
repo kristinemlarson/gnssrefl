@@ -94,7 +94,12 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
     if (month1 == month2):
         newurl = url1 + station + '&timestart=' + date1 + '&timestop=' + date2 + url2
         print(newurl)
-        data = requests.get(newurl).json()
+        try:
+            data = requests.get(newurl).json()
+        except:
+            print('major problem with download - internet issue?')
+            sys.exit()
+
         NV = len(data)
         if (len(data) <= 1):
             print('No data. Exiting')
@@ -106,7 +111,12 @@ def download_ioc(station: str, date1: str, date2: str, output: str = None, plt: 
             print(d1,d2)
             newurl = url1 + station + '&timestart=' + d1 + '&timestop=' + d2 + url2
             print(newurl)
-            tdata = requests.get(newurl).json()
+            try:
+                tdata = requests.get(newurl).json()
+            except:
+                print('major problem with download - internet issue?')
+                sys.exit()
+
             if ij == 0:
                 data = tdata
             else:

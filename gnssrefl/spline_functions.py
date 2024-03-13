@@ -179,7 +179,7 @@ def readklsnrtxt(snrfile, thedir, signal):
 
     # remove the zeroes
     ii = (snrdata[:,4] != 0)
-    print('Num of obs before ', len(snrdata))
+    #print('Num of obs before ', len(snrdata))
     snrdata = snrdata[ii,:]
     print('Num of non-zero obs ', len(snrdata))
 
@@ -368,7 +368,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
             snrdata = snrdata[tfilter]
             print('Num of obs after decimation', len(snrdata))
 
-    print('sat consts before if statement', satconsts)
+    #print('sat consts before if statement', satconsts)
     # remove satellite data from non-requested constellations
     if 'satconsts' in kwargs:
         satconsts = kwargs.get('satconsts')
@@ -389,7 +389,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     if 'C' not in satconsts:
         nogal = np.logical_or(snrdata[:, 0] < 300, snrdata[:, 0] > 400)
         snrdata = snrdata[nogal]
-        print('Num of obs after Beidou removal', len(snrdata))
+        #print('Num of obs after Beidou removal', len(snrdata))
 
     # apply elevation and azimuth restrictions.   
     # KL: we usually do the DC first and then apply the restrictions DC  
@@ -403,7 +403,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     snrdata = snrdata[tfilter]
     print('Apply azimuth angle filter: ', azilims[0], azilims[1])
 
-    print('Using Lomb Scargle precision of ', precision, ' m')
+    #print('Using Lomb Scargle precision of ', precision, ' m')
     # setting up arrays for the output of the LSP
     # changed this to 12 to accommodate frequency
     #rh_arr = np.empty((0, 11))
@@ -422,11 +422,11 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     #if signal not in ['L1','L2','L5','L1+L2','L1+L5','L1+L2+L5','L1+L6','L6','L1+L2+L6','L1+L2+L5+L6']:
     #    print('code only currently works for L1, L2, L5, L6, and combinations therein- exiting')
     #    sys.exit()
-    print('Satellites:')
+    #print('Satellites:')
     satellite_list = np.unique(snrdata[:,0]); 
-    print(satellite_list)
+    #print(satellite_list)
     signal_list = signal2list(signal)
-    print('Frequencies: ', signal_list)
+    #print('Frequencies: ', signal_list)
     # make a dictionary to keep track of the constellation/frequencies that are being used
     alld = {}
     # initialize values?
@@ -779,7 +779,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
             imodel = 1 #
         dmjd = 59580 # fake number
         p,T,irefr,humidity = set_refraction_model(station, dmjd,lsp,imodel)
-        print('refraction parameters ', p,T,humidity,irefr)
+        #print('refraction parameters ', p,T,humidity,irefr)
 
     if 'rough_in' in kwargs:
         rough_in  = kwargs.get('rough_in')
@@ -803,6 +803,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     if 'outlier_limit' in kwargs:
         outlier_limit = kwargs.get('outlier_limit')
 
+    # default is 66 - originally I think david had it as a string?  
     snr_ending = 66
     if 'snr_ending' in kwargs:
         snr_ending = kwargs.get('snr_ending')
@@ -839,7 +840,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     nr,nc = snrdata.shape
     print('Number of obs', nr, ' number of days', numdays)
     if imodel == 1:
-        print('Modifying elevation angles for a simple refraction correction')
+        #print('Modifying elevation angles for a simple refraction correction')
         #print('Elevation angle before ', snrdata[0,1])
         correctedE = refr.corr_el_angles(snrdata[:,1], p,T)
         snrdata[:,1] = correctedE
@@ -852,20 +853,20 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     print(stryday)
     tobj = Time(stryday, format='yday')
     gbase = tobj.gps
-    print('>>>>  gbase value', gbase)
+    #print('>>>>  gbase value', gbase)
     # Setting up knots ...
     knots = np.linspace(gbase + int(kdt/2), gbase + numdays*86400 - int(kdt/2), int(numdays*86400/kdt))
-    print('Here be the knots:', knots)
+    #print('Here be the knots:', knots)
     print('Knot spacing in seconds ',int(kdt/2))
     print('Number of knots',int(numdays*86400/kdt))
     knots = np.append(gbase, knots)  # add start and end of day for more stable output but dont use these points
     knots = np.append(knots, gbase + numdays*86400)
 
 
-    print('Sorting snr data into arcs')
+    #print('Sorting snr data into arcs')
 
     # arguments sent directly
-    print('Begin Lomb Scargle analysis')
+    #print('Begin Lomb Scargle analysis')
     s1=time.time()
     rh_arr, snrdt_arr, fspecdict= snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year, doy, signal=signal,**kwargs)
     # should already exist
@@ -875,7 +876,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     #    subprocess.call(['mkdir',xdir])
     s2=time.time()
     print('Time spent: ',round(s2-s1,2), ' seconds')
-    print(fspecdict)
+    #print(fspecdict)
     print('Found ' + str(np.ma.size(rh_arr, axis=0)) + ' arcs')
     if screenstats:
         print(' RH(m)  Sat  Azim  Dt  Pk2noise Freq  Hours since epoch0')
@@ -924,40 +925,40 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         residuals = residuals_cubspl_spectral(kval, knots, rh_arr)
         return residuals
 
-    print('Now fitting a cubic spline to the arcs with rhdot included?')
+    #print('Now fitting a cubic spline to the arcs but rhdot not included')
     kval_0 = np.nanmean(rh_arr[:, 1]) * np.ones(len(knots))
-    print('Number of knots here ', len(knots))
+    #print('Number of knots used in ', len(knots))
     s1=time.time()
     ls_spectral = least_squares(residuals_spectral_ls, kval_0, method='trf', bounds=rhlims)
     kval_spectral = ls_spectral.x
-    print('Length of kval_spectral', len(kval_spectral))
+    #print('Length of kval_spectral', len(kval_spectral))
     invout['knots'] = knots
     invout['kval_spectral'] = kval_spectral[1:-1]  # dont save first and last points
     s2=time.time()
-    print(round(s2-s1,2), ' seconds')
+    #print('Fitting spline to LSP results took ', round(s2-s1,2), ' seconds')
     print('satellite constellations ', satconsts)
     if snrfit:
         s1=time.time()
-        print('Now doing Joakim Strandberg SNR fitting inversion')
+        #print('Now doing Joakim Strandberg SNR fitting inversion')
         kval_0 = kval_spectral
         #print('kval_0', kval_0) dont need to print htis out
         final_list, Nfreq = smarterWay(fspecdict)
         print(final_list)
-        print('Number of constellation specific frequencies', Nfreq)
+        #print('Number of constellation specific frequencies', Nfreq)
         # consts = len(satconsts)
         #kval_0 = np.append(kval_0, np.zeros(consts * 2))
         # this should be correct .... wont 
         kval_0 = np.append(kval_0, np.zeros(Nfreq* 2))
-        print('Roughness', rough_in)
+        #print('Roughness', rough_in)
         kval_0 = np.append(kval_0, rough_in)
 
         aa,bb = snrdt_arr.shape
-        print('Dimensions of the snrdt_arr variable', aa,bb)
-        print('Now sending it ', Nfreq, ' different constellation specific frequencies')
+        #print('Dimensions of the snrdt_arr variable', aa,bb)
+        #print('Now sending it ', Nfreq, ' different constellation specific frequencies')
         def residuals_js_ls(inparam):
             residuals = residuals_cubspl_js(inparam, knots, satconsts, signal, snrdt_arr,final_list,Nfreq)
             return residuals
-        print('Calling the least squares code')
+        #print('Calling the least squares code')
         ls_js = least_squares(residuals_js_ls, kval_0, method='lm')
         invout_js = ls_js.x
         kval_js = invout_js[:len(knots)]
@@ -965,7 +966,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         invout['kval_js'] = kval_js[1:-1]  # dont save first and last points
         invout['outparams_js'] = outparams_js
         s2 = time.time()
-        print('Time spend in snrfit', round(s2-s1,2), ' seconds')
+        print('Time spent in snrfit', round(s2-s1,2), ' seconds')
 
     if True:
         delta_out = 300 # seconds
@@ -1174,12 +1175,12 @@ def define_inputfile(station,year,doy,snr_ending):
         # look for gzipped file
         elif os.path.isfile(gzfile):
             # unzip it, declare success
-            print('Found gzipped version', snrfile)
+            #print('Found gzipped version', snrfile)
             subprocess.call(['gunzip',gzfile])
             snrdir = xdir
         elif os.path.isfile(xzfile):
             # unxz it, declare success
-            print('Found xz version', snrfile)
+            #print('Found xz version', snrfile)
             subprocess.call(['unxz',xzfile])
             snrdir = xdir
         else:
@@ -1728,7 +1729,7 @@ def set_refraction_model(station, dmjd,lsp,imodel):
     """
     xdir = os.environ['REFL_CODE']
     p = 0; T = 0; irefr = 0
-    print(lsp['lat'], lsp['lon'])
+    #print(lsp['lat'], lsp['lon'])
     if (imodel == 1):
         irefr = 1
         refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])

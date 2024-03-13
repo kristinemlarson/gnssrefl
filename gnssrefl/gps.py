@@ -1982,8 +1982,9 @@ def glonass_channels(f,prn):
 
 def open_outputfile(station,year,doy,extension):
     """
-    opens output file in 
-    REFL_CODE/year/results/station/extension directory
+    opens an output file in 
+    $REFL_CODE/year/results/station/extension directory
+    for lomb scargle periodogram results
 
     Parameters
     ----------
@@ -2018,9 +2019,9 @@ def open_outputfile(station,year,doy,extension):
 #   changed to a function
     filepath1,fexit = LSPresult_name(station,year,doy,extension)
     #print('Output will go to:', filepath1)
-    versionNumber = version('gnssrefl')
+    versionNumber = 'v' + str(version('gnssrefl'))
     #versionNumber = 'working-on-it'
-    tem = '% gnssrefl, https://github.com/kristinemlarson, ' + str(versionNumber) + ' \n'
+    tem = '% station ' + station + ' https://github.com/kristinemlarson/gnssrefl ' + versionNumber  + '\n'
     try:
         fout=open(filepath1,'w+')
 #       put a header in the output file
@@ -2188,6 +2189,28 @@ def diffraction_correction(el_deg, temp=20.0, press=1013.25):
 
     return corr_el_deg
 
+def ydoy2mjd(year,doy):
+    """
+    calculates modified julian day from year and day of year
+
+    Parameters
+    ----------
+    year : int
+        full year
+
+    doy : int
+        day of year
+
+    Returns
+    -------
+    mjd : float
+        modified julian day
+    """
+    yy,mm,dd, cyyyy, cdoy, YMD = ydoy2useful(year,doy)
+
+    mjd = getMJD(year,mm,dd,0)
+
+    return mjd
 
 def fdoy2mjd(year,fdoy):
     """
@@ -6670,4 +6693,26 @@ def unr_database(file1, file2, database_file):
 
     return exists_now , file1
 
+
+def modjul_to_ydoy(MJD):
+    """
+    yet another data translation function.  when will it end?
+    Modified Julian Day to Year, Doy
+
+    Parameter
+    ========
+    MJD: float
+        modified julian day
+
+    Returns
+    =======
+    year : int
+        full year
+    doy : int
+        day of year
+    """
+    year,mm,dd = mjd_to_date(MJD)
+    doy, cdoy, cyyyy, cyy = ymd2doy(year,mm,dd)
+
+    return year, doy
 

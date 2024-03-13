@@ -6,9 +6,8 @@
 .. image:: ../_static/mnis_H0.png
    :width: 500
 
-Registration
-============
-`Course Registration <https://sfb1502.de/news-events/events/external-events/gnss-ir-2024/gnss-ir-short-course-registration>`_
+Registration is Closed
+======================
 
 Agenda
 ======
@@ -18,27 +17,22 @@ Agenda
 
 The course meets each day from 12:00-14:00 Central European Time. 
 
-Other Local Times
-
-08:00-10:00 Rio de Janeiro, Buenos Aires
-
-11:00-12:00 London, Reykjavik
-
-14:00-16:00 Istanbul
-
-19:00-21:00 Singapore, Wuhan 
-
 There will be a short break at the midpoint.
 
 Before the Class Begins
 =======================
 `Install gnssrefl <https://gnssrefl.readthedocs.io/en/latest/pages/README_install.html>`_
 
-`Information from the last class <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse2024.html>`_
+`Beginner with GNSS-IR and python <https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchn.html>`_ try this
 
-Videos
-======
-`Some older videos <https://www.youtube.com/@funwithgps/videos>`_ about GNSS-IR are available on youtube. 
+`If you are familiar with GNSS-IR and python installs <https://morefunwithgps.com/public_html/gps_toolbox/SupplementFeb26.pdf>`_ try this
+
+`Some comments from the last short course <https://gnssrefl.readthedocs.io/en/latest/pages/sc_precourse2024.html>`_
+
+Lecture Material
+================
+
+`Links to videos and lecture files <https://gnssrefl.readthedocs.io/en/latest/pages/sc_media2024.html>`_ 
 
 Sponsor
 =======

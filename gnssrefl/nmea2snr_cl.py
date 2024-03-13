@@ -37,6 +37,7 @@ def main():
     the orbits being propagated to the wrong time and thus az-el values are biased. The impact on RH 
     is not necessarily large - but you should be aware. The best thing to do is remake your SNR files.  
 
+
     Parameters
     ----------
     station : str
@@ -92,7 +93,7 @@ def main():
     parser.add_argument("-dec", default=None, help="decimation, seconds", type=int)
     parser.add_argument("-lat", default=None, help="latitude, degrees", type=float)
     parser.add_argument("-lon", default=None, help="longitude, degrees", type=float)
-    parser.add_argument("-height", default=None, help="ellipsoid height,m", type=float)
+    parser.add_argument("-height", default=None, help="ellipsoid height, m", type=float)
     parser.add_argument("-sp3", default=None, help="boolean for whether sp3 orbits are used", type=str)
     parser.add_argument("-risky", default=None, help="boolean for whether sp3 orbits are used", type=str)
     parser.add_argument("-gzip", default=None, help="Gzip SNR file after creation. Default is true.", type=str)
