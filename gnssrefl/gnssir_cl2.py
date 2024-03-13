@@ -42,7 +42,7 @@ def parse_arguments():
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
     parser.add_argument("-newarcs", default=None, type=str, help="This no longer has any meaning")
-    parser.add_argument("-par", default=None, type=int, help="Number of processes ?")
+    parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
 
 
     args = parser.parse_args().__dict__
@@ -64,6 +64,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
 
+    beta version of parallel processing is now onine. If you set -par to an integer >=2, it will do processing across years, i.e. you
+    won't see any improvement unless you are trying to analyze two years of data - in which case it will
+    be twice as fast, three years of data, three times as fast.  I have added an option par=-99 which
+    only works for now on a single year. but it will create up to 10 simultaneous processes, so very slick.  
+    Ultimately of course I will put these together and make this the official version.  Huge thank you to
+    Aaryan Rampal for getting this up and running.
         
     Examples
     --------
@@ -162,6 +168,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         periodograms are computed. 1 sec is default (i.e. no decimating)
     newarcs : bool, optional
         this input no longer has any meaning 
+    par : int
+        parallel processing parameter. If an integer from 2-10, it sets up
+        2-10 processes for years, i.e. you should add at least the same number of 
+        processes as you have years. For par = -99, it sets
+        up 10 processes for jobs within that single year. Ultimately these modes will be 
+        merged so that the -99 option goes away.
 
     """
 
@@ -322,13 +334,42 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         for year in year_list:
             process_year(year, **additional_args)
     else:
-        print('Using process year with pools')
-        pool = multiprocessing.Pool(processes=par) 
-        partial_process_year = partial(process_year, **additional_args)
+        if par > 10:
+            print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
+            sys.exit()
+        if (par == -99):
+            print('Using pools with multiple lists of dates. For now only one year can be accommodating')
+            if (year != year_end):
+                print('Submit within one year for now')
+                sys.exit()
+            numproc = 10
+            # hardwire for five processes now
+            # try sending this instead of just args 
+            #d = { 0: [2020, 251, 260], 1:[2020, 261, 270], 2: [2020, 271, 280], 3:[2020, 281, 290], 4:[2020,291,300] }
+            # may end up using fewer processes ... so return numproc for that
+            d,numproc=guts2.make_parallel_proc_lists(year, doy, doy_end, numproc)
+            print(numproc)
+            print(d)
 
-        pool.map(partial_process_year, year_list)
-        pool.close()
-        pool.join()
+            index_list = list(range(numproc))
+
+            pool = multiprocessing.Pool(processes=numproc) 
+            partial_process_yearD = partial(process_year_dictionary, args=args,datelist=d)
+            pool.map(partial_process_yearD,index_list)
+
+            pool.close()
+            pool.join()
+
+        else:
+            print('Using process year with pools')
+            pool = multiprocessing.Pool(processes=par) 
+            partial_process_year = partial(process_year, **additional_args)
+            print(year_list)
+            type(partial_process_year)
+
+            pool.map(partial_process_year, year_list)
+            pool.close()
+            pool.join()
 
     t2 = time.time()
     print('Time to compute ', round(t2-t1,2))
@@ -375,6 +416,40 @@ def process_year(year, year_end, year_st, doy, doy_end, args):
             guts2.gnssir_guts_v2(**args)
         except:
             warnings.warn(f'error processing {year} {doy}');                
+
+def process_year_dictionary(index,args,datelist):
+    """
+    Code that does the processing for a specific year. Refactored to separate
+    function to allow for parallel processes
+
+    Parameters
+    ----------
+    index: int
+        value from '0' to '4', telling you which element of args to use 
+    args : dict
+        arguments passed into gnssir through commandline (or python)
+        should have the new arguments for sublists
+    datelist : dict
+        list of dates you want to analyze in simple year, doy1, doy2 format
+        should have up to 10 sets of dates, from 0 to 9, e.g. for five processes
+        dd = { 0: [2020, 251, 260], 1:[2020, 261, 270], 2: [2020, 271, 280], 3:[2020, 281, 290], 4:[2020,291,300] }
+
+    """
+
+
+    year = datelist[index][0]; d1 = datelist[index][1] ; d2 = datelist[index][2]
+
+    doy_list = list(range(d1, d2+1))
+
+    # now store year and doy in args dictionary, which is somewhat silly
+    args['year'] = year
+    for doy in doy_list:
+        print(f'processing {year} {doy}');
+        args['doy']=doy
+
+        guts2.gnssir_guts_v2(**args)
+
+#        warnings.warn(f'error processing {year} {doy}');
 
 
 
