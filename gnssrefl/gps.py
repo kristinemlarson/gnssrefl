@@ -18,6 +18,9 @@ from urllib.parse import urlparse
 import time
 from ftplib import FTP #import FTP commands from python's built-in ftp library
 from ftplib import FTP_TLS
+from random import seed
+from random import random
+
 
 # remove for now
 from importlib.metadata import version
@@ -6715,4 +6718,16 @@ def modjul_to_ydoy(MJD):
     doy, cdoy, cyyyy, cyy = ymd2doy(year,mm,dd)
 
     return year, doy
+
+
+def randomfilename():
+    """
+    makes a string -length 9 - using random number
+    generator.  useful for filenames
+    """
+    a=math.modf(random())
+    xx = int(math.floor(a[0]*1000000000))
+    # make sure it is length 9
+    rname = '{:09d}'.format(xx)
+    return rname
 
