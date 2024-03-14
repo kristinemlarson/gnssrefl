@@ -365,16 +365,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             pool.close()
             pool.join()
 
-        if not error_queue.empty():
-            print("One (or more) of the processes encountered errors. Will not proceed until errors are fixed.")
-            i = 1
-            while not error_queue.empty():
-                e = error_queue.get()
-                print(f"Error {i} type: {type(e)}. Error {i} message: {e}")
-                i += 1
-            sys.exit(1)
-
-=======
 
     t2 = time.time()
     print('Time to compute ', round(t2-t1,2))
