@@ -53,7 +53,7 @@ C:\\Users\\login\\Documents\\Docker\\refl_code\\nmea\\sph1\\2022
 
 Convert the file using the following command:
 
-`nmea2snr sph1 2022 001 -lat -30.021278 -lon -51.221390 -height 1.8`
+`nmea2snr sph1 2022 1 -lat -30.021278 -lon -51.221390 -height 1.8`
 
 You can verify the generated file at:
 
@@ -96,7 +96,7 @@ The quicklook results, QC metric and Lomb-Scargle Periodogram (LSP) can be expla
 
 To obtain one day precise water level retrievals, run:
 
-`gnssir sph1 2022 001`
+`gnssir sph1 2022 1`
 
 Generated results at:
 
@@ -137,7 +137,7 @@ mv 220107.LOG sph10070.22.A
 
 To convert NMEA data, do:
 
-`nmea2snr sph1 2022 001 -doy_end 007 -lat -30.021278 -lon -51.221390 -height 1.8`
+`nmea2snr sph1 2022 1 -doy_end 7 -lat -30.021278 -lon -51.221390 -height 1.8`
 
 Creating a configuration file
 
@@ -147,7 +147,7 @@ We choose an appropriate azimuth interval based on one-day results.
 
 To obtain multiple days of precise water level retrievals, with decimation value in seconds, run:
 
-`gnssir sph1 2022 001 -doy_end 007 -dec 10`
+`gnssir sph1 2022 1 -doy_end 7 -dec 10`
 
 To list all generate results, do:
 
@@ -163,9 +163,9 @@ To plot water level results to each satellite
 
 Calculate the hourly moving average
 
-`subdaily sph1 2022 -delta_out 3600 -rhdot true`
+`subdaily sph1 2022 -delta_out 3600 `
 
-For hourly smooth output, use delta_out parameter (in seconds). To apply vertical velocity correction use the rhdot parameter.
+For hourly-smooth output, use delta_out parameter (in seconds). 
 
 Plot of regularly spaced water level, hourly moving average data:
 
