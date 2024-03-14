@@ -331,6 +331,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     t1 = time.time()
     if not par: 
         # analyze one year at a time in the current code
+        # FWIW, this should be changed to MJD too.  
         for year in year_list:
             process_year(year, **additional_args)
     else:
@@ -342,8 +343,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             d,numproc=guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
             print(d)
 
-            #d,numproc=guts2.make_parallel_proc_lists(year, doy, doy_end, numproc)
-
             # make a list of process IDs
             index_list = list(range(numproc))
 
@@ -351,18 +350,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             partial_process_yearD = partial(process_year_dictionary, args=args,datelist=d)
             pool.map(partial_process_yearD,index_list)
 
-            pool.close()
-            pool.join()
-
-        if False:
-            # I think we can get rid of this now and use MJD for both parts ...
-            print('Using process year with pools')
-            pool = multiprocessing.Pool(processes=par) 
-            partial_process_year = partial(process_year, **additional_args)
-            print(year_list)
-            type(partial_process_year)
-
-            pool.map(partial_process_year, year_list)
             pool.close()
             pool.join()
 
