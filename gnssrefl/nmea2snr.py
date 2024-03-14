@@ -183,7 +183,9 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, gzip):
     print('Leap second offset ', offset)
 
     if sp3 :
-        tmpfile =  station + 'tmp.txt'
+       # this tmpfile has a terrible name.  
+        #tmpfile =  station + 'tmp.txt'
+        tmpfile = g.randomfilename() + '.txt'
         timetags = np.unique(T)
 
         xT = np.asarray(T)
