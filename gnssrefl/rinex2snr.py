@@ -6,6 +6,8 @@ from scipy.interpolate import interp1d
 import subprocess
 import sys
 import time
+import multiprocessing
+from functools import partial
 
 
 # progress bar for RINEX translation/orbits
@@ -58,7 +60,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
-        mk,skipit,stream,strip,bkg,screenstats,gzip):
+        mk,skipit,stream,strip,bkg,screenstats,gzip,par):
     """
     main code to convert RINEX files into SNR files 
 
@@ -128,6 +130,9 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
 
     gzip: bool
          whether SNR files are gzipped after creation
+
+    par: int
+         amount of parallel processes to run 
     """
     #
     # do not allow illegal skipit values
@@ -161,8 +166,112 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     doy_st = doy_list[0]
     doy_end = doy_list[-1]
 
-# loop thru years and days
-    for year in year_list:
+    # queue which handles any exceptions any of the processes encounter
+    manager = multiprocessing.Manager()
+    error_queue = manager.Queue()
+    args = { "station": station, "doy_list": doy_list, "isnr": isnr, "orbtype": orbtype, "rate": rate, 
+            "dec_rate": dec_rate, "archive": archive, "fortran": fortran, "nol": nol, 
+            "overwrite": overwrite, "translator": translator, "srate": srate, "mk": mk, "skipit": skipit, 
+            "stream": stream, "strip": strip, "bkg": bkg, "screenstats": screenstats, "gzip": gzip, 
+            "year_st": year_st, "year_end": year_end, "doy_st": doy_st, "doy_end": doy_end, "version": version, "error_queue": error_queue }
+
+    if not par: 
+        for year in year_list:
+            process_year(year, **args)
+    else:
+        if par > 10:
+            print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
+            sys.exit()
+        else:
+            pool = multiprocessing.Pool(processes=par) 
+            partial_process_year = partial(process_year, **args)
+
+            pool.map(partial_process_year, year_list)
+            pool.close()
+            pool.join()
+
+    if not error_queue.empty():
+        print("One (or more) of the processes encountered errors. Will not proceed until errors are fixed.")
+        i = 1
+        while not error_queue.empty():
+            e = error_queue.get()
+            print(f"Error {i} type: {type(e)}. Error {i} message: {e}")
+            i += 1
+        sys.exit(1)
+
+def process_year(year, station, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate, 
+mk, skipit, stream, strip, bkg, screenstats, gzip, year_st, year_end, doy_st, doy_end, version, error_queue):
+    """
+    Code that does the processing for a specific year. Refactored to seperate function to allow for parallel processes
+
+    Parameters
+    ----------
+    year : int
+        the year to be analyzed
+
+    station : str
+        4 or 9 character station name. 6 ch allowed for japanese archive
+        9 means it is a RINEX 3 file
+
+    doy_list : list of integers
+        doys to be analyzed
+
+    isnr : int
+        SNR file type choice
+
+    orbtype : str
+        orbit type, e.g. nav, rapid, gnss
+
+    rate : str
+        general sample rate.
+        high: use 1-Hz area in the archive
+        low: use default area in the archive
+
+    dec_rate : integer
+         decimation value
+
+    archive : str
+        choice of GNSS archive
+
+    fortran : bool
+        whether the fortran rinex translator is to be used
+        default: false
+
+    nol: bool
+        True: assumes RINEX files are in local directory
+        False (default): will look at multiple - or specific archive
+
+    overwrite: bool
+        False (default): if SNR file exists, SNR file not made
+        True: make a new SNR file
+
+    translator : str
+        hybrid (default), fortran, or python
+        hybrid uses fortran within the python code
+
+    srate : int
+        sample rate for RINEX 3 files
+
+    mk : boolean
+        makan option
+
+    skipit : int
+         skips making files every day, so a value of 7 means weekly.  1 means do every day
+
+    strip : bool
+         reduces observables to only SNR (too many observables, particularly in RINEX 2 files
+         will break the RINEX translator)
+
+    bkg : str
+         location of bkg files, EUREF or IGS
+
+    screenstats: bool
+         whether print statements come to screen
+
+    gzip: bool
+         whether SNR files are gzipped after creation
+    """
+    try:
         ann = g.make_nav_dirs(year)
         cyyyy = str(year)
         dec31 = g.dec31(year)
@@ -211,7 +320,7 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
                 if nol:
                     current_local = os.getcwd()
-                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is located here :', current_local)
+                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is :', current_local)
                     # this assumes RINEX file is in local directory or "nearby"
                     if version == 2:
 
@@ -257,20 +366,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             if screenstats: 
                                 print('Try to gunzip ', r3gz)
                             subprocess.call(['gunzip', r3gz])
-
-                        # have not found the rinex 3 file
-                        if not os.path.exists(r3):
-                            local_rinex3_dir  = os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
-                            print('try looking for RINEX 3 in ', local_rinex3_dir)
-                            lrinex3 = local_rinex3_dir+r3
-                            if os.path.exists(lrinex3):
-                                subprocess.call(['cp', lrinex3, '.'])
-                            else:
-                                lrinex3 = local_rinex3_dir+r3cmpgz
-                                if os.path.exists(lrinex3):
-                                    subprocess.call(['cp', lrinex3, '.']); 
-                                    deletecrx = True
-                                    translated, rnx_filename = go_from_crxgz_to_rnx(r3cmpgz,deletecrx)
                         if os.path.exists(r3):
                             rinext =float(np.loadtxt(r3,usecols=0,dtype='str',max_rows=1))
                             print('Apparent Rinex version', rinext)
@@ -286,9 +381,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                             else:
                                 print('Something about the RINEX 3-2 conversion did not work')
                         else:
-                            print('You Chose the No Look Option, but did not provide the needed RINEX3 file ', r3)
-                            print('I looked for files ending with rnx, rnx.gz, and crx.gz in the local directory')
-                            print('I looked for files ending with rnx and crx.gz in $REFL_CODE/YYYY/rinex for your station')
+                            print('You Chose the No Look Option, but did not provide the needed RINEX3 file.')
+                            print('I assumed its name was ', r3)
 
                 else:
                     if screenstats:
@@ -373,6 +467,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                         print(station, ' year:', year, ' doy:', doy, ' from: ', archive, ' rate:', rate, ' orb:', orbtype)
                         # this is rinex version 2 - finds rinex and converts it
                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
+    except Exception as e:
+        error_queue.put(e)
 
 
 def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,fortran,translator):
