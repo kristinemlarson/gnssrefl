@@ -325,7 +325,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # changed to better describe year and doy start/end
 
     print('Requested frequencies ', lsp['freqs'])
-    additional_args = { "year_end": year_end, "year_st": year_st, "doy": doy, "doy_end": doy_end, "args": args }
+
+# queue which handles any exceptions any of the processes encounter
+    manager = multiprocessing.Manager()
+    error_queue = manager.Queue()
+    additional_args = { "year_end": year_end, "year_st": year_st, "doy": doy, "doy_end": doy_end, "args": args, "error_queue": error_queue }
+
 
 
     t1 = time.time()
@@ -347,7 +352,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             index_list = list(range(numproc))
 
             pool = multiprocessing.Pool(processes=numproc) 
-            partial_process_yearD = partial(process_year_dictionary, args=args,datelist=d)
+            partial_process_yearD = partial(process_year_dictionary, args=args,datelist=d,error_queue = error_queue)
             pool.map(partial_process_yearD,index_list)
 
             pool.close()
@@ -365,11 +370,19 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             pool.close()
             pool.join()
 
+        if not error_queue.empty():
+            print("One (or more) of the processes encountered errors. Will not proceed until errors are fixed.")
+            i = 1
+            while not error_queue.empty():
+                e = error_queue.get()
+                print(f"Error {i} type: {type(e)}. Error {i} message: {e}")
+                i += 1
+            sys.exit(1)
 
     t2 = time.time()
     print('Time to compute ', round(t2-t1,2))
 
-def process_year(year, year_end, year_st, doy, doy_end, args):
+def process_year(year, year_end, year_st, doy, doy_end, args,error_queue):
     """
     Code that does the processing for a specific year. Refactored to separate 
     function to allow for parallel processes
@@ -392,27 +405,30 @@ def process_year(year, year_end, year_st, doy, doy_end, args):
         arguments passed into gnssir through commandline (or python)
 
     """
-    if year != year_end:
-        doy_en = 366
-    else:
-        doy_en = doy_end
+    try:
+        if year != year_end:
+            doy_en = 366
+        else:
+            doy_en = doy_end
 
-    if year == year_st:
-        doy_list = list(range(doy, doy_en+1))
-    else:
-        doy_list = list(range(1, doy_en+1))
+        if year == year_st:
+            doy_list = list(range(doy, doy_en+1))
+        else:
+            doy_list = list(range(1, doy_en+1))
 
     # so really this is looking at only a single year
     # looping through day of year. I think? 
-    args['year'] = year
-    for doy in doy_list:
-        args['doy'] = doy
-        try:
-            guts2.gnssir_guts_v2(**args)
-        except:
-            warnings.warn(f'error processing {year} {doy}');                
+        args['year'] = year
+        for doy in doy_list:
+            args['doy'] = doy
+            try:
+                guts2.gnssir_guts_v2(**args)
+            except:
+                warnings.warn(f'error processing {year} {doy}');                
+    except Exception as e:
+        error_queue.put(e)
 
-def process_year_dictionary(index,args,datelist):
+def process_year_dictionary(index,args,datelist,error_queue):
     """
     Code that does the processing for a specific year. Refactored to separate
     function to allow for parallel processes
@@ -432,21 +448,24 @@ def process_year_dictionary(index,args,datelist):
     """
 
 
-    d1 = datelist[index][0]; d2 = datelist[index][1] 
+    try:
+        d1 = datelist[index][0]; d2 = datelist[index][1] 
 
-    mjd_list = list(range(d1, d2+1))
+        mjd_list = list(range(d1, d2+1))
 
     # now store year and doy in args dictionary, which is somewhat silly
-    for MJD in mjd_list:
-        year, doy = g.modjul_to_ydoy(MJD)
-        args['year'] = year
-        args['doy']=doy
-        print(f'Processing MJD {MJD} Year {year} DOY {doy}');
+        for MJD in mjd_list:
+            year, doy = g.modjul_to_ydoy(MJD)
+            args['year'] = year
+            args['doy']=doy
+            print(f'Processing MJD {MJD} Year {year} DOY {doy}');
 
-        guts2.gnssir_guts_v2(**args)
+            guts2.gnssir_guts_v2(**args)
 
 #        warnings.warn(f'error processing {year} {doy}');
 
+    except Exception as e:
+        error_queue.put(e)
 
 
 def main():
