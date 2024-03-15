@@ -304,13 +304,13 @@ def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays,gzip):
     """
     if gzip:
         if (os.path.isfile(obsfile) == True):
-            subprocess.call(['gzip', obsfile])
+            subprocess.call(['gzip', '-f', obsfile])
         if (os.path.isfile(obsfile2) == True and twoDays == True):
-            subprocess.call(['gzip', obsfile2])
+            subprocess.call(['gzip', '-f', obsfile2])
     else:
         # this is only for xz compression
         if wantCompression:
             if (os.path.isfile(obsfile) == True):
-                subprocess.call(['xz', obsfile])
+                subprocess.call(['xz', '-f', obsfile])
             if (os.path.isfile(obsfile2) == True and twoDays == True):
-                subprocess.call(['xz', obsfile2])
+                subprocess.call(['xz', '-f', obsfile2])
