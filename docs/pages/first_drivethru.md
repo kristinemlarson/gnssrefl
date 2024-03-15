@@ -30,7 +30,9 @@
 
 * [Lake Yellowstone, USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p709.html)
 
-* [Wesel, Germany](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_wesl.html)
+* [Guaiba Lake, Brazil (low-cost)](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_sph1.html)
+
+* [Wesel, Germany (low-cost)](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_wesl.html)
 
 ## Soil Moisture 
 

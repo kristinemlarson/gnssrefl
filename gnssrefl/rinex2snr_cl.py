@@ -152,7 +152,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         it will not search anywhere else for the file.  It should be a 30 sec, 1 day file 
         for this example
 
-    rinex2snr mchl00aus 2022 15  -orb rapid -samplerate 1 -nolook T -stream S
+    rinex2snr mchl00aus 2022 15  -orb rapid -samplerate 1 -nolook T -stream S -rate high
         This should analyze a RINEX 3 file if it exists in your local working directory.
         it will not search anywhere else for the file.  It should be a 1 sec, 1 day file 
         for this example with S being set for streaming in the filename.
@@ -480,7 +480,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     #highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  
     # adding spanish
     highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes']  
-
     if ns == 9:
         # rinex3
         if rate == 'high':

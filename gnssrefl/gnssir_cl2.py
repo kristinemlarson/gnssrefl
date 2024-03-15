@@ -326,6 +326,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     print('Requested frequencies ', lsp['freqs'])
 
+
     # queue which handles any exceptions any of the processes encounter
     manager = multiprocessing.Manager()
     error_queue = manager.Queue()
@@ -334,6 +335,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     t1 = time.time()
     if not par: 
         # analyze one year at a time in the current code
+        # FWIW, this should be changed to MJD too.  
         for year in year_list:
             process_year(year, **additional_args)
     else:
@@ -345,13 +347,13 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             d,numproc=guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
             print(d)
 
-            #d,numproc=guts2.make_parallel_proc_lists(year, doy, doy_end, numproc)
-
             # make a list of process IDs
             index_list = list(range(numproc))
 
             pool = multiprocessing.Pool(processes=numproc) 
+
             partial_process_yearD = partial(process_year_dictionary, args=args,datelist=d, error_queue = error_queue)
+
             pool.map(partial_process_yearD,index_list)
 
             pool.close()
@@ -380,6 +382,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     t2 = time.time()
     print('Time to compute ', round(t2-t1,2))
+
 
 def process_year(year, year_end, year_st, doy, doy_end, args, error_queue):
     """
@@ -417,6 +420,7 @@ def process_year(year, year_end, year_st, doy, doy_end, args, error_queue):
 
         # so really this is looking at only a single year
         # looping through day of year. I think? 
+
         args['year'] = year
         for doy in doy_list:
             args['doy'] = doy
@@ -452,7 +456,9 @@ def process_year_dictionary(index,args,datelist,error_queue):
 
         mjd_list = list(range(d1, d2+1))
 
+
         # now store year and doy in args dictionary, which is somewhat silly
+ 
         for MJD in mjd_list:
             year, doy = g.modjul_to_ydoy(MJD)
             args['year'] = year
@@ -465,6 +471,8 @@ def process_year_dictionary(index,args,datelist,error_queue):
     except Exception as e:
         error_queue.put(e)
 
+    except Exception as e:
+        error_queue.put(e)
 
 
 def main():
