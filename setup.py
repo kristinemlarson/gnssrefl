@@ -54,7 +54,7 @@ setup(
     entry_points={
         "console_scripts": [
             "gnssir = gnssrefl.gnssir_cl:main",
-            "gnssir2 = gnssrefl.gnssir_cl2:main",
+            "gnssir_old = gnssrefl.gnssir_cl_old:main",
             "rinex2snr = gnssrefl.rinex2snr_cl:main",
             "daily_avg = gnssrefl.daily_avg_cl:main",
             "quickLook= gnssrefl.quickLook_cl:main",
