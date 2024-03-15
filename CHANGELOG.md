@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.0.0
+
+parallel processing for gnssir, makes it much much faster
+
 ## 2.6.0
 
 beta version of multi-processing for gnssir. It is called gnssir2 for now. I will
