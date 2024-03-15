@@ -11,6 +11,7 @@ from functools import partial
 #import gnssrefl.gnssir as guts
 import gnssrefl.gnssir_v2 as guts2
 import gnssrefl.gps as g
+import gnssrefl.refraction as refr
 
 from gnssrefl.utils import str2bool
 
@@ -75,6 +76,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     --------
     gnssir p041 2021 15 
         analyzes the data for station p041, year 2021 and day of year 15.
+    gnssir p041 2021 1 -doy_end 100 -par 10
+        analyze 100 days of data - but spawn 10 processes at a time. Big time saver.
     gnssir p041 2021 15  -snr 99
         uses SNR files with a 99 suffix
     gnssir p041 2021 15  -plt T
@@ -179,13 +182,25 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
+    xdir = str(os.environ['REFL_CODE'])
 
     exitS = g.check_inputs(station, year, doy, snr)
 
     if exitS:
         sys.exit()
 
+    # check this now before spawning multi-processor jobs
+    if year_end is None:
+        g.result_directories(station,year,extension)
+    else:
+        for y in range(year, year_end+1):
+            g.result_directories(station,y,extension)
+
     lsp = guts2.read_json_file(station, extension)
+
+    # make a refraction file you will need later
+    refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
+
     # now check the overrides to the json instructions
 
     # requiring people use the new code
@@ -193,8 +208,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         print('An azval2 variable was not found in your json input file. Fix your json ')
         print('and/or use gnssir_input to make a new one. Exiting')
         sys.exit()
-
-
 
     # plt is False unless user changes
     lsp['plt_screen'] = plt
@@ -279,7 +292,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     if 'refr_model' not in lsp.keys():
         lsp['refr_model'] = 1
 
-    xdir = str(os.environ['REFL_CODE'])
     picklefile = 'gpt_1wA.pickle'
     pname = xdir + '/input/' + picklefile
 

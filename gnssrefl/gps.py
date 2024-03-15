@@ -4374,10 +4374,6 @@ def big_Disk_work_hard(station,year,month,day):
     # want to merge the hourly files into this filename
     rinexfile =  station + cdoy + '0.' + cyy + 'o'
     exc = teqc_version()
-    if not os.path.exists(exc):
-        print('teqc is used for this subroutine - it does not exist, so exiting.')
-        print('Please help us by submitting a pull request.')
-        sys.exit()
 
     let = 'abcdefghijklmnopqrstuvwxyz';
     alist = [exc]
@@ -4394,6 +4390,10 @@ def big_Disk_work_hard(station,year,month,day):
             alist.append(fname)
             blist.append(fname)
 
+    if not os.path.exists(exc):
+        print('teqc is used for this subroutine - it does not exist, so exiting.')
+        print('Please help us by submitting a pull request.')
+        sys.exit()
     print(alist)
     fout = open(rinexfile,'w')
     subprocess.call(alist,stdout=fout)
