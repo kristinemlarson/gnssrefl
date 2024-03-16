@@ -42,7 +42,7 @@ requirements = [
 ]
 setup(
     name="gnssrefl",
-    version="3.0.0",
+    version="3.1.0",
     author="Kristine Larson",
     author_email="kristinem.larson@gmail.com",
     description="A GNSS reflectometry software package ",

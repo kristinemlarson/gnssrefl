@@ -57,10 +57,11 @@ def quickname(station,year,cyy, cdoy, csnr):
 
     return fname
 
-def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate,
-        mk,skipit,stream,strip,bkg,screenstats,gzip):
+def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate, 
+                  mk, stream,strip,bkg,screenstats,gzip):
     """
     main code to convert RINEX files into SNR files 
+    now works on a single year and doy
 
     Parameters
     ----------
@@ -68,11 +69,11 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         4 or 9 character station name. 6 ch allowed for japanese archive
         9 means it is a RINEX 3 file
 
-    year_list : list of int
-        years to be analyzed
+    year : int
+        full year 
 
-    doy_list : list of integers
-        doys to be analyzed
+    doy : int 
+        day of year
 
     isnr : int
         SNR file type choice
@@ -113,9 +114,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
     mk : boolean
         makan option
 
-    skipit : int
-         skips making files every day, so a value of 7 means weekly.  1 means do every day
-
     strip : bool
          reduces observables to only SNR (too many observables, particularly in RINEX 2 files
          will break the RINEX translator)
@@ -130,9 +128,6 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
          whether SNR files are gzipped after creation
     """
     #
-    # do not allow illegal skipit values
-    if skipit < 1:
-        skipit = 1
 
     NS = len(station)
     if (NS == 4):
@@ -155,28 +150,13 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
         print('Illegal station input - Station must have 4,6,or 9 characters. Exiting')
         sys.exit()
 
-    year_st = year_list[0]
-    year_end = year_list[-1]
 
-    doy_st = doy_list[0]
-    doy_end = doy_list[-1]
-
-# loop thru years and days
-    for year in year_list:
+# old loop thru years and days - will fix later. now avoiding retyping
+    if True:
         ann = g.make_nav_dirs(year)
         cyyyy = str(year)
         dec31 = g.dec31(year)
-        if year != year_end:
-            doy_en = dec31
-        else:
-            doy_en = doy_end
-
-        if year == year_st:
-            doy_list = list(range(doy_st, doy_en+1,skipit))
-        else:
-            doy_list = list(range(1, doy_en+1,skipit))
-
-        for doy in doy_list:
+        if True:
             csnr = str(isnr)
             cdoy = '{:03d}'.format(doy)
             if (year<2000):
@@ -185,6 +165,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 cyy = '{:02d}'.format(year-2000)
             # first, check to see if the SNR file exists
             fname =  quickname(station,year,cyy,cdoy,csnr)
+            if screenstats:
+                print(fname)
             # now it unzips if that version exists
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
@@ -209,6 +191,8 @@ def run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,arc
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
                 localpath2 =  os.environ['REFL_CODE'] + '/' + cyyyy + '/rinex/' + station + '/'
+                if screenstats:
+                    print(localpath2)
                 if nol:
                     current_local = os.getcwd()
                     print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is located here :', current_local)

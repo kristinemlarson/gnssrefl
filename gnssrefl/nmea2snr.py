@@ -10,57 +10,13 @@ from scipy.interpolate import interp1d
 import gnssrefl.gps as g
 import gnssrefl.decipher_argt as gt
 
-#Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
-
-def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, gzip):
+def nmea_apriori_coords(station,llh,sp3):
     """
-    Reads and translates the NMEA file stored in locdir + fname
-
-    Naming convention assumed for NMEA files :  SSSS1520.23.A
-
-    where SSSS is station name, day of year is 152 and year is 2023
-
-    locdir is generally $REFL_CODE/nmea/SSSS/yyyy where yyyy is the year number and SSSS is the station name
-
-    I believe lowercase is also allowed, but the A at the end is still set to be upper case
-
-    (I believe) The SNR files are stored with upper case if given upper case, lower case if given lower case.
-
-
-    Parameters
-    -----------
-    locdir : str
-        directory where your NMEA files are kept
-    fname : str
-        NMEA filename 
-    snrfile : str
-        name of output file for SNR data
-    csnr : str
-        snr option, i.e. '66' or '99'
-    dec : int
-        decimation value in seconds
-    year : int
-        full year
-    doy : int
-        day of year
-    llh : list of floats
-        station location, lat (deg), lon(deg), height (m)
-    sp3 : bool
-        whether you use multi-GNSS sp3 file to do azimuth elevation angle calculations
-        currently this only uses the GFZ rapid orbit.  
-    gzip: bool
-        gzip compress snrfiles. No idea if it is used here ...
-        as this compression should happen in the calling function, not here
-        
     """
-    
-    idec = int(dec)
-    missing = True
-    station = fname.lower() ; station = station[0:4]
-    yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
-    
     foundcoords = False
-    if (llh[0] != 0):
+    recv = [0,0,0]
+    # you input the coordinates on the command line
+    if (llh[0] is not None) & (llh[1] is not None) & (llh[2] is not None):
         # compute Cartesian receiver coordinates in meters
         x,y,z = g.llh2xyz(llh[0],llh[1],llh[2])
         recv = [x,y,z]
@@ -91,6 +47,61 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, llh, sp3, gzip):
             print('make a json file using gnssir_input.  Exiting')
             sys.exit()
 
+    # if coordinates not found you are using low quality NMEA az el and thus do not need
+    # a priori coordinates
+    if foundcoords:
+        print('Cartesian coordinates ', recv)
+
+    return recv, foundcoords
+
+#Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
+
+def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, sp3, recv, gzip):
+    """
+    Reads and translates the NMEA file stored in locdir + fname
+
+    Naming convention assumed for NMEA files :  SSSS1520.23.A
+
+    where SSSS is station name, day of year is 152 and year is 2023
+
+    locdir is generally $REFL_CODE/nmea/SSSS/yyyy where yyyy is the year number and SSSS is the station name
+
+    KL I believe lowercase is also allowed, but the A at the end is still set to be upper case
+
+    (I believe) The SNR files are stored with upper case if given upper case, lower case if given lower case.
+
+
+    Parameters
+    -----------
+    locdir : str
+        directory where your NMEA files are kept
+    fname : str
+        NMEA filename 
+    snrfile : str
+        name of output file for SNR data
+    csnr : str
+        snr option, i.e. '66' or '99'
+    dec : int
+        decimation value in seconds
+    year : int
+        full year
+    doy : int
+        day of year
+    sp3 : bool
+        whether you use multi-GNSS sp3 file to do azimuth elevation angle calculations
+    recv : list of floats
+        a priori Cartesian station coordinates for people using high quality orbits
+    gzip: bool
+        gzip compress snrfiles. No idea if it is used here ...
+        as this compression should happen in the calling function, not here
+        
+    """
+    
+    idec = int(dec)
+    missing = True
+    station = fname.lower() ; station = station[0:4]
+    yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
+    
     if sp3:
         # first try to find precise because they have beidou
         xf,orbdir,foundit=g.gbm_orbits_direct(year,month,day)
@@ -764,9 +775,9 @@ def elev_limits(snroption):
 
     return emin, emax
   
-def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, gzip):
+def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, sp3, gzip):
     """
-    runs the nmea2snr conversion code
+    runs the nmea2snr conversion code - ONE DAY AT A TIME (2024 March 16)
 
     Looks for NMEA files in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023.
     I prefer lowercase station names, but I believe the code allows both upper and lower
@@ -783,10 +794,10 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, g
     ----------
     station : str
         4 ch name of station 
-    year_list : list of integers
-        years 
-    doy_list : list of days of year
-        days of years
+    year : int
+        full year 
+    doy : int
+        day of year
     isnr : int
         snr file type
     overwrite : bool
@@ -801,19 +812,14 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, g
         whether snrfiles are gzipped after creation
 
     """
-    # loop over years and day of years
-    for yr in year_list:
-        
-        locdir= os.environ['REFL_CODE'] + '/nmea/' + station + '/' + str(yr) + '/'
-        for dy in doy_list:
-            csnr = str(isnr)
-            cdoy = '{:03d}'.format(dy)
-            if (yr < 2000):
-                cyy = '{:02d}'.format(yr-1900)
-            else:
-                cyy = '{:02d}'.format(yr-2000)
-            snrfile =  quickname(station,yr,cyy,cdoy,csnr)#snr filename
-            snre = g.snr_exist(station,yr,dy,csnr)#check if snrfile already sxists
+    # avoiding makan's loops - but using True to avoid re-indenting
+    if True:
+        locdir= os.environ['REFL_CODE'] + '/nmea/' + station + '/' + str(year) + '/'
+        if True:
+            yy,mm,dd, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
+            csnr = str(isnr) ; cyy =  cyyyy[2:4]
+            snrfile =  quickname(station,year,cyy,cdoy,csnr)#snr filename
+            snre = g.snr_exist(station,year,doy,csnr)#check if snrfile already sxists
             if snre:
                 if overwrite:
                     print('SNR file exists, but you requested it be overwritten')
@@ -828,14 +834,14 @@ def run_nmea2snr(station, year_list, doy_list, isnr, overwrite, dec, llh, sp3, g
                     print('SNR file already exists', snrfile)
         
             illegal_day = False
-            if (float(dy) > g.dec31(yr)):
+            if ( doy > g.dec31(year) ):
                 illegal_day = True
         
             if (not illegal_day) and (not snre):
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
                     #print('Creating '+snrfile)
-                    NMEA2SNR(locdir, r, snrfile, csnr, dec, yr, dy, llh, sp3, gzip)
+                    NMEA2SNR(locdir, r, snrfile, csnr, dec, year, doy, llh, sp3, gzip)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
                     if os.path.isfile(locdir + r ):

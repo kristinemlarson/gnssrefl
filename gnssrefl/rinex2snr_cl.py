@@ -10,8 +10,9 @@ f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
 
 import argparse
 import os
-import time
+import subprocess
 import sys
+import time
 
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rnx
@@ -92,7 +93,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     that you use this option, but it is there.
 
     For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory. It 
-    checks the $REFL_CODE/YYYY/rinex directory for the crx.gz and rnx versions. 
+    also checks the $REFL_CODE/YYYY/rinex directory for the crx.gz and rnx versions. 
     It looks like I do not delete the RINEX 3 files (though I do delete the RINEX 2.11 files).
 
     FAQ: what is rate anad srate?  rate is telling the code which folder to use because archives always have 
@@ -336,7 +337,20 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     # make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
+    xdir = os.environ['REFL_CODE']
     #
+    if doy_end is None:
+        doy_end = doy
+    if year_end is None:
+        year_end = year
+
+    # make sure directories are there for orbit files and snr files
+    for y in range(year, year_end+1):
+        ann = g.make_nav_dirs(y)
+        f1 = xdir + '/' + str(y) + '/snr/' + station[0:4]
+        if not os.path.isdir(f1):
+            print('make output directory for snr files in ', y)
+            subprocess.call(['mkdir','-p',f1])
 
     # when multi-GNSS orbits are reliably available
     gfz_avail = 2021 + 137/365.25
@@ -451,12 +465,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         print('rate not set to either "low" or "high". Exiting')
         sys.exit()
 
-    if doy_end is None:
-        doy2 = doy
-    else:
-        doy2 = doy_end
-
-
     bkg = 'EUREF' # just so the code doesn't crash later on when variable
     # is sent to rinex2snr
     if 'bkg' in archive:
@@ -472,13 +480,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         archive = 'bkg'
 
 
-    # no longer allow the all option
-    # unavco is only rinex2
-    # ga is only rinex3
-    # bkg is only rinex 3
-    # i cannot remember for nrcan. it is probably rinex2
-    #highrate_list = ['unavco', 'nrcan', 'cddis','ga','bkg']  
-    # adding spanish
+    # adding spanish archive
     highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes']  
     if ns == 9:
         # rinex3
@@ -510,12 +512,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
                 print(archive_list)
                 sys.exit()
 
-    year1 = year
-    if year_end is None:
-        year2 = year 
-    else:
-        year2 = year_end
-
 # the weekly option
     skipit = 1
     if weekly:
@@ -525,10 +521,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         print('You have invoked the monthly option')
         skipit = 30
 
-    # this makes the correct lists in the function
-    doy_list = [doy, doy2]
-    year_list = list(range(year1, year2+1))
-
     # the Makan option
     if mk:
         print('You have invoked the Makan option')
@@ -536,16 +528,19 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if stream not in ['R', 'S']:
         stream = 'R'
 
-    args = {'station': station, 'year_list': year_list, 'doy_list': doy_list, 'isnr': snr, 'orbtype': orb,
-            'rate': rate, 'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook,
-            'overwrite': overwrite, 'translator': translator, 'srate': samplerate, 'mk': mk,
-            'skipit': skipit, 'stream': stream, 'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip}
-
+    MJD1 = int(g.ydoy2mjd(year,doy))
+    MJD2 = int(g.ydoy2mjd(year_end,doy_end))
     s1 = time.time()
-    rnx.run_rinex2snr(**args)
+    for mjd in range(MJD1, MJD2+1,skipit):
+        y, d = g.modjul_to_ydoy(mjd)
+        args = {'station': station, 'year':y, 'doy':d, 'isnr': snr, 'orbtype': orb, 'rate': rate, 
+                'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook, 'overwrite': overwrite, 
+                'translator': translator, 'srate': samplerate, 'mk': mk, 'stream': stream, 
+                'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip}
+        rnx.run_rinex2snr(**args)
+
     s2 = time.time()
     print('That took ', round(s2-s1,2), ' seconds')
-    #print('Feedback written to subdirectory logs')
 
 
 def main():

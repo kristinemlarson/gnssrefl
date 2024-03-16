@@ -4343,14 +4343,14 @@ def nicerTime(UTCtime):
     return T
 
 
-def big_Disk_work_hard(station,year,month,day):
+def big_Disk_work_hard(station,year,month,day,delete_hourly):
     """
     Attempts to pick up subdaily RINEX 2.11 files from the NGS archive
     creates a single RINEX file
 
     If day is 0, then month is presumed to be the day of year
 
-    Requires teqc
+    Requires gfzrnx for merging.
 
     Parameters
     ----------
@@ -4363,6 +4363,8 @@ def big_Disk_work_hard(station,year,month,day):
     day: integer
         day
 
+    delete_hourly : bool
+        whether hourly files are deleted
     """
     if (day == 0):
         doy = month
@@ -4373,11 +4375,9 @@ def big_Disk_work_hard(station,year,month,day):
 
     # want to merge the hourly files into this filename
     rinexfile =  station + cdoy + '0.' + cyy + 'o'
-    exc = teqc_version()
 
     let = 'abcdefghijklmnopqrstuvwxyz';
-    alist = [exc]
-    blist = ['rm']
+    alist = []
     for i in range(0,24):
         idtag = let[i:i+1]
         fname= station + cdoy + idtag + '.' + cyy + 'o'
@@ -4386,22 +4386,24 @@ def big_Disk_work_hard(station,year,month,day):
             big_Disk_in_DC_hourly(station, year, month, day,idtag) 
         else:
             print(fname, ' exists')
-        if os.path.isfile(fname):
             alist.append(fname)
-            blist.append(fname)
 
-    if not os.path.exists(exc):
-        print('teqc is used for this subroutine - it does not exist, so exiting.')
-        print('Please help us by submitting a pull request.')
-        sys.exit()
-    print(alist)
-    fout = open(rinexfile,'w')
-    subprocess.call(alist,stdout=fout)
-    fout.close()
-    print('file created: ', rinexfile)
-    # should delete the hourly files
-    subprocess.call(blist)
+    gexe = gfz_version()
+    searchpath = station + cdoy + '*.' + cyy + 'o'
+    
+    # attempt to merge - check for pre-existing file
+    if os.path.isfile(rinexfile):
+        subprocess.call(['rm','-f', rinexfile])
 
+    # now merge the hourly files you have 
+    subprocess.call([gexe,'-finp', searchpath, '-fout', rinexfile, '-vo','2','-obs_types', 'S','-f','-q'])
+    if os.path.isfile(rinexfile):
+        print('file created: ', rinexfile)
+
+    if delete_hourly:
+        for i in range(0, len(alist)):
+            cm = ['rm', '-f',alist[i]]
+            subprocess.call(cm)
 
 def big_Disk_in_DC_hourly(station, year, month, day,idtag):
     """
@@ -4434,7 +4436,7 @@ def big_Disk_in_DC_hourly(station, year, month, day,idtag):
         wget.download(url, out=crinexfile)
         status = subprocess.call(['gunzip', crinexfile])
     except:
-        print('some problem in download - maybe the site does not exist on this archive')
+        print('some problem in download - maybe the file does not exist on this archive')
 
 
 def check_environ_variables():
@@ -5078,6 +5080,7 @@ def rapid_gfz_orbits(year,month,day):
 def ultra_gfz_orbits(year,month,day,hour):
     """
     downloads rapid GFZ sp3 file and stores them in $ORBITS
+    is this correct?  or is the regular file?
 
     Parameters
     ----------
@@ -5138,6 +5141,7 @@ def ultra_gfz_orbits(year,month,day,hour):
         subprocess.call(['gunzip', littlename + '.gz'])
     except:
         print('Problems downloading ultrarapid GFZ orbit')
+        print(url)
 
     if os.path.isfile(littlename):
         store_orbitfile(littlename,year,'sp3') ; foundit = True

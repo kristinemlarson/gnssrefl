@@ -4,9 +4,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.1.0
+
+hourly downloads from NGS allowed (download_rinex using ngs-hourly archive)
+At some point the NGS merges the files - but this allows you to follow real time activities
+
+rewrote nmea2snr to use standard python packaging tools
+
+rewrote rinex2snr to use standard python packaging tools. setting up for multi-processor
+use.
+
+
 ## 3.0.0
 
-parallel processing for gnssir, makes it much much faster
+parallel processing for gnssir, makes it much much faster. still testing how
+it should be used with the docker.
+
+fixed some places in gnssir where files were being downloaded/created - this has been
+moved to gnssir_cl.py so that multiple spawned processes won't overwrite.
 
 ## 2.6.0
 

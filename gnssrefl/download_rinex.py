@@ -30,11 +30,12 @@ def parse_arguments():
     parser.add_argument("-screenstats", default=None, type=str, help="debugging flag for printout. default is False")
     parser.add_argument("-dec", default=None, type=int, help="decimation value (seconds). Only for RINEX 3.")
     parser.add_argument("-save_crx", default=None, type=str, help="Save crx version. Only for RINEX 3.")
+    parser.add_argument("-delete_hourly", default=None, type=str, help="Delete hourly files from NGS archive?. Default is yes")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['strip','screenstats','save_crx']
+    boolean_args = ['strip','screenstats','save_crx','delete_hourly']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -43,7 +44,7 @@ def parse_arguments():
 
 def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'low', archive: str = 'all',
                    version: int = 2, strip: bool = False, doy_end: int = None, stream: str = 'R', samplerate: int = 30, 
-                   screenstats : bool = False, dec: int = 1, save_crx: bool = False ):
+                   screenstats : bool = False, dec: int = 1, save_crx: bool = False, delete_hourly: bool = True ):
     """
     Command line interface for downloading RINEX files from global archives.
     Required inputs are station, year, month, and day. If you want to use day of year,
@@ -122,6 +123,8 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
             unavco : now earthscope
 
+            ngs-hourly: NGS, hourly files will be merged if they exist
+
             all : (searches unavco, sopac, and sonel in that order)
 
     version : int, optional
@@ -183,7 +186,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     # allowed archives, rinex 2.11
     # not really sure bev, gfz, bkg work ???
     archive_list = ['bkg','bfg','bev','cddis', 'ga', 'gfz', 'jeff', 'ngs', 
-            'nrcan', 'nz','sonel','sopac','special', 'unavco', 'all','unavco2']
+            'nrcan', 'nz','sonel','sopac','special', 'unavco', 'all','unavco2','ngs-hourly']
 
     # removed the all archive
     # removed cddis because it is too slow
@@ -300,6 +303,12 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         else:  # RINEX VERSION 2
             # using new karnak code
             rinexfile, rinexfiled = g.rinex_name(station, year, d, 0)
+            # gets hourly downloads, so not highrate in the regular sense
+            if (archive == 'ngs-hourly'):
+                print('try to find hourly files at the NGS')
+                g.big_Disk_work_hard(station,year,d,0,delete_hourly)
+                sys.exit()
+
             if rate == 'high':
                 rinexfile, foundit = k.rinex2_highrate(station, year, d, archive, strip)
             else:
