@@ -9,9 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 hourly downloads from NGS allowed (download_rinex using ngs-hourly archive)
 At some point the NGS merges the files - but this allows you to follow real time activities
 
+fixed the ultra orbits option to look both day of and day before, as that is how it works
+for GFZ
+
 rewrote nmea2snr to use standard python packaging tools
 
-rewrote rinex2snr to use standard python packaging tools. setting up for multi-processor
+rewrote rinex2snr to use standard python packaging tools. now set up for multi-processor
 use.
 
 
