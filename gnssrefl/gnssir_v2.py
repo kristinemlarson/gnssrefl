@@ -1167,6 +1167,8 @@ def make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, nproc):
     # number of days for spacing ... 
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
+    if MJD1 == MJD2:
+        return [MJD1, MJD2], None
 
     Ndays  = math.ceil((MJD2-MJD1)/nproc) 
     #print(Ndays)

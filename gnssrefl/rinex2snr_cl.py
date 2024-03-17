@@ -16,8 +16,12 @@ import time
 
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rnx
+import gnssrefl.gnssir_v2 as guts2
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
+
+import multiprocessing
+from functools import partial
 
 
 def parse_arguments():
@@ -52,6 +56,7 @@ def parse_arguments():
     parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
     parser.add_argument("-gzip", default=None, help="boolean, default is SNR files are gzipped after creation", type=str)
+    parser.add_argument("-par", default=None, help="parallel processes allowed", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -67,7 +72,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
-              screenstats : bool = False, gzip : bool = True, monthly : bool = False ):
+              screenstats : bool = False, gzip : bool = True, monthly : bool = False, par : int=None ):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
@@ -324,6 +329,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     monthly : bool, optional
         default is false. snr files created every 30 days instead of every day
 
+    par : int, optional
+        default is NOne.  parallel processing, valid up to 10
+
     """
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
@@ -512,7 +520,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
                 print(archive_list)
                 sys.exit()
 
-# the weekly option
     skipit = 1
     if weekly:
         print('You have invoked the weekly option')
@@ -528,20 +535,101 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if stream not in ['R', 'S']:
         stream = 'R'
 
+    args = {'station': station, 'year':year, 'doy':doy, 'isnr': snr, 'orbtype': orb, 'rate': rate, 
+            'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook, 'overwrite': overwrite, 
+            'translator': translator, 'srate': samplerate, 'mk': mk, 'stream': stream, 
+            'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip}
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
-    s1 = time.time()
-    for mjd in range(MJD1, MJD2+1,skipit):
+
+    print('Monthly and Weekly functions are not currently working.')
+    # queue which handles any exceptions any of the processes encounter
+    manager = multiprocessing.Manager()
+    error_queue = manager.Queue()
+
+
+    if MJD1 == MJD2:
+        print('requested parallel processing, but only asked for one day of analysis')
+        par = None
+
+    if not par:
+        print('No parallel processing')
+        #mjd_list = range(MJD1, MJD2+1, skipit)
+        mjd_list = {}; mjd_list[0] = [MJD1, MJD2]
+        s1 = time.time()
+        process_jobs_multi(index=0,args=args,datelist=mjd_list,error_queue=error_queue)
+        s2 = time.time()
+        print('That took ', round(s2-s1,2), ' seconds')
+
+    else:
+        print('You have chosen parallel processing')
+        if par > 10:
+            print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
+            sys.exit()
+        else:
+            numproc = par
+            # get a list of times in MJD associated with the multiple spawned processes
+            # this does not work for skipping dates though ... 
+
+            datelist, numproc = guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
+            print(datelist)
+
+            # make a list of process IDs
+            index = list(range(numproc))
+
+            s1 = time.time()
+
+            pool = multiprocessing.Pool(processes=numproc)
+
+            partial_process = partial(process_jobs_multi, args=args,datelist=datelist,error_queue = error_queue)
+
+            pool.map(partial_process,index)
+
+            pool.close()
+            pool.join()
+            s2 = time.time()
+            print('That took ', round(s2-s1,2), ' seconds')
+
+def process_jobs_multi(index,args,datelist,error_queue):
+    """
+    runs the rinex2snr queue
+
+    Parameters
+    ==========
+    index : int
+        which job to run
+        args : dict
+        dictionary of parameters for run_rinex2snr
+    datelist: dict
+        start and stop dates in MJD
+    error_queue:
+
+    """
+
+    try:
+        d1 = datelist[index][0]; d2 = datelist[index][1]
+        mjd_list = list(range(d1, d2+1))
+        for mjd in mjd_list:
+            y, d = g.modjul_to_ydoy(mjd)
+            args['year'] = y
+            args['doy'] = d
+            rnx.run_rinex2snr(**args)
+
+    except Exception as e:
+        error_queue.put(e)
+
+    return
+
+def process_jobs(mjd_list, args):
+    """
+    """
+    for mjd in mjd_list:
         y, d = g.modjul_to_ydoy(mjd)
-        args = {'station': station, 'year':y, 'doy':d, 'isnr': snr, 'orbtype': orb, 'rate': rate, 
-                'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook, 'overwrite': overwrite, 
-                'translator': translator, 'srate': samplerate, 'mk': mk, 'stream': stream, 
-                'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip}
+        args['year'] = y
+        args['doy'] = d
         rnx.run_rinex2snr(**args)
 
-    s2 = time.time()
-    print('That took ', round(s2-s1,2), ' seconds')
-
+    return
 
 def main():
     args = parse_arguments()

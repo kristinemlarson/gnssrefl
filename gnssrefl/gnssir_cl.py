@@ -171,12 +171,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         periodograms are computed. 1 sec is default (i.e. no decimating)
     newarcs : bool, optional
         this input no longer has any meaning 
-    par : int
-        parallel processing parameter. If an integer from 2-10, it sets up
-        2-10 processes for years, i.e. you should add at least the same number of 
-        processes as you have years. For par = -99, it sets
-        up 10 processes for jobs within that single year. Ultimately these modes will be 
-        merged so that the -99 option goes away.
+    par : int, optional
+        number of parallel processing jobs. 
 
     """
 
@@ -362,6 +358,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         else:
             numproc = par
             print(year,doy,year_end,doy_end)
+            # get a list of times in MJD associated with the multiple spawned processes
             d,numproc=guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
 
             # make a list of process IDs
@@ -389,6 +386,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     t2 = time.time()
     print('Time to compute: ', round(t2-t1,2), ' seconds')
 
+
+# process year and process year dictionary should be combined at some point
+# see rinex2snr as example
 
 def process_year(year, year_end, doy, doy_end, args, error_queue):
     """
@@ -453,9 +453,6 @@ def process_year_dictionary(index,args,datelist,error_queue):
             print(f'Processing MJD {MJD} Year {year} DOY {doy}');
 
             guts2.gnssir_guts_v2(**args)
-    except Exception as e:
-        error_queue.put(e)
-
     except Exception as e:
         error_queue.put(e)
 

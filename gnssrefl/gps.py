@@ -5110,13 +5110,23 @@ def ultra_gfz_orbits(year,month,day,hour):
     # figure out the GPS week number
     wk,sec=kgpsweek(year,month,day,0,0,0)
 
+
+    # try the day before cause ... 
+    if (doy == 1):
+        wk0,sec0=kgpsweek(year-1,12,31,0,0,0)
+    else:
+        doy = doy-1
+        yy, mm, dd, t1,tw,t2 = ydoy2useful(year,doy)
+        wk0,sec0=kgpsweek(yy,mm,dd,0,0,0)
+
+
     gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/ultra/'
     fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
     # change the hour into two character string
     chr = '{:02d}'.format(hour)
     littlename = 'gfu' + str(wk) + str(int(sec/86400)) + '_' + chr + '.sp3'  
-
     url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
+
     #print(url)
     if (year + doy/365.25) < dday:
         print('No rapid GFZ orbits until 2021/doy137')
@@ -5142,6 +5152,11 @@ def ultra_gfz_orbits(year,month,day,hour):
     except:
         print('Problems downloading ultrarapid GFZ orbit')
         print(url)
+        littlename = 'gfu' + str(wk0) + str(int(sec0/86400)) + '_' + chr + '.sp3'  
+        url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
+        print('now try the day before ', url)
+        wget.download(url,littlename + '.gz')
+        subprocess.call(['gunzip', littlename + '.gz'])
 
     if os.path.isfile(littlename):
         store_orbitfile(littlename,year,'sp3') ; foundit = True
