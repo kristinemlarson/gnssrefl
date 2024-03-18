@@ -939,7 +939,7 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
 
     return badpoints2
 
-def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,spline,delta_out):
+def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,spline,delta_out,csvfile):
     """
 
     Makes a plot of the final spline fit to the data. Output time interval controlled by the user.
@@ -970,6 +970,8 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
         used for fitting 
     delta_out : int
         how often spline is printed, in seconds
+    csvfile : bool
+        print out csv instead of plain txt
     """
 
     firstpoint = float(th[0]); lastpoint = float(th[-1])
@@ -1006,8 +1008,12 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     fout.write('{0:1s}  {1:30s}  {2:8.3f} \n'.format('%','orthometric height minus RH, where Hortho (m) is ', H0  ))
     #fout.write('{0:1s}  {1:30s}  \n'.format('%','This assumes RH is measured relative to the L1 phase center.  '))
     #fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD, RH(m), YY,MM,DD,HH,MM,SS, quasi-sea-level(m)'))
-    fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD              RH(m)  YYYY  MM  DD  HH  MM  SS   quasi-sea-level(m)'))
-    fout.write('{0:1s}  {1:30s}  \n'.format('%','(1)               (2)   (3)  (4) (5)  (6) (7) (8)    (9)'))
+    if csvfile:
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD,             RH(m), YYYY, MM, DD, HH, MM, SS,  quasi-sea-level(m)'))
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','(1),              (2),  (3), (4),(5), (6),(7),(8),   (9)'))
+    else:
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD              RH(m)  YYYY  MM  DD  HH  MM  SS   quasi-sea-level(m)'))
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','(1)               (2)   (3)  (4) (5)  (6) (7) (8)    (9)'))
 
 
     # difference function to find time between all rh measurements
@@ -1050,8 +1056,10 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
         for i in range(0,N_new):
             if not np.isnan(spline_new[i]):
                 rhout = spline_new[i]
-                fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:3.0f} {4:3.0f} {5:3.0f} {6:3.0f} {7:3.0f} {8:10.3f} \n'.format(
-                    mjd_new[i], rhout, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], H0-rhout))
+                if csvfile:
+                    fout.write('{0:15.7f}, {1:10.3f},{2:4.0f},{3:3.0f},{4:3.0f},{5:3.0f},{6:3.0f},{7:3.0f},{8:10.3f} \n'.format( mjd_new[i], rhout, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], H0-rhout))
+                else:
+                    fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:3.0f} {4:3.0f} {5:3.0f} {6:3.0f} {7:3.0f} {8:10.3f} \n'.format(mjd_new[i], rhout, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], H0-rhout))
 
 
     fout.close()

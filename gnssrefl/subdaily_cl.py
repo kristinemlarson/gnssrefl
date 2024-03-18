@@ -241,6 +241,9 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     if csvfile:
         print('>>>> WARNING: csvfile option is currently turned off.  We are working to add it back.')
         csvfile = False
+        csvfile_spline = True
+    else:
+        csvfile_spline = False
 
     outputs = [] # this is for multiple years
 
@@ -314,10 +317,13 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
     # not sure why tv and corr are being returned.
     if rhdot:
-       tv, corr = t.rhdot_correction2(station, input2spline, output4spline, plt, spline_outlier1, spline_outlier2, 
-                   knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out,
-                   if_corr=if_corr,knots_test=knots_test,hires_figs=hires_figs,
-                   apply_rhdot=apply_rhdot,fs=fs,gap_min_val=gap_min_val,year=year,extension=extension,knots2=knots2)
+       tv, corr = t.rhdot_correction2(station, input2spline, output4spline, 
+                                      plt, spline_outlier1, spline_outlier2, 
+                                      knots=knots,txtdir=txtdir,testing=testing,delta_out=delta_out, 
+                                      if_corr=if_corr,knots_test=knots_test,
+                                      hires_figs=hires_figs, apply_rhdot=apply_rhdot,fs=fs,
+                                      gap_min_val=gap_min_val,year=year, extension=extension, 
+                                      knots2=knots2,csvfile_spline=csvfile_spline)
        if plt:
            mplt.show()
 

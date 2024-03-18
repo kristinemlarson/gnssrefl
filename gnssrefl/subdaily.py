@@ -771,6 +771,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     else:
         apply_if_corr = False
 
+    csvfile_spline = kwargs.get('csvfile_spline',False)
+    print('csvfile spline ', csvfile_spline)
+
     apply_rhdot  = kwargs.get('apply_rhdot',True)
     if apply_rhdot:
         apply_rhdot_corr = True
@@ -1134,7 +1137,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
                                                fs, strsig, hires_figs,txtdir, ii,jj,th_even, spline_whole_time)
     H0 = sd.find_ortho_height(station,extension)
     # this writes out spline file and makes plot .... 
-    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out)
+    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out,csvfile_spline)
     print('\nRMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
 
 
