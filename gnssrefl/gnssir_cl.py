@@ -421,8 +421,8 @@ def process_year(year, year_end, doy, doy_end, args, error_queue):
         except:
             warnings.warn(f'error processing {y} {d}');                
 
+    # where should i put the error queue statement?
     return
-
 
 def process_year_dictionary(index,args,datelist,error_queue):
     """
@@ -442,6 +442,7 @@ def process_year_dictionary(index,args,datelist,error_queue):
         dd = { 0: [MJD1, MJD2], 1:[MJD1,MJD2] }
 
     """
+    #should the try be further in the loop?
     try:
         d1 = datelist[index][0]; d2 = datelist[index][1] 
         mjd_list = list(range(d1, d2+1))

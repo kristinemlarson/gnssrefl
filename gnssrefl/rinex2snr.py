@@ -287,10 +287,10 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive,fort
                             print('This code only accesses 1-Hz Rinex 3 data at BKG, CDDIS, and GA')
                             if archive == 'ga':
                                 deleteOld = True
-                                # cold should return the new name of the rinex 2 file
-                                r2, foundit = g.ga_highrate(station9ch,year,doy,dec_rate,deleteOld)
-                                if foundit and screenstats:
-                                    print('rinex2 file should now exist:', r2)
+                                # this downloads RINEX 3 and converts to Rinex 2
+                                r2, fexists= g.ga_highrate(station9ch,year,doy,dec_rate,deleteOld)
+                                if screenstats:
+                                    print('RINEX 2 file derived from the GA archive should now exist:', r2)
                             if archive == 'cddis':
                                 bad_day = g.cddis_restriction(year, doy,'cddis')
                                 if not bad_day:

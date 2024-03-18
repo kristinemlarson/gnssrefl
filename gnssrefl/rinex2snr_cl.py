@@ -337,6 +337,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
 
+    archive_list_no_parallel = ['sopac','cddis']
+
     if False:
         print('RINEX 3 archives \n', archive_list_rinex3)
         print('\n')
@@ -543,6 +545,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
 
     print('Monthly and Weekly functions are not currently working.')
+
     # queue which handles any exceptions any of the processes encounter
     manager = multiprocessing.Manager()
     error_queue = manager.Queue()
@@ -550,6 +553,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     if MJD1 == MJD2:
         print('requested parallel processing, but only asked for one day of analysis')
+        par = None
+    if archive in archive_list_no_parallel:
+        print('You have chosen an archive that is unfriendly to multiple simultaneous download')
+        print('requests. Your request for parallel processing has been declined.')
         par = None
 
     if not par:
@@ -602,7 +609,8 @@ def process_jobs_multi(index,args,datelist,error_queue):
         dictionary of parameters for run_rinex2snr
     datelist: dict
         start and stop dates in MJD
-    error_queue:
+    error_queue:? 
+        not sure how to describe this
 
     """
 
@@ -616,12 +624,14 @@ def process_jobs_multi(index,args,datelist,error_queue):
             rnx.run_rinex2snr(**args)
 
     except Exception as e:
+        print(y, d)
         error_queue.put(e)
 
     return
 
 def process_jobs(mjd_list, args):
     """
+    this is not being used
     """
     for mjd in mjd_list:
         y, d = g.modjul_to_ydoy(mjd)

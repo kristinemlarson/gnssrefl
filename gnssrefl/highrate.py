@@ -303,7 +303,7 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
     searchP = station.upper() + streamID + cyyyy + cdoy + '*15M*MO.rnx'
     print('Found ', fileF,' 15 minute files')
 
-    outfile = station.upper() + '.tmp'
+    outfile = station.upper() + cyyyy + cdoy + '.tmp'
     crate = '{:02d}'.format(dec_rate)
 
     file_name24 = ''

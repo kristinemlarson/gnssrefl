@@ -371,7 +371,9 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, sp3, recv, gzip):
 def read_nmea(fname):
     """
     reads a NMEA file.
-    it only reads the GPGGA sentence (includes snr data) in NMEA files    
+
+    is this statement correct?
+    "it only reads the GPGGA sentence (includes snr data) in NMEA files"
 
     Parameters
     ----------

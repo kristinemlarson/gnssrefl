@@ -5796,7 +5796,7 @@ def inout(c3gz):
 
 def ga_highrate(station9,year,doy,dec,deleteOld=True):
     """
-    Attempts to download highrate RINEX from GA
+    Attempts to download highrate RINEX 3 files from GA
 
     Parameters
     ----------
@@ -5850,15 +5850,18 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
             rinexname = newname[:-3] + 'rnx'
             v = v + 1
             cv = '{:02d}'.format(v)
-            tmpname=  'tmp' + cv + '.' + station + cdoy + '0.'  + cyy + 'o'
+            tmpname=  station + cdoy + '0.'  + cyy + 'o' + 'tmp' + cv
             # if you ran the program previously and have the files online
             if os.path.exists(rinexname):
                 print(cv, file_name, tmpname)
                 if (dec > 1):
-                    subprocess.call([gexe,'-finp', rinexname, '-fout', rinex2, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
+                    subprocess.call([gexe,'-finp', rinexname, '-fout', tmpname, '-vo','2','-ot', gobblygook, '-smp', crate, '-f','-q'])
+                    # does not like using tmp names with sei input. because of course
+                    #subprocess.call([gexe,'-finp', rinexname, '-fout', tmpname, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
                 else:
-                    subprocess.call([gexe,'-finp', rinexname, '-fout', rinex2, '-vo','2','-ot', gobblygook, '-sei','out','-f','-q'])
-                subprocess.call(['mv', rinex2,tmpname])
+                    subprocess.call([gexe,'-finp', rinexname, '-fout', tmpname, '-vo','2','-ot', gobblygook, '-f','-q'])
+                    #subprocess.call([gexe,'-finp', rinexname, '-fout', tmpname, '-vo','2','-ot', gobblygook, '-sei','out','-f','-q'])
+                #subprocess.call(['mv', rinex2,tmpname])
             else:
                 if os.path.exists(file_name): # file exists
                     print('file exists so gunzip it')
@@ -5875,22 +5878,28 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
 
                 if os.path.exists(rinexname):
                     if (dec > 1):
-                        subprocess.call([gexe,'-finp', rinexname, '-fout', rinex2, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
+                        subprocess.call([gexe,'-finp', rinexname, '-fout', tmpname, '-vo','2','-ot', gobblygook, '-smp', crate, '-f','-q'])
+                        #subprocess.call([gexe,'-finp', rinexname, '-fout', tmpname, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f'])
                     else:
-                        subprocess.call([gexe,'-finp', rinexname, '-fout', rinex2, '-vo','2','-ot', gobblygook, '-sei','out','-f','-q'])
-                    subprocess.call(['mv', rinex2,tmpname])
+                        subprocess.call([gexe,'-finp', rinexname, '-fout', tmpname, '-vo','2','-ot', gobblygook, '-f','-q'])
+                        #subprocess.call([gexe,'-finp', rinexname, '-fout', tmpname, '-vo','2','-ot', gobblygook, '-sei','out','-f'])
+                    #subprocess.call(['mv', rinex2,tmpname])
 
 # now merge them
-    searchpath = 'tmp' + '*' + station + cdoy + '0.' + cyy + 'o'
+    searchpath =  station + cdoy + '0.' + cyy + 'o' + 'tmp*'
+    print(searchpath)
     subprocess.call([gexe,'-finp', searchpath, '-fout', rinex2, '-vo','2','-f'])
     fexist = False
     if os.path.exists(rinex2):
         fexist = True
 
-# remove detritus
-    searchpath = 'tmp*' + station + cdoy + '0.' + cyy + 'o'
+
+    # should always remove tmp files
+    searchpath =  station + cdoy + '0.'  + cyy + 'otmp*' 
     cm ='rm -f ' + searchpath
     subprocess.call(cm,shell=True)
+
+# remove detritus
     if deleteOld:
         searchpath = station9.upper()  + '*' + cyyyy + cdoy + '*rnx'
         cm ='rm -f ' + searchpath

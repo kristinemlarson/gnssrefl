@@ -5,6 +5,7 @@ import subprocess
 import sys
 
 import gnssrefl.gps as g
+import gnssrefl.gnssir_v2 as guts2
 
 from gnssrefl.utils import str2bool
 
@@ -30,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-l2c", default=None, type=str, help="Set to T to only use GPS L2C")
     parser.add_argument("-xyz", default=None, type=str, help="Set to True if using Cartesian coordinates instead of LLH")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
-    parser.add_argument("-extension", type=str, help="Provide extension name so you can try different strategies")
+    parser.add_argument("-extension", default=None,type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-ediff", default=None, type=float, help="Allowed min/max elevation diff from obs min/max elev angle (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument("-frlist", nargs="*",type=int,  help="User defined frequencies using our nomenclature")
@@ -41,12 +42,13 @@ def parse_arguments():
     parser.add_argument("-pele", nargs="*", type=float, help="min and max elevation angle in direct signal removal, default is 5-30")
     parser.add_argument("-daily_medfilter", default=None, type=float, help="daily_avg, median filter, meters")
     parser.add_argument("-subdaily_knots", default=None, type=float, help="subdaily, knots")
+    parser.add_argument("-update", default=None, type=str, help="mode to update existing json (under dev)")
 
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['allfreq', 'l1', 'l2c', 'xyz', 'refraction']
+    boolean_args = ['allfreq', 'l1', 'l2c', 'xyz', 'refraction','update']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -57,7 +59,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
        h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None, peak2noise: float = 2.8, 
        ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
-       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : int=1, Hortho : float = None, pele: list=[5,30]):
+       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], 
+                      refr_model : int=1, Hortho : float = None, pele: list=[5,30], update: bool=False):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -215,6 +218,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     pele : float
         min and max elevation angles in direct signal removal, i.e. 3 40. Default is 5 30. 
 
+    update : bool
+        allows you to update an existing json
     """
 
     # make sure environment variables exist
@@ -225,11 +230,16 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         print('station name must be four characters long. Exiting.')
         sys.exit()
 
+    if update:
+        print('You have selected to update an existing json')
+        lsp = guts2.read_json_file(station, extension)
+        sys.exit()
+
 # location of the site - does not have to be very good.  within 100 meters is fine
     query_unr = False
 # if you input lat and long as zero ...
     if lat + lon == 0:
-        print('Assume you want to use the UNR database for a priori receiver coordinates.')
+        print('Assume you want to use our database for a priori receiver coordinates.')
         query_unr = True
 
     if xyz:
@@ -242,7 +252,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         # try to find the coordinates  at UNR
         lat, lon, height = g.queryUNR_modern(station)
         if lat == 0:
-            print('Tried to find coordinates in our UNR database. Not found so exiting')
+            print('Tried to find coordinates in our station database. None found so exiting')
             sys.exit()
 
     # calculate Hortho using EGM96 if none provided
