@@ -26,7 +26,7 @@ def parse_arguments():
     parser.add_argument("-lon", default=None, help="longitude, degrees", type=float)
     parser.add_argument("-height", default=None, help="ellipsoid height, m", type=float)
     parser.add_argument("-risky", default=None, help="boolean for whether sp3 orbits are used", type=str)
-    parser.add_argument("-gzip", default=None, help="Gzip SNR file after creation. Default is true.", type=str)
+    parser.add_argument("-gzip", default=None, help="gzip SNR file after creation. Default is true.", type=str)
 
     args = parser.parse_args().__dict__
 

@@ -56,20 +56,15 @@ def nmea_apriori_coords(station,llh,sp3):
 
 #Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
 
-def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, sp3, recv, gzip):
+def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, sp3, recv, gzip):
     """
-    Reads and translates the NMEA file stored in locdir + fname
-
-    Naming convention assumed for NMEA files :  SSSS1520.23.A
-
+    Reads and translates a NMEA file stored in locdir + fname.
+    The naming convention assumed for the NMEA file is  SSSS1520.23.A
     where SSSS is station name, day of year is 152 and year is 2023
-
     locdir is generally $REFL_CODE/nmea/SSSS/yyyy where yyyy is the year number and SSSS is the station name
 
-    KL I believe lowercase is also allowed, but the A at the end is still set to be upper case
-
+    Note from KL: I believe lowercase is also allowed (and preferred), but the A at the end is still set to be upper case
     (I believe) The SNR files are stored with upper case if given upper case, lower case if given lower case.
-
 
     Parameters
     -----------
@@ -97,6 +92,7 @@ def NMEA2SNR(locdir, fname, snrfile, csnr, dec, year, doy, sp3, recv, gzip):
         
     """
     
+    # decimation
     idec = int(dec)
     missing = True
     station = fname.lower() ; station = station[0:4]
@@ -372,20 +368,20 @@ def read_nmea(fname):
     """
     reads a NMEA file.
 
-    is this statement correct?
+    KL: is this statement correct?
     "it only reads the GPGGA sentence (includes snr data) in NMEA files"
 
     Parameters
     ----------
-    fname : string
+    fname : str
         NMEA filename
 
     Returns
     -------
-    t : list of integers
+    t : list of int
         timetags in GPS seconds 
 
-    prn : list of integers
+    prn : list of int
         GPS satellite numbers
 
     az : list of floats ??
@@ -558,7 +554,7 @@ def read_nmea(fname):
 def fix_angle_azimuth(time, angle, azimuth):
     """
     interpolate elevation angles and azimuth to retrieve decimal values thru time     
-    this is for NMEA files.
+    this is for NMEA files. This is not used if sp3 orbit file used.
 
     Parameters
     ----------
@@ -673,7 +669,7 @@ def angle_range_positive(ang):
 
 def azimuth_mean(azim1, azim2):
     """
-    someone should document this
+    someone that is not me should document this
 
     Parameters
     ----------
@@ -843,7 +839,7 @@ def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, sp3, gzip):
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
                     #print('Creating '+snrfile)
-                    NMEA2SNR(locdir, r, snrfile, csnr, dec, year, doy, llh, sp3, gzip)
+                    nmea_translate(locdir, r, snrfile, csnr, dec, year, doy, llh, sp3, gzip)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
                     if os.path.isfile(locdir + r ):

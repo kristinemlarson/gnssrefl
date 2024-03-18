@@ -78,6 +78,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     RINEX obs files are provided by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
     the default is RINEX 2.11 files
 
+    beta version of parallel processing available in this release.  Set -par to a number < 11 
+    Some archives have been set to non-compliant with this feature. Please look in the first few lines
+    of code to see the names of these archives.
+
     Default orbits are GPS only until day of year 137, 2021 when rapid GFZ orbits became available.  If you still want to use
     the nav message, i.e. GPS only, you can request it.
 
@@ -337,7 +341,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
 
-    archive_list_no_parallel = ['sopac','cddis']
+    archive_list_no_parallel = ['sopac','cddis','jeff']
 
     if False:
         print('RINEX 3 archives \n', archive_list_rinex3)

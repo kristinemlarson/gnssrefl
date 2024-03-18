@@ -65,19 +65,15 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
 
-    beta version of parallel processing is now onine. If you set -par to an integer >=2, it will do processing across years, i.e. you
-    won't see any improvement unless you are trying to analyze two years of data - in which case it will
-    be twice as fast, three years of data, three times as fast.  I have added an option par=-99 which
-    only works for now on a single year. but it will create up to 10 simultaneous processes, so very slick.  
-    Ultimately of course I will put these together and make this the official version.  Huge thank you to
-    AaryanRampal for getting this up and running.
+    beta version of parallel processing is now onine. If you set -par to an integer between 2 and 10,
+    it should substantially speed up your processing. Big thank you to AaryanRampal for getting this up and running.
         
     Examples
     --------
     gnssir p041 2021 15 
         analyzes the data for station p041, year 2021 and day of year 15.
     gnssir p041 2021 1 -doy_end 100 -par 10
-        analyze 100 days of data - but spawn 10 processes at a time. Big time saver.
+        analyze 100 days of data - but spawn 10 processes at a time. Big cpu time savings.
     gnssir p041 2021 15  -snr 99
         uses SNR files with a 99 suffix
     gnssir p041 2021 15  -plt T
@@ -141,11 +137,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         doy_end will be for year_end. Default is None.
     azim1 : int, optional
         lower limit azimuth.
-        If the azimuth angles are changed in the json (using 'azval' key) and not here, then the json overrides these.
+        If the azimuth angles are changed in the json (using 'azval2' key) and not here, then the json overrides these.
         If changed here, then it overrides what you requested in the json. default is 0.
     azim2 : int, optional
         upper limit azimuth.
-        If the azimuth angles are changed in the json (using 'azval' key) and not changed here, then the json overrides these.
+        If the azimuth angles are changed in the json (using 'azval2' key) and not changed here, then the json overrides these.
         If changed here, then it overrides what you requested in the json. default is 360.
     nooverwrite : bool, optional
         Use to overwrite lomb scargle result files or not.
@@ -201,7 +197,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     # requiring people use the new code
     if 'azval2' not in lsp:
-        print('An azval2 variable was not found in your json input file. Fix your json ')
+        print('An azval2 variable was not found in your gnssir json input file. Fix your json ')
         print('and/or use gnssir_input to make a new one. Exiting')
         sys.exit()
 
@@ -265,7 +261,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # TODO figure out the goal here
     # this only sets the new azim values only if bother azim1 and azim2 changed?
     if setA == 2:
-        lsp['azval'] = [azim1,  azim2]
+        lsp['azval2'] = [azim1,  azim2]
 
     # this is for when you want to run the code with just a single frequency, i.e. input at the console
     # rather than using the input restrictions
@@ -288,6 +284,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     if 'refr_model' not in lsp.keys():
         lsp['refr_model'] = 1
 
+    # good lord - why is this here? surely a function can be called
     picklefile = 'gpt_1wA.pickle'
     pname = xdir + '/input/' + picklefile
 
@@ -329,11 +326,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # should make sure there are directories for the results ... 
     g.checkFiles(station.lower(), extension)
 
-    year_list = list(range(year_st, year_end+1))
-    # changed to better describe year and doy start/end
-
     print('Requested frequencies ', lsp['freqs'])
-
 
     # queue which handles any exceptions any of the processes encounter
     manager = multiprocessing.Manager()
@@ -343,15 +336,16 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     t1 = time.time()
     if (year == year_end) & (doy == doy_end):
         if par:
-            print('analyze only one day - no reason to submit multiple processes')
+            print('You are analyzing only one day of data - no reason to submit multiple processes')
             par = None
 
     if not par: 
-        print('No parallel processing')
+        print('Parallel processing not requested')
+        # this should be changed to call process_year_dictionary
         process_year(year,year_end,doy,doy_end, **additional_args)
 
     else:
-        print('You have chosen parallel processing')
+        print('Parallel processing chosen')
         if par > 10:
             print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
             sys.exit()
@@ -432,7 +426,8 @@ def process_year_dictionary(index,args,datelist,error_queue):
     Parameters
     ----------
     index: int
-        value from '0' to '4', telling you which element of args to use 
+        accommodation for parallel processing. It should be a value 
+        from 0 to 9, telling the code which part of datelist to use 
     args : dict
         arguments passed into gnssir through commandline (or python)
         should have the new arguments for sublists
@@ -440,6 +435,7 @@ def process_year_dictionary(index,args,datelist,error_queue):
         list of dates you want to analyze in pairs of MJD
         could have up to 10 sets of dates, from 0 to 9, e.g. for two processes
         dd = { 0: [MJD1, MJD2], 1:[MJD1,MJD2] }
+    error_queue : ?
 
     """
     #should the try be further in the loop?
