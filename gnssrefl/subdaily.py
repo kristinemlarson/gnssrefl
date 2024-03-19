@@ -1095,6 +1095,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     firstKnot_in_minutes = 15
     t1 = tnew.min()+firstKnot_in_minutes/60/24
     t2 = tnew.max()-firstKnot_in_minutes/60/24
+    print('what are these values? ' , t1, t2)
     knots =np.linspace(t1,t2,num=numKnots)
 
 
@@ -1135,6 +1136,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # make the plot externally now
     badpoints2 = sd.subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, 
                                                fs, strsig, hires_figs,txtdir, ii,jj,th_even, spline_whole_time)
+
+    # pick up the orthometric height from the gnssir_analysis json
     H0 = sd.find_ortho_height(station,extension)
     # this writes out spline file and makes plot .... 
     sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out,csvfile_spline)

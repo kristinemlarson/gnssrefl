@@ -82,6 +82,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     Some archives have been set to non-compliant with this feature. Please look in the first few lines
     of code to see the names of these archives.
 
+    Real-time users should use ultra, wum, or wum2
+
     Default orbits are GPS only until day of year 137, 2021 when rapid GFZ orbits became available.  If you still want to use
     the nav message, i.e. GPS only, you can request it.
 
@@ -530,9 +532,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if weekly:
         print('You have invoked the weekly option')
         skipit = 7
+        print('Monthly and Weekly functions are not currently working. Resubmit.')
+        sys.exit()
     if monthly:
         print('You have invoked the monthly option')
         skipit = 30
+        print('Monthly and Weekly functions are not currently working. Resubmit.')
+        sys.exit()
 
     # the Makan option
     if mk:
@@ -548,7 +554,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
 
-    print('Monthly and Weekly functions are not currently working.')
 
     # queue which handles any exceptions any of the processes encounter
     manager = multiprocessing.Manager()
@@ -618,6 +623,7 @@ def process_jobs_multi(index,args,datelist,error_queue):
 
     """
 
+    # should try be on each submission?  or each list of submissions?
     try:
         d1 = datelist[index][0]; d2 = datelist[index][1]
         mjd_list = list(range(d1, d2+1))
@@ -635,7 +641,7 @@ def process_jobs_multi(index,args,datelist,error_queue):
 
 def process_jobs(mjd_list, args):
     """
-    this is not being used
+    this is not being used - calls should be sent to function above instead
     """
     for mjd in mjd_list:
         y, d = g.modjul_to_ydoy(mjd)

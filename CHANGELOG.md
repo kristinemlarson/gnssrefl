@@ -13,6 +13,11 @@ added ultra rapid orbits to nmea code
 ## 3.1.1
 nmea2snr checks rapid, final, and ultra GNSS orbits from GFZ.
 
+Changed it so that last spline written out by subdaily only includes time
+periods with data. Before it was starting at the beginning of first day and ending
+at the end of the last day. This didn't cause huge problems when full days were 
+analyzed but is definitely wrong otherwise.
+
 ## 3.1.0
 
 hourly downloads from NGS allowed (download_rinex using ngs-hourly archive)

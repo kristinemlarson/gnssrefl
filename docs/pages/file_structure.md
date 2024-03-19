@@ -168,6 +168,17 @@ But for the sake of completeness, we are either using broadcast navigation files
 or precise orbits in the sp3 format.  If you have nav files for your station, we recommend you delete them.
 They are not useful in this code.
 
+The main things you need to know:
+
+- if your files only have GPS data in them, there is no need to use multi-GNSS SP3 files. Flag -nav T
+
+- if your files are multi-GNSS, the best option is gnss, which are final orbits. This is complicated for 
+older data. Those files are reliably available from 2023. And they cover the four main constellations.  
+My current default is rapid GNSS - but that does not always have Beidou in it. 
+
+- we also have ultra-orbit options, which are appropriate for real-time users. I cannot keep track of 
+what ultra products are working. You can try ultra, wum, and wum2. The first is from GFZ and the latter two are from Wuhan.
+
 ## EXECUTABLES
 
 There are two key executables: CRX2RNX and gfzrnx. For notebook and docker users, these 

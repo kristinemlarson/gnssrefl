@@ -41,8 +41,6 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
              overwrite : bool=False, dec : int=1, lat : float = None, lon : float=None, 
              height : float = None, risky : bool=False, gzip : bool = True):
     """
-    main script for the nmea2snr conversion code
-
     This code creates SNR files from NMEA files.  
 
     The NMEA files should be stored in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023
@@ -68,6 +66,7 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
     is not necessarily large - but you should be aware. The best thing to do is remake your SNR files.  
 
     As for March 16, 2024, this code has been changed to use gnssrefl standards for inputs and outputs.
+    The code, in principle, now looks for final, rapid, and ultra rapid orbits from GFZ, in that order.
 
     Parameters
     ----------

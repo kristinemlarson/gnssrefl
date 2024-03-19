@@ -979,7 +979,14 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     ndays = s2-s1 # number of days
     numvals = 1 + int(ndays*86400/delta_out)
     tp=np.linspace(s1,s2,numvals,endpoint= True)
-    # this means it is alreayd in MJD
+
+    # previous tp definition goes from beginning of the first day to the end of last day - but 
+    # does not recognize that the file could have started well beyond that first point 
+    # and it might end say 8 hours into the last day
+    ii = (tp >= firstpoint) & (tp <= lastpoint)
+    tp = tp[ii]
+
+    # this means it is already in MJD
 
     if (th[0] > 400): 
         multiyear = True
