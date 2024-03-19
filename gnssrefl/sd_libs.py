@@ -996,8 +996,13 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
 
     # looks like I identified the gaps in day of year units - 
     # but then did the implementation in mjd and then datetime ...
-    splinefileout =  txtdir + '/' + station + '_' + str(year) + '_spline_out.txt'
-    splinefileout =  txtdir + '/' + station +  '_spline_out.txt'
+    #splinefileout =  txtdir + '/' + station + '_' + str(year) + '_spline_out.txt'
+    if csvfile:
+        splinefileout =  txtdir + '/' + station +  '_spline_out.csv'
+    else:
+        splinefileout =  txtdir + '/' + station +  '_spline_out.txt'
+
+
     print('Writing evenly sampled file to: ', splinefileout)
     fout = open(splinefileout,'w+')
     vn = station + ' gnssrefl v' + str(g.version('gnssrefl'))

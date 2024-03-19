@@ -7,8 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Fixed bugs in highrate RINEX 3 downloads/translations that conflicted with parallel processing
 (GA and BKG archives). This was mostly related to how I stored interim Rinex 2 files.
 
+added ultra rapid orbits to nmea code
+
+
 ## 3.1.1
-?force update of user manual
+nmea2snr checks rapid, final, and ultra GNSS orbits from GFZ.
 
 ## 3.1.0
 

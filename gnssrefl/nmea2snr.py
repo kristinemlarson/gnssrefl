@@ -101,14 +101,20 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, sp3, recv, gzip
     if sp3:
         # first try to find precise because they have beidou
         xf,orbdir,foundit=g.gbm_orbits_direct(year,month,day)
+        # try to find it elsewhere
         if not foundit: 
             print('Could not find the precise GNSS orbits from GFZ. ')
             xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
             if not foundit: 
-                print('Could not find the rapid orbits from GFZ. Exiting')
-            return
-        else:
-            orbfile = orbdir + '/' + xf # hopefully
+                print('Could not find the rapid orbits from GFZ. ')
+                xf,orbdir,foundit = g.ultra_gfz_orbits(year,month,day,0)
+                if not foundit:
+                    print('Could not find the ultrarapid orbits from GFZ. Exiting')
+                    return
+
+        # define orbit file name
+        orbfile = orbdir + '/' + xf # hopefully
+        print('Found a sp3 file: ', orbfile)
 
     # this is to help a colleague 
     if station == 'argt':

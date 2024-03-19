@@ -1,8 +1,9 @@
-# gnssrefl v3.1.0 
+# gnssrefl v3.1.1 
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.10644225.svg)](http://dx.doi.org/10.5281/zenodo.10644225) 
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601494.svg)](http://dx.doi.org/10.5281/zenodo.5601494) 
+
 
 gnssrefl is an open source software package for GNSS interferometric reflectometry (GNSS-IR). 
 
