@@ -1,4 +1,4 @@
-# gnssrefl v3.1.1 
+# gnssrefl v3.1.2 
 
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 

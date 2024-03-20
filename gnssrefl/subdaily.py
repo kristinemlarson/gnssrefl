@@ -534,17 +534,17 @@ def write_out_header(fout,station,extraline,**kwargs):
     fout.write('% Traditional phase center corrections have NOT been applied \n')
     if extra_columns:
         fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)    (23)        (24) \n")
-        fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS   RH with      RHdot \n")
+        fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise, DelT,    MJD, refr, MM,DD,HH,MM,SS,  RH with,     RHdot \n")
         fout.write("%             m       hours   deg   v/v    deg   deg                1/-1       ratio    minute        1/0                    RHdotCorr    Corr m    \n")
     else:
         if IFcol:
             fout.write('% Reflector heights set to the L1-phase center are in column 25 \n')
             fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)   (23)      (24)    (25)\n")
-            fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS  RH with    RHdot     RH with  \n")
+            fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise, DelT,    MJD, refr, MM,DD,HH,MM,SS, RH with,   RHdot,    RH with  \n")
             fout.write("%             m       hours   deg   v/v    deg   deg                1/-1       ratio    minute        1/0                   RHdotCorr  Corr m    IF Corr  m  \n")
         else:
             fout.write("% (1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)\n")
-            fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD  refr  MM DD HH MM SS \n")
+            fout.write("% year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise, DelT,    MJD, refr, MM,DD,HH,MM,SS \n")
             fout.write("%             m       hours   deg   v/v    deg   deg                1/-1       ratio    minute        1/0                  \n")
 
 
@@ -814,7 +814,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         apply_if_corr = False
 
     writecsv = kwargs.get('csv',False)
-    # i will merge these two in a bit
 
 
     apply_rhdot  = kwargs.get('apply_rhdot',True)
@@ -833,7 +832,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     fs = kwargs.get('fs',12)
 
-    #print('output directory: ', txtdir)
 
 #   how often do you want velocity computed (per day)
     perday = 24*20 # so every 3 minutes

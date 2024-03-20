@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.1.2
+
 Fixed bugs in highrate RINEX 3 downloads/translations that conflicted with parallel processing
 (GA and BKG archives). This was mostly related to how I stored interim Rinex 2 files.
 
-added ultra rapid orbits to nmea code
-
+Restored csv outputs to subdaily module. 
 
 ## 3.1.1
 nmea2snr checks rapid, final, and ultra GNSS orbits from GFZ.
