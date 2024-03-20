@@ -19,7 +19,7 @@ def parse_arguments():
     parser.add_argument("-year_end", default=None, type=int, help="Allow multiple years of inputs by specifying last year")
     parser.add_argument("-txtfile_part1", default=None, type=str, help="optional filename (part1), must be in gnssir output format") 
     parser.add_argument("-txtfile_part2", default=None, type=str, help="optional filename (part2), must be gnssir output format ") 
-    parser.add_argument("-csvfile", default=None, type=str, help="set to True if you prefer csv to plain txt")
+    parser.add_argument("-csv", default=None, type=str, help="set to True if you prefer csv to plain txt")
     parser.add_argument("-plt", default=None, type=str, help="set to False to suppress plots")
     parser.add_argument("-spline_outlier1", default=None, type=float, help="outlier criterion used in first splinefit (meters)")
     parser.add_argument("-spline_outlier2", default=None, type=float, help="outlier criterion used in second splinefit (meters)")
@@ -51,14 +51,14 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['csvfile', 'plt', 'rhdot', 'testing','kplt','if_corr','hires_figs','apply_rhdot','alt_sigma']
+    boolean_args = ['csv', 'plt', 'rhdot', 'testing','kplt','if_corr','hires_figs','apply_rhdot','alt_sigma']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
 
 
-def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: str = None, csvfile: bool = False, 
+def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: str = None, csv: bool = False, 
         plt: bool = True, spline_outlier1: float = None, spline_outlier2: float = None, 
         knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True, doy1: int = 1, 
         doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.4, h2: float=300.0, 
@@ -139,8 +139,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         input File name for part 1.
     txtfile_part2 : str, optional
         Input filename for part 2.
-    csvfile: boolean, optional
-        Set to True if you prefer csv to plain txt.
+    csv: bool, optional
+        Set to True if you would like csv in addition to plain txt.
         default is False.
     plt : bool, optional
         To print plots to screen or not.
@@ -205,7 +205,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         bigger than this value, in hours
     year_end : int, optional
         last year of analysis period.  
-
+    knots2 : int, optional
+        testing out allowing different knots for last spline
     """
 
     if len(station) != 4:
@@ -234,21 +235,20 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
 
     #create the subdaily file
-    writecsv = False
     if (h1 > h2):
         print('h1 must be less than h2. You submitted ', h1, ' and ', h2)
         sys.exit()
-    if csvfile:
-        print('>>>> WARNING: csvfile option is currently turned off.  We are working to add it back.')
-        csvfile = False
+
+    if csv:
         csvfile_spline = True
+        writecsv = True
     else:
+        writecsv = False
         csvfile_spline = False
 
     outputs = [] # this is for multiple years
 
-    if csvfile:
-        writecsv = True
+
     if year_end is None: 
         year_end = year
 
@@ -323,7 +323,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
                                       if_corr=if_corr,knots_test=knots_test,
                                       hires_figs=hires_figs, apply_rhdot=apply_rhdot,fs=fs,
                                       gap_min_val=gap_min_val,year=year, extension=extension, 
-                                      knots2=knots2,csvfile_spline=csvfile_spline)
+                                      knots2=knots2,csv=writecsv )
        if plt:
            mplt.show()
 

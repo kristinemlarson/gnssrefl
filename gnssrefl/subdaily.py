@@ -29,6 +29,11 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
     """
     figures out what the names of the outputs are going to be
 
+    I have modified this so it always returns plain txt. csv will
+    simply be written out in addition.
+
+    this function no longer has much point. 
+
     Parameters
     ----------
     txtdir : str
@@ -53,31 +58,37 @@ def output_names(txtdir, txtfile,csvfile,jsonfile):
 
     """
     writetxt = True
-    if txtfile == None:
-        writetxt = False
-    writecsv = True
-    if csvfile == None:
-        writecsv = False
+    #if txtfile == None:
+    #    writetxt = False
 
-    writejson = True
-    if writejson == None:
-        writejson = False
+    #writecsv = True
+    #if csvfile == None:
+    #    writecsv = False
+    writecsv = csvfile
 
-    if writejson:
-        outfile = txtdir + '/' + jsonfile
-    if writecsv:
-        outfile = txtdir + '/' + csvfile
+    # no longer allowed
+    #writejson = True
+    #if writejson == None:
+    #    writejson = False
+    writejson = False 
+    #if writejson:
+    #    outfile = txtdir + '/' + jsonfile
+    #if writecsv:
+    #    outfile = txtdir + '/' + csvfile
     if writetxt:
         outfile = txtdir + '/' + txtfile
-    if (writecsv) and (writetxt) :
-        print('You cannot simultaneously write out a csvfile and a txtfile')
-        print('Default to writing only a txtfile')
-        writecsv = False
+    #if (writecsv) and (writetxt) :
+    #    print('You cannot simultaneously write out a csvfile and a txtfile')
+    #    print('Default to writing only a txtfile')
+    #    writecsv = False
 
-    print('outputfile ', outfile)
+    print('Main plain txt outputfile ', outfile)
+    if writecsv:
+        print('csv file will also be written')
+
     return writetxt,writecsv,writejson,outfile
 
-def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
+def write_subdaily(outfile,station,ntv,csv,extraline,**kwargs):
     """
     writes out the subdaily results. currently only works for plain txt
 
@@ -91,13 +102,12 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
         4 character station name, lowercase
     nvt : numpy multi-dimensional
         the variable with the LSP results read via np.loadtxt
-    writecsv : bool
-        whether the file output is csv
+    csv : bool
+        whether both csv and txt file should be written 
     extraline: bool
         whether the header has an extra line
 
     """
-    # this is lazy - should use shape
     RHdot_corr= kwargs.get('RHdot_corr',[])
 
     newRH = kwargs.get('newRH',[])
@@ -123,17 +133,40 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
     if nr == 0:
         print('No results in this file, so nothing to write out.')
         return
-    print(nr, ' observations will be written to:')
-    print(outfile)
+    print(nr, ' observations will be written to:', outfile)
+
     N= nr
+    # the lucky people get plain txt AND csv
+    if csv:
+        # exchange txt for csv
+        if original:
+            csv_outfile = outfile[0:-3] + 'csv'
+        if extra: # or just add the csv.  
+            csv_outfile = outfile + '.csv'
+        if write_IF_corrected: # or just add the csv.  
+            csv_outfile = outfile + '.csv'
+
+        print('Opening this as well ', csv_outfile)
+        fout_csv = open(csv_outfile, 'w+')
+
+    # everyone gets a plain txt file
     fout = open(outfile, 'w+')
+
     if extra:
         write_out_header(fout,station,extraline,extra_columns=True)
+        if csv:
+            write_out_header(fout_csv,station,extraline,extra_columns=True)
+
     else:
         if write_IF_corrected:
             write_out_header(fout,station,extraline, IF=True)
+            if csv:
+                write_out_header(fout_csv,station,extraline, IF=True)
         else:
             write_out_header(fout,station,extraline)
+            if csv:
+                write_out_header(fout_csv,station,extraline)
+
     dtime = False
     for i in np.arange(0,N,1):
         year = int(ntv[i,0]); doy = int(ntv[i,1])
@@ -141,19 +174,21 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
         rh = ntv[i,2]; UTCtime = ntv[i,4]; 
         dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
         #ctime = g.nicerTime(UTCtime); 
-        #hr = ctime[0:2]
-        #minute = ctime[3:5]
-        # you can either write a csv or text, but not both
-        if writecsv:
+        # taking hte lazy approach - if someone wants csv write out txt and csv
+        if csv:
             if original:
-                fout.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
+                fout_csv.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
 
             if extra: 
-                fout.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f},{22:10.3f},{23:10.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i],RHdot_corr[i]))
+                fout_csv.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f},{22:10.3f},{23:10.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i],RHdot_corr[i]))
             if write_IF_corrected:
-                print('this option (IF correction) has not been implemented yet for csv files')
+                fout_csv.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f},{22:10.3f},{23:10.3f},{24:10.3f},\n".format(year, doy, rh,ntv[i,3], 
+                    UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], 
+                    ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day, hour,minute, 
+                    int(second), ntv[i,22], ntv[i,23], newRH_IF[i] ))
 
-        else:
+        # just so i don't have to re-indent everything
+        if True:
             if write_IF_corrected:
                 fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:10.3f} {23:10.3f} {24:10.3f} \n".format(year, doy, rh,ntv[i,3], 
                     UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], 
@@ -169,6 +204,11 @@ def write_subdaily(outfile,station,ntv,writecsv,extraline,**kwargs):
                 fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],
                     ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], 
                     ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
+
+    # close both files if necessary
+    if csv:
+        fout_csv.close()
+
     fout.close()
 
 
@@ -238,7 +278,10 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     # felipe nievinski alternate definition
     alt_sigma = kwargs.get('alt_sigma', False)
-    # fontsize for plot labels and such
+
+    # used different name here
+    csv2= writecsv
+
     xdir = os.environ['REFL_CODE']
     print('Will remove daily outliers greater than ', sigma, ' sigma')
     if not os.path.exists(txtdir):
@@ -372,12 +415,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
 
     # now write things out - using txtdir variable sent 
-    if writecsv: 
-        fname =     txtdir  + '/' + station + '_' + str(year) + '_subdaily_all.csv'
-        fname_new = txtdir  + '/' + station + '_' + str(year) + '_subdaily_edit.csv'
-    else:
-        fname =     txtdir  + '/' + station + '_' + str(year) + '_subdaily_all.txt'
-        fname_new = txtdir  + '/' + station + '_' + str(year) + '_subdaily_edit.txt'
+    fname =     txtdir  + '/' + station + '_' + str(year) + '_subdaily_all.txt'
+    fname_new = txtdir  + '/' + station + '_' + str(year) + '_subdaily_edit.txt'
 
     extraline = ''
 
@@ -484,9 +523,12 @@ def write_out_header(fout,station,extraline,**kwargs):
     """
     extra_columns = kwargs.get('extra_columns',False)
     IFcol = kwargs.get('IF',False)
-    xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-    fout.write('% Results for {0:4s} calculated on {1:20s} \n'.format(  station, xxx ))
-    fout.write('% gnssrefl, https://github.com/kristinemlarson \n')
+    vers = 'gnssrefl v' + str(g.version('gnssrefl')) 
+    xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M")) 
+    #d= 'Results for ' + station + 'calculated with' + vers + ' on '  + xxx
+    d=f'Results for {station} calculated with {vers} on {xxx}'
+    fout.write("% {0:40s} \n".format(d))
+    #fout.write('% gnssrefl, https://github.com/kristinemlarson \n')
     if len(extraline) > 0:
         fout.write('% IMPORTANT {0:s} \n'.format(  extraline ))
     fout.write('% Traditional phase center corrections have NOT been applied \n')
@@ -771,8 +813,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     else:
         apply_if_corr = False
 
-    csvfile_spline = kwargs.get('csvfile_spline',False)
-    print('csvfile spline ', csvfile_spline)
+    writecsv = kwargs.get('csv',False)
+    # i will merge these two in a bit
+
 
     apply_rhdot  = kwargs.get('apply_rhdot',True)
     if apply_rhdot:
@@ -1009,7 +1052,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     if not multiyear:
         sd.rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs,year)
 
-    writecsv = False ; extraline = ''
+    #writecsv = False ; 
+    extraline = ''
     # write out the new solutions with RHdot and without 3 sigma outliers
     # this should be changed to take into account apply_rhdot_corr
     write_subdaily(fname_new,station,tvd_new,writecsv,extraline,newRH=correctedRH_new, RHdot_corr=correction_new)
@@ -1095,7 +1139,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     firstKnot_in_minutes = 15
     t1 = tnew.min()+firstKnot_in_minutes/60/24
     t2 = tnew.max()-firstKnot_in_minutes/60/24
-    print('what are these values? ' , t1, t2)
     knots =np.linspace(t1,t2,num=numKnots)
 
 
@@ -1140,13 +1183,14 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # pick up the orthometric height from the gnssir_analysis json
     H0 = sd.find_ortho_height(station,extension)
     # this writes out spline file and makes plot .... 
-    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out,csvfile_spline)
+    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out,writecsv)
     print('\nRMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
 
 
     # write out the files with RH dot and IF bias corrected - and again without 3 sigma outliers
-    bias_corrected_filename = fname_new + 'IF'; extraline = ''; writecsv = False
+    bias_corrected_filename = fname_new + 'IF'; extraline = ''; 
     biasCor_rh = tvd_new[jj,24]
+    print(writecsv)
     write_subdaily(bias_corrected_filename,station,tvd_new[jj,:], writecsv,extraline, newRH_IF=biasCor_rh)
 
     new_outliers = tvd_new[ii,:]
