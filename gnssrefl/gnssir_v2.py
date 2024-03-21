@@ -507,7 +507,7 @@ def plot2screen(station, f,ax1,ax2,pltname):
     return True
 
 
-def read_json_file(station, extension):
+def read_json_file(station, extension,**kwargs):
     """
     picks up json instructions for calculation of lomb scargle periodogram
 
@@ -525,6 +525,9 @@ def read_json_file(station, extension):
 
     """
     lsp = {} # 
+    # pick up a new parameter - that will be True for people looking
+    # for the json but that aren't upset it does not exist.
+    noexit = kwargs.get('noexit',False)
     # leftover from when i was using None
     if len(extension) == 0:
         useextension = False
@@ -547,9 +550,13 @@ def read_json_file(station, extension):
             with open(instructions) as f:
                 lsp = json.load(f)
         else:
-            print('The json instruction file does not exist: ', instructions)
-            print('Please make with gnssir_input and run this code again.')
-            sys.exit()
+            if noexit:
+                lsp = {}
+                return lsp
+            else:
+                print('The json instruction file does not exist: ', instructions)
+                print('Please make with gnssir_input and run this code again.')
+                sys.exit()
 
     if len(lsp['reqAmp']) < len(lsp['freqs']) :
         print('Number of frequencies found in json: ', len(lsp['freqs']))

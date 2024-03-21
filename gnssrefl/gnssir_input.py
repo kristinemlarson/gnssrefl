@@ -40,7 +40,8 @@ def parse_arguments():
     parser.add_argument("-refr_model", default=1, type=int, help="refraction model. default is 1, zero turns it off)")
     parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height, meters")
     parser.add_argument("-pele", nargs="*", type=float, help="min and max elevation angle in direct signal removal, default is 5-30")
-    parser.add_argument("-daily_medfilter", default=None, type=float, help="daily_avg, median filter, meters")
+    parser.add_argument("-daily_avg_medfilter", default=None, type=float, help="daily_avg, median filter, meters")
+    parser.add_argument("-daily_avg_reqtracks", default=None, type=int, help="daily_avg, ReqTracks parameter ")
     parser.add_argument("-subdaily_knots", default=None, type=float, help="subdaily, knots")
     parser.add_argument("-update", default=None, type=str, help="mode to update existing json (under dev)")
 
@@ -59,8 +60,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
        h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None, peak2noise: float = 2.8, 
        ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
-       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], 
-                      refr_model : int=1, Hortho : float = None, pele: list=[5,30], update: bool=False):
+       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : int=1, 
+                      Hortho : float = None, pele: list=[5,30], update: bool=False, daily_avg_reqtracks: int=None, daily_avg_medfilter=None):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -220,6 +221,12 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     update : bool
         allows you to update an existing json
+
+    daily_avg_reqtracks : int
+        number of tracks required for daily_avg code
+
+    daily_avg_medfilter : float
+        median filter value required for daily_avg code (meters)
     """
 
     # make sure environment variables exist
@@ -402,6 +409,12 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['ellist'] = ellist
 
     lsp['refr_model'] = refr_model
+
+    # added for people that want to save their daily average strategies.
+    # if not set, then they are saved as None.
+    lsp['daily_avg_reqtracks'] = daily_avg_reqtracks
+
+    lsp['daily_avg_medfilter'] = daily_avg_medfilter
 
     print('writing out to:', outputfile)
     print(lsp)

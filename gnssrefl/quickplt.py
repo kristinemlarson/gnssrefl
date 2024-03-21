@@ -5,6 +5,7 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import subprocess
 import sys
 
 
@@ -160,7 +161,7 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
         if columns 1-5 are Y,M,D,H,M then x-axis will be plotted in obstimes
     filename2 : str
         in principle this allows you to make plots from two files with identical formatting
-        not sure that it works
+        but I am not sure that it one hundred percent always works
     freq: int, optional
         use column 11 to find (and extract) a single frequency
     utc_offset: int, optional
@@ -197,6 +198,10 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
     convert_mjd = mjd
 
     commentsign = '%'
+
+    if (not os.path.isfile(filename)) & os.path.isfile(filename + '.gz'):
+        print('I will be nice and gunzip the file for you ...')
+        subprocess.call(['gunzip', filename + '.gz'])
 
     if os.path.isfile(filename):
         tvd = np.loadtxt(filename,comments=commentsign)
@@ -242,6 +247,14 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
                 return
             else:
                 secondFile = True
+                if not keepzeros:
+                    print('Remove zero values from second file')
+                    ii = (tvd2[:,ycol] != 0)
+                    tvd2 = tvd2[ii,:]
+                if (sat is not None):
+                    print('Only show satellite ', sat, ' for second file')
+                    ii = (tvd2[:,0] == sat)
+                    tvd2 = tvd2[ii,:]
         else:
             print('second filename does not exist')
 
@@ -278,7 +291,7 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
 
     # is second file currently supported???
     if secondFile:
-        ax.plot(tval2, yval2, 'r.')
+        ax.plot(tval2, yval2, symbol)
 
     plt.grid()
     plt.ylabel(ylabel)
@@ -301,11 +314,11 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
         if convert_mjd:
             t1 = Time(xlimits[0],format='mjd')
             t1_utc = t1.utc # change to UTC
-            tval1 =  t1_utc.datetime # change to datetime
+            tvalues1 =  t1_utc.datetime # change to datetime
             t2 = Time(xlimits[1],format='mjd')
             t2_utc = t2.utc # change to UTC
-            tval2 =  t2_utc.datetime # change to datetime
-            plt.xlim((tval1,tval2))
+            tvalues2 =  t2_utc.datetime # change to datetime
+            plt.xlim((tvalues1,tvalues2))
             if utc_offset is not None:
                 cc = '{:02d}'.format(abs(utc_offset)) + ':00'
                 if utc_offset < 0:

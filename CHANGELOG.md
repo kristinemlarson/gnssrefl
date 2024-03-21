@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.1.3
+
+Allow users to store required input parameters to daily_avg in the json used
+by gnssir. The names of these parameters are:
+"daily_avg_reqtracks" and  "daily_avg_medfilter".  For those making a new json,
+the parameters will be set to None if you don't choose a value on the command line. 
+You can also hand edit or add it. This would be helpful in not 
+having to rerun gnssir_input and risk losing some of your other specialized selections.
+
 ## 3.1.2
 
 Fixed bugs in highrate RINEX 3 downloads/translations that conflicted with parallel processing

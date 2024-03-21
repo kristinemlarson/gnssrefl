@@ -3,8 +3,9 @@ import matplotlib.pyplot as matplt
 import os
 import sys
 
-import gnssrefl.gps as g
 import gnssrefl.daily_avg as da
+import gnssrefl.gps as g
+import gnssrefl.gnssir_v2 as guts2
 
 from gnssrefl.utils import str2bool
 
@@ -49,6 +50,14 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     They are applied in two steps. The code first calculates the median value each day - and keeps
     only the RH that are within medfilter (meters) of this median value. If there are at least "ReqTracks"
     number of RH left after that step, a daily average is computed for that day.
+
+
+    As of version 3.1.3 users may store the required input parameters to daily_avg 
+    in the json used by gnssir. The names of these parameters are:
+    daily_avg_reqtracks and  daily_avg_medfilter.  For those making a new json, 
+    the parameters will be set to None if you don't choose a value on the command line. 
+    You can also hand edit or add it. This would be helpful in not having to rerun gnssir_input and 
+    risk losing some of your other specialized selections.
 
     If you are unfamiliar with what a median filter does in this code, please see 
     https://gnssrefl.readthedocs.io/en/latest/pages/README_dailyavg.html
@@ -180,6 +189,35 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
 # where the summary files will be written to
     xdir = os.environ['REFL_CODE']
     txtdir = xdir + '/Files/'  + subdir
+
+    # read in potential medfilter and reqtracks values
+    # set noexit to True because I want to look for the json but 
+    # don't want to require it
+    lsp = guts2.read_json_file(station, extension,noexit=True)
+    # if valeus not found, then set them to None
+    if 'daily_avg_medfilter' not in lsp:
+        lsp['daily_avg_medfilter'] = None
+    if 'daily_avg_reqtracks' not in lsp:
+        lsp['daily_avg_reqtracks'] = None
+
+    # if these required values are zero, then the code 
+    # looks to see if you set them in the json
+    if ReqTracks == 0:
+        if  lsp['daily_avg_reqtracks'] is not None:
+            print('Using ReqTracks value from json')
+            ReqTracks = lsp['daily_avg_reqtracks']
+        else:
+            print('Zero is an invalid value for ReqTracks. Change value on command line')
+            print('or in gnssir_input created json. Exiting.')
+            sys.exit()
+    if medfilter == 0:
+        if  lsp['daily_avg_medfilter'] is not None:
+            print('Using medfilter value from json')
+            medfilter = lsp['daily_avg_medfilter']
+        else:
+            print('Zero is an invalid value for medfilter parameter. Change value on command ')
+            print('line or in gnssir_input created json. Exiting.')
+            sys.exit()
 
     # set the name of the output format
     if csv:
