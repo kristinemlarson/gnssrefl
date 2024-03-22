@@ -120,3 +120,6 @@ Make sure people are using version 3.9
 is version 3.10 ok?  for sure 3.11 is not.
 
 How to make a new github release?
+
+myAnimation.gif is in the EarthScopeLecture folder in Presentations.
+Need to find a better place for it

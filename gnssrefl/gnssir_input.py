@@ -36,20 +36,25 @@ def parse_arguments():
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument("-frlist", nargs="*",type=int,  help="User defined frequencies using our nomenclature")
     parser.add_argument("-azlist2", nargs="*",type=float,  default=None,help="list of azimuth regions, default is 0-360") 
-    parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles to allow more complex analysis scenarios-advanced users only!") 
+    parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles, advanced users only!") 
     parser.add_argument("-refr_model", default=1, type=int, help="refraction model. default is 1, zero turns it off)")
     parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height, meters")
     parser.add_argument("-pele", nargs="*", type=float, help="min and max elevation angle in direct signal removal, default is 5-30")
     parser.add_argument("-daily_avg_medfilter", default=None, type=float, help="daily_avg, median filter, meters")
     parser.add_argument("-daily_avg_reqtracks", default=None, type=int, help="daily_avg, ReqTracks parameter ")
-    parser.add_argument("-subdaily_knots", default=None, type=float, help="subdaily, knots")
-    parser.add_argument("-update", default=None, type=str, help="mode to update existing json (under dev)")
-
+    parser.add_argument("-subdaily_alt_sigma", default=None, type=str, help="subdaily, Nievinski sigma")
+    parser.add_argument("-subdaily_sigma", default=None, type=str, help="subdaily, sigma for part 1")
+    parser.add_argument("-subdaily_ampl", default=None, type=float, help="subdaily, LSP amplitude override")
+    parser.add_argument("-subdaily_delta_out", default=None, type=int, help="subdaily, spline output interval (sec)")
+    parser.add_argument("-subdaily_knots", default=None, type=float, help="subdaily, knots, how many per day")
+    parser.add_argument("-subdaily_subdir", default=None, type=str, help="subdaily, output directory")
+    parser.add_argument("-subdaily_spline_outlier1", default=None, type=float, help="subdaily, outlier value (m), part1")
+    parser.add_argument("-subdaily_spline_outlier2", default=None, type=float, help="subdaily, outlier value (m), part2")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['allfreq', 'l1', 'l2c', 'xyz', 'refraction','update']
+    boolean_args = ['allfreq', 'l1', 'l2c', 'xyz', 'refraction','subdaily_alt_sigma']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -61,7 +66,10 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
        ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
        delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : int=1, 
-                      Hortho : float = None, pele: list=[5,30], update: bool=False, daily_avg_reqtracks: int=None, daily_avg_medfilter=None):
+                      Hortho : float = None, pele: list=[5,30], daily_avg_reqtracks: int=None, 
+                      daily_avg_medfilter: float =None, subdaily_alt_sigma : bool=None, subdaily_ampl : float=None, subdaily_delta_out : float=None, 
+                      subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
+                      subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -219,14 +227,36 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     pele : float
         min and max elevation angles in direct signal removal, i.e. 3 40. Default is 5 30. 
 
-    update : bool
-        allows you to update an existing json
-
-    daily_avg_reqtracks : int
+    daily_avg_reqtracks : int, optional
         number of tracks required for daily_avg code
 
-    daily_avg_medfilter : float
+    daily_avg_medfilter : float, optional
         median filter value required for daily_avg code (meters)
+
+    subdaily_alt_sigma : bool, optional
+        use Nievinski sigma definition
+
+    subdaily_ampl : float, optional
+        override the required LSP amplitude  
+
+    subdaily_delta_out : int, optional
+        spacing for final subdaily spline output
+
+    subdaily_knots : int, optional
+        number of knots per day for subdaily spline fits
+
+    subdaily_sigma : float, optional
+        how many standard deviations for outliers in subdaily code setting
+
+    subdaily_subdir : str, optional
+        non-standard location for subdaily outputs
+
+    subdaily_spline_outlier1 : float, optional
+        alternate setting for outlier detection in part1
+
+    subdaily_spline_outlier2 : float, optional
+        alternate setting for outlier detection in part2
+
     """
 
     # make sure environment variables exist
@@ -237,10 +267,6 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         print('station name must be four characters long. Exiting.')
         sys.exit()
 
-    if update:
-        print('You have selected to update an existing json')
-        lsp = guts2.read_json_file(station, extension)
-        sys.exit()
 
 # location of the site - does not have to be very good.  within 100 meters is fine
     query_unr = False
@@ -382,6 +408,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['overwriteResults'] = True
 
     # if snr file does not exist, try to make one
+    # i don't think this option exists anymore
     lsp['seekRinex'] = False
 
     # compress snr files after analysis - saves disk space
@@ -404,17 +431,26 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['delTmax'] = delTmax  
  
     # gzip SNR files after running the code
+    # this really should be set to True.  the code is obviously ignoring it
     lsp['gzip'] = False   
 
     lsp['ellist'] = ellist
 
     lsp['refr_model'] = refr_model
 
-    # added for people that want to save their daily average strategies.
+    # added for people that want to save their daily average and subdaily strategies.
     # if not set, then they are saved as None.
     lsp['daily_avg_reqtracks'] = daily_avg_reqtracks
-
     lsp['daily_avg_medfilter'] = daily_avg_medfilter
+
+    lsp['subdaily_alt_sigma'] = subdaily_alt_sigma
+    lsp['subdaily_ampl'] = subdaily_ampl
+    lsp['subdaily_delta_out'] = subdaily_delta_out
+    lsp['subdaily_knots'] = subdaily_knots
+    lsp['subdaily_sigma'] = subdaily_sigma
+    lsp['subdaily_spline_outlier1'] = subdaily_spline_outlier1
+    lsp['subdaily_spline_outlier2'] = subdaily_spline_outlier2
+    lsp['subdaily_subdir'] = subdaily_subdir
 
     print('writing out to:', outputfile)
     print(lsp)

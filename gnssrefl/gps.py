@@ -6244,18 +6244,9 @@ def set_subdir(subdir):
         print('This will tell the code where to put the output.')
         sys.exit()
 
-    outdir = xdir  + '/Files/'
+    outdir = xdir  + '/Files/' + subdir 
     if not os.path.exists(outdir) :
-        subprocess.call(['mkdir', outdir])
-
-    if subdir == '':
-        okokk = 1
-        #print('Using this output directory: ', outdir)
-    else:
-        outdir = xdir  + '/Files/' + subdir + '/'
-        #print('Using this output directory: ', outdir)
-        if not os.path.exists(outdir) :
-            subprocess.call(['mkdir', outdir])
+        subprocess.call(['mkdir', '-p', outdir])
 
     return
 

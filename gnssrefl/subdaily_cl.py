@@ -8,6 +8,7 @@ import sys
 
 import gnssrefl.gps as g
 import gnssrefl.subdaily as t
+import gnssrefl.sd_libs as sd
 
 from gnssrefl.utils import str2bool
 
@@ -45,7 +46,7 @@ def parse_arguments():
     parser.add_argument("-apply_rhdot", default=None, type=str, help="apply rhdot, default is True")
     parser.add_argument("-fs", default=None, type=int, help="fontsize for figures. default is 10")
     parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate Nievinski sigma definition. default is False")
-    parser.add_argument("-gap_min_val", default=None, type=float, help="min gap allowed in splinefit output file. default is 6 hours")
+    parser.add_argument("-gap_min_val", default=None, type=float, help="min gap (hours) allowed in splinefit output file. default is 6 hours")
     parser.add_argument("-knots2", default=None, type=int, help="Secondary knots value for final fit. default is to use original knots value.")
 
     args = parser.parse_args().__dict__
@@ -60,10 +61,10 @@ def parse_arguments():
 
 def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: str = None, csv: bool = False, 
         plt: bool = True, spline_outlier1: float = None, spline_outlier2: float = None, 
-        knots: int = 8, sigma: float = 2.5, extension: str = '', rhdot: bool = True, doy1: int = 1, 
-        doy2: int = 366, testing: bool = True, ampl: float = 0, h1: float=0.4, h2: float=300.0, 
+        knots: int = None, sigma: float = None, extension: str = None, rhdot: bool = True, doy1: int = 1, 
+        doy2: int = 366, testing: bool = True, ampl: float = None, h1: float=0.4, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
-        subdir: str = None, delta_out : int = 1800, if_corr: bool = True, knots_test: int = 0, 
+        subdir: str = None, delta_out : int = None , if_corr: bool = True, knots_test: int = 0, 
              hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0,
              year_end: int=None, knots2 : int=None):
     """
@@ -80,7 +81,11 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
     This code calculates and applies various corrections. New Reflector Height values are added 
     to the output files as new columns. If you run the code but continue to assume the "good answers" are
-    in still in column 3, you are essentially not using the code at all.
+    in still in column 3, you are essentially not using the code at all. 
+
+    As of version 3.1.4 you can use some of the subdaily optional inputs from the gnssir_input created json.
+    See gnssir_input for details.
+
 
     As of version 2.0.0:
 
@@ -144,7 +149,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         default is False.
     plt : bool, optional
         To print plots to screen or not.
-        default is TRUE.
+        default is True.
     spline_outlier1 : float, optional
         Outlier criterion used in first splinefit, before RHdot  (m)
     spline_outlier2 : float, optional
@@ -157,7 +162,6 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         default is 2.5
     extension : str, optional
         Solution subdirectory.
-        default is empty string.
     rhdot : bool, optional
         Set to True to turn on spline fitting for RHdot correction.
         default is True.
@@ -209,6 +213,10 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         testing out allowing different knots for last spline
     """
 
+    print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    print('<<<<<<<<<<<<<<<<<<<<<<<<<< subdaily >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+
     if len(station) != 4:
         print('station names must be four characters long')
         sys.exit()
@@ -217,37 +225,84 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']
 
-    # default subdirectory is the station name
-    if subdir == None:
-        subdir = station
+    lsp = sd.pickup_subdaily_json_defaults(xdir, station, extension)
+
+    if subdir is None: # not set on the command line
+        if lsp['subdaily_subdir'] is None: 
+            subdir = station
+        else:
+            subdir = lsp['subdaily_subdir']
+            print('Using subdir value from json')
+
     # this makes sure the directory exists
     g.set_subdir(subdir)
 
-    g.checkFiles(station, extension)
-
-    # this should no longer be needed
-    if extension == '':
+    # I am not 100% sure of this - wish I had not created the subdir variable
+    if extension is None:
         txtdir = xdir + '/Files/' + subdir
+        extension = '' # is this needed? Yes, it is.
     else:
         txtdir = xdir + '/Files/' + subdir + '/' + extension
 
+    g.checkFiles(station, extension)
+
     print('Using this directory for output: ', txtdir)
 
+    
+    # this is ugly - should be moved to a function
+
+    if alt_sigma is None: # not set on the command line
+        if lsp['subdaily_alt_sigma'] is not None: # but it has been set in the json
+            alt_sigma = lsp['subdaily_alt_sigma']
+            print('Using alt_sigma from json')
+
+
+    if ampl is None: # not set on the command line
+        if lsp['subdaily_ampl'] is not None: # but it has been set in the json
+            ampl = lsp['subdaily_ampl']
+            print('Using ampl value from json')
+        else:
+            ampl = 0 # don't go beyond whatever was done when you ran gnssir
+
+
+    if delta_out is None: # not set on the command line
+        if lsp['subdaily_delta_out'] is not None: # but it has been set in the json
+            delta_out = lsp['subdaily_delta_out']
+            print('Using delta_out from json')
+        else:
+            delta_out = 1800 # setting default here now instead of above
+
+    if knots is None: # not set on the command line
+        if lsp['subdaily_knots'] is not None: # but it has been set in the json
+            knots = lsp['subdaily_knots']
+            print('Using knots from json')
+        else:
+            knots = 8
+
+
+    if sigma is None: # not set on the command line
+        if lsp['subdaily_sigma'] is not None: # but it has been set in the json
+            sigma = lsp['subdaily_sigma']
+            print('Using sigma from json')
+        else:
+            sigma = 2.5
+
+    if spline_outlier1 is None: # not set on the command line
+        if lsp['subdaily_spline_outlier1'] is not None: # but it has been set in the json
+            spline_outlier1 = lsp['subdaily_spline_outlier1']
+            print('Using spline_outlier1 from json')
+
+    if spline_outlier2 is None: # not set on the command line
+        if lsp['subdaily_spline_outlier2'] is not None: # but it has been set in the json
+            spline_outlier2 = lsp['subdaily_spline_outlier2']
+            print('Using spline_outlier2 from json')
 
     #create the subdaily file
     if (h1 > h2):
         print('h1 must be less than h2. You submitted ', h1, ' and ', h2)
         sys.exit()
 
-    if csv:
-        csvfile_spline = True
-        writecsv = True
-    else:
-        writecsv = False
-        csvfile_spline = False
-
     outputs = [] # this is for multiple years
-
 
     if year_end is None: 
         year_end = year
@@ -289,7 +344,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
             print('Reading in the results for year: ', y, ' and doys ',  doy_st, ':', doy_en)
 
             ntv, obstimes, fname, fname_new = t.readin_and_plot(station, y, doy_st, doy_en, plt, \
-                    extension, sigma, writecsv, azim1, azim2, ampl, peak2noise, txtfile_part1, \
+                    extension, sigma, csv, azim1, azim2, ampl, peak2noise, txtfile_part1, \
                     h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma)
             outputs.append(fname_new)
 
@@ -323,7 +378,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
                                       if_corr=if_corr,knots_test=knots_test,
                                       hires_figs=hires_figs, apply_rhdot=apply_rhdot,fs=fs,
                                       gap_min_val=gap_min_val,year=year, extension=extension, 
-                                      knots2=knots2,csv=writecsv )
+                                      knots2=knots2,csv=csv )
        if plt:
            mplt.show()
 

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.1.4 
+
+Added a gazillion options to gnssir_input to accommodate daily_avg and subdaily 
+users that want to store strategies there. See the gnssir_input code for more details,
+i.e. the parameter names.
+
 ## 3.1.3
 
 Allow users to store required input parameters to daily_avg in the json used

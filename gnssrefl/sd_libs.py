@@ -1041,6 +1041,7 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
 
     # find indices of gaps  that are larger than a certain value
     ii = (gdiff > gap_min_val)
+    #print('gap_min_val',gap_min_val, gdiff)
     N = len(mjd[ii])
     Ngdiff = len(gdiff)
 
@@ -1087,3 +1088,58 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     g.save_plot(pfile)
 
     return
+
+def pickup_subdaily_json_defaults(xdir, station, extension):
+    """
+    picks up an existing gnssir analysis json. augments
+    with subdaily parameters if needed. Returns the dictionary.
+
+    Parameters
+    ----------
+    xdir : str
+        REFL_CODE code location
+    station : str
+        name of station
+    extension : str
+        possible extension location
+
+    Returns
+    -------
+    lsp : dictionary 
+        contents of gnssir json
+    """
+
+    # changed default in subdaily to None instead of '' So have to check
+    if extension is None:
+        lsp = guts2.read_json_file(station, '',noexit=True)
+    else:
+        lsp = guts2.read_json_file(station, extension,noexit=True)
+
+    # check json for subdaily settings
+    # if values not found, then set them to None
+
+    if 'subdaily_ampl' not in lsp:
+        lsp['subdaily_ampl'] = None
+
+    if 'subdaily_spline_outlier1' not in lsp:
+        lsp['subdaily_spline_outlier1'] = None
+
+    if 'subdaily_spline_outlier2' not in lsp:
+        lsp['subdaily_spline_outlier2'] = None
+
+    if 'subdaily_knots' not in lsp:
+        lsp['subdaily_knots'] = None
+
+    if 'subdaily_delta_out' not in lsp:
+        lsp['subdaily_delta_out'] = None
+
+    if 'subdaily_alt_sigma' not in lsp:
+        lsp['subdaily_alt_sigma'] = None
+
+    if 'subdaily_sigma' not in lsp:
+        lsp['subdaily_sigma'] = None
+
+    if 'subdaily_subdir' not in lsp:
+        lsp['subdaily_subdir'] = None
+
+    return lsp

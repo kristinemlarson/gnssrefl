@@ -786,6 +786,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # output will go to REFL_CODE/Files unless txtdir provided
     xdir = os.environ['REFL_CODE']
 
+    # change units to day of year
     gap_min_val = kwargs.get('gap_min_val',6.0)
     gap_min_val = gap_min_val/24 # change to DOY units
 
@@ -1128,7 +1129,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         tnew, ynew = flipit(tvd_new,column)
 
     Ndays = tnew.max()-tnew.min()
-    print('trying knots2')
+    #print('trying knots2')
     knots_per_day = knots2_per_day
 
     numKnots = int(knots_per_day*(Ndays))
@@ -1188,7 +1189,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # write out the files with RH dot and IF bias corrected - and again without 3 sigma outliers
     bias_corrected_filename = fname_new + 'IF'; extraline = ''; 
     biasCor_rh = tvd_new[jj,24]
-    print(writecsv)
     write_subdaily(bias_corrected_filename,station,tvd_new[jj,:], writecsv,extraline, newRH_IF=biasCor_rh)
 
     new_outliers = tvd_new[ii,:]
