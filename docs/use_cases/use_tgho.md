@@ -1,6 +1,6 @@
 # Lake Taupo
 
-Updated December 11, 2022 
+Try using <code>-par 10</code> when running **gnssir**.
 
 <p align="center">
 <img src="../_static/tgho_barker.jpg" width="500"><BR>

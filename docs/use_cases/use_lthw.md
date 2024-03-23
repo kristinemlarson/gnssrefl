@@ -1,5 +1,7 @@
 # Lower Thwaites Glacier
 
+Try using <code>-par 10</code> when you run **rinex2snr** and **gnssir**. Your code should run must faster.
+
 ## metadata
 
 <p align=center>
@@ -36,7 +38,6 @@ Because there are no permanent structures surrounding the site, elevation and az
 The only restriction that should be imposed is a minimum elevation angle of 7; this is because the field
 crew set this at the receiver when it was originally installed.
 
-lthw is one of the example cases for the [GNSS-IR webapp.](https://gnss-reflections.org/api?example=lthw)
 
 ## Take a quick look at the SNR data
 
@@ -44,7 +45,7 @@ Translate the GPS data for January 1 in 2018. First you need to make the SNR fil
 
 <code>rinex2snr lthw 2018 1</code>
 
-Use our utility **quickLook** to look at these data [(For more details on quickLook output)](../pages/quickLook.md):
+Use our utility **quickLook** to look at these data. 
 
 <code>quickLook lthw 2018 1 -e1 7</code>
 

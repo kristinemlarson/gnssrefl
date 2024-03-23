@@ -1,7 +1,5 @@
 # St Michael Bay
 
-**2023 June 6, I am still working to update this use case with the new code."
-
 [Warning](warning.md)
 
 **at01 is the only tide gauge in this region of Alaska.** 
@@ -74,7 +72,8 @@ You will also see strong retrievals in the Lomb Scargle periodograms:
 
 <img src=../_static/at01_lsp_109.png width=600>
 
-This site has modern GPS signals, Galileo signal, and Glonass signals. Here are some sample results for L2C:
+This site has modern GPS signals, Galileo signal, and Glonass signals. Here are 
+some sample results for L2C:
 
 <code>quickLook at01 2020 109 -e1 5 -e2 13 -h1 8 -h2 15 -fr 20</code>
 
