@@ -1,6 +1,5 @@
 # Estimating Reflector Heights 
 
-We have changed how arcs are selected. We now recommend the following procedure.
 
 ## gnssir_input
 
@@ -34,24 +33,14 @@ Note: the reflector height region should not be too small, as it is also used to
 If you use tiny RH constraints, your periodogram will not make any sense and your work will fail the quality control metrics.
 
 
-[The old way of setting the strategy, using make_json_input](old_way.md)
-
 ## gnssir
 
 <code>gnssir</code> estimates reflector heights. It assumes you have made SNR files and defined an analysis strategy.
 The minimum inputs are the station name, year, and doy. 
  
-New - recommended - protocol:
-
-<CODE>gnssir p041 2020 150 -newarcs T</CODE> 
-
-Old protocol:
 
 <CODE>gnssir p041 2020 150 </CODE> 
 
-**Warning: eventually the newarc method will become the default.**  I am allowing both to exist for a while so that 
-users aren't faced with non-working analysis strategies.  The azimuth limits have different variable names so that you can
-store them in a single json file.
 
 [Additional inputs](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_cl.html)
 
