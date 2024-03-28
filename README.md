@@ -9,6 +9,9 @@ gnssrefl is an open source software package for GNSS interferometric reflectomet
 
 ![](docs/myAnimation.gif)
 
+I made this animation ages ago - so it is in Matlab.  I would be happy to host a link to 
+a version in python.  The main code is [snr_simulation](docs/pages/snr_simulation.m) 
+and the helper function is [setFrame.m](docs/pages/set_Frame.m). 
 
 Documentation:
 

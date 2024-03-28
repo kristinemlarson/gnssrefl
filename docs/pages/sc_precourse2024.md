@@ -109,8 +109,6 @@ to both of these codes.
 
 You should read [the overview documentation](https://gnssrefl.readthedocs.io/en/latest/pages/understand.html)
 
-And then the [quickLook documentation](https://gnssrefl.readthedocs.io/en/latest/pages/quickLook.html).
-
 ## What is a Reflection Zone 
 
 [Watch this video](https://www.youtube.com/watch?v=sygZMeCHHDg&t=23s)
