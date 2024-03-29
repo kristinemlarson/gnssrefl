@@ -1,5 +1,8 @@
 # gnssrefl v3.1.4 
 
+If you use this code in any presentation or publication, you are expected to cite either 
+this github repository or the gnssrefl DOI.
+
 [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601494.svg)](http://dx.doi.org/10.5281/zenodo.5601494) 

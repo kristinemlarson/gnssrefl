@@ -1989,6 +1989,7 @@ def open_outputfile(station,year,doy,extension):
     $REFL_CODE/year/results/station/extension directory
     for lomb scargle periodogram results
 
+
     Parameters
     ----------
     station : str
@@ -2007,16 +2008,16 @@ def open_outputfile(station,year,doy,extension):
         when you open a file so you can keep writing to it
 
     """
-    if os.path.isdir('logs'):
-        skippingxist = True
-    else:
-        subprocess.call(['mkdir', 'logs'])
+    xdir = os.environ['REFL_CODE']
+    logdir = xdir + '/logs'
+
+    if not os.path.isdir(logdir):
+        subprocess.call(['mkdir', logdir])
     fout = 0
 #   primary reflector height output goes to this directory
-    xdir = os.environ['REFL_CODE']
     cdoy = '{:03d}'.format(doy)
 #   extra file with rejected arcs
-    w = 'logs/reject.' + str(year) + '_' + cdoy  + station + '.txt'
+    w = logdir + '/reject.' + str(year) + '_' + cdoy  + station + '.txt'
 
     filedir = xdir + '/' + str(year)  + '/results/' + station 
 #   changed to a function

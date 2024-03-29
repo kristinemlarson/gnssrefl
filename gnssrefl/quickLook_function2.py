@@ -102,8 +102,11 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     g.check_environ_variables()
 
     # make sure logs directory exists
-    if not os.path.isdir('logs'):
-        subprocess.call(['mkdir', 'logs'])
+    xdir = os.environ['REFL_CODE']
+    logdir = xdir + '/logs'
+
+    if not os.path.isdir(logdir):
+        subprocess.call(['mkdir', logdir])
 
     # if it finds the station coordinates, it will return irefr as 1
     quick_p,quick_T,irefr, quick_e = quick_refraction(station)
@@ -143,7 +146,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     else:
         # make output file for the quickLook RRH values, just so you can give them a quick look see
         # also used in the azimuth QC plot
-        quicklog = 'logs/rh_' + station + '.txt'
+        quicklog = logdir + '/rh_' + station + '.txt'
         rhout = open(quicklog,'w+')
         amax = 0
         minEdataset = min(snrD[:,1])

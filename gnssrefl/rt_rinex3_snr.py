@@ -42,6 +42,7 @@ def main():
     idoy = int(cdoy)
     iyear,month,day=g.ydoy2ymd(iyear, idoy)
 
+    maindir = os.environ['REFL_CODE']
     # where rinex data are
     xdir = os.environ['REFL_CODE'] + '/rinex/' + STATION + '/' + year + '/'
     # where snr data will go
@@ -104,7 +105,7 @@ def main():
         decr = '0'
     in5 = g.binary(decr) # decimation can be used in hybrid option
     message = 'None '
-    errorlog = 'logs/' + station + '_hybrid_error.txt'
+    errorlog = maindir + '/logs/' + station + '_hybrid_error.txt'
     in6 = g.binary(errorlog)
     gnsssnrbigger.foo(in1,in2,in3,in4,in5,in6)
     # clean up - remove the rinex2 file

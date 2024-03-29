@@ -40,8 +40,9 @@ def parse_arguments():
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
                         help="True means only use RINEX files on local machine")
-    parser.add_argument("-fortran", default=None, metavar='False', type=str,
-                        help="True means use Fortran RINEX translators ")
+    # remove fortran as an option
+    #parser.add_argument("-fortran", default=None, metavar='False', type=str,
+    #                    help="True means use Fortran RINEX translators ")
     parser.add_argument("-archive", default=None, metavar='all',
                         help="specify archive", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
@@ -61,7 +62,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['nolook', 'fortran', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip','monthly']
+    boolean_args = ['nolook', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip','monthly']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -69,7 +70,7 @@ def parse_arguments():
 
 
 def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None, rate: str = 'low', dec: int = 0,
-              fortran: bool = False, nolook: bool = False, archive: str = 'all', doy_end: int = None,
+              nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
               screenstats : bool = False, gzip : bool = True, monthly : bool = False, par : int=None ):
@@ -241,9 +242,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     dec : int, optional
         Decimation rate. 0 is default.
 
-    fortran : bool, optional
-        Whether to use fortran to translate the rinex files. 
-
     nolook : bool, optional
         tells the code to retrieve RINEX files from your local machine. default is False
 
@@ -302,7 +300,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     translator : str, optional
         hybrid (default) : uses a combination of python and fortran to translate the files.
 
-        fortran : uses fortran to translate (requires the fortran translator executable)
+        fortran : uses fortran to translate (requires the fortran translator executable to exist)
 
         python : uses python to translate. (Warning: This can be very slow)
 
@@ -339,6 +337,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         default is NOne.  parallel processing, valid up to 10
 
     """
+
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
@@ -432,35 +431,21 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         orb = 'jax'
 
     # default is to use hybrid for RINEX translator - UNLESS You chose fortran
-    if translator is None:
-        # the case when someone sets fortran to true and doesn't set translator also
-        # but i do not think this happens because Kelly has made hybrid the default
-        if fortran:
-            translator = 'fortran'
-        else:
-            translator = 'hybrid'
-    elif translator == 'hybrid':
-        # override
-        if fortran:
-            translator = 'fortran'     
-    elif translator == 'python':
-        fortran = False  
-    elif translator == 'fortran':
-        fortran = True
-    translator_accepted = [None, 'fortran', 'hybrid', 'python']
+
+    # these are currently accepted
+    translator_accepted = ['fortran', 'hybrid', 'python']
     if translator not in translator_accepted:
         print(f'translator option must be one of {translator_accepted}. Exiting.')
         sys.exit()
 
     # check that the fortran exe exist
-    if fortran:
+    if translator == 'fortran':
         if orb == 'nav':
             snrexe = g.gpsSNR_version()
             if not os.path.isfile(snrexe):
                 print('You have selected the fortran and GPS only options.')
-                print('However, the fortran translator gpsSNR.e has not been properly installed.')
+                print('However, the fortran translator gpsSNR.e does not exist.')
                 print('We are changing your choice to the hybrid translator option.')
-                fortran = False
                 translator = 'hybrid'
         else:
             snrexe = g.gnssSNR_version()
@@ -468,7 +453,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
                 print('You have selected the fortran and GNSS options.')
                 print('However, the fortran translator gnssSNR.e has not been properly installed.')
                 print('We are changing your choice to hybrid option.')
-                fortran = False
                 translator = 'hybrid'
 
     rate = rate.lower()
@@ -548,7 +532,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         stream = 'R'
 
     args = {'station': station, 'year':year, 'doy':doy, 'isnr': snr, 'orbtype': orb, 'rate': rate, 
-            'dec_rate': dec, 'archive': archive, 'fortran': fortran, 'nol': nolook, 'overwrite': overwrite, 
+            'dec_rate': dec, 'archive': archive, 'nol': nolook, 'overwrite': overwrite, 
             'translator': translator, 'srate': samplerate, 'mk': mk, 'stream': stream, 
             'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip}
     MJD1 = int(g.ydoy2mjd(year,doy))
@@ -561,7 +545,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
 
     if MJD1 == MJD2:
-        print('requested parallel processing, but only asked for one day of analysis')
+        print('Only one day being analyzed, parallel processing turned off')
         par = None
     if archive in archive_list_no_parallel:
         print('You have chosen an archive that is unfriendly to multiple simultaneous download')

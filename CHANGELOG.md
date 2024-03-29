@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.1.5
+rinex3 translations not working
+
+I removed fortran as optional boolean input to rinex2snr.  this hsould be accommodated by setting
+translator to 'fortran' instead.
+
+rinex2snr logs will now be written to $REFL_CODE/logs. Previously the logs directory
+was created wherever you were running the code, which was confusing to people using
+dockers.
+
 ## 3.1.4 
 
 Added a gazillion options to gnssir_input to accommodate daily_avg and subdaily 

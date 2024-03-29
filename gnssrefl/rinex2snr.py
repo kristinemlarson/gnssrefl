@@ -57,7 +57,7 @@ def quickname(station,year,cyy, cdoy, csnr):
 
     return fname
 
-def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive,fortran,nol,overwrite,translator,srate, 
+def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol,overwrite,translator,srate, 
                   mk, stream,strip,bkg,screenstats,gzip):
     """
     main code to convert RINEX files into SNR files 
@@ -91,10 +91,6 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive,fort
 
     archive : str
         choice of GNSS archive
-
-    fortran : bool
-        whether the fortran rinex translator is to be used
-        default: false
 
     nol: bool
         True: assumes RINEX files are in local directory
@@ -218,7 +214,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive,fort
                                 if screenstats:
                                     print('Testing out stripping the RINEX 2 file here')
                                 k.strip_rinexfile(r)
-                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
+                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator)
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
@@ -266,7 +262,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive,fort
                             # convert to RINEX 2.11
                             fexists = g.new_rinex3_rinex2(r3,r2,dec_rate)
                             if fexists:
-                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
+                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator)
                             else:
                                 print('Something about the RINEX 3-2 conversion did not work')
                         else:
@@ -350,18 +346,20 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive,fort
                              if screenstats:
                                  print('RINEX 2 created from v3', year, doy, ' Now remove RINEX 3 files and convert')
                              subprocess.call(['rm', '-f',rnx_filename]) # rnx
-                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
+                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator)
                         else:
                             print('Unsuccessful RINEX 3 retrieval/translation', year, doy)
                     else:
                         print(station, ' year:', year, ' doy:', doy, ' from: ', archive, ' rate:', rate, ' orb:', orbtype)
                         # this is rinex version 2 - finds rinex and converts it
-                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,fortran,translator)
+                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator)
 
 
-def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,fortran,translator):
+def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,translator):
     """
     convert RINEX files to SNR files
+
+    2024 March 29: change location of logs directory to below REFL_CODE
 
     Parameters
     ----------
@@ -386,34 +384,52 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
     archive : str
         external location (archive) of the rinex files
 
-    fortran : bool
-         whether fortran translator to be used.  this is here for backwards compatability
-
     translator : str
          hybrid, python, or fortran
 
     """
+    xdir = os.environ['REFL_CODE']
+
+    exedir = os.environ['EXE'] # location of executables for fortran people
+
+    # universal location for the log directory
+    logdir = xdir + '/logs'
+
     screenstats = False # for now
     # define directory for the conversion executables
-    if not os.path.isdir('logs'):
-        subprocess.call(['mkdir', 'logs'])
-    logname = 'logs/' + station + '.txt'
+    if not os.path.isdir(logdir):
+        subprocess.call(['mkdir', logdir])
+
+    logname = logdir + '/' + station + '.txt'
+    print('Minimal feedback is written to ', logname)
     log = open(logname, 'w+')
     log.write("Receiver rate: {0:5s} \n".format(receiverrate))
     log.write("Decimation rate: {0:3.0f} \n".format(dec_rate))
     log.write("Archive: {0:10s} \n".format(archive))
     log.write("Orbits : {0:10s} \n".format(orbtype))
-    exedir = os.environ['EXE']
+    log.write("Translator : {0:10s} \n".format(translator))
     csnr = str(option)
+    # should be using a function for this
     cdoy = '{:03d}'.format(doy)
     cyy = str(year)[2:4]
+
     snrname_full =  quickname(station,year,cyy,cdoy,csnr)
-    print('Creating ', snrname_full)
+    log.write("Creating : {0:s} \n".format(snrname_full))
+
     snrname_compressed = ''
 
     # if it exists, you should not have gotten to this code...
     snre = False
     #snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
+
+    # use a local definition of fortran now that we are only using translator variable from
+    # the functions that call conv2snr
+    # 
+    fortran = False
+
+    if translator == 'fortran':
+        fortran == True
+
     if (snre == True):
         log.write("The snrfile already exists: {0:50s} \n".format(snrname_full))
         print("The snrfile already exists: ", snrname_full)
@@ -466,7 +482,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
             if (oexist) and (rexist):
                 snrname = g.snr_name(station, year,month,day,option)
                 orbfile = orbdir + '/' + f
-                #print('translator',translator)
+                # almost everyone uses hybrid. python only is heavily discouraged because
+                # it is too slow. 
                 if translator == 'hybrid':
                     g.make_snrdir(year,station) # make sure output directory exists
                     in1 = g.binary(rinexfile)
@@ -483,7 +500,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         decr = '0'
                     in5 = g.binary(decr) # decimation can be used in hybrid option
                     message = 'None '
-                    errorlog = 'logs/' + station + '_hybrid_error.txt'
+                    errorlog = logdir + '/' + station + '_hybrid_error.txt'
+
                     in6 = g.binary(errorlog)
                     log.write('SNR file {0:50s} \n will use hybrid of python and fortran to make \n'.format( snrname))
                     # these are calls to the fortran codes that have been ported to be called from python
@@ -497,11 +515,12 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                             gnsssnr.foo(in1,in2,in3,in4,in5,in6)
                 else:
                     if (translator == 'fortran'):
+                        print('trying to use fortran translator')
                         t1=time.time()
                         try:
                             #subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
                             log.write('Using standalone fortran for translation  - separate log is used for stdout \n')
-                            flogname = 'logs/' + station + '_fortran.txt'
+                            flogname = logdir  + '/' + station + '_fortran.txt'
                             flog = open(flogname, 'w+')
                             a=subprocess.run([snrexe, rinexfile, snrname, orbfile, str(option)],capture_output=True,text=True)
                             ddd = a.stdout; flog.write(ddd); flog.close()
@@ -510,15 +529,14 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         except:
                             log.write('Problem with making SNR file, check fortran specific log {0:50s} \n'.format(flogname))
                         t2=time.time()
-#                        print(' Exec time:', '{0:4.2f}'.format(t2-t1) )
-#                      this is for people that want to use slow python code
                     else:
+                        print('trying to use python translator')
+#                      this is for people that want to use slow python code
                         log.write('SNR file {0:50s} \n will use python to make \n'.format( snrname))
                         log.write('Decimating will be done here instead of using teqc \n')
                         t1=time.time()
                         rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate,log)
                         t2=time.time()
-#                        print(' Exec time:', '{0:4.2f}'.format(t2-t1) )
 
                 # remove the rinex file
                 subprocess.call(['rm', '-f',rinexfile])
@@ -537,7 +555,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
                         subprocess.call(['gzip', snrname_full])
 
                 else:
-                    logfile = 'logs/' + station + '_hybrid_error.txt'
+                    # not sure why this is made here??? wasn't it created earlier?
+                    logfile = logdir + '/' + station + '_hybrid_error.txt'
                     print('No SNR file created - check ', logfile, ' for why it failed.')
             else:
                 print('Either the RINEX file or orbit file does not exist, so there is nothing to convert')
@@ -545,7 +564,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,f
         else:
             print('The orbit file you requested does not exist.')
 
-    # close the log file
     log.close()
 
     return True

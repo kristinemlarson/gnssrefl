@@ -27,7 +27,7 @@ def decipher_argt(station,filename,idec,snrname,orbfile,recx,csnr,year,month,day
     idec : int
         decimation interval, sec
     snrname : str
-        ultimaet output file
+        ultimate output file
     orbfile : str
         sp3 filename
     recx : list of floats
@@ -91,12 +91,14 @@ def decipher_argt(station,filename,idec,snrname,orbfile,recx,csnr,year,month,day
                 iii = 0
     #print(igal,igps,iglo)
     message = 'None '
+    xdir = os.environ['REFL_CODE']
+    logdir = xdir + '/logs'
     # make sure this directory exists
-    if not os.path.isdir('logs'):
-        subprocess.call(['mkdir', 'logs'])
+    if not os.path.isdir(logdir):
+        subprocess.call(['mkdir', logdir])
 
     # temporary file - will be deleted
-    outputfile = 'logs/' + station + 'tmp.txt'
+    outputfile = logdir + '/' + station + 'tmp.txt'
     # write to file tod, iprn, s1, freq
     fout = open(outputfile, 'w+')
     fout.write('{0:15.4f}{1:15.4f}{2:15.4f} \n'.format(recx[0], recx[1],recx[2]) )
@@ -107,8 +109,7 @@ def decipher_argt(station,filename,idec,snrname,orbfile,recx,csnr,year,month,day
             fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:1.0f} \n'.format(t[i], prn[i], snr[i],freq[i]) )
     fout.close()
 
-
-    errorlog = 'logs/' + station + '_nmea2snr_error.txt'
+    errorlog = logdir + '/' + station + '_nmea2snr_error.txt'
 
     in1 = g.binary(outputfile)
     in2 = g.binary(snrname)
