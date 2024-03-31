@@ -167,7 +167,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
                 if overwrite:
-                    print('File exists, ', fname, ' and you requested overwriting, so will delete existing file')
+                    print('SNR file exists/you requested overwriting, existing file will be deleted')
                     if os.path.isfile(fname):
                         subprocess.call(['rm', fname]); 
                     if os.path.isfile(fname + '.gz'):
@@ -365,44 +365,36 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
     ----------
     year : int
         full year
-
     doy : int
         day of year
-
     option : int
         snr choice (66, 99 etc)
-
     orbtype : str
         orbit source (nav, gps, gnss, etc)
-
     receiverrate : int
         sampling interval of the GPS receiver, e.g. 1, 30, 15
-
     dec_rate : int
         decimation value to reduce file size
-
     archive : str
         external location (archive) of the rinex files
-
     translator : str
          hybrid, python, or fortran
 
     """
     xdir = os.environ['REFL_CODE']
 
+    # universal location for the log directory
+    logdir, logname = g.define_logdir(station,year,doy)
+
     exedir = os.environ['EXE'] # location of executables for fortran people
 
-    # universal location for the log directory
-    logdir = xdir + '/logs'
-
     screenstats = False # for now
-    # define directory for the conversion executables
-    if not os.path.isdir(logdir):
-        subprocess.call(['mkdir', logdir])
 
-    logname = logdir + '/' + station + '.txt'
-    print('Minimal feedback is written to ', logname)
-    log = open(logname, 'w+')
+    general_log = logdir + '/' + logname + '.gen'
+    print('Minimal feedback is written to ', general_log)
+    errorlog = logdir + '/' + logname
+
+    log = open(general_log, 'w+')
     log.write("Receiver rate: {0:5s} \n".format(receiverrate))
     log.write("Decimation rate: {0:3.0f} \n".format(dec_rate))
     log.write("Archive: {0:10s} \n".format(archive))
@@ -410,8 +402,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
     log.write("Translator : {0:10s} \n".format(translator))
     csnr = str(option)
     # should be using a function for this
-    cdoy = '{:03d}'.format(doy)
-    cyy = str(year)[2:4]
+    cyyyy,cyy,cdoy = g.ydoych(year,doy)
 
     snrname_full =  quickname(station,year,cyy,cdoy,csnr)
     log.write("Creating : {0:s} \n".format(snrname_full))
@@ -426,9 +417,9 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
     # the functions that call conv2snr
     # 
     fortran = False
-
     if translator == 'fortran':
         fortran == True
+
 
     if (snre == True):
         log.write("The snrfile already exists: {0:50s} \n".format(snrname_full))
@@ -500,7 +491,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
                         decr = '0'
                     in5 = g.binary(decr) # decimation can be used in hybrid option
                     message = 'None '
-                    errorlog = logdir + '/' + station + '_hybrid_error.txt'
 
                     in6 = g.binary(errorlog)
                     log.write('SNR file {0:50s} \n will use hybrid of python and fortran to make \n'.format( snrname))
@@ -515,23 +505,21 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
                             gnsssnr.foo(in1,in2,in3,in4,in5,in6)
                 else:
                     if (translator == 'fortran'):
-                        print('trying to use fortran translator')
                         t1=time.time()
                         try:
                             #subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
                             log.write('Using standalone fortran for translation  - separate log is used for stdout \n')
-                            flogname = logdir  + '/' + station + '_fortran.txt'
+                            flogname = errorlog
+
                             flog = open(flogname, 'w+')
                             a=subprocess.run([snrexe, rinexfile, snrname, orbfile, str(option)],capture_output=True,text=True)
                             ddd = a.stdout; flog.write(ddd); flog.close()
                             status = subprocess.call(['rm','-f', rinexfile ])
                             status = subprocess.call(['xz', orbfile])
                         except:
-                            log.write('Problem with making SNR file, check fortran specific log {0:50s} \n'.format(flogname))
+                            log.write('Problem with making SNR file, check log {0:50s} \n'.format(flogname))
                         t2=time.time()
                     else:
-                        print('trying to use python translator')
-#                      this is for people that want to use slow python code
                         log.write('SNR file {0:50s} \n will use python to make \n'.format( snrname))
                         log.write('Decimating will be done here instead of using teqc \n')
                         t1=time.time()
@@ -556,8 +544,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
 
                 else:
                     # not sure why this is made here??? wasn't it created earlier?
-                    logfile = logdir + '/' + station + '_hybrid_error.txt'
-                    print('No SNR file created - check ', logfile, ' for why it failed.')
+                    print('No SNR file created - check ', errorlog, ' or ')
+                    print( general_log , ' for why it failed.')
             else:
                 print('Either the RINEX file or orbit file does not exist, so there is nothing to convert')
                 log.write('Either the RINEX file or orbit file does not exist, so there is nothing to convert \n')

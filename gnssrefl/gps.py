@@ -6744,10 +6744,79 @@ def randomfilename():
     """
     makes a string -length 9 - using random number
     generator.  useful for filenames
+
+    Returns
+    -------
+    rname : str
+        filename with nine random numerical characters
+
     """
     a=math.modf(random())
     xx = int(math.floor(a[0]*1000000000))
     # make sure it is length 9
     rname = '{:09d}'.format(xx)
     return rname
+
+
+def replace_wget(url,f):
+    """
+    use requests instead of wget to download files
+
+    Parameters
+    ----------
+    url : str
+        full path to file
+    f : str
+        filename
+
+    Returns
+    -------
+    success : bool
+        whether file was found or not
+    """
+    # use a try in case the website is down
+    try:
+        response = requests.get(url)
+        #print(response.status_code)
+        if response.status_code == 200:
+            with open(f, "wb") as file:
+                file. write(response.content)
+            success = True
+        else:
+            success = False
+    except:
+        print('No file downloaded')
+        success = False
+
+    if success: 
+        print("Successful download:", f)
+
+    return success
+
+def define_logdir(station,year,doy):
+    """
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+    year : int
+        full year
+    doy : int
+        day of year
+    """
+    cyyyy,cyy,cdoy = ydoych(year,doy)
+
+    xdir = os.environ['REFL_CODE']
+
+    # universal location for the log directory
+    logdir = xdir + '/logs/' + station + '/' + cyyyy + '/'
+
+    # define directory for the 
+    if not os.path.isdir(logdir):
+        subprocess.call(['mkdir', '-p',logdir])
+
+    logname = cdoy + '_error.txt'
+
+    return logdir, logname
+
 

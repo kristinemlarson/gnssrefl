@@ -93,20 +93,23 @@ def just_bkg(cyyyy, cdoy, file_name):
         expected RINEX filename
 
     """
+    # BKG has two separate archives - 
     dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cyyyy + '/' + cdoy + '/'
     dir2 = 'https://igs.bkg.bund.de/root_ftp/EUREF/obs/' + cyyyy + '/' + cdoy + '/'
     print('>>> Trying first : ',dir1+file_name)
     fexist = False
     try:
-        wget.download(dir1+file_name,file_name)
-        fexist = True
+        fexist = g.replace_wget(dir1+file_name, file_name)
+        #wget.download(dir1+file_name,file_name)
+        #fexist = True
     except:
-        print('did not find the file')
+        print('did not find the RINEX 3 file')
     if (not fexist):
         print('>>> Now trying: ',dir2+file_name)
         try:
-            wget.download(dir2+file_name,file_name)
-            fexist = True
+            fexist = g.replace_wget(dir2+file_name, file_name)
+            #wget.download(dir2+file_name,file_name)
+            #fexist = True
         except:
             print('did not find it there either')
 
@@ -236,9 +239,7 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
             dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
         elif (archive == 'gfz'):
-            # no idea
             dir1 = 'ftp://isdcftp.gfz-potsdam.de/gnss/data/daily/' + cyyyy + '/' + cdoy + '/'
-            #print(dir1+file_name)
             wget.download(dir1+file_name,file_name)
         elif (archive == 'cddis'):
             new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/'
@@ -270,22 +271,18 @@ def filename_plus(station9ch,year,doy,srate,stream):
     Parameters
     ----------
     station9ch : str
-         9 character station name
-
+        9 character station name
     year : int
-
+        full year
     doy : int
         day of year
-
     srate : int
-         receiver sample rate 
-
+        receiver sample rate 
     stream : str 
-         R or S ; latter means the file was streamed.
-
+        R or S ; latter means the file was streamed.
     output : str
-         compliant filename with crx.gz on the end as this is how the files 
-         are stored at GNSS archives as far as I know.
+        compliant filename with crx.gz on the end as this is how the files 
+        are stored at GNSS archives as far as I know.
 
     Returns
     -------
@@ -324,9 +321,9 @@ def ga_stuff(station, year, doy,rinexv=3):
 
     Returns
     -------
-    QUERY_PARAMS : json
+    QUERY_PARAMS : dict
         I think
-    headers : json
+    headers : dict
         I think
 
     """
@@ -479,11 +476,13 @@ def universal_rinex2(station, year, doy, archive,screenstats):
     elif (archive == 'unavco'):
         #url1 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
         url1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
-        print(url1)
+        if screenstats:
+            print(url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1, dname + '.Z')
         if not foundit:
             url2 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
-            print(url2)
+            if screenstats:
+                print(url2)
             foundit,file_name = kelly.the_kelly_simple_way(url2, oname + '.Z')
     elif (archive == 'special'):
         #print('testing out new protocol at unavco')
@@ -495,13 +494,19 @@ def universal_rinex2(station, year, doy, archive,screenstats):
         #foundit, file_name = gogetit(dir1, oname, '.gz'); 
     elif archive == 'sopac':
         dir1 = 'ftp://garner.ucsd.edu/pub/rinex/' + cydoy
+        file_name = dname + '.Z'
+        url = dir1 + '/' + file_name
         foundit, file_name = gogetit(dir1, dname, '.Z');
     elif archive == 'sonel':
         dir1 = 'ftp://ftp.sonel.org/gps/data/' + cydoy
         foundit, file_name = gogetit(dir1, dname, '.Z');
     elif archive == 'nz':
-        dir1 =  'https://data.geonet.org.nz/gnss/rinex/' + cydoy
-        foundit, file_name = gogetit(dir1, oname, '.gz'); 
+        dir1 =  'https://data.geonet.org.nz/gnss/rinex/' + cydoy + '/'
+        # try using requests
+        file_name = oname + '.gz'
+        url = dir1 + file_name
+        foundit = g.replace_wget(url, file_name)
+        #foundit, file_name = gogetit(dir1, oname, '.gz'); 
     elif archive == 'bkg':
         # are the old data with Z instead of gz?
         dir1 = 'https://igs.bkg.bund.de/root_ftp/IGS/obs/' + cydoy
@@ -527,9 +532,13 @@ def universal_rinex2(station, year, doy, archive,screenstats):
             foundit, file_name = gogetit(dir1, oname, '.gz');
     elif (archive == 'ngs'):
         dir1 = 'https://geodesy.noaa.gov/corsdata/rinex/' + cydoy + '/' + station + '/'
-        foundit, file_name = gogetit(dir1, oname, '.gz');
+        file_name = oname + '.gz' ; url = dir1 + file_name
+        foundit = g.replace_wget(url,file_name)
+        #foundit, file_name = gogetit(dir1, oname, '.gz');
         if not foundit:
-            foundit, file_name = gogetit(dir1, dname, '.gz')
+            file_name = dname + '.gz'; url = dir1 + file_name
+            foundit = g.replace_wget(url,file_name)
+            #foundit, file_name = gogetit(dir1, dname, '.gz')
     elif (archive == 'cddis'):
         foundit,file_name = serial_cddis_files(dname,cyyyy,cdoy); 
     elif (archive == 'ga'):

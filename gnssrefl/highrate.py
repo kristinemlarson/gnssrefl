@@ -219,20 +219,20 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
 
     Parameters
     ----------
-    inputs: string
+    station : str
         9 ch station name 
-    year : integer
+    year : int
         full year
     month : integer
         month or day of year if day set to 0
-    day : integer
+    day : int
         day of the month
     stream : str
         R or S
-    dec_rate : integer
+    dec_rate : int
         decimation rate in seconds
     bkg : str
-        file directory at BKG
+        file directory at BKG (igs or euref)
 
     Returns
     -------
@@ -279,7 +279,7 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
         for e in ['00', '15', '30', '45']:
             file_name = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.crx.gz'
             dirname = gns + '/' + alpha[h] + '/'
-            print('looking for', dirname + file_name)
+            #print('looking for', dirname + file_name)
             crnx_name = file_name[:-3] 
             oname = file_name[:-6] + 'rnx'
 
@@ -288,17 +288,18 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
                 print('already have ', oname)
             else:
                 try:
-                    wget.download(dirname+file_name,file_name)
+                    s = g.replace_wget(dirname+file_name, file_name)
+                    #wget.download(dirname+file_name,file_name)
                     subprocess.call(['gunzip',file_name]) # unzip
                     subprocess.call([crnxpath, crnx_name]) # hatanaka
                     subprocess.call(['rm',crnx_name]) # remove old file
                 except:
                     okok = 1
                 if os.path.isfile(oname):
-                    print('successful download ', oname)
+                    #print('successful download ', oname)
                     fileF = fileF + 1
-                else:
-                    print('unsuccessful download ', oname)
+                #else:
+                #    print('unsuccessful download ', oname)
 
     searchP = station.upper() + streamID + cyyyy + cdoy + '*15M*MO.rnx'
     print('Found ', fileF,' 15 minute files')
@@ -390,7 +391,7 @@ def esp_highrate(station, year, month, day,stream,dec_rate):
         print('Hour: ', ch)
         file_name = station.upper() + streamID + cyyyy + cdoy + ch + '00_01H_01S_MO.crx.gz'
         dirname = gns + '/' + ch + '/'
-        print('looking for', dirname + file_name)
+        #print('looking for', dirname + file_name)
         crnx_name = file_name[:-3] 
         oname = file_name[:-6] + 'rnx'
         if os.path.isfile(oname):
@@ -405,10 +406,10 @@ def esp_highrate(station, year, month, day,stream,dec_rate):
             except:
                 okok = 1
             if os.path.isfile(oname):
-                print('successful download ', oname)
+                print('Successful download ', oname)
                 fileF = fileF + 1
             else:
-                print('unsuccessful download ', oname)
+                print('Unsuccessful download ', oname)
 
     searchP = station.upper() + streamID + cyyyy + cdoy + '*01H*MO.rnx'
     print(searchP)

@@ -360,7 +360,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         year_end = year
 
     # make sure directories are there for orbit files and snr files
+    # and for logs
     for y in range(year, year_end+1):
+        tmp1, tmp2 = g.define_logdir(station,y,1)
         ann = g.make_nav_dirs(y)
         f1 = xdir + '/' + str(y) + '/snr/' + station[0:4]
         if not os.path.isdir(f1):
@@ -618,7 +620,7 @@ def process_jobs_multi(index,args,datelist,error_queue):
             rnx.run_rinex2snr(**args)
 
     except Exception as e:
-        print(y, d)
+        print('Error of some kind processing ', y, d)
         error_queue.put(e)
 
     return
