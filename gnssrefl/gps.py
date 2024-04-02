@@ -6761,6 +6761,7 @@ def randomfilename():
 def replace_wget(url,f):
     """
     use requests instead of wget to download files
+    this cannot be used for ftp addresses.
 
     Parameters
     ----------
@@ -6795,6 +6796,9 @@ def replace_wget(url,f):
 
 def define_logdir(station,year,doy):
     """
+    creates logfile name and directory (for rinex2snr) 
+    given a station, year and day of year
+
     Parameters
     ----------
     station : str
