@@ -92,13 +92,16 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         gzips the SNR file after you run the code. Big space saver (now the default)
 
     Parameters
-    ----------
+    --------
     station : str
         lowercase 4 character ID of the station
     year : int
         full Year
     doy : integer
         Day of year
+
+    Optional parameters (requires hyphen prefix)
+    ----------
     snr : int, optional
         SNR format. This tells the code what elevation angles to save data for. Input is the snr file ending.
         Value options:
