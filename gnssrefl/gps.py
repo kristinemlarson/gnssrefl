@@ -6815,7 +6815,7 @@ def define_logdir(station,year,doy):
     if not os.path.isdir(logdir):
         subprocess.call(['mkdir', '-p',logdir])
 
-    logname = cdoy + '_error.txt'
+    logname = cdoy + '_translation.txt'
 
     return logdir, logname
 
