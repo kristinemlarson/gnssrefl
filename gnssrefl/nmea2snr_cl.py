@@ -17,7 +17,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
 
-    parser.add_argument("-snr", default='66', help="snr file ending, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg", type=str)
+    parser.add_argument("-snr", default='66', help="snr file type, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg", type=str)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
@@ -25,7 +25,7 @@ def parse_arguments():
     parser.add_argument("-lat", default=None, help="latitude, degrees", type=float)
     parser.add_argument("-lon", default=None, help="longitude, degrees", type=float)
     parser.add_argument("-height", default=None, help="ellipsoid height, m", type=float)
-    parser.add_argument("-risky", default=None, help="boolean for whether sp3 orbits are used", type=str)
+    parser.add_argument("-risky", default=None, help="boolean for whether low quality orbits are used instead of precise sp3", type=str)
     parser.add_argument("-gzip", default=None, help="gzip SNR file after creation. Default is true.", type=str)
 
     args = parser.parse_args().__dict__
@@ -77,7 +77,7 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
     doy : int
         day of year
     snr : int, optional
-        snr file type, default is 66
+        snr file type (default is 66); 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg
     year_end : int, optional
         final year
     doy_end : int, optional
