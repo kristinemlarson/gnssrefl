@@ -61,6 +61,7 @@ def the_kelly_simple_way(url,filename):
 
     headers = {}
     headers['authorization'] = 'Bearer ' + token
+    #print('In the kelly function')
 
     s1 = time.time()
     r = requests.get(url, headers=headers)

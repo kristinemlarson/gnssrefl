@@ -210,10 +210,11 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
             just_bkg(cyyyy, cdoy, file_name)
         elif (archive == 'bev'):
             dir1 = 'https://gnss.bev.gv.at/at.gv.bev.dc/data/obs/' + cyyyy + '/' + cdoy + '/'
-            wget.download(dir1+file_name,file_name)
+            #wget.download(dir1+file_name,file_name)
+            fex = g.replace_wget(dir1+file_name, file_name)
         elif (archive == 'epn'):
             dir1 = 'https://epncb.oma.be/ftp/obs/' + cyyyy + '/' + cdoy + '/'
-            print(dir1)
+            #print(dir1)
             wget.download(dir1+file_name,file_name)
         elif (archive == 'ignes'):
            # if someone wanted to help by adding this to the high rate
@@ -231,13 +232,14 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
                 for query_response_item in json.loads(request.content):
                     file_url = query_response_item['fileLocation']
                     file_name = urlparse(file_url).path.rsplit('/', 1)[1]
-                    wget.download(file_url,file_name)
+                    fex = g.replace_wget(file_url, file_name)
+                    #wget.download(file_url,file_name)
         elif (archive == 'nrcan'):
             dir1 = 'https://cacsa.nrcan.gc.ca/gps/data/gpsdata/' + cyy + cdoy  + '/' + cyy + 'd' + '/'
             wget.download(dir1+file_name,file_name)
-        elif (archive == 'unavco-old'):
-            dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
-            wget.download(dir1+file_name,file_name)
+        #elif (archive == 'unavco-old'):
+        #    dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
+        #    wget.download(dir1+file_name,file_name)
         elif (archive == 'gfz'):
             dir1 = 'ftp://isdcftp.gfz-potsdam.de/gnss/data/daily/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
@@ -441,7 +443,7 @@ def universal_rinex2(station, year, doy, archive,screenstats):
     Returns
     -------
     file_name : str
-        filename that was downloaded
+        RINEX filename that was downloaded
     foundit : bool
         whether file was found
 
@@ -468,11 +470,11 @@ def universal_rinex2(station, year, doy, archive,screenstats):
         file_name = oname
         if os.path.exists(file_name):
             foundit = True
-    elif (archive == 'unavco-old'):
-        dir1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy
-        foundit, file_name = gogetit(dir1, dname, '.Z'); 
-        if not foundit:
-            foundit, file_name = gogetit(dir1, oname, '.Z')
+    #elif (archive == 'unavco-old'):
+    #    dir1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy
+    #    foundit, file_name = gogetit(dir1, dname, '.Z'); 
+    #    if not foundit:
+    #        foundit, file_name = gogetit(dir1, oname, '.Z')
     elif (archive == 'unavco'):
         #url1 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
         url1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
