@@ -285,16 +285,18 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
 
             if os.path.isfile(oname):
                 fileF = fileF + 1
-                print('already have ', oname)
+                print('You already have ', oname, ' so no need to download')
             else:
                 try:
                     s = g.replace_wget(dirname+file_name, file_name)
                     #wget.download(dirname+file_name,file_name)
-                    subprocess.call(['gunzip',file_name]) # unzip
-                    subprocess.call([crnxpath, crnx_name]) # hatanaka
-                    subprocess.call(['rm',crnx_name]) # remove old file
+                    if os.path.isfile(file_name):
+                        subprocess.call(['gunzip',file_name]) # unzip
+                        subprocess.call([crnxpath, crnx_name]) # hatanaka
+                        subprocess.call(['rm',crnx_name]) # remove old file
                 except:
                     okok = 1
+                    print('Could not find ', file_name, ' at BKG')
                 if os.path.isfile(oname):
                     #print('successful download ', oname)
                     fileF = fileF + 1

@@ -4694,12 +4694,24 @@ def get_obstimes_plus(tvd):
     2022jun10 - added MJD output
 
     See get_obstimes 
+    2024apr06 too slow because I was using np.append
 
+    Parameters
+    ----------
+    tvd : numpy array
+        contents of Lomb Scargle data processing
+    Returns
+    -------
+    obstimes: list of datetime objects
+        times of observations 
+    modjulian : list of floats
+        modified julian days
 
     """
     nr,nc = tvd.shape
     obstimes = []
-    modjulian = np.empty(shape=[0,1])
+    #modjulian = np.empty(shape=[0,1])
+    modjulian = []
 
     if nr > 0:
         for ijk in range(0,nr):
@@ -4707,15 +4719,21 @@ def get_obstimes_plus(tvd):
             obstimes.append(dtime)
             m,f = mjd(iyear,imon,iday,ihour,imin,isec)
             x=[m+f]
-            modjulian = np.append(modjulian, [x],axis=0 )
+            xx = m+f
+            #modjulian = np.append(modjulian, [x],axis=0 )
+            modjulian.append(xx)
     else:
         print('empty file')
+
+    # afterwards change to np array - but probably best to keep them as lists for now
+    #modjulian = np.asarray(modjulian)
 
     return obstimes, modjulian
 
 
 def confused_obstimes(tvd):
     """
+    this will be slow (and should be fixed)
 
     Parameters
     ----------
@@ -4741,6 +4759,7 @@ def confused_obstimes(tvd):
 
 def more_confused_obstimes(tvd):
     """
+    too slow
 
     Parameters
     ----------
@@ -4886,7 +4905,8 @@ def get_noaa_obstimes(t):
 
     Returns
     -------
-    obstimes : datetime 
+    obstimes : list
+        datetime format
 
     """
     nr,nc = t.shape
@@ -4916,11 +4936,11 @@ def get_noaa_obstimes_plus(t,**kwargs):
 
     Returns
     -------
-    obstimes : datetime obj
-        timetags 
+    obstimes : list of datetime obj
+        list of timetags 
 
-    modjulian : numpy array of floats
-        modified julian date array 
+    modjulian : list of floats
+        modified julian date 
 
     """
     time_format = kwargs.get('time_format','new')
@@ -4930,11 +4950,15 @@ def get_noaa_obstimes_plus(t,**kwargs):
         tt = False
 
     nr,nc = t.shape
+
     obstimes = []
-    modjulian = np.empty(shape=[0,1])
-    #modjulian=[]
+    # was doing this
+    #modjulian = np.empty(shape=[0,1])
+    # now try this
+    modjulian=[]
 
     # if i read in the file better, would not have to change from float
+    # slow because i am using np.append
     if nr > 0:
         for i in range(0,nr):
             # new fileformat
@@ -4947,9 +4971,18 @@ def get_noaa_obstimes_plus(t,**kwargs):
             obstimes.append(dtime)
             imjd, fr = mjd(year,month,day,hour,minute,second)
             x = [imjd+fr]
-            modjulian = np.append(modjulian, x)
+            #modjulian = np.append(modjulian, x)
+            xx = float(imjd+fr)
+            modjulian.append(xx)
     else:
         print('you sent me an empty variable')
+
+    # change modjulian to numpy array at the append
+    #modjulian = np.asarray(modjulian)
+    #nr,nc=modjulian.shape
+    #print('mjd', nr,nc)
+    #nr,nc=obstimes.shape
+    #print('obstimes ' , nr,nc)
 
     return obstimes, modjulian
 

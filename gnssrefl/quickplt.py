@@ -37,8 +37,11 @@ def parse_arguments():
     parser.add_argument("-freq", help="spec freq, column 11 in a LSP file ", type=int,default=None)
     parser.add_argument("-utc_offset", help="offset from UTC, hours  ", type=int,default=None)
     parser.add_argument("-yoffset", help="offset for y-axis values", type=float,default=None)
+    parser.add_argument("-yoffset2", help="offset for y-axis values in file 2", type=float,default=None)
     parser.add_argument("-keepzeros", help="keep zeros (default is to remove)", type=str,default=None)
     parser.add_argument("-sat", help="print only this satellite (only for SNR file)", type=int,default=None)
+    parser.add_argument("-scale", help="scale factor for first file", type=float,default=None)
+    parser.add_argument("-scale2", help="scale factor for file 2", type=float,default=None)
 
 
     args = parser.parse_args().__dict__
@@ -55,7 +58,7 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
                   ylabel: str=None, symbol: str=None, reverse:bool=False,title:str=None,outfile: str=None,
                   xlimits: float=[], ylimits: float=[], ydoy:bool=False, ymd:bool=False, ymdhm:bool=False, 
                   filename2: str=None, freq:int=None, utc_offset: int=None, yoffset: float=None, 
-                  keepzeros: bool=False, sat: int=None):
+                  keepzeros: bool=False, sat: int=None,yoffset2: float=None,scale: float=1.0, scale2: float=1.0):
 
     """
     quick file plotting using matplotlib
@@ -173,6 +176,12 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
         keep/remove zeros, default is to remove
     sat : int
         satellite number for SNR file plotting (i.e. column 1)
+    yoffset2 : float
+        add or subtract to the y-axis values in filename2
+    scale : float
+        multiply all y-axis values in file 1 by this value
+    scale2 : float
+        multiply all y-axis values in file 2 by this value
 
     """
 
@@ -192,6 +201,8 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
 
     if yoffset is None:
         yoffset = 0
+    if yoffset2 is None:
+        yoffset2 = 0
 
     reverse_sign = reverse
 
@@ -265,7 +276,9 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
 
     if secondFile:
         tval2,yval2 = q.trans_time(tvd2, ymd, ymdhm, convert_mjd, ydoy,xcol,ycol,utc_offset)
-        yval2 = yval2 + yoffset
+        yval2 = yval2 + yoffset2
+        yval2 = yval2*scale2
+
 
     # supercedes previous trans_time ... ??? 
     if ydoy:
@@ -291,7 +304,10 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
 
     # is second file currently supported???
     if secondFile:
-        ax.plot(tval2, yval2, symbol)
+        if symbol is None:
+            ax.plot(tval2, yval2, 'r.')
+        else:
+            ax.plot(tval2, yval2, color='red', fmt=symbol)
 
     plt.grid()
     plt.ylabel(ylabel)
