@@ -2,7 +2,7 @@
 import argparse
 from astropy.time import Time
 import datetime
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as myplt
 import numpy as np
 import os
 import subprocess
@@ -44,12 +44,13 @@ def parse_arguments():
     parser.add_argument("-scale2", help="scale factor for file 2", type=float,default=None)
     parser.add_argument("-elimits", nargs="*",type=float, help="optional elevation angle limits for SNR file", default=None)
     parser.add_argument("-azlimits", nargs="*",type=float, help="optional azimuth angle limits for SNR file", default=None)
+    parser.add_argument("-plt", help="If you do not want the plot to come to the screen, set to F", type=str,default=None)
 
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['mjd', 'reverse', 'ymdhm', 'ydoy','ymd','keepzeros']
+    boolean_args = ['mjd', 'reverse', 'ymdhm', 'ydoy','ymd','keepzeros','plt']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -61,7 +62,7 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
                   xlimits: float=[], ylimits: float=[], ydoy:bool=False, ymd:bool=False, ymdhm:bool=False, 
                   filename2: str=None, freq:int=None, utc_offset: int=None, yoffset: float=None, 
                   keepzeros: bool=False, sat: str=None,yoffset2: float=None,scale: float=1.0, 
-                  scale2: float=1.0, elimits: float=[0], azlimits:float=[0]):
+                  scale2: float=1.0, elimits: float=[0], azlimits:float=[0], plt:bool=True):
 
     """
     quick file plotting using matplotlib
@@ -210,6 +211,9 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
         if SNR file is plotted, elevation angle limits are applied
     azlimits : list of floats
         if SNR file is plotted, azimuth angle limits are applied
+    plt: bool
+         whether you want the plot to be displayed on the screen.
+         png file is always created.
 
     """
     snrfile = False
@@ -407,7 +411,7 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
         print('Making obstimes for second ydoy x-axis')
         tval2 = g.ydoy2datetime(tvd2[:,0], tvd2[:,1])
 
-    fig,ax=plt.subplots()
+    fig,ax=myplt.subplots()
 
     # i.e. using default
     if symbol is None:
@@ -428,18 +432,18 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
         else:
             ax.plot(tval2, yval2, color='red', fmt=symbol)
 
-    plt.grid()
-    plt.ylabel(ylabel)
+    myplt.grid()
+    myplt.ylabel(ylabel)
 
     if xlabel is not None:
-        plt.xlabel(xlabel)
+        myplt.xlabel(xlabel)
     else:
         if snrfile:
             if (xcol == 1): # python column name
-                plt.xlabel('elevation angle (degrees)')
+                myplt.xlabel('elevation angle (degrees)')
             if (xcol == 3): # using python column name
-                plt.xlabel('seconds of the day')
-            plt.ylabel(ycolT + ' SNR, dBHz')
+                myplt.xlabel('seconds of the day')
+            myplt.ylabel(ycolT + ' SNR, dBHz')
 
 
     if title is None:
@@ -456,7 +460,7 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
 
     if len(ylimits) == 2:
         print('found y-axis limits')
-        plt.ylim((ylimits))
+        myplt.ylim((ylimits))
     if len(xlimits) == 2:
         print('found x-axis limits')
         if convert_mjd:
@@ -466,19 +470,19 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
             t2 = Time(xlimits[1],format='mjd')
             t2_utc = t2.utc # change to UTC
             tvalues2 =  t2_utc.datetime # change to datetime
-            plt.xlim((tvalues1,tvalues2))
+            myplt.xlim((tvalues1,tvalues2))
             if utc_offset is not None:
                 cc = '{:02d}'.format(abs(utc_offset)) + ':00'
                 if utc_offset < 0:
-                    plt.xlabel('UTC-' + cc)
+                    myplt.xlabel('UTC-' + cc)
                 else:
-                    plt.xlabel('UTC+' + cc)
+                    myplt.xlabel('UTC+' + cc)
         else:
             if ydoy:
                 t1,t2 = q.set_xlimits_ydoy(xlimits)
-                plt.xlim((t1,t2))
+                myplt.xlim((t1,t2))
             else:
-                plt.xlim((xlimits))
+                myplt.xlim((xlimits))
 
 
     if reverse_sign:
@@ -486,7 +490,8 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
     fig.autofmt_xdate() # obstimes
 
     q.save_plot(outfile)
-    plt.show()
+    if plt:
+        myplt.show()
 
 
 def main():
