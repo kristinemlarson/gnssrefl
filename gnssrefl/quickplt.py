@@ -82,12 +82,21 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
     elevation angle and azimuth angle limits. Only for SNR files, you can send the name of the SNR file
     without the directory, i.e. sc021500.22.snr66 instead of /Users/Files/2022/snr/sc02/sc021500.22.snr66
 
-    I now allow file names without 
+    You may submit a filename that has been gzipped. The code will checked to see if the gzip version
+    is there and gunzip it for you.
+
 
     Examples
     --------
     quickplt txtfile 1 16
         would plot column 1 on the x-axis and column 16 on the y-axis
+
+    quickplt sc021500.22.snr66 time L1 -sat gps
+        would plot all the GPS L1 SNR data for the given SNR file, with time on the 
+        x-axis column 1 on the x-axis and SNR data on the y-axis
+        You have to set -sat or it will not work. For a specific satellite number,
+        provide that instead of gps. The other allowed x-axis option is elevation which
+        is short for elevation angle.
 
     quickplt txtfile 1 16 -xlabel Time
         would plot column 1 on the x-axis and column 16 on the y-axis
@@ -214,13 +223,13 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
         else:
             xcol = int(xcol) - 1
 
-        if ycol == 'L1':
+        if (ycol.upper() == 'L1'):
             ycolT = 'L1'
             ycol = 6
-        elif ycol == 'L2':
+        elif (ycol.upper() == 'L2'):
             ycolT = 'L2'
             ycol = 7
-        elif ycol == 'L5':
+        elif (ycol.upper() == 'L5'):
             ycolT = 'L5'
             ycol = 8
         else:
@@ -228,8 +237,15 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
             ycol = int(ycol) - 1
     else:
         # change strings to integers and change to python column
-        xcol = int(xcol) - 1
-        ycol = int(ycol) - 1
+        if (xcol == 'time'):
+            print('You cannot chose time for the xcolumn unless you invoke -sat mode. xcol must be an integer. Exit')
+            sys.exit()
+        elif (xcol == 'elevation'):
+            print('You cannot chose elevation for the xcolumn. Unless you invoke -sat mode. xcol must be an integer. Exit')
+            sys.exit()
+        else:
+            xcol = int(xcol) - 1
+            ycol = int(ycol) - 1
 
 
     if errorcol is None:
@@ -420,7 +436,7 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
     else:
         if snrfile:
             if (xcol == 1): # python column name
-                plt.xlabel('elevation angle')
+                plt.xlabel('elevation angle (degrees)')
             if (xcol == 3): # using python column name
                 plt.xlabel('seconds of the day')
             plt.ylabel(ycolT + ' SNR, dBHz')
