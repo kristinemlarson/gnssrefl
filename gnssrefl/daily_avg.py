@@ -187,6 +187,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
     tv = np.empty(shape=[0, 8])
     tv_median = np.empty(shape=[0, 9])
     tvall = np.empty(shape=[0, 7])
+    tv_list = []
+    tv_median_list = []
     #
     ngps = []; nglo = [] ; ngal = []; nbei = []
     obstimes = []; medRH = []; meanRH = [] ; alltimes = []; meanAmp = []
@@ -194,6 +196,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
     fig,ax=plt.subplots()
     year_list = np.arange(year1, year2+1, 1)
     NumFiles = 0
+    test_alltimes = []
+    test_good = []
     s1 = time.time()
     for yr in year_list:
         direc = xdir + '/' + str(yr) + '/results/' + station + '/' + extension + '/'
@@ -269,6 +273,11 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
                                     filler = datetime.datetime(year=yr, month=d.month, day=d.day, hour = hrr, minute=mm, second = ss)
                                     alltimes.append(filler)
                                 # 
+                                # this probably should not be inside the loop
+                                # maybe this makes it slow? will try accumulating it all and plot outside the loop
+                                #test_alltimes.append(alltimes)
+                                #test_good.append(good)
+
                                 ax.plot(alltimes,good,'b.')
 
                                 # this are stats for the daily averages - is this slowing it down? - apparently not
@@ -305,31 +314,42 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
                                 # a new variable is not really needed - but I did not want to oerwrite working code
                                 newl_plus_median = [yr, doy, meanRHtoday, len(rh), d.month, d.day, stdRHtoday, np.mean(goodAmp),medv]
 
-                                tv = np.append(tv, [newl],axis=0)
-                                tv_median = np.append(tv_median, [newl_plus_median],axis=0)
+                                # maybe this is slow??
+                                #tv = np.append(tv, [newl],axis=0)
+                                #tv_median = np.append(tv_median, [newl_plus_median],axis=0)
+                                # see if this works
+                                tv_list.append(newl)
+                                tv_median_list.append(newl_plus_median)
 
                                 k += 1
                             else:
                                 NotEnough = NotEnough + 1
                     except:
                         okok = 1;
+            #ax.plot(test_alltimes,test_good,'b.')
         else:
             abc = 0; # dummy line
     #meanRH = np.asarray(meanRH)
+
     s2 = time.time()
+    #print(s2-s1, ' seconds')
+    tv = np.asarray(tv_list)
+    tv_median = np.asarray(tv_median_list)
 
     # not sure you can sort obstimes
     dumb_time = tv_median[:,0] + tv_median[:,1]/365.25
     # sort it ...
     ii = np.argsort(dumb_time)
     tv_median = tv_median[ii,:]
+    # i have a function for this now - though it asks for MJD
     for www in range(0,len(tv_median)):
         filler = datetime.datetime(year=int(tv_median[www,0]), 
                 month=int(tv_median[www,4]), day=int(tv_median[www,5]), hour = 12, minute=0, second = 0)
         tttimes.append(filler)
 
     # plot the median 
-    ax.plot(tttimes, tv_median[:,8],'ks',markerfacecolor='white',label='median value')
+    #ax.plot(tttimes, tv_median[:,8],'k.',label='median value')
+    ax.plot(tttimes, tv_median[:,8],'ks',markerfacecolor='white',label='median value',markersize=4)
     # if requested, also show the limits for the median filter
     if plot_limits:
         ax.plot(tttimes, tv_median[:,8]+howBig,'-',color='gray',label='median+limit')

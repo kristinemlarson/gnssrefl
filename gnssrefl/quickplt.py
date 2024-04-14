@@ -18,8 +18,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("filename", help="filename", type=str)
-    parser.add_argument("xcol", help="x-column", type=int)
-    parser.add_argument("ycol",   help="y-column", type=int)
+    parser.add_argument("xcol", help="x-column", type=str)
+    parser.add_argument("ycol",   help="y-column", type=str)
     parser.add_argument("-errorcol",   help="error bar for y-values", type=int,default=None)
     parser.add_argument("-mjd", help="if x-values are MJD ", type=str,default=None)
     parser.add_argument("-reverse", help="reverse the y-axis", type=str,default=None)
@@ -39,9 +39,11 @@ def parse_arguments():
     parser.add_argument("-yoffset", help="offset for y-axis values", type=float,default=None)
     parser.add_argument("-yoffset2", help="offset for y-axis values in file 2", type=float,default=None)
     parser.add_argument("-keepzeros", help="keep zeros (default is to remove)", type=str,default=None)
-    parser.add_argument("-sat", help="print only this satellite (only for SNR file)", type=int,default=None)
+    parser.add_argument("-sat", help="print only this satellite (only for SNR file)", type=str,default=None)
     parser.add_argument("-scale", help="scale factor for first file", type=float,default=None)
     parser.add_argument("-scale2", help="scale factor for file 2", type=float,default=None)
+    parser.add_argument("-elimits", nargs="*",type=float, help="optional elevation angle limits for SNR file", default=None)
+    parser.add_argument("-azlimits", nargs="*",type=float, help="optional azimuth angle limits for SNR file", default=None)
 
 
     args = parser.parse_args().__dict__
@@ -54,11 +56,12 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: bool=False, xlabel: str=None, 
+def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: bool=False, xlabel: str=None, 
                   ylabel: str=None, symbol: str=None, reverse:bool=False,title:str=None,outfile: str=None,
                   xlimits: float=[], ylimits: float=[], ydoy:bool=False, ymd:bool=False, ymdhm:bool=False, 
                   filename2: str=None, freq:int=None, utc_offset: int=None, yoffset: float=None, 
-                  keepzeros: bool=False, sat: int=None,yoffset2: float=None,scale: float=1.0, scale2: float=1.0):
+                  keepzeros: bool=False, sat: str=None,yoffset2: float=None,scale: float=1.0, 
+                  scale2: float=1.0, elimits: float=[0], azlimits:float=[0]):
 
     """
     quick file plotting using matplotlib
@@ -72,6 +75,14 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
 
     I rewrote this recently to take advantage of our boolean argument translator.  Let me know 
     if things have broken or submit a PR.
+
+    To make simple plots of observables in SNR files, the x-axis can be either time or elevation.
+    The latter is short for elevation angle. To pick this option set -sat to a specific satellite
+    nubmer or a constellation (gps, glonass, etc). You can also set elimits and azlimits for simple
+    elevation angle and azimuth angle limits. Only for SNR files, you can send the name of the SNR file
+    without the directory, i.e. sc021500.22.snr66 instead of /Users/Files/2022/snr/sc02/sc021500.22.snr66
+
+    I now allow file names without 
 
     Examples
     --------
@@ -129,10 +140,12 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
     ----------
     filename : str
         name of file to be plotted 
-    xcol : int
+    xcol : str
         column number in the file for the x-axis parameter
-    ycol : int
+        for snrfiles, you can say time or elevation
+    ycol : str
         column number in the file for the y-axis parameter
+        for snrfiles, you can say L1, L2, or L5
     errorcol : int, optional
         column number for the error bars
     mjd : bool, optional
@@ -174,20 +187,51 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
         add or subtract to the y-axis values
     keepzeros: bool, optional
         keep/remove zeros, default is to remove
-    sat : int
-        satellite number for SNR file plotting (i.e. column 1)
+    sat : str
+        satellite number for SNR file plotting 
+        for all gps satellites, say gps instead of a number
+        similar for glonass, galileo, and beidou
     yoffset2 : float
         add or subtract to the y-axis values in filename2
     scale : float
         multiply all y-axis values in file 1 by this value
     scale2 : float
         multiply all y-axis values in file 2 by this value
+    elimits : list of floats
+        if SNR file is plotted, elevation angle limits are applied
+    azlimits : list of floats
+        if SNR file is plotted, azimuth angle limits are applied
 
     """
+    snrfile = False
+    if sat is not None:
+        snrfile = True
 
-    # change column numbers to pythonese
-    xcol = xcol - 1
-    ycol = ycol - 1
+        if xcol == 'elevation':
+            xcol = 1 # python column
+        elif xcol == 'time':
+            xcol = 3 # python column
+        else:
+            xcol = int(xcol) - 1
+
+        if ycol == 'L1':
+            ycolT = 'L1'
+            ycol = 6
+        elif ycol == 'L2':
+            ycolT = 'L2'
+            ycol = 7
+        elif ycol == 'L5':
+            ycolT = 'L5'
+            ycol = 8
+        else:
+            ycolT = ''
+            ycol = int(ycol) - 1
+    else:
+        # change strings to integers and change to python column
+        xcol = int(xcol) - 1
+        ycol = int(ycol) - 1
+
+
     if errorcol is None:
         yerrors = False
     else:
@@ -207,8 +251,22 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
     reverse_sign = reverse
 
     convert_mjd = mjd
-
     commentsign = '%'
+
+    basename = os.path.basename(filename)
+    station = basename[0:4]
+    cyear = '20' + basename[9:11]  
+    if snrfile:
+        xdir = os.environ['REFL_CODE']
+        longfile = xdir + '/' + cyear + '/snr/' + station + '/' + basename
+        longfile_gz = longfile + '.gz'
+        if not os.path.isfile(filename) and os.path.isfile(longfile):
+            filename = longfile
+            print('using ', longfile)
+        elif not os.path.isfile(filename) and os.path.isfile(longfile_gz):
+            subprocess.call(['gunzip', longfile_gz])
+            filename = longfile
+            print('now using ', longfile)
 
     if (not os.path.isfile(filename)) & os.path.isfile(filename + '.gz'):
         print('I will be nice and gunzip the file for you ...')
@@ -233,13 +291,57 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
                 print('Remove zero values')
                 ii = (tvd[:,ycol] != 0)
                 tvd = tvd[ii,:]
-            if (sat is not None):
-                print('Only show satellite ', sat)
-                ii = (tvd[:,0] == sat)
-                tvd = tvd[ii,:]
+            if snrfile:
+                if sat.lower() == 'gps':
+                    print('Show all GPS satellites')
+                    print('initial nmber of observations:', len(tvd))
+                    ii = (tvd[:,0] < 33)
+                    tvd = tvd[ii,:]
+                    print('after editing:', len(tvd))
+                elif sat.lower() == 'glonass':
+                    print('Show all Glonass satellites')
+                    print('initial nmber of observations:', len(tvd))
+                    ii = (tvd[:,0] > 100) & (tvd[:,0] <= 199)
+                    tvd = tvd[ii,:]
+                    print('after editing:', len(tvd))
+                elif sat.lower() == 'galileo':
+                    print('Show all Galileo satellites')
+                    print('initial nmber of observations:', len(tvd))
+                    ii = (tvd[:,0] > 200) & (tvd[:,0] <= 299)
+                    tvd = tvd[ii,:]
+                    print('after editing:', len(tvd))
+                elif sat.lower() == 'beidou':
+                    print('Show all Beidou satellites')
+                    print('initial nmber of observations:', len(tvd))
+                    ii = (tvd[:,0] > 300) & (tvd[:,0] <= 399)
+                    tvd = tvd[ii,:]
+                    print('after editing:', len(tvd))
+                else:
+                    sat = int(sat)
+                    print('Only show satellite ', sat)
+                    ii = (tvd[:,0] == sat)
+                    tvd = tvd[ii,:]
             if len(tvd) == 0:
                 print('No data are left. Exiting')
                 sys.exit()
+
+            if snrfile:
+                # this means it is a SNR file
+                if len(elimits) == 2:
+                    print('Apply elevation angle limits')
+                    e1 = elimits[0]
+                    e2 = elimits[1]
+                    i= (tvd[:,1] >= e1) & (tvd[:,1] <= e2)
+                    tvd=tvd[i,:]
+                if len(azlimits) == 2:
+                    print('Apply azimuth angle limits')
+                    a1 = azlimits[0]
+                    a2 = azlimits[1]
+                    i= (tvd[:,2] >= a1) & (tvd[:,2] <= a2)
+                    tvd=tvd[i,:]
+                if len(tvd) == 0:
+                    print('no data for this satellite and these editing choices.')
+                    print('exiting '); sys.exit()
 
         tval = []
         yval = []
@@ -251,6 +353,7 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
     tvd2=[]
     secondFile = False
     if filename2 is not None:
+        print('Warning: filename2 does not allow SNR file options')
         if os.path.isfile(filename2):
             tvd2 = np.loadtxt(filename2,comments=commentsign)
             if len(tvd2) == 0:
@@ -314,9 +417,22 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
 
     if xlabel is not None:
         plt.xlabel(xlabel)
+    else:
+        if snrfile:
+            if (xcol == 1): # python column name
+                plt.xlabel('elevation angle')
+            if (xcol == 3): # using python column name
+                plt.xlabel('seconds of the day')
+            plt.ylabel(ycolT + ' SNR, dBHz')
+
 
     if title is None:
-        ax.set_title(os.path.basename(filename) )
+        if snrfile:
+            sname = os.path.basename(filename)
+            ytitle = sname[0:4] + ' 20' + sname[9:11] + ' ' + sname[4:7]
+            ax.set_title('sat ' + str(sat) + '/' + ytitle  )
+        else:
+            ax.set_title(os.path.basename(filename) )
     else:
         ax.set_title(title)
 
@@ -347,6 +463,7 @@ def run_quickplt (filename: str, xcol: int, ycol: int, errorcol: int=None, mjd: 
                 plt.xlim((t1,t2))
             else:
                 plt.xlim((xlimits))
+
 
     if reverse_sign:
         ax.invert_yaxis()
