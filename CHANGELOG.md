@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 3.1.5
 
+quickplt has been significantly updated to allow plotting of SNR files.
+This mode is triggered by setting the optional parameter -sat.  See 
+the quickplt documentation for details.
+
 remove_wget is a new function in gps.py. This is my attempt to get away from
 using wet.download. It uses requests instead. That route doesn't work for ftp
 address, so will need to do something else for those sites.
