@@ -572,9 +572,8 @@ def Ulich_Bending_Angle(ele, N0,lsp,p,T,ttime,sat):   #UBA
     Ulich, B. L. "Millimeter wave radio telescopes: Gain and pointing characteristics." (1981)
 
     Author: 20220629, fengpeng
-    modified to use numpy so I can do arrays
 
-    currently writes out corrections to a file for testing
+    Modified by KL to use numpy so I can use arrays
 
     Parameters
     ----------
@@ -584,10 +583,22 @@ def Ulich_Bending_Angle(ele, N0,lsp,p,T,ttime,sat):   #UBA
     N0 : float
         antenna refractivity in ppm
 
+    lsp : dict
+
+    p : float
+        pressure, units?
+
+    T :  float
+        temperature, units?
+
+    ttime : 
+
+    sat : 
+
     Returns
     -------
     De : numpy array of floats
-        corrected elevation angle, deg
+        corrected elevation angles, deg
         
     """
     e_simple_corr = corr_el_angles(ele, p,T)
@@ -598,12 +609,11 @@ def Ulich_Bending_Angle(ele, N0,lsp,p,T,ttime,sat):   #UBA
     r = N0/1000000.
     f = np.cos(ele_rad) / (np.sin(ele_rad) + 0.00175 * np.tan(deg2rad*(87.5) - ele_rad))
     dE = (r * f)/deg2rad
-    fout = open('ulich.txt', 'w+')
-    for i in range(0,len(ele)):
-        fout.write(" {0:8.5f} {1:8.5f} {2:8.5f} {3:10.0f} {4:5.0f} \n ".format( 
-            ele[i], ele[i]+dE[i], e_simple_corr[i], ttime[i], sat[i]))
-
-    fout.close()
+    #fout = open('ulich.txt', 'w+')
+    #for i in range(0,len(ele)):
+    #    fout.write(" {0:8.5f} {1:8.5f} {2:8.5f} {3:10.0f} {4:5.0f} \n ".format( 
+    #        ele[i], ele[i]+dE[i], e_simple_corr[i], ttime[i], sat[i]))
+    #fout.close()
 
     return dE + ele
 
@@ -611,7 +621,7 @@ def refrc_Rueger(drypress,vpress,temp):
     """
     Obtains refractivity index suitable for GNSS-IR
 
-    Rüeger, Jean M. "Refractive index formulae for radio waves." Proceedings of the 
+    Rueger, Jean M. "Refractive index formulae for radio waves." Proceedings of the 
     FIG XXII International Congress, Washington, DC, USA. Vol. 113. 2002.
 
     Parameters
@@ -651,37 +661,40 @@ def refrc_Rueger(drypress,vpress,temp):
     Nwet=K2rr * vpress / temp + K3r * vpress / (temp ** 2)
     # in ppm
     ref=[round(Nrueger,4),round(Nhydro,4),round(Nwet,4)]    
+
     return ref
 
 
-def Equvilent_Angle_Corr_NITE(Hr_apr, e_T, N_ant, ztd_ant, mpf_tot, dmpf_de_tot):
+def Equivilent_Angle_Corr_NITE(Hr_apr, e_T, N_ant, ztd_ant, mpf_tot, dmpf_de_tot):
     """
-    NITE formula equvilent angle correction and forward model
-    From Peng et al. 2023
+
+    This function computes the "equvilent" angular correction to apply the 
+    NITE formula on the true elevation angle ele_eqv = e_T + dele
+
+
+    Equation (24) in Peng (2023), DOI: 10.1109/TGRS.2023.3332422
+    The variable substitude method can be found in Strandberg, J. (2020). New
+    methods and applications for interferometric GNSS reflectometry. Chalmers Tekniska Hogskola (Sweden).
 
     Parameters
     ----------
     Hr_apr : float
-        a priori reflector height, meters
-
+        approximate a-priori reflector height, in meters
     e_T : float
-        elevation angle - units!!!!!
-
+        satellite true elevation angle in degree
     N_ant : float
-        antenna refractivity
-
+        atmospheric refractivity at the GNSS antenna, in ppm
     ztd_ant : float
-        total zenith tropo delay, meters
-
+        zenith total delay at the antenna, in meters
     mpf_tot : float
-
+        total mapping function for this elevation angle
     dmpf_de_tot : float
-
+        derivative of the mapping function over elevation angle
 
     Returns
     -------
-    new_elev : float
-        new elevation angle, units?
+    dele : float
+        equvilent angular correction in degrees
 
     """
     e_A = e_T+Ulich_Bending_Angle_original(e_T, N_ant)
@@ -696,8 +709,9 @@ def Equvilent_Angle_Corr_NITE(Hr_apr, e_T, N_ant, ztd_ant, mpf_tot, dmpf_de_tot)
     dsin_down = Nl / 1000000.*mpf_tot-ztd_ant*(dmpf_de_tot*(1. / (6378137. *ddele_T_dh ))+dmpf_dh(e_T, dhgt=1.))
     dsin = 0.5*(dsin_up + dsin_down)
     ele_eqv = np.degrees(np.arcsin(sin_eqv_geo + dsin))
-    new_elev = ele_eqv - e_T
-    return new_elev
+    dele = ele_eqv - e_T
+
+    return dele
 
 
 def gmf_deriv(dmjd,dlat,dlon,dhgt,zd):
@@ -720,16 +734,17 @@ def gmf_deriv(dmjd,dlat,dlon,dhgt,zd):
     dlon: float
         longitude in radians
     dhgt: float
-        height in m
+        height in meters
     zd: float
         zenith distance in radians ??? ( is this really what you mean??
+        I suspect it is the zenith angle ... in radians
 
     Returns
     -------
-    gmfh(2): floats
+    gmfh(2): float
         hydrostatic mapping function and derivative wrt z
 
-    gmfw(2): floats
+    gmfw(2): float
         wet mapping function and derivative wrt z
     
     """
@@ -907,8 +922,12 @@ def gmf_deriv(dmjd,dlat,dlon,dhgt,zd):
     # print(ah_mean)
 
 
-    sine = math.sin(pi / 2 - zd)
-    cose = math.cos(pi / 2 - zd)
+    # changing this
+    #sine = math.sin(pi / 2 - zd)
+    #cose = math.cos(pi / 2 - zd)
+    #
+    sine = np.sin(pi / 2 - zd)
+    cose = np.cos(pi / 2 - zd)
     beta = bh / (sine + ch)
     gamma = ah / (sine + beta)
     topcon = (1.0 + ah / (1.0 + bh / (1.0 + ch)))
@@ -956,98 +975,231 @@ def gmf_deriv(dmjd,dlat,dlon,dhgt,zd):
 
 #   derivative
     gmfw[1] = gmfw[0] ** 2 / topcon * cose * (1 - gamma ** 2 / aw * (1 - beta ** 2 / bw))
+
     return [gmfh[0],gmfh[1],gmfw[0],gmfw[1]]
 
 
 def sita_Earth(Hr, e_A):                                   
     """
-    no documentation
-    # in meter, in degree
+    This function computes the angular separation of the antenna and the 
+    reflection point in earth surface, view from earth center
 
+    See Equation (7) in Peng (2023), DOI: 10.1109/TGRS.2023.3332422
+
+    Parameters
+    ----------
+    Hr : float
+        reflector height in meters (height difference between the antenna and the reflecting surface)
+    e_A : float
+        apparent elevation angle at the antenna, in degrees
+
+    Returns
+    -------
+    sita_E : float
+        earth center angle in degrees
 
     """
 
     # earth center angle between the reflection point and the GNSS antenna
     sita_E = Hr / (6378137. * np.tan(np.radians(e_A)))
-    return round(np.degrees(sita_E), 6)                              # in degree
+    # 
+    #return round(np.degrees(sita_E), 6)                              # in degree
+    return np.degrees(sita_E)                              # in degree
 
 def sita_Satellite(Hr, e_A):                               
     """
-    no documentation 
-    # in meter, in degree
-    # satellite angle between the reflection point and the GNSS antenna
+    This function computes the angle formed by the antenna-satellite line-of-sight 
+    and the reflection point-satellite LoS
+
+    Equation (8) in Peng (2023), DOI: 10.1109/TGRS.2023.3332422
+
+    Parameters
+    ----------
+    Hr : float
+        reflector height in meters (height difference between the antenna and the reflecting surface)
+    e_A : float
+       apparent elevation angle at the antenna, in degree
+
+    Returns
+    -------
+    sita_S : float
+        satellite angle in degrees (small for MEO satellites)
 
     """
 
     ant2satell = 4.*6378137.    # assume satellite distance 4 times earth radius
     sita_S = 2 * Hr * np.cos(np.radians(e_A)) / ant2satell
-    return round(np.degrees(sita_S), 6)    # in degree, small for MEO satellites
+    #return round(np.degrees(sita_S), 6)    # in degree, small for MEO satellites
+    return np.degrees(sita_S)    # in degree, small for MEO satellites
 
 def dH_curve(Hr, Re, e_A):                       
     """
-    no documentation provided
-    # in meter, in meter, in degree
-    #vertial displacement of the reflection point vs. a "plane reflection"
+    Computes vertical displacement of the reflection point vs. that of a "planar reflection"
+
+    See Equation (7) in Peng (2023), DOI: 10.1109/TGRS.2023.3332422
+
+    Parameters
+    ----------
+    Hr : float
+        reflector height in meters (height difference between the antenna and the reflecting surface)
+    Re : float
+        (Gaussian) radius of the Earth in meters
+    e_A : float
+       apparent elevation angle at the antenna, in degrees
+
+    Returns
+    -------
+    dH : float
+        vertial displacement of the reflection point in meters
+
     """
     dH = Re * (1. - np.cos(Hr / np.tan(np.radians(e_A)) / Re))
-    return round(dH, 6)    # in meters
+    #return round(dH, 6)    # in meters
+
+    return dH    # in meters
 
 def Hv_Hr_ratio(Hr, Re, e_A):
     """
-    no documentation provided
-    # in meter, in meter, in degree
+    This function computes the ratio between the "vertical height difference between
+    the antenna and the refection point" and the "reflector height", assuming a 
+    sperical reflector (ocean)
+
+    See equation (23) in Peng (2023), DOI: 10.1109/TGRS.2023.3332422
+
+    Parameters
+    ----------
+    Hr : float
+        approximate reflector height in meters 
+        (height difference between the antenna and the reflecting surface)
+    Re : float
+        (Gaussian) radius of the Earth in meters
+    e_A : float
+       apparent elevation angle at the antenna, in degree
+
+    Returns
+    -------
+    the_ratio : float
+        ratio, allways bigger than 1
+
+
     """
     dH = Re * (1. - np.cos(Hr / np.tan(np.radians(e_A)) / Re))
-    return (Hr+dH) /Hr    #ratio, allways bigger than 1
+    the_ratio = (Hr+dH)/Hr #ratio, allways bigger than 1
+
+    return the_ratio    
 
 def N_layer(N_antenna, Hr):
     """
-    no documentation 
+    Computes average refractivity of the top (antenna) and bottom (reflecting surface) of this layer
 
-    #in ppm, in meter
-    # average refractivity in the layer between GNSS antenna and sea surface
+    See Equation (14) in Peng (2023), DOI: 10.1109/TGRS.2023.3332422
+
+    Parameters
+    ----------
+    N_antenna : float
+        refractivity at the antenna in ppm
+    Hr : float
+        reflector height in meters (height difference between the antenna and the reflecting surface)
+
+    Returns
+    -------
+    Nl : float
+        average refractivity in ppm in this layer
+
     """
     Nl = N_antenna *(1+np.exp(Hr/8000.)) /2
-    return round(Nl, 4)     #in ppm
+    #return round(Nl, 4)     #in ppm
+    return Nl      #in ppm
 
 def saastam2(press, lat, height):
     """
-    no documentation
-    in hPa,  in degree, in meter
-    Saastamion model with updated refractivity equation from Rüeger (2002)
+    This function computes the Zenith Hydrostatic Delay using the Saastamoinen model 
+    with updated refractivity equation from Rueger (2002)
 
-    as best i understand this it is the dry delay
+    Saastamoinen, J. (1972). Atmospheric corrections for the troposphere and 
+    stratosphere in radio ranging of satellites. The Use of Artificial Satellites for 
+    Geodesy, Geophysics Monograph Service, 15, 274-251.
+
+    Feng, P., Li, F., Yan, J., Zhang, F., & Barriot, J. P. (2020). 
+    Assessment of the accuracy of the Saastamoinen model and VMF1/VMF3 mapping functions 
+    with respect to ray-tracing from radiosonde data in the framework of GNSS meteorology. 
+    Remote Sensing, 12(20), 3337.
+
+    Parameters
+    ----------
+    press : float
+        atmospheric total pressure in hPa
+    lat : float
+        latitude of the station in degree
+    height : float
+        height of the station in meters ??? Which kind of height ????
+
+    Returns
+    -------
+    zhd : float
+        zenith hystostatic delay in meters
+
     """
     phi = lat / 180 * 3.14159265359
     height = height / 1000.
     f = 1. - 0.0026 * np.cos(2. * phi) - 0.00028 * height
-    # ZHD in meter
-    return round(2.2794 * press / f / 1000., 6)                   
+    # ZHD in meters
+    zhd = 2.2794 * press / f / 1000.                
+
+    return zhd
 
 def mpf_tot(gmf_h, gmf_w, zhd, zwd):  
     """
-    no documentation
-    #convert seperate wet&dry MPF to total MPF
-
-    guessing
-
+    Finds the total mapping function by weighting the hydrostatic and wet mapping 
+    function with the zenith hydrostatic and wet delay. Author: Peng
+    
+    Parameters
+    ----------
     gmf_h : float
-        ?
+        hydrostatic mapping function
     gmf_w : float
-        ?
+        wet mapping function
     zhd : float
-        zenith hydrostatic delay
+        zenith hydrostatic delay in meters
     zwd : float
-        zenith wet delay
+        zenith wet delay in meters
+
+    Returns
+    -------
+    mpf_tot1 : float
+        total mapping function
     """
+
     mpf_tot1=(gmf_h*zhd+gmf_w*zwd)/(zhd+zwd)
 
     return mpf_tot1
 
 def dmpf_dh(ele, dhgt):    
     """
-    no documentation
-    # mapping function height correction by (Niell, 1996)
+    Station height correction of the hydrostatic mapping function (Niell, 1996)
+    This is translated from Johannes Boehm's vmf1_ht.f Fortran code
+
+    Niell, A. E. (1996). Global mapping functions for the atmosphere delay at
+    radio wavelengths. Journal of geophysical research: solid earth, 101(B2), 3227-3246.
+
+    Boehm, J., Werl, B., & Schuh, H. (2006). Troposphere mapping functions for
+    GPS and very long baseline interferometry from European Centre for Medium‐Range
+    Weather Forecasts operational analysis data. Journal of geophysical research: solid earth, 111(B2).
+
+    Parameters
+    ----------
+    ele : float
+        true elevation angle in degree
+    dhgt : float
+        height difference in meters. In GNSS-IR, this is reflector height; 
+        in applying mapping function grid products, this is the height 
+        difference between the antenna and the grid point height
+
+    Returns
+    -------
+    ht_corr : float
+        correction to the hydrostatic mapping function (vmf1h= vmf1h + ht_corr)
+
     """
     sine = np.sin(np.radians(ele))
     [a_ht, b_ht, c_ht] = [0.0000253, 0.00549, 0.00114]
@@ -1055,16 +1207,71 @@ def dmpf_dh(ele, dhgt):
     beta = b_ht / (sine + c_ht)
     topcon = (1. + a_ht / (1. + b_ht / (1. + c_ht)))
     ht_corr_coef = 1 / sine - topcon / (sine + a_ht / (sine + beta))
+
     return ht_corr_coef * hs_km
 
 
 def Ulich_Bending_Angle_original(ele, N0):   
     """
-    no documentation
-    # input degree, ppm
+    This function computes the atmospheric bending angle with the Ulich equation.
+
+    Equation (18) in Ulich, B. L. (1981). Millimeter wave radio telescopes: 
+    Gain and pointing characteristics. International Journal of Infrared and Millimeter Waves, 2, 293-310.
+
+    Parameters
+    ----------
+    ele : float
+        true elevation angle in degrees
+    N0 : float
+        refractivity in part-per-million
+
+    Returns
+    ----------
+    dele : float
+        bending angle (angular difference between apparent and true elevation angle), in degrees
+
     """
     ele = np.radians(ele)
     r = N0/1000000.
     f = np.cos(ele) / (np.sin(ele) + 0.00175 * np.tan(np.radians(87.5) - ele))
+
     return np.degrees(r * f)
+
+
+def Equivilent_Angle_Corr_mpf(ele, mpf_tot, N0, Hr_apr):
+    """
+    This function computes the "equvilent" angular correction to apply the 
+    tropospheric delay calculated with the mapping function.
+
+
+    See: Williams, S. D. P., & Nievinski, F. G. (2017). Tropospheric delays in ground‐based 
+    GNSS multipath reflectometry—Experimental evidence from coastal sites. Journal of Geophysical 
+    Research: Solid Earth, 122(3), 2310-2327.
+
+    Strandberg, J. (2020). New methods and applications for interferometric GNSS 
+    reflectometry. Chalmers Tekniska Hogskola (Sweden).
+
+    Parameters
+    ----------
+    ele : float
+        true elevation angle in degrees
+    mpf_tot : float
+        total mapping function, units?
+    N0 : float
+        refractivity at GNSS antenna in part-per-million
+    Hr_apr : float
+        approximate reflector height in meters
+
+    Returns
+    -------
+    dele : float
+        equvilent angular correction in degrees
+    """
+
+    Nl = N_layer(N0, Hr_apr)
+    dsin_mpf = Nl * mpf_tot / 1000000.  # correction to the sine value
+    ele_eqv = np.degrees(np.arcsin(np.sin(np.radians(ele)) + dsin_mpf))
+    dele = ele_eqv -ele
+
+    return dele
 

@@ -38,7 +38,8 @@ def parse_arguments():
     parser.add_argument("-azlist2", nargs="*",type=float,  default=None,help="list of azimuth regions, default is 0-360") 
     parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles, advanced users only!") 
     parser.add_argument("-refr_model", default=1, type=int, help="refraction model. default is 1, zero turns it off)")
-    parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height, meters")
+    parser.add_argument("-apriori_rh", default=None, type=float, help="apriori reflector height (m) used by NITE model")
+    parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height (m)")
     parser.add_argument("-pele", nargs="*", type=float, help="min and max elevation angle in direct signal removal, default is 5-30")
     parser.add_argument("-daily_avg_medfilter", default=None, type=float, help="daily_avg, median filter, meters")
     parser.add_argument("-daily_avg_reqtracks", default=None, type=int, help="daily_avg, ReqTracks parameter ")
@@ -66,8 +67,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
        ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
        delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : int=1, 
-                      Hortho : float = None, pele: list=[5,30], daily_avg_reqtracks: int=None, 
-                      daily_avg_medfilter: float =None, subdaily_alt_sigma : bool=None, subdaily_ampl : float=None, subdaily_delta_out : float=None, 
+                      apriori_rh: float=None, Hortho : float = None, pele: list=[5,30], daily_avg_reqtracks: int=None, 
+                      daily_avg_medfilter: float =None, subdaily_alt_sigma : bool=None, 
+                      subdaily_ampl : float=None, subdaily_delta_out : float=None, 
                       subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
                       subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None):
 
@@ -99,7 +101,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         Model 2: Bennett and time-varying
         Model 3: Ulich, static
         Model 4: Ulich, time-varying
-        Model 5: NITE, Feng et al. 2023 DOI: 10.1109/TGRS.2023.3332422
+        Model 5: NITE, Feng et al. 2023 DOI: 10.1109/TGRS.2023.3332422, time-varying
+        Model 6: MPF, Williams and Nievinski, 2017,  DOI: 10.1002/2016JB013612, time-varying
 
     gnssir_input will have a new parameter for the json output, refr_model. If it is not set, i.e. you 
     have an old json, it is assumed to be 1. You can change the refraction model by 
@@ -220,6 +223,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         using standard bending models).  0 is no refraction correction.  As we add more
         models, they will receiver their own number. 
 
+    apriori_rh : float
+        apriori reflector height (meters). only used in NITE model 
+
     Hortho : float
         station orthometric height, in meters. Currently only used in subdaily.  If not provided on the command line, 
         it will use ellipsoidal height and EGM96 to compute.
@@ -293,6 +299,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         geoidC = g.geoidCorrection(lat,lon)
         Hortho = height - geoidC
 
+    if apriori_rh is None:
+        apriori_rh = 5 # completely made up, meters
+
 # start the lsp dictionary
     reqA = ampl
 
@@ -302,6 +311,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['lon'] = lon
     lsp['ht'] = height
     lsp['Hortho'] = round(Hortho,4) # no point having it be so many decimal points
+    lsp['apriori_rh'] = apriori_rh
     
 
     if h1 > h2:

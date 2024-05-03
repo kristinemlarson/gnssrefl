@@ -8,6 +8,7 @@ import scipy.interpolate
 import scipy.signal
 import subprocess
 import sys
+import time
 import warnings
 
 import gnssrefl.gps as g
@@ -134,15 +135,30 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
     p,T,irefr,humidity = set_refraction_params(station, dmjd, lsp)
-    # removing print statement for now.  should add screenstats parameter
-    if screenstats:
-        print('Refraction parameters (press, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
+    TempK = T + 273.15 # T is in celsius ... I think.
+    vapor = humidity
+    pressure = p
+    temperature = TempK
+    # peng used these variables. eventually consolidate
+    lat1=lsp['lat']; lon1=lsp['lon']; height1=lsp['ht'] ; mjd1 = dmjd
+    lat1R = math.radians(lat1); lon1R = math.radians(lon1); 
 
-    if (irefr == 3) or (irefr == 4):
-        TempK = T + 273.15 # T is in celsius ... I think.
-        # N_ant is the refraction index
-        N_ant=refr.refrc_Rueger(p,humidity,TempK)[0]    #
+    # only used by NITE
+    RH_apriori = lsp['apriori_rh']  # a priori reflector height - but this is for testing
 
+    #if screenstats:
+    print('Refraction parameters (press, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
+
+    if (irefr >= 3) & (irefr <= 6):
+        # N_ant is the index of refraction
+        # apparently this is wrong ?
+        #N_ant=refr.refrc_Rueger(p,humidity,TempK)[0]    #
+        N_ant = refr.refrc_Rueger(pressure-vapor, vapor, TempK)[0]   #get antenne refractivity
+        ztd=2.3                                             #zenith total delay from PPP
+        # hydrostatic delay
+        zhd = refr.saastam2(pressure, lat1, height1)             # Saastamoinen model for ZHD
+        # getting wet delay by subtracting
+        zwd = ztd - zhd  # using zwd and zhd to get total mapping function
 
 # only doing one day at a time for now - but have started defining the needed inputs for using it
     twoDays = False
@@ -188,12 +204,34 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                 sys.exit()
 
         if (irefr == 3) or (irefr == 4):
-            # elev refraction, lsp, pres, temp, time, sat
+            # elev refraction, lsp, pressure, temperature- units?, time, sat
             if irefr == 3:
                 print('Ulich refraction correction')
             else:
                 print('Ulich refraction correction, time-varying')
+            print('Is this using the correct temperature units?')
             ele=refr.Ulich_Bending_Angle(snrD[:,1],N_ant,lsp,p,T,snrD[:,3],snrD[:,0])
+        elif irefr == 5:
+            # remove ele < 1.5 cause it blows up
+            i=snrD[:,1] > 1.5
+            snrD = snrD[i,:]
+            N = len(snrD[:,1])
+            print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
+            # elevation angles, degrees
+            ele=snrD[:,1]
+            # zenith angle in radians
+            zenithA = 0.5*np.pi - np.radians(ele)
+            #get mapping function and derivatives
+            [gmf_h,dgmf_h,gmf_w,dgmf_w]=refr.gmf_deriv(mjd1, lat1R, lon1R,height1,zenithA)
+            [mpf, dmpf]=[refr.mpf_tot(gmf_h,gmf_w,zhd,zwd),refr.mpf_tot(dgmf_h,dgmf_w,zhd,zwd)]
+
+            # inputs apriori RH, elevation angle, refractive index, zenith delay, mpf ?, dmpf?
+            dE_NITE=refr.Equivilent_Angle_Corr_NITE(RH_apriori, ele, N_ant, ztd, mpf, dmpf)
+            ele = ele + dE_NITE 
+        elif irefr == 6:
+            print('MPF refraction correction, Wiliams and Nievinski? Exiting')
+            return
+
         elif irefr == 0:
             print('No refraction correction applied ')
             ele = snrD[:,1]
@@ -211,6 +249,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         i= (ele >= pele[0]) & (ele < pele[1])
         ele = ele[i]
         snrD = snrD[i,:]
+        # why doesn't this have an i index, is it not used?
         sats = snrD[:,0]
         # make sure the snrD array has elevation angles fixed
         snrD[:,1] = ele # ????
@@ -372,7 +411,7 @@ def set_refraction_params(station, dmjd,lsp):
 
     Parameters
     ----------
-    station : string
+    station : str
         4 character station name
 
     dmjd : float
@@ -415,8 +454,11 @@ def set_refraction_params(station, dmjd,lsp):
         refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
         # time varying was originally set to no for now (it = 1)
         # now allows time varying for models 2 and 4
-        if (refraction_model == 2) or (refraction_model == 4):
+        if refraction_model in [2, 4, 5]:
+        #if (refraction_model == 2) or (refraction_model == 4):
             it = 0
+            print('Using time-varying refraction parameter inputs')
+        #elif (refraction_model == 5):
         else:
             it = 1
         dlat = lsp['lat']*np.pi/180; dlong = lsp['lon']*np.pi/180; ht = lsp['ht']
