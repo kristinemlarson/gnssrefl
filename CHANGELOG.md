@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.2.0
+Added NITE model.  Peng (2023), DOI: 10.1109/TGRS.2023.3332422
+Internally the NITE model is known as refraction model 5.
+While the NITE publication advocates using estimated zenith troposphere delays,
+we provide no such access here, and use Saastamoinen model corrections using
+standard met outputs created by Generic Mapping functions.  If someone wants
+to use estimated zenith delays, they are welcome to do so.
+
+An a priori RH  is needed for this model. It should be input and saved when
+using the optional apriori_rh. The NITE model should be much more accurate
+than the default refraction model (1). It is not clear how much more precise
+it is.  I would expect it to be more precise for tall sites. 
+
 ## 3.1.5
 
 quickplt has been significantly updated to allow plotting of SNR files.

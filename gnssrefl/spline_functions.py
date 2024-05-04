@@ -778,7 +778,7 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         if lsp['refraction']:
             imodel = 1 #
         dmjd = 59580 # fake number
-        p,T,irefr,humidity = set_refraction_model(station, dmjd,lsp,imodel)
+        p,T,irefr,humidity, Tm, lapse_rate = set_refraction_model(station, dmjd,lsp,imodel)
         #print('refraction parameters ', p,T,humidity,irefr)
 
     if 'rough_in' in kwargs:
@@ -1725,6 +1725,10 @@ def set_refraction_model(station, dmjd,lsp,imodel):
         number value written to output files to keep track of refraction model
     e : float
         water vapor pressure, hPa
+    Tm : float
+        temperature in kelvin
+    lapse_rate : float
+        see source code for details
 
     """
     xdir = os.environ['REFL_CODE']
@@ -1735,9 +1739,10 @@ def set_refraction_model(station, dmjd,lsp,imodel):
         refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
 # time varying is set to no for now (it = 1)
         it = 1
+        # should use sea level, and this is ellipsoidal height.  so it is wrong
         dlat = lsp['lat']*np.pi/180; dlong = lsp['lon']*np.pi/180; ht = lsp['ht']
         p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
         #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
 
-    return p,T,irefr, e
+    return p,T,irefr, e, Tm, la
 

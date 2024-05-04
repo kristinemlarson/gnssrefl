@@ -66,6 +66,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             required periodogram amplitude for QC
         ellist: list of floats
             added 23jun16, allow multiple elevation angle regions
+        apriori_rh : float
+            a priori reflector height, used in NITE, meters
         
     """
 
@@ -83,8 +85,6 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         ellist = [];
         #print('no augmented elevation angle list')
 
-
-
     # this is also checked in the command line - but for people calling the code ...
     if ((lsp['maxH'] - lsp['minH']) < 5):
         print('Requested reflector heights (', lsp['minH'], ',', lsp['maxH'], ') are too close together. Exiting.')
@@ -94,7 +94,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     e1=lsp['e1']; e2=lsp['e2']; minH = lsp['minH']; maxH = lsp['maxH']
     ediff = lsp['ediff']; NReg = lsp['NReg']  
     PkNoise = lsp['PkNoise']; prec = lsp['desiredP']; delTmax = lsp['delTmax']
-    if 'azval2' in lsp:
+    if 'azval2' in lsp.keys():
         azval2 = lsp['azval2']; 
         naz = int(len(azval2)/2)
     else:
@@ -134,7 +134,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
    # this defines the minimum number of points in an arc.  This depends entirely on the sampling
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
-    p,T,irefr,humidity = set_refraction_params(station, dmjd, lsp)
+    p,T,irefr,humidity,Tm, lapse_rate = set_refraction_params(station, dmjd, lsp)
     TempK = T + 273.15 # T is in celsius ... I think.
     vapor = humidity
     pressure = p
@@ -144,27 +144,33 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     lat1R = math.radians(lat1); lon1R = math.radians(lon1); 
 
     # only used by NITE
-    RH_apriori = lsp['apriori_rh']  # a priori reflector height - but this is for testing
+    if 'apriori_rh' in lsp.keys():
+        RH_apriori = lsp['apriori_rh']  # a priori reflector height used in NITE
+    else:
+        RH_apriori = 5 # completely made up
 
     #if screenstats:
-    print('Refraction parameters (press, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
+    print('Refraction parameters (pressure, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
 
     if (irefr >= 3) & (irefr <= 6):
         # N_ant is the index of refraction
         # apparently this is wrong ?
         #N_ant=refr.refrc_Rueger(p,humidity,TempK)[0]    #
         N_ant = refr.refrc_Rueger(pressure-vapor, vapor, TempK)[0]   #get antenne refractivity
-        ztd=2.3                                             #zenith total delay from PPP
-        # hydrostatic delay
-        zhd = refr.saastam2(pressure, lat1, height1)             # Saastamoinen model for ZHD
-        # getting wet delay by subtracting
-        zwd = ztd - zhd  # using zwd and zhd to get total mapping function
+        #ztd=2.3                                             #zenith total delay from PPP
+        # hydrostatic delay, Saastamoinen
+        zhd = refr.saastam2(pressure, lat1, height1)             
+        # wet delay 
+        zwd = refr.asknewet(humidity, Tm, lapse_rate)
+        print('Dry and wet zenith delays, meters ', round(zhd,3),round(zwd,3))
+        # if you had estimated total delay, you could get wet delay by 
+        ztd = zhd + zwd 
 
 # only doing one day at a time for now - but have started defining the needed inputs for using it
     twoDays = False
     obsfile2= '' # dummy value for name of file for the day before, when we get to that
     fname, resultExist = g.LSPresult_name(station,year,doy,extension) 
-    #print('Results are written to:', fname)
+    print('Results are written to:', fname)
 
     if (lsp['nooverwrite'] == True) & (resultExist == True):
         allGood = 0
@@ -191,7 +197,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
     if (allGood == 1):
         print('Reading from: ', obsfile)
-        print('Results will be written to:', fname)
+        #print('Results will be written to:', fname)
         minObsE = min(snrD[:,1])
         print('Min observed elev. angle ', station, year, doy, minObsE, '/requested e1 and e2 ', e1,e2)
         # only apply this test for simple e1 and e2
@@ -209,9 +215,11 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                 print('Ulich refraction correction')
             else:
                 print('Ulich refraction correction, time-varying')
-            print('Is this using the correct temperature units?')
+            # I do not understand why all these extra parameters are sent to this 
+            # function as they are not used. Maybe I was doing some testing.
             ele=refr.Ulich_Bending_Angle(snrD[:,1],N_ant,lsp,p,T,snrD[:,3],snrD[:,0])
         elif irefr == 5:
+            # NITE MODEL
             # remove ele < 1.5 cause it blows up
             i=snrD[:,1] > 1.5
             snrD = snrD[i,:]
@@ -435,6 +443,10 @@ def set_refraction_params(station, dmjd,lsp):
         refraction model number I believe, which is also sent, so not needed
     e : float
         water vapor pressure, hPa
+    Tm : float
+        temperature in Kelvin
+    la : float
+        lapse rate
 
     """
 
@@ -461,13 +473,14 @@ def set_refraction_params(station, dmjd,lsp):
         #elif (refraction_model == 5):
         else:
             it = 1
+        # I believe this uses the wrong height
         dlat = lsp['lat']*np.pi/180; dlong = lsp['lon']*np.pi/180; ht = lsp['ht']
         p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
         # e is water vapor pressure, so humidity ??
         #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
 
     #print('refraction model', refraction_model,irefr)
-    return p,T,irefr, e
+    return p,T,irefr, e, Tm, la
 
 def apply_refraction_corr(lsp,ele,p,T):
     """

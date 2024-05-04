@@ -573,7 +573,8 @@ def Ulich_Bending_Angle(ele, N0,lsp,p,T,ttime,sat):   #UBA
 
     Author: 20220629, fengpeng
 
-    Modified by KL to use numpy so I can use arrays
+    Modified by KL to use numpy so I can use arrays.  I do not know why
+    all these extra input parameters are here.
 
     Parameters
     ----------
@@ -1111,6 +1112,46 @@ def N_layer(N_antenna, Hr):
     #return round(Nl, 4)     #in ppm
     return Nl      #in ppm
 
+def saastam_wet(p,T):
+    """
+    This was never finished
+
+    Parameters
+    ----------
+    p : float
+        total pressure, hPa
+    T : float
+        temperature in Kelvin
+    e : float
+        partial pressure of water vapor
+    h_rel : float
+        relative humidity
+    h : float
+        geodetic height above sea level (meters)
+
+    Returns
+    -------
+    WZD : float
+        wet zenith delay, meters
+
+    """
+    #TM : mean temperature of the water vapor
+    # got these values from UNB package
+    TM = T * (1 - BETA * RD/DEN)
+    MD = 28.9644
+    MW = 18.0152;
+    K1 = 77.604;
+    K2 = 64.79;
+    K3 = 3.776e5;
+    R  = 8314.34;
+    C1 = 2.2768e-03;
+    K2PRIM = K2 - K1*(MW/MD);
+    RD     = R / MD;
+
+    WZD = 1.0E-6 * (K2PRIM + K3/TM) * RD * E/DEN
+
+    return WZD
+
 def saastam2(press, lat, height):
     """
     This function computes the Zenith Hydrostatic Delay using the Saastamoinen model 
@@ -1274,4 +1315,61 @@ def Equivilent_Angle_Corr_mpf(ele, mpf_tot, N0, Hr_apr):
     dele = ele_eqv -ele
 
     return dele
+
+def asknewet(e, Tm, lambda_val):
+    """
+    This function determines the zenith wet delay based on the equation 22 by Askne and Nordius (1987)
+
+    Askne and Nordius, Estimation of tropospheric delay for microwaves from surface weather data,
+    Radio Science, Vol 22(3): 379-386, 1987.
+
+    Source: Peng Feng
+   
+    Parameters
+    ----------
+    e : float
+        water vapor pressure in hPa
+    Tm : float
+        mean temperature in Kelvin
+    lambda_val: float
+        water vapor lapse rate (see definition in Askne and Nordius 1987)
+
+    Returns
+    -------
+    zwd :  float
+        zenith wet delay in meter
+
+    """
+
+    #
+    # Example 1:
+    # e =  10.9621 hPa
+    # Tm = 273.8720
+    # lambda_val = 2.8071
+    #
+    # output:
+    # zwd = 0.1176 m
+    # translated from matlab code available at https://vmf.geo.tuwien.ac.at/codes/
+    # Johannes Boehm, 3 August 2013
+    # ---
+
+    # coefficients
+    k1 = 77.604  # K/hPa
+    k2 = 64.79  # K/hPa
+    k2p = k2 - k1 * 18.0152 / 28.9644  # K/hPa
+    k3 = 377600  # KK/hPa
+
+    # mean gravity in m/s**2
+    gm = 9.80665
+    # molar mass of dry air in kg/mol
+    dMtr = 28.965 * 1e-3
+    # universal gas constant in J/K/mol
+    R = 8.3143
+
+    # specific gas constant for dry consituents
+    Rd = R / dMtr
+
+    zwd = 1e-6 * (k2p + k3 / Tm) * Rd / (lambda_val + 1) / gm * e
+
+    return zwd
 
