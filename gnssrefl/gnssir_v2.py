@@ -218,13 +218,12 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             # I do not understand why all these extra parameters are sent to this 
             # function as they are not used. Maybe I was doing some testing.
             ele=refr.Ulich_Bending_Angle(snrD[:,1],N_ant,lsp,p,T,snrD[:,3],snrD[:,0])
-        elif irefr == 5:
+        elif (irefr == 5 ) or (irefr == 6):
             # NITE MODEL
             # remove ele < 1.5 cause it blows up
             i=snrD[:,1] > 1.5
             snrD = snrD[i,:]
             N = len(snrD[:,1])
-            print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
             # elevation angles, degrees
             ele=snrD[:,1]
             # zenith angle in radians
@@ -234,11 +233,14 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             [mpf, dmpf]=[refr.mpf_tot(gmf_h,gmf_w,zhd,zwd),refr.mpf_tot(dgmf_h,dgmf_w,zhd,zwd)]
 
             # inputs apriori RH, elevation angle, refractive index, zenith delay, mpf ?, dmpf?
-            dE_NITE=refr.Equivilent_Angle_Corr_NITE(RH_apriori, ele, N_ant, ztd, mpf, dmpf)
-            ele = ele + dE_NITE 
-        elif irefr == 6:
-            print('MPF refraction correction, Wiliams and Nievinski? Exiting')
-            return
+            if irefr == 5:
+                print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
+                dE_NITE=refr.Equivalent_Angle_Corr_NITE(RH_apriori, ele, N_ant, ztd, mpf, dmpf)
+                ele = ele + dE_NITE 
+            else: 
+                print('MPF refraction correction, Wiliams and Nievinski')
+                dE_MPF= refr.Equivalent_Angle_Corr_mpf(ele,mpf,N_ant,RH_apriori)
+                ele = ele + dE_MPF 
 
         elif irefr == 0:
             print('No refraction correction applied ')
@@ -465,15 +467,13 @@ def set_refraction_params(station, dmjd,lsp):
         irefr = refraction_model
         refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
         # time varying was originally set to no for now (it = 1)
-        # now allows time varying for models 2 and 4
-        if refraction_model in [2, 4, 5]:
-        #if (refraction_model == 2) or (refraction_model == 4):
+        # now allows time varying for models 2, 4 and now MPF and NITE
+        if refraction_model in [2, 4, 5, 6]:
             it = 0
             print('Using time-varying refraction parameter inputs')
         #elif (refraction_model == 5):
         else:
             it = 1
-        # I believe this uses the wrong height
         dlat = lsp['lat']*np.pi/180; dlong = lsp['lon']*np.pi/180; ht = lsp['ht']
         p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
         # e is water vapor pressure, so humidity ??

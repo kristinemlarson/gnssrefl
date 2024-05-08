@@ -5099,8 +5099,10 @@ def rapid_gfz_orbits(year,month,day):
         #print(littlename, ' already exists on disk')
         return littlename, fdir, True 
     try:
+        #g.replace_wget(url,littlename + '.gz')
         wget.download(url,littlename + '.gz')
-        subprocess.call(['gunzip', littlename + '.gz'])
+        if os.path.isfile(littlename + '.gz'):
+            subprocess.call(['gunzip', littlename + '.gz'])
     except:
         print('Problems downloading Rapid GFZ orbit')
         print(url)

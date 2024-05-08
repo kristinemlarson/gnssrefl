@@ -1,4 +1,5 @@
 env
+set_simulator*py
 test_animation.py
 NITE*py
 test3.py

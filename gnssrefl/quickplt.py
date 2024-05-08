@@ -27,7 +27,7 @@ def parse_arguments():
     parser.add_argument("-ymdhm", help="True/T for when columns 1-5 are year month day hour minute", type=str,default=None)
     parser.add_argument("-xlabel", type=str, help="optional x-axis label", default=None)
     parser.add_argument("-ylabel", type=str, help="optional y-axis label", default=None)
-    parser.add_argument("-symbol", help="plot symbol, e.g. * or -", type=str,default=None)
+    parser.add_argument("-symbol", help="plot symbol, e.g. o or -", type=str,default=None)
     parser.add_argument("-title", help="optional title", type=str,default=None)
     parser.add_argument("-outfile", help="optional filename for plot. Must end in png", type=str,default=None)
     parser.add_argument("-xlimits", nargs="*",type=float, help="optional x-axis limits", default=None)
@@ -416,7 +416,7 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
     # i.e. using default
     if symbol is None:
         if yerrors:
-            ax.errorbar(tval, yval, yerr=tvd[:,errorcol], fmt='.',color='blue')
+            ax.errorbar(tval, yval, yerr=tvd[:,errorcol], fmt='.')
         else:
             ax.plot(tval, yval, 'b.')
     else:
@@ -430,7 +430,8 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
         if symbol is None:
             ax.plot(tval2, yval2, 'r.')
         else:
-            ax.plot(tval2, yval2, color='red', fmt=symbol)
+            # ??
+            ax.plot(tval2, yval2, symbol )
 
     myplt.grid()
     myplt.ylabel(ylabel)

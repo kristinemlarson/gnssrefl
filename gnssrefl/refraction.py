@@ -641,7 +641,7 @@ def refrc_Rueger(drypress,vpress,temp):
 
     """
 
-    # Rüeger's "best average", for 375 ppm CO2, 77.690 for 392 ppm CO2
+    # Rueger's "best average", for 375 ppm CO2, 77.690 for 392 ppm CO2
     [K1r,K2r,K3r]=[77.689 ,71.2952 ,375463.]     
 
     # Rueger,IAG recommend, in ppm
@@ -656,17 +656,18 @@ def refrc_Rueger(drypress,vpress,temp):
     vdensity=(vpress*100.)*Mw/(Rgas*temp)   
     totaldensity=drydensity+vdensity
 
-    #divide 100 because hPa in Rueger formula, result in ppm
+    #divide by 100 because hPa in Rueger formula, result in ppm
     Nhydro=(K1r*Rgas*totaldensity/Md)/100.   
     K2rr=K2r-K1r*(Mw/Md)
     Nwet=K2rr * vpress / temp + K3r * vpress / (temp ** 2)
     # in ppm
-    ref=[round(Nrueger,4),round(Nhydro,4),round(Nwet,4)]    
+    ref=[Nrueger,Nhydro,Nwet]    
+    #ref=[round(Nrueger,4),round(Nhydro,4),round(Nwet,4)]    
 
     return ref
 
 
-def Equivilent_Angle_Corr_NITE(Hr_apr, e_T, N_ant, ztd_ant, mpf_tot, dmpf_de_tot):
+def Equivalent_Angle_Corr_NITE(Hr_apr, e_T, N_ant, ztd_ant, mpf_tot, dmpf_de_tot):
     """
 
     This function computes the "equvilent" angular correction to apply the 
@@ -674,8 +675,10 @@ def Equivilent_Angle_Corr_NITE(Hr_apr, e_T, N_ant, ztd_ant, mpf_tot, dmpf_de_tot
 
 
     Equation (24) in Peng (2023), DOI: 10.1109/TGRS.2023.3332422
-    The variable substitude method can be found in Strandberg, J. (2020). New
-    methods and applications for interferometric GNSS reflectometry. Chalmers Tekniska Hogskola (Sweden).
+
+    The variable substitude method can be found in Strandberg, J. (2020). 
+    New methods and applications for interferometric GNSS reflectometry. 
+    Chalmers Tekniska Hogskola (Sweden).
 
     Parameters
     ----------
@@ -738,7 +741,7 @@ def gmf_deriv(dmjd,dlat,dlon,dhgt,zd):
         height in meters
     zd: float
         zenith distance in radians ??? ( is this really what you mean??
-        I suspect it is the zenith angle ... in radians
+        KL: I suspect it is the zenith angle ... in radians
 
     Returns
     -------
@@ -1112,45 +1115,6 @@ def N_layer(N_antenna, Hr):
     #return round(Nl, 4)     #in ppm
     return Nl      #in ppm
 
-def saastam_wet(p,T):
-    """
-    This was never finished
-
-    Parameters
-    ----------
-    p : float
-        total pressure, hPa
-    T : float
-        temperature in Kelvin
-    e : float
-        partial pressure of water vapor
-    h_rel : float
-        relative humidity
-    h : float
-        geodetic height above sea level (meters)
-
-    Returns
-    -------
-    WZD : float
-        wet zenith delay, meters
-
-    """
-    #TM : mean temperature of the water vapor
-    # got these values from UNB package
-    TM = T * (1 - BETA * RD/DEN)
-    MD = 28.9644
-    MW = 18.0152;
-    K1 = 77.604;
-    K2 = 64.79;
-    K3 = 3.776e5;
-    R  = 8314.34;
-    C1 = 2.2768e-03;
-    K2PRIM = K2 - K1*(MW/MD);
-    RD     = R / MD;
-
-    WZD = 1.0E-6 * (K2PRIM + K3/TM) * RD * E/DEN
-
-    return WZD
 
 def saastam2(press, lat, height):
     """
@@ -1171,9 +1135,9 @@ def saastam2(press, lat, height):
     press : float
         atmospheric total pressure in hPa
     lat : float
-        latitude of the station in degree
+        latitude of the station, degrees
     height : float
-        height of the station in meters ??? Which kind of height ????
+        ellipsoidal height of the station in meters 
 
     Returns
     -------
@@ -1192,7 +1156,9 @@ def saastam2(press, lat, height):
 def mpf_tot(gmf_h, gmf_w, zhd, zwd):  
     """
     Finds the total mapping function by weighting the hydrostatic and wet mapping 
-    function with the zenith hydrostatic and wet delay. Author: Peng
+    function with the zenith hydrostatic and wet delay. 
+
+    Author: Peng Feng
     
     Parameters
     ----------
@@ -1225,7 +1191,7 @@ def dmpf_dh(ele, dhgt):
 
     Boehm, J., Werl, B., & Schuh, H. (2006). Troposphere mapping functions for
     GPS and very long baseline interferometry from European Centre for Medium‐Range
-    Weather Forecasts operational analysis data. Journal of geophysical research: solid earth, 111(B2).
+    Weather Forecasts operational analysis data. JGR: Solid Earth, 111(B2).
 
     Parameters
     ----------
@@ -1279,7 +1245,7 @@ def Ulich_Bending_Angle_original(ele, N0):
     return np.degrees(r * f)
 
 
-def Equivilent_Angle_Corr_mpf(ele, mpf_tot, N0, Hr_apr):
+def Equivalent_Angle_Corr_mpf(ele, mpf_tot, N0, Hr_apr):
     """
     This function computes the "equvilent" angular correction to apply the 
     tropospheric delay calculated with the mapping function.
@@ -1318,7 +1284,7 @@ def Equivilent_Angle_Corr_mpf(ele, mpf_tot, N0, Hr_apr):
 
 def asknewet(e, Tm, lambda_val):
     """
-    This function determines the zenith wet delay based on the equation 22 by Askne and Nordius (1987)
+    Determines the zenith wet delay based on the equation 22 by Askne and Nordius (1987)
 
     Askne and Nordius, Estimation of tropospheric delay for microwaves from surface weather data,
     Radio Science, Vol 22(3): 379-386, 1987.
