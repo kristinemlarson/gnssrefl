@@ -280,6 +280,13 @@ If you want to compute it for your site, please use
 [max_resolve_RH](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.max_resolve_RH_cl.html) 
 That's all I am going to say on the matter.
 
+## Refraction
+
+We would welcome help from the community to add a discussion here of refraction models and GNSS-IR.
+Currently we only provide an explanation of refraction corrections inside of our code, specifically
+inside gnssir_input.py, which is where the refraction model is set.  Please see that 
+[documentation for details](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html).
+
 ## quickLook
 
 <CODE>quickLook</code> is meant to provide the user with a visual sense of the data 

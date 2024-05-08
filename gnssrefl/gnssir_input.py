@@ -37,7 +37,7 @@ def parse_arguments():
     parser.add_argument("-frlist", nargs="*",type=int,  help="User defined frequencies using our nomenclature")
     parser.add_argument("-azlist2", nargs="*",type=float,  default=None,help="list of azimuth regions, default is 0-360") 
     parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles, advanced users only!") 
-    parser.add_argument("-refr_model", default=1, type=int, help="refraction model. default is 1, zero turns it off)")
+    parser.add_argument("-refr_model", default="1", type=str, help="refraction model. default is 1, zero turns it off)")
     parser.add_argument("-apriori_rh", default=None, type=float, help="apriori reflector height (m) used by NITE model")
     parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height (m)")
     parser.add_argument("-pele", nargs="*", type=float, help="min and max elevation angle in direct signal removal, default is 5-30")
@@ -66,7 +66,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
        h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None, peak2noise: float = 2.8, 
        ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
-       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : int=1, 
+       delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : str="1", 
                       apriori_rh: float=None, Hortho : float = None, pele: list=[5,30], daily_avg_reqtracks: int=None, 
                       daily_avg_medfilter: float =None, subdaily_alt_sigma : bool=None, 
                       subdaily_ampl : float=None, subdaily_delta_out : float=None, 
@@ -90,23 +90,35 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     set them manually.
 
     Originally we had refraction as a boolean, i.e. on or off. This was stored in the gnssir 
-    analysis json. The code however, uses an integer 1 (for a simple non-time-varying 
-    Bennett correction) and integer 0 for no correction.
-    From version 1.8.4 we begin to implement more refraction models.  1 (and Bennett) will continue to be 
-    the default.  The "1" is written to the LSP results file so that people can keep track easily of whether
+    analysis description json. The code however, uses a 1 for a simple non-time-varying 
+    Bennett correction and 0 for no correction.
+
+    From version 1.8.4 we begin to implement more refraction models.  Model 1 (Bennett) will continue to be 
+    the default.  The model number is written (as an integer) to the LSP results file so that people can keep track easily of whether
     they are inadvertently mixing files with different strategies. And that is why it is an integer, because
     all results in the LSP results files are numbers.  Going forward, we are adding a time-varying capability.
 
-        Model 1: Bennett, static
-        Model 2: Bennett and time-varying
-        Model 3: Ulich, static
+        Model 1: Bennett, non-time-varying
+
+        Model 2: Bennett, time-varying
+
+        Model 3: Ulich, non-time-varying
+
         Model 4: Ulich, time-varying
+
         Model 5: NITE, Feng et al. 2023 DOI: 10.1109/TGRS.2023.3332422, time-varying
+
         Model 6: MPF, Williams and Nievinski, 2017,  DOI: 10.1002/2016JB013612, time-varying
 
-    gnssir_input will have a new parameter for the json output, refr_model. If it is not set, i.e. you 
-    have an old json, it is assumed to be 1. You can change the refraction model by 
-    hand editting the file if you like. And you can certainly test out the impact by using -extension option.
+
+    We allow users to input the model names NITE and MPF (nite and mpf also allowed).  The other models do not allow that.
+    If you want model 2, you have to ask for model 2. We thank Peng Feng for providing python code to be used for some of these models.
+
+    If you want to test the effect of different refraction models, you are encouraged to create
+    two json files using the extension option. You can then run gnssir using those two extensions.
+    In general I think the refraction default is fine for soil moisture and snow accumulation.
+    If you are going to look at tall sites, you most definitely need the refraction correction. If you
+    plan to look at very tall sites, you should pick the best one.
 
     Examples
     --------
@@ -122,6 +134,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     gnssir_input p041  -h1 0.5 -h2 10 -e1 5 -e2 25
         uses UNR database, only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
+
     gnssir_input p041 -ediff 1
         uses UNR database, only GPS data, default station coordinates, enforces elevation angles to be 
         within 1 degrees of default elevation angle limits (5-25)
@@ -217,11 +230,11 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         [5 10 6 11 7 12 8 13] would allow overlapping regions - all five degrees long 
         Default is empty list. 
 
-    refr_model : int
-        refraction model. we are keeping this as integer as it is written to a file withonly
-        numbers in it.  1 is the default simple refraction (just correct elevation angles
-        using standard bending models).  0 is no refraction correction.  As we add more
-        models, they will receiver their own number. 
+    refr_model : str
+        refraction model. While defined as a string (so that people can specify names of models)
+        we convert this to an integer for book-keeping. 1 is the default refraction model 
+        (it corrects elevation angles using standard bending models).  0 is no refraction correction.  
+        The other models are defined in the summary section of this code.
 
     apriori_rh : float
         apriori reflector height (meters). only used in NITE model 
@@ -446,7 +459,26 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     lsp['ellist'] = ellist
 
+    if refr_model[0] == '-':
+         print('You selected a negative refraction model. Exiting')
+         sys.exit()
+
+    if refr_model.isnumeric():
+        # number has been input
+        refr_model = int(refr_model)
+        if (refr_model > 6) :
+            print('We only have six refraction models and you selected ', refr_model, ' Exiting')
+            sys.exit()
+    else:
+        if refr_model.upper() == 'NITE':
+            refr_model = 5
+        elif refr_model.upper() == 'MPF':
+            refr_model = 6
+        else:
+            print('Your refraction model ', refr_model, ' is not recognized by the code. Exiting')
+
     lsp['refr_model'] = refr_model
+    print('refraction model ', refr_model)
 
     # added for people that want to save their daily average and subdaily strategies.
     # if not set, then they are saved as None.
