@@ -30,7 +30,7 @@ def parse_arguments():
     parser.add_argument("-symbol", help="plot symbol, e.g. o or -", type=str,default=None)
     parser.add_argument("-title", help="optional title", type=str,default=None)
     parser.add_argument("-outfile", help="optional filename for plot. Must end in png", type=str,default=None)
-    parser.add_argument("-xlimits", nargs="*",type=float, help="optional x-axis limits", default=None)
+    parser.add_argument("-xlimits", nargs="*",type=str, help="optional x-axis limits, use yyyyMMdd", default=None)
     parser.add_argument("-ylimits", nargs="*",type=float, help="optional y-axis limits", default=None)
     parser.add_argument("-ydoy", help="True/T for when columns 1-2 are year and doy", type=str,default=None)
     parser.add_argument("-filename2", help="second filename", type=str, default=None)
@@ -59,7 +59,7 @@ def parse_arguments():
 
 def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: bool=False, xlabel: str=None, 
                   ylabel: str=None, symbol: str=None, reverse:bool=False,title:str=None,outfile: str=None,
-                  xlimits: float=[], ylimits: float=[], ydoy:bool=False, ymd:bool=False, ymdhm:bool=False, 
+                  xlimits: str=None, ylimits: float=[], ydoy:bool=False, ymd:bool=False, ymdhm:bool=False, 
                   filename2: str=None, freq:int=None, utc_offset: int=None, yoffset: float=None, 
                   keepzeros: bool=False, sat: str=None,yoffset2: float=None,scale: float=1.0, 
                   scale2: float=1.0, elimits: float=[0], azlimits:float=[0], plt:bool=True):
@@ -173,8 +173,10 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
         title for plot 
     outfile : str, optional
         name of png file to store plot 
-    xlimits: list of floats, optional
+    xlimits: list of str, 
         xaxis limits  
+        if you selected any time options (ymd, mjd, ydoy,mjd), the code assumes
+        a format of yyyyMMdd (year,month,day) 
     ylimits: list of floats, optional
         yaxis limits  
     ydoy : bool, optional
@@ -216,6 +218,9 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
          png file is always created.
 
     """
+    if xlimits is None:
+        xlimits = []
+
     snrfile = False
     if sat is not None:
         snrfile = True
@@ -267,7 +272,6 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
         yoffset = 0
     if yoffset2 is None:
         yoffset2 = 0
-
     reverse_sign = reverse
 
     convert_mjd = mjd
@@ -464,11 +468,25 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
         myplt.ylim((ylimits))
     if len(xlimits) == 2:
         print('found x-axis limits')
+        if (convert_mjd | ymd | ydoy | ymdhm):
+            if (len(xlimits[0]) != 8):
+                print('xlimit format is YYYYMMDD, but you said: ', xlimits[0], ' Exiting'); sys.exit()
+            if (len(xlimits[1]) != 8):
+                print('xlimit format is YYYYMMDD, but you said: ', xlimits[1], ' Exiting'); sys.exit()
+        else:
+            # make sure you change from string to numbers
+            xlimits[0] = float(xlimits[0])
+            xlimits[1] = float(xlimits[1])
+
         if convert_mjd:
-            t1 = Time(xlimits[0],format='mjd')
+            # need to just get MJD so you can use the local UTC offset
+            year1, month1, day1, doy1, mjd1 = g.noaa2me(xlimits[0])
+            year2, month2, day2, doy2, mjd2 = g.noaa2me(xlimits[1])
+
+            t1 = Time(mjd1,format='mjd')
             t1_utc = t1.utc # change to UTC
             tvalues1 =  t1_utc.datetime # change to datetime
-            t2 = Time(xlimits[1],format='mjd')
+            t2 = Time(mjd2,format='mjd')
             t2_utc = t2.utc # change to UTC
             tvalues2 =  t2_utc.datetime # change to datetime
             myplt.xlim((tvalues1,tvalues2))
@@ -479,12 +497,13 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
                 else:
                     myplt.xlabel('UTC+' + cc)
         else:
-            if ydoy:
-                t1,t2 = q.set_xlimits_ydoy(xlimits)
+            if ymd | ydoy | ymdhm :
+                t1 = g.noaatime_to_obstime(xlimits[0])
+                t2 = g.noaatime_to_obstime(xlimits[1])
                 myplt.xlim((t1,t2))
-            else:
-                myplt.xlim((xlimits))
-
+            else: 
+                # this is for when you are plotting something that isn't time
+                myplt.xlim((xlimits[0], xlimits[1]))
 
     if reverse_sign:
         ax.invert_yaxis()

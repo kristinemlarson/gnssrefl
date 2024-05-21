@@ -14,6 +14,7 @@ import requests
 import subprocess
 import sys
 import sqlite3
+import zipfile
 from urllib.parse import urlparse
 import time
 from ftplib import FTP #import FTP commands from python's built-in ftp library
@@ -37,6 +38,7 @@ import gnssrefl.read_snr_files as snr
 import gnssrefl.karnak_libraries as k
 import gnssrefl.EGM96 as EGM96
 import gnssrefl.rinex2snr as rnx
+import gnssrefl.sd_libs as sd
 import gnssrefl.kelly as kelly
 
 # for future ref
@@ -6401,8 +6403,8 @@ def cddis_restriction(iyear, idoy,archive):
         # i.e. half a year is six months
         bad_day =  True
         print(archive.upper() + ' does not allow direct access to their high-rate data for this day and year. ')
-        print('They now tar files six months after the data archived. If you are willing to ')
-        print('submit a pull request to fix this issue, we would be very willing to host it.')
+        print('They now tar files six months after the data archived - but force you to merge them. I have installed a solution for CDDIS.')
+        print('It would be nice if someone would make a similar fix for BKG')
 
     else:
         bad_day = False
@@ -6857,5 +6859,133 @@ def define_logdir(station,year,doy):
     logname = cdoy + '_translation.txt'
 
     return logdir, logname
+
+
+def noaa2me(date1):
+    """
+    converts NOAA type of date string to simple integers
+
+    Parameters
+    ----------
+    date1 : string
+        time in format YYYYMMDD for year month and day
+
+    Returns
+    -------
+    year1 : integer
+        full year
+
+    month1 : integer
+        month
+
+    day1 : integer
+        day of the month
+
+    doy : integer
+        day of year
+
+    modjulday : float
+        modified julian date
+
+    """
+    year1 = int(date1[0:4]);
+    month1=int(date1[4:6]);
+    day1=int(date1[6:8])
+    doy, cdoy, cyyyy, cyy =ymd2doy(year1, month1, day1)
+
+    mj, fj = mjd(year1, month1, day1, 0, 0, 0)
+    modjulday = mj + fj;
+
+    return year1, month1, day1, doy, modjulday
+
+def noaatime_to_obstime(noaa):
+    """
+    stitching together something to convert string
+    with year, month, day and returning obstime
+
+    Parameters
+    ----------
+    noaa : str
+        year, month, day (e.g. 20220115)
+
+    Returns
+    -------
+    obstime : datetime
+        time in datetime format
+
+    """
+    year1, month1, day1, doy1, modjulday1 = noaa2me(noaa)
+    obstime =  sd.mjd_to_obstimes(modjulday1)
+
+    return obstime
+
+
+def trignet(station,year,doy):
+    """
+    tries to pick up 30 sec RINEX 2.11 data from TRIGNET
+
+    Parameters
+    ----------
+    station : str
+        station name
+    year : int
+        full year
+    doy : int
+        day of year
+    Returns
+    -------
+    fexist : bool
+        whether you succeeded
+
+    """
+    cyyyy,cyy,cdoy = ydoych(year,doy)
+    data_server = 'ftp.trignet.co.za'
+    fexist = False
+
+    try:
+        ftp=FTP(data_server) #log in to server
+        ftp.login(user='anonymous', passwd='kristine@colorado.edu')
+        rinex_dirc = 'RefData.' + cyy + '/' + cdoy + '/L1L2_30sec/'
+        ftp.cwd(rinex_dirc) #change to the directory
+        files=ftp.nlst() #list files in the directory
+        for f in files:
+            if station.upper() in f:
+                print(f)
+                ftp.retrbinary('RETR '+f, open(f,'wb').write)
+        ftp.close()
+    except:
+        print('no file found ', cyyyy, cdoy)
+    the_zipfile = station.upper() + cdoy + 'Z.zip'
+
+    if os.path.exists(the_zipfile):
+        station_u = station.upper() + cdoy + 'z.' + cyy 
+        station_l = station.lower() + cdoy + '0.' + cyy 
+    # in case they are there
+        subprocess.call(['rm', '-f','unpack.bat'])
+        subprocess.call(['rm', '-f','CRX2RNX.EXE'])
+        try:
+            archive = zipfile.ZipFile(the_zipfile, 'r')
+            subprocess.call(['unzip', the_zipfile])
+            subprocess.call(['rm', '-f',station.upper() + cdoy + 'Z.' + cyy + 'q'])
+            subprocess.call(['rm', '-f',station.upper() + cdoy + 'Z.' + cyy + 'n'])
+            subprocess.call(['rm', '-f',station.upper() + cdoy + 'Z.zip'])
+            if os.path.exists(station_u +'d'):
+                subprocess.call(['mv', station_u + 'd', station_l + 'd' ])
+                subprocess.call(['rm', '-f','unpack.bat'])
+                subprocess.call(['rm', '-f','CRX2RNX.EXE'])
+
+                crnxpath = hatanaka_version()
+                subprocess.call([crnxpath, station_l + 'd'])
+                subprocess.call(['rm', '-f',station_l + 'd'])
+
+        except:
+            print('probably a corrupt zipfile, but who knows')
+    # remove crap
+        if os.path.exists(station_l + 'o'):
+            fexist = True
+            print('Found RINEX ', station_l + 'o')
+
+    return fexist
+
 
 

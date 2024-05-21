@@ -155,6 +155,10 @@ def quicklook(station: str, year: int, doy: int,
         eps instead of png files
     """
 
+    vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
+    print('You are running ', vers)
+
+
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 

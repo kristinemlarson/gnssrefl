@@ -300,8 +300,8 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
                 if os.path.isfile(oname):
                     #print('successful download ', oname)
                     fileF = fileF + 1
-                #else:
-                #    print('unsuccessful download ', oname)
+                else:
+                    print('Unsuccessful download ', oname)
 
     searchP = station.upper() + streamID + cyyyy + cdoy + '*15M*MO.rnx'
     print('Found ', fileF,' 15 minute files')
@@ -438,3 +438,140 @@ def esp_highrate(station, year, month, day,stream,dec_rate):
         subprocess.call(cm,shell=True)
 
     return file_name24,  fexist
+
+
+def cddis_highrate_tar(station, year, month, day,stream,dec_rate):
+    """
+    picks up a tar'ed highrate RINEX files from CDDIS, untars it, and merges.
+
+    Parameters
+    ----------
+    station : str
+        4 char or 9 char station name
+        Rinex 2.11 for the first and rinex 3 for the latter
+    year : int
+        full year
+    month : int
+        calendar month
+    day : int 
+        calendar day
+    stream : str
+        rinex3 ID, S or R
+    dec_rate : int
+        decimation rate, seconds
+
+    Returns
+    -------
+    rinexname : str
+        name of the merged/uncompressed outputfile
+    fexist : bool
+        whether the Rinex file was successfully retrieved
+
+    requires hatanaka code and gfzrnx
+    """
+    s1=time.time()
+    fexist  = False
+    version = 3 # only version 3
+    crnxpath = g.hatanaka_version()
+    gfzpath = g.gfz_version()
+    alpha='abcdefghijklmnopqrstuvwxyz'
+    # if doy is input
+    if day == 0:
+        doy=month
+        d = g.doy2ymd(year,doy);
+        month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = g.ymd2doy(year,month,day); 
+
+    if not os.path.isfile(gfzpath):
+        print('You need to install gfzrnx to use high-rate RINEX data in gnssrefl.')
+        return
+
+    gns = 'https://cddis.nasa.gov/archive/gnss/data/highrate/' 
+    gns = gns + cyyyy + '/'+ cdoy + '/' +cyy + 'd/'
+
+    streamID  = '_' + stream + '_'
+
+    new_way_dir = 'gnss/data/highrate/' + cyyyy + '/' + cdoy + '/'
+    file_name = station.upper() +  streamID + cyyyy + cdoy + '0000_01D_01S_MO.crx.tar'
+    #print(new_way_dir,file_name)
+    if os.path.isfile(file_name):
+        print('already have the tar file - so it has probably been un tarred')
+    else:
+        g.cddis_download_2022B(file_name,new_way_dir)
+        if os.path.isfile(file_name):
+            subprocess.call(['tar','-xf', file_name])
+            print('Now remove the tar file')
+            subprocess.call(['rm', file_name])
+
+    fileF = 0
+    for h in range(0,24):
+        # subdirectory
+        ch = '{:02d}'.format(h)
+        print('Hour: ', ch)
+        #gnss/data/highrate/2023/199/23d/22
+        new_way_dir = 'gnss/data/highrate/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/' + ch + '/'
+        for e in ['00', '15', '30', '45']:
+            file_name = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.crx.gz'
+            crnx_name = file_name[:-3] 
+            oname = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.rnx' # do we need this?
+            if os.path.isfile(new_way_dir + oname):
+                #print('Found rnx file', oname)
+                subprocess.call(['mv',new_way_dir + oname, 'gnss/data'])
+                fileF = fileF + 1
+            elif os.path.isfile(new_way_dir + file_name):
+                #print('Found file:', new_way_dir,file_name)
+                subprocess.call(['gunzip',new_way_dir + file_name])
+                subprocess.call([crnxpath, new_way_dir + crnx_name])
+                subprocess.call(['rm',new_way_dir + crnx_name])
+                subprocess.call(['mv',new_way_dir + oname, 'gnss/data'])
+                if os.path.isfile('gnss/data/' + oname):
+                    fileF = fileF + 1
+            else:
+                print('did not find  file:', new_way_dir,file_name)
+    # moved the files to 'gnss/data/'
+    searchpath = 'gnss/data/' + station.upper() + streamID + cyyyy + cdoy + '*.rnx'
+    #print(searchpath)
+    rinexname = station.upper() + streamID + cyyyy + cdoy + '0000_01D_01S_MO.rnx'
+    tmpname = rinexname + 'tmp'
+
+    print('Attempt to merge the 15 minute files using gfzrnx and move to ', rinexname)
+    if (fileF > 0): # files exist
+        if (dec_rate == 1):
+            subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-f','-q'])
+        else:
+            print('Am decimating with gfzrnx')
+            crate = str(dec_rate)
+            subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-sei','out','-smp',crate,'-f','-q'])
+
+        cm = 'rm ' + searchpath 
+        if os.path.isfile(tmpname): # clean up
+            ok = 1
+            subprocess.call(cm,shell=True)
+            subprocess.call(['mv',tmpname,rinexname])
+            print('File created ', rinexname)
+            fexist = True
+
+        # remove unneeded 15 minute files
+        #new_way_dir = 'gnss/data/highrate/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/' + ch + '/'
+        new_dir =      'gnss/data/highrate/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/*'
+        print('remove compressed 15 minute files')
+        cm = 'rm -rf ' + new_dir
+        subprocess.call(cm,shell=True)
+
+        print('remove converted 15 minute files')
+        searchpath = 'gnss/data/' + station.upper() + streamID + cyyyy + cdoy + '*.rnx'
+        cm = 'rm -rf ' + searchpath
+        subprocess.call(cm,shell=True)
+
+        # remove junk from CDDIS
+        searchpath = station.upper() + streamID + cyyyy + cdoy + '*.md5.txt'
+        cm = 'rm -rf ' + searchpath
+        subprocess.call(cm,shell=True)
+
+        searchpath = station.upper() + streamID + cyyyy + cdoy + '*.sha512.txt'
+        cm = 'rm -rf ' + searchpath
+        subprocess.call(cm,shell=True)
+
+    s2=time.time()
+    print('That download/merge experience took ', int(s2-s1), ' seconds.')
+    return rinexname,  fexist

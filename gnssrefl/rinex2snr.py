@@ -292,13 +292,18 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 if not bad_day:
                                     rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
                                 else: 
+                                    print('Check the tar version')
+                                    rnx_filename,foundit = ch.cddis_highrate_tar(station9ch, year, doy, 0,stream,dec_rate)
+                                    print(rnx_filename, ' returned from tar version')
+                                if not foundit:
                                     print('No high-rate RINEX data will be downloaded')
                                     foundit = False; fexists = False; rnx_file = ''
-                                if foundit:
+                                else:
                                     if screenstats:
                                         print('The RINEX 3 file has been downloaded from CDDIS . Try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
                             if archive == 'bkg':
+                                # this is confusing - so the bkg variable is either IGS or EUREF
                                 bad_day = g.cddis_restriction(year, doy,'bkg')
                                 if not bad_day:
                                     rnx_filename,foundit = ch.bkg_highrate(station9ch, year, doy, 0,stream,dec_rate,bkg)

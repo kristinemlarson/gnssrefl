@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.2.2
+
+Fixed some bugs in quickplt. Timing limits along the x-axis are now
+more consistent. If are you using time, the limits are YYYYMMDD format.
+This can be prompted by using mjd, ydoy, ymdhms optional flags, e.g.
+
+Changed issue report request so that users are directed to 
+provide needed information about version number.
+
+## 3.2.1
+
+gnssrefl now allows 1-hz files from CDDIS that are more than 6 months old.
+I would still like someone 'other than me' to make a similar change for BKG.
+The download is clearly much faster (download 1 file instead of 96) but 
+merging still slow. Has anyone tested new versions of gfzrnx to see if they
+are faster? They might be.
 
 ## 3.2.0
 Added NITE model.  In gnssrefl this is refl_model 5.

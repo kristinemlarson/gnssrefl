@@ -174,6 +174,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         number of parallel processing jobs. 
 
     """
+    vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
+    print('You are running ', vers)
+
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
@@ -306,7 +309,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp}
 
     print(lsp['pele'], ' direct signal elevation angle limits')
-    print(lsp['e1'], lsp['e2'], ' min and max elevation angles')
+    #print(lsp['e1'], lsp['e2'], ' min and max elevation angles')
     # added this because ellist is a new option and was not necessarily created in old json files
     if 'ellist' not in lsp:
         #print('did not find ellist')

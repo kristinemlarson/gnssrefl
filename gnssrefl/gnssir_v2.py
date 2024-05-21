@@ -196,7 +196,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
         snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
     if (allGood == 1):
-        print('Reading from: ', obsfile)
+        print('Reading SNR data from: ', obsfile)
         #print('Results will be written to:', fname)
         minObsE = min(snrD[:,1])
         print('Min observed elev. angle ', station, year, doy, minObsE, '/requested e1 and e2 ', e1,e2)

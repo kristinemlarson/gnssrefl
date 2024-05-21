@@ -57,16 +57,16 @@ def trans_time(tvd, ymd, ymdhm, convert_mjd, ydoy ,xcol,ycol,utc_offset):
         sys.exit()
 
     if ymd :
+        yval = tvd[:,ycol] # ??
         for i in range(0,len(tvd)):
             bigT = datetime.datetime(year=int(tvd[i,0]), month=int(tvd[i,1]), day=int(tvd[i,2]) )
             tval.append(bigT)
-            yval.append( tvd[i,ycol])
     elif ymdhm:
+        yval = tvd[:,ycol] # ??
         for i in range(0,len(tvd)):
             bigT = datetime.datetime(year=int(tvd[i,0]), month=int(tvd[i,1]), 
                                      day=int(tvd[i,2]), hour=int(tvd[i,3]), minute=int(tvd[i,4]), second=0)
             tval.append(bigT)
-            yval.append( tvd[i,ycol])
     else:
         if convert_mjd:
             mm = tvd[:,xcol]
