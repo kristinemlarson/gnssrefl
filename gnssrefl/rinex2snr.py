@@ -202,19 +202,24 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             # could try this way? - look for file in localpath2. gunzip if necessary
                             allgood = get_local_rinexfile(r,localpath2)
                         if os.path.exists(r):
-                            rinext =float(np.loadtxt(r,usecols=0,dtype='str',max_rows=1))
-                            print('Apparent Rinex version', rinext)
-                            if (rinext != 2.11):
-                                print('Your file is not RINEX v2.11 which is what you told the code it was. Exiting')
-                                sys.exit()
-
                             if screenstats:
                                 print('Found the RINEX 2.11 file', r)
+                            try:
+                                rinext =float(np.loadtxt(r,usecols=0,dtype='str',max_rows=1))
+                                print('Apparent Rinex version', rinext)
+                                if (rinext != 2.11):
+                                    print('Your file is not RINEX v2.11 which is what you told the code it was. Exiting')
+                                    sys.exit()
+
+                            except:
+                                print('I had problems confirming RINEX version. Will ignore that for now.')
+
                             if strip:
                                 if screenstats:
                                     print('Testing out stripping the RINEX 2 file here')
                                 k.strip_rinexfile(r)
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator)
+
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
