@@ -208,8 +208,8 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 rinext =float(np.loadtxt(r,usecols=0,dtype='str',max_rows=1))
                                 print('Apparent Rinex version', rinext)
                                 if (rinext != 2.11):
-                                    print('Your file is not RINEX v2.11 which is what you told the code it was. Exiting')
-                                    sys.exit()
+                                    print('Your file is not RINEX v2.11 which is what you told the code it was.')
+                                    #sys.exit()
 
                             except:
                                 print('I had problems confirming RINEX version. Will ignore that for now.')

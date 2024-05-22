@@ -20,7 +20,7 @@ c change to 132 characters for inputs
       real*8 c
       parameter (c = 0.299792458D+09)     
 
-      integer stderr
+      integer stderr,iuseful,k
       parameter (stderr=6)
       character*80 inline
       character*4 station
@@ -137,17 +137,25 @@ c removed subroutine moving_sites bevacuse life is short
         write(errid,*)mess
         return
       endif
-      if (iobs(6) .eq. 0) then
-        mess='ERROR:no L1 SNR data - exiting'
+      iuseful = 0
+      do k = 6, 11
+         if (iobs(k) .gt. 0) then
+            iuseful = iuseful + 1
+         endif
+      enddo
+      if (iuseful .eq. 0) then
+        mess='ERROR:no SNR data found. Fatal error'
         write(errid,*)mess
         return
       endif
+
+c     if (iobs(6) .eq. 0) then
+c       return
+c     endif
       if (nobs .gt. 20) then
         mess = 'ERROR: this code only works for <= 20 obs types'
         write(errid,*)mess
-        mess = '1 solution is to to run teqc on the original RINEX'
-        write(errid,*)mess
-        mess = 'with -O.obs S1+S2+S5 as the option, rerun.'
+        mess = 'try using -strip T when running rinex2snr'
         write(errid,*)mess
         return
       endif
@@ -567,8 +575,9 @@ c     KL 18mar05, fixed bug on nobs
           read(line, fmt='(I6)') nobs
 c         exit if more than 20 observables
           if (nobs.gt.20) then
-             mess ='ERROR:supports <=20 observ types'
+             mess ='ERROR:this code only supports <=20 observ types'
              write(fid,*) mess
+             write(fid,*) nobs 
              return
           endif
 c   KL 19jan09 allowing more lines of OBS types

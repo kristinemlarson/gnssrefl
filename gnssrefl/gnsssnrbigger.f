@@ -132,9 +132,9 @@ c     and an observable array and nobs, number of observables
 c     print*,'number of obs main code', nobs
 c     moving sites has been removed
       if (nobs .gt. 25 .or. nobs .eq. 0) then
-        write(errid,*) 'Only obs types <= 25 allowed. You'
-        write(errid,*) 'can try using teqc to remove'
-        write(errid,*) 'unneeded observables'
+        write(errid,*) 'Only works with <= 25 obs types.'
+        write(errid,*) 'You can try -strip T in rinex2snr'
+        write(errid,*) 'or use gfzrnx'
         return
       endif
 

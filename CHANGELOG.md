@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.3.0
+
+Problem with how some RINEX 2.11 files on Windows were being read when
+I checked for whether the file was compliant.  numpy loadtxt assumes certain kinds of 
+strings and it will fail if it is not (the file that led to this change was Latin-1).  
+This is not apparently an issue in linux or on macos.  Or when files are picked up from
+an archive.  Anyway, I put the check for compliance behind a try/except command.  So effectively
+it own't check whether the file is RINEX 2.11, but it is better than crashing.
+
 ## 3.2.2
 
 Fixed some bugs in quickplt. Timing limits along the x-axis are now

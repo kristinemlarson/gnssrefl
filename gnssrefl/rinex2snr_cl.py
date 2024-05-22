@@ -83,6 +83,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     Some archives have been set to non-compliant with this feature. Please look in the first few lines
     of code to see the names of these archives.
 
+    In general, you should not make RINEX 2.11 files with a huge number of observables. Especially do not put
+    Doppler data in your file.  If you have more than 25 observables (multi-GNSS) or 20 (GPS only), the code
+    should send an error message to a log. The location of that log is printed to the screen. If you don't want
+    to remake your RINEX files, you can try the -strip T option, which I believe uses gfzrnx to strip out everything
+    except for SNR data.
+
     Real-time users should use ultra, wum, or wum2
 
     Default orbits are GPS only until day of year 137, 2021 when rapid GFZ orbits became available.  If you still want to use

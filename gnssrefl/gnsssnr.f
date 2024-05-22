@@ -141,9 +141,9 @@ c     and an observable array and nobs, number of observables
 c     print*,'number of obs main code', nobs
 c     moving sites has been removed
       if (nobs .gt. 25 .or. nobs .eq. 0) then
-        write(errid,*) 'Only obs types <= 25 allowed. You'
-        write(errid,*) 'can try using teqc to remove'
-        write(errid,*) 'unneeded observables'
+        write(errid,*) 'Only <= 25 observable types allowed. '
+        write(errid,*) 'You can try using -strip T when using'
+        write(errid,*) 'rinex2snr or use gfzrnx'
         return
       endif
 
@@ -559,8 +559,8 @@ c     KL 18mar05, fixed bug on nobs
 c         exit if more than 20 observables
           if (nobs.gt.25) then
              write(fid,*)'this code only supports <=25 observ types'
-             write(fid,*)'If your file has more, reduce using teqc '
-             write(fid,*)'teqc -O.obs S1+S2+S5+S6+S8 should work' 
+             write(fid,*)'try using -strip T when using rinex2snr'
+             write(fid,*)'Or you could try using gfzrnx' 
              return
           endif
 c   KL 19jan09 allowing more lines of OBS types
