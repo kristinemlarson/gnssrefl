@@ -575,3 +575,132 @@ def cddis_highrate_tar(station, year, month, day,stream,dec_rate):
     s2=time.time()
     print('That download/merge experience took ', int(s2-s1), ' seconds.')
     return rinexname,  fexist
+
+def bkg_highrate_tar(station, year, month, day,stream,dec_rate,bkg):
+    """
+    picks up a highrate RINEX 3 file from BKG, merges and decimates it.
+    requires gfzrnx
+
+    Parameters
+    ----------
+    station : str
+        9 ch station name 
+    year : int
+        full year
+    month : integer
+        month or day of year if day set to 0
+    day : int
+        day of the month
+    stream : str
+        R or S
+    dec_rate : int
+        decimation rate in seconds
+    bkg : str
+        file directory at BKG (igs or euref)
+
+    Returns
+    -------
+    file_name24 : str
+        name of merged rinex file
+    fexist : boolean
+        whether file exists
+
+    """
+    fexist  = False
+    version = 3
+    crnxpath = g.hatanaka_version()
+    gexe = g.gfz_version()
+    alpha='abcdefghijklmnopqrstuvwxyz'
+    # if doy is input
+    if day == 0:
+        doy=month
+        d = g.doy2ymd(year,doy);
+        month = d.month; day = d.day
+    doy,cdoy,cyyyy,cyy = g.ymd2doy(year,month,day); 
+
+    if not os.path.isfile(crnxpath):
+        g.hatanaka_warning(); return
+
+    if not os.path.isfile(gexe):
+        print('You need to install gfzrnx to use high-rate RINEX data in my code.')
+        return '', fexist
+
+#    https://igs.bkg.bund.de/root_ftp/EUREF/highrate/2022/233/a/VLIS00NLD_R_20222330000_15M_01S_MO.crx.gz
+# 	VLIS00NLD_R_20231220000_01D_01S_MO.crx.tar.gz
+    gns = 'https://igs.bkg.bund.de/root_ftp/' + bkg + '/highrate/'
+    streamID  = '_' + stream + '_'
+    # base directory name
+    dirname = gns + cyyyy + '/'+ cdoy + '/' 
+    xend = '0000_01D_01S_MO'
+    print('looking for files in: ', dirname)
+    file_name = station.upper() + streamID + cyyyy + cdoy + xend + '.crx'
+    file_name1 = file_name + '.tar.gz'
+    print(dirname + file_name1)
+    if not os.path.isfile(file_name + '.tar'):
+        s1=time.time()
+        s = g.replace_wget(dirname+file_name1, file_name1)
+        s2=time.time()
+        print('That file took ', int(s2-s1), ' seconds to download')
+        if os.path.isfile(file_name1):
+            subprocess.call(['gunzip',file_name1]) # unzip
+            subprocess.call(['tar','-xf', file_name + '.tar'])
+        else:
+            print('Something is wrong with tar download')
+            return '', False
+
+    fileF = 0
+    for h in range(0,24):
+        # subdirectory
+        ch = '{:02d}'.format(h)
+        print('Hour: ', ch)
+        for e in ['00', '15', '30', '45']:
+            crnx_name = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.crx'
+            oname = crnx_name[:-3] + 'rnx'
+            print(oname)
+
+            if os.path.isfile(oname):
+                fileF = fileF + 1
+                print('You already have ', oname, ' so no need to make it ')
+                if os.path.isfile(crnx_name):
+                    subprocess.call(['rm',crnx_name])  
+            else:
+                if os.path.isfile(crnx_name):
+                    subprocess.call([crnxpath,crnx_name])  
+                    if os.path.isfile(oname):
+                        fileF = fileF + 1
+                        subprocess.call(['rm',crnx_name])  
+                else:
+                    print('File does not exist', oname)
+
+    searchP = station.upper() + streamID + cyyyy + cdoy + '*15M*MO.rnx'
+    print('Found ', fileF,' 15 minute files')
+
+
+    outfile = station.upper() + streamID + cyyyy + cdoy + '.tmp'
+    crate = '{:02d}'.format(dec_rate)
+
+    file_name24 = station.upper() + streamID + cyyyy + cdoy + '0000_01D_01S_MO.rnx'
+    print('Final name of RINEX 3 file ', file_name24)
+
+    if os.path.isfile(outfile):
+        print('you already merged')
+        fexist = True
+    else:
+        if (fileF > 0):
+            s1= time.time()
+            subprocess.call([gexe,'-finp', searchP, '-fout', outfile, '-vo','3', '-smp', crate, '-f','-q'])
+            fexist = True
+            s2=time.time()
+            print('That merging/decimating experience took ', int(s2-s1), ' seconds.')
+            print('remove 15 minute files')
+            cm = 'rm ' + station.upper() + streamID + cyyyy + cdoy + '*15M_01S_MO.rnx'
+            subprocess.call(cm,shell=True)
+
+    if fexist:
+        print('Now change the output name: ', file_name24)
+        subprocess.call(['mv', outfile, file_name24])
+        subprocess.call(['rm', file_name+'.tar'])
+    else:
+        file_name24 = ''
+
+    return file_name24,  fexist

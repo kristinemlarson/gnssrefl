@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.3.1
+Added BKG access to high-rate files that are more than 6 months old.
+This allows parallel processing, whereas CDDIS does not.
+
 ## 3.3.0
 
 Problem with how some RINEX 2.11 files on Windows were being read when
