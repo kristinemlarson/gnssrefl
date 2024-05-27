@@ -632,7 +632,7 @@ def bkg_highrate_tar(station, year, month, day,stream,dec_rate,bkg):
     # base directory name
     dirname = gns + cyyyy + '/'+ cdoy + '/' 
     xend = '0000_01D_01S_MO'
-    print('looking for files in: ', dirname)
+    #print('looking for files in: ', dirname)
     file_name = station.upper() + streamID + cyyyy + cdoy + xend + '.crx'
     file_name1 = file_name + '.tar.gz'
     print(dirname + file_name1)

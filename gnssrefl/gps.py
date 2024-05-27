@@ -6403,8 +6403,8 @@ def cddis_restriction(iyear, idoy,archive):
         # i.e. half a year is six months
         bad_day =  True
         print(archive.upper() + ' does not allow direct access to their high-rate data for this day and year. ')
-        print('They now tar files six months after the data archived - but force you to merge them. I have installed a solution for CDDIS.')
-        print('It would be nice if someone would make a similar fix for BKG')
+        print('They now tar files six months after the data archived - but force you to merge them.')
+        print('I have installed a solution for this problem for CDDIS and BKG.')
 
     else:
         bad_day = False
