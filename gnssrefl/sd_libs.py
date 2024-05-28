@@ -1060,7 +1060,12 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
         if (Ngdiff > 0):
             for i in range(0,Ngdiff):
                 if ii[i]:
-                    e0 = mjd[i] ; e1 = mjd[i+1] # beginning and ending of the gap
+                    try:
+                        e0 = mjd[i] ; e1 = mjd[i+1] # beginning and ending of the gap
+                    except:
+                        # alerted to this problem by Felipe Nievinski.  
+                        print('>>>>  DUNNO, some problem with the spline - maybe gap at end of day',mjd[i])
+                        continue
                     bad_indices = (mjd_new > e0) & (mjd_new < e1 )
                     spline_new[bad_indices] = np.nan
                     mjd_new_obstimes[bad_indices] = np.datetime64("NaT")
