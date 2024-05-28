@@ -6369,7 +6369,7 @@ def cddis_restriction(iyear, idoy,archive):
     If six months has passed since you ran the code, a warning will come to the 
     screen and the code will exit.
 
-    updated now that i realize BKG does the same thing
+    Updated now that i realize BKG does the same thing
 
     Parameters
     ----------

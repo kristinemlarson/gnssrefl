@@ -5,7 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 3.3.1
 Added BKG access to high-rate files that are more than 6 months old.
-This allows parallel processing, whereas CDDIS does not.
+This will allow parallel processing, though CDDIS does not (this is a restriction
+at CDDIS, not because of gnssrefl).
+
+Fixed bug in rinex3_snr (some inputs had changed to run_rinex2snr)
+
+Fixed download_rinex for highrate files from BKG and CDDIS so that it allows
+both old and current datastreams
 
 ## 3.3.0
 

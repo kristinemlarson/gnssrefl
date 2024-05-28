@@ -83,8 +83,10 @@ def main():
         strip = False; stream = 'S'  ; bkg = 'IGS' # many of these are fake values because the file has already been translated to rinex2
         gzip = True
         screenstats = False
-        r.run_rinex2snr(station, year_list, doy_list, isnr, orbtype, rate,dec_rate,archive,fortran,nol,
-                overwrite,translator,srate,mk,skipit,stream,strip,bkg,screenstats,gzip)
+        # removed fortran and skipit inputs ...  and got rid of the year and doy lists
+        # 2024 may 28
+        r.run_rinex2snr(station, iyear, idoy, isnr, orbtype, rate,dec_rate,archive,nol,
+                overwrite,translator,srate,mk,stream,strip,bkg,screenstats,gzip)
 
 
 if __name__ == "__main__":

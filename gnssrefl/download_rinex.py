@@ -268,13 +268,19 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             print('Request ', station, year, d, archive, samplerate, stream)
             if rate == 'high':
                 if archive == 'cddis':
-                    if debug:
-                        print('seek highrate data at CDDIS')
-                    ch.cddis_highrate(station, year, d, 0, stream, 1)
+                    bad_day = g.cddis_restriction(year, doy,'cddis')
+                    print('seek highrate data at CDDIS')
+                    if bad_day:
+                        rnx_filename, foundit = ch.cddis_highrate_tar(station, year, d, 0, stream, 1)
+                    else:
+                        rnx_filename, foundit = ch.cddis_highrate(station, year, d, 0, stream, 1)
                 if archive == 'bkg':                               
-                    if debug:
-                        print('seek highrate data at BKG')
-                    rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec,bkg)
+                    print('seek highrate data at BKG')
+                    bad_day = g.cddis_restriction(year, doy,'bkg')
+                    if bad_day:
+                        rnx_filename,foundit = ch.bkg_highrate_tar(station, year, d, 0,stream,dec,bkg)
+                    else:
+                        rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec,bkg)
                 if archive == 'ga':
                     if debug:
                         print('seek highrate data at GA')
