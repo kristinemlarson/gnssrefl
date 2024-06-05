@@ -36,6 +36,7 @@ from numpy import array
 
 import gnssrefl.read_snr_files as snr
 import gnssrefl.karnak_libraries as k
+import gnssrefl.gps as g
 import gnssrefl.EGM96 as EGM96
 import gnssrefl.rinex2snr as rnx
 import gnssrefl.sd_libs as sd
@@ -5080,39 +5081,68 @@ def rapid_gfz_orbits(year,month,day):
     """
     foundit = False
     dday = 2021 + 137/365.25
+    dday2 = 2024 + 149/365.25
     wk,sec=kgpsweek(year,month,day,0,0,0)
 
     gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/rapid/'
+
+    new_gns = 'ftp://isdcftp.gfz-potsdam.de/gnss/products/rapid/'
+
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
 
     fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
     littlename = 'gfz' + str(wk) + str(int(sec/86400)) + '.sp3'
+    longname = 'GFZ0OPSRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
     url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
-    #print(url)
+    url2 = new_gns + 'w' + str(wk) + '/' + longname + '.gz'
     if (year + doy/365.25) < dday:
         print('No rapid GFZ orbits until 2021/doy137')
         return '', '', foundit
-    fullname = fdir + '/' + littlename + '.xz'
-    # look for compressed file
-    if os.path.isfile(fullname):
-        subprocess.call(['unxz', fullname])
 
-    if os.path.isfile(fdir + '/' + littlename):
-        #print(littlename, ' already exists on disk')
-        return littlename, fdir, True 
-    try:
-        #g.replace_wget(url,littlename + '.gz')
-        wget.download(url,littlename + '.gz')
-        if os.path.isfile(littlename + '.gz'):
-            subprocess.call(['gunzip', littlename + '.gz'])
-    except:
-        print('Problems downloading Rapid GFZ orbit')
-        print(url)
+    if (year + doy/365.25) > dday2:
+        print('Use the second way to download: ', url2)
+        fullname = fdir + '/' + longname 
+        if os.path.isfile(fullname):
+            foundit = True
+        elif os.path.isfile(fullname + '.gz'):
+            subprocess.call(['gunzip', fullname + '.gz'])
+            foundit = True
+        else:
+            try:
+                wget.download(url2, longname + '.gz')
+                if os.path.isfile(longname + '.gz'):
+                    subprocess.call(['gunzip', longname + '.gz'])
+                    store_orbitfile(longname,year,'sp3') ; 
+                foundit = True
+            except:
+                print('problems downloading Rapid GFZ orbit (2)')
 
-    if os.path.isfile(littlename):
-       store_orbitfile(littlename,year,'sp3') ; foundit = True
+        return longname, fdir, foundit
 
-    return littlename, fdir, foundit
+    else:
+        print('Try First way to download : ',url)
+        fullname = fdir + '/' + littlename
+        if os.path.isfile(fullname):
+            foundit = True
+        elif os.path.isfile(fullname + '.xz'):
+            subprocess.call(['unxz', fullname + '.xz'])
+            foundit = True
+        elif os.path.isfile(fullname + '.gz'):
+            subprocess.call(['gunzip', fullname + '.gz'])
+            foundit = True
+        else:
+            try:
+                wget.download(url,littlename + '.gz')
+                if os.path.isfile(littlename + '.gz'):
+                    subprocess.call(['gunzip', littlename + '.gz'])
+                    foundit = True
+            except:
+                print('Problems downloading Rapid GFZ orbit (1)')
+
+            if os.path.isfile(littlename):
+                store_orbitfile(littlename,year,'sp3') ; foundit = True
+
+        return littlename, fdir, foundit
 
 
 def ultra_gfz_orbits(year,month,day,hour):
@@ -5906,8 +5936,9 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
                     subprocess.call(['gunzip', file_name])
                 else:
                     # download and gunzip it
-                    print(cv, file_name)
-                    wget.download(file_url,file_name)
+                    print(file_name)
+                    g.replace_wget(file_url,file_name)
+                    #wget.download(file_url,file_name)
                     subprocess.call(['gunzip', file_name])
 
                 # hatanaka uncompress it

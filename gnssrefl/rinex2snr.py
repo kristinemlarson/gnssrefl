@@ -285,7 +285,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
                         if (rate == 'high'):
-                            print('This code only accesses 1-Hz Rinex 3 data at BKG, CDDIS, and GA')
+                            print('This code only accesses 1-Hz Rinex 3 data at BKG, CDDIS, GA, and the Spanish IGN')
                             if archive == 'ga':
                                 deleteOld = True
                                 # this downloads RINEX 3 and converts to Rinex 2
@@ -305,7 +305,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                     foundit = False; fexists = False; rnx_file = ''
                                 else:
                                     if screenstats:
-                                        print('The RINEX 3 file has been downloaded from CDDIS . Try to make ', r2)
+                                        print('The RINEX 3 file has been downloaded from CDDIS. Now try to make ', r2)
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
                             if archive == 'bkg':
                                 # this is confusing - so the bkg variable is either IGS or EUREF
