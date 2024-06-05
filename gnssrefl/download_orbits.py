@@ -98,7 +98,7 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
     g.check_environ_variables()
 
     orbit_list = ['igs', 'igr', 'jax', 'grg', 'wum', 'gbm', 'nav', 'gps', 'gps+glo', 
-            'gnss', 'gfr', 'esa', 'gnss2', 'gnss3','gnss-gfz','ultra', 'rapid','nav-esa', 'nav-sopac','nav-cddis']
+            'gnss', 'gfr', 'esa', 'gnss2', 'gnss3','gnss-gfz','ultra', 'rapid','nav-esa', 'nav-sopac','nav-cddis','wum2']
 
 #   assign to normal variables
     pCtr = orbit
@@ -160,14 +160,17 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 if pCtr == 'esa':
                 # this is ugly - but hopefully will work for now.
                     filename, fdir, foundit = g.getsp3file_flex(year, month, day, pCtr)
-                elif pCtr == 'gfr':
+                elif (pCtr == 'wum2'):
+                     filename,fdir,foundit = g.get_wuhan_orbits(year,month,day)
+                elif (pCtr == 'gfr'):
                 # rapid GFZ is available again ...
+                # updated yet again, new location/filenames 2024 june 4
                     filename, fdir, foundit = g.rapid_gfz_orbits(year, month, day)
                 elif pCtr == 'ultra':
                     hour = 0 # for now only download hour 0 for ultra products
                     filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
                 elif (pCtr == 'gnss3') or (pCtr == 'gnss-gfz'):
-                # use GFZ archive instead of CDDIS
+                    # use GFZ archive instead of CDDIS
                     filename, fdir, foundit = g.gbm_orbits_direct(year, month, day)
                 elif pCtr == 'gnss2':
                 # use IGN instead of CDDIS
