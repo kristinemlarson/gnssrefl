@@ -48,11 +48,12 @@ def parse_arguments():
     parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate Nievinski sigma definition. default is False")
     parser.add_argument("-gap_min_val", default=None, type=float, help="min gap (hours) allowed in splinefit output file. default is 6 hours")
     parser.add_argument("-knots2", default=None, type=int, help="Secondary knots value for final fit. default is to use original knots value.")
+    parser.add_argument("-gap_flag", default=None, type=str, help="if set to True/T, write 999 to spline fit for gaps")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['csv', 'plt', 'rhdot', 'testing','kplt','if_corr','hires_figs','apply_rhdot','alt_sigma']
+    boolean_args = ['csv', 'plt', 'rhdot', 'testing','kplt','if_corr','hires_figs','apply_rhdot','alt_sigma','gap_flag']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -66,7 +67,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = None , if_corr: bool = True, knots_test: int = 0, 
              hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0,
-             year_end: int=None, knots2 : int=None):
+             year_end: int=None, knots2 : int=None, gap_flag: bool = False):
     """
     Subdaily combines gnssir solutions and applies relevant corrections needed to measure water levels (tides). 
     As of January 2024, it will allow multiple years. You can also specify which day of year to start with, i.e.
@@ -211,6 +212,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         last year of analysis period.  
     knots2 : int, optional
         testing out allowing different knots for last spline
+    gap_flag : bool
+        whether you want gaps filled with 999 values in the final spline file 
     """
 
     print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
@@ -378,7 +381,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
                                       if_corr=if_corr,knots_test=knots_test,
                                       hires_figs=hires_figs, apply_rhdot=apply_rhdot,fs=fs,
                                       gap_min_val=gap_min_val,year=year, extension=extension, 
-                                      knots2=knots2,csv=csv )
+                                      knots2=knots2,csv=csv,gap_flag=gap_flag)
        if plt:
            mplt.show()
 

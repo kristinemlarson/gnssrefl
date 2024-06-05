@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.4.0
+fixed pretty major problem with default (rapid) orbits.  updated to new file names and 
+locations for GFZ analysis center.  I do not know when the old naming conventions will fail for ultra.
+
+also added Wuhan ultra rapid orbit downloads from Wuhan to download_orbits.
+It was previously added to rinex2snr 
+
+Changed spline output file in subdaily so that you can print out 999 at the gap values
+(times during large gaps were previously not written out at all).  per request, I also
+told people the time tags are in UTC in the file header. this is currently on the command line
+as gap_flag = T for putting in the gap flag.
+
 ## 3.3.1
 rinex2snr: Added BKG access to high-rate files that are more than 6 months old.
 This will allow parallel processing, though CDDIS does not (this is a restriction

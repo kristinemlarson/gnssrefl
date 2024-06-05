@@ -780,6 +780,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         a secondary knot value if you want the final output 
         to use a different one than the one used for outliers and 
         RH dot
+    gap_flag : bool, option
+        whether gaps are written as 999 in final output
 
 
     """
@@ -791,6 +793,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     gap_min_val = gap_min_val/24 # change to DOY units
 
     val = kwargs.get('txtdir',[])
+
+    gap_flag = kwargs.get('gap_flag',False)
+    print('gap flag ', gap_flag)
 
     if len(val) == 0:
         txtdir = xdir + '/Files/'
@@ -971,7 +976,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     th_obs = sd.mjd_to_obstimes(mjd0 + th-th[0])
 
     if multiyear :
-        print('exiting')
         th_obs = sd.mjd_to_obstimes(th)
 
     fig=plt.figure(figsize=(10,6))
@@ -1182,7 +1186,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # pick up the orthometric height from the gnssir_analysis json
     H0 = sd.find_ortho_height(station,extension)
     # this writes out spline file and makes plot .... 
-    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out,writecsv)
+    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out,writecsv,gap_flag)
     print('\nRMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
 
 
