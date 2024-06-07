@@ -5,11 +5,17 @@ import numpy as np
 import os
 import sys
 import subprocess
+import time
 
 import gnssrefl.gps as g
 import gnssrefl.nmea2snr as nmea
+import gnssrefl.gnssir_v2 as guts2
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
+
+import multiprocessing
+from functools import partial
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -17,7 +23,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
 
-    parser.add_argument("-snr", default='66', help="snr file type, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg", type=str)
+    parser.add_argument("-snr", default=66, help="snr file type, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
@@ -27,6 +33,7 @@ def parse_arguments():
     parser.add_argument("-height", default=None, help="ellipsoid height, m", type=float)
     parser.add_argument("-risky", default=None, help="boolean for whether low quality orbits are used instead of precise sp3", type=str)
     parser.add_argument("-gzip", default=None, help="gzip SNR file after creation. Default is true.", type=str)
+    parser.add_argument("-par", default=None, help="parallel processing, up to 10", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -39,7 +46,7 @@ def parse_arguments():
 
 def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=None, doy_end: int=None, 
              overwrite : bool=False, dec : int=1, lat : float = None, lon : float=None, 
-             height : float = None, risky : bool=False, gzip : bool = True):
+             height : float = None, risky : bool=False, gzip : bool = True, par:int = None):
     """
     This code creates SNR files from NMEA files.  
 
@@ -96,6 +103,8 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
         confirm you want to use low quality orbits (default is False)
     gzip : bool, optional
         compress SNR files after creation.  Default is true
+    par : int
+        number of parallel processes. default is none (i.e. 1)
 
     Examples
     --------
@@ -109,6 +118,10 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
          makes SNR file with user provided station coordinates and good orbits
 
     """
+    # queue which handles any exceptions any of the processes encounter
+    manager = multiprocessing.Manager()
+    error_queue = manager.Queue()
+
 
     g.check_environ_variables()
 
@@ -121,8 +134,6 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
     if len(str(year)) != 4:
         print('Year must be four characters long. Exiting.', year)
         sys.exit()    
-
-    isnr = snr
 
     # 
     gfz_date = 2021 + 137/365.25
@@ -152,9 +163,79 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
 
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
-    for mjd in range(MJD1, MJD2+1):
-        y, d = g.modjul_to_ydoy(mjd)
-        nmea.run_nmea2snr(station, y, d, isnr, overwrite, dec,  sp3, recv, gzip)
+
+    #def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, sp3, gzip):
+    # calling cartesian coordinates llh is so wrong
+    args = {'station': station, 'isnr': snr,  'overwrite': overwrite, 'dec':dec, 'llh': llh, 'recv': recv, 'sp3': sp3, 'gzip': gzip}
+
+    # first get it working without parallel processing
+    if not par:
+        print('No parallel processing')
+        mjd_list = {}; mjd_list[0] = [MJD1, MJD2]
+        s1 = time.time()
+        process_jobs_multi(index=0,args=args,datelist=mjd_list,error_queue=error_queue)
+        s2 = time.time()
+        print('That took ', round(s2-s1,2), ' seconds')
+    else:
+        if par > 10:
+            print('Only allow ten parallel processes for now')
+            par = 10
+        numproc = par
+
+        # get a list of times in MJD associated with the multiple spawned processes
+        # this does not work for skipping dates though ...
+        datelist, numproc = guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
+        print(datelist)
+
+        # make a list of process IDs
+        index = list(range(numproc))
+        s1 = time.time()
+
+        pool = multiprocessing.Pool(processes=numproc)
+
+        partial_process = partial(process_jobs_multi, args=args,datelist=datelist,error_queue = error_queue)
+
+        pool.map(partial_process,index)
+
+        pool.close()
+        pool.join()
+        s2 = time.time()
+        print('That took ', round(s2-s1,2), ' seconds')
+
+
+def process_jobs_multi(index,args,datelist,error_queue):
+    """
+    runs the nmea2snr queue
+
+    Parameters
+    ----------
+    index : int
+        which job to run
+    args : dict
+        dictionary of parameters for run_nmea2snr
+    datelist: dict
+        start and stop dates in MJD
+    error_queue:?
+        not sure how to describe this
+
+    """
+
+    # should try be on each submission?  or each list of submissions?
+    try:
+        d1 = datelist[index][0]; d2 = datelist[index][1]
+        mjd_list = list(range(d1, d2+1))
+        for mjd in mjd_list:
+            y, d = g.modjul_to_ydoy(mjd)
+            args['year'] = y
+            args['doy'] = d
+            nmea.run_nmea2snr(**args)
+
+    except Exception as e:
+        print('Error of some kind processing year/doy ', y, d)
+        error_queue.put(e)
+
+    return
+
 
 def main():
     args = parse_arguments()

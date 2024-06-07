@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.5.0
+
+Tried to implement parallel processing for NMEA files.  Let me know if it doesn't seem
+to work.
+
 ## 3.4.0
 fixed pretty major problem with default (rapid) orbits.  updated to new file names and 
 locations for GFZ analysis center.  I do not know when the old naming conventions will fail for ultra.

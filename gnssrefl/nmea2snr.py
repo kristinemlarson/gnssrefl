@@ -56,7 +56,7 @@ def nmea_apriori_coords(station,llh,sp3):
 
 #Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
 
-def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, sp3, recv, gzip):
+def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip):
     """
     Reads and translates a NMEA file stored in locdir + fname.
     The naming convention assumed for the NMEA file is  SSSS1520.23.A
@@ -82,16 +82,15 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, sp3, recv, gzip
         full year
     doy : int
         day of year
-    sp3 : bool
-        whether you use multi-GNSS sp3 file to do azimuth elevation angle calculations
     recv : list of floats
         a priori Cartesian station coordinates for people using high quality orbits
+    sp3 : bool
+        whether you use multi-GNSS sp3 file to do azimuth elevation angle calculations
     gzip: bool
         gzip compress snrfiles. No idea if it is used here ...
         as this compression should happen in the calling function, not here
         
     """
-    
     # decimation
     idec = int(dec)
     missing = True
@@ -205,7 +204,6 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, sp3, recv, gzip
         xPRN = np.asarray(PRN)
         xSNR = np.asarray(SNR)
         xfreq = np.asarray(FREQ)
-
         print('Opening temporary file : ', tmpfile)
         fout = open(tmpfile, 'w+')
         fout.write('{0:15.4f}{1:15.4f}{2:15.4f} \n'.format(recv[0], recv[1],recv[2]) )
@@ -779,7 +777,7 @@ def elev_limits(snroption):
 
     return emin, emax
   
-def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, sp3, gzip):
+def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip):
     """
     runs the nmea2snr conversion code - ONE DAY AT A TIME (2024 March 16)
 
@@ -810,6 +808,8 @@ def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, sp3, gzip):
         decimation in seconds
     llh : list of floats
         lat and lon (deg) and ellipsoidal ht (m)
+    recv : list of floats
+        cartesian receiver coordinates (m)
     sp3 : bool
         whether you want to use GFZ rapid sp3 file for the orbits
     gzip : bool
@@ -844,8 +844,7 @@ def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, sp3, gzip):
             if (not illegal_day) and (not snre):
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
-                    #print('Creating '+snrfile)
-                    nmea_translate(locdir, r, snrfile, csnr, dec, year, doy, llh, sp3, gzip)
+                    nmea_translate(locdir, r, snrfile, csnr, dec, year, doy, recv, sp3, gzip)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
                     if os.path.isfile(locdir + r ):
