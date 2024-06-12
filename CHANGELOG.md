@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.5.1
+
+... Had to change the source of the ultra rapid orbits from GFZ ... 
+Also, had to change it so it uses the ultras from day before ... since it is a 
+two day product ... 
+
+This was added to download_orbits, rinex2snr and nmea2snr (and the library in gps.py).
+
 ## 3.5.0
 
 Tried to implement parallel processing for NMEA files.  Let me know if it doesn't seem
