@@ -77,7 +77,7 @@ def the_kelly_simple_way(url,filename):
 
         foundit = True
     else:
-        print('RINEX File was not found', filename)
+        print('RINEX File was not found', url)
         foundit = False
 
     return foundit, filename
