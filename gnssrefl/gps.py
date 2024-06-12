@@ -3606,7 +3606,17 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     elif orbtype == 'ultra':
         print('getting ultra rapid orbits from GFZ local machine')
-        f, orbdir, foundit = ultra_gfz_orbits(year,month,day,0)
+        doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
+        if (year + doy/365.25) > (2024 + 153/365.25):
+            # use new file structure and two day orbit ... 
+            if doy == 1:
+                # use december 31 from previous year
+                f, orbdir, foundit = new_ultra_gfz_orbits(year-1,12,31)
+            else:
+                # use previous day ... 
+                f, orbdir, foundit = new_ultra_gfz_orbits(year,doy-1,0)
+        else:
+            f, orbdir, foundit = ultra_gfz_orbits(year,month,day,0)
         snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     else:
         if ('nav' in orbtype):
@@ -5150,6 +5160,9 @@ def ultra_gfz_orbits(year,month,day,hour):
     downloads rapid GFZ sp3 file and stores them in $ORBITS
     is this correct?  or is the regular file?
 
+    started to changed file directory source and name in may 2024
+    right now they are segregated
+
     Parameters
     ----------
     year : int
@@ -5197,7 +5210,7 @@ def ultra_gfz_orbits(year,month,day,hour):
 
     #print(url)
     if (year + doy/365.25) < dday:
-        print('No rapid GFZ orbits until 2021/doy137')
+        print('No rapid GFZ orbits until 2021/doy137. Not sure about ultra')
         return '', '', foundit
 
     # check to see if the file is there already
@@ -7018,5 +7031,105 @@ def trignet(station,year,doy):
 
     return fexist
 
+def new_ultra_gfz_orbits(year,month,day):
+    """
+    downloads gfz ultra rapid orbit and stores in $ORBITS locally
+    this is for the two day version with long file names that became
+    the only access point in early June 2024
 
+    to use this code properly for day N you should call it for 
+    day N-1 need because GFZ creates a two day file, and the file
+    is named for day N-1
+
+    Parameters
+    ----------
+    year : int
+        full year
+    month : int
+        month or day of year if day is set to zero
+    day : int
+        day of month
+
+    Returns
+    -------
+    littlename : str
+        name of the orbit file
+    fdir: str
+        name of the file directory where orbit is stored
+    foundit : bool
+        whether file was found
+
+    """
+    if day == 0:
+        # this means someone submitted doy in the month place
+        # which is not great - but allowed
+        y, m, d = ydoy2ymd(year, month)
+        month = m; day = d
+
+    foundit = False
+    dday = 2021 + 137/365.25 # when GFZ started making these products
+    dday2 = 2024 + 149/365.25 # when GFZ stopped making the old files.
+    # get GPS week number
+    wk,sec=kgpsweek(year,month,day,0,0,0)
+
+    gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/ultra/'
+
+    new_gns = 'ftp://isdcftp.gfz-potsdam.de/gnss/products/ultra/'
+
+    month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
+
+    fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
+    littlename = 'gfz' + str(wk) + str(int(sec/86400)) + '.sp3'
+    #          'GFZ0OPSULT_20241620000_02D_05M_ORB.SP3
+    longname = 'GFZ0OPSULT_' + cyyyy + cdoy + '0000_02D_05M_ORB.SP3'
+    url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
+    url2 = new_gns + 'w' + str(wk) + '/' + longname + '.gz'
+    if (year + doy/365.25) < dday:
+        print('No rapid GFZ orbits until 2021/doy137')
+        return '', '', foundit
+
+    if (year + doy/365.25) > dday2:
+        print('Use the second way to download: ', url2)
+        fullname = fdir + '/' + longname 
+        if os.path.isfile(fullname):
+            foundit = True
+        elif os.path.isfile(fullname + '.gz'):
+            subprocess.call(['gunzip', fullname + '.gz'])
+            foundit = True
+        else:
+            try:
+                wget.download(url2, longname + '.gz')
+                if os.path.isfile(longname + '.gz'):
+                    subprocess.call(['gunzip', longname + '.gz'])
+                    store_orbitfile(longname,year,'sp3') ; 
+                foundit = True
+            except:
+                print('problems downloading Ultra GFZ orbit (2)')
+
+        return longname, fdir, foundit
+
+    else:
+        print('Try First way to download : ',url)
+        fullname = fdir + '/' + littlename
+        if os.path.isfile(fullname):
+            foundit = True
+        elif os.path.isfile(fullname + '.xz'):
+            subprocess.call(['unxz', fullname + '.xz'])
+            foundit = True
+        elif os.path.isfile(fullname + '.gz'):
+            subprocess.call(['gunzip', fullname + '.gz'])
+            foundit = True
+        else:
+            try:
+                wget.download(url,littlename + '.gz')
+                if os.path.isfile(littlename + '.gz'):
+                    subprocess.call(['gunzip', littlename + '.gz'])
+                    foundit = True
+            except:
+                print('Problems downloading Ultra GFZ orbit (1)')
+
+            if os.path.isfile(littlename):
+                store_orbitfile(littlename,year,'sp3') ; foundit = True
+
+        return littlename, fdir, foundit
 

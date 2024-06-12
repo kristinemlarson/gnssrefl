@@ -167,8 +167,17 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 # updated yet again, new location/filenames 2024 june 4
                     filename, fdir, foundit = g.rapid_gfz_orbits(year, month, day)
                 elif pCtr == 'ultra':
-                    hour = 0 # for now only download hour 0 for ultra products
-                    filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
+                    if (year + d/365.25) > (2024 + 153/365.25):
+                        # use the new filenames and location ... 
+                        if (d == 1):
+                            # if january 1
+                            filename, fdir, foundit = g.new_ultra_gfz_orbits(year-1, 12, 31)
+                        else:
+                            # give it day of year (minus 1) in the second input ... 
+                            filename, fdir, foundit = g.new_ultra_gfz_orbits(year, d-1, 0)
+                    else:
+                        hour = 0 # for now only download hour 0 for ultra products
+                        filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
                 elif (pCtr == 'gnss3') or (pCtr == 'gnss-gfz'):
                     # use GFZ archive instead of CDDIS
                     filename, fdir, foundit = g.gbm_orbits_direct(year, month, day)

@@ -96,6 +96,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
     missing = True
     station = fname.lower() ; station = station[0:4]
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
+    gfz_date = 2024 + doy/365.25 # when we added the new GFZ directory to gnssrefl
     
     if sp3:
         # first try to find precise because they have beidou
@@ -106,7 +107,14 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
             xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
             if not foundit: 
                 print('Could not find the rapid orbits from GFZ. ')
-                xf,orbdir,foundit = g.ultra_gfz_orbits(year,month,day,0)
+                if (year + doy/365.25) > gfz_date:
+                    print('Use new GFZ directory for ultra rapid orbits with the long filenames')
+                    if doy == 1:
+                        xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31)
+                    else:
+                        xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0)
+                else:
+                    xf,orbdir,foundit = g.ultra_gfz_orbits(year,month,day,0)
                 if not foundit:
                     print('Could not find the ultrarapid orbits from GFZ. Exiting')
                     return
