@@ -3636,6 +3636,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         else:
             print('I do not recognize the orbit type you tried to use: ', orbtype)
 
+    print('\n')
     return foundit, f, orbdir, snrexe
 
 def warn_and_exit(snrexe,fortran):
@@ -5915,6 +5916,7 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
         return
     print('WARNING 1: Have some coffee, downloading 96 files of high-rate GPS data takes a long time.')
     print('WARNING 2: Downloading 96 files of high-rate GPS data from Australia takes an even longer time.')
+    print('WARNING 3: Unless you are in Australia ...')
     QUERY_PARAMS, headers = k.ga_stuff_highrate(station9, year, doy)
     API_URL = 'https://data.gnss.ga.gov.au/api/rinexFiles/'
     request = requests.get(API_URL, QUERY_PARAMS, headers=headers)
@@ -6536,6 +6538,8 @@ def gbm_orbits_direct(year,month,day):
     else:
         gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/mgex/' + cgpsweek + '_IGS20/'
 
+    # this has now been changed again ... sigh
+
     fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
     littlename = 'gbm' + str(gpsweek) + str(int(sec/86400)) + '.sp3'
     bigname = 'GFZ0MGXRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
@@ -7109,7 +7113,7 @@ def new_ultra_gfz_orbits(year,month,day):
         return longname, fdir, foundit
 
     else:
-        print('Try First way to download : ',url)
+        print('Try first protocol to download : ',url)
         fullname = fdir + '/' + littlename
         if os.path.isfile(fullname):
             foundit = True
@@ -7131,5 +7135,6 @@ def new_ultra_gfz_orbits(year,month,day):
             if os.path.isfile(littlename):
                 store_orbitfile(littlename,year,'sp3') ; foundit = True
 
+        print('/n')
         return littlename, fdir, foundit
 

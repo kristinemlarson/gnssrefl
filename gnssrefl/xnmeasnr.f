@@ -16,7 +16,8 @@ c
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 288)
+c     parameter (np= 288)
+      parameter (np= 864)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -196,7 +197,8 @@ c     19mar25 changed filename of sp3 to be really really long
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 288)
+      parameter (np= 864)
+c     parameter (np= 288)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -396,7 +398,8 @@ c             ipointer tells you where it is in the sp3 file
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 288)
+      parameter (np= 864)
+c     parameter (np= 288)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -465,7 +468,8 @@ c    19feb04 - I am assuming we should use sp3_rel_seconds and relTime now
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 288)
+      parameter (np= 864)
+c     parameter (np= 288)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
@@ -586,7 +590,8 @@ c     kl 2021 feb 24
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 288)
+c     parameter (np= 288)
+      parameter (np= 864)
 
       real*8 c 
 
@@ -896,7 +901,8 @@ c     20mar02 added msec to the output, sent from main code
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
-      parameter (np= 288)
+      parameter (np= 864)
+c     parameter (np= 288)
       real*8 c 
       parameter (c = 0.299792458D+09)      
 

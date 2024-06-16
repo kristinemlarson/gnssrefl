@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.5.2
+
+Fixed bug in nmea2snr that used old directories for (rapid?) gfz orbits.
+Updated the wuhan orbit source so that it correctly translates a multi-day SP3 file.
+Previously it was set to only allow one day sp3 file, depending on sampling rate. 
+The same problem was most likely impacting the GFZ orbits as well. Not sure.
+
+
+It no longer looks for final GFZ GNSS files after doy 153/year 2024 as that 
+would require my writing a new function to access GFZ final orbit directories.  
+This is unlikely to be a huge problem for chipsets - and the Wuhan orbits are 
+perfectly good for this purpose and include all four systems. The GFZ rapids 
+have historically not had Beidou in them.
+
 ## 3.5.1
 
 ... Had to change the source of the ultra rapid orbits from GFZ ... 

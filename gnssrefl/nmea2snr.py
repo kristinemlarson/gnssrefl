@@ -96,17 +96,18 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
     missing = True
     station = fname.lower() ; station = station[0:4]
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
-    gfz_date = 2024 + doy/365.25 # when we added the new GFZ directory to gnssrefl
+    gfz_date = 2024 + 153/365.25 # when we added the new GFZ directory to gnssrefl
     
     if sp3:
         # first try to find precise because they have beidou
-        xf,orbdir,foundit=g.gbm_orbits_direct(year,month,day)
-        # try to find it elsewhere
-        if not foundit: 
-            print('Could not find the precise GNSS orbits from GFZ. ')
+        # but have not done this for new location of final orbits yet
+        if (year+doy/365.25) < gfz_date:
+            xf,orbdir,foundit=g.gbm_orbits_direct(year,month,day)
+        else:
+            print('Could not find the precise GNSS orbits from GFZ. Try Rapid GFZ ')
             xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
             if not foundit: 
-                print('Could not find the rapid orbits from GFZ. ')
+                print('Could not find the rapid orbits from GFZ. Try ultra')
                 if (year + doy/365.25) > gfz_date:
                     print('Use new GFZ directory for ultra rapid orbits with the long filenames')
                     if doy == 1:
@@ -114,9 +115,13 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                     else:
                         xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0)
                 else:
+                    print('use old GFZ directory structure')
                     xf,orbdir,foundit = g.ultra_gfz_orbits(year,month,day,0)
                 if not foundit:
-                    print('Could not find the ultrarapid orbits from GFZ. Exiting')
+                    print('Could not find the ultrarapid orbits from GFZ. Trying Wuhan')
+                    xf,orbdir,foundit = g.get_wuhan_orbits(year,month,day)
+                if not foundit:
+                    print('Out of luck - could not find a good orbit file for you')
                     return
 
         # define orbit file name
