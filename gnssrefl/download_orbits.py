@@ -22,7 +22,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None, hour: int : 0 ):
+def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None, hour: int = 0 ):
     """
     command line interface for download_orbits. If day is zero, then it is assumed that 
     the month record is day or year
