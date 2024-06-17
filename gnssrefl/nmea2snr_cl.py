@@ -34,6 +34,8 @@ def parse_arguments():
     parser.add_argument("-risky", default=None, help="boolean for whether low quality orbits are used instead of precise sp3", type=str)
     parser.add_argument("-gzip", default=None, help="gzip SNR file after creation. Default is true.", type=str)
     parser.add_argument("-par", default=None, help="parallel processing, up to 10", type=int)
+    parser.add_argument("-orb", default=None, help="request specific orbit source", type=str)
+    parser.add_argument("-hour", default=None, help="request hour for ultra orbit", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -46,7 +48,7 @@ def parse_arguments():
 
 def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=None, doy_end: int=None, 
              overwrite : bool=False, dec : int=1, lat : float = None, lon : float=None, 
-             height : float = None, risky : bool=False, gzip : bool = True, par:int = None):
+             height : float = None, risky : bool=False, gzip : bool = True, par:int = None, orb:str = None, hour:int =0):
     """
     This code creates SNR files from NMEA files.  
 
@@ -105,6 +107,10 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
         compress SNR files after creation.  Default is true
     par : int
         number of parallel processes. default is none (i.e. 1)
+    orb : str
+        specific orbit source (gnss, rapid, ultra, wum2). default is rapid
+    hour : int
+        specific hour of ultrarapid orbit. default is zero
 
     Examples
     --------
@@ -161,12 +167,14 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
     if year_end is None:
         year_end = year
 
+
+
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
 
     #def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, sp3, gzip):
     # calling cartesian coordinates llh is so wrong
-    args = {'station': station, 'isnr': snr,  'overwrite': overwrite, 'dec':dec, 'llh': llh, 'recv': recv, 'sp3': sp3, 'gzip': gzip}
+    args = {'station': station, 'isnr': snr,  'overwrite': overwrite, 'dec':dec, 'llh': llh, 'recv': recv, 'sp3': sp3, 'gzip': gzip, 'orb': orb, 'hour': hour}
 
     # first get it working without parallel processing
     if not par:

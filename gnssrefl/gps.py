@@ -3556,7 +3556,10 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gnss3') or (orbtype == 'gnss-gfz'):
-        f,orbdir,foundit=gbm_orbits_direct(year,month,day)
+        if (year >= 2024):
+            f,orbdir,foundit=newish_gfz_orbits(year,month,day,'final')
+        else:
+            f,orbdir,foundit=gbm_orbits_direct(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
         #print('uses default IGS orbits, so only GPS ?')
@@ -5164,6 +5167,9 @@ def ultra_gfz_orbits(year,month,day,hour):
     started to changed file directory source and name in may 2024
     right now they are segregated
 
+
+    I am not sure this works anymore.  You should use new_ultra instead
+
     Parameters
     ----------
     year : int
@@ -5246,7 +5252,7 @@ def ultra_gfz_orbits(year,month,day,hour):
     return littlename, fdir, foundit
 
 
-def get_wuhan_orbits(year: int, month: int, day: int) -> [str, str, bool]:
+def get_wuhan_orbits(year: int, month: int, day: int, hour: int) -> [str, str, bool]:
     """
     Downloads ultra-rapid Wuhan sp3 file and stores them in $ORBITS
 
@@ -5258,6 +5264,8 @@ def get_wuhan_orbits(year: int, month: int, day: int) -> [str, str, bool]:
         month or day of year
     day : int
         day or if set to 0, then month is really day of year
+    hour : int
+        specific hour of ultrarapid orbit
 
     Returns
     -------
@@ -5273,7 +5281,8 @@ def get_wuhan_orbits(year: int, month: int, day: int) -> [str, str, bool]:
     _, _, doy, _, _, _ = ymd2ch(year, month, day)
 
     url_base = f'ftp://igs.gnsswhu.cn/pub/gnss/products/mgex/{gps_week}/'
-    filename = f'WUM0MGXULT_{year}{doy:03}0000_01D_05M_ORB.SP3.gz'
+    # changed this to have hour
+    filename = f'WUM0MGXULT_{year}{doy:03}{hour:02}00_01D_05M_ORB.SP3.gz'
     unzipped_filename = filename[:-3]
     orbit_dir = f'{os.environ["ORBITS"]}/{year}/sp3'
     if not os.path.isfile(f'{orbit_dir}/{unzipped_filename}'):
@@ -5284,6 +5293,7 @@ def get_wuhan_orbits(year: int, month: int, day: int) -> [str, str, bool]:
             print('Problems downloading ultra-rapid Wuhan orbit')
             print(f'{url_base}{filename}')
         if os.path.isfile(unzipped_filename):
+            print('\n')
             store_orbitfile(unzipped_filename, year, 'sp3')
             foundit = True
     else:
@@ -7035,7 +7045,7 @@ def trignet(station,year,doy):
 
     return fexist
 
-def new_ultra_gfz_orbits(year,month,day):
+def new_ultra_gfz_orbits(year, month, day, hour):
     """
     downloads gfz ultra rapid orbit and stores in $ORBITS locally
     this is for the two day version with long file names that became
@@ -7053,6 +7063,8 @@ def new_ultra_gfz_orbits(year,month,day):
         month or day of year if day is set to zero
     day : int
         day of month
+    hour : int
+        hour for ultrarapid
 
     Returns
     -------
@@ -7064,12 +7076,19 @@ def new_ultra_gfz_orbits(year,month,day):
         whether file was found
 
     """
+    hours_allowed = [0,3,6,9,12,15,18,21]
+    if hour not in hours_allowed:
+        print('You chose an illegal hour - setting to zero')
+        print('These are allowed ', hours_allowed)
+        hour = 0
+        
     if day == 0:
         # this means someone submitted doy in the month place
         # which is not great - but allowed
         y, m, d = ydoy2ymd(year, month)
         month = m; day = d
 
+    chour = '{:02d}'.format(hour)
     foundit = False
     dday = 2021 + 137/365.25 # when GFZ started making these products
     dday2 = 2024 + 149/365.25 # when GFZ stopped making the old files.
@@ -7085,7 +7104,8 @@ def new_ultra_gfz_orbits(year,month,day):
     fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
     littlename = 'gfz' + str(wk) + str(int(sec/86400)) + '.sp3'
     #          'GFZ0OPSULT_20241620000_02D_05M_ORB.SP3
-    longname = 'GFZ0OPSULT_' + cyyyy + cdoy + '0000_02D_05M_ORB.SP3'
+    longname = 'GFZ0OPSULT_' + cyyyy + cdoy + chour + '00_02D_05M_ORB.SP3'
+    #longname = 'GFZ0OPSULT_' + cyyyy + cdoy + '0000_02D_05M_ORB.SP3'
     url = gns + 'w' + str(wk) + '/' + littlename + '.gz'
     url2 = new_gns + 'w' + str(wk) + '/' + longname + '.gz'
     if (year + doy/365.25) < dday:
@@ -7093,7 +7113,7 @@ def new_ultra_gfz_orbits(year,month,day):
         return '', '', foundit
 
     if (year + doy/365.25) > dday2:
-        print('Use the second way to download: ', url2)
+        print('Use the second site and name for download: ', url2)
         fullname = fdir + '/' + longname 
         if os.path.isfile(fullname):
             foundit = True
@@ -7113,7 +7133,7 @@ def new_ultra_gfz_orbits(year,month,day):
         return longname, fdir, foundit
 
     else:
-        print('Try first protocol to download : ',url)
+        print('Try first site and name for download : ',url)
         fullname = fdir + '/' + littlename
         if os.path.isfile(fullname):
             foundit = True
@@ -7137,4 +7157,76 @@ def new_ultra_gfz_orbits(year,month,day):
 
         print('/n')
         return littlename, fdir, foundit
+
+def newish_gfz_orbits(year,month,day, orbtype):
+    """
+    downloads "newish" gfz final and rapid orbits and stores in $ORBITS locally
+    Uses isdcftp instead original GFZ ftp site
+    final are 15 minute files and rapid are 5 minute
+    uses different name than at CDDIS?
+
+    Parameters
+    ----------
+    year : int
+        full year
+    month : int
+        month or day of year if day is set to zero
+    day : int
+        day of month
+    orbtype : str
+        kind of orbit, rapid or final
+
+    Returns
+    -------
+    littlename : str
+        name of the orbit file
+    fdir: str
+        name of the file directory where orbit is stored
+    foundit : bool
+        whether file was found
+
+    """
+    foundit = False
+    dday2 = 2024 # have to check 
+    if day == 0:
+        year,month,day = ydoy2ymd(year, month)
+
+    wk,sec = kgpsweek(year,month,day,0,0,0)
+
+    new_gns = 'ftp://isdcftp.gfz-potsdam.de/gnss/products/' + orbtype + '/'
+
+    month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
+
+
+    fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
+    if orbtype == 'rapid':
+        longname = 'GFZ0OPSRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
+    else:
+        longname = 'GFZ0OPSFIN_' + cyyyy + cdoy + '0000_01D_15M_ORB.SP3'
+
+    url2 = new_gns + 'w' + str(wk) + '/' + longname + '.gz'
+
+    if (year + doy/365.25) < dday2:
+        print('For now only searching for GFZ data from 2024 on')
+        print('If this should be changed, submit a pull request')
+    else:
+        fullname = fdir + '/' + longname 
+        if os.path.isfile(fullname):
+            foundit = True
+        elif os.path.isfile(fullname + '.gz'):
+            subprocess.call(['gunzip', fullname + '.gz'])
+            foundit = True
+        else:
+            print('Use the new GFZ ftp site: ', url2)
+            try:
+                wget.download(url2, longname + '.gz')
+                if os.path.isfile(longname + '.gz'):
+                    subprocess.call(['gunzip', longname + '.gz'])
+                    store_orbitfile(longname,year,'sp3') ; 
+                foundit = True
+            except:
+                print('problems downloading GFZ orbit ')
+
+    return longname, fdir, foundit
+
 

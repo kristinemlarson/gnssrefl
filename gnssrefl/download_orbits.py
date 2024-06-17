@@ -14,6 +14,7 @@ def parse_arguments():
     parser.add_argument("month", help="month (or day of year)", type=int)
     parser.add_argument("day", help="day (zero if you use day of year earlier)", type=int)
     parser.add_argument("-doy_end", default=None, help="doy end for multi-day download ", type=str)
+    parser.add_argument("-hour", default=None, help="optional request for ultrarapid hour", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -21,7 +22,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None ):
+def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = None, hour: int : 0 ):
     """
     command line interface for download_orbits. If day is zero, then it is assumed that 
     the month record is day or year
@@ -91,6 +92,8 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
         day of the month
     doy_end : integer 
         optional, allows multiple day download
+    hour : int
+        optional hour for ultrarapid orbit , default is zero
 
     """
 
@@ -161,7 +164,7 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 # this is ugly - but hopefully will work for now.
                     filename, fdir, foundit = g.getsp3file_flex(year, month, day, pCtr)
                 elif (pCtr == 'wum2'):
-                     filename,fdir,foundit = g.get_wuhan_orbits(year,month,day)
+                     filename,fdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
                 elif (pCtr == 'gfr'):
                 # rapid GFZ is available again ...
                 # updated yet again, new location/filenames 2024 june 4
@@ -171,16 +174,19 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                         # use the new filenames and location ... 
                         if (d == 1):
                             # if january 1
-                            filename, fdir, foundit = g.new_ultra_gfz_orbits(year-1, 12, 31)
+                            filename, fdir, foundit = g.new_ultra_gfz_orbits(year-1, 12, 31,hour)
                         else:
                             # give it day of year (minus 1) in the second input ... 
-                            filename, fdir, foundit = g.new_ultra_gfz_orbits(year, d-1, 0)
+                            filename, fdir, foundit = g.new_ultra_gfz_orbits(year, d-1, 0,hour)
                     else:
-                        hour = 0 # for now only download hour 0 for ultra products
+                        # should update this
                         filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
                 elif (pCtr == 'gnss3') or (pCtr == 'gnss-gfz'):
-                    # use GFZ archive instead of CDDIS
-                    filename, fdir, foundit = g.gbm_orbits_direct(year, month, day)
+                    # use GFZ ftp site instead of CDDIS
+                    if (year >= 2024):
+                        filename, fdir, foundit = g.newish_gfz_orbits(year,month,day, 'final')
+                    else:
+                        filename, fdir, foundit = g.gbm_orbits_direct(year, month, day)
                 elif pCtr == 'gnss2':
                 # use IGN instead of CDDIS
                     print('To my knowledge, this option no longer works')

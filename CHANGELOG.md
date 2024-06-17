@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.5.3
+
+2024 Jun 17
+
+Added more options for nmea2snr in terms of orbit choices. If you specify ultra or 
+wum2, you can also use a specific hour for the ultrarapid orbit. GFZ (ultra) only
+has hour solutions every three hours.  it appears that wum2 is every hour. If you say
+
+If no orbit is selected, it will use the previous behavior, which tries a variety of different choices.
+download_orbits also updated to be consistent.
+
 ## 3.5.2
+
+2024 Jun 16
 
 Fixed bug in nmea2snr that used old directories for (rapid?) gfz orbits.
 Updated the wuhan orbit source so that it correctly translates a multi-day SP3 file.

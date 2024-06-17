@@ -56,7 +56,7 @@ def nmea_apriori_coords(station,llh,sp3):
 
 #Last modified Feb 22, 2023 by Taylor Smith (git: tasmi) for additional constellation support
 
-def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip):
+def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip,orb,hour):
     """
     Reads and translates a NMEA file stored in locdir + fname.
     The naming convention assumed for the NMEA file is  SSSS1520.23.A
@@ -89,7 +89,10 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
     gzip: bool
         gzip compress snrfiles. No idea if it is used here ...
         as this compression should happen in the calling function, not here
-        
+    orb : str
+        requested orbit source
+    hour : int
+        ultrarapid orbit hour
     """
     # decimation
     idec = int(dec)
@@ -99,30 +102,41 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
     gfz_date = 2024 + 153/365.25 # when we added the new GFZ directory to gnssrefl
     
     if sp3:
-        # first try to find precise because they have beidou
-        # but have not done this for new location of final orbits yet
-        if (year+doy/365.25) < gfz_date:
-            xf,orbdir,foundit=g.gbm_orbits_direct(year,month,day)
-        else:
-            print('Could not find the precise GNSS orbits from GFZ. Try Rapid GFZ ')
-            xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
-            if not foundit: 
-                print('Could not find the rapid orbits from GFZ. Try ultra')
-                if (year + doy/365.25) > gfz_date:
-                    print('Use new GFZ directory for ultra rapid orbits with the long filenames')
-                    if doy == 1:
-                        xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31)
-                    else:
-                        xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0)
+        if orb is not None:
+            if (orb == 'wum2'):
+                xf,orbdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
+
+            if orb == 'ultra':
+                if doy == 1:
+                    xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,hour)
                 else:
-                    print('use old GFZ directory structure')
-                    xf,orbdir,foundit = g.ultra_gfz_orbits(year,month,day,0)
-                if not foundit:
-                    print('Could not find the ultrarapid orbits from GFZ. Trying Wuhan')
-                    xf,orbdir,foundit = g.get_wuhan_orbits(year,month,day)
-                if not foundit:
-                    print('Out of luck - could not find a good orbit file for you')
-                    return
+                    xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,hour)
+        else:
+            # the old way is to try multiple orbit sources
+            if (year+doy/365.25) < gfz_date:
+                # someone needs to link to new code for newer final orbits
+                xf,orbdir,foundit=g.gbm_orbits_direct(year,month,day)
+            else:
+                print('Could not find the precise GNSS orbits from GFZ. Try Rapid GFZ ')
+                xf,orbdir,foundit=g.rapid_gfz_orbits(year,month,day)
+
+                if not foundit: 
+                    print('Could not find the rapid orbits from GFZ. Try ultra')
+                    if (year + doy/365.25) > gfz_date:
+                        print('Use new GFZ directory for ultra rapid orbits with the long filenames')
+                        if doy == 1:
+                            xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,hour)
+                        else:
+                            xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,hour)
+                    else:
+                        print('use old GFZ directory structure')
+                        xf,orbdir,foundit = g.ultra_gfz_orbits(year,month,day,0)
+                    if not foundit:
+                        print('Could not find the ultrarapid orbits from GFZ. Trying Wuhan')
+                        xf,orbdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
+                    if not foundit:
+                        print('Out of luck - could not find a good orbit file for you')
+                        return
 
         # define orbit file name
         orbfile = orbdir + '/' + xf # hopefully
@@ -790,7 +804,7 @@ def elev_limits(snroption):
 
     return emin, emax
   
-def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip):
+def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip,orb,hour):
     """
     runs the nmea2snr conversion code - ONE DAY AT A TIME (2024 March 16)
 
@@ -827,6 +841,10 @@ def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip)
         whether you want to use GFZ rapid sp3 file for the orbits
     gzip : bool
         whether snrfiles are gzipped after creation
+    orb : str
+        requested orbit source
+    hour : int
+        requested hour for ultrarapid orbit
 
     """
     # avoiding makan's loops - but using True to avoid re-indenting
@@ -857,7 +875,7 @@ def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip)
             if (not illegal_day) and (not snre):
                 r =  station + cdoy + '0.' + cyy + '.A'# nmea file name example:  WESL2120.21.A 
                 if os.path.exists(locdir+r) or os.path.exists(locdir+r+'.gz') or os.path.exists(locdir+r+'.Z') or (station == 'argt'):
-                    nmea_translate(locdir, r, snrfile, csnr, dec, year, doy, recv, sp3, gzip)
+                    nmea_translate(locdir, r, snrfile, csnr, dec, year, doy, recv, sp3, gzip,orb,hour)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
                     if os.path.isfile(locdir + r ):
