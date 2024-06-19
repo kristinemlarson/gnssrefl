@@ -105,12 +105,24 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         if orb is not None:
             if (orb == 'wum2'):
                 xf,orbdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
+                if not foundit:
+                    print('try noon previous day')
+                    if doy == 1:
+                        xf,orbdir,foundit = g.get_wuhan_orbits(year-1,12,31,12)
+                    else:
+                        xf,orbdir,foundit = g.get_wuhan_orbits(year,doy-1,0,12)
 
             if orb == 'ultra':
-                if doy == 1:
+                if (doy == 1):
                     xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,hour)
                 else:
                     xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,hour)
+                    if not foundit:
+                        print('Try noon from previous day')
+                        if ((doy-1) == 1):
+                            xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,12)
+                        else:
+                            xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-2,0,12)
         else:
             # the old way is to try multiple orbit sources
             if (year+doy/365.25) < gfz_date:
@@ -173,7 +185,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         subprocess.call(['rm',fname])
         missing = False
         
-
+    print('Number of t values ', len(t))
     # why is there all this going back and forth between lists and np arrays?
 
     t = np.array(t);az = np.array(az);elv = np.array(elv);snr = np.array(snr);prn = np.array(prn); freq=np.array(freq)
@@ -237,6 +249,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         fout.write('{0:6.0f}{1:6.0f}{2:6.0f} \n'.format(year, month, day) )
         #(t[i], prn[i], snr[i],freq[i])
         # look thru the unique time tags
+        print('Found ', len(timetags), ' time tags')
         for i in range(0,len(timetags)):
             if ( (timetags[i] % idec) == 0):
                 # for this timetag and if pass decimation test
@@ -278,6 +291,8 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                     fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:6.2f} {4:6.2f} \n'.format(timetags[i]+offset, sat, s1, s2, s5) )
                     
         fout.close()
+        print(station, tmpfile,snrfile)
+        print(orbfile)
         gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
         print('Az/El Updated...')
         return # translation has taken place in new_azel, so return to main code 

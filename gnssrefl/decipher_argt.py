@@ -156,4 +156,5 @@ def new_azel(station,tmpfile,snrname,orbfile,csnr):
     in4 = g.binary(csnr)
     in5 = g.binary(errorlog)
     xnmeasnr.foo(in1,in2,in3,in4,in5)
+    print('removing temporary file')
     subprocess.call(['rm',tmpfile])
