@@ -133,7 +133,9 @@ c     write(stderr,*)'The day of year in your filename: ', rinex_doy
 
 c removed subroutine moving_sites bevacuse life is short
       if ((xrec+yrec+zrec) .eq.0) then
-        mess='ERROR:No (useful) apriori coordinates - exiting'
+        mess='FATAL ERROR:No (useful) apriori coordinates - exiting'
+        write(errid,*)mess
+        mess='Fix the a priori coordinates in your header. '
         write(errid,*)mess
         return
       endif
@@ -144,8 +146,13 @@ c removed subroutine moving_sites bevacuse life is short
          endif
       enddo
       if (iuseful .eq. 0) then
-        mess='ERROR:no SNR data found. Fatal error'
+        mess='FATAL ERROR:no SNR data were found in your file. This '
         write(errid,*)mess
+        mess='usually this means you need to remake the RINEX file.'
+        write(errid,*)mess
+        mess='Please contact your local RINEX expert for help.'
+        write(errid,*)mess
+
         return
       endif
 

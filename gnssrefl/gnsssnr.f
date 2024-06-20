@@ -41,7 +41,7 @@ c     21feb22 port to python f2py so it can be used in gnssrefl
 
       integer stderr
       parameter (stderr=6)
-      character*80 inline 
+      character*80 inline , mess
       character*4 station
 c     character*2  key(maxsat) 
       character*2 prn_pickc
@@ -126,22 +126,29 @@ c     and an observable array and nobs, number of observables
          endif
       enddo
       if (iuseful .eq. 0) then
-        write(errid,*) 'Your file had no useful SNR observables'
-        write(errid,*) 'in it. Look at the header of your file'
+        mess='FATAL ERROR:no SNR data were found in your file. This '
+        write(errid,*)mess
+        mess='usually this means you need to remake the RINEX file.'
+        write(errid,*)mess
+        mess='Please contact your local RINEX expert for help.'
+        write(errid,*)mess
+
         return
       endif 
       if (xrec.eq.0.d0) then
-        write(errid,*) 'you need real station coords '
+        write(errid,*) 'you need non-zero station coords.'
+        write(errid,*) 'Fix the coordinates in your header.'
         return
       endif
       if (zrec.eq.0.d0) then
-        write(errid,*) 'you need real station coords '
+        write(errid,*) 'you need non-zero station coords '
+        write(errid,*) 'Fix the coordinates in your header.'
         return
       endif
 c     print*,'number of obs main code', nobs
 c     moving sites has been removed
       if (nobs .gt. 25 .or. nobs .eq. 0) then
-        write(errid,*) 'Only <= 25 observable types allowed. '
+        write(errid,*) 'Only <= 25 observable types are allowed. '
         write(errid,*) 'You can try using -strip T when using'
         write(errid,*) 'rinex2snr or use gfzrnx'
         return

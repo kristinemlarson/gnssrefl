@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.5.5
+
+Oops - introduced a bug for ultra orbit use in rinex2snr.  This should be 
+fixed now. If you would like to select an ultrarapid orbit file at hours other than zero,
+please submit a PR.
+
+Added clearer error messages for people that try to use RINEX files without
+SNR data in them. Hopefully
+
 ## 3.5.4
 
 nmea2snr ultra/wum2 orb option tries to use the expected ultra rapid file and if it fails

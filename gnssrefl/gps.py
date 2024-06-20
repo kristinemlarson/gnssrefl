@@ -3590,7 +3590,8 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     elif (orbtype == 'wum2'):
         # Wuhan ultra-rapid orbit from the Wuhan FTP
         # but only hour 00:00
-        f,orbdir,foundit=get_wuhan_orbits(year,month,day)
+        ihr = 0
+        f,orbdir,foundit=get_wuhan_orbits(year,month,day,ihr)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif orbtype == 'jax':
         # this uses JAXA, has GPS and GLONASS and appears to be quick and reliable
@@ -3612,12 +3613,14 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
         if (year + doy/365.25) > (2024 + 153/365.25):
             # use new file structure and two day orbit ... 
+            #use hour 0
+            ihr = 0
             if doy == 1:
                 # use december 31 from previous year
-                f, orbdir, foundit = new_ultra_gfz_orbits(year-1,12,31)
+                f, orbdir, foundit = new_ultra_gfz_orbits(year-1,12,31,ihr)
             else:
                 # use previous day ... 
-                f, orbdir, foundit = new_ultra_gfz_orbits(year,doy-1,0)
+                f, orbdir, foundit = new_ultra_gfz_orbits(year,doy-1,0,ihr)
         else:
             f, orbdir, foundit = ultra_gfz_orbits(year,month,day,0)
         snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)

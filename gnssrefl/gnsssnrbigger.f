@@ -31,7 +31,7 @@ c     19feb04
 c     allow sp3 files that are longer than 23 hr 45 minutes
 c     21feb22 port to python f2py so it can be used in gnssrefl
 
-      integer maxsat, maxob, maxGNSS, np
+      integer maxsat, maxob, maxGNSS, np, iuseful
       parameter (maxsat = 200)
       parameter (maxob = 25)
       parameter (maxGNSS = 400)
@@ -41,9 +41,9 @@ c     increased dimension for 3 days of 5 minute data
       real*8 c 
       parameter (c = 0.299792458D+09)      
 
-      integer stderr
+      integer stderr, k
       parameter (stderr=6)
-      character*80 inline 
+      character*80 inline , mess
       character*4 station
 c     character*2  key(maxsat) 
       character*2 prn_pickc
@@ -122,11 +122,13 @@ c     and an observable array and nobs, number of observables
       call read_header_25obs(fileIN,rawfilename, xrec,yrec,zrec,
      .  iobs,nobs,iymd, station,errid)
       if (xrec.eq.0.d0) then
-        write(errid,*) 'you need real station coords '
+        write(errid,*) 'You need non-zero station coords '
+        write(errid,*) 'Fix your RINEX file.'
         return
       endif
       if (zrec.eq.0.d0) then
-        write(errid,*) 'you need real station coords '
+        write(errid,*) 'You need non-zero station coords '
+        write(errid,*) 'Fix your RINEX file.'
         return
       endif
 c     print*,'number of obs main code', nobs
@@ -138,6 +140,22 @@ c     moving sites has been removed
         return
       endif
 
+c added error message for people without SNR data in their files ...
+      iuseful = 0
+      do k = 6, 11
+         if (iobs(k) .gt. 0) then
+            iuseful = iuseful + 1
+         endif
+      enddo
+      if (iuseful .eq. 0) then
+        mess='FATAL ERROR:no SNR data were found in your file. This '
+        write(errid,*)mess
+        mess='usually this means you need to remake the RINEX file.'
+        write(errid,*)mess
+        mess='Please contact your local RINEX expert for help.'
+        write(errid,*)mess
+        return
+      endif
 
       call envTrans(xrec,yrec,zrec,staXYZ,Lat,Long,Ht,North,East,Up)
 c     open output file
