@@ -1,5 +1,7 @@
 # gnssrefl v3.5.5 
 
+gnssrefl is an open source software package for GNSS interferometric reflectometry (GNSS-IR). 
+
 If you use this code in any presentation or publication, you are expected to cite either 
 this github repository or the gnssrefl DOI, which is given just below.
 
@@ -8,7 +10,6 @@ this github repository or the gnssrefl DOI, which is given just below.
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601494.svg)](http://dx.doi.org/10.5281/zenodo.5601494) 
 
 
-gnssrefl is an open source software package for GNSS interferometric reflectometry (GNSS-IR). 
 
 ![](docs/myAnimation.gif)
 
