@@ -58,6 +58,7 @@ def parse_arguments():
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
     parser.add_argument("-gzip", default=None, help="boolean, default is SNR files are gzipped after creation", type=str)
     parser.add_argument("-par", default=None, help="parallel processes allowed", type=int)
+    parser.add_argument("-timeout", default=None, help="timeout in secs, useful for some archives", type=int)
 
     args = parser.parse_args().__dict__
 
@@ -73,7 +74,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
-              screenstats : bool = False, gzip : bool = True, monthly : bool = False, par : int=None ):
+              screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
+              par : int=None, timeout : int = 0):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
@@ -342,6 +344,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     par : int, optional
         default is NOne.  parallel processing, valid up to 10
 
+    timeout : int, optional
+        am seeing some timeouts when using highrate downloads and requests.
+        adding this optional parameter to let you set the timeout value, but 
+        it has not been implemented everywhere.  right now just the BKG
+
     """
 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
@@ -545,7 +552,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     args = {'station': station, 'year':year, 'doy':doy, 'isnr': snr, 'orbtype': orb, 'rate': rate, 
             'dec_rate': dec, 'archive': archive, 'nol': nolook, 'overwrite': overwrite, 
             'translator': translator, 'srate': samplerate, 'mk': mk, 'stream': stream, 
-            'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip}
+            'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'timeout' : timeout}
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
 

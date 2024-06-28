@@ -1148,6 +1148,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
     # compute spline - use for times th
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
+    #print('first and last th value - but for what exactly?')
+    #print(th[0])
+    # print(th[-1])
 
     # calculate spline values at GPS time tags
     spline_at_GPS = spline(th)

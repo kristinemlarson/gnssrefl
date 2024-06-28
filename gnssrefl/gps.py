@@ -6856,10 +6856,12 @@ def randomfilename():
     return rname
 
 
-def replace_wget(url,f):
+def replace_wget(url,f,**kwargs):
     """
     use requests instead of wget to download files
     this cannot be used for ftp addresses.
+
+    added optional input parameter timeout
 
     Parameters
     ----------
@@ -6867,15 +6869,21 @@ def replace_wget(url,f):
         full path to file
     f : str
         filename
+    timeout : int
+        optional timeout parameter, seconds
 
     Returns
     -------
     success : bool
         whether file was found or not
     """
+    timeout = kwargs.get('timeout',0)
     # use a try in case the website is down
     try:
-        response = requests.get(url)
+        if (timeout > 0):
+            response = requests.get(url,timeout=timeout)
+        else:
+            response = requests.get(url)
         #print(response.status_code)
         if response.status_code == 200:
             with open(f, "wb") as file:

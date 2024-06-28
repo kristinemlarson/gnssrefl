@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.5.6
+
+June 28, 2024
+
+Changed default high-rate BKG behavior to wget.download as using requests
+seems to be unhappy with many of the downloads - at least using my internet connection.
+Adding a timeout did not alleviate the problem. 
+
+Final spline output in subdaily was correct, but did not start at a sensible
+value (i.e. it put out values at seconds 29 and 59 instead of 0 and 30). This
+also depended on whether you did one year or two years of analysis.  I believe
+this has been fixed.
+
 ## 3.5.5
 
 Oops - introduced a bug for ultra orbit use in rinex2snr.  This should be 

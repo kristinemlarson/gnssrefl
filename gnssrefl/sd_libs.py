@@ -981,6 +981,8 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     ndays = s2-s1 # number of days
     numvals = 1 + int(ndays*86400/delta_out)
     tp=np.linspace(s1,s2,numvals,endpoint= True)
+    #print('RH_ortho_plot2, s1, s2, numvals,ndays')
+    #print(s1, s2, numvals,ndays)
 
     # previous tp definition goes from beginning of the first day to the end of last day - but 
     # does not recognize that the file could have started well beyond that first point 
@@ -988,17 +990,20 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     ii = (tp >= firstpoint) & (tp <= lastpoint)
     tp = tp[ii]
 
-    # this means it is already in MJD
+    # this means it is already in MJD ???
 
     if (th[0] > 400): 
         multiyear = True
         mjd_new = tp
+        print('multiyear is true, start at ', mjd_new[0])
         mjd_new_obstimes = mjd_to_obstimes(mjd_new)
         spline_new = spline(tp)
     else:
         multiyear = False
         mjd1 = g.fdoy2mjd(year, tp[0] ) # 
-        mjd_new = mjd1 + (tp - tp[0])
+        #print(year, tp[0], mjd1,np.floor(mjd1))
+        mjd_new = np.floor(mjd1) + (tp - tp[0])
+        print('multiyear is false, start at ', mjd_new[0])
         mjd_new_obstimes = mjd_to_obstimes(mjd_new)
         spline_new = spline(tp)
     N_new = len(mjd_new_obstimes)

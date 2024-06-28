@@ -58,7 +58,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol,overwrite,translator,srate, 
-                  mk, stream,strip,bkg,screenstats,gzip):
+                  mk, stream,strip,bkg,screenstats,gzip,timeout):
     """
     main code to convert RINEX files into SNR files 
     now works on a single year and doy
@@ -111,17 +111,22 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
         makan option
 
     strip : bool
-         reduces observables to only SNR (too many observables, particularly in RINEX 2 files
-         will break the RINEX translator)
+        reduces observables to only SNR (too many observables, particularly in RINEX 2 files
+        will break the RINEX translator)
 
     bkg : str
-         location of bkg files, EUREF or IGS
+        location of bkg files, EUREF or IGS
 
     screenstats: bool
-         whether print statements come to screen
+        whether print statements come to screen
 
     gzip: bool
-         whether SNR files are gzipped after creation
+        whether SNR files are gzipped after creation
+
+    timeout : int
+         optional parameter I am testing out for requests timeout parameter
+         in seconds
+
     """
     #
 
@@ -311,10 +316,12 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 # this is confusing - so the bkg variable is either IGS or EUREF
                                 bad_day = g.cddis_restriction(year, doy,'bkg')
                                 if not bad_day:
-                                    rnx_filename,foundit = ch.bkg_highrate(station9ch, year, doy, 0,stream,dec_rate,bkg)
+                                    rnx_filename,foundit = ch.bkg_highrate(station9ch, year , doy, 
+                                                                           0,stream,dec_rate,bkg,timeout=timeout)
                                 else:
                                     print('Will try the tar version ')
-                                    rnx_filename,foundit = ch.bkg_highrate_tar(station9ch, year, doy, 0,stream,dec_rate,bkg)
+                                    rnx_filename,foundit = ch.bkg_highrate_tar(station9ch, year, doy, 
+                                                                               0,stream,dec_rate,bkg,timeout=timeout)
                                 if foundit:
                                     if screenstats:
                                         print('The RINEX 3 file has been downloaded from the BKG and merged. Now try to make ', r2)

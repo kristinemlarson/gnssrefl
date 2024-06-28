@@ -212,7 +212,7 @@ def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):
 
     return file_name, crnx_name, file_name2, crnx_name2, exe1, exe2
 
-def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
+def bkg_highrate(station, year, month, day,stream,dec_rate,bkg,**kwargs):
     """
     picks up a highrate RINEX 3 file from BKG, merges and decimates it.
     requires gfzrnx
@@ -242,6 +242,10 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
         whether file exists
 
     """
+    timeout = kwargs.get('timeout',0)
+    if (timeout > 0) :
+        print('timeout parameter has been set')
+
     fexist  = False
     version = 3
     crnxpath = g.hatanaka_version()
@@ -288,8 +292,12 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg):
                 print('You already have ', oname, ' so no need to download')
             else:
                 try:
-                    s = g.replace_wget(dirname+file_name, file_name)
-                    #wget.download(dirname+file_name,file_name)
+                    if timeout > 0:
+                        s = g.replace_wget(dirname+file_name, file_name,timeout=timeout)
+                    else:
+                        # it is not getting all the files. maybe go back to wget
+                        #s = g.replace_wget(dirname+file_name, file_name)
+                        wget.download(dirname+file_name,file_name,noverbose=True)
                     if os.path.isfile(file_name):
                         subprocess.call(['gunzip',file_name]) # unzip
                         subprocess.call([crnxpath, crnx_name]) # hatanaka

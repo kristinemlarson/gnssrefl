@@ -1,4 +1,4 @@
-# gnssrefl v3.5.5 
+# gnssrefl v3.5.6 
 
 gnssrefl is an open source software package for GNSS interferometric reflectometry (GNSS-IR). 
 
@@ -45,7 +45,7 @@ GNSS-IR was developed with funding from NSF (ATM 0740515, EAR 0948957, AGS 09357
 NASA (NNX12AK21G and NNX13AF43G). <code>gnssrefl</code> was initially developed 
 as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 
-The [CRC 1502 DETECT project](https://sfb1502.de/) supported this project from 2022-2024.
+The [CRC 1502 DETECT project](https://sfb1502.de/) and the University of Bonn supported this project from 2022-2024.
 
 Kristine M. Larson
 
