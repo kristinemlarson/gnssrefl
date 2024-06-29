@@ -293,11 +293,13 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg,**kwargs):
             else:
                 try:
                     if timeout > 0:
+                        #print('using replace_wget')
                         s = g.replace_wget(dirname+file_name, file_name,timeout=timeout)
                     else:
                         # it is not getting all the files. maybe go back to wget
                         #s = g.replace_wget(dirname+file_name, file_name)
-                        wget.download(dirname+file_name,file_name,noverbose=True)
+                        #print('using wget.download')
+                        wget.download(dirname+file_name,file_name)
                     if os.path.isfile(file_name):
                         subprocess.call(['gunzip',file_name]) # unzip
                         subprocess.call([crnxpath, crnx_name]) # hatanaka

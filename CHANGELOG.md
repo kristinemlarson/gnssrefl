@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.5.7
+
+small issue with bkg high rate downloads. now fixed.
+
 ## 3.5.6
 
 June 28, 2024
