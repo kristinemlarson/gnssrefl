@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.5.8
+At request for Felipe Nevinski, I am having the ultra orbit option in nmea2snr check for three different files.
+I am skeptical ... but I could be wrong.
+
 ## 3.5.7
 
 small issue with bkg high rate downloads. now fixed.
