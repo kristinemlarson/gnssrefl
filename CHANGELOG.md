@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.5.9
+
+July 5, 2024
+
+You can input a frequency list for gnssir that overrides the json values stored via gnssir_input.
+However, you can only have one request for minimum spectral amplitude on the command line.  if you want more
+control, you need to use the  extension option. 
+
+The gnssrefl version number if printed out when you run gnssir, rinex2snr, quickLook.
+if you want to add it to other functions, submit a PR.
+
 ## 3.5.8
 At request for Felipe Nevinski, I am having the ultra orbit option in nmea2snr check for three different files.
 I am skeptical ... but I could be wrong.

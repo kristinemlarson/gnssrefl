@@ -44,8 +44,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             min elev angle, deg
         e2 : float
             max elev angle, deg
-        freqs: list of floats
-            list of frequencies to use 
+        freqs: list of int
+            frequencies to use 
         minH : float
             min reflector height, m
         maxH : float
@@ -62,8 +62,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             peak to noise value for QC
         ediff : float
             elev angle difference for arc length, QC
-        reqAmp : float
-            required periodogram amplitude for QC
+        reqAmp : list of floats
+            list of required periodogram amplitude for QC for each frequency
         ellist: list of floats
             added 23jun16, allow multiple elevation angle regions
         apriori_rh : float

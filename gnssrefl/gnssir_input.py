@@ -34,7 +34,7 @@ def parse_arguments():
     parser.add_argument("-extension", default=None,type=str, help="Provide extension name so you can try different strategies")
     parser.add_argument("-ediff", default=None, type=float, help="Allowed min/max elevation diff from obs min/max elev angle (degrees) default is 2")
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
-    parser.add_argument("-frlist", nargs="*",type=int,  help="User defined frequencies using our nomenclature")
+    parser.add_argument("-frlist", nargs="*",type=int,  help="User defined frequencies using our nomenclature, e.g. 1 101 for GPS and Glonass L1")
     parser.add_argument("-azlist2", nargs="*",type=float,  default=None,help="list of azimuth regions, default is 0-360") 
     parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles, advanced users only!") 
     parser.add_argument("-refr_model", default="1", type=str, help="refraction model. default is 1, zero turns it off)")

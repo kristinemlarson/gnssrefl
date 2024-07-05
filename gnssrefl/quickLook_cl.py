@@ -36,6 +36,9 @@ def parse_arguments():
     parser.add_argument("-plt", default=None, type=str, help="Set to false to turn off plots to the screen.")
     parser.add_argument("-hires_figs", default=None, type=str, help="Set to true to make eps instead of png.")
 
+    g.print_version_to_screen()
+
+
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -156,7 +159,7 @@ def quicklook(station: str, year: int, doy: int,
     """
 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
-    print('You are running ', vers)
+    #print('You are running ', vers)
 
 
 #   make sure environment variables exist.  set to current directory if not

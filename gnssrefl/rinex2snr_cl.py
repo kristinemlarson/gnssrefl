@@ -27,6 +27,7 @@ from functools import partial
 def parse_arguments():
 
     #msg = rnx.print_archives()
+    g.print_version_to_screen()
 
     parser = argparse.ArgumentParser()
     #parser = argparse.ArgumentParser(epilog=msg)
@@ -352,7 +353,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     """
 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
-    print('You are running ', vers)
+    #print('You are running ', vers)
 
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',

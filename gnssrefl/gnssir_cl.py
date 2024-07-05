@@ -22,10 +22,13 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="day of year", type=int)
 
+    #print('gnssrefl version ', str(g.version('gnssrefl')))
+    g.print_version_to_screen()
+
     # optional inputs
     parser.add_argument("-snr", default=None, help="snr file ending, default is 66", type=int)
     parser.add_argument("-plt", default=None, help="plt to screen (True or False)", type=str)
-    parser.add_argument("-fr", default=None, type=int, help="Frequency, 1 for GPS L1, 101 for Glonass L1 etc")
+    parser.add_argument("-fr", default=None, nargs="*",type=int, help="Frequency override for json, e.g. 1 101 for GPS and Glonass L1")
     parser.add_argument("-ampl", default=None, type=float, help="Min spectral amplitude ")
     parser.add_argument("-sat", default=None, type=int, help="Only look at this satellite")
     parser.add_argument("-doy_end", default=None, type=int, help="doy end")
@@ -56,7 +59,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, fr: int = None, 
+def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, fr: list= [], 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
@@ -90,9 +93,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         before computing periodograms, decimates the SNR file contents to 5 seconds
     gnssir p041 2021 15 -gzip T
         gzips the SNR file after you run the code. Big space saver (now the default)
+    gnssir p041 2021 15 -fr 1 101 
+        ignore frequency list in your json and use frequencies 1 and 101 
 
     Parameters
-    --------
+    ----------
     station : str
         lowercase 4 character ID of the station
     year : int
@@ -100,8 +105,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     doy : integer
         Day of year
 
-    Optional parameters (requires hyphen prefix)
-    ----------
     snr : int, optional
         SNR format. This tells the code what elevation angles to save data for. Input is the snr file ending.
         Value options:
@@ -117,7 +120,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     plt : bool, optional
         Send plots to screen or not. Default is False.
     fr : int, optional
-        GNSS frequency. Value options:
+        As of version 3.5.9 you are allowed to enter more than one GNSS frequency.
+        It overrides whatever was stored in your json. This is entered into
+        a list so do not use commas, i.e. 1 101 102 
+        allowed frequency names:
 
             1,2,20,5 : GPS L1, L2, L2C, L5
 
@@ -272,7 +278,13 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # this is for when you want to run the code with just a single frequency, i.e. input at the console
     # rather than using the input restrictions
     if fr is not None:
-        lsp['freqs'] = [fr]
+        lsp['freqs'] = fr
+        # better make sure you have enough amplitudes
+        ampl_from_json = lsp['reqAmp'][0]
+        if ampl is None:
+            lsp['reqAmp'] = [ampl_from_json for i in range(14)]
+
+
     if ampl is not None:
         # this is not elegant - but allows people to set ampl on the command line
         # but use the frequency list from their json ...  which i think has max of 12
@@ -332,7 +344,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # should make sure there are directories for the results ... 
     g.checkFiles(station.lower(), extension)
 
-    print('Requested frequencies ', lsp['freqs'])
+    #if screenstats:
+    # for my sanity might as well print it out
+    if True:
+        print('Requested frequencies ', lsp['freqs'])
+        #print('Requested amplitudes', lsp['reqAmp'])
 
     # queue which handles any exceptions any of the processes encounter
     manager = multiprocessing.Manager()

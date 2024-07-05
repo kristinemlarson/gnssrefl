@@ -7240,4 +7240,9 @@ def newish_gfz_orbits(year,month,day, orbtype):
 
     return longname, fdir, foundit
 
-
+def print_version_to_screen():
+    """
+    what it sounds like
+    """
+    print('gnssrefl version: ', str(version('gnssrefl')), '\n')
+    return
