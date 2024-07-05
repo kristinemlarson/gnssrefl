@@ -277,13 +277,14 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     # this is for when you want to run the code with just a single frequency, i.e. input at the console
     # rather than using the input restrictions
-    if fr is not None:
+    #print(lsp['freqs'])
+    #if fr is not None:
+    if len(fr) > 0:
         lsp['freqs'] = fr
         # better make sure you have enough amplitudes
         ampl_from_json = lsp['reqAmp'][0]
         if ampl is None:
             lsp['reqAmp'] = [ampl_from_json for i in range(14)]
-
 
     if ampl is not None:
         # this is not elegant - but allows people to set ampl on the command line
