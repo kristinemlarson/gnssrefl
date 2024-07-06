@@ -11,6 +11,8 @@ import sys
 import time
 import warnings
 
+from importlib.metadata import version
+
 import gnssrefl.gps as g
 import gnssrefl.read_snr_files as snr
 import gnssrefl.refraction as refr
@@ -25,6 +27,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
     2023-aug-02 trying to fix the issue with azimuth print out being different than
     azimuth at lowest elevation angle
+
+    if screenstats is True, it prints to a log file now, directory $REFL_CODE/logs/ssss
 
     Parameters
     ----------
@@ -110,7 +114,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
     ok = g.is_it_legal(freqs)
     if not ok:
-        print('Fix your json list of frequencies. Exiting')
+        print('There is something wrong. Fix your json list of frequencies. Exiting')
         sys.exit()
 
     plot_screen = lsp['plt_screen'] 
@@ -171,6 +175,12 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     obsfile2= '' # dummy value for name of file for the day before, when we get to that
     fname, resultExist = g.LSPresult_name(station,year,doy,extension) 
     print('Results are written to:', fname)
+    if screenstats:
+        logid, logfilename = open_gnssir_logfile(station,year,doy,extension)
+    else:
+        logid = None 
+        logfilename = None
+
 
     if (lsp['nooverwrite'] == True) & (resultExist == True):
         allGood = 0
@@ -277,6 +287,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             rj = 0
             gj = 0
             if screenstats: 
+                logid.write('=================================================================================\n')
+                logid.write('Looking at {0:4s} {1:4.0f} {2:3.0f} frequency {3:3.0f} ReqAmp {4:7.2f} \n'.format(station, year, doy,f,reqAmp[ct]))
+                logid.write('=================================================================================\n')
                 print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
 #           get the list of satellites for this frequency
             if onesat == None:
@@ -289,6 +302,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             for satNu in satlist:
                 if screenstats: 
                     print('Satellite', satNu)
+                    logid.write('satellite {0:3.0f} \n'.format(satNu))
+
                 iii = (sats == satNu)
                 thissat = snrD[iii,:]
                 goahead = False
@@ -305,11 +320,11 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                             # poorly named inputs - elev, azimuth, seconds of the day, ...
                             # te1 and te2 are the requested elevation angles I believe
                             # satNu is the requested satellite number
-                            tarclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],te1, te2,ediff,satNu,screenstats)
+                            tarclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],te1, te2,ediff,satNu,screenstats,logid)
                             arclist = np.append(arclist, tarclist,axis=0)
 
                     else:
-                        arclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],e1, e2,ediff,satNu,screenstats)
+                        arclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],e1, e2,ediff,satNu,screenstats,logid)
 
                     nr,nc = arclist.shape
                     if nr > 0:
@@ -370,6 +385,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                                 gj +=1
                                 if screenstats:
                                     T = g.nicerTime(UTCtime)
+                                    logid.write('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} \n'.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
                                     print('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} '.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
                                 if plot_screen:
                                     failed = False
@@ -380,8 +396,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                                     #print(delT, tooclose,Noise,PkNoise)
                                     #35.0 False 3.682862189099345 2.8
 
+                                    logid.write('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f} \n'.format( iAzim,satNu,UTCtime,maxF))
                                     print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f}'.format( iAzim,satNu,UTCtime,maxF))
-                                    g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose)
+                                    g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose,logid)
                                 if plot_screen:
                                     failed = True
                                     local_update_plot(x,y,px,pz,ax1,ax2,failed)
@@ -390,6 +407,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                 print('=================================================================================')
                 print('     Frequency ', f, ' good arcs:', gj, ' rejected arcs:', rj )
                 print('=================================================================================')
+                logid.write('=================================================================================\n')
+                logid.write('     Frequency  {0:3.0f}   good arcs: {1:3.0f}  rejected arcs: {2:3.0f} \n'.format( f, gj, rj))
+                logid.write('=================================================================================\n')
             total_arcs = gj + total_arcs
 # close the output files
             ct += 1
@@ -413,6 +433,10 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         # try moving this
         if found_results and plot_screen:
             plot2screen(station, f, ax1, ax2,lsp['pltname']) 
+
+        if screenstats:
+            logid.close()
+            print('Screen stat information printed to: ', logfilename)
 
 
 def set_refraction_params(station, dmjd,lsp):
@@ -663,11 +687,13 @@ def onesat_freq_check(satlist,f ):
     return satlist
 
 
-def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
+def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats):
     """
     This provides a list of rising and setting arcs 
     for a given satellite in a SNR file
     based on using changes in elevation angle
+
+    I think this is used in quickLook but not gnssir
 
     Parameters
     ----------
@@ -1098,7 +1124,7 @@ def check_azim_compliance(initA,azlist):
 
     return keeparc
 
-def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
+def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid ):
     """
     This provides a list of rising and setting arcs 
     for a given satellite in a SNR file
@@ -1122,6 +1148,8 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
         satellite number
     screenstats : bool
         whether you want info printed to the screen
+    logid: fileid
+        where the screen stat info is stored as a file
 
     Returns
     -------
@@ -1189,8 +1217,10 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
                     add = ' violates ediff'
                 if not verysmall:
                     print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2), minA,maxA,add)
+                    logid.write('Failed sat/arc {0:3.0f} {1:3.0f} {2:7.2f} index {3:7.2f} min/max elev: {4:7.2f} {5:7.2f} Azims: {6:6.2f} {7:6.2f} {8:15s}  \n'.format( sat,iarc+1,sind,eind,np.round(minObse,2), np.round(maxObse,2), minA,maxA,add))
             else:
                 print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2),minA,maxA)
+                logid.write('Keep sat/arc {0:3.0f} {1:3.0f} {2:7.2f} index {3:7.2f} min/max elev: {4:7.2f} {5:7.2f} Azims: {6:6.2f} {7:6.2f}  \n'.format( sat,iarc+1,sind,eind,np.round(minObse,2), np.round(maxObse,2), minA,maxA))
 
         if not nogood :
             iarc = iarc + 1
@@ -1200,12 +1230,13 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats ):
             tv = np.append(tv, [newl],axis=0)
 
     return tv 
+
 def make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, nproc):
     """
     make lists of dates for parallel processing to spawn multiple jobs
 
     Parameters
-    ==========
+    ----------
     year : int
         year processing begins
     doy : int
@@ -1254,7 +1285,7 @@ def make_parallel_proc_lists(year, doy1, doy2, nproc):
     make lists of dates for parallel processing to spawn multiple jobs
 
     Parameters
-    ==========
+    ----------
     year : int
         year of processing
     doy1 : int
@@ -1263,7 +1294,7 @@ def make_parallel_proc_lists(year, doy1, doy2, nproc):
         end day of year
 
     Returns
-    =======
+    -------
     datelist : dict
         list of dates formatted as year doy1 doy2
     numproc : int
@@ -1289,3 +1320,45 @@ def make_parallel_proc_lists(year, doy1, doy2, nproc):
     numproc = i
     return datelist, numproc
 
+
+def open_gnssir_logfile(station,year,doy,extension):
+    """
+    opens a logfile when asking for screen output
+
+    Parameters
+    ----------
+    station : str
+        4 ch station name
+    year : int
+        full year
+    doy : int
+        day of year
+    extension : str
+        analysis extension name (for storage of results)
+        if not set you should send empty string
+
+    Returns
+    -------
+    fileid : ?
+        I don't know the proper name of this - but what comes out
+        when you open a file so you can keep writing to it
+
+    """
+    xdir = os.environ['REFL_CODE']
+    if len(extension) == 0:
+        logdir = xdir + '/logs/' + station + '/' + str(year) + '/'
+    else:
+        logdir = xdir + '/logs/' + station + '/' + extension + '/' + str(year) + '/'
+
+    if not os.path.isdir(logdir):
+        subprocess.call(['mkdir', '-p',logdir])
+    fout = 0
+    cdoy = '{:03d}'.format(doy)
+#   extra file with rejected arcs
+
+    filename = logdir + cdoy + '_gnssir.txt' 
+    fileid = open(filename,'w+')
+    v = str(g.version('gnssrefl'))
+    fileid.write('gnssrefl version {0:s} \n'.format(v))
+
+    return fileid, filename

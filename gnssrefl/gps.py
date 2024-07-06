@@ -3074,7 +3074,7 @@ def result_directories(station,year,extension):
     if not os.path.isdir(f1):
         subprocess.call(['mkdir',f1])
 
-def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp,tooclose2edge):
+def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp,tooclose2edge,fileid):
     """
     prints out various QC fails to the screen
 
@@ -3104,23 +3104,40 @@ def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNois
         require peak LSP
     tooclose2edge : bool
         wehther peak value is too close to begining or ending of the RH constraints
+    fileid : ?
+        file identifier
 
     """
     print('delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp,tooclose2edge')
-    print(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp,tooclose2edge)
+    print(delT,delTmax,round(eminObs,2),round(emaxObs,2),e1,e2,ediff,round(maxAmp,2), round(Noise,2),PkNoise,reqamp,tooclose2edge)
     if tooclose2edge:
         print('     Retrieved reflector height too close to the edge of the RH space')
 
-    if delT >= delTmax:
-        print('     Obs delT {0:.3f} minutes vs {1:.1f} requested limit '.format(delT,delTmax ))
-    if eminObs  > (e1 + ediff):
-        print('     Obs emin {0:.1f} is higher than {1:.1f} +- {2:.1f} degrees '.format(eminObs, e1, ediff ))
-    if emaxObs  < (e2 - ediff):
-        print('     Obs emax {0:.1f} is lower than {1:.1f} +- {2:.1f} degrees'.format(emaxObs, e2, ediff ))
-    if maxAmp < reqamp:
-        print('     Obs Ampl {0:.1f} vs {1:.1f} required '.format(maxAmp,reqamp  ))
-    if maxAmp/Noise < PkNoise:
-        print('     Obs PkN  {0:.1f} vs {1:.1f} required'.format(maxAmp/Noise, PkNoise ))
+    # did not want to re-indent
+    if True:
+        if delT >= delTmax:
+            print('     Obs delT {0:.3f} minutes vs {1:.1f} requested limit '.format(delT,delTmax ))
+        if eminObs  > (e1 + ediff):
+            print('     Obs emin {0:.1f} is higher than {1:.1f} +- {2:.1f} degrees '.format(eminObs, e1, ediff ))
+        if emaxObs  < (e2 - ediff):
+            print('     Obs emax {0:.1f} is lower than {1:.1f} +- {2:.1f} degrees'.format(emaxObs, e2, ediff ))
+        if maxAmp < reqamp:
+            print('     Obs Ampl {0:.1f} vs {1:.1f} required '.format(maxAmp,reqamp  ))
+        if maxAmp/Noise < PkNoise:
+            print('     Obs PkN  {0:.1f} vs {1:.1f} required'.format(maxAmp/Noise, PkNoise ))
+    if fileid is not None:
+        if delT >= delTmax:
+            fileid.write('     Obs delT {0:.3f} minutes vs {1:.1f} requested limit \n'.format(delT,delTmax ))
+        if eminObs  > (e1 + ediff):
+            fileid.write('     Obs emin {0:.1f} is higher than {1:.1f} +- {2:.1f} degrees \n'.format(eminObs, e1, ediff ))
+        if emaxObs  < (e2 - ediff):
+            fileid.write('     Obs emax {0:.1f} is lower than {1:.1f} +- {2:.1f} degrees\n'.format(emaxObs, e2, ediff ))
+        if maxAmp < reqamp:
+            fileid.write('     Obs Ampl {0:.1f} vs {1:.1f} required \n'.format(maxAmp,reqamp  ))
+        if maxAmp/Noise < PkNoise:
+            fileid.write('     Obs PkN  {0:.1f} vs {1:.1f} required \n'.format(maxAmp/Noise, PkNoise ))
+        if tooclose2edge:
+            fileid.write('     Retrieved reflector height too close to the edge of the RH space \n')
         
 def define_quick_filename(station,year,doy,snr):
     """
@@ -7244,5 +7261,6 @@ def print_version_to_screen():
     """
     what it sounds like
     """
-    print('gnssrefl version: ', str(version('gnssrefl')), '\n')
+    print('gnssrefl version:', str(version('gnssrefl')), '\n')
     return
+

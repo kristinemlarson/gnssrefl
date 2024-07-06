@@ -269,7 +269,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                                     lw = 0.5 ; colorful(a,px,pz,lw,False,saxis) # add to the plot
                                     if screenstats:
                                         print('FAILED QC for Azimuth {0:5.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:7.3f} '.format( avgAzim,satNu,UTCtime,maxF))
-                                        g.write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose)
+                                        logout = None
+                                        g.write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,requireAmp,tooclose,logout)
 
                                     idc = 'f' + stitles[a]
                                     data[idc][satNu] = [px,pz]

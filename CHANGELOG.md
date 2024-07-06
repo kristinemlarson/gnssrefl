@@ -14,6 +14,9 @@ control, you need to use the  extension option.
 The gnssrefl version number if printed out when you run gnssir, rinex2snr, quickLook.
 if you want to add it to other functions, submit a PR.
 
+logfile of the gnssir screen stats is written to a file. The File location is written to screen. 
+Default goes to $REFL_CODE/logs/ssss/yyyy 
+
 ## 3.5.8
 At request for Felipe Nevinski, I am having the ultra orbit option in nmea2snr check for three different files.
 I am skeptical ... but I could be wrong.
