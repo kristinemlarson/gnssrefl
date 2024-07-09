@@ -38,6 +38,8 @@ def parse_arguments():
     parser.add_argument("-delta_out", default=None, type=str, help="Output increment, in seconds (default is 300)")
     parser.add_argument("-refraction", default=None, type=str, help="bool, Set to False to turn off")
     parser.add_argument("-json_override", default=None, type=str, help="bool, Override json file name")
+    parser.add_argument("-lastday_seconds", default=None, type=int, help="if last doy incomplete, provides last timepoint, this option currently does not work")
+
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -53,7 +55,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
         doy_end: int = None, lspfigs: bool = False, snrfigs: bool = False, knot_space: int = 3, 
         rough_in: float = 0.1, risky: bool = False, snr: int = 66, outfile_type: str = 'txt', 
         outfile_name: str = '', outlier_limit: float = 0.5, no_dots: bool = False, delta_out: int = 300, 
-        refraction: bool = True, json_override: bool = False):
+           refraction: bool = True, json_override: bool = False, lastday_seconds: int=0):
     """
     You must have run invsnr_input before using this code. This is the wrapper code that does the 
     invsnr modelling. Note: outfile_name and outfile_type are unnecessary. Consolidate them.
@@ -165,6 +167,10 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
     json_override : bool, optional
         Override json file name
         Default is False
+    lastday_seconds : int, optional
+        last time point (seconds of the day)
+        should really be read from the file - 
+        if you don't provide this the fit blows up
 
     """
 
@@ -272,7 +278,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
                                 satconsts=satconsts, screenstats=screenstats, tempres=dec, doy_end=doy_end,
                                 l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr,
                                 outfile_type=outfile_type, delta_out=delta_out, lsp=lsp, outfile_name=outfile_name,
-                                outlier_limit=outlier_limit, no_dots=no_dots)
+                                outlier_limit=outlier_limit, no_dots=no_dots,lastday_seconds=lastday_seconds)
 
 
 def main():

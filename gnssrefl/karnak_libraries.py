@@ -425,7 +425,7 @@ def rinex2names(station,year,doy):
 
 def universal_rinex2(station, year, doy, archive,screenstats):
     """
-    seamless archive for rinex 2 files ...
+    The long-awaited seamless archive for rinex 2 files ...
 
     Parameters
     ----------
@@ -532,6 +532,11 @@ def universal_rinex2(station, year, doy, archive,screenstats):
         else:
             dir1 = 'ftp://gps.alaska.edu/pub/gpsdata/CoopCORS/' + cydoy + '/' + station.upper() + '/'
             foundit, file_name = gogetit(dir1, oname, '.gz');
+    elif (archive == 'ngs_hourly'):
+        print('Hourly NGS')
+        delete_hourly= True
+        yy,mm,dd = g.ydoy2ymd(year,doy)
+        file_name, foundit = g.big_Disk_work_hard(station,yy,mm,dd,delete_hourly)
     elif (archive == 'ngs'):
         dir1 = 'https://geodesy.noaa.gov/corsdata/rinex/' + cydoy + '/' + station + '/'
         file_name = oname + '.gz' ; url = dir1 + file_name

@@ -40,7 +40,7 @@ def the_kelly_simple_way(url,filename):
     #print(token_path)
     device_flow = DeviceCodeFlowSimple(Path(token_path))
 
-    print('Seeking permission from Earthscope to use their archive - wish me luck')
+    #print('Seeking permission from Earthscope to use their archive - wish me luck')
     # had turned this off when nothing worked
     if True:
         try:

@@ -518,11 +518,13 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                         sind = bkpt[ii - 1] + 1
                     eind = bkpt[ii] + 1
                     if eind - sind < 20:
-                     #print('arc not big enough')
+                        #print('arc not big enough')
+                        # should this really be continue?
                         continue
                     elvt = np.array(tempd[sind:eind, 1], dtype=float)
                     if len(np.unique(elvt)) == 1:
                         print('unchanging elevation')
+                        # should this really be continue?
                         continue
                     azit = np.array(tempd[sind:eind, 2], dtype=float) # azimuth array
                     sinelvt = np.sin(elvt / 180 * np.pi) # sine elevation angle array
@@ -569,7 +571,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                         snrdt_arr = np.vstack((snrdt_arr, temp_arr2))
                         # and plots moved to function to clean this up
                         aa = str( int( np.mean(azit)) )
-                        arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,aa)
+                        arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,aa,xsignal)
     rh_arr = rh_arr[rh_arr[:, 0].argsort()]
     # make sure that arrays are sorted by time
     snrdt_arr = snrdt_arr[snrdt_arr[:, 0].argsort()]
@@ -775,8 +777,11 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     imodel = 0 # no refraction
     if 'lsp' in kwargs:
         lsp = kwargs.get('lsp')
+        print('Thisi is a minimal refraction correction. Please submit a PR if you')
+        print('would like to implement a better one.')
         if lsp['refraction']:
             imodel = 1 #
+        # this should be the correct date if you want a better model 
         dmjd = 59580 # fake number
         p,T,irefr,humidity, Tm, lapse_rate = set_refraction_model(station, dmjd,lsp,imodel)
         #print('refraction parameters ', p,T,humidity,irefr)
@@ -787,6 +792,10 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     risky = False
     if 'risky' in kwargs:
         risky = kwargs.get('risky')
+
+    lastday_seconds = 0
+    if 'lastday_seconds' in kwargs:
+        lastday_seconds = kwargs.get('lastday_seconds')
 
     if risky: 
         print('You are a risk taker.')
@@ -855,18 +864,24 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     gbase = tobj.gps
     #print('>>>>  gbase value', gbase)
     # Setting up knots ...
-    knots = np.linspace(gbase + int(kdt/2), gbase + numdays*86400 - int(kdt/2), int(numdays*86400/kdt))
+    # now deal with a final file that isn't 24 hours long ... 
+    if (lastday_seconds == 0):
+        total_seconds = numdays*86400
+    else:
+        total_seconds = (numdays-1)*86400 + lastday_seconds
+    print('Total seconds ', total_seconds)
+    knots = np.linspace(gbase + int(kdt/2), gbase + total_seconds - int(kdt/2), int(total_seconds/kdt))
     #print('Here be the knots:', knots)
     print('Knot spacing in seconds ',int(kdt/2))
-    print('Number of knots',int(numdays*86400/kdt))
+    print('Number of knots',int(total_seconds/kdt))
     knots = np.append(gbase, knots)  # add start and end of day for more stable output but dont use these points
-    knots = np.append(knots, gbase + numdays*86400)
+    knots = np.append(knots, gbase + total_seconds)
 
 
     #print('Sorting snr data into arcs')
 
     # arguments sent directly
-    #print('Begin Lomb Scargle analysis')
+    print('Begin Lomb Scargle analysis')
     s1=time.time()
     rh_arr, snrdt_arr, fspecdict= snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year, doy, signal=signal,**kwargs)
     # should already exist
@@ -907,7 +922,8 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
     # sort the results by time??
     temp_dn = np.sort(rh_arr[:, 0])
     temp_dn = np.append(gbase, temp_dn)
-    temp_dn = np.append(temp_dn, gbase + numdays*86400)
+    #temp_dn = np.append(temp_dn, gbase + numdays*86400)
+    temp_dn = np.append(temp_dn, gbase + total_seconds)
     maxtgap = np.max(np.ediff1d(temp_dn))
     mintgap = np.min(np.ediff1d(temp_dn))
     if mintgap < 0:
@@ -925,17 +941,17 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         residuals = residuals_cubspl_spectral(kval, knots, rh_arr)
         return residuals
 
-    #print('Now fitting a cubic spline to the arcs but rhdot not included')
+    print('Now fitting a cubic spline to the arcs, but DP does not include rhdot')
     kval_0 = np.nanmean(rh_arr[:, 1]) * np.ones(len(knots))
     #print('Number of knots used in ', len(knots))
     s1=time.time()
     ls_spectral = least_squares(residuals_spectral_ls, kval_0, method='trf', bounds=rhlims)
     kval_spectral = ls_spectral.x
-    #print('Length of kval_spectral', len(kval_spectral))
+    print('Length of kval_spectral', len(kval_spectral))
     invout['knots'] = knots
     invout['kval_spectral'] = kval_spectral[1:-1]  # dont save first and last points
     s2=time.time()
-    #print('Fitting spline to LSP results took ', round(s2-s1,2), ' seconds')
+    print('Fitting spline to LSP results took ', round(s2-s1,2), ' seconds')
     print('satellite constellations ', satconsts)
     if snrfit:
         s1=time.time()
@@ -981,10 +997,16 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         #plotdt = 5 * 60
         plotdt = delta_out # make it so people can change it
         #tplot = np.linspace(gbase, gbase + numdays*86400, int(86400/plotdt + 1))
-        numvals = 1 + int(numdays*86400/delta_out)
-        nv2 = 1 + int(numdays*86400/3600)
-        tplot = np.linspace(gbase, gbase + numdays*86400, numvals)
-        tplot_hourly = np.linspace(gbase, gbase + numdays*86400, nv2 )
+
+        
+        #numvals = 1 + int(numdays*86400/delta_out)
+        numvals = 1 + int(total_seconds/delta_out)
+
+        #nv2 = 1 + int(numdays*86400/3600)
+        nv2 = 1 + int(total_seconds/3600)
+        tplot = np.linspace(gbase, gbase + total_seconds, numvals)
+
+        tplot_hourly = np.linspace(gbase, gbase + total_seconds, nv2 )
         lsp_per_hour = []
         for ijk in range(0,len(tplot_hourly)): 
             H1 = float((tplot_hourly[ijk]-gbase)/3600) ; H2 = H1 + 1
@@ -1053,8 +1075,10 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
         dformat = DateFormatter('%Y-%m-%d')
         ax.xaxis.set_major_formatter(dformat)
         ax.set_title('Station ' + station.upper() + ' ' + signal)
-        ax.set_xlim(gps2datenum(gbase), gps2datenum(gbase + numdays*86400))
-        ax.set_xticks(np.linspace(gps2datenum(gbase), gps2datenum(gbase + numdays*86400), int(86400 / (60 * 60 * 6) + 1)))
+        ax.set_xlim(gps2datenum(gbase), gps2datenum(gbase + total_seconds))
+        #ax.set_xlim(gps2datenum(gbase), gps2datenum(gbase + numdays*86400))
+        ax.set_xticks(np.linspace(gps2datenum(gbase), gps2datenum(gbase + total_seconds), int(86400 / (60 * 60 * 6) + 1)))
+        #ax.set_xticks(np.linspace(gps2datenum(gbase), gps2datenum(gbase + numdays*86400), int(86400 / (60 * 60 * 6) + 1)))
         ax.xaxis.set_major_formatter(DateFormatter('%m-%d %H:%M'))
         #ax.xaxis.set_major_formatter(DateFormatter('%Y-%m-%d %H:%M'))
         ax.legend(loc="upper right", prop={"size":8})
@@ -1189,7 +1213,7 @@ def define_inputfile(station,year,doy,snr_ending):
 
     return snrfile,snrdir, cyyyy, cdoy
 
-def arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,azdesc):
+def arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,azdesc,xsignal):
     """
     moved these individual plots out of the way
 
@@ -1210,13 +1234,16 @@ def arc_plots(lspfigs, snrfigs, reflh,pgram,sat,datet,elvlims,elvt,snrdt,azdesc)
     elvlims : list of floats
         min and max elev angle (deg)
 
+    xsignal : str
+        i think this is L1, L2 etc
+
     """
     if not os.path.isdir('plots'):
         print('make output directory for plots')
         subprocess.call(['mkdir','plots'])
 
     resol = 150
-    nm = 'sat' + str(int(sat)) + '_' + gps2datetime(np.mean(datet)).strftime('%H-%M')  
+    nm = 'sat' + str(int(sat)) + '_' + xsignal + '_' + gps2datetime(np.mean(datet)).strftime('%H-%M')  
     if lspfigs:
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.plot(reflh, pgram)

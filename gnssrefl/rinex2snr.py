@@ -71,62 +71,45 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
 
     year : int
         full year 
-
     doy : int 
         day of year
-
     isnr : int
-        SNR file type choice
-
+        SNR file type choice, i.e. 66, 88
     orbtype : str
         orbit type, e.g. nav, rapid, gnss
-
     rate : str
         general sample rate.
         high: use 1-Hz area in the archive
         low: use default area in the archive
-
     dec_rate : integer
          decimation value
-
     archive : str
-        choice of GNSS archive
-
+        choice of GNSS archive, of which there are many
     nol: bool
         True: assumes RINEX files are in local directory
         False (default): will look at multiple - or specific archive
-
     overwrite: bool
         False (default): if SNR file exists, SNR file not made
         True: make a new SNR file
-
     translator : str
         hybrid (default), fortran, or python
         hybrid uses fortran within he python code
-
     srate : int
         sample rate for RINEX 3 files
-
-    mk : boolean
+    mk : bool
         makan option
-
     strip : bool
         reduces observables to only SNR (too many observables, particularly in RINEX 2 files
         will break the RINEX translator)
-
     bkg : str
         location of bkg files, EUREF or IGS
-
     screenstats: bool
         whether print statements come to screen
-
     gzip: bool
         whether SNR files are gzipped after creation
-
     timeout : int
-         optional parameter I am testing out for requests timeout parameter
-         in seconds
-
+        optional parameter I am testing out for requests timeout parameter
+        in seconds
     """
     #
 

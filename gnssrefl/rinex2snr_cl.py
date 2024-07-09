@@ -76,7 +76,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
               screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
-              par : int=None, timeout : int = 0):
+              par : int=None, timeout : int = 0 ):
     """
     rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
@@ -350,6 +350,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         adding this optional parameter to let you set the timeout value, but 
         it has not been implemented everywhere.  right now just the BKG
 
+
     """
 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
@@ -357,7 +358,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
-                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
+                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis','ngs_hourly']
 
     archive_list_no_parallel = ['sopac','cddis','jeff']
 
@@ -553,7 +554,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     args = {'station': station, 'year':year, 'doy':doy, 'isnr': snr, 'orbtype': orb, 'rate': rate, 
             'dec_rate': dec, 'archive': archive, 'nol': nolook, 'overwrite': overwrite, 
             'translator': translator, 'srate': samplerate, 'mk': mk, 'stream': stream, 
-            'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'timeout' : timeout}
+            'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'timeout' : timeout }
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
 
