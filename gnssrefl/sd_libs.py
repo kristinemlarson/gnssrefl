@@ -9,6 +9,11 @@ from astropy.time import Time
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
 
+import scipy
+import scipy.interpolate as interpolate
+from scipy.interpolate import interp1d
+
+
 def mjd_to_obstimes(mjd):
     """
     takes mjd array and converts to datetime for plotting.
@@ -985,7 +990,7 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     gap_min_val : float
         minimum length gap allowed, in day of year units
     th : numpy floats
-        time values in day of year units
+        time values in MJD
     spline : output of interpolate.BSpline
         used for fitting 
     delta_out : int
@@ -996,7 +1001,7 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
         whether to write 999 in file where there are gaps
     """
 
-    print('Entering RH_ortho_plot2')
+    #print('Entering RH_ortho_plot2')
     firstpoint = float(th[0]); lastpoint = float(th[-1])
     s1 = math.floor(firstpoint); s2 = math.ceil(lastpoint)
     ndays = s2-s1 # number of days
@@ -1012,21 +1017,25 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
     tp = tp[ii]
 
     # this means it is already in MJD ???
+    #if (th[0] > 400): 
 
-    if (th[0] > 400): 
+    if True: 
+        # don't think this boolean is used anymore.  it is not
+        # truly multiyear, but more a flag that you are using MJD
         multiyear = True
         mjd_new = tp
-        print('multiyear is true, start at ', mjd_new[0])
+        #print('multiyear is true, start at ', mjd_new[0])
         mjd_new_obstimes = mjd_to_obstimes(mjd_new)
         spline_new = spline(tp)
-    else:
-        multiyear = False
-        mjd1 = g.fdoy2mjd(year, tp[0] ) # 
-        #print(year, tp[0], mjd1,np.floor(mjd1))
-        mjd_new = np.floor(mjd1) + (tp - tp[0])
-        print('multiyear is false, start at ', mjd_new[0])
-        mjd_new_obstimes = mjd_to_obstimes(mjd_new)
-        spline_new = spline(tp)
+    #else:
+    #    multiyear = False
+    #    mjd1 = g.fdoy2mjd(year, tp[0] ) # 
+    #    #print(year, tp[0], mjd1,np.floor(mjd1))
+    #    mjd_new = np.floor(mjd1) + (tp - tp[0])
+    #    print('multiyear is false, start at ', mjd_new[0])
+    #    mjd_new_obstimes = mjd_to_obstimes(mjd_new)
+    #    spline_new = spline(tp)
+
     N_new = len(mjd_new_obstimes)
 
     # looks like I identified the gaps in day of year units - 
