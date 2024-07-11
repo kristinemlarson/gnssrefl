@@ -164,7 +164,6 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     g.check_environ_variables()
     debug = screenstats
 
-
     if 'bkg' in archive:
         if (archive == 'bkg'):
             print('You have not specified which BKG archive you want.')
@@ -180,6 +179,10 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     if len(str(year)) != 4:
         print('Year must have four characters: ', year)
         sys.exit()
+
+    if (samplerate == 1):
+        # even if you forget to set it to high ...
+        rate = 'high'
 
     month, day, doy, cyyyy, cyy, cdoy = g.ymd2ch(year,month,day)
 

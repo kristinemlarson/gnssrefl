@@ -9,6 +9,14 @@ added new Wuhan (wum2) near real time orbits. Triggered from year 2024 and doy 1
 
 added hourly NGS - useful for near real time users. 
 
+I think both rinex2snr and download_rinex now make the sensible decision that
+samplerate of 1 should mean rate=high whether you have selected it or not.
+rate=high has to do with the folder name, and that varies by archive. 
+
+I attempted to fix issues in subdaily having to do with gaps at beginning/end of series,
+and also splinefits for data all on one year and multi-year.  In adding the latter, I had
+treated the two cases separately, as the spilne was done on time units of day of year.
+Now both cases are done with MJD, which is far easier and consistent.
 
 ## 3.5.9
 

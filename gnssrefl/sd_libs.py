@@ -665,13 +665,13 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_fig
     Parameters
     ----------
     th : numpy array
-        time of obs, day of year
+        time of obs, MJD
     correction : numpy array
         rhcorrections in meters
     rhdot_at_th : numpy array of floats
         spline fit for rhdot in meters
     tvel : numpy array of floats
-        time for surface velocity in days of year
+        time for surface velocity in MJD
     yvel : numpy array of floats
         surface velocity in m/hr
     fs : integer
@@ -688,14 +688,16 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_fig
     """
     mjd0 = g.fdoy2mjd(year, th[0] ) # MJD of first point
     # not being used
-    #th_obs = mjd_to_obstimes(th+mjd0)
 
 
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
-    plt.plot(th, correction,'b.')
+    th_obs = mjd_to_obstimes(th)
+
+    plt.plot(th_obs, correction,'b.')
+
     plt.ylabel('meters',fontsize=fs);
-    plt.xlim((np.min(th), np.max(th)))
+    #plt.xlim((np.min(th), np.max(th)))
     plt.grid()
     plt.title('The RH correction from RHdot effect ')
     #plt.xlim((th_obs[0], th_obs[-1])) #fig.autofmt_xdate()
@@ -708,15 +710,22 @@ def rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_fig
     A1 = np.min(th)  ; A2 = np.max(th) 
     jj = (tvel >= A1) & (tvel <= A2)
 
-    plt.plot(th, rhdot_at_th,'b.',label='at GNSS obs')
+    plt.plot(th_obs, rhdot_at_th,'b.',label='at GNSS obs')
     # disaster - did not work
     #plt.plot(tvel_obs, yvel,'c-', label='spline fit')
-    plt.plot(tvel[jj], yvel[jj],'c-', label='spline fit')
+
+    tvel_obstime = mjd_to_obstimes(tvel[jj])
+    plt.plot(tvel_obstime, yvel[jj],'c-', label='spline fit')
+    #plt.plot(tvel[jj], yvel[jj],'c-', label='spline fit')
+
     plt.legend(loc="upper left")
     plt.grid()
     plt.title('surface velocity')
-    plt.ylabel('meters/hour'); plt.xlabel('days of the year') 
-    plt.xlim((A1,A2))
+    plt.ylabel('meters/hour'); 
+    #plt.xlabel('days of the year') 
+    fig.autofmt_xdate()
+
+    #plt.xlim((A1,A2))
     #plt.xlim((th[0], th[-1])) #fig.autofmt_xdate()
 
     if hires_figs:
@@ -768,7 +777,7 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     Parameters
     ----------
     tnew : numpy of floats
-        time in days of year, including the faked data, used for splines
+        time in MJD
     ynew : numpy of floats
         RH in meters 
     spl_x : numpy of floats
@@ -780,27 +789,37 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     station : str
         name of station for title
     beginT : float
-        first time (day of year) real RH measurement
+        first measurement time (MJD) for RH measurement
     endT : float
-        last time (day of year) for first real RH measurement
+        last measurement time (MJD) for RH measurement
 
     """
     fig=plt.figure(figsize=(10,4))
-
-    plt.plot(tnew,ynew, 'b.', label='obs+fake obs')
     i = (spl_x > beginT) & (spl_x < endT) # to avoid wonky points in spline
-    plt.plot(spl_x[i],spl_y[i],'c-', label='spline')
+    #if (beginT > 380):
+    if True:
+        objtime = mjd_to_obstimes(tnew)
+        plt.plot(objtime,ynew, 'b.', label='obs+fake obs')
+        plt.plot(mjd_to_obstimes(spl_x),spl_y,'-', color='orange',label='spline all')
+        plt.plot(mjd_to_obstimes(spl_x[i]),spl_y[i],'c-', label='spline obs')
+        plt.xlabel('MJD')
+    #else:
+    #    plt.plot(tnew,ynew, 'b.', label='obs+fake obs')
+    #    plt.plot(spl_x,spl_y,'o-', label='spline for all')
+    #    plt.plot(spl_x[i],spl_y[i],'c-', label='spline for obs')
+    #    plt.xlabel('days of the year')
+
     plt.title('Mirrored obs and spline fit ')
     plt.legend(loc="upper left")
     plt.ylabel('meters')
-    if (beginT > 380):
-        plt.xlabel('MJD')
-    else:
-        plt.xlabel('days of the year')
-    plt.xlim((beginT, endT))
+    #plt.xlim((beginT, endT))
+
     plt.grid()
+    fig.autofmt_xdate()
+
     g.save_plot(txtdir + '/' + station + '_rhdot1.png')
-    plt.close()
+    # plot to the screen ... 
+    #plt.close()
 
 def quickTr(year, doy,frachours):
     """
@@ -886,16 +905,17 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
          RH residuals
     """
     # this means you are already in MJD ... 
-    if (th[0] > 400):
+    #if (th[0] > 400):
+    if True:
         th_obs = mjd_to_obstimes(th)
         th_even_obs = mjd_to_obstimes(th_even)
-    else:
-        # convert obs to mjd and then obstimes
-        mjd0 = g.fdoy2mjd(year, th[0])
-        th_obs = mjd_to_obstimes(mjd0 + th - th[0])
+    #else:
+    #    # convert obs to mjd and then obstimes
+    #    mjd0 = g.fdoy2mjd(year, th[0])
+    #    th_obs = mjd_to_obstimes(mjd0 + th - th[0])
     # convert the spline to mjd and then obstimes
-        mjd1 = g.fdoy2mjd(year, th_even[0])
-        th_even_obs = mjd_to_obstimes(mjd1 + th_even - th_even[0])
+    #    mjd1 = g.fdoy2mjd(year, th_even[0])
+    #    th_even_obs = mjd_to_obstimes(mjd1 + th_even - th_even[0])
 
 
     # these are now plotted in datetime via mjd translation
@@ -976,6 +996,7 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
         whether to write 999 in file where there are gaps
     """
 
+    print('Entering RH_ortho_plot2')
     firstpoint = float(th[0]); lastpoint = float(th[-1])
     s1 = math.floor(firstpoint); s2 = math.ceil(lastpoint)
     ndays = s2-s1 # number of days
@@ -1163,3 +1184,110 @@ def pickup_subdaily_json_defaults(xdir, station, extension):
         lsp['subdaily_subdir'] = None
 
     return lsp
+
+def flipit3(tvd,col):
+    """
+    Third version of the flipit code. It takes a time series of RH values, extracts 
+    24 hours of observations from the beginning and end of the series, uses
+    them as fake data to make the spline fit stable.  
+    Also fill the temporal gaps with fake data
+    Previous versions assumed you were going to have full days of data at the beginning
+    and end of the series.
+
+    This version uses MJD rather than day of year for x-axis
+
+    Parameters
+    ----------
+    tvd : numpy array of floats
+        output of LSP runs. 
+    col : integer
+        column number (in normal speak) of the RH results
+        in python-speak, this will have one subtracted from it
+
+    Returns
+    -------
+    tnew : numpy array of floats
+        time in MJD
+    ynew : numpy array
+        RH in meters 
+
+    """
+    nr,nc = np.shape(tvd)
+    #print(nr,nc)
+    # sort it just to make sure ...
+    #tnew = tvd[:,1] + tvd[:,4]/24
+    # use MJD
+    tnew = tvd[:,15]
+    # change from normal columns to python columns
+    ynew = tvd[:,col-1]
+
+    # these are in MJD 
+    day0= tnew[0] # first observation time
+    dayN = tnew[-1] # last observation time
+
+    # these are the times relative to time zero
+    middle = tnew-day0
+
+    # use the first day
+    ii = tnew < (day0+1)
+    leftTime = -(tnew[ii]-day0)
+    leftY = ynew[ii]
+
+    # now use the last day. no idea if this will work
+    ii = tnew > (dayN-1)
+    rightY = np.flip(ynew[ii])
+    rightTime = tnew[ii] -day0 + 1 
+
+    tmp= np.hstack((leftTime,middle)) ; 
+    th = np.hstack((tmp,rightTime))
+
+    tmp = np.hstack((leftY, ynew )) ; 
+    h = np.hstack((tmp, rightY))
+
+    # and sort it ...
+    ii = np.argsort(th)
+    th = th[ii] ; h = h[ii]
+
+    th = th + day0 # add day0 back in
+
+    # now fill the gaps ... 
+    fillgap = 1/24 # one hour fake values
+    # ???
+    gap = 5/24 # up to five hour gap allowed before warning
+
+    tnew =[] ; ynew =[]; faket = [];
+    # fill in gaps using variables called tnew and ynew
+    Ngaps = 0
+    for i in range(1,len(th)):
+        d= th[i]-th[i-1] # delta in time in units of days ?
+        if (d > gap):
+            x0 = th[i-1:i+1] ; h0 = h[i-1:i+1]
+
+            # only print out the gap information the first time thru
+            if col == 3:
+                print('Gap on MJD:', int(np.floor(x0[0])), ' lasting ', round(d*24,2), ' hours ')
+            #print(d,x0,h0)
+            Ngaps = Ngaps + 1
+            f = scipy.interpolate.interp1d(x0,h0)
+            # so this is fake data
+            ttnew = np.arange(th[i-1]+fillgap, th[i], fillgap)
+            yynew = f(ttnew)
+            faket = np.append(faket, ttnew)
+            # now append it to your real data
+            tnew = np.append(tnew,ttnew)
+            ynew = np.append(ynew,yynew)
+        else:
+            tnew = np.append(tnew,th[i])
+            ynew = np.append(ynew,h[i])
+
+
+    if (Ngaps > 3) and (col == 3):
+        print('\nThis is a beta version of the rhdot/spline fit code - and does not')
+        print('work well with gaps. You have been warned!\n')
+
+    # sort again
+    ii = np.argsort( tnew) 
+    tnew = tnew[ii]
+    ynew = ynew[ii]
+
+    return tnew, ynew

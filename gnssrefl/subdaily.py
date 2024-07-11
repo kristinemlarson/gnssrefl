@@ -393,6 +393,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     ii = (np.absolute(residuals) > sigma) # data you like
     jj = (np.absolute(residuals) < sigma) # data you do not like ;-)
 
+    # I think this is plots for section I
     if plt2screen:
 
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
@@ -892,14 +893,22 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     tvd = tvd[ii,:]
 
 
-    if multiyear : 
-        # use MJD
-        th= tvd[:,15] ; h = tvd[:,2]
-        tnew, ynew = flipit2(tvd,3)
-    else:
-        # use day of year for the spline fits
-        th= tvd[:,1] + tvd[:,4]/24; h = tvd[:,2]
-        tnew, ynew = flipit(tvd,3)
+    # originally I used day of year.  Then i used MJD for multi-year and 
+    # doy of year for dates within a year.... now i am trying to consolidate
+    # entirely as MJD
+    # use MJD
+    th= tvd[:,15] ; h = tvd[:,2]
+    tnew, ynew = sd.flipit3(tvd,3)
+
+    #else:
+    # use day of year for the spline fits
+    #th= tvd[:,1] + tvd[:,4]/24; 
+    #tnew, ynew = flipit(tvd,3)
+    #    h = tvd[:,2]
+    # try this instead of of fractional doy
+    #    th = tvd[:,15]
+    #    tnew, ynew = flipit2(tvd,3)
+
 
     # this is the edot factor - 
     # this was computed by gnssir as the mean of the tangent(eangles) over an arc,
@@ -907,7 +916,6 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # but then converted to rad/hour).  Thus this parameter has units  rad/(rad/hour) >>>> hours
     # it is multiplied by RHDot in meters/hour, which gives you a correction value in meters
     xfac = tvd[:,12]
-
 
 
     Ndays = tnew.max()-tnew.min()
@@ -939,13 +947,10 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     sd.mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,th[0],th[-1])
 
-
-
     plot_begin = np.floor(np.min(th))
     plot_end =np.ceil(np.max(th)) 
 
     obsPerHour= perday/24
-
 
     tvel = spl_x[1:N]
     yvel = obsPerHour*np.diff(spl_y)
@@ -972,25 +977,27 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     label2 = 'w RHdot ' + str(np.round(sigmaAfter,3)) + 'm'
 
     # start the figure, convert from doy to MJD to obstime
+    # not sure this is still used?
     mjd0 = g.fdoy2mjd(year,th[0])
     th_obs = sd.mjd_to_obstimes(mjd0 + th-th[0])
 
-    if multiyear :
-        th_obs = sd.mjd_to_obstimes(th)
+    #get datetime values
+    th_obs = sd.mjd_to_obstimes(th)
 
     fig=plt.figure(figsize=(10,6))
     plt.subplot(2,1,1)
     plt.plot(th_obs, h, 'b.', label=label1,markersize=4)
+
     iw = (spl_x > th[0]) & (spl_x < th[-1])
 
     # change to datetime
-    if multiyear:
-        spl_x_obs = sd.mjd_to_obstimes(spl_x[iw])
-        plt.plot(spl_x_obs, spl_y[iw], 'c--', label='spline') # otherwise wonky spline makes a goofy plot
-    else:
-        tm_mjd = g.fdoy2mjd(year, spl_x[iw][0])
-        spl_x_obs = sd.mjd_to_obstimes(tm_mjd + spl_x[iw] - spl_x[iw][0] )
-        plt.plot(spl_x_obs, spl_y[iw], 'c--', label='spline') # otherwise wonky spline makes a goofy plot
+    #if multiyear:
+    spl_x_obs = sd.mjd_to_obstimes(spl_x[iw])
+    plt.plot(spl_x_obs, spl_y[iw], 'c--', label='spline') 
+    #else:
+    #    tm_mjd = g.fdoy2mjd(year, spl_x[iw][0])
+    #    spl_x_obs = sd.mjd_to_obstimes(tm_mjd + spl_x[iw] - spl_x[iw][0] )
+    #    plt.plot(spl_x_obs, spl_y[iw], 'c--', label='spline') # otherwise wonky spline makes a goofy plot
 
     plt.plot(th_obs,correctedRH,'m.',label=label2,markersize=4)
 
@@ -1009,6 +1016,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     plt.subplot(2,1,2)
     plt.plot(th_obs, residual_after,'r.',label='all pts')
+    plt.title('RH residuals')
 
     if outlierV is None:
     # use 3 sigma
@@ -1123,14 +1131,13 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
  
     # add mirror time series at beginning and end of series for spline
-    if multiyear:
-        th = tvd_new[:,15] # use MJD now
-        column = 25 # tells the code which column to use. 
-        tnew, ynew = flipit2(tvd_new,column)
-    else:
-        th = tvd_new[:,1] + tvd_new[:,4]/24 # days of year, fractional
-        column = 25 # tells the code which column to use. 
-        tnew, ynew = flipit(tvd_new,column)
+    th = tvd_new[:,15] # use MJD now
+    column = 25 # tells the code which column to use. 
+    tnew, ynew = sd.flipit3(tvd_new,column)
+    #else:
+    #    th = tvd_new[:,1] + tvd_new[:,4]/24 # days of year, fractional
+    #    column = 25 # tells the code which column to use. 
+    #    tnew, ynew = flipit(tvd_new,column)
 
     Ndays = tnew.max()-tnew.min()
     #print('trying knots2')
@@ -1149,8 +1156,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # compute spline - use for times th
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
     #print('first and last th value - but for what exactly?')
-    #print(th[0])
-    # print(th[-1])
+
 
     # calculate spline values at GPS time tags
     spline_at_GPS = spline(th)

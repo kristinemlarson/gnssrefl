@@ -113,6 +113,7 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
 
                 if os.path.isfile(oname):
                     fileF = fileF + 1
+                    print(' >>>  and found it')
     if version == 2:
         searchpath = station + cdoy + '*.' + cyy + 'o'
         rinexname = station + cdoy + '0.' + cyy + 'o'
