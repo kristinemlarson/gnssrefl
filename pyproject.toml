@@ -1,15 +1,23 @@
 [build-system]
 
-# setup.py script requires numpy to be installed in order to configure
-# the Fortran bindings. setuptools and wheel are standard
-# dependencies, as per [1]. See [2] for discussion of why the numpy
-# build-time dependency causes a problem and how this configuration in
-# pyproject.toml solves the problem, which has been well-known in the
-# Python packaging community for quite some time.
-#
-# [1]: https://www.python.org/dev/peps/pep-0518/#build-system-table
-# [2]: https://www.python.org/dev/peps/pep-0518/#rationale
-#requires = ["setuptools", "wheel", "numpy==1.22.2"]
-requires = ["setuptools<60", "wheel", "numpy"]
+requires = ["meson-python"]
+build-backend = "mesonpy"
 
-#requires-python="<3.10"
+[project]
+name = "gnssrefl"
+version = "3.5.10"
+description = "A GNSS reflectometry software package "
+readme = "README.md"
+maintainers = [
+    { name = "Kristine Larson", email = "kristinem.larson@gmail.com" },
+]
+requires-python = ">=3.9,<4"
+classifiers = [
+    "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+
+[project.urls]
+"Documentation" = "https://gnssrefl.readthedocs.io/en/latest/"
+"Source" = "https://github.com/kristinemlarson/gnssrefl/"
+"Issue Tracker" = "https://github.com/kristinemlarson/gnssrefl/issues/"
