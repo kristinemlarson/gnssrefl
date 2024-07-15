@@ -7,7 +7,7 @@
 Updated December 10, 2022
 
 <P align=center>
-<img src=../_static/mbbc-three.png>
+<img src=../_static/mbbc-three.jpg>
 <P>
 
 **Latitude:** -11.2736 degrees

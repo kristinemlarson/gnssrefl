@@ -7317,7 +7317,11 @@ def greenland_rinex3(station,year,doy):
     """
     For now it only downloads 1 second RINEX3 files from GNET.
 
-    It requires you have a GNET password
+    It requires you have a GNET password. The first time you call this 
+    function it will ask for the username and password and it will store 
+    it locally.  
+
+    You must have installed lftp on your own. (gnssrefl will not do it for you).
 
     Parameters
     ----------
@@ -7338,6 +7342,14 @@ def greenland_rinex3(station,year,doy):
     """
     found = False
     filename = ''
+    checking = subprocess.call(['which','lftp'])
+    if (checking == 1):
+        print('I do not think you have lftp installed. gnssrefl will ')
+        print('not do this for you. Exiting.')
+        return filename, found
+               
+
+    # information for accessing GNET with appropriate filename
     archive = 'gnet'
     fdir = os.environ['REFL_CODE']
     ch = '0000_01D_01S_MO'
@@ -7347,6 +7359,7 @@ def greenland_rinex3(station,year,doy):
     cyyyy = str(year)
     serve = '@ftp.dataforsyningen.dk; cd /GNSS/RINEX3/GRL/'
 
+    # define file names
     gfilename = station.upper() + streamID + cyyyy + cdoy + ch + '.crx.gz'
     filename = station.upper() + streamID + cyyyy + cdoy + ch + '.crx'
 

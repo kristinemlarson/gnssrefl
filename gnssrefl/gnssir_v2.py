@@ -447,7 +447,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         head = g.lsp_header(station) # header
         # convert to numpy array
         allL = np.asarray(all_lsp)
-        # sort for felipe
+        # sort the results for felipe
         ii = np.argsort(allL[:,15])
         allL = allL[ii,:]
 
@@ -458,7 +458,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
         # this is really just overwriting what I had before. However, This will be sorted.
         testfile,fe = g.LSPresult_name(station,year,doy,extension)
-        print('Writing sorted LSP results to : ', testfile)
+        print('Writing sorted LSP results to : ', testfile, '\n')
         np.savetxt(testfile, allL, fmt=f, delimiter=' ', newline='\n',header=head, comments='%')
 
 def set_refraction_params(station, dmjd,lsp):

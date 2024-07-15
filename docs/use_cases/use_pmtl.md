@@ -45,7 +45,7 @@ use high-rate GNSS data.
 Note the [ellipsoidal height and geoid corrected height](https://gnss-reflections.org/geoid?station=pmtl). To pick an 
 azimuth and elevation mask, try the [reflection zone webapp](https://gnss-reflections.org/rzones) with station name pmtl, varying elevation angles, and different azimuth limits. Here is one effort:
 
-<img src="../_static/pmtl_rzone.png" width="500">
+<img src="../_static/pmtl_rzone.jpg" width="500">
 
 ### quickLook
 

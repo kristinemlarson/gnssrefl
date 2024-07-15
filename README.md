@@ -1,15 +1,19 @@
-# gnssrefl v3.5.10
+# gnssrefl v3.6.0
 
 gnssrefl is an open source software package for GNSS interferometric reflectometry (GNSS-IR). 
-
-If you use this code in any presentation or publication, you are expected to cite either 
+If you use this code in presentations or a publication, please cite either 
 this github repository or the gnssrefl DOI, which is given just below.
-
-[![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601494.svg)](http://dx.doi.org/10.5281/zenodo.5601494) 
 
+Documentation: [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
+- [online](https://gnssrefl.readthedocs.io/en/latest/)
+
+- [pdf](https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/)
+
+
+The latest pypi version can be found here [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
 ![](docs/myAnimation.gif)
 
@@ -17,15 +21,6 @@ I made this animation ages ago - so it is in Matlab.  I would be happy to host a
 a version in python.  The main code is [snr_simulation](docs/pages/snr_simulation.m) 
 and the helper function is [setFrame.m](docs/pages/set_Frame.m). 
 
-High-rate data from CDDIS that are more than six months old can now be downloaded.
-
-Documentation:
-
-- [online](https://gnssrefl.readthedocs.io/en/latest/)
-
-- [pdf](https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/)
-
-- [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
 See documentation for [gnssir_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html) for new refraction models.
 
