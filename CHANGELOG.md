@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.6.0
+Daily Lomb Scargle results are sorted in time instead of frequency.
+
+Fixed bug in rinex3_snr
+
+You can access 1-sec GNET archive data if you have an account and the utility lftp
+
+Allow snr choice to be stored in the gnssir_input json. For now you have to add it to the json by
+hand, but I am happy to accept a PR that adds it explicitly.
+
 ## 3.5.10
 
 added new Wuhan (wum2) near real time orbits. Triggered from year 2024 and doy 187

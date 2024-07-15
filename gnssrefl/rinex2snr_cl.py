@@ -356,7 +356,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
     #print('You are running ', vers)
 
-    archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
+    archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes','gnet']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis','ngs_hourly']
 
@@ -501,7 +501,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
 
     # adding spanish archive
-    highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes','bkg-igs','bkg-euref']  
+    highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes','bkg-igs','bkg-euref','gnet']  
     if ns == 9:
         # rinex3
         if rate == 'high':

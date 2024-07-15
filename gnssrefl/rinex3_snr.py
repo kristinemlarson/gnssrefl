@@ -29,6 +29,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("rinex3", help="rinex3 filename", type=str)
     parser.add_argument("-orb", help="orbit choice", default='gbm',type=str)
+    parser.add_argument("-dec", help="decimation", default=None,type=int)
     parser.add_argument("-snr", help="SNR file ending (default is 66)", default=None,type=str)
 
 
@@ -37,6 +38,11 @@ def main():
         snr = '66'
     else:
         snr = int(args.snr)
+
+    if args.dec is None:
+        dec_rate = 0; 
+    else:
+        dec_rate = args.dec
 
     rinex3 = args.rinex3
     station = rinex3[0:4].lower()
@@ -78,15 +84,17 @@ def main():
     if os.path.isfile(rinex2):
         print('found version 2 rinex')
         isnr = 66;  rate = 30; idoy = int(cdoy); iyear = int(year)
-        rate = '30'; dec_rate = 0; archive = 'unavco' ; fortran = False; translator = 'hybrid'
+        rate = '30'; 
+        archive = 'unavco' ; fortran = False; translator = 'hybrid'
         year_list = [iyear]; doy_list = [idoy]; rate = 'low';   nol = True; overwrite = False; srate = 30; mk = False; skipit = 1
         strip = False; stream = 'S'  ; bkg = 'IGS' # many of these are fake values because the file has already been translated to rinex2
         gzip = True
+        timeout = 0
         screenstats = False
         # removed fortran and skipit inputs ...  and got rid of the year and doy lists
         # 2024 may 28
         r.run_rinex2snr(station, iyear, idoy, isnr, orbtype, rate,dec_rate,archive,nol,
-                overwrite,translator,srate,mk,stream,strip,bkg,screenstats,gzip)
+                overwrite,translator,srate,mk,stream,strip,bkg,screenstats,gzip,timeout)
 
 
 if __name__ == "__main__":

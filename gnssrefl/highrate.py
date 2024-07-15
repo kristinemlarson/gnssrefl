@@ -130,12 +130,10 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
         if (dec_rate == 1):
             subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-f','-q'])
         else:
-            print('Am decimating with gfzrnx')
             s3=time.time()
             crate = str(dec_rate)
             subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-sei','out','-smp',crate,'-f','-q'])
             s4=time.time()
-            print(s4-s3, 'seconds')
 
         cm = 'rm ' + searchpath 
         if os.path.isfile(tmpname): # clean up
@@ -146,7 +144,7 @@ def cddis_highrate(station, year, month, day,stream,dec_rate):
             fexist = True
 
     s2=time.time()
-    print('That experience took ', int(s2-s1), ' seconds.')
+    print('The whole experience took ', int(s2-s1), ' seconds.')
     return rinexname,  fexist
 
 def variableArchives(station,year,doy,cyyyy,cyy, cdoy,chh,cmm):

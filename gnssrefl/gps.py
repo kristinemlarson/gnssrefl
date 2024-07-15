@@ -1990,8 +1990,8 @@ def open_outputfile(station,year,doy,extension):
     """
     opens an output file in 
     $REFL_CODE/year/results/station/extension directory
-    for lomb scargle periodogram results
-
+    for Lomb Scargle periodogram results. This really 
+    should go in a gnssir library.
 
     Parameters
     ----------
@@ -2054,6 +2054,20 @@ def open_outputfile(station,year,doy,extension):
     frej = 100
 
     return fout, frej
+
+def lsp_header(station):
+    """
+    """
+    versionNumber = 'v' + str(version('gnssrefl'))
+    tem =  ' station ' + station + ' https://github.com/kristinemlarson/gnssrefl ' + versionNumber  + '\n'
+#       put a header in the output file
+    line2= ' Phase Center corrections have NOT been applied \n'
+    line3= ' year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD   refr-model\n'
+    line4= '(1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16)   (17)\n'
+    line5= '            m        hrs    deg   v/v    deg    deg  values            hrs             min           0 is none \n'
+    all = tem + line2 + line3 + line4 + line5
+    return all
+
 
 def removeDC(dat,satNu, sat,ele, pele, azi,az1,az2,edot,seconds):
     """
@@ -3760,6 +3774,8 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
         s2=time.time()
         #print('gfzrnx rinex3 to rinex 2:', round(s2-s1,2), ' seconds')
 
+        print('remove rnx version of RINEX 3 file')
+        subprocess.call(['rm', '-f', r3_filename_new ])
 
     return fexists
 
@@ -5787,19 +5803,25 @@ def translate_dates(year,month,day):
     return doy, cdoy, cyyyy, cyy
 
 
-def bfg_password():
+def bfg_password(**kwargs):
     """
     Picks up BFG userid and password that is stored in a pickle file
     in your REFL_CODE/Files/passwords area
     If it does not exist, it asks you to input the values and stores them for you.
 
+    Allows you to send another name for your password
+
     Returns  
     -------
     userid : str
         BFG username
-    password : str 
-        BFG password
+    passpord : str 
+        password for archive 
     """
+
+    # default is bfg
+    archive = kwargs.get('archive','bfg')
+    print('Using archive ', archive)
 
     fdir = os.environ['REFL_CODE']
     if not os.path.isdir(fdir):
@@ -5812,7 +5834,9 @@ def bfg_password():
     if not os.path.isdir(fdir + '/Files/passwords'):
         subprocess.call(['mkdir',fdir + '/Files/passwords'])
 
-    userinfo_file = fdir + '/Files/passwords/' + 'bfg.pickle'
+
+    userinfo_file = fdir + '/Files/passwords/' + archive + '.pickle'
+
     #print('user information file', userinfo_file)
 
     #print('Will try to pick up BFG account information',userinfo_file)
@@ -7288,4 +7312,68 @@ def print_version_to_screen():
     """
     print('gnssrefl version:', str(version('gnssrefl')), '\n')
     return
+
+def greenland_rinex3(station,year,doy):
+    """
+    For now it only downloads 1 second RINEX3 files from GNET.
+
+    It requires you have a GNET password
+
+    Parameters
+    ----------
+    station : str
+        long station name
+    year : int
+        full year
+    doy : int
+        day of year
+
+    Returns
+    -------
+    filename : str
+        rinex3 filename
+
+    found : bool
+        whether file was found
+    """
+    found = False
+    filename = ''
+    archive = 'gnet'
+    fdir = os.environ['REFL_CODE']
+    ch = '0000_01D_01S_MO'
+    userinfo_file = fdir + '/Files/passwords/' + archive + '.pickle'
+    streamID = '_R_'
+    cdoy = '{:03d}'.format(doy)
+    cyyyy = str(year)
+    serve = '@ftp.dataforsyningen.dk; cd /GNSS/RINEX3/GRL/'
+
+    gfilename = station.upper() + streamID + cyyyy + cdoy + ch + '.crx.gz'
+    filename = station.upper() + streamID + cyyyy + cdoy + ch + '.crx'
+
+    if os.path.exists(gfilename):
+        print('File found ', gfilename)
+        subprocess.call(['gunzip', gfilename])
+        if os.path.exists(filename):
+            return filename, True
+
+    #print('Will try to pick up BFG account information',userinfo_file)
+    if os.path.exists(userinfo_file):
+        with open(userinfo_file, 'rb') as client_info:
+            login_info = pickle.load(client_info)
+            user_id = login_info[0]
+            passport = login_info[1]
+            print('Looking for ', filename)
+            cd1 = 'lftp -c "open ftps://' + user_id + ':' + passport + serve + cyyyy + '/' + cdoy + '; get ' + gfilename + '"'
+            try:
+                subprocess.call(cd1,shell=True)
+                subprocess.call(['gunzip', gfilename])
+            except:
+                print('something went wrong with access to GNET files')
+
+    if os.path.exists(filename):
+        found = True
+
+    return filename, found
+
+
 

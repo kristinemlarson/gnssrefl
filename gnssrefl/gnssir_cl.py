@@ -201,6 +201,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             g.result_directories(station,y,extension)
 
     lsp = guts2.read_json_file(station, extension)
+    if 'snr' in lsp:
+        snr = lsp['snr']
+        print('Found a snr choice in the json:', snr)
 
     # make a refraction file you will need later
     refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])

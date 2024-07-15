@@ -32,15 +32,15 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
 
     Parameters
     ----------
-    station : string
+    station : str
         4 character station name
-    year : integer
+    year : int
         full year
-    doy : integer
+    doy : int
         day of year
-    snr_type : integer
+    snr_type : int
         snr file type
-    extension : string
+    extension : str
         optional subdirectory to save results
 
     lsp : dictionary
@@ -136,6 +136,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     g.result_directories(station,year,extension) # make directories for the LSP results
 
    # this defines the minimum number of points in an arc.  This depends entirely on the sampling
+    all_lsp = []
    # rate for the receiver, so you should not assume this value is relevant to your case.
     minNumPts = 20
     p,T,irefr,humidity,Tm, lapse_rate = set_refraction_params(station, dmjd, lsp)
@@ -380,9 +381,14 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                                 if lsp['mmdd']:
                                     ctime = g.nicerTime(UTCtime); ctime2 = ctime[0:2] + ' ' + ctime[3:5]
                                     fout.write(" {0:4.0f} {1:3.0f} {2:6.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:5s} \n".format(year,doy,maxF,satNu, UTCtime, avgAzim,maxAmp,eminObs,emaxObs,Nv, f,riseSet, Edot2, maxAmp/Noise, delT, MJD,irefr,month,day,ctime2)) 
+                                    onelsp = [year,doy,maxF,satNu,UTCtime,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr,month,day,ctime2]
+
                                 else:
+                                    onelsp = [year,doy,maxF,satNu,UTCtime,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr]
                                     fout.write(" {0:4.0f} {1:3.0f} {2:6.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} \n".format(year,doy,maxF,satNu, UTCtime, avgAzim,maxAmp,eminObs,emaxObs,Nv, f,riseSet, Edot2, maxAmp/Noise, delT, MJD,irefr)) 
                                 gj +=1
+
+                                all_lsp.append(onelsp)
                                 if screenstats:
                                     T = g.nicerTime(UTCtime)
                                     logid.write('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} \n'.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
@@ -438,6 +444,22 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
             logid.close()
             print('Screen stat information printed to: ', logfilename)
 
+        head = g.lsp_header(station) # header
+        # convert to numpy array
+        allL = np.asarray(all_lsp)
+        # sort for felipe
+        ii = np.argsort(allL[:,15])
+        allL = allL[ii,:]
+
+        if lsp['mmdd']:
+            f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %1.0f %2.0f %2.0f %5s'
+        else:
+            f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %1.0f'
+
+        # this is really just overwriting what I had before. However, This will be sorted.
+        testfile,fe = g.LSPresult_name(station,year,doy,extension)
+        print('Writing sorted LSP results to : ', testfile)
+        np.savetxt(testfile, allL, fmt=f, delimiter=' ', newline='\n',header=head, comments='%')
 
 def set_refraction_params(station, dmjd,lsp):
     """
