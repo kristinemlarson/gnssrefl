@@ -3707,7 +3707,8 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     ----------
     r3_filename : str
          RINEX 3 format filename. Either Hatanaka 
-         compressed or uncompressed allowed
+         compressed or uncompressed allowed, but not if it is gzipped.
+         The file extensions are crx or rnx.
     r2_filename : str
          RINEX 2.11 file
     dec : integer
@@ -3724,58 +3725,74 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     fexists = False
     gexe = gfz_version()
     crnxpath = hatanaka_version()
-    #lastbit =  r3_filename[-6:]
-    if r3_filename[-3:] == 'crx':
+    lastbit =  r3_filename[-3:]
+    gobblygook = myfavoriteobs()
+    gobblygook_gps = myfavoritegpsobs()
+
+    if not os.path.exists(gexe):
+        print('gfzrnx executable does not exist and this file cannot be translated. Exiting')
+        sys.exit()
+    if not os.path.exists(r3_filename):
+        print('RINEX 3 inputfile does not exist', r3_filename, ' Exiting')
+        return fexists
+
+    if (lastbit == 'rnx'):
+        print('found Hatanaka decompressed version', r3_filename)
+        r3_filename_new = r3_filename
+    elif (lastbit == 'crx'):
+        print('found Hatanaka compressed version', r3_filename)
+        r3_filename_new = r3_filename[0:-3] + 'rnx'
         if not os.path.exists(crnxpath):
             print('You need to install Hatanaka translator. Exiting.')
-            sys.exit()
-        r3_filename_new = r3_filename[0:35] + 'rnx'
+            return fexists
         s1=time.time()
-        print('Converting to Hatanaka compressed to uncompressed')
         subprocess.call([crnxpath, r3_filename])
         s2=time.time()
         print(round(s2-s1,2), ' seconds')
         # removing the compressed version - will keep new version
         subprocess.call(['rm', '-f', r3_filename ])
-        # now swap name
-        r3_filename = r3_filename_new
-    gobblygook = myfavoriteobs()
-    gobblygook_gps = myfavoritegpsobs()
-    #print('decimate value: ', dec)
-    if not os.path.exists(gexe):
-        print('gfzrnx executable does not exist and this file cannot be translated')
-    else:
-        s1=time.time()
-        if os.path.isfile(r3_filename):
-            try:
-                if (dec == 1) or (dec == 0):
-                    if (gpsonly):
-                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-f','-q'])
-                    else:
-                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
-                    #'-sei','out','-smp',crate
-                else:
-                    crate = str(dec)
-                   #subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-sei','out','-smp',crate,'-f','-q'])
-
-                    if (gpsonly):
-                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-sei','out','-smp', crate, '-f','-q'])
-                    else:
-                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
-                if os.path.exists(r2_filename):
-                    #print('Look for the rinex 2.11 file here: ', r2_filename)
-                    fexists = True
-                else:
-                    sigh = 0
-            except:
-                print('some kind of problem in translation from RINEX 3 to RINEX 2.11')
+        if os.path.exists(r3_filename_new):
+            print('Hatanaka Conversion successful ', r3_filename_new)
         else:
-            print('RINEX 3 file does not exist', r3_filename)
-        s2=time.time()
-        #print('gfzrnx rinex3 to rinex 2:', round(s2-s1,2), ' seconds')
+            print('file does not exist')
+    else:
+        print('I found neither a rnx or crx RINEX 3 file and those are the only ones allowed. Exiting')
+        return fexists
 
-        print('remove rnx version of RINEX 3 file')
-        subprocess.call(['rm', '-f', r3_filename_new ])
+    #print('decimate value: ', dec)
+    s1=time.time()
+    if os.path.exists(r3_filename_new):
+        print('Now Convert from RINEX 3 to RINEX 2.11')
+        if True:
+            if (dec == 1) or (dec == 0):
+                if (gpsonly):
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-f','-q'])
+                else:
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
+                    #subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
+                    #'-sei','out','-smp',crate
+            else:
+                crate = str(dec)
+                if (gpsonly):
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-sei','out','-smp', crate, '-f','-q'])
+                else:
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
+        #except:
+        #    print('Some kind of problem in translation from RINEX 3 to RINEX 2.11')
+    else:
+        print('RINEX 3 file I need does not exist, so no translation.', r3_filename_new)
+
+    s2=time.time()
+
+    if os.path.exists(r2_filename):
+        print('RINEX 2.11 file now exists: ', r2_filename)
+        fexists = True
+    else:
+        print('RINEX 2.11 file does not exist: ', r2_filename)
+
+
+    #print('remove RINEX3 rnx version of the file ',r3_filename_new)
+    subprocess.call(['rm', '-f', r3_filename_new ])
 
     return fexists
 

@@ -3,7 +3,19 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## 3.6.0
+## 3.6.2
+
+July 17, 2024
+
+There was a bug in the RINEX3 to RINEX2 conversion code.
+This should be fixed - and the code is less silly now.  I think.
+Thanks to Drew Lindow for finding this bug.
+
+deleted gnssrefl/data/gpt_1wA.pickle. I do not think it is used.
+
+## 3.6.1 
+
+3.6.0 and 3.6.1 are about the same.  I had some issues with the version tags.
 
 July 15, 2024
 
