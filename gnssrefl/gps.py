@@ -3775,7 +3775,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
         #print('gfzrnx rinex3 to rinex 2:', round(s2-s1,2), ' seconds')
 
         print('remove rnx version of RINEX 3 file')
-        subprocess.call(['rm', '-f', r3_filename_new ])
+        subprocess.call(['rm', '-f', r3_filename])
 
     return fexists
 
