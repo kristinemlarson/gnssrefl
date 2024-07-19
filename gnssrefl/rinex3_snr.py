@@ -31,6 +31,7 @@ def main():
     parser.add_argument("-orb", help="orbit choice", default='gbm',type=str)
     parser.add_argument("-dec", help="decimation", default=None,type=int)
     parser.add_argument("-snr", help="SNR file ending (default is 66)", default=None,type=str)
+    parser.add_argument("-earthscope_fail", help="boolean(T or True), earthscope created illegal filenames", default=None,type=str)
 
 
     args = parser.parse_args()
@@ -44,12 +45,29 @@ def main():
     else:
         dec_rate = args.dec
 
-    rinex3 = args.rinex3
-    station = rinex3[0:4].lower()
-    STATION = rinex3[0:4]
-    year = rinex3[12:16]
-    cdoy = rinex3[16:19] 
-    idoy = int(cdoy)
+    if (args.earthscope_fail == 'T') or (args.earthscope_fail == 'True'):
+        # earthscope felt the need to distribute illegal RINEX files.
+        # this is an attempt to help those people impacted by this activity.
+        illegal_file = args.rinex3
+        print('Earthscope using an illegal filename for RINEX 3 data:', illegal_file)
+
+        station = illegal_file[0:4].lower()
+        STATION = illegal_file[0:4].upper() + '00ANT'
+        cdoy = illegal_file[4:7]
+        year = '20' + illegal_file[9:11]
+        idoy = int(cdoy) 
+        rinex3 = STATION + '_R_' + year + cdoy + '0000_01D_30S_MO.rnx'
+        # move the illegal file to its proper name
+        subprocess.call(['mv','-f',illegal_file,rinex3])
+
+    else:
+
+        rinex3 = args.rinex3
+        station = rinex3[0:4].lower()
+        STATION = rinex3[0:4]
+        year = rinex3[12:16]
+        cdoy = rinex3[16:19] 
+        idoy = int(cdoy)
 
     #print(station, STATION, year, cdoy)
     # all lowercase in my world
@@ -86,7 +104,8 @@ def main():
         isnr = 66;  rate = 30; idoy = int(cdoy); iyear = int(year)
         rate = '30'; 
         archive = 'unavco' ; fortran = False; translator = 'hybrid'
-        year_list = [iyear]; doy_list = [idoy]; rate = 'low';   nol = True; overwrite = False; srate = 30; mk = False; skipit = 1
+        year_list = [iyear]; doy_list = [idoy]; rate = 'low';   nol = True; 
+        overwrite = False; srate = 30; mk = False; skipit = 1
         strip = False; stream = 'S'  ; bkg = 'IGS' # many of these are fake values because the file has already been translated to rinex2
         gzip = True
         timeout = 0

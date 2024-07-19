@@ -46,6 +46,7 @@ def parse_arguments():
     parser.add_argument("-azlimits", nargs="*",type=float, help="optional azimuth angle limits for SNR file", default=None)
     parser.add_argument("-plt", help="Set to False/F if you do not want the plot to come to the screen ", type=str,default=None)
 
+    g.print_version_to_screen()
 
     args = parser.parse_args().__dict__
 

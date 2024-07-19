@@ -50,6 +50,8 @@ def parse_arguments():
     parser.add_argument("-knots2", default=None, type=int, help="Secondary knots value for final fit. default is to use original knots value.")
     parser.add_argument("-gap_flag", default=None, type=str, help="if set to True/T, write 999 to spline fit for gaps")
 
+    g.print_version_to_screen()
+
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans

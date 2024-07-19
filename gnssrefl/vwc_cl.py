@@ -39,6 +39,8 @@ def parse_arguments():
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
     parser.add_argument("-advanced", default=None, type=str, help="Whether you want to implement advanced veg model (in development)")
 
+    g.print_version_to_screen()
+
     args = parser.parse_args().__dict__
 
     boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced']

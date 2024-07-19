@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.6.3
+July 19, 2024
+
+added option in rinex3_snr to correct illegal filenames that Earthscope is distributing
+to the world. it assumes they used rinex 2.11 filename but filled it with Rinex 3 data.
+and used upper case instead of lower case.
+
+Am trying to add version number to print out to all major codes in gnssrefl.
+
 ## 3.6.2
 
 July 17, 2024

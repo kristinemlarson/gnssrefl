@@ -37,6 +37,8 @@ def parse_arguments():
     parser.add_argument("-orb", default=None, help="request specific orbit source", type=str)
     parser.add_argument("-hour", default=None, help="request hour for ultra orbit", type=int)
 
+    g.print_version_to_screen()
+
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans

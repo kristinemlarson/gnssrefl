@@ -23,7 +23,6 @@ def parse_arguments():
     parser.add_argument("doy", help="day of year", type=int)
 
     #print('gnssrefl version ', str(g.version('gnssrefl')))
-    g.print_version_to_screen()
 
     # optional inputs
     parser.add_argument("-snr", default=None, help="snr file ending, default is 66", type=int)
@@ -48,6 +47,8 @@ def parse_arguments():
     parser.add_argument("-newarcs", default=None, type=str, help="This no longer has any meaning")
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
 
+    g.print_version_to_screen()
+    print (sys.version)
 
     args = parser.parse_args().__dict__
 

@@ -54,6 +54,8 @@ def parse_arguments():
 
     args = parser.parse_args().__dict__
 
+    g.print_version_to_screen()
+
     # convert all expected boolean inputs from strings to booleans
     boolean_args = ['allfreq', 'l1', 'l2c', 'xyz', 'refraction','subdaily_alt_sigma']
     args = str2bool(args, boolean_args)
