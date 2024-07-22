@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.6.4
+
+July 22, 2024
+
+I added a final plot to subdaily. Doesn't have the spline in it.  Uses a line instead 
+of a symbol. But otherwise it isn't new information.
+
+I added a simple file for a priori lat lon and ellipsoidal height values. 
+It should be located in $REFL_CODE/llh_local.txt. and the values should simply
+be station lat lon height. NO COMMANS between then,  simply spaces.
+comment lines are allowed if preceded by percent sign. I would prefer station names to be 
+lowercase, but it allows and checks uppercase.
+This kind of file would be particularly useful for NMEA people as it allows you to 
+store your a priori receiver coordinates and don't have to worry about it being 
+overwritten if you change your analysis strategy.
+
 ## 3.6.3
 July 19, 2024
 

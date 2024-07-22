@@ -306,7 +306,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         # try to find the coordinates  at UNR
         lat, lon, height = g.queryUNR_modern(station)
         if lat == 0:
-            print('Tried to find coordinates in our station database. None found so exiting')
+            print('Tried to find coordinates in station database. None found so exiting')
             sys.exit()
 
     # calculate Hortho using EGM96 if none provided

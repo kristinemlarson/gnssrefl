@@ -27,6 +27,10 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     This is a new version that tries to picks all rising and setting arcs, not just those constrained to 90 degree
     quadrants.
 
+    It will attempt to make a refraction correction if you have a local coordinate file or 
+    a station analysis json. The format of the local coordinate file can be found in the documentation
+    for query_coordinate_file which is in the gps library.
+
     Parameters
     ----------
     station : str

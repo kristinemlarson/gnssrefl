@@ -155,12 +155,20 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
         sp3 = False
     else:
         sp3 = True
+        # check local coordinte file
+        foundcoords, lat, lon, ht = g.query_coordinate_file(station)
+        if foundcoords:
+            print(lat,lon,ht)
+            x,y,z = g.llh2xyz(lat,lon,ht)
+            recv = [x,y,z]
+        else:
         # try to get a priori coordinates, Cartesian
-        recv, foundcoords = nmea.nmea_apriori_coords(station,llh,sp3)
+            recv, foundcoords = nmea.nmea_apriori_coords(station,llh,sp3)
         if not foundcoords:
             print('The default in this code is to use precise orbits to calculate az/el values.')
             print('We need to know apriori coordinates for your site. Please input lat/lon/ellipsoidal height ')
-            print('on the command line or set those values using gnssir_input.')
+            print('on the command line or use a local coordinate file as explained in the documentation for')
+            print('query_coordinate_file. You can also store the values using gnssir_input.')
             sys.exit()
 
 

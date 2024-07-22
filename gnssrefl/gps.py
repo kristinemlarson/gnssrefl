@@ -5591,19 +5591,12 @@ def queryUNR_modern(station):
     Queries the UNR database for station coordinates that has been stored in sql. downloads 
     the sql file and stores it locally if necessary
 
-    Parameters
-    -----------
-    station : str
-        4 character station name
-    
-    Returns
-    -------
-    lat : float
-        latitude in degrees (zero if not found)
-    lon : float
-        longitude in degrees (zero if not found)
-    ht : float
-        ellipsoidal ht in meters (zzero if not found)
+    Also queries a local file if you have defined one.
+    It should be located in $REFL_CODE/input/llh_local.txt
+    four columns should be station name lat lon height
+    No commas between them and the station name should be four characters
+    Hopefully lowercase, but I will try to put in a toggle that allows uppercase
+
 
     """
     lat = 0; lon = 0; ht = 0
@@ -5616,6 +5609,11 @@ def queryUNR_modern(station):
     fdir = xdir + '/Files'
     if not os.path.isdir(fdir):
         subprocess.call(['mkdir', fdir])
+
+    # check local database file
+    foundit, lat, lon, ht = query_coordinate_file(station)
+    if foundit:
+        return lat, lon, ht 
 
     # new database locations 
     nfile00 = 'gnssrefl/station_pos_2024.db'
@@ -5656,21 +5654,30 @@ def queryUNR_modern(station):
 
     if (station == 'moss'):
         lat= -16.434464800 ;lon = 145.403622520 ; ht = 71.418
+        print('override')
     elif (station == 'mnis'):
         lat = -16.667810553; lon  = 139.170597267; ht = 60.367;  
+        print('override')
     elif (station == 'boig'):
         lat =  -9.24365375 ; lon  = 142.253961217; ht = 82.5;  
+        print('override')
     elif (station == 'glbx'):
         lat = 58.455146633; lon  = -135.888483766 ; ht = 12.559;  
+        print('override')
     elif (station == 'ugar'):
         lat = -9.50477824; lon = 143.54686680 ; ht =  81.2
+        print('override')
     elif (station == 'whla'):
         lat = -33.01640186 ; lon = 137.59157111 ; ht = 7.856
+        print('override')
     elif (station == 'kubn'):
         lat =-10.23608303 ; lon =142.21446068; ht = 78.2
+        print('override')
     elif (station == 'smm4'):
         lat =72.57369139 ; lon =-38.470709199 ; ht = 3262
+        print('override')
     elif (station == 'pchl'):
+        print('override')
         lat = 60.242562899 ; lon = -147.248979547 ; ht = 18.368
 
     if (not_in_database) and (lat == 0):
@@ -7408,4 +7415,50 @@ def greenland_rinex3(station,year,doy):
     return filename, found
 
 
+def query_coordinate_file(station):
+    """
+    Returns a priori Cartesian coordinates from a local file
+    The file is stored in $REFL_CODE/input/llh_local.txt
+    It has a simple structure. Each value is separated by spaces
+
+    station latitude longitude height
+
+    The station name is four characters and the units of the other
+    three are degrees, degrees, and meters. Height is the ellipsoidal
+    height. Comments are allowed using a percent sign.
+
+
+    Parameters
+    -----------
+    station : str
+        4 character station name. checks both upper and lower case
+    
+    Returns
+    -------
+    foundit : bool
+        whether you found the coordinates
+    lat : float
+        latitude in degrees (zero if not found)
+    lon : float
+        longitude in degrees (zero if not found)
+    ht : float
+        ellipsoidal ht in meters (zzero if not found)
+    """
+    xdir = os.environ['REFL_CODE']
+    f= xdir + '/input/llh_local.txt'
+    foundit = False
+    lat = 0; lon = 0; ht = 0;
+    if os.path.isfile(f):
+        allofit =np.loadtxt(f,usecols = (0,1,2,3), dtype='str',comments= '%')
+        nr,nc = np.shape(allofit)
+        for i in range(0,nr):
+            dbname = allofit[i,0].lower()
+            if (station.lower() == dbname):
+                print('Found in local coordinates file : ', f)
+                lat = float(allofit[i,1])
+                lon = float(allofit[i,2])
+                ht = float(allofit[i,3])
+                foundit = True
+
+    return foundit, lat, lon, ht
 
