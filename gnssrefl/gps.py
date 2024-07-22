@@ -5670,6 +5670,8 @@ def queryUNR_modern(station):
         lat =-10.23608303 ; lon =142.21446068; ht = 78.2
     elif (station == 'smm4'):
         lat =72.57369139 ; lon =-38.470709199 ; ht = 3262
+    elif (station == 'pchl'):
+        lat = 60.242562899 ; lon = -147.248979547 ; ht = 18.368
 
     if (not_in_database) and (lat == 0):
         print('Did not find station coordinates :', station)

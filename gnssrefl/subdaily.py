@@ -1208,7 +1208,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     # write outliers to a file ... again ... 
     sd.writeout_spline_outliers(new_outliers,txtdir,badpoints2,'outliers.spline2.txt')
-
+    sd.the_last_plot(tvd_new[jj,:], station, txtdir + station + '_last.png')
 
     return tvd, correction
 

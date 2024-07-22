@@ -1300,3 +1300,33 @@ def flipit3(tvd,col):
     ynew = ynew[ii]
 
     return tnew, ynew
+
+def the_last_plot(tv,station,plotname):
+    """
+    simple - reveresed - reflector height plot
+
+    Parameters
+    station : str
+        station name, four characters
+    tv : numpy array
+        output of the subdaily code
+    plotname : str
+        where the plot should be stored
+
+    """
+    fs = 10
+    obstimes = mjd_to_obstimes(tv[:,15])
+    final_rh = tv[:,24]
+    # new plot
+    fig=plt.figure(figsize=(10,4))
+    plt.plot(obstimes,final_rh, 'b-')
+    plt.title
+    plt.ylabel('meters')
+    plt.title(station.upper() + ' : GNSS-IR Reflector Height') 
+    plt.gca().invert_yaxis()
+    plt.grid()
+    fig.autofmt_xdate()
+
+    plt.savefig(plotname,dpi=300)
+    print('Plot file saved as: ', plotname)
+
