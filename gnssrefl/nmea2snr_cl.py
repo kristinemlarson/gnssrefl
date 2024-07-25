@@ -79,6 +79,10 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
     As for March 16, 2024, this code has been changed to use gnssrefl standards for inputs and outputs.
     The code, in principle, now looks for final, rapid, and ultra rapid orbits from GFZ, in that order.
 
+    As of version 3.6.4 you no longer have to enter station coordinates on the command line. 
+    You just need to follow the instructions in the file formats documentation to set up a list of the locations of 
+    your local stations. 
+
     Parameters
     ----------
     station : str

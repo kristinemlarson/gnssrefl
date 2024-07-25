@@ -22,6 +22,24 @@ we strongly encourage you to use them. And never use an elevation mask on your r
 completely unncessary for positioning (which allows masking to be done at the software level) and 
 are extremely harmful to GNSS-IR.
 
+## Where should I store station coordinates? (as of version 3.6.4)
+
+The software comes with a long list (almost 20,000) of station coordinates taken from the University 
+of Nevada Reno. If you are analyzing any of those stations, you should not have to enter
+any coordinates (use **query_unr** to see if your station is included). 
+
+If you are analyzing your own data, eventually you will need to tell the software 
+where your stations are. This location does not have to be super precise, within a few meters
+is perfectly acceptable, as it is primarily used for the refraction correction. The better your
+site coordinates, the better your reflection zone maps would be, however. Previously you 
+input this information (latitude, longitude, and ellipsoidal
+height) at the **gnssir_input** station). There is now another option. If you create a plain
+txt file iwth the name llh_local.txt and store it in the $REFL_CODE/input directory, the code will
+use this as your *a priori* station coordinates. The format of this file is station latitude longitude
+and height, with units of degrees, degrees, and meters. You can add comment lines with a percent sign.
+This file is read in the *query_coordinate_file* function in gps.py. The file is read by **nmea2snr**, so 
+that means you won't have to enter station coordinates on the command line when using **nmea2snr**.
+
 ## How do I analyze my own GNSS data?
 
 To analyze your own GNSS data you must comply with the software expectations for how the 

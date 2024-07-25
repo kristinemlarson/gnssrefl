@@ -51,7 +51,7 @@ answer should pop up in about 10 seconds. The writing in magenta are comments I 
 point out various things.
 
 <p align=center>
-<img src=../_static/vlis-default.png width=800/>
+<img src=../_static/vlis-default.jpg width=800/>
 </p>
 
 So what's going on here? (If you have never used this site before, I recommend you give a 
@@ -76,7 +76,7 @@ right answer (10 meters) and the tidal range (plus/minus two meters).
 Make sure your RINEX file is loaded and hit submit.
 
 <p align=center>
-<img src=../_static/vlis-better-choices.png width=800/>
+<img src=../_static/vlis-better-choices.jpg width=800/>
 </p>
 
 Now you can see a broad swath of "successful" retrievals in the azimuth range you chose. The RH 

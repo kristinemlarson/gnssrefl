@@ -88,17 +88,19 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     Note: you can keep using your old json files - you just need to add this new -azlist2 setting manually.
 
-    Latitude, longitude, and height are assumed to be stored in the UNR database.  If they are not, you should
-    set them manually.
+    Latitude, longitude, and height are assumed to be stored in either the UNR database we provide with
+    gnssrefl or in your local coordinate file. See the instructions in the file formats section of gnssrefl for 
+    information about the format, name, and location of that local coordinate file.  
 
     Originally we had refraction as a boolean, i.e. on or off. This was stored in the gnssir 
     analysis description json. The code however, uses a 1 for a simple non-time-varying 
     Bennett correction and 0 for no correction.
 
     From version 1.8.4 we begin to implement more refraction models.  Model 1 (Bennett) will continue to be 
-    the default.  The model number is written (as an integer) to the LSP results file so that people can keep track easily of whether
-    they are inadvertently mixing files with different strategies. And that is why it is an integer, because
-    all results in the LSP results files are numbers.  Going forward, we are adding a time-varying capability.
+    the default.  The model number is written (as an integer) to the LSP results file so that people can 
+    keep track easily of whether they are inadvertently mixing files with different strategies. And that 
+    is why it is an integer, because all results in the LSP results files are numbers.  Going forward, 
+    we are adding a time-varying capability.
 
         Model 1: Bennett, non-time-varying
 
@@ -132,7 +134,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     gnssir_input p041 -lat 39.9494 -lon -105.19426 -height 1728.85  -l2c T -e1 5 -e2 15
         uses only L2C GPS data between elevation angles of 5 and 15 degrees.
-        user input lat/long/height
+        user input lat/long/height. The lat/long/height can also be entered into a local
+        coordinate file.  See documentation in the file formats section.
 
     gnssir_input p041  -h1 0.5 -h2 10 -e1 5 -e2 25
         uses UNR database, only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
