@@ -49,7 +49,7 @@ Use our utility **quickLook** to look at these data.
 
 <code>quickLook lthw 2018 1 -e1 7</code>
 
-<img src="../_static/lthw-day1-2018.png" width="600">
+<img src="../_static/lthw-day1-2018.jpg" width="600">
 
 This is a bit of a mess really. If there are significant peaks, they are really 
 close to the cutoff for the method (at 0.5 meters). Let's compare with about a week later.
@@ -57,7 +57,7 @@ First make a SNR file:
 
 <code>rinex2snr lthw 2018 9</code>
 
-Now run quickLook:
+Now run <code>quickLook<code>:
 
 <code>quickLook lthw 2018 9 -e1 7</code>
 
@@ -119,5 +119,6 @@ overall character of the results:
 
 [Sample daily average RH file for 2018](lthw_dailyRH.txt)
 
-If you are feeling ambitious, try looking at the data for [Upper Thwaites Glacier](https://www.unavco.org/instrumentation/networks/status/nota/overview/UTHW) :-)
+If you are feeling ambitious, try looking at the 
+data for [Upper Thwaites Glacier](https://www.unavco.org/instrumentation/networks/status/nota/overview/UTHW) :-)
 

@@ -7,7 +7,7 @@
 **Updated June 4, 2023 to use gnssir_input**
 
 <p align="center">
-<img src=../_static/VLIS.jpeg width=600</img>
+<img src=../_static/vlis.jpg width=600</img>
 </P>
 
 **Station Name:** vlis  or VLIS00NLD

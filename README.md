@@ -15,6 +15,8 @@ Documentation: [![Documentation Status](https://readthedocs.org/projects/gnssref
 
 The latest pypi version can be found here [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
+You can now store coordinates for your local GNSS-IR sites. See [file formats](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html) for more information.
+
 ![](docs/myAnimation.gif)
 
 I made this animation ages ago - so it is in Matlab.  I would be happy to host a link to 

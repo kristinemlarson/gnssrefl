@@ -26,19 +26,21 @@ are extremely harmful to GNSS-IR.
 
 The software comes with a long list (almost 20,000) of station coordinates taken from the University 
 of Nevada Reno. If you are analyzing any of those stations, you should not have to enter
-any coordinates (use **query_unr** to see if your station is included). 
+any coordinates (Note: you can use **query_unr** to see if your station is included in the UNR database). 
 
 If you are analyzing your own data, eventually you will need to tell the software 
 where your stations are. This location does not have to be super precise, within a few meters
 is perfectly acceptable, as it is primarily used for the refraction correction. The better your
 site coordinates, the better your reflection zone maps would be, however. Previously you 
 input this information (latitude, longitude, and ellipsoidal
-height) at the **gnssir_input** station). There is now another option. If you create a plain
+height) when you set your analysis strategy in **gnssir_input**. There is now another option. If you create a plain
 txt file iwth the name llh_local.txt and store it in the $REFL_CODE/input directory, the code will
 use this as your *a priori* station coordinates. The format of this file is station latitude longitude
-and height, with units of degrees, degrees, and meters. You can add comment lines with a percent sign.
-This file is read in the *query_coordinate_file* function in gps.py. The file is read by **nmea2snr**, so 
-that means you won't have to enter station coordinates on the command line when using **nmea2snr**.
+and height, with units of degrees, degrees, and meters. Only spaces between these parameters - no commas.
+You can add comment lines to the file with a percent sign.
+This file is read in the *query_coordinate_file* function in gps.py. The local coordinate 
+file is read by **nmea2snr**. This means you no longer have to enter station coordinates on 
+the command line when using **nmea2snr**.
 
 ## How do I analyze my own GNSS data?
 
@@ -151,12 +153,9 @@ want to use the -rate high files and provide -samplerate 1. Why two inputs?  Bec
 -rate high option tells the code to look in a particular folder. The samplerate is related
 to the name of the file itself.  
 
-Unfortunately IGS archives have refused to change the standard storage format of 96 files per day.
-And after six months, they tar the files. This code does not currently have the capability to 
-recover those tarred files.  I am happy to host it - but someone else needs to do it. Please
-look at the existing code and make a new python function with similar inputs/outputs and submit a pull request.
-Keep in mind that you should be able to use the existing code base once you have downloaded and untarred 
-the IGS archived file.
+Recently the IGS and its sister archives have started making a single tar file of 
+the 96 daily files after six months.
+gnssrefl now allows access to these older data from CDDIS and BKG.
 
 Please see the rinex2snr documentation page for more examples.
 
@@ -183,7 +182,7 @@ Additional information about nmea2snr [is in the code.](https://gnssrefl.readthe
 
 We have tried our best to make the orbit files relatively invisible to users.
 But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
-or precise orbits in the sp3 format.  If you have nav files for your station, we recommend you delete them.
+or precise orbits in the sp3 format. If you have nav files for your station, we recommend you delete them.
 They are not useful in this code.
 
 The main things you need to know:
@@ -195,16 +194,19 @@ older data. Those files are reliably available from 2023. And they cover the fou
 My current default is rapid GNSS - but that does not always have Beidou in it. 
 
 - we also have ultra-orbit options, which are appropriate for real-time users. I cannot keep track of 
-what ultra products are working. You can try ultra, wum, and wum2. The first is from GFZ and the latter two are from Wuhan.
+what ultra products are working. You can try ultra, wum, and wum2. The first is from GFZ 
+and the latter two are from Wuhan. The second file comes from Wuhan directly while the first (I believe)
+comes from the one stored at CDDIS.
 
 ## EXECUTABLES
 
 There are two key executables: CRX2RNX and gfzrnx. For notebook and docker users, these 
 are installed for you.  pypi/github users must install them. The utility <code>installexe</code>
 should take care of this. They are stored in the directory defined by the EXE environment variable.
+We used to support the use of teqc but as Earthscope no longer provides technical support for it, 
+we have mostly eliminated it.
 
 ## Where Files are Stored
-
 
 File structure for station abcd in the year YYYY (last two characters YY), doy DDD:
 
