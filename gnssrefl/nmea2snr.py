@@ -127,11 +127,23 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                     else:
                         xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,hour)
                         if not foundit:
-                            print('Try ultrarapid orbit from noon on the previous day')
+                            print('Try ultrarapid orbit from noon on the second previous day')
                             if ((doy-1) == 1):
-                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,12)
+                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,30,12)
                             else:
                                 xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-2,0,12)
+                            if not foundit:
+                                print('Try ultrarapid orbit from 21h on the third previous day')
+                                if ((doy-2) == 1):
+                                    xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,29,21)
+                                else:
+                                    xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-3,0,21)
+                                if not foundit:
+                                    print('Could not find the ultrarapid orbits from GFZ. Trying Wuhan')
+                                    xf,orbdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
+                                if not foundit:
+                                    print('Out of luck - could not find a good orbit file for you')
+                                    return
         else:
             # the old way is to try multiple orbit sources
             if (year+doy/365.25) < gfz_date:
