@@ -823,8 +823,8 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     fig.autofmt_xdate()
 
     g.save_plot(txtdir + '/' + station + '_rhdot1.png')
-    # plot to the screen ... 
-    #plt.close()
+    # do not plot to the screen ... 
+    plt.close()
 
 def quickTr(year, doy,frachours):
     """
@@ -1328,5 +1328,7 @@ def the_last_plot(tv,station,plotname):
     fig.autofmt_xdate()
 
     plt.savefig(plotname,dpi=300)
-    print('Plot file saved as: ', plotname)
+    print('Plot file for final RH saved as: ', plotname)
+    # don't plot to the screen
+    plt.close()
 
