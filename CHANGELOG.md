@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.6.5
+
+July 29, 2024
+
+Various minor changes.
+
+Updated nmea2snr ultra orbit choices 
+
+
 ## 3.6.4
 
 July 22, 2024
