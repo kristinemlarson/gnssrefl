@@ -118,20 +118,21 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                         xf,orbdir,foundit = g.get_wuhan_orbits(year,doy-1,0,12)
 
             if orb == 'ultra':
-                # first try given doy
-                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy,0,hour=0)
+                # first try given doy (may be more complete, if available)
+                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy,0,0)
                 # now try doy before
                 if not foundit:
                     if (doy == 1):
                         xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,hour)
                     else:
                         xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,hour)
-                        if not foundit:
-                            print('Try ultrarapid orbit from noon on the previous day')
-                            if ((doy-1) == 1):
-                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,12)
-                            else:
-                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-2,0,12)
+                    # don't try noon of two previous days, as it won't cover all of current day!
+                    if not foundit:
+                        print('Could not find the ultrarapid orbits from GFZ; trying Wuhan')
+                        xf,orbdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
+                    if not foundit:
+                        print('Out of luck - could not find a good orbit file for you')
+                        return
         else:
             # the old way is to try multiple orbit sources
             if (year+doy/365.25) < gfz_date:
@@ -145,12 +146,12 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                     print('Could not find the rapid orbits from GFZ. Try ultrarapid')
                     if (year + doy/365.25) > gfz_date:
                         print('Use new GFZ directory for ultra rapid orbits with the long filenames')
-                        xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy, 0,hour=0)
+                        xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy, 0,0)
                         if not foundit:
                             if doy == 1:
-                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,hour=0)
+                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,0)
                             else:
-                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,hour=0)
+                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,0)
                     else:
                         print('use old GFZ directory structure')
                         xf,orbdir,foundit = g.ultra_gfz_orbits(year,month,day,0)
