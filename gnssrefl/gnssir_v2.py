@@ -129,9 +129,16 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     if (dec != 1):
         print('Using decimation value: ', dec)
 
+    testit = True 
+    xdir = os.environ['REFL_CODE']
+    cdoy = '{:03d}'.format(doy)
+    sdir = xdir + '/' + str(year) + '/arcs/' + station + '/' 
+    #print(sdir)
+    if testit and not os.path.isdir(sdir):
+        print('Make output directory for arcs file')
+        subprocess.call(['mkdir', '-p', sdir])
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
     dmjd, fracS = g.mjd(year,month,day,0,0,0)
-    xdir = os.environ['REFL_CODE']
     ann = g.make_nav_dirs(year) # make sure directories are there for orbits
     g.result_directories(station,year,extension) # make directories for the LSP results
 
@@ -347,6 +354,24 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                         e1 = arclist[a,4]; e2 = arclist[a,5]
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT= window_new(d2, f, 
                                 satNu,ncols,pele, lsp['polyV'],e1,e2,azvalues,screenstats)
+                        # need to add azimuth and print out later on
+                        # gonna do this differently
+                        if False:
+                        #if testit and (Nvv > 0):
+                            fm = '%12.7f  %12.7f'
+                            if (f == 1):
+                                newffile = sdir + 'sat_' + str(satNu) + '_L1.txt'
+                            elif (f == 2) or (f == 20):
+                                newffile = sdir + 'sat_' + str(satNu) + '_L2.txt'
+                            elif (f == 5):
+                                newffile = sdir + 'sat_' + str(satNu) + '_L5.txt'
+                            else:
+                                newffile = ''
+                            print(f, Nvv, newffile )
+                            if len(newffile) > 0:
+                                xy = np.vstack((x,y)).T
+                                np.savetxt(newffile, xy, fmt=fm, delimiter=' ', newline='\n',comments='%')
+
                         Nv = Nvv # number of points
                         UTCtime = meanTime
 

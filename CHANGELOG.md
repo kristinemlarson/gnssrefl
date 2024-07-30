@@ -9,7 +9,7 @@ July 29, 2024
 
 Various minor changes.
 
-Updated nmea2snr ultra orbit choices 
+Updated nmea2snr ultra orbit choices : first tries GFZ and then Wuhan (wum2)
 
 
 ## 3.6.4

@@ -2998,7 +2998,7 @@ def llh2xyz(lat,lon,height):
 
 def LSPresult_name(station,year,doy,extension):
     """
-    makes name for the Lomb Scargle output
+    Makes filename for the Lomb Scargle output
 
     Parameters
     ----------
