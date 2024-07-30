@@ -5,6 +5,7 @@ import numpy as np
 import os, datetime, traceback, gzip
 import subprocess
 import sys
+import tempfile
 from scipy.interpolate import interp1d
 
 import gnssrefl.gps as g
@@ -101,11 +102,10 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
     """
     # decimation
     idec = int(dec)
-    missing = True
     station = fname.lower() ; station = station[0:4]
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
     gfz_date = 2024 + 153/365.25 # when we added the new GFZ directory to gnssrefl
-    
+
     if sp3:
         if orb is not None:
             if (orb == 'wum2'):
@@ -175,28 +175,28 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         else:
             print('Translation was unsuccessful'); return
 
-
     #check whether the input file is a uncompressed or compressed     
-    if os.path.exists(locdir + fname):
-        subprocess.call(['cp', '-f',locdir + fname ,'.'])
-        t, prn, az, elv, snr, freq = read_nmea(fname)#read nmea files
-        subprocess.call(['rm',fname])
-        missing = False
+    tmpobj = tempfile.TemporaryDirectory()
+    tmpdir = tmpobj.name
+    tmpfpath = os.path.join(tmpdir,fname)
+    fpath = os.path.join(locdir,fname)
+    print('tmpfpath: ', tmpfpath)
+    print('fpath: ', fpath)
 
-    if os.path.exists(locdir + fname + '.gz') and missing:
-        subprocess.call(['cp', '-f',locdir + fname + '.gz' ,'.'])
-        subprocess.call(['gunzip', '-f', fname + '.gz'])
-        t, prn, az, elv, snr, freq = read_nmea(fname)#read nmea files
-        subprocess.call(['rm',fname])
-        missing = False
-        
-    if os.path.exists(locdir + fname + '.Z') and missing:
-        subprocess.call(['cp', '-f',locdir + fname + '.Z','.'])
-        subprocess.call(['uncompress', fname + '.Z'])
-        t, prn, az, elv, snr, freq = read_nmea(fname)#read nmea files
-        subprocess.call(['rm',fname])
-        missing = False
-        
+    if os.path.exists(fpath):
+        subprocess.call(['cp', '-f',fpath,tmpdir])
+    elif os.path.exists(fpath+'.gz'):
+        subprocess.call(['cp', '-f',fpath+'.gz',tmpdir])
+        subprocess.call(['gunzip', '-f', tmpfpath+'.gz'])
+    elif os.path.exists(fpath+'.Z'):
+        subprocess.call(['cp', '-f',fpath+'.Z',tmpdir])
+        subprocess.call(['uncompress', tmpfpath+'.Z'])
+    else:
+        print('File not found: ', fpath); return
+    t, prn, az, elv, snr, freq = read_nmea(tmpfpath) #read nmea files
+    subprocess.call(['rm',tmpfpath])
+    tmpobj.cleanup()
+    
     print('Number of t values ', len(t))
     # why is there all this going back and forth between lists and np arrays?
 
@@ -905,11 +905,6 @@ def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip,
                     nmea_translate(locdir, r, snrfile, csnr, dec, year, doy, recv, sp3, gzip,orb,hour)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
-                    if os.path.isfile(locdir + r ):
-                        # gzip the NMEA file now
-                        print('gzip the NMEA file', locdir + r)
-                        subprocess.call(['gzip', locdir + r])
-                        # otherwise it is already gzipped?
                     if gzip:
                         if not snrfile.endswith('.gz'):
                             subprocess.call(['gzip', snrfile])
