@@ -349,7 +349,7 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
     scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax1)
     colorbar.set_label('Frequency', fontsize=fs)
-    ax1.set_title('Signals',fontsize=fs)
+    ax1.set_title(station.upper() + ': Signals',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); 
     ax1.set_ylabel('RH (m)',fontsize=fs)
     plt.yticks(fontsize=fs)
@@ -435,7 +435,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     plt.plot(tv[ii,5],tv[ii,2], 'ro',markersize=4,label='outliers')
     plt.xlabel('Azimuth (degrees)')
     plt.ylabel('Reflector Height (m)')
-    plt.title('Quick Plot of RH with respect to Azimuth')
+    plt.title(station.upper() + ': Quick Plot of RH with respect to Azimuth')
     plt.gca().invert_yaxis()
     plt.legend(loc="best")
     plt.grid()

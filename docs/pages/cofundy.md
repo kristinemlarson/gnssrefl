@@ -1,17 +1,19 @@
-## COFUNDY 
+## GOFUNDY 
 
-COsortium to measure tides in the Bay of FUNDY
+GPS Observations at the bay of FUNDY
 
 
-- Ask New Brunswick-Richard Langley-to help? Or Fundy Force?
+- Ask Thalia or Richard Langley-to help? Or Fundy Force? 
 
-- David Purnell for a couple of instruments?
+- Felipe or D. Purnell for a couple of instruments?
 
 - Simon and Kristine - analysis 
 
-- Collect one day's data to make sure it will work.
+- Collect one day's data to make sure it will work. Then for a couple months?
 
-- Have Richard R or Duncan tell us potential tidal ranges?
+- Richard R
+
+- Duncan on the history?
 
 
 ## Possible Sites
@@ -29,3 +31,5 @@ COsortium to measure tides in the Bay of FUNDY
 <img src=../_static/Tides-fundy.jpg>
 
 [some more info](https://fundydiscovery.ca/tides-tidal-bores/)
+
+https://www.noaa.gov/ocean/fundy-max
