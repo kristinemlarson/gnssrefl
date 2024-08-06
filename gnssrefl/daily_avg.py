@@ -333,6 +333,10 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
 
     s2 = time.time()
     #print(s2-s1, ' seconds')
+    if len(tv_median_list) == 0 :
+        print('No results fit your inputs. Exiting.'); sys.exit()
+    if len(tv_list) == 0 :
+        print('No results fit your inputs. Exiting.'); sys.exit()
     tv = np.asarray(tv_list)
     tv_median = np.asarray(tv_median_list)
 

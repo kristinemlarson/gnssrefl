@@ -17,7 +17,7 @@ import gnssrefl.gps as g
 import gnssrefl.read_snr_files as snr
 import gnssrefl.refraction as refr
 
-def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
+def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     """
 
     Computes lomb scargle periodograms for a given station, year, day of year etc.
@@ -73,8 +73,12 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
         apriori_rh : float
             a priori reflector height, used in NITE, meters
         
+    debug : bool
+        debugging value to help track down bugs
+
     """
 
+    print('debug', debug)
     #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
@@ -129,14 +133,19 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
     if (dec != 1):
         print('Using decimation value: ', dec)
 
-    testit = True 
+    if 'savearcs' in lsp:
+        testit = lsp['savearcs']
+    else:
+        testit = False
+
     xdir = os.environ['REFL_CODE']
     cdoy = '{:03d}'.format(doy)
-    sdir = xdir + '/' + str(year) + '/arcs/' + station + '/' 
-    #print(sdir)
-    if testit and not os.path.isdir(sdir):
-        print('Make output directory for arcs file')
-        subprocess.call(['mkdir', '-p', sdir])
+    sdir = xdir + '/' + str(year) + '/arcs/' + station + '/' + cdoy + '/'
+    if testit:
+        print('Writing individual arcs (elevation angle, SNR) to ', sdir)
+        if not os.path.isdir(sdir):
+            print('Make output directory for arcs file')
+            subprocess.call(['mkdir', '-p', sdir])
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
     dmjd, fracS = g.mjd(year,month,day,0,0,0)
     ann = g.make_nav_dirs(year) # make sure directories are there for orbits
@@ -354,21 +363,13 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp):
                         e1 = arclist[a,4]; e2 = arclist[a,5]
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT= window_new(d2, f, 
                                 satNu,ncols,pele, lsp['polyV'],e1,e2,azvalues,screenstats)
-                        # need to add azimuth and print out later on
-                        # gonna do this differently
-                        if False:
-                        #if testit and (Nvv > 0):
+                        #if False:
+                        if testit and (Nvv > 0):
                             fm = '%12.7f  %12.7f'
-                            if (f == 1):
-                                newffile = sdir + 'sat_' + str(satNu) + '_L1.txt'
-                            elif (f == 2) or (f == 20):
-                                newffile = sdir + 'sat_' + str(satNu) + '_L2.txt'
-                            elif (f == 5):
-                                newffile = sdir + 'sat_' + str(satNu) + '_L5.txt'
-                            else:
-                                newffile = ''
-                            print(f, Nvv, newffile )
-                            if len(newffile) > 0:
+                            newffile = arc_name(sdir,satNu,f,a,avgAzim)
+                            if (len(newffile) > 0) and (delT !=0):
+                                #print(f, satNu, a, newffile )
+                                #print('Num points delT', Nvv,delT,avgAzim)
                                 xy = np.vstack((x,y)).T
                                 np.savetxt(newffile, xy, fmt=fm, delimiter=' ', newline='\n',comments='%')
 
@@ -1409,3 +1410,60 @@ def open_gnssir_logfile(station,year,doy,extension):
     fileid.write('gnssrefl version {0:s} \n'.format(v))
 
     return fileid, filename
+
+def arc_name(sdir,satNu,f,arcnum,avgAzim):
+    """
+    creates filename for SNR arc output
+
+    Parameters
+    ----------
+    sdir: str
+        output directory
+    satNu : int
+        satellite number
+    f : int
+        frequency
+    arcnum : int
+        arc number
+    avgAzim: float
+        average azimuth, degrees
+
+    Returns
+    -------
+    newffile : str
+        filename of outputs
+    """
+    # 
+    cazim = '_az' + '{:03d}'.format(round(avgAzim))
+    #cazim = '_az' + '{:03d}'.format(int(np.rint(avgAzim)))
+    csat = '{:03d}'.format(satNu)
+    cf = ''
+    # must have a function that does this ... but in the meantime
+    if (f < 100):
+        constell = 'G'
+        fout = f
+    elif (f > 100) & (f < 200):
+        constell = 'R'
+        fout = f - 100
+    elif (f > 200) & (f < 300):
+        fout = f - 200
+        constell = 'E'
+    else: 
+        fout = f - 300
+        constell = 'C'
+
+    # take care of L2C special frequency
+    if (f == 20):
+        cf = '_L2_'          
+    # otherwise
+    else:
+        cf = '_L' + str(fout)  + '_'
+
+    cf = cf + constell  + cazim
+
+    if len(cf) > 0:
+        newffile = sdir + 'sat' + csat + cf + '.txt'
+    else:
+        newffile = ''
+
+    return newffile

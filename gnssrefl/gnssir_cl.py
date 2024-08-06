@@ -44,8 +44,9 @@ def parse_arguments():
     parser.add_argument("-e2", default=None, type=float, help="max elev angle (deg)")
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
-    parser.add_argument("-newarcs", default=None, type=str, help="This no longer has any meaning")
+    parser.add_argument("-savearcs", default=None, type=str, help="This is not ready for use")
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
+    parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
 
     g.print_version_to_screen()
     print (sys.version)
@@ -53,7 +54,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd','gzip','newarcs']
+    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd','gzip','savearcs','debug']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -64,7 +65,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
-           mmdd: bool = False, gzip: bool = True, dec : int = 1, newarcs : bool = True, par : int = None ):
+           mmdd: bool = False, gzip: bool = True, dec : int = 1, savearcs : bool = False, par : int = None, debug : bool=False ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
@@ -84,7 +85,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     gnssir p041 2021 15  -plt T
         plots of SNR data and periodograms come to the screen. Each frequency gets its own plot.
     gnssir p041 2021 15  -screenstats T
-        sends debugging information to the screen
+        sends more information to the screen
     gnssir p041 2021 15  -nooverwrite T 
         only runs gnssir if there isn't a previous solution
     gnssir p041 2021 15  -extension strategy1
@@ -176,10 +177,13 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     dec : int, optional
         decimate SNR file to this sampling period before the 
         periodograms are computed. 1 sec is default (i.e. no decimating)
-    newarcs : bool, optional
+    savearcs : bool, optional
         this input no longer has any meaning 
     par : int, optional
         number of parallel processing jobs. 
+    debug : bool, optional
+        remove the primary call from try/except so that you have a better idea of why the code
+        might be crashing. No parallel processing in this mode
 
     """
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
@@ -303,6 +307,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     lsp['mmdd'] = add_mmddhhss
     # added 2022apr15
     lsp['gzip'] = gzip
+    # added 2024aug01
+    lsp['savearcs'] = savearcs
 
     # if refraction model is not assigned, set it to 1
     if 'refr_model' not in lsp.keys():
@@ -324,7 +330,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             wget.download(url, picklefile)
             subprocess.call(['mv', '-f', picklefile, xdir + '/input/'])
 
-    args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp}
+    # added debug aug 3/2024
+    args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp, 'debug': debug}
 
     print(lsp['pele'], ' direct signal elevation angle limits')
     #print(lsp['e1'], lsp['e2'], ' min and max elevation angles')
@@ -431,17 +438,22 @@ def process_year(year, year_end, doy, doy_end, args, error_queue):
         arguments passed into gnssir through commandline (or python)
 
     """
-    # an infinitely better way
+    debug = args['debug']
+
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
     for modjul in range(MJD1, MJD2+1):
         y, d = g.modjul_to_ydoy(modjul)
         args['year'] = y
         args['doy'] = d
-        try:
+        if debug:
+            # let's you more easily see why the code is crashing
             guts2.gnssir_guts_v2(**args)
-        except:
-            warnings.warn(f'error processing {y} {d}');                
+        else:
+            try:
+                guts2.gnssir_guts_v2(**args)
+            except:
+                warnings.warn(f'error processing {y} {d}');                
 
     # where should i put the error queue statement?
     return
