@@ -1195,7 +1195,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # pick up the orthometric height from the gnssir_analysis json
     H0 = sd.find_ortho_height(station,extension)
     # this writes out spline file and makes plot .... 
-    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj],biasCor_rh[jj],gap_min_val,th,spline,delta_out,writecsv,gap_flag)
+    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj], 
+                      biasCor_rh[jj],gap_min_val,th,spline,delta_out,writecsv,gap_flag,hires_figs,knots2_per_day)
     print('\nRMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
 
 

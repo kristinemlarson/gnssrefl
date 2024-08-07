@@ -964,12 +964,14 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
 
     return badpoints2
 
-def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,spline,delta_out,csvfile,gap_flag):
+def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, 
+                   gap_min_val,th,spline,delta_out,csvfile,gap_flag,hires_figs,knots):
     """
 
-    Makes a plot of the final spline fit to the data. Output time interval controlled by the user.
+    Makes a plot of the final spline fit to the data. Output time 
+    interval controlled by the user.
 
-    It also now writes out the file with the spline fit
+    It writes out the file with the spline fit. Location is printed to the screen
 
     Parameters
     ----------
@@ -999,6 +1001,8 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
         print out csv instead of plain txt
     gap_flag : bool
         whether to write 999 in file where there are gaps
+    knots : int
+        number of knots per day used in final spline
     """
 
     #print('Entering RH_ortho_plot2')
@@ -1127,14 +1131,18 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
 
     fout.close()
 
+    # plot of the final spline
     fig=plt.figure(figsize=(10,5))
     plt.plot(mjd_new_obstimes, H0 -spline_new, 'b-',linewidth=2)
     plt.grid()
     plt.ylabel('meters',fontsize=fs)
-    plt.title(station.upper() + ' Water Level from GNSS-IR', fontsize=fs)
+    plt.title(station.upper() + ' Water Level from GNSS-IR using splinefit/' + str(knots) + ' knots', fontsize=fs)
     fig.autofmt_xdate()
 
-    pfile = txtdir + '/' + station + '_H0.png'
+    if hires_figs:
+        pfile = txtdir + '/' + station + '_H0.eps'
+    else:
+        pfile = txtdir + '/' + station + '_H0.png'
     g.save_plot(pfile)
 
     return
@@ -1303,9 +1311,13 @@ def flipit3(tvd,col):
 
 def the_last_plot(tv,station,plotname):
     """
-    simple - reveresed - reflector height plot
+    simple - reversed - reflector height plot - created after all
+    corrections are made (RHdot and Interfrequency)
+
+    Location of the png plot is printed to the screen
 
     Parameters
+    ----------
     station : str
         station name, four characters
     tv : numpy array
