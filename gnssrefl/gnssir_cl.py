@@ -44,7 +44,7 @@ def parse_arguments():
     parser.add_argument("-e2", default=None, type=float, help="max elev angle (deg)")
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
-    parser.add_argument("-savearcs", default=None, type=str, help="This is not ready for use")
+    parser.add_argument("-savearcs", default=None, type=str, help="boolean, attempts to save individual arcs in text files. It is experimental.")
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
     parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
 
@@ -453,6 +453,9 @@ def process_year(year, year_end, doy, doy_end, args, error_queue):
             try:
                 guts2.gnssir_guts_v2(**args)
             except:
+                print('***********************************************************************')
+                print('Try using -debug T to get better information about why the code crashed.')
+                print('***********************************************************************')
                 warnings.warn(f'error processing {y} {d}');                
 
     # where should i put the error queue statement?
@@ -491,6 +494,9 @@ def process_year_dictionary(index,args,datelist,error_queue):
 
             guts2.gnssir_guts_v2(**args)
     except Exception as e:
+        print('***********************************************************************')
+        print('Try using -debug T to get better information about why the code crashed.')
+        print('***********************************************************************')
         error_queue.put(e)
 
 

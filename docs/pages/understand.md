@@ -362,6 +362,41 @@ are supposed to have chosen a strategy, which is stored in the json file.
 <code>quickLook -screenstats True</code> provides more information to the screen 
 about why arcs have been rejected.
 
+## Looking at raw SNR data
+
+This code was not developed with an emphasis on *looking* at raw SNR data. But, I can
+offer a workaround. You can use <code>quickplt</code>.  This works on SNR files - so you 
+do have to at least translate either RINEX or NMEA data first.  Because I find it annoying
+to have to provide the full path and gunzip files, it will add that path and gunzip for you if 
+necessary.  I'll just give one example.  
+
+Assume you have a SNR file. I will use <code>rinex2snr p041 2024 1 -archive sopac</code>. It creates
+
+SNR file p0410010.24.snr66 which is stored in $REFL_CODE/2024/snr/p041
+From the [file formats discussion](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html) you 
+should know that column 2 is elevation angle, azimuth is column 3, time is column 4, and L1 SNR is in column 7.
+If i wanted to plot the raw SNR GPS L1 data for this file:
+
+<code>quickplt p0410010.24.snr66 4 7 -sat gps</code>
+
+The -sat option tells quickplot you are working with a SNR file.
+
+<img src=../_static/raw_1.png>
+
+<code>quickplt p0410010.24.snr66 2 7 -sat gps</code> would show azimuth on the x-axis
+
+<img src=../_static/raw_2.png>
+
+You can also ask for glonass, galileo, beidou etc.  You can change symbols, restrict x-axis, etc  
+with <code>quickplt</code>. Check the [documentation](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.quickplt.html) for more detail.
+
+You can also specify a single satellite if you want (make sure you add 100 for Glonass, etc).
+
+If you want to look at the SNR data after the direct signal has been removed, you 
+can use <code>gnssir -savearcs T </code>
+which has a beta version that prints plain text files for each arc.
+However, this is beta - I am unlikely to fix bugs in it. Please submit a PR if you find bugs.
+
 ## gnssir
 
 **gnssir_input**
@@ -443,4 +478,4 @@ information, see the <code>subdaily</code> code.
 
 Kristine M. Larson
 
-January 11, 2024
+August 8, 2024

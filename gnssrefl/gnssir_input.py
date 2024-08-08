@@ -36,7 +36,7 @@ def parse_arguments():
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument("-frlist", nargs="*",type=int,  help="User defined frequencies using our nomenclature, e.g. 1 101 for GPS and Glonass L1")
     parser.add_argument("-azlist2", nargs="*",type=float,  default=None,help="list of azimuth regions, default is 0-360") 
-    parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles, advanced users only!") 
+    parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angle pairs, advanced users only!") 
     parser.add_argument("-refr_model", default="1", type=str, help="refraction model. default is 1, zero turns it off)")
     parser.add_argument("-apriori_rh", default=None, type=float, help="apriori reflector height (m) used by NITE model")
     parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height (m)")
@@ -150,6 +150,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         do two arcs, one for 5-10 degrees and the other for 7-12.
         WARNING: you need to pay attention to QC metrics (amplitude and peak2noise).  You likely need to lower them since 
         your periodogram for fewer data will be less robust than with the longer elevation angle region.
+        WARNING: these are pairs.  Don't give the code an odd number of values.
 
     Parameters
     ----------
@@ -462,6 +463,12 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     # this really should be set to True.  the code is obviously ignoring it
     lsp['gzip'] = False   
 
+    # for people that don't know how to input pairs of angles
+    if ( (len(ellist) % 2) != 0):
+        print('You input an illegal list of elevation angles. There must be an even number of elevation angle values.')
+        print('Exiting.')
+        sys.exit()
+
     lsp['ellist'] = ellist
 
     if refr_model[0] == '-':
@@ -480,7 +487,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         elif refr_model.upper() == 'MPF':
             refr_model = 6
         else:
-            print('Your refraction model ', refr_model, ' is not recognized by the code. Exiting')
+            print('Your refraction model ', refr_model, ' is illegal. Please use a model supported by gnssrefl. Exiting')
+            sys.exit()
 
     lsp['refr_model'] = refr_model
     print('refraction model ', refr_model)

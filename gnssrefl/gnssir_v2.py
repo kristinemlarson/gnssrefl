@@ -78,7 +78,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
 
     """
 
-    print('debug', debug)
+    #print('debug', debug)
     #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
@@ -470,22 +470,23 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             logid.close()
             print('Screen stat information printed to: ', logfilename)
 
-        head = g.lsp_header(station) # header
         # convert to numpy array
         allL = np.asarray(all_lsp)
+        if len(allL) > 0:
+            head = g.lsp_header(station) # header
         # sort the results for felipe
-        ii = np.argsort(allL[:,15])
-        allL = allL[ii,:]
+            ii = np.argsort(allL[:,15])
+            allL = allL[ii,:]
 
-        if lsp['mmdd']:
-            f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %1.0f %2.0f %2.0f %5s'
-        else:
-            f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %1.0f'
+            if lsp['mmdd']:
+                f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %1.0f %2.0f %2.0f %5s'
+            else:
+                f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %1.0f'
 
         # this is really just overwriting what I had before. However, This will be sorted.
-        testfile,fe = g.LSPresult_name(station,year,doy,extension)
-        print('Writing sorted LSP results to : ', testfile, '\n')
-        np.savetxt(testfile, allL, fmt=f, delimiter=' ', newline='\n',header=head, comments='%')
+            testfile,fe = g.LSPresult_name(station,year,doy,extension)
+            print('Writing sorted LSP results to : ', testfile, '\n')
+            np.savetxt(testfile, allL, fmt=f, delimiter=' ', newline='\n',header=head, comments='%')
 
 def set_refraction_params(station, dmjd,lsp):
     """

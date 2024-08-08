@@ -82,7 +82,7 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
     The latter is short for elevation angle. To pick this option set -sat to a specific satellite
     nubmer or a constellation (gps, glonass, etc). You can also set elimits and azlimits for simple
     elevation angle and azimuth angle limits. Only for SNR files, you can send the name of the SNR file
-    without the directory, i.e. sc021500.22.snr66 instead of /Users/Files/2022/snr/sc02/sc021500.22.snr66
+    without the directory, i.e. sc021500.22.snr66 instead of REFL_CODE/2022/snr/sc02/sc021500.22.snr66
 
     You may submit a filename that has been gzipped. The code will checked to see if the gzip version
     is there and gunzip it for you.

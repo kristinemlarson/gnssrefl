@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.6.6
+
+added debug option to remove the try in gnssir_cl.py - because that makes it really hard to debug things.
+
+optional savearcs option to gnssir: writeout plain text files of elevation angle and detrended snr 
+using savearcs option. This is bare bones ... not really ready for prime time
+
+fixed bug in daily_avt for people that try to analyze sites with no results. it now  
+politely exits for this case.
+
+
+added peak 2 noise to subdaily summary plot
+
+added gnssir output that tells you to use the (new) debug option in error situations.
+
+exits when people try to use illegal refraction models in gnssir_input
+
+added warning for people that don't input legal elevation angle lists to gnssir_input
+
+added documentation for quickplt so people can look at raw SNR data.
+
+
 ## 3.6.5
 
 July 29, 2024
@@ -11,6 +33,8 @@ Various minor changes.
 
 Updated nmea2snr ultra orbit choices : first tries GFZ and then Wuhan (wum2)
 
+Felipe Nievinski improved how the NMEA files are accessed in nmea2snr.
+Uses a temporary file location which is deleted after use.
 
 ## 3.6.4
 

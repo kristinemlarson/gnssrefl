@@ -310,6 +310,8 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
     This actually makes three stacked plots - not two, LOL
     It gives an overview for quality control
 
+    Wait wait, you want four plots?  
+
     Parameters
     ----------
     otimes : numpy array of datetime objects
@@ -342,7 +344,8 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
     # this is not working, so just setting it to false, cause who cares!
     setlimits = False
     fs = 12
-    fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True,figsize=(10,8))
+    fig,(ax1,ax2,ax3,ax4)=plt.subplots(4,1,sharex=True,figsize=(10,9))
+    #fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True,figsize=(10,8))
     #fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
     i = (tv[:,10] < 100)
     colors = tv[:,10]
@@ -380,8 +383,6 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
 
 # put some amplitude information on it
     colors = tv[:,6]
-    # ax.plot( otimes, tv[:,2], '.')
-    # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
     scatter = ax3.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax3)
     ax3.set_ylabel('RH (m)',fontsize=fs)
@@ -392,6 +393,20 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
     ax3.grid(True)
     if setlimits:
         ax3.set_xlim((th1, th2))
+    fig.autofmt_xdate()
+
+# put some peak 2 noise information on it
+    colors = tv[:,13]
+    scatter = ax4.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax4)
+    ax4.set_ylabel('RH (m)',fontsize=fs)
+    colorbar.set_label('p2n', fontsize=fs)
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    ax4.set_title('Peak to Noise',fontsize=fs)
+    ax4.invert_yaxis()
+    ax4.grid(True)
+    if setlimits:
+        ax4.set_xlim((th1, th2))
     fig.autofmt_xdate()
 
     plotname = txtdir + '/' + station + '_' + str(year) + '_combined.png'
