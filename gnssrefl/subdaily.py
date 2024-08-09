@@ -215,7 +215,8 @@ def write_subdaily(outfile,station,ntv,csv,extraline,**kwargs):
 def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim1,azim2,ampl,
         peak2noise,txtfile,h1,h2,kplt,txtdir,default_usage,hires_figs,fs,**kwargs):
     """
-    Reads in RH results and makes various plots to help users assess the quality of the solution
+    Reads in and concatenates RH results from previous runs of gnssir and makes various plots to help 
+    users assess the quality of the solution
 
     This is basically "section 1" of the code
 
@@ -243,6 +244,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         maximum azimuth value (degrees)
     ampl : float
         minimum LSP amplitude allowed
+        this has been changed to a list as of v 3.6.6
+        it corresponds to the frequency list
     peak2noise : float
         minim peak2noise value to set solution good
     txtfile : str
@@ -278,6 +281,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     # felipe nievinski alternate definition
     alt_sigma = kwargs.get('alt_sigma', False)
+    freqs = kwargs.get('freqs', [])
 
     # used different name here
     csv2= writecsv
@@ -323,7 +327,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         tv = np.loadtxt(txtfile,comments='%')
 
      
-    tv,t,rh,fdoy,ldoy= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2)
+    #print(tv.shape)
+    tv,t,rh,fdoy,ldoy= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs)
+    #print(tv.shape)
 
     tvoriginal = tv
     nr,nc = tvoriginal.shape
@@ -550,7 +556,7 @@ def write_out_header(fout,station,extraline,**kwargs):
 
 
 
-def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
+def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs):
     """
     cleaning up the main code. this sorts data and applies various "commandline" constraints
     tv is the full set of results from gnssrefl
@@ -563,7 +569,7 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
         min azimuth (deg)
     azim2 : float
         max azimuth (deg)
-    ampl : float
+    ampl : list of float
         required amplitude for periodogram
     peak2noise : float
         require peak2noise criterion
@@ -575,6 +581,9 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
         min reflector height (m)
     h2 : float
         max reflector height (m)
+    freqs : list of int
+        list of frequencies that correspond to minimum amplitudes
+        if empty list, then just use the one amplitude for all
 
     Returns
     -------
@@ -600,17 +609,18 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
     ii = (tv[:,2] <= h2) & (tv[:,2] >= h1)
     tv = tv[ii,:]
 
-    if ((nr-len(tv)) > 0):
-        print(nr-len(tv) , ' points removed for reflector height constraints ',h1,h2, ' (m)')
+    #if ((nr-len(tv)) > 0):
+    print(nr-len(tv) , ' points removed for reflector height constraints ')
 
     # not sure these need to be here - are they used elsewhere?
     # could be moved to apply_new_constraints
-    
+    # this is dumb - should use MJD
     t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
     rh = tv[:,2]
 
 # sort the data
     ii = np.argsort(t)
+    # is this even used?
     t = t[ii] ; rh = rh[ii]
     # store the sorted data
     tv = tv[ii,:]
@@ -621,16 +631,10 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
     tv = tv[ii,:]
     print(nr-len(tv) , ' points removed for azimuth constraints ',azim1,azim2)
 
-    # now apply amplitude constraint
-    nr,nc = tv.shape
-    ii = (tv[:,6]  >= ampl) ; tv = tv[ii,:]
-    print(nr-len(tv) , ' points removed for amplitude constraint ')
-
     # now apply peak2noise constraint
     nr,nc = tv.shape
     ii = (tv[:,13]  >= peak2noise) ; tv = tv[ii,:]
     print(nr-len(tv) , ' points removed for peak2noise constraints ')
-
 
     # silly - why read it if you are not going to use it
     # and restrict by doy - mostly to make testing go faster
@@ -638,8 +642,34 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2):
     tv = tv[ii,:]
     firstdoy = int(min(tv[:,1]))
     lastdoy =  int(max(tv[:,1]))
+    print(len(tv) , ' points remaining after doy constraints')
 
-    return tv,t,rh,firstdoy,lastdoy
+    # now apply amplitude constraint
+    NA = len(ampl)
+    NF = len(freqs)
+    # cause life is short ... 
+    if NA > NF:
+        NA = NF
+    nr,nc = tv.shape
+    # if it ain't broke
+    if NA == 1:
+        oneamplitude = float(ampl[0])
+        ii = (tv[:,6]  >= oneamplitude) ; tv = tv[ii,:]
+        print(nr-len(tv) , ' points removed for amplitude constraint ')
+        return tv,t,rh,firstdoy,lastdoy
+    else:
+        #print('when we started ', nr,nc)
+        newarray = np.empty(shape=[0,nc])
+        for ia in range(0,NA):
+            # if you gave an amplitude for which no frequency exists do not crash
+            if (ia > NF):
+                oneamplitude = 0
+            else:
+                oneamplitude = float(ampl[ia])
+            ii = (tv[:,6]  >= oneamplitude)  & (tv[:,10] == freqs[ia])
+            newarray = np.vstack((newarray, tv[ii,:]))
+            print(len(tv[ii,6]), ' points kept for freq ', freqs[ia],  ' with amplitude ', ampl[ia] )
+        return newarray,t,rh,firstdoy,lastdoy
 
 
 def flipit(tvd,col):
