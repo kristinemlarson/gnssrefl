@@ -826,7 +826,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     val = kwargs.get('txtdir',[])
 
     gap_flag = kwargs.get('gap_flag',False)
-    print('gap flag ', gap_flag)
+    #print('gap flag ', gap_flag)
 
     if len(val) == 0:
         txtdir = xdir + '/Files/'
@@ -883,8 +883,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         knots2_per_day = knots_per_day
     else:
         knots2_per_day = knots2
-
-    print('knots2 ', knots2_per_day) 
+        print('Use ', knots2_per_day, ' for second spline')
 
     knots_test = kwargs.get('knots_test',0)
     if (knots_test== 0):
