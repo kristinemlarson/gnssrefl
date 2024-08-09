@@ -24,6 +24,9 @@ added warning for people that don't input legal elevation angle lists to gnssir_
 
 added documentation for quickplt so people can look at raw SNR data.
 
+added subdaily option to allow different required amplitude values for different frequencies.
+It uses frequency list in the json to set the order of those amplitudes.  
+
 
 ## 3.6.5
 
