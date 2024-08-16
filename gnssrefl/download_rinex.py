@@ -91,41 +91,43 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         Select which archive to get the files from.
         Default is redirected to all, as defined below. Value options:
 
-            cddis : (NASA)
+            cddis : NASA
 
-            bev : (Austria Federal Office of Metrology and Surveying)
+            bev : Austria Federal Office of Metrology and Surveying
 
-            bkg-igs : igs folder of BKG (German Agency for Cartography and Geodesy)
+            bkg-igs : igs folder of BKG German Agency for Cartography and Geodesy
 
-            bkg-euref : Euref folder of BKG (German Agency for Cartography and Geodesy)
+            bkg-euref : Euref folder of BKG German Agency for Cartography and Geodesy
 
-            bfg : (German Agency for water research, only Rinex 3)
+            bfg : German Agency for water research, only Rinex 3
 
-            ga : (Geoscience Australia)
+            ga : Geoscience Australia
 
-            gfz : (GFZ)
+            gnet : Greenland Network
 
-            jp : (Japan)
+            gfz : GFZ
+
+            jp : Japan-GSI
 
             jeff : Jeff Freymueller
 
-            nrcan : (Natural Resources Canada)
+            nrcan : Natural Resources Canada
 
-            ngs : (National Geodetic Survey)
+            ngs : National Geodetic Survey
 
-            nz : (GNS, New Zealand)
+            nz : GNS, New Zealand
 
             sonel : (?)
 
-            sopac : (Scripps Orbit and Permanent Array Center)
+            sopac : Scripps Orbit and Permanent Array Center
 
-            special : (reflectometry Rinex 2.11 files maintained by unavco)
+            special : reflectometry Rinex 2.11 files maintained by unavco
 
             unavco : now earthscope
 
             ngs-hourly: NGS, hourly files will be merged if they exist
 
-            all : (searches unavco, sopac, and sonel in that order)
+            all : unavco, sopac, and sonel in that order
 
     version : int, optional
         Version of Rinex file. Default is 2.
@@ -173,8 +175,8 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             bkg = 'EUREF'
         else:
             bkg = 'IGS'
-        # change archive name back to original
-        archive = 'bkg'
+        # change archive name back to original. This is ridiculously confusing
+        archive = 'bkg' # 
 
     if len(str(year)) != 4:
         print('Year must have four characters: ', year)
@@ -189,14 +191,14 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     # allowed archives, rinex 2.11
     # not really sure bev, gfz, bkg work ???
     archive_list = ['bkg','bfg','bev','cddis', 'ga', 'gfz', 'jeff', 'ngs', 
-            'nrcan', 'nz','sonel','sopac','special', 'unavco', 'all','unavco2','ngs-hourly']
+            'nrcan', 'nz','sonel','sopac','special', 'unavco', 'all','unavco2','ngs-hourly','gnet']
 
     # removed the all archive
     # removed cddis because it is too slow
-    archive_list_high = ['bkg','unavco', 'nrcan', 'ga']  # though it is confusing because some are rinex 2.11 and others 3
+    archive_list_high = ['gnet','bkg','unavco', 'nrcan', 'ga']  # though it is confusing because some are rinex 2.11 and others 3
 
     # archive list for rinex3 lowrate files
-    archive_list_rinex3 = ['unavco', 'bkg','cddis', 'ga', 'bev', 'ign', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz']
+    archive_list_rinex3 = ['unavco', 'bkg','cddis', 'ga', 'bev', 'ign', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','gnet']
 
     if doy_end is None:
         doy_end = doy
@@ -261,6 +263,8 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     if (rate == 'high') and (version == 3):
         if (archive == 'bkg') or (archive == 'ga'):
             print('Highrate RINEX 3 is supported - but it is very slow. Pick up a cup of coffee.')
+        elif (archive == 'gnet'):
+            print('Greenland downloads are supported')
         else:
             print('I do not support RINEX 3 high rate downloads from your selected archive.')
             sys.exit()
@@ -284,6 +288,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                         rnx_filename,foundit = ch.bkg_highrate_tar(station, year, d, 0,stream,dec,bkg)
                     else:
                         rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec,bkg)
+                if archive == 'gnet':
+                    rnx_filename, foundit = g.greenland_rinex3(station,year,doy,stream=stream,samplerate=samplerate)
+
                 if archive == 'ga':
                     if debug:
                         print('seek highrate data at GA')
@@ -298,10 +305,12 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                     file_name, foundit = k.universal(station, year, d, archive, samplerate, stream,debug)
                     if not foundit:
                         file_name, foundit = k.universal(station, year, d, archive, samplerate, k.swapRS(stream),debug)
+
                 if foundit: 
                     print('\n SUCCESS 1: ', file_name)
                     deletecrx = not save_crx
-                    translated, new_file_name = r.go_from_crxgz_to_rnx(file_name,deletecrx)
+                    if True:
+                        translated, new_file_name = r.go_from_crxgz_to_rnx(file_name,deletecrx)
                     if translated:
                         # i do not think this was doing what we thought it was doing ....
                         #subprocess.call(['rm', '-f', new_file_name.replace('rnx', 'crx')])  # delete crx file

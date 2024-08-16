@@ -123,22 +123,16 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     ----------
     station9ch : str
         nine character station name
-
     year : int
         year 
-
     doy : int
         day of year
-
     archive : str
         archive name
-
     srate : int
         receiver samplerate
-
     stream : str
         one character: R or S
-
     debug : bool
         whether debugging statements printed
 
@@ -146,7 +140,6 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     -------
     file_name : str
         name of rinexfile
-
     foundit : boolean
         whether file was found
 
@@ -198,6 +191,9 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         if debug:
             print('Download took ',np.round(s2-s1,2), ' seconds') 
         return file_name,foundit
+    if archive == 'gnet':
+        foundit,file_name = g.greenland_rinex3(station9ch,year,doy,stream=stream,samplerate=srate)
+        return foundit, file_name
 
     try:
         if (archive == 'ign'):
