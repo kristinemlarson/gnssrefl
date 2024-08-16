@@ -110,6 +110,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         sys.exit()
 
     pele = lsp['pele'] ; pfitV = lsp['polyV']
+    #print(pele, pfitV)
 
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp'] 
 
@@ -884,6 +885,8 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
 
     2023-aug02 updated to improve azimuth calculation reported
 
+    2024-aug-15 imposing pele values for DC removal
+
     Parameters
     ----------
     snrD : numpy array (multiD)
@@ -930,6 +933,7 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
         arc length in minutes
 
     """
+    #print('Using polyfit ', pfitV)
     x=[]; y=[]; azi=[]; seconds = []; edot = [] ; sat = []
     Nvv= 0; meanTime = 0; avgAzim = 0 ; outFact2 = 0 ; delT = 0
     initA = 0;
@@ -978,12 +982,20 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
                 nn = (datatest > 0) ; 
                 snrD = snrD[nn,:]
 
+        # maybe here is where you could impose the pele values
+        debugging = True
+        if debugging:
+            Elen = len(snrD)
+            ijk = (snrD[:,1] > pele[0]) & (snrD[:,1] <= pele[1])
+            snrD = snrD[ijk,:]
+
         sat = snrD[:,0]
         ele = snrD[:,1]
         azm = snrD[:,2]
         seconds = snrD[:,3]
         edot = snrD[:,4] # but does not have to exist?
         data = snrD[:,icol]
+
 
         # not really good - but at least the zeros have been removed
         if good:
@@ -997,6 +1009,7 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
                 i =  (ele > e1) & (ele <= e2)
                 # arbitrary
                 Nvv = len(ele[i])
+
                 if Nvv > 15:
                     # get the index of the min elevation angle
                     ie = np.argmin(ele[i])
@@ -1009,6 +1022,8 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
                         edot = edot[i]
                         sat = sat[i] ; azm = azm[i]
                         seconds = seconds[i]
+                        if debugging:
+                            print(f, initA, Elen, len(snrD),Nvv)
                     else:
                         if screenstats:
                             print('This azimuth is not in the azimuth region', initA, '(deg)')
