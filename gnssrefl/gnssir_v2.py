@@ -362,7 +362,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                         # this is saying that these are the min and max elev angles you should be using
                         e1 = arclist[a,4]; e2 = arclist[a,5]
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT= window_new(d2, f, 
-                                satNu,ncols,pele, lsp['polyV'],e1,e2,azvalues,screenstats)
+                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats)
                         #if False:
                         if testit and (Nvv > 0):
                             fm = '%12.7f  %12.7f'
@@ -877,7 +877,7 @@ def read_snr(obsfile):
     return allGood, f, r, c
 
 
-def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
+def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats):
     """
     retrieves SNR arcs for a given satellite. returns elevation angle and 
     detrended linear SNR
