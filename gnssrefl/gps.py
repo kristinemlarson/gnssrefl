@@ -5593,10 +5593,9 @@ def queryUNR_modern(station):
 
     Also queries a local file if you have defined one.
     It should be located in $REFL_CODE/input/llh_local.txt
-    four columns should be station name lat lon height
+    four columns should be 4 character station name lat lon height
     No commas between them and the station name should be four characters
     Hopefully lowercase, but I will try to put in a toggle that allows uppercase
-
 
     """
     lat = 0; lon = 0; ht = 0
@@ -7453,7 +7452,6 @@ def query_coordinate_file(station):
     three are degrees, degrees, and meters. Height is the ellipsoidal
     height. Comments are allowed using a percent sign.
 
-
     Parameters
     -----------
     station : str
@@ -7474,17 +7472,24 @@ def query_coordinate_file(station):
     f= xdir + '/input/llh_local.txt'
     foundit = False
     lat = 0; lon = 0; ht = 0;
+    # if the local coordinate file exists
     if os.path.isfile(f):
         allofit =np.loadtxt(f,usecols = (0,1,2,3), dtype='str',comments= '%')
-        nr,nc = np.shape(allofit)
-        for i in range(0,nr):
-            dbname = allofit[i,0].lower()
-            if (station.lower() == dbname):
-                print('Found in local coordinates file : ', f)
-                lat = float(allofit[i,1])
-                lon = float(allofit[i,2])
-                ht = float(allofit[i,3])
+        nx = np.shape(allofit)
+        if len(nx) == 2:
+            nr = nx[0]; nc=nx[1]
+            for i in range(0,nr):
+                dbname = allofit[i,0].lower()
+                if (station.lower() == dbname):
+                    print('Found in local coordinates file : ', lat,lon, ht)
+                    lat = float(allofit[i,1]);lon = float(allofit[i,2])
+                    ht =  float(allofit[i,3])
+                    foundit = True
+        else: # annoying single line
+            if (allofit[0] == station.lower()):
                 foundit = True
+                lat=  float(allofit[1]) ; lon = float(allofit[2]) ; ht =  float(allofit[3])
+                print('Found in local coordinates file : ', lat,lon,ht)
 
     return foundit, lat, lon, ht
 
