@@ -281,11 +281,13 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 if screenstats:
                                     print('RINEX 2 file derived from the GA archive should now exist:', r2)
                             if archive == 'gnet':
-                                rnx_filename,foundit = g.greenland_rinex3(station9ch, year, doy )
+                                rnx_filename,foundit = g.greenland_rinex3(station9ch, year, doy,samplerate=srate,stream=stream )
                                 print(rnx_filename,foundit)
                                 if foundit: 
-                                    print('The RINEX 3 file has been downloaded and gunzipped. Try to make ', r2)
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
+                                    print('The RINEX 3 file has been downloaded. Try to make ', r2)
+                                    subprocess.call(['gunzip', rnx_filename])
+                                    # take off gz on the name
+                                    fexists = g.new_rinex3_rinex2(rnx_filename[0:-3],r2,dec_rate)
 
                             if archive == 'cddis':
                                 bad_day = g.cddis_restriction(year, doy,'cddis')
@@ -334,12 +336,10 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 if (not foundit): # try again
                                     file_name,foundit = k.universal_all(station9ch, year, doy, srate,k.swapRS(stream),screenstats)
                             else:
-                                #print('stream',stream)
                                 file_name,foundit = k.universal(station9ch, year, doy, archive,srate,stream)
                                 if (not foundit): # try again
-                                    #print('stream',stream)
                                     file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
-                            if foundit: # version 3 found - now need to gzip, then hatanaka decompress
+                            if foundit: # version 3 found - now need to gunzip, then hatanaka decompress
                                 deletecrx = True # no point keeping this around
                                 translated, rnx_filename = go_from_crxgz_to_rnx(file_name,deletecrx)
                             # now make rinex2

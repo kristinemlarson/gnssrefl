@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 import os
+import pickle
 import scipy.interpolate
 import scipy.signal
 import subprocess
@@ -29,6 +30,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     azimuth at lowest elevation angle
 
     if screenstats is True, it prints to a log file now, directory $REFL_CODE/logs/ssss
+
 
     Parameters
     ----------
@@ -72,6 +74,11 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             added 23jun16, allow multiple elevation angle regions
         apriori_rh : float
             a priori reflector height, used in NITE, meters
+        savearcs : bool
+            if true, elevation angle and detrended SNR data are saved for each arc
+            default is False
+        savearcs_format : str
+            if arcs are to be saved, will they be plain text or pickle format
         
     debug : bool
         debugging value to help track down bugs
@@ -110,11 +117,10 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         sys.exit()
 
     pele = lsp['pele'] ; pfitV = lsp['polyV']
-    #print(pele, pfitV)
 
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp'] 
 
-    # allows negatiev az value for first pair
+    # allows negative azimuth value for first pair
     azvalues = rewrite_azel(azval2)
 
     ok = g.is_it_legal(freqs)
@@ -124,6 +130,10 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
 
     plot_screen = lsp['plt_screen'] 
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
+    # testing this out - turned out not to be useful/needed
+    new_direct_signal = False
+    #lsp['newdirect']
+
     gzip = lsp['gzip']
     if 'dec' in lsp.keys():
         dec = int(lsp['dec'])
@@ -135,14 +145,20 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         print('Using decimation value: ', dec)
 
     if 'savearcs' in lsp:
-        testit = lsp['savearcs']
+        test_savearcs = lsp['savearcs']
     else:
-        testit = False
+        test_savearcs = False
+
+    # default will be plain txt
+    if 'savearcs_format' in lsp:
+        savearcs_format = lsp['savearcs_format']
+    else:
+        savearcs_format = 'txt'
 
     xdir = os.environ['REFL_CODE']
     cdoy = '{:03d}'.format(doy)
     sdir = xdir + '/' + str(year) + '/arcs/' + station + '/' + cdoy + '/'
-    if testit:
+    if test_savearcs:
         print('Writing individual arcs (elevation angle, SNR) to ', sdir)
         if not os.path.isdir(sdir):
             print('Make output directory for arcs file')
@@ -285,6 +301,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
 
         # apply an elevation mask for all the data for the polynomial fit
         i= (ele >= pele[0]) & (ele < pele[1])
+
         ele = ele[i]
         snrD = snrD[i,:]
         # why doesn't this have an i index, is it not used?
@@ -362,18 +379,20 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                         # window the data - which also removes DC 
                         # this is saying that these are the min and max elev angles you should be using
                         e1 = arclist[a,4]; e2 = arclist[a,5]
-                        x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT= window_new(d2, f, 
-                                satNu,ncols,pele, lsp['polyV'],e1,e2,azvalues,screenstats)
-                        #if False:
-                        if testit and (Nvv > 0):
-                            fm = '%12.7f  %12.7f'
-                            newffile = arc_name(sdir,satNu,f,a,avgAzim)
-                            if (len(newffile) > 0) and (delT !=0):
-                                #print(f, satNu, a, newffile )
-                                #print('Num points delT', Nvv,delT,avgAzim)
-                                xy = np.vstack((x,y)).T
-                                np.savetxt(newffile, xy, fmt=fm, delimiter=' ', newline='\n',comments='%')
+                        x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT, secxonds = window_new(d2, f, 
+                                satNu,ncols,pele, lsp['polyV'],e1,e2,azvalues,screenstats,new_direct_signal)
 
+                        #writing out arcs
+                        if test_savearcs and (Nvv > 0):
+                            docstring = 'arrays are eangles (degrees), dsnrData is SNR with/DC removed, and sec (seconds of the day),\n'
+
+                            newffile = arc_name(sdir,satNu,f,a,avgAzim)
+                            # name for the individual arc file
+                            if (len(newffile) > 0) and (delT !=0):
+                                MJD = g.getMJD(year,month,day, meanTime)
+                                file_info = [station,satNu,f,avgAzim,year,doy,meanTime,MJD,docstring]
+                                #xy = np.vstack((x,y,secxonds)).T
+                                write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
                         Nv = Nvv # number of points
                         UTCtime = meanTime
 
@@ -453,7 +472,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                 ax1.set_title(station + ' Raw Data/Periodogram for ' + g.ftitle(f) + ' Frequency')
                 ax2.set_xlabel('Reflector Height (m)');
                 ax2.set_ylabel('volts/volts') ; ax1.set_ylabel('volts/volts')
-                plotname = xdir + '/Files/' + station + '/gnssir_freq' + str(f) + '.png'
+                plotname = f'{xdir}/Files/{station}/gnssir_freq{f:03d}.png'
+                print(plotname)
                 g.save_plot(plotname)
                 plt.show()
                 #plot2screen(station, f, ax1, ax2,lsp['pltname']) 
@@ -493,6 +513,8 @@ def set_refraction_params(station, dmjd,lsp):
     """
     set values used in refraction correction
 
+    2024-aug-20, fixed the case where refraction is set to zero
+
     Parameters
     ----------
     station : str
@@ -525,6 +547,11 @@ def set_refraction_params(station, dmjd,lsp):
         lapse rate
 
     """
+    # default values in case you have set refraction to zero.
+    # which you should not do ... but 
+    p = 0; T = 0; Tm = 0; la = 0
+
+
 
     if 'refr_model' not in lsp.keys():
         # default is always to use refraction model 1
@@ -552,8 +579,10 @@ def set_refraction_params(station, dmjd,lsp):
         p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
         # e is water vapor pressure, so humidity ??
         #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
+    else:
+        irefr = 0 # ???
 
-    #print('refraction model', refraction_model,irefr)
+    print('refraction model', refraction_model,irefr)
     return p,T,irefr, e, Tm, la
 
 def apply_refraction_corr(lsp,ele,p,T):
@@ -743,8 +772,6 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats):
     for a given satellite in a SNR file
     based on using changes in elevation angle
 
-    I think this is used in quickLook but not gnssir
-
     Parameters
     ----------
     elv : numpy array  of floats
@@ -754,11 +781,11 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats):
     dates : numpy array  of floats
         seconds of the day from SNR file
     e1 : float
-        min eval
+        min elevation angle 
     e2 : float
-        max eval
+        max elevation angle
     ediff : float
-        el angle difference QC
+        el angle difference Quality control parameter
     sat : int
         satellite number
 
@@ -878,14 +905,14 @@ def read_snr(obsfile):
     return allGood, f, r, c
 
 
-def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
+def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats,new_direct_signal):
     """
     retrieves SNR arcs for a given satellite. returns elevation angle and 
     detrended linear SNR
 
     2023-aug02 updated to improve azimuth calculation reported
 
-    2024-aug-15 imposing pele values for DC removal
+    2024-aug-15 testing out imposing pele values for DC removal
 
     Parameters
     ----------
@@ -909,6 +936,9 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
         non-continguous azimuth regions, corrected for negative regions
     screenstats : bool
         whether you want debugging information
+        printed to the screen
+    new_direct_signal : bool
+        trying out new way to remove direct signal
 
     Returns
     -------
@@ -931,6 +961,8 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
         edot factor used in RH dot correction
     delT : float
         arc length in minutes
+    secxonds : numpy array of floats
+        hopefully seconds of the day
 
     """
     #print('Using polyfit ', pfitV)
@@ -983,11 +1015,17 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
                 snrD = snrD[nn,:]
 
         # maybe here is where you could impose the pele values
-        debugging = True
-        if debugging:
+        if new_direct_signal:
+
             Elen = len(snrD)
+            if True:
+                print(f, Elen, len(snrD),max(snrD[:,1]), min(snrD[:,1]))
+
             ijk = (snrD[:,1] > pele[0]) & (snrD[:,1] <= pele[1])
             snrD = snrD[ijk,:]
+            #if (Elen != len(snrD)):
+            if True:
+                print(f, Elen, len(snrD),max(snrD[:,1]), min(snrD[:,1]),pele )
 
         sat = snrD[:,0]
         ele = snrD[:,1]
@@ -1022,7 +1060,7 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
                         edot = edot[i]
                         sat = sat[i] ; azm = azm[i]
                         seconds = seconds[i]
-                        if debugging:
+                        if False:
                             print(f, initA, Elen, len(snrD),Nvv)
                     else:
                         if screenstats:
@@ -1065,7 +1103,8 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats):
     # I think you can return the initA instead of avgAzim here
     #    return x,y, Nvv, cf, meanTime,avgAzim,outFact1, outFact2, delT
     #print('new ', initA, ' old ', avgAzim)
-    return x,y, Nvv, cf, meanTime,initA, outFact1, outFact2, delT
+    # try reutrning seconds
+    return x,y, Nvv, cf, meanTime,initA, outFact1, outFact2, delT, seconds
 
 
 def find_mgnss_satlist(f,year,doy):
@@ -1483,3 +1522,39 @@ def arc_name(sdir,satNu,f,arcnum,avgAzim):
         newffile = ''
 
     return newffile
+
+def write_out_arcs(newffile,eangles,dsnrData,sec,file_info,savearcs_format):
+    """
+
+    Parameters
+    ----------
+    newffile : str
+        name of the output file
+    eangles : numpy array of floats
+        elevation angles in degrees
+    dsnrData : numpy array of floats
+        SNR data, with DC removed
+    sec : numpy array of floats
+        seconds of the day (UTC, though really GPS time)
+    file_info: list
+        satNu, f, avgAzim, year,doy,meanTime, MJD, docstring
+    savearcs_format : str
+        whether file is txt or pickle
+
+    """
+    headerline = ' elev-angle (deg), dSNR (volts/volts), sec of day'
+    [station,satNu,f,avgAzim,year,doy,meanTime,MJD,docstring] = file_info
+    fm = '%12.7f  %12.7f  %10.0f'
+    xyz = np.vstack((eangles,dsnrData,sec)).T
+    if savearcs_format == 'txt':
+        np.savetxt(newffile, xyz, fmt=fm, delimiter=' ', newline='\n',comments='%',header=headerline)
+    else:
+        pname = newffile[:-4] + '.pickle'
+        fff = open(pname, 'wb')
+        pickle.dump([station,eangles,dsnrData,sec,satNu,f,avgAzim,year,doy,meanTime,MJD,docstring], fff)
+        fff.close()
+
+#   doc1 = 'arrays are eangles (degrees), dsnrData is SNR with/DC removed, and sec (seconds of the day),\n'
+#   doc2 = 'avgAzim is arc azimuth in degrees , doy is day of year,\n'
+#   doc3 = 'f is frequency, meanTime is avg hours in UTC for the arc.'
+#   docstring = doc1+doc2+doc3

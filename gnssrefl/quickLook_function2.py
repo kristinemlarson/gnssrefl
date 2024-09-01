@@ -227,9 +227,10 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                     for arc in range(0,nr):
                         sind = int(arclist[arc,0]) ; eind = int(arclist[arc,1])
                         d2 = np.array(thissat[sind:eind, :], dtype=float)
-                    # window the data - which also removes DC
+                    # window the data - which also removes DC, for now use old version 
+                        new_direct_signal = False
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT= gnssir_v2.window_new(d2, f,
-                                satNu,ncols,pele, polyV,e1,e2,azvalues,screenstats)
+                                satNu,ncols,pele, polyV,e1,e2,azvalues,screenstats,new_direct_signal)
                         Nv = Nvv # number of points
                         UTCtime = meanTime
                     # for this arc, which a value is it?

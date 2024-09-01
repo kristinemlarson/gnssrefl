@@ -238,7 +238,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             rapid : GFZ rapid, multi-GNSS
 
-            ultra: GFZ ultra-rapid, multi-GNSS
+            ultra: first tries GFZ ultra-rapid then Wuhan, multi-GNSS
 
     rate : str, optional
         The data rate. Rather than numerical value, this tells the code which folder to use

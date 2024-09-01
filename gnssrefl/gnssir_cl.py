@@ -44,12 +44,13 @@ def parse_arguments():
     parser.add_argument("-e2", default=None, type=float, help="max elev angle (deg)")
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
-    parser.add_argument("-savearcs", default=None, type=str, help="boolean, attempts to save individual arcs in text files. It is experimental.")
+    parser.add_argument("-savearcs", default=None, type=str, help="boolean, save individual arcs. default is false.")
+    parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs, txt or pickle")
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
     parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
 
     g.print_version_to_screen()
-    print (sys.version)
+    #print (sys.version)
 
     args = parser.parse_args().__dict__
 
@@ -65,19 +66,30 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
-           mmdd: bool = False, gzip: bool = True, dec : int = 1, savearcs : bool = False, par : int = None, debug : bool=False ):
+           mmdd: bool = False, gzip: bool = True, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt', 
+           par : int = None, debug : bool=False  ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
 
     beta version of parallel processing is now onine. If you set -par to an integer between 2 and 10,
     it should substantially speed up your processing. Big thank you to AaryanRampal for getting this up and running.
+    If you are using hte docker, you will need to experiment about how to use this - as they have 
+    requirements for multiple processes that I do not know about.
+
+    As of v3.6. there is a way to save individual rising and setting arcs to an external file.
+    You can then use them as you wish. The default is plain text but only has elevation angles
+    and deltaSNR (SNR with direct signal removed). You can also save more information in a pickle
+    file.  Just say -savearcs_format pickle. Both require -savearcs T to set this option. The 
+    location of the files is printed to the screen.
 
         
     Examples
     --------
     gnssir p041 2021 15 
         analyzes the data for station p041, year 2021 and day of year 15.
+    gnssir p041 2021 15 -savearcs T 
+        prints out individual arcs to $REFL_CODE/2021/arcs/p041/015
     gnssir p041 2021 1 -doy_end 100 -par 10
         analyze 100 days of data - but spawn 10 processes at a time. Big cpu time savings.
     gnssir p041 2021 15  -snr 99
@@ -178,7 +190,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         decimate SNR file to this sampling period before the 
         periodograms are computed. 1 sec is default (i.e. no decimating)
     savearcs : bool, optional
-        this input no longer has any meaning 
+        save arcs in individual files (elevation angle and deltaSNR)
+    savearcs_format : str, optional
+        format of saved arc files, txt or pickle. default is txt
     par : int, optional
         number of parallel processing jobs. 
     debug : bool, optional
@@ -210,6 +224,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     if 'snr' in lsp:
         snr = lsp['snr']
         print('Found a snr choice in the json:', snr)
+
+    #lsp['newdirect'] = newdirect
+    #if lsp['newdirect']:
+    #    print('trying out new direct signal removal')
 
     # make a refraction file you will need later
     refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
@@ -309,6 +327,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     lsp['gzip'] = gzip
     # added 2024aug01
     lsp['savearcs'] = savearcs
+
+    # added 2024aug27
+    lsp['savearcs_format'] = savearcs_format
 
     # if refraction model is not assigned, set it to 1
     if 'refr_model' not in lsp.keys():

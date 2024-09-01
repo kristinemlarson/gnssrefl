@@ -33,3 +33,15 @@ GPS Observations at the bay of FUNDY
 [some more info](https://fundydiscovery.ca/tides-tidal-bores/)
 
 https://www.noaa.gov/ocean/fundy-max
+
+[Burntcoat info](https://www.your-nova-scotia-holiday.com/burntcoat-head.html#gallery[pageGallery]/6/)
+
+It is Located on the southeast side of Minas Basin along the Glooscap Trail at Burntcoat.
+
+Latitude: 45.311364, Longitude: -63.805965
+
+Suggested by a couple Canadians, Location of Island off of Burt coat head
+
+45.311771° -63.808282°
+
+Android - https://github.com/luiscancillo/toRINEX

@@ -5983,7 +5983,7 @@ def inout(c3gz):
 
 def ga_highrate(station9,year,doy,dec,deleteOld=True):
     """
-    Attempts to download highrate RINEX 3 files from GA
+    Attempts to download and merge highrate RINEX 3 files from GA
 
     Parameters
     ----------
@@ -6075,13 +6075,13 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
                     #subprocess.call(['mv', rinex2,tmpname])
 
 # now merge them
+# it would be nice if someone would check to see if any were found ... 
     searchpath =  station + cdoy + '0.' + cyy + 'o' + 'tmp*'
     print(searchpath)
     subprocess.call([gexe,'-finp', searchpath, '-fout', rinex2, '-vo','2','-f'])
     fexist = False
     if os.path.exists(rinex2):
         fexist = True
-
 
     # should always remove tmp files
     searchpath =  station + cdoy + '0.'  + cyy + 'otmp*' 
@@ -7339,9 +7339,10 @@ def print_version_to_screen():
     print('gnssrefl version:', str(version('gnssrefl')), '\n')
     return
 
-def greenland_rinex3(station,year,doy):
+def greenland_rinex3(station,year,doy,**kwargs):
     """
-    For now it only downloads 1 second RINEX3 files from GNET.
+    downloads RINEX3 files from GNET. Returns hatanaka and gzipped file.
+    Could uncompress and convert, but downstream code expects *crx.gz
 
     It requires you have a GNET password. The first time you call this 
     function it will ask for the username and password and it will store 
@@ -7357,15 +7358,23 @@ def greenland_rinex3(station,year,doy):
         full year
     doy : int
         day of year
+    streamID : str
+        optional stream ID (R or S)
+        default is R
+    samplerate : optional, int 
+        default is 1
+        only 30 or 1 is allowed
 
     Returns
     -------
     filename : str
-        rinex3 filename
+        rinex3 filename(hatanaka compressed and gzipped)
 
     found : bool
         whether file was found
     """
+    crnxpath = hatanaka_version()
+
     found = False
     filename = ''
     checking = subprocess.call(['which','lftp'])
@@ -7378,9 +7387,17 @@ def greenland_rinex3(station,year,doy):
     # information for accessing GNET with appropriate filename
     archive = 'gnet'
     fdir = os.environ['REFL_CODE']
-    ch = '0000_01D_01S_MO'
+    samplerate = kwargs.get('samplerate',1)
+    if (samplerate == 1):
+        ch = '0000_01D_01S_MO'
+    else:
+        ch = '0000_01D_30S_MO'
+
     userinfo_file = fdir + '/Files/passwords/' + archive + '.pickle'
-    streamID = '_R_'
+    streamID = kwargs.get('stream_ID','R')
+    streamID = '_' + streamID + '_'
+
+
     cdoy = '{:03d}'.format(doy)
     cyyyy = str(year)
     serve = '@ftp.dataforsyningen.dk; cd /GNSS/RINEX3/GRL/'
@@ -7388,12 +7405,16 @@ def greenland_rinex3(station,year,doy):
     # define file names
     gfilename = station.upper() + streamID + cyyyy + cdoy + ch + '.crx.gz'
     filename = station.upper() + streamID + cyyyy + cdoy + ch + '.crx'
+    rfilename = station.upper() + streamID + cyyyy + cdoy + ch + '.rnx'
 
     if os.path.exists(gfilename):
         print('File found ', gfilename)
-        subprocess.call(['gunzip', gfilename])
-        if os.path.exists(filename):
-            return filename, True
+        #subprocess.call(['gunzip', gfilename])
+        return gfilename, True
+        #if os.path.exists(filename):
+        #    # decompress
+        #    subprocess.call([crnxpath, filename])
+        #    subprocess.call(['rm', filename])
 
     #print('Will try to pick up BFG account information',userinfo_file)
     if os.path.exists(userinfo_file):
@@ -7405,14 +7426,19 @@ def greenland_rinex3(station,year,doy):
             cd1 = 'lftp -c "open ftps://' + user_id + ':' + passport + serve + cyyyy + '/' + cdoy + '; get ' + gfilename + '"'
             try:
                 subprocess.call(cd1,shell=True)
-                subprocess.call(['gunzip', gfilename])
+                #if os.path.exists(gfilename):
+                #   subprocess.call(['gunzip', gfilename])
+                #if os.path.exists(filename):# decompress
+                #    subprocess.call([crnxpath, filename])
             except:
                 print('something went wrong with access to GNET files')
 
-    if os.path.exists(filename):
+    if os.path.exists(gfilename):
         found = True
+        # get rid of hatanaka compressed version
+        #subprocess.call(['rm', filename])
 
-    return filename, found
+    return gfilename, found
 
 
 def query_coordinate_file(station):

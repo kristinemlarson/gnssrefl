@@ -392,6 +392,9 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                     az2 = apriori_results[i, 6]
                     rh_apriori = apriori_results[i, 1]
 
+                    # this uses the old way of resolving arcs - but I think that is ok because we only want
+                    # one arc per quadrant anyway when doing soil moisture. And soil moisture doesn't really
+                    # work unless you have most of the field (i.e. 180 degrees of azimuth)
                     x, y, nv, cf, utctime, avg_azim, avg_edot, edot2, del_t = g.window_data(s1, s2, s5, s6, s7, s8, sat, ele, azi,
                                                                                         t, edot, freq, az1, az2, e1, e2,
                                                                                         sat_number, poly_v, pele, screenstats)

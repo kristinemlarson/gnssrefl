@@ -3,16 +3,19 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+
 ## 3.6.6
 
-added debug option to remove the try in gnssir_cl.py - because that makes it really hard to debug things.
+added debug option to remove the try in gnssir_cl.py - because that 
+makes it really hard to know why your run is crashing. If you set debug to
+T, you will  have more information.
 
-optional savearcs option to gnssir: writeout plain text files of elevation angle and detrended snr 
+optional savearcs option to gnssir: writeout plain text files of 
+elevation angle and detrended snr 
 using savearcs option. This is bare bones ... not really ready for prime time
 
-fixed bug in daily_avt for people that try to analyze sites with no results. it now  
+fixed bug in daily_avg for people that try to analyze sites with no results. it now  
 politely exits for this case.
-
 
 added peak 2 noise to subdaily summary plot
 
@@ -76,7 +79,7 @@ deleted gnssrefl/data/gpt_1wA.pickle. I do not think it is used.
 
 ## 3.6.1 
 
-3.6.0 and 3.6.1 are about the same.  I had some issues with the version tags.
+Versions 3.6.0 and 3.6.1 are about the same.  I had some issues with the version tags.
 
 July 15, 2024
 
@@ -84,11 +87,14 @@ Daily Lomb Scargle results are sorted in time instead of frequency.
 
 Fixed bug in rinex3_snr (inputs changed)
 
-You can access 1-sec RINEX3 GNET archive data if you have an account and the utility lftp installed.
+You can access 1-sec RINEX3 GNET archive data if you have 
+an account and the utility lftp installed.
 
-Allow snr choice to be stored in the gnssir_input json. For now you have to add it to the json by
-hand, but I am happy to accept a PR that adds it explicitly. If you do that, you want to make sure
-that the downstream code (gnssir) can still change the snr choice on the command line. Right now it assumes
+Allow snr choice to be stored in the gnssir_input json. For now you have 
+to add it to the json by
+hand, but I am happy to accept a PR that adds it explicitly. If 
+you do that, you want to make sure that the downstream code (gnssir) can 
+still change the snr choice on the command line. Right now it assumes
 if it finds a snr value in the json, it should use it.
 
 ## 3.5.10
@@ -196,6 +202,9 @@ Tried to implement parallel processing for NMEA files.  Let me know if it doesn'
 to work.
 
 ## 3.4.0
+
+June 5, 2024 
+
 fixed pretty major problem with default (rapid) orbits.  updated to new file names and 
 locations for GFZ analysis center.  I do not know when the old naming conventions will fail for ultra.
 
@@ -212,7 +221,7 @@ rinex2snr: Added BKG access to high-rate files that are more than 6 months old.
 This will allow parallel processing, though CDDIS does not (this is a restriction
 at CDDIS, not because of gnssrefl).
 
-Fixed bug in rinex3_snr (inputs had changed to run_rinex2snr)
+Fixed bug in rinex3_snr (inputs had changed in run_rinex2snr)
 
 Fixed download_rinex for highrate files from BKG and CDDIS so that it allows
 both old and current datastreams
@@ -249,6 +258,9 @@ merging still slow. Has anyone tested new versions of gfzrnx to see if they
 are faster? They might be.
 
 ## 3.2.0
+
+May 8, 2024 
+
 Added NITE model.  In gnssrefl this is refl_model 5.
 
 For details see Peng (2023), DOI: 10.1109/TGRS.2023.3332422

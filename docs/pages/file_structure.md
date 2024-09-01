@@ -22,21 +22,27 @@ we strongly encourage you to use them. And never use an elevation mask on your r
 completely unncessary for positioning (which allows masking to be done at the software level) and 
 are extremely harmful to GNSS-IR.
 
-## Where should I store station coordinates? (as of version 3.6.4)
+## Where should I store station coordinates? 
 
-The software comes with a long list (almost 20,000) of station coordinates taken from the University 
-of Nevada Reno. If you are analyzing any of those stations, you should not have to enter
-any coordinates (Note: you can use **query_unr** to see if your station is included in the UNR database). 
+The software comes with a long list (almost 20,000) of station coordinates 
+taken from the University of Nevada Reno. If you are analyzing data from any of 
+those stations, you should not have to enter
+any coordinates (Note: you can use **query_unr** to see if your station 
+is included in the UNR database). 
 
 If you are analyzing your own data, eventually you will need to tell the software 
 where your stations are. This location does not have to be super precise, within a few meters
 is perfectly acceptable, as it is primarily used for the refraction correction. The better your
 site coordinates, the better your reflection zone maps would be, however. Previously you 
 input this information (latitude, longitude, and ellipsoidal
-height) when you set your analysis strategy in **gnssir_input**. There is now another option. If you create a plain
-txt file iwth the name llh_local.txt and store it in the $REFL_CODE/input directory, the code will
-use this as your *a priori* station coordinates. The format of this file is station latitude longitude
-and height, with units of degrees, degrees, and meters. Only spaces between these parameters - no commas.
+height) when you set your analysis strategy in **gnssir_input**. 
+
+As of version 3.6.4, there is now another 
+option. If you create a plain txt file with the name llh_local.txt and store it 
+in the $REFL_CODE/input directory, the code will
+use this as your *a priori* station coordinates. The format of this 
+file is station latitude longitude and ellipsoidal height, with units of 
+degrees, degrees, and meters. Only spaces between these parameters - no commas.
 You can add comment lines to the file with a percent sign.
 This file is read in the *query_coordinate_file* function in gps.py. The local coordinate 
 file is read by **nmea2snr**. This means you no longer have to enter station coordinates on 

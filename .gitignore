@@ -3,6 +3,8 @@ set_simulator*py
 test_animation.py
 NITE*py
 test3.py
+totals*txt
+download_scripps.py
 list_denmark.py
 llh.csv
 llh.txt
