@@ -34,19 +34,30 @@ If you are analyzing your own data, eventually you will need to tell the softwar
 where your stations are. This location does not have to be super precise, within a few meters
 is perfectly acceptable, as it is primarily used for the refraction correction. The better your
 site coordinates, the better your reflection zone maps would be, however. Previously you 
-input this information (latitude, longitude, and ellipsoidal
-height) when you set your analysis strategy in **gnssir_input**. 
+input this information (latitude, longitude, and ellipsoidal height) when you set your analysis strategy in **gnssir_input**. 
 
 As of version 3.6.4, there is now another 
 option. If you create a plain txt file with the name llh_local.txt and store it 
 in the $REFL_CODE/input directory, the code will
 use this as your *a priori* station coordinates. The format of this 
-file is station latitude longitude and ellipsoidal height, with units of 
-degrees, degrees, and meters. Only spaces between these parameters - no commas.
+file for **each line** should be :
+
+station name (4 characters, preferably lowercase)
+latitude , degrees
+longitude , degrees
+ellipsoidal height, meters. 
+
+Example:
+
+<PRE>
+xxxx 39.949492 -105.194266 1728.856
+</PRE>
+
+There should only be spaces between these parameters - no commas.
 You can add comment lines to the file with a percent sign.
-This file is read in the *query_coordinate_file* function in gps.py. The local coordinate 
+This file is read in the <code>query_coordinate_file</code> function found in gps.py. The local coordinate 
 file is read by **nmea2snr**. This means you no longer have to enter station coordinates on 
-the command line when using **nmea2snr**.
+the command line when using **nmea2snr**. 
 
 ## How do I analyze my own GNSS data?
 
@@ -67,7 +78,7 @@ Documentation can always be improved, so if you would like to add more examples 
 current documentation confusing, please submit a pull request.
 
 If you are using the notebooks, there is currently no notebook for this option.
-Please contact Kelly.Enloe@earthscope.org for guidance.
+Please contact Kelly.Enloe@earthscope.org directly for guidance. 
 
 If you have questions about converting NMEA files, the best I can offer is that you read
 the next section on that specific format.
@@ -328,17 +339,22 @@ Now look at the L2C retrievals.
 
 <img src="../_static/p038usingL2c.png" width="600">
 
-If you were trying to find a periodic signal, which one 
-would you want to use?
+If you were trying to find a periodic signal, which one would you want to use?
 
 To further confuse things, when the receiver was updated to a Septentrio, unavco began
 providing L2C data in the default 15 second files. This is a good thing - but it is confusing
-to people that won't know why the signal quality improved over night.
+to people that won't know why the signal quality improved overnight.
+
+L2C is easy to extract from RINEX 3 files - and that is what is done by <code>rinex2snr</code>. However,
+I do not make the same restriction for RINEX 2.11 files.  In principle I could, but for now, I translate
+all L2 signals in a RINEX 2.11 file. When you subsequently chose L2C (frequency 20) in <code>gnssir</code>, you will
+be given results for all GPS satellites that could be L2C. The list of L2C transmitting satellites is found
+in the gps.py library.
 
 ### GPS L5
 
 Another great signal.  I love it. It does have a high chipping rate, which is 
-relevant (i.e. bad) for reflectomtry from very tall sites.
+relevant (i.e. bad) for reflectometry from very tall sites.
 
 ### Aliasing
 

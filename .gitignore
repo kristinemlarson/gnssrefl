@@ -1,5 +1,7 @@
 env
 set_simulator*py
+swh.py
+waves_lib.py
 test_animation.py
 NITE*py
 test3.py
