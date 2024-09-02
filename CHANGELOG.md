@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.6.7
+
+added savearcs_format option - allows pickle format which has more information 
+than plain txt version. See gnssir for more information.
+
+removed bug in reading local coordinate file.  it failed when there was only a 
+single station in the file. it should now work though you can't disobey the format.
+you have to have four entries per line: station, lat, lon, ht and comment lines must
+have a % at the beginning.
+
 
 ## 3.6.6
 
@@ -51,7 +61,7 @@ of a symbol. But otherwise it isn't new information.
 
 I added a simple file for a priori lat lon and ellipsoidal height values. 
 It should be located in $REFL_CODE/llh_local.txt. and the values should simply
-be station lat lon height. NO COMMANS between then,  simply spaces.
+be 4 ch station name lat lon height. NO COMMAS between then,  simply spaces.
 comment lines are allowed if preceded by percent sign. I would prefer station names to be 
 lowercase, but it allows and checks uppercase.
 This kind of file would be particularly useful for NMEA people as it allows you to 

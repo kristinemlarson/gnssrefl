@@ -1,14 +1,10 @@
-# gnssrefl v3.6.6
+# gnssrefl v3.6.7
 
-gnssrefl is an open source software package for GNSS interferometric reflectometry (GNSS-IR). 
+gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 When citing gnssrefl, please use:
 
 Larson, K.M., gnssrefl: an open source python software package for environmental 
 GNSS interferometric reflectometry applications, *GPS Solutions*, Vol. 28(165), 10.1007/s10291-024-01694-8, 2024.
-
-The code also has a DOI from zenodo.
-
-[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601494.svg)](http://dx.doi.org/10.5281/zenodo.5601494) 
 
 Documentation: [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
@@ -16,10 +12,20 @@ Documentation: [![Documentation Status](https://readthedocs.org/projects/gnssref
 
 - [pdf](https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/)
 
+Questions/Concerns and bug reports, **must** be submitted via the **Issues** button at 
+the [github repository](https://github.com/kristinemlarson/gnssrefl/issues).
+
+gnssrefl also has a DOI from zenodo.
+
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601494.svg)](http://dx.doi.org/10.5281/zenodo.5601494) 
 
 The latest pypi version can be found here [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
-You can now store coordinates for your local GNSS-IR sites. See [file formats](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html) for more information.
+**Some new features:**
+
+You can now store coordinates for your local GNSS-IR sites. 
+See [file formats](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html) for more information.
+(A bug in this option was fixed in version 3.6.7. The previous version failed when you only had a single station in your file.)
 
 ![](docs/myAnimation.gif)
 
@@ -30,7 +36,8 @@ and the helper function is [setFrame.m](docs/pages/set_Frame.m).
 
 See documentation for [gnssir_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html) for new refraction models.
 
-How do you find out which version are you running? Type <code>pip list | grep gnssrefl</code>
+How do you find out which version are you running? Any of the major pieces
+of code should display this information on the first line. Try <code>rinex2snr</code>.
 
 If you want to sign up for the GNSS-IR email list, please contact Kristine Larson.
 

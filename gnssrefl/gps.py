@@ -7442,15 +7442,16 @@ def greenland_rinex3(station,year,doy,**kwargs):
 
 def query_coordinate_file(station):
     """
-    Returns a priori Cartesian coordinates from a local file
-    The file is stored in $REFL_CODE/input/llh_local.txt
+    Returns a priori latitude, longitude, and ellipsoidal height from a local file
+    The file should be stored in $REFL_CODE/input/llh_local.txt
     It has a simple structure. Each value is separated by spaces
 
     station latitude longitude height
 
-    The station name is four characters and the units of the other
+    The station name is four characters long and the units of the other
     three are degrees, degrees, and meters. Height is the ellipsoidal
-    height. Comments are allowed using a percent sign.
+    height. Comments are allowed in this file using a percent sign. If you use
+    more or less than four columns per line the code will crash.
 
     Parameters
     -----------
