@@ -23,11 +23,6 @@ You can now store coordinates for your local GNSS-IR sites. See [file formats](h
 
 ![](docs/myAnimation.gif)
 
-I made this animation ages ago - so it is in Matlab.  I would be happy to host a link to 
-a version in python.  The main code is [snr_simulation](docs/pages/snr_simulation.m) 
-and the helper function is [setFrame.m](docs/pages/set_Frame.m). 
-
-
 See documentation for [gnssir_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html) for new refraction models.
 
 How do you find out which version are you running? Type <code>pip list | grep gnssrefl</code>
