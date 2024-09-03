@@ -113,6 +113,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     Beyond that, you can try the -mk T option which searches other places, i.e. $REFL_CODE/rinex/ etc. I do not recommend
     that you use this option, but it is there.
 
+    For RINEX 3, use the 9 character station ID "XXXXMRCCC" (for example, "mchl00aus"), where:
+        XXXX - 4 character site designation
+        M – monument or marker number (0-9)
+        R – receiver number (0-9)
+        CCC – ISO Country or Region code
+
     For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory. It 
     also checks the $REFL_CODE/YYYY/rinex directory for the crx.gz and rnx versions. 
     It looks like I do not delete the RINEX 3 files (though I do delete the RINEX 2.11 files).
@@ -188,7 +194,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     Parameters
     ----------
     station : str
-        4 or 9 character ID of the station, preferably lowercase
+        4 or 9 character ID of the station, respectively for RINEX 2 and RINEX 3, preferably lowercase
     year : int
         Year
     doy : int
