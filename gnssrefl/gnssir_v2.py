@@ -131,8 +131,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     plot_screen = lsp['plt_screen'] 
     onesat = lsp['onesat']; screenstats = lsp['screenstats']
     # testing this out - turned out not to be useful/needed
-    new_direct_signal = False
-    #lsp['newdirect']
+    #new_direct_signal = False
 
     gzip = lsp['gzip']
     if 'dec' in lsp.keys():
@@ -248,7 +247,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         print('Reading SNR data from: ', obsfile)
         #print('Results will be written to:', fname)
         minObsE = min(snrD[:,1])
-        print('Min observed elev. angle ', station, year, doy, minObsE, '/requested e1 and e2 ', e1,e2)
+        print(f'Min observed elev. angle {minObsE} for {station} {year}:{doy}/ Requested e1-e2: of {e1}-{e2}')
         # only apply this test for simple e1 and e2
         if len(ellist) == 0:
             if minObsE > (e1 + ediff):
@@ -384,8 +383,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                         # window the data - which also removes DC 
                         # this is saying that these are the min and max elev angles you should be using
                         e1 = arclist[a,4]; e2 = arclist[a,5]
+                        # pele is not used, so no longer used in window_new, v3.6.8
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT, secxonds = window_new(d2, f, 
-                                satNu,ncols,pele, lsp['polyV'],e1,e2,azvalues,screenstats,new_direct_signal)
+                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats)
 
                         #writing out arcs - try putting it later on ... 
                         if test_savearcs and (Nvv > 0):
@@ -597,7 +597,7 @@ def set_refraction_params(station, dmjd,lsp):
     else:
         irefr = 0 # ???
 
-    print('refraction model', refraction_model,irefr)
+    print('refraction model', refraction_model)
     return p,T,irefr, e, Tm, la
 
 def apply_refraction_corr(lsp,ele,p,T):
@@ -924,14 +924,15 @@ def read_snr(obsfile):
     return allGood, f, r, c
 
 
-def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats,new_direct_signal):
+def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats):
     """
     retrieves SNR arcs for a given satellite. returns elevation angle and 
     detrended linear SNR
 
     2023-aug02 updated to improve azimuth calculation reported
 
-    2024-aug-15 testing out imposing pele values for DC removal
+    2024-aug-15 testing out imposing pele values for DC removal.
+    2024-sep04 removed pele as input
 
     Parameters
     ----------
@@ -943,8 +944,6 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats,new_dire
         requested satellite number
     ncols : int
         how many columns does the SNR file have
-    pele : list of floats
-        elevation angles for polynomial fit
     pfitV : float
         polynomial order
     e1 : float
@@ -956,8 +955,6 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats,new_dire
     screenstats : bool
         whether you want debugging information
         printed to the screen
-    new_direct_signal : bool
-        trying out new way to remove direct signal
 
     Returns
     -------
@@ -1033,18 +1030,16 @@ def window_new(snrD, f, satNu,ncols,pele,pfitV,e1,e2,azlist,screenstats,new_dire
                 nn = (datatest > 0) ; 
                 snrD = snrD[nn,:]
 
-        # maybe here is where you could impose the pele values
-        if new_direct_signal:
+        # I was trying something out here. #if False:
+        #    Elen = len(snrD)
+        #    if True:
+        #        print(f, Elen, len(snrD),max(snrD[:,1]), min(snrD[:,1]))
 
-            Elen = len(snrD)
-            if True:
-                print(f, Elen, len(snrD),max(snrD[:,1]), min(snrD[:,1]))
-
-            ijk = (snrD[:,1] > pele[0]) & (snrD[:,1] <= pele[1])
-            snrD = snrD[ijk,:]
+        #    ijk = (snrD[:,1] > pele[0]) & (snrD[:,1] <= pele[1])
+        #    snrD = snrD[ijk,:]
             #if (Elen != len(snrD)):
-            if True:
-                print(f, Elen, len(snrD),max(snrD[:,1]), min(snrD[:,1]),pele )
+        #    if True:
+        #        print(f, Elen, len(snrD),max(snrD[:,1]), min(snrD[:,1]),pele )
 
         sat = snrD[:,0]
         ele = snrD[:,1]

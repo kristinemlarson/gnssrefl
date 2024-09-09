@@ -51,6 +51,7 @@ def parse_arguments():
     parser.add_argument("-subdaily_subdir", default=None, type=str, help="subdaily, output directory")
     parser.add_argument("-subdaily_spline_outlier1", default=None, type=float, help="subdaily, outlier value (m), part1")
     parser.add_argument("-subdaily_spline_outlier2", default=None, type=float, help="subdaily, outlier value (m), part2")
+    parser.add_argument("-snr", default=None, type=int, help="SNR file type (66,10, 88 etc)")
 
     args = parser.parse_args().__dict__
 
@@ -73,7 +74,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
                       daily_avg_medfilter: float =None, subdaily_alt_sigma : bool=None, 
                       subdaily_ampl : float=None, subdaily_delta_out : float=None, 
                       subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
-                      subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None):
+                      subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None, snr: int=None):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -282,6 +283,11 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     subdaily_spline_outlier2 : float, optional
         alternate setting for outlier detection in part2
 
+    snr : int
+        kind of SNR file. If using the default (66), there is no reason to set this.
+        if you are going to use non-defaults (i.e. 88) throughout, it would be helpful
+        to set this here and then the value will be used when using gnssir.  You would
+        not have to enter it on the command line.
     """
 
     # make sure environment variables exist
@@ -331,7 +337,10 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['ht'] = height
     lsp['Hortho'] = round(Hortho,4) # no point having it be so many decimal points
     lsp['apriori_rh'] = apriori_rh
-    
+
+    # don't save it unless it is not the default.
+    if snr is not None:
+        lsp['snr'] = snr
 
     if h1 > h2:
         print(f'h1 cannot be greater than h2. You have set h1 to {h1} and h2 to {h2}. Exiting.')

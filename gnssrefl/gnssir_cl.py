@@ -45,7 +45,7 @@ def parse_arguments():
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
     parser.add_argument("-savearcs", default=None, type=str, help="boolean, save individual arcs. default is false.")
-    parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs, txt or pickle. default is txt")
+    parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs (txt or pickle). default is txt")
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
     parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
 
@@ -84,12 +84,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     location of the files is printed to the screen. If an arc does not pass QC, it is saved, but in a separate
     directory with the name failQC added to it. 
 
-
     If you are using the non-standard snr files (i.e. not 66), you have been required to provide an online parameter
-    every time you run gnssir. As of v 3.6.6, you can now save a parameter called snr in your json analysis file.
-    So if you are using snr files with a 50 on them, you could save that value there and the gnssir code would know to use that 
-    ending.  This may not be that useful to most people, but for people that are doing high-rate datasets from tall sites,
-    it could be helpful.
+    every time you run gnssir. As of v 3.6.6, you can now save a parameter called snr when you use gnssir_input.
+    So that would automate it for you.  If you haven't done that then you should use snr on the command line
+    and set it to the appropriate value.
         
     Examples
     --------
@@ -123,7 +121,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     station : str
         lowercase 4 character ID of the station
     year : int
-        full Year
+        full year
     doy : integer
         Day of year
 
@@ -228,13 +226,13 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             g.result_directories(station,y,extension)
 
     lsp = guts2.read_json_file(station, extension)
+    # 
     if 'snr' in lsp:
         snr = lsp['snr']
         print('Found a snr choice in the json:', snr)
+    else:
+        print('Using snr file type: ', snr)
 
-    #lsp['newdirect'] = newdirect
-    #if lsp['newdirect']:
-    #    print('trying out new direct signal removal')
 
     # make a refraction file you will need later
     refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])

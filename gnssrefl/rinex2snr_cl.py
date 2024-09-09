@@ -78,9 +78,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
               par : int=None, timeout : int = 0 ):
     """
-    rinex2snr translates RINEX files to a new file in SNR format. This function will also fetch orbit files for you.
-    RINEX obs files are provided by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
-    the default is RINEX 2.11 files
+    rinex2snr translates RINEX files to a new file in the SNR format. This function will also fetch orbit files for you.
+    RINEX obs files are provided either by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
+    the default is RINEX 2.11 files. To tell the code you are using a RINEX 3 file, you should use a RINEX 3 station name,
+    i.e. the 9 character version.
 
     beta version of parallel processing available in this release.  Set -par to a number < 11 
     Some archives have been set to non-compliant with this feature. Please look in the first few lines
@@ -123,9 +124,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     also checks the $REFL_CODE/YYYY/rinex directory for the crx.gz and rnx versions. 
     It looks like I do not delete the RINEX 3 files (though I do delete the RINEX 2.11 files).
 
-    FAQ: what is rate anad srate?  rate is telling the code which folder to use because archives always have 
+    FAQ: what is rate and srate and why do you have both?  rate tells the code which folder to use because archives always have 
     files in different directories depending on sample rate.  srate is for RINEX 3 files only because RINEX 3 
-    has the sample rate on the filename itself (not just the directory).  
+    has the sample rate on the filename itself (not just the directory). A RINEX 2.11 filename will not tell you which 
+    sample rate it is.
 
     What is the stream parameter? It is a naming convention that is only used by RINEX 3 people. The allowed 
     file types are S or R.  I believe S stands for streamed.
@@ -134,7 +136,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel
 
     RINEX3 15 sec archives
-        bfg, unavco  - you may need to specify 15 second sample rate
+        bfg, unavco  - You likely need to specify a 15 second sample rate
 
     RINEX3 1 sec 
         bkg-igs, bkg-euref, cddis, ignes (spain), maybe nrcan 
@@ -195,6 +197,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     ----------
     station : str
         4 or 9 character ID of the station, respectively for RINEX 2 and RINEX 3, preferably lowercase
+        I believe 6 characters are allowed for GSI (Japan), but I have not tested it in a while
     year : int
         Year
     doy : int
@@ -360,8 +363,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     """
 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
-    #print('You are running ', vers)
 
+    # list of RINEX 3 archives
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes','gnet']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis','ngs_hourly']

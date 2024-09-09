@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.6.8
+
+Added snr input to gnssir_input.  If you have non-default SNR files (i.e. not 66), then
+you can set that and not have to type it in the command line.
+
+Added a few info messages in quickLook explaining why station coordinates are not needed
+(though they are helpful). Also check that azim1 is < azim2.
+
 ## 3.6.7
 
 added savearcs_format option - allows pickle format which has more information 
@@ -10,9 +18,8 @@ than plain txt version. See gnssir for more information.
 
 removed bug in reading local coordinate file.  it failed when there was only a 
 single station in the file. it should now work though you can't disobey the format.
-you have to have four entries per line: station, lat, lon, ht and comment lines must
+you have to have four entries per line: station, lat, lon, ht. Comment lines must
 have a % at the beginning.
-
 
 ## 3.6.6
 

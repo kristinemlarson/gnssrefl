@@ -228,9 +228,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         sind = int(arclist[arc,0]) ; eind = int(arclist[arc,1])
                         d2 = np.array(thissat[sind:eind, :], dtype=float)
                     # window the data - which also removes DC, for now use old version 
-                        new_direct_signal = False
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT,secxonds= gnssir_v2.window_new(d2, f,
-                                satNu,ncols,pele, polyV,e1,e2,azvalues,screenstats,new_direct_signal)
+                                satNu,ncols, polyV,e1,e2,azvalues,screenstats)
                         Nv = Nvv # number of points
                         UTCtime = meanTime
                     # for this arc, which a value is it?
@@ -537,7 +536,7 @@ def quick_refraction(station):
     p = 0; T = 0; irefr = 1; e=0 ; it = 1 #?
     dmjd = 0
     if (lat == 0) & (lon == 0):
-        #print('no coordinates found')
+        print('Although no station coordinates were found, this is ok for quickLook.')
         irefr = 0
         return p,T,irefr, e
 

@@ -105,11 +105,11 @@ def quicklook(station: str, year: int, doy: int,
         Lomb-Scargle Periodogram (LSP) amplitude significance criterion in volts/volts.
         Default is 7 
 
-    e1 : int, optional
+    e1 : float, optional
         elevation angle lower limit in degrees for the LSP.
         default is 5.
 
-    e2: int, optional
+    e2: float, optional
         elevation angle upper limit in degrees for the LSP.
         default is 25.
 
@@ -187,6 +187,13 @@ def quicklook(station: str, year: int, doy: int,
         print('We have to change the polynomial limits because you went below 5 degrees.')
         print('This restriction is for quickLook only ')
         pele[0] = e1
+
+    if (azim1 > azim2):
+        print('azim1 must be less than azim2')
+        sys.exit()
+    if (e1> e2):
+        print('e1 must be less than e2')
+        sys.exit()
 
     pltscreen = plt
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'f': fr[0], 'reqAmp': ampl, 'e1': e1,

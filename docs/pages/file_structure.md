@@ -42,22 +42,19 @@ in the $REFL_CODE/input directory, the code will
 use this as your *a priori* station coordinates. The format of this 
 file for **each line** should be :
 
-station name (4 characters, preferably lowercase)
-latitude , degrees
-longitude , degrees
-ellipsoidal height, meters. 
+station latitude longitude and height, where station must be four characters,
+preferably lower case. latitude and longitude should be in degrees. height means ellipsoidal
+height in meters.  Example for station **xxxx**:
 
-Example:
 
 <PRE>
 xxxx 39.949492 -105.194266 1728.856
 </PRE>
 
-There should only be spaces between these parameters - no commas.
 You can add comment lines to the file with a percent sign.
 This file is read in the <code>query_coordinate_file</code> function found in gps.py. The local coordinate 
-file is read by **nmea2snr**. This means you no longer have to enter station coordinates on 
-the command line when using **nmea2snr**. 
+file is read by <code>mea2snr</code>. This means you no longer have to enter station coordinates on 
+the command line when using <code>nmea2snr</code>. 
 
 ## How do I analyze my own GNSS data?
 
