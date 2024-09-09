@@ -5,12 +5,14 @@
 - [videos/lectures](https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html)
 
 ## 2024 Short Course on GNSS-IR for Water Level Measurements
-- [index[](https://gnssrefl.readthedocs.io/en/latest/pages/sc_index2024.html)
+- [index](https://gnssrefl.readthedocs.io/en/latest/pages/sc_index2024.html)
 
 ## E-mail list
 Would you like to join our <code>gnssrefl</code> users email list?
 This is currently maintained by earthscope.org. To join, please e-mail 
 melissa.weber@earthscope.org or Kristine Larson.
+
+## Papers about Cheap Sensors
 
 ## Publications
 - [One Receiver, Zenith Pointing](https://gnssrefl.readthedocs.io/en/latest/pages/community.html)
