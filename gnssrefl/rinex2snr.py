@@ -179,10 +179,12 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                     print(localpath2)
                 if nol:
                     current_local = os.getcwd()
-                    print('Will first assume RINEX file ', station, ' year:', year, ' doy:', doy, 'is located here :', current_local)
+                    print('Looking for the RINEX file on your machine')
+                    print('Will first assume station ', station, ' year:', year, ' doy:', doy, 'is located here :', current_local)
                     # this assumes RINEX file is in local directory or "nearby"
                     if version == 2:
-
+                        if screenstats: 
+                            print('Version 2.11')
                         if mk:
                             the_makan_option(station,cyyyy,cyy,cdoy) # looks everywhere in your local directories
                         if not os.path.exists(r):
@@ -206,11 +208,12 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 if screenstats:
                                     print('Testing out stripping the RINEX 2 file here')
                                 k.strip_rinexfile(r)
-                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator)
-
+                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator,rinex2_filename=r)
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
+                        if screenstats: 
+                            print('RINEX Version 3')
                         if rate == 'high':
                             csrate = '01' # high rate assumes 1-sec
                         else:
@@ -254,8 +257,10 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 print('The RINEX 3 file exists locally', r3)
                             # convert to RINEX 2.11
                             fexists = g.new_rinex3_rinex2(r3,r2,dec_rate)
+                            # this is so flawed.  If file exists, it should not look for it via conv2snr
+                            # It looks like i was just trying to use old code here. Have added rinex2_filename parameter 
                             if fexists:
-                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator)
+                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator,rinex2_filename=r2)
                             else:
                                 print('Something about the RINEX 3-2 conversion did not work')
                         else:
@@ -273,7 +278,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
                         if (rate == 'high'):
-                            print('This code only accesses 1-Hz Rinex 3 data at BKG, CDDIS, GA, the Spanish IGN, and GNET')
+                            print('Looks for 1-Hz Rinex 3 data at BKG, CDDIS, GA, the Spanish IGN, and GNET')
                             if archive == 'ga':
                                 deleteOld = True
                                 # this downloads RINEX 3 and converts to Rinex 2
@@ -331,6 +336,8 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                     fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate)
 
                         else:
+                            if screenstats: 
+                                print('looks for lowrate RINEX 3 files')
                             if (archive == 'all'):
                                 file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream,screenstats)
                                 if (not foundit): # try again
@@ -353,20 +360,25 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                              if screenstats:
                                  print('RINEX 2 created from v3', year, doy, ' Now remove RINEX 3 files and convert')
                              subprocess.call(['rm', '-f',rnx_filename]) # rnx
-                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator)
+                             # should send it the version 2 name
+                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator,rinex2_filename=r2)
                         else:
                             print('Unsuccessful RINEX 3 retrieval/translation', year, doy)
                     else:
                         print(station, ' year:', year, ' doy:', doy, ' from: ', archive, ' rate:', rate, ' orb:', orbtype)
-                        # this is rinex version 2 - finds rinex and converts it
+                        # for version 2, since i was using old code, the RINEX 2.11 searching goes on in conv2snr
                         conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator)
 
 
-def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,translator):
+def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,translator,**kwargs):
     """
-    convert RINEX files to SNR files
+    This code originally picked up and translated files. You can now optionally send 
+    a parameter called rinex2_filename if the file exists. This needs to be done especially for RINEX 3
+    which have been converted to RINEX 2.11
+
 
     2024 March 29: change location of logs directory to below REFL_CODE
+
 
     Parameters
     ----------
@@ -388,6 +400,9 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
          hybrid, python, or fortran
 
     """
+
+    r2_filename = kwargs.get('rinex2_filename','')
+
     xdir = os.environ['REFL_CODE']
 
     # universal location for the log directory
@@ -427,7 +442,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
     if translator == 'fortran':
         fortran == True
 
-
     if (snre == True):
         log.write("The snrfile already exists: {0:50s} \n".format(snrname_full))
         print("The snrfile already exists: ", snrname_full)
@@ -444,22 +458,27 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
             rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
             # This goes to find the rinex file. I am changing it to allow
             # an archive preference
-            if receiverrate == 'high':
-                strip_snr = False # for now -
-                #print('trying to find highrate file')
-                file_name, foundit = k.rinex2_highrate(station, year, doy,archive,strip_snr)
+            if len(r2_filename) > 0:
+                print('In principle this RINEX 2.11 file exists: ', r2_filename)
+                # further down code wnats it called rinexfile ... so let's play along
+                rinexfile = r2_filename
             else:
-                # added karnak librariies
-                if (archive == 'all'):
-                    foundrinex = False
-                    for archivechoice in ['unavco','sopac','sonel']:
-                        if (not foundrinex):
-                            file_name,foundrinex = k.universal_rinex2(station, year, doy, archivechoice,screenstats)
+                print('In principle the RINEX 2.11 file does not yet exist : ', r2_filename)
+                if receiverrate == 'high':
+                    strip_snr = False # for now -
+                    file_name, foundit = k.rinex2_highrate(station, year, doy,archive,strip_snr)
                 else:
-                    file_name,foundrinex = k.universal_rinex2(station, year, doy, archive,screenstats)
+                # added karnak librariies
+                    if (archive == 'all'):
+                        foundrinex = False
+                        for archivechoice in ['unavco','sopac','sonel']:
+                            if (not foundrinex):
+                                file_name,foundrinex = k.universal_rinex2(station, year, doy, archivechoice,screenstats)
+                    else:
+                        file_name,foundrinex = k.universal_rinex2(station, year, doy, archive,screenstats)
 
-                if foundrinex: #uncompress etc  to make o files ...
-                    rinexfile, foundit2 = k.make_rinex2_ofiles(file_name) # translate
+                    if foundrinex: #uncompress etc  to make o files ...
+                        rinexfile, foundit2 = k.make_rinex2_ofiles(file_name) # translate
 
 #           define booleans for various files
             oexist = os.path.isfile(orbdir + '/' + f) == True
@@ -488,7 +507,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
                     in2 = g.binary(snrname) # this file is made locally and moved later
                     in3 = g.binary(orbfile)
                     if (len(snrname) > 132) or (len(orbfile) > 132):
-                        print('The orbit or SNR file name is too long.')
+                        print('The orbit or SNR file name you are using is too long.')
                         print('Make your environment variable names shorter.')
                         return
                     in4 = g.binary(str(option))

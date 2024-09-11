@@ -668,6 +668,10 @@ def fix_angle_azimuth(time, angle, azimuth):
     return angle_fixed, azim_fixed  
         
 def azimuth_diff2(azim1, azim2):
+    """
+    Someone that is not me should document this
+
+    """
     diff = azim1 - azim2
     idx = (diff > +180)  
     diff[idx] = diff[idx] - 360
@@ -677,6 +681,8 @@ def azimuth_diff2(azim1, azim2):
 
 def azimuth_diff1 (azim):
     """
+    Someone that is not me should document this
+
     Parameters
     ----------
     azim: ??
@@ -690,7 +696,7 @@ def azimuth_diff1 (azim):
 
 def azimuth_diff(azim1, azim2):
     """
-    someone should document this
+    Someone that is not me should document this
 
     Parameters
     ----------
@@ -712,7 +718,7 @@ def azimuth_diff(azim1, azim2):
      
 def angle_range_positive(ang):
     """
-    someone should document this
+    This code lacks documentation
 
     Parameters
     ----------
@@ -727,7 +733,7 @@ def angle_range_positive(ang):
 
 def azimuth_mean(azim1, azim2):
     """
-    someone that is not me should document this
+    Someone that is not me should document this
 
     Parameters
     ----------
@@ -758,22 +764,19 @@ def azimuth_mean(azim1, azim2):
 def quickname(station,year,cyy, cdoy, csnr):
     """
     Creates a full name of the snr file name (i.e. including the path) 
-    >>>> Checks that directories exist.
+
+    Checks that directories exist.
 
     Parameters
     ----------
     station : str
         4 ch station name
-
     year : int
         full year
-
     cyy : str 
         two character year
-
     cdoy : str
         three character day of year
-
     csnr : str
         snr type, e.g. '66' 
 
@@ -801,7 +804,6 @@ def quickname(station,year,cyy, cdoy, csnr):
 
 def elev_limits(snroption):
     """
-
     Given a snr option, return the elevation angle limits
 
     Parameters
@@ -833,7 +835,7 @@ def elev_limits(snroption):
   
 def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip,orb,hour):
     """
-    runs the nmea2snr conversion code - ONE DAY AT A TIME (2024 March 16)
+    runs the nmea2snr conversion code 
 
     Looks for NMEA files in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023.
     I prefer lowercase station names, but I believe the code allows both upper and lower

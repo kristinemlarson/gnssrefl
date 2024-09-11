@@ -2615,10 +2615,11 @@ def rinex_unavco_highrate(station, year, month, day):
     station : str
         4 ch station name
     year : int
-
-    month : intr
-
+        full year
+    month : int
+        month number
     day : int
+        calendar day number
 
     """
     #print('in rinex_unavco_highrate')
@@ -3701,7 +3702,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     """
     This code translates a RINEX 3 file into a RINEX 2.11 file.
     It is assumed that the gfzrnx exists and that the RINEX 3 file is 
-    Hatanaka uncompressed or compressed.
+    Hatanaka uncompressed or compressed. (ending in rnx or crx)
 
     Parameters
     ----------
@@ -3794,7 +3795,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     #print('remove RINEX3 rnx version of the file ',r3_filename_new)
     subprocess.call(['rm', '-f', r3_filename_new ])
 
-    return fexists
+    return fexists 
 
 
 def ign_orbits(filename, directory,year):

@@ -11,6 +11,10 @@ you can set that and not have to type it in the command line.
 Added a few info messages in quickLook explaining why station coordinates are not needed
 (though they are helpful). Also check that azim1 is < azim2.
 
+Fixed a very stupid bug in conv2snr that was looking for RINEX files even though
+they already existed (as nolook option was set and the file was found). Optional
+filename now sent to conv2snr to make sure this choice is not made.
+
 ## 3.6.7
 
 added savearcs_format option - allows pickle format which has more information 

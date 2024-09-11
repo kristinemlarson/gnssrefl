@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 command line tool for the rinex2snr module
-it translates rinex files and makes SNR files
-
-compile the fortran first
-f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
+it translates RINEX files (computing azimuth and elevation angle)
+and stores these along with time and satellite number and SNR data 
+into SNR files
 
 """
 
@@ -41,11 +40,7 @@ def parse_arguments():
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
                         help="True means only use RINEX files on local machine")
-    # remove fortran as an option
-    #parser.add_argument("-fortran", default=None, metavar='False', type=str,
-    #                    help="True means use Fortran RINEX translators ")
-    parser.add_argument("-archive", default=None, metavar='all',
-                        help="specify archive", type=str)
+    parser.add_argument("-archive", default=None, metavar='all', help="specify archive", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
@@ -102,27 +97,26 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     For the nolook option :
 
-    If you have the RINEX 2.11 file, the file was originally required to be normal RINEX (ends in o) or 
-    gzipped normal RINEX. It can be in the local directory which is where you are running the code 
+    If you have the RINEX 2.11 file, the file can be in the local directory which is where you are running the code 
     or it can be in $REFL_CODE/YYYY/rinex/ssss, where ssss is the lowercase directory name for your station. 
-    nolook now allows RINEX 2.11 files that are Hatanaka compressed, Hatanaka compressed + unix compressed,  for 
-    the local directory. It also allows Hatanaka compressed in the REFL_CODE directory.  
+    nolook now allows regular RINEX 2.11 obs files (ends in o) as well as as Hatanaka compressed (ends in d).
+    The o or d file can be gzipped. The code also allows d files to be unix compressed which is how archives used
+    to save these files.
 
     If you are running the Docker, it can be a bit confusing to figure out where to put the files.  Please 
     see the discussion in the Docker installation section, as this is my best effort to help you with this.
 
     Beyond that, you can try the -mk T option which searches other places, i.e. $REFL_CODE/rinex/ etc. I do not recommend
-    that you use this option, but it is there.
+    that you use this option, but it is there.  In general, you shoud use lowercase file names for RINEX 2.11 files.
 
-    For RINEX 3, use the 9 character station ID "XXXXMRCCC" (for example, "mchl00aus"), where:
-        XXXX - 4 character site designation
-        M – monument or marker number (0-9)
-        R – receiver number (0-9)
-        CCC – ISO Country or Region code
+    If you have a RINEX3 file, you have to use the same naming convention as used by GNSS archive facilities.
+    This means everything is capitalized except for the ending. The station name has 9 characters and various other 
+    parameters which can be quite confusing. Please see  this page for the details.
 
-    For RINEX 3 files, I believe it checks for crx.gz, rnx, or rnx.gz endings in the local directory. It 
+    https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html
+
+    I believe the code allows crx.gz, rnx, or rnx.gz endings in the local directory. It 
     also checks the $REFL_CODE/YYYY/rinex directory for the crx.gz and rnx versions. 
-    It looks like I do not delete the RINEX 3 files (though I do delete the RINEX 2.11 files).
 
     FAQ: what is rate and srate and why do you have both?  rate tells the code which folder to use because archives always have 
     files in different directories depending on sample rate.  srate is for RINEX 3 files only because RINEX 3 
@@ -281,6 +275,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             ga : (Geoscience Australia)
 
+            gnet : Greenland Network, RINEX3 only
+
             gfz : (GFZ, Germany)
 
             ignes : IGN in Spain, only RINEX 3
@@ -334,9 +330,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         stored locally and in $REFL_CODE/YYYY/snr/ssss where YYYY is the year and 
         ssss is station name
 
-    weekly : bool, optional
-        Takes 1 out of every 7 days in the doy-doy_end range (one file per week) - used to save cpu time.
-        Default is False.
+    weekly : bool, optional, deprecated
+        This originally took 1 out of every 7 days in the doy-doy_end range (one file per week) - used to save cpu time.
+        Default is False.   
 
     strip : bool, optional
         Reduces observables since the translator does not allow more than 25
@@ -366,6 +362,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     # list of RINEX 3 archives
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes','gnet']
+    # list of RINEX 2.11 archives
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis','ngs_hourly']
 
@@ -417,7 +414,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         print('Year must be four characters long. Exiting.', year)
         sys.exit()
 
-    # currently allowed orbit types - shanghai removed 2020sep08
+    # currently allowed orbit types 
     #
     orbit_list = ['gps', 'gps+glo', 'gnss', 'nav', 'igs', 'igr', 'jax', 'gbm',
                   'grg', 'wum', 'wum2', 'gfr', 'esa', 'ultra', 'rapid', 'gnss2',
@@ -545,12 +542,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if weekly:
         print('You have invoked the weekly option')
         skipit = 7
-        print('Monthly and Weekly functions are not currently working. Resubmit.')
+        print('The weekly functions is not currently working. If you would be willing to ')
+        print('submit a PR fixing it, that would be very helpful. ')
         sys.exit()
     if monthly:
-        print('You have invoked the monthly option')
+        print('You have invoked the monthly option, which does not work.')
         skipit = 30
-        print('Monthly and Weekly functions are not currently working. Resubmit.')
         sys.exit()
 
     # the Makan option
@@ -652,7 +649,7 @@ def process_jobs_multi(index,args,datelist,error_queue):
 
     return
 
-def process_jobs(mjd_list, args):
+def z_process_jobs(mjd_list, args):
     """
     this is not being used - calls should be sent to function above instead
     """
