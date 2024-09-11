@@ -671,6 +671,8 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
     strip_snr is boolean as to whether you want to strip out the non-SNR data
     it can be slow with highrate data. it requires gfzrnx
 
+    this no longer allows the all archive ... which should have been stopped at rinex2snr_cl
+
     Parameters
     ----------
     station : string
@@ -693,15 +695,15 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
     d = g.doy2ymd(year,doy);
     month = d.month; day = d.day
     rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
-    if (archive == 'unavco') or (archive == 'all'):
+    if (archive == 'unavco') :
         g.rinex_unavco_highrate(station, year, month, day)
     # file does not exist, so keep looking
     if not os.path.isfile(rinexfile):
-        if (archive == 'nrcan') or (archive == 'all'):
+        if (archive == 'nrcan') :
             g.rinex_nrcan_highrate(station, year, month, day)
-    # try new cddis for highrate rINex 2
+    # try new cddis for highrate rinex 2
     if not os.path.isfile(rinexfile):
-        if (archive == 'cddis') or (archive == 'all'):
+        if (archive == 'cddis') :
             stream = 'R'
             srate = 1 # one second
             ch.cddis_highrate(station, year, month, day,stream,srate)

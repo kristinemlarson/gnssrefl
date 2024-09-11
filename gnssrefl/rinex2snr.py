@@ -463,7 +463,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
                 # further down code wnats it called rinexfile ... so let's play along
                 rinexfile = r2_filename
             else:
-                print('In principle the RINEX 2.11 file does not yet exist : ', r2_filename)
+                print('the RINEX 2.11 file does not yet exist, so will look for it')
                 if receiverrate == 'high':
                     strip_snr = False # for now -
                     file_name, foundit = k.rinex2_highrate(station, year, doy,archive,strip_snr)
@@ -520,7 +520,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
 
                     in6 = g.binary(errorlog)
                     log.write('SNR file {0:50s} \n will use hybrid of python and fortran to make \n'.format( snrname))
-                    # these are calls to the fortran codes that have been ported to be called from python
+                    # these are calls to the fortran codes that are called from python
                     if (orbtype  == 'gps') or ('nav' in orbtype):
                         gpssnr.foo(in1,in2,in3,in4,in5,in6)
                     else:
@@ -549,6 +549,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
                         log.write('SNR file {0:50s} \n will use python to make \n'.format( snrname))
                         log.write('Decimating will be done here instead of using teqc \n')
                         t1=time.time()
+                        # i think this uses the strandberg way
                         rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate,log)
                         t2=time.time()
 
