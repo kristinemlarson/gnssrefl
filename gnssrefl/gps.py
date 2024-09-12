@@ -800,8 +800,8 @@ def getsp3file_mgex(year,month,day,pCtr):
     if (mgex == 1):
         name = file1[:-2]
 
-    print('Type 1 filename',file1)
-    print('Type 2 filename',file2)
+    #print('Type 1 filename',file1)
+    #print('Type 2 filename',file2)
 
     if not foundit:
         if (mgex == 0):
@@ -7483,9 +7483,9 @@ def query_coordinate_file(station):
             for i in range(0,nr):
                 dbname = allofit[i,0].lower()
                 if (station.lower() == dbname):
-                    print('Found in local coordinates file : ', lat,lon, ht)
                     lat = float(allofit[i,1]);lon = float(allofit[i,2])
                     ht =  float(allofit[i,3])
+                    print('Found in local coordinates file : ', lat,lon, ht)
                     foundit = True
         else: # annoying single line
             if (allofit[0] == station.lower()):
