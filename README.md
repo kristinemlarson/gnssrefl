@@ -29,6 +29,8 @@ See [file formats](https://gnssrefl.readthedocs.io/en/latest/pages/file_structur
 
 ![](docs/myAnimation.gif)
 
+Mohammad Mohseni Aref has graciously made a [notebook version](https://github.com/kristinemlarson/gnssrefl/blob/master/notebooks/use-cases/Soil_Moisture/GNSSRefGeometry-SNRSimulation.ipynb) of this animation
+
 See documentation for [gnssir_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html) for new refraction models.
 
 How do you find out which version are you running? Any of the major pieces
