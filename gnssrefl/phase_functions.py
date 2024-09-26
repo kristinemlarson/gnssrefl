@@ -1160,7 +1160,8 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     g.checkFiles(station, '')
 
     # not using extension
-    lsp = gnssir.read_json_file(station, '')
+    # should not crash if file does not exist...
+    lsp = gnssir.read_json_file(station, '',noexit=True)
     # pick up values in json, if available
     if 'vwc_min_soil_texture' in lsp:
         tmin = lsp['vwc_min_soil_texture']

@@ -33,7 +33,7 @@ def parse_arguments():
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
-    parser.add_argument("-snr", default=None, help="snr file ending, 99: 5-30 deg.; 66: < 30 deg.; 88: all data; 50: < 10 deg.", type=int)
+    parser.add_argument("-snr", default=None, help="snr file ending, Default is 66: < 30 deg, other values 99: 5-30 deg.; 88: all data; 50: < 10 deg.", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra, gnss3")
     parser.add_argument("-rate", default=None, metavar='low', type=str, help="low or high (tells code which folder to search).  If samplerate is 1, this is set automatically to high.") 
@@ -55,6 +55,7 @@ def parse_arguments():
     parser.add_argument("-gzip", default=None, help="boolean, default is SNR files are gzipped after creation", type=str)
     parser.add_argument("-par", default=None, help="parallel processes allowed", type=int)
     parser.add_argument("-timeout", default=None, help="timeout in secs, useful for some archives", type=int)
+    parser.add_argument("-extension", default=None, help="optional extension to keep information like samplerate, snr, lat, lon etc", type=str)
 
     args = parser.parse_args().__dict__
 
@@ -71,14 +72,18 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
               screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
-              par : int=None, timeout : int = 0 ):
+              par : int=None, timeout : int = 0, extension : str='' ):
     """
     rinex2snr translates RINEX files to a new file in the SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided either by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
     the default is RINEX 2.11 files. To tell the code you are using a RINEX 3 file, you should use a RINEX 3 station name,
     i.e. the 9 character version.
 
-    beta version of parallel processing available in this release.  Set -par to a number < 11 
+    New feature as of September 2024: various parameters can be stored in the station.json (created by gnssir_input).
+    This is really just for convenience. Parameters are dec, snr, stream, and samplerate. Why? because I kept forgetting
+    to set them on the command line! Right now you can add them by hand, but I will try to fix that.
+
+    Parallel processing is now available.  Set -par to a number <= 10 
     Some archives have been set to non-compliant with this feature. Please look in the first few lines
     of code to see the names of these archives.
 
@@ -355,6 +360,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         adding this optional parameter to let you set the timeout value, but 
         it has not been implemented everywhere.  right now just the BKG
 
+    extension : str, optional
+        parameter that tells the code you want to use parameters saved in the gnssir json 
+        for that extension parameter. otherwise it uses station.json. It is a convenience
+        for saving things like stream, samplerate, and snr settings that previously had 
+        to be input on the command line
 
     """
 
@@ -377,6 +387,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']
+
+
     #
     if doy_end is None:
         doy_end = doy
@@ -392,6 +404,41 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         if not os.path.isdir(f1):
             print('make output directory for snr files in ', y)
             subprocess.call(['mkdir','-p',f1])
+
+    # if it exists, you can now store information in the json, like samplerate and snr
+    # set noexit cause otherwise it exits ...
+    lsp = guts2.read_json_file(station[0:4].lower(), extension,noexit=True)
+
+    if 'snr' in lsp:
+        if lsp['snr'] is None:
+            print('snr should not be set to this value, ignoring ', lsp['snr'])
+        else:
+            snr = lsp['snr']
+            print('An snr ending parameter was found in the station json: ', snr)
+            print('If you try to override on the command line it will not work.')
+
+    print('Using snr value of ', snr)
+
+    if ('samplerate' in lsp):
+        if lsp['samplerate'] is None:
+            samplerate = 30 # use the default
+        else:
+            samplerate = lsp['samplerate']
+            print('Using samplerate from json ', samplerate)
+
+    if ('stream' in lsp):
+        if lsp['stream'] is None:
+            stream = 'R'
+        else:
+            stream = lsp['stream']
+            print('Using stream setting from json ', stream)
+
+    if ('dec' in lsp):
+        if lsp['dec'] is None:
+            dec = 0 # default
+        else:
+            dec = lsp['dec']
+            print('Using dec parameter from json ', dec )
 
     # when multi-GNSS orbits are reliably available
     gfz_avail = 2021 + 137/365.25
@@ -464,7 +511,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         print(f'translator option must be one of {translator_accepted}. Exiting.')
         sys.exit()
 
-    # check that the fortran exe exist
+    # check that the fortran exe exists
     if translator == 'fortran':
         if orb == 'nav':
             snrexe = g.gpsSNR_version()

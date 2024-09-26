@@ -228,10 +228,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     lsp = guts2.read_json_file(station, extension)
     # 
     if 'snr' in lsp:
-        snr = lsp['snr']
-        print('Found a snr choice in the json:', snr)
-    else:
-        print('Using snr file type: ', snr)
+        if lsp['snr'] is not None:
+            snr = lsp['snr']
+            print('Found a snr choice in the json:', snr)
+    print('Using snr file type: ', snr)
 
 
     # make a refraction file you will need later

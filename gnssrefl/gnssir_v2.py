@@ -683,6 +683,7 @@ def plot2screen(station, f,ax1,ax2,pltname):
 def read_json_file(station, extension,**kwargs):
     """
     picks up json instructions for calculation of lomb scargle periodogram
+    This is meant to be used by GNSSIR
 
     Parameters
     ----------

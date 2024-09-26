@@ -60,8 +60,8 @@ def quickname(station,year,cyy, cdoy, csnr):
 def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol,overwrite,translator,srate, 
                   mk, stream,strip,bkg,screenstats,gzip,timeout):
     """
-    main code to convert RINEX files into SNR files 
-    now works on a single year and doy
+    main code to convert RINEX files into SNR files.
+    It works on a single year and doy.
 
     Parameters
     ----------

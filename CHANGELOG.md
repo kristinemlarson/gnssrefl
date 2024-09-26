@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.7.0
+I have been trying to make a way to save frequently used settings in rinex2snr and gnssir,
+especially the snr ending, and to a lesser extent, the samplerate. 
+I do not want to make a brand new file, so I have added them to them gnssir json
+(created by gnssir_input). So if you are going to be downloading and translating RINEX 3 
+files regularly, you should consider this. The relevant settings are in the gnssir_input documentation
+(samplerate, stream, dec, and snr). I would not set snr unless you are using the non-default
+values (88 or 50 are the most common). 
+
+When you analyze data from a lot of different sites, you might have set up scripts that
+save all this information. I no longer do this - so I do like to save the information so 
+I don't have to remember if it is R or S (for streaming), or samplerate, or whether a site
+should be decimated. It does not save the archive name or the nine character station name, which
+are also useful bits of information when running rinex2snr. Someone else feel 
+free to add these to gnssir_input.py and rinex2snr.
+
+If you are going to do this it does mean the json needs to be created before using rinex2snr.
+And that is a bit illogical. But if you are a frequent user, you will alreayd have a json and 
+it will save you time. And it should not complain if it cannot find the json.
+
 ## 3.6.8
 
 Added snr input to gnssir_input.  If you have non-default SNR files (i.e. not 66), then

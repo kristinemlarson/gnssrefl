@@ -52,6 +52,9 @@ def parse_arguments():
     parser.add_argument("-subdaily_spline_outlier1", default=None, type=float, help="subdaily, outlier value (m), part1")
     parser.add_argument("-subdaily_spline_outlier2", default=None, type=float, help="subdaily, outlier value (m), part2")
     parser.add_argument("-snr", default=None, type=int, help="SNR file type (66,10, 88 etc)")
+    parser.add_argument("-stream", default=None, type=str, help="RINEX3 stream parameter")
+    parser.add_argument("-samplerate", default=None, type=int, help="RINEX3 samplerate parameter")
+    parser.add_argument("-dec", default=None, type=int, help="optional decimation value when creating SNR files ")
 
     args = parser.parse_args().__dict__
 
@@ -74,7 +77,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
                       daily_avg_medfilter: float =None, subdaily_alt_sigma : bool=None, 
                       subdaily_ampl : float=None, subdaily_delta_out : float=None, 
                       subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
-                      subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None, snr: int=None):
+                      subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None, snr: int=None, 
+                      stream: str=None , samplerate: int=None, dec: int=None):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -286,8 +290,14 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     snr : int
         kind of SNR file. If using the default (66), there is no reason to set this.
         if you are going to use non-defaults (i.e. 88) throughout, it would be helpful
-        to set this here and then the value will be used when using gnssir.  You would
-        not have to enter it on the command line.
+        to set this here and then the value will be used when using gnssir. If you set it,
+        it will also be used by rinex2snr, which again can be useful.
+    stream : str, optional
+        for RINEX3 translation, R or S naming parameter
+        set to R
+    samplerate : int , optional
+        for RINEX3 translation, file sample rate to be used
+        set to None for now
     """
 
     # make sure environment variables exist
@@ -338,7 +348,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['Hortho'] = round(Hortho,4) # no point having it be so many decimal points
     lsp['apriori_rh'] = apriori_rh
 
-    # don't save it unless it is not the default.
+    # don't save it unless it was set.
     if snr is not None:
         lsp['snr'] = snr
 
@@ -515,6 +525,15 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['subdaily_spline_outlier1'] = subdaily_spline_outlier1
     lsp['subdaily_spline_outlier2'] = subdaily_spline_outlier2
     lsp['subdaily_subdir'] = subdaily_subdir
+
+    # these are for RINEX 3 filenames
+    lsp['stream'] = stream
+    lsp['samplerate'] = samplerate
+
+    # for snr number, default is None, i.e. set by gnssir and rinex2snr if not specified here
+    lsp['snr'] = snr
+    # mostly for decimating SNR files when created from RINEX files.  
+    lsp['dec'] = dec
 
     print('writing out to:', outputfile)
     print(lsp)
