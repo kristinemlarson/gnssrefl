@@ -278,7 +278,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
                         if (rate == 'high'):
-                            print('Looks for 1-Hz Rinex 3 data at BKG, CDDIS, GA, the Spanish IGN, and GNET')
+                            #print('Looks for 1-Hz Rinex 3 data at BKG, CDDIS, GA, the Spanish IGN, and GNET')
                             if archive == 'ga':
                                 deleteOld = True
                                 # this downloads RINEX 3 and converts to Rinex 2
