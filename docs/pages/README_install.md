@@ -8,6 +8,8 @@ you can also use a linux emulator and follow instructions for linux.
 
 [Install Instructions](https://gnssrefl.readthedocs.io/en/latest/pages/jupyter_notebook_instructions.html)
 
+[Notebook Area for Use Case Examples](https://github.com/kristinemlarson/gnssrefl/tree/master/notebooks/use-cases)
+
 ## Docker Container
 
 [Install Instructions](https://gnssrefl.readthedocs.io/en/latest/pages/docker_cl_instructions.html)
