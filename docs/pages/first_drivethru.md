@@ -78,6 +78,11 @@ The plots might look slightly different and the defaults we used in the analysis
 
 * [MNIS (not finished)](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mnis.html)
 
+## GNSS Reflection Geometry and SNR Simulation:
+
+* [GNSSRefGeometry-SNRSimulation.ipynb](https://github.com/kristinemlarson/gnssrefl/blob/master/notebooks/use-cases/Soil_Moisture/GNSSRefGeometry-SNRSimulation.ipynb): Explore the simulation of GNSS reflection geometry and SNR using python in Jupyter Notebook 
+
+
 ## Homeworks from Previous Shortcourses:
 
 * [Homework 0](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework0.html): Make sure you have properly installed the software
@@ -88,6 +93,7 @@ The plots might look slightly different and the defaults we used in the analysis
 
     * [Homework 2 Solution](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework2_soln.html)
 
-* [Homework 3](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework3.html): Learn how to measure water levels 
+* [Homework 3](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework3.html): Learn how to measure water levels
+  
 
     * [Homework 3 Solution](https://gnssrefl.readthedocs.io/en/latest/homeworks/homework3_soln.html)
