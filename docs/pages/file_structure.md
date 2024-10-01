@@ -22,6 +22,40 @@ we strongly encourage you to use them. And never use an elevation mask on your r
 completely unncessary for positioning (which allows masking to be done at the software level) and 
 are extremely harmful to GNSS-IR.
 
+## Where should I store station coordinates? 
+
+The software comes with a long list (almost 20,000) of station coordinates 
+taken from the University of Nevada Reno. If you are analyzing data from any of 
+those stations, you should not have to enter
+any coordinates (Note: you can use **query_unr** to see if your station 
+is included in the UNR database). 
+
+If you are analyzing your own data, eventually you will need to tell the software 
+where your stations are. This location does not have to be super precise, within a few meters
+is perfectly acceptable, as it is primarily used for the refraction correction. The better your
+site coordinates, the better your reflection zone maps would be, however. Previously you 
+input this information (latitude, longitude, and ellipsoidal height) when you set your analysis strategy in **gnssir_input**. 
+
+As of version 3.6.4, there is now another 
+option. If you create a plain txt file with the name llh_local.txt and store it 
+in the $REFL_CODE/input directory, the code will
+use this as your *a priori* station coordinates. The format of this 
+file for **each line** should be :
+
+station latitude longitude and height, where station must be four characters,
+preferably lower case. latitude and longitude should be in degrees. height means ellipsoidal
+height in meters.  Example for station **xxxx**:
+
+
+<PRE>
+xxxx 39.949492 -105.194266 1728.856
+</PRE>
+
+You can add comment lines to the file with a percent sign.
+This file is read in the <code>query_coordinate_file</code> function found in gps.py. The local coordinate 
+file is read by <code>mea2snr</code>. This means you no longer have to enter station coordinates on 
+the command line when using <code>nmea2snr</code>. 
+
 ## How do I analyze my own GNSS data?
 
 To analyze your own GNSS data you must comply with the software expectations for how the 
@@ -41,7 +75,7 @@ Documentation can always be improved, so if you would like to add more examples 
 current documentation confusing, please submit a pull request.
 
 If you are using the notebooks, there is currently no notebook for this option.
-Please contact Kelly.Enloe@earthscope.org for guidance.
+Please contact Kelly.Enloe@earthscope.org directly for guidance. 
 
 If you have questions about converting NMEA files, the best I can offer is that you read
 the next section on that specific format.
@@ -133,12 +167,9 @@ want to use the -rate high files and provide -samplerate 1. Why two inputs?  Bec
 -rate high option tells the code to look in a particular folder. The samplerate is related
 to the name of the file itself.  
 
-Unfortunately IGS archives have refused to change the standard storage format of 96 files per day.
-And after six months, they tar the files. This code does not currently have the capability to 
-recover those tarred files.  I am happy to host it - but someone else needs to do it. Please
-look at the existing code and make a new python function with similar inputs/outputs and submit a pull request.
-Keep in mind that you should be able to use the existing code base once you have downloaded and untarred 
-the IGS archived file.
+Recently the IGS and its sister archives have started making a single tar file of 
+the 96 daily files after six months.
+gnssrefl now allows access to these older data from CDDIS and BKG.
 
 Please see the rinex2snr documentation page for more examples.
 
@@ -165,7 +196,7 @@ Additional information about nmea2snr [is in the code.](https://gnssrefl.readthe
 
 We have tried our best to make the orbit files relatively invisible to users.
 But for the sake of completeness, we are either using broadcast navigation files in the RINEX 2.11 format
-or precise orbits in the sp3 format.  If you have nav files for your station, we recommend you delete them.
+or precise orbits in the sp3 format. If you have nav files for your station, we recommend you delete them.
 They are not useful in this code.
 
 The main things you need to know:
@@ -177,16 +208,19 @@ older data. Those files are reliably available from 2023. And they cover the fou
 My current default is rapid GNSS - but that does not always have Beidou in it. 
 
 - we also have ultra-orbit options, which are appropriate for real-time users. I cannot keep track of 
-what ultra products are working. You can try ultra, wum, and wum2. The first is from GFZ and the latter two are from Wuhan.
+what ultra products are working. You can try ultra, wum, and wum2. The first is from GFZ 
+and the latter two are from Wuhan. The second file comes from Wuhan directly while the first (I believe)
+comes from the one stored at CDDIS.
 
 ## EXECUTABLES
 
 There are two key executables: CRX2RNX and gfzrnx. For notebook and docker users, these 
 are installed for you.  pypi/github users must install them. The utility <code>installexe</code>
 should take care of this. They are stored in the directory defined by the EXE environment variable.
+We used to support the use of teqc but as Earthscope no longer provides technical support for it, 
+we have mostly eliminated it.
 
 ## Where Files are Stored
-
 
 File structure for station abcd in the year YYYY (last two characters YY), doy DDD:
 
@@ -302,17 +336,22 @@ Now look at the L2C retrievals.
 
 <img src="../_static/p038usingL2c.png" width="600">
 
-If you were trying to find a periodic signal, which one 
-would you want to use?
+If you were trying to find a periodic signal, which one would you want to use?
 
 To further confuse things, when the receiver was updated to a Septentrio, unavco began
 providing L2C data in the default 15 second files. This is a good thing - but it is confusing
-to people that won't know why the signal quality improved over night.
+to people that won't know why the signal quality improved overnight.
+
+L2C is easy to extract from RINEX 3 files - and that is what is done by <code>rinex2snr</code>. However,
+I do not make the same restriction for RINEX 2.11 files.  In principle I could, but for now, I translate
+all L2 signals in a RINEX 2.11 file. When you subsequently chose L2C (frequency 20) in <code>gnssir</code>, you will
+be given results for all GPS satellites that could be L2C. The list of L2C transmitting satellites is found
+in the gps.py library.
 
 ### GPS L5
 
 Another great signal.  I love it. It does have a high chipping rate, which is 
-relevant (i.e. bad) for reflectomtry from very tall sites.
+relevant (i.e. bad) for reflectometry from very tall sites.
 
 ### Aliasing
 

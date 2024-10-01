@@ -57,7 +57,7 @@ The default return is for the L1 frequency:
 
 <code>quickLook p041 2020 132</code>
 
-<img src="../_static/p041-l1.x.png" width="600">
+<img src="../_static/p041-l1.x.jpg" width="600">
 
 The code also summarizes these RH retrievals in terms of 
 azimuth (x-axis) and QC metrics:
@@ -68,21 +68,12 @@ Now try looking at the periodogram for L2C by specifying frequency 20:
 
 <code>quickLook p041 2020 132 -fr 20</code>
 
-<img src="../_static/p041-l2c.x.png" width="600">
+<img src="../_static/p041-l2c.x.jpg" width="600">
 <P>
 <img src="../_static/new-qc-p041-l2c.png" width="600">
 
 Note that there are more colors in the L1 plots than in the L2C plots. That is 
 the result of there being more L1 transmitting satellite than L2C transmitting satellites.
-
-Now try L5:
-
-<CODE>quickLook p041 2020 132 -fr 5</code>
-
-<img src="../_static/p041-l5.png" width="600">
-
-The L5 signal has only been available on satellites launched after 2010, so there are even 
-fewer satellite tracks than either L1 or L2C.
 
 The **quickLook** code has multiple options. For example, it is possible change the reflector height range:
 

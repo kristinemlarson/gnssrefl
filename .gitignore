@@ -1,8 +1,14 @@
 env
+new.pyproject.toml
+meson.build
 set_simulator*py
+swh.py
+waves_lib.py
 test_animation.py
 NITE*py
 test3.py
+totals*txt
+download_scripps.py
 list_denmark.py
 llh.csv
 llh.txt

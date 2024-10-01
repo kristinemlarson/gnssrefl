@@ -1,4 +1,20 @@
+# disutils - change to meson
+
+https://numpy.org/doc/stable/reference/distutils_status_migration.html
+
+# example of someone doing this ?
+https://github.com/quarkslab/qbindiff/commit/46247bc377f806f91b53e42172c2e48f48e4da4a
+
+will be removed as of Python 12
+
+https://meson-python.readthedocs.io/en/stable/tutorials/introduction.html
+
 # should get rid of flipit detritus in subdaily
+
+compile the fortran first
+f2py -c -m gnssrefl.gpssnr gnssrefl/gpssnr.f
+
+
 
 https://stackoverflow.com/questions/7053996/how-do-i-install-imagemagick-with-homebrew
 

@@ -37,8 +37,10 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
     This module creates “stand-alone” Fresnel Zones maps for google Earth. At a minimum 
     it requires a four station character name as input. The output is a KML file.
 
-    If the station is in the UNR database, those latitude, longitude, and ellipsoidal 
-    height values are used. You may override those values with the optional inputs.
+    If the station is in either your local coordinate file or in the UNR database that comes with gnssrefl, 
+    those latitude, longitude, and ellipsoidal height values are used. For information on the local
+    coordinate file see the file formats section of the documentation.
+    You may override those stored values with the optional lat lon height inputs.
 
     The output file will be stored in REFL_CODE/Files/kml unless you specify an output name. In that case
     it will go into your working directory

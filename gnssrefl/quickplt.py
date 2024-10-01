@@ -46,6 +46,7 @@ def parse_arguments():
     parser.add_argument("-azlimits", nargs="*",type=float, help="optional azimuth angle limits for SNR file", default=None)
     parser.add_argument("-plt", help="Set to False/F if you do not want the plot to come to the screen ", type=str,default=None)
 
+    g.print_version_to_screen()
 
     args = parser.parse_args().__dict__
 
@@ -81,10 +82,10 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
     The latter is short for elevation angle. To pick this option set -sat to a specific satellite
     nubmer or a constellation (gps, glonass, etc). You can also set elimits and azlimits for simple
     elevation angle and azimuth angle limits. Only for SNR files, you can send the name of the SNR file
-    without the directory, i.e. sc021500.22.snr66 instead of /Users/Files/2022/snr/sc02/sc021500.22.snr66
+    without the directory, i.e. sc021500.22.snr66 instead of REFL_CODE/2022/snr/sc02/sc021500.22.snr66
 
-    You may submit a filename that has been gzipped. The code will checked to see if the gzip version
-    is there and gunzip it for you.
+    You may submit a snr filename that has been gzipped. The code will checked to see if the gzip version
+    is there and gunzip it for you. But this option does not exist for other kinds of files.
 
 
     Examples
@@ -168,15 +169,15 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
         prescribe the marker used in the plot . It can include the color, i.e.
         'b.' or 'b^'
     reverse : bool, optional
-        to reverse y-axis limits
+        to reverse y-axis limits which is helpful for when you are showing RH results
+        but want the tides to be shown.
     title : str, optional
         title for plot 
     outfile : str, optional
         name of png file to store plot 
     xlimits: list of str, 
-        xaxis limits  
-        if you selected any time options (ymd, mjd, ydoy,mjd), the code assumes
-        a format of yyyyMMdd (year,month,day) 
+        xaxis limits. if you selected any time options (ymd, mjd, ydoy,mjd), the code assumes
+        a format of yyyyMMdd (year,month,day) for xlimits
     ylimits: list of floats, optional
         yaxis limits  
     ydoy : bool, optional
@@ -282,7 +283,8 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
     cyear = '20' + basename[9:11]  
     if snrfile:
         xdir = os.environ['REFL_CODE']
-        longfile = xdir + '/' + cyear + '/snr/' + station + '/' + basename
+        #longfile = xdir + '/' + cyear + '/snr/' + station + '/' + basename
+        longfile = f'{xdir}/{cyear}/snr/{station}/{basename}'
         longfile_gz = longfile + '.gz'
         if not os.path.isfile(filename) and os.path.isfile(longfile):
             filename = longfile
@@ -451,11 +453,12 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
             myplt.ylabel(ycolT + ' SNR, dBHz')
 
 
+    # sat is a string ...
     if title is None:
         if snrfile:
             sname = os.path.basename(filename)
-            ytitle = sname[0:4] + ' 20' + sname[9:11] + ' ' + sname[4:7]
-            ax.set_title('sat ' + str(sat) + '/' + ytitle  )
+            ytitle = f'{sname[0:4]} 20{sname[9:11]}/{sname[4:7]}'
+            ax.set_title(f'sat {sat}/{ytitle}' )
         else:
             ax.set_title(os.path.basename(filename) )
     else:

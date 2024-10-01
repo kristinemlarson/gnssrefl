@@ -310,6 +310,8 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
     This actually makes three stacked plots - not two, LOL
     It gives an overview for quality control
 
+    Wait wait, you want four plots?  
+
     Parameters
     ----------
     otimes : numpy array of datetime objects
@@ -342,14 +344,15 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
     # this is not working, so just setting it to false, cause who cares!
     setlimits = False
     fs = 12
-    fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True,figsize=(10,8))
+    fig,(ax1,ax2,ax3,ax4)=plt.subplots(4,1,sharex=True,figsize=(10,9))
+    #fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True,figsize=(10,8))
     #fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
     i = (tv[:,10] < 100)
     colors = tv[:,10]
     scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax1)
     colorbar.set_label('Frequency', fontsize=fs)
-    ax1.set_title('Signals',fontsize=fs)
+    ax1.set_title(station.upper() + ': Signals',fontsize=fs)
     plt.xticks(rotation =45,fontsize=fs); 
     ax1.set_ylabel('RH (m)',fontsize=fs)
     plt.yticks(fontsize=fs)
@@ -380,8 +383,6 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
 
 # put some amplitude information on it
     colors = tv[:,6]
-    # ax.plot( otimes, tv[:,2], '.')
-    # https://matplotlib.org/stable/gallery/lines_bars_and_markers/scatter_with_legend.html
     scatter = ax3.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
     colorbar = fig.colorbar(scatter, ax=ax3)
     ax3.set_ylabel('RH (m)',fontsize=fs)
@@ -392,6 +393,20 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
     ax3.grid(True)
     if setlimits:
         ax3.set_xlim((th1, th2))
+    fig.autofmt_xdate()
+
+# put some peak 2 noise information on it
+    colors = tv[:,13]
+    scatter = ax4.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
+    colorbar = fig.colorbar(scatter, ax=ax4)
+    ax4.set_ylabel('RH (m)',fontsize=fs)
+    colorbar.set_label('p2n', fontsize=fs)
+    plt.xticks(rotation =45,fontsize=fs); plt.yticks(fontsize=fs)
+    ax4.set_title('Peak to Noise',fontsize=fs)
+    ax4.invert_yaxis()
+    ax4.grid(True)
+    if setlimits:
+        ax4.set_xlim((th1, th2))
     fig.autofmt_xdate()
 
     plotname = txtdir + '/' + station + '_' + str(year) + '_combined.png'
@@ -435,7 +450,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     plt.plot(tv[ii,5],tv[ii,2], 'ro',markersize=4,label='outliers')
     plt.xlabel('Azimuth (degrees)')
     plt.ylabel('Reflector Height (m)')
-    plt.title('Quick Plot of RH with respect to Azimuth')
+    plt.title(station.upper() + ': Quick Plot of RH with respect to Azimuth')
     plt.gca().invert_yaxis()
     plt.legend(loc="best")
     plt.grid()
@@ -823,8 +838,8 @@ def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     fig.autofmt_xdate()
 
     g.save_plot(txtdir + '/' + station + '_rhdot1.png')
-    # plot to the screen ... 
-    #plt.close()
+    # do not plot to the screen ... 
+    plt.close()
 
 def quickTr(year, doy,frachours):
     """
@@ -964,12 +979,14 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
 
     return badpoints2
 
-def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,spline,delta_out,csvfile,gap_flag):
+def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, 
+                   gap_min_val,th,spline,delta_out,csvfile,gap_flag,hires_figs,knots):
     """
 
-    Makes a plot of the final spline fit to the data. Output time interval controlled by the user.
+    Makes a plot of the final spline fit to the data. Output time 
+    interval controlled by the user.
 
-    It also now writes out the file with the spline fit
+    It writes out the file with the spline fit. Location is printed to the screen
 
     Parameters
     ----------
@@ -999,6 +1016,8 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
         print out csv instead of plain txt
     gap_flag : bool
         whether to write 999 in file where there are gaps
+    knots : int
+        number of knots per day used in final spline
     """
 
     #print('Entering RH_ortho_plot2')
@@ -1127,14 +1146,18 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh, gap_min_val,th,
 
     fout.close()
 
+    # plot of the final spline
     fig=plt.figure(figsize=(10,5))
     plt.plot(mjd_new_obstimes, H0 -spline_new, 'b-',linewidth=2)
     plt.grid()
     plt.ylabel('meters',fontsize=fs)
-    plt.title(station.upper() + ' Water Level from GNSS-IR', fontsize=fs)
+    plt.title(station.upper() + ' Water Level from GNSS-IR using splinefit/' + str(knots) + ' knots', fontsize=fs)
     fig.autofmt_xdate()
 
-    pfile = txtdir + '/' + station + '_H0.png'
+    if hires_figs:
+        pfile = txtdir + '/' + station + '_H0.eps'
+    else:
+        pfile = txtdir + '/' + station + '_H0.png'
     g.save_plot(pfile)
 
     return
@@ -1300,3 +1323,39 @@ def flipit3(tvd,col):
     ynew = ynew[ii]
 
     return tnew, ynew
+
+def the_last_plot(tv,station,plotname):
+    """
+    simple - reversed - reflector height plot - created after all
+    corrections are made (RHdot and Interfrequency)
+
+    Location of the png plot is printed to the screen
+
+    Parameters
+    ----------
+    station : str
+        station name, four characters
+    tv : numpy array
+        output of the subdaily code
+    plotname : str
+        where the plot should be stored
+
+    """
+    fs = 10
+    obstimes = mjd_to_obstimes(tv[:,15])
+    final_rh = tv[:,24]
+    # new plot
+    fig=plt.figure(figsize=(10,4))
+    plt.plot(obstimes,final_rh, 'b-')
+    plt.title
+    plt.ylabel('meters')
+    plt.title(station.upper() + ' : GNSS-IR Reflector Height') 
+    plt.gca().invert_yaxis()
+    plt.grid()
+    fig.autofmt_xdate()
+
+    plt.savefig(plotname,dpi=300)
+    print('Plot file for final RH saved as: ', plotname)
+    # don't plot to the screen
+    plt.close()
+

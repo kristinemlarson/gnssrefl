@@ -1,3 +1,4 @@
+exit
 clear all
 close all
 clc

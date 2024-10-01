@@ -49,7 +49,7 @@ Use our utility **quickLook** to look at these data.
 
 <code>quickLook lthw 2018 1 -e1 7</code>
 
-<img src="../_static/lthw-day1-2018.png" width="600">
+<img src="../_static/lthw-day1-2018.jpg" width="600">
 
 This is a bit of a mess really. If there are significant peaks, they are really 
 close to the cutoff for the method (at 0.5 meters). Let's compare with about a week later.
@@ -57,11 +57,11 @@ First make a SNR file:
 
 <code>rinex2snr lthw 2018 9</code>
 
-Now run quickLook:
+Now run <code>quickLook<code>:
 
 <code>quickLook lthw 2018 9 -e1 7</code>
 
-<img src="../_static/qc-lthw-1.png" width="600">
+<img src="../_static/qc-lthw-1.jpg" width="600">
 
 This is *much* better and clearly shows that a field crew reset the antenna to a little 
 less than 5 meters sometime between day 1 and day 9 in the year 2018. You can also look 
@@ -69,7 +69,7 @@ at the second plot to get an idea of how well the method performs for various az
 and QC parameters:
 
 
-<img src="../_static/qc-lthw-2.png" width="600">
+<img src="../_static/qc-lthw-2.jpg" width="600">
 
 Except for a region ~270-300 degrees in azimuth, and directly south, retrievals are consistently good.
 A peak to noise ratio of 3 appears to be appropriate. The rejected southern retrievals are unlikely to be 
@@ -82,7 +82,7 @@ If you like you can compare this to the first day of 2020, first make the SNR fi
 
 Again use quickLook:
 
-<img src="../_static/qc-lthw-2020.png" width=600>
+<img src="../_static/qc-lthw-2020.jpg" width=600>
 
 Now the peaks in the reflector height (RH) periodograms are ~2.2 meters - 
 so that means that there was ~2.5 meters of surface change from 2018 to 2020.
@@ -119,5 +119,6 @@ overall character of the results:
 
 [Sample daily average RH file for 2018](lthw_dailyRH.txt)
 
-If you are feeling ambitious, try looking at the data for [Upper Thwaites Glacier](https://www.unavco.org/instrumentation/networks/status/nota/overview/UTHW) :-)
+If you are feeling ambitious, try looking at the 
+data for [Upper Thwaites Glacier](https://www.unavco.org/instrumentation/networks/status/nota/overview/UTHW) :-)
 

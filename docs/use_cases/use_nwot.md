@@ -127,7 +127,7 @@ the [Niwot Ridge facility.](https://portal.edirepository.org/nis/mapbrowse?packa
 We will compare to pole 16, which is shown in the photograph above. 
 The relevant Niwot Ridge csv file is provided here: 
 
-[in situ data from the Niwot Ridge LTER](saddsnow.dw.data.csv)
+[in situ data from the Niwot Ridge LTER](saddsnow.dw.data.csv.gz)
 
 If the daily average RH file created above is stored in the same directory 
 as the Niwot Ridge *in situ* datafile, you can use 

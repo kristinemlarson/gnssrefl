@@ -37,6 +37,8 @@ def parse_arguments():
     parser.add_argument("-orb", default=None, help="request specific orbit source", type=str)
     parser.add_argument("-hour", default=None, help="request hour for ultra orbit", type=int)
 
+    g.print_version_to_screen()
+
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -76,6 +78,10 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
 
     As for March 16, 2024, this code has been changed to use gnssrefl standards for inputs and outputs.
     The code, in principle, now looks for final, rapid, and ultra rapid orbits from GFZ, in that order.
+
+    As of version 3.6.4 you no longer have to enter station coordinates on the command line. 
+    You just need to follow the instructions in the file formats documentation to set up a list of the locations of 
+    your local stations. 
 
     Parameters
     ----------
@@ -153,12 +159,20 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
         sp3 = False
     else:
         sp3 = True
+        # check local coordinte file
+        foundcoords, lat, lon, ht = g.query_coordinate_file(station)
+        if foundcoords:
+            print(lat,lon,ht)
+            x,y,z = g.llh2xyz(lat,lon,ht)
+            recv = [x,y,z]
+        else:
         # try to get a priori coordinates, Cartesian
-        recv, foundcoords = nmea.nmea_apriori_coords(station,llh,sp3)
+            recv, foundcoords = nmea.nmea_apriori_coords(station,llh,sp3)
         if not foundcoords:
             print('The default in this code is to use precise orbits to calculate az/el values.')
             print('We need to know apriori coordinates for your site. Please input lat/lon/ellipsoidal height ')
-            print('on the command line or set those values using gnssir_input.')
+            print('on the command line or use a local coordinate file as explained in the documentation for')
+            print('query_coordinate_file. You can also store the values using gnssir_input.')
             sys.exit()
 
 

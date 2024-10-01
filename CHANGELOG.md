@@ -3,6 +3,141 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.7.0
+I have been trying to make a way to save frequently used settings in rinex2snr and gnssir,
+especially the snr ending, and to a lesser extent, the samplerate. 
+I do not want to make a brand new file, so I have added them to them gnssir json
+(created by gnssir_input). So if you are going to be downloading and translating RINEX 3 
+files regularly, you should consider this. The relevant settings are in the gnssir_input documentation
+(samplerate, stream, dec, and snr). I would not set snr unless you are using the non-default
+values (88 or 50 are the most common). 
+
+When you analyze data from a lot of different sites, you might have set up scripts that
+save all this information. I no longer do this - so I do like to save the information so 
+I don't have to remember if it is R or S (for streaming), or samplerate, or whether a site
+should be decimated. It does not save the archive name or the nine character station name, which
+are also useful bits of information when running rinex2snr. Someone else feel 
+free to add these to gnssir_input.py and rinex2snr.
+
+If you are going to do this it does mean the json needs to be created before using rinex2snr.
+And that is a bit illogical. But if you are a frequent user, you will alreayd have a json and 
+it will save you time. And it should not complain if it cannot find the json.
+
+## 3.6.8
+
+Added snr input to gnssir_input.  If you have non-default SNR files (i.e. not 66), then
+you can set that and not have to type it in the command line.
+
+Added a few info messages in quickLook explaining why station coordinates are not needed
+(though they are helpful). Also check that azim1 is < azim2.
+
+Fixed a very stupid bug in conv2snr that was looking for RINEX files even though
+they already existed (as nolook option was set and the file was found). Optional
+filename now sent to conv2snr to make sure this choice is not made.
+
+## 3.6.7
+
+added savearcs_format option - allows pickle format which has more information 
+than plain txt version. See gnssir for more information.
+
+removed bug in reading local coordinate file.  it failed when there was only a 
+single station in the file. it should now work though you can't disobey the format.
+you have to have four entries per line: station, lat, lon, ht. Comment lines must
+have a % at the beginning.
+
+## 3.6.6
+
+added debug option to remove the try in gnssir_cl.py - because that 
+makes it really hard to know why your run is crashing. If you set debug to
+T, you will  have more information.
+
+optional savearcs option to gnssir: writeout plain text files of 
+elevation angle and detrended snr 
+using savearcs option. This is bare bones ... not really ready for prime time
+
+fixed bug in daily_avg for people that try to analyze sites with no results. it now  
+politely exits for this case.
+
+added peak 2 noise to subdaily summary plot
+
+added gnssir output that tells you to use the (new) debug option in error situations.
+
+exits when people try to use illegal refraction models in gnssir_input
+
+added warning for people that don't input legal elevation angle lists to gnssir_input
+
+added documentation for quickplt so people can look at raw SNR data.
+
+added subdaily option to allow different required amplitude values for different frequencies.
+It uses frequency list in the json to set the order of those amplitudes.  
+
+
+## 3.6.5
+
+July 29, 2024
+
+Various minor changes.
+
+Updated nmea2snr ultra orbit choices : first tries GFZ and then Wuhan (wum2)
+
+Felipe Nievinski improved how the NMEA files are accessed in nmea2snr.
+Uses a temporary file location which is deleted after use.
+
+## 3.6.4
+
+July 22, 2024
+
+I added a final plot to subdaily. Doesn't have the spline in it.  Uses a line instead 
+of a symbol. But otherwise it isn't new information.
+
+I added a simple file for a priori lat lon and ellipsoidal height values. 
+It should be located in $REFL_CODE/llh_local.txt. and the values should simply
+be 4 ch station name lat lon height. NO COMMAS between then,  simply spaces.
+comment lines are allowed if preceded by percent sign. I would prefer station names to be 
+lowercase, but it allows and checks uppercase.
+This kind of file would be particularly useful for NMEA people as it allows you to 
+store your a priori receiver coordinates and don't have to worry about it being 
+overwritten if you change your analysis strategy.
+
+## 3.6.3
+July 19, 2024
+
+added option in rinex3_snr to correct illegal filenames that Earthscope is distributing
+to the world. it assumes they used rinex 2.11 filename but filled it with Rinex 3 data.
+and used upper case instead of lower case.
+
+Am trying to add version number to print out to all major codes in gnssrefl.
+
+## 3.6.2
+
+July 17, 2024
+
+There was a bug in the RINEX3 to RINEX2 conversion code.
+This should be fixed - and the code is less silly now.  I think.
+Thanks to Drew Lindow for finding this bug.
+
+deleted gnssrefl/data/gpt_1wA.pickle. I do not think it is used.
+
+## 3.6.1 
+
+Versions 3.6.0 and 3.6.1 are about the same.  I had some issues with the version tags.
+
+July 15, 2024
+
+Daily Lomb Scargle results are sorted in time instead of frequency.
+
+Fixed bug in rinex3_snr (inputs changed)
+
+You can access 1-sec RINEX3 GNET archive data if you have 
+an account and the utility lftp installed.
+
+Allow snr choice to be stored in the gnssir_input json. For now you have 
+to add it to the json by
+hand, but I am happy to accept a PR that adds it explicitly. If 
+you do that, you want to make sure that the downstream code (gnssir) can 
+still change the snr choice on the command line. Right now it assumes
+if it finds a snr value in the json, it should use it.
+
 ## 3.5.10
 
 added new Wuhan (wum2) near real time orbits. Triggered from year 2024 and doy 187
@@ -108,6 +243,9 @@ Tried to implement parallel processing for NMEA files.  Let me know if it doesn'
 to work.
 
 ## 3.4.0
+
+June 5, 2024 
+
 fixed pretty major problem with default (rapid) orbits.  updated to new file names and 
 locations for GFZ analysis center.  I do not know when the old naming conventions will fail for ultra.
 
@@ -124,7 +262,7 @@ rinex2snr: Added BKG access to high-rate files that are more than 6 months old.
 This will allow parallel processing, though CDDIS does not (this is a restriction
 at CDDIS, not because of gnssrefl).
 
-Fixed bug in rinex3_snr (inputs had changed to run_rinex2snr)
+Fixed bug in rinex3_snr (inputs had changed in run_rinex2snr)
 
 Fixed download_rinex for highrate files from BKG and CDDIS so that it allows
 both old and current datastreams
@@ -161,6 +299,9 @@ merging still slow. Has anyone tested new versions of gfzrnx to see if they
 are faster? They might be.
 
 ## 3.2.0
+
+May 8, 2024 
+
 Added NITE model.  In gnssrefl this is refl_model 5.
 
 For details see Peng (2023), DOI: 10.1109/TGRS.2023.3332422

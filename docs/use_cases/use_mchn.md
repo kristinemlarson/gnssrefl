@@ -19,7 +19,7 @@ Updated February 28, 2024 by Kristine Larson
 [Google Maps Link](https://goo.gl/maps/mU5GbsvMsLfe5buQ7) 
 
 <p align=center>
-<img src="../_static/mchn_monu-cors.png" width="500"/>
+<img src="../_static/mchn_monu-cors.jpg" width="500"/>
 </P>
 
 ### Data Summary

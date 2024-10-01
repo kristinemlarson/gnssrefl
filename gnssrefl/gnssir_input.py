@@ -36,7 +36,7 @@ def parse_arguments():
     parser.add_argument("-delTmax", default=None, type=float, help="max arc length (min) default is 75. Shorten for tides.")
     parser.add_argument("-frlist", nargs="*",type=int,  help="User defined frequencies using our nomenclature, e.g. 1 101 for GPS and Glonass L1")
     parser.add_argument("-azlist2", nargs="*",type=float,  default=None,help="list of azimuth regions, default is 0-360") 
-    parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angles, advanced users only!") 
+    parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angle pairs, advanced users only!") 
     parser.add_argument("-refr_model", default="1", type=str, help="refraction model. default is 1, zero turns it off)")
     parser.add_argument("-apriori_rh", default=None, type=float, help="apriori reflector height (m) used by NITE model")
     parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height (m)")
@@ -51,8 +51,14 @@ def parse_arguments():
     parser.add_argument("-subdaily_subdir", default=None, type=str, help="subdaily, output directory")
     parser.add_argument("-subdaily_spline_outlier1", default=None, type=float, help="subdaily, outlier value (m), part1")
     parser.add_argument("-subdaily_spline_outlier2", default=None, type=float, help="subdaily, outlier value (m), part2")
+    parser.add_argument("-snr", default=None, type=int, help="SNR file type (66,10, 88 etc)")
+    parser.add_argument("-stream", default=None, type=str, help="RINEX3 stream parameter")
+    parser.add_argument("-samplerate", default=None, type=int, help="RINEX3 samplerate parameter")
+    parser.add_argument("-dec", default=None, type=int, help="optional decimation value when creating SNR files ")
 
     args = parser.parse_args().__dict__
+
+    g.print_version_to_screen()
 
     # convert all expected boolean inputs from strings to booleans
     boolean_args = ['allfreq', 'l1', 'l2c', 'xyz', 'refraction','subdaily_alt_sigma']
@@ -71,7 +77,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
                       daily_avg_medfilter: float =None, subdaily_alt_sigma : bool=None, 
                       subdaily_ampl : float=None, subdaily_delta_out : float=None, 
                       subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
-                      subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None):
+                      subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None, snr: int=None, 
+                      stream: str=None , samplerate: int=None, dec: int=None):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -86,17 +93,19 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     Note: you can keep using your old json files - you just need to add this new -azlist2 setting manually.
 
-    Latitude, longitude, and height are assumed to be stored in the UNR database.  If they are not, you should
-    set them manually.
+    Latitude, longitude, and height are assumed to be stored in either the UNR database we provide with
+    gnssrefl or in your local coordinate file. See the instructions in the file formats section of gnssrefl for 
+    information about the format, name, and location of that local coordinate file.  
 
     Originally we had refraction as a boolean, i.e. on or off. This was stored in the gnssir 
     analysis description json. The code however, uses a 1 for a simple non-time-varying 
     Bennett correction and 0 for no correction.
 
     From version 1.8.4 we begin to implement more refraction models.  Model 1 (Bennett) will continue to be 
-    the default.  The model number is written (as an integer) to the LSP results file so that people can keep track easily of whether
-    they are inadvertently mixing files with different strategies. And that is why it is an integer, because
-    all results in the LSP results files are numbers.  Going forward, we are adding a time-varying capability.
+    the default.  The model number is written (as an integer) to the LSP results file so that people can 
+    keep track easily of whether they are inadvertently mixing files with different strategies. And that 
+    is why it is an integer, because all results in the LSP results files are numbers.  Going forward, 
+    we are adding a time-varying capability.
 
         Model 1: Bennett, non-time-varying
 
@@ -130,7 +139,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     gnssir_input p041 -lat 39.9494 -lon -105.19426 -height 1728.85  -l2c T -e1 5 -e2 15
         uses only L2C GPS data between elevation angles of 5 and 15 degrees.
-        user input lat/long/height
+        user input lat/long/height. The lat/long/height can also be entered into a local
+        coordinate file.  See documentation in the file formats section.
 
     gnssir_input p041  -h1 0.5 -h2 10 -e1 5 -e2 25
         uses UNR database, only GPS data between elevation angles of 5-25 degrees and reflector heights of 0.5-10 meters
@@ -145,6 +155,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         do two arcs, one for 5-10 degrees and the other for 7-12.
         WARNING: you need to pay attention to QC metrics (amplitude and peak2noise).  You likely need to lower them since 
         your periodogram for fewer data will be less robust than with the longer elevation angle region.
+        WARNING: these are pairs.  Don't give the code an odd number of values.
 
     Parameters
     ----------
@@ -276,6 +287,17 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     subdaily_spline_outlier2 : float, optional
         alternate setting for outlier detection in part2
 
+    snr : int
+        kind of SNR file. If using the default (66), there is no reason to set this.
+        if you are going to use non-defaults (i.e. 88) throughout, it would be helpful
+        to set this here and then the value will be used when using gnssir. If you set it,
+        it will also be used by rinex2snr, which again can be useful.
+    stream : str, optional
+        for RINEX3 translation, R or S naming parameter
+        set to R
+    samplerate : int , optional
+        for RINEX3 translation, file sample rate to be used
+        set to None for now
     """
 
     # make sure environment variables exist
@@ -304,7 +326,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         # try to find the coordinates  at UNR
         lat, lon, height = g.queryUNR_modern(station)
         if lat == 0:
-            print('Tried to find coordinates in our station database. None found so exiting')
+            print('Tried to find coordinates in station database. None found so exiting')
             sys.exit()
 
     # calculate Hortho using EGM96 if none provided
@@ -325,7 +347,10 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['ht'] = height
     lsp['Hortho'] = round(Hortho,4) # no point having it be so many decimal points
     lsp['apriori_rh'] = apriori_rh
-    
+
+    # don't save it unless it was set.
+    if snr is not None:
+        lsp['snr'] = snr
 
     if h1 > h2:
         print(f'h1 cannot be greater than h2. You have set h1 to {h1} and h2 to {h2}. Exiting.')
@@ -457,6 +482,12 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     # this really should be set to True.  the code is obviously ignoring it
     lsp['gzip'] = False   
 
+    # for people that don't know how to input pairs of angles
+    if ( (len(ellist) % 2) != 0):
+        print('You input an illegal list of elevation angles. There must be an even number of elevation angle values.')
+        print('Exiting.')
+        sys.exit()
+
     lsp['ellist'] = ellist
 
     if refr_model[0] == '-':
@@ -475,7 +506,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         elif refr_model.upper() == 'MPF':
             refr_model = 6
         else:
-            print('Your refraction model ', refr_model, ' is not recognized by the code. Exiting')
+            print('Your refraction model ', refr_model, ' is illegal. Please use a model supported by gnssrefl. Exiting')
+            sys.exit()
 
     lsp['refr_model'] = refr_model
     print('refraction model ', refr_model)
@@ -493,6 +525,15 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['subdaily_spline_outlier1'] = subdaily_spline_outlier1
     lsp['subdaily_spline_outlier2'] = subdaily_spline_outlier2
     lsp['subdaily_subdir'] = subdaily_subdir
+
+    # these are for RINEX 3 filenames
+    lsp['stream'] = stream
+    lsp['samplerate'] = samplerate
+
+    # for snr number, default is None, i.e. set by gnssir and rinex2snr if not specified here
+    lsp['snr'] = snr
+    # mostly for decimating SNR files when created from RINEX files.  
+    lsp['dec'] = dec
 
     print('writing out to:', outputfile)
     print(lsp)

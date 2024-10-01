@@ -93,7 +93,7 @@ For p208:
 
 p048 was highlighted in Larson and Small (2014). You can get a feel for the processing steps:
 
-<img src="docs/p048-frompaper.png" width=450>
+<img src="docs/p048-frompaper.jpg" width=450>
 
 Let's try to reproduce some of this with the new software:
 

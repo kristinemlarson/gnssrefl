@@ -5,6 +5,7 @@ import numpy as np
 import os, datetime, traceback, gzip
 import subprocess
 import sys
+import tempfile
 from scipy.interpolate import interp1d
 
 import gnssrefl.gps as g
@@ -101,11 +102,10 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
     """
     # decimation
     idec = int(dec)
-    missing = True
     station = fname.lower() ; station = station[0:4]
     yy,month,day, cyyyy, cdoy, YMD = g.ydoy2useful(year,doy)
     gfz_date = 2024 + 153/365.25 # when we added the new GFZ directory to gnssrefl
-    
+
     if sp3:
         if orb is not None:
             if (orb == 'wum2'):
@@ -118,20 +118,21 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                         xf,orbdir,foundit = g.get_wuhan_orbits(year,doy-1,0,12)
 
             if orb == 'ultra':
-                # first try given doy
-                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy,0,hour=0)
+                # first try given doy (may be more complete, if available)
+                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy,0,0)
                 # now try doy before
                 if not foundit:
                     if (doy == 1):
                         xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,hour)
                     else:
                         xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,hour)
-                        if not foundit:
-                            print('Try ultrarapid orbit from noon on the previous day')
-                            if ((doy-1) == 1):
-                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,12)
-                            else:
-                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-2,0,12)
+                    # don't try noon of two previous days, as it won't cover all of current day!
+                    if not foundit:
+                        print('Could not find the ultrarapid orbits from GFZ; trying Wuhan')
+                        xf,orbdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
+                    if not foundit:
+                        print('Out of luck - could not find a good orbit file for you')
+                        return
         else:
             # the old way is to try multiple orbit sources
             if (year+doy/365.25) < gfz_date:
@@ -145,12 +146,12 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                     print('Could not find the rapid orbits from GFZ. Try ultrarapid')
                     if (year + doy/365.25) > gfz_date:
                         print('Use new GFZ directory for ultra rapid orbits with the long filenames')
-                        xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy, 0,hour=0)
+                        xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy, 0,0)
                         if not foundit:
                             if doy == 1:
-                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,hour=0)
+                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year-1,12,31,0)
                             else:
-                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,hour=0)
+                                xf,orbdir,foundit = g.new_ultra_gfz_orbits(year,doy-1,0,0)
                     else:
                         print('use old GFZ directory structure')
                         xf,orbdir,foundit = g.ultra_gfz_orbits(year,month,day,0)
@@ -174,28 +175,28 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         else:
             print('Translation was unsuccessful'); return
 
-
     #check whether the input file is a uncompressed or compressed     
-    if os.path.exists(locdir + fname):
-        subprocess.call(['cp', '-f',locdir + fname ,'.'])
-        t, prn, az, elv, snr, freq = read_nmea(fname)#read nmea files
-        subprocess.call(['rm',fname])
-        missing = False
+    tmpobj = tempfile.TemporaryDirectory()
+    tmpdir = tmpobj.name
+    tmpfpath = os.path.join(tmpdir,fname)
+    fpath = os.path.join(locdir,fname)
+    print('tmpfpath: ', tmpfpath)
+    print('fpath: ', fpath)
 
-    if os.path.exists(locdir + fname + '.gz') and missing:
-        subprocess.call(['cp', '-f',locdir + fname + '.gz' ,'.'])
-        subprocess.call(['gunzip', '-f', fname + '.gz'])
-        t, prn, az, elv, snr, freq = read_nmea(fname)#read nmea files
-        subprocess.call(['rm',fname])
-        missing = False
-        
-    if os.path.exists(locdir + fname + '.Z') and missing:
-        subprocess.call(['cp', '-f',locdir + fname + '.Z','.'])
-        subprocess.call(['uncompress', fname + '.Z'])
-        t, prn, az, elv, snr, freq = read_nmea(fname)#read nmea files
-        subprocess.call(['rm',fname])
-        missing = False
-        
+    if os.path.exists(fpath):
+        subprocess.call(['cp', '-f',fpath,tmpdir])
+    elif os.path.exists(fpath+'.gz'):
+        subprocess.call(['cp', '-f',fpath+'.gz',tmpdir])
+        subprocess.call(['gunzip', '-f', tmpfpath+'.gz'])
+    elif os.path.exists(fpath+'.Z'):
+        subprocess.call(['cp', '-f',fpath+'.Z',tmpdir])
+        subprocess.call(['uncompress', tmpfpath+'.Z'])
+    else:
+        print('File not found: ', fpath); return
+    t, prn, az, elv, snr, freq = read_nmea(tmpfpath) #read nmea files
+    subprocess.call(['rm',tmpfpath])
+    tmpobj.cleanup()
+    
     print('Number of t values ', len(t))
     # why is there all this going back and forth between lists and np arrays?
 
@@ -667,6 +668,10 @@ def fix_angle_azimuth(time, angle, azimuth):
     return angle_fixed, azim_fixed  
         
 def azimuth_diff2(azim1, azim2):
+    """
+    Someone that is not me should document this
+
+    """
     diff = azim1 - azim2
     idx = (diff > +180)  
     diff[idx] = diff[idx] - 360
@@ -676,6 +681,8 @@ def azimuth_diff2(azim1, azim2):
 
 def azimuth_diff1 (azim):
     """
+    Someone that is not me should document this
+
     Parameters
     ----------
     azim: ??
@@ -689,7 +696,7 @@ def azimuth_diff1 (azim):
 
 def azimuth_diff(azim1, azim2):
     """
-    someone should document this
+    Someone that is not me should document this
 
     Parameters
     ----------
@@ -711,7 +718,7 @@ def azimuth_diff(azim1, azim2):
      
 def angle_range_positive(ang):
     """
-    someone should document this
+    This code lacks documentation
 
     Parameters
     ----------
@@ -726,7 +733,7 @@ def angle_range_positive(ang):
 
 def azimuth_mean(azim1, azim2):
     """
-    someone that is not me should document this
+    Someone that is not me should document this
 
     Parameters
     ----------
@@ -757,22 +764,19 @@ def azimuth_mean(azim1, azim2):
 def quickname(station,year,cyy, cdoy, csnr):
     """
     Creates a full name of the snr file name (i.e. including the path) 
-    >>>> Checks that directories exist.
+
+    Checks that directories exist.
 
     Parameters
     ----------
     station : str
         4 ch station name
-
     year : int
         full year
-
     cyy : str 
         two character year
-
     cdoy : str
         three character day of year
-
     csnr : str
         snr type, e.g. '66' 
 
@@ -800,7 +804,6 @@ def quickname(station,year,cyy, cdoy, csnr):
 
 def elev_limits(snroption):
     """
-
     Given a snr option, return the elevation angle limits
 
     Parameters
@@ -832,7 +835,7 @@ def elev_limits(snroption):
   
 def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip,orb,hour):
     """
-    runs the nmea2snr conversion code - ONE DAY AT A TIME (2024 March 16)
+    runs the nmea2snr conversion code 
 
     Looks for NMEA files in $REFL_CODE/nmea/ssss/2023 for station ssss and year 2023.
     I prefer lowercase station names, but I believe the code allows both upper and lower
@@ -904,11 +907,6 @@ def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip,
                     nmea_translate(locdir, r, snrfile, csnr, dec, year, doy, recv, sp3, gzip,orb,hour)
                     if os.path.isfile(snrfile):
                         print('SUCCESS: SNR file created', snrfile)
-                    if os.path.isfile(locdir + r ):
-                        # gzip the NMEA file now
-                        print('gzip the NMEA file', locdir + r)
-                        subprocess.call(['gzip', locdir + r])
-                        # otherwise it is already gzipped?
                     if gzip:
                         if not snrfile.endswith('.gz'):
                             subprocess.call(['gzip', snrfile])

@@ -38,7 +38,7 @@ improve visibility of the sea surface.  From the [geoid app](http://gnss-reflect
 the general location of the antenna with respect to the coast. You will also note that it is at ~12 meters above sea level.
 
 <p align=center>
-<img src=../_static/geoid-at01.png width=400>
+<img src=../_static/geoid-at01.jpg width=400>
 </p>
 
 Use the gnss-reflections.org webapp to set a [possible mask.](http://gnss-reflections.org/rzones?station=at01&lat=0.0&lon=0.0&height=0.0&msl=msl&RH=2&eang=3&azim1=0&azim2=240) In this example we used the option for elevation angles between 5 and 12 degrees. 

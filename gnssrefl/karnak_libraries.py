@@ -123,22 +123,16 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     ----------
     station9ch : str
         nine character station name
-
     year : int
         year 
-
     doy : int
         day of year
-
     archive : str
         archive name
-
     srate : int
         receiver samplerate
-
     stream : str
         one character: R or S
-
     debug : bool
         whether debugging statements printed
 
@@ -146,7 +140,6 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     -------
     file_name : str
         name of rinexfile
-
     foundit : boolean
         whether file was found
 
@@ -198,6 +191,9 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         if debug:
             print('Download took ',np.round(s2-s1,2), ' seconds') 
         return file_name,foundit
+    if archive == 'gnet':
+        foundit,file_name = g.greenland_rinex3(station9ch,year,doy,stream=stream,samplerate=srate)
+        return foundit, file_name
 
     try:
         if (archive == 'ign'):
@@ -675,6 +671,8 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
     strip_snr is boolean as to whether you want to strip out the non-SNR data
     it can be slow with highrate data. it requires gfzrnx
 
+    this no longer allows the all archive ... which should have been stopped at rinex2snr_cl
+
     Parameters
     ----------
     station : string
@@ -697,15 +695,15 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
     d = g.doy2ymd(year,doy);
     month = d.month; day = d.day
     rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
-    if (archive == 'unavco') or (archive == 'all'):
+    if (archive == 'unavco') :
         g.rinex_unavco_highrate(station, year, month, day)
     # file does not exist, so keep looking
     if not os.path.isfile(rinexfile):
-        if (archive == 'nrcan') or (archive == 'all'):
+        if (archive == 'nrcan') :
             g.rinex_nrcan_highrate(station, year, month, day)
-    # try new cddis for highrate rINex 2
+    # try new cddis for highrate rinex 2
     if not os.path.isfile(rinexfile):
-        if (archive == 'cddis') or (archive == 'all'):
+        if (archive == 'cddis') :
             stream = 'R'
             srate = 1 # one second
             ch.cddis_highrate(station, year, month, day,stream,srate)

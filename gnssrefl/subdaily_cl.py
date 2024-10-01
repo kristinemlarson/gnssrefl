@@ -28,14 +28,14 @@ def parse_arguments():
     parser.add_argument("-sigma", default=None, type=float, help="part1 outlier criterion, float, default is 2.5 (sigma)")
     parser.add_argument("-extension", default=None, type=str, help="solution subdirectory")
     parser.add_argument("-rhdot", default=None, type=str, help="set to False if you want to stop after section 1 of the QC code")
-    parser.add_argument("-doy1", default=None, type=int, help="initial day of year")
-    parser.add_argument("-doy2", default=None, type=int, help="end day of year")
+    parser.add_argument("-doy1", default=None, type=int, help="constrain to this initial day of year")
+    parser.add_argument("-doy2", default=None, type=int, help="constrain to this final day of year")
     parser.add_argument("-testing", default=None, type=str, help="set to False for old code ")
-    parser.add_argument("-ampl", default=None, type=float, help="new amplitude constraint")
+    parser.add_argument("-ampl", default=None, nargs="*", type=float, help="new amplitude constraints (list); see documentation")
     parser.add_argument("-azim1", default=None, type=int, help="new min azimuth")
     parser.add_argument("-azim2", default=None, type=int, help="new max azimuth")
-    parser.add_argument("-h1", default=None, type=float, help="min RH (m)")
-    parser.add_argument("-h2", default=None, type=float, help="max RH (m)")
+    parser.add_argument("-h1", default=None, type=float, help="new min RH (m)")
+    parser.add_argument("-h2", default=None, type=float, help="new max RH (m)")
     parser.add_argument("-peak2noise", default=None, type=float, help="new peak2noise constraint")
     parser.add_argument("-kplt", default=None, type=str, help="special plot for kristine")
     parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output")
@@ -48,7 +48,9 @@ def parse_arguments():
     parser.add_argument("-alt_sigma", default=None, type=str, help="boolean test for alternate Nievinski sigma definition. default is False")
     parser.add_argument("-gap_min_val", default=None, type=float, help="min gap (hours) allowed in splinefit output file. default is 6 hours")
     parser.add_argument("-knots2", default=None, type=int, help="Secondary knots value for final fit. default is to use original knots value.")
-    parser.add_argument("-gap_flag", default=None, type=str, help="if set to True/T, write 999 to spline fit for gaps")
+    parser.add_argument("-gap_flag", default=None, type=str, help="boolean, writes 999 to spline fit for gaps")
+
+    g.print_version_to_screen()
 
     args = parser.parse_args().__dict__
 
@@ -63,7 +65,7 @@ def parse_arguments():
 def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: str = None, csv: bool = False, 
         plt: bool = True, spline_outlier1: float = None, spline_outlier2: float = None, 
         knots: int = None, sigma: float = None, extension: str = None, rhdot: bool = True, doy1: int = 1, 
-        doy2: int = 366, testing: bool = True, ampl: float = None, h1: float=0.4, h2: float=300.0, 
+        doy2: int = 366, testing: bool = True, ampl: float = [], h1: float=0.4, h2: float=300.0, 
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = None , if_corr: bool = True, knots_test: int = 0, 
              hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0,
@@ -174,7 +176,13 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         Set to False for older code.
         default is now True.
     ampl : float, optional
-        New amplitude constraint. Default is 0.
+        New amplitude constraint. Default is to do nothing.
+        Now allows a list of amplitude values for the frequencies listed in your json.
+        You have to use the same order of frequencies - but do not have to list them all,
+        i.e. if you had fr 1 20 101 102 and you only wanted to use GPS, you could provide
+        just two ampl values and it would return L1 and L2 GPS. If you had a subdaily value
+        stored before, that is currently restricted to one value for all frequencies.
+        That can be changed if someone submits a PR.
     azim1: int, optional
         minimum azimuth. Default is 0.
     azim2: int, optional
@@ -229,6 +237,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     xdir = os.environ['REFL_CODE']
 
     lsp = sd.pickup_subdaily_json_defaults(xdir, station, extension)
+    print(lsp['freqs'])
+    fr = lsp['freqs']
 
     if subdir is None: # not set on the command line
         if lsp['subdaily_subdir'] is None: 
@@ -260,12 +270,17 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
             print('Using alt_sigma from json')
 
 
-    if ampl is None: # not set on the command line
+    # send ampl as a list now ...  ?
+    if len(ampl) == 0: # not set on the command line
         if lsp['subdaily_ampl'] is not None: # but it has been set in the json
             ampl = lsp['subdaily_ampl']
             print('Using ampl value from json')
         else:
-            ampl = 0 # don't go beyond whatever was done when you ran gnssir
+            ampl = 0.0 # don't edit anything (beyond what was done in gnssir)
+        print('You have set the minimum amplitude value using json ')
+        ampl = [ampl]
+    else:
+        print('You have set the minimum amplitude on the command line')
 
 
     if delta_out is None: # not set on the command line
@@ -348,7 +363,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
             ntv, obstimes, fname, fname_new = t.readin_and_plot(station, y, doy_st, doy_en, plt, \
                     extension, sigma, csv, azim1, azim2, ampl, peak2noise, txtfile_part1, \
-                    h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma)
+                    h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma,freqs=fr)
             outputs.append(fname_new)
 
         haveObstimes = True

@@ -125,6 +125,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     g.result_directories(station, year, '')
 
+    # this should really be read from the json
     pele = [5, 30]  # polynomial fit limits  for direct signal
 
     # TODO maybe instead of specific doy we can do only year and pick up all those files just like the other parts?

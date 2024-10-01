@@ -27,6 +27,10 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     This is a new version that tries to picks all rising and setting arcs, not just those constrained to 90 degree
     quadrants.
 
+    It will attempt to make a refraction correction if you have a local coordinate file or 
+    a station analysis json. The format of the local coordinate file can be found in the documentation
+    for query_coordinate_file which is in the gps library.
+
     Parameters
     ----------
     station : str
@@ -223,9 +227,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                     for arc in range(0,nr):
                         sind = int(arclist[arc,0]) ; eind = int(arclist[arc,1])
                         d2 = np.array(thissat[sind:eind, :], dtype=float)
-                    # window the data - which also removes DC
-                        x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT= gnssir_v2.window_new(d2, f,
-                                satNu,ncols,pele, polyV,e1,e2,azvalues,screenstats)
+                    # window the data - which also removes DC, for now use old version 
+                        x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT,secxonds= gnssir_v2.window_new(d2, f,
+                                satNu,ncols, polyV,e1,e2,azvalues,screenstats)
                         Nv = Nvv # number of points
                         UTCtime = meanTime
                     # for this arc, which a value is it?
@@ -287,7 +291,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         g.set_subdir(station)
         # where plots will go
         fdir = os.environ['REFL_CODE'] + '/Files/' + station 
-        tt = 'GNSS-IR: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy) + ' elev: ' + str(e1) + '-' +  str(e2)
+        #tt = 'GNSS-IR: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy) + ' elev: ' + str(e1) + '-' +  str(e2)
+        # kristine uses fstrings!
+        tt = f'GNSS-IR: {station.upper()} Freq: {g.ftitle(f)} Year/DOY: {year:04d},{doy:03d} elev:{e1} -{e2}'
         fig.suptitle(tt, fontsize=FS)
         # if you have no results, no point plotting them!
         if hires_figs:
@@ -502,11 +508,12 @@ def whichquad(iaz):
 
 def quick_refraction(station):
     """
+    computes the necessary information for a 
     refraction correction used in quickLook. no time dependence.
 
     Parameters
     ----------
-    station : string
+    station : str
         4 character station name
 
     Returns
@@ -529,7 +536,7 @@ def quick_refraction(station):
     p = 0; T = 0; irefr = 1; e=0 ; it = 1 #?
     dmjd = 0
     if (lat == 0) & (lon == 0):
-        #print('no coordinates found')
+        print('Although no station coordinates were found, this is ok for quickLook.')
         irefr = 0
         return p,T,irefr, e
 

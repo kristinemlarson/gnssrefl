@@ -23,7 +23,6 @@ def parse_arguments():
     parser.add_argument("doy", help="day of year", type=int)
 
     #print('gnssrefl version ', str(g.version('gnssrefl')))
-    g.print_version_to_screen()
 
     # optional inputs
     parser.add_argument("-snr", default=None, help="snr file ending, default is 66", type=int)
@@ -45,14 +44,18 @@ def parse_arguments():
     parser.add_argument("-e2", default=None, type=float, help="max elev angle (deg)")
     parser.add_argument("-mmdd", default=None, type=str, help="Boolean, add columns for month,day,hour,minute")
     parser.add_argument("-dec", default=1, type=int, help="decimate SNR file to this sampling rate before computing periodograms")
-    parser.add_argument("-newarcs", default=None, type=str, help="This no longer has any meaning")
+    parser.add_argument("-savearcs", default=None, type=str, help="boolean, save individual arcs. default is false.")
+    parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs (txt or pickle). default is txt")
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
+    parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
 
+    g.print_version_to_screen()
+    #print (sys.version)
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd','gzip','newarcs']
+    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd','gzip','savearcs','debug']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -63,18 +66,35 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
-           mmdd: bool = False, gzip: bool = True, dec : int = 1, newarcs : bool = True, par : int = None ):
+           mmdd: bool = False, gzip: bool = True, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt', 
+           par : int = None, debug : bool=False  ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
 
-    beta version of parallel processing is now onine. If you set -par to an integer between 2 and 10,
+    Parallel processing is now available. If you set -par to an integer between 2 and 10,
     it should substantially speed up your processing. Big thank you to AaryanRampal for getting this up and running.
+    If you are using the docker, you will need to experiment about how to use this - as they have 
+    requirements for multiple processes that I do not know about.
+
+    As of v3.6. there is a way to save individual rising and setting arcs to an external file.
+    You can then use them as you wish. The default is plain text but only has elevation angles
+    and deltaSNR (SNR with direct signal removed). You can also save more information in a pickle
+    file.  Just say -savearcs_format pickle. Both require -savearcs T to set this option. The 
+    location of the files is printed to the screen. If an arc does not pass QC, it is saved, but in a separate
+    directory with the name failQC added to it. 
+
+    If you are using the non-standard snr files (i.e. not 66), you have been required to provide an online parameter
+    every time you run gnssir. As of v 3.6.6, you can now save a parameter called snr when you use gnssir_input.
+    So that would automate it for you.  If you haven't done that then you should use snr on the command line
+    and set it to the appropriate value.
         
     Examples
     --------
     gnssir p041 2021 15 
         analyzes the data for station p041, year 2021 and day of year 15.
+    gnssir p041 2021 15 -savearcs T 
+        prints out individual arcs to $REFL_CODE/2021/arcs/p041/015
     gnssir p041 2021 1 -doy_end 100 -par 10
         analyze 100 days of data - but spawn 10 processes at a time. Big cpu time savings.
     gnssir p041 2021 15  -snr 99
@@ -82,7 +102,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     gnssir p041 2021 15  -plt T
         plots of SNR data and periodograms come to the screen. Each frequency gets its own plot.
     gnssir p041 2021 15  -screenstats T
-        sends debugging information to the screen
+        sends more information to the screen
     gnssir p041 2021 15  -nooverwrite T 
         only runs gnssir if there isn't a previous solution
     gnssir p041 2021 15  -extension strategy1
@@ -101,7 +121,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     station : str
         lowercase 4 character ID of the station
     year : int
-        full Year
+        full year
     doy : integer
         Day of year
 
@@ -174,10 +194,15 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     dec : int, optional
         decimate SNR file to this sampling period before the 
         periodograms are computed. 1 sec is default (i.e. no decimating)
-    newarcs : bool, optional
-        this input no longer has any meaning 
+    savearcs : bool, optional
+        save arcs in individual files (elevation angle and deltaSNR)
+    savearcs_format : str, optional
+        format of saved arc files, txt or pickle. default is txt
     par : int, optional
         number of parallel processing jobs. 
+    debug : bool, optional
+        remove the primary call from try/except so that you have a better idea of why the code
+        might be crashing. No parallel processing in this mode
 
     """
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
@@ -201,6 +226,13 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             g.result_directories(station,y,extension)
 
     lsp = guts2.read_json_file(station, extension)
+    # 
+    if 'snr' in lsp:
+        if lsp['snr'] is not None:
+            snr = lsp['snr']
+            print('Found a snr choice in the json:', snr)
+    print('Using snr file type: ', snr)
+
 
     # make a refraction file you will need later
     refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
@@ -298,6 +330,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     lsp['mmdd'] = add_mmddhhss
     # added 2022apr15
     lsp['gzip'] = gzip
+    # added 2024aug01
+    lsp['savearcs'] = savearcs
+
+    # added 2024aug27
+    lsp['savearcs_format'] = savearcs_format
 
     # if refraction model is not assigned, set it to 1
     if 'refr_model' not in lsp.keys():
@@ -319,7 +356,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             wget.download(url, picklefile)
             subprocess.call(['mv', '-f', picklefile, xdir + '/input/'])
 
-    args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp}
+    # added debug aug 3/2024
+    args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp, 'debug': debug}
 
     print(lsp['pele'], ' direct signal elevation angle limits')
     #print(lsp['e1'], lsp['e2'], ' min and max elevation angles')
@@ -426,17 +464,25 @@ def process_year(year, year_end, doy, doy_end, args, error_queue):
         arguments passed into gnssir through commandline (or python)
 
     """
-    # an infinitely better way
+    debug = args['debug']
+
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
     for modjul in range(MJD1, MJD2+1):
         y, d = g.modjul_to_ydoy(modjul)
         args['year'] = y
         args['doy'] = d
-        try:
+        if debug:
+            # let's you more easily see why the code is crashing
             guts2.gnssir_guts_v2(**args)
-        except:
-            warnings.warn(f'error processing {y} {d}');                
+        else:
+            try:
+                guts2.gnssir_guts_v2(**args)
+            except:
+                print('***********************************************************************')
+                print('Try using -debug T to get better information about why the code crashed.')
+                print('***********************************************************************')
+                warnings.warn(f'error processing {y} {d}');                
 
     # where should i put the error queue statement?
     return
@@ -474,6 +520,9 @@ def process_year_dictionary(index,args,datelist,error_queue):
 
             guts2.gnssir_guts_v2(**args)
     except Exception as e:
+        print('***********************************************************************')
+        print('Try using -debug T to get better information about why the code crashed.')
+        print('***********************************************************************')
         error_queue.put(e)
 
 

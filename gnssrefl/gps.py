@@ -800,8 +800,8 @@ def getsp3file_mgex(year,month,day,pCtr):
     if (mgex == 1):
         name = file1[:-2]
 
-    print('Type 1 filename',file1)
-    print('Type 2 filename',file2)
+    #print('Type 1 filename',file1)
+    #print('Type 2 filename',file2)
 
     if not foundit:
         if (mgex == 0):
@@ -1990,8 +1990,8 @@ def open_outputfile(station,year,doy,extension):
     """
     opens an output file in 
     $REFL_CODE/year/results/station/extension directory
-    for lomb scargle periodogram results
-
+    for Lomb Scargle periodogram results. This really 
+    should go in a gnssir library.
 
     Parameters
     ----------
@@ -2054,6 +2054,20 @@ def open_outputfile(station,year,doy,extension):
     frej = 100
 
     return fout, frej
+
+def lsp_header(station):
+    """
+    """
+    versionNumber = 'v' + str(version('gnssrefl'))
+    tem =  ' station ' + station + ' https://github.com/kristinemlarson/gnssrefl ' + versionNumber  + '\n'
+#       put a header in the output file
+    line2= ' Phase Center corrections have NOT been applied \n'
+    line3= ' year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD   refr-model\n'
+    line4= '(1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16)   (17)\n'
+    line5= '            m        hrs    deg   v/v    deg    deg  values            hrs             min           0 is none \n'
+    all = tem + line2 + line3 + line4 + line5
+    return all
+
 
 def removeDC(dat,satNu, sat,ele, pele, azi,az1,az2,edot,seconds):
     """
@@ -2601,10 +2615,11 @@ def rinex_unavco_highrate(station, year, month, day):
     station : str
         4 ch station name
     year : int
-
-    month : intr
-
+        full year
+    month : int
+        month number
     day : int
+        calendar day number
 
     """
     #print('in rinex_unavco_highrate')
@@ -2984,7 +2999,7 @@ def llh2xyz(lat,lon,height):
 
 def LSPresult_name(station,year,doy,extension):
     """
-    makes name for the Lomb Scargle output
+    Makes filename for the Lomb Scargle output
 
     Parameters
     ----------
@@ -3687,13 +3702,14 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     """
     This code translates a RINEX 3 file into a RINEX 2.11 file.
     It is assumed that the gfzrnx exists and that the RINEX 3 file is 
-    Hatanaka uncompressed or compressed.
+    Hatanaka uncompressed or compressed. (ending in rnx or crx)
 
     Parameters
     ----------
     r3_filename : str
          RINEX 3 format filename. Either Hatanaka 
-         compressed or uncompressed allowed
+         compressed or uncompressed allowed, but not if it is gzipped.
+         The file extensions are crx or rnx.
     r2_filename : str
          RINEX 2.11 file
     dec : integer
@@ -3710,58 +3726,76 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     fexists = False
     gexe = gfz_version()
     crnxpath = hatanaka_version()
-    #lastbit =  r3_filename[-6:]
-    if r3_filename[-3:] == 'crx':
+    lastbit =  r3_filename[-3:]
+    gobblygook = myfavoriteobs()
+    gobblygook_gps = myfavoritegpsobs()
+
+    if not os.path.exists(gexe):
+        print('gfzrnx executable does not exist and this file cannot be translated. Exiting')
+        sys.exit()
+    if not os.path.exists(r3_filename):
+        print('RINEX 3 inputfile does not exist', r3_filename, ' Exiting')
+        return fexists
+
+    if (lastbit == 'rnx'):
+        print('found Hatanaka decompressed version', r3_filename)
+        r3_filename_new = r3_filename
+    elif (lastbit == 'crx'):
+        print('found Hatanaka compressed version', r3_filename)
+        r3_filename_new = r3_filename[0:-3] + 'rnx'
         if not os.path.exists(crnxpath):
             print('You need to install Hatanaka translator. Exiting.')
-            sys.exit()
-        r3_filename_new = r3_filename[0:35] + 'rnx'
+            return fexists
         s1=time.time()
-        print('Converting to Hatanaka compressed to uncompressed')
         subprocess.call([crnxpath, r3_filename])
         s2=time.time()
         print(round(s2-s1,2), ' seconds')
         # removing the compressed version - will keep new version
         subprocess.call(['rm', '-f', r3_filename ])
-        # now swap name
-        r3_filename = r3_filename_new
-    gobblygook = myfavoriteobs()
-    gobblygook_gps = myfavoritegpsobs()
-    #print('decimate value: ', dec)
-    if not os.path.exists(gexe):
-        print('gfzrnx executable does not exist and this file cannot be translated')
-    else:
-        s1=time.time()
-        if os.path.isfile(r3_filename):
-            try:
-                if (dec == 1) or (dec == 0):
-                    if (gpsonly):
-                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-f','-q'])
-                    else:
-                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
-                    #'-sei','out','-smp',crate
-                else:
-                    crate = str(dec)
-                   #subprocess.call([gfzpath,'-finp', searchpath, '-fout', tmpname, '-vo',str(version),'-sei','out','-smp',crate,'-f','-q'])
-
-                    if (gpsonly):
-                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-sei','out','-smp', crate, '-f','-q'])
-                    else:
-                        subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
-                if os.path.exists(r2_filename):
-                    #print('Look for the rinex 2.11 file here: ', r2_filename)
-                    fexists = True
-                else:
-                    sigh = 0
-            except:
-                print('some kind of problem in translation from RINEX 3 to RINEX 2.11')
+        if os.path.exists(r3_filename_new):
+            print('Hatanaka Conversion successful ', r3_filename_new)
         else:
-            print('RINEX 3 file does not exist', r3_filename)
-        s2=time.time()
-        #print('gfzrnx rinex3 to rinex 2:', round(s2-s1,2), ' seconds')
+            print('file does not exist')
+    else:
+        print('I found neither a rnx or crx RINEX 3 file and those are the only ones allowed. Exiting')
+        return fexists
+
+    #print('decimate value: ', dec)
+    s1=time.time()
+    if os.path.exists(r3_filename_new):
+        print('Now Convert from RINEX 3 to RINEX 2.11')
+        if True:
+            if (dec == 1) or (dec == 0):
+                if (gpsonly):
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-f','-q'])
+                else:
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
+                    #subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
+                    #'-sei','out','-smp',crate
+            else:
+                crate = str(dec)
+                if (gpsonly):
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-sei','out','-smp', crate, '-f','-q'])
+                else:
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
+        #except:
+        #    print('Some kind of problem in translation from RINEX 3 to RINEX 2.11')
+    else:
+        print('RINEX 3 file I need does not exist, so no translation.', r3_filename_new)
+
+    s2=time.time()
+
+    if os.path.exists(r2_filename):
+        print('RINEX 2.11 file now exists: ', r2_filename)
+        fexists = True
+    else:
+        print('RINEX 2.11 file does not exist: ', r2_filename)
 
 
-    return fexists
+    #print('remove RINEX3 rnx version of the file ',r3_filename_new)
+    subprocess.call(['rm', '-f', r3_filename_new ])
+
+    return fexists 
 
 
 def ign_orbits(filename, directory,year):
@@ -5558,19 +5592,11 @@ def queryUNR_modern(station):
     Queries the UNR database for station coordinates that has been stored in sql. downloads 
     the sql file and stores it locally if necessary
 
-    Parameters
-    -----------
-    station : str
-        4 character station name
-    
-    Returns
-    -------
-    lat : float
-        latitude in degrees (zero if not found)
-    lon : float
-        longitude in degrees (zero if not found)
-    ht : float
-        ellipsoidal ht in meters (zzero if not found)
+    Also queries a local file if you have defined one.
+    It should be located in $REFL_CODE/input/llh_local.txt
+    four columns should be 4 character station name lat lon height
+    No commas between them and the station name should be four characters
+    Hopefully lowercase, but I will try to put in a toggle that allows uppercase
 
     """
     lat = 0; lon = 0; ht = 0
@@ -5583,6 +5609,11 @@ def queryUNR_modern(station):
     fdir = xdir + '/Files'
     if not os.path.isdir(fdir):
         subprocess.call(['mkdir', fdir])
+
+    # check local database file
+    foundit, lat, lon, ht = query_coordinate_file(station)
+    if foundit:
+        return lat, lon, ht 
 
     # new database locations 
     nfile00 = 'gnssrefl/station_pos_2024.db'
@@ -5623,20 +5654,31 @@ def queryUNR_modern(station):
 
     if (station == 'moss'):
         lat= -16.434464800 ;lon = 145.403622520 ; ht = 71.418
+        print('override')
     elif (station == 'mnis'):
         lat = -16.667810553; lon  = 139.170597267; ht = 60.367;  
+        print('override')
     elif (station == 'boig'):
         lat =  -9.24365375 ; lon  = 142.253961217; ht = 82.5;  
+        print('override')
     elif (station == 'glbx'):
         lat = 58.455146633; lon  = -135.888483766 ; ht = 12.559;  
+        print('override')
     elif (station == 'ugar'):
         lat = -9.50477824; lon = 143.54686680 ; ht =  81.2
+        print('override')
     elif (station == 'whla'):
         lat = -33.01640186 ; lon = 137.59157111 ; ht = 7.856
+        print('override')
     elif (station == 'kubn'):
         lat =-10.23608303 ; lon =142.21446068; ht = 78.2
+        print('override')
     elif (station == 'smm4'):
         lat =72.57369139 ; lon =-38.470709199 ; ht = 3262
+        print('override')
+    elif (station == 'pchl'):
+        print('override')
+        lat = 60.242562899 ; lon = -147.248979547 ; ht = 18.368
 
     if (not_in_database) and (lat == 0):
         print('Did not find station coordinates :', station)
@@ -5787,19 +5829,25 @@ def translate_dates(year,month,day):
     return doy, cdoy, cyyyy, cyy
 
 
-def bfg_password():
+def bfg_password(**kwargs):
     """
     Picks up BFG userid and password that is stored in a pickle file
     in your REFL_CODE/Files/passwords area
     If it does not exist, it asks you to input the values and stores them for you.
 
+    Allows you to send another name for your password
+
     Returns  
     -------
     userid : str
         BFG username
-    password : str 
-        BFG password
+    passpord : str 
+        password for archive 
     """
+
+    # default is bfg
+    archive = kwargs.get('archive','bfg')
+    print('Using archive ', archive)
 
     fdir = os.environ['REFL_CODE']
     if not os.path.isdir(fdir):
@@ -5812,7 +5860,9 @@ def bfg_password():
     if not os.path.isdir(fdir + '/Files/passwords'):
         subprocess.call(['mkdir',fdir + '/Files/passwords'])
 
-    userinfo_file = fdir + '/Files/passwords/' + 'bfg.pickle'
+
+    userinfo_file = fdir + '/Files/passwords/' + archive + '.pickle'
+
     #print('user information file', userinfo_file)
 
     #print('Will try to pick up BFG account information',userinfo_file)
@@ -5933,7 +5983,7 @@ def inout(c3gz):
 
 def ga_highrate(station9,year,doy,dec,deleteOld=True):
     """
-    Attempts to download highrate RINEX 3 files from GA
+    Attempts to download and merge highrate RINEX 3 files from GA
 
     Parameters
     ----------
@@ -6025,13 +6075,13 @@ def ga_highrate(station9,year,doy,dec,deleteOld=True):
                     #subprocess.call(['mv', rinex2,tmpname])
 
 # now merge them
+# it would be nice if someone would check to see if any were found ... 
     searchpath =  station + cdoy + '0.' + cyy + 'o' + 'tmp*'
     print(searchpath)
     subprocess.call([gexe,'-finp', searchpath, '-fout', rinex2, '-vo','2','-f'])
     fexist = False
     if os.path.exists(rinex2):
         fexist = True
-
 
     # should always remove tmp files
     searchpath =  station + cdoy + '0.'  + cyy + 'otmp*' 
@@ -7288,4 +7338,160 @@ def print_version_to_screen():
     """
     print('gnssrefl version:', str(version('gnssrefl')), '\n')
     return
+
+def greenland_rinex3(station,year,doy,**kwargs):
+    """
+    downloads RINEX3 files from GNET. Returns hatanaka and gzipped file.
+    Could uncompress and convert, but downstream code expects *crx.gz
+
+    It requires you have a GNET password. The first time you call this 
+    function it will ask for the username and password and it will store 
+    it locally.  
+
+    You must have installed lftp on your own. (gnssrefl will not do it for you).
+
+    Parameters
+    ----------
+    station : str
+        long station name
+    year : int
+        full year
+    doy : int
+        day of year
+    streamID : str
+        optional stream ID (R or S)
+        default is R
+    samplerate : optional, int 
+        default is 1
+        only 30 or 1 is allowed
+
+    Returns
+    -------
+    filename : str
+        rinex3 filename(hatanaka compressed and gzipped)
+
+    found : bool
+        whether file was found
+    """
+    crnxpath = hatanaka_version()
+
+    found = False
+    filename = ''
+    checking = subprocess.call(['which','lftp'])
+    if (checking == 1):
+        print('I do not think you have lftp installed. gnssrefl will ')
+        print('not do this for you. Exiting.')
+        return filename, found
+               
+
+    # information for accessing GNET with appropriate filename
+    archive = 'gnet'
+    fdir = os.environ['REFL_CODE']
+    samplerate = kwargs.get('samplerate',1)
+    if (samplerate == 1):
+        ch = '0000_01D_01S_MO'
+    else:
+        ch = '0000_01D_30S_MO'
+
+    userinfo_file = fdir + '/Files/passwords/' + archive + '.pickle'
+    streamID = kwargs.get('stream_ID','R')
+    streamID = '_' + streamID + '_'
+
+
+    cdoy = '{:03d}'.format(doy)
+    cyyyy = str(year)
+    serve = '@ftp.dataforsyningen.dk; cd /GNSS/RINEX3/GRL/'
+
+    # define file names
+    gfilename = station.upper() + streamID + cyyyy + cdoy + ch + '.crx.gz'
+    filename = station.upper() + streamID + cyyyy + cdoy + ch + '.crx'
+    rfilename = station.upper() + streamID + cyyyy + cdoy + ch + '.rnx'
+
+    if os.path.exists(gfilename):
+        print('File found ', gfilename)
+        #subprocess.call(['gunzip', gfilename])
+        return gfilename, True
+        #if os.path.exists(filename):
+        #    # decompress
+        #    subprocess.call([crnxpath, filename])
+        #    subprocess.call(['rm', filename])
+
+    #print('Will try to pick up BFG account information',userinfo_file)
+    if os.path.exists(userinfo_file):
+        with open(userinfo_file, 'rb') as client_info:
+            login_info = pickle.load(client_info)
+            user_id = login_info[0]
+            passport = login_info[1]
+            print('Looking for ', filename)
+            cd1 = 'lftp -c "open ftps://' + user_id + ':' + passport + serve + cyyyy + '/' + cdoy + '; get ' + gfilename + '"'
+            try:
+                subprocess.call(cd1,shell=True)
+                #if os.path.exists(gfilename):
+                #   subprocess.call(['gunzip', gfilename])
+                #if os.path.exists(filename):# decompress
+                #    subprocess.call([crnxpath, filename])
+            except:
+                print('something went wrong with access to GNET files')
+
+    if os.path.exists(gfilename):
+        found = True
+        # get rid of hatanaka compressed version
+        #subprocess.call(['rm', filename])
+
+    return gfilename, found
+
+
+def query_coordinate_file(station):
+    """
+    Returns a priori latitude, longitude, and ellipsoidal height from a local file
+    The file should be stored in $REFL_CODE/input/llh_local.txt
+    It has a simple structure. Each value is separated by spaces
+
+    station latitude longitude height
+
+    The station name is four characters long and the units of the other
+    three are degrees, degrees, and meters. Height is the ellipsoidal
+    height. Comments are allowed in this file using a percent sign. If you use
+    more or less than four columns per line the code will crash.
+
+    Parameters
+    -----------
+    station : str
+        4 character station name. checks both upper and lower case
+    
+    Returns
+    -------
+    foundit : bool
+        whether you found the coordinates
+    lat : float
+        latitude in degrees (zero if not found)
+    lon : float
+        longitude in degrees (zero if not found)
+    ht : float
+        ellipsoidal ht in meters (zzero if not found)
+    """
+    xdir = os.environ['REFL_CODE']
+    f= xdir + '/input/llh_local.txt'
+    foundit = False
+    lat = 0; lon = 0; ht = 0;
+    # if the local coordinate file exists
+    if os.path.isfile(f):
+        allofit =np.loadtxt(f,usecols = (0,1,2,3), dtype='str',comments= '%')
+        nx = np.shape(allofit)
+        if len(nx) == 2:
+            nr = nx[0]; nc=nx[1]
+            for i in range(0,nr):
+                dbname = allofit[i,0].lower()
+                if (station.lower() == dbname):
+                    lat = float(allofit[i,1]);lon = float(allofit[i,2])
+                    ht =  float(allofit[i,3])
+                    print('Found in local coordinates file : ', lat,lon, ht)
+                    foundit = True
+        else: # annoying single line
+            if (allofit[0] == station.lower()):
+                foundit = True
+                lat=  float(allofit[1]) ; lon = float(allofit[2]) ; ht =  float(allofit[3])
+                print('Found in local coordinates file : ', lat,lon,ht)
+
+    return foundit, lat, lon, ht
 

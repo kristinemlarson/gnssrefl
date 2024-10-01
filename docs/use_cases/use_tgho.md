@@ -63,21 +63,11 @@ Now try looking at the periodogram for L2:
 <img src="../_static/tgho-l2.png" width="600"/>
 
 These results are not very compelling for a variety of reasons. The GPS L2 data 
-will not be used in subsequent analysis. Next, check the two Glonass frequencies:
+will not be used in subsequent analysis. We will 
+exclude 135-225 degrees in azimuth. We will require 
+an amplitude of 9 and a peak to noise ratio of 3.0.
 
-<CODE>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 101</code>
-
-<img src="../_static/tgho-glonass-l1.png" width="600"/>
-
-<code>quickLook tgho 2020 300 -e1 5 -e2 15 -h1 2 -h2 8 -fr 102</code>
-
-<img src="../_static/tgho-glonass-l2.png" width="600"/>
-
-The QC metrics from Glonass 101 are helpful for setting the azimuth mask:
-
-<img src=../_static/tgho-glonss-qc.png width="600">
-
-We will exclude 135-225 degrees in azimuth. We will require an amplitude of 9 and a peak to noise ratio of 3.0.
+Users are encouraged to examine Glonass results on their own.
 
 ## Analyze the Data
 
@@ -85,7 +75,8 @@ Set the analysis parameters using what you learned from quickLook.
 
 <code>gnssir_input tgho  -h1 2 -h2 8 -e1 5 -e2 15 -peak2noise 3 -ampl 9  -azlist2 0 135 225 360 -frlist 1 101 102 </code>
 
-Note the -frlist entries. I am asking for GPS L1 and Glonass L1 and L2. The GPS L2 are not high quality 
+Note the -frlist entries. I am asking for GPS L1 and Glonass 
+L1 and L2. The GPS L2 are not high quality 
 and there are no Galileo or Beidou data. 
 
 Then make SNR files for about six months:
