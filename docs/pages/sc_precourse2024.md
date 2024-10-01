@@ -20,8 +20,8 @@ installing python packages.
 for mac and linux users that don't want to install python and/or 
 manage dependencies or environment variables.
 
- - Notebooks for GNSS-IR were created and are supported by Earthscope. Please send all questions 
- about the notebooks to Kelly Enloe at Earthscope. Her email address is kelly.enloe@earthscope.org
+ - Notebooks for GNSS-IR were created by Earthscope; their maintenance is not supported.
+ If you feel comfortable fixing bugs in these older notebooks created by Earthscope, please submit a pull request.
 
 - Check your environment variables (disregard this step if using dockers or notebooks)
 

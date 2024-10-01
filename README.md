@@ -12,14 +12,22 @@ Documentation: [![Documentation Status](https://readthedocs.org/projects/gnssref
 
 - [pdf](https://gnssrefl.readthedocs.io/_/downloads/en/latest/pdf/)
 
-Questions/Concerns and bug reports, **must** be submitted via the **Issues** button at 
-the [github repository](https://github.com/kristinemlarson/gnssrefl/issues).
-
 gnssrefl also has a DOI from zenodo.
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601494.svg)](http://dx.doi.org/10.5281/zenodo.5601494) 
 
 The latest pypi version can be found here [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
+
+Questions and bug reports for gnssrefl (but not the notebooks) **must** be submitted via the **Issues** button at 
+the [github repository](https://github.com/kristinemlarson/gnssrefl/issues). The notebooks were created by Earthscope 
+with NASA funding. I formally asked Earthscope about maintenance of the notebooks and received the following response:
+
+*In general, we place maintenance of notebooks (and many of our apps) that are not in active production on the **Low Priority** list 
+and I think it would be really healthy for our community to be willing to apply their expertise to provide fixes and enhancements 
+to the notebook collection that can be reviewed in a pull request and merged for deployment.*
+
+So that's the story - if the notebooks aren't working, you need to fix them yourselves.
+
 
 **Some new features:**
 
