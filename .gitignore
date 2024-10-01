@@ -1,4 +1,6 @@
 env
+new.pyproject.toml
+meson.build
 set_simulator*py
 swh.py
 waves_lib.py
