@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster 
+FROM python:3.9-slim-buster 
 LABEL maintainer="EARTHSCOPE"
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
@@ -27,8 +27,10 @@ RUN cd /etc/gnssrefl/exe && \
 
 ENV PATH="/etc/gnssrefl/exe:$PATH" 
 
-RUN pip install numpy --upgrade --ignore-installed
-COPY pyproject.toml README.md setup.py /usr/src/gnssrefl/
+# should not be needed
+#RUN pip install numpy --upgrade --ignore-installed
+COPY pyproject.toml README.md meson.build /usr/src/gnssrefl/
+#COPY pyproject.toml README.md setup.py /usr/src/gnssrefl/
 COPY gnssrefl /usr/src/gnssrefl/gnssrefl
 COPY notebooks/learn-the-code /etc/gnssrefl/notebooks/learn-the-code
 COPY notebooks/use-cases /etc/gnssrefl/notebooks/use-cases
@@ -43,6 +45,7 @@ ENV REFL_CODE=/etc/gnssrefl/refl_code
 ENV DOCKER=true
 
 # i don't believe these commands do anything useful.
+# I don't think we need station_pos.db anymore either, just the 2024 one. 
 RUN mkdir -p /etc/gnssrefl/refl_code/input/
 RUN cp /usr/src/gnssrefl/gnssrefl/gpt_1wA.pickle /etc/gnssrefl/refl_code/input/
 RUN cp /usr/src/gnssrefl/gnssrefl/station_pos.db /etc/gnssrefl/refl_code/Files/

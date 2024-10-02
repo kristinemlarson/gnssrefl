@@ -65,7 +65,6 @@ files should be named. The naming conventions for GNSS observation files are giv
 If you are working with the docker, I have made some notes in the [docker install section](docker_cl_instructions.md) 
 that might be helpful to you about where to store your files.
 
-
 If you are working with git clone or pypi install, you should be able to have the RINEX files 
 in the directory you are currently working in. Or you should put them in the rinex directory as defined 
 below in the *Where Files are Stored* section, i.e. $REFL_CODE/YYYY/rinex/abcd where abcd is the station name. 
@@ -74,8 +73,7 @@ Examples are given in the [rinex2snr code](https://gnssrefl.readthedocs.io/en/la
 Documentation can always be improved, so if you would like to add more examples or find the 
 current documentation confusing, please submit a pull request.
 
-If you are using the notebooks, there is currently no notebook for this option.
-Please contact Kelly.Enloe@earthscope.org directly for guidance. 
+If you are using the gnssrefl notebook, unfortunately no notebook was developed by Earthscope for this option. 
 
 If you have questions about converting NMEA files, the best I can offer is that you read
 the next section on that specific format.

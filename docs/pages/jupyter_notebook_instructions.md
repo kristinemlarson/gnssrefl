@@ -1,8 +1,7 @@
 # Jupyter Notebook Installation Instructions
 
-Please send your feedback on these instructions or anything related to Notebooks 
-to Kelly Enloe at EarthScope, kelly.enloe@earthscope.org.
-You can also submit a GitHub issue.
+Notebooks are no longer supported by the Earthscope team that developed them. You are free to submit an issue on github,
+but as the README indicates, Earthscope expects the community to fix these issues themselves. 
 
 Listed below are instructions for running jupyter notebooks with Docker (recommended) or on your local machine.
 
@@ -67,8 +66,7 @@ them into the local directory associated with your mounted volume, i.e.
 `refl_code/yyyy/rinex/abcd`, where station is abcd and yyyy is the year. 
 There is an alternate directory structure you can also try, but it requires the use of 
 the makan option when running rinex2snr. I cannot promise that it works. Please note below that
-instead of mounting the one volume, you are mounting two. Please direct all questions about this 
-to Kelly Enloe.
+instead of mounting the one volume, you are mounting two. 
 
 ```bash
 docker run -p 8888:8888 -it -v $(pwd)/refl_code:/etc/gnssrefl/refl_code/ -v $(pwd)/refl_code/rinex/station/yyyy:/etc/gnssrefl/refl_code/rinex/station/yyyy/ --name gnssrefl_jupyter ghcr.io/kristinemlarson/gnssrefl:latest jupyter lab --allow-root --port=8888 --ip=0.0.0.0 
