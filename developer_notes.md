@@ -1,3 +1,13 @@
+# from tim
+I'm always happy to help, but in the future-- you can always build a new image if you want to test on your own.
+
+from your gnssrefl directory (that has the Dockerfile):
+docker build --no-cache -t <imagename> .
+docker run -it <imagename> /bin/bash
+If you want to mount volumes you could copy the -v syntax from the unavdocker/gnssrefl docker run command.
+
+
+
 # disutils - change to meson
 
 https://numpy.org/doc/stable/reference/distutils_status_migration.html

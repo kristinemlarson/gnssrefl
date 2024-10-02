@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.8.0
+
+Changed our build to meson. This will now accommodate python >= 3.11.
+It also eliminates the setup tool deprecation. 
+
+Why we did this: https://numpy.org/doc/stable/reference/distutils_status_migration.html
+
 ## 3.7.0
 I have been trying to make a way to save frequently used settings in rinex2snr and gnssir,
 especially the snr ending, and to a lesser extent, the samplerate. 

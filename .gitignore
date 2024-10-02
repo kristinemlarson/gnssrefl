@@ -1,4 +1,5 @@
 env
+developer_notes.md
 new.pyproject.toml
 meson.build
 set_simulator*py
