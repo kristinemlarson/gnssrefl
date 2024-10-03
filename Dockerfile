@@ -48,7 +48,8 @@ ENV DOCKER=true
 # I don't think we need station_pos.db anymore either, just the 2024 one. 
 RUN mkdir -p /etc/gnssrefl/refl_code/input/
 RUN cp /usr/src/gnssrefl/gnssrefl/gpt_1wA.pickle /etc/gnssrefl/refl_code/input/
-RUN cp /usr/src/gnssrefl/gnssrefl/station_pos.db /etc/gnssrefl/refl_code/Files/
+# I do not think this is needed.  Checking out that hypothesis 
+# RUN cp /usr/src/gnssrefl/gnssrefl/station_pos.db /etc/gnssrefl/refl_code/Files/
 RUN cp /usr/src/gnssrefl/gnssrefl/station_pos_2024.db /etc/gnssrefl/refl_code/Files/
 
 WORKDIR /usr/src/gnssrefl

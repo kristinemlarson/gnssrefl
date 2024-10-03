@@ -40,12 +40,9 @@ As of version 3.6.4, there is now another
 option. If you create a plain txt file with the name llh_local.txt and store it 
 in the $REFL_CODE/input directory, the code will
 use this as your *a priori* station coordinates. The format of this 
-file for **each line** should be :
-
-station latitude longitude and height, where station must be four characters,
-preferably lower case. latitude and longitude should be in degrees. height means ellipsoidal
-height in meters.  Example for station **xxxx**:
-
+file for **each line** should have four entries with spaces between them.  These entries
+are the four character station name, the latitude, the longitude, and ellipsoidal height.
+The units of the last four are degrees, degrees, and meters. Example for a station called **xxxx**:
 
 <PRE>
 xxxx 39.949492 -105.194266 1728.856

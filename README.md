@@ -1,7 +1,7 @@
 # gnssrefl v3.8.0
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
-When citing gnssrefl, please use:
+When citing results using gnssrefl, please use:
 
 Larson, K.M., gnssrefl: an open source python software package for environmental 
 GNSS interferometric reflectometry applications, *GPS Solutions*, Vol. 28(165), 10.1007/s10291-024-01694-8, 2024.
@@ -22,12 +22,10 @@ Questions and bug reports for gnssrefl (but not the notebooks) **must** be submi
 the [github repository](https://github.com/kristinemlarson/gnssrefl/issues). The notebooks were created by Earthscope 
 with NASA funding. I formally asked Earthscope about maintenance of the notebooks and received the following response:
 
-*In general, we place maintenance of notebooks (and many of our apps) that are not in active production on the **Low Priority** list 
-and I think it would be really healthy for our community to be willing to apply their expertise to provide fixes and enhancements 
+*In general, we place maintenance of notebooks (and many of our apps) that are not in active production on 
+the Low Priority list and I think it would be really healthy for our community to be 
+willing to apply their expertise to provide fixes and enhancements 
 to the notebook collection that can be reviewed in a pull request and merged for deployment.*
-
-So that's the story - if the notebooks aren't working, you need to fix them yourselves.
-
 
 **Some new features:**
 
