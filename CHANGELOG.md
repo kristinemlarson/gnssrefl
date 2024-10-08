@@ -3,14 +3,17 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.9.0
+
+Changed required python version back down to 3.8.  Eventually will be changing that
+
+to 3.9
 ## 3.8.1
 
 screenstats is always True now - but output goes to a file.
 The file location is printed to the screen.
 If this causes funny print statements please let me know.
 
-Changed required python version back down to 3.8.  Eventually will be changing that
-to 3.9
 
 Added RINEX 3 files for the nz archive. Minimal testing.
 

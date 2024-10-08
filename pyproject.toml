@@ -5,13 +5,13 @@ build-backend = "mesonpy"
 
 [project]
 name = "gnssrefl"
-version = "3.8.1"
+version = "3.9.0"
 description = "A GNSS reflectometry software package "
 readme = "README.md"
 maintainers = [
     { name = "Kristine Larson", email = "kristinem.larson@gmail.com" },
 ]
-requires-python = ">=3.9,<4"
+requires-python = ">=3.8,<4"
 classifiers = [
     "Programming Language :: Python :: 3.9",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
