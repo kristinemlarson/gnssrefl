@@ -35,10 +35,10 @@ def parse_arguments():
     parser.add_argument("-azim1", default=None, type=int, help="lower limit azimuth (deg)")
     parser.add_argument("-azim2", default=None, type=int, help="upper limit azimuth (deg)")
     parser.add_argument("-nooverwrite", default=None, type=str, help="default is False, i.e. you will overwrite")
+    parser.add_argument("-screenstats", default=None, type=str, help="screenstats, always created ")
     parser.add_argument("-extension", type=str, help="extension for result file, useful for testing strategies")
     parser.add_argument("-compress", default=None, type=str, help="Boolean, xz compress SNR files after use")
     parser.add_argument("-gzip", default=None, type=str, help="Boolean, gzip SNR files after use. Default is True")
-    parser.add_argument("-screenstats", default=None, type=str, help="Boolean, some stats printed to screen(default is False)")
     parser.add_argument("-delTmax", default=None, type=int, help="Allowed satellite arc length (minutes)")
     parser.add_argument("-e1", default=None, type=float, help="min elev angle (deg)")
     parser.add_argument("-e2", default=None, type=float, help="max elev angle (deg)")
@@ -55,7 +55,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'screenstats', 'nooverwrite', 'compress', 'screenstats', 'mmdd','gzip','savearcs','debug']
+    boolean_args = ['plt', 'nooverwrite', 'compress', 'mmdd','gzip','savearcs','debug','screenstats']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -65,12 +65,15 @@ def parse_arguments():
 def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, fr: list= [], 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
-        screenstats: bool = False, delTmax: int = None, e1: float = None, e2: float = None, 
+        screenstats: bool = True, delTmax: int = None, e1: float = None, e2: float = None, 
            mmdd: bool = False, gzip: bool = True, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt', 
            par : int = None, debug : bool=False  ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
+
+    screenstats is always True now - and the information is written to a file. I have kept the optional parameter
+    for backwards compatability, but it does not do anything.
 
     Parallel processing is now available. If you set -par to an integer between 2 and 10,
     it should substantially speed up your processing. Big thank you to AaryanRampal for getting this up and running.
@@ -206,7 +209,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     """
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
-    print('You are running ', vers)
+    #print('You are running ', vers)
+    screenstats = True
 
 
 #   make sure environment variables exist.  set to current directory if not

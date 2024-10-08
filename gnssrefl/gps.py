@@ -558,9 +558,9 @@ def getnavfile(year, month, day):
 
     Returns
     -------
-    navname : string
+    navname : str
         name of navigation file
-    navdir : string
+    navdir : str
         location of where the nav file should be stored
     foundit : bool
         whether the file was found
@@ -641,19 +641,18 @@ def getsp3file(year,month,day):
 def getsp3file_flex(year,month,day,pCtr):
     """
     retrieves sp3files
-    returns the name of the orbit file and its directory from CDDIS
     only gets the old-style filenames
 
     Parameters
     ----------
-    year : integer
-
-    month : integer
-
-    day : integer
-
-    pCtr : string
-        3 character orbit processing center
+    year : int
+        full year
+    month : int
+        calendar month
+    day : int
+        calendar day 
+    pCtr : str
+        3 character orbit processing center, i.e. gfz
 
     Returns
     -------
@@ -707,24 +706,23 @@ def getsp3file_mgex(year,month,day,pCtr):
 
     Parameters
     ----------
-    year : integer
-
-    month : integer
-
-    day : integer
-
-    pCtr : string
-        name of the orbit center
+    year : int
+        full year
+    month : int
+        month number
+    day : int
+        day of month
+    pCtr : str
+        name of the orbit center, i.e. gfz
 
     Returns
     -------
     name : str
         orbit filename
-
     fdir : str
         file directory
-
     foundit : bool
+        whether orbit file was found
 
     """
     screenstats = False # for now
@@ -969,19 +967,18 @@ def igsname(year,month,day):
 
     Parameters
     ----------
-    year : integer
-        four character year
-
-    month : integer
-
-    day : integer 
+    year : int
+        full year
+    month : int
+        month number
+    day : int
+        calendar day number
 
     Returns
     -------
     name : str
-        IGS orbit name
-
-    clockname : string
+        IGS orbit file name
+    clockname : str
         COD clockname 
 
     """
@@ -998,6 +995,8 @@ def igsname(year,month,day):
 def read_sp3(file):
     """
     borrowed from Ryan Hardy, who got it from David Wiese ... 
+    can't really say more about it
+
     """
     try:      
         f = open(file)
@@ -1027,6 +1026,9 @@ def read_sp3(file):
 
 def myreadnav(file):
     """
+    Reads a GPS nav message. Not currently used in gnssrefl.
+    For historical purposes I am leaving it here.
+
     Parameters
     ----------
     file : str
@@ -3100,9 +3102,9 @@ def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNois
     delTmax : float
         max satellite arc allowed (minutes)
     eminObs: float
-        minimum observed elev angle (Deg)
+        minimum observed elev angle (deg)
     emaxObs : float
-        maximum observed elev angle (Deg)
+        maximum observed elev angle (deg)
     e1 : float
         minimum allowed elev angle (deg)
     e2 : float
@@ -3123,13 +3125,15 @@ def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNois
         file identifier
 
     """
-    print('delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqamp,tooclose2edge')
-    print(delT,delTmax,round(eminObs,2),round(emaxObs,2),e1,e2,ediff,round(maxAmp,2), round(Noise,2),PkNoise,reqamp,tooclose2edge)
-    if tooclose2edge:
-        print('     Retrieved reflector height too close to the edge of the RH space')
+    if fileid is not None:
+        fileid.write('delT {0:3.1f} delTmax {1:3.1f} Obs emin/emax {2:6.2f} {3:6.2f} Setting e1 e2 ediff {4:6.2f} {5:6.2f} {6:3.1f} \n'.format(delT, delTmax,eminObs,emaxObs,e1,e2,ediff))
+
+        fileid.write('Observed maxAmp Noise Setting PkNoise reqAmp {0:5.2f} {1:5.2f} {2:5.2f} {3:5.2f} \n'.format(maxAmp,Noise,PkNoise,reqamp))
+        if tooclose2edge:
+            fileid.write('     Retrieved reflector height too close to the edge of the RH space')
 
     # did not want to re-indent
-    if True:
+    if False:
         if delT >= delTmax:
             print('     Obs delT {0:.3f} minutes vs {1:.1f} requested limit '.format(delT,delTmax ))
         if eminObs  > (e1 + ediff):
@@ -5625,8 +5629,13 @@ def queryUNR_modern(station):
 
 
     haveit,usedatabase = unr_database(nfile0, nfile00, 'station_pos_2024.db')
+    # i will no longer support downloading the old station database. But will allow you to use
+    # it if it exists ...
     if (not haveit):
-        haveit,usedatabase = unr_database(nfile2, nfile1, 'station_pos.db')
+        exist_old_database = os.path.isfile(nfile2)
+        if exist_old_database:
+            haveit = True
+            usedatabase = nfile2
 
     if not haveit:
         print('No station database was found.')
@@ -7468,7 +7477,7 @@ def query_coordinate_file(station):
     lon : float
         longitude in degrees (zero if not found)
     ht : float
-        ellipsoidal ht in meters (zzero if not found)
+        ellipsoidal ht in meters (zero if not found)
     """
     xdir = os.environ['REFL_CODE']
     f= xdir + '/input/llh_local.txt'

@@ -97,13 +97,11 @@ def download_chmod_move(url,savename,exedir):
 
     Parameters
     -----------
-    url : string
+    url : str
         external location of the executable
-
-    savename : string
+    savename : str
         name of the executable
-
-    exedir : string
+    exedir : str
         name of local executable directory (EXE environment variable)
 
     """
@@ -136,7 +134,7 @@ def installexe(opsys: str):
 
     Parameters
     ----------
-    opsys : string
+    opsys : str
         operating system. Allowed values are linux64,  macos, and mac-newchip 
         PC users should use the docker, where these executables 
         come pre-installed
@@ -228,7 +226,7 @@ def main():
 
     Parameters
     ----------
-    opsys : string
+    opsys : str
         operating system. Allowed values are linux64,  macos, and mac-newchip
         PC users should use the docker, where these executables
         come pre-installed

@@ -347,8 +347,14 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 if (not foundit): # try again
                                     file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
                             if foundit: # version 3 found - now need to gunzip, then hatanaka decompress
-                                deletecrx = True # no point keeping this around
-                                translated, rnx_filename = go_from_crxgz_to_rnx(file_name,deletecrx)
+                                if archive == 'nz':
+                                    print('Skip the Hatanaka gunzip step, change the name variable')
+                                    rnx_filename = file_name
+                                    print(rnx_filename)
+                                    translated = True
+                                else:
+                                    deletecrx = True # no point keeping this around
+                                    translated, rnx_filename = go_from_crxgz_to_rnx(file_name,deletecrx)
                             # now make rinex2
                                 if translated:
                                     if screenstats:

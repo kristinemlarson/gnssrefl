@@ -329,7 +329,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                 logid.write('=================================================================================\n')
                 logid.write('Looking at {0:4s} {1:4.0f} {2:3.0f} frequency {3:3.0f} ReqAmp {4:7.2f} \n'.format(station, year, doy,f,reqAmp[ct]))
                 logid.write('=================================================================================\n')
-                print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
+                #print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
 #           get the list of satellites for this frequency
             if onesat == None:
                 satlist = find_mgnss_satlist(f,year,doy)
@@ -340,7 +340,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             # main satellite loop
             for satNu in satlist:
                 if screenstats: 
-                    print('Satellite', satNu)
+                    #print('Satellite', satNu)
                     logid.write('satellite {0:3.0f} \n'.format(satNu))
 
                 iii = (sats == satNu)
@@ -384,8 +384,10 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                         # this is saying that these are the min and max elev angles you should be using
                         e1 = arclist[a,4]; e2 = arclist[a,5]
                         # pele is not used, so no longer used in window_new, v3.6.8
+
+                        # send it the log id now
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT, secxonds = window_new(d2, f, 
-                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats)
+                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats,logid)
 
                         #writing out arcs - try putting it later on ... 
                         if test_savearcs and (Nvv > 0):
@@ -447,7 +449,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                                 if screenstats:
                                     T = g.nicerTime(UTCtime)
                                     logid.write('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} \n'.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
-                                    print('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} '.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
+                                    #print('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} '.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
                                 if plot_screen:
                                     failed = False
                                     local_update_plot(x,y,px,pz,ax1,ax2,failed)
@@ -464,16 +466,16 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                                     #35.0 False 3.682862189099345 2.8
 
                                     logid.write('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f} \n'.format( iAzim,satNu,UTCtime,maxF))
-                                    print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f}'.format( iAzim,satNu,UTCtime,maxF))
+                                    #print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f}'.format( iAzim,satNu,UTCtime,maxF))
                                     g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose,logid)
                                 if plot_screen:
                                     failed = True
                                     local_update_plot(x,y,px,pz,ax1,ax2,failed)
 
             if screenstats:
-                print('=================================================================================')
-                print('     Frequency ', f, ' good arcs:', gj, ' rejected arcs:', rj )
-                print('=================================================================================')
+                #print('=================================================================================')
+                #print('     Frequency ', f, ' good arcs:', gj, ' rejected arcs:', rj )
+                #print('=================================================================================')
                 logid.write('=================================================================================\n')
                 logid.write('     Frequency  {0:3.0f}   good arcs: {1:3.0f}  rejected arcs: {2:3.0f} \n'.format( f, gj, rj))
                 logid.write('=================================================================================\n')
@@ -925,7 +927,7 @@ def read_snr(obsfile):
     return allGood, f, r, c
 
 
-def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats):
+def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid):
     """
     retrieves SNR arcs for a given satellite. returns elevation angle and 
     detrended linear SNR
@@ -956,6 +958,8 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats):
     screenstats : bool
         whether you want debugging information
         printed to the screen
+    fileid : 
+        log location
 
     Returns
     -------
@@ -982,6 +986,7 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats):
         hopefully seconds of the day
 
     """
+
     #print('Using polyfit ', pfitV)
     x=[]; y=[]; azi=[]; seconds = []; edot = [] ; sat = []
     Nvv= 0; meanTime = 0; avgAzim = 0 ; outFact2 = 0 ; delT = 0
@@ -1022,7 +1027,7 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats):
         nzero = len(datatest[ijk])
         if np.sum(datatest) < 1:
             if screenstats:
-                print('No useful data on frequency ', f , 'and sat ', satNu, ': all zeros')
+                fileid.write('No useful data on frequency {0:3.0f} /sat {1:3.0f} : all zeros\n'.format(f,satNu))
             good = False
         else:
             if nzero > 0:
@@ -1079,7 +1084,7 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats):
                             print(f, initA, Elen, len(snrD),Nvv)
                     else:
                         if screenstats:
-                            print('This azimuth is not in the azimuth region', initA, '(deg)')
+                            fileid.write('This azimuth is not in a requested azimuth region {0:7.2f} (deg)\n'.format(initA))
                         good = False
     else:
         if screenstats:
@@ -1338,10 +1343,10 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid ):
                 if ediff_violation:
                     add = ' violates ediff'
                 if not verysmall:
-                    print('Fail sat/arc/indices ',sat,iarc+1, sind,eind,' min/max obs elev: ', np.round(minObse,3), np.round(maxObse,3), minA,maxA,add)
+                    #print('Fail sat/arc/indices ',sat,iarc+1, sind,eind,' min/max obs elev: ', np.round(minObse,3), np.round(maxObse,3), minA,maxA,add)
                     logid.write('Failed sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max obs elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f} {8:15s}  \n'.format( sat,iarc+1,sind,eind,np.round(minObse,3), np.round(maxObse,3), minA,maxA,add))
             else:
-                print('Keep sat/arc/indices ',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2),minA,maxA)
+                #print('Keep sat/arc/indices ',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2),minA,maxA)
                 logid.write('Keep sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max obs elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f}  \n'.format( sat,iarc+1,sind,eind,np.round(minObse,3), np.round(maxObse,3), minA,maxA))
 
         if not nogood :

@@ -3,12 +3,26 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.8.1
+
+screenstats is always True now - but output goes to a file.
+The file location is printed to the screen.
+If this causes funny print statements please let me know.
+
+Changed required python version back down to 3.8.  Eventually will be changing that
+to 3.9
+
+Added RINEX 3 files for the nz archive. Minimal testing.
+
 ## 3.8.0
 
 Changed our build to meson. This will now accommodate python >= 3.11.
 It also eliminates the setup tool deprecation. 
 
 Why we did this: https://numpy.org/doc/stable/reference/distutils_status_migration.html
+
+Remove package stored version of station_pos.db. This has been replaced by station_pos_2024.db
+And it will no longer download this file if you use unr_database function.  
 
 ## 3.7.0
 I have been trying to make a way to save frequently used settings in rinex2snr and gnssir,

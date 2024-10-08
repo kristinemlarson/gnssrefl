@@ -139,7 +139,7 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     Returns
     -------
     file_name : str
-        name of rinexfile
+        name of rinexfile (?? with gz or not?   crx or rnx??)
     foundit : boolean
         whether file was found
 
@@ -159,6 +159,21 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     dir2 = ''
 
     # put this outside the try because I think there is one in the function
+
+    if archive == 'nz':
+        cydoy =  cyyyy + '/' + cdoy + '/'
+        dir1 =  'https://data.geonet.org.nz/gnss/rinex/' + cydoy + '/'
+        # try using requests
+        file_name = file_name.replace('crx','rnx')
+        url = dir1 + file_name
+        foundit = g.replace_wget(url, file_name)
+        if foundit:
+            subprocess.call(['gunzip', file_name])
+            file_name = file_name[0:-3]
+            print('Now', file_name)
+        return file_name, foundit
+
+
     if archive == 'bfg':
         station = station9ch[0:4] ; samplerate = srate; stream = 'R'
         debug = False
@@ -391,11 +406,11 @@ def rinex2names(station,year,doy):
 
     Parameters
     ----------
-    station : string
-
-    year : integer
-
-    doy : integer
+    station : str
+        four character station name
+    year : int
+        full year
+    doy : int
         day of year
 
     Results
@@ -406,8 +421,7 @@ def rinex2names(station,year,doy):
         regular rinex filename
     cyyyy : str
         four character year 
-
-    cdoy : string
+    cdoy : str
         three character day of year
 
     """
@@ -578,14 +592,14 @@ def make_rinex2_ofiles(file_name):
 
     Parameters
     ----------
-    file_name: string
+    file_name: str
         rinex2 filename
 
     Returns
     -------
-    new_name : string
+    new_name : str
         filename after multiple decompression processes
-    fexist : boolean
+    fexist : bool
         whether file was successfully created
 
     """
@@ -624,7 +638,7 @@ def strip_rinexfile(rinexfile):
 
     Parameters
     ----------
-    rinexfile : string
+    rinexfile : str
         name of the rinex2 file
     """
     print('You chose the strip option to reduce the number of observables in the RINEX file')
@@ -648,7 +662,7 @@ def strip_rinexfile(rinexfile):
 
 def gsi_data(station,year,doy):
     """
-    get data from GSI
+    get data from GSI, Japan
 
     Parameters
     ----------
@@ -657,7 +671,7 @@ def gsi_data(station,year,doy):
     year : int
         full year
     doy : int
-        day of yare
+        day of year
 
     """
     d = g.doy2ymd(year,doy);
@@ -675,19 +689,15 @@ def rinex2_highrate(station, year, doy,archive,strip_snr):
 
     Parameters
     ----------
-    station : string
+    station : str
          4 character station ID.  lowercase
-
-    year : integer
+    year : int
         full year
-
-    doy : integer
+    doy : int
         day of year
-
-    archive : string
+    archive : str
         name of GNSS archive
-
-    strip_snr : boolean
+    strip_snr : bool
         whether you want to strip out the observables (leaving only SNR)
 
     """
@@ -771,12 +781,12 @@ def serial_cddis_files(dname,cyyyy,cdoy):
 
     Parameters
     ----------
-    dname : string
+    dname : str
         rinex2 filename without compression extension
-    cyyyy : string
-        four character year
-    cdoy : string
-        three character day of yaer
+    cyyyy : str
+        character string of full year
+    cdoy : str
+        character string (3) of day of year
 
     Returns
     -------

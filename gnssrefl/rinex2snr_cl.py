@@ -371,7 +371,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
 
     # list of RINEX 3 archives
-    archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes','gnet']
+    archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes','gnet','nz']
     # list of RINEX 2.11 archives
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis','ngs_hourly']
@@ -410,9 +410,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     lsp = guts2.read_json_file(station[0:4].lower(), extension,noexit=True)
 
     if 'snr' in lsp:
-        if lsp['snr'] is None:
-            print('snr should not be set to this value, ignoring ', lsp['snr'])
-        else:
+        if lsp['snr'] is not None:
+            #print('snr should not be set to this value, ignoring ', lsp['snr'])
+        #else:
             snr = lsp['snr']
             print('An snr ending parameter was found in the station json: ', snr)
             print('If you try to override on the command line it will not work.')
