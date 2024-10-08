@@ -5,9 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 3.9.0
 
-Changed required python version back down to 3.8.  Eventually will be changing that
+**This is in flux - maybe 3.9 will be required going forward**
+Changed required python version back down to 3.8.  Eventually will be changing that.
 
-to 3.9
 ## 3.8.1
 
 screenstats is always True now - but output goes to a file.

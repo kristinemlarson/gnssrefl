@@ -16,10 +16,9 @@ you can also use a linux emulator and follow instructions for linux.
 
 ## Local Python Install for Linux/MacOS
 
-**YOU SHOULD BE RUNNING python version 3.8, 3.9 or 3.10.**  Absolutely versions >= 3.11 will not work.
-This has to do with our using the fortran reading features in the numpy library. That feature is being
-deprecated and we are aware that long-term, we need to find a solution for it. It could be that 
-we will simply compile the existing code for the users and call the fortran module using <code>subprocess</code>.
+As of gnssrefl version 3.9.0 you are allowed to run any python version greater than or equal to 3.9.
+To allow this we had to change how the package is built; we now use meson. If you have problems 
+with the install, please let us know by posting a github Issue.
 
 For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
 To check please type:
