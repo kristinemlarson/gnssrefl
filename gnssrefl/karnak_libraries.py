@@ -542,7 +542,7 @@ def universal_rinex2(station, year, doy, archive,screenstats):
         else:
             dir1 = 'ftp://gps.alaska.edu/pub/gpsdata/CoopCORS/' + cydoy + '/' + station.upper() + '/'
             foundit, file_name = gogetit(dir1, oname, '.gz');
-    elif (archive == 'ngs_hourly'):
+    elif (archive == 'ngs-hourly'):
         print('Hourly NGS')
         delete_hourly= True
         yy,mm,dd = g.ydoy2ymd(year,doy)

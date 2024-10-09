@@ -1,4 +1,4 @@
-# Quick Links to the Code
+# Quick Links/Expert Modes
 
 I originally made special documentation pages for different modules. I am now trying to
 put all documentation INTO the code intself using readthedocs since the format allows for example calls. While 
