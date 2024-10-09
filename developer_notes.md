@@ -1,5 +1,5 @@
 # from tim
-I'm always happy to help, but in the future-- you can always build a new image if you want to test on your own.
+you can always build a new image if you want to test on your own.
 
 from your gnssrefl directory (that has the Dockerfile):
 docker build --no-cache -t <imagename> .

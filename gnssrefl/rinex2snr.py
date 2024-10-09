@@ -1451,9 +1451,9 @@ def print_archives():
     feeble attempt to print list of archives to screen ...
 
     """
-    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes']
+    archive_list_rinex3 = ['unavco', 'cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','nrcan','gfz','ignes']
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
-                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis']
+                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','cddis']
     w = 'RINEX 3 archives '
     for i in range(0,len(archive_list_rinex3)):
         w = w + archive_list_rinex3[i] + ' '

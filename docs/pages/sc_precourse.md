@@ -1,5 +1,10 @@
 # Pre-course Activities
 
+**October 9, 2024: Please note that our software is being continuously updated. Thus some of these
+instructions and activites may be out of date (such as required python version).
+[Support for Jupyter notebooks](https://github.com/kristinemlarson/gnssrefl/blob/master/README.md) 
+has been officially deprecated as of October 2024.
+
 While it is possible to simply listen to the lecturers in the short 
 course, we think that this is a far better learning experience if 
 you are able to follow along with the examples. And for this we recommend the following:
@@ -15,10 +20,10 @@ you are able to follow along with the examples. And for this we recommend the fo
 for three different ways to access our code. 
 
   - The github or pypi install requires you are running linux and 
-have python 3.8+ on your system and feel comfortable
+have python >= 3.9 on your system and feel comfortable
 installing python packages.  
 
-  - Dockers. PC users should use this path, but it is also a good way 
+  - Dockers. Windows users should use this path, but it is also a good way 
 for mac and linux users that don't want to install python and/or 
 manage dependencies or environment variables.
 

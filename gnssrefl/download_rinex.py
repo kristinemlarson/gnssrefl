@@ -191,14 +191,14 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
     # allowed archives, rinex 2.11
     # not really sure bev, gfz, bkg work ???
     archive_list = ['bkg','bfg','bev','cddis', 'ga', 'gfz', 'jeff', 'ngs', 
-            'nrcan', 'nz','sonel','sopac','special', 'unavco', 'all','unavco2','ngs-hourly','gnet']
+            'nrcan', 'nz','sonel','sopac','special', 'unavco', 'all','ngs-hourly','gnet']
 
     # removed the all archive
     # removed cddis because it is too slow
     archive_list_high = ['gnet','bkg','unavco', 'nrcan', 'ga']  # though it is confusing because some are rinex 2.11 and others 3
 
     # archive list for rinex3 lowrate files
-    archive_list_rinex3 = ['unavco', 'bkg','cddis', 'ga', 'bev', 'ign', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','gnet']
+    archive_list_rinex3 = ['unavco', 'bkg','cddis', 'ga', 'bev', 'ign', 'epn', 'bfg','sonel','all','nrcan','gfz','gnet']
 
     if doy_end is None:
         doy_end = doy
@@ -240,10 +240,6 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
             stream = 'R'
 
         if archive == 'unavco':
-            # override the sample rate here
-            samplerate = 15
-
-        if archive == 'unavco2':
             # override the sample rate here
             samplerate = 15
 

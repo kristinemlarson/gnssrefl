@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 command line tool for the rinex2snr module
-it translates RINEX files (computing azimuth and elevation angle)
-and stores these along with time and satellite number and SNR data 
+it translates RINEX 2.11 and 3 files (computing azimuth and elevation angle)
+and stores these along with time and satellite number and SNR observations 
 into SNR files
 
 """
@@ -25,7 +25,6 @@ from functools import partial
 
 def parse_arguments():
 
-    #msg = rnx.print_archives()
     g.print_version_to_screen()
 
     parser = argparse.ArgumentParser()
@@ -80,12 +79,15 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     i.e. the 9 character version.
 
     New feature as of September 2024: various parameters can be stored in the station.json (created by gnssir_input).
-    This is really just for convenience. Parameters are dec, snr, stream, and samplerate. Why? because I kept forgetting
-    to set them on the command line! Right now you can add them by hand, but I will try to fix that.
+    This is really just for convenience. Parameters are dec, snr, stream, and samplerate. 
+    Why did I add these? because I kept forgetting
+    to set them on the command line! Right now you can add them to the json by hand, but most people will 
+    prefer to change them by using gnssir_input. Official documentation for these new inputs is 
+    defined in the gnssir_input documentation. 
 
-    Parallel processing is now available.  Set -par to a number <= 10 
-    Some archives have been set to non-compliant with this feature. Please look in the first few lines
-    of code to see the names of these archives.
+    Parallel processing is now available.  Set -par to a number <= 10.
+    Some archives have been set to be non-compliant with this feature. Please look in the first few lines
+    of the rinex2snr code to see the names of these archives.
 
     In general, you should not make RINEX 2.11 files with a huge number of observables. Especially do not put
     Doppler data in your file.  If you have more than 25 observables (multi-GNSS) or 20 (GPS only), the code
@@ -93,12 +95,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     to remake your RINEX files, you can try the -strip T option, which I believe uses gfzrnx to strip out everything
     except for SNR data.
 
-    Real-time users should use ultra, wum, or wum2
+    Real-time users should use ultra, wum2, or wum.
 
     Default orbits are GPS only until day of year 137, 2021 when rapid GFZ orbits became available.  If you still want to use
-    the nav message, i.e. GPS only, you can request it.
+    the nav message, i.e. GPS only, you can request it by setting orb to nav or gps.
 
-    bkg no longer a boolean input - must be specified with archive name, i.e. bkg-igs or bkg-euref
+    bkg no longer a boolean input - it must be specified with archive name, i.e. bkg-igs or bkg-euref
 
     For the nolook option :
 
@@ -132,13 +134,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     file types are S or R.  I believe S stands for streamed.
 
     RINEX3 30 second archives supported  
-        bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel
+        bev, bkg-euref, bkg-igs, cddis, epn, ga, gfz, nrcan, sonel, gnet, nz
 
     RINEX3 15 sec archives
-        bfg, unavco  - You likely need to specify a 15 second sample rate
+        bfg, unavco  - You likely need to specify a 15 second sample rate. bfg requires a password.
 
     RINEX3 1 sec 
-        bkg-igs, bkg-euref, cddis, ignes (spain), maybe nrcan 
+        bkg-igs, bkg-euref, cddis, ignes (spain), maybe nrcan?? , gnet
 
     Examples
     --------
@@ -292,6 +294,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             ngs : (National Geodetic Survey, USA)
 
+            ngs-hourly : (merged hourly files from National Geodetic Survey, USA)
+
             nrcan : (Natural Resources Canada)
 
             nz : (GNS, New Zealand)
@@ -370,11 +374,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
 
-    # list of RINEX 3 archives
-    archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','all','unavco2','nrcan','gfz','ignes','gnet','nz']
+    # list of RINEX 3 archives (but no longer allowing all)
+    archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','nrcan','gfz','ignes','gnet','nz']
     # list of RINEX 2.11 archives
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
-                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','unavco2','cddis','ngs_hourly']
+                    'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','cddis','ngs-hourly']
 
     archive_list_no_parallel = ['sopac','cddis','jeff']
 

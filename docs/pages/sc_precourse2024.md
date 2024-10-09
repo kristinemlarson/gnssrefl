@@ -1,5 +1,8 @@
 # Pre-course Activities
 
+*October 9, 2024: Please keep in mind that our code has been updated since this class was given.
+We currently require python version >= 3.9*
+
 While it is possible to simply listen to the lecturers in the short 
 course, we think that this is a far better learning experience if 
 you are able to follow along with the examples. And for this we recommend the following:
@@ -13,10 +16,10 @@ you are able to follow along with the examples. And for this we recommend the fo
 for three different ways to access our code. 
 
   - The github or pypi install requires you are running linux and 
-have python version between 3.8-3.10 on your system and feel comfortable
+have python version between >= 3.9 on your system and feel comfortable
 installing python packages.  
 
-  - Dockers. PC users should use this path, but it is also a good way 
+  - Dockers. Windows users should use this path, but it is also a good way 
 for mac and linux users that don't want to install python and/or 
 manage dependencies or environment variables.
 
