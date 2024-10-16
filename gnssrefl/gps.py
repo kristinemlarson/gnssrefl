@@ -3128,7 +3128,7 @@ def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNois
     if fileid is not None:
         fileid.write('delT {0:3.1f} delTmax {1:3.1f} Obs emin/emax {2:6.2f} {3:6.2f} Setting e1 e2 ediff {4:6.2f} {5:6.2f} {6:3.1f} \n'.format(delT, delTmax,eminObs,emaxObs,e1,e2,ediff))
 
-        fileid.write('Observed maxAmp Noise Setting PkNoise reqAmp {0:5.2f} {1:5.2f} {2:5.2f} {3:5.2f} \n'.format(maxAmp,Noise,PkNoise,reqamp))
+        fileid.write('Obs/Request Amplitude {0:5.2f} {1:5.2f} Peak2Noise {2:5.2f} {3:5.2f} \n'.format(maxAmp,reqamp,Noise,PkNoise))
         if tooclose2edge:
             fileid.write('     Retrieved reflector height too close to the edge of the RH space')
 
@@ -3707,6 +3707,8 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     This code translates a RINEX 3 file into a RINEX 2.11 file.
     It is assumed that the gfzrnx exists and that the RINEX 3 file is 
     Hatanaka uncompressed or compressed. (ending in rnx or crx)
+
+    if fileid is sent as an (optional) input parameter, log statements are printed to it
 
     Parameters
     ----------

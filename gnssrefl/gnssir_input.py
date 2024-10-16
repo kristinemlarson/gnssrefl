@@ -55,6 +55,8 @@ def parse_arguments():
     parser.add_argument("-stream", default=None, type=str, help="RINEX3 stream parameter")
     parser.add_argument("-samplerate", default=None, type=int, help="RINEX3 samplerate parameter")
     parser.add_argument("-dec", default=None, type=int, help="optional decimation value when creating SNR files ")
+    parser.add_argument("-orb", default=None, type=str, help="optional orbit value used when creating SNR files")
+    parser.add_argument("-archive", default=None, type=str, help="optional archive value used when creating SNR files")
 
     args = parser.parse_args().__dict__
 
@@ -78,7 +80,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
                       subdaily_ampl : float=None, subdaily_delta_out : float=None, 
                       subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
                       subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None, snr: int=None, 
-                      stream: str=None , samplerate: int=None, dec: int=None):
+                      stream: str=None , samplerate: int=None, dec: int=None, orb: str=None, archive: str=None):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -298,6 +300,10 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     samplerate : int , optional
         for RINEX3 translation, file sample rate to be used
         set to None for now
+    orb : str, optional
+        for SNR file creation. If nothing is provided, nothing is written to the json
+    archive : str, optional
+        for SNR file creation. If nothing is provided, nothing is written to the json
     """
 
     # make sure environment variables exist
@@ -351,6 +357,10 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     # don't save it unless it was set.
     if snr is not None:
         lsp['snr'] = snr
+    if orb is not None:
+        lsp['orb'] = orb
+    if archive is not None:
+        lsp['archive'] = archive
 
     if h1 > h2:
         print(f'h1 cannot be greater than h2. You have set h1 to {h1} and h2 to {h2}. Exiting.')

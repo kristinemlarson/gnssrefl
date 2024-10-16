@@ -79,7 +79,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     i.e. the 9 character version.
 
     New feature as of September 2024: various parameters can be stored in the station.json (created by gnssir_input).
-    This is really just for convenience. Parameters are dec, snr, stream, and samplerate. 
+    This is really just for convenience. Parameters are dec, snr, stream, samplerate, archive, and orb. 
     Why did I add these? because I kept forgetting
     to set them on the command line! Right now you can add them to the json by hand, but most people will 
     prefer to change them by using gnssir_input. Official documentation for these new inputs is 
@@ -308,7 +308,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             unavco : (University Navstar Consortium, now Earthscope)
 
-            all : (searches sopac, unavco, and sonel )
+            all : (searches sopac and unavco)
 
     doy_end : int, optional
         end day of year to be downloaded. 
@@ -374,8 +374,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
 
-    # list of RINEX 3 archives (but no longer allowing all)
+    # list of RINEX 3 archives 
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','nrcan','gfz','ignes','gnet','nz']
+
     # list of RINEX 2.11 archives
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
                     'ngs', 'nrcan', 'special', 'bev', 'jp', 'all','cddis','ngs-hourly']
@@ -422,6 +423,16 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
             print('If you try to override on the command line it will not work.')
 
     print('Using snr value of ', snr)
+
+    if 'orb' in lsp:
+        if lsp['orb'] is not None:
+            orb = lsp['orb']
+            print('Using orb value of ', orb, ' from the json')
+
+    if 'archive' in lsp:
+        if lsp['archive'] is not None:
+            archive = lsp['archive']
+            print('Using archive value of ', archive, ' from the json')
 
     if ('samplerate' in lsp):
         if lsp['samplerate'] is None:
@@ -561,13 +572,18 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes','bkg-igs','bkg-euref','gnet']  
     if ns == 9:
         # rinex3
+        # change default archive from all to cddis, cause we do not allow all as a valid archive for rinex3 files
+        if (archive == 'all'):
+            archive = 'cddis'
+            print('Because you did not choose one, using cddis as the archive to look at.')
+
         if rate == 'high':
             if (archive not in highrate_list) and (nolook == False):
                 print('You have chosen an archive not supported by the code.')
                 print(highrate_list)
                 sys.exit()
         else:
-            if archive not in archive_list_rinex3:
+            if archive not in archive_list_rinex3 and (nolook == False):
                 print('You have chosen an archive not supported by the code.')
                 print(archive_list_rinex3)
                 sys.exit()
@@ -624,7 +640,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if MJD1 == MJD2:
         print('Only one day being analyzed, parallel processing turned off')
         par = None
-    if archive in archive_list_no_parallel:
+    if (archive in archive_list_no_parallel) and par:
         print('You have chosen an archive that is unfriendly to multiple simultaneous download')
         print('requests. Your request for parallel processing has been declined.')
         par = None
@@ -675,8 +691,8 @@ def process_jobs_multi(index,args,datelist,error_queue):
     ==========
     index : int
         which job to run
-        args : dict
-        dictionary of parameters for run_rinex2snr
+    args : dict
+        dictionary of parameters that are sent to run_rinex2snr
     datelist: dict
         start and stop dates in MJD
     error_queue:? 

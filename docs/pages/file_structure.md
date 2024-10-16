@@ -50,8 +50,8 @@ xxxx 39.949492 -105.194266 1728.856
 
 You can add comment lines to the file with a percent sign.
 This file is read in the <code>query_coordinate_file</code> function found in gps.py. The local coordinate 
-file is read by <code>mea2snr</code>. This means you no longer have to enter station coordinates on 
-the command line when using <code>nmea2snr</code>. 
+file is read by <code>nmea2snr</code>. This means you no longer have to enter station coordinates on 
+the command line when using that code. 
 
 ## How do I analyze my own GNSS data?
 

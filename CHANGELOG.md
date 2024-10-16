@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.10.1
+
+added archive and orb to the gnssir_input json. These are to be used in rinex2snr - mostly
+useful for people (like me) that forget what command line options I want to use.
+Other things you can save are mostly for RINEX 3 (e.g. stream parameter, samplerate). snr and dec values can also be 
+set if you are doing something non-standard (i.e. not using snr file 66 and not decimating).  
+
+Default for rinex3 files is now explicitly set to cddis. This is different than for RINEX 2.11 files where
+the default is all, which now cycles thru unavco and sopac. It used to use sonel, but I don't think
+many people use sonel. And if they want to use sonel, of course they can do so by specifying sonel.
+
 ## 3.10.0
 
 Making new pypi version with python 3.9 just to be sure we are all on the same page.

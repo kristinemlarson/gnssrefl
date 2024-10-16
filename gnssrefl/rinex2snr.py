@@ -31,7 +31,7 @@ class constants:
 #
 def quickname(station,year,cyy, cdoy, csnr):
     """
-    creates filename for a local SNR file
+    creates full filename (including directory) for a local SNR file
 
     Parameters
     ----------
@@ -143,6 +143,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
         if True:
             csnr = str(isnr)
             cdoy = '{:03d}'.format(doy)
+            # this is absurd - someone should fix this ... 
             if (year<2000):
                 cyy = '{:02d}'.format(year-1900)
             else:
@@ -338,6 +339,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                         else:
                             if screenstats: 
                                 print('looks for lowrate RINEX 3 files')
+                            #  I do not think this 'all' option is even allowed anymore.  
                             if (archive == 'all'):
                                 file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream,screenstats)
                                 if (not foundit): # try again
@@ -477,7 +479,9 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
                 # added karnak librariies
                     if (archive == 'all'):
                         foundrinex = False
-                        for archivechoice in ['unavco','sopac','sonel']:
+                        # removed sonel from all option in version 3.10.1
+                        for archivechoice in ['unavco','sopac']:
+                        #for archivechoice in ['unavco','sopac','sonel']:
                             if (not foundrinex):
                                 file_name,foundrinex = k.universal_rinex2(station, year, doy, archivechoice,screenstats)
                     else:

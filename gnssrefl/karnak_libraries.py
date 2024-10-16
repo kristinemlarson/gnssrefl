@@ -550,6 +550,7 @@ def universal_rinex2(station, year, doy, archive,screenstats):
     elif (archive == 'ngs'):
         dir1 = 'https://geodesy.noaa.gov/corsdata/rinex/' + cydoy + '/' + station + '/'
         file_name = oname + '.gz' ; url = dir1 + file_name
+        print(url)
         foundit = g.replace_wget(url,file_name)
         #foundit, file_name = gogetit(dir1, oname, '.gz');
         if not foundit:
