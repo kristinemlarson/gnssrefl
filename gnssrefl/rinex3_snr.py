@@ -14,7 +14,8 @@ def main():
 
     Creates SNR file from RINEX 3 file that is stored locally
     Requires the gfzrnx executable to be available.
-    Does not overwrite existing SNR files
+    Does not overwrite existing SNR files. It would be nice if someone would
+    add that - plus utilize the libraries for boolean inputs.
 
     Parameters
     ----------
@@ -53,8 +54,11 @@ def main():
     snre = g.snr_exist(station4ch,year,doy,str(isnr))
 
     if snre : 
-        print('Requested SNR file already exists. Exiting.')
+        print('Requested SNR file already exists. You need to delete it. Exiting.')
         sys.exit()
+
+    #set logs  - this is also used by rinex2snr
+    log, errorlog, exedir = r.set_rinex2snr_logs(station4ch,year,doy)
 
     if (args.name_fail == 'T') or (args.name_fail == 'True'):
         # this is an attempt to help those people impacted by this activity.
@@ -71,7 +75,6 @@ def main():
         subprocess.call(['mv','-f',illegal_file,rinex3])
 
     else:
-
         rinex3 = args.rinex3
         station = rinex3[0:4].lower()
         STATION = rinex3[0:4]
@@ -100,17 +103,23 @@ def main():
     # first step will be to translate to rinex2
 
     if os.path.isfile(rinex3):
-        print('Found version 3 input file ')
+        log.write('Found version 3 input file \n')
         if (rinex3[-2::] == 'gz'):
-            print('Must gunzip version 3 rinex')
+            #print('Must gunzip version 3 rinex')
             subprocess.call(['gunzip', rinex3])
             rinex3 = rinex3[0:-3]
-        g.new_rinex3_rinex2(rinex3,rinex2)
+        gpsonly = False
+        if orbtype == 'nav':
+            gpsonly = True
+        g.new_rinex3_rinex2(rinex3,rinex2,dec_rate,gpsonly,log)
+
     else:
-        print('ERROR: your input file does not exist:', rinex3)
+        log.write('ERROR: your input file does not exist: {0:s} \n'.format(rinex3))
+        log.close()
         sys.exit()
+
     if os.path.isfile(rinex2):
-        print('found version 2 rinex',rinex2)
+        log.write('Found version 2.11 RINEX file : {0:s} \n'.format(rinex2))
         idoy = int(cdoy); iyear = int(year)
 
         # many of these are fake values because the file has already been translated to rinex2
@@ -123,6 +132,7 @@ def main():
         screenstats = False
         # removed fortran and skipit inputs ...  and got rid of the year and doy lists
         # 2024 may 28
+        # this should really call conv2snr ... 
         r.run_rinex2snr(station, iyear, idoy, isnr, orbtype, rate,dec_rate,archive,nol,
                 overwrite,translator,srate,mk,stream,strip,bkg,screenstats,gzip,timeout)
 

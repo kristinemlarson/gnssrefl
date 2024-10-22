@@ -55,11 +55,12 @@ def parse_arguments():
     parser.add_argument("-par", default=None, help="parallel processes allowed", type=int)
     parser.add_argument("-timeout", default=None, help="timeout in secs, useful for some archives", type=int)
     parser.add_argument("-extension", default=None, help="optional extension to keep information like samplerate, snr, lat, lon etc", type=str)
+    parser.add_argument("-debug", default=None, help="run without task queue", type=str)
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['nolook', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip','monthly']
+    boolean_args = ['nolook', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip','monthly','debug']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -71,7 +72,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
               screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
-              par : int=None, timeout : int = 0, extension : str='' ):
+              par : int=None, timeout : int = 0, extension : str='', debug: bool = False ):
     """
     rinex2snr translates RINEX files to a new file in the SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided either by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
@@ -369,6 +370,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         for that extension parameter. otherwise it uses station.json. It is a convenience
         for saving things like stream, samplerate, and snr settings that previously had 
         to be input on the command line
+    debug : bool, optional
+        run without task queue - important for debugging
 
     """
 
@@ -589,7 +592,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
                 sys.exit()
     else:
         # rinex2
+
         if rate == 'high':
+            if archive == 'all':
+            # not really allowed for highrate ...set to something reasonable like unavco
+                archive = 'unavco'
             if archive not in highrate_list:
                 if nolook:
                     print('You have chosen nolook, so I will proceed assuming you have the RINEX file.')
@@ -640,6 +647,14 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     if MJD1 == MJD2:
         print('Only one day being analyzed, parallel processing turned off')
         par = None
+
+    if debug:
+        print('Debug mode. Only runs first day')
+        args['year'] = year
+        args['doy'] = doy
+        rnx.run_rinex2snr(**args)
+        sys.exit()
+
     if (archive in archive_list_no_parallel) and par:
         print('You have chosen an archive that is unfriendly to multiple simultaneous download')
         print('requests. Your request for parallel processing has been declined.')

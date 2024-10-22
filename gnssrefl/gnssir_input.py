@@ -51,9 +51,9 @@ def parse_arguments():
     parser.add_argument("-subdaily_subdir", default=None, type=str, help="subdaily, output directory")
     parser.add_argument("-subdaily_spline_outlier1", default=None, type=float, help="subdaily, outlier value (m), part1")
     parser.add_argument("-subdaily_spline_outlier2", default=None, type=float, help="subdaily, outlier value (m), part2")
-    parser.add_argument("-snr", default=None, type=int, help="SNR file type (66,10, 88 etc)")
-    parser.add_argument("-stream", default=None, type=str, help="RINEX3 stream parameter")
-    parser.add_argument("-samplerate", default=None, type=int, help="RINEX3 samplerate parameter")
+    parser.add_argument("-snr", default=None, type=int, help="file type (66,10, 88 etc) when creating SNR files")
+    parser.add_argument("-stream", default=None, type=str, help="RINEX3 stream parameter when creating SNR files")
+    parser.add_argument("-samplerate", default=None, type=int, help="RINEX3 samplerate parameter when creating SNR files")
     parser.add_argument("-dec", default=None, type=int, help="optional decimation value when creating SNR files ")
     parser.add_argument("-orb", default=None, type=str, help="optional orbit value used when creating SNR files")
     parser.add_argument("-archive", default=None, type=str, help="optional archive value used when creating SNR files")
@@ -290,20 +290,24 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         alternate setting for outlier detection in part2
 
     snr : int
-        kind of SNR file. If using the default (66), there is no reason to set this.
-        if you are going to use non-defaults (i.e. 88) throughout, it would be helpful
-        to set this here and then the value will be used when using gnssir. If you set it,
+        This denotes the kind of SNR file when either creating or using SNR files. 
+        If using the default (66), there is no reason to set this.
+        If you are going to use non-defaults (i.e. 88) throughout, it would be helpful
+        to set this here and then the value will be used when using gnssir. If you do set it,
         it will also be used by rinex2snr, which again can be useful.
     stream : str, optional
-        for RINEX3 translation, R or S naming parameter
+        for RINEX3 translation only, R or S naming parameter
         set to R
     samplerate : int , optional
-        for RINEX3 translation, file sample rate to be used
+        for RINEX3 translation only, file sample rate to be used
         set to None for now
     orb : str, optional
-        for SNR file creation. If nothing is provided, nothing is written to the json
+        for SNR file creation. If nothing is provided, nothing is written to the json.
+        Can be useful if you want to use a specific orbit source (that the code recognizes)
     archive : str, optional
-        for SNR file creation. If nothing is provided, nothing is written to the json
+        for SNR file creation. If nothing is provided, nothing is written to the json.
+        Can be useful if you forget which archive has which station files.
+
     """
 
     # make sure environment variables exist
@@ -332,7 +336,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         # try to find the coordinates  at UNR
         lat, lon, height = g.queryUNR_modern(station)
         if lat == 0:
-            print('Tried to find coordinates in station database. None found so exiting')
+            print('Tried to find coordinates in coordinate databases. None found so exiting')
             sys.exit()
 
     # calculate Hortho using EGM96 if none provided

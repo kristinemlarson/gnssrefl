@@ -2631,7 +2631,6 @@ def rinex_unavco_highrate(station, year, month, day):
 
     rinexfile,rinexfiled = rinex_name(station, year, month, day)
 
-    #print('Using new unavco protocols')
     #unavco = 'https://data-idm.unavco.org/archive/gnss/highrate/1-Hz/rinex/' 
     unavco = 'https://data.unavco.org/archive/gnss/highrate/1-Hz/rinex/'
 
@@ -3279,7 +3278,7 @@ def make_nav_dirs(yyyy):
 def check_inputs(station,year,doy,snr_type):
     """
     inputs to Lomb Scargle and Rinex translation codes
-    are checked for sensibility. Returns true or false to 
+    are checked for sensibility. Returns true or false so 
     code can exit. 
 
     Parameters
@@ -3702,13 +3701,12 @@ def warn_and_exit(snrexe,fortran):
             print('Install it or use -fortran False. Exiting')
             sys.exit()
 
-def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
+def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log):
     """
     This code translates a RINEX 3 file into a RINEX 2.11 file.
     It is assumed that the gfzrnx exists and that the RINEX 3 file is 
     Hatanaka uncompressed or compressed. (ending in rnx or crx)
 
-    if fileid is sent as an (optional) input parameter, log statements are printed to it
 
     Parameters
     ----------
@@ -3722,6 +3720,8 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
         decimation factor. If 0 or 1, no decimation is done.
     gpsonly : bool
         whether you want only GPS signals. Default is false
+    log : fileiD
+        this must have been defined before you call this code
 
     Returns
     -------
@@ -3737,20 +3737,21 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
     gobblygook_gps = myfavoritegpsobs()
 
     if not os.path.exists(gexe):
-        print('gfzrnx executable does not exist and this file cannot be translated. Exiting')
+        log.write('gfzrnx executable does not exist and this file cannot be translated. Exiting \n')
         sys.exit()
     if not os.path.exists(r3_filename):
-        print('RINEX 3 inputfile does not exist', r3_filename, ' Exiting')
+        log.write('RINEX 3 inputfile does not exist:  {0:s}  Exiting.\n'.format(r3_filename))
         return fexists
 
     if (lastbit == 'rnx'):
-        print('found Hatanaka decompressed version', r3_filename)
+        log.write('found Hatanaka decompressed version {0:s} \n'.format(r3_filename))
         r3_filename_new = r3_filename
     elif (lastbit == 'crx'):
-        print('found Hatanaka compressed version', r3_filename)
+        log.write('found Hatanaka compressed version {0:s} \n'.format(r3_filename))
+        #print('found Hatanaka compressed version', r3_filename)
         r3_filename_new = r3_filename[0:-3] + 'rnx'
         if not os.path.exists(crnxpath):
-            print('You need to install Hatanaka translator. Exiting.')
+            log.write('You need to install Hatanaka translator. Exiting.\n')
             return fexists
         s1=time.time()
         subprocess.call([crnxpath, r3_filename])
@@ -3759,17 +3760,17 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
         # removing the compressed version - will keep new version
         subprocess.call(['rm', '-f', r3_filename ])
         if os.path.exists(r3_filename_new):
-            print('Hatanaka Conversion successful ', r3_filename_new)
+            log.write('Hatanaka Conversion successful {0:s} \n'.format(r3_filename_new))
         else:
-            print('file does not exist')
+            log.write('RINEX 3 file does not exist \n')
     else:
-        print('I found neither a rnx or crx RINEX 3 file and those are the only ones allowed. Exiting')
+        log.write('I found neither a rnx or crx RINEX 3 file and those are the only ones allowed. Exiting \n')
         return fexists
 
     #print('decimate value: ', dec)
     s1=time.time()
     if os.path.exists(r3_filename_new):
-        print('Now Convert from RINEX 3 to RINEX 2.11')
+        log.write('Now Convert from RINEX 3 to RINEX 2.11\n')
         if True:
             if (dec == 1) or (dec == 0):
                 if (gpsonly):
@@ -3787,15 +3788,15 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec=1,gpsonly=False):
         #except:
         #    print('Some kind of problem in translation from RINEX 3 to RINEX 2.11')
     else:
-        print('RINEX 3 file I need does not exist, so no translation.', r3_filename_new)
+        log.write('RINEX 3 file I need does not exist, so no translation {0:s} \n'.format( r3_filename_new))
 
     s2=time.time()
 
     if os.path.exists(r2_filename):
-        print('RINEX 2.11 file now exists: ', r2_filename)
+        log.write('The RINEX 2.11 file now exists: {0:s} \n'.format(r2_filename))
         fexists = True
     else:
-        print('RINEX 2.11 file does not exist: ', r2_filename)
+        log.write('The RINEX 2.11 file does not exist: {0:s} \n'.format(r2_filename))
 
 
     #print('remove RINEX3 rnx version of the file ',r3_filename_new)
@@ -5178,7 +5179,7 @@ def rapid_gfz_orbits(year,month,day):
         return '', '', foundit
 
     if (year + doy/365.25) > dday2:
-        print('Use the second way to download: ', url2)
+        #print('Use the second way to download: ', url2)
         fullname = fdir + '/' + longname 
         if os.path.isfile(fullname):
             foundit = True
@@ -5198,7 +5199,7 @@ def rapid_gfz_orbits(year,month,day):
         return longname, fdir, foundit
 
     else:
-        print('Try First way to download : ',url)
+        #print('Try First way to download : ',url)
         fullname = fdir + '/' + littlename
         if os.path.isfile(fullname):
             foundit = True
@@ -5643,7 +5644,7 @@ def queryUNR_modern(station):
         print('No station database was found.')
         return 0, 0, 0
     else:
-        print('Using database ', usedatabase)
+        #print('Using database ', usedatabase)
         conn = sqlite3.connect(usedatabase)
 
     c=conn.cursor()

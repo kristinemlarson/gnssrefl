@@ -57,7 +57,9 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     daily_avg_reqtracks and  daily_avg_medfilter.  For those making a new json, 
     the parameters will be set to None if you don't choose a value on the command line. 
     You can also hand edit or add it. This would be helpful in not having to rerun gnssir_input and 
-    risk losing some of your other specialized selections.
+    risk losing some of your other specialized selections. Because median filter and required tracks are 
+    REQUIRED inputs, you still have to tell the code something, even if you overwrite it in the json.
+    Set to 0 and 0 to trigger the json inputs.  I will work on getting a better way to do this.
 
     If you are unfamiliar with what a median filter does in this code, please see 
     https://gnssrefl.readthedocs.io/en/latest/pages/README_dailyavg.html
@@ -88,6 +90,9 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
         and restricts it to years between 2015 and 2020 and azimuths between 0 and 180 degrees
     daily_avg p041 0.25 10 -extension NV
         consolidates results which were created using the extension NV when you ran gnssir.
+    daily_avg p041 0 0 
+        this will use median filter and required tracks values from within the json.  The parameter 
+        names are slightly different, daily_avg_medianfilter and dailyavg_reqtracks.
 
 
     Parameters
@@ -165,7 +170,7 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
         maximum azimuth, degrees
 
     test : bool, optional
-        not sure what this does
+        not sure what this does anymore.
 
     subdir: str, optional
         non-default subdirectory for Files output

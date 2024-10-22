@@ -233,8 +233,9 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
         if NS != 9:
             print('exiting: RINEX 3+ station names must have 9 characters')
             sys.exit()
-        if archive is None:
+        if archive is None or archive == 'all':
             archive = 'cddis'
+            print('Using cddis as default archive for RINEX 3 files - since you do not provide one')
 
         if stream not in ['R', 'S']:
             stream = 'R'

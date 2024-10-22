@@ -52,7 +52,8 @@ def parse_arguments():
 def quicklook(station: str, year: int, doy: int,
               snr: int = 66, fr: int = 1, ampl: float = 7., e1: float = 5, e2: float = 25, h1: float = 0.5, 
               h2: float = 8., sat: int = None, peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
-              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, delTmax : float=75.0, hires_figs : bool=False ):
+              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, 
+              delTmax : float=75.0, hires_figs : bool=False ):
     """
 
     quickLook assessment of GNSS-IR results using SNR data. It creates two plots: one with periodograms for
@@ -69,7 +70,14 @@ def quicklook(station: str, year: int, doy: int,
         analyzes station p041 on day of year 1 in the year 2023.  
         The periodogram would be restricted to RH of 1-10 meters.  
 
+    quickLook p041 2023 1 -fr 20
+        Uses L2C frequency instead of GPS L1.
+
+    quickLook p041 2023 1 -azim1 10 -azim2 180
+        Only shows azimuths between 10 and 180
+
     If your site name is in the GNSS-IR database (which is generated from the Nevada Reno geodesy group), 
+    or in the local coordinates database,d 
     a standard refraction correction is applied. If not, it does not.  This is most relevant for very very
     tall sites, i.e. > 200 meters. Refraction models are always applied in the gnssir module.
 
@@ -159,7 +167,6 @@ def quicklook(station: str, year: int, doy: int,
     """
 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
-    #print('You are running ', vers)
 
 
 #   make sure environment variables exist.  set to current directory if not
@@ -169,7 +176,6 @@ def quicklook(station: str, year: int, doy: int,
     g.checkFiles(station, '')
 
     exitS = g.check_inputs(station, year, doy, snr)
-
 
     if exitS:
         sys.exit()

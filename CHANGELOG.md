@@ -14,6 +14,15 @@ Default for rinex3 files is now explicitly set to cddis. This is different than 
 the default is all, which now cycles thru unavco and sopac. It used to use sonel, but I don't think
 many people use sonel. And if they want to use sonel, of course they can do so by specifying sonel.
 
+Trying to make a log file for rinex2snr so that you are not overwhelmed with messages
+to the screen.  rinex3_rinex2 had to be changed to allow log input.  and file needed to be 
+created in run_rinex2snr.
+
+I added a debug option to rinex2snr so you could see what is going wrong without using
+the task queues.
+
+
+
 ## 3.10.0
 
 Making new pypi version with python 3.9 just to be sure we are all on the same page.

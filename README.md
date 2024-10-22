@@ -1,7 +1,7 @@
 # gnssrefl v3.10.1
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
-When citing results using gnssrefl, please use:
+When showing results created using gnssrefl, please use:
 
 Larson, K.M., gnssrefl: an open source python software package for environmental 
 GNSS interferometric reflectometry applications, *GPS Solutions*, Vol. 28(165), 10.1007/s10291-024-01694-8, 2024.

@@ -161,7 +161,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
         # apply elevation angle correction for simple refraction here
         if irefr == 1:
-            print('found simple refraction parameters')
+            #print('found simple refraction parameters')
             lsp={}; lsp['refraction'] = True
             snrD[:,1] = gnssir_v2.apply_refraction_corr(lsp,snrD[:,1],quick_p,quick_T)
         # restrict to DC limits 

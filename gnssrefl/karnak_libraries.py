@@ -488,19 +488,19 @@ def universal_rinex2(station, year, doy, archive,screenstats):
     elif (archive == 'unavco'):
         #url1 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
         url1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
-        if screenstats:
-            print(url1)
+        #if screenstats:
+        #    print(url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1, dname + '.Z')
         if not foundit:
             url2 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
-            if screenstats:
-                print(url2)
+            #if screenstats:
+            #    print(url2)
             foundit,file_name = kelly.the_kelly_simple_way(url2, oname + '.Z')
     elif (archive == 'special'):
         #print('testing out new protocol at unavco')
         url1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy + oname + '.gz'
-        if screenstats:
-            print(url1)
+        #if screenstats:
+        #    print(url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1, oname + '.gz')
         # old way
         #foundit, file_name = gogetit(dir1, oname, '.gz'); 

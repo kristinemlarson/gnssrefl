@@ -8,10 +8,13 @@ import subprocess
 import sys
 
 import gnssrefl.gps as g
+import gnssrefl.rinex2snr as r
 
 def main():
     """
     Converts a RINEX 3 file into a RINEX 2.11 file. Uses gfzrnx.
+
+    It will delete your RINEX 3 file!
 
     Parameters
     ----------
@@ -42,12 +45,14 @@ def main():
     if (args.gpsonly == 'True') or (args.gpsonly == 'T'):
         gpsonly = True
 
+    station = rinex3[0:4].lower()
+    cyyyy = rinex3[12:16]
+    cdoy = rinex3[16:19]
+    year = int(cyyyy)
+    doy = int(cdoy)
+
     if args.rinex2 is None:
-        station = rinex3[0:4].lower()
-        cyyyy = rinex3[12:16]
-        cdoy = rinex3[16:19]
         rinex2 = station + cdoy + '0.' + cyyyy[2:4] + 'o'
-        print('Output filename ', rinex2)
     else:
         rinex2 = args.rinex2
 
@@ -61,19 +66,21 @@ def main():
         sys.exit()
 
 
+    log,nada,exedir = r.set_rinex2snr_logs(station,year,doy)
     if os.path.isfile(rinex3):
-        print('Your RINEX input file does exist:', rinex3)
+        log.write('WARNING: your RINEX 3 file will be deleted.')
+        log.write('Your RINEX 3 input file does exist: {0:s} \n'.format(rinex3))
         if (rinex3[-2::] == 'gz'):
-            print('Must gunzip version 3 rinex')
             subprocess.call(['gunzip', rinex3])
             rinex3 = rinex3[0:-3]
-        g.new_rinex3_rinex2(rinex3,rinex2,dec,gpsonly)
+        g.new_rinex3_rinex2(rinex3,rinex2,dec,gpsonly,log)
+        log.close()
     else:
-        print('ERROR: your input file does not exist:', rinex3)
+        log.write('ERROR: your input file does not exist: {0:s} \n'.format(rinex3))
+        log.close()
         sys.exit()
 
-    if os.path.isfile(rinex2):
-        print('SUCCESS: new file created', rinex2)
+
 
 if __name__ == "__main__":
     main()

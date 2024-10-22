@@ -14,21 +14,26 @@ import gnssrefl.gnsssnrbigger as gnsssnrbigger
 def main():
     """
 
-    Creates SNR file from RINEX 3 file that is stored locally in makan folders
-    It may allow crx - I am not sure.
-    Only allows GFZ ultra orbit files
+    Creates SNR file from RINEX 3 file that is stored locally in makan type folders
+    It may allow crx endings -  I am not sure. It only allows GFZ ultra orbit files
+    That could be changed.
+
+    This code could be improved - it would be great if the people that are using
+    it would make those changes.
 
     Parameters
     ----------
     rinex3 : str
-        name of filename
+        name of RINEX 3 file
 
-    """
+    dec : str, optional
+        optional decimation value
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("rinex3", help="rinex3 filename", type=str)
-    parser.add_argument("-dec", help="decimation", default=None,type=str)
-
+    
+    """ 
+    parser = argparse.ArgumentParser() 
+    parser.add_argument("rinex3", help="rinex3 filename - has to live in Makan directories", type=str)
+    parser.add_argument("-dec", help="decimation value, seconds", default=None,type=str)
 
     args = parser.parse_args()
     rinex3 = args.rinex3
@@ -47,8 +52,6 @@ def main():
     xdir = os.environ['REFL_CODE'] + '/rinex/' + STATION + '/' + year + '/'
     # where snr data will go
     snrdir =  os.environ['REFL_CODE'] + '/' + year + '/snr/' + STATION + '/'
-    print(xdir)
-
 
     # default keeps everything
     if args.dec is None:
@@ -81,7 +84,11 @@ def main():
     full_rinex3 = xdir + rinex3
     if os.path.isfile(full_rinex3):
         print('found version 3 rinex in the makan directories')
-        g.new_rinex3_rinex2(full_rinex3,rinex2)
+        # open log file
+        log,nada,exedir = r.set_rinex2snr_logs(station,iyear,idoy)
+        dec=1; gpsonly=False
+        g.new_rinex3_rinex2(full_rinex3,rinex2,dec,gpsonly,log)
+        log.close()
     else:
         print('ERROR: your input file does not exist:', rinex3)
         sys.exit()
@@ -109,7 +116,7 @@ def main():
     in6 = g.binary(errorlog)
     gnsssnrbigger.foo(in1,in2,in3,in4,in5,in6)
     # clean up - remove the rinex2 file
-    print('Output file written to: ', snrname)
+    print('SNR file written to: ', snrname)
     subprocess.call(['rm','-f',rinex2])
 
 if __name__ == "__main__":
