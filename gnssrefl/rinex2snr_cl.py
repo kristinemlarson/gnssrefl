@@ -438,23 +438,17 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
             print('Using archive value of ', archive, ' from the json')
 
     if ('samplerate' in lsp):
-        if lsp['samplerate'] is None:
-            samplerate = 30 # use the default
-        else:
+        if lsp['samplerate'] is not None:
             samplerate = lsp['samplerate']
             print('Using samplerate from json ', samplerate)
 
     if ('stream' in lsp):
-        if lsp['stream'] is None:
-            stream = 'R'
-        else:
+        if lsp['stream'] is not None:
             stream = lsp['stream']
             print('Using stream setting from json ', stream)
 
     if ('dec' in lsp):
-        if lsp['dec'] is None:
-            dec = 0 # default
-        else:
+        if lsp['dec'] is not None:
             dec = lsp['dec']
             print('Using dec parameter from json ', dec )
 

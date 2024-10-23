@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.10.2
+
+It fixed bug in rinex2snr inputs read from the json.  was ignoring
+command line requests (such as samplerate, orb, archive).
+
 ## 3.10.1
 
 added archive and orb to the gnssir_input json. These are to be used in rinex2snr - mostly
