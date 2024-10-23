@@ -484,7 +484,7 @@ def process_year(year, year_end, doy, doy_end, args, error_queue):
                 guts2.gnssir_guts_v2(**args)
             except:
                 print('***********************************************************************')
-                print('Try using -debug T to get better information about why the code crashed.')
+                print('Try using -debug T to get better information about why the code crashed:  ',y,d)
                 print('***********************************************************************')
                 warnings.warn(f'error processing {y} {d}');                
 
@@ -525,7 +525,7 @@ def process_year_dictionary(index,args,datelist,error_queue):
             guts2.gnssir_guts_v2(**args)
     except Exception as e:
         print('***********************************************************************')
-        print('Try using -debug T to get better information about why the code crashed.')
+        print('Try using -debug T to get better information about why the code crashed: ',year,doy)
         print('***********************************************************************')
         error_queue.put(e)
 
