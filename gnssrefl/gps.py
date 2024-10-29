@@ -7400,8 +7400,11 @@ def greenland_rinex3(station,year,doy,**kwargs):
     archive = 'gnet'
     fdir = os.environ['REFL_CODE']
     samplerate = kwargs.get('samplerate',1)
+    # this is dumb!  should use the actual sample rate
     if (samplerate == 1):
         ch = '0000_01D_01S_MO'
+    elif (samplerate == 5):
+        ch = '0000_01D_05S_MO'
     else:
         ch = '0000_01D_30S_MO'
 

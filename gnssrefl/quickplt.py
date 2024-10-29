@@ -343,8 +343,8 @@ def run_quickplt (filename: str, xcol: str, ycol: str, errorcol: int=None, mjd: 
                     tvd = tvd[ii,:]
                     print('after editing:', len(tvd))
                 else:
-                    sat = int(sat)
                     print('Only show satellite ', sat)
+                    sat = int(sat)
                     ii = (tvd[:,0] == sat)
                     tvd = tvd[ii,:]
             if len(tvd) == 0:

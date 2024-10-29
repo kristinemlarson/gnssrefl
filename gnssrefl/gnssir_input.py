@@ -345,6 +345,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         Hortho = height - geoidC
 
     if apriori_rh is None:
+        print('If you plan to use the NITE refraction model you should choose a better a priori ')
+        print('Reflector Height. Currently using the default which is not necessarily relevant')
+        print('for your site. Hortho value can be used for coastal sites, but not for interior lakes/rivers.\n')
         apriori_rh = 5 # completely made up, meters
 
 # start the lsp dictionary

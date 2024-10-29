@@ -53,7 +53,7 @@ The periodograms show the tides in the southwest quadrant. That is further demon
 
 Set your analysis strategy (with some variations):
 
-<code>gnssir_input tnpp  -e1 5 -e2 12 -h1 55 -h2 70  -ampl 0 -azlist2 180 270</code>
+<code>gnssir_input tnpp  -e1 5 -e2 12 -h1 55 -h2 70  -ampl 0 -azlist2 180 270 -fr_list 1 20 5 101 102 201 205</code>
 
 Now go back and make more SNR files:
 

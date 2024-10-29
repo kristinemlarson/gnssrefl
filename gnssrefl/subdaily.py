@@ -10,19 +10,15 @@ import warnings
 
 from datetime import date
 
-# support code
-import gnssrefl.gnssir_v2 as guts2
-import gnssrefl.gps as g
-
-import gnssrefl.sd_libs as sd
-
-
 import scipy
 import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
 import math
 
-#KL trying to move plots and output files to sd_libs.py
+# support code
+import gnssrefl.gnssir_v2 as guts2
+import gnssrefl.gps as g
+import gnssrefl.sd_libs as sd
 
 
 def output_names(txtdir, txtfile,csvfile,jsonfile):
@@ -350,6 +346,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     # constellation spec number of values
     Cval=[]; Gval =[]; Rval=[]; Eval=[]
     stats = np.empty(shape=[0,3])
+
+    # this should be moved to the library
     # only look at the doy range where i have data
     for d in range(fdoy,(ldoy+1)):
         ii = (tv[:,1] == d) ; tmp = tv[ii,:]
@@ -478,6 +476,9 @@ def fract_to_obstimes(spl_x):
 
 def spline_in_out(x,y,knots_per_day):
     """
+    Given a time series (x in days) and the number of knots
+    you want per day, computes a spline fit for you. It returns
+    both the fitted values and the evenly space x values.
 
     Parameters
     ----------
@@ -493,7 +494,7 @@ def spline_in_out(x,y,knots_per_day):
     Returns
     -------
     xx : numpy of floats
-        regularly spaced observations
+        time of the regularly spaced observations
 
     spline(xx): numpy of floats
         spline value at those times
@@ -1121,6 +1122,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     # add a column for the IF correction
     tvd_new = np.hstack((tvd_new,onecol))
     nr,nc = tvd_new.shape
+
+    # write a table to the screen so you have an idea of how things
+    # fit to the different frequencies/overall
 
     print('Freq  Bias  Sigma   NumObs ')
     print('       (m)   (m)       ')
