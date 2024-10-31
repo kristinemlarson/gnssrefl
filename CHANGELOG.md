@@ -3,9 +3,18 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.10.3
+The parallel processing code (management of the spawned processes) was 
+causing the code to crash when calling
+rinex2snr or gnssir within a python function. I don't know enough to fix it - 
+but I did segregate it so that people that don't want parallel processing
+can still directly access the code within rinex2snr_cl and gnssir_cl.
+I did not fix nmea2snr_cl, so I think that has to be fixed if people want
+to run nmea2snr_cl within a python function.
+
 ## 3.10.2
 
-It fixed bug in rinex2snr inputs read from the json.  was ignoring
+I fixed a bug in rinex2snr inputs read from the json. It was ignoring
 command line requests (such as samplerate, orb, archive).
 
 ## 3.10.1

@@ -44,7 +44,6 @@ def parse_arguments():
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
-    parser.add_argument("-samplerate", default=None, help="sample rate in sec (RINEX 3 only)", type=int)
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
     parser.add_argument("-mk", default=None, help="use T for uppercase station names and non-standaard archives", type=str)
     parser.add_argument("-weekly", default=None, help="use T for weekly data translation", type=str)
@@ -467,11 +466,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         pass
     else:
         print('Illegal input - Station name must have 4 (RINEX 2), 6 (GSI), or 9 (RINEX 3) characters. Exiting.')
-        sys.exit()
+        return
 
     if len(str(year)) != 4:
         print('Year must be four characters long. Exiting.', year)
-        sys.exit()
+        return
 
     # currently allowed orbit types 
     #
@@ -482,7 +481,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         print('You picked an orbit type I do not recognize. Here are the ones I allow')
         print(orbit_list)
         print('Exiting')
-        sys.exit()
+        return
 
     # if you choose GPS, you get the nav message
     if orb == 'gps':
@@ -507,7 +506,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         if not foundit:
             print('You picked the backup multi-GNSS option.')
             print('I tried to get the file from IGN and failed. Exiting')
-            sys.exit()
+            return
         else:
             print('found GFZ orbits at IGN - warning, only a single file at a time')
 
@@ -633,21 +632,20 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
 
 
-    # queue which handles any exceptions any of the processes encounter
-    manager = multiprocessing.Manager()
-    error_queue = manager.Queue()
 
 
+    oneday = False
     if MJD1 == MJD2:
-        print('Only one day being analyzed, parallel processing turned off')
+        oneday = True
         par = None
 
-    if debug:
-        print('Debug mode. Only runs first day')
+    if debug or oneday:
+        print('Debug mode or only analyzing one day of data. ')
         args['year'] = year
         args['doy'] = doy
         rnx.run_rinex2snr(**args)
-        sys.exit()
+        return
+
 
     if (archive in archive_list_no_parallel) and par:
         print('You have chosen an archive that is unfriendly to multiple simultaneous download')
@@ -659,11 +657,15 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         #mjd_list = range(MJD1, MJD2+1, skipit)
         mjd_list = {}; mjd_list[0] = [MJD1, MJD2]
         s1 = time.time()
-        process_jobs_multi(index=0,args=args,datelist=mjd_list,error_queue=error_queue)
+        #process_jobs_multi(index=0,args=args,datelist=mjd_list,error_queue=error_queue)
+        z_process_jobs(MJD1, MJD2,args)
         s2 = time.time()
         print('That took ', round(s2-s1,2), ' seconds')
 
     else:
+        # queue which handles any exceptions any of the processes encounter
+        manager = multiprocessing.Manager()
+        error_queue = manager.Queue()
         print('You have chosen parallel processing')
         if par > 10:
             print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
@@ -725,15 +727,28 @@ def process_jobs_multi(index,args,datelist,error_queue):
 
     return
 
-def z_process_jobs(mjd_list, args):
+def z_process_jobs(mjd1,mjd2, args):
     """
-    this is not being used - calls should be sent to function above instead
+    queue for non parallel processing
+
+    Parameters
+    ----------
+    mjd1 : int
+        starting ModJulDate for processing
+    mjd2 : int
+        ending ModJulDate for processing
+    args : dict
+        inputs to run_rinex2snr
+      
     """
-    for mjd in mjd_list:
-        y, d = g.modjul_to_ydoy(mjd)
-        args['year'] = y
-        args['doy'] = d
-        rnx.run_rinex2snr(**args)
+    for mjd in range(mjd1,mjd2+1):
+        try:
+            y, d = g.modjul_to_ydoy(mjd)
+            args['year'] = y
+            args['doy'] = d
+            rnx.run_rinex2snr(**args)
+        except:
+            print('problem on year/doy: ', y, d)
 
     return
 
@@ -743,6 +758,8 @@ def main():
 
 
 if __name__ == "__main__":
+    # trying this???
+    #freeze_support()
     main()
 
 

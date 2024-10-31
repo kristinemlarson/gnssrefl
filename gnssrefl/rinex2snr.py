@@ -133,7 +133,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
             station = station[0:4].upper()
     else:
         print('Illegal station input - Station must have 4,6,or 9 characters. Exiting')
-        sys.exit()
+        return
 
 
 # old loop thru years and days - will fix later. now avoiding retyping

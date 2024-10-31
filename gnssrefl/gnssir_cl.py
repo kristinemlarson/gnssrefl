@@ -393,10 +393,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         print('Requested frequencies ', lsp['freqs'])
         #print('Requested amplitudes', lsp['reqAmp'])
 
-    # queue which handles any exceptions any of the processes encounter
-    manager = multiprocessing.Manager()
-    error_queue = manager.Queue()
-    additional_args = { "args": args, "error_queue": error_queue }
+
+    if (par == 1):
+        par = None
 
     t1 = time.time()
     if (year == year_end) & (doy == doy_end):
@@ -406,10 +405,14 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
     if not par: 
         print('Parallel processing not requested')
-        # this should be changed to call process_year_dictionary
+        additional_args = { "args": args }
         process_year(year,year_end,doy,doy_end, **additional_args)
 
     else:
+    # queue which handles any exceptions any of the processes encounter
+        manager = multiprocessing.Manager()
+        error_queue = manager.Queue()
+        additional_args = { "args": args, "error_queue": error_queue }
         print('Parallel processing chosen')
         if par > 10:
             print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
@@ -449,10 +452,13 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 # process year and process year dictionary should be combined at some point
 # see rinex2snr as example
 
-def process_year(year, year_end, doy, doy_end, args, error_queue):
+#def process_year(year, year_end, doy, doy_end, args, error_queue):
+def process_year(year, year_end, doy, doy_end, args ):
     """
     Code that does the processing for a specific year. Refactored to separate 
     function to allow for parallel processes
+
+    Removed error queue - 
 
     Parameters
     ----------
@@ -486,9 +492,7 @@ def process_year(year, year_end, doy, doy_end, args, error_queue):
                 print('***********************************************************************')
                 print('Try using -debug T to get better information about why the code crashed:  ',y,d)
                 print('***********************************************************************')
-                warnings.warn(f'error processing {y} {d}');                
 
-    # where should i put the error queue statement?
     return
 
 def process_year_dictionary(index,args,datelist,error_queue):

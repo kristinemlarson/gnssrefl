@@ -1,4 +1,4 @@
-# gnssrefl v3.10.2
+# gnssrefl v3.10.3
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 When showing results created using gnssrefl, please use:
@@ -20,7 +20,7 @@ The latest pypi version can be found here [![PyPI Version](https://img.shields.i
 
 Questions and bug reports for gnssrefl (but not the notebooks) **must** be submitted via the **Issues** button at 
 the [github repository](https://github.com/kristinemlarson/gnssrefl/issues). The notebooks were created by Earthscope 
-with NASA funding. I formally asked Earthscope about maintenance of the notebooks and received the following response:
+with NASA funding. I formally asked Earthscope about maintenance of the notebooks and received the following response from them:
 
 *In general, we place maintenance of notebooks (and many of our apps) that are not in active production on 
 the Low Priority list and I think it would be really healthy for our community to be 

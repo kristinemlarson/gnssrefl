@@ -83,6 +83,9 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
     You just need to follow the instructions in the file formats documentation to set up a list of the locations of 
     your local stations. 
 
+    I added parallel processing at some point - but I do not think this code allows you to call it as a function within
+    a python script. If anyone knows how to fix this please submit a PR or let me know. 
+
     Parameters
     ----------
     station : str
@@ -130,10 +133,12 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
          makes SNR file with user provided station coordinates and good orbits
 
     """
+    # THIS CODE DOES NOT USE OUR ACCEPTED PROTOCOLS for argparse
+
     # queue which handles any exceptions any of the processes encounter
+    # I think this will throw an error if run from a script rather than the command line
     manager = multiprocessing.Manager()
     error_queue = manager.Queue()
-
 
     g.check_environ_variables()
 
@@ -142,7 +147,6 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
         print('Illegal input - Station name must have 4 characters. Exiting.')
         sys.exit()
 
-    # THIS CODE DOES NOT USE OUR ACCEPTED PROTOCOLS for argparse
     if len(str(year)) != 4:
         print('Year must be four characters long. Exiting.', year)
         sys.exit()    
@@ -180,8 +184,6 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
         doy_end = doy
     if year_end is None:
         year_end = year
-
-
 
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
