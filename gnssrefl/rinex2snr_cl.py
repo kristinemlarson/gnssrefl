@@ -45,6 +45,7 @@ def parse_arguments():
     parser.add_argument("-overwrite", default=None, help="boolean", type=str)
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
+    parser.add_argument("-samplerate", default=None, help="Sample rate (RINEX 3 only)", type=int)
     parser.add_argument("-mk", default=None, help="use T for uppercase station names and non-standaard archives", type=str)
     parser.add_argument("-weekly", default=None, help="use T for weekly data translation", type=str)
     parser.add_argument("-monthly", default=None, help="use T for monthly data translation", type=str)
@@ -570,8 +571,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         # rinex3
         # change default archive from all to cddis, cause we do not allow all as a valid archive for rinex3 files
         if (archive == 'all'):
-            archive = 'cddis'
-            print('Because you did not choose one, using cddis as the archive to look at.')
+            if not nolook:
+                archive = 'cddis'
+                print('Because you did not choose one, using cddis as the archive to look at.')
+            else:
+                print('You have chosen the nolook option, so archive is irrelevant.')
 
         if rate == 'high':
             if (archive not in highrate_list) and (nolook == False):
@@ -622,7 +626,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         print('You have invoked the Makan option')
 
     if stream not in ['R', 'S']:
-        stream = 'R'
+        # only check this for rinex 3
+        if ns == 9:
+           print('Your stream parameter is illegal, so setting it to R')
+           stream = 'R'
 
     args = {'station': station, 'year':year, 'doy':doy, 'isnr': snr, 'orbtype': orb, 'rate': rate, 
             'dec_rate': dec, 'archive': archive, 'nol': nolook, 'overwrite': overwrite, 

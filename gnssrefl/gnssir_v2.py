@@ -92,6 +92,14 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     # make sure REFL_CODE/Files/station directory exists ... 
     g.checkFiles(station, '')
 
+    if 'azlist' in lsp.keys():
+        azlist = lsp['azlist']
+        if len(azlist) > 0:
+            print('Using an augmented azimuth angle list', azlist)
+    else:
+        azlist = [];
+        #print('no augmented elevation angle list')
+
     if 'ellist' in lsp.keys():
         ellist = lsp['ellist']
         if len(ellist) > 0:
@@ -99,6 +107,15 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     else:
         ellist = [];
         #print('no augmented elevation angle list')
+
+    variable_azel = False
+    if (len(ellist) >0) & (len(azlist) & 0) :
+        if len(ellist) == len(azlist) :
+            print('You are using a beta version of the code that sets')
+            print('variable elevation angle limits for different azimuth regions.')
+            print('Be careful! Especially for tall sites.')
+            variable_azel = True
+        
 
     # this is also checked in the command line - but for people calling the code ...
     if ((lsp['maxH'] - lsp['minH']) < 5):
@@ -315,9 +332,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
 
         # open output file
         fout,frej = g.open_outputfile(station,year,doy,extension) 
-#  main loop a given list of frequencies
         total_arcs = 0
         ct = 0
+#       the main loop a given list of frequencies
         for f in freqs:
             found_results = False
             if plot_screen: 
@@ -330,6 +347,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                 logid.write('Looking at {0:4s} {1:4.0f} {2:3.0f} frequency {3:3.0f} ReqAmp {4:7.2f} \n'.format(station, year, doy,f,reqAmp[ct]))
                 logid.write('=================================================================================\n')
                 #print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
+
 #           get the list of satellites for this frequency
             if onesat == None:
                 satlist = find_mgnss_satlist(f,year,doy)
@@ -462,8 +480,6 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                                         write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
                                 rj +=1
                                 if screenstats:
-                                    #print(delT, tooclose,Noise,PkNoise)
-                                    #35.0 False 3.682862189099345 2.8
 
                                     logid.write('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f} \n'.format( iAzim,satNu,UTCtime,maxF))
                                     #print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f}'.format( iAzim,satNu,UTCtime,maxF))

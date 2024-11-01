@@ -224,6 +224,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             csrate = '01' # high rate assumes 1-sec
                         else:
                             csrate = '{:02d}'.format(srate)
+                        print(csrate)
                         streamid = '_' + stream  + '_'
                         # this can be done in a function now ...
                         r3cmpgz = station9ch + streamid + str(year) + cdoy + '0000_01D_' + csrate + 'S_MO.crx.gz'

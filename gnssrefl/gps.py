@@ -7401,10 +7401,16 @@ def greenland_rinex3(station,year,doy,**kwargs):
     fdir = os.environ['REFL_CODE']
     samplerate = kwargs.get('samplerate',1)
     # this is dumb!  should use the actual sample rate
+    #  csrate = '{:02d}'.format(srate)
+    # am keeping it since sample rate it is not a required parameter.
     if (samplerate == 1):
         ch = '0000_01D_01S_MO'
     elif (samplerate == 5):
         ch = '0000_01D_05S_MO'
+    elif (samplerate == 2):
+        ch = '0000_01D_02S_MO'
+    elif (samplerate == 15):
+        ch = '0000_01D_15S_MO'
     else:
         ch = '0000_01D_30S_MO'
 
