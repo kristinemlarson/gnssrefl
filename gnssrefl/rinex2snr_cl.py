@@ -568,6 +568,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # adding spanish archive
     highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes','bkg-igs','bkg-euref','gnet']  
     if ns == 9:
+        print('Station ', station, ' >>> RINEX 3')
         # rinex3
         # change default archive from all to cddis, cause we do not allow all as a valid archive for rinex3 files
         if (archive == 'all'):
@@ -589,12 +590,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
                 sys.exit()
     else:
         # rinex2
+        print('Station ', station, ' >>> RINEX 2.11')
 
         if rate == 'high':
-            if archive == 'all':
+            if (archive == 'all') & (not nolook):
             # not really allowed for highrate ...set to something reasonable like unavco
                 archive = 'unavco'
-            if archive not in highrate_list:
+            if (archive not in highrate_list) :
                 if nolook:
                     print('You have chosen nolook, so I will proceed assuming you have the RINEX file.')
                     # change to lowrate since the code only uses low vs high for retrieving files from
@@ -604,7 +606,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
                     print('You have chosen highrate option.  But I do not support this archive: ',archive)
                     sys.exit()
         else:
-            if archive not in archive_list:
+            if (archive not in archive_list) & (not nolook):
                 print('You picked an archive that is not allowed. Exiting')
                 print(archive_list)
                 sys.exit()

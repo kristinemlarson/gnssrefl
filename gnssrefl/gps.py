@@ -7351,7 +7351,7 @@ def print_version_to_screen():
     print('gnssrefl version:', str(version('gnssrefl')), '\n')
     return
 
-def greenland_rinex3(station,year,doy,**kwargs):
+def greenland_rinex3(station,year,doy,stream,samplerate):
     """
     downloads RINEX3 files from GNET. Returns hatanaka and gzipped file.
     Could uncompress and convert, but downstream code expects *crx.gz
@@ -7362,6 +7362,10 @@ def greenland_rinex3(station,year,doy,**kwargs):
 
     You must have installed lftp on your own. (gnssrefl will not do it for you).
 
+    stream and samplerate parameters REQUIRED
+
+    Only allows one day files
+
     Parameters
     ----------
     station : str
@@ -7370,12 +7374,10 @@ def greenland_rinex3(station,year,doy,**kwargs):
         full year
     doy : int
         day of year
-    streamID : str
-        optional stream ID (R or S)
-        default is R
-    samplerate : optional, int 
-        default is 1
-        only 30 or 1 is allowed
+    stream : str
+        stream ID
+    samplerate : int 
+        seconds
 
     Returns
     -------
@@ -7388,6 +7390,9 @@ def greenland_rinex3(station,year,doy,**kwargs):
     crnxpath = hatanaka_version()
 
     found = False
+    cdoy = '{:03d}'.format(doy)
+    cyyyy = str(year)
+
     filename = ''
     checking = subprocess.call(['which','lftp'])
     if (checking == 1):
@@ -7399,28 +7404,13 @@ def greenland_rinex3(station,year,doy,**kwargs):
     # information for accessing GNET with appropriate filename
     archive = 'gnet'
     fdir = os.environ['REFL_CODE']
-    samplerate = kwargs.get('samplerate',1)
-    # this is dumb!  should use the actual sample rate
-    #  csrate = '{:02d}'.format(srate)
-    # am keeping it since sample rate it is not a required parameter.
-    if (samplerate == 1):
-        ch = '0000_01D_01S_MO'
-    elif (samplerate == 5):
-        ch = '0000_01D_05S_MO'
-    elif (samplerate == 2):
-        ch = '0000_01D_02S_MO'
-    elif (samplerate == 15):
-        ch = '0000_01D_15S_MO'
-    else:
-        ch = '0000_01D_30S_MO'
+
+    csrate = '{:02d}'.format(samplerate)
+    ch = '0000_01D_' + csrate + 'S_MO'
 
     userinfo_file = fdir + '/Files/passwords/' + archive + '.pickle'
-    streamID = kwargs.get('stream_ID','R')
-    streamID = '_' + streamID + '_'
+    streamID = '_' + stream + '_'
 
-
-    cdoy = '{:03d}'.format(doy)
-    cyyyy = str(year)
     serve = '@ftp.dataforsyningen.dk; cd /GNSS/RINEX3/GRL/'
 
     # define file names

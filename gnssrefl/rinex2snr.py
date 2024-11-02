@@ -98,6 +98,8 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
         sample rate for RINEX 3 files
     mk : bool
         makan option
+    stream : str
+        naming parameter for RINEX 3 files (R or S)
     strip : bool
         reduces observables to only SNR (too many observables, particularly in RINEX 2 files
         will break the RINEX translator)
@@ -220,10 +222,10 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                     if version == 3:
 
                         log.write('RINEX Version 3 \n')
-                        if rate == 'high':
-                            csrate = '01' # high rate assumes 1-sec
-                        else:
-                            csrate = '{:02d}'.format(srate)
+                        #if rate == 'high':
+                        #    csrate = '01' # high rate assumes 1-sec
+                        #else:
+                        csrate = '{:02d}'.format(srate)
                         print(csrate)
                         streamid = '_' + stream  + '_'
                         # this can be done in a function now ...
@@ -289,7 +291,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 r2, fexists= g.ga_highrate(station9ch,year,doy,dec_rate,deleteOld)
                                 log.write('RINEX 2 file derived from the GA archive should now exist: {0:s} \n'.format(r2))
                             if archive == 'gnet':
-                                rnx_filename,foundit = g.greenland_rinex3(station9ch, year, doy,samplerate=srate,stream=stream )
+                                rnx_filename,foundit = g.greenland_rinex3(station9ch, year, doy,stream,srate)
                                 #print(rnx_filename,foundit)
                                 if foundit: 
                                     log.write('The RINEX 3 file has been downloaded. Try to make {0:s} \n '.format(r2))

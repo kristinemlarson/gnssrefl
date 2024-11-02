@@ -286,7 +286,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
                     else:
                         rnx_filename,foundit = ch.bkg_highrate(station, year, d, 0,stream,dec,bkg)
                 if archive == 'gnet':
-                    rnx_filename, foundit = g.greenland_rinex3(station,year,doy,stream=stream,samplerate=samplerate)
+                    rnx_filename, foundit = g.greenland_rinex3(station,year,doy,stream,samplerate)
 
                 if archive == 'ga':
                     if debug:
