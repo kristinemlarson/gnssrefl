@@ -1,4 +1,5 @@
 env
+gnss/*
 developer_notes.md
 new.pyproject.toml
 meson.build

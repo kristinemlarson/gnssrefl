@@ -309,7 +309,8 @@ def rising_setting_new(recv,el_range,obsfile):
     Returns
     -------
     azlist : list of floats
-        azimuth angle (deg), PRN, elevation angle (Deg)
+        each line has azimuth angle, PRN, elevation angle in that order
+        angles are in units of degrees
 
     """
     # will put azimuth and satellite number

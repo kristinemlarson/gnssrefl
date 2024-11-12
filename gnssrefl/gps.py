@@ -731,7 +731,7 @@ def getsp3file_mgex(year,month,day,pCtr):
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
 
     name, fdir = sp3_name(year,month,day,pCtr) 
-    print('sp3 filename ',name)
+    #print('sp3 filename ',name)
     gps_week = name[3:7]
     igps_week = int(gps_week)
     # unfortunately the CDDIS archive was at one point computing the GPS week wrong
@@ -6165,11 +6165,16 @@ def cddis_download_2022B(filename,directory):
     ftps.login(user='anonymous', passwd=email)
     ftps.prot_p()
     ftps.cwd(directory)
+    #filelist = ftps.nlst()
+    #if filename in filelist:
     ftps.retrbinary("RETR " + filename, open(filename, 'wb').write)
     siz = os.path.getsize(filename)
     if siz == 0:
         print('No file found')
         subprocess.call(['rm',filename])
+    #else:
+    #    print('That file does not exist at CDDIS')
+
 
 def getnavfile_archive(year, month, day, archive):
     """

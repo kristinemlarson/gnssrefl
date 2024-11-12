@@ -28,7 +28,6 @@ def parse_arguments():
     g.print_version_to_screen()
 
     parser = argparse.ArgumentParser()
-    #parser = argparse.ArgumentParser(epilog=msg)
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
@@ -74,10 +73,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
               par : int=None, timeout : int = 0, extension : str='', debug: bool = False ):
     """
-    rinex2snr translates RINEX files to a new file in the SNR format. This function will also fetch orbit files for you.
-    RINEX obs files are provided either by the user or fetched from a long list of archives. Although RINEX 3 is supported, 
-    the default is RINEX 2.11 files. To tell the code you are using a RINEX 3 file, you should use a RINEX 3 station name,
-    i.e. the 9 character version.
+    rinex2snr translates RINEX version 2.11 and 3+ files to a new file in 
+    the SNR format. This function will also fetch orbit files for you.
+    RINEX obs files are provided either by the user or fetched from a 
+    long list of archives. Although RINEX 3 is supported, the default is 
+    RINEX 2.11 files. To tell the code you are using a RINEX 3 file, 
+    you should use a RINEX 3 station name, i.e. the 9 character version.
 
     New feature as of September 2024: various parameters can be stored in the station.json (created by gnssir_input).
     This is really just for convenience. Parameters are dec, snr, stream, samplerate, archive, and orb. 
@@ -179,6 +180,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     rinex2snr mchl00aus 2022 15  -orb rapid -nolook T
         works if the RINEX 3 crx.gz or rnx files are in $REFL_CODE/2022/rinex/mchl
 
+    rinex2snr mchl00aus 2022 15  -orb rapid -nolook T -strip T
+        Removes non-SNR data before translating. 
+
     rinex2snr mchl00aus 2022 15  -orb rapid -samplerate 30 -nolook T
         This should analyze a RINEX 3 file if it exists in your local working directory.
         it will not search anywhere else for the file.  It should be a 30 sec, 1 day file 
@@ -198,7 +202,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     Parameters
     ----------
     station : str
-        4 or 9 character ID of the station, respectively for RINEX 2 and RINEX 3, preferably lowercase
+        4 or 9 character ID of the station, respectively for RINEX 2.11 and RINEX 3, preferably lowercase
         I believe 6 characters are allowed for GSI (Japan), but I have not tested it in a while
     year : int
         Year
@@ -219,7 +223,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     orb : str, optional
         Which orbit files to download. Value options:
 
-            gps (default) : will use GPS broadcast orbit
+            gps (default < 2021) : will use GPS broadcast orbit
+
+            rapid (default > 2021) : GFZ rapid, multi-GNSS
 
             gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 
@@ -247,7 +253,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             wum2 : Wuhan ultra-rapid, from Wuhan FTP
 
-            rapid : GFZ rapid, multi-GNSS
 
             ultra: first tries GFZ ultra-rapid then Wuhan, multi-GNSS
 
@@ -260,7 +265,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
             high : high-rate data
 
     dec : int, optional
-        Decimation rate. 0 is default.
+        Decimation rate. 0 is default which means do nothing.
 
     nolook : bool, optional
         tells the code to retrieve RINEX files from your local machine. default is False
@@ -328,8 +333,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
         python : uses python to translate. (Warning: This can be very slow)
 
-    srate : int, optional
+    samplerate : int, optional
         sample rate for RINEX 3 files only. Default is 30.
+
+    stream : str
+        RINEX 3 files only, R (default) or S
 
     mk : bool, optional
         Default is False.
@@ -341,11 +349,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         ssss is station name
 
     weekly : bool, optional, deprecated
-        This originally took 1 out of every 7 days in the doy-doy_end range (one file per week) - used to save cpu time.
-        Default is False.   
+        This originally took 1 out of every 7 days in the doy-doy_end range (one 
+        file per week) - used to save cpu time. Default is False.   
 
     strip : bool, optional
-        Reduces observables since the translator does not allow more than 25
+        Reduces observables since the translator does not allow more than 25 in a RINEX 2.11 file.
         Default is False.
 
     screenstats: bool, optional
@@ -356,29 +364,32 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     monthly : bool, optional
         default is false. snr files created every 30 days instead of every day
+        This does not work anymore
 
     par : int, optional
-        default is NOne.  parallel processing, valid up to 10
+        default is None.  parallel processing, valid up to values of 10 for some 
+        archives.
 
     timeout : int, optional
-        am seeing some timeouts when using highrate downloads and requests.
-        adding this optional parameter to let you set the timeout value, but 
+        This is a non-standard option for timeouts when using highrate downloads and requests.
+        I added this parameter to let you set the timeout value, but 
         it has not been implemented everywhere.  right now just the BKG
 
     extension : str, optional
         parameter that tells the code you want to use parameters saved in the gnssir json 
         for that extension parameter. otherwise it uses station.json. It is a convenience
-        for saving things like stream, samplerate, and snr settings that previously had 
+        for saving things like stream, samplerate, archive, orb, and snr settings that previously had 
         to be input on the command line
     debug : bool, optional
-        run without task queue - important for debugging
+        run without task queue - important for debugging.
 
     """
 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
 
     # list of RINEX 3 archives 
-    archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 'bfg','sonel','nrcan','gfz','ignes','gnet','nz']
+    archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 
+                           'bfg','sonel','nrcan','gfz','ignes','gnet','nz']
 
     # list of RINEX 2.11 archives
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
@@ -648,7 +659,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         oneday = True
         par = None
 
-    if debug or oneday:
+    #if debug or oneday:
+    if debug :
         print('Debug mode or only analyzing one day of data. ')
         args['year'] = year
         args['doy'] = doy

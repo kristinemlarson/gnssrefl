@@ -453,6 +453,9 @@ def cddis_highrate_tar(station, year, month, day,stream,dec_rate):
     """
     picks up a tar'ed highrate RINEX files from CDDIS, untars it, and merges.
 
+
+    added a try so it doesn't die if the file does not exist
+
     Parameters
     ----------
     station : str
@@ -506,11 +509,28 @@ def cddis_highrate_tar(station, year, month, day,stream,dec_rate):
     if os.path.isfile(file_name):
         print('already have the tar file - so it has probably been un tarred')
     else:
-        g.cddis_download_2022B(file_name,new_way_dir)
+        try:
+            g.cddis_download_2022B(file_name,new_way_dir)
+        except:
+            print('Problem downloading', file_name)
+
         if os.path.isfile(file_name):
-            subprocess.call(['tar','-xf', file_name])
-            print('Now remove the tar file')
-            subprocess.call(['rm', file_name])
+            siz = os.path.getsize(file_name)
+            if (siz == 0):
+                print('No tar file available at CDDIS')
+                subprocess.call(['rm', file_name])
+                fexist = False
+                rinexname = station.upper() + streamID + cyyyy + cdoy + '0000_01D_01S_MO.rnx'
+                return rinexname,  fexist
+            else:
+                subprocess.call(['tar','-xf', file_name])
+                print('File exists ; remove the tar file')
+                subprocess.call(['rm', file_name])
+        else:
+            print('File does not exist')
+            fexist = False
+            rinexname = station.upper() + streamID + cyyyy + cdoy + '0000_01D_01S_MO.rnx'
+            return rinexname,  fexist
 
     fileF = 0
     for h in range(0,24):

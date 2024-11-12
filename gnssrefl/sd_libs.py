@@ -1252,6 +1252,7 @@ def flipit3(tvd,col):
     tnew = tvd[:,15]
     # change from normal columns to python columns
     ynew = tvd[:,col-1]
+    #print(tnew[0], tnew[-1])
 
     # these are in MJD 
     day0= tnew[0] # first observation time
@@ -1322,6 +1323,7 @@ def flipit3(tvd,col):
     tnew = tnew[ii]
     ynew = ynew[ii]
 
+    #print(tnew[0],tnew[-1])
     return tnew, ynew
 
 def the_last_plot(tv,station,plotname):

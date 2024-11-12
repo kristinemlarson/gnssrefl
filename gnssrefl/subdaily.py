@@ -1167,6 +1167,9 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     th = tvd_new[:,15] # use MJD now
     column = 25 # tells the code which column to use. 
     tnew, ynew = sd.flipit3(tvd_new,column)
+    #plt.figure()
+    #plt.plot(tnew, ynew)
+
     #else:
     #    th = tvd_new[:,1] + tvd_new[:,4]/24 # days of year, fractional
     #    column = 25 # tells the code which column to use. 

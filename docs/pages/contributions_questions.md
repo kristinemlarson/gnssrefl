@@ -1,22 +1,13 @@
-# Community 
-
-## 2023 Short Course  on GNSS-IR
-- [overview](https://gnssrefl.readthedocs.io/en/latest/pages/sc_index.html)
-- [videos/lectures](https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html)
-
-## 2024 Short Course on GNSS-IR for Water Level Measurements
-- [index](https://gnssrefl.readthedocs.io/en/latest/pages/sc_index2024.html)
+# Community Publications/Courses
 
 ## E-mail list
 Would you like to join our <code>gnssrefl</code> users email list?
 This is currently maintained by earthscope.org. To join, please e-mail 
 melissa.weber@earthscope.org or Kristine Larson.
 
-## Papers about Cheap Sensors
-
 ## Publications
 - [One Receiver, Zenith Pointing](https://gnssrefl.readthedocs.io/en/latest/pages/community.html)
-- [Non-Zenith Pointing Antenna Examples](https://gnssrefl.readthedocs.io/en/latest/pages/tilted.html)
+- [Non-Zenith Pointing and/or Low-Cost Antenna Examples](https://gnssrefl.readthedocs.io/en/latest/pages/tilted.html)
 
 ## Acknowledgements
 
@@ -41,6 +32,14 @@ Glonass to the NMEA reader
 - [Taylor Smith](https://github.com/tasmi) has worked on the NMEA reader and the refl_zones utility.
 - Surui Xie and Thomas Nylen were instrumental in finding a bug in the newarcs version
 - Peng Feng, Rudiger Haas, and Gunnar Elgered have helped us improve refraction models.
+
+## 2023 Short Course  on GNSS-IR
+- [overview](https://gnssrefl.readthedocs.io/en/latest/pages/sc_index.html)
+- [videos/lectures](https://gnssrefl.readthedocs.io/en/latest/pages/sc_media.html)
+
+## 2024 Short Course on GNSS-IR for Water Level Measurements
+- [index](https://gnssrefl.readthedocs.io/en/latest/pages/sc_index2024.html)
+- videos are on Kristine's youtube page.
 
 ## How you can help improve this code
 

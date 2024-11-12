@@ -1,8 +1,11 @@
-# Publications for Tilted Antenna Setups
+# Publications for Cheap Receivers AND/OR Tilted Antenna Setups
 
 Changes to this file will only be allowed thru a pull request on github.
 
 ## Water Levels
+
+
+- Fagundes, M.A.R., Mendonça-Tinti, I., Iescheck, A.L., Akos, D.M., & Geremia-Nievinski, F. An open-source low-cost sensor for SNR-based GNSS reflectometry: Design and long-term validation towards sea-level altimetry. GPS Solutions, 25(2), 73, 2021
 
 - [Santamaría-Gómez, A., & Watson, C. (2017). Remote leveling of tide gauges using GNSS reflectometry: case study at Spring Bay, Australia. GPS solutions, 21, 451-459.](https://link.springer.com/article/10.1007/s10291-016-0537-x)
 

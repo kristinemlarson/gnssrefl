@@ -5,7 +5,7 @@ Changes to this file will only be allowed thru a pull request on github.
 
 ## Software
 
-Larson K.M., gnssrefl: an open source python software package for environmental GNSS interferometric reflectometry applications, GPS Solutions, in review.
+- [Larson K.M., gnssrefl: an open source python software package for environmental GNSS interferometric reflectometry applications, GPS Solutions, Volume 28, article number 165, 2024](https://link.springer.com/article/10.1007/s10291-024-01694-8)
 
 ## Soil Moisture
 
@@ -84,13 +84,22 @@ reflected GPS signals, The Cryosphere, Vol 12, 477–489, doi:10.5194/tc-12-477-
 
 ## Ice
 
+- [Derek James Pickell, Robert Lyman Hawley, and Adam LeWinter,
+Spatio-Temporal Patterns of Accumulation and Surface Roughness in Interior Greenland with a GNSS-IR Network, 
+preprint, DOI 10.5194/egusphere-2024-2898, 2024](https://egusphere.copernicus.org/preprints/2024/egusphere-2024-2898/)
+
+- [Albin Wells, David Rounce, Louis Sass, Caitlyn Florentine, Adam Garbo, Emily Baker, 
+Christopher McNeil, 
+GNSS reflectometry from low-cost sensors for continuous in situ contemporaneous glacier mass balance and flux divergence,
+Journal of Glaciology, DOI: https://doi.org/10.1017/jog.2024.54, 2024]( https://www.cambridge.org/core/journals/journal-of-glaciology/article/gnss-reflectometry-from-lowcost-sensors-for-continuous-in-situ-contemporaneous-glacier-mass-balance-and-flux-divergence/7F36028E3EBA46B8A1D3CB974D40B9D0)
+
 - [Larson, K.M., J. Wahr, and P. Kuipers Munneke, Constraints on Snow Accumulation and Firn Density in Greenland Using GPS Receivers, J. Glaciology, Vol. 61, No. 225, doi:10.3189/2015JoG14J130, 2015](https://www.kristinelarson.net/wp-content/uploads/2015/10/LarsonWahrKuipers_2015.pdf)
 
 - [Shean, D., K. Christianson, K.M. Larson, S.R.M. Ligtenberg, I.R. Joughin, B. E. Smith, C.M. Stevens, M. Bushuk, and D.M. Holland, GPS-derived estimates of surface mass balance and ocean-induced basal melt for Pine Island Glacier ice shelf, Antarctica, The Cryosphere Vol. 11, 2655-2674, doi:10.5194/tc-11-2655, 2017](https://tc.copernicus.org/articles/11/2655/2017/tc-11-2655-2017.pdf)
 
-- Pinat,E.;Defraigne,P.; Bergeot, N.; Chevalier, J.-M.; Bertrand, B. Long-Term 
+- [Pinat,E.;Defraigne,P.; Bergeot, N.; Chevalier, J.-M.; Bertrand, B. Long-Term 
 Snow Height Variations in Antarctica from GNSS Interferometric Reflectometry. 
-Remote Sens. 13, 1164. https:// doi.org/10.3390/rs13061164, 2021
+Remote Sens. 13, 1164. 2021](https:// doi.org/10.3390/rs13061164)
 
 - [Larson, K.M., M. MacFerrin, and T. Nylen, Brief Communication: Update on the GPS Reflection Technique for Measuring Snow Accumulation in Greenland, The Cryosphere, Vol. 14, 1985–1988, doi:10.5194/tc-2019-303, 2020.](https://tc.copernicus.org/articles/14/1985/2020/)
 

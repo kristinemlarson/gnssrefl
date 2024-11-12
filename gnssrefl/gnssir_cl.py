@@ -376,12 +376,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         if float(lsp['e1']) < float(lsp['pele'][0]):
             print('Your requested emin is lower than the minimum elevation angle used ')
             print('for direct signal removal. This is stored in the variable pele.')
-            print('This is Forbidden. Fix the pele records set in the json created by gnssir_analysis')
+            print('This is Forbidden. Fix the pele records set in the json created by gnssir_input')
             sys.exit()
         if float(lsp['e2']) > float(lsp['pele'][1]):
             print('Your requested emax is higher than the maximum elevation angle used ')
             print('for direct signal removal. This is stored in the variable pele.')
-            print('This is Forbidden. Fix the pele records set in the json created by gnssir_analysis')
+            print('This is Forbidden. Fix the pele records set in the json created by gnssir_input')
             sys.exit()
 
     # should make sure there are directories for the results ... 

@@ -234,6 +234,7 @@ def reflzones(station: str, azim1: int=0, azim2: int=360, lat: float=None, lon: 
 
     # make the KML map file
     # 2023jan19 add station location
+    #print(azlist)
     fz_maps = rf.make_FZ_kml(station,output,fr, el_list, h, lat,lon,azlist)
 
     if fz_maps == True:
