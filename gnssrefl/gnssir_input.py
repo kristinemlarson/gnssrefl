@@ -41,6 +41,7 @@ def parse_arguments():
     parser.add_argument("-apriori_rh", default=None, type=float, help="apriori reflector height (m) used by NITE model")
     parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height (m)")
     parser.add_argument("-pele", nargs="*", type=float, help="min and max elevation angle in direct signal removal, default is 5-30")
+    parser.add_argument("-polyV", default=None, type=int, help="polynomial order for DC removal")
     parser.add_argument("-daily_avg_medfilter", default=None, type=float, help="daily_avg, median filter, meters")
     parser.add_argument("-daily_avg_reqtracks", default=None, type=int, help="daily_avg, ReqTracks parameter ")
     parser.add_argument("-subdaily_alt_sigma", default=None, type=str, help="subdaily, Nievinski sigma")
@@ -75,7 +76,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
        ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
        delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : str="1", 
-                      apriori_rh: float=None, Hortho : float = None, pele: list=[5,30], daily_avg_reqtracks: int=None, 
+                      apriori_rh: float=None, Hortho : float = None, pele: list=[5,30], polyV: int=4, 
+                      daily_avg_reqtracks: int=None, 
                       daily_avg_medfilter: float =None, subdaily_alt_sigma : bool=None, 
                       subdaily_ampl : float=None, subdaily_delta_out : float=None, 
                       subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
@@ -259,6 +261,10 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     pele : float
         min and max elevation angles in direct signal removal, i.e. 3 40. Default is 5 30. 
 
+    polyV: int 
+        polynomial order used in direct signal removal. The default is 4, but you 
+        can set it to something different for your specific antenna and elevation angle range.
+
     daily_avg_reqtracks : int, optional
         number of tracks required for daily_avg code
 
@@ -399,7 +405,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     else:
         outputfile = outputdir + '/' + station + '.' + extension + '.json'
 
-    lsp['polyV'] = 4 # polynomial order for DC removal
+    # 4 was the original default.  Totally up to the user. 
+    lsp['polyV'] = polyV # polynomial order for DC removal
     # change this so the min elevation angle for polynomial removal is the same as the 
     # requested analysis region. previously it was hardwired to 5-30
 
