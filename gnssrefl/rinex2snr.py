@@ -137,6 +137,14 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
         print('Illegal station input - Station must have 4,6,or 9 characters. Exiting')
         return
 
+    # a kluge of sorts - but hey
+    if (version == 3):
+        if (rate == 'low') & (archive == 'kadaster'):
+            print('Sorry - gnssrefl does not support 30 sec RINEX 3 files from kadaster.nl')
+            print('Please submit a PR if you have time or interest.')
+            return
+
+
 
 # old loop thru years and days - will fix later. now avoiding retyping
     if True:
