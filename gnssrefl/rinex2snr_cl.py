@@ -298,6 +298,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             jeff : (My good friend Professor Freymueller!)
 
+            kadaster: (Dutch Geodetic data)
+
             ngs : (National Geodetic Survey, USA)
 
             ngs-hourly : (merged hourly files from National Geodetic Survey, USA)
@@ -389,7 +391,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     # list of RINEX 3 archives 
     archive_list_rinex3 = ['unavco', 'epn','cddis', 'bev', 'bkg', 'ga', 'epn', 
-                           'bfg','sonel','nrcan','gfz','ignes','gnet','nz']
+                           'bfg','sonel','nrcan','gfz','ignes','gnet','nz','kadaster']
 
     # list of RINEX 2.11 archives
     archive_list = ['sopac', 'unavco', 'sonel',  'nz', 'ga', 'bkg', 'jeff',
@@ -577,7 +579,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
 
     # adding spanish archive
-    highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes','bkg-igs','bkg-euref','gnet']  
+    highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes','bkg-igs','bkg-euref','gnet','kadaster']  
     if ns == 9:
         print('Station ', station, ' >>> RINEX 3')
         # rinex3
@@ -659,8 +661,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         oneday = True
         par = None
 
-    #if debug or oneday:
-    if debug :
+    if debug or oneday:
+    #if debug :
         print('Debug mode or only analyzing one day of data. ')
         args['year'] = year
         args['doy'] = doy

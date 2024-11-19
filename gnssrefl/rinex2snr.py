@@ -298,6 +298,14 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                     subprocess.call(['gunzip', rnx_filename])
                                     # take off gz on the name
                                     fexists = g.new_rinex3_rinex2(rnx_filename[0:-3],r2,dec_rate,gpsonly,log)
+                            if archive == 'kadaster':
+                                print('testing out Kadaster option')
+                                # this code only does 1-hz data for now, so samplerate (srate) is not needed
+                                rnx_filename,foundit = ch.kadaster_highrate(station9ch, year, doy,stream,dec_rate)
+                                if foundit: 
+                                    log.write('The RINEX 3 file has been downloaded. Try to make {0:s} \n '.format(r2))
+                                    # take off gz on the name
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log)
 
                             if archive == 'cddis':
                                 bad_day = g.cddis_restriction(year, doy,'cddis')

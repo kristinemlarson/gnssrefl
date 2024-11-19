@@ -733,3 +733,114 @@ def bkg_highrate_tar(station, year, month, day,stream,dec_rate,bkg):
         file_name24 = ''
 
     return file_name24,  fexist
+
+
+def kadaster_highrate(station, year, doy,stream,dec_rate):
+    """
+    picks up a highrate RINEX 3 file from Dutch archive, merges and decimates it.
+    requires gfzrnx. Someone should add regular 30 second downloads - but it is not 
+    gonna be me.
+
+    Parameters
+    ----------
+    station : str
+        9 ch station name 
+    year : int
+        full year
+    doy : int
+        day of year
+    stream : str
+        R or S
+    dec_rate : int
+        decimation rate in seconds
+
+    Returns
+    -------
+    file_name24 : str
+        name of merged rinex file
+    fexist : boolean
+        whether the new merged file exists
+
+    """
+    timeout = 0
+
+    fexist  = False
+    version = 3
+    crnxpath = g.hatanaka_version()
+    gexe = g.gfz_version()
+    # if doy is input
+    d = g.doy2ymd(year,doy);
+    month = d.month; day = d.day
+
+    doy,cdoy,cyyyy,cyy = g.ymd2doy(year,month,day); 
+
+    if not os.path.isfile(crnxpath):
+        g.hatanaka_warning(); return
+
+    if not os.path.isfile(gexe):
+        print('You need to install gfzrnx to use high-rate RINEX data in my code.')
+        return '', fexist
+
+    gns = 'https://gnss-data.kadaster.nl/data/highrate/'
+    # base directory name
+    gns = gns + cyyyy + '/'+ cdoy + '/' 
+    print('looking for files in: ', gns)
+
+    print('WARNING: Get yourself a cup of coffeee. Downloading 96 files takes a long time.')
+    fileF = 0
+    streamID  = '_' + stream + '_'
+    for h in range(0,24):
+        # subdirectory
+        ch = '{:02d}'.format(h)
+        print('Hour: ', ch)
+        for e in ['00', '15', '30', '45']:
+            file_name = station.upper() + streamID + cyyyy + cdoy + ch + e + '_15M_01S_MO.crx.gz'
+            dirname = gns 
+            crnx_name = file_name[:-3] 
+            oname = file_name[:-6] + 'rnx'
+
+            if os.path.isfile(oname):
+                fileF = fileF + 1
+                print('You already have ', oname, ' so no need to download and uncompress')
+            else:
+                print('****', dirname+file_name)
+                try:
+                    if not os.path.isfile(file_name):
+                        wget.download(dirname+file_name,file_name)
+
+                    if os.path.isfile(file_name):
+                        print('found crx')
+                        subprocess.call(['gunzip',file_name]) # unzip
+                        subprocess.call([crnxpath, crnx_name]) # hatanaka
+                        subprocess.call(['rm',crnx_name]) # remove old file
+                except:
+                    okok = 1
+                    #print('Could not find ', file_name, ' at Kadaster')
+
+                if os.path.isfile(oname):
+                    print('found rnx ', oname)
+                    fileF = fileF + 1
+                else:
+                    print('did not find rnx ', oname)
+
+    searchP = station.upper() + streamID + cyyyy + cdoy + '*15M*MO.rnx'
+    print('Found ', fileF,' 15 minute files')
+
+    outfile = station.upper() + cyyyy + cdoy + '.tmp'
+    crate = '{:02d}'.format(dec_rate)
+
+    file_name24 = ''
+
+    if (fileF > 0):
+        print('Merging and decimating')
+        subprocess.call([gexe,'-finp', searchP, '-fout', outfile, '-vo','3', '-smp', crate, '-f','-q'])
+        file_name24 = station.upper() + streamID + cyyyy + cdoy + '0000_01D_' + crate + 'S_MO.rnx'
+        subprocess.call(['mv',outfile, file_name24]) # remove old file
+        fexist = True
+
+    # remove 15 minute files
+    cm = 'rm ' + station.upper() + streamID + cyyyy + cdoy + '*15M_01S_MO.rnx'
+    if fexist:
+        subprocess.call(cm,shell=True)
+
+    return file_name24,  fexist
