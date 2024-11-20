@@ -133,6 +133,9 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     subdaily at01 2023 -doy1 15 -doy2 45
         for all solutions in 2023 between days of year 15 through 45
 
+    subdaily at01 2023 -date1 20230115 -date2 20230615
+        for all solutions in 2023 between January 15 and June 15
+
     subdaily at01 2023 -h2 14 -if_corr F
         for all solutions in 2023 but with max RH set to 14 meters and interfrequency correction not applied 
 
