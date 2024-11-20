@@ -49,6 +49,8 @@ def parse_arguments():
     parser.add_argument("-gap_min_val", default=None, type=float, help="min gap (hours) allowed in splinefit output file. default is 6 hours")
     parser.add_argument("-knots2", default=None, type=int, help="Secondary knots value for final fit. default is to use original knots value.")
     parser.add_argument("-gap_flag", default=None, type=str, help="boolean, writes 999 to spline fit for gaps")
+    parser.add_argument("-date1", default=None, type=str, help="start time, yyyymmdd")
+    parser.add_argument("-date2", default=None, type=str, help="end time, yyyymmdd")
 
     g.print_version_to_screen()
 
@@ -69,12 +71,15 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = None , if_corr: bool = True, knots_test: int = 0, 
              hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0,
-             year_end: int=None, knots2 : int=None, gap_flag: bool = False):
+             year_end: int=None, knots2 : int=None, gap_flag: bool = False, date1: str=None, date2: str=None):
     """
     Subdaily combines gnssir solutions and applies relevant corrections needed to measure water levels (tides). 
     As of January 2024, it will allow multiple years. You can also specify which day of year to start with, i.e.
     -doy1 300 and -doy2 330 will do that range in a single year, or you could specific doy1 and doy2 as linked to 
     the start and stop year (year and year_end)
+
+    As of verison 3.10.6 I am starting to move to full ymd start and stop times, i.e. date1=20240101 and date2=20240131 will 
+    start on January 1 and end on January 31. Eventually doy1 and doy2 will be ignored.
 
     In general this code is meant to be used at sites with tidal signals. If you have a site 
     without tidal signals, you should consider using daily_avg instead. If you would still 
@@ -222,6 +227,11 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         testing out allowing different knots for last spline
     gap_flag : bool
         whether you want gaps filled with 999 values in the final spline file 
+    date1 : str
+        avoid doy1/doy2.  start time in yyyyymmdd
+    date2 : str
+        avoid doy1/doy2.  end time in yyyyymmdd
+
     """
 
     print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
@@ -321,6 +331,18 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         sys.exit()
 
     outputs = [] # this is for multiple years
+
+    if date1 is not None:
+        year = int(date1[0:4])
+        mm = int(date1[4:6])
+        dd = int(date1[6:8])
+        doy1,cdoy,cyyyy,cyy = g.ymd2doy(year,mm,dd)
+
+    if date2 is not None:
+        year_end = int(date2[0:4])
+        mm = int(date2[4:6])
+        dd = int(date2[6:8])
+        doy2,cdoy,cyyyy,cyy = g.ymd2doy(year_end,mm,dd)
 
     if year_end is None: 
         year_end = year
