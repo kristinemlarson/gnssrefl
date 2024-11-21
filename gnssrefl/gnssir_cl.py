@@ -212,6 +212,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     #print('You are running ', vers)
     screenstats = True
 
+    if (len(station) == 9):
+        print('Going to assume you meant ', station[0:4], ' and not ', station)
+        # being lazy
+        station = station[0:4]
+
+
 
 #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()

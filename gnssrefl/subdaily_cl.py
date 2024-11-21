@@ -336,16 +336,19 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     outputs = [] # this is for multiple years
 
     if date1 is not None:
-        year = int(date1[0:4])
-        mm = int(date1[4:6])
-        dd = int(date1[6:8])
-        doy1,cdoy,cyyyy,cyy = g.ymd2doy(year,mm,dd)
+        if (len(date1) == 8):
+            year = int(date1[0:4]) ; mm = int(date1[4:6]); dd = int(date1[6:8])
+            doy1,cdoy,cyyyy,cyy = g.ymd2doy(year,mm,dd )
+        else:
+            print('Your date1 is incorrectly formated: ', date1, ' Exiting'); return
 
     if date2 is not None:
-        year_end = int(date2[0:4])
-        mm = int(date2[4:6])
-        dd = int(date2[6:8])
-        doy2,cdoy,cyyyy,cyy = g.ymd2doy(year_end,mm,dd)
+        if (len(date2) == 8):
+            year_end = int(date2[0:4])
+            mm = int(date2[4:6]); dd = int(date2[6:8])
+            doy2,cdoy,cyyyy,cyy = g.ymd2doy(year_end,mm,dd)
+        else:
+            print('Your date2 is incorrectly formated: ', date2, ' Exiting'); return
 
     if year_end is None: 
         year_end = year
