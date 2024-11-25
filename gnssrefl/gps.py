@@ -6168,6 +6168,7 @@ def cddis_download_2022B(filename,directory):
     #filelist = ftps.nlst()
     #if filename in filelist:
     ftps.retrbinary("RETR " + filename, open(filename, 'wb').write)
+    ftps.close()
     siz = os.path.getsize(filename)
     if siz == 0:
         print('No file found')

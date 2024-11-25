@@ -3,7 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+
+added date1 and date2 as optional inputs to subdaily. These can be used instead of the doy1, doy2,
+and year_end inputs.
+
+added link to Fagundes et al.
+
 ## 3.10.5
+
 
 added polyV to gnssir_input (polynomial used in direct signal removal)
 
