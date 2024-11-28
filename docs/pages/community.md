@@ -35,6 +35,8 @@ Noise Ratio Data, IEEE TGRS,Vol. 53(5), 2755-2763, doi: 10.1109/TGRS.2014.236451
 
 - [McCreight, E.E. Small, and K.M. Larson, Snow Depth, Density, and SWE estimates Derived from GPS Reflection Data: Validation in the Western U.S., Water Resources Research,Vol. 50(8), doi:10.1002/2014WR015561, 2014](https://www.kristinelarson.net/wp-content/uploads/2015/10/McCreightSmallLarson.pdf)
 
+- [Altuntas, C., Tunalioglu, N., and Erdogan, B., Implementing robust outlier detection to enhance estimation accuracy of GNSS-IR based seasonal snow depth retrievals, International Journal of Remote Sensing, Vol. 45(11), 3648-3663, doi:10.1080/01431161.2024.2349265, 2024](https://www.tandfonline.com/doi/full/10.1080/01431161.2024.2349265) 
+
 ## Tides 
 
 - L&ouml;fgren, J., R. Haas, and H.-G. Scherneck,2014: Sea level time series and ocean tide 
@@ -62,6 +64,8 @@ Sea Level Measurements, IEEE Journal of Selected Topics in Applied Earth Observa
 - [Altuntas, C. and N. Tunalioglu, A systematic approach for identifying optimal azimuth and elevation angle masks in GNSS-IR: validation through a sea level experiment, GPS Solutions, Vol 27(4), 198, doi:10.1007/s10291-023-01535-0, 2023](https://link.springer.com/article/10.1007/s10291-023-01535-0)
 
 - [Larson, K.M. and S.D.P. Williams, Water level measurements using reflected GNSS signals](https://ihr.iho.int/articles/water-level-measurements-using-reflected-gnss-signals/)
+
+- [Altuntas, C., Tunalioglu, N., and Ocalan, T., Datum Alignment Between GNSS-IR Sea Level Estimations and Tide Gauges in Türkiye: A Vertical Local Tie Approach, Marine Geodesy, doi:10.1080/01490419.2024.2402008, 2024](https://www.tandfonline.com/doi/full/10.1080/01490419.2024.2402008) 
 
 
 ## Lakes and Rivers
