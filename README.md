@@ -27,6 +27,7 @@ the Low Priority list and I think it would be really healthy for our community t
 willing to apply their expertise to provide fixes and enhancements 
 to the notebook collection that can be reviewed in a pull request and merged for deployment.*
 
+
 **Some new features:**
 
 You can now store coordinates for your local GNSS-IR sites. 

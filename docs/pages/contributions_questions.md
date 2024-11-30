@@ -1,13 +1,13 @@
-# Community Publications/Courses
+# Community Information 
 
 ## E-mail list
 Would you like to join our <code>gnssrefl</code> users email list?
 This is currently maintained by earthscope.org. To join, please e-mail 
 melissa.weber@earthscope.org or Kristine Larson.
 
-## Publications
-- [One Receiver, Zenith Pointing](https://gnssrefl.readthedocs.io/en/latest/pages/community.html)
-- [Non-Zenith Pointing and/or Low-Cost Antenna Examples](https://gnssrefl.readthedocs.io/en/latest/pages/tilted.html)
+## Citation for gnssrefl
+
+- [Larson K.M., gnssrefl: an open source python software package for environmental GNSS interferometric reflectometry applications, GPS Solutions, Volume 28, article number 165, 2024](https://link.springer.com/article/10.1007/s10291-024-01694-8)
 
 ## Acknowledgements
 
@@ -80,7 +80,8 @@ If the string is long - please post the error string in a thread response to you
 
 [Old news section from before we moved to readthedocs](https://gnssrefl.readthedocs.io/en/latest/pages/old_news.html)
 
-**Updated February 1, 2024**
+I have removed the publications section.
 
 Kristine M. Larson
+
 

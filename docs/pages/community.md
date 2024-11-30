@@ -97,9 +97,7 @@ Journal of Glaciology, DOI: https://doi.org/10.1017/jog.2024.54, 2024]( https://
 
 - [Shean, D., K. Christianson, K.M. Larson, S.R.M. Ligtenberg, I.R. Joughin, B. E. Smith, C.M. Stevens, M. Bushuk, and D.M. Holland, GPS-derived estimates of surface mass balance and ocean-induced basal melt for Pine Island Glacier ice shelf, Antarctica, The Cryosphere Vol. 11, 2655-2674, doi:10.5194/tc-11-2655, 2017](https://tc.copernicus.org/articles/11/2655/2017/tc-11-2655-2017.pdf)
 
-- [Pinat,E.;Defraigne,P.; Bergeot, N.; Chevalier, J.-M.; Bertrand, B. Long-Term 
-Snow Height Variations in Antarctica from GNSS Interferometric Reflectometry. 
-Remote Sens. 13, 1164. 2021](https:// doi.org/10.3390/rs13061164)
+- [Pinat,E.;Defraigne,P.; Bergeot, N.; Chevalier, J.-M.; Bertrand, B. Long-Term Snow Height Variations in Antarctica from GNSS Interferometric Reflectometry. Remote Sens. 13, 1164. 2021](https:// doi.org/10.3390/rs13061164)
 
 - [Larson, K.M., M. MacFerrin, and T. Nylen, Brief Communication: Update on the GPS Reflection Technique for Measuring Snow Accumulation in Greenland, The Cryosphere, Vol. 14, 1985–1988, doi:10.5194/tc-2019-303, 2020.](https://tc.copernicus.org/articles/14/1985/2020/)
 
