@@ -96,7 +96,7 @@ def fbias_daily_avg(station):
 
 
 def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
-        howBig,ReqTracks,azim1,azim2,test,subdir,plot_limits):
+        howBig,ReqTracks,azim1,azim2,test,subdir,plot_limits,**kwargs):
     """
     worker code for daily_avg_cl.py
 
@@ -114,10 +114,10 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
     extension : str
         folder extension - usually empty string 
 
-    year1 : integer
+    year1 : int
         first year
 
-    year2 : integer
+    year2 : int
         last year 
 
     fr : integer
@@ -162,6 +162,27 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
         observation times
 
     """
+    date1 = kwargs.get('date1',None)
+    date2 = kwargs.get('date2',None)
+    mjd1=None
+    mjd2=None
+    if date1 is not None:
+        try:
+            m = int(date1[4:6])
+            d = int(date1[6:8])
+            mjd1,duh = g.mjd(year1,m,d,0,0,0)
+        except:
+            date1 = None # illegal input
+    if date2 is not None:
+        try:
+            m = int(date2[4:6])
+            d = int(date2[6:8])
+            mjd2,duh = g.mjd(year2,m,d,0,0,0) 
+            mjd2=mjd2 + 1
+        except:
+            # illegal input
+            date2 = None
+
     print('Median Filter', howBig, ' Required number of tracks/day ', ReqTracks)
     xdir = os.environ['REFL_CODE']
     print('All RH retrievals - including bad ones - will be written to: ' )
@@ -211,8 +232,30 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
             for f in all_files:
                 fname = direc + f
                 L = len(f)
+                keep_this_one1 = True
+                keep_this_one2 = True
         # file names must have 7 characters in them ...  and end in txt for that matter
                 if (L == 7):
+                    mjd = g.ydoy2mjd(yr,int(f[0:3]))
+                    if mjd1 is not None:
+                        if (mjd >= mjd1):
+                            keep_this_one1 = True
+                        else:
+                            keep_this_one1 = False
+                    if mjd2 is not None:
+                        if (mjd <= mjd2):
+                            keep_this_one2 = True
+                        else:
+                            keep_this_one2 = False
+                if keep_this_one1 & keep_this_one2:
+                    keepit = True
+                else:
+                    keepit = False
+
+                #if not keepit:
+                #    print('thrown out because it was not between your dates',f)
+
+                if (L == 7) & keepit:
                     NumFiles +=  1
         # check that it is a file and not a directory and that it has something/anything in it
                     try:

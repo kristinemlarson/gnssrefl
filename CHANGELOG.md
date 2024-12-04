@@ -4,10 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
-added date1 and date2 as optional inputs to subdaily. These can be used instead of the doy1, doy2,
-and year_end inputs.
+## 3.10.6
+December 3, 2024
 
-added link to Fagundes et al.
+I added date1 and date2 as optional inputs to subdaily. These can be used instead of the doy1, doy2,
+and year_end inputs. for now both kinds are allowed though I will likely change that at some point.
+
+I added date1 and date2 to daily_avg. You can narrow your use of data.  It set to correct values (i.e. it 
+is truly a date in yyyymmdd format), it will override any -year1 and -year2 values.
 
 ## 3.10.5
 

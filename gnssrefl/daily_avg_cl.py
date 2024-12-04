@@ -27,6 +27,8 @@ def parse_arguments():
     parser.add_argument("-test", default=None, type=str, help="augmentation to plot")
     parser.add_argument("-subdir", default=None, type=str, help="non-default subdirectory for output ")
     parser.add_argument("-plot_limits", default=None, type=str, help="add median value and limits to plot, default is False ")
+    parser.add_argument("-date1", default=None, type=str, help="Optional beginning date, yyyymmdd")
+    parser.add_argument("-date2", default=None, type=str, help="Optional ending date, yyyymmdd")
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
@@ -38,8 +40,9 @@ def parse_arguments():
 
 
 def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = None, plt: bool = True, 
-        extension: str = '', year1: int = 2005, year2: int = 2030, fr: int = 0, csv: bool = False, 
-        azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None,plot_limits: bool=False):
+        extension: str = '', year1: int = None, year2: int = None, fr: int = 0, csv: bool = False, 
+        azim1: int = 0, azim2: int = 360, test: bool = False, subdir: str=None,plot_limits: bool=False, 
+              date1: str=None, date2: str=None):
     """
     The goal of this code is to consolidate individual RH results into a single file consisting of 
     daily averaged RH without outliers. These daily average values are nominally associated 
@@ -93,7 +96,8 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     daily_avg p041 0 0 
         this will use median filter and required tracks values from within the json.  The parameter 
         names are slightly different, daily_avg_medianfilter and dailyavg_reqtracks.
-
+    daily_avg p041 0.5 50 -date1 20200501 -date2 20210601
+        only uses data beteween May 1, 2020 and June 1, 2021
 
     Parameters
     ----------
@@ -121,11 +125,11 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
 
     year1 : int, optional
         restrict to years starting with.
-        default is 2005.
+        default is 2005 (set below).
 
     year2 : int, optional
         restrict to years ending with.
-        default is 2030.
+        default is 2035 (set below).
 
     fr : int, optional
         GNSS frequency. If none input, all are used. Value options:
@@ -178,8 +182,21 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     plot_limits: bool, optional
         adds the median value and median filter limits to the plot.
         default is False
+    date1: str, optional
+        you only want data starting from this date, format yyyymmdd
+        this will supercede year1
+    date2: str, optional
+        you only want data ending from this date, format yyyymmdd
+        this will supercede year2
 
     """
+    # set some defaults so they are easy to find
+    if year1 is None:
+        year1 = 2005
+
+    if year2 is None:
+        year2 = 2035
+
     if len(station) != 4:
         print('Station names must have four characters. Exiting.')
         sys.exit()
@@ -231,16 +248,34 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
         alldatafile = txtdir + '/' + station + '_allRH.txt' 
 
     # read in the files
+    if date1 is not None:
+        # overwrite year1
+        try:
+            year1 = int(date1[0:4])
+        except:
+            # illegal year 
+            year1= 2005
+            print('Illegal date1. Ignoring and using default year1 ', year1)
+            date1 = None
+
+    if date2 is not None:
+        try:
+            year2 = int(date2[0:4])
+        except:
+            year2=2030
+            print('Illegal date2. Ignoring and using default year2 ', year2)
+            date2 = None
+
     tv, obstimes = da.readin_plot_daily(station, extension, year1, year2, fr, 
-            alldatafile, csv, medfilter, ReqTracks,azim1,azim2,test,subdir,plot_limits)
+            alldatafile, csv, medfilter, ReqTracks,azim1,azim2,test,subdir,plot_limits,date1=date1,date2=date2)
 
     # default is to show the plots
     nr,nc = tv.shape
     if plt2screen & (nr > 0):
         matplt.show()
 
-    # now write out the result file:
 
+    # now write out the result file:
     if txtfile is None:
         if csv:
             outfile = txtdir + '/' + station + '_dailyRH.csv' 

@@ -1,5 +1,6 @@
 env
 gnss/*
+rise_set_tracks.py
 developer_notes.md
 new.pyproject.toml
 meson.build

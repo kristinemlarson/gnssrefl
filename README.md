@@ -1,4 +1,4 @@
-# gnssrefl v3.10.5
+# gnssrefl v3.10.6
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 When showing results created using gnssrefl, please use:
@@ -17,6 +17,9 @@ gnssrefl also has a DOI from zenodo.
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601494.svg)](http://dx.doi.org/10.5281/zenodo.5601494) 
 
 The latest pypi version can be found here [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
+
+Latest Feature - you can set beginning and end dates in <code>daily_avg</code> and <code>subdaily</code>. The parameters are 
+called date1 and date2. See the descriptions of these modules in the usual place.
 
 Questions and bug reports for gnssrefl (but not the notebooks) **must** be submitted via the **Issues** button at 
 the [github repository](https://github.com/kristinemlarson/gnssrefl/issues). The notebooks were created by Earthscope 
