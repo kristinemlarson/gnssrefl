@@ -197,7 +197,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
     subprocess.call(['rm',tmpfpath])
     tmpobj.cleanup()
     
-    print('Number of t values ', len(t))
+    #print('Number of t values ', len(t))
     # why is there all this going back and forth between lists and np arrays?
 
     t = np.array(t);az = np.array(az);elv = np.array(elv);snr = np.array(snr);prn = np.array(prn); freq=np.array(freq)
@@ -306,7 +306,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         print(station, tmpfile,snrfile)
         print(orbfile)
         gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
-        print('Az/El Updated...')
+        #print('Az/El Updated...')
         return # translation has taken place in new_azel, so return to main code 
 
     # this was my first effort.  It only allowed L1 data. I am not deleting it - but
@@ -330,7 +330,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         #subprocess.call(['cp', tmpfile,'k_debug.txt']) 
         # make the snrfile
         gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
-        print('Az/El Updated...')
+        #print('Az/El Updated...')
 
         return # - in theory the fortran called in new_azel took care of everything
     
@@ -910,6 +910,6 @@ def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip,
                     if gzip:
                         if not snrfile.endswith('.gz'):
                             subprocess.call(['gzip', snrfile])
-                            print('SNR file gzip compressed')
+                            #print('SNR file gzip compressed')
                 else:
                     print('NMEA file '+ locdir + r +' does not exist')

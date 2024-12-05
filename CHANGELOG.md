@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+Made better error messages for nmea2snr, added debug option so you aren't behind
+a try.  And parallel processing is segregated.
+
 ## 3.10.6
 December 3, 2024
 

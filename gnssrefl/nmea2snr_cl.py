@@ -36,13 +36,14 @@ def parse_arguments():
     parser.add_argument("-par", default=None, help="parallel processing, up to 10", type=int)
     parser.add_argument("-orb", default=None, help="request specific orbit source", type=str)
     parser.add_argument("-hour", default=None, help="request hour for ultra orbit", type=int)
+    parser.add_argument("-debug", default=None, help="Allow error messages to the screen", type=str)
 
     g.print_version_to_screen()
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['risky', 'gzip', 'overwrite']
+    boolean_args = ['risky', 'gzip', 'overwrite','debug']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -50,7 +51,8 @@ def parse_arguments():
 
 def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=None, doy_end: int=None, 
              overwrite : bool=False, dec : int=1, lat : float = None, lon : float=None, 
-             height : float = None, risky : bool=False, gzip : bool = True, par:int = None, orb:str = None, hour:int =0):
+             height : float = None, risky : bool=False, gzip : bool = True, par:int = None, 
+             orb:str = None, hour:int =0, debug: bool=None):
     """
     This code creates SNR files from NMEA files.  
 
@@ -121,6 +123,11 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
     hour : int
         specific hour of ultrarapid orbit. default is zero
 
+    debug : bool
+        whether you want your processing to be behind a "try". Without that,
+        you will get uglier error messages, which can be helpful in figuring out
+        why the code did not work.
+
     Examples
     --------
     nmea2snr wesl 2023 8 -dec 5
@@ -133,23 +140,22 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
          makes SNR file with user provided station coordinates and good orbits
 
     """
-    # THIS CODE DOES NOT USE OUR ACCEPTED PROTOCOLS for argparse
+    # THIS CODE DOES NOT USE OUR ACCEPTED PROTOCOLS for argparse because it was written 
+    # separately.  Please feel free to try and add it.
 
     # queue which handles any exceptions any of the processes encounter
     # I think this will throw an error if run from a script rather than the command line
-    manager = multiprocessing.Manager()
-    error_queue = manager.Queue()
 
     g.check_environ_variables()
 
     NS = len(station)
     if (NS != 4):
         print('Illegal input - Station name must have 4 characters. Exiting.')
-        sys.exit()
+        return
 
     if len(str(year)) != 4:
         print('Year must be four characters long. Exiting.', year)
-        sys.exit()    
+        return
 
     # 
     gfz_date = 2021 + 137/365.25
@@ -187,6 +193,9 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
 
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
+    if (MJD1 > MJD2):
+        print('You have selected an ending day that is before the starting day. Exiting')
+        return
 
     #def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, sp3, gzip):
     # calling cartesian coordinates llh is so wrong
@@ -195,12 +204,18 @@ def nmea2snr( station: str, year: int, doy: int, snr: int = 66, year_end: int=No
     # first get it working without parallel processing
     if not par:
         print('No parallel processing')
-        mjd_list = {}; mjd_list[0] = [MJD1, MJD2]
+        if (MJD1 == MJD2):
+            mjd_list = [MJD1]
+        else:
+            mjd_list = list(range(MJD1, MJD2+1))
+
         s1 = time.time()
-        process_jobs_multi(index=0,args=args,datelist=mjd_list,error_queue=error_queue)
+        process_jobs_nopar(args,mjd_list,debug)
         s2 = time.time()
         print('That took ', round(s2-s1,2), ' seconds')
     else:
+        manager = multiprocessing.Manager()
+        error_queue = manager.Queue()
         if par > 10:
             print('Only allow ten parallel processes for now')
             par = 10
@@ -258,6 +273,37 @@ def process_jobs_multi(index,args,datelist,error_queue):
         print('Error of some kind processing year/doy ', y, d)
         error_queue.put(e)
 
+    return
+
+def process_jobs_nopar(args,mjd_list,debug):
+    """
+    runs the nmea2snr queue but in series, not in parallel
+    optional debug input that moves your work outside the try
+    so you can better see where the code is failing.  Hopefully.
+
+    Parameters
+    ----------
+    args : dict
+        selections for nmea2snr like snr, orbit 
+    datelist : list
+        modified julian day begin and end
+    debug : bool
+        whether you want the work done behind a try or not
+        default is False
+
+    """
+
+    for mjd in mjd_list:
+        y, d = g.modjul_to_ydoy(mjd)
+        args['year'] = y
+        args['doy'] = d
+        if debug:
+            nmea.run_nmea2snr(**args)
+        else:
+            try:
+                nmea.run_nmea2snr(**args)
+            except:
+                print('Error of some kind processing year/doy ', y, d)
     return
 
 
