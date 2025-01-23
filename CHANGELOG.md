@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.10.7
+
+Fixed bug in check_rinex_file
+
+Added nz archive to Rinex3 30 second list in download_rinex
+
 Made better error messages for nmea2snr, added debug option so you aren't behind
 a try.  And parallel processing is segregated.
 

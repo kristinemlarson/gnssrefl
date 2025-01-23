@@ -171,6 +171,8 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
             subprocess.call(['gunzip', file_name])
             file_name = file_name[0:-3]
             print('Now', file_name)
+        else:
+            print('Did not find the file ')
         return file_name, foundit
 
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import sys
 import gnssrefl.gps as g
 
 # this requires python 3.8
@@ -7,7 +8,7 @@ import gnssrefl.gps as g
 
 def main():
     """
-    converts year month day to day of year and prints it to the screen
+    converts year,month, day to day of year and prints it to the screen
 
     MJD is an optional output
 
@@ -15,13 +16,10 @@ def main():
     ----------
     year : int
         4 ch year
-
     month : int
         calendar month
-
     day : int
         calendar day
-
     mjd : str
         use T or True to get MJD printed to the screen
 
@@ -42,6 +40,11 @@ def main():
     year = args.year
     month = args.month
     day = args.day
+
+    if (month > 13) or (month < 1):
+        print('Illegal month', month); sys.exit()
+    if (day > 31) or (day< 1):
+        print('Illegal day ', day); sys.exit()
 
     doy,cdoy,cyyyy,cyy = g.ymd2doy(year, month, day )
     print(cdoy)
