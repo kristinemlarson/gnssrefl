@@ -5,8 +5,11 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG TARGETARCH
 
 # build requirements
-RUN apt-get update && \
-  apt-get install -y gfortran python3-pip unzip wget vim 
+RUN apt-get update
+RUN apt-get install -y gfortran python3-pip unzip wget vim 
+
+#RUN apt-get update && \
+#  apt-get install -y gfortran python3-pip unzip wget vim 
 
 ## executables
 RUN mkdir -p /etc/gnssrefl/exe /etc/gnssrefl/orbits /etc/gnssrefl/refl_code/Files /etc/gnssrefl/notebooks
