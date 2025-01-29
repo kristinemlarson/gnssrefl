@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+While it works locally, I have been having problems making the docker using github actions.
+I have recently changed the docker to use python 3.10 instead of 3.9.  To do so I had to 
+update the EGM96 code that is used to go from ellipsoidal height to orthometric height.
+The EGM96 code used interp2d which is no longer supported by scipy in v 3.10. 
+So fingers crossed this will work. If it does, I will change the version number accordingly.
+
+
 ## 3.10.7
 
 Fixed bug in check_rinex_file

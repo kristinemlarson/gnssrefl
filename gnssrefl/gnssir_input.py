@@ -559,8 +559,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     # mostly for decimating SNR files when created from RINEX files.  
     lsp['dec'] = dec
 
-    print('writing out to:', outputfile)
-    print(lsp)
+    print('writing json file to: ', outputfile)
+    #print(lsp)
     with open(outputfile, 'w+') as outfile:
         json.dump(lsp, outfile, indent=4)
 
