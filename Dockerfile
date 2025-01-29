@@ -1,4 +1,6 @@
-FROM python:3.9-slim-buster 
+FROM python:3.10-slim-buster 
+# 2025 jan 28 trying python 3.10
+#FROM python:3.9-slim-buster 
 #FROM python:3.8-slim-buster 
 LABEL maintainer="EARTHSCOPE"
 ARG DEBIAN_FRONTEND=noninteractive

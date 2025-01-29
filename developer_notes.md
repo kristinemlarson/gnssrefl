@@ -6,7 +6,13 @@ docker build --no-cache -t <imagename> .
 docker run -it <imagename> /bin/bash
 If you want to mount volumes you could copy the -v syntax from the unavdocker/gnssrefl docker run command.
 
+docker images tells you what is running
 
+docker.io/library/nameofimage
+tag is latest
+get image number imageNu
+
+docker run -i -t imageNu /bin/bash
 
 # disutils - change to meson
 
