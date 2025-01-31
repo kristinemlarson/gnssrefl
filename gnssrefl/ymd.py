@@ -41,6 +41,8 @@ def main():
     month = args.month
     day = args.day
 
+    w = 0 
+
     if (month > 13) or (month < 1):
         print('Illegal month', month); sys.exit()
     if (day > 31) or (day< 1):
