@@ -4654,6 +4654,8 @@ def l2c_l5_list(year,doy):
 
     # this numpy array has the satellite number, year, and doy of each launch of a L2C satellite
     # updated 2023 feb 1 to include prn 28 - was set operational on jan 31
+    # there is a new PRN 1, as of January 2025.  no need to add to this list as 
+    # it was previously an L2C and L5 satellite (launched in 2011)
     l2c=np.array([[1 ,2011 ,290], [3 ,2014 ,347], [4 ,2018 ,357], [5 ,2008 ,240],
         [6 ,2014 ,163], [7 ,2008 ,85], [8 ,2015 ,224], [9 ,2014 ,258], [10 ,2015 ,343],
         [11, 2021, 168],
