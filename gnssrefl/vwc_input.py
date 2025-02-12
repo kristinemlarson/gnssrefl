@@ -103,6 +103,8 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100,
     # it failed and there is no need for it at this time
     y = year
     data_dir = xdir / str(y) / 'results' / station
+    if extension:
+        data_dir = data_dir / extension  # add extension subdirectory if specified
     result_files = read_files_in_dir(data_dir)
     if result_files == None:
         print('Exiting.')
