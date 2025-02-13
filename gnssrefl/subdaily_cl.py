@@ -409,13 +409,17 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     # only read in one year
     if year_end == year:
         input2spline = [fname_new]; output4spline = fname_new + '.withrhdot'
+        lastpng = txtdir + '/' + station + '_' + str(year) + '_last.png'
 
     # this is for multiyaer
     else:
         # this is a bit of a kluge - send it names of the yearly files
         input2spline = outputs 
-        output4spline = txtdir + '/' + station + '_' + str(year) + '_' + str(year_end) + '.withrhdot'
+        #output4spline = txtdir + '/' + station + '_' + str(year) + '_' + str(year_end) + '.withrhdot'
+        output4spline = txtdir + '/' + station + '_' + str(year) + '_' + str(year_end) + '_subdaily_edit.txt.withrhdot'
+        lastpng = txtdir + '/' + station + '_' + str(year) + '_' + str(year_end) + '_last.png'
 
+    print(lastpng)
     # not sure why tv and corr are being returned.
     if rhdot:
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, 
@@ -424,7 +428,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
                                       if_corr=if_corr,knots_test=knots_test,
                                       hires_figs=hires_figs, apply_rhdot=apply_rhdot,fs=fs,
                                       gap_min_val=gap_min_val,year=year, extension=extension, 
-                                      knots2=knots2,csv=csv,gap_flag=gap_flag)
+                                      knots2=knots2,csv=csv,gap_flag=gap_flag,lastpng=lastpng)
        if plt:
            mplt.show()
 

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.10.9
+
+Changed some inconsistencies in subdaily for multi-year processing. rhdot3 plot
+was not being created, but now is. And the filenames for the outputs are now consistent
+with how they are named for the one year runs. The "last" png file is also named more 
+consistently (i.e. year or year_year_end is in the filename).
+
 ## 3.10.8
 
 While it works locally, I have been having problems making the docker using github actions.

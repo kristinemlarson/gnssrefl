@@ -814,11 +814,17 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
         RH dot
     gap_flag : bool, option
         whether gaps are written as 999 in final output
+    lastpng : str
+        name of the last file created.
 
 
     """
     # output will go to REFL_CODE/Files unless txtdir provided
     xdir = os.environ['REFL_CODE']
+
+    # since year and year_end are not sent to this code it was easier
+    # just to have subdaily_cl itself define this last png file
+    lastpng = kwargs.get('lastpng','lastfile.png')
 
     # change units to day of year
     gap_min_val = kwargs.get('gap_min_val',6.0)
@@ -1090,7 +1096,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     residual_after = residual_after[ii]
 
     # make the RHdot plot as well. if multiyear, Skip for now
-    if not multiyear:
+    #if not multiyear:
+    if True:
         sd.rhdot_plots(th,correction,rhdot_at_th, tvel,yvel,fs,station,txtdir,hires_figs,year)
 
     #writecsv = False ; 
@@ -1245,7 +1252,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     # write outliers to a file ... again ... 
     sd.writeout_spline_outliers(new_outliers,txtdir,badpoints2,'outliers.spline2.txt')
-    sd.the_last_plot(tvd_new[jj,:], station, txtdir + '/' + station + '_last.png')
+    sd.the_last_plot(tvd_new[jj,:], station, lastpng)
+    #sd.the_last_plot(tvd_new[jj,:], station, txtdir + '/' + station + '_last.png')
 
     return tvd, correction
 

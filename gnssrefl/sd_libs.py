@@ -952,9 +952,9 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
 
     # put hires_figs boolean here
     if hires_figs:
-        g.save_plot(txtdir + '/' + station + '_rhdot4.eps')
+        g.save_plot(txtdir + '/' + station +  '_rhdot4.eps')
     else:
-        g.save_plot(txtdir + '/' + station + '_rhdot4.png')
+        g.save_plot(txtdir + '/' + station +  '_rhdot4.png')
 
     # this figure is not sent to the screen
     fig=plt.figure(figsize=(10,5))
@@ -971,9 +971,9 @@ def subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, fs,
 
     # print('\n RMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
     if hires_figs:
-        g.save_plot(txtdir + '/' + station + '_rhdot5.eps')
+        g.save_plot(txtdir + '/' + station +  '_rhdot5.eps')
     else:
-        g.save_plot(txtdir + '/' + station + '_rhdot5.png')
+        g.save_plot(txtdir + '/' + station +  '_rhdot5.png')
 
     plt.close() # 
 

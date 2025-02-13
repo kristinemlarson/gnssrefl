@@ -14,6 +14,10 @@ get image number imageNu
 
 docker run -i -t imageNu /bin/bash
 
+# google map API
+
+https://developers.google.com/maps/documentation/javascript/localization
+
 # disutils - change to meson
 
 https://numpy.org/doc/stable/reference/distutils_status_migration.html
