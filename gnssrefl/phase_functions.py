@@ -260,7 +260,7 @@ def read_apriori_rh(station,fr):
         apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
 
     if os.path.exists(apriori_path_f):
-        result = np.loadtxt(apriori_path_f, comments='%')
+        result = np.loadtxt(apriori_path_f, comments='%', ndmin=2)
         print('Using: ', apriori_path_f) 
     else:
         print('Average RH file does not exist')
