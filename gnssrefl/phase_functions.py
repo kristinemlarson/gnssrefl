@@ -260,7 +260,7 @@ def read_apriori_rh(station,fr):
         apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
 
     if os.path.exists(apriori_path_f):
-        result = np.loadtxt(apriori_path_f, comments='%')
+        result = np.loadtxt(apriori_path_f, comments='%', ndmin=2)
         print('Using: ', apriori_path_f) 
     else:
         print('Average RH file does not exist')
@@ -812,7 +812,7 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir):
             # put in amplitude criteria to keep out bad L2P results
                 ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
                 amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                if (len(ph1) > minvalperday):
+                if (len(ph1) >= minvalperday):
                     newl = [requested_year, doy, np.mean(ph1), len(ph1)]
                 # i think you normalize the individual satellites before this step
                 #namp = qp.normAmp(amp1,0.15)
