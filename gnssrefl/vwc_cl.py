@@ -27,7 +27,7 @@ def parse_arguments():
     parser.add_argument("-fr", help="frequency", type=int)
     parser.add_argument("-plt", default=None, type=str, help="boolean for plotting to screen")
     parser.add_argument("-screenstats", default=None, type=str, help="boolean for plotting statistics to screen")
-    parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 50")
+    parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 100")
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
     parser.add_argument("-minvalperday", default=None, type=int, help="min number of satellite tracks needed each day. Default is 10")
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean, try to remove snow contaminated points. Default is F")
@@ -38,6 +38,7 @@ def parse_arguments():
     parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
     parser.add_argument("-advanced", default=None, type=str, help="Whether you want to implement advanced veg model (in development)")
+    parser.add_argument("-extension", default=None, type=str, help="which extension -if any - used in analysis json")
 
     g.print_version_to_screen()
 
@@ -50,9 +51,9 @@ def parse_arguments():
 
 
 def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool = True, screenstats: bool = False, 
-        min_req_pts_track: int = 150, polyorder: int = -99, minvalperday: int = 10, 
+        min_req_pts_track: int = None, polyorder: int = -99, minvalperday: int = None, 
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None, 
-        warning_value : float=5.5, auto_removal : bool=False, hires_figs : bool=False, advanced : bool=False ):
+        warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False, advanced : bool=False, extension:str=None ):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
     It concatenates previously computed phase results, makes plots for the four geographic quadrants, computes daily 
@@ -95,6 +96,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         default is now set to 150 (was previously 50). This is an issue when a satellite has recently 
         been launched. You don't really have enough information to trust it for several months (and in some cases longer)
         this can now be set in the gnssir_input created analysis json (vwc_min_req_pts_track)
+        As of version 3.10.9 it is set to 100.
     polyorder : int
         polynomial order used for leveling.  Usually the code picks it but this allows to users to override. 
         Default is -99 which means let the code decide
@@ -121,6 +123,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
          default value is false
     advanced : bool, optional
          advanced veg model implmentation. Currently in testing
+    extension : str
+         extension used when you made the json analysis file
 
     Returns
     -------
@@ -144,9 +148,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     # pick up the parameters used for this code
     minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, \
-            remove_bad_tracks, warning_value,min_norm_amp,sat_legend,circles= \
+            remove_bad_tracks, warning_value,min_norm_amp,sat_legend,circles,extension = \
             qp.set_parameters(station, minvalperday, tmin,tmax, min_req_pts_track, 
-                              fr, year, year_end,subdir,plt, auto_removal,warning_value)
+                              fr, year, year_end,subdir,plt, auto_removal,warning_value,extension)
 
     # if you have requested snow filtering
     if snow_filter:

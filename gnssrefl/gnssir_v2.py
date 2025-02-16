@@ -701,7 +701,8 @@ def plot2screen(station, f,ax1,ax2,pltname):
 def read_json_file(station, extension,**kwargs):
     """
     picks up json instructions for calculation of lomb scargle periodogram
-    This is meant to be used by GNSSIR
+    This was originally meant to be used by gnssir, but is now read by other functions.
+
 
     Parameters
     ----------
@@ -709,7 +710,7 @@ def read_json_file(station, extension,**kwargs):
         4 character station name
 
     extension : str
-        experimental subdirectory - default is ''
+        subdirectory - default is ''
 
     Returns
     -------
@@ -730,6 +731,10 @@ def read_json_file(station, extension,**kwargs):
 
     instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
 
+    if useextension and not os.path.isfile(instructions_ext):
+        print('You asked to use : ', instructions_ext, ' but it does not exist.')
+        print('Will try the non-extension json file: ', instructions)
+
     if useextension and os.path.isfile(instructions_ext):
         usefile = instructions_ext
         print('Using these instructions ', usefile)
@@ -743,6 +748,7 @@ def read_json_file(station, extension,**kwargs):
                 lsp = json.load(f)
         else:
             if noexit:
+                print('No json file found - but you have requested the code not exit')
                 lsp = {}
                 return lsp
             else:

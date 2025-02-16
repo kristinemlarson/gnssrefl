@@ -15,12 +15,13 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
-    parser.add_argument("-min_tracks", default=None, help="min number of tracks to keep mean RH (default is 100)", type=int)
+    parser.add_argument("-min_tracks", default=None, help="min number of daily tracks to keep the series (default is 100)", type=int)
+    parser.add_argument("-minvalperday", default=None, help="min number of tracks needed on one day to compute VWC (default is 10)", type=int)
     parser.add_argument("-fr", default=None, help="frequency (default is L2C)", type=int)
     parser.add_argument("-extension", default='', help="analysis extension parameter", type=str)
     parser.add_argument("-tmin", default=0.05, help="min soil texture", type=float)
-    parser.add_argument("-tmax", default=0.45, help="max soil texture", type=float)
-    parser.add_argument("-warning_value", default=5.5, help="warning value, phaseRMS", type=float)
+    parser.add_argument("-tmax", default=0.5, help="max soil texture", type=float)
+    parser.add_argument("-warning_value", default=5.5, help="warning value, degrees, phaseRMS", type=float)
 
     args = parser.parse_args().__dict__
 
@@ -28,15 +29,16 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100, 
-              extension : str='', tmin : float=0.05, tmax : float=0.45, minvalperday : int = 5, warning_value :float=5.5 ):
+def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100, minvalperday : int = 10, 
+              extension : str='', tmin : float=0.05, tmax : float=0.5, warning_value :float=5.5 ):
     """
-    Starts the analysis for volumetric water content.  Picks up reflector height (RH) results for a 
+    Sets inputs for the estimation of vwc (volumetric water content).  Picks up reflector height (RH) results for a 
     given station and year-year end range and computes the RH mean values and writes them 
     to a file. These will be used to compute a consistent set of phase estimates.
 
     Secondarily, it will add vwc input parameters into the json previously created for RH estimates.
-    If nothing is requested here, it will put the defaults in the file.  
+    If nothing is requested here, it will put the defaults in the file.  That json file is then used when 
+    you run vwc.
 
     Examples
     --------
@@ -56,17 +58,18 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100,
     fr : int, optional
         GPS frequency. Currently only supports l2c, which is frequency 20.
     min_tracks : int, optional
-        number of minimum tracks needed in order to keep the average RH
+        number of minimum daily tracks needed in order to keep that satellite track
+    minvalperday : int, optional
+        how many unique tracks are needed to compute a valid VWC measurement for a given day
     extension : str, optional
         strategy extension value (same as used in gnssir, subdaily etc)
     tmin : float, optional
         minimum soil moisture value
     tmax : float, optional
         maximum soil moisture value
-    minvalperday : int, optional
-        how many unique tracks are needed to compute a valid VWC measurement for that day
     warning_value : float, optional
         for removing low quality satellite tracks when running vwc
+        phase units, degrees
 
     Returns
     -------
@@ -85,6 +88,7 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100,
     xdir = Path(os.environ["REFL_CODE"]) # for kelly enloe
     myxdir = os.environ['REFL_CODE'] # for kristine 
 
+    # check that it is a nominally valid year and station name
 
     if (len(station) != 4):
         print('station name must be four characters. Exiting.')
@@ -93,11 +97,8 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100,
         print('Year must be four characters. Exiting.')
         sys.exit()
 
-    # not sure this is needed?
-    if not min_tracks:
-        min_tracks = 100
 
-    print('Minimum number of tracks required ', min_tracks)
+    print('Minimum number of tracks required to save a series ', min_tracks)
     gnssir_results = []
     # removed the ability to look at multiple years
     # it failed and there is no need for it at this time

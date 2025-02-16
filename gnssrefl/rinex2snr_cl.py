@@ -409,7 +409,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']
 
-
     #
     if doy_end is None:
         doy_end = doy
@@ -440,10 +439,23 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     print('Using snr value of ', snr)
 
-    if 'orb' in lsp:
-        if lsp['orb'] is not None:
+    # when multi-GNSS orbits are reliably available
+    gfz_avail = 2021 + 137/365.25
+
+    if orb is None:
+        if 'orb' in lsp:
             orb = lsp['orb']
-            print('Using orb value of ', orb, ' from the json')
+            print('Using orbit selection of ', orb, ' from the json')
+        else:
+            if ((year + doy/365.25) > gfz_avail):
+                orb = 'rapid'
+            else:
+                orb = 'nav'
+        print('Using default orbit for this time period: ', orb)
+
+    else:
+        print('Using command line orbit selection of ', orb)
+
 
     if 'archive' in lsp:
         if lsp['archive'] is not None:
@@ -465,15 +477,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
             dec = lsp['dec']
             print('Using dec parameter from json ', dec )
 
-    # when multi-GNSS orbits are reliably available
-    gfz_avail = 2021 + 137/365.25
-
-    if orb is None:
-        # you asked for default
-        if ((year + doy/365.25) > gfz_avail):
-            orb = 'rapid'
-        else:
-            orb = 'nav'
 
     ns = len(station)
     if (ns == 4) or (ns == 6) or (ns == 9):

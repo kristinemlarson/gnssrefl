@@ -1118,18 +1118,45 @@ def load_sat_phase(station, year, year_end, freq):
     return dataexist, results
 
 
-def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,subdir,plt,auto_removal,warning_value):
+def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,
+                   subdir,plt,auto_removal,warning_value,extension):
     """
+    the goal of this code is to pick up the relevant parameters used in vwc.
 
     Parameters
     ----------
     station : str
         4 character station name
+    minvalperday : int
+        number of phase values required each day
+    tmin : float
+        min soil texture
+    tmax : float
+        max soil texture
+    min_req_pts_track: int 
+        minimum number of phase values per year per track
+    freq : int
+        frequency to use (1,20 allowed)
+    year : int 
+        first year to analyze
+    year_end : int
+        last year to analyze
+    subdir : str
+        name for subdirectory used in subdirectory of REFL_CODE/Files
+        this probably should go away and be repaced with extension
+    plt : bool
+        whether you want plots to come to the screen
+    auto_removal : bool
+        whther tracks should be removed when they fail QC
+    warning_value : float
+        phase RMS needed to trigger warning
+    extension : str
+        extension used for inputs and outputs (i.e. test1 in ssss.test1.json)
 
     Returns
     -------
     minvalperday : int
-        number of phase values required each day
+        number of phase values required to create a daily average
     tmin : float
         min soil texture
     tmax : float
@@ -1148,47 +1175,70 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         whther tracks should be removed when they fail QC
     warning_value : float
         phase RMS needed to trigger warning
-    plot_legend : bool
-        whether to plot PRN numbers on the phase & amplitude results
+    extension : str
+        extra name for the json file
 
     """
+    if (len(station) != 4):
+        print('station name must be four characters. Exiting')
+        sys.exit()
+
+    if (len(str(year)) != 4):
+        print('Year must be full year (4 char). Exiting')
+        sys.exit()
+
+    g.checkFiles(station, '')
+    # should not crash if file does not exist...
+    if extension is None:
+        lsp = gnssir.read_json_file(station, '',noexit=True)
+    else:
+        lsp = gnssir.read_json_file(station, extension,noexit=True)
+
     # originally this was for command line interface ... 
     remove_bad_tracks = auto_removal # ??
     plot_legend = True # default is to use them
     circles = False
 
-    g.checkFiles(station, '')
+    if tmin is None:
+        if 'vwc_min_soil_texture' in lsp:
+            tmin = lsp['vwc_min_soil_texture']
+        else:
+            tmin = 0.05
+    if tmax is None:
+        if 'vwc_max_soil_texture' in lsp:
+            tmax = lsp['vwc_max_soil_texture']
+        else:
+            tmax = 0.50
+    if min_req_pts_track is None:
+        if 'vwc_min_req_pts_track' in lsp:
+            min_req_pts_track = lsp['vwc_min_req_pts_track']
+        else:
+            min_req_pts_track = 100
+    if minvalperday is None:
+        if 'vwc_minvalperday' in lsp:
+            minvalperday = lsp['vwc_minvalperday']
+        else:
+            minvalperday = 10
+
+    if warning_value is None:    
+        if 'vwc_warning_value' in lsp:
+            warning_value = lsp['vwc_warning_value']
+        else:
+            warning_value = 5.5
+
 
     # not using extension
-    # should not crash if file does not exist...
-    lsp = gnssir.read_json_file(station, '',noexit=True)
     # pick up values in json, if available
-    if 'vwc_min_soil_texture' in lsp:
-        tmin = lsp['vwc_min_soil_texture']
-    if 'vwc_max_soil_texture' in lsp:
-        tmax = lsp['vwc_max_soil_texture']
-    if 'vwc_minvalperday' in lsp:
-        minvalperday = lsp['vwc_minvalperday']
-    if 'vwc_warning_value' in lsp:
-        warning_value = lsp['vwc_warning_value']
-    if 'vwc_min_req_pts_track' in lsp:
-        min_req_pts_track = lsp['vwc_min_req_pts_track']
     if 'vwc_plot_legend' in lsp:
         plot_legend = lsp['vwc_plot_legend']
     if 'vwc_circles' in lsp:
         circles = lsp['vwc_circles']
+
     if 'vwc_min_norm_amp' in lsp:
         min_norm_amp = lsp['vwc_min_norm_amp']
     else:
         min_norm_amp = 0.5  # trying this out
 
-    if (len(station) != 4):
-        print('station name must be four characters')
-        sys.exit()
-
-    if (len(str(year)) != 4):
-        print('Year must be four characters')
-        sys.exit()
 
     freq = fr # KE kept the other variable
 
@@ -1214,10 +1264,14 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     if not plt:
         print('no plots will come to screen. Will only be saved.')
 
-    print('minvalperday/tmin/tmax/min_req_tracks', minvalperday, tmin, tmax, min_req_pts_track)
+    print('minvalperday', minvalperday)
+    print('tmin/tmax',  tmin, tmax )
+    print('min_req_tracks', min_req_pts_track)
+    print('warning value', warning_value)
+    print('extension value', extension)
 
     return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, \
-            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles
+            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles, extension
 
 def write_all_phase(v,fname):
     """

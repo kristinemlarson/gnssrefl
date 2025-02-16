@@ -11,6 +11,17 @@ was not being created, but now is. And the filenames for the outputs are now con
 with how they are named for the one year runs. The "last" png file is also named more 
 consistently (i.e. year or year_year_end is in the filename).
 
+Fixed vwc_input input for the extension parameter. Code was not finding the file inputs because
+the file directory was not properly defined. Not sure about how is owrking downstream (i.e. modules phase
+and vwc do not appear to allow the extension parameter). Thank you George Townsend.
+
+Changed behavior for inputs to vwc.py  Command line takes precedence over stored values.
+
+Allow extension input to vwc. If it does not find that extension json it reverts to the non-extension
+version. It does not, however, stores results in the extension directory in $REFL_CODE/Files.
+That is currently controlled by subdir - but to be consistent, subdir should probably be removed
+and extension used instead (for the outputs).
+
 ## 3.10.8
 
 While it works locally, I have been having problems making the docker using github actions.
