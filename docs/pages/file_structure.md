@@ -56,7 +56,9 @@ the command line when using that code.
 ## How do I analyze my own GNSS data?
 
 To analyze your own GNSS data you must comply with the software expectations for how the 
-files should be named. The naming conventions for GNSS observation files are given below. 
+files should be named. The naming conventions for GNSS observation files are given in the next section.
+You are always better off to use lowercase for Rinex 2.11. For RINEX 3 we follow the convention of the 
+GNSS archives, where the first part is upper case and the stem is lower.
 
 
 If you are working with the docker, I have made some notes in the [docker install section](docker_cl_instructions.md) 
@@ -69,11 +71,23 @@ below in the *Where Files are Stored* section, i.e. $REFL_CODE/YYYY/rinex/abcd w
 Examples are given in the [rinex2snr code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.rinex2snr_cl.html).
 Documentation can always be improved, so if you would like to add more examples or find the 
 current documentation confusing, please submit a pull request.
+If you don't know how to read the documentation, I suggest you try typing <code>rinex2snr -h</code>. You will
+notice that there is an option called <code>nolook</code>. **You have to set this to True.** 
 
-If you are using the gnssrefl notebook, unfortunately no notebook was developed by Earthscope for this option. 
+Example  <code>rinex2snr p041 2025 191 -nolook T</code> will look on your coputer for a RINEX 2.11 file
+called p0411910.25o. It might look for the Hatanaka compressed file too - I can't remember.
+
+You are telling the code
+not to look for the data at an archive. Perhaps that is not the best name for an option, but that is what it is.
+If you don't say -nolook T, it will think you want a file in a global GNSS archive and well, it won't find it if you have
+the only copy of your data.
+
+If you are using the gnssrefl notebooks, unfortunately no notebook was 
+developed by [Earthscope](https://earthscope.org) for this option. I am unable to provide you with any
+assistance. If you would like to share such a notebook as a PR, that would be great.
 
 If you have questions about converting NMEA files, the best I can offer is that you read
-the next section on that specific format.
+the next section on that specific format. The command is <code>nmea2snr</code>.
 
 Many file conversion programs produce orbit files as well as observation files. These orbit files
 are unnecessary in this software package. The code is set up to find the appropriate orbit files for you.

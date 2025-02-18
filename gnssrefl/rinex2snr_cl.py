@@ -34,24 +34,24 @@ def parse_arguments():
     parser.add_argument("-snr", default=None, help="snr file ending, Default is 66: < 30 deg, other values 99: 5-30 deg.; 88: all data; 50: < 10 deg.", type=int)
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra, gnss3")
-    parser.add_argument("-rate", default=None, metavar='low', type=str, help="low or high (tells code which folder to search).  If samplerate is 1, this is set automatically to high.") 
+    parser.add_argument("-rate", default=None, metavar='low', type=str, help="low or high (tells code which archive folder to search).  If samplerate is 1, this is set automatically to high.") 
     parser.add_argument("-dec", default=None, type=int, help="decimate (seconds)")
     parser.add_argument("-nolook", default=None, metavar='False', type=str,
                         help="True means only use RINEX files on local machine")
-    parser.add_argument("-archive", default=None, metavar='all', help="specify archive", type=str)
+    parser.add_argument("-archive", default=None, metavar='all', help="Specify archive", type=str)
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
-    parser.add_argument("-overwrite", default=None, help="boolean", type=str)
+    parser.add_argument("-overwrite", default=None, help="Make new SNR file even if it already exists, boolean", type=str)
     parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
     parser.add_argument("-samplerate", default=None, help="Sample rate (RINEX 3 only)", type=int)
-    parser.add_argument("-mk", default=None, help="use T for uppercase station names and non-standaard archives", type=str)
-    parser.add_argument("-weekly", default=None, help="use T for weekly data translation", type=str)
-    parser.add_argument("-monthly", default=None, help="use T for monthly data translation", type=str)
+    parser.add_argument("-mk", default=None, help="use T for uppercase station names and non-standard filename convention ", type=str)
+    parser.add_argument("-weekly", default=None, help="use T for weekly data translation (does not work)", type=str)
+    parser.add_argument("-monthly", default=None, help="use T for monthly data translation (does not work)", type=str)
     parser.add_argument("-strip", default=None, help="use T to reduce number of obs", type=str)
     parser.add_argument("-screenstats", default=None, help="set to T see more info printed to screen", type=str)
     parser.add_argument("-gzip", default=None, help="boolean, default is SNR files are gzipped after creation", type=str)
-    parser.add_argument("-par", default=None, help="parallel processes allowed", type=int)
+    parser.add_argument("-par", default=None, help="Number of parallel processes allowed", type=int)
     parser.add_argument("-timeout", default=None, help="timeout in secs, useful for some archives", type=int)
     parser.add_argument("-extension", default=None, help="optional extension to keep information like samplerate, snr, lat, lon etc", type=str)
     parser.add_argument("-debug", default=None, help="run without task queue", type=str)
@@ -104,7 +104,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
     bkg no longer a boolean input - it must be specified with archive name, i.e. bkg-igs or bkg-euref
 
-    For the nolook option :
+    To analyze your own data you have to use the nolook option :
 
     If you have the RINEX 2.11 file, the file can be in the local directory which is where you are running the code 
     or it can be in $REFL_CODE/YYYY/rinex/ssss, where ssss is the lowercase directory name for your station. 
@@ -116,11 +116,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     see the discussion in the Docker installation section, as this is my best effort to help you with this.
 
     Beyond that, you can try the -mk T option which searches other places, i.e. $REFL_CODE/rinex/ etc. I do not recommend
-    that you use this option, but it is there.  In general, you shoud use lowercase file names for RINEX 2.11 files.
+    that you use this option, but it is there.  In general, you should use lowercase file names for RINEX 2.11 files.
+
 
     If you have a RINEX3 file, you have to use the same naming convention as used by GNSS archive facilities.
     This means everything is capitalized except for the ending. The station name has 9 characters and various other 
-    parameters which can be quite confusing. Please see  this page for the details.
+    parameters which can be quite confusing. Please see this page for the details.
 
     https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html
 
@@ -347,7 +348,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         by some users. Look at the function the_makan_option in rinex2snr.py for more information.  
         The general requirement is that your RINEX 2.11 file should be normal RINEX or 
         gzipped normal RINEX. This flag allows access to Hatanaka/compressed files 
-        stored locally and in $REFL_CODE/YYYY/snr/ssss where YYYY is the year and 
+        stored locally and in $REFL_CODE/YYYY/rinex/ssss where YYYY is the year and 
         ssss is station name
 
     weekly : bool, optional, deprecated
