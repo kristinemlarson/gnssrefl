@@ -206,8 +206,8 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             print('First using the_makan_option')
                             the_makan_option(station,cyyyy,cyy,cdoy) # looks various places in your local directories
                         if not os.path.exists(r):
-                            print('Did not find the file, so now trying other names/directories')
-                            # could try this way? - look for file in localpath2. gunzip if necessary
+                            print('Looked for ', current_local+'/'+r)
+                            print('Failed, will search other names/directories')
                             allgood = get_local_rinexfile(r,localpath2)
                         if os.path.exists(r):
                             log.write('Found the RINEX 2.11 file {0:s} \n'.format(r))
@@ -1249,22 +1249,27 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
 
     if os.path.exists(r):
         missing = False
+        return
 
     if os.path.exists(r + '.gz') and missing:
         subprocess.call(['gunzip', r + '.gz'])
         missing = False
+        return
 
     if os.path.exists(r + '.Z') and missing:
         subprocess.call(['uncompress', r + '.Z'])
         missing = False
+        return
 
     if os.path.exists(rd) and missing:
         if os.path.exists(crnxpath):
             subprocess.call([crnxpath,rd])
             subprocess.call(['rm',rd])
             missing = False
+            return
         else:
-            g.hatanaka_warning(); return
+            g.hatanaka_warning(); 
+            return
 
     if os.path.exists(rd + '.gz') and missing:
         subprocess.call(['gunzip', rd + '.gz'])
@@ -1272,25 +1277,25 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
             subprocess.call([crnxpath,rd])
             subprocess.call(['rm',rd])
             missing = False
+            return
         else:
-            g.hatanaka_warning();
+            g.hatanaka_warning(); return
 
     if os.path.exists(rd + '.Z') and missing:
-        #print('type 6')
         subprocess.call(['uncompress', rd + '.Z'])
         if os.path.exists(crnxpath):
             subprocess.call([crnxpath,rd])
             subprocess.call(['rm',rd])
-            missing = False
+            missing = False; return
         else:
-            g.hatanaka_warning()
+            g.hatanaka_warning() ; return
 
     makan_warning(missing, locdir + r )
 
     if os.path.exists(locdir + r) and missing:
-        #print('type 7')
         subprocess.call(['cp', '-f',locdir + r,'.'])
         missing = False
+        return
 
     makan_warning(missing, locdir + r + '.gz')
 
@@ -1298,14 +1303,14 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
         #print('type 8')
         subprocess.call(['cp', '-f',locdir + r + '.gz' ,'.'])
         subprocess.call(['gunzip', r + '.gz'])
-        missing = False
+        missing = False; return
 
     makan_warning(missing, locdir + r + '.Z')
 
     if os.path.exists(locdir + r + '.Z') and missing:
         subprocess.call(['cp', '-f',locdir + r + '.Z','.'])
         subprocess.call(['uncompress', r + '.Z'])
-        missing = False
+        missing = False ; return
 
     makan_warning(missing, locdir + rd )
 
@@ -1314,9 +1319,9 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
         if os.path.exists(crnxpath):
             subprocess.call([crnxpath,rd])
             subprocess.call(['rm',rd])
-            missing = False
+            missing = False ; return
         else:
-            g.hatanaka_warning();
+            g.hatanaka_warning(); return
 
     makan_warning(missing, locdir + rd + '.Z')
 
@@ -1326,7 +1331,7 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
         if os.path.exists(crnxpath):
             subprocess.call([crnxpath,rd])
             subprocess.call(['rm',rd])
-            missing = False
+            missing = False ; return
         else:
             g.hatanaka_warning();
 
@@ -1338,15 +1343,15 @@ def the_makan_option(station,cyyyy,cyy,cdoy):
         if os.path.exists(crnxpath):
             subprocess.call([crnxpath,rd])
             subprocess.call(['rm',rd])
-            missing = False
+            missing = False ; return
         else:
-            g.hatanaka_warning()
+            g.hatanaka_warning() ; return
 
 def makan_warning(missing, f):
     """
-    Writes a warning
+    Writes a warning for the makan option which checks for non-standard RINEX file names
 
-    Parametesr
+    Parameters
     ----------
     missing: bool
         whether file is missing
@@ -1358,6 +1363,7 @@ def makan_warning(missing, f):
         print('Makan option, checking : ', f)
 
     return
+
 def go_from_crxgz_to_rnx(c3gz,deletecrx=True):
     """
     checks to see if rinex3 file exists, gunzip if necessary,
@@ -1436,7 +1442,7 @@ def get_local_rinexfile(rfile,localpath2):
     if os.path.exists(rfile + '.gz'):
         print('found ', curlocal + rfile + '.gz')
         subprocess.call(['gunzip', rfile + '.gz'])
-        allgood = True
+        allgood = True; return allgood
 
 
     # then look for unix compressed version local directory 
@@ -1445,7 +1451,7 @@ def get_local_rinexfile(rfile,localpath2):
     if os.path.exists(rfile + '.Z') and not allgood:
         print('found ', rfile + '.Z')
         subprocess.call(['uncompress', rfile + '.Z'])
-        allgood = True 
+        allgood = True  ; return allgood
 
     if not allgood:
         print('Looking for file: ', curlocal+rd)
@@ -1457,6 +1463,7 @@ def get_local_rinexfile(rfile,localpath2):
             if os.path.exists(rfile):
                 allgood = True
                 subprocess.call(['rm',rd])
+                return allgood
 
     # then look for hatanaka compressed and unix compressed version local directory 
     if os.path.exists(rd + '.Z') and not allgood:
@@ -1467,11 +1474,12 @@ def get_local_rinexfile(rfile,localpath2):
             if os.path.exists(rfile):
                 allgood = True
                 subprocess.call(['rm',rd])
+                return allgood
 
     # now check in 
     if not allgood:
         r = localpath2 + rfile
-        print('Checking for the file in : ', r)
+        print('Now looking for the file in : ', r)
         # hatanaka version in REFL_CODE
         rdd = localpath2 + rd
 
@@ -1480,6 +1488,7 @@ def get_local_rinexfile(rfile,localpath2):
         # cp to the local directory
             print('copying RINEX file to local area')
             subprocess.call(['cp',r,'.'])
+            return allgood
         else:
        # did not find normal rinex, so look for gzip version
             print('Now looking for the file in : ', r + '.gz')
@@ -1490,7 +1499,7 @@ def get_local_rinexfile(rfile,localpath2):
                     subprocess.call(['cp',r,'.'])
                     # now gzip the original file ...
                     subprocess.call(['gzip', r ])
-                    allgood = True
+                    allgood = True; return allgood
             # if hatanaka is stored locally
             if not allgood:
                 print('Now looking for the file in : ', rdd )
@@ -1504,6 +1513,7 @@ def get_local_rinexfile(rfile,localpath2):
                 if os.path.exists(rfile):
                     allgood = True
                     subprocess.call(['rm',rd])
+                    return allgood
 
     return allgood
 
