@@ -426,14 +426,24 @@ by also using L8.
 <img src="../_static/at01_358_208.png" width="600"/>
 
 
-###  What about L1C?
+###  L1C
 
-I would be happy to host some results from L1C - please submit a pull request 
-with the needed figures and a description of what you are comparing. I imagine
-this would require making two snr files - one with L1C and one with L1 C/A. 
-And using only the small subset of satellites that transmit L1C.
-From what I have seen, it is not much better than L1 C/A - which surprisees me.
-But I have to imagine it is receiver dependent (some receivers have terrible C/A SNR).  
+The Trimble Alloy receiver at Mitchell (MCHL) in Australia records both legacy L1 and modern L1C signals, which are available in the daily RINEX 3 files. RINEX 3 names the legacy signal "L1C" and the modern signal "L1X" (the SNR observables are thus "S1C" and "S1X"). RINEX 2 does not support both signals simultaneously, so two separate files must be created. For example, using gfzrnx:
+
+```
+gfzrnx -finp FILE.rnx -fout OUTPUT_L1C.rnx -ot S1C -vo 2
+gfzrnx -finp FILE.rnx -fout OUTPUT_L1X.rnx -ot S1X -vo 2
+```
+
+These files can be renamed and processed using rinex2snr/gnssir. First, the legacy results for MCHL 2023/day 1:
+
+<img src="../_static/L1C_TrimbleAlloy.png" width="600"/>
+
+And the modern signal results, showing marginally higher peaks in the LSP: 
+
+<img src="../_static/L1X_TrimbleAlloy.png" width="600"/>
+
+There is less data for L1X as the modern signal is only broadcast by Block III satellites, of which there are currently only 10 (in Feb 2025).  
 
 <HR>
 
