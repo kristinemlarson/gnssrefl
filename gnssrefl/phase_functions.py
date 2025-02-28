@@ -249,10 +249,6 @@ def read_apriori_rh(station,fr):
         column 7 is maximum azimuth degrees for the quadrant
     """
     result = []
-    # do not have time to use this
-    file_manager = FileManagement(station, FileTypes.apriori_rh_file)
-    apriori_results = file_manager.read_file(comments='%')
-    # for l2c
     myxdir = os.environ['REFL_CODE']
     apriori_path_f = myxdir + '/input/' + station + '_phaseRH.txt'
 
