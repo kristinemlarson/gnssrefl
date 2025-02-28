@@ -500,6 +500,22 @@ def dec31(year):
 
     return doy
 
+def what_is_today():
+    """
+    figures out year and doy for the current date on your computer
+
+    Returns
+    -------
+    year
+    doy 
+    """
+    x=date.today()
+    year = int(str(x)[0:4])
+    jan1 = datetime.date(year,1,1)
+    doy = int((x-jan1).days) + 1
+
+    return year,doy
+
 def ymd2doy(year,month,day):
     """
     Calculates day of year and other date strings
@@ -7494,6 +7510,8 @@ def query_coordinate_file(station):
     foundit = False
     lat = 0; lon = 0; ht = 0;
     # if the local coordinate file exists
+    # apparently loadtxt has a ndim input - which would avoid all this nonsense
+    # when someone has a single line in their file.
     if os.path.isfile(f):
         allofit =np.loadtxt(f,usecols = (0,1,2,3), dtype='str',comments= '%')
         nx = np.shape(allofit)

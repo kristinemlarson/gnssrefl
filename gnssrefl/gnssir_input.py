@@ -334,9 +334,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     if xyz:
         xyz = [lat, lon, height]
-        print(xyz)
+        print('Cartesian coordinates ', xyz)
         lat, lon, height = g.xyz2llhd(xyz)
-        print(lat,lon,height)
+        print('LLH ', lat,lon,height)
 
     if query_unr:
         # try to find the coordinates  at UNR

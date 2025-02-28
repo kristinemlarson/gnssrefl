@@ -77,12 +77,13 @@ def quicklook(station: str, year: int, doy: int,
         Only shows azimuths between 10 and 180
 
     If your site name is in the GNSS-IR database (which is generated from the Nevada Reno geodesy group), 
-    or in the local coordinates database,d 
+    or in the local coordinates database, 
     a standard refraction correction is applied. If not, it does not.  This is most relevant for very very
     tall sites, i.e. > 200 meters. Refraction models are always applied in the gnssir module.
 
-    If users would like the refraction correction to be applied here for stations that are not in the standard database,
-    they need to submit a pull request making that possible. One option is to read from an existing gnssir_input 
+    If users would like the refraction correction to be applied here for stations 
+    that are not in the standard database, they need to submit a pull request making 
+    that possible. One option is to read from an existing gnssir_input 
     json file. That is what is done in nmea2snr and invsnr_input.
 
     Parameters
