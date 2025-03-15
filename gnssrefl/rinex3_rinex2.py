@@ -37,6 +37,7 @@ def main():
 
     args = parser.parse_args()
     rinex3 = args.rinex3
+    rinex3_basename = os.path.basename(rinex3)  # Extract just the filename
 
     gexe = g.gfz_version()
 
@@ -45,9 +46,9 @@ def main():
     if (args.gpsonly == 'True') or (args.gpsonly == 'T'):
         gpsonly = True
 
-    station = rinex3[0:4].lower()
-    cyyyy = rinex3[12:16]
-    cdoy = rinex3[16:19]
+    station = rinex3_basename[0:4].lower()
+    cyyyy = rinex3_basename[12:16]
+    cdoy = rinex3_basename[16:19]
     year = int(cyyyy)
     doy = int(cdoy)
 
