@@ -148,9 +148,6 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
 
 # old loop thru years and days - will fix later. now avoiding retyping
     if True:
-        # make log directory ... used to be in conv2snr
-        log, errorlog, exedir = set_rinex2snr_logs(station,year,doy)
-        print('Log for Fortran translation : ', errorlog)
 
         ann = g.make_nav_dirs(year)
         cyyyy = str(year)
@@ -159,11 +156,6 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
             csnr = str(isnr)
             cdoy = '{:03d}'.format(doy)
             cyy = cyyyy[2:4]
-            # this is absurd - someone should fix this ... 
-            #if (year<2000):
-            #    cyy = '{:02d}'.format(year-1900)
-            #else:
-            #    cyy = '{:02d}'.format(year-2000)
             # first, check to see if the SNR file exists
             fname =  quickname(station,year,cyy,cdoy,csnr)
             if screenstats:
@@ -189,6 +181,11 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                 illegal_day = True
 
             if (not illegal_day) and (not snre):
+                # make log directory ... 
+                log, errorlog, exedir,gen_log = set_rinex2snr_logs(station,year,doy)
+                print('Fortran translation log: ', errorlog)
+                print('General log: ', gen_log)
+
                 r = station + cdoy + '0.' + cyy + 'o'
                 rgz = station + cdoy + '0.' + cyy + 'o.gz'
                 localpath2 =  xdir + '/' + cyyyy + '/rinex/' + station + '/'
@@ -1571,12 +1568,12 @@ def set_rinex2snr_logs(station,year,doy):
 
 
     general_log = logdir + '/' + logname + '.gen'
-    print('Feedback about the RINEX translation: ', general_log)
+    #print('Feedback about the RINEX translation: ', general_log)
 
     errorlog = logdir + '/' + logname
     #print('Log created by the fortran code: ', errorlog)
 
     log = open(general_log, 'w+')
 
-    return log, errorlog, exedir
+    return log, errorlog, exedir, general_log
 

@@ -250,8 +250,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     xdir = os.environ['REFL_CODE']
 
     lsp = sd.pickup_subdaily_json_defaults(xdir, station, extension)
-    print(lsp['freqs'])
-    fr = lsp['freqs']
+    if 'freqs' in lsp:
+        fr = lsp['freqs']
 
     if subdir is None: # not set on the command line
         if lsp['subdaily_subdir'] is None: 
@@ -361,6 +361,9 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
     year_list = list(range(year, year_end+1))
 
+    close_figures = False
+    if year != year_end:
+        close_figures = True
     if txtfile_part2 is None:
         if txtfile_part1 == '':
             print('Will pick up and concatenate daily result files')
@@ -391,7 +394,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
             ntv, obstimes, fname, fname_new = t.readin_and_plot(station, y, doy_st, doy_en, plt, \
                     extension, sigma, csv, azim1, azim2, ampl, peak2noise, txtfile_part1, \
-                    h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma,freqs=fr)
+                    h1,h2,kplt,txtdir,default_usage,hires_figs,fs,alt_sigma=alt_sigma,freqs=fr,close_figures=close_figures)
             outputs.append(fname_new)
 
         haveObstimes = True

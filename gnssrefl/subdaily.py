@@ -278,6 +278,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     # felipe nievinski alternate definition
     alt_sigma = kwargs.get('alt_sigma', False)
     freqs = kwargs.get('freqs', [])
+    # this is set if more than one year of data are going to be read in
+    close_figures = kwargs.get('close_figures', False)
 
     # used different name here
     csv2= writecsv
@@ -403,12 +405,12 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
         if default_usage:
-            sd.numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year)
+            sd.numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year,close_figures)
             # was testing some things out
             #testing_nvals(Gval, Rval, Eval, Cval)
 
-            sd.two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs)
-            sd.stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt,hires_figs,year)
+            sd.two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs,close_figures)
+            sd.stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt,hires_figs,year,close_figures)
             sd.print_badpoints(tv[ii,:],residuals[ii],txtdir,real_residuals[ii])
         else:
             # make both plots cause life is short
@@ -439,6 +441,7 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
         print('Percent of observations removed: ', round(100*(NV-nr)/NV,2))
     
     # now return the names of the output files ... 
+     
 
     return tv,otimes, fname, fname_new
 

@@ -85,6 +85,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
 
     """
 
+    #print('>>>> ', station, year, doy, snr)
     #print('debug', debug)
     #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
@@ -209,7 +210,6 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         RH_apriori = 5 # completely made up
 
     #if screenstats:
-    print('Refraction parameters (pressure, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
 
     if (irefr >= 3) & (irefr <= 6):
         # N_ant is the index of refraction
@@ -229,7 +229,6 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     twoDays = False
     obsfile2= '' # dummy value for name of file for the day before, when we get to that
     fname, resultExist = g.LSPresult_name(station,year,doy,extension) 
-    print('Results are written to:', fname)
     if screenstats:
         logid, logfilename = open_gnssir_logfile(station,year,doy,extension)
     else:
@@ -242,6 +241,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         print('>>>>> The result file already exists for this day and you have selected the do not overwrite option')
         #sys.exit()
     else:
+        print('LSP Results will be written to:', fname)
+        print('Refraction parameters (pressure, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
         # uncompress here so you should not have to do it in read_snr_multiday ...
         obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
 

@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+
+## 3.10.10
+
+Individual subdaily year plots (part 1 of the code) are still created but they are not opened on the screen
+anymore. the names of the plots are output to the screen.  The final multi-year plots will continue to be shown on the screen
+Why? matplotlib was complaining about having too many figures open.
+
+small bug fixed in subdaily when it could not compute the orthometric height - Hortho. This is a rare occurrence, but
+might as well fix it. This is triggered by using a station name for which there is no json (and thus
+no lat,lon,ellipsoidal ht).
+
 ## 3.10.9
 
 Changed some inconsistencies in subdaily for multi-year processing. rhdot3 plot

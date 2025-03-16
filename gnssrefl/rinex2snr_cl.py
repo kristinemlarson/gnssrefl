@@ -73,6 +73,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
               screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
               par : int=None, timeout : int = 0, extension : str='', debug: bool = False ):
     """
+    Note: rinex2snr means rinex TO snr. It is not a tool that is only meant for version 2 rinex files.
+
     rinex2snr translates RINEX version 2.11 and 3+ files to a new file in 
     the SNR format. This function will also fetch orbit files for you.
     RINEX obs files are provided either by the user or fetched from a 
@@ -607,7 +609,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
                 sys.exit()
     else:
         # rinex2
-        print('Station ', station, ' >>> RINEX 2.11')
+        print('Station ', station, ' has four characters, assume RINEX 2.11 format')
 
         if rate == 'high':
             if (archive == 'all') & (not nolook):

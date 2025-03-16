@@ -128,7 +128,7 @@ def testing_nvals(Gval, Rval, Eval, Cval):
     return
 
 
-def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year):
+def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year,closefigure):
     """
     makes the plot that summarizes the number of satellites in each
     constellation per epoch
@@ -157,6 +157,8 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year
         try to plot high resolution
     year : int
         calendar year
+    closefigure : bool
+
 
     """
 
@@ -199,6 +201,8 @@ def numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year
 
     plt.savefig(plotname,dpi=300)
     print('Plot file saved as: ', plotname)
+    if closefigure:
+        plt.close()
 
 
 def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
@@ -305,7 +309,7 @@ def rh_plots(otimes,tv,station,txtdir,year,d1,d2,percent99):
     plt.savefig(plotname,dpi=300)
 
 
-def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
+def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs,close_figures):
     """
     This actually makes three stacked plots - not two, LOL
     It gives an overview for quality control
@@ -330,6 +334,10 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
         maximum day of year
     hires_figs : bool
         true for eps instead of png
+    close_figures: bool
+        whether plot will come to the screen
+        this is turned off specifically when too many
+        plot windows are opened
 
     """
     if d1 == 1 and d2 == 366:
@@ -416,8 +424,10 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs):
     else:
         plt.savefig(plotname,dpi=300)
     print('Plot file saved as: ', plotname)
+    if close_figures:
+        plt.close()
 
-def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs,year):
+def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs,year,close_figures):
     """
     makes a plot of the reflector heights before and after minimal editing
 
@@ -462,6 +472,8 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
 
     plt.savefig(plotname,dpi=300)
     print('Plot file saved as: ', plotname)
+    if close_figures:
+        plt.close()
 
     #    fig=plt.figure(figsize=(10,6))
     fig = plt.figure(figsize=(10,6))
@@ -505,8 +517,12 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
         plotname = plotstem + '.png'
         plt.savefig(plotname,dpi=300)
 
+    # why is this out here?
     plt.ylim((savey1, savey2))
     print('Plot file saved as: ', plotname)
+    if close_figures:
+        plt.close()
+
     if kplt:
         fig = plt.figure()
         ax1 = fig.add_subplot(211)
@@ -518,6 +534,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
         plt.ylim((-0.1, 1.1*np.max(ddd)))
         plt.suptitle(f"St Michael, Alaska ", size=12)
         plt.grid()
+
 
 def writeout_spline_outliers(tvd_bad,txtdir,residual,filename):
     """
@@ -777,7 +794,14 @@ def find_ortho_height(station,extension):
 
     """
 
-    lsp = guts2.read_json_file(station, extension)
+    # this will create a nonsense Hortho
+    lsp = guts2.read_json_file(station, extension,noexit=True)
+
+    if not lsp:
+        print('No json - so no orthometric height can be determined')
+        print('Using zero - but that is far from ideal')
+        return 0
+
 
     if 'Hortho' in lsp:
         # found in the lsp file
