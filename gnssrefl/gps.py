@@ -1306,6 +1306,9 @@ def myscan(rinexfile):
 
 def read_files(year,month,day,station):
     """
+    who wrote this and who is it for?
+    I do not believe it is for reflectometry and should be removed.
+
     """   
 
     doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)

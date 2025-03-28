@@ -461,9 +461,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
 
     if 'archive' in lsp:
-        if lsp['archive'] is not None:
-            archive = lsp['archive']
-            print('Using archive value of ', archive, ' from the json')
+        if archive == 'all':
+            # that is the commandline default , so ok to change it to what you
+            # have in the json
+            if lsp['archive'] is not None:
+                archive = lsp['archive']
+
+    print('Using archive value of ', archive)
 
     if ('samplerate' in lsp):
         if lsp['samplerate'] is not None:

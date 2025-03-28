@@ -16,6 +16,8 @@ def main():
 
     It will delete your RINEX 3 file!
 
+    This code has been updated so that your input filename can include a path
+
     Parameters
     ----------
     rinex3 : str
@@ -33,7 +35,7 @@ def main():
     parser.add_argument("rinex3", help="rinex3 filename", type=str)
     parser.add_argument("-rinex2", help="rinex2 filename", type=str,default=None)
     parser.add_argument("-dec", help="decimation value (seconds)", type=int,default=None)
-    parser.add_argument("-gpsonly", help="remove everything except GPS", type=str,default=None)
+    parser.add_argument("-gpsonly", help="remove everything except GPS (T or True inputs allowed)", type=str,default=None)
 
     args = parser.parse_args()
     rinex3 = args.rinex3

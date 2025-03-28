@@ -75,7 +75,8 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
          whether to use eps instead of png
 
     """
-    if f not in [1, 2, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302,306]:
+    # March 28, 2025 made 307 no longer illegal
+    if f not in [1, 2, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302,306,307]:
         print('As far as I know, this is an illegal frequency for this software. Exiting. ', f)
         sys.exit()
     # it really should only mean whether you want to run plt.show()

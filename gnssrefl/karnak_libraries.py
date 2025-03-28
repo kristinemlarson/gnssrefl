@@ -202,7 +202,10 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
     if (archive == 'unavco'):
         # original dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
         #url1 =      'https://data-idm.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
-        url1 =      'https://data.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
+        #url1 =      'https://data.unavco.org/archive/gnss/rinex3/obs/' + cydoy + file_name
+        # change to earthscope
+        url1 =      'https://data.earthscope.org/archive/gnss/rinex3/obs/' + cydoy + file_name
+        print(url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1,file_name)
         s2 = time.time()
         if debug:
@@ -250,9 +253,6 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
         elif (archive == 'nrcan'):
             dir1 = 'https://cacsa.nrcan.gc.ca/gps/data/gpsdata/' + cyy + cdoy  + '/' + cyy + 'd' + '/'
             wget.download(dir1+file_name,file_name)
-        #elif (archive == 'unavco-old'):
-        #    dir1 = 'https://data.unavco.org/archive/gnss/rinex3/obs/' + cyyyy + '/' + cdoy + '/'
-        #    wget.download(dir1+file_name,file_name)
         elif (archive == 'gfz'):
             dir1 = 'ftp://isdcftp.gfz-potsdam.de/gnss/data/daily/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
@@ -437,7 +437,7 @@ def rinex2names(station,year,doy):
 
 def universal_rinex2(station, year, doy, archive,screenstats):
     """
-    The long-awaited seamless archive for rinex 2 files ...
+    The long-awaited seamless archive for rinex 2.11 files ...
 
     Parameters
     ----------
@@ -482,25 +482,27 @@ def universal_rinex2(station, year, doy, archive,screenstats):
         file_name = oname
         if os.path.exists(file_name):
             foundit = True
-    #elif (archive == 'unavco-old'):
-    #    dir1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy
-    #    foundit, file_name = gogetit(dir1, dname, '.Z'); 
-    #    if not foundit:
-    #        foundit, file_name = gogetit(dir1, oname, '.Z')
     elif (archive == 'unavco'):
         #url1 = 'https://data-idm.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
-        url1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
+        #url1 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
+        # march 20, 2025 preparing for the end of data.unavco.org
+        url1 = 'https://data.earthscope.org/archive/gnss/rinex/obs/' + cydoy + dname + '.Z'
+        print(url1)
+
         #if screenstats:
         #    print(url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1, dname + '.Z')
         if not foundit:
-            url2 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
+            #url2 = 'https://data.unavco.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
+            # end of unavco ...
+            url2 = 'https://data.earthscope.org/archive/gnss/rinex/obs/' + cydoy + oname + '.Z'
             #if screenstats:
             #    print(url2)
             foundit,file_name = kelly.the_kelly_simple_way(url2, oname + '.Z')
     elif (archive == 'special'):
         #print('testing out new protocol at unavco')
-        url1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy + oname + '.gz'
+        #url1 = 'https://data.unavco.org/archive/gnss/products/reflectometry/' + cydoy + oname + '.gz'
+        url1 = 'https://data.earthscope.org/archive/gnss/products/reflectometry/' + cydoy + oname + '.gz'
         #if screenstats:
         #    print(url1)
         foundit,file_name = kelly.the_kelly_simple_way(url1, oname + '.gz')

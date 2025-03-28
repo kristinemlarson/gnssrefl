@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 3.11.0
+
+Changing unavco URL addresses to earthscope.
+The archive option will continue to be unavco.
+Per email from Earthscope, this change is strongly encouraged (and for some 
+access tools required) as of July 2, 2025.
+
+Allow frequency 307 into quickLook (already allowed in gnssir)
+
 ## 3.10.10
 
 Individual subdaily year plots (part 1 of the code) are still created but they are not opened on the screen
