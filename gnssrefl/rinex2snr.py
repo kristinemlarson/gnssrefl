@@ -610,6 +610,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
             print('The orbit file you requested does not exist.')
 
     log.close()
+    # 
 
     return True
 
@@ -1557,8 +1558,11 @@ def set_rinex2snr_logs(station,year,doy):
     exedir : str
         location of the executable directdory
 
+    general_log : str
+        name of the more general error log
     """
 
+    print(station,year,doy)
     xdir = os.environ['REFL_CODE']
 
     # universal location for the log directory

@@ -58,7 +58,7 @@ def main():
         sys.exit()
 
     #set logs  - this is also used by rinex2snr
-    log, errorlog, exedir = r.set_rinex2snr_logs(station4ch,year,doy)
+    log, errorlog, exedir,genlog = r.set_rinex2snr_logs(station4ch,year,doy)
 
     if (args.name_fail == 'T') or (args.name_fail == 'True'):
         # this is an attempt to help those people impacted by this activity.
@@ -116,6 +116,8 @@ def main():
     else:
         log.write('ERROR: your input file does not exist: {0:s} \n'.format(rinex3))
         log.close()
+        genlog.close()
+
         sys.exit()
 
     if os.path.isfile(rinex2):

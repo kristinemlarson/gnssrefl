@@ -76,7 +76,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
 
     """
     # March 28, 2025 made 307 no longer illegal
-    if f not in [1, 2, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302,306,307]:
+    #if f not in [1, 2, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302,306,307]:
+    # May 10, 2025 added more Beidou
+    if f not in [1, 2, 20, 5, 101, 102, 201, 205, 206, 207, 208, 301,302,305,306,307,308]:
         print('As far as I know, this is an illegal frequency for this software. Exiting. ', f)
         sys.exit()
     # it really should only mean whether you want to run plt.show()

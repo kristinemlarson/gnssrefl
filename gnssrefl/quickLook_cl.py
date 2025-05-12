@@ -108,7 +108,7 @@ def quicklook(station: str, year: int, doy: int,
 
             201,205,206,207,208 : GALILEO E1 E5a E6,E5b,E5
 
-            302,306,307 : BEIDOU B1, B3, B2
+            301,302,305,306,307,308 : various BEIDOU 
 
     reqAmp : int or array_like, optional
         Lomb-Scargle Periodogram (LSP) amplitude significance criterion in volts/volts.

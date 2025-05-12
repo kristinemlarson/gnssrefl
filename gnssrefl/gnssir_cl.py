@@ -154,7 +154,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
 
             201, 205,206,207,208 : GALILEO E1, E5a,E6,E5b,E5
 
-            302,306,307 : BEIDOU B1, B3, B2 (not sure we do 307)
+            301,302,305,306,307,308 : BEIDOU (See RINEX 3 format description for details)
 
     ampl : float, optional
         minimum spectral peak amplitude. default is None

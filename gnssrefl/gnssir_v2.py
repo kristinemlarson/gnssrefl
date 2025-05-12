@@ -1022,14 +1022,18 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid):
         column = 7
     elif f in [2,20,102,302]:
         column = 8
-    elif f in [5, 205]:
+        # added beidou
+    #elif f in [5, 205]:
+    elif f in [5, 205,305]:
         column = 9
 #   these are galileo frequencies (via RINEX definition)
     elif f in [206,306]:
         column = 6
     elif f in [207,307]:
         column = 10
-    elif (f == 208):
+        # added beidou
+    #elif (f == 208):
+    elif f in [208,308]:
         column = 11
     else:
         column = 0

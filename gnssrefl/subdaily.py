@@ -1138,7 +1138,7 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
 
     print('Freq  Bias  Sigma   NumObs ')
     print('       (m)   (m)       ')
-    for f in [1, 2, 20, 5, 101, 102, 201, 205,206,207,208,302,306,307]:
+    for f in [1, 2, 20, 5, 101, 102, 201, 205,206,207,208,302,306,307,305,301,308]:
         ff = (tvd_new[:,10] == f)
         ret = residual_after[ff]
         if len(ret) > 0:

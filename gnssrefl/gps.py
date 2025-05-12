@@ -72,16 +72,25 @@ class constants:
     wgL8 = c/(gal_L8*1e6)
 
 #   beidou frequencies and wavelengths
-    bei_L2 = 1561.098
-    bei_L7 = 1207.14
-    bei_L6 = 1268.52
+#   these values are defined in Rinex 3 
+
+    bei_L2 = 1561.098 # B1-2
+    bei_L7 = 1207.14 # B2b, BDS-2
+    bei_L6 = 1268.52 # B3
+
+
     wbL2 = c/(bei_L2*1e6)
-    # these values are defined in Rinex 3 
-    wbL7 = c/(bei_L7*1e6)
     wbL6 = c/(bei_L6*1e6)
-    # does this even exist? I am using gps l5 for now
-    bei_L5 = 1176.45
+    wbL7 = c/(bei_L7*1e6)
+
+    bei_L5 = 1176.45 # BDS-3
     wbL5 = c/(bei_L5*1e6)
+
+    bei_L1 = 1575.42
+    wbL1 = c/(bei_L1*1e6)
+
+    bei_L8 = 1191.795
+    wbL8 = c/(bei_L8*1e6)
 
 #   Earth rotation rate used in GPS Nav message
     omegaEarth = 7.2921151467E-5 #	%rad/sec
@@ -112,6 +121,8 @@ def is_it_legal(freq):
     """
     # currently allowed
     legal_list = [1,2,20,5,101,102,201,205,206,207,208,302,306,307]
+    # new list as of May 10 ,2025, adding more Beidou
+    legal_list = [1,2,20,5,101,102,201,205,206,207,208,302,306,307,301,305,308]
     # assume legal
     legal = True
 
@@ -132,6 +143,8 @@ def myfavoriteobs():
     gobblygook = 'G:S1C,S1X,S2X,S2L,S2S,S2X,S5I,S5Q,S5X+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
     # testing C vs P for glonass
     #gobblygook = 'G:S1C,S1X,S2X,S2L,S2S,S2X,S5I,S5Q,S5X+R:S1C,S1P,S2C,S2P+E:S1,S5,S6,S7,S8+C:S2C,S7C,S6C,S2I,S7I,S6I,S2X,S6X,S7X'
+    # 2025 May 10, adding more Beidou for Peng Feng 
+    gobblygook = 'G:S1C,S1X,S2X,S2L,S2S,S2X,S5I,S5Q,S5X+R:S1P,S1C,S2P,S2C+E:S1,S5,S6,S7,S8+C:S2C,S6C,S7C,S2I,S6I,S7I,S1X,S2X,S5X,S6X,S7X,S8X,S1P,S5P'
 
     return gobblygook
 
@@ -1669,12 +1682,16 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
         dat = s2
     if (f == 5) or (f==205):
         dat = s5
+    # added beidou 2025 may 10
+    if (f == 305) :
+        dat = s5
 #   these are galileo frequencies (via RINEX definition)
     if (f == 206) or (f == 306):
         dat = s6
     if (f == 207) or (f == 307):
         dat = s7
-    if (f == 208):
+    if (f == 208) or (f == 308):
+    #if (f == 208):
         dat = s8
 #   get the scaling factor for this frequency and satellite number
     cf = arc_scaleF(f,satNu)
@@ -1682,6 +1699,8 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
 #   if not, frequency does not exist, will be tripped by Nv
 #   this does remove the direct signal component - but gets you ready to do that
     #print('cf before removeDC', cf,' freq and sat ', f, satNu)
+
+    #added new beidou  2025 may 10
     if (satNu > 100):
         # check that there are even any data because this is crashing on files w/o SNR beidou data in them
         if (f == 307):
@@ -1695,6 +1714,11 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
             else:
                 x=[]; y=[]; sat=[];azi=[];seconds=[];edot =[]
         elif (f == 208):
+            if len(s8) > 0:
+                x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds)
+            else:
+                x=[]; y=[]; sat=[];azi=[];seconds=[];edot =[]
+        elif (f == 308):
             if len(s8) > 0:
                 x,y,sat,azi,seconds,edot  = removeDC(dat, satNu, sat,ele, pele, azi,az1,az2,edot,seconds)
             else:
@@ -1832,15 +1856,20 @@ def arc_scaleF(f,satNu):
 #
 #   add beidou 18oct15
 #  i am confused about this ...
+# added more beidou 2025 may 10
     if (f > 300) and (f < 310):
         if (f == 301):
             w = constants.wbL1
         if (f == 302):
             w = constants.wbL2
+        if (f == 305):
+            w = constants.wbL5
         if (f == 306):
             w = constants.wbL6
         if (f == 307):
             w = constants.wbL7
+        if (f == 308):
+            w = constants.wbL8
 
 #   glonass satellite frequencies
     if (f == 101) or (f == 102):
@@ -1953,8 +1982,9 @@ def find_satlist_wdate(f,snrExist,year,doy):
     if f == 202:
         satlist = []
 #   pretend there are 32 Beidou satellites for now
+#   may 10 ,2025 pretend there are 61 Beidou satellites for now
     if (f > 300):
-        satlist = np.arange(301,333,1)
+        satlist = np.arange(301,361,1)
 
     # minimize screen output
     #if len(satlist) == 0:
@@ -3754,6 +3784,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log):
     lastbit =  r3_filename[-3:]
     gobblygook = myfavoriteobs()
     gobblygook_gps = myfavoritegpsobs()
+    print(gobblygook)
 
     if not os.path.exists(gexe):
         log.write('gfzrnx executable does not exist and this file cannot be translated. Exiting \n')
@@ -4575,18 +4606,20 @@ def ftitle(freq):
     out['5'] = 'GPS L5'
     out['101'] = 'Glonass L1'
     out['102'] = 'Glonass L2'
+
     out['201'] = 'Galileo L1'
     out['205'] = 'Galileo L5'
     out['206'] = 'Galileo L6'
     out['207'] = 'Galileo L7'
     out['208'] = 'Galileo L8'
-    # still need to work on these because it is confusing!...
+
     out['301'] = 'Beidou L1'
     out['302'] = 'Beidou L2'
     out['305'] = 'Beidou L5'
     out['306'] = 'Beidou L6'
     out['307'] = 'Beidou L7'
-    if freq not in [1,2, 20,5,101,102,201,205,206,207,208,301,302,305,306,307]:
+    out['308'] = 'Beidou L8'
+    if freq not in [1,2, 20,5,101,102,201,205,206,207,208,301,302,305,306,307,308]:
         returnf = ''
     else:
         returnf = out[f]

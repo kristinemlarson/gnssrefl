@@ -453,9 +453,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     # this is the case for only GPS, but the good L2 
     lsp['freqs'] = [1, 20, 5]
     if allfreq is True:
-        # 307 was making it crash.  did not check as to why
         # includes glonass, galileo, and beidou
-        lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302, 306]
+        lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302, 306,307]
 
     if l1 is True:
         lsp['freqs'] = [1]

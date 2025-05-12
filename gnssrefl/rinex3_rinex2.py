@@ -69,7 +69,8 @@ def main():
         sys.exit()
 
 
-    log,nada,exedir = r.set_rinex2snr_logs(station,year,doy)
+    #print(station,year,doy)
+    log,nada,exedir,genlog = r.set_rinex2snr_logs(station,year,doy)
     if os.path.isfile(rinex3):
         log.write('WARNING: your RINEX 3 file will be deleted.')
         log.write('Your RINEX 3 input file does exist: {0:s} \n'.format(rinex3))
