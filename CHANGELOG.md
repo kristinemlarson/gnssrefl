@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.12.1
+
+I added new plot to subbaily - after large outlier removal (first section), it now makes a 
+plot without the outliers. This is written to disk - not displayed to screen. Location 
+and name of file is written to the screen.
+
 ## 3.12.0
 
 Added new Beidou frequencies. See [issues](https://github.com/kristinemlarson/gnssrefl/issues/342) for more information.

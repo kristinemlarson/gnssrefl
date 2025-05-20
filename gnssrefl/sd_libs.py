@@ -475,6 +475,27 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     if close_figures:
         plt.close()
 
+
+    # plot for felipe
+    plt.figure(figsize=(10,5))
+    plt.plot(tv[:,5],tv[:,2], '.',markersize=4,label='obs')
+    #plt.plot(tv[ii,5],tv[ii,2], 'ro',markersize=4,label='outliers')
+    plt.xlabel('Azimuth (degrees)')
+    plt.ylabel('Reflector Height (m)')
+    plt.title(station.upper() + ': Quick Plot of RH with respect to Azimuth')
+    plt.gca().invert_yaxis()
+    plt.legend(loc="best")
+    plt.grid()
+    plotname_stem = txtdir + '/' + station + '_' + str(year) + '_no_outliers_wrt_az'
+    if hires_figs:
+        plotname = plotname_stem + '.eps'
+    else:
+        plotname = plotname_stem + '.png'
+
+    plt.savefig(plotname,dpi=300)
+    print('Plot file without outliers saved as: ', plotname)
+    plt.close()
+
     #    fig=plt.figure(figsize=(10,6))
     fig = plt.figure(figsize=(10,6))
     colors = tv[:,5]
