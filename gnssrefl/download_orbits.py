@@ -184,8 +184,9 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 elif (pCtr == 'gnss3') or (pCtr == 'gnss-gfz'):
                     # use GFZ ftp site instead of CDDIS
                     if (year >= 2024):
+                        print('this path to orbits has apparently been removed')
                         filename, fdir, foundit = g.newish_gfz_orbits(year,month,day, 'final')
-                    else:
+                    if not foundit:
                         filename, fdir, foundit = g.gbm_orbits_direct(year, month, day)
                 elif pCtr == 'gnss2':
                 # use IGN instead of CDDIS

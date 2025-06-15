@@ -41,6 +41,7 @@ import gnssrefl.EGM96 as EGM96
 import gnssrefl.rinex2snr as rnx
 import gnssrefl.sd_libs as sd
 import gnssrefl.kelly as kelly
+import gnssrefl.utils as u
 
 # for future ref
 #import urllib.request
@@ -885,6 +886,7 @@ def orbfile_cddis(name, year, secure_file, secure_dir, file2):
         gzip = True
     else:
         gzip = False
+    print('Searching for ', secure_dir, secure_file)
     try:
         cddis_download_2022B(secure_file, secure_dir)
     except:
@@ -3642,7 +3644,9 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     elif (orbtype == 'gnss3') or (orbtype == 'gnss-gfz'):
         if (year >= 2024):
             f,orbdir,foundit=newish_gfz_orbits(year,month,day,'final')
-        else:
+        #else:
+        # try try again?
+        if not foundit :
             f,orbdir,foundit=gbm_orbits_direct(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
@@ -6307,7 +6311,6 @@ def check_navexistence(year,month,day):
     nfile = navdir + '/' + navname
     if not os.path.exists(navdir):
         subprocess.call(['mkdir',navdir])
-    #print('Looking for ', navname, navdir)
 
     if os.path.exists(nfile):
         foundit = True
@@ -6398,33 +6401,38 @@ def checkEGM():
 
     """
     foundfile = False
+    ok = u.check_environment()
+    if not ok:
+        print('Required environment variables not set. Exiting.')
+
     xdir = os.environ['REFL_CODE']
     matfile = 'EGM96geoidDATA.mat'
-    localdir = xdir + '/Files/'
+    localdir = xdir + '/Files'
+    #print('local directory location ', localdir)
     if not os.path.isdir(localdir):
         print('Making ', localdir)
         subprocess.call('mkdir',localdir)
 
-    egm = localdir + matfile
+
     if 'REFL_CODE' in os.environ:
-        egm = localdir + matfile
+        egm = localdir + '/' + matfile
         interiorfile = 'gnssrefl/' + matfile
         if os.path.isfile(egm):
-            #print('EGM96 file exists')
+            print('EGM96 file exists')
             foundfile = True
         elif os.path.isfile(interiorfile):
-            print('cp EGM96 file to where it belongs')
+            print('cp existing copy of EGM96 file to where it belongs')
             subprocess.call(['cp',interiorfile, localdir])
             foundfile = True
         else:
-            print('EGM96 file does not exist. We will try to download and store it in ',localdir)
+            print('EGM96 file does not exist. We will try to download for you and store it in ',localdir)
             githubdir = 'https://raw.githubusercontent.com/kristinemlarson/gnssrefl/master/docs/'   
-            wget.download(githubdir+matfile, localdir + matfile)
+            wget.download(githubdir+matfile, localdir + '/' + matfile)
             if os.path.isfile(egm):
-                print('successful download, EGM file exists')
+                print('successful download, EGM96 file now exists')
                 foundfile = True
             else:
-                print('unsuccessful download')
+                print('unsuccessful download of the EGM96 file')
     else:
         print('The REFL_CODE environment variable has not been set.')
 

@@ -161,3 +161,7 @@ How to make a new github release?
 
 myAnimation.gif is in the EarthScopeLecture folder in Presentations.
 Need to find a better place for it
+
+# for listings of ftp sites
+
+~/Documents/Code/Listings

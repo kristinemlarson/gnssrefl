@@ -38,6 +38,8 @@ ENV PATH="/etc/gnssrefl/exe:$PATH"
 COPY pyproject.toml README.md meson.build /usr/src/gnssrefl/
 #COPY pyproject.toml README.md setup.py /usr/src/gnssrefl/
 COPY gnssrefl /usr/src/gnssrefl/gnssrefl
+# might as well install this EGM 96 file
+COPY gnssrefl/EGM96geoidDATA.mat /etc/gnssrefl/refl_code/Files
 COPY notebooks/learn-the-code /etc/gnssrefl/notebooks/learn-the-code
 COPY notebooks/use-cases /etc/gnssrefl/notebooks/use-cases
 RUN pip3 install --no-cache-dir /usr/src/gnssrefl

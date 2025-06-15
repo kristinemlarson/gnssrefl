@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.13.0
+Fixing a bug in the docker for Windows user.  Used slash twice in a filename???  for EGM96 file.
+This doesn't cause a problem on a mac or maybe other machines. But it was found
+by someone using Windows and the Docker. And there is no reason to have double slashes.
+Also went ahead and installed it for the Docker. Hopefully.
+
 ## 3.12.1
 
 I added new plot to subbaily - after large outlier removal (first section), it now makes a 
