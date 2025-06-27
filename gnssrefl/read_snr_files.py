@@ -5,6 +5,9 @@ import os
 import subprocess 
 import sys
 
+# I am skeptical that this is being used ... perhaps in code in soil
+# moisture module that has not been udpated.
+
 def read_snr_multiday(obsfile,obsfile2,twoDays,dec=1):
     """
     originally meant to make snr arrays longer than a day to take care
@@ -302,13 +305,15 @@ def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays,gzip):
         whether you want to gzip/gunzip the file
 
     """
+
+    # apparently written before I knew how to use booleans in python
     if gzip:
         if (os.path.isfile(obsfile) == True):
             subprocess.call(['gzip', '-f', obsfile])
         if (os.path.isfile(obsfile2) == True and twoDays == True):
             subprocess.call(['gzip', '-f', obsfile2])
     else:
-        # this is only for xz compression
+        # this is only for xz compression - which I should get rid of
         if wantCompression:
             if (os.path.isfile(obsfile) == True):
                 subprocess.call(['xz', '-f', obsfile])

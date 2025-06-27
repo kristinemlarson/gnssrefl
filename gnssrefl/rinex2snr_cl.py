@@ -130,7 +130,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     I believe the code allows crx.gz, rnx, or rnx.gz endings in the local directory. It 
     also checks the $REFL_CODE/YYYY/rinex directory for the crx.gz and rnx versions. 
 
-    FAQ: what is rate and srate and why do you have both?  rate tells the code which folder to use because archives always have 
+    FAQ: what is rate and srate and why do you have both?  rate tells the 
+    code which folder to use because archives always have 
     files in different directories depending on sample rate.  srate is for RINEX 3 files only because RINEX 3 
     has the sample rate on the filename itself (not just the directory). A RINEX 2.11 filename will not tell you which 
     sample rate it is.
@@ -228,11 +229,11 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
 
             gps (default < 2021) : will use GPS broadcast orbit
 
-            rapid (default > 2021) : GFZ rapid, multi-GNSS
+            rapid (default > 2021) : GFZ rapid, multi-GNSS. After 2025/168 the default is gnss.
 
             gps+glos : will use JAXA orbits which have GPS and Glonass (usually available in 48 hours)
 
-            gnss : use GFZ final orbits, which is multi-GNSS (available in 3-4 days?), but from CDDIS archive
+            gnss : use GFZ final orbits, which is multi-GNSS (available in 2-4 days?), but from CDDIS archive
 
             gnss-gfz : GFZ orbits downloaded from GFZ instead of CDDIS, but do they include beidou?. Same as gnss3?
 
@@ -452,6 +453,10 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
         else:
             if ((year + doy/365.25) > gfz_avail):
                 orb = 'rapid'
+                # our code cannot find the rapid orbits anymore
+                # presumably this can be fixed, but not by me.
+                if ((year + doy/365.25) > 2025 + 168/365.25):
+                    orb = 'gnss'
             else:
                 orb = 'nav'
         print('Using default orbit for this time period: ', orb)

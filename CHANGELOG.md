@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.14.0
+
+added "midnite crossing" capability.  -midnite T in gnssir.  Not 100 percent sure i did it the best
+way, but it is a start.  All it does is check to see if you have an arc that starts at midnite - 
+and if so, it then uses data from the last two hours of the previous day to allow you to get a better
+RH. 
+
+found a bug in nicerTime in gps.py that was used to write out UTC time in logs (HH:MM). Mostly it did not
+like negative times, which is fine, because why are you using HH:MM anyway?  You should use MJD.  
+But the bug was also killing file creation for people that asked for time tags in month, day, 
+hours, minutes. So I guess not so many people were using that option!  
+(this was because I was writing out the LSP file results - and np.write did not like that that column was a string - it wanted all floats.)
+
+access to standard (default) rapid GFZ orbits is failing as of year 2025, doy 169.  
+am changing default from that time stance to orb option gnss.
 
 ## 3.13.0
 Fixing a bug in the docker for Windows user.  Used slash twice in a filename???  for EGM96 file.

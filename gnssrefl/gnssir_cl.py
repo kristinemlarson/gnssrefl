@@ -48,6 +48,7 @@ def parse_arguments():
     parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs (txt or pickle). default is txt")
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
     parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
+    parser.add_argument("-midnite", default=None, type=str, help="allow midnite crossings (default is false)")
 
     g.print_version_to_screen()
     #print (sys.version)
@@ -55,7 +56,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'nooverwrite', 'compress', 'mmdd','gzip','savearcs','debug','screenstats']
+    boolean_args = ['plt', 'nooverwrite', 'compress', 'mmdd','gzip','savearcs','debug','screenstats','midnite']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -67,7 +68,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = True, delTmax: int = None, e1: float = None, e2: float = None, 
            mmdd: bool = False, gzip: bool = True, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt', 
-           par : int = None, debug : bool=False  ):
+           par : int = None, debug : bool=False, midnite : bool=False  ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
@@ -206,7 +207,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     debug : bool, optional
         remove the primary call from try/except so that you have a better idea of why the code
         might be crashing. No parallel processing in this mode
-
+    midnite : bool
+        whether arcs can cross midnite
     """
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
     #print('You are running ', vers)
@@ -216,7 +218,6 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         print('Going to assume you meant ', station[0:4], ' and not ', station)
         # being lazy
         station = station[0:4]
-
 
 
 #   make sure environment variables exist.  set to current directory if not
@@ -243,6 +244,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             print('Found a snr choice in the json:', snr)
     print('Using snr file type: ', snr)
 
+    lsp['midnite'] = midnite
+    print('testing out midnite option : ',midnite)
 
     # make a refraction file you will need later
     refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])

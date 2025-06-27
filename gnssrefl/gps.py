@@ -501,12 +501,12 @@ def dec31(year):
 
     Parameters 
     ----------
-    input: integer
+    input: int
         year
 
     Returns 
     -------
-    doy : integer
+    doy : int
         day of year for December 31
     """
     today=datetime.datetime(year,12,31)
@@ -3052,6 +3052,8 @@ def llh2xyz(lat,lon,height):
 def LSPresult_name(station,year,doy,extension):
     """
     Makes filename for the Lomb Scargle output
+    if extension is not being used you should send it 
+    empty string ('')
 
     Parameters
     ----------
@@ -3083,10 +3085,14 @@ def LSPresult_name(station,year,doy,extension):
     if not os.path.isdir(filedir):
         #print('making new results bdirectory ')
         subprocess.call(['mkdir', filedir])
-    filedirx = filedir + '/' + extension
+
+    if len(extension) > 0:
+        filedirx = filedir + '/' + extension
+    else:
+        filedirx = filedir
+
     # this is what you do if there is an extension
     if not os.path.isdir(filedirx):
-        #print('making new results subdirectory ')
         subprocess.call(['mkdir', filedirx])
 
     filepath1 =  filedirx + '/' + cdoy  + '.txt'
@@ -4446,6 +4452,8 @@ def nicerTime(UTCtime):
     """
     Converts fractional time (hours) to HH:MM
 
+    This only works properly for positive numbers.  Took out the screen warning.
+
     Parameters
     ----------
     UTCtime : float
@@ -4457,6 +4465,9 @@ def nicerTime(UTCtime):
         output as HH:MM 
 
     """
+#    if UTCtime < 0:
+#        print('this only works for hours 0-24. no negative numbers')
+
     hour = int(np.floor(UTCtime))
     minute = int ( np.floor(60* ( UTCtime - hour )))
     second = int ( 3600*UTCtime - 3600*hour  - 60*minute)
@@ -5252,7 +5263,7 @@ def rapid_gfz_orbits(year,month,day):
                     store_orbitfile(longname,year,'sp3') ; 
                 foundit = True
             except:
-                print('problems downloading Rapid GFZ orbit (2)')
+                print('problems downloading Rapid GFZ orbit (2)',url2)
 
         return longname, fdir, foundit
 
@@ -5274,7 +5285,7 @@ def rapid_gfz_orbits(year,month,day):
                     subprocess.call(['gunzip', littlename + '.gz'])
                     foundit = True
             except:
-                print('Problems downloading Rapid GFZ orbit (1)')
+                print('Problems downloading Rapid GFZ orbit (1),url')
 
             if os.path.isfile(littlename):
                 store_orbitfile(littlename,year,'sp3') ; foundit = True

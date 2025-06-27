@@ -17,6 +17,7 @@ from importlib.metadata import version
 import gnssrefl.gps as g
 import gnssrefl.read_snr_files as snr
 import gnssrefl.refraction as refr
+import gnssrefl.retrieve_rh as r
 
 def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     """
@@ -79,19 +80,20 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             default is False
         savearcs_format : str
             if arcs are to be saved, will they be txt or pickle format
+        midnite : bool
+            whether midnite arcs are alloweed 
         
     debug : bool
         debugging value to help track down bugs
 
     """
 
-    #print('>>>> ', station, year, doy, snr)
-    #print('debug', debug)
     #   make sure environment variables exist.  set to current directory if not
     g.check_environ_variables()
 
     # make sure REFL_CODE/Files/station directory exists ... 
     g.checkFiles(station, '')
+    midnite = lsp['midnite']
 
     if 'azlist' in lsp.keys():
         azlist = lsp['azlist']
@@ -109,6 +111,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         ellist = [];
         #print('no augmented elevation angle list')
 
+    # this must have been experimental and it does not seem to be used ...
     variable_azel = False
     if (len(ellist) >0) & (len(azlist) & 0) :
         if len(ellist) == len(azlist) :
@@ -117,6 +120,11 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             print('Be careful! Especially for tall sites.')
             variable_azel = True
         
+    if (len(ellist) > 0) and midnite:
+        print('You have invoked multiple elevation angle bins and the midnite crossing option.')
+        print('This has not been implemented yet.  Please submit a PR if you speak python or ')
+        print('an Issue if your project needs this.')
+        midnite = False
 
     # this is also checked in the command line - but for people calling the code ...
     if ((lsp['maxH'] - lsp['minH']) < 5):
@@ -209,7 +217,6 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     else:
         RH_apriori = 5 # completely made up
 
-    #if screenstats:
 
     if (irefr >= 3) & (irefr <= 6):
         # N_ant is the index of refraction
@@ -235,8 +242,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         logid = None 
         logfilename = None
 
-
-    if (lsp['nooverwrite'] == True) & (resultExist == True):
+    if (lsp['nooverwrite'] ) & (resultExist ):
         allGood = 0
         print('>>>>> The result file already exists for this day and you have selected the do not overwrite option')
         #sys.exit()
@@ -246,26 +252,58 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         # uncompress here so you should not have to do it in read_snr_multiday ...
         obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
 
+
         allGood, snrD, nrows, ncols = read_snr(obsfile)
-        # added gzip option.  first input is xz compression
-        if allGood and (dec != 1):
-            print('Invoking decimation option')
-            # does dec need to be a list??? was in original code
-            # get the indices
-            rem_arr = np.remainder( snrD[:,3], dec)
-            # find out where they are zero
-            iss =  (rem_arr == 0)
-            # and apply
-            snrD = snrD[iss,:]
-            # not sure nrows and ncols is being used ... so not redoing it
+        if allGood:
+            snrD = decimate_snr(snrD, allGood, dec)
 
+        # if primary file exists and you want to invoke midnite
+        if midnite and allGood: 
+            # keep first two hours on normal day
+            ii = snrD[:,3] < 2*3600
+            outD = snrD[ii,:]
+            print(outD.shape)
+            print('invoking midnite option. Need to pick up and look at day before')
+            if doy == 1:
+                test_obsfile, test_obsfileCmp, test_snre = g.define_and_xz_snr(station,year-1,g.dec31(year-1),snr_type) 
+            else:
+                test_obsfile, test_obsfileCmp, test_snre = g.define_and_xz_snr(station,year,doy-1,snr_type) 
+            print('Second observation file ', test_obsfile, test_snre)
+            # if it exists
+            if test_snre: 
+                # load it and decimate
+                test_allGood, test_snrD, nnrows, nncols = read_snr(test_obsfile)
+                test_snrD = decimate_snr(test_snrD, test_allGood, dec)
+                # only last hour or so
+                ii = test_snrD[:,3] > 22*3600
+                test_snrD = test_snrD[ii,:]
+            # offset wrt to main code so that time is not repeated (file format unfortunately 
+            # is seconds within a day
+                test_snrD[:,3] = test_snrD[:,3] -86400
+            # now merge the last two hours of this file with the primarily file (hours 0-22)
+                c1,c2 = test_snrD.shape
+                d1,d2 = outD.shape
+                if (c2 != d2):
+                    print('The two SNR files do not have the same number of columns. This likely means one was ')
+                    print('GPS only and the other was GNSS. You need to remake one of the two files so they are ')
+                    print('consistent.  Changing your request for midnite crossing to False.')
+                    midnite = False
+                else:
+                    outD =  np.vstack((test_snrD,outD))
+            else:
+                print('The SNR file for the day before does not exist. midnite crossing option is turned off')
+                midnite = False
 
-        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,twoDays,gzip) 
-    if (allGood == 1):
-        print('Reading SNR data from: ', obsfile)
-        #print('Results will be written to:', fname)
+    snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,midnite,gzip) 
+
+    if allGood:
+        print('SNR data were read from: ', obsfile)
         minObsE = min(snrD[:,1])
         print(f'Min observed elev. angle {minObsE} for {station} {year}:{doy}/ Requested e1-e2: of {e1}-{e2}')
+        #if midnite:
+        #    test_minObsE = min(outD[:,1])
+            #print(f'Min observed elev. angle {test_minObsE} for SNR file the day before Requested e1-e2: of {e1}-{e2}')
+
         # only apply this test for simple e1 and e2
         if len(ellist) == 0:
             if minObsE > (e1 + ediff):
@@ -284,33 +322,41 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             # I do not understand why all these extra parameters are sent to this 
             # function as they are not used. Maybe I was doing some testing.
             ele=refr.Ulich_Bending_Angle(snrD[:,1],N_ant,lsp,p,T,snrD[:,3],snrD[:,0])
+            if midnite:
+                ele_midnite = refr.Ulich_Bending_Angle(outD[:,1],N_ant,lsp,p,T,outD[:,3],outD[:,0])
+                ele = ele + dE_MPF 
         elif (irefr == 5 ) or (irefr == 6):
+            ele,snrD = refraction_nite_mpf(irefr,snrD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd,zwd)
+            if midnite: 
+                ele_midnite,outD = refraction_nite_mpf(irefr,outD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd,zwd)
+          
             # NITE MODEL
             # remove ele < 1.5 cause it blows up
-            i=snrD[:,1] > 1.5
-            snrD = snrD[i,:]
-            N = len(snrD[:,1])
-            # elevation angles, degrees
-            ele=snrD[:,1]
+            #i=snrD[:,1] > 1.5
+            #snrD = snrD[i,:]
+            #N = len(snrD[:,1])
+            ## elevation angles, degrees
+            #ele=snrD[:,1]
             # zenith angle in radians
-            zenithA = 0.5*np.pi - np.radians(ele)
+            #zenithA = 0.5*np.pi - np.radians(ele)
             #get mapping function and derivatives
-            [gmf_h,dgmf_h,gmf_w,dgmf_w]=refr.gmf_deriv(mjd1, lat1R, lon1R,height1,zenithA)
-            [mpf, dmpf]=[refr.mpf_tot(gmf_h,gmf_w,zhd,zwd),refr.mpf_tot(dgmf_h,dgmf_w,zhd,zwd)]
+            #[gmf_h,dgmf_h,gmf_w,dgmf_w]=refr.gmf_deriv(mjd1, lat1R, lon1R,height1,zenithA)
+            #[mpf, dmpf]=[refr.mpf_tot(gmf_h,gmf_w,zhd,zwd),refr.mpf_tot(dgmf_h,dgmf_w,zhd,zwd)]
 
             # inputs apriori RH, elevation angle, refractive index, zenith delay, mpf ?, dmpf?
-            if irefr == 5:
-                print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
-                dE_NITE=refr.Equivalent_Angle_Corr_NITE(RH_apriori, ele, N_ant, ztd, mpf, dmpf)
-                ele = ele + dE_NITE 
-            else: 
-                print('MPF refraction correction, Wiliams and Nievinski')
-                dE_MPF= refr.Equivalent_Angle_Corr_mpf(ele,mpf,N_ant,RH_apriori)
-                ele = ele + dE_MPF 
+            #if irefr == 5:
+            #    print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
+            #    dE_NITE=refr.Equivalent_Angle_Corr_NITE(RH_apriori, ele, N_ant, ztd, mpf, dmpf)
+            #    ele = ele + dE_NITE 
+            #else: 
+            #    print('MPF refraction correction, Wiliams and Nievinski')
+            #    dE_MPF= refr.Equivalent_Angle_Corr_mpf(ele,mpf,N_ant,RH_apriori)
 
         elif irefr == 0:
             print('No refraction correction applied ')
             ele = snrD[:,1]
+            if midnite: 
+                ele_midnite = outD[:,1]
         else :
             if irefr == 1:
                 if screenstats:
@@ -320,228 +366,31 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                     print('Standard Bennett refraction correction, time-varying')
             ele = snrD[:,1]
             ele=apply_refraction_corr(lsp,ele,p,T)
+            if midnite:
+                ele_midnite = outD[:,1]
+                ele_midnite=apply_refraction_corr(lsp,ele_midnite,p,T)
 
         # apply an elevation mask for all the data for the polynomial fit
         i= (ele >= pele[0]) & (ele < pele[1])
-
         ele = ele[i]
         snrD = snrD[i,:]
-        # why doesn't this have an i index, is it not used?
         sats = snrD[:,0]
-        # make sure the snrD array has elevation angles fixed
         snrD[:,1] = ele # ????
 
-        # open output file
-        fout,frej = g.open_outputfile(station,year,doy,extension) 
-        total_arcs = 0
-        ct = 0
-#       the main loop a given list of frequencies
-        for f in freqs:
-            found_results = False
-            if plot_screen: 
-                # no idea if this will work
-                fig, (ax1, ax2) = plt.subplots(2, 1,figsize=(10,7))
-            rj = 0
-            gj = 0
-            if screenstats: 
-                logid.write('=================================================================================\n')
-                logid.write('Looking at {0:4s} {1:4.0f} {2:3.0f} frequency {3:3.0f} ReqAmp {4:7.2f} \n'.format(station, year, doy,f,reqAmp[ct]))
-                logid.write('=================================================================================\n')
-                #print('**** looking at frequency ', f, ' ReqAmp', reqAmp[ct], ' doy ', doy, 'ymd', year, month, day )
+        if midnite:
+            i= (ele_midnite >= pele[0]) & (ele_midnite < pele[1])
+            ele_midnite = ele_midnite[i]
+            outD = outD[i,:]
+            sats_midnite = outD[:,0]
+            outD[:,1] = ele_midnite
+        else:
+            outD = None
 
-#           get the list of satellites for this frequency
-            if onesat == None:
-                satlist = find_mgnss_satlist(f,year,doy)
-            else:
-                # check that your requested satellite is the right frequency
-                satlist = onesat_freq_check(onesat,f )
+        # testing out a new function that does ... everything
 
-            # main satellite loop
-            for satNu in satlist:
-                if screenstats: 
-                    #print('Satellite', satNu)
-                    logid.write('satellite {0:3.0f} \n'.format(satNu))
+        r.retrieve_rh(station,year,doy,extension, midnite,lsp,snrD, outD, screenstats, irefr,logid,logfilename)
 
-                iii = (sats == satNu)
-                thissat = snrD[iii,:]
-                goahead = False
-
-                if len(thissat) > 0:
-                    # if there are data for this satellite, find all the arcs
-                    # separate numpy array of elevation angles .... 
-
-                    # allow more than one set of elevation angles
-                    if len(ellist) > 0:
-                        arclist = np.empty(shape=[0,6])
-                        for ij in range(0,len(ellist),2):
-                            te1 = ellist[ij]; te2 = ellist[ij+1]; newl = [te1,te2]
-                            # poorly named inputs - elev, azimuth, seconds of the day, ...
-                            # te1 and te2 are the requested elevation angles I believe
-                            # satNu is the requested satellite number
-                            tarclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],te1, te2,ediff,satNu,screenstats,logid)
-                            arclist = np.append(arclist, tarclist,axis=0)
-
-                    else:
-                        arclist = new_rise_set_again(thissat[:,1],thissat[:,2],thissat[:,3],e1, e2,ediff,satNu,screenstats,logid)
-
-                    nr,nc = arclist.shape
-                    if nr > 0:
-                        goahead = True
-                    else:
-                        goahead = False
-
-                if goahead:
-                    found_results = True
-                    # instead of az bins now go through each arc 
-                    for a in range(0,nr):
-                        sind = int(arclist[a,0]) ; eind = int(arclist[a,1])
-                        #if screenstats:
-                        #    print('Indices for this arc', a, sind, eind)
-                        # create array for the requested arc
-                        d2 = np.array(thissat[sind:eind, :], dtype=float)
-                        # window the data - which also removes DC 
-                        # this is saying that these are the min and max elev angles you should be using
-                        e1 = arclist[a,4]; e2 = arclist[a,5]
-                        # pele is not used, so no longer used in window_new, v3.6.8
-
-                        # send it the log id now
-                        x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT, secxonds = window_new(d2, f, 
-                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats,logid)
-
-                        #writing out arcs - try putting it later on ... 
-                        if test_savearcs and (Nvv > 0):
-                            newffile = arc_name(sdir,satNu,f,a,avgAzim)
-                            # name for the individual arc file
-                            if (len(newffile) > 0) and (delT !=0):
-                                file_info = [station,satNu,f,avgAzim,year,doy,meanTime,docstring]
-                                #write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
-                        Nv = Nvv # number of points
-                        UTCtime = meanTime
-
-                        # if delT  is zero, that means the arc is really not acceptable.  That is set in window_new
-                        if (delT != 0):
-                            MJD = g.getMJD(year,month,day, meanTime)
-                            maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,prec,pfitV,minH)
-
-                            tooclose = False
-                            if (maxF ==0) & (maxAmp == 0):
-                                tooclose == True; Noise = 1; iAzim = 0;
-                            else:
-                                nij =  pz[(px > NReg[0]) & (px < NReg[1])]
-
-                            Noise = 1
-                            if (len(nij) > 0):
-                                Noise = np.mean(nij)
-
-                            iAzim = int(avgAzim)
-
-                            if abs(maxF - minH) < 0.10: #  peak too close to min value
-                                tooclose = True
-
-                            if abs(maxF - maxH) < 0.10: #  peak too close to max value
-                                tooclose = True
-
-                            if False:
-                                print(avgAzim, satNu, e1, e2)
-
-                            if (not tooclose) & (delT < delTmax) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
-                            # request from a tide gauge person for Month, Day, Hour, Minute
-                                # save arc and QC is good
-                                if test_savearcs and (Nv > 0):
-                                    newffile = arc_name(sdir,satNu,f,a,avgAzim)
-                            # name for the individual arc file
-                                    if (len(newffile) > 0) and (delT !=0):
-                                        file_info = [station,satNu,f,avgAzim,year,month,day,doy,meanTime,docstring]
-                                        write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
-
-                                if lsp['mmdd']:
-                                    ctime = g.nicerTime(UTCtime); ctime2 = ctime[0:2] + ' ' + ctime[3:5]
-                                    fout.write(" {0:4.0f} {1:3.0f} {2:6.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:5s} \n".format(year,doy,maxF,satNu, UTCtime, avgAzim,maxAmp,eminObs,emaxObs,Nv, f,riseSet, Edot2, maxAmp/Noise, delT, MJD,irefr,month,day,ctime2)) 
-                                    onelsp = [year,doy,maxF,satNu,UTCtime,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr,month,day,ctime2]
-
-                                else:
-                                    onelsp = [year,doy,maxF,satNu,UTCtime,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr]
-                                    fout.write(" {0:4.0f} {1:3.0f} {2:6.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} \n".format(year,doy,maxF,satNu, UTCtime, avgAzim,maxAmp,eminObs,emaxObs,Nv, f,riseSet, Edot2, maxAmp/Noise, delT, MJD,irefr)) 
-                                gj +=1
-
-                                all_lsp.append(onelsp)
-                                if screenstats:
-                                    T = g.nicerTime(UTCtime)
-                                    logid.write('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} \n'.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
-                                    #print('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:5s} DT {7:3.0f} '.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
-                                if plot_screen:
-                                    failed = False
-                                    local_update_plot(x,y,px,pz,ax1,ax2,failed)
-                            else:
-                                if test_savearcs and (Nv > 0):
-                                    newffile = arc_name(sdir+'failQC/',satNu,f,a,avgAzim)
-                                    # name for the individual arc file - i think delT is redundant here
-                                    if (len(newffile) > 0) and (delT !=0):
-                                        file_info = [station,satNu,f,avgAzim,year,month,day,doy,meanTime,docstring]
-                                        write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
-                                rj +=1
-                                if screenstats:
-
-                                    logid.write('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f} \n'.format( iAzim,satNu,UTCtime,maxF))
-                                    #print('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f}'.format( iAzim,satNu,UTCtime,maxF))
-                                    g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose,logid)
-                                if plot_screen:
-                                    failed = True
-                                    local_update_plot(x,y,px,pz,ax1,ax2,failed)
-
-            if screenstats:
-                #print('=================================================================================')
-                #print('     Frequency ', f, ' good arcs:', gj, ' rejected arcs:', rj )
-                #print('=================================================================================')
-                logid.write('=================================================================================\n')
-                logid.write('     Frequency  {0:3.0f}   good arcs: {1:3.0f}  rejected arcs: {2:3.0f} \n'.format( f, gj, rj))
-                logid.write('=================================================================================\n')
-            total_arcs = gj + total_arcs
-# close the output files
-            ct += 1
-            if found_results and plot_screen:
-                print('data found for this frequency: ',f)
-                ax1.set_xlabel('Elevation Angles (deg)')
-                ax1.grid(True, linestyle='-'); ax2.grid(True, linestyle='-')
-                ax1.set_title(station + ' Raw Data/Periodogram for ' + g.ftitle(f) + ' Frequency')
-                ax2.set_xlabel('Reflector Height (m)');
-                ax2.set_ylabel('volts/volts') ; ax1.set_ylabel('volts/volts')
-                plotname = f'{xdir}/Files/{station}/gnssir_freq{f:03d}.png'
-                print(plotname)
-                g.save_plot(plotname)
-                plt.show()
-                #plot2screen(station, f, ax1, ax2,lsp['pltname']) 
-            else:
-                if plot_screen: 
-                    print('no data found for this frequency: ',f)
-                    #plt.close()
-
-        fout.close() ; # these are the LSP results written to text file 
-        # try moving this
-        if found_results and plot_screen:
-            plot2screen(station, f, ax1, ax2,lsp['pltname']) 
-
-        if screenstats:
-            logid.close()
-            print('Screen stat information printed to: ', logfilename)
-
-        # convert to numpy array
-        allL = np.asarray(all_lsp)
-        if len(allL) > 0:
-            head = g.lsp_header(station) # header
-        # sort the results for felipe
-            ii = np.argsort(allL[:,15])
-            allL = allL[ii,:]
-
-            if lsp['mmdd']:
-                f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %1.0f %2.0f %2.0f %5s'
-            else:
-                f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %1.0f'
-
-        # this is really just overwriting what I had before. However, This will be sorted.
-            testfile,fe = g.LSPresult_name(station,year,doy,extension)
-            print('Writing sorted LSP results to : ', testfile, '\n')
-            np.savetxt(testfile, allL, fmt=f, delimiter=' ', newline='\n',header=head, comments='%')
+        return
 
 def set_refraction_params(station, dmjd,lsp):
     """
@@ -896,9 +745,11 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats):
                 if ediff_violation:
                     add = ' violates ediff'
                 if not verysmall:
-                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max observed elev: ', np.round(minObse,3), np.round(maxObse,3), minA,maxA,add)
+                    print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max observed elev: ', 
+                          np.round(minObse,3), np.round(maxObse,3), minA,maxA,add)
             else:
-                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max observed elev: ', np.round(minObse,3), np.round(maxObse,3),minA,maxA)
+                print('Keep   sat/arc',sat,iarc+1, sind,eind,' min/max observed elev: ', 
+                      np.round(minObse,3), np.round(maxObse,3),minA,maxA,add)
 
         if not nogood :
             iarc = iarc + 1
@@ -1274,11 +1125,12 @@ def check_azim_compliance(initA,azlist):
 
     return keeparc
 
-def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid ):
+def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid,**kwargs ):
     """
     This provides a list of rising and setting arcs 
     for a given satellite in a SNR file
     based on using changes in elevation angle
+    (though it seems primarily driven by time change TBF)
 
     Parameters
     ----------
@@ -1307,7 +1159,13 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid ):
         beginning and ending indices of the arc
         satellite number, arc number, elev min, elev max
 
+    flag_midnite : bool
+
     """
+    flag_midnite = False
+    # whether you want to look for a midnite crossing ...
+    midnite = kwargs.get('midnite',False)
+
     # require arcs to be this length in elev angle
     min_deg = (e2-ediff)   - (e1 + ediff)
 
@@ -1320,11 +1178,15 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid ):
     bkpt = len(ddate)
     bkpt = np.append(bkpt, np.where(ddate > gaptlim)[0])
     bkpt = np.append(bkpt,  np.where(np.diff(np.sign(delv)))[0])
+    aa = np.where(ddate > gaptlim)[0]
+    bb = np.where(np.diff(np.sign(delv)))[0]
+
     bkpt = np.unique(bkpt)
     bkpt = np.sort(bkpt)
     N=len(bkpt)
     tv = np.empty(shape=[0,6])
 
+    flag_midnite = False # this is for the whole file - so should not be reset in hte loop
     for ii in range(N):
         if ii == 0:
             sind = 0
@@ -1361,6 +1223,10 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid ):
         if ((maxObse - minObse) < min_deg):
             nogood = True
             #print('v4')
+        if (dates[sind] == 0) and midnite:
+            logid.write('Remove this arc to allow midnite crossing track for satellite {0:3.0f} \n'.format(sat))
+            nogood = True
+            flag_midnite = True
 
         if screenstats:
             if nogood:
@@ -1369,21 +1235,24 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid ):
                 add = ''
                 if ediff_violation:
                     add = ' violates ediff'
+                if flag_midnite:
+                    add = ' flag midnite'
                 if not verysmall:
-                    #print('Fail sat/arc/indices ',sat,iarc+1, sind,eind,' min/max obs elev: ', np.round(minObse,3), np.round(maxObse,3), minA,maxA,add)
-                    logid.write('Failed sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max obs elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f} {8:15s}  \n'.format( sat,iarc+1,sind,eind,np.round(minObse,3), np.round(maxObse,3), minA,maxA,add))
+                    logid.write('Failed sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max obs elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f} {8:15s}  \n'.format( sat,iarc+1, sind,eind, minObse, maxObse, minA,maxA,add))
             else:
-                #print('Keep sat/arc/indices ',sat,iarc+1, sind,eind,' min/max elev: ', np.round(minObse,2), np.round(maxObse,2),minA,maxA)
-                logid.write('Keep sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max obs elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f}  \n'.format( sat,iarc+1,sind,eind,np.round(minObse,3), np.round(maxObse,3), minA,maxA))
+                logid.write('Keep sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max obs elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f}  \n'.format( sat,iarc+1, sind,eind,minObse, maxObse, minA,maxA))
 
         if not nogood :
             iarc = iarc + 1
             newl = [sind, eind, int(sat), iarc,e1,e2]
-            #print('indices ',sind, eind, elv[sind], elv[eind] )
-            #print('indices ',sind, eind, elv[sind], elv[eind], azm[sind], azm[eind])
             tv = np.append(tv, [newl],axis=0)
 
-    return tv 
+            if midnite:
+                if len(dates) == eind:
+                    eind = eind - 1
+                logid.write('{0:4.0f} {1:4.0f} {2:5.0f} {3:5.0f} {4:5.2f} {5:5.2f} {6:5.1f} {7:5.1f}\n'.format(sind, eind, dates[sind], dates[eind],elv[sind], elv[eind],azm[sind],azm[eind])) 
+
+    return tv , flag_midnite
 
 def make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, nproc):
     """
@@ -1615,3 +1484,92 @@ def write_out_arcs(newffile,eangles,dsnrData,sec,file_info,savearcs_format):
 #   doc2 = 'avgAzim is arc azimuth in degrees , doy is day of year,\n'
 #   doc3 = 'f is frequency, meanTime is avg hours in UTC for the arc.'
 #   docstring = doc1+doc2+doc3
+
+def decimate_snr(snrD, allGood, dec):
+    """
+    Parameters
+    ----------
+    snrD : numpy array of floats
+        loadtxt input of a snr file
+    allGood : bool
+        whether file exists?
+
+    dec : int
+        decimation value
+
+    Returns
+    -------
+    snrD : numpy array of floats
+        decimated array
+
+    """
+
+    if allGood and (dec != 1):
+        print('Invoking decimation option')
+        # does dec need to be a list??? was in original code
+        # get the indices
+        rem_arr = np.remainder( snrD[:,3], dec)
+        # find out where they are zero
+        iss =  (rem_arr == 0)
+        # and apply
+        snrD = snrD[iss,:]
+        # not sure nrows and ncols is being used ... so not redoing it
+
+    return snrD
+
+def refraction_nite_mpf(irefr,snrD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd,zwd):
+    """
+    Parameters
+    ----------
+    irefr: int
+    snrD : numpy array
+        contents of SNR file
+    mjd1 : float
+        modified julian day?
+    lat1R : float
+        latitude in radians
+    lon1R : float
+        longitude in radians
+    height : float
+        ellipsoidal ? height in meters
+    RH_apriori : float
+        aprori RH in meters
+    N_ant : float
+        refraction index I think
+    zhd : float
+        hydrostatic zenith tropo dely in meters
+    zwd : float
+        wet zenith tropo dely in meters
+    Returns
+    -------
+    ele : numpy array
+        corrected elevation angles, deg
+        
+    """
+    # NITE MODEL
+    # remove ele < 1.5 cause it blows up
+    i=snrD[:,1] > 1.5
+    snrD = snrD[i,:]
+    N = len(snrD[:,1])
+            # elevation angles, degrees
+    ele=snrD[:,1]
+    # zenith angle in radians
+    zenithA = 0.5*np.pi - np.radians(ele)
+    #get mapping function and derivatives
+
+    [gmf_h,dgmf_h,gmf_w,dgmf_w]=refr.gmf_deriv(mjd1, lat1R, lon1R,height1,zenithA)
+    [mpf, dmpf]=[refr.mpf_tot(gmf_h,gmf_w,zhd,zwd),refr.mpf_tot(dgmf_h,dgmf_w,zhd,zwd)]
+
+    ztd = zhd + zwd
+    # inputs apriori RH, elevation angle, refractive index, zenith delay, mpf ?, dmpf?
+    if irefr == 5:
+        print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
+        dE_NITE=refr.Equivalent_Angle_Corr_NITE(RH_apriori, ele, N_ant, ztd, mpf, dmpf)
+        ele = ele + dE_NITE 
+    else: 
+        print('MPF refraction correction, Wiliams and Nievinski')
+        dE_MPF= refr.Equivalent_Angle_Corr_mpf(ele,mpf,N_ant,RH_apriori)
+        ele = ele + dE_MPF 
+
+    return ele,snrD
+
