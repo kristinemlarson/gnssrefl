@@ -14,8 +14,7 @@ melissa.weber@earthscope.org or Kristine Larson.
 - [Kristine M. Larson](https://kristinelarson.net) Overall 
 - [Kelly Enloe](https://github.com/k-enloe) Jupyter Notebooks
 - [Tim Dittmann](https://github.com/timdittmann) Access to Dockers
-- [Radon Rosborough](https://github.com/raxod502) helped with 
-python/packaging questions, improved our docker distribution, and 
+- [Radon Rosborough](https://github.com/raxod502) helped with python/packaging questions, improved our docker distribution, and 
 set up smoke tests. 
 - [Naoya Kadota](https://github.com/naoyakadota) added the GSI data archive and helped find a bug in nmea2snr. 
 - [Joakim Strandberg](https://github.com/Ydmir) provided python RINEX translators and the EGM96 code. 
@@ -23,8 +22,7 @@ set up smoke tests.
 - [Makan Karegar](https://github.com/MakanAKaregar) added the NMEA capability.
 - [Dave Purnell](https://github.com/purnelldj) provided his SNR inversion code. 
 - Carolyn Roesler helped with the original GNSS-IR Matlab codes.
-- [Felipe Nievinski](https://github.com/fgnievinski) 
-and Simon Williams have provided significant advice for this project.
+- [Felipe Nievinski](https://github.com/fgnievinski) and Simon Williams have provided significant advice for this project.
 - Clara Chew and Eric Small developed the soil moisture algorithm; I ported it to python with Kelly's help.
 - [Sree Ram Radha Krishnan](https://github.com/sreeram-radhakrishnan) ported the rzones web app code.
 - [Dan Nowacki](https://github.com/dnowacki-usgs) added 
@@ -65,10 +63,10 @@ Before you ask for help - you should check to see if you are running the current
 Please go to the install page for help on how to update your latest 
 docker/jupyter installs. For github/pypi, we recommend doing a clean download and new install.
 
-You are encouraged to submit your concerns as an issue to 
-the [github repository](https://github.com/kristinemlarson/gnssrefl). If you are unfamiliar 
-with github, you can also email Kelly (enloe@earthscope.org ) about Jupyter 
-NoteBooks or Tim (dittmann@earthscope.org) for commandline/docker issues. Please include
+You are encouraged to submit your concerns as an **Issue** to 
+the [github repository](https://github.com/kristinemlarson/gnssrefl). 
+
+Please include
 
 * the exact command or section of code you were running that prompted your question.
 
@@ -77,6 +75,9 @@ Please copy and paste (this is preferred over a screenshot) the error string.
 If the string is long - please post the error string in a thread response to your question.
 
 * the operating system of your computer.
+
+**We are not able to answer any questions about Jupyter Notebooks. These were developed 
+by Earthscope and unfortunately they no longer help maintain them.**
 
 [Old news section from before we moved to readthedocs](https://gnssrefl.readthedocs.io/en/latest/pages/old_news.html)
 

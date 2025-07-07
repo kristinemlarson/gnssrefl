@@ -1,8 +1,8 @@
 # [Installing and running the gnssrefl docker image](https://github.com/kristinemlarson/gnssrefl/pkgs/container/gnssrefl)
 
 
-Please send your feedback on these instructions to Tim Dittmann at 
-EarthScope, or better still, [submit a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
+Please send your feedback on these instructions 
+by [submitting a GitHub issue](https://github.com/kristinemlarson/gnssrefl/blob/master/.github/ISSUE_TEMPLATE/bug_report.md).
 
 ## Install Docker
 &ensp;&ensp; Pick your system and follow instructions on the Docker website 

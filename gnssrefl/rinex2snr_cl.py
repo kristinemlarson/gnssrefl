@@ -82,6 +82,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     RINEX 2.11 files. To tell the code you are using a RINEX 3 file, 
     you should use a RINEX 3 station name, i.e. the 9 character version.
 
+    June 29, 2025 - tried to update to new folders for GFZ orbit products ...
+
     New feature as of September 2024: various parameters can be stored in the station.json (created by gnssir_input).
     This is really just for convenience. Parameters are dec, snr, stream, samplerate, archive, and orb. 
     Why did I add these? because I kept forgetting
@@ -256,7 +258,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
             wum : Wuhan ultra-rapid, from CDDIS
 
             wum2 : Wuhan ultra-rapid, from Wuhan FTP
-
 
             ultra: first tries GFZ ultra-rapid then Wuhan, multi-GNSS
 

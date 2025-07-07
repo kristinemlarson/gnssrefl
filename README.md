@@ -1,4 +1,4 @@
-# gnssrefl v3.14.0
+# gnssrefl v3.15.0
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 When showing results created using gnssrefl, please use:
@@ -30,6 +30,10 @@ the Low Priority list and I think it would be really healthy for our community t
 willing to apply their expertise to provide fixes and enhancements 
 to the notebook collection that can be reviewed in a pull request and merged for deployment.*
 
+**Questions?**
+
+Try looking at old Issues on github. People might have asked your question before. If you found our documentation confusing or 
+lacking, please submit a PR to improve it.
 
 **Some new features:**
 

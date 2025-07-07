@@ -1,9 +1,9 @@
 # Jupyter Notebook Installation Instructions
 
-Notebooks are no longer supported by the Earthscope team that developed them. You are free to submit an issue on github,
+Notebooks are no longer supported by the Earthscope team that developed them. You are free to submit an Issue on github,
 but as the README indicates, Earthscope expects the community to fix these issues themselves. 
 
-Listed below are instructions for running jupyter notebooks with Docker (recommended) or on your local machine.
+Listed below are the original instructions that we posted for running jupyter notebooks with Docker (recommended) or on your local machine.
 
 If you have run the notebooks in the past, the first thing you should do is update your docker. Look below to the **Update 
 Docker Image**.

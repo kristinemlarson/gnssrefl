@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.15.0
+
+Added new directory structure for GFZ rapid and ultra-rapid orbits. old directories were failing.
+YOU STILL NEED TO USE orb option gnss to get Beidou. The rapid product does not have it.
+
+I have not changed the final orbits that live in Potsdam - I typically pick up the final GFZ
+orbits from CDDIS, which continues to be linked to the orb of gnss.
+
+This impacted rinex2snr, nmea2snr, and rinex3_snr.  If you find places with problems, please post an issue.
+I still do not fully understand how/when GFZ made these changes.  It could be that the what I wrote was
+correct at the time, but they have migrated to new sites over the years. Since nothing broke, I did not 
+notice it. Thanks to Leila Cruz for alerting me to this problem.
+
+
 ## 3.14.0
 
 added "midnite crossing" capability.  -midnite T in gnssir.  Not 100 percent sure i did it the best
@@ -18,6 +32,9 @@ hours, minutes. So I guess not so many people were using that option!
 
 access to standard (default) rapid GFZ orbits is failing as of year 2025, doy 169.  
 am changing default from that time stance to orb option gnss.
+
+Pinned earthscope_sdk to an old version as their new version does not include the code we use.
+Problem has been reported to earthscope.
 
 ## 3.13.0
 Fixing a bug in the docker for Windows user.  Used slash twice in a filename???  for EGM96 file.

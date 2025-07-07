@@ -3599,6 +3599,10 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
     picks up and stores orbits as needed.
     It also sets executable location for translation (gpsonly vs multignss)
 
+    why does this work if it does not include the hour for ultra?
+
+    modified 2025 jul 5 to use new GFZ website
+
     Parameters
     ----------
     year : int
@@ -3634,7 +3638,7 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         #    orbtype = 'rapid'
 
     foundit = False
-    f=''; orbdir=''
+    f=''; orbdir=''; snrexe = ''
     # define directory for the conversion executables
     exedir = os.environ['EXE']
     if (orbtype == 'grg'):
@@ -3642,10 +3646,22 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'grg')
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gfr'):
-        f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
+        if (year >= 2022):
+            print('Using newest GFZ orbit code for gfr')
+            f,orbdir,foundit = one_gfz_archive_to_rule_them_all(year,month,day,'rapid',0)
+            if not foundit: 
+                f,orbdir,foundit=another_gfz_orbits(year,month,day,'rapid',0)
+        else:
+            f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'rapid'):
-        f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
+        if (year >= 2022):
+            print('Using newest GFZ orbit code for rapid')
+            f,orbdir,foundit = one_gfz_archive_to_rule_them_all(year,month,day,'rapid',0)
+        else:
+            f,orbdir,foundit=another_gfz_orbits(year,month,day,'rapid',0)
+            if not foundit:
+                f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
         snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gnss3') or (orbtype == 'gnss-gfz'):
         if (year >= 2024):
@@ -3697,26 +3713,23 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         f,orbdir,foundit=getsp3file_flex(year,month,day,'esa')
         snrexe = gnssSNR_version(); 
         warn_and_exit(snrexe,fortran)
-    elif orbtype == 'test':
-        # i can't even remember this ... 
-        print('getting gFZ orbits from CDDIS using test protocol')
-        f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
-        snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     elif orbtype == 'ultra':
-        print('getting ultra rapid orbits from GFZ local machine')
+        ihr = 0
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
-        if (year + doy/365.25) > (2024 + 153/365.25):
-            # use new file structure and two day orbit ... 
-            #use hour 0
-            ihr = 0
-            if doy == 1:
-                # use december 31 from previous year
-                f, orbdir, foundit = new_ultra_gfz_orbits(year-1,12,31,ihr)
+        if year >= 2022:
+            f,orbdir,foundit = one_gfz_archive_to_rule_them_all(year,month,day,'ultra',ihr)
+        else: 
+            # no idea if any of this works ... 
+            if (year + doy/365.25) > (2024 + 153/365.25):
+                if year >= 2025:
+                    f,orbdir,foundit=another_gfz_orbits(year,month,day,'ultra',0)
+                else:
+                    if doy == 1:
+                        f, orbdir, foundit = new_ultra_gfz_orbits(year-1,12,31,ihr)
+                    else:
+                        f, orbdir, foundit = new_ultra_gfz_orbits(year,doy-1,0,ihr)
             else:
-                # use previous day ... 
-                f, orbdir, foundit = new_ultra_gfz_orbits(year,doy-1,0,ihr)
-        else:
-            f, orbdir, foundit = ultra_gfz_orbits(year,month,day,0)
+                f, orbdir, foundit = ultra_gfz_orbits(year,month,day,0)
         snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     else:
         if ('nav' in orbtype):
@@ -5959,7 +5972,6 @@ def bfg_password(**kwargs):
         with open(userinfo_file, 'wb') as client_info:
             pickle.dump((user_id,passport) , client_info)
         print('User id and password saved to', userinfo_file)
-
     return user_id, passport
 
 def bfg_data(fstation, year, doy, samplerate=30,debug=False):
@@ -6429,7 +6441,7 @@ def checkEGM():
         egm = localdir + '/' + matfile
         interiorfile = 'gnssrefl/' + matfile
         if os.path.isfile(egm):
-            print('EGM96 file exists')
+            #print('EGM96 file exists')
             foundfile = True
         elif os.path.isfile(interiorfile):
             print('cp existing copy of EGM96 file to where it belongs')
@@ -7352,6 +7364,71 @@ def new_ultra_gfz_orbits(year, month, day, hour):
         print('/n')
         return littlename, fdir, foundit
 
+def another_gfz_orbits(year,month,day, orbtype,hour):
+    """
+    a function to access yet more differently named GFZ orbits ...
+
+    Parameters
+    ----------
+    year : int
+        full year
+    month : int
+        month or day of year if day is set to zero
+    day : int
+        day of month
+    orbtype : str
+        kind of orbit, rapid or final
+    hour : int
+        only for ultra
+
+    Returns
+    -------
+    littlename : str
+        name of the orbit file
+    fdir: str
+        name of the file directory where orbit is stored
+    foundit : bool
+        whether file was found
+
+    """
+#    ftp://ftp.gfz-potsdam.de//pub/GNSS/products/rapid/w2371/gfz23714.sp3.gz
+    xdir = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/' 
+    #rapid/w2371/gfz23714.sp3.gz
+    foundit = False
+    chour = '{:02d}'.format(hour)
+
+    if day == 0:
+        year,month,day = ydoy2ymd(year, month)
+    month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
+
+    fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
+    wk,sec = kgpsweek(year,month,day,0,0,0)
+
+    url = xdir + orbtype + '/w'  + str(wk) + '/' 
+    x=int(sec/86400)
+    filename = 'gfz' + str(wk) + str(x) + '.sp3' 
+    if orbtype == 'ultra':
+        filename = 'gfu' + str(wk) + str(x) + '_' + chour + '.sp3' 
+
+    fullname = fdir + '/' + filename
+    if os.path.isfile(fullname):
+        foundit = True
+    elif os.path.isfile(fullname + '.gz'):
+        subprocess.call(['gunzip', fullname + '.gz'])
+        foundit = True
+    else:
+        print(url,filename)
+        try: 
+            wget.download(url + filename + '.gz', filename+'.gz')
+            if os.path.isfile(filename + '.gz'):
+                subprocess.call(['gunzip', filename + '.gz'])
+                store_orbitfile(filename,year,'sp3') ; 
+                foundit = True
+        except:
+            print('tried to download but did not find the requested GFZ orbit file')
+
+    return filename, fdir, foundit
+
 def newish_gfz_orbits(year,month,day, orbtype):
     """
     downloads "newish" gfz final and rapid orbits and stores in $ORBITS locally
@@ -7587,4 +7664,83 @@ def query_coordinate_file(station):
 
     return foundit, lat, lon, ht
 
+
+
+def one_gfz_archive_to_rule_them_all(year,month,day,orbtype,hour):
+    """
+    access to latest GFZ archive structure for orbits
+
+    Parameters
+    ----------
+    year : int
+        full year
+    month : int
+        month or day of year if day is set to zero
+    day : int
+        day of month
+    orbtype : str
+        kind of orbit: rapid, final, ultra
+    hour : int
+        hour of orbit, only used for ultra
+
+    Returns
+    -------
+    filename : str
+        name of the orbit file
+    fdir: str
+        name of the file directory where orbit is stored by gnssrefl
+    foundit : bool
+        whether orbit file was found
+
+    """
+    foundit = False
+    chour = '{:02d}'.format(hour)
+
+    if day == 0: # means you sent day of year in the month spot
+        year,month,day = ydoy2ymd(year, month)
+    month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
+
+    # where orbits are stored by gnssrefl
+    fdir = os.environ['ORBITS'] + '/' + cyyyy + '/sp3'
+    
+    # get the IGS/GPS week number 
+    wk,sec = kgpsweek(year,month,day,0,0,0)
+    x=int(sec/86400)
+
+    xdir = 'https://isdc-data.gfz.de/gnss/products/' + orbtype +  '/' 
+
+    url = xdir + 'w'  + str(wk) + '/' 
+
+
+    if orbtype == 'rapid':
+        filename = 'GFZ0OPSRAP_' + cyyyy + cdoy + '0000_01D_05M_ORB.SP3'
+    elif orbtype == 'ultra':
+        filename = 'GFZ0OPSULT_' + cyyyy + cdoy + chour + '00_02D_05M_ORB.SP3'
+    elif orbtype == 'final':
+        filename = 'GFZ0OPSFIN_' + cyyyy + cdoy + '0000_01D_15M_ORB.SP3'
+    else:
+        print('I do not recognize this type of orbit.  Exiting.', orbtype)
+        return filename, fdir, foundit
+
+    fullname = fdir + '/' + filename
+
+    if os.path.isfile(fullname): # you have it online already
+        print('found locally ', fdir + '/' + filename)
+        foundit = True
+    elif os.path.isfile(fullname + '.gz'): # you have it - but it is gzipped
+        subprocess.call(['gunzip', fullname + '.gz'])
+        foundit = True
+        print('found locally ', fdir + '/' + filename)
+    else:
+        print('Seeking ', url + filename)
+        try: 
+            wget.download(url + filename + '.gz', filename+'.gz')
+            if os.path.isfile(filename + '.gz'):
+                subprocess.call(['gunzip', filename + '.gz'])
+                store_orbitfile(filename,year,'sp3') ; 
+                foundit = True
+        except:
+            print('tried and failed to download ')
+
+    return filename, fdir, foundit
 

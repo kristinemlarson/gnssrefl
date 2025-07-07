@@ -449,8 +449,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
     #log = open(general_log, 'w+') this file is now opened earlier
     log.write("Receiver rate: {0:5s} \n".format(receiverrate))
     log.write("Decimation rate: {0:3.0f} \n".format(dec_rate))
-    log.write("Archive: {0:10s} \n".format(archive))
-    log.write("Orbits : {0:10s} \n".format(orbtype))
+    log.write("Archive : {0:10s} \n".format(archive))
+    log.write("Orbit option : {0:10s} \n".format(orbtype))
     log.write("Translator : {0:10s} \n".format(translator))
     csnr = str(option)
     # should be using a function for this
@@ -479,11 +479,11 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
         log.write("The snrfile does not exist: {0:50s} \n".format(snrname_full))
         d = g.doy2ymd(year,doy);
         month = d.month; day = d.day
-        # new function to do the whole orbit thing
+        # new function to do the whole orbit thing - but it assumes ultra is hour zero?
         foundit, f, orbdir, snrexe = g.get_orbits_setexe(year,month,day,orbtype,fortran)
         # if you have the orbit file, you can get the rinex file. First lets define the expected names
-        #print('Orbit file: ', orbdir + '/' + f)
         if foundit:
+            print('Orbit file: ', f)
             # now you can look for a rinex file
             rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
             # This goes to find the rinex file. I am changing it to allow
@@ -1571,10 +1571,10 @@ def set_rinex2snr_logs(station,year,doy):
     exedir = os.environ['EXE'] # location of executables for fortran people
 
 
-    general_log = logdir + '/' + logname + '.gen'
+    general_log = logdir  + logname + '.gen'
     #print('Feedback about the RINEX translation: ', general_log)
 
-    errorlog = logdir + '/' + logname
+    errorlog = logdir +  logname
     #print('Log created by the fortran code: ', errorlog)
 
     log = open(general_log, 'w+')

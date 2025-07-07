@@ -166,21 +166,29 @@ def download_orbits(orbit: str, year: int, month: int, day: int, doy_end: int = 
                 elif (pCtr == 'wum2'):
                      filename,fdir,foundit = g.get_wuhan_orbits(year,month,day,hour)
                 elif (pCtr == 'gfr'):
-                # rapid GFZ is available again ...
-                # updated yet again, new location/filenames 2024 june 4
-                    filename, fdir, foundit = g.rapid_gfz_orbits(year, month, day)
+                    foundit = False
+                    if year >= 2022:
+                        filename, fdir, foundit = g.one_gfz_archive_to_rule_them_all(year, month, day,'rapid',0)
+                    if not foundit:
+                        if (year >= 2025):
+                            filename, fdir, foundit = g.another_gfz_orbits(year, month, day,'rapid',0)
+                    if not foundit:
+                        filename, fdir, foundit = g.rapid_gfz_orbits(year, month, day)
+
                 elif pCtr == 'ultra':
-                    if (year + d/365.25) > (2024 + 153/365.25):
+                    if year >= 2022:
+                        filename, fdir, foundit = g.one_gfz_archive_to_rule_them_all(year, month, day,'ultra',0)
+                    if not foundit:
+                        filename, fdir, foundit = g.another_gfz_orbits(year, month, day,'ultra',0)
+                    if not foundit:
+                        if (year + d/365.25) > (2024 + 153/365.25):
                         # use the new filenames and location ... 
-                        if (d == 1):
+                            if (d == 1):
                             # if january 1
-                            filename, fdir, foundit = g.new_ultra_gfz_orbits(year-1, 12, 31,hour)
-                        else:
+                                filename, fdir, foundit = g.new_ultra_gfz_orbits(year-1, 12, 31,hour)
+                            else:
                             # give it day of year (minus 1) in the second input ... 
-                            filename, fdir, foundit = g.new_ultra_gfz_orbits(year, d-1, 0,hour)
-                    else:
-                        # should update this
-                        filename, fdir, foundit = g.ultra_gfz_orbits(year, month, day, hour)
+                                filename, fdir, foundit = g.new_ultra_gfz_orbits(year, d-1, 0,hour)
                 elif (pCtr == 'gnss3') or (pCtr == 'gnss-gfz'):
                     # use GFZ ftp site instead of CDDIS
                     if (year >= 2024):
