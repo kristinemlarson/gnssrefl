@@ -245,7 +245,8 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     print('Using snr file type: ', snr)
 
     lsp['midnite'] = midnite
-    print('testing out midnite option : ',midnite)
+    if midnite:
+        print('You are testing out the midnite')
 
     # make a refraction file you will need later
     refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])

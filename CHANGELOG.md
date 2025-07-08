@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.15.1
+
+The nooverwrite option in gnssir was not properly working ... because I had moved the 
+compress snr code 
+
 ## 3.15.0
 
 Added new directory structure for GFZ rapid and ultra-rapid orbits. old directories were failing.

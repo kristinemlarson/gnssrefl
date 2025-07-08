@@ -1343,7 +1343,8 @@ def flipit3(tvd,col):
 
             # only print out the gap information the first time thru
             if col == 3:
-                print('Gap on MJD:', int(np.floor(x0[0])), ' lasting ', round(d*24,2), ' hours ')
+                xy,nul,nul,xdoy = g.mjd_more(x0[0])
+                print('Gap on MJD:', int(np.floor(x0[0])), ' lasting ', round(d*24,2), ' hours year/doy',xy,xdoy)
             #print(d,x0,h0)
             Ngaps = Ngaps + 1
             f = scipy.interpolate.interp1d(x0,h0)

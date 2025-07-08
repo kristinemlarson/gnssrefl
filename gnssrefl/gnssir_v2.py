@@ -245,7 +245,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     if (lsp['nooverwrite'] ) & (resultExist ):
         allGood = 0
         print('>>>>> The result file already exists for this day and you have selected the do not overwrite option')
-        #sys.exit()
+        obsfile = ''; obsfile2 = ''
     else:
         print('LSP Results will be written to:', fname)
         print('Refraction parameters (pressure, temp, humidity, ModelNum)',np.round(p,3),np.round(T,3),np.round(humidity,3),irefr)
@@ -294,7 +294,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                 print('The SNR file for the day before does not exist. midnite crossing option is turned off')
                 midnite = False
 
-    snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,midnite,gzip) 
+        # only compress if result was not found ...
+        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,midnite,gzip) 
 
     if allGood:
         print('SNR data were read from: ', obsfile)
