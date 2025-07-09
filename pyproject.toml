@@ -5,7 +5,7 @@ build-backend = "mesonpy"
 
 [project]
 name = "gnssrefl"
-version = "3.15.1"
+version = "3.15.2"
 description = "A GNSS reflectometry software package "
 readme = "README.md"
 maintainers = [

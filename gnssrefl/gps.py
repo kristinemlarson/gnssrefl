@@ -3850,16 +3850,12 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log):
                     subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-f','-q'])
                 else:
                     subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
-                    #subprocess.call([gexe,'-finp', r3_filename, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
-                    #'-sei','out','-smp',crate
             else:
                 crate = str(dec)
                 if (gpsonly):
                     subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-sei','out','-smp', crate, '-f','-q'])
                 else:
                     subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
-        #except:
-        #    print('Some kind of problem in translation from RINEX 3 to RINEX 2.11')
     else:
         log.write('RINEX 3 file I need does not exist, so no translation {0:s} \n'.format( r3_filename_new))
 
@@ -3872,7 +3868,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log):
         log.write('The RINEX 2.11 file does not exist: {0:s} \n'.format(r2_filename))
 
 
-    #print('remove RINEX3 rnx version of the file ',r3_filename_new)
+    log.write('Now remove RINEX3 rnx version of the file ',r3_filename_new)
     subprocess.call(['rm', '-f', r3_filename_new ])
 
     return fexists 

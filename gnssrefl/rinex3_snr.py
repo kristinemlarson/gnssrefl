@@ -33,7 +33,7 @@ def main():
     parser.add_argument("-orb", help="orbit choice", default='gbm',type=str)
     parser.add_argument("-dec", help="decimation, in seconds", default=None,type=int)
     parser.add_argument("-snr", help="SNR file ending (default is 66)", default=None,type=int)
-    parser.add_argument("-name_fail", help="boolean(T or True), RINEX 3 files masquerading as RINEX 2.11 files", default=None,type=str)
+    parser.add_argument("-name_fail", help="RINEX 3 files masquerading as RINEX 2.11 files (boolean)", default=None,type=str)
 
 
     args = parser.parse_args()
@@ -54,11 +54,18 @@ def main():
     snre = g.snr_exist(station4ch,year,doy,str(isnr))
 
     if snre : 
-        print('Requested SNR file already exists. You need to delete it. Exiting.')
+        print('Requested SNR file already exists. You need to delete ')
+        print('it if you want a new one. Exiting.')
         sys.exit()
 
     #set logs  - this is also used by rinex2snr
-    log, errorlog, exedir,genlog = r.set_rinex2snr_logs(station4ch,year,doy)
+    #log, errorlog, exedir,genlog = r.set_rinex2snr_logs(station4ch,year,doy)
+
+    # universal location for the log directory
+    logdir, logname = g.define_logdir(station4ch,year,doy)
+
+    logname = logdir + '/' + logname + 'rinex3'
+
 
     if (args.name_fail == 'T') or (args.name_fail == 'True'):
         # this is an attempt to help those people impacted by this activity.
@@ -101,9 +108,10 @@ def main():
 
 
     # first step will be to translate to rinex2
+    # need a log ... 
 
     if os.path.isfile(rinex3):
-        log.write('Found version 3 input file \n')
+        print('Found version 3 input file \n')
         if (rinex3[-2::] == 'gz'):
             #print('Must gunzip version 3 rinex')
             subprocess.call(['gunzip', rinex3])
@@ -111,17 +119,17 @@ def main():
         gpsonly = False
         if orbtype == 'nav':
             gpsonly = True
+        print('opening ', logname)
+        log = open(logname, 'w+')
         g.new_rinex3_rinex2(rinex3,rinex2,dec_rate,gpsonly,log)
+        log.close()
 
     else:
-        log.write('ERROR: your input file does not exist: {0:s} \n'.format(rinex3))
-        log.close()
-        genlog.close()
-
+        print('ERROR: your input file does not exist: {0:s} \n'.format(rinex3))
         sys.exit()
 
     if os.path.isfile(rinex2):
-        log.write('Found version 2.11 RINEX file : {0:s} \n'.format(rinex2))
+        print('Found version 2.11 RINEX file : {0:s} \n'.format(rinex2))
         idoy = int(cdoy); iyear = int(year)
 
         # many of these are fake values because the file has already been translated to rinex2
@@ -131,7 +139,7 @@ def main():
         strip = False; stream = 'R'  ; bkg = 'IGS' 
         gzip = True
         timeout = 0
-        screenstats = False
+        screenstats = True
         # removed fortran and skipit inputs ...  and got rid of the year and doy lists
         # 2024 may 28
         # this should really call conv2snr ... 
