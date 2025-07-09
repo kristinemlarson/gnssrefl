@@ -3840,7 +3840,6 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log):
         log.write('I found neither a rnx or crx RINEX 3 file and those are the only ones allowed. Exiting \n')
         return fexists
 
-    #print('decimate value: ', dec)
     s1=time.time()
     if os.path.exists(r3_filename_new):
         log.write('Now Convert from RINEX 3 to RINEX 2.11\n')
@@ -3868,7 +3867,7 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log):
         log.write('The RINEX 2.11 file does not exist: {0:s} \n'.format(r2_filename))
 
 
-    log.write('Now remove RINEX3 rnx version of the file ',r3_filename_new)
+    #log.write('Now remove RINEX3 rnx version of the file ',r3_filename_new)
     subprocess.call(['rm', '-f', r3_filename_new ])
 
     return fexists 

@@ -64,7 +64,7 @@ def main():
     # universal location for the log directory
     logdir, logname = g.define_logdir(station4ch,year,doy)
 
-    logname = logdir + '/' + logname + 'rinex3'
+    logname = logdir + '/' + logname + '.rinex3'
 
 
     if (args.name_fail == 'T') or (args.name_fail == 'True'):
