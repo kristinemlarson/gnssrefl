@@ -4778,6 +4778,7 @@ def l1c_list(year, doy):
     # GPS Block III satellites with L1C capability
     # Format: [PRN, launch_year, launch_doy]
     # Data compiled from GPS launch records as of July 2025
+    # https://en.wikipedia.org/wiki/List_of_GPS_satellites#Block_III
     l1c = np.array([
         [4, 2018, 357],  # GPS III SV01 "Vespucci" - Dec 23, 2018
         [18, 2019, 234],  # GPS III SV02 "Magellan" - Aug 22, 2019
