@@ -4752,6 +4752,51 @@ def l2c_l5_list(year,doy):
     return l2csatlist, l5satlist
 
 
+def l1c_list(year, doy):
+    """
+    Creates a satellite list of L1C transmitting satellites
+    for a given year/doy
+
+    L1C is only transmitted by GPS Block III satellites launched since December 2018.
+    Note: L1C signals are currently pre-operational and marked as "unhealthy"
+    until sufficient operational capability is established.
+
+    Parameters
+    ----------
+    year: int
+        full year
+    doy: integer
+        day of year
+
+    Returns
+    -------
+    l1csatlist : numpy array (int)
+        satellites possibly transmitting L1C signal
+
+    """
+
+    # GPS Block III satellites with L1C capability
+    # Format: [PRN, launch_year, launch_doy]
+    # Data compiled from GPS launch records as of July 2025
+    l1c = np.array([
+        [4, 2018, 357],  # GPS III SV01 "Vespucci" - Dec 23, 2018
+        [18, 2019, 234],  # GPS III SV02 "Magellan" - Aug 22, 2019
+        [23, 2020, 182],  # GPS III SV03 "Columbus" - Jun 30, 2020
+        [20, 2020, 310],  # GPS III SV04 "Henson" - Nov 5, 2020
+        [22, 2021, 168],  # GPS III SV05 "Neil Armstrong" - Jun 17, 2021
+        [19, 2023, 18],  # GPS III SV06 "Amelia Earhart" - Jan 18, 2023
+        [21, 2024, 351],  # GPS III SV07 "Sally Ride" - Dec 16, 2024
+        [26, 2025, 150],  # GPS III SV08 "Katherine Johnson" - May 30, 2025
+        # Additional GPS III satellites (SV09, SV10) expected 2025-2026
+    ])
+
+    # Find satellites launched before the specified date
+    ij = (l1c[:, 1] + l1c[:, 2] / 365.25) < (year + doy / 365.25)
+    l1csatlist = l1c[ij, 0]
+
+    return l1csatlist
+
+
 def binary(string):
     """
     changes python string to bytes for use in

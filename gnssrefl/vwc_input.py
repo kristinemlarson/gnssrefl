@@ -6,7 +6,7 @@ import sys
 
 from pathlib import Path
 
-from gnssrefl.gps import l2c_l5_list
+from gnssrefl.gps import l2c_l5_list, l1c_list
 from gnssrefl.utils import read_files_in_dir, FileTypes, FileManagement
 import gnssrefl.gnssir_v2 as guts2
 from gnssrefl.phase_functions import get_vwc_frequency
@@ -134,6 +134,10 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     if (fr == 1):
         l1_satellite_list = np.arange(1,33)
         satellite_list = l1_satellite_list
+
+        # Uncomment to use experimental L1C_list function, for filtering to GPS BLock III
+        #satellite_list = l1c_list(year, 365)
+
         apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
     else:
         print('Using L2C satellite list for December 31 on ', year)
