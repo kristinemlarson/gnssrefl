@@ -307,6 +307,62 @@ def test_func_new(x, a, b, rh_apriori,freq):
 
     return a * np.sin(freq_least_squares * x + b)
 
+def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
+    """
+    Determines the frequency to use for VWC workflows.
+    Priority is: command line -> json file -> default (20).
+
+    Parameters
+    ----------
+    station : str
+        4-character station name.
+    extension : str
+        Analysis extension name.
+    fr_cmd : str, optional
+        Frequency provided from the command line (e.g., '1', '20', or 'all'), by default None.
+
+    Returns
+    -------
+    list
+        A list of frequencies to be used for analysis.
+    """
+    # Handle the 'all' case first, which overrides everything else.
+    if fr_cmd == 'all':
+        print("Processing all supported frequencies: L1 (1) and L2C (20).")
+        return [1, 20]
+
+    final_fr = None
+    # Use command line frequency if provided (and it's not 'all')
+    if fr_cmd is not None:
+        try:
+            final_fr = int(fr_cmd)
+            print(f"Using frequency from command line: {final_fr}")
+        except ValueError:
+            print(f"Error: Invalid frequency '{fr_cmd}'. Must be an integer or 'all'.")
+            sys.exit()
+    else:
+        # Otherwise, try to read from the json file
+        lsp = gnssir.read_json_file(station, extension, noexit=True)
+        if 'freqs' in lsp and lsp.get('freqs'):
+            if len(lsp['freqs']) == 1:
+                final_fr = lsp['freqs'][0]
+                print(f"Frequency read from JSON file: {final_fr}")
+            else:
+                print("Error: 'freqs' in JSON must be a list with a single value. Exiting.")
+                sys.exit()
+        else:
+            # Default to L2C if not specified anywhere
+            final_fr = 20
+            print("No frequency specified. Defaulting to L2C (20).")
+
+    # Warn if not using the standard L2C frequency
+    if final_fr not in [1, 20]:
+        print(f"Warning: Only frequencies 1 (L1) and 20 (L2C) are officially supported.")
+    elif final_fr != 20:
+        print(f"Warning: Analyzing frequency L1 ({final_fr}). The standard is L2C (20).")
+
+    # Always return a list
+    return [final_fr]
 
 def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip):
     """

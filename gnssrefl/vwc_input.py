@@ -9,7 +9,7 @@ from pathlib import Path
 from gnssrefl.gps import l2c_l5_list
 from gnssrefl.utils import read_files_in_dir, FileTypes, FileManagement
 import gnssrefl.gnssir_v2 as guts2
-
+from gnssrefl.phase_functions import get_vwc_frequency
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -29,7 +29,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def vwc_input(station: str, year: int, fr: int = None, min_tracks: int = 100, minvalperday : int = 10,
+def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, minvalperday : int = 10,
               extension : str='', tmin : float=0.05, tmax : float=0.5, warning_value :float=5.5 ):
     """
     Sets inputs for the estimation of vwc (volumetric water content).  Picks up reflector height (RH) results for a 
@@ -96,6 +96,15 @@ def vwc_input(station: str, year: int, fr: int = None, min_tracks: int = 100, mi
     if (len(str(year)) != 4):
         print('Year must be four characters. Exiting.')
         sys.exit()
+
+    # Use helper function to determine the frequency from existing json input file if no -fr is specified
+    fr_list = get_vwc_frequency(station, extension, fr)
+    if len(fr_list) > 1:
+        print("Error: vwc_input can only process one frequency at a time.")
+        print("Please specify a single frequency with -fr or in the json file.")
+        sys.exit()
+    # Get the single frequency from the list
+    fr = fr_list[0]
 
     # Read the JSON file early to get frequency + vwc_ prefixed inputs
     lsp = guts2.read_json_file(station, extension)
