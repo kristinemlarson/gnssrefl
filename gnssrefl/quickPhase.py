@@ -141,10 +141,10 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
             for d in date_range:
                 print('Analyzing year/day of year ' + str(y) + '/' + str(d))
-                qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip)
+                qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip, extension)
     else:
         for d in np.arange(doy, doy_end + 1):
-            qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip)
+            qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip, extension)
 
 
 def main():

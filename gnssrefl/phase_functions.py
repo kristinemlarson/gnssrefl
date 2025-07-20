@@ -364,7 +364,7 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
     # Always return a list
     return [final_fr]
 
-def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip):
+def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip, extension=''):
     """
     This does the main work of estimating phase and other parameters from the SNR files
     it uses tracks that were predefined by the apriori.py code
@@ -420,9 +420,13 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
     else:
         header = "Year DOY Hour   Phase   Nv  Azimuth  Sat  Ampl emin emax  DelT aprioriRH  freq estRH  pk2noise LSPAmp\n(1)  (2)  (3)    (4)   (5)    (6)    (7)  (8)  (9)  (10)  (11)   (12)     (13)  (14)    (15)    (16)"
-        file_manager = FileManagement(station, FileTypes.phase_file, year, doy, file_not_found_ok=True)
-        print(f"Saving phase file to: {file_manager.get_file_path()}")
-        with open(file_manager.get_file_path(), 'w') as my_file:
+        output_path = FileManagement(station, FileTypes.phase_file, year, doy).get_file_path()
+        if extension:
+            output_path = output_path.parent / extension / output_path.name
+            output_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure the new subdirectory exists
+
+        print(f"Saving phase file to: {output_path}")
+        with open(output_path, 'w') as my_file:
             np.savetxt(my_file, [], header=header, comments='%')
             # read the SNR file into memory
             sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snr_exists = read_snr.read_one_snr(obsfile, 1)
