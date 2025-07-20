@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
     parser.add_argument("-advanced", default=None, type=str, help="Whether you want to implement advanced veg model (in development)")
-    parser.add_argument("-extension", default=None, type=str, help="which extension -if any - used in analysis json")
+    parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
 
     g.print_version_to_screen()
 
