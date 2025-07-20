@@ -972,6 +972,11 @@ def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = 
     fname = output_dir / 'raw.phase'
 
     dataexist, results = load_sat_phase(station, year1,year2, fr, extension)
+    if not dataexist:
+        print("No phase data was found to load.")
+        # Return empty values to prevent a crash downstream
+        return False, [], [], [], [], [], [], [], [], [], [], []
+
     results = results.T # backwards for consistency
     if snowmask == None:
         nr,nc = np.shape(results)
