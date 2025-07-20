@@ -535,7 +535,7 @@ def low_pct(amp, basepercent):
 
 
 def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
-        subdir='',hires_figs=False):
+        subdir='',hires_figs=False, extension=''):
     """
     Convert GPS phase to VWC. Using Clara Chew's algorithm from 
     Matlab write_vegcorrect_smc.m
@@ -575,7 +575,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     # read makejson
     station_file = FileManagement(station, 'make_json')
-    json_data = station_file.read_file()
+    json_data = gnssir.read_json_file(station, extension)
 
     if json_data['lat'] >= 0:
         print('Northern hemisphere summer')
@@ -585,7 +585,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         southern = True
 
     else:
-        print(f"the required json file created by gnssir_input could not be found: {station_file.get_file_path()}")
+        print(f"The required json file could not be found or is invalid: {station_file.get_file_path()}")
         sys.exit()
 
     # for PBO H2O this was set using STATSGO. 5% is reasonable as a starting point for australia
@@ -910,7 +910,7 @@ def apriori_file_exist(station,fr):
     
     return os.path.exists(apriori_path_f) 
 
-def load_phase_filter_out_snow(station, year1, year2, fr,snowmask):
+def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = ''):
     """
     Load all phase data and attempt to remove outliers from snow if snowmask provided. 
 
@@ -962,11 +962,16 @@ def load_phase_filter_out_snow(station, year1, year2, fr,snowmask):
     newresults = []
     results_trans = []
     vquad = np.empty(shape=[0, 16])
-    xdir = os.environ['REFL_CODE']
     # output will go to 
-    fname = xdir + '/Files/' + station + '/raw.phase'  
+    output_dir = Path(os.environ['REFL_CODE']) / 'Files' / station
+    if extension:
+        output_dir = output_dir / extension
 
-    dataexist, results = load_sat_phase(station, year1,year2, fr)
+    # Ensure the directory exists before trying to save to it
+    output_dir.mkdir(parents=True, exist_ok=True)
+    fname = output_dir / 'raw.phase'
+
+    dataexist, results = load_sat_phase(station, year1,year2, fr, extension)
     results = results.T # backwards for consistency
     if snowmask == None:
         nr,nc = np.shape(results)
@@ -1102,7 +1107,7 @@ def load_avg_phase(station,fr):
     return avg_exist, avg_date, avg_phase
 
 
-def load_sat_phase(station, year, year_end, freq):
+def load_sat_phase(station, year, year_end, freq, extension = ''):
     """
     Picks up the phase estimates from local (REFL_CODE) results section
     and returns most of the information from those files
@@ -1147,6 +1152,8 @@ def load_sat_phase(station, year, year_end, freq):
         print('reading in year', yyyy)
         # where the results are stored
         data_dir = thedir / str(yyyy) / 'phase' / station
+        if extension:
+            data_dir = data_dir / extension
         local_results = read_files_in_dir(data_dir)
         if local_results:
             results.extend(local_results)
@@ -1310,9 +1317,12 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     if tmax is None:
         tmax = 0.5
 
-    # default is station name
-    if subdir == None:
-        subdir = station 
+    # default is station name, but use extension if provided
+    if subdir is None:
+        if extension:
+            subdir = f"{station}/{extension}"
+        else:
+            subdir = station
 
     # make sure subdirectory exists
     g.set_subdir(subdir)

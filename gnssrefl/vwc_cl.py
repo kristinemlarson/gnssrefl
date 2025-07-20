@@ -165,7 +165,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     # pick up all the phase data. unwrapped phase is stored in the results variable
     data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp,amp_ls,ap_rh, results = \
-            qp.load_phase_filter_out_snow(station, year, year_end, fr,snow_file)
+            qp.load_phase_filter_out_snow(station, year, year_end, fr,snow_file, extension)
 
 
     if not data_exist:
@@ -442,7 +442,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs)
 
         # convert daily phase values to volumetric water content
-        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir,hires_figs)
+        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir,hires_figs, extension)
 
 
 def main():
