@@ -29,7 +29,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100, minvalperday : int = 10, 
+def vwc_input(station: str, year: int, fr: int = None, min_tracks: int = 100, minvalperday : int = 10,
               extension : str='', tmin : float=0.05, tmax : float=0.5, warning_value :float=5.5 ):
     """
     Sets inputs for the estimation of vwc (volumetric water content).  Picks up reflector height (RH) results for a 
@@ -97,6 +97,29 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100, minv
         print('Year must be four characters. Exiting.')
         sys.exit()
 
+    # Read the JSON file early to get frequency + vwc_ prefixed inputs
+    lsp = guts2.read_json_file(station, extension)
+
+    # Determine frequency from command line, JSON, or default to 20
+    if fr is None:
+        if 'freqs' in lsp and lsp['freqs'] is not None:
+            if len(lsp['freqs']) == 1:
+                fr = lsp['freqs'][0]
+                print(f"Frequency read from JSON file: {fr}")
+            else:
+                print("Error: 'freqs' in JSON must be a list with a single value. Exiting.")
+                sys.exit()
+        else:
+            # Default to L2C if not specified anywhere
+            fr = 20
+            print("No frequency specified via command line or JSON. Defaulting to L2C (20).")
+
+    # Warn if not using the standard L2C frequency
+    if fr == 1:
+        print(f"Warning: Only the L2C (-freq 20) is officially supported. L1 (-freq 1) processing is untested and in early development.")
+    elif fr not in [1, 20]:
+        print(f"Error: Frequency {fr} is not supported.")
+        sys.exit()
 
     print('Minimum number of tracks required to save a series ', min_tracks)
     gnssir_results = []
@@ -181,10 +204,6 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100, minv
     #with open(apriori_path, 'w') as my_file:
         np.savetxt(fout, apriori_array, fmt="%3.0f %6.3f %4.0f %7.2f   %4.0f  %3.0f  %3.0f")
         fout.close()
-
-
-    # read in existing information
-    lsp = guts2.read_json_file(station, extension)
 
     # new one for minimum normalized amplitude
     lsp['vwc_min_norm_amp'] = 0.5;
