@@ -4754,12 +4754,9 @@ def l2c_l5_list(year,doy):
 
 def l1c_list(year, doy):
     """
-    Creates a satellite list of L1C transmitting satellites
-    for a given year/doy
+    Creates a satellite list of L1C transmitting satellites for a given year/doy
 
     L1C is only transmitted by GPS Block III satellites launched since December 2018.
-    Note: L1C signals are currently pre-operational and marked as "unhealthy"
-    until sufficient operational capability is established.
 
     Parameters
     ----------
