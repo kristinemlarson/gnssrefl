@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("station", help="station name", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="start day of year", type=int)
-    parser.add_argument("-snr", default=None, help="snr file ending, Default is 66: < 30 deg, other values 99: 5-30 deg.; 88: all data; 50: < 10 deg.", type=int)
+    parser.add_argument("-snr", default=None, help="snr file ending, Default is 66: < 30 deg, other values 99: 5-30 deg.; 88: all data; 50: < 10 deg." )
     parser.add_argument("-orb", default=None, type=str,
                         help="orbit type, e.g. gps, gps+glo, gnss, rapid, ultra, gnss3")
     parser.add_argument("-rate", default=None, metavar='low', type=str, help="low or high (tells code which archive folder to search).  If samplerate is 1, this is set automatically to high.") 
@@ -66,7 +66,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None, rate: str = 'low', dec: int = 0,
+def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = None, rate: str = 'low', dec: int = 0,
               nolook: bool = False, archive: str = 'all', doy_end: int = None,
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
@@ -434,13 +434,18 @@ def rinex2snr(station: str, year: int, doy: int, snr: int = 66, orb: str = None,
     # set noexit cause otherwise it exits ...
     lsp = guts2.read_json_file(station[0:4].lower(), extension,noexit=True)
 
-    if 'snr' in lsp:
-        if lsp['snr'] is not None:
-            #print('snr should not be set to this value, ignoring ', lsp['snr'])
-        #else:
-            snr = lsp['snr']
-            print('An snr ending parameter was found in the station json: ', snr)
-            print('If you try to override on the command line it will not work.')
+    print('Passed value of snr ', snr)
+    if snr is None: # nothing on the command line
+        #print('You did not set the snr option on the command line')
+        if 'snr' in lsp:
+            if lsp['snr'] is None:
+                snr = 66
+            else:
+                snr = lsp['snr']
+        else:
+            snr = 66
+    else:
+        snr = int(snr)
 
     print('Using snr value of ', snr)
 

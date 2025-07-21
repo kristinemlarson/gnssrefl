@@ -34,6 +34,7 @@ def main():
     parser.add_argument("-dec", help="decimation, in seconds", default=None,type=int)
     parser.add_argument("-snr", help="SNR file ending (default is 66)", default=None,type=int)
     parser.add_argument("-name_fail", help="RINEX 3 files masquerading as RINEX 2.11 files (boolean)", default=None,type=str)
+    parser.add_argument("-overwrite", help="whether to overwrite snr file (T or True)", default=None,type=str)
 
 
     args = parser.parse_args()
@@ -47,16 +48,30 @@ def main():
     else:
         dec_rate = args.dec
 
+    xdir = os.environ['REFL_CODE']
     r3=args.rinex3
     station4ch = r3[0:4].lower()
     year = int(r3[12:16])
     doy = int(r3[16:19] )
-    snre = g.snr_exist(station4ch,year,doy,str(isnr))
 
-    if snre : 
-        print('Requested SNR file already exists. You need to delete ')
-        print('it if you want a new one. Exiting.')
-        sys.exit()
+    cyyyy, cyy, cdoy = g.ydoych(year,doy)
+
+    # snr filename
+    filename = station4ch + cdoy + '0.' + cyy + '.snr' + str(isnr)
+    full_fname = xdir + '/' + cyyyy + '/snr/' + station4ch + '/' + filename
+
+#   snre = g.snr_exist(station4ch,year,doy,str(isnr))
+    if os.path.exists(full_fname) or os.path.exists(full_fname + '.gz'):
+        snre = True
+        # lazy way of doing this
+        if (args.overwrite == 'T') or (args.overwrite == 'True'):
+            print('Requested SNR file already exists. You requested it be overwritten')
+            snre = False
+            subprocess.call(['rm','-f',full_fname])
+            subprocess.call(['rm','-f',full_fname + '.gz'])
+        else:
+            print('Requested SNR file already exists.')
+            sys.exit()
 
     #set logs  - this is also used by rinex2snr
     #log, errorlog, exedir,genlog = r.set_rinex2snr_logs(station4ch,year,doy)
@@ -119,7 +134,7 @@ def main():
         gpsonly = False
         if orbtype == 'nav':
             gpsonly = True
-        print('opening ', logname)
+        print('Opening ', logname)
         log = open(logname, 'w+')
         g.new_rinex3_rinex2(rinex3,rinex2,dec_rate,gpsonly,log)
         log.close()
