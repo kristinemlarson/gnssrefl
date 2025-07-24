@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.16.0
+July 24, 2025
+
+Various changes to the soil moisture code. This was done by George Townsend to support
+L1 soil moisture retrievals.  
+
+See [this PR](https://github.com/kristinemlarson/gnssrefl/pull/353) for more details.
+
+
 ## 3.15.3
 minor changes 
 
