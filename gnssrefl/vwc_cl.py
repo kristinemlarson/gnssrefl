@@ -24,7 +24,7 @@ def parse_arguments():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year_end", type=int)
-    parser.add_argument("-fr", help="frequency", type=int)
+    parser.add_argument("-fr", help="frequency", type=str)
     parser.add_argument("-plt", default=None, type=str, help="boolean for plotting to screen")
     parser.add_argument("-screenstats", default=None, type=str, help="boolean for plotting statistics to screen")
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 100")
@@ -38,7 +38,7 @@ def parse_arguments():
     parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
     parser.add_argument("-advanced", default=None, type=str, help="Whether you want to implement advanced veg model (in development)")
-    parser.add_argument("-extension", default=None, type=str, help="which extension -if any - used in analysis json")
+    parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
 
     g.print_version_to_screen()
 
@@ -50,7 +50,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool = True, screenstats: bool = False, 
+def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool = True, screenstats: bool = False,
         min_req_pts_track: int = None, polyorder: int = -99, minvalperday: int = None, 
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None, 
         warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False, advanced : bool=False, extension:str=None ):
@@ -144,7 +144,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
     # azimuth list, starting point only (i.e. 270 means 270 thru 360)
     azlist = [270, 0, 180,90 ]
     # consistency with old adv vegetation code
-    oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for 
+    oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for
+
+    # Default frequency selection logic (from json if none supplied by command line)
+    fr_list = qp.get_vwc_frequency(station, extension, fr)
+    if len(fr_list) > 1:
+        print("Error: vwc can only process one frequency at a time.")
+        sys.exit()
+    # Get the single frequency from the list
+    fr = fr_list[0]
 
     # pick up the parameters used for this code
     minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, \
@@ -165,7 +173,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
 
     # pick up all the phase data. unwrapped phase is stored in the results variable
     data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp,amp_ls,ap_rh, results = \
-            qp.load_phase_filter_out_snow(station, year, year_end, fr,snow_file)
+            qp.load_phase_filter_out_snow(station, year, year_end, fr,snow_file, extension)
 
 
     if not data_exist:
@@ -442,7 +450,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = 20, plt: bool =
         qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs)
 
         # convert daily phase values to volumetric water content
-        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir,hires_figs)
+        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir,hires_figs, extension)
 
 
 def main():

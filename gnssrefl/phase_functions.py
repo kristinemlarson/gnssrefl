@@ -307,8 +307,64 @@ def test_func_new(x, a, b, rh_apriori,freq):
 
     return a * np.sin(freq_least_squares * x + b)
 
+def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
+    """
+    Determines the frequency to use for VWC workflows.
+    Priority is: command line -> json file -> default (20).
 
-def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip):
+    Parameters
+    ----------
+    station : str
+        4-character station name.
+    extension : str
+        Analysis extension name.
+    fr_cmd : str, optional
+        Frequency provided from the command line (e.g., '1', '20', or 'all'), by default None.
+
+    Returns
+    -------
+    list
+        A list of frequencies to be used for analysis.
+    """
+    # Handle the 'all' case first, which overrides everything else.
+    if fr_cmd == 'all':
+        print("Processing all supported frequencies: L1 (1) and L2C (20).")
+        return [1, 20]
+
+    final_fr = None
+    # Use command line frequency if provided (and it's not 'all')
+    if fr_cmd is not None:
+        try:
+            final_fr = int(fr_cmd)
+            print(f"Using frequency from command line: {final_fr}")
+        except ValueError:
+            print(f"Error: Invalid frequency '{fr_cmd}'. Must be an integer or 'all'.")
+            sys.exit()
+    else:
+        # Otherwise, try to read from the json file
+        lsp = gnssir.read_json_file(station, extension, noexit=True)
+        if 'freqs' in lsp and lsp.get('freqs'):
+            if len(lsp['freqs']) == 1:
+                final_fr = lsp['freqs'][0]
+                print(f"Frequency read from JSON file: {final_fr}")
+            else:
+                print("Error: 'freqs' in JSON must be a list with a single value. Exiting.")
+                sys.exit()
+        else:
+            # Default to L2C if not specified anywhere
+            final_fr = 20
+            print("No frequency specified. Defaulting to L2C (20).")
+
+    # Warn if not using the standard L2C frequency
+    if final_fr not in [1, 20]:
+        print(f"Warning: Only frequencies 1 (L1) and 20 (L2C) are officially supported.")
+    elif final_fr != 20:
+        print(f"Warning: Analyzing frequency L1 ({final_fr}). The standard is L2C (20).")
+
+    # Always return a list
+    return [final_fr]
+
+def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip, extension=''):
     """
     This does the main work of estimating phase and other parameters from the SNR files
     it uses tracks that were predefined by the apriori.py code
@@ -364,9 +420,13 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
     else:
         header = "Year DOY Hour   Phase   Nv  Azimuth  Sat  Ampl emin emax  DelT aprioriRH  freq estRH  pk2noise LSPAmp\n(1)  (2)  (3)    (4)   (5)    (6)    (7)  (8)  (9)  (10)  (11)   (12)     (13)  (14)    (15)    (16)"
-        file_manager = FileManagement(station, FileTypes.phase_file, year, doy, file_not_found_ok=True)
-        print(f"Saving phase file to: {file_manager.get_file_path()}")
-        with open(file_manager.get_file_path(), 'w') as my_file:
+        output_path = FileManagement(station, FileTypes.phase_file, year, doy).get_file_path()
+        if extension:
+            output_path = output_path.parent / extension / output_path.name
+            output_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure the new subdirectory exists
+
+        print(f"Saving phase file to: {output_path}")
+        with open(output_path, 'w') as my_file:
             np.savetxt(my_file, [], header=header, comments='%')
             # read the SNR file into memory
             sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snr_exists = read_snr.read_one_snr(obsfile, 1)
@@ -475,7 +535,7 @@ def low_pct(amp, basepercent):
 
 
 def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
-        subdir='',hires_figs=False):
+        subdir='',hires_figs=False, extension=''):
     """
     Convert GPS phase to VWC. Using Clara Chew's algorithm from 
     Matlab write_vegcorrect_smc.m
@@ -515,7 +575,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     # read makejson
     station_file = FileManagement(station, 'make_json')
-    json_data = station_file.read_file()
+    json_data = gnssir.read_json_file(station, extension)
 
     if json_data['lat'] >= 0:
         print('Northern hemisphere summer')
@@ -525,7 +585,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         southern = True
 
     else:
-        print(f"the required json file created by gnssir_input could not be found: {station_file.get_file_path()}")
+        print(f"The required json file could not be found or is invalid: {station_file.get_file_path()}")
         sys.exit()
 
     # for PBO H2O this was set using STATSGO. 5% is reasonable as a starting point for australia
@@ -850,7 +910,7 @@ def apriori_file_exist(station,fr):
     
     return os.path.exists(apriori_path_f) 
 
-def load_phase_filter_out_snow(station, year1, year2, fr,snowmask):
+def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = ''):
     """
     Load all phase data and attempt to remove outliers from snow if snowmask provided. 
 
@@ -902,11 +962,21 @@ def load_phase_filter_out_snow(station, year1, year2, fr,snowmask):
     newresults = []
     results_trans = []
     vquad = np.empty(shape=[0, 16])
-    xdir = os.environ['REFL_CODE']
     # output will go to 
-    fname = xdir + '/Files/' + station + '/raw.phase'  
+    output_dir = Path(os.environ['REFL_CODE']) / 'Files' / station
+    if extension:
+        output_dir = output_dir / extension
 
-    dataexist, results = load_sat_phase(station, year1,year2, fr)
+    # Ensure the directory exists before trying to save to it
+    output_dir.mkdir(parents=True, exist_ok=True)
+    fname = output_dir / 'raw.phase'
+
+    dataexist, results = load_sat_phase(station, year1,year2, fr, extension)
+    if not dataexist:
+        print("No phase data was found to load.")
+        # Return empty values to prevent a crash downstream
+        return False, [], [], [], [], [], [], [], [], [], [], []
+
     results = results.T # backwards for consistency
     if snowmask == None:
         nr,nc = np.shape(results)
@@ -1042,7 +1112,7 @@ def load_avg_phase(station,fr):
     return avg_exist, avg_date, avg_phase
 
 
-def load_sat_phase(station, year, year_end, freq):
+def load_sat_phase(station, year, year_end, freq, extension = ''):
     """
     Picks up the phase estimates from local (REFL_CODE) results section
     and returns most of the information from those files
@@ -1087,6 +1157,8 @@ def load_sat_phase(station, year, year_end, freq):
         print('reading in year', yyyy)
         # where the results are stored
         data_dir = thedir / str(yyyy) / 'phase' / station
+        if extension:
+            data_dir = data_dir / extension
         local_results = read_files_in_dir(data_dir)
         if local_results:
             results.extend(local_results)
@@ -1250,9 +1322,12 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     if tmax is None:
         tmax = 0.5
 
-    # default is station name
-    if subdir == None:
-        subdir = station 
+    # default is station name, but use extension if provided
+    if subdir is None:
+        if extension:
+            subdir = f"{station}/{extension}"
+        else:
+            subdir = station
 
     # make sure subdirectory exists
     g.set_subdir(subdir)

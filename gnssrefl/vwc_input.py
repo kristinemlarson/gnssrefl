@@ -6,10 +6,10 @@ import sys
 
 from pathlib import Path
 
-from gnssrefl.gps import l2c_l5_list
+from gnssrefl.gps import l2c_l5_list, l1c_list
 from gnssrefl.utils import read_files_in_dir, FileTypes, FileManagement
 import gnssrefl.gnssir_v2 as guts2
-
+from gnssrefl.phase_functions import get_vwc_frequency
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -29,7 +29,7 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100, minvalperday : int = 10, 
+def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, minvalperday : int = 10,
               extension : str='', tmin : float=0.05, tmax : float=0.5, warning_value :float=5.5 ):
     """
     Sets inputs for the estimation of vwc (volumetric water content).  Picks up reflector height (RH) results for a 
@@ -97,6 +97,14 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100, minv
         print('Year must be four characters. Exiting.')
         sys.exit()
 
+    # Use the new helper function to determine the frequency.
+    fr_list = get_vwc_frequency(station, extension, fr)
+    if len(fr_list) > 1:
+        print("Error: vwc_input can only process one frequency at a time.")
+        print("Please specify a single frequency with -fr or in the json file.")
+        sys.exit()
+    # Get the single frequency from the list (vwc command only supports 1 frequency)
+    fr = fr_list[0]
 
     print('Minimum number of tracks required to save a series ', min_tracks)
     gnssir_results = []
@@ -126,6 +134,10 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100, minv
     if (fr == 1):
         l1_satellite_list = np.arange(1,33)
         satellite_list = l1_satellite_list
+
+        # Uncomment to use experimental L1C_list function, for filtering to GPS BLock III
+        #satellite_list = l1c_list(year, 365)
+
         apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
     else:
         print('Using L2C satellite list for December 31 on ', year)
@@ -182,8 +194,6 @@ def vwc_input(station: str, year: int, fr: int = 20, min_tracks: int = 100, minv
         np.savetxt(fout, apriori_array, fmt="%3.0f %6.3f %4.0f %7.2f   %4.0f  %3.0f  %3.0f")
         fout.close()
 
-
-    # read in existing information
     lsp = guts2.read_json_file(station, extension)
 
     # new one for minimum normalized amplitude

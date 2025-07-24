@@ -13,9 +13,10 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="doy", type=int)
     parser.add_argument("-snr", default=None, help="snr file ending", type=int)
-    parser.add_argument("-fr", default=None, help="frequency (use all if you want both 1 and 20)", type=str)
+    parser.add_argument("-fr", default=None, help="frequency (e.g. 1, 20, or 'all'). If not set, reads from json.", type=str)
     parser.add_argument("-doy_end", "-doy_end", default=None, type=int, help="doy end")
     parser.add_argument("-year_end", "-year_end", default=None, type=int, help="year end")
+    parser.add_argument("-extension", default='', help="analysis extension for json file", type=str)
     parser.add_argument("-e1", default=None, type=float),
     parser.add_argument("-e2", default=None, type=float),
     parser.add_argument("-plt", default=None, type=str, help="plots come to the screen - which you do not want!")
@@ -32,8 +33,8 @@ def parse_arguments():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66, 
-        fr: str = '20', e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip: bool = True):
+def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66,
+        fr: str = None, e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip: bool = True, extension: str = ''):
     """
     quickphase computes phase, which are subquently used in vwc. The command line call is phase
     (which maybe we should change).
@@ -100,19 +101,15 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         print('Station name must be four characters long. Exiting.')
         sys.exit()
 
-    if fr == 'all':
-        fr_list = [1, 20]
-        ex = qp.apriori_file_exist(station,20)
-        if (not ex):
-            print('No apriori RH file exists. Run vwc_input')
-            sys.exit()
-    else:
-        fr_list = [int(fr)]
-        ex = qp.apriori_file_exist(station,int(fr))
-        if (not ex):
-            print('No apriori RH file exists. Run vwc_input')
-            sys.exit()
+    # Use the helper function to get the list of frequencies.
+    fr_list = qp.get_vwc_frequency(station, extension, fr)
 
+    # Check that an apriori file exists for each requested frequency.
+    for f in fr_list:
+        ex = qp.apriori_file_exist(station, f)
+        if not ex:
+            print(f'No apriori RH file exists for frequency {f}. Please run vwc_input.')
+            sys.exit()
 
     # in case you want to analyze multiple days of data
     if not doy_end:
@@ -144,10 +141,10 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
             for d in date_range:
                 print('Analyzing year/day of year ' + str(y) + '/' + str(d))
-                qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip)
+                qp.phase_tracks(station, y, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip, extension)
     else:
         for d in np.arange(doy, doy_end + 1):
-            qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip)
+            qp.phase_tracks(station, year, d, snr, fr_list, e1, e2, pele, plt, screenstats, compute_lsp, gzip, extension)
 
 
 def main():
