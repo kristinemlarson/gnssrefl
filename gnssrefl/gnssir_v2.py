@@ -18,6 +18,7 @@ import gnssrefl.gps as g
 import gnssrefl.read_snr_files as snr
 import gnssrefl.refraction as refr
 import gnssrefl.retrieve_rh as r
+from gnssrefl.utils import FileManagement, FileTypes
 
 def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     """
@@ -577,7 +578,6 @@ def read_json_file(station, extension,**kwargs):
     noexit = kwargs.get('noexit',False)
     
     # Use FileManagement to find JSON file with proper fallback
-    from .utils import FileManagement, FileTypes
     json_manager = FileManagement(station, FileTypes.make_json, extension=extension)
     json_path, format_type = json_manager.find_json_file()
     

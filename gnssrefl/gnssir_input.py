@@ -7,7 +7,7 @@ import sys
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
 
-from gnssrefl.utils import str2bool
+from gnssrefl.utils import str2bool, FileManagement, FileTypes
 
 
 def parse_arguments():
@@ -395,7 +395,6 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['PkNoise'] = peak2noise
 
     # Use FileManagement to get JSON file path with new directory structure
-    from .utils import FileManagement, FileTypes
     json_manager = FileManagement(station, FileTypes.make_json, extension=extension)
     outputfile = json_manager.get_file_path()
     
