@@ -67,12 +67,14 @@ class FileManagement:
     Optional parameters are year, doy, and file_not_found_ok.
     """
 
-    def __init__(self, station, file_type: FileTypes, year: int = None, doy: int = None, file_not_found_ok: bool = False):
+    def __init__(self, station, file_type: FileTypes, year: int = None, doy: int = None, file_not_found_ok: bool = False, frequency: int = None, extension: str = ''):
         self.station = station
         self.file_type: FileTypes = file_type
         self.year = year
         self.doy = doy
         self.file_not_found_ok = file_not_found_ok
+        self.frequency = frequency
+        self.extension = extension
 
         self.xdir = Path(os.environ["REFL_CODE"])
 
@@ -82,7 +84,7 @@ class FileManagement:
         Returns file paths requested as a string
         """
         if self.file_type in FileTypes.__dict__.keys():
-            files = {FileTypes.apriori_rh_file: self.xdir / "input" / f"{self.station}_phaseRH.txt",
+            files = {FileTypes.apriori_rh_file: self._get_apriori_rh_path(),
                      FileTypes.daily_avg_phase_results: self.xdir / "Files" / f"{self.station}_phase.txt",
                      FileTypes.make_json: self.xdir / "input" / f"{self.station}.json",
                      FileTypes.volumetric_water_content: self.xdir / "Files" / f"{self.station}_vwc.txt"
@@ -94,6 +96,68 @@ class FileManagement:
             return files[self.file_type]
         else:
             raise ValueError("The file type you requested does not exist")
+
+    def _get_apriori_rh_path(self):
+        """
+        Generate backwards-compatible apriori RH file paths with frequency and extension support.
+        
+        New naming convention:
+        - No extension: {station}_phaseRH_L{freq}.txt  
+        - With extension: {station}_phaseRH_L{freq}_{extension}.txt
+        
+        Fallback for legacy files:
+        - L2 legacy: {station}_phaseRH.txt (no L2 suffix)
+        - L1 legacy: {station}_phaseRH_L1.txt
+        """
+        # Determine base directory
+        base_dir = self.xdir / "input"
+        if self.extension:
+            base_dir = base_dir / self.extension
+        
+        # Generate new format filename
+        if self.frequency is None:
+            # Default to L2 if no frequency specified
+            freq_suffix = "L2"
+        else:
+            freq_suffix = f"L{self.frequency}"
+        
+        if self.extension:
+            filename = f"{self.station}_phaseRH_{freq_suffix}_{self.extension}.txt"
+        else:
+            filename = f"{self.station}_phaseRH_{freq_suffix}.txt"
+        
+        return base_dir / filename
+
+    def find_apriori_rh_file(self):
+        """
+        Find apriori RH file with backwards compatibility fallback.
+        
+        Search order:
+        1. New format: {station}_phaseRH_L{freq}[_{extension}].txt
+        2. Legacy fallback: {station}_phaseRH[_L1].txt (L2 default, L1 explicit)
+        
+        Returns: (Path, bool) - (file_path, is_legacy_format)
+        """
+        # Try new format first
+        new_path = self._get_apriori_rh_path()
+        if new_path.exists():
+            return new_path, False
+        
+        # Try legacy format fallback
+        base_dir = self.xdir / "input"  # Legacy files are always in root input/
+        
+        if self.frequency == 1:
+            # L1 legacy format
+            legacy_path = base_dir / f"{self.station}_phaseRH_L1.txt"
+        else:
+            # L2 legacy format (no frequency suffix)
+            legacy_path = base_dir / f"{self.station}_phaseRH.txt"
+        
+        if legacy_path.exists():
+            return legacy_path, True
+        
+        # Return new format path even if it doesn't exist (for writing new files)
+        return new_path, False
 
     def read_file(self, transpose=False, **kwargs):
         """
