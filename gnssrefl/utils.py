@@ -140,17 +140,16 @@ class FileManagement:
         if self.extension:
             base_dir = base_dir / self.extension
         
-        # Generate new format filename
+        # Generate clean filename (extension handled by directory structure)
         if self.frequency is None:
             # Default to L2 if no frequency specified
             freq_suffix = "L2"
+        elif self.frequency == 20:
+            freq_suffix = "L2"  # Map L2C (20) to clean L2 naming
         else:
             freq_suffix = f"L{self.frequency}"
         
-        if self.extension:
-            filename = f"{self.station}_phaseRH_{freq_suffix}_{self.extension}.txt"
-        else:
-            filename = f"{self.station}_phaseRH_{freq_suffix}.txt"
+        filename = f"{self.station}_phaseRH_{freq_suffix}.txt"
         
         return base_dir / filename
 
@@ -175,9 +174,15 @@ class FileManagement:
         if self.frequency == 1:
             # L1 legacy format
             legacy_path = base_dir / f"{self.station}_phaseRH_L1.txt"
-        else:
-            # L2 legacy format (no frequency suffix)
+        elif self.frequency == 20 or self.frequency is None:
+            # L2C/L2 legacy format (no frequency suffix for backwards compatibility)
             legacy_path = base_dir / f"{self.station}_phaseRH.txt"
+        elif self.frequency == 5:
+            # L5 legacy format
+            legacy_path = base_dir / f"{self.station}_phaseRH_L5.txt"
+        else:
+            # Other frequencies
+            legacy_path = base_dir / f"{self.station}_phaseRH_L{self.frequency}.txt"
         
         if legacy_path.exists():
             return legacy_path, True
