@@ -108,7 +108,10 @@ class FileManagement:
                      }
 
             if self.year and self.doy:
-                files[FileTypes.phase_file] = self.xdir / str(self.year) / 'phase' / str(self.station) / f'{self.doy:03d}.txt'
+                phase_path = self.xdir / str(self.year) / 'phase' / str(self.station)
+                if self.extension:
+                    phase_path = phase_path / self.extension
+                files[FileTypes.phase_file] = phase_path / f'{self.doy:03d}.txt'
 
             file_path = files[self.file_type]
             

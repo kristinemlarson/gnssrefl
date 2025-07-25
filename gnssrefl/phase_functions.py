@@ -425,9 +425,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
     else:
         header = "Year DOY Hour   Phase   Nv  Azimuth  Sat  Ampl emin emax  DelT aprioriRH  freq estRH  pk2noise LSPAmp\n(1)  (2)  (3)    (4)   (5)    (6)    (7)  (8)  (9)  (10)  (11)   (12)     (13)  (14)    (15)    (16)"
-        output_path = FileManagement(station, 'phase_file', year, doy).get_file_path()
-        if extension:
-            output_path = output_path.parent / extension / output_path.name
+        output_path = FileManagement(station, 'phase_file', year, doy, extension=extension).get_file_path()
 
         print(f"Saving phase file to: {output_path}")
         with open(output_path, 'w') as my_file:
