@@ -806,7 +806,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
                 w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
 
 
-def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir):
+def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension=''):
 
     """
     creates output file for average phase results
@@ -834,6 +834,9 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir):
 
     subdir : str
         subdirectory for results
+    
+    extension : str, optional
+        analysis extension for directory organization
 
     Returns
     -------

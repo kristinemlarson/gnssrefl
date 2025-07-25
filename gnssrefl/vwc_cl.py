@@ -437,7 +437,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         sys.exit()
     else:
         # write out daily phase values
-        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir)
+        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension)
         print('Number of daily phase measurements ', len(tv))
         if len(tv) < 1:
             print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
