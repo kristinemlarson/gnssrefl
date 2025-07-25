@@ -577,7 +577,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     # read makejson
     station_file = FileManagement(station, 'make_json')
-    json_data = gnssir.read_json_file(station, extension)
+    json_data = gnssir.read_json_file(station, extension, silent=True)
 
     if json_data['lat'] >= 0:
         print('Northern hemisphere summer')
@@ -1265,9 +1265,9 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     g.checkFiles(station, '')
     # should not crash if file does not exist...
     if extension is None:
-        lsp = gnssir.read_json_file(station, '',noexit=True)
+        lsp = gnssir.read_json_file(station, '',noexit=True, silent=True)
     else:
-        lsp = gnssir.read_json_file(station, extension,noexit=True)
+        lsp = gnssir.read_json_file(station, extension,noexit=True, silent=True)
 
     # originally this was for command line interface ... 
     remove_bad_tracks = auto_removal # ??

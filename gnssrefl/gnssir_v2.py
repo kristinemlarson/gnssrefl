@@ -576,16 +576,18 @@ def read_json_file(station, extension,**kwargs):
     # pick up a new parameter - that will be True for people looking
     # for the json but that aren't upset it does not exist.
     noexit = kwargs.get('noexit',False)
+    silent = kwargs.get('silent',False)
     
     # Use FileManagement to find JSON file with proper fallback
     json_manager = FileManagement(station, 'make_json', extension=extension)
     json_path, format_type = json_manager.find_json_file()
     
     if json_path.exists():
-        if format_type in ['legacy_extension', 'legacy_station']:
-            print(f'Using JSON file (legacy directory): {json_path}')
-        else:
-            print(f'Using JSON file: {json_path}')
+        if not silent:
+            if format_type in ['legacy_extension', 'legacy_station']:
+                print(f'Using JSON file (legacy directory): {json_path}')
+            else:
+                print(f'Using JSON file: {json_path}')
         
         with open(json_path) as f:
             lsp = json.load(f)
