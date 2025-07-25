@@ -233,8 +233,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # checking each geographic quadrant
     k4 = 1
     # two list of tracks - lets you compare an old run with a new run as a form of QC
-    newlist = station + '_tmp.txt'
-    oldlist = xdir + '/input/' + station + '_phaseRH.txt'
+    newlist = f'{station}_tmp.txt'
+    oldlist = Path(xdir) / 'input' / f'{station}_phaseRH.txt'
 
     ftmp = open(newlist,'w+')
     ftmp.write("{0:s} \n".format( '% station ' + station) )

@@ -68,7 +68,7 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs):
         whether you want eps instead of png files
 
     """
-    outdir = xdir + '/Files/' + subdir
+    outdir = Path(xdir) / 'Files' / subdir
     plt.figure(figsize=(10, 6))
     plt.plot(datetime_dates, tv[:, 2], 'b-')
     plt.ylabel('phase (degrees)')
@@ -126,7 +126,8 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     """
     snowmask_exists = False
     myxdir = os.environ['REFL_CODE']
-    snowfile = myxdir + '/Files/' + station + '/snowmask_' + station + '.txt' 
+    # Use consistent path structure for snow mask file
+    snowfile = Path(myxdir) / 'Files' / station / f'snowmask_{station}.txt' 
     if os.path.exists(snowfile):
         print('Using existing snow mask file, ', snowfile)
         snowmask_exists = True
@@ -139,7 +140,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
     # writes out a daily average file. woudl be better if it returned the values, but this works
     da.daily_avg(station, medfilter, ReqTracks, txtfile, pltit,
               extension, year1, year2, fr, csv) 
-    avgf = myxdir + '/Files/' + station + '/' + txtfile
+    avgf = Path(myxdir) / 'Files' / station / txtfile
     print('Looking in ', avgf)
     x = np.loadtxt(avgf, comments='%')
     # delete the file!
@@ -764,7 +765,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     ax.grid()
     plt.gcf().autofmt_xdate()
 
-    outdir = f'{xdir}/Files/{subdir}'
+    outdir = Path(xdir) / 'Files' / subdir
 
     if hires_figs:
         plot_path = f'{outdir}/{station}_phase_vwc_result.eps'
@@ -1053,7 +1054,7 @@ def help_debug(rt,xdir, station):
         name of the station
 
     """
-    fname = xdir + '/Files/' + station +'/tmp.' + station
+    fname = Path(xdir) / 'Files' / station / f'tmp.{station}'
     # don't have a priori rh values at this point
     rhtrack = 0
     #if True:
@@ -1144,7 +1145,7 @@ def load_sat_phase(station, year, year_end, freq, extension = ''):
     print('Requested frequency: ', freq)
     dataexist = False
     xdir = os.environ['REFL_CODE']
-    xfile = xdir + '/input/override/' + station + '_vwc' 
+    xfile = Path(xdir) / 'input' / 'override' / f'{station}_vwc' 
     found_override = False
     # not implementing this yet
     if os.path.exists(xfile):

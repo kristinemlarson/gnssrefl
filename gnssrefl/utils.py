@@ -69,8 +69,12 @@ class FileManagement:
 
     def __init__(self, station, file_type, year: int = None, doy: int = None, file_not_found_ok: bool = False, frequency: int = None, extension: str = ''):
         self.station = station
+        
         # Convert string to FileTypes enum if needed for better usability
         if isinstance(file_type, str):
+            if not hasattr(FileTypes, file_type):
+                valid_types = [attr for attr in dir(FileTypes) if not attr.startswith('_')]
+                raise ValueError(f"Unknown file type: '{file_type}'. Valid types: {valid_types}")
             self.file_type = getattr(FileTypes, file_type)
         else:
             self.file_type = file_type
