@@ -793,7 +793,10 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     print('>>> VWC results being written to ', vwcfile)
     with open(vwcfile, 'w') as w:
         N = len(nv)
+        freq_map = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}
+        freq_name = freq_map.get(fr, f"Frequency {fr}")
         w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
+        w.write("% Frequency used: {0} \n".format(freq_name))
         w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
         w.write("% FracYr    Year   DOY   VWC Month Day \n")
         for iw in range(0, N):

@@ -24,7 +24,7 @@ def parse_arguments():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year_end", type=int)
-    parser.add_argument("-fr", help="frequency", type=str)
+    parser.add_argument("-fr", help="frequency: 1 (L1), 20 (L2C), 5 (L5). Only L2C officially supported.", type=str)
     parser.add_argument("-plt", default=None, type=str, help="boolean for plotting to screen")
     parser.add_argument("-screenstats", default=None, type=str, help="boolean for plotting statistics to screen")
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 100")
