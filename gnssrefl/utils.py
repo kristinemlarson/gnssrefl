@@ -85,9 +85,9 @@ class FileManagement:
         """
         if self.file_type in FileTypes.__dict__.keys():
             files = {FileTypes.apriori_rh_file: self._get_apriori_rh_path(),
-                     FileTypes.daily_avg_phase_results: self.xdir / "Files" / f"{self.station}_phase.txt",
+                     FileTypes.daily_avg_phase_results: self._get_daily_avg_phase_path(),
                      FileTypes.make_json: self._get_json_path(),
-                     FileTypes.volumetric_water_content: self.xdir / "Files" / f"{self.station}_vwc.txt"
+                     FileTypes.volumetric_water_content: self._get_volumetric_water_content_path()
                      }
 
             if self.year and self.doy:
@@ -211,6 +211,112 @@ class FileManagement:
         
         # Return new format path for writing
         return self._get_json_path(), 'new_format'
+
+    def _get_daily_avg_phase_path(self):
+        """
+        Generate phase file paths with station/extension directory structure.
+        
+        New directory structure:
+        - No extension: Files/{station}/{station}_phase.txt
+        - With extension: Files/{station}/{extension}/{station}_phase.txt
+        """
+        if self.extension:
+            phase_dir = self.xdir / "Files" / self.station / self.extension
+            return phase_dir / f"{self.station}_phase.txt"
+        else:
+            phase_dir = self.xdir / "Files" / self.station
+            return phase_dir / f"{self.station}_phase.txt"
+
+    def find_daily_avg_phase_file(self):
+        """
+        Find daily average phase file with backwards compatibility fallback.
+        
+        Search order:
+        - No extension: 
+          1. Files/{station}/{station}_phase.txt (new format)
+          2. Files/{station}_phase.txt (legacy fallback)
+        - With extension:
+          1. Files/{station}/{extension}/{station}_phase.txt (new format)  
+          2. Files/{station}_phase.txt (legacy fallback - no extension separation in legacy)
+        
+        Returns: (Path, str) - (file_path, format_type)
+        """
+        if self.extension:
+            # Extension specified: try new extension format first
+            extension_dir_path = self.xdir / "Files" / self.station / self.extension / f"{self.station}_phase.txt"
+            if extension_dir_path.exists():
+                return extension_dir_path, 'extension_dir'
+            
+            # Fall back to legacy format (no extension distinction in legacy)
+            legacy_path = self.xdir / "Files" / f"{self.station}_phase.txt"
+            if legacy_path.exists():
+                return legacy_path, 'legacy'
+        else:
+            # No extension: try new station format first
+            station_dir_path = self.xdir / "Files" / self.station / f"{self.station}_phase.txt"
+            if station_dir_path.exists():
+                return station_dir_path, 'station_dir'
+            
+            # Fall back to legacy format
+            legacy_path = self.xdir / "Files" / f"{self.station}_phase.txt"
+            if legacy_path.exists():
+                return legacy_path, 'legacy'
+        
+        # Return new format path for writing
+        return self._get_daily_avg_phase_path(), 'new_format'
+
+    def _get_volumetric_water_content_path(self):
+        """
+        Generate volumetric water content file paths with station/extension directory structure.
+        
+        New directory structure:
+        - No extension: Files/{station}/{station}_vwc.txt
+        - With extension: Files/{station}/{extension}/{station}_vwc.txt
+        """
+        if self.extension:
+            vwc_dir = self.xdir / "Files" / self.station / self.extension
+            return vwc_dir / f"{self.station}_vwc.txt"
+        else:
+            vwc_dir = self.xdir / "Files" / self.station
+            return vwc_dir / f"{self.station}_vwc.txt"
+
+    def find_volumetric_water_content_file(self):
+        """
+        Find volumetric water content file with backwards compatibility fallback.
+        
+        Search order:
+        - No extension: 
+          1. Files/{station}/{station}_vwc.txt (new format)
+          2. Files/{station}_vwc.txt (legacy fallback)
+        - With extension:
+          1. Files/{station}/{extension}/{station}_vwc.txt (new format)  
+          2. Files/{station}_vwc.txt (legacy fallback - no extension separation in legacy)
+        
+        Returns: (Path, str) - (file_path, format_type)
+        """
+        if self.extension:
+            # Extension specified: try new extension format first
+            extension_dir_path = self.xdir / "Files" / self.station / self.extension / f"{self.station}_vwc.txt"
+            if extension_dir_path.exists():
+                return extension_dir_path, 'extension_dir'
+            
+            # Fall back to legacy format (no extension distinction in legacy)
+            legacy_path = self.xdir / "Files" / f"{self.station}_vwc.txt"
+            if legacy_path.exists():
+                return legacy_path, 'legacy'
+        else:
+            # No extension: try new station format first
+            station_dir_path = self.xdir / "Files" / self.station / f"{self.station}_vwc.txt"
+            if station_dir_path.exists():
+                return station_dir_path, 'station_dir'
+            
+            # Fall back to legacy format
+            legacy_path = self.xdir / "Files" / f"{self.station}_vwc.txt"
+            if legacy_path.exists():
+                return legacy_path, 'legacy'
+        
+        # Return new format path for writing
+        return self._get_volumetric_water_content_path(), 'new_format'
 
     def read_file(self, transpose=False, **kwargs):
         """
