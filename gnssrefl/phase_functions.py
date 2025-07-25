@@ -255,9 +255,9 @@ def read_apriori_rh(station, fr, extension=''):
     if apriori_path_f.exists():
         result = np.loadtxt(apriori_path_f, comments='%', ndmin=2)
         if is_legacy:
-            print(f'Using legacy RH file: {apriori_path_f}')
+            print(f'Using RH file (legacy directory): {apriori_path_f}')
         else:
-            print(f'Using: {apriori_path_f}')
+            print(f'Using RH file: {apriori_path_f}')
     else:
         print('Average RH file does not exist')
         sys.exit()

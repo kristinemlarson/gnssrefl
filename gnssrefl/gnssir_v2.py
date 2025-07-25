@@ -583,9 +583,9 @@ def read_json_file(station, extension,**kwargs):
     
     if json_path.exists():
         if format_type in ['legacy_extension', 'legacy_station']:
-            print(f'Using legacy JSON file: {json_path}')
+            print(f'Using JSON file (legacy directory): {json_path}')
         else:
-            print(f'Using these instructions {json_path}')
+            print(f'Using JSON file: {json_path}')
         
         with open(json_path) as f:
             lsp = json.load(f)
