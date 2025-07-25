@@ -397,9 +397,6 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     # Use FileManagement to get JSON file path with new directory structure
     json_manager = FileManagement(station, FileTypes.make_json, extension=extension)
     outputfile = json_manager.get_file_path()
-    
-    # Ensure directory exists for new structure
-    outputfile.parent.mkdir(parents=True, exist_ok=True)
 
     # 4 was the original default.  Totally up to the user. 
     lsp['polyV'] = polyV # polynomial order for DC removal

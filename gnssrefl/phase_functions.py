@@ -427,7 +427,6 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
         output_path = FileManagement(station, FileTypes.phase_file, year, doy).get_file_path()
         if extension:
             output_path = output_path.parent / extension / output_path.name
-            output_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure the new subdirectory exists
 
         print(f"Saving phase file to: {output_path}")
         with open(output_path, 'w') as my_file:
@@ -578,7 +577,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         year_end = year
 
     # read makejson
-    station_file = FileManagement(station, 'make_json')
+    station_file = FileManagement(station, FileTypes.make_json)
     json_data = gnssir.read_json_file(station, extension)
 
     if json_data['lat'] >= 0:
@@ -604,12 +603,13 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     myxdir = os.environ['REFL_CODE']
 
 
-    # begging for a function ...
-    # overriding Kelly's code for now
+    # Use FileManagement for consistent phase file paths
+    file_manager = FileManagement(station, FileTypes.daily_avg_phase_results, extension=extension)
+    fileout = file_manager.get_file_path()
+    
+    # Handle L1 frequency naming convention
     if (fr == 1):
-        fileout = myxdir + '/Files/' + subdir + '/' + station + '_phase_L1.txt'
-    else:
-        fileout = myxdir + '/Files/' + subdir + '/' + station + '_phase.txt'
+        fileout = fileout.parent / f"{station}_phase_L1.txt"
     print(subdir)
 
     if os.path.exists(fileout):
@@ -784,9 +784,9 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     if plt2screen:
         plt.show()
 
-    vwcfile = FileManagement(station, FileTypes.volumetric_water_content).get_file_path()
-
-    vwcfile = f'{outdir}/{station}_vwc.txt'
+    # Use FileManagement with extension support for consistent directory structure
+    file_manager = FileManagement(station, FileTypes.volumetric_water_content, extension=extension)
+    vwcfile = file_manager.get_file_path()
     print('>>> VWC results being written to ', vwcfile)
     with open(vwcfile, 'w') as w:
         N = len(nv)
@@ -856,11 +856,13 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir):
 
     tv = np.empty(shape=[0, 4])
 
-    # ultimately would like to use kelly's code here
+    # Use FileManagement for consistent phase file paths
+    file_manager = FileManagement(station, FileTypes.daily_avg_phase_results, extension=extension)
+    fileout = file_manager.get_file_path()
+    
+    # Handle L1 frequency naming convention
     if (fr == 1):
-        fileout = myxdir + '/Files/'  + subdir + '/' + station + '_phase_L1.txt'
-    else:
-        fileout = myxdir + '/Files/' + subdir + '/' + station + '_phase.txt'
+        fileout = fileout.parent / f"{station}_phase_L1.txt"
 
     print('Daily averaged phases will be written to : ', fileout)
     with open(fileout, 'w') as fout:
@@ -969,7 +971,6 @@ def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = 
         output_dir = output_dir / extension
 
     # Ensure the directory exists before trying to save to it
-    output_dir.mkdir(parents=True, exist_ok=True)
     fname = output_dir / 'raw.phase'
 
     dataexist, results = load_sat_phase(station, year1,year2, fr, extension)
@@ -1091,10 +1092,13 @@ def load_avg_phase(station,fr):
     avg_phase = []
     avg_exist = False
 
+    # Use FileManagement for consistent phase file paths
+    file_manager = FileManagement(station, FileTypes.daily_avg_phase_results)
+    xfile = file_manager.get_file_path()
+    
+    # Handle L1 frequency naming convention
     if fr == 1:
-        xfile = f'{xdir}/Files/{station}/{station}_phase_L1.txt'
-    else:
-        xfile = f'{xdir}/Files/{station}/{station}_phase.txt'
+        xfile = xfile.parent / f"{station}_phase_L1.txt"
 
     if os.path.exists(xfile):
         result = np.loadtxt(xfile, comments='%')

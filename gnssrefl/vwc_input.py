@@ -173,9 +173,6 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     # Use FileManagement with frequency and extension support
     file_manager = FileManagement(station, FileTypes.apriori_rh_file, frequency=fr, extension=extension)
     apriori_path_f = file_manager.get_file_path()
-    
-    # Ensure directory exists for new extension-based paths
-    apriori_path_f.parent.mkdir(parents=True, exist_ok=True)
 
     # save file
 
@@ -211,9 +208,6 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     # Use FileManagement to get JSON file path with new directory structure
     json_manager = FileManagement(station, FileTypes.make_json, extension=extension)
     json_path = json_manager.get_file_path()
-    
-    # Ensure directory exists for new structure
-    json_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(json_path, 'w+') as outfile:
         json.dump(lsp, outfile, indent=4)

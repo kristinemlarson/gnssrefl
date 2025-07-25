@@ -78,10 +78,19 @@ class FileManagement:
 
         self.xdir = Path(os.environ["REFL_CODE"])
 
-    def get_file_path(self):
+    def get_file_path(self, ensure_directory=True):
         """
         Get the path of a specific file from the FileTypes class.
-        Returns file paths requested as a string
+        
+        Parameters
+        ----------
+        ensure_directory : bool, optional
+            If True, creates the parent directory if it doesn't exist. Default is True.
+            
+        Returns
+        -------
+        Path
+            File path requested as a Path object
         """
         if self.file_type in FileTypes.__dict__.keys():
             files = {FileTypes.apriori_rh_file: self._get_apriori_rh_path(),
@@ -93,7 +102,13 @@ class FileManagement:
             if self.year and self.doy:
                 files[FileTypes.phase_file] = self.xdir / str(self.year) / 'phase' / str(self.station) / f'{self.doy:03d}.txt'
 
-            return files[self.file_type]
+            file_path = files[self.file_type]
+            
+            # Create directory if requested
+            if ensure_directory:
+                file_path.parent.mkdir(parents=True, exist_ok=True)
+                
+            return file_path
         else:
             raise ValueError("The file type you requested does not exist")
 
