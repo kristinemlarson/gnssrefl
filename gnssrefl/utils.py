@@ -67,9 +67,13 @@ class FileManagement:
     Optional parameters are year, doy, and file_not_found_ok.
     """
 
-    def __init__(self, station, file_type: FileTypes, year: int = None, doy: int = None, file_not_found_ok: bool = False, frequency: int = None, extension: str = ''):
+    def __init__(self, station, file_type, year: int = None, doy: int = None, file_not_found_ok: bool = False, frequency: int = None, extension: str = ''):
         self.station = station
-        self.file_type: FileTypes = file_type
+        # Convert string to FileTypes enum if needed for better usability
+        if isinstance(file_type, str):
+            self.file_type = getattr(FileTypes, file_type)
+        else:
+            self.file_type = file_type
         self.year = year
         self.doy = doy
         self.file_not_found_ok = file_not_found_ok

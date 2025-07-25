@@ -171,7 +171,7 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
                 apriori_array.append([b, np.mean(reflector_heights), satellite, average_azimuth, len(reflector_heights), azimuth_min, azimuth_max])
 
     # Use FileManagement with frequency and extension support
-    file_manager = FileManagement(station, FileTypes.apriori_rh_file, frequency=fr, extension=extension)
+    file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
     apriori_path_f = file_manager.get_file_path()
 
     # save file
@@ -206,7 +206,7 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     lsp['vwc_min_req_pts_track'] = min_tracks # this is total number of days needed to keep a satellite
 
     # Use FileManagement to get JSON file path with new directory structure
-    json_manager = FileManagement(station, FileTypes.make_json, extension=extension)
+    json_manager = FileManagement(station, 'make_json', extension=extension)
     json_path = json_manager.get_file_path()
 
     with open(json_path, 'w+') as outfile:

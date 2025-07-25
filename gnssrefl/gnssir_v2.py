@@ -578,7 +578,7 @@ def read_json_file(station, extension,**kwargs):
     noexit = kwargs.get('noexit',False)
     
     # Use FileManagement to find JSON file with proper fallback
-    json_manager = FileManagement(station, FileTypes.make_json, extension=extension)
+    json_manager = FileManagement(station, 'make_json', extension=extension)
     json_path, format_type = json_manager.find_json_file()
     
     if json_path.exists():

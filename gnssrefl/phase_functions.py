@@ -249,7 +249,7 @@ def read_apriori_rh(station, fr, extension=''):
         column 7 is maximum azimuth degrees for the quadrant
     """
     result = []
-    file_manager = FileManagement(station, FileTypes.apriori_rh_file, frequency=fr, extension=extension)
+    file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
     apriori_path_f, is_legacy = file_manager.find_apriori_rh_file()
 
     if apriori_path_f.exists():
@@ -424,7 +424,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
     else:
         header = "Year DOY Hour   Phase   Nv  Azimuth  Sat  Ampl emin emax  DelT aprioriRH  freq estRH  pk2noise LSPAmp\n(1)  (2)  (3)    (4)   (5)    (6)    (7)  (8)  (9)  (10)  (11)   (12)     (13)  (14)    (15)    (16)"
-        output_path = FileManagement(station, FileTypes.phase_file, year, doy).get_file_path()
+        output_path = FileManagement(station, 'phase_file', year, doy).get_file_path()
         if extension:
             output_path = output_path.parent / extension / output_path.name
 
@@ -577,7 +577,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         year_end = year
 
     # read makejson
-    station_file = FileManagement(station, FileTypes.make_json)
+    station_file = FileManagement(station, 'make_json')
     json_data = gnssir.read_json_file(station, extension)
 
     if json_data['lat'] >= 0:
@@ -604,7 +604,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
 
     # Use FileManagement for consistent phase file paths
-    file_manager = FileManagement(station, FileTypes.daily_avg_phase_results, extension=extension)
+    file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
     fileout = file_manager.get_file_path()
     
     # Handle L1 frequency naming convention
@@ -785,7 +785,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         plt.show()
 
     # Use FileManagement with extension support for consistent directory structure
-    file_manager = FileManagement(station, FileTypes.volumetric_water_content, extension=extension)
+    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
     vwcfile = file_manager.get_file_path()
     print('>>> VWC results being written to ', vwcfile)
     with open(vwcfile, 'w') as w:
@@ -857,7 +857,7 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir):
     tv = np.empty(shape=[0, 4])
 
     # Use FileManagement for consistent phase file paths
-    file_manager = FileManagement(station, FileTypes.daily_avg_phase_results, extension=extension)
+    file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
     fileout = file_manager.get_file_path()
     
     # Handle L1 frequency naming convention
@@ -908,7 +908,7 @@ def apriori_file_exist(station, fr, extension=''):
     boolean as to whether the apriori file exists
 
     """
-    file_manager = FileManagement(station, FileTypes.apriori_rh_file, frequency=fr, extension=extension)
+    file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
     apriori_path_f, _ = file_manager.find_apriori_rh_file()
     
     return apriori_path_f.exists() 
@@ -1093,7 +1093,7 @@ def load_avg_phase(station,fr):
     avg_exist = False
 
     # Use FileManagement for consistent phase file paths
-    file_manager = FileManagement(station, FileTypes.daily_avg_phase_results)
+    file_manager = FileManagement(station, 'daily_avg_phase_results')
     xfile = file_manager.get_file_path()
     
     # Handle L1 frequency naming convention
