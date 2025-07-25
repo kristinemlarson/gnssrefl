@@ -137,13 +137,10 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
 
         # Uncomment to use experimental L1C_list function, for filtering to GPS BLock III
         #satellite_list = l1c_list(year, 365)
-
-        apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
     else:
         print('Using L2C satellite list for December 31 on ', year)
         l2c_sat, l5_sat = l2c_l5_list(year, 365)
         satellite_list = l2c_sat
-        apriori_path_f = myxdir + '/input/' + station + '_phaseRH.txt'
 
 
     # window out frequency 20
@@ -173,7 +170,12 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
                 #print("{0:3.0f} {1:5.2f} {2:2.0f} {3:7.2f} {4:3.0f} {5:3.0f} {6:3.0f} ".format(b, np.mean(reflector_heights), satellite, average_azimuth, len(reflector_heights),azimuth_min,azimuth_max))
                 apriori_array.append([b, np.mean(reflector_heights), satellite, average_azimuth, len(reflector_heights), azimuth_min, azimuth_max])
 
-    apriori_path = FileManagement(station, FileTypes("apriori_rh_file")).get_file_path()
+    # Use FileManagement with frequency and extension support
+    file_manager = FileManagement(station, FileTypes.apriori_rh_file, frequency=fr, extension=extension)
+    apriori_path_f = file_manager.get_file_path()
+    
+    # Ensure directory exists for new extension-based paths
+    apriori_path_f.parent.mkdir(parents=True, exist_ok=True)
 
     # save file
 
