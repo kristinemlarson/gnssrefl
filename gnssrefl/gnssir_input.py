@@ -394,16 +394,13 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['NReg'] = [nr1, nr2]
     lsp['PkNoise'] = peak2noise
 
-    # where the instructions will be written
-    xdir = os.environ['REFL_CODE']
-    outputdir = xdir + '/input'
-    if not os.path.isdir(outputdir):
-        subprocess.call(['mkdir', outputdir])
-
-    if len(extension) == 0:
-        outputfile = outputdir + '/' + station + '.json'
-    else:
-        outputfile = outputdir + '/' + station + '.' + extension + '.json'
+    # Use FileManagement to get JSON file path with new directory structure
+    from .utils import FileManagement, FileTypes
+    json_manager = FileManagement(station, FileTypes.make_json, extension=extension)
+    outputfile = json_manager.get_file_path()
+    
+    # Ensure directory exists for new structure
+    outputfile.parent.mkdir(parents=True, exist_ok=True)
 
     # 4 was the original default.  Totally up to the user. 
     lsp['polyV'] = polyV # polynomial order for DC removal
