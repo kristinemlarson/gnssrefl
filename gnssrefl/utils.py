@@ -86,7 +86,7 @@ class FileManagement:
         if self.file_type in FileTypes.__dict__.keys():
             files = {FileTypes.apriori_rh_file: self._get_apriori_rh_path(),
                      FileTypes.daily_avg_phase_results: self.xdir / "Files" / f"{self.station}_phase.txt",
-                     FileTypes.make_json: self.xdir / "input" / f"{self.station}.json",
+                     FileTypes.make_json: self._get_json_path(),
                      FileTypes.volumetric_water_content: self.xdir / "Files" / f"{self.station}_vwc.txt"
                      }
 
@@ -158,6 +158,59 @@ class FileManagement:
         
         # Return new format path even if it doesn't exist (for writing new files)
         return new_path, False
+
+    def _get_json_path(self):
+        """
+        Generate JSON file paths with station/extension directory structure.
+        
+        New directory structure:
+        - No extension: input/{station}/{station}.json
+        - With extension: input/{station}/{extension}/{station}.json
+        """
+        if self.extension:
+            json_dir = self.xdir / "input" / self.station / self.extension
+            return json_dir / f"{self.station}.json"
+        else:
+            json_dir = self.xdir / "input" / self.station
+            return json_dir / f"{self.station}.json"
+
+    def find_json_file(self):
+        """
+        Find JSON file with backwards compatibility fallback.
+        
+        Search order (no cross-priority):
+        - No extension: 
+          1. input/{station}/{station}.json (new format)
+          2. input/{station}.json (legacy fallback)
+        - With extension:
+          1. input/{station}/{extension}/{station}.json (new format)  
+          2. input/{station}.{extension}.json (legacy fallback)
+        
+        Returns: (Path, str) - (file_path, format_type)
+        """
+        if self.extension:
+            # Extension specified: try new extension format first
+            extension_dir_path = self.xdir / "input" / self.station / self.extension / f"{self.station}.json"
+            if extension_dir_path.exists():
+                return extension_dir_path, 'extension_dir'
+            
+            # Fall back to legacy extension format
+            legacy_ext_path = self.xdir / "input" / f"{self.station}.{self.extension}.json"
+            if legacy_ext_path.exists():
+                return legacy_ext_path, 'legacy_extension'
+        else:
+            # No extension: try new station format first
+            station_dir_path = self.xdir / "input" / self.station / f"{self.station}.json"
+            if station_dir_path.exists():
+                return station_dir_path, 'station_dir'
+            
+            # Fall back to legacy station format
+            legacy_station_path = self.xdir / "input" / f"{self.station}.json"
+            if legacy_station_path.exists():
+                return legacy_station_path, 'legacy_station'
+        
+        # Return new format path for writing
+        return self._get_json_path(), 'new_format'
 
     def read_file(self, transpose=False, **kwargs):
         """

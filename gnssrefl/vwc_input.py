@@ -208,12 +208,14 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     lsp['vwc_minvalperday'] = minvalperday # this is how many unique tracks you need on each day 
     lsp['vwc_min_req_pts_track'] = min_tracks # this is total number of days needed to keep a satellite
 
-    if len(extension)==0:
-        instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
-    else:
-        instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
+    # Use FileManagement to get JSON file path with new directory structure
+    json_manager = FileManagement(station, FileTypes.make_json, extension=extension)
+    json_path = json_manager.get_file_path()
+    
+    # Ensure directory exists for new structure
+    json_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(instructions, 'w+') as outfile:
+    with open(json_path, 'w+') as outfile:
         json.dump(lsp, outfile, indent=4)
 
 
