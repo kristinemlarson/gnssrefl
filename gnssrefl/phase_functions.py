@@ -74,6 +74,8 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs):
     plt.ylabel('phase (degrees)')
     if fr == 1:
         plt.title(f"Daily L1 Phase Results: {station.upper()}")
+    elif fr == 5:
+        plt.title(f"Daily L5 Phase Results: {station.upper()}")
     else:
         plt.title(f"Daily L2C Phase Results: {station.upper()}")
     plt.grid()
@@ -303,6 +305,8 @@ def test_func_new(x, a, b, rh_apriori,freq):
     """
     if (freq == 20) or (freq == 2):
         freq_least_squares = 2*np.pi*2*rh_apriori/g.constants.wL2
+    elif freq == 5:
+        freq_least_squares = 2*np.pi*2*rh_apriori/g.constants.wL5
     else:
         freq_least_squares = 2*np.pi*2*rh_apriori/g.constants.wL1
 
