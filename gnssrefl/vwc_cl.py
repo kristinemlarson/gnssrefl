@@ -185,7 +185,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     
     # pick up the tracks you will use to compute phase.  THis was previously
     # created by vwc_input ...
-    tracks = qp.read_apriori_rh(station,freq)
+    tracks = qp.read_apriori_rh(station, freq, extension)
     nr = len(tracks[:,1])
 
     if (minvalperday > nr ):

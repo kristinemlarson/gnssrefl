@@ -218,7 +218,7 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
 
-def read_apriori_rh(station,fr):
+def read_apriori_rh(station, fr, extension=''):
     """
     read the track dependent a priori reflector heights needed for
     phase & thus soil moisture.
@@ -249,15 +249,15 @@ def read_apriori_rh(station,fr):
         column 7 is maximum azimuth degrees for the quadrant
     """
     result = []
-    myxdir = os.environ['REFL_CODE']
-    apriori_path_f = myxdir + '/input/' + station + '_phaseRH.txt'
+    file_manager = FileManagement(station, FileTypes.apriori_rh_file, frequency=fr, extension=extension)
+    apriori_path_f, is_legacy = file_manager.find_apriori_rh_file()
 
-    if (fr == 1):
-        apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
-
-    if os.path.exists(apriori_path_f):
+    if apriori_path_f.exists():
         result = np.loadtxt(apriori_path_f, comments='%', ndmin=2)
-        print('Using: ', apriori_path_f) 
+        if is_legacy:
+            print(f'Using legacy RH file: {apriori_path_f}')
+        else:
+            print(f'Using: {apriori_path_f}')
     else:
         print('Average RH file does not exist')
         sys.exit()
@@ -433,7 +433,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
 
             for freq in fr_list:
             # read apriori reflector height results
-                apriori_results = read_apriori_rh(station,freq)
+                apriori_results = read_apriori_rh(station, freq, extension)
 
                 print('Analyzing Frequency ', freq, ' Year ', year, ' Day of Year ', doy)
 
@@ -882,7 +882,7 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir):
         fout.close()
     return tv
 
-def apriori_file_exist(station,fr):
+def apriori_file_exist(station, fr, extension=''):
     """
     reads in the a priori RH results
 
@@ -894,21 +894,18 @@ def apriori_file_exist(station,fr):
     fr : integer
         frequency
         
+    extension : str, optional
+        analysis extension for finding files
+        
     Returns
     -------
     boolean as to whether the apriori file exists
 
     """
-    # do not have time to use this
-    file_manager = FileManagement(station, FileTypes.apriori_rh_file)
-    # for l2c
-    myxdir = os.environ['REFL_CODE']
-    apriori_path_f = myxdir + '/input/' + station + '_phaseRH.txt'
-
-    if (fr == 1):
-        apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
+    file_manager = FileManagement(station, FileTypes.apriori_rh_file, frequency=fr, extension=extension)
+    apriori_path_f, _ = file_manager.find_apriori_rh_file()
     
-    return os.path.exists(apriori_path_f) 
+    return apriori_path_f.exists() 
 
 def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = ''):
     """
