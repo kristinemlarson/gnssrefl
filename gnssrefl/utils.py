@@ -125,18 +125,16 @@ class FileManagement:
 
     def _get_apriori_rh_path(self):
         """
-        Generate backwards-compatible apriori RH file paths with frequency and extension support.
+        Generate apriori RH file paths with station/extension directory structure.
         
-        New naming convention:
-        - No extension: {station}_phaseRH_L{freq}.txt  
-        - With extension: {station}_phaseRH_L{freq}_{extension}.txt
+        Directory structure:
+        - No extension: input/{station}/{station}_phaseRH_L{freq}.txt
+        - With extension: input/{station}/{extension}/{station}_phaseRH_L{freq}.txt
         
-        Fallback for legacy files:
-        - L2 legacy: {station}_phaseRH.txt (no L2 suffix)
-        - L1 legacy: {station}_phaseRH_L1.txt
+        Fallback for legacy files in input/ root directory.
         """
-        # Determine base directory
-        base_dir = self.xdir / "input"
+        # Determine base directory with station/extension structure
+        base_dir = self.xdir / "input" / self.station
         if self.extension:
             base_dir = base_dir / self.extension
         
