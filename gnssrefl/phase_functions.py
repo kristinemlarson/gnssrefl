@@ -328,8 +328,9 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
     """
     # Handle the 'all' case first, which overrides everything else.
     if fr_cmd == 'all':
-        print("Processing all supported frequencies: L1 (1) and L2C (20).")
-        return [1, 20]
+        print("Processing all supported frequencies: L1 (1), L2C (20), and L5 (5).")
+        print("Note: L1 and L5 are experimental - only L2C is officially supported.")
+        return [1, 20, 5]
 
     final_fr = None
     # Use command line frequency if provided (and it's not 'all')
@@ -356,10 +357,13 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
             print("No frequency specified. Defaulting to L2C (20).")
 
     # Warn if not using the standard L2C frequency
-    if final_fr not in [1, 20]:
-        print(f"Warning: Only frequencies 1 (L1) and 20 (L2C) are officially supported.")
-    elif final_fr != 20:
-        print(f"Warning: Analyzing frequency L1 ({final_fr}). The standard is L2C (20).")
+    if final_fr not in [1, 20, 5]:
+        print(f"Error: Frequency {final_fr} is not supported. Supported frequencies: 1 (L1), 20 (L2C), 5 (L5).")
+        sys.exit()
+    elif final_fr == 1:
+        print(f"Warning: Using L1 frequency ({final_fr}) - EXPERIMENTAL. Only L2C (20) is officially supported.")
+    elif final_fr == 5:
+        print(f"Warning: Using L5 frequency ({final_fr}) - EXPERIMENTAL. Only L2C (20) is officially supported.")
 
     # Always return a list
     return [final_fr]

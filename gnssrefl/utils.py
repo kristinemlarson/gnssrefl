@@ -9,6 +9,24 @@ from typing import get_type_hints
 from pathlib import Path
 
 
+def frequency_to_name(freq):
+    """
+    Convert frequency number to standard name.
+    
+    Parameters
+    ----------
+    freq : int
+        Frequency number
+        
+    Returns
+    -------
+    str
+        Frequency name (L1, L2C, L5) or Unknown for unsupported frequencies
+    """
+    freq_map = {1: 'L1', 20: 'L2C', 5: 'L5'}
+    return freq_map.get(freq, f'Unknown({freq})')
+
+
 def validate_input_datatypes(obj, **kwargs):
     hints = get_type_hints(obj)
 

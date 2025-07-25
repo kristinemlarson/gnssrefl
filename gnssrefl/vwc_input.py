@@ -17,7 +17,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-min_tracks", default=None, help="min number of daily tracks to keep the series (default is 100)", type=int)
     parser.add_argument("-minvalperday", default=None, help="min number of tracks needed on one day to compute VWC (default is 10)", type=int)
-    parser.add_argument("-fr", default=None, help="frequency (default is L2C)", type=int)
+    parser.add_argument("-fr", default=None, help="frequency: 1 (L1), 20 (L2C), 5 (L5). Only L2C officially supported.", type=int)
     parser.add_argument("-extension", default='', help="analysis extension parameter", type=str)
     parser.add_argument("-tmin", default=0.05, help="min soil texture", type=float)
     parser.add_argument("-tmax", default=0.5, help="max soil texture", type=float)
@@ -56,7 +56,7 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     year : int
         full year
     fr : int, optional
-        GPS frequency. Currently only supports l2c, which is frequency 20.
+        GPS frequency: 1 (L1), 20 (L2C), 5 (L5). Only L2C is officially supported.
     min_tracks : int, optional
         number of minimum daily tracks needed in order to keep that satellite track
     minvalperday : int, optional
