@@ -40,8 +40,13 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
         name of the log file ... 
 
     """
+    docstring = 'arrays are eangles (degrees), dsnrData is SNR with/DC removed, and sec (seconds of the day),\n'
+
     xdir = os.environ['REFL_CODE']
     all_lsp = [] # variable to save the results so you can sort them
+
+    cdoy = '{:03d}'.format(doy)
+    sdir = xdir + '/' + str(year) + '/arcs/' + station + '/' + cdoy + '/'
 
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
 
@@ -92,6 +97,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
     if (dec != 1):
         print('Using decimation value: ', dec)
 
+    # this must have been something i was doing privately
     if 'savearcs' in lsp:
         test_savearcs = lsp['savearcs']
     else:
