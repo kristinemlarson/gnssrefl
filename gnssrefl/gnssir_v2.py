@@ -184,9 +184,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     # this is for savearcs, txt
     docstring = 'arrays are eangles (degrees), dsnrData is SNR with/DC removed, and sec (seconds of the day),\n'
 
-    xdir = os.environ['REFL_CODE']
-    cdoy = '{:03d}'.format(doy)
-    sdir = xdir + '/' + str(year) + '/arcs/' + station + '/' + cdoy + '/'
+    # Use FileManagement for arcs directory with extension support
+    fm = FileManagement(station, "arcs_directory", year=year, doy=doy, extension=extension)
+    sdir = str(fm.get_directory_path())
     if test_savearcs:
         print('Writing individual arcs (elevation angle, SNR) to ', sdir)
         if not os.path.isdir(sdir):

@@ -55,6 +55,7 @@ class FileTypes(str, Enum):
     make_json = "make_json"
     phase_file = "phase_file"
     volumetric_water_content = "volumetric_water_content"
+    arcs_directory = "arcs_directory"
     directory = "directory"
 
 
@@ -128,6 +129,36 @@ class FileManagement:
                 file_path.parent.mkdir(parents=True, exist_ok=True)
                 
             return file_path
+        else:
+            raise ValueError("The file type you requested does not exist")
+
+    def get_directory_path(self, ensure_directory=True):
+        """
+        Get the path of a specific directory from the FileTypes class.
+        
+        Parameters
+        ----------
+        ensure_directory : bool, optional
+            If True, creates the directory if it doesn't exist. Default is True.
+            
+        Returns
+        -------
+        Path
+            Directory path requested as a Path object
+        """
+        if isinstance(self.file_type, FileTypes):
+            directories = {FileTypes.arcs_directory: self._get_arcs_directory_path()}
+            
+            if self.file_type not in directories:
+                raise ValueError(f"File type {self.file_type} is not a directory type")
+            
+            directory_path = directories[self.file_type]
+            
+            # Create directory if requested
+            if ensure_directory:
+                directory_path.mkdir(parents=True, exist_ok=True)
+                
+            return directory_path
         else:
             raise ValueError("The file type you requested does not exist")
 
@@ -353,6 +384,26 @@ class FileManagement:
         
         # Return new format path for writing
         return self._get_volumetric_water_content_path(), 'new_format'
+
+    def _get_arcs_directory_path(self):
+        """
+        Generate arcs directory path with extension support.
+        
+        Directory structure:
+        - No extension: {year}/arcs/{station}/{doy}/
+        - With extension: {year}/arcs/{station}/{extension}/{doy}/
+        """
+        if not self.year or not self.doy:
+            raise ValueError("Year and day of year required for arcs directory")
+        
+        cdoy = f'{self.doy:03d}'
+        
+        if self.extension:
+            # With extension: {year}/arcs/{station}/{extension}/{doy}/
+            return self.xdir / str(self.year) / "arcs" / self.station / self.extension / cdoy
+        else:
+            # No extension: {year}/arcs/{station}/{doy}/
+            return self.xdir / str(self.year) / "arcs" / self.station / cdoy
 
     def read_file(self, transpose=False, **kwargs):
         """
