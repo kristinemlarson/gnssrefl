@@ -18,7 +18,11 @@ gnssrefl also has a DOI from zenodo.
 
 The latest pypi version can be found here [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
-Latest Feature - you can set beginning and end dates in <code>daily_avg</code> and <code>subdaily</code>. The parameters are 
+Latest Features
+
+- Soil moisture can be computed from L1 data (via [George Townsend PR.](https://github.com/kristinemlarson/gnssrefl/pull/35PR)
+
+- you can set beginning and end dates in <code>daily_avg</code> and <code>subdaily</code>. The parameters are 
 called date1 and date2. See the descriptions of these modules in the usual place.
 
 Questions and bug reports for gnssrefl (but not the notebooks) **must** be submitted via the **Issues** button at 
@@ -35,7 +39,7 @@ to the notebook collection that can be reviewed in a pull request and merged for
 Try looking at old Issues on github. People might have asked your question before. If you found our documentation confusing or 
 lacking, please submit a PR to improve it.
 
-**Some new features:**
+**Some older new features:**
 
 You can now store coordinates for your local GNSS-IR sites. 
 See [file formats](https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html) for more information.

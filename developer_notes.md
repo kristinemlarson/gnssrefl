@@ -1,4 +1,37 @@
+
+# debian and docker problems
+
+There is no limit to the number of changing components in a modern networked computer system
+
+https://wiki.debian.org/Python#Supported_Python_Versions
+
+https://hub.docker.com/_/python#pythonversion
+
+
+https://www.debian.org/releases/buster/
+
+https://endoflife.date/debian
+
+# debugging
+
+1. Need to know what Dockerfile you are building
+
+2. Build it myself to see the error
+
+3. Check the Dockerfile to see if there are any commands you're running before the error
+
+4. No, therefore it's likely an issue with the base image
+
+5. Run apt interactively in the base image to confirm
+
+6. Check the tag listing https://hub.docker.com/_/python to see if the tag you're using is supported
+
+7. It's not there, consider why - check whether the individual components in the tag are out of support
+
+8. Debian version if out of support => clearly that's the issue, because EOL distros don't continue to maintain archive servers
+
 # from tim
+
 you can always build a new image if you want to test on your own.
 
 from your gnssrefl directory (that has the Dockerfile):
