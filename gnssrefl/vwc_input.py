@@ -130,14 +130,18 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     # four quadrants
     azimuth_list = [0, 90, 180, 270]
 
-    # get the satellites for the requested frequency (20 for now) and most recent year
+    # get the satellites for the requested frequency and most recent year
     if (fr == 1):
         l1_satellite_list = np.arange(1,33)
         satellite_list = l1_satellite_list
 
         # Uncomment to use experimental L1C_list function, for filtering to GPS BLock III
         #satellite_list = l1c_list(year, 365)
-    else:
+    elif (fr == 5):
+        print('Using L5 satellite list for December 31 on ', year)
+        l2c_sat, l5_sat = l2c_l5_list(year, 365)
+        satellite_list = l5_sat
+    else:  # fr == 20 (L2C)
         print('Using L2C satellite list for December 31 on ', year)
         l2c_sat, l5_sat = l2c_l5_list(year, 365)
         satellite_list = l2c_sat
