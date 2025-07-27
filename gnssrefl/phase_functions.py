@@ -421,7 +421,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
     # noise region - hardwired for normal sites ~ 2-3 meters tall
     noise_region = [0.5, 8]
 
-    l2c_list, l5_sat = g.l2c_l5_list(year,doy)
+    l2c_list, l5_list = g.l2c_l5_list(year,doy)
 
     if not snrexist:
         print('No SNR file on this day.')
@@ -463,6 +463,11 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                     if (freq == 20) and (sat_number not in l2c_list) :
                         if screenstats: 
                             print('Asked for L2C but this is not L2C transmitting on this day: ', int(sat_number))
+                        compute_lsp = False
+                    
+                    if (freq == 5) and (sat_number not in l5_list):
+                        if screenstats: 
+                            print('Asked for L5 but this is not L5 transmitting on this day: ', int(sat_number))
                         compute_lsp = False
 
                     if screenstats:

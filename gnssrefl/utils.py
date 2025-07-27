@@ -84,6 +84,8 @@ class FileManagement:
         self.frequency = frequency
         self.extension = extension
 
+        if "REFL_CODE" not in os.environ:
+            raise EnvironmentError("REFL_CODE environment variable not set")
         self.xdir = Path(os.environ["REFL_CODE"])
 
     def get_file_path(self, ensure_directory=True):
