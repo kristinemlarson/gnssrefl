@@ -154,10 +154,10 @@ class TestAprioriRHFileHandling:
         legacy_path.write_text("# Legacy L2 data")
         
         fm = FileManagement("TEST", "apriori_rh_file", frequency=20)
-        found_path, is_legacy = fm.find_apriori_rh_file()
+        found_path, format_type = fm.find_apriori_rh_file()
         
         assert found_path == legacy_path
-        assert is_legacy is True
+        assert format_type == 'legacy'
     
     def test_apriori_rh_legacy_fallback_l1(self, temp_refl_code):
         """Test apriori RH fallback to legacy L1 format."""
@@ -166,10 +166,10 @@ class TestAprioriRHFileHandling:
         legacy_path.write_text("# Legacy L1 data")
         
         fm = FileManagement("TEST", "apriori_rh_file", frequency=1)
-        found_path, is_legacy = fm.find_apriori_rh_file()
+        found_path, format_type = fm.find_apriori_rh_file()
         
         assert found_path == legacy_path
-        assert is_legacy is True
+        assert format_type == 'legacy'
 
 
 class TestPhaseFileHandling:
