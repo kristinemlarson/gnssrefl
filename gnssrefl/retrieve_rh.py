@@ -47,7 +47,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
     # Only create directory if savearcs is enabled
     test_savearcs = lsp.get('savearcs', False)
     fm = FileManagement(station, "arcs_directory", year=year, doy=doy, extension=extension)
-    sdir = str(fm.get_directory_path(ensure_directory=test_savearcs))
+    sdir = str(fm.get_directory_path(ensure_directory=test_savearcs)) + '/'
     
     all_lsp = [] # variable to save the results so you can sort them
 
