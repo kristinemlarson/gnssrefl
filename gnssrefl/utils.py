@@ -158,37 +158,36 @@ class FileManagement:
         Find apriori RH file with backwards compatibility fallback.
         
         Search order:
-        1. New format: {station}_phaseRH_L{freq}[_{extension}].txt
-        2. Legacy fallback: {station}_phaseRH[_L1].txt (L2 default, L1 explicit)
+        1. New format: input/{station}/[{extension}/]{station}_phaseRH_L{freq}.txt
+        2. Legacy fallback: input/{station}_phaseRH[_L1|_L5].txt (L2 has no suffix)
         
-        Returns: (Path, bool) - (file_path, is_legacy_format)
+        Returns:
+            tuple: (Path, str) - (file_path, format_type)
+                format_type: 'new_format', 'legacy'
         """
         # Try new format first
         new_path = self._get_apriori_rh_path()
         if new_path.exists():
-            return new_path, False
+            return new_path, 'new_format'
         
-        # Try legacy format fallback
-        base_dir = self.xdir / "input"  # Legacy files are always in root input/
+        # Try legacy format fallback in root input/ directory
+        base_dir = self.xdir / "input"
         
         if self.frequency == 1:
-            # L1 legacy format
             legacy_path = base_dir / f"{self.station}_phaseRH_L1.txt"
         elif self.frequency == 20 or self.frequency is None:
-            # L2C/L2 legacy format (no frequency suffix for backwards compatibility)
+            # L2C legacy has no frequency suffix for backwards compatibility
             legacy_path = base_dir / f"{self.station}_phaseRH.txt"
         elif self.frequency == 5:
-            # L5 legacy format
             legacy_path = base_dir / f"{self.station}_phaseRH_L5.txt"
         else:
-            # Other frequencies
             legacy_path = base_dir / f"{self.station}_phaseRH_L{self.frequency}.txt"
         
         if legacy_path.exists():
-            return legacy_path, True
+            return legacy_path, 'legacy'
         
-        # Return new format path even if it doesn't exist (for writing new files)
-        return new_path, False
+        # Return new format path for writing new files
+        return new_path, 'new_format'
 
     def _get_json_path(self):
         """

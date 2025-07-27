@@ -253,11 +253,11 @@ def read_apriori_rh(station, fr, extension=''):
     """
     result = []
     file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
-    apriori_path_f, is_legacy = file_manager.find_apriori_rh_file()
+    apriori_path_f, format_type = file_manager.find_apriori_rh_file()
 
     if apriori_path_f.exists():
         result = np.loadtxt(apriori_path_f, comments='%', ndmin=2)
-        if is_legacy:
+        if format_type == 'legacy':
             print(f'Using RH file (legacy directory): {apriori_path_f}')
         else:
             print(f'Using RH file: {apriori_path_f}')
@@ -923,7 +923,7 @@ def apriori_file_exist(station, fr, extension=''):
 
     """
     file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
-    apriori_path_f, _ = file_manager.find_apriori_rh_file()
+    apriori_path_f, format_type = file_manager.find_apriori_rh_file()
     
     return apriori_path_f.exists() 
 
