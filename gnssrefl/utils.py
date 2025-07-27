@@ -81,6 +81,12 @@ class FileManagement:
         self.year = year
         self.doy = doy
         self.file_not_found_ok = file_not_found_ok
+        # Validate frequency parameter
+        if frequency is not None:
+            VALID_FREQUENCIES = [1, 5, 20]
+            if frequency not in VALID_FREQUENCIES:
+                raise ValueError(f"Invalid frequency {frequency}. Valid frequencies: {VALID_FREQUENCIES}")
+        
         self.frequency = frequency
         self.extension = extension
 
@@ -102,7 +108,7 @@ class FileManagement:
         Path
             File path requested as a Path object
         """
-        if self.file_type in FileTypes.__dict__.keys():
+        if isinstance(self.file_type, FileTypes):
             files = {FileTypes.apriori_rh_file: self._get_apriori_rh_path(),
                      FileTypes.daily_avg_phase_results: self._get_daily_avg_phase_path(),
                      FileTypes.make_json: self._get_json_path(),
