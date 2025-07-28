@@ -1,4 +1,4 @@
-# gnssrefl v3.16.0
+# gnssrefl v3.16.1
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 When showing results created using gnssrefl, please use:
@@ -20,7 +20,7 @@ The latest pypi version can be found here [![PyPI Version](https://img.shields.i
 
 Latest Features
 
-- Soil moisture can be computed from L1 data (via [George Townsend PR.](https://github.com/kristinemlarson/gnssrefl/pull/35PR)
+- Soil moisture can be computed from L1 and L5 data, see e.g. [George Townsend PR](https://github.com/kristinemlarson/gnssrefl/pull/354)
 
 - you can set beginning and end dates in <code>daily_avg</code> and <code>subdaily</code>. The parameters are 
 called date1 and date2. See the descriptions of these modules in the usual place.
