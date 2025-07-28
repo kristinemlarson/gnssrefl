@@ -17,7 +17,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-min_tracks", default=None, help="min number of daily tracks to keep the series (default is 100)", type=int)
     parser.add_argument("-minvalperday", default=None, help="min number of tracks needed on one day to compute VWC (default is 10)", type=int)
-    parser.add_argument("-fr", default=None, help="frequency (default is L2C)", type=int)
+    parser.add_argument("-fr", default=None, help="frequency: 1 (L1), 20 (L2C), 5 (L5). Only L2C officially supported.", type=int)
     parser.add_argument("-extension", default='', help="analysis extension parameter", type=str)
     parser.add_argument("-tmin", default=0.05, help="min soil texture", type=float)
     parser.add_argument("-tmax", default=0.5, help="max soil texture", type=float)
@@ -56,7 +56,7 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     year : int
         full year
     fr : int, optional
-        GPS frequency. Currently only supports l2c, which is frequency 20.
+        GPS frequency: 1 (L1), 20 (L2C), 5 (L5). Only L2C is officially supported.
     min_tracks : int, optional
         number of minimum daily tracks needed in order to keep that satellite track
     minvalperday : int, optional
@@ -130,20 +130,21 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     # four quadrants
     azimuth_list = [0, 90, 180, 270]
 
-    # get the satellites for the requested frequency (20 for now) and most recent year
+    # get the satellites for the requested frequency and most recent year
     if (fr == 1):
         l1_satellite_list = np.arange(1,33)
         satellite_list = l1_satellite_list
 
         # Uncomment to use experimental L1C_list function, for filtering to GPS BLock III
         #satellite_list = l1c_list(year, 365)
-
-        apriori_path_f = myxdir + '/input/' + station + '_phaseRH_L1.txt'
-    else:
+    elif (fr == 5):
+        print('Using L5 satellite list for December 31 on ', year)
+        l2c_sat, l5_sat = l2c_l5_list(year, 365)
+        satellite_list = l5_sat
+    else:  # fr == 20 (L2C)
         print('Using L2C satellite list for December 31 on ', year)
         l2c_sat, l5_sat = l2c_l5_list(year, 365)
         satellite_list = l2c_sat
-        apriori_path_f = myxdir + '/input/' + station + '_phaseRH.txt'
 
 
     # window out frequency 20
@@ -173,7 +174,9 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
                 #print("{0:3.0f} {1:5.2f} {2:2.0f} {3:7.2f} {4:3.0f} {5:3.0f} {6:3.0f} ".format(b, np.mean(reflector_heights), satellite, average_azimuth, len(reflector_heights),azimuth_min,azimuth_max))
                 apriori_array.append([b, np.mean(reflector_heights), satellite, average_azimuth, len(reflector_heights), azimuth_min, azimuth_max])
 
-    apriori_path = FileManagement(station, FileTypes("apriori_rh_file")).get_file_path()
+    # Use FileManagement with frequency and extension support
+    file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
+    apriori_path_f = file_manager.get_file_path()
 
     # save file
 
@@ -206,12 +209,11 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     lsp['vwc_minvalperday'] = minvalperday # this is how many unique tracks you need on each day 
     lsp['vwc_min_req_pts_track'] = min_tracks # this is total number of days needed to keep a satellite
 
-    if len(extension)==0:
-        instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
-    else:
-        instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
+    # Use FileManagement to get JSON file path with new directory structure
+    json_manager = FileManagement(station, 'make_json', extension=extension)
+    json_path = json_manager.get_file_path()
 
-    with open(instructions, 'w+') as outfile:
+    with open(json_path, 'w+') as outfile:
         json.dump(lsp, outfile, indent=4)
 
 

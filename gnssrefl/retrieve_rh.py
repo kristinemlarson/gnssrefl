@@ -6,6 +6,7 @@ import sys
 
 import gnssrefl.gnssir_v2 as guts
 import gnssrefl.gps as g
+from gnssrefl.utils import FileManagement
 
 def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstats, irefr,logid,logfilename):
     """
@@ -42,11 +43,13 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
     """
     docstring = 'arrays are eangles (degrees), dsnrData is SNR with/DC removed, and sec (seconds of the day),\n'
 
-    xdir = os.environ['REFL_CODE']
+    # Use FileManagement for arcs directory with extension support
+    # Only create directory if savearcs is enabled
+    test_savearcs = lsp.get('savearcs', False)
+    fm = FileManagement(station, "arcs_directory", year=year, doy=doy, extension=extension)
+    sdir = str(fm.get_directory_path(ensure_directory=test_savearcs)) + '/'
+    
     all_lsp = [] # variable to save the results so you can sort them
-
-    cdoy = '{:03d}'.format(doy)
-    sdir = xdir + '/' + str(year) + '/arcs/' + station + '/' + cdoy + '/'
 
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
 

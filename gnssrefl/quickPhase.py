@@ -13,7 +13,7 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("doy", help="doy", type=int)
     parser.add_argument("-snr", default=None, help="snr file ending", type=int)
-    parser.add_argument("-fr", default=None, help="frequency (e.g. 1, 20, or 'all'). If not set, reads from json.", type=str)
+    parser.add_argument("-fr", default=None, help="frequency: 1 (L1), 20 (L2C), 5 (L5), or 'all'. Only L2C officially supported.", type=str)
     parser.add_argument("-doy_end", "-doy_end", default=None, type=int, help="doy end")
     parser.add_argument("-year_end", "-year_end", default=None, type=int, help="year end")
     parser.add_argument("-extension", default='', help="analysis extension for json file", type=str)
@@ -106,7 +106,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     # Check that an apriori file exists for each requested frequency.
     for f in fr_list:
-        ex = qp.apriori_file_exist(station, f)
+        ex = qp.apriori_file_exist(station, f, extension)
         if not ex:
             print(f'No apriori RH file exists for frequency {f}. Please run vwc_input.')
             sys.exit()

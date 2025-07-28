@@ -18,6 +18,7 @@ import gnssrefl.gps as g
 import gnssrefl.read_snr_files as snr
 import gnssrefl.refraction as refr
 import gnssrefl.retrieve_rh as r
+from gnssrefl.utils import FileManagement, FileTypes
 
 def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     """
@@ -183,9 +184,9 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     # this is for savearcs, txt
     docstring = 'arrays are eangles (degrees), dsnrData is SNR with/DC removed, and sec (seconds of the day),\n'
 
-    xdir = os.environ['REFL_CODE']
-    cdoy = '{:03d}'.format(doy)
-    sdir = xdir + '/' + str(year) + '/arcs/' + station + '/' + cdoy + '/'
+    # Use FileManagement for arcs directory with extension support  
+    fm = FileManagement(station, "arcs_directory", year=year, doy=doy, extension=extension)
+    sdir = str(fm.get_directory_path(ensure_directory=test_savearcs)) + '/'
     if test_savearcs:
         print('Writing individual arcs (elevation angle, SNR) to ', sdir)
         if not os.path.isdir(sdir):
@@ -554,6 +555,9 @@ def read_json_file(station, extension,**kwargs):
     picks up json instructions for calculation of lomb scargle periodogram
     This was originally meant to be used by gnssir, but is now read by other functions.
 
+    Uses new directory structure:
+    - No extension: input/{station}/{station}.json with fallback to input/{station}.json
+    - With extension: input/{station}/{extension}/{station}.json with fallback to input/{station}.{extension}.json
 
     Parameters
     ----------
@@ -568,50 +572,40 @@ def read_json_file(station, extension,**kwargs):
     lsp : dictionary
 
     """
-    lsp = {} # 
+    lsp = {} 
     # pick up a new parameter - that will be True for people looking
     # for the json but that aren't upset it does not exist.
     noexit = kwargs.get('noexit',False)
-    # leftover from when i was using None
-    if len(extension) == 0:
-        useextension = False
-        instructions_ext = ''
-    else:
-        useextension = True 
-        instructions_ext = str(os.environ['REFL_CODE']) + '/input/' + station + '.' + extension + '.json'
-
-    instructions = str(os.environ['REFL_CODE']) + '/input/' + station + '.json'
-
-    if useextension and not os.path.isfile(instructions_ext):
-        print('You asked to use : ', instructions_ext, ' but it does not exist.')
-        print('Will try the non-extension json file: ', instructions)
-
-    if useextension and os.path.isfile(instructions_ext):
-        usefile = instructions_ext
-        print('Using these instructions ', usefile)
-        with open(instructions_ext) as f:
+    silent = kwargs.get('silent',False)
+    
+    # Use FileManagement to find JSON file with proper fallback
+    json_manager = FileManagement(station, 'make_json', extension=extension)
+    json_path, format_type = json_manager.find_json_file()
+    
+    if json_path.exists():
+        if not silent:
+            if format_type in ['legacy_extension', 'legacy_station']:
+                print(f'Using JSON file (legacy directory): {json_path}')
+            else:
+                print(f'Using JSON file: {json_path}')
+        
+        with open(json_path) as f:
             lsp = json.load(f)
     else:
-        usefile = instructions
-        if os.path.isfile(instructions):
-            print('Using these instructions ', usefile)
-            with open(instructions) as f:
-                lsp = json.load(f)
+        if noexit:
+            print('No json file found - but you have requested the code not exit')
+            lsp = {}
+            return lsp
         else:
-            if noexit:
-                print('No json file found - but you have requested the code not exit')
-                lsp = {}
-                return lsp
-            else:
-                print('The json instruction file does not exist: ', instructions)
-                print('Please make with gnssir_input and run this code again.')
-                sys.exit()
+            print('The json instruction file does not exist: ', json_path)
+            print('Please make with gnssir_input and run this code again.')
+            sys.exit()
 
     if len(lsp['reqAmp']) < len(lsp['freqs']) :
         print('Number of frequencies found in json: ', len(lsp['freqs']))
         print('Number of required amplitudes found in json: ', len(lsp['reqAmp']))
         print('You need to have a required Amplitude for each frequency.')
-        print('Please fix your json file: ', usefile)
+        print('Please fix your json file: ', json_path)
         sys.exit()
 
     return lsp

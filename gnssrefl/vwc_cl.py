@@ -14,7 +14,7 @@ import gnssrefl.phase_functions as qp
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as gnssir
 
-from gnssrefl.utils import str2bool, read_files_in_dir
+from gnssrefl.utils import str2bool, read_files_in_dir, FileManagement
 
 xdir = os.environ['REFL_CODE']
 
@@ -24,7 +24,7 @@ def parse_arguments():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year_end", type=int)
-    parser.add_argument("-fr", help="frequency", type=str)
+    parser.add_argument("-fr", help="frequency: 1 (L1), 20 (L2C), 5 (L5). Only L2C officially supported.", type=str)
     parser.add_argument("-plt", default=None, type=str, help="boolean for plotting to screen")
     parser.add_argument("-screenstats", default=None, type=str, help="boolean for plotting statistics to screen")
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 100")
@@ -185,7 +185,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     
     # pick up the tracks you will use to compute phase.  THis was previously
     # created by vwc_input ...
-    tracks = qp.read_apriori_rh(station,freq)
+    tracks = qp.read_apriori_rh(station, freq, extension)
     nr = len(tracks[:,1])
 
     if (minvalperday > nr ):
@@ -233,8 +233,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # checking each geographic quadrant
     k4 = 1
     # two list of tracks - lets you compare an old run with a new run as a form of QC
-    newlist = station + '_tmp.txt'
-    oldlist = xdir + '/input/' + station + '_phaseRH.txt'
+    newlist = f'{station}_tmp.txt'
+    file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
+    oldlist = file_manager.get_file_path()
 
     ftmp = open(newlist,'w+')
     ftmp.write("{0:s} \n".format( '% station ' + station) )
@@ -437,7 +438,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         sys.exit()
     else:
         # write out daily phase values
-        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir)
+        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension)
         print('Number of daily phase measurements ', len(tv))
         if len(tv) < 1:
             print('No results - perhaps minvalperday or min_req_pts_track are too stringent')

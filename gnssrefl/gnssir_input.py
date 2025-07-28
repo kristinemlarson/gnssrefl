@@ -7,7 +7,7 @@ import sys
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
 
-from gnssrefl.utils import str2bool
+from gnssrefl.utils import str2bool, FileManagement, FileTypes
 
 
 def parse_arguments():
@@ -29,6 +29,7 @@ def parse_arguments():
     parser.add_argument("-allfreq", default=None, type=str, help="Set to T to include all GNSS signals")
     parser.add_argument("-l1", default=None, type=str, help="Set to T to use only GPS L1")
     parser.add_argument("-l2c", default=None, type=str, help="Set to T to only use GPS L2C")
+    parser.add_argument("-l5", default=None, type=str, help="Set to T to use only GPS L5")
     parser.add_argument("-xyz", default=None, type=str, help="Set to True if using Cartesian coordinates instead of LLH")
     parser.add_argument("-refraction", default=None, type=str, help="Set to False to turn off refraction correction")
     parser.add_argument("-extension", default=None,type=str, help="Provide extension name so you can try different strategies")
@@ -64,7 +65,7 @@ def parse_arguments():
     g.print_version_to_screen()
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['allfreq', 'l1', 'l2c', 'xyz', 'refraction','subdaily_alt_sigma']
+    boolean_args = ['allfreq', 'l1', 'l2c', 'l5', 'xyz', 'refraction','subdaily_alt_sigma']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -73,7 +74,7 @@ def parse_arguments():
 
 def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0, e1: float = 5.0, e2: float = 25.0,
        h1: float = 0.5, h2: float = 8.0, nr1: float = None, nr2: float = None, peak2noise: float = 2.8, 
-       ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, 
+       ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, l5: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
        delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : str="1", 
                       apriori_rh: float=None, Hortho : float = None, pele: list=[5,30], polyV: int=4, 
@@ -394,16 +395,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['NReg'] = [nr1, nr2]
     lsp['PkNoise'] = peak2noise
 
-    # where the instructions will be written
-    xdir = os.environ['REFL_CODE']
-    outputdir = xdir + '/input'
-    if not os.path.isdir(outputdir):
-        subprocess.call(['mkdir', outputdir])
-
-    if len(extension) == 0:
-        outputfile = outputdir + '/' + station + '.json'
-    else:
-        outputfile = outputdir + '/' + station + '.' + extension + '.json'
+    # Use FileManagement to get JSON file path with new directory structure
+    json_manager = FileManagement(station, 'make_json', extension=extension)
+    outputfile = json_manager.get_file_path()
 
     # 4 was the original default.  Totally up to the user. 
     lsp['polyV'] = polyV # polynomial order for DC removal
@@ -461,6 +455,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     if l2c is True:
         lsp['freqs'] = [20]
+
+    if l5 is True:
+        lsp['freqs'] = [5]
 
     if len(frlist) == 0:
         print('Using standard frequency choices.')
