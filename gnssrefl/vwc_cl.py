@@ -14,7 +14,7 @@ import gnssrefl.phase_functions as qp
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as gnssir
 
-from gnssrefl.utils import str2bool, read_files_in_dir
+from gnssrefl.utils import str2bool, read_files_in_dir, FileManagement
 
 xdir = os.environ['REFL_CODE']
 
@@ -234,7 +234,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     k4 = 1
     # two list of tracks - lets you compare an old run with a new run as a form of QC
     newlist = f'{station}_tmp.txt'
-    oldlist = Path(xdir) / 'input' / f'{station}_phaseRH.txt'
+    file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
+    oldlist = file_manager.get_file_path()
 
     ftmp = open(newlist,'w+')
     ftmp.write("{0:s} \n".format( '% station ' + station) )
