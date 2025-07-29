@@ -777,7 +777,7 @@ def read_snr(obsfile):
     """
     allGood = 1
     if os.path.isfile(obsfile):
-        f = np.genfromtxt(obsfile,comments='%')
+        f = np.loadtxt(obsfile,comments='%')
     else:
         print('No SNR file found')
         allGood = 0
