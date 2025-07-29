@@ -204,7 +204,7 @@ def read_one_snr(obsfile,ifile):
 #
 
     snrE = np.array([False, True, True,False,False,True,True,True,True],dtype = bool)
-    f = np.genfromtxt(obsfile,comments='%')
+    f = np.loadtxt(obsfile,comments='%')
     #print('reading from this snr file ',obsfile)
     r,c = f.shape
     if (r > 0) & (c > 0):
