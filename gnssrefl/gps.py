@@ -2732,44 +2732,6 @@ def ydoy2ymd(year, doy):
     day = int(d.day)
     return year, month, day
 
-def rewrite_UNR_highrate(fname,station,year,doy):
-    """
-    takes a filename from was already retrieved? from 
-    UNReno, reads it, rewrites as all numbers for other uses.
-    no header, but year, month, day, day of year, seconds vertical, east, north
-    the latter three are in meters
-    stores in $REFL_CODE/yyyy/pos/station
-    """
-# make sure the various output directories  are there
-    xdir = os.environ['REFL_CODE'] 
-    dir1 = xdir + '/' + str(year)
-    if not os.path.isdir(dir1):
-        status = subprocess.call(['mkdir', dir1])
-
-    dir1 = xdir + '/' + str(year) + '/' + 'pos'
-    if not os.path.isdir(dir1):
-        status = subprocess.call(['mkdir', dir1])
-
-    dir1 = xdir + '/' + str(year) + '/' + 'pos' + '/' + station
-#   make filename for the output
-    yy,mm,dd, cyyyy, cdoy, YMD = ydoy2useful(year,doy)
-    outputfile = dir1 + '/' + cdoy + '_hr.txt'
-    print('file will go to: ' , outputfile)
-    if not os.path.isdir(dir1):
-        print('use subprocess to make directory')
-        status = subprocess.call(['mkdir', dir1])
-    try:
-        x=np.genfromtxt(fname, skip_header=1, usecols = (3, 4, 5, 6, 7, 8, 9, 10))
-        N = len(x)
-        print('open outputfile',outputfile)
-        f=open(outputfile,'w+')
-        for i in range(0,N):
-            f.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:3.0f} {4:7.0f} {5:9.4f} {6:9.4f} {7:9.4f} \n".format(x[i,0], x[i,1],x[i,2],x[i,3], x[i,4],x[i,5],x[i,6],x[i,7]))
-        print('delete the original Blewitt file')
-        subprocess.call(['rm','-f', fname])
-        f.close()
-    except:
-        print('problem with accessing the file')
 
 def month_converter(month):
     """
@@ -2937,69 +2899,6 @@ def getseries(site):
     else:
         url = 'http://geodesy.unr.edu/gps_timeseries/rapids/tenv3/NA12/' + siteid + '.NA12.tenv3'
         wget.download(url, out=fname3)
-
-def rewrite_tseries(station):
-    """
-    given a station name, look at a daily blewitt position (ENV) 
-    file and write a new file that is more human friendly
-
-    Parameters
-    ----------
-    station : str
-        4 character station name
-    """
-    siteid = station.upper()
-    # NA12 env time series
-    fname = 'tseries/' + siteid + '.NA12.tenv3'
-    fname_rapid = 'tseries/' + siteid + '.NA12.rapid.tenv3'
-    outputfile = 'tseries/' + station+ '_na12.env'
-    print(fname,outputfile)
-    try:
-        x=np.genfromtxt(fname, skip_header=1, usecols = (3, 7, 8, 9, 10, 11, 12,13))
-        N = len(x)
-        print(N,'open outputfile',outputfile)
-        f=open(outputfile,'w+')
-        for i in range(0,N):
-            mjd = x[i,0]
-            yy,mm,dd = mjd_to_date(mjd) 
-            doy, cdoy, cyyyy, cyy = ymd2doy(yy,mm,dd)
-            east = x[i,1] + x[i,2]
-            north= x[i,3] + x[i,4]
-            # adding in the antenna
-            vert = x[i,5] + x[i,6] +  x[i,7]
-            f.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:3.0f} {4:13.4f} {5:13.4f} {6:13.4f} \n".format(yy,mm,dd,doy,east,north,vert))
-        f.close()
-    except:
-        print('some problem writing the new output file')
-
-def rewrite_tseries_igs(station):
-    """
-    given a station name, look at a daily blewitt position (ENV)
-    file and write a new file that is less insane to understand
-    """
-    siteid = station.upper()
-    # NA12 env time series
-    fname = 'tseries/' + siteid + '.IGS08.tenv3'
-    outputfile = 'tseries/' + station + '_igs08.env'
-    print(fname,outputfile)
-    try:
-        x=np.genfromtxt(fname, skip_header=1, usecols = (3, 7, 8, 9, 10, 11, 12,13))
-        N = len(x)
-        print(N)
-        print(N,'open outputfile',outputfile)
-        f=open(outputfile,'w+')
-        for i in range(0,N):
-            mjd = x[i,0]
-            yy,mm,dd = mjd_to_date(mjd)
-            doy, cdoy, cyyyy, cyy = ymd2doy(yy,mm,dd)
-            east = x[i,1] + x[i,2]
-            north= x[i,3] + x[i,4]
-            # adding in the antenna
-            vert = x[i,5] + x[i,6] +  x[i,7]
-            f.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:3.0f} {4:13.4f} {5:13.4f} {6:13.4f} \n".format(yy,mm,dd,doy,east,north,vert))
-        f.close()
-    except:
-        print('some problem writing the output')
 
 
 def llh2xyz(lat,lon,height):
@@ -3379,48 +3278,6 @@ def check_inputs(station,year,doy,snr_type):
 
     return exitSys
 
-
-def rewrite_tseries_wrapids(station):
-    """
-    given a station name, look at a daily blewitt position (ENV)
-    file and write a new file that is less insane to understand
-    """
-    siteid = station.upper()
-    # NA12 env time series
-    fname = 'tseries/' + siteid + '.NA12.tenv3'
-    fname_rapid = 'tseries/' + siteid + '.NA12.rapid.tenv3'
-    outputfile = 'tseries/' + station+ '_na12.env'
-    print(fname,outputfile)
-    try:
-        x=np.genfromtxt(fname, skip_header=1, usecols = (3, 7, 8, 9, 10, 11, 12,13))
-        y=np.genfromtxt(fname_rapid, skip_header=1, usecols = (3, 7, 8, 9, 10, 11, 12,13))
-        N = len(x)
-        N2 = len(y)
-        print(N,'open outputfile',outputfile)
-        f=open(outputfile,'w+')
-        for i in range(0,N):
-            mjd = x[i,0]
-            yy,mm,dd = mjd_to_date(mjd)
-            doy, cdoy, cyyyy, cyy = ymd2doy(yy,mm,dd)
-            east = x[i,1] + x[i,2]
-            north= x[i,3] + x[i,4]
-            # adding in the antenna
-            vert = x[i,5] + x[i,6] +  x[i,7]
-            f.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:3.0f} {4:13.4f} {5:13.4f} {6:13.4f} \n".format(yy,mm,dd,doy,east,north,vert))
-# write out the rapid numbers
-        for i in range(0,N2):
-            mjd = y[i,0]
-            yy,mm,dd = mjd_to_date(mjd)
-            doy, cdoy, cyyyy, cyy = ymd2doy(yy,mm,dd)
-            east = y[i,1] + y[i,2]
-            north= y[i,3] + y[i,4]
-            # adding in the antenna
-            vert = y[i,5] + y[i,6] +  y[i,7]
-            f.write(" {0:4.0f} {1:2.0f} {2:2.0f} {3:3.0f} {4:13.4f} {5:13.4f} {6:13.4f} \n".format(yy,mm,dd,doy,east,north,vert))
-#  then close it
-        f.close()
-    except:
-        print('some problem writing the output')
 
 def back2thefuture(iyear, idoy):
     """

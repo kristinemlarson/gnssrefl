@@ -175,7 +175,8 @@ def read_the_orbits(obsfile,constel):
     constel : int
         which constellation (1-4), 1 for gps, 2 for glonass etc
     """
-    f = np.genfromtxt(obsfile,comments='%')
+    f = np.loadtxt(obsfile,comments='%')
+    #f = np.genfromtxt(obsfile,comments='%')
     if (constel == 4):
         #print('found beidou')
         i = (f[:,0] < 38) | (f[:,0] > 40)

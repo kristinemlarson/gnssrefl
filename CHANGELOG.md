@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.16.2
+July 29, 2025
+
+[George Townsend PR](https://github.com/kristinemlarson/gnssrefl/pull/355) to increase speed of SNR load.
+Remove unused position file reading code.
+
 ## 3.16.1
 July 26, 2025
 
