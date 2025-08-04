@@ -234,8 +234,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
                 L = len(f)
                 keep_this_one1 = True
                 keep_this_one2 = True
-        # file names must have 7 characters in them ...  and end in txt for that matter
-                if (L == 7):
+        # file names must have 7 characters in them ...  and end in txt 
+                if (L == 7) and (f[-3::] == 'txt'):
                     mjd = g.ydoy2mjd(yr,int(f[0:3]))
                     if mjd1 is not None:
                         if (mjd >= mjd1):

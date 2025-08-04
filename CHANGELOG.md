@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.16.3
+August 4, 2025
+
+Fixed bug in daily_avg (which meant it crashed). Now check that input LSP files have doy in the first
+three characters and that it ends in txt.
+
 ## 3.16.2
 July 29, 2025
 
