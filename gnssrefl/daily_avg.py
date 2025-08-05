@@ -106,6 +106,8 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
     if there is only one RH on a given day - there is no median value and thus nothing will 
     be saved for that day.  
 
+    Gosh it would be nice if someone would clean this up.  It was written before I understood python.
+
     Parameters
     ----------
     station : str
@@ -434,6 +436,11 @@ def readin_plot_daily(station,extension,year1,year2,fr,alldatafile,csvformat,
     if (nr > 0) & (NumFiles > 1):
         daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei,test)
 
+        # my new plot
+        inputf= f"{txtdir}/{station}_allRH.txt" ; outputf = f"{txtdir}/{station}_LSPamp.png"
+        multi_freq_amp(station,inputf,outputf)
+
+
     return tv, obstimes
 
 def quick_raw(alldatafile2,xdir,station,subdir):
@@ -482,6 +489,8 @@ def quick_raw(alldatafile2,xdir,station,subdir):
 def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ngal,nbei,test):
     """
     plots of results for the daily avg code
+
+    daily average amplitude is now done elsewhere
       
     Parameters
     ----------
@@ -538,33 +547,19 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
     minyear = int(np.min(tv[:,0])); maxyear = int(np.max(tv[:,0]))
     maxA = np.max(meanAmp); minA = np.min(meanAmp)
     #print(minyear,maxyear,minA,maxA)
-    fig,ax=plt.subplots()
-    ax.plot(obstimes,meanAmp,'b.',label='Amplitude')
-    
-    # 
-    if test:
-        for dy in range(minyear, maxyear+1):
-            d1 = datetime.datetime(year=dy, month =11, day = 1)
-            d2 = datetime.datetime(year=dy, month =6, day = 1)
-            if dy == minyear:
-                ax.plot([d1, d1], [minA, maxA], 'k-',label='Nov 1')
-                ax.plot([d2, d2], [minA, maxA], 'k--',label='Jun 1')
-            else:
-                ax.plot([d1, d1], [minA, maxA], 'k-')
-                ax.plot([d2, d2], [minA, maxA], 'k--')
 
-        plt.legend(loc="upper left")
-
-    fig.autofmt_xdate()
-    plt.ylabel('Amplitude (v/v)',fontsize=fs)
-    today = str(date.today())
-    #plt.title(station.upper() + ': Daily Mean Reflection Amplitude, Computed ' + today,fontsize=fs)
-    plt.title(station.upper() + ': Daily Mean Reflection Amplitude', fontsize=fs)
-    plt.grid()
-    plt.xticks(fontsize=fs); plt.yticks(fontsize=fs)
-    pltname = txtdir + '/' + station + '_RHamp.png'
-    plt.savefig(pltname)
-    print('Daily average RH amplitude file saved as: ', pltname)
+    if False:
+        fig,ax=plt.subplots()
+        ax.plot(obstimes,meanAmp,'b.',label='Amplitude')
+        fig.autofmt_xdate()
+        plt.ylabel('Amplitude (v/v)',fontsize=fs)
+        today = str(date.today())
+        plt.title(station.upper() + ': Daily Mean Reflection Amplitude', fontsize=fs)
+        plt.grid()
+        plt.xticks(fontsize=fs); plt.yticks(fontsize=fs)
+        pltname = txtdir + '/' + station + '_RHamp.png'
+        plt.savefig(pltname)
+        print('Daily average RH amplitude file saved as: ', pltname)
 
 
     # added constellation specific info
@@ -718,3 +713,70 @@ def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gam
 
 
     return tvall
+
+
+def multi_freq_amp(station,inputf,pngname):
+    """
+
+    creates a time series plot of daily average LSP amplitude 
+    by frequency.
+
+    Parameters
+    ----------
+    station: str
+        4 char staiton name
+    inputf : str
+        location of plain text file to be plotted
+    pngname : str
+        location of png file created 
+
+    """
+    fs = 10
+    if os.path.exists(inputf):
+        tvall = np.loadtxt(inputf,comments='%')
+    else:
+        print('LSP results file does not exist')
+        return
+
+    if (len(tvall) == 0):
+        print('No LSP results, so no plot created  ', inputf)
+        return
+
+    freq = tvall[:,6]
+    fr = np.unique(freq)
+
+# get mjd for each record
+    mjdall = []
+    for i in range(0,len(tvall)):
+        mjd = g.ydoy2mjd(int(tvall[i,0]),int(tvall[i,1]))
+        mjdall.append(mjd)
+    mjdall = np.asarray(mjdall)
+
+    fig,ax=plt.subplots(figsize=(10, 6))
+# look thru the frequencies
+    for f in fr:
+        index = (f== tvall[:,6] )
+        mjdf = mjdall[index] # mjd
+        amplitude = tvall[index,8] #lsp amp 
+
+        # for each mjd in this frequency
+        mi = []; mia = []
+        for m in np.unique(mjdf):
+            i = (mjdf == m )
+            mi.append(m)
+            mia.append(np.mean(amplitude[i]))
+        mi = np.asarray(mi)
+        mia = np.asarray(mia)
+        ax.plot(sd.mjd_to_obstimes(mi),mia,'.',label=str(int(f)))
+
+
+    ax.grid(True)
+    ax.legend(loc='upper right',fontsize=fs-2,ncol=len(fr))
+    fig.autofmt_xdate()
+    ax.set_ylabel('v/v',fontsize=fs)
+    ax.set_title(station + ' daily LSP amplitude',fontsize=fs)
+    plt.xticks(fontsize=fs)
+    plt.yticks(fontsize=fs)
+    print('Saving daily amplitude plot to ', pngname)
+    plt.savefig(pngname)
+

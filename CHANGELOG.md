@@ -9,6 +9,8 @@ August 4, 2025
 Fixed bug in daily_avg (which meant it crashed). Now check that input LSP files have doy in the first
 three characters and that it ends in txt.
 
+Changed daily amplitude plot in **daily_avg** to be frequency dependent (was previously all frequencies together).
+
 ## 3.16.2
 July 29, 2025
 

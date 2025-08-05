@@ -190,6 +190,10 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
         this will supercede year2
 
     """
+    if test:
+        # turning it off ...
+        test = False
+
     # set some defaults so they are easy to find
     if year1 is None:
         year1 = 2005
