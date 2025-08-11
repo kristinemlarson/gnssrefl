@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.16.4
+August 11, 2025
+
+Allow lomb scargle periodogram to be done on SNR data in original dB-Hz units.
+Use command line option -dbhz True
+
+
 ## 3.16.3
 August 4, 2025
 

@@ -49,6 +49,7 @@ def parse_arguments():
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
     parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
     parser.add_argument("-midnite", default=None, type=str, help="allow midnite crossings (default is false)")
+    parser.add_argument("-dbhz", default=None, type=str, help="whether to keep SNR in db-hz (default is false)")
 
     g.print_version_to_screen()
     #print (sys.version)
@@ -56,7 +57,7 @@ def parse_arguments():
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'nooverwrite', 'compress', 'mmdd','gzip','savearcs','debug','screenstats','midnite']
+    boolean_args = ['plt', 'nooverwrite', 'compress', 'mmdd','gzip','savearcs','debug','screenstats','midnite','dbhz']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -68,7 +69,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = True, delTmax: int = None, e1: float = None, e2: float = None, 
            mmdd: bool = False, gzip: bool = True, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt', 
-           par : int = None, debug : bool=False, midnite : bool=False  ):
+           par : int = None, debug : bool=False, midnite : bool=False, dbhz : bool=False ):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
@@ -209,6 +210,9 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         might be crashing. No parallel processing in this mode
     midnite : bool
         whether arcs can cross midnite
+    dbhz : bool
+        whether to keep SNR data in db-hz. default (false) is to convert to linear scale
+
     """
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
     #print('You are running ', vers)
@@ -281,6 +285,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # 1 sec data
 
     lsp['dec'] = dec
+
+    # new field
+
+    lsp['dbhz'] = dbhz
+    print('dbhz', dbhz)
 
     # in case you want to analyze multiple days of data
     if doy_end is None:

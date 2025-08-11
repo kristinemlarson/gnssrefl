@@ -8,7 +8,7 @@ import gnssrefl.gnssir_v2 as guts
 import gnssrefl.gps as g
 from gnssrefl.utils import FileManagement
 
-def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstats, irefr,logid,logfilename):
+def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstats, irefr,logid,logfilename,dbhz):
     """
     new worker code that estimates LSP from GNSS SNR data.
     it will now live here and be called by gnssir_v2.py
@@ -39,8 +39,11 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
         opened in earlier function
     logfilename : str
         name of the log file ... 
+    dbhz : bool
+        keep dbhz units  (or not)
 
     """
+    xdir = os.environ['REFL_CODE']
     docstring = 'arrays are eangles (degrees), dsnrData is SNR with/DC removed, and sec (seconds of the day),\n'
 
     # Use FileManagement for arcs directory with extension support
@@ -219,7 +222,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
 
                         # send it the log id now
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT, secxonds = guts.window_new(d2, f, 
-                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats,logid)
+                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats,logid,dbhz)
 
                         #writing out arcs - try putting it later on ... 
                         if test_savearcs and (Nvv > 0):
@@ -314,7 +317,13 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
                 ax1.grid(True, linestyle='-'); ax2.grid(True, linestyle='-')
                 ax1.set_title(station + ' Raw Data/Periodogram for ' + g.ftitle(f) + ' Frequency')
                 ax2.set_xlabel('Reflector Height (m)');
-                ax2.set_ylabel('volts/volts') ; ax1.set_ylabel('volts/volts')
+                if dbhz:
+                    ax2.set_ylabel('db-Hz') ; 
+                    ax1.set_ylabel('db-Hz')
+                else:
+                    ax2.set_ylabel('volts/volts') ; 
+                    ax1.set_ylabel('volts/volts')
+
                 plotname = f'{xdir}/Files/{station}/gnssir_freq{f:03d}.png'
                 print(plotname)
                 g.save_plot(plotname)

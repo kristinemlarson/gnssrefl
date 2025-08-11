@@ -83,6 +83,8 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             if arcs are to be saved, will they be txt or pickle format
         midnite : bool
             whether midnite arcs are alloweed 
+        dbhz : bool
+            whether db-hz (True) or volts/volts (False) are used for SNR data
         
     debug : bool
         debugging value to help track down bugs
@@ -390,7 +392,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
 
         # testing out a new function that does ... everything
 
-        r.retrieve_rh(station,year,doy,extension, midnite,lsp,snrD, outD, screenstats, irefr,logid,logfilename)
+        r.retrieve_rh(station,year,doy,extension, midnite,lsp,snrD, outD, screenstats, irefr,logid,logfilename,lsp['dbhz'])
 
         return
 
@@ -796,7 +798,7 @@ def read_snr(obsfile):
     return allGood, f, r, c
 
 
-def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid):
+def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid,dbhz):
     """
     retrieves SNR arcs for a given satellite. returns elevation angle and 
     detrended linear SNR
@@ -829,6 +831,8 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid):
         printed to the screen
     fileid : 
         log location
+    dbhz : bool
+        whether you want dbhz or linear SNR units
 
     Returns
     -------
@@ -930,8 +934,9 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid):
 
         # not really good - but at least the zeros have been removed
         if good:
-            # change to linear units
-            data = np.power(10,(data/20))
+            # change to linear units if dbhz is False
+            if not dbhz : 
+                data = np.power(10,(data/20))
             if len(ele) > 20:
                 model = np.polyfit(ele,data,pfitV)
                 fit = np.polyval(model,ele)

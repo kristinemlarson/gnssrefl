@@ -20,6 +20,8 @@ The latest pypi version can be found here [![PyPI Version](https://img.shields.i
 
 Latest Features
 
+- You can estimate LSP in SNR units of dB-Hz. Command line option dbhz.
+
 - Soil moisture can be computed from L1 and L5 data, see e.g. [George Townsend PR](https://github.com/kristinemlarson/gnssrefl/pull/354)
 
 - you can set beginning and end dates in <code>daily_avg</code> and <code>subdaily</code>. The parameters are 
