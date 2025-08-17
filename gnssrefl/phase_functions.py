@@ -1196,7 +1196,7 @@ def help_debug(rt,xdir, station):
 
 def load_avg_phase(station,fr,bin_hours=24,extension=''):
     """
-    loads a previously computed daily average phase solution.
+    loads a previously computed averaged phase solution with matching temporal resolution.
     this is NOT the same as the multi-track phase results.
     This file is now stored in station subdirectory in $REFL_CODE/Files/
 
@@ -1206,6 +1206,11 @@ def load_avg_phase(station,fr,bin_hours=24,extension=''):
         4 character station ID, lowercase
     fr : int
         frequency
+    bin_hours : int, optional
+        time bin size in hours (1,2,3,4,6,8,12,24). Default is 24 (daily).
+        Only compares against files with exact same temporal resolution.
+    extension : str, optional
+        analysis extension for finding files, default is ''
 
     Returns
     -------
@@ -1214,7 +1219,7 @@ def load_avg_phase(station,fr,bin_hours=24,extension=''):
     avg_date : list of floats
         fractional year, i.e. year + doy/365.25
     avg_phase : list of floats
-        average phase for a given day
+        average phase for the given temporal resolution
 
     """
 
@@ -1242,7 +1247,12 @@ def load_avg_phase(station,fr,bin_hours=24,extension=''):
             avg_exist = True
 
     if not avg_exist:
-        print('WARNING The average phase file used from a previous run for QC does not exist as yet')
+        if bin_hours < 24:
+            print(f'WARNING: No previous {bin_hours}-hour phase file found for QC. File: {xfile}')
+            print('You do not have a previous solution to compare to so I cannot compute QC stats. Rerun vwc')
+        else:
+            print('WARNING: The average phase file used from a previous run for QC does not exist as yet')
+            print('You do not have a previous solution to compare to so I cannot compute QC stats. Rerun vwc')
 
     return avg_exist, avg_date, avg_phase
 
