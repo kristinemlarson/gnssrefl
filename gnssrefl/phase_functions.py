@@ -1714,7 +1714,20 @@ def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_pha
         keepit=False
 
         # figure out intersection with "good" results
-        inter, id1, id2 = np.intersect1d(avg_date, satdate, assume_unique=True, return_indices=True)
+        inter, id1, id2 = np.intersect1d(avg_date, satdate, return_indices=True)
+        
+        # Check for valid intersection and indices
+        if len(inter) == 0:
+            # No matching dates found - skip QC for this track
+            return k4
+        
+        # Validate indices before accessing arrays
+        if (np.any(id1 >= len(avg_phase)) or np.any(id2 >= len(satphase)) or 
+            np.any(id1 < 0) or np.any(id2 < 0)):
+            # Invalid indices - skip QC for this track  
+            print(f'Warning: QC index mismatch for satellite {satellite}, skipping QC')
+            return k4
+            
         aa = avg_phase[id1]
         bb = satphase[id2]
         if len(aa) > 0:
