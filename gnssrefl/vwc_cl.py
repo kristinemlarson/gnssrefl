@@ -187,7 +187,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         matplt.close ('all')# we do not want the plots to come to the screen for the daily average
 
     # load past VWC analysis  for QC
-    avg_exist, avg_date, avg_phase = qp.load_avg_phase(station,freq,bin_hours,extension)
+    avg_exist, avg_date, avg_phase = qp.load_avg_phase(station,freq,bin_hours,extension,bin_offset)
 
     # pick up all the phase data. unwrapped phase is stored in the results variable
     data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp,amp_ls,ap_rh, results = \
@@ -438,10 +438,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     else:
         subprocess.call(['rm','-f', newlist ])
 
-    qp.save_vwc_plot(fig,  f'{xdir}/Files/{subdir}/{station}_az_phase.png')
+    # Generate azimuth plot filename with temporal suffix
+    suffix = qp.get_temporal_suffix(freq, bin_hours, bin_offset)
+    qp.save_vwc_plot(fig,  f'{xdir}/Files/{subdir}/{station}_az_phase{suffix}.png')
 
     if advanced:
-        qp.save_vwc_plot(fig2,  f'{xdir}/Files/{subdir}/{station}_az_normamp.png')
+        qp.save_vwc_plot(fig2,  f'{xdir}/Files/{subdir}/{station}_az_normamp{suffix}.png')
 
 
     #Need to Define clearly the stored values in vxyz
@@ -469,11 +471,18 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
                 print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
             sys.exit()
 
-        # make datetime date array
-        datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
+        # make datetime date array with hour-aware handling
+        if bin_hours < 24:
+            # Subdaily: use BinStart hour from column 4 (5th column in tv array)
+            from datetime import timedelta
+            datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') + timedelta(hours=int(bin_start)) 
+                             for yr, d, bin_start in zip(tv[:, 0], tv[:, 1], tv[:, 4])]
+        else:
+            # Daily: use midnight (00:00) for backwards compatibility
+            datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
 
         # make a plot of daily phase values
-        qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs)
+        qp.subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bin_hours,bin_offset)
 
         # convert averaged phase values to volumetric water content
         qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir,hires_figs, extension, bin_hours, bin_offset)

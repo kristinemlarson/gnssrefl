@@ -21,9 +21,9 @@ from gnssrefl.utils import str2bool, read_files_in_dir
 
 xdir = Path(os.environ["REFL_CODE"])
 
-def get_temporal_suffix(fr, bin_hours=24):
+def get_temporal_suffix(fr, bin_hours=24, bin_offset=0):
     """
-    Generate consistent suffix for all output files with temporal resolution
+    Generate consistent suffix for all output files with temporal resolution and offset
     
     Parameters
     ----------
@@ -31,11 +31,13 @@ def get_temporal_suffix(fr, bin_hours=24):
         Frequency (1, 5, 20, etc.)
     bin_hours : int, optional
         Time bin size in hours. Default is 24 (daily)
+    bin_offset : int, optional
+        Bin timing offset in hours. Default is 0
         
     Returns
     -------
     str
-        Suffix string like "_L1_6hr", "_L2_24hr", etc.
+        Suffix string like "_L1_6hr+0", "_L2_24hr+1", etc.
     """
     # Generate frequency suffix
     if fr == 1:
@@ -47,8 +49,8 @@ def get_temporal_suffix(fr, bin_hours=24):
     else:
         freq_suffix = f"_freq{fr}"
     
-    # Generate temporal suffix
-    time_suffix = f"_{bin_hours}hr"
+    # Generate temporal suffix with offset
+    time_suffix = f"_{bin_hours}hr+{bin_offset}"
     
     return freq_suffix + time_suffix
 
@@ -103,7 +105,7 @@ def normAmp(amp, basepercent):
 
     return Namp
 
-def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs):
+def subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bin_hours=24,bin_offset=0):
     """
     makes a plot of daily averaged phase for vwc code
 
@@ -129,20 +131,20 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs):
     plt.figure(figsize=(10, 6))
     plt.plot(datetime_dates, tv[:, 2], 'b-')
     plt.ylabel('phase (degrees)')
-    if fr == 1:
-        plt.title(f"Daily L1 Phase Results: {station.upper()}")
-    elif fr == 5:
-        plt.title(f"Daily L5 Phase Results: {station.upper()}")
+    freq_name = {1: "L1", 2: "L2", 20: "L2C", 5: "L5"}.get(fr, f"freq{fr}")
+    if bin_hours < 24:
+        plt.title(f"{bin_hours}-hour {freq_name} Phase Results: {station.upper()}")
     else:
-        plt.title(f"Daily L2C Phase Results: {station.upper()}")
+        plt.title(f"Daily {freq_name} Phase Results: {station.upper()}")
     plt.grid()
     plt.gcf().autofmt_xdate()
 
-    # maybe this works.  Maybe not.
+    # Generate filename with temporal suffix
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
     if hires_figs:
-        plot_path = f'{outdir}/{station}_daily_phase.eps'
+        plot_path = f'{outdir}/{station}_phase{suffix}.eps'
     else:
-        plot_path = f'{outdir}/{station}_daily_phase.png'
+        plot_path = f'{outdir}/{station}_phase{suffix}.png'
     print(f"Saving figure to {plot_path}")
 
     plt.savefig(plot_path)
@@ -673,7 +675,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     base_fileout = file_manager.get_file_path()
     
     # Generate consistent filename using temporal resolution
-    suffix = get_temporal_suffix(fr, bin_hours)
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
     fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
     
     if os.path.exists(fileout):
@@ -870,7 +872,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     outdir = Path(xdir) / 'Files' / subdir
 
-    suffix = get_temporal_suffix(fr, bin_hours)
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
     if hires_figs:
         plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.eps'
     else:
@@ -894,7 +896,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     base_vwcfile = file_manager.get_file_path()
     
     # Generate VWC filename using consistent suffix
-    suffix = get_temporal_suffix(fr, bin_hours) 
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset) 
     vwcfile = base_vwcfile.parent / f"{station}_vwc{suffix}.txt"
     print('>>> VWC results being written to ', vwcfile)
     with open(vwcfile, 'w') as w:
@@ -991,7 +993,7 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
     base_fileout = file_manager.get_file_path()
     
     # Generate consistent filename with temporal resolution
-    suffix = get_temporal_suffix(fr, bin_hours)
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
     fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
 
     if bin_hours < 24:
@@ -1247,7 +1249,7 @@ def help_debug(rt,xdir, station):
     #    debug.close()
 
 
-def load_avg_phase(station,fr,bin_hours=24,extension=''):
+def load_avg_phase(station,fr,bin_hours=24,extension='',bin_offset=0):
     """
     loads a previously computed averaged phase solution with matching temporal resolution.
     this is NOT the same as the multi-track phase results.
@@ -1285,7 +1287,7 @@ def load_avg_phase(station,fr,bin_hours=24,extension=''):
     base_path = file_manager.get_file_path().parent
     
     # Generate consistent filename with exact temporal resolution matching
-    suffix = get_temporal_suffix(fr, bin_hours)
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
     xfile = base_path / f"{station}_phase{suffix}.txt"
 
     if os.path.exists(xfile):
