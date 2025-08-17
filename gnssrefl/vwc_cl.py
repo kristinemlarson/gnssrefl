@@ -30,6 +30,9 @@ def parse_arguments():
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 100")
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
     parser.add_argument("-minvalperday", default=None, type=int, help="min number of satellite tracks needed each day. Default is 10")
+    parser.add_argument("-bin_hours", default=None, type=int, help="time bin size in hours (1,2,3,4,6,8,12,24). Default is 24 (daily)")
+    parser.add_argument("-minvalperbin", default=None, type=int, help="min number of satellite tracks needed per time bin. Default is 10")
+    parser.add_argument("-bin_offset", default=None, type=int, help="bin timing offset in hours (0 <= offset < bin_hours). Default is 0")
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean, try to remove snow contaminated points. Default is F")
     parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
     parser.add_argument("-tmin", default=None, type=float, help="minimum soil texture. Default is 0.05.")
@@ -52,6 +55,7 @@ def parse_arguments():
 
 def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool = True, screenstats: bool = False,
         min_req_pts_track: int = None, polyorder: int = -99, minvalperday: int = None, 
+        bin_hours: int = None, minvalperbin: int = None, bin_offset: int = None,
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None, 
         warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False, advanced : bool=False, extension:str=None ):
     """
@@ -136,6 +140,18 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         with columns: FracYr Year DOY  VWC Month Day
 
     """
+    # Validate subdaily binning parameters
+    if bin_hours is not None:
+        valid_bin_hours = [1, 2, 3, 4, 6, 8, 12, 24]
+        if bin_hours not in valid_bin_hours:
+            print(f"Error: bin_hours must be one of {valid_bin_hours}")
+            sys.exit()
+    
+    if bin_offset is not None and bin_hours is not None:
+        if bin_offset < 0 or bin_offset >= bin_hours:
+            print(f"Error: bin_offset must be 0 <= offset < bin_hours ({bin_hours})")
+            sys.exit()
+
     fs =10 # fontsize
     snow_file = None
     colors = 'mrgbcykmrgbcykmrbcykmrgbcykmrgbcykmrbcyk'
@@ -156,9 +172,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     # pick up the parameters used for this code
     minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, \
-            remove_bad_tracks, warning_value,min_norm_amp,sat_legend,circles,extension = \
+            remove_bad_tracks, warning_value,min_norm_amp,sat_legend,circles,extension, \
+            bin_hours, minvalperbin, bin_offset = \
             qp.set_parameters(station, minvalperday, tmin,tmax, min_req_pts_track, 
-                              fr, year, year_end,subdir,plt, auto_removal,warning_value,extension)
+                              fr, year, year_end,subdir,plt, auto_removal,warning_value,extension,
+                              bin_hours, minvalperbin, bin_offset)
 
     # if you have requested snow filtering
     if snow_filter:

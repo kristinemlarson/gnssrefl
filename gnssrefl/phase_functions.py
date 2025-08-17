@@ -1210,7 +1210,8 @@ def load_sat_phase(station, year, year_end, freq, extension = ''):
 
 
 def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,
-                   subdir,plt,auto_removal,warning_value,extension):
+                   subdir,plt,auto_removal,warning_value,extension,
+                   bin_hours=None, minvalperbin=None, bin_offset=None):
     """
     the goal of this code is to pick up the relevant parameters used in vwc.
 
@@ -1330,6 +1331,31 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     else:
         min_norm_amp = 0.5  # trying this out
 
+    # Handle subdaily binning parameters with precedence: CLI > JSON > Defaults
+    if bin_hours is None:
+        if 'vwc_bin_hours' in lsp:
+            bin_hours = lsp['vwc_bin_hours']
+        else:
+            bin_hours = 24  # Default to daily
+    
+    if bin_offset is None:
+        if 'vwc_bin_offset' in lsp:
+            bin_offset = lsp['vwc_bin_offset']
+        else:
+            bin_offset = 0  # Default offset
+    
+    # Handle minvalperbin vs minvalperday transition
+    if minvalperbin is None:
+        if 'vwc_minvalperbin' in lsp:
+            minvalperbin = lsp['vwc_minvalperbin']
+        else:
+            # Smart fallback for backwards compatibility
+            if bin_hours == 24 and minvalperday is not None:
+                minvalperbin = minvalperday
+                if minvalperday != 10:  # Only warn if explicitly set to non-default
+                    print("Warning: minvalperday is deprecated for 24hr bins. Use minvalperbin instead.")
+            else:
+                minvalperbin = 10  # Default value
 
     freq = fr # KE kept the other variable
 
@@ -1358,14 +1384,26 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     if not plt:
         print('no plots will come to screen. Will only be saved.')
 
-    print('minvalperday', minvalperday)
-    print('tmin/tmax',  tmin, tmax )
-    print('min_req_tracks', min_req_pts_track)
-    print('warning value', warning_value)
-    print('extension value', extension)
+    print('=== VWC Configuration ===')
+    print(f'vwc_min_soil_texture: {tmin:.2f}')
+    print(f'vwc_max_soil_texture: {tmax:.2f}')
+    print(f'vwc_min_req_pts_track: {min_req_pts_track}')
+    print(f'vwc_warning_value: {warning_value:.1f}')
+    print(f'vwc_min_norm_amp: {min_norm_amp:.1f}')
+    
+    print('=== Time Binning ===')
+    print(f'vwc_bin_hours: {bin_hours}')
+    print(f'vwc_bin_offset: {bin_offset}') 
+    print(f'vwc_minvalperbin: {minvalperbin}')
+    if minvalperday is not None and bin_hours == 24:
+        print(f'vwc_minvalperday: {minvalperday} (deprecated - use vwc_minvalperbin)')
+    
+    if extension:
+        print(f'extension: {extension}')
 
     return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, \
-            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles, extension
+            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles, extension, \
+            bin_hours, minvalperbin, bin_offset
 
 def write_all_phase(v,fname):
     """
