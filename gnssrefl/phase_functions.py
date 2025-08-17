@@ -52,6 +52,32 @@ def get_temporal_suffix(fr, bin_hours=24):
     
     return freq_suffix + time_suffix
 
+def get_bin_schedule_info(bin_hours, bin_offset=0):
+    """
+    Helper function to generate bin schedule information strings
+    
+    Parameters
+    ----------
+    bin_hours : int
+        Time bin size in hours
+    bin_offset : int, optional
+        Bin timing offset in hours. Default is 0
+        
+    Returns
+    -------
+    str
+        Bin schedule description line
+    """
+    bins_per_day = 24 // bin_hours
+    schedule_parts = []
+    for i in range(bins_per_day):
+        start_hour = (i * bin_hours + bin_offset) % 24
+        end_hour = ((i + 1) * bin_hours + bin_offset) % 24
+        if end_hour == 0:
+            end_hour = 24
+        schedule_parts.append(f"Bin{i}: {start_hour:02d}-{end_hour:02d}h")
+    return "% Bin schedule: " + "  ".join(schedule_parts)
+
 def normAmp(amp, basepercent):
     """
     emulated amp_normK code from PBO H2O
@@ -899,8 +925,13 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
     az = vxyz[:, 4] # this is not used
     rh = vxyz[:, 5] # this is not used
     amp = vxyz[:, 6]
-
-    tv = np.empty(shape=[0, 4])
+    hour = vxyz[:, 8] # hour of day, UTC
+    
+    # For subdaily mode, we need an extra column for hour bin
+    if bin_hours < 24:
+        tv = np.empty(shape=[0, 5])  # year, doy, meanph, nvals, bin_start_hour
+    else:
+        tv = np.empty(shape=[0, 4])  # year, doy, meanph, nvals (backwards compatibility)
 
     # Use FileManagement for consistent phase file paths
     file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
@@ -915,26 +946,76 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
     else:
         print('Daily averaged phases will be written to : ', fileout)
     with open(fileout, 'w') as fout:
-        # Year DOY Ph Phsig NormA MM DD
-          #            2012   1  10.00   2.60  0.962  0.00    1  1
-        fout.write("% Year DOY   Ph    Phsig NormA  empty  Mon Day \n")
+        # Write frequency information
+        if fr == 1:
+            freq_name = "L1"
+        elif fr == 2 or fr == 20:
+            freq_name = "L2"
+        elif fr == 5:
+            freq_name = "L5"  
+        else:
+            freq_name = f"freq{fr}"
+        fout.write(f"% {freq_name} phase results for station {station.upper()}\n")
+        
+        # Write header based on mode
+        if bin_hours < 24:
+            # Subdaily mode: add bin info and BinStart column
+            fout.write(f"% Subdaily phase averaging with {bin_hours}-hour bins (offset: {bin_offset}h)\n")
+            fout.write(get_bin_schedule_info(bin_hours, bin_offset) + "\n")
+            fout.write("% Year DOY   Ph    Phsig NormA  empty  Mon Day BinStart\n")
+        else:
+            # Daily mode: keep existing header for backwards compatibility  
+            fout.write("% Year DOY   Ph    Phsig NormA  empty  Mon Day \n")
+            
+        # Calculate number of bins per day
+        bins_per_day = 24 // bin_hours
+        
         for requested_year in range(year, year_end + 1):
             for doy in range(1, 367):
-            # put in amplitude criteria to keep out bad L2P results
-                ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                if (len(ph1) >= minvalperday):
-                    newl = [requested_year, doy, np.mean(ph1), len(ph1)]
-                # i think you normalize the individual satellites before this step
-                #namp = qp.normAmp(amp1,0.15)
-                    tv = np.append(tv, [newl], axis=0)
-                    rph1 = np.round(np.mean(ph1), 2)
-                    meanA = np.mean(amp1)
-                    rph1_std = np.std(ph1)
-                    yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
-                    fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
-
-        fout.close()
+                if bin_hours < 24:
+                    # Subdaily binning: process each time bin separately
+                    for bin_idx in range(bins_per_day):
+                        # Calculate bin boundaries with offset
+                        bin_start = (bin_idx * bin_hours + bin_offset) % 24
+                        bin_end = ((bin_idx + 1) * bin_hours + bin_offset) % 24
+                        
+                        # Handle midnight wraparound
+                        if bin_end <= bin_start:  # bin crosses midnight
+                            hour_mask = (hour >= bin_start) | (hour < bin_end)
+                        else:
+                            hour_mask = (hour >= bin_start) & (hour < bin_end)
+                        
+                        # Filter data for this year, doy, and time bin
+                        time_mask = (y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65) & hour_mask
+                        ph1 = phase[time_mask]
+                        amp1 = amp[time_mask]
+                        
+                        if len(ph1) >= minvalperbin:
+                            # Calculate statistics
+                            rph1 = np.round(np.mean(ph1), 2)
+                            meanA = np.mean(amp1)
+                            rph1_std = np.std(ph1)
+                            yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                            bin_start_hour = (bin_idx * bin_hours + bin_offset) % 24
+                            
+                            # Create data entry for tv array and write to file
+                            newl = [requested_year, doy, np.mean(ph1), len(ph1), bin_start_hour]
+                            fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f}   {bin_start_hour:2.0f}\n")
+                            tv = np.append(tv, [newl], axis=0)
+                else:
+                    # Daily binning: use existing logic for backwards compatibility
+                    time_mask = (y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)
+                    ph1 = phase[time_mask]
+                    amp1 = amp[time_mask]
+                    
+                    if len(ph1) >= minvalperday:
+                        newl = [requested_year, doy, np.mean(ph1), len(ph1)]
+                        tv = np.append(tv, [newl], axis=0)
+                        rph1 = np.round(np.mean(ph1), 2)
+                        meanA = np.mean(amp1)
+                        rph1_std = np.std(ph1)
+                        yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                        fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
     return tv
 
 def apriori_file_exist(station, fr, extension=''):
