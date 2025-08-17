@@ -21,6 +21,37 @@ from gnssrefl.utils import str2bool, read_files_in_dir
 
 xdir = Path(os.environ["REFL_CODE"])
 
+def get_temporal_suffix(fr, bin_hours=24):
+    """
+    Generate consistent suffix for all output files with temporal resolution
+    
+    Parameters
+    ----------
+    fr : int
+        Frequency (1, 5, 20, etc.)
+    bin_hours : int, optional
+        Time bin size in hours. Default is 24 (daily)
+        
+    Returns
+    -------
+    str
+        Suffix string like "_L1_6hr", "_L2_24hr", etc.
+    """
+    # Generate frequency suffix
+    if fr == 1:
+        freq_suffix = "_L1"
+    elif fr == 2 or fr == 20:
+        freq_suffix = "_L2"  # Both L2 (fr=2) and L2C (fr=20) use L2 
+    elif fr == 5:
+        freq_suffix = "_L5"  
+    else:
+        freq_suffix = f"_freq{fr}"
+    
+    # Generate temporal suffix
+    time_suffix = f"_{bin_hours}hr"
+    
+    return freq_suffix + time_suffix
+
 def normAmp(amp, basepercent):
     """
     emulated amp_normK code from PBO H2O
@@ -818,7 +849,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
                 w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
 
 
-def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension=''):
+def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension='',
+                   bin_hours=24, minvalperbin=10, bin_offset=0):
 
     """
     creates output file for average phase results
@@ -872,15 +904,16 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
 
     # Use FileManagement for consistent phase file paths
     file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
-    fileout = file_manager.get_file_path()
+    base_fileout = file_manager.get_file_path()
     
-    # Handle frequency-specific naming convention
-    if fr == 1:
-        fileout = fileout.parent / f"{station}_phase_L1.txt"
-    elif fr == 5:
-        fileout = fileout.parent / f"{station}_phase_L5.txt"
+    # Generate consistent filename with temporal resolution
+    suffix = get_temporal_suffix(fr, bin_hours)
+    fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
 
-    print('Daily averaged phases will be written to : ', fileout)
+    if bin_hours < 24:
+        print(f'{bin_hours}-hour averaged phases will be written to : ', fileout)
+    else:
+        print('Daily averaged phases will be written to : ', fileout)
     with open(fileout, 'w') as fout:
         # Year DOY Ph Phsig NormA MM DD
           #            2012   1  10.00   2.60  0.962  0.00    1  1
@@ -1080,7 +1113,7 @@ def help_debug(rt,xdir, station):
     #    debug.close()
 
 
-def load_avg_phase(station,fr):
+def load_avg_phase(station,fr,bin_hours=24,extension=''):
     """
     loads a previously computed daily average phase solution.
     this is NOT the same as the multi-track phase results.
@@ -1109,14 +1142,12 @@ def load_avg_phase(station,fr):
     avg_exist = False
 
     # Use FileManagement for consistent phase file paths
-    file_manager = FileManagement(station, 'daily_avg_phase_results')
-    xfile = file_manager.get_file_path()
+    file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
+    base_path = file_manager.get_file_path().parent
     
-    # Handle frequency-specific naming convention
-    if fr == 1:
-        xfile = xfile.parent / f"{station}_phase_L1.txt"
-    elif fr == 5:
-        xfile = xfile.parent / f"{station}_phase_L5.txt"
+    # Generate consistent filename with exact temporal resolution matching
+    suffix = get_temporal_suffix(fr, bin_hours)
+    xfile = base_path / f"{station}_phase{suffix}.txt"
 
     if os.path.exists(xfile):
         result = np.loadtxt(xfile, comments='%')

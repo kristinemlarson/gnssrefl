@@ -187,7 +187,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         matplt.close ('all')# we do not want the plots to come to the screen for the daily average
 
     # load past VWC analysis  for QC
-    avg_exist, avg_date, avg_phase = qp.load_avg_phase(station,freq)
+    avg_exist, avg_date, avg_phase = qp.load_avg_phase(station,freq,bin_hours,extension)
 
     # pick up all the phase data. unwrapped phase is stored in the results variable
     data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp,amp_ls,ap_rh, results = \
@@ -455,11 +455,18 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
             matplt.show()
         sys.exit()
     else:
-        # write out daily phase values
-        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension)
-        print('Number of daily phase measurements ', len(tv))
+        # write out averaged phase values
+        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension,
+                               bin_hours, minvalperbin, bin_offset)
+        if bin_hours < 24:
+            print(f'Number of {bin_hours}-hour phase measurements ', len(tv))
+        else:
+            print('Number of daily phase measurements ', len(tv))
         if len(tv) < 1:
-            print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
+            if bin_hours < 24:
+                print(f'No results - perhaps minvalperbin or min_req_pts_track are too stringent')
+            else:
+                print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
             sys.exit()
 
         # make datetime date array
