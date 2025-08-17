@@ -874,9 +874,11 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
     file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
     fileout = file_manager.get_file_path()
     
-    # Handle L1 frequency naming convention
-    if (fr == 1):
+    # Handle frequency-specific naming convention
+    if fr == 1:
         fileout = fileout.parent / f"{station}_phase_L1.txt"
+    elif fr == 5:
+        fileout = fileout.parent / f"{station}_phase_L5.txt"
 
     print('Daily averaged phases will be written to : ', fileout)
     with open(fileout, 'w') as fout:
@@ -1110,9 +1112,11 @@ def load_avg_phase(station,fr):
     file_manager = FileManagement(station, 'daily_avg_phase_results')
     xfile = file_manager.get_file_path()
     
-    # Handle L1 frequency naming convention
+    # Handle frequency-specific naming convention
     if fr == 1:
         xfile = xfile.parent / f"{station}_phase_L1.txt"
+    elif fr == 5:
+        xfile = xfile.parent / f"{station}_phase_L5.txt"
 
     if os.path.exists(xfile):
         result = np.loadtxt(xfile, comments='%')
