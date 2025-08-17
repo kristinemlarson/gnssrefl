@@ -603,7 +603,7 @@ def low_pct(amp, basepercent):
 
 
 def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
-        subdir='',hires_figs=False, extension=''):
+        subdir='',hires_figs=False, extension='', bin_hours=24, bin_offset=0):
     """
     Convert GPS phase to VWC. Using Clara Chew's algorithm from 
     Matlab write_vegcorrect_smc.m
@@ -670,26 +670,49 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     # Use FileManagement for consistent phase file paths
     file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
-    fileout = file_manager.get_file_path()
+    base_fileout = file_manager.get_file_path()
     
-    # Handle L1 frequency naming convention
-    if (fr == 1):
-        fileout = fileout.parent / f"{station}_phase_L1.txt"
-    print(subdir)
-
+    # Generate consistent filename using temporal resolution
+    suffix = get_temporal_suffix(fr, bin_hours)
+    fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
+    
     if os.path.exists(fileout):
         avg_phase_results = np.loadtxt(fileout, comments='%')
+        if bin_hours < 24:
+            print(f'Found {bin_hours}-hour phase file: {fileout}')
+        else:
+            print(f'Found daily phase file: {fileout}')
     else:
-        print('Average phase results not found')
+        if bin_hours < 24:
+            print(f'No {bin_hours}-hour phase file found: {fileout}')
+        else:
+            print('Average phase results not found')
         sys.exit()
     if (len(avg_phase_results) == 0):
         print('Empty results file')
+        sys.exit()
+        
+    # Auto-detect file format based on number of columns
+    if avg_phase_results.ndim == 1:
+        # Single row, reshape for consistency
+        avg_phase_results = avg_phase_results.reshape(1, -1)
+    
+    num_columns = avg_phase_results.shape[1]
+    if num_columns == 9:
+        is_subdaily = True
+        print('Detected 9-column subdaily format from file')
+    elif num_columns == 8:
+        is_subdaily = False  
+        print('Detected 8-column daily format from file')
+    else:
+        print(f'Unexpected file format: {num_columns} columns. Expected 8 (daily) or 9 (subdaily)')
         sys.exit()
 
 
     # get only the years requested - this matters if in previous steps more data was processed
     avg_phase_results_requested = np.array([v for v in avg_phase_results if v[0] in np.arange(year, year_end+1)])
 
+    # Extract columns based on file format (8 vs 9 columns)
     years = avg_phase_results_requested[:, 0]
     doys = avg_phase_results_requested[:, 1]
     ph = avg_phase_results_requested[:, 2]
@@ -697,6 +720,13 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     amp = avg_phase_results_requested[:, 4]
     months = avg_phase_results_requested[:, 6]
     days = avg_phase_results_requested[:, 7]
+    
+    # For subdaily files, we have an additional BinStart column
+    if is_subdaily:
+        bin_start_hours = avg_phase_results_requested[:, 8]
+        print(f'Processing {len(avg_phase_results_requested)} subdaily measurements')
+    else:
+        print(f'Processing {len(avg_phase_results_requested)} daily measurements')
 
     t = years + doys/365.25
     tspan = t[-1] - t[0]
@@ -776,8 +806,17 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     plt.subplots_adjust(hspace=0.2)
     plt.suptitle(f'Station: {station}', size=16)
 
-    # list comprehension to make datetime objects from year, doy
-    t_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(years, doys)]
+    # Create datetime objects with hour information for subdaily data  
+    if is_subdaily:
+        from datetime import timedelta
+        t_datetime = []
+        for yr, d, h in zip(years, doys, bin_start_hours):
+            base_dt = datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j')
+            dt_with_hours = base_dt + timedelta(hours=int(h))
+            t_datetime.append(dt_with_hours)
+    else:
+        # Daily data: use existing logic
+        t_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(years, doys)]
 
     # create subplots: 2 rows 1 column, 1st subplot
     ax = plt.subplot(2, 1, 1)
@@ -831,18 +870,19 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     outdir = Path(xdir) / 'Files' / subdir
 
+    suffix = get_temporal_suffix(fr, bin_hours)
     if hires_figs:
-        plot_path = f'{outdir}/{station}_phase_vwc_result.eps'
+        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.eps'
     else:
-        plot_path = f'{outdir}/{station}_phase_vwc_result.png'
+        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.png'
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
 
 
     if hires_figs:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture.eps'
+        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.eps'
     else:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture.png'
+        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.png'
 
     vwc_plot(station,t_datetime, nv, plot_path,circles) 
 
@@ -851,7 +891,11 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     # Use FileManagement with extension support for consistent directory structure
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
-    vwcfile = file_manager.get_file_path()
+    base_vwcfile = file_manager.get_file_path()
+    
+    # Generate VWC filename using consistent suffix
+    suffix = get_temporal_suffix(fr, bin_hours) 
+    vwcfile = base_vwcfile.parent / f"{station}_vwc{suffix}.txt"
     print('>>> VWC results being written to ', vwcfile)
     with open(vwcfile, 'w') as w:
         N = len(nv)
@@ -860,7 +904,12 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
         w.write("% Frequency used: {0} \n".format(freq_name))
         w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
-        w.write("% FracYr    Year   DOY   VWC Month Day \n")
+        if is_subdaily:
+            w.write(f"% Subdaily VWC with {bin_hours}-hour bins (offset: {bin_offset}h)\n")
+            w.write(get_bin_schedule_info(bin_hours, bin_offset) + "\n")
+            w.write("% FracYr    Year   DOY   VWC Month Day BinStart \n")
+        else:
+            w.write("% FracYr    Year   DOY   VWC Month Day \n")
         for iw in range(0, N):
             whydoys = np.round(365.25 * (t[iw] - years))
 
@@ -872,7 +921,11 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
             watercontent = nv[iw]
             # we do not allow negative soil moisture in my world.
             if (watercontent> 0 and watercontent < 0.5):
-                w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
+                if is_subdaily:
+                    bin_start = bin_start_hours[iw]
+                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} {bin_start:3.0f} \n")
+                else:
+                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
 
 
 def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension='',

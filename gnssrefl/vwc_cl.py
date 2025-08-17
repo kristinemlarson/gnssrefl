@@ -475,8 +475,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         # make a plot of daily phase values
         qp.daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs)
 
-        # convert daily phase values to volumetric water content
-        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir,hires_figs, extension)
+        # convert averaged phase values to volumetric water content
+        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir,hires_figs, extension, bin_hours, bin_offset)
 
 
 def main():
