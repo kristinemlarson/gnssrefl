@@ -1034,14 +1034,16 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
                         bin_start = (bin_idx * bin_hours + bin_offset) % 24
                         bin_end = ((bin_idx + 1) * bin_hours + bin_offset) % 24
                         
-                        # Handle midnight wraparound
+                        # Handle midnight wraparound - collect data from both days for cross-midnight bins
                         if bin_end <= bin_start:  # bin crosses midnight
-                            hour_mask = (hour >= bin_start) | (hour < bin_end)
+                            # Current day: late hours (e.g., 22:00-24:00)
+                            current_day_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start)
+                            # Next day: early hours (e.g., 00:00-02:00)
+                            next_day_mask = (y1 == requested_year) & (d1 == doy + 1) & (hour < bin_end)
+                            time_mask = (current_day_mask | next_day_mask) & (phase > -10) & (amp > 0.65)
                         else:
-                            hour_mask = (hour >= bin_start) & (hour < bin_end)
-                        
-                        # Filter data for this year, doy, and time bin
-                        time_mask = (y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65) & hour_mask
+                            # Normal case: bin doesn't cross midnight
+                            time_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start) & (hour < bin_end) & (phase > -10) & (amp > 0.65)
                         ph1 = phase[time_mask]
                         amp1 = amp[time_mask]
                         
