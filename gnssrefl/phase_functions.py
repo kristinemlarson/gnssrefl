@@ -1494,11 +1494,10 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
             min_req_pts_track = lsp['vwc_min_req_pts_track']
         else:
             min_req_pts_track = 100
-    if minvalperday is None:
-        if 'vwc_minvalperday' in lsp:
-            minvalperday = lsp['vwc_minvalperday']
-        else:
-            minvalperday = 10
+    # Always load minvalperday from JSON for transparency (even if not used)
+    json_minvalperday = None
+    if 'vwc_minvalperday' in lsp:
+        json_minvalperday = lsp['vwc_minvalperday']
 
     if warning_value is None:    
         if 'vwc_warning_value' in lsp:
@@ -1532,18 +1531,45 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         else:
             bin_offset = 0  # Default offset
     
-    # Handle minvalperbin vs minvalperday transition
-    if minvalperbin is None:
-        if 'vwc_minvalperbin' in lsp:
-            minvalperbin = lsp['vwc_minvalperbin']
-        else:
-            # Smart fallback for backwards compatibility
-            if bin_hours == 24 and minvalperday is not None:
-                minvalperbin = minvalperday
-                if minvalperday != 10:  # Only warn if explicitly set to non-default
-                    print("Warning: minvalperday is deprecated for 24hr bins. Use minvalperbin instead.")
+    # Store original parameters to detect CLI conflicts
+    original_minvalperbin = minvalperbin
+    original_minvalperday = minvalperday
+    
+    # Validate CLI parameter conflicts
+    if original_minvalperbin is not None and original_minvalperday is not None:
+        print("Error: Cannot specify both -minvalperbin and -minvalperday at the same time.")
+        print("Use -minvalperbin for all time bin sizes, or -minvalperday only for 24hr bins.")
+        sys.exit()
+    
+    if original_minvalperday is not None and bin_hours != 24:
+        print(f"Error: -minvalperday is only valid for daily (24hr) analysis, got {bin_hours}hr bins.")
+        print("Use -minvalperbin for subdaily analysis.")
+        sys.exit()
+    
+    # Handle minvalperbin vs minvalperday parameter resolution
+    if original_minvalperbin is not None:
+        # Function called with minvalperbin - use it
+        minvalperbin = original_minvalperbin
+    elif original_minvalperday is not None:
+        # Function called with minvalperday - use it (with warning)
+        minvalperbin = original_minvalperday
+        print("Warning: -minvalperday is deprecated for 24hr bins. Use -minvalperbin instead.")
+    elif minvalperbin is None:
+        # No CLI parameters - resolve from JSON with preference rules
+        if bin_hours == 24:
+            # For 24hr bins, prefer minvalperday over minvalperbin
+            if json_minvalperday is not None:
+                minvalperbin = json_minvalperday
+            elif 'vwc_minvalperbin' in lsp:
+                minvalperbin = lsp['vwc_minvalperbin']
             else:
-                minvalperbin = 5  # Default value (reduced from 10 for better subdaily coverage)
+                minvalperbin = 10  # Daily default
+        else:
+            # For subdaily bins, use minvalperbin or default
+            if 'vwc_minvalperbin' in lsp:
+                minvalperbin = lsp['vwc_minvalperbin']
+            else:
+                minvalperbin = 5   # Subdaily default
 
     freq = fr # KE kept the other variable
 
@@ -1582,9 +1608,22 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     print('=== Time Binning ===')
     print(f'vwc_bin_hours: {bin_hours}')
     print(f'vwc_bin_offset: {bin_offset}') 
-    print(f'vwc_minvalperbin: {minvalperbin}')
-    if minvalperday is not None and bin_hours == 24:
-        print(f'vwc_minvalperday: {minvalperday} (deprecated - use vwc_minvalperbin)')
+    # Show minvalperbin with source information
+    minvalperbin_source = ""
+    if original_minvalperbin is not None:
+        minvalperbin_source = " (from CLI)"
+    elif original_minvalperday is not None:
+        minvalperbin_source = " (from CLI -minvalperday)"
+    elif bin_hours == 24 and json_minvalperday is not None and 'vwc_minvalperbin' not in lsp:
+        minvalperbin_source = " (from JSON vwc_minvalperday)"
+    elif bin_hours == 24 and json_minvalperday is not None:
+        minvalperbin_source = " (from JSON vwc_minvalperday, preferred for 24hr bins)"
+    elif 'vwc_minvalperbin' in lsp:
+        minvalperbin_source = " (from JSON)"
+    else:
+        minvalperbin_source = " (default)"
+    
+    print(f'vwc_minvalperbin: {minvalperbin}{minvalperbin_source}')
     
     # Warning for experimental subdaily features
     if bin_hours < 24:

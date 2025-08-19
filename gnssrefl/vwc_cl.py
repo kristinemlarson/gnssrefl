@@ -206,13 +206,13 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     tracks = qp.read_apriori_rh(station, freq, extension)
     nr = len(tracks[:,1])
 
-    if (minvalperday > nr ):
-        print('The code thinks you are using ', nr, ' satellite tracks but you are requiring', minvalperday, ' for each VWC point.')
-        print('Try lowering minvalperday at the command line or in the gnssir analysis json (vwc_minvalperday)')
+    if (minvalperbin > nr ):
+        print('The code thinks you are using ', nr, ' satellite tracks but you are requiring', minvalperbin, ' for each VWC point.')
+        print('Try lowering minvalperbin at the command line or in the gnssir analysis json (vwc_minvalperbin)')
         sys.exit()
-    if (nr < 15 ) and (minvalperday==10):
-        print('The code thinks you are using ', nr, ' satellite tracks but that is pretty close to the default (', minvalperday, ')')
-        print('This could be problematic. Try lowering minvalperday at the command line or in the gnssir analysis json (vwc_minvalperday)')
+    if (nr < 15 ) and (minvalperbin==10):
+        print('The code thinks you are using ', nr, ' satellite tracks but that is pretty close to the default (', minvalperbin, ')')
+        print('This could be problematic. Try lowering minvalperbin at the command line or in the gnssir analysis json (vwc_minvalperbin)')
         sys.exit()
 
     atracks = tracks[:, 5]  # min azimuth values
@@ -464,7 +464,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         sys.exit()
     else:
         # write out averaged phase values
-        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension,
+        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperbin,vxyz,subdir,extension,
                                bin_hours, minvalperbin, bin_offset)
         if bin_hours < 24:
             print(f'Number of {bin_hours}-hour phase measurements ', len(tv))
@@ -738,6 +738,10 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     if bin_hours not in valid_bin_hours:
         print(f"Error: bin_hours must be one of {valid_bin_hours} for hourly rolling")
         sys.exit()
+    
+    # Set default for subdaily analysis
+    if minvalperbin is None:
+        minvalperbin = 5
     
     print(f"Generating hourly rolling VWC with {bin_hours}-hour windows")
     print(f"Processing {bin_hours} offsets for station {station}, year {year}")
