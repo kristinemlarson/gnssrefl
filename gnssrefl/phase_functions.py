@@ -1586,6 +1586,10 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     if minvalperday is not None and bin_hours == 24:
         print(f'vwc_minvalperday: {minvalperday} (deprecated - use vwc_minvalperbin)')
     
+    # Warning for experimental subdaily features
+    if bin_hours < 24:
+        print('WARNING: Subdaily VWC analysis (bin_hours < 24) is EXPERIMENTAL.')
+    
     if extension:
         print(f'extension: {extension}')
 
