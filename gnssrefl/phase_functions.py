@@ -105,7 +105,7 @@ def normAmp(amp, basepercent):
 
     return Namp
 
-def subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bin_hours=24,bin_offset=0):
+def subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bin_hours=24,bin_offset=0,plt2screen=True):
     """
     makes a plot of daily averaged phase for vwc code
 
@@ -148,6 +148,8 @@ def subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bi
     print(f"Saving figure to {plot_path}")
 
     plt.savefig(plot_path)
+    if not plt2screen:
+        plt.close()  # Close figure only when not displaying to screen
 
 
 
@@ -230,7 +232,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
 
     return snowmask_exists, snowfile
 
-def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
+def vwc_plot(station,t_datetime, vwcdata, plot_path,circles,plt2screen=True):
     """
     makes a plot of volumetric water content
 
@@ -279,6 +281,8 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
 
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
+    if not plt2screen:
+        plt.close()  # Close figure only when not displaying to screen
 
 def read_apriori_rh(station, fr, extension=''):
     """
@@ -845,6 +849,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         print('No summer nodes found. Exiting.')
         if plt2screen:
             plt.show()
+        else:
+            plt.close('all')
         sys.exit()
     
     else:
@@ -886,10 +892,13 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     else:
         plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.png'
 
-    vwc_plot(station,t_datetime, nv, plot_path,circles) 
+    vwc_plot(station,t_datetime, nv, plot_path,circles,plt2screen) 
 
     if plt2screen:
         plt.show()
+    else:
+        # Close all figures to prevent them from displaying when plt2screen=False
+        plt.close('all')
 
     # Use FileManagement with extension support for consistent directory structure
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
@@ -1534,7 +1543,7 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
                 if minvalperday != 10:  # Only warn if explicitly set to non-default
                     print("Warning: minvalperday is deprecated for 24hr bins. Use minvalperbin instead.")
             else:
-                minvalperbin = 10  # Default value
+                minvalperbin = 5  # Default value (reduced from 10 for better subdaily coverage)
 
     freq = fr # KE kept the other variable
 
