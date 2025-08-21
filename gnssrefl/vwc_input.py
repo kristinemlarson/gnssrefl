@@ -150,6 +150,9 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
         l2c_sat, l5_sat = l2c_l5_list(year, 365)
         satellite_list = l2c_sat
 
+    if len(gnssir_results) == 0:
+        print('Found no results - perhaps wrong year? Please run gnssir first.')
+        sys.exit()
 
     # window out frequency 20
     # the following function returns the index values where the statement is True

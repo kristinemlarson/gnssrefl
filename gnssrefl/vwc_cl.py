@@ -780,7 +780,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     combined_vwc = combine_vwc_files_to_hourly(station, resolved_fr, bin_hours, subdir, extension)
     
     if len(combined_vwc) > 0:
-        print(f"\n✅ Success! Generated {len(combined_vwc)} hourly rolling VWC measurements")
+        print(f"\nSuccess! Generated {len(combined_vwc)} hourly rolling VWC measurements")
         if resolved_fr == 20:
             freq_suffix = "_L2"
         elif resolved_fr == 1:
@@ -793,12 +793,15 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
         final_file = f"{station}_vwc{freq_suffix}_rolling{bin_hours}hr.txt"
         print(f"Output file: $REFL_CODE/Files/{subdir if subdir else station}/{final_file}")
         
+        print(f"\nWARNING: vwc_hourly is experimental code and currently under development.")
+        print(f"Please see https://github.com/kristinemlarson/gnssrefl/issues/358 for the latest discussion.")
+        
         # Generate comparison plot if requested
         if plt:
             print(f"\n=== Generating VWC Comparison Plot ===")
             plot_hourly_vs_daily_vwc(station, resolved_fr, bin_hours, subdir, extension, year, year_end)
     else:
-        print("\n❌ Error: No VWC measurements generated from any offset")
+        print("\nError: No VWC measurements generated from any offset")
         sys.exit()
 
 
