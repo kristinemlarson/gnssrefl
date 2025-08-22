@@ -4,7 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 3.16.4
-August 11, 2025
+
+August 22, 2025
+
+added quiet option to rinex3 to rinex2 function - 
+this allows the user to decide whether to send screen output
+from gfzrnx.  This can be super helpful when you don't know
+why gfzrnx is creating a zero length file.  In general not needed.
+
+
+Attempt to allow ellist to be available for midnite option.  Please report
+issues with it.
+
+Added latest L2C/L5 transmitting satellite: PRN 21 
+
 
 Allow lomb scargle periodogram to be done on SNR data in original dB-Hz units.
 Use command line option -dbhz True

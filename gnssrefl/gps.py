@@ -3110,8 +3110,8 @@ def write_QC_fails(delT,delTmax,eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNois
             fileid.write('     Obs Ampl {0:.1f} vs {1:.1f} required \n'.format(maxAmp,reqamp  ))
         if maxAmp/Noise < PkNoise:
             fileid.write('     Obs PkN  {0:.1f} vs {1:.1f} required \n'.format(maxAmp/Noise, PkNoise ))
-        if tooclose2edge:
-            fileid.write('     Retrieved reflector height too close to the edge of the RH space \n')
+        #if tooclose2edge:
+        #    fileid.write('     Retrieved reflector height too close to the edge of the RH space \n')
         
 def define_quick_filename(station,year,doy,snr):
     """
@@ -3630,7 +3630,7 @@ def warn_and_exit(snrexe,fortran):
             print('Install it or use -fortran False. Exiting')
             sys.exit()
 
-def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log):
+def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log,**kwargs):
     """
     This code translates a RINEX 3 file into a RINEX 2.11 file.
     It is assumed that the gfzrnx exists and that the RINEX 3 file is 
@@ -3658,6 +3658,15 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log):
         whether the RINEX 2.11 file was created and exists
 
     """
+    # this is for the call to gfzrnx. set to True for the default.
+    quiet = kwargs.get('quiet',True)
+    if quiet:
+        #print('Quiet gfzrnx screen output')
+        q = '-q'
+    else:
+        #print('No gfzrnx screen output')
+        q = ''
+
     fexists = False
     gexe = gfz_version()
     crnxpath = hatanaka_version()
@@ -3703,15 +3712,15 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log):
         if True:
             if (dec == 1) or (dec == 0):
                 if (gpsonly):
-                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-f','-q'])
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-f',q])
                 else:
-                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f','-q'])
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-f',q])
             else:
                 crate = str(dec)
                 if (gpsonly):
-                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-sei','out','-smp', crate, '-f','-q'])
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook_gps, '-sei','out','-smp', crate, '-f',q])
                 else:
-                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f','-q'])
+                    subprocess.call([gexe,'-finp', r3_filename_new, '-fout', r2_filename, '-vo','2','-ot', gobblygook, '-sei','out','-smp', crate, '-f',q])
     else:
         log.write('RINEX 3 file I need does not exist, so no translation {0:s} \n'.format( r3_filename_new))
 
@@ -4588,11 +4597,13 @@ def l2c_l5_list(year,doy):
     # updated 2023 feb 1 to include prn 28 - was set operational on jan 31
     # there is a new PRN 1, as of January 2025.  no need to add to this list as 
     # it was previously an L2C and L5 satellite (launched in 2011)
+    # updated 2025 aug 18 to include prn 21
     l2c=np.array([[1 ,2011 ,290], [3 ,2014 ,347], [4 ,2018 ,357], [5 ,2008 ,240],
-        [6 ,2014 ,163], [7 ,2008 ,85], [8 ,2015 ,224], [9 ,2014 ,258], [10 ,2015 ,343],
-        [11, 2021, 168],
+        [6 ,2014 ,163], [7 ,2008 ,85], [8 ,2015 ,224], 
+        [9 ,2014 ,258], [10 ,2015 ,343], [11, 2021, 168],
         [12 ,2006 ,300], [14 ,2020 ,310], [15 ,2007 ,285], [17 ,2005 ,270],
-        [18 ,2019 ,234], [23 ,2020 ,182], [24 ,2012 ,319], [25 ,2010 ,240],
+        [18 ,2019 ,234], [21, 2025, 150],
+        [23 ,2020 ,182], [24 ,2012 ,319], [25 ,2010 ,240],
         [26 ,2015 ,111], [27 ,2013 ,173], [28,2023,17], [29 ,2007 ,355], 
         [30 ,2014 ,151], [31 ,2006 ,270], [32 ,2016 ,36]])
     # indices that meet your criteria

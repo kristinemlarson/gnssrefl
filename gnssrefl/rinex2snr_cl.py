@@ -55,11 +55,12 @@ def parse_arguments():
     parser.add_argument("-timeout", default=None, help="timeout in secs, useful for some archives", type=int)
     parser.add_argument("-extension", default=None, help="optional extension to keep information like samplerate, snr, lat, lon etc", type=str)
     parser.add_argument("-debug", default=None, help="run without task queue", type=str)
+    parser.add_argument("-quiet", default=None, help="gfzrnx output sent to the screen (default is True)", type=str)
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['nolook', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip','monthly','debug']
+    boolean_args = ['nolook', 'overwrite', 'mk', 'weekly','strip','screenstats','gzip','monthly','debug','quiet']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -71,7 +72,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
               year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
               screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
-              par : int=None, timeout : int = 0, extension : str='', debug: bool = False ):
+              par : int=None, timeout : int = 0, extension : str='', debug: bool = False, quiet: bool = True):
     """
     Note: rinex2snr means rinex TO snr. It is not a tool that is only meant for version 2 rinex files.
 
@@ -387,8 +388,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
         for that extension parameter. otherwise it uses station.json. It is a convenience
         for saving things like stream, samplerate, archive, orb, and snr settings that previously had 
         to be input on the command line
+
     debug : bool, optional
         run without task queue - important for debugging.
+
+    quiet: bool, optional
+        run gfzrnx for RINEX 3 files but suppress the screen output (default is True)
 
     """
 
@@ -670,7 +675,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     args = {'station': station, 'year':year, 'doy':doy, 'isnr': snr, 'orbtype': orb, 'rate': rate, 
             'dec_rate': dec, 'archive': archive, 'nol': nolook, 'overwrite': overwrite, 
             'translator': translator, 'srate': samplerate, 'mk': mk, 'stream': stream, 
-            'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'timeout' : timeout }
+            'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'timeout' : timeout, 'quiet' : quiet }
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))
 

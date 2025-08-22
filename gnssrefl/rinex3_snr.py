@@ -35,6 +35,7 @@ def main():
     parser.add_argument("-snr", help="SNR file ending (default is 66)", default=None,type=int)
     parser.add_argument("-name_fail", help="RINEX 3 files masquerading as RINEX 2.11 files (boolean)", default=None,type=str)
     parser.add_argument("-overwrite", help="whether to overwrite snr file (T or True)", default=None,type=str)
+    parser.add_argument("-quiet", help="whether to print gfzrnx log to the screen (default is F)", default=None,type=str)
 
 
     args = parser.parse_args()
@@ -47,6 +48,11 @@ def main():
         dec_rate = 0; 
     else:
         dec_rate = args.dec
+
+    if args.quiet is 'F':
+        quiet = False
+    else:
+        quiet = True
 
     xdir = os.environ['REFL_CODE']
     r3=args.rinex3
@@ -136,7 +142,7 @@ def main():
             gpsonly = True
         print('Opening ', logname)
         log = open(logname, 'w+')
-        g.new_rinex3_rinex2(rinex3,rinex2,dec_rate,gpsonly,log)
+        g.new_rinex3_rinex2(rinex3,rinex2,dec_rate,gpsonly,log,quiet=quiet)
         log.close()
 
     else:
@@ -159,7 +165,7 @@ def main():
         # 2024 may 28
         # this should really call conv2snr ... 
         r.run_rinex2snr(station, iyear, idoy, isnr, orbtype, rate,dec_rate,archive,nol,
-                overwrite,translator,srate,mk,stream,strip,bkg,screenstats,gzip,timeout)
+                overwrite,translator,srate,mk,stream,strip,bkg,screenstats,gzip,timeout,quiet)
 
 
 if __name__ == "__main__":

@@ -77,6 +77,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     screenstats is always True now - and the information is written to a file. I have kept the optional parameter
     for backwards compatability, but it does not do anything.
 
+    To improve screen output when your job crashes, try -debug T 
+
+    "secret limits" : arcs must be at least one degree long (in elevation angle).  I can change that - but just a warning.
+
     Parallel processing is now available. If you set -par to an integer between 2 and 10,
     it should substantially speed up your processing. Big thank you to AaryanRampal for getting this up and running.
     If you are using the docker, you will need to experiment about how to use this - as they have 

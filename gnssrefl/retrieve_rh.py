@@ -158,19 +158,28 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
                         logid.write('Satellite {0:3.0f} \n'.format(satNu))
                         logid.write('---------------------------------------------------------------------------------\n')
 
-                    # allow more than one set of elevation angles
+                    # make two arc lists - one with and one without midnite crossings ...
 
+                    # the day of is stored in thissat and day before is stored in ts2
+
+                    # allow more than one set of elevation angles
                     if len(ellist) > 0:
                         # not doing midnite option here yet ... but maybe it would not be so hard
                         arclist = np.empty(shape=[0,6])
+                        arclist_midnite = np.empty(shape=[0,6])
                         for ij in range(0,len(ellist),2):
+                            found_midnite_cross = False
                             te1 = ellist[ij]; te2 = ellist[ij+1]; newl = [te1,te2]
                             # poorly named inputs - elev, azimuth, seconds of the day, ...
                             # te1 and te2 are the requested elevation angles I believe
                             # satNu is the requested satellite number
-                            tarclist,flagm = guts.new_rise_set_again(thissat[:,1],thissat[:,2],
+                            tarclist,found_midnite_cross = guts.new_rise_set_again(thissat[:,1],thissat[:,2],
                                                           thissat[:,3],te1, te2,ediff,satNu,screenstats,logid,midnite=midnite)
                             arclist = np.append(arclist, tarclist,axis=0)
+
+                            if midnite and found_midnite_cross:
+                                arclist_midniteX,flagm = guts.new_rise_set_again(ts2[:,1],ts2[:,2], ts2[:,3],te1, te2,ediff,satNu,screenstats,logid,midnite=midnite)
+                                arclist_midnite = np.append(arclist_midnite, arclist_midniteX ,axis=0)
 
                     else:
                         arclist,found_midnite_cross = guts.new_rise_set_again(thissat[:,1],thissat[:,2],
@@ -183,6 +192,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
                             arclist_midnite = np.empty(shape=[0,6])
 
 
+                    # arcsum is a variable that keeps trakc whether you should use the day of SNR file or the day before SNR file
                     arcsum = []
                     nr,nc = arclist.shape
                     for i in range (0,nr):
@@ -193,7 +203,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
                         mnr,mnc = arclist_midnite.shape
                         if mnr > 0:
                             for i in range(0,mnr):
-                                logid.write('midnite arc {0:3s} {1:5.0f} {2:5.0f} \n'.format(str(i), arclist_midnite[i,0], arclist_midnite[i,1]))
+                                logid.write('Midnite arc {0:3s} {1:5.0f} {2:5.0f} \n'.format(str(i), arclist_midnite[i,0], arclist_midnite[i,1]))
                                 arcsum.append(True)
                         arclist = np.vstack((arclist, arclist_midnite))
                         nr,nc = arclist.shape

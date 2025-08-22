@@ -58,7 +58,7 @@ def quickname(station,year,cyy, cdoy, csnr):
     return fname
 
 def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol,overwrite,translator,srate, 
-                  mk, stream,strip,bkg,screenstats,gzip,timeout):
+                  mk, stream,strip,bkg,screenstats,gzip,timeout,quiet):
     """
     main code to convert RINEX files into SNR files.
     It works on a single year and doy.
@@ -112,8 +112,12 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
     timeout : int
         optional parameter I am testing out for requests timeout parameter
         in seconds
+    quiet : bool
+        whether gfzrnx messages are printed to the screen (T) or suppressed (F)
+
     """
     #
+    print('quiet option ', quiet)
     xdir = os.environ['REFL_CODE']
     gpsonly = False
 
@@ -268,8 +272,8 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 sys.exit()
 
                             log.write('The RINEX 3 file exists locally {0:s} \n'.format( r3))
-                            # convert to RINEX 2.11
-                            fexists = g.new_rinex3_rinex2(r3,r2,dec_rate,gpsonly,log)
+                            # convert to RINEX 2.11, now allowing gfzrnx messages to be printed
+                            fexists = g.new_rinex3_rinex2(r3,r2,dec_rate,gpsonly,log,quiet=quiet)
                             # this is so flawed.  If file exists, it should not look for it via conv2snr
                             # It looks like i was just trying to use old code here. Have added rinex2_filename parameter 
                             if fexists:
@@ -304,14 +308,14 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                     log.write('The RINEX 3 file has been downloaded. Try to make {0:s} \n '.format(r2))
                                     subprocess.call(['gunzip', rnx_filename])
                                     # take off gz on the name
-                                    fexists = g.new_rinex3_rinex2(rnx_filename[0:-3],r2,dec_rate,gpsonly,log)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename[0:-3],r2,dec_rate,gpsonly,log,quiet=quiet)
                             if archive == 'kadaster':
                                 # this code only does 1-hz data for now, so samplerate (srate) is not needed
                                 rnx_filename,foundit = ch.kadaster_highrate(station9ch, year, doy,stream,dec_rate)
                                 if foundit: 
                                     log.write('The RINEX 3 file has been downloaded. Try to make {0:s} \n '.format(r2))
                                     # take off gz on the name
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
                                     # delete the merged RINEX 3 if the RINEX 2.11 was made properly
                                     if fexists: 
                                         subprocess.call(['rm',rnx_filename])
@@ -329,7 +333,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                     foundit = False; fexists = False; rnx_file = ''
                                 else:
                                     log.write('The RINEX 3 file has been downloaded from CDDIS. Now try to make {0:s} \n'.format(r2))
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
                             if archive == 'bkg':
                                 # this is confusing - so the bkg variable is either IGS or EUREF
                                 bad_day = g.cddis_restriction(year, doy,'bkg')
@@ -342,7 +346,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                                                                0,stream,dec_rate,bkg,timeout=timeout)
                                 if foundit:
                                     log.write('The RINEX 3 file has been downloaded from BKG. Now try to make {0:s} \n'.format(r2))
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
                             if archive == 'ignes':
                                 bad_day = g.cddis_restriction(year, doy,'bkg')
                                 if not bad_day:
@@ -352,7 +356,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                     foundit = False; fexists = False; rnx_file = ''
                                 if foundit:
                                     log.write('The RINEX 3 file has been downloaded from IGN ES. Now try to make {0:s} \n'.format(r2))
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
 
                         else:
                             log.write('Looking for lowrate RINEX 3 files')
@@ -378,7 +382,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             # now make rinex2
                                 if translated:
                                     log.write('The RINEX 3 file has been downloaded. Now try to make {0:s} \n'.format(r2))
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log)
+                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
                         # this means the rinex 2 version exists
                         if fexists:
                             log.write('RINEX 2 created from v3 and {0:4.0f} {1:3.0f}. Now remove RINEX 3 files and convert \n'.format(year,doy))

@@ -124,10 +124,12 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             variable_azel = True
         
     if (len(ellist) > 0) and midnite:
-        print('You have invoked multiple elevation angle bins and the midnite crossing option.')
-        print('This has not been implemented yet.  Please submit a PR if you speak python or ')
-        print('an Issue if your project needs this.')
-        midnite = False
+        print('Testing midnite option on multiple elevation angle bins')
+        if False:
+            print('You have invoked multiple elevation angle bins and the midnite crossing option.')
+            print('This has not been implemented yet.  Please submit a PR if you speak python or ')
+            print('an Issue if your project needs this.')
+            midnite = False
 
     # this is also checked in the command line - but for people calling the code ...
     if ((lsp['maxH'] - lsp['minH']) < 5):
@@ -334,27 +336,6 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             if midnite: 
                 ele_midnite,outD = refraction_nite_mpf(irefr,outD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd,zwd)
           
-            # NITE MODEL
-            # remove ele < 1.5 cause it blows up
-            #i=snrD[:,1] > 1.5
-            #snrD = snrD[i,:]
-            #N = len(snrD[:,1])
-            ## elevation angles, degrees
-            #ele=snrD[:,1]
-            # zenith angle in radians
-            #zenithA = 0.5*np.pi - np.radians(ele)
-            #get mapping function and derivatives
-            #[gmf_h,dgmf_h,gmf_w,dgmf_w]=refr.gmf_deriv(mjd1, lat1R, lon1R,height1,zenithA)
-            #[mpf, dmpf]=[refr.mpf_tot(gmf_h,gmf_w,zhd,zwd),refr.mpf_tot(dgmf_h,dgmf_w,zhd,zwd)]
-
-            # inputs apriori RH, elevation angle, refractive index, zenith delay, mpf ?, dmpf?
-            #if irefr == 5:
-            #    print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
-            #    dE_NITE=refr.Equivalent_Angle_Corr_NITE(RH_apriori, ele, N_ant, ztd, mpf, dmpf)
-            #    ele = ele + dE_NITE 
-            #else: 
-            #    print('MPF refraction correction, Wiliams and Nievinski')
-            #    dE_MPF= refr.Equivalent_Angle_Corr_mpf(ele,mpf,N_ant,RH_apriori)
 
         elif irefr == 0:
             print('No refraction correction applied ')
@@ -740,7 +721,7 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats):
                 # i am likely reading the code incorrectly
                 add = ''
                 if ediff_violation:
-                    add = ' violates ediff'
+                    add = ' violates ediff or very small'
                 if not verysmall:
                     print('Failed sat/arc',sat,iarc+1, sind,eind,' min/max observed elev: ', 
                           np.round(minObse,3), np.round(maxObse,3), minA,maxA,add)
@@ -1171,6 +1152,9 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid,**kwa
 
 #   time limit in seconds - taken from david purnell
     gaptlim = 5*60 # seems awfully small
+    # 2025 aug 15, change to 10 minutes 
+    gaptlim = 10*60 # seems awfully small
+
     #newf = np.array(f[i, :], dtype=float)
     iarc = 0
     ddate = np.ediff1d(dates)
@@ -1216,31 +1200,39 @@ def new_rise_set_again(elv,azm,dates, e1, e2, ediff,sat, screenstats,logid,**kwa
             nogood = True
             ediff_violation = True
             #print('v2')
-        if (eind-sind) == 1 :
+        # need at least 20 epochs?
+        if (eind-sind) <20 :
             nogood = True
             verysmall = True
             #print('v3')
         if ((maxObse - minObse) < min_deg):
             nogood = True
             #print('v4')
-        if (dates[sind] == 0) and midnite:
+        # looser constraint for people that do not have files that start exactly at zero
+        midniteF = ''
+        if (dates[sind] < 60 and dates[sind] >= 0 ) and midnite:
+        #if (dates[sind] == 0) and midnite:
             logid.write('Remove this arc to allow midnite crossing track for satellite {0:3.0f} \n'.format(sat))
             nogood = True
             flag_midnite = True
+            midniteF = ' midnite '
+            logid.write('flagging a file that starts near midnite {0:6.0f} sec \n'.format(dates[sind]))
 
         if screenstats:
+            ddt = np.max(nt) - np.min(nt)
             if nogood:
                 # do not write out warning for these tiny arcs which should not even be there.
                 # i am likely reading the code incorrectly
                 add = ''
                 if ediff_violation:
-                    add = ' violates ediff'
-                if flag_midnite:
-                    add = ' flag midnite'
+                    add = ' violates ediff '
+                #if flag_midnite:
+                #    add = ' flag midnite'
+                add = add + str(e1) + ' ' + str(e2) + midniteF
                 if not verysmall:
-                    logid.write('Failed sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max obs elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f} {8:15s}  \n'.format( sat,iarc+1, sind,eind, minObse, maxObse, minA,maxA,add))
+                    logid.write('Failed sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f} {8:6.0f} sec {9:15s}  \n'.format( sat,iarc+1, sind,eind, minObse, maxObse, minA,maxA,ddt, add))
             else:
-                logid.write('Keep sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max obs elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f}  \n'.format( sat,iarc+1, sind,eind,minObse, maxObse, minA,maxA))
+                logid.write('Keep sat/arc {0:3.0f} {1:3.0f}/indices {2:7.0f}-{3:7.0f} min/max obs elev: {4:7.3f} {5:7.3f} Azims: {6:6.2f} {7:6.2f} {8:6.0f} sec \n'.format( sat,iarc+1, sind,eind,minObse, maxObse, minA,maxA,ddt))
 
         if not nogood :
             iarc = iarc + 1
@@ -1573,3 +1565,24 @@ def refraction_nite_mpf(irefr,snrD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd
 
     return ele,snrD
 
+            # NITE MODEL
+            # remove ele < 1.5 cause it blows up
+            #i=snrD[:,1] > 1.5
+            #snrD = snrD[i,:]
+            #N = len(snrD[:,1])
+            ## elevation angles, degrees
+            #ele=snrD[:,1]
+            # zenith angle in radians
+            #zenithA = 0.5*np.pi - np.radians(ele)
+            #get mapping function and derivatives
+            #[gmf_h,dgmf_h,gmf_w,dgmf_w]=refr.gmf_deriv(mjd1, lat1R, lon1R,height1,zenithA)
+            #[mpf, dmpf]=[refr.mpf_tot(gmf_h,gmf_w,zhd,zwd),refr.mpf_tot(dgmf_h,dgmf_w,zhd,zwd)]
+
+            # inputs apriori RH, elevation angle, refractive index, zenith delay, mpf ?, dmpf?
+            #if irefr == 5:
+            #    print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
+            #    dE_NITE=refr.Equivalent_Angle_Corr_NITE(RH_apriori, ele, N_ant, ztd, mpf, dmpf)
+            #    ele = ele + dE_NITE 
+            #else: 
+            #    print('MPF refraction correction, Wiliams and Nievinski')
+            #    dE_MPF= refr.Equivalent_Angle_Corr_mpf(ele,mpf,N_ant,RH_apriori)
