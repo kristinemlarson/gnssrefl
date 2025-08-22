@@ -17,6 +17,9 @@ def parse_arguments():
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-min_tracks", default=None, help="min number of daily tracks to keep the series (default is 100)", type=int)
     parser.add_argument("-minvalperday", default=None, help="min number of tracks needed on one day to compute VWC (default is 10)", type=int)
+    parser.add_argument("-bin_hours", default=None, type=int, help="time bin size in hours (1,2,3,4,6,8,12,24). Default is 24 (daily)")
+    parser.add_argument("-minvalperbin", default=None, type=int, help="min number of satellite tracks needed per time bin. Default is 5")
+    parser.add_argument("-bin_offset", default=None, type=int, help="bin timing offset in hours (0 <= offset < bin_hours). Default is 0")
     parser.add_argument("-fr", default=None, help="frequency: 1 (L1), 20 (L2C), 5 (L5). Only L2C officially supported.", type=int)
     parser.add_argument("-extension", default='', help="analysis extension parameter", type=str)
     parser.add_argument("-tmin", default=0.05, help="min soil texture", type=float)
@@ -30,6 +33,7 @@ def parse_arguments():
 
 
 def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, minvalperday : int = 10,
+              bin_hours: int = None, minvalperbin: int = 5, bin_offset: int = None,
               extension : str='', tmin : float=0.05, tmax : float=0.5, warning_value :float=5.5 ):
     """
     Sets inputs for the estimation of vwc (volumetric water content).  Picks up reflector height (RH) results for a 
@@ -146,6 +150,9 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
         l2c_sat, l5_sat = l2c_l5_list(year, 365)
         satellite_list = l2c_sat
 
+    if len(gnssir_results) == 0:
+        print('Found no results - perhaps wrong year? Please run gnssir first.')
+        sys.exit()
 
     # window out frequency 20
     # the following function returns the index values where the statement is True
@@ -206,8 +213,15 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     lsp['vwc_warning_value'] = warning_value
     lsp['vwc_min_soil_texture'] = tmin
     lsp['vwc_max_soil_texture'] = tmax
-    lsp['vwc_minvalperday'] = minvalperday # this is how many unique tracks you need on each day 
+    lsp['vwc_minvalperday'] = minvalperday # this is how many unique tracks you need on each day (legacy)
+    lsp['vwc_minvalperbin'] = minvalperbin # preferred parameter for subdaily analysis
     lsp['vwc_min_req_pts_track'] = min_tracks # this is total number of days needed to keep a satellite
+    
+    # Add subdaily binning parameters if provided
+    if bin_hours is not None:
+        lsp['vwc_bin_hours'] = bin_hours
+    if bin_offset is not None:
+        lsp['vwc_bin_offset'] = bin_offset
 
     # Use FileManagement to get JSON file path with new directory structure
     json_manager = FileManagement(station, 'make_json', extension=extension)

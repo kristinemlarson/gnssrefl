@@ -21,6 +21,65 @@ from gnssrefl.utils import str2bool, read_files_in_dir
 
 xdir = Path(os.environ["REFL_CODE"])
 
+def get_temporal_suffix(fr, bin_hours=24, bin_offset=0):
+    """
+    Generate consistent suffix for all output files with temporal resolution and offset
+    
+    Parameters
+    ----------
+    fr : int
+        Frequency (1, 5, 20, etc.)
+    bin_hours : int, optional
+        Time bin size in hours. Default is 24 (daily)
+    bin_offset : int, optional
+        Bin timing offset in hours. Default is 0
+        
+    Returns
+    -------
+    str
+        Suffix string like "_L1_6hr+0", "_L2_24hr+1", etc.
+    """
+    # Generate frequency suffix
+    if fr == 1:
+        freq_suffix = "_L1"
+    elif fr == 2 or fr == 20:
+        freq_suffix = "_L2"  # Both L2 (fr=2) and L2C (fr=20) use L2 
+    elif fr == 5:
+        freq_suffix = "_L5"  
+    else:
+        freq_suffix = f"_freq{fr}"
+    
+    # Generate temporal suffix with offset
+    time_suffix = f"_{bin_hours}hr+{bin_offset}"
+    
+    return freq_suffix + time_suffix
+
+def get_bin_schedule_info(bin_hours, bin_offset=0):
+    """
+    Helper function to generate bin schedule information strings
+    
+    Parameters
+    ----------
+    bin_hours : int
+        Time bin size in hours
+    bin_offset : int, optional
+        Bin timing offset in hours. Default is 0
+        
+    Returns
+    -------
+    str
+        Bin schedule description line
+    """
+    bins_per_day = 24 // bin_hours
+    schedule_parts = []
+    for i in range(bins_per_day):
+        start_hour = (i * bin_hours + bin_offset) % 24
+        end_hour = ((i + 1) * bin_hours + bin_offset) % 24
+        if end_hour == 0:
+            end_hour = 24
+        schedule_parts.append(f"Bin{i}: {start_hour:02d}-{end_hour:02d}h")
+    return "% Bin schedule: " + "  ".join(schedule_parts)
+
 def normAmp(amp, basepercent):
     """
     emulated amp_normK code from PBO H2O
@@ -46,7 +105,7 @@ def normAmp(amp, basepercent):
 
     return Namp
 
-def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs):
+def subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bin_hours=24,bin_offset=0,plt2screen=True):
     """
     makes a plot of daily averaged phase for vwc code
 
@@ -72,23 +131,25 @@ def daily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs):
     plt.figure(figsize=(10, 6))
     plt.plot(datetime_dates, tv[:, 2], 'b-')
     plt.ylabel('phase (degrees)')
-    if fr == 1:
-        plt.title(f"Daily L1 Phase Results: {station.upper()}")
-    elif fr == 5:
-        plt.title(f"Daily L5 Phase Results: {station.upper()}")
+    freq_name = {1: "L1", 2: "L2", 20: "L2C", 5: "L5"}.get(fr, f"freq{fr}")
+    if bin_hours < 24:
+        plt.title(f"{bin_hours}-hour {freq_name} Phase Results: {station.upper()}")
     else:
-        plt.title(f"Daily L2C Phase Results: {station.upper()}")
+        plt.title(f"Daily {freq_name} Phase Results: {station.upper()}")
     plt.grid()
     plt.gcf().autofmt_xdate()
 
-    # maybe this works.  Maybe not.
+    # Generate filename with temporal suffix
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
     if hires_figs:
-        plot_path = f'{outdir}/{station}_daily_phase.eps'
+        plot_path = f'{outdir}/{station}_phase{suffix}.eps'
     else:
-        plot_path = f'{outdir}/{station}_daily_phase.png'
+        plot_path = f'{outdir}/{station}_phase{suffix}.png'
     print(f"Saving figure to {plot_path}")
 
     plt.savefig(plot_path)
+    if not plt2screen:
+        plt.close()  # Close figure only when not displaying to screen
 
 
 
@@ -171,7 +232,7 @@ def make_snow_filter(station, medfilter, ReqTracks, year1, year2):
 
     return snowmask_exists, snowfile
 
-def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
+def vwc_plot(station,t_datetime, vwcdata, plot_path,circles,plt2screen=True):
     """
     makes a plot of volumetric water content
 
@@ -220,6 +281,8 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path,circles):
 
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
+    if not plt2screen:
+        plt.close()  # Close figure only when not displaying to screen
 
 def read_apriori_rh(station, fr, extension=''):
     """
@@ -546,7 +609,7 @@ def low_pct(amp, basepercent):
 
 
 def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
-        subdir='',hires_figs=False, extension=''):
+        subdir='',hires_figs=False, extension='', bin_hours=24, bin_offset=0):
     """
     Convert GPS phase to VWC. Using Clara Chew's algorithm from 
     Matlab write_vegcorrect_smc.m
@@ -613,26 +676,49 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     # Use FileManagement for consistent phase file paths
     file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
-    fileout = file_manager.get_file_path()
+    base_fileout = file_manager.get_file_path()
     
-    # Handle L1 frequency naming convention
-    if (fr == 1):
-        fileout = fileout.parent / f"{station}_phase_L1.txt"
-    print(subdir)
-
+    # Generate consistent filename using temporal resolution
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+    fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
+    
     if os.path.exists(fileout):
         avg_phase_results = np.loadtxt(fileout, comments='%')
+        if bin_hours < 24:
+            print(f'Found {bin_hours}-hour phase file: {fileout}')
+        else:
+            print(f'Found daily phase file: {fileout}')
     else:
-        print('Average phase results not found')
+        if bin_hours < 24:
+            print(f'No {bin_hours}-hour phase file found: {fileout}')
+        else:
+            print('Average phase results not found')
         sys.exit()
     if (len(avg_phase_results) == 0):
         print('Empty results file')
+        sys.exit()
+        
+    # Auto-detect file format based on number of columns
+    if avg_phase_results.ndim == 1:
+        # Single row, reshape for consistency
+        avg_phase_results = avg_phase_results.reshape(1, -1)
+    
+    num_columns = avg_phase_results.shape[1]
+    if num_columns == 9:
+        is_subdaily = True
+        print('Detected 9-column subdaily format from file')
+    elif num_columns == 8:
+        is_subdaily = False  
+        print('Detected 8-column daily format from file')
+    else:
+        print(f'Unexpected file format: {num_columns} columns. Expected 8 (daily) or 9 (subdaily)')
         sys.exit()
 
 
     # get only the years requested - this matters if in previous steps more data was processed
     avg_phase_results_requested = np.array([v for v in avg_phase_results if v[0] in np.arange(year, year_end+1)])
 
+    # Extract columns based on file format (8 vs 9 columns)
     years = avg_phase_results_requested[:, 0]
     doys = avg_phase_results_requested[:, 1]
     ph = avg_phase_results_requested[:, 2]
@@ -640,6 +726,13 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     amp = avg_phase_results_requested[:, 4]
     months = avg_phase_results_requested[:, 6]
     days = avg_phase_results_requested[:, 7]
+    
+    # For subdaily files, we have an additional BinStart column
+    if is_subdaily:
+        bin_start_hours = avg_phase_results_requested[:, 8]
+        print(f'Processing {len(avg_phase_results_requested)} subdaily measurements')
+    else:
+        print(f'Processing {len(avg_phase_results_requested)} daily measurements')
 
     t = years + doys/365.25
     tspan = t[-1] - t[0]
@@ -719,8 +812,17 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     plt.subplots_adjust(hspace=0.2)
     plt.suptitle(f'Station: {station}', size=16)
 
-    # list comprehension to make datetime objects from year, doy
-    t_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(years, doys)]
+    # Create datetime objects with hour information for subdaily data  
+    if is_subdaily:
+        from datetime import timedelta
+        t_datetime = []
+        for yr, d, h in zip(years, doys, bin_start_hours):
+            base_dt = datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j')
+            dt_with_hours = base_dt + timedelta(hours=int(h))
+            t_datetime.append(dt_with_hours)
+    else:
+        # Daily data: use existing logic
+        t_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(years, doys)]
 
     # create subplots: 2 rows 1 column, 1st subplot
     ax = plt.subplot(2, 1, 1)
@@ -747,6 +849,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         print('No summer nodes found. Exiting.')
         if plt2screen:
             plt.show()
+        else:
+            plt.close('all')
         sys.exit()
     
     else:
@@ -774,27 +878,35 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
 
     outdir = Path(xdir) / 'Files' / subdir
 
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
     if hires_figs:
-        plot_path = f'{outdir}/{station}_phase_vwc_result.eps'
+        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.eps'
     else:
-        plot_path = f'{outdir}/{station}_phase_vwc_result.png'
+        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.png'
     print(f"Saving to {plot_path}")
     plt.savefig(plot_path)
 
 
     if hires_figs:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture.eps'
+        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.eps'
     else:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture.png'
+        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.png'
 
-    vwc_plot(station,t_datetime, nv, plot_path,circles) 
+    vwc_plot(station,t_datetime, nv, plot_path,circles,plt2screen) 
 
     if plt2screen:
         plt.show()
+    else:
+        # Close all figures to prevent them from displaying when plt2screen=False
+        plt.close('all')
 
     # Use FileManagement with extension support for consistent directory structure
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
-    vwcfile = file_manager.get_file_path()
+    base_vwcfile = file_manager.get_file_path()
+    
+    # Generate VWC filename using consistent suffix
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset) 
+    vwcfile = base_vwcfile.parent / f"{station}_vwc{suffix}.txt"
     print('>>> VWC results being written to ', vwcfile)
     with open(vwcfile, 'w') as w:
         N = len(nv)
@@ -803,7 +915,12 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
         w.write("% Frequency used: {0} \n".format(freq_name))
         w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
-        w.write("% FracYr    Year   DOY   VWC Month Day \n")
+        if is_subdaily:
+            w.write(f"% Subdaily VWC with {bin_hours}-hour bins (offset: {bin_offset}h)\n")
+            w.write(get_bin_schedule_info(bin_hours, bin_offset) + "\n")
+            w.write("% FracYr    Year   DOY   VWC Month Day BinStart \n")
+        else:
+            w.write("% FracYr    Year   DOY   VWC Month Day \n")
         for iw in range(0, N):
             whydoys = np.round(365.25 * (t[iw] - years))
 
@@ -815,10 +932,15 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
             watercontent = nv[iw]
             # we do not allow negative soil moisture in my world.
             if (watercontent> 0 and watercontent < 0.5):
-                w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
+                if is_subdaily:
+                    bin_start = bin_start_hours[iw]
+                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} {bin_start:3.0f} \n")
+                else:
+                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
 
 
-def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension=''):
+def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension='',
+                   bin_hours=24, minvalperbin=10, bin_offset=0):
 
     """
     creates output file for average phase results
@@ -867,39 +989,99 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
     az = vxyz[:, 4] # this is not used
     rh = vxyz[:, 5] # this is not used
     amp = vxyz[:, 6]
-
-    tv = np.empty(shape=[0, 4])
+    hour = vxyz[:, 8] # hour of day, UTC
+    
+    # For subdaily mode, we need an extra column for hour bin
+    if bin_hours < 24:
+        tv = np.empty(shape=[0, 5])  # year, doy, meanph, nvals, bin_start_hour
+    else:
+        tv = np.empty(shape=[0, 4])  # year, doy, meanph, nvals (backwards compatibility)
 
     # Use FileManagement for consistent phase file paths
     file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
-    fileout = file_manager.get_file_path()
+    base_fileout = file_manager.get_file_path()
     
-    # Handle L1 frequency naming convention
-    if (fr == 1):
-        fileout = fileout.parent / f"{station}_phase_L1.txt"
+    # Generate consistent filename with temporal resolution
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+    fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
 
-    print('Daily averaged phases will be written to : ', fileout)
+    if bin_hours < 24:
+        print(f'{bin_hours}-hour averaged phases will be written to : ', fileout)
+    else:
+        print('Daily averaged phases will be written to : ', fileout)
     with open(fileout, 'w') as fout:
-        # Year DOY Ph Phsig NormA MM DD
-          #            2012   1  10.00   2.60  0.962  0.00    1  1
-        fout.write("% Year DOY   Ph    Phsig NormA  empty  Mon Day \n")
+        # Write frequency information
+        if fr == 1:
+            freq_name = "L1"
+        elif fr == 2 or fr == 20:
+            freq_name = "L2"
+        elif fr == 5:
+            freq_name = "L5"  
+        else:
+            freq_name = f"freq{fr}"
+        fout.write(f"% {freq_name} phase results for station {station.upper()}\n")
+        
+        # Write header based on mode
+        if bin_hours < 24:
+            # Subdaily mode: add bin info and BinStart column
+            fout.write(f"% Subdaily phase averaging with {bin_hours}-hour bins (offset: {bin_offset}h)\n")
+            fout.write(get_bin_schedule_info(bin_hours, bin_offset) + "\n")
+            fout.write("% Year DOY   Ph    Phsig NormA  empty  Mon Day BinStart\n")
+        else:
+            # Daily mode: keep existing header for backwards compatibility  
+            fout.write("% Year DOY   Ph    Phsig NormA  empty  Mon Day \n")
+            
+        # Calculate number of bins per day
+        bins_per_day = 24 // bin_hours
+        
         for requested_year in range(year, year_end + 1):
             for doy in range(1, 367):
-            # put in amplitude criteria to keep out bad L2P results
-                ph1 = phase[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                amp1 = amp[(y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)]
-                if (len(ph1) >= minvalperday):
-                    newl = [requested_year, doy, np.mean(ph1), len(ph1)]
-                # i think you normalize the individual satellites before this step
-                #namp = qp.normAmp(amp1,0.15)
-                    tv = np.append(tv, [newl], axis=0)
-                    rph1 = np.round(np.mean(ph1), 2)
-                    meanA = np.mean(amp1)
-                    rph1_std = np.std(ph1)
-                    yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
-                    fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
-
-        fout.close()
+                if bin_hours < 24:
+                    # Subdaily binning: process each time bin separately
+                    for bin_idx in range(bins_per_day):
+                        # Calculate bin boundaries with offset
+                        bin_start = (bin_idx * bin_hours + bin_offset) % 24
+                        bin_end = ((bin_idx + 1) * bin_hours + bin_offset) % 24
+                        
+                        # Handle midnight wraparound - collect data from both days for cross-midnight bins
+                        if bin_end <= bin_start:  # bin crosses midnight
+                            # Current day: late hours (e.g., 22:00-24:00)
+                            current_day_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start)
+                            # Next day: early hours (e.g., 00:00-02:00)
+                            next_day_mask = (y1 == requested_year) & (d1 == doy + 1) & (hour < bin_end)
+                            time_mask = (current_day_mask | next_day_mask) & (phase > -10) & (amp > 0.65)
+                        else:
+                            # Normal case: bin doesn't cross midnight
+                            time_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start) & (hour < bin_end) & (phase > -10) & (amp > 0.65)
+                        ph1 = phase[time_mask]
+                        amp1 = amp[time_mask]
+                        
+                        if len(ph1) >= minvalperbin:
+                            # Calculate statistics
+                            rph1 = np.round(np.mean(ph1), 2)
+                            meanA = np.mean(amp1)
+                            rph1_std = np.std(ph1)
+                            yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                            bin_start_hour = (bin_idx * bin_hours + bin_offset) % 24
+                            
+                            # Create data entry for tv array and write to file
+                            newl = [requested_year, doy, np.mean(ph1), len(ph1), bin_start_hour]
+                            fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f}   {bin_start_hour:2.0f}\n")
+                            tv = np.append(tv, [newl], axis=0)
+                else:
+                    # Daily binning: use existing logic for backwards compatibility
+                    time_mask = (y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)
+                    ph1 = phase[time_mask]
+                    amp1 = amp[time_mask]
+                    
+                    if len(ph1) >= minvalperday:
+                        newl = [requested_year, doy, np.mean(ph1), len(ph1)]
+                        tv = np.append(tv, [newl], axis=0)
+                        rph1 = np.round(np.mean(ph1), 2)
+                        meanA = np.mean(amp1)
+                        rph1_std = np.std(ph1)
+                        yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                        fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
     return tv
 
 def apriori_file_exist(station, fr, extension=''):
@@ -1078,9 +1260,9 @@ def help_debug(rt,xdir, station):
     #    debug.close()
 
 
-def load_avg_phase(station,fr):
+def load_avg_phase(station,fr,bin_hours=24,extension='',bin_offset=0):
     """
-    loads a previously computed daily average phase solution.
+    loads a previously computed averaged phase solution with matching temporal resolution.
     this is NOT the same as the multi-track phase results.
     This file is now stored in station subdirectory in $REFL_CODE/Files/
 
@@ -1090,6 +1272,11 @@ def load_avg_phase(station,fr):
         4 character station ID, lowercase
     fr : int
         frequency
+    bin_hours : int, optional
+        time bin size in hours (1,2,3,4,6,8,12,24). Default is 24 (daily).
+        Only compares against files with exact same temporal resolution.
+    extension : str, optional
+        analysis extension for finding files, default is ''
 
     Returns
     -------
@@ -1098,7 +1285,7 @@ def load_avg_phase(station,fr):
     avg_date : list of floats
         fractional year, i.e. year + doy/365.25
     avg_phase : list of floats
-        average phase for a given day
+        average phase for the given temporal resolution
 
     """
 
@@ -1107,12 +1294,12 @@ def load_avg_phase(station,fr):
     avg_exist = False
 
     # Use FileManagement for consistent phase file paths
-    file_manager = FileManagement(station, 'daily_avg_phase_results')
-    xfile = file_manager.get_file_path()
+    file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
+    base_path = file_manager.get_file_path().parent
     
-    # Handle L1 frequency naming convention
-    if fr == 1:
-        xfile = xfile.parent / f"{station}_phase_L1.txt"
+    # Generate consistent filename with exact temporal resolution matching
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+    xfile = base_path / f"{station}_phase{suffix}.txt"
 
     if os.path.exists(xfile):
         result = np.loadtxt(xfile, comments='%')
@@ -1126,7 +1313,12 @@ def load_avg_phase(station,fr):
             avg_exist = True
 
     if not avg_exist:
-        print('WARNING The average phase file used from a previous run for QC does not exist as yet')
+        if bin_hours < 24:
+            print(f'WARNING: No previous {bin_hours}-hour phase file found for QC. File: {xfile}')
+            print('You do not have a previous solution to compare to so I cannot compute QC stats. Rerun vwc')
+        else:
+            print('WARNING: The average phase file used from a previous run for QC does not exist as yet')
+            print('You do not have a previous solution to compare to so I cannot compute QC stats. Rerun vwc')
 
     return avg_exist, avg_date, avg_phase
 
@@ -1206,7 +1398,8 @@ def load_sat_phase(station, year, year_end, freq, extension = ''):
 
 
 def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,
-                   subdir,plt,auto_removal,warning_value,extension):
+                   subdir,plt,auto_removal,warning_value,extension,
+                   bin_hours=None, minvalperbin=None, bin_offset=None):
     """
     the goal of this code is to pick up the relevant parameters used in vwc.
 
@@ -1301,11 +1494,10 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
             min_req_pts_track = lsp['vwc_min_req_pts_track']
         else:
             min_req_pts_track = 100
-    if minvalperday is None:
-        if 'vwc_minvalperday' in lsp:
-            minvalperday = lsp['vwc_minvalperday']
-        else:
-            minvalperday = 10
+    # Always load minvalperday from JSON for transparency (even if not used)
+    json_minvalperday = None
+    if 'vwc_minvalperday' in lsp:
+        json_minvalperday = lsp['vwc_minvalperday']
 
     if warning_value is None:    
         if 'vwc_warning_value' in lsp:
@@ -1326,6 +1518,58 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     else:
         min_norm_amp = 0.5  # trying this out
 
+    # Handle subdaily binning parameters with precedence: CLI > JSON > Defaults
+    if bin_hours is None:
+        if 'vwc_bin_hours' in lsp:
+            bin_hours = lsp['vwc_bin_hours']
+        else:
+            bin_hours = 24  # Default to daily
+    
+    if bin_offset is None:
+        if 'vwc_bin_offset' in lsp:
+            bin_offset = lsp['vwc_bin_offset']
+        else:
+            bin_offset = 0  # Default offset
+    
+    # Store original parameters to detect CLI conflicts
+    original_minvalperbin = minvalperbin
+    original_minvalperday = minvalperday
+    
+    # Validate CLI parameter conflicts
+    if original_minvalperbin is not None and original_minvalperday is not None:
+        print("Error: Cannot specify both -minvalperbin and -minvalperday at the same time.")
+        print("Use -minvalperbin for all time bin sizes, or -minvalperday only for 24hr bins.")
+        sys.exit()
+    
+    if original_minvalperday is not None and bin_hours != 24:
+        print(f"Error: -minvalperday is only valid for daily (24hr) analysis, got {bin_hours}hr bins.")
+        print("Use -minvalperbin for subdaily analysis.")
+        sys.exit()
+    
+    # Handle minvalperbin vs minvalperday parameter resolution
+    if original_minvalperbin is not None:
+        # Function called with minvalperbin - use it
+        minvalperbin = original_minvalperbin
+    elif original_minvalperday is not None:
+        # Function called with minvalperday - use it (with warning)
+        minvalperbin = original_minvalperday
+        print("Warning: -minvalperday is deprecated for 24hr bins. Use -minvalperbin instead.")
+    elif minvalperbin is None:
+        # No CLI parameters - resolve from JSON with preference rules
+        if bin_hours == 24:
+            # For 24hr bins, prefer minvalperday over minvalperbin
+            if json_minvalperday is not None:
+                minvalperbin = json_minvalperday
+            elif 'vwc_minvalperbin' in lsp:
+                minvalperbin = lsp['vwc_minvalperbin']
+            else:
+                minvalperbin = 10  # Daily default
+        else:
+            # For subdaily bins, use minvalperbin or default
+            if 'vwc_minvalperbin' in lsp:
+                minvalperbin = lsp['vwc_minvalperbin']
+            else:
+                minvalperbin = 5   # Subdaily default
 
     freq = fr # KE kept the other variable
 
@@ -1354,14 +1598,43 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     if not plt:
         print('no plots will come to screen. Will only be saved.')
 
-    print('minvalperday', minvalperday)
-    print('tmin/tmax',  tmin, tmax )
-    print('min_req_tracks', min_req_pts_track)
-    print('warning value', warning_value)
-    print('extension value', extension)
+    print('=== VWC Configuration ===')
+    print(f'vwc_min_soil_texture: {tmin:.2f}')
+    print(f'vwc_max_soil_texture: {tmax:.2f}')
+    print(f'vwc_min_req_pts_track: {min_req_pts_track}')
+    print(f'vwc_warning_value: {warning_value:.1f}')
+    print(f'vwc_min_norm_amp: {min_norm_amp:.1f}')
+    
+    print('=== Time Binning ===')
+    print(f'vwc_bin_hours: {bin_hours}')
+    print(f'vwc_bin_offset: {bin_offset}') 
+    # Show minvalperbin with source information
+    minvalperbin_source = ""
+    if original_minvalperbin is not None:
+        minvalperbin_source = " (from CLI)"
+    elif original_minvalperday is not None:
+        minvalperbin_source = " (from CLI -minvalperday)"
+    elif bin_hours == 24 and json_minvalperday is not None and 'vwc_minvalperbin' not in lsp:
+        minvalperbin_source = " (from JSON vwc_minvalperday)"
+    elif bin_hours == 24 and json_minvalperday is not None:
+        minvalperbin_source = " (from JSON vwc_minvalperday, preferred for 24hr bins)"
+    elif 'vwc_minvalperbin' in lsp:
+        minvalperbin_source = " (from JSON)"
+    else:
+        minvalperbin_source = " (default)"
+    
+    print(f'vwc_minvalperbin: {minvalperbin}{minvalperbin_source}')
+    
+    # Warning for experimental subdaily features
+    if bin_hours < 24:
+        print('WARNING: Subdaily VWC analysis (bin_hours < 24) is EXPERIMENTAL.')
+    
+    if extension:
+        print(f'extension: {extension}')
 
     return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, \
-            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles, extension
+            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles, extension, \
+            bin_hours, minvalperbin, bin_offset
 
 def write_all_phase(v,fname):
     """
@@ -1497,7 +1770,20 @@ def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_pha
         keepit=False
 
         # figure out intersection with "good" results
-        inter, id1, id2 = np.intersect1d(avg_date, satdate, assume_unique=True, return_indices=True)
+        inter, id1, id2 = np.intersect1d(avg_date, satdate, return_indices=True)
+        
+        # Check for valid intersection and indices
+        if len(inter) == 0:
+            # No matching dates found - skip QC for this track
+            return k4
+        
+        # Validate indices before accessing arrays
+        if (np.any(id1 >= len(avg_phase)) or np.any(id2 >= len(satphase)) or 
+            np.any(id1 < 0) or np.any(id2 < 0)):
+            # Invalid indices - skip QC for this track  
+            print(f'Warning: QC index mismatch for satellite {satellite}, skipping QC')
+            return k4
+            
         aa = avg_phase[id1]
         bb = satphase[id2]
         if len(aa) > 0:
