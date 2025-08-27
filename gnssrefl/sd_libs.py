@@ -93,6 +93,7 @@ def write_spline_output(iyear, th, spline, delta_out, station, txtdir,Hortho):
 
 
         dtime = False
+        # i hope this still works ...
         for i in range(0,N):
             modjul = g.fdoy2mjd(iyear,tplot[i])
             doy = math.floor(tplot[i])
@@ -340,21 +341,11 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs,close_figur
         plot windows are opened
 
     """
-    if d1 == 1 and d2 == 366:
-        # these are the defaults
-        setlimits = False
-    else:
-        setlimits = True
-        yyy,mm,dd = g.ydoy2ymd(year, d1)
-        th1 = datetime.datetime(year=year, month=mm, day=dd)
-        yyy,mm,dd = g.ydoy2ymd(year, d2)
-        th2 = datetime.datetime(year=year, month=mm, day=dd)
-    # this is not working, so just setting it to false, cause who cares!
+    # was originally going to set limits ... but gave up 
     setlimits = False
+
     fs = 12
     fig,(ax1,ax2,ax3,ax4)=plt.subplots(4,1,sharex=True,figsize=(10,9))
-    #fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True,figsize=(10,8))
-    #fig,(ax1,ax2,ax3)=plt.subplots(3,1,sharex=True)
     i = (tv[:,10] < 100)
     colors = tv[:,10]
     scatter = ax1.scatter(otimes,tv[:,2],marker='o', s=10, c=colors)
@@ -413,8 +404,8 @@ def two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs,close_figur
     ax4.set_title('Peak to Noise',fontsize=fs)
     ax4.invert_yaxis()
     ax4.grid(True)
-    if setlimits:
-        ax4.set_xlim((th1, th2))
+    #if setlimits:
+    #    ax4.set_xlim((th1, th2))
     fig.autofmt_xdate()
 
     plotname = txtdir + '/' + station + '_' + str(year) + '_combined.png'
@@ -434,7 +425,7 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     Parameters
     ----------
     otimes : numpy array of datetime objects 
-        observation times
+        observation times ??? or is this a list
     tv : numpy array
         variable with the gnssrefl LSP results
     ii : numpy array
@@ -543,18 +534,6 @@ def stack_two_more(otimes,tv,ii,jj,stats, station, txtdir, sigma,kplt,hires_figs
     print('Plot file saved as: ', plotname)
     if close_figures:
         plt.close()
-
-    if kplt:
-        fig = plt.figure()
-        ax1 = fig.add_subplot(211)
-        ddd = - (tv[jj,2] - np.max(tv[jj,2]))
-        plt.plot(otimesarray[jj],ddd, '.',color='blue')
-        plt.title('Relative Sea Level Measured with Reflected GNSS Signals:' + station.upper(), fontsize=fs)
-        plt.ylabel('meters',fontsize=fs)
-        plt.xticks(rotation =45,fontsize=fs-1); plt.yticks(fontsize=fs-1)
-        plt.ylim((-0.1, 1.1*np.max(ddd)))
-        plt.suptitle(f"St Michael, Alaska ", size=12)
-        plt.grid()
 
 
 def writeout_spline_outliers(tvd_bad,txtdir,residual,filename):

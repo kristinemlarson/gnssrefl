@@ -2,7 +2,6 @@
 import datetime
 from datetime import date
 from datetime import timedelta
-#from datetime import datetime
 
 import getpass
 import json
@@ -21,6 +20,8 @@ from ftplib import FTP #import FTP commands from python's built-in ftp library
 from ftplib import FTP_TLS
 from random import seed
 from random import random
+
+from astropy.time import Time
 
 
 # remove for now
@@ -2108,16 +2109,35 @@ def open_outputfile(station,year,doy,extension):
 
     return fout, frej
 
-def lsp_header(station):
+def lsp_header(station,**kwargs):
     """
+    makes a header for a LSP result file that can be used with np.savetxt
+
+    Parameters
+    ----------
+    station : str
+        name of station
+
+    Returns
+    -------
+    all : str
+        multi-line string for LSP header file
     """
+    longer_line = kwargs.get('longer_line',False)
+
     versionNumber = 'v' + str(version('gnssrefl'))
     tem =  ' station ' + station + ' https://github.com/kristinemlarson/gnssrefl ' + versionNumber  + '\n'
-#       put a header in the output file
     line2= ' Phase Center corrections have NOT been applied \n'
-    line3= ' year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise  DelT     MJD   refr-model\n'
-    line4= '(1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16)   (17)\n'
-    line5= '            m        hrs    deg   v/v    deg    deg  values            hrs             min           0 is none \n'
+    if longer_line: 
+        line3 =  '(1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) (18,19,20,21,22)\n'
+        line4 = '            RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise, DelT ,   MJD, refr, MM DD HH MM SS \n'
+        line5= '            m        hrs    deg   v/v    deg    deg  values        set   hrs             min           model \n'
+    else:
+        line3 =  '(1)  (2)   (3) (4)  (5)     (6)   (7)    (8)    (9)   (10)  (11) (12) (13)    (14)     (15)    (16) (17) \n'
+        line4= ' year, doy, RH, sat,UTCtime, Azim, Amp,  eminO, emaxO,NumbOf,freq,rise,EdotF, PkNoise,  DelT,    MJD, refr \n'
+        line5= '            m        hrs    deg   v/v    deg    deg  values        set  hrs            min           model \n'
+
+#   put all the lines together .... 
     all = tem + line2 + line3 + line4 + line5
     return all
 
@@ -4322,6 +4342,36 @@ def read_sp3file(file_path):
     #print('number of rows and columns being returned from the sp3 file', nr,nc)
     return sp3
 
+def simpleTime(mjd):
+    """
+    Parameters
+    ----------
+    mjd : float
+        modified julian day
+
+    Returns
+    -------
+    year : int
+        full year
+    month : int
+        calendar year
+    day : int
+        calendar day
+    hour : int
+        hour of the day
+    minute : int 
+        minute 
+    second : int
+        second of the day
+    doy : int
+        day of year
+    """
+    dt = Time(mjd,format='mjd').utc.datetime;
+    doy, cdoy, cyyyy, cyy = ymd2doy(dt.year, dt.month,dt.day)
+
+    return dt.year, dt.month, dt.day, dt.hour, dt.minute, int(dt.second), doy
+
+
 def nicerTime(UTCtime):
     """
     Converts fractional time (hours) to HH:MM
@@ -4677,6 +4727,9 @@ def ymd_hhmmss(year,doy,utc,dtime):
     """
     translates year, day of year and UTC hours 
     into various other time parameters
+
+    this code should really be removed.  all time translations should be 
+    wrt to MJD.
 
     Parameters
     ----------

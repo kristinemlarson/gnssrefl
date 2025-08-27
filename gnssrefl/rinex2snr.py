@@ -117,7 +117,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
 
     """
     #
-    print('quiet option ', quiet)
+    #print('quiet option ', quiet)
     xdir = os.environ['REFL_CODE']
     gpsonly = False
 

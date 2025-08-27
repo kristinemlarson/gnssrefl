@@ -1,4 +1,4 @@
-# codes for subdaily module. primarily for tidal applications
+# these are the codes for subdaily module. primarily for tidal applications
 import argparse
 import datetime
 import json
@@ -166,40 +166,47 @@ def write_subdaily(outfile,station,ntv,csv,extraline,**kwargs):
     dtime = False
     for i in np.arange(0,N,1):
         year = int(ntv[i,0]); doy = int(ntv[i,1])
+        # not sure this is needed anymore
         year, month, day, cyyyy,cdoy, YMD = g.ydoy2useful(year,doy)
-        rh = ntv[i,2]; UTCtime = ntv[i,4]; 
-        dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
+        rh = ntv[i,2]; UTCtimeOld = ntv[i,4];  MJD = ntv[i,15]
+        #dob, year, month, day, hour, minute, second = g.ymd_hhmmss(year,doy,UTCtime,dtime)
         #ctime = g.nicerTime(UTCtime); 
         # taking hte lazy approach - if someone wants csv write out txt and csv
+        # wow - so stupid.   replacing with better code.
+        # and using the new year and doy since that will take care of january 1 issues for midnite option
+        year,xmonth,xday,xhour, xminute, xsec,doy = g.simpleTime(MJD)
+        #now replace UTCtime ... 
+        UTCtime = xhour + xminute/60 + xsec/3600
+
         if csv:
             if original:
-                fout_csv.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
+                fout_csv.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],xmonth,xday,xhour,xminute, xsec))
 
             if extra: 
-                fout_csv.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f},{22:10.3f},{23:10.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i],RHdot_corr[i]))
+                fout_csv.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f},{22:10.3f},{23:10.3f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],xmonth,xday,xhour,xminute, xsec, newRH[i],RHdot_corr[i]))
             if write_IF_corrected:
                 fout_csv.write(" {0:4.0f},{1:3.0f},{2:7.3f},{3:3.0f},{4:6.3f},{5:6.2f},{6:6.2f},{7:6.2f},{8:6.2f},{9:4.0f},{10:3.0f},{11:2.0f},{12:8.5f},{13:6.2f},{14:7.2f},{15:12.6f},{16:1.0f},{17:2.0f},{18:2.0f},{19:2.0f},{20:2.0f},{21:2.0f},{22:10.3f},{23:10.3f},{24:10.3f},\n".format(year, doy, rh,ntv[i,3], 
                     UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], 
-                    ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day, hour,minute, 
-                    int(second), ntv[i,22], ntv[i,23], newRH_IF[i] ))
+                    ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],xmonth,xday, xhour,minute, xsec,
+                    ntv[i,22], ntv[i,23], newRH_IF[i] ))
 
         # just so i don't have to re-indent everything
         if True:
             if write_IF_corrected:
                 fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:10.3f} {23:10.3f} {24:10.3f} \n".format(year, doy, rh,ntv[i,3], 
                     UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], 
-                    ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],month,day, hour,minute, 
-                    int(second), ntv[i,22], ntv[i,23], newRH_IF[i] ))
+                    ntv[i,12],ntv[i,13], ntv[i,14], ntv[i,15], ntv[i,16],xmonth,xday, xhour,xminute, 
+                    xsec, ntv[i,22], ntv[i,23], newRH_IF[i] ))
 
             if extra:
                     fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} {22:10.3f} {23:10.3f} \n".format(year, doy, rh, ntv[i,3], 
                         UTCtime,ntv[i,5],ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], 
-                        ntv[i,15], ntv[i,16],month,day,hour,minute, int(second), newRH[i], RHdot_corr[i]))
+                        ntv[i,15], ntv[i,16],xmonth,xday,xhour,xminute, xsec, newRH[i], RHdot_corr[i]))
 
             if original:
                 fout.write(" {0:4.0f} {1:3.0f} {2:7.3f} {3:3.0f} {4:6.3f} {5:6.2f} {6:6.2f} {7:6.2f} {8:6.2f} {9:4.0f} {10:3.0f} {11:2.0f} {12:8.5f} {13:6.2f} {14:7.2f} {15:12.6f} {16:1.0f} {17:2.0f} {18:2.0f} {19:2.0f} {20:2.0f} {21:2.0f} \n".format(year, doy, rh,ntv[i,3],UTCtime,ntv[i,5],
                     ntv[i,6],ntv[i,7],ntv[i,8], ntv[i,9], ntv[i,10],ntv[i,11], ntv[i,12],ntv[i,13], ntv[i,14], 
-                    ntv[i,15], ntv[i,16],month,day,hour,minute, int(second)))
+                    ntv[i,15], ntv[i,16],xmonth,xday,xhour,xminute, xsec))
 
     # close both files if necessary
     if csv:
@@ -215,6 +222,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     users assess the quality of the solution
 
     This is basically "section 1" of the code
+
+    Exits if no data found
 
     Parameters
     ----------
@@ -283,6 +292,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     # used different name here
     csv2= writecsv
+    tv = []
+    obstimes = [] # no idea if this is used
 
     xdir = os.environ['REFL_CODE']
     print('Will remove daily outliers greater than ', sigma, ' sigma')
@@ -300,9 +311,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             sys.exit()
     # where the LSP results are kept
         direc = xdir + '/' + str(year) + '/results/' + station  + '/' + extension + '/'
-    # datetime object for time
-        obstimes = []
-        tv = np.empty(shape=[0, 17])
+        #tv = np.empty(shape=[0, 17])
+        icounter = 0
         if os.path.isdir(direc):
             all_files = os.listdir(direc)
             for f in all_files:
@@ -316,30 +326,51 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
                                 warnings.simplefilter("ignore")
                                 a = np.loadtxt(fname,comments='%')
                             if len(a) > 0:
+                                if icounter == 0:
+                                    # you have found the first file.  check how many columns it has
+                                    numr, numc = a.shape
+                                    print('Starting to concatenate.')
+                                    print('The number of columns in file ', fname, ' is ', numc)
+                                    # initialize the variable
+                                    tv = np.empty(shape=[0, numc])
+
+                                icounter = icounter + 1
+
                                 tv = np.append(tv, a,axis=0)
+
                         except:
-                            print('some issue with ',fname)
+                            print('WARNING WARNING WARNING WARNING WARNING WARNING WARNING ')
+                            print('I had a problem reading ',fname)
+                            numr, numc = a.shape
+                            print('The number of columns in this file is ', numc)
+                            print('If this number is not the same as printed above, that is a problem.')
+                            print('All the files should have the same numbers of columns. ')
+                            print('WARNING WARNING WARNING WARNING WARNING WARNING WARNING ')
 
     else:
-        print('using external file of concatenated results', txtfile)
-        tv = np.loadtxt(txtfile,comments='%')
+        print('Trying to read external file of concatenated results', txtfile)
+        try: 
+            tv = np.loadtxt(txtfile,comments='%')
+        except:
+            print('I tried to use your external file - and the code was not happy. Exiting.')
+            sys.exit()
 
-     
-    #print(tv.shape)
-    tv,t,rh,fdoy,ldoy= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs)
-    #print(tv.shape)
+    if len(tv) == 0:
+        print('No result files were found. Exiting.')
+        sys.exit()
 
+    # save this
     tvoriginal = tv
-    nr,nc = tvoriginal.shape
+    nr,nc = tv.shape
+    print('Original number of rows and columns: ', nr,nc)
+
+    tv,t,rh,mjd1,mjd2= apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,year, d1,d2,h1,h2,freqs)
+
+    nr,nc = tv.shape
     print('RH retrievals after all commandline constraints', nr)
 
-    # now that you have everything the way you want it .... 
-    # make the datatime objects
-    nr,nc = tv.shape
-    otimes = []
-    for ijk in range(0,nr):
-        dtime, iyear,imon,iday,ihour,imin,isec = g.ymd_hhmmss(tv[ijk,0],tv[ijk,1],tv[ijk,4],True)
-        otimes.append(dtime)
+    #  create obstimes from MJD records
+    otimes = sd.mjd_to_obstimes(tv[:,15])
 
     # make arrays to save number of RH retrievals on each day
     residuals = np.empty(shape=[0,1])
@@ -351,10 +382,15 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
 
     # this should be moved to the library
     # only look at the doy range where i have data
-    for d in range(fdoy,(ldoy+1)):
-        ii = (tv[:,1] == d) ; tmp = tv[ii,:]
-        dtime, iyear,imon,iday,ihour,imin,isec = g.ymd_hhmmss(year,d,12,True)
-        tval.append(dtime)
+    tval_mjd = []
+    for d in range(mjd1,(mjd2+1)):
+        ii = ( (tv[:,15] >= d) & (tv[:,15] < (d+1)) ); 
+        tmp = tv[ii,:]
+        #ii = (tv[:,1] == d) ; tmp = tv[ii,:]
+        #dtime, iyear,imon,iday,ihour,imin,isec = g.ymd_hhmmss(year,d,12,True)
+        # figure out the time using obstime - add 0.5 to plot it at noon 
+        tval_mjd.append(d+0.5)
+
         n = len(tv[ii,1])
         # total
         nval.append(n)
@@ -375,6 +411,8 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
             else:
                 rhavg = np.mean(tv[ii,2]); 
                 rhstd = np.std(tv[ii,2]); 
+
+            dtime = sd.mjd_to_obstimes(d+0.5)
 
             newl = [dtime, rhavg, rhstd]
             stats = np.append(stats, [newl], axis=0)
@@ -399,26 +437,19 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
     ii = (np.absolute(residuals) > sigma) # data you like
     jj = (np.absolute(residuals) < sigma) # data you do not like ;-)
 
+    # change from list to numpy array
+    tval_mjd = np.asarray(tval_mjd)
+    tval = sd.mjd_to_obstimes(tval_mjd) 
     # I think this is plots for section I
     if plt2screen:
 
         minAz = float(np.min(tv[:,5])) ; maxAz = float(np.max(tv[:,5]))
 
-        if default_usage:
-            sd.numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year,close_figures)
-            # was testing some things out
-            #testing_nvals(Gval, Rval, Eval, Cval)
+        sd.numsats_plot(station,tval,nval,Gval,Rval,Eval,Cval,txtdir,fs,hires_figs,year,close_figures)
 
-            sd.two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs,close_figures)
-            sd.stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt,hires_figs,year,close_figures)
-            sd.print_badpoints(tv[ii,:],residuals[ii],txtdir,real_residuals[ii])
-        else:
-            # make both plots cause life is short
-            # I do not think this is currently used ... 
-            sd.rh_plots(otimes,tv,station,txtdir,year,d1,d2,True)
-            sd.rh_plots(otimes,tv,station,txtdir,year,d1,d2,False)
-
-        #plt.show()
+        sd.two_stacked_plots(otimes,tv,station,txtdir,year,d1,d2,hires_figs,close_figures)
+        sd.stack_two_more(otimes,tv,ii,jj,stats, station, txtdir,sigma,kplt,hires_figs,year,close_figures)
+        sd.print_badpoints(tv[ii,:],residuals[ii],txtdir,real_residuals[ii])
 
 
     # now write things out - using txtdir variable sent 
@@ -560,7 +591,7 @@ def write_out_header(fout,station,extraline,**kwargs):
 
 
 
-def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs):
+def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,year, d1,d2,h1,h2,freqs):
     """
     cleaning up the main code. this sorts data and applies various "commandline" constraints
     tv is the full set of results from gnssrefl
@@ -577,6 +608,8 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs):
         required amplitude for periodogram
     peak2noise : float
         require peak2noise criterion
+    year : int
+        full year
     d1 : int
         min day of year
     d2 : int
@@ -592,15 +625,15 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs):
     Returns
     -------
     tv : numpy array
-        edited from input
+        LSP, edited from input
     t : numpy of floats
         crude time for obs, in fractional days
     rh : numpy of floats
         reflector heights (m)
-    firstdoy : int
-        first day of year
-    lastdoy : int 
-        last day of year
+    firstmjd : int
+        first MJD in the file (requested)
+    lastmjd : int 
+        last MJD in the file (requested)
     """
     nr,nc=tv.shape
     tvoriginal = tv
@@ -619,7 +652,8 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs):
     # not sure these need to be here - are they used elsewhere?
     # could be moved to apply_new_constraints
     # this is dumb - should use MJD
-    t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
+    #t=tv[:,0] + (tv[:,1] + tv[:,4]/24)/365.25
+    t = tv[:,15]
     rh = tv[:,2]
 
 # sort the data
@@ -640,13 +674,12 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs):
     ii = (tv[:,13]  >= peak2noise) ; tv = tv[ii,:]
     print(nr-len(tv) , ' points removed for peak2noise constraints ')
 
-    # silly - why read it if you are not going to use it
-    # and restrict by doy - mostly to make testing go faster
-    ii = (tv[:,1] >= d1) & (tv[:,1] <= d2)
-    tv = tv[ii,:]
-    firstdoy = int(min(tv[:,1]))
-    lastdoy =  int(max(tv[:,1]))
-    print(len(tv) , ' points remaining after doy constraints')
+
+    # do not restrict by time because you already did that
+
+
+    firstmjd = int(min(tv[:,15]))
+    lastmjd = int(max(tv[:,15])) 
 
     # now apply amplitude constraint
     NA = len(ampl)
@@ -660,7 +693,7 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs):
         oneamplitude = float(ampl[0])
         ii = (tv[:,6]  >= oneamplitude) ; tv = tv[ii,:]
         print(nr-len(tv) , ' points removed for amplitude constraint ')
-        return tv,t,rh,firstdoy,lastdoy
+        return tv,t,rh,firstmjd,lastmjd
     else:
         #print('when we started ', nr,nc)
         newarray = np.empty(shape=[0,nc])
@@ -673,7 +706,7 @@ def apply_new_constraints(tv,azim1,azim2,ampl,peak2noise,d1,d2,h1,h2,freqs):
             ii = (tv[:,6]  >= oneamplitude)  & (tv[:,10] == freqs[ia])
             newarray = np.vstack((newarray, tv[ii,:]))
             print(len(tv[ii,6]), ' points kept for freq ', freqs[ia],  ' with amplitude ', ampl[ia] )
-        return newarray,t,rh,firstdoy,lastdoy
+        return newarray,t,rh,firstmjd,lastmjd
 
 
 def flipit(tvd,col):

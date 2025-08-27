@@ -470,7 +470,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
                     orb = 'gnss'
             else:
                 orb = 'nav'
-        print('Using default orbit for this time period: ', orb)
+            print('Using default orbit for this time period: ', orb)
 
     else:
         print('Using command line orbit selection of ', orb)

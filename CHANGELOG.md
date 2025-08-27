@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.18.0
+August 25, 2025
+
+Fixing bug reports by Nievinski group on subdaily (for files created with mmdd option)
+and ellist (issue with output file wanting hours between 0 and 23).
+
+The LSP results for users requesting mm dd hh mm ss
+have not had seconds written out for the last couple versions (long story, but it had to do
+with updating for the midnite option).  This is not really a big deal, but if you try to concatenate
+files that have a different number of columns...  that will be a problem. 
+
+For midnite option, originally it was printing out the day of year for the file, and thus
+the UTC time (frational) in hours was negative. Now I print out the correct doy and a normal
+hour from 0-24.
+
+All of this required some fairly big changes in subdaily.py.  The code could still be cleaned up.
+
 ## 3.17.0
 August 22, 2025
 

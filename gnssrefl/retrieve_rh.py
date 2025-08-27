@@ -279,21 +279,29 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
                                         file_info = [station,satNu,f,avgAzim,year,month,day,doy,meanTime,docstring]
                                         guts.write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
 
+                                xyear,xmonth,xday,xhr, xmin, xsec,xdoy = g.simpleTime(MJD)
+                                # fractional UTC time of the day, in hours
+                                betterUTC = xhr + xmin/60 + xsec/3600
                                 if lsp['mmdd']:
-                                    ctime = g.nicerTime(UTCtime); xhr = float(ctime[0:2]); xmin = float(ctime[3:5])
-                                    onelsp = [year,doy,maxF,satNu,UTCtime,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr,month,day,xhr,xmin]
+                                    #ctime = g.nicerTime(UTCtime); #xhr = float(ctime[0:2]); xmin = float(ctime[3:5])
+                                    #dt = Time(mjd,format='mjd').utc.datetime;
+                                    onelsp = [xyear,xdoy,maxF,satNu,betterUTC,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr,xmonth,xday,xhr,xmin,xsec]
+                                    #onelsp = [year,doy,maxF,satNu,UTCtime,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr,xmonth,xday,xhr,xmin,xsec]
+                                    
 
                                 else:
-                                    onelsp = [year,doy,maxF,satNu,UTCtime,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr]
+                                    onelsp = [xyear,xdoy,maxF,satNu,betterUTC,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr]
+
                                 gj +=1
 
                                 all_lsp.append(onelsp)
                                 if screenstats:
-                                    if UTCtime < 0:
-                                        T = g.nicerTime(-UTCtime)
-                                        T = '-' + T
-                                    else:
-                                        T = ' ' + g.nicerTime(UTCtime)
+                                    #if UTCtime < 0:
+                                    #    T = g.nicerTime(-UTCtime)
+                                    #    T = '-' + T
+                                    #else:
+                                    # won't have the year - but better to avoid the whole stupid negative time
+                                    T = ' ' + g.nicerTime(betterUTC)
                                     logid.write('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:6s} DT {7:3.0f} \n'.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
                                 if plot_screen:
                                     failed = False
@@ -353,14 +361,16 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
         # look like someone asked me to sort the LSP results ... 
         # convert to numpy array
         allL = np.asarray(all_lsp)
+        longer_line = lsp['mmdd']
+        #print('writing out longer line ', longer_line)
         if len(allL) > 0:
-            head = g.lsp_header(station) # header
+            head = g.lsp_header(station,longer_line=longer_line) # header
         # sort the results for felipe
             ii = np.argsort(allL[:,15])
             allL = allL[ii,:]
 
-            if lsp['mmdd']:
-                f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %2.0f %2.0f %2.0f %2.0f %2.0f '
+            if longer_line:
+                f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %2.0f %2.0f %2.0f %2.0f %2.0f %2.0f '
             else:
                 f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %2.0f'
 
