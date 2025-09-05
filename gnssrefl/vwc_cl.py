@@ -31,17 +31,19 @@ def parse_arguments():
     parser.add_argument("-polyorder", default=None, type=int, help="override on polynomial order")
     parser.add_argument("-minvalperday", default=None, type=int, help="min number of satellite tracks needed each day. Default is 10")
     parser.add_argument("-bin_hours", default=None, type=int, help="time bin size in hours (1,2,3,4,6,8,12,24). Default is 24 (daily)")
-    parser.add_argument("-minvalperbin", default=None, type=int, help="min number of satellite tracks needed per time bin. Default is 5")
+    parser.add_argument("-minvalperbin", default=None, type=int, help="min number of sat tracks needed per time bin. Default is 5")
     parser.add_argument("-bin_offset", default=None, type=int, help="bin timing offset in hours (0 <= offset < bin_hours). Default is 0")
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean, try to remove snow contaminated points. Default is F")
     parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
     parser.add_argument("-tmin", default=None, type=float, help="minimum soil texture. Default is 0.05.")
     parser.add_argument("-tmax", default=None, type=float, help="maximum soil texture. Defafult is 0.50.")
     parser.add_argument("-warning_value", default=None, type=float, help="Phase RMS (deg) threshold for bad tracks, default is 5.5 degrees")
-    parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False")
+    parser.add_argument("-auto_removal", default=None, type=str, help="Remove bad tracks automatically (default is False)")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
     parser.add_argument("-advanced", default=None, type=str, help="Whether you want to implement advanced veg model (in development)")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
+    parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes",type=int) 
+
 
     g.print_version_to_screen()
 
@@ -57,7 +59,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         min_req_pts_track: int = None, polyorder: int = -99, minvalperday: int = None, 
         bin_hours: int = None, minvalperbin: int = None, bin_offset: int = None,
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None, 
-        warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False, advanced : bool=False, extension:str=None ):
+        warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False, 
+        advanced : bool=False, extension:str=None, level_doys : list =[] ):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
     It concatenates previously computed phase results, makes plots for the four geographic quadrants, computes daily 
@@ -69,6 +72,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     Code now allows inputs (minvalperday, tmin, and tmax) to be stored in the gnssir analysis json file.
     To avoid confusion, in the json they are called vwc_minvalperday, vwc_min_soil_texture, and vwc_max_soil_texture.
     These values can also be overwritten on the command line ... 
+
+    Code now allows doy values for level nodes to be set in the json (variable name vwc_level_doys) and it 
+    is a list, i.e. [170,230] would be the input for summer months in NOAM.  This can be overriden by
+    the command line -level_inputs 170 230. If no information is provided by the user, it has defaults
+    based on the station being in the northern or southern hemisphere. However, this is a hack, and I have
+    no idea if it works well for Australia, e.g.  It worked well for PBO H2O in the semi-arid western U.S.
+    Those values are defined in set_parameters in phase_functions.py if you want to take a look
+    If you want a time period that crosses the year boundary (i.e. you want all of december and january), 
+    you can input level_doys of 335 and 31, and the code will process accordingly.
 
     Examples
     --------
@@ -129,6 +141,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
          advanced veg model implmentation. Currently in testing
     extension : str
          extension used when you made the json analysis file
+    level_doys : list
+         pair of day of years that are used to define time period for "leveling"
+         default is north american summer
 
     Returns
     -------
@@ -140,6 +155,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         with columns: FracYr Year DOY  VWC Month Day
 
     """
+    print('Requested level doys ', level_doys,len(level_doys))
     # Validate subdaily binning parameters
     if bin_hours is not None:
         valid_bin_hours = [1, 2, 3, 4, 6, 8, 12, 24]
@@ -171,10 +187,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     fr = fr_list[0]
 
     # pick up the parameters used for this code
+    # Sep 4, 2025 added level_doys parameter 
     minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, \
             remove_bad_tracks, warning_value,min_norm_amp,sat_legend,circles,extension, \
-            bin_hours, minvalperbin, bin_offset = \
-            qp.set_parameters(station, minvalperday, tmin,tmax, min_req_pts_track, 
+            bin_hours, minvalperbin, bin_offset, level_doys = \
+            qp.set_parameters(station, level_doys, minvalperday, tmin,tmax, min_req_pts_track, 
                               fr, year, year_end,subdir,plt, auto_removal,warning_value,extension,
                               bin_hours, minvalperbin, bin_offset)
 
@@ -400,7 +417,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
                             # turn off for now - changed x-axis to datetime instead of fractional year
                             #ax2[bx[index],by[index]].plot(fracyear[ik], smoothAmps, '-',color=adv_color)
                         except:
-                            print('some issue with the smoothing')
+                            print('some issue with the smoothing in the function vwc')
                         # not sure this will work
                         ax2[bx[index],by[index]].plot(datetime_dates, norm_ampLSP, '.',color=adv_color,label=csat)
                         #ax2[bx[index],by[index]].plot(fracyear[ik], norm_ampLSP[ik], '.',color=adv_color,label=csat)
@@ -492,7 +509,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
             qp.subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bin_hours,bin_offset,plt2screen=plt)
 
         # convert averaged phase values to volumetric water content
-        qp.convert_phase(station, year, year_end, plt,fr,tmin,tmax,polyorder,circles,subdir,hires_figs, extension, bin_hours, bin_offset)
+        qp.convert_phase(station, year, level_doys,year_end, plt,fr,tmin,tmax,polyorder,circles,
+                         subdir,hires_figs, extension, bin_hours, bin_offset)
 
 
 def parse_arguments_hourly():

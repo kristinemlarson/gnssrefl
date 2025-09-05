@@ -417,8 +417,8 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
                 final_fr = lsp['freqs'][0]
                 print(f"Frequency read from JSON file: {final_fr}")
             else:
-                print("Error: 'freqs' in JSON must be a list with a single value. Exiting.")
-                sys.exit()
+                print("Tried to use frequency values in json but there were too many.  Using default of L2C (20).")
+                final_fr = 20
         else:
             # Default to L2C if not specified anywhere
             final_fr = 20
@@ -608,7 +608,7 @@ def low_pct(amp, basepercent):
     return lowval
 
 
-def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
+def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
         subdir='',hires_figs=False, extension='', bin_hours=24, bin_offset=0):
     """
     Convert GPS phase to VWC. Using Clara Chew's algorithm from 
@@ -622,6 +622,8 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         4 char station name
     year : int
         beginning year
+    level_doys : list of int
+        start and end day of year to set levels
     year_end : int
         last year
     plt2screen : boolean
@@ -641,6 +643,12 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
         subdirectory for $REFL_CODE/Files
     hires_figs : bool
         whether you want eps instead of png files created
+    extension : str
+        using special json LSP parameters
+    bin_hours : int
+        not sure - GT added
+    bin_offset : int
+        not sure - GT added
 
     """
 
@@ -651,16 +659,16 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     station_file = FileManagement(station, 'make_json')
     json_data = gnssir.read_json_file(station, extension, silent=True)
 
-    if json_data['lat'] >= 0:
-        print('Northern hemisphere summer')
-        southern = False
-    elif json_data['lat'] < 0:
-        print('Southern hemisphere summer')
-        southern = True
+    #if json_data['lat'] >= 0:
+    #    print('Northern hemisphere summer')
+    #    southern = False
+    #elif json_data['lat'] < 0:
+    #    print('Southern hemisphere summer')
+    #    southern = True
 
-    else:
-        print(f"The required json file could not be found or is invalid: {station_file.get_file_path()}")
-        sys.exit()
+    #else:
+    #    print(f"The required json file could not be found or is invalid: {station_file.get_file_path()}")
+    #    sys.exit()
 
     # for PBO H2O this was set using STATSGO. 5% is reasonable as a starting point for australia
     #tmin = 0.05  # for now
@@ -774,38 +782,33 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     # acting on newvwc, year and doys
     nodes = np.empty(shape=[0, 3])
 
-    if southern:
-        for yr in np.arange(year, year_end+1):
-            y1 = yr - 30/365.25  # dec previous year
-            y2 = yr + 45/365.25  # mid feb
-            print(yr, y1, y2)  # kristine's idea of summer in australia
-            # summer_vwc = newvwc[(year == y) &   (doys >= 1) & (doys < 40)]
-            summer_vwc = newvwc[(t > y1) & (t < y2)]
-            # summer_vwc2 = newvwc[(year == (y-1))  &   (doys >= 334) & (doys < 365)]
-            # new_summer = np.vstack((summer_vwc, summer_vwc2))
-            if len(summer_vwc) > 0:
-                basepercent = 0.15
-                lval = low_pct(summer_vwc, basepercent)
-                newl = [yr, 15, lval]
-                #print(newl)
-                nodes = np.append(nodes, [newl], axis=0)
-                print('Level value:', yr, np.round(lval,2))
-            else:
-                print('No summer dates found to compute VWC for ', yr)
-    else:
-        # northern hemisphere
+    # do not really need southern and northern here anymore.  Using True so I don't ahve to reindent everything.
+    if True:
+        print('Level value points (year, doy, value):')
         for yr in np.arange(year, year_end+1):
             # put in amplitude criteria to keep out bad L2P results
-            summer_vwc = newvwc[(years == yr) & (doys >= 190) & (doys < 273)]
+            if level_doys[0] > level_doys[1]:
+                # this might be the case where you want to go from doy 330 in previous year to doy 40 in current year
+                MJD1 = int(g.ydoy2mjd(yr-1, level_doys[0]))
+                MJD2 = int(g.ydoy2mjd(yr,   level_doys[1]))
+                t1 = (yr - 1) + level_doys[0]/365.25 ; t2 = yr + level_doys[1]/365.25                
+            else:
+                MJD1 = int(g.ydoy2mjd(yr,   level_doys[0]))
+                MJD2 = int(g.ydoy2mjd(yr,   level_doys[1]))
+                t1 = yr + level_doys[0]/365.25 ; t2 = yr + level_doys[1]/365.25                
+            tindex = (t > t1) & (t < t2)
+            summer_vwc = newvwc[tindex]
+            mid_mjd = int(0.5*(MJD1+MJD2))
+            mid_year, _, _, _, _, _,mid_doy = g.simpleTime(mid_mjd)
+
             if len(summer_vwc) > 0:
                 basepercent = 0.15
                 lval = low_pct(summer_vwc, basepercent)
-                newl = [yr, 213, lval]
-                #print(newl)
+                # need to fix for date over the year boundary
+                newl = [mid_year, mid_doy, lval];
                 nodes = np.append(nodes, [newl], axis=0)
-                print('Level value:',yr, np.round(lval,2))
             else:
-                print('No summer dates found to compute VWC', yr)
+                print('No dry dates found to compute VWC', yr)
 
 
     plt.figure(figsize=(10, 10))
@@ -842,6 +845,7 @@ def convert_phase(station, year, year_end=None, plt2screen=True,fr=20,tmin=0.05,
     st = nodes[:, 0] + nodes[:, 1]/365.25
     st_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(nodes[:, 0], nodes[:, 1])]
     sp = nodes[:, 2]
+    print(nodes)
 
     howmanynodes = len(sp)
     print('number of nodes', howmanynodes)
@@ -1176,18 +1180,23 @@ def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = 
         return False, [], [], [], [], [], [], [], [], [], [], []
 
     results = results.T # backwards for consistency
-    if snowmask == None:
+    if snowmask is None:
         nr,nc = np.shape(results)
         if nr > 0:
             print('Number of rows and columns ', nr,nc)
             raw = write_out_raw_phase(results,fname)
     else:
-        print('Snow mask should exist')
+        print('Snow mask file should exist',snowmask)
         override = np.loadtxt(snowmask, comments='%')
+        if len(override) == 0:
+            print('your snow mask file does not have any data in it. Exit.')
+            sys.exit()
         # adding nonsense because it doesn't like having only one value
         #  which is a kluge i know
-        blah = np.array([[1, 2], [3, 4]])
-        override = np.vstack((override, blah))
+        # this is failing, so turning off 
+        if False:
+            blah = np.array([[1, 2], [3, 4]])
+            override = np.vstack((override, blah))
         for year in range(year1,year2+1):
             ii = (results[:,0] == year) & (results[:,12] == fr)
         # it is easier for me to do this year by year
@@ -1396,9 +1405,8 @@ def load_sat_phase(station, year, year_end, freq, extension = ''):
 
     return dataexist, results
 
-
-def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,
-                   subdir,plt,auto_removal,warning_value,extension,
+def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,
+                   subdir,plt,auto_removal,warning_value,extension, 
                    bin_hours=None, minvalperbin=None, bin_offset=None):
     """
     the goal of this code is to pick up the relevant parameters used in vwc.
@@ -1407,6 +1415,9 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     ----------
     station : str
         4 character station name
+    level_doys : list of int
+        option doy inputs for defining leveling period.  can be in the json or on 
+        the command line
     minvalperday : int
         number of phase values required each day
     tmin : float
@@ -1432,6 +1443,12 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         phase RMS needed to trigger warning
     extension : str
         extension used for inputs and outputs (i.e. test1 in ssss.test1.json)
+    bin_hours : ?
+        needs documentation
+    minvalperbin ? 
+        needs documentation
+    bin_offset ?
+        needs documentation
 
     Returns
     -------
@@ -1457,8 +1474,11 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
         phase RMS needed to trigger warning
     extension : str
         extra name for the json file
+    return_level_doys : list
+        start and end day of years for leveling
 
     """
+    print('level_doys value', level_doys)
     if (len(station) != 4):
         print('station name must be four characters. Exiting')
         sys.exit()
@@ -1474,10 +1494,36 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     else:
         lsp = gnssir.read_json_file(station, extension,noexit=True, silent=True)
 
+
+    # this used to be in convert_phase function.  Now will set doy limits in this function
+    if lsp['lat'] >= 0:
+        print('Northern hemisphere station ')
+        southern = False
+    elif lsp['lat'] < 0:
+        print('Southern hemisphere station ')
+        southern = True
+
+
     # originally this was for command line interface ... 
     remove_bad_tracks = auto_removal # ??
     plot_legend = True # default is to use them
     circles = False
+
+    if len(level_doys) == 0:
+        if 'vwc_level_doys' in lsp:
+            print('use levels in the json')
+            return_level_doys = lsp['vwc_level_doys']
+        else:
+            print('use default levels which may not be appropriate for your site')
+            if southern: 
+                # do these values even make sense?   someone from the southern hemisphere please speak up!
+                return_level_doys = [330, 45]
+            else:
+                return_level_doys = [180, 273]
+    else:
+        print('Using level values provided on the command line ' )
+        # sorry if this is dumb - but obviously I did not define this properly or something
+        return_level_doys = level_doys
 
     if tmin is None:
         if 'vwc_min_soil_texture' in lsp:
@@ -1604,6 +1650,8 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
     print(f'vwc_min_req_pts_track: {min_req_pts_track}')
     print(f'vwc_warning_value: {warning_value:.1f}')
     print(f'vwc_min_norm_amp: {min_norm_amp:.1f}')
+    print(f'vwc_level_start: {return_level_doys[0]}')
+    print(f'vwc_level_end  : {return_level_doys[1]}')
     
     print('=== Time Binning ===')
     print(f'vwc_bin_hours: {bin_hours}')
@@ -1634,7 +1682,7 @@ def set_parameters(station, minvalperday,tmin,tmax,min_req_pts_track,fr, year, y
 
     return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, \
             plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles, extension, \
-            bin_hours, minvalperbin, bin_offset
+            bin_hours, minvalperbin, bin_offset, return_level_doys
 
 def write_all_phase(v,fname):
     """
@@ -1948,7 +1996,7 @@ def write_phase_for_advanced(filename, vxyz):
     Writes out a file of interim phase results for advanced models
     developed by Clara Chew
 
-    File generally written to $REFL_CODE/Files/<station>/all_phase.txt
+    File now written to $REFL_CODE/Files/<station>/<station>_all_phase.txt
 
     Parameters
     ----------
@@ -1961,12 +2009,13 @@ def write_phase_for_advanced(filename, vxyz):
     ii = np.argsort(vxyz[:,0] + vxyz[:,1]/365.25)
     vxyz = vxyz[ii,:]
     #headers for output file - these are not correct BTW
-    print('writing interim file for advanced model ', filename)
+    print('Writing interim file for advanced vegetation model ', filename)
+    h0 = "File created by vwc function write_phase_for_advanced \n"
     h1 = "Year DOY Phase  Azim Sat    RH    nLSPA nLSA    Hour   LSPA   LS  apRH  quad  delRH  vegM\n"
     h2 = "(1)  (2)  (3)   (4)  (5)    (6)    (7)   (8)     (9)   (10)  (11)  (12)  (13)  (14)  (15) "
     #2012   1   9.19  315.6  1   1.850   0.97   0.98  0.59 19.80 19.79  1.85  2
     with open(filename, 'w') as my_file:
-        np.savetxt(my_file, vxyz, fmt="%4.0f %3.0f %6.2f %6.1f %2.0f %7.3f %6.2f %6.2f %5.2f %6.2f %6.2f %6.3f %2.0f %6.3f %2.0f  ",header=h1+h2,comments='%')
+        np.savetxt(my_file, vxyz, fmt="%4.0f %3.0f %6.2f %6.1f %2.0f %7.3f %6.2f %6.2f %5.2f %6.2f %6.2f %6.3f %2.0f %6.3f %2.0f  ",header=h0+h1+h2,comments='%')
 
     return
 #                   if adhoc_snow:
