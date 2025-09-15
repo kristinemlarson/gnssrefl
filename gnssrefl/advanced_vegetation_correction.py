@@ -12,7 +12,7 @@ import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
 
 def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='', 
-                                bin_hours=24, bin_offset=0, pltit=True, fr=20):
+                                bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10):
     """
     Clara's high vegetation model
     
@@ -45,6 +45,8 @@ def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='',
         Whether plots come to the screen
     fr : int
         Frequency code (1=L1, 5=L5, 20=L2C, default: 20)
+    minvalperbin : int
+        Minimum values required per time bin (default: 10)
     
     Returns
     -------
@@ -82,9 +84,9 @@ def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='',
     
     # Step 2: Apply vegetation filter to compute soil moisture
     print('Step 2: Applying vegetation model...')
-    final_mjd, final_vwc = apply_vegetation_model(station, vxyz, metrics_all, tracks, 
+    final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks, 
                                                   sgolnum, sgolply, padlen, tmin, pltit, 
-                                                  fr, bin_hours, bin_offset, subdir)
+                                                  fr, bin_hours, bin_offset, subdir, tv, minvalperbin)
     
     if len(final_mjd) == 0:
         print('No vegetation-corrected soil moisture estimates could be computed')
@@ -92,7 +94,7 @@ def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='',
     
     # Step 3: Write output in standard gnssrefl VWC format
     print('Step 3: Writing VWC output...')
-    write_vwc_output(station, final_mjd, final_vwc, year, subdir, bin_hours, bin_offset, fr)
+    write_vwc_output(station, final_mjd, final_vwc, year, subdir, bin_hours, bin_offset, fr, final_binstarts)
     
     # Step 4: Generate standard VWC plot if requested
     if pltit and len(final_mjd) > 0:
@@ -293,7 +295,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
 
 
 def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply, 
-                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir):
+                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, tv, minvalperbin):
     """
     Apply Clara's vegetation filter to compute soil moisture
     
@@ -317,13 +319,25 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Minimum soil texture
     pltit : bool
         Show plots
+    fr : int
+        Frequency code
+    bin_hours : int
+        Time bin size in hours
+    bin_offset : int
+        Bin timing offset in hours
+    subdir : str
+        Subdirectory for output
+    tv : numpy array
+        Time-binned phase data from write_avg_phase
+    minvalperbin : int
+        Minimum values required per time bin
         
     Returns
     -------
     final_mjd : list
-        MJD values for daily averages
+        MJD values for time-binned averages
     final_vwc : list
-        VWC values for daily averages
+        VWC values for time-binned averages
     """
     
     print('>>>>>>>>>>> Applying vegetation model <<<<<<<<<<<<')
@@ -420,21 +434,55 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             #     plt.legend(loc="best")
             #     plt.show()
     
-    # Compute daily averages
-    print('Computing daily averages...')
+    # Use time bins from tv array 
+    if bin_hours < 24:
+        print(f'Computing {bin_hours}-hour averaged VWC estimates...')
+    else:
+        print('Computing daily averaged VWC estimates...')
+    
     finalx = []
     finaly = []
-    unique_mjd = np.unique(mjd)
+    final_binstarts = []  # Track bin start hours for subdaily output
     
-    for i in range(len(unique_mjd)):
-        umjd = int(unique_mjd[i])
-        jj = (mjd == umjd)
-        if len(svwc[jj]) >= 4:  # Minimum 4 tracks per day
-            finalx.append(umjd)
-            finaly.append(np.mean(svwc[jj]))
+    # For each time bin in tv, aggregate corresponding svwc values
+    for i in range(len(tv)):
+        year_val = int(tv[i, 0])
+        doy_val = int(tv[i, 1])
+        
+        if bin_hours < 24:
+            # Subdaily: use bin_start_hour to match tracks
+            bin_start = int(tv[i, 4])
+            bin_end = (bin_start + bin_hours) % 24
+            
+            # Match individual tracks to this time bin
+            if bin_end <= bin_start:  # crosses midnight
+                time_mask = ((year == year_val) & (doy == doy_val) & (hour >= bin_start)) | \
+                           ((year == year_val) & (doy == doy_val + 1) & (hour < bin_end))
+            else:
+                time_mask = (year == year_val) & (doy == doy_val) & \
+                           (hour >= bin_start) & (hour < bin_end)
+        else:
+            # Daily: match by year/doy only
+            time_mask = (year == year_val) & (doy == doy_val)
+            bin_start = 0  # For daily bins, use 0
+        
+        # Get VWC values for tracks in this time bin
+        bin_vwc_raw = svwc[time_mask].flatten()
+        # Filter out zeros (unprocessed tracks)
+        bin_vwc = bin_vwc_raw[bin_vwc_raw != 0]
+        
+        
+        if len(bin_vwc) >= minvalperbin:
+            # Store time bin average
+            finalx.append(g.ydoy2mjd(year_val, doy_val))
+            finaly.append(np.mean(bin_vwc))
+            final_binstarts.append(bin_start)
     
     if len(finalx) == 0:
-        print('No daily averages could be computed')
+        if bin_hours < 24:
+            print(f'No {bin_hours}-hour averages could be computed')
+        else:
+            print('No daily averages could be computed')
         return [], []
         
     # Apply leveling (Clara's approach)
@@ -446,10 +494,10 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
     fy = (100 * tmin + (fy - lowest25)) / 100
     
     
-    return finalx, fy.tolist()
+    return finalx, fy.tolist(), final_binstarts
 
 
-def write_vwc_output(station, mjd_list, vwc_list, year, subdir, bin_hours, bin_offset, fr):
+def write_vwc_output(station, mjd_list, vwc_list, year, subdir, bin_hours, bin_offset, fr, bin_starts):
     """Write VWC output file in standard gnssrefl format"""
     
     xdir = os.environ['REFL_CODE']
@@ -458,9 +506,9 @@ def write_vwc_output(station, mjd_list, vwc_list, year, subdir, bin_hours, bin_o
     suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
     
     if subdir:
-        outfile = f'{xdir}/Files/{subdir}/{station}_vwc{suffix}'
+        outfile = f'{xdir}/Files/{subdir}/{station}_vwc{suffix}.txt'
     else:
-        outfile = f'{xdir}/Files/{station}_vwc{suffix}'
+        outfile = f'{xdir}/Files/{station}_vwc{suffix}.txt'
     
     # Convert MJD to datetime
     datetime_array = sd.mjd_to_obstimes(np.array(mjd_list))
@@ -488,8 +536,8 @@ def write_vwc_output(station, mjd_list, vwc_list, year, subdir, bin_hours, bin_o
             day = dt.day
             
             if bin_hours < 24:
-                # Future subdaily format - for now just write 0 for BinStart
-                bin_start = 0
+                # Subdaily format - use actual bin start hour
+                bin_start = bin_starts[i]
                 f.write(f' {fracyr:8.4f} {year_val:4d} {doy:4d} {vwc_list[i]:8.3f} {month:4d} {day:4d} {bin_start:4d}\n')
             else:
                 # Daily format

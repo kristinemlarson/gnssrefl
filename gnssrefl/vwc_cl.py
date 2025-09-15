@@ -13,6 +13,7 @@ from pathlib import Path
 import gnssrefl.phase_functions as qp
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as gnssir
+import gnssrefl.advanced_vegetation_correction as avc
 
 from gnssrefl.utils import str2bool, read_files_in_dir, FileManagement
 
@@ -501,9 +502,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
             sys.exit()
         
         # Apply Clara's vegetation model directly
-        import gnssrefl.advanced_vegetation_correction as avc
         avc.clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir,
-                                         bin_hours, bin_offset, plt, fr)
+                                         bin_hours, bin_offset, plt, fr, minvalperbin)
         
         # Make phase plot if requested  
         if plt:
