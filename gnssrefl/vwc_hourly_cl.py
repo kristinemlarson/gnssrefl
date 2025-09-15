@@ -7,7 +7,7 @@ Generates hourly rolling VWC measurements by processing all possible bin offsets
 and combining them into a chronologically ordered dataset.
 """
 
-from gnssrefl.vwc_cl import main_hourly
+from gnssrefl.vwc_hourly import main_hourly
 
 def main():
     main_hourly()
