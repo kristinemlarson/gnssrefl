@@ -40,7 +40,8 @@ def parse_arguments():
     parser.add_argument("-warning_value", default=None, type=float, help="Phase RMS (deg) threshold for bad tracks, default is 5.5 degrees")
     parser.add_argument("-auto_removal", default=None, type=str, help="Remove bad tracks automatically (default is False)")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
-    parser.add_argument("-advanced", default=None, type=str, help="Whether you want to implement advanced veg model (in development)")
+    parser.add_argument("-advanced", default=None, type=str, help="DEPRECATED: use -vegetation_model clara_high instead. Enables Clara's advanced vegetation model")
+    parser.add_argument("-vegetation_model", default=None, choices=['simple', 'clara_high'], help="Vegetation correction model: simple (default) or clara_high")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
     parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes",type=int) 
 
@@ -60,14 +61,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         bin_hours: int = None, minvalperbin: int = None, bin_offset: int = None,
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None, 
         warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False, 
-        advanced : bool=False, extension:str=None, level_doys : list =[] ):
+        advanced : bool=False, vegetation_model: str=None, extension:str=None, level_doys : list =[] ):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
     It concatenates previously computed phase results, makes plots for the four geographic quadrants, computes daily 
-    average phase files before converting to volumetric water content (VWC). It uses the simple vegetation model
-    from Clara Chew's dissertation. For the more advanced vegetation model, we will need a volumteer to convert it from Matlab.
-    It is not a difficult port - but it will require care be taken that it is checked carefully.
+    average phase files before converting to volumetric water content (VWC).
 
+    The code now allows the user to select between vegetation models using the -vegetation_model parameter.
+    The default 'simple' model is the legacy vegetation correction method, while 'clara_high' implements 
+    Clara Chew's advanced vegetation correction algorithm for sites with dense vegetation.
 
     Code now allows inputs (minvalperday, tmin, and tmax) to be stored in the gnssir analysis json file.
     To avoid confusion, in the json they are called vwc_minvalperday, vwc_min_soil_texture, and vwc_max_soil_texture.
@@ -138,7 +140,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
          whether to make eps instead of png files
          default value is false
     advanced : bool, optional
-         advanced veg model implmentation. Currently in testing
+         DEPRECATED: use -vegetation_model clara_high instead
+    vegetation_model : str, optional
+         vegetation correction model: 'simple' (default) or 'clara_high'
     extension : str
          extension used when you made the json analysis file
     level_doys : list
@@ -278,7 +282,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     ftmp.write("{0:s} \n".format( '% TrackN  RefH SatNu MeanAz  Nval  Azimuths'))
     # open up a figure for the phase results by quadrant
     fig,ax = matplt.subplots(2, 2, figsize=(10,10))
-    matplt.suptitle(f"Station: {station}", size=12)
+    matplt.suptitle(f"Phase by Azimuth Quadrant: {station}", size=12)
 
     # open up a second plot for the amplitudes in the advanced option
     if advanced: 
@@ -379,7 +383,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
                     vegMask[i] = 1
 
                     # Sep 8, 2025 add MJD
-                    # this is for advanced ... 
+                    # this is for advanced ...
                     newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs,qs,delRH,vegMask.T,mjds)).T
                     #newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs,qs)).T
 
@@ -473,15 +477,51 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     #Need to Define clearly the stored values in vxyz
 
+    # Handle vegetation model selection
+    veg_model = 'simple'  # default
     if advanced:
-        print('Still working on the advanced option. Exiting.')
-        fname_phase = f'{xdir}/Files/{subdir}/{station}_all_phase.txt'
-        qp.write_phase_for_advanced(fname_phase, vxyz)
+        print("Warning: -advanced is deprecated, use -vegetation_model clara_high instead")
+        veg_model = 'clara_high'  # -advanced T is shorthand for clara_high
+    elif vegetation_model:
+        veg_model = vegetation_model
 
+    if veg_model == 'clara_high':
+        print('Running Clara Chew high vegetation model...')
+        
+        # First get averaged phase data (like the simple model does)
+        tv = qp.write_avg_phase(station, phase, fr, year, year_end, minvalperbin, vxyz, 
+                               subdir, extension, bin_hours, minvalperbin, bin_offset)
+        
+        if len(tv) < 1:
+            print('No phase measurements available for vegetation model')
+            if bin_hours < 24:
+                print(f'No results - perhaps minvalperbin or min_req_pts_track are too stringent')
+            else:
+                print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
+            sys.exit()
+        
+        # Apply Clara's vegetation model directly
+        import gnssrefl.advanced_vegetation_correction as avc
+        avc.clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir,
+                                         bin_hours, bin_offset, plt, fr)
+        
+        # Make phase plot if requested  
         if plt:
+            if bin_hours < 24:
+                # Subdaily: use BinStart hour from column 4 (5th column in tv array)
+                from datetime import timedelta
+                datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') + timedelta(hours=int(bin_start)) 
+                                 for yr, d, bin_start in zip(tv[:, 0], tv[:, 1], tv[:, 4])]
+            else:
+                # Daily: use midnight (00:00) for backwards compatibility
+                datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
+            
+            qp.subdaily_phase_plot(station, fr, datetime_dates, tv, xdir, subdir, 
+                                  hires_figs, bin_hours, bin_offset, plt2screen=plt)
             matplt.show()
-        sys.exit()
-    else:
+    
+    elif veg_model == 'simple':
+        # Existing simple model logic
         # write out averaged phase values
         tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperbin,vxyz,subdir,extension,
                                bin_hours, minvalperbin, bin_offset)
@@ -513,6 +553,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         # convert averaged phase values to volumetric water content
         qp.convert_phase(station, year, level_doys,year_end, plt,fr,tmin,tmax,polyorder,circles,
                          subdir,hires_figs, extension, bin_hours, bin_offset)
+    
+    else:
+        print(f'Unknown vegetation model: {veg_model}')
+        sys.exit()
 
 
 def parse_arguments_hourly():
