@@ -21,6 +21,7 @@ from pathlib import Path
 
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
+import gnssrefl.advanced_vegetation_correction as avc
 from gnssrefl.utils import str2bool, FileManagement
 from gnssrefl.vwc_cl import vwc
 
@@ -44,7 +45,8 @@ def parse_arguments_hourly():
     parser.add_argument("-warning_value", default=None, type=float, help="Phase RMS (deg) threshold for bad tracks, default is 5.5 degrees")
     parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
-    parser.add_argument("-advanced", default=None, type=str, help="Whether you want to implement advanced veg model (in development)")
+    parser.add_argument("-advanced", default=None, type=str, help="DEPRECATED: use -vegetation_model clara_high instead")
+    parser.add_argument("-vegetation_model", default=None, choices=['simple', 'clara_high'], help="Vegetation correction model: simple (default) or clara_high")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
 
     g.print_version_to_screen()
@@ -229,7 +231,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
                minvalperbin: int = None, min_req_pts_track: int = None, polyorder: int = -99,
                snow_filter: bool = False, subdir: str = None, tmin: float = None, tmax: float = None,
                warning_value: float = None, auto_removal: bool = False, hires_figs: bool = False, 
-               advanced: bool = False, extension: str = None):
+               advanced: bool = False, vegetation_model: str = None, extension: str = None):
     """
     Generate hourly rolling VWC from all possible bin offsets.
     
@@ -273,37 +275,86 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     if minvalperbin is None:
         minvalperbin = 5
     
+    # Map extension to subdir (following gnssrefl convention: station/extension)
+    if extension and not subdir:
+        subdir = f'{station}/{extension}'
+    
     print(f"Generating hourly rolling VWC with {bin_hours}-hour windows")
     print(f"Processing {bin_hours} offsets for station {station}, year {year}")
     
-    # First run daily VWC for comparison plotting - FORCE plots off
-    print(f"\n=== Generating Daily VWC for comparison ===")
-    vwc(station=station, year=year, year_end=year_end, fr=fr, plt=False, screenstats=False,
-        bin_hours=24, minvalperbin=minvalperbin, bin_offset=0,
-        min_req_pts_track=min_req_pts_track, polyorder=polyorder,
-        snow_filter=snow_filter, subdir=subdir, tmin=tmin, tmax=tmax,
-        warning_value=warning_value, auto_removal=auto_removal, hires_figs=hires_figs,
-        advanced=advanced, extension=extension)
+    # Handle vegetation model selection
+    veg_model = 'simple'  # default
+    if advanced:
+        print("Warning: -advanced is deprecated, use -vegetation_model clara_high instead")
+        veg_model = 'clara_high'  # -advanced T is shorthand for clara_high
+    elif vegetation_model:
+        veg_model = vegetation_model
     
-    # Process each offset - FORCE plots off for all batch processing
-    for offset in range(bin_hours):
-        print(f"\n=== Processing offset {offset}/{bin_hours-1} ({offset:02d}-{(offset+bin_hours)%24:02d}h bins) ===")
+    # Clara model: Use efficient track-based processing
+    if veg_model == 'clara_high':
+        print(f"Using efficient Clara model processing with saved track data")
         
-        # Call vwc with plots FORCED off for batch processing
+        # Get resolved frequency
+        fr_list = qp.get_vwc_frequency(station, extension, fr)
+        if len(fr_list) > 1:
+            print("Error: vwc_hourly can only process one frequency at a time.")
+            sys.exit()
+        resolved_fr = fr_list[0]
+        
+        print(f"\n=== Generating all {bin_hours} VWC offsets using saved track data ===")
+        
+        # Process each offset efficiently using saved track data
+        success_count = 0
+        for offset in range(bin_hours):
+            print(f"Processing offset {offset}/{bin_hours-1} ({offset:02d}-{(offset+bin_hours)%24:02d}h bins)")
+            
+            success = clara_efficient_hourly_vwc(station, year, resolved_fr, 
+                                                bin_hours, offset, minvalperbin, subdir)
+            if success:
+                success_count += 1
+            else:
+                print(f"  Failed to generate VWC for offset {offset}")
+        
+        if success_count == 0:
+            print("Error: No VWC files generated. Run 'vwc' with -save_tracks T first.")
+            sys.exit()
+        
+        print(f"Successfully generated {success_count}/{bin_hours} VWC offset files using efficient processing")
+        
+        # Skip the traditional processing and go to combination
+        resolved_fr = resolved_fr  # Already set above
+        
+    else:
+        # Simple model: Use traditional approach
+        print(f"Using traditional processing for simple vegetation model")
+        
+        # First run daily VWC for comparison plotting - FORCE plots off
+        print(f"\n=== Generating Daily VWC for comparison ===")
         vwc(station=station, year=year, year_end=year_end, fr=fr, plt=False, screenstats=False,
-            bin_hours=bin_hours, minvalperbin=minvalperbin, bin_offset=offset,
+            bin_hours=24, minvalperbin=minvalperbin, bin_offset=0,
             min_req_pts_track=min_req_pts_track, polyorder=polyorder,
             snow_filter=snow_filter, subdir=subdir, tmin=tmin, tmax=tmax,
             warning_value=warning_value, auto_removal=auto_removal, hires_figs=hires_figs,
-            advanced=advanced, extension=extension)
-    
-    # Get parameters that were resolved during first vwc call for file combination
-    import gnssrefl.phase_functions as qp
-    fr_list = qp.get_vwc_frequency(station, extension, fr)
-    if len(fr_list) > 1:
-        print("Error: vwc_hourly can only process one frequency at a time.")
-        sys.exit()
-    resolved_fr = fr_list[0]
+            advanced=advanced, vegetation_model=veg_model, extension=extension)
+        
+        # Process each offset - FORCE plots off for all batch processing
+        for offset in range(bin_hours):
+            print(f"\n=== Processing offset {offset}/{bin_hours-1} ({offset:02d}-{(offset+bin_hours)%24:02d}h bins) ===")
+            
+            # Call vwc with plots FORCED off for batch processing
+            vwc(station=station, year=year, year_end=year_end, fr=fr, plt=False, screenstats=False,
+                bin_hours=bin_hours, minvalperbin=minvalperbin, bin_offset=offset,
+                min_req_pts_track=min_req_pts_track, polyorder=polyorder,
+                snow_filter=snow_filter, subdir=subdir, tmin=tmin, tmax=tmax,
+                warning_value=warning_value, auto_removal=auto_removal, hires_figs=hires_figs,
+                advanced=advanced, vegetation_model=veg_model, extension=extension)
+        
+        # Get parameters that were resolved during first vwc call for file combination
+        fr_list = qp.get_vwc_frequency(station, extension, fr)
+        if len(fr_list) > 1:
+            print("Error: vwc_hourly can only process one frequency at a time.")
+            sys.exit()
+        resolved_fr = fr_list[0]
     
     # Combine all VWC offset files
     print(f"\n=== Combining all {bin_hours} VWC offset files ===")
@@ -344,6 +395,211 @@ def main_hourly():
 def main():
     """Alternative entry point (for compatibility)"""
     main_hourly()
+
+
+def load_and_rebin_track_data(station, year, subdir, fr, bin_hours, bin_offset, minvalperbin):
+    """
+    Load saved individual track data and re-bin into specified time windows
+    
+    This function provides efficient re-binning of Clara model results without
+    reprocessing the vegetation corrections. It reads all track files into a
+    single data structure then performs time binning.
+    
+    Parameters
+    ----------
+    station : str
+        4-character station name
+    year : int
+        Analysis year
+    subdir : str
+        Subdirectory for track files
+    fr : int
+        Frequency code (20 for L2C, etc.)
+    bin_hours : int
+        Time bin size in hours
+    bin_offset : int
+        Bin timing offset in hours
+    minvalperbin : int
+        Minimum tracks required per time bin
+        
+    Returns
+    -------
+    binned_mjd : list
+        MJD values for time bins
+    binned_vwc : list  
+        Aggregated VWC values for time bins
+    binned_binstarts : list
+        Bin start hours for each time bin
+    """
+    import os
+    import numpy as np
+    import glob
+    
+    # Find track data directory
+    xdir = os.environ['REFL_CODE']
+    if subdir:
+        track_dir = f'{xdir}/Files/{subdir}/individual_tracks'
+    else:
+        track_dir = f'{xdir}/Files/{station}/individual_tracks'
+    
+    if not os.path.exists(track_dir):
+        print(f'No saved track data found in {track_dir}')
+        print('Run vwc with -save_tracks T first to generate individual track files')
+        return [], [], []
+    
+    # Load all track files for this station/year/frequency
+    freq_suffix = qp.get_temporal_suffix(fr)
+    pattern = f'{track_dir}/{station}_track_sat*_quad*_{year}{freq_suffix}.txt'
+    track_files = glob.glob(pattern)
+    
+    if not track_files:
+        print(f'No track files found matching pattern: {pattern}')
+        print('Run vwc with -save_tracks T first to generate individual track files')
+        return [], [], []
+    
+    print(f'Loading {len(track_files)} saved track files for efficient re-binning...')
+    
+    # Load ALL track data into single arrays
+    all_data = []
+    for track_file in track_files:
+        try:
+            # Load track data (skip header lines starting with %)
+            data = np.loadtxt(track_file, comments='%')
+            if len(data.shape) == 1:
+                data = data.reshape(1, -1)
+            all_data.append(data)
+        except Exception as e:
+            print(f'Warning: Could not load track file {track_file}: {e}')
+            continue
+    
+    if not all_data:
+        print('No valid track data loaded')
+        return [], [], []
+    
+    # Combine all track data into single array
+    combined_data = np.vstack(all_data)
+    print(f'Loaded {len(combined_data)} individual track observations from saved files')
+    
+    # Extract columns: Year(0), DOY(1), Hour(2), MJD(3), VWC(16)
+    years = combined_data[:, 0]
+    doys = combined_data[:, 1] 
+    hours = combined_data[:, 2]
+    mjds = combined_data[:, 3]
+    vwc = combined_data[:, 16] / 100.0  # Convert VWC from percentage to fraction (0-1)
+    
+    # Now perform time binning
+    return rebin_track_vwc_data(years, doys, hours, mjds, vwc, bin_hours, bin_offset, minvalperbin)
+
+
+def rebin_track_vwc_data(years, doys, hours, mjds, vwc, bin_hours, bin_offset, minvalperbin):
+    """
+    Re-bin individual track VWC data into specified time windows
+    
+    Parameters
+    ----------
+    years, doys, hours, mjds, vwc : numpy.ndarray
+        Individual track observation data
+    bin_hours : int
+        Time bin size in hours
+    bin_offset : int
+        Bin timing offset in hours
+    minvalperbin : int
+        Minimum tracks required per time bin
+        
+    Returns
+    -------
+    binned_mjd : list
+        MJD values for time bins
+    binned_vwc : list
+        Aggregated VWC values for time bins  
+    binned_binstarts : list
+        Bin start hours for each time bin
+    """
+    import numpy as np
+    
+    # Generate time bins covering the data range
+    unique_days = np.unique(np.floor(mjds))
+    
+    binned_mjd = []
+    binned_vwc = []
+    binned_binstarts = []
+    
+    # Process each day with time bins
+    for day_mjd in unique_days:
+        # Convert MJD to datetime then extract year and DOY
+        dt = g.mjd_to_datetime(day_mjd)
+        year_val = dt.year
+        doy_val = dt.timetuple().tm_yday
+        
+        # Generate time bins for this day
+        for offset in range(0, 24, bin_hours):
+            actual_bin_start = (offset + bin_offset) % 24
+            bin_end = (actual_bin_start + bin_hours) % 24
+            
+            # Select tracks that fall within this time bin
+            if bin_end <= actual_bin_start:  # Crosses midnight
+                day_mask = (np.floor(mjds) == day_mjd) | (np.floor(mjds) == day_mjd + 1)
+                time_mask = day_mask & ((hours >= actual_bin_start) | (hours < bin_end))
+            else:
+                day_mask = np.floor(mjds) == day_mjd
+                time_mask = day_mask & (hours >= actual_bin_start) & (hours < bin_end)
+            
+            # Get VWC values for this time bin
+            bin_vwc = vwc[time_mask]
+            
+            # Apply minimum count threshold
+            if len(bin_vwc) >= minvalperbin:
+                binned_mjd.append(day_mjd)
+                binned_vwc.append(np.mean(bin_vwc))
+                binned_binstarts.append(actual_bin_start)
+    
+    print(f'Generated {len(binned_mjd)} time-binned VWC estimates from track data')
+    return binned_mjd, binned_vwc, binned_binstarts
+
+
+def clara_efficient_hourly_vwc(station, year, fr, bin_hours, bin_offset, minvalperbin, subdir=''):
+    """
+    Efficient hourly VWC generation using saved Clara model track data
+    
+    This function provides a fast alternative to full vegetation model reprocessing
+    for hourly VWC generation. It requires that individual track files have been
+    previously saved using -save_tracks T.
+    
+    Parameters
+    ----------
+    station : str
+        4-character station name
+    year : int
+        Analysis year
+    fr : int
+        Frequency code (20 for L2C, etc.)
+    bin_hours : int
+        Time bin size in hours
+    bin_offset : int
+        Bin timing offset in hours
+    minvalperbin : int
+        Minimum tracks required per time bin
+    subdir : str
+        Subdirectory for output files
+        
+    Returns
+    -------
+    success : bool
+        True if VWC file was successfully generated
+    """
+    # Load and re-bin saved track data
+    binned_mjd, binned_vwc, binned_binstarts = load_and_rebin_track_data(
+        station, year, subdir, fr, bin_hours, bin_offset, minvalperbin)
+    
+    if not binned_mjd:
+        return False
+    
+    # Write VWC output file
+    avc.write_vwc_output(station, binned_mjd, binned_vwc, year, subdir, 
+                         bin_hours, bin_offset, fr, binned_binstarts)
+    
+    print(f'Successfully generated efficient VWC output with {len(binned_mjd)} time bins')
+    return True
 
 
 if __name__ == "__main__":

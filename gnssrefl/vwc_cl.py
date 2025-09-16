@@ -43,6 +43,7 @@ def parse_arguments():
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
     parser.add_argument("-advanced", default=None, type=str, help="DEPRECATED: use -vegetation_model clara_high instead. Enables Clara's advanced vegetation model")
     parser.add_argument("-vegetation_model", default=None, choices=['simple', 'clara_high'], help="Vegetation correction model: simple (default) or clara_high")
+    parser.add_argument("-save_tracks", default=None, type=str, help="Save individual track VWC data (Clara model only)")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
     parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes",type=int) 
 
@@ -51,7 +52,7 @@ def parse_arguments():
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced']
+    boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced','save_tracks']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
@@ -62,7 +63,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         bin_hours: int = None, minvalperbin: int = None, bin_offset: int = None,
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None, 
         warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False, 
-        advanced : bool=False, vegetation_model: str=None, extension:str=None, level_doys : list =[] ):
+        advanced : bool=False, vegetation_model: str=None, save_tracks: bool=False, extension:str=None, level_doys : list =[] ):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
     It concatenates previously computed phase results, makes plots for the four geographic quadrants, computes daily 
@@ -503,7 +504,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         
         # Apply Clara's vegetation model directly
         avc.clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir,
-                                         bin_hours, bin_offset, plt, fr, minvalperbin)
+                                         bin_hours, bin_offset, plt, fr, minvalperbin, save_tracks)
         
         # Make phase plot if requested  
         if plt:
