@@ -608,7 +608,7 @@ def low_pct(amp, basepercent):
     return lowval
 
 
-def apply_baseline_leveling(vwc_values, years, doys, level_doys, tmin, polyorder=-99):
+def apply_baseline_leveling(vwc_values, years, doys, level_doys, tmin, polyorder=-99, station=None, plot_debug=False, plt2screen=True, subdir='', fr=20, bin_hours=24, bin_offset=0):
     """
     Apply global baseline leveling to VWC values using per-year nodes and polynomial fitting.
 
@@ -706,7 +706,74 @@ def apply_baseline_leveling(vwc_values, years, doys, level_doys, tmin, polyorder
     
     print(f'Applied baseline leveling with {howmanynodes} nodes, polynomial order {polyordernum}')
     
+    # Generate debug plot if requested
+    if plot_debug and station:
+        import os
+        xdir = os.environ.get('REFL_CODE', '.')
+        suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+        plot_suffix = suffix.replace('.txt', '.png')
+        
+        if subdir:
+            plot_path = f'{xdir}/Files/{subdir}/{station}_baseline_leveling{plot_suffix}'
+            os.makedirs(f'{xdir}/Files/{subdir}', exist_ok=True)
+        else:
+            plot_path = f'{xdir}/Files/{station}_baseline_leveling{plot_suffix}'
+            os.makedirs(f'{xdir}/Files', exist_ok=True)
+            
+        plot_baseline_leveling(station, years, doys, vwc_values, new_level, nodes, plot_path, tmin, level_doys, plt2screen)
+    
     return leveled_vwc, nodes
+
+
+def plot_baseline_leveling(station, years, doys, vwc_values, new_level, nodes, plot_path, tmin, level_doys, plt2screen=True):
+    """
+    Plot baseline leveling results - before/after style like vegetation correction
+    """
+    import matplotlib.pyplot as plt
+    
+    # Convert to fractional years for plotting
+    t = years + doys/365.25
+    # Apply the same conversion as the actual function: convert to decimal and add tmin offset
+    leveled_vwc = tmin + (vwc_values - new_level) / 100
+    
+    plt.figure(figsize=(10, 6))
+    
+    # Add faded yellow highlight for baseline periods
+    year_start = int(np.min(years))
+    year_end = int(np.max(years))
+    for yr in range(year_start, year_end + 1):
+        if level_doys[0] > level_doys[1]:  # crosses year boundary
+            t1 = (yr - 1) + level_doys[0]/365.25
+            t2 = yr + level_doys[1]/365.25
+        else:
+            t1 = yr + level_doys[0]/365.25
+            t2 = yr + level_doys[1]/365.25
+        plt.axvspan(t1, t2, alpha=0.2, color='yellow', label='Baseline period' if yr == year_start else "")
+    
+    # Plot before (blue) and after (red) on same scale
+    plt.plot(t, vwc_values / 100, 'b-', alpha=0.7, label='Before leveling')
+    plt.plot(t, leveled_vwc, 'r-', alpha=0.7, label='After leveling')
+    
+    # Plot polynomial baseline
+    plt.plot(t, new_level / 100, 'g--', linewidth=2, label='Polynomial baseline')
+    
+    # Plot level nodes
+    if len(nodes) > 0:
+        node_t = nodes[:, 0] + nodes[:, 1]/365.25
+        plt.plot(node_t, nodes[:, 2] / 100, 'ko', markersize=6, label='Level nodes')
+    
+    plt.ylabel('VWC (m³/m³)')
+    plt.xlabel('Year')
+    plt.title(f'{station.upper()} Baseline Leveling')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.savefig(plot_path, dpi=150, bbox_inches='tight')
+    print(f'Saved leveling plot: {plot_path}')
+    
+    if not plt2screen:
+        plt.close()
 
 
 def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
@@ -882,7 +949,9 @@ def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=2
     newvwc = 100 * tmin + 1.48 * (newph - residval);
     
     # Apply unified baseline leveling
-    nv, nodes = apply_baseline_leveling(newvwc, years, doys, level_doys, tmin, polyorder)
+    nv, nodes = apply_baseline_leveling(newvwc, years, doys, level_doys, tmin, polyorder,
+                                       station=station, plot_debug=plt2screen, plt2screen=plt2screen,
+                                       subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset)
 
 
     plt.figure(figsize=(10, 10))

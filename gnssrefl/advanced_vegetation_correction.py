@@ -532,7 +532,9 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
     final_doys = np.array(final_doys)
     
     # Apply unified baseline leveling
-    fy, nodes = qp.apply_baseline_leveling(fy, final_years, final_doys, level_doys, tmin)
+    fy, nodes = qp.apply_baseline_leveling(fy, final_years, final_doys, level_doys, tmin, 
+                                         station=station, plot_debug=pltit, plt2screen=pltit,
+                                         subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset)
     
     # Apply bounds checking after leveling (Clara's second stage) 
     bad_indices = (fy > 0.6) | (fy < 0)  # fy is now in decimal units
