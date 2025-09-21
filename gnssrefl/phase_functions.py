@@ -608,6 +608,107 @@ def low_pct(amp, basepercent):
     return lowval
 
 
+def apply_baseline_leveling(vwc_values, years, doys, level_doys, tmin, polyorder=-99):
+    """
+    Apply global baseline leveling to VWC values using per-year nodes and polynomial fitting.
+
+    This is used by the simple and advanced (clara_high) vegetation correction algorithms. However, the Clara model
+    also applies track-based levelling before this.
+
+    
+    Parameters
+    ----------
+    vwc_values : numpy array
+        VWC values to be leveled (in percentage units, e.g., 0-60%)
+    years : numpy array
+        Year values corresponding to each VWC measurement
+    doys : numpy array
+        Day of year values corresponding to each VWC measurement
+    level_doys : list of int
+        [start_doy, end_doy] defining the dry season for baseline calculation
+    tmin : float
+        Minimum soil texture value (0.05 typical)
+    polyorder : int, optional
+        Polynomial order override. Default -99 uses automatic selection
+        
+    Returns
+    -------
+    leveled_vwc : numpy array
+        Leveled VWC values in decimal units (0.0-0.6 range)
+    nodes : numpy array
+        Level nodes used for polynomial fitting (for debugging/plotting)
+    """
+    
+    # Convert to fractional year for processing
+    t = years + doys/365.25
+    year_start = int(np.min(years))
+    year_end = int(np.max(years))
+    
+    # Calculate level nodes for each year
+    nodes = np.empty(shape=[0, 3])  # [year, doy, value]
+    
+    print('Baseline leveling - Level value points (year, doy, value):')
+    for yr in np.arange(year_start, year_end + 1):
+        # Handle year boundary crossing for southern hemisphere
+        if level_doys[0] > level_doys[1]:
+            # Cross year boundary (e.g., Dec to Jan)
+            MJD1 = int(g.ydoy2mjd(yr-1, level_doys[0]))
+            MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
+            t1 = (yr - 1) + level_doys[0]/365.25
+            t2 = yr + level_doys[1]/365.25
+        else:
+            # Normal case within same year
+            MJD1 = int(g.ydoy2mjd(yr, level_doys[0]))
+            MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
+            t1 = yr + level_doys[0]/365.25
+            t2 = yr + level_doys[1]/365.25
+            
+        # Find VWC values in the dry season window
+        tindex = (t > t1) & (t < t2)
+        summer_vwc = vwc_values[tindex]
+        
+        # Calculate mid-point for node placement
+        mid_mjd = int(0.5 * (MJD1 + MJD2))
+        mid_year, _, _, _, _, _, mid_doy = g.simpleTime(mid_mjd)
+        
+        if len(summer_vwc) > 0:
+            # Calculate 15% percentile minimum (Clara's approach)
+            basepercent = 0.15
+            lval = low_pct(summer_vwc, basepercent)
+            newl = [mid_year, mid_doy, lval]
+            nodes = np.append(nodes, [newl], axis=0)
+            print(f'  {mid_year} {mid_doy:3.0f} {lval:6.2f}')
+        else:
+            print(f'  No dry dates found to compute baseline for year {yr}')
+    
+    if len(nodes) == 0:
+        print('No baseline nodes found. Cannot apply leveling.')
+        return vwc_values / 100, nodes  # Convert to decimal, no leveling applied
+    
+    # Determine polynomial order
+    howmanynodes = len(nodes)
+    if polyorder >= 0:
+        print(f'Using user override polynomial order: {polyorder}')
+        polyordernum = polyorder
+    else:
+        polyordernum = howmanynodes - 1
+        print(f'Using automatic polynomial order: {polyordernum} (based on {howmanynodes} nodes)')
+    
+    # Fit polynomial to nodes
+    st = nodes[:, 0] + nodes[:, 1]/365.25  # Convert nodes to fractional years
+    sp = nodes[:, 2]  # Node VWC values
+    
+    anothermodel = np.polyfit(st, sp, polyordernum)
+    new_level = np.polyval(anothermodel, t)
+    
+    # Apply leveling: convert to decimal and apply tmin offset
+    leveled_vwc = tmin + (vwc_values - new_level) / 100
+    
+    print(f'Applied baseline leveling with {howmanynodes} nodes, polynomial order {polyordernum}')
+    
+    return leveled_vwc, nodes
+
+
 def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
         subdir='',hires_figs=False, extension='', bin_hours=24, bin_offset=0):
     """
@@ -779,36 +880,9 @@ def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=2
     vwc = 100 * tmin + 1.48 * (ph - residval);
     # this is our "vegetation corrected" value - though needs leveling
     newvwc = 100 * tmin + 1.48 * (newph - residval);
-    # acting on newvwc, year and doys
-    nodes = np.empty(shape=[0, 3])
-
-    # do not really need southern and northern here anymore.  Using True so I don't ahve to reindent everything.
-    if True:
-        print('Level value points (year, doy, value):')
-        for yr in np.arange(year, year_end+1):
-            # put in amplitude criteria to keep out bad L2P results
-            if level_doys[0] > level_doys[1]:
-                # this might be the case where you want to go from doy 330 in previous year to doy 40 in current year
-                MJD1 = int(g.ydoy2mjd(yr-1, level_doys[0]))
-                MJD2 = int(g.ydoy2mjd(yr,   level_doys[1]))
-                t1 = (yr - 1) + level_doys[0]/365.25 ; t2 = yr + level_doys[1]/365.25                
-            else:
-                MJD1 = int(g.ydoy2mjd(yr,   level_doys[0]))
-                MJD2 = int(g.ydoy2mjd(yr,   level_doys[1]))
-                t1 = yr + level_doys[0]/365.25 ; t2 = yr + level_doys[1]/365.25                
-            tindex = (t > t1) & (t < t2)
-            summer_vwc = newvwc[tindex]
-            mid_mjd = int(0.5*(MJD1+MJD2))
-            mid_year, _, _, _, _, _,mid_doy = g.simpleTime(mid_mjd)
-
-            if len(summer_vwc) > 0:
-                basepercent = 0.15
-                lval = low_pct(summer_vwc, basepercent)
-                # need to fix for date over the year boundary
-                newl = [mid_year, mid_doy, lval];
-                nodes = np.append(nodes, [newl], axis=0)
-            else:
-                print('No dry dates found to compute VWC', yr)
+    
+    # Apply unified baseline leveling
+    nv, nodes = apply_baseline_leveling(newvwc, years, doys, level_doys, tmin, polyorder)
 
 
     plt.figure(figsize=(10, 10))
@@ -841,33 +915,28 @@ def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=2
     plt.gcf().autofmt_xdate()
 
 
-    # More descriptive variable names would help 
-    st = nodes[:, 0] + nodes[:, 1]/365.25
-    st_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(nodes[:, 0], nodes[:, 1])]
-    sp = nodes[:, 2]
-    print(nodes)
-
-    howmanynodes = len(sp)
-    print('number of nodes', howmanynodes)
-    if howmanynodes == 0:
+    # Check if baseline leveling was successful
+    if len(nodes) == 0:
         print('No summer nodes found. Exiting.')
         if plt2screen:
             plt.show()
         else:
             plt.close('all')
         sys.exit()
-    
-    else:
-        polyordernum = howmanynodes - 1
-    if polyorder >= 0: # default is -99
-        print('>>> Using user override for polynomial order on leveling')
-        polyordernum = polyorder
 
+    # Prepare node data for plotting
+    st = nodes[:, 0] + nodes[:, 1]/365.25
+    st_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(nodes[:, 0], nodes[:, 1])]
+    sp = nodes[:, 2]
+    print(nodes)
+    
+    # Reconstruct the polynomial level for plotting
+    t = years + doys/365.25
+    polyordernum = len(nodes) - 1
+    if polyorder >= 0:
+        polyordernum = polyorder
     anothermodel = np.polyfit(st, sp, polyordernum)
     new_level = np.polyval(anothermodel, t)
-
-    # this is applying the level and the tmin values
-    nv = tmin + (newvwc - new_level) / 100
 
     ax = plt.subplot(2, 1, 2)
     ax.plot(t_datetime, newvwc, 'b-', label='new vwc')

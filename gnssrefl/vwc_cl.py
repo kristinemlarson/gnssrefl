@@ -504,7 +504,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         
         # Apply Clara's vegetation model directly
         avc.clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir,
-                                         bin_hours, bin_offset, plt, fr, minvalperbin, save_tracks)
+                                         bin_hours, bin_offset, plt, fr, minvalperbin, save_tracks, level_doys)
         
         # Make phase plot if requested  
         if plt:

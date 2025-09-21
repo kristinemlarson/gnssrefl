@@ -12,7 +12,7 @@ import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
 
 def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='', 
-                                bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False):
+                                bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False, level_doys=None):
     """
     Clara's high vegetation model
     
@@ -49,6 +49,9 @@ def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='',
         Minimum values required per time bin (default: 10)
     save_tracks : bool
         Save individual track VWC data to files (default: False)
+    level_doys : list of int, optional
+        [start_doy, end_doy] defining the dry season for baseline calculation
+        If None, will use default values based on hemisphere
     
     Returns
     -------
@@ -57,6 +60,14 @@ def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='',
     
     print('>>>>>>>>>>> Clara Chew High Vegetation Model <<<<<<<<<<<<')
     print(f'Processing {len(vxyz)} track observations for station {station}')
+    
+    # Set default level_doys if not provided 
+    if level_doys is None:
+        # Use default dry season periods (could be made more sophisticated)
+        level_doys = [152, 244]  # Default summer dry season for northern hemisphere
+        print(f'Using default level_doys: {level_doys}')
+    else:
+        print(f'Using provided level_doys: {level_doys}')
     
     # Warn about untested frequencies  
     if fr != 20:
@@ -88,7 +99,7 @@ def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='',
     print('Step 2: Applying vegetation model...')
     final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks, 
                                                   sgolnum, sgolply, padlen, tmin, pltit, 
-                                                  fr, bin_hours, bin_offset, subdir, tv, minvalperbin, save_tracks)
+                                                  fr, bin_hours, bin_offset, subdir, tv, minvalperbin, save_tracks, level_doys)
     
     if len(final_mjd) == 0:
         print('No vegetation-corrected soil moisture estimates could be computed')
@@ -113,8 +124,8 @@ def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='',
         # Convert MJD to datetime for plotting
         datetime_array = sd.mjd_to_obstimes(np.array(final_mjd))
         
-        # Use the standard vwc_plot function (convert back to percentage for plotting)
-        qp.vwc_plot(station, datetime_array, np.array(final_vwc) * 100, plot_path, circles=False, plt2screen=pltit)
+        # Use the standard vwc_plot function (final_vwc already in decimal units)
+        qp.vwc_plot(station, datetime_array, np.array(final_vwc), plot_path, circles=False, plt2screen=pltit)
     
     print(f'Clara high vegetation model completed for {station}')
 
@@ -297,7 +308,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
 
 
 def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply, 
-                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, tv, minvalperbin, save_tracks=False):
+                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, tv, minvalperbin, save_tracks=False, level_doys=None):
     """
     Apply Clara's vegetation filter to compute soil moisture
     
@@ -335,6 +346,8 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Minimum values required per time bin
     save_tracks : bool
         Save individual track VWC data to files
+    level_doys : list of int, optional
+        [start_doy, end_doy] defining the dry season for baseline calculation
         
     Returns
     -------
@@ -504,20 +517,26 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             print('No daily averages could be computed')
         return [], []
         
-    # Apply leveling
-    fy = np.asarray(finaly)
-    fsorted = np.sort(fy)
-    lowest25 = np.mean(fsorted[0:min(25, len(fsorted))])
+    # Apply sophisticated baseline leveling (same as simple model)
+    fy = np.asarray(finaly)  # VWC values in percentage
     
-    # Level the data
-    fy = (100 * tmin + (fy - lowest25)) / 100
+    # Convert MJD back to years and DOYs for leveling function
+    final_years = []
+    final_doys = []
+    for mjd_val in finalx:
+        year_val, month, day, hour, minute, second, doy = g.simpleTime(mjd_val)
+        final_years.append(year_val)
+        final_doys.append(doy)
     
-    # Apply bounds checking after leveling (Clara's second stage)
-    bad_indices = (fy > 60) | (fy < 0)
+    final_years = np.array(final_years)
+    final_doys = np.array(final_doys)
+    
+    # Apply unified baseline leveling
+    fy, nodes = qp.apply_baseline_leveling(fy, final_years, final_doys, level_doys, tmin)
+    
+    # Apply bounds checking after leveling (Clara's second stage) 
+    bad_indices = (fy > 0.6) | (fy < 0)  # fy is now in decimal units
     fy[bad_indices] = np.nan
-    
-    # Convert from percentage to decimal for output (0-60% -> 0.0-0.6)
-    fy = fy / 100
     
     return finalx, fy.tolist(), final_binstarts
 
