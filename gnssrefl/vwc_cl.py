@@ -352,8 +352,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
                     # this is ok for regular model - not so good for big vegetation sites
                     ii = (new_phase > -20) & (new_phase < 60)
-                    # just wondering
-                    if advanced:
+                    # Apply wider bounds for high vegetation model
+                    if advanced or vegetation_model == 'clara_high':
                         ii = (new_phase > -30) & (new_phase < 100)
 
                     y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs,ap_rhs,mjds = \
@@ -479,7 +479,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     #Need to Define clearly the stored values in vxyz
 
-    # Handle vegetation model selection
+    # Handle vegetation model selection - do this early so phase bounds can use it
     veg_model = 'simple'  # default
     if advanced:
         print("Warning: -advanced is deprecated, use -vegetation_model clara_high instead")

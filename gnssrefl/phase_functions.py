@@ -612,10 +612,6 @@ def apply_baseline_leveling(vwc_values, years, doys, level_doys, tmin, polyorder
     """
     Apply global baseline leveling to VWC values using per-year nodes and polynomial fitting.
 
-    This is used by the simple and advanced (clara_high) vegetation correction algorithms. However, the Clara model
-    also applies track-based levelling before this.
-
-    
     Parameters
     ----------
     vwc_values : numpy array
