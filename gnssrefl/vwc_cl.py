@@ -174,6 +174,17 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
             print(f"Error: bin_offset must be 0 <= offset < bin_hours ({bin_hours})")
             sys.exit()
 
+    # Handle vegetation model selection - do this early so phase bounds can use it
+    veg_model = 'simple'  # default
+    if advanced:
+        print("Warning: -advanced is deprecated, use -vegetation_model clara_high instead")
+        veg_model = 'clara_high'  # -advanced T is shorthand for clara_high
+    elif vegetation_model:
+        veg_model = vegetation_model
+        # Set advanced=True when using clara_high to trigger all advanced behavior
+        if veg_model == 'clara_high':
+            advanced = True
+
     fs =10 # fontsize
     snow_file = None
     colors = 'mrgbcykmrgbcykmrbcykmrgbcykmrgbcykmrbcyk'
@@ -478,14 +489,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
 
     #Need to Define clearly the stored values in vxyz
-
-    # Handle vegetation model selection - do this early so phase bounds can use it
-    veg_model = 'simple'  # default
-    if advanced:
-        print("Warning: -advanced is deprecated, use -vegetation_model clara_high instead")
-        veg_model = 'clara_high'  # -advanced T is shorthand for clara_high
-    elif vegetation_model:
-        veg_model = vegetation_model
 
     if veg_model == 'clara_high':
         print('Running Clara Chew high vegetation model...')
