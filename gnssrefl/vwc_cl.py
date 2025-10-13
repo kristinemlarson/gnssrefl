@@ -237,7 +237,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     k = 1
     # define the contents of this variable HERE
-    vxyz = np.empty(shape=[0, 15]) 
+    vxyz = np.empty(shape=[0, 16]) 
     # newl = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,qs)).T
     # column, contents of this variable
     # 0 year
@@ -255,6 +255,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # 12 quadrant (pboh2o style)
     # 13 delRH (for adv model)
     # 14 vegMask (for adv model)
+    # 15 MJD for Kristine's sanity
 
 
     # this is the number of points for a given satellite track
@@ -306,7 +307,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         for satellite in satlist:
             # set the indices for the satellite and quadrant you want to look at here
             ii = (ssat == satellite) & (azdata > amin) & (azdata < amax) & (phase < 360)
-            y,t,h,x,azd,s,amp_lsps,amp_lss,rhs,ap_rhs = \
+            # added mjd as an output
+            y,t,h,x,azd,s,amp_lsps,amp_lss,rhs,ap_rhs,mjds = \
                     qp.rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp_lsp, amp_ls, rh, ap_rh, ii)
             if screenstats:
                 print('Looking at ', int(satellite), amin, amax,' Num vals', len(y))
@@ -327,7 +329,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
                 # this might be a problem ???? maybe use -30?
                 ii = (new_phase > -20)
 
-                y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs,ap_rhs = \
+                y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs,ap_rhs,mjds = \
                         qp.rename_vals(y, t, h, new_phase, azd, s, amp_lsps, amp_lss, rhs, ap_rhs,ii)
 
                 if len(t) == 0:
@@ -348,7 +350,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
                     if advanced:
                         ii = (new_phase > -30) & (new_phase < 100)
 
-                    y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs,ap_rhs = \
+                    y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs,ap_rhs,mjds = \
                             qp.rename_vals(y, t, h, new_phase, azd, s, amp_lsps, amp_lss, rhs, ap_rhs, ii)
 
                     sortY = np.sort(new_phase)
@@ -360,8 +362,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
                     newl = np.vstack((y, t, new_phase, azd)).T
                     vquad = np.vstack((vquad, newl))
-                    if screenstats:
-                        print('here0')
 
                     # this is to normalize the amplitudes. use base 15% to set it
                     basepercent = 0.15
@@ -378,7 +378,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
                     vegMask = np.zeros(shape=[NN,1])
                     vegMask[i] = 1
 
-                    newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs,qs,delRH,vegMask.T)).T
+                    # Sep 8, 2025 add MJD
+                    # this is for advanced ... 
+                    newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs,qs,delRH,vegMask.T,mjds)).T
                     #newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs,qs)).T
 
                     newl = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP,norm_ampLS,h,amp_lsps,amp_lss,ap_rhs)).T

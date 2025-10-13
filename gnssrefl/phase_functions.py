@@ -1873,18 +1873,30 @@ def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp_lsp, amp_ls, r
     this is just trying to clean up vwc.py  
     send indices ii - and return renamed variables.  
 
+    calculates and also returns mjd
+
     Parameters
     ----------
-    year_sat_sat
-    doy : 
-    hr : 
-    phase : 
-    azdata : 
-    ssat : 
-    amp_lsp : 
-    amp_ls
-    rh : 
-    ap_rh :
+    year_sat_sat:
+
+    doy :  numpy array
+        day of year (int)
+    hr : numpy array 
+        floats (UTC hour)
+    phase : numpy array of floats
+        estimated phase (deg)
+    azdata : numpy array of floats
+        azimuth (deg)
+    ssat : numpy array of int
+        satellite numbers
+    amp_lsp :  numpy array of floats
+        lomb scargle periodogram amplitude
+    amp_ls : numpy array of floats
+        least squares amplitude
+    rh : numpy array of floats 
+        reflector heights (m)
+    ap_rh : 
+        apriori reflector height (m)
     ii :
 
     Returns
@@ -1908,6 +1920,8 @@ def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp_lsp, amp_ls, r
         estimated RH (m)
     ap_rhs : numpy array of floats
         a priori RH (m)
+    mjds : numpy array of int 
+        Modified julian day
 
     """
     y = year_sat_phase[ii]
@@ -1922,7 +1936,18 @@ def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp_lsp, amp_ls, r
     rhs = rh[ii] # estimated RH
     ap_rhs = ap_rh[ii] # apriori RH
 
-    return y,t,h,x,azd,s,amps_lsp,amps_ls,rhs, ap_rhs
+    Nv = len(t)
+    # only know how to do this in a loop ... 
+    mjds = []
+    for i in range(Nv):
+        mjd = g.ydoy2mjd(int(y[i]), int(t[i]))
+        mjds.append(mjd)
+
+    mjds = np.asarray(mjds)
+    # ???
+    mjds = mjds.T
+
+    return y,t,h,x,azd,s,amps_lsp,amps_ls,rhs, ap_rhs, mjds
 
 
 def write_out_raw_phase(v,fname):
@@ -1998,6 +2023,8 @@ def write_phase_for_advanced(filename, vxyz):
 
     File now written to $REFL_CODE/Files/<station>/<station>_all_phase.txt
 
+    September 8, 2025: Added a new column for MJD
+
     Parameters
     ----------
     filename : str
@@ -2011,11 +2038,11 @@ def write_phase_for_advanced(filename, vxyz):
     #headers for output file - these are not correct BTW
     print('Writing interim file for advanced vegetation model ', filename)
     h0 = "File created by vwc function write_phase_for_advanced \n"
-    h1 = "Year DOY Phase  Azim Sat    RH    nLSPA nLSA    Hour   LSPA   LS  apRH  quad  delRH  vegM\n"
-    h2 = "(1)  (2)  (3)   (4)  (5)    (6)    (7)   (8)     (9)   (10)  (11)  (12)  (13)  (14)  (15) "
+    h1 = "Year DOY Phase  Azim Sat    RH    nLSPA nLSA    Hour   LSPA   LS  apRH  quad  delRH  vegM  MJD \n"
+    h2 = "(1)  (2)  (3)   (4)  (5)    (6)    (7)   (8)     (9)   (10)  (11)  (12)  (13)  (14)  (15)  (16)"
     #2012   1   9.19  315.6  1   1.850   0.97   0.98  0.59 19.80 19.79  1.85  2
     with open(filename, 'w') as my_file:
-        np.savetxt(my_file, vxyz, fmt="%4.0f %3.0f %6.2f %6.1f %2.0f %7.3f %6.2f %6.2f %5.2f %6.2f %6.2f %6.3f %2.0f %6.3f %2.0f  ",header=h0+h1+h2,comments='%')
+        np.savetxt(my_file, vxyz, fmt="%4.0f %3.0f %6.2f %6.1f %2.0f %7.3f %6.2f %6.2f %5.2f %6.2f %6.2f %6.3f %2.0f %6.3f %2.0f %8.0f ",header=h0+h1+h2,comments='%')
 
     return
 #                   if adhoc_snow:

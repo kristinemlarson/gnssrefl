@@ -4,11 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## 3.18.1
-Spetember 5, 2025
+September 5, 2025
 
 Added flexibly time periods for the leveling used in vwc.
 They can be added in the json, on the command line, or one
 can keep using the defaults. See documentation in vwc.py
+
+Tried to improve file format description.  Hopefully any other changes
+are not a problem.
 
 ## 3.18.0
 August 25, 2025

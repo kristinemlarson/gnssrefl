@@ -16,6 +16,8 @@ gnssrefl also has a DOI from zenodo.
 
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.5601494.svg)](http://dx.doi.org/10.5281/zenodo.5601494) 
 
+[Time to upgrade to python 3.10](https://devguide.python.org/versions/)
+
 The latest pypi version can be found here [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
 Latest Features

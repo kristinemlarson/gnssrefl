@@ -1,6 +1,8 @@
 env
 gnss/*
+felipe_plot.py
 rise_set_tracks.py
+highveg_model.py
 developer_notes.md
 new.pyproject.toml
 meson.build

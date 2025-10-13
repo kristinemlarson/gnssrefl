@@ -287,10 +287,11 @@ azimuth-specific mask is decided later when you run **gnssir**.  The SNR choices
 - 50 is elevation angles less than 10 degrees (good for very tall sites, high-rate applications)
 
 66,99, etc are not good names for files. And for this I apologize. It is too late to change them now.
+The SNR files are not self-documenting (i.e. there is no header) and for that I also apologize.
 
 The columns in the SNR data are defined as:
 
-- Satellite number (remember 100 is added for Glonass, 200 for Galileo etc)
+- Satellite number (remember 100 is added for Glonass, 200 for Galileo, 300 for Beidou)
 - Elevation angle, degrees
 - Azimuth angle, degrees
 - **Seconds of the day, GPS time**
@@ -302,19 +303,28 @@ The columns in the SNR data are defined as:
 -  S7 SNR on L7
 -  S8 SNR on L8
 
-The unit for all SNR data is dB-Hz.
+The unit for all SNR data is dB-Hz. In some cases these frequencies come from RINEX conventions.
+The constellation people themselves do not use them.  See below for more information.
+
+I do not currently use SBAS signals, but they would be easy to add if someone wants to make a PR.
+I suggest 400 be added to such signals and someone needs to define the various organizations that 
+run SBAS satellites. 
 
 ## GNSS frequencies
+
+gnssrefl uses numbers for the frequencies that are defined in the RINEX files:
 
 - 1,2,20, and 5 are GPS L1, L2, L2C, and L5 
 
 - 101,102 are Glonass L1 and L2
 
-- 201, 205, 206, 207, 208: Galileo frequencies, which are
+- 201, 205, 206, 207, 208 are Galileo frequencies, which are
 set as 1575.420, 1176.450, 1278.70, 1207.140, 1191.795 MHz
 
-- 302, 306, 307 : Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz
+- 302, 306, 307 are Beidou frequencies, defined as 1561.098, 1207.14, 1268.52 MHz
 
+This means that if you want the Beidou frequency data from 1561.098, you need to look in the "L2" column.
+If you want the 1278.70 Galileo frequency, you need to look in the "L6" column.
 
 ## Additional files 
 

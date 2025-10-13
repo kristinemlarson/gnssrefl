@@ -439,7 +439,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     # set noexit cause otherwise it exits ...
     lsp = guts2.read_json_file(station[0:4].lower(), extension,noexit=True)
 
-    print('Passed value of snr ', snr)
+    #print('Passed value of snr ', snr)
     if snr is None: # nothing on the command line
         #print('You did not set the snr option on the command line')
         if 'snr' in lsp:
