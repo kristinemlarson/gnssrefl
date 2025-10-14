@@ -123,7 +123,7 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
     # Calculate fractional year
     t = years + doys/365.25
     tspan = t[-1] - t[0]
-    print('>>> Timespan in years: ', np.round(tspan, 3))
+    print('Timespan in years: ', np.round(tspan, 3))
 
     # Apply 30-day smoothing to amplitude
     window_len = 30
@@ -151,11 +151,17 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
     vwc = 100 * tmin + 1.48 * (ph - residval)
     newvwc = 100 * tmin + 1.48 * (newph - residval)
 
-    # Apply global baseline leveling using shared function
-    nv, nodes = qp.apply_baseline_leveling(newvwc, years, doys, level_doys, tmin, polyorder,
-                                          station=station, plot_debug=plt2screen, plt2screen=plt2screen,
-                                          subdir=subdir, fr=fr, bin_hours=bin_hours,
-                                          bin_offset=bin_offset)
+    # Apply baseline leveling using unified function
+    nv, leveling_info = qp.apply_vwc_leveling(
+        newvwc, tmin,
+        method='polynomial',
+        years=years, doys=doys, level_doys=level_doys, polyorder=polyorder,
+        station=station, plot_debug=plt2screen, plt2screen=plt2screen,
+        subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
+    )
+
+    # Extract nodes for plotting (polynomial method returns nodes)
+    nodes = leveling_info.get('nodes', np.empty(shape=[0, 3]))
 
     # Create datetime objects for plotting
     if is_subdaily:
@@ -246,7 +252,7 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
     base_vwcfile = file_manager.get_file_path()
 
     vwcfile = base_vwcfile.parent / f"{station}_vwc{suffix}.txt"
-    print('>>> VWC results being written to ', vwcfile)
+    print('VWC results being written to ', vwcfile)
 
     with open(vwcfile, 'w') as w:
         N = len(nv)

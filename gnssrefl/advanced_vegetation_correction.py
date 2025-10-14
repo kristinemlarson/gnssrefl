@@ -517,36 +517,29 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             print('No daily averages could be computed')
         return [], []
         
-    # Apply sophisticated baseline leveling (same as simple model)
+    # Apply global baseline leveling to time-averaged VWC
     fy = np.asarray(finaly)  # VWC values in percentage
-    
-    # Convert MJD back to years and DOYs for leveling function
-    final_years = []
-    final_doys = []
-    for mjd_val in finalx:
-        year_val, month, day, hour, minute, second, doy = g.simpleTime(mjd_val)
-        final_years.append(year_val)
-        final_doys.append(doy)
-    
-    final_years = np.array(final_years)
-    final_doys = np.array(final_doys)
-    
-    # Apply baseline leveling
-    # For now, using simple method for testing
 
-    # Option 1: "kludge" approach
-    if True:  # Change to False use sophisticated leveling
-        fsorted = np.sort(fy)
-        num_baseline_values = min(25, len(fsorted) // 4)  # Use 25 or 25% of data, whichever is smaller
-        lowest_baseline = np.mean(fsorted[0:num_baseline_values])
-        fy = (100 * tmin + (fy - lowest_baseline)) / 100
-        print(f'Applied simple baseline leveling using lowest {num_baseline_values} values')
-    else:
-        # Option 2: sophisticated levelling, same as simple model, not really working
-        fy, nodes = qp.apply_baseline_leveling(fy, final_years, final_doys, level_doys, tmin, 
-                                             station=station, plot_debug=pltit, plt2screen=pltit,
-                                             subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset)
-        print('Applied sophisticated baseline leveling')
+    # Select leveling method
+    # Options: 'simple_global' (matches Kristine's reference), 'polynomial' (sophisticated)
+    leveling_method = 'simple_global'  # Matches Kristine's reference implementation
+
+    # Apply leveling (MJD auto-converts to years/doys internally if needed)
+    fy, leveling_info = qp.apply_vwc_leveling(
+        fy, tmin,
+        method=leveling_method,
+        mjd=finalx,  # Auto-converts to years/doys internally
+        level_doys=level_doys,
+        station=station, plot_debug=pltit, plt2screen=pltit,
+        subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
+    )
+
+    # Report results
+    print(f"Applied '{leveling_info['method']}' baseline leveling")
+    if leveling_info['baseline_points']:
+        print(f"  Used {leveling_info['baseline_points']} baseline points")
+    if leveling_info['baseline_value'] is not None:
+        print(f"  Baseline offset: {leveling_info['baseline_value']:.2f}%")
     
     # Apply bounds checking after leveling (Clara's second stage) 
     bad_indices = (fy > 0.6) | (fy < 0)  # fy is now in decimal units

@@ -623,117 +623,236 @@ def low_pct(amp, basepercent):
     return lowval
 
 
-def apply_baseline_leveling(vwc_values, years, doys, level_doys, tmin, polyorder=-99, station=None, plot_debug=False, plt2screen=True, subdir='', fr=20, bin_hours=24, bin_offset=0):
+def apply_vwc_leveling(vwc_values, tmin,
+                       method='polynomial',
+                       years=None, doys=None, mjd=None,
+                       level_doys=None, polyorder=-99,
+                       **kwargs):
     """
-    Apply global baseline leveling to VWC values using per-year nodes and polynomial fitting.
+    Apply global baseline leveling to time-averaged VWC estimates.
+
+    This is the FINAL leveling step applied to time-binned VWC values.
+
+    Two leveling approaches are available:
+    - simple_global: Simple approach using fixed 25 lowest points (for testing)
+    - polynomial: Sophisticated per-year polynomial fitting (uses dry season nodes)
 
     Parameters
     ----------
-    vwc_values : numpy array
-        VWC values to be leveled (in percentage units, e.g., 0-60%)
-    years : numpy array
-        Year values corresponding to each VWC measurement
-    doys : numpy array
-        Day of year values corresponding to each VWC measurement
-    level_doys : list of int
-        [start_doy, end_doy] defining the dry season for baseline calculation
+    vwc_values : array-like
+        Time-averaged VWC values in percentage units (0-60 range)
+        These should be AFTER per-track processing and time-averaging
     tmin : float
         Minimum soil texture value (0.05 typical)
+    method : str, optional
+        Leveling method (default: 'polynomial'):
+        - 'simple_global': Global baseline using fixed 25 lowest points (Clara's reference)
+        - 'polynomial': Per-year nodes with polynomial baseline (most sophisticated)
+    years : array-like, optional
+        Year values (required for 'polynomial' method, or auto-derived from mjd)
+    doys : array-like, optional
+        Day of year values (required for 'polynomial' method, or auto-derived from mjd)
+    mjd : array-like, optional
+        Modified Julian Day values (alternative to years/doys, will be auto-converted)
+    level_doys : list of int, optional
+        [start_doy, end_doy] for dry season baseline (required for 'polynomial' method)
     polyorder : int, optional
-        Polynomial order override. Default -99 uses automatic selection
-        
+        Polynomial order override for 'polynomial' method (default: -99 = auto)
+    **kwargs : dict
+        Optional parameters for polynomial method:
+        - station : str (for plot labels)
+        - plot_debug : bool (generate diagnostic plots)
+        - plt2screen : bool (show plots on screen)
+        - subdir : str (subdirectory for output)
+        - fr : int (frequency code for file naming)
+        - bin_hours : int (temporal binning for file naming)
+        - bin_offset : int (temporal offset for file naming)
+
     Returns
     -------
-    leveled_vwc : numpy array
+    leveled_vwc : numpy.ndarray
         Leveled VWC values in decimal units (0.0-0.6 range)
-    nodes : numpy array
-        Level nodes used for polynomial fitting (for debugging/plotting)
+    info : dict
+        Additional information about the leveling:
+        - 'method': str - Method used
+        - 'nodes': numpy.ndarray or None - Level nodes (polynomial method only)
+        - 'baseline_points': int or None - Number of baseline points used
+        - 'baseline_value': float or None - Baseline offset (simple_global only)
+
+    Examples
+    --------
+    Simple global leveling (matches Kristine's reference):
+    >>> leveled, info = apply_vwc_leveling(vwc, tmin=0.05, method='simple_global')
+
+    Polynomial leveling with years/doys:
+    >>> leveled, info = apply_vwc_leveling(vwc, tmin=0.05, method='polynomial',
+    ...                                    years=yrs, doys=dys, level_doys=[152, 244])
+
+    Polynomial leveling with MJD (auto-converts to years/doys):
+    >>> leveled, info = apply_vwc_leveling(vwc, tmin=0.05, method='polynomial',
+    ...                                    mjd=mjd_list, level_doys=[152, 244])
     """
-    
-    # Convert to fractional year for processing
-    t = years + doys/365.25
-    year_start = int(np.min(years))
-    year_end = int(np.max(years))
-    
-    # Calculate level nodes for each year
-    nodes = np.empty(shape=[0, 3])  # [year, doy, value]
-    
-    print('Baseline leveling - Level value points (year, doy, value):')
-    for yr in np.arange(year_start, year_end + 1):
-        # Handle year boundary crossing for southern hemisphere
-        if level_doys[0] > level_doys[1]:
-            # Cross year boundary (e.g., Dec to Jan)
-            MJD1 = int(g.ydoy2mjd(yr-1, level_doys[0]))
-            MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
-            t1 = (yr - 1) + level_doys[0]/365.25
-            t2 = yr + level_doys[1]/365.25
+
+    # Convert inputs to numpy arrays
+    vwc_values = np.asarray(vwc_values)
+
+    # Initialize info dictionary
+    info = {
+        'method': method,
+        'nodes': None,
+        'baseline_points': None,
+        'baseline_value': None
+    }
+
+    # Handle MJD to years/doys conversion if needed
+    if mjd is not None and (years is None or doys is None):
+        mjd_array = np.asarray(mjd)
+        years = []
+        doys = []
+        for mjd_val in mjd_array:
+            year_val, month, day, hour, minute, second, doy = g.simpleTime(mjd_val)
+            years.append(year_val)
+            doys.append(doy)
+        years = np.array(years)
+        doys = np.array(doys)
+
+    # Method: simple_global - used for testing, from reference highveg_model.py by KL
+    if method == 'simple_global':
+        vwc_sorted = np.sort(vwc_values)
+        num_baseline = min(25, len(vwc_sorted))  # Fixed 25 points (or less if dataset is small)
+        baseline_value = np.mean(vwc_sorted[0:num_baseline])
+        leveled_vwc = (100 * tmin + (vwc_values - baseline_value)) / 100
+
+        info['baseline_points'] = num_baseline
+        info['baseline_value'] = baseline_value
+
+        # Create constant baseline for plotting (if temporal data available)
+        if years is not None and doys is not None:
+            years = np.asarray(years)
+            doys = np.asarray(doys)
+            baseline_curve = np.full_like(vwc_values, baseline_value)  # Constant baseline
+            nodes = np.empty(shape=[0, 3])  # No nodes for simple method
         else:
-            # Normal case within same year
-            MJD1 = int(g.ydoy2mjd(yr, level_doys[0]))
-            MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
-            t1 = yr + level_doys[0]/365.25
-            t2 = yr + level_doys[1]/365.25
-            
-        # Find VWC values in the dry season window
-        tindex = (t > t1) & (t < t2)
-        summer_vwc = vwc_values[tindex]
-        
-        # Calculate mid-point for node placement
-        mid_mjd = int(0.5 * (MJD1 + MJD2))
-        mid_year, _, _, _, _, _, mid_doy = g.simpleTime(mid_mjd)
-        
-        if len(summer_vwc) > 0:
-            # Calculate 15% percentile minimum (Clara's approach)
-            basepercent = 0.15
-            lval = low_pct(summer_vwc, basepercent)
-            newl = [mid_year, mid_doy, lval]
-            nodes = np.append(nodes, [newl], axis=0)
-            print(f'  {mid_year} {mid_doy:3.0f} {lval:6.2f}')
+            baseline_curve = None
+            nodes = None
+
+    # Method: polynomial - Sophisticated per-year baseline
+    elif method == 'polynomial':
+        # Validate required parameters
+        if years is None or doys is None:
+            raise ValueError("Polynomial method requires 'years' and 'doys' (or 'mjd')")
+        if level_doys is None:
+            raise ValueError("Polynomial method requires 'level_doys' parameter")
+
+        years = np.asarray(years)
+        doys = np.asarray(doys)
+
+        # Convert to fractional year for processing
+        t = years + doys / 365.25
+        year_start = int(np.min(years))
+        year_end = int(np.max(years))
+
+        # Calculate level nodes for each year
+        nodes = np.empty(shape=[0, 3])  # [year, doy, value]
+
+        print('Baseline leveling - Level value points (year, doy, value):')
+        for yr in np.arange(year_start, year_end + 1):
+            # Handle year boundary crossing for southern hemisphere
+            if level_doys[0] > level_doys[1]:
+                # Cross year boundary (e.g., Dec to Jan)
+                MJD1 = int(g.ydoy2mjd(yr - 1, level_doys[0]))
+                MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
+                t1 = (yr - 1) + level_doys[0] / 365.25
+                t2 = yr + level_doys[1] / 365.25
+            else:
+                # Normal case within same year
+                MJD1 = int(g.ydoy2mjd(yr, level_doys[0]))
+                MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
+                t1 = yr + level_doys[0] / 365.25
+                t2 = yr + level_doys[1] / 365.25
+
+            # Find VWC values in the dry season window
+            tindex = (t > t1) & (t < t2)
+            summer_vwc = vwc_values[tindex]
+
+            # Calculate mid-point for node placement
+            mid_mjd = int(0.5 * (MJD1 + MJD2))
+            mid_year, _, _, _, _, _, mid_doy = g.simpleTime(mid_mjd)
+
+            if len(summer_vwc) > 0:
+                # Calculate 15% percentile minimum (Clara's approach)
+                basepercent = 0.15
+                lval = low_pct(summer_vwc, basepercent)
+                newl = [mid_year, mid_doy, lval]
+                nodes = np.append(nodes, [newl], axis=0)
+                print(f'  {mid_year} {mid_doy:3.0f} {lval:6.2f}')
+            else:
+                print(f'  No dry dates found to compute baseline for year {yr}')
+
+        if len(nodes) == 0:
+            print('No baseline nodes found. Cannot apply polynomial leveling.')
+            print('Returning values with simple unit conversion only.')
+            leveled_vwc = vwc_values / 100
+            info['method'] = 'none (no nodes found)'
+            return leveled_vwc, info
+
+        # Determine polynomial order
+        howmanynodes = len(nodes)
+        if polyorder >= 0:
+            print(f'Using user override polynomial order: {polyorder}')
+            polyordernum = polyorder
         else:
-            print(f'  No dry dates found to compute baseline for year {yr}')
-    
-    if len(nodes) == 0:
-        print('No baseline nodes found. Cannot apply leveling.')
-        return vwc_values / 100, nodes  # Convert to decimal, no leveling applied
-    
-    # Determine polynomial order
-    howmanynodes = len(nodes)
-    if polyorder >= 0:
-        print(f'Using user override polynomial order: {polyorder}')
-        polyordernum = polyorder
+            polyordernum = howmanynodes - 1
+            print(f'Using automatic polynomial order: {polyordernum} (based on {howmanynodes} nodes)')
+
+        # Fit polynomial to nodes
+        st = nodes[:, 0] + nodes[:, 1] / 365.25  # Convert nodes to fractional years
+        sp = nodes[:, 2]  # Node VWC values
+
+        polynomial_coeffs = np.polyfit(st, sp, polyordernum)
+        baseline_curve = np.polyval(polynomial_coeffs, t)
+
+        # Apply leveling: convert to decimal and apply tmin offset
+        leveled_vwc = tmin + (vwc_values - baseline_curve) / 100
+
+        info['nodes'] = nodes
+        info['baseline_points'] = howmanynodes
+
+        print(f'Applied polynomial baseline leveling with {howmanynodes} nodes, order {polyordernum}')
+
     else:
-        polyordernum = howmanynodes - 1
-        print(f'Using automatic polynomial order: {polyordernum} (based on {howmanynodes} nodes)')
-    
-    # Fit polynomial to nodes
-    st = nodes[:, 0] + nodes[:, 1]/365.25  # Convert nodes to fractional years
-    sp = nodes[:, 2]  # Node VWC values
-    
-    anothermodel = np.polyfit(st, sp, polyordernum)
-    new_level = np.polyval(anothermodel, t)
-    
-    # Apply leveling: convert to decimal and apply tmin offset
-    leveled_vwc = tmin + (vwc_values - new_level) / 100
-    
-    print(f'Applied baseline leveling with {howmanynodes} nodes, polynomial order {polyordernum}')
-    
+        raise ValueError(f"Unknown leveling method: '{method}'. "
+                        f"Choose from: 'simple_global', 'polynomial'")
+
     # Generate debug plot if requested
-    if plot_debug and station:
-        import os
-        xdir = os.environ.get('REFL_CODE', '.')
-        suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
-        plot_suffix = suffix.replace('.txt', '.png')
-        
-        if subdir:
-            plot_path = f'{xdir}/Files/{subdir}/{station}_baseline_leveling{plot_suffix}'
-            os.makedirs(f'{xdir}/Files/{subdir}', exist_ok=True)
+    if kwargs.get('plot_debug', False) and kwargs.get('station'):
+        # Check if we have the data needed for plotting
+        if baseline_curve is not None and years is not None and doys is not None:
+            station = kwargs.get('station')
+            plt2screen = kwargs.get('plt2screen', True)
+            subdir = kwargs.get('subdir', '')
+            fr = kwargs.get('fr', 20)
+            bin_hours = kwargs.get('bin_hours', 24)
+            bin_offset = kwargs.get('bin_offset', 0)
+
+            import os
+            xdir = os.environ.get('REFL_CODE', '.')
+            suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+            plot_suffix = suffix.replace('.txt', '.png')
+
+            if subdir:
+                plot_path = f'{xdir}/Files/{subdir}/{station}_baseline_leveling{plot_suffix}'
+                os.makedirs(f'{xdir}/Files/{subdir}', exist_ok=True)
+            else:
+                plot_path = f'{xdir}/Files/{station}_baseline_leveling{plot_suffix}'
+                os.makedirs(f'{xdir}/Files', exist_ok=True)
+
+            plot_baseline_leveling(station, years, doys, vwc_values, baseline_curve,
+                                 nodes, plot_path, tmin, level_doys, plt2screen)
         else:
-            plot_path = f'{xdir}/Files/{station}_baseline_leveling{plot_suffix}'
-            os.makedirs(f'{xdir}/Files', exist_ok=True)
-            
-        plot_baseline_leveling(station, years, doys, vwc_values, new_level, nodes, plot_path, tmin, level_doys, plt2screen)
-    
-    return leveled_vwc, nodes
+            print('Skipping baseline leveling plot: temporal data not available')
+
+    return leveled_vwc, info
 
 
 def plot_baseline_leveling(station, years, doys, vwc_values, new_level, nodes, plot_path, tmin, level_doys, plt2screen=True):
@@ -785,323 +904,6 @@ def plot_baseline_leveling(station, years, doys, vwc_values, new_level, nodes, p
     
     if not plt2screen:
         plt.close()
-
-
-def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
-        subdir='',hires_figs=False, extension='', bin_hours=24, bin_offset=0):
-    """
-    Convert GPS phase to VWC. Using Clara Chew's algorithm from
-    Matlab write_vegcorrect_smc.m
-
-    .. deprecated::
-        This function is deprecated. Use `simple_vegetation_correction.simple_vegetation_filter()` instead.
-        This function remains for backward compatibility but may be removed in a future version.
-
-    https://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
-
-    Parameters
-    -----------
-    station : str
-        4 char station name
-    year : int
-        beginning year
-    level_doys : list of int
-        start and end day of year to set levels
-    year_end : int
-        last year
-    plt2screen : boolean
-        plots come to the screen
-    fr : integer
-        frequency
-        default is L2C (20)
-    tmin : float
-        soil texture minimum
-    tmax : float
-        soil texture maximum
-    polyorder : integer
-        override on the polynomial order used in leveling
-    circles : boolean
-        final plot using circles (instead of line)
-    subdir : str
-        subdirectory for $REFL_CODE/Files
-    hires_figs : bool
-        whether you want eps instead of png files created
-    extension : str
-        using special json LSP parameters
-    bin_hours : int
-        not sure - GT added
-    bin_offset : int
-        not sure - GT added
-
-    """
-
-    import warnings
-    warnings.warn(
-        "convert_phase() is deprecated and will be removed in a future version. "
-        "Use simple_vegetation_correction.simple_vegetation_filter() instead.",
-        DeprecationWarning,
-        stacklevel=2
-    )
-
-    if not year_end:
-        year_end = year
-
-    # read makejson
-    station_file = FileManagement(station, 'make_json')
-    json_data = gnssir.read_json_file(station, extension, silent=True)
-
-    #if json_data['lat'] >= 0:
-    #    print('Northern hemisphere summer')
-    #    southern = False
-    #elif json_data['lat'] < 0:
-    #    print('Southern hemisphere summer')
-    #    southern = True
-
-    #else:
-    #    print(f"The required json file could not be found or is invalid: {station_file.get_file_path()}")
-    #    sys.exit()
-
-    # for PBO H2O this was set using STATSGO. 5% is reasonable as a starting point for australia
-    #tmin = 0.05  # for now
-    #print('minimum texture value', tmin)
-    residval = 2  # for now
-
-    # daily average file of phase results
-    #file_manager = FileManagement(station, FileTypes.daily_avg_phase_results)
-    #avg_phase_results = file_manager.read_file(comments='%')
-
-    myxdir = os.environ['REFL_CODE']
-
-
-    # Use FileManagement for consistent phase file paths
-    file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
-    base_fileout = file_manager.get_file_path()
-    
-    # Generate consistent filename using temporal resolution
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
-    fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
-    
-    if os.path.exists(fileout):
-        avg_phase_results = np.loadtxt(fileout, comments='%')
-        if bin_hours < 24:
-            print(f'Found {bin_hours}-hour phase file: {fileout}')
-        else:
-            print(f'Found daily phase file: {fileout}')
-    else:
-        if bin_hours < 24:
-            print(f'No {bin_hours}-hour phase file found: {fileout}')
-        else:
-            print('Average phase results not found')
-        sys.exit()
-    if (len(avg_phase_results) == 0):
-        print('Empty results file')
-        sys.exit()
-        
-    # Auto-detect file format based on number of columns
-    if avg_phase_results.ndim == 1:
-        # Single row, reshape for consistency
-        avg_phase_results = avg_phase_results.reshape(1, -1)
-    
-    num_columns = avg_phase_results.shape[1]
-    if num_columns == 9:
-        is_subdaily = True
-        print('Detected 9-column subdaily format from file')
-    elif num_columns == 8:
-        is_subdaily = False  
-        print('Detected 8-column daily format from file')
-    else:
-        print(f'Unexpected file format: {num_columns} columns. Expected 8 (daily) or 9 (subdaily)')
-        sys.exit()
-
-
-    # get only the years requested - this matters if in previous steps more data was processed
-    avg_phase_results_requested = np.array([v for v in avg_phase_results if v[0] in np.arange(year, year_end+1)])
-
-    # Extract columns based on file format (8 vs 9 columns)
-    years = avg_phase_results_requested[:, 0]
-    doys = avg_phase_results_requested[:, 1]
-    ph = avg_phase_results_requested[:, 2]
-    phsig = avg_phase_results_requested[:, 3] # TODO this is not used in the rest of the code
-    amp = avg_phase_results_requested[:, 4]
-    months = avg_phase_results_requested[:, 6]
-    days = avg_phase_results_requested[:, 7]
-    
-    # For subdaily files, we have an additional BinStart column
-    if is_subdaily:
-        bin_start_hours = avg_phase_results_requested[:, 8]
-        print(f'Processing {len(avg_phase_results_requested)} subdaily measurements')
-    else:
-        print(f'Processing {len(avg_phase_results_requested)} daily measurements')
-
-    t = years + doys/365.25
-    tspan = t[-1] - t[0]
-    print('>>> Timespan in years: ', np.round(tspan,3))
-    if tspan < 1.5:
-        polyordernum = 0  # do nothing
-    else:
-        polyordernum =  int(np.floor(tspan - 0.5));
-    print('>>> Polynomial Order ', polyordernum)
-
-    # need to do a 30 day smoother on amp
-    window_len = 30
-    s = np.r_[amp[window_len - 1:0:-1], amp, amp[-2:-window_len - 1:-1]]
-    w = np.ones(window_len, 'd')
-    y = np.convolve(w / w.sum(), s, mode='valid')
-    # NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
-    y0 = int(window_len / 2 - 1);
-    y1 = -int(window_len / 2)
-    smamp = y[y0:y1]
-
-    # TODO do we want this plot as an option to display?
-    # plt.figure() #plt.plot(t, smamp, '-', t, amp,'o') #plt.show()
-
-    # original clara chew code
-    # residval is the median of the lowest 10 % of the values
-    wetwt = 10.6 * np.power(smamp, 4) - 34.9 * np.power(smamp, 3) + 41.8 * np.power(smamp, 2) - 22.6 * smamp + 5.24
-
-    # TODO this variable (below) is never used in the code
-    delphi = -5.65 * np.power(wetwt, 4) + 43.9 * np.power(wetwt, 3) - 101 * np.power(wetwt,
-                                                                                     2) + 20.4 * wetwt - 2.37;
-    # I think this is just changing the units by factor of 100
-    delphi = (smamp - 1) * 50.25 / 1.48;  # % CR 17jan12
-    newph = ph - delphi;
-    # resid value should be min value of the actual data
-
-    vwc = 100 * tmin + 1.48 * (ph - residval);
-    # this is our "vegetation corrected" value - though needs leveling
-    newvwc = 100 * tmin + 1.48 * (newph - residval);
-    
-    # Apply unified baseline leveling
-    nv, nodes = apply_baseline_leveling(newvwc, years, doys, level_doys, tmin, polyorder,
-                                       station=station, plot_debug=plt2screen, plt2screen=plt2screen,
-                                       subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset)
-
-
-    plt.figure(figsize=(10, 10))
-    plt.subplots_adjust(hspace=0.2)
-    plt.suptitle(f'Station: {station}', size=16)
-
-    # Create datetime objects with hour information for subdaily data  
-    if is_subdaily:
-        from datetime import timedelta
-        t_datetime = []
-        for yr, d, h in zip(years, doys, bin_start_hours):
-            base_dt = datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j')
-            dt_with_hours = base_dt + timedelta(hours=int(h))
-            t_datetime.append(dt_with_hours)
-    else:
-        # Daily data: use existing logic
-        t_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(years, doys)]
-
-    # create subplots: 2 rows 1 column, 1st subplot
-    ax = plt.subplot(2, 1, 1)
-
-    ax.plot(t_datetime, ph, 'b-',label='original')
-    ax.plot(t_datetime, newph, 'r-',label='vegcorrected')
-#    ax.plot(t_datetime, ph-newph, 'm-',label='subtracted')
-    ax.set_title(f'With and Without Vegetation Correction ')
-    ax.set_ylabel('phase (degrees)')
-    ax.legend(loc='best')
-    ax.grid()
-    # ?? does not seem to be working.  sigh
-    plt.gcf().autofmt_xdate()
-
-
-    # Check if baseline leveling was successful
-    if len(nodes) == 0:
-        print('No summer nodes found. Exiting.')
-        if plt2screen:
-            plt.show()
-        else:
-            plt.close('all')
-        sys.exit()
-
-    # Prepare node data for plotting
-    st = nodes[:, 0] + nodes[:, 1]/365.25
-    st_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(nodes[:, 0], nodes[:, 1])]
-    sp = nodes[:, 2]
-    print(nodes)
-    
-    # Reconstruct the polynomial level for plotting
-    t = years + doys/365.25
-    polyordernum = len(nodes) - 1
-    if polyorder >= 0:
-        polyordernum = polyorder
-    anothermodel = np.polyfit(st, sp, polyordernum)
-    new_level = np.polyval(anothermodel, t)
-
-    ax = plt.subplot(2, 1, 2)
-    ax.plot(t_datetime, newvwc, 'b-', label='new vwc')
-
-    ax.plot(st_datetime, sp, 'ro', label='nodes')
-    ax.plot(t_datetime, new_level, 'r-', label='level')
-    ax.set_ylabel('VWC')
-    ax.set_title('Volumetric Water Content')
-    ax.legend(loc='best')
-    ax.grid()
-    plt.gcf().autofmt_xdate()
-
-    outdir = Path(xdir) / 'Files' / subdir
-
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
-    if hires_figs:
-        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.eps'
-    else:
-        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.png'
-    print(f"Saving to {plot_path}")
-    plt.savefig(plot_path)
-
-
-    if hires_figs:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.eps'
-    else:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.png'
-
-    vwc_plot(station,t_datetime, nv, plot_path,circles,plt2screen) 
-
-    if plt2screen:
-        plt.show()
-    else:
-        # Close all figures to prevent them from displaying when plt2screen=False
-        plt.close('all')
-
-    # Use FileManagement with extension support for consistent directory structure
-    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
-    base_vwcfile = file_manager.get_file_path()
-    
-    # Generate VWC filename using consistent suffix
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset) 
-    vwcfile = base_vwcfile.parent / f"{station}_vwc{suffix}.txt"
-    print('>>> VWC results being written to ', vwcfile)
-    with open(vwcfile, 'w') as w:
-        N = len(nv)
-        freq_map = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}
-        freq_name = freq_map.get(fr, f"Frequency {fr}")
-        w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
-        w.write("% Frequency used: {0} \n".format(freq_name))
-        w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
-        if is_subdaily:
-            w.write(f"% Subdaily VWC with {bin_hours}-hour bins (offset: {bin_offset}h)\n")
-            w.write(get_bin_schedule_info(bin_hours, bin_offset) + "\n")
-            w.write("% FracYr    Year   DOY   VWC Month Day BinStart \n")
-        else:
-            w.write("% FracYr    Year   DOY   VWC Month Day \n")
-        for iw in range(0, N):
-            whydoys = np.round(365.25 * (t[iw] - years))
-
-            fdate = t[iw]
-            myyear = years[iw]
-            mm = months[iw]
-            dd = days[iw]
-            mydoy = doys[iw]
-            watercontent = nv[iw]
-            # we do not allow negative soil moisture in my world.
-            if (watercontent> 0 and watercontent < 0.5):
-                if is_subdaily:
-                    bin_start = bin_start_hours[iw]
-                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} {bin_start:3.0f} \n")
-                else:
-                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
 
 
 def calculate_avg_phase(vxyz, year, year_end, bin_hours=24, bin_offset=0, minvalperbin=10):
