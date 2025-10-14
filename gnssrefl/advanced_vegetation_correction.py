@@ -11,8 +11,9 @@ import gnssrefl.sd_libs as sd
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
 
-def high_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
-                           bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False, level_doys=None):
+def high_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir='',
+                           bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False,
+                           leveling_method='simple_global'):
     """
     Advanced vegetation model (model 2)
 
@@ -58,21 +59,15 @@ def high_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
     
     print('>>>>>>>>>>> Advanced Vegetation Model (model 2) <<<<<<<<<<<<')
     print(f'Processing {len(vxyz)} track observations for station {station}')
-    
-    # Set default level_doys if not provided 
-    if level_doys is None:
-        # Use default dry season periods (could be made more sophisticated)
-        level_doys = [152, 244]  # Default summer dry season for northern hemisphere
-        print(f'Using default level_doys: {level_doys}')
-    else:
-        print(f'Using provided level_doys: {level_doys}')
-    
-    # Warn about untested frequencies  
+
+    # level_doys should already be set by set_parameters() in the caller
+    # (handles CLI, JSON, and hemisphere-based defaults)
+    print(f'Using level_doys: {level_doys}')
+
     if fr != 20:
         freq_name = {1: "L1", 2: "L2C", 5: "L5"}.get(fr, f"frequency {fr}")
         print(f"\nWarning: Clara's vegetation model was developed and tested only with L2C data.")
         print(f"Using {freq_name} is experimental and results may not be reliable.")
-        print(f"For best results, use frequency 20 (L2C) with this vegetation model.\n")
     
     # Clara's default parameters (from original code)
     remoutli = 1        # Remove outliers? 0=no, 1=yes
@@ -97,7 +92,7 @@ def high_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
     print('Step 2: Applying vegetation model...')
     final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks,
                                                   sgolnum, sgolply, padlen, tmin, pltit,
-                                                  fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks, level_doys)
+                                                  fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks, level_doys, leveling_method)
     
     if len(final_mjd) == 0:
         print('No vegetation-corrected soil moisture estimates could be computed')
@@ -124,7 +119,12 @@ def high_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
         
         # Use the standard vwc_plot function (final_vwc already in decimal units)
         qp.vwc_plot(station, datetime_array, np.array(final_vwc), plot_path, circles=False, plt2screen=pltit)
-    
+
+    if pltit:
+        plt.show()
+    else:
+        plt.close('all')
+
     print(f'Advanced vegetation model (model 2) completed for {station}')
 
 
@@ -306,7 +306,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
 
 
 def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
-                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks=False, level_doys=None):
+                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks=False, level_doys=None, leveling_method='simple_global'):
     """
     Apply Clara's vegetation filter to compute soil moisture
     
@@ -344,13 +344,17 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Save individual track VWC data to files
     level_doys : list of int, optional
         [start_doy, end_doy] defining the dry season for baseline calculation
-        
+    leveling_method : str, optional
+        Baseline leveling method ('polynomial' or 'simple_global', default: 'simple_global')
+
     Returns
     -------
     final_mjd : list
         MJD values for time-binned averages
     final_vwc : list
         VWC values for time-binned averages
+    final_binstarts : list
+        Bin start hours for subdaily data (empty for daily)
     """
     
     print('>>>>>>>>>>> Applying vegetation model <<<<<<<<<<<<')
@@ -531,10 +535,6 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         
     # Apply global baseline leveling to time-averaged VWC
     fy = np.asarray(finaly)  # VWC values in percentage
-
-    # Select leveling method
-    # Options: 'simple_global' (matches Kristine's reference), 'polynomial' (sophisticated)
-    leveling_method = 'simple_global'  # Matches Kristine's reference implementation
 
     # Apply leveling (MJD auto-converts to years/doys internally if needed)
     fy, leveling_info = qp.apply_vwc_leveling(

@@ -23,10 +23,11 @@ from gnssrefl.utils import FileManagement
 xdir = os.environ['REFL_CODE']
 
 
-def simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
+def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir='',
                              bin_hours=24, bin_offset=0, plt2screen=True, fr=20,
-                             level_doys=None, polyorder=-99, circles=False,
-                             hires_figs=False, extension='', year_end=None, minvalperbin=10):
+                             polyorder=-99, circles=False,
+                             hires_figs=False, extension='', year_end=None, minvalperbin=10,
+                             leveling_method='polynomial'):
     """
     Apply simple vegetation correction model to phase data and compute VWC
 
@@ -81,12 +82,15 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
     if not year_end:
         year_end = year
 
-    # Set default level_doys if not provided
-    if level_doys is None:
-        level_doys = [152, 244]  # Default summer dry season for northern hemisphere
-        print(f'Using default level_doys: {level_doys}')
-    else:
-        print(f'Using provided level_doys: {level_doys}')
+    # Validate leveling method for simple model
+    if leveling_method != 'polynomial':
+        print(f'Error: Simple vegetation model (model 1) only supports polynomial leveling.')
+        print(f'You specified: {leveling_method}')
+        sys.exit()
+
+    # level_doys should already be set by set_parameters() in the caller
+    # (handles CLI, JSON, and hemisphere-based defaults)
+    print(f'Using level_doys: {level_doys}')
 
     # Calculate averaged phase from vxyz in memory
     avg_phase = qp.calculate_avg_phase(vxyz, year, year_end, bin_hours, bin_offset, minvalperbin)
@@ -154,7 +158,7 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
     # Apply baseline leveling using unified function
     nv, leveling_info = qp.apply_vwc_leveling(
         newvwc, tmin,
-        method='polynomial',
+        method=leveling_method,
         years=years, doys=doys, level_doys=level_doys, polyorder=polyorder,
         station=station, plot_debug=plt2screen, plt2screen=plt2screen,
         subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
