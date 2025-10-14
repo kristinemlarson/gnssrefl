@@ -1542,6 +1542,8 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         extra name for the json file
     return_level_doys : list
         start and end day of years for leveling
+    vegetation_model : int
+        vegetation correction model: 1 (simple), 2 (advanced)
 
     """
     print('level_doys value', level_doys)
@@ -1611,12 +1613,21 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
     if 'vwc_minvalperday' in lsp:
         json_minvalperday = lsp['vwc_minvalperday']
 
-    if warning_value is None:    
+    if warning_value is None:
         if 'vwc_warning_value' in lsp:
             warning_value = lsp['vwc_warning_value']
         else:
             warning_value = 5.5
 
+    # Vegetation model parameter handling (model 1=simple, 2=advanced)
+    if 'vwc_vegetation_model' in lsp:
+        vegetation_model = lsp['vwc_vegetation_model']
+        # Validate it's an integer model number
+        if not isinstance(vegetation_model, int) or vegetation_model not in [1, 2]:
+            print(f'Warning: vwc_vegetation_model in JSON must be 1 or 2, got {vegetation_model}. Using default (1).')
+            vegetation_model = 1
+    else:
+        vegetation_model = 1  # Default to simple model
 
     # not using extension
     # pick up values in json, if available
@@ -1711,6 +1722,7 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         print('no plots will come to screen. Will only be saved.')
 
     print('=== VWC Configuration ===')
+    print(f'vwc_vegetation_model: {vegetation_model}')
     print(f'vwc_min_soil_texture: {tmin:.2f}')
     print(f'vwc_max_soil_texture: {tmax:.2f}')
     print(f'vwc_min_req_pts_track: {min_req_pts_track}')
@@ -1747,8 +1759,8 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         print(f'extension: {extension}')
 
     return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, \
-            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles, extension, \
-            bin_hours, minvalperbin, bin_offset, return_level_doys
+            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend, circles, extension, \
+            bin_hours, minvalperbin, bin_offset, return_level_doys, vegetation_model
 
 def write_all_phase(v,fname):
     """

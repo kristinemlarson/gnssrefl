@@ -45,8 +45,8 @@ def parse_arguments_hourly():
     parser.add_argument("-warning_value", default=None, type=float, help="Phase RMS (deg) threshold for bad tracks, default is 5.5 degrees")
     parser.add_argument("-auto_removal", default=None, type=str, help="Whether you want to remove bad tracks automatically, default is False")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
-    parser.add_argument("-advanced", default=None, type=str, help="DEPRECATED: use -vegetation_model clara_high instead")
-    parser.add_argument("-vegetation_model", default=None, choices=['simple', 'clara_high'], help="Vegetation correction model: simple (default) or clara_high")
+    parser.add_argument("-advanced", default=None, type=str, help="Shorthand for -vegetation_model 2 (advanced vegetation model)")
+    parser.add_argument("-vegetation_model", default=None, type=str, help="Vegetation correction model: 1 (simple, default) or 2 (advanced)")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
 
     g.print_version_to_screen()
@@ -230,8 +230,8 @@ def plot_hourly_vs_daily_vwc(station, fr, bin_hours, subdir, extension, year, ye
 def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, plt: bool = True, bin_hours: int = 6,
                minvalperbin: int = None, min_req_pts_track: int = None, polyorder: int = -99,
                snow_filter: bool = False, subdir: str = None, tmin: float = None, tmax: float = None,
-               warning_value: float = None, auto_removal: bool = False, hires_figs: bool = False, 
-               advanced: bool = False, vegetation_model: str = None, extension: str = None):
+               warning_value: float = None, auto_removal: bool = False, hires_figs: bool = False,
+               advanced: bool = False, vegetation_model: int = None, extension: str = None):
     """
     Generate hourly rolling VWC from all possible bin offsets.
     
@@ -283,16 +283,24 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     print(f"Processing {bin_hours} offsets for station {station}, year {year}")
     
     # Handle vegetation model selection
-    veg_model = 'simple'  # default
+    veg_model = 1  # default is simple model
     if advanced:
-        print("Warning: -advanced is deprecated, use -vegetation_model clara_high instead")
-        veg_model = 'clara_high'  # -advanced T is shorthand for clara_high
+        veg_model = 2  # -advanced T is shorthand for model 2
     elif vegetation_model:
-        veg_model = vegetation_model
-    
-    # Clara model: Use efficient track-based processing
-    if veg_model == 'clara_high':
-        print(f"Using efficient Clara model processing with saved track data")
+        # Accept numeric string or integer
+        if isinstance(vegetation_model, str) and vegetation_model.isnumeric():
+            veg_model = int(vegetation_model)
+        else:
+            veg_model = vegetation_model
+
+        # Validate model number
+        if veg_model not in [1, 2]:
+            print(f'Vegetation model {veg_model} is not supported. Use 1 (simple) or 2 (advanced). Exiting.')
+            sys.exit()
+
+    # Model 2 (advanced): Use efficient track-based processing
+    if veg_model == 2:
+        print(f"Using efficient model 2 processing with saved track data")
         
         # Get resolved frequency
         fr_list = qp.get_vwc_frequency(station, extension, fr)

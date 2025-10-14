@@ -42,9 +42,9 @@ def parse_arguments():
     parser.add_argument("-warning_value", default=None, type=float, help="Phase RMS (deg) threshold for bad tracks, default is 5.5 degrees")
     parser.add_argument("-auto_removal", default=None, type=str, help="Remove bad tracks automatically (default is False)")
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
-    parser.add_argument("-advanced", default=None, type=str, help="DEPRECATED: use -vegetation_model clara_high instead. Enables Clara's advanced vegetation model")
-    parser.add_argument("-vegetation_model", default=None, choices=['simple', 'clara_high'], help="Vegetation correction model: simple (default) or clara_high")
-    parser.add_argument("-save_tracks", default=None, type=str, help="Save individual track VWC data (Clara model only)")
+    parser.add_argument("-advanced", default=None, type=str, help="Shorthand for -vegetation_model 2 (advanced vegetation model)")
+    parser.add_argument("-vegetation_model", default=None, type=str, help="Vegetation correction model: 1 (simple, default) or 2 (advanced)")
+    parser.add_argument("-save_tracks", default=None, type=str, help="Save individual track VWC data (model 2 only)")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
     parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes",type=int) 
 
@@ -64,15 +64,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         bin_hours: int = None, minvalperbin: int = None, bin_offset: int = None,
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None,
         warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False,
-        advanced : bool=False, vegetation_model: str=None, save_tracks: bool=False, extension:str=None, level_doys : list =[] ):
+        advanced : bool=False, vegetation_model: int=None, save_tracks: bool=False, extension:str=None, level_doys : list =[] ):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
     It concatenates previously computed phase results, makes plots for the four geographic quadrants, computes daily 
     average phase files before converting to volumetric water content (VWC).
 
     The code now allows the user to select between vegetation models using the -vegetation_model parameter.
-    The default 'simple' model is the legacy vegetation correction method, while 'clara_high' implements 
-    Clara Chew's advanced vegetation correction algorithm for sites with dense vegetation.
+    Model 1 (simple, default) is the legacy vegetation correction method, while model 2 implements
+    an advanced vegetation correction algorithm for sites with dense vegetation.
 
     Code now allows inputs (minvalperday, tmin, and tmax) to be stored in the gnssir analysis json file.
     To avoid confusion, in the json they are called vwc_minvalperday, vwc_min_soil_texture, and vwc_max_soil_texture.
@@ -143,9 +143,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
          whether to make eps instead of png files
          default value is false
     advanced : bool, optional
-         DEPRECATED: use -vegetation_model clara_high instead
-    vegetation_model : str, optional
-         vegetation correction model: 'simple' (default) or 'clara_high'
+         shorthand for vegetation_model=2
+    vegetation_model : int, optional
+         vegetation correction model: 1=simple (default), 2=advanced
     extension : str
          extension used when you made the json analysis file
     level_doys : list
@@ -175,16 +175,23 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
             print(f"Error: bin_offset must be 0 <= offset < bin_hours ({bin_hours})")
             sys.exit()
 
-    # Handle vegetation model selection - do this early so phase bounds can use it
-    veg_model = 'simple'  # default
+    # Handle vegetation model selection - do this BEFORE set_parameters for phase bounds
+    # Precedence: CLI -advanced > CLI -vegetation_model > JSON vwc_vegetation_model > default (1)
+    # Note: We'll update from JSON after set_parameters call
+    veg_model = None  # Will be determined below
     if advanced:
-        print("Warning: -advanced is deprecated, use -vegetation_model clara_high instead")
-        veg_model = 'clara_high'  # -advanced T is shorthand for clara_high
+        veg_model = 2  # -advanced T is shorthand for model 2
     elif vegetation_model:
-        veg_model = vegetation_model
-        # Set advanced=True when using clara_high to trigger all advanced behavior
-        if veg_model == 'clara_high':
-            advanced = True
+        # Accept numeric string or integer
+        if isinstance(vegetation_model, str) and vegetation_model.isnumeric():
+            veg_model = int(vegetation_model)
+        else:
+            veg_model = vegetation_model
+
+        # Validate model number
+        if veg_model not in [1, 2]:
+            print(f'Vegetation model {veg_model} is not supported. Use 1 (simple) or 2 (advanced). Exiting.')
+            sys.exit()
 
     fs =10 # fontsize
     snow_file = None
@@ -205,13 +212,25 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     fr = fr_list[0]
 
     # pick up the parameters used for this code
-    # Sep 4, 2025 added level_doys parameter 
+    # Sep 4, 2025 added level_doys parameter
     minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, \
             remove_bad_tracks, warning_value,min_norm_amp,sat_legend,circles,extension, \
-            bin_hours, minvalperbin, bin_offset, level_doys = \
-            qp.set_parameters(station, level_doys, minvalperday, tmin,tmax, min_req_pts_track, 
+            bin_hours, minvalperbin, bin_offset, level_doys, json_vegetation_model = \
+            qp.set_parameters(station, level_doys, minvalperday, tmin,tmax, min_req_pts_track,
                               fr, year, year_end,subdir,plt, auto_removal,warning_value,extension,
                               bin_hours, minvalperbin, bin_offset)
+
+    # Finalize vegetation model: use JSON value if not set by CLI
+    if veg_model is None:
+        veg_model = json_vegetation_model  # Will be 1 or 2 from JSON, defaulting to 1
+
+    # Set advanced flag when using model 2 for backward compatibility
+    if veg_model == 2:
+        advanced = True
+
+    # Print final resolved vegetation model (overrides the JSON printout from set_parameters)
+    if veg_model != json_vegetation_model:
+        print(f'Vegetation model overridden by CLI: {veg_model}')
 
     # if you have requested snow filtering
     if snow_filter:
@@ -364,8 +383,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
                     # this is ok for regular model - not so good for big vegetation sites
                     ii = (new_phase > -20) & (new_phase < 60)
-                    # Apply wider bounds for high vegetation model
-                    if advanced or vegetation_model == 'clara_high':
+                    # Apply wider bounds for high vegetation model (model 2)
+                    if veg_model == 2:
                         ii = (new_phase > -30) & (new_phase < 100)
 
                     y,t,h,new_phase,azd,s,amp_lsps,amp_lss,rhs,ap_rhs,mjds = \
@@ -535,21 +554,21 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         qp.subdaily_phase_plot(station, fr, tv, xdir, subdir, hires_figs, bin_hours, bin_offset, plt2screen=plt)
         matplt.show(block=False)
 
-    if veg_model == 'clara_high':
-        print('Running Clara Chew high vegetation model...')
-        avc.clara_high_vegetation_filter(station, year, vxyz, tmin, tmax, subdir,
-                                         bin_hours, bin_offset, plt, fr, minvalperbin,
-                                         save_tracks, level_doys)
-
-    elif veg_model == 'simple':
-        print('Running simple vegetation model...')
+    if veg_model == 1:
+        print('Running simple vegetation model (model 1)...')
         svc.simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir,
                                      bin_hours, bin_offset, plt2screen=plt, fr=fr, level_doys=level_doys,
                                      polyorder=polyorder, circles=circles, hires_figs=hires_figs,
                                      extension=extension, year_end=year_end, minvalperbin=minvalperbin)
 
+    elif veg_model == 2:
+        print('Running advanced vegetation model (model 2)...')
+        avc.high_vegetation_filter(station, year, vxyz, tmin, tmax, subdir,
+                                   bin_hours, bin_offset, plt, fr, minvalperbin,
+                                   save_tracks, level_doys)
+
     else:
-        print(f'Unknown vegetation model: {veg_model}')
+        print(f'Unknown vegetation model: {veg_model}. Use 1 (simple) or 2 (advanced).')
         sys.exit()
 
 

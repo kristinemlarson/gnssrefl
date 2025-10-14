@@ -76,7 +76,7 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
     None (writes VWC output file directly)
     """
 
-    print('>>>>>>>>>>> Simple Vegetation Model <<<<<<<<<<<<')
+    print('>>>>>>>>>>> Simple Vegetation Model (model 1) <<<<<<<<<<<<')
 
     if not year_end:
         year_end = year
@@ -261,6 +261,7 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
 
         w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
         w.write("% Frequency used: {0} \n".format(freq_name))
+        w.write("% Vegetation model: 1 (simple) \n")
         w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
 
         if is_subdaily:
