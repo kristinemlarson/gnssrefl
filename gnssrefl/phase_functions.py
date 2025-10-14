@@ -105,9 +105,9 @@ def normAmp(amp, basepercent):
 
     return Namp
 
-def subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bin_hours=24,bin_offset=0,plt2screen=True):
+def subdaily_phase_plot(station, fr, tv, xdir, subdir, hires_figs, bin_hours=24, bin_offset=0, plt2screen=True):
     """
-    makes a plot of daily averaged phase for vwc code
+    makes a plot of daily or subdaily averaged phase for vwc code
 
     Parameters
     ----------
@@ -115,18 +115,33 @@ def subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bi
         4 char station name
     fr : int
         frequency of signal
-    datetime_dates : ...
-        datetime values for phase points
-    tv : list of results
-        cannot remember the format
+    tv : numpy array
+        Averaged phase results with columns [Year, DOY, Phase, ...]
+        For subdaily: column 4 contains BinStart hour
     xdir : str
         location of the results (environment variable REFL_CODE)
     subdir : str
         subdirectory in Files
     hires_figs: bool
         whether you want eps instead of png files
+    bin_hours : int
+        time bin size in hours (default: 24 for daily)
+    bin_offset : int
+        bin timing offset in hours (default: 0)
+    plt2screen : bool
+        whether to display plot to screen (default: True)
 
     """
+    from datetime import datetime, timedelta
+
+    # Create datetime array from tv data
+    datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j')
+                     for yr, d in zip(tv[:, 0], tv[:, 1])]
+    if bin_hours < 24:
+        # Add hour offset for subdaily data (BinStart is in column 4)
+        datetime_dates = [dt + timedelta(hours=int(h))
+                         for dt, h in zip(datetime_dates, tv[:, 4])]
+
     outdir = Path(xdir) / 'Files' / subdir
     plt.figure(figsize=(10, 6))
     plt.plot(datetime_dates, tv[:, 2], 'b-')
@@ -775,8 +790,12 @@ def plot_baseline_leveling(station, years, doys, vwc_values, new_level, nodes, p
 def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
         subdir='',hires_figs=False, extension='', bin_hours=24, bin_offset=0):
     """
-    Convert GPS phase to VWC. Using Clara Chew's algorithm from 
+    Convert GPS phase to VWC. Using Clara Chew's algorithm from
     Matlab write_vegcorrect_smc.m
+
+    .. deprecated::
+        This function is deprecated. Use `simple_vegetation_correction.simple_vegetation_filter()` instead.
+        This function remains for backward compatibility but may be removed in a future version.
 
     https://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
 
@@ -815,6 +834,14 @@ def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=2
         not sure - GT added
 
     """
+
+    import warnings
+    warnings.warn(
+        "convert_phase() is deprecated and will be removed in a future version. "
+        "Use simple_vegetation_correction.simple_vegetation_filter() instead.",
+        DeprecationWarning,
+        stacklevel=2
+    )
 
     if not year_end:
         year_end = year
@@ -1075,6 +1102,109 @@ def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=2
                     w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} {bin_start:3.0f} \n")
                 else:
                     w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
+
+
+def calculate_avg_phase(vxyz, year, year_end, bin_hours=24, bin_offset=0, minvalperbin=10):
+    """
+    Calculate time-averaged phase statistics from track-level data
+
+    This is a pure calculation function that bins vxyz data by time and computes
+    statistics without any file I/O.
+
+    Parameters
+    ----------
+    vxyz : numpy array
+        Track-level phase observations (16 columns)
+        Columns: [year, doy, phase, azimuth, sat, rh, norm_amp_LSP, norm_amp_LS,
+                  hour, raw_LSP, raw_LS, apriori_RH, quadrant, delRH, vegMask, MJD]
+    year : int
+        First year to process
+    year_end : int
+        Last year to process
+    bin_hours : int, optional
+        Time bin size in hours (default: 24 for daily)
+    bin_offset : int, optional
+        Bin timing offset in hours (default: 0)
+    minvalperbin : int, optional
+        Minimum observations required per bin (default: 10)
+
+    Returns
+    -------
+    avg_phase : numpy array (N x 8 or N x 9)
+        Averaged phase data with columns:
+        [Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day, [BinStart]]
+        For daily: 8 columns (no BinStart)
+        For subdaily: 9 columns (with BinStart)
+    """
+    # Extract columns from vxyz
+    y1 = vxyz[:, 0]      # year
+    d1 = vxyz[:, 1]      # doy
+    phase = vxyz[:, 2]   # phase
+    amp = vxyz[:, 6]     # normalized amplitude
+    hour = vxyz[:, 8]    # hour of day, UTC
+
+    # Initialize result array
+    if bin_hours < 24:
+        avg_phase = np.empty(shape=[0, 9])  # subdaily: includes BinStart
+    else:
+        avg_phase = np.empty(shape=[0, 8])  # daily: no BinStart
+
+    # Calculate number of bins per day
+    bins_per_day = 24 // bin_hours
+
+    # Loop through years and days
+    for requested_year in range(year, year_end + 1):
+        for doy in range(1, 367):
+            if bin_hours < 24:
+                # Subdaily binning: process each time bin separately
+                for bin_idx in range(bins_per_day):
+                    # Calculate bin boundaries with offset
+                    bin_start = (bin_idx * bin_hours + bin_offset) % 24
+                    bin_end = ((bin_idx + 1) * bin_hours + bin_offset) % 24
+
+                    # Handle midnight wraparound
+                    if bin_end <= bin_start:  # bin crosses midnight
+                        current_day_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start)
+                        next_day_mask = (y1 == requested_year) & (d1 == doy + 1) & (hour < bin_end)
+                        time_mask = (current_day_mask | next_day_mask) & (phase > -10) & (amp > 0.65)
+                    else:
+                        # Normal case: bin doesn't cross midnight
+                        time_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start) & \
+                                   (hour < bin_end) & (phase > -10) & (amp > 0.65)
+
+                    ph1 = phase[time_mask]
+                    amp1 = amp[time_mask]
+
+                    if len(ph1) >= minvalperbin:
+                        # Calculate statistics
+                        mean_ph = np.mean(ph1)
+                        std_ph = np.std(ph1)
+                        mean_amp = np.mean(amp1)
+                        yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                        frac_year = requested_year + doy / 365.25
+                        bin_start_hour = (bin_idx * bin_hours + bin_offset) % 24
+
+                        # Build row: Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day, BinStart
+                        newl = [requested_year, doy, mean_ph, std_ph, mean_amp, frac_year, mm, dd, bin_start_hour]
+                        avg_phase = np.append(avg_phase, [newl], axis=0)
+            else:
+                # Daily binning
+                time_mask = (y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)
+                ph1 = phase[time_mask]
+                amp1 = amp[time_mask]
+
+                if len(ph1) >= minvalperbin:
+                    mean_ph = np.mean(ph1)
+                    std_ph = np.std(ph1)
+                    mean_amp = np.mean(amp1)
+                    yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                    frac_year = requested_year + doy / 365.25
+
+                    # Build row: Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day
+                    newl = [requested_year, doy, mean_ph, std_ph, mean_amp, frac_year, mm, dd]
+                    avg_phase = np.append(avg_phase, [newl], axis=0)
+
+    return avg_phase
 
 
 def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension='',

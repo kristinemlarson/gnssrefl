@@ -7,13 +7,14 @@ import scipy
 import subprocess
 import sys
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import gnssrefl.phase_functions as qp
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as gnssir
 import gnssrefl.advanced_vegetation_correction as avc
+import gnssrefl.simple_vegetation_correction as svc
 
 from gnssrefl.utils import str2bool, read_files_in_dir, FileManagement
 
@@ -488,76 +489,65 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
             matplt.close(fig2)
 
 
-    #Need to Define clearly the stored values in vxyz
+    # ========================================================================
+    # DATA STRUCTURES: vxyz (track-level) → tv (time-binned averages)
+    # ========================================================================
+    #
+    # At this point we have built vxyz from individual satellite track observations:
+    #
+    # vxyz: Track-level phase data (N x 16 array)
+    #       Each row is ONE observation from ONE satellite pass
+    #       Example: 10,000+ rows for a year of data
+    #       Columns (documented lines 261-276):
+    #         [0]=year, [1]=doy, [2]=phase (unwrapped), [3]=azimuth, [4]=satellite
+    #         [5]=RH, [6]=norm_amp_LSP, [7]=norm_amp_LS, [8]=hour (UTC)
+    #         [9]=raw_LSP, [10]=raw_LS, [11]=apriori_RH, [12]=quadrant
+    #         [13]=delRH, [14]=vegMask, [15]=MJD
+    #
+    # write_avg_phase() transforms vxyz → tv by time-binning:
+    #   - Groups track observations by time bins (daily or subdaily)
+    #   - Calculates statistics: mean phase, std, mean amplitude per bin
+    #   - Applies quality filters: phase>-10, amp>0.65, min obs count
+    #   - Writes full results to file for archival/inspection
+    #
+    # tv: Time-binned averaged data (M x 4-5 array)
+    #     Each row is ONE time bin (e.g., one day or one 6-hour period)
+    #     Example: 365 rows for a year of daily data
+    #     Columns: [Year, DOY, MeanPhase, Nvals, [BinStart]]
+    #     Used for: phase plotting and Clara's model (to know valid time bins)
+    #
+    # Key distinction:
+    #   - vxyz: Individual satellite tracks (many per time period)
+    #   - tv: Averaged statistics (one per time period)
+    # ========================================================================
+
+    tv = qp.write_avg_phase(station, phase, fr, year, year_end, minvalperbin, vxyz,
+                           subdir, extension, bin_hours, minvalperbin, bin_offset)
+
+    print(f'Number of phase measurements: {len(tv)}')
+
+    if len(tv) < 1:
+        print('No phase measurements available - perhaps minvalperbin/minvalperday or min_req_pts_track are too stringent')
+        sys.exit()
+
+    # Plot averaged phase data (before vegetation correction)
+    if plt:
+        qp.subdaily_phase_plot(station, fr, tv, xdir, subdir, hires_figs, bin_hours, bin_offset, plt2screen=plt)
+        matplt.show(block=False)
 
     if veg_model == 'clara_high':
         print('Running Clara Chew high vegetation model...')
-        
-        # First get averaged phase data (like the simple model does)
-        tv = qp.write_avg_phase(station, phase, fr, year, year_end, minvalperbin, vxyz, 
-                               subdir, extension, bin_hours, minvalperbin, bin_offset)
-        
-        if len(tv) < 1:
-            print('No phase measurements available for vegetation model')
-            if bin_hours < 24:
-                print(f'No results - perhaps minvalperbin or min_req_pts_track are too stringent')
-            else:
-                print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
-            sys.exit()
-        
-        # Apply Clara's vegetation model directly
         avc.clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir,
-                                         bin_hours, bin_offset, plt, fr, minvalperbin, save_tracks, level_doys)
-        
-        # Make phase plot if requested  
-        if plt:
-            if bin_hours < 24:
-                # Subdaily: use BinStart hour from column 4 (5th column in tv array)
-                from datetime import timedelta
-                datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') + timedelta(hours=int(bin_start)) 
-                                 for yr, d, bin_start in zip(tv[:, 0], tv[:, 1], tv[:, 4])]
-            else:
-                # Daily: use midnight (00:00) for backwards compatibility
-                datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
-            
-            qp.subdaily_phase_plot(station, fr, datetime_dates, tv, xdir, subdir, 
-                                  hires_figs, bin_hours, bin_offset, plt2screen=plt)
-            matplt.show()
-    
+                                         bin_hours, bin_offset, plt, fr, minvalperbin,
+                                         save_tracks, level_doys)
+
     elif veg_model == 'simple':
-        # Existing simple model logic
-        # write out averaged phase values
-        tv = qp.write_avg_phase(station, phase, fr,year,year_end,minvalperbin,vxyz,subdir,extension,
-                               bin_hours, minvalperbin, bin_offset)
-        if bin_hours < 24:
-            print(f'Number of {bin_hours}-hour phase measurements ', len(tv))
-        else:
-            print('Number of daily phase measurements ', len(tv))
-        if len(tv) < 1:
-            if bin_hours < 24:
-                print(f'No results - perhaps minvalperbin or min_req_pts_track are too stringent')
-            else:
-                print('No results - perhaps minvalperday or min_req_pts_track are too stringent')
-            sys.exit()
+        print('Running simple vegetation model...')
+        svc.simple_vegetation_filter(station, year, vxyz, tmin, tmax, subdir,
+                                     bin_hours, bin_offset, plt2screen=plt, fr=fr, level_doys=level_doys,
+                                     polyorder=polyorder, circles=circles, hires_figs=hires_figs,
+                                     extension=extension, year_end=year_end, minvalperbin=minvalperbin)
 
-        # make datetime date array with hour-aware handling
-        if bin_hours < 24:
-            # Subdaily: use BinStart hour from column 4 (5th column in tv array)
-            from datetime import timedelta
-            datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') + timedelta(hours=int(bin_start)) 
-                             for yr, d, bin_start in zip(tv[:, 0], tv[:, 1], tv[:, 4])]
-        else:
-            # Daily: use midnight (00:00) for backwards compatibility
-            datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(tv[:, 0], tv[:, 1])]
-
-        # make a plot of daily phase values (only if plotting is enabled)
-        if plt:
-            qp.subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bin_hours,bin_offset,plt2screen=plt)
-
-        # convert averaged phase values to volumetric water content
-        qp.convert_phase(station, year, level_doys,year_end, plt,fr,tmin,tmax,polyorder,circles,
-                         subdir,hires_figs, extension, bin_hours, bin_offset)
-    
     else:
         print(f'Unknown vegetation model: {veg_model}')
         sys.exit()
