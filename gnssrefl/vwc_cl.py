@@ -60,10 +60,10 @@ def parse_arguments():
 
 
 def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool = True, screenstats: bool = False,
-        min_req_pts_track: int = None, polyorder: int = -99, minvalperday: int = None, 
+        min_req_pts_track: int = None, polyorder: int = -99, minvalperday: int = None,
         bin_hours: int = None, minvalperbin: int = None, bin_offset: int = None,
-        snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None, 
-        warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False, 
+        snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None,
+        warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False,
         advanced : bool=False, vegetation_model: str=None, save_tracks: bool=False, extension:str=None, level_doys : list =[] ):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
@@ -537,7 +537,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     if veg_model == 'clara_high':
         print('Running Clara Chew high vegetation model...')
-        avc.clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir,
+        avc.clara_high_vegetation_filter(station, year, vxyz, tmin, tmax, subdir,
                                          bin_hours, bin_offset, plt, fr, minvalperbin,
                                          save_tracks, level_doys)
 

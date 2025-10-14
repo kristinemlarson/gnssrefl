@@ -11,29 +11,27 @@ import gnssrefl.sd_libs as sd
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
 
-def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='', 
+def clara_high_vegetation_filter(station, year, vxyz, tmin, tmax, subdir='',
                                 bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False, level_doys=None):
     """
     Clara's high vegetation model
-    
-    This function applies Clara's high vegetation correction directly to 
+
+    This function applies Clara's high vegetation correction directly to
     the vwc workflow data structures, replacing the simple vegetation model.
-    
+
     Parameters
     ----------
     station : str
         4-char GNSS station name
-    year : int 
+    year : int
         Calendar year
     vxyz : numpy array
         Full track-level data from vwc (16 columns):
-        [year, doy, phase, azim, sat, rh, norm_ampLSP, norm_ampLS, hour, 
+        [year, doy, phase, azim, sat, rh, norm_ampLSP, norm_ampLS, hour,
          ampLSP, ampLS, ap_rh, quad, delRH, vegMask, mjd]
-    tv : numpy array
-        Averaged phase data from write_avg_phase
     tmin : float
         Min soil moisture value based on soil texture
-    tmax : float 
+    tmax : float
         Max soil moisture value based on soil texture
     subdir : str
         Subdirectory for file organization (default: '')
@@ -97,9 +95,9 @@ def clara_high_vegetation_filter(station, year, vxyz, tv, tmin, tmax, subdir='',
     
     # Step 2: Apply vegetation filter to compute soil moisture
     print('Step 2: Applying vegetation model...')
-    final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks, 
-                                                  sgolnum, sgolply, padlen, tmin, pltit, 
-                                                  fr, bin_hours, bin_offset, subdir, tv, minvalperbin, save_tracks, level_doys)
+    final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks,
+                                                  sgolnum, sgolply, padlen, tmin, pltit,
+                                                  fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks, level_doys)
     
     if len(final_mjd) == 0:
         print('No vegetation-corrected soil moisture estimates could be computed')
@@ -307,8 +305,8 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
     return tracks, metrics_all, vegmast
 
 
-def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply, 
-                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, tv, minvalperbin, save_tracks=False, level_doys=None):
+def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
+                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks=False, level_doys=None):
     """
     Apply Clara's vegetation filter to compute soil moisture
     
@@ -340,8 +338,6 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Bin timing offset in hours
     subdir : str
         Subdirectory for output
-    tv : numpy array
-        Time-binned phase data from write_avg_phase
     minvalperbin : int
         Minimum values required per time bin
     save_tracks : bool
@@ -438,11 +434,11 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             
             # Convert to volumetric water content
             svwc[ii] = 100 * tmin + newslope.reshape(Ntrack, 1) * avgf
-            
+
             # Apply bounds checking
             bad_indices = (svwc[ii] > 60) | (svwc[ii] < 0)
             svwc[ii][bad_indices] = np.nan
-            
+
             # Save individual track data if requested
             if save_tracks:
                 save_individual_track_data(station, int(year[ii][0]), thissat, thisquad, 
@@ -466,56 +462,72 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             #     plt.legend(loc="best")
             #     plt.show()
     
-    # Use time bins from tv array 
+    # Generate time bins from vxyz data (not tv) to process ALL days
     if bin_hours < 24:
         print(f'Computing {bin_hours}-hour averaged VWC estimates...')
     else:
         print('Computing daily averaged VWC estimates...')
-    
+
     finalx = []
     finaly = []
     final_binstarts = []  # Track bin start hours for subdaily output
-    
-    # For each time bin in tv, aggregate corresponding svwc values
-    for i in range(len(tv)):
-        year_val = int(tv[i, 0])
-        doy_val = int(tv[i, 1])
-        
+
+    # Get unique year/doy combinations from vxyz
+    unique_days = np.unique(vxyz[:, [0, 1]], axis=0)
+    print(f'Processing {len(unique_days)} unique days from vxyz data')
+
+    # Process each unique day
+    for year_val, doy_val in unique_days:
+        year_val = int(year_val)
+        doy_val = int(doy_val)
+
         if bin_hours < 24:
-            # Subdaily: use bin_start_hour to match tracks
-            bin_start = int(tv[i, 4])
-            bin_end = (bin_start + bin_hours) % 24
-            
-            # Match individual tracks to this time bin
-            if bin_end <= bin_start:  # crosses midnight
-                time_mask = ((year == year_val) & (doy == doy_val) & (hour >= bin_start)) | \
-                           ((year == year_val) & (doy == doy_val + 1) & (hour < bin_end))
-            else:
-                time_mask = (year == year_val) & (doy == doy_val) & \
-                           (hour >= bin_start) & (hour < bin_end)
+            # Subdaily: loop through time bins for this day
+            bins_per_day = 24 // bin_hours
+            for bin_idx in range(bins_per_day):
+                bin_start = (bin_idx * bin_hours + bin_offset) % 24
+                bin_end = (bin_start + bin_hours) % 24
+
+                # Match individual tracks to this time bin
+                if bin_end <= bin_start:  # crosses midnight
+                    time_mask = ((year == year_val) & (doy == doy_val) & (hour >= bin_start)) | \
+                               ((year == year_val) & (doy == doy_val + 1) & (hour < bin_end))
+                else:
+                    time_mask = (year == year_val) & (doy == doy_val) & \
+                               (hour >= bin_start) & (hour < bin_end)
+
+                # Get VWC values for tracks in this time bin
+                bin_vwc_raw = svwc[time_mask].flatten()
+                # Filter out zeros (unprocessed tracks)
+                bin_vwc = bin_vwc_raw[bin_vwc_raw != 0]
+
+                if len(bin_vwc) >= minvalperbin:
+                    # Store time bin average
+                    finalx.append(g.ydoy2mjd(year_val, doy_val))
+                    finaly.append(np.mean(bin_vwc))
+                    final_binstarts.append(bin_start)
         else:
             # Daily: match by year/doy only
             time_mask = (year == year_val) & (doy == doy_val)
             bin_start = 0  # For daily bins, use 0
-        
-        # Get VWC values for tracks in this time bin
-        bin_vwc_raw = svwc[time_mask].flatten()
-        # Filter out zeros (unprocessed tracks)
-        bin_vwc = bin_vwc_raw[bin_vwc_raw != 0]
-        
-        
-        if len(bin_vwc) >= minvalperbin:
-            # Store time bin average
-            finalx.append(g.ydoy2mjd(year_val, doy_val))
-            finaly.append(np.mean(bin_vwc))
-            final_binstarts.append(bin_start)
+
+            # Get VWC values for tracks in this day
+            bin_vwc_raw = svwc[time_mask].flatten()
+            # Filter out zeros (unprocessed tracks)
+            bin_vwc = bin_vwc_raw[bin_vwc_raw != 0]
+
+            if len(bin_vwc) >= minvalperbin:
+                # Store daily average
+                finalx.append(g.ydoy2mjd(year_val, doy_val))
+                finaly.append(np.mean(bin_vwc))
+                final_binstarts.append(bin_start)
     
     if len(finalx) == 0:
         if bin_hours < 24:
             print(f'No {bin_hours}-hour averages could be computed')
         else:
             print('No daily averages could be computed')
-        return [], []
+        return [], [], []
         
     # Apply global baseline leveling to time-averaged VWC
     fy = np.asarray(finaly)  # VWC values in percentage
@@ -540,11 +552,11 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         print(f"  Used {leveling_info['baseline_points']} baseline points")
     if leveling_info['baseline_value'] is not None:
         print(f"  Baseline offset: {leveling_info['baseline_value']:.2f}%")
-    
-    # Apply bounds checking after leveling (Clara's second stage) 
+
+    # Apply bounds checking after leveling (Clara's second stage)
     bad_indices = (fy > 0.6) | (fy < 0)  # fy is now in decimal units
     fy[bad_indices] = np.nan
-    
+
     return finalx, fy.tolist(), final_binstarts
 
 
