@@ -518,49 +518,37 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
 
     # ========================================================================
-    # DATA STRUCTURES: vxyz (track-level) → tv (time-binned averages)
+    # TRACK-LEVEL PHASE DATA (vxyz)
     # ========================================================================
     #
-    # At this point we have built vxyz from individual satellite track observations:
+    # vxyz contains individual satellite track observations (N x 16 array):
+    #   - Each row = ONE observation from ONE satellite pass
+    #   - Example: 10,000+ rows for a year of data
+    #   - Columns:
+    #       [0]  year
+    #       [1]  doy (day of year)
+    #       [2]  phase (unwrapped, degrees)
+    #       [3]  azimuth (degrees)
+    #       [4]  satellite number
+    #       [5]  RH (reflector height, meters)
+    #       [6]  norm_amp_LSP (normalized LSP amplitude)
+    #       [7]  norm_amp_LS (normalized LS amplitude)
+    #       [8]  hour (UTC)
+    #       [9]  raw_LSP (raw LSP amplitude)
+    #       [10] raw_LS (raw LS amplitude)
+    #       [11] apriori_RH (a priori reflector height, meters)
+    #       [12] quadrant (1-4)
+    #       [13] delRH (RH - apriori_RH, meters)
+    #       [14] vegMask (vegetation mask flag)
+    #       [15] MJD (Modified Julian Day)
     #
-    # vxyz: Track-level phase data (N x 16 array)
-    #       Each row is ONE observation from ONE satellite pass
-    #       Example: 10,000+ rows for a year of data
-    #       Columns (documented lines 261-276):
-    #         [0]=year, [1]=doy, [2]=phase (unwrapped), [3]=azimuth, [4]=satellite
-    #         [5]=RH, [6]=norm_amp_LSP, [7]=norm_amp_LS, [8]=hour (UTC)
-    #         [9]=raw_LSP, [10]=raw_LS, [11]=apriori_RH, [12]=quadrant
-    #         [13]=delRH, [14]=vegMask, [15]=MJD
-    #
-    # write_avg_phase() transforms vxyz → tv by time-binning:
-    #   - Groups track observations by time bins (daily or subdaily)
-    #   - Calculates statistics: mean phase, std, mean amplitude per bin
-    #   - Applies quality filters: phase>-10, amp>0.65, min obs count
-    #   - Writes full results to file for archival/inspection
-    #
-    # tv: Time-binned averaged data (M x 4-5 array)
-    #     Each row is ONE time bin (e.g., one day or one 6-hour period)
-    #     Example: 365 rows for a year of daily data
-    #     Columns: [Year, DOY, MeanPhase, Nvals, [BinStart]]
-    #     Used for: phase plotting and Clara's model (to know valid time bins)
-    #
-    # Key distinction:
-    #   - vxyz: Individual satellite tracks (many per time period)
-    #   - tv: Averaged statistics (one per time period)
+    # This track-level data is passed directly to vegetation filters and plotting functions.
     # ========================================================================
 
-    tv = qp.write_avg_phase(station, phase, fr, year, year_end, minvalperbin, vxyz,
-                           subdir, extension, bin_hours, minvalperbin, bin_offset)
-
-    print(f'Number of phase measurements: {len(tv)}')
-
-    if len(tv) < 1:
-        print('No phase measurements available - perhaps minvalperbin/minvalperday or min_req_pts_track are too stringent')
-        sys.exit()
-
-    # Plot averaged phase data (before vegetation correction)
+    # Plot averaged phase data
     if plt:
-        qp.subdaily_phase_plot(station, fr, tv, xdir, subdir, hires_figs, bin_hours, bin_offset, plt2screen=plt)
+        qp.subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours, bin_offset,
+                               minvalperbin, plt2screen=plt)
         matplt.show(block=False)
 
     # Write all_phase.txt file if save_tracks is enabled
@@ -570,21 +558,70 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     if veg_model == 1:
         print('Running simple vegetation model (model 1)...')
-        svc.simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir,
-                                     bin_hours, bin_offset, plt2screen=plt, fr=fr,
-                                     polyorder=polyorder, circles=circles, hires_figs=hires_figs,
-                                     extension=extension, year_end=year_end, minvalperbin=minvalperbin,
-                                     simple_level=simple_level)
+        vwc_data = svc.simple_vegetation_filter(
+            station, vxyz, subdir,
+            bin_hours, bin_offset, plt2screen=plt, fr=fr,
+            minvalperbin=minvalperbin)
 
     elif veg_model == 2:
         print('Running advanced vegetation model (model 2)...')
-        avc.advanced_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir,
-                                       bin_hours, bin_offset, plt, fr, minvalperbin,
-                                       save_tracks, simple_level=simple_level)
+        vwc_data = avc.advanced_vegetation_filter(
+            station, vxyz, subdir,
+            bin_hours, bin_offset, plt, fr, minvalperbin,
+            save_tracks)
 
     else:
         print(f'Unknown vegetation model: {veg_model}. Use 1 (simple) or 2 (advanced).')
         sys.exit()
+
+    # Check if vegetation correction produced results
+    if not vwc_data or len(vwc_data.get('vwc', [])) == 0:
+        print('No vegetation-corrected VWC values produced. Exiting.')
+        sys.exit()
+
+    # Step 2: Apply baseline leveling
+    print('\nApplying baseline leveling...')
+    leveled_vwc, leveling_info = qp.apply_vwc_leveling(
+        vwc_data['vwc'], tmin,
+        simple=simple_level,
+        years=vwc_data.get('years'),
+        doys=vwc_data.get('doys'),
+        mjd=vwc_data.get('mjd'),
+        level_doys=level_doys,
+        polyorder=polyorder,
+        station=station, plot_debug=plt, plt2screen=plt,
+        subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
+    )
+
+    # Update vwc_data with leveled values (convert to list for compatibility)
+    vwc_data['vwc'] = leveled_vwc if isinstance(leveled_vwc, list) else leveled_vwc.tolist()
+
+    # Step 3: Write output file (common for both models)
+    print('\nWriting VWC output file...')
+    qp.write_vwc_output(
+        station, vwc_data, year, subdir, fr,
+        bin_hours, bin_offset, extension, veg_model
+    )
+
+    # Step 4: Generate final VWC plot (common for both models)
+    if plt:
+        print('\nGenerating final VWC plot...')
+        suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
+        plot_suffix = suffix.replace('.txt', '.png')
+
+        if hires_figs:
+            plot_path = f'{xdir}/Files/{subdir}/{station}_vol_soil_moisture{plot_suffix[:-4]}.eps'
+        else:
+            plot_path = f'{xdir}/Files/{subdir}/{station}_vol_soil_moisture{plot_suffix}'
+
+        qp.vwc_plot(station, vwc_data['datetime'], leveled_vwc, plot_path, circles, plt2screen=plt)
+
+        if plt:
+            matplt.show()
+        else:
+            matplt.close('all')
+
+    print(f'\n✓ VWC processing complete for {station}')
 
 
 

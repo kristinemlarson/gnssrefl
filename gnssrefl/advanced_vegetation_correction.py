@@ -18,9 +18,8 @@ import gnssrefl.sd_libs as sd
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
 
-def advanced_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir='',
-                               bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False,
-                               simple_level=False):
+def advanced_vegetation_filter(station, vxyz, subdir='',
+                               bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False):
     """
     Advanced vegetation model (model 2)
 
@@ -30,16 +29,8 @@ def advanced_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subd
     ----------
     station : str
         4-char GNSS station name
-    year : int
-        Calendar year
     vxyz : numpy array
-        Full track-level data from vwc (16 columns):
-        [year, doy, phase, azim, sat, rh, norm_ampLSP, norm_ampLS, hour,
-         ampLSP, ampLS, ap_rh, quad, delRH, vegMask, mjd]
-    tmin : float
-        Min soil moisture value based on soil texture
-    tmax : float
-        Max soil moisture value based on soil texture
+        Full track-level data from vwc (16 columns)
     subdir : str
         Subdirectory for file organization (default: '')
     bin_hours : int
@@ -54,29 +45,25 @@ def advanced_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subd
         Minimum values required per time bin (default: 10)
     save_tracks : bool
         Save individual track VWC data to files (default: False)
-    level_doys : list of int, optional
-        [start_doy, end_doy] defining the dry season for baseline calculation
-        If None, will use default values based on hemisphere
-    simple_level : bool, optional
-        Use simple baseline leveling instead of polynomial (default: False)
 
     Returns
     -------
-    None (writes VWC output file directly)
+    dict
+        Dictionary containing:
+        - 'mjd': list of Modified Julian Day values
+        - 'vwc': list of VWC values (percentage units, not leveled)
+        - 'datetime': list of datetime objects for plotting
+        - 'bin_starts': list of bin start hours (subdaily only) or empty list
     """
     
     print('>>>>>>>>>>> Advanced Vegetation Model (model 2) <<<<<<<<<<<<')
     print(f'Processing {len(vxyz)} track observations for station {station}')
 
-    # level_doys should already be set by set_parameters() in the caller
-    # (handles CLI, JSON, and hemisphere-based defaults)
-    print(f'Using level_doys: {level_doys}')
-
     if fr != 20:
         freq_name = {1: "L1", 2: "L2C", 5: "L5"}.get(fr, f"frequency {fr}")
         print(f"\nWarning: Clara's vegetation model was developed and tested only with L2C data.")
         print(f"Using {freq_name} is experimental and results may not be reliable.")
-    
+
     # Clara's default parameters (from original code)
     remoutli = 1        # Remove outliers? 0=no, 1=yes
     baseperc = 0.2      # Amplitude normalization percentage (top 20%)
@@ -84,56 +71,45 @@ def advanced_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subd
     ampvarday = 5       # Days for variance calculation
     ampvarlimit = 5     # Variance threshold for amplitude outliers
     acc_rhdrift = 1     # Apply RH drift correction
-    
+
     # Savgol filtering parameters
-    men = 20            # Points for padding calculation  
+    men = 20            # Points for padding calculation
     sgolnum = 99        # Savgol filter length
     sgolply = 2         # Savgol polynomial order
     padlen = 1000       # Padding length
-    
+
     # Step 1: Normalize and process the track-level data
     print('Step 1: Normalizing metrics and removing outliers...')
-    tracks, metrics_all, vegmast = norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, 
+    tracks, metrics_all, vegmast = norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift,
                                                   baseperc, zphival, ampvarday, ampvarlimit)
-    
+
     # Step 2: Apply vegetation filter to compute soil moisture
     print('Step 2: Applying vegetation model...')
     final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks,
-                                                  sgolnum, sgolply, padlen, tmin, pltit,
-                                                  fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks, level_doys, simple_level)
-    
+                                                  sgolnum, sgolply, padlen, pltit,
+                                                  fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks)
+
     if len(final_mjd) == 0:
         print('No vegetation-corrected soil moisture estimates could be computed')
-        return
-    
-    # Step 3: Write output in standard gnssrefl VWC format
-    print('Step 3: Writing VWC output...')
-    write_vwc_output(station, final_mjd, final_vwc, year, subdir, bin_hours, bin_offset, fr, final_binstarts)
-    
-    # Step 4: Generate standard VWC plot if requested
-    if pltit and len(final_mjd) > 0:
-        # Use the existing gnssrefl vwc_plot function for consistency
-        xdir = os.environ['REFL_CODE']
-        suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
-        plot_suffix = suffix.replace('.txt', '.png')
-        
-        if subdir:
-            plot_path = f'{xdir}/Files/{subdir}/{station}_vol_soil_moisture{plot_suffix}'
-        else:
-            plot_path = f'{xdir}/Files/{station}_vol_soil_moisture{plot_suffix}'
-        
-        # Convert MJD to datetime for plotting
-        datetime_array = sd.mjd_to_obstimes(np.array(final_mjd))
-        
-        # Use the standard vwc_plot function (final_vwc already in decimal units)
-        qp.vwc_plot(station, datetime_array, np.array(final_vwc), plot_path, circles=False, plt2screen=pltit)
+        return {
+            'mjd': [],
+            'vwc': [],
+            'datetime': [],
+            'bin_starts': []
+        }
 
-    if pltit:
-        plt.show()
-    else:
-        plt.close('all')
+    # Convert MJD to datetime for plotting
+    datetime_array = sd.mjd_to_obstimes(np.array(final_mjd))
 
     print(f'Advanced vegetation model (model 2) completed for {station}')
+
+    # Return data structure for caller to handle leveling and file writing
+    return {
+        'mjd': final_mjd,
+        'vwc': final_vwc,  # Percentage units, not leveled
+        'datetime': datetime_array.tolist() if isinstance(datetime_array, np.ndarray) else datetime_array,
+        'bin_starts': final_binstarts
+    }
 
 
 def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival, 
@@ -314,10 +290,10 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
 
 
 def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
-                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks=False, level_doys=None, simple_level=False):
+                          padlen, pltit, fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks=False):
     """
     Apply Clara's vegetation filter to compute soil moisture
-    
+
     Parameters
     ----------
     station : str
@@ -334,8 +310,6 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Savgol polynomial order
     padlen : int
         Padding length
-    tmin : float
-        Minimum soil texture
     pltit : bool
         Show plots
     fr : int
@@ -350,17 +324,13 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Minimum values required per time bin
     save_tracks : bool
         Save individual track VWC data to files
-    level_doys : list of int, optional
-        [start_doy, end_doy] defining the dry season for baseline calculation
-    simple_level : bool, optional
-        Use simple baseline leveling instead of polynomial (default: False)
 
     Returns
     -------
     final_mjd : list
         MJD values for time-binned averages
     final_vwc : list
-        VWC values for time-binned averages
+        VWC values for time-binned averages (percentage units, not leveled)
     final_binstarts : list
         Bin start hours for subdaily data (empty for daily)
     """
@@ -443,12 +413,13 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             avgf = D_phi[ii] - phipred2
             newslope = 1.48 - slopepred2  # 1.48 is default bare soil slope
             avgf = np.reshape(avgf, (Ntrack, 1))
-            
-            # Convert to volumetric water content
-            svwc[ii] = 100 * tmin + newslope.reshape(Ntrack, 1) * avgf
 
-            # Apply bounds checking
-            bad_indices = (svwc[ii] > 60) | (svwc[ii] < 0)
+            # Convert to VWC (percentage units, not yet leveled)
+            # Note: tmin offset will be applied during leveling in caller
+            svwc[ii] = newslope.reshape(Ntrack, 1) * avgf
+
+            # Apply bounds checking (in percentage units)
+            bad_indices = (svwc[ii] > 60) | (svwc[ii] < -10)
             svwc[ii][bad_indices] = np.nan
 
             # Save individual track data if requested
@@ -540,81 +511,11 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         else:
             print('No daily averages could be computed')
         return [], [], []
-        
-    # Apply global baseline leveling to time-averaged VWC
-    fy = np.asarray(finaly)  # VWC values in percentage
 
-    # Apply leveling (MJD auto-converts to years/doys internally if needed)
-    fy, leveling_info = qp.apply_vwc_leveling(
-        fy, tmin,
-        simple=simple_level,
-        mjd=finalx,  # Auto-converts to years/doys internally
-        level_doys=level_doys,
-        station=station, plot_debug=pltit, plt2screen=pltit,
-        subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
-    )
+    # Return VWC values in percentage units (not leveled - caller will handle leveling)
+    fy = finaly  # Keep as list
 
-    # Report results
-    print(f"Applied '{leveling_info['method']}' baseline leveling")
-    if leveling_info['baseline_points']:
-        print(f"  Used {leveling_info['baseline_points']} baseline points")
-    if leveling_info['baseline_value'] is not None:
-        print(f"  Baseline offset: {leveling_info['baseline_value']:.2f}%")
-
-    # Apply bounds checking after leveling (Clara's second stage)
-    bad_indices = (fy > 0.6) | (fy < 0)  # fy is now in decimal units
-    fy[bad_indices] = np.nan
-
-    return finalx, fy.tolist(), final_binstarts
-
-
-def write_vwc_output(station, mjd_list, vwc_list, year, subdir, bin_hours, bin_offset, fr, bin_starts):
-    """Write VWC output file in standard gnssrefl format"""
-    
-    xdir = os.environ['REFL_CODE']
-    
-    # Use standard gnssrefl naming convention with proper frequency and temporal suffix
-    suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
-    
-    if subdir:
-        outfile = f'{xdir}/Files/{subdir}/{station}_vwc{suffix}.txt'
-    else:
-        outfile = f'{xdir}/Files/{station}_vwc{suffix}.txt'
-    
-    # Convert MJD to datetime
-    datetime_array = sd.mjd_to_obstimes(np.array(mjd_list))
-    
-    with open(outfile, 'w') as f:
-        # Header matching gnssrefl VWC format
-        freq_name = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}.get(fr, f"Frequency {fr}")
-        f.write(f'% Soil Moisture Results for GNSS Station {station.upper()}\n')
-        f.write(f'% Frequency used: {freq_name}\n')
-        f.write(f'% Vegetation model: 2 (advanced)\n')
-        f.write('% https://github.com/kristinemlarson/gnssrefl\n')
-        
-        if bin_hours < 24:
-            f.write(f'% Subdaily VWC with {bin_hours}-hour bins (offset: {bin_offset}h)\n')
-            f.write('% FracYr    Year   DOY   VWC Month Day BinStart\n')
-        else:
-            f.write('% FracYr    Year   DOY   VWC Month Day\n')
-        
-        # Write data
-        for i, dt in enumerate(datetime_array):
-            year_val = dt.year
-            fracyr = year_val + (dt.timetuple().tm_yday - 1) / 365.25
-            doy = dt.timetuple().tm_yday
-            month = dt.month
-            day = dt.day
-            
-            if bin_hours < 24:
-                # Subdaily format - use actual bin start hour
-                bin_start = bin_starts[i]
-                f.write(f' {fracyr:8.4f} {year_val:4d} {doy:4d} {vwc_list[i]:8.3f} {month:4d} {day:4d} {bin_start:4d}\n')
-            else:
-                # Daily format
-                f.write(f' {fracyr:8.4f} {year_val:4d} {doy:4d} {vwc_list[i]:8.3f} {month:4d} {day:4d}\n')
-    
-    print(f'Wrote {len(mjd_list)} vegetation-corrected soil moisture estimates to {outfile}')
+    return finalx, fy, final_binstarts
 
 
 def load_clara_model():

@@ -11,15 +11,12 @@ from datetime import datetime
 from pathlib import Path
 
 import gnssrefl.phase_functions as qp
-from gnssrefl.utils import FileManagement
 
 xdir = os.environ['REFL_CODE']
 
-def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir='',
+def simple_vegetation_filter(station, vxyz, subdir='',
                              bin_hours=24, bin_offset=0, plt2screen=True, fr=20,
-                             polyorder=-99, circles=False,
-                             hires_figs=False, extension='', year_end=None, minvalperbin=10,
-                             simple_level=False):
+                             minvalperbin=10):
     """
     Simple vegetation model (model 1)
 
@@ -30,14 +27,8 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
     ----------
     station : str
         4-char GNSS station name
-    year : int
-        Calendar year (start)
     vxyz : numpy array
         Track-level phase observations (16 columns)
-    tmin : float
-        Min soil moisture value based on soil texture
-    tmax : float
-        Max soil moisture value based on soil texture
     subdir : str
         Subdirectory for file organization (default: '')
     bin_hours : int
@@ -48,39 +39,26 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
         Whether plots come to the screen (default: True)
     fr : int
         Frequency code (1=L1, 5=L5, 20=L2C, default: 20)
-    level_doys : list of int, optional
-        [start_doy, end_doy] defining the dry season for baseline calculation
-    polyorder : int
-        Override for polynomial order used in leveling (default: -99, auto)
-    circles : bool
-        Final plot using circles instead of line (default: False)
-    hires_figs : bool
-        Whether to make eps instead of png files (default: False)
-    extension : str
-        Extension used for json analysis file (default: '')
-    year_end : int, optional
-        Last year for multi-year analysis (default: same as year)
     minvalperbin : int, optional
         Minimum observations required per time bin (default: 10)
-    simple_level : bool, optional
-        Use simple baseline leveling instead of polynomial (default: False)
 
     Returns
     -------
-    None (writes VWC output file directly)
+    dict
+        Dictionary containing:
+        - 'years': numpy array of year values
+        - 'doys': numpy array of day of year values
+        - 'vwc': numpy array of VWC values (percentage units, not leveled)
+        - 'datetime': list of datetime objects for plotting
+        - 'bin_starts': numpy array of bin start hours (subdaily only) or None
+        - 'months': numpy array of month values
+        - 'days': numpy array of day values
     """
 
     print('>>>>>>>>>>> Simple Vegetation Model (model 1) <<<<<<<<<<<<')
 
-    if not year_end:
-        year_end = year
-
-    # level_doys should already be set by set_parameters() in the caller
-    # (handles CLI, JSON, and hemisphere-based defaults)
-    print(f'Using level_doys: {level_doys}')
-
     # Calculate averaged phase from vxyz in memory
-    avg_phase = qp.calculate_avg_phase(vxyz, year, year_end, bin_hours, bin_offset, minvalperbin)
+    avg_phase = qp.calculate_avg_phase(vxyz, bin_hours, bin_offset, minvalperbin)
 
     if len(avg_phase) == 0:
         print('No averaged phase data could be calculated - perhaps minvalperbin is too stringent')
@@ -137,21 +115,9 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
     delphi = (smamp - 1) * 50.25 / 1.48
     newph = ph - delphi
 
-    # Convert to VWC
-    vwc = 100 * tmin + 1.48 * (ph - residval)
-    newvwc = 100 * tmin + 1.48 * (newph - residval)
-
-    # Apply baseline leveling
-    nv, leveling_info = qp.apply_vwc_leveling(
-        newvwc, tmin,
-        simple=simple_level,
-        years=years, doys=doys, level_doys=level_doys, polyorder=polyorder,
-        station=station, plot_debug=plt2screen, plt2screen=plt2screen,
-        subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
-    )
-
-    # Extract nodes for plotting (polynomial method returns nodes)
-    nodes = leveling_info.get('nodes', np.empty(shape=[0, 3]))
+    # Convert to VWC (percentage units, baseline = 2 degrees)
+    # Note: This is NOT leveled yet - caller will handle leveling
+    newvwc = 1.48 * (newph - residval)
 
     # Create datetime objects for plotting
     if is_subdaily:
@@ -166,50 +132,15 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
                      for yr, d in zip(years, doys)]
 
     # Create diagnostic plot: phase before/after vegetation correction
-    plt.figure(figsize=(10, 10))
-    plt.subplots_adjust(hspace=0.2)
-    plt.suptitle(f'Station: {station}', size=16)
+    plt.figure(figsize=(10, 6))
+    plt.suptitle(f'Station: {station} - Vegetation Correction', size=16)
 
-    # Subplot 1: Phase with and without vegetation correction
-    ax = plt.subplot(2, 1, 1)
-    ax.plot(t_datetime, ph, 'b-', label='original')
-    ax.plot(t_datetime, newph, 'r-', label='vegcorrected')
-    ax.set_title('With and Without Vegetation Correction')
+    # Plot: Phase with and without vegetation correction
+    ax = plt.gca()
+    ax.plot(t_datetime, ph, 'b-', label='original phase')
+    ax.plot(t_datetime, newph, 'r-', label='vegetation-corrected phase')
+    ax.set_title('Phase Before and After Vegetation Correction')
     ax.set_ylabel('phase (degrees)')
-    ax.legend(loc='best')
-    ax.grid()
-    plt.gcf().autofmt_xdate()
-
-    # Check if baseline leveling was successful
-    if len(nodes) == 0:
-        print('No summer nodes found. Exiting.')
-        if plt2screen:
-            plt.show()
-        else:
-            plt.close('all')
-        sys.exit()
-
-    # Prepare node data for plotting
-    st = nodes[:, 0] + nodes[:, 1]/365.25
-    st_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j')
-                   for yr, d in zip(nodes[:, 0], nodes[:, 1])]
-    sp = nodes[:, 2]
-    print(nodes)
-
-    # Reconstruct the polynomial level for plotting
-    polyordernum = len(nodes) - 1
-    if polyorder >= 0:
-        polyordernum = polyorder
-    anothermodel = np.polyfit(st, sp, polyordernum)
-    new_level = np.polyval(anothermodel, t)
-
-    # Subplot 2: VWC with leveling nodes and polynomial fit
-    ax = plt.subplot(2, 1, 2)
-    ax.plot(t_datetime, newvwc, 'b-', label='new vwc')
-    ax.plot(st_datetime, sp, 'ro', label='nodes')
-    ax.plot(t_datetime, new_level, 'r-', label='level')
-    ax.set_ylabel('VWC')
-    ax.set_title('Volumetric Water Content')
     ax.legend(loc='best')
     ax.grid()
     plt.gcf().autofmt_xdate()
@@ -217,64 +148,22 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
     # Save diagnostic plot
     outdir = Path(xdir) / 'Files' / subdir
     suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
-    if hires_figs:
-        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.eps'
-    else:
-        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.png'
-    print(f"Saving to {plot_path}")
+    plot_path = f'{outdir}/{station}_phase_vegcorr{suffix}.png'
+    print(f"Saving vegetation correction diagnostic plot to {plot_path}")
     plt.savefig(plot_path)
-
-    # Create final VWC plot
-    if hires_figs:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.eps'
-    else:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.png'
-
-    qp.vwc_plot(station, t_datetime, nv, plot_path, circles, plt2screen)
 
     if plt2screen:
         plt.show()
     else:
         plt.close('all')
 
-    # Write VWC output file
-    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
-    base_vwcfile = file_manager.get_file_path()
-
-    vwcfile = base_vwcfile.parent / f"{station}_vwc{suffix}.txt"
-    print('VWC results being written to ', vwcfile)
-
-    with open(vwcfile, 'w') as w:
-        N = len(nv)
-        freq_map = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}
-        freq_name = freq_map.get(fr, f"Frequency {fr}")
-
-        w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
-        w.write("% Frequency used: {0} \n".format(freq_name))
-        w.write("% Vegetation model: 1 (simple) \n")
-        w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
-
-        if is_subdaily:
-            w.write(f"% Subdaily VWC with {bin_hours}-hour bins (offset: {bin_offset}h)\n")
-            w.write(qp.get_bin_schedule_info(bin_hours, bin_offset) + "\n")
-            w.write("% FracYr    Year   DOY   VWC Month Day BinStart \n")
-        else:
-            w.write("% FracYr    Year   DOY   VWC Month Day \n")
-
-        for iw in range(0, N):
-            fdate = t[iw]
-            myyear = years[iw]
-            mm = months[iw]
-            dd = days[iw]
-            mydoy = doys[iw]
-            watercontent = nv[iw]
-
-            # Only write positive, reasonable soil moisture values
-            if watercontent > 0 and watercontent < 0.5:
-                if is_subdaily:
-                    bin_start = bin_start_hours[iw]
-                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
-                           f"{mm:3.0f} {dd:3.0f} {bin_start:3.0f} \n")
-                else:
-                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
-                           f"{mm:3.0f} {dd:3.0f} \n")
+    # Return data structure for caller to handle leveling and file writing
+    return {
+        'years': years,
+        'doys': doys,
+        'vwc': newvwc,  # Percentage units, not leveled
+        'datetime': t_datetime,
+        'bin_starts': bin_start_hours if is_subdaily else None,
+        'months': months,
+        'days': days
+    }
