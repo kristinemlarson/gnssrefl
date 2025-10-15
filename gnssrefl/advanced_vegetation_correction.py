@@ -1,3 +1,11 @@
+"""
+Advanced vegetation correction model for VWC estimation.
+
+Reference: DOI 10.1007/s10291-015-0462-4
+
+Ported to gnssrefl from original MATLAB in October 2025.
+"""
+
 import scipy
 import scipy.signal
 import matplotlib.pyplot as plt
@@ -5,20 +13,18 @@ import numpy as np
 import os
 import sys
 from pathlib import Path
-from datetime import datetime
 
 import gnssrefl.sd_libs as sd
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
 
-def high_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir='',
-                           bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False,
-                           leveling_method='simple_global'):
+def advanced_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir='',
+                               bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False,
+                               simple_level=False):
     """
     Advanced vegetation model (model 2)
 
-    This function applies Claras high vegetation correction directly to
-    the vwc workflow data structures, working as replacement for the simple vegetation model.
+    This function applies the advanced vegetation correction filter to a vxyz array input.
 
     Parameters
     ----------
@@ -51,7 +57,9 @@ def high_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir='
     level_doys : list of int, optional
         [start_doy, end_doy] defining the dry season for baseline calculation
         If None, will use default values based on hemisphere
-    
+    simple_level : bool, optional
+        Use simple baseline leveling instead of polynomial (default: False)
+
     Returns
     -------
     None (writes VWC output file directly)
@@ -92,7 +100,7 @@ def high_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir='
     print('Step 2: Applying vegetation model...')
     final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks,
                                                   sgolnum, sgolply, padlen, tmin, pltit,
-                                                  fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks, level_doys, leveling_method)
+                                                  fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks, level_doys, simple_level)
     
     if len(final_mjd) == 0:
         print('No vegetation-corrected soil moisture estimates could be computed')
@@ -306,7 +314,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
 
 
 def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
-                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks=False, level_doys=None, leveling_method='simple_global'):
+                          padlen, tmin, pltit, fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks=False, level_doys=None, simple_level=False):
     """
     Apply Clara's vegetation filter to compute soil moisture
     
@@ -344,8 +352,8 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Save individual track VWC data to files
     level_doys : list of int, optional
         [start_doy, end_doy] defining the dry season for baseline calculation
-    leveling_method : str, optional
-        Baseline leveling method ('polynomial' or 'simple_global', default: 'simple_global')
+    simple_level : bool, optional
+        Use simple baseline leveling instead of polynomial (default: False)
 
     Returns
     -------
@@ -539,7 +547,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
     # Apply leveling (MJD auto-converts to years/doys internally if needed)
     fy, leveling_info = qp.apply_vwc_leveling(
         fy, tmin,
-        method=leveling_method,
+        simple=simple_level,
         mjd=finalx,  # Auto-converts to years/doys internally
         level_doys=level_doys,
         station=station, plot_debug=pltit, plt2screen=pltit,
@@ -797,8 +805,6 @@ def save_individual_track_data(station, track_year, sat_num, quad_num,
     (10)        (11)        (12)     (13)         (14)      (15)       
     (16)           (17)
     """
-    import os
-    import numpy as np
     
     # Create directory structure  
     xdir = os.environ['REFL_CODE']
@@ -808,48 +814,25 @@ def save_individual_track_data(station, track_year, sat_num, quad_num,
         track_dir = f'{xdir}/Files/{station}/individual_tracks'
     
     os.makedirs(track_dir, exist_ok=True)
-    
-    # Create filename
+
     freq_suffix = qp.get_temporal_suffix(fr)
     track_file = f'{track_dir}/{station}_track_sat{sat_num:02d}_quad{quad_num}_{track_year}{freq_suffix}.txt'
-    
-    # Create comprehensive header
+
     header_lines = [
-        f"% Comprehensive Individual Track Data for Station {station}",
+        f"% Individual Track Data for Station {station}",
         f"% Satellite: {sat_num}, Quadrant: {quad_num}, Year: {track_year}",
         f"% Frequency: {'L2C' if fr == 20 else 'L1' if fr == 1 else 'L5' if fr == 5 else f'L{fr}'}",
         f"% Generated by Advanced Vegetation Model (model 2)",
-        f"% Complete processing chain from raw observations to final VWC",
-        f"%",
-        f"% Column definitions:",
-        f"% Year         - Observation year",
-        f"% DOY          - Day of year", 
-        f"% Hour         - Hour of day (UTC)",
-        f"% MJD          - Modified Julian Date",
-        f"% Az           - Azimuth angle (degrees)",
-        f"% PhaseOrig    - Original unwrapped phase (degrees)",
-        f"% AmpLSPOrig   - Original LSP amplitude",
-        f"% AmpLSOrig    - Original LS amplitude", 
-        f"% RHOrig       - Original reflector height (meters)",
-        f"% AmpLSPSmooth - Smoothed LSP amplitude (model input)",
-        f"% AmpLSSmooth  - Smoothed LS amplitude (model input)",
-        f"% RHSmooth     - Smoothed reflector height (model input)", 
-        f"% PhaseVegCorr - Vegetation phase correction (degrees)",
-        f"% SlopeCorr    - Slope sensitivity correction",
-        f"% SlopeFinal   - Final corrected slope (1.48 - SlopeCorr)",
-        f"% PhaseCorrected - Vegetation-corrected phase (degrees)",
-        f"% VWC          - Volumetric water content (%)",
-        f"%",
+
         f"% Year DOY Hour   MJD   Az  PhaseOrig AmpLSPOrig AmpLSOrig RHOrig AmpLSPSmooth AmpLSSmooth RHSmooth PhaseVegCorr SlopeCorr SlopeFinal PhaseCorrected   VWC",
         f"% (1)  (2)  (3)   (4)  (5)    (6)       (7)        (8)     (9)       (10)         (11)       (12)        (13)      (14)       (15)         (16)       (17)"
     ]
-    
-    # Write comprehensive track data
+
     with open(track_file, 'w') as f:
         for line in header_lines:
             f.write(line + '\n')
         
-        # Write individual track observations with all processing data
+        # Write individual track observations
         for i in range(len(years)):
             f.write(f'{int(years[i]):4d} {int(doys[i]):3d} {hours[i]:6.2f} {mjds[i]:8.0f} {azimuths[i]:6.1f} '
                    f'{phase_orig[i]:9.3f} {amp_lsp_orig[i]:10.6f} {amp_ls_orig[i]:9.6f} {rh_orig[i]:6.3f} '

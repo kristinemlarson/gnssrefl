@@ -624,7 +624,7 @@ def low_pct(amp, basepercent):
 
 
 def apply_vwc_leveling(vwc_values, tmin,
-                       method='polynomial',
+                       simple=False,
                        years=None, doys=None, mjd=None,
                        level_doys=None, polyorder=-99,
                        **kwargs):
@@ -634,8 +634,8 @@ def apply_vwc_leveling(vwc_values, tmin,
     This is the FINAL leveling step applied to time-binned VWC values.
 
     Two leveling approaches are available:
-    - simple_global: Simple approach using fixed 25 lowest points (for testing)
-    - polynomial: Sophisticated per-year polynomial fitting (uses dry season nodes)
+    - Polynomial (default): Sophisticated per-year polynomial fitting using dry season nodes
+    - Simple: Simple global offset using 25 lowest points (for testing)
 
     Parameters
     ----------
@@ -644,20 +644,20 @@ def apply_vwc_leveling(vwc_values, tmin,
         These should be AFTER per-track processing and time-averaging
     tmin : float
         Minimum soil texture value (0.05 typical)
-    method : str, optional
-        Leveling method (default: 'polynomial'):
-        - 'simple_global': Global baseline using fixed 25 lowest points (Clara's reference)
-        - 'polynomial': Per-year nodes with polynomial baseline (most sophisticated)
+    simple : bool, optional
+        Use simple leveling instead of polynomial (default: False)
+        - False (default): Polynomial per-year baseline (recommended)
+        - True: Simple global offset using 25 lowest points (for testing)
     years : array-like, optional
-        Year values (required for 'polynomial' method, or auto-derived from mjd)
+        Year values (required for polynomial leveling, or auto-derived from mjd)
     doys : array-like, optional
-        Day of year values (required for 'polynomial' method, or auto-derived from mjd)
+        Day of year values (required for polynomial leveling, or auto-derived from mjd)
     mjd : array-like, optional
         Modified Julian Day values (alternative to years/doys, will be auto-converted)
     level_doys : list of int, optional
-        [start_doy, end_doy] for dry season baseline (required for 'polynomial' method)
+        [start_doy, end_doy] for dry season baseline (required for polynomial leveling)
     polyorder : int, optional
-        Polynomial order override for 'polynomial' method (default: -99 = auto)
+        Polynomial order override for polynomial leveling (default: -99 = auto)
     **kwargs : dict
         Optional parameters for polynomial method:
         - station : str (for plot labels)
@@ -677,24 +677,23 @@ def apply_vwc_leveling(vwc_values, tmin,
         - 'method': str - Method used
         - 'nodes': numpy.ndarray or None - Level nodes (polynomial method only)
         - 'baseline_points': int or None - Number of baseline points used
-        - 'baseline_value': float or None - Baseline offset (simple_global only)
+        - 'baseline_value': float or None - Baseline offset (simple method only)
 
     Examples
     --------
-    Simple global leveling (matches Kristine's reference):
-    >>> leveled, info = apply_vwc_leveling(vwc, tmin=0.05, method='simple_global')
+    Polynomial leveling (default):
+        leveled, info = apply_vwc_leveling(vwc, tmin=0.05,
+                                           years=yrs, doys=dys, level_doys=[152, 244])
 
-    Polynomial leveling with years/doys:
-    >>> leveled, info = apply_vwc_leveling(vwc, tmin=0.05, method='polynomial',
-    ...                                    years=yrs, doys=dys, level_doys=[152, 244])
-
-    Polynomial leveling with MJD (auto-converts to years/doys):
-    >>> leveled, info = apply_vwc_leveling(vwc, tmin=0.05, method='polynomial',
-    ...                                    mjd=mjd_list, level_doys=[152, 244])
+    Simple leveling:
+        leveled, info = apply_vwc_leveling(vwc, tmin=0.05, simple=True)
     """
 
     # Convert inputs to numpy arrays
     vwc_values = np.asarray(vwc_values)
+
+    # Convert boolean to method string for internal logic
+    method = 'simple' if simple else 'polynomial'
 
     # Initialize info dictionary
     info = {
@@ -716,8 +715,8 @@ def apply_vwc_leveling(vwc_values, tmin,
         years = np.array(years)
         doys = np.array(doys)
 
-    # Method: simple_global - used for testing, from reference highveg_model.py by KL
-    if method == 'simple_global':
+    # Method: simple - simple global baseline leveling
+    if method == 'simple':
         vwc_sorted = np.sort(vwc_values)
         num_baseline = min(25, len(vwc_sorted))  # Fixed 25 points (or less if dataset is small)
         baseline_value = np.mean(vwc_sorted[0:num_baseline])
@@ -822,7 +821,7 @@ def apply_vwc_leveling(vwc_values, tmin,
 
     else:
         raise ValueError(f"Unknown leveling method: '{method}'. "
-                        f"Choose from: 'simple_global', 'polynomial'")
+                        f"Choose from: 'simple', 'polynomial'")
 
     # Generate debug plot if requested
     if kwargs.get('plot_debug', False) and kwargs.get('station'):

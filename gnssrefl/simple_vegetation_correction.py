@@ -1,11 +1,6 @@
 """
-Simple vegetation correction model for VWC estimation
+Simple vegetation correction model for VWC estimation. The default and only option until October 2025.
 
-This module implements the simple vegetation correction algorithm based on
-Clara Chew's original Matlab code (write_vegcorrect_smc.m) used in PBO H2O.
-
-The simple model uses a polynomial relationship between normalized amplitude
-and vegetation effects to correct phase measurements before converting to VWC.
 """
 
 import matplotlib.pyplot as plt
@@ -15,24 +10,21 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-import gnssrefl.gps as g
-import gnssrefl.gnssir_v2 as gnssir
 import gnssrefl.phase_functions as qp
 from gnssrefl.utils import FileManagement
 
 xdir = os.environ['REFL_CODE']
 
-
 def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir='',
                              bin_hours=24, bin_offset=0, plt2screen=True, fr=20,
                              polyorder=-99, circles=False,
                              hires_figs=False, extension='', year_end=None, minvalperbin=10,
-                             leveling_method='polynomial'):
+                             simple_level=False):
     """
-    Apply simple vegetation correction model to phase data and compute VWC
+    Simple vegetation model (model 1)
 
-    This is the original/simple vegetation correction model that uses a polynomial
-    relationship between normalized amplitude and phase corrections.
+    This function applies the simple vegetation correction filter to a vxyz array input. This was the default and
+    only available vegetation correction until October 2025.
 
     Parameters
     ----------
@@ -42,7 +34,6 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
         Calendar year (start)
     vxyz : numpy array
         Track-level phase observations (16 columns)
-        Columns documented in vwc_cl.py lines 261-276
     tmin : float
         Min soil moisture value based on soil texture
     tmax : float
@@ -71,6 +62,8 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
         Last year for multi-year analysis (default: same as year)
     minvalperbin : int, optional
         Minimum observations required per time bin (default: 10)
+    simple_level : bool, optional
+        Use simple baseline leveling instead of polynomial (default: False)
 
     Returns
     -------
@@ -81,12 +74,6 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
 
     if not year_end:
         year_end = year
-
-    # Validate leveling method for simple model
-    if leveling_method != 'polynomial':
-        print(f'Error: Simple vegetation model (model 1) only supports polynomial leveling.')
-        print(f'You specified: {leveling_method}')
-        sys.exit()
 
     # level_doys should already be set by set_parameters() in the caller
     # (handles CLI, JSON, and hemisphere-based defaults)
@@ -138,7 +125,6 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
     y1 = -int(window_len / 2)
     smamp = y[y0:y1]
 
-    # Simple vegetation correction algorithm (from Clara's original code)
     residval = 2  # Residual value for baseline
 
     # Vegetation weight calculation (4th order polynomial)
@@ -155,10 +141,10 @@ def simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir
     vwc = 100 * tmin + 1.48 * (ph - residval)
     newvwc = 100 * tmin + 1.48 * (newph - residval)
 
-    # Apply baseline leveling using unified function
+    # Apply baseline leveling
     nv, leveling_info = qp.apply_vwc_leveling(
         newvwc, tmin,
-        method=leveling_method,
+        simple=simple_level,
         years=years, doys=doys, level_doys=level_doys, polyorder=polyorder,
         station=station, plot_debug=plt2screen, plt2screen=plt2screen,
         subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset

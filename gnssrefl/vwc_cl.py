@@ -45,7 +45,7 @@ def parse_arguments():
     parser.add_argument("-advanced", default=None, type=str, help="Shorthand for -vegetation_model 2 (advanced vegetation model)")
     parser.add_argument("-vegetation_model", default=None, type=str, help="Vegetation correction model: 1 (simple, default) or 2 (advanced)")
     parser.add_argument("-save_tracks", default=None, type=str, help="Save individual track VWC data (model 2 only)")
-    parser.add_argument("-leveling_method", default=None, type=str, choices=['polynomial', 'simple_global'], help="Global baseline leveling method: polynomial (default for simple vegetation model) or simple_global (default for advanced vegetation model)")
+    parser.add_argument("-simple_level", default=None, type=str, help="Use simple global leveling instead of polynomial (default: False)")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
     parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes",type=int) 
 
@@ -54,7 +54,7 @@ def parse_arguments():
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced','save_tracks']
+    boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced','save_tracks','simple_level']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
@@ -65,7 +65,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         bin_hours: int = None, minvalperbin: int = None, bin_offset: int = None,
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None,
         warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False,
-        advanced : bool=False, vegetation_model: int=None, save_tracks: bool=False, leveling_method: str=None,
+        advanced : bool=False, vegetation_model: int=None, save_tracks: bool=False, simple_level: bool=False,
         extension:str=None, level_doys : list =[] ):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
@@ -148,6 +148,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
          shorthand for vegetation_model=2
     vegetation_model : int, optional
          vegetation correction model: 1=simple (default), 2=advanced
+    simple_level : bool, optional
+         use simple global leveling instead of polynomial (default: False)
+         most users should use the default polynomial leveling
+    save_tracks : bool, optional
+         save individual track VWC data and raw phase file (station_all_phase.txt)
     extension : str
          extension used when you made the json analysis file
     level_doys : list
@@ -234,11 +239,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     if veg_model != json_vegetation_model:
         print(f'Vegetation model overridden by CLI: {veg_model}')
 
-    # Set leveling method default based on vegetation model if not specified
-    if leveling_method is None:
-        leveling_method = 'polynomial' if veg_model == 1 else 'simple_global'
-
-    print(f'Using leveling method: {leveling_method}')
+    print(f'Using baseline leveling: {"simple" if simple_level else "polynomial"}')
 
     # if you have requested snow filtering
     if snow_filter:
@@ -562,19 +563,24 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         qp.subdaily_phase_plot(station, fr, tv, xdir, subdir, hires_figs, bin_hours, bin_offset, plt2screen=plt)
         matplt.show(block=False)
 
+    # Write all_phase.txt file if save_tracks is enabled
+    if save_tracks:
+        fname_phase = f'{xdir}/Files/{subdir}/{station}_all_phase.txt'
+        qp.write_phase_for_advanced(fname_phase, vxyz)
+
     if veg_model == 1:
         print('Running simple vegetation model (model 1)...')
         svc.simple_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir,
                                      bin_hours, bin_offset, plt2screen=plt, fr=fr,
                                      polyorder=polyorder, circles=circles, hires_figs=hires_figs,
                                      extension=extension, year_end=year_end, minvalperbin=minvalperbin,
-                                     leveling_method=leveling_method)
+                                     simple_level=simple_level)
 
     elif veg_model == 2:
         print('Running advanced vegetation model (model 2)...')
-        avc.high_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir,
-                                   bin_hours, bin_offset, plt, fr, minvalperbin,
-                                   save_tracks, leveling_method=leveling_method)
+        avc.advanced_vegetation_filter(station, year, vxyz, tmin, tmax, level_doys, subdir,
+                                       bin_hours, bin_offset, plt, fr, minvalperbin,
+                                       save_tracks, simple_level=simple_level)
 
     else:
         print(f'Unknown vegetation model: {veg_model}. Use 1 (simple) or 2 (advanced).')
