@@ -57,7 +57,7 @@ def advanced_vegetation_filter(station, vxyz, subdir='',
         - 'bin_starts': list of bin start hours (subdaily only) or empty list
     """
     
-    print('>>>>>>>>>>> Advanced Vegetation Model (model 2) <<<<<<<<<<<<')
+    print('=== Advanced Vegetation Model (model 2) ===')
     print(f'Processing {len(vxyz)} track observations for station {station}')
 
     if fr != 20:
@@ -78,12 +78,10 @@ def advanced_vegetation_filter(station, vxyz, subdir='',
     padlen = 1000       # Padding length
 
     # Step 1: Normalize and process the track-level data
-    print('Step 1: Normalizing metrics and removing outliers...')
     tracks, metrics_all, vegmast = norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift,
                                                   baseperc, zphival, ampvarday, ampvarlimit)
 
     # Step 2: Apply vegetation filter to compute soil moisture
-    print('Step 2: Applying vegetation model...')
     final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks,
                                                   sgolnum, sgolply, padlen, pltit,
                                                   fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks)
@@ -147,7 +145,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
         Vegetation mask
     """
     
-    print('>>>>>>>>>>> Normalizing track data <<<<<<<<<<<<')
+    print('=== Normalizing track data ===')
     
     phivarlimit = 150  # Phase variance limit
     
@@ -196,9 +194,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
         
         if Nvals < 10:  # Skip tracks with too few points
             continue
-            
-        print(f'Processing track {i+1}/{numtracks}: sat {thesat}, quad {thequad}, {Nvals} points')
-        
+
         # Extract data for this track
         s_refhgt = rh[ii].copy()
         aprioris = apriori[ii]
@@ -206,24 +202,30 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
         amplsp = ampLSP[ii].copy()
         phis = phi[ii].copy()
         doys = doy[ii]
-        
+
         # ===== Reflector Height Processing =====
         # Remove outliers in RH (> 15cm from apriori)
         bad = np.abs(aprioris - s_refhgt) >= 0.15
         good = np.abs(aprioris - s_refhgt) < 0.15
-        
+
         if np.any(bad) and np.any(good):
             s_refhgt[bad] = np.interp(doys[bad], doys[good], s_refhgt[good])
-        
+
         # Calculate delta RH
         s_refhgt = s_refhgt.reshape(Nvals, 1)
         D_RH[ii] = aprioris.reshape(Nvals, 1) - s_refhgt
-        
+
         # Apply RH drift correction
         medrh = np.mean(aprioris) - np.median(s_refhgt.flatten())
         if acc_rhdrift == 1:
             smrh = np.zeros((Nvals, 1)) + medrh
             D_RH[ii] = D_RH[ii] - smrh
+
+        # Print quality metrics for this track
+        Ngood = np.sum(good)
+        Nbad = np.sum(bad)
+        offs = np.round(np.mean(aprioris) - np.mean(s_refhgt.flatten()), 3)
+        print(f'quad {thequad} sat {thesat}  Offset {offs:6.3f} m  good {Ngood:4d}  bad {Nbad:4d}')
         
         # ===== LSP Amplitude Processing =====
         # Find outliers using rolling variance
@@ -283,7 +285,6 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
     # Combine results
     metrics_all = np.hstack((D_amplsp, D_amp, D_phi, D_RH))
     
-    print(f'Completed normalization for {numtracks} tracks')
     return tracks, metrics_all, vegmast
 
 
@@ -333,7 +334,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Bin start hours for subdaily data (empty for daily)
     """
     
-    print('>>>>>>>>>>> Applying vegetation model <<<<<<<<<<<<')
+    print('=== Applying vegetation model ===')
     
     # Extract normalized metrics
     D_amplsp = normmet[:, 0]
@@ -365,6 +366,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
     men = 20    # Points for padding calculation
 
     Nt, nc = tracks.shape
+    tracks_processed = 0  # Counter for tracks that meet minimum threshold
 
     # Process each track
     for i in range(Nt):
@@ -374,7 +376,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Ntrack = len(sat[ii])
 
         if Ntrack > min_number_points:
-            print(f'Processing track {i+1}/{Nt}: sat {thissat}/quad {thisquad}, {Ntrack} points')
+            tracks_processed += 1
 
             # Pad and smooth the metrics
             paddedAmplsp = padClara(D_amplsp[ii], Ntrack, men, padlen)
@@ -446,7 +448,9 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             #     fig.autofmt_xdate()
             #     plt.legend(loc="best")
             #     plt.show()
-    
+
+    print(f'Processed {tracks_processed}/{Nt} tracks (minimum {min_number_points} points required)')
+
     # Generate time bins from vxyz data
     if bin_hours < 24:
         print(f'Computing {bin_hours}-hour averaged VWC estimates...')
@@ -553,9 +557,7 @@ def load_clara_model():
     delta_heff = data[:, 2]     # Change in effective reflector height
     veg_correction = data[:, 3] # Vegetation phase corrections
     slope_correction = data[:, 4] # Slope sensitivity corrections
-    
-    print(f'Loaded model with {len(data)} data points')
-    
+
     return amp_lsp, amp_dsnr, delta_heff, veg_correction, slope_correction
 
 
