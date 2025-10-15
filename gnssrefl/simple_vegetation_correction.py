@@ -152,9 +152,8 @@ def simple_vegetation_filter(station, vxyz, subdir='',
     print(f"Saving vegetation correction diagnostic plot to {plot_path}")
     plt.savefig(plot_path)
 
-    if plt2screen:
-        plt.show()
-    else:
+    # Don't call plt.show() here - let all figures accumulate and display together at the end
+    if not plt2screen:
         plt.close('all')
 
     # Return data structure for caller to handle leveling and file writing

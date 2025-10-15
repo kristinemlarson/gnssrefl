@@ -498,7 +498,6 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         else:
             # Daily: match by year/doy only
             time_mask = (year == year_val) & (doy == doy_val)
-            bin_start = 0  # For daily bins, use 0
 
             # Get VWC values for tracks in this day
             bin_vwc_raw = svwc[time_mask].flatten()
@@ -506,10 +505,10 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             bin_vwc = bin_vwc_raw[bin_vwc_raw != 0]
 
             if len(bin_vwc) >= minvalperbin:
-                # Store daily average
+                # Store daily average (no bin_start for daily data)
                 finalx.append(g.ydoy2mjd(year_val, doy_val))
                 finaly.append(np.mean(bin_vwc))
-                final_binstarts.append(bin_start)
+                # Don't append to final_binstarts for daily data
     
     if len(finalx) == 0:
         if bin_hours < 24:

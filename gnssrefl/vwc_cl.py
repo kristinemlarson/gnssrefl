@@ -545,13 +545,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # This track-level data is passed directly to vegetation filters and plotting functions.
     # ========================================================================
 
-    # Plot averaged phase data, pre vegetation correction
+    # Plot averaged phase data, from BEFORE vegetation correction
     if plt:
-        qp.subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours, bin_offset,
-                               minvalperbin, plt2screen=plt)
-        matplt.show(block=False)
+        qp.subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours, bin_offset, minvalperbin, plt2screen=plt)
 
-    # Write all_phase.txt file
+    # Write all_phase.txt file if requested
     if save_tracks:
         fname_phase = f'{xdir}/Files/{subdir}/{station}_all_phase.txt'
         qp.write_phase_for_advanced(fname_phase, vxyz)
@@ -593,17 +591,16 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
     )
 
-    # Update vwc_data with leveled values (convert to list for compatibility)
+    # Update vwc_data with leveled values
     vwc_data['vwc'] = leveled_vwc if isinstance(leveled_vwc, list) else leveled_vwc.tolist()
 
-    # Step 3: Write output file (common for both models)
+    # Step 3: Write output files
     print('\nWriting VWC output file...')
     qp.write_vwc_output(
         station, vwc_data, year, subdir, fr,
         bin_hours, bin_offset, extension, veg_model
     )
 
-    # Step 4: Generate final VWC plot (common for both models)
     if plt:
         print('\nGenerating final VWC plot...')
         suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)

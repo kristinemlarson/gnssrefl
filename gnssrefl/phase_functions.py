@@ -980,48 +980,56 @@ def plot_baseline_leveling(station, years, doys, vwc_values, new_level, nodes, p
     Plot baseline leveling results - before/after style like vegetation correction
     """
     import matplotlib.pyplot as plt
-    
-    # Convert to fractional years for plotting
+    from datetime import datetime
+
+    # Convert to fractional years for calculations
     t = years + doys/365.25
     # Apply the same conversion as the actual function: convert to decimal and add tmin offset
     leveled_vwc = tmin + (vwc_values - new_level) / 100
-    
+
+    # Convert to datetime objects for better date formatting
+    t_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(years, doys)]
+
     plt.figure(figsize=(10, 6))
-    
+
     # Add faded yellow highlight for baseline periods
     year_start = int(np.min(years))
     year_end = int(np.max(years))
     for yr in range(year_start, year_end + 1):
         if level_doys[0] > level_doys[1]:  # crosses year boundary
-            t1 = (yr - 1) + level_doys[0]/365.25
-            t2 = yr + level_doys[1]/365.25
+            # Create datetime objects for baseline period boundaries
+            dt1 = datetime.strptime(f'{yr-1} {level_doys[0]}', '%Y %j')
+            dt2 = datetime.strptime(f'{yr} {level_doys[1]}', '%Y %j')
         else:
-            t1 = yr + level_doys[0]/365.25
-            t2 = yr + level_doys[1]/365.25
-        plt.axvspan(t1, t2, alpha=0.2, color='yellow', label='Baseline period' if yr == year_start else "")
-    
+            dt1 = datetime.strptime(f'{yr} {level_doys[0]}', '%Y %j')
+            dt2 = datetime.strptime(f'{yr} {level_doys[1]}', '%Y %j')
+        plt.axvspan(dt1, dt2, alpha=0.2, color='yellow', label='Baseline period' if yr == year_start else "")
+
     # Plot before (blue) and after (red) on same scale
-    plt.plot(t, vwc_values / 100, 'b-', alpha=0.7, label='Before leveling')
-    plt.plot(t, leveled_vwc, 'r-', alpha=0.7, label='After leveling')
-    
+    plt.plot(t_datetime, vwc_values / 100, 'b-', alpha=0.7, label='Before leveling')
+    plt.plot(t_datetime, leveled_vwc, 'r-', alpha=0.7, label='After leveling')
+
     # Plot polynomial baseline
-    plt.plot(t, new_level / 100, 'g--', linewidth=2, label='Polynomial baseline')
-    
+    plt.plot(t_datetime, new_level / 100, 'g--', linewidth=2, label='Polynomial baseline')
+
     # Plot level nodes
     if len(nodes) > 0:
-        node_t = nodes[:, 0] + nodes[:, 1]/365.25
-        plt.plot(node_t, nodes[:, 2] / 100, 'ko', markersize=6, label='Level nodes')
-    
+        node_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(nodes[:, 0], nodes[:, 1])]
+        plt.plot(node_datetime, nodes[:, 2] / 100, 'ko', markersize=6, label='Level nodes')
+
     plt.ylabel('VWC (m³/m³)')
-    plt.xlabel('Year')
+    plt.xlabel('Date')
     plt.title(f'{station.upper()} Baseline Leveling')
     plt.legend()
     plt.grid(True, alpha=0.3)
-    
+
+    # Auto-format x-axis dates like in master branch
+    plt.gcf().autofmt_xdate()
+
     plt.tight_layout()
     plt.savefig(plot_path, dpi=150, bbox_inches='tight')
     print(f'Saved leveling plot: {plot_path}')
-    
+
     if not plt2screen:
         plt.close()
 
