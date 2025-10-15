@@ -8,6 +8,7 @@ Ported to gnssrefl from original MATLAB in October 2025.
 
 import scipy
 import scipy.signal
+import scipy.spatial
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -358,37 +359,41 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
     # Load Clara's model
     amp_lsp_model, amp_dsnr_model, delta_heff_model, veg_correction_model, slopes_model = load_clara_model()
     ref_points = np.column_stack([amp_lsp_model, amp_dsnr_model, delta_heff_model])
-    
+
+    # Build KD-tree once for all tracks (much faster than brute force for each track)
+    print(f'Building KD-tree for {len(ref_points)} model points...')
+    kdtree = scipy.spatial.cKDTree(ref_points)
+
     min_number_points = 90  # Minimum points per track
     men = 20    # Points for padding calculation
-    
+
     Nt, nc = tracks.shape
-    
+
     # Process each track
     for i in range(Nt):
         thissat = int(tracks[i, 0])
         thisquad = int(tracks[i, 1])
         ii = (thissat == sat) & (thisquad == q)
         Ntrack = len(sat[ii])
-        
+
         if Ntrack > min_number_points:
             print(f'Processing track {i+1}/{Nt}: sat {thissat}/quad {thisquad}, {Ntrack} points')
-            
+
             # Pad and smooth the metrics
             paddedAmplsp = padClara(D_amplsp[ii], Ntrack, men, padlen)
             paddedAmp = padClara(D_amp[ii], Ntrack, men, padlen)
             paddedRH = padClara(D_RH[ii], Ntrack, men, padlen)
-            
+
             # Apply Savgol smoothing
             s1 = scipy.signal.savgol_filter(paddedAmplsp.flatten(), sgolnum, sgolply)
             s2 = scipy.signal.savgol_filter(paddedAmp.flatten(), sgolnum, sgolply)
             s3 = scipy.signal.savgol_filter(paddedRH.flatten(), sgolnum, sgolply)
-            
+
             # Combine smoothed metrics for model lookup
             mypts = np.column_stack([s1, s2, s3])
-            
-            # Find nearest neighbors in Clara's model
-            indices = numpy_1nn_v2(mypts, ref_points)
+
+            # Find nearest neighbors in Clara's model using KD-tree
+            _, indices = kdtree.query(mypts, k=1)
             
             # Get vegetation phase correction
             uns_phi = veg_correction_model[indices]
@@ -586,33 +591,6 @@ def padClara(obs, Ntrack, men, padlen):
     padded_obs = np.vstack((interim, p + m2))
     
     return padded_obs
-
-
-def numpy_1nn_v2(query_points, reference_points):
-    """
-    Pure numpy 1-nearest neighbor search
-    
-    Parameters
-    ----------
-    query_points : numpy array (N, 3)
-        Points to find neighbors for
-    reference_points : numpy array (M, 3)
-        Reference points to search in
-        
-    Returns
-    -------
-    indices : numpy array
-        Indices of nearest neighbors
-    """
-    
-    # Compute all pairwise Euclidean distances
-    diff = query_points[:, np.newaxis, :] - reference_points[np.newaxis, :, :]
-    distances = np.sqrt(np.sum(diff**2, axis=2))
-    
-    # Find nearest neighbor
-    indices = np.argmin(distances, axis=1, keepdims=True).flatten()
-    
-    return indices
 
 
 def rolling_window(a, window):
