@@ -68,13 +68,13 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         advanced : bool=False, vegetation_model: int=None, save_tracks: bool=False, simple_level: bool=False,
         extension:str=None, level_doys : list =[] ):
     """
-    The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates. 
-    It concatenates previously computed phase results, makes plots for the four geographic quadrants, computes daily 
-    average phase files before converting to volumetric water content (VWC).
+    The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates.
+    It concatenates previously computed phase results, makes plots for the four geographic quadrants, bins the data
+    (into daily or subdaily time bins), applies vegetation correction, and converts to volumetric water content.
 
-    The code now allows the user to select between vegetation models using the -vegetation_model parameter.
-    Model 1 (simple, default) is the legacy vegetation correction method, while model 2 implements
-    an advanced vegetation correction algorithm for sites with dense vegetation.
+    The code supports two vegetation correction models: Model 1 (simple, default) uses amplitude-based correction
+    suitable for sites with bare soil or sparse vegetation. Model 2 (advanced) uses the Chew et al. (2016) GPS Solutions
+    (DOI: 10.1007/s10291-015-0462-4) algorithm, and should be used for sites with dense or tall vegetation.
 
     Code now allows inputs (minvalperday, tmin, and tmax) to be stored in the gnssir analysis json file.
     To avoid confusion, in the json they are called vwc_minvalperday, vwc_min_soil_texture, and vwc_max_soil_texture.
@@ -147,12 +147,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     advanced : bool, optional
          shorthand for vegetation_model=2
     vegetation_model : int, optional
-         vegetation correction model: 1=simple (default), 2=advanced
+         vegetation correction model: 1=simple (default), 2=advanced (Chew et al. 2016)
+         can be set in gnssir analysis JSON as vwc_vegetation_model
     simple_level : bool, optional
-         use simple global leveling instead of polynomial (default: False)
-         most users should use the default polynomial leveling
+         use simple leveling instead of polynomial (default: False)
     save_tracks : bool, optional
-         save individual track VWC data and raw phase file (station_all_phase.txt)
+         save individual track VWC data to files (advanced model only)
     extension : str
          extension used when you made the json analysis file
     level_doys : list
@@ -545,13 +545,13 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # This track-level data is passed directly to vegetation filters and plotting functions.
     # ========================================================================
 
-    # Plot averaged phase data
+    # Plot averaged phase data, pre vegetation correction
     if plt:
         qp.subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours, bin_offset,
                                minvalperbin, plt2screen=plt)
         matplt.show(block=False)
 
-    # Write all_phase.txt file if save_tracks is enabled
+    # Write all_phase.txt file
     if save_tracks:
         fname_phase = f'{xdir}/Files/{subdir}/{station}_all_phase.txt'
         qp.write_phase_for_advanced(fname_phase, vxyz)

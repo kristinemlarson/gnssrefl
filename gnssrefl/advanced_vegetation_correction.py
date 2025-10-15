@@ -61,11 +61,9 @@ def advanced_vegetation_filter(station, vxyz, subdir='',
     print(f'Processing {len(vxyz)} track observations for station {station}')
 
     if fr != 20:
-        freq_name = {1: "L1", 2: "L2C", 5: "L5"}.get(fr, f"frequency {fr}")
-        print(f"\nWarning: Clara's vegetation model was developed and tested only with L2C data.")
-        print(f"Using {freq_name} is experimental and results may not be reliable.")
+        print(f"\nWarning: The advanced vegetation model was developed and tested only with L2C data.")
 
-    # Clara's default parameters (from original code)
+    # Clara's default parameters (from original MATLAB code)
     remoutli = 1        # Remove outliers? 0=no, 1=yes
     baseperc = 0.2      # Amplitude normalization percentage (top 20%)
     zphival = 0.15      # Fraction of values for phase zeroing
@@ -107,8 +105,8 @@ def advanced_vegetation_filter(station, vxyz, subdir='',
     # Return data structure for caller to handle leveling and file writing
     return {
         'mjd': final_mjd,
-        'vwc': final_vwc,  # Percentage units, not leveled
-        'datetime': datetime_array.tolist() if isinstance(datetime_array, np.ndarray) else datetime_array,
+        'vwc': final_vwc,  # Percentage units, not yet leveled
+        'datetime': datetime_array.tolist(),
         'bin_starts': final_binstarts
     }
 
@@ -118,8 +116,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
     """
     Normalize metrics and remove outliers from vxyz data
     
-    This processes the full track-level data from vwc to prepare it for
-    Clara's vegetation model.
+    This processes the full track-level data from vwc to prepare it for the KNN lookup.
     
     Parameters
     ----------
@@ -360,7 +357,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
     amp_lsp_model, amp_dsnr_model, delta_heff_model, veg_correction_model, slopes_model = load_clara_model()
     ref_points = np.column_stack([amp_lsp_model, amp_dsnr_model, delta_heff_model])
 
-    # Build KD-tree once for all tracks (much faster than brute force for each track)
+    # Build KD-tree once for all tracks for efficient KNN search
     print(f'Building KD-tree for {len(ref_points)} model points...')
     kdtree = scipy.spatial.cKDTree(ref_points)
 
@@ -420,7 +417,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             avgf = np.reshape(avgf, (Ntrack, 1))
 
             # Convert to VWC (percentage units, not yet leveled)
-            # Note: tmin offset will be applied during leveling in caller
+            # Note: tmin offset will be applied during leveling in original vwc function
             svwc[ii] = newslope.reshape(Ntrack, 1) * avgf
 
             # Apply bounds checking (in percentage units)
@@ -450,7 +447,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             #     plt.legend(loc="best")
             #     plt.show()
     
-    # Generate time bins from vxyz data (not tv) to process ALL days
+    # Generate time bins from vxyz data
     if bin_hours < 24:
         print(f'Computing {bin_hours}-hour averaged VWC estimates...')
     else:
@@ -460,7 +457,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
     finaly = []
     final_binstarts = []  # Track bin start hours for subdaily output
 
-    # Get unique year/doy combinations from vxyz
+    # Get unique year/doy combinations
     unique_days = np.unique(vxyz[:, [0, 1]], axis=0)
     print(f'Processing {len(unique_days)} unique days from vxyz data')
 
@@ -517,7 +514,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             print('No daily averages could be computed')
         return [], [], []
 
-    # Return VWC values in percentage units (not leveled - caller will handle leveling)
+    # Return VWC values in percentage units (not leveled - vwc function will handle leveling)
     fy = finaly  # Keep as list
 
     return finalx, fy, final_binstarts
@@ -550,8 +547,7 @@ def load_clara_model():
     
     print(f'Loading Clara model from: {model_file}')
     data = np.loadtxt(model_file, comments='%')
-    
-    # Extract columns with descriptive variable names
+
     amp_lsp = data[:, 0]        # LSP amplitude features
     amp_dsnr = data[:, 1]       # DSNR amplitude features  
     delta_heff = data[:, 2]     # Change in effective reflector height
@@ -618,11 +614,10 @@ def save_individual_track_data(station, track_year, sat_num, quad_num,
                              phase_corrected, vwc_values, 
                              subdir, fr):
     """
-    Save comprehensive individual track VWC data for efficient re-binning and analysis
+    Save individual track VWC data for efficient re-binning and analysis
     
     This function saves the complete processing chain from raw observations through
-    Clara's vegetation model corrections to final VWC estimates. The data enables
-    quality control, alternative processing approaches, and efficient temporal re-binning.
+    Clara's vegetation model corrections to final VWC estimates.
     
     Parameters
     ----------
@@ -679,13 +674,9 @@ def save_individual_track_data(station, track_year, sat_num, quad_num,
     Year DOY Hour MJD Az PhaseOrig AmpLSPOrig AmpLSOrig RHOrig 
     AmpLSPSmooth AmpLSSmooth RHSmooth PhaseVegCorr SlopeCorr SlopeFinal 
     PhaseCorrected VWC
-    
-    (1)  (2) (3)  (4) (5) (6)       (7)        (8)       (9)    
-    (10)        (11)        (12)     (13)         (14)      (15)       
-    (16)           (17)
+
     """
-    
-    # Create directory structure  
+
     xdir = os.environ['REFL_CODE']
     if subdir:
         track_dir = f'{xdir}/Files/{subdir}/individual_tracks'
