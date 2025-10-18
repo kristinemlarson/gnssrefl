@@ -519,6 +519,14 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         if advanced:
             matplt.close(fig2)
 
+    # Plot averaged phase data, from before vegetation correction
+    if plt:
+        qp.subdaily_phase_plot(station, fr, vxyz, xdir, subdir_path, hires_figs, bin_hours, bin_offset, minvalperbin, plt2screen=plt)
+
+    # Write all_phase.txt file if requested
+    if save_tracks:
+        fname_phase = f'{xdir}/Files/{subdir_path}/{station}_all_phase.txt'
+        qp.write_phase_for_advanced(fname_phase, vxyz)
 
     # ========================================================================
     # TRACK-LEVEL PHASE DATA (vxyz)
@@ -548,14 +556,21 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # This track-level data is passed directly to vegetation filters and plotting functions.
     # ========================================================================
 
-    # Plot averaged phase data, from BEFORE vegetation correction
-    if plt:
-        qp.subdaily_phase_plot(station, fr, vxyz, xdir, subdir_path, hires_figs, bin_hours, bin_offset, minvalperbin, plt2screen=plt)
-
-    # Write all_phase.txt file if requested
-    if save_tracks:
-        fname_phase = f'{xdir}/Files/{subdir_path}/{station}_all_phase.txt'
-        qp.write_phase_for_advanced(fname_phase, vxyz)
+    # ========================================================================
+    # VWC DATA STRUCTURE (vwc_data)
+    # ========================================================================
+    #
+    # vwc_data is the standardized output from both vegetation models:
+    #   - Dictionary with time-binned VWC estimates (after vegetation correction)
+    #   - Keys:
+    #       'mjd'        : list of Modified Julian Day values
+    #       'vwc'        : list of VWC values (percentage units, not yet leveled)
+    #       'datetime'   : list of datetime objects (for plotting)
+    #       'bin_starts' : list of bin start hours (subdaily) or empty list (daily)
+    #
+    # This structure is returned by both simple_vegetation_filter() and
+    # advanced_vegetation_filter(), then passed to leveling and output functions.
+    # ========================================================================
 
     if veg_model == 1:
         print('Running simple vegetation model (model 1)...')
@@ -563,14 +578,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
             station, vxyz, subdir_path,
             bin_hours, bin_offset, plt2screen=plt, fr=fr,
             minvalperbin=minvalperbin)
-
     elif veg_model == 2:
         print('Running advanced vegetation model (model 2)...')
         vwc_data = avc.advanced_vegetation_filter(
             station, vxyz, subdir_path,
             bin_hours, bin_offset, plt, fr, minvalperbin,
             save_tracks)
-
     else:
         print(f'Unknown vegetation model: {veg_model}. Use 1 (simple) or 2 (advanced).')
         sys.exit()
@@ -580,29 +593,24 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         print('No vegetation-corrected VWC values produced. Exiting.')
         sys.exit()
 
-    # Step 2: Apply baseline leveling
+    # Apply baseline leveling
     print('\nApplying baseline leveling...')
     leveled_vwc, leveling_info = qp.apply_vwc_leveling(
         vwc_data['vwc'], tmin,
         simple=simple_level,
-        years=vwc_data.get('years'),
-        doys=vwc_data.get('doys'),
-        mjd=vwc_data.get('mjd'),
+        mjd=vwc_data['mjd'],
         level_doys=level_doys,
         polyorder=polyorder,
         station=station, plot_debug=plt, plt2screen=plt,
-        subdir=subdir_path, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
+        extension=extension, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
     )
 
     # Update vwc_data with leveled values
     vwc_data['vwc'] = leveled_vwc if isinstance(leveled_vwc, list) else leveled_vwc.tolist()
 
-    # Step 3: Write output files
+    # Write output files
     print('\nWriting VWC output file...')
-    qp.write_vwc_output(
-        station, vwc_data, year, fr,
-        bin_hours, bin_offset, extension, veg_model
-    )
+    qp.write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset, extension, veg_model)
 
     if plt:
         print('\nGenerating final VWC plot...')

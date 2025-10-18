@@ -878,7 +878,7 @@ def apply_vwc_leveling(vwc_values, tmin,
         - station : str (for plot labels)
         - plot_debug : bool (generate diagnostic plots)
         - plt2screen : bool (show plots on screen)
-        - subdir : str (subdirectory for output)
+        - extension : str (extension for subdirectory, e.g. 'test1' → 'station/test1')
         - fr : int (frequency code for file naming)
         - bin_hours : int (temporal binning for file naming)
         - bin_offset : int (temporal offset for file naming)
@@ -1044,7 +1044,7 @@ def apply_vwc_leveling(vwc_values, tmin,
         if baseline_curve is not None and years is not None and doys is not None:
             station = kwargs.get('station')
             plt2screen = kwargs.get('plt2screen', True)
-            subdir = kwargs.get('subdir', '')
+            extension = kwargs.get('extension', '')
             fr = kwargs.get('fr', 20)
             bin_hours = kwargs.get('bin_hours', 24)
             bin_offset = kwargs.get('bin_offset', 0)
@@ -1054,12 +1054,10 @@ def apply_vwc_leveling(vwc_values, tmin,
             suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
             plot_suffix = suffix.replace('.txt', '.png')
 
-            if subdir:
-                plot_path = f'{xdir}/Files/{subdir}/{station}_baseline_leveling{plot_suffix}'
-                os.makedirs(f'{xdir}/Files/{subdir}', exist_ok=True)
-            else:
-                plot_path = f'{xdir}/Files/{station}_baseline_leveling{plot_suffix}'
-                os.makedirs(f'{xdir}/Files', exist_ok=True)
+            # Build subdir path from extension (consistent with vwc_cl.py pattern)
+            subdir_path = f"{station}/{extension}" if extension else station
+            plot_path = f'{xdir}/Files/{subdir_path}/{station}_baseline_leveling{plot_suffix}'
+            os.makedirs(f'{xdir}/Files/{subdir_path}', exist_ok=True)
 
             plot_baseline_leveling(station, years, doys, vwc_values, baseline_curve,
                                  nodes, plot_path, tmin, level_doys, plt2screen)

@@ -420,7 +420,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
             level_doys=level_doys,
             polyorder=polyorder,
             station=station, plot_debug=False, plt2screen=False,
-            subdir=subdir_path,
+            extension=extension,
             fr=resolved_fr, bin_hours=bin_hours, bin_offset=0
         )
 
