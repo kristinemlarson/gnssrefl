@@ -123,6 +123,7 @@ def combine_offset_files_to_vwc_data(station, fr, bin_hours, extension=''):
     bin_starts = all_measurements[:, 6].astype(int)
 
     # Convert year/doy/binhour to MJD
+    mjd_values = []
     datetimes = []
     for yr, doy, bin_hr in zip(years, doys, bin_starts):
         mjd = g.ydoy2mjd(int(yr), int(doy)) + int(bin_hr) / 24.0
