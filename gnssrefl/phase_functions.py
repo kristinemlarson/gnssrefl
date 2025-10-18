@@ -315,7 +315,42 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path,circles,plt2screen=True):
         plt.close()  # Close figure only when not displaying to screen
 
 
-def write_vwc_output(station, vwc_data, year, subdir, fr, bin_hours, bin_offset,
+def mjd_to_file_columns(mjd_list):
+    """
+    Convert MJD values to year, doy, month, day for file writing.
+
+    Parameters
+    ----------
+    mjd_list : list or array
+        Modified Julian Day values
+
+    Returns
+    -------
+    years : np.ndarray
+        Year values
+    doys : np.ndarray
+        Day of year values
+    months : np.ndarray
+        Month values
+    days : np.ndarray
+        Day of month values
+    """
+    years = []
+    doys = []
+    months = []
+    days = []
+
+    for mjd_val in mjd_list:
+        dt = g.mjd_to_datetime(mjd_val)
+        years.append(dt.year)
+        doys.append(dt.timetuple().tm_yday)
+        months.append(dt.month)
+        days.append(dt.day)
+
+    return np.array(years), np.array(doys), np.array(months), np.array(days)
+
+
+def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
                      extension='', vegetation_model=1):
     """
     Write VWC output file in standard gnssrefl format.
@@ -326,14 +361,13 @@ def write_vwc_output(station, vwc_data, year, subdir, fr, bin_hours, bin_offset,
     station : str
         4-character station name
     vwc_data : dict
-        Must contain one of:
-        - 'years', 'doys', 'vwc', 'datetime' (simple model format)
-        - 'mjd', 'vwc', 'datetime' (advanced model format, converts mjd to years/doys)
-        Optional: 'bin_starts' (for subdaily)
+        Must contain:
+        - 'mjd': Modified Julian Day values
+        - 'vwc': VWC values
+        - 'datetime': datetime objects
+        - 'bin_starts': list of bin start hours (subdaily) or empty list (daily)
     year : int
         Year for file naming
-    subdir : str
-        Subdirectory for output files
     fr : int
         Frequency code (1=L1, 5=L5, 20=L2C)
     bin_hours : int
@@ -350,29 +384,14 @@ def write_vwc_output(station, vwc_data, year, subdir, fr, bin_hours, bin_offset,
     # Extract data from vwc_data dict
     vwc_values = vwc_data['vwc']
     datetime_array = vwc_data['datetime']
+    mjd_values = vwc_data['mjd']
 
-    # Handle different input formats
-    if 'years' in vwc_data:
-        # Simple model format: already has years/doys
-        years = vwc_data['years']
-        doys = vwc_data['doys']
-    elif 'mjd' in vwc_data:
-        # Advanced model format: convert MJD to years/doys
-        import gnssrefl.gps as g
-        years = []
-        doys = []
-        for mjd_val in vwc_data['mjd']:
-            year_val, month, day, hour, minute, second, doy = g.simpleTime(mjd_val)
-            years.append(year_val)
-            doys.append(doy)
-        years = np.array(years)
-        doys = np.array(doys)
-    else:
-        raise ValueError("vwc_data must contain either 'years'/'doys' or 'mjd'")
+    # Convert MJD to year/doy/month/day for file output
+    years, doys, months, days = mjd_to_file_columns(mjd_values)
 
     # Get bin starts if subdaily
-    bin_starts = vwc_data.get('bin_starts', None)
-    is_subdaily = bin_starts is not None and len(bin_starts) > 0
+    bin_starts = vwc_data.get('bin_starts', [])
+    is_subdaily = len(bin_starts) > 0
 
     # Generate standard filename
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
@@ -401,11 +420,10 @@ def write_vwc_output(station, vwc_data, year, subdir, fr, bin_hours, bin_offset,
             w.write("% FracYr    Year   DOY   VWC Month Day \n")
 
         for iw in range(0, N):
-            dt = datetime_array[iw]
             myyear = int(years[iw])
             mydoy = int(doys[iw])
-            mm = dt.month
-            dd = dt.day
+            mm = int(months[iw])
+            dd = int(days[iw])
             fdate = myyear + mydoy / 365.25
             watercontent = vwc_values[iw]
 
@@ -418,6 +436,82 @@ def write_vwc_output(station, vwc_data, year, subdir, fr, bin_hours, bin_offset,
                 else:
                     w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
                            f"{mm:3.0f} {dd:3.0f} \n")
+
+
+def write_rolling_vwc_output(station, vwc_data, fr, bin_hours, extension='', vegetation_model=2):
+    """
+    Write hourly rolling VWC output file.
+
+    This writes a combined file with all hourly rolling measurements (e.g., bins starting
+    at 0:00, 1:00, 2:00, etc.) sorted chronologically.
+
+    Parameters
+    ----------
+    station : str
+        4-character station name
+    vwc_data : dict
+        Must contain:
+        - 'mjd': Modified Julian Day values
+        - 'vwc': VWC values (already leveled)
+        - 'datetime': datetime objects
+        - 'bin_starts': list of bin start hours
+    fr : int
+        Frequency code (1=L1, 5=L5, 20=L2C)
+    bin_hours : int
+        Time bin size in hours (e.g., 6 for 6-hour windows)
+    extension : str, optional
+        Extension for file naming (default: '')
+    vegetation_model : int, optional
+        1=simple, 2=advanced (for header documentation, default: 2)
+    """
+    from gnssrefl.utils import FileManagement
+
+    # Extract data from vwc_data dict
+    vwc_values = vwc_data['vwc']
+    datetime_array = vwc_data['datetime']
+    mjd_values = vwc_data['mjd']
+    bin_starts = vwc_data.get('bin_starts', [])
+
+    # Convert MJD to year/doy/month/day for file output
+    years, doys, months, days = mjd_to_file_columns(mjd_values)
+
+    # Generate rolling filename
+    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
+    base_vwcfile = file_manager.get_file_path()
+
+    # Frequency suffix
+    freq_map = {1: "_L1", 20: "_L2", 5: "_L5"}
+    freq_suffix = freq_map.get(fr, f"_L{fr}")
+
+    vwcfile = base_vwcfile.parent / f"{station}_vwc{freq_suffix}_rolling{bin_hours}hr.txt"
+
+    print(f'Rolling VWC results being written to {vwcfile}')
+
+    with open(vwcfile, 'w') as w:
+        N = len(vwc_values)
+        freq_name_map = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}
+        freq_name = freq_name_map.get(fr, f"L{fr}")
+
+        w.write(f"% Soil Moisture Results for GNSS Station {station}\n")
+        w.write(f"% Frequency used: {freq_name}\n")
+        w.write(f"% Vegetation model: {vegetation_model} ({'simple' if vegetation_model == 1 else 'advanced'})\n")
+        w.write("% https://github.com/kristinemlarson/gnssrefl\n")
+        w.write(f"% Hourly rolling VWC from {bin_hours}-hour windows\n")
+        w.write("% FracYr    Year   DOY   VWC Month Day BinStart\n")
+
+        for iw in range(0, N):
+            myyear = int(years[iw])
+            mydoy = int(doys[iw])
+            mm = int(months[iw])
+            dd = int(days[iw])
+            bin_start = int(bin_starts[iw])
+            fdate = myyear + mydoy / 365.25
+            watercontent = vwc_values[iw]
+
+            # Only write positive, reasonable soil moisture values
+            if watercontent > 0 and watercontent < 0.5:
+                w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
+                       f"{mm:3.0f} {dd:3.0f} {bin_start:3.0f}\n")
 
 
 def read_apriori_rh(station, fr, extension=''):
@@ -1585,7 +1679,7 @@ def load_sat_phase(station, year, year_end, freq, extension = ''):
     return dataexist, results
 
 def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,
-                   subdir,plt,auto_removal,warning_value,extension, 
+                   plt,auto_removal,warning_value,extension,
                    bin_hours=None, minvalperbin=None, bin_offset=None):
     """
     the goal of this code is to pick up the relevant parameters used in vwc.
@@ -1611,9 +1705,6 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         first year to analyze
     year_end : int
         last year to analyze
-    subdir : str
-        name for subdirectory used in subdirectory of REFL_CODE/Files
-        this probably should go away and be repaced with extension
     plt : bool
         whether you want plots to come to the screen
     auto_removal : bool
@@ -1643,8 +1734,6 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         frequency to use (1,20 allowed)
     year_end : int
         last year to analyze
-    subdir : str
-        name for subdirectory used in subdirectory of REFL_CODE/Files
     plt : bool
         whether you want plots to come to the screen
     auto_removal : bool
@@ -1821,15 +1910,14 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
     if tmax is None:
         tmax = 0.5
 
-    # default is station name, but use extension if provided
-    if subdir is None:
-        if extension:
-            subdir = f"{station}/{extension}"
-        else:
-            subdir = station
+    # Compute subdirectory path from extension for file operations
+    if extension:
+        subdir_path = f"{station}/{extension}"
+    else:
+        subdir_path = station
 
     # make sure subdirectory exists
-    g.set_subdir(subdir)
+    g.set_subdir(subdir_path)
 
     if not plt:
         print('no plots will come to screen. Will only be saved.')
@@ -1871,7 +1959,7 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
     if extension:
         print(f'extension: {extension}')
 
-    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, \
+    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, \
             plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend, circles, extension, \
             bin_hours, minvalperbin, bin_offset, return_level_doys, vegetation_model
 

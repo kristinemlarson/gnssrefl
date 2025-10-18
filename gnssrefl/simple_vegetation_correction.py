@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import gnssrefl.phase_functions as qp
+import gnssrefl.gps as g
 
 xdir = os.environ['REFL_CODE']
 
@@ -46,16 +47,13 @@ def simple_vegetation_filter(station, vxyz, subdir='',
     -------
     dict
         Dictionary containing:
-        - 'years': numpy array of year values
-        - 'doys': numpy array of day of year values
+        - 'mjd': list of Modified Julian Day values
         - 'vwc': numpy array of VWC values (percentage units, not leveled)
         - 'datetime': list of datetime objects for plotting
-        - 'bin_starts': numpy array of bin start hours (subdaily only) or None
-        - 'months': numpy array of month values
-        - 'days': numpy array of day values
+        - 'bin_starts': numpy array of bin start hours (subdaily) or empty list (daily)
     """
 
-    print('>>>>>>>>>>> Simple Vegetation Model (model 1) <<<<<<<<<<<<')
+    print('=== Simple Vegetation Model (model 1) ===')
 
     # Calculate averaged phase from vxyz in memory
     avg_phase = qp.calculate_avg_phase(vxyz, bin_hours, bin_offset, minvalperbin)
@@ -119,17 +117,26 @@ def simple_vegetation_filter(station, vxyz, subdir='',
     # Note: This is NOT leveled yet - caller will handle leveling
     newvwc = 1.48 * (newph - residval)
 
-    # Create datetime objects for plotting
+    # Convert to MJD and datetime for unified format
+    mjd_values = []
+    t_datetime = []
+
     if is_subdaily:
-        from datetime import timedelta
-        t_datetime = []
         for yr, d, h in zip(years, doys, bin_start_hours):
+            # Compute MJD from year/doy + fractional hours
+            mjd = g.ydoy2mjd(int(yr), int(d)) + int(h) / 24.0
+            mjd_values.append(mjd)
+            # Create datetime for plotting
             base_dt = datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j')
             dt_with_hours = base_dt + timedelta(hours=int(h))
             t_datetime.append(dt_with_hours)
     else:
-        t_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j')
-                     for yr, d in zip(years, doys)]
+        for yr, d in zip(years, doys):
+            # Compute MJD from year/doy (daily)
+            mjd = g.ydoy2mjd(int(yr), int(d))
+            mjd_values.append(mjd)
+            # Create datetime for plotting
+            t_datetime.append(datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j'))
 
     # Create diagnostic plot: phase before/after vegetation correction
     plt.figure(figsize=(10, 6))
@@ -156,13 +163,10 @@ def simple_vegetation_filter(station, vxyz, subdir='',
     if not plt2screen:
         plt.close('all')
 
-    # Return data structure for caller to handle leveling and file writing
+    # Return unified MJD format (matches advanced model)
     return {
-        'years': years,
-        'doys': doys,
+        'mjd': mjd_values,
         'vwc': newvwc,  # Percentage units, not leveled
         'datetime': t_datetime,
-        'bin_starts': bin_start_hours if is_subdaily else None,
-        'months': months,
-        'days': days
+        'bin_starts': bin_start_hours if is_subdaily else []
     }

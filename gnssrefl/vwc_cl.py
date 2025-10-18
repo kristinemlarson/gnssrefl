@@ -36,7 +36,7 @@ def parse_arguments():
     parser.add_argument("-minvalperbin", default=None, type=int, help="min number of sat tracks needed per time bin. Default is 5")
     parser.add_argument("-bin_offset", default=None, type=int, help="bin timing offset in hours (0 <= offset < bin_hours). Default is 0")
     parser.add_argument("-snow_filter", default=None, type=str, help="boolean, try to remove snow contaminated points. Default is F")
-    parser.add_argument("-subdir", default=None, type=str, help="use non-default subdirectory for output files")
+    parser.add_argument("-subdir", default=None, type=str, help="DEPRECATED: use -extension instead")
     parser.add_argument("-tmin", default=None, type=float, help="minimum soil texture. Default is 0.05.")
     parser.add_argument("-tmax", default=None, type=float, help="maximum soil texture. Defafult is 0.50.")
     parser.add_argument("-warning_value", default=None, type=float, help="Phase RMS (deg) threshold for bad tracks, default is 5.5 degrees")
@@ -130,7 +130,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         whether you want to attempt to remove points contaminated by snow
         default is False
     subdir: str
-        subdirectory in $REFL_CODE/Files for plots and text file outputs
+        DEPRECATED: use -extension instead. This parameter is ignored.
     tmin: float
         minimum soil texture value, default 0.05. This can now be set in the gnssir_input json (with vwc_ added)
     tmax: float
@@ -184,21 +184,11 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     # Handle vegetation model selection - do this BEFORE set_parameters for phase bounds
     # Precedence: CLI -advanced > CLI -vegetation_model > JSON vwc_vegetation_model > default (1)
-    # Note: We'll update from JSON after set_parameters call
-    veg_model = None  # Will be determined below
+    veg_model = None  # Will be finalized from JSON if not set by CLI
     if advanced:
-        veg_model = 2  # -advanced T is shorthand for model 2
+        veg_model = 2
     elif vegetation_model:
-        # Accept numeric string or integer
-        if isinstance(vegetation_model, str) and vegetation_model.isnumeric():
-            veg_model = int(vegetation_model)
-        else:
-            veg_model = vegetation_model
-
-        # Validate model number
-        if veg_model not in [1, 2]:
-            print(f'Vegetation model {veg_model} is not supported. Use 1 (simple) or 2 (advanced). Exiting.')
-            sys.exit()
+        veg_model = int(vegetation_model)
 
     fs =10 # fontsize
     snow_file = None
@@ -218,18 +208,31 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # Get the single frequency from the list
     fr = fr_list[0]
 
+    # Deprecation warning for subdir parameter
+    if subdir is not None:
+        print("Warning: -subdir is deprecated. Please use -extension instead.")
+        print(f"  (subdir '{subdir}' will be ignored, using extension-based path)")
+
+    # Compute subdirectory path from extension (for file operations)
+    subdir_path = f"{station}/{extension}" if extension else station
+
     # pick up the parameters used for this code
     # Sep 4, 2025 added level_doys parameter
-    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, plt, \
-            remove_bad_tracks, warning_value,min_norm_amp,sat_legend,circles,extension, \
+    minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, \
+            plt, remove_bad_tracks, warning_value,min_norm_amp,sat_legend,circles,extension, \
             bin_hours, minvalperbin, bin_offset, level_doys, json_vegetation_model = \
             qp.set_parameters(station, level_doys, minvalperday, tmin,tmax, min_req_pts_track,
-                              fr, year, year_end,subdir,plt, auto_removal,warning_value,extension,
+                              fr, year, year_end, plt, auto_removal,warning_value,extension,
                               bin_hours, minvalperbin, bin_offset)
 
     # Finalize vegetation model: use JSON value if not set by CLI
     if veg_model is None:
         veg_model = json_vegetation_model  # Will be 1 or 2 from JSON, defaulting to 1
+
+    # Validate model number
+    if veg_model not in [1, 2]:
+        print(f'Vegetation model {veg_model} is not supported. Use 1 (simple) or 2 (advanced). Exiting.')
+        sys.exit()
 
     # Set advanced flag when using model 2 for backward compatibility
     if veg_model == 2:
@@ -505,10 +508,10 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     # Generate azimuth plot filename with temporal suffix
     suffix = qp.get_temporal_suffix(freq, bin_hours, bin_offset)
-    qp.save_vwc_plot(fig,  f'{xdir}/Files/{subdir}/{station}_az_phase{suffix}.png')
+    qp.save_vwc_plot(fig,  f'{xdir}/Files/{subdir_path}/{station}_az_phase{suffix}.png')
 
     if advanced:
-        qp.save_vwc_plot(fig2,  f'{xdir}/Files/{subdir}/{station}_az_normamp{suffix}.png')
+        qp.save_vwc_plot(fig2,  f'{xdir}/Files/{subdir_path}/{station}_az_normamp{suffix}.png')
     
     # Close figures to prevent them from showing on screen when plt=False
     if not plt:
@@ -547,24 +550,24 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     # Plot averaged phase data, from BEFORE vegetation correction
     if plt:
-        qp.subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours, bin_offset, minvalperbin, plt2screen=plt)
+        qp.subdaily_phase_plot(station, fr, vxyz, xdir, subdir_path, hires_figs, bin_hours, bin_offset, minvalperbin, plt2screen=plt)
 
     # Write all_phase.txt file if requested
     if save_tracks:
-        fname_phase = f'{xdir}/Files/{subdir}/{station}_all_phase.txt'
+        fname_phase = f'{xdir}/Files/{subdir_path}/{station}_all_phase.txt'
         qp.write_phase_for_advanced(fname_phase, vxyz)
 
     if veg_model == 1:
         print('Running simple vegetation model (model 1)...')
         vwc_data = svc.simple_vegetation_filter(
-            station, vxyz, subdir,
+            station, vxyz, subdir_path,
             bin_hours, bin_offset, plt2screen=plt, fr=fr,
             minvalperbin=minvalperbin)
 
     elif veg_model == 2:
         print('Running advanced vegetation model (model 2)...')
         vwc_data = avc.advanced_vegetation_filter(
-            station, vxyz, subdir,
+            station, vxyz, subdir_path,
             bin_hours, bin_offset, plt, fr, minvalperbin,
             save_tracks)
 
@@ -588,7 +591,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         level_doys=level_doys,
         polyorder=polyorder,
         station=station, plot_debug=plt, plt2screen=plt,
-        subdir=subdir, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
+        subdir=subdir_path, fr=fr, bin_hours=bin_hours, bin_offset=bin_offset
     )
 
     # Update vwc_data with leveled values
@@ -597,7 +600,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # Step 3: Write output files
     print('\nWriting VWC output file...')
     qp.write_vwc_output(
-        station, vwc_data, year, subdir, fr,
+        station, vwc_data, year, fr,
         bin_hours, bin_offset, extension, veg_model
     )
 
@@ -607,9 +610,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         plot_suffix = suffix.replace('.txt', '.png')
 
         if hires_figs:
-            plot_path = f'{xdir}/Files/{subdir}/{station}_vol_soil_moisture{plot_suffix[:-4]}.eps'
+            plot_path = f'{xdir}/Files/{subdir_path}/{station}_vol_soil_moisture{plot_suffix[:-4]}.eps'
         else:
-            plot_path = f'{xdir}/Files/{subdir}/{station}_vol_soil_moisture{plot_suffix}'
+            plot_path = f'{xdir}/Files/{subdir_path}/{station}_vol_soil_moisture{plot_suffix}'
 
         qp.vwc_plot(station, vwc_data['datetime'], leveled_vwc, plot_path, circles, plt2screen=plt)
 
