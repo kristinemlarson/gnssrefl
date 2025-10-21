@@ -779,7 +779,7 @@ def read_snr(obsfile):
     return allGood, f, r, c
 
 
-def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid,dbhz):
+def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid,dbhz,**kwargs):
     """
     retrieves SNR arcs for a given satellite. returns elevation angle and 
     detrended linear SNR
@@ -840,6 +840,7 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid,dbhz):
         hopefully seconds of the day
 
     """
+    fundy = kwargs.get('fundy',False)
 
     #print('Using polyfit ', pfitV)
     x=[]; y=[]; azi=[]; seconds = []; edot = [] ; sat = []
@@ -918,7 +919,14 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid,dbhz):
             # change to linear units if dbhz is False
             if not dbhz : 
                 data = np.power(10,(data/20))
-            if len(ele) > 20:
+            reqN = 20
+            if fundy:
+                reqN = 50
+            # for high rate stations should not be using 20 ... 
+            # this is a bit of a bandaid
+
+            if len(ele) > reqN:
+                #print(len(ele), len(data))
                 model = np.polyfit(ele,data,pfitV)
                 fit = np.polyval(model,ele)
                 data = data - fit

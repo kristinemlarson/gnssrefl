@@ -69,7 +69,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = True, delTmax: int = None, e1: float = None, e2: float = None, 
            mmdd: bool = False, gzip: bool = True, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt', 
-           par : int = None, debug : bool=False, midnite : bool=False, dbhz : bool=False ):
+           par : int = None, debug : bool=False, midnite : bool=False, dbhz : bool=False):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
@@ -221,6 +221,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     vers = 'gnssrefl version ' + str(g.version('gnssrefl'))
     #print('You are running ', vers)
     screenstats = True
+
 
     if (len(station) == 9):
         print('Going to assume you meant ', station[0:4], ' and not ', station)

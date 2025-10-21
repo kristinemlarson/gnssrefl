@@ -43,6 +43,10 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
         keep dbhz units  (or not)
 
     """
+    fundy = False
+    if station == 'bof3':
+        fundy = True
+
     xdir = os.environ['REFL_CODE']
     docstring = 'arrays are eangles (degrees), dsnrData is SNR with/DC removed, and sec (seconds of the day),\n'
 
@@ -232,7 +236,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
 
                         # send it the log id now
                         x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT, secxonds = guts.window_new(d2, f, 
-                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats,logid,dbhz)
+                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats,logid,dbhz,fundy=fundy)
 
                         #writing out arcs - try putting it later on ... 
                         if test_savearcs and (Nvv > 0):

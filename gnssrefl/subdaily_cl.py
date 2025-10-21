@@ -51,6 +51,7 @@ def parse_arguments():
     parser.add_argument("-gap_flag", default=None, type=str, help="boolean, writes 999 to spline fit for gaps")
     parser.add_argument("-date1", default=None, type=str, help="start time, yyyymmdd")
     parser.add_argument("-date2", default=None, type=str, help="end time, yyyymmdd")
+    parser.add_argument("-fundy", default=None, type=str, help="name of fundy low tide times (in mjd)")
 
     g.print_version_to_screen()
 
@@ -71,7 +72,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = None , if_corr: bool = True, knots_test: int = 0, 
              hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0,
-             year_end: int=None, knots2 : int=None, gap_flag: bool = False, date1: str=None, date2: str=None):
+             year_end: int=None, knots2 : int=None, gap_flag: bool = False, date1: str=None, date2: str=None, fundy: str=None):
     """
     Subdaily combines gnssir solutions and applies relevant corrections needed to measure water levels (tides). 
     As of January 2024, it will allow multiple years. You can also specify which day of year to start with, i.e.
@@ -234,7 +235,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         avoid doy1/doy2.  start time in yyyyymmdd
     date2 : str
         avoid doy1/doy2.  end time in yyyyymmdd
-
+    fundy : str
+        name of file with low tide times (MJD)
     """
 
     print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
@@ -423,6 +425,9 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         lastpng = txtdir + '/' + station + '_' + str(year) + '_' + str(year_end) + '_last.png'
 
     print(lastpng)
+    if fundy is not None:
+        okoko = 1
+
     # not sure why tv and corr are being returned.
     if rhdot:
        tv, corr = t.rhdot_correction2(station, input2spline, output4spline, 
