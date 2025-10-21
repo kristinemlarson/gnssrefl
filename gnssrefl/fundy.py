@@ -1,5 +1,6 @@
 import datetime
 import numpy as np
+import os
 import sys
 
 import gnssrefl.gps as g
@@ -26,6 +27,7 @@ def read_predicts(f):
         water level in meters
 
     """
+    print(f)
     data = np.genfromtxt(f, comments='%', skip_header=1,skip_footer=1,dtype='str',delimiter=',')
     data = np.char.replace(data,' UTC','')
     mjd = []
@@ -45,12 +47,14 @@ def read_predicts(f):
     return mjd, tide
 
 
-def apply_new_azim_mask(file1):
+def apply_new_azim_mask(file1,predictf):
     """
     Parameters
     ----------
     file1 : str
         observation file created by first part of subdaily
+    predictf : str
+        file of predicts downloaded from Canadian tide gauge site
 
     Returns
     -------
@@ -59,15 +63,25 @@ def apply_new_azim_mask(file1):
         part of subdaily 
     """
     # read in the first results file created by subdaily
-    gnss = np.loadtxt(file1, comments='%')
+    if os.path.isfile(file1):
+        gnss = np.loadtxt(file1, comments='%')
+    else:
+        print('I could not find the gnssir observation file needed by the Fundy module.')
+        print(file1)
+        print('This should have been created by the first section of the subdaily code.')
+        sys.exit()
 
     N = len(gnss)
     keep = np.empty(shape=[0, 22])
 
 
 # read in the predicts from canada
-    f='predicts_2025-10-17.csv'
-    mjd, tide = read_predicts(f)
+    #predictf='predicts_2025-10-17.csv'
+    if os.path.isfile(predictf):
+        mjd, tide = read_predicts(predictf)
+    else:
+        print('I cannot find the file that you indicated had the tidal predictions in it. Exiting.')
+        sys.exit()
 
     x1 = int(min(mjd))
     x2 = int(max(mjd)) + 1
@@ -87,6 +101,7 @@ def apply_new_azim_mask(file1):
     BI = len(bad_indices)
     ijk = 0
     # loop thru the observations 
+    removeCrit = 2.25 # hours
     for i in range(0,N):
     # so for each one check if it is near a low tide
     # and if so, check if azimuth is ok
@@ -96,7 +111,7 @@ def apply_new_azim_mask(file1):
         if azim < 240: # this could be 250 - dunno
             lowtide = False
             for w in range(0, BI):# check low tides
-                if (mjd > bad_indices[w] - 2/24) &  (mjd < bad_indices[w]+2/24):
+                if (mjd > bad_indices[w] - removeCrit/24) &  (mjd < bad_indices[w]+removeCrit/24):
                     print('Excluding',round(mjd,3), 'Azimuth ', azim)
                     lowtide = True
                     ijk = ijk + 1
@@ -117,4 +132,3 @@ def apply_new_azim_mask(file1):
     np.savetxt(fout, keep, fmt=fo+fo2)
 
     return fout
-

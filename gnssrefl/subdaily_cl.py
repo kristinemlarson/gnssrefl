@@ -9,6 +9,7 @@ import sys
 import gnssrefl.gps as g
 import gnssrefl.subdaily as t
 import gnssrefl.sd_libs as sd
+import gnssrefl.fundy as fundylib
 
 from gnssrefl.utils import str2bool
 
@@ -425,8 +426,13 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         lastpng = txtdir + '/' + station + '_' + str(year) + '_' + str(year_end) + '_last.png'
 
     print(lastpng)
+
+    # only can do one year at a time
     if fundy is not None:
-        okoko = 1
+        # rewrite input2spline so that azimuths < 240 are removed at low tide
+        inputf = fname_new 
+        editedAzim = fundylib.apply_new_azim_mask(inputf,fundy)
+        input2spline = [editedAzim]
 
     # not sure why tv and corr are being returned.
     if rhdot:
