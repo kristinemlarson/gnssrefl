@@ -8,6 +8,9 @@ import gnssrefl.sd_libs as sd
 
 # https://tides.gc.ca/en/stations/00270
 # https://tides.gc.ca/en/stations/00270/2025-10-17?tz=UTC&unit=m
+# web service
+# https://tides.gc.ca/en/web-services-offered-canadian-hydrographic-service
+# https://api.iwls-sine.azure.cloud-nuage.dfo-mpo.gc.ca/swagger-ui/index.html
 
 def read_predicts(f):
     """
@@ -47,10 +50,12 @@ def read_predicts(f):
     return mjd, tide
 
 
-def apply_new_azim_mask(file1,predictf):
+def apply_new_azim_mask(station,file1,predictf):
     """
     Parameters
     ----------
+    station : str
+        4 ch station name
     file1 : str
         observation file created by first part of subdaily
     predictf : str
@@ -75,10 +80,13 @@ def apply_new_azim_mask(file1,predictf):
     keep = np.empty(shape=[0, 22])
 
 
-# read in the predicts from canada
-    #predictf='predicts_2025-10-17.csv'
+    # will look at current directory and this directory for hte prediction file
+    xf1 = os.environ['REFL_CODE'] + '/input/' + station + '/' + predictf
+
     if os.path.isfile(predictf):
         mjd, tide = read_predicts(predictf)
+    elif os.path.isfile(xf1):
+        mjd, tide = read_predicts(xf1)
     else:
         print('I cannot find the file that you indicated had the tidal predictions in it. Exiting.')
         sys.exit()
@@ -93,8 +101,8 @@ def apply_new_azim_mask(file1,predictf):
         if len(tide[tf1]) > 0 & len(tide[tf2]) & 0 : 
             i = np.argmin(tide[tf1])
             j = np.argmin(tide[tf2])
-            print('low tide 1',  mjd[tf1][i], min(tide[tf1]) )
-            print('low tide 2',  mjd[tf2][j], min(tide[tf2]) ) 
+            #print('low tide 1',  mjd[tf1][i], min(tide[tf1]) )
+            #print('low tide 2',  mjd[tf2][j], min(tide[tf2]) ) 
             bad_indices.append(mjd[tf1][i])
             bad_indices.append(mjd[tf2][j])
 
@@ -112,7 +120,7 @@ def apply_new_azim_mask(file1,predictf):
             lowtide = False
             for w in range(0, BI):# check low tides
                 if (mjd > bad_indices[w] - removeCrit/24) &  (mjd < bad_indices[w]+removeCrit/24):
-                    print('Excluding',round(mjd,3), 'Azimuth ', azim)
+                    #print('Excluding',round(mjd,3), 'Azimuth ', azim)
                     lowtide = True
                     ijk = ijk + 1
 

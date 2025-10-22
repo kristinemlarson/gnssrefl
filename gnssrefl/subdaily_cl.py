@@ -431,7 +431,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     if fundy is not None:
         # rewrite input2spline so that azimuths < 240 are removed at low tide
         inputf = fname_new 
-        editedAzim = fundylib.apply_new_azim_mask(inputf,fundy)
+        editedAzim = fundylib.apply_new_azim_mask(station, inputf, fundy)
         input2spline = [editedAzim]
 
     # not sure why tv and corr are being returned.
