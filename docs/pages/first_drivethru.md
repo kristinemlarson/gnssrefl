@@ -34,7 +34,7 @@
 
 * [Wesel, Germany (low-cost)](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_wesl.html)
 
-## Soil Moisture 
+## Soil Moisture
 
 * [Portales, New Mexico USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p038.html)
 
@@ -43,6 +43,8 @@
 * [Victorville, California USA ](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_scia.html)
 
 * [Boulder, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mfle.html)
+
+* [Stillwater, Oklahoma USA (Advanced Vegetation Model)](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_okl2_advanced.html)
 
 
 ## Seasonal Snow Accumulation

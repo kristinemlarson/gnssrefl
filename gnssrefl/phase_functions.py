@@ -105,9 +105,10 @@ def normAmp(amp, basepercent):
 
     return Namp
 
-def subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bin_hours=24,bin_offset=0,plt2screen=True):
+def subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours=24, bin_offset=0,
+                        minvalperbin=10, plt2screen=True):
     """
-    makes a plot of daily averaged phase for vwc code
+    makes a plot of daily or subdaily averaged phase for vwc code
 
     Parameters
     ----------
@@ -115,21 +116,50 @@ def subdaily_phase_plot(station, fr,datetime_dates, tv,xdir,subdir,hires_figs,bi
         4 char station name
     fr : int
         frequency of signal
-    datetime_dates : ...
-        datetime values for phase points
-    tv : list of results
-        cannot remember the format
+    vxyz : numpy array
+        Track-level phase data
     xdir : str
         location of the results (environment variable REFL_CODE)
     subdir : str
         subdirectory in Files
     hires_figs: bool
         whether you want eps instead of png files
+    bin_hours : int
+        time bin size in hours (default: 24 for daily)
+    bin_offset : int
+        bin timing offset in hours (default: 0)
+    minvalperbin : int
+        minimum observations required per bin (default: 10)
+    plt2screen : bool
+        whether to display plot to screen (default: True)
 
     """
+    from datetime import datetime, timedelta
+
+    # Calculate averaged phase (no duplication!)
+    avg_phase = calculate_avg_phase(vxyz, bin_hours, bin_offset, minvalperbin)
+
+    if len(avg_phase) == 0:
+        print('No phase data to plot')
+        return
+
+    # Extract columns: [Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day, [BinStart]]
+    years = avg_phase[:, 0]
+    doys = avg_phase[:, 1]
+    phases = avg_phase[:, 2]
+
+    # Create datetime array
+    datetime_dates = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j')
+                     for yr, d in zip(years, doys)]
+    if bin_hours < 24:
+        # Add hour offset for subdaily data (BinStart is in column 8)
+        bin_starts = avg_phase[:, 8]
+        datetime_dates = [dt + timedelta(hours=int(h))
+                         for dt, h in zip(datetime_dates, bin_starts)]
+
     outdir = Path(xdir) / 'Files' / subdir
     plt.figure(figsize=(10, 6))
-    plt.plot(datetime_dates, tv[:, 2], 'b-')
+    plt.plot(datetime_dates, phases, 'b-')
     plt.ylabel('phase (degrees)')
     freq_name = {1: "L1", 2: "L2", 20: "L2C", 5: "L5"}.get(fr, f"freq{fr}")
     if bin_hours < 24:
@@ -283,6 +313,206 @@ def vwc_plot(station,t_datetime, vwcdata, plot_path,circles,plt2screen=True):
     plt.savefig(plot_path)
     if not plt2screen:
         plt.close()  # Close figure only when not displaying to screen
+
+
+def mjd_to_file_columns(mjd_list):
+    """
+    Convert MJD values to year, doy, month, day for file writing.
+
+    Parameters
+    ----------
+    mjd_list : list or array
+        Modified Julian Day values
+
+    Returns
+    -------
+    years : np.ndarray
+        Year values
+    doys : np.ndarray
+        Day of year values
+    months : np.ndarray
+        Month values
+    days : np.ndarray
+        Day of month values
+    """
+    years = []
+    doys = []
+    months = []
+    days = []
+
+    for mjd_val in mjd_list:
+        dt = g.mjd_to_datetime(mjd_val)
+        years.append(dt.year)
+        doys.append(dt.timetuple().tm_yday)
+        months.append(dt.month)
+        days.append(dt.day)
+
+    return np.array(years), np.array(doys), np.array(months), np.array(days)
+
+
+def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
+                     extension='', vegetation_model=1):
+    """
+    Write VWC output file in standard gnssrefl format.
+    Works for both vegetation models.
+
+    Parameters
+    ----------
+    station : str
+        4-character station name
+    vwc_data : dict
+        Must contain:
+        - 'mjd': Modified Julian Day values
+        - 'vwc': VWC values
+        - 'datetime': datetime objects
+        - 'bin_starts': list of bin start hours (subdaily) or empty list (daily)
+    year : int
+        Year for file naming
+    fr : int
+        Frequency code (1=L1, 5=L5, 20=L2C)
+    bin_hours : int
+        Time bin size in hours (default: 24)
+    bin_offset : int
+        Bin timing offset in hours (default: 0)
+    extension : str, optional
+        Extension for file naming (default: '')
+    vegetation_model : int, optional
+        1=simple, 2=advanced (for header documentation, default: 1)
+    """
+    from gnssrefl.utils import FileManagement
+
+    # Extract data from vwc_data dict
+    vwc_values = vwc_data['vwc']
+    datetime_array = vwc_data['datetime']
+    mjd_values = vwc_data['mjd']
+
+    # Convert MJD to year/doy/month/day for file output
+    years, doys, months, days = mjd_to_file_columns(mjd_values)
+
+    # Get bin starts if subdaily
+    bin_starts = vwc_data.get('bin_starts', [])
+    is_subdaily = len(bin_starts) > 0
+
+    # Generate standard filename
+    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
+    base_vwcfile = file_manager.get_file_path()
+
+    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+    vwcfile = base_vwcfile.parent / f"{station}_vwc{suffix}.txt"
+
+    print(f'VWC results being written to {vwcfile}')
+
+    with open(vwcfile, 'w') as w:
+        N = len(vwc_values)
+        freq_map = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}
+        freq_name = freq_map.get(fr, f"Frequency {fr}")
+
+        w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
+        w.write("% Frequency used: {0} \n".format(freq_name))
+        w.write(f"% Vegetation model: {vegetation_model} ({'simple' if vegetation_model == 1 else 'advanced'}) \n")
+        w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
+
+        if is_subdaily:
+            w.write(f"% Subdaily VWC with {bin_hours}-hour bins (offset: {bin_offset}h)\n")
+            w.write(get_bin_schedule_info(bin_hours, bin_offset) + "\n")
+            w.write("% FracYr    Year   DOY   VWC Month Day BinStart \n")
+        else:
+            w.write("% FracYr    Year   DOY   VWC Month Day \n")
+
+        for iw in range(0, N):
+            myyear = int(years[iw])
+            mydoy = int(doys[iw])
+            mm = int(months[iw])
+            dd = int(days[iw])
+            fdate = myyear + mydoy / 365.25
+            watercontent = vwc_values[iw]
+
+            # Only write positive, reasonable soil moisture values
+            if watercontent > 0 and watercontent < 0.5:
+                if is_subdaily:
+                    bin_start = int(bin_starts[iw])
+                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
+                           f"{mm:3.0f} {dd:3.0f} {bin_start:3.0f} \n")
+                else:
+                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
+                           f"{mm:3.0f} {dd:3.0f} \n")
+
+
+def write_rolling_vwc_output(station, vwc_data, fr, bin_hours, extension='', vegetation_model=2):
+    """
+    Write hourly rolling VWC output file.
+
+    This writes a combined file with all hourly rolling measurements (e.g., bins starting
+    at 0:00, 1:00, 2:00, etc.) sorted chronologically.
+
+    Parameters
+    ----------
+    station : str
+        4-character station name
+    vwc_data : dict
+        Must contain:
+        - 'mjd': Modified Julian Day values
+        - 'vwc': VWC values (already leveled)
+        - 'datetime': datetime objects
+        - 'bin_starts': list of bin start hours
+    fr : int
+        Frequency code (1=L1, 5=L5, 20=L2C)
+    bin_hours : int
+        Time bin size in hours (e.g., 6 for 6-hour windows)
+    extension : str, optional
+        Extension for file naming (default: '')
+    vegetation_model : int, optional
+        1=simple, 2=advanced (for header documentation, default: 2)
+    """
+    from gnssrefl.utils import FileManagement
+
+    # Extract data from vwc_data dict
+    vwc_values = vwc_data['vwc']
+    datetime_array = vwc_data['datetime']
+    mjd_values = vwc_data['mjd']
+    bin_starts = vwc_data.get('bin_starts', [])
+
+    # Convert MJD to year/doy/month/day for file output
+    years, doys, months, days = mjd_to_file_columns(mjd_values)
+
+    # Generate rolling filename
+    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
+    base_vwcfile = file_manager.get_file_path()
+
+    # Frequency suffix
+    freq_map = {1: "_L1", 20: "_L2", 5: "_L5"}
+    freq_suffix = freq_map.get(fr, f"_L{fr}")
+
+    vwcfile = base_vwcfile.parent / f"{station}_vwc{freq_suffix}_rolling{bin_hours}hr.txt"
+
+    print(f'Rolling VWC results being written to {vwcfile}')
+
+    with open(vwcfile, 'w') as w:
+        N = len(vwc_values)
+        freq_name_map = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}
+        freq_name = freq_name_map.get(fr, f"L{fr}")
+
+        w.write(f"% Soil Moisture Results for GNSS Station {station}\n")
+        w.write(f"% Frequency used: {freq_name}\n")
+        w.write(f"% Vegetation model: {vegetation_model} ({'simple' if vegetation_model == 1 else 'advanced'})\n")
+        w.write("% https://github.com/kristinemlarson/gnssrefl\n")
+        w.write(f"% Hourly rolling VWC from {bin_hours}-hour windows\n")
+        w.write("% FracYr    Year   DOY   VWC Month Day BinStart\n")
+
+        for iw in range(0, N):
+            myyear = int(years[iw])
+            mydoy = int(doys[iw])
+            mm = int(months[iw])
+            dd = int(days[iw])
+            bin_start = int(bin_starts[iw])
+            fdate = myyear + mydoy / 365.25
+            watercontent = vwc_values[iw]
+
+            # Only write positive, reasonable soil moisture values
+            if watercontent > 0 and watercontent < 0.5:
+                w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
+                       f"{mm:3.0f} {dd:3.0f} {bin_start:3.0f}\n")
+
 
 def read_apriori_rh(station, fr, extension=''):
     """
@@ -608,342 +838,399 @@ def low_pct(amp, basepercent):
     return lowval
 
 
-def convert_phase(station, year, level_doys, year_end=None, plt2screen=True,fr=20,tmin=0.05,tmax=0.5,polyorder=-99,circles=False,
-        subdir='',hires_figs=False, extension='', bin_hours=24, bin_offset=0):
+def apply_vwc_leveling(vwc_values, tmin,
+                       simple=False,
+                       years=None, doys=None, mjd=None,
+                       level_doys=None, polyorder=-99,
+                       **kwargs):
     """
-    Convert GPS phase to VWC. Using Clara Chew's algorithm from 
-    Matlab write_vegcorrect_smc.m
+    Apply global baseline leveling to time-averaged VWC estimates.
 
-    https://scipy-cookbook.readthedocs.io/items/SignalSmooth.html
+    This is the FINAL leveling step applied to time-binned VWC values.
+
+    Two leveling approaches are available:
+    - Polynomial (default): Sophisticated per-year polynomial fitting using dry season nodes
+    - Simple: Simple global offset using 25 lowest points (for testing)
 
     Parameters
-    -----------
-    station : str
-        4 char station name
-    year : int
-        beginning year
-    level_doys : list of int
-        start and end day of year to set levels
-    year_end : int
-        last year
-    plt2screen : boolean
-        plots come to the screen
-    fr : integer
-        frequency
-        default is L2C (20)
+    ----------
+    vwc_values : array-like
+        Time-averaged VWC values in percentage units (0-60 range)
+        These should be AFTER per-track processing and time-averaging
     tmin : float
-        soil texture minimum
-    tmax : float
-        soil texture maximum
-    polyorder : integer
-        override on the polynomial order used in leveling
-    circles : boolean
-        final plot using circles (instead of line)
-    subdir : str
-        subdirectory for $REFL_CODE/Files
-    hires_figs : bool
-        whether you want eps instead of png files created
-    extension : str
-        using special json LSP parameters
-    bin_hours : int
-        not sure - GT added
-    bin_offset : int
-        not sure - GT added
+        Minimum soil texture value (0.05 typical)
+    simple : bool, optional
+        Use simple leveling instead of polynomial (default: False)
+        - False (default): Polynomial per-year baseline (recommended)
+        - True: Simple global offset using 25 lowest points (for testing)
+    years : array-like, optional
+        Year values (required for polynomial leveling, or auto-derived from mjd)
+    doys : array-like, optional
+        Day of year values (required for polynomial leveling, or auto-derived from mjd)
+    mjd : array-like, optional
+        Modified Julian Day values (alternative to years/doys, will be auto-converted)
+    level_doys : list of int, optional
+        [start_doy, end_doy] for dry season baseline (required for polynomial leveling)
+    polyorder : int, optional
+        Polynomial order override for polynomial leveling (default: -99 = auto)
+    **kwargs : dict
+        Optional parameters for polynomial method:
+        - station : str (for plot labels)
+        - plot_debug : bool (generate diagnostic plots)
+        - plt2screen : bool (show plots on screen)
+        - extension : str (extension for subdirectory, e.g. 'test1' → 'station/test1')
+        - fr : int (frequency code for file naming)
+        - bin_hours : int (temporal binning for file naming)
+        - bin_offset : int (temporal offset for file naming)
 
+    Returns
+    -------
+    leveled_vwc : numpy.ndarray
+        Leveled VWC values in decimal units (0.0-0.6 range)
+    info : dict
+        Additional information about the leveling:
+        - 'method': str - Method used
+        - 'nodes': numpy.ndarray or None - Level nodes (polynomial method only)
+        - 'baseline_points': int or None - Number of baseline points used
+        - 'baseline_value': float or None - Baseline offset (simple method only)
+
+    Examples
+    --------
+    Polynomial leveling (default):
+        leveled, info = apply_vwc_leveling(vwc, tmin=0.05,
+                                           years=yrs, doys=dys, level_doys=[152, 244])
+
+    Simple leveling:
+        leveled, info = apply_vwc_leveling(vwc, tmin=0.05, simple=True)
     """
 
-    if not year_end:
-        year_end = year
+    # Convert inputs to numpy arrays
+    vwc_values = np.asarray(vwc_values)
 
-    # read makejson
-    station_file = FileManagement(station, 'make_json')
-    json_data = gnssir.read_json_file(station, extension, silent=True)
+    # Convert boolean to method string for internal logic
+    method = 'simple' if simple else 'polynomial'
 
-    #if json_data['lat'] >= 0:
-    #    print('Northern hemisphere summer')
-    #    southern = False
-    #elif json_data['lat'] < 0:
-    #    print('Southern hemisphere summer')
-    #    southern = True
+    # Initialize info dictionary
+    info = {
+        'method': method,
+        'nodes': None,
+        'baseline_points': None,
+        'baseline_value': None
+    }
 
-    #else:
-    #    print(f"The required json file could not be found or is invalid: {station_file.get_file_path()}")
-    #    sys.exit()
+    # Handle MJD to years/doys conversion if needed
+    if mjd is not None and (years is None or doys is None):
+        mjd_array = np.asarray(mjd)
+        years = []
+        doys = []
+        for mjd_val in mjd_array:
+            year_val, month, day, hour, minute, second, doy = g.simpleTime(mjd_val)
+            years.append(year_val)
+            doys.append(doy)
+        years = np.array(years)
+        doys = np.array(doys)
 
-    # for PBO H2O this was set using STATSGO. 5% is reasonable as a starting point for australia
-    #tmin = 0.05  # for now
-    #print('minimum texture value', tmin)
-    residval = 2  # for now
+    # Method: simple - simple global baseline leveling
+    if method == 'simple':
+        vwc_sorted = np.sort(vwc_values)
+        num_baseline = min(25, len(vwc_sorted))  # Fixed 25 points (or less if dataset is small)
+        baseline_value = np.mean(vwc_sorted[0:num_baseline])
+        leveled_vwc = (100 * tmin + (vwc_values - baseline_value)) / 100
 
-    # daily average file of phase results
-    #file_manager = FileManagement(station, FileTypes.daily_avg_phase_results)
-    #avg_phase_results = file_manager.read_file(comments='%')
+        info['baseline_points'] = num_baseline
+        info['baseline_value'] = baseline_value
 
-    myxdir = os.environ['REFL_CODE']
-
-
-    # Use FileManagement for consistent phase file paths
-    file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
-    base_fileout = file_manager.get_file_path()
-    
-    # Generate consistent filename using temporal resolution
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
-    fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
-    
-    if os.path.exists(fileout):
-        avg_phase_results = np.loadtxt(fileout, comments='%')
-        if bin_hours < 24:
-            print(f'Found {bin_hours}-hour phase file: {fileout}')
+        # Create constant baseline for plotting (if temporal data available)
+        if years is not None and doys is not None:
+            years = np.asarray(years)
+            doys = np.asarray(doys)
+            baseline_curve = np.full_like(vwc_values, baseline_value)  # Constant baseline
+            nodes = np.empty(shape=[0, 3])  # No nodes for simple method
         else:
-            print(f'Found daily phase file: {fileout}')
-    else:
-        if bin_hours < 24:
-            print(f'No {bin_hours}-hour phase file found: {fileout}')
-        else:
-            print('Average phase results not found')
-        sys.exit()
-    if (len(avg_phase_results) == 0):
-        print('Empty results file')
-        sys.exit()
-        
-    # Auto-detect file format based on number of columns
-    if avg_phase_results.ndim == 1:
-        # Single row, reshape for consistency
-        avg_phase_results = avg_phase_results.reshape(1, -1)
-    
-    num_columns = avg_phase_results.shape[1]
-    if num_columns == 9:
-        is_subdaily = True
-        print('Detected 9-column subdaily format from file')
-    elif num_columns == 8:
-        is_subdaily = False  
-        print('Detected 8-column daily format from file')
-    else:
-        print(f'Unexpected file format: {num_columns} columns. Expected 8 (daily) or 9 (subdaily)')
-        sys.exit()
+            baseline_curve = None
+            nodes = None
 
+    # Method: polynomial - Sophisticated per-year baseline
+    elif method == 'polynomial':
+        # Validate required parameters
+        if years is None or doys is None:
+            raise ValueError("Polynomial method requires 'years' and 'doys' (or 'mjd')")
+        if level_doys is None:
+            raise ValueError("Polynomial method requires 'level_doys' parameter")
 
-    # get only the years requested - this matters if in previous steps more data was processed
-    avg_phase_results_requested = np.array([v for v in avg_phase_results if v[0] in np.arange(year, year_end+1)])
+        years = np.asarray(years)
+        doys = np.asarray(doys)
 
-    # Extract columns based on file format (8 vs 9 columns)
-    years = avg_phase_results_requested[:, 0]
-    doys = avg_phase_results_requested[:, 1]
-    ph = avg_phase_results_requested[:, 2]
-    phsig = avg_phase_results_requested[:, 3] # TODO this is not used in the rest of the code
-    amp = avg_phase_results_requested[:, 4]
-    months = avg_phase_results_requested[:, 6]
-    days = avg_phase_results_requested[:, 7]
-    
-    # For subdaily files, we have an additional BinStart column
-    if is_subdaily:
-        bin_start_hours = avg_phase_results_requested[:, 8]
-        print(f'Processing {len(avg_phase_results_requested)} subdaily measurements')
-    else:
-        print(f'Processing {len(avg_phase_results_requested)} daily measurements')
+        # Convert to fractional year for processing
+        t = years + doys / 365.25
+        year_start = int(np.min(years))
+        year_end = int(np.max(years))
 
-    t = years + doys/365.25
-    tspan = t[-1] - t[0]
-    print('>>> Timespan in years: ', np.round(tspan,3))
-    if tspan < 1.5:
-        polyordernum = 0  # do nothing
-    else:
-        polyordernum =  int(np.floor(tspan - 0.5));
-    print('>>> Polynomial Order ', polyordernum)
+        # Calculate level nodes for each year
+        nodes = np.empty(shape=[0, 3])  # [year, doy, value]
 
-    # need to do a 30 day smoother on amp
-    window_len = 30
-    s = np.r_[amp[window_len - 1:0:-1], amp, amp[-2:-window_len - 1:-1]]
-    w = np.ones(window_len, 'd')
-    y = np.convolve(w / w.sum(), s, mode='valid')
-    # NOTE: length(output) != length(input), to correct this: return y[(window_len/2-1):-(window_len/2)] instead of just y.
-    y0 = int(window_len / 2 - 1);
-    y1 = -int(window_len / 2)
-    smamp = y[y0:y1]
-
-    # TODO do we want this plot as an option to display?
-    # plt.figure() #plt.plot(t, smamp, '-', t, amp,'o') #plt.show()
-
-    # original clara chew code
-    # residval is the median of the lowest 10 % of the values
-    wetwt = 10.6 * np.power(smamp, 4) - 34.9 * np.power(smamp, 3) + 41.8 * np.power(smamp, 2) - 22.6 * smamp + 5.24
-
-    # TODO this variable (below) is never used in the code
-    delphi = -5.65 * np.power(wetwt, 4) + 43.9 * np.power(wetwt, 3) - 101 * np.power(wetwt,
-                                                                                     2) + 20.4 * wetwt - 2.37;
-    # I think this is just changing the units by factor of 100
-    delphi = (smamp - 1) * 50.25 / 1.48;  # % CR 17jan12
-    newph = ph - delphi;
-    # resid value should be min value of the actual data
-
-    vwc = 100 * tmin + 1.48 * (ph - residval);
-    # this is our "vegetation corrected" value - though needs leveling
-    newvwc = 100 * tmin + 1.48 * (newph - residval);
-    # acting on newvwc, year and doys
-    nodes = np.empty(shape=[0, 3])
-
-    # do not really need southern and northern here anymore.  Using True so I don't ahve to reindent everything.
-    if True:
-        print('Level value points (year, doy, value):')
-        for yr in np.arange(year, year_end+1):
-            # put in amplitude criteria to keep out bad L2P results
+        print('Baseline leveling - Level value points (year, doy, value):')
+        for yr in np.arange(year_start, year_end + 1):
+            # Handle year boundary crossing for southern hemisphere
             if level_doys[0] > level_doys[1]:
-                # this might be the case where you want to go from doy 330 in previous year to doy 40 in current year
-                MJD1 = int(g.ydoy2mjd(yr-1, level_doys[0]))
-                MJD2 = int(g.ydoy2mjd(yr,   level_doys[1]))
-                t1 = (yr - 1) + level_doys[0]/365.25 ; t2 = yr + level_doys[1]/365.25                
+                # Cross year boundary (e.g., Dec to Jan)
+                MJD1 = int(g.ydoy2mjd(yr - 1, level_doys[0]))
+                MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
+                t1 = (yr - 1) + level_doys[0] / 365.25
+                t2 = yr + level_doys[1] / 365.25
             else:
-                MJD1 = int(g.ydoy2mjd(yr,   level_doys[0]))
-                MJD2 = int(g.ydoy2mjd(yr,   level_doys[1]))
-                t1 = yr + level_doys[0]/365.25 ; t2 = yr + level_doys[1]/365.25                
+                # Normal case within same year
+                MJD1 = int(g.ydoy2mjd(yr, level_doys[0]))
+                MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
+                t1 = yr + level_doys[0] / 365.25
+                t2 = yr + level_doys[1] / 365.25
+
+            # Find VWC values in the dry season window
             tindex = (t > t1) & (t < t2)
-            summer_vwc = newvwc[tindex]
-            mid_mjd = int(0.5*(MJD1+MJD2))
-            mid_year, _, _, _, _, _,mid_doy = g.simpleTime(mid_mjd)
+            summer_vwc = vwc_values[tindex]
+
+            # Calculate mid-point for node placement
+            mid_mjd = int(0.5 * (MJD1 + MJD2))
+            mid_year, _, _, _, _, _, mid_doy = g.simpleTime(mid_mjd)
 
             if len(summer_vwc) > 0:
+                # Calculate 15% percentile minimum (Clara's approach)
                 basepercent = 0.15
                 lval = low_pct(summer_vwc, basepercent)
-                # need to fix for date over the year boundary
-                newl = [mid_year, mid_doy, lval];
+                newl = [mid_year, mid_doy, lval]
                 nodes = np.append(nodes, [newl], axis=0)
+                print(f'  {mid_year} {mid_doy:3.0f} {lval:6.2f}')
             else:
-                print('No dry dates found to compute VWC', yr)
+                print(f'  No dry dates found to compute baseline for year {yr}')
 
+        if len(nodes) == 0:
+            print('No baseline nodes found. Cannot apply polynomial leveling.')
+            print('Returning values with simple unit conversion only.')
+            leveled_vwc = vwc_values / 100
+            info['method'] = 'none (no nodes found)'
+            return leveled_vwc, info
 
-    plt.figure(figsize=(10, 10))
-    plt.subplots_adjust(hspace=0.2)
-    plt.suptitle(f'Station: {station}', size=16)
+        # Determine polynomial order
+        howmanynodes = len(nodes)
+        if polyorder >= 0:
+            print(f'Using user override polynomial order: {polyorder}')
+            polyordernum = polyorder
+        else:
+            polyordernum = howmanynodes - 1
+            print(f'Using automatic polynomial order: {polyordernum} (based on {howmanynodes} nodes)')
 
-    # Create datetime objects with hour information for subdaily data  
-    if is_subdaily:
-        from datetime import timedelta
-        t_datetime = []
-        for yr, d, h in zip(years, doys, bin_start_hours):
-            base_dt = datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j')
-            dt_with_hours = base_dt + timedelta(hours=int(h))
-            t_datetime.append(dt_with_hours)
+        # Fit polynomial to nodes
+        st = nodes[:, 0] + nodes[:, 1] / 365.25  # Convert nodes to fractional years
+        sp = nodes[:, 2]  # Node VWC values
+
+        polynomial_coeffs = np.polyfit(st, sp, polyordernum)
+        baseline_curve = np.polyval(polynomial_coeffs, t)
+
+        # Apply leveling: convert to decimal and apply tmin offset
+        leveled_vwc = tmin + (vwc_values - baseline_curve) / 100
+
+        info['nodes'] = nodes
+        info['baseline_points'] = howmanynodes
+
+        print(f'Applied polynomial baseline leveling with {howmanynodes} nodes, order {polyordernum}')
+
     else:
-        # Daily data: use existing logic
-        t_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(years, doys)]
+        raise ValueError(f"Unknown leveling method: '{method}'. "
+                        f"Choose from: 'simple', 'polynomial'")
 
-    # create subplots: 2 rows 1 column, 1st subplot
-    ax = plt.subplot(2, 1, 1)
+    # Generate debug plot if requested
+    if kwargs.get('plot_debug', False) and kwargs.get('station'):
+        # Check if we have the data needed for plotting
+        if baseline_curve is not None and years is not None and doys is not None:
+            station = kwargs.get('station')
+            plt2screen = kwargs.get('plt2screen', True)
+            extension = kwargs.get('extension', '')
+            fr = kwargs.get('fr', 20)
+            bin_hours = kwargs.get('bin_hours', 24)
+            bin_offset = kwargs.get('bin_offset', 0)
 
-    ax.plot(t_datetime, ph, 'b-',label='original')
-    ax.plot(t_datetime, newph, 'r-',label='vegcorrected')
-#    ax.plot(t_datetime, ph-newph, 'm-',label='subtracted')
-    ax.set_title(f'With and Without Vegetation Correction ')
-    ax.set_ylabel('phase (degrees)')
-    ax.legend(loc='best')
-    ax.grid()
-    # ?? does not seem to be working.  sigh
+            import os
+            xdir = os.environ.get('REFL_CODE', '.')
+            suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+            plot_suffix = suffix.replace('.txt', '.png')
+
+            # Build subdir path from extension (consistent with vwc_cl.py pattern)
+            subdir_path = f"{station}/{extension}" if extension else station
+            plot_path = f'{xdir}/Files/{subdir_path}/{station}_baseline_leveling{plot_suffix}'
+            os.makedirs(f'{xdir}/Files/{subdir_path}', exist_ok=True)
+
+            plot_baseline_leveling(station, years, doys, vwc_values, baseline_curve,
+                                 nodes, plot_path, tmin, level_doys, plt2screen)
+        else:
+            print('Skipping baseline leveling plot: temporal data not available')
+
+    return leveled_vwc, info
+
+
+def plot_baseline_leveling(station, years, doys, vwc_values, new_level, nodes, plot_path, tmin, level_doys, plt2screen=True):
+    """
+    Plot baseline leveling results - before/after style like vegetation correction
+    """
+    import matplotlib.pyplot as plt
+    from datetime import datetime
+
+    # Convert to fractional years for calculations
+    t = years + doys/365.25
+    # Apply the same conversion as the actual function: convert to decimal and add tmin offset
+    leveled_vwc = tmin + (vwc_values - new_level) / 100
+
+    # Convert to datetime objects for better date formatting
+    t_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(years, doys)]
+
+    plt.figure(figsize=(10, 6))
+
+    # Add faded yellow highlight for baseline periods
+    year_start = int(np.min(years))
+    year_end = int(np.max(years))
+    for yr in range(year_start, year_end + 1):
+        if level_doys[0] > level_doys[1]:  # crosses year boundary
+            # Create datetime objects for baseline period boundaries
+            dt1 = datetime.strptime(f'{yr-1} {level_doys[0]}', '%Y %j')
+            dt2 = datetime.strptime(f'{yr} {level_doys[1]}', '%Y %j')
+        else:
+            dt1 = datetime.strptime(f'{yr} {level_doys[0]}', '%Y %j')
+            dt2 = datetime.strptime(f'{yr} {level_doys[1]}', '%Y %j')
+        plt.axvspan(dt1, dt2, alpha=0.2, color='yellow', label='Baseline period' if yr == year_start else "")
+
+    # Plot before (blue) and after (red) on same scale
+    plt.plot(t_datetime, vwc_values / 100, 'b-', alpha=0.7, label='Before leveling')
+    plt.plot(t_datetime, leveled_vwc, 'r-', alpha=0.7, label='After leveling')
+
+    # Plot polynomial baseline
+    plt.plot(t_datetime, new_level / 100, 'g--', linewidth=2, label='Polynomial baseline')
+
+    # Plot level nodes
+    if len(nodes) > 0:
+        node_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(nodes[:, 0], nodes[:, 1])]
+        plt.plot(node_datetime, nodes[:, 2] / 100, 'ko', markersize=6, label='Level nodes')
+
+    plt.ylabel('VWC (m³/m³)')
+    plt.xlabel('Date')
+    plt.title(f'{station.upper()} Baseline Leveling')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+
+    # Auto-format x-axis dates like in master branch
     plt.gcf().autofmt_xdate()
 
+    plt.tight_layout()
+    plt.savefig(plot_path, dpi=150, bbox_inches='tight')
+    print(f'Saved leveling plot: {plot_path}')
 
-    # More descriptive variable names would help 
-    st = nodes[:, 0] + nodes[:, 1]/365.25
-    st_datetime = [datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j') for yr, d in zip(nodes[:, 0], nodes[:, 1])]
-    sp = nodes[:, 2]
-    print(nodes)
+    if not plt2screen:
+        plt.close()
 
-    howmanynodes = len(sp)
-    print('number of nodes', howmanynodes)
-    if howmanynodes == 0:
-        print('No summer nodes found. Exiting.')
-        if plt2screen:
-            plt.show()
-        else:
-            plt.close('all')
-        sys.exit()
-    
+
+def calculate_avg_phase(vxyz, bin_hours=24, bin_offset=0, minvalperbin=10):
+    """
+    Calculate time-averaged phase statistics from track-level data
+
+    This is a pure calculation function that bins vxyz data by time and computes
+    statistics without any file I/O.
+
+    Parameters
+    ----------
+    vxyz : numpy array
+        Track-level phase observations (16 columns)
+        Columns: [year, doy, phase, azimuth, sat, rh, norm_amp_LSP, norm_amp_LS,
+                  hour, raw_LSP, raw_LS, apriori_RH, quadrant, delRH, vegMask, MJD]
+    bin_hours : int, optional
+        Time bin size in hours (default: 24 for daily)
+    bin_offset : int, optional
+        Bin timing offset in hours (default: 0)
+    minvalperbin : int, optional
+        Minimum observations required per bin (default: 10)
+
+    Returns
+    -------
+    avg_phase : numpy array (N x 8 or N x 9)
+        Averaged phase data with columns:
+        [Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day, [BinStart]]
+        For daily: 8 columns (no BinStart)
+        For subdaily: 9 columns (with BinStart)
+    """
+    # Extract columns from vxyz
+    y1 = vxyz[:, 0]      # year
+    d1 = vxyz[:, 1]      # doy
+    phase = vxyz[:, 2]   # phase
+    amp = vxyz[:, 6]     # normalized amplitude
+    hour = vxyz[:, 8]    # hour of day, UTC
+
+    # Initialize result array
+    if bin_hours < 24:
+        avg_phase = np.empty(shape=[0, 9])  # subdaily: includes BinStart
     else:
-        polyordernum = howmanynodes - 1
-    if polyorder >= 0: # default is -99
-        print('>>> Using user override for polynomial order on leveling')
-        polyordernum = polyorder
+        avg_phase = np.empty(shape=[0, 8])  # daily: no BinStart
 
-    anothermodel = np.polyfit(st, sp, polyordernum)
-    new_level = np.polyval(anothermodel, t)
+    # Calculate number of bins per day
+    bins_per_day = 24 // bin_hours
 
-    # this is applying the level and the tmin values
-    nv = tmin + (newvwc - new_level) / 100
+    # Get unique year/doy combinations from vxyz
+    unique_days = np.unique(vxyz[:, [0, 1]], axis=0)
 
-    ax = plt.subplot(2, 1, 2)
-    ax.plot(t_datetime, newvwc, 'b-', label='new vwc')
+    # Loop through days with data
+    for requested_year, doy in unique_days:
+        requested_year = int(requested_year)
+        doy = int(doy)
 
-    ax.plot(st_datetime, sp, 'ro', label='nodes')
-    ax.plot(t_datetime, new_level, 'r-', label='level')
-    ax.set_ylabel('VWC')
-    ax.set_title('Volumetric Water Content')
-    ax.legend(loc='best')
-    ax.grid()
-    plt.gcf().autofmt_xdate()
+        if bin_hours < 24:
+            # Subdaily binning: process each time bin separately
+            for bin_idx in range(bins_per_day):
+                # Calculate bin boundaries with offset
+                bin_start = (bin_idx * bin_hours + bin_offset) % 24
+                bin_end = ((bin_idx + 1) * bin_hours + bin_offset) % 24
 
-    outdir = Path(xdir) / 'Files' / subdir
-
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
-    if hires_figs:
-        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.eps'
-    else:
-        plot_path = f'{outdir}/{station}_phase_vwc_result{suffix}.png'
-    print(f"Saving to {plot_path}")
-    plt.savefig(plot_path)
-
-
-    if hires_figs:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.eps'
-    else:
-        plot_path = f'{outdir}/{station}_vol_soil_moisture{suffix}.png'
-
-    vwc_plot(station,t_datetime, nv, plot_path,circles,plt2screen) 
-
-    if plt2screen:
-        plt.show()
-    else:
-        # Close all figures to prevent them from displaying when plt2screen=False
-        plt.close('all')
-
-    # Use FileManagement with extension support for consistent directory structure
-    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
-    base_vwcfile = file_manager.get_file_path()
-    
-    # Generate VWC filename using consistent suffix
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset) 
-    vwcfile = base_vwcfile.parent / f"{station}_vwc{suffix}.txt"
-    print('>>> VWC results being written to ', vwcfile)
-    with open(vwcfile, 'w') as w:
-        N = len(nv)
-        freq_map = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}
-        freq_name = freq_map.get(fr, f"Frequency {fr}")
-        w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
-        w.write("% Frequency used: {0} \n".format(freq_name))
-        w.write("% {0:s} \n".format('https://github.com/kristinemlarson/gnssrefl'))
-        if is_subdaily:
-            w.write(f"% Subdaily VWC with {bin_hours}-hour bins (offset: {bin_offset}h)\n")
-            w.write(get_bin_schedule_info(bin_hours, bin_offset) + "\n")
-            w.write("% FracYr    Year   DOY   VWC Month Day BinStart \n")
-        else:
-            w.write("% FracYr    Year   DOY   VWC Month Day \n")
-        for iw in range(0, N):
-            whydoys = np.round(365.25 * (t[iw] - years))
-
-            fdate = t[iw]
-            myyear = years[iw]
-            mm = months[iw]
-            dd = days[iw]
-            mydoy = doys[iw]
-            watercontent = nv[iw]
-            # we do not allow negative soil moisture in my world.
-            if (watercontent> 0 and watercontent < 0.5):
-                if is_subdaily:
-                    bin_start = bin_start_hours[iw]
-                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} {bin_start:3.0f} \n")
+                # Handle midnight wraparound
+                if bin_end <= bin_start:  # bin crosses midnight
+                    current_day_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start)
+                    next_day_mask = (y1 == requested_year) & (d1 == doy + 1) & (hour < bin_end)
+                    time_mask = (current_day_mask | next_day_mask) & (phase > -10) & (amp > 0.65)
                 else:
-                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} {mm:3.0f} {dd:3.0f} \n")
+                    # Normal case: bin doesn't cross midnight
+                    time_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start) & \
+                               (hour < bin_end) & (phase > -10) & (amp > 0.65)
+
+                ph1 = phase[time_mask]
+                amp1 = amp[time_mask]
+
+                if len(ph1) >= minvalperbin:
+                    # Calculate statistics
+                    mean_ph = np.mean(ph1)
+                    std_ph = np.std(ph1)
+                    mean_amp = np.mean(amp1)
+                    yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                    frac_year = requested_year + doy / 365.25
+                    bin_start_hour = (bin_idx * bin_hours + bin_offset) % 24
+
+                    # Build row: Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day, BinStart
+                    newl = [requested_year, doy, mean_ph, std_ph, mean_amp, frac_year, mm, dd, bin_start_hour]
+                    avg_phase = np.append(avg_phase, [newl], axis=0)
+        else:
+            # Daily binning
+            time_mask = (y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)
+            ph1 = phase[time_mask]
+            amp1 = amp[time_mask]
+
+            if len(ph1) >= minvalperbin:
+                mean_ph = np.mean(ph1)
+                std_ph = np.std(ph1)
+                mean_amp = np.mean(amp1)
+                yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
+                frac_year = requested_year + doy / 365.25
+
+                # Build row: Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day
+                newl = [requested_year, doy, mean_ph, std_ph, mean_amp, frac_year, mm, dd]
+                avg_phase = np.append(avg_phase, [newl], axis=0)
+
+    return avg_phase
 
 
-def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,extension='',
+def write_avg_phase(station, phase, fr, minvalperday, vxyz, subdir, extension='',
                    bin_hours=24, minvalperbin=10, bin_offset=0):
 
     """
@@ -954,57 +1241,69 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
     station : string
 
     phase : numpy list  (float)
-         phase values 
+         phase values (legacy parameter, extracted from vxyz)
 
     fr : int
         frequency
 
-    year: int
-        first year evaluated
-
-    year_end : int
-        last year evaluated
-
     minvalperday : int
-        required number of satellite tracks to trust the daily average 
+        required number of satellite tracks to trust the daily average
 
-    vxyz is from some other compilation
+    vxyz : numpy array
+        Track-level data, pre-filtered to desired years
 
     subdir : str
         subdirectory for results
-    
+
     extension : str, optional
         analysis extension for directory organization
+
+    bin_hours : int, optional
+        Time bin size in hours (default: 24)
+
+    minvalperbin : int, optional
+        Minimum values per bin (default: 10)
+
+    bin_offset : int, optional
+        Bin timing offset in hours (default: 0)
 
     Returns
     -------
     tv : numpy array with elements
-        year 
+        year
         doy  - day of year
         meanph - mean phase value in degrees
         nvals - number of values that went into the average
 
     """
-    myxdir = os.environ['REFL_CODE']
-    y1 = vxyz[:, 0]
-    d1 = vxyz[:, 1]
-    phase = vxyz[:, 2]
-    sat = vxyz[:, 3] # this is not used
-    az = vxyz[:, 4] # this is not used
-    rh = vxyz[:, 5] # this is not used
-    amp = vxyz[:, 6]
-    hour = vxyz[:, 8] # hour of day, UTC
-    
-    # For subdaily mode, we need an extra column for hour bin
-    if bin_hours < 24:
-        tv = np.empty(shape=[0, 5])  # year, doy, meanph, nvals, bin_start_hour
-    else:
-        tv = np.empty(shape=[0, 4])  # year, doy, meanph, nvals (backwards compatibility)
+    # Call calculate_avg_phase to do all the averaging work (eliminates duplication!)
+    avg_phase = calculate_avg_phase(vxyz, bin_hours, bin_offset, minvalperbin)
+
+    if len(avg_phase) == 0:
+        print('No averaged phase data to write')
+        if bin_hours < 24:
+            return np.empty(shape=[0, 5])
+        else:
+            return np.empty(shape=[0, 4])
+
+    # Extract columns from avg_phase result
+    # Columns: [Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day, [BinStart]]
+    years = avg_phase[:, 0]
+    doys = avg_phase[:, 1]
+    phases = avg_phase[:, 2]
+    phase_sigs = avg_phase[:, 3]
+    norm_amps = avg_phase[:, 4]
+    months = avg_phase[:, 6]
+    days = avg_phase[:, 7]
+
+    is_subdaily = avg_phase.shape[1] == 9
+    if is_subdaily:
+        bin_starts = avg_phase[:, 8]
 
     # Use FileManagement for consistent phase file paths
     file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
     base_fileout = file_manager.get_file_path()
-    
+
     # Generate consistent filename with temporal resolution
     suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
     fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
@@ -1013,6 +1312,7 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
         print(f'{bin_hours}-hour averaged phases will be written to : ', fileout)
     else:
         print('Daily averaged phases will be written to : ', fileout)
+
     with open(fileout, 'w') as fout:
         # Write frequency information
         if fr == 1:
@@ -1020,72 +1320,43 @@ def write_avg_phase(station, phase, fr,year,year_end,minvalperday,vxyz,subdir,ex
         elif fr == 2 or fr == 20:
             freq_name = "L2"
         elif fr == 5:
-            freq_name = "L5"  
+            freq_name = "L5"
         else:
             freq_name = f"freq{fr}"
         fout.write(f"% {freq_name} phase results for station {station.upper()}\n")
-        
+
         # Write header based on mode
-        if bin_hours < 24:
+        if is_subdaily:
             # Subdaily mode: add bin info and BinStart column
             fout.write(f"% Subdaily phase averaging with {bin_hours}-hour bins (offset: {bin_offset}h)\n")
             fout.write(get_bin_schedule_info(bin_hours, bin_offset) + "\n")
             fout.write("% Year DOY   Ph    Phsig NormA  empty  Mon Day BinStart\n")
         else:
-            # Daily mode: keep existing header for backwards compatibility  
+            # Daily mode: keep existing header for backwards compatibility
             fout.write("% Year DOY   Ph    Phsig NormA  empty  Mon Day \n")
-            
-        # Calculate number of bins per day
-        bins_per_day = 24 // bin_hours
-        
-        for requested_year in range(year, year_end + 1):
-            for doy in range(1, 367):
-                if bin_hours < 24:
-                    # Subdaily binning: process each time bin separately
-                    for bin_idx in range(bins_per_day):
-                        # Calculate bin boundaries with offset
-                        bin_start = (bin_idx * bin_hours + bin_offset) % 24
-                        bin_end = ((bin_idx + 1) * bin_hours + bin_offset) % 24
-                        
-                        # Handle midnight wraparound - collect data from both days for cross-midnight bins
-                        if bin_end <= bin_start:  # bin crosses midnight
-                            # Current day: late hours (e.g., 22:00-24:00)
-                            current_day_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start)
-                            # Next day: early hours (e.g., 00:00-02:00)
-                            next_day_mask = (y1 == requested_year) & (d1 == doy + 1) & (hour < bin_end)
-                            time_mask = (current_day_mask | next_day_mask) & (phase > -10) & (amp > 0.65)
-                        else:
-                            # Normal case: bin doesn't cross midnight
-                            time_mask = (y1 == requested_year) & (d1 == doy) & (hour >= bin_start) & (hour < bin_end) & (phase > -10) & (amp > 0.65)
-                        ph1 = phase[time_mask]
-                        amp1 = amp[time_mask]
-                        
-                        if len(ph1) >= minvalperbin:
-                            # Calculate statistics
-                            rph1 = np.round(np.mean(ph1), 2)
-                            meanA = np.mean(amp1)
-                            rph1_std = np.std(ph1)
-                            yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
-                            bin_start_hour = (bin_idx * bin_hours + bin_offset) % 24
-                            
-                            # Create data entry for tv array and write to file
-                            newl = [requested_year, doy, np.mean(ph1), len(ph1), bin_start_hour]
-                            fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f}   {bin_start_hour:2.0f}\n")
-                            tv = np.append(tv, [newl], axis=0)
-                else:
-                    # Daily binning: use existing logic for backwards compatibility
-                    time_mask = (y1 == requested_year) & (d1 == doy) & (phase > -10) & (amp > 0.65)
-                    ph1 = phase[time_mask]
-                    amp1 = amp[time_mask]
-                    
-                    if len(ph1) >= minvalperday:
-                        newl = [requested_year, doy, np.mean(ph1), len(ph1)]
-                        tv = np.append(tv, [newl], axis=0)
-                        rph1 = np.round(np.mean(ph1), 2)
-                        meanA = np.mean(amp1)
-                        rph1_std = np.std(ph1)
-                        yy, mm, dd, cyyyy, cdoy, YMD = g.ydoy2useful(requested_year, doy)
-                        fout.write(f" {requested_year:4.0f} {doy:3.0f} {rph1:6.2f} {rph1_std:6.2f} {meanA:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f} \n")
+
+        # Write each row from avg_phase
+        for i in range(len(avg_phase)):
+            yr = int(years[i])
+            doy = int(doys[i])
+            ph = phases[i]
+            ph_sig = phase_sigs[i]
+            norm_amp = norm_amps[i]
+            mm = int(months[i])
+            dd = int(days[i])
+
+            if is_subdaily:
+                bin_start = int(bin_starts[i])
+                fout.write(f" {yr:4.0f} {doy:3.0f} {ph:6.2f} {ph_sig:6.2f} {norm_amp:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f}   {bin_start:2.0f}\n")
+            else:
+                fout.write(f" {yr:4.0f} {doy:3.0f} {ph:6.2f} {ph_sig:6.2f} {norm_amp:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f}\n")
+
+    # Build tv array for backwards compatibility (year, doy, meanph, nvals, [bin_start])
+    if is_subdaily:
+        tv = np.column_stack((years, doys, phases, np.full(len(avg_phase), len(vxyz)), bin_starts))
+    else:
+        tv = np.column_stack((years, doys, phases, np.full(len(avg_phase), len(vxyz))))
+
     return tv
 
 def apriori_file_exist(station, fr, extension=''):
@@ -1406,7 +1677,7 @@ def load_sat_phase(station, year, year_end, freq, extension = ''):
     return dataexist, results
 
 def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,fr, year, year_end,
-                   subdir,plt,auto_removal,warning_value,extension, 
+                   plt,auto_removal,warning_value,extension,
                    bin_hours=None, minvalperbin=None, bin_offset=None):
     """
     the goal of this code is to pick up the relevant parameters used in vwc.
@@ -1432,9 +1703,6 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         first year to analyze
     year_end : int
         last year to analyze
-    subdir : str
-        name for subdirectory used in subdirectory of REFL_CODE/Files
-        this probably should go away and be repaced with extension
     plt : bool
         whether you want plots to come to the screen
     auto_removal : bool
@@ -1464,8 +1732,6 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         frequency to use (1,20 allowed)
     year_end : int
         last year to analyze
-    subdir : str
-        name for subdirectory used in subdirectory of REFL_CODE/Files
     plt : bool
         whether you want plots to come to the screen
     auto_removal : bool
@@ -1476,6 +1742,8 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         extra name for the json file
     return_level_doys : list
         start and end day of years for leveling
+    vegetation_model : int
+        vegetation correction model: 1 (simple), 2 (advanced)
 
     """
     print('level_doys value', level_doys)
@@ -1545,12 +1813,21 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
     if 'vwc_minvalperday' in lsp:
         json_minvalperday = lsp['vwc_minvalperday']
 
-    if warning_value is None:    
+    if warning_value is None:
         if 'vwc_warning_value' in lsp:
             warning_value = lsp['vwc_warning_value']
         else:
             warning_value = 5.5
 
+    # Vegetation model parameter handling (model 1=simple, 2=advanced)
+    if 'vwc_vegetation_model' in lsp:
+        vegetation_model = lsp['vwc_vegetation_model']
+        # Validate it's an integer model number
+        if not isinstance(vegetation_model, int) or vegetation_model not in [1, 2]:
+            print(f'Warning: vwc_vegetation_model in JSON must be 1 or 2, got {vegetation_model}. Using default (1).')
+            vegetation_model = 1
+    else:
+        vegetation_model = 1  # Default to simple model
 
     # not using extension
     # pick up values in json, if available
@@ -1631,20 +1908,20 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
     if tmax is None:
         tmax = 0.5
 
-    # default is station name, but use extension if provided
-    if subdir is None:
-        if extension:
-            subdir = f"{station}/{extension}"
-        else:
-            subdir = station
+    # Compute subdirectory path from extension for file operations
+    if extension:
+        subdir_path = f"{station}/{extension}"
+    else:
+        subdir_path = station
 
     # make sure subdirectory exists
-    g.set_subdir(subdir)
+    g.set_subdir(subdir_path)
 
     if not plt:
         print('no plots will come to screen. Will only be saved.')
 
     print('=== VWC Configuration ===')
+    print(f'vwc_vegetation_model: {vegetation_model}')
     print(f'vwc_min_soil_texture: {tmin:.2f}')
     print(f'vwc_max_soil_texture: {tmax:.2f}')
     print(f'vwc_min_req_pts_track: {min_req_pts_track}')
@@ -1680,9 +1957,9 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
     if extension:
         print(f'extension: {extension}')
 
-    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, subdir, \
-            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend,circles, extension, \
-            bin_hours, minvalperbin, bin_offset, return_level_doys
+    return minvalperday, tmin, tmax, min_req_pts_track, freq, year_end, \
+            plt, remove_bad_tracks, warning_value, min_norm_amp, plot_legend, circles, extension, \
+            bin_hours, minvalperbin, bin_offset, return_level_doys, vegetation_model
 
 def write_all_phase(v,fname):
     """

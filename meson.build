@@ -11,6 +11,10 @@ py_files = run_command('find', 'gnssrefl', '-name', '*.py', check: true).stdout(
 
 py.install_sources(py_files, subdir: 'gnssrefl')
 
+# Install vegetation model data files
+vegetation_data = ['gnssrefl/vegetation_models/clara_high_model.txt']
+py.install_sources(vegetation_data, subdir: 'gnssrefl/vegetation_models')
+
 lib_names = ['gpssnr', 'gnsssnr', 'gnsssnrbigger', 'xnmeasnr']
 libs = {}
 

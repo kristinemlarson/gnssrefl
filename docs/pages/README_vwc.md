@@ -162,11 +162,26 @@ See the *warning_value* and *auto_removal* inputs.
 
 We currently have four use cases posted:
 
- - a shorter version of [p038](../use_cases/use_p038.md) 
- - [mchl](../use_cases/use_mchl.md) 
+ - a shorter version of [p038](../use_cases/use_p038.md)
+ - [mchl](../use_cases/use_mchl.md)
  - [scia](../use_cases/use_scia.md)
  - [mfle](../use_cases/use_mfle.md)
 
 Kristine M. Larson
 
 Updated April 23, 2023
+
+
+## Advanced Vegetation Model
+
+As of October 2025, an advanced vegetation correction model (model 2) is now available as an option
+alongside the original simple model (model 1) described above. The advanced model implements Clara Chew's
+track-level KNN correction algorithm as described in [DOI 10.1007/s10291-015-0462-4](https://doi.org/10.1007/s10291-015-0462-4).
+
+To use the advanced vegetation model specify the <code>vegetation_model</code> parameter:
+
+<code>vwc p038 2016 -year_end 2018 -vegetation_model 2</code>
+
+Use `-save_tracks T` to save individual satellite track data to the <code>$REFL_CODE/Files/p038/individual_tracks</code> folder for further analysis. See the [okl2 advanced model use case](../use_cases/use_okl2_advanced.md) for a complete example.
+
+
