@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.18.3
+October 24, 2025
+
+Setting this version for George Townsend's latest PR 
+for soil moisture code
+
+Also fixing a reported bug in subdaily that crashes when a daily file has only a single
+RH retrieval in it.
+
 ## 3.18.2
 October 21, 2025 
 

@@ -325,17 +325,18 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
                             with warnings.catch_warnings():
                                 warnings.simplefilter("ignore")
                                 a = np.loadtxt(fname,comments='%')
-                            if len(a) > 0:
+                                # this is for files that have only a single row of results
+                                if len(a.shape) == 1:
+                                    a = a.reshape(1,len(a))
+                                    
                                 if icounter == 0:
                                     # you have found the first file.  check how many columns it has
                                     numr, numc = a.shape
-                                    print('Starting to concatenate.')
-                                    print('The number of columns in file ', fname, ' is ', numc)
+                                    print('Starting to concatenate. Results will have ',numc, ' columns')
                                     # initialize the variable
                                     tv = np.empty(shape=[0, numc])
 
                                 icounter = icounter + 1
-
                                 tv = np.append(tv, a,axis=0)
 
                         except:
@@ -343,7 +344,6 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
                             print('I had a problem reading ',fname)
                             numr, numc = a.shape
                             print('The number of columns in this file is ', numc)
-                            print('If this number is not the same as printed above, that is a problem.')
                             print('All the files should have the same numbers of columns. ')
                             print('WARNING WARNING WARNING WARNING WARNING WARNING WARNING ')
 
