@@ -53,6 +53,7 @@ def parse_arguments():
     parser.add_argument("-date1", default=None, type=str, help="start time, yyyymmdd")
     parser.add_argument("-date2", default=None, type=str, help="end time, yyyymmdd")
     parser.add_argument("-fundy", default=None, type=str, help="name of fundy low tide times (in mjd)")
+    parser.add_argument("-fundy_trigger", default=None, type=float, help="fundy low-tide deletion trigger (in hours)")
 
     g.print_version_to_screen()
 
@@ -73,7 +74,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
         azim1: int=0, azim2: int = 360, peak2noise: float = 0, kplt: bool = False, 
         subdir: str = None, delta_out : int = None , if_corr: bool = True, knots_test: int = 0, 
              hires_figs : bool=False, apply_rhdot : bool=True, fs: int = 10, alt_sigma: bool= False, gap_min_val: float=6.0,
-             year_end: int=None, knots2 : int=None, gap_flag: bool = False, date1: str=None, date2: str=None, fundy: str=None):
+             year_end: int=None, knots2 : int=None, gap_flag: bool = False, date1: str=None, date2: str=None, fundy: str=None,
+             fundy_trigger: float=2.25):
     """
     Subdaily combines gnssir solutions and applies relevant corrections needed to measure water levels (tides). 
     As of January 2024, it will allow multiple years. You can also specify which day of year to start with, i.e.
@@ -243,6 +245,7 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
     print('<<<<<<<<<<<<<<<<<<<<<<<<<< subdaily >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
     print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    print(fundy_trigger)
 
     if len(station) != 4:
         print('station names must be four characters long')
@@ -430,8 +433,14 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     # only can do one year at a time
     if fundy is not None:
         # rewrite input2spline so that azimuths < 240 are removed at low tide
+        if fundy == 'kristine':
+            fundy = xdir + '/input/' + station + '/Burnt_2025-10-17thru2025-12-12.csv'
+
         inputf = fname_new 
-        editedAzim = fundylib.apply_new_azim_mask(station, inputf, fundy)
+        editedAzim = fundylib.apply_new_azim_mask(station, inputf, fundy,fundy_trigger)
+        ea = np.loadtxt(editedAzim,comments='%')
+        sd.fundyplt1(station,ea[:,5], ea[:,2])
+
         input2spline = [editedAzim]
 
     # not sure why tv and corr are being returned.

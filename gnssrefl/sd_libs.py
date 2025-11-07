@@ -9,6 +9,7 @@ from astropy.time import Time
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
 
+import os
 import scipy
 import scipy.interpolate as interpolate
 from scipy.interpolate import interp1d
@@ -1385,4 +1386,23 @@ def the_last_plot(tv,station,plotname):
     print('Plot file for final RH saved as: ', plotname)
     # don't plot to the screen
     plt.close()
+
+
+def fundyplt1(station,az, RH):
+    """
+    """
+    plt.figure(figsize=(10,5))
+    plt.plot(az,RH, '.',markersize=4,label='obs')
+    plt.xlabel('Azimuth (degrees)')
+    plt.ylabel('Reflector Height (m)')
+    plt.title(station.upper() + ': After Azimuth Mask')
+    plt.gca().invert_yaxis()
+    plt.legend(loc="best")
+    plt.grid()
+    xdir = os.environ['REFL_CODE']
+    txtdir = xdir + '/Files/' + station 
+    plotname= txtdir + '/after_az_restriction.png'
+
+    plt.savefig(plotname,dpi=300)
+    print('RH plot file with azimuth restrictions: ', plotname)
 

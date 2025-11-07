@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 3.18.4
+November 7, 2025
+
+More secret modules.
+
 ## 3.18.3
 October 24, 2025
 
