@@ -18,7 +18,6 @@
 
 [Station Page at Nevada Geodetic Laboratory](http://geodesy.unr.edu/NGLStationPages/stations/PHNX.sta)
 
-[Webapp example using this site](https://gnss-reflections.org/api?example=phnx&ftype=txt)
 
 ### Experiment
 
@@ -33,8 +32,7 @@ around (and above) the GPS antenna would obstruct GPS reflections in some sense:
 
 However, we will take this as an opportunity to see if we can see how the 
 clutter impacts the GNSS-IR results. The paper says the Antarctic Precipitation System removed 
-their instruments by 3 December 2019. The GPS receiver continues to 
-[operate and produce good data as of March 14, 2022](http://gnss-reflections.org/api?station=phnx&year=2022&doy=73&freq=L1&amp=10&h1=0.4&h2=6.0&e1=5.0&e2=25.0&pk2noise=3.0&rinex=2.11&azim1=0&azim2=360&archive=all&ftype=txt)
+their instruments by 3 December 2019. 
 
 ### Let's Take a Look at the Data
 
