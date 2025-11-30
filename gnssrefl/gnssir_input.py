@@ -317,6 +317,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     """
 
+
     # make sure environment variables exist
     g.check_environ_variables()
 
@@ -325,6 +326,13 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         print('station name must be four characters long. Exiting.')
         sys.exit()
 
+    xdir = os.environ['REFL_CODE']
+    check_dir = f'{xdir}/input/{station}'
+    if os.path.isfile(check_dir):
+        print('Looks like you have an old version of the file input system.')
+        print(check_dir)
+        print('Please remove it and rerun.')
+        sys.exit()
 
 # location of the site - does not have to be very good.  within 100 meters is fine
     query_unr = False

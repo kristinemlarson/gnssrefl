@@ -147,6 +147,7 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
 
     RINEX3 15 sec archives
         bfg, unavco  - You likely need to specify a 15 second sample rate. bfg requires a password.
+        No longer in existence, 2025 Nov 28.
 
     RINEX3 1 sec 
         bkg-igs, bkg-euref, cddis, ignes (spain), maybe nrcan?? , gnet
@@ -484,6 +485,13 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
                 archive = lsp['archive']
 
     print('Using archive value of ', archive)
+
+
+    if archive == 'bfg':
+        print('To the best of my knowledge this archive has been turned off.')
+        print('Newer data are now at BKG and I would be happy to host a PR adding it.')
+        sys.exit()
+
 
     if ('samplerate' in lsp):
         if lsp['samplerate'] is not None:

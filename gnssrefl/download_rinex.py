@@ -99,7 +99,7 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
             bkg-euref : Euref folder of BKG German Agency for Cartography and Geodesy
 
-            bfg : German Agency for water research, only Rinex 3
+            bfg : German Agency for water research, only Rinex 3 (no longer works)
 
             ga : Geoscience Australia
 
@@ -199,6 +199,11 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     # archive list for rinex3 lowrate files
     archive_list_rinex3 = ['unavco', 'bkg','cddis', 'ga', 'bev', 'ign', 'epn', 'bfg','sonel','all','nrcan','gfz','gnet','nz']
+
+    if archive == 'bfg':
+        print('To the best of my knowledge this archive has been turned off.')
+        print('Newer data are now at BKG and I would be happy to host a PR adding it.')
+        sys.exit()
 
     if doy_end is None:
         doy_end = doy

@@ -2,6 +2,8 @@
 
 ## tggo 
 
+**Unfortunately these data are no longer available from BFG.**
+
 **RINEX 3 name:** TGGO00DEU
 
 **Location:** Elbe River, Germany
