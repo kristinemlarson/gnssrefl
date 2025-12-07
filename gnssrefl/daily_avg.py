@@ -608,7 +608,13 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat,station,extension):
 
     """
     # ignore extension for now
-    Hortho = sd.find_ortho_height(station,extension)
+    Hortho,Hdate = sd.find_ortho_height(station,extension)
+    if Hortho == 'list':
+        Hortho = float(Hortho[0][0])
+    else:
+        Hortho = Hortho
+
+    print(Hortho)
     # sort the time tags
     nr,nc = tv.shape
     # nothing to write 
