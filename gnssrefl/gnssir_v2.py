@@ -1594,3 +1594,58 @@ def refraction_nite_mpf(irefr,snrD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd
             #else: 
             #    print('MPF refraction correction, Wiliams and Nievinski')
             #    dE_MPF= refr.Equivalent_Angle_Corr_mpf(ele,mpf,N_ant,RH_apriori)
+
+
+
+def retrieve_Hdates(a):
+    """
+    Parameters
+    a : list of str
+        online input to gnssir_input for Hdates 
+
+    Returns
+    -------
+    Hdate : list of str
+        full dates (2024-10-11 15:12) of Hortho values
+
+    """
+    NV = len(a)
+
+    Hdates = []
+    if  NV % 2 != 0:
+        print(a)
+        print('Your Hdates have an uneven number of entries. There ')
+        print('needs to be one date and one HH:MM for each Hortho entry')
+        sys.exit()
+
+    for i in range(0,int(NV/2)):
+        index = i*2 + 1
+        #print(i, index, a[index])
+        if len(a[index]) != 5:
+            print(a[index], ' is an invalid time. It must be exactly five characters long including the :')
+            sys.exit()
+        else:
+            H= a[index-1] + ' ' + a[index]
+            Hdates.append(H)
+            #o=datetime.datetime.fromisoformat(H)
+            #ts = datetime.datetime.utctimetuple(o)
+            #year = ts.tm_year ; mm  = ts.tm_mon ; dd =  ts.tm_mday
+            #hh = ts.tm_hour ; minutes = ts.tm_min ; sec = 0
+            #print(year, mm, dd, hh, minutes)
+
+    return Hdates
+
+def convert_Hdates_mjd(Hdates):
+    """
+    takes a list of dates in format yyyy-mm-dd hh:mm and turns them into a list of mjd
+
+    """
+    mjd_Hortho = []
+    for i in range(0,len(Hdates)):
+        # convert to mjd
+        m  = g.datestring_mjd(Hdates[i])
+        mjd_Hortho.append(m)
+
+    return mjd_Hortho 
+
+

@@ -63,6 +63,8 @@ def write_spline_output(iyear, th, spline, delta_out, station, txtdir,Hortho):
         orthometric height used to convert RH to something more sea level like
         meters
     """
+    print('I do not think this is used anymore. It has been consolidated with the plot code.')
+    sys.exit()
 
     if delta_out == 0:
         print('No spline values will be written because the interval is set to zero.')
@@ -778,6 +780,8 @@ def find_ortho_height(station,extension):
     and plots. This value should be defined for the GPS L1 phase center of 
     the GNSS antenna as this is what is assumed in the subdaily code.
 
+    Updated to return Hdate variable
+
     Parameters
     ----------
     station : str
@@ -787,11 +791,16 @@ def find_ortho_height(station,extension):
 
     Returns
     -------
-    Hortho : float
+    Hortho : list of floats
+        originally one value, now allowed to be a list.
         orthometric height from gnssir json analysis file as 
         defined as Hortho, in meters. If your preferred value 
         for Hortho is not present, it is calculated from the  
         ellipsoidal height and EGM96. 
+
+    Hdate : list of str
+        date associated with a given Hortho
+        Added to accommodate antenna height changes
 
     """
 
@@ -812,7 +821,13 @@ def find_ortho_height(station,extension):
         geoidC = g.geoidCorrection(lsp['lat'],lsp['lon'])
         Hortho = lsp['ht']- geoidC
 
-    return Hortho
+    if 'Hdate' in lsp:
+        # found in the lsp file
+        Hdate = lsp['Hdate']
+    else:
+        Hdate = None
+
+    return Hortho, Hdate
 
 def mirror_plot(tnew,ynew,spl_x,spl_y,txtdir,station,beginT,endT):
     """
@@ -1008,6 +1023,8 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh,
                    gap_min_val,th,spline,delta_out,csvfile,gap_flag,hires_figs,knots):
     """
 
+    H0 can only have a single value in this code
+
     Makes a plot of the final spline fit to the data. Output time 
     interval controlled by the user.
 
@@ -1019,6 +1036,7 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh,
         name of station, 4 ch
     H0 : float
         datum correction (orthometric height) to convert RH to MSL data, in meters
+        (changed to a list for v. 3.18.5)
     year : int
         year of the time series (ultimately should not be needed)
     txtdir : str
@@ -1045,7 +1063,6 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh,
         number of knots per day used in final spline
     """
 
-    #print('Entering RH_ortho_plot2')
     firstpoint = float(th[0]); lastpoint = float(th[-1])
     s1 = math.floor(firstpoint); s2 = math.ceil(lastpoint)
     ndays = s2-s1 # number of days
@@ -1071,14 +1088,6 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh,
         #print('multiyear is true, start at ', mjd_new[0])
         mjd_new_obstimes = mjd_to_obstimes(mjd_new)
         spline_new = spline(tp)
-    #else:
-    #    multiyear = False
-    #    mjd1 = g.fdoy2mjd(year, tp[0] ) # 
-    #    #print(year, tp[0], mjd1,np.floor(mjd1))
-    #    mjd_new = np.floor(mjd1) + (tp - tp[0])
-    #    print('multiyear is false, start at ', mjd_new[0])
-    #    mjd_new_obstimes = mjd_to_obstimes(mjd_new)
-    #    spline_new = spline(tp)
 
     N_new = len(mjd_new_obstimes)
 
@@ -1090,6 +1099,9 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh,
     else:
         splinefileout =  txtdir + '/' + station +  '_spline_out.txt'
 
+    # only use the first one ... 
+    if type(H0) == list:
+        H0 = float(H0[0][0]) # for now
 
     print('Writing evenly sampled file to: ', splinefileout)
     fout = open(splinefileout,'w+')
@@ -1099,9 +1111,8 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh,
     fout.write('{0:1s}  {1:30s}  \n'.format('%','This is NOT observational data - be careful when interpreting it.'))
     fout.write('{0:1s}  {1:30s}  \n'.format('%','If the data are not well represented by the spline functions, you will '))
     fout.write('{0:1s}  {1:30s}  \n'.format('%','have a very poor representation of the data. I am also writing out station '))
+    # taking out for now ... because Hortho is now a list
     fout.write('{0:1s}  {1:30s}  {2:8.3f} \n'.format('%','orthometric height minus RH, where Hortho (m) is ', H0  ))
-    #fout.write('{0:1s}  {1:30s}  \n'.format('%','This assumes RH is measured relative to the L1 phase center.  '))
-    #fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD, RH(m), YY,MM,DD,HH,MM,SS, quasi-sea-level(m)'))
     if csvfile:
         fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD,             RH(m), YYYY, MM, DD, HH, MM, SS,  quasi-sea-level(m)'))
         fout.write('{0:1s}  {1:30s}  \n'.format('%','(1),              (2),  (3), (4),(5), (6),(7),(8),   (9)'))
@@ -1130,8 +1141,7 @@ def RH_ortho_plot2( station, H0, year,  txtdir, fs, time_rh, rh,
     dlist = mjd_new_obstimes.tolist()
 
 
-    # i have not figured this one out yet ... the horror
-    #if not multiyear:
+
     if True:
     # get the integer values to write out  to the text file ...
         theyear = [y.year for y in dlist ]
@@ -1405,4 +1415,181 @@ def fundyplt1(station,az, RH):
 
     plt.savefig(plotname,dpi=300)
     print('RH plot file with azimuth restrictions: ', plotname)
+
+
+def vary_Hortho( station, H0, year,  txtdir, fs, time_rh, rh, 
+                   gap_min_val,th,spline,delta_out,csvfile,gap_flag,hires_figs,knots):
+    """
+
+    Makes a plot of the final spline fit to the data. Output time 
+    interval controlled by the user.
+
+    It writes out the file with the spline fit. Location is printed to the screen
+
+    Parameters
+    ----------
+    station : str
+        name of station, 4 ch
+    H0 : float
+        datum correction (orthometric height) to convert RH to MSL data, in meters
+        (changed to a list for v. 3.18.5)
+    year : int
+        year of the time series (ultimately should not be needed)
+    txtdir : str
+       location of plot
+    fs : int
+        fontsize
+    time_rh : numpy of floats
+        time of rh values, in fractional doy I believe
+    rh : numpy of floats
+        refl hgt in meters
+    gap_min_val : float
+        minimum length gap allowed, in day of year units
+    th : numpy floats
+        time values in MJD
+    spline : output of interpolate.BSpline
+        used for fitting 
+    delta_out : int
+        how often spline is printed, in seconds
+    csvfile : bool
+        print out csv instead of plain txt
+    gap_flag : bool
+        whether to write 999 in file where there are gaps
+    knots : int
+        number of knots per day used in final spline
+    """
+    # H0 is applied before we get here now
+
+    firstpoint = float(th[0]); lastpoint = float(th[-1])
+    s1 = math.floor(firstpoint); s2 = math.ceil(lastpoint)
+    ndays = s2-s1 # number of days
+    numvals = 1 + int(ndays*86400/delta_out)
+    tp=np.linspace(s1,s2,numvals,endpoint= True)
+
+    # previous tp definition goes from beginning of the first day to the end of last day - but 
+    # does not recognize that the file could have started well beyond that first point 
+    # and it might end say 8 hours into the last day
+    ii = (tp >= firstpoint) & (tp <= lastpoint)
+    tp = tp[ii]
+
+    # this means it is already in MJD ???
+    #if (th[0] > 400): 
+
+    if True: 
+        # don't think this boolean is used anymore.  it is not
+        # truly multiyear, but more a flag that you are using MJD
+        multiyear = True
+        mjd_new = tp
+        #print('multiyear is true, start at ', mjd_new[0])
+        mjd_new_obstimes = mjd_to_obstimes(mjd_new)
+        spline_new = spline(tp)
+
+    N_new = len(mjd_new_obstimes)
+
+    # looks like I identified the gaps in day of year units - 
+    # but then did the implementation in mjd and then datetime ...
+    #splinefileout =  txtdir + '/' + station + '_' + str(year) + '_spline_out.txt'
+    if csvfile:
+        splinefileout =  txtdir + '/' + station +  '_spline_out.csv'
+    else:
+        splinefileout =  txtdir + '/' + station +  '_spline_out.txt'
+
+
+    print('Writing evenly sampled file to: ', splinefileout)
+    fout = open(splinefileout,'w+')
+    vn = station + ' gnssrefl v' + str(g.version('gnssrefl'))
+    fout.write('{0:1s}  {1:30s}  \n'.format('%','station ' + vn))
+    fout.write('{0:1s}  {1:60s}  \n'.format('%','TIME TAGS ARE IN UTC/999 values mean there was a large gap and no spline value is available.'))
+    fout.write('{0:1s}  {1:30s}  \n'.format('%','This is NOT observational data - be careful when interpreting it.'))
+    fout.write('{0:1s}  {1:30s}  \n'.format('%','If the data are not well represented by the spline functions, you will '))
+    fout.write('{0:1s}  {1:30s}  \n'.format('%','have a very poor representation of the data. '))
+
+    fout.write('{0:1s}  {1:30s}  \n'.format('%','The orthometric heights used in this conversion are found in the analysis json.'))
+    # taking out for now ... because Hortho is now a list
+    #fout.write('{0:1s}  {1:30s}  {2:8.3f} \n'.format('%','orthometric height minus RH, where Hortho (m) is ', H0  ))
+    if csvfile:
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD,             RH(m), YYYY, MM, DD, HH, MM, SS,  quasi-sea-level(m)'))
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','(1),              (2),  (3), (4),(5), (6),(7),(8),   (9)'))
+    else:
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','MJD              RH(m)  YYYY  MM  DD  HH  MM  SS   quasi-sea-level(m)'))
+        fout.write('{0:1s}  {1:30s}  \n'.format('%','(1)               (2)   (3)  (4) (5)  (6) (7) (8)    (9)'))
+
+
+    # difference function to find time between all rh measurements
+    gdiff = np.diff( time_rh )
+    if multiyear:
+        mjdt = time_rh
+        mjd = mjdt[0:-1]
+    else:
+        mjdx = g.fdoy2mjd(year, time_rh[0] ) # 
+        mjdt = mjdx + (time_rh - time_rh[0])
+        mjd = mjdt[0:-1]
+
+
+    # find indices of gaps  that are larger than a certain value
+    ii = (gdiff > gap_min_val)
+    #print('gap_min_val',gap_min_val, gdiff)
+    N = len(mjd[ii])
+    Ngdiff = len(gdiff)
+
+    dlist = mjd_new_obstimes.tolist()
+
+
+    # i have not figured this one out yet ... the horror
+    #if not multiyear:
+    if True:
+    # get the integer values to write out  to the text file ...
+        theyear = [y.year for y in dlist ]
+        xm = [y.month for y in dlist]; xd = [y.day for y in dlist]
+        xh = [y.hour for y in dlist]; xmin = [y.minute for y in dlist]
+        xs = [y.second for y in dlist]
+
+        if (Ngdiff > 0):
+            for i in range(0,Ngdiff):
+                if ii[i]:
+                    try:
+                        e0 = mjd[i] ; e1 = mjd[i+1] # beginning and ending of the gap
+                    except:
+                        # alerted to this problem by Felipe Nievinski.  
+                        print('>>>>  DUNNO, some problem with the spline - maybe gap at end of day',mjd[i])
+                        continue
+                    bad_indices = (mjd_new > e0) & (mjd_new < e1 )
+                    spline_new[bad_indices] = np.nan
+                    mjd_new_obstimes[bad_indices] = np.datetime64("NaT")
+
+    # write the spline values to a file, with gaps removed
+        for i in range(0,N_new):
+            if not np.isnan(spline_new[i]):
+                rhout = spline_new[i]
+                if csvfile:
+                    fout.write('{0:15.7f}, {1:10.3f},{2:4.0f},{3:3.0f},{4:3.0f},{5:3.0f},{6:3.0f},{7:3.0f},{8:10.3f} \n'.format( mjd_new[i], rhout, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], rhout))
+                else:
+                    fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:3.0f} {4:3.0f} {5:3.0f} {6:3.0f} {7:3.0f} {8:10.3f} \n'.format(mjd_new[i], rhout, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], rhout))
+            else:
+                if gap_flag: 
+                    rhout = spline_new[i]
+                    if csvfile:
+                        fout.write('{0:15.7f}, {1:10.3f},{2:4.0f},{3:3.0f},{4:3.0f},{5:3.0f},{6:3.0f},{7:3.0f},{8:10.3f} \n'.format( mjd_new[i], 999, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], 999))
+                    else:
+                        fout.write('{0:15.7f}  {1:10.3f} {2:4.0f} {3:3.0f} {4:3.0f} {5:3.0f} {6:3.0f} {7:3.0f} {8:10.3f} \n'.format(mjd_new[i], 999, theyear[i], xm[i], xd[i], xh[i], xmin[i], xs[i], 999))
+
+
+    fout.close()
+
+    # plot of the final spline
+    fig=plt.figure(figsize=(10,5))
+    # spline removed H0 in previous function
+    plt.plot(mjd_new_obstimes, spline_new, 'b-',linewidth=2)
+    plt.grid()
+    plt.ylabel('meters',fontsize=fs)
+    plt.title(station.upper() + ' Water Level from GNSS-IR using splinefit/' + str(knots) + ' knots', fontsize=fs)
+    fig.autofmt_xdate()
+
+    if hires_figs:
+        pfile = txtdir + '/' + station + '_H0.eps'
+    else:
+        pfile = txtdir + '/' + station + '_H0.png'
+    g.save_plot(pfile)
+
+    return
 

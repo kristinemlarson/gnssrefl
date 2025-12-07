@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.19.0
+
+December 7, 2025
+
+Allow more than one Hortho value used in subdaily to turn reflector heights
+into values above sea level. This value 
+
+
 ## 3.18.5
 Removed bfg as allowed archive (rinex2snr and download_rinex)
 Added warning to use case for tggo.

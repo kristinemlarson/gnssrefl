@@ -2752,6 +2752,28 @@ def ydoy2ymd(year, doy):
     day = int(d.day)
     return year, month, day
 
+def datestring_mjd(H):
+    """
+    Parameters
+    ----------
+    H : str
+        date is of form 2024-10-01 15:22
+        I think it will work with only 2024-10-01
+
+    Returns
+    -------
+    mjd : float
+        modified julian day
+
+    """
+    o=datetime.datetime.fromisoformat(H)
+    ts = datetime.datetime.utctimetuple(o)
+    year = ts.tm_year ; mm  = ts.tm_mon ; dd =  ts.tm_mday
+    hh = ts.tm_hour ; minutes = ts.tm_min ; sec = 0
+    modjuld, modjulf = mjd(year,mm,dd,hh,minutes,sec)
+    mjdvalue = modjuld + modjulf
+
+    return mjdvalue
 
 def month_converter(month):
     """

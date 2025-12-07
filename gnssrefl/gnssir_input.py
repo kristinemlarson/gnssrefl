@@ -40,7 +40,7 @@ def parse_arguments():
     parser.add_argument("-ellist", nargs="*",type=float,  default=None,help="List of elevation angle pairs, advanced users only!") 
     parser.add_argument("-refr_model", default="1", type=str, help="refraction model. default is 1, zero turns it off)")
     parser.add_argument("-apriori_rh", default=None, type=float, help="apriori reflector height (m) used by NITE model")
-    parser.add_argument("-Hortho", default=None, type=float, help="station orthometric height (m)")
+    parser.add_argument("-Hortho", default=None, nargs="*", type=float, help="station orthometric height (m)")
     parser.add_argument("-pele", nargs="*", type=float, help="min and max elevation angle in direct signal removal, default is 5-30")
     parser.add_argument("-polyV", default=None, type=int, help="polynomial order for DC removal")
     parser.add_argument("-daily_avg_medfilter", default=None, type=float, help="daily_avg, median filter, meters")
@@ -59,6 +59,7 @@ def parse_arguments():
     parser.add_argument("-dec", default=None, type=int, help="optional decimation value when creating SNR files ")
     parser.add_argument("-orb", default=None, type=str, help="optional orbit value used when creating SNR files")
     parser.add_argument("-archive", default=None, type=str, help="optional archive value used when creating SNR files")
+    parser.add_argument("-Hdates", nargs="*", type=str, help="dates of Hortho values(testing)")
 
     args = parser.parse_args().__dict__
 
@@ -77,17 +78,19 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
        ampl: float = 5.0, allfreq: bool = False, l1: bool = False, l2c: bool = False, l5: bool = False, 
        xyz: bool = False, refraction: bool = True, extension: str = '', ediff: float=2.0, 
        delTmax: float=75.0, frlist: list=[], azlist2: list=[0,360], ellist : list=[], refr_model : str="1", 
-                      apriori_rh: float=None, Hortho : float = None, pele: list=[5,30], polyV: int=4, 
+                      apriori_rh: float=None, Hortho : list = None, pele: list=[5,30], polyV: int=4, 
                       daily_avg_reqtracks: int=None, 
                       daily_avg_medfilter: float =None, subdaily_alt_sigma : bool=None, 
                       subdaily_ampl : float=None, subdaily_delta_out : float=None, 
                       subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
                       subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None, snr: int=None, 
-                      stream: str=None , samplerate: int=None, dec: int=None, orb: str=None, archive: str=None):
+                      stream: str=None , samplerate: int=None, dec: int=None, orb: str=None, archive: str=None,
+                      Hdates: str=None):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
     to a json file which by default is saved in REFL_CODE/<station>.json. This code replaces make_json_input.
+
 
     This version no longer requires you to have azimuth regions of 90-100 degrees. You can set a single set of 
     azimuths in the command line variable azlist2, i.e. -azlist2 0 270 would accommodate all rising and setting arcs 
@@ -97,6 +100,10 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     Your first azimuth constraint can be negative, i.e. -azlist2 -90 90, is allowed.
 
     Note: you can keep using your old json files - you just need to add this new -azlist2 setting manually.
+
+    Hortho can be added to your json so that you can save orthometric height used in subdaily. Multiple Hortho values
+    can be input if you moved your site. You will need to associates times with them, which can be done using
+    Hdates, in this format, 2024-01-01 15:29. subdaily will read the json to get these values.
 
     Latitude, longitude, and height are assumed to be stored in either the UNR database we provide with
     gnssrefl or in your local coordinate file. See the instructions in the file formats section of gnssrefl for 
@@ -255,9 +262,10 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     apriori_rh : float
         apriori reflector height (meters). only used in NITE model 
 
-    Hortho : float
+    Hortho : list 
         station orthometric height, in meters. Currently only used in subdaily.  If not provided on the command line, 
-        it will use ellipsoidal height and EGM96 to compute.
+        it will use ellipsoidal height and EGM96 to compute. Advanced users can set more than one
+        Hortho if they provide a Hdates list
 
     pele : float
         min and max elevation angles in direct signal removal, i.e. 3 40. Default is 5 30. 
@@ -315,8 +323,17 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         for SNR file creation. If nothing is provided, nothing is written to the json.
         Can be useful if you forget which archive has which station files.
 
-    """
+    Hdates : str, optional
+        Is used to allow time information for different Hortho values
+        Uses format of 2024-11-01 15:22
+        You must include all of these values in this format
 
+    """
+    if Hdates is None:
+        print('No Hdates were input')
+        Hdate = None
+    else:
+        Hdate = guts2.retrieve_Hdates(Hdates)
 
     # make sure environment variables exist
     g.check_environ_variables()
@@ -357,7 +374,8 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     # calculate Hortho using EGM96 if none provided
     if Hortho is None:
         geoidC = g.geoidCorrection(lat,lon)
-        Hortho = height - geoidC
+        # turn into a list for below
+        Hortho = [round((height - geoidC),4)]
 
     if apriori_rh is None:
         print('If you plan to use the NITE refraction model you should choose a better a priori ')
@@ -373,8 +391,15 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['lat'] = lat
     lsp['lon'] = lon
     lsp['ht'] = height
-    lsp['Hortho'] = round(Hortho,4) # no point having it be so many decimal points
+    if type(Hortho) == list:
+        lsp['Hortho'] = Hortho
+
+    if Hdate is not None:
+        print('Hdate being written to json')
+        lsp['Hdate'] = Hdate
+
     lsp['apriori_rh'] = apriori_rh
+
 
     # don't save it unless it was set.
     if snr is not None:

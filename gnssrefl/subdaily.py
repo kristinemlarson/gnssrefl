@@ -1211,13 +1211,30 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     th = tvd_new[:,15] # use MJD now
     column = 25 # tells the code which column to use. 
     tnew, ynew = sd.flipit3(tvd_new,column)
-    #plt.figure()
-    #plt.plot(tnew, ynew)
 
-    #else:
-    #    th = tvd_new[:,1] + tvd_new[:,4]/24 # days of year, fractional
-    #    column = 25 # tells the code which column to use. 
-    #    tnew, ynew = flipit(tvd_new,column)
+    # pick up the orthometric height from the gnssir_analysis json
+    H0, Hdate = sd.find_ortho_height(station,extension)
+
+    # set this up so you can keep track of the new code
+    multiH0 = False
+    if type(H0) == list:
+        if len(H0) > 1:
+            NumbOrtho = len(H0) # how many antenna heights
+            multiH0 = True
+            # so we can use different "antenna" heights
+            ynew_Hortho = np.copy(ynew)
+            mjd_Hortho = guts2.convert_Hdates_mjd(Hdate)
+            # random date in the future so that you can search between two dates
+            mend  = g.datestring_mjd('2050-01-01 00:00')
+            mjd_Hortho.append(mend)
+            for ij in range(0,len(H0)):
+                time1 = mjd_Hortho[ij]; time2 = mjd_Hortho[ij+1]
+                #print(ij, time1, time2)
+                tfilter = np.logical_and(tnew >= time1, tnew <time2)
+                ynew_Hortho[tfilter] = H0[ij] - ynew[tfilter]
+    
+        else:
+            H0 = H0[0] # so it isn't a list later on?
 
     Ndays = tnew.max()-tnew.min()
     #print('trying knots2')
@@ -1232,10 +1249,14 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     knots =np.linspace(t1,t2,num=numKnots)
 
 
+    # extra spline
+    if multiH0:
+        t, c, k = interpolate.splrep(tnew, ynew_Hortho, s=0, k=3,t=knots,task=-1)
+        spline_Hortho = interpolate.BSpline(t, c, k, extrapolate=False)
+
     t, c, k = interpolate.splrep(tnew, ynew, s=0, k=3,t=knots,task=-1)
     # compute spline - use for times th
     spline = interpolate.BSpline(t, c, k, extrapolate=False)
-    #print('first and last th value - but for what exactly?')
 
 
     # calculate spline values at GPS time tags
@@ -1272,11 +1293,14 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
     badpoints2 = sd.subdaily_resids_last_stage(station, year, th, biasCor_rh, spline_at_GPS, 
                                                fs, strsig, hires_figs,txtdir, ii,jj,th_even, spline_whole_time)
 
-    # pick up the orthometric height from the gnssir_analysis json
-    H0 = sd.find_ortho_height(station,extension)
-    # this writes out spline file and makes plot .... 
-    sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj], 
+    if multiH0: 
+        # for Felipe's group. H0 not used. H0 applied to the spline_Hortho
+        sd.vary_Hortho( station, H0, year, txtdir, fs, th[jj], 
+                          biasCor_rh[jj],gap_min_val,th,spline_Hortho,delta_out,writecsv,gap_flag,hires_figs,knots2_per_day)
+    else:
+        sd.RH_ortho_plot2( station, H0, year, txtdir, fs, th[jj], 
                       biasCor_rh[jj],gap_min_val,th,spline,delta_out,writecsv,gap_flag,hires_figs,knots2_per_day)
+
     print('\nRMS with frequency biases and RHdot taken out (m) ', np.round(newsigma,3) , '\n' )
 
 

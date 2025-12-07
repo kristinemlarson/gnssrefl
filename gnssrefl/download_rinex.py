@@ -202,7 +202,6 @@ def download_rinex(station: str, year: int, month: int, day: int, rate: str = 'l
 
     if archive == 'bfg':
         print('To the best of my knowledge this archive has been turned off.')
-        print('Newer data are now at BKG and I would be happy to host a PR adding it.')
         sys.exit()
 
     if doy_end is None:

@@ -98,6 +98,8 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     As of version 3.1.4 you can use some of the subdaily optional inputs from the gnssir_input created json.
     See gnssir_input for details.
 
+    As of version 3.18.4 you can use multiple Hortho corrections (use Hdate definition in your json). This
+    would accommodate antenna changes. 
 
     As of version 2.0.0:
 
@@ -245,7 +247,6 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
     print('<<<<<<<<<<<<<<<<<<<<<<<<<< subdaily >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
     print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-    print(fundy_trigger)
 
     if len(station) != 4:
         print('station names must be four characters long')
