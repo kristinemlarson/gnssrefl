@@ -1222,8 +1222,8 @@ def rhdot_correction2(station,fname,fname_new,pltit,outlierV,outlierV2,**kwargs)
             NumbOrtho = len(H0) # how many antenna heights
             multiH0 = True
             # so we can use different "antenna" heights
-            ynew_Hortho = np.copy(ynew)
-            mjd_Hortho = guts2.convert_Hdates_mjd(Hdate)
+            ynew_Hortho = np.copy(ynew) ; remove_hhmm = False
+            mjd_Hortho = guts2.convert_Hdates_mjd(Hdate, remove_hhmm)
             # random date in the future so that you can search between two dates
             mend  = g.datestring_mjd('2050-01-01 00:00')
             mjd_Hortho.append(mend)

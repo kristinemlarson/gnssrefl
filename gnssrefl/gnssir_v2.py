@@ -1599,7 +1599,11 @@ def refraction_nite_mpf(irefr,snrD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd
 
 def retrieve_Hdates(a):
     """
+    Retrieves character strings of dates and attempts to QC
+    them.  
+
     Parameters
+    ----------
     a : list of str
         online input to gnssir_input for Hdates 
 
@@ -1635,15 +1639,32 @@ def retrieve_Hdates(a):
 
     return Hdates
 
-def convert_Hdates_mjd(Hdates):
+def convert_Hdates_mjd(Hdates,remove_hhmm):
     """
     takes a list of dates in format yyyy-mm-dd hh:mm and turns them into a list of mjd
 
+    Parameters
+    ----------
+    Hdates : list of str
+         date strings in the format yyyy-mm-dd hh:mm
+
+    remove_hhmm : bool
+         whether you want to ignore hh:mm
+
+    Returns
+    -------
+    mjd_Hortho : list of floats
+        modified julian dates of character string dates
+
     """
     mjd_Hortho = []
+    print(Hdates)
     for i in range(0,len(Hdates)):
         # convert to mjd
-        m  = g.datestring_mjd(Hdates[i])
+        if remove_hhmm : 
+            m  = g.datestring_mjd(Hdates[i][0:10])
+        else:
+            m  = g.datestring_mjd(Hdates[i])
         mjd_Hortho.append(m)
 
     return mjd_Hortho 

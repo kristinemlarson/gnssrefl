@@ -11,6 +11,11 @@ December 7, 2025
 Allow more than one Hortho value used in subdaily to turn reflector heights
 into values above sea level. This value 
 
+December 10, 2025
+
+Allow more than one Hortho value in daily_avg. Hortho-RH is the only metric 
+affected in the daily_avg output. Also cleaned up how the daily average file
+is printed.
 
 ## 3.18.5
 Removed bfg as allowed archive (rinex2snr and download_rinex)

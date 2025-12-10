@@ -13,6 +13,7 @@ from datetime import date
 # my code
 import gnssrefl.gps as g
 import gnssrefl.sd_libs as sd
+import gnssrefl.gnssir_v2 as guts2
 #
 
 def fbias_daily_avg(station):
@@ -589,14 +590,16 @@ def daily_avg_stat_plots(obstimes,meanRH,meanAmp, station,txtdir,tv,ngps,nglo,ng
 
 def write_out_RH_file(obstimes,tv,outfile,csvformat,station,extension):
     """
-    write out the daily average RH values 
+    write out a file with the daily average RH values in it
 
     Parameters
     ----------
     obstimes : datetime object
         time of observation
     tv : numpy array
-        content of a LSP results file
+        these values [year, doy, meanRHtoday, len(rh), month, day, stdRH, averageAmplitude]
+        where meanRHtoday is the mean (with QC), averageAmplitude is the average
+        of the LSP amplitudes.  stdRH is probably the standard deviation of RH
     outfile : string
         full name of output file
     csvformat : boolean
@@ -609,47 +612,65 @@ def write_out_RH_file(obstimes,tv,outfile,csvformat,station,extension):
     """
     # ignore extension for now
     Hortho,Hdate = sd.find_ortho_height(station,extension)
+    nr,nc = tv.shape
+    # copy over the original RH values
+    Hortho_RH = np.copy(tv[:,2]).reshape(nr,1)
+    # make empty array for modified julian day
+    mjd = np.zeros((nr,1))
     if type(Hortho) == list:
-        Hortho = float(Hortho[0])
+        NumH = len(Hortho)
+        if NumH > 1:
+            # figure out mjd because i never did 
+            for i in range(0,nr):
+                mjd[i]  = g.ydoy2mjd(int(tv[i,0]),int(tv[i,1]))
+            # convert Hdate to mjd
+            hdate_mjd = guts2.convert_Hdates_mjd(Hdate,remove_hhmm=True)
+            hdate_mjd.append (88069) # this is the year 2100, jan 1 to cover last time period
+
+            for ij in range(0,NumH):
+                time1 = hdate_mjd[ij]; time2 = hdate_mjd[ij+1]
+                tfilter = np.logical_and(mjd >= time1, mjd < time2)
+                Hortho_RH[tfilter] = float(Hortho[ij]) - Hortho_RH[tfilter]
+        else:
+            # just use the first one cause that is all there is
+            Hortho = float(Hortho[0])
+            Hortho_RH = Hortho - tv[:,2] 
     else:
         Hortho = float(Hortho)
+        Hortho_RH = Hortho - tv[:,2] 
 
-    print(Hortho)
+    # make sure it is a column with dimension 1 
+    Hortho_RH = Hortho_RH.reshape(nr,1)
+    # merge them
+    newtv = np.hstack((tv,Hortho_RH))
+
     # sort the time tags
     nr,nc = tv.shape
-    # nothing to write 
+    # nothing to write  - though this probably will crash before getting here on an empty file
     if (nr < 1):
         return
     print('\nDaily average RH file written to: ', outfile)
+
+    # sort the array by time, store in ntv
     ii = np.argsort(obstimes)
-    # apply time tags to a new variable
-    ntv = tv[ii,:]
+    ntv = newtv[ii,:]
     N,M = np.shape(ntv)
     xxx = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-    fout = open(outfile, 'w+')
-    #  header of a sorts
-    # change comment value from # to %
-    # 2021 november 8 added another column that has mean amplitude
-    # 2024 march 10 added a column with orthometric height
-    fout.write("{0:48s} \n".format( '% station:' + station + ' calculated on ' + xxx ))
-    fout.write("% Daily average reflector heights (RH) calculated using the gnssrefl software \n")
-    fout.write("% Nominally you should assume this average is associated with 12:00 UTC hours \n")
-    fout.write("% year doy   RH    numval month day RH-sigma RH-amp  Hortho-RH\n")
-    fout.write("%            (m)                       (m)    (v/v)     (m) \n")
-    fout.write("% (1)  (2)   (3)    (4)    (5)  (6)   (7)     (8)       (9) \n")
 
-    # these print statements could be much smarter
+    f1 = ' station:' + station + ' calculated on ' + xxx  + ' \n'
+    f1a = ' Daily average reflector heights (RH) calculated using the gnssrefl software \n'
+    f1b = ' Nominally you should assume this average is associated with 12:00 UTC hours \n'
+    f1b = ' Column 9 is only relevant for water level measurements (see subdaily for discussion) \n'
+    f2 = ' year doy   RH    numval month day RH-sigma  RH-amp  Hortho-RH \n'
+    f3 = '            (m)                       (m)    (v/v)     (m) \n' 
+    f4 = '  (1)  (2)   (3)    (4)    (5)  (6)   (7)     (8)      (9) \n'
+    f1 = f1 + f1a + f1b + f2 + f3 + f4
+
+    fmat = "%4.0f  %3.0f  %7.3f %3.0f %4.0f %4.0f %7.3f %6.2f  %7.3f"
     if csvformat:
-        for i in np.arange(0,N,1):
-            dv = Hortho - ntv[i,2]
-            fout.write(" {0:4.0f},  {1:3.0f},{2:7.3f},{3:3.0f},{4:4.0f},{5:4.0f},{6:7.3f},{7:6.2f},{8:7.3f} \n".format(ntv[i,0], 
-                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6],ntv[i,7],dv ))
+        np.savetxt(outfile, ntv, fmt=fmat, delimiter=',', newline='\n',header=f1, comments='%')
     else:
-        for i in np.arange(0,N,1):
-            dv = Hortho - ntv[i,2]
-            fout.write(" {0:4.0f}   {1:3.0f} {2:7.3f} {3:3.0f} {4:4.0f} {5:4.0f} {6:7.3f} {7:6.2f} {8:7.3f} \n".format(ntv[i,0], 
-                ntv[i,1], ntv[i,2],ntv[i,3],ntv[i,4],ntv[i,5],ntv[i,6], ntv[i,7],dv))
-    fout.close()
+        np.savetxt(outfile, ntv, fmt=fmat, delimiter=' ', newline='\n',header=f1, comments='%')
 
 
 def write_out_all(allrh, csvformat, NG, yr, doy, d, good, gazim, gfreq, gsat,gamp,gpeak2noise,gutcTime,tvall ):
