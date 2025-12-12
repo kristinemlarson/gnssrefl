@@ -840,7 +840,6 @@ def low_pct(amp, basepercent):
 
 
 def apply_vwc_leveling(vwc_values, tmin,
-                       simple=False,
                        years=None, doys=None, mjd=None,
                        level_doys=None, polyorder=-99,
                        **kwargs):
@@ -848,10 +847,7 @@ def apply_vwc_leveling(vwc_values, tmin,
     Apply global baseline leveling to time-averaged VWC estimates.
 
     This is the FINAL leveling step applied to time-binned VWC values.
-
-    Two leveling approaches are available:
-    - Polynomial (default): Sophisticated per-year polynomial fitting using dry season nodes
-    - Simple: Simple global offset using 25 lowest points (for testing)
+    Uses per-year polynomial fitting with dry season nodes for baseline calculation.
 
     Parameters
     ----------
@@ -860,22 +856,18 @@ def apply_vwc_leveling(vwc_values, tmin,
         These should be AFTER per-track processing and time-averaging
     tmin : float
         Minimum soil texture value (0.05 typical)
-    simple : bool, optional
-        Use simple leveling instead of polynomial (default: False)
-        - False (default): Polynomial per-year baseline (recommended)
-        - True: Simple global offset using 25 lowest points (for testing)
     years : array-like, optional
-        Year values (required for polynomial leveling, or auto-derived from mjd)
+        Year values (required, or auto-derived from mjd)
     doys : array-like, optional
-        Day of year values (required for polynomial leveling, or auto-derived from mjd)
+        Day of year values (required, or auto-derived from mjd)
     mjd : array-like, optional
         Modified Julian Day values (alternative to years/doys, will be auto-converted)
     level_doys : list of int, optional
-        [start_doy, end_doy] for dry season baseline (required for polynomial leveling)
+        [start_doy, end_doy] for dry season baseline (required)
     polyorder : int, optional
-        Polynomial order override for polynomial leveling (default: -99 = auto)
+        Polynomial order override (default: -99 = auto)
     **kwargs : dict
-        Optional parameters for polynomial method:
+        Optional parameters:
         - station : str (for plot labels)
         - plot_debug : bool (generate diagnostic plots)
         - plt2screen : bool (show plots on screen)
@@ -890,33 +882,24 @@ def apply_vwc_leveling(vwc_values, tmin,
         Leveled VWC values in decimal units (0.0-0.6 range)
     info : dict
         Additional information about the leveling:
-        - 'method': str - Method used
-        - 'nodes': numpy.ndarray or None - Level nodes (polynomial method only)
+        - 'method': str - Always 'polynomial'
+        - 'nodes': numpy.ndarray or None - Level nodes used
         - 'baseline_points': int or None - Number of baseline points used
-        - 'baseline_value': float or None - Baseline offset (simple method only)
 
     Examples
     --------
-    Polynomial leveling (default):
         leveled, info = apply_vwc_leveling(vwc, tmin=0.05,
                                            years=yrs, doys=dys, level_doys=[152, 244])
-
-    Simple leveling:
-        leveled, info = apply_vwc_leveling(vwc, tmin=0.05, simple=True)
     """
 
     # Convert inputs to numpy arrays
     vwc_values = np.asarray(vwc_values)
 
-    # Convert boolean to method string for internal logic
-    method = 'simple' if simple else 'polynomial'
-
     # Initialize info dictionary
     info = {
-        'method': method,
+        'method': 'polynomial',
         'nodes': None,
-        'baseline_points': None,
-        'baseline_value': None
+        'baseline_points': None
     }
 
     # Handle MJD to years/doys conversion if needed
@@ -931,113 +914,87 @@ def apply_vwc_leveling(vwc_values, tmin,
         years = np.array(years)
         doys = np.array(doys)
 
-    # Method: simple - simple global baseline leveling
-    if method == 'simple':
-        vwc_sorted = np.sort(vwc_values)
-        num_baseline = min(25, len(vwc_sorted))  # Fixed 25 points (or less if dataset is small)
-        baseline_value = np.mean(vwc_sorted[0:num_baseline])
-        leveled_vwc = (100 * tmin + (vwc_values - baseline_value)) / 100
+    # Validate required parameters
+    if years is None or doys is None:
+        raise ValueError("Leveling requires 'years' and 'doys' (or 'mjd')")
+    if level_doys is None:
+        raise ValueError("Leveling requires 'level_doys' parameter")
 
-        info['baseline_points'] = num_baseline
-        info['baseline_value'] = baseline_value
+    years = np.asarray(years)
+    doys = np.asarray(doys)
 
-        # Create constant baseline for plotting (if temporal data available)
-        if years is not None and doys is not None:
-            years = np.asarray(years)
-            doys = np.asarray(doys)
-            baseline_curve = np.full_like(vwc_values, baseline_value)  # Constant baseline
-            nodes = np.empty(shape=[0, 3])  # No nodes for simple method
+    # Convert to fractional year for processing
+    t = years + doys / 365.25
+    year_start = int(np.min(years))
+    year_end = int(np.max(years))
+
+    # Calculate level nodes for each year
+    nodes = np.empty(shape=[0, 3])  # [year, doy, value]
+
+    print('Baseline leveling - Level value points (year, doy, value):')
+    for yr in np.arange(year_start, year_end + 1):
+        # Handle year boundary crossing for southern hemisphere
+        if level_doys[0] > level_doys[1]:
+            # Cross year boundary (e.g., Dec to Jan)
+            MJD1 = int(g.ydoy2mjd(yr - 1, level_doys[0]))
+            MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
+            t1 = (yr - 1) + level_doys[0] / 365.25
+            t2 = yr + level_doys[1] / 365.25
         else:
-            baseline_curve = None
-            nodes = None
+            # Normal case within same year
+            MJD1 = int(g.ydoy2mjd(yr, level_doys[0]))
+            MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
+            t1 = yr + level_doys[0] / 365.25
+            t2 = yr + level_doys[1] / 365.25
 
-    # Method: polynomial - Sophisticated per-year baseline
-    elif method == 'polynomial':
-        # Validate required parameters
-        if years is None or doys is None:
-            raise ValueError("Polynomial method requires 'years' and 'doys' (or 'mjd')")
-        if level_doys is None:
-            raise ValueError("Polynomial method requires 'level_doys' parameter")
+        # Find VWC values in the dry season window
+        tindex = (t > t1) & (t < t2)
+        summer_vwc = vwc_values[tindex]
 
-        years = np.asarray(years)
-        doys = np.asarray(doys)
+        # Calculate mid-point for node placement
+        mid_mjd = int(0.5 * (MJD1 + MJD2))
+        mid_year, _, _, _, _, _, mid_doy = g.simpleTime(mid_mjd)
 
-        # Convert to fractional year for processing
-        t = years + doys / 365.25
-        year_start = int(np.min(years))
-        year_end = int(np.max(years))
-
-        # Calculate level nodes for each year
-        nodes = np.empty(shape=[0, 3])  # [year, doy, value]
-
-        print('Baseline leveling - Level value points (year, doy, value):')
-        for yr in np.arange(year_start, year_end + 1):
-            # Handle year boundary crossing for southern hemisphere
-            if level_doys[0] > level_doys[1]:
-                # Cross year boundary (e.g., Dec to Jan)
-                MJD1 = int(g.ydoy2mjd(yr - 1, level_doys[0]))
-                MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
-                t1 = (yr - 1) + level_doys[0] / 365.25
-                t2 = yr + level_doys[1] / 365.25
-            else:
-                # Normal case within same year
-                MJD1 = int(g.ydoy2mjd(yr, level_doys[0]))
-                MJD2 = int(g.ydoy2mjd(yr, level_doys[1]))
-                t1 = yr + level_doys[0] / 365.25
-                t2 = yr + level_doys[1] / 365.25
-
-            # Find VWC values in the dry season window
-            tindex = (t > t1) & (t < t2)
-            summer_vwc = vwc_values[tindex]
-
-            # Calculate mid-point for node placement
-            mid_mjd = int(0.5 * (MJD1 + MJD2))
-            mid_year, _, _, _, _, _, mid_doy = g.simpleTime(mid_mjd)
-
-            if len(summer_vwc) > 0:
-                # Calculate 15% percentile minimum (Clara's approach)
-                basepercent = 0.15
-                lval = low_pct(summer_vwc, basepercent)
-                newl = [mid_year, mid_doy, lval]
-                nodes = np.append(nodes, [newl], axis=0)
-                print(f'  {mid_year} {mid_doy:3.0f} {lval:6.2f}')
-            else:
-                print(f'  No dry dates found to compute baseline for year {yr}')
-
-        if len(nodes) == 0:
-            print('No baseline nodes found. Cannot apply polynomial leveling.')
-            print('Returning values with simple unit conversion only.')
-            leveled_vwc = vwc_values / 100
-            info['method'] = 'none (no nodes found)'
-            return leveled_vwc, info
-
-        # Determine polynomial order
-        howmanynodes = len(nodes)
-        if polyorder >= 0:
-            print(f'Using user override polynomial order: {polyorder}')
-            polyordernum = polyorder
+        if len(summer_vwc) > 0:
+            # Calculate 15% percentile minimum (Clara's approach)
+            basepercent = 0.15
+            lval = low_pct(summer_vwc, basepercent)
+            newl = [mid_year, mid_doy, lval]
+            nodes = np.append(nodes, [newl], axis=0)
+            print(f'  {mid_year} {mid_doy:3.0f} {lval:6.2f}')
         else:
-            polyordernum = howmanynodes - 1
-            print(f'Using automatic polynomial order: {polyordernum} (based on {howmanynodes} nodes)')
+            print(f'  No dry dates found to compute baseline for year {yr}')
 
-        # Fit polynomial to nodes
-        st = nodes[:, 0] + nodes[:, 1] / 365.25  # Convert nodes to fractional years
-        sp = nodes[:, 2]  # Node VWC values
+    if len(nodes) == 0:
+        print('No baseline nodes found. Cannot apply leveling.')
+        print('Returning values with simple unit conversion only.')
+        leveled_vwc = vwc_values / 100
+        info['method'] = 'none (no nodes found)'
+        return leveled_vwc, info
 
-        polynomial_coeffs = np.polyfit(st, sp, polyordernum)
-        baseline_curve = np.polyval(polynomial_coeffs, t)
-
-        # Apply leveling: convert to decimal and apply tmin offset
-        leveled_vwc = tmin + (vwc_values - baseline_curve) / 100
-
-        info['nodes'] = nodes
-        info['baseline_points'] = howmanynodes
-
-        print(f'Applied polynomial baseline leveling with {howmanynodes} nodes, order {polyordernum}')
-
+    # Determine polynomial order
+    howmanynodes = len(nodes)
+    if polyorder >= 0:
+        print(f'Using user override polynomial order: {polyorder}')
+        polyordernum = polyorder
     else:
-        raise ValueError(f"Unknown leveling method: '{method}'. "
-                        f"Choose from: 'simple', 'polynomial'")
+        polyordernum = howmanynodes - 1
+        print(f'Using automatic polynomial order: {polyordernum} (based on {howmanynodes} nodes)')
+
+    # Fit polynomial to nodes
+    st = nodes[:, 0] + nodes[:, 1] / 365.25  # Convert nodes to fractional years
+    sp = nodes[:, 2]  # Node VWC values
+
+    polynomial_coeffs = np.polyfit(st, sp, polyordernum)
+    baseline_curve = np.polyval(polynomial_coeffs, t)
+
+    # Apply leveling: convert to decimal and apply tmin offset
+    leveled_vwc = tmin + (vwc_values - baseline_curve) / 100
+
+    info['nodes'] = nodes
+    info['baseline_points'] = howmanynodes
+
+    print(f'Applied polynomial baseline leveling with {howmanynodes} nodes, order {polyordernum}')
 
     # Generate debug plot if requested
     if kwargs.get('plot_debug', False) and kwargs.get('station'):

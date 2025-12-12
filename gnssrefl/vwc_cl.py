@@ -45,7 +45,6 @@ def parse_arguments():
     parser.add_argument("-advanced", default=None, type=str, help="Shorthand for -vegetation_model 2 (advanced vegetation model)")
     parser.add_argument("-vegetation_model", default=None, type=str, help="Vegetation correction model: 1 (simple, default) or 2 (advanced)")
     parser.add_argument("-save_tracks", default=None, type=str, help="Save individual track VWC data (model 2 only)")
-    parser.add_argument("-simple_level", default=None, type=str, help="Use simple global leveling instead of polynomial (default: False)")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
     parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes",type=int) 
 
@@ -54,7 +53,7 @@ def parse_arguments():
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced','save_tracks','simple_level']
+    boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced','save_tracks']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
@@ -65,7 +64,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         bin_hours: int = None, minvalperbin: int = None, bin_offset: int = None,
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None,
         warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False,
-        advanced : bool=False, vegetation_model: int=None, save_tracks: bool=False, simple_level: bool=False,
+        advanced : bool=False, vegetation_model: int=None, save_tracks: bool=False,
         extension:str=None, level_doys : list =[], skip_leveling: bool=False):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates.
@@ -149,8 +148,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     vegetation_model : int, optional
          vegetation correction model: 1=simple (default), 2=advanced (Chew et al. 2016)
          can be set in gnssir analysis JSON as vwc_vegetation_model
-    simple_level : bool, optional
-         use simple leveling instead of polynomial (default: False)
     save_tracks : bool, optional
          save individual track VWC data to files (advanced model only)
     extension : str
@@ -244,8 +241,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # Print final resolved vegetation model (overrides the JSON printout from set_parameters)
     if veg_model != json_vegetation_model:
         print(f'Vegetation model overridden by CLI: {veg_model}')
-
-    print(f'Using baseline leveling: {"simple" if simple_level else "polynomial"}')
 
     # if you have requested snow filtering
     if snow_filter:
@@ -607,7 +602,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     print('\nApplying baseline leveling...')
     leveled_vwc, leveling_info = qp.apply_vwc_leveling(
         vwc_data['vwc'], tmin,
-        simple=simple_level,
         mjd=vwc_data['mjd'],
         level_doys=level_doys,
         polyorder=polyorder,
