@@ -431,7 +431,8 @@ def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
             if watercontent > 0 and watercontent < 0.5:
                 if is_subdaily:
                     bin_start = int(bin_starts[iw])
-                    w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
+                    fdate = myyear + (mydoy + bin_start/24.0) / 365.25  # Recalc with hour
+                    w.write(f"{fdate:10.6f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
                            f"{mm:3.0f} {dd:3.0f} {bin_start:3.0f} \n")
                 else:
                     w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
@@ -505,12 +506,12 @@ def write_rolling_vwc_output(station, vwc_data, fr, bin_hours, extension='', veg
             mm = int(months[iw])
             dd = int(days[iw])
             bin_start = int(bin_starts[iw])
-            fdate = myyear + mydoy / 365.25
+            fdate = myyear + (mydoy + bin_start/24.0) / 365.25  # Include hour
             watercontent = vwc_values[iw]
 
             # Only write positive, reasonable soil moisture values
             if watercontent > 0 and watercontent < 0.5:
-                w.write(f"{fdate:10.4f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
+                w.write(f"{fdate:10.6f} {myyear:4.0f} {mydoy:4.0f} {watercontent:8.3f} "
                        f"{mm:3.0f} {dd:3.0f} {bin_start:3.0f}\n")
 
 
