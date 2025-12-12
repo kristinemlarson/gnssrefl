@@ -1,10 +1,20 @@
 # gnssrefl v3.19.0
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
-When showing results created using gnssrefl, please use:
+
+While it is great to see so many people expressing interest in GNSS-IR and using this software, I *cannot* answer
+questions sent to my personal e-mail. **All questions must be posted as an [issue](https://github.com/kristinemlarson/gnssrefl/issues).**
+This allows tracking of community usage and allows others to benefit if they have the same question. It also
+provides a forum for other community members to provide their perspective as I am not able to answer every question 
+that is posted.
+
+When showing any results created using gnssrefl, I request that you use:
 
 Larson, K.M., gnssrefl: an open source python software package for environmental 
 GNSS interferometric reflectometry applications, *GPS Solutions*, Vol. 28(165), 10.1007/s10291-024-01694-8, 2024.
+
+If you use the [online Fresnel mapping tool](https://gnss-reflections.org/rzones), 
+you should similarly cite this paper as it uses the exact same code.
 
 Documentation: [![Documentation Status](https://readthedocs.org/projects/gnssrefl/badge/?version=latest)](https://gnssrefl.readthedocs.io/en/latest/?badge=latest)
 
@@ -21,6 +31,11 @@ gnssrefl also has a DOI from zenodo.
 The latest pypi version can be found here [![PyPI Version](https://img.shields.io/pypi/v/gnssrefl.svg)](https://pypi.python.org/pypi/gnssrefl) 
 
 Latest Features
+
+- There is a more advanced vegetation model available for the soil moisture module.
+
+- You can define your water level measurements with respect to more than one orthometric height. This value is read from the analysis json 
+in both subdaily and daily_avg. Please see the documented inputs to gnssir_input for more information.
 
 - You can set your own leveling time periods for soil moisture (see vwc.py).
 
@@ -58,9 +73,9 @@ A [notebook version](https://github.com/kristinemlarson/gnssrefl/blob/master/not
 See documentation for [gnssir_input](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.gnssir_input.html) for new refraction models.
 
 How do you find out which version are you running? Any of the major pieces
-of code should display this information on the first line. Try <code>rinex2snr</code>.
+of code (rinex2snr, gnssir, subdaily) should display this information on the first line of the screen output. 
 
-If you want to sign up for the GNSS-IR email list, please contact Kristine Larson.
+If you would like to sign up for the GNSS-IR email list, please contact Melissa Weber at Melissa.weber@earthscope.org
 
 [Youtube videos for beginners](https://www.youtube.com/channel/UCC1NW5oS7liG7C8NBK148Bg).
 
@@ -76,11 +91,14 @@ as a fun post-retirement project, followed by support from NASA (80NSSC20K1731).
 The [CRC 1502 DETECT project](https://sfb1502.de/) and the University of Bonn supported this project from 2022-2024.
 
 I am not funded to give courses on using <code>gnssrefl</code>. If you are interested in 
-hosting a GNSS-IR workshop, as was done by the Earth Observatory of Singapore in 
-2022, please feel free to contact me.
+hosting a GNSS-IR workshop or short course, please contact one of the chairs of 
+the [IAG study group on GNSS-IR](https://geodesy.science/iccc/structure/jwg-c-5/)
+
 
 Kristine M. Larson
 
-January 19, 2025
+Last updated
+
+December 11, 2025
 
 

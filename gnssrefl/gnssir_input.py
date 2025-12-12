@@ -263,9 +263,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         apriori reflector height (meters). only used in NITE model 
 
     Hortho : list 
-        station orthometric height, in meters. Currently only used in subdaily.  If not provided on the command line, 
+        station orthometric height, in meters. Currently used in subdaily and daily_avg.  If not provided on the command line, 
         it will use ellipsoidal height and EGM96 to compute. Advanced users can set more than one
-        Hortho if they provide a Hdates list
+        Hortho if they provide a Hdates list (see below).
 
     pele : float
         min and max elevation angles in direct signal removal, i.e. 3 40. Default is 5 30. 
@@ -324,9 +324,11 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         Can be useful if you forget which archive has which station files.
 
     Hdates : str, optional
-        Is used to allow time information for different Hortho values
+        This variable is used to allow time information for different Hortho values, as might 
+        happen if you moved your GNSS antenna vertical between installations.
         Uses format of 2024-11-01 15:22
-        You must include all of these values in this format
+        You must include all of these values in this format (i.e. you cannot leave off HH:MM)
+
 
     """
     if Hdates is None:
