@@ -51,14 +51,13 @@ def parse_arguments_hourly():
     parser.add_argument("-advanced", default=None, type=str, help="Shorthand for -vegetation_model 2 (advanced vegetation model)")
     parser.add_argument("-vegetation_model", default=None, type=str, help="Vegetation correction model: 1 (simple, default) or 2 (advanced)")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
-    parser.add_argument("-simple_level", default=None, type=str, help="Use simple global leveling instead of polynomial (default: False)")
     parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes", type=int)
 
     g.print_version_to_screen()
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt','snow_filter','auto_removal','hires_figs','advanced','simple_level']
+    boolean_args = ['plt','snow_filter','auto_removal','hires_figs','advanced']
     args = str2bool(args, boolean_args)
     return {key: value for key, value in args.items() if value is not None}
 
@@ -150,6 +149,86 @@ def combine_offset_files_to_vwc_data(station, fr, bin_hours, extension=''):
     return vwc_data
 
 
+def combine_and_level_vwc_data(all_vwc_data, tmin, level_doys,
+                                polyorder, station, extension, fr, bin_hours):
+    """
+    Combine unleveled VWC data from multiple offsets and apply unified leveling.
+
+    This solves the bias problem in Model 1 by ensuring all offsets share the
+    same leveling baseline calculation. See GitHub issue #358.
+
+    Parameters
+    ----------
+    all_vwc_data : list of dict
+        List of vwc_data dicts from each offset (PERCENTAGE units, 0-60)
+    tmin : float
+        Minimum soil texture value (e.g., 0.05)
+    level_doys : list
+        [start_doy, end_doy] for dry season baseline window
+    polyorder : int
+        Polynomial order for leveling (-99 = auto)
+    station : str
+        Station name
+    extension : str
+        File extension
+    fr : int
+        Frequency code
+    bin_hours : int
+        Time bin size in hours
+
+    Returns
+    -------
+    vwc_data : dict
+        Combined and leveled data with keys:
+        'mjd', 'vwc' (DECIMAL units), 'datetime', 'bin_starts'
+    """
+    # Combine all offset data
+    all_mjd = []
+    all_vwc = []
+    all_datetime = []
+    all_bin_starts = []
+
+    for vwc_data in all_vwc_data:
+        all_mjd.extend(vwc_data['mjd'])
+        all_vwc.extend(vwc_data['vwc'] if isinstance(vwc_data['vwc'], list) else vwc_data['vwc'].tolist())
+        all_datetime.extend(vwc_data['datetime'])
+        all_bin_starts.extend(vwc_data['bin_starts'] if isinstance(vwc_data['bin_starts'], list) else vwc_data['bin_starts'].tolist())
+
+    print(f"  Combined {len(all_mjd)} measurements from {len(all_vwc_data)} offsets")
+
+    # Sort chronologically by MJD
+    sort_indices = np.argsort(all_mjd)
+    all_mjd = [all_mjd[i] for i in sort_indices]
+    all_vwc = [all_vwc[i] for i in sort_indices]
+    all_datetime = [all_datetime[i] for i in sort_indices]
+    all_bin_starts = [all_bin_starts[i] for i in sort_indices]
+
+    # Apply unified leveling to the complete dataset
+    leveled_vwc, leveling_info = qp.apply_vwc_leveling(
+        np.array(all_vwc),  # PERCENTAGE units input
+        tmin,
+        mjd=all_mjd,
+        level_doys=level_doys,
+        polyorder=polyorder,
+        station=station,
+        plot_debug=False,
+        plt2screen=False,
+        extension=extension,
+        fr=fr,
+        bin_hours=bin_hours,
+        bin_offset=0  # Not meaningful for combined data
+    )
+
+    print(f"  Leveling method: {leveling_info.get('method', 'unknown')}")
+
+    return {
+        'mjd': all_mjd,
+        'vwc': leveled_vwc.tolist() if hasattr(leveled_vwc, 'tolist') else list(leveled_vwc),
+        'datetime': all_datetime,
+        'bin_starts': all_bin_starts
+    }
+
+
 def plot_hourly_vs_daily_vwc(station, fr, bin_hours, extension=''):
     """
     Plot hourly rolling VWC (gray dots) vs daily VWC (bold red) for comparison.
@@ -236,7 +315,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
                snow_filter: bool = False, tmin: float = None, tmax: float = None,
                warning_value: float = None, auto_removal: bool = False, hires_figs: bool = False,
                advanced: bool = False, vegetation_model: int = None, extension: str = '',
-               simple_level: bool = False, level_doys: list = []):
+               level_doys: list = []):
     """
     Generate VWC estimates from n-hour windows that start at every hour throughout
     the day, creating a rolling/sliding time window dataset.
@@ -256,17 +335,13 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     Vegetation Models
     ---------------
     Vegetation Model 1 (simple):
-        Runs vwc() for each offset (0, 1, 2, ..., bin_hours-1) to create separate
-        VWC files, then combines them chronologically.
-
-        NOTE: Each offset calculates its own vegetation correction baseline, which
-        can introduce systematic biases between offsets. See issue #358:
-        https://github.com/kristinemlarson/gnssrefl/issues/358
+        Uses two-pass processing: first collects unleveled VWC from all offsets,
+        then applies unified leveling to the combined dataset. This ensures all
+        offsets share the same leveling baseline.
 
     Vegetation Model 2 (advanced):
         Runs vwc() once with -save_tracks to generate track files, then aggregates
-        those saved tracks into different time bins. This avoids reprocessing the
-        vegetation corrections for each offset and eliminates the bias issue present in Model 1.
+        those saved tracks into different time bins with unified leveling.
 
     Examples
     --------
@@ -275,7 +350,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     vwc_hourly p038 2022 -bin_hours 12 -minvalperbin 5
         12-hour rolling bins with minimum 5 tracks per bin
     vwc_hourly okl2 2012 -vegetation_model 2
-        6-hour rolling bins using advanced vegetation model (model 2, recommended)
+        6-hour rolling bins using advanced vegetation model (model 2)
 
     Parameters
     ----------
@@ -291,8 +366,6 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
         time bin size in hours (1,2,3,4,6,8,12). Default is 6
     minvalperbin : int, optional
         min number of satellite tracks needed per time bin. Default is 5
-    simple_level : bool, optional
-        use simple leveling instead of polynomial (default: False)
     level_doys : list, optional
         pair of day of years for baseline leveling period
     (other parameters same as vwc function)
@@ -325,10 +398,56 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
 
     # Process based on vegetation model
     if veg_model == 1:
-        # Simple model
-        print(f"Using traditional offset+aggregation processing for simple vegetation model")
+        # Simple model - Two-pass approach for unified leveling (fixes issue #358)
+        print(f"Using two-pass processing for unified leveling (model 1)")
 
-        # First run daily VWC for comparison plotting
+        # Get parameters from set_parameters to ensure we have defaults for leveling
+        _, tmin, tmax, _, _, year_end, plt, _, _, _, _, _, extension, \
+            _, _, _, level_doys, _ = qp.set_parameters(
+                station, level_doys, None, tmin, tmax, min_req_pts_track,
+                resolved_fr, year, year_end, plt, auto_removal, warning_value, extension,
+                bin_hours, minvalperbin, 0
+            )
+
+        # === PASS 1: Collect unleveled VWC from all offsets ===
+        all_vwc_data = []  # Store unleveled results from each offset
+
+        for offset in range(bin_hours):
+            print(f"\n=== Pass 1: Processing offset {offset}/{bin_hours-1} ({offset:02d}-{(offset+bin_hours)%24:02d}h bins) ===")
+
+            # Call vwc with skip_leveling=True to get unleveled data
+            offset_vwc_data = vwc(
+                station=station, year=year, year_end=year_end, fr=fr,
+                plt=False, screenstats=False,
+                bin_hours=bin_hours, minvalperbin=minvalperbin, bin_offset=offset,
+                min_req_pts_track=min_req_pts_track, polyorder=polyorder,
+                snow_filter=snow_filter, tmin=tmin, tmax=tmax,
+                warning_value=warning_value, auto_removal=auto_removal,
+                hires_figs=hires_figs, vegetation_model=veg_model,
+                extension=extension,
+                level_doys=level_doys,
+                skip_leveling=True  # Skip leveling, return percentage units
+            )
+
+            if offset_vwc_data is not None and len(offset_vwc_data.get('vwc', [])) > 0:
+                all_vwc_data.append(offset_vwc_data)
+
+        if not all_vwc_data:
+            print("Error: No VWC data generated from any offset")
+            sys.exit()
+
+        # === PASS 2: Combine and apply unified leveling ===
+        print(f"\n=== Pass 2: Applying unified leveling to {len(all_vwc_data)} offsets ===")
+        vwc_data = combine_and_level_vwc_data(
+            all_vwc_data, tmin, level_doys, polyorder,
+            station, extension, resolved_fr, bin_hours
+        )
+
+        if vwc_data is None:
+            print("Error: Failed to combine and level VWC data")
+            sys.exit()
+
+        # Generate daily VWC for comparison (with its own leveling - this is fine for comparison)
         print(f"\n=== Generating Daily VWC for comparison ===")
         vwc(station=station, year=year, year_end=year_end, fr=fr, plt=False, screenstats=False,
             bin_hours=24, minvalperbin=minvalperbin, bin_offset=0,
@@ -336,27 +455,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
             snow_filter=snow_filter, tmin=tmin, tmax=tmax,
             warning_value=warning_value, auto_removal=auto_removal, hires_figs=hires_figs,
             advanced=advanced, vegetation_model=veg_model, extension=extension,
-            simple_level=simple_level, level_doys=level_doys)
-
-        # Process each offset
-        for offset in range(bin_hours):
-            print(f"\n=== Processing offset {offset}/{bin_hours-1} ({offset:02d}-{(offset+bin_hours)%24:02d}h bins) ===")
-
-            vwc(station=station, year=year, year_end=year_end, fr=fr, plt=False, screenstats=False,
-                bin_hours=bin_hours, minvalperbin=minvalperbin, bin_offset=offset,
-                min_req_pts_track=min_req_pts_track, polyorder=polyorder,
-                snow_filter=snow_filter, tmin=tmin, tmax=tmax,
-                warning_value=warning_value, auto_removal=auto_removal, hires_figs=hires_figs,
-                advanced=advanced, vegetation_model=veg_model, extension=extension,
-                simple_level=simple_level, level_doys=level_doys)
-
-        # Combine all VWC offset files
-        print("=== Combining all", bin_hours, "VWC offset files ===")
-        vwc_data = combine_offset_files_to_vwc_data(station, resolved_fr, bin_hours, extension)
-
-        if vwc_data is None:
-            print("Error: No VWC measurements generated from any offset")
-            sys.exit()
+            level_doys=level_doys)
 
     elif veg_model == 2:
         # Model 2 (advanced)
@@ -399,7 +498,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
             snow_filter=snow_filter, tmin=tmin, tmax=tmax,
             warning_value=warning_value, auto_removal=auto_removal, hires_figs=hires_figs,
             advanced=True, vegetation_model=2, extension=extension,
-            simple_level=simple_level, level_doys=level_doys, save_tracks=True)
+            level_doys=level_doys, save_tracks=True)
 
         print("=== Generating hourly rolling VWC from saved track data ===")
 
@@ -415,7 +514,6 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
         leveled_vwc, leveling_info = qp.apply_vwc_leveling(
             vwc_data['vwc'],
             tmin,
-            simple=simple_level,
             mjd=vwc_data['mjd'],
             level_doys=level_doys,
             polyorder=polyorder,
@@ -435,8 +533,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     qp.write_rolling_vwc_output(station, vwc_data, resolved_fr, bin_hours, extension, vegetation_model=veg_model)
 
     print(f"Successfully generated {len(vwc_data['vwc'])} hourly rolling VWC measurements")
-    print("WARNING: vwc_hourly is experimental code and currently under development.")
-    print("Please see https://github.com/kristinemlarson/gnssrefl/issues/358 for the latest discussion.")
+    print("WARNING: vwc_hourly is experimental code.")
 
     if plt:
         print("=== Generating VWC Comparison Plot ===")

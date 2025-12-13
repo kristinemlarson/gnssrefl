@@ -45,7 +45,6 @@ def parse_arguments():
     parser.add_argument("-advanced", default=None, type=str, help="Shorthand for -vegetation_model 2 (advanced vegetation model)")
     parser.add_argument("-vegetation_model", default=None, type=str, help="Vegetation correction model: 1 (simple, default) or 2 (advanced)")
     parser.add_argument("-save_tracks", default=None, type=str, help="Save individual track VWC data (model 2 only)")
-    parser.add_argument("-simple_level", default=None, type=str, help="Use simple global leveling instead of polynomial (default: False)")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
     parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes",type=int) 
 
@@ -54,7 +53,7 @@ def parse_arguments():
 
     args = parser.parse_args().__dict__
 
-    boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced','save_tracks','simple_level']
+    boolean_args = ['plt','screenstats','snow_filter','auto_removal','hires_figs','advanced','save_tracks']
     args = str2bool(args, boolean_args)
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
     return {key: value for key, value in args.items() if value is not None}
@@ -65,8 +64,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         bin_hours: int = None, minvalperbin: int = None, bin_offset: int = None,
         snow_filter: bool = False, subdir: str=None, tmin: float=None, tmax: float=None,
         warning_value : float=None, auto_removal : bool=False, hires_figs : bool=False,
-        advanced : bool=False, vegetation_model: int=None, save_tracks: bool=False, simple_level: bool=False,
-        extension:str=None, level_doys : list =[] ):
+        advanced : bool=False, vegetation_model: int=None, save_tracks: bool=False,
+        extension:str=None, level_doys : list =[], skip_leveling: bool=False):
     """
     The goal of this code is to compute volumetric water content (VWC) from GNSS-IR phase estimates.
     It concatenates previously computed phase results, makes plots for the four geographic quadrants, bins the data
@@ -149,8 +148,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     vegetation_model : int, optional
          vegetation correction model: 1=simple (default), 2=advanced (Chew et al. 2016)
          can be set in gnssir analysis JSON as vwc_vegetation_model
-    simple_level : bool, optional
-         use simple leveling instead of polynomial (default: False)
     save_tracks : bool, optional
          save individual track VWC data to files (advanced model only)
     extension : str
@@ -158,6 +155,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     level_doys : list
          pair of day of years that are used to define time period for "leveling"
          default is north american summer
+    skip_leveling : bool, optional
+         internal use only - skip leveling and return percentage units for unified leveling
+         in vwc_hourly. Default is False.
 
     Returns
     -------
@@ -241,8 +241,6 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     # Print final resolved vegetation model (overrides the JSON printout from set_parameters)
     if veg_model != json_vegetation_model:
         print(f'Vegetation model overridden by CLI: {veg_model}')
-
-    print(f'Using baseline leveling: {"simple" if simple_level else "polynomial"}')
 
     # if you have requested snow filtering
     if snow_filter:
@@ -508,13 +506,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
 
     # Generate azimuth plot filename with temporal suffix
     suffix = qp.get_temporal_suffix(freq, bin_hours, bin_offset)
-    qp.save_vwc_plot(fig,  f'{xdir}/Files/{subdir_path}/{station}_az_phase{suffix}.png')
 
-    if advanced:
-        qp.save_vwc_plot(fig2,  f'{xdir}/Files/{subdir_path}/{station}_az_normamp{suffix}.png')
-    
+    # Skip saving plots when skip_leveling=True (vwc_hourly two-pass mode)
+    if not skip_leveling:
+        qp.save_vwc_plot(fig,  f'{xdir}/Files/{subdir_path}/{station}_az_phase{suffix}.png')
+        if advanced:
+            qp.save_vwc_plot(fig2,  f'{xdir}/Files/{subdir_path}/{station}_az_normamp{suffix}.png')
+
     # Close figures to prevent them from showing on screen when plt=False
-    if not plt:
+    if not plt or skip_leveling:
         matplt.close(fig)
         if advanced:
             matplt.close(fig2)
@@ -577,7 +577,7 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         vwc_data = svc.simple_vegetation_filter(
             station, vxyz, subdir_path,
             bin_hours, bin_offset, plt2screen=plt, fr=fr,
-            minvalperbin=minvalperbin)
+            minvalperbin=minvalperbin, skip_plots=skip_leveling)
     elif veg_model == 2:
         print('Running advanced vegetation model (model 2)...')
         vwc_data = avc.advanced_vegetation_filter(
@@ -593,11 +593,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         print('No vegetation-corrected VWC values produced. Exiting.')
         sys.exit()
 
+    # Check if we should skip leveling (for vwc_hourly unified leveling)
+    if skip_leveling:
+        print('  Skipping leveling - returning unleveled data for unified processing')
+        return vwc_data  # vwc_data['vwc'] is in PERCENTAGE units (0-60)
+
     # Apply baseline leveling
     print('\nApplying baseline leveling...')
     leveled_vwc, leveling_info = qp.apply_vwc_leveling(
         vwc_data['vwc'], tmin,
-        simple=simple_level,
         mjd=vwc_data['mjd'],
         level_doys=level_doys,
         polyorder=polyorder,

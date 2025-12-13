@@ -17,7 +17,7 @@ xdir = os.environ['REFL_CODE']
 
 def simple_vegetation_filter(station, vxyz, subdir='',
                              bin_hours=24, bin_offset=0, plt2screen=True, fr=20,
-                             minvalperbin=10):
+                             minvalperbin=10, skip_plots=False):
     """
     Simple vegetation model (model 1)
 
@@ -42,6 +42,9 @@ def simple_vegetation_filter(station, vxyz, subdir='',
         Frequency code (1=L1, 5=L5, 20=L2C, default: 20)
     minvalperbin : int, optional
         Minimum observations required per time bin (default: 10)
+    skip_plots : bool, optional
+        Skip saving diagnostic plots (default: False). Used by vwc_hourly
+        to avoid generating redundant per-offset plots.
 
     Returns
     -------
@@ -139,29 +142,30 @@ def simple_vegetation_filter(station, vxyz, subdir='',
             t_datetime.append(datetime.strptime(f'{int(yr)} {int(d)}', '%Y %j'))
 
     # Create diagnostic plot: phase before/after vegetation correction
-    plt.figure(figsize=(10, 6))
-    plt.suptitle(f'Station: {station} - Vegetation Correction', size=16)
+    if not skip_plots:
+        plt.figure(figsize=(10, 6))
+        plt.suptitle(f'Station: {station} - Vegetation Correction', size=16)
 
-    # Plot: Phase with and without vegetation correction
-    ax = plt.gca()
-    ax.plot(t_datetime, ph, 'b-', label='original phase')
-    ax.plot(t_datetime, newph, 'r-', label='vegetation-corrected phase')
-    ax.set_title('Phase Before and After Vegetation Correction')
-    ax.set_ylabel('phase (degrees)')
-    ax.legend(loc='best')
-    ax.grid()
-    plt.gcf().autofmt_xdate()
+        # Plot: Phase with and without vegetation correction
+        ax = plt.gca()
+        ax.plot(t_datetime, ph, 'b-', label='original phase')
+        ax.plot(t_datetime, newph, 'r-', label='vegetation-corrected phase')
+        ax.set_title('Phase Before and After Vegetation Correction')
+        ax.set_ylabel('phase (degrees)')
+        ax.legend(loc='best')
+        ax.grid()
+        plt.gcf().autofmt_xdate()
 
-    # Save diagnostic plot
-    outdir = Path(xdir) / 'Files' / subdir
-    suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
-    plot_path = f'{outdir}/{station}_phase_vegcorr{suffix}.png'
-    print(f"Saving vegetation correction diagnostic plot to {plot_path}")
-    plt.savefig(plot_path)
+        # Save diagnostic plot
+        outdir = Path(xdir) / 'Files' / subdir
+        suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
+        plot_path = f'{outdir}/{station}_phase_vegcorr{suffix}.png'
+        print(f"Saving vegetation correction diagnostic plot to {plot_path}")
+        plt.savefig(plot_path)
 
-    # Don't call plt.show() here - let all figures accumulate and display together at the end
-    if not plt2screen:
-        plt.close('all')
+        # Don't call plt.show() here - let all figures accumulate and display together at the end
+        if not plt2screen:
+            plt.close('all')
 
     # Return unified MJD format (matches advanced model)
     return {
