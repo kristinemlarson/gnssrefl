@@ -27,8 +27,8 @@ def _get_snr_column(freq: int) -> int:
 
     SNR file format (columns 1-based):
         1: sat, 2: ele, 3: azi, 4: seconds, 5: edot
-        6: s1 (L1), 7: s2 (L2/L2C), 8: s5 (L5)
-        9: s6 (E6), 10: s7 (E5b), 11: s8 (E5a+b)
+        6: S6, 7: S1 (L1), 8: S2 (L2/L2C), 9: S5 (L5)
+        10: S7 (E5b), 11: S8 (E5a+b)
 
     Parameters
     ----------
@@ -45,22 +45,22 @@ def _get_snr_column(freq: int) -> int:
     ValueError
         If frequency code is not recognized
     """
-    # L1 frequencies -> s1 column
+    # L1 frequencies -> S1 column (7)
     if freq in [1, 101, 201, 301]:
-        return 6
-    # L2/L2C frequencies -> s2 column
-    elif freq in [2, 20, 102, 302]:
         return 7
-    # L5 frequencies -> s5 column
-    elif freq in [5, 205, 305]:
+    # L2/L2C frequencies -> S2 column (8)
+    elif freq in [2, 20, 102, 302]:
         return 8
-    # E6/B3 frequencies -> s6 column
-    elif freq in [206, 306]:
+    # L5 frequencies -> S5 column (9)
+    elif freq in [5, 205, 305]:
         return 9
-    # E5b/B2 frequencies -> s7 column
+    # E6/B3 frequencies -> S6 column (6)
+    elif freq in [206, 306]:
+        return 6
+    # E5b/B2 frequencies -> S7 column (10)
     elif freq in [207, 307]:
         return 10
-    # E5a+b frequencies -> s8 column
+    # E5a+b frequencies -> S8 column (11)
     elif freq in [208, 308]:
         return 11
     else:
@@ -447,8 +447,9 @@ def extract_arcs(
             arc_edot = sat_edot[sind:eind].copy()
             arc_snr = sat_snr[sind:eind].copy()
 
-            # Remove zero SNR values from the arc
-            nonzero_mask = arc_snr > 0
+            # Remove zero/invalid SNR values from the arc
+            # Use > 1 to filter zeros in both dB-Hz (valid: 15-50) and linear (valid: 30-300)
+            nonzero_mask = arc_snr > 1
             if np.sum(nonzero_mask) < min_pts:
                 if screenstats:
                     print(f"No useful data on frequency {freq} / sat {sat}: all zeros")

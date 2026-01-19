@@ -6,7 +6,6 @@ import sys
 
 
 import gnssrefl.gps as g
-import gnssrefl.read_snr_files as read_snr
 from gnssrefl.utils import FileManagement, FileTypes
 import gnssrefl.daily_avg_cl as da
 import gnssrefl.gnssir_v2 as gnssir
@@ -728,11 +727,8 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
         print(f"Saving phase file to: {output_path}")
         with open(output_path, 'w') as my_file:
             np.savetxt(my_file, [], header=header, comments='%')
-            # read the SNR file into memory
-            sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snr_exists = read_snr.read_one_snr(obsfile, 1)
-
-            # Build SNR array for extract_arcs
-            snrD = np.column_stack([sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8])
+            # read the SNR file into memory (use np.loadtxt for consistency with gnssir)
+            snrD = np.loadtxt(obsfile, comments='%')
 
             for freq in fr_list:
                 # read apriori reflector height results
@@ -741,14 +737,30 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                 print('Analyzing Frequency ', freq, ' Year ', year, ' Day of Year ', doy)
 
                 # Get satellite data using extract_arcs
+                # dbhz=False: convert dB-Hz to linear after filtering
                 all_arcs = extract_arcs(
                     snrD, freq=freq, e1=pele[0], e2=pele[1], azlist=[0, 360],
-                    min_pts=1, polyV=poly_v, dbhz=True, detrend=False,
+                    min_pts=1, polyV=poly_v, dbhz=False, detrend=False,
                     screenstats=screenstats, split_arcs=False,
                 )
 
                 # Map satellite -> (meta, data)
                 sat_data_map = {meta['sat']: (meta, data) for meta, data in all_arcs}
+
+                # =================================================================
+                # BACKWARDS COMPATIBILITY: Phase-specific post-processing
+                # -----------------------------------------------------------------
+                # The following processing replicates the behavior of the legacy
+                # g.window_data() function used by phase processing. This differs
+                # from gnssir's arc extraction in several ways:
+                #   1. Uses apriori azimuth bounds (az1/az2) per track, not global
+                #   2. Applies polynomial detrending after azimuth filtering
+                #   3. Performs rising/setting arc splitting inline
+                #   4. Uses different elevation filtering (pele then e1/e2)
+                # This logic is preserved here to maintain output consistency with
+                # previous versions. Future refactoring could unify this with
+                # extract_arcs if phase and gnssir workflows are aligned.
+                # =================================================================
 
                 # Process each apriori track
                 rows, columns = np.shape(apriori_results)
