@@ -21,6 +21,244 @@ GAP_TIME_LIMIT = 600  # seconds (10 minutes)
 MIN_ARC_POINTS = 20
 
 
+def extract_arcs(
+    snr_array: np.ndarray,
+    freq: int,
+    e1: float = 5.0,
+    e2: float = 25.0,
+    ellist: Optional[List[float]] = None,
+    azlist: Optional[List[float]] = None,
+    sat_list: Optional[List[int]] = None,
+    min_pts: int = MIN_ARC_POINTS,
+    ediff: float = 2.0,
+    polyV: int = 4,
+    dbhz: bool = False,
+    screenstats: bool = False,
+    detrend: bool = True,
+    split_arcs: bool = True,
+    filter_to_day: bool = True,
+) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
+    """
+    Extract satellite arcs from SNR data array.
+
+    Parameters
+    ----------
+    snr_array : np.ndarray
+        2D array with columns: [sat, ele, azi, seconds, edot, snr1, snr2, ...]
+        This is the output of loading an SNR file with np.loadtxt()
+    freq : int
+        Frequency code (1, 2, 5, 20, 101, 102, 201, 205, 206, 207, 208, etc.)
+    e1 : float
+        Minimum elevation angle (degrees) for analysis. Default: 5.0
+    e2 : float
+        Maximum elevation angle (degrees) for analysis. Default: 25.0
+    ellist : list of floats, optional
+        Multiple elevation angle ranges as pairs, e.g., [5, 10, 7, 12] means
+        ranges (5-10 deg) and (7-12 deg). When provided and non-empty, this
+        overrides e1/e2. Each pair is processed independently. Default: None
+    azlist : list of floats, optional
+        Azimuth regions as pairs, e.g., [0, 90, 180, 270] means 0-90 and 180-270.
+        Default: [0, 360] (all azimuths)
+    sat_list : list of int, optional
+        Specific satellites to process. Default: all satellites in data
+    min_pts : int
+        Minimum points required per arc. Default: 20
+    ediff : float
+        Elevation difference tolerance for arc validation (degrees). Default: 2.0
+    polyV : int
+        Polynomial order for DC removal. Default: 4
+    dbhz : bool
+        If True, keep SNR in dB-Hz; if False, convert to linear units. Default: False
+    screenstats : bool
+        If True, print debug information. Default: False
+    detrend : bool
+        If True (default), remove DC component via polynomial fit.
+        If False, return SNR converted to linear units only (no detrending).
+    split_arcs : bool
+        If True (default), split data into separate arcs by time gaps and elevation
+        direction changes. If False, return all data for each satellite as a single
+        arc without splitting or validation. Useful for phase processing.
+    filter_to_day : bool
+        If True (default), only return arcs whose midpoint (arc_timestamp) falls
+        within the principal day (0-24 hours). This prevents double-counting arcs
+        when processing consecutive days with buffer_hours. Arc data may still
+        extend beyond day boundaries. If False, return all arcs regardless of
+        their midpoint time.
+
+    Returns
+    -------
+    list of (metadata, data) tuples
+        Each arc is represented as:
+        - metadata: dict with keys: sat, freq, arc_num, arc_type, ele_start, ele_end,
+          az_init, az_avg, time_start, time_end, time_avg, num_pts, delT, edot_factor, cf
+        - data: dict with keys: ele, azi, snr, seconds, edot (all np.ndarray)
+    """
+    if azlist is None:
+        azlist = [0, 360]
+
+    # Get SNR column for this frequency
+    try:
+        column = _get_snr_column(freq)
+    except ValueError as e:
+        if screenstats:
+            print(f"Warning: {e}")
+        return []
+
+    # Convert to 0-based index
+    icol = column - 1
+    ncols = snr_array.shape[1]
+
+    # Check if column exists
+    if column > ncols:
+        if screenstats:
+            print(f"Warning: SNR file has {ncols} columns, need column {column} for freq {freq}")
+        return []
+
+    # Extract columns
+    sats = snr_array[:, 0].astype(int)
+    ele_all = snr_array[:, 1]
+    azi_all = snr_array[:, 2]
+    seconds_all = snr_array[:, 3]
+    edot_all = snr_array[:, 4] if ncols > 4 else np.zeros_like(seconds_all)
+    snr_all = snr_array[:, icol]
+
+    # Get unique satellites
+    if sat_list is None:
+        unique_sats = np.unique(sats)
+    else:
+        unique_sats = np.array(sat_list)
+
+    all_arcs = []
+
+    # Parse elevation list
+    elev_pairs = _parse_elevation_list(e1, e2, ellist)
+    if screenstats and len(elev_pairs) > 1:
+        print(f'Using {len(elev_pairs)} elevation angle ranges: {elev_pairs}')
+
+    for sat in unique_sats:
+        sat_mask = sats == sat
+
+        if np.sum(sat_mask) < min_pts:
+            continue
+
+        sat_ele = ele_all[sat_mask]
+        sat_azi = azi_all[sat_mask]
+        sat_seconds = seconds_all[sat_mask]
+        sat_edot = edot_all[sat_mask]
+        sat_snr = snr_all[sat_mask]
+
+        for pair_e1, pair_e2 in elev_pairs:
+            if split_arcs:
+                # Detect arc boundaries on full satellite data
+                # (arc detection validates against e1/e2 but uses all elevation data)
+                arc_boundaries = _detect_arc_boundaries(
+                    sat_ele, sat_azi, sat_seconds,
+                    pair_e1, pair_e2, ediff, sat,
+                    min_pts=min_pts,
+                )
+            else:
+                # No splitting - treat all satellite data as one arc
+                # This returns ALL data without validation, used in phase processing
+                arc_boundaries = [(0, len(sat_ele), sat, 1)]
+
+            for sind, eind, sat_num, arc_num in arc_boundaries:
+                # Extract arc data (full elevation range)
+                arc_ele = sat_ele[sind:eind].copy()
+                arc_azi = sat_azi[sind:eind].copy()
+                arc_seconds = sat_seconds[sind:eind].copy()
+                arc_edot = sat_edot[sind:eind].copy()
+                arc_snr = sat_snr[sind:eind].copy()
+
+                # Remove zero/invalid SNR values from the arc
+                # Use > 1 to filter zeros in both dB-Hz and linear
+                nonzero_mask = arc_snr > 1
+                if np.sum(nonzero_mask) < min_pts:
+                    if screenstats:
+                        print(f"No useful data on frequency {freq} / sat {sat}: all zeros")
+                    continue
+
+                arc_ele = arc_ele[nonzero_mask]
+                arc_azi = arc_azi[nonzero_mask]
+                arc_seconds = arc_seconds[nonzero_mask]
+                arc_edot = arc_edot[nonzero_mask]
+                arc_snr = arc_snr[nonzero_mask]
+
+                # Check minimum points for polynomial fit
+                reqN = 20
+                if len(arc_ele) <= reqN:
+                    continue
+
+                # Process SNR: either detrend or just convert to linear units
+                if detrend:
+                    arc_snr_processed = _remove_dc_component(arc_ele, arc_snr, polyV, dbhz)
+                else:
+                    # Just convert to linear units, no detrending
+                    if dbhz:
+                        arc_snr_processed = arc_snr.copy()
+                    else:
+                        arc_snr_processed = np.power(10, (arc_snr / 20))
+
+                # Apply e1/e2 filter (after DC removal) - skip if not splitting arcs
+                if split_arcs:
+                    e_mask = (arc_ele > pair_e1) & (arc_ele <= pair_e2)
+                    Nvv = np.sum(e_mask)
+
+                    if Nvv < 15:
+                        continue
+
+                    # Get index of min elevation in filtered data for azimuth check
+                    filtered_ele = arc_ele[e_mask]
+                    filtered_azi = arc_azi[e_mask]
+                    ie = np.argmin(filtered_ele)
+                    init_azim = filtered_azi[ie]
+
+                    # Check azimuth compliance
+                    if not _check_azimuth_compliance(init_azim, azlist):
+                        if screenstats:
+                            print(f"Azimuth {init_azim:.2f} not in requested region")
+                        continue
+
+                    # Apply e1/e2 filter to all arrays
+                    final_ele = arc_ele[e_mask]
+                    final_azi = arc_azi[e_mask]
+                    final_seconds = arc_seconds[e_mask]
+                    final_edot = arc_edot[e_mask]
+                    final_snr = arc_snr_processed[e_mask]
+                else:
+                    # No filtering - return all data for this satellite
+                    # Phase will do its own filtering by azimuth and elevation
+                    final_ele = arc_ele
+                    final_azi = arc_azi
+                    final_seconds = arc_seconds
+                    final_edot = arc_edot
+                    final_snr = arc_snr_processed
+
+                # Compute metadata using filtered data
+                metadata = _compute_arc_metadata(
+                    final_ele, final_azi, final_seconds,
+                    sat, freq, arc_num,
+                )
+
+                # Create data dictionary
+                data = {
+                    'ele': final_ele,
+                    'azi': final_azi,
+                    'snr': final_snr,
+                    'seconds': final_seconds,
+                    'edot': final_edot,
+                }
+
+                all_arcs.append((metadata, data))
+
+    # Optionally remove any arcs where the mean time is not 0 <= h < 24 (when using buffer_hours > 0)
+    if filter_to_day:
+        all_arcs = [
+            (meta, data) for meta, data in all_arcs
+            if 0 <= meta['arc_timestamp'] < 24
+        ]
+
+    return all_arcs
+
 def _parse_elevation_list(
     e1: float,
     e2: float,
@@ -62,12 +300,14 @@ def _parse_elevation_list(
 
 def _get_snr_column(freq: int) -> int:
     """
-    Map frequency code to SNR column index (1-based, as used in SNR files).
+    Map frequency code to SNR column index
 
-    SNR file format (columns 1-based):
+    SNR file format:
         1: sat, 2: ele, 3: azi, 4: seconds, 5: edot
         6: S6, 7: S1 (L1), 8: S2 (L2/L2C), 9: S5 (L5)
         10: S7 (E5b), 11: S8 (E5a+b)
+
+    Docs: https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html#the-snr-data-format
 
     Parameters
     ----------
@@ -353,243 +593,3 @@ def _compute_arc_metadata(
         'edot_factor': float(edot_factor),
         'cf': float(cf),
     }
-
-
-def extract_arcs(
-    snr_array: np.ndarray,
-    freq: int,
-    e1: float = 5.0,
-    e2: float = 25.0,
-    ellist: Optional[List[float]] = None,
-    azlist: Optional[List[float]] = None,
-    sat_list: Optional[List[int]] = None,
-    min_pts: int = MIN_ARC_POINTS,
-    ediff: float = 2.0,
-    polyV: int = 4,
-    dbhz: bool = False,
-    screenstats: bool = False,
-    detrend: bool = True,
-    split_arcs: bool = True,
-    filter_to_day: bool = True,
-) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
-    """
-    Extract satellite arcs from SNR data array.
-
-    Parameters
-    ----------
-    snr_array : np.ndarray
-        2D array with columns: [sat, ele, azi, seconds, edot, snr1, snr2, ...]
-        This is the output of loading an SNR file with np.loadtxt()
-    freq : int
-        Frequency code (1, 2, 5, 20, 101, 102, 201, 205, 206, 207, 208, etc.)
-    e1 : float
-        Minimum elevation angle (degrees) for analysis. Default: 5.0
-    e2 : float
-        Maximum elevation angle (degrees) for analysis. Default: 25.0
-    ellist : list of floats, optional
-        Multiple elevation angle ranges as pairs, e.g., [5, 10, 7, 12] means
-        ranges (5-10 deg) and (7-12 deg). When provided and non-empty, this
-        overrides e1/e2. Each pair is processed independently. Default: None
-    azlist : list of floats, optional
-        Azimuth regions as pairs, e.g., [0, 90, 180, 270] means 0-90 and 180-270.
-        Default: [0, 360] (all azimuths)
-    sat_list : list of int, optional
-        Specific satellites to process. Default: all satellites in data
-    min_pts : int
-        Minimum points required per arc. Default: 20
-    ediff : float
-        Elevation difference tolerance for arc validation (degrees). Default: 2.0
-    polyV : int
-        Polynomial order for DC removal. Default: 4
-    dbhz : bool
-        If True, keep SNR in dB-Hz; if False, convert to linear units. Default: False
-    screenstats : bool
-        If True, print debug information. Default: False
-    detrend : bool
-        If True (default), remove DC component via polynomial fit.
-        If False, return SNR converted to linear units only (no detrending).
-    split_arcs : bool
-        If True (default), split data into separate arcs by time gaps and elevation
-        direction changes. If False, return all data for each satellite as a single
-        arc without splitting or validation. Useful for phase processing.
-    filter_to_day : bool
-        If True (default), only return arcs whose midpoint (arc_timestamp) falls
-        within the principal day (0-24 hours). This prevents double-counting arcs
-        when processing consecutive days with buffer_hours. Arc data may still
-        extend beyond day boundaries. If False, return all arcs regardless of
-        their midpoint time.
-
-    Returns
-    -------
-    list of (metadata, data) tuples
-        Each arc is represented as:
-        - metadata: dict with keys: sat, freq, arc_num, arc_type, ele_start, ele_end,
-          az_init, az_avg, time_start, time_end, time_avg, num_pts, delT, edot_factor, cf
-        - data: dict with keys: ele, azi, snr, seconds, edot (all np.ndarray)
-    """
-    if azlist is None:
-        azlist = [0, 360]
-
-    # Get SNR column for this frequency
-    try:
-        column = _get_snr_column(freq)
-    except ValueError as e:
-        if screenstats:
-            print(f"Warning: {e}")
-        return []
-
-    # Convert to 0-based index
-    icol = column - 1
-    ncols = snr_array.shape[1]
-
-    # Check if column exists
-    if column > ncols:
-        if screenstats:
-            print(f"Warning: SNR file has {ncols} columns, need column {column} for freq {freq}")
-        return []
-
-    # Extract columns
-    sats = snr_array[:, 0].astype(int)
-    ele_all = snr_array[:, 1]
-    azi_all = snr_array[:, 2]
-    seconds_all = snr_array[:, 3]
-    edot_all = snr_array[:, 4] if ncols > 4 else np.zeros_like(seconds_all)
-    snr_all = snr_array[:, icol]
-
-    # Get unique satellites
-    if sat_list is None:
-        unique_sats = np.unique(sats)
-    else:
-        unique_sats = np.array(sat_list)
-
-    all_arcs = []
-
-    # Parse elevation list
-    elev_pairs = _parse_elevation_list(e1, e2, ellist)
-    if screenstats and len(elev_pairs) > 1:
-        print(f'Using {len(elev_pairs)} elevation angle ranges: {elev_pairs}')
-
-    for sat in unique_sats:
-        # Filter for this satellite only (no pele filter - removed as of v3.6.8)
-        sat_mask = sats == sat
-
-        if np.sum(sat_mask) < min_pts:
-            continue
-
-        sat_ele = ele_all[sat_mask]
-        sat_azi = azi_all[sat_mask]
-        sat_seconds = seconds_all[sat_mask]
-        sat_edot = edot_all[sat_mask]
-        sat_snr = snr_all[sat_mask]
-
-        for pair_e1, pair_e2 in elev_pairs:
-            if split_arcs:
-                # Detect arc boundaries on full satellite data
-                # (arc detection validates against e1/e2 but uses all elevation data)
-                arc_boundaries = _detect_arc_boundaries(
-                    sat_ele, sat_azi, sat_seconds,
-                    pair_e1, pair_e2, ediff, sat,
-                    min_pts=min_pts,
-                )
-            else:
-                # No splitting - treat all satellite data as one arc
-                # This returns ALL data without validation, useful for phase processing
-                arc_boundaries = [(0, len(sat_ele), sat, 1)]
-
-            for sind, eind, sat_num, arc_num in arc_boundaries:
-                # Extract arc data (full elevation range)
-                arc_ele = sat_ele[sind:eind].copy()
-                arc_azi = sat_azi[sind:eind].copy()
-                arc_seconds = sat_seconds[sind:eind].copy()
-                arc_edot = sat_edot[sind:eind].copy()
-                arc_snr = sat_snr[sind:eind].copy()
-
-                # Remove zero/invalid SNR values from the arc
-                # Use > 1 to filter zeros in both dB-Hz (valid: 15-50) and linear (valid: 30-300)
-                nonzero_mask = arc_snr > 1
-                if np.sum(nonzero_mask) < min_pts:
-                    if screenstats:
-                        print(f"No useful data on frequency {freq} / sat {sat}: all zeros")
-                    continue
-
-                arc_ele = arc_ele[nonzero_mask]
-                arc_azi = arc_azi[nonzero_mask]
-                arc_seconds = arc_seconds[nonzero_mask]
-                arc_edot = arc_edot[nonzero_mask]
-                arc_snr = arc_snr[nonzero_mask]
-
-                # Check minimum points for polynomial fit
-                reqN = 20
-                if len(arc_ele) <= reqN:
-                    continue
-
-                # Process SNR: either detrend or just convert to linear units
-                if detrend:
-                    arc_snr_processed = _remove_dc_component(arc_ele, arc_snr, polyV, dbhz)
-                else:
-                    # Just convert to linear units, no detrending
-                    if dbhz:
-                        arc_snr_processed = arc_snr.copy()
-                    else:
-                        arc_snr_processed = np.power(10, (arc_snr / 20))
-
-                # Apply e1/e2 filter (after DC removal) - skip if not splitting arcs
-                if split_arcs:
-                    e_mask = (arc_ele > pair_e1) & (arc_ele <= pair_e2)
-                    Nvv = np.sum(e_mask)
-
-                    if Nvv < 15:
-                        continue
-
-                    # Get index of min elevation in filtered data for azimuth check
-                    filtered_ele = arc_ele[e_mask]
-                    filtered_azi = arc_azi[e_mask]
-                    ie = np.argmin(filtered_ele)
-                    init_azim = filtered_azi[ie]
-
-                    # Check azimuth compliance
-                    if not _check_azimuth_compliance(init_azim, azlist):
-                        if screenstats:
-                            print(f"Azimuth {init_azim:.2f} not in requested region")
-                        continue
-
-                    # Apply e1/e2 filter to all arrays
-                    final_ele = arc_ele[e_mask]
-                    final_azi = arc_azi[e_mask]
-                    final_seconds = arc_seconds[e_mask]
-                    final_edot = arc_edot[e_mask]
-                    final_snr = arc_snr_processed[e_mask]
-                else:
-                    # No filtering - return all data for this satellite
-                    # Phase will do its own filtering by azimuth and elevation
-                    final_ele = arc_ele
-                    final_azi = arc_azi
-                    final_seconds = arc_seconds
-                    final_edot = arc_edot
-                    final_snr = arc_snr_processed
-
-                # Compute metadata using filtered data
-                metadata = _compute_arc_metadata(
-                    final_ele, final_azi, final_seconds,
-                    sat, freq, arc_num,
-                )
-
-                # Create data dictionary
-                data = {
-                    'ele': final_ele,
-                    'azi': final_azi,
-                    'snr': final_snr,
-                    'seconds': final_seconds,
-                    'edot': final_edot,
-                }
-
-                all_arcs.append((metadata, data))
-
-    # Filter to principal day if requested
-    if filter_to_day:
-        all_arcs = [
-            (meta, data) for meta, data in all_arcs
-            if 0 <= meta['arc_timestamp'] < 24
-        ]
-
-    return all_arcs

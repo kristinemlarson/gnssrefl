@@ -136,17 +136,7 @@ def retrieve_rh(station,year,doy,extension, lsp, snrD, screenstats, irefr,logid,
                 satlist = guts.onesat_freq_check(onesat,f )
 
             # Extract arcs using the new module
-            arcs = extract_arcs(
-                snrD,
-                freq=f,
-                e1=e1, e2=e2,
-                ellist=ellist,
-                azlist=azvalues,
-                sat_list=satlist,
-                ediff=ediff,
-                polyV=lsp['polyV'],
-                dbhz=dbhz,
-            )
+            arcs = extract_arcs(snrD, freq=f, e1=e1, e2=e2, ellist=ellist, azlist=azvalues, sat_list=satlist, ediff=ediff, polyV=lsp['polyV'], dbhz=dbhz)
 
             # Process each arc
             for a, (meta, data) in enumerate(arcs):

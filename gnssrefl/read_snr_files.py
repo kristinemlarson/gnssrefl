@@ -1,291 +1,197 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import datetime
 import numpy as np
 import os
-import subprocess 
-import sys
+import subprocess
 
-# I am skeptical that this is being used ... perhaps in code in soil
-# moisture module that has not been udpated.
+import gnssrefl.gps as g
 
-def read_snr_multiday(obsfile,obsfile2,twoDays,dec=1):
+
+def _parse_snr_filename(obsfile):
     """
-    originally meant to make snr arrays longer than a day to take care
-    of midnight crossing.  not currently invoked.
+    Parse station, year, doy, snr_type from SNR file path.
 
-    Snr data have units changed to linear units I believed.
-
-    Parameters
-    ----------
-    obsfile : string
-        name of first SNR input file
-
-    obsfile2 : string
-        name of second SNR input file
-
-    twoDays : boolean
-        False (default) for using only the first file
-
-    dec : int
-        decimation value. 1 means do nothing
-
-    Results
-    -------
-    allGood1 : numpy array
-
-    sat : numpy array
-        satellite numbers 
-
-    ele : numpy array
-        elevation angle (degrees)
-
-    azi : numpy array
-        azimuth angles (degrees)
-
-    t : numpy array
-        time, seconds of the day, GPS time
-
-    edot : numpy array
-        derivative of elevation angle with respect to time
-
-    s1 : numpy array
-        SNR on L1 frequency
-
-    s2 : numpy array
-        SNR on L2 frequency
-
-    s5 : numpy array
-        SNR on L5 frequency
-
-    s6 : numpy array
-        SNR on L6 frequency
-
-    s7 : numpy array
-        SNR on L7 frequency
-
-    s8 : numpy array
-        SNR on L8 frequency
-
-    snrE : boolean
-        whether it exists
-
-    """
-#   defaults so all returned vectors have something stored in them
-    sat=[]; ele =[]; azi = []; t=[]; edot=[]; s1=[];
-    s2=[]; s5=[]; s6=[]; s7=[]; s8=[];
-    snrE = np.array([False, True, True,False,False,True,True,True,True],dtype = bool)
-#
-    allGood1 = 0; allGood2 = 0
-    # set these for now.  should be passed 
-    # not being used ??? why are they here
-    #e1 = 5
-    #e2 = 15
-    try:
-#       this will be 24 hours - all in one calendar day 
-#        print('>>>>>>>>>>>>>>>>>>>>> try to read file 1:')
-        compressedObs = obsfile + '.xz'
-        if (os.path.isfile(compressedObs) == True):
-            print('compressed file exists, so uncompress it')
-            subprocess.call(['unxz', compressedObs])
-        sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE = read_one_snr(obsfile,1)
-        allGood1 = 1
-#        g.print_file_stats(ele,sat,s1,s2,s5,s6,s7,s8,e1,e2)
-    except:
-        print('>>>>> Could not read the first SNR file:', obsfile)
-#
-    if (dec != 1) & (allGood1 == 1):
-        print('Invoking the decimation flag:')
-        rem_arr = np.remainder(t, [dec])
-        iss = (rem_arr==0)
-        sat=sat[iss] ; ele=ele[iss] ; azi=azi[iss]
-        t=t[iss] ; edot=edot[iss]
-        s1= s1[iss] ; s2= s2[iss] ; 
-        if len(s5) > 0:
-            s5= s5[iss] ;
-        if len(s6) > 0:
-            s6= s6[iss] ; 
-        if len(s7) > 0:
-            s7= s7[iss] ; 
-        if len(s8) > 0:
-            s8= s8[iss]
-#
-    if twoDays:
-#   restrict day one to first 21 hours.  will then merge iwth last three hours
-#   of previous day
-#       in case these observables do not exist
-        Qs5=[]; Qs6=[]; Qs7=[]; Qs8=[]
-        tt = t 
-        hours21 = 21*3600
-        print('length(tt)', len(tt))
-        Qt =tt[tt < hours21]
-        Qsat =sat[tt < hours21]
-        Qele =ele[tt < hours21]
-        Qazi =azi[tt < hours21]
-        Qedot = edot[tt < hours21]
-        Qs1 = s1[tt < hours21]
-        Qs2 = s2[tt < hours21]
-        if snrE[5]:
-            Qs5 = s5[tt < hours21]
-        if snrE[6]:
-            Qs6 = s6[tt < hours21]
-        if snrE[7]:
-            Qs7 = s7[tt < hours21]
-        if snrE[8]:
-            Qs8 = s8[tt < hours21]
-#       I think this is ok??
-        QsnrE = snrE
-        try:
-            compressedObs = obsfile2 + '.xz'
-            if (os.path.isfile(compressedObs) == True):
-                print('compressed file exists, so uncompress it')
-                cmd = 'unxz ' + compressedObs; os.system(cmd)
-            #print('>>>>>>>>>>>>>>>>>>>>> try to read last three hours of file 2:')
-            Psat, Pele, Pazi, Pt, Pedot, Ps1, Ps2, Ps5, Ps6, Ps7, Ps8, PsnrE = read_one_snr(obsfile2,2)
-            allGood2 = 1
-        except: 
-            print('failed to read second file')
-    if (twoDays) & (allGood1 == 1) & (allGood2 == 1):
-        print('stack the two days')
-        ele = np.hstack((Pele,Qele))
-        sat = np.hstack((Psat,Qsat))
-        azi = np.hstack((Pazi,Qazi))
-        t =   np.hstack((Pt,Qt))
-        edot= np.hstack((Pedot,Qedot))
-        s1 =  np.hstack((Ps1,Qs1))
-        s2 =  np.hstack((Ps1,Qs2))
-        s5 =  np.hstack((Ps1,Qs5))
-        s6 =  np.hstack((Ps1,Qs6))
-        s7 =  np.hstack((Ps1,Qs7))
-        s8 =  np.hstack((Ps1,Qs8))
-    return  allGood1,sat,ele,azi,t,edot,s1,s2,s5,s6,s7,s8,snrE
-
-def read_one_snr(obsfile,ifile):
-    """
-    reads a SNR file, changes units (linear) and stores as variables
+    Path format: {REFL_CODE}/{yyyy}/snr/{station}/{station}{doy}0.{yy}.snr{type}
+    Example: /home/user/.../2024/snr/alby/alby1000.24.snr66
 
     Parameters
     ----------
     obsfile : str
-        SNR file name
-    ifile : int
-        1 for primary file or 2 for the day before the primary file
+        path to SNR file
 
     Returns
     -------
-    sat: numpy array of int 
-        satellite number 
-    ele : numpy array of floats 
-        elevation angle in degrees
-    azi : numpy array of floats
-        azimuth in degrees
-    t:  numpy array of floats
-        time in seconds of the day
-    edot : numpy array of floats
-        elevation angle derivative (units?)
-    s1 : numpy array of floats
-        L1 SNR in dB-Hz
-    s2:  numpy array of floats 
-        L2 SNR in dB-Hz
-    s5 :  numpy array of floats 
-        L5 SNR in dB-Hz
-    s6 :  numpy array of floats 
-        L6 SNR in dB-Hz
-    s7 :  numpy array of floats 
-        L7 SNR in dB-Hz
-    s8 :  numpy array of floats 
-        L8 SNR in dB-Hz
-    snrE : bool list
-        whether the SNR exists for that Frequency 
+    station : str
+        4-character station name
+    year : int
+        full year (e.g. 2024)
+    doy : int
+        day of year
+    snr_type : int
+        SNR file type (e.g. 66)
+    """
+    basename = os.path.basename(obsfile)  # alby1000.24.snr66
+    station = basename[:4]                 # alby
+    doy = int(basename[4:7])               # 100
+    yy = int(basename[9:11])               # 24
+    year = 2000 + yy if yy < 80 else 1900 + yy
+    snr_type = int(basename.split('.snr')[1])  # 66
+    return station, year, doy, snr_type
+
+
+def _get_adjacent_doy(year, doy, offset):
+    """
+    Get year/doy for adjacent day.
+
+    Parameters
+    ----------
+    year : int
+        full year
+    doy : int
+        day of year
+    offset : int
+        -1 for previous day, +1 for next day
+
+    Returns
+    -------
+    new_year : int
+        year of adjacent day
+    new_doy : int
+        doy of adjacent day
+    """
+    # Convert to datetime, apply offset, convert back
+    date = datetime.datetime(year, 1, 1) + datetime.timedelta(days=doy - 1 + offset)
+    new_year = date.year
+    new_doy = date.timetuple().tm_yday
+    return new_year, new_doy
+
+
+def read_snr(obsfile, buffer_hours=0, screenstats=False):
+    """
+    Load the contents of a SNR file into a numpy array, optionally including
+    data from adjacent days.
+
+    Parameters
+    ----------
+    obsfile : str
+        name of the snrfile
+    buffer_hours : float, optional
+        hours of data to include from adjacent days. If > 0, reads last
+        buffer_hours from previous day and first buffer_hours from next day.
+        Time tags are adjusted: prev day uses negative seconds, next day
+        uses seconds > 86400. Default is 0 (single day only).
+    screenstats : bool, optional
+        print verbose information about buffer data loading. Default is False.
+
+    Returns
+    -------
+    allGood : int
+        1, file was successfully loaded, 0 if not.
+        apparently this variable was defined when I did not know about booleans....
+    f : numpy array
+        contents of the SNR file
+    r : int
+        number of rows in SNR file
+    c : int
+        number of columns in SNR file
 
     """
-
-    sat=[]; ele=[]; az=[]; t=[]; edot=[]; s=[];  s2=[]; s5=[];  s6=[]; s7=[];  s8=[];
-#SNR existence array : s0, s1,s2,s3,s4,s5,s6,s7,s8.  fields 0,3,4 are always false
-#
-
-    snrE = np.array([False, True, True,False,False,True,True,True,True],dtype = bool)
-    f = np.loadtxt(obsfile,comments='%')
-    #print('reading from this snr file ',obsfile)
+    allGood = 1
+    if os.path.isfile(obsfile):
+        f = np.loadtxt(obsfile,comments='%')
+    else:
+        print('No SNR file found')
+        allGood = 0
+        return allGood, 0, 0, 0
     r,c = f.shape
     if (r > 0) & (c > 0):
-        #print('make sure no negative elevation angle data are used')
         i= f[:,1] > 0
         f=f[i,:]
     if r == 0:
-        print('no rows in this file!')
+        print('No rows in this file!')
+        allGood = 0
     if c == 0:
-        print('no columns in this file!')
+        print('No columns in this file!')
+        allGood = 0
 
-    #print('Number of rows:', r, ' Number of columns:',c)
-#   store into new variable f
-#   now only keep last three hours if previous day's file
-    hoursKept = 21*3600
-    if (ifile == 2):
-        print('window last three hours')
-        tt = f[:,3]
-        f=f[tt > hoursKept]
-#   save satellite number, elevation angle, azimuth value
-    sat = f[:,0]
-    ele = f[:,1]
-    azi = f[:,2]
-#   negative time tags for day before
-    if (ifile == 1):
-        #print('keep timetags as they are ')
-        t =  f[:,3]
-    else:
-        print('make timetags negative')
-        t =  f[:,3] - 86400
-#   ok - the rest is the same as alwasy
-#   this is sometimes all zeros
-    edot =  f[:,4]
-    s1 = f[:,6]
-    s2 = f[:,7]
-#   typically there is a zero in this row, but older files may have something
-#   something that should not be used 
-    s6 = f[:,5]
+    # Handle buffer_hours for adjacent day data
+    if allGood and buffer_hours > 0:
+        station, year, doy, snr_type = _parse_snr_filename(obsfile)
+        buffer_seconds = buffer_hours * 3600
+        arrays_to_stack = []
+        main_cols = c
+        prev_loaded, next_loaded = False, False
 
-    s1 = np.power(10,(s1/20))  
-    s2 = np.power(10,(s2/20))  
-#
-    s6 = s6/20
-    s6 = np.power(10,s6)  
-#
-#   sometimes these records exist, sometimes not
-#   depends on when the file was made, which version was used
-#   make sure s5 has default value?
-    s5 = []
-    if c > 8:
-        s5 = f[:,8]
-        if (sum(s5) > 0):
-            s5 = s5/20; s5 = np.power(10,s5)  
-    if c > 9:
-        s7 = f[:,9]
-        if (sum(s7) > 0):
-            s7 = np.power(10,(s7/20))  
-        else:
-            s7 = []
+        # Get previous day data
+        prev_year, prev_doy = _get_adjacent_doy(year, doy, -1)
+        prev_obsfile, prev_obsfileCmp, prev_snre = g.define_and_xz_snr(station, prev_year, prev_doy, snr_type)
+        if prev_snre and os.path.isfile(prev_obsfile):
+            prev_data = np.loadtxt(prev_obsfile, comments='%')
+            if prev_data.size > 0:
+                # Ensure 2D array
+                if prev_data.ndim == 1:
+                    prev_data = prev_data.reshape(1, -1)
+                # Check column count matches main file
+                if prev_data.shape[1] != main_cols:
+                    print(f'Warning: Previous day SNR file has different column count ({prev_data.shape[1]} vs {main_cols}). Skipping.')
+                else:
+                    # Filter: positive elevation and last buffer_hours of previous day
+                    threshold = 86400 - buffer_seconds
+                    mask = (prev_data[:, 1] > 0) & (prev_data[:, 3] > threshold)
+                    prev_data = prev_data[mask, :]
+                    if prev_data.size > 0:
+                        # Adjust time tags: subtract 86400 to get negative seconds
+                        prev_data[:, 3] = prev_data[:, 3] - 86400
+                        arrays_to_stack.append(prev_data)
+                        prev_loaded = True
 
-    if c > 10:
-        s8 = f[:,10]
-        if (sum(s8) > 0):
-            s8 = np.power(10,(s8/20))  
-        else:
-            s8 = []
+        # Add main day data
+        arrays_to_stack.append(f)
 
-    if (np.sum(s5) == 0):
-        snrE[5] = False
-        #print('no s5 data')
-    if (np.sum(s6) == 0):
-        #print('no s6 data')
-        snrE[6] = False
-    if (np.sum(s7) == 0):
-        #print('no s7 data')
-        snrE[7] = False
-    if (np.sum(s8) == 0):
-        snrE[8] = False
-        #print('no s8 data')
+        # Get next day data
+        next_year, next_doy = _get_adjacent_doy(year, doy, +1)
+        next_obsfile, next_obsfileCmp, next_snre = g.define_and_xz_snr(station, next_year, next_doy, snr_type)
+        if next_snre and os.path.isfile(next_obsfile):
+            next_data = np.loadtxt(next_obsfile, comments='%')
+            if next_data.size > 0:
+                # Ensure 2D array
+                if next_data.ndim == 1:
+                    next_data = next_data.reshape(1, -1)
+                # Check column count matches main file
+                if next_data.shape[1] != main_cols:
+                    print(f'Warning: Next day SNR file has different column count ({next_data.shape[1]} vs {main_cols}). Skipping.')
+                else:
+                    # Filter: positive elevation and first buffer_hours of next day
+                    mask = (next_data[:, 1] > 0) & (next_data[:, 3] < buffer_seconds)
+                    next_data = next_data[mask, :]
+                    if next_data.size > 0:
+                        # Adjust time tags: add 86400 to get seconds > 86400
+                        next_data[:, 3] = next_data[:, 3] + 86400
+                        arrays_to_stack.append(next_data)
+                        next_loaded = True
 
-    return sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snrE
+        # Log buffer loading status
+        if screenstats:
+            status = []
+            if prev_loaded:
+                status.append(f'prev ({prev_year}/{prev_doy})')
+            if next_loaded:
+                status.append(f'next ({next_year}/{next_doy})')
+            if status:
+                print(f'  Buffer data loaded: {", ".join(status)}')
+            else:
+                print(f'  Buffer data: no adjacent day SNR files available')
+
+        # Stack all arrays
+        if len(arrays_to_stack) > 1:
+            f = np.vstack(arrays_to_stack)
+
+        # Update row/col counts
+        r, c = f.shape
+
+    return allGood, f, r, c
+
 
 def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays,gzip):
     """

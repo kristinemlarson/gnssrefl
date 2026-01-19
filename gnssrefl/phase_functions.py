@@ -9,6 +9,7 @@ import gnssrefl.gps as g
 from gnssrefl.utils import FileManagement, FileTypes
 import gnssrefl.daily_avg_cl as da
 import gnssrefl.gnssir_v2 as gnssir
+import gnssrefl.read_snr_files as snr
 from gnssrefl.extract_arcs import extract_arcs
 from functools import partial
 from scipy import optimize
@@ -733,7 +734,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
             buffer_hours = 2 if midnite else 0
             if midnite:
                 print('Midnite option enabled: loading +/- 2 hours from adjacent days')
-            allGood, snrD, nrows, ncols = gnssir.read_snr(obsfile, buffer_hours=buffer_hours, screenstats=screenstats)
+            allGood, snrD, nrows, ncols = snr.read_snr(obsfile, buffer_hours=buffer_hours, screenstats=screenstats)
             if not allGood:
                 print(f'Problem reading SNR file: {obsfile}')
                 return
@@ -802,8 +803,6 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                     arc_azi, arc_seconds = data['azi'][mask], data['seconds'][mask]
 
                     # When midnite is enabled, split by time gaps to separate multi-day data
-                    # This is needed because with split_arcs=False, azimuth filtering can
-                    # select data from multiple days (satellite passes same azimuth each day)
                     if midnite and len(arc_seconds) > 1:
                         # Sort by time and find gaps > 1 hour
                         sort_idx = np.argsort(arc_seconds)

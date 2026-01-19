@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+
+echo this has been modified to remove all references to the unavco archive
+
+#
+# various tests that gnssrefl build is still working
+# this only checks that the code does not crash. It does not currently
+
+ls -l $EXE/gfzrnx
+
+ls -l $EXE/CRX2RNX
+
+# this is likely not there
+ls -l $REFL_CODE/input/gpt_1wA.pickle
+
+# smoke tests for invsnr and subdaily
+
+rinex2snr sc02 2023 120 -archive sopac -doy_end 123 -orb rapid -overwrite T
+#make_json_input sc02 0 0 0 -azlist 60 90 90 180 180 220 -e1 5 -e2 13 -h1 2.5 -h2 12 -frlist 1 5 20 101 102 -extension docker -delTmax 40
+gnssir_input sc02 -azlist2 60 220 -e1 5 -e2 13 -h1 2.5 -h2 12 -frlist 1 5 20 101 102 -extension docker -delTmax 40
+gnssir sc02 2023 120 -doy_end 123 -extension docker
+
+subdaily sc02 2023 -extension docker -plt F -doy1 120
+
+invsnr_input sc02 -h1 2.5 -h2 10 -e1 5 -e2 13 -azim1 60 -azim2 220
+invsnr sc02 2023 120 L1+L2+L5 -plt F
+
+
+# smoke test for nmea2snr
+wget https://morefunwithgps.com/public_html/BEUL0050.23.A.gz
+mkdir $REFL_CODE/nmea
+mkdir $REFL_CODE/nmea/BEUL
+mkdir $REFL_CODE/nmea/BEUL/2023/
+gunzip BEUL0050.23.A.gz
+mv BEUL0050.23.A $REFL_CODE/nmea/BEUL/2023
+
+nmea2snr BEUL 2023 5 -dec 5 -overwrite  T -lat 50.038894 -lon 8.198476 -height 105.0 
+
+
+rinex2snr p103 2020 105 -doy_end 109   -archive sopac
+
+gnssir_input p103  -frlist 1 20 5 101 102 201 306 307  -extension TEST
+#make_json_input p103 0 0 0 -frlist 1 20 5 101 102 201 306 307  -extension TEST
+
+gnssir p103 2020 105 -extension TEST -doy_end 109
+
+refl_zones p103
+
+refl_zones p103 -azlist 90 180 270 360 -fr 2
+
+gnssir_input p103 
+#make_json_input p103 0 0 0
+
+
+
+quickLook p103 2020 105 -plt F
+quickLook p103 2020 107 -plt F -fr 2
+
+gnssir p103 2020 105 -doy_end 109
+daily_avg p103 0.5 10 -plt F
+
+subdaily p103 2020 -plt F 
+
+vwc_input p103 2012 
+
+gnssir_input p031 
+
+# case where station should not exist in the database
+gnssir_input xxxx 
+
+# case where station coordinates provided
+gnssir_input xxxx  -lat 40 -lon -120 -height 10  -h1 5 -h2 20 -e1 5 -e2 15
+
+download_orbits nav 2010 1 1
+download_orbits igs 2010 1 1
+download_orbits gbm 2018 1 1
+
+# removed unavco - now will go to sopac first
+rinex2snr p041 2022 1  -overwrite T -archive sopac
+rinex2snr p041 2022 1 -orb rapid -overwrite T -archive sopac
+
+# try various RINEX 3 things
+#
+
+# archive is currently unvailable
+rinex2snr pots00deu 2022 1 -archive bkg-igs -orb rapid -overwrite T
+
+rinex2snr mchl00aus 2018 1 -archive cddis  -overwrite T
+#rinex2snr p041 2018 1 -archive unavco -rate high -dec 15 -overwrite T
+
+# testing quickLook
+#
+#
+rinex2snr p033 2022 1 -orb rapid -overwrite T -archive sopac
+gnssir_input p033 
+quickLook p033 2022 1 -plt F
+
+
+

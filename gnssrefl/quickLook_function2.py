@@ -14,6 +14,7 @@ import gnssrefl.gps as g
 import gnssrefl.refraction as refr
 import gnssrefl.rinex2snr as rinex
 import gnssrefl.gnssir_v2 as gnssir_v2
+import gnssrefl.read_snr_files as snr
 
 
 def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,
@@ -146,7 +147,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     requireAmp = reqAmp[0]
 
     obsfile, obsfileCmp, snre =  g.define_and_xz_snr(station,year,doy,snr_type)
-    allGood, snrD, nrows, ncols = gnssir_v2.read_snr(obsfile)
+    allGood, snrD, nrows, ncols = snr.read_snr(obsfile)
 
     if allGood == 0:
         print('file does not exist'); sys.exit()
