@@ -25,6 +25,11 @@ def _get_snr_column(freq: int) -> int:
     """
     Map frequency code to SNR column index (1-based, as used in SNR files).
 
+    SNR file format (columns 1-based):
+        1: sat, 2: ele, 3: azi, 4: seconds, 5: edot
+        6: s1 (L1), 7: s2 (L2/L2C), 8: s5 (L5)
+        9: s6 (E6), 10: s7 (E5b), 11: s8 (E5a+b)
+
     Parameters
     ----------
     freq : int
@@ -40,16 +45,22 @@ def _get_snr_column(freq: int) -> int:
     ValueError
         If frequency code is not recognized
     """
+    # L1 frequencies -> s1 column
     if freq in [1, 101, 201, 301]:
-        return 7
-    elif freq in [2, 20, 102, 302]:
-        return 8
-    elif freq in [5, 205, 305]:
-        return 9
-    elif freq in [206, 306]:
         return 6
+    # L2/L2C frequencies -> s2 column
+    elif freq in [2, 20, 102, 302]:
+        return 7
+    # L5 frequencies -> s5 column
+    elif freq in [5, 205, 305]:
+        return 8
+    # E6/B3 frequencies -> s6 column
+    elif freq in [206, 306]:
+        return 9
+    # E5b/B2 frequencies -> s7 column
     elif freq in [207, 307]:
         return 10
+    # E5a+b frequencies -> s8 column
     elif freq in [208, 308]:
         return 11
     else:
@@ -317,6 +328,8 @@ def extract_arcs(
     polyV: int = 4,
     dbhz: bool = False,
     screenstats: bool = False,
+    detrend: bool = True,
+    split_arcs: bool = True,
 ) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
     """
     Extract satellite arcs from SNR data array.
@@ -347,6 +360,13 @@ def extract_arcs(
         If True, keep SNR in dB-Hz; if False, convert to linear units. Default: False
     screenstats : bool
         If True, print debug information. Default: False
+    detrend : bool
+        If True (default), remove DC component via polynomial fit.
+        If False, return SNR converted to linear units only (no detrending).
+    split_arcs : bool
+        If True (default), split data into separate arcs by time gaps and elevation
+        direction changes. If False, return all data for each satellite as a single
+        arc without splitting or validation. Useful for phase processing.
 
     Returns
     -------
@@ -406,13 +426,18 @@ def extract_arcs(
         sat_edot = edot_all[sat_mask]
         sat_snr = snr_all[sat_mask]
 
-        # Detect arc boundaries on full satellite data
-        # (arc detection validates against e1/e2 but uses all elevation data)
-        arc_boundaries = _detect_arc_boundaries(
-            sat_ele, sat_azi, sat_seconds,
-            e1, e2, ediff, sat,
-            min_pts=min_pts,
-        )
+        if split_arcs:
+            # Detect arc boundaries on full satellite data
+            # (arc detection validates against e1/e2 but uses all elevation data)
+            arc_boundaries = _detect_arc_boundaries(
+                sat_ele, sat_azi, sat_seconds,
+                e1, e2, ediff, sat,
+                min_pts=min_pts,
+            )
+        else:
+            # No splitting - treat all satellite data as one arc
+            # This returns ALL data without validation, useful for phase processing
+            arc_boundaries = [(0, len(sat_ele), sat, 1)]
 
         for sind, eind, sat_num, arc_num in arc_boundaries:
             # Extract arc data (full elevation range)
@@ -440,34 +465,50 @@ def extract_arcs(
             if len(arc_ele) <= reqN:
                 continue
 
-            # Remove DC component on FULL arc (before e1/e2 filter)
-            arc_snr_detrended = _remove_dc_component(arc_ele, arc_snr, polyV, dbhz)
+            # Process SNR: either detrend or just convert to linear units
+            if detrend:
+                arc_snr_processed = _remove_dc_component(arc_ele, arc_snr, polyV, dbhz)
+            else:
+                # Just convert to linear units, no detrending
+                if dbhz:
+                    arc_snr_processed = arc_snr.copy()
+                else:
+                    arc_snr_processed = np.power(10, (arc_snr / 20))
 
-            # NOW apply e1/e2 filter (after DC removal)
-            e_mask = (arc_ele > e1) & (arc_ele <= e2)
-            Nvv = np.sum(e_mask)
+            # Apply e1/e2 filter (after DC removal) - skip if not splitting arcs
+            if split_arcs:
+                e_mask = (arc_ele > e1) & (arc_ele <= e2)
+                Nvv = np.sum(e_mask)
 
-            if Nvv < 15:
-                continue
+                if Nvv < 15:
+                    continue
 
-            # Get index of min elevation in filtered data for azimuth check
-            filtered_ele = arc_ele[e_mask]
-            filtered_azi = arc_azi[e_mask]
-            ie = np.argmin(filtered_ele)
-            init_azim = filtered_azi[ie]
+                # Get index of min elevation in filtered data for azimuth check
+                filtered_ele = arc_ele[e_mask]
+                filtered_azi = arc_azi[e_mask]
+                ie = np.argmin(filtered_ele)
+                init_azim = filtered_azi[ie]
 
-            # Check azimuth compliance
-            if not _check_azimuth_compliance(init_azim, azlist):
-                if screenstats:
-                    print(f"Azimuth {init_azim:.2f} not in requested region")
-                continue
+                # Check azimuth compliance
+                if not _check_azimuth_compliance(init_azim, azlist):
+                    if screenstats:
+                        print(f"Azimuth {init_azim:.2f} not in requested region")
+                    continue
 
-            # Apply e1/e2 filter to all arrays
-            final_ele = arc_ele[e_mask]
-            final_azi = arc_azi[e_mask]
-            final_seconds = arc_seconds[e_mask]
-            final_edot = arc_edot[e_mask]
-            final_snr = arc_snr_detrended[e_mask]
+                # Apply e1/e2 filter to all arrays
+                final_ele = arc_ele[e_mask]
+                final_azi = arc_azi[e_mask]
+                final_seconds = arc_seconds[e_mask]
+                final_edot = arc_edot[e_mask]
+                final_snr = arc_snr_processed[e_mask]
+            else:
+                # No filtering - return all data for this satellite
+                # Phase will do its own filtering by azimuth and elevation
+                final_ele = arc_ele
+                final_azi = arc_azi
+                final_seconds = arc_seconds
+                final_edot = arc_edot
+                final_snr = arc_snr_processed
 
             # Compute metadata using filtered data
             metadata = _compute_arc_metadata(
