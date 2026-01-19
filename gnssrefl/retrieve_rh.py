@@ -149,6 +149,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
                 snrD,
                 freq=f,
                 e1=e1, e2=e2,
+                ellist=ellist,
                 azlist=azvalues,
                 sat_list=satlist,
                 ediff=ediff,

@@ -737,14 +737,17 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                 print('Analyzing Frequency ', freq, ' Year ', year, ' Day of Year ', doy)
 
                 # Get satellite data using extract_arcs
-                # dbhz=False: convert dB-Hz to linear after filtering
+                # IMPORTANT for backwards compatibility:
+                #   - detrend=False: phase does its own detrending after azimuth filtering
+                #   - split_arcs=False: returns all data per satellite unsplit, so phase
+                #     can filter by azimuth per apriori track (below)
                 all_arcs = extract_arcs(
                     snrD, freq=freq, e1=pele[0], e2=pele[1], azlist=[0, 360],
-                    min_pts=1, polyV=poly_v, dbhz=False, detrend=False,
+                    min_pts=1, polyV=poly_v, detrend=False,
                     screenstats=screenstats, split_arcs=False,
                 )
 
-                # Map satellite -> (meta, data)
+                # Map satellite -> data. Phase filters by azimuth from apriori_results.
                 sat_data_map = {meta['sat']: (meta, data) for meta, data in all_arcs}
 
                 # =================================================================
