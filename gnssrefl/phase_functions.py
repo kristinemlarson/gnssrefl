@@ -727,8 +727,10 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
         print(f"Saving phase file to: {output_path}")
         with open(output_path, 'w') as my_file:
             np.savetxt(my_file, [], header=header, comments='%')
-            # read the SNR file into memory (use np.loadtxt for consistency with gnssir)
-            snrD = np.loadtxt(obsfile, comments='%')
+            allGood, snrD, nrows, ncols = gnssir.read_snr(obsfile)
+            if not allGood:
+                print(f'Problem reading SNR file: {obsfile}')
+                return
 
             for freq in fr_list:
                 # read apriori reflector height results

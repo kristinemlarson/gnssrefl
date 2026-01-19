@@ -347,7 +347,7 @@ def _compute_arc_metadata(
         'az_avg': float(np.mean(azi)),
         'time_start': float(np.min(seconds)),
         'time_end': float(np.max(seconds)),
-        'time_avg': float(np.mean(seconds) / 3600),  # hours UTC
+        'arc_timestamp': float(np.mean(seconds) / 3600),  # hours UTC
         'num_pts': len(ele),
         'delT': float((np.max(seconds) - np.min(seconds)) / 60),  # minutes
         'edot_factor': float(edot_factor),
@@ -370,6 +370,7 @@ def extract_arcs(
     screenstats: bool = False,
     detrend: bool = True,
     split_arcs: bool = True,
+    filter_to_day: bool = True,
 ) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
     """
     Extract satellite arcs from SNR data array.
@@ -411,6 +412,12 @@ def extract_arcs(
         If True (default), split data into separate arcs by time gaps and elevation
         direction changes. If False, return all data for each satellite as a single
         arc without splitting or validation. Useful for phase processing.
+    filter_to_day : bool
+        If True (default), only return arcs whose midpoint (arc_timestamp) falls
+        within the principal day (0-24 hours). This prevents double-counting arcs
+        when processing consecutive days with buffer_hours. Arc data may still
+        extend beyond day boundaries. If False, return all arcs regardless of
+        their midpoint time.
 
     Returns
     -------
@@ -577,5 +584,12 @@ def extract_arcs(
                 }
 
                 all_arcs.append((metadata, data))
+
+    # Filter to principal day if requested
+    if filter_to_day:
+        all_arcs = [
+            (meta, data) for meta, data in all_arcs
+            if 0 <= meta['arc_timestamp'] < 24
+        ]
 
     return all_arcs

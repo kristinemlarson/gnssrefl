@@ -9,7 +9,7 @@ import gnssrefl.gps as g
 from gnssrefl.utils import FileManagement
 from gnssrefl.extract_arcs import extract_arcs
 
-def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstats, irefr,logid,logfilename,dbhz):
+def retrieve_rh(station,year,doy,extension, lsp, snrD, screenstats, irefr,logid,logfilename,dbhz):
     """
     new worker code that estimates LSP from GNSS SNR data.
     it will now live here and be called by gnssir_v2.py
@@ -24,14 +24,10 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
         day of year
     extension : str
         strategy extension
-    midnite : bool
-        whether you are going to allow arcs to cross midnite
     lsp : dict
         inputs to LSP analysis
     snrD : numpy array
-        contents of SNR file
-    outD : numpy array
-        contents of SNR file including two hours before midnite
+        contents of SNR file (may include adjacent day data if midnite option enabled)
     screenstats : bool
         whether you want stats to the screen
     irefr: int
@@ -39,7 +35,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
     logid : file ID
         opened in earlier function
     logfilename : str
-        name of the log file ... 
+        name of the log file ...
     dbhz : bool
         keep dbhz units  (or not)
 
@@ -65,11 +61,6 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
     # used in previous code ... these elevation angles have been refraction corrected
     ele =  snrD[:,1]
     sats = snrD[:,0]
-
-    if midnite:
-        ele_midnite = outD[:,1] 
-        sats_midnite = outD[:,0] 
-        nnrows,nncols=outD.shape
 
     onesat = lsp['onesat']; #screenstats = lsp['screenstats']
 
@@ -170,7 +161,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
                 avgAzim = meta['az_init']
                 Edot2 = meta['edot_factor']
                 delT = meta['delT']
-                meanTime = meta['time_avg']
+                meanTime = meta['arc_timestamp']
                 Nvv = meta['num_pts']
                 Nv = Nvv
                 UTCtime = meanTime

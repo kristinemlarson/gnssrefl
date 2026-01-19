@@ -258,49 +258,16 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
 
 
-        allGood, snrD, nrows, ncols = read_snr(obsfile)
+        # Use buffer_hours to load adjacent day data when midnite option is enabled
+        buffer_hours = 3 if midnite else 0
+        if midnite:
+            print('Midnite option enabled: loading +/- 3 hours from adjacent days')
+        allGood, snrD, nrows, ncols = read_snr(obsfile, buffer_hours=buffer_hours)
         if allGood:
             snrD = decimate_snr(snrD, allGood, dec)
 
-        # if primary file exists and you want to invoke midnite
-        if midnite and allGood: 
-            # keep first two hours on normal day
-            ii = snrD[:,3] < 2*3600
-            outD = snrD[ii,:]
-            print(outD.shape)
-            print('invoking midnite option. Need to pick up and look at day before')
-            if doy == 1:
-                test_obsfile, test_obsfileCmp, test_snre = g.define_and_xz_snr(station,year-1,g.dec31(year-1),snr_type) 
-            else:
-                test_obsfile, test_obsfileCmp, test_snre = g.define_and_xz_snr(station,year,doy-1,snr_type) 
-            print('Second observation file ', test_obsfile, test_snre)
-            # if it exists
-            if test_snre: 
-                # load it and decimate
-                test_allGood, test_snrD, nnrows, nncols = read_snr(test_obsfile)
-                test_snrD = decimate_snr(test_snrD, test_allGood, dec)
-                # only last hour or so
-                ii = test_snrD[:,3] > 22*3600
-                test_snrD = test_snrD[ii,:]
-            # offset wrt to main code so that time is not repeated (file format unfortunately 
-            # is seconds within a day
-                test_snrD[:,3] = test_snrD[:,3] -86400
-            # now merge the last two hours of this file with the primarily file (hours 0-22)
-                c1,c2 = test_snrD.shape
-                d1,d2 = outD.shape
-                if (c2 != d2):
-                    print('The two SNR files do not have the same number of columns. This likely means one was ')
-                    print('GPS only and the other was GNSS. You need to remake one of the two files so they are ')
-                    print('consistent.  Changing your request for midnite crossing to False.')
-                    midnite = False
-                else:
-                    outD =  np.vstack((test_snrD,outD))
-            else:
-                print('The SNR file for the day before does not exist. midnite crossing option is turned off')
-                midnite = False
-
         # only compress if result was not found ...
-        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,midnite,gzip) 
+        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2, False, gzip) 
 
     if allGood:
         print('SNR data were read from: ', obsfile)
@@ -325,23 +292,14 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                 print('Ulich refraction correction')
             else:
                 print('Ulich refraction correction, time-varying')
-            # I do not understand why all these extra parameters are sent to this 
+            # I do not understand why all these extra parameters are sent to this
             # function as they are not used. Maybe I was doing some testing.
             ele=refr.Ulich_Bending_Angle(snrD[:,1],N_ant,lsp,p,T,snrD[:,3],snrD[:,0])
-            if midnite:
-                ele_midnite = refr.Ulich_Bending_Angle(outD[:,1],N_ant,lsp,p,T,outD[:,3],outD[:,0])
-                ele = ele + dE_MPF 
         elif (irefr == 5 ) or (irefr == 6):
             ele,snrD = refraction_nite_mpf(irefr,snrD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd,zwd)
-            if midnite: 
-                ele_midnite,outD = refraction_nite_mpf(irefr,outD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd,zwd)
-          
-
         elif irefr == 0:
             print('No refraction correction applied ')
             ele = snrD[:,1]
-            if midnite: 
-                ele_midnite = outD[:,1]
         else :
             if irefr == 1:
                 if screenstats:
@@ -351,29 +309,15 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                     print('Standard Bennett refraction correction, time-varying')
             ele = snrD[:,1]
             ele=apply_refraction_corr(lsp,ele,p,T)
-            if midnite:
-                ele_midnite = outD[:,1]
-                ele_midnite=apply_refraction_corr(lsp,ele_midnite,p,T)
 
         # apply an elevation mask for all the data for the polynomial fit
         i= (ele >= pele[0]) & (ele < pele[1])
         ele = ele[i]
         snrD = snrD[i,:]
         sats = snrD[:,0]
-        snrD[:,1] = ele # ????
+        snrD[:,1] = ele
 
-        if midnite:
-            i= (ele_midnite >= pele[0]) & (ele_midnite < pele[1])
-            ele_midnite = ele_midnite[i]
-            outD = outD[i,:]
-            sats_midnite = outD[:,0]
-            outD[:,1] = ele_midnite
-        else:
-            outD = None
-
-        # testing out a new function that does ... everything
-
-        r.retrieve_rh(station,year,doy,extension, midnite,lsp,snrD, outD, screenstats, irefr,logid,logfilename,lsp['dbhz'])
+        r.retrieve_rh(station,year,doy,extension,lsp,snrD, screenstats, irefr,logid,logfilename,lsp['dbhz'])
 
         return
 
@@ -736,18 +680,83 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats):
 
     return tv 
 
-def read_snr(obsfile):
+def _parse_snr_filename(obsfile):
     """
-    Simple function to load the contents of a SNR file into a numpy array
+    Parse station, year, doy, snr_type from SNR file path.
+
+    Path format: {REFL_CODE}/{yyyy}/snr/{station}/{station}{doy}0.{yy}.snr{type}
+    Example: /home/user/.../2024/snr/alby/alby1000.24.snr66
 
     Parameters
     ----------
     obsfile : str
-        name of the snrfile 
+        path to SNR file
 
     Returns
     -------
-    allGood : int 
+    station : str
+        4-character station name
+    year : int
+        full year (e.g. 2024)
+    doy : int
+        day of year
+    snr_type : int
+        SNR file type (e.g. 66)
+    """
+    basename = os.path.basename(obsfile)  # alby1000.24.snr66
+    station = basename[:4]                 # alby
+    doy = int(basename[4:7])               # 100
+    yy = int(basename[9:11])               # 24
+    year = 2000 + yy if yy < 80 else 1900 + yy
+    snr_type = int(basename.split('.snr')[1])  # 66
+    return station, year, doy, snr_type
+
+
+def _get_adjacent_doy(year, doy, offset):
+    """
+    Get year/doy for adjacent day.
+
+    Parameters
+    ----------
+    year : int
+        full year
+    doy : int
+        day of year
+    offset : int
+        -1 for previous day, +1 for next day
+
+    Returns
+    -------
+    new_year : int
+        year of adjacent day
+    new_doy : int
+        doy of adjacent day
+    """
+    # Convert to datetime, apply offset, convert back
+    date = datetime.datetime(year, 1, 1) + datetime.timedelta(days=doy - 1 + offset)
+    new_year = date.year
+    new_doy = date.timetuple().tm_yday
+    return new_year, new_doy
+
+
+def read_snr(obsfile, buffer_hours=0):
+    """
+    Load the contents of a SNR file into a numpy array, optionally including
+    data from adjacent days.
+
+    Parameters
+    ----------
+    obsfile : str
+        name of the snrfile
+    buffer_hours : float, optional
+        hours of data to include from adjacent days. If > 0, reads last
+        buffer_hours from previous day and first buffer_hours from next day.
+        Time tags are adjusted: prev day uses negative seconds, next day
+        uses seconds > 86400. Default is 0 (single day only).
+
+    Returns
+    -------
+    allGood : int
         1, file was successfully loaded, 0 if not.
         apparently this variable was defined when I did not know about booleans....
     f : numpy array
@@ -774,7 +783,67 @@ def read_snr(obsfile):
         allGood = 0
     if c == 0:
         print('No columns in this file!')
-        allGood = 0 
+        allGood = 0
+
+    # Handle buffer_hours for adjacent day data
+    if allGood and buffer_hours > 0:
+        station, year, doy, snr_type = _parse_snr_filename(obsfile)
+        buffer_seconds = buffer_hours * 3600
+        arrays_to_stack = []
+        main_cols = c
+
+        # Get previous day data
+        prev_year, prev_doy = _get_adjacent_doy(year, doy, -1)
+        prev_obsfile, prev_obsfileCmp, prev_snre = g.define_and_xz_snr(station, prev_year, prev_doy, snr_type)
+        if prev_snre and os.path.isfile(prev_obsfile):
+            prev_data = np.loadtxt(prev_obsfile, comments='%')
+            if prev_data.size > 0:
+                # Ensure 2D array
+                if prev_data.ndim == 1:
+                    prev_data = prev_data.reshape(1, -1)
+                # Check column count matches main file
+                if prev_data.shape[1] != main_cols:
+                    print(f'Warning: Previous day SNR file has different column count ({prev_data.shape[1]} vs {main_cols}). Skipping.')
+                else:
+                    # Filter: positive elevation and last buffer_hours of previous day
+                    threshold = 86400 - buffer_seconds
+                    mask = (prev_data[:, 1] > 0) & (prev_data[:, 3] > threshold)
+                    prev_data = prev_data[mask, :]
+                    if prev_data.size > 0:
+                        # Adjust time tags: subtract 86400 to get negative seconds
+                        prev_data[:, 3] = prev_data[:, 3] - 86400
+                        arrays_to_stack.append(prev_data)
+
+        # Add main day data
+        arrays_to_stack.append(f)
+
+        # Get next day data
+        next_year, next_doy = _get_adjacent_doy(year, doy, +1)
+        next_obsfile, next_obsfileCmp, next_snre = g.define_and_xz_snr(station, next_year, next_doy, snr_type)
+        if next_snre and os.path.isfile(next_obsfile):
+            next_data = np.loadtxt(next_obsfile, comments='%')
+            if next_data.size > 0:
+                # Ensure 2D array
+                if next_data.ndim == 1:
+                    next_data = next_data.reshape(1, -1)
+                # Check column count matches main file
+                if next_data.shape[1] != main_cols:
+                    print(f'Warning: Next day SNR file has different column count ({next_data.shape[1]} vs {main_cols}). Skipping.')
+                else:
+                    # Filter: positive elevation and first buffer_hours of next day
+                    mask = (next_data[:, 1] > 0) & (next_data[:, 3] < buffer_seconds)
+                    next_data = next_data[mask, :]
+                    if next_data.size > 0:
+                        # Adjust time tags: add 86400 to get seconds > 86400
+                        next_data[:, 3] = next_data[:, 3] + 86400
+                        arrays_to_stack.append(next_data)
+
+        # Stack all arrays
+        if len(arrays_to_stack) > 1:
+            f = np.vstack(arrays_to_stack)
+
+        # Update row/col counts
+        r, c = f.shape
 
     return allGood, f, r, c
 
