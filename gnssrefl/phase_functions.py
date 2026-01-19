@@ -666,7 +666,7 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
     # Always return a list
     return [final_fr]
 
-def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip, extension=''):
+def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip, extension='', midnite=False):
     """
     This does the main work of estimating phase and other parameters from the SNR files
     it uses tracks that were predefined by the apriori.py code
@@ -695,6 +695,8 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
         this is always true for now
     gzip : bool
         whether you want SNR files gzipped after running the code
+    midnite : bool, optional
+        Allow midnight crossings. When True, loads +/- 2 hours from adjacent days. Default is False.
     Only GPS frequencies are allowed because this relies on the repeating ground track.
 
     """
@@ -727,7 +729,11 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
         print(f"Saving phase file to: {output_path}")
         with open(output_path, 'w') as my_file:
             np.savetxt(my_file, [], header=header, comments='%')
-            allGood, snrD, nrows, ncols = gnssir.read_snr(obsfile)
+            # Use buffer_hours to load adjacent day data when midnite option is enabled
+            buffer_hours = 2 if midnite else 0
+            if midnite:
+                print('Midnite option enabled: loading +/- 2 hours from adjacent days')
+            allGood, snrD, nrows, ncols = gnssir.read_snr(obsfile, buffer_hours=buffer_hours, screenstats=screenstats)
             if not allGood:
                 print(f'Problem reading SNR file: {obsfile}')
                 return
@@ -743,10 +749,13 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                 #   - detrend=False: phase does its own detrending after azimuth filtering
                 #   - split_arcs=False: returns all data per satellite unsplit, so phase
                 #     can filter by azimuth per apriori track (below)
+                #   - filter_to_day=False: phase has its own utctime filter after azimuth
+                #     filtering, which is more accurate for phase workflow
                 all_arcs = extract_arcs(
                     snrD, freq=freq, e1=pele[0], e2=pele[1], azlist=[0, 360],
                     min_pts=1, polyV=poly_v, detrend=False,
                     screenstats=screenstats, split_arcs=False,
+                    filter_to_day=False,
                 )
 
                 # Map satellite -> data. Phase filters by azimuth from apriori_results.
@@ -792,6 +801,42 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                     arc_ele, arc_snr = data['ele'][mask], data['snr'][mask]
                     arc_azi, arc_seconds = data['azi'][mask], data['seconds'][mask]
 
+                    # When midnite is enabled, split by time gaps to separate multi-day data
+                    # This is needed because with split_arcs=False, azimuth filtering can
+                    # select data from multiple days (satellite passes same azimuth each day)
+                    if midnite and len(arc_seconds) > 1:
+                        # Sort by time and find gaps > 1 hour
+                        sort_idx = np.argsort(arc_seconds)
+                        arc_ele, arc_snr = arc_ele[sort_idx], arc_snr[sort_idx]
+                        arc_azi, arc_seconds = arc_azi[sort_idx], arc_seconds[sort_idx]
+
+                        time_gaps = np.diff(arc_seconds)
+                        gap_indices = np.where(time_gaps > 3600)[0]  # gaps > 1 hour
+
+                        if len(gap_indices) > 0:
+                            # Split into segments and keep the one in principal day [0, 24)
+                            boundaries = [0] + list(gap_indices + 1) + [len(arc_seconds)]
+                            best_segment = None
+                            for j in range(len(boundaries) - 1):
+                                start, end = boundaries[j], boundaries[j + 1]
+                                seg_seconds = arc_seconds[start:end]
+                                seg_utctime = np.mean(seg_seconds) / 3600
+                                if 0 <= seg_utctime < 24:
+                                    if best_segment is None or len(seg_seconds) > len(best_segment[0]):
+                                        best_segment = (seg_seconds, start, end)
+
+                            if best_segment is None:
+                                continue  # No segment in principal day
+
+                            _, start, end = best_segment
+                            arc_ele = arc_ele[start:end]
+                            arc_snr = arc_snr[start:end]
+                            arc_azi = arc_azi[start:end]
+                            arc_seconds = arc_seconds[start:end]
+
+                            if len(arc_ele) < 30:
+                                continue
+
                     # Polynomial fit (same as window_data)
                     fit = np.polyval(np.polyfit(arc_ele, arc_snr, poly_v), arc_ele)
                     arc_snr_detrended = arc_snr - fit
@@ -829,6 +874,13 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                     utctime = np.mean(seconds_filtered) / 3600
                     avg_azim = np.mean(azi_filtered)
                     del_t = (np.max(seconds_filtered) - np.min(seconds_filtered)) / 60
+
+                    # When midnite is enabled, skip arcs whose midpoint falls outside principal day
+                    # This can happen when azimuth filtering selects data primarily from buffer regions
+                    if midnite and (utctime < 0 or utctime >= 24):
+                        if screenstats:
+                            print(f'Skipping arc: utctime {utctime:.2f} outside principal day')
+                        continue
 
                     # L2C/L5 satellite checks
                     compute_lsp = True

@@ -739,7 +739,7 @@ def _get_adjacent_doy(year, doy, offset):
     return new_year, new_doy
 
 
-def read_snr(obsfile, buffer_hours=0):
+def read_snr(obsfile, buffer_hours=0, screenstats=False):
     """
     Load the contents of a SNR file into a numpy array, optionally including
     data from adjacent days.
@@ -753,6 +753,8 @@ def read_snr(obsfile, buffer_hours=0):
         buffer_hours from previous day and first buffer_hours from next day.
         Time tags are adjusted: prev day uses negative seconds, next day
         uses seconds > 86400. Default is 0 (single day only).
+    screenstats : bool, optional
+        print verbose information about buffer data loading. Default is False.
 
     Returns
     -------
@@ -791,6 +793,7 @@ def read_snr(obsfile, buffer_hours=0):
         buffer_seconds = buffer_hours * 3600
         arrays_to_stack = []
         main_cols = c
+        prev_loaded, next_loaded = False, False
 
         # Get previous day data
         prev_year, prev_doy = _get_adjacent_doy(year, doy, -1)
@@ -813,6 +816,7 @@ def read_snr(obsfile, buffer_hours=0):
                         # Adjust time tags: subtract 86400 to get negative seconds
                         prev_data[:, 3] = prev_data[:, 3] - 86400
                         arrays_to_stack.append(prev_data)
+                        prev_loaded = True
 
         # Add main day data
         arrays_to_stack.append(f)
@@ -837,6 +841,19 @@ def read_snr(obsfile, buffer_hours=0):
                         # Adjust time tags: add 86400 to get seconds > 86400
                         next_data[:, 3] = next_data[:, 3] + 86400
                         arrays_to_stack.append(next_data)
+                        next_loaded = True
+
+        # Log buffer loading status
+        if screenstats:
+            status = []
+            if prev_loaded:
+                status.append(f'prev ({prev_year}/{prev_doy})')
+            if next_loaded:
+                status.append(f'next ({next_year}/{next_doy})')
+            if status:
+                print(f'  Buffer data loaded: {", ".join(status)}')
+            else:
+                print(f'  Buffer data: no adjacent day SNR files available')
 
         # Stack all arrays
         if len(arrays_to_stack) > 1:

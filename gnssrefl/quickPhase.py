@@ -27,11 +27,12 @@ def parse_arguments():
     parser.add_argument("-screenstats", default=None, type=str, help="stats come to the screen")
     parser.add_argument("-gzip", default=None, type=str, help="gzip SNR files after use, default is True" )
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
+    parser.add_argument("-midnite", default=None, type=str, help="allow midnite crossings (default is false)")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'screenstats', 'gzip']
+    boolean_args = ['plt', 'screenstats', 'gzip', 'midnite']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -39,7 +40,7 @@ def parse_arguments():
 
 
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66,
-        fr: str = None, e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip: bool = True, extension: str = '', par: int = None):
+        fr: str = None, e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip: bool = True, extension: str = '', par: int = None, midnite: bool = False):
     """
     quickphase computes phase, which are subquently used in vwc. The command line call is phase
     (which maybe we should change).
@@ -96,6 +97,8 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         gzip the SNR file after use.  Default is True
     par : int, optional
         Number of parallel processes to spawn (up to 10). Default is 1 (single process).
+    midnite : bool, optional
+        Allow midnight crossings. When True, loads +/- 2 hours from adjacent days. Default is False.
 
     Returns
     -------
@@ -160,7 +163,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     args = {
         'station': station, 'snr': snr, 'fr_list': fr_list, 'e1': e1, 'e2': e2,
         'pele': pele, 'plt': plt, 'screenstats': screenstats, 'compute_lsp': compute_lsp,
-        'gzip': gzip, 'extension': extension
+        'gzip': gzip, 'extension': extension, 'midnite': midnite
     }
     
     if par == 1:
@@ -178,9 +181,10 @@ def process_phase_day(year, doy, args, error_queue=None):
     """Process a single day - shared by both sequential and parallel processing"""
     try:
         print(f'Analyzing year/day of year {year}/{doy}')
-        qp.phase_tracks(args['station'], year, doy, args['snr'], args['fr_list'], 
-                       args['e1'], args['e2'], args['pele'], args['plt'], 
-                       args['screenstats'], args['compute_lsp'], args['gzip'], args['extension'])
+        qp.phase_tracks(args['station'], year, doy, args['snr'], args['fr_list'],
+                       args['e1'], args['e2'], args['pele'], args['plt'],
+                       args['screenstats'], args['compute_lsp'], args['gzip'], args['extension'],
+                       args['midnite'])
     except Exception as e:
         if error_queue:
             print('***********************************************************************')
