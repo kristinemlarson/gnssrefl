@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
+## 3.19.1
+
+February 10, 2026
+
+[George Townsend pull request for soil moisture](https://github.com/kristinemlarson/gnssrefl/pull/367)
+
+Added PRN 20, which was launched January 28, 2026.  
+
 ## 3.19.0
 
 December 7, 2025
