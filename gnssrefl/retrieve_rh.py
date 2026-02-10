@@ -7,8 +7,9 @@ import sys
 import gnssrefl.gnssir_v2 as guts
 import gnssrefl.gps as g
 from gnssrefl.utils import FileManagement
+from gnssrefl.extract_arcs import extract_arcs
 
-def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstats, irefr,logid,logfilename,dbhz):
+def retrieve_rh(station,year,doy,extension, lsp, snrD, screenstats, irefr,logid,logfilename,dbhz):
     """
     new worker code that estimates LSP from GNSS SNR data.
     it will now live here and be called by gnssir_v2.py
@@ -23,14 +24,10 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
         day of year
     extension : str
         strategy extension
-    midnite : bool
-        whether you are going to allow arcs to cross midnite
     lsp : dict
         inputs to LSP analysis
     snrD : numpy array
-        contents of SNR file
-    outD : numpy array
-        contents of SNR file including two hours before midnite
+        contents of SNR file (may include adjacent day data if midnite option enabled)
     screenstats : bool
         whether you want stats to the screen
     irefr: int
@@ -38,7 +35,7 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
     logid : file ID
         opened in earlier function
     logfilename : str
-        name of the log file ... 
+        name of the log file ...
     dbhz : bool
         keep dbhz units  (or not)
 
@@ -64,11 +61,6 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
     # used in previous code ... these elevation angles have been refraction corrected
     ele =  snrD[:,1]
     sats = snrD[:,0]
-
-    if midnite:
-        ele_midnite = outD[:,1] 
-        sats_midnite = outD[:,0] 
-        nnrows,nncols=outD.shape
 
     onesat = lsp['onesat']; #screenstats = lsp['screenstats']
 
@@ -143,188 +135,89 @@ def retrieve_rh(station,year,doy,extension, midnite, lsp, snrD, outD, screenstat
                 # check that your requested satellite is the right frequency
                 satlist = guts.onesat_freq_check(onesat,f )
 
-            # main satellite loop
-            for satNu in satlist:
-                found_midnite_cross = False
+            # Extract arcs using the new module
+            arcs = extract_arcs(snrD, freq=f, e1=e1, e2=e2, ellist=ellist, azlist=azvalues, sat_list=satlist, ediff=ediff, polyV=lsp['polyV'], dbhz=dbhz)
 
-                iii = (sats == satNu)
-                thissat = snrD[iii,:]
+            # Process each arc
+            for a, (meta, data) in enumerate(arcs):
+                found_results = True
 
-                if midnite:
-                    iii = (sats_midnite == satNu)
-                    ts2 = outD[iii,:]
+                # Map extract_arcs output to expected variables
+                satNu = meta['sat']
+                x = data['ele']
+                y = data['snr']
+                secxonds = data['seconds']
+                cf = meta['cf']
+                avgAzim = meta['az_init']
+                Edot2 = meta['edot_factor']
+                delT = meta['delT']
+                meanTime = meta['arc_timestamp']
+                Nvv = meta['num_pts']
+                Nv = Nvv
+                UTCtime = meanTime
 
-                goahead = False
+                # LSP computation
+                MJD = g.getMJD(year,month,day, meanTime)
+                maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz = g.strip_compute(x,y,cf,maxH,prec,pfitV,minH)
 
-                # go find the arcs for this satellite
-                if len(thissat) > 0:
-                    if screenstats: 
-                        logid.write('Satellite {0:3.0f} \n'.format(satNu))
-                        logid.write('---------------------------------------------------------------------------------\n')
+                tooclose = False
+                if (maxF == 0) & (maxAmp == 0):
+                    tooclose = True
+                    Noise = 1
+                    iAzim = 0
+                else:
+                    nij = pz[(px > NReg[0]) & (px < NReg[1])]
 
-                    # make two arc lists - one with and one without midnite crossings ...
+                Noise = 1
+                if len(nij) > 0:
+                    Noise = np.mean(nij)
 
-                    # the day of is stored in thissat and day before is stored in ts2
+                iAzim = int(avgAzim)
 
-                    # allow more than one set of elevation angles
-                    if len(ellist) > 0:
-                        # not doing midnite option here yet ... but maybe it would not be so hard
-                        arclist = np.empty(shape=[0,6])
-                        arclist_midnite = np.empty(shape=[0,6])
-                        for ij in range(0,len(ellist),2):
-                            found_midnite_cross = False
-                            te1 = ellist[ij]; te2 = ellist[ij+1]; newl = [te1,te2]
-                            # poorly named inputs - elev, azimuth, seconds of the day, ...
-                            # te1 and te2 are the requested elevation angles I believe
-                            # satNu is the requested satellite number
-                            tarclist,found_midnite_cross = guts.new_rise_set_again(thissat[:,1],thissat[:,2],
-                                                          thissat[:,3],te1, te2,ediff,satNu,screenstats,logid,midnite=midnite)
-                            arclist = np.append(arclist, tarclist,axis=0)
+                if abs(maxF - minH) < 0.10:  # peak too close to min value
+                    tooclose = True
 
-                            if midnite and found_midnite_cross:
-                                arclist_midniteX,flagm = guts.new_rise_set_again(ts2[:,1],ts2[:,2], ts2[:,3],te1, te2,ediff,satNu,screenstats,logid,midnite=midnite)
-                                arclist_midnite = np.append(arclist_midnite, arclist_midniteX ,axis=0)
+                if abs(maxF - maxH) < 0.10:  # peak too close to max value
+                    tooclose = True
 
+                if (not tooclose) & (delT < delTmax) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
+                    # QC passed - save arc
+                    if test_savearcs and (Nv > 0):
+                        newffile = guts.arc_name(sdir,satNu,f,a,avgAzim)
+                        if (len(newffile) > 0) and (delT != 0):
+                            file_info = [station,satNu,f,avgAzim,year,month,day,doy,meanTime,docstring]
+                            guts.write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
+
+                    xyear,xmonth,xday,xhr,xmin,xsec,xdoy = g.simpleTime(MJD)
+                    betterUTC = xhr + xmin/60 + xsec/3600
+                    if lsp['mmdd']:
+                        onelsp = [xyear,xdoy,maxF,satNu,betterUTC,avgAzim,maxAmp,eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr,xmonth,xday,xhr,xmin,xsec]
                     else:
-                        arclist,found_midnite_cross = guts.new_rise_set_again(thissat[:,1],thissat[:,2],
-                                                     thissat[:,3],e1, e2,ediff,satNu,screenstats,logid,midnite=midnite)
-                        # means you want to try and find a midnite crossing in the day before data file
-                        if midnite and found_midnite_cross:
-                            arclist_midnite,flagm = guts.new_rise_set_again(ts2[:,1],ts2[:,2],
-                                                     ts2[:,3],e1, e2,ediff,satNu,screenstats,logid,midnite=midnite)
-                        else:
-                            arclist_midnite = np.empty(shape=[0,6])
+                        onelsp = [xyear,xdoy,maxF,satNu,betterUTC,avgAzim,maxAmp,eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr]
 
+                    gj += 1
+                    all_lsp.append(onelsp)
 
-                    # arcsum is a variable that keeps trakc whether you should use the day of SNR file or the day before SNR file
-                    arcsum = []
-                    nr,nc = arclist.shape
-                    for i in range (0,nr):
-                        logid.write('Regular arc {0:3s} {1:5.0f} {2:5.0f} \n'.format(str(i), arclist[i,0], arclist[i,1]))
-                        arcsum.append(False)
-                      
-                    if midnite :
-                        mnr,mnc = arclist_midnite.shape
-                        if mnr > 0:
-                            for i in range(0,mnr):
-                                logid.write('Midnite arc {0:3s} {1:5.0f} {2:5.0f} \n'.format(str(i), arclist_midnite[i,0], arclist_midnite[i,1]))
-                                arcsum.append(True)
-                        arclist = np.vstack((arclist, arclist_midnite))
-                        nr,nc = arclist.shape
-
-                    nr,nc = arclist.shape
-                    if nr > 0:
-                        goahead = True
-
-                if goahead:
-                    found_results = True
-                    # instead of az bins now go through each arc 
-                    for a in range(0,nr):
-                        # starting and ending index
-                        sind = int(arclist[a,0]) ; eind = int(arclist[a,1])
-
-                        # create array for the requested arc
-                        if arcsum[a] is True: # this means you have a midnite arc, so use ts2 instead of thissat
-                            d2 = np.array(ts2[sind:eind, :], dtype=float)
-                        else:
-                            d2 = np.array(thissat[sind:eind, :], dtype=float)
-
-                        # window the data - which also removes DC 
-                        # this is saying that these are the min and max elev angles you should be using
-                        e1 = arclist[a,4]; e2 = arclist[a,5]
-                        # pele is not used, so no longer used in window_new, as of v3.6.8
-
-                        # send it the log id now
-                        x,y, Nvv, cf, meanTime,avgAzim,outFact1, Edot2, delT, secxonds = guts.window_new(d2, f, 
-                                satNu,ncols,lsp['polyV'],e1,e2,azvalues,screenstats,logid,dbhz,fundy=fundy)
-
-                        #writing out arcs - try putting it later on ... 
-                        if test_savearcs and (Nvv > 0):
-                            newffile = guts.arc_name(sdir,satNu,f,a,avgAzim)
-                            # name for the individual arc file
-                            if (len(newffile) > 0) and (delT !=0):
-                                file_info = [station,satNu,f,avgAzim,year,doy,meanTime,docstring]
-                        Nv = Nvv # number of points
-                        UTCtime = meanTime
-
-                        # if delT  is zero, that means the arc is really not acceptable.  That is set in window_new
-                        if (delT != 0):
-                            MJD = g.getMJD(year,month,day, meanTime)
-                            maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,prec,pfitV,minH)
-
-                            tooclose = False
-                            if (maxF ==0) & (maxAmp == 0):
-                                tooclose == True; Noise = 1; iAzim = 0;
-                            else:
-                                nij =  pz[(px > NReg[0]) & (px < NReg[1])]
-
-                            Noise = 1
-                            if (len(nij) > 0):
-                                Noise = np.mean(nij)
-
-                            iAzim = int(avgAzim)
-
-                            if abs(maxF - minH) < 0.10: #  peak too close to min value
-                                tooclose = True
-
-                            if abs(maxF - maxH) < 0.10: #  peak too close to max value
-                                tooclose = True
-
-                            if False:
-                                print(avgAzim, satNu, e1, e2)
-
-                            if (not tooclose) & (delT < delTmax) & (maxAmp > reqAmp[ct]) & (maxAmp/Noise > PkNoise):
-                            # request from a tide gauge person for Month, Day, Hour, Minute
-                                # save arc and QC is good
-                                if test_savearcs and (Nv > 0):
-                                    newffile = guts.arc_name(sdir,satNu,f,a,avgAzim)
-                            # name for the individual arc file
-                                    if (len(newffile) > 0) and (delT !=0):
-                                        file_info = [station,satNu,f,avgAzim,year,month,day,doy,meanTime,docstring]
-                                        guts.write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
-
-                                xyear,xmonth,xday,xhr, xmin, xsec,xdoy = g.simpleTime(MJD)
-                                # fractional UTC time of the day, in hours
-                                betterUTC = xhr + xmin/60 + xsec/3600
-                                if lsp['mmdd']:
-                                    #ctime = g.nicerTime(UTCtime); #xhr = float(ctime[0:2]); xmin = float(ctime[3:5])
-                                    #dt = Time(mjd,format='mjd').utc.datetime;
-                                    onelsp = [xyear,xdoy,maxF,satNu,betterUTC,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr,xmonth,xday,xhr,xmin,xsec]
-                                    #onelsp = [year,doy,maxF,satNu,UTCtime,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr,xmonth,xday,xhr,xmin,xsec]
-                                    
-
-                                else:
-                                    onelsp = [xyear,xdoy,maxF,satNu,betterUTC,avgAzim,maxAmp, eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr]
-
-                                gj +=1
-
-                                all_lsp.append(onelsp)
-                                if screenstats:
-                                    #if UTCtime < 0:
-                                    #    T = g.nicerTime(-UTCtime)
-                                    #    T = '-' + T
-                                    #else:
-                                    # won't have the year - but better to avoid the whole stupid negative time
-                                    T = ' ' + g.nicerTime(betterUTC)
-                                    logid.write('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:6s} DT {7:3.0f} \n'.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp, f,T,round(delT)))
-                                if plot_screen:
-                                    failed = False
-                                    guts.local_update_plot(x,y,px,pz,ax1,ax2,failed)
-                            else:
-                                if test_savearcs and (Nv > 0):
-                                    newffile = guts.arc_name(sdir+'failQC/',satNu,f,a,avgAzim)
-                                    # name for the individual arc file - i think delT is redundant here
-                                    if (len(newffile) > 0) and (delT !=0):
-                                        file_info = [station,satNu,f,avgAzim,year,month,day,doy,meanTime,docstring]
-                                        guts.write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
-                                rj +=1
-                                if screenstats:
-
-                                    logid.write('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f} \n'.format( iAzim,satNu,UTCtime,maxF))
-                                    g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp, Noise,PkNoise,reqAmp[ct],tooclose,logid)
-                                if plot_screen:
-                                    failed = True
-                                    guts.local_update_plot(x,y,px,pz,ax1,ax2,failed)
+                    if screenstats:
+                        T = ' ' + g.nicerTime(betterUTC)
+                        logid.write('SUCCESS Azimuth {0:3.0f} Sat {1:3.0f} RH {2:7.3f} m PkNoise {3:4.1f} Amp {4:4.1f} Fr{5:3.0f} UTC {6:6s} DT {7:3.0f} \n'.format(iAzim,satNu,maxF,maxAmp/Noise,maxAmp,f,T,round(delT)))
+                    if plot_screen:
+                        failed = False
+                        guts.local_update_plot(x,y,px,pz,ax1,ax2,failed)
+                else:
+                    # QC failed
+                    if test_savearcs and (Nv > 0):
+                        newffile = guts.arc_name(sdir+'failQC/',satNu,f,a,avgAzim)
+                        if (len(newffile) > 0) and (delT != 0):
+                            file_info = [station,satNu,f,avgAzim,year,month,day,doy,meanTime,docstring]
+                            guts.write_out_arcs(newffile,x,y,secxonds,file_info,savearcs_format)
+                    rj += 1
+                    if screenstats:
+                        logid.write('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f} \n'.format(iAzim,satNu,UTCtime,maxF))
+                        g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,ediff,maxAmp,Noise,PkNoise,reqAmp[ct],tooclose,logid)
+                    if plot_screen:
+                        failed = True
+                        guts.local_update_plot(x,y,px,pz,ax1,ax2,failed)
 
             if screenstats:
                 logid.write('=================================================================================\n')

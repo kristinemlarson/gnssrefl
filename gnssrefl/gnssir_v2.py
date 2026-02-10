@@ -258,49 +258,16 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         obsfile, obsfileCmp, snre = g.define_and_xz_snr(station,year,doy,snr_type) 
 
 
-        allGood, snrD, nrows, ncols = read_snr(obsfile)
+        # Use buffer_hours to load adjacent day data when midnite option is enabled
+        buffer_hours = 2 if midnite else 0
+        if midnite:
+            print('Midnite option enabled: loading +/- 2 hours from adjacent days')
+        allGood, snrD, nrows, ncols = snr.read_snr(obsfile, buffer_hours=buffer_hours)
         if allGood:
             snrD = decimate_snr(snrD, allGood, dec)
 
-        # if primary file exists and you want to invoke midnite
-        if midnite and allGood: 
-            # keep first two hours on normal day
-            ii = snrD[:,3] < 2*3600
-            outD = snrD[ii,:]
-            print(outD.shape)
-            print('invoking midnite option. Need to pick up and look at day before')
-            if doy == 1:
-                test_obsfile, test_obsfileCmp, test_snre = g.define_and_xz_snr(station,year-1,g.dec31(year-1),snr_type) 
-            else:
-                test_obsfile, test_obsfileCmp, test_snre = g.define_and_xz_snr(station,year,doy-1,snr_type) 
-            print('Second observation file ', test_obsfile, test_snre)
-            # if it exists
-            if test_snre: 
-                # load it and decimate
-                test_allGood, test_snrD, nnrows, nncols = read_snr(test_obsfile)
-                test_snrD = decimate_snr(test_snrD, test_allGood, dec)
-                # only last hour or so
-                ii = test_snrD[:,3] > 22*3600
-                test_snrD = test_snrD[ii,:]
-            # offset wrt to main code so that time is not repeated (file format unfortunately 
-            # is seconds within a day
-                test_snrD[:,3] = test_snrD[:,3] -86400
-            # now merge the last two hours of this file with the primarily file (hours 0-22)
-                c1,c2 = test_snrD.shape
-                d1,d2 = outD.shape
-                if (c2 != d2):
-                    print('The two SNR files do not have the same number of columns. This likely means one was ')
-                    print('GPS only and the other was GNSS. You need to remake one of the two files so they are ')
-                    print('consistent.  Changing your request for midnite crossing to False.')
-                    midnite = False
-                else:
-                    outD =  np.vstack((test_snrD,outD))
-            else:
-                print('The SNR file for the day before does not exist. midnite crossing option is turned off')
-                midnite = False
-
         # only compress if result was not found ...
-        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2,midnite,gzip) 
+        snr.compress_snr_files(lsp['wantCompression'], obsfile, obsfile2, False, gzip) 
 
     if allGood:
         print('SNR data were read from: ', obsfile)
@@ -325,23 +292,14 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                 print('Ulich refraction correction')
             else:
                 print('Ulich refraction correction, time-varying')
-            # I do not understand why all these extra parameters are sent to this 
+            # I do not understand why all these extra parameters are sent to this
             # function as they are not used. Maybe I was doing some testing.
             ele=refr.Ulich_Bending_Angle(snrD[:,1],N_ant,lsp,p,T,snrD[:,3],snrD[:,0])
-            if midnite:
-                ele_midnite = refr.Ulich_Bending_Angle(outD[:,1],N_ant,lsp,p,T,outD[:,3],outD[:,0])
-                ele = ele + dE_MPF 
         elif (irefr == 5 ) or (irefr == 6):
             ele,snrD = refraction_nite_mpf(irefr,snrD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd,zwd)
-            if midnite: 
-                ele_midnite,outD = refraction_nite_mpf(irefr,outD,mjd1,lat1R,lon1R,height1,RH_apriori,N_ant,zhd,zwd)
-          
-
         elif irefr == 0:
             print('No refraction correction applied ')
             ele = snrD[:,1]
-            if midnite: 
-                ele_midnite = outD[:,1]
         else :
             if irefr == 1:
                 if screenstats:
@@ -351,29 +309,15 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
                     print('Standard Bennett refraction correction, time-varying')
             ele = snrD[:,1]
             ele=apply_refraction_corr(lsp,ele,p,T)
-            if midnite:
-                ele_midnite = outD[:,1]
-                ele_midnite=apply_refraction_corr(lsp,ele_midnite,p,T)
 
         # apply an elevation mask for all the data for the polynomial fit
         i= (ele >= pele[0]) & (ele < pele[1])
         ele = ele[i]
         snrD = snrD[i,:]
         sats = snrD[:,0]
-        snrD[:,1] = ele # ????
+        snrD[:,1] = ele
 
-        if midnite:
-            i= (ele_midnite >= pele[0]) & (ele_midnite < pele[1])
-            ele_midnite = ele_midnite[i]
-            outD = outD[i,:]
-            sats_midnite = outD[:,0]
-            outD[:,1] = ele_midnite
-        else:
-            outD = None
-
-        # testing out a new function that does ... everything
-
-        r.retrieve_rh(station,year,doy,extension, midnite,lsp,snrD, outD, screenstats, irefr,logid,logfilename,lsp['dbhz'])
+        r.retrieve_rh(station,year,doy,extension,lsp,snrD, screenstats, irefr,logid,logfilename,lsp['dbhz'])
 
         return
 
@@ -734,49 +678,7 @@ def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats):
             newl = [sind, eind, int(sat), iarc]
             tv = np.append(tv, [newl],axis=0)
 
-    return tv 
-
-def read_snr(obsfile):
-    """
-    Simple function to load the contents of a SNR file into a numpy array
-
-    Parameters
-    ----------
-    obsfile : str
-        name of the snrfile 
-
-    Returns
-    -------
-    allGood : int 
-        1, file was successfully loaded, 0 if not.
-        apparently this variable was defined when I did not know about booleans....
-    f : numpy array
-        contents of the SNR file
-    r : int
-        number of rows in SNR file
-    c : int
-        number of columns in SNR file
-
-    """
-    allGood = 1
-    if os.path.isfile(obsfile):
-        f = np.loadtxt(obsfile,comments='%')
-    else:
-        print('No SNR file found')
-        allGood = 0
-        return allGood, 0, 0, 0
-    r,c = f.shape
-    if (r > 0) & (c > 0):
-        i= f[:,1] > 0
-        f=f[i,:]
-    if r == 0:
-        print('No rows in this file!')
-        allGood = 0
-    if c == 0:
-        print('No columns in this file!')
-        allGood = 0 
-
-    return allGood, f, r, c
+    return tv
 
 
 def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid,dbhz,**kwargs):

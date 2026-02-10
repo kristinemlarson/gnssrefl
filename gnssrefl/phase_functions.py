@@ -6,11 +6,11 @@ import sys
 
 
 import gnssrefl.gps as g
-import gnssrefl.read_snr_files as read_snr
 from gnssrefl.utils import FileManagement, FileTypes
 import gnssrefl.daily_avg_cl as da
 import gnssrefl.gnssir_v2 as gnssir
-
+import gnssrefl.read_snr_files as snr
+from gnssrefl.extract_arcs import extract_arcs
 from functools import partial
 from scipy import optimize
 from scipy.interpolate import interp1d
@@ -667,7 +667,7 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
     # Always return a list
     return [final_fr]
 
-def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip, extension=''):
+def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, screenstats, compute_lsp,gzip, extension='', midnite=False):
     """
     This does the main work of estimating phase and other parameters from the SNR files
     it uses tracks that were predefined by the apriori.py code
@@ -696,6 +696,8 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
         this is always true for now
     gzip : bool
         whether you want SNR files gzipped after running the code
+    midnite : bool, optional
+        Allow midnight crossings. When True, loads +/- 2 hours from adjacent days. Default is False.
     Only GPS frequencies are allowed because this relies on the repeating ground track.
 
     """
@@ -728,47 +730,173 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
         print(f"Saving phase file to: {output_path}")
         with open(output_path, 'w') as my_file:
             np.savetxt(my_file, [], header=header, comments='%')
-            # read the SNR file into memory
-            sat, ele, azi, t, edot, s1, s2, s5, s6, s7, s8, snr_exists = read_snr.read_one_snr(obsfile, 1)
+            # Use buffer_hours to load adjacent day data when midnite option is enabled
+            buffer_hours = 2 if midnite else 0
+            if midnite:
+                print('Midnite option enabled: loading +/- 2 hours from adjacent days')
+            allGood, snrD, nrows, ncols = snr.read_snr(obsfile, buffer_hours=buffer_hours, screenstats=screenstats)
+            if not allGood:
+                print(f'Problem reading SNR file: {obsfile}')
+                return
 
             for freq in fr_list:
-            # read apriori reflector height results
+                # read apriori reflector height results
                 apriori_results = read_apriori_rh(station, freq, extension)
 
                 print('Analyzing Frequency ', freq, ' Year ', year, ' Day of Year ', doy)
 
-                rows, columns = np.shape(apriori_results)
+                # Get satellite data using extract_arcs
+                # IMPORTANT for backwards compatibility:
+                #   - detrend=False: phase does its own detrending after azimuth filtering
+                #   - split_arcs=False: returns all data per satellite unsplit, so phase
+                #     can filter by azimuth per apriori track (below)
+                #   - filter_to_day=False: phase has its own utctime filter after azimuth
+                #     filtering, which is more accurate for phase workflow
+                all_arcs = extract_arcs(
+                    snrD, freq=freq, e1=pele[0], e2=pele[1], azlist=[0, 360],
+                    min_pts=1, polyV=poly_v, detrend=False,
+                    screenstats=screenstats, split_arcs=False,
+                    filter_to_day=False,
+                )
 
+                # Map satellite -> data. Phase filters by azimuth from apriori_results.
+                sat_data_map = {meta['sat']: (meta, data) for meta, data in all_arcs}
+
+                # =================================================================
+                # BACKWARDS COMPATIBILITY: Phase-specific post-processing
+                # -----------------------------------------------------------------
+                # The following processing replicates the behavior of the legacy
+                # g.window_data() function used by phase processing. This differs
+                # from gnssir's arc extraction in several ways:
+                #   1. Uses apriori azimuth bounds (az1/az2) per track, not global
+                #   2. Applies polynomial detrending after azimuth filtering
+                #   3. Performs rising/setting arc splitting inline
+                #   4. Uses different elevation filtering (pele then e1/e2)
+                # This logic is preserved here to maintain output consistency with
+                # previous versions. Future refactoring could unify this with
+                # extract_arcs if phase and gnssir workflows are aligned.
+                # =================================================================
+
+                # Process each apriori track
+                rows, columns = np.shape(apriori_results)
                 for i in range(0, rows):
-                    compute_lsp = True # will set to false for non-compliant L2C requests
-                    azim = apriori_results[i, 3]
-                    # this will be the satellite number you are working on 
-                    sat_number = apriori_results[i, 2]
+                    sat_number = int(apriori_results[i, 2])
                     az1 = apriori_results[i, 5]
                     az2 = apriori_results[i, 6]
                     rh_apriori = apriori_results[i, 1]
+                    azim = apriori_results[i, 3]
 
-                    # this uses the old way of resolving arcs - but I think that is ok because we only want
-                    # one arc per quadrant anyway when doing soil moisture. And soil moisture doesn't really
-                    # work unless you have most of the field (i.e. 180 degrees of azimuth)
-                    x, y, nv, cf, utctime, avg_azim, avg_edot, edot2, del_t = g.window_data(s1, s2, s5, s6, s7, s8, sat, ele, azi,
-                                                                                        t, edot, freq, az1, az2, e1, e2,
-                                                                                        sat_number, poly_v, pele, screenstats)
-                    if (freq == 20) and (sat_number not in l2c_list) :
-                        if screenstats: 
-                            print('Asked for L2C but this is not L2C transmitting on this day: ', int(sat_number))
+                    if sat_number not in sat_data_map:
+                        continue
+
+                    meta, data = sat_data_map[sat_number]
+                    cf = meta['cf']
+
+                    # Filter by pele, azimuth, SNR > 5 (same as removeDC)
+                    mask = ((data['ele'] > pele[0]) & (data['ele'] < pele[1]) &
+                            (data['azi'] > az1) & (data['azi'] < az2) &
+                            (data['snr'] > 5))
+                    if np.sum(mask) < 30:
+                        continue
+
+                    arc_ele, arc_snr = data['ele'][mask], data['snr'][mask]
+                    arc_azi, arc_seconds = data['azi'][mask], data['seconds'][mask]
+
+                    # When midnite is enabled, split by time gaps to separate multi-day data
+                    if midnite and len(arc_seconds) > 1:
+                        # Sort by time and find gaps > 1 hour
+                        sort_idx = np.argsort(arc_seconds)
+                        arc_ele, arc_snr = arc_ele[sort_idx], arc_snr[sort_idx]
+                        arc_azi, arc_seconds = arc_azi[sort_idx], arc_seconds[sort_idx]
+
+                        time_gaps = np.diff(arc_seconds)
+                        gap_indices = np.where(time_gaps > 3600)[0]  # gaps > 1 hour
+
+                        if len(gap_indices) > 0:
+                            # Split into segments and keep the one in principal day [0, 24)
+                            boundaries = [0] + list(gap_indices + 1) + [len(arc_seconds)]
+                            best_segment = None
+                            for j in range(len(boundaries) - 1):
+                                start, end = boundaries[j], boundaries[j + 1]
+                                seg_seconds = arc_seconds[start:end]
+                                seg_utctime = np.mean(seg_seconds) / 3600
+                                if 0 <= seg_utctime < 24:
+                                    if best_segment is None or len(seg_seconds) > len(best_segment[0]):
+                                        best_segment = (seg_seconds, start, end)
+
+                            if best_segment is None:
+                                continue  # No segment in principal day
+
+                            _, start, end = best_segment
+                            arc_ele = arc_ele[start:end]
+                            arc_snr = arc_snr[start:end]
+                            arc_azi = arc_azi[start:end]
+                            arc_seconds = arc_seconds[start:end]
+
+                            if len(arc_ele) < 30:
+                                continue
+
+                    # Polynomial fit (same as window_data)
+                    fit = np.polyval(np.polyfit(arc_ele, arc_snr, poly_v), arc_ele)
+                    arc_snr_detrended = arc_snr - fit
+
+                    # Secondary e1/e2 filter (same as window_data)
+                    e_mask = (arc_ele > e1) & (arc_ele < e2)
+                    if np.sum(e_mask) < 10:
+                        continue
+
+                    x, y = arc_ele[e_mask], arc_snr_detrended[e_mask]
+                    azi_filtered, seconds_filtered = arc_azi[e_mask], arc_seconds[e_mask]
+
+                    # Rising/setting split (same as window_data lines 1759-1779)
+                    if len(x) > 0:
+                        ijkl = np.argmax(x)
+                        if ijkl > 0 and ijkl < len(x) - 1:
+                            edif1 = x[ijkl] - x[0]
+                            edif2 = x[ijkl] - x[-1]
+                            if edif1 > edif2:
+                                x = x[0:ijkl]
+                                y = y[0:ijkl]
+                                azi_filtered = azi_filtered[0:ijkl]
+                                seconds_filtered = seconds_filtered[0:ijkl]
+                            else:
+                                x = x[ijkl:-1]
+                                y = y[ijkl:-1]
+                                azi_filtered = azi_filtered[ijkl:-1]
+                                seconds_filtered = seconds_filtered[ijkl:-1]
+
+                    nv = len(x)
+                    if nv < min_num_pts:
+                        continue
+
+                    # Compute metadata
+                    utctime = np.mean(seconds_filtered) / 3600
+                    avg_azim = np.mean(azi_filtered)
+                    del_t = (np.max(seconds_filtered) - np.min(seconds_filtered)) / 60
+
+                    # When midnite is enabled, skip arcs whose midpoint falls outside principal day
+                    # This can happen when azimuth filtering selects data primarily from buffer regions
+                    if midnite and (utctime < 0 or utctime >= 24):
+                        if screenstats:
+                            print(f'Skipping arc: utctime {utctime:.2f} outside principal day')
+                        continue
+
+                    # L2C/L5 satellite checks
+                    compute_lsp = True
+                    if (freq == 20) and (sat_number not in l2c_list):
+                        if screenstats:
+                            print('Asked for L2C but not L2C transmitting: ', int(sat_number))
                         compute_lsp = False
-                    
+
                     if (freq == 5) and (sat_number not in l5_list):
-                        if screenstats: 
-                            print('Asked for L5 but this is not L5 transmitting on this day: ', int(sat_number))
+                        if screenstats:
+                            print('Asked for L5 but not L5 transmitting: ', int(sat_number))
                         compute_lsp = False
 
                     if screenstats:
                         print(f'Track {i:2.0f} Sat {sat_number:3.0f} Azimuth {azim:5.1f} RH {rh_apriori:6.2f} {nv:5.0f}')
 
                     if compute_lsp and (nv > min_num_pts):
-                        # this is the same every track, so no reason to be in the loop
                         min_height = 0.5 ; max_height = 8 ; desired_p = 0.01
 
                         max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(x, y, cf, max_height,
@@ -783,22 +911,17 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                             if screenstats:
                                 print(f'>> LSP RH {max_f:7.3f} m {obs_pk2noise:6.1f} Amp {max_amp:6.1f} {min_amp:6.1f} ')
                         else:
-                            max_amp = 0  # so it will have a value
+                            max_amp = 0
 
-                    # http://scipy-lectures.org/intro/scipy/auto_examples/plot_curve_fit.html
                         if (nv > min_num_pts) and (max_amp > min_amp):
                             minmax = np.max(x) - np.min(x)
                             if (minmax > 22) and (del_t < 120):
-                                x_data = np.sin(np.deg2rad(x))  # calculate sine(E)
+                                x_data = np.sin(np.deg2rad(x))
                                 y_data = y
                                 test_function_apriori = partial(test_func_new, rh_apriori=rh_apriori,freq=freq)
-                                #test_function_apriori = partial(test_func, rh_apriori=rh_apriori)
                                 params, params_covariance = optimize.curve_fit(test_function_apriori, x_data, y_data, p0=[2, 2])
-    
 
-                                # change phase to degrees
                                 phase = params[1]*180/np.pi
-                                # calculate min and max elevation angle
                                 min_el = min(x); max_el = max(x)
                                 amp = np.absolute(params[0])
                                 raw_amp = params[0]
@@ -807,7 +930,6 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                                     if phase > 360:
                                         phase = phase - 360
 
-                                # do not allow negative amplitudes. 
                                 if raw_amp < 0:
                                     phase = phase + 180
 
