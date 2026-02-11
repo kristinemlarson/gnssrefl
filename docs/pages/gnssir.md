@@ -77,6 +77,9 @@ When multiplied by RHdot (meters/hour), you will get a correction in units of me
 information, see the <code>subdaily</code> code.
 - ediff QC metric
 
+For programmatic access to individual arcs (e.g. for custom plotting or analysis),
+see [Extracting Satellite Arcs (Python API)](extract_arcs.md).
+
 Warning: We try to enforce homogenous track lengths by using a quality control factor called *ediff*. Its 
 default value is 2 degrees, which means your arc should be within 2 degrees of the requested elevation angle inputs.
 So if you ask for 5 and 25 degrees, your arcs should at least be from 7 to 23 degrees.  To tell 

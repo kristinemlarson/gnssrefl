@@ -58,10 +58,12 @@ This is further emphasized in the next panel, that shows the actual periodograms
 In addition to the **peak2noise** and required amplitude (**ampl**) QC metrics, there is a 
 couple more QC metrics that are hardwired. One is the length of time 
 allowed for an arc - this can be a problem when you have an arc that crosses midnite;
-since the gnssrefl code works on elevation angle, it will combine part of 
-the arc from the beginning of the day and the rest 
-from the end of the day. This is not sensible - and it will reject this arc 
-nominally for being far too long. Really it is rejecting it because it is non-physical.  
+since the gnssrefl code works on elevation angle, it will combine part of
+the arc from the beginning of the day and the rest
+from the end of the day. This is not sensible - and it will reject this arc
+nominally for being far too long. Really it is rejecting it because it is non-physical.
+The Python API offers a `buffer_hours` option that solves this — see
+[Midnight-Crossing Arcs](extract_arcs.md#midnight-crossing-arcs).  
 
 The code tries to find all eligible arcs between elevation angles **e1 (emin)** and **e2 (emax)**.
 Why? In my experience you don't want to use an arc that only goes from 5-10 degrees if you 
