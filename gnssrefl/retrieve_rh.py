@@ -7,7 +7,6 @@ import sys
 import gnssrefl.gnssir_v2 as guts
 import gnssrefl.gps as g
 from gnssrefl.utils import FileManagement
-from gnssrefl.extract_arcs import extract_arcs
 
 def retrieve_rh(station,year,doy,extension, lsp, snrD, screenstats, irefr,logid,logfilename,dbhz):
     """
@@ -135,7 +134,8 @@ def retrieve_rh(station,year,doy,extension, lsp, snrD, screenstats, irefr,logid,
                 # check that your requested satellite is the right frequency
                 satlist = guts.onesat_freq_check(onesat,f )
 
-            # Extract arcs using the new module
+            # Extract arcs
+            from gnssrefl.extract_arcs import extract_arcs
             arcs = extract_arcs(snrD, freq=f, e1=e1, e2=e2, ellist=ellist, azlist=azvalues, sat_list=satlist, ediff=ediff, polyV=lsp['polyV'], dbhz=dbhz)
 
             # Process each arc
