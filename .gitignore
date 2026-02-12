@@ -69,3 +69,4 @@ spline_out.png
 logs
 outliers.txt
 **/.DS_Store
+test/data/expected/
