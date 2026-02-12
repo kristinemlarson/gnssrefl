@@ -1,0 +1,73 @@
+{
+    "station": "mchl",
+    "lat": -26.358904661,
+    "lon": 148.144960505,
+    "ht": 534.591379,
+    "Hortho": [
+        497.0014
+    ],
+    "apriori_rh": 5,
+    "minH": 0.5,
+    "maxH": 8.0,
+    "e1": 5.0,
+    "e2": 25.0,
+    "NReg": [
+        0.5,
+        8.0
+    ],
+    "PkNoise": 2.8,
+    "polyV": 4,
+    "pele": [
+        5,
+        30
+    ],
+    "ediff": 2.0,
+    "desiredP": 0.005,
+    "azval2": [
+        0,
+        360
+    ],
+    "freqs": [
+        1,
+        20,
+        5
+    ],
+    "reqAmp": [
+        5.0,
+        5.0,
+        5.0
+    ],
+    "refraction": true,
+    "overwriteResults": true,
+    "seekRinex": false,
+    "wantCompression": false,
+    "plt_screen": false,
+    "onesat": null,
+    "screenstats": false,
+    "pltname": "mchl_lsp.png",
+    "delTmax": 75.0,
+    "gzip": false,
+    "ellist": [],
+    "refr_model": 1,
+    "daily_avg_reqtracks": null,
+    "daily_avg_medfilter": null,
+    "subdaily_alt_sigma": null,
+    "subdaily_ampl": null,
+    "subdaily_delta_out": null,
+    "subdaily_knots": null,
+    "subdaily_sigma": null,
+    "subdaily_spline_outlier1": null,
+    "subdaily_spline_outlier2": null,
+    "subdaily_subdir": null,
+    "stream": null,
+    "samplerate": null,
+    "snr": null,
+    "dec": null,
+    "vwc_min_norm_amp": 0.5,
+    "vwc_warning_value": 5.5,
+    "vwc_min_soil_texture": 0.05,
+    "vwc_max_soil_texture": 0.5,
+    "vwc_minvalperday": 10,
+    "vwc_minvalperbin": 5,
+    "vwc_min_req_pts_track": 100
+}
