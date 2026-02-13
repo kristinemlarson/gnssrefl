@@ -145,6 +145,9 @@ def read_snr(obsfile, buffer_hours=0, screenstats=False):
                         prev_data[:, 3] = prev_data[:, 3] - 86400
                         arrays_to_stack.append(prev_data)
                         prev_loaded = True
+        else:
+            print(f'Warning: no SNR file for previous day ({prev_year}/{prev_doy:03d}), '
+                  f'midnight arcs near 0h may be incomplete')
 
         # Add main day data
         arrays_to_stack.append(f)
@@ -170,6 +173,9 @@ def read_snr(obsfile, buffer_hours=0, screenstats=False):
                         next_data[:, 3] = next_data[:, 3] + 86400
                         arrays_to_stack.append(next_data)
                         next_loaded = True
+        else:
+            print(f'Warning: no SNR file for next day ({next_year}/{next_doy:03d}), '
+                  f'midnight arcs near 24h may be incomplete')
 
         # Log buffer loading status
         if screenstats:
