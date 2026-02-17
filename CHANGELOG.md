@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 3.19.2
+
+Testing
+
 ## 3.19.1
 
 February 10, 2026
