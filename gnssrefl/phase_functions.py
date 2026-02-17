@@ -550,13 +550,19 @@ def read_apriori_rh(station, fr, extension=''):
     apriori_path_f, format_type = file_manager.find_apriori_rh_file()
 
     if apriori_path_f.exists():
+        with open(apriori_path_f) as f:
+            has_data = any(line.strip() and not line.startswith('%') for line in f)
+        if not has_data:
+            print(f'No satellite tracks found in {apriori_path_f}')
+            print('Please run vwc_input first.')
+            sys.exit()
         result = np.loadtxt(apriori_path_f, comments='%', ndmin=2)
         if format_type == 'legacy':
             print(f'Using RH file (legacy directory): {apriori_path_f}')
         else:
             print(f'Using RH file: {apriori_path_f}')
     else:
-        print('Average RH file does not exist')
+        print('Average RH file does not exist. Please run vwc_input first.')
         sys.exit()
 
     # column 2 is RH, 3 is sat, 4 is azimuth, 5 is number of values
@@ -569,6 +575,35 @@ def read_apriori_rh(station, fr, extension=''):
 
 
     return result
+
+
+def write_apriori_rh(filepath, tracks, station, year, tmin, tmax):
+    """
+    Write apriori RH track list file. Used by both vwc_input and vwc auto_removal.
+
+    Parameters
+    ----------
+    filepath : path-like
+    tracks : list
+        each element is [track_num, rh, satellite, mean_az, nvals, az_min, az_max]
+    station : str
+    year : int
+    tmin : float
+        minimum soil texture (header metadata only)
+    tmax : float
+        maximum soil texture (header metadata only)
+    """
+    # sort by mean azimuth and renumber
+    tracks = [[i+1] + t[1:] for i, t in enumerate(sorted(tracks, key=lambda t: t[3]))]
+
+    with open(filepath, 'w') as f:
+        f.write('% apriori RH values used for phase estimation  \n')
+        f.write(f'% year/station {year} {station}  \n')
+        f.write(f'% tmin {tmin:.2f}  \n')
+        f.write(f'% tmax {tmax:.2f}  \n')
+        f.write('% Track  RefH SatNu MeanAz  Nval   Azimuths   \n')
+        f.write('%         m     \n')
+        np.savetxt(f, tracks, fmt="%3.0f %6.3f %4.0f %7.2f   %4.0f  %3.0f  %3.0f")
 
 
 def test_func(x, a, b, rh_apriori):
@@ -1310,61 +1345,35 @@ def calculate_avg_phase(vxyz, bin_hours=24, bin_offset=0, minvalperbin=10):
     return avg_phase
 
 
-def write_avg_phase(station, phase, fr, minvalperday, vxyz, subdir, extension='',
-                   bin_hours=24, minvalperbin=10, bin_offset=0):
+def write_avg_phase(station, fr, avg_phase, extension='', bin_hours=24, bin_offset=0):
 
     """
-    creates output file for average phase results
+    writes averaged phase results to a text file
 
     Parameters
     ----------
     station : string
 
-    phase : numpy list  (float)
-         phase values (legacy parameter, extracted from vxyz)
-
     fr : int
         frequency
 
-    minvalperday : int
-        required number of satellite tracks to trust the daily average
-
-    vxyz : numpy array
-        Track-level data, pre-filtered to desired years
-
-    subdir : str
-        subdirectory for results
+    avg_phase : numpy array
+        output of calculate_avg_phase
+        columns: [Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day, [BinStart]]
 
     extension : str, optional
         analysis extension for directory organization
 
     bin_hours : int, optional
-        Time bin size in hours (default: 24)
-
-    minvalperbin : int, optional
-        Minimum values per bin (default: 10)
+        Time bin size in hours (default: 24). Used for filename suffix and header.
 
     bin_offset : int, optional
-        Bin timing offset in hours (default: 0)
-
-    Returns
-    -------
-    tv : numpy array with elements
-        year
-        doy  - day of year
-        meanph - mean phase value in degrees
-        nvals - number of values that went into the average
+        Bin timing offset in hours (default: 0). Used for filename suffix and header.
 
     """
-    # Call calculate_avg_phase to do all the averaging work (eliminates duplication!)
-    avg_phase = calculate_avg_phase(vxyz, bin_hours, bin_offset, minvalperbin)
-
     if len(avg_phase) == 0:
         print('No averaged phase data to write')
-        if bin_hours < 24:
-            return np.empty(shape=[0, 5])
-        else:
-            return np.empty(shape=[0, 4])
+        return
 
     # Extract columns from avg_phase result
     # Columns: [Year, DOY, Phase, PhaseSig, NormAmp, FracYear, Month, Day, [BinStart]]
@@ -1431,13 +1440,6 @@ def write_avg_phase(station, phase, fr, minvalperday, vxyz, subdir, extension=''
             else:
                 fout.write(f" {yr:4.0f} {doy:3.0f} {ph:6.2f} {ph_sig:6.2f} {norm_amp:6.3f} {0.0:5.2f}   {mm:2.0f} {dd:2.0f}\n")
 
-    # Build tv array for backwards compatibility (year, doy, meanph, nvals, [bin_start])
-    if is_subdaily:
-        tv = np.column_stack((years, doys, phases, np.full(len(avg_phase), len(vxyz)), bin_starts))
-    else:
-        tv = np.column_stack((years, doys, phases, np.full(len(avg_phase), len(vxyz))))
-
-    return tv
 
 def apriori_file_exist(station, fr, extension=''):
     """
@@ -2126,15 +2128,15 @@ def old_quad(azim):
     return q
 
 
-def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase, 
-             avg_date,avg_phase,warning_value,ftmp,remove_bad_tracks,k4,avg_exist):
+def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase,
+             avg_date,avg_phase,warning_value,remove_bad_tracks,avg_exist):
     """
     Parameters
     ----------
     satellite : int
         satellite number
     rhtrack: float
-        a priori reflector height 
+        a priori reflector height
     meanaztrack : float
         I think it is the azimuth of the track, degrees
     nvalstrack : int
@@ -2155,61 +2157,50 @@ def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_pha
         average phase, in degrees
     warning_value : float
         phase noise value
-    ftmp : file ID 
-        for writing
     remove_bad_tracks : bool
         whether you write out new tracks with bad ones removed
-    k4 : int
-        number of tracks?
     avg_exist : bool
         whether you have previous solution to compare to
-    
-        
+
+    Returns
+    -------
+    keepit : bool
+        whether this track should be kept
     """
-    # this is a kind of quality control -use previous solution to have 
-    # better feel for whether current solution works. defintely needs to go in a function
-    if avg_exist:
-        # quadrant results for this satellite track
-        satdate = y + t/365.25
-        satphase = new_phase
-        keepit=False
+    if not avg_exist:
+        return True
 
-        # figure out intersection with "good" results
-        inter, id1, id2 = np.intersect1d(avg_date, satdate, return_indices=True)
-        
-        # Check for valid intersection and indices
-        if len(inter) == 0:
-            # No matching dates found - skip QC for this track
-            return k4
-        
-        # Validate indices before accessing arrays
-        if (np.any(id1 >= len(avg_phase)) or np.any(id2 >= len(satphase)) or 
-            np.any(id1 < 0) or np.any(id2 < 0)):
-            # Invalid indices - skip QC for this track  
-            print(f'Warning: QC index mismatch for satellite {satellite}, skipping QC')
-            return k4
-            
-        aa = avg_phase[id1]
-        bb = satphase[id2]
-        if len(aa) > 0:
-            res = np.round(np.std(aa - bb), 2)
-            addit = ''
-            keepit = True
-            if (res > warning_value ) :
-                addit = '>>>>>  Consider Removing This Track <<<<<'
-                if remove_bad_tracks:
-                    addit = '>>>>>  Removing This Track - rerun to see effect <<<<<'
-                    keepit = False
-            if keepit:
-                ftmp.write("{0:3.0f} {1:7.2f} {2:3.0f} {3:7.1f} {4:7.0f} {5:4.0f} {6:4.0f} \n".format(k4,rhtrack, 
-                       satellite,meanaztrack,nvalstrack,amin,amax))
-                k4 = k4 + 1
-                print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} {addit:20s} ")
+    # quadrant results for this satellite track
+    satdate = y + t/365.25
+    satphase = new_phase
 
-    else:
-        print('You do not have a previous solution to compare to so I cannot compute QC stats. Rerun vwc')
+    # figure out intersection with "good" results
+    inter, id1, id2 = np.intersect1d(avg_date, satdate, return_indices=True)
 
-    return k4
+    if len(inter) == 0:
+        return True
+
+    if (np.any(id1 >= len(avg_phase)) or np.any(id2 >= len(satphase)) or
+        np.any(id1 < 0) or np.any(id2 < 0)):
+        print(f'Warning: QC index mismatch for satellite {satellite}, skipping QC')
+        return True
+
+    aa = avg_phase[id1]
+    bb = satphase[id2]
+    if len(aa) == 0:
+        return True
+
+    res = np.round(np.std(aa - bb), 2)
+    addit = ''
+    keepit = True
+    if (res > warning_value ) :
+        addit = '>>>>>  Consider Removing This Track <<<<<'
+        if remove_bad_tracks:
+            addit = '>>>>>  Removing This Track <<<<<'
+            keepit = False
+    print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} {addit:s} ")
+
+    return keepit
 
 def save_vwc_plot(fig, pngfile):
     """

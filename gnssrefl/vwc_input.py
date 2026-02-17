@@ -9,6 +9,7 @@ from pathlib import Path
 from gnssrefl.gps import l2c_l5_list, l1c_list
 from gnssrefl.utils import read_files_in_dir, FileTypes, FileManagement
 import gnssrefl.gnssir_v2 as guts2
+import gnssrefl.phase_functions as qp
 from gnssrefl.phase_functions import get_vwc_frequency
 
 def parse_arguments():
@@ -190,19 +191,8 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     if (len(apriori_array) == 0):
         print('Found no results - perhaps wrong year? or ')
     else:
+        qp.write_apriori_rh(apriori_path_f, apriori_array, station, year, tmin, tmax)
         print('>>>> Apriori RH file written to ', apriori_path_f)
-        fout = open(apriori_path_f, 'w+')
-        fout.write("{0:s}  \n".format('% apriori RH values used for phase estimation'))
-        l = '% year/station ' + str(year) + ' ' + station 
-        fout.write("{0:s}  \n".format(l))
-        fout.write("{0:s}  \n".format('% tmin 0.05 (default)'))
-        fout.write("{0:s}  \n".format('% tmax 0.50 (default)'))
-        fout.write("{0:s}  \n".format('% Track  RefH SatNu MeanAz  Nval   Azimuths '))
-        fout.write("{0:s}  \n".format('%         m   ' ))
-
-    #with open(apriori_path, 'w') as my_file:
-        np.savetxt(fout, apriori_array, fmt="%3.0f %6.3f %4.0f %7.2f   %4.0f  %3.0f  %3.0f")
-        fout.close()
 
     lsp = guts2.read_json_file(station, extension)
 

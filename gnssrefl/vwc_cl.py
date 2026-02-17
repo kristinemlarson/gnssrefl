@@ -4,7 +4,6 @@ import matplotlib.pyplot as matplt
 import numpy as np
 import os
 import scipy
-import subprocess
 import sys
 
 from datetime import datetime, timedelta
@@ -193,12 +192,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     fs =10 # fontsize
     snow_file = None
     colors = 'mrgbcykmrgbcykmrbcykmrgbcykmrgbcykmrbcyk'
-    # plotting indices for phase data
-    by=[0,1,0,1]; bx=[0,0,1,1]
-    # azimuth list, starting point only (i.e. 270 means 270 thru 360)
-    azlist = [270, 0, 180,90 ]
+    # azimuth list in natural order (matches vwc_input output)
+    azlist = [0, 90, 180, 270]
     # consistency with old adv vegetation code
-    oldquads = [2, 1, 3, 4] # number system from pboh2o, only used for
+    oldquads = [1, 4, 3, 2] # number system from pboh2o, only used for
+    # plotting indices: NE=top-right, SE=bot-right, SW=bot-left, NW=top-left
+    bx=[0,1,1,0]; by=[1,1,0,0]
 
     # Default frequency selection logic (from json if none supplied by command line)
     fr_list = qp.get_vwc_frequency(station, extension, fr)
@@ -315,14 +314,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     
     # checking each geographic quadrant
     k4 = 1
-    # two list of tracks - lets you compare an old run with a new run as a form of QC
-    newlist = f'{station}_tmp.txt'
+    good_tracks = []
     file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
     oldlist = file_manager.get_file_path()
-
-    ftmp = open(newlist,'w+')
-    ftmp.write("{0:s} \n".format( '% station ' + station) )
-    ftmp.write("{0:s} \n".format( '% TrackN  RefH SatNu MeanAz  Nval  Azimuths'))
     # open up a figure for the phase results by quadrant
     fig,ax = matplt.subplots(2, 2, figsize=(10,10))
     matplt.suptitle(f"Phase by Azimuth Quadrant: {station}", size=12)
@@ -435,9 +429,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
                     # this is a kind of quality control -use previous solution to have 
                     # better feel for whether current solution works. defintely needs to go in a function
 
-                    if (len(newl) > reqNumpts): 
-                        k4= qp.kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase, 
-                                         avg_date,avg_phase,warning_value,ftmp,remove_bad_tracks,k4,avg_exist )
+                    if (len(newl) > reqNumpts):
+                        keepit = qp.kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase,
+                                         avg_date,avg_phase,warning_value,remove_bad_tracks,avg_exist )
+                        if keepit:
+                            good_tracks.append([k4, rhtrack, satellite, meanaztrack, nvalstrack, amin, amax])
+                            k4 += 1
                     else:
                         print('No previous solution or not enough points for this satellite.', int(satellite), amin, amax,len(newl))
 
@@ -496,13 +493,9 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
             if sat_legend and (ww > 0):
                 ax2[bx[index],by[index]].legend(loc='upper right',fontsize=fs-2)
 
-    ftmp.close()
-
-    if remove_bad_tracks:
+    if remove_bad_tracks and avg_exist:
         print('Writing out a new list of good satellite tracks to ', oldlist)
-        subprocess.call(['mv','-f', newlist, oldlist])
-    else:
-        subprocess.call(['rm','-f', newlist ])
+        qp.write_apriori_rh(oldlist, good_tracks, station, year, tmin, tmax)
 
     # Generate azimuth plot filename with temporal suffix
     suffix = qp.get_temporal_suffix(freq, bin_hours, bin_offset)
@@ -519,9 +512,15 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         if advanced:
             matplt.close(fig2)
 
+    # Calculate averaged phase once (used by plot and file output)
+    avg_phase = qp.calculate_avg_phase(vxyz, bin_hours, bin_offset, minvalperbin)
+
     # Plot averaged phase data, from before vegetation correction
     if plt:
         qp.subdaily_phase_plot(station, fr, vxyz, xdir, subdir_path, hires_figs, bin_hours, bin_offset, minvalperbin, plt2screen=plt)
+
+    # Write averaged phase file for QC on subsequent runs (needed by auto_removal)
+    qp.write_avg_phase(station, fr, avg_phase, extension, bin_hours, bin_offset)
 
     # Write all_phase.txt file if requested
     if save_tracks:
