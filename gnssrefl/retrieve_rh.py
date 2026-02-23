@@ -7,7 +7,6 @@ import sys
 
 import gnssrefl.gnssir_v2 as guts
 import gnssrefl.gps as g
-from gnssrefl.extract_arcs import move_arc_to_failqc
 from gnssrefl.utils import FileManagement, check_arc_quality, format_qc_summary
 
 def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,logfilename,dbhz):
@@ -142,6 +141,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                     guts.local_update_plot(x,y,px,pz,ax1,ax2,failed)
             finally:
                 if not arc_passed and savearcs:
+                    from gnssrefl.extract_arcs import move_arc_to_failqc
                     move_arc_to_failqc(meta, station, year, doy, extension)
 
         qc_line = format_qc_summary(f, n_total, qc_counts, good_arcs)
