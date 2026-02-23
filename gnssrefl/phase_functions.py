@@ -581,11 +581,17 @@ def write_apriori_rh(filepath, tracks, station, year, tmin, tmax):
     """
     Write apriori RH track list file. Used by both vwc_input and vwc auto_removal.
 
+    A track is defined by satellite number and the azimuth at minimum elevation
+    angle (az_min_ele) of each arc. Arcs are clustered into tracks when their
+    az_min_ele values fall within 3 degrees of the cluster center. The track's
+    mean azimuth (track_avg_az) is the circular mean of az_min_ele over e.g. a
+    year of arcs in the cluster.
+
     Parameters
     ----------
     filepath : path-like
     tracks : list
-        each element is [track_num, rh, satellite, mean_az, nvals, az_min, az_max]
+        each element is [track_num, rh, satellite, track_avg_az, nvals, az_min, az_max]
     station : str
     year : int
     tmin : float
@@ -593,7 +599,7 @@ def write_apriori_rh(filepath, tracks, station, year, tmin, tmax):
     tmax : float
         maximum soil texture (header metadata only)
     """
-    # sort by mean azimuth and renumber
+    # sort by track average azimuth and renumber
     tracks = [[i+1] + t[1:] for i, t in enumerate(sorted(tracks, key=lambda t: t[3]))]
 
     with open(filepath, 'w') as f:
@@ -2053,31 +2059,23 @@ def old_quad(azim):
     return q
 
 
-def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_phase,
-             avg_date,avg_phase,warning_value,remove_bad_tracks,avg_exist):
+def kinda_qc(satellite, track_avg_az, y, t, new_phase,
+             avg_date, avg_phase, warning_value, remove_bad_tracks, avg_exist):
     """
     Parameters
     ----------
     satellite : int
         satellite number
-    rhtrack: float
-        a priori reflector height
-    meanaztrack : float
-        I think it is the azimuth of the track, degrees
-    nvalstrack : int
-        not sure?
-    amin : int
-        min az of this quadrant
-    amax : int
-        max az of this quadrant
+    track_avg_az : float
+        yearly average azimuth of the track, degrees
     y : numpy array of ints
         year
     t : numpy array of ints
         day of year
     new_phase : numpy array of floats
-        phase values for a given satellite track ??
+        phase values for a given satellite track
     avg_date : numpy array of floats
-        y + doy/365.25 I think
+        y + doy/365.25
     avg_phase : numpy array of floats
         average phase, in degrees
     warning_value : float
@@ -2095,7 +2093,7 @@ def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_pha
     if not avg_exist:
         return True
 
-    # quadrant results for this satellite track
+    # results for this satellite track
     satdate = y + t/365.25
     satphase = new_phase
 
@@ -2123,7 +2121,7 @@ def kinda_qc(satellite, rhtrack,meanaztrack,nvalstrack, amin,amax, y, t, new_pha
         if remove_bad_tracks:
             addit = '>>>>>  Removing This Track <<<<<'
             keepit = False
-    print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} Azims {amin:3.0f} {amax:3.0f} {addit:s} ")
+    print(f"Npts {len(aa):4.0f} SatNu {satellite:2.0f} Residual {res:6.2f} AvgAz {track_avg_az:5.1f} {addit:s} ")
 
     return keepit
 
@@ -2311,7 +2309,7 @@ def write_phase_for_advanced(filename, vxyz):
     #headers for output file - these are not correct BTW
     print('Writing interim file for advanced vegetation model ', filename)
     h0 = "File created by vwc function write_phase_for_advanced \n"
-    h1 = "Year DOY Phase  Azim Sat    RH    nLSPA nLSA    Hour   LSPA   LS  apRH  quad  delRH  vegM  MJD \n"
+    h1 = "Year DOY Phase  Azim Sat    RH    nLSPA nLSA    Hour   LSPA   LS  apRH  avgAz  delRH  vegM  MJD \n"
     h2 = "(1)  (2)  (3)   (4)  (5)    (6)    (7)   (8)     (9)   (10)  (11)  (12)  (13)  (14)  (15)  (16)"
     #2012   1   9.19  315.6  1   1.850   0.97   0.98  0.59 19.80 19.79  1.85  2
     with open(filename, 'w') as my_file:
