@@ -743,7 +743,7 @@ def extract_arcs(
                         filtered_azi = arc_azi[e_mask]
                         arc_azim = circular_mean_deg(filtered_azi)
 
-                        if not _check_azimuth_compliance(arc_azim, azlist):
+                        if not check_azimuth_compliance(arc_azim, azlist):
                             if screenstats:
                                 print(f"Azimuth {arc_azim:.2f} not in requested region")
                             continue
@@ -870,13 +870,13 @@ def _get_snr_column(freq: int) -> int:
         raise ValueError(f"Unrecognized frequency code: {freq}")
 
 
-def _check_azimuth_compliance(init_azim: float, azlist: List[float]) -> bool:
+def check_azimuth_compliance(az_min_ele: float, azlist: List[float]) -> bool:
     """
     Check if azimuth is within allowed regions.
 
     Parameters
     ----------
-    init_azim : float
+    az_min_ele : float
         Azimuth angle (degrees) at the lowest elevation point of the arc
     azlist : list of float
         Azimuth regions as pairs [az1_start, az1_end, az2_start, az2_end, ...]
@@ -891,7 +891,7 @@ def _check_azimuth_compliance(init_azim: float, azlist: List[float]) -> bool:
     for a in range(N):
         azim1 = azlist[2 * a]
         azim2 = azlist[2 * a + 1]
-        if (init_azim >= azim1) and (init_azim <= azim2):
+        if (az_min_ele >= azim1) and (az_min_ele <= azim2):
             return True
     return False
 
@@ -1071,7 +1071,7 @@ def _compute_arc_metadata(
 
     # Get index of minimum elevation angle
     ie = np.argmin(ele)
-    init_azim = azi[ie]
+    az_min_ele = azi[ie]
 
     # Compute edot factor (from window_new lines 975-987)
     # edot in radians/sec
@@ -1095,7 +1095,7 @@ def _compute_arc_metadata(
         'arc_type': arc_type,
         'ele_start': float(np.min(ele)),
         'ele_end': float(np.max(ele)),
-        'az_min_ele': float(init_azim),
+        'az_min_ele': float(az_min_ele),
         'az_avg': float(circular_mean_deg(azi)),
         'time_start': float(np.min(seconds)),
         'time_end': float(np.max(seconds)),

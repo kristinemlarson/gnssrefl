@@ -696,13 +696,13 @@ def rewrite_azel(azval2):
     #print('Using azimuths: ', azelout)
     return azelout
 
-def check_azim_compliance(initA,azlist):
+def check_azim_compliance(az_min_ele,azlist):
     """
     Check to see if your arc is in one of the requested regions
 
     Parameters
     ----------
-    initA : float
+    az_min_ele : float
         azimuth of selected arc (deg)
     azlist : list of floats
         list of acceptable azimuth regions
@@ -716,7 +716,7 @@ def check_azim_compliance(initA,azlist):
     N = int(len(azlist)/2)
     for a in range(0,N):
         azim1 = azlist[2*a]; azim2 = azlist[2*a+1]
-        if (initA>= azim1) & (initA <= azim2):
+        if (az_min_ele>= azim1) & (az_min_ele <= azim2):
             keeparc = True
             #print('found one in requested region', azim1, azim2)
 
