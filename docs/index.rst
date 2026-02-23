@@ -26,6 +26,7 @@ using a locally installed python version, python version 3.9 is required.
    pages/first_drivethru.md
    pages/contributions_questions.md
    pages/new_station.md
+   pages/extract_arcs.md
    api
 
 .. note::
