@@ -55,6 +55,7 @@ class FileTypes(str, Enum):
     make_json = "make_json"
     phase_file = "phase_file"
     volumetric_water_content = "volumetric_water_content"
+    gnssir_result = "gnssir_result"
     arcs_directory = "arcs_directory"
     directory = "directory"
 
@@ -121,6 +122,11 @@ class FileManagement:
                 if self.extension:
                     phase_path = phase_path / self.extension
                 files[FileTypes.phase_file] = phase_path / f'{self.doy:03d}.txt'
+
+                result_path = self.xdir / str(self.year) / 'results' / str(self.station)
+                if self.extension:
+                    result_path = result_path / self.extension
+                files[FileTypes.gnssir_result] = result_path / f'{self.doy:03d}.txt'
 
             file_path = files[self.file_type]
             
