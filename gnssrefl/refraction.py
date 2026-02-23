@@ -1339,3 +1339,127 @@ def asknewet(e, Tm, lambda_val):
 
     return zwd
 
+
+def correct_elevations(ele, lsp, year, doy):
+    """Apply refraction correction to elevation angles.
+
+    Reads the GPT2 grid for the station location, computes atmospheric
+    parameters, and dispatches to the selected refraction model (Bennett,
+    Ulich, NITE, or MPF).  Models 5 and 6 (NITE/MPF) remove observations
+    below 1.5 degrees elevation where the correction diverges.
+
+    Parameters
+    ----------
+    ele : numpy array of floats
+        elevation angles in degrees
+    lsp : dict
+        station analysis parameters (from json).  Required keys:
+        station, lat, lon, ht, refraction.  Optional: refr_model,
+        apriori_rh.
+    year : int
+        calendar year
+    doy : int
+        day of year
+
+    Returns
+    -------
+    corrected_ele : numpy array of floats
+        refraction-corrected elevation angles in degrees
+    valid_mask : numpy array of bools
+        True for each element that survived filtering (some models
+        remove low-elevation data).  Has same length as the *input*
+        ``ele``.
+    """
+    year = int(year)
+    doy = int(doy)
+    valid_mask = np.ones(len(ele), dtype=bool)
+
+    if not lsp.get('refraction', False):
+        return ele.copy(), valid_mask
+
+    station = lsp['station']
+    lat = lsp['lat']
+    lon = lsp['lon']
+    ht = lsp['ht']
+    refraction_model = lsp.get('refr_model', 1)
+
+    # Compute MJD
+    d = g.doy2ymd(year, doy)
+    dmjd, _ = g.mjd(year, d.month, d.day, 0, 0, 0)
+
+    # Ensure GPT2 grid file exists
+    xdir = os.environ['REFL_CODE']
+    readWrite_gpt2_1w(xdir, station, lat, lon)
+
+    # Time-varying for models 2, 4, 5, 6
+    it = 0 if refraction_model in [2, 4, 5, 6] else 1
+    dlat = lat * np.pi / 180
+    dlong = lon * np.pi / 180
+    p, T, dT, Tm, humidity, ah, aw, la, undu = gpt2_1w(
+        station, dmjd, dlat, dlong, ht, it,
+    )
+
+    print('Refraction parameters (pressure, temp, humidity, ModelNum)',
+          np.round(p, 3), np.round(T, 3), np.round(humidity, 3), refraction_model)
+
+    # Bennett (models 1, 2)
+    if refraction_model in [1, 2]:
+        if refraction_model == 1:
+            print('Standard Bennett refraction correction')
+        else:
+            print('Standard Bennett refraction correction, time-varying')
+        corrected = corr_el_angles(ele, p, T)
+        return corrected, valid_mask
+
+    # Ulich (models 3, 4)
+    TempK = T + 273.15
+    vapor = humidity
+    pressure = p
+    N_ant = refrc_Rueger(pressure - vapor, vapor, TempK)[0]
+
+    if refraction_model in [3, 4]:
+        if refraction_model == 3:
+            print('Ulich refraction correction')
+        else:
+            print('Ulich refraction correction, time-varying')
+        corrected = Ulich_Bending_Angle(
+            ele, N_ant, lsp, p, T, np.zeros_like(ele), np.zeros_like(ele),
+        )
+        return corrected, valid_mask
+
+    # NITE (5) and MPF (6) — need mapping functions and zenith delays
+    RH_apriori = lsp.get('apriori_rh', 5)
+    lat1R = np.radians(lat)
+    lon1R = np.radians(lon)
+
+    zhd = saastam2(pressure, lat, ht)
+    zwd = asknewet(humidity, Tm, la)
+    print('Dry and wet zenith delays, meters ', round(zhd, 3), round(zwd, 3))
+
+    # Remove ele < 1.5 (NITE/MPF blow up there)
+    valid_mask = ele > 1.5
+    ele_filt = ele[valid_mask]
+
+    zenithA = 0.5 * np.pi - np.radians(ele_filt)
+    gmf_h, dgmf_h, gmf_w, dgmf_w = gmf_deriv(
+        dmjd, lat1R, lon1R, ht, zenithA,
+    )
+    mpf_val = mpf_tot(gmf_h, gmf_w, zhd, zwd)
+    dmpf_val = mpf_tot(dgmf_h, dgmf_w, zhd, zwd)
+
+    if refraction_model == 5:
+        print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
+        dE = Equivalent_Angle_Corr_NITE(
+            RH_apriori, ele_filt, N_ant,
+            zhd + zwd, mpf_val, dmpf_val,
+        )
+    else:  # 6
+        print('MPF refraction correction, Wiliams and Nievinski')
+        dE = Equivalent_Angle_Corr_mpf(
+            ele_filt, mpf_val, N_ant, RH_apriori,
+        )
+
+    corrected = ele.copy()
+    corrected[valid_mask] = ele_filt + dE
+    return corrected, valid_mask
+

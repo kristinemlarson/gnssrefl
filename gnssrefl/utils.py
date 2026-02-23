@@ -473,6 +473,72 @@ def read_files_in_dir(directory, transpose=False):
     else:
         raise ValueError(f"path is not absolute. Please provide an absolute path: {dir_path}")
 
+QC_FILTER_ORDER = ['track', 'ediff', 'L2C/L5', 'tooclose', 'noise', 'amp', 'pk2noise', 'delT']
+
+
+def circular_mean_deg(angles):
+    """Circular mean of angles in degrees, handling the 0/360 wrap correctly."""
+    rad = np.deg2rad(angles)
+    return np.rad2deg(np.arctan2(np.mean(np.sin(rad)), np.mean(np.cos(rad)))) % 360
+
+
+def circular_distance_deg(a, b):
+    """Shortest angular distance between two azimuths in degrees.
+
+    Works with scalars and numpy arrays (via broadcasting).
+    """
+    d = np.abs(a - b) % 360
+    return np.minimum(d, 360 - d)
+
+
+def check_arc_quality(meta, peak_rh, max_amp, noise, lsp):
+    """Apply QC filters to a single arc. Returns (passed, fail_reason)."""
+    e1 = lsp['e1']; e2 = lsp['e2']
+    ediff = lsp['ediff']
+    min_height = lsp['minH']; max_height = lsp['maxH']
+    pk_noise = lsp['PkNoise']; del_t_max = lsp['delTmax']
+    try:
+        req_amp = lsp['reqAmp'][lsp['freqs'].index(meta['freq'])]
+    except (ValueError, IndexError):
+        req_amp = lsp['reqAmp'][0]
+
+    if (meta['ele_start'] - e1) > ediff:
+        return False, 'ediff'
+    if (meta['ele_end'] - e2) < -ediff:
+        return False, 'ediff'
+
+    if (peak_rh == 0) and (max_amp == 0):
+        return False, 'tooclose'
+    if abs(peak_rh - min_height) < 0.10:
+        return False, 'tooclose'
+    if abs(peak_rh - max_height) < 0.10:
+        return False, 'tooclose'
+
+    if noise <= 0:
+        return False, 'noise'
+    if max_amp <= req_amp:
+        return False, 'amp'
+    if max_amp / noise <= pk_noise:
+        return False, 'pk2noise'
+    if meta['delT'] >= del_t_max:
+        return False, 'delT'
+
+    return True, None
+
+
+def format_qc_summary(freq, n_total, qc_counts, n_saved):
+    """Build condensed QC summary showing only filters that rejected arcs."""
+    parts = [f'Freq {freq} quality control: {n_total} arcs']
+    running = n_total
+    for name in QC_FILTER_ORDER:
+        n_rejected = qc_counts.get(name, 0)
+        if n_rejected > 0:
+            running -= n_rejected
+            parts.append(f'{name} {running}')
+    parts.append(f'{n_saved} saved')
+    return ' -> '.join(parts)
+
+
 def check_environment():
     try:
         os.environ['ORBITS']
