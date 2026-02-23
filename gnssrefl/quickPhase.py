@@ -27,12 +27,17 @@ def parse_arguments():
     parser.add_argument("-screenstats", default=None, type=str, help="stats come to the screen")
     parser.add_argument("-gzip", default=None, type=str, help="gzip SNR files after use, default is True" )
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
-    parser.add_argument("-midnite", default=None, type=str, help="allow midnite crossings (default is false)")
+    parser.add_argument("-midnite", default=None, type=str, help="load adjacent day data for midnight-crossing arcs (default is true)")
+    parser.add_argument("-ampl", default=None, type=float, help="Min spectral amplitude")
+    parser.add_argument("-savearcs", default=None, type=str, help="save individual arcs, default is False")
+    parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs (txt or pickle), default is txt")
+    parser.add_argument("-dec", default=None, type=int, help="decimate SNR data to this sampling rate")
+    parser.add_argument("-dbhz", default=None, type=str, help="keep SNR in dB-Hz units (default is false)")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'screenstats', 'gzip', 'midnite']
+    boolean_args = ['plt', 'screenstats', 'gzip', 'midnite', 'savearcs', 'dbhz']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -40,17 +45,17 @@ def parse_arguments():
 
 
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66,
-        fr: str = None, e1: float = 5, e2: float = 30, plt: bool = False, screenstats: bool = False, gzip: bool = True, extension: str = '', par: int = None, midnite: bool = False):
+        fr: str = None, e1: float = None, e2: float = None, plt: bool = False, screenstats: bool = False, gzip: bool = True, extension: str = '', par: int = None, midnite: bool = True, ampl: float = None, savearcs: bool = False, savearcs_format: str = None, dec: int = None, dbhz: bool = None):
     """
     quickphase computes phase, which are subquently used in vwc. The command line call is phase
     (which maybe we should change).
-    
+
     Examples
     --------
     phase p038 2021 4
         analyzes data for year 2021 and day of year 4
 
-    phase p038 2021 1 -doy_end 365 
+    phase p038 2021 1 -doy_end 365
         analyzes data for the whole year
 
     phase p038 2021 1 -doy_end 365 -par 5
@@ -79,16 +84,16 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
             99 : data with elevation angles between 5 and 30 degrees
 
-            88 : data with all elevation angles 
+            88 : data with all elevation angles
 
             50 : data with elevation angles less than 10 degrees
 
     fr : str, optional
         GNSS frequency. Currently only supports L2C. Default is 20 (l2c)
     e1 : float, optional
-        Elevation angle lower limit in degrees for the LSP. default is 5
+        Elevation angle lower limit in degrees for the LSP. default is from json (typically 5)
     e2: float, optional
-        Elevation angle upper limit in degrees for the LSP. default is 30
+        Elevation angle upper limit in degrees for the LSP. default is from json (typically 25)
     plt: bool, optional
         Whether to plot results. Default is False
     screenstats: bool, optional
@@ -98,7 +103,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     par : int, optional
         Number of parallel processes to spawn (up to 10). Default is 1 (single process).
     midnite : bool, optional
-        Allow midnight crossings. When True, loads +/- 2 hours from adjacent days. Default is False.
+        Allow midnight crossings. When True, loads +/- 2 hours from adjacent days. Default is True.
 
     Returns
     -------
@@ -109,7 +114,6 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     """
 
-    compute_lsp = True # used to be an optional input
     if len(station) != 4:
         print('Station name must be four characters long. Exiting.')
         sys.exit()
@@ -127,7 +131,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     # in case you want to analyze multiple days of data
     if not doy_end:
         doy_end = doy
-    
+
     # in case you want to analyze only data within one year
     if not year_end:
         year_end = year
@@ -137,42 +141,55 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     if exitS:
         sys.exit()
 
-    g.result_directories(station, year, '')
-
-    # this should really be read from the json
-    pele = [5, 30]  # polynomial fit limits  for direct signal
+    # Read station json and apply CLI overrides (same pattern as gnssir_cl.py)
+    lsp = guts2.read_json_file(station, extension)
+    if e1 is not None:
+        lsp['e1'] = e1
+    if e2 is not None:
+        lsp['e2'] = e2
+    if ampl is not None:
+        lsp['reqAmp'] = [ampl]
+    lsp['screenstats'] = screenstats
+    lsp['midnite'] = midnite
+    lsp['gzip'] = gzip
+    lsp['savearcs'] = savearcs
+    if savearcs_format is not None:
+        lsp['savearcs_format'] = savearcs_format
+    if dec is not None:
+        lsp['dec'] = dec
+    if dbhz is not None:
+        lsp['dbhz'] = dbhz
 
     # Set up timing and parallel processing
     t1 = time.time()
-    
+
     # Set default for par and validate
     if isinstance(par, type(None)):
         par = 1
-    
+
     if not isinstance(par, int) or par <= 0 or par > 10:
         print('Number of processes must be between 1 and 10. Submit again. Exiting.')
         sys.exit()
-    
+
     # Check for single day processing
     if (year == year_end) and (doy == doy_end):
         if par > 1:
             print('You are analyzing only one day of data - no reason to submit multiple processes')
             par = 1
-    
+
     # Create args for worker function
     args = {
-        'station': station, 'snr': snr, 'fr_list': fr_list, 'e1': e1, 'e2': e2,
-        'pele': pele, 'plt': plt, 'screenstats': screenstats, 'compute_lsp': compute_lsp,
-        'gzip': gzip, 'extension': extension, 'midnite': midnite
+        'station': station, 'snr': snr, 'fr_list': fr_list,
+        'lsp': lsp, 'extension': extension,
     }
-    
+
     if par == 1:
         print('Sequential processing')
         process_phase_sequential(year, year_end, doy, doy_end, args)
     else:
         print('Parallel processing chosen')
         process_phase_parallel(year, year_end, doy, doy_end, args, par)
-    
+
     t2 = time.time()
     print('Time to compute: ', round(t2-t1, 2), ' seconds')
 
@@ -182,9 +199,7 @@ def process_phase_day(year, doy, args, error_queue=None):
     try:
         print(f'Analyzing year/day of year {year}/{doy}')
         qp.phase_tracks(args['station'], year, doy, args['snr'], args['fr_list'],
-                       args['e1'], args['e2'], args['pele'], args['plt'],
-                       args['screenstats'], args['compute_lsp'], args['gzip'], args['extension'],
-                       args['midnite'])
+                       args['lsp'], args['extension'])
     except Exception as e:
         if error_queue:
             print('***********************************************************************')
@@ -220,12 +235,12 @@ def process_phase_parallel(year, year_end, doy, doy_end, args, par):
     """Parallel processing setup and execution"""
     manager = multiprocessing.Manager()
     error_queue = manager.Queue()
-    
+
     numproc = par
     print(year, doy, year_end, doy_end)
     # Get date ranges for parallel processing
     d, numproc = guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
-    
+
     # Create list of (year, doy, args, error_queue) for each day to process
     day_list = []
     for index in range(numproc):
@@ -234,12 +249,12 @@ def process_phase_parallel(year, year_end, doy, doy_end, args, par):
         for MJD in range(d1, d2+1):
             year_mjd, doy_mjd = g.modjul_to_ydoy(MJD)
             day_list.append((year_mjd, doy_mjd, args, error_queue))
-    
+
     pool = multiprocessing.Pool(processes=numproc)
     pool.starmap(process_phase_day, day_list)
     pool.close()
     pool.join()
-    
+
     # Check for errors
     if not error_queue.empty():
         print("One (or more) of the processes encountered errors. Will not proceed until errors are fixed.")
