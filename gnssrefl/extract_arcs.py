@@ -288,11 +288,10 @@ def _get_arc_filename(sdir, sat, freq, az_min_ele, arc_timestamp):
         constell = 'C'; fout = freq - 300
     cf = '_L2_' if freq == 20 else f'_L{fout}_'
     cf += constell
-    cazim = f'az{round(az_min_ele):03d}'
     hh = int(arc_timestamp) % 24
     mm = int((arc_timestamp % 1) * 60)
     ctime = f'{hh:02d}{mm:02d}z'
-    return f'{sdir}sat{csat}{cf}{cazim}_{ctime}.txt'
+    return f'{sdir}sat{csat}{cf}_az{round(az_min_ele):03d}_{ctime}.txt'
 
 
 def _write_arc_file(fname, data, meta, station, year, doy, savearcs_format='txt'):
