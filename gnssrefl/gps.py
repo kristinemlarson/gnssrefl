@@ -1507,24 +1507,22 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
 
     return ofac, hifac
 
-def strip_compute(x,y,cf,maxH,desiredP,pfitV,minH):
+def strip_compute(x,y,cf,maxH,desiredP,minH):
     """
     strips snr data
 
     Parameters
     -----------
-    x : numpy array 
+    x : numpy array
         elevation angles in degrees
     y : numpy array
-        SNR data 
+        SNR data
     cf : float
         scale factor for given frequency
     maxH : float
         maximum reflector height in meters
     desiredP : float
         precision of Lomb Scargle in meters
-    pfitV : integer
-        polynomial order for DC model
     minH : float
         minimum reflector height in meters
 

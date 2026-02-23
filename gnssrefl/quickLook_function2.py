@@ -245,7 +245,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
                         tooclose = False
                         if (delT != 0) & (Nv > 20):
                             T = g.nicerTime(UTCtime)
-                            maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,desiredP,polyV,minH)
+                            maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz= g.strip_compute(x,y,cf,maxH,desiredP,minH)
                             if (maxF ==0) & (maxAmp == 0):
                                 tooclose == True; Noise = 1; iAzim = 0;
                             else:

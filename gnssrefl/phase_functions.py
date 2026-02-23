@@ -935,7 +935,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, e1, e2, pele, plot, scre
                         min_height = 0.5 ; max_height = 8 ; desired_p = 0.01
 
                         max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(x, y, cf, max_height,
-                                                                                           desired_p, poly_v, min_height)
+                                                                                           desired_p, min_height)
 
                         nij = pz[(px > noise_region[0]) & (px < noise_region[1])]
                         noise = 0
