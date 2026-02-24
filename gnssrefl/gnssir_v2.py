@@ -160,6 +160,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             buffer_hours=buffer_hours, dec=dec,
             e1=e1, e2=e2, ellist=ellist, azlist=azvalues,
             polyV=lsp['polyV'], pele=pele, dbhz=lsp['dbhz'],
+            extension=extension,
             gzip=gzip, lsp=lsp,
             sat_list=lsp['onesat'],
         )

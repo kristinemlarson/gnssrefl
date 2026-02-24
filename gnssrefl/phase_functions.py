@@ -776,6 +776,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                 azlist=azvalues,
                 screenstats=screenstats,
                 buffer_hours=buffer_hours,
+                extension=extension,
                 lsp=lsp, gzip=gzip,
                 dbhz=dbhz,
                 dec=dec,
