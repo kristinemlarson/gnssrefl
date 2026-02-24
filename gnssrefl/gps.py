@@ -2298,9 +2298,9 @@ def ydoy2mjd(year,doy):
     mjd : float
         modified julian day
     """
-    yy,mm,dd, cyyyy, cdoy, YMD = ydoy2useful(year,doy)
+    d = datetime.datetime(year, 1, 1) + datetime.timedelta(days=(doy-1))
 
-    mjd = getMJD(year,mm,dd,0)
+    mjd = getMJD(d.year, d.month, d.day, 0)
 
     return mjd
 
