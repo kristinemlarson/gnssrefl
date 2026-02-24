@@ -308,7 +308,7 @@ def _write_arc_file(fname, data, meta, station, year, doy, savearcs_format='txt'
                    comments='%', header=headerline)
     else:
         import pickle
-        d = g.doy2ymd(year, doy)
+        d = g.doy2ymd(int(year), int(doy))
         MJD = g.getMJD(year, d.month, d.day, meta['arc_timestamp'])
         docstring = ('arrays are eangles (degrees), dsnrData is SNR '
                      'with/DC removed, and sec (seconds of the day),\n')
