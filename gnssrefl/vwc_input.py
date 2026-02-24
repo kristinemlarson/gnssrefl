@@ -3,11 +3,12 @@ import json
 import numpy as np
 import os
 import sys
+from scipy.stats import skew, kurtosis as scipy_kurtosis
 
 from pathlib import Path
 
 from gnssrefl.gps import l2c_l5_list, l1c_list
-from gnssrefl.utils import read_files_in_dir, FileTypes, FileManagement
+from gnssrefl.utils import read_files_in_dir, FileTypes, FileManagement, circular_mean_deg, circular_distance_deg
 import gnssrefl.gnssir_v2 as guts2
 import gnssrefl.phase_functions as qp
 from gnssrefl.phase_functions import get_vwc_frequency
@@ -132,9 +133,6 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     gnssir_results = np.transpose(gnssir_results) 
 
 
-    # four quadrants
-    azimuth_list = [0, 90, 180, 270]
-
     # get the satellites for the requested frequency and most recent year
     if (fr == 1):
         l1_satellite_list = np.arange(1,33)
@@ -163,24 +161,33 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     satellite_gnssir_results = gnssir_results[3][frequency_indices]
     azimuth_gnssir_results = gnssir_results[5][frequency_indices]
 
-    b=0
+    b = 0
 
     apriori_array = []
-    for azimuth in azimuth_list:
-        azimuth_min = azimuth
-        azimuth_max = azimuth + 90
-        for satellite in satellite_list:
-            reflector_heights = reflector_height_gnssir_results[(azimuth_gnssir_results > azimuth_min)
-                                                                & (azimuth_gnssir_results < azimuth_max)
-                                                                & (satellite_gnssir_results == satellite)]
-            azimuths = azimuth_gnssir_results[(azimuth_gnssir_results > azimuth_min)
-                                              & (azimuth_gnssir_results < azimuth_max)
-                                              & (satellite_gnssir_results == satellite)]
-            if (len(reflector_heights) > min_tracks):
-                b = b+1
-                average_azimuth = np.mean(azimuths)
-                #print("{0:3.0f} {1:5.2f} {2:2.0f} {3:7.2f} {4:3.0f} {5:3.0f} {6:3.0f} ".format(b, np.mean(reflector_heights), satellite, average_azimuth, len(reflector_heights),azimuth_min,azimuth_max))
-                apriori_array.append([b, np.mean(reflector_heights), satellite, average_azimuth, len(reflector_heights), azimuth_min, azimuth_max])
+    for satellite in satellite_list:
+        sat_mask = satellite_gnssir_results == satellite
+        sat_azimuths = azimuth_gnssir_results[sat_mask]
+        if len(sat_azimuths) == 0:
+            continue
+        clusters = define_track_clusters(sat_azimuths)
+        for cluster in clusters:
+            track_avg_az = circular_mean_deg(cluster)
+            mask = sat_mask & (circular_distance_deg(azimuth_gnssir_results, track_avg_az) <= 3)
+            reflector_heights = reflector_height_gnssir_results[mask]
+            azimuths = azimuth_gnssir_results[mask]
+            if len(reflector_heights) > min_tracks:
+                # Exclude bimodal RH distributions (high BC + low kurtosis)
+                kurt = scipy_kurtosis(reflector_heights, fisher=False)
+                bc = (skew(reflector_heights)**2 + 1) / kurt if kurt > 0 else 0
+                if bc > 0.9 and kurt < 3:
+                    print(f'  Excluding bimodal track: sat {satellite:2.0f} avgAz {track_avg_az:5.1f} (BC={bc:.3f}, n={len(reflector_heights)})')
+                    continue
+
+                b = b + 1
+                average_azimuth = circular_mean_deg(azimuths)
+                az_min = (average_azimuth - 3) % 360
+                az_max = (average_azimuth + 3) % 360
+                apriori_array.append([b, np.mean(reflector_heights), satellite, average_azimuth, len(reflector_heights), az_min, az_max])
 
     # Use FileManagement with frequency and extension support
     file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
@@ -189,7 +196,8 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     # save file
 
     if (len(apriori_array) == 0):
-        print('Found no results - perhaps wrong year? or ')
+        print('Found no results - perhaps wrong year?')
+        sys.exit()
     else:
         qp.write_apriori_rh(apriori_path_f, apriori_array, station, year, tmin, tmax)
         print('>>>> Apriori RH file written to ', apriori_path_f)
@@ -219,6 +227,58 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
 
     with open(json_path, 'w+') as outfile:
         json.dump(lsp, outfile, indent=4)
+
+
+def define_track_clusters(azimuths, gap_threshold=10):
+    """Define satellite track clusters from observed azimuths.
+
+    Groups azimuths into distinct tracks by sorting them on the circle,
+    finding the largest gap (natural break), then splitting at any gap
+    exceeding the threshold. Handles 0/360 wrap.
+
+    Parameters
+    ----------
+    azimuths : array-like
+        Observed azimuth values in degrees for a single satellite
+    gap_threshold : float
+        Minimum azimuth gap in degrees to split into separate tracks. Default 10.
+
+    Returns
+    -------
+    list of numpy arrays
+        Each array contains the azimuths belonging to one track.
+    """
+    az = np.sort(np.asarray(azimuths, dtype=float) % 360)
+    n = len(az)
+    if n == 0:
+        return []
+    if n == 1:
+        return [az]
+
+    # Compute gaps between consecutive sorted values (including wrap-around)
+    gaps = np.empty(n)
+    gaps[:-1] = np.diff(az)
+    gaps[-1] = (az[0] + 360) - az[-1]
+
+    # Reorder starting after the largest gap (natural circle break)
+    start = (np.argmax(gaps) + 1) % n
+    ordered_az = np.roll(az, -start)
+
+    # Compute gaps in the reordered sequence, handling wrap
+    ordered_gaps = np.diff(ordered_az)
+    ordered_gaps[ordered_gaps < 0] += 360
+
+    # Split at gaps exceeding threshold
+    clusters = []
+    current = [ordered_az[0]]
+    for i in range(1, n):
+        if ordered_gaps[i - 1] > gap_threshold:
+            clusters.append(np.array(current))
+            current = []
+        current.append(ordered_az[i])
+    clusters.append(np.array(current))
+
+    return clusters
 
 
 def main():
