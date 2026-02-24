@@ -625,14 +625,20 @@ def extract_arcs(
 
     ncols = snr_array.shape[1]
 
-    # Build column list and per-column freq/constellation info
+    # Build column list and optional freq filter
     freq_list = [freq] if isinstance(freq, int) else (list(freq) if freq is not None else None)
+    freq_set = set(freq_list) if freq_list is not None else None
     if freq_list is not None:
-        column_list = [_get_snr_column(f) for f in freq_list]
-        explicit = {_get_snr_column(f): (f, (f // 100) * 100) for f in freq_list}
+        # Deduplicate columns while preserving order (multiple freqs can share a column)
+        seen = set()
+        column_list = []
+        for f in freq_list:
+            c = _get_snr_column(f)
+            if c not in seen:
+                seen.add(c)
+                column_list.append(c)
     else:
         column_list = [c for c in SNR_COLUMNS if c <= ncols]
-        explicit = None
 
     # L2C/L5 satellite sets for GPS freq assignment
     l2c_sats = l5_sats = None
@@ -670,15 +676,11 @@ def extract_arcs(
 
         for sat in unique_sats:
             # Determine freq code for this column + satellite
-            if explicit is not None:
-                exp_freq, exp_const = explicit[column]
-                if (sat // 100) * 100 != exp_const:
-                    continue  # wrong constellation for this freq
-                sat_freq = exp_freq
-            else:
-                sat_freq = _freq_for_column_and_sat(column, sat, l2c_sats, l5_sats)
-                if sat_freq is None:
-                    continue
+            sat_freq = _freq_for_column_and_sat(column, sat, l2c_sats, l5_sats)
+            if sat_freq is None:
+                continue
+            if freq_set is not None and sat_freq not in freq_set:
+                continue  # user didn't request this freq
 
             sat_mask = sats == sat
 
