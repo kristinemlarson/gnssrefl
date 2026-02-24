@@ -659,27 +659,21 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
     extension : str
         Analysis extension name.
     fr_cmd : str, optional
-        Frequency provided from the command line (e.g., '1', '20', or 'all'), by default None.
+        Frequency provided from the command line (e.g., '1', '20'), by default None.
 
     Returns
     -------
     list
         A list of frequencies to be used for analysis.
     """
-    # Handle the 'all' case first, which overrides everything else.
-    if fr_cmd == 'all':
-        print("Processing all supported frequencies: L1 (1), L2C (20), and L5 (5).")
-        print("Note: L1 and L5 are experimental - only L2C is officially supported.")
-        return [1, 20, 5]
-
     final_fr = None
-    # Use command line frequency if provided (and it's not 'all')
+    # Use command line frequency if provided
     if fr_cmd is not None:
         try:
             final_fr = int(fr_cmd)
             print(f"Using frequency from command line: {final_fr}")
         except ValueError:
-            print(f"Error: Invalid frequency '{fr_cmd}'. Must be an integer or 'all'.")
+            print(f"Error: Invalid frequency '{fr_cmd}'. Must be 1 (L1), 20 (L2C), or 5 (L5).")
             sys.exit()
     else:
         # Otherwise, try to read from the json file
