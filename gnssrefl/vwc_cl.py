@@ -43,7 +43,7 @@ def parse_arguments():
     parser.add_argument("-hires_figs", default=None, type=str, help="Whether you want eps instead of png files")
     parser.add_argument("-advanced", default=None, type=str, help="Shorthand for -vegetation_model 2 (advanced vegetation model)")
     parser.add_argument("-vegetation_model", default=None, type=str, help="Vegetation correction model: 1 (simple, default) or 2 (advanced)")
-    parser.add_argument("-save_tracks", default=None, type=str, help="Save individual track VWC data (model 2 only)")
+    parser.add_argument("-save_tracks", default=None, type=str, help="Save individual track data")
     parser.add_argument("-extension", default='', type=str, help="which extension -if any - used in analysis json")
     parser.add_argument("-level_doys", nargs="*", help="doy limits to define level nodes",type=int) 
 
@@ -547,7 +547,8 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
         vwc_data = svc.simple_vegetation_filter(
             station, vxyz, subdir_path,
             bin_hours, bin_offset, plt2screen=plt, fr=fr,
-            minvalperbin=minvalperbin, skip_plots=skip_leveling)
+            minvalperbin=minvalperbin, skip_plots=skip_leveling,
+            save_tracks=save_tracks)
     elif veg_model == 2:
         print('Running advanced vegetation model (model 2)...')
         vwc_data = avc.advanced_vegetation_filter(

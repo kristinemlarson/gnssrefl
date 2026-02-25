@@ -21,10 +21,10 @@ from gnssrefl.utils import str2bool, read_files_in_dir
 
 xdir = Path(os.environ["REFL_CODE"])
 
-def get_temporal_suffix(fr, bin_hours=24, bin_offset=0):
+def get_temporal_suffix(fr, bin_hours=24, bin_offset=0, include_time=True):
     """
     Generate consistent suffix for all output files with temporal resolution and offset
-    
+
     Parameters
     ----------
     fr : int
@@ -33,11 +33,15 @@ def get_temporal_suffix(fr, bin_hours=24, bin_offset=0):
         Time bin size in hours. Default is 24 (daily)
     bin_offset : int, optional
         Bin timing offset in hours. Default is 0
-        
+    include_time : bool, optional
+        Whether to include bin timing suffix (e.g. _24hr+0). Default is True.
+        Set to False for track files which contain per-observation data.
+
     Returns
     -------
     str
         Suffix string like "_L1_6hr+0", "_L2_24hr+1", etc.
+        Or just "_L1", "_L2" if include_time=False.
     """
     # Generate frequency suffix
     if fr == 1:
@@ -49,10 +53,12 @@ def get_temporal_suffix(fr, bin_hours=24, bin_offset=0):
     else:
         freq_suffix = f"_freq{fr}"
     
-    # Generate temporal suffix with offset
-    time_suffix = f"_{bin_hours}hr+{bin_offset}"
-    
-    return freq_suffix + time_suffix
+    if include_time:
+        # Generate temporal suffix with offset
+        time_suffix = f"_{bin_hours}hr+{bin_offset}"
+        return freq_suffix + time_suffix
+    else:
+        return freq_suffix
 
 def get_bin_schedule_info(bin_hours, bin_offset=0):
     """

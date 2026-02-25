@@ -590,7 +590,7 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         print('Run vwc with -save_tracks T first to generate individual track files')
         return None
 
-    freq_suffix = qp.get_temporal_suffix(fr)
+    freq_suffix = qp.get_temporal_suffix(fr, include_time=False)
 
     # Determine year range
     if year and year_end:
@@ -599,19 +599,26 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         years_to_load = [year]
     else:
         # Load all years if not specified
-        pattern = f'{track_dir}/{station}_track_sat*_quad*_*{freq_suffix}.txt'
-        track_files = glob.glob(pattern)
+        # New naming: {station}_track_sat{NN}_az{NNN}_{year}{freq}.txt
+        pattern_new = f'{track_dir}/{station}_track_sat*_az*_*{freq_suffix}.txt'
+        # Old naming: {station}_track_sat{NN}_quad{N}_{year}{freq}_24hr+0.txt
+        pattern_old = f'{track_dir}/{station}_track_sat*_quad*_*{freq_suffix}_*.txt'
+        track_files = glob.glob(pattern_new) + glob.glob(pattern_old)
         years_to_load = None
 
     # Load track files for specified years
     if years_to_load:
         track_files = []
         for yr in years_to_load:
-            pattern = f'{track_dir}/{station}_track_sat*_quad*_{yr}{freq_suffix}.txt'
-            track_files.extend(glob.glob(pattern))
+            # New naming: {station}_track_sat{NN}_az{NNN}_{year}{freq}.txt
+            pattern_new = f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'
+            # Old naming: {station}_track_sat{NN}_quad{N}_{year}{freq}_24hr+0.txt
+            pattern_old = f'{track_dir}/{station}_track_sat*_quad*_{yr}{freq_suffix}_*.txt'
+            track_files.extend(glob.glob(pattern_new))
+            track_files.extend(glob.glob(pattern_old))
 
     if not track_files:
-        print(f'No track files found matching pattern: {pattern}')
+        print(f'No track files found in {track_dir}')
         print('Run vwc with -save_tracks T first to generate individual track files')
         return None
 
