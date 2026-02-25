@@ -765,6 +765,7 @@ def extract_arcs(
                     metadata = _compute_arc_metadata(
                         final_ele, final_azi, final_seconds,
                         sat, sat_freq, arc_num,
+                        pair_e1, pair_e2,
                     )
 
                     data = {
@@ -1041,6 +1042,8 @@ def _compute_arc_metadata(
     sat: int,
     freq: int,
     arc_num: int,
+    e1: float,
+    e2: float,
 ) -> Dict[str, Any]:
     """
     Compute metadata for an arc including edot factor.
@@ -1059,6 +1062,10 @@ def _compute_arc_metadata(
         Frequency code
     arc_num : int
         Arc index number
+    e1 : float, optional
+        Lower elevation angle limit for this arc's bin
+    e2 : float, optional
+        Upper elevation angle limit for this arc's bin
 
     Returns
     -------
@@ -1106,4 +1113,6 @@ def _compute_arc_metadata(
         'delT': float((np.max(seconds) - np.min(seconds)) / 60),  # minutes
         'edot_factor': float(edot_factor),
         'cf': float(cf),
+        'e1': float(e1),
+        'e2': float(e2),
     }
