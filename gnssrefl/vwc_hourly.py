@@ -470,21 +470,23 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
             )
 
         # Delete existing track files for requested year(s) and regenerate
-        xdir = os.environ['REFL_CODE']
-        subdir_path = f"{station}/{extension}" if extension else station
-        track_dir = f'{xdir}/Files/{subdir_path}/individual_tracks'
+        fm = FileManagement(station, "individual_tracks", extension=extension)
+        track_dir = str(fm.get_directory_path(ensure_directory=False))
 
         # Determine year range to delete/regenerate
-        freq_suffix = qp.get_temporal_suffix(resolved_fr)
+        freq_suffix = qp.get_temporal_suffix(resolved_fr, include_time=False)
         years_to_regenerate = range(year, (year_end if year_end else year) + 1)
 
         # Delete track files for requested years only
         if os.path.exists(track_dir):
             deleted_count = 0
             for yr in years_to_regenerate:
-                pattern = f'{track_dir}/{station}_track_sat*_quad*_{yr}{freq_suffix}.txt'
-                files_to_delete = glob.glob(pattern)
-                for f in files_to_delete:
+                # New naming: {station}_track_sat{NN}_az{NNN}_{year}{freq}.txt
+                for f in glob.glob(f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'):
+                    os.remove(f)
+                    deleted_count += 1
+                # Old naming fallback
+                for f in glob.glob(f'{track_dir}/{station}_track_sat*_quad*_{yr}{freq_suffix}_*.txt'):
                     os.remove(f)
                     deleted_count += 1
             if deleted_count > 0:
@@ -581,9 +583,8 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         Dictionary with 'mjd', 'vwc', 'datetime', 'bin_starts' (NOT leveled yet)
         Returns None if no track data found
     """
-    xdir = os.environ['REFL_CODE']
-    subdir_path = f"{station}/{extension}" if extension else station
-    track_dir = f'{xdir}/Files/{subdir_path}/individual_tracks'
+    fm = FileManagement(station, "individual_tracks", extension=extension)
+    track_dir = str(fm.get_directory_path(ensure_directory=False))
 
     if not os.path.exists(track_dir):
         print(f'No saved track data found in {track_dir}')

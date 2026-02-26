@@ -221,8 +221,8 @@ def attach_vwc_track_results(arcs, station, year, doy, extension='',
     if not refl_code:
         return _set_all_none()
 
-    subdir = os.path.join(station, extension) if extension else station
-    track_dir = os.path.join(refl_code, 'Files', subdir, 'individual_tracks')
+    fm = FileManagement(station, "individual_tracks", extension=extension)
+    track_dir = str(fm.get_directory_path(ensure_directory=False))
     if not os.path.isdir(track_dir):
         return _set_all_none()
 
