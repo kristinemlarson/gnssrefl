@@ -19,7 +19,7 @@ import gnssrefl.sd_libs as sd
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
 
-def advanced_vegetation_filter(station, vxyz, subdir='',
+def advanced_vegetation_filter(station, vxyz, extension='',
                                bin_hours=24, bin_offset=0, pltit=True, fr=20, minvalperbin=10, save_tracks=False):
     """
     Advanced vegetation model (model 2)
@@ -32,8 +32,8 @@ def advanced_vegetation_filter(station, vxyz, subdir='',
         4-char GNSS station name
     vxyz : numpy array
         Full track-level data from vwc (16 columns)
-    subdir : str
-        Subdirectory for file organization (default: '')
+    extension : str
+        Extension used in the analysis json (default: '')
     bin_hours : int
         Time bin size for future subdaily support (default: 24)
     bin_offset : int
@@ -84,7 +84,7 @@ def advanced_vegetation_filter(station, vxyz, subdir='',
     # Step 2: Apply vegetation filter to compute soil moisture
     final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks,
                                                   sgolnum, sgolply, padlen, pltit,
-                                                  fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks)
+                                                  fr, bin_hours, bin_offset, extension, minvalperbin, save_tracks)
 
     if len(final_mjd) == 0:
         print('No vegetation-corrected soil moisture estimates could be computed')
@@ -289,7 +289,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
 
 
 def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
-                          padlen, pltit, fr, bin_hours, bin_offset, subdir, minvalperbin, save_tracks=False):
+                          padlen, pltit, fr, bin_hours, bin_offset, extension, minvalperbin, save_tracks=False):
     """
     Apply Clara's vegetation filter to compute soil moisture
 
@@ -317,8 +317,8 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Time bin size in hours
     bin_offset : int
         Bin timing offset in hours
-    subdir : str
-        Subdirectory for output
+    extension : str
+        Extension used in the analysis json
     minvalperbin : int
         Minimum values required per time bin
     save_tracks : bool
@@ -370,8 +370,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
 
     # Clear old track files before writing new ones
     if save_tracks:
-        ext = subdir[len(station)+1:] if len(subdir) > len(station) else ''
-        track_dir = qp.prepare_track_dir(station, ext)
+        track_dir = qp.prepare_track_dir(station, extension)
 
     # Process each track
     for i in range(Nt):

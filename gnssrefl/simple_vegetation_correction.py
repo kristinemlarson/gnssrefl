@@ -15,7 +15,7 @@ import gnssrefl.gps as g
 
 xdir = os.environ['REFL_CODE']
 
-def simple_vegetation_filter(station, vxyz, subdir='',
+def simple_vegetation_filter(station, vxyz, extension='',
                              bin_hours=24, bin_offset=0, plt2screen=True, fr=20,
                              minvalperbin=10, skip_plots=False, save_tracks=False):
     """
@@ -30,8 +30,8 @@ def simple_vegetation_filter(station, vxyz, subdir='',
         4-char GNSS station name
     vxyz : numpy array
         Track-level phase observations (16 columns)
-    subdir : str
-        Subdirectory for file organization (default: '')
+    extension : str
+        Extension used in the analysis json (default: '')
     bin_hours : int
         Time bin size for subdaily support (default: 24)
     bin_offset : int
@@ -160,7 +160,7 @@ def simple_vegetation_filter(station, vxyz, subdir='',
         plt.gcf().autofmt_xdate()
 
         # Save diagnostic plot
-        outdir = Path(xdir) / 'Files' / subdir
+        outdir = Path(xdir) / 'Files' / station / extension if extension else Path(xdir) / 'Files' / station
         suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
         plot_path = f'{outdir}/{station}_phase_vegcorr{suffix}.png'
         print(f"Saving vegetation correction diagnostic plot to {plot_path}")
@@ -172,7 +172,7 @@ def simple_vegetation_filter(station, vxyz, subdir='',
 
     # Save individual track files if requested
     if save_tracks:
-        save_individual_track_data(station, vxyz, subdir, fr)
+        save_individual_track_data(station, vxyz, extension, fr)
 
     # Return unified MJD format (matches advanced model)
     return {
@@ -183,7 +183,7 @@ def simple_vegetation_filter(station, vxyz, subdir='',
     }
 
 
-def save_individual_track_data(station, vxyz, subdir, fr):
+def save_individual_track_data(station, vxyz, extension, fr):
     """
     Save individual track files for model 1. Columns 10-17 (model-2-specific)
     are written as NaN since model 1 corrects aggregate bins, not individual tracks.
@@ -194,13 +194,12 @@ def save_individual_track_data(station, vxyz, subdir, fr):
         Station name
     vxyz : numpy array
         Track-level observations (N x 16)
-    subdir : str
-        Subdirectory for file organization
+    extension : str
+        Extension used in the analysis json
     fr : int
         Frequency code
     """
-    ext = subdir[len(station)+1:] if len(subdir) > len(station) else ''
-    track_dir = qp.prepare_track_dir(station, ext)
+    track_dir = qp.prepare_track_dir(station, extension)
 
     # vxyz columns: [0]year [1]doy [2]phase [3]azimuth [4]sat [5]rh
     #   [6]norm_ampLSP [7]norm_ampLS [8]hour [9]ampLSP [10]ampLS

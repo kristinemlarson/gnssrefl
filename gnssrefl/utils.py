@@ -154,17 +154,12 @@ class FileManagement:
             Directory path requested as a Path object
         """
         if isinstance(self.file_type, FileTypes):
-            # Use lazy dispatch to avoid evaluating paths that require
-            # parameters (e.g. year/doy) that may not have been provided.
-            directory_getters = {
-                FileTypes.arcs_directory: self._get_arcs_directory_path,
-                FileTypes.individual_tracks: self._get_individual_tracks_path,
-            }
-
-            if self.file_type not in directory_getters:
+            if self.file_type == FileTypes.arcs_directory:
+                directory_path = self._get_arcs_directory_path()
+            elif self.file_type == FileTypes.individual_tracks:
+                directory_path = self._get_individual_tracks_path()
+            else:
                 raise ValueError(f"File type {self.file_type} is not a directory type")
-
-            directory_path = directory_getters[self.file_type]()
 
             # Create directory if requested
             if ensure_directory:

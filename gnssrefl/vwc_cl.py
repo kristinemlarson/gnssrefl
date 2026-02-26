@@ -545,14 +545,14 @@ def vwc(station: str, year: int, year_end: int = None, fr: str = None, plt: bool
     if veg_model == 1:
         print('Running simple vegetation model (model 1)...')
         vwc_data = svc.simple_vegetation_filter(
-            station, vxyz, subdir_path,
+            station, vxyz, extension,
             bin_hours, bin_offset, plt2screen=plt, fr=fr,
             minvalperbin=minvalperbin, skip_plots=skip_leveling,
             save_tracks=save_tracks)
     elif veg_model == 2:
         print('Running advanced vegetation model (model 2)...')
         vwc_data = avc.advanced_vegetation_filter(
-            station, vxyz, subdir_path,
+            station, vxyz, extension,
             bin_hours, bin_offset, plt, fr, minvalperbin,
             save_tracks)
     else:

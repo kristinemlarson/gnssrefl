@@ -226,20 +226,13 @@ def attach_vwc_track_results(arcs, station, year, doy, extension='',
     if not os.path.isdir(track_dir):
         return _set_all_none()
 
-    # New naming: {station}_track_sat{NN}_az{NNN}_{year}{freq}.txt
-    filename_re_new = re.compile(r'.*_track_sat(\d{2})_az(\d{3})_')
-    # Old naming: az{NNN}_sat{NN}_{station}_...
-    filename_re_old = re.compile(r'az(\d{3})_sat(\d{2})_')
+    # {station}_track_sat{NN}_az{NNN}_{year}{freq}.txt
+    filename_re = re.compile(r'.*_track_sat(\d{2})_az(\d{3})_')
     sat_lookup = {}
     for fpath in glob.glob(os.path.join(track_dir, '*.txt')):
-        basename = os.path.basename(fpath)
-        m = filename_re_new.match(basename)
+        m = filename_re.match(os.path.basename(fpath))
         if m:
             sat_lookup.setdefault(int(m.group(1)), []).append((int(m.group(2)), fpath))
-            continue
-        m = filename_re_old.match(basename)
-        if m:
-            sat_lookup.setdefault(int(m.group(2)), []).append((int(m.group(1)), fpath))
     if not sat_lookup:
         return _set_all_none()
 

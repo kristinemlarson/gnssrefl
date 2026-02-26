@@ -481,12 +481,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
         if os.path.exists(track_dir):
             deleted_count = 0
             for yr in years_to_regenerate:
-                # New naming: {station}_track_sat{NN}_az{NNN}_{year}{freq}.txt
                 for f in glob.glob(f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'):
-                    os.remove(f)
-                    deleted_count += 1
-                # Old naming fallback
-                for f in glob.glob(f'{track_dir}/{station}_track_sat*_quad*_{yr}{freq_suffix}_*.txt'):
                     os.remove(f)
                     deleted_count += 1
             if deleted_count > 0:
@@ -600,23 +595,16 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         years_to_load = [year]
     else:
         # Load all years if not specified
-        # New naming: {station}_track_sat{NN}_az{NNN}_{year}{freq}.txt
-        pattern_new = f'{track_dir}/{station}_track_sat*_az*_*{freq_suffix}.txt'
-        # Old naming: {station}_track_sat{NN}_quad{N}_{year}{freq}_24hr+0.txt
-        pattern_old = f'{track_dir}/{station}_track_sat*_quad*_*{freq_suffix}_*.txt'
-        track_files = glob.glob(pattern_new) + glob.glob(pattern_old)
+        pattern = f'{track_dir}/{station}_track_sat*_az*_*{freq_suffix}.txt'
+        track_files = glob.glob(pattern)
         years_to_load = None
 
     # Load track files for specified years
     if years_to_load:
         track_files = []
         for yr in years_to_load:
-            # New naming: {station}_track_sat{NN}_az{NNN}_{year}{freq}.txt
-            pattern_new = f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'
-            # Old naming: {station}_track_sat{NN}_quad{N}_{year}{freq}_24hr+0.txt
-            pattern_old = f'{track_dir}/{station}_track_sat*_quad*_{yr}{freq_suffix}_*.txt'
-            track_files.extend(glob.glob(pattern_new))
-            track_files.extend(glob.glob(pattern_old))
+            pattern = f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'
+            track_files.extend(glob.glob(pattern))
 
     if not track_files:
         print(f'No track files found in {track_dir}')
