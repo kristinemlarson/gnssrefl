@@ -470,21 +470,18 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
             )
 
         # Delete existing track files for requested year(s) and regenerate
-        xdir = os.environ['REFL_CODE']
-        subdir_path = f"{station}/{extension}" if extension else station
-        track_dir = f'{xdir}/Files/{subdir_path}/individual_tracks'
+        fm = FileManagement(station, "individual_tracks", extension=extension)
+        track_dir = str(fm.get_directory_path(ensure_directory=False))
 
         # Determine year range to delete/regenerate
-        freq_suffix = qp.get_temporal_suffix(resolved_fr)
+        freq_suffix = qp.get_temporal_suffix(resolved_fr, include_time=False)
         years_to_regenerate = range(year, (year_end if year_end else year) + 1)
 
         # Delete track files for requested years only
         if os.path.exists(track_dir):
             deleted_count = 0
             for yr in years_to_regenerate:
-                pattern = f'{track_dir}/{station}_track_sat*_quad*_{yr}{freq_suffix}.txt'
-                files_to_delete = glob.glob(pattern)
-                for f in files_to_delete:
+                for f in glob.glob(f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'):
                     os.remove(f)
                     deleted_count += 1
             if deleted_count > 0:
@@ -581,16 +578,15 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         Dictionary with 'mjd', 'vwc', 'datetime', 'bin_starts' (NOT leveled yet)
         Returns None if no track data found
     """
-    xdir = os.environ['REFL_CODE']
-    subdir_path = f"{station}/{extension}" if extension else station
-    track_dir = f'{xdir}/Files/{subdir_path}/individual_tracks'
+    fm = FileManagement(station, "individual_tracks", extension=extension)
+    track_dir = str(fm.get_directory_path(ensure_directory=False))
 
     if not os.path.exists(track_dir):
         print(f'No saved track data found in {track_dir}')
         print('Run vwc with -save_tracks T first to generate individual track files')
         return None
 
-    freq_suffix = qp.get_temporal_suffix(fr)
+    freq_suffix = qp.get_temporal_suffix(fr, include_time=False)
 
     # Determine year range
     if year and year_end:
@@ -599,7 +595,7 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         years_to_load = [year]
     else:
         # Load all years if not specified
-        pattern = f'{track_dir}/{station}_track_sat*_quad*_*{freq_suffix}.txt'
+        pattern = f'{track_dir}/{station}_track_sat*_az*_*{freq_suffix}.txt'
         track_files = glob.glob(pattern)
         years_to_load = None
 
@@ -607,11 +603,11 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
     if years_to_load:
         track_files = []
         for yr in years_to_load:
-            pattern = f'{track_dir}/{station}_track_sat*_quad*_{yr}{freq_suffix}.txt'
+            pattern = f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'
             track_files.extend(glob.glob(pattern))
 
     if not track_files:
-        print(f'No track files found matching pattern: {pattern}')
+        print(f'No track files found in {track_dir}')
         print('Run vwc with -save_tracks T first to generate individual track files')
         return None
 

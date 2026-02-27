@@ -57,6 +57,7 @@ class FileTypes(str, Enum):
     volumetric_water_content = "volumetric_water_content"
     gnssir_result = "gnssir_result"
     arcs_directory = "arcs_directory"
+    individual_tracks = "individual_tracks"
     directory = "directory"
 
 
@@ -153,17 +154,17 @@ class FileManagement:
             Directory path requested as a Path object
         """
         if isinstance(self.file_type, FileTypes):
-            directories = {FileTypes.arcs_directory: self._get_arcs_directory_path()}
-            
-            if self.file_type not in directories:
+            if self.file_type == FileTypes.arcs_directory:
+                directory_path = self._get_arcs_directory_path()
+            elif self.file_type == FileTypes.individual_tracks:
+                directory_path = self._get_individual_tracks_path()
+            else:
                 raise ValueError(f"File type {self.file_type} is not a directory type")
-            
-            directory_path = directories[self.file_type]
-            
+
             # Create directory if requested
             if ensure_directory:
                 directory_path.mkdir(parents=True, exist_ok=True)
-                
+
             return directory_path
         else:
             raise ValueError("The file type you requested does not exist")
@@ -410,6 +411,19 @@ class FileManagement:
         else:
             # No extension: {year}/arcs/{station}/{doy}/
             return self.xdir / str(self.year) / "arcs" / self.station / cdoy
+
+    def _get_individual_tracks_path(self):
+        """
+        Generate individual tracks directory path with extension support.
+
+        Directory structure:
+        - No extension: Files/{station}/individual_tracks/
+        - With extension: Files/{station}/{extension}/individual_tracks/
+        """
+        if self.extension:
+            return self.xdir / "Files" / self.station / self.extension / "individual_tracks"
+        else:
+            return self.xdir / "Files" / self.station / "individual_tracks"
 
     def read_file(self, transpose=False, **kwargs):
         """

@@ -1,4 +1,5 @@
 from collections import defaultdict
+import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -21,10 +22,10 @@ from gnssrefl.utils import str2bool, read_files_in_dir
 
 xdir = Path(os.environ["REFL_CODE"])
 
-def get_temporal_suffix(fr, bin_hours=24, bin_offset=0):
+def get_temporal_suffix(fr, bin_hours=24, bin_offset=0, include_time=True):
     """
     Generate consistent suffix for all output files with temporal resolution and offset
-    
+
     Parameters
     ----------
     fr : int
@@ -33,11 +34,15 @@ def get_temporal_suffix(fr, bin_hours=24, bin_offset=0):
         Time bin size in hours. Default is 24 (daily)
     bin_offset : int, optional
         Bin timing offset in hours. Default is 0
-        
+    include_time : bool, optional
+        Whether to include bin timing suffix (e.g. _24hr+0). Default is True.
+        Set to False for track files which contain per-observation data.
+
     Returns
     -------
     str
         Suffix string like "_L1_6hr+0", "_L2_24hr+1", etc.
+        Or just "_L1", "_L2" if include_time=False.
     """
     # Generate frequency suffix
     if fr == 1:
@@ -49,10 +54,87 @@ def get_temporal_suffix(fr, bin_hours=24, bin_offset=0):
     else:
         freq_suffix = f"_freq{fr}"
     
-    # Generate temporal suffix with offset
-    time_suffix = f"_{bin_hours}hr+{bin_offset}"
-    
-    return freq_suffix + time_suffix
+    if include_time:
+        # Generate temporal suffix with offset
+        time_suffix = f"_{bin_hours}hr+{bin_offset}"
+        return freq_suffix + time_suffix
+    else:
+        return freq_suffix
+
+def prepare_track_dir(station, extension=''):
+    """
+    Create (or clear) the individual_tracks directory for a station.
+
+    Parameters
+    ----------
+    station : str
+        Station name
+    extension : str
+        Optional subdirectory extension
+
+    Returns
+    -------
+    str
+        Absolute path to the individual_tracks directory
+    """
+    fm = FileManagement(station, "individual_tracks", extension=extension)
+    track_dir = str(fm.get_directory_path())
+    for f in glob.glob(f'{track_dir}/*.txt'):
+        os.remove(f)
+    return track_dir
+
+
+def write_track_file(track_dir, station, year, sat_num, avg_az, rows, fr, extra_headers=None):
+    """
+    Write a single track file with standard header and row format.
+
+    Parameters
+    ----------
+    track_dir : str
+        Directory to write the track file in
+    station : str
+        Station name
+    year : int
+        Year for the track
+    sat_num : int
+        Satellite number
+    avg_az : float
+        Track average azimuth (degrees)
+    rows : numpy.ndarray
+        (N, 17) array of track data columns
+    fr : int
+        Frequency code
+    extra_headers : list of str, optional
+        Additional header lines inserted before the column legend
+    """
+    freq_suffix = get_temporal_suffix(fr, include_time=False)
+    track_file = f'{track_dir}/{station}_track_sat{sat_num:02d}_az{int(avg_az):03d}_{year}{freq_suffix}.txt'
+
+    freq_label = 'L2C' if fr == 20 else 'L1' if fr == 1 else 'L5' if fr == 5 else f'L{fr}'
+    header_lines = [
+        f"% Individual Track Data for Station {station}",
+        f"% Satellite: {sat_num}, TrackAvgAz: {avg_az:.1f}, Year: {year}",
+        f"% Frequency: {freq_label}",
+    ]
+    if extra_headers:
+        header_lines.extend(extra_headers)
+    header_lines.extend([
+        f"% Year DOY Hour   MJD   AzMinEle  PhaseOrig AmpLSPOrig AmpLSOrig DeltaRHOrig AmpLSPSmooth AmpLSSmooth DeltaRHSmooth PhaseVegCorr SlopeCorr SlopeFinal PhaseCorrected   VWC",
+        f"% (1)  (2)  (3)   (4)  (5)    (6)       (7)        (8)     (9)       (10)         (11)       (12)        (13)      (14)       (15)         (16)       (17)"
+    ])
+
+    with open(track_file, 'w') as f:
+        for line in header_lines:
+            f.write(line + '\n')
+        for r in rows:
+            f.write(f'{int(r[0]):4d} {int(r[1]):3d} {r[2]:6.2f} {r[3]:8.0f} {r[4]:6.1f} '
+                    f'{r[5]:9.3f} {r[6]:10.6f} {r[7]:9.6f} {r[8]:6.3f} '
+                    f'{r[9]:12.6f} {r[10]:11.6f} {r[11]:8.3f} '
+                    f'{r[12]:12.6f} {r[13]:9.6f} {r[14]:10.6f} '
+                    f'{r[15]:14.6f} {r[16]:7.3f}\n')
+
+    print(f'  Saved {len(rows)} comprehensive track observations to {track_file}')
+
 
 def get_bin_schedule_info(bin_hours, bin_offset=0):
     """
