@@ -20,7 +20,7 @@ you are able to follow along with the examples. And for this we recommend the fo
 for three different ways to access our code. 
 
   - The github or pypi install requires you are running linux and 
-have python >= 3.9 on your system and feel comfortable
+have python >= 3.9 (Feb 2026: now >= 3.10) on your system and feel comfortable
 installing python packages.  
 
   - Dockers. Windows users should use this path, but it is also a good way 

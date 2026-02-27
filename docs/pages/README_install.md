@@ -16,7 +16,7 @@ you can also use a linux emulator and follow instructions for linux.
 
 ## Local Python Install for Linux/MacOS
 
-As of gnssrefl version 3.9.0 you are allowed to run any python version >= 3.9.
+As of gnssrefl version 3.19.4, python version >= 3.10 is required.
 To allow this we had to change how the package is built; we now use meson. If you have problems 
 with the install, please let us know by posting a github Issue.
 
@@ -81,7 +81,7 @@ If you are using the version from gitHub:
 * <code>git clone https://github.com/kristinemlarson/gnssrefl </code>
 * cd into that directory, set up a virtual environment, a la <code>python3 -m venv env </code> **make sure you are running 
 the correction of python, as discussed at the top of the page** You can have two versions of python on
-your machine. To have it run 3.9 instead of 3.11 (for example), type <code>python3.9 -m venv env</code>
+your machine. To have it run 3.10 instead of 3.11 (for example), type <code>python3.10 -m venv env</code>
 * activate your virtual environment <code>source env/bin/activate </code>
 * <code>pip install .</code> **Make sure you are using pip3 - either directoyr or linked to pip**
 * so please read below or type <code>installexe -h</code> 
