@@ -1,6 +1,6 @@
 [build-system]
 
-requires = ["meson-python", "numpy"]
+requires = ["meson-python", "numpy<2"]
 build-backend = "mesonpy"
 
 [project]
@@ -17,7 +17,7 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 ]
 dependencies = [
-    "numpy",
+    "numpy<2",
     "wget",
     "scipy",
     "matplotlib",
