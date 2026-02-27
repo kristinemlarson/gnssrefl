@@ -77,8 +77,8 @@ def read_4by5(station, dlat,dlon,hell):
     Tgrid = np.zeros((4,5))
     Qgrid = np.zeros((4,5))
     dTgrid = np.zeros((4,5))
-    u = np.zeros((4,1))
-    Hs = np.zeros((4,1)) 
+    u = np.zeros(4)
+    Hs = np.zeros(4)
     ahgrid = np.zeros((4,5))
     awgrid = np.zeros((4,5))
     lagrid = np.zeros((4,5))
@@ -186,7 +186,7 @@ def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
         coshy = np.cos(pi4*dmjd1/365.25) 
         sinfy = np.sin(pi2*dmjd1/365.25) 
         sinhy = np.sin(pi4*dmjd1/365.25) 
-    cossin = np.matrix([1, cosfy, sinfy, coshy, sinhy])
+    cossin = np.array([1, cosfy, sinfy, coshy, sinhy])
 # initialization of new vectors
     p =  0; T =  0; dT = 0; Tm = 0; e =  0; ah = 0; aw = 0; la = 0; undu = 0;
     undul = np.zeros(4)
@@ -210,7 +210,7 @@ def gpt2_1w (station, dmjd,dlat,dlon,hell,it):
         hgt = hell-undul[l] 
 #  pressure, temperature at the height of the grid
         T0 = Tgrid[KL,0] + Tgrid[KL,1]*cosfy + Tgrid[KL,2]*sinfy + Tgrid[KL,3]*coshy + Tgrid[KL,4]*sinhy;
-        tg = float(Tgrid[KL,:] *cossin.T)
+        tg = np.dot(Tgrid[KL,:], cossin)
 #     print(T0,tg)
 
         p0 = pgrid[KL,0] + pgrid[KL,1]*cosfy + pgrid[KL,2]*sinfy + pgrid[KL,3]*coshy + pgrid[KL,4]*sinhy;

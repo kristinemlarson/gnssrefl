@@ -309,10 +309,10 @@ def rot3(vector, angle):
         float, original vector rotated by angle 
 
     """
-    rotmat = np.matrix([[ np.cos(angle), np.sin(angle), 0],
-                        [-np.sin(angle), np.cos(angle), 0],
-                        [             0,             0, 1]])
-    vector2 = np.array((rotmat*np.matrix(vector).T).T)[0]
+    rotmat = np.array([[ np.cos(angle), np.sin(angle), 0],
+                       [-np.sin(angle), np.cos(angle), 0],
+                       [             0,             0, 1]])
+    vector2 = rotmat @ np.asarray(vector)
     return vector2
 
 def xyz2llh(xyz, tol):
@@ -2018,8 +2018,8 @@ def glonass_channels(f,prn):
     lightSpeed = 299792458
     slot = [14,15,10,20,19,13,12,1,6,5,22,23,24,16,4,8,3,7,2,18,21,9,17,11]
     channel = [-7,0,-7,2,3,-2,-1,1,-4,1,-3,3,2,-1,6,6,5,5,-4,-3,4,-2,4,0]
-    slot = np.matrix(slot)
-    channel = np.matrix(channel)
+    slot = np.array(slot)
+    channel = np.array(channel)
 #   main frequencies
     L1 = 1602e6
     L2 = 1246e6
@@ -2028,7 +2028,7 @@ def glonass_channels(f,prn):
     dL2 = 0.4375e6
 
     ch = channel[(slot == prn)]
-    ch = int(ch)
+    ch = int(ch.item())
 #   wavelengths in meters
 #    print(prn,ch,f)
     l = 0.0

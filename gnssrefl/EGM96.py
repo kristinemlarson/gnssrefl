@@ -1,5 +1,5 @@
 import scipy.io
-from scipy.interpolate import interp2d, RectBivariateSpline
+from scipy.interpolate import RectBivariateSpline
 import os
 
 class EGM96geoid:
@@ -48,7 +48,7 @@ class EGM96geoid:
         # Fix geoid height at hundreth of a meter
         #print('original',self.old(lon,lat)[0])
         #print('new     ',self.h(lon,lat)[0])
-        newval = float(self.h(lon,lat)[0])
+        newval = self.h(lon, lat).item()
         return round(newval, 2)
 
     
