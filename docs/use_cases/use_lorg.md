@@ -75,7 +75,7 @@ Now prepare to analyze the data using <code>gnssir</code>.  First you need to cr
 
 <code>gnssir_input lorg</code>
 
-The json output will be stored in $REFL_CODE/input/lorg.json. [Here is a sample json file.](lorg.json)
+The json output will be stored in $REFL_CODE/input/lorg/lorg.json. [Here is a sample json file.](lorg.json)
 
 Next make some snr files for a time span of about eight months. Restrict the search to the UNAVCO archive to make the 
 code run faster (otherwise it will check three other archives as well). The resulting SNR files will be stored in $REFL_CODE/2019/snr/lorg. 

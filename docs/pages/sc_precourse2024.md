@@ -1,7 +1,7 @@
 # Pre-course Activities
 
 *October 9, 2024: Please keep in mind that our code has been updated since this class was given.
-We currently require python version >= 3.9*
+We currently require python version >= 3.9 (Feb 2026: Python 3.10 is now the minimum version)*
 
 While it is possible to simply listen to the lecturers in the short 
 course, we think that this is a far better learning experience if 

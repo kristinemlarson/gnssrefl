@@ -7,7 +7,7 @@ Welcome to the gnssrefl documentation!
 ``gnssrefl`` is an open source python-based software package for GNSS interferometric reflectometry (GNSS-IR).
 Please note that the link to API documentation shown below will provide access to every single piece of code in gnssrefl. 
 For the the main modules in gnssrefl, it is probably easier and faster to use Quick Links to the Code. For individuals 
-using a locally installed python version, python version 3.9 is required.
+using a locally installed python version, python version 3.10 is required.
 
 .. image:: https://img.shields.io/pypi/v/gnssrefl.svg
 
