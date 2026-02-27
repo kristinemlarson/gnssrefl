@@ -112,6 +112,13 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     # Get the single frequency from the list (vwc command only supports 1 frequency)
     fr = fr_list[0]
 
+    lsp = guts2.read_json_file(station, extension)
+    ellist = lsp.get('ellist', [])
+    if len(ellist) > 0:
+        print('vwc_input does not support ellist. Please remove ellist from your json')
+        print('and rerun gnssir_input with a single e1/e2 range before using vwc_input.')
+        sys.exit()
+
     print('Minimum number of tracks required to save a series ', min_tracks)
     gnssir_results = []
     # removed the ability to look at multiple years

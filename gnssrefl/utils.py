@@ -499,7 +499,7 @@ def circular_distance_deg(a, b):
 
 def check_arc_quality(meta, peak_rh, max_amp, noise, lsp):
     """Apply QC filters to a single arc. Returns (passed, fail_reason)."""
-    e1 = lsp['e1']; e2 = lsp['e2']
+    e1 = meta['e1']; e2 = meta['e2']
     ediff = lsp['ediff']
     min_height = lsp['minH']; max_height = lsp['maxH']
     pk_noise = lsp['PkNoise']; del_t_max = lsp['delTmax']
