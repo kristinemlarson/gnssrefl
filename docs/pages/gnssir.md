@@ -14,7 +14,7 @@ If you happen to have the Cartesian coordinates (in meters), you can
 set <code>-xyz True</code> and input those instead.
 
 
-The json file of instructions will be stored in $REFL_CODE/input/p101.json. 
+The json file of instructions will be stored in $REFL_CODE/input/p101/p101.json.
 
 The default azimuth inputs are from 0 to 360 degrees.
 You can set your preferred azimuth regions using -azlist2. Previously you were required to use multiple
@@ -46,7 +46,7 @@ The minimum inputs are the station name, year, and doy.
 
 Where would the code store the files for this example?
 
-- json instructions are stored in $REFL_CODE/input/p041.json
+- json instructions are stored in $REFL_CODE/input/p041/p041.json
 - SNR files are stored in $REFL_CODE/2020/snr/p041
 - Reflector Height (RH) results are stored in $REFL_CODE/2020/results/p041/150.txt
 

@@ -47,7 +47,7 @@ We only need the L2C data, so have set the parameter accordingly.
 
 <code>gnssir_input p038  -l2c true</code>
 
-The json file is saved at $REFL_CODE/input/p038.json
+The json file is saved at $REFL_CODE/input/p038/p038.json
 
 Now we run <code>gnssir</code>. This will be needed for estimate a priori reflector heights for the soil moisture code.
 
@@ -62,7 +62,7 @@ We need a list of satellite tracks to use:
 
 <code>vwc_input p038 2017</code>
 
-This creates a file that is stored in $REFL_CODE/input/p038_phaseRH.txt
+This creates a file that is stored in $REFL_CODE/input/p038/p038_phaseRH_L2.txt
 
 Now we estimate the phase for each satellite track on each day:
 
@@ -92,7 +92,7 @@ Final results:
 
 By default the final VWC results go to:
 
-$REFL_CODE/Files/p038/p038_vwc.txt
+$REFL_CODE/Files/p038/p038_vwc_L2_24hr+0.txt
 
 
 Thank you to Naoya Kadota for test driving this use case.

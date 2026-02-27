@@ -85,7 +85,7 @@ Use <code>vwc_input</code> to pick the best satellite tracks. The default will b
 
 The code also requires that you pick the year that you think has the most L2C satellites (by definition this will be the latest year).
 
-This creates a file that will go in <code>$REFL_CODE/input/ssss_phaseRH.txt</code> where ssss is your station name.
+This creates a file that will go in <code>$REFL_CODE/input/ssss/ssss_phaseRH_L2.txt</code> where ssss is your station name.
 If you want to remove certain azimuths, just delete or comment out those azimuths (use a %).
 
 You then need to estimate the phase for the years in question. I will just use 2016 through 2018 for station p038:

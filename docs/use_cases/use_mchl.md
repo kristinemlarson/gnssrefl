@@ -66,7 +66,7 @@ Pick the satellite tracks you are going to use:
 
 <code>vwc_input mchl 2018</code>
 
-This creates a file that will go in $REFL_CODE/input/mchl_phaseRH.txt
+This creates a file that will go in $REFL_CODE/input/mchl/mchl_phaseRH_L2.txt
 
 This file can be hand edited if you find out later that a 
 particular satellite track is not working. To comment lines out you use %. 
@@ -105,7 +105,7 @@ It also produces plots which can help you assess your results:
 
 Final VWC results are saved to:
 
-$REFL_CODE/Files/mchl/mchl_vwc.txt
+$REFL_CODE/Files/mchl/mchl_vwc_L2_24hr+0.txt
 
 
 A big thank you to Lucas Holden for test driving this use case.

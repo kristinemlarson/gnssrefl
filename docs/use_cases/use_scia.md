@@ -83,7 +83,7 @@ Final plot:
 
 VWC results are written to:
 
-$REFL_CODE/Files/scia/scia_vwc.txt
+$REFL_CODE/Files/scia/scia_vwc_L2_24hr+0.txt
 
 Let's try to get rid of that snow outlier. I could look in the vwc file to see 
 what day has a very large value. Or you can also try setting -snow_filter to True.

@@ -233,7 +233,7 @@ we have mostly eliminated it.
 
 File structure for station abcd in the year YYYY (last two characters YY), doy DDD:
 
-- REFL_CODE/input/abcd.json - instructions for gnssir analysis, refraction files
+- REFL_CODE/input/abcd/abcd.json - instructions for gnssir analysis, refraction files
 
 - REFL_CODE/YYYY/snr/abcd/abcdDDD0.YY.snr66  - SNR files 
 

@@ -87,7 +87,7 @@ avoid that step:
 
 <code>gnssir_input phnx</code>
 
-The json output will be stored in $REFL_CODE/input/phnx.json.
+The json output will be stored in $REFL_CODE/input/phnx/phnx.json.
 The default peak to noise ratio is 2.7 - which is better for water. Since these are ice/snow reflections, I'm
 going to increase it a bit to 3.2 and require a larger amplitude. I am also selecting the azimuth region from 0 to 320.
 
