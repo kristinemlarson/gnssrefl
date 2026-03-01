@@ -938,7 +938,7 @@ def satorb_prop(week, secweek, prn, rrec0, closest_ephem):
     return SatOrbn
 
 
-def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij):
+def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij,dt_offset=0.0):
     """
     for satellite number prn
     and receiver coordinates rrec0
@@ -957,10 +957,14 @@ def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij):
 
     ij :
 
+    dt_offset : float
+        additional time offset in seconds (used for edot computation)
+
     sp3 has the orbit information in it
     """
     # start wit 70 milliseconds as the guess for the transmission time
-    nx = iX(Tp[ij]-0.07); ny = iY(Tp[ij]-0.07); nz = iZ(Tp[ij]-0.07)
+    t_obs = Tp[ij] + dt_offset
+    nx = iX(t_obs-0.07); ny = iY(t_obs-0.07); nz = iZ(t_obs-0.07)
     oE = constants.omegaEarth
     c = constants.c
     # get initial deltaA
@@ -971,7 +975,7 @@ def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij):
     error = 0
     k = 0
     while (k < 2):
-        nx = iX(Tp[ij]-tau); ny = iY(Tp[ij]-tau); nz = iZ(Tp[ij]-tau)
+        nx = iX(t_obs-tau); ny = iY(t_obs-tau); nz = iZ(t_obs-tau)
         SatOrb=np.array([nx,ny,nz]).T
         Th = -oE * tau
         xs = SatOrb[0]*np.cos(Th)-SatOrb[1]*np.sin(Th)
@@ -996,7 +1000,7 @@ def _test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,da
     # epoch at the beginning of the day of your RINEX file
     gweek0, gpssec0 = g.kgpsweek(year, month,day,0,0,0 )
 
-    ll = 'quadratic'
+    ll = 'cubic'
 #   will store in this variable, then sort it before writing out to a file
     saveit = np.empty(shape=[0,11] )
     fout = open(outputfile, 'w+')
@@ -1032,7 +1036,7 @@ def _test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,da
                     Tp = gpstime[not_ij,1] # only use the seconds of the week for now
                     s1 = s1[not_ij];
                     #print(s1.shape)
-                    emp = np.zeros(shape=[len(s1),1],dtype=float)
+                    emp = np.zeros(len(s1),dtype=float)
         # get the rest of the SNR data in a function
                     s2,s5,s6,s7,s8 = extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp)
 
@@ -1117,11 +1121,11 @@ def elev_limits(snroption):
     if (snroption == 99):
         emin = 5; emax = 30
     elif (snroption == 50):
-        emin = 0; emax = 10
+        emin = -90; emax = 10
     elif (snroption == 66):
-        emin = 0; emax = 30
+        emin = -90; emax = 30
     elif (snroption == 88):
-        emin = 5; emax = 90
+        emin = 0; emax = 90
     else:
         emin = 5; emax = 30
 
@@ -1142,10 +1146,9 @@ def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month
     # epoch at the beginning of the day of your RINEX file
     gweek0, gpssec0 = g.kgpsweek(year, month,day,0,0,0 )
 
-    ll = 'quadratic'
-#   will store in this variable, then sort it before writing out to a file
-    saveit = np.empty(shape=[0,11] )
-    fout = open(outputfile, 'w+')
+    ll = 'cubic'
+    # accumulate all rows, then sort by time before writing
+    rows = []
     NsatT = 0
     # make a dictionary for constellation name
     sname ={}; sname['G']='GPS' ; sname['R'] = 'GLONASS'; sname['E'] = 'GALILEO'; sname['C']='BEIDOU'
@@ -1184,7 +1187,7 @@ def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month
                         Tp = gpstime[not_ij,1] # only use the seconds of the week for now
                         s1 = s1[not_ij];
                     #print(s1.shape)
-                        emp = np.zeros(shape=[len(s1),1],dtype=float)
+                        emp = np.zeros(len(s1),dtype=float)
         # get the rest of the SNR data in a function
                         s2,s5,s6,s7,s8 = extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp)
         # make sure there are no nan values in s2 or s5
@@ -1200,14 +1203,27 @@ def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month
                                 azimA = g.azimuth_angle(r, East, North)
                                 eleA = g.elev_angle(up, r)*180/np.pi
                                 if (eleA >= emin) and (eleA <= emax):
-                                    # bug reported by Andrea Gatti. 2021 October 26
-                                    fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} {9:7.2f} {10:7.2f} \n".format(
-                                        prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s7[ij]),float(s8[ij]) ))
+                                    # compute edot: elevation rate in deg/sec
+                                    # same method as Fortran: elev at t+0.5s minus elev at t, times 2
+                                    SatOrb2 = satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij,dt_offset=0.5)
+                                    r2=np.subtract(SatOrb2,recv)
+                                    eleA2 = g.elev_angle(up, r2)*180/np.pi
+                                    edot = 2.0*(eleA2 - eleA)
+                                    tod = Tp[ij]-gpssec0
+                                    rows.append((tod, prn+addon,eleA,azimA,tod, edot,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s7[ij]),float(s8[ij])))
                     else:
                         log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
         else:
             log.write('No data for constellation {0:1s} \n'.format(con))
+    # sort by time-of-day, then by satellite number (matching Fortran output order)
+    rows.sort(key=lambda r: (r[0], r[1]))
     log.write('write SNR data to file \n')
+    # write using Fortran-compatible format: i3, 2f10.4, f10.1, f10.6, f7.2, 5f7.2
+    fout = open(outputfile, 'w+')
+    for row in rows:
+        _, prn_id, eleA, azimA, tod, edot, s6v, s1v, s2v, s5v, s7v, s8v = row
+        fout.write("{0:3.0f}{1:10.4f}{2:10.4f}{3:10.1f}{4:10.6f}{5:7.2f}{6:7.2f}{7:7.2f}{8:7.2f}{9:7.2f}{10:7.2f}\n".format(
+            prn_id, eleA, azimA, tod, edot, s6v, s1v, s2v, s5v, s7v, s8v))
     fout.close()
 
 
