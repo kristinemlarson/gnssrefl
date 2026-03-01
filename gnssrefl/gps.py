@@ -2557,7 +2557,7 @@ def store_snrfile(filename,year,station):
     if not os.path.isdir(xdir): #if year folder doesn't exist, make it
         os.makedirs(xdir)
     if (os.path.isfile(filename) == True):
-        status = subprocess.call(['mv','-f', filename, xdir])
+        os.replace(filename, os.path.join(xdir, os.path.basename(filename)))
     else:
         print('the SNR file does not exist, so nothing was moved')
 
@@ -3737,7 +3737,10 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log,**kwargs):
         s2=time.time()
         print(round(s2-s1,2), ' seconds')
         # removing the compressed version - will keep new version
-        subprocess.call(['rm', '-f', r3_filename ])
+        try:
+            os.remove(r3_filename)
+        except OSError:
+            pass
         if os.path.exists(r3_filename_new):
             log.write('Hatanaka Conversion successful {0:s} \n'.format(r3_filename_new))
         else:
@@ -3774,7 +3777,10 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log,**kwargs):
 
 
     #log.write('Now remove RINEX3 rnx version of the file ',r3_filename_new)
-    subprocess.call(['rm', '-f', r3_filename_new ])
+    try:
+        os.remove(r3_filename_new)
+    except OSError:
+        pass
 
     return fexists 
 

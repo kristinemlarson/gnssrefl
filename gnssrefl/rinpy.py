@@ -360,20 +360,29 @@ def _readblocks_v21(lines, header, headerlines, headerlengths, epochsatlists, sa
     fmt = '14s 2x '*nobstypes
     fieldstruct = struct.Struct(fmt)
     parse = fieldstruct.unpack_from
+    _float = float  # local ref avoids global lookup
 
     for iepoch, (headerstart, headerlength, satlist) in enumerate(zip(headerlines, headerlengths, epochsatlists)):
         for i, sat in enumerate(satlist):
-            datastring = ''.join(["{:<80}".format(line.rstrip()) for line in
+            datastring = ''.join([line.rstrip().ljust(80) for line in
                                   lines[headerstart+headerlength+rowpersat*i:headerstart+headerlength+rowpersat*(i+1)]])
             try:
-                data = np.array([_converttofloat(number.decode('ascii')) for number in parse(datastring.encode('ascii'))])
-
-                systemletter = sat[0]
-                prn = int(sat[1:])
-
-                observationdata[systemletter][iepoch, prntoidx[systemletter][prn], :] = data
+                fields = parse(datastring.encode('ascii'))
             except struct.error:
                 continue
+
+            data = np.empty(nobstypes)
+            for j in range(nobstypes):
+                stripped = fields[j].strip()
+                if stripped:
+                    data[j] = _float(stripped)
+                else:
+                    data[j] = np.nan
+
+            systemletter = sat[0]
+            prn = int(sat[1:])
+
+            observationdata[systemletter][iepoch, prntoidx[systemletter][prn], :] = data
 
     for letter in observationdata:
         kept_observables = [i for i in range(len(obstypes[letter])) if np.sum(~np.isnan(observationdata[letter][:,:,i]))>0]

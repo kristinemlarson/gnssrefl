@@ -2,7 +2,7 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d, CubicSpline
 import subprocess
 import sys
 import time
@@ -386,7 +386,10 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                         # this means the rinex 2 version exists
                         if fexists:
                             log.write('RINEX 2 created from v3 and {0:4.0f} {1:3.0f}. Now remove RINEX 3 files and convert \n'.format(year,doy))
-                            subprocess.call(['rm', '-f',rnx_filename]) # rnx
+                            try:
+                                os.remove(rnx_filename)
+                            except OSError:
+                                pass
                              # should send it the version 2 name
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
                                       translator,log,errorlog,rinex2_filename=r2)
@@ -596,7 +599,10 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
                     if (os.stat(snrname).st_size == 0):
                         log.write('you created a zero file size which could mean a lot of things \n')
                         log.write('bad exe, bad snr option, do not really have the orbit file \n')
-                        status = subprocess.call(['rm','-f', snrname ])
+                        try:
+                            os.remove(snrname)
+                        except OSError:
+                            pass
                     else:
                         log.write('A SNR file was created : {0:50s}  \n'.format(snrname_full))
                         print('\n')
@@ -1146,9 +1152,17 @@ def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month
     # epoch at the beginning of the day of your RINEX file
     gweek0, gpssec0 = g.kgpsweek(year, month,day,0,0,0 )
 
-    ll = 'cubic'
-    # accumulate all rows, then sort by time before writing
-    rows = []
+    # pre-index SP3 data by satellite number (avoids repeated boolean scans)
+    sp3_index = {}
+    for sat_id in np.unique(sp3[:, 0]).astype(int):
+        m = sp3[:, 0] == sat_id
+        sp3_index[sat_id] = (sp3[m, 2], sp3[m, 3], sp3[m, 4], sp3[m, 5])  # sec, x, y, z
+
+    oE = constants.omegaEarth
+    clight = constants.c
+
+    # accumulate output as array blocks, then sort before writing
+    out_blocks = []
     NsatT = 0
     # make a dictionary for constellation name
     sname ={}; sname['G']='GPS' ; sname['R'] = 'GLONASS'; sname['E'] = 'GALILEO'; sname['C']='BEIDOU'
@@ -1164,132 +1178,139 @@ def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month
                     bar.next()
                     addon = g.findConstell(con) # 100,200,or 300 for R,E, and C
                     log.write('Constellation {0:1s} Satellite {1:2.0f}  Addon {2:3.0f} \n'.format( con, prn, addon))
-                # window out the data for this satellite
-                    m = sp3[:,0] == prn + addon
-                    x = sp3[m,3]
-                    if len(x) > 0:
-                        sp3_week = sp3[m,1] ; sp3_sec = sp3[m,2]
-                        x = sp3[m,3] ; y = sp3[m,4] ; z = sp3[m,5]
+                    sat_id = prn + addon
+                    if sat_id not in sp3_index:
+                        log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
+                        continue
+                    sp3_sec, x, y, z = sp3_index[sat_id]
+                    if len(x) == 0:
+                        log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
+                        continue
                 # fit the orbits for this satellite
-                        t=sp3_sec
-                        iX= interp1d(t, x, ll,bounds_error=False,fill_value='extrapolate')
-                        iY= interp1d(t, y, ll,bounds_error=False,fill_value='extrapolate')
-                        iZ= interp1d(t, z, ll,bounds_error=False,fill_value='extrapolate')
+                    iX = CubicSpline(sp3_sec, x, extrapolate=True)
+                    iY = CubicSpline(sp3_sec, y, extrapolate=True)
+                    iZ = CubicSpline(sp3_sec, z, extrapolate=True)
         # get the S1 data for this satellite
-                        if 'S1' in obslist:
-                            s1 = obsdata[con]['S1'][:, prntoidx[con][prn]]
+                    if 'S1' in obslist:
+                        s1 = obsdata[con]['S1'][:, prntoidx[con][prn]]
 
         # indices when there are no data for this satellite
-                        ij = np.isnan(s1)
+                    ij = np.isnan(s1)
         # indices when there are data in the RINEX file - this way you do not compute
         # orbits unless there are data.
-                        not_ij = np.logical_not(ij)
-                        Tp = gpstime[not_ij,1] # only use the seconds of the week for now
-                        s1 = s1[not_ij];
-                    #print(s1.shape)
-                        emp = np.zeros(len(s1),dtype=float)
+                    not_ij = np.logical_not(ij)
+                    Tp = gpstime[not_ij,1] # only use the seconds of the week for now
+                    s1 = s1[not_ij];
+                    emp = np.zeros(len(s1),dtype=float)
         # get the rest of the SNR data in a function
-                        s2,s5,s6,s7,s8 = extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp)
-        # make sure there are no nan values in s2 or s5
+                    s2,s5,s6,s7,s8 = extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp)
 
-                        nepochs = len(Tp)
-                        if nepochs == 0:
-                            continue
+                    nepochs = len(Tp)
+                    if nepochs == 0:
+                        continue
 
-                        # --- decimation filter (vectorized) ---
-                        if checkD:
-                            dec_mask = (Tp % dec_rate) == 0
-                        else:
-                            dec_mask = np.ones(nepochs, dtype=bool)
-
-                        t_all = Tp[dec_mask]
-                        if len(t_all) == 0:
-                            continue
-                        # indices into the original arrays for SNR lookup
-                        idx_all = np.where(dec_mask)[0]
-
-                        # --- vectorized orbit propagation (replaces satorb_prop_sp3 loop) ---
-                        oE = constants.omegaEarth
-                        clight = constants.c
-
-                        # initial guess: 70 ms transmission time
-                        nx = iX(t_all - 0.07); ny = iY(t_all - 0.07); nz = iZ(t_all - 0.07)
-                        SatOrb = np.column_stack((nx, ny, nz))  # (N, 3)
-                        r_vec = SatOrb - recv  # (N, 3)
-                        tau = np.sqrt(np.sum(r_vec**2, axis=1)) / clight  # (N,)
-
-                        # two light-time iterations (matching scalar satorb_prop_sp3)
-                        for _k in range(2):
-                            nx = iX(t_all - tau); ny = iY(t_all - tau); nz = iZ(t_all - tau)
-                            SatOrb = np.column_stack((nx, ny, nz))
-                            Th = -oE * tau
-                            cosT = np.cos(Th); sinT = np.sin(Th)
-                            xs = SatOrb[:, 0]*cosT - SatOrb[:, 1]*sinT
-                            ys = SatOrb[:, 0]*sinT + SatOrb[:, 1]*cosT
-                            SatOrbn = np.column_stack((xs, ys, SatOrb[:, 2]))
-                            tau = np.sqrt(np.sum((SatOrbn - recv)**2, axis=1)) / clight
-
-                        # --- vectorized azimuth and elevation ---
-                        r_vec = SatOrbn - recv  # (N, 3)
-                        r_norms = np.sqrt(np.sum(r_vec**2, axis=1))  # (N,)
-
-                        # elevation: pi/2 - arccos(dot(r, up) / |r|)
-                        eleA_all = (np.pi/2.0 - np.arccos(r_vec @ up / r_norms)) * 180.0/np.pi
-
-                        # azimuth: arctan2(dot(r, East), dot(r, North)) in degrees
-                        azimA_all = np.arctan2(r_vec @ East, r_vec @ North) * 180.0/np.pi
-                        azimA_all = azimA_all % 360.0
-
-                        # --- elevation filter ---
-                        elev_mask = (eleA_all >= emin) & (eleA_all <= emax)
-                        if not np.any(elev_mask):
-                            continue
-
-                        # --- edot only for epochs passing elevation filter ---
-                        t_pass = t_all[elev_mask]
-                        nx2 = iX(t_pass + 0.5 - 0.07); ny2 = iY(t_pass + 0.5 - 0.07); nz2 = iZ(t_pass + 0.5 - 0.07)
-                        SatOrb2 = np.column_stack((nx2, ny2, nz2))
-                        r2_vec = SatOrb2 - recv
-                        tau2 = np.sqrt(np.sum(r2_vec**2, axis=1)) / clight
-                        for _k in range(2):
-                            nx2 = iX(t_pass + 0.5 - tau2); ny2 = iY(t_pass + 0.5 - tau2); nz2 = iZ(t_pass + 0.5 - tau2)
-                            SatOrb2 = np.column_stack((nx2, ny2, nz2))
-                            Th2 = -oE * tau2
-                            cosT2 = np.cos(Th2); sinT2 = np.sin(Th2)
-                            xs2 = SatOrb2[:, 0]*cosT2 - SatOrb2[:, 1]*sinT2
-                            ys2 = SatOrb2[:, 0]*sinT2 + SatOrb2[:, 1]*cosT2
-                            SatOrbn2 = np.column_stack((xs2, ys2, SatOrb2[:, 2]))
-                            tau2 = np.sqrt(np.sum((SatOrbn2 - recv)**2, axis=1)) / clight
-
-                        r2_vec = SatOrbn2 - recv
-                        r2_norms = np.sqrt(np.sum(r2_vec**2, axis=1))
-                        eleA2_all = (np.pi/2.0 - np.arccos(r2_vec @ up / r2_norms)) * 180.0/np.pi
-                        edot_all = 2.0 * (eleA2_all - eleA_all[elev_mask])
-
-                        # --- accumulate rows ---
-                        tod_all = t_all[elev_mask] - gpssec0
-                        idx_pass = idx_all[elev_mask]
-                        prn_id = prn + addon
-                        for ii in range(len(tod_all)):
-                            jj = idx_pass[ii]
-                            rows.append((tod_all[ii], prn_id, eleA_all[elev_mask][ii],
-                                         azimA_all[elev_mask][ii], tod_all[ii], edot_all[ii],
-                                         float(s6[jj]), s1[jj], float(s2[jj]), float(s5[jj]),
-                                         float(s7[jj]), float(s8[jj])))
+                    # --- decimation filter (vectorized) ---
+                    if checkD:
+                        dec_mask = (Tp % dec_rate) == 0
                     else:
-                        log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
+                        dec_mask = np.ones(nepochs, dtype=bool)
+
+                    t_all = Tp[dec_mask]
+                    if len(t_all) == 0:
+                        continue
+                    # indices into the original arrays for SNR lookup
+                    idx_all = np.where(dec_mask)[0]
+
+                    # --- vectorized orbit propagation ---
+                    # initial guess: 70 ms transmission time
+                    nx = iX(t_all - 0.07); ny = iY(t_all - 0.07); nz = iZ(t_all - 0.07)
+                    SatOrb = np.column_stack((nx, ny, nz))  # (N, 3)
+                    r_vec = SatOrb - recv  # (N, 3)
+                    tau = np.sqrt(np.sum(r_vec**2, axis=1)) / clight  # (N,)
+
+                    # two light-time iterations (matching scalar satorb_prop_sp3)
+                    for _k in range(2):
+                        nx = iX(t_all - tau); ny = iY(t_all - tau); nz = iZ(t_all - tau)
+                        SatOrb = np.column_stack((nx, ny, nz))
+                        Th = -oE * tau
+                        cosT = np.cos(Th); sinT = np.sin(Th)
+                        xs = SatOrb[:, 0]*cosT - SatOrb[:, 1]*sinT
+                        ys = SatOrb[:, 0]*sinT + SatOrb[:, 1]*cosT
+                        SatOrbn = np.column_stack((xs, ys, SatOrb[:, 2]))
+                        tau = np.sqrt(np.sum((SatOrbn - recv)**2, axis=1)) / clight
+
+                    # --- vectorized azimuth and elevation ---
+                    r_vec = SatOrbn - recv  # (N, 3)
+                    r_norms = np.sqrt(np.sum(r_vec**2, axis=1))  # (N,)
+
+                    # elevation: pi/2 - arccos(dot(r, up) / |r|)
+                    eleA_all = (np.pi/2.0 - np.arccos(r_vec @ up / r_norms)) * 180.0/np.pi
+
+                    # azimuth: arctan2(dot(r, East), dot(r, North)) in degrees
+                    azimA_all = np.arctan2(r_vec @ East, r_vec @ North) * 180.0/np.pi
+                    azimA_all = azimA_all % 360.0
+
+                    # --- elevation filter ---
+                    elev_mask = (eleA_all >= emin) & (eleA_all <= emax)
+                    if not np.any(elev_mask):
+                        continue
+
+                    # --- edot only for epochs passing elevation filter ---
+                    t_pass = t_all[elev_mask]
+                    nx2 = iX(t_pass + 0.5 - 0.07); ny2 = iY(t_pass + 0.5 - 0.07); nz2 = iZ(t_pass + 0.5 - 0.07)
+                    SatOrb2 = np.column_stack((nx2, ny2, nz2))
+                    r2_vec = SatOrb2 - recv
+                    tau2 = np.sqrt(np.sum(r2_vec**2, axis=1)) / clight
+                    for _k in range(2):
+                        nx2 = iX(t_pass + 0.5 - tau2); ny2 = iY(t_pass + 0.5 - tau2); nz2 = iZ(t_pass + 0.5 - tau2)
+                        SatOrb2 = np.column_stack((nx2, ny2, nz2))
+                        Th2 = -oE * tau2
+                        cosT2 = np.cos(Th2); sinT2 = np.sin(Th2)
+                        xs2 = SatOrb2[:, 0]*cosT2 - SatOrb2[:, 1]*sinT2
+                        ys2 = SatOrb2[:, 0]*sinT2 + SatOrb2[:, 1]*cosT2
+                        SatOrbn2 = np.column_stack((xs2, ys2, SatOrb2[:, 2]))
+                        tau2 = np.sqrt(np.sum((SatOrbn2 - recv)**2, axis=1)) / clight
+
+                    r2_vec = SatOrbn2 - recv
+                    r2_norms = np.sqrt(np.sum(r2_vec**2, axis=1))
+                    eleA2_all = (np.pi/2.0 - np.arccos(r2_vec @ up / r2_norms)) * 180.0/np.pi
+                    edot_all = 2.0 * (eleA2_all - eleA_all[elev_mask])
+
+                    # --- accumulate as array block ---
+                    tod_pass = t_all[elev_mask] - gpssec0
+                    idx_pass = idx_all[elev_mask]
+                    n_pass = len(tod_pass)
+                    block = np.empty((n_pass, 12))
+                    block[:, 0] = tod_pass
+                    block[:, 1] = sat_id
+                    block[:, 2] = eleA_all[elev_mask]
+                    block[:, 3] = azimA_all[elev_mask]
+                    block[:, 4] = tod_pass
+                    block[:, 5] = edot_all
+                    block[:, 6] = s6[idx_pass]
+                    block[:, 7] = s1[idx_pass]
+                    block[:, 8] = s2[idx_pass]
+                    block[:, 9] = s5[idx_pass]
+                    block[:, 10] = s7[idx_pass]
+                    block[:, 11] = s8[idx_pass]
+                    out_blocks.append(block)
         else:
             log.write('No data for constellation {0:1s} \n'.format(con))
+
+    if not out_blocks:
+        log.write('write SNR data to file \n')
+        open(outputfile, 'w+').close()
+        return
+
     # sort by time-of-day, then by satellite number (matching Fortran output order)
-    rows.sort(key=lambda r: (r[0], r[1]))
+    all_data = np.vstack(out_blocks)
+    sort_idx = np.lexsort((all_data[:, 1], all_data[:, 0]))
+    all_data = all_data[sort_idx]
+
     log.write('write SNR data to file \n')
     # write using Fortran-compatible format: i3, 2f10.4, f10.1, f10.6, f7.2, 5f7.2
-    fout = open(outputfile, 'w+')
-    for row in rows:
-        _, prn_id, eleA, azimA, tod, edot, s6v, s1v, s2v, s5v, s7v, s8v = row
-        fout.write("{0:3.0f}{1:10.4f}{2:10.4f}{3:10.1f}{4:10.6f}{5:7.2f}{6:7.2f}{7:7.2f}{8:7.2f}{9:7.2f}{10:7.2f}\n".format(
-            prn_id, eleA, azimA, tod, edot, s6v, s1v, s2v, s5v, s7v, s8v))
-    fout.close()
+    fmt = "%3.0f%10.4f%10.4f%10.1f%10.6f%7.2f%7.2f%7.2f%7.2f%7.2f%7.2f"
+    np.savetxt(outputfile, all_data[:, 1:], fmt=fmt)
 
 
 def the_makan_option(station,cyyyy,cyy,cdoy):
