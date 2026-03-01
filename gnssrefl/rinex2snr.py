@@ -952,7 +952,7 @@ def satorb_prop(week, secweek, prn, rrec0, closest_ephem):
     return SatOrbn
 
 
-def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij,dt_offset=0.0):
+def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij):
     """
     for satellite number prn
     and receiver coordinates rrec0
@@ -971,13 +971,10 @@ def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij,dt_offset=0.0):
 
     ij :
 
-    dt_offset : float
-        additional time offset in seconds (used for edot computation)
-
     sp3 has the orbit information in it
     """
     # start wit 70 milliseconds as the guess for the transmission time
-    t_obs = Tp[ij] + dt_offset
+    t_obs = Tp[ij]
     nx = iX(t_obs-0.07); ny = iY(t_obs-0.07); nz = iZ(t_obs-0.07)
     oE = constants.omegaEarth
     c = constants.c
@@ -1146,6 +1143,55 @@ def elev_limits(snroption):
     return emin, emax
 
 
+def propagate_and_azel_sp3(iX, iY, iZ, t, recv, up, East, North, oE, clight):
+    """
+    Vectorized SP3 orbit propagation with light-time iteration, then azimuth/elevation.
+
+    Parameters
+    ----------
+    iX, iY, iZ : CubicSpline
+        interpolators for satellite ECEF coordinates
+    t : ndarray
+        observation times (GPS seconds of week), shape (N,)
+    recv : ndarray
+        receiver ECEF position, shape (3,)
+    up, East, North : ndarray
+        unit vectors at receiver, shape (3,)
+    oE : float
+        Earth rotation rate (rad/s)
+    clight : float
+        speed of light (m/s)
+
+    Returns
+    -------
+    elv : ndarray, shape (N,)
+        elevation angles in degrees
+    azm : ndarray, shape (N,)
+        azimuth angles in degrees [0, 360)
+    """
+    # initial guess: 70 ms transmission time
+    nx = iX(t - 0.07); ny = iY(t - 0.07); nz = iZ(t - 0.07)
+    SatOrb = np.column_stack((nx, ny, nz))
+    tau = np.sqrt(np.sum((SatOrb - recv)**2, axis=1)) / clight
+
+    # two light-time iterations (matching scalar satorb_prop_sp3)
+    for _k in range(2):
+        nx = iX(t - tau); ny = iY(t - tau); nz = iZ(t - tau)
+        SatOrb = np.column_stack((nx, ny, nz))
+        Th = -oE * tau
+        cosT = np.cos(Th); sinT = np.sin(Th)
+        xs = SatOrb[:, 0]*cosT - SatOrb[:, 1]*sinT
+        ys = SatOrb[:, 0]*sinT + SatOrb[:, 1]*cosT
+        SatOrbn = np.column_stack((xs, ys, SatOrb[:, 2]))
+        tau = np.sqrt(np.sum((SatOrbn - recv)**2, axis=1)) / clight
+
+    r_vec = SatOrbn - recv
+    r_norms = np.sqrt(np.sum(r_vec**2, axis=1))
+    elv = (np.pi/2.0 - np.arccos(r_vec @ up / r_norms)) * 180.0/np.pi
+    azm = np.arctan2(r_vec @ East, r_vec @ North) * 180.0/np.pi % 360.0
+    return elv, azm
+
+
 def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day, emin,emax,outputfile,up,East,North,recv,dec_rate,log):
     """
     inputs are gpstime( numpy array with week and sow)
@@ -1229,60 +1275,20 @@ def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month
                     # indices into the original arrays for SNR lookup
                     idx_all = np.where(dec_mask)[0]
 
-                    # --- vectorized orbit propagation ---
-                    # initial guess: 70 ms transmission time
-                    nx = iX(t_all - 0.07); ny = iY(t_all - 0.07); nz = iZ(t_all - 0.07)
-                    SatOrb = np.column_stack((nx, ny, nz))  # (N, 3)
-                    r_vec = SatOrb - recv  # (N, 3)
-                    tau = np.sqrt(np.sum(r_vec**2, axis=1)) / clight  # (N,)
-
-                    # two light-time iterations (matching scalar satorb_prop_sp3)
-                    for _k in range(2):
-                        nx = iX(t_all - tau); ny = iY(t_all - tau); nz = iZ(t_all - tau)
-                        SatOrb = np.column_stack((nx, ny, nz))
-                        Th = -oE * tau
-                        cosT = np.cos(Th); sinT = np.sin(Th)
-                        xs = SatOrb[:, 0]*cosT - SatOrb[:, 1]*sinT
-                        ys = SatOrb[:, 0]*sinT + SatOrb[:, 1]*cosT
-                        SatOrbn = np.column_stack((xs, ys, SatOrb[:, 2]))
-                        tau = np.sqrt(np.sum((SatOrbn - recv)**2, axis=1)) / clight
-
-                    # --- vectorized azimuth and elevation ---
-                    r_vec = SatOrbn - recv  # (N, 3)
-                    r_norms = np.sqrt(np.sum(r_vec**2, axis=1))  # (N,)
-
-                    # elevation: pi/2 - arccos(dot(r, up) / |r|)
-                    eleA_all = (np.pi/2.0 - np.arccos(r_vec @ up / r_norms)) * 180.0/np.pi
-
-                    # azimuth: arctan2(dot(r, East), dot(r, North)) in degrees
-                    azimA_all = np.arctan2(r_vec @ East, r_vec @ North) * 180.0/np.pi
-                    azimA_all = azimA_all % 360.0
+                    # --- vectorized orbit propagation + geometry ---
+                    eleA_all, azimA_all = propagate_and_azel_sp3(
+                        iX, iY, iZ, t_all, recv, up, East, North, oE, clight)
 
                     # --- elevation filter ---
                     elev_mask = (eleA_all >= emin) & (eleA_all <= emax)
                     if not np.any(elev_mask):
                         continue
 
-                    # --- edot only for epochs passing elevation filter ---
+                    # --- edot: forward difference at +0.5s, doubled to match central difference ---
                     t_pass = t_all[elev_mask]
-                    nx2 = iX(t_pass + 0.5 - 0.07); ny2 = iY(t_pass + 0.5 - 0.07); nz2 = iZ(t_pass + 0.5 - 0.07)
-                    SatOrb2 = np.column_stack((nx2, ny2, nz2))
-                    r2_vec = SatOrb2 - recv
-                    tau2 = np.sqrt(np.sum(r2_vec**2, axis=1)) / clight
-                    for _k in range(2):
-                        nx2 = iX(t_pass + 0.5 - tau2); ny2 = iY(t_pass + 0.5 - tau2); nz2 = iZ(t_pass + 0.5 - tau2)
-                        SatOrb2 = np.column_stack((nx2, ny2, nz2))
-                        Th2 = -oE * tau2
-                        cosT2 = np.cos(Th2); sinT2 = np.sin(Th2)
-                        xs2 = SatOrb2[:, 0]*cosT2 - SatOrb2[:, 1]*sinT2
-                        ys2 = SatOrb2[:, 0]*sinT2 + SatOrb2[:, 1]*cosT2
-                        SatOrbn2 = np.column_stack((xs2, ys2, SatOrb2[:, 2]))
-                        tau2 = np.sqrt(np.sum((SatOrbn2 - recv)**2, axis=1)) / clight
-
-                    r2_vec = SatOrbn2 - recv
-                    r2_norms = np.sqrt(np.sum(r2_vec**2, axis=1))
-                    eleA2_all = (np.pi/2.0 - np.arccos(r2_vec @ up / r2_norms)) * 180.0/np.pi
-                    edot_all = 2.0 * (eleA2_all - eleA_all[elev_mask])
+                    elv_after, _ = propagate_and_azel_sp3(
+                        iX, iY, iZ, t_pass + 0.5, recv, up, East, North, oE, clight)
+                    edot_all = 2.0 * (elv_after - eleA_all[elev_mask])
 
                     # --- accumulate as array block ---
                     tod_pass = t_all[elev_mask] - gpssec0
