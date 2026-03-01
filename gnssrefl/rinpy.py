@@ -362,11 +362,16 @@ def _readblocks_v21(lines, header, headerlines, headerlengths, epochsatlists, sa
     parse = fieldstruct.unpack_from
     _float = float  # local ref avoids global lookup
 
-    # Pre-pad all lines as bytes once (avoids repeated rstrip/ljust/encode per satellite)
-    padded = [line.rstrip().ljust(80).encode('ascii') for line in lines]
+    # Pre-pad only data lines as bytes (skip file header and epoch headers)
+    padded = [None] * len(lines)
+    for headerstart, headerlength, satlist in zip(headerlines, headerlengths, epochsatlists):
+        datastart = headerstart + headerlength
+        end = datastart + rowpersat * len(satlist)
+        for k in range(datastart, end):
+            padded[k] = lines[k].rstrip().ljust(80).encode('ascii')
+
     blank = b'              '  # 14 spaces — blank observation field
     _nan = np.nan
-    data = np.empty(nobstypes)  # pre-allocate, reused each iteration
 
     for iepoch, (headerstart, headerlength, satlist) in enumerate(zip(headerlines, headerlengths, epochsatlists)):
         datastart = headerstart + headerlength
@@ -378,14 +383,9 @@ def _readblocks_v21(lines, header, headerlines, headerlengths, epochsatlists, sa
             except struct.error:
                 continue
 
-            for j in range(nobstypes):
-                f = fields[j]
-                if f != blank:
-                    data[j] = _float(f)
-                else:
-                    data[j] = _nan
-
-            observationdata[sat[0]][iepoch, prntoidx[sat[0]][int(sat[1:])], :] = data
+            # List comprehension runs in optimized C bytecode vs explicit for loop
+            observationdata[sat[0]][iepoch, prntoidx[sat[0]][int(sat[1:])], :] = \
+                [_float(f) if f != blank else _nan for f in fields[:nobstypes]]
 
     for letter in observationdata:
         kept_observables = [i for i in range(len(obstypes[letter])) if np.sum(~np.isnan(observationdata[letter][:,:,i]))>0]
