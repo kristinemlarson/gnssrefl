@@ -112,7 +112,7 @@ def _readheader_v21x(lines):
     obstimes = []
     epochsatlists = []
     # for those of who do not like datetime
-    gpstime = np.empty(shape=[0, 2])
+    gpstime_list = []
     satset = set()
 
     century = int(timeoffirstobs[0][:2]+'00')
@@ -136,8 +136,7 @@ def _readheader_v21x(lines):
                                                   microsecond=int(float(second) % 1 * 100000)))
 
                 week, sow = g.kgpsweek(century+int(year), int(month), int(day), int(hour), int(minute), int(float(second)))
-                ne = np.array((week,sow))
-                gpstime = np.vstack((gpstime,ne))
+                gpstime_list.append((week, sow))
 
                 numsats = int(lines[i][29:32])  # Number of visible satellites %i3
                 headerlengths.append(1 + (numsats-1)//12)  # number of lines in header, depends on how many svs on view
@@ -168,7 +167,8 @@ def _readheader_v21x(lines):
     for satlist in epochsatlists:
         satset = satset.union(satlist)
 
-    return header, headerlines, headerlengths, obstimes, epochsatlists, satset, gpstime 
+    gpstime = np.array(gpstime_list) if gpstime_list else np.empty(shape=[0, 2])
+    return header, headerlines, headerlengths, obstimes, epochsatlists, satset, gpstime
 
 
 def _readheader_v3(lines):
@@ -362,27 +362,30 @@ def _readblocks_v21(lines, header, headerlines, headerlengths, epochsatlists, sa
     parse = fieldstruct.unpack_from
     _float = float  # local ref avoids global lookup
 
+    # Pre-pad all lines as bytes once (avoids repeated rstrip/ljust/encode per satellite)
+    padded = [line.rstrip().ljust(80).encode('ascii') for line in lines]
+    blank = b'              '  # 14 spaces — blank observation field
+    _nan = np.nan
+    data = np.empty(nobstypes)  # pre-allocate, reused each iteration
+
     for iepoch, (headerstart, headerlength, satlist) in enumerate(zip(headerlines, headerlengths, epochsatlists)):
+        datastart = headerstart + headerlength
         for i, sat in enumerate(satlist):
-            datastring = ''.join([line.rstrip().ljust(80) for line in
-                                  lines[headerstart+headerlength+rowpersat*i:headerstart+headerlength+rowpersat*(i+1)]])
+            start = datastart + rowpersat * i
+            databytes = b''.join(padded[start:start + rowpersat])
             try:
-                fields = parse(datastring.encode('ascii'))
+                fields = parse(databytes)
             except struct.error:
                 continue
 
-            data = np.empty(nobstypes)
             for j in range(nobstypes):
-                stripped = fields[j].strip()
-                if stripped:
-                    data[j] = _float(stripped)
+                f = fields[j]
+                if f != blank:
+                    data[j] = _float(f)
                 else:
-                    data[j] = np.nan
+                    data[j] = _nan
 
-            systemletter = sat[0]
-            prn = int(sat[1:])
-
-            observationdata[systemletter][iepoch, prntoidx[systemletter][prn], :] = data
+            observationdata[sat[0]][iepoch, prntoidx[sat[0]][int(sat[1:])], :] = data
 
     for letter in observationdata:
         kept_observables = [i for i in range(len(obstypes[letter])) if np.sum(~np.isnan(observationdata[letter][:,:,i]))>0]

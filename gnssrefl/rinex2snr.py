@@ -1,4 +1,5 @@
 import datetime
+import gzip as gzip_mod
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -170,9 +171,9 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                 if overwrite:
                     print('SNR file exists/you requested overwriting, existing file will be deleted')
                     if os.path.isfile(fname):
-                        subprocess.call(['rm', fname]); 
+                        os.remove(fname)
                     if os.path.isfile(fname + '.gz'):
-                        subprocess.call(['rm', fname + '.gz']); 
+                        os.remove(fname + '.gz')
                     snre = False
                 else:
                     print('SNR file already exists', fname, '\n')
@@ -592,7 +593,10 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
                         t2=time.time()
 
                 # remove the rinex file
-                subprocess.call(['rm', '-f',rinexfile])
+                try:
+                    os.remove(rinexfile)
+                except FileNotFoundError:
+                    pass
 
                 if os.path.isfile(snrname):
 #                make sure it exists and is non-zero size before moving it
@@ -608,7 +612,11 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
                         print('\n')
                         print('SUCCESS: SNR file was created \n', snrname_full)
                         g.store_snrfile(snrname,year,station)
-                        subprocess.call(['gzip', snrname_full])
+                        with open(snrname_full, 'rb') as f_in:
+                            snr_data = f_in.read()
+                        with gzip_mod.open(snrname_full + '.gz', 'wb', compresslevel=6) as f_out:
+                            f_out.write(snr_data)
+                        os.remove(snrname_full)
 
                 else:
                     # not sure why this is made here??? wasn't it created earlier?
@@ -1309,8 +1317,12 @@ def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month
 
     log.write('write SNR data to file \n')
     # write using Fortran-compatible format: i3, 2f10.4, f10.1, f10.6, f7.2, 5f7.2
-    fmt = "%3.0f%10.4f%10.4f%10.1f%10.6f%7.2f%7.2f%7.2f%7.2f%7.2f%7.2f"
-    np.savetxt(outputfile, all_data[:, 1:], fmt=fmt)
+    fmt = "%3.0f%10.4f%10.4f%10.1f%10.6f%7.2f%7.2f%7.2f%7.2f%7.2f%7.2f\n"
+    rows = all_data[:, 1:].tolist()
+    with open(outputfile, 'w') as f:
+        write = f.write
+        for row in rows:
+            write(fmt % tuple(row))
 
 
 def the_makan_option(station,cyyyy,cyy,cdoy):
