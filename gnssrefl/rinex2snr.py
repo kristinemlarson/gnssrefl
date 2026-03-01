@@ -1193,24 +1193,89 @@ def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month
         # make sure there are no nan values in s2 or s5
 
                         nepochs = len(Tp)
-                        for ij in range(0,nepochs):
-                            TT = 0 # default value
-                            if checkD:
-                                TT = Tp[ij]  % dec_rate # get the modulus
-                            if TT == 0:
-                                SatOrb = satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij)
-                                r=np.subtract(SatOrb,recv)
-                                azimA = g.azimuth_angle(r, East, North)
-                                eleA = g.elev_angle(up, r)*180/np.pi
-                                if (eleA >= emin) and (eleA <= emax):
-                                    # compute edot: elevation rate in deg/sec
-                                    # same method as Fortran: elev at t+0.5s minus elev at t, times 2
-                                    SatOrb2 = satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij,dt_offset=0.5)
-                                    r2=np.subtract(SatOrb2,recv)
-                                    eleA2 = g.elev_angle(up, r2)*180/np.pi
-                                    edot = 2.0*(eleA2 - eleA)
-                                    tod = Tp[ij]-gpssec0
-                                    rows.append((tod, prn+addon,eleA,azimA,tod, edot,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s7[ij]),float(s8[ij])))
+                        if nepochs == 0:
+                            continue
+
+                        # --- decimation filter (vectorized) ---
+                        if checkD:
+                            dec_mask = (Tp % dec_rate) == 0
+                        else:
+                            dec_mask = np.ones(nepochs, dtype=bool)
+
+                        t_all = Tp[dec_mask]
+                        if len(t_all) == 0:
+                            continue
+                        # indices into the original arrays for SNR lookup
+                        idx_all = np.where(dec_mask)[0]
+
+                        # --- vectorized orbit propagation (replaces satorb_prop_sp3 loop) ---
+                        oE = constants.omegaEarth
+                        clight = constants.c
+
+                        # initial guess: 70 ms transmission time
+                        nx = iX(t_all - 0.07); ny = iY(t_all - 0.07); nz = iZ(t_all - 0.07)
+                        SatOrb = np.column_stack((nx, ny, nz))  # (N, 3)
+                        r_vec = SatOrb - recv  # (N, 3)
+                        tau = np.sqrt(np.sum(r_vec**2, axis=1)) / clight  # (N,)
+
+                        # two light-time iterations (matching scalar satorb_prop_sp3)
+                        for _k in range(2):
+                            nx = iX(t_all - tau); ny = iY(t_all - tau); nz = iZ(t_all - tau)
+                            SatOrb = np.column_stack((nx, ny, nz))
+                            Th = -oE * tau
+                            cosT = np.cos(Th); sinT = np.sin(Th)
+                            xs = SatOrb[:, 0]*cosT - SatOrb[:, 1]*sinT
+                            ys = SatOrb[:, 0]*sinT + SatOrb[:, 1]*cosT
+                            SatOrbn = np.column_stack((xs, ys, SatOrb[:, 2]))
+                            tau = np.sqrt(np.sum((SatOrbn - recv)**2, axis=1)) / clight
+
+                        # --- vectorized azimuth and elevation ---
+                        r_vec = SatOrbn - recv  # (N, 3)
+                        r_norms = np.sqrt(np.sum(r_vec**2, axis=1))  # (N,)
+
+                        # elevation: pi/2 - arccos(dot(r, up) / |r|)
+                        eleA_all = (np.pi/2.0 - np.arccos(r_vec @ up / r_norms)) * 180.0/np.pi
+
+                        # azimuth: arctan2(dot(r, East), dot(r, North)) in degrees
+                        azimA_all = np.arctan2(r_vec @ East, r_vec @ North) * 180.0/np.pi
+                        azimA_all = azimA_all % 360.0
+
+                        # --- elevation filter ---
+                        elev_mask = (eleA_all >= emin) & (eleA_all <= emax)
+                        if not np.any(elev_mask):
+                            continue
+
+                        # --- edot only for epochs passing elevation filter ---
+                        t_pass = t_all[elev_mask]
+                        nx2 = iX(t_pass + 0.5 - 0.07); ny2 = iY(t_pass + 0.5 - 0.07); nz2 = iZ(t_pass + 0.5 - 0.07)
+                        SatOrb2 = np.column_stack((nx2, ny2, nz2))
+                        r2_vec = SatOrb2 - recv
+                        tau2 = np.sqrt(np.sum(r2_vec**2, axis=1)) / clight
+                        for _k in range(2):
+                            nx2 = iX(t_pass + 0.5 - tau2); ny2 = iY(t_pass + 0.5 - tau2); nz2 = iZ(t_pass + 0.5 - tau2)
+                            SatOrb2 = np.column_stack((nx2, ny2, nz2))
+                            Th2 = -oE * tau2
+                            cosT2 = np.cos(Th2); sinT2 = np.sin(Th2)
+                            xs2 = SatOrb2[:, 0]*cosT2 - SatOrb2[:, 1]*sinT2
+                            ys2 = SatOrb2[:, 0]*sinT2 + SatOrb2[:, 1]*cosT2
+                            SatOrbn2 = np.column_stack((xs2, ys2, SatOrb2[:, 2]))
+                            tau2 = np.sqrt(np.sum((SatOrbn2 - recv)**2, axis=1)) / clight
+
+                        r2_vec = SatOrbn2 - recv
+                        r2_norms = np.sqrt(np.sum(r2_vec**2, axis=1))
+                        eleA2_all = (np.pi/2.0 - np.arccos(r2_vec @ up / r2_norms)) * 180.0/np.pi
+                        edot_all = 2.0 * (eleA2_all - eleA_all[elev_mask])
+
+                        # --- accumulate rows ---
+                        tod_all = t_all[elev_mask] - gpssec0
+                        idx_pass = idx_all[elev_mask]
+                        prn_id = prn + addon
+                        for ii in range(len(tod_all)):
+                            jj = idx_pass[ii]
+                            rows.append((tod_all[ii], prn_id, eleA_all[elev_mask][ii],
+                                         azimA_all[elev_mask][ii], tod_all[ii], edot_all[ii],
+                                         float(s6[jj]), s1[jj], float(s2[jj]), float(s5[jj]),
+                                         float(s7[jj]), float(s8[jj])))
                     else:
                         log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
         else:

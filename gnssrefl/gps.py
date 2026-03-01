@@ -4325,7 +4325,7 @@ def read_sp3file(file_path):
     ignorePoint = False
     max_sat = 150 # not used
     # store as satNu, week, sec of week , x, y, and z?
-    sp3 = np.empty(shape=[0, 6])
+    rows = []
     count = -1
     firstEpochFound = False
 
@@ -4337,7 +4337,7 @@ def read_sp3file(file_path):
             wk,swk = kgpsweek(int(year), int(month), int(day), int(hour), int(minute), float(second))
             wk = int(wk) ; swk = float(swk)
             if (not firstEpochFound):
-                firstWeek = wk 
+                firstWeek = wk
                 firstEpochFound = True
                 #print('first GPS Week and Seconds in the file', firstWeek, swk)
             count += 1
@@ -4355,9 +4355,9 @@ def read_sp3file(file_path):
                 x = float(xs[1])*1000.0
                 y = float(xs[2])*1000.0
                 z = float(xs[3])*1000.0
-                lis = [satNu, wk,swk, x,y,z]
-                sp3 = np.vstack((sp3,lis))
+                rows.append([satNu, wk,swk, x,y,z])
     f.close()
+    sp3 = np.array(rows) if rows else np.empty(shape=[0, 6])
     nr,nc = sp3.shape
     #print('number of rows and columns being returned from the sp3 file', nr,nc)
     return sp3
