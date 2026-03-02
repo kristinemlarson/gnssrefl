@@ -1,20 +1,10 @@
 import os
 import shutil
 import sys
-import types
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
-# gnssrefl.gps imports gnssrefl.rinex2snr which imports compiled Fortran
-# extensions (.so). These are not available when running from the source tree,
-# so inject stubs before any gnssrefl module is loaded. The extensions are only
-# used for RINEX translation, not for gnssir/phase analysis.
-for _mod in ("gnssrefl.gpssnr", "gnssrefl.gnsssnr",
-             "gnssrefl.gnsssnrbigger", "gnssrefl.xnmeasnr"):
-    if _mod not in sys.modules:
-        sys.modules[_mod] = types.ModuleType(_mod)
 
 FIXTURE_DIR = Path(__file__).parent / "data" / "refl_code"
 

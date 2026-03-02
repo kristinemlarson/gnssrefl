@@ -8,7 +8,6 @@ import sys
 
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as r
-import gnssrefl.gnsssnrbigger as gnsssnrbigger
 
 
 def main():
@@ -47,7 +46,6 @@ def main():
     idoy = int(cdoy)
     iyear,month,day=g.ydoy2ymd(iyear, idoy)
 
-    maindir = os.environ['REFL_CODE']
     # where rinex data are
     xdir = os.environ['REFL_CODE'] + '/rinex/' + STATION + '/' + year + '/'
     # where snr data will go
@@ -96,26 +94,13 @@ def main():
 
     g.make_snrdir(year,STATION) # make sure output directory exists
     snrname = snrdir + rinex3[0:-3] + 'snr66'
-
-    in1 = g.binary(rinex2)
-    in2 = g.binary(snrname) 
-    in3 = g.binary(orbfile)
-
-    if (len(snrname) > 132) or (len(orbfile) > 132):
-        print('The orbit or SNR file name is too long.')
-        print('Make your environment variable names shorter.')
-        sys.exit()
     option = 66
-    in4 = g.binary(str(option))
-    if (dec_rate > 0):
-        decr = str(dec_rate)
-    else:
-        decr = '0'
-    in5 = g.binary(decr) # decimation can be used in hybrid option
-    message = 'None '
-    errorlog = maindir + '/logs/' + station + '_hybrid_error.txt'
-    in6 = g.binary(errorlog)
-    gnsssnrbigger.foo(in1,in2,in3,in4,in5,in6)
+
+    log,nada2,exedir2,gen_log2 = r.set_rinex2snr_logs(station,iyear,idoy)
+    r.rnx2snr(rinex2, orbfile, snrname, option, iyear, month, day, dec_rate, log)
+    log.close()
+    gen_log2.close()
+
     # clean up - remove the rinex2 file
     print('SNR file written to: ', snrname)
     subprocess.call(['rm','-f',rinex2])
