@@ -18,11 +18,6 @@ import gnssrefl.rinpy as rinpy
 import gnssrefl.karnak_libraries as k
 import gnssrefl.highrate as ch
 
-# fortran codes for translating RINEX
-import gnssrefl.gpssnr as gpssnr
-import gnssrefl.gnsssnr as gnsssnr
-import gnssrefl.gnsssnrbigger as gnsssnrbigger
-
 from gnssrefl.snrfile_functions import constants, elev_limits, propagate_and_azel_sp3
 
 #
@@ -55,7 +50,7 @@ def quickname(station,year,cyy, cdoy, csnr):
 
     return fname
 
-def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol,overwrite,translator,srate, 
+def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol,overwrite,srate,
                   mk, stream,strip,bkg,screenstats,gzip,timeout,quiet):
     """
     main code to convert RINEX files into SNR files.
@@ -89,9 +84,6 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
     overwrite: bool
         False (default): if SNR file exists, SNR file not made
         True: make a new SNR file
-    translator : str
-        hybrid (default), fortran, or python
-        hybrid uses fortran within he python code
     srate : int
         sample rate for RINEX 3 files
     mk : bool
@@ -185,7 +177,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
             if (not illegal_day) and (not snre):
                 # make log directory ... 
                 log, errorlog, exedir,gen_log = set_rinex2snr_logs(station,year,doy)
-                print('Fortran translation log: ', errorlog)
+                print('Translation log: ', errorlog)
                 print('General log: ', gen_log)
 
                 r = station + cdoy + '0.' + cyy + 'o'
@@ -225,7 +217,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             if strip:
                                 log.write('Testing out stripping the RINEX 2 file here\n')
                                 k.strip_rinexfile(r)
-                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator,log,errorlog,rinex2_filename=r)
+                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log,errorlog,rinex2_filename=r)
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
@@ -275,7 +267,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             # this is so flawed.  If file exists, it should not look for it via conv2snr
                             # It looks like i was just trying to use old code here. Have added rinex2_filename parameter 
                             if fexists:
-                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator, 
+                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
                                          log,errorlog, rinex2_filename=r2)
                             else:
                                 log.write('Something about the RINEX 3-2 conversion did not work. No SNR file created.\n')
@@ -390,18 +382,18 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 pass
                              # should send it the version 2 name
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
-                                      translator,log,errorlog,rinex2_filename=r2)
+                                      log,errorlog,rinex2_filename=r2)
                         else:
                             log.write('Unsuccessful RINEX 3 retrieval/translation for year-doy {0:4.0f} {1:3.0f} \n'.format(year, doy))
                     else:
                         print(station, ' year:', year, ' doy:', doy, ' from: ', archive, ' rate:', rate, ' orb:', orbtype)
                         # for version 2, since i was using old code, the RINEX 2.11 searching goes on in conv2snr
-                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,translator,log,errorlog)
+                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log,errorlog)
 
 
-def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,translator,log,errorlog,**kwargs):
+def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,log,errorlog,**kwargs):
     """
-    This code originally picked up and translated files. You can now optionally send 
+    This code originally picked up and translated files. You can now optionally send
     a parameter called rinex2_filename if the file exists. This needs to be done especially for RINEX 3
     which have been converted to RINEX 2.11
 
@@ -427,12 +419,10 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
         decimation value to reduce file size
     archive : str
         external location (archive) of the rinex files
-    translator : str
-         hybrid, python, or fortran
     log : fileid
         for screen messages
     errorlog : str
-        location of fortran logs
+        location of logs
 
     """
 
@@ -440,23 +430,12 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
 
     xdir = os.environ['REFL_CODE']
 
-    # universal location for the log directory
-    #logdir, logname = g.define_logdir(station,year,doy)
-
-    exedir = os.environ['EXE'] # location of executables for fortran people
-
     screenstats = True # hopefully most goes to a file now
 
-    #general_log = logdir + '/' + logname + '.gen'
-    #print('Minimal feedback is written to ', general_log)
-    #errorlog = logdir + '/' + logname
-
-    #log = open(general_log, 'w+') this file is now opened earlier
     log.write("Receiver rate: {0:5s} \n".format(receiverrate))
     log.write("Decimation rate: {0:3.0f} \n".format(dec_rate))
     log.write("Archive : {0:10s} \n".format(archive))
     log.write("Orbit option : {0:10s} \n".format(orbtype))
-    log.write("Translator : {0:10s} \n".format(translator))
     csnr = str(option)
     # should be using a function for this
     cyyyy,cyy,cdoy = g.ydoych(year,doy)
@@ -468,24 +447,14 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
 
     # if it exists, you should not have gotten to this code...
     snre = False
-    #snrname_full, snrname_compressed, snre = g.define_and_xz_snr(station,year,doy,option)
-
-    # use a local definition of fortran now that we are only using translator variable from
-    # the functions that call conv2snr
-    # 
-    fortran = False
-    if translator == 'fortran':
-        fortran == True
 
     if (snre == True):
         log.write("The snrfile already exists: {0:50s} \n".format(snrname_full))
-        #print("The snrfile already exists: ", snrname_full)
     else:
         log.write("The snrfile does not exist: {0:50s} \n".format(snrname_full))
         d = g.doy2ymd(year,doy);
         month = d.month; day = d.day
-        # new function to do the whole orbit thing - but it assumes ultra is hour zero?
-        foundit, f, orbdir, snrexe = g.get_orbits_setexe(year,month,day,orbtype,fortran)
+        foundit, f, orbdir, snrexe = g.get_orbits_setexe(year,month,day,orbtype,False)
         # if you have the orbit file, you can get the rinex file. First lets define the expected names
         if foundit:
             print('Orbit file: ', f)
@@ -519,75 +488,13 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,t
 #           define booleans for various files
             oexist = os.path.isfile(orbdir + '/' + f) == True
             rexist = os.path.isfile(rinexfile) == True
-            exc = exedir + '/teqc'
-            texist = os.path.isfile(exc) == True
-            if rexist:
-                # decimate using teqc  if you have it
-                if (texist) and (fortran) and (dec_rate > 0):
-                    log.write("Decimating using teqc:  {0:3.0f}  seconds \n".format(dec_rate))
-                    log.write('Unfortunately teqc removes Beidou data. Eventually I will remove this. \n')
-                    rinexout = rinexfile + '.tmp'; cdec = str(dec_rate)
-                    fout = open(rinexout,'w')
-                    subprocess.call([exc, '-O.dec', cdec, rinexfile],stdout=fout)
-                    fout.close() # needed?
-                    status = subprocess.call(['mv','-f', rinexout, rinexfile])
             # if orbits and rinexfile exist
             if (oexist) and (rexist):
                 snrname = g.snr_name(station, year,month,day,option)
                 orbfile = orbdir + '/' + f
-                # almost everyone uses hybrid. python only is heavily discouraged because
-                # it is too slow. 
-                if translator == 'hybrid':
-                    g.make_snrdir(year,station) # make sure output directory exists
-                    in1 = g.binary(rinexfile)
-                    in2 = g.binary(snrname) # this file is made locally and moved later
-                    in3 = g.binary(orbfile)
-                    if (len(snrname) > 132) or (len(orbfile) > 132):
-                        print('The orbit or SNR file name you are using is too long.')
-                        print('Make your environment variable names shorter.')
-                        return
-                    in4 = g.binary(str(option))
-                    if (dec_rate > 0):
-                        decr = str(dec_rate)
-                    else:
-                        decr = '0'
-                    in5 = g.binary(decr) # decimation can be used in hybrid option
-                    message = 'None '
-
-                    in6 = g.binary(errorlog)
-                    log.write('SNR file {0:50s} \n will use hybrid of python and fortran to make \n'.format( snrname))
-                    # these are calls to the fortran codes that are called from python
-                    if (orbtype  == 'gps') or ('nav' in orbtype):
-                        gpssnr.foo(in1,in2,in3,in4,in5,in6)
-                    else:
-                        if orbtype in ['ultra', 'wum', 'wum2']:
-                            print('Using an ultrarapid orbit')
-                            gnsssnrbigger.foo(in1,in2,in3,in4,in5,in6)
-                        else:
-                            gnsssnr.foo(in1,in2,in3,in4,in5,in6)
-                else:
-                    if (translator == 'fortran'):
-                        t1=time.time()
-                        try:
-                            #subprocess.call([snrexe, rinexfile, snrname, orbfile, str(option)])
-                            log.write('Using standalone fortran for translation  - separate log is used for stdout \n')
-                            flogname = errorlog
-
-                            flog = open(flogname, 'w+')
-                            a=subprocess.run([snrexe, rinexfile, snrname, orbfile, str(option)],capture_output=True,text=True)
-                            ddd = a.stdout; flog.write(ddd); flog.close()
-                            status = subprocess.call(['rm','-f', rinexfile ])
-                            status = subprocess.call(['xz', orbfile])
-                        except:
-                            log.write('Problem with making SNR file, check log {0:50s} \n'.format(flogname))
-                        t2=time.time()
-                    else:
-                        log.write('SNR file {0:50s} \n will use python to make \n'.format( snrname))
-                        log.write('Decimating will be done here instead of using teqc \n')
-                        t1=time.time()
-                        # i think this uses the strandberg way
-                        rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate,log)
-                        t2=time.time()
+                g.make_snrdir(year,station) # make sure output directory exists
+                log.write('SNR file {0:50s} \n'.format( snrname))
+                rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate,log)
 
                 # remove the rinex file
                 try:
