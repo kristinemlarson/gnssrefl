@@ -6,10 +6,10 @@ import os, datetime, traceback, gzip
 import subprocess
 import sys
 import tempfile
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d, CubicSpline
 
 import gnssrefl.gps as g
-import gnssrefl.decipher_argt as gt
+from gnssrefl.snrfile_functions import constants, elev_limits as snr_elev_limits, propagate_and_azel_sp3
 
 def nmea_apriori_coords(station,llh,sp3):
     """
@@ -181,15 +181,6 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
             print('Out of luck - could not find a good orbit file for you')
             return
 
-    # this was to help a colleague  and should be deleted
-    #if station == 'argt':
-    #    gt.decipher_argt(station,'jul01.txt',idec,snrfile,orbfile,recv,csnr,year,month,day)
-    #    if os.path.isfile(snrfile):
-    #        print('File made, ignoring the rest of the code')
-    #        return
-    #    else:
-    #        print('Translation was unsuccessful'); return
-
     #check whether the input file is a uncompressed or compressed     
     tmpobj = tempfile.TemporaryDirectory()
     tmpdir = tmpobj.name
@@ -261,91 +252,50 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
     print('Leap second offset ', offset)
 
     if sp3 :
-       # this tmpfile has a terrible name.  
-        #tmpfile =  station + 'tmp.txt'
-        tmpfile = g.randomfilename() + '.txt'
+        # collect per-epoch, per-satellite SNR into arrays for Python orbit computation
         timetags = np.unique(T)
-
         xT = np.asarray(T)
         xPRN = np.asarray(PRN)
         xSNR = np.asarray(SNR)
         xfreq = np.asarray(FREQ)
-        print('Opening temporary file : ', tmpfile)
-        fout = open(tmpfile, 'w+')
-        fout.write('{0:15.4f}{1:15.4f}{2:15.4f} \n'.format(recv[0], recv[1],recv[2]) )
-        fout.write('{0:6.0f}{1:6.0f}{2:6.0f} \n'.format(year, month, day) )
-        #(t[i], prn[i], snr[i],freq[i])
-        # look thru the unique time tags
-        print('Found ', len(timetags), ' time tags')
-        for i in range(0,len(timetags)):
-            if ( (timetags[i] % idec) == 0):
-                # for this timetag and if pass decimation test
-                jj = (xT == timetags[i])
-                # satellites at the epoch
-                unique_sats_epoch = np.unique(xPRN[jj])
-                epoch_sat = xPRN[jj]
-                # snr data at the epoch
-                epoch_snr = xSNR[jj]
-                # fr data at the epoch
-                epoch_freq = xfreq[jj]
-                # go thru the unique satellite numbers at this epoch... 
-                for ij in range(0,len(unique_sats_epoch)):
-                    # pick out that satellite number
-                    sat = int(unique_sats_epoch[ij])
-                    # find all data that go with this 
-                    ijk = (sat == epoch_sat)
-                    # store the SNR data ..
-                    snrdata = epoch_snr[ijk]
-                    # store the freq data ..
-                    frdata = epoch_freq[ijk]
-                    # to fix the long-lived glonass mistake
-                    if (sat > 100) & (sat < 200):
-                        sat = sat - 64
 
-                    #print(timetags[i], sat, snrdata, frdata)
-                    # now write them out ... first assume all SNR data are zero
-                    # then reassign based on frequency
-                    s1=0; s2=0; s5=0  
-                    for iugh in range(0,len(frdata)):
-                        if (frdata[iugh] == '1'):
-                            s1 = snrdata[iugh]
-                        elif (frdata[iugh] == '2'):
-                            s2 = snrdata[iugh]
-                        elif (frdata[iugh] == '5'):
-                            s5 = snrdata[iugh]
-                    #print(timetags[i], sat, s1, s2, s5)
-                    # testing for leap seconds, not good for all time
-                    fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:6.2f} {4:6.2f} \n'.format(timetags[i]+offset, sat, s1, s2, s5) )
-                    
-        fout.close()
-        gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
-        #print('Az/El Updated...')
-        return # translation has taken place in new_azel, so return to main code 
+        tod_list = []; prn_list = []; s1_list = []; s2_list = []; s5_list = []
+        for tt in timetags:
+            if (tt % idec) != 0:
+                continue
+            jj = (xT == tt)
+            epoch_sat = xPRN[jj]
+            epoch_snr = xSNR[jj]
+            epoch_freq = xfreq[jj]
+            for sat in np.unique(epoch_sat):
+                sat = int(sat)
+                ijk = (sat == epoch_sat)
+                frdata = epoch_freq[ijk]
+                snrdata = epoch_snr[ijk]
+                s1 = 0.0; s2 = 0.0; s5 = 0.0
+                for k in range(len(frdata)):
+                    if frdata[k] == '1':
+                        s1 = float(snrdata[k])
+                    elif frdata[k] == '2':
+                        s2 = float(snrdata[k])
+                    elif frdata[k] == '5':
+                        s5 = float(snrdata[k])
+                tod_list.append(tt + offset)
+                prn_list.append(sat)
+                s1_list.append(s1); s2_list.append(s2); s5_list.append(s5)
 
-    # this was my first effort.  It only allowed L1 data. I am not deleting it - but
-    # it is no longer valid.
-    if sp3 and False:
-        tmpfile =  station + 'tmp.txt'
-        print('Opening temporary file : ', tmpfile)
-        fout = open(tmpfile, 'w+')
-        fout.write('{0:15.4f}{1:15.4f}{2:15.4f} \n'.format(recv[0], recv[1],recv[2]) )
-        fout.write('{0:6.0f}{1:6.0f}{2:6.0f} \n'.format(year, month, day) )
-        #(t[i], prn[i], snr[i],freq[i])
-        for i in range(0,len(T)):
-            if ( (int(t[i]) % idec) == 0):
-                sat = PRN[i]
-                # glonass satellites are misnamed by the code
-                if (sat > 100) & (sat < 200):
-                    sat = sat - 64
-                fout.write('{0:8.0f} {1:3.0f} {2:6.2f} {3:s} \n'.format(T[i], sat, SNR[i], freq[i]) )
-                newl = [T[i], sat, SNR[i], int(freq[i])]
-        fout.close()
-        #subprocess.call(['cp', tmpfile,'k_debug.txt']) 
-        # make the snrfile
-        gt.new_azel(station,tmpfile,snrfile,orbfile,csnr)
-        #print('Az/El Updated...')
+        if len(tod_list) == 0:
+            print('No observations survived decimation'); return
 
-        return # - in theory the fortran called in new_azel took care of everything
+        nmea_sp3_azel(
+            recv, year, month, day,
+            np.array(tod_list, dtype=float),
+            np.array(prn_list, dtype=int),
+            np.array(s1_list, dtype=float),
+            np.array(s2_list, dtype=float),
+            np.array(s5_list, dtype=float),
+            orbfile, snrfile, csnr)
+        return
     
     inx = np.argsort(T)  #Sort data by time
     
@@ -435,6 +385,125 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                     fout.write(outline + snrline + '\n')
                 #fout.write("%3g %10.4f %10.4f %10g %4s %4s %7.2f %4s %4s\n" % (p, float(ELV[i]), float(AZ[i]), float(T[i]),'0', '0', float(SNR[i]),'0', '0')) 
         
+def nmea_sp3_azel(recv, year, month, day, tod, prn, s1, s2, s5,
+                  orbfile, snrfile, csnr):
+    """
+    Compute azimuth/elevation from SP3 orbits for NMEA observations and write SNR file.
+
+    Parameters
+    ----------
+    recv : list of float
+        Cartesian receiver coordinates [X, Y, Z] in meters
+    year, month, day : int
+        calendar date
+    tod : ndarray
+        time of day in seconds (with leap-second offset applied)
+    prn : ndarray of int
+        satellite PRN numbers (gnssrefl convention: GPS 1-32, GLONASS 101-132, etc.)
+    s1, s2, s5 : ndarray of float
+        SNR values on L1, L2, L5
+    orbfile : str
+        path to SP3 orbit file
+    snrfile : str
+        path to output SNR file
+    csnr : str
+        SNR option ('66', '99', etc.)
+    """
+    recv = np.array(recv, dtype=float)
+    lat, lon, h = g.xyz2llh(recv, 1e-8)
+    up, East, North = g.up(lat, lon)
+
+    gweek0, gpssec0 = g.kgpsweek(year, month, day, 0, 0, 0)
+    obs_sow = gpssec0 + tod
+
+    sp3 = g.read_sp3file(orbfile)
+    if sp3.size == 0:
+        print('SP3 file is empty or unreadable'); return
+
+    # pre-index SP3 data by satellite number
+    sp3_index = {}
+    for sat_id in np.unique(sp3[:, 0]).astype(int):
+        m = sp3[:, 0] == sat_id
+        sp3_index[sat_id] = (sp3[m, 2], sp3[m, 3], sp3[m, 4], sp3[m, 5])
+
+    oE = constants.omegaEarth
+    clight = constants.c
+    emin, emax = snr_elev_limits(int(csnr))
+
+    out_blocks = []
+    unique_sats = np.unique(prn)
+    for sat_id in unique_sats:
+        if sat_id not in sp3_index:
+            continue
+        sp3_sec, x, y, z = sp3_index[sat_id]
+        if len(x) == 0:
+            continue
+
+        iX = CubicSpline(sp3_sec, x, extrapolate=True)
+        iY = CubicSpline(sp3_sec, y, extrapolate=True)
+        iZ = CubicSpline(sp3_sec, z, extrapolate=True)
+
+        mask = (prn == sat_id)
+        t_sat = obs_sow[mask]
+        s1_sat = s1[mask]; s2_sat = s2[mask]; s5_sat = s5[mask]
+        tod_sat = tod[mask]
+
+        if len(t_sat) == 0:
+            continue
+
+        eleA, azimA = propagate_and_azel_sp3(
+            iX, iY, iZ, t_sat, recv, up, East, North, oE, clight)
+
+        # elevation filter
+        elev_mask = (eleA >= emin) & (eleA <= emax)
+        if not np.any(elev_mask):
+            continue
+
+        # edot: forward difference at +0.5s, doubled to match central difference
+        t_pass = t_sat[elev_mask]
+        elv_after, _ = propagate_and_azel_sp3(
+            iX, iY, iZ, t_pass + 0.5, recv, up, East, North, oE, clight)
+        edot = 2.0 * (elv_after - eleA[elev_mask])
+
+        # clamp bad SNR values
+        s1_pass = s1_sat[elev_mask]; s2_pass = s2_sat[elev_mask]; s5_pass = s5_sat[elev_mask]
+        for arr in (s1_pass, s2_pass, s5_pass):
+            bad = (arr < 0) | (arr > 999)
+            arr[bad] = 0
+
+        n = len(t_pass)
+        block = np.empty((n, 12))
+        block[:, 0] = tod_sat[elev_mask]       # sort key: time of day
+        block[:, 1] = sat_id                    # satellite number
+        block[:, 2] = eleA[elev_mask]           # elevation
+        block[:, 3] = azimA[elev_mask]          # azimuth
+        block[:, 4] = tod_sat[elev_mask]        # seconds of the day
+        block[:, 5] = edot                      # elevation rate
+        block[:, 6] = 0                         # S6
+        block[:, 7] = s1_pass                   # S1
+        block[:, 8] = s2_pass                   # S2
+        block[:, 9] = s5_pass                   # S5
+        block[:, 10] = 0                        # S7
+        block[:, 11] = 0                        # S8
+        out_blocks.append(block)
+
+    if not out_blocks:
+        print('No observations survived orbit computation')
+        open(snrfile, 'w').close()
+        return
+
+    all_data = np.vstack(out_blocks)
+    sort_idx = np.lexsort((all_data[:, 1], all_data[:, 0]))
+    all_data = all_data[sort_idx]
+
+    fmt = "%3.0f%10.4f%10.4f%10.1f%10.6f%7.2f%7.2f%7.2f%7.2f%7.2f%7.2f\n"
+    rows = all_data[:, 1:].tolist()
+    with open(snrfile, 'w') as f:
+        write = f.write
+        for row in rows:
+            write(fmt % tuple(row))
+
+
 def read_nmea(fname):
     """
     reads a NMEA file.
