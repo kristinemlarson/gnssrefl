@@ -1039,14 +1039,14 @@ def _test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,da
                     if 'S1' in obslist:
                         s1 = obsdata[con]['S1'][:, prntoidx[con][prn]]
 
-        # indices when there are no data for this satellite
-                    ij = np.isnan(s1)
-        # indices when there are data in the RINEX file - this way you do not compute
-        # orbits unless there are data.
-                    not_ij = np.logical_not(ij)
+        # keep epoch if ANY SNR channel has data (matches Fortran behavior)
+                    all_nan = np.isnan(s1)
+                    for skey in ['S2','S5','S6','S7','S8']:
+                        if skey in obslist:
+                            all_nan = all_nan & np.isnan(obsdata[con][skey][:, prntoidx[con][prn]])
+                    not_ij = ~all_nan
                     Tp = gpstime[not_ij,1] # only use the seconds of the week for now
-                    s1 = s1[not_ij];
-                    #print(s1.shape)
+                    s1 = s1[not_ij]; is1 = np.isnan(s1); s1[is1] = 0
                     emp = np.zeros(len(s1),dtype=float)
         # get the rest of the SNR data in a function
                     s2,s5,s6,s7,s8 = extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp)
@@ -1248,13 +1248,14 @@ def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month
                     if 'S1' in obslist:
                         s1 = obsdata[con]['S1'][:, prntoidx[con][prn]]
 
-        # indices when there are no data for this satellite
-                    ij = np.isnan(s1)
-        # indices when there are data in the RINEX file - this way you do not compute
-        # orbits unless there are data.
-                    not_ij = np.logical_not(ij)
+        # keep epoch if ANY SNR channel has data (matches Fortran behavior)
+                    all_nan = np.isnan(s1)
+                    for skey in ['S2','S5','S6','S7','S8']:
+                        if skey in obslist:
+                            all_nan = all_nan & np.isnan(obsdata[con][skey][:, prntoidx[con][prn]])
+                    not_ij = ~all_nan
                     Tp = gpstime[not_ij,1] # only use the seconds of the week for now
-                    s1 = s1[not_ij];
+                    s1 = s1[not_ij]; is1 = np.isnan(s1); s1[is1] = 0
                     emp = np.zeros(len(s1),dtype=float)
         # get the rest of the SNR data in a function
                     s2,s5,s6,s7,s8 = extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp)

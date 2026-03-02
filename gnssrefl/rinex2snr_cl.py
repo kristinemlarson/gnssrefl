@@ -69,7 +69,7 @@ def parse_arguments():
 
 def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = None, rate: str = 'low', dec: int = 0,
               nolook: bool = False, archive: str = 'all', doy_end: int = None,
-              year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
+              year_end: int = None, overwrite: bool = False, translator: str = 'python', samplerate: int = 30,
               stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
               screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
               par : int=None, timeout : int = 0, extension : str='', debug: bool = False, quiet: bool = True):
