@@ -216,86 +216,80 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         t = t[prn !=''];az = az[prn !=''];elv = elv[prn !=''];snr = snr[prn !=''];freq = freq[prn != ''];prn = prn[prn !=''] 
         t = t[freq !=''];az = az[freq !=''];elv = elv[freq !=''];snr = snr[freq !=''];prn = prn[freq !='']; freq = freq[freq != '']
     
-    az = az.astype(float)
-    elv = elv.astype(float)
     snr = snr.astype(float)
     prn = prn.astype(int)
 
-    prn_unique = np.unique(prn) 
+    # SP3 path: skip fix_angle_azimuth (az/el come from orbits) and use
+    # vectorized grouping instead of per-epoch Python loops.
+    if sp3:
+        leap_mjd = g.getMJD(year,month,day,0)
+        offset = g.read_leapsecond_file(leap_mjd)
+        print('Leap second offset ', offset)
+
+        t_int = t.astype(int)
+        # decimation filter
+        dec_mask = (t_int % idec) == 0
+        t_dec = t_int[dec_mask] + offset
+        prn_dec = prn[dec_mask]
+        snr_dec = snr[dec_mask]
+        freq_dec = freq[dec_mask]
+
+        # vectorized group-by (time, satellite) → s1/s2/s5
+        # unique pairs and inverse index
+        pairs = np.column_stack((t_dec, prn_dec))
+        unique_pairs, inverse = np.unique(pairs, axis=0, return_inverse=True)
+        n = len(unique_pairs)
+        s1_arr = np.zeros(n); s2_arr = np.zeros(n); s5_arr = np.zeros(n)
+
+        f1 = (freq_dec == '1'); f2 = (freq_dec == '2'); f5 = (freq_dec == '5')
+        # scatter in reverse so first observation wins on duplicate (time, sat, freq)
+        s1_arr[inverse[f1][::-1]] = snr_dec[f1][::-1]
+        s2_arr[inverse[f2][::-1]] = snr_dec[f2][::-1]
+        s5_arr[inverse[f5][::-1]] = snr_dec[f5][::-1]
+
+        if n == 0:
+            print('No observations survived decimation'); return
+
+        nmea_sp3_azel(
+            recv, year, month, day,
+            unique_pairs[:, 0].astype(float),
+            unique_pairs[:, 1].astype(int),
+            s1_arr, s2_arr, s5_arr,
+            orbfile, snrfile, csnr)
+        return
+
+    az = az.astype(float)
+    elv = elv.astype(float)
+
+    prn_unique = np.unique(prn)
     #print(prn_unique)
 
-    T = []; PRN = []; AZ = []; ELV = []; SNR = []; FREQ = []        
+    T = []; PRN = []; AZ = []; ELV = []; SNR = []; FREQ = []
     for i_prn in prn_unique:
-        # the original code added 100 - but did not take into account the 
+        # the original code added 100 - but did not take into account the
         # satellite numbers have been shifted for glonass.
-        # also there is an illegal signal at satellite "48" 
+        # also there is an illegal signal at satellite "48"
         # i do not know what that is, but i am ignoring it.
         #if (i_prn > 32):
         #    print(i_prn, 'looks like an illegal satellite number')
         time = t[prn == i_prn];angle = elv[prn == i_prn];azimuth = az[prn == i_prn]; frequency = freq[prn == i_prn]
         Snr = snr[prn == i_prn];Prn = prn[prn == i_prn]
-        
-        angle_fixed, azim_fixed = fix_angle_azimuth(time, angle, azimuth)#fix the angles 
+
+        angle_fixed, azim_fixed = fix_angle_azimuth(time, angle, azimuth)#fix the angles
         if (len(angle_fixed) == 0 and len(azim_fixed) == 0):
             continue
-            
+
         T.extend(time);AZ.extend(azim_fixed);ELV.extend(angle_fixed);SNR.extend(Snr);PRN.extend(Prn); FREQ.extend(frequency)
-        
+
         del  time, angle, azimuth, Snr, Prn, angle_fixed, azim_fixed, frequency
-        
+
     # It is easier for the sp3 option to write out the time, satellite, and SNR data into a plain file.
-    # then the fortran can read that file and calculate the orbits from teh SP3 file and write out a new 
+    # then the fortran can read that file and calculate the orbits from teh SP3 file and write out a new
     # file with the correct azimuth and elevation angle.
     leap_mjd = g.getMJD(year,month,day,0)
 
     offset = g.read_leapsecond_file(leap_mjd)
     print('Leap second offset ', offset)
-
-    if sp3 :
-        # collect per-epoch, per-satellite SNR into arrays for Python orbit computation
-        timetags = np.unique(T)
-        xT = np.asarray(T)
-        xPRN = np.asarray(PRN)
-        xSNR = np.asarray(SNR)
-        xfreq = np.asarray(FREQ)
-
-        tod_list = []; prn_list = []; s1_list = []; s2_list = []; s5_list = []
-        for tt in timetags:
-            if (tt % idec) != 0:
-                continue
-            jj = (xT == tt)
-            epoch_sat = xPRN[jj]
-            epoch_snr = xSNR[jj]
-            epoch_freq = xfreq[jj]
-            for sat in np.unique(epoch_sat):
-                sat = int(sat)
-                ijk = (sat == epoch_sat)
-                frdata = epoch_freq[ijk]
-                snrdata = epoch_snr[ijk]
-                s1 = 0.0; s2 = 0.0; s5 = 0.0
-                for k in range(len(frdata)):
-                    if frdata[k] == '1':
-                        s1 = float(snrdata[k])
-                    elif frdata[k] == '2':
-                        s2 = float(snrdata[k])
-                    elif frdata[k] == '5':
-                        s5 = float(snrdata[k])
-                tod_list.append(tt + offset)
-                prn_list.append(sat)
-                s1_list.append(s1); s2_list.append(s2); s5_list.append(s5)
-
-        if len(tod_list) == 0:
-            print('No observations survived decimation'); return
-
-        nmea_sp3_azel(
-            recv, year, month, day,
-            np.array(tod_list, dtype=float),
-            np.array(prn_list, dtype=int),
-            np.array(s1_list, dtype=float),
-            np.array(s2_list, dtype=float),
-            np.array(s5_list, dtype=float),
-            orbfile, snrfile, csnr)
-        return
     
     inx = np.argsort(T)  #Sort data by time
     
