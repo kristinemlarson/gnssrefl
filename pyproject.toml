@@ -1,7 +1,7 @@
 [build-system]
 
-requires = ["meson-python", "numpy"]
-build-backend = "mesonpy"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "gnssrefl"
@@ -29,6 +29,9 @@ dependencies = [
     "jupyterlab",
     "ipywidgets",
 ]
+
+[tool.setuptools.packages.find]
+include = ["gnssrefl*"]
 
 [project.urls]
 "Documentation" = "https://gnssrefl.readthedocs.io/en/latest/"
