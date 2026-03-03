@@ -1045,7 +1045,7 @@ def write_snr_from_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year
 
     if not out_blocks:
         log.write('write SNR data to file \n')
-        open(outputfile, 'w+').close()
+        open(outputfile, 'w').close()
         return
 
     # sort by time-of-day, then by satellite number (matching Fortran output order)

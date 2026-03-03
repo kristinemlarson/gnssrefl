@@ -17,38 +17,7 @@ you can also use a linux emulator and follow instructions for linux.
 ## Local Python Install for Linux/MacOS
 
 As of gnssrefl version 3.19.4, python version >= 3.10 is required.
-To allow this we had to change how the package is built; we now use meson. If you have problems 
-with the install, please let us know by posting a github Issue.
-
-For installation with github/pypi, the setup requires a few system dependencies: gcc and gfortran.
-To check please type:
-
-<code>apt-get install -y gcc</code>
-
-and 
-
-<code>apt-get install -y gfortran</code> 
-
-in your terminal (or <code>yum install -y gcc-gfortran</code>).
-
-**If you are using a MacOS** then you will need to install <code>xcode</code>. First, in your
-terminal, check first to see if you already have it:
-
-<code>xcode-select -p</code>
-
-If it is installed, it should return a path. If it is not installed then run
-
-<code>xcode-select --install</code>
-
-This should install gcc. You can check if you have gcc by typing
-
-<code>gcc --version</code>
-
-You can check to see if you have gfortran by typing
-
-<code>gfortran --version</code>
-
-If you do not have gfortran, then you can use homebrew to install (<code>brew install gfortran</code>).
+If you have problems with the install, please let us know by posting a github Issue.
 
 ### Environment Variables
 
