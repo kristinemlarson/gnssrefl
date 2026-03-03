@@ -27,7 +27,7 @@ jobs:
           docker exec -i gnssrefl bash -c '
             set -e
             # Install pinned version for golden file generation
-            pip3 install --force-reinstall https://github.com/kristinemlarson/gnssrefl/archive/d8ed64e5597ac5e92c4f5ea80e82a04ae8a2b24c.tar.gz
+            pip3 install --force-reinstall https://github.com/kristinemlarson/gnssrefl/archive/193576150e68d2fdee038c6351508ac521e9afdb.tar.gz
 
             REFL_CODE=/etc/gnssrefl/refl_code
             mkdir -p $REFL_CODE/2025/snr/mchl $REFL_CODE/2025/results/mchl \
