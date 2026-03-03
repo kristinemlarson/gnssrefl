@@ -9,9 +9,6 @@ import sys
 import time
 
 
-# progress bar for RINEX translation/orbits
-from progress.bar import Bar
-
 # my gps libraries
 import gnssrefl.gps as g
 import gnssrefl.rinpy as rinpy
@@ -729,9 +726,7 @@ def write_snr_from_nav(navfile,obstimes,observationdata,obslist,prntoidx,gpssatl
         log.write('Number of epochs in the RINEX file {0:6.0f} \n '.format( K))
         log.write('Decimation rate {0:3.0f} \n'.format(dec_rate))
 
-        with Bar('Processing RINEX', max=K,fill='@',suffix='%(percent)d%%') as bar:
-            for i in range(0,K):
-                bar.next()
+        for i in range(0,K):
                 if np.remainder(i,200) == 0:
                     log.write('Epoch {0:6.0f} \n'.format( i))
             # sod is seconds of the day
@@ -953,14 +948,10 @@ def write_snr_from_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year
     sname ={}; sname['G']='GPS' ; sname['R'] = 'GLONASS'; sname['E'] = 'GALILEO'; sname['C']='BEIDOU'
     for con in ['G','E','R','C']:
         if con in obstypes:
-            satL = len(systemsatlists[con][:])
-            satS = 'Processing ' + sname[con]
-            with Bar(satS, max=satL,fill='@',suffix='%(percent)d%%') as bar:
-                log.write('Good news - found data for constellation {0:s} \n'.format( con))
-                obslist = obstypes[con][:]
-                satlist = systemsatlists[con][:]
-                for prn in satlist:
-                    bar.next()
+            log.write('Good news - found data for constellation {0:s} \n'.format( con))
+            obslist = obstypes[con][:]
+            satlist = systemsatlists[con][:]
+            for prn in satlist:
                     addon = g.findConstell(con) # 100,200,or 300 for R,E, and C
                     log.write('Constellation {0:1s} Satellite {1:2.0f}  Addon {2:3.0f} \n'.format( con, prn, addon))
                     sat_id = prn + addon
