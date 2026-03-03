@@ -17,7 +17,7 @@ import gnssrefl.gnssir_v2 as gnssir_v2
 import gnssrefl.read_snr_files as snr
 
 
-def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,fortran,
+def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,
         pltscreen,azim1,azim2,ediff, delTmax,hires_figs,**kwargs):
     """
     This is the main function to compute spectral characteristics of a SNR file.
@@ -60,8 +60,6 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         satellite number
     PkNoise : float
         peak to noise ratio for QC
-    fortran : bool
-         whether external fortran translator is being explicitly called. 
     pltscreen : bool
         whether you want plots sent to the terminal
     azim1 : float

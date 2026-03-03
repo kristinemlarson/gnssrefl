@@ -50,9 +50,9 @@ def parse_arguments():
 
 
 def quicklook(station: str, year: int, doy: int,
-              snr: int = 66, fr: int = 1, ampl: float = 7., e1: float = 5, e2: float = 25, h1: float = 0.5, 
-              h2: float = 8., sat: int = None, peak2noise: float = 3., screenstats: bool = False, fortran: bool = None, 
-              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0, 
+              snr: int = 66, fr: int = 1, ampl: float = 7., e1: float = 5, e2: float = 25, h1: float = 0.5,
+              h2: float = 8., sat: int = None, peak2noise: float = 3., screenstats: bool = False,
+              plt: bool = True, azim1: float = 0., azim2: float = 360., ediff: float = 2.0,
               delTmax : float=75.0, hires_figs : bool=False ):
     """
 
@@ -204,7 +204,7 @@ def quicklook(station: str, year: int, doy: int,
 
     pltscreen = plt
     args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'f': fr[0], 'reqAmp': ampl, 'e1': e1,
-            'e2': e2, 'minH': h1, 'maxH': h2, 'PkNoise': peak2noise, 'satsel': sat, 'fortran': fortran, 'pele': pele,
+            'e2': e2, 'minH': h1, 'maxH': h2, 'PkNoise': peak2noise, 'satsel': sat, 'pele': pele,
             'pltscreen': pltscreen, 'screenstats': screenstats, 'azim1': azim1, 'azim2': azim2, 'ediff': ediff, 
             'delTmax': delTmax, 'hires_figs': hires_figs}
 

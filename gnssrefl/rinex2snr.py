@@ -454,7 +454,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
         log.write("The snrfile does not exist: {0:50s} \n".format(snrname_full))
         d = g.doy2ymd(year,doy);
         month = d.month; day = d.day
-        foundit, f, orbdir, snrexe = g.get_orbits_setexe(year,month,day,orbtype,False)
+        foundit, f, orbdir = g.get_orbits_setexe(year,month,day,orbtype)
         # if you have the orbit file, you can get the rinex file. First lets define the expected names
         if foundit:
             print('Orbit file: ', f)

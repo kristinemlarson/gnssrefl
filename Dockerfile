@@ -12,10 +12,7 @@ ARG TARGETARCH
 
 # build requirements
 RUN apt-get update
-RUN apt-get install -y gfortran python3-pip unzip wget vim 
-
-#RUN apt-get update && \
-#  apt-get install -y gfortran python3-pip unzip wget vim 
+RUN apt-get install -y python3-pip unzip wget vim
 
 ## executables
 RUN mkdir -p /etc/gnssrefl/exe /etc/gnssrefl/orbits /etc/gnssrefl/refl_code/Files /etc/gnssrefl/notebooks
@@ -39,8 +36,7 @@ ENV PATH="/etc/gnssrefl/exe:$PATH"
 
 # should not be needed
 #RUN pip install numpy --upgrade --ignore-installed
-COPY pyproject.toml README.md meson.build /usr/src/gnssrefl/
-#COPY pyproject.toml README.md setup.py /usr/src/gnssrefl/
+COPY pyproject.toml README.md /usr/src/gnssrefl/
 COPY gnssrefl /usr/src/gnssrefl/gnssrefl
 # might as well install this EGM 96 file
 COPY gnssrefl/EGM96geoidDATA.mat /etc/gnssrefl/refl_code/Files
