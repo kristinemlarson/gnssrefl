@@ -83,11 +83,10 @@ def main():
     if os.path.isfile(full_rinex3):
         print('found version 3 rinex in the makan directories')
         # open log file(s)
-        log,nada,exedir,gen_log = r.set_rinex2snr_logs(station,iyear,idoy)
+        log, gen_log = r.set_rinex2snr_logs(station,iyear,idoy)
         dec=1; gpsonly=False
         g.new_rinex3_rinex2(full_rinex3,rinex2,dec,gpsonly,log)
         log.close()
-        gen_log.close()
     else:
         print('ERROR: your input file does not exist:', rinex3)
         sys.exit()
@@ -96,10 +95,9 @@ def main():
     snrname = snrdir + rinex3[0:-3] + 'snr66'
     option = 66
 
-    log,nada2,exedir2,gen_log2 = r.set_rinex2snr_logs(station,iyear,idoy)
+    log, gen_log2 = r.set_rinex2snr_logs(station,iyear,idoy)
     r.rnx2snr(rinex2, orbfile, snrname, option, iyear, month, day, dec_rate, log)
     log.close()
-    gen_log2.close()
 
     # clean up - remove the rinex2 file
     print('SNR file written to: ', snrname)

@@ -176,8 +176,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
 
             if (not illegal_day) and (not snre):
                 # make log directory ... 
-                log, errorlog, exedir,gen_log = set_rinex2snr_logs(station,year,doy)
-                print('Translation log: ', errorlog)
+                log, gen_log = set_rinex2snr_logs(station,year,doy)
                 print('General log: ', gen_log)
 
                 r = station + cdoy + '0.' + cyy + 'o'
@@ -217,7 +216,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             if strip:
                                 log.write('Testing out stripping the RINEX 2 file here\n')
                                 k.strip_rinexfile(r)
-                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log,errorlog,rinex2_filename=r)
+                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log,rinex2_filename=r)
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
@@ -268,7 +267,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             # It looks like i was just trying to use old code here. Have added rinex2_filename parameter 
                             if fexists:
                                 conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
-                                         log,errorlog, rinex2_filename=r2)
+                                         log, rinex2_filename=r2)
                             else:
                                 log.write('Something about the RINEX 3-2 conversion did not work. No SNR file created.\n')
                         else:
@@ -382,16 +381,16 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 pass
                              # should send it the version 2 name
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
-                                      log,errorlog,rinex2_filename=r2)
+                                      log,rinex2_filename=r2)
                         else:
                             log.write('Unsuccessful RINEX 3 retrieval/translation for year-doy {0:4.0f} {1:3.0f} \n'.format(year, doy))
                     else:
                         print(station, ' year:', year, ' doy:', doy, ' from: ', archive, ' rate:', rate, ' orb:', orbtype)
                         # for version 2, since i was using old code, the RINEX 2.11 searching goes on in conv2snr
-                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log,errorlog)
+                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log)
 
 
-def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,log,errorlog,**kwargs):
+def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,log,**kwargs):
     """
     This code originally picked up and translated files. You can now optionally send
     a parameter called rinex2_filename if the file exists. This needs to be done especially for RINEX 3
@@ -421,8 +420,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
         external location (archive) of the rinex files
     log : fileid
         for screen messages
-    errorlog : str
-        location of logs
 
     """
 
@@ -682,10 +679,6 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
     else:
         log.write('Read the sp3 file \n'); sp3 = g.read_sp3file(navfile)
         _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate,log)
-        #_test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate,log)
-
-    #print('Closing python RINEX conversion log file:',logname)
-    #log.close()
 
 def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log):
     """
@@ -900,93 +893,6 @@ def satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij):
         k+=1
 
     return SatOrbn
-
-def _test_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day, emin,emax,outputfile,up,East,North,recv,dec_rate,log):
-    """
-    inputs are gpstime( numpy array with week and sow)
-    sp3 is what has been read from the sp3 file
-    columsn are satNu, week, sow, x, y, z (in meters)
-    log is for comments
-    """
-    checkD = False
-    if dec_rate > 0:
-        checkD = True
-        log.write('You are decimating \n')
-    # epoch at the beginning of the day of your RINEX file
-    gweek0, gpssec0 = g.kgpsweek(year, month,day,0,0,0 )
-
-    ll = 'cubic'
-#   will store in this variable, then sort it before writing out to a file
-    saveit = np.empty(shape=[0,11] )
-    fout = open(outputfile, 'w+')
-    for con in ['G','E','R','C']:
-        if con in obstypes:
-            log.write('Good news - found data for constellation {0:s} \n'.format( con))
-            obslist = obstypes[con][:]
-            satlist = systemsatlists[con][:]
-            #print(satlist)
-            for prn in satlist:
-                addon = g.findConstell(con) # 100,200,or 300 for R,E, and C
-                log.write('Constellation {0:1s} Satellite {1:2.0f}  Addon {2:3.0f} \n'.format( con, prn, addon))
-                # window out the data for this satellite
-                m = sp3[:,0] == prn + addon
-                x = sp3[m,3]
-                if len(x) > 0:
-                    sp3_week = sp3[m,1] ; sp3_sec = sp3[m,2]
-                    x = sp3[m,3] ; y = sp3[m,4] ; z = sp3[m,5]
-                # fit the orbits for this satellite
-                    t=sp3_sec
-                    iX= interp1d(t, x, ll,bounds_error=False,fill_value='extrapolate')
-                    iY= interp1d(t, y, ll,bounds_error=False,fill_value='extrapolate')
-                    iZ= interp1d(t, z, ll,bounds_error=False,fill_value='extrapolate')
-        # get the S1 data for this satellite
-                    if 'S1' in obslist:
-                        s1 = obsdata[con]['S1'][:, prntoidx[con][prn]]
-
-        # keep epoch if ANY SNR channel has data (matches Fortran behavior)
-                    all_nan = np.isnan(s1)
-                    for skey in ['S2','S5','S6','S7','S8']:
-                        if skey in obslist:
-                            all_nan = all_nan & np.isnan(obsdata[con][skey][:, prntoidx[con][prn]])
-                    not_ij = ~all_nan
-                    Tp = gpstime[not_ij,1] # only use the seconds of the week for now
-                    s1 = s1[not_ij]; is1 = np.isnan(s1); s1[is1] = 0
-                    emp = np.zeros(len(s1),dtype=float)
-        # get the rest of the SNR data in a function
-                    s2,s5,s6,s7,s8 = extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp)
-
-        # make sure there are no nan values in s2 or s5
-
-                    nepochs = len(Tp)
-                    for ij in range(0,nepochs):
-                        TT = 0 # default value
-                        if checkD:
-                            TT = Tp[ij]  % dec_rate # get the modulus
-                        if TT == 0:
-                            SatOrb = satorb_prop_sp3(iX,iY,iZ,recv,Tp,ij)
-                            r=np.subtract(SatOrb,recv)
-                            azimA = g.azimuth_angle(r, East, North)
-                            eleA = g.elev_angle(up, r)*180/np.pi
-                            # 2021 october 26
-                            # thank you to andrea gatti for pointing out the mistake
-                            if (eleA >= emin) and (eleA <= emax):
-                                fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} {9:7.2f} {10:7.2f} \n".format(
-                                    prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s7[ij]),float(s8[ij]) ))
-                                #fout.write("{0:3.0f} {1:10.4f} {2:10.4f} {3:10.0f} {4:7.2f} {5:7.2f} {6:7.2f} {7:7.2f} {8:7.2f} {9:7.2f} {10:7.2f} \n".format(
-                                #    prn+addon,eleA,azimA,Tp[ij]-gpssec0, 0,float(s6[ij]),s1[ij],float(s2[ij]),float(s5[ij]),float(s6[ij]),float(s7[ij]) ))
-                else:
-                    log.write('This satellite is not in the orbit file. {0:3.0f} \n'.format(prn))
-        else:
-            log.write('No data for constellation {0:1s} \n'.format(con))
-    # print('sort by time')
-    # tried saving to variable but it was very slow
-    #ne = np.array([prn,eleA,azimA,Tp[ij],0,0,s1[ij],s2[ij],s5[ij],0,0])
-    #saveit = np.vstack((saveit,ne))
-    #i = np.argsort(saveit[:,3])
-    # apply that sort to variable with shorter name
-    #s = saveit[i,:]
-    log.write('write SNR data to file \n')
-    fout.close()
 
 
 def extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp):
@@ -1483,10 +1389,8 @@ def print_archives():
 
 def set_rinex2snr_logs(station,year,doy):
     """
-
-    Open a file for screen messages. Return the file ID
-    (was previously created elsewhere). Also determine name
-    of the log used for fortran translation.
+    Open a file for translation log messages. Return the file ID
+    and the log path.
 
     Parameters
     ----------
@@ -1500,33 +1404,20 @@ def set_rinex2snr_logs(station,year,doy):
     Returns
     -------
     log : file ID
-
-    errorlog : str
-        name of the error log for fortran code
-
-    exedir : str
-        location of the executable directdory
+        translation log
 
     general_log : str
-        name of the more general error log
+        path of the log file
     """
 
     print(station,year,doy)
-    xdir = os.environ['REFL_CODE']
 
     # universal location for the log directory
     logdir, logname = g.define_logdir(station,year,doy)
 
-    exedir = os.environ['EXE'] # location of executables for fortran people
-
-
     general_log = logdir  + logname + '.gen'
-    #print('Feedback about the RINEX translation: ', general_log)
-
-    errorlog = logdir +  logname
-    #print('Log created by the fortran code: ', errorlog)
 
     log = open(general_log, 'w+')
 
-    return log, errorlog, exedir, general_log
+    return log, general_log
 

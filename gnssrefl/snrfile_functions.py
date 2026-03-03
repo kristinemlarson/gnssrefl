@@ -81,6 +81,7 @@ def propagate_and_azel_sp3(iX, iY, iZ, t, recv, up, East, North, oE, clight):
 
     r_vec = SatOrbn - recv
     r_norms = np.sqrt(np.sum(r_vec**2, axis=1))
-    elv = (np.pi/2.0 - np.arccos(r_vec @ up / r_norms)) * 180.0/np.pi
+    cos_zenith = np.clip(r_vec @ up / r_norms, -1.0, 1.0)
+    elv = (np.pi/2.0 - np.arccos(cos_zenith)) * 180.0/np.pi
     azm = np.arctan2(r_vec @ East, r_vec @ North) * 180.0/np.pi % 360.0
     return elv, azm

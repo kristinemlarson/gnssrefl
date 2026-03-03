@@ -284,7 +284,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         del  time, angle, azimuth, Snr, Prn, angle_fixed, azim_fixed, frequency
 
     # It is easier for the sp3 option to write out the time, satellite, and SNR data into a plain file.
-    # then the fortran can read that file and calculate the orbits from teh SP3 file and write out a new
+    # then Python can compute azel from the SP3 file and write out a new
     # file with the correct azimuth and elevation angle.
     leap_mjd = g.getMJD(year,month,day,0)
 
