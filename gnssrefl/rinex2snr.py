@@ -675,12 +675,12 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
     if (orbtype == 'nav'):
         gpssatlist = systemsatlists['G'][:]
         #print('GPS satellite list', gpssatlist)
-        navorbits(navfile,obstimes,obsdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log)
+        write_snr_from_nav(navfile,obstimes,obsdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log)
     else:
         log.write('Read the sp3 file \n'); sp3 = g.read_sp3file(navfile)
-        _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate,log)
+        write_snr_from_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate,log)
 
-def navorbits(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log):
+def write_snr_from_nav(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log):
     """
     Strandberg nav reading file?
 
@@ -918,11 +918,12 @@ def extract_snr(prn, con, obslist,obsdata,prntoidx,not_ij,emp):
     if 'S8' in obslist:
         s8 = obsdata[con]['S8'][:, prntoidx[con][prn]]
         s8 = s8[not_ij]
+        is8 = np.isnan(s8); s8[is8] = 0
 
     return s2,s5,s6,s7,s8
 
 
-def _testing_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day, emin,emax,outputfile,up,East,North,recv,dec_rate,log):
+def write_snr_from_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day, emin,emax,outputfile,up,East,North,recv,dec_rate,log):
     """
     inputs are gpstime( numpy array with week and sow)
     sp3 is what has been read from the sp3 file

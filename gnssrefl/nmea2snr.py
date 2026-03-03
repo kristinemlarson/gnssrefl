@@ -297,7 +297,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
     
     T = T[inx];PRN = PRN[inx];ELV = ELV[inx];SNR = SNR[inx];AZ = AZ[inx]; FREQ=FREQ[inx]
                                
-    emin,emax = elev_limits(int(csnr))#select snr option 50, 66, 88, 99
+    emin,emax = snr_elev_limits(int(csnr))#select snr option 50, 66, 88, 99
     #write to an output file 
     with open(snrfile, 'w') as fout:
         for i in range(len(T)):
@@ -878,37 +878,6 @@ def quickname(station,year,cyy, cdoy, csnr):
 
     return fname
 
-def elev_limits(snroption):
-    """
-    Given a snr option, return the elevation angle limits
-
-    Parameters
-    ----------
-    snroption : int
-        snrfile number
-
-    Returns
-    -------
-    emin : float
-        min elevation angle (degrees)
-    emax : float
-        max elevation angle (degrees)
-
-    """
-
-    if (snroption == 99):
-        emin = 5; emax = 30
-    elif (snroption == 50):
-        emin = 0; emax = 10
-    elif (snroption == 66):
-        emin = 0; emax = 30
-    elif (snroption == 88):
-        emin = 0; emax = 90
-    else:
-        emin = 5; emax = 30
-
-    return emin, emax
-  
 def run_nmea2snr(station, year, doy, isnr, overwrite, dec, llh, recv, sp3, gzip,orb,hour):
     """
     runs the nmea2snr conversion code 

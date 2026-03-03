@@ -26,11 +26,11 @@ def elev_limits(snroption):
     if (snroption == 99):
         emin = 5; emax = 30
     elif (snroption == 50):
-        emin = -90; emax = 10
+        emin = 0; emax = 10
     elif (snroption == 66):
-        emin = -90; emax = 30
+        emin = 0; emax = 30
     elif (snroption == 88):
-        emin = 0; emax = 90
+        emin = 5; emax = 90
     else:
         emin = 5; emax = 30
 
