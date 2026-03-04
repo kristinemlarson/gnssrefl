@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 4.0.0
+
+We are installing George Townsend's PRs that allow us to abandon
+our reliance on Fortran. Yippee!
+
 ## 3.19.3
 
 Will be incorporating new soil moisture edits from George Townsend

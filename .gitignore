@@ -1,5 +1,6 @@
 env
 gnss/*
+env_3.9
 canadian_predicts_mjd.txt
 predicts_2025-10-17.csv
 felipe_plot.py

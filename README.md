@@ -1,6 +1,8 @@
-# gnssrefl v3.19.3
+# gnssrefl v4.0.0
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
+
+We are in the process of upgrading our RINEX reader. Versions >= 4.0.0 will include this change.
 
 While it is great to see so many people expressing interest in GNSS-IR and using this software, I *cannot* answer
 questions sent to my personal e-mail. **All questions must be posted as an [issue](https://github.com/kristinemlarson/gnssrefl/issues).**
