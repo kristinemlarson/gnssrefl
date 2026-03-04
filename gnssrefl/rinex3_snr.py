@@ -154,18 +154,15 @@ def main():
         idoy = int(cdoy); iyear = int(year)
 
         # many of these are fake values because the file has already been translated to rinex2
-        archive = 'unavco' ; fortran = False; translator = 'hybrid'
-        year_list = [iyear]; doy_list = [idoy]; rate = 'low';   nol = True; 
+        archive = 'unavco'
+        year_list = [iyear]; doy_list = [idoy]; rate = 'low';   nol = True;
         overwrite = False; srate = 30; mk = False; skipit = 1
-        strip = False; stream = 'R'  ; bkg = 'IGS' 
+        strip = False; stream = 'R'  ; bkg = 'IGS'
         gzip = True
         timeout = 0
         screenstats = True
-        # removed fortran and skipit inputs ...  and got rid of the year and doy lists
-        # 2024 may 28
-        # this should really call conv2snr ... 
         r.run_rinex2snr(station, iyear, idoy, isnr, orbtype, rate,dec_rate,archive,nol,
-                overwrite,translator,srate,mk,stream,strip,bkg,screenstats,gzip,timeout,quiet)
+                overwrite,srate,mk,stream,strip,bkg,screenstats,gzip,timeout,quiet)
 
 
 if __name__ == "__main__":

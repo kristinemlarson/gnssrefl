@@ -42,7 +42,6 @@ def parse_arguments():
     parser.add_argument("-doy_end", default=None, help="end day of year", type=int)
     parser.add_argument("-year_end", default=None, help="end year", type=int)
     parser.add_argument("-overwrite", default=None, help="Make new SNR file even if it already exists, boolean", type=str)
-    parser.add_argument("-translator", default=None, help="translator(fortran,hybrid,python)", type=str)
     parser.add_argument("-stream", default=None, help="Set to R or S (RINEX 3 only)", type=str)
     parser.add_argument("-samplerate", default=None, help="Sample rate (RINEX 3 only)", type=int)
     parser.add_argument("-mk", default=None, help="use T for uppercase station names and non-standard filename convention ", type=str)
@@ -69,9 +68,9 @@ def parse_arguments():
 
 def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = None, rate: str = 'low', dec: int = 0,
               nolook: bool = False, archive: str = 'all', doy_end: int = None,
-              year_end: int = None, overwrite: bool = False, translator: str = 'hybrid', samplerate: int = 30,
-              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False, 
-              screenstats : bool = False, gzip : bool = True, monthly : bool = False, 
+              year_end: int = None, overwrite: bool = False, samplerate: int = 30,
+              stream: str = 'R', mk: bool = False, weekly: bool = False, strip: bool = False,
+              screenstats : bool = False, gzip : bool = True, monthly : bool = False,
               par : int=None, timeout : int = 0, extension : str='', debug: bool = False, quiet: bool = True):
     """
     Note: rinex2snr means rinex TO snr. It is not a tool that is only meant for version 2 rinex files.
@@ -335,13 +334,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
         Make a new SNR file even if one already exists (overwrite existing file).
         Default is False.
 
-    translator : str, optional
-        hybrid (default) : uses a combination of python and fortran to translate the files.
-
-        fortran : uses fortran to translate (requires the fortran translator executable to exist)
-
-        python : uses python to translate. (Warning: This can be very slow)
-
     samplerate : int, optional
         sample rate for RINEX 3 files only. Default is 30.
 
@@ -561,31 +553,6 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     if orb == 'gps+glo':
         orb = 'jax'
 
-    # default is to use hybrid for RINEX translator - UNLESS You chose fortran
-
-    # these are currently accepted
-    translator_accepted = ['fortran', 'hybrid', 'python']
-    if translator not in translator_accepted:
-        print(f'translator option must be one of {translator_accepted}. Exiting.')
-        sys.exit()
-
-    # check that the fortran exe exists
-    if translator == 'fortran':
-        if orb == 'nav':
-            snrexe = g.gpsSNR_version()
-            if not os.path.isfile(snrexe):
-                print('You have selected the fortran and GPS only options.')
-                print('However, the fortran translator gpsSNR.e does not exist.')
-                print('We are changing your choice to the hybrid translator option.')
-                translator = 'hybrid'
-        else:
-            snrexe = g.gnssSNR_version()
-            if not os.path.isfile(snrexe):
-                print('You have selected the fortran and GNSS options.')
-                print('However, the fortran translator gnssSNR.e has not been properly installed.')
-                print('We are changing your choice to hybrid option.')
-                translator = 'hybrid'
-
     rate = rate.lower()
     # default is set to low.  set to high for 1sec files so the user doesn't have to
     if samplerate == 1:
@@ -679,9 +646,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
            print('Your stream parameter is illegal, so setting it to R')
            stream = 'R'
 
-    args = {'station': station, 'year':year, 'doy':doy, 'isnr': snr, 'orbtype': orb, 'rate': rate, 
-            'dec_rate': dec, 'archive': archive, 'nol': nolook, 'overwrite': overwrite, 
-            'translator': translator, 'srate': samplerate, 'mk': mk, 'stream': stream, 
+    args = {'station': station, 'year':year, 'doy':doy, 'isnr': snr, 'orbtype': orb, 'rate': rate,
+            'dec_rate': dec, 'archive': archive, 'nol': nolook, 'overwrite': overwrite,
+            'srate': samplerate, 'mk': mk, 'stream': stream,
             'strip': strip, 'bkg': bkg, 'screenstats': screenstats, 'gzip' : gzip, 'timeout' : timeout, 'quiet' : quiet }
     MJD1 = int(g.ydoy2mjd(year,doy))
     MJD2 = int(g.ydoy2mjd(year_end,doy_end))

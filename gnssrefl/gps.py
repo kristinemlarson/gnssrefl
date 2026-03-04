@@ -2557,7 +2557,7 @@ def store_snrfile(filename,year,station):
     if not os.path.isdir(xdir): #if year folder doesn't exist, make it
         os.makedirs(xdir)
     if (os.path.isfile(filename) == True):
-        status = subprocess.call(['mv','-f', filename, xdir])
+        os.replace(filename, os.path.join(xdir, os.path.basename(filename)))
     else:
         print('the SNR file does not exist, so nothing was moved')
 
@@ -3491,10 +3491,9 @@ def highrate_nz(station, year, month, day):
             print('some kind of problem with download',file1)
 
 
-def get_orbits_setexe(year,month,day,orbtype,fortran):
+def get_orbits_setexe(year,month,day,orbtype):
     """
     picks up and stores orbits as needed.
-    It also sets executable location for translation (gpsonly vs multignss)
 
     why does this work if it does not include the hour for ultra?
 
@@ -3510,8 +3509,6 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         calendar day
     orbtype : str
         orbit source, e.g. nav, gps...
-    fortran : bool
-        whether you are using fortran code for translation
 
     Returns
     -------
@@ -3521,8 +3518,6 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         name of the orbit file
     orbdir : str
         location of the orbit file
-    snrexe : str 
-        location of SNR executable. only relevant for fortran users
 
     """
     #default values
@@ -3535,13 +3530,10 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         #    orbtype = 'rapid'
 
     foundit = False
-    f=''; orbdir=''; snrexe = ''
-    # define directory for the conversion executables
-    exedir = os.environ['EXE']
+    f=''; orbdir=''
     if (orbtype == 'grg'):
         # French multi gnss, but there are no Beidou results
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'grg')
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gfr'):
         if (year >= 2022):
             print('Using newest GFZ orbit code for gfr')
@@ -3550,7 +3542,6 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
                 f,orbdir,foundit=another_gfz_orbits(year,month,day,'rapid',0)
         else:
             f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'rapid'):
         if (year >= 2022):
             print('Using newest GFZ orbit code for rapid')
@@ -3559,7 +3550,6 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
             f,orbdir,foundit=another_gfz_orbits(year,month,day,'rapid',0)
             if not foundit:
                 f,orbdir,foundit=rapid_gfz_orbits(year,month,day)
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gnss3') or (orbtype == 'gnss-gfz'):
         if (year >= 2024):
             f,orbdir,foundit=newish_gfz_orbits(year,month,day,'final')
@@ -3567,49 +3557,38 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
         # try try again?
         if not foundit :
             f,orbdir,foundit=gbm_orbits_direct(year,month,day)
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'sp3'):
         #print('uses default IGS orbits, so only GPS ?')
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igs')
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gfz'):
         print('using Final gfz sp3 file, GPS and GLONASS') # though I advocate gbm
         f,orbdir,foundit=getsp3file_flex(year,month,day,'gfz')
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'igr'):
         print('using rapid IGS orbits, so only GPS')
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igr') # use default
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'igs'):
         print('using IGS final orbits, so only GPS')
         f,orbdir,foundit=getsp3file_flex(year,month,day,'igs') # use default
-        snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     elif (orbtype == 'gbm'):
         # this uses GFZ multi-GNSS and is rapid, but not super rapid - but from CDDIS ... 
         # having it look first at GFZ for this file, which has a different name
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'gbm')
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'wum'):
         # this uses WUHAN multi-GNSS which is ultra, but is not rapid ??
         # but only hour 00:00
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'wum')
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif (orbtype == 'wum2'):
         # Wuhan ultra-rapid orbit from the Wuhan FTP
         # but only hour 00:00
         ihr = 0
         f,orbdir,foundit=get_wuhan_orbits(year,month,day,ihr)
-        snrexe = gnssSNR_version() ; warn_and_exit(snrexe,fortran)
     elif orbtype == 'jax':
         # this uses JAXA, has GPS and GLONASS and appears to be quick and reliable
         f,orbdir,foundit=getsp3file_mgex(year,month,day,'jax')
-        snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
-    # added iwth help of Makan Karegar 
+    # added iwth help of Makan Karegar
     elif orbtype == 'esa':
         # this uses ESA, GPS+GLONASS available from Aug 6, 2006 (added by Makan)
         f,orbdir,foundit=getsp3file_flex(year,month,day,'esa')
-        snrexe = gnssSNR_version(); 
-        warn_and_exit(snrexe,fortran)
     elif orbtype == 'ultra':
         ihr = 0
         doy,cdoy,cyyyy,cyy = ymd2doy(year,month,day)
@@ -3627,48 +3606,22 @@ def get_orbits_setexe(year,month,day,orbtype,fortran):
                         f, orbdir, foundit = new_ultra_gfz_orbits(year,doy-1,0,ihr)
             else:
                 f, orbdir, foundit = ultra_gfz_orbits(year,month,day,0)
-        snrexe = gnssSNR_version(); warn_and_exit(snrexe,fortran)
     else:
         if ('nav' in orbtype):
             print('Requested a GPS only nav file')
             if orbtype == 'nav':
                 f,orbdir,foundit=getnavfile(year, month, day) # use default version, which is gps only
-                snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
             if orbtype == 'nav-sopac':
                 f,orbdir,foundit=getnavfile_archive(year, month, day,'sopac') # use default version, which is gps only
-                snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
             if orbtype == 'nav-cddis':
                 f,orbdir,foundit=getnavfile_archive(year, month, day,'cddis') # use default version, which is gps only
-                snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
             if orbtype == 'nav-esa':
                 f,orbdir,foundit=getnavfile_archive(year, month, day,'esa') # use default version, which is gps only
-                snrexe = gpsSNR_version() ; warn_and_exit(snrexe,fortran)
         else:
             print('I do not recognize the orbit type you tried to use: ', orbtype)
 
     print('\n')
-    return foundit, f, orbdir, snrexe
-
-def warn_and_exit(snrexe,fortran):
-    """
-    if the GNSS/GPS to SNR executable does not exist, exit
-
-    Parameters
-    ----------
-    snrexe : str
-        name of the executable
-    fortran : bool
-        whether fortran is being used for translation
-    """
-    if not fortran:
-        ok = 1
-        #print('not using fortran, so it does not matter if translation exe exists')
-    else:
-        #print('you are using fortran, so good to check now if translation exe exists')
-        if (os.path.isfile(snrexe) == False):
-            print('This RINEX translation executable does not exist:' + snrexe )
-            print('Install it or use -fortran False. Exiting')
-            sys.exit()
+    return foundit, f, orbdir
 
 def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log,**kwargs):
     """
@@ -3737,7 +3690,10 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log,**kwargs):
         s2=time.time()
         print(round(s2-s1,2), ' seconds')
         # removing the compressed version - will keep new version
-        subprocess.call(['rm', '-f', r3_filename ])
+        try:
+            os.remove(r3_filename)
+        except OSError:
+            pass
         if os.path.exists(r3_filename_new):
             log.write('Hatanaka Conversion successful {0:s} \n'.format(r3_filename_new))
         else:
@@ -3774,7 +3730,10 @@ def new_rinex3_rinex2(r3_filename,r2_filename,dec,gpsonly,log,**kwargs):
 
 
     #log.write('Now remove RINEX3 rnx version of the file ',r3_filename_new)
-    subprocess.call(['rm', '-f', r3_filename_new ])
+    try:
+        os.remove(r3_filename_new)
+    except OSError:
+        pass
 
     return fexists 
 
@@ -3895,39 +3854,6 @@ def gfz_version():
     if not os.path.exists(gfzv):
         gfzv = './gfzrnx'
     return gfzv
-
-def gpsSNR_version():
-    """
-    Finds location of the gps to SNR executable
-
-    Returns
-    -------
-    gpse : str
-        location of gpsSNR executable
-    """
-    exedir = os.environ['EXE']
-    gpse = exedir + '/gpsSNR.e'
-    # heroku version should be in the main area
-    if not os.path.exists(gpse):
-        gpse = './gpsSNR.e'
-    return gpse
-
-def gnssSNR_version():
-    """
-    Finds location of the GNSS to SNR executable
-
-    Returns
-    -------
-    gpse : str 
-        location of gnssSNR executable
-
-    """
-    exedir = os.environ['EXE']
-    gpse = exedir + '/gnssSNR.e'
-    # heroku version should be in the main area
-    if not os.path.exists(gpse):
-        gpse = './gnssSNR.e'
-    return gpse
 
 def teqc_version():
     """
@@ -4325,7 +4251,7 @@ def read_sp3file(file_path):
     ignorePoint = False
     max_sat = 150 # not used
     # store as satNu, week, sec of week , x, y, and z?
-    sp3 = np.empty(shape=[0, 6])
+    rows = []
     count = -1
     firstEpochFound = False
 
@@ -4337,7 +4263,7 @@ def read_sp3file(file_path):
             wk,swk = kgpsweek(int(year), int(month), int(day), int(hour), int(minute), float(second))
             wk = int(wk) ; swk = float(swk)
             if (not firstEpochFound):
-                firstWeek = wk 
+                firstWeek = wk
                 firstEpochFound = True
                 #print('first GPS Week and Seconds in the file', firstWeek, swk)
             count += 1
@@ -4355,9 +4281,9 @@ def read_sp3file(file_path):
                 x = float(xs[1])*1000.0
                 y = float(xs[2])*1000.0
                 z = float(xs[3])*1000.0
-                lis = [satNu, wk,swk, x,y,z]
-                sp3 = np.vstack((sp3,lis))
+                rows.append([satNu, wk,swk, x,y,z])
     f.close()
+    sp3 = np.array(rows) if rows else np.empty(shape=[0, 6])
     nr,nc = sp3.shape
     #print('number of rows and columns being returned from the sp3 file', nr,nc)
     return sp3

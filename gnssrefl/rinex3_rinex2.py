@@ -85,8 +85,8 @@ def main():
 
 
     #print(station,year,doy)
-    log,nada,exedir,genlog = r.set_rinex2snr_logs(station,year,doy)
-    print('Log (mostly) written to ', genlog)
+    log, gen_log = r.set_rinex2snr_logs(station,year,doy)
+    print('Log (mostly) written to ', gen_log)
 
     if os.path.isfile(rinex3):
         log.write('WARNING: your RINEX 3 file will be deleted.')
