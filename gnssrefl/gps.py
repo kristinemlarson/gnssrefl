@@ -13,6 +13,7 @@ import requests
 import subprocess
 import sys
 import sqlite3
+import warnings
 import zipfile
 from urllib.parse import urlparse
 import time
@@ -7550,6 +7551,8 @@ def query_coordinate_file(station):
     # if the local coordinate file exists
     # apparently loadtxt has a ndim input - which would avoid all this nonsense
     # when someone has a single line in their file.
+    warnings.filterwarnings("ignore")
+
     if os.path.isfile(f):
         allofit =np.loadtxt(f,usecols = (0,1,2,3), dtype='str',comments= '%')
         nx = np.shape(allofit)
