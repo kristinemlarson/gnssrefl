@@ -3,9 +3,8 @@
 import datetime
 import numpy as np
 import os
-import subprocess
 
-import gnssrefl.gps as g
+from gnssrefl.utils import FileManagement
 
 
 def _parse_snr_filename(obsfile):
@@ -125,8 +124,8 @@ def read_snr(obsfile, buffer_hours=0, screenstats=False):
 
         # Get previous day data
         prev_year, prev_doy = _get_adjacent_doy(year, doy, -1)
-        prev_obsfile, prev_obsfileCmp, prev_snre = g.define_and_xz_snr(station, prev_year, prev_doy, snr_type)
-        if prev_snre and os.path.isfile(prev_obsfile):
+        prev_obsfile, prev_snre = FileManagement(station, 'snr_file', prev_year, prev_doy, snr_type=snr_type).find_snr_file()
+        if prev_snre:
             prev_data = np.loadtxt(prev_obsfile, comments='%')
             if prev_data.size > 0:
                 # Ensure 2D array
@@ -154,8 +153,8 @@ def read_snr(obsfile, buffer_hours=0, screenstats=False):
 
         # Get next day data
         next_year, next_doy = _get_adjacent_doy(year, doy, +1)
-        next_obsfile, next_obsfileCmp, next_snre = g.define_and_xz_snr(station, next_year, next_doy, snr_type)
-        if next_snre and os.path.isfile(next_obsfile):
+        next_obsfile, next_snre = FileManagement(station, 'snr_file', next_year, next_doy, snr_type=snr_type).find_snr_file()
+        if next_snre:
             next_data = np.loadtxt(next_obsfile, comments='%')
             if next_data.size > 0:
                 # Ensure 2D array
@@ -197,37 +196,3 @@ def read_snr(obsfile, buffer_hours=0, screenstats=False):
         r, c = f.shape
 
     return allGood, f, r, c
-
-
-def compress_snr_files(wantCompression, obsfile, obsfile2,TwoDays,gzip):
-    """
-    compresses SNR files
-
-    Parameters
-    ----------
-    wantCompression : bool
-        whether the file should be compressed again
-    obsfile : str
-        name of first SNR file
-    obsfile2 : str
-        name of second SNR file
-    TwoDays : bool
-        whether second file is being input
-    gzip : bool
-        whether you want to gzip/gunzip the file
-
-    """
-
-    # apparently written before I knew how to use booleans in python
-    if gzip:
-        if (os.path.isfile(obsfile) == True):
-            subprocess.call(['gzip', '-f', obsfile])
-        if (os.path.isfile(obsfile2) == True and twoDays == True):
-            subprocess.call(['gzip', '-f', obsfile2])
-    else:
-        # this is only for xz compression - which I should get rid of
-        if wantCompression:
-            if (os.path.isfile(obsfile) == True):
-                subprocess.call(['xz', '-f', obsfile])
-            if (os.path.isfile(obsfile2) == True and twoDays == True):
-                subprocess.call(['xz', '-f', obsfile2])

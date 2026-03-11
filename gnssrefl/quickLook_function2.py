@@ -15,6 +15,7 @@ import gnssrefl.refraction as refr
 import gnssrefl.rinex2snr as rinex
 import gnssrefl.gnssir_v2 as gnssir_v2
 import gnssrefl.read_snr_files as snr
+from gnssrefl.utils import FileManagement
 
 
 def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pele,satsel,PkNoise,
@@ -144,7 +145,7 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
     pltname = 'temp.png' # default plot
     requireAmp = reqAmp[0]
 
-    obsfile, obsfileCmp, snre =  g.define_and_xz_snr(station,year,doy,snr_type)
+    obsfile, snre = FileManagement(station, 'snr_file', year, doy, snr_type=snr_type).find_snr_file()
     allGood, snrD, nrows, ncols = snr.read_snr(obsfile)
 
     if allGood == 0:

@@ -430,8 +430,7 @@ def extract_arcs_from_station(
     FileNotFoundError
         If the SNR file does not exist and cannot be decompressed.
     """
-    import gnssrefl.gps as g
-    obsfile, _, snr_exists = g.define_and_xz_snr(station, year, doy, snr_type)
+    obsfile, snr_exists = FileManagement(station, 'snr_file', year, doy, snr_type=snr_type).find_snr_file(gzip=gzip)
     if not snr_exists:
         raise FileNotFoundError(
             f"SNR file not found for station={station}, year={year}, "
@@ -444,9 +443,6 @@ def extract_arcs_from_station(
     )
     if not allGood:
         raise RuntimeError(f"read_snr failed for: {obsfile}")
-
-    if gzip and os.path.isfile(obsfile):
-        subprocess.call(['gzip', '-f', obsfile])
 
     # Apply refraction correction
     if lsp is not None and lsp.get('refraction', False):
@@ -494,7 +490,6 @@ def extract_arcs_from_file(
     obsfile: str,
     freq: Optional[Union[int, List[int]]] = None,
     buffer_hours: float = 2,
-    gzip: bool = True,
     **kwargs,
 ) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
     """
@@ -510,8 +505,6 @@ def extract_arcs_from_file(
         Frequency code(s). Default: None (auto-detect)
     buffer_hours : float
         Hours of data from adjacent days. Default: 2
-    gzip : bool
-        If True, gzip the SNR file after reading. Default: False
     **kwargs
         Additional keyword arguments passed to ``extract_arcs()``
 
@@ -533,9 +526,6 @@ def extract_arcs_from_file(
     )
     if not allGood:
         raise RuntimeError(f"read_snr failed for: {obsfile}")
-
-    if gzip and os.path.isfile(obsfile):
-        subprocess.call(['gzip', '-f', obsfile])
 
     return extract_arcs(snr_array, freq=freq, **kwargs)
 

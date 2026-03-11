@@ -826,8 +826,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
     dbhz = lsp.get('dbhz') or False
     compute_lsp = True
 
-    # get the SNR filename
-    obsfile, obsfilecmp, snrexist = g.define_and_xz_snr(station, year, doy, snr_type)
+    _, snrexist = FileManagement(station, 'snr_file', year, doy, snr_type=snr_type).find_snr_file()
 
     l2c_list, l5_list = g.l2c_l5_list(year,doy)
 

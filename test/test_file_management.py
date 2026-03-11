@@ -351,6 +351,131 @@ class TestFrequencyMapping:
         assert "L2" in str(path)
 
 
+class TestSNRFileResolution:
+    """Test SNR file resolution via find_snr_file()."""
+
+    def _snr_path(self, temp_refl_code, station, year, doy, snr_type):
+        """Helper: construct the expected uncompressed SNR file path."""
+        cyyyy = str(year)
+        cyy = cyyyy[2:]
+        cdoy = f'{doy:03d}'
+        filename = f'{station}{cdoy}0.{cyy}.snr{snr_type}'
+        return temp_refl_code / cyyyy / 'snr' / station / filename
+
+    def _create_snr(self, path, compressed=False):
+        """Helper: create a dummy SNR file (optionally .gz)."""
+        target = Path(str(path) + '.gz') if compressed else path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text('dummy snr data')
+        return target
+
+    def test_gz_exists_gzip_true(self, temp_refl_code):
+        """gzip=True with .gz file returns .gz path."""
+        base = self._snr_path(temp_refl_code, 'test', 2024, 100, 66)
+        self._create_snr(base, compressed=True)
+        obsfile, found = FileManagement('test', 'snr_file', 2024, 100, snr_type=66).find_snr_file(gzip=True)
+        assert found
+        assert str(obsfile).endswith('.gz')
+
+    @patch('gnssrefl.utils.subprocess.call')
+    def test_uncompressed_exists_gzip_true_compresses_it(self, mock_call, temp_refl_code):
+        """gzip=True with only uncompressed file compresses it and returns .gz path."""
+        base = self._snr_path(temp_refl_code, 'test', 2024, 100, 66)
+        self._create_snr(base, compressed=False)
+        gz = Path(str(base) + '.gz')
+
+        def fake_gzip(cmd):
+            base.unlink()
+            gz.write_text('dummy compressed')
+        mock_call.side_effect = fake_gzip
+
+        obsfile, found = FileManagement('test', 'snr_file', 2024, 100, snr_type=66).find_snr_file(gzip=True)
+        assert found
+        assert str(obsfile).endswith('.gz')
+
+    def test_gz_preferred_over_uncompressed_when_gzip_true(self, temp_refl_code):
+        """gzip=True prefers .gz when both exist."""
+        base = self._snr_path(temp_refl_code, 'test', 2024, 100, 66)
+        self._create_snr(base, compressed=False)
+        self._create_snr(base, compressed=True)
+        obsfile, found = FileManagement('test', 'snr_file', 2024, 100, snr_type=66).find_snr_file(gzip=True)
+        assert found
+        assert str(obsfile).endswith('.gz')
+
+    def test_uncompressed_exists_gzip_false(self, temp_refl_code):
+        """gzip=False with uncompressed file returns it directly."""
+        base = self._snr_path(temp_refl_code, 'test', 2024, 100, 66)
+        self._create_snr(base, compressed=False)
+        obsfile, found = FileManagement('test', 'snr_file', 2024, 100, snr_type=66).find_snr_file(gzip=False)
+        assert found
+        assert not str(obsfile).endswith('.gz')
+
+    @patch('gnssrefl.utils.subprocess.call')
+    def test_gz_only_gzip_false_decompresses(self, mock_call, temp_refl_code):
+        """gzip=False with only .gz decompresses and returns uncompressed path."""
+        base = self._snr_path(temp_refl_code, 'test', 2024, 100, 66)
+        gz = self._create_snr(base, compressed=True)
+
+        # Simulate gunzip: remove .gz, create uncompressed
+        def fake_gunzip(cmd):
+            gz.unlink()
+            base.write_text('dummy snr data')
+        mock_call.side_effect = fake_gunzip
+
+        obsfile, found = FileManagement('test', 'snr_file', 2024, 100, snr_type=66).find_snr_file(gzip=False)
+        assert found
+        assert not str(obsfile).endswith('.gz')
+        mock_call.assert_called_once_with(['gunzip', str(gz)])
+
+    @patch('gnssrefl.utils.subprocess.call')
+    def test_uncompressed_only_gzip_true_compresses(self, mock_call, temp_refl_code):
+        """gzip=True with only uncompressed file compresses and returns .gz path."""
+        base = self._snr_path(temp_refl_code, 'test', 2024, 100, 66)
+        self._create_snr(base, compressed=False)
+        gz = Path(str(base) + '.gz')
+
+        # Simulate gzip: remove uncompressed, create .gz
+        def fake_gzip(cmd):
+            base.unlink()
+            gz.write_text('dummy compressed')
+        mock_call.side_effect = fake_gzip
+
+        obsfile, found = FileManagement('test', 'snr_file', 2024, 100, snr_type=66).find_snr_file(gzip=True)
+        assert found
+        assert str(obsfile).endswith('.gz')
+        mock_call.assert_called_once_with(['gzip', str(base)])
+
+    def test_gzip_none_finds_gz(self, temp_refl_code):
+        """gzip=None with .gz file returns .gz path without converting."""
+        base = self._snr_path(temp_refl_code, 'test', 2024, 100, 66)
+        self._create_snr(base, compressed=True)
+        obsfile, found = FileManagement('test', 'snr_file', 2024, 100, snr_type=66).find_snr_file()
+        assert found
+        assert str(obsfile).endswith('.gz')
+
+    def test_gzip_none_finds_uncompressed(self, temp_refl_code):
+        """gzip=None with uncompressed file returns it without compressing."""
+        base = self._snr_path(temp_refl_code, 'test', 2024, 100, 66)
+        self._create_snr(base, compressed=False)
+        obsfile, found = FileManagement('test', 'snr_file', 2024, 100, snr_type=66).find_snr_file()
+        assert found
+        assert not str(obsfile).endswith('.gz')
+        # File should still be uncompressed (no side effects)
+        assert base.exists()
+
+    def test_not_found(self, temp_refl_code):
+        """No SNR file returns (path, False)."""
+        obsfile, found = FileManagement('test', 'snr_file', 2024, 100, snr_type=66).find_snr_file(gzip=True)
+        assert not found
+
+    def test_uppercase_path_construction(self, temp_refl_code):
+        """Uppercase path variant is constructed correctly."""
+        fm = FileManagement('test', 'snr_file', 2024, 100, snr_type=66)
+        upper = fm._get_snr_path(uppercase=True)
+        assert 'TEST' in upper.name
+        assert 'TEST' in upper.parent.name
+
+
 if __name__ == "__main__":
     # Allow running tests directly with: python test_file_management.py
     pytest.main([__file__, "-v"])

@@ -2,6 +2,7 @@ import json
 import numpy as np
 import os
 import platform
+import subprocess
 import warnings
 
 from enum import Enum
@@ -58,6 +59,7 @@ class FileTypes(str, Enum):
     gnssir_result = "gnssir_result"
     arcs_directory = "arcs_directory"
     individual_tracks = "individual_tracks"
+    snr_file = "snr_file"
     directory = "directory"
 
 
@@ -70,7 +72,7 @@ class FileManagement:
     Optional parameters are year, doy, and file_not_found_ok.
     """
 
-    def __init__(self, station, file_type, year: int = None, doy: int = None, file_not_found_ok: bool = False, frequency: int = None, extension: str = ''):
+    def __init__(self, station, file_type, year: int = None, doy: int = None, file_not_found_ok: bool = False, frequency: int = None, extension: str = '', snr_type: int = None):
         self.station = station
         
         # Convert string to FileTypes enum if needed for better usability
@@ -92,6 +94,7 @@ class FileManagement:
         
         self.frequency = frequency
         self.extension = extension
+        self.snr_type = snr_type
 
         if "REFL_CODE" not in os.environ:
             raise EnvironmentError("REFL_CODE environment variable not set")
@@ -424,6 +427,63 @@ class FileManagement:
             return self.xdir / "Files" / self.station / self.extension / "individual_tracks"
         else:
             return self.xdir / "Files" / self.station / "individual_tracks"
+
+    def _get_snr_path(self, uppercase=False):
+        """
+        Construct the base (uncompressed) SNR file path.
+
+        Path pattern: {REFL_CODE}/{yyyy}/snr/{station}/{station}{doy}0.{yy}.snr{type}
+        """
+        if not self.year or not self.doy or self.snr_type is None:
+            raise ValueError("Year, doy, and snr_type required for SNR files")
+        cyyyy = str(self.year)
+        cyy = cyyyy[2:]
+        cdoy = f'{self.doy:03d}'
+        sta = self.station.upper() if uppercase else self.station
+        filename = f'{sta}{cdoy}0.{cyy}.snr{self.snr_type}'
+        return self.xdir / cyyyy / 'snr' / sta / filename
+
+    def find_snr_file(self, gzip=None):
+        """
+        Find an SNR file, optionally converting to match the desired storage format.
+
+        Parameters
+        ----------
+        gzip : bool or None
+            If None (default): find whatever exists, no conversion.
+            If True: prefer .gz. Compress uncompressed files.
+            If False: prefer uncompressed. Decompress .gz files.
+
+        Returns
+        -------
+        tuple: (Path, bool) - (file_path, found)
+        """
+        for uppercase in [False, True]:
+            base = self._get_snr_path(uppercase=uppercase)
+            gz_path = Path(str(base) + '.gz')
+
+            if gzip is None:
+                # Read-only: return whatever exists, prefer .gz
+                if gz_path.exists():
+                    return gz_path, True
+                if base.exists():
+                    return base, True
+            elif gzip:
+                if gz_path.exists():
+                    return gz_path, True
+                if base.exists():
+                    subprocess.call(['gzip', str(base)])
+                    if gz_path.exists():
+                        return gz_path, True
+            else:
+                if base.exists():
+                    return base, True
+                if gz_path.exists():
+                    subprocess.call(['gunzip', str(gz_path)])
+                    if base.exists():
+                        return base, True
+
+        return self._get_snr_path(), False
 
     def read_file(self, transpose=False, **kwargs):
         """

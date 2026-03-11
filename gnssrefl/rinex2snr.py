@@ -213,7 +213,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             if strip:
                                 log.write('Testing out stripping the RINEX 2 file here\n')
                                 k.strip_rinexfile(r)
-                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log,rinex2_filename=r)
+                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log,rinex2_filename=r,gzip=gzip)
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX file.')
                     if version == 3:
@@ -264,7 +264,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                             # It looks like i was just trying to use old code here. Have added rinex2_filename parameter 
                             if fexists:
                                 conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
-                                         log, rinex2_filename=r2)
+                                         log, rinex2_filename=r2, gzip=gzip)
                             else:
                                 log.write('Something about the RINEX 3-2 conversion did not work. No SNR file created.\n')
                         else:
@@ -378,13 +378,13 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 pass
                              # should send it the version 2 name
                             conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
-                                      log,rinex2_filename=r2)
+                                      log,rinex2_filename=r2,gzip=gzip)
                         else:
                             log.write('Unsuccessful RINEX 3 retrieval/translation for year-doy {0:4.0f} {1:3.0f} \n'.format(year, doy))
                     else:
                         print(station, ' year:', year, ' doy:', doy, ' from: ', archive, ' rate:', rate, ' orb:', orbtype)
                         # for version 2, since i was using old code, the RINEX 2.11 searching goes on in conv2snr
-                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log)
+                        conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,log,gzip=gzip)
 
 
 def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,log,**kwargs):
@@ -509,12 +509,13 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
                         log.write('A SNR file was created : {0:50s}  \n'.format(snrname_full))
                         print('\n')
                         print('SUCCESS: SNR file was created \n', snrname_full)
-                        g.store_snrfile(snrname,year,station)
-                        with open(snrname_full, 'rb') as f_in:
-                            snr_data = f_in.read()
-                        with gzip_mod.open(snrname_full + '.gz', 'wb', compresslevel=6) as f_out:
-                            f_out.write(snr_data)
-                        os.remove(snrname_full)
+                        g.store_snrfile(snrname, year, station)
+                        if kwargs.get('gzip', True):
+                            with open(snrname_full, 'rb') as f_in:
+                                snr_data = f_in.read()
+                            with gzip_mod.open(snrname_full + '.gz', 'wb', compresslevel=6) as f_out:
+                                f_out.write(snr_data)
+                            os.remove(snrname_full)
 
                 else:
                     # not sure why this is made here??? wasn't it created earlier?
