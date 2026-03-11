@@ -99,6 +99,21 @@ def _compare_arcs(actual_dir, expected_dir):
     pytest.fail("\n".join(lines))
 
 
+def test_extract_arcs_output_unchanged():
+    actual, expected = _check_dirs_exist("test_extract_arcs_output_unchanged")
+    _compare_arcs(actual.joinpath(*ARCS), expected.joinpath(*ARCS))
+
+
+def test_extract_arcs_from_file_output_unchanged():
+    actual, expected = _check_dirs_exist("test_extract_arcs_from_file_output_unchanged")
+    _compare_arcs(actual.joinpath(*ARCS), expected.joinpath(*ARCS))
+
+
+def test_extract_arcs_from_station_output_unchanged():
+    actual, expected = _check_dirs_exist("test_extract_arcs_from_station_output_unchanged")
+    _compare_arcs(actual.joinpath(*ARCS), expected.joinpath(*ARCS))
+
+
 def test_gnssir_output_unchanged():
     actual, expected = _check_dirs_exist("test_gnssir_output_unchanged")
     _compare_output(actual.joinpath(*RESULTS), expected.joinpath(*RESULTS))

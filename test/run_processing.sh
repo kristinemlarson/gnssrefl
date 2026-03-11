@@ -81,6 +81,17 @@ run_test() {
 
 echo "=== Processing test data into $OUTPUT_DIR ==="
 
+# extract_arcs tests (Python API — foundational, run first)
+run_test test_extract_arcs_output_unchanged \
+    python3 "$SCRIPT_DIR/run_extract_arcs.py" test_extract_arcs_output_unchanged
+
+run_test test_extract_arcs_from_file_output_unchanged \
+    python3 "$SCRIPT_DIR/run_extract_arcs.py" test_extract_arcs_from_file_output_unchanged
+
+# Generate multi-constellation config, then run extract_arcs_from_station
+run_test test_extract_arcs_from_station_output_unchanged \
+    bash -c 'gnssir_input mchl -lat -26.358904661 -lon 148.144960505 -height 534.591379 -Hortho 497.0014 -allfreq T && python3 "'"$SCRIPT_DIR"'/run_extract_arcs.py" test_extract_arcs_from_station_output_unchanged'
+
 run_test test_gnssir_output_unchanged \
     gnssir mchl 2025 11
 
