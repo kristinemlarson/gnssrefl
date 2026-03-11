@@ -36,7 +36,7 @@ def _parse_snr_filename(obsfile):
     doy = int(basename[4:7])               # 100
     yy = int(basename[9:11])               # 24
     year = 2000 + yy if yy < 80 else 1900 + yy
-    snr_type = int(basename.split('.snr')[1])  # 66
+    snr_type = int(basename.split('.snr')[1].replace('.gz', ''))  # 66
     return station, year, doy, snr_type
 
 
