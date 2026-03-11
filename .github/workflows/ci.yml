@@ -6,6 +6,9 @@ on:
       - "master"
   pull_request: {}
 
+env:
+  PINNED_VERSION: 193576150e68d2fdee038c6351508ac521e9afdb
+
 jobs:
   build:
     name: "CI"
@@ -22,49 +25,15 @@ jobs:
       - name: Run smoke tests
         run: |
           docker exec -i gnssrefl /src/software_tests
-      - name: Generate golden files from pinned version
+      - name: Generate expected output (pinned baseline)
         run: |
-          docker exec -i gnssrefl bash -c '
-            set -e
-            # Install pinned version for golden file generation
-            pip3 install --force-reinstall https://github.com/kristinemlarson/gnssrefl/archive/193576150e68d2fdee038c6351508ac521e9afdb.tar.gz
-
-            REFL_CODE=/etc/gnssrefl/refl_code
-            mkdir -p $REFL_CODE/2025/snr/mchl $REFL_CODE/2025/results/mchl \
-                     $REFL_CODE/2025/phase/mchl $REFL_CODE/2025/arcs/mchl
-            cp /src/test/data/refl_code/2025/snr/mchl/* $REFL_CODE/2025/snr/mchl/
-            cp -r /src/test/data/refl_code/input/mchl $REFL_CODE/input/
-            cp /src/test/data/refl_code/input/mchl_refr.txt $REFL_CODE/input/
-
-            # Generate golden files
-            gnssir mchl 2025 11 -savearcs T
-            mkdir -p /src/test/data/expected/gnssir/2025
-            cp $REFL_CODE/2025/results/mchl/011.txt /src/test/data/expected/gnssir/2025/
-            rm -rf /src/test/data/expected/arcs/2025/011
-            mkdir -p /src/test/data/expected/arcs/2025/011
-            cp $REFL_CODE/2025/arcs/mchl/011/*.txt /src/test/data/expected/arcs/2025/011/
-
-            phase mchl 2025 11
-            mkdir -p /src/test/data/expected/phase/2025
-            cp $REFL_CODE/2025/phase/mchl/011.txt /src/test/data/expected/phase/2025/
-
-            # Clean previous run output before midnite run
-            rm -f $REFL_CODE/2025/results/mchl/011.txt
-            rm -rf $REFL_CODE/2025/arcs/mchl/011
-
-            gnssir mchl 2025 11 -midnite T -savearcs T
-            mkdir -p /src/test/data/expected/gnssir_midnite/2025
-            cp $REFL_CODE/2025/results/mchl/011.txt /src/test/data/expected/gnssir_midnite/2025/
-            rm -rf /src/test/data/expected/arcs_midnite/2025/011
-            mkdir -p /src/test/data/expected/arcs_midnite/2025/011
-            cp $REFL_CODE/2025/arcs/mchl/011/*.txt /src/test/data/expected/arcs_midnite/2025/011/
-
-            # Reinstall current branch code for testing
-            pip3 install /src
-          '
+          docker exec -i gnssrefl /src/test/run_processing.sh "$PINNED_VERSION" /src/test/data/expected
+      - name: Generate actual output (current code)
+        run: |
+          docker exec -i gnssrefl /src/test/run_processing.sh local /src/test/data/actual
       - name: Install pytest
         run: |
           docker exec -i gnssrefl pip3 install 'pytest~=7.2' 'pytest-mock~=3.10'
       - name: Run unit tests
         run: |
-          docker exec -i gnssrefl pytest /src/test
+          docker exec -i gnssrefl pytest /src/test -v

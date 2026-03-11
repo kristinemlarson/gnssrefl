@@ -71,3 +71,4 @@ logs
 outliers.txt
 **/.DS_Store
 test/data/expected/
+test/data/actual/

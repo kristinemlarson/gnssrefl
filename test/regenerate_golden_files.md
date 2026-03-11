@@ -1,43 +1,38 @@
-# Golden Files
+# Running Regression Tests
 
-Golden files are the expected output that regression tests compare against.
-They are **generated automatically in CI** from a pinned version of gnssrefl,
-so they never need to be committed.
+## Quick start (local, via Docker)
+
+```bash
+./run_tests.sh
+```
+
+This builds the Docker image, generates both expected (golden) and actual
+output, then runs pytest. After completion, both sets of files are on your
+local filesystem:
+
+- `test/data/expected/<test_name>/` — output from the pinned baseline version
+- `test/data/actual/<test_name>/` — output from the current code
+
+You can diff them directly:
+
+```bash
+diff -r test/data/expected/test_gnssir_output_unchanged \
+       test/data/actual/test_gnssir_output_unchanged
+```
 
 ## How it works
 
-The CI workflow (`.github/workflows/ci.yml`) has a step that:
+`test/run_processing.sh <version> <output_dir>` installs a version of
+gnssrefl (either a git hash or `local`), then runs gnssir/phase against
+committed test fixtures, writing a per-test REFL_CODE tree under `<output_dir>`.
 
-1. Installs a pinned release (e.g. `gnssrefl==3.19.0`) inside the Docker container
-2. Runs `gnssir` and `phase` on the committed test data to produce golden files
-3. Reinstalls the current branch code
-4. Runs pytest, which compares current output against the golden files
-
-Because both generation and testing happen in the same Docker container, there
-are no platform differences (Mac ARM vs Linux x86_64) to cause false failures.
+`run_tests.sh` calls it twice — once with the pinned baseline hash, once
+with the current code — then runs pytest to compare the two trees.
 
 ## Changing the baseline version
 
-Edit the `pip3 install gnssrefl==X.Y.Z` line in `.github/workflows/ci.yml`.
-
-## Running tests locally
-
-To run tests locally, you need to generate golden files first. Use the same
-commands from the CI step, substituting `$REFL_CODE` for your local path:
-
-```bash
-# Install the pinned version
-pip install gnssrefl==3.19.0
-
-# Run gnssir and phase, then copy output to test/data/expected/
-# (see ci.yml for the exact commands)
-
-# Reinstall your local code
-pip install .
-
-# Run tests
-pytest test/
-```
+Edit the `PINNED` variable in `run_tests.sh` and `PINNED_VERSION` in
+`.github/workflows/ci.yml`.
 
 ## Test data (committed)
 
