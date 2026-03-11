@@ -1,11 +1,13 @@
-# gnssrefl v4.0.0
+# gnssrefl v4.0.1
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 
-We are in the process of upgrading our RINEX reader. Versions >= 4.0.0 will include this change.
+**We have recently moved to python 3.10!**
 
-While it is great to see so many people expressing interest in GNSS-IR and using this software, I *cannot* answer
-questions sent to my personal e-mail. **All questions must be posted as an [issue](https://github.com/kristinemlarson/gnssrefl/issues).**
+**George Townsend recently removed the hidden Fortran code used for the orbit calculations and RINEX reading.**
+Thank you!
+
+**All questions must be posted as an [issue](https://github.com/kristinemlarson/gnssrefl/issues).**
 This allows tracking of community usage and allows others to benefit if they have the same question. It also
 provides a forum for other community members to provide their perspective as I am not able to answer every question 
 that is posted.
