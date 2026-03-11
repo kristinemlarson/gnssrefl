@@ -285,6 +285,34 @@ def read_json_file(station, extension,**kwargs):
     return lsp
 
 
+def gzip_migration(lsp, station, extension=''):
+    """Temporary migration (remove after 2027-01-01): old JSON configs had
+    gzip defaulting to False due to a bug in gnssir_input. This function
+    overrides gzip to True, updates the JSON on disk, and warns the user.
+
+    Call this after read_json_file() and before using lsp['gzip'].
+    Pass -gzip F on the command line to opt out.
+    """
+    if lsp.get('gzip', True):
+        return
+    if datetime.date.today() >= datetime.date(2027, 1, 1):
+        return
+
+    print('WARNING: your JSON has gzip=False (old default). Updating to True.')
+    print('  Pass -gzip F on the command line if you need files uncompressed.')
+    lsp['gzip'] = True
+
+    # Update the JSON file on disk so this warning only appears once
+    json_manager = FileManagement(station, 'make_json', extension=extension)
+    json_path, _ = json_manager.find_json_file()
+    if json_path.exists():
+        with open(json_path) as f:
+            data = json.load(f)
+        data['gzip'] = True
+        with open(json_path, 'w') as f:
+            json.dump(data, f, indent=4)
+
+
 def new_rise_set(elv,azm,dates, e1, e2, ediff,sat, screenstats):
     """
     This provides a list of rising and setting arcs 

@@ -60,13 +60,14 @@ def parse_arguments():
     parser.add_argument("-orb", default=None, type=str, help="optional orbit value used when creating SNR files")
     parser.add_argument("-archive", default=None, type=str, help="optional archive value used when creating SNR files")
     parser.add_argument("-Hdates", nargs="*", type=str, help="dates of Hortho values(testing)")
+    parser.add_argument("-gzip", default=None, type=str, help="Re-gzip SNR files after gnssir reads them, default is T")
 
     args = parser.parse_args().__dict__
 
     g.print_version_to_screen()
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['allfreq', 'l1', 'l2c', 'l5', 'xyz', 'refraction','subdaily_alt_sigma']
+    boolean_args = ['allfreq', 'l1', 'l2c', 'l5', 'xyz', 'refraction','subdaily_alt_sigma', 'gzip']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -85,7 +86,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
                       subdaily_knots : int=None, subdaily_sigma: float=None, subdaily_subdir: str=None, 
                       subdaily_spline_outlier1: float=None, subdaily_spline_outlier2: float=None, snr: int=None, 
                       stream: str=None , samplerate: int=None, dec: int=None, orb: str=None, archive: str=None,
-                      Hdates: str=None):
+                      Hdates: str=None, gzip: bool=True):
 
     """
     This new script sets the Lomb Scargle analysis strategy you will use in gnssir. It saves your inputs 
@@ -534,8 +535,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     lsp['delTmax'] = delTmax  
  
     # gzip SNR files after running the code
-    # this really should be set to True.  the code is obviously ignoring it
-    lsp['gzip'] = False   
+    lsp['gzip'] = gzip
 
     # for people that don't know how to input pairs of angles
     if ( (len(ellist) % 2) != 0):

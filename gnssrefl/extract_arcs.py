@@ -384,7 +384,7 @@ def extract_arcs_from_station(
     attach_results: bool = False,
     extension: str = '',
     lsp: Optional[Dict[str, Any]] = None,
-    gzip: bool = False,
+    gzip: bool = True,
     **kwargs,
 ) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
     """
@@ -494,7 +494,7 @@ def extract_arcs_from_file(
     obsfile: str,
     freq: Optional[Union[int, List[int]]] = None,
     buffer_hours: float = 2,
-    gzip: bool = False,
+    gzip: bool = True,
     **kwargs,
 ) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
     """

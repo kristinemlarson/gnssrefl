@@ -68,7 +68,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         ampl: float = None, sat: int = None, doy_end: int = None, year_end: int = None, azim1: int = 0, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = True, delTmax: int = None, e1: float = None, e2: float = None, 
-           mmdd: bool = False, gzip: bool = True, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt', 
+           mmdd: bool = False, gzip: bool = None, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt',
            par : int = None, debug : bool=False, midnite : bool=False, dbhz : bool=False):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
@@ -356,8 +356,11 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         lsp['onesat'] = [sat]
 
     lsp['mmdd'] = add_mmddhhss
-    # added 2022apr15
-    lsp['gzip'] = gzip
+    # only override JSON gzip setting if explicitly passed on command line
+    if gzip is not None:
+        lsp['gzip'] = gzip
+    else:
+        guts2.gzip_migration(lsp, station, extension)
     # added 2024aug01
     lsp['savearcs'] = savearcs
 

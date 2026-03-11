@@ -45,7 +45,7 @@ def parse_arguments():
 
 
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66,
-        fr: str = None, e1: float = None, e2: float = None, plt: bool = False, screenstats: bool = False, gzip: bool = True, extension: str = '', par: int = None, midnite: bool = True, ampl: float = None, savearcs: bool = False, savearcs_format: str = None, dec: int = None, dbhz: bool = None):
+        fr: str = None, e1: float = None, e2: float = None, plt: bool = False, screenstats: bool = False, gzip: bool = None, extension: str = '', par: int = None, midnite: bool = True, ampl: float = None, savearcs: bool = False, savearcs_format: str = None, dec: int = None, dbhz: bool = None):
     """
     quickphase computes phase, which are subquently used in vwc. The command line call is phase
     (which maybe we should change).
@@ -151,7 +151,10 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         lsp['reqAmp'] = [ampl]
     lsp['screenstats'] = screenstats
     lsp['midnite'] = midnite
-    lsp['gzip'] = gzip
+    if gzip is not None:
+        lsp['gzip'] = gzip
+    else:
+        guts2.gzip_migration(lsp, station, extension)
     lsp['savearcs'] = savearcs
     if savearcs_format is not None:
         lsp['savearcs_format'] = savearcs_format
