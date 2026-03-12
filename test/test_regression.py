@@ -9,8 +9,7 @@ After a test run, inspect results locally:
     diff -r test/data/expected/test_gnssir_output_unchanged \
            test/data/actual/test_gnssir_output_unchanged
 
-To regenerate golden files after an INTENTIONAL change, see
-test/regenerate_golden_files.md.
+To change the golden baseline, edit test/GOLDEN_COMMIT.
 """
 from pathlib import Path
 

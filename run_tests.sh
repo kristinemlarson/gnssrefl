@@ -20,7 +20,7 @@ set -euo pipefail
 
 IMAGE_NAME="gnssrefl-test"
 CONTAINER_NAME="gnssrefl-test-$$"
-PINNED=193576150e68d2fdee038c6351508ac521e9afdb
+PINNED=$(cat "$(dirname "$0")/test/GOLDEN_COMMIT")
 
 usage() {
     echo "Usage: $0 [--quick | --full | --smoke-only]"
