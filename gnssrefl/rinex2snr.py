@@ -258,15 +258,8 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 sys.exit()
 
                             log.write('The RINEX 3 file exists locally {0:s} \n'.format( r3))
-                            # convert to RINEX 2.11, now allowing gfzrnx messages to be printed
-                            fexists = g.new_rinex3_rinex2(r3,r2,dec_rate,gpsonly,log,quiet=quiet)
-                            # this is so flawed.  If file exists, it should not look for it via conv2snr
-                            # It looks like i was just trying to use old code here. Have added rinex2_filename parameter 
-                            if fexists:
-                                conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
-                                         log, rinex2_filename=r2, gzip=gzip)
-                            else:
-                                log.write('Something about the RINEX 3-2 conversion did not work. No SNR file created.\n')
+                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
+                                     log, rinex3_filename=r3, gzip=gzip)
                         else:
                             print('You Chose the No Look Option, but did not provide the needed RINEX3 file ', r3)
                             print('I looked for files ending with rnx, rnx.gz, and crx.gz in the local directory')
@@ -281,73 +274,50 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                         r2 = station + cdoy + '0.' + cyy + 'o'
                         rinex2exists = False; rinex3name = '';
                         if (rate == 'high'):
-                            #print('Looks for 1-Hz Rinex 3 data at BKG, CDDIS, GA, the Spanish IGN, and GNET')
                             if archive == 'ga':
                                 deleteOld = True
-                                # this downloads RINEX 3 and converts to Rinex 2
+                                # ga_highrate returns a RINEX 2 file directly
                                 r2, fexists= g.ga_highrate(station9ch,year,doy,dec_rate,deleteOld)
                                 log.write('RINEX 2 file derived from the GA archive should now exist: {0:s} \n'.format(r2))
+                                if fexists:
+                                    conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
+                                             log,rinex2_filename=r2,gzip=gzip)
+                                rnx_filename = '' # already handled
                             if archive == 'gnet':
                                 rnx_filename,foundit = g.greenland_rinex3(station9ch, year, doy,stream,srate)
-                                #print(rnx_filename,foundit)
-                                if foundit: 
-                                    log.write('The RINEX 3 file has been downloaded. Try to make {0:s} \n '.format(r2))
+                                if foundit:
                                     subprocess.call(['gunzip', rnx_filename])
-                                    # take off gz on the name
-                                    fexists = g.new_rinex3_rinex2(rnx_filename[0:-3],r2,dec_rate,gpsonly,log,quiet=quiet)
+                                    rnx_filename = rnx_filename[0:-3]
                             if archive == 'kadaster':
-                                # this code only does 1-hz data for now, so samplerate (srate) is not needed
                                 rnx_filename,foundit = ch.kadaster_highrate(station9ch, year, doy,stream,dec_rate)
-                                if foundit: 
-                                    log.write('The RINEX 3 file has been downloaded. Try to make {0:s} \n '.format(r2))
-                                    # take off gz on the name
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
-                                    # delete the merged RINEX 3 if the RINEX 2.11 was made properly
-                                    if fexists: 
-                                        subprocess.call(['rm',rnx_filename])
-
                             if archive == 'cddis':
                                 bad_day = g.cddis_restriction(year, doy,'cddis')
                                 if not bad_day:
                                     rnx_filename,foundit = ch.cddis_highrate(station9ch, year, doy, 0,stream,dec_rate)
-                                else: 
+                                else:
                                     log.write('Will Check for the tar version')
                                     rnx_filename,foundit = ch.cddis_highrate_tar(station9ch, year, doy, 0,stream,dec_rate)
                                     log.write('{0:s}  is returned from tar version \n'.format( rnx_filename))
                                 if not foundit:
                                     print('No high-rate RINEX data were found ')
-                                    foundit = False; fexists = False; rnx_file = ''
-                                else:
-                                    log.write('The RINEX 3 file has been downloaded from CDDIS. Now try to make {0:s} \n'.format(r2))
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
                             if archive == 'bkg':
-                                # this is confusing - so the bkg variable is either IGS or EUREF
                                 bad_day = g.cddis_restriction(year, doy,'bkg')
                                 if not bad_day:
-                                    rnx_filename,foundit = ch.bkg_highrate(station9ch, year , doy, 
+                                    rnx_filename,foundit = ch.bkg_highrate(station9ch, year , doy,
                                                                            0,stream,dec_rate,bkg,timeout=timeout)
                                 else:
                                     log.write('Will Check for the tar version')
-                                    rnx_filename,foundit = ch.bkg_highrate_tar(station9ch, year, doy, 
+                                    rnx_filename,foundit = ch.bkg_highrate_tar(station9ch, year, doy,
                                                                                0,stream,dec_rate,bkg,timeout=timeout)
-                                if foundit:
-                                    log.write('The RINEX 3 file has been downloaded from BKG. Now try to make {0:s} \n'.format(r2))
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
                             if archive == 'ignes':
                                 bad_day = g.cddis_restriction(year, doy,'bkg')
                                 if not bad_day:
                                     rnx_filename,foundit = ch.esp_highrate(station9ch, year, doy, 0,stream,dec_rate)
                                 else:
                                     print('No high-rate RINEX data will be downloaded from IGN ES')
-                                    foundit = False; fexists = False; rnx_file = ''
-                                if foundit:
-                                    log.write('The RINEX 3 file has been downloaded from IGN ES. Now try to make {0:s} \n'.format(r2))
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
 
                         else:
                             log.write('Looking for lowrate RINEX 3 files')
-                            #  I do not think this 'all' option is even allowed anymore.  
-                            #if (archive == 'all'):
                             if False:
                                 file_name,foundit = k.universal_all(station9ch, year, doy,srate,stream,screenstats)
                                 if (not foundit): # try again
@@ -357,28 +327,27 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 file_name,foundit = k.universal(station9ch, year, doy, archive,srate,stream)
                                 if (not foundit): # try again
                                     file_name,foundit = k.universal(station9ch, year, doy, archive,srate,k.swapRS(stream))
-                            if foundit: # version 3 found - now need to gunzip, then hatanaka decompress
+                            if foundit:
                                 if archive == 'nz':
                                     rnx_filename = file_name
                                     log.write('Skip Hatanaka/gunzip, {0:s}'.format(rnx_filename))
-                                    translated = True
                                 else:
-                                    deletecrx = True # no point keeping this around
+                                    deletecrx = True
                                     translated, rnx_filename = go_from_crxgz_to_rnx(file_name,deletecrx)
-                            # now make rinex2
-                                if translated:
-                                    log.write('The RINEX 3 file has been downloaded. Now try to make {0:s} \n'.format(r2))
-                                    fexists = g.new_rinex3_rinex2(rnx_filename,r2,dec_rate,gpsonly,log,quiet=quiet)
-                        # this means the rinex 2 version exists
-                        if fexists:
-                            log.write('RINEX 2 created from v3 and {0:4.0f} {1:3.0f}. Now remove RINEX 3 files and convert \n'.format(year,doy))
+                                    if not translated:
+                                        rnx_filename = ''
+
+                        # Process RINEX 3 file directly if we have one
+                        if rnx_filename and os.path.exists(rnx_filename):
+                            log.write('Processing RINEX 3 file directly: {0:s} \n'.format(rnx_filename))
+                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
+                                     log,rinex3_filename=rnx_filename,gzip=gzip)
                             try:
                                 os.remove(rnx_filename)
                             except OSError:
                                 pass
-                             # should send it the version 2 name
-                            conv2snr(year, doy, station, isnr, orbtype,rate,dec_rate,archive,
-                                      log,rinex2_filename=r2,gzip=gzip)
+                        elif not rnx_filename:
+                            pass # ga highrate already handled above, or nothing found
                         else:
                             log.write('Unsuccessful RINEX 3 retrieval/translation for year-doy {0:4.0f} {1:3.0f} \n'.format(year, doy))
                     else:
@@ -421,6 +390,7 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
     """
 
     r2_filename = kwargs.get('rinex2_filename','')
+    r3_filename = kwargs.get('rinex3_filename','')
 
     xdir = os.environ['REFL_CODE']
 
@@ -452,6 +422,41 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
         # if you have the orbit file, you can get the rinex file. First lets define the expected names
         if foundit:
             print('Orbit file: ', f)
+            orbfile = orbdir + '/' + f
+            oexist = os.path.isfile(orbfile)
+
+            # RINEX 3 direct path — bypass gfzrnx conversion
+            if len(r3_filename) > 0 and oexist:
+                log.write('Processing RINEX 3 file directly: {0:s} \n'.format(r3_filename))
+                snrname = g.snr_name(station, year, month, day, option)
+                g.make_snrdir(year, station)
+                log.write('SNR file {0:50s} \n'.format(snrname))
+                rnx2snr_v3(r3_filename, orbfile, snrname, option, year, month, day, dec_rate, log)
+
+                if os.path.isfile(snrname):
+                    if (os.stat(snrname).st_size == 0):
+                        log.write('you created a zero file size which could mean a lot of things \n')
+                        log.write('bad exe, bad snr option, do not really have the orbit file \n')
+                        try:
+                            os.remove(snrname)
+                        except OSError:
+                            pass
+                    else:
+                        log.write('A SNR file was created : {0:50s}  \n'.format(snrname_full))
+                        print('\nSUCCESS: SNR file was created')
+                        print(snrname_full + '\n')
+                        g.store_snrfile(snrname, year, station)
+                        if kwargs.get('gzip', True):
+                            with open(snrname_full, 'rb') as f_in:
+                                snr_data = f_in.read()
+                            with gzip_mod.open(snrname_full + '.gz', 'wb', compresslevel=6) as f_out:
+                                f_out.write(snr_data)
+                            os.remove(snrname_full)
+                else:
+                    print('No SNR file created - check error logs')
+                log.close()
+                return True
+
             # now you can look for a rinex file
             rinexfile,rinexfiled = g.rinex_name(station, year, month, day)
             # This goes to find the rinex file. I am changing it to allow
@@ -480,12 +485,10 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
                         rinexfile, foundit2 = k.make_rinex2_ofiles(file_name) # translate
 
 #           define booleans for various files
-            oexist = os.path.isfile(orbdir + '/' + f) == True
             rexist = os.path.isfile(rinexfile) == True
             # if orbits and rinexfile exist
             if (oexist) and (rexist):
                 snrname = g.snr_name(station, year,month,day,option)
-                orbfile = orbdir + '/' + f
                 g.make_snrdir(year,station) # make sure output directory exists
                 log.write('SNR file {0:50s} \n'.format( snrname))
                 rnx2snr(rinexfile, orbfile,snrname,option,year,month,day,dec_rate,log)
@@ -677,6 +680,77 @@ def rnx2snr(obsfile, navfile,snrfile,snroption,year,month,day,dec_rate,log):
     else:
         log.write('Read the sp3 file \n'); sp3 = g.read_sp3file(navfile)
         write_snr_from_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year,month,day,emin,emax,snrfile,up,East,North,recv,dec_rate,log)
+
+def rnx2snr_v3(obsfile, navfile, snrfile, snroption, year, month, day, dec_rate, log):
+    """
+    Converts a RINEX 3 obs file directly, bypassing gfzrnx conversion to RINEX 2.
+
+    Parameters
+    ----------
+    obsfile : str
+        RINEX 3 filename
+    navfile : str
+        navigation/orbit file
+    snrfile : str
+        SNR output filename
+    snroption : int
+        kind of SNR file requested
+    year : int
+        full year
+    month : int
+        calendar month
+    day : int
+        calendar day
+    dec_rate : int
+        decimation rate in seconds
+    log : file
+        log file handle
+    """
+    last3 = navfile[-3::]
+    orbtype = 'sp3'
+    if (last3 != 'SP3') and (last3 != 'sp3'):
+        orbtype = 'nav'
+    log.write("Orbit type {0:4s} \n".format(orbtype))
+    log.write("File name {0:50s} \n".format(navfile))
+    emin, emax = elev_limits(snroption)
+
+    obsdata, systemsatlists, prntoidx, obstypes, header, obstimes, gpstime = rinpy.processrinexfile(obsfile)
+    obsdata = rinpy.separateobservables(obsdata, obstypes)
+    obsdata, obstypes = rinpy.collapse_rinex3_obs(obsdata, obstypes)
+
+    key = 'APPROX POSITION XYZ'
+    if key not in header:
+        log.write('RINEX file does not have station coordinates. Exiting \n')
+        print('RINEX file does not have station coordinates. This is illegal. Exiting')
+        return
+    rv = header['APPROX POSITION XYZ']
+    recv = np.array([float(i) for i in rv.split()])
+    log.write("XYZ from header {0:15.5f} {1:15.5f} {2:15.5f} \n".format(recv[0], recv[1], recv[2]))
+    if np.sum(np.abs(recv)) < 5:
+        print('Your receiver coordinates are in the middle of the Earth. Exiting.')
+        return
+
+    lat, lon, h = g.xyz2llh(recv, 1e-8)
+    up, East, North = g.up(lat, lon)
+
+    obslist = obstypes.get('G', [])
+    s1exist = 'S1' in obslist
+    s2exist = 'S2' in obslist
+    s5exist = 'S5' in obslist
+    if not s1exist and not s2exist:
+        log.write('There are no S1 and no S2 data - this file is not useful for reflectometry \n')
+        return
+
+    if orbtype == 'nav':
+        gpssatlist = systemsatlists['G'][:]
+        write_snr_from_nav(navfile, obstimes, obsdata, obslist, prntoidx, gpssatlist, snrfile,
+                           s1exist, s2exist, s5exist, up, East, North, emin, emax, recv, dec_rate, log)
+    else:
+        log.write('Read the sp3 file \n')
+        sp3 = g.read_sp3file(navfile)
+        write_snr_from_sp3(gpstime, sp3, systemsatlists, obsdata, obstypes, prntoidx, year, month, day,
+                           emin, emax, snrfile, up, East, North, recv, dec_rate, log)
+
 
 def write_snr_from_nav(navfile,obstimes,observationdata,obslist,prntoidx,gpssatlist,snrfile,s1exist,s2exist,s5exist,up,East,North,emin,emax,recv,dec_rate,log):
     """
@@ -970,6 +1044,8 @@ def write_snr_from_sp3(gpstime,sp3,systemsatlists,obsdata,obstypes,prntoidx,year
         # get the S1 data for this satellite
                     if 'S1' in obslist:
                         s1 = obsdata[con]['S1'][:, prntoidx[con][prn]]
+                    else:
+                        s1 = np.full(gpstime.shape[0], np.nan)
 
         # keep epoch if ANY SNR channel has data (matches Fortran behavior)
                     all_nan = np.isnan(s1)

@@ -121,48 +121,26 @@ def main():
     elif orbtype == 'gps+glo':
         orbtype = 'gbm'
 
-    gexe = g.gfz_version()
-
-    if not os.path.exists(gexe):
-        print('Required gfzrnx executable does not exist. Exiting.')
-        sys.exit()
-
-
-    # first step will be to translate to rinex2
-    # need a log ... 
-
     if os.path.isfile(rinex3):
         print('Found version 3 input file \n')
         if (rinex3[-2::] == 'gz'):
-            #print('Must gunzip version 3 rinex')
             subprocess.call(['gunzip', rinex3])
             rinex3 = rinex3[0:-3]
-        gpsonly = False
-        if orbtype == 'nav':
-            gpsonly = True
-        print('Opening ', logname)
-        log = open(logname, 'w+')
-        g.new_rinex3_rinex2(rinex3,rinex2,dec_rate,gpsonly,log,quiet=quiet)
-        log.close()
+
+        idoy = int(cdoy); iyear = int(year)
+        # extract 9-char station name from RINEX 3 filename
+        station9ch = rinex3[0:9]
+        archive = 'unavco'
+        rate = 'low'; nol = True
+        overwrite = False; srate = 30; mk = False
+        strip = False; stream = 'R'; bkg = 'IGS'
+        gzip = True; timeout = 0; screenstats = True
+        r.run_rinex2snr(station9ch, iyear, idoy, isnr, orbtype, rate,dec_rate,archive,nol,
+                overwrite,srate,mk,stream,strip,bkg,screenstats,gzip,timeout,quiet)
 
     else:
         print('ERROR: your input file does not exist: {0:s} \n'.format(rinex3))
         sys.exit()
-
-    if os.path.isfile(rinex2):
-        print('Found version 2.11 RINEX file : {0:s} \n'.format(rinex2))
-        idoy = int(cdoy); iyear = int(year)
-
-        # many of these are fake values because the file has already been translated to rinex2
-        archive = 'unavco'
-        year_list = [iyear]; doy_list = [idoy]; rate = 'low';   nol = True;
-        overwrite = False; srate = 30; mk = False; skipit = 1
-        strip = False; stream = 'R'  ; bkg = 'IGS'
-        gzip = True
-        timeout = 0
-        screenstats = True
-        r.run_rinex2snr(station, iyear, idoy, isnr, orbtype, rate,dec_rate,archive,nol,
-                overwrite,srate,mk,stream,strip,bkg,screenstats,gzip,timeout,quiet)
 
 
 if __name__ == "__main__":
