@@ -19,6 +19,7 @@ import subprocess
 import numpy as np
 from typing import List, Tuple, Optional, Dict, Any, Union
 
+import gnssrefl.gps as g
 from gnssrefl.read_snr_files import read_snr
 from gnssrefl.utils import circular_mean_deg, circular_distance_deg
 from gnssrefl.utils import FileManagement
@@ -297,7 +298,6 @@ def _get_arc_filename(sdir, sat, freq, az_min_ele, arc_timestamp):
 
 def _write_arc_file(fname, data, meta, station, year, doy, savearcs_format='txt'):
     """Write a single arc to disk."""
-    import gnssrefl.gps as g
     eangles = data['ele']
     dsnr = data['snr']
     sec = data['seconds']
@@ -381,7 +381,7 @@ def extract_arcs_from_station(
     freq: Optional[Union[int, List[int]]] = None,
     snr_type: int = 66,
     buffer_hours: float = 2,
-    attach_results: bool = False,
+    attach_results: Union[bool, List[str]] = False,
     extension: str = '',
     lsp: Optional[Dict[str, Any]] = None,
     gzip: bool = True,
@@ -460,28 +460,33 @@ def extract_arcs_from_station(
             save_arc(meta, data, sdir, station, year, doy, savearcs_format)
 
     if attach_results:
-        # gnssir results
-        try:
-            result_path = g.LSPresult_name(station, year, doy, extension)[0]
-            if os.path.isfile(result_path):
-                attach_gnssir_processing_results(arcs, result_path)
-            else:
+        # Normalize: True means all, list means specific types
+        if attach_results is True:
+            attach_results = ['gnssir', 'phase', 'vwc']
+
+        if 'gnssir' in attach_results:
+            try:
+                result_path = g.LSPresult_name(station, year, doy, extension)[0]
+                if os.path.isfile(result_path):
+                    attach_gnssir_processing_results(arcs, result_path)
+                else:
+                    for metadata, _data in arcs:
+                        metadata['gnssir_processing_results'] = None
+            except Exception:
                 for metadata, _data in arcs:
                     metadata['gnssir_processing_results'] = None
-        except Exception:
-            for metadata, _data in arcs:
-                metadata['gnssir_processing_results'] = None
 
-        # phase results
-        phase_path = FileManagement(station, 'phase_file', year, doy,
-                                    extension=extension).get_file_path(ensure_directory=False)
-        if phase_path.is_file():
-            attach_phase_processing_results(arcs, str(phase_path))
-        else:
-            for metadata, _data in arcs:
-                metadata['phase_processing_results'] = None
+        if 'phase' in attach_results:
+            phase_path = FileManagement(station, 'phase_file', year, doy,
+                                        extension=extension).get_file_path(ensure_directory=False)
+            if phase_path.is_file():
+                attach_phase_processing_results(arcs, str(phase_path))
+            else:
+                for metadata, _data in arcs:
+                    metadata['phase_processing_results'] = None
 
-        attach_vwc_track_results(arcs, station, year, doy, extension)
+        if 'vwc' in attach_results:
+            attach_vwc_track_results(arcs, station, year, doy, extension)
 
     return arcs
 
@@ -657,8 +662,7 @@ def extract_arcs(
     if screenstats and len(elev_pairs) > 1:
         print(f'Using {len(elev_pairs)} elevation angle ranges: {elev_pairs}')
 
-    # Pre-compute arc scale factors (wavelength/2) to avoid repeated import + lookup
-    import gnssrefl.gps as g
+    # Pre-compute arc scale factors (wavelength/2) to avoid repeated lookup
     cf_cache = {}
 
     # Pre-compute per-satellite masks and index ranges for fast lookup
@@ -1106,7 +1110,6 @@ def _compute_arc_metadata(
 
     # Scale factor (wavelength/2)
     if cf is None:
-        import gnssrefl.gps as g
         cf = g.arc_scaleF(freq, sat)
 
     # Circular mean azimuth

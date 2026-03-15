@@ -7,7 +7,7 @@ import sys
 
 import gnssrefl.gnssir_v2 as guts
 import gnssrefl.gps as g
-from gnssrefl.utils import FileManagement, check_arc_quality, format_qc_summary
+from gnssrefl.utils import FileManagement, pre_check_arc, check_arc_quality, format_qc_summary
 
 def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,logfilename,dbhz):
     """
@@ -80,9 +80,6 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
         n_total = len(freq_arcs)
         qc_counts = defaultdict(int)
 
-        ediff = lsp['ediff']
-        delTmax = lsp['delTmax']
-
         for arc_number, (meta, data) in enumerate(freq_arcs):
             arc_passed = False
             try:
@@ -101,12 +98,9 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                 UTCtime = meanTime
 
                 # Pre-check: skip expensive LSP for arcs that will definitely fail QC
-                if (meta['ele_start'] - e1) > ediff or (meta['ele_end'] - e2) < -ediff:
-                    qc_counts['ediff'] += 1
-                    rejected_arcs += 1
-                    continue
-                if delT >= delTmax:
-                    qc_counts['delT'] += 1
+                passed, reason = pre_check_arc(meta, lsp)
+                if not passed:
+                    qc_counts[reason] += 1
                     rejected_arcs += 1
                     continue
 

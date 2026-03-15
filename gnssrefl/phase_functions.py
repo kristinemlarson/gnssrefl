@@ -8,7 +8,7 @@ import sys
 
 
 import gnssrefl.gps as g
-from gnssrefl.utils import FileManagement, FileTypes, check_arc_quality, format_qc_summary, circular_distance_deg
+from gnssrefl.utils import FileManagement, FileTypes, pre_check_arc, check_arc_quality, format_qc_summary, circular_distance_deg
 import gnssrefl.daily_avg_cl as da
 import gnssrefl.gnssir_v2 as gnssir
 from gnssrefl.extract_arcs import extract_arcs_from_station, move_arc_to_failqc
@@ -824,8 +824,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
     azvalues = gnssir.rewrite_azel(lsp.get('azval2'))
     dec = lsp.get('dec') or 1
     dbhz = lsp.get('dbhz') or False
-    compute_lsp = True
-
+    recompute_lsp = lsp.get('recompute_lsp', False)
     _, snrexist = FileManagement(station, 'snr_file', year, doy, snr_type=snr_type).find_snr_file()
 
     l2c_list, l5_list = g.l2c_l5_list(year,doy)
@@ -855,6 +854,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                 lsp=lsp, gzip=gzip,
                 dbhz=dbhz,
                 dec=dec,
+                attach_results=['gnssir'] if not recompute_lsp else False,
             )
 
             # Group arcs by frequency
@@ -930,14 +930,29 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                             qc_counts['L2C/L5'] += 1
                             continue
 
+                        # Pre-check: skip expensive LSP for arcs that will definitely fail QC
+                        passed, reason = pre_check_arc(meta, lsp)
+                        if not passed:
+                            qc_counts[reason] += 1
+                            continue
+
                         if screenstats:
                             print(f'Sat {sat_number:3.0f} Azimuth {track_azim:5.1f} RH {rh_apriori:6.2f} {nv:5.0f}')
 
-                        max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(x, y, cf, max_height,
-                                                                                           desired_p, min_height)
-
-                        nij = pz[(px > noise_region[0]) & (px < noise_region[1])]
-                        noise = np.mean(nij) if len(nij) > 0 else 0
+                        gnssir_results = meta.get('gnssir_processing_results')
+                        if gnssir_results is not None:
+                            max_f = gnssir_results['RH']
+                            max_amp = gnssir_results['Amp']
+                            obs_pk2noise = gnssir_results['PkNoise']
+                            noise = max_amp / obs_pk2noise if obs_pk2noise > 0 else 0
+                        elif recompute_lsp:
+                            max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(
+                                x, y, cf, max_height, desired_p, min_height)
+                            nij = pz[(px > noise_region[0]) & (px < noise_region[1])]
+                            noise = np.mean(nij) if len(nij) > 0 else 0
+                            obs_pk2noise = max_amp / noise if noise > 0 else 0
+                        else:
+                            continue
 
                         if noise > 0 and screenstats:
                             print(f'>> LSP RH {max_f:7.3f} m {max_amp/noise:6.1f} Amp {max_amp:6.1f} ')
@@ -946,8 +961,6 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                         if not passed:
                             qc_counts[reason] += 1
                             continue
-
-                        obs_pk2noise = max_amp / noise
                         x_data = np.sin(np.deg2rad(x))
                         y_data = y
                         test_function_apriori = partial(test_func_new, rh_apriori=rh_apriori,freq=freq)

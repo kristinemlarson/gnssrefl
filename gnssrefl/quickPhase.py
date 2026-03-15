@@ -33,11 +33,12 @@ def parse_arguments():
     parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs (txt or pickle), default is txt")
     parser.add_argument("-dec", default=None, type=int, help="decimate SNR data to this sampling rate")
     parser.add_argument("-dbhz", default=None, type=str, help="keep SNR in dB-Hz units (default is false)")
+    parser.add_argument("-recompute_lsp", default=None, type=str, help="recompute LSP for all arcs instead of using gnssir results (default is false)")
 
     args = parser.parse_args().__dict__
 
     # convert all expected boolean inputs from strings to booleans
-    boolean_args = ['plt', 'screenstats', 'gzip', 'midnite', 'savearcs', 'dbhz']
+    boolean_args = ['plt', 'screenstats', 'gzip', 'midnite', 'savearcs', 'dbhz', 'recompute_lsp']
     args = str2bool(args, boolean_args)
 
     # only return a dictionary of arguments that were added from the user - all other defaults will be set in code below
@@ -45,7 +46,7 @@ def parse_arguments():
 
 
 def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end: int = None, snr: int = 66,
-        fr: str = None, e1: float = None, e2: float = None, plt: bool = False, screenstats: bool = False, gzip: bool = None, extension: str = '', par: int = None, midnite: bool = True, ampl: float = None, savearcs: bool = False, savearcs_format: str = None, dec: int = None, dbhz: bool = None):
+        fr: str = None, e1: float = None, e2: float = None, plt: bool = False, screenstats: bool = False, gzip: bool = None, extension: str = '', par: int = None, midnite: bool = True, ampl: float = None, savearcs: bool = False, savearcs_format: str = None, dec: int = None, dbhz: bool = None, recompute_lsp: bool = False):
     """
     quickphase computes phase, which are subquently used in vwc. The command line call is phase
     (which maybe we should change).
@@ -162,6 +163,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         lsp['dec'] = dec
     if dbhz is not None:
         lsp['dbhz'] = dbhz
+    lsp['recompute_lsp'] = recompute_lsp
 
     # Set up timing and parallel processing
     t1 = time.time()
