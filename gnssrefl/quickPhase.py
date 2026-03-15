@@ -1,9 +1,12 @@
 import argparse
+import contextlib
 import numpy as np
+import os
 import sys
 import time
 import multiprocessing
-from functools import partial
+
+from tqdm import tqdm
 
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
@@ -34,6 +37,8 @@ def parse_arguments():
     parser.add_argument("-dec", default=None, type=int, help="decimate SNR data to this sampling rate")
     parser.add_argument("-dbhz", default=None, type=str, help="keep SNR in dB-Hz units (default is false)")
     parser.add_argument("-recompute_lsp", default=None, type=str, help="recompute LSP for all arcs instead of using gnssir results (default is false)")
+
+    g.print_version_to_screen()
 
     args = parser.parse_args().__dict__
 
@@ -119,8 +124,10 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         print('Station name must be four characters long. Exiting.')
         sys.exit()
 
-    # Use the helper function to get the list of frequencies.
-    fr_list = qp.get_vwc_frequency(station, extension, fr)
+    # Read station json once, pass to get_vwc_frequency to avoid double-loading
+    lsp = guts2.read_json_file(station, extension)
+
+    fr_list = qp.get_vwc_frequency(station, extension, fr, lsp=lsp)
 
     # Check that an apriori file exists for each requested frequency.
     for f in fr_list:
@@ -141,9 +148,6 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     if exitS:
         sys.exit()
-
-    # Read station json and apply CLI overrides (same pattern as gnssir_cl.py)
-    lsp = guts2.read_json_file(station, extension)
     if e1 is not None:
         lsp['e1'] = e1
     if e2 is not None:
@@ -188,45 +192,84 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         'lsp': lsp, 'extension': extension,
     }
 
+    total_arcs = 0
     if par == 1:
-        print('Sequential processing')
+        print('Sequential processing\n')
         process_phase_sequential(year, year_end, doy, doy_end, args)
     else:
-        print('Parallel processing chosen')
-        process_phase_parallel(year, year_end, doy, doy_end, args, par)
+        print('Per-day output suppressed in parallel mode. Run without -par to see detailed output.')
+
+        # Build flat list of (year, doy) work units
+        MJD1 = int(g.ydoy2mjd(year, doy))
+        MJD2 = int(g.ydoy2mjd(year_end, doy_end))
+        day_list = []
+        for mjd in range(MJD1, MJD2 + 1):
+            y, d = g.modjul_to_ydoy(mjd)
+            day_list.append((y, d))
+
+        manager = multiprocessing.Manager()
+        error_queue = manager.Queue()
+        pool = multiprocessing.Pool(processes=par)
+
+        worker_args = [(y, d, args, error_queue) for y, d in day_list]
+        total_arcs = 0
+        with tqdm(pool.imap_unordered(process_phase_day_worker, worker_args),
+                  total=len(day_list),
+                  desc=f"phase {station}",
+                  unit="day") as pbar:
+            for n_arcs in pbar:
+                total_arcs += n_arcs
+                elapsed = time.time() - t1
+                ms_per_arc = elapsed / total_arcs * 1000 if total_arcs else 0
+                pbar.set_postfix_str(f"{total_arcs} arcs, {ms_per_arc:.1f} ms/arc")
+
+        pool.close()
+        pool.join()
+
+        if not error_queue.empty():
+            print("One (or more) of the processes encountered errors. Will not proceed until errors are fixed.")
+            i = 1
+            while not error_queue.empty():
+                e = error_queue.get()
+                print(f"Error {i} type: {type(e)}. Error {i} message: {e}")
+                i += 1
+            sys.exit(1)
 
     t2 = time.time()
-    print('Time to compute: ', round(t2-t1, 2), ' seconds')
+    elapsed = round(t2-t1, 2)
+    ndays = int(g.ydoy2mjd(year_end, doy_end)) - int(g.ydoy2mjd(year, doy)) + 1
+    if par > 1 and total_arcs:
+        ms_per_arc = round(elapsed / total_arcs * 1000, 1)
+        print(f'Processed {ndays} days, {total_arcs} arcs in {elapsed} s ({ms_per_arc} ms/arc)')
+    else:
+        print(f'Processed {ndays} days in {elapsed} s ({round(elapsed/ndays, 2)} s/day)')
 
 
-def process_phase_day(year, doy, args, error_queue=None):
-    """Process a single day - shared by both sequential and parallel processing"""
+def count_result_arcs(result_path):
+    """Count non-comment lines in a result file."""
     try:
-        print(f'Analyzing year/day of year {year}/{doy}')
-        qp.phase_tracks(args['station'], year, doy, args['snr'], args['fr_list'],
-                       args['lsp'], args['extension'])
-    except Exception as e:
-        if error_queue:
-            print('***********************************************************************')
-            print('Error in phase processing: ', year, doy)
-            print('***********************************************************************')
-            error_queue.put(e)
-        else:
-            raise
+        with open(result_path) as f:
+            return sum(1 for line in f if not line.startswith('%'))
+    except FileNotFoundError:
+        return 0
+
+
+def process_phase_day(year, doy, args):
+    """Process a single day for sequential mode."""
+    print(f'Analyzing year/day of year {year}/{doy}')
+    qp.phase_tracks(args['station'], year, doy, args['snr'], args['fr_list'],
+                   args['lsp'], args['extension'])
+
 
 def process_phase_sequential(year, year_end, doy, doy_end, args):
     """Sequential processing function"""
-    # Original logic preserved
     if year_end != year:  # Multi-year processing
         year_range = np.arange(year, year_end+1)
         for y in np.arange(year, year_end+1):
-            # If first year in multi-year range, then start on doy requested and finish year.
             if y == year_range[0]:
                 date_range = np.arange(doy, 366)
-            # If last year in multi-year range, then start on doy 1 finish on doy_end.
             elif y == year_range[-1]:
                 date_range = np.arange(1, doy_end+1)
-            # If year within multi-year range then do whole year start to finish.
             else:
                 date_range = np.arange(1, 366)
 
@@ -236,39 +279,24 @@ def process_phase_sequential(year, year_end, doy, doy_end, args):
         for d in np.arange(doy, doy_end + 1):
             process_phase_day(year, d, args)
 
-def process_phase_parallel(year, year_end, doy, doy_end, args, par):
-    """Parallel processing setup and execution"""
-    manager = multiprocessing.Manager()
-    error_queue = manager.Queue()
 
-    numproc = par
-    print(year, doy, year_end, doy_end)
-    # Get date ranges for parallel processing
-    d, numproc = guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
-
-    # Create list of (year, doy, args, error_queue) for each day to process
-    day_list = []
-    for index in range(numproc):
-        d1 = d[index][0]
-        d2 = d[index][1]
-        for MJD in range(d1, d2+1):
-            year_mjd, doy_mjd = g.modjul_to_ydoy(MJD)
-            day_list.append((year_mjd, doy_mjd, args, error_queue))
-
-    pool = multiprocessing.Pool(processes=numproc)
-    pool.starmap(process_phase_day, day_list)
-    pool.close()
-    pool.join()
-
-    # Check for errors
-    if not error_queue.empty():
-        print("One (or more) of the processes encountered errors. Will not proceed until errors are fixed.")
-        i = 1
-        while not error_queue.empty():
-            e = error_queue.get()
-            print(f"Error {i} type: {type(e)}. Error {i} message: {e}")
-            i += 1
-        sys.exit(1)
+def process_phase_day_worker(worker_args):
+    """Worker for parallel phase processing. Returns arc count for progress bar."""
+    year, doy, args, error_queue = worker_args
+    try:
+        with contextlib.redirect_stdout(open(os.devnull, 'w')):
+            qp.phase_tracks(args['station'], year, doy, args['snr'], args['fr_list'],
+                           args['lsp'], args['extension'])
+        xdir = str(os.environ['REFL_CODE'])
+        station = args['station']
+        result_path = os.path.join(xdir, str(year), 'phase', station, f'{doy:03d}.txt')
+        return count_result_arcs(result_path)
+    except Exception as e:
+        print('***********************************************************************')
+        print('Error in phase processing: ', year, doy)
+        print('***********************************************************************')
+        error_queue.put(e)
+        return 0
 
 def main():
     args = parse_arguments()

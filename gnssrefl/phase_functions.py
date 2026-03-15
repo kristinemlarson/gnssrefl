@@ -729,7 +729,7 @@ def test_func_new(x, a, b, rh_apriori,freq):
 
     return a * np.sin(freq_least_squares * x + b)
 
-def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
+def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None, lsp: dict = None):
     """
     Determines the frequency to use for VWC workflows.
     Priority is: command line -> json file -> default (20).
@@ -742,6 +742,8 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
         Analysis extension name.
     fr_cmd : str, optional
         Frequency provided from the command line (e.g., '1', '20'), by default None.
+    lsp : dict, optional
+        Pre-loaded json dict. Pass to skip re-reading the json file.
 
     Returns
     -------
@@ -758,12 +760,13 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
             print(f"Error: Invalid frequency '{fr_cmd}'. Must be 1 (L1), 20 (L2C), or 5 (L5).")
             sys.exit()
     else:
-        # Otherwise, try to read from the json file
-        lsp = gnssir.read_json_file(station, extension, noexit=True)
+        # Read json if not already provided
+        if lsp is None:
+            lsp = gnssir.read_json_file(station, extension, noexit=True)
         if 'freqs' in lsp and lsp.get('freqs'):
             if len(lsp['freqs']) == 1:
                 final_fr = lsp['freqs'][0]
-                print(f"Frequency read from JSON file: {final_fr}")
+                print(f"Requested frequencies  [{final_fr}]")
             else:
                 print("Tried to use frequency values in json but there were too many.  Using default of L2C (20).")
                 final_fr = 20
@@ -992,7 +995,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                 np.savetxt(my_file, all_results, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f", comments="%")
 
             if qc_lines:
-                print('\n'.join(qc_lines))
+                print('\n'.join(qc_lines) + '\n')
 
 
 def low_pct(amp, basepercent):

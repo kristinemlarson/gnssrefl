@@ -209,7 +209,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
 
     # this is really just overwriting what I had before. However, This will be sorted.
         testfile = FileManagement(station, 'gnssir_result', year, doy, extension=extension).get_file_path()
-        print('Writing sorted LSP results to : ', testfile, '\n')
+        print('Writing sorted LSP results to : ', testfile)
         np.savetxt(testfile, allL, fmt=f, delimiter=' ', newline='\n',header=head, comments='%')
     else:
         print('No good retrievals found so no LSP file should be created ')
@@ -220,4 +220,4 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
             subprocess.call(['rm', '-f', str(lspname)])
 
     if qc_lines:
-        print('\n'.join(qc_lines))
+        print('\n'.join(qc_lines) + '\n')

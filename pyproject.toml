@@ -22,7 +22,7 @@ dependencies = [
     "scipy",
     "matplotlib",
     "requests",
-    "progress",
+    "tqdm",
     "astropy",
     "simplekml",
     "earthscope-sdk<=0.2.1",

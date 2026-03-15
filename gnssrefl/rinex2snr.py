@@ -507,8 +507,8 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
                             pass
                     else:
                         log.write('A SNR file was created : {0:50s}  \n'.format(snrname_full))
-                        print('\n')
-                        print('SUCCESS: SNR file was created \n', snrname_full)
+                        print('\nSUCCESS: SNR file was created')
+                        print(snrname_full + '\n')
                         g.store_snrfile(snrname, year, station)
                         if kwargs.get('gzip', True):
                             with open(snrname_full, 'rb') as f_in:
