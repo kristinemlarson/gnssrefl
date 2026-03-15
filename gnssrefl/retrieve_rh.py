@@ -80,6 +80,9 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
         n_total = len(freq_arcs)
         qc_counts = defaultdict(int)
 
+        ediff = lsp['ediff']
+        delTmax = lsp['delTmax']
+
         for arc_number, (meta, data) in enumerate(freq_arcs):
             arc_passed = False
             try:
@@ -96,6 +99,16 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                 Nvv = meta['num_pts']
                 Nv = Nvv
                 UTCtime = meanTime
+
+                # Pre-check: skip expensive LSP for arcs that will definitely fail QC
+                if (meta['ele_start'] - e1) > ediff or (meta['ele_end'] - e2) < -ediff:
+                    qc_counts['ediff'] += 1
+                    rejected_arcs += 1
+                    continue
+                if delT >= delTmax:
+                    qc_counts['delT'] += 1
+                    rejected_arcs += 1
+                    continue
 
                 # LSP computation
                 MJD = g.getMJD(year,month,day, meanTime)
@@ -121,7 +134,10 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                     continue
 
                 arc_passed = True
-                xyear,xmonth,xday,xhr,xmin,xsec,xdoy = g.simpleTime(MJD)
+                dt = g.mjd_to_datetime(MJD)
+                xyear = dt.year; xmonth = dt.month; xday = dt.day
+                xhr = dt.hour; xmin = dt.minute; xsec = dt.second
+                xdoy = dt.timetuple().tm_yday
                 betterUTC = xhr + xmin/60 + xsec/3600
 
                 if lsp['mmdd']:
