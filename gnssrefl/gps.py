@@ -4202,6 +4202,8 @@ def read_sp3file(file_path):
                 ignorePoint = True
         if (line[0] == 'P') and (not ignorePoint):
             co = line[1]
+            if co == 'J':
+                continue  # skip QZSS; collides with BeiDou in findConstell
             out = findConstell(co)
             satNu = int(line[2:4]) + out
             xs = line.split()
