@@ -103,16 +103,10 @@ run_test test_extract_arcs_from_station_output_unchanged \
 run_test test_gnssir_output_unchanged \
     gnssir mchl 2025 11
 
-run_test test_gnssir_midnite_output_unchanged \
-    gnssir mchl 2025 11 -midnite T
-
 run_test test_phase_output_unchanged \
     bash -c 'gnssir mchl 2025 11 && phase mchl 2025 11'
 
 run_test test_gnssir_arcs_unchanged \
     gnssir mchl 2025 11 -savearcs T
-
-run_test test_gnssir_midnite_arcs_unchanged \
-    gnssir mchl 2025 11 -midnite T -savearcs T
 
 echo "=== Done: output in $OUTPUT_DIR ==="

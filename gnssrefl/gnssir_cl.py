@@ -48,7 +48,7 @@ def parse_arguments():
     parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs (txt or pickle). default is txt")
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
     parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
-    parser.add_argument("-midnite", default=None, type=str, help="allow midnite crossings (default is false)")
+    parser.add_argument("-midnite", default=None, type=str, help="allow midnite crossings (default is true)")
     parser.add_argument("-dbhz", default=None, type=str, help="whether to keep SNR in db-hz (default is false)")
 
     g.print_version_to_screen()
@@ -69,7 +69,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = True, delTmax: int = None, e1: float = None, e2: float = None, 
            mmdd: bool = False, gzip: bool = None, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt',
-           par : int = None, debug : bool=False, midnite : bool=False, dbhz : bool=False):
+           par : int = None, debug : bool=False, midnite : bool=True, dbhz : bool=False):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 

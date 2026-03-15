@@ -118,11 +118,6 @@ def test_gnssir_output_unchanged():
     _compare_output(actual.joinpath(*RESULTS), expected.joinpath(*RESULTS))
 
 
-def test_gnssir_midnite_output_unchanged():
-    actual, expected = _check_dirs_exist("test_gnssir_midnite_output_unchanged")
-    _compare_output(actual.joinpath(*RESULTS), expected.joinpath(*RESULTS))
-
-
 def test_phase_output_unchanged():
     actual, expected = _check_dirs_exist("test_phase_output_unchanged")
     _compare_output(actual.joinpath(*PHASE), expected.joinpath(*PHASE))
@@ -130,9 +125,4 @@ def test_phase_output_unchanged():
 
 def test_gnssir_arcs_unchanged():
     actual, expected = _check_dirs_exist("test_gnssir_arcs_unchanged")
-    _compare_arcs(actual.joinpath(*ARCS), expected.joinpath(*ARCS))
-
-
-def test_gnssir_midnite_arcs_unchanged():
-    actual, expected = _check_dirs_exist("test_gnssir_midnite_arcs_unchanged")
     _compare_arcs(actual.joinpath(*ARCS), expected.joinpath(*ARCS))
