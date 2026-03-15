@@ -571,6 +571,24 @@ def circular_distance_deg(a, b):
     return np.minimum(d, 360 - d)
 
 
+def pre_check_arc(meta, lsp):
+    """Quick QC check using arc metadata only. Returns (passed, fail_reason).
+
+    Checks ediff and delT — no LSP results needed, so call before strip_compute.
+    """
+    e1 = meta['e1']; e2 = meta['e2']
+    ediff = lsp['ediff']
+
+    if (meta['ele_start'] - e1) > ediff:
+        return False, 'ediff'
+    if (meta['ele_end'] - e2) < -ediff:
+        return False, 'ediff'
+    if meta['delT'] >= lsp['delTmax']:
+        return False, 'delT'
+
+    return True, None
+
+
 def check_arc_quality(meta, peak_rh, max_amp, noise, lsp):
     """Apply QC filters to a single arc. Returns (passed, fail_reason)."""
     e1 = meta['e1']; e2 = meta['e2']

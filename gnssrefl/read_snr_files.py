@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import datetime
+import gzip
 import numpy as np
 import os
 
+from io import BytesIO
 from gnssrefl.utils import FileManagement
 
 
@@ -66,6 +68,77 @@ def _get_adjacent_doy(year, doy, offset):
     return new_year, new_doy
 
 
+def load_snr_time_filtered(obsfile, sec_min=None, sec_max=None):
+    """Load an SNR file, parsing only rows within a seconds-of-day window.
+
+    Decompresses the full file (unavoidable for gzip), but only passes the
+    matching rows to np.loadtxt, which is where most of the time is spent.
+
+    Parameters
+    ----------
+    obsfile : str or Path
+        Path to SNR file (plain text or .gz)
+    sec_min : float or None
+        Keep rows with seconds > sec_min. None means no lower bound.
+    sec_max : float or None
+        Keep rows with seconds < sec_max. None means no upper bound.
+
+    Returns
+    -------
+    data : numpy array (N x cols) or None if no matching rows
+    """
+    obsfile = str(obsfile)
+    is_gz = obsfile.endswith('.gz')
+
+    if is_gz:
+        with gzip.open(obsfile, 'rb') as f:
+            raw = f.read()
+    else:
+        with open(obsfile, 'rb') as f:
+            raw = f.read()
+
+    lines = raw.split(b'\n')
+    data_lines = [l for l in lines if l and not l.startswith(b'%')]
+    if not data_lines:
+        return None
+
+    # SNR files are sorted by time (column 3, 0-indexed).
+    # Use binary search to find the start/end row indices.
+    n = len(data_lines)
+
+    def get_sec(idx):
+        return float(data_lines[idx].split(None, 4)[3])
+
+    start = 0
+    end = n
+
+    if sec_min is not None:
+        lo, hi = 0, n
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if get_sec(mid) <= sec_min:
+                lo = mid + 1
+            else:
+                hi = mid
+        start = lo
+
+    if sec_max is not None:
+        lo, hi = start, n
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if get_sec(mid) < sec_max:
+                lo = mid + 1
+            else:
+                hi = mid
+        end = lo
+
+    if start >= end:
+        return None
+
+    subset = b'\n'.join(data_lines[start:end])
+    return np.loadtxt(BytesIO(subset))
+
+
 def read_snr(obsfile, buffer_hours=0, screenstats=False):
     """
     Load the contents of a SNR file into a numpy array, optionally including
@@ -122,25 +195,22 @@ def read_snr(obsfile, buffer_hours=0, screenstats=False):
         main_cols = c
         prev_loaded, next_loaded = False, False
 
-        # Get previous day data
+        # Get previous day data (last buffer_hours only)
         prev_year, prev_doy = _get_adjacent_doy(year, doy, -1)
         prev_obsfile, prev_snre = FileManagement(station, 'snr_file', prev_year, prev_doy, snr_type=snr_type).find_snr_file()
         if prev_snre:
-            prev_data = np.loadtxt(prev_obsfile, comments='%')
-            if prev_data.size > 0:
-                # Ensure 2D array
+            threshold = 86400 - buffer_seconds
+            prev_data = load_snr_time_filtered(prev_obsfile, sec_min=threshold)
+            if prev_data is not None:
                 if prev_data.ndim == 1:
                     prev_data = prev_data.reshape(1, -1)
-                # Check column count matches main file
                 if prev_data.shape[1] != main_cols:
                     print(f'Warning: Previous day SNR file has different column count ({prev_data.shape[1]} vs {main_cols}). Skipping.')
                 else:
-                    # Filter: positive elevation and last buffer_hours of previous day
-                    threshold = 86400 - buffer_seconds
-                    mask = (prev_data[:, 1] > 0) & (prev_data[:, 3] > threshold)
+                    # Filter positive elevation, adjust time tags to negative seconds
+                    mask = prev_data[:, 1] > 0
                     prev_data = prev_data[mask, :]
                     if prev_data.size > 0:
-                        # Adjust time tags: subtract 86400 to get negative seconds
                         prev_data[:, 3] = prev_data[:, 3] - 86400
                         arrays_to_stack.append(prev_data)
                         prev_loaded = True
@@ -151,24 +221,21 @@ def read_snr(obsfile, buffer_hours=0, screenstats=False):
         # Add main day data
         arrays_to_stack.append(f)
 
-        # Get next day data
+        # Get next day data (first buffer_hours only)
         next_year, next_doy = _get_adjacent_doy(year, doy, +1)
         next_obsfile, next_snre = FileManagement(station, 'snr_file', next_year, next_doy, snr_type=snr_type).find_snr_file()
         if next_snre:
-            next_data = np.loadtxt(next_obsfile, comments='%')
-            if next_data.size > 0:
-                # Ensure 2D array
+            next_data = load_snr_time_filtered(next_obsfile, sec_max=buffer_seconds)
+            if next_data is not None:
                 if next_data.ndim == 1:
                     next_data = next_data.reshape(1, -1)
-                # Check column count matches main file
                 if next_data.shape[1] != main_cols:
                     print(f'Warning: Next day SNR file has different column count ({next_data.shape[1]} vs {main_cols}). Skipping.')
                 else:
-                    # Filter: positive elevation and first buffer_hours of next day
-                    mask = (next_data[:, 1] > 0) & (next_data[:, 3] < buffer_seconds)
+                    # Filter positive elevation, adjust time tags past 86400
+                    mask = next_data[:, 1] > 0
                     next_data = next_data[mask, :]
                     if next_data.size > 0:
-                        # Adjust time tags: add 86400 to get seconds > 86400
                         next_data[:, 3] = next_data[:, 3] + 86400
                         arrays_to_stack.append(next_data)
                         next_loaded = True

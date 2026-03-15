@@ -23,6 +23,7 @@ from random import seed
 from random import random
 
 from astropy.time import Time
+from astropy.timeseries import LombScargle
 
 
 # remove for now
@@ -1454,7 +1455,7 @@ def strip_compute(x,y,cf,maxH,desiredP,minH):
     minH : float
         minimum reflector height in meters
 
-    Returns 
+    Returns
     -------
     maxF : float
         maximum Reflector height (meters)
@@ -1469,12 +1470,12 @@ def strip_compute(x,y,cf,maxH,desiredP,minH):
     px : numpy array
         periodogram, x-axis, RH, meters
     pz : numpy array
-        periodogram, y-axis, volts/volts 
+        periodogram, y-axis, volts/volts
     """
     ofac,hifac = get_ofac_hifac(x,cf,maxH,desiredP)
     if np.isnan(ofac):
         print("WARNING - bad ofac")
-        return 0, 0, 0, 0,0,0,0 
+        return 0, 0, 0, 0,0,0,0
     if ofac == 0:
         print("WARNING - bad ofac")
         return 0, 0, 0, 0,0, 0,0
@@ -1498,13 +1499,13 @@ def strip_compute(x,y,cf,maxH,desiredP,minH):
     x=x/cf
 #    y=newy
 #   get frequency spacing
-    px = freq_out(x,ofac,hifac) 
-#   compute spectrum using scipy
-    scipy_LSP = spectral.lombscargle(x, y, 2*np.pi*px)
+    px = freq_out(x,ofac,hifac)
+#   compute spectrum
+    lsp_power = LombScargle(x, y).power(px, method='fast', normalization='psd')
 
 #   find biggest peak
 #   scaling required to get amplitude spectrum
-    pz = 2*np.sqrt(scipy_LSP/len(x))
+    pz = 2*np.sqrt(lsp_power/len(x))
 #   now window
 #    ij = np.argmax(px > minH)
 #    new_px = px[ij]

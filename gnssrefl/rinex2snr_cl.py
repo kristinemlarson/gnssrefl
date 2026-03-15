@@ -8,19 +8,20 @@ into SNR files
 """
 
 import argparse
+import contextlib
 import os
 import subprocess
 import sys
 import time
+import multiprocessing
+
+from tqdm import tqdm
 
 import gnssrefl.gps as g
 import gnssrefl.rinex2snr as rnx
 import gnssrefl.gnssir_v2 as guts2
 
 from gnssrefl.utils import validate_input_datatypes, str2bool
-
-import multiprocessing
-from functools import partial
 
 
 def parse_arguments():
@@ -445,7 +446,9 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     else:
         snr = int(snr)
 
-    print('Using snr value of ', snr)
+    verbose = not par or par <= 1
+    if verbose:
+        print('Using snr value of ', snr)
 
     # when multi-GNSS orbits are reliably available
     gfz_avail = 2021 + 137/365.25
@@ -453,7 +456,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     if orb is None:
         if 'orb' in lsp:
             orb = lsp['orb']
-            print('Using orbit selection of ', orb, ' from the json')
+            if verbose:
+                print('Using orbit selection of ', orb, ' from the json')
         else:
             if ((year + doy/365.25) > gfz_avail):
                 orb = 'rapid'
@@ -463,10 +467,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
                     orb = 'gnss'
             else:
                 orb = 'nav'
-            print('Using default orbit for this time period: ', orb)
+            if verbose:
+                print('Using default orbit for this time period: ', orb)
 
     else:
-        print('Using command line orbit selection of ', orb)
+        if verbose:
+            print('Using command line orbit selection of ', orb)
 
 
     if 'archive' in lsp:
@@ -476,7 +482,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
             if lsp['archive'] is not None:
                 archive = lsp['archive']
 
-    print('Using archive value of ', archive)
+    if verbose:
+        print('Using archive value of ', archive)
 
 
     if archive == 'bfg':
@@ -487,17 +494,20 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     if ('samplerate' in lsp):
         if lsp['samplerate'] is not None:
             samplerate = lsp['samplerate']
-            print('Using samplerate from json ', samplerate)
+            if verbose:
+                print('Using samplerate from json ', samplerate)
 
     if ('stream' in lsp):
         if lsp['stream'] is not None:
             stream = lsp['stream']
-            print('Using stream setting from json ', stream)
+            if verbose:
+                print('Using stream setting from json ', stream)
 
     if ('dec' in lsp):
         if lsp['dec'] is not None:
             dec = lsp['dec']
-            print('Using dec parameter from json ', dec )
+            if verbose:
+                print('Using dec parameter from json ', dec )
 
 
     ns = len(station)
@@ -581,7 +591,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     # adding spanish archive
     highrate_list = ['unavco', 'nrcan', 'ga','bkg','cddis','ignes','bkg-igs','bkg-euref','gnet','kadaster']  
     if ns == 9:
-        print('Station ', station, ' >>> RINEX 3')
+        if verbose:
+            print('Station ', station, ' >>> RINEX 3')
         # rinex3
         # change default archive from all to cddis, cause we do not allow all as a valid archive for rinex3 files
         if (archive == 'all'):
@@ -603,7 +614,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
                 sys.exit()
     else:
         # rinex2
-        print('Station ', station, ' has four characters, assume RINEX 2.11 format')
+        if verbose:
+            print('Station ', station, ' has four characters, assume RINEX 2.11 format')
 
         if rate == 'high':
             if (archive == 'all') & (not nolook):
@@ -662,109 +674,106 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
         par = None
 
     if debug or oneday:
-    #if debug :
         print('Debug mode or only analyzing one day of data. ')
         args['year'] = year
         args['doy'] = doy
         rnx.run_rinex2snr(**args)
         return
 
-
     if (archive in archive_list_no_parallel) and par:
         print('You have chosen an archive that is unfriendly to multiple simultaneous download')
         print('requests. Your request for parallel processing has been declined.')
         par = None
 
-    if not par:
-        print('No parallel processing')
-        #mjd_list = range(MJD1, MJD2+1, skipit)
-        mjd_list = {}; mjd_list[0] = [MJD1, MJD2]
-        s1 = time.time()
-        #process_jobs_multi(index=0,args=args,datelist=mjd_list,error_queue=error_queue)
-        z_process_jobs(MJD1, MJD2,args)
-        s2 = time.time()
-        print('That took ', round(s2-s1,2), ' seconds')
+    s1 = time.time()
 
+    if not par:
+        print('No parallel processing\n')
+        z_process_jobs(MJD1, MJD2, args)
     else:
-        # queue which handles any exceptions any of the processes encounter
-        manager = multiprocessing.Manager()
-        error_queue = manager.Queue()
-        print('You have chosen parallel processing')
         if par > 10:
             print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
             sys.exit()
-        else:
-            numproc = par
-            # get a list of times in MJD associated with the multiple spawned processes
-            # this does not work for skipping dates though ... 
 
-            datelist, numproc = guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
-            print(datelist)
+        print('Per-day output suppressed in parallel mode. Run without -par to see detailed output.')
 
-            # make a list of process IDs
-            index = list(range(numproc))
-
-            s1 = time.time()
-
-            pool = multiprocessing.Pool(processes=numproc)
-
-            partial_process = partial(process_jobs_multi, args=args,datelist=datelist,error_queue = error_queue)
-
-            pool.map(partial_process,index)
-
-            pool.close()
-            pool.join()
-            s2 = time.time()
-            print('That took ', round(s2-s1,2), ' seconds')
-
-def process_jobs_multi(index,args,datelist,error_queue):
-    """
-    runs the rinex2snr queue
-
-    Parameters
-    ==========
-    index : int
-        which job to run
-    args : dict
-        dictionary of parameters that are sent to run_rinex2snr
-    datelist: dict
-        start and stop dates in MJD
-    error_queue:? 
-        not sure how to describe this
-
-    """
-
-    # should try be on each submission?  or each list of submissions?
-    try:
-        d1 = datelist[index][0]; d2 = datelist[index][1]
-        mjd_list = list(range(d1, d2+1))
-        for mjd in mjd_list:
+        # Build flat list of (year, doy) work units
+        day_list = []
+        for mjd in range(MJD1, MJD2 + 1):
             y, d = g.modjul_to_ydoy(mjd)
-            args['year'] = y
-            args['doy'] = d
+            day_list.append((y, d))
+
+        manager = multiprocessing.Manager()
+        error_queue = manager.Queue()
+        pool = multiprocessing.Pool(processes=par)
+
+        worker_args = [(y, d, args, snr, error_queue) for y, d in day_list]
+        ok = 0
+        fail = 0
+        total_bytes = 0
+        with tqdm(pool.imap_unordered(rinex2snr_day_worker, worker_args),
+                  total=len(day_list),
+                  desc=f"rinex2snr {station}",
+                  unit="day") as pbar:
+            for nbytes in pbar:
+                if nbytes > 0:
+                    ok += 1
+                    total_bytes += nbytes
+                else:
+                    fail += 1
+                pbar.set_postfix_str(f"{ok} ok, {fail} fail")
+
+        pool.close()
+        pool.join()
+
+        if not error_queue.empty():
+            print("One (or more) of the processes encountered errors.")
+            i = 1
+            while not error_queue.empty():
+                e = error_queue.get()
+                print(f"Error {i} type: {type(e)}. Error {i} message: {e}")
+                i += 1
+
+    s2 = time.time()
+    elapsed = round(s2 - s1, 2)
+    ndays = MJD2 - MJD1 + 1
+    summary = f'Processed {ndays} days in {elapsed} s ({round(elapsed/ndays, 2)} s/day)'
+    if par and total_bytes > 0:
+        mb = round(total_bytes / 1e6, 1)
+        summary += f'. Wrote {mb} MB of SNR files to disk'
+    print(summary)
+
+
+def snr_file_size(station, year, doy, snr_type):
+    """Return size in bytes of the SNR file for this day, or 0 if not found."""
+    xdir = os.environ['REFL_CODE']
+    yy = year % 100
+    base = f"{xdir}/{year}/snr/{station[0:4]}/{station[0:4]}{doy:03d}0.{yy:02d}.snr{snr_type}"
+    for path in [base + '.gz', base]:
+        if os.path.isfile(path):
+            return os.path.getsize(path)
+    return 0
+
+
+def rinex2snr_day_worker(worker_args):
+    """Worker for parallel rinex2snr. Returns file size in bytes (0 = failure)."""
+    year, doy, args, snr_type, error_queue = worker_args
+    try:
+        args = dict(args)
+        args['year'] = year
+        args['doy'] = doy
+        with contextlib.redirect_stdout(open(os.devnull, 'w')):
             rnx.run_rinex2snr(**args)
-
+        return snr_file_size(args['station'], year, doy, snr_type)
     except Exception as e:
-        print('Error of some kind processing year/doy ', y, d)
+        print('Error of some kind processing year/doy ', year, doy)
         error_queue.put(e)
+        return 0
 
-    return
 
-def z_process_jobs(mjd1,mjd2, args):
-    """
-    queue for non parallel processing
-
-    Parameters
-    ----------
-    mjd1 : int
-        starting ModJulDate for processing
-    mjd2 : int
-        ending ModJulDate for processing
-    args : dict
-        inputs to run_rinex2snr
-      
-    """
-    for mjd in range(mjd1,mjd2+1):
+def z_process_jobs(mjd1, mjd2, args):
+    """Sequential processing for rinex2snr."""
+    for mjd in range(mjd1, mjd2+1):
         try:
             y, d = g.modjul_to_ydoy(mjd)
             args['year'] = y

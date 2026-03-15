@@ -7,7 +7,7 @@ import sys
 
 import gnssrefl.gnssir_v2 as guts
 import gnssrefl.gps as g
-from gnssrefl.utils import FileManagement, check_arc_quality, format_qc_summary
+from gnssrefl.utils import FileManagement, pre_check_arc, check_arc_quality, format_qc_summary
 
 def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,logfilename,dbhz):
     """
@@ -97,6 +97,13 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                 Nv = Nvv
                 UTCtime = meanTime
 
+                # Pre-check: skip expensive LSP for arcs that will definitely fail QC
+                passed, reason = pre_check_arc(meta, lsp)
+                if not passed:
+                    qc_counts[reason] += 1
+                    rejected_arcs += 1
+                    continue
+
                 # LSP computation
                 MJD = g.getMJD(year,month,day, meanTime)
                 maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz = g.strip_compute(x,y,cf,maxH,prec,minH)
@@ -121,7 +128,10 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                     continue
 
                 arc_passed = True
-                xyear,xmonth,xday,xhr,xmin,xsec,xdoy = g.simpleTime(MJD)
+                dt = g.mjd_to_datetime(MJD)
+                xyear = dt.year; xmonth = dt.month; xday = dt.day
+                xhr = dt.hour; xmin = dt.minute; xsec = dt.second
+                xdoy = dt.timetuple().tm_yday
                 betterUTC = xhr + xmin/60 + xsec/3600
 
                 if lsp['mmdd']:
@@ -199,7 +209,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
 
     # this is really just overwriting what I had before. However, This will be sorted.
         testfile = FileManagement(station, 'gnssir_result', year, doy, extension=extension).get_file_path()
-        print('Writing sorted LSP results to : ', testfile, '\n')
+        print('Writing sorted LSP results to : ', testfile)
         np.savetxt(testfile, allL, fmt=f, delimiter=' ', newline='\n',header=head, comments='%')
     else:
         print('No good retrievals found so no LSP file should be created ')
@@ -210,4 +220,4 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
             subprocess.call(['rm', '-f', str(lspname)])
 
     if qc_lines:
-        print('\n'.join(qc_lines))
+        print('\n'.join(qc_lines) + '\n')

@@ -8,7 +8,7 @@ import sys
 
 
 import gnssrefl.gps as g
-from gnssrefl.utils import FileManagement, FileTypes, check_arc_quality, format_qc_summary, circular_distance_deg
+from gnssrefl.utils import FileManagement, FileTypes, pre_check_arc, check_arc_quality, format_qc_summary, circular_distance_deg
 import gnssrefl.daily_avg_cl as da
 import gnssrefl.gnssir_v2 as gnssir
 from gnssrefl.extract_arcs import extract_arcs_from_station, move_arc_to_failqc
@@ -729,7 +729,7 @@ def test_func_new(x, a, b, rh_apriori,freq):
 
     return a * np.sin(freq_least_squares * x + b)
 
-def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
+def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None, lsp: dict = None):
     """
     Determines the frequency to use for VWC workflows.
     Priority is: command line -> json file -> default (20).
@@ -742,6 +742,8 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
         Analysis extension name.
     fr_cmd : str, optional
         Frequency provided from the command line (e.g., '1', '20'), by default None.
+    lsp : dict, optional
+        Pre-loaded json dict. Pass to skip re-reading the json file.
 
     Returns
     -------
@@ -758,12 +760,13 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
             print(f"Error: Invalid frequency '{fr_cmd}'. Must be 1 (L1), 20 (L2C), or 5 (L5).")
             sys.exit()
     else:
-        # Otherwise, try to read from the json file
-        lsp = gnssir.read_json_file(station, extension, noexit=True)
+        # Read json if not already provided
+        if lsp is None:
+            lsp = gnssir.read_json_file(station, extension, noexit=True)
         if 'freqs' in lsp and lsp.get('freqs'):
             if len(lsp['freqs']) == 1:
                 final_fr = lsp['freqs'][0]
-                print(f"Frequency read from JSON file: {final_fr}")
+                print(f"Requested frequencies  [{final_fr}]")
             else:
                 print("Tried to use frequency values in json but there were too many.  Using default of L2C (20).")
                 final_fr = 20
@@ -824,8 +827,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
     azvalues = gnssir.rewrite_azel(lsp.get('azval2'))
     dec = lsp.get('dec') or 1
     dbhz = lsp.get('dbhz') or False
-    compute_lsp = True
-
+    recompute_lsp = lsp.get('recompute_lsp', False)
     _, snrexist = FileManagement(station, 'snr_file', year, doy, snr_type=snr_type).find_snr_file()
 
     l2c_list, l5_list = g.l2c_l5_list(year,doy)
@@ -855,6 +857,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                 lsp=lsp, gzip=gzip,
                 dbhz=dbhz,
                 dec=dec,
+                attach_results=['gnssir'] if not recompute_lsp else False,
             )
 
             # Group arcs by frequency
@@ -930,14 +933,29 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                             qc_counts['L2C/L5'] += 1
                             continue
 
+                        # Pre-check: skip expensive LSP for arcs that will definitely fail QC
+                        passed, reason = pre_check_arc(meta, lsp)
+                        if not passed:
+                            qc_counts[reason] += 1
+                            continue
+
                         if screenstats:
                             print(f'Sat {sat_number:3.0f} Azimuth {track_azim:5.1f} RH {rh_apriori:6.2f} {nv:5.0f}')
 
-                        max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(x, y, cf, max_height,
-                                                                                           desired_p, min_height)
-
-                        nij = pz[(px > noise_region[0]) & (px < noise_region[1])]
-                        noise = np.mean(nij) if len(nij) > 0 else 0
+                        gnssir_results = meta.get('gnssir_processing_results')
+                        if gnssir_results is not None:
+                            max_f = gnssir_results['RH']
+                            max_amp = gnssir_results['Amp']
+                            obs_pk2noise = gnssir_results['PkNoise']
+                            noise = max_amp / obs_pk2noise if obs_pk2noise > 0 else 0
+                        elif recompute_lsp:
+                            max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(
+                                x, y, cf, max_height, desired_p, min_height)
+                            nij = pz[(px > noise_region[0]) & (px < noise_region[1])]
+                            noise = np.mean(nij) if len(nij) > 0 else 0
+                            obs_pk2noise = max_amp / noise if noise > 0 else 0
+                        else:
+                            continue
 
                         if noise > 0 and screenstats:
                             print(f'>> LSP RH {max_f:7.3f} m {max_amp/noise:6.1f} Amp {max_amp:6.1f} ')
@@ -946,8 +964,6 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                         if not passed:
                             qc_counts[reason] += 1
                             continue
-
-                        obs_pk2noise = max_amp / noise
                         x_data = np.sin(np.deg2rad(x))
                         y_data = y
                         test_function_apriori = partial(test_func_new, rh_apriori=rh_apriori,freq=freq)
@@ -979,7 +995,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                 np.savetxt(my_file, all_results, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f", comments="%")
 
             if qc_lines:
-                print('\n'.join(qc_lines))
+                print('\n'.join(qc_lines) + '\n')
 
 
 def low_pct(amp, basepercent):
