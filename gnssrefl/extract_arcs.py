@@ -361,14 +361,14 @@ def move_arc_to_failqc(meta, station, year, doy, extension=''):
     shutil.move(fname, dest)
 
 
-def apply_refraction(snr_array, lsp, year, doy):
+def apply_refraction(snr_array, station_config, year, doy):
     """Apply refraction correction to SNR elevation angles.
 
     Returns a copy of *snr_array* with corrected elevations; rows where
     the correction is invalid (e.g. ele < 1.5 for NITE/MPF) are removed.
     """
     from gnssrefl.refraction import correct_elevations
-    corrected, valid_mask = correct_elevations(snr_array[:, 1], lsp, year, doy)
+    corrected, valid_mask = correct_elevations(snr_array[:, 1], station_config, year, doy)
     snr_array = snr_array.copy()
     snr_array[:, 1] = corrected
     return snr_array[valid_mask]
@@ -383,7 +383,7 @@ def extract_arcs_from_station(
     buffer_hours: float = 2,
     attach_results: Union[bool, List[str]] = False,
     extension: str = '',
-    lsp: Optional[Dict[str, Any]] = None,
+    station_config: Optional[Dict[str, Any]] = None,
     gzip: bool = True,
     **kwargs,
 ) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
@@ -412,9 +412,9 @@ def extract_arcs_from_station(
         If True, attach gnssir/phase/vwc results to arc metadata. Default: False
     extension : str
         Strategy extension for result file paths. Default: ''
-    lsp : dict, optional
+    station_config : dict, optional
         Station analysis parameters. When provided, enables refraction
-        correction (if ``lsp['refraction']``) and savearcs (if ``lsp['savearcs']``).
+        correction (if ``station_config['refraction']``) and savearcs (if ``station_config['savearcs']``).
     gzip : bool
         If True, gzip the SNR file after reading. Default: False
     **kwargs
@@ -445,15 +445,15 @@ def extract_arcs_from_station(
         raise RuntimeError(f"read_snr failed for: {obsfile}")
 
     # Apply refraction correction
-    if lsp is not None and lsp.get('refraction', False):
-        snr_array = apply_refraction(snr_array, lsp, year, doy)
+    if station_config is not None and station_config.get('refraction', False):
+        snr_array = apply_refraction(snr_array, station_config, year, doy)
 
     arcs = extract_arcs(snr_array, freq=freq, year=year, doy=doy, **kwargs)
 
     # Save individual arc files to disk
-    if lsp is not None and lsp.get('savearcs', False):
-        nooverwrite = lsp.get('nooverwrite', False)
-        savearcs_format = lsp.get('savearcs_format', 'txt')
+    if station_config is not None and station_config.get('savearcs', False):
+        nooverwrite = station_config.get('nooverwrite', False)
+        savearcs_format = station_config.get('savearcs_format', 'txt')
         sdir = setup_arcs_directory(station, year, doy, extension, nooverwrite)
         print('Writing individual arcs to', sdir)
         for meta, data in arcs:

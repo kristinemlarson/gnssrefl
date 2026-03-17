@@ -44,15 +44,15 @@ def run_extract_arcs_from_station():
     from gnssrefl.gnssir_v2 import read_json_file
     from gnssrefl.extract_arcs import extract_arcs_from_station
 
-    lsp = read_json_file(STATION, '')
-    lsp['savearcs'] = True
-    lsp['savearcs_format'] = 'txt'
-    lsp['nooverwrite'] = False
+    station_config = read_json_file(STATION, '')
+    station_config['savearcs'] = True
+    station_config['savearcs_format'] = 'txt'
+    station_config['nooverwrite'] = False
     extract_arcs_from_station(
         STATION, YEAR, DOY,
-        freq=lsp['freqs'], snr_type=66, buffer_hours=2,
-        e1=lsp['e1'], e2=lsp['e2'], polyV=lsp['polyV'],
-        pele=lsp['pele'], azlist=lsp['azval2'], lsp=lsp,
+        freq=station_config['freqs'], snr_type=66, buffer_hours=2,
+        e1=station_config['e1'], e2=station_config['e2'], polyV=station_config['polyV'],
+        pele=station_config['pele'], azlist=station_config['azval2'], station_config=station_config,
     )
 
 

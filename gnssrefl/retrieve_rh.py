@@ -9,7 +9,7 @@ import gnssrefl.gnssir_v2 as guts
 import gnssrefl.gps as g
 from gnssrefl.utils import FileManagement, pre_check_arc, check_arc_quality, format_qc_summary
 
-def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,logfilename,dbhz):
+def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats, irefr, logid, logfilename, dbhz):
     """
     new worker code that estimates LSP from GNSS SNR data.
     it will now live here and be called by gnssir_v2.py
@@ -24,7 +24,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
         day of year
     extension : str
         strategy extension
-    lsp : dict
+    station_config : dict
         inputs to LSP analysis
     arcs : list of (metadata, data) tuples
         pre-extracted satellite arcs from extract_arcs_from_station
@@ -45,15 +45,15 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
         fundy = True
 
     xdir = os.environ['REFL_CODE']
-    savearcs = lsp.get('savearcs', False)
+    savearcs = station_config.get('savearcs', False)
     all_lsp = [] # variable to save the results so you can sort them
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
 
-    e1=lsp['e1']; e2=lsp['e2']; minH = lsp['minH']; maxH = lsp['maxH']
-    NReg = lsp['NReg']
-    plot_screen = lsp['plt_screen']
-    PkNoise = lsp['PkNoise']; prec = lsp['desiredP']; lsp_method = lsp.get('lsp_method', 'fast')
-    freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp']
+    e1=station_config['e1']; e2=station_config['e2']; minH = station_config['minH']; maxH = station_config['maxH']
+    NReg = station_config['NReg']
+    plot_screen = station_config['plt_screen']
+    PkNoise = station_config['PkNoise']; prec = station_config['desiredP']; lsp_method = station_config.get('lsp_method', 'fast')
+    freqs = station_config['freqs'] ; reqAmp = station_config['reqAmp']
     reqAmp_dict = {f: reqAmp[i] for i, f in enumerate(freqs)}
 
     # Group pre-extracted arcs by frequency
@@ -98,7 +98,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                 UTCtime = meanTime
 
                 # Pre-check: skip expensive LSP for arcs that will definitely fail QC
-                passed, reason = pre_check_arc(meta, lsp)
+                passed, reason = pre_check_arc(meta, station_config)
                 if not passed:
                     qc_counts[reason] += 1
                     rejected_arcs += 1
@@ -113,7 +113,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
 
                 iAzim = int(az_min_ele)
 
-                passed, reason = check_arc_quality(meta, maxF, maxAmp, Noise, lsp)
+                passed, reason = check_arc_quality(meta, maxF, maxAmp, Noise, station_config)
                 if not passed:
                     qc_counts[reason] += 1
                     rejected_arcs += 1
@@ -121,7 +121,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                     if screenstats:
                         logid.write('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f} \n'.format(iAzim,satNu,UTCtime,maxF))
                         tooclose = reason == 'tooclose'
-                        g.write_QC_fails(delT,lsp['delTmax'],eminObs,emaxObs,e1,e2,lsp['ediff'],maxAmp,Noise,PkNoise,reqAmp_dict[f],tooclose,logid)
+                        g.write_QC_fails(delT, station_config['delTmax'], eminObs, emaxObs, e1, e2, station_config['ediff'], maxAmp, Noise, PkNoise, reqAmp_dict[f], tooclose, logid)
                     if plot_screen:
                         failed = True
                         guts.local_update_plot(x,y,px,pz,ax1,ax2,failed)
@@ -134,7 +134,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                 xdoy = dt.timetuple().tm_yday
                 betterUTC = xhr + xmin/60 + xsec/3600
 
-                if lsp['mmdd']:
+                if station_config['mmdd']:
                     onelsp = [xyear,xdoy,maxF,satNu,betterUTC,az_min_ele,maxAmp,eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr,xmonth,xday,xhr,xmin,xsec]
                 else:
                     onelsp = [xyear,xdoy,maxF,satNu,betterUTC,az_min_ele,maxAmp,eminObs,emaxObs,Nv,f,riseSet,Edot2,maxAmp/Noise,delT,MJD,irefr]
@@ -186,7 +186,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
                 print('no data found for this frequency: ',f)
 
     if good_arcs > 0 and plot_screen:
-        guts.plot2screen(station, f, ax1, ax2,lsp['pltname'])
+        guts.plot2screen(station, f, ax1, ax2, station_config['pltname'])
 
     if screenstats:
         logid.close()
@@ -195,7 +195,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
     # look like someone asked me to sort the LSP results ...
     # convert to numpy array
     allL = np.asarray(all_lsp)
-    longer_line = lsp['mmdd']
+    longer_line = station_config['mmdd']
     if len(allL) > 0:
         head = g.lsp_header(station,longer_line=longer_line) # header
     # sort the results for felipe

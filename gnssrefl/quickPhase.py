@@ -125,9 +125,9 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
         sys.exit()
 
     # Read station json once, pass to get_vwc_frequency to avoid double-loading
-    lsp = guts2.read_json_file(station, extension)
+    station_config = guts2.read_json_file(station, extension)
 
-    fr_list = qp.get_vwc_frequency(station, extension, fr, lsp=lsp)
+    fr_list = qp.get_vwc_frequency(station, extension, fr, station_config=station_config)
 
     # Check that an apriori file exists for each requested frequency.
     for f in fr_list:
@@ -149,25 +149,25 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     if exitS:
         sys.exit()
     if e1 is not None:
-        lsp['e1'] = e1
+        station_config['e1'] = e1
     if e2 is not None:
-        lsp['e2'] = e2
+        station_config['e2'] = e2
     if ampl is not None:
-        lsp['reqAmp'] = [ampl]
-    lsp['screenstats'] = screenstats
-    lsp['midnite'] = midnite
+        station_config['reqAmp'] = [ampl]
+    station_config['screenstats'] = screenstats
+    station_config['midnite'] = midnite
     if gzip is not None:
-        lsp['gzip'] = gzip
+        station_config['gzip'] = gzip
     else:
-        guts2.gzip_migration(lsp, station, extension)
-    lsp['savearcs'] = savearcs
+        guts2.gzip_migration(station_config, station, extension)
+    station_config['savearcs'] = savearcs
     if savearcs_format is not None:
-        lsp['savearcs_format'] = savearcs_format
+        station_config['savearcs_format'] = savearcs_format
     if dec is not None:
-        lsp['dec'] = dec
+        station_config['dec'] = dec
     if dbhz is not None:
-        lsp['dbhz'] = dbhz
-    lsp['recompute_lsp'] = recompute_lsp
+        station_config['dbhz'] = dbhz
+    station_config['recompute_lsp'] = recompute_lsp
 
     # Set up timing and parallel processing
     t1 = time.time()
@@ -189,7 +189,7 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
     # Create args for worker function
     args = {
         'station': station, 'snr': snr, 'fr_list': fr_list,
-        'lsp': lsp, 'extension': extension,
+        'station_config': station_config, 'extension': extension,
     }
 
     total_arcs = 0
@@ -258,7 +258,7 @@ def process_phase_day(year, doy, args):
     """Process a single day for sequential mode."""
     print(f'Analyzing year/day of year {year}/{doy}')
     qp.phase_tracks(args['station'], year, doy, args['snr'], args['fr_list'],
-                   args['lsp'], args['extension'])
+                   args['station_config'], args['extension'])
 
 
 def process_phase_sequential(year, year_end, doy, doy_end, args):
@@ -286,7 +286,7 @@ def process_phase_day_worker(worker_args):
     try:
         with contextlib.redirect_stdout(open(os.devnull, 'w')):
             qp.phase_tracks(args['station'], year, doy, args['snr'], args['fr_list'],
-                           args['lsp'], args['extension'])
+                           args['station_config'], args['extension'])
         xdir = str(os.environ['REFL_CODE'])
         station = args['station']
         result_path = os.path.join(xdir, str(year), 'phase', station, f'{doy:03d}.txt')

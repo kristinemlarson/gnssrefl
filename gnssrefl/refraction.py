@@ -567,7 +567,7 @@ def look_for_pickle_file():
     return foundit , fullpname
 
 
-def Ulich_Bending_Angle(ele, N0,lsp,p,T,ttime,sat):   #UBA
+def Ulich_Bending_Angle(ele, N0,station_config,p,T,ttime,sat):   #UBA
     """
     Ulich, B. L. "Millimeter wave radio telescopes: Gain and pointing characteristics." (1981)
 
@@ -584,7 +584,7 @@ def Ulich_Bending_Angle(ele, N0,lsp,p,T,ttime,sat):   #UBA
     N0 : float
         antenna refractivity in ppm
 
-    lsp : dict
+    station_config : dict
 
     p : float
         pressure, units?
@@ -1340,7 +1340,7 @@ def asknewet(e, Tm, lambda_val):
     return zwd
 
 
-def correct_elevations(ele, lsp, year, doy):
+def correct_elevations(ele, station_config, year, doy):
     """Apply refraction correction to elevation angles.
 
     Reads the GPT2 grid for the station location, computes atmospheric
@@ -1352,7 +1352,7 @@ def correct_elevations(ele, lsp, year, doy):
     ----------
     ele : numpy array of floats
         elevation angles in degrees
-    lsp : dict
+    station_config : dict
         station analysis parameters (from json).  Required keys:
         station, lat, lon, ht, refraction.  Optional: refr_model,
         apriori_rh.
@@ -1374,14 +1374,14 @@ def correct_elevations(ele, lsp, year, doy):
     doy = int(doy)
     valid_mask = np.ones(len(ele), dtype=bool)
 
-    if not lsp.get('refraction', False):
+    if not station_config.get('refraction', False):
         return ele.copy(), valid_mask
 
-    station = lsp['station']
-    lat = lsp['lat']
-    lon = lsp['lon']
-    ht = lsp['ht']
-    refraction_model = lsp.get('refr_model', 1)
+    station = station_config['station']
+    lat = station_config['lat']
+    lon = station_config['lon']
+    ht = station_config['ht']
+    refraction_model = station_config.get('refr_model', 1)
 
     # Compute MJD
     d = g.doy2ymd(year, doy)
@@ -1423,12 +1423,12 @@ def correct_elevations(ele, lsp, year, doy):
         else:
             print('Ulich refraction correction, time-varying')
         corrected = Ulich_Bending_Angle(
-            ele, N_ant, lsp, p, T, np.zeros_like(ele), np.zeros_like(ele),
+            ele, N_ant, station_config, p, T, np.zeros_like(ele), np.zeros_like(ele),
         )
         return corrected, valid_mask
 
     # NITE (5) and MPF (6) — need mapping functions and zenith delays
-    RH_apriori = lsp.get('apriori_rh', 5)
+    RH_apriori = station_config.get('apriori_rh', 5)
     lat1R = np.radians(lat)
     lon1R = np.radians(lon)
 

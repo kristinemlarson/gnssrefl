@@ -219,27 +219,27 @@ def daily_avg(station: str , medfilter: float, ReqTracks: int, txtfile: str = No
     # read in potential medfilter and reqtracks values
     # set noexit to True because I want to look for the json but 
     # don't want to require it
-    lsp = guts2.read_json_file(station, extension,noexit=True)
+    station_config = guts2.read_json_file(station, extension,noexit=True)
     # if valeus not found, then set them to None
-    if 'daily_avg_medfilter' not in lsp:
-        lsp['daily_avg_medfilter'] = None
-    if 'daily_avg_reqtracks' not in lsp:
-        lsp['daily_avg_reqtracks'] = None
+    if 'daily_avg_medfilter' not in station_config:
+        station_config['daily_avg_medfilter'] = None
+    if 'daily_avg_reqtracks' not in station_config:
+        station_config['daily_avg_reqtracks'] = None
 
     # if these required values are zero, then the code 
     # looks to see if you set them in the json
     if ReqTracks == 0:
-        if  lsp['daily_avg_reqtracks'] is not None:
+        if  station_config['daily_avg_reqtracks'] is not None:
             print('Using ReqTracks value from json')
-            ReqTracks = lsp['daily_avg_reqtracks']
+            ReqTracks = station_config['daily_avg_reqtracks']
         else:
             print('Zero is an invalid value for ReqTracks. Change value on command line')
             print('or in gnssir_input created json. Exiting.')
             sys.exit()
     if medfilter == 0:
-        if  lsp['daily_avg_medfilter'] is not None:
+        if  station_config['daily_avg_medfilter'] is not None:
             print('Using medfilter value from json')
-            medfilter = lsp['daily_avg_medfilter']
+            medfilter = station_config['daily_avg_medfilter']
         else:
             print('Zero is an invalid value for medfilter parameter. Change value on command ')
             print('line or in gnssir_input created json. Exiting.')

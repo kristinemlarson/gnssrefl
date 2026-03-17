@@ -248,54 +248,54 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         for y in range(year, year_end+1):
             g.result_directories(station,y,extension)
 
-    lsp = guts2.read_json_file(station, extension)
+    station_config = guts2.read_json_file(station, extension)
     # 
-    if 'snr' in lsp:
-        if lsp['snr'] is not None:
-            snr = lsp['snr']
+    if 'snr' in station_config:
+        if station_config['snr'] is not None:
+            snr = station_config['snr']
             if not par or par <= 1:
                 print('Found a snr choice in the json:', snr)
     if not par or par <= 1:
         print('Using snr file type: ', snr)
 
-    lsp['midnite'] = midnite
+    station_config['midnite'] = midnite
 
     # make a refraction file you will need later
-    refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
+    refr.readWrite_gpt2_1w(xdir, station, station_config['lat'], station_config['lon'])
 
     # now check the overrides to the json instructions
 
     # requiring people use the new code
-    if 'azval2' not in lsp:
+    if 'azval2' not in station_config:
         print('An azval2 variable was not found in your gnssir json input file. Fix your json ')
         print('and/or use gnssir_input to make a new one. Exiting')
         sys.exit()
 
     # plt is False unless user changes
-    lsp['plt_screen'] = plt
+    station_config['plt_screen'] = plt
 
     if delTmax is not None:
-        lsp['delTmax'] = delTmax
+        station_config['delTmax'] = delTmax
 
-    if ((lsp['maxH'] - lsp['minH']) < 5):
-        print('Requested reflector heights (', lsp['minH'], ',', lsp['maxH'], ') are too close together. Exiting.')
+    if ((station_config['maxH'] - station_config['minH']) < 5):
+        print('Requested reflector heights (', station_config['minH'], ',', station_config['maxH'], ') are too close together. Exiting.')
         print('They must be at least 5 meters apart - and preferably further than that.')
         sys.exit()
 
     # compress is False unless user changes
-    lsp['wantCompression'] = compress
+    station_config['wantCompression'] = compress
 
     # screenstats is True unless user changes
-    lsp['screenstats'] = screenstats
+    station_config['screenstats'] = screenstats
 
     # added this for people that have 1 sec files that do not need this resolution
     # decimation is a bit slow but way faster than doing a gazillion periodograms with 
     # 1 sec data
 
-    lsp['dec'] = dec
+    station_config['dec'] = dec
 
-    lsp['dbhz'] = dbhz
-    lsp['lsp_method'] = lsp_method if lsp_method is not None else 'fast'
+    station_config['dbhz'] = dbhz
+    station_config['lsp_method'] = lsp_method if lsp_method is not None else 'fast'
 
     # in case you want to analyze multiple days of data
     if doy_end is None:
@@ -310,16 +310,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     if year_end is None:
         year_end = year
 
-    # default will be to overwrite
-    #if nooverwrite is None:
-    lsp['nooverwrite'] = nooverwrite
-    #else:
-    #    lsp['overwriteResults'] = False
+    station_config['nooverwrite'] = nooverwrite
 
     if e1 is not None:
-        lsp['e1'] = e1
+        station_config['e1'] = e1
     if e2 is not None:
-        lsp['e2'] = e2
+        station_config['e2'] = e2
 
     # in case you want to look at a restricted azimuth range from the command line
     setA = 0
@@ -334,47 +330,46 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # TODO figure out the goal here
     # this only sets the new azim values only if bother azim1 and azim2 changed?
     if setA == 2:
-        lsp['azval2'] = [azim1,  azim2]
+        station_config['azval2'] = [azim1,  azim2]
 
     # this is for when you want to run the code with just a single frequency, i.e. input at the console
     # rather than using the input restrictions
-    #print(lsp['freqs'])
-    #if fr is not None:
+
     if len(fr) > 0:
-        lsp['freqs'] = fr
+        station_config['freqs'] = fr
         # better make sure you have enough amplitudes
-        ampl_from_json = lsp['reqAmp'][0]
+        ampl_from_json = station_config['reqAmp'][0]
         if ampl is None:
-            lsp['reqAmp'] = [ampl_from_json for i in range(14)]
+            station_config['reqAmp'] = [ampl_from_json for i in range(14)]
 
     if ampl is not None:
         # this is not elegant - but allows people to set ampl on the command line
         # but use the frequency list from their json ...  which i think has max of 12
         # but use 14 to be sure
-        lsp['reqAmp'] = [ampl for i in range(14)]
+        station_config['reqAmp'] = [ampl for i in range(14)]
 
     if sat is not None:
-        lsp['onesat'] = [sat]
+        station_config['onesat'] = [sat]
 
-    lsp['mmdd'] = add_mmddhhss
+    station_config['mmdd'] = add_mmddhhss
     # only override JSON gzip setting if explicitly passed on command line
     if gzip is not None:
-        lsp['gzip'] = gzip
+        station_config['gzip'] = gzip
     else:
-        guts2.gzip_migration(lsp, station, extension)
+        guts2.gzip_migration(station_config, station, extension)
     # added 2024aug01
-    lsp['savearcs'] = savearcs
+    station_config['savearcs'] = savearcs
 
     # added 2024aug27
-    lsp['savearcs_format'] = savearcs_format
+    station_config['savearcs_format'] = savearcs_format
 
     # if refraction model is not assigned, set it to 1
-    if 'refr_model' not in lsp:
-        lsp['refr_model'] = 1
+    if 'refr_model' not in station_config:
+        station_config['refr_model'] = 1
 
     # default to fast (astropy NFFT) LSP; users can override with -lsp_method scipy
-    if 'lsp_method' not in lsp:
-        lsp['lsp_method'] = 'fast'
+    if 'lsp_method' not in station_config:
+        station_config['lsp_method'] = 'fast'
 
     # good lord - why is this here? surely a function can be called
     picklefile = 'gpt_1wA.pickle'
@@ -393,25 +388,25 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             subprocess.call(['mv', '-f', picklefile, xdir + '/input/'])
 
     # added debug aug 3/2024
-    args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp, 'debug': debug}
+    args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'station_config': station_config, 'debug': debug}
 
     if not par or par <= 1:
-        print(lsp['pele'], ' direct signal elevation angle limits')
-    #print(lsp['e1'], lsp['e2'], ' min and max elevation angles')
+        print(station_config['pele'], ' direct signal elevation angle limits')
+
     # added this because ellist is a new option and was not necessarily created in old json files
-    if 'ellist' not in lsp:
+    if 'ellist' not in station_config:
         #print('did not find ellist')
-        if float(lsp['e1']) < float(lsp['pele'][0]):
+        if float(station_config['e1']) < float(station_config['pele'][0]):
             print('emin is smaller than the minimum eangle (pele) used for direct signal removed.')
             print('This is Forbidden. Fix the records set in the json created by gnssir_analysis')
             sys.exit()
     else:
-        if float(lsp['e1']) < float(lsp['pele'][0]):
+        if float(station_config['e1']) < float(station_config['pele'][0]):
             print('Your requested emin is lower than the minimum elevation angle used ')
             print('for direct signal removal. This is stored in the variable pele.')
             print('This is Forbidden. Fix the pele records set in the json created by gnssir_input')
             sys.exit()
-        if float(lsp['e2']) > float(lsp['pele'][1]):
+        if float(station_config['e2']) > float(station_config['pele'][1]):
             print('Your requested emax is higher than the maximum elevation angle used ')
             print('for direct signal removal. This is stored in the variable pele.')
             print('This is Forbidden. Fix the pele records set in the json created by gnssir_input')
@@ -420,8 +415,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # should make sure there are directories for the results ... 
     g.checkFiles(station.lower(), extension)
 
-    print('Requested frequencies ', lsp['freqs'])
-        #print('Requested amplitudes', lsp['reqAmp'])
+    print('Requested frequencies ', station_config['freqs'])
 
 
     if (par == 1):

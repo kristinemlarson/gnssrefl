@@ -571,34 +571,34 @@ def circular_distance_deg(a, b):
     return np.minimum(d, 360 - d)
 
 
-def pre_check_arc(meta, lsp):
+def pre_check_arc(meta, station_config):
     """Quick QC check using arc metadata only. Returns (passed, fail_reason).
 
     Checks ediff and delT — no LSP results needed, so call before strip_compute.
     """
     e1 = meta['e1']; e2 = meta['e2']
-    ediff = lsp['ediff']
+    ediff = station_config['ediff']
 
     if (meta['ele_start'] - e1) > ediff:
         return False, 'ediff'
     if (meta['ele_end'] - e2) < -ediff:
         return False, 'ediff'
-    if meta['delT'] >= lsp['delTmax']:
+    if meta['delT'] >= station_config['delTmax']:
         return False, 'delT'
 
     return True, None
 
 
-def check_arc_quality(meta, peak_rh, max_amp, noise, lsp):
+def check_arc_quality(meta, peak_rh, max_amp, noise, station_config):
     """Apply QC filters to a single arc. Returns (passed, fail_reason)."""
     e1 = meta['e1']; e2 = meta['e2']
-    ediff = lsp['ediff']
-    min_height = lsp['minH']; max_height = lsp['maxH']
-    pk_noise = lsp['PkNoise']; del_t_max = lsp['delTmax']
+    ediff = station_config['ediff']
+    min_height = station_config['minH']; max_height = station_config['maxH']
+    pk_noise = station_config['PkNoise']; del_t_max = station_config['delTmax']
     try:
-        req_amp = lsp['reqAmp'][lsp['freqs'].index(meta['freq'])]
+        req_amp = station_config['reqAmp'][station_config['freqs'].index(meta['freq'])]
     except (ValueError, IndexError):
-        req_amp = lsp['reqAmp'][0]
+        req_amp = station_config['reqAmp'][0]
 
     if (meta['ele_start'] - e1) > ediff:
         return False, 'ediff'

@@ -103,10 +103,9 @@ def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=
             Long = float(lon)
             Height = float(height)
 
-# start the lsp dictionary (left over name from another piece of code)
-    lsp={}
-    lsp['station'] = station
-    lsp['lat'] = Lat; lsp['lon'] = Long; lsp['ht']=Height
+    station_config={}
+    station_config['station'] = station
+    station_config['lat'] = Lat; station_config['lon'] = Long; station_config['ht']=Height
 #
     if h1 > h2:
         print('h1 cannot be greater than h2. ', h1, h2, ' Exiting.')
@@ -121,11 +120,11 @@ def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=
         sys.exit()
 
     # make groupings of RH, ele, and azim limits
-    lsp['rhlims'] = [h1, h2]
-    lsp['elvlims'] = [e1, e2]
-    lsp['azilims'] = [a1, a2]
+    station_config['rhlims'] = [h1, h2]
+    station_config['elvlims'] = [e1, e2]
+    station_config['azilims'] = [a1, a2]
     # use david's naming convention for this
-    lsp['pktnlim'] = peak2noise
+    station_config['pktnlim'] = peak2noise
 
 # where the instructions will be written eventually. for now in the current directory
     if 'REFL_CODE' not in os.environ:
@@ -137,15 +136,15 @@ def invsnr_input(station: str, h1: float=1, h2: float=8, e1: float=5, e2: float=
     if not os.path.isdir(outputdir):
         subprocess.call(['mkdir', outputdir])
 # 
-    lsp['precision'] = 0.005 # precision of RH in meters
+    station_config['precision'] = 0.005 # precision of RH in meters
 # 
-    lsp['l2c_only'] = True
+    station_config['l2c_only'] = True
 
     outputfile = outputdir + '/' + station + '.inv.json'
     print('Writing json file to:', outputfile)
     #print(lsp)
     with open(outputfile, 'w+') as outfile:
-        json.dump(lsp, outfile, indent=4)
+        json.dump(station_config, outfile, indent=4)
 
 
 def main():

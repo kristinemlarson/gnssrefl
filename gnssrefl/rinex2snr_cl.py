@@ -431,16 +431,16 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
 
     # if it exists, you can now store information in the json, like samplerate and snr
     # set noexit cause otherwise it exits ...
-    lsp = guts2.read_json_file(station[0:4].lower(), extension,noexit=True)
+    station_config = guts2.read_json_file(station[0:4].lower(), extension,noexit=True)
 
     #print('Passed value of snr ', snr)
     if snr is None: # nothing on the command line
         #print('You did not set the snr option on the command line')
-        if 'snr' in lsp:
-            if lsp['snr'] is None:
+        if 'snr' in station_config:
+            if station_config['snr'] is None:
                 snr = 66
             else:
-                snr = lsp['snr']
+                snr = station_config['snr']
         else:
             snr = 66
     else:
@@ -454,8 +454,8 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
     gfz_avail = 2021 + 137/365.25
 
     if orb is None:
-        if 'orb' in lsp:
-            orb = lsp['orb']
+        if 'orb' in station_config:
+            orb = station_config['orb']
             if verbose:
                 print('Using orbit selection of ', orb, ' from the json')
         else:
@@ -475,12 +475,12 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
             print('Using command line orbit selection of ', orb)
 
 
-    if 'archive' in lsp:
+    if 'archive' in station_config:
         if archive == 'all':
             # that is the commandline default , so ok to change it to what you
             # have in the json
-            if lsp['archive'] is not None:
-                archive = lsp['archive']
+            if station_config['archive'] is not None:
+                archive = station_config['archive']
 
     if verbose:
         print('Using archive value of ', archive)
@@ -491,21 +491,21 @@ def rinex2snr(station: str, year: int, doy: int, snr: str = None, orb: str = Non
         sys.exit()
 
 
-    if ('samplerate' in lsp):
-        if lsp['samplerate'] is not None:
-            samplerate = lsp['samplerate']
+    if ('samplerate' in station_config):
+        if station_config['samplerate'] is not None:
+            samplerate = station_config['samplerate']
             if verbose:
                 print('Using samplerate from json ', samplerate)
 
-    if ('stream' in lsp):
-        if lsp['stream'] is not None:
-            stream = lsp['stream']
+    if ('stream' in station_config):
+        if station_config['stream'] is not None:
+            stream = station_config['stream']
             if verbose:
                 print('Using stream setting from json ', stream)
 
-    if ('dec' in lsp):
-        if lsp['dec'] is not None:
-            dec = lsp['dec']
+    if ('dec' in station_config):
+        if station_config['dec'] is not None:
+            dec = station_config['dec']
             if verbose:
                 print('Using dec parameter from json ', dec )
 

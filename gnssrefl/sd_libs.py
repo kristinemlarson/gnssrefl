@@ -805,25 +805,25 @@ def find_ortho_height(station,extension):
     """
 
     # this will create a nonsense Hortho
-    lsp = guts2.read_json_file(station, extension,noexit=True)
+    station_config = guts2.read_json_file(station, extension,noexit=True)
 
-    if not lsp:
+    if not station_config:
         print('No json - so no orthometric height can be determined')
         print('Using zero - but that is far from ideal')
         return 0
 
 
-    if 'Hortho' in lsp:
-        # found in the lsp file
-        Hortho = lsp['Hortho']
+    if 'Hortho' in station_config:
+        # found in the station_config file
+        Hortho = station_config['Hortho']
     else:
         # calculate from EGM96
-        geoidC = g.geoidCorrection(lsp['lat'],lsp['lon'])
-        Hortho = lsp['ht']- geoidC
+        geoidC = g.geoidCorrection(station_config['lat'],station_config['lon'])
+        Hortho = station_config['ht']- geoidC
 
-    if 'Hdate' in lsp:
-        # found in the lsp file
-        Hdate = lsp['Hdate']
+    if 'Hdate' in station_config:
+        # found in the station_config file
+        Hdate = station_config['Hdate']
     else:
         Hdate = None
 
@@ -1213,44 +1213,40 @@ def pickup_subdaily_json_defaults(xdir, station, extension):
 
     Returns
     -------
-    lsp : dictionary 
+    station_config : dictionary
         contents of gnssir json
     """
 
-    # changed default in subdaily to None instead of '' So have to check
-    if extension is None:
-        lsp = guts2.read_json_file(station, '',noexit=True)
-    else:
-        lsp = guts2.read_json_file(station, extension,noexit=True)
+    station_config = guts2.read_json_file(station, extension, noexit=True)
 
     # check json for subdaily settings
     # if values not found, then set them to None
 
-    if 'subdaily_ampl' not in lsp:
-        lsp['subdaily_ampl'] = None
+    if 'subdaily_ampl' not in station_config:
+        station_config['subdaily_ampl'] = None
 
-    if 'subdaily_spline_outlier1' not in lsp:
-        lsp['subdaily_spline_outlier1'] = None
+    if 'subdaily_spline_outlier1' not in station_config:
+        station_config['subdaily_spline_outlier1'] = None
 
-    if 'subdaily_spline_outlier2' not in lsp:
-        lsp['subdaily_spline_outlier2'] = None
+    if 'subdaily_spline_outlier2' not in station_config:
+        station_config['subdaily_spline_outlier2'] = None
 
-    if 'subdaily_knots' not in lsp:
-        lsp['subdaily_knots'] = None
+    if 'subdaily_knots' not in station_config:
+        station_config['subdaily_knots'] = None
 
-    if 'subdaily_delta_out' not in lsp:
-        lsp['subdaily_delta_out'] = None
+    if 'subdaily_delta_out' not in station_config:
+        station_config['subdaily_delta_out'] = None
 
-    if 'subdaily_alt_sigma' not in lsp:
-        lsp['subdaily_alt_sigma'] = None
+    if 'subdaily_alt_sigma' not in station_config:
+        station_config['subdaily_alt_sigma'] = None
 
-    if 'subdaily_sigma' not in lsp:
-        lsp['subdaily_sigma'] = None
+    if 'subdaily_sigma' not in station_config:
+        station_config['subdaily_sigma'] = None
 
-    if 'subdaily_subdir' not in lsp:
-        lsp['subdaily_subdir'] = None
+    if 'subdaily_subdir' not in station_config:
+        station_config['subdaily_subdir'] = None
 
-    return lsp
+    return station_config
 
 def flipit3(tvd,col):
     """

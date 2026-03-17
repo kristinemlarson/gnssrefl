@@ -201,7 +201,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
         if os.path.isfile(instructions2):
             #print('using:', instructions2)
             with open(instructions2) as f:
-                lsp = json.load(f)
+                station_config = json.load(f)
         else:
             print('Instruction file does not exist.', instructions2, ' Exiting.')
             sys.exit()
@@ -210,7 +210,7 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
         if os.path.isfile(instructions2):
             #print('using:', instructions2)
             with open(instructions2) as f:
-                lsp = json.load(f)
+                station_config = json.load(f)
         else:
             print('Instruction file does not exist.', instructions2, ' Exiting.')
             sys.exit()
@@ -218,14 +218,14 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
 
 # save json inputs to variables
 # this is ridiculous - I should just send the dictionary!
-    precision = lsp['precision']
-    azilims = lsp['azilims']
-    elvlims = lsp['elvlims']
-    rhlims = lsp['rhlims']
-    l2c_only = lsp['l2c_only']
-    if 'pktnlim' in lsp:
+    precision = station_config['precision']
+    azilims = station_config['azilims']
+    elvlims = station_config['elvlims']
+    rhlims = station_config['rhlims']
+    l2c_only = station_config['l2c_only']
+    if 'pktnlim' in station_config:
         print('use peak2noise from json')
-        peak2noise = lsp['pktnlim']
+        peak2noise = station_config['pktnlim']
 
 
 # multi doy listing
@@ -267,17 +267,17 @@ def invsnr(station: str, year: int, doy: int, signal: str, peak2noise: float = 2
 
     kdt = knot_space * 60 * 60  # change knot spacing to seconds
 
-    # trying to add refraction to an existing dictionary. this is how it is done in the main lsp code
-    lsp['refraction'] = False
+    # trying to add refraction to an existing dictionary. this is how it is done in the main station_config code
+    station_config['refraction'] = False
 
     if refraction:
-        lsp['refraction'] = True
+        station_config['refraction'] = True
 
     spline_functions.snr2spline(station, year, doy, azilims, elvlims, rhlims, precision, kdt, signal=signal,
                                 lspfigs=lspfigs, snrfigs=snrfigs, snrfit=snrfit, doplot=plt, pktnlim=peak2noise,
                                 satconsts=satconsts, screenstats=screenstats, tempres=dec, doy_end=doy_end,
                                 l2c_only=l2c_only, rough_in=rough_in, risky=risky, snr_ending=snr,
-                                outfile_type=outfile_type, delta_out=delta_out, lsp=lsp, outfile_name=outfile_name,
+                                outfile_type=outfile_type, delta_out=delta_out, station_config=station_config, outfile_name=outfile_name,
                                 outlier_limit=outlier_limit, no_dots=no_dots,lastday_seconds=lastday_seconds)
 
 

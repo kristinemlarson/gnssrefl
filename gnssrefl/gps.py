@@ -6331,7 +6331,7 @@ def make_azim_choices(alist):
 
     """
 # want to make a list for make_json_input
-# lsp['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
+# station_config['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
     if alist[0] < 0 | alist[-1] < 0 :
         print('We do not currently allow negative azimuths ')
         sys.exit()
