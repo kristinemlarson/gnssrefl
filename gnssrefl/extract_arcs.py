@@ -352,13 +352,19 @@ def move_arc_to_failqc(meta, station, year, doy, extension=''):
     fm = FileManagement(station, "arcs_directory", year=year, doy=doy,
                         extension=extension)
     sdir = str(fm.get_directory_path()) + '/'
-    fname = _get_arc_filename(sdir, meta['sat'], meta['freq'],
-                              meta['az_min_ele'], meta['arc_timestamp'])
-    if not fname or not os.path.isfile(fname):
-        return
-    dest = _get_arc_filename(sdir + 'failQC/', meta['sat'], meta['freq'],
+    base = _get_arc_filename(sdir, meta['sat'], meta['freq'],
                              meta['az_min_ele'], meta['arc_timestamp'])
-    shutil.move(fname, dest)
+    if not base:
+        return
+    # arc may have been saved as .txt or .pickle
+    for ext in ('.txt', '.pickle'):
+        src = base[:-4] + ext
+        if os.path.isfile(src):
+            dest = _get_arc_filename(sdir + 'failQC/', meta['sat'], meta['freq'],
+                                     meta['az_min_ele'], meta['arc_timestamp'])
+            dest = dest[:-4] + ext
+            shutil.move(src, dest)
+            return
 
 
 def apply_refraction(snr_array, station_config, year, doy):
