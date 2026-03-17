@@ -819,6 +819,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
     min_height = lsp.get('minH', 0.5)
     max_height = lsp.get('maxH', 8)
     desired_p = lsp.get('desiredP', 0.01)
+    lsp_method = lsp.get('lsp_method', 'fast')
     pele = lsp.get('pele', [e1, e2])
     screenstats = lsp.get('screenstats', False)
     midnite = lsp.get('midnite', True)
@@ -950,7 +951,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                             noise = max_amp / obs_pk2noise if obs_pk2noise > 0 else 0
                         elif recompute_lsp:
                             max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(
-                                x, y, cf, max_height, desired_p, min_height)
+                                x, y, cf, max_height, desired_p, min_height, lsp_method)
                             nij = pz[(px > noise_region[0]) & (px < noise_region[1])]
                             noise = np.mean(nij) if len(nij) > 0 else 0
                             obs_pk2noise = max_amp / noise if noise > 0 else 0

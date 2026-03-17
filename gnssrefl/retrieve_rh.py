@@ -52,7 +52,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
     e1=lsp['e1']; e2=lsp['e2']; minH = lsp['minH']; maxH = lsp['maxH']
     NReg = lsp['NReg']
     plot_screen = lsp['plt_screen']
-    PkNoise = lsp['PkNoise']; prec = lsp['desiredP']
+    PkNoise = lsp['PkNoise']; prec = lsp['desiredP']; lsp_method = lsp.get('lsp_method', 'fast')
     freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp']
     reqAmp_dict = {f: reqAmp[i] for i, f in enumerate(freqs)}
 
@@ -106,7 +106,7 @@ def retrieve_rh(station,year,doy,extension, lsp, arcs, screenstats, irefr,logid,
 
                 # LSP computation
                 MJD = g.getMJD(year,month,day, meanTime)
-                maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz = g.strip_compute(x,y,cf,maxH,prec,minH)
+                maxF, maxAmp, eminObs, emaxObs,riseSet,px,pz = g.strip_compute(x,y,cf,maxH,prec,minH,lsp_method)
 
                 nij = pz[(px > NReg[0]) & (px < NReg[1])]
                 Noise = np.mean(nij) if len(nij) > 0 else 0

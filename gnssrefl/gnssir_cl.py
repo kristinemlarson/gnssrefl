@@ -52,6 +52,7 @@ def parse_arguments():
     parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
     parser.add_argument("-midnite", default=None, type=str, help="allow midnite crossings (default is true)")
     parser.add_argument("-dbhz", default=None, type=str, help="whether to keep SNR in db-hz (default is false)")
+    parser.add_argument("-lsp_method", default=None, type=str, help="LSP backend: fast (default, astropy NFFT) or scipy (original)")
 
     g.print_version_to_screen()
     #print (sys.version)
@@ -71,7 +72,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = True, delTmax: int = None, e1: float = None, e2: float = None, 
            mmdd: bool = False, gzip: bool = None, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt',
-           par : int = None, debug : bool=False, midnite : bool=True, dbhz : bool=False):
+           par : int = None, debug : bool=False, midnite : bool=True, dbhz : bool=False, lsp_method : str='fast'):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
@@ -294,6 +295,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     lsp['dec'] = dec
 
     lsp['dbhz'] = dbhz
+    lsp['lsp_method'] = lsp_method if lsp_method is not None else 'fast'
 
     # in case you want to analyze multiple days of data
     if doy_end is None:
@@ -367,8 +369,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     lsp['savearcs_format'] = savearcs_format
 
     # if refraction model is not assigned, set it to 1
-    if 'refr_model' not in lsp.keys():
+    if 'refr_model' not in lsp:
         lsp['refr_model'] = 1
+
+    # default to fast (astropy NFFT) LSP; users can override with -lsp_method scipy
+    if 'lsp_method' not in lsp:
+        lsp['lsp_method'] = 'fast'
 
     # good lord - why is this here? surely a function can be called
     picklefile = 'gpt_1wA.pickle'

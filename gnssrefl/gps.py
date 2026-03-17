@@ -1436,7 +1436,7 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
 
     return ofac, hifac
 
-def strip_compute(x,y,cf,maxH,desiredP,minH):
+def strip_compute(x,y,cf,maxH,desiredP,minH,lsp_method='fast'):
     """
     strips snr data
 
@@ -1454,6 +1454,8 @@ def strip_compute(x,y,cf,maxH,desiredP,minH):
         precision of Lomb Scargle in meters
     minH : float
         minimum reflector height in meters
+    lsp_method : str
+        'fast' for AstroPy NFFT (default), 'scipy' for original SciPy
 
     Returns
     -------
@@ -1501,7 +1503,10 @@ def strip_compute(x,y,cf,maxH,desiredP,minH):
 #   get frequency spacing
     px = freq_out(x,ofac,hifac)
 #   compute spectrum
-    lsp_power = LombScargle(x, y).power(px, method='fast', normalization='psd')
+    if lsp_method == 'scipy':
+        lsp_power = spectral.lombscargle(x, y, 2*np.pi*px)
+    else:
+        lsp_power = LombScargle(x, y).power(px, method='fast', normalization='psd')
 
 #   find biggest peak
 #   scaling required to get amplitude spectrum

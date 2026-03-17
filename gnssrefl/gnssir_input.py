@@ -468,6 +468,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
 
     lsp['ediff'] = ediff # degrees
     lsp['desiredP'] = 0.005 # precision of RH in meters
+    lsp['lsp_method'] = 'fast' # LSP backend: 'fast' (astropy NFFT) or 'scipy'
     # azimuth regions in degrees (in pairs)
     # you can of course have more subdivisions here
     #if (az_list[0]) == 0 & (az_list[-1] == 360):
