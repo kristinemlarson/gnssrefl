@@ -38,9 +38,10 @@ if [ "$VERSION" = "local" ]; then
     fi
 else
     # Prefer local git archive (works with unpushed commits); fall back to GitHub
-    if [ -d /src/.git ] && git -C /src cat-file -e "$VERSION" 2>/dev/null; then
+    # Use -c safe.directory='*' to handle Docker volume mount ownership mismatch
+    if [ -d /src/.git ] && git -c safe.directory='*' -C /src cat-file -e "$VERSION" 2>/dev/null; then
         _tmpdir=$(mktemp -d)
-        git -C /src archive "$VERSION" | tar -x -C "$_tmpdir"
+        git -c safe.directory='*' -C /src archive "$VERSION" | tar -x -C "$_tmpdir"
         pip3 install -q --force-reinstall "$_tmpdir"
         rm -rf "$_tmpdir"
     else
