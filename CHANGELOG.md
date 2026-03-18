@@ -5,11 +5,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 4.1.0
+
+March 18, 2026
+
+Faster lomb scargles using Astropy
+
+Fixing bugs in prev install for Rinex 3 reader
+
+Streamlining everywhere
+
+Details
+
+https://github.com/kristinemlarson/gnssrefl/pull/387
+
 ## 4.0.1
 March 11, 2026
+
 Removing xz compression and prioritizing gz.
 
 Fixing minor bugs in previous install.
+
+Read Rinex 3 directly instead of using gfzrnx
 
 ## 4.0.0
 

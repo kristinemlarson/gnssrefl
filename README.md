@@ -1,11 +1,12 @@
-# gnssrefl v4.0.1
+# gnssrefl v4.1.0
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 
 **We have recently moved to python 3.10!**
 
-**George Townsend recently removed the hidden Fortran code used for the orbit calculations and RINEX reading.**
-Thank you!
+**George Townsend** recently removed the hidden Fortran code used for the orbit calculations and RINEX reading.
+RINEX 3 is now read directly instead of using the gfzrnx utility which converted everything to RINEX 2.11. 
+He has also added a faster Lomb Scargle periodogram calculator. You may still use the slow one if you prefer (PR 379)
 
 **All questions must be posted as an [issue](https://github.com/kristinemlarson/gnssrefl/issues).**
 This allows tracking of community usage and allows others to benefit if they have the same question. It also
@@ -38,7 +39,8 @@ Latest Features
 
 - There is a more advanced vegetation model available for the soil moisture module.
 
-- You can define your water level measurements with respect to more than one orthometric height. This value is read from the analysis json 
+- You can define your water level measurements with respect to more than one 
+orthometric height. This value is read from the analysis json 
 in both subdaily and daily_avg. Please see the documented inputs to gnssir_input for more information.
 
 - You can set your own leveling time periods for soil moisture (see vwc.py).
