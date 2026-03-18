@@ -112,8 +112,8 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
     # Get the single frequency from the list (vwc command only supports 1 frequency)
     fr = fr_list[0]
 
-    lsp = guts2.read_json_file(station, extension)
-    ellist = lsp.get('ellist', [])
+    station_config = guts2.read_json_file(station, extension)
+    ellist = station_config.get('ellist', [])
     if len(ellist) > 0:
         print('vwc_input does not support ellist. Please remove ellist from your json')
         print('and rerun gnssir_input with a single e1/e2 range before using vwc_input.')
@@ -209,31 +209,31 @@ def vwc_input(station: str, year: int, fr: str = None, min_tracks: int = 100, mi
         qp.write_apriori_rh(apriori_path_f, apriori_array, station, year, tmin, tmax)
         print('>>>> Apriori RH file written to ', apriori_path_f)
 
-    lsp = guts2.read_json_file(station, extension)
+    station_config = guts2.read_json_file(station, extension)
 
     # new one for minimum normalized amplitude
-    lsp['vwc_min_norm_amp'] = 0.5;
+    station_config['vwc_min_norm_amp'] = 0.5;
 
     # save the vwc specific values that might be useful
-    lsp['vwc_warning_value'] = warning_value
-    lsp['vwc_min_soil_texture'] = tmin
-    lsp['vwc_max_soil_texture'] = tmax
-    lsp['vwc_minvalperday'] = minvalperday # this is how many unique tracks you need on each day (legacy)
-    lsp['vwc_minvalperbin'] = minvalperbin # preferred parameter for subdaily analysis
-    lsp['vwc_min_req_pts_track'] = min_tracks # this is total number of days needed to keep a satellite
+    station_config['vwc_warning_value'] = warning_value
+    station_config['vwc_min_soil_texture'] = tmin
+    station_config['vwc_max_soil_texture'] = tmax
+    station_config['vwc_minvalperday'] = minvalperday # this is how many unique tracks you need on each day (legacy)
+    station_config['vwc_minvalperbin'] = minvalperbin # preferred parameter for subdaily analysis
+    station_config['vwc_min_req_pts_track'] = min_tracks # this is total number of days needed to keep a satellite
     
     # Add subdaily binning parameters if provided
     if bin_hours is not None:
-        lsp['vwc_bin_hours'] = bin_hours
+        station_config['vwc_bin_hours'] = bin_hours
     if bin_offset is not None:
-        lsp['vwc_bin_offset'] = bin_offset
+        station_config['vwc_bin_offset'] = bin_offset
 
     # Use FileManagement to get JSON file path with new directory structure
     json_manager = FileManagement(station, 'make_json', extension=extension)
     json_path = json_manager.get_file_path()
 
     with open(json_path, 'w+') as outfile:
-        json.dump(lsp, outfile, indent=4)
+        json.dump(station_config, outfile, indent=4)
 
 
 def define_track_clusters(azimuths, gap_threshold=10):

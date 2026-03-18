@@ -386,31 +386,31 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         print('for your site. Hortho value can be used for coastal sites, but not for interior lakes/rivers.\n')
         apriori_rh = 5 # completely made up, meters
 
-# start the lsp dictionary
+# start the station_config dictionary
     reqA = ampl
 
-    lsp = {}
-    lsp['station'] = station.lower()
-    lsp['lat'] = lat
-    lsp['lon'] = lon
-    lsp['ht'] = height
+    station_config = {}
+    station_config['station'] = station.lower()
+    station_config['lat'] = lat
+    station_config['lon'] = lon
+    station_config['ht'] = height
     if type(Hortho) == list:
-        lsp['Hortho'] = Hortho
+        station_config['Hortho'] = Hortho
 
     if Hdate is not None:
         print('Hdate being written to json')
-        lsp['Hdate'] = Hdate
+        station_config['Hdate'] = Hdate
 
-    lsp['apriori_rh'] = apriori_rh
+    station_config['apriori_rh'] = apriori_rh
 
 
     # don't save it unless it was set.
     if snr is not None:
-        lsp['snr'] = snr
+        station_config['snr'] = snr
     if orb is not None:
-        lsp['orb'] = orb
+        station_config['orb'] = orb
     if archive is not None:
-        lsp['archive'] = archive
+        station_config['archive'] = archive
 
     if h1 > h2:
         print(f'h1 cannot be greater than h2. You have set h1 to {h1} and h2 to {h2}. Exiting.')
@@ -420,7 +420,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         print(f'h2-h1 must be at least 5 meters apart. You have set h1 to {h1} and h2 to {h2}. Exiting.')
         sys.exit()
 
-    lsp['minH'] = h1 ; lsp['maxH'] = h2 ; lsp['e1'] = e1 ; lsp['e2'] = e2
+    station_config['minH'] = h1 ; station_config['maxH'] = h2 ; station_config['e1'] = e1 ; station_config['e2'] = e2
 
 # the default noise region will the same as the RH exclusion area for now
     if nr1 is None:
@@ -428,30 +428,30 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
     if nr2 is None:
         nr2 = h2
 
-    lsp['NReg'] = [nr1, nr2]
-    lsp['PkNoise'] = peak2noise
+    station_config['NReg'] = [nr1, nr2]
+    station_config['PkNoise'] = peak2noise
 
     # Use FileManagement to get JSON file path with new directory structure
     json_manager = FileManagement(station, 'make_json', extension=extension)
     outputfile = json_manager.get_file_path()
 
     # 4 was the original default.  Totally up to the user. 
-    lsp['polyV'] = polyV # polynomial order for DC removal
+    station_config['polyV'] = polyV # polynomial order for DC removal
     # change this so the min elevation angle for polynomial removal is the same as the 
     # requested analysis region. previously it was hardwired to 5-30
 
-    lsp['pele'] = pele # elevation angles used for DC removal
+    station_config['pele'] = pele # elevation angles used for DC removal
 
     default_pele1 = 5; default_pele2 = 30
     if (pele[0] == default_pele1) & (pele[1] == default_pele2):
         print('Using default DC removal elevation angle limits,', default_pele1, default_pele2)
         print('Checking that they are sensible')
         usethis1 = default_pele1; usethis2 = default_pele2 
-        if (lsp['e1']) < default_pele1:
-            usethis1 = lsp['e1']
-        if (lsp['e2']) > default_pele2:
-            usethis2 = lsp['e2']
-        lsp['pele'] = [usethis1, usethis2] # modified elevation angles 
+        if (station_config['e1']) < default_pele1:
+            usethis1 = station_config['e1']
+        if (station_config['e2']) > default_pele2:
+            usethis2 = station_config['e2']
+        station_config['pele'] = [usethis1, usethis2] # modified elevation angles
     else:
         print('You manually set the DC removal elevation angle limits ', pele)
         print('We will respect your wishes. For future reference, ')
@@ -459,83 +459,84 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         print('angle range - but they cannot be outside of them. For example,')
         print('pele min cannot be greater than e1 and pele max cannot be less than e2.')
 
-    #if ((lsp['e1'] < 5 or lsp['e2'] > 30) and (lsp['pele'][0] >= 5 and lsp['pele'][1] <= 30)):
+    #if ((station_config['e1'] < 5 or station_config['e2'] > 30) and (station_config['pele'][0] >= 5 and station_config['pele'][1] <= 30)):
     ## Check if the elevation angle limits for DC removal are outside the default range
     #    print('Change the pele (elevation angle limits) for DC removal')
     #    sys.exit()
     #else:
-    #    lsp['pele'] = pele # elevation angles used for DC removal
+    #    station_config['pele'] = pele # elevation angles used for DC removal
 
-    lsp['ediff'] = ediff # degrees
-    lsp['desiredP'] = 0.005 # precision of RH in meters
+    station_config['ediff'] = ediff # degrees
+    station_config['desiredP'] = 0.005 # precision of RH in meters
+    station_config['lsp_method'] = 'fast' # LSP backend: 'fast' (astropy NFFT) or 'scipy'
     # azimuth regions in degrees (in pairs)
     # you can of course have more subdivisions here
     #if (az_list[0]) == 0 & (az_list[-1] == 360):
 
     N2 = len(azlist2)
     if (N2 % 2) == 0:
-        lsp['azval2'] = azlist2
+        station_config['azval2'] = azlist2
     else:
         print('Illegal azimuth inputs. Must be an even number of azimuth pairs.')
         sys.exit()
 
     # default frequencies to use - and their required amplitudes. The amplitudes are not set in stone
     # this is the case for only GPS, but the good L2 
-    lsp['freqs'] = [1, 20, 5]
+    station_config['freqs'] = [1, 20, 5]
     if allfreq is True:
         # includes glonass, galileo, and beidou
-        lsp['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302, 306,307]
+        station_config['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302, 306,307]
 
     if l1 is True:
-        lsp['freqs'] = [1]
+        station_config['freqs'] = [1]
 
     if l2c is True:
-        lsp['freqs'] = [20]
+        station_config['freqs'] = [20]
 
     if l5 is True:
-        lsp['freqs'] = [5]
+        station_config['freqs'] = [5]
 
     if len(frlist) == 0:
         print('Using standard frequency choices.')
     else:
         print('Implementing user-provided frequency list.')
-        lsp['freqs'] = frlist
+        station_config['freqs'] = frlist
 
     # create a list with all values equal to reqA
     # but the length of the list depends on the length of the list of frequencies
-    lsp['reqAmp'] = [reqA]*len(lsp['freqs'])
+    station_config['reqAmp'] = [reqA]*len(station_config['freqs'])
 
     # this is true or false.  I think
-    lsp['refraction'] = refraction
+    station_config['refraction'] = refraction
 
     # write new RH results  each time you run the code
-    lsp['overwriteResults'] = True
+    station_config['overwriteResults'] = True
 
     # if snr file does not exist, try to make one
     # i don't think this option exists anymore
-    lsp['seekRinex'] = False
+    station_config['seekRinex'] = False
 
     # compress snr files after analysis - saves disk space
-    lsp['wantCompression'] = False
+    station_config['wantCompression'] = False
 
     # periodogram plots come to the screen
-    lsp['plt_screen'] = False
+    station_config['plt_screen'] = False
 
     # command line req to only do a single satellite - default is do all satellites
-    lsp['onesat'] = None
+    station_config['onesat'] = None
 
     # default will now be False ....
     # send some information on periodogram RH retrievals to the screen
-    lsp['screenstats'] = False
+    station_config['screenstats'] = False
 
     # save the output plots
-    lsp['pltname'] = station + '_lsp.png'
+    station_config['pltname'] = station + '_lsp.png'
 
     # how long can the arc be, in minutes
-    lsp['delTmax'] = delTmax  
+    station_config['delTmax'] = delTmax
  
     # gzip SNR files after running the code
-    lsp['gzip'] = gzip
+    station_config['gzip'] = gzip
 
     # for people that don't know how to input pairs of angles
     if ( (len(ellist) % 2) != 0):
@@ -543,7 +544,7 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         print('Exiting.')
         sys.exit()
 
-    lsp['ellist'] = ellist
+    station_config['ellist'] = ellist
 
     if refr_model[0] == '-':
          print('You selected a negative refraction model. Exiting')
@@ -564,36 +565,36 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
             print('Your refraction model ', refr_model, ' is illegal. Please use a model supported by gnssrefl. Exiting')
             sys.exit()
 
-    lsp['refr_model'] = refr_model
+    station_config['refr_model'] = refr_model
     print('refraction model ', refr_model)
 
     # added for people that want to save their daily average and subdaily strategies.
     # if not set, then they are saved as None.
-    lsp['daily_avg_reqtracks'] = daily_avg_reqtracks
-    lsp['daily_avg_medfilter'] = daily_avg_medfilter
+    station_config['daily_avg_reqtracks'] = daily_avg_reqtracks
+    station_config['daily_avg_medfilter'] = daily_avg_medfilter
 
-    lsp['subdaily_alt_sigma'] = subdaily_alt_sigma
-    lsp['subdaily_ampl'] = subdaily_ampl
-    lsp['subdaily_delta_out'] = subdaily_delta_out
-    lsp['subdaily_knots'] = subdaily_knots
-    lsp['subdaily_sigma'] = subdaily_sigma
-    lsp['subdaily_spline_outlier1'] = subdaily_spline_outlier1
-    lsp['subdaily_spline_outlier2'] = subdaily_spline_outlier2
-    lsp['subdaily_subdir'] = subdaily_subdir
+    station_config['subdaily_alt_sigma'] = subdaily_alt_sigma
+    station_config['subdaily_ampl'] = subdaily_ampl
+    station_config['subdaily_delta_out'] = subdaily_delta_out
+    station_config['subdaily_knots'] = subdaily_knots
+    station_config['subdaily_sigma'] = subdaily_sigma
+    station_config['subdaily_spline_outlier1'] = subdaily_spline_outlier1
+    station_config['subdaily_spline_outlier2'] = subdaily_spline_outlier2
+    station_config['subdaily_subdir'] = subdaily_subdir
 
     # these are for RINEX 3 filenames
-    lsp['stream'] = stream
-    lsp['samplerate'] = samplerate
+    station_config['stream'] = stream
+    station_config['samplerate'] = samplerate
 
     # for snr number, default is None, i.e. set by gnssir and rinex2snr if not specified here
-    lsp['snr'] = snr
+    station_config['snr'] = snr
     # mostly for decimating SNR files when created from RINEX files.  
-    lsp['dec'] = dec
+    station_config['dec'] = dec
 
     print('writing json file to: ', outputfile)
-    #print(lsp)
+    #print(station_config)
     with open(outputfile, 'w+') as outfile:
-        json.dump(lsp, outfile, indent=4)
+        json.dump(station_config, outfile, indent=4)
 
 
 def main():

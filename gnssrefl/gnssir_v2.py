@@ -17,7 +17,7 @@ import gnssrefl.gps as g
 import gnssrefl.retrieve_rh as r
 from gnssrefl.utils import FileManagement, FileTypes
 
-def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
+def gnssir_guts_v2(station, year, doy, snr_type, extension, station_config, debug):
     """
 
     Computes lomb scargle periodograms for a given station, year, day of year etc.
@@ -44,7 +44,7 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
     extension : str
         optional subdirectory to save results
 
-    lsp : dictionary
+    station_config : dictionary
         e1 : float
             min elev angle, deg
         e2 : float
@@ -93,10 +93,10 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
 
     # make sure REFL_CODE/Files/station directory exists ...
     g.checkFiles(station, '')
-    midnite = lsp['midnite']
+    midnite = station_config['midnite']
 
-    if 'ellist' in lsp.keys():
-        ellist = lsp['ellist']
+    if 'ellist' in station_config.keys():
+        ellist = station_config['ellist']
         if len(ellist) > 0:
             print('Using an augmented elevation angle list', ellist)
     else:
@@ -106,29 +106,29 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         print('Testing midnite option on multiple elevation angle bins')
 
     # this is also checked in the command line - but for people calling the code ...
-    if ((lsp['maxH'] - lsp['minH']) < 5):
-        print('Requested reflector heights (', lsp['minH'], ',', lsp['maxH'], ') are too close together. Exiting.')
+    if ((station_config['maxH'] - station_config['minH']) < 5):
+        print('Requested reflector heights (', station_config['minH'], ',', station_config['maxH'], ') are too close together. Exiting.')
         print('They must be at least 5 meters apart - and preferably further than that.')
         return
 
-    e1=lsp['e1']; e2=lsp['e2']
-    azvalues = rewrite_azel(lsp.get('azval2'))
+    e1=station_config['e1']; e2=station_config['e2']
+    azvalues = rewrite_azel(station_config.get('azval2'))
     if not azvalues:
         print('This module requires azval2 to be set in gnssir_input. This record is not present in your json.')
         sys.exit()
 
-    pele = lsp['pele']
+    pele = station_config['pele']
 
-    freqs = lsp['freqs'] ; reqAmp = lsp['reqAmp']
+    freqs = station_config['freqs'] ; reqAmp = station_config['reqAmp']
 
     ok = g.is_it_legal(freqs)
     if not ok:
         print('There is something wrong. Fix your json list of frequencies. Exiting')
         sys.exit()
 
-    screenstats = lsp['screenstats']
-    gzip = lsp['gzip']
-    dec = int(lsp.get('dec', 1))
+    screenstats = station_config['screenstats']
+    gzip = station_config['gzip']
+    dec = int(station_config.get('dec', 1))
     if dec != 1:
         print('Using decimation value: ', dec)
 
@@ -142,12 +142,12 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
         logid = None
         logfilename = None
 
-    if (lsp['nooverwrite'] ) & (resultExist ):
+    if (station_config['nooverwrite']) & (resultExist):
         print('>>>>> The result file already exists for this day and you have selected the do not overwrite option')
         return
 
     print('LSP Results will be written to:', fname)
-    irefr = lsp.get('refr_model', 1) if lsp.get('refraction', False) else 0
+    irefr = station_config.get('refr_model', 1) if station_config.get('refraction', False) else 0
 
     buffer_hours = 2 if midnite else 0
     if midnite:
@@ -159,16 +159,16 @@ def gnssir_guts_v2(station,year,doy, snr_type, extension,lsp, debug):
             station, year, doy, freq=freqs, snr_type=snr_type,
             buffer_hours=buffer_hours, dec=dec,
             e1=e1, e2=e2, ellist=ellist, azlist=azvalues,
-            polyV=lsp['polyV'], pele=pele, dbhz=lsp['dbhz'],
+            polyV=station_config['polyV'], pele=pele, dbhz=station_config['dbhz'],
             extension=extension,
-            gzip=gzip, lsp=lsp,
-            sat_list=lsp['onesat'],
+            gzip=gzip, station_config=station_config,
+            sat_list=station_config['onesat'],
         )
     except FileNotFoundError as e:
         print(str(e))
         return
 
-    r.retrieve_rh(station,year,doy,extension,lsp,arcs,screenstats,irefr,logid,logfilename,lsp['dbhz'])
+    r.retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats, irefr, logid, logfilename, station_config['dbhz'])
 
 def local_update_plot(x,y,px,pz,ax1, ax2,failure):
     """
@@ -224,7 +224,7 @@ def plot2screen(station, f,ax1,ax2,pltname):
     return True
 
 
-def read_json_file(station, extension,**kwargs):
+def read_json_file(station, extension='',**kwargs):
     """
     picks up json instructions for calculation of lomb scargle periodogram
     This was originally meant to be used by gnssir, but is now read by other functions.
@@ -243,10 +243,12 @@ def read_json_file(station, extension,**kwargs):
 
     Returns
     -------
-    lsp : dictionary
+    station_config : dictionary
 
     """
-    lsp = {} 
+    if extension is None:
+        extension = ''
+    station_config = {}
     # pick up a new parameter - that will be True for people looking
     # for the json but that aren't upset it does not exist.
     noexit = kwargs.get('noexit',False)
@@ -264,43 +266,43 @@ def read_json_file(station, extension,**kwargs):
                 print(f'Using JSON file: {json_path}')
         
         with open(json_path) as f:
-            lsp = json.load(f)
+            station_config = json.load(f)
     else:
         if noexit:
             print('No json file found - but you have requested the code not exit')
-            lsp = {}
-            return lsp
+            station_config = {}
+            return station_config
         else:
             print('The json instruction file does not exist: ', json_path)
             print('Please make with gnssir_input and run this code again.')
             sys.exit()
 
-    if len(lsp['reqAmp']) < len(lsp['freqs']) :
-        print('Number of frequencies found in json: ', len(lsp['freqs']))
-        print('Number of required amplitudes found in json: ', len(lsp['reqAmp']))
+    if len(station_config['reqAmp']) < len(station_config['freqs']) :
+        print('Number of frequencies found in json: ', len(station_config['freqs']))
+        print('Number of required amplitudes found in json: ', len(station_config['reqAmp']))
         print('You need to have a required Amplitude for each frequency.')
         print('Please fix your json file: ', json_path)
         sys.exit()
 
-    return lsp
+    return station_config
 
 
-def gzip_migration(lsp, station, extension=''):
+def gzip_migration(station_config, station, extension=''):
     """Temporary migration (remove after 2027-01-01): old JSON configs had
     gzip defaulting to False due to a bug in gnssir_input. This function
     overrides gzip to True, updates the JSON on disk, and warns the user.
 
-    Call this after read_json_file() and before using lsp['gzip'].
+    Call this after read_json_file() and before using station_config['gzip'].
     Pass -gzip F on the command line to opt out.
     """
-    if lsp.get('gzip', True):
+    if station_config.get('gzip', True):
         return
     if datetime.date.today() >= datetime.date(2027, 1, 1):
         return
 
     print('WARNING: your JSON has gzip=False (old default). Updating to True.')
     print('  Pass -gzip F on the command line if you need files uncompressed.')
-    lsp['gzip'] = True
+    station_config['gzip'] = True
 
     # Update the JSON file on disk so this warning only appears once
     json_manager = FileManagement(station, 'make_json', extension=extension)

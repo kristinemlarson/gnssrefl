@@ -12,7 +12,7 @@ ARG TARGETARCH
 
 # build requirements
 RUN apt-get update
-RUN apt-get install -y python3-pip unzip wget vim
+RUN apt-get install -y python3-pip unzip wget vim git
 
 ## executables
 RUN mkdir -p /etc/gnssrefl/exe /etc/gnssrefl/orbits /etc/gnssrefl/refl_code/Files /etc/gnssrefl/notebooks

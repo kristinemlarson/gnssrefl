@@ -775,15 +775,15 @@ def snr2spline(station,year,doy, azilims, elvlims,rhlims, precision, kdt, snrfit
 
     #print(doplot, ' doplot setting')
     imodel = 0 # no refraction
-    if 'lsp' in kwargs:
-        lsp = kwargs.get('lsp')
+    if 'station_config' in kwargs:
+        station_config = kwargs.get('station_config')
         print('Thisi is a minimal refraction correction. Please submit a PR if you')
         print('would like to implement a better one.')
-        if lsp['refraction']:
+        if station_config['refraction']:
             imodel = 1 #
         # this should be the correct date if you want a better model 
         dmjd = 59580 # fake number
-        p,T,irefr,humidity, Tm, lapse_rate = set_refraction_model(station, dmjd,lsp,imodel)
+        p,T,irefr,humidity, Tm, lapse_rate = set_refraction_model(station, dmjd,station_config,imodel)
         #print('refraction parameters ', p,T,humidity,irefr)
 
     if 'rough_in' in kwargs:
@@ -1723,7 +1723,7 @@ def save_lsp_results(datet,maxind,reflh_sub,sat,elvt,azit,pgram_sub,snrdt,pktn,i
     return temp_arr
 
 
-def set_refraction_model(station, dmjd,lsp,imodel):
+def set_refraction_model(station, dmjd, station_config, imodel):
     """
     imodel is 1 for simple refraction model
     eventually will add other refraction models
@@ -1737,7 +1737,7 @@ def set_refraction_model(station, dmjd,lsp,imodel):
         4 ch station name
     dmjd : float
         modified julian date
-    lsp : dictionary
+    station_config : dictionary
         station information including latitude and longitude
     imodel : integer
         set to 1 (time varying off) or 0 (time varying on)
@@ -1760,14 +1760,13 @@ def set_refraction_model(station, dmjd,lsp,imodel):
     """
     xdir = os.environ['REFL_CODE']
     p = 0; T = 0; irefr = 0
-    #print(lsp['lat'], lsp['lon'])
     if (imodel == 1):
         irefr = 1
-        refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
+        refr.readWrite_gpt2_1w(xdir, station, station_config['lat'], station_config['lon'])
 # time varying is set to no for now (it = 1)
         it = 1
         # should use sea level, and this is ellipsoidal height.  so it is wrong
-        dlat = lsp['lat']*np.pi/180; dlong = lsp['lon']*np.pi/180; ht = lsp['ht']
+        dlat = station_config['lat'] * np.pi / 180; dlong = station_config['lon'] * np.pi / 180; ht = station_config['ht']
         p,T,dT,Tm,e,ah,aw,la,undu = refr.gpt2_1w(station, dmjd,dlat,dlong,ht,it)
         #print("Pressure {0:8.2f} Temperature {1:6.1f} \n".format(p,T))
 

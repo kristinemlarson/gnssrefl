@@ -19,6 +19,7 @@ import subprocess
 import numpy as np
 from typing import List, Tuple, Optional, Dict, Any, Union
 
+import gnssrefl.gps as g
 from gnssrefl.read_snr_files import read_snr
 from gnssrefl.utils import circular_mean_deg, circular_distance_deg
 from gnssrefl.utils import FileManagement
@@ -297,7 +298,6 @@ def _get_arc_filename(sdir, sat, freq, az_min_ele, arc_timestamp):
 
 def _write_arc_file(fname, data, meta, station, year, doy, savearcs_format='txt'):
     """Write a single arc to disk."""
-    import gnssrefl.gps as g
     eangles = data['ele']
     dsnr = data['snr']
     sec = data['seconds']
@@ -352,23 +352,29 @@ def move_arc_to_failqc(meta, station, year, doy, extension=''):
     fm = FileManagement(station, "arcs_directory", year=year, doy=doy,
                         extension=extension)
     sdir = str(fm.get_directory_path()) + '/'
-    fname = _get_arc_filename(sdir, meta['sat'], meta['freq'],
-                              meta['az_min_ele'], meta['arc_timestamp'])
-    if not fname or not os.path.isfile(fname):
-        return
-    dest = _get_arc_filename(sdir + 'failQC/', meta['sat'], meta['freq'],
+    base = _get_arc_filename(sdir, meta['sat'], meta['freq'],
                              meta['az_min_ele'], meta['arc_timestamp'])
-    shutil.move(fname, dest)
+    if not base:
+        return
+    # arc may have been saved as .txt or .pickle
+    for ext in ('.txt', '.pickle'):
+        src = base[:-4] + ext
+        if os.path.isfile(src):
+            dest = _get_arc_filename(sdir + 'failQC/', meta['sat'], meta['freq'],
+                                     meta['az_min_ele'], meta['arc_timestamp'])
+            dest = dest[:-4] + ext
+            shutil.move(src, dest)
+            return
 
 
-def apply_refraction(snr_array, lsp, year, doy):
+def apply_refraction(snr_array, station_config, year, doy):
     """Apply refraction correction to SNR elevation angles.
 
     Returns a copy of *snr_array* with corrected elevations; rows where
     the correction is invalid (e.g. ele < 1.5 for NITE/MPF) are removed.
     """
     from gnssrefl.refraction import correct_elevations
-    corrected, valid_mask = correct_elevations(snr_array[:, 1], lsp, year, doy)
+    corrected, valid_mask = correct_elevations(snr_array[:, 1], station_config, year, doy)
     snr_array = snr_array.copy()
     snr_array[:, 1] = corrected
     return snr_array[valid_mask]
@@ -381,9 +387,9 @@ def extract_arcs_from_station(
     freq: Optional[Union[int, List[int]]] = None,
     snr_type: int = 66,
     buffer_hours: float = 2,
-    attach_results: bool = False,
+    attach_results: Union[bool, List[str]] = False,
     extension: str = '',
-    lsp: Optional[Dict[str, Any]] = None,
+    station_config: Optional[Dict[str, Any]] = None,
     gzip: bool = True,
     **kwargs,
 ) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
@@ -412,9 +418,9 @@ def extract_arcs_from_station(
         If True, attach gnssir/phase/vwc results to arc metadata. Default: False
     extension : str
         Strategy extension for result file paths. Default: ''
-    lsp : dict, optional
+    station_config : dict, optional
         Station analysis parameters. When provided, enables refraction
-        correction (if ``lsp['refraction']``) and savearcs (if ``lsp['savearcs']``).
+        correction (if ``station_config['refraction']``) and savearcs (if ``station_config['savearcs']``).
     gzip : bool
         If True, gzip the SNR file after reading. Default: False
     **kwargs
@@ -445,43 +451,48 @@ def extract_arcs_from_station(
         raise RuntimeError(f"read_snr failed for: {obsfile}")
 
     # Apply refraction correction
-    if lsp is not None and lsp.get('refraction', False):
-        snr_array = apply_refraction(snr_array, lsp, year, doy)
+    if station_config is not None and station_config.get('refraction', False):
+        snr_array = apply_refraction(snr_array, station_config, year, doy)
 
     arcs = extract_arcs(snr_array, freq=freq, year=year, doy=doy, **kwargs)
 
     # Save individual arc files to disk
-    if lsp is not None and lsp.get('savearcs', False):
-        nooverwrite = lsp.get('nooverwrite', False)
-        savearcs_format = lsp.get('savearcs_format', 'txt')
+    if station_config is not None and station_config.get('savearcs', False):
+        nooverwrite = station_config.get('nooverwrite', False)
+        savearcs_format = station_config.get('savearcs_format', 'txt')
         sdir = setup_arcs_directory(station, year, doy, extension, nooverwrite)
         print('Writing individual arcs to', sdir)
         for meta, data in arcs:
             save_arc(meta, data, sdir, station, year, doy, savearcs_format)
 
     if attach_results:
-        # gnssir results
-        try:
-            result_path = g.LSPresult_name(station, year, doy, extension)[0]
-            if os.path.isfile(result_path):
-                attach_gnssir_processing_results(arcs, result_path)
-            else:
+        # Normalize: True means all, list means specific types
+        if attach_results is True:
+            attach_results = ['gnssir', 'phase', 'vwc']
+
+        if 'gnssir' in attach_results:
+            try:
+                result_path = g.LSPresult_name(station, year, doy, extension)[0]
+                if os.path.isfile(result_path):
+                    attach_gnssir_processing_results(arcs, result_path)
+                else:
+                    for metadata, _data in arcs:
+                        metadata['gnssir_processing_results'] = None
+            except Exception:
                 for metadata, _data in arcs:
                     metadata['gnssir_processing_results'] = None
-        except Exception:
-            for metadata, _data in arcs:
-                metadata['gnssir_processing_results'] = None
 
-        # phase results
-        phase_path = FileManagement(station, 'phase_file', year, doy,
-                                    extension=extension).get_file_path(ensure_directory=False)
-        if phase_path.is_file():
-            attach_phase_processing_results(arcs, str(phase_path))
-        else:
-            for metadata, _data in arcs:
-                metadata['phase_processing_results'] = None
+        if 'phase' in attach_results:
+            phase_path = FileManagement(station, 'phase_file', year, doy,
+                                        extension=extension).get_file_path(ensure_directory=False)
+            if phase_path.is_file():
+                attach_phase_processing_results(arcs, str(phase_path))
+            else:
+                for metadata, _data in arcs:
+                    metadata['phase_processing_results'] = None
 
-        attach_vwc_track_results(arcs, station, year, doy, extension)
+        if 'vwc' in attach_results:
+            attach_vwc_track_results(arcs, station, year, doy, extension)
 
     return arcs
 
@@ -641,6 +652,32 @@ def extract_arcs(
 
     all_arcs = []
 
+    # Pre-extract column-independent arrays once (not per-column)
+    sats = snr_array[:, 0].astype(int)
+    ele_all = snr_array[:, 1]
+    azi_all = snr_array[:, 2]
+    seconds_all = snr_array[:, 3]
+    edot_all = snr_array[:, 4] if ncols > 4 else np.zeros_like(seconds_all)
+
+    if sat_list is None:
+        unique_sats = np.unique(sats)
+    else:
+        unique_sats = np.array(sat_list)
+
+    elev_pairs = _parse_elevation_list(e1, e2, ellist)
+    if screenstats and len(elev_pairs) > 1:
+        print(f'Using {len(elev_pairs)} elevation angle ranges: {elev_pairs}')
+
+    # Pre-compute arc scale factors (wavelength/2) to avoid repeated lookup
+    cf_cache = {}
+
+    # Pre-compute per-satellite masks and index ranges for fast lookup
+    sort_idx = np.argsort(sats, kind='stable')
+    sorted_sats = sats[sort_idx]
+    sat_boundaries = np.searchsorted(sorted_sats, unique_sats, side='left')
+    sat_boundaries_r = np.searchsorted(sorted_sats, unique_sats, side='right')
+    sat_counts = sat_boundaries_r - sat_boundaries
+
     for column in column_list:
         icol = column - 1
 
@@ -649,23 +686,9 @@ def extract_arcs(
                 print(f"Warning: SNR file has {ncols} columns, need column {column}")
             continue
 
-        sats = snr_array[:, 0].astype(int)
-        ele_all = snr_array[:, 1]
-        azi_all = snr_array[:, 2]
-        seconds_all = snr_array[:, 3]
-        edot_all = snr_array[:, 4] if ncols > 4 else np.zeros_like(seconds_all)
         snr_all = snr_array[:, icol]
 
-        if sat_list is None:
-            unique_sats = np.unique(sats)
-        else:
-            unique_sats = np.array(sat_list)
-
-        elev_pairs = _parse_elevation_list(e1, e2, ellist)
-        if screenstats and len(elev_pairs) > 1:
-            print(f'Using {len(elev_pairs)} elevation angle ranges: {elev_pairs}')
-
-        for sat in unique_sats:
+        for sat_idx, sat in enumerate(unique_sats):
             # Determine freq code for this column + satellite
             sat_freq = _freq_for_column_and_sat(column, sat, l2c_sats, l5_sats)
             if sat_freq is None:
@@ -673,16 +696,16 @@ def extract_arcs(
             if freq_set is not None and sat_freq not in freq_set:
                 continue  # user didn't request this freq
 
-            sat_mask = sats == sat
-
-            if np.sum(sat_mask) < min_pts:
+            if sat_counts[sat_idx] < min_pts:
                 continue
 
-            sat_ele = ele_all[sat_mask]
-            sat_azi = azi_all[sat_mask]
-            sat_seconds = seconds_all[sat_mask]
-            sat_edot = edot_all[sat_mask]
-            sat_snr = snr_all[sat_mask]
+            # Use pre-sorted index for fast satellite data extraction
+            sat_indices = sort_idx[sat_boundaries[sat_idx]:sat_boundaries_r[sat_idx]]
+            sat_ele = ele_all[sat_indices]
+            sat_azi = azi_all[sat_indices]
+            sat_seconds = seconds_all[sat_indices]
+            sat_edot = edot_all[sat_indices]
+            sat_snr = snr_all[sat_indices]
 
             for pair_e1, pair_e2 in elev_pairs:
                 if split_arcs:
@@ -695,14 +718,15 @@ def extract_arcs(
                     arc_boundaries = [(0, len(sat_ele), sat, 1)]
 
                 for sind, eind, sat_num, arc_num in arc_boundaries:
-                    arc_ele = sat_ele[sind:eind].copy()
-                    arc_azi = sat_azi[sind:eind].copy()
-                    arc_seconds = sat_seconds[sind:eind].copy()
-                    arc_edot = sat_edot[sind:eind].copy()
-                    arc_snr = sat_snr[sind:eind].copy()
+                    # Use views (not copies) — nonzero_mask indexing below creates new arrays
+                    arc_ele = sat_ele[sind:eind]
+                    arc_azi = sat_azi[sind:eind]
+                    arc_seconds = sat_seconds[sind:eind]
+                    arc_edot = sat_edot[sind:eind]
+                    arc_snr = sat_snr[sind:eind]
 
                     nonzero_mask = arc_snr > 1
-                    if np.sum(nonzero_mask) < min_pts:
+                    if np.count_nonzero(nonzero_mask) < min_pts:
                         if screenstats:
                             print(f"No useful data on frequency {sat_freq} / sat {sat}: all zeros")
                         continue
@@ -717,17 +741,9 @@ def extract_arcs(
                     if len(arc_ele) <= reqN:
                         continue
 
-                    if detrend:
-                        arc_snr_processed = _remove_dc_component(arc_ele, arc_snr, polyV, dbhz, pele)
-                    else:
-                        if dbhz:
-                            arc_snr_processed = arc_snr.copy()
-                        else:
-                            arc_snr_processed = np.power(10, (arc_snr / 20))
-
                     if split_arcs:
                         e_mask = (arc_ele > pair_e1) & (arc_ele <= pair_e2)
-                        Nvv = np.sum(e_mask)
+                        Nvv = np.count_nonzero(e_mask)
 
                         if Nvv < 15:
                             continue
@@ -742,32 +758,44 @@ def extract_arcs(
                             continue
 
                         final_ele = arc_ele[e_mask]
-                        final_azi = arc_azi[e_mask]
+                        final_azi = filtered_azi
                         final_seconds = arc_seconds[e_mask]
                         final_edot = arc_edot[e_mask]
-                        final_snr = arc_snr_processed[e_mask]
+                        precomputed_az_avg = arc_azim
                     else:
+                        e_mask = None
                         final_ele = arc_ele
                         final_azi = arc_azi
                         final_seconds = arc_seconds
                         final_edot = arc_edot
-                        final_snr = arc_snr_processed
+                        precomputed_az_avg = None
+
+                    # Cache arc scale factor (wavelength/2) by (freq, sat)
+                    cf_key = (sat_freq, sat)
+                    cf = cf_cache.get(cf_key)
+                    if cf is None:
+                        cf = g.arc_scaleF(sat_freq, sat)
+                        cf_cache[cf_key] = cf
 
                     metadata = _compute_arc_metadata(
                         final_ele, final_azi, final_seconds,
                         sat, sat_freq, arc_num,
                         pair_e1, pair_e2,
+                        az_avg=precomputed_az_avg, cf=cf,
                     )
 
-                    data = {
-                        'ele': final_ele,
-                        'azi': final_azi,
-                        'snr': final_snr,
-                        'seconds': final_seconds,
-                        'edot': final_edot,
-                    }
+                    # Detrend and apply e_mask in one step
+                    if detrend:
+                        dt_snr = remove_dc_component(arc_ele, arc_snr, polyV, dbhz, pele)
+                    else:
+                        dt_snr = arc_snr.copy() if dbhz else np.power(10, arc_snr / 20)
+                    final_snr = dt_snr[e_mask] if e_mask is not None else dt_snr
 
-                    all_arcs.append((metadata, data))
+                    all_arcs.append((metadata, {
+                        'ele': final_ele, 'azi': final_azi,
+                        'snr': final_snr, 'seconds': final_seconds,
+                        'edot': final_edot,
+                    }))
 
     if filter_to_day:
         all_arcs = [
@@ -937,18 +965,10 @@ def _detect_arc_boundaries(
     ddate = np.ediff1d(seconds)
     delv = np.ediff1d(ele)
 
-    # Initialize with the last index
-    bkpt = np.array([len(ddate)])
-
-    # Add time gap breakpoints
-    bkpt = np.append(bkpt, np.where(ddate > gap_time)[0])
-
-    # Add elevation direction change breakpoints
-    bkpt = np.append(bkpt, np.where(np.diff(np.sign(delv)))[0])
-
-    # Remove duplicates and sort
-    bkpt = np.unique(bkpt)
-    bkpt = np.sort(bkpt)
+    # Collect all breakpoints at once (np.unique returns sorted, no need for np.sort)
+    gap_breaks = np.where(ddate > gap_time)[0]
+    dir_breaks = np.where(np.diff(np.sign(delv)))[0]
+    bkpt = np.unique(np.concatenate(([len(ddate)], gap_breaks, dir_breaks)))
 
     valid_arcs = []
     iarc = 0
@@ -975,7 +995,7 @@ def _detect_arc_boundaries(
     return valid_arcs
 
 
-def _remove_dc_component(
+def remove_dc_component(
     ele: np.ndarray,
     snr: np.ndarray,
     polyV: int,
@@ -1026,6 +1046,7 @@ def _remove_dc_component(
     return data
 
 
+
 def _compute_arc_metadata(
     ele: np.ndarray,
     azi: np.ndarray,
@@ -1035,6 +1056,8 @@ def _compute_arc_metadata(
     arc_num: int,
     e1: float,
     e2: float,
+    az_avg: Optional[float] = None,
+    cf: Optional[float] = None,
 ) -> Dict[str, Any]:
     """
     Compute metadata for an arc including edot factor.
@@ -1057,6 +1080,10 @@ def _compute_arc_metadata(
         Lower elevation angle limit for this arc's bin
     e2 : float, optional
         Upper elevation angle limit for this arc's bin
+    az_avg : float, optional
+        Pre-computed circular mean azimuth (avoids recomputation)
+    cf : float, optional
+        Pre-computed arc scale factor (wavelength/2)
 
     Returns
     -------
@@ -1074,19 +1101,26 @@ def _compute_arc_metadata(
     az_min_ele = azi[ie]
 
     # Compute edot factor (from window_new lines 975-987)
-    # edot in radians/sec
-    model = np.polyfit(seconds, ele * np.pi / 180, 1)
-    avgEdot_fit = model[0]
+    # edot in radians/sec — direct linear regression (replaces np.polyfit degree 1)
+    ele_rad = ele * (np.pi / 180)
+    n = len(seconds)
+    sx = seconds.sum()
+    sy = ele_rad.sum()
+    avgEdot_fit = (n * (seconds * ele_rad).sum() - sx * sy) / (n * (seconds * seconds).sum() - sx * sx)
 
     # Average tan(elev)
-    cunit = np.mean(np.tan(np.pi * ele / 180))
+    cunit = np.tan(ele_rad).mean()
 
     # edot factor: tan(e)/edot in units of 1/(radians/hour)
     edot_factor = cunit / (avgEdot_fit * 3600) if avgEdot_fit != 0 else 0.0
 
     # Scale factor (wavelength/2)
-    import gnssrefl.gps as g
-    cf = g.arc_scaleF(freq, sat)
+    if cf is None:
+        cf = g.arc_scaleF(freq, sat)
+
+    # Circular mean azimuth
+    if az_avg is None:
+        az_avg = circular_mean_deg(azi)
 
     return {
         'sat': sat,
@@ -1096,7 +1130,7 @@ def _compute_arc_metadata(
         'ele_start': float(np.min(ele)),
         'ele_end': float(np.max(ele)),
         'az_min_ele': float(az_min_ele),
-        'az_avg': float(circular_mean_deg(azi)),
+        'az_avg': float(az_avg),
         'time_start': float(np.min(seconds)),
         'time_end': float(np.max(seconds)),
         'arc_timestamp': float(np.mean(seconds) / 3600),  # hours UTC

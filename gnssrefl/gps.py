@@ -23,6 +23,7 @@ from random import seed
 from random import random
 
 from astropy.time import Time
+from astropy.timeseries import LombScargle
 
 
 # remove for now
@@ -1435,7 +1436,7 @@ def get_ofac_hifac(elevAngles, cf, maxH, desiredPrec):
 
     return ofac, hifac
 
-def strip_compute(x,y,cf,maxH,desiredP,minH):
+def strip_compute(x,y,cf,maxH,desiredP,minH,lsp_method='fast'):
     """
     strips snr data
 
@@ -1453,8 +1454,10 @@ def strip_compute(x,y,cf,maxH,desiredP,minH):
         precision of Lomb Scargle in meters
     minH : float
         minimum reflector height in meters
+    lsp_method : str
+        'fast' for AstroPy NFFT (default), 'scipy' for original SciPy
 
-    Returns 
+    Returns
     -------
     maxF : float
         maximum Reflector height (meters)
@@ -1469,12 +1472,12 @@ def strip_compute(x,y,cf,maxH,desiredP,minH):
     px : numpy array
         periodogram, x-axis, RH, meters
     pz : numpy array
-        periodogram, y-axis, volts/volts 
+        periodogram, y-axis, volts/volts
     """
     ofac,hifac = get_ofac_hifac(x,cf,maxH,desiredP)
     if np.isnan(ofac):
         print("WARNING - bad ofac")
-        return 0, 0, 0, 0,0,0,0 
+        return 0, 0, 0, 0,0,0,0
     if ofac == 0:
         print("WARNING - bad ofac")
         return 0, 0, 0, 0,0, 0,0
@@ -1498,13 +1501,16 @@ def strip_compute(x,y,cf,maxH,desiredP,minH):
     x=x/cf
 #    y=newy
 #   get frequency spacing
-    px = freq_out(x,ofac,hifac) 
-#   compute spectrum using scipy
-    scipy_LSP = spectral.lombscargle(x, y, 2*np.pi*px)
+    px = freq_out(x,ofac,hifac)
+#   compute spectrum
+    if lsp_method == 'scipy':
+        lsp_power = spectral.lombscargle(x, y, 2*np.pi*px)
+    else:
+        lsp_power = LombScargle(x, y).power(px, method='fast', normalization='psd')
 
 #   find biggest peak
 #   scaling required to get amplitude spectrum
-    pz = 2*np.sqrt(scipy_LSP/len(x))
+    pz = 2*np.sqrt(lsp_power/len(x))
 #   now window
 #    ij = np.argmax(px > minH)
 #    new_px = px[ij]
@@ -4201,6 +4207,8 @@ def read_sp3file(file_path):
                 ignorePoint = True
         if (line[0] == 'P') and (not ignorePoint):
             co = line[1]
+            if co == 'J':
+                continue  # skip QZSS; collides with BeiDou in findConstell
             out = findConstell(co)
             satNu = int(line[2:4]) + out
             xs = line.split()
@@ -6323,7 +6331,7 @@ def make_azim_choices(alist):
 
     """
 # want to make a list for make_json_input
-# lsp['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
+# station_config['azval'] = [0, 90, 90, 180, 180, 270, 270, 360]
     if alist[0] < 0 | alist[-1] < 0 :
         print('We do not currently allow negative azimuths ')
         sys.exit()

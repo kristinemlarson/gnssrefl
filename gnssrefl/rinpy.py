@@ -192,6 +192,7 @@ def _readheader_v3(lines):
     headerlines = []
     obstimes = []
     epochsatlists = []
+    gpstime_list = []
     satset = set()
 
     while i < len(lines):
@@ -207,6 +208,9 @@ def _readheader_v3(lines):
                                                   minute=int(minute),
                                                   second=int(float(second)),
                                                   microsecond=int(float(second) % 1 * 100000)))
+
+                week, sow = g.kgpsweek(int(year), int(month), int(day), int(hour), int(minute), int(float(second)))
+                gpstime_list.append((week, sow))
 
                 numsats = int(lines[i][33:35])  # Number of visible satellites %i3
 
@@ -231,7 +235,8 @@ def _readheader_v3(lines):
         satset = satset.union(satlist)
 
     headerlengths = None
-    return header, headerlines, headerlengths, obstimes, epochsatlists, satset
+    gpstime = np.array(gpstime_list) if gpstime_list else np.empty(shape=[0, 2])
+    return header, headerlines, headerlengths, obstimes, epochsatlists, satset, gpstime
 
 
 def _converttofloat(numberstr):
@@ -471,21 +476,26 @@ def _readblocks_v3(lines, header, headerlines, epochsatlists, satset):
         fmt = '3x' + '14s 2x ' * (nobstypes-1) + '14s'
         parser[letter] = struct.Struct(fmt)
 
+    # pre-compute required line width per constellation for padding short lines
+    parser_size = {letter: parser[letter].size for letter in parser}
+
     for iepoch, (headerstart, satlist) in enumerate(zip(headerlines, epochsatlists)):
         for i, sat in enumerate(satlist):
             datastring = lines[headerstart+1+i]
 
             systemletter = sat[0]
+            if systemletter not in parser:
+                continue
             prn = int(sat[1:])
 
             try:
+                raw = datastring.rstrip('\n').ljust(parser_size[systemletter]).encode('ascii')
                 data = np.array([_converttofloat(number.decode('ascii'))
-                                 for number in parser[systemletter].unpack_from(datastring.encode('ascii'))])
+                                 for number in parser[systemletter].unpack_from(raw)])
 
                 observationdata[systemletter][iepoch, prntoidx[systemletter][prn], :] = data
             except struct.error:
                 continue
-                #print('Data loss for %s at epoch %i' % (sat, iepoch))
 
     for letter in observationdata:
         kept_observables = [i for i in range(len(obstypes[letter])) if np.sum(~np.isnan(observationdata[letter][:,:,i]))>0]
@@ -607,7 +617,7 @@ def mergerinexfiles(filelist, savefile=None):
                         line = f.readline()
                     lines.extend(f.read().splitlines(True))
 
-        header, headerlines, headerlengths, obstimes, epochsatlists, satset = _readheader(lines, rinexversion)
+        header, headerlines, headerlengths, obstimes, epochsatlists, satset, gpstime = _readheader(lines, rinexversion)
         observationdata, satlists, prntoidx, obstypes = _readblocks(lines, rinexversion, header, headerlines,
                                                                     headerlengths, epochsatlists, satset)
 
@@ -663,6 +673,83 @@ def separateobservables(observationdata, obstypes):
         for idx, obstype in enumerate(obstypes[systemletter]):
             separatedobservationdata[systemletter][obstype] = observationdata[systemletter][:, :, idx]
     return separatedobservationdata
+
+
+def get_favourite_obs_dict():
+    """Parse myfavoriteobs() into a priority dict for collapsing RINEX 3 obs.
+
+    Returns dict like {'G': {'S1': ['S1C', 'S1X'], 'S2': ['S2X', 'S2L']}, ...}
+    Bare two-char names (e.g. 'S1' in Galileo) are kept as-is and will match
+    any three-char observable starting with that prefix.
+    """
+    priorities = {}
+    for block in g.myfavoriteobs().split('+'):
+        con = block[0]
+        obs_list = block[2:].split(',')
+        bands = {}
+        for obs in obs_list:
+            band = obs[:2]  # e.g. 'S1' from 'S1C' or 'S1'
+            if band not in bands:
+                bands[band] = []
+            if len(obs) > 2:
+                bands[band].append(obs)
+            # bare two-char name means "any tracking mode" — handled in collapse
+        priorities[con] = bands
+    return priorities
+
+
+def collapse_rinex3_obs(obsdata, obstypes):
+    """Collapse RINEX 3 three-char observable names to RINEX 2 two-char band names.
+
+    For each constellation and band, merges all matching candidate observables
+    in priority order: highest-priority non-NaN value wins at each (epoch, sat)
+    cell. This mirrors gfzrnx behavior where e.g. S1C and S1X both map to S1,
+    with S1C preferred when available.
+
+    Parameters
+    ----------
+    obsdata : dict
+        Separated observation data as returned by separateobservables().
+    obstypes : dict
+        Observable types per constellation as returned by processrinexfile().
+
+    Returns
+    -------
+    new_obsdata : dict
+        Remapped observation data with two-char keys.
+    new_obstypes : dict
+        Remapped observable type lists with two-char names.
+    """
+    priorities = get_favourite_obs_dict()
+    new_obsdata = {}
+    new_obstypes = {}
+    for con in obsdata:
+        new_obsdata[con] = {}
+        new_obstypes[con] = []
+        con_priorities = priorities.get(con, {})
+        available = set(obsdata[con].keys())
+
+        for band, candidates in con_priorities.items():
+            if not candidates:
+                # Bare two-char name (e.g. Galileo 'S1') — match any 3-char obs with that prefix
+                candidates = sorted(k for k in available if k.startswith(band) and len(k) == 3)
+            matched = [c for c in candidates if c in available]
+            if not matched:
+                continue
+            # Per-satellite selection: for each sat, use the highest-priority
+            # candidate that has any data, matching gfzrnx behavior.
+            shape = obsdata[con][matched[0]].shape  # (nepochs, nsats)
+            merged = np.full(shape, np.nan)
+            for sat_idx in range(shape[1]):
+                for cand in matched:
+                    col = obsdata[con][cand][:, sat_idx]
+                    if np.any(~np.isnan(col)):
+                        merged[:, sat_idx] = col
+                        break
+            new_obsdata[con][band] = merged
+            new_obstypes[con].append(band)
+
+    return new_obsdata, new_obstypes
 
 
 def saverinextonpz(savefile, observationdata, satlists, prntoidx, obstypes, header, obstimes):

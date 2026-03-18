@@ -8,7 +8,7 @@ import sys
 
 
 import gnssrefl.gps as g
-from gnssrefl.utils import FileManagement, FileTypes, check_arc_quality, format_qc_summary, circular_distance_deg
+from gnssrefl.utils import FileManagement, FileTypes, pre_check_arc, check_arc_quality, format_qc_summary, circular_distance_deg
 import gnssrefl.daily_avg_cl as da
 import gnssrefl.gnssir_v2 as gnssir
 from gnssrefl.extract_arcs import extract_arcs_from_station, move_arc_to_failqc
@@ -729,7 +729,7 @@ def test_func_new(x, a, b, rh_apriori,freq):
 
     return a * np.sin(freq_least_squares * x + b)
 
-def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
+def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None, station_config: dict = None):
     """
     Determines the frequency to use for VWC workflows.
     Priority is: command line -> json file -> default (20).
@@ -742,6 +742,8 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
         Analysis extension name.
     fr_cmd : str, optional
         Frequency provided from the command line (e.g., '1', '20'), by default None.
+    station_config : dict, optional
+        Pre-loaded json dict. Pass to skip re-reading the json file.
 
     Returns
     -------
@@ -758,12 +760,13 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
             print(f"Error: Invalid frequency '{fr_cmd}'. Must be 1 (L1), 20 (L2C), or 5 (L5).")
             sys.exit()
     else:
-        # Otherwise, try to read from the json file
-        lsp = gnssir.read_json_file(station, extension, noexit=True)
-        if 'freqs' in lsp and lsp.get('freqs'):
-            if len(lsp['freqs']) == 1:
-                final_fr = lsp['freqs'][0]
-                print(f"Frequency read from JSON file: {final_fr}")
+        # Read json if not already provided
+        if station_config is None:
+            station_config = gnssir.read_json_file(station, extension, noexit=True)
+        if 'freqs' in station_config and station_config.get('freqs'):
+            if len(station_config['freqs']) == 1:
+                final_fr = station_config['freqs'][0]
+                print(f"Requested frequencies  [{final_fr}]")
             else:
                 print("Tried to use frequency values in json but there were too many.  Using default of L2C (20).")
                 final_fr = 20
@@ -784,7 +787,7 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None):
     # Always return a list
     return [final_fr]
 
-def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
+def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extension=''):
     """
     This does the main work of estimating phase and other parameters from the SNR files
     it uses tracks that were predefined by the apriori.py code
@@ -801,7 +804,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
         SNR file extension (i.e. 99, 66 etc)
     fr_list : list of integers
         frequency, [1], [20] or [1,20]
-    lsp : dict
+    station_config : dict
         station analysis parameters (from json, with CLI overrides applied)
     extension : str, optional
         analysis extension for json file. Default is ''.
@@ -809,23 +812,23 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
     Only GPS frequencies are allowed because this relies on the repeating ground track.
 
     """
-    e1 = lsp.get('e1', 5)
-    e2 = lsp.get('e2', 25)
-    poly_v = lsp.get('polyV', 4)
-    noise_region = lsp.get('NReg', [0.5, 8])
-    min_height = lsp.get('minH', 0.5)
-    max_height = lsp.get('maxH', 8)
-    desired_p = lsp.get('desiredP', 0.01)
-    pele = lsp.get('pele', [e1, e2])
-    screenstats = lsp.get('screenstats', False)
-    midnite = lsp.get('midnite', True)
-    gzip = lsp.get('gzip', True)
-    savearcs = lsp.get('savearcs', False)
-    azvalues = gnssir.rewrite_azel(lsp.get('azval2'))
-    dec = lsp.get('dec') or 1
-    dbhz = lsp.get('dbhz') or False
-    compute_lsp = True
-
+    e1 = station_config.get('e1', 5)
+    e2 = station_config.get('e2', 25)
+    poly_v = station_config.get('polyV', 4)
+    noise_region = station_config.get('NReg', [0.5, 8])
+    min_height = station_config.get('minH', 0.5)
+    max_height = station_config.get('maxH', 8)
+    desired_p = station_config.get('desiredP', 0.01)
+    lsp_method = station_config.get('lsp_method', 'fast')
+    pele = station_config.get('pele', [e1, e2])
+    screenstats = station_config.get('screenstats', False)
+    midnite = station_config.get('midnite', True)
+    gzip = station_config.get('gzip', True)
+    savearcs = station_config.get('savearcs', False)
+    azvalues = gnssir.rewrite_azel(station_config.get('azval2'))
+    dec = station_config.get('dec') or 1
+    dbhz = station_config.get('dbhz') or False
+    recompute_lsp = station_config.get('recompute_lsp', False)
     _, snrexist = FileManagement(station, 'snr_file', year, doy, snr_type=snr_type).find_snr_file()
 
     l2c_list, l5_list = g.l2c_l5_list(year,doy)
@@ -852,9 +855,10 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                 screenstats=screenstats,
                 buffer_hours=buffer_hours,
                 extension=extension,
-                lsp=lsp, gzip=gzip,
+                station_config=station_config, gzip=gzip,
                 dbhz=dbhz,
                 dec=dec,
+                attach_results=['gnssir'] if not recompute_lsp else False,
             )
 
             # Group arcs by frequency
@@ -930,24 +934,37 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                             qc_counts['L2C/L5'] += 1
                             continue
 
-                        if screenstats:
-                            print(f'Sat {sat_number:3.0f} Azimuth {track_azim:5.1f} RH {rh_apriori:6.2f} {nv:5.0f}')
-
-                        max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(x, y, cf, max_height,
-                                                                                           desired_p, min_height)
-
-                        nij = pz[(px > noise_region[0]) & (px < noise_region[1])]
-                        noise = np.mean(nij) if len(nij) > 0 else 0
-
-                        if noise > 0 and screenstats:
-                            print(f'>> LSP RH {max_f:7.3f} m {max_amp/noise:6.1f} Amp {max_amp:6.1f} ')
-
-                        passed, reason = check_arc_quality(meta, max_f, max_amp, noise, lsp)
+                        # Pre-check: skip expensive LSP for arcs that will definitely fail QC
+                        passed, reason = pre_check_arc(meta, station_config)
                         if not passed:
                             qc_counts[reason] += 1
                             continue
 
-                        obs_pk2noise = max_amp / noise
+                        if screenstats:
+                            print(f'Sat {sat_number:3.0f} Azimuth {track_azim:5.1f} RH {rh_apriori:6.2f} {nv:5.0f}')
+
+                        gnssir_results = meta.get('gnssir_processing_results')
+                        if gnssir_results is not None:
+                            max_f = gnssir_results['RH']
+                            max_amp = gnssir_results['Amp']
+                            obs_pk2noise = gnssir_results['PkNoise']
+                            noise = max_amp / obs_pk2noise if obs_pk2noise > 0 else 0
+                        elif recompute_lsp:
+                            max_f, max_amp, emin_obs, emax_obs, rise_set, px, pz = g.strip_compute(
+                                x, y, cf, max_height, desired_p, min_height, lsp_method)
+                            nij = pz[(px > noise_region[0]) & (px < noise_region[1])]
+                            noise = np.mean(nij) if len(nij) > 0 else 0
+                            obs_pk2noise = max_amp / noise if noise > 0 else 0
+                        else:
+                            continue
+
+                        if noise > 0 and screenstats:
+                            print(f'>> LSP RH {max_f:7.3f} m {max_amp/noise:6.1f} Amp {max_amp:6.1f} ')
+
+                        passed, reason = check_arc_quality(meta, max_f, max_amp, noise, station_config)
+                        if not passed:
+                            qc_counts[reason] += 1
+                            continue
                         x_data = np.sin(np.deg2rad(x))
                         y_data = y
                         test_function_apriori = partial(test_func_new, rh_apriori=rh_apriori,freq=freq)
@@ -979,7 +996,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, lsp, extension=''):
                 np.savetxt(my_file, all_results, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f", comments="%")
 
             if qc_lines:
-                print('\n'.join(qc_lines))
+                print('\n'.join(qc_lines) + '\n')
 
 
 def low_pct(amp, basepercent):
@@ -1845,21 +1862,15 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         sys.exit()
 
     g.checkFiles(station, '')
-    # should not crash if file does not exist...
-    if extension is None:
-        lsp = gnssir.read_json_file(station, '',noexit=True, silent=True)
-    else:
-        lsp = gnssir.read_json_file(station, extension,noexit=True, silent=True)
-
+    station_config = gnssir.read_json_file(station, extension, noexit=True, silent=True)
 
     # this used to be in convert_phase function.  Now will set doy limits in this function
-    if lsp['lat'] >= 0:
+    if station_config['lat'] >= 0:
         print('Northern hemisphere station ')
         southern = False
-    elif lsp['lat'] < 0:
+    elif station_config['lat'] < 0:
         print('Southern hemisphere station ')
         southern = True
-
 
     # originally this was for command line interface ... 
     remove_bad_tracks = auto_removal # ??
@@ -1867,9 +1878,9 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
     circles = False
 
     if len(level_doys) == 0:
-        if 'vwc_level_doys' in lsp:
+        if 'vwc_level_doys' in station_config:
             print('use levels in the json')
-            return_level_doys = lsp['vwc_level_doys']
+            return_level_doys = station_config['vwc_level_doys']
         else:
             print('use default levels which may not be appropriate for your site')
             if southern: 
@@ -1883,34 +1894,34 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         return_level_doys = level_doys
 
     if tmin is None:
-        if 'vwc_min_soil_texture' in lsp:
-            tmin = lsp['vwc_min_soil_texture']
+        if 'vwc_min_soil_texture' in station_config:
+            tmin = station_config['vwc_min_soil_texture']
         else:
             tmin = 0.05
     if tmax is None:
-        if 'vwc_max_soil_texture' in lsp:
-            tmax = lsp['vwc_max_soil_texture']
+        if 'vwc_max_soil_texture' in station_config:
+            tmax = station_config['vwc_max_soil_texture']
         else:
             tmax = 0.50
     if min_req_pts_track is None:
-        if 'vwc_min_req_pts_track' in lsp:
-            min_req_pts_track = lsp['vwc_min_req_pts_track']
+        if 'vwc_min_req_pts_track' in station_config:
+            min_req_pts_track = station_config['vwc_min_req_pts_track']
         else:
             min_req_pts_track = 100
     # Always load minvalperday from JSON for transparency (even if not used)
     json_minvalperday = None
-    if 'vwc_minvalperday' in lsp:
-        json_minvalperday = lsp['vwc_minvalperday']
+    if 'vwc_minvalperday' in station_config:
+        json_minvalperday = station_config['vwc_minvalperday']
 
     if warning_value is None:
-        if 'vwc_warning_value' in lsp:
-            warning_value = lsp['vwc_warning_value']
+        if 'vwc_warning_value' in station_config:
+            warning_value = station_config['vwc_warning_value']
         else:
             warning_value = 5.5
 
     # Vegetation model parameter handling (model 1=simple, 2=advanced)
-    if 'vwc_vegetation_model' in lsp:
-        vegetation_model = lsp['vwc_vegetation_model']
+    if 'vwc_vegetation_model' in station_config:
+        vegetation_model = station_config['vwc_vegetation_model']
         # Validate it's an integer model number
         if not isinstance(vegetation_model, int) or vegetation_model not in [1, 2]:
             print(f'Warning: vwc_vegetation_model in JSON must be 1 or 2, got {vegetation_model}. Using default (1).')
@@ -1920,26 +1931,26 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
 
     # not using extension
     # pick up values in json, if available
-    if 'vwc_plot_legend' in lsp:
-        plot_legend = lsp['vwc_plot_legend']
-    if 'vwc_circles' in lsp:
-        circles = lsp['vwc_circles']
+    if 'vwc_plot_legend' in station_config:
+        plot_legend = station_config['vwc_plot_legend']
+    if 'vwc_circles' in station_config:
+        circles = station_config['vwc_circles']
 
-    if 'vwc_min_norm_amp' in lsp:
-        min_norm_amp = lsp['vwc_min_norm_amp']
+    if 'vwc_min_norm_amp' in station_config:
+        min_norm_amp = station_config['vwc_min_norm_amp']
     else:
         min_norm_amp = 0.5  # trying this out
 
     # Handle subdaily binning parameters with precedence: CLI > JSON > Defaults
     if bin_hours is None:
-        if 'vwc_bin_hours' in lsp:
-            bin_hours = lsp['vwc_bin_hours']
+        if 'vwc_bin_hours' in station_config:
+            bin_hours = station_config['vwc_bin_hours']
         else:
             bin_hours = 24  # Default to daily
     
     if bin_offset is None:
-        if 'vwc_bin_offset' in lsp:
-            bin_offset = lsp['vwc_bin_offset']
+        if 'vwc_bin_offset' in station_config:
+            bin_offset = station_config['vwc_bin_offset']
         else:
             bin_offset = 0  # Default offset
     
@@ -1972,14 +1983,14 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
             # For 24hr bins, prefer minvalperday over minvalperbin
             if json_minvalperday is not None:
                 minvalperbin = json_minvalperday
-            elif 'vwc_minvalperbin' in lsp:
-                minvalperbin = lsp['vwc_minvalperbin']
+            elif 'vwc_minvalperbin' in station_config:
+                minvalperbin = station_config['vwc_minvalperbin']
             else:
                 minvalperbin = 10  # Daily default
         else:
             # For subdaily bins, use minvalperbin or default
-            if 'vwc_minvalperbin' in lsp:
-                minvalperbin = lsp['vwc_minvalperbin']
+            if 'vwc_minvalperbin' in station_config:
+                minvalperbin = station_config['vwc_minvalperbin']
             else:
                 minvalperbin = 5   # Subdaily default
 
@@ -2028,11 +2039,11 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         minvalperbin_source = " (from CLI)"
     elif original_minvalperday is not None:
         minvalperbin_source = " (from CLI -minvalperday)"
-    elif bin_hours == 24 and json_minvalperday is not None and 'vwc_minvalperbin' not in lsp:
+    elif bin_hours == 24 and json_minvalperday is not None and 'vwc_minvalperbin' not in station_config:
         minvalperbin_source = " (from JSON vwc_minvalperday)"
     elif bin_hours == 24 and json_minvalperday is not None:
         minvalperbin_source = " (from JSON vwc_minvalperday, preferred for 24hr bins)"
-    elif 'vwc_minvalperbin' in lsp:
+    elif 'vwc_minvalperbin' in station_config:
         minvalperbin_source = " (from JSON)"
     else:
         minvalperbin_source = " (default)"

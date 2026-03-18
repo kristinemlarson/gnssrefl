@@ -1,12 +1,14 @@
 import warnings
 import argparse
+import contextlib
 import os
 import subprocess
 import sys
 import time
 import wget
 import multiprocessing
-from functools import partial
+
+from tqdm import tqdm
 
 #import gnssrefl.gnssir as guts
 import gnssrefl.gnssir_v2 as guts2
@@ -48,8 +50,9 @@ def parse_arguments():
     parser.add_argument("-savearcs_format", default=None, type=str, help="format of saved arcs (txt or pickle). default is txt")
     parser.add_argument("-par", default=None, type=int, help="Number of processes to spawn (up to 10)")
     parser.add_argument("-debug", default=None, type=str, help="remove try/except so that error messages are provided. Parallel processing turned off")
-    parser.add_argument("-midnite", default=None, type=str, help="allow midnite crossings (default is false)")
+    parser.add_argument("-midnite", default=None, type=str, help="allow midnite crossings (default is true)")
     parser.add_argument("-dbhz", default=None, type=str, help="whether to keep SNR in db-hz (default is false)")
+    parser.add_argument("-lsp_method", default=None, type=str, help="LSP backend: fast (default, astropy NFFT) or scipy (original)")
 
     g.print_version_to_screen()
     #print (sys.version)
@@ -69,7 +72,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         azim2: int = 360, nooverwrite: bool = False, extension: str = '', compress: bool = False, 
         screenstats: bool = True, delTmax: int = None, e1: float = None, e2: float = None, 
            mmdd: bool = False, gzip: bool = None, dec : int = 1, savearcs : bool = False, savearcs_format: str='txt',
-           par : int = None, debug : bool=False, midnite : bool=False, dbhz : bool=False):
+           par : int = None, debug : bool=False, midnite : bool=True, dbhz : bool=False, lsp_method : str='fast'):
     """
     gnssir is the main driver for estimating reflector heights. The user is required to 
     have set up an analysis strategy using gnssir_input. 
@@ -245,56 +248,54 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
         for y in range(year, year_end+1):
             g.result_directories(station,y,extension)
 
-    lsp = guts2.read_json_file(station, extension)
+    station_config = guts2.read_json_file(station, extension)
     # 
-    if 'snr' in lsp:
-        if lsp['snr'] is not None:
-            snr = lsp['snr']
-            print('Found a snr choice in the json:', snr)
-    print('Using snr file type: ', snr)
+    if 'snr' in station_config:
+        if station_config['snr'] is not None:
+            snr = station_config['snr']
+            if not par or par <= 1:
+                print('Found a snr choice in the json:', snr)
+    if not par or par <= 1:
+        print('Using snr file type: ', snr)
 
-    lsp['midnite'] = midnite
-    if midnite:
-        print('You are testing out the midnite')
+    station_config['midnite'] = midnite
 
     # make a refraction file you will need later
-    refr.readWrite_gpt2_1w(xdir, station, lsp['lat'], lsp['lon'])
+    refr.readWrite_gpt2_1w(xdir, station, station_config['lat'], station_config['lon'])
 
     # now check the overrides to the json instructions
 
     # requiring people use the new code
-    if 'azval2' not in lsp:
+    if 'azval2' not in station_config:
         print('An azval2 variable was not found in your gnssir json input file. Fix your json ')
         print('and/or use gnssir_input to make a new one. Exiting')
         sys.exit()
 
     # plt is False unless user changes
-    lsp['plt_screen'] = plt
+    station_config['plt_screen'] = plt
 
     if delTmax is not None:
-        lsp['delTmax'] = delTmax
+        station_config['delTmax'] = delTmax
 
-    if ((lsp['maxH'] - lsp['minH']) < 5):
-        print('Requested reflector heights (', lsp['minH'], ',', lsp['maxH'], ') are too close together. Exiting.')
+    if ((station_config['maxH'] - station_config['minH']) < 5):
+        print('Requested reflector heights (', station_config['minH'], ',', station_config['maxH'], ') are too close together. Exiting.')
         print('They must be at least 5 meters apart - and preferably further than that.')
         sys.exit()
 
     # compress is False unless user changes
-    lsp['wantCompression'] = compress
+    station_config['wantCompression'] = compress
 
     # screenstats is True unless user changes
-    lsp['screenstats'] = screenstats
+    station_config['screenstats'] = screenstats
 
     # added this for people that have 1 sec files that do not need this resolution
     # decimation is a bit slow but way faster than doing a gazillion periodograms with 
     # 1 sec data
 
-    lsp['dec'] = dec
+    station_config['dec'] = dec
 
-    # new field
-
-    lsp['dbhz'] = dbhz
-    print('dbhz', dbhz)
+    station_config['dbhz'] = dbhz
+    station_config['lsp_method'] = lsp_method if lsp_method is not None else 'fast'
 
     # in case you want to analyze multiple days of data
     if doy_end is None:
@@ -309,16 +310,12 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     if year_end is None:
         year_end = year
 
-    # default will be to overwrite
-    #if nooverwrite is None:
-    lsp['nooverwrite'] = nooverwrite
-    #else:
-    #    lsp['overwriteResults'] = False
+    station_config['nooverwrite'] = nooverwrite
 
     if e1 is not None:
-        lsp['e1'] = e1
+        station_config['e1'] = e1
     if e2 is not None:
-        lsp['e2'] = e2
+        station_config['e2'] = e2
 
     # in case you want to look at a restricted azimuth range from the command line
     setA = 0
@@ -333,43 +330,46 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # TODO figure out the goal here
     # this only sets the new azim values only if bother azim1 and azim2 changed?
     if setA == 2:
-        lsp['azval2'] = [azim1,  azim2]
+        station_config['azval2'] = [azim1,  azim2]
 
     # this is for when you want to run the code with just a single frequency, i.e. input at the console
     # rather than using the input restrictions
-    #print(lsp['freqs'])
-    #if fr is not None:
+
     if len(fr) > 0:
-        lsp['freqs'] = fr
+        station_config['freqs'] = fr
         # better make sure you have enough amplitudes
-        ampl_from_json = lsp['reqAmp'][0]
+        ampl_from_json = station_config['reqAmp'][0]
         if ampl is None:
-            lsp['reqAmp'] = [ampl_from_json for i in range(14)]
+            station_config['reqAmp'] = [ampl_from_json for i in range(14)]
 
     if ampl is not None:
         # this is not elegant - but allows people to set ampl on the command line
         # but use the frequency list from their json ...  which i think has max of 12
         # but use 14 to be sure
-        lsp['reqAmp'] = [ampl for i in range(14)]
+        station_config['reqAmp'] = [ampl for i in range(14)]
 
     if sat is not None:
-        lsp['onesat'] = [sat]
+        station_config['onesat'] = [sat]
 
-    lsp['mmdd'] = add_mmddhhss
+    station_config['mmdd'] = add_mmddhhss
     # only override JSON gzip setting if explicitly passed on command line
     if gzip is not None:
-        lsp['gzip'] = gzip
+        station_config['gzip'] = gzip
     else:
-        guts2.gzip_migration(lsp, station, extension)
+        guts2.gzip_migration(station_config, station, extension)
     # added 2024aug01
-    lsp['savearcs'] = savearcs
+    station_config['savearcs'] = savearcs
 
     # added 2024aug27
-    lsp['savearcs_format'] = savearcs_format
+    station_config['savearcs_format'] = savearcs_format
 
     # if refraction model is not assigned, set it to 1
-    if 'refr_model' not in lsp.keys():
-        lsp['refr_model'] = 1
+    if 'refr_model' not in station_config:
+        station_config['refr_model'] = 1
+
+    # default to fast (astropy NFFT) LSP; users can override with -lsp_method scipy
+    if 'lsp_method' not in station_config:
+        station_config['lsp_method'] = 'fast'
 
     # good lord - why is this here? surely a function can be called
     picklefile = 'gpt_1wA.pickle'
@@ -388,24 +388,25 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             subprocess.call(['mv', '-f', picklefile, xdir + '/input/'])
 
     # added debug aug 3/2024
-    args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'lsp': lsp, 'debug': debug}
+    args = {'station': station.lower(), 'year': year, 'doy': doy, 'snr_type': snr, 'extension': extension, 'station_config': station_config, 'debug': debug}
 
-    print(lsp['pele'], ' direct signal elevation angle limits')
-    #print(lsp['e1'], lsp['e2'], ' min and max elevation angles')
+    if not par or par <= 1:
+        print(station_config['pele'], ' direct signal elevation angle limits')
+
     # added this because ellist is a new option and was not necessarily created in old json files
-    if 'ellist' not in lsp:
+    if 'ellist' not in station_config:
         #print('did not find ellist')
-        if float(lsp['e1']) < float(lsp['pele'][0]):
+        if float(station_config['e1']) < float(station_config['pele'][0]):
             print('emin is smaller than the minimum eangle (pele) used for direct signal removed.')
             print('This is Forbidden. Fix the records set in the json created by gnssir_analysis')
             sys.exit()
     else:
-        if float(lsp['e1']) < float(lsp['pele'][0]):
+        if float(station_config['e1']) < float(station_config['pele'][0]):
             print('Your requested emin is lower than the minimum elevation angle used ')
             print('for direct signal removal. This is stored in the variable pele.')
             print('This is Forbidden. Fix the pele records set in the json created by gnssir_input')
             sys.exit()
-        if float(lsp['e2']) > float(lsp['pele'][1]):
+        if float(station_config['e2']) > float(station_config['pele'][1]):
             print('Your requested emax is higher than the maximum elevation angle used ')
             print('for direct signal removal. This is stored in the variable pele.')
             print('This is Forbidden. Fix the pele records set in the json created by gnssir_input')
@@ -414,11 +415,7 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     # should make sure there are directories for the results ... 
     g.checkFiles(station.lower(), extension)
 
-    #if screenstats:
-    # for my sanity might as well print it out
-    if True:
-        print('Requested frequencies ', lsp['freqs'])
-        #print('Requested amplitudes', lsp['reqAmp'])
+    print('Requested frequencies ', station_config['freqs'])
 
 
     if (par == 1):
@@ -430,38 +427,44 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             print('You are analyzing only one day of data - no reason to submit multiple processes')
             par = None
 
-    if not par: 
-        print('Parallel processing not requested')
+    if not par:
+        print('Parallel processing not requested\n')
         additional_args = { "args": args }
         process_year(year,year_end,doy,doy_end, **additional_args)
 
     else:
-    # queue which handles any exceptions any of the processes encounter
-        manager = multiprocessing.Manager()
-        error_queue = manager.Queue()
-        additional_args = { "args": args, "error_queue": error_queue }
-        print('Parallel processing chosen')
         if par > 10:
             print('For now we will only allow ten simultaneous processes. Submit again. Exiting.')
             sys.exit()
-        else:
-            numproc = par
-            print(year,doy,year_end,doy_end)
-            # get a list of times in MJD associated with the multiple spawned processes
-            d,numproc=guts2.make_parallel_proc_lists_mjd(year, doy, year_end, doy_end, numproc)
 
-            # make a list of process IDs
-            index_list = list(range(numproc))
+        print('Per-day output suppressed in parallel mode. Run without -par to see detailed output.')
 
-            pool = multiprocessing.Pool(processes=numproc) 
+        # Build flat list of (year, doy) work units
+        MJD1 = int(g.ydoy2mjd(year, doy))
+        MJD2 = int(g.ydoy2mjd(year_end, doy_end))
+        day_list = []
+        for mjd in range(MJD1, MJD2 + 1):
+            y, d = g.modjul_to_ydoy(mjd)
+            day_list.append((y, d))
 
-            partial_process_yearD = partial(process_year_dictionary, args=args,datelist=d, error_queue = error_queue)
+        manager = multiprocessing.Manager()
+        error_queue = manager.Queue()
+        pool = multiprocessing.Pool(processes=par)
 
-            pool.map(partial_process_yearD,index_list)
+        worker_args = [(y, d, args, error_queue) for y, d in day_list]
+        total_arcs = 0
+        with tqdm(pool.imap_unordered(process_day_worker, worker_args),
+                  total=len(day_list),
+                  desc=f"gnssir {station}",
+                  unit="day") as pbar:
+            for n_arcs in pbar:
+                total_arcs += n_arcs
+                elapsed = time.time() - t1
+                ms_per_arc = elapsed / total_arcs * 1000 if total_arcs else 0
+                pbar.set_postfix_str(f"{total_arcs} arcs, {ms_per_arc:.1f} ms/arc")
 
-            pool.close()
-            pool.join()
-
+        pool.close()
+        pool.join()
 
         if not error_queue.empty():
             print("One (or more) of the processes encountered errors. Will not proceed until errors are fixed.")
@@ -473,34 +476,26 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
             sys.exit(1)
 
     t2 = time.time()
-    print('Time to compute: ', round(t2-t1,2), ' seconds')
+    elapsed = round(t2-t1, 2)
+    ndays = int(g.ydoy2mjd(year_end, doy_end)) - int(g.ydoy2mjd(year, doy)) + 1
+    if par and total_arcs:
+        ms_per_arc = round(elapsed / total_arcs * 1000, 1)
+        print(f'Processed {ndays} days, {total_arcs} arcs in {elapsed} s ({ms_per_arc} ms/arc)')
+    else:
+        print(f'Processed {ndays} days in {elapsed} s ({round(elapsed/ndays, 2)} s/day)')
 
 
-# process year and process year dictionary should be combined at some point
-# see rinex2snr as example
+def count_result_arcs(result_path):
+    """Count non-comment lines in a result file."""
+    try:
+        with open(result_path) as f:
+            return sum(1 for line in f if not line.startswith('%'))
+    except FileNotFoundError:
+        return 0
 
-#def process_year(year, year_end, doy, doy_end, args, error_queue):
-def process_year(year, year_end, doy, doy_end, args ):
-    """
-    Code that does the processing for a specific year. Refactored to separate 
-    function to allow for parallel processes
 
-    Removed error queue - 
-
-    Parameters
-    ----------
-    year : int
-        the start year 
-    year_end : int
-        end year. This was the last year you plan to analyze
-    doy : integer
-        Day of year to start processing 
-    doy_end : int
-        end day of year on the last year you plan to analyze
-    args : dict
-        arguments passed into gnssir through commandline (or python)
-
-    """
+def process_year(year, year_end, doy, doy_end, args):
+    """Sequential processing for gnssir."""
     debug = args['debug']
 
     MJD1 = int(g.ydoy2mjd(year,doy))
@@ -510,7 +505,6 @@ def process_year(year, year_end, doy, doy_end, args ):
         args['year'] = y
         args['doy'] = d
         if debug:
-            # let's you more easily see why the code is crashing
             guts2.gnssir_guts_v2(**args)
         else:
             try:
@@ -522,43 +516,26 @@ def process_year(year, year_end, doy, doy_end, args ):
 
     return
 
-def process_year_dictionary(index,args,datelist,error_queue):
-    """
-    Code that does the processing for a specific year. Refactored to separate
-    function to allow for parallel processes
 
-    Parameters
-    ----------
-    index: int
-        accommodation for parallel processing. It should be a value 
-        from 0 to 9, telling the code which part of datelist to use 
-    args : dict
-        arguments passed into gnssir through commandline (or python)
-        should have the new arguments for sublists
-    datelist : dict
-        list of dates you want to analyze in pairs of MJD
-        could have up to 10 sets of dates, from 0 to 9, e.g. for two processes
-        dd = { 0: [MJD1, MJD2], 1:[MJD1,MJD2] }
-    error_queue : ?
-
-    """
-    #should the try be further in the loop?
+def process_day_worker(worker_args):
+    """Worker for parallel gnssir processing. Returns arc count for progress bar."""
+    year, doy, args, error_queue = worker_args
     try:
-        d1 = datelist[index][0]; d2 = datelist[index][1] 
-        mjd_list = list(range(d1, d2+1))
- 
-        for MJD in mjd_list:
-            year, doy = g.modjul_to_ydoy(MJD)
-            args['year'] = year
-            args['doy']=doy
-            print(f'Processing MJD {MJD} Year {year} DOY {doy}');
-
+        args = dict(args)
+        args['year'] = year
+        args['doy'] = doy
+        with contextlib.redirect_stdout(open(os.devnull, 'w')):
             guts2.gnssir_guts_v2(**args)
+        xdir = str(os.environ['REFL_CODE'])
+        station = args['station']
+        result_path = os.path.join(xdir, str(year), 'results', station, f'{doy:03d}.txt')
+        return count_result_arcs(result_path)
     except Exception as e:
         print('***********************************************************************')
         print('Try using -debug T to get better information about why the code crashed: ',year,doy)
         print('***********************************************************************')
         error_queue.put(e)
+        return 0
 
 
 def main():

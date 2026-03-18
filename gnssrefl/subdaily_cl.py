@@ -256,15 +256,15 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     g.check_environ_variables()
     xdir = os.environ['REFL_CODE']
 
-    lsp = sd.pickup_subdaily_json_defaults(xdir, station, extension)
-    if 'freqs' in lsp:
-        fr = lsp['freqs']
+    station_config = sd.pickup_subdaily_json_defaults(xdir, station, extension)
+    if 'freqs' in station_config:
+        fr = station_config['freqs']
 
     if subdir is None: # not set on the command line
-        if lsp['subdaily_subdir'] is None: 
+        if station_config['subdaily_subdir'] is None:
             subdir = station
         else:
-            subdir = lsp['subdaily_subdir']
+            subdir = station_config['subdaily_subdir']
             print('Using subdir value from json')
 
     # this makes sure the directory exists
@@ -285,15 +285,15 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
     # this is ugly - should be moved to a function
 
     if alt_sigma is None: # not set on the command line
-        if lsp['subdaily_alt_sigma'] is not None: # but it has been set in the json
-            alt_sigma = lsp['subdaily_alt_sigma']
+        if station_config['subdaily_alt_sigma'] is not None: # but it has been set in the json
+            alt_sigma = station_config['subdaily_alt_sigma']
             print('Using alt_sigma from json')
 
 
     # send ampl as a list now ...  ?
     if len(ampl) == 0: # not set on the command line
-        if lsp['subdaily_ampl'] is not None: # but it has been set in the json
-            ampl = lsp['subdaily_ampl']
+        if station_config['subdaily_ampl'] is not None: # but it has been set in the json
+            ampl = station_config['subdaily_ampl']
             print('Using ampl value from json')
         else:
             ampl = 0.0 # don't edit anything (beyond what was done in gnssir)
@@ -304,35 +304,35 @@ def subdaily(station: str, year: int, txtfile_part1: str = '', txtfile_part2: st
 
 
     if delta_out is None: # not set on the command line
-        if lsp['subdaily_delta_out'] is not None: # but it has been set in the json
-            delta_out = lsp['subdaily_delta_out']
+        if station_config['subdaily_delta_out'] is not None: # but it has been set in the json
+            delta_out = station_config['subdaily_delta_out']
             print('Using delta_out from json')
         else:
             delta_out = 1800 # setting default here now instead of above
 
     if knots is None: # not set on the command line
-        if lsp['subdaily_knots'] is not None: # but it has been set in the json
-            knots = lsp['subdaily_knots']
+        if station_config['subdaily_knots'] is not None: # but it has been set in the json
+            knots = station_config['subdaily_knots']
             print('Using knots from json')
         else:
             knots = 8
 
 
     if sigma is None: # not set on the command line
-        if lsp['subdaily_sigma'] is not None: # but it has been set in the json
-            sigma = lsp['subdaily_sigma']
+        if station_config['subdaily_sigma'] is not None: # but it has been set in the json
+            sigma = station_config['subdaily_sigma']
             print('Using sigma from json')
         else:
             sigma = 2.5
 
     if spline_outlier1 is None: # not set on the command line
-        if lsp['subdaily_spline_outlier1'] is not None: # but it has been set in the json
-            spline_outlier1 = lsp['subdaily_spline_outlier1']
+        if station_config['subdaily_spline_outlier1'] is not None: # but it has been set in the json
+            spline_outlier1 = station_config['subdaily_spline_outlier1']
             print('Using spline_outlier1 from json')
 
     if spline_outlier2 is None: # not set on the command line
-        if lsp['subdaily_spline_outlier2'] is not None: # but it has been set in the json
-            spline_outlier2 = lsp['subdaily_spline_outlier2']
+        if station_config['subdaily_spline_outlier2'] is not None: # but it has been set in the json
+            spline_outlier2 = station_config['subdaily_spline_outlier2']
             print('Using spline_outlier2 from json')
 
     #create the subdaily file
