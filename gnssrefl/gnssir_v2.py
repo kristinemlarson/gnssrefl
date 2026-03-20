@@ -127,7 +127,13 @@ def gnssir_guts_v2(station, year, doy, snr_type, extension, station_config, debu
         sys.exit()
 
     screenstats = station_config['screenstats']
-    gzip = station_config['gzip']
+
+    # KML 
+    if 'gzip' in station_config.keys():
+        gzip = station_config['gzip']
+    else:
+        gzip = True
+
     dec = int(station_config.get('dec', 1))
     if dec != 1:
         print('Using decimation value: ', dec)
