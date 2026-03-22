@@ -1,6 +1,10 @@
 # Soil Moisture
 <p align=center>
 
+Note: some updates have been made to the vwc code and some of these changes may not 
+have made it into this documentation. Some of the changes are discussed [here](https://github.com/kristinemlarson/gnssrefl/pull/367)
+
+
 [Latest options for the code.](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.vwc_cl.html)
 
 <img src=https://www.kristinelarson.net/wp-content/uploads/2015/10/famousFigure.png width=500>
