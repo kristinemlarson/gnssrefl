@@ -3237,8 +3237,8 @@ def check_inputs(station,year,doy,snr_type):
         print('Year must be four characters. Exiting')
         exitSys = True
 
-    if (doy < 1) or (doy > 366):
-        print('Day of year must be bewteen 1 and 366. Exiting')
+    if (doy < 1) or (doy > dec31(year)):
+        print(f'Day of year {doy} is not valid for {year} (max {dec31(year)}). Exiting')
         exitSys = True
 
     s = snr_type

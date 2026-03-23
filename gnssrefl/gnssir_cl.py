@@ -310,6 +310,10 @@ def gnssir(station: str, year: int, doy: int, snr: int = 66, plt: bool = False, 
     if year_end is None:
         year_end = year
 
+    if doy_end > g.dec31(year_end):
+        print(f'doy_end {doy_end} is not valid for {year_end} (max {g.dec31(year_end)}). Exiting')
+        sys.exit()
+
     station_config['nooverwrite'] = nooverwrite
 
     if e1 is not None:

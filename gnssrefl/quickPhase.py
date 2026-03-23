@@ -148,6 +148,11 @@ def quickphase(station: str, year: int, doy: int, year_end: int = None, doy_end:
 
     if exitS:
         sys.exit()
+
+    if doy_end > g.dec31(year_end):
+        print(f'doy_end {doy_end} is not valid for {year_end} (max {g.dec31(year_end)}). Exiting')
+        sys.exit()
+
     if e1 is not None:
         station_config['e1'] = e1
     if e2 is not None:
