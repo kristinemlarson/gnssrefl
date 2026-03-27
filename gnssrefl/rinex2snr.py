@@ -284,10 +284,11 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                              log,rinex2_filename=r2,gzip=gzip)
                                 rnx_filename = '' # already handled
                             if archive == 'gnet':
-                                rnx_filename,foundit = g.greenland_rinex3(station9ch, year, doy,stream,srate)
+                                crnxgz,foundit = g.greenland_rinex3(station9ch, year, doy,stream,srate)
                                 if foundit:
-                                    subprocess.call(['gunzip', rnx_filename])
-                                    rnx_filename = rnx_filename[0:-3]
+                                    # this code should gunzip and convert from hatanaka
+                                    rnx_filename = g.crx2rnx(crnxgz) 
+
                             if archive == 'kadaster':
                                 rnx_filename,foundit = ch.kadaster_highrate(station9ch, year, doy,stream,dec_rate)
                             if archive == 'cddis':

@@ -7588,3 +7588,34 @@ def one_gfz_archive_to_rule_them_all(year,month,day,orbtype,hour):
 
     return filename, fdir, foundit
 
+def crx2rnx(crnx_filename):
+    """
+    Parameters
+    ----------
+    crnx_filename : str
+        name of the hatanaka compressed file. can be either 
+        gzipped or not
+
+    Returns 
+    -------
+    rnx_filename : str
+        name of the unzipped and hatanaka uncompressed file
+
+    """
+    # check to see if it is gzipped
+    if crnx_filename[-3:] == '.gz':
+        # ungzip file
+        subprocess.call(['gunzip', crnx_filename])
+        # rename file 
+        crnx_filename = crnx_filename[0:-3]
+
+    crnxpath = hatanaka_version()
+    # name of the "rnx" file
+    rnx_filename = crnx_filename[0:-3] + 'rnx'
+    # hatanaka 
+    subprocess.call([crnxpath, crnx_filename])
+    if os.path.isfile(rnx_filename):
+        print('successful conversion from crnx to rnx')
+
+    return rnx_filename
+

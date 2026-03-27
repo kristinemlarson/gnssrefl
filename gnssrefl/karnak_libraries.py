@@ -212,7 +212,10 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
             print('Download took ',np.round(s2-s1,2), ' seconds') 
         return file_name,foundit
     if archive == 'gnet':
-        foundit,file_name = g.greenland_rinex3(station9ch,year,doy,stream,srate)
+        # i think this was backward before ... 
+        # but maybe it just wasn't used 2026 3 27
+        #foundit,file_name = g.greenland_rinex3(station9ch,year,doy,stream,srate)
+        file_name,foundit  = g.greenland_rinex3(station9ch,year,doy,stream,srate)
         return foundit, file_name
 
     try:
