@@ -292,13 +292,9 @@ def bkg_highrate(station, year, month, day,stream,dec_rate,bkg,**kwargs):
             else:
                 try:
                     if timeout > 0:
-                        #print('using replace_wget')
-                        s = g.replace_wget(dirname+file_name, file_name,timeout=timeout)
+                        g.replace_wget(dirname+file_name, file_name,timeout=timeout)
                     else:
-                        # it is not getting all the files. maybe go back to wget
-                        #s = g.replace_wget(dirname+file_name, file_name)
-                        #print('using wget.download')
-                        wget.download(dirname+file_name,file_name)
+                        g.replace_wget(dirname+file_name, file_name)
                     if os.path.isfile(file_name):
                         subprocess.call(['gunzip',file_name]) # unzip
                         subprocess.call([crnxpath, crnx_name]) # hatanaka
@@ -396,7 +392,7 @@ def esp_highrate(station, year, month, day,stream,dec_rate):
     fileF = 0
     streamID  = '_' + stream + '_'
     s1 = time.time()
-    for h in range(0,23):
+    for h in range(0,24):
         # subdirectory
         ch = '{:02d}'.format(h)
         print('Hour: ', ch)
@@ -410,7 +406,7 @@ def esp_highrate(station, year, month, day,stream,dec_rate):
             print('already have ', oname)
         else:
             try:
-                wget.download(dirname+file_name,file_name)
+                g.replace_wget(dirname+file_name,file_name)
                 subprocess.call(['gunzip',file_name]) # gunzip
                 subprocess.call([crnxpath, crnx_name]) # hatanaka
                 subprocess.call(['rm',crnx_name]) # remove old file
@@ -806,7 +802,7 @@ def kadaster_highrate(station, year, doy,stream,dec_rate):
                 print('****', dirname+file_name)
                 try:
                     if not os.path.isfile(file_name):
-                        wget.download(dirname+file_name,file_name)
+                        g.replace_wget(dirname+file_name,file_name)
 
                     if os.path.isfile(file_name):
                         print('found crx')
