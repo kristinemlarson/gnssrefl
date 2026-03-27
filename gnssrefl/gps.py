@@ -7425,27 +7425,39 @@ def greenland_rinex3(station,year,doy,stream,samplerate):
         #    subprocess.call([crnxpath, filename])
         #    subprocess.call(['rm', filename])
 
-    #print('Will try to pick up BFG account information',userinfo_file)
-    if os.path.exists(userinfo_file):
-        with open(userinfo_file, 'rb') as client_info:
-            login_info = pickle.load(client_info)
-            user_id = login_info[0]
-            passport = login_info[1]
-            print('Looking for ', filename)
-            cd1 = 'lftp -c "open ftps://' + user_id + ':' + passport + serve + cyyyy + '/' + cdoy + '; get ' + gfilename + '"'
-            try:
-                subprocess.call(cd1,shell=True)
-                #if os.path.exists(gfilename):
-                #   subprocess.call(['gunzip', gfilename])
-                #if os.path.exists(filename):# decompress
-                #    subprocess.call([crnxpath, filename])
-            except:
-                print('something went wrong with access to GNET files')
+    if not os.path.exists(userinfo_file):
+        print('No GNET credentials found.')
+        print('WARNING: credentials will be stored unencrypted on disk at', userinfo_file)
+        user_id = input('GNET username: ')
+        passport = getpass.getpass('GNET password: ')
+        os.makedirs(os.path.dirname(userinfo_file), exist_ok=True)
+        with open(userinfo_file, 'wb') as f:
+            pickle.dump([user_id, passport], f)
+        print('Credentials saved.')
+
+    with open(userinfo_file, 'rb') as client_info:
+        login_info = pickle.load(client_info)
+        user_id = login_info[0]
+        passport = login_info[1]
+
+    print('Looking for ', gfilename)
+    lftp_cmd = lambda u, p: 'lftp -c "open ftps://' + u + ':' + p + serve + cyyyy + '/' + cdoy + '; get ' + gfilename + '"'
+    try:
+        result = subprocess.run(lftp_cmd(user_id, passport), shell=True, capture_output=True, text=True)
+        if 'Login failed' in result.stderr:
+            print('Login failed. Your stored credentials may be incorrect.')
+            print('WARNING: credentials will be stored unencrypted on disk at', userinfo_file)
+            user_id = input('GNET username: ')
+            passport = getpass.getpass('GNET password: ')
+            with open(userinfo_file, 'wb') as f:
+                pickle.dump([user_id, passport], f)
+            print('Credentials updated. Retrying...')
+            subprocess.run(lftp_cmd(user_id, passport), shell=True)
+    except:
+        print('something went wrong with access to GNET files')
 
     if os.path.exists(gfilename):
         found = True
-        # get rid of hatanaka compressed version
-        #subprocess.call(['rm', filename])
 
     return gfilename, found
 
