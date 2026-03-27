@@ -309,7 +309,7 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
                                 else:
                                     log.write('Will Check for the tar version')
                                     rnx_filename,foundit = ch.bkg_highrate_tar(station9ch, year, doy,
-                                                                               0,stream,dec_rate,bkg,timeout=timeout)
+                                                                               0,stream,dec_rate,bkg)
                             if archive == 'ignes':
                                 bad_day = g.cddis_restriction(year, doy,'bkg')
                                 if not bad_day:
