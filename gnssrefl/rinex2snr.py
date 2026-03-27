@@ -154,15 +154,13 @@ def run_rinex2snr(station, year, doy,  isnr, orbtype, rate,dec_rate,archive, nol
             # now it unzips if that version exists
             snre = g.snr_exist(station,year,doy,csnr)
             if snre:
+                snr_on_disk = fname + '.gz' if os.path.isfile(fname + '.gz') else fname
                 if overwrite:
                     print('SNR file exists/you requested overwriting, existing file will be deleted')
-                    if os.path.isfile(fname):
-                        os.remove(fname)
-                    if os.path.isfile(fname + '.gz'):
-                        os.remove(fname + '.gz')
+                    os.remove(snr_on_disk)
                     snre = False
                 else:
-                    print('SNR file already exists', fname, '\n')
+                    print('SNR file already exists', snr_on_disk, '\n')
             else:
                 print('SNR file does not already exist. Which means I will try to make it.')
 
@@ -443,9 +441,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
                         except OSError:
                             pass
                     else:
-                        log.write('A SNR file was created : {0:50s}  \n'.format(snrname_full))
-                        print('\nSUCCESS: SNR file was created')
-                        print(snrname_full + '\n')
                         g.store_snrfile(snrname, year, station)
                         if kwargs.get('gzip', True):
                             with open(snrname_full, 'rb') as f_in:
@@ -453,6 +448,10 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
                             with gzip_mod.open(snrname_full + '.gz', 'wb', compresslevel=6) as f_out:
                                 f_out.write(snr_data)
                             os.remove(snrname_full)
+                            snrname_full = snrname_full + '.gz'
+                        log.write('A SNR file was created : {0:50s}  \n'.format(snrname_full))
+                        print('\nSUCCESS: SNR file was created')
+                        print(snrname_full + '\n')
                 else:
                     print('No SNR file created - check error logs')
                 log.close()
@@ -510,9 +509,6 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
                         except OSError:
                             pass
                     else:
-                        log.write('A SNR file was created : {0:50s}  \n'.format(snrname_full))
-                        print('\nSUCCESS: SNR file was created')
-                        print(snrname_full + '\n')
                         g.store_snrfile(snrname, year, station)
                         if kwargs.get('gzip', True):
                             with open(snrname_full, 'rb') as f_in:
@@ -520,6 +516,10 @@ def conv2snr(year, doy, station, option, orbtype,receiverrate,dec_rate,archive,l
                             with gzip_mod.open(snrname_full + '.gz', 'wb', compresslevel=6) as f_out:
                                 f_out.write(snr_data)
                             os.remove(snrname_full)
+                            snrname_full = snrname_full + '.gz'
+                        log.write('A SNR file was created : {0:50s}  \n'.format(snrname_full))
+                        print('\nSUCCESS: SNR file was created')
+                        print(snrname_full + '\n')
 
                 else:
                     # not sure why this is made here??? wasn't it created earlier?
