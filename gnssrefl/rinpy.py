@@ -218,9 +218,6 @@ def _readheader_v3(lines):
                 for j in range(numsats):
                     sv.append(lines[i+1+j][:3])
 
-                if i < 5:
-                    print('am i here?')
-                    print(sv)
                 i += numsats+1
                 epochsatlists.append(sv)
 
@@ -289,7 +286,6 @@ def _readblocks(lines, rinexversion, header, headerlines, headerlengths, epochsa
     obstypes : dict
         Dict with observation types.
     """
-    #print(rinexversion)
     try:
         if '2.1' in rinexversion:
             return _readblocks_v21(lines, header, headerlines, headerlengths, epochsatlists, satset)
