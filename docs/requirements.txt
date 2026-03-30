@@ -1,0 +1,11 @@
+sphinx<7
+sphinx_rtd_theme
+myst_parser
+nbsphinx
+numpydoc
+sphinxcontrib-apidoc
+jupyter
+numpy
+pandas
+seaborn
+git+https://github.com/kristinemlarson/gnssrefl.git
