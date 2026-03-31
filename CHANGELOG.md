@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 4.1.2
+
+Updated yaml for readthedocs due to deprecation notice
+
 ## 4.1.1
 
 fixed bug when gzip not set in json. Default will be True

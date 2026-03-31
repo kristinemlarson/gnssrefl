@@ -7627,7 +7627,8 @@ def crx2rnx(crnx_filename):
     # hatanaka 
     subprocess.call([crnxpath, crnx_filename])
     if os.path.isfile(rnx_filename):
-        print('successful conversion from crnx to rnx')
+        print('successful conversion from crnx to rnx, so removing crnx file now')
+        subprocess.call(['rm', crnx_filename])
 
     return rnx_filename
 
