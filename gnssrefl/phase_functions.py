@@ -19,6 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 from gnssrefl.utils import str2bool, read_files_in_dir
+from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_label
 
 xdir = Path(os.environ["REFL_CODE"])
 
@@ -44,15 +45,7 @@ def get_temporal_suffix(fr, bin_hours=24, bin_offset=0, include_time=True):
         Suffix string like "_L1_6hr+0", "_L2_24hr+1", etc.
         Or just "_L1", "_L2" if include_time=False.
     """
-    # Generate frequency suffix
-    if fr == 1:
-        freq_suffix = "_L1"
-    elif fr == 2 or fr == 20:
-        freq_suffix = "_L2"  # Both L2 (fr=2) and L2C (fr=20) use L2 
-    elif fr == 5:
-        freq_suffix = "_L5"  
-    else:
-        freq_suffix = f"_freq{fr}"
+    freq_suffix = get_file_suffix(fr)
     
     if include_time:
         # Generate temporal suffix with offset
@@ -110,7 +103,7 @@ def write_track_file(track_dir, station, year, sat_num, avg_az, rows, fr, extra_
     freq_suffix = get_temporal_suffix(fr, include_time=False)
     track_file = f'{track_dir}/{station}_track_sat{sat_num:02d}_az{int(avg_az):03d}_{year}{freq_suffix}.txt'
 
-    freq_label = 'L2C' if fr == 20 else 'L1' if fr == 1 else 'L5' if fr == 5 else f'L{fr}'
+    freq_label = get_signal_label(fr)
     header_lines = [
         f"% Individual Track Data for Station {station}",
         f"% Satellite: {sat_num}, TrackAvgAz: {avg_az:.1f}, Year: {year}",
@@ -243,7 +236,7 @@ def subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours=2
     plt.figure(figsize=(10, 6))
     plt.plot(datetime_dates, phases, 'b-')
     plt.ylabel('phase (degrees)')
-    freq_name = {1: "L1", 2: "L2", 20: "L2C", 5: "L5"}.get(fr, f"freq{fr}")
+    freq_name = get_signal_label(fr)
     if bin_hours < 24:
         plt.title(f"{bin_hours}-hour {freq_name} Phase Results: {station.upper()}")
     else:
@@ -486,8 +479,7 @@ def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
 
     with open(vwcfile, 'w') as w:
         N = len(vwc_values)
-        freq_map = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}
-        freq_name = freq_map.get(fr, f"Frequency {fr}")
+        freq_name = get_signal_label(fr)
 
         w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
         w.write("% Frequency used: {0} \n".format(freq_name))
@@ -562,9 +554,7 @@ def write_rolling_vwc_output(station, vwc_data, fr, bin_hours, extension='', veg
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
     base_vwcfile = file_manager.get_file_path()
 
-    # Frequency suffix
-    freq_map = {1: "_L1", 20: "_L2", 5: "_L5"}
-    freq_suffix = freq_map.get(fr, f"_L{fr}")
+    freq_suffix = get_file_suffix(fr)
 
     vwcfile = base_vwcfile.parent / f"{station}_vwc{freq_suffix}_rolling{bin_hours}hr.txt"
 
@@ -572,8 +562,7 @@ def write_rolling_vwc_output(station, vwc_data, fr, bin_hours, extension='', veg
 
     with open(vwcfile, 'w') as w:
         N = len(vwc_values)
-        freq_name_map = {1: "L1", 2: "L2C", 20: "L2C", 5: "L5"}
-        freq_name = freq_name_map.get(fr, f"L{fr}")
+        freq_name = get_signal_label(fr)
 
         w.write(f"% Soil Moisture Results for GNSS Station {station}\n")
         w.write(f"% Frequency used: {freq_name}\n")
@@ -1427,15 +1416,7 @@ def write_avg_phase(station, fr, avg_phase, extension='', bin_hours=24, bin_offs
         print('Daily averaged phases will be written to : ', fileout)
 
     with open(fileout, 'w') as fout:
-        # Write frequency information
-        if fr == 1:
-            freq_name = "L1"
-        elif fr == 2 or fr == 20:
-            freq_name = "L2"
-        elif fr == 5:
-            freq_name = "L5"
-        else:
-            freq_name = f"freq{fr}"
+        freq_name = get_signal_label(fr)
         fout.write(f"% {freq_name} phase results for station {station.upper()}\n")
 
         # Write header based on mode

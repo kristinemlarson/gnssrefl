@@ -4,10 +4,19 @@ Central registry of GNSS frequency and constellation metadata.
 All frequency codes, wavelengths, satellite ranges, display labels, and SNR
 column mappings are defined here. Other modules should use the accessor
 functions rather than maintaining their own hardcoded lists.
+
+This module has NO dependencies on other gnssrefl modules at import time,
+so it can be safely imported from anywhere without circular import issues.
 """
 import numpy as np
 
-from gnssrefl.gps import constants, glonass_channels
+
+# Speed of light (m/s)
+_C = 299792458
+
+def _wl(freq_mhz):
+    """Wavelength in meters from frequency in MHz."""
+    return _C / (freq_mhz * 1e6)
 
 
 # ---------------------------------------------------------------------------
@@ -31,26 +40,30 @@ CONSTELLATIONS = {
 # Use get_wavelength(f, sat) for GLONASS.
 
 FREQUENCIES = {
-    1:   ('GPS',     'L1',  constants.wL1,  7),
-    2:   ('GPS',     'L2',  constants.wL2,  8),
-    20:  ('GPS',     'L2C', constants.wL2,  8),
-    5:   ('GPS',     'L5',  constants.wL5,  9),
-    101: ('GLONASS', 'L1',  None,           7),
-    102: ('GLONASS', 'L2',  None,           8),
-    201: ('Galileo', 'L1',  constants.wgL1, 7),
-    205: ('Galileo', 'L5',  constants.wgL5, 9),
-    206: ('Galileo', 'L6',  constants.wgL6, 6),
-    207: ('Galileo', 'L7',  constants.wgL7, 10),
-    208: ('Galileo', 'L8',  constants.wgL8, 11),
-    301: ('BeiDou',  'L1',  constants.wbL1, 7),
-    302: ('BeiDou',  'L2',  constants.wbL2, 8),
-    305: ('BeiDou',  'L5',  constants.wbL5, 9),
-    306: ('BeiDou',  'L6',  constants.wbL6, 6),
-    307: ('BeiDou',  'L7',  constants.wbL7, 10),
-    308: ('BeiDou',  'L8',  constants.wbL8, 11),
+    # GPS
+    1:   ('GPS',     'L1',  _wl(1575.42),     7),
+    2:   ('GPS',     'L2',  _wl(1227.60),     8),
+    20:  ('GPS',     'L2C', _wl(1227.60),     8),
+    5:   ('GPS',     'L5',  _wl(115*10.23),   9),
+    # GLONASS, FDMA so wavelength depends on satellite channel number
+    101: ('GLONASS', 'L1',  None,             7),
+    102: ('GLONASS', 'L2',  None,             8),
+    # Galileo
+    201: ('Galileo', 'L1',  _wl(1575.420),    7),
+    205: ('Galileo', 'L5',  _wl(1176.450),    9),
+    206: ('Galileo', 'L6',  _wl(1278.70),     6),
+    207: ('Galileo', 'L7',  _wl(1207.140),   10),
+    208: ('Galileo', 'L8',  _wl(1191.795),   11),
+    # BeiDou, values defined in RINEX 3
+    301: ('BeiDou',  'L1',  _wl(1575.42),     7),
+    302: ('BeiDou',  'L2',  _wl(1561.098),    8),   # B1-2
+    305: ('BeiDou',  'L5',  _wl(1176.45),     9),   # BDS-3
+    306: ('BeiDou',  'L6',  _wl(1268.52),     6),   # B3
+    307: ('BeiDou',  'L7',  _wl(1207.14),    10),   # B2b, BDS-2
+    308: ('BeiDou',  'L8',  _wl(1191.795),   11),
 }
 
-# File-naming suffixes — L2C (20) maps to '_L2' for backwards compatibility
+# File-naming suffixes. L2C (20) maps to '_L2' for backwards compatibility
 _FILE_SUFFIXES = {
     1: '_L1', 2: '_L2', 20: '_L2', 5: '_L5',
 }
@@ -96,7 +109,7 @@ def get_signal_label(f):
 
 
 def get_label(f):
-    """Return display label like 'GPS L2C' for plot titles. Replaces ftitle."""
+    """Return display label like 'GPS L2C' for plot titles."""
     entry = FREQUENCIES.get(f)
     if entry is None:
         return ''
@@ -113,11 +126,12 @@ def get_wavelength(f, sat=None):
     # GLONASS: per-satellite wavelength
     if sat is None:
         raise ValueError(f'GLONASS frequency {f} requires a satellite number')
+    from gnssrefl.gps import glonass_channels
     return glonass_channels(f, sat)
 
 
 def get_scale_factor(f, sat=None):
-    """Return wavelength/2 (the LSP scale factor cf). Drop-in for arc_scaleF."""
+    """Return wavelength/2 (the LSP scale factor cf)."""
     return get_wavelength(f, sat) / 2
 
 

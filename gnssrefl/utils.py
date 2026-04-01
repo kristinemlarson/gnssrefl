@@ -8,6 +8,7 @@ import warnings
 from enum import Enum
 from typing import get_type_hints
 from pathlib import Path
+from gnssrefl.gnss_frequencies import is_valid_frequency, all_frequencies
 
 
 def validate_input_datatypes(obj, **kwargs):
@@ -88,9 +89,8 @@ class FileManagement:
         self.file_not_found_ok = file_not_found_ok
         # Validate frequency parameter
         if frequency is not None:
-            VALID_FREQUENCIES = [1, 5, 20]
-            if frequency not in VALID_FREQUENCIES:
-                raise ValueError(f"Invalid frequency {frequency}. Valid frequencies: {VALID_FREQUENCIES}")
+            if not is_valid_frequency(frequency):
+                raise ValueError(f"Invalid frequency {frequency}. Valid frequencies: {all_frequencies()}")
         
         self.frequency = frequency
         self.extension = extension

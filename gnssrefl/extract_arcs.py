@@ -15,14 +15,13 @@ import glob
 import os
 import shutil
 import subprocess
-
 import numpy as np
 from typing import List, Tuple, Optional, Dict, Any, Union
 
 import gnssrefl.gps as g
 from gnssrefl.read_snr_files import read_snr
-from gnssrefl.utils import circular_mean_deg, circular_distance_deg
-from gnssrefl.utils import FileManagement
+from gnssrefl.utils import circular_mean_deg, circular_distance_deg, FileManagement
+from gnssrefl.gnss_frequencies import get_snr_column, get_scale_factor
 
 # Constants
 GAP_TIME_LIMIT = 600  # seconds (10 minutes)
@@ -635,7 +634,7 @@ def extract_arcs(
         seen = set()
         column_list = []
         for f in freq_list:
-            c = _get_snr_column(f)
+            c = get_snr_column(f)
             if c not in seen:
                 seen.add(c)
                 column_list.append(c)
@@ -774,7 +773,7 @@ def extract_arcs(
                     cf_key = (sat_freq, sat)
                     cf = cf_cache.get(cf_key)
                     if cf is None:
-                        cf = g.arc_scaleF(sat_freq, sat)
+                        cf = get_scale_factor(sat_freq, sat)
                         cf_cache[cf_key] = cf
 
                     metadata = _compute_arc_metadata(
@@ -843,53 +842,6 @@ def _parse_elevation_list(
 
     return [(ellist[i], ellist[i + 1]) for i in range(0, len(ellist), 2)]
 
-
-def _get_snr_column(freq: int) -> int:
-    """
-    Map frequency code to SNR column index
-
-    SNR file format:
-        1: sat, 2: ele, 3: azi, 4: seconds, 5: edot
-        6: S6, 7: S1 (L1), 8: S2 (L2/L2C), 9: S5 (L5)
-        10: S7 (E5b), 11: S8 (E5a+b)
-
-    Docs: https://gnssrefl.readthedocs.io/en/latest/pages/file_structure.html#the-snr-data-format
-
-    Parameters
-    ----------
-    freq : int
-        Frequency code (1, 2, 5, 20, 101, 102, 201, 205, 206, 207, 208, etc.)
-
-    Returns
-    -------
-    int
-        Column number (1-based) for the SNR data
-
-    Raises
-    ------
-    ValueError
-        If frequency code is not recognized
-    """
-    # L1 frequencies -> S1 column (7)
-    if freq in [1, 101, 201, 301]:
-        return 7
-    # L2/L2C frequencies -> S2 column (8)
-    elif freq in [2, 20, 102, 302]:
-        return 8
-    # L5 frequencies -> S5 column (9)
-    elif freq in [5, 205, 305]:
-        return 9
-    # E6/B3 frequencies -> S6 column (6)
-    elif freq in [206, 306]:
-        return 6
-    # E5b/B2 frequencies -> S7 column (10)
-    elif freq in [207, 307]:
-        return 10
-    # E5a+b frequencies -> S8 column (11)
-    elif freq in [208, 308]:
-        return 11
-    else:
-        raise ValueError(f"Unrecognized frequency code: {freq}")
 
 
 def check_azimuth_compliance(az_min_ele: float, azlist: List[float]) -> bool:
@@ -1116,7 +1068,7 @@ def _compute_arc_metadata(
 
     # Scale factor (wavelength/2)
     if cf is None:
-        cf = g.arc_scaleF(freq, sat)
+        cf = get_scale_factor(freq, sat)
 
     # Circular mean azimuth
     if az_avg is None:

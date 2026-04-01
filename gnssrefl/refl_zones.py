@@ -8,6 +8,7 @@ import time
 import wget
 
 import gnssrefl.gps as g
+from gnssrefl.gnss_frequencies import get_wavelength
 
 import simplekml
 
@@ -101,11 +102,8 @@ def FresnelZone(f,e,h):
 
     """
 
-# SOME GPSCONSTANTS	
-    CLIGHT = 299792458;  # speed of light, m/sec
-    FREQ = [0, 1575.42e6, 1227.6e6, 0, 0, 1176.45e6];   # GPS frequencies, Hz
-    CYCLE = CLIGHT/FREQ[f]; #  wavelength per cycle (m/cycle)
-    RAD2M = 0.5*CYCLE/np.pi; # % (m)
+    CYCLE = get_wavelength(f)  # wavelength per cycle (m/cycle)
+    RAD2M = 0.5*CYCLE/np.pi  # (m)
     erad = e*np.pi/180;
 
 # check for legal frequency later

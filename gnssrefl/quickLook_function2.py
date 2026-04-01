@@ -15,6 +15,7 @@ import gnssrefl.refraction as refr
 import gnssrefl.rinex2snr as rinex
 import gnssrefl.gnssir_v2 as gnssir_v2
 import gnssrefl.read_snr_files as snr
+from gnssrefl.gnss_frequencies import get_label
 from gnssrefl.utils import FileManagement
 
 
@@ -295,9 +296,9 @@ def quickLook_function(station, year, doy, snr_type,f,e1,e2,minH,maxH,reqAmp,pel
         g.set_subdir(station)
         # where plots will go
         fdir = os.environ['REFL_CODE'] + '/Files/' + station 
-        #tt = 'GNSS-IR: ' + station.upper() + ' Freq:' + g.ftitle(f) + ' Year/DOY:' + str(year) + ',' + str(doy) + ' elev: ' + str(e1) + '-' +  str(e2)
+        #tt = 'GNSS-IR: ' + station.upper() + ' Freq:' + get_label(f) + ' Year/DOY:' + str(year) + ',' + str(doy) + ' elev: ' + str(e1) + '-' +  str(e2)
         # kristine uses fstrings!
-        tt = f'GNSS-IR: {station.upper()} Freq: {g.ftitle(f)} Year/DOY: {year:04d},{doy:03d} elev:{e1} -{e2}'
+        tt = f'GNSS-IR: {station.upper()} Freq: {get_label(f)} Year/DOY: {year:04d},{doy:03d} elev:{e1} -{e2}'
         fig.suptitle(tt, fontsize=FS)
         # if you have no results, no point plotting them!
         if hires_figs:
@@ -373,8 +374,8 @@ def goodbad(fname,station,year,doy,h1,h2,PkNoise,reqAmp,freq,e1,e2,hires_figs):
     plt.plot(a[ij,0], a[ij,1], 'o',color='blue',label='good')
     plt.plot(a[ik,0], a[ik,1], 'o',color='gray', label='bad')
     ydoy = ' ' + str(year) + '/' + str(doy) + ' '
-    #print(freq, g.ftitle(freq))
-    plt.title('quickLook Retrieval Metrics: ' + station + ' Freq:' + g.ftitle(freq) + ydoy + ' elev:' + str(e1) + '-' + str(e2) ,fontsize=fs)
+    #print(freq, get_label(freq))
+    plt.title('quickLook Retrieval Metrics: ' + station + ' Freq:' + get_label(freq) + ydoy + ' elev:' + str(e1) + '-' + str(e2) ,fontsize=fs)
     plt.legend(loc="upper right")
     plt.ylabel('Refl. Ht. (m)',fontsize=fs)
     plt.grid()
