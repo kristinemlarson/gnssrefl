@@ -123,7 +123,11 @@ def _readheader_v21x(lines):
 
     while i < len(lines):
         if pattern.match(lines[i][:6]):  # then it's the first line in a header record
-            if int(lines[i][28]) in (0, 1, 6):  # CHECK EPOCH FLAG  STATUS
+            try:
+                epochflag = int(lines[i][28])
+            except IndexError:
+                break  # truncated epoch header, stop parsing
+            if epochflag in (0, 1, 6):  # CHECK EPOCH FLAG  STATUS
                 headerlines.append(i)
                 year, month, day, hour = lines[i][1:3], lines[i][4:6], lines[i][7:9], lines[i][10:12]
                 minute, second = lines[i][13:15], lines[i][16:26]
@@ -155,9 +159,8 @@ def _readheader_v21x(lines):
                 i += numsats*rowpersat+1
 
             else:  # there was a comment or some header info
-                flag = int(lines[i][28])
-                if flag != 4:
-                    print(flag)
+                if epochflag != 4:
+                    print(epochflag)
                 skip = int(lines[i][30:32])
                 i += skip+1
         else:
@@ -352,8 +355,12 @@ def _readblocks_v21(lines, header, headerlines, headerlengths, epochsatlists, sa
     prntoidx = {}
     obstypes = {}
 
+    # skip malformed satellite entries from truncated epoch headers
     for sat in satset:
-        satlists[sat[0]].append(int(sat[1:]))
+        try:
+            satlists[sat[0]].append(int(sat[1:]))
+        except (IndexError, ValueError):
+            continue
 
     for letter in systemletters:
         satlists[letter].sort()
