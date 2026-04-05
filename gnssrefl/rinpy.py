@@ -367,13 +367,17 @@ def _readblocks_v21(lines, header, headerlines, headerlengths, epochsatlists, sa
     parse = fieldstruct.unpack_from
     _float = float  # local ref avoids global lookup
 
-    # Pre-pad only data lines as bytes (skip file header and epoch headers)
+    # Pre-pad only data lines as bytes (skip file header and epoch headers).
+    # try/except guards allow graceful handling of broken/truncated epochs.
     padded = [None] * len(lines)
     for headerstart, headerlength, satlist in zip(headerlines, headerlengths, epochsatlists):
         datastart = headerstart + headerlength
         end = datastart + rowpersat * len(satlist)
-        for k in range(datastart, end):
-            padded[k] = lines[k].rstrip().ljust(80).encode('ascii')
+        try:
+            for k in range(datastart, end):
+                padded[k] = lines[k].rstrip().ljust(80).encode('ascii')
+        except IndexError:
+            pass
 
     blank = b'              '  # 14 spaces — blank observation field
     _nan = np.nan
@@ -382,10 +386,10 @@ def _readblocks_v21(lines, header, headerlines, headerlengths, epochsatlists, sa
         datastart = headerstart + headerlength
         for i, sat in enumerate(satlist):
             start = datastart + rowpersat * i
-            databytes = b''.join(padded[start:start + rowpersat])
             try:
+                databytes = b''.join(padded[start:start + rowpersat])
                 fields = parse(databytes)
-            except struct.error:
+            except (struct.error, TypeError):
                 continue
 
             # List comprehension runs in optimized C bytecode vs explicit for loop
