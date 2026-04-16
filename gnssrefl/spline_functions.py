@@ -315,7 +315,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     #    print('For L2, only use L2c ')
 
     # get the list
-    l2clist,l5list = l2c_l5_list(year,doy)
+    l2clist,l5list = g.l2c_l5_list(year,doy)
     # convert SNR to linear scale (from dB-Hz)
     snrdata[:, 4] = 10 ** (snrdata[:, 4] / 20)
     if lspfigs:
@@ -1574,39 +1574,6 @@ def simpleLSP(rhlims, lcar, precision,elvt, sinelvt, snrdt,sat,xsignal,screensta
     if screenstats and (not bad):
         fout.write("{0:5.2f} {1:5.2f} {2:5.1f} {3:3.0f} {4:s} \n".format(maxF, maxAmp,peak2noise, sat, xsignal))
     return maxF, maxAmp, peak2noise
-
-def l2c_l5_list(year,doy):
-    """
-    for given year and day of year, returns a satellite list of
-    L2C and L5 transmitting satellites
-
-    to update this numpy array, the data are stored in a simple triple of PRN number, launch year,
-    and launch date.
-    author: kristine larson
-    date: march 27, 2021
-    june 24, 2021: updated for SVN78
-
-    this should point to gps.py
-
-    """
-
-    # this numpy array
-    l2c=np.array([[1 ,2011 ,290], [3 ,2014 ,347], [4 ,2018 ,357], [5 ,2008 ,240],
-        [6 ,2014 ,163], [7 ,2008 ,85], [8 ,2015 ,224], [9 ,2014 ,258], [10 ,2015 ,343],
-        [11, 2021, 168],
-        [12 ,2006 ,300], [14 ,2020 ,310], [15 ,2007 ,285], [17 ,2005 ,270],
-        [18 ,2019 ,234], [23 ,2020 ,182], [24 ,2012 ,319], [25 ,2010 ,240],
-        [26 ,2015 ,111], [27 ,2013 ,173], [29 ,2007 ,355], [30 ,2014 ,151], [31 ,2006 ,270], [32 ,2016 ,36]])
-    # indices that meet your criteria
-    ij=(l2c[:,1] + l2c[:,2]/365.25) < (year + doy/365.25)
-    l2csatlist = l2c[ij,0]
-    firstL5 = 2010 + 148/365.25 # launch may 28, 2010  - some delay before becoming healthy
-
-    newlist = l2c[ij,:]
-    ik= (newlist[:,1] + newlist[:,2]/365.25) > firstL5
-    l5satlist = newlist[ik,0]
-
-    return l2csatlist, l5satlist
 
 def save_lsp_results(datet,maxind,reflh_sub,sat,elvt,azit,pgram_sub,snrdt,pktn,isignal):
     """
