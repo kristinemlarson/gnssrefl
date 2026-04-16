@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 from gnssrefl.utils import str2bool, read_files_in_dir
-from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_label
+from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_label, get_wavelength
 
 xdir = Path(os.environ["REFL_CODE"])
 
@@ -687,7 +687,7 @@ def test_func(x, a, b, rh_apriori):
     """
     This is least squares for estimating a sine wave given a fixed frequency, freqLS
     """
-    freq_least_squares = 2*np.pi*2*rh_apriori/g.constants.wL2
+    freq_least_squares = 2*np.pi*2*rh_apriori/get_wavelength(2)
     return a * np.sin(freq_least_squares * x + b)
 
 def test_func_new(x, a, b, rh_apriori,freq):
@@ -705,16 +705,11 @@ def test_func_new(x, a, b, rh_apriori,freq):
         phase  - estimated
     rh_apriori : float
         reflector height (m)
-    freq : int 
+    freq : int
         frequency
 
     """
-    if (freq == 20) or (freq == 2):
-        freq_least_squares = 2*np.pi*2*rh_apriori/g.constants.wL2
-    elif freq == 5:
-        freq_least_squares = 2*np.pi*2*rh_apriori/g.constants.wL5
-    else:
-        freq_least_squares = 2*np.pi*2*rh_apriori/g.constants.wL1
+    freq_least_squares = 2*np.pi*2*rh_apriori/get_wavelength(freq)
 
     return a * np.sin(freq_least_squares * x + b)
 

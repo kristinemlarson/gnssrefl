@@ -18,6 +18,7 @@ import time
 # my local functions
 import gnssrefl.gps as g
 import gnssrefl.refraction as refr
+from gnssrefl.gnss_frequencies import get_wavelength, glonass_channels, signal_label_to_freq
 
 
 def make_wavelength_column(nr,snrdata,signal):
@@ -193,41 +194,6 @@ def readklsnrtxt(snrfile, thedir, signal):
     #snrdata[:, 3] = snrdata[:, 3] + gbase
 
     return snrdata
-
-def glonasswlen(prn, signal):
-    """
-    Given PRN, returns glonass wavelength
-
-    Parameters
-    ----------
-    prn : integer
-        satellite number
-    signal : string
-         L1 or L2 for glonass
-
-    Returns
-    -------
-    wavelength : float
-        wavelength for the given signal
-
-    """
-    channel = [1, -4, 5, 6, 1, -4, 5, 6, -2, -7, 0, -1, -2, -7, 0, -1, 4, -3, 3, 2, 4, -3, 3, 2]
-    offset = 101  # 101 onwards is glonass
-    try:
-        channel_t = np.array([channel[i-offset] for i in prn], dtype=float)
-    except TypeError:
-        channel_t = channel[prn-offset]
-    if signal == 'L1':
-        lcar = g.constants.c / (1602e06 + channel_t * 0.5625e06)
-        #lcar = 299792458 / (1602e06 + channel_t * 0.5625e06)
-    elif signal == 'L2':
-        lcar = g.constants.c / (1246e06 + channel_t * 0.4375e06)
-        #lcar = 299792458. / (1246e06 + channel_t * 0.4375e06)
-    else:
-        #print('signal not recognised')
-        lcar = np.nan
-    return lcar
-
 
 def datetime2gps(dt):
     """
@@ -451,31 +417,20 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
             sfilter = (first_tempd[:, 5] == isignal)
             tempd = first_tempd[sfilter]
 
-            # this is still the same ....  
-            # use the constants in gps.py
-            # 22feb09 add beidou
-            if np.logical_or(sat < 100, np.logical_and(sat > 200, sat < 300)):
-                if xsignal == 'L1':
-                    lcar = g.constants.wL1
-                elif xsignal == 'L2':
-                    lcar = g.constants.wL2
-                elif xsignal == 'L5':
-                    lcar = g.constants.wL5
-                # these are for galileo, should not have this in the GPS loop - 
-                # but will be lazy here because of how it was originally written
-                elif xsignal == 'L6':
-                    lcar = g.constants.wgL6
-                elif xsignal == 'L7':
-                    lcar = g.constants.wgL7
-            elif np.logical_and(sat > 100, sat < 200):
-                lcar = glonasswlen(int(sat), xsignal)
-            elif np.logical_and(sat > 300, sat < 400):# beidou
-                if xsignal == 'L2':
-                    lcar = g.constants.wbL2
-                if xsignal == 'L6':
-                    lcar = g.constants.wbL6
-                if xsignal == 'L7':
-                    lcar = g.constants.wbL7
+            if sat < 100:
+                satc = 'G'
+            elif sat < 200:
+                satc = 'R'
+            elif sat < 300:
+                satc = 'E'
+            else:
+                satc = 'C'
+
+            if satc == 'R':
+                freq_code = 101 if xsignal == 'L1' else 102
+                lcar = glonass_channels(freq_code, int(sat))
+            else:
+                lcar = get_wavelength(signal_label_to_freq(satc, xsignal))
 
             # this restricts to L2C satellite but only if requested.
             # this does not mean the file has L2C data in it however.  unfortunately
@@ -1289,45 +1244,24 @@ def signal2list(signal):
     return signal_list
 
 
-def satfreq2waveL(satc, xsignal,fsatnos):
+def satfreq2waveL(satc, xsignal, fsatnos):
     """
     given satellite constellation ('G', 'E' ...)
     xsignal ('L1','L2' ...)
     satnos (satellite numbers)
     2022feb09 added Beidou.
     """
-    if (satc == 'G'):
-        if (xsignal == 'L1'):
-            lcar = g.constants.wL1
-        elif (xsignal == 'L2'):
-            lcar = g.constants.wL2
-        elif (xsignal == 'L5'):
-            lcar = g.constants.wL5
-    elif satc == 'R':
+    if satc == 'R':
         if xsignal == 'L5':
             lcar = np.nan
         else:
+            freq_code = 101 if xsignal == 'L1' else 102
             satnos = np.array(fsatnos, dtype=int)
-            lcar = glonasswlen(satnos, xsignal)
-    elif (satc == 'E'):
-        if xsignal == 'L1':
-            lcar = g.constants.wL1
-        elif xsignal == 'L2':
-            lcar = np.nan
-        elif xsignal == 'L5':
-            lcar = g.constants.wL5
-        # added galileo l6,l7
-        elif xsignal == 'L6':
-            lcar = g.constants.wgL6
-        elif xsignal == 'L7':
-            lcar = g.constants.wgL7
-    elif (satc == 'C'):
-        if xsignal == 'L2':
-            lcar = g.constants.wbL2
-        if xsignal == 'L6':
-            lcar = g.constants.wbL6
-        if xsignal == 'L7':
-            lcar = g.constants.wbL7
+            lcar = np.array([glonass_channels(freq_code, s) for s in satnos])
+    elif satc == 'E' and xsignal == 'L2':
+        lcar = np.nan
+    else:
+        lcar = get_wavelength(signal_label_to_freq(satc, xsignal))
 
     return lcar
 

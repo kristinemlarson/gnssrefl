@@ -111,6 +111,16 @@ FILE_SUFFIXES = {
     1: '_L1', 2: '_L2', 20: '_L2', 5: '_L5',
 }
 
+# Reverse index: (constellation_char, signal_label) -> frequency code.
+# Constellation chars follow RINEX convention: G=GPS, R=GLONASS, E=Galileo, C=BeiDou.
+CONSTELLATION_CHARS = {
+    'GPS': 'G', 'GLONASS': 'R', 'Galileo': 'E', 'BeiDou': 'C',
+}
+SIGNAL_TO_FREQ = {}
+for _code, (_cons, _label, _wl, _col) in FREQUENCIES.items():
+    _char = CONSTELLATION_CHARS[_cons]
+    SIGNAL_TO_FREQ[(_char, _label)] = _code
+
 # ---------------------------------------------------------------------------
 # Accessor functions
 # ---------------------------------------------------------------------------
@@ -202,3 +212,26 @@ def get_file_suffix(f):
     if f in FILE_SUFFIXES:
         return FILE_SUFFIXES[f]
     return f'_freq{f}'
+
+
+def signal_label_to_freq(constellation_char, signal_label):
+    """Return the frequency code for a RINEX constellation char and signal label.
+
+    Parameters
+    ----------
+    constellation_char : str
+        Single RINEX char: 'G' (GPS), 'R' (GLONASS), 'E' (Galileo), 'C' (BeiDou)
+    signal_label : str
+        Signal label like 'L1', 'L2', 'L5', 'L6', 'L7', 'L8', 'L2C'
+
+    Returns
+    -------
+    int
+        Frequency code (e.g. 1, 20, 205, 302)
+
+    Raises
+    ------
+    KeyError
+        If the (constellation_char, signal_label) pair is not recognized
+    """
+    return SIGNAL_TO_FREQ[(constellation_char, signal_label)]
