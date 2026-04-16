@@ -12,11 +12,54 @@ import numpy as np
 
 
 # Speed of light (m/s)
-_C = 299792458
+C = 299792458
 
-def _wl(freq_mhz):
+def wl(freq_mhz):
     """Wavelength in meters from frequency in MHz."""
-    return _C / (freq_mhz * 1e6)
+    return C / (freq_mhz * 1e6)
+
+
+def glonass_channels(f, prn):
+    """
+    Retrieves appropriate wavelength for a given GLONASS satellite.
+
+    GLONASS uses FDMA so each satellite transmits on a slightly different
+    frequency determined by its channel number.
+
+    Parameters
+    ----------
+    f : int
+        frequency (101 or 102)
+    prn : int
+        satellite number
+
+    Returns
+    -------
+    l : float
+        wavelength for GLONASS satellite in meters
+
+    logic from Simon Williams, copied from gps.py in v4.1.2
+    """
+    if (prn > 100):
+        prn = prn - 100
+    lightSpeed = 299792458
+    slot = [14,15,10,20,19,13,12,1,6,5,22,23,24,16,4,8,3,7,2,18,21,9,17,11]
+    channel = [-7,0,-7,2,3,-2,-1,1,-4,1,-3,3,2,-1,6,6,5,5,-4,-3,4,-2,4,0]
+    slot = np.array(slot)
+    channel = np.array(channel)
+    L1 = 1602e6
+    L2 = 1246e6
+    dL1 = 0.5625e6
+    dL2 = 0.4375e6
+
+    ch = channel[(slot == prn)]
+    ch = int(ch.item())
+    l = 0.0
+    if (f == 101):
+        l = lightSpeed/(L1 + ch*dL1)
+    if (f == 102):
+        l = lightSpeed/(L2 + ch*dL2)
+    return l
 
 
 # ---------------------------------------------------------------------------
@@ -41,30 +84,30 @@ CONSTELLATIONS = {
 
 FREQUENCIES = {
     # GPS
-    1:   ('GPS',     'L1',  _wl(1575.42),     7),
-    2:   ('GPS',     'L2',  _wl(1227.60),     8),
-    20:  ('GPS',     'L2C', _wl(1227.60),     8),
-    5:   ('GPS',     'L5',  _wl(115*10.23),   9),
+    1:   ('GPS',     'L1',  wl(1575.42),     7),
+    2:   ('GPS',     'L2',  wl(1227.60),     8),
+    20:  ('GPS',     'L2C', wl(1227.60),     8),
+    5:   ('GPS',     'L5',  wl(115*10.23),   9),
     # GLONASS, FDMA so wavelength depends on satellite channel number
     101: ('GLONASS', 'L1',  None,             7),
     102: ('GLONASS', 'L2',  None,             8),
     # Galileo
-    201: ('Galileo', 'L1',  _wl(1575.420),    7),
-    205: ('Galileo', 'L5',  _wl(1176.450),    9),
-    206: ('Galileo', 'L6',  _wl(1278.70),     6),
-    207: ('Galileo', 'L7',  _wl(1207.140),   10),
-    208: ('Galileo', 'L8',  _wl(1191.795),   11),
+    201: ('Galileo', 'L1',  wl(1575.420),    7),
+    205: ('Galileo', 'L5',  wl(1176.450),    9),
+    206: ('Galileo', 'L6',  wl(1278.70),     6),
+    207: ('Galileo', 'L7',  wl(1207.140),   10),
+    208: ('Galileo', 'L8',  wl(1191.795),   11),
     # BeiDou, values defined in RINEX 3
-    301: ('BeiDou',  'L1',  _wl(1575.42),     7),
-    302: ('BeiDou',  'L2',  _wl(1561.098),    8),   # B1-2
-    305: ('BeiDou',  'L5',  _wl(1176.45),     9),   # BDS-3
-    306: ('BeiDou',  'L6',  _wl(1268.52),     6),   # B3
-    307: ('BeiDou',  'L7',  _wl(1207.14),    10),   # B2b, BDS-2
-    308: ('BeiDou',  'L8',  _wl(1191.795),   11),
+    301: ('BeiDou',  'L1',  wl(1575.42),     7),
+    302: ('BeiDou',  'L2',  wl(1561.098),    8),   # B1-2
+    305: ('BeiDou',  'L5',  wl(1176.45),     9),   # BDS-3
+    306: ('BeiDou',  'L6',  wl(1268.52),     6),   # B3
+    307: ('BeiDou',  'L7',  wl(1207.14),    10),   # B2b, BDS-2
+    308: ('BeiDou',  'L8',  wl(1191.795),   11),
 }
 
 # File-naming suffixes. L2C (20) maps to '_L2' for backwards compatibility
-_FILE_SUFFIXES = {
+FILE_SUFFIXES = {
     1: '_L1', 2: '_L2', 20: '_L2', 5: '_L5',
 }
 
@@ -126,7 +169,6 @@ def get_wavelength(f, sat=None):
     # GLONASS: per-satellite wavelength
     if sat is None:
         raise ValueError(f'GLONASS frequency {f} requires a satellite number')
-    from gnssrefl.gps import glonass_channels
     return glonass_channels(f, sat)
 
 
@@ -157,6 +199,6 @@ def get_sat_list(f):
 
 def get_file_suffix(f):
     """Return file naming suffix like '_L2', '_L1'. Non-GPS uses '_freq{f}'."""
-    if f in _FILE_SUFFIXES:
-        return _FILE_SUFFIXES[f]
+    if f in FILE_SUFFIXES:
+        return FILE_SUFFIXES[f]
     return f'_freq{f}'

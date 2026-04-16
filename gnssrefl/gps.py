@@ -1839,50 +1839,6 @@ def find_satlist_wdate(f,snrExist,year,doy):
 
 
 
-def glonass_channels(f,prn):
-    """
-    Retrieves appropriate wavelength for a given Glonass satellite
-
-    Parameters
-    ----------
-    f : int
-        frequency( 101 or 102)
-    prn : int
-        satellite number
-
-    Returns
-    -------
-    l : float
-        wavelength for glonass satellite in meters
-
-    logic from Simon Williams 
-    """
-#   we define glonass by adding 100.  remove this for definition of the wavelength
-    if (prn > 100):
-        prn = prn - 100
-    lightSpeed = 299792458
-    slot = [14,15,10,20,19,13,12,1,6,5,22,23,24,16,4,8,3,7,2,18,21,9,17,11]
-    channel = [-7,0,-7,2,3,-2,-1,1,-4,1,-3,3,2,-1,6,6,5,5,-4,-3,4,-2,4,0]
-    slot = np.array(slot)
-    channel = np.array(channel)
-#   main frequencies
-    L1 = 1602e6
-    L2 = 1246e6
-#   deltas
-    dL1 = 0.5625e6
-    dL2 = 0.4375e6
-
-    ch = channel[(slot == prn)]
-    ch = int(ch.item())
-#   wavelengths in meters
-#    print(prn,ch,f)
-    l = 0.0
-    if (f == 101):
-        l = lightSpeed/(L1 + ch*dL1)
-    if (f == 102):
-        l = lightSpeed/(L2 + ch*dL2)
-    return l
-
 def open_outputfile(station,year,doy,extension):
     """
     opens an output file in 
