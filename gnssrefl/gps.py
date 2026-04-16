@@ -51,55 +51,12 @@ from gnssrefl.gnss_frequencies import is_valid_frequency, get_scale_factor, get_
 #import urllib.request
 
 
-# various numbers you need in the GNSS world
-# mostly frequencies and wavelengths
+# Physical constants used by orbit/timing math.
+# GNSS frequency and wavelength data lives in gnss_frequencies.py.
 class constants:
-    c= 299792458 # speed of light m/sec
-#   GPS frequencies and wavelengths
-    fL1 = 1575.42 # MegaHz 154*10.23
-    fL2 = 1227.60 # 120*10.23
-    fL5 = 115*10.23 # L5
-#  GPS wavelengths
-    wL1 = c/(fL1*1e6) # meters wavelength
-    wL2 = c/(fL2*1e6)
-    wL5 = c/(fL5*1e6)
-#   galileo frequency values
-    gal_L1 = 1575.420
-    gal_L5 = 1176.450
-    gal_L6 = 1278.70
-    gal_L7 = 1207.140
-    gal_L8 = 1191.795
-#  galileo wavelengths, meters
-    wgL1 = c/(gal_L1*1e6)
-    wgL5 = c/(gal_L5*1e6)
-    wgL6 = c/(gal_L6*1e6)
-    wgL7 = c/(gal_L7*1e6)
-    wgL8 = c/(gal_L8*1e6)
-
-#   beidou frequencies and wavelengths
-#   these values are defined in Rinex 3 
-
-    bei_L2 = 1561.098 # B1-2
-    bei_L7 = 1207.14 # B2b, BDS-2
-    bei_L6 = 1268.52 # B3
-
-
-    wbL2 = c/(bei_L2*1e6)
-    wbL6 = c/(bei_L6*1e6)
-    wbL7 = c/(bei_L7*1e6)
-
-    bei_L5 = 1176.45 # BDS-3
-    wbL5 = c/(bei_L5*1e6)
-
-    bei_L1 = 1575.42
-    wbL1 = c/(bei_L1*1e6)
-
-    bei_L8 = 1191.795
-    wbL8 = c/(bei_L8*1e6)
-
-#   Earth rotation rate used in GPS Nav message
-    omegaEarth = 7.2921151467E-5 #	%rad/sec
-    mu = 3.986005e14 # Earth GM value
+    c = 299792458             # speed of light, m/sec
+    omegaEarth = 7.2921151467E-5  # Earth rotation rate, rad/sec
+    mu = 3.986005e14          # Earth GM value
 
 
 class wgs84:
