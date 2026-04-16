@@ -76,10 +76,20 @@ CONSTELLATIONS = {
 # ---------------------------------------------------------------------------
 # Frequency registry
 # ---------------------------------------------------------------------------
+# Signal labels (L1, L2, L5, L6, L7, L8) follow the RINEX 3 frequency-band
+# numbering convention. For each constellation, the physical frequency the
+# band number maps to is given in:
+#
+#   RINEX 3.05 §5.2.17 "Observation codes", Tables 14-20
+#   https://files.igs.org/pub/data/format/rinex305.pdf
+#
+# Code 20 ('L2C') is the modernized GPS civilian signal on the L2 band;
+# code 2 is the legacy L2 P-code. Both transmit at 1227.60 MHz.
+#
 # Key:   integer frequency code used throughout gnssrefl
 # Value: (constellation, signal_label, wavelength_m, snr_column)
 #
-# GLONASS wavelengths are per-satellite; stored as None here.
+# GLONASS wavelengths are per-satellite (FDMA); stored as None here.
 # Use get_wavelength(f, sat) for GLONASS.
 
 FREQUENCIES = {
