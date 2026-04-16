@@ -116,11 +116,6 @@ FREQUENCIES = {
     308: ('BeiDou',  'L8',  wl(1191.795),   11),
 }
 
-# File-naming suffixes. L2C (20) maps to '_L2' for backwards compatibility
-FILE_SUFFIXES = {
-    1: '_L1', 2: '_L2', 20: '_L2', 5: '_L5',
-}
-
 # Reverse index: (constellation_char, signal_label) -> frequency code.
 # Constellation chars follow RINEX convention: G=GPS, R=GLONASS, E=Galileo, C=BeiDou.
 CONSTELLATION_CHARS = {
@@ -218,10 +213,13 @@ def get_sat_list(f):
 
 
 def get_file_suffix(f):
-    """Return file naming suffix like '_L2', '_L1'. Non-GPS uses '_freq{f}'."""
-    if f in FILE_SUFFIXES:
-        return FILE_SUFFIXES[f]
-    return f'_freq{f}'
+    """Return file naming suffix like '_G_L1', '_E_L7', '_C_L5'.
+
+    Format is '_<constellation_char>_<signal_label>' using the RINEX 3
+    constellation chars (G/R/E/C) and band labels (L1/L2/L2C/L5/L6/L7/L8).
+    """
+    cons, label, _, _ = FREQUENCIES[f]
+    return f'_{CONSTELLATION_CHARS[cons]}_{label}'
 
 
 def signal_label_to_freq(constellation_char, signal_label):
