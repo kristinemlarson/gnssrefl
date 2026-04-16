@@ -21,7 +21,7 @@ from typing import List, Tuple, Optional, Dict, Any, Union
 import gnssrefl.gps as g
 from gnssrefl.read_snr_files import read_snr
 from gnssrefl.utils import circular_mean_deg, circular_distance_deg, FileManagement
-from gnssrefl.gnss_frequencies import get_snr_column, get_scale_factor
+from gnssrefl.gnss_frequencies import get_snr_column, get_scale_factor, get_file_suffix
 
 # Constants
 GAP_TIME_LIMIT = 600  # seconds (10 minutes)
@@ -277,22 +277,16 @@ def attach_vwc_track_results(arcs, station, year, doy, extension='',
 
 
 def _get_arc_filename(sdir, sat, freq, az_min_ele, arc_timestamp):
-    """Build deterministic arc filename from metadata."""
+    """Build deterministic arc filename from metadata.
+
+    Suffix follows the registry convention _<C>_<label> shared with
+    phaseRH/VWC/track files (e.g. _G_L1, _G_L2C, _E_L7).
+    """
     csat = f'{sat:03d}'
-    if freq < 100:
-        constell = 'G'; fout = freq
-    elif freq < 200:
-        constell = 'R'; fout = freq - 100
-    elif freq < 300:
-        constell = 'E'; fout = freq - 200
-    else:
-        constell = 'C'; fout = freq - 300
-    cf = '_L2_' if freq == 20 else f'_L{fout}_'
-    cf += constell
     hh = int(arc_timestamp) % 24
     mm = int((arc_timestamp % 1) * 60)
     ctime = f'{hh:02d}{mm:02d}z'
-    return f'{sdir}sat{csat}{cf}_az{round(az_min_ele):03d}_{ctime}.txt'
+    return f'{sdir}sat{csat}{get_file_suffix(freq)}_az{round(az_min_ele):03d}_{ctime}.txt'
 
 
 def _write_arc_file(fname, data, meta, station, year, doy, savearcs_format='txt'):
