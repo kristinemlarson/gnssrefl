@@ -45,7 +45,7 @@ import gnssrefl.rinex2snr as rnx
 import gnssrefl.sd_libs as sd
 import gnssrefl.kelly as kelly
 import gnssrefl.utils as u
-from gnssrefl.gnss_frequencies import is_valid_frequency, get_scale_factor, get_label, CONSTELLATIONS
+from gnssrefl.gnss_frequencies import is_valid_frequency, get_scale_factor, get_display_label, CONSTELLATIONS
 
 # for future ref
 #import urllib.request
@@ -2999,7 +2999,7 @@ def update_quick_plot(station, f):
     plt.xlabel('reflector height (m)'); plt.title('SNR periodogram')
     plt.subplot(211)
     plt.xlabel('elev Angles (deg)')
-    plt.title(station + ' SNR Data/' + get_label(f) + ' Frequency')
+    plt.title(station + ' SNR Data/' + get_display_label(f) + ' Frequency')
 
     return True
 

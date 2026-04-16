@@ -15,7 +15,7 @@ from importlib.metadata import version
 
 import gnssrefl.gps as g
 import gnssrefl.retrieve_rh as r
-from gnssrefl.gnss_frequencies import get_sat_list, get_label, get_scale_factor, is_valid_frequency
+from gnssrefl.gnss_frequencies import get_sat_list, get_display_label, get_scale_factor, is_valid_frequency
 from gnssrefl.utils import FileManagement, FileTypes
 
 def gnssir_guts_v2(station, year, doy, snr_type, extension, station_config, debug):
@@ -225,7 +225,7 @@ def plot2screen(station, f,ax1,ax2,pltname):
     ax1.set_xlabel('Elevation Angles (deg)')
     ax1.grid(True, linestyle='-')
     ax2.grid(True, linestyle='-')
-    ax1.set_title(station + ' SNR Data/' + get_label(f) + ' Frequency')
+    ax1.set_title(station + ' SNR Data/' + get_display_label(f) + ' Frequency')
     plt.show()
 
     return True

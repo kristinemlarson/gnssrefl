@@ -18,7 +18,7 @@ import time
 # my local functions
 import gnssrefl.gps as g
 import gnssrefl.refraction as refr
-from gnssrefl.gnss_frequencies import get_wavelength, glonass_channels, signal_label_to_freq
+from gnssrefl.gnss_frequencies import get_wavelength, get_glonass_wavelength, signal_label_to_freq
 
 
 def make_wavelength_column(nr,snrdata,signal):
@@ -428,7 +428,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
 
             if satc == 'R':
                 freq_code = 101 if xsignal == 'L1' else 102
-                lcar = glonass_channels(freq_code, int(sat))
+                lcar = get_glonass_wavelength(freq_code, int(sat))
             else:
                 lcar = get_wavelength(signal_label_to_freq(satc, xsignal))
 
@@ -1257,7 +1257,7 @@ def satfreq2waveL(satc, xsignal, fsatnos):
         else:
             freq_code = 101 if xsignal == 'L1' else 102
             satnos = np.array(fsatnos, dtype=int)
-            lcar = np.array([glonass_channels(freq_code, s) for s in satnos])
+            lcar = np.array([get_glonass_wavelength(freq_code, s) for s in satnos])
     elif satc == 'E' and xsignal == 'L2':
         lcar = np.nan
     else:

@@ -19,47 +19,41 @@ def wl(freq_mhz):
     return C / (freq_mhz * 1e6)
 
 
-def glonass_channels(f, prn):
-    """
-    Retrieves appropriate wavelength for a given GLONASS satellite.
-
-    GLONASS uses FDMA so each satellite transmits on a slightly different
-    frequency determined by its channel number.
+def get_glonass_channel(prn):
+    """Return the FDMA channel number for a GLONASS satellite.
 
     Parameters
     ----------
-    f : int
-        frequency (101 or 102)
     prn : int
-        satellite number
+        satellite number (slot, 1-24, with or without the 100-offset)
 
     Returns
     -------
-    l : float
-        wavelength for GLONASS satellite in meters
+    int
+        channel number in the range -7..+6
 
-    logic from Simon Williams, copied from gps.py in v4.1.2
+    Slot-to-channel mapping is fixed per GLONASS satellite assignment.
+    Logic from Simon Williams, copied from gps.py in v4.1.2.
     """
-    if (prn > 100):
+    if prn > 100:
         prn = prn - 100
-    lightSpeed = 299792458
-    slot = [14,15,10,20,19,13,12,1,6,5,22,23,24,16,4,8,3,7,2,18,21,9,17,11]
-    channel = [-7,0,-7,2,3,-2,-1,1,-4,1,-3,3,2,-1,6,6,5,5,-4,-3,4,-2,4,0]
-    slot = np.array(slot)
-    channel = np.array(channel)
-    L1 = 1602e6
-    L2 = 1246e6
-    dL1 = 0.5625e6
-    dL2 = 0.4375e6
+    slot = np.array([14,15,10,20,19,13,12,1,6,5,22,23,24,16,4,8,3,7,2,18,21,9,17,11])
+    channel = np.array([-7,0,-7,2,3,-2,-1,1,-4,1,-3,3,2,-1,6,6,5,5,-4,-3,4,-2,4,0])
+    return int(channel[slot == prn].item())
 
-    ch = channel[(slot == prn)]
-    ch = int(ch.item())
-    l = 0.0
-    if (f == 101):
-        l = lightSpeed/(L1 + ch*dL1)
-    if (f == 102):
-        l = lightSpeed/(L2 + ch*dL2)
-    return l
+
+def get_glonass_wavelength(f, prn):
+    """Return GLONASS wavelength in meters for frequency code f and satellite prn.
+
+    GLONASS uses FDMA so each satellite transmits on a slightly different
+    carrier determined by its channel number. f is 101 (G1) or 102 (G2).
+    """
+    ch = get_glonass_channel(prn)
+    if f == 101:
+        return C / (1602e6 + ch * 0.5625e6)
+    if f == 102:
+        return C / (1246e6 + ch * 0.4375e6)
+    return 0.0
 
 
 # ---------------------------------------------------------------------------
@@ -121,10 +115,10 @@ FREQUENCIES = {
 CONSTELLATION_CHARS = {
     'GPS': 'G', 'GLONASS': 'R', 'Galileo': 'E', 'BeiDou': 'C',
 }
-SIGNAL_TO_FREQ = {}
-for _code, (_cons, _label, _wl, _col) in FREQUENCIES.items():
-    _char = CONSTELLATION_CHARS[_cons]
-    SIGNAL_TO_FREQ[(_char, _label)] = _code
+SIGNAL_TO_FREQ = {
+    (CONSTELLATION_CHARS[constellation], label): code
+    for code, (constellation, label, _, _) in FREQUENCIES.items()
+}
 
 # ---------------------------------------------------------------------------
 # Accessor functions
@@ -138,16 +132,6 @@ def is_valid_frequency(f):
 def all_frequencies():
     """Return sorted list of all valid frequency codes."""
     return sorted(FREQUENCIES.keys())
-
-
-def gps_default_frequencies():
-    """Default GPS-only frequency list for gnssir_input."""
-    return [1, 20, 5]
-
-
-def all_default_frequencies():
-    """All-constellation default frequency list for gnssir_input -allfreq."""
-    return [f for f in sorted(FREQUENCIES.keys()) if f != 2]
 
 
 def get_constellation(f):
@@ -166,7 +150,7 @@ def get_signal_label(f):
     return entry[1]
 
 
-def get_label(f):
+def get_display_label(f):
     """Return display label like 'GPS L2C' for plot titles."""
     entry = FREQUENCIES.get(f)
     if entry is None:
@@ -184,7 +168,7 @@ def get_wavelength(f, sat=None):
     # GLONASS: per-satellite wavelength
     if sat is None:
         raise ValueError(f'GLONASS frequency {f} requires a satellite number')
-    return glonass_channels(f, sat)
+    return get_glonass_wavelength(f, sat)
 
 
 def get_scale_factor(f, sat=None):
@@ -243,3 +227,20 @@ def signal_label_to_freq(constellation_char, signal_label):
         If the (constellation_char, signal_label) pair is not recognized
     """
     return SIGNAL_TO_FREQ[(constellation_char, signal_label)]
+
+
+# ---------------------------------------------------------------------------
+# Default frequency selections (used by gnssir_input)
+# ---------------------------------------------------------------------------
+
+def gps_default_frequencies():
+    """Default GPS-only frequency list for gnssir_input."""
+    return [1, 20, 5]
+
+
+def all_default_frequencies():
+    """All-constellation default frequency list for gnssir_input -allfreq.
+
+    GPS L2 P-code (code 2) is excluded; we prefer L2C (code 20).
+    """
+    return [f for f in sorted(FREQUENCIES.keys()) if f != 2]

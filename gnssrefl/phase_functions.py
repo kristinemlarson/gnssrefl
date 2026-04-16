@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 from gnssrefl.utils import str2bool, read_files_in_dir
-from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_label, get_wavelength
+from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_wavelength
 
 xdir = Path(os.environ["REFL_CODE"])
 
