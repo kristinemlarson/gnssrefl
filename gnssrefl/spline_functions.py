@@ -430,7 +430,12 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
                 freq_code = 101 if xsignal == 'L1' else 102
                 lcar = get_glonass_wavelength(freq_code, int(sat))
             else:
-                lcar = get_wavelength(signal_label_to_freq(satc, xsignal))
+                try:
+                    lcar = get_wavelength(signal_label_to_freq(satc, xsignal))
+                except KeyError:
+                    # (constellation, signal) pair has no physical signal
+                    # (e.g. Galileo L2, GPS L6); skip via the isnan guard below.
+                    lcar = np.nan
 
             # this restricts to L2C satellite but only if requested.
             # this does not mean the file has L2C data in it however.  unfortunately
@@ -1258,10 +1263,12 @@ def satfreq2waveL(satc, xsignal, fsatnos):
             freq_code = 101 if xsignal == 'L1' else 102
             satnos = np.array(fsatnos, dtype=int)
             lcar = np.array([get_glonass_wavelength(freq_code, s) for s in satnos])
-    elif satc == 'E' and xsignal == 'L2':
-        lcar = np.nan
     else:
-        lcar = get_wavelength(signal_label_to_freq(satc, xsignal))
+        try:
+            lcar = get_wavelength(signal_label_to_freq(satc, xsignal))
+        except KeyError:
+            # (constellation, signal) pair has no physical signal (e.g. Galileo L2, GPS L6).
+            lcar = np.nan
 
     return lcar
 
