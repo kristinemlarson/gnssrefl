@@ -118,58 +118,99 @@ class TestJSONFileHandling:
 
 class TestAprioriRHFileHandling:
     """Test apriori RH file path resolution and frequency handling."""
-    
-    def test_apriori_rh_l2_default(self, temp_refl_code):
-        """Test apriori RH path for L2 (default frequency)."""
+
+    def test_apriori_rh_l2c_default(self, temp_refl_code):
+        """L2C (fr=20) uses the registry suffix _G_L2C."""
         fm = FileManagement("TEST", "apriori_rh_file", frequency=20)
         path = fm.get_file_path()
-        expected = temp_refl_code / "input" / "TEST" / "TEST_phaseRH_L2.txt"
+        expected = temp_refl_code / "input" / "TEST" / "TEST_phaseRH_G_L2C.txt"
         assert path == expected
-    
+
     def test_apriori_rh_l1(self, temp_refl_code):
-        """Test apriori RH path for L1 frequency."""
+        """L1 (fr=1) uses the registry suffix _G_L1."""
         fm = FileManagement("TEST", "apriori_rh_file", frequency=1)
         path = fm.get_file_path()
-        expected = temp_refl_code / "input" / "TEST" / "TEST_phaseRH_L1.txt"
+        expected = temp_refl_code / "input" / "TEST" / "TEST_phaseRH_G_L1.txt"
         assert path == expected
-    
+
     def test_apriori_rh_l5(self, temp_refl_code):
-        """Test apriori RH path for L5 frequency (experimental)."""
+        """L5 (fr=5) uses the registry suffix _G_L5."""
         fm = FileManagement("TEST", "apriori_rh_file", frequency=5)
         path = fm.get_file_path()
-        expected = temp_refl_code / "input" / "TEST" / "TEST_phaseRH_L5.txt"
+        expected = temp_refl_code / "input" / "TEST" / "TEST_phaseRH_G_L5.txt"
         assert path == expected
-    
+
+    def test_apriori_rh_non_gps(self, temp_refl_code):
+        """Non-GPS constellations get their own suffix (e.g. Galileo L1 -> _E_L1)."""
+        fm = FileManagement("TEST", "apriori_rh_file", frequency=201)
+        path = fm.get_file_path()
+        expected = temp_refl_code / "input" / "TEST" / "TEST_phaseRH_E_L1.txt"
+        assert path == expected
+
     def test_apriori_rh_with_extension(self, temp_refl_code):
-        """Test apriori RH path with extension."""
+        """Extension is inserted as a subdirectory; filename still uses registry suffix."""
         fm = FileManagement("TEST", "apriori_rh_file", frequency=20, extension="custom")
         path = fm.get_file_path()
-        expected = temp_refl_code / "input" / "TEST" / "custom" / "TEST_phaseRH_L2.txt"
+        expected = temp_refl_code / "input" / "TEST" / "custom" / "TEST_phaseRH_G_L2C.txt"
         assert path == expected
-    
-    def test_apriori_rh_legacy_fallback_l2(self, temp_refl_code):
-        """Test apriori RH fallback to legacy L2 format."""
-        # Create legacy L2 file (no frequency suffix for backwards compatibility)
-        legacy_path = temp_refl_code / "input" / "TEST_phaseRH.txt"
-        legacy_path.write_text("# Legacy L2 data")
-        
+
+    def test_apriori_rh_preregistry_fallback_l2c(self, temp_refl_code):
+        """Pre-registry station-dir _phaseRH_L2.txt is still discoverable."""
+        station_dir = temp_refl_code / "input" / "TEST"
+        station_dir.mkdir()
+        preregistry_path = station_dir / "TEST_phaseRH_L2.txt"
+        preregistry_path.write_text("# pre-registry L2C data")
+
         fm = FileManagement("TEST", "apriori_rh_file", frequency=20)
         found_path, format_type = fm.find_apriori_rh_file()
-        
-        assert found_path == legacy_path
-        assert format_type == 'legacy'
-    
-    def test_apriori_rh_legacy_fallback_l1(self, temp_refl_code):
-        """Test apriori RH fallback to legacy L1 format."""
-        # Create legacy L1 file
-        legacy_path = temp_refl_code / "input" / "TEST_phaseRH_L1.txt"
-        legacy_path.write_text("# Legacy L1 data")
-        
+        assert found_path == preregistry_path
+        assert format_type == 'preregistry'
+
+    def test_apriori_rh_preregistry_fallback_l1(self, temp_refl_code):
+        """Pre-registry station-dir _phaseRH_L1.txt is still discoverable."""
+        station_dir = temp_refl_code / "input" / "TEST"
+        station_dir.mkdir()
+        preregistry_path = station_dir / "TEST_phaseRH_L1.txt"
+        preregistry_path.write_text("# pre-registry L1 data")
+
         fm = FileManagement("TEST", "apriori_rh_file", frequency=1)
         found_path, format_type = fm.find_apriori_rh_file()
-        
+        assert found_path == preregistry_path
+        assert format_type == 'preregistry'
+
+    def test_apriori_rh_legacy_root_fallback_l2(self, temp_refl_code):
+        """Legacy root _phaseRH.txt (no suffix, implicitly L2C) still resolves."""
+        legacy_path = temp_refl_code / "input" / "TEST_phaseRH.txt"
+        legacy_path.write_text("# Legacy L2 data")
+
+        fm = FileManagement("TEST", "apriori_rh_file", frequency=20)
+        found_path, format_type = fm.find_apriori_rh_file()
         assert found_path == legacy_path
         assert format_type == 'legacy'
+
+    def test_apriori_rh_legacy_root_fallback_l1(self, temp_refl_code):
+        """Legacy root _phaseRH_L1.txt still resolves."""
+        legacy_path = temp_refl_code / "input" / "TEST_phaseRH_L1.txt"
+        legacy_path.write_text("# Legacy L1 data")
+
+        fm = FileManagement("TEST", "apriori_rh_file", frequency=1)
+        found_path, format_type = fm.find_apriori_rh_file()
+        assert found_path == legacy_path
+        assert format_type == 'legacy'
+
+    def test_apriori_rh_new_format_beats_preregistry(self, temp_refl_code):
+        """When both new-format and pre-registry files exist, new format wins."""
+        station_dir = temp_refl_code / "input" / "TEST"
+        station_dir.mkdir()
+        preregistry_path = station_dir / "TEST_phaseRH_L2.txt"
+        preregistry_path.write_text("# pre-registry")
+        new_path = station_dir / "TEST_phaseRH_G_L2C.txt"
+        new_path.write_text("# new format")
+
+        fm = FileManagement("TEST", "apriori_rh_file", frequency=20)
+        found_path, format_type = fm.find_apriori_rh_file()
+        assert found_path == new_path
+        assert format_type == 'new_format'
 
 
 class TestPhaseFileHandling:
@@ -324,31 +365,23 @@ class TestBackwardsCompatibility:
 
 
 class TestFrequencyMapping:
-    """Test frequency to suffix mapping logic."""
-    
+    """Test frequency-to-suffix mapping via gnss_frequencies.get_file_suffix."""
+
     def test_frequency_mapping_consistency(self, temp_refl_code):
-        """Test that frequency mapping is consistent across file types."""
-        # L2C (20) should map to L2
+        """Registry suffix is applied consistently across frequencies."""
         fm_l2c = FileManagement("TEST", "apriori_rh_file", frequency=20)
-        path_l2c = fm_l2c._get_apriori_rh_path()
-        assert "L2" in str(path_l2c)
-        
-        # L1 (1) should map to L1
+        assert str(fm_l2c._get_apriori_rh_path()).endswith("_phaseRH_G_L2C.txt")
+
         fm_l1 = FileManagement("TEST", "apriori_rh_file", frequency=1)
-        path_l1 = fm_l1._get_apriori_rh_path()
-        assert "L1" in str(path_l1)
-        
-        # L5 (5) should map to L5
+        assert str(fm_l1._get_apriori_rh_path()).endswith("_phaseRH_G_L1.txt")
+
         fm_l5 = FileManagement("TEST", "apriori_rh_file", frequency=5)
-        path_l5 = fm_l5._get_apriori_rh_path()
-        assert "L5" in str(path_l5)
-    
+        assert str(fm_l5._get_apriori_rh_path()).endswith("_phaseRH_G_L5.txt")
+
     def test_default_frequency_handling(self, temp_refl_code):
-        """Test default frequency handling when none specified."""
-        fm = FileManagement("TEST", "apriori_rh_file")  # No frequency specified
-        path = fm._get_apriori_rh_path()
-        # Should default to L2
-        assert "L2" in str(path)
+        """When no frequency is given, default is L2C (matches pre-registry default)."""
+        fm = FileManagement("TEST", "apriori_rh_file")
+        assert str(fm._get_apriori_rh_path()).endswith("_phaseRH_G_L2C.txt")
 
 
 class TestSNRFileResolution:
