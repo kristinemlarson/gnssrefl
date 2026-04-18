@@ -16,6 +16,7 @@ import os
 import shutil
 import subprocess
 import numpy as np
+from numpy.polynomial import Polynomial
 from typing import List, Tuple, Optional, Dict, Any, Union
 
 import gnssrefl.gps as g
@@ -987,17 +988,18 @@ def remove_dc_component(
     if not dbhz:
         data = np.power(10, (data / 20))
 
-    # Fit polynomial on pele range if provided, otherwise full arc
+    # Fit polynomial on pele range if provided, otherwise full arc.
+    # Polynomial.fit internally maps x to [-1, 1] before fitting, which keeps
+    # the Vandermonde matrix well-conditioned and avoids numpy RankWarning.
     if pele is not None:
         pele_mask = (ele >= pele[0]) & (ele <= pele[1])
         if np.sum(pele_mask) > polyV + 1:
-            model = np.polyfit(ele[pele_mask], data[pele_mask], polyV)
+            poly = Polynomial.fit(ele[pele_mask], data[pele_mask], polyV)
         else:
-            model = np.polyfit(ele, data, polyV)
+            poly = Polynomial.fit(ele, data, polyV)
     else:
-        model = np.polyfit(ele, data, polyV)
-    fit = np.polyval(model, ele)
-    data = data - fit
+        poly = Polynomial.fit(ele, data, polyV)
+    data = data - poly(ele)
 
     return data
 
