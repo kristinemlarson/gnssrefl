@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 4.1.3
+
+April 20, 2026
+
+Minor changes to documentation. sent out gnssrefl email list 
+explanation of changes in past few years.
+
+Will be adding [new PR](https://github.com/kristinemlarson/gnssrefl/pull/403) that governs frequency definitions. 
+
 ## 4.1.2
 
 Updated yaml for readthedocs due to deprecation notice
@@ -25,9 +34,7 @@ Fixing bugs in prev install for Rinex 3 reader
 
 Streamlining everywhere
 
-Details
-
-https://github.com/kristinemlarson/gnssrefl/pull/387
+[Details](https://github.com/kristinemlarson/gnssrefl/pull/387)
 
 ## 4.0.1
 March 11, 2026

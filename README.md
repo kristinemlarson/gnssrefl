@@ -1,12 +1,36 @@
-# gnssrefl v4.1.2
+# gnssrefl v4.1.3
 
 gnssrefl is an open source software package for GNSS Interferometric Reflectometry (GNSS-IR). 
 
-**We have moved to python 3.10 for people making their own installs!** This should have no impact on docker users.
+**News**
 
-**George Townsend** recently removed the hidden Fortran code used for the orbit calculations and RINEX reading.
-RINEX 3 is now read directly instead of using the gfzrnx utility which converted everything to RINEX 2.11. 
-He has also added a faster Lomb Scargle periodogram calculator. You may still use the slow one if you prefer (PR 379)
+gnssrefl releases from v4.0.0+ are focused on modernizing the package code to improve maintainability, 
+consistency, and performance (up to 5x faster).  Specifically, changes since v3.19.2 (17th Feb 2026) 
+
+* The default Lomb-Scargle Periodogram backend has changed from SciPy to AstroPy, which is more efficient 
+but introduces absolute difference in RH on the order of ~ 1mm. Use -lsp_method scipy to use the 
+old method, which produces identical results to previous versions. 
+
+* FORTRAN compilation/meson is no longer required to install the package
+
+* gfzrnx binary is no longer required to process RINEX 3 files, which increases speed.
+
+* A new arc extraction module (extract_arcs) allows efficient loading of raw dSNR 
+data / processing results from a user-facing Python API
+
+* gnssir and phase processing will now automatically load data from previous/next 
+days to avoid arcs truncating at the midnight boundary (optional, previously disabled by default) - most days gain a few observations
+
+* Improve track identification in phase processing- most stations will gain a few new tracks
+
+* Add refraction correction to phase processing - dSNR data now aligned with gnssir
+
+* If you make your own install, we require you use python versions >= 3.10. 
+
+* Added the lsp_method parameter in the station json, gnssir_input, and gnssir. Options are 'fast' 
+(default) or 'scipy'. With -lsp_method scipy the RH estimates are identical to previous versions.
+
+Thanks to George Townsend for all his work on these changes.
 
 **All questions must be posted as an [issue](https://github.com/kristinemlarson/gnssrefl/issues).**
 This allows tracking of community usage and allows others to benefit if they have the same question. It also
