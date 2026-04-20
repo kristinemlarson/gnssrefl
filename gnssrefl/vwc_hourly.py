@@ -26,6 +26,7 @@ from pathlib import Path
 
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
+from gnssrefl.gnss_frequencies import get_file_suffix
 from gnssrefl.utils import str2bool, FileManagement
 from gnssrefl.vwc_cl import vwc
 
@@ -80,14 +81,7 @@ def combine_offset_files_to_vwc_data(station, fr, bin_hours, extension=''):
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
     base_vwc_path = file_manager.get_file_path()
 
-    if fr == 20:
-        freq_suffix = "_L2"
-    elif fr == 1:
-        freq_suffix = "_L1"
-    elif fr == 5:
-        freq_suffix = "_L5"
-    else:
-        freq_suffix = f"_L{fr}"
+    freq_suffix = get_file_suffix(fr)
 
     # Read all offset VWC files to combine
     for offset in range(bin_hours):
@@ -236,14 +230,7 @@ def plot_hourly_vs_daily_vwc(station, fr, bin_hours, extension=''):
     Requires both daily and hourly VWC files to exist.
     """
 
-    if fr == 20:
-        freq_suffix = "_L2"
-    elif fr == 1:
-        freq_suffix = "_L1"
-    elif fr == 5:
-        freq_suffix = "_L5"
-    else:
-        freq_suffix = f"_L{fr}"
+    freq_suffix = get_file_suffix(fr)
 
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
     base_vwc_path = file_manager.get_file_path()

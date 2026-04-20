@@ -45,60 +45,18 @@ import gnssrefl.rinex2snr as rnx
 import gnssrefl.sd_libs as sd
 import gnssrefl.kelly as kelly
 import gnssrefl.utils as u
+from gnssrefl.gnss_frequencies import is_valid_frequency, get_scale_factor, get_display_label, CONSTELLATIONS
 
 # for future ref
 #import urllib.request
 
 
-# various numbers you need in the GNSS world
-# mostly frequencies and wavelengths
+# Physical constants used by orbit/timing math.
+# GNSS frequency and wavelength data lives in gnss_frequencies.py.
 class constants:
-    c= 299792458 # speed of light m/sec
-#   GPS frequencies and wavelengths
-    fL1 = 1575.42 # MegaHz 154*10.23
-    fL2 = 1227.60 # 120*10.23
-    fL5 = 115*10.23 # L5
-#  GPS wavelengths
-    wL1 = c/(fL1*1e6) # meters wavelength
-    wL2 = c/(fL2*1e6)
-    wL5 = c/(fL5*1e6)
-#   galileo frequency values
-    gal_L1 = 1575.420
-    gal_L5 = 1176.450
-    gal_L6 = 1278.70
-    gal_L7 = 1207.140
-    gal_L8 = 1191.795
-#  galileo wavelengths, meters
-    wgL1 = c/(gal_L1*1e6)
-    wgL5 = c/(gal_L5*1e6)
-    wgL6 = c/(gal_L6*1e6)
-    wgL7 = c/(gal_L7*1e6)
-    wgL8 = c/(gal_L8*1e6)
-
-#   beidou frequencies and wavelengths
-#   these values are defined in Rinex 3 
-
-    bei_L2 = 1561.098 # B1-2
-    bei_L7 = 1207.14 # B2b, BDS-2
-    bei_L6 = 1268.52 # B3
-
-
-    wbL2 = c/(bei_L2*1e6)
-    wbL6 = c/(bei_L6*1e6)
-    wbL7 = c/(bei_L7*1e6)
-
-    bei_L5 = 1176.45 # BDS-3
-    wbL5 = c/(bei_L5*1e6)
-
-    bei_L1 = 1575.42
-    wbL1 = c/(bei_L1*1e6)
-
-    bei_L8 = 1191.795
-    wbL8 = c/(bei_L8*1e6)
-
-#   Earth rotation rate used in GPS Nav message
-    omegaEarth = 7.2921151467E-5 #	%rad/sec
-    mu = 3.986005e14 # Earth GM value
+    c = 299792458             # speed of light, m/sec
+    omegaEarth = 7.2921151467E-5  # Earth rotation rate, rad/sec
+    mu = 3.986005e14          # Earth GM value
 
 
 class wgs84:
@@ -108,34 +66,6 @@ class wgs84:
     a = 6378137. # meters Earth radius
     f  =  1./298.257223563 # flattening factor
     e = np.sqrt(2*f-f**2) # 
-
-def is_it_legal(freq):
-    """
-    checks whether the frequency list set by the user in gnssir is legal
-
-    Parameters
-    ----------
-    freq : list of integers
-        frequencies you want to check
-
-    Returns:
-    --------
-    legal : bool
-        whether it is legal or not
-    """
-    # currently allowed
-    legal_list = [1,2,20,5,101,102,201,205,206,207,208,302,306,307]
-    # new list as of May 10 ,2025, adding more Beidou
-    legal_list = [1,2,20,5,101,102,201,205,206,207,208,302,306,307,301,305,308]
-    # assume legal
-    legal = True
-
-    for f in freq:
-        if f not in legal_list:
-            print('This is not a legal gnssrefl frequency:', f)
-            legal = False
-
-    return legal
 
 def myfavoriteobs():
     """
@@ -1629,7 +1559,7 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
     #if (f == 208):
         dat = s8
 #   get the scaling factor for this frequency and satellite number
-    cf = arc_scaleF(f,satNu)
+    cf = get_scale_factor(f, satNu)
 
 #   if not, frequency does not exist, will be tripped by Nv
 #   this does remove the direct signal component - but gets you ready to do that
@@ -1750,68 +1680,6 @@ def window_data(s1,s2,s5,s6,s7,s8, sat,ele,azi,seconds,edot,f,az1,az2,e1,e2,satN
 
     return x,y,Nvv,cf,meanTime,avgAzim,outFact1, outFact2, delT
 
-def arc_scaleF(f,satNu):
-    """
-    calculates LSP scale factor cf , the wavelength divided by 2
-
-    Parameters
-    --------
-    f : integer
-        satellite frequency
-    satNu : integer
-        satellite number (1-400)
-
-    Returns
-    -------
-    cf : float
-        GNSS wavelength/2 (meters)
-
-    """ 
-#   default value for w so that if someone inputs an illegal frequency, it does not crash
-    w = 0
-    if f == 1:
-        w = constants.wL1
-    if (f == 2) or (f == 20):
-        w = constants.wL2
-    if f == 5:
-        w = constants.wL5
-#   galileo satellites
-#   must be a smarter way to do this
-    if (f > 200) and (f < 210):
-        if (f == 201):
-            w = constants.wgL1
-        if (f == 205):
-            w = constants.wgL5
-        if (f == 206):
-            w = constants.wgL6
-        if (f == 207):
-            w = constants.wgL7
-        if (f == 208):
-            w = constants.wgL8
-#
-#   add beidou 18oct15
-#  i am confused about this ...
-# added more beidou 2025 may 10
-    if (f > 300) and (f < 310):
-        if (f == 301):
-            w = constants.wbL1
-        if (f == 302):
-            w = constants.wbL2
-        if (f == 305):
-            w = constants.wbL5
-        if (f == 306):
-            w = constants.wbL6
-        if (f == 307):
-            w = constants.wbL7
-        if (f == 308):
-            w = constants.wbL8
-
-#   glonass satellite frequencies
-    if (f == 101) or (f == 102):
-        w = glonass_channels(f,satNu) 
-    cf = w/2
-    return cf 
-
 def freq_out(x,ofac,hifac):
     """
 
@@ -1927,50 +1795,6 @@ def find_satlist_wdate(f,snrExist,year,doy):
     return satlist
 
 
-
-def glonass_channels(f,prn):
-    """
-    Retrieves appropriate wavelength for a given Glonass satellite
-
-    Parameters
-    ----------
-    f : int
-        frequency( 101 or 102)
-    prn : int
-        satellite number
-
-    Returns
-    -------
-    l : float
-        wavelength for glonass satellite in meters
-
-    logic from Simon Williams 
-    """
-#   we define glonass by adding 100.  remove this for definition of the wavelength
-    if (prn > 100):
-        prn = prn - 100
-    lightSpeed = 299792458
-    slot = [14,15,10,20,19,13,12,1,6,5,22,23,24,16,4,8,3,7,2,18,21,9,17,11]
-    channel = [-7,0,-7,2,3,-2,-1,1,-4,1,-3,3,2,-1,6,6,5,5,-4,-3,4,-2,4,0]
-    slot = np.array(slot)
-    channel = np.array(channel)
-#   main frequencies
-    L1 = 1602e6
-    L2 = 1246e6
-#   deltas
-    dL1 = 0.5625e6
-    dL2 = 0.4375e6
-
-    ch = channel[(slot == prn)]
-    ch = int(ch.item())
-#   wavelengths in meters
-#    print(prn,ch,f)
-    l = 0.0
-    if (f == 101):
-        l = lightSpeed/(L1 + ch*dL1)
-    if (f == 102):
-        l = lightSpeed/(L2 + ch*dL2)
-    return l
 
 def open_outputfile(station,year,doy,extension):
     """
@@ -2167,10 +1991,14 @@ def print_file_stats(ele,sat,s1,s2,s5,s6,s7,s8,e1,e2):
     s2 
 
     """
-    gps = ele[(sat > 0) & (sat < 33) & (ele < e2) ]
-    glonass = ele[(sat > 100) & (sat < 125) & (ele < e2) ]
-    beidou = ele[(sat > 300) & (sat < 340) & (ele < e2) ]
-    galileo = ele[(sat > 200) & (sat < 240) & (ele < e2) ]
+    gps_r = CONSTELLATIONS['GPS']['sat_range']
+    glo_r = CONSTELLATIONS['GLONASS']['sat_range']
+    gal_r = CONSTELLATIONS['Galileo']['sat_range']
+    bei_r = CONSTELLATIONS['BeiDou']['sat_range']
+    gps = ele[(sat >= gps_r[0]) & (sat < gps_r[1]) & (ele < e2)]
+    glonass = ele[(sat >= glo_r[0]) & (sat < glo_r[1]) & (ele < e2)]
+    galileo = ele[(sat >= gal_r[0]) & (sat < gal_r[1]) & (ele < e2)]
+    beidou = ele[(sat >= bei_r[0]) & (sat < bei_r[1]) & (ele < e2)]
     print('GPS     obs ', len(gps) )
     print('Glonass obs ', len(glonass))
     print('Galileo obs ', len(galileo))
@@ -3128,7 +2956,7 @@ def update_quick_plot(station, f):
     plt.xlabel('reflector height (m)'); plt.title('SNR periodogram')
     plt.subplot(211)
     plt.xlabel('elev Angles (deg)')
-    plt.title(station + ' SNR Data/' + ftitle(f) + ' Frequency') 
+    plt.title(station + ' SNR Data/' + get_display_label(f) + ' Frequency')
 
     return True
 
@@ -4405,48 +4233,6 @@ def check_environ_variables():
             print(env_var, ' not found, so set to current directory')
             os.environ[env_var] = '.'
 
-
-def ftitle(freq):
-    """
-    makes a frequency title for plots 
-
-    Parameters
-    ----------
-    freq : int
-        GNSS frequency
-
-    Returns
-    -------
-    returnf : str
-        nice string for the constellation/frequency for the title of a plot
-    """
-    f=str(freq)
-    out = {}
-    out['1'] = 'GPS L1'
-    out['2'] = 'GPS L2'
-    out['20'] = 'GPS L2C'
-    out['5'] = 'GPS L5'
-    out['101'] = 'Glonass L1'
-    out['102'] = 'Glonass L2'
-
-    out['201'] = 'Galileo L1'
-    out['205'] = 'Galileo L5'
-    out['206'] = 'Galileo L6'
-    out['207'] = 'Galileo L7'
-    out['208'] = 'Galileo L8'
-
-    out['301'] = 'Beidou L1'
-    out['302'] = 'Beidou L2'
-    out['305'] = 'Beidou L5'
-    out['306'] = 'Beidou L6'
-    out['307'] = 'Beidou L7'
-    out['308'] = 'Beidou L8'
-    if freq not in [1,2, 20,5,101,102,201,205,206,207,208,301,302,305,306,307,308]:
-        returnf = ''
-    else:
-        returnf = out[f]
-
-    return returnf 
 
 def cdate2nums(col1):
     """

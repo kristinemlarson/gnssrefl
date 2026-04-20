@@ -8,6 +8,7 @@ import warnings
 from enum import Enum
 from typing import get_type_hints
 from pathlib import Path
+from gnssrefl.gnss_frequencies import is_valid_frequency, all_frequencies, get_file_suffix
 
 
 def validate_input_datatypes(obj, **kwargs):
@@ -88,9 +89,8 @@ class FileManagement:
         self.file_not_found_ok = file_not_found_ok
         # Validate frequency parameter
         if frequency is not None:
-            VALID_FREQUENCIES = [1, 5, 20]
-            if frequency not in VALID_FREQUENCIES:
-                raise ValueError(f"Invalid frequency {frequency}. Valid frequencies: {VALID_FREQUENCIES}")
+            if not is_valid_frequency(frequency):
+                raise ValueError(f"Invalid frequency {frequency}. Valid frequencies: {all_frequencies()}")
         
         self.frequency = frequency
         self.extension = extension
@@ -172,68 +172,77 @@ class FileManagement:
         else:
             raise ValueError("The file type you requested does not exist")
 
-    def _get_apriori_rh_path(self):
-        """
-        Generate apriori RH file paths with station/extension directory structure.
-        
-        Directory structure:
-        - No extension: input/{station}/{station}_phaseRH_L{freq}.txt
-        - With extension: input/{station}/{extension}/{station}_phaseRH_L{freq}.txt
-        
-        Fallback for legacy files in input/ root directory.
-        """
-        # Determine base directory with station/extension structure
+    def _apriori_rh_base_dir(self):
+        """Station-scoped input directory, optionally suffixed with an extension."""
         base_dir = self.xdir / "input" / self.station
         if self.extension:
             base_dir = base_dir / self.extension
-        
-        # Generate clean filename (extension handled by directory structure)
-        if self.frequency is None:
-            # Default to L2 if no frequency specified
-            freq_suffix = "L2"
-        elif self.frequency == 20:
-            freq_suffix = "L2"  # Map L2C (20) to clean L2 naming
-        else:
-            freq_suffix = f"L{self.frequency}"
-        
-        filename = f"{self.station}_phaseRH_{freq_suffix}.txt"
-        
-        return base_dir / filename
+        return base_dir
+
+    def _preregistry_apriori_rh_suffix(self):
+        """Pre-registry suffix scheme: L1/L2/L5, with L2C (fr=20) aliased to L2."""
+        fr = self.frequency
+        if fr == 1:
+            return "_L1"
+        if fr == 5:
+            return "_L5"
+        # None, 2, 20 all mapped to "_L2" in the old scheme
+        return "_L2"
+
+    def _get_apriori_rh_path(self):
+        """
+        Generate the canonical apriori RH file path using the frequency registry.
+
+        Directory structure:
+        - No extension: input/{station}/{station}_phaseRH<suffix>.txt
+        - With extension: input/{station}/{extension}/{station}_phaseRH<suffix>.txt
+
+        Suffix comes from gnss_frequencies.get_file_suffix (e.g. '_G_L2C', '_E_L1'),
+        matching the convention used by VWC and track files.
+        """
+        freq_code = self.frequency if self.frequency is not None else 20
+        filename = f"{self.station}_phaseRH{get_file_suffix(freq_code)}.txt"
+        return self._apriori_rh_base_dir() / filename
 
     def find_apriori_rh_file(self):
         """
         Find apriori RH file with backwards compatibility fallback.
-        
+
         Search order:
-        1. New format: input/{station}/[{extension}/]{station}_phaseRH_L{freq}.txt
-        2. Legacy fallback: input/{station}_phaseRH[_L1|_L5].txt (L2 has no suffix)
-        
-        Returns:
-            tuple: (Path, str) - (file_path, format_type)
-                format_type: 'new_format', 'legacy'
+        1. New (registry) format: input/{station}/[{ext}/]{station}_phaseRH_<C>_<label>.txt
+        2. Pre-registry station-dir format: input/{station}/[{ext}/]{station}_phaseRH_L{1,2,5}.txt
+        3. Legacy root format: input/{station}_phaseRH[_L1|_L5].txt (L2 has no suffix)
+
+        Returns
+        -------
+        tuple of (Path, str)
+            (file_path, format_type) where format_type is one of
+            'new_format', 'preregistry', 'legacy'.
         """
-        # Try new format first
         new_path = self._get_apriori_rh_path()
         if new_path.exists():
             return new_path, 'new_format'
-        
-        # Try legacy format fallback in root input/ directory
+
+        # Pre-registry station-dir names (L2C aliased to _L2)
+        preregistry_path = self._apriori_rh_base_dir() / f"{self.station}_phaseRH{self._preregistry_apriori_rh_suffix()}.txt"
+        if preregistry_path.exists():
+            return preregistry_path, 'preregistry'
+
+        # Legacy root format: input/{station}_phaseRH[_L1|_L5].txt
         base_dir = self.xdir / "input"
-        
         if self.frequency == 1:
             legacy_path = base_dir / f"{self.station}_phaseRH_L1.txt"
-        elif self.frequency == 20 or self.frequency is None:
-            # L2C legacy has no frequency suffix for backwards compatibility
+        elif self.frequency in (20, 2) or self.frequency is None:
             legacy_path = base_dir / f"{self.station}_phaseRH.txt"
         elif self.frequency == 5:
             legacy_path = base_dir / f"{self.station}_phaseRH_L5.txt"
         else:
             legacy_path = base_dir / f"{self.station}_phaseRH_L{self.frequency}.txt"
-        
+
         if legacy_path.exists():
             return legacy_path, 'legacy'
-        
-        # Return new format path for writing new files
+
+        # Nothing on disk — return new format path for writing
         return new_path, 'new_format'
 
     def _get_json_path(self):

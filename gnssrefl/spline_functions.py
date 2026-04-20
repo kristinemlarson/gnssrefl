@@ -18,6 +18,7 @@ import time
 # my local functions
 import gnssrefl.gps as g
 import gnssrefl.refraction as refr
+from gnssrefl.gnss_frequencies import get_wavelength, get_glonass_wavelength, signal_label_to_freq
 
 
 def make_wavelength_column(nr,snrdata,signal):
@@ -194,41 +195,6 @@ def readklsnrtxt(snrfile, thedir, signal):
 
     return snrdata
 
-def glonasswlen(prn, signal):
-    """
-    Given PRN, returns glonass wavelength
-
-    Parameters
-    ----------
-    prn : integer
-        satellite number
-    signal : string
-         L1 or L2 for glonass
-
-    Returns
-    -------
-    wavelength : float
-        wavelength for the given signal
-
-    """
-    channel = [1, -4, 5, 6, 1, -4, 5, 6, -2, -7, 0, -1, -2, -7, 0, -1, 4, -3, 3, 2, 4, -3, 3, 2]
-    offset = 101  # 101 onwards is glonass
-    try:
-        channel_t = np.array([channel[i-offset] for i in prn], dtype=float)
-    except TypeError:
-        channel_t = channel[prn-offset]
-    if signal == 'L1':
-        lcar = g.constants.c / (1602e06 + channel_t * 0.5625e06)
-        #lcar = 299792458 / (1602e06 + channel_t * 0.5625e06)
-    elif signal == 'L2':
-        lcar = g.constants.c / (1246e06 + channel_t * 0.4375e06)
-        #lcar = 299792458. / (1246e06 + channel_t * 0.4375e06)
-    else:
-        #print('signal not recognised')
-        lcar = np.nan
-    return lcar
-
-
 def datetime2gps(dt):
     """
     Parameters
@@ -349,7 +315,7 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
     #    print('For L2, only use L2c ')
 
     # get the list
-    l2clist,l5list = l2c_l5_list(year,doy)
+    l2clist,l5list = g.l2c_l5_list(year,doy)
     # convert SNR to linear scale (from dB-Hz)
     snrdata[:, 4] = 10 ** (snrdata[:, 4] / 20)
     if lspfigs:
@@ -451,31 +417,25 @@ def snr2arcs(station,snrdata, azilims, elvlims, rhlims, precision, year,doy,sign
             sfilter = (first_tempd[:, 5] == isignal)
             tempd = first_tempd[sfilter]
 
-            # this is still the same ....  
-            # use the constants in gps.py
-            # 22feb09 add beidou
-            if np.logical_or(sat < 100, np.logical_and(sat > 200, sat < 300)):
-                if xsignal == 'L1':
-                    lcar = g.constants.wL1
-                elif xsignal == 'L2':
-                    lcar = g.constants.wL2
-                elif xsignal == 'L5':
-                    lcar = g.constants.wL5
-                # these are for galileo, should not have this in the GPS loop - 
-                # but will be lazy here because of how it was originally written
-                elif xsignal == 'L6':
-                    lcar = g.constants.wgL6
-                elif xsignal == 'L7':
-                    lcar = g.constants.wgL7
-            elif np.logical_and(sat > 100, sat < 200):
-                lcar = glonasswlen(int(sat), xsignal)
-            elif np.logical_and(sat > 300, sat < 400):# beidou
-                if xsignal == 'L2':
-                    lcar = g.constants.wbL2
-                if xsignal == 'L6':
-                    lcar = g.constants.wbL6
-                if xsignal == 'L7':
-                    lcar = g.constants.wbL7
+            if sat < 100:
+                satc = 'G'
+            elif sat < 200:
+                satc = 'R'
+            elif sat < 300:
+                satc = 'E'
+            else:
+                satc = 'C'
+
+            if satc == 'R':
+                freq_code = 101 if xsignal == 'L1' else 102
+                lcar = get_glonass_wavelength(freq_code, int(sat))
+            else:
+                try:
+                    lcar = get_wavelength(signal_label_to_freq(satc, xsignal))
+                except KeyError:
+                    # (constellation, signal) pair has no physical signal
+                    # (e.g. Galileo L2, GPS L6); skip via the isnan guard below.
+                    lcar = np.nan
 
             # this restricts to L2C satellite but only if requested.
             # this does not mean the file has L2C data in it however.  unfortunately
@@ -1289,45 +1249,26 @@ def signal2list(signal):
     return signal_list
 
 
-def satfreq2waveL(satc, xsignal,fsatnos):
+def satfreq2waveL(satc, xsignal, fsatnos):
     """
     given satellite constellation ('G', 'E' ...)
     xsignal ('L1','L2' ...)
     satnos (satellite numbers)
     2022feb09 added Beidou.
     """
-    if (satc == 'G'):
-        if (xsignal == 'L1'):
-            lcar = g.constants.wL1
-        elif (xsignal == 'L2'):
-            lcar = g.constants.wL2
-        elif (xsignal == 'L5'):
-            lcar = g.constants.wL5
-    elif satc == 'R':
+    if satc == 'R':
         if xsignal == 'L5':
             lcar = np.nan
         else:
+            freq_code = 101 if xsignal == 'L1' else 102
             satnos = np.array(fsatnos, dtype=int)
-            lcar = glonasswlen(satnos, xsignal)
-    elif (satc == 'E'):
-        if xsignal == 'L1':
-            lcar = g.constants.wL1
-        elif xsignal == 'L2':
+            lcar = np.array([get_glonass_wavelength(freq_code, s) for s in satnos])
+    else:
+        try:
+            lcar = get_wavelength(signal_label_to_freq(satc, xsignal))
+        except KeyError:
+            # (constellation, signal) pair has no physical signal (e.g. Galileo L2, GPS L6).
             lcar = np.nan
-        elif xsignal == 'L5':
-            lcar = g.constants.wL5
-        # added galileo l6,l7
-        elif xsignal == 'L6':
-            lcar = g.constants.wgL6
-        elif xsignal == 'L7':
-            lcar = g.constants.wgL7
-    elif (satc == 'C'):
-        if xsignal == 'L2':
-            lcar = g.constants.wbL2
-        if xsignal == 'L6':
-            lcar = g.constants.wbL6
-        if xsignal == 'L7':
-            lcar = g.constants.wbL7
 
     return lcar
 
@@ -1640,39 +1581,6 @@ def simpleLSP(rhlims, lcar, precision,elvt, sinelvt, snrdt,sat,xsignal,screensta
     if screenstats and (not bad):
         fout.write("{0:5.2f} {1:5.2f} {2:5.1f} {3:3.0f} {4:s} \n".format(maxF, maxAmp,peak2noise, sat, xsignal))
     return maxF, maxAmp, peak2noise
-
-def l2c_l5_list(year,doy):
-    """
-    for given year and day of year, returns a satellite list of
-    L2C and L5 transmitting satellites
-
-    to update this numpy array, the data are stored in a simple triple of PRN number, launch year,
-    and launch date.
-    author: kristine larson
-    date: march 27, 2021
-    june 24, 2021: updated for SVN78
-
-    this should point to gps.py
-
-    """
-
-    # this numpy array
-    l2c=np.array([[1 ,2011 ,290], [3 ,2014 ,347], [4 ,2018 ,357], [5 ,2008 ,240],
-        [6 ,2014 ,163], [7 ,2008 ,85], [8 ,2015 ,224], [9 ,2014 ,258], [10 ,2015 ,343],
-        [11, 2021, 168],
-        [12 ,2006 ,300], [14 ,2020 ,310], [15 ,2007 ,285], [17 ,2005 ,270],
-        [18 ,2019 ,234], [23 ,2020 ,182], [24 ,2012 ,319], [25 ,2010 ,240],
-        [26 ,2015 ,111], [27 ,2013 ,173], [29 ,2007 ,355], [30 ,2014 ,151], [31 ,2006 ,270], [32 ,2016 ,36]])
-    # indices that meet your criteria
-    ij=(l2c[:,1] + l2c[:,2]/365.25) < (year + doy/365.25)
-    l2csatlist = l2c[ij,0]
-    firstL5 = 2010 + 148/365.25 # launch may 28, 2010  - some delay before becoming healthy
-
-    newlist = l2c[ij,:]
-    ik= (newlist[:,1] + newlist[:,2]/365.25) > firstL5
-    l5satlist = newlist[ik,0]
-
-    return l2csatlist, l5satlist
 
 def save_lsp_results(datet,maxind,reflh_sub,sat,elvt,azit,pgram_sub,snrdt,pktn,isignal):
     """

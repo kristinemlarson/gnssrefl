@@ -15,6 +15,7 @@ from importlib.metadata import version
 
 import gnssrefl.gps as g
 import gnssrefl.retrieve_rh as r
+from gnssrefl.gnss_frequencies import get_sat_list, get_display_label, get_scale_factor, is_valid_frequency
 from gnssrefl.utils import FileManagement, FileTypes
 
 def gnssir_guts_v2(station, year, doy, snr_type, extension, station_config, debug):
@@ -121,7 +122,7 @@ def gnssir_guts_v2(station, year, doy, snr_type, extension, station_config, debu
 
     freqs = station_config['freqs'] ; reqAmp = station_config['reqAmp']
 
-    ok = g.is_it_legal(freqs)
+    ok = all(is_valid_frequency(f) for f in freqs)
     if not ok:
         print('There is something wrong. Fix your json list of frequencies. Exiting')
         sys.exit()
@@ -224,7 +225,7 @@ def plot2screen(station, f,ax1,ax2,pltname):
     ax1.set_xlabel('Elevation Angles (deg)')
     ax1.grid(True, linestyle='-')
     ax2.grid(True, linestyle='-')
-    ax1.set_title(station + ' SNR Data/' + g.ftitle(f) + ' Frequency')
+    ax1.set_title(station + ' SNR Data/' + get_display_label(f) + ' Frequency')
     plt.show()
 
     return True
@@ -491,7 +492,7 @@ def window_new(snrD, f, satNu,ncols,pfitV,e1,e2,azlist,screenstats,fileid,dbhz,*
     x=[]; y=[]; azi=[]; seconds = []; edot = [] ; sat = []
     Nvv= 0; meanTime = 0; avgAzim = 0 ; outFact2 = 0 ; delT = 0
     initA = 0;
-    cf = g.arc_scaleF(f,satNu)
+    cf = get_scale_factor(f,satNu)
     outFact1 = 0 # backwards compatability
     good = True
 
@@ -660,35 +661,17 @@ def find_mgnss_satlist(f,year,doy):
         satellites to use
 
     """
-    # get list of relevant satellites
-    l2c_sat, l5_sat = g.l2c_l5_list(year,doy)
-
-    l1_sat = np.arange(1,33,1)
-    satlist = []
-    if f == 1:
-        satlist = l1_sat
+    # GPS L2C and L5 have date-dependent satellite lists
+    l2c_sat, l5_sat = g.l2c_l5_list(year, doy)
     if f == 20:
-        satlist = l2c_sat
-    if f == 2:
-        satlist = l1_sat
+        return l2c_sat
     if f == 5:
-        satlist = l5_sat
-# only have 24 frequencies defined for glonass
-    if (f == 101) or (f==102):
-        satlist = np.arange(101,125,1)
-#   galileo - 40 max?
-    gfs = int(f-200)
-
-    if (f >  200) and (f < 210):
-        satlist = np.arange(201,241,1)
-#   galileo has no L2 frequency, so set that always to zero
+        return l5_sat
+    # Galileo has no L2 frequency
     if f == 202:
-        satlist = []
-#   pretend there are 32 Beidou satellites for now
-    if (f > 300):
-        satlist = np.arange(301,333,1)
+        return []
 
-    return satlist
+    return get_sat_list(f)
 
 
 

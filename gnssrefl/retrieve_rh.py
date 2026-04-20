@@ -7,6 +7,7 @@ import sys
 
 import gnssrefl.gnssir_v2 as guts
 import gnssrefl.gps as g
+from gnssrefl.gnss_frequencies import get_display_label
 from gnssrefl.utils import FileManagement, pre_check_arc, check_arc_quality, format_qc_summary
 
 def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats, irefr, logid, logfilename, dbhz):
@@ -166,7 +167,7 @@ def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats
         if good_arcs > 0 and plot_screen:
             ax1.set_xlabel('Elevation Angles (deg)')
             ax1.grid(True, linestyle='-'); ax2.grid(True, linestyle='-')
-            ax1.set_title(station + ' Raw Data/Periodogram for ' + g.ftitle(f) + ' Frequency')
+            ax1.set_title(station + ' Raw Data/Periodogram for ' + get_display_label(f) + ' Frequency')
             ax2.set_xlabel('Reflector Height (m)');
             if dbhz:
                 ax2.set_ylabel('db-Hz') ;

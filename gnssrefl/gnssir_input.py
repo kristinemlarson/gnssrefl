@@ -6,6 +6,7 @@ import sys
 
 import gnssrefl.gps as g
 import gnssrefl.gnssir_v2 as guts2
+from gnssrefl.gnss_frequencies import gps_default_frequencies, all_default_frequencies
 
 from gnssrefl.utils import str2bool, FileManagement, FileTypes
 
@@ -481,11 +482,9 @@ def make_gnssir_input(station: str, lat: float=0, lon: float=0, height: float=0,
         sys.exit()
 
     # default frequencies to use - and their required amplitudes. The amplitudes are not set in stone
-    # this is the case for only GPS, but the good L2 
-    station_config['freqs'] = [1, 20, 5]
+    station_config['freqs'] = gps_default_frequencies()
     if allfreq is True:
-        # includes glonass, galileo, and beidou
-        station_config['freqs'] = [1, 20, 5, 101, 102, 201, 205, 206, 207, 208, 302, 306,307]
+        station_config['freqs'] = all_default_frequencies()
 
     if l1 is True:
         station_config['freqs'] = [1]
