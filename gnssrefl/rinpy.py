@@ -200,10 +200,20 @@ def _readheader_v3(lines):
 
     while i < len(lines):
         if lines[i][0] == '>':  # then it's the first line in a header record
-            if int(lines[i][31]) in (0, 1, 6):  # CHECK EPOCH FLAG  STATUS
-                headerlines.append(i)
+            try:
+                epochflag = int(lines[i][31])
+            except IndexError:
+                break  # truncated epoch header, stop parsing
+            if epochflag in (0, 1, 6):  # CHECK EPOCH FLAG  STATUS
                 year, month, day, hour = lines[i][2:6], lines[i][7:9], lines[i][10:12], lines[i][13:15]
                 minute, second = lines[i][16:18], lines[i][19:30]
+
+                numsats = int(lines[i][33:35])  # Number of visible satellites %i3
+
+                if i + 1 + numsats > len(lines):
+                    break  # truncated final epoch, drop it and stop
+
+                headerlines.append(i)
                 obstimes.append(datetime.datetime(year=int(year),
                                                   month=int(month),
                                                   day=int(day),
@@ -215,8 +225,6 @@ def _readheader_v3(lines):
                 week, sow = g.kgpsweek(int(year), int(month), int(day), int(hour), int(minute), int(float(second)))
                 gpstime_list.append((week, sow))
 
-                numsats = int(lines[i][33:35])  # Number of visible satellites %i3
-
                 sv = []
                 for j in range(numsats):
                     sv.append(lines[i+1+j][:3])
@@ -225,9 +233,8 @@ def _readheader_v3(lines):
                 epochsatlists.append(sv)
 
             else:  # there was a comment or some header info
-                flag = int(lines[i][31])
-                if flag != 4:
-                    print(flag)
+                if epochflag != 4:
+                    print(epochflag)
                 skip = int(lines[i][30:32])
                 i += skip+1
         else:
@@ -468,8 +475,12 @@ def _readblocks_v3(lines, header, headerlines, epochsatlists, satset):
     prntoidx = {}
     parser = {}
 
+    # skip malformed satellite entries from truncated epoch headers
     for sat in satset:
-        satlists[sat[0]].append(int(sat[1:]))
+        try:
+            satlists[sat[0]].append(int(sat[1:]))
+        except (IndexError, ValueError):
+            continue
 
     for letter in systemletters:
 
