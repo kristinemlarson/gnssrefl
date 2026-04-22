@@ -62,6 +62,7 @@ class FileTypes(str, Enum):
     individual_tracks = "individual_tracks"
     snr_file = "snr_file"
     directory = "directory"
+    tracks_file = "tracks_file"
 
 
 # TODO we should do something like this below for all of our file structuring so it's all in one place
@@ -118,7 +119,8 @@ class FileManagement:
             files = {FileTypes.apriori_rh_file: self._get_apriori_rh_path(),
                      FileTypes.daily_avg_phase_results: self._get_daily_avg_phase_path(),
                      FileTypes.make_json: self._get_json_path(),
-                     FileTypes.volumetric_water_content: self._get_volumetric_water_content_path()
+                     FileTypes.volumetric_water_content: self._get_volumetric_water_content_path(),
+                     FileTypes.tracks_file: self.get_tracks_file_path(),
                      }
 
             if self.year and self.doy:
@@ -403,6 +405,18 @@ class FileManagement:
         
         # Return new format path for writing
         return self._get_volumetric_water_content_path(), 'new_format'
+
+    def get_tracks_file_path(self):
+        """Path to the multi-GNSS tracks.json file.
+
+        Directory structure:
+        - No extension: Files/{station}/tracks.json
+        - With extension: Files/{station}/{extension}/tracks.json
+        """
+        base = self.xdir / "Files" / self.station
+        if self.extension:
+            base = base / self.extension
+        return base / "tracks.json"
 
     def _get_arcs_directory_path(self):
         """
