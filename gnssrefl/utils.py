@@ -58,6 +58,7 @@ class FileTypes(str, Enum):
     phase_file = "phase_file"
     volumetric_water_content = "volumetric_water_content"
     gnssir_result = "gnssir_result"
+    gnssir_failqc_result = "gnssir_failqc_result"
     arcs_directory = "arcs_directory"
     individual_tracks = "individual_tracks"
     snr_file = "snr_file"
@@ -133,6 +134,7 @@ class FileManagement:
                 if self.extension:
                     result_path = result_path / self.extension
                 files[FileTypes.gnssir_result] = result_path / f'{self.doy:03d}.txt'
+                files[FileTypes.gnssir_failqc_result] = result_path / 'failQC' / f'{self.doy:03d}.txt'
 
             file_path = files[self.file_type]
             

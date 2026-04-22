@@ -140,21 +140,67 @@ def unwrap_az(az):
 # BUILD SIDE
 # ===========================================================================
 
-def load_arcs(station, year, year_end, extension, snr_type):
-    """For each (year, doy), call extract_arcs_from_station and collect
-    per-arc geometry (sat, freq, mjd, azim, rise) into a DataFrame.
+def load_arcs(station, year, year_end, extension, snr_type=66, fast=False):
+    """Collect per-arc geometry for station across [year..year_end] into a DataFrame.
+
+    Unified SNR-walk and results-walk entry point. Both paths return the same
+    schema (year, doy, sat, freq, mjd, azim, rise); the results path also
+    carries RH (useful for later stats).
+
+    * ``fast=False`` (default): walk SNR files day by day via
+      extract_arcs_from_station. Authoritative; covers every frequency the
+      SNR file contains. Slow.
+    * ``fast=True``: read the gnssir results/ + failQC/ artifacts via
+      load_results_with_failqc. Orders of magnitude faster, but only covers
+      frequencies gnssir was configured to run. Requires a prior gnssir run
+      with save_failqc=True.
 
     BeiDou GEO/IGSO PRNs in BEIDOU_NON_MEO_SATS are skipped here so the
     rest of the pipeline never sees them.
     """
     # Deferred: circular with extract_arcs.
-    from gnssrefl.extract_arcs import extract_arcs_from_station
+    from gnssrefl.extract_arcs import RESULT_COLUMNS, extract_arcs_from_station, load_results_with_failqc
+
+    rows = []
+    t0 = time.time()
+
+    if fast:
+        COL_SAT = RESULT_COLUMNS.index('sat')
+        COL_FREQ = RESULT_COLUMNS.index('freq')
+        COL_RISE = RESULT_COLUMNS.index('rise')
+        COL_AZIM = RESULT_COLUMNS.index('Azim')
+        COL_MJD = RESULT_COLUMNS.index('MJD')
+        COL_RH = RESULT_COLUMNS.index('RH')
+
+        print(f'loading arcs for {station} {year}-{year_end} from results/+failQC/ (fast path)')
+        n_days = n_missing = 0
+        for y in range(year, year_end + 1):
+            for doy in range(1, g.dec31(y) + 1):
+                results = load_results_with_failqc(station, y, doy, extension, require_failqc=True)
+                if results is None:
+                    n_missing += 1
+                    continue
+                n_days += 1
+                for i in range(results.shape[0]):
+                    sat = int(results[i, COL_SAT])
+                    if sat in BEIDOU_NON_MEO_SATS:
+                        continue
+                    rows.append({
+                        'year': y, 'doy': doy, 'sat': sat,
+                        'freq': int(results[i, COL_FREQ]),
+                        'mjd':  float(results[i, COL_MJD]),
+                        'azim': float(results[i, COL_AZIM]),
+                        'rise': int(results[i, COL_RISE]),
+                        'RH':   float(results[i, COL_RH]),
+                    })
+        print(f'done: {n_days} days processed, {n_missing} missing, {len(rows):,} arcs in {time.time()-t0:.1f}s')
+        if not rows:
+            raise RuntimeError('no arcs loaded from results/+failQC/: run gnssir first or use -source snr to build tracks directly from SNR files')
+        return pd.DataFrame(rows)
 
     cfg = read_json_file(station, extension=extension, noexit=True, silent=True)
     if not cfg:
-        raise FileNotFoundError(
-            f'station config not found for {station} (extension={extension!r})'
-        )
+        raise FileNotFoundError(f'station config not found for {station} (extension={extension!r})')
     e1 = cfg['e1']
     e2 = cfg['e2']
     pele = cfg['pele']
@@ -165,11 +211,8 @@ def load_arcs(station, year, year_end, extension, snr_type):
     freqs_all = all_frequencies()
     print(f'extracting arcs for {station} {year}-{year_end}, e1={e1} e2={e2}, {len(freqs_all)} freqs')
 
-    rows = []
     n_processed = n_missing = n_errors = 0
-    t0 = time.time()
     silent_buf = io.StringIO()
-
     day_list = [(y, doy) for y in range(year, year_end + 1) for doy in range(1, 367)]
     with tqdm(day_list, desc=f'load_arcs {station}', unit='day') as pbar:
         for y, doy in pbar:
@@ -183,6 +226,7 @@ def load_arcs(station, year, year_end, extension, snr_type):
                         detrend=False,
                         station_config=cfg,
                         screenstats=False,
+                        refraction_verbose=False,
                     )
                 silent_buf.truncate(0)
                 silent_buf.seek(0)
@@ -217,66 +261,6 @@ def load_arcs(station, year, year_end, extension, snr_type):
 
     if not rows:
         raise RuntimeError('no arcs loaded: check station, year range, and SNR files')
-    return pd.DataFrame(rows)
-
-
-def load_arcs_from_results(station, year, year_end, extension):
-    """Fast sibling of load_arcs() that reads results/ + failQC/ instead of SNR.
-
-    Returns the same DataFrame shape (year, doy, sat, freq, mjd, azim, rise)
-    and skips BeiDou GEO/IGSO PRNs identically. Requires a prior gnssir run
-    with save_failqc=True (the default), so every arc gnssir saw is covered
-    via results/ + failQC/. Rows on days with only results/ and no failQC/
-    raise FileNotFoundError naming -save_failqc.
-
-    This path only sees arcs for frequencies gnssir was configured to run.
-    If you need tracks for a freq gnssir did not process, use load_arcs.
-    """
-    # Deferred: circular with extract_arcs.
-    from gnssrefl.extract_arcs import RESULT_COLUMNS, load_results_with_failqc
-
-    COL_SAT = RESULT_COLUMNS.index('sat')
-    COL_FREQ = RESULT_COLUMNS.index('freq')
-    COL_RISE = RESULT_COLUMNS.index('rise')
-    COL_AZIM = RESULT_COLUMNS.index('Azim')
-    COL_MJD = RESULT_COLUMNS.index('MJD')
-    COL_RH = RESULT_COLUMNS.index('RH')
-
-    print(f'loading arcs for {station} {year}-{year_end} from results/+failQC/ (fast path)')
-    rows = []
-    n_days = n_missing = 0
-    t0 = time.time()
-    for y in range(year, year_end + 1):
-        for doy in range(1, g.dec31(y) + 1):
-            results = load_results_with_failqc(
-                station, y, doy, extension, require_failqc=True,
-            )
-            if results is None:
-                n_missing += 1
-                continue
-            n_days += 1
-            for i in range(results.shape[0]):
-                sat = int(results[i, COL_SAT])
-                if sat in BEIDOU_NON_MEO_SATS:
-                    continue
-                rows.append({
-                    'year': y,
-                    'doy': doy,
-                    'sat': sat,
-                    'freq': int(results[i, COL_FREQ]),
-                    'mjd': float(results[i, COL_MJD]),
-                    'azim': float(results[i, COL_AZIM]),
-                    'rise': int(results[i, COL_RISE]),
-                    'RH': float(results[i, COL_RH]),
-                })
-
-    print(f'done: {n_days} days processed, {n_missing} missing, '
-          f'{len(rows):,} arcs in {time.time()-t0:.1f}s')
-    if not rows:
-        raise RuntimeError(
-            'no arcs loaded from results/+failQC/: run gnssir first '
-            'or use -source snr to build tracks directly from SNR files'
-        )
     return pd.DataFrame(rows)
 
 
@@ -458,9 +442,9 @@ def build_tracks(station, year, year_end=None, extension='',
         source = 'results' if results_dir_has_files(station, year, year_end, extension) else 'snr'
         print(f'tracks source: auto-detected {source!r}')
     if source == 'results':
-        df = load_arcs_from_results(station, year, year_end, extension)
+        df = load_arcs(station, year, year_end, extension, fast=True)
     elif source == 'snr':
-        df = load_arcs(station, year, year_end, extension, snr_type)
+        df = load_arcs(station, year, year_end, extension, snr_type=snr_type, fast=False)
     else:
         raise ValueError(f"source must be 'auto', 'results', or 'snr'; got {source!r}")
 

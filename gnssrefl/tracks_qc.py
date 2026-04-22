@@ -31,13 +31,8 @@ from pathlib import Path
 
 import numpy as np
 
-from gnssrefl.tracks import (
-    write_tracks_json,
-    fit_segment,
-    iso_to_mjd,
-    mjd_to_iso_ceil,
-    mjd_to_iso_floor,
-)
+from gnssrefl.extract_arcs import extract_arcs_from_tracks
+from gnssrefl.tracks import write_tracks_json, fit_segment, iso_to_mjd, mjd_to_iso_ceil, mjd_to_iso_floor
 
 
 DEFAULT_APRIORI_RH_NDAYS = 365
@@ -69,10 +64,6 @@ def save_tracks(tracks_json, path, tool, note="", arcs_df=None):
     })
 
     if arcs_df is None:
-        # Lazy import: extract_arcs_from_tracks lands in commit 4. Every
-        # current caller passes arcs_df explicitly, so this branch is
-        # live only after that commit.
-        from gnssrefl.extract_arcs import extract_arcs_from_tracks
         arcs_df = extract_arcs_from_tracks(tracks_json)
     recompute_derived_fields(tracks_json, arcs_df)
 
