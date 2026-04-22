@@ -213,6 +213,56 @@ def delete_track(tracks_json, track_id):
     return tracks_json
 
 
+def apply_auto_removal(tracks_json, fr, good_keys):
+    """Drop bad tracks/epochs at frequency fr via the QC primitives.
+
+    For every track whose freq equals fr, walks its active epochs. Epochs
+    whose (track_id, track_epoch) is not in good_keys are removed: the whole
+    track goes via delete_track when none of its active epochs survive,
+    otherwise each bad epoch goes via deactivate_epoch. Tracks on other
+    frequencies are untouched.
+
+    Parameters
+    ----------
+    tracks_json : dict
+        vwc_tracks.json document (mutated in place).
+    fr : int
+        Frequency to filter. Only tracks with track['freq'] == fr are considered.
+    good_keys : set of (int, int)
+        (track_id, track_epoch) pairs that passed the run's QC.
+
+    Returns
+    -------
+    dict
+        {'tracks_removed', 'tracks_total', 'epochs_deactivated', 'epochs_total'}.
+        Totals count only tracks/epochs at fr.
+    """
+    fr = int(fr)
+    counts = {'tracks_removed': 0, 'tracks_total': 0,
+              'epochs_deactivated': 0, 'epochs_total': 0}
+    tracks = tracks_json['tracks']
+    for tid_str in list(tracks.keys()):
+        track = tracks[tid_str]
+        if int(track['freq']) != fr:
+            continue
+        tid = int(tid_str)
+        counts['tracks_total'] += 1
+        active_ep_ids = [int(ep['epoch_id']) for ep in track['epochs'] if ep['epoch_type'] == 'active']
+        counts['epochs_total'] += len(active_ep_ids)
+        bad_ep_ids = [eid for eid in active_ep_ids if (tid, eid) not in good_keys]
+        if not bad_ep_ids:
+            continue
+        if len(bad_ep_ids) == len(active_ep_ids):
+            delete_track(tracks_json, tid)
+            counts['tracks_removed'] += 1
+            counts['epochs_deactivated'] += len(bad_ep_ids)
+        else:
+            for eid in bad_ep_ids:
+                deactivate_epoch(tracks_json, tid, eid)
+            counts['epochs_deactivated'] += len(bad_ep_ids)
+    return counts
+
+
 def merge_epochs(tracks_json, track_id, epoch_id_a, epoch_id_b):
     """Merge two adjacent active epochs with matching constellation / match_T.
 

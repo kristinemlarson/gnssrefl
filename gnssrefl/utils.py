@@ -61,9 +61,11 @@ class FileTypes(str, Enum):
     gnssir_failqc_result = "gnssir_failqc_result"
     arcs_directory = "arcs_directory"
     individual_tracks = "individual_tracks"
+    vwc_outputs = "vwc_outputs"
     snr_file = "snr_file"
     directory = "directory"
     tracks_file = "tracks_file"
+    vwc_tracks_file = "vwc_tracks_file"
 
 
 # TODO we should do something like this below for all of our file structuring so it's all in one place
@@ -122,6 +124,7 @@ class FileManagement:
                      FileTypes.make_json: self._get_json_path(),
                      FileTypes.volumetric_water_content: self._get_volumetric_water_content_path(),
                      FileTypes.tracks_file: self.get_tracks_file_path(),
+                     FileTypes.vwc_tracks_file: self.get_vwc_tracks_file_path(),
                      }
 
             if self.year and self.doy:
@@ -165,6 +168,8 @@ class FileManagement:
                 directory_path = self._get_arcs_directory_path()
             elif self.file_type == FileTypes.individual_tracks:
                 directory_path = self._get_individual_tracks_path()
+            elif self.file_type == FileTypes.vwc_outputs:
+                directory_path = self._get_vwc_outputs_path()
             else:
                 raise ValueError(f"File type {self.file_type} is not a directory type")
 
@@ -420,6 +425,21 @@ class FileManagement:
             base = base / self.extension
         return base / "tracks.json"
 
+    def get_vwc_tracks_file_path(self):
+        """Path to the vwc_tracks.json file written by ``vwc_input``.
+
+        Same schema as ``tracks.json`` with one added per-epoch field
+        (``apriori_RH``). Consumed by ``phase`` and ``vwc``.
+
+        Directory structure:
+        - No extension: Files/{station}/vwc_tracks.json
+        - With extension: Files/{station}/{extension}/vwc_tracks.json
+        """
+        base = self.xdir / "Files" / self.station
+        if self.extension:
+            base = base / self.extension
+        return base / "vwc_tracks.json"
+
     def _get_arcs_directory_path(self):
         """
         Generate arcs directory path with extension support.
@@ -452,6 +472,24 @@ class FileManagement:
             return self.xdir / "Files" / self.station / self.extension / "individual_tracks"
         else:
             return self.xdir / "Files" / self.station / "individual_tracks"
+
+    def _get_vwc_outputs_path(self):
+        """Per-frequency vwc output directory.
+
+        Directory structure:
+        - No extension: Files/{station}/vwc_outputs/{label}/
+        - With extension: Files/{station}/{extension}/vwc_outputs/{label}/
+
+        ``label`` comes from ``get_file_suffix`` with the leading underscore
+        stripped (e.g. ``G_L1``, ``C_L5``).
+        """
+        if self.frequency is None:
+            raise ValueError("frequency is required for vwc_outputs")
+        label = get_file_suffix(self.frequency).lstrip('_')
+        base = self.xdir / "Files" / self.station
+        if self.extension:
+            base = base / self.extension
+        return base / "vwc_outputs" / label
 
     def _get_snr_path(self, uppercase=False):
         """

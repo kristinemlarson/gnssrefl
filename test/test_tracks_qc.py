@@ -5,6 +5,7 @@ import pytest
 
 from gnssrefl import tracks_qc as qc
 from gnssrefl.tracks import iso_to_mjd, mjd_to_iso_ceil, mjd_to_iso_floor
+from gnssrefl.vwc_input import build_vwc_tracks
 
 
 def _make_epoch(eid, start_mjd, end_mjd, anchor_mjd=None, T=0.997, az=120.0):
@@ -296,6 +297,58 @@ def test_validate_epoch_ids_detects_deletion(tmp_path):
                        arcs_df=_arcs_df())
 
 
+def test_build_vwc_tracks_happy(tmp_path):
+    src = _make_doc()
+    # Add a second track on a different freq so fr_list filtering bites.
+    src['tracks']['7042'] = {
+        'constellation': 'GPS',
+        'sat': 6,
+        'freq': 1,  # will be filtered out by fr_list=[20]
+        'rise': 1,
+        'epochs': [_make_epoch(1, 60000.0, 60100.0)],
+    }
+
+    # 4 arcs in (7041, 0); 1 arc in (7041, 1), below a threshold of 3.
+    arcs_df = _arcs_df([
+        (60010.0, 2.0, 0), (60030.0, 2.1, 0),
+        (60050.0, 2.2, 0), (60080.0, 2.3, 0),
+        (60210.0, 2.5, 1),
+    ])
+
+    vwc_tracks = build_vwc_tracks(
+        src, arcs_df, min_req_pts_track=3, fr_list=[20],
+        apriori_rh_ndays=365,
+    )
+    # save_tracks writes n_arcs across all epochs (mirroring vwc_input flow).
+    qc.save_tracks(vwc_tracks, tmp_path / 'vwc_tracks.json',
+                   tool='test', arcs_df=arcs_df)
+
+    # Input not mutated.
+    assert '7042' in src['tracks']
+    assert src['metadata']['file_type'] == 'tracks'
+
+    # Metadata set by the builder.
+    assert vwc_tracks['metadata']['file_type'] == 'vwc_tracks'
+    assert vwc_tracks['metadata']['apriori_rh_ndays'] == 365
+
+    # fr_list=[20] drops 7042 (freq=1) entirely.
+    assert '7042' not in vwc_tracks['tracks']
+    assert '7041' in vwc_tracks['tracks']
+
+    epochs = vwc_tracks['tracks']['7041']['epochs']
+    # Epoch 0 stays active (4 arcs >= 3); epoch 1 deactivated (1 arc < 3).
+    ep0 = next(ep for ep in epochs if ep['epoch_id'] == 0)
+    ep1 = next(ep for ep in epochs if ep['epoch_id'] == 1)
+    assert ep0.get('epoch_type', 'active') == 'active'
+    assert ep1['epoch_type'] == 'inactive'
+
+    # recompute_stats populated apriori_RH / RH_std on the active epoch.
+    assert ep0['apriori_RH'] == pytest.approx(2.15, abs=1e-3)
+    assert ep0['RH_std'] is not None
+    assert ep0['n_arcs'] == 4
+    assert ep0['n_qc_arcs'] == 4
+
+
 def test_save_recomputes_n_arcs_after_split(tmp_path):
     tracks_json = _make_doc()
     qc.split_epoch(tracks_json, track_id=7041, split_mjd=60050.0)
@@ -310,6 +363,34 @@ def test_save_recomputes_n_arcs_after_split(tmp_path):
     # Both split halves should have correct n_arcs (not the parent's stale 100).
     assert epochs[0]['n_arcs'] == 2
     assert epochs[1]['n_arcs'] == 3
+
+
+def test_n_arcs_vs_n_qc_arcs_with_failed_qc(tmp_path):
+    src = _make_doc()
+    nan = float('nan')
+    arcs_df = _arcs_df([
+        (60010.0, 2.0, 0), (60030.0, 2.1, 0),
+        (60050.0, nan, 0), (60070.0, nan, 0), (60090.0, nan, 0),
+        (60210.0, 2.5, 1), (60230.0, 2.6, 1),
+        (60250.0, 2.7, 1), (60280.0, 2.8, 1), (60290.0, nan, 1),
+    ])
+    vwc_tracks = build_vwc_tracks(
+        src, arcs_df, min_req_pts_track=3, fr_list=[20],
+        apriori_rh_ndays=365,
+    )
+    qc.save_tracks(vwc_tracks, tmp_path / 'vwc_tracks.json',
+                   tool='test', arcs_df=arcs_df)
+    epochs = vwc_tracks['tracks']['7041']['epochs']
+    ep0, ep1 = epochs[0], epochs[1]
+    # ep0: 2 QC-passing < min_req 3, deactivated; inactive invariant => zeros.
+    assert ep0['epoch_type'] == 'inactive'
+    assert ep0['n_arcs'] == 0
+    assert ep0['n_qc_arcs'] == 0
+    # ep1 stays active: n_arcs counts all in-window arcs, n_qc_arcs counts
+    # the RH-non-NaN subset (4 of 5 arcs have RH set).
+    assert ep1['epoch_type'] == 'active'
+    assert ep1['n_arcs'] == 5
+    assert ep1['n_qc_arcs'] == 4
 
 
 def test_deactivate_epoch_zeros_arc_counts():
