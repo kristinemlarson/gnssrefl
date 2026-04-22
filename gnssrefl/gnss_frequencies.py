@@ -71,6 +71,9 @@ CONSTELLATIONS = {
     'BeiDou':  {'sat_range': (301, 361), 'offset': 300},
 }
 
+# BeiDou GEO + IGSO satellites (non-MEO), currently excluded.
+BEIDOU_NON_MEO_SATS = frozenset({301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 313, 338, 339, 340, 359, 360, 361})
+
 # ---------------------------------------------------------------------------
 # Frequency registry
 # ---------------------------------------------------------------------------
