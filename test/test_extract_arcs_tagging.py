@@ -105,7 +105,7 @@ def test_attach_track_id_uses_cache(tmp_path):
     arcs = [_make_arc(sat=5, freq=20, az_min_ele=120.0, arc_timestamp=1.0)]
     attach_track_id(arcs, str(track_file), year=2023, doy=60, track_cache=cache)
     assert cache['path'] == str(track_file)
-    assert isinstance(cache['index'], dict)
+    assert isinstance(cache['track_lookup_index'], dict)
 
 
 # ---------------------------------------------------------------------------

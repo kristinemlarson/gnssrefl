@@ -93,9 +93,6 @@ MAX_GAP_CYCLES = 15    # bridge up to N missed cycles for a single match
 
 # track_id == -1 means "not in a track"; kept rows always have track_id >= 0.
 
-# How far outside [first_mjd, last_mjd] a query may fall and still match.
-LOOKUP_MJD_BUFFER_D = 1.0
-
 
 # ===========================================================================
 # Time / azimuth helpers
@@ -600,7 +597,7 @@ def build_lookup_index(tracks_json):
         rise, repeat_interval_d, anchor_mjd, az_avg_minel, az_drift_rate,
         first_mjd, last_mjd, epoch_type
     """
-    index = {}
+    track_lookup_index = {}
     for tid_str, track in tracks_json['tracks'].items():
         sat = int(track['sat'])
         if sat in BEIDOU_NON_MEO_SATS:
@@ -637,18 +634,33 @@ def build_lookup_index(tracks_json):
                     [float(r[0]), float(r[1])] for r in ep['ignored_ranges']
                 ],
             })
-            index.setdefault((sat, freq), []).append(entry)
-    return index
+            track_lookup_index.setdefault((sat, freq), []).append(entry)
+    return track_lookup_index
 
 
-def lookup_arc(sat, freq, mjd, az, rise, index,
-               az_tol=AZ_TOL, time_tol_min=TIME_TOL_MIN,
-               mjd_buffer_d=LOOKUP_MJD_BUFFER_D):
+def lookup_arc(sat, freq, obs_time_mjd, obs_az_minel, track_lookup_index,
+               az_tol=AZ_TOL, time_tol_min=TIME_TOL_MIN):
     """Look up the (track_id, track_epoch, epoch_entry) for a single arc.
 
+    Parameters
+    ----------
+    sat, freq : int
+        Satellite number and frequency code identifying the candidate list.
+    obs_time_mjd : float
+        Arc observation time in MJD.
+    obs_az_minel : float
+        Arc azimuth at minimum elevation (degrees). Compared against each
+        candidate's drift-corrected expected azimuth.
+    track_lookup_index : dict
+        Pre-built (sat, freq) -> [(track_id, track_epoch, entry_dict), ...]
+        candidate index produced by ``build_lookup_index(tracks_json)``.
+        Each ``entry_dict`` carries the epoch's matching parameters
+        (``first_mjd``, ``last_mjd``, ``anchor_mjd``, ``repeat_interval_d``,
+        ``az_avg_minel``, ``az_drift_rate``, ``epoch_type``, ``ignored_ranges``).
+
     Active matches require the query to fall inside the track's
-    ``[first_mjd - buffer, last_mjd + buffer]`` interval AND fit the periodic
-    model within ``time_tol_min`` and ``az_tol``.
+    ``[first_mjd, last_mjd]`` interval AND fit the periodic model within
+    ``time_tol_min`` and ``az_tol``.
 
     Returns
     -------
@@ -657,36 +669,34 @@ def lookup_arc(sat, freq, mjd, az, rise, index,
         matched epoch dict from ``build_lookup_index`` (keys include
         ``az_avg_minel`` and ``apriori_RH``) when the match succeeds.
     """
-    cands = index.get((int(sat), int(freq)), [])
+    key = (int(sat), int(freq))
+    if key not in track_lookup_index:
+        return (-1, -1, None)
     best_score = float('inf')
     best_match = (-1, -1, None)
 
-    for tid, track_epoch, t in cands:
-        if t['rise'] != rise:
-            continue
-        if mjd < t['first_mjd'] - mjd_buffer_d:
-            continue
-        if mjd > t['last_mjd'] + mjd_buffer_d:
+    for tid, track_epoch, t in track_lookup_index[key]:
+        if obs_time_mjd < t['first_mjd'] or obs_time_mjd > t['last_mjd']:
             continue
         if t['epoch_type'] != 'active':
             continue
         in_ignored = False
         for r_start, r_end in t['ignored_ranges']:
-            if r_start <= mjd <= r_end:
+            if r_start <= obs_time_mjd <= r_end:
                 in_ignored = True
                 break
         if in_ignored:
             continue
 
-        dt_anchor = mjd - t['anchor_mjd']
+        dt_anchor = obs_time_mjd - t['anchor_mjd']
         expected_az = t['az_avg_minel'] + t['az_drift_rate'] * dt_anchor
-        daz = abs(((az - expected_az + 180.0) % 360.0) - 180.0)
+        daz = abs(((obs_az_minel - expected_az + 180.0) % 360.0) - 180.0)
         if daz > az_tol:
             continue
         T = t['repeat_interval_d']
         n_cycles = round(dt_anchor / T)
         expected = t['anchor_mjd'] + n_cycles * T
-        err_min = abs(mjd - expected) * 1440.0
+        err_min = abs(obs_time_mjd - expected) * 1440.0
         if err_min > time_tol_min:
             continue
         score = daz / az_tol + err_min / time_tol_min
@@ -732,24 +742,23 @@ def attach_track_id(arcs, track_file_path, year, doy, track_cache=None):
     """
     track_file_path = str(track_file_path)
     if track_cache is not None and track_cache.get('path') == track_file_path:
-        index = track_cache['index']
+        track_lookup_index = track_cache['track_lookup_index']
     else:
         tracks_json = load_tracks_json(track_file_path)
-        index = build_lookup_index(tracks_json)
+        track_lookup_index = build_lookup_index(tracks_json)
         if track_cache is not None:
             track_cache['path'] = track_file_path
-            track_cache['index'] = index
+            track_cache['track_lookup_index'] = track_lookup_index
 
     d = g.doy2ymd(int(year), int(doy))
 
     for metadata, _data in arcs:
         sat = int(metadata['sat'])
         freq = int(metadata['freq'])
-        az = float(metadata['az_min_ele'])
-        rise = 1 if metadata['arc_type'] == 'rising' else -1
-        mjd = g.getMJD(int(year), d.month, d.day, float(metadata['arc_timestamp']))
+        obs_az_minel = float(metadata['az_min_ele'])
+        obs_time_mjd = g.getMJD(int(year), d.month, d.day, float(metadata['arc_timestamp']))
 
-        track_id, track_epoch, entry = lookup_arc(sat, freq, mjd, az, rise, index)
+        track_id, track_epoch, entry = lookup_arc(sat, freq, obs_time_mjd, obs_az_minel, track_lookup_index)
         metadata['track_id'] = int(track_id)
         metadata['track_epoch'] = int(track_epoch)
         if entry is not None:

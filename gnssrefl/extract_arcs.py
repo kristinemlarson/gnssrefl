@@ -1239,12 +1239,11 @@ def extract_arcs_from_tracks(tracks_json, fast=False):
         return pd.DataFrame(columns=columns)
 
     if fast:
-        index = build_lookup_index(tracks_json)
+        track_lookup_index = build_lookup_index(tracks_json)
         track_constellation = {int(tid): track['constellation'] for tid, track in tracks_json['tracks'].items()}
 
         COL_SAT = RESULT_COLUMNS.index('sat')
         COL_FREQ = RESULT_COLUMNS.index('freq')
-        COL_RISE = RESULT_COLUMNS.index('rise')
         COL_AZIM = RESULT_COLUMNS.index('Azim')
         COL_RH = RESULT_COLUMNS.index('RH')
         COL_MJD = RESULT_COLUMNS.index('MJD')
@@ -1257,15 +1256,14 @@ def extract_arcs_from_tracks(tracks_json, fast=False):
             for i in range(results.shape[0]):
                 sat = int(results[i, COL_SAT])
                 freq = int(results[i, COL_FREQ])
-                rise = int(results[i, COL_RISE])
-                az = float(results[i, COL_AZIM])
-                mjd = float(results[i, COL_MJD])
-                tid, track_epoch, _entry = lookup_arc(sat, freq, mjd, az, rise, index)
+                obs_az_minel = float(results[i, COL_AZIM])
+                obs_time_mjd = float(results[i, COL_MJD])
+                tid, track_epoch, _entry = lookup_arc(sat, freq, obs_time_mjd, obs_az_minel, track_lookup_index)
                 if tid < 0 or track_epoch < 0:
                     continue
                 rows.append({
-                    'mjd': mjd,
-                    'azim': az,
+                    'mjd': obs_time_mjd,
+                    'azim': obs_az_minel,
                     'constellation': track_constellation.get(tid, ''),
                     'RH': float(results[i, COL_RH]),
                     'match_T': float('nan'),
