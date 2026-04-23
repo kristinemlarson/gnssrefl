@@ -93,6 +93,12 @@ MAX_GAP_CYCLES = 15    # bridge up to N missed cycles for a single match
 
 # track_id == -1 means "not in a track"; kept rows always have track_id >= 0.
 
+# Module-level default cache for attach_track_id, keyed by absolute JSON path.
+# Supports multiple stations / extensions / tracks.json vs vwc_tracks.json in
+# the same process: each path gets its own entry. Not invalidated on file
+# rewrite; restart the process if the tracks file changes on disk.
+TRACK_INDEX_CACHE = {}
+
 
 # ===========================================================================
 # Time / azimuth helpers
@@ -731,24 +737,24 @@ def attach_track_id(arcs, track_file_path, year, doy, track_cache=None):
         Year and day-of-year of the arcs (used together with each arc's
         ``arc_timestamp`` to compute MJD for the lookup).
     track_cache : dict, optional
-        Shared dict for reusing the same tracks JSON across many calls. Pass
-        the same dict on each call; the JSON is loaded and indexed on the
-        first call and reused thereafter.
+        Path-keyed cache for reusing prebuilt lookup indexes across many
+        calls. When omitted, a module-level default (TRACK_INDEX_CACHE) is
+        used, so repeated calls transparently reuse the same index across
+        stations, extensions, and tracks.json vs vwc_tracks.json. Cache
+        entries are never invalidated; restart the process if a tracks file
+        is rewritten on disk.
 
     Returns
     -------
     list
         The same ``arcs`` list (modified in place), for chaining.
     """
-    track_file_path = str(track_file_path)
-    if track_cache is not None and track_cache.get('path') == track_file_path:
-        track_lookup_index = track_cache['track_lookup_index']
-    else:
-        tracks_json = load_tracks_json(track_file_path)
-        track_lookup_index = build_lookup_index(tracks_json)
-        if track_cache is not None:
-            track_cache['path'] = track_file_path
-            track_cache['track_lookup_index'] = track_lookup_index
+    path = str(Path(track_file_path).resolve())
+    cache = track_cache if track_cache is not None else TRACK_INDEX_CACHE
+    track_lookup_index = cache.get(path)
+    if track_lookup_index is None:
+        track_lookup_index = build_lookup_index(load_tracks_json(path))
+        cache[path] = track_lookup_index
 
     d = g.doy2ymd(int(year), int(doy))
 
