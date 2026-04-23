@@ -22,6 +22,44 @@ from gnssrefl.utils import str2bool, read_files_in_dir
 from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_wavelength
 
 
+# Column schemas for the phase files. Writers build header/fmt from these
+# tuples via phase_file_header/phase_file_fmt; readers resolve positions
+# with .index(name) instead of hard-coded integers. Per-day phase files
+# (written by phase_tracks) omit 'quad' and 'unphase' since those are only
+# computed when consolidating into raw.phase.
+PHASE_COLS_LEGACY = (
+    'Year', 'DOY', 'Hour', 'Phase', 'Nv', 'Azim', 'Sat', 'Ampl',
+    'emin', 'emax', 'DelT', 'aprRH', 'fr', 'estRH', 'pk2n', 'LSPAmp',
+    'quad', 'unphase',
+)
+PHASE_COLS = (
+    'Year', 'DOY', 'Hour', 'Phase', 'Nv', 'Azim', 'Sat', 'Ampl',
+    'emin', 'emax', 'DelT', 'aprRH', 'fr', 'estRH', 'pk2n', 'LSPAmp',
+    'quad', 'unphase', 'TrackID', 'TrackEpoch',
+)
+
+PHASE_FMT = {
+    'Year':   '%4.0f', 'DOY':    '%3.0f', 'Hour':   '%6.2f', 'Phase':  '%8.3f',
+    'Nv':     '%5.0f', 'Azim':   '%6.1f', 'Sat':    '%3.0f', 'Ampl':   '%5.2f',
+    'emin':   '%5.2f', 'emax':   '%5.2f', 'DelT':   '%6.2f', 'aprRH':  '%5.3f',
+    'fr':     '%2.0f', 'estRH':  '%6.3f', 'pk2n':   '%6.2f', 'LSPAmp': '%6.2f',
+    'quad':   '%2.0f', 'unphase':'%8.3f',
+    'TrackID': '%5.0f', 'TrackEpoch': '%2.0f',
+}
+
+
+def phase_file_header(columns):
+    """Two-line '#'-style header ('Name1 Name2 ...\\n(1) (2) ...') for a phase file."""
+    line1 = ' '.join(columns)
+    line2 = ' '.join(f'({i + 1})' for i in range(len(columns)))
+    return line1 + '\n' + line2
+
+
+def phase_file_fmt(columns):
+    """np.savetxt fmt string for a phase file given its column tuple."""
+    return ' '.join(PHASE_FMT[c] for c in columns)
+
+
 def get_temporal_suffix(fr, bin_hours=24, bin_offset=0, include_time=True):
     """
     Generate consistent suffix for all output files with temporal resolution and offset
@@ -807,9 +845,9 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config,
     Notes
     -----
     Output layout depends on legacy. The default path writes 18 columns:
-    16 phase columns plus TrkID (col 17) and TrkEp (col 18) carried
-    from arc metadata. With legacy=True, the file stays at the historical
-    16-column layout (no track tags appended).
+    16 phase columns plus TrackID and TrackEpoch carried from arc metadata.
+    With legacy=True, the file stays at the historical 16-column layout
+    (no track tags appended).
 
     """
     e1 = station_config.get('e1', 5)
@@ -838,10 +876,9 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config,
         pass
 
     else:
-        if legacy:
-            header = "Year DOY Hour   Phase   Nv  Azimuth  Sat  Ampl emin emax  DelT aprioriRH  freq estRH  pk2noise LSPAmp\n(1)  (2)  (3)    (4)   (5)    (6)    (7)  (8)  (9)  (10)  (11)   (12)     (13)  (14)    (15)    (16)"
-        else:
-            header = "Year DOY Hour   Phase   Nv  Azimuth  Sat  Ampl emin emax  DelT aprioriRH  freq estRH  pk2noise LSPAmp TrkID TrkEp\n(1)  (2)  (3)    (4)   (5)    (6)    (7)  (8)  (9)  (10)  (11)   (12)     (13)  (14)    (15)    (16)  (17)  (18)"
+        raw_columns = PHASE_COLS_LEGACY if legacy else PHASE_COLS
+        phase_columns = tuple(c for c in raw_columns if c not in ('quad', 'unphase'))
+        header = phase_file_header(phase_columns)
         output_path = FileManagement(station, 'phase_file', year, doy, extension=extension).get_file_path()
 
         if legacy:
@@ -981,10 +1018,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config,
 
             if all_results:
                 all_results.sort(key=lambda r: r[2])  # sort by hour
-                fmt = "%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f"
-                if not legacy:
-                    fmt += " %5.0f %2.0f"
-                np.savetxt(my_file, all_results, fmt=fmt, comments="%")
+                np.savetxt(my_file, all_results, fmt=phase_file_fmt(phase_columns), comments="%")
 
             if qc_lines:
                 print('\n'.join(qc_lines) + '\n')
@@ -1469,7 +1503,7 @@ def apriori_file_exist(station, fr, extension=''):
     return apriori_path_f.exists()
 
 
-def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension='', legacy=False):
+def load_phase(station, year1, year2, fr, snowmask, extension='', legacy=False):
     """
     Load all phase data and attempt to remove outliers from snow if snowmask provided. 
 
@@ -1520,7 +1554,8 @@ def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension=''
 #   now load the phase data
     newresults = []
     results_trans = []
-    vquad = np.empty(shape=[0, 16 if legacy else 18])
+    per_day_cols = tuple(c for c in (PHASE_COLS_LEGACY if legacy else PHASE_COLS) if c not in ('quad', 'unphase'))
+    vquad = np.empty(shape=[0, len(per_day_cols)])
     # output will go to
     output_dir = Path(os.environ['REFL_CODE']) / 'Files' / station
     if extension:
@@ -1536,7 +1571,7 @@ def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension=''
         return False, [], [], [], [], [], [], [], [], [], [], []
 
     results = results.T # backwards for consistency
-    expected_nc = 16 if legacy else 18
+    expected_nc = len(per_day_cols)
     actual_nc = results.shape[1]
     if actual_nc != expected_nc:
         print(f"Phase file has {actual_nc} cols; expected {expected_nc}. "
@@ -1764,7 +1799,7 @@ def load_sat_phase(station, year, year_end, freq, extension = ''):
         print(f'reusing cached phase data for {station} {year}-{year_end}')
 
     if freq is not None:
-        freq_list = results[:, 12]
+        freq_list = results[:, PHASE_COLS_LEGACY.index('fr')]
         ii = (freq_list == freq)
         results = results[ii, :]
         print('Total phase measurements for this frequency: ', len(results))
@@ -2311,93 +2346,72 @@ def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp_lsp, amp_ls, r
 
 def write_out_raw_phase(v, fname, legacy=False):
     """
-    write daily phase values used in vwc to a new consolidated file
-    I added columns for quadrant and unwrapped phase
+    Write daily phase values used in vwc to a consolidated file, inserting
+    quadrant and unwrapped-phase columns after the core columns. In the
+    default (multi-GNSS) path TrackID/TrackEpoch stay as the final two
+    columns; see PHASE_COLS in this module for the exact schema.
 
     Parameters
     ----------
     v : numpy array
-        phase results read for multiple years.
-        could be with snow filter applied. Has 16 columns when ``legacy=True``
-        and 18 columns (with TrkID, TrkEp tags) when ``legacy=False``.
+        Per-day phase results concatenated across years (optionally
+        snow-filtered). Has the per-day layout: PHASE_COLS_LEGACY /
+        PHASE_COLS minus quad and unphase.
     fname : str
-        filename for output
+        Filename for output.
     legacy : bool, optional
-        Phase-file layout. ``True`` for the historical 16-col GPS layout
-        (output adds quad/unphase as cols 17-18). ``False`` (default) for the
-        18-col multi-GNSS layout (output adds quad/unphase as cols 19-20,
-        leaving TrkID/TrkEp at 17/18 untouched).
+        Phase-file layout. ``True`` for the historical GPS layout (no track
+        tags). ``False`` (default) for the multi-GNSS layout, which groups
+        the unwrap by (TrackID, TrackEpoch) rather than by (sat, quadrant).
 
     Returns
     -------
     newv : numpy array
-        original variable v with columns appended for
-        quadrant (1-4) and unwrapped phase
-
+        Rows laid out per PHASE_COLS_LEGACY or PHASE_COLS.
     """
 
     print('Writing to ', fname)
-    # make sure v is numpy
     v = np.asarray(v)
-    nr, nc = v.shape
-# sort by time
+    nr, _ = v.shape
     ii = np.argsort(v[:, 0] + v[:, 1]/365.25)
     v = v[ii, :]
-# calculate quadrants cause it makes life easier
-    q = np.zeros((nr, 1))
-    for i in range(nr):
-        q[i] = old_quad(v[i, 5])
 
-    # make a column full of zeros to store unwrapped phase
+    out_columns = PHASE_COLS_LEGACY if legacy else PHASE_COLS
+    quad_col = out_columns.index('quad')
+    unphase_col = out_columns.index('unphase')
+    sat_col = out_columns.index('Sat')
+    azim_col = out_columns.index('Azim')
+    phase_col = out_columns.index('Phase')
+
+    core = v[:, :quad_col]
+    tail = v[:, quad_col:]
+    q = np.array([[old_quad(core[i, azim_col])] for i in range(nr)])
     unwrapped = np.zeros((nr, 1))
+    newv = np.hstack((core, q, unwrapped, tail))
 
-    # add quadrant and unwrapped columns at the tail
-    newv = np.hstack((v, q, unwrapped))
-
-    quad_col = nc
-    unphase_col = nc + 1
-    discont = 270  # phase-wrapping discontinuity
-
+    discont = 270
     if legacy:
-        # No track tags in the legacy file; fall back to (sat, azimuth quadrant).
-        sat_list = np.unique(v[:, 6])
+        sat_list = np.unique(newv[:, sat_col])
         for ql in [1, 2, 3, 4]:
             for s in sat_list:
-                iw = (newv[:, quad_col] == ql) & (newv[:, 6] == s)
-                tnewv = newv[iw, :]
-                if len(tnewv) > 0:
-                    phase = tnewv[:, 3]
-                    unwrap_phase = np.unwrap(phase, period=360, discont=discont)
-                    newv[iw, unphase_col] = unwrap_phase
+                iw = (newv[:, quad_col] == ql) & (newv[:, sat_col] == s)
+                if iw.any():
+                    newv[iw, unphase_col] = np.unwrap(newv[iw, phase_col], period=360, discont=discont)
     else:
-        # Group by (track_id, track_epoch). Each (tid, ep) is by construction a
-        # single continuous reflection geometry, so the within-group unwrap is
-        # well-defined; epoch boundaries (orbital changes, BeiDou drift
-        # changepoints) are real discontinuities and are intentionally left
-        # unbridged. The (tid, ep) pairs here are scoped to whatever
-        # vwc_tracks_json snapshot tagged the input rows; see tracks.py.
-        track_ids = newv[:, 16]
-        track_epochs = newv[:, 17]
+        tid_col = out_columns.index('TrackID')
+        ep_col = out_columns.index('TrackEpoch')
+        track_ids = newv[:, tid_col]
+        track_epochs = newv[:, ep_col]
         unique_keys = np.unique(np.column_stack([track_ids, track_epochs]), axis=0)
         for tid, ep in unique_keys:
             iw = (track_ids == tid) & (track_epochs == ep)
-            tnewv = newv[iw, :]
-            if len(tnewv) > 0:
-                phase = tnewv[:, 3]
-                unwrap_phase = np.unwrap(phase, period=360, discont=discont)
-                newv[iw, unphase_col] = unwrap_phase
+            if iw.any():
+                newv[iw, unphase_col] = np.unwrap(newv[iw, phase_col], period=360, discont=discont)
 
-    if legacy:
-        h1 = "Year DOY Hour   Phase   Nv  Azim   Sat  Ampl emin emax   DelT aprRH  fr  estRH  pk2n  LSPAmp  quad  unphase\n"
-        h2 = "(1)  (2)  (3)    (4)   (5)   (6)   (7)  (8)  (9)  (10)  (11)   (12)  (13)  (14)   (15)   (16)  (17)  (18) "
-        fmt = "%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f %2.0f %8.3f "
-    else:
-        h1 = "Year DOY Hour   Phase   Nv  Azim   Sat  Ampl emin emax   DelT aprRH  fr  estRH  pk2n  LSPAmp TrkID TrkEp  quad  unphase\n"
-        h2 = "(1)  (2)  (3)    (4)   (5)   (6)   (7)  (8)  (9)  (10)  (11)   (12)  (13)  (14)   (15)   (16)  (17)  (18)  (19)  (20) "
-        fmt = "%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f %5.0f %2.0f %2.0f %8.3f "
-
+    header = phase_file_header(out_columns)
+    fmt = phase_file_fmt(out_columns)
     with open(fname, 'w') as my_file:
-        np.savetxt(my_file, newv, fmt=fmt, header=h1+h2, comments='%')
+        np.savetxt(my_file, newv, fmt=fmt, header=header, comments='%')
 
     return newv
 

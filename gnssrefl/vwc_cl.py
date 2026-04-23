@@ -371,19 +371,16 @@ def process_vwc_from_tracks(
 
     legacy_path = vwc_tracks is None
     data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp, amp_ls, ap_rh, results = \
-            qp.load_phase_filter_out_snow(station, year, year_end, fr, snow_file, extension,
-                                          legacy=legacy_path)
+            qp.load_phase(station, year, year_end, fr, snow_file, extension,
+                          legacy=legacy_path)
 
     track_ids_arr = track_epochs_arr = None
     if data_exist:
-        # Default-path raw.phase has TrkID/TrkEp at cols 16/17 (carried from
-        # arc metadata) and unwrapped phase at col 19. Legacy raw.phase has
-        # no tags; unwrapped phase sits at col 17.
-        unwrapped_phase_col = 17 if legacy_path else 19
-        phase = results[unwrapped_phase_col, :]
+        raw_columns = qp.PHASE_COLS_LEGACY if legacy_path else qp.PHASE_COLS
+        phase = results[raw_columns.index('unphase'), :]
         if not legacy_path:
-            track_ids_arr = results[16, :].astype(int)
-            track_epochs_arr = results[17, :].astype(int)
+            track_ids_arr = results[raw_columns.index('TrackID'), :].astype(int)
+            track_epochs_arr = results[raw_columns.index('TrackEpoch'), :].astype(int)
 
     if not data_exist:
         print('No data were found. Check your frequency request or station name')
