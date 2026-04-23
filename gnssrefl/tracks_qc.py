@@ -38,6 +38,16 @@ from gnssrefl.tracks import write_tracks_json, fit_segment, iso_to_mjd, mjd_to_i
 DEFAULT_APRIORI_RH_NDAYS = 365
 
 
+def filter_by_ignored_ranges(sub, ranges):
+    """Return ``sub`` with rows whose mjd falls in any ignored range removed."""
+    if not ranges:
+        return sub
+    keep = np.ones(len(sub), dtype=bool)
+    for r_start, r_end in ranges:
+        keep &= ~((sub.mjd.values >= r_start) & (sub.mjd.values <= r_end))
+    return sub[keep]
+
+
 # ===========================================================================
 # save
 # ===========================================================================
@@ -475,13 +485,7 @@ def refit_active_epochs(tracks_json, arcs_df):
             sub = grouped.get(key)
             if sub is None or len(sub) == 0:
                 continue
-            # Drop arcs in ignored_ranges.
-            ranges = ep['ignored_ranges']
-            if ranges:
-                keep = np.ones(len(sub), dtype=bool)
-                for r_start, r_end in ranges:
-                    keep &= ~((sub.mjd.values >= r_start) & (sub.mjd.values <= r_end))
-                sub = sub[keep]
+            sub = filter_by_ignored_ranges(sub, ep['ignored_ranges'])
             if len(sub) == 0:
                 continue
             T_fit, anchor_mjd, az_avg_minel, az_drift_rate = fit_segment(sub)
@@ -506,9 +510,8 @@ def recompute_n_arcs(tracks_json, arcs_df):
 
     Counts arcs whose ``(track_id, track_epoch)`` matches the epoch and
     whose ``mjd`` is outside any ``ignored_ranges``. Writes ``0`` when no
-    arcs match. Mirrors the ignored-range mask in `refit_active_epochs`
-    so the values agree on active epochs. Inactive epochs are skipped;
-    their ``n_arcs`` is zeroed at deactivation time.
+    arcs match. Inactive epochs are skipped; their ``n_arcs`` is zeroed
+    at deactivation time.
     """
     if arcs_df.empty:
         for track in tracks_json.get('tracks', {}).values():
@@ -527,12 +530,7 @@ def recompute_n_arcs(tracks_json, arcs_df):
             if sub is None or len(sub) == 0:
                 ep['n_arcs'] = 0
                 continue
-            ranges = ep['ignored_ranges']
-            if ranges:
-                keep = np.ones(len(sub), dtype=bool)
-                for r_start, r_end in ranges:
-                    keep &= ~((sub.mjd.values >= r_start) & (sub.mjd.values <= r_end))
-                sub = sub[keep]
+            sub = filter_by_ignored_ranges(sub, ep['ignored_ranges'])
             ep['n_arcs'] = int(len(sub))
 
 
@@ -562,12 +560,7 @@ def compute_tracks_stats(tracks_json, arcs_df, apriori_rh_ndays):
                 ep['apriori_RH'] = None
                 ep['RH_std'] = None
                 continue
-            ranges = ep['ignored_ranges']
-            if ranges:
-                keep = np.ones(len(sub), dtype=bool)
-                for r_start, r_end in ranges:
-                    keep &= ~((sub.mjd.values >= r_start) & (sub.mjd.values <= r_end))
-                sub = sub[keep]
+            sub = filter_by_ignored_ranges(sub, ep['ignored_ranges'])
             ep['n_qc_arcs'] = int(sub['RH'].notna().sum()) if len(sub) else 0
             if len(sub) == 0:
                 ep['apriori_RH'] = None
