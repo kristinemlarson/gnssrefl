@@ -929,8 +929,8 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config,
                         az_min_ele = meta['az_min_ele']
                         cf = meta['cf']
 
-                        rh_apriori = meta.get('apriori_RH')
-                        track_azim = meta.get('track_azim')
+                        rh_apriori = meta['apriori_RH']
+                        track_azim = meta['track_azim']
                         if rh_apriori is None or track_azim is None:
                             qc_counts['track'] += 1
                             continue
