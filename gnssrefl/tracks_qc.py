@@ -31,7 +31,7 @@ from pathlib import Path
 
 import numpy as np
 
-from gnssrefl.extract_arcs import extract_arcs_from_tracks
+from gnssrefl.extract_arcs import load_gnssir_results_from_tracks
 from gnssrefl.tracks import write_tracks_json, fit_segment, iso_to_mjd, mjd_to_iso_ceil, mjd_to_iso_floor
 
 
@@ -60,8 +60,8 @@ def save_tracks(tracks_json, path, tool, note="", arcs_df=None):
     ``apriori_rh_ndays`` window. Writes atomically (temp file + rename).
 
     ``arcs_df`` can be passed by callers that already have the walked
-    arcs (avoids re-walking the SNR files). If ``None``, arcs are
-    loaded via `extract_arcs_from_tracks`.
+    arcs (avoids re-reading the results files). If ``None``, arcs are
+    loaded via `load_gnssir_results_from_tracks`.
     """
     validate_epoch_ids(tracks_json)
 
@@ -74,7 +74,7 @@ def save_tracks(tracks_json, path, tool, note="", arcs_df=None):
     })
 
     if arcs_df is None:
-        arcs_df = extract_arcs_from_tracks(tracks_json)
+        arcs_df = load_gnssir_results_from_tracks(tracks_json)
     recompute_derived_fields(tracks_json, arcs_df)
 
     path = Path(path)

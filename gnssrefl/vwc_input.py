@@ -9,7 +9,7 @@ from pathlib import Path
 from scipy.stats import skew, kurtosis as scipy_kurtosis
 
 from gnssrefl.gps import l2c_l5_list
-from gnssrefl.extract_arcs import extract_arcs_from_tracks
+from gnssrefl.extract_arcs import load_gnssir_results_from_tracks
 from gnssrefl.tracks import build_tracks, load_tracks_json
 from gnssrefl.tracks_qc import deactivate_epoch, delete_track, save_tracks
 from gnssrefl.utils import (read_files_in_dir, FileManagement,
@@ -243,7 +243,7 @@ def vwc_input(station: str, year: int, fr=None, min_req_pts_track: int = None, m
 
     if arcs_df is None:
         print('loading gnssir results + failQC...')
-        arcs_df = extract_arcs_from_tracks(tracks_json, fast=True)
+        arcs_df = load_gnssir_results_from_tracks(tracks_json)
 
     n_gnssir_attached = int(arcs_df['RH'].notna().sum())
     n_failqc = int(arcs_df['RH'].isna().sum())

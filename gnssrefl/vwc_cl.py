@@ -14,7 +14,7 @@ import gnssrefl.simple_vegetation_correction as svc
 import gnssrefl.tracks as tracks_mod
 import gnssrefl.tracks_qc as tracks_qc
 
-from gnssrefl.extract_arcs import extract_arcs_from_tracks
+from gnssrefl.extract_arcs import load_gnssir_results_from_tracks
 from gnssrefl.utils import str2bool, FileManagement, circular_distance_deg
 
 
@@ -613,7 +613,7 @@ def process_vwc_from_tracks(
         else:
             counts = tracks_qc.apply_auto_removal(vwc_tracks, fr, set(good_track_keys))
             vwc_tracks_path = FileManagement(station, 'vwc_tracks_file', extension=extension).get_file_path(ensure_directory=False)
-            arcs_df = extract_arcs_from_tracks(vwc_tracks, fast=True)
+            arcs_df = load_gnssir_results_from_tracks(vwc_tracks)
             note = (f"freq={fr}, warning_value={warning_value}, "
                     f"tracks_removed={counts['tracks_removed']}/{counts['tracks_total']}, "
                     f"epochs_deactivated={counts['epochs_deactivated']}/{counts['epochs_total']}")
