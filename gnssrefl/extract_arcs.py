@@ -16,12 +16,13 @@ import os
 import shutil
 import subprocess
 import numpy as np
+from numpy.polynomial import Polynomial
 from typing import List, Tuple, Optional, Dict, Any, Union
 
 import gnssrefl.gps as g
 from gnssrefl.read_snr_files import read_snr
 from gnssrefl.utils import circular_mean_deg, circular_distance_deg, FileManagement
-from gnssrefl.gnss_frequencies import get_snr_column, get_scale_factor, get_file_suffix
+from gnssrefl.gnss_frequencies import get_snr_column, get_scale_factor, get_file_suffix, get_glonass_channel
 
 # Constants
 GAP_TIME_LIMIT = 600  # seconds (10 minutes)
@@ -657,6 +658,16 @@ def extract_arcs(
     else:
         unique_sats = np.array(sat_list)
 
+    # Drop GLONASS sats whose slot has no known FDMA channel (e.g. newly launched
+    # GLONASS-K not yet in the slot table). Without this they would crash the
+    # per-arc wavelength lookup. Log once so the user sees which PRNs were skipped.
+    glonass_mask = (unique_sats >= 101) & (unique_sats <= 199)
+    if glonass_mask.any():
+        unknown = [int(s) for s in unique_sats[glonass_mask] if get_glonass_channel(int(s)) is None]
+        if unknown:
+            print(f'Skipping GLONASS sats with no known channel assignment: {unknown}')
+            unique_sats = np.array([s for s in unique_sats if int(s) not in unknown])
+
     elev_pairs = _parse_elevation_list(e1, e2, ellist)
     if screenstats and len(elev_pairs) > 1:
         print(f'Using {len(elev_pairs)} elevation angle ranges: {elev_pairs}')
@@ -977,17 +988,18 @@ def remove_dc_component(
     if not dbhz:
         data = np.power(10, (data / 20))
 
-    # Fit polynomial on pele range if provided, otherwise full arc
+    # Fit polynomial on pele range if provided, otherwise full arc.
+    # Polynomial.fit internally maps x to [-1, 1] before fitting, which keeps
+    # the Vandermonde matrix well-conditioned and avoids numpy RankWarning.
     if pele is not None:
         pele_mask = (ele >= pele[0]) & (ele <= pele[1])
         if np.sum(pele_mask) > polyV + 1:
-            model = np.polyfit(ele[pele_mask], data[pele_mask], polyV)
+            poly = Polynomial.fit(ele[pele_mask], data[pele_mask], polyV)
         else:
-            model = np.polyfit(ele, data, polyV)
+            poly = Polynomial.fit(ele, data, polyV)
     else:
-        model = np.polyfit(ele, data, polyV)
-    fit = np.polyval(model, ele)
-    data = data - fit
+        poly = Polynomial.fit(ele, data, polyV)
+    data = data - poly(ele)
 
     return data
 
