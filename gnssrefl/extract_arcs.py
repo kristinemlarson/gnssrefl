@@ -21,7 +21,7 @@ from typing import List, Tuple, Optional, Dict, Any, Union
 import gnssrefl.gps as g
 from gnssrefl.read_snr_files import read_snr
 from gnssrefl.utils import circular_mean_deg, circular_distance_deg, FileManagement
-from gnssrefl.gnss_frequencies import get_snr_column, get_scale_factor, get_file_suffix
+from gnssrefl.gnss_frequencies import get_snr_column, get_scale_factor, get_file_suffix, get_glonass_channel
 
 # Constants
 GAP_TIME_LIMIT = 600  # seconds (10 minutes)
@@ -656,6 +656,16 @@ def extract_arcs(
         unique_sats = np.unique(sats)
     else:
         unique_sats = np.array(sat_list)
+
+    # Drop GLONASS sats whose slot has no known FDMA channel (e.g. newly launched
+    # GLONASS-K not yet in the slot table). Without this they would crash the
+    # per-arc wavelength lookup. Log once so the user sees which PRNs were skipped.
+    glonass_mask = (unique_sats >= 101) & (unique_sats <= 199)
+    if glonass_mask.any():
+        unknown = [int(s) for s in unique_sats[glonass_mask] if get_glonass_channel(int(s)) is None]
+        if unknown:
+            print(f'Skipping GLONASS sats with no known channel assignment: {unknown}')
+            unique_sats = np.array([s for s in unique_sats if int(s) not in unknown])
 
     elev_pairs = _parse_elevation_list(e1, e2, ellist)
     if screenstats and len(elev_pairs) > 1:

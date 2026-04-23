@@ -19,27 +19,28 @@ def wl(freq_mhz):
     return C / (freq_mhz * 1e6)
 
 
+# GLONASS slot -> FDMA channel mapping.
+# Static snapshot; channels actually vary over time (the authoritative value is
+# carried per-record in the GLONASS broadcast nav file) and a future fix should
+# read them from the nav ephemeris.
+#
+# Slots 1-24: long-standing mapping from Simon Williams (originally in gps.py, ported in v4.1.3).
+# Slots 25-28: current as of early 2026 per IGS satellite metadata
+# (files.igs.org/pub/station/general/igs_satellite_metadata.snx).
+# Slot 25 is the historical value; outdated as of 2025:145 but previously stood for 18 years.
+_GLONASS_SLOT_CHANNEL = {
+    1: 1, 2: -4, 3: 5, 4: 6, 5: 1, 6: -4, 7: 5, 8: 6,
+    9: -2, 10: -7, 11: 0, 12: -1, 13: -2, 14: -7, 15: 0, 16: -1,
+    17: 4, 18: -3, 19: 3, 20: 2, 21: 4, 22: -3, 23: 3, 24: 2,
+    25: 3, 26: -6, 27: -5, 28: 7,
+}
+
+
 def get_glonass_channel(prn):
-    """Return the FDMA channel number for a GLONASS satellite.
-
-    Parameters
-    ----------
-    prn : int
-        satellite number (slot, 1-24, with or without the 100-offset)
-
-    Returns
-    -------
-    int
-        channel number in the range -7..+6
-
-    Slot-to-channel mapping is fixed per GLONASS satellite assignment.
-    Logic from Simon Williams, copied from gps.py in v4.1.2.
-    """
+    """Return the FDMA channel number for a GLONASS satellite, or None if unknown."""
     if prn > 100:
         prn = prn - 100
-    slot = np.array([14,15,10,20,19,13,12,1,6,5,22,23,24,16,4,8,3,7,2,18,21,9,17,11])
-    channel = np.array([-7,0,-7,2,3,-2,-1,1,-4,1,-3,3,2,-1,6,6,5,5,-4,-3,4,-2,4,0])
-    return int(channel[slot == prn].item())
+    return _GLONASS_SLOT_CHANNEL.get(int(prn))
 
 
 def get_glonass_wavelength(f, prn):
@@ -47,8 +48,11 @@ def get_glonass_wavelength(f, prn):
 
     GLONASS uses FDMA so each satellite transmits on a slightly different
     carrier determined by its channel number. f is 101 (G1) or 102 (G2).
+    Raises ValueError if the satellite slot has no known channel assignment.
     """
     ch = get_glonass_channel(prn)
+    if ch is None:
+        raise ValueError(f'No GLONASS channel assignment known for slot {prn % 100}')
     if f == 101:
         return C / (1602e6 + ch * 0.5625e6)
     if f == 102:
@@ -62,7 +66,7 @@ def get_glonass_wavelength(f, prn):
 
 CONSTELLATIONS = {
     'GPS':     {'sat_range': (1, 33),   'offset': 0},
-    'GLONASS': {'sat_range': (101, 125), 'offset': 100},
+    'GLONASS': {'sat_range': (101, 129), 'offset': 100},
     'Galileo': {'sat_range': (201, 241), 'offset': 200},
     'BeiDou':  {'sat_range': (301, 361), 'offset': 300},
 }
