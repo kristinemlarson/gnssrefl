@@ -21,6 +21,7 @@ dependencies = [
     "wget",
     "scipy",
     "matplotlib",
+    "pandas",
     "requests",
     "tqdm",
     "astropy",

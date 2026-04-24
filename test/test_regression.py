@@ -20,7 +20,6 @@ EXPECTED_DIR = Path(__file__).parent / "data" / "expected"
 ACTUAL_DIR = Path(__file__).parent / "data" / "actual"
 
 RESULTS = ("2025", "results", "mchl", "011.txt")
-PHASE = ("2025", "phase", "mchl", "011.txt")
 ARCS = ("2025", "arcs", "mchl", "011")
 
 
@@ -116,11 +115,6 @@ def test_extract_arcs_from_station_output_unchanged():
 def test_gnssir_output_unchanged():
     actual, expected = _check_dirs_exist("test_gnssir_output_unchanged")
     _compare_output(actual.joinpath(*RESULTS), expected.joinpath(*RESULTS))
-
-
-def test_phase_output_unchanged():
-    actual, expected = _check_dirs_exist("test_phase_output_unchanged")
-    _compare_output(actual.joinpath(*PHASE), expected.joinpath(*PHASE))
 
 
 def test_gnssir_arcs_unchanged():

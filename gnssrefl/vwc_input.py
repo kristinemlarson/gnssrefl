@@ -236,7 +236,11 @@ def vwc_input(station: str, year: int, fr=None, min_req_pts_track: int = None, m
         arcs_df = None
     else:
         print(f'tracks.json not found at {tracks_path}, auto-building...')
-        tracks_json, arcs_df = build_tracks(station, year, year_end=year_end, extension=extension)
+        try:
+            tracks_json, arcs_df = build_tracks(station, year, year_end=year_end, extension=extension)
+        except RuntimeError as e:
+            print(f'cannot build tracks.json: {e}')
+            sys.exit()
 
     # Read station config so refraction etc. matches gnssir
     station_config = guts2.read_json_file(station, extension)
