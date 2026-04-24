@@ -66,6 +66,7 @@ class FileTypes(str, Enum):
     directory = "directory"
     tracks_file = "tracks_file"
     vwc_tracks_file = "vwc_tracks_file"
+    raw_phase_file = "raw_phase_file"
 
 
 # TODO we should do something like this below for all of our file structuring so it's all in one place
@@ -125,6 +126,7 @@ class FileManagement:
                      FileTypes.volumetric_water_content: self._get_volumetric_water_content_path(),
                      FileTypes.tracks_file: self.get_tracks_file_path(),
                      FileTypes.vwc_tracks_file: self.get_vwc_tracks_file_path(),
+                     FileTypes.raw_phase_file: (self.xdir / "Files" / self.station / (self.extension or "") / "raw.phase"),
                      }
 
             if self.year and self.doy:

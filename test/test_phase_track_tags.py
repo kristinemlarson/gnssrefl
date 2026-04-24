@@ -44,6 +44,26 @@ def test_write_out_raw_phase_round_trip(tmp_path):
     np.testing.assert_allclose(loaded[:, unphase_col], written[:, unphase_col])
 
 
+def test_write_out_raw_phase_appends_across_pairs(tmp_path):
+    """Successive calls to write_out_raw_phase accumulate rows in one file with a single header."""
+    first = np.array([make_phase_row(2024, 1, 6.0, 5, 120.0, 20, tid=7041, ep=0, fr_value=20)])
+    second = np.array([
+        make_phase_row(2024, 1, 7.0, 11, 210.0, 205, tid=9102, ep=0, fr_value=205),
+        make_phase_row(2024, 2, 7.1, 11, 211.0, 205, tid=9102, ep=0, fr_value=205),
+    ])
+    out = tmp_path / 'raw.phase'
+    qp.write_out_raw_phase(first, out, legacy=False)
+    qp.write_out_raw_phase(second, out, legacy=False)
+
+    header_lines = [line for line in out.read_text().splitlines() if line.startswith('%')]
+    assert len(header_lines) == 2  # phase_file_header emits two %-lines (names + numbered)
+
+    loaded = np.loadtxt(out, comments='%')
+    fr_col = qp.PHASE_COLS.index('fr')
+    assert loaded.shape == (3, len(qp.PHASE_COLS))
+    assert set(loaded[:, fr_col].astype(int).tolist()) == {20, 205}
+
+
 def test_write_out_raw_phase_legacy_round_trip(tmp_path):
     """Legacy per-day input becomes raw.phase with quad/unphase appended (no tags)."""
     rows = []

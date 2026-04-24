@@ -1556,13 +1556,7 @@ def load_phase(station, year1, year2, fr, snowmask, extension='', legacy=False):
     results_trans = []
     per_day_cols = tuple(c for c in (PHASE_COLS_LEGACY if legacy else PHASE_COLS) if c not in ('quad', 'unphase'))
     vquad = np.empty(shape=[0, len(per_day_cols)])
-    # output will go to
-    output_dir = Path(os.environ['REFL_CODE']) / 'Files' / station
-    if extension:
-        output_dir = output_dir / extension
-
-    # Ensure the directory exists before trying to save to it
-    fname = output_dir / 'raw.phase'
+    fname = FileManagement(station, FileTypes.raw_phase_file, extension=extension).get_file_path()
 
     dataexist, results = load_sat_phase(station, year1,year2, fr, extension)
     if not dataexist:
@@ -2370,7 +2364,8 @@ def write_out_raw_phase(v, fname, legacy=False):
         Rows laid out per PHASE_COLS_LEGACY or PHASE_COLS.
     """
 
-    print('Writing to ', fname)
+    append = Path(fname).exists() and Path(fname).stat().st_size > 0
+    print(f"{'Appending to' if append else 'Writing to'} {fname}")
     v = np.asarray(v)
     nr, _ = v.shape
     ii = np.argsort(v[:, 0] + v[:, 1]/365.25)
@@ -2408,10 +2403,10 @@ def write_out_raw_phase(v, fname, legacy=False):
             if iw.any():
                 newv[iw, unphase_col] = np.unwrap(newv[iw, phase_col], period=360, discont=discont)
 
-    header = phase_file_header(out_columns)
     fmt = phase_file_fmt(out_columns)
-    with open(fname, 'w') as my_file:
-        np.savetxt(my_file, newv, fmt=fmt, header=header, comments='%')
+    with open(fname, 'a') as my_file:
+        header = '' if append else phase_file_header(out_columns)
+        np.savetxt(my_file, newv, fmt=fmt, header=header, comments='' if append else '%')
 
     return newv
 

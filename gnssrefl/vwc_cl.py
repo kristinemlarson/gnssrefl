@@ -812,6 +812,8 @@ def main():
     legacy = args.get('legacy', False)
     fr_list = args.pop('fr', None)
 
+    FileManagement(args['station'], 'raw_phase_file', extension=args.get('extension', '')).get_file_path().unlink(missing_ok=True)
+
     if legacy:
         print('Note: -legacy T is deprecated and may be removed after 2027-01-01.')
         # Legacy accepts a single frequency.
