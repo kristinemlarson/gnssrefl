@@ -704,7 +704,7 @@ def process_vwc_from_tracks(
         vwc_data = svc.simple_vegetation_filter(
             station, vxyz, extension,
             bin_hours, bin_offset, plt2screen=plt, fr=fr,
-            minvalperbin=minvalperbin, skip_plots=skip_leveling,
+            minvalperbin=minvalperbin, skip_plots=skip_leveling or not plt,
             save_tracks=save_tracks)
     elif veg_model == 2:
         print('Running advanced vegetation model (model 2)...')
