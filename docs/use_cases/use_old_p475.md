@@ -4,6 +4,8 @@
 
 This use case is difficult - and I am no longer recommending that people use it.
 
+Note: since v4.1.3, the multi-year `vwc`/`phase` workflow has changed; we use `-legacy T` here for compatibility with previous versions.
+
 [Warning](warning.md)
 
 
@@ -74,12 +76,12 @@ Now we estimate the phase for each satellite track on each day in 2020 and 2021:
 
 Finally, convert the phase to volumetric water content:
 
-<code>vwc p475 2020 -year_end 2022</code>
+<code>vwc p475 2020 -year_end 2022 -legacy T</code>
 
 A warning comes to the screen that you very likely will not have enough tracks per day -
 or at least you should lower the requirement. Try again ...
 
-<code>vwc p475 2020 -year_end 2022 -minvalperday 8</code>
+<code>vwc p475 2020 -year_end 2022 -minvalperday 8 -legacy T</code>
 
 Phase results plotted in geographic coordinates:
 

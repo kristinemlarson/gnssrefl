@@ -38,9 +38,11 @@
 
 * [Portales, New Mexico USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_p038.html)
 
-* [Mitchell, Australia](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchl.html)
+* [Mitchell, Australia (Legacy GPS tracks)](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mchl.html)
 
-* [Victorville, California USA ](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_scia.html)
+* [Mitchell, Australia (Multi-GNSS)](../use_cases/use_mchl_multi_gnss.md)
+
+* [Victorville, California USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_scia.html)
 
 * [Boulder, Colorado USA](https://gnssrefl.readthedocs.io/en/latest/use_cases/use_mfle.html)
 

@@ -1,5 +1,6 @@
 # Airport near Victorville, CA
 
+Note: since v4.1.3, the multi-year `vwc`/`phase` workflow has changed; we use `-legacy T` here for compatibility with previous versions.
 
 [Warning](warning.md)
 
@@ -59,7 +60,7 @@ Estimate the phase for each satellite track on each day:
 Finally, convert the phase to volumetric water content. To make it easier to 
 look at the plots, I'll just show the first two years:
 
-<code>vwc scia 2018 -year_end 2019 </code>
+<code>vwc scia 2018 -year_end 2019 -legacy T</code>
 
 Phase results plotted in geographic coordinates:
 
@@ -96,7 +97,7 @@ So I went ahead and made that file with one line in it, 2019 361
 
 Then I ran the vwc code again:
 
-<code>vwc scia 2018 -year_end 2019 -snow_filter T</code>
+<code>vwc scia 2018 -year_end 2019 -snow_filter T -legacy T</code>
 
 Produces:
 
@@ -104,7 +105,7 @@ Produces:
 
 Now let's look at three years:
 
-<code>vwc scia 2018 -year_end 2020 -snow_filter T</code>
+<code>vwc scia 2018 -year_end 2020 -snow_filter T -legacy T</code>
 
 <img src="../_static/scia_3years.png" width=600>
 

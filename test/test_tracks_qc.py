@@ -205,7 +205,7 @@ def test_merge_mismatched_repeat_raises():
 
 
 # ---------------------------------------------------------------------------
-# save_tracks — history + orchestration
+# save_tracks: history + orchestration
 # ---------------------------------------------------------------------------
 
 def test_history_appended_on_save(tmp_path):

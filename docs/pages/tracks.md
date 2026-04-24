@@ -9,20 +9,24 @@ This page describes the `tracks` module and the `tracks.json` artifact it produc
 
 ## Overview
 
-A **track** is one of the repeating sky paths a satellite traces through the elevation mask. A single satellite produces many distinct tracks. An **arc** (see the [extract_arcs page](extract_arcs.md)) is one observation of one track; arcs from different days which share a track can be tagged with a common `track_id`.
+A **track** is one of the repeating sky paths a satellite traces through the elevation mask. A single satellite produces many distinct tracks. An **arc** (see the [extract_arcs page](extract_arcs.md)) is one observation of one track; arcs from different days which share a track can be tagged with a common `track_id`. The figure below shows tracks produced by a single satellite from each constellation at MCHL, Australia. 
+
+<img src="../_static/tracks_skyplot.png" width="700">
+
+Each colored segment is one track that will produce observations ('arcs') at the repeat rate. 
 
 `tracks.json` is a derived catalog of tracks at a station. It is the ground-truth reference used by downstream tools (phase, vwc) to associate arcs to a track.
 
 Two entry points cover the most common workflows for generating a `tracks.json`:
 
-| Function | Use when you have...                                                      |
-|----------|---------------------------------------------------------------------------|
-| `generate_tracks <station> <year>` | CLI access, a station name and a multi-year window; writes `tracks.json`  |
-| `build_tracks(station, year, ...)` | programmatic access to the same builder; returns `(tracks_json, arcs_df)` |
+| Function                                     | Use when you have...                                                                     |
+|----------------------------------------------|------------------------------------------------------------------------------------------|
+| `generate_tracks/vwc_input <station> <year>` | CLI access, a station name and a multi-year window; writes `tracks.json/vwc_tracks.json` |
+| `build_tracks(station, year, ...)`           | programmatic access to the same builder; returns `(tracks_json, arcs_df)`                |
 
 ### Background
 
-Legacy gnssrefl (pre v4.1.4) identified tracks by azimuth clustering. This works for GPS because GPS has a 1-sidereal-day ground-track repeat, with 2 orbits per day. Therefore, a station can observe at most four distinct tracks per satellite (rising/setting tracks for each of the two orbits) which are generally well seperated in azimuth-space. Non-GPS constellations have much longer repeat periods, and thus produce many more tracks: 
+Legacy gnssrefl (pre v4.1.4) identified tracks by azimuth clustering. This works for GPS because GPS has a 1-sidereal-day ground-track repeat, with 2 orbits per day. Therefore, a station can observe at most 4 distinct tracks per satellite (rising/setting tracks for each of the 2 orbits) which are generally well seperated in azimuth-space. Non-GPS constellations have much longer repeat periods, and thus produce many more tracks: 
 
 | Constellation | $T_{\text{sid}}$ | Solar days | Orbits per repeat |
 |---------------|------------------|------------|-------------------|
@@ -31,11 +35,7 @@ Legacy gnssrefl (pre v4.1.4) identified tracks by azimuth clustering. This works
 | Galileo       | 10               | 9.97270    | 17                |
 | BeiDou MEO    | 7                | 6.98089    | 13                |
 
-The figure below shows the set of tracks produced by a single satellite of each constellation at MCHL, Australia. 
-
-<img src="../_static/tracks_skyplot.png" width="700">
-
-Each colored segment is one track that will produce observations ('arcs') at the repeat rate. Because tracks of non-GPS constellations can overlap in azimuth, we adopt a time matching approach track associations. 
+Because tracks of non-GPS constellations can overlap in azimuth, we adopt a time matching approach track associations.
 
 ### The matching rule
 
@@ -55,8 +55,9 @@ Key properties:
 - $T_{\text{repeat}}$ is the **track-specific fitted repeat period**, not the nominal constellation value. `fit_segment` produces a linear fit to recover a per-track period that accounts for individual satellite drift. This matters for satellites in anomalous orbits (for example Galileo E14 and E18) where the constellation repeat is wrong by several minutes per cycle.
 - `az_drift_rate` is zero for GPS, GLONASS, and Galileo. For BeiDou MEO it captures the J2-driven westward drift of the ground track. See the final section of this page.
 - `tau_t` defaults to 30 minutes (`TIME_TOL_MIN`) and `tau_az` defaults to 5 degrees (`AZ_TOL`).
+- A satellite broadcasting many frequencies will have a unique 'track' for each frequency.
 
-### Identity
+### Track Identity
 
 Two layers of identity are used throughout the pipeline:
 
@@ -65,7 +66,7 @@ Two layers of identity are used throughout the pipeline:
 
 A track starts life with a single epoch (`epoch_id == 0`). Later user-specified operations may split it into multiple epochs representing periods of different hardware, orbital, or environmental states. Tracks can be `active` or `inactive`, and only arcs in `active` epochs are used in downstream processing. Within an active epoch, smaller `ignored_ranges` can be added to remove specific outlier arcs.
 
-## Quick Start
+## Building a Track Catalog
 
 Build the catalog directly from the command line:
 
@@ -102,6 +103,7 @@ tracks_json, arcs_df = build_tracks('mchl', 2023, year_end=2025)
 print(f"{tracks_json['metadata']['n_tracks']} tracks over {tracks_json['metadata']['duration_d']} days")
 # 9494 tracks over 1095 days
 ```
+
 ## Parameter References
 ### Input Reference
 
@@ -166,7 +168,7 @@ Each epoch describes would ideally be a region of time with a comparable measure
 
 `tracks.json` vs `vwc_tracks.json`: both share this schema; `vwc_tracks.json` is the filtered subset used by the VWC pipeline, containing only tracks at the requested frequencies and adding `apriori_RH`, `RH_std`, and `n_qc_arcs` per epoch.
 
-## Example Use Cases
+## Example Code
 ### Labelling arcs at runtime
 
 Once `tracks.json` is built, pass it to `extract_arcs_from_station` via the `track_file` kwarg and the returned arcs come back already tagged:
@@ -201,9 +203,9 @@ Point `track_file` at `vwc_tracks.json` instead to pick up `apriori_RH`. Interna
 
 ### Loading all arcs in a tracks_json
 
-Two entry points cover multi-day workflows that iterate the active-epoch days of a `tracks_json`. Both take station/extension and drop arcs that don't match any track.
+Two entry points cover multi-day workflows that load all arcs from a `tracks_json`.
 
-**`extract_arcs_from_tracks(tracks_json)`** is the robust version, and can bootstrap when `gnssir` results do not exist. Returns a flat list of `(metadata, data)` tuples in the same format as `extract_arcs_from_station`, tagged against the in-memory `tracks_json` (including any QC edits). Use when you need the full per-arc SNR payload (`ele`, `snr`, `seconds`).
+**`extract_arcs_from_tracks(tracks_json)`** is the robust version, and can bootstrap a `tracks_json` when `gnssir` results do not exist. Returns a flat list of `(metadata, data)` tuples in the same format as `extract_arcs_from_station`, tagged against the in-memory `tracks_json` (including any QC edits). Use when you need the full per-arc SNR payload (`ele`, `snr`, `seconds`).
 
 ```python
 from gnssrefl.extract_arcs import extract_arcs_from_tracks
@@ -213,16 +215,16 @@ tracks_json = load_tracks_json(tracks_path)
 arcs = extract_arcs_from_tracks(tracks_json)  # [(meta, data), ...]
 ```
 
-**`load_gnssir_results_from_tracks(tracks_json)`**: fast summary read from existing `results/` + `failQC/` files. Returns a tagged DataFrame with columns `mjd, azim, constellation, RH, match_T, track_id, track_epoch`. Much faster because no SNR is read; requires a prior `gnssir` run so the sibling `failQC/` files exist, and raises `FileNotFoundError` if any are missing.
+**`load_gnssir_results_from_tracks(tracks_json)`**: fast summary read from `results/` + `failQC/` files. Returns a tagged DataFrame with columns `mjd, azim, constellation, RH, match_T, track_id, track_epoch`. Much faster because no SNR is read; requires a prior `gnssir` run so the sibling `failQC/` files exist, and raises `FileNotFoundError` if any are missing.
 
 ```python
 
 df = load_gnssir_results_from_tracks(tracks_json)
 ```
 
-## Track level quality control
+## Track Level Quality Control
 
-The companion module `tracks_qc` provides the operations used to edit a tracks-shaped JSON. All edits mutate the in-memory dict and only become self-consistent once `save_tracks` runs the refit pass. Structurally invalid edits raise `ValueError`.
+The companion module `tracks_qc` provides the operations used to edit a tracks-shaped JSON. All edits mutate the in-memory dict and only become self-consistent once `save_tracks` recalculates statistics.
 
 ### QC primitives
 
@@ -244,7 +246,7 @@ Composite policies built on the primitives. `vwc_cl` and `vwc_input` surface the
 ## Extra Notes
 ### Legacy GPS-only path
 
-Stations processed before the multi-GNSS refactor may still have per-frequency `apriori_rh_{fr}.txt` files from the legacy azimuth-matching workflow. The vwc pipeline retains this path behind the `-legacy T` flag of `vwc_input` (with a 2027-01-01 deprecation notice), and `attach_legacy_apriori` labels arcs under that scheme. Under the legacy path `track_epoch` is always 0 on match (legacy tracks have only one epoch each).
+Stations processed before the multi-GNSS refactor may still have per-frequency `apriori_rh_{fr}.txt` files from the legacy azimuth-matching workflow. The vwc pipeline (`vwc_input`/`phase`/`vwc`) retains this path behind the `-legacy T` flag (with a 2027-01-01 deprecation notice), and `attach_legacy_apriori` labels arcs under that scheme. Under the legacy path `track_epoch` is always 0 on match (legacy tracks have only one epoch each).
 
 New stations should use the default multi-GNSS path. If `tracks.json` is missing but a legacy `apriori_rh` file exists, `vwc_input` prints a hint pointing at `-legacy T`.
 
@@ -261,5 +263,3 @@ BeiDou MEO is the only constellation whose ground tracks do not maintain a stati
 The figure below shows BeiDou sat 325 track 7139 at `mchl`, 2023 to 2025. Red is the azimuth residual under a constant-azimuth model; blue is the residual after the fitted `az_drift_rate` term is applied.
 
 <img src="../_static/tracks_beidou_drift.png" width="800">
-
-The uncorrected model drifts at -2.27 deg/yr with 3.94 deg RMS; the corrected model is zero-mean with 0.47 deg RMS, close to an order of magnitude improvement.
