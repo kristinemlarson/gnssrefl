@@ -240,12 +240,17 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         unique_pairs, inverse = np.unique(pairs, axis=0, return_inverse=True)
         n = len(unique_pairs)
         s1_arr = np.zeros(n); s2_arr = np.zeros(n); s5_arr = np.zeros(n)
+        s6_arr = np.zeros(n); s7_arr = np.zeros(n); s8_arr = np.zeros(n)
 
         f1 = (freq_dec == '1'); f2 = (freq_dec == '2'); f5 = (freq_dec == '5')
+        f6 = (freq_dec == '6'); f7 = (freq_dec == '7'); f8 = (freq_dec == '8')
         # scatter in reverse so first observation wins on duplicate (time, sat, freq)
         s1_arr[inverse[f1][::-1]] = snr_dec[f1][::-1]
         s2_arr[inverse[f2][::-1]] = snr_dec[f2][::-1]
         s5_arr[inverse[f5][::-1]] = snr_dec[f5][::-1]
+        s6_arr[inverse[f6][::-1]] = snr_dec[f6][::-1]
+        s7_arr[inverse[f7][::-1]] = snr_dec[f7][::-1]
+        s8_arr[inverse[f8][::-1]] = snr_dec[f8][::-1]
 
         if n == 0:
             print('No observations survived decimation'); return
@@ -254,7 +259,7 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
             recv, year, month, day,
             unique_pairs[:, 0].astype(float),
             unique_pairs[:, 1].astype(int),
-            s1_arr, s2_arr, s5_arr,
+            s1_arr, s2_arr, s5_arr, s6_arr, s7_arr, s8_arr,
             orbfile, snrfile, csnr)
         return
 
@@ -361,25 +366,26 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
                     l2 = float(SNR[i])
                 elif f_store == '5':
                     l5 = float(SNR[i])
-                # remove l6 and l7 ... we can add back in if a cheap instrument ever produces these obs
-                #elif f_store == '6':
-                #    l6 = float(SNR[i])
-                #elif f_store == '8':
-                #    l8 = float(SNR[i])
-                    
-                #NOTE -- All satellites have a 'mixed/undefined' frequency 0 for 
+                elif f_store == '6':
+                    l6 = float(SNR[i])
+                elif f_store == '7':
+                    l7 = float(SNR[i])
+                elif f_store == '8':
+                    l8 = float(SNR[i])
+
+                #NOTE -- All satellites have a 'mixed/undefined' frequency 0 for
                 # NMEA 4.11 (https://gpsd.gitlab.io/gpsd/NMEA.html#_nmea_4_11_system_id_and_signal_id)
                 #This is never used here so could leave blank snr lines!
-                
+
                 outline = "%3g %10.4f %10.4f %10g %4s " % (p, float(ELV[i]), float(AZ[i]), float(T[i]), '0')
-                snrline = "%7.2f %7.2f %7.2f %7.2f " % (l6, l1, l2, l5 )
+                snrline = "%7.2f %7.2f %7.2f %7.2f %7.2f %7.2f" % (l6, l1, l2, l5, l7, l8)
                  
                 # apply decimating here
                 if ( (int(T[i]) % idec) == 0):
                     fout.write(outline + snrline + '\n')
                 #fout.write("%3g %10.4f %10.4f %10g %4s %4s %7.2f %4s %4s\n" % (p, float(ELV[i]), float(AZ[i]), float(T[i]),'0', '0', float(SNR[i]),'0', '0')) 
         
-def nmea_sp3_azel(recv, year, month, day, tod, prn, s1, s2, s5,
+def nmea_sp3_azel(recv, year, month, day, tod, prn, s1, s2, s5, s6, s7, s8,
                   orbfile, snrfile, csnr):
     """
     Compute azimuth/elevation from SP3 orbits for NMEA observations and write SNR file.
@@ -394,8 +400,8 @@ def nmea_sp3_azel(recv, year, month, day, tod, prn, s1, s2, s5,
         time of day in seconds (with leap-second offset applied)
     prn : ndarray of int
         satellite PRN numbers (gnssrefl convention: GPS 1-32, GLONASS 101-132, etc.)
-    s1, s2, s5 : ndarray of float
-        SNR values on L1, L2, L5
+    s1, s2, s5, s6, s7, s8 : ndarray of float
+        SNR values on L1, L2, L5, L6, L7, L8
     orbfile : str
         path to SP3 orbit file
     snrfile : str
@@ -440,6 +446,7 @@ def nmea_sp3_azel(recv, year, month, day, tod, prn, s1, s2, s5,
         mask = (prn == sat_id)
         t_sat = obs_sow[mask]
         s1_sat = s1[mask]; s2_sat = s2[mask]; s5_sat = s5[mask]
+        s6_sat = s6[mask]; s7_sat = s7[mask]; s8_sat = s8[mask]
         tod_sat = tod[mask]
 
         if len(t_sat) == 0:
@@ -461,7 +468,8 @@ def nmea_sp3_azel(recv, year, month, day, tod, prn, s1, s2, s5,
 
         # clamp bad SNR values
         s1_pass = s1_sat[elev_mask]; s2_pass = s2_sat[elev_mask]; s5_pass = s5_sat[elev_mask]
-        for arr in (s1_pass, s2_pass, s5_pass):
+        s6_pass = s6_sat[elev_mask]; s7_pass = s7_sat[elev_mask]; s8_pass = s8_sat[elev_mask]
+        for arr in (s1_pass, s2_pass, s5_pass, s6_pass, s7_pass, s8_pass):
             bad = (arr < 0) | (arr > 999)
             arr[bad] = 0
 
@@ -473,12 +481,12 @@ def nmea_sp3_azel(recv, year, month, day, tod, prn, s1, s2, s5,
         block[:, 3] = azimA[elev_mask]          # azimuth
         block[:, 4] = tod_sat[elev_mask]        # seconds of the day
         block[:, 5] = edot                      # elevation rate
-        block[:, 6] = 0                         # S6
+        block[:, 6] = s6_pass                   # S6
         block[:, 7] = s1_pass                   # S1
         block[:, 8] = s2_pass                   # S2
         block[:, 9] = s5_pass                   # S5
-        block[:, 10] = 0                        # S7
-        block[:, 11] = 0                        # S8
+        block[:, 10] = s7_pass                  # S7
+        block[:, 11] = s8_pass                  # S8
         out_blocks.append(block)
 
     if not out_blocks:
@@ -641,18 +649,28 @@ def read_nmea(fname):
                             sig_id = 2
                     if 'GAGSV' in line:
                         if sig_id in ['6', '7']:
-                            sig_id = 1
-                        elif sig_id in ['1', '2', '3']:
-                            sig_id = 5
+                            sig_id = 1   # L1-A, L1-BC → L1 (1575.42 MHz)
+                        elif sig_id in ['1']:
+                            sig_id = 5   # E5a → L5 (1176.45 MHz)
+                        elif sig_id in ['2']:
+                            sig_id = 7   # E5b → L7 (1207.14 MHz)
+                        elif sig_id in ['3']:
+                            sig_id = 8   # E5a+b → L8 (1191.795 MHz)
                         elif sig_id in ['4', '5']:
-                            sig_id = 6
-                    if ('GBGSV' in line or 'BDGSV' in line): #Beidou has two possible calls in NMEA (and weird frequency codes)...
-                        if sig_id in ['0','1','2','3','4']:
-                            sig_id = 1
-                        elif sig_id in ['5','6','7','B','C']:
-                            sig_id = 2
-                        elif sig_id in ['8','9','A']:
-                            sig_id = 3
+                            sig_id = 6   # E6-A, E6-BC → L6 (1278.70 MHz)
+                    if ('GBGSV' in line or 'BDGSV' in line):
+                        if sig_id in ['3', '4']:
+                            sig_id = 1   # B1C, B1A (1575.42 MHz) → L1
+                        elif sig_id in ['0', '1', '2']:
+                            sig_id = 2   # All/B1I/B1Q (1561.098 MHz) → L2
+                        elif sig_id in ['5']:
+                            sig_id = 5   # B2-a (1176.45 MHz) → L5
+                        elif sig_id in ['6', 'B', 'C']:
+                            sig_id = 7   # B2-b/B2I/B2Q (1207.14 MHz) → L7
+                        elif sig_id in ['7']:
+                            sig_id = 8   # B2 a+b (1191.795 MHz) → L8
+                        elif sig_id in ['8', '9', 'A']:
+                            sig_id = 6   # B3I/B3Q/B3A (1268.52 MHz) → L6
             
                 else:
                     sig_id = 1 #Default is L1 -- this is most data/chips that return NMEA by default
