@@ -9,7 +9,7 @@ This page describes the `tracks` module and the `tracks.json` artifact it produc
 
 ## Overview
 
-A **track** is one of the repeating sky paths a satellite traces through the elevation mask. A single satellite produces many distinct tracks. An **arc** (see the [extract_arcs page](extract_arcs.md)) is one observation of one track; arcs from different days which share a track can be tagged with a common `track_id`. The figure below shows tracks produced by a single satellite from each constellation at MCHL, Australia. 
+A **track** is one of the repeating sky paths a satellite traces through the elevation mask. A single satellite produces many distinct tracks. An **arc** (see the [extract_arcs page](extract_arcs.md)) is one observation from a track; arcs from different days which share a track can be tagged with a common `track_id` using this module. The figure below shows tracks produced by a single satellite from each constellation at MCHL, Australia. 
 
 <img src="../_static/tracks_skyplot.png" width="700">
 

@@ -176,6 +176,9 @@ def read_snr(obsfile, buffer_hours=0, screenstats=False):
         print('No SNR file found')
         allGood = 0
         return allGood, 0, 0, 0
+    if f.ndim < 2 or f.size == 0:
+        print(f'Empty SNR file: {obsfile}')
+        return 0, 0, 0, 0
     r,c = f.shape
     if (r > 0) & (c > 0):
         i= f[:,1] > 0

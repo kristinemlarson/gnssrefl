@@ -510,6 +510,13 @@ class FileManagement:
         """
         Find an SNR file, optionally converting to match the desired storage format.
 
+        A .gz is considered trustworthy only when it is non-empty and the
+        uncompressed sibling is absent. A zero-byte .gz, or coexistence of
+        .gz and the uncompressed original, indicates an interrupted gzip
+        run (successful gzip removes the original on completion). In that
+        case the corpse is unlinked and the uncompressed copy is treated
+        as authoritative.
+
         Parameters
         ----------
         gzip : bool or None
@@ -525,23 +532,27 @@ class FileManagement:
             base = self._get_snr_path(uppercase=uppercase)
             gz_path = Path(str(base) + '.gz')
 
+            gz_valid = gz_path.exists() and gz_path.stat().st_size > 0 and not base.exists()
+            if gz_path.exists() and not gz_valid:
+                print(f'Removing interrupted-gzip corpse: {gz_path}')
+                gz_path.unlink()
+
             if gzip is None:
-                # Read-only: return whatever exists, prefer .gz
-                if gz_path.exists():
+                if gz_valid:
                     return gz_path, True
                 if base.exists():
                     return base, True
             elif gzip:
-                if gz_path.exists():
+                if gz_valid:
                     return gz_path, True
                 if base.exists():
                     subprocess.call(['gzip', str(base)])
-                    if gz_path.exists():
+                    if gz_path.exists() and gz_path.stat().st_size > 0:
                         return gz_path, True
             else:
                 if base.exists():
                     return base, True
-                if gz_path.exists():
+                if gz_valid:
                     subprocess.call(['gunzip', str(gz_path)])
                     if base.exists():
                         return base, True
