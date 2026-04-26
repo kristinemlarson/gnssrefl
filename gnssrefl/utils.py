@@ -58,10 +58,15 @@ class FileTypes(str, Enum):
     phase_file = "phase_file"
     volumetric_water_content = "volumetric_water_content"
     gnssir_result = "gnssir_result"
+    gnssir_failqc_result = "gnssir_failqc_result"
     arcs_directory = "arcs_directory"
     individual_tracks = "individual_tracks"
+    vwc_outputs = "vwc_outputs"
     snr_file = "snr_file"
     directory = "directory"
+    tracks_file = "tracks_file"
+    vwc_tracks_file = "vwc_tracks_file"
+    raw_phase_file = "raw_phase_file"
 
 
 # TODO we should do something like this below for all of our file structuring so it's all in one place
@@ -118,7 +123,10 @@ class FileManagement:
             files = {FileTypes.apriori_rh_file: self._get_apriori_rh_path(),
                      FileTypes.daily_avg_phase_results: self._get_daily_avg_phase_path(),
                      FileTypes.make_json: self._get_json_path(),
-                     FileTypes.volumetric_water_content: self._get_volumetric_water_content_path()
+                     FileTypes.volumetric_water_content: self._get_volumetric_water_content_path(),
+                     FileTypes.tracks_file: self.get_tracks_file_path(),
+                     FileTypes.vwc_tracks_file: self.get_vwc_tracks_file_path(),
+                     FileTypes.raw_phase_file: (self.xdir / "Files" / self.station / (self.extension or "") / "raw.phase"),
                      }
 
             if self.year and self.doy:
@@ -131,6 +139,7 @@ class FileManagement:
                 if self.extension:
                     result_path = result_path / self.extension
                 files[FileTypes.gnssir_result] = result_path / f'{self.doy:03d}.txt'
+                files[FileTypes.gnssir_failqc_result] = result_path / 'failQC' / f'{self.doy:03d}.txt'
 
             file_path = files[self.file_type]
             
@@ -161,6 +170,8 @@ class FileManagement:
                 directory_path = self._get_arcs_directory_path()
             elif self.file_type == FileTypes.individual_tracks:
                 directory_path = self._get_individual_tracks_path()
+            elif self.file_type == FileTypes.vwc_outputs:
+                directory_path = self._get_vwc_outputs_path()
             else:
                 raise ValueError(f"File type {self.file_type} is not a directory type")
 
@@ -404,6 +415,33 @@ class FileManagement:
         # Return new format path for writing
         return self._get_volumetric_water_content_path(), 'new_format'
 
+    def get_tracks_file_path(self):
+        """Path to the multi-GNSS tracks.json file.
+
+        Directory structure:
+        - No extension: Files/{station}/tracks.json
+        - With extension: Files/{station}/{extension}/tracks.json
+        """
+        base = self.xdir / "Files" / self.station
+        if self.extension:
+            base = base / self.extension
+        return base / "tracks.json"
+
+    def get_vwc_tracks_file_path(self):
+        """Path to the vwc_tracks.json file written by ``vwc_input``.
+
+        Same schema as ``tracks.json`` with one added per-epoch field
+        (``apriori_RH``). Consumed by ``phase`` and ``vwc``.
+
+        Directory structure:
+        - No extension: Files/{station}/vwc_tracks.json
+        - With extension: Files/{station}/{extension}/vwc_tracks.json
+        """
+        base = self.xdir / "Files" / self.station
+        if self.extension:
+            base = base / self.extension
+        return base / "vwc_tracks.json"
+
     def _get_arcs_directory_path(self):
         """
         Generate arcs directory path with extension support.
@@ -437,6 +475,24 @@ class FileManagement:
         else:
             return self.xdir / "Files" / self.station / "individual_tracks"
 
+    def _get_vwc_outputs_path(self):
+        """Per-frequency vwc output directory.
+
+        Directory structure:
+        - No extension: Files/{station}/vwc_outputs/{label}/
+        - With extension: Files/{station}/{extension}/vwc_outputs/{label}/
+
+        ``label`` comes from ``get_file_suffix`` with the leading underscore
+        stripped (e.g. ``G_L1``, ``C_L5``).
+        """
+        if self.frequency is None:
+            raise ValueError("frequency is required for vwc_outputs")
+        label = get_file_suffix(self.frequency).lstrip('_')
+        base = self.xdir / "Files" / self.station
+        if self.extension:
+            base = base / self.extension
+        return base / "vwc_outputs" / label
+
     def _get_snr_path(self, uppercase=False):
         """
         Construct the base (uncompressed) SNR file path.
@@ -456,6 +512,13 @@ class FileManagement:
         """
         Find an SNR file, optionally converting to match the desired storage format.
 
+        A .gz is considered trustworthy only when it is non-empty and the
+        uncompressed sibling is absent. A zero-byte .gz, or coexistence of
+        .gz and the uncompressed original, indicates an interrupted gzip
+        run (successful gzip removes the original on completion). In that
+        case the corpse is unlinked and the uncompressed copy is treated
+        as authoritative.
+
         Parameters
         ----------
         gzip : bool or None
@@ -471,23 +534,27 @@ class FileManagement:
             base = self._get_snr_path(uppercase=uppercase)
             gz_path = Path(str(base) + '.gz')
 
+            gz_valid = gz_path.exists() and gz_path.stat().st_size > 0 and not base.exists()
+            if gz_path.exists() and not gz_valid:
+                print(f'Removing interrupted-gzip corpse: {gz_path}')
+                gz_path.unlink()
+
             if gzip is None:
-                # Read-only: return whatever exists, prefer .gz
-                if gz_path.exists():
+                if gz_valid:
                     return gz_path, True
                 if base.exists():
                     return base, True
             elif gzip:
-                if gz_path.exists():
+                if gz_valid:
                     return gz_path, True
                 if base.exists():
                     subprocess.call(['gzip', str(base)])
-                    if gz_path.exists():
+                    if gz_path.exists() and gz_path.stat().st_size > 0:
                         return gz_path, True
             else:
                 if base.exists():
                     return base, True
-                if gz_path.exists():
+                if gz_valid:
                     subprocess.call(['gunzip', str(gz_path)])
                     if base.exists():
                         return base, True

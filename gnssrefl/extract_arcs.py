@@ -11,18 +11,28 @@ Arcs are split when:
 2. Elevation angle direction reverses (rising <-> setting)
 """
 
+import contextlib
 import glob
+import io
+import json
 import os
 import shutil
 import subprocess
+import tempfile
+import warnings
+from pathlib import Path
+from typing import List, Tuple, Optional, Dict, Any, Union
+
 import numpy as np
 from numpy.polynomial import Polynomial
-from typing import List, Tuple, Optional, Dict, Any, Union
+import pandas as pd
+from tqdm import tqdm
 
 import gnssrefl.gps as g
 from gnssrefl.read_snr_files import read_snr
 from gnssrefl.utils import circular_mean_deg, circular_distance_deg, FileManagement
-from gnssrefl.gnss_frequencies import get_snr_column, get_scale_factor, get_file_suffix, get_glonass_channel
+from gnssrefl.gnss_frequencies import all_frequencies, get_snr_column, get_scale_factor, get_file_suffix, get_glonass_channel
+from gnssrefl.tracks import active_epoch_days, attach_legacy_apriori, attach_track_id, build_lookup_index, lookup_arc
 
 # Constants
 GAP_TIME_LIMIT = 600  # seconds (10 minutes)
@@ -70,8 +80,15 @@ def _freq_for_column_and_sat(column, sat, l2c_sats=None, l5_sats=None):
 
 
 def _load_result_file(path):
-    """Load a gnssir/phase result file into a 2-D numpy array."""
-    data = np.loadtxt(path, comments='%')
+    """Load a gnssir/phase result file into a 2-D numpy array.
+
+    Empty (header-only) files are valid gnssir output that acts as a
+    signpost that a day was processed but yielded zero rows. Suppress
+    loadtxt's 'input contained no data' UserWarning in that case.
+    """
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', message='loadtxt: input contained no data')
+        data = np.loadtxt(path, comments='%')
     if data.size == 0:
         return None
     if data.ndim == 1:
@@ -361,14 +378,14 @@ def move_arc_to_failqc(meta, station, year, doy, extension=''):
             return
 
 
-def apply_refraction(snr_array, station_config, year, doy):
+def apply_refraction(snr_array, station_config, year, doy, verbose=True):
     """Apply refraction correction to SNR elevation angles.
 
     Returns a copy of *snr_array* with corrected elevations; rows where
     the correction is invalid (e.g. ele < 1.5 for NITE/MPF) are removed.
     """
     from gnssrefl.refraction import correct_elevations
-    corrected, valid_mask = correct_elevations(snr_array[:, 1], station_config, year, doy)
+    corrected, valid_mask = correct_elevations(snr_array[:, 1], station_config, year, doy, verbose=verbose)
     snr_array = snr_array.copy()
     snr_array[:, 1] = corrected
     return snr_array[valid_mask]
@@ -385,6 +402,10 @@ def extract_arcs_from_station(
     extension: str = '',
     station_config: Optional[Dict[str, Any]] = None,
     gzip: bool = True,
+    track_file: Optional[Union[str, Path]] = None,
+    track_cache: Optional[Dict[str, Any]] = None,
+    tag_with_legacy_apriori: bool = False,
+    refraction_verbose: bool = True,
     **kwargs,
 ) -> List[Tuple[Dict[str, Any], Dict[str, np.ndarray]]]:
     """
@@ -416,7 +437,29 @@ def extract_arcs_from_station(
         Station analysis parameters. When provided, enables refraction
         correction (if ``station_config['refraction']``) and savearcs (if ``station_config['savearcs']``).
     gzip : bool
-        If True, gzip the SNR file after reading. Default: False
+        If True, gzip the SNR file after reading. Default: True
+    track_file : path-like, optional
+        Path to a tracks-shaped JSON file (tracks.json from build_tracks, or
+        vwc_tracks.json from vwc_input). When supplied, each arc's metadata
+        is tagged via tracks.attach_track_id with track_id, track_epoch,
+        track_azim, and (if present in the epoch dict) apriori_RH. Arcs that
+        don't match any track get -1/None.
+    track_cache : dict, optional
+        Shared dict for reusing the same tracks JSON across many calls. Pass
+        the same dict on each call; the JSON is loaded and indexed on the
+        first call and reused thereafter.
+    tag_with_legacy_apriori : bool
+        When True, tag arcs from the legacy GPS apriori_rh_{fr}.txt file via
+        tracks.attach_legacy_apriori (sets apriori_RH / track_azim on each arc
+        by (sat, azimuth-within-3 deg) matching). Mutually exclusive with
+        track_file. Default: False.
+
+        When neither track_file nor tag_with_legacy_apriori is provided, arcs
+        are returned without track_id / track_epoch / track_azim / apriori_RH
+        tagging.
+    refraction_verbose : bool
+        Forwarded as ``verbose`` to apply_refraction so batch callers can
+        silence the per-day refraction prints. Default: True.
     **kwargs
         Additional keyword arguments passed to ``extract_arcs()``
 
@@ -428,8 +471,23 @@ def extract_arcs_from_station(
     Raises
     ------
     FileNotFoundError
-        If the SNR file does not exist and cannot be decompressed.
+        If the SNR file does not exist and cannot be decompressed, or if
+        ``track_file`` is supplied but does not exist.
+    ValueError
+        If both ``track_file`` and ``tag_with_legacy_apriori=True`` are set.
     """
+    if tag_with_legacy_apriori and track_file is not None:
+        raise ValueError(
+            "extract_arcs_from_station: 'track_file' and 'tag_with_legacy_apriori=True' "
+            "are mutually exclusive. Pass one or the other."
+        )
+
+    if track_file is not None and not Path(track_file).exists():
+        raise FileNotFoundError(
+            f"track_file not found: {track_file}. "
+            f"Run vwc_input (default path) or build_tracks before tagging arcs."
+        )
+
     obsfile, snr_exists = FileManagement(station, 'snr_file', year, doy, snr_type=snr_type).find_snr_file(gzip=gzip)
     if not snr_exists:
         raise FileNotFoundError(
@@ -442,13 +500,19 @@ def extract_arcs_from_station(
         obsfile, buffer_hours=buffer_hours, screenstats=screenstats,
     )
     if not allGood:
-        raise RuntimeError(f"read_snr failed for: {obsfile}")
+        print(f'No usable SNR data for {station} {year} {doy}, skipping')
+        return []
 
     # Apply refraction correction
     if station_config is not None and station_config.get('refraction', False):
-        snr_array = apply_refraction(snr_array, station_config, year, doy)
+        snr_array = apply_refraction(snr_array, station_config, year, doy, verbose=refraction_verbose)
 
     arcs = extract_arcs(snr_array, freq=freq, year=year, doy=doy, **kwargs)
+
+    if track_file is not None:
+        attach_track_id(arcs, track_file, year, doy, track_cache=track_cache)
+    elif tag_with_legacy_apriori:
+        attach_legacy_apriori(arcs, station, extension=extension)
 
     # Save individual arc files to disk
     if station_config is not None and station_config.get('savearcs', False):
@@ -466,9 +530,9 @@ def extract_arcs_from_station(
 
         if 'gnssir' in attach_results:
             try:
-                result_path = g.LSPresult_name(station, year, doy, extension)[0]
-                if os.path.isfile(result_path):
-                    attach_gnssir_processing_results(arcs, result_path)
+                results = load_results_with_failqc(station, year, doy, extension, require_failqc=False)
+                if results is not None:
+                    attach_gnssir_processing_results(arcs, results)
                 else:
                     for metadata, _data in arcs:
                         metadata['gnssir_processing_results'] = None
@@ -1099,3 +1163,184 @@ def _compute_arc_metadata(
         'e1': float(e1),
         'e2': float(e2),
     }
+
+
+def load_results_with_failqc(station, year, doy, extension, require_failqc):
+    """Load the combined results+failQC ndarray for one day.
+
+    Reads results/{station}/[{extension}/]{doy:03d}.txt and the sibling
+    failQC/ file written by retrieve_rh. Both files share the RESULT_COLUMNS
+    layout; failQC rows have their RH column overwritten with NaN so that
+    downstream consumers filtering on RH.notna() separate pass from fail
+    without a second column.
+
+    Parameters
+    ----------
+    station, year, doy : identifier tuple used by FileManagement.
+    extension : strategy extension string ('' for the default strategy).
+    require_failqc : bool
+        When True, raise FileNotFoundError if the results file has at least
+        one row but the failQC sibling does not exist. Empty results files
+        (zero-row, e.g. from days where the SNR file had no data) are
+        tolerated because gnssir writes no failQC file in that case. The
+        fast-path tracks loader sets this. When False, missing failQC is
+        silently tolerated (used by the attach_results=['gnssir'] branch of
+        extract_arcs_from_station).
+
+    Returns
+    -------
+    np.ndarray or None
+        Combined 2-D array with the same column layout as RESULT_COLUMNS, or
+        None when neither file exists.
+    """
+    fm_ok = FileManagement(station, 'gnssir_result', year, doy, extension=extension)
+    fm_fail = FileManagement(station, 'gnssir_failqc_result', year, doy, extension=extension)
+    ok_path = fm_ok.get_file_path(ensure_directory=False)
+    fail_path = fm_fail.get_file_path(ensure_directory=False)
+
+    ok_rows = _load_result_file(ok_path) if ok_path.is_file() else None
+    fail_rows = _load_result_file(fail_path) if fail_path.is_file() else None
+
+    if ok_rows is None and fail_rows is None:
+        return None
+
+    if require_failqc and ok_rows is not None and not fail_path.is_file():
+        raise FileNotFoundError(
+            f"failQC file missing at {fail_path}; please rerun gnssir "
+            f"(failQC artifacts are now generated by default)"
+        )
+
+    if fail_rows is not None:
+        rh_col = RESULT_COLUMNS.index('RH')
+        fail_rows = fail_rows.copy()
+        fail_rows[:, rh_col] = np.nan
+
+    if ok_rows is not None and fail_rows is not None:
+        return np.vstack([ok_rows, fail_rows])
+    return ok_rows if ok_rows is not None else fail_rows
+
+
+def extract_arcs_from_tracks(tracks_json):
+    """Walk active-epoch days in tracks_json and return tagged (meta, data) arcs.
+
+    Robust SNR-walk entry for consumers that need the full per-arc SNR
+    payload tagged against a (possibly QC-edited) in-memory tracks_json.
+    Station and extension come from tracks_json['metadata']; tagging happens
+    via a temp-file round-trip through extract_arcs_from_station's track_file
+    kwarg. Arcs with no matching track are dropped.
+
+    Returns a flat list of (metadata, data) tuples in the standard
+    extract_arcs format, concatenated across all active-epoch days.
+
+    For the fast summary-only path (results/ + failQC/ with no SNR walk),
+    use load_gnssir_results_from_tracks instead.
+    """
+    metadata = tracks_json['metadata']
+    station = metadata['station']
+    extension = metadata.get('extension', '')
+
+    days = active_epoch_days(tracks_json)
+    if not days:
+        return []
+
+    json_path, _ = FileManagement(station, 'make_json', extension=extension).find_json_file()
+    if not json_path.exists():
+        raise FileNotFoundError(f'station config not found for {station} (extension={extension!r}): {json_path}')
+    with open(json_path) as f:
+        station_config = json.load(f)
+    cfg = {**station_config, 'savearcs': False}
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as tf:
+        json.dump(tracks_json, tf)
+        temp_track_file = tf.name
+    track_cache = {}
+
+    freqs_all = all_frequencies()
+    all_arcs = []
+    silent_buf = io.StringIO()
+    try:
+        with tqdm(sorted(days), desc=f'extract_arcs_from_tracks {station}', unit='day') as pbar:
+            for y, doy in pbar:
+                try:
+                    with contextlib.redirect_stdout(silent_buf):
+                        arcs = extract_arcs_from_station(
+                            station, y, doy,
+                            freq=freqs_all,
+                            track_file=temp_track_file,
+                            track_cache=track_cache,
+                            extension=extension,
+                            station_config=cfg,
+                            refraction_verbose=False,
+                        )
+                    silent_buf.truncate(0)
+                    silent_buf.seek(0)
+                except FileNotFoundError:
+                    continue
+                for meta, data in arcs:
+                    if int(meta['track_id']) < 0 or int(meta['track_epoch']) < 0:
+                        continue
+                    all_arcs.append((meta, data))
+    finally:
+        with contextlib.suppress(FileNotFoundError):
+            os.remove(temp_track_file)
+    return all_arcs
+
+
+def load_gnssir_results_from_tracks(tracks_json):
+    """Fast-path summary DataFrame from results/ + failQC/ artifacts.
+
+    Walks active-epoch days in tracks_json, reads the gnssir results file
+    and its failQC sibling for each day via load_results_with_failqc, and
+    tags each row against tracks_json via lookup_arc. Requires a prior
+    gnssir run; missing failQC siblings raise FileNotFoundError. Rows with
+    no matching track are dropped.
+
+    Returns a DataFrame with columns
+    ``mjd, azim, constellation, RH, match_T, track_id, track_epoch``.
+    ``match_T`` is always NaN so tracks.fit_segment falls back to the
+    constellation's default repeat interval via the constellation column.
+
+    For the robust SNR-walk that returns full (meta, data) tuples, use
+    extract_arcs_from_tracks instead.
+    """
+    metadata = tracks_json['metadata']
+    station = metadata['station']
+    extension = metadata.get('extension', '')
+
+    columns = ['mjd', 'azim', 'constellation', 'RH', 'match_T', 'track_id', 'track_epoch']
+    days = active_epoch_days(tracks_json)
+    if not days:
+        return pd.DataFrame(columns=columns)
+
+    track_lookup_index = build_lookup_index(tracks_json)
+    track_constellation = {int(tid): track['constellation'] for tid, track in tracks_json['tracks'].items()}
+
+    COL_SAT = RESULT_COLUMNS.index('sat')
+    COL_FREQ = RESULT_COLUMNS.index('freq')
+    COL_AZIM = RESULT_COLUMNS.index('Azim')
+    COL_RH = RESULT_COLUMNS.index('RH')
+    COL_MJD = RESULT_COLUMNS.index('MJD')
+
+    rows = []
+    for y, doy in sorted(days):
+        results = load_results_with_failqc(station, y, doy, extension, require_failqc=True)
+        if results is None:
+            continue
+        for i in range(results.shape[0]):
+            sat = int(results[i, COL_SAT])
+            freq = int(results[i, COL_FREQ])
+            obs_az_minel = float(results[i, COL_AZIM])
+            obs_time_mjd = float(results[i, COL_MJD])
+            tid, track_epoch, _entry = lookup_arc(sat, freq, obs_time_mjd, obs_az_minel, track_lookup_index)
+            if tid < 0 or track_epoch < 0:
+                continue
+            rows.append({
+                'mjd': obs_time_mjd,
+                'azim': obs_az_minel,
+                'constellation': track_constellation.get(tid, ''),
+                'RH': float(results[i, COL_RH]),
+                'match_T': float('nan'),
+                'track_id': tid,
+                'track_epoch': track_epoch,
+            })
+    return pd.DataFrame(rows, columns=columns)

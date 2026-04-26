@@ -2,6 +2,8 @@
 
 **Updated June 4, 2023 to use gnssir_input**
 
+Note: since v4.1.3, the multi-year `vwc`/`phase` workflow has changed; we use `-legacy T` here for compatibility with previous versions.
+
 [Warning](warning.md)
 
 <p align="center">
@@ -105,7 +107,7 @@ Then you want to compute the daily phase for our time period:
 
 And then finally:
 
-<code>vwc mfle 2016 -year_end 2019</code>
+<code>vwc mfle 2016 -year_end 2019 -legacy T</code>
 
 These are the daily averages for phase:
 
@@ -115,7 +117,7 @@ At a minimum there does appear to be at least one point (circled in red) I do no
 
 Now let's invoke the snow filter:
 
-<code>vwc mfle 2016 -year_end 2019 -snow_filter T </code>
+<code>vwc mfle 2016 -year_end 2019 -snow_filter T -legacy T</code>
 
 <img src=../_static/mfle_withsnowfilter.png width=600>
 

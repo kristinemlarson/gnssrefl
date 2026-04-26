@@ -1,5 +1,7 @@
 # Mitchell
 
+Note: since v4.1.3, the multi-year `vwc`/`phase` workflow has changed; we use `-legacy T` here for compatibility with previous versions.
+
 ## metadata
 **Station Name:** 	mchl (mchl00aus)
 
@@ -80,7 +82,7 @@ The location of the output files for this stage are printed to the screen.
 Finally, the <code>vwc</code> module compiles all the 
 data in the requested years and generates a volumetric water content file.
 
-<code>vwc mchl 2017 -year_end 2018</code>
+<code>vwc mchl 2017 -year_end 2018 -legacy T</code>
 
 It also produces plots which can help you assess your results:
 

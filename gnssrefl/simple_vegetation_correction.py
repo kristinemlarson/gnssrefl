@@ -8,10 +8,10 @@ import numpy as np
 import os
 import sys
 from datetime import datetime, timedelta
-from pathlib import Path
 
 import gnssrefl.phase_functions as qp
 import gnssrefl.gps as g
+from gnssrefl.utils import FileManagement
 
 xdir = os.environ['REFL_CODE']
 
@@ -159,8 +159,8 @@ def simple_vegetation_filter(station, vxyz, extension='',
         ax.grid()
         plt.gcf().autofmt_xdate()
 
-        # Save diagnostic plot
-        outdir = Path(xdir) / 'Files' / station / extension if extension else Path(xdir) / 'Files' / station
+        # Save diagnostic plot alongside the other per-freq vwc outputs
+        outdir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
         suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
         plot_path = f'{outdir}/{station}_phase_vegcorr{suffix}.png'
         print(f"Saving vegetation correction diagnostic plot to {plot_path}")

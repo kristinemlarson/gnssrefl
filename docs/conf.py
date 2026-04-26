@@ -32,7 +32,8 @@ author = 'Kristine M. Larson and GNSS-IR community'
 extensions = ['myst_parser','nbsphinx','sphinx.ext.autodoc','sphinx.ext.autosummary',"sphinxcontrib.apidoc",'sphinx.ext.napoleon'] #,
 myst_heading_anchors = 3
 myst_enable_extensions = [
-    "html_image"
+    "html_image",
+    "dollarmath",
 ]
 
 # APIDOC configuration 

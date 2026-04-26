@@ -1340,7 +1340,7 @@ def asknewet(e, Tm, lambda_val):
     return zwd
 
 
-def correct_elevations(ele, station_config, year, doy):
+def correct_elevations(ele, station_config, year, doy, verbose=True):
     """Apply refraction correction to elevation angles.
 
     Reads the GPT2 grid for the station location, computes atmospheric
@@ -1399,15 +1399,17 @@ def correct_elevations(ele, station_config, year, doy):
         station, dmjd, dlat, dlong, ht, it,
     )
 
-    print('Refraction parameters (pressure, temp, humidity, ModelNum)',
-          np.round(p, 3), np.round(T, 3), np.round(humidity, 3), refraction_model)
+    if verbose:
+        print('Refraction parameters (pressure, temp, humidity, ModelNum)',
+              np.round(p, 3), np.round(T, 3), np.round(humidity, 3), refraction_model)
 
     # Bennett (models 1, 2)
     if refraction_model in [1, 2]:
-        if refraction_model == 1:
-            print('Standard Bennett refraction correction')
-        else:
-            print('Standard Bennett refraction correction, time-varying')
+        if verbose:
+            if refraction_model == 1:
+                print('Standard Bennett refraction correction')
+            else:
+                print('Standard Bennett refraction correction, time-varying')
         corrected = corr_el_angles(ele, p, T)
         return corrected, valid_mask
 
@@ -1418,10 +1420,11 @@ def correct_elevations(ele, station_config, year, doy):
     N_ant = refrc_Rueger(pressure - vapor, vapor, TempK)[0]
 
     if refraction_model in [3, 4]:
-        if refraction_model == 3:
-            print('Ulich refraction correction')
-        else:
-            print('Ulich refraction correction, time-varying')
+        if verbose:
+            if refraction_model == 3:
+                print('Ulich refraction correction')
+            else:
+                print('Ulich refraction correction, time-varying')
         corrected = Ulich_Bending_Angle(
             ele, N_ant, station_config, p, T, np.zeros_like(ele), np.zeros_like(ele),
         )
@@ -1434,7 +1437,8 @@ def correct_elevations(ele, station_config, year, doy):
 
     zhd = saastam2(pressure, lat, ht)
     zwd = asknewet(humidity, Tm, la)
-    print('Dry and wet zenith delays, meters ', round(zhd, 3), round(zwd, 3))
+    if verbose:
+        print('Dry and wet zenith delays, meters ', round(zhd, 3), round(zwd, 3))
 
     # Remove ele < 1.5 (NITE/MPF blow up there)
     valid_mask = ele > 1.5
@@ -1448,13 +1452,15 @@ def correct_elevations(ele, station_config, year, doy):
     dmpf_val = mpf_tot(dgmf_h, dgmf_w, zhd, zwd)
 
     if refraction_model == 5:
-        print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
+        if verbose:
+            print('NITE refraction correction, Peng et al. remove data < 1.5 degrees')
         dE = Equivalent_Angle_Corr_NITE(
             RH_apriori, ele_filt, N_ant,
             zhd + zwd, mpf_val, dmpf_val,
         )
     else:  # 6
-        print('MPF refraction correction, Wiliams and Nievinski')
+        if verbose:
+            print('MPF refraction correction, Wiliams and Nievinski')
         dE = Equivalent_Angle_Corr_mpf(
             ele_filt, mpf_val, N_ant, RH_apriori,
         )

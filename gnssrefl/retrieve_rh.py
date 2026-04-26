@@ -48,6 +48,7 @@ def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats
     xdir = os.environ['REFL_CODE']
     savearcs = station_config.get('savearcs', False)
     all_lsp = [] # variable to save the results so you can sort them
+    all_failqc = []  # rejected arcs mirrored into the failQC/ artifact
     d = g.doy2ymd(year,doy); month = d.month; day = d.day
 
     e1=station_config['e1']; e2=station_config['e2']; minH = station_config['minH']; maxH = station_config['maxH']
@@ -103,6 +104,17 @@ def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats
                 if not passed:
                     qc_counts[reason] += 1
                     rejected_arcs += 1
+                    pc_MJD = g.getMJD(year, month, day, meanTime)
+                    pc_dt = g.mjd_to_datetime(pc_MJD)
+                    pc_betterUTC = pc_dt.hour + pc_dt.minute/60 + pc_dt.second/3600
+                    riseSet_pc = 1 if meta['arc_type'] == 'rising' else -1
+                    row = [pc_dt.year, pc_dt.timetuple().tm_yday, np.nan, satNu,
+                           pc_betterUTC, az_min_ele, np.nan,
+                           meta['ele_start'], meta['ele_end'], Nv, f, riseSet_pc,
+                           Edot2, np.nan, delT, pc_MJD, irefr]
+                    if station_config['mmdd']:
+                        row += [pc_dt.month, pc_dt.day, pc_dt.hour, pc_dt.minute, pc_dt.second]
+                    all_failqc.append(row)
                     continue
 
                 # LSP computation
@@ -123,6 +135,19 @@ def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats
                         logid.write('FAILED QC for Azimuth {0:.1f} Satellite {1:2.0f} UTC {2:5.2f} RH {3:5.2f} \n'.format(iAzim,satNu,UTCtime,maxF))
                         tooclose = reason == 'tooclose'
                         g.write_QC_fails(delT, station_config['delTmax'], eminObs, emaxObs, e1, e2, station_config['ediff'], maxAmp, Noise, PkNoise, reqAmp_dict[f], tooclose, logid)
+                    dt = g.mjd_to_datetime(MJD)
+                    xyear = dt.year; xmonth = dt.month; xday = dt.day
+                    xhr = dt.hour; xmin = dt.minute; xsec = dt.second
+                    xdoy = dt.timetuple().tm_yday
+                    betterUTC = xhr + xmin/60 + xsec/3600
+                    riseSet_f = 1 if meta['arc_type'] == 'rising' else -1
+                    noise_for_row = maxAmp/Noise if Noise > 0 else np.nan
+                    row = [xyear, xdoy, maxF, satNu, betterUTC, az_min_ele, maxAmp,
+                           eminObs, emaxObs, Nv, f, riseSet_f, Edot2,
+                           noise_for_row, delT, MJD, irefr]
+                    if station_config['mmdd']:
+                        row += [xmonth, xday, xhr, xmin, xsec]
+                    all_failqc.append(row)
                     if plot_screen:
                         failed = True
                         guts.local_update_plot(x,y,px,pz,ax1,ax2,failed)
@@ -197,21 +222,21 @@ def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats
     # convert to numpy array
     allL = np.asarray(all_lsp)
     longer_line = station_config['mmdd']
+    head = g.lsp_header(station, longer_line=longer_line)
+    if longer_line:
+        fmt = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %2.0f %2.0f %2.0f %2.0f %2.0f %2.0f '
+    else:
+        fmt = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %2.0f'
+
     if len(allL) > 0:
-        head = g.lsp_header(station,longer_line=longer_line) # header
     # sort the results for felipe
         ii = np.argsort(allL[:,15])
         allL = allL[ii,:]
 
-        if longer_line:
-            f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %2.0f %2.0f %2.0f %2.0f %2.0f %2.0f '
-        else:
-            f = '%4.0f %3.0f %6.3f %3.0f %6.3f %6.2f %6.2f %6.2f %6.2f %4.0f  %3.0f  %2.0f %8.5f %6.2f %7.2f %12.6f %2.0f'
-
     # this is really just overwriting what I had before. However, This will be sorted.
         testfile = FileManagement(station, 'gnssir_result', year, doy, extension=extension).get_file_path()
         print('Writing sorted LSP results to : ', testfile)
-        np.savetxt(testfile, allL, fmt=f, delimiter=' ', newline='\n',header=head, comments='%')
+        np.savetxt(testfile, allL, fmt=fmt, delimiter=' ', newline='\n',header=head, comments='%')
     else:
         print('No good retrievals found so no LSP file should be created ')
         lspname = FileManagement(station, 'gnssir_result', year, doy, extension=extension).get_file_path(ensure_directory=False)
@@ -219,6 +244,15 @@ def retrieve_rh(station, year, doy, extension, station_config, arcs, screenstats
         print(lspname,orgexist)
         if orgexist:
             subprocess.call(['rm', '-f', str(lspname)])
+
+    failqc_path = FileManagement(station, 'gnssir_failqc_result', year, doy, extension=extension).get_file_path()
+    ncols = 22 if longer_line else 17
+    allF = np.asarray(all_failqc) if all_failqc else np.empty((0, ncols))
+    if len(allF) > 0:
+        jj = np.argsort(allF[:, 15])
+        allF = allF[jj, :]
+    np.savetxt(failqc_path, allF, fmt=fmt, delimiter=' ', newline='\n',
+               header=head, comments='%')
 
     if qc_lines:
         print('\n'.join(qc_lines) + '\n')

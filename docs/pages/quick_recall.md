@@ -21,6 +21,9 @@ those discussion links will likely go away in the not very distant future.
 * [extract_arcs code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.extract_arcs.html),
 [discussion](https://gnssrefl.readthedocs.io/en/latest/pages/extract_arcs.html)
 
+* [tracks code](../api/gnssrefl.tracks.rst),
+[discussion](tracks.md)
+
 * [nmea2snr](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.nmea2snr_cl.html)
 
 * [daily_avg code](https://gnssrefl.readthedocs.io/en/latest/api/gnssrefl.daily_avg_cl.html),

@@ -8,7 +8,7 @@ import sys
 
 
 import gnssrefl.gps as g
-from gnssrefl.utils import FileManagement, FileTypes, pre_check_arc, check_arc_quality, format_qc_summary, circular_distance_deg
+from gnssrefl.utils import FileManagement, FileTypes, pre_check_arc, check_arc_quality, format_qc_summary
 import gnssrefl.daily_avg_cl as da
 import gnssrefl.gnssir_v2 as gnssir
 from gnssrefl.extract_arcs import extract_arcs_from_station, move_arc_to_failqc
@@ -21,7 +21,44 @@ from pathlib import Path
 from gnssrefl.utils import str2bool, read_files_in_dir
 from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_wavelength
 
-xdir = Path(os.environ["REFL_CODE"])
+
+# Column schemas for the phase files. Writers build header/fmt from these
+# tuples via phase_file_header/phase_file_fmt; readers resolve positions
+# with .index(name) instead of hard-coded integers. Per-day phase files
+# (written by phase_tracks) omit 'quad' and 'unphase' since those are only
+# computed when consolidating into raw.phase.
+PHASE_COLS_LEGACY = (
+    'Year', 'DOY', 'Hour', 'Phase', 'Nv', 'Azim', 'Sat', 'Ampl',
+    'emin', 'emax', 'DelT', 'aprRH', 'fr', 'estRH', 'pk2n', 'LSPAmp',
+    'quad', 'unphase',
+)
+PHASE_COLS = (
+    'Year', 'DOY', 'Hour', 'Phase', 'Nv', 'Azim', 'Sat', 'Ampl',
+    'emin', 'emax', 'DelT', 'aprRH', 'fr', 'estRH', 'pk2n', 'LSPAmp',
+    'quad', 'unphase', 'TrackID', 'TrackEpoch',
+)
+
+PHASE_FMT = {
+    'Year':   '%4.0f', 'DOY':    '%3.0f', 'Hour':   '%6.2f', 'Phase':  '%8.3f',
+    'Nv':     '%5.0f', 'Azim':   '%6.1f', 'Sat':    '%3.0f', 'Ampl':   '%5.2f',
+    'emin':   '%5.2f', 'emax':   '%5.2f', 'DelT':   '%6.2f', 'aprRH':  '%5.3f',
+    'fr':     '%2.0f', 'estRH':  '%6.3f', 'pk2n':   '%6.2f', 'LSPAmp': '%6.2f',
+    'quad':   '%2.0f', 'unphase':'%8.3f',
+    'TrackID': '%5.0f', 'TrackEpoch': '%2.0f',
+}
+
+
+def phase_file_header(columns):
+    """Two-line '#'-style header ('Name1 Name2 ...\\n(1) (2) ...') for a phase file."""
+    line1 = ' '.join(columns)
+    line2 = ' '.join(f'({i + 1})' for i in range(len(columns)))
+    return line1 + '\n' + line2
+
+
+def phase_file_fmt(columns):
+    """np.savetxt fmt string for a phase file given its column tuple."""
+    return ' '.join(PHASE_FMT[c] for c in columns)
+
 
 def get_temporal_suffix(fr, bin_hours=24, bin_offset=0, include_time=True):
     """
@@ -180,7 +217,7 @@ def normAmp(amp, basepercent):
 
     return Namp
 
-def subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours=24, bin_offset=0,
+def subdaily_phase_plot(station, fr, vxyz, outdir, hires_figs, bin_hours=24, bin_offset=0,
                         minvalperbin=10, plt2screen=True):
     """
     makes a plot of daily or subdaily averaged phase for vwc code
@@ -193,10 +230,8 @@ def subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours=2
         frequency of signal
     vxyz : numpy array
         Track-level phase data
-    xdir : str
-        location of the results (environment variable REFL_CODE)
-    subdir : str
-        subdirectory in Files
+    outdir : str or Path
+        directory to write the plot into
     hires_figs: bool
         whether you want eps instead of png files
     bin_hours : int
@@ -232,7 +267,6 @@ def subdaily_phase_plot(station, fr, vxyz, xdir, subdir, hires_figs, bin_hours=2
         datetime_dates = [dt + timedelta(hours=int(h))
                          for dt, h in zip(datetime_dates, bin_starts)]
 
-    outdir = Path(xdir) / 'Files' / subdir
     plt.figure(figsize=(10, 6))
     plt.plot(datetime_dates, phases, 'b-')
     plt.ylabel('phase (degrees)')
@@ -469,11 +503,10 @@ def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
     is_subdaily = len(bin_starts) > 0
 
     # Generate standard filename
-    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
-    base_vwcfile = file_manager.get_file_path()
+    out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
     suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
-    vwcfile = base_vwcfile.parent / f"{station}_vwc{suffix}.txt"
+    vwcfile = out_dir / f"{station}_vwc{suffix}.txt"
 
     print(f'VWC results being written to {vwcfile}')
 
@@ -551,12 +584,11 @@ def write_rolling_vwc_output(station, vwc_data, fr, bin_hours, extension='', veg
     years, doys, months, days = mjd_to_file_columns(mjd_values)
 
     # Generate rolling filename
-    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
-    base_vwcfile = file_manager.get_file_path()
+    out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
     freq_suffix = get_file_suffix(fr)
 
-    vwcfile = base_vwcfile.parent / f"{station}_vwc{freq_suffix}_rolling{bin_hours}hr.txt"
+    vwcfile = out_dir / f"{station}_vwc{freq_suffix}_rolling{bin_hours}hr.txt"
 
     print(f'Rolling VWC results being written to {vwcfile}')
 
@@ -690,7 +722,7 @@ def test_func(x, a, b, rh_apriori):
     freq_least_squares = 2*np.pi*2*rh_apriori/get_wavelength(2)
     return a * np.sin(freq_least_squares * x + b)
 
-def test_func_new(x, a, b, rh_apriori,freq):
+def test_func_new(x, a, b, rh_apriori, freq, sat=None):
     """
     This is least squares for estimating a sine wave given a fixed frequency, freqLS
     now freq is input so it is not hardwired for L2
@@ -707,9 +739,11 @@ def test_func_new(x, a, b, rh_apriori,freq):
         reflector height (m)
     freq : int
         frequency
+    sat : int, optional
+        satellite number, required for GLONASS (per-SV FDMA wavelengths)
 
     """
-    freq_least_squares = 2*np.pi*2*rh_apriori/get_wavelength(freq)
+    freq_least_squares = 2*np.pi*2*rh_apriori/get_wavelength(freq, sat=sat)
 
     return a * np.sin(freq_least_squares * x + b)
 
@@ -771,10 +805,19 @@ def get_vwc_frequency(station: str, extension: str, fr_cmd: str = None, station_
     # Always return a list
     return [final_fr]
 
-def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extension=''):
+def phase_tracks(station, year, doy, snr_type, fr_list, station_config,
+                 extension='', legacy=False):
     """
-    This does the main work of estimating phase and other parameters from the SNR files
-    it uses tracks that were predefined by the apriori.py code
+    Estimate phase and related parameters from the SNR file for one day.
+
+    Uses extract_arcs_from_station to detect arcs and tag each one with a
+    per-arc apriori reflector height (apriori_RH) and track-mean azimuth
+    (track_azim). In the default path the tagging is driven by
+    vwc_tracks.json (a filtered copy of tracks.json with per-epoch
+    apriori_RH attached); arcs that don't match any VWC-eligible epoch
+    are skipped. The loop is the same in either path: it reads
+    meta['apriori_RH'] / meta['track_azim'] off each arc and performs
+    the LSP phase fit.
 
     Parameters
     ----------
@@ -787,13 +830,24 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extensio
     snr_type : int
         SNR file extension (i.e. 99, 66 etc)
     fr_list : list of integers
-        frequency, [1], [20] or [1,20]
+        Frequencies to process. Typically the full all_frequencies() list
+        in the default multi-GNSS path, or a GPS-only list such as [20] when
+        legacy=True.
     station_config : dict
         station analysis parameters (from json, with CLI overrides applied)
     extension : str, optional
         analysis extension for json file. Default is ''.
+    legacy : bool, optional
+        When True, arcs are tagged from the legacy GPS apriori_rh_{fr}.txt
+        files (sat + azimuth-within-3 degrees) instead of vwc_tracks.json.
+        Default: False.
 
-    Only GPS frequencies are allowed because this relies on the repeating ground track.
+    Notes
+    -----
+    Output layout depends on legacy. The default path writes 18 columns:
+    16 phase columns plus TrackID and TrackEpoch carried from arc metadata.
+    With legacy=True, the file stays at the historical 16-column layout
+    (no track tags appended).
 
     """
     e1 = station_config.get('e1', 5)
@@ -822,8 +876,16 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extensio
         pass
 
     else:
-        header = "Year DOY Hour   Phase   Nv  Azimuth  Sat  Ampl emin emax  DelT aprioriRH  freq estRH  pk2noise LSPAmp\n(1)  (2)  (3)    (4)   (5)    (6)    (7)  (8)  (9)  (10)  (11)   (12)     (13)  (14)    (15)    (16)"
+        raw_columns = PHASE_COLS_LEGACY if legacy else PHASE_COLS
+        phase_columns = tuple(c for c in raw_columns if c not in ('quad', 'unphase'))
+        header = phase_file_header(phase_columns)
         output_path = FileManagement(station, 'phase_file', year, doy, extension=extension).get_file_path()
+
+        if legacy:
+            tagging_kwargs = {'tag_with_legacy_apriori': True}
+        else:
+            vwc_tracks_path = FileManagement(station, 'vwc_tracks_file', extension=extension).get_file_path(ensure_directory=False)
+            tagging_kwargs = {'track_file': vwc_tracks_path}
 
         print(f"Saving phase file to: {output_path}")
         with open(output_path, 'w') as my_file:
@@ -831,7 +893,6 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extensio
             # Load adjacent day data for midnight-crossing arcs (default: on)
             buffer_hours = 2 if midnite else 0
 
-            # Extract arcs for ALL frequencies in one call
             all_arcs = extract_arcs_from_station(
                 station, year, doy, freq=fr_list, snr_type=snr_type,
                 e1=e1, e2=e2, polyV=poly_v, pele=pele,
@@ -843,6 +904,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extensio
                 dbhz=dbhz,
                 dec=dec,
                 attach_results=['gnssir'] if not recompute_lsp else False,
+                **tagging_kwargs,
             )
 
             # Group arcs by frequency
@@ -853,26 +915,10 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extensio
             qc_lines = []
             all_results = []
             for freq in fr_list:
-                # read apriori reflector height results
-                apriori_results = read_apriori_rh(station, freq, extension)
-
                 print('Analyzing Frequency ', freq, ' Year ', year, ' Day of Year ', doy)
 
                 freq_arcs = arcs_by_freq[freq]
 
-                # Build apriori track lookup
-                rows, columns = np.shape(apriori_results)
-                apriori_tracks = []
-                for i in range(rows):
-                    apriori_tracks.append({
-                        'sat': int(apriori_results[i, 2]),
-                        'az1': apriori_results[i, 5],
-                        'az2': apriori_results[i, 6],
-                        'rh_apriori': apriori_results[i, 1],
-                        'track_azim': apriori_results[i, 3],
-                    })
-
-                # Process each arc from extract_arcs
                 n_total = len(freq_arcs)
                 qc_counts = defaultdict(int)
                 n_saved = 0
@@ -883,19 +929,11 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extensio
                         az_min_ele = meta['az_min_ele']
                         cf = meta['cf']
 
-                        # Match arc to apriori track by satellite and circular distance to track avg azimuth
-                        matching_track = None
-                        for track in apriori_tracks:
-                            if track['sat'] == sat_number and circular_distance_deg(az_min_ele, track['track_azim']) <= 3:
-                                matching_track = track
-                                break
-
-                        if matching_track is None:
+                        rh_apriori = meta['apriori_RH']
+                        track_azim = meta['track_azim']
+                        if rh_apriori is None or track_azim is None:
                             qc_counts['track'] += 1
                             continue
-
-                        rh_apriori = matching_track['rh_apriori']
-                        track_azim = matching_track['track_azim']
 
                         # Data is already detrended and e1/e2 filtered by extract_arcs
                         x, y = data['ele'], data['snr']
@@ -951,7 +989,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extensio
                             continue
                         x_data = np.sin(np.deg2rad(x))
                         y_data = y
-                        test_function_apriori = partial(test_func_new, rh_apriori=rh_apriori,freq=freq)
+                        test_function_apriori = partial(test_func_new, rh_apriori=rh_apriori, freq=freq, sat=int(sat_number))
                         params, params_covariance = optimize.curve_fit(test_function_apriori, x_data, y_data, p0=[2, 2])
 
                         phase = params[1]*180/np.pi
@@ -966,7 +1004,10 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extensio
                         if raw_amp < 0:
                             phase = phase + 180
 
-                        all_results.append([year, doy, utctime, phase, nv, az_min_ele, sat_number, amp, min_el, max_el, del_t, rh_apriori, freq, max_f, obs_pk2noise, max_amp])
+                        row = [year, doy, utctime, phase, nv, az_min_ele, sat_number, amp, min_el, max_el, del_t, rh_apriori, freq, max_f, obs_pk2noise, max_amp]
+                        if not legacy:
+                            row.extend([meta['track_id'], meta['track_epoch']])
+                        all_results.append(row)
                         n_saved += 1
                         arc_passed = True
                     finally:
@@ -977,7 +1018,7 @@ def phase_tracks(station, year, doy, snr_type, fr_list, station_config, extensio
 
             if all_results:
                 all_results.sort(key=lambda r: r[2])  # sort by hour
-                np.savetxt(my_file, all_results, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f", comments="%")
+                np.savetxt(my_file, all_results, fmt=phase_file_fmt(phase_columns), comments="%")
 
             if qc_lines:
                 print('\n'.join(qc_lines) + '\n')
@@ -1172,15 +1213,11 @@ def apply_vwc_leveling(vwc_values, tmin,
             bin_hours = kwargs.get('bin_hours', 24)
             bin_offset = kwargs.get('bin_offset', 0)
 
-            import os
-            xdir = os.environ.get('REFL_CODE', '.')
             suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
             plot_suffix = suffix.replace('.txt', '.png')
 
-            # Build subdir path from extension (consistent with vwc_cl.py pattern)
-            subdir_path = f"{station}/{extension}" if extension else station
-            plot_path = f'{xdir}/Files/{subdir_path}/{station}_baseline_leveling{plot_suffix}'
-            os.makedirs(f'{xdir}/Files/{subdir_path}', exist_ok=True)
+            out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
+            plot_path = f'{out_dir}/{station}_baseline_leveling{plot_suffix}'
 
             plot_baseline_leveling(station, years, doys, vwc_values, baseline_curve,
                                  nodes, plot_path, tmin, level_doys, plt2screen)
@@ -1398,12 +1435,11 @@ def write_avg_phase(station, fr, avg_phase, extension='', bin_hours=24, bin_offs
         bin_starts = avg_phase[:, 8]
 
     # Use FileManagement for consistent phase file paths
-    file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
-    base_fileout = file_manager.get_file_path()
+    out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
     # Generate consistent filename with temporal resolution
     suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
-    fileout = base_fileout.parent / f"{station}_phase{suffix}.txt"
+    fileout = out_dir / f"{station}_phase{suffix}.txt"
 
     if bin_hours < 24:
         print(f'{bin_hours}-hour averaged phases will be written to : ', fileout)
@@ -1464,9 +1500,10 @@ def apriori_file_exist(station, fr, extension=''):
     file_manager = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)
     apriori_path_f, format_type = file_manager.find_apriori_rh_file()
     
-    return apriori_path_f.exists() 
+    return apriori_path_f.exists()
 
-def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = ''):
+
+def load_phase(station, year1, year2, fr, snowmask, extension='', legacy=False):
     """
     Load all phase data and attempt to remove outliers from snow if snowmask provided. 
 
@@ -1517,14 +1554,9 @@ def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = 
 #   now load the phase data
     newresults = []
     results_trans = []
-    vquad = np.empty(shape=[0, 16])
-    # output will go to 
-    output_dir = Path(os.environ['REFL_CODE']) / 'Files' / station
-    if extension:
-        output_dir = output_dir / extension
-
-    # Ensure the directory exists before trying to save to it
-    fname = output_dir / 'raw.phase'
+    per_day_cols = tuple(c for c in (PHASE_COLS_LEGACY if legacy else PHASE_COLS) if c not in ('quad', 'unphase'))
+    vquad = np.empty(shape=[0, len(per_day_cols)])
+    fname = FileManagement(station, FileTypes.raw_phase_file, extension=extension).get_file_path()
 
     dataexist, results = load_sat_phase(station, year1,year2, fr, extension)
     if not dataexist:
@@ -1533,11 +1565,17 @@ def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = 
         return False, [], [], [], [], [], [], [], [], [], [], []
 
     results = results.T # backwards for consistency
+    expected_nc = len(per_day_cols)
+    actual_nc = results.shape[1]
+    if actual_nc != expected_nc:
+        print(f"Phase file has {actual_nc} cols; expected {expected_nc}. "
+              f"Rerun 'phase{' -legacy T' if legacy else ''}' with the current code.")
+        sys.exit()
     if snowmask is None:
         nr,nc = np.shape(results)
         if nr > 0:
             print('Number of rows and columns ', nr,nc)
-            raw = write_out_raw_phase(results,fname)
+            raw = write_out_raw_phase(results, fname, legacy=legacy)
     else:
         print('Snow mask file should exist',snowmask)
         override = np.loadtxt(snowmask, comments='%')
@@ -1546,12 +1584,15 @@ def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = 
             sys.exit()
         # adding nonsense because it doesn't like having only one value
         #  which is a kluge i know
-        # this is failing, so turning off 
+        # this is failing, so turning off
         if False:
             blah = np.array([[1, 2], [3, 4]])
             override = np.vstack((override, blah))
         for year in range(year1,year2+1):
-            ii = (results[:,0] == year) & (results[:,12] == fr)
+            if fr is None:
+                ii = (results[:,0] == year)
+            else:
+                ii = (results[:,0] == year) & (results[:,12] == fr)
         # it is easier for me to do this year by year
             y = results[ii,0];
             d = results[ii,1]
@@ -1568,11 +1609,11 @@ def load_phase_filter_out_snow(station, year1, year2, fr, snowmask, extension = 
             newresults = np.append(newresults, masked_results)
             #vquad = np.vstack((vquad, thisyear_results[mask] ) )
             vquad = np.append(vquad, masked_results,axis=0)
-    #  
+    #
         nr,nc = np.shape(vquad)
         if nr > 0:
             print('Number of rows and columns after snow filter ', nr,nc)
-            raw = write_out_raw_phase(vquad,fname)
+            raw = write_out_raw_phase(vquad, fname, legacy=legacy)
 
     rtrans= np.transpose(raw)
 
@@ -1656,9 +1697,8 @@ def load_avg_phase(station,fr,bin_hours=24,extension='',bin_offset=0):
     avg_exist = False
 
     # Use FileManagement for consistent phase file paths
-    file_manager = FileManagement(station, 'daily_avg_phase_results', extension=extension)
-    base_path = file_manager.get_file_path().parent
-    
+    base_path = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
+
     # Generate consistent filename with exact temporal resolution matching
     suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
     xfile = base_path / f"{station}_phase{suffix}.txt"
@@ -1685,6 +1725,9 @@ def load_avg_phase(station,fr,bin_hours=24,extension='',bin_offset=0):
     return avg_exist, avg_date, avg_phase
 
 
+_ALL_PHASE_CACHE = {}
+
+
 def load_sat_phase(station, year, year_end, freq, extension = ''):
     """
     Picks up the phase estimates from local (REFL_CODE) results section
@@ -1709,10 +1752,13 @@ def load_sat_phase(station, year, year_end, freq, extension = ''):
         basically one variable with everything in the original columns from the daily phase files
 
     """
-    print('Requested frequency: ', freq)
+    if freq is None:
+        print('Requested frequency: all frequencies')
+    else:
+        print('Requested frequency: ', freq)
     dataexist = False
     xdir = os.environ['REFL_CODE']
-    xfile = Path(xdir) / 'input' / 'override' / f'{station}_vwc' 
+    xfile = Path(xdir) / 'input' / 'override' / f'{station}_vwc'
     found_override = False
     # not implementing this yet
     if os.path.exists(xfile):
@@ -1720,31 +1766,39 @@ def load_sat_phase(station, year, year_end, freq, extension = ''):
     #    override = np.loadtxt(xfile, comments='%')
     #    found_override = True
 
-    thedir = Path(os.environ["REFL_CODE"])
-
     if not year_end:
         year_end = year
 
-    results = []
-    for yyyy in range(year, year_end+1):
-        print('reading in year', yyyy)
-        # where the results are stored
-        data_dir = thedir / str(yyyy) / 'phase' / station
-        if extension:
-            data_dir = data_dir / extension
-        local_results = read_files_in_dir(data_dir)
-        if local_results:
-            results.extend(local_results)
+    cache_key = (station, int(year), int(year_end), extension or '')
+    results = _ALL_PHASE_CACHE.get(cache_key)
+    if results is None:
+        thedir = Path(os.environ["REFL_CODE"])
+        rows = []
+        for yyyy in range(year, year_end+1):
+            print('reading in year', yyyy)
+            data_dir = thedir / str(yyyy) / 'phase' / station
+            if extension:
+                data_dir = data_dir / extension
+            local_results = read_files_in_dir(data_dir)
+            if local_results:
+                rows.extend(local_results)
 
-    if not results:
-        print(f"No results were found for the year range you requested: ({year}-{year_end})")
-        sys.exit()
+        if not rows:
+            print(f"No results were found for the year range you requested: ({year}-{year_end})")
+            sys.exit()
 
-    results = np.array(results)
-    freq_list = results[:, 12]
-    ii = (freq_list == freq)
-    results = results[ii, :]
-    print('Total phase measurements for this frequency: ', len(results))
+        results = np.array(rows)
+        _ALL_PHASE_CACHE[cache_key] = results
+    else:
+        print(f'reusing cached phase data for {station} {year}-{year_end}')
+
+    if freq is not None:
+        freq_list = results[:, PHASE_COLS_LEGACY.index('fr')]
+        ii = (freq_list == freq)
+        results = results[ii, :]
+        print('Total phase measurements for this frequency: ', len(results))
+    else:
+        print('Total phase measurements (all frequencies): ', len(results))
 #    common_elements, ar1_i, ar2_i = np.intersect1d(ar1, ar2, return_indices=True)
     #minyear = np.min(np.unique(results[:,0]))
     #maxyear = np.max(np.unique(results[:,0]))
@@ -1883,7 +1937,7 @@ def set_parameters(station, level_doys,minvalperday,tmin,tmax,min_req_pts_track,
         if 'vwc_min_req_pts_track' in station_config:
             min_req_pts_track = station_config['vwc_min_req_pts_track']
         else:
-            min_req_pts_track = 100
+            min_req_pts_track = 30
     # Always load minvalperday from JSON for transparency (even if not used)
     json_minvalperday = None
     if 'vwc_minvalperday' in station_config:
@@ -2284,69 +2338,75 @@ def rename_vals(year_sat_phase, doy, hr, phase, azdata, ssat, amp_lsp, amp_ls, r
     return y,t,h,x,azd,s,amps_lsp,amps_ls,rhs, ap_rhs, mjds
 
 
-def write_out_raw_phase(v,fname):
+def write_out_raw_phase(v, fname, legacy=False):
     """
-    write daily phase values used in vwc to a new consolidated file
-    I added columns for quadrant and unwrapped phase
+    Write daily phase values used in vwc to a consolidated file, inserting
+    quadrant and unwrapped-phase columns after the core columns. In the
+    default (multi-GNSS) path TrackID/TrackEpoch stay as the final two
+    columns; see PHASE_COLS in this module for the exact schema.
 
     Parameters
     ----------
     v : numpy array
-        phase results read for multiple years. 
-        could be with snow filter applied
+        Per-day phase results concatenated across years (optionally
+        snow-filtered). Has the per-day layout: PHASE_COLS_LEGACY /
+        PHASE_COLS minus quad and unphase.
     fname : str
-        filename for output
+        Filename for output.
+    legacy : bool, optional
+        Phase-file layout. ``True`` for the historical GPS layout (no track
+        tags). ``False`` (default) for the multi-GNSS layout, which groups
+        the unwrap by (TrackID, TrackEpoch) rather than by (sat, quadrant).
 
     Returns
     -------
     newv : numpy array
-        original variable v with columns added for
-        quadrant (1-4) and unwrapped phase 
-
+        Rows laid out per PHASE_COLS_LEGACY or PHASE_COLS.
     """
 
-    print('Writing to ', fname)
-    # make sure v is numpy 
+    append = Path(fname).exists() and Path(fname).stat().st_size > 0
+    print(f"{'Appending to' if append else 'Writing to'} {fname}")
     v = np.asarray(v)
-    nr,nc = v.shape; 
-# sort by time
-    ii = np.argsort(v[:,0] + v[:,1]/365.25)
-    v = v[ii,:]
-# calculate quadrants cause it makes life easier
-    q = np.zeros((nr,1)) #
-    for i in range(nr):
-        q[i] = old_quad(v[i,5])
+    nr, _ = v.shape
+    ii = np.argsort(v[:, 0] + v[:, 1]/365.25)
+    v = v[ii, :]
 
-    # make a column full of zeros to store unwrapped phase
-    unwrapped = np.zeros((nr,1)) #
+    out_columns = PHASE_COLS_LEGACY if legacy else PHASE_COLS
+    quad_col = out_columns.index('quad')
+    unphase_col = out_columns.index('unphase')
+    sat_col = out_columns.index('Sat')
+    azim_col = out_columns.index('Azim')
+    phase_col = out_columns.index('Phase')
 
-    # add quadrant column
-    newv = np.hstack((v,q))
-    # add unwrapped column
-    newv = np.hstack((newv,unwrapped))
+    core = v[:, :quad_col]
+    tail = v[:, quad_col:]
+    q = np.array([[old_quad(core[i, azim_col])] for i in range(nr)])
+    unwrapped = np.zeros((nr, 1))
+    newv = np.hstack((core, q, unwrapped, tail))
 
-    # get a list of possible satellites
-    sat_list = np.unique(v[:,6])
-    # discontinuity used in phase wrapping
     discont = 270
+    if legacy:
+        sat_list = np.unique(newv[:, sat_col])
+        for ql in [1, 2, 3, 4]:
+            for s in sat_list:
+                iw = (newv[:, quad_col] == ql) & (newv[:, sat_col] == s)
+                if iw.any():
+                    newv[iw, unphase_col] = np.unwrap(newv[iw, phase_col], period=360, discont=discont)
+    else:
+        tid_col = out_columns.index('TrackID')
+        ep_col = out_columns.index('TrackEpoch')
+        track_ids = newv[:, tid_col]
+        track_epochs = newv[:, ep_col]
+        unique_keys = np.unique(np.column_stack([track_ids, track_epochs]), axis=0)
+        for tid, ep in unique_keys:
+            iw = (track_ids == tid) & (track_epochs == ep)
+            if iw.any():
+                newv[iw, unphase_col] = np.unwrap(newv[iw, phase_col], period=360, discont=discont)
 
-    # make a variable to return
-    tnewv = np.zeros((nr,18)) #
-    for ql in [1,2,3,4]:
-        for s in sat_list:
-            iw = (newv[:,16] == ql) & (newv[:,6] == s)
-            tnewv = newv[iw,:]
-            if (len(tnewv) > 0):
-                doy = tnewv[:,1]; phase = tnewv[:,3]
-                unwrap_phase = np.unwrap(phase,period=360,discont=discont)
-                newv[iw,17] = unwrap_phase
-
-    # headers for output file
-    h1 = "Year DOY Hour   Phase   Nv  Azim   Sat  Ampl emin emax   DelT aprRH  fr  estRH  pk2n  LSPAmp  quad  unphase\n"   
-    h2 = "(1)  (2)  (3)    (4)   (5)   (6)   (7)  (8)  (9)  (10)  (11)   (12)  (13)  (14)   (15)   (16)  (17)  (18) "
-
-    with open(fname, 'w') as my_file:
-        np.savetxt(my_file, newv, fmt="%4.0f %3.0f %6.2f %8.3f %5.0f %6.1f %3.0f %5.2f %5.2f %5.2f %6.2f %5.3f %2.0f %6.3f %6.2f %6.2f %2.0f %8.3f ",header=h1+h2,comments='%')
+    fmt = phase_file_fmt(out_columns)
+    with open(fname, 'a') as my_file:
+        header = '' if append else phase_file_header(out_columns)
+        np.savetxt(my_file, newv, fmt=fmt, header=header, comments='' if append else '%')
 
     return newv
 
