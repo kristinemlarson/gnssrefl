@@ -5,24 +5,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 4.1.4
+
+April 24, 2026
+
+[Fix NMEA allocations for Beidou.] Added more Galileo channels.(https://github.com/kristinemlarson/gnssrefl/pull/405)
+
+[Add more constellations to soil moisture module](https://github.com/kristinemlarson/gnssrefl/pull/407)
+
+
 ## 4.1.3
 
 April 20, 2026
 
+[Don't crash when Glonass > 24 satellite number is found](https://github.com/kristinemlarson/gnssrefl/pull/406)
+
 Minor changes to documentation. sent out gnssrefl email list 
 explanation of changes in past few years.
 
-Will be adding [new PR](https://github.com/kristinemlarson/gnssrefl/pull/403) that governs frequency definitions. 
+Adding [new PR](https://github.com/kristinemlarson/gnssrefl/pull/403) that governs frequency definitions. 
+
+Minor bug fix when [illegal Rinex 3 files](https://github.com/kristinemlarson/gnssrefl/pull/404) are 
+translated (the code previously crashed).
 
 ## 4.1.2
 
 Updated yaml for readthedocs due to deprecation notice
 
-bug in subdaily for csv users
+Fixed bug in subdaily for csv users
 
 ## 4.1.1
 
-fixed bug when gzip not set in json. Default will be True
+Fixed bug when gzip not set in json. Default will be True
 
 ## 4.1.0
 
