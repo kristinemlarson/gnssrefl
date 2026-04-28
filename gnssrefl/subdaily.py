@@ -325,6 +325,9 @@ def readin_and_plot(station, year,d1,d2,plt2screen,extension,sigma,writecsv,azim
                             with warnings.catch_warnings():
                                 warnings.simplefilter("ignore")
                                 a = np.loadtxt(fname,comments='%')
+                                # skip empty files (header-only, no retrievals)
+                                if a.size == 0:
+                                    continue                                    
                                 # this is for files that have only a single row of results
                                 if len(a.shape) == 1:
                                     a = a.reshape(1,len(a))
