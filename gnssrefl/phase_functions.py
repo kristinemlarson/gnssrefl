@@ -1571,6 +1571,15 @@ def load_phase(station, year1, year2, fr, snowmask, extension='', legacy=False):
         print(f"Phase file has {actual_nc} cols; expected {expected_nc}. "
               f"Rerun 'phase{' -legacy T' if legacy else ''}' with the current code.")
         sys.exit()
+
+    # Drop failQC rows (estRH NaN) per the loader contract from
+    # extract_arcs.load_results_with_failqc.
+    estRH_col = per_day_cols.index('estRH')
+    ok = ~np.isnan(results[:, estRH_col])
+    n_dropped = int((~ok).sum())
+    if n_dropped:
+        print(f'Dropped {n_dropped} failQC observations with NaN estRH')
+        results = results[ok, :]
     if snowmask is None:
         nr,nc = np.shape(results)
         if nr > 0:
