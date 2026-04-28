@@ -30,7 +30,7 @@ def elev_limits(snroption):
     elif (snroption == 66):
         emin = 0; emax = 30
     elif (snroption == 88):
-        emin = 5; emax = 90
+        emin = 0; emax = 90
     else:
         emin = 5; emax = 30
 
