@@ -230,10 +230,13 @@ def nmea_translate(locdir, fname, snrfile, csnr, dec, year, doy, recv, sp3, gzip
         # decimation filter
         dec_mask = (t_int % idec) == 0
         t_dec = t_int[dec_mask] + offset
-        prn_dec = prn[dec_mask]
+        prn_dec = prn[dec_mask].copy()
         snr_dec = snr[dec_mask]
         freq_dec = freq[dec_mask]
 
+        glo_mask = (prn_dec >= 165) & (prn_dec <= 196)
+        prn_dec[glo_mask] -= 64
+        
         # vectorized group-by (time, satellite) → s1/s2/s5
         # unique pairs and inverse index
         pairs = np.column_stack((t_dec, prn_dec))
@@ -510,8 +513,7 @@ def read_nmea(fname):
     """
     reads a NMEA file.
 
-    KL: is this statement correct?
-    "it only reads the GPGGA sentence (includes snr data) in NMEA files"
+    Reads timing from RMC sentences (and GGA when present)
 
     Parameters
     ----------
@@ -566,12 +568,24 @@ def read_nmea(fname):
         #line = line.replace('$', '') #Strip leading $
         
         if 'RMC' in line: #Get timing info
-            row = line.split(',')
-            #sect = int(float(row[1][0:2]) * 60 * 60 + float(row[1][2:4]) * 60 + float(row[1][4:])) #Time in seconds
+            row = line.split(',')  
             try:
                 curdt = datetime.datetime(int(row[9][4:6])+2000,int(row[9][2:4]),int(row[9][0:2])) #Current date
             except:
                 pass
+            try:
+                hr = int(row[1][0:2])
+                mn = int(row[1][2:4])
+                sc = float(row[1][4:8])
+                t_sec_rmc = hr*3600 + mn*60 + sc
+                if i > 100 and t_sec_rmc == 0:
+                    t_sec_rmc = 86400
+                if t_sec is None:   # only use RMC time when GGA has not set it yet
+                    t_sec = t_sec_rmc
+                else:
+                    t_sec = t_sec_rmc  # keep in sync with RMC
+            except:
+                pass                
         
         if not curdt: #Skip forward until the first 'RMC' instance which gives a proper date to store
             continue
