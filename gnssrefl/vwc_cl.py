@@ -653,9 +653,9 @@ def process_vwc_from_tracks(
     # Write averaged phase file for QC on subsequent runs (needed by auto_removal)
     qp.write_avg_phase(station, fr, avg_phase, extension, bin_hours, bin_offset)
 
-    # Write avg_phase.txt QA file if requested
+    # Write all_phase.txt QA file if requested
     if save_tracks:
-        fname_phase = f'{vwc_out_dir}/{station}_avg_phase.txt'
+        fname_phase = f'{vwc_out_dir}/{station}_all_phase.txt'
         qp.write_phase_for_advanced(fname_phase, vxyz, station, fr)
 
     # ========================================================================

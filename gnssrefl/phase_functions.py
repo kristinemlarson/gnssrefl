@@ -2410,7 +2410,7 @@ def write_phase_for_advanced(filename, vxyz, station, fr):
     """
     Writes per-track phase observations as a QA dump (one row per observation).
 
-    File written to $REFL_CODE/Files/<station>/vwc_outputs/<freq>/<station>_avg_phase.txt
+    File written to $REFL_CODE/Files/<station>/vwc_outputs/<freq>/<station>_all_phase.txt
 
     Parameters
     ----------
