@@ -121,7 +121,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
     station : str
         Station name
     vxyz : numpy array
-        Full track data (16 columns)
+        Full track data (18 columns; see column list inside the function)
     remoutli : int
         Remove outliers flag
     acc_rhdrift : int
@@ -137,8 +137,6 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
         
     Returns
     -------
-    tracks : numpy array
-        Unique satellite/quadrant combinations
     metrics_all : numpy array
         Normalized metrics [D_amplsp, D_amp, D_phi, D_RH]
     vegmast : numpy array
@@ -310,8 +308,6 @@ def apply_vegetation_model(station, vxyz, normmet, sgolnum, sgolply,
         Original vwc data
     normmet : numpy array
         Normalized metrics from norm_zero_vxyz
-    tracks : numpy array
-        Satellite/quadrant combinations
     sgolnum : int
         Savgol filter length
     sgolply : int

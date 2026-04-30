@@ -197,12 +197,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = None, plt: bool
     -------
 
     Daily phase results in a file at
-        $REFL_CODE/Files/<station>/[<extension>/]<station>_phase_<C>_<label>_<bin_hours>hr+<bin_offset>.txt
+        $REFL_CODE/Files/<station>/[<extension>/]vwc_outputs/<label>/<station>_phase_<bin_hours>hr.txt
         with columns: Year DOY Ph Phsig NormA MM DD
-        (<C> is the constellation char G/R/E/C and <label> the signal label L1/L2C/L5/...)
+        (<label> is f<fr>_<C>_<signal>, e.g. f20_G_L2C; bin_offset lives in the file header)
 
     VWC results in a file at
-        $REFL_CODE/Files/<station>/[<extension>/]<station>_vwc_<C>_<label>_<bin_hours>hr+<bin_offset>.txt
+        $REFL_CODE/Files/<station>/[<extension>/]vwc_outputs/<label>/<station>_vwc_<bin_hours>hr.txt
         with columns: FracYr Year DOY  VWC Month Day
 
     """
@@ -775,7 +775,7 @@ def vwc_legacy(station, year, year_end, fr, plt, screenstats, min_req_pts_track,
     Reads apriori_rh_{fr}.txt (the legacy per-freq track list), then
     delegates the downstream pipeline to process_vwc_from_tracks, which
     matches each phase-file row to a track by (satellite, azimuth within
-    3 deg) when no vwc_tracks.json doc is supplied.
+    3 deg) when no vwc_tracks.json is supplied.
     """
     fr_list = qp.get_vwc_frequency(station, extension, fr)
     if len(fr_list) > 1:
@@ -806,8 +806,8 @@ def get_vwc_tracks_freqs(station, extension=''):
     vwc_tracks_path = FileManagement(station, 'vwc_tracks_file', extension=extension).get_file_path(ensure_directory=False)
     if not vwc_tracks_path.exists():
         return None
-    doc = load_vwc_tracks(vwc_tracks_path)
-    return sorted({int(track['freq']) for track in doc['tracks'].values()})
+    tracks_json = load_vwc_tracks(vwc_tracks_path)
+    return sorted({int(track['freq']) for track in tracks_json['tracks'].values()})
 
 
 def main():
@@ -856,9 +856,7 @@ def main():
         if 'plt' in args:
             plt_default_for_loop = args['plt']
         else:
-            # User omitted -plt during an auto-loop: save per-freq plots but
-            # don't pop 15 windows. Switching to a non-interactive backend
-            # makes plt.show() a no-op while savefig still works.
+            # Non-interactive backend so per-freq plots still save without popping windows.
             matplt.switch_backend('Agg')
             plt_default_for_loop = True
         for fr in freqs:

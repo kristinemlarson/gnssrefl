@@ -27,6 +27,7 @@ from pathlib import Path
 
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
+from gnssrefl.tracks import warn_legacy_apriori_and_exit
 from gnssrefl.utils import str2bool, FileManagement
 from gnssrefl.vwc_cl import vwc, get_vwc_tracks_freqs
 
@@ -286,7 +287,7 @@ def vwc_hourly(station: str, year: int, fr: int, year_end: int = None, plt: bool
 
     Returns
     -------
-    Creates hourly rolling VWC file: station_vwc_L2_rolling6hr.txt
+    Creates hourly rolling VWC file under $REFL_CODE/Files/<station>/vwc_outputs/<freq_label>/<station>_vwc_rolling<bin_hours>hr.txt
     """
     valid_bin_hours = [1, 2, 3, 4, 6, 8, 12]  # No 24hr for rolling
     if bin_hours not in valid_bin_hours:
@@ -381,23 +382,6 @@ def vwc_hourly(station: str, year: int, fr: int, year_end: int = None, plt: bool
                 bin_hours, minvalperbin, 0
             )
 
-        # Delete existing track files for requested year(s) and regenerate
-        fm = FileManagement(station, "individual_tracks", frequency=resolved_fr, extension=extension)
-        track_dir = str(fm.get_directory_path(ensure_directory=False))
-
-        years_to_regenerate = range(year, (year_end if year_end else year) + 1)
-
-        # Delete track files for requested years only (legacy filenames embed year)
-        if os.path.exists(track_dir):
-            deleted_count = 0
-            for yr in years_to_regenerate:
-                for f in glob.glob(f'{track_dir}/{station}_track_sat*_az*_{yr}.txt'):
-                    os.remove(f)
-                    deleted_count += 1
-            if deleted_count > 0:
-                print(f'Deleted {deleted_count} existing track files for year(s) {year}-{year_end if year_end else year}')
-
-        # Generate fresh track files for requested years
         print("=== Generating track data with vwc -save_tracks T ===")
         vwc(station=station, year=year, year_end=year_end, fr=resolved_fr, plt=False, screenstats=False,
             bin_hours=24, minvalperbin=minvalperbin, bin_offset=0,
@@ -467,6 +451,7 @@ def main_hourly():
 
     available = get_vwc_tracks_freqs(station, extension)
     if available is None:
+        warn_legacy_apriori_and_exit(station, 'vwc_tracks.json', extension)
         print('vwc_tracks.json not found. Run `vwc_input` first.')
         sys.exit()
     if not available:
@@ -497,8 +482,6 @@ def main_hourly():
         for fr in freqs:
             print(f'\n{"=" * 60}\n  vwc_hourly -fr {fr}\n{"=" * 60}\n')
             vwc_hourly(**{**args, 'fr': fr, 'plt': plt_default})
-
-    print('WARNING: vwc_hourly is experimental code.')
 
 
 def main():
