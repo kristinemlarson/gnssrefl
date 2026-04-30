@@ -551,7 +551,7 @@ def process_vwc_from_tracks(
                 else:
                     print(f'No previous solution or not enough points for this satellite. sat {int(satellite)} avgAz {track_avg_az:.1f} n={len(newl2)}')
 
-                adv_color = colors[ww:ww + 1]  # sets color for below
+                adv_color = colors[ww % len(colors)]  # cycle when more tracks than palette entries
                 # stack this latest set of values to vxyz
                 vxyz = np.vstack((vxyz, newl2))
                 datetime_dates = []
