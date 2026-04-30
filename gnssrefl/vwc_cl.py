@@ -399,7 +399,7 @@ def process_vwc_from_tracks(
 
     k = 1
     # define the contents of this variable HERE
-    vxyz = np.empty(shape=[0, 16])
+    vxyz = np.empty(shape=[0, 18])
     # column, contents of this variable
     # 0 year
     # 1 doy
@@ -417,6 +417,8 @@ def process_vwc_from_tracks(
     # 13 delRH (for adv model)
     # 14 vegMask (for adv model)
     # 15 MJD for Kristine's sanity
+    # 16 track_id (modern path; -1 sentinel on legacy path)
+    # 17 track_epoch (modern path; -1 sentinel on legacy path)
 
 
     # this is the number of points for a given satellite track
@@ -530,7 +532,9 @@ def process_vwc_from_tracks(
                 vegMask = np.zeros(shape=[NN, 1])
                 vegMask[i] = 1
 
-                newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP, norm_ampLS, h, amp_lsps, amp_lss, ap_rhs, qs, delRH, vegMask.T, mjds)).T
+                tid_col = (tid if tid is not None else -1) * np.ones(shape=[1, NN])
+                ep_col = (ep if ep is not None else -1) * np.ones(shape=[1, NN])
+                newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP, norm_ampLS, h, amp_lsps, amp_lss, ap_rhs, qs, delRH, vegMask.T, mjds, tid_col, ep_col)).T
 
                 # this is a kind of quality control -use previous solution to have
                 # better feel for whether current solution works. defintely needs to go in a function
@@ -624,8 +628,7 @@ def process_vwc_from_tracks(
                   f"({counts['tracks_removed']}/{counts['tracks_total']} tracks fully removed); "
                   f"history appended to {vwc_tracks_path.name}")
 
-    # Generate azimuth plot filename with temporal suffix
-    suffix = qp.get_temporal_suffix(freq, bin_hours, bin_offset)
+    suffix = qp.get_temporal_suffix(bin_hours, bin_offset)
     vwc_out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
     # Skip saving plots when -plt F or skip_leveling (vwc_hourly two-pass mode)
@@ -650,16 +653,16 @@ def process_vwc_from_tracks(
     # Write averaged phase file for QC on subsequent runs (needed by auto_removal)
     qp.write_avg_phase(station, fr, avg_phase, extension, bin_hours, bin_offset)
 
-    # Write all_phase.txt file if requested
+    # Write avg_phase.txt QA file if requested
     if save_tracks:
-        fname_phase = f'{vwc_out_dir}/{station}_all_phase.txt'
-        qp.write_phase_for_advanced(fname_phase, vxyz)
+        fname_phase = f'{vwc_out_dir}/{station}_avg_phase.txt'
+        qp.write_phase_for_advanced(fname_phase, vxyz, station, fr)
 
     # ========================================================================
     # TRACK-LEVEL PHASE DATA (vxyz)
     # ========================================================================
     #
-    # vxyz contains individual satellite track observations (N x 16 array):
+    # vxyz contains individual satellite track observations (N x 18 array):
     #   - Each row = ONE observation from ONE satellite pass
     #   - Example: 10,000+ rows for a year of data
     #   - Columns:
@@ -679,6 +682,8 @@ def process_vwc_from_tracks(
     #       [13] delRH (RH - apriori_RH, meters)
     #       [14] vegMask (vegetation mask flag)
     #       [15] MJD (Modified Julian Day)
+    #       [16] track_id (modern path; -1 sentinel on legacy path)
+    #       [17] track_epoch (modern path; -1 sentinel on legacy path)
     #
     # This track-level data is passed directly to vegetation filters and plotting functions.
     # ========================================================================
@@ -746,13 +751,12 @@ def process_vwc_from_tracks(
 
     if plt:
         print('\nGenerating final VWC plot...')
-        suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
-        plot_suffix = suffix.replace('.txt', '.png')
+        suffix = qp.get_temporal_suffix(bin_hours, bin_offset)
 
         if hires_figs:
-            plot_path = f'{vwc_out_dir}/{station}_vol_soil_moisture{plot_suffix[:-4]}.eps'
+            plot_path = f'{vwc_out_dir}/{station}_vol_soil_moisture{suffix}.eps'
         else:
-            plot_path = f'{vwc_out_dir}/{station}_vol_soil_moisture{plot_suffix}'
+            plot_path = f'{vwc_out_dir}/{station}_vol_soil_moisture{suffix}.png'
 
         qp.vwc_plot(station, vwc_data['datetime'], leveled_vwc, plot_path, circles, plt2screen=plt)
 

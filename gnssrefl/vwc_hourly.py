@@ -26,7 +26,6 @@ from pathlib import Path
 
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
-from gnssrefl.gnss_frequencies import get_file_suffix
 from gnssrefl.utils import str2bool, FileManagement
 from gnssrefl.vwc_cl import vwc
 
@@ -81,11 +80,9 @@ def combine_offset_files_to_vwc_data(station, fr, bin_hours, extension=''):
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
     base_vwc_path = file_manager.get_file_path()
 
-    freq_suffix = get_file_suffix(fr)
-
     # Read all offset VWC files to combine
     for offset in range(bin_hours):
-        vwc_file = base_vwc_path.parent / f"{station}_vwc{freq_suffix}_{bin_hours}hr+{offset}.txt"
+        vwc_file = base_vwc_path.parent / f"{station}_vwc_{bin_hours}hr+{offset}.txt"
 
         if vwc_file.exists():
             try:
@@ -230,13 +227,11 @@ def plot_hourly_vs_daily_vwc(station, fr, bin_hours, extension=''):
     Requires both daily and hourly VWC files to exist.
     """
 
-    freq_suffix = get_file_suffix(fr)
-
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
     base_vwc_path = file_manager.get_file_path()
 
-    daily_file = base_vwc_path.parent / f"{station}_vwc{freq_suffix}_24hr+0.txt"
-    hourly_file = base_vwc_path.parent / f"{station}_vwc{freq_suffix}_rolling{bin_hours}hr.txt"
+    daily_file = base_vwc_path.parent / f"{station}_vwc_24hr+0.txt"
+    hourly_file = base_vwc_path.parent / f"{station}_vwc_rolling{bin_hours}hr.txt"
     
     # Ensure both files exist
     if not daily_file.exists():
@@ -457,18 +452,16 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
             )
 
         # Delete existing track files for requested year(s) and regenerate
-        fm = FileManagement(station, "individual_tracks", extension=extension)
+        fm = FileManagement(station, "individual_tracks", frequency=resolved_fr, extension=extension)
         track_dir = str(fm.get_directory_path(ensure_directory=False))
 
-        # Determine year range to delete/regenerate
-        freq_suffix = qp.get_temporal_suffix(resolved_fr, include_time=False)
         years_to_regenerate = range(year, (year_end if year_end else year) + 1)
 
-        # Delete track files for requested years only
+        # Delete track files for requested years only (legacy filenames embed year)
         if os.path.exists(track_dir):
             deleted_count = 0
             for yr in years_to_regenerate:
-                for f in glob.glob(f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'):
+                for f in glob.glob(f'{track_dir}/{station}_track_sat*_az*_{yr}.txt'):
                     os.remove(f)
                     deleted_count += 1
             if deleted_count > 0:
@@ -565,7 +558,7 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         Dictionary with 'mjd', 'vwc', 'datetime', 'bin_starts' (NOT leveled yet)
         Returns None if no track data found
     """
-    fm = FileManagement(station, "individual_tracks", extension=extension)
+    fm = FileManagement(station, "individual_tracks", frequency=fr, extension=extension)
     track_dir = str(fm.get_directory_path(ensure_directory=False))
 
     if not os.path.exists(track_dir):
@@ -573,25 +566,7 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         print('Run vwc with -save_tracks T first to generate individual track files')
         return None
 
-    freq_suffix = qp.get_temporal_suffix(fr, include_time=False)
-
-    # Determine year range
-    if year and year_end:
-        years_to_load = range(year, year_end + 1)
-    elif year:
-        years_to_load = [year]
-    else:
-        # Load all years if not specified
-        pattern = f'{track_dir}/{station}_track_sat*_az*_*{freq_suffix}.txt'
-        track_files = glob.glob(pattern)
-        years_to_load = None
-
-    # Load track files for specified years
-    if years_to_load:
-        track_files = []
-        for yr in years_to_load:
-            pattern = f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'
-            track_files.extend(glob.glob(pattern))
+    track_files = glob.glob(f'{track_dir}/{station}_*.txt')
 
     if not track_files:
         print(f'No track files found in {track_dir}')
@@ -617,7 +592,16 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         return None
 
     combined_data = np.vstack(all_data)
+    if year is not None:
+        y_lo = year
+        y_hi = year_end if year_end else year
+        years_col = combined_data[:, 0].astype(int)
+        combined_data = combined_data[(years_col >= y_lo) & (years_col <= y_hi)]
     print(f'Loaded {len(combined_data)} individual track observations from saved files')
+
+    if len(combined_data) == 0:
+        print('No track observations matched the requested year range')
+        return None
 
     # Extract columns: Year(0), DOY(1), Hour(2), MJD(3), VWC(16)
     hours = combined_data[:, 2]
