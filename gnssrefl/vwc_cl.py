@@ -367,7 +367,7 @@ def process_vwc_from_tracks(
         snowfileexists, snow_file = qp.make_snow_filter(station, medf, ReqTracks, year, year_end + 1)
         matplt.close('all')  # we do not want the plots to come to the screen for the daily average
 
-    avg_exist, avg_date, avg_phase = qp.load_avg_phase(station, freq, bin_hours, extension, bin_offset)
+    avg_exist, avg_date, avg_phase = qp.load_avg_phase(station, freq, bin_hours, extension)
 
     legacy_path = vwc_tracks is None
     data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp, amp_ls, ap_rh, results = \
@@ -628,7 +628,7 @@ def process_vwc_from_tracks(
                   f"({counts['tracks_removed']}/{counts['tracks_total']} tracks fully removed); "
                   f"history appended to {vwc_tracks_path.name}")
 
-    suffix = qp.get_temporal_suffix(bin_hours, bin_offset)
+    suffix = qp.get_temporal_suffix(bin_hours)
     vwc_out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
     # Skip saving plots when -plt F or skip_leveling (vwc_hourly two-pass mode)
@@ -751,7 +751,7 @@ def process_vwc_from_tracks(
 
     if plt:
         print('\nGenerating final VWC plot...')
-        suffix = qp.get_temporal_suffix(bin_hours, bin_offset)
+        suffix = qp.get_temporal_suffix(bin_hours)
 
         if hires_figs:
             plot_path = f'{vwc_out_dir}/{station}_vol_soil_moisture{suffix}.eps'

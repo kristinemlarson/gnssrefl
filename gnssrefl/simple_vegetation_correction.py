@@ -161,7 +161,7 @@ def simple_vegetation_filter(station, vxyz, extension='',
 
         # Save diagnostic plot alongside the other per-freq vwc outputs
         outdir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
-        suffix = qp.get_temporal_suffix(bin_hours, bin_offset)
+        suffix = qp.get_temporal_suffix(bin_hours)
         plot_path = f'{outdir}/{station}_phase_vegcorr{suffix}.png'
         print(f"Saving vegetation correction diagnostic plot to {plot_path}")
         plt.savefig(plot_path)

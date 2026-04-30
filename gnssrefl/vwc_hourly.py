@@ -19,6 +19,7 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import shutil
 import sys
 
 from datetime import datetime, timedelta
@@ -517,6 +518,17 @@ def vwc_hourly(station: str, year: int, fr: int, year_end: int = None, plt: bool
     qp.write_rolling_vwc_output(station, vwc_data, resolved_fr, bin_hours, extension, vegetation_model=veg_model)
 
     print(f"Successfully generated {len(vwc_data['vwc'])} hourly rolling VWC measurements")
+
+    vwc_out_dir = FileManagement(station, 'vwc_outputs',
+                                 frequency=resolved_fr, extension=extension).get_directory_path()
+
+    if veg_model == 1:
+        (vwc_out_dir / f'{station}_phase_{bin_hours}hr.txt').unlink(missing_ok=True)
+    elif veg_model == 2:
+        (vwc_out_dir / f'{station}_avg_phase.txt').unlink(missing_ok=True)
+        tracks_dir = vwc_out_dir / 'individual_tracks'
+        if tracks_dir.exists():
+            shutil.rmtree(tracks_dir)
 
     if plt:
         print("=== Generating VWC Comparison Plot ===")

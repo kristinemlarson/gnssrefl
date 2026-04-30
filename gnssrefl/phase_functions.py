@@ -60,26 +60,25 @@ def phase_file_fmt(columns):
     return ' '.join(PHASE_FMT[c] for c in columns)
 
 
-def get_temporal_suffix(bin_hours=24, bin_offset=0):
+def get_temporal_suffix(bin_hours=24):
     """
     Generate the temporal-resolution suffix for vwc output filenames.
 
-    The constellation/band tag is omitted because every vwc output is already
-    written to a per-freq subdirectory (e.g. vwc_outputs/G_L2C/).
+    Format is `_{bin_hours}hr` (e.g. `_24hr`, `_6hr`). The bin_offset is
+    intentionally not in the filename; it lives in the file header instead
+    (see `write_avg_phase` / `write_vwc_output` subdaily header lines).
 
     Parameters
     ----------
     bin_hours : int, optional
         Time bin size in hours. Default is 24 (daily)
-    bin_offset : int, optional
-        Bin timing offset in hours. Default is 0
 
     Returns
     -------
     str
-        Suffix string like "_24hr+0", "_6hr+1", etc.
+        Suffix string like "_24hr", "_6hr".
     """
-    return f"_{bin_hours}hr+{bin_offset}"
+    return f"_{bin_hours}hr"
 
 def prepare_track_dir(station, extension, fr):
     """
@@ -274,7 +273,7 @@ def subdaily_phase_plot(station, fr, vxyz, outdir, hires_figs, bin_hours=24, bin
     plt.grid()
     plt.gcf().autofmt_xdate()
 
-    suffix = get_temporal_suffix(bin_hours, bin_offset)
+    suffix = get_temporal_suffix(bin_hours)
     if hires_figs:
         plot_path = f'{outdir}/{station}_phase{suffix}.eps'
     else:
@@ -500,7 +499,7 @@ def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
     # Generate standard filename
     out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
-    suffix = get_temporal_suffix(bin_hours, bin_offset)
+    suffix = get_temporal_suffix(bin_hours)
     vwcfile = out_dir / f"{station}_vwc{suffix}.txt"
 
     print(f'VWC results being written to {vwcfile}')
@@ -1204,7 +1203,7 @@ def apply_vwc_leveling(vwc_values, tmin,
             bin_hours = kwargs.get('bin_hours', 24)
             bin_offset = kwargs.get('bin_offset', 0)
 
-            plot_suffix = get_temporal_suffix(bin_hours, bin_offset) + '.png'
+            plot_suffix = get_temporal_suffix(bin_hours) + '.png'
 
             out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
             plot_path = f'{out_dir}/{station}_baseline_leveling{plot_suffix}'
@@ -1427,7 +1426,7 @@ def write_avg_phase(station, fr, avg_phase, extension='', bin_hours=24, bin_offs
     # Use FileManagement for consistent phase file paths
     out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
-    suffix = get_temporal_suffix(bin_hours, bin_offset)
+    suffix = get_temporal_suffix(bin_hours)
     fileout = out_dir / f"{station}_phase{suffix}.txt"
 
     if bin_hours < 24:
@@ -1661,7 +1660,7 @@ def help_debug(rt,xdir, station):
     #    debug.close()
 
 
-def load_avg_phase(station,fr,bin_hours=24,extension='',bin_offset=0):
+def load_avg_phase(station,fr,bin_hours=24,extension=''):
     """
     loads a previously computed averaged phase solution with matching temporal resolution.
     this is NOT the same as the multi-track phase results.
@@ -1697,7 +1696,7 @@ def load_avg_phase(station,fr,bin_hours=24,extension='',bin_offset=0):
     # Use FileManagement for consistent phase file paths
     base_path = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
-    suffix = get_temporal_suffix(bin_hours, bin_offset)
+    suffix = get_temporal_suffix(bin_hours)
     xfile = base_path / f"{station}_phase{suffix}.txt"
 
     if os.path.exists(xfile):
