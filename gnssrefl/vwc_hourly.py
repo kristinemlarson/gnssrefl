@@ -70,84 +70,6 @@ def parse_arguments_hourly():
     return {key: value for key, value in args.items() if value is not None}
 
 
-def combine_offset_files_to_vwc_data(station, fr, bin_hours, extension=''):
-    """
-    Combine all offset VWC files into a unified vwc_data dictionary. Used for vegetation model 1 processing.
-
-    Reads all VWC offset files (e.g., p038_vwc_L2_6hr+0.txt, p038_vwc_L2_6hr+1.txt, etc.),
-    sorts all measurements chronologically, and returns a vwc_data dict.
-
-    Returns
-    -------
-    vwc_data : dict or None
-        Dictionary with 'mjd', 'vwc', 'datetime', 'bin_starts'
-        Returns None if no data found
-    """
-    all_measurements = []
-
-    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
-    base_vwc_path = file_manager.get_file_path()
-
-    # Read all offset VWC files to combine
-    for offset in range(bin_hours):
-        vwc_file = base_vwc_path.parent / f"{station}_vwc_{bin_hours}hr+{offset}.txt"
-
-        if vwc_file.exists():
-            try:
-                data = np.loadtxt(vwc_file, comments='%')
-                if len(data.shape) == 1:  # Single row
-                    data = data.reshape(1, -1)
-
-                for row in data:
-                    all_measurements.append(row)
-                print(f"  Read {len(data)} VWC measurements from offset {offset}")
-            except Exception as e:
-                print(f"  Warning: Could not read VWC offset file {vwc_file}: {e}")
-        else:
-            print(f"  Warning: VWC offset file {vwc_file} not found")
-
-    if not all_measurements:
-        print("  Error: No VWC measurements found in any offset files")
-        return None
-
-    # Convert to numpy array
-    all_measurements = np.array(all_measurements)
-
-    # Build temporary arrays for MJD calculation
-    # File columns: [FracYr(0), Year(1), DOY(2), VWC(3), Month(4), Day(5), BinStart(6)]
-    years = all_measurements[:, 1].astype(int)
-    doys = all_measurements[:, 2].astype(int)
-    vwc = all_measurements[:, 3]
-    bin_starts = all_measurements[:, 6].astype(int)
-
-    # Convert year/doy/binhour to MJD
-    mjd_values = []
-    datetimes = []
-    for yr, doy, bin_hr in zip(years, doys, bin_starts):
-        mjd = g.ydoy2mjd(int(yr), int(doy)) + int(bin_hr) / 24.0
-        mjd_values.append(mjd)
-        datetimes.append(g.mjd_to_datetime(mjd))
-
-    # Sort by MJD for chronological ordering
-    mjd_array = np.array(mjd_values)
-    sort_indices = np.argsort(mjd_array)
-
-    mjd_values = [mjd_values[i] for i in sort_indices]
-    vwc = vwc[sort_indices]
-    datetimes = [datetimes[i] for i in sort_indices]
-    bin_starts = bin_starts[sort_indices]
-
-    vwc_data = {
-        'mjd': mjd_values,
-        'vwc': vwc.tolist(),
-        'datetime': datetimes,
-        'bin_starts': bin_starts.tolist()
-    }
-
-    print(f"  Combined {len(mjd_values)} VWC measurements from offset files")
-    return vwc_data
-
-
 def combine_and_level_vwc_data(all_vwc_data, tmin, level_doys,
                                 polyorder, station, extension, fr, bin_hours):
     """
@@ -238,7 +160,7 @@ def plot_hourly_vs_daily_vwc(station, fr, bin_hours, extension=''):
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
     base_vwc_path = file_manager.get_file_path()
 
-    daily_file = base_vwc_path.parent / f"{station}_vwc_24hr+0.txt"
+    daily_file = base_vwc_path.parent / f"{station}_vwc_24hr.txt"
     hourly_file = base_vwc_path.parent / f"{station}_vwc_rolling{bin_hours}hr.txt"
     
     # Ensure both files exist
