@@ -16,6 +16,7 @@ import glob
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -224,50 +225,44 @@ def attach_vwc_track_results(arcs, station, year, doy, extension='',
                              az_tolerance=5.0, time_tolerance=0.25):
     """Attach VWC track results to extracted arcs.
 
-    Matches track file rows to arcs by sat, freq suffix, azimuth, and hour.
+    Matches track file rows to arcs by sat, azimuth, and hour. Track files
+    live under vwc_outputs/<freq>/individual_tracks/, so the freq lookup is
+    resolved by the per-arc metadata['freq'].
+
     Sets ``metadata['vwc_track_results']`` to a dict or ``None``.
     """
-    import re
-    from gnssrefl.phase_functions import get_temporal_suffix
-
-    def _set_all_none():
+    if not os.environ.get('REFL_CODE', ''):
         for metadata, _data in arcs:
             metadata['vwc_track_results'] = None
         return arcs
 
-    refl_code = os.environ.get('REFL_CODE', '')
-    if not refl_code:
-        return _set_all_none()
-
-    fm = FileManagement(station, "individual_tracks", extension=extension)
-    track_dir = str(fm.get_directory_path(ensure_directory=False))
-    if not os.path.isdir(track_dir):
-        return _set_all_none()
-
-    # {station}_track_sat{NN}_az{NNN}_{year}{freq}.txt
-    filename_re = re.compile(r'.*_track_sat(\d{2})_az(\d{3})_')
-    sat_lookup = {}
-    for fpath in glob.glob(os.path.join(track_dir, '*.txt')):
-        m = filename_re.match(os.path.basename(fpath))
-        if m:
-            sat_lookup.setdefault(int(m.group(1)), []).append((int(m.group(2)), fpath))
-    if not sat_lookup:
-        return _set_all_none()
+    filename_re = re.compile(r'_sat(\d{2})_az(\d{3})')
 
     vwc_fields = {name: (i, float) for i, name in enumerate(VWC_TRACK_COLUMNS)}
     for col in ('Year', 'DOY', 'MJD'):
         vwc_fields[col] = (VWC_TRACK_COLUMNS.index(col), int)
 
+    freq_lookups = {}
+
     for metadata, _data in arcs:
         metadata['vwc_track_results'] = None
-        candidates = sat_lookup.get(metadata['sat'])
-        if not candidates:
+        fr = metadata.get('freq')
+        if fr is None:
             continue
-        try:
-            freq_suffix = get_temporal_suffix(metadata['freq'], include_time=False)
-        except Exception:
-            continue
-        candidates = [(az, fp) for az, fp in candidates if freq_suffix in os.path.basename(fp)]
+        if fr not in freq_lookups:
+            try:
+                freq_dir = str(FileManagement(station, "individual_tracks", frequency=fr,
+                                              extension=extension).get_directory_path(ensure_directory=False))
+            except Exception:
+                freq_dir = None
+            sat_to_files = {}
+            if freq_dir and os.path.isdir(freq_dir):
+                for fpath in glob.glob(os.path.join(freq_dir, f'{station}_*.txt')):
+                    m = filename_re.search(os.path.basename(fpath))
+                    if m:
+                        sat_to_files.setdefault(int(m.group(1)), []).append((int(m.group(2)), fpath))
+            freq_lookups[fr] = sat_to_files
+        candidates = freq_lookups[fr].get(metadata['sat'])
         if not candidates:
             continue
         az_dists = np.array([circular_distance_deg(metadata['az_min_ele'], az) for az, _ in candidates])

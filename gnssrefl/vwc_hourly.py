@@ -19,6 +19,7 @@ import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import shutil
 import sys
 
 from datetime import datetime, timedelta
@@ -26,9 +27,9 @@ from pathlib import Path
 
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
-from gnssrefl.gnss_frequencies import get_file_suffix
+from gnssrefl.tracks import warn_legacy_apriori_and_exit
 from gnssrefl.utils import str2bool, FileManagement
-from gnssrefl.vwc_cl import vwc
+from gnssrefl.vwc_cl import vwc, get_vwc_tracks_freqs
 
 
 def parse_arguments_hourly():
@@ -37,8 +38,15 @@ def parse_arguments_hourly():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year_end", type=int)
-    parser.add_argument("-fr", help="frequency: 1 (L1), 20 (L2C), 5 (L5). Only L2C officially supported.", type=str)
-    parser.add_argument("-plt", default=None, type=str, help="boolean for plotting to screen")
+    parser.add_argument("-fr", default=None, nargs="*", type=int,
+                        help="frequency filter. Omit to loop over every freq in "
+                             "vwc_tracks.json, pass one value for a single-freq run, "
+                             "or pass multiple values (e.g. -fr 20 5) to loop over "
+                             "that subset. L2C is the most validated.")
+    parser.add_argument("-plt", default=None, type=str,
+                        help="boolean for plotting to screen. Default: True for single-frequency "
+                             "runs; False when auto-looping over multiple frequencies. Pass -plt T "
+                             "to force plots during an auto-loop.")
     parser.add_argument("-bin_hours", default=6, type=int, help="time bin size in hours (1,2,3,4,6,8,12). Default is 6")
     parser.add_argument("-minvalperbin", default=None, type=int, help="min number of satellite tracks needed per time bin. Default is 10")
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 100")
@@ -61,86 +69,6 @@ def parse_arguments_hourly():
     boolean_args = ['plt','snow_filter','auto_removal','hires_figs','advanced']
     args = str2bool(args, boolean_args)
     return {key: value for key, value in args.items() if value is not None}
-
-
-def combine_offset_files_to_vwc_data(station, fr, bin_hours, extension=''):
-    """
-    Combine all offset VWC files into a unified vwc_data dictionary. Used for vegetation model 1 processing.
-
-    Reads all VWC offset files (e.g., p038_vwc_L2_6hr+0.txt, p038_vwc_L2_6hr+1.txt, etc.),
-    sorts all measurements chronologically, and returns a vwc_data dict.
-
-    Returns
-    -------
-    vwc_data : dict or None
-        Dictionary with 'mjd', 'vwc', 'datetime', 'bin_starts'
-        Returns None if no data found
-    """
-    all_measurements = []
-
-    file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
-    base_vwc_path = file_manager.get_file_path()
-
-    freq_suffix = get_file_suffix(fr)
-
-    # Read all offset VWC files to combine
-    for offset in range(bin_hours):
-        vwc_file = base_vwc_path.parent / f"{station}_vwc{freq_suffix}_{bin_hours}hr+{offset}.txt"
-
-        if vwc_file.exists():
-            try:
-                data = np.loadtxt(vwc_file, comments='%')
-                if len(data.shape) == 1:  # Single row
-                    data = data.reshape(1, -1)
-
-                for row in data:
-                    all_measurements.append(row)
-                print(f"  Read {len(data)} VWC measurements from offset {offset}")
-            except Exception as e:
-                print(f"  Warning: Could not read VWC offset file {vwc_file}: {e}")
-        else:
-            print(f"  Warning: VWC offset file {vwc_file} not found")
-
-    if not all_measurements:
-        print("  Error: No VWC measurements found in any offset files")
-        return None
-
-    # Convert to numpy array
-    all_measurements = np.array(all_measurements)
-
-    # Build temporary arrays for MJD calculation
-    # File columns: [FracYr(0), Year(1), DOY(2), VWC(3), Month(4), Day(5), BinStart(6)]
-    years = all_measurements[:, 1].astype(int)
-    doys = all_measurements[:, 2].astype(int)
-    vwc = all_measurements[:, 3]
-    bin_starts = all_measurements[:, 6].astype(int)
-
-    # Convert year/doy/binhour to MJD
-    mjd_values = []
-    datetimes = []
-    for yr, doy, bin_hr in zip(years, doys, bin_starts):
-        mjd = g.ydoy2mjd(int(yr), int(doy)) + int(bin_hr) / 24.0
-        mjd_values.append(mjd)
-        datetimes.append(g.mjd_to_datetime(mjd))
-
-    # Sort by MJD for chronological ordering
-    mjd_array = np.array(mjd_values)
-    sort_indices = np.argsort(mjd_array)
-
-    mjd_values = [mjd_values[i] for i in sort_indices]
-    vwc = vwc[sort_indices]
-    datetimes = [datetimes[i] for i in sort_indices]
-    bin_starts = bin_starts[sort_indices]
-
-    vwc_data = {
-        'mjd': mjd_values,
-        'vwc': vwc.tolist(),
-        'datetime': datetimes,
-        'bin_starts': bin_starts.tolist()
-    }
-
-    print(f"  Combined {len(mjd_values)} VWC measurements from offset files")
-    return vwc_data
 
 
 def combine_and_level_vwc_data(all_vwc_data, tmin, level_doys,
@@ -230,13 +158,11 @@ def plot_hourly_vs_daily_vwc(station, fr, bin_hours, extension=''):
     Requires both daily and hourly VWC files to exist.
     """
 
-    freq_suffix = get_file_suffix(fr)
-
     file_manager = FileManagement(station, 'volumetric_water_content', extension=extension)
     base_vwc_path = file_manager.get_file_path()
 
-    daily_file = base_vwc_path.parent / f"{station}_vwc{freq_suffix}_24hr+0.txt"
-    hourly_file = base_vwc_path.parent / f"{station}_vwc{freq_suffix}_rolling{bin_hours}hr.txt"
+    daily_file = base_vwc_path.parent / f"{station}_vwc_24hr.txt"
+    hourly_file = base_vwc_path.parent / f"{station}_vwc_rolling{bin_hours}hr.txt"
     
     # Ensure both files exist
     if not daily_file.exists():
@@ -297,7 +223,7 @@ def plot_hourly_vs_daily_vwc(station, fr, bin_hours, extension=''):
         print(f"Error creating VWC comparison plot: {e}")
 
 
-def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, plt: bool = True, bin_hours: int = 6,
+def vwc_hourly(station: str, year: int, fr: int, year_end: int = None, plt: bool = True, bin_hours: int = 6,
                minvalperbin: int = 5, min_req_pts_track: int = None, polyorder: int = -99,
                snow_filter: bool = False, tmin: float = None, tmax: float = None,
                warning_value: float = None, auto_removal: bool = False, hires_figs: bool = False,
@@ -347,8 +273,10 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
         full Year
     year_end : int, optional
         last year for analysis
-    fr : str, optional
-        GNSS frequency. Default is from JSON or 20 (L2C)
+    fr : int
+        GNSS frequency code (e.g. 20 for GPS L2C, 101 for GLONASS L1).
+        Must be a single freq present in vwc_tracks.json. The CLI auto-loops
+        over multiple freqs by calling this function once per freq.
     bin_hours : int, optional
         time bin size in hours (1,2,3,4,6,8,12). Default is 6
     minvalperbin : int, optional
@@ -359,7 +287,7 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
 
     Returns
     -------
-    Creates hourly rolling VWC file: station_vwc_L2_rolling6hr.txt
+    Creates hourly rolling VWC file under $REFL_CODE/Files/<station>/vwc_outputs/<freq_label>/<station>_vwc_rolling<bin_hours>hr.txt
     """
     valid_bin_hours = [1, 2, 3, 4, 6, 8, 12]  # No 24hr for rolling
     if bin_hours not in valid_bin_hours:
@@ -369,12 +297,10 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     print(f"Generating hourly rolling VWC with {bin_hours}-hour windows")
     print(f"Processing {bin_hours} offsets for station {station}, year {year}")
 
-    # Resolve frequency once for both models
-    fr_list = qp.get_vwc_frequency(station, extension, fr)
-    if len(fr_list) > 1:
-        print("Error: vwc_hourly can only process one frequency at a time.")
+    if fr is None:
+        print('Error: vwc_hourly requires a single frequency. Pass fr=<int> or use the CLI which auto-loops.')
         sys.exit()
-    resolved_fr = fr_list[0]
+    resolved_fr = int(fr)
 
     if advanced:
         veg_model = 2
@@ -456,25 +382,6 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
                 bin_hours, minvalperbin, 0
             )
 
-        # Delete existing track files for requested year(s) and regenerate
-        fm = FileManagement(station, "individual_tracks", extension=extension)
-        track_dir = str(fm.get_directory_path(ensure_directory=False))
-
-        # Determine year range to delete/regenerate
-        freq_suffix = qp.get_temporal_suffix(resolved_fr, include_time=False)
-        years_to_regenerate = range(year, (year_end if year_end else year) + 1)
-
-        # Delete track files for requested years only
-        if os.path.exists(track_dir):
-            deleted_count = 0
-            for yr in years_to_regenerate:
-                for f in glob.glob(f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'):
-                    os.remove(f)
-                    deleted_count += 1
-            if deleted_count > 0:
-                print(f'Deleted {deleted_count} existing track files for year(s) {year}-{year_end if year_end else year}')
-
-        # Generate fresh track files for requested years
         print("=== Generating track data with vwc -save_tracks T ===")
         vwc(station=station, year=year, year_end=year_end, fr=resolved_fr, plt=False, screenstats=False,
             bin_hours=24, minvalperbin=minvalperbin, bin_offset=0,
@@ -517,7 +424,16 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     qp.write_rolling_vwc_output(station, vwc_data, resolved_fr, bin_hours, extension, vegetation_model=veg_model)
 
     print(f"Successfully generated {len(vwc_data['vwc'])} hourly rolling VWC measurements")
-    print("WARNING: vwc_hourly is experimental code.")
+
+    vwc_out_dir = FileManagement(station, 'vwc_outputs',
+                                 frequency=resolved_fr, extension=extension).get_directory_path()
+
+    if veg_model == 1:
+        (vwc_out_dir / f'{station}_phase_{bin_hours}hr.txt').unlink(missing_ok=True)
+    elif veg_model == 2:
+        tracks_dir = vwc_out_dir / 'individual_tracks'
+        if tracks_dir.exists():
+            shutil.rmtree(tracks_dir)
 
     if plt:
         print("=== Generating VWC Comparison Plot ===")
@@ -527,7 +443,45 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
 def main_hourly():
     """CLI entry point for vwc_hourly command"""
     args = parse_arguments_hourly()
-    vwc_hourly(**args)
+    fr_list = args.pop('fr', None)
+    station = args['station']
+    extension = args.get('extension', '')
+
+    FileManagement(station, 'raw_phase_file', extension=extension).get_file_path().unlink(missing_ok=True)
+
+    available = get_vwc_tracks_freqs(station, extension)
+    if available is None:
+        warn_legacy_apriori_and_exit(station, 'vwc_tracks.json', extension)
+        print('vwc_tracks.json not found. Run `vwc_input` first.')
+        sys.exit()
+    if not available:
+        print('vwc_tracks.json is empty.')
+        sys.exit()
+
+    if fr_list:
+        missing = [f for f in fr_list if f not in available]
+        if missing:
+            print(f'Error: requested frequencies {missing} not in vwc_tracks.json. Available: {available}')
+            sys.exit()
+        freqs = fr_list
+    else:
+        freqs = available
+
+    print('WARNING: vwc_hourly is experimental code.')
+
+    if len(freqs) == 1:
+        args['fr'] = freqs[0]
+        vwc_hourly(**args)
+    else:
+        print(f'Auto-looping over {len(freqs)} frequencies: {freqs}')
+        if 'plt' in args:
+            plt_default = args['plt']
+        else:
+            plt.switch_backend('Agg')
+            plt_default = True
+        for fr in freqs:
+            print(f'\n{"=" * 60}\n  vwc_hourly -fr {fr}\n{"=" * 60}\n')
+            vwc_hourly(**{**args, 'fr': fr, 'plt': plt_default})
 
 
 def main():
@@ -565,7 +519,7 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         Dictionary with 'mjd', 'vwc', 'datetime', 'bin_starts' (NOT leveled yet)
         Returns None if no track data found
     """
-    fm = FileManagement(station, "individual_tracks", extension=extension)
+    fm = FileManagement(station, "individual_tracks", frequency=fr, extension=extension)
     track_dir = str(fm.get_directory_path(ensure_directory=False))
 
     if not os.path.exists(track_dir):
@@ -573,25 +527,7 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         print('Run vwc with -save_tracks T first to generate individual track files')
         return None
 
-    freq_suffix = qp.get_temporal_suffix(fr, include_time=False)
-
-    # Determine year range
-    if year and year_end:
-        years_to_load = range(year, year_end + 1)
-    elif year:
-        years_to_load = [year]
-    else:
-        # Load all years if not specified
-        pattern = f'{track_dir}/{station}_track_sat*_az*_*{freq_suffix}.txt'
-        track_files = glob.glob(pattern)
-        years_to_load = None
-
-    # Load track files for specified years
-    if years_to_load:
-        track_files = []
-        for yr in years_to_load:
-            pattern = f'{track_dir}/{station}_track_sat*_az*_{yr}{freq_suffix}.txt'
-            track_files.extend(glob.glob(pattern))
+    track_files = glob.glob(f'{track_dir}/{station}_*.txt')
 
     if not track_files:
         print(f'No track files found in {track_dir}')
@@ -617,7 +553,16 @@ def generate_rolling_vwc_from_tracks(station, fr, bin_hours, minvalperbin, exten
         return None
 
     combined_data = np.vstack(all_data)
+    if year is not None:
+        y_lo = year
+        y_hi = year_end if year_end else year
+        years_col = combined_data[:, 0].astype(int)
+        combined_data = combined_data[(years_col >= y_lo) & (years_col <= y_hi)]
     print(f'Loaded {len(combined_data)} individual track observations from saved files')
+
+    if len(combined_data) == 0:
+        print('No track observations matched the requested year range')
+        return None
 
     # Extract columns: Year(0), DOY(1), Hour(2), MJD(3), VWC(16)
     hours = combined_data[:, 2]

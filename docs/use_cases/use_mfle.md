@@ -97,13 +97,13 @@ fit the models, but we also have an explicit snow filter option that we will tes
 
 First, set up the analysis strategy for mfle. This command selects the satellite tracks you want to use going forward:
 
-<code>vwc_input mfle 2019</code>
+<code>vwc_input mfle 2019 -legacy T</code>
 
 It creates a file - its location is printed to the screen.
 
 Then you want to compute the daily phase for our time period:
 
-<code>phase mfle 2016 1 -year_end 2019 -doy_end 366</code>
+<code>phase mfle 2016 1 -year_end 2019 -doy_end 366 -legacy T</code>
 
 And then finally:
 

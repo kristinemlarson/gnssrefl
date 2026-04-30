@@ -78,11 +78,11 @@ def advanced_vegetation_filter(station, vxyz, extension='',
     padlen = 1000       # Padding length
 
     # Step 1: Normalize and process the track-level data
-    tracks, metrics_all, vegmast = norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift,
-                                                  baseperc, zphival, ampvarday, ampvarlimit)
+    metrics_all, vegmast = norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift,
+                                          baseperc, zphival, ampvarday, ampvarlimit)
 
     # Step 2: Apply vegetation filter to compute soil moisture
-    final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all, tracks,
+    final_mjd, final_vwc, final_binstarts = apply_vegetation_model(station, vxyz, metrics_all,
                                                   sgolnum, sgolply, padlen, pltit,
                                                   fr, bin_hours, bin_offset, extension, minvalperbin, save_tracks)
 
@@ -121,7 +121,7 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
     station : str
         Station name
     vxyz : numpy array
-        Full track data (16 columns)
+        Full track data (18 columns; see column list inside the function)
     remoutli : int
         Remove outliers flag
     acc_rhdrift : int
@@ -137,8 +137,6 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
         
     Returns
     -------
-    tracks : numpy array
-        Unique satellite/quadrant combinations
     metrics_all : numpy array
         Normalized metrics [D_amplsp, D_amp, D_phi, D_RH]
     vegmast : numpy array
@@ -150,8 +148,8 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
     phivarlimit = 150  # Phase variance limit
     
     # Extract columns from vxyz array
-    # vxyz columns: [year, doy, phase, azim, sat, rh, norm_ampLSP, norm_ampLS, hour, 
-    #                ampLSP, ampLS, ap_rh, quad, delRH, vegMask, mjd]
+    # vxyz columns: [year, doy, phase, azim, sat, rh, norm_ampLSP, norm_ampLS, hour,
+    #                ampLSP, ampLS, ap_rh, quad, delRH, vegMask, mjd, track_id, track_epoch]
     year = vxyz[:, 0]
     doy = vxyz[:, 1]
     phi = vxyz[:, 2]        # Phase
@@ -167,14 +165,20 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
     delRH = vxyz[:, 13]     # Delta RH (pre-computed)
     # vegMask in column 14
     mjd = vxyz[:, 15]       # Modified Julian Day
-    
-    # Get unique satellite/track combinations
-    sqmat = vxyz[:, [4, 12]]  # [satellite, track_avg_az]
-    tracks = np.unique(sqmat, axis=0)
-    numtracks, nn = tracks.shape
+    track_id = vxyz[:, 16].astype(int)
+    track_epoch = vxyz[:, 17].astype(int)
 
-    print(f'Found {numtracks} unique satellite tracks')
-    
+    # Modern path identifies each track by (track_id, track_epoch) so split
+    # epochs (tracks_qc.split_epoch) fit independently. Legacy -legacy T runs
+    # carry -1 sentinels in cols 16-17 and fall back to (sat, avg_az).
+    legacy = (track_id < 0).any()
+    if legacy:
+        unique_tracks = np.unique(vxyz[:, [4, 12]], axis=0)
+    else:
+        unique_tracks = np.unique(np.column_stack([track_id, track_epoch]), axis=0)
+
+    print(f'Found {len(unique_tracks)} unique satellite tracks')
+
     # Initialize output arrays
     N = len(doy)
     D_amplsp = np.zeros((N, 1))
@@ -182,14 +186,17 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
     D_amp = np.zeros((N, 1))
     D_phi = np.zeros((N, 1))
     vegmast = np.ones((N, 1))  # Vegetation mask
-    
-    # Process each track
-    for i in range(numtracks):
-        the_avg_az = tracks[i, 1]
-        thesat = int(tracks[i, 0])
 
-        # Get indices for this satellite/track combination
-        ii = (qmat == the_avg_az) & (smat == thesat)
+    for k0, k1 in unique_tracks:
+        if legacy:
+            thesat, the_avg_az = int(k0), k1
+            ii = (smat == thesat) & (qmat == the_avg_az)
+        else:
+            ii = (track_id == int(k0)) & (track_epoch == int(k1))
+            if not ii.any():
+                continue
+            thesat = int(smat[ii][0])
+            the_avg_az = qmat[ii][0]
         Nvals = len(rh[ii])
         
         if Nvals < 10:  # Skip tracks with too few points
@@ -284,11 +291,11 @@ def norm_zero_vxyz(station, vxyz, remoutli, acc_rhdrift, baseperc, zphival,
     
     # Combine results
     metrics_all = np.hstack((D_amplsp, D_amp, D_phi, D_RH))
-    
-    return tracks, metrics_all, vegmast
+
+    return metrics_all, vegmast
 
 
-def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
+def apply_vegetation_model(station, vxyz, normmet, sgolnum, sgolply,
                           padlen, pltit, fr, bin_hours, bin_offset, extension, minvalperbin, save_tracks=False):
     """
     Apply Clara's vegetation filter to compute soil moisture
@@ -301,8 +308,6 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
         Original vwc data
     normmet : numpy array
         Normalized metrics from norm_zero_vxyz
-    tracks : numpy array
-        Satellite/quadrant combinations
     sgolnum : int
         Savgol filter length
     sgolply : int
@@ -350,10 +355,17 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
     q = vxyz[:, 12]
     sat = vxyz[:, 4]
     mjd = vxyz[:, 15]
-    
+    track_id = vxyz[:, 16].astype(int)
+    track_epoch = vxyz[:, 17].astype(int)
+    legacy = (track_id < 0).any()
+    if legacy:
+        unique_tracks = np.unique(vxyz[:, [4, 12]], axis=0)
+    else:
+        unique_tracks = np.unique(np.column_stack([track_id, track_epoch]), axis=0)
+
     Nobs = len(vxyz)
     svwc = np.zeros((Nobs, 1))  # Soil moisture output
-    
+
     # Load Clara's model
     amp_lsp_model, amp_dsnr_model, delta_heff_model, veg_correction_model, slopes_model = load_clara_model()
     ref_points = np.column_stack([amp_lsp_model, amp_dsnr_model, delta_heff_model])
@@ -365,18 +377,24 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
     min_number_points = 90  # Minimum points per track
     men = 20    # Points for padding calculation
 
-    Nt, nc = tracks.shape
     tracks_processed = 0  # Counter for tracks that meet minimum threshold
 
     # Clear old track files before writing new ones
     if save_tracks:
-        track_dir = qp.prepare_track_dir(station, extension)
+        track_dir = qp.prepare_track_dir(station, extension, fr)
 
-    # Process each track
-    for i in range(Nt):
-        thissat = int(tracks[i, 0])
-        this_avg_az = tracks[i, 1]
-        ii = (thissat == sat) & (this_avg_az == q)
+    for k0, k1 in unique_tracks:
+        if legacy:
+            thissat, this_avg_az = int(k0), k1
+            ii = (sat == thissat) & (q == this_avg_az)
+            this_tid, this_ep = -1, -1
+        else:
+            this_tid, this_ep = int(k0), int(k1)
+            ii = (track_id == this_tid) & (track_epoch == this_ep)
+            if not ii.any():
+                continue
+            thissat = int(sat[ii][0])
+            this_avg_az = q[ii][0]
         Ntrack = len(sat[ii])
 
         if Ntrack > min_number_points:
@@ -437,10 +455,10 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
                     D_phi[ii], D_amplsp[ii], D_amp[ii], D_RH[ii],
                     s1[padlen:padlen+Ntrack], s2[padlen:padlen+Ntrack], s3[padlen:padlen+Ntrack],
                     phipred2, slopepred2, newslope,
-                    avgf.flatten(), svwc[ii].flatten()
+                    avgf.flatten(), svwc[ii].flatten(),
                 ])
-                qp.write_track_file(track_dir, station, int(year[ii][0]), thissat,
-                                    this_avg_az, rows, fr,
+                qp.write_track_file(track_dir, station, thissat, this_avg_az, rows,
+                                    track_id=this_tid, track_epoch=this_ep,
                                     extra_headers=["% Generated by Advanced Vegetation Model (model 2)"])
             
             # Plot individual tracks only if specifically requested (could add a separate flag for this)
@@ -456,7 +474,7 @@ def apply_vegetation_model(station, vxyz, normmet, tracks, sgolnum, sgolply,
             #     plt.legend(loc="best")
             #     plt.show()
 
-    print(f'Processed {tracks_processed}/{Nt} tracks (minimum {min_number_points} points required)')
+    print(f'Processed {tracks_processed}/{len(unique_tracks)} tracks (minimum {min_number_points} points required)')
 
     # Generate time bins from vxyz data
     if bin_hours < 24:

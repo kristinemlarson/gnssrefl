@@ -66,7 +66,7 @@ Run the <code>gnssir</code> each day in 2017 and 2018:
 
 Pick the satellite tracks you are going to use:
 
-<code>vwc_input mchl 2018</code>
+<code>vwc_input mchl 2018 -legacy T</code>
 
 This creates a file that will go in $REFL_CODE/input/mchl/mchl_phaseRH_L2.txt
 
@@ -75,7 +75,7 @@ particular satellite track is not working. To comment lines out you use %.
 
 Run the <code>phase</code> code:
 
-<code>phase mchl 2017 1 -doy_end 365 -year_end 2018</code>
+<code>phase mchl 2017 1 -doy_end 365 -year_end 2018 -legacy T</code>
 
 The location of the output files for this stage are printed to the screen.
 

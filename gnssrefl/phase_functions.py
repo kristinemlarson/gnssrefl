@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 
 from gnssrefl.utils import str2bool, read_files_in_dir
-from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_wavelength
+from gnssrefl.gnss_frequencies import get_file_suffix, get_signal_label, get_display_label, get_wavelength
 
 
 # Column schemas for the phase files. Writers build header/fmt from these
@@ -60,40 +60,29 @@ def phase_file_fmt(columns):
     return ' '.join(PHASE_FMT[c] for c in columns)
 
 
-def get_temporal_suffix(fr, bin_hours=24, bin_offset=0, include_time=True):
+def get_temporal_suffix(bin_hours=24):
     """
-    Generate consistent suffix for all output files with temporal resolution and offset
+    Generate the temporal-resolution suffix for vwc output filenames.
+
+    Format is `_{bin_hours}hr` (e.g. `_24hr`, `_6hr`). The bin_offset is
+    intentionally not in the filename; it lives in the file header instead
+    (see `write_avg_phase` / `write_vwc_output` subdaily header lines).
 
     Parameters
     ----------
-    fr : int
-        Frequency (1, 5, 20, etc.)
     bin_hours : int, optional
         Time bin size in hours. Default is 24 (daily)
-    bin_offset : int, optional
-        Bin timing offset in hours. Default is 0
-    include_time : bool, optional
-        Whether to include bin timing suffix (e.g. _24hr+0). Default is True.
-        Set to False for track files which contain per-observation data.
 
     Returns
     -------
     str
-        Suffix string like "_L1_6hr+0", "_L2_24hr+1", etc.
-        Or just "_L1", "_L2" if include_time=False.
+        Suffix string like "_24hr", "_6hr".
     """
-    freq_suffix = get_file_suffix(fr)
-    
-    if include_time:
-        # Generate temporal suffix with offset
-        time_suffix = f"_{bin_hours}hr+{bin_offset}"
-        return freq_suffix + time_suffix
-    else:
-        return freq_suffix
+    return f"_{bin_hours}hr"
 
-def prepare_track_dir(station, extension=''):
+def prepare_track_dir(station, extension, fr):
     """
-    Create (or clear) the individual_tracks directory for a station.
+    Create (or clear) the per-freq individual_tracks directory for a station.
 
     Parameters
     ----------
@@ -101,22 +90,30 @@ def prepare_track_dir(station, extension=''):
         Station name
     extension : str
         Optional subdirectory extension
+    fr : int
+        Frequency code; selects the vwc_outputs/<label> subdirectory.
 
     Returns
     -------
     str
         Absolute path to the individual_tracks directory
     """
-    fm = FileManagement(station, "individual_tracks", extension=extension)
+    fm = FileManagement(station, "individual_tracks", frequency=fr, extension=extension)
     track_dir = str(fm.get_directory_path())
     for f in glob.glob(f'{track_dir}/*.txt'):
         os.remove(f)
     return track_dir
 
 
-def write_track_file(track_dir, station, year, sat_num, avg_az, rows, fr, extra_headers=None):
+def write_track_file(track_dir, station, sat_num, avg_az, rows,
+                     track_id, track_epoch, extra_headers=None):
     """
     Write a single track file with standard header and row format.
+
+    Track identity is always carried in the filename via (sat_num, avg_az).
+    Under the modern path the (track_id, track_epoch) pair from vwc_tracks.json
+    is also prefixed; under legacy those are -1 sentinels and the prefix is
+    omitted.
 
     Parameters
     ----------
@@ -124,28 +121,26 @@ def write_track_file(track_dir, station, year, sat_num, avg_az, rows, fr, extra_
         Directory to write the track file in
     station : str
         Station name
-    year : int
-        Year for the track
     sat_num : int
-        Satellite number
+        Satellite number for filename display
     avg_az : float
-        Track average azimuth (degrees)
+        Track average azimuth (degrees) for filename display
     rows : numpy.ndarray
         (N, 17) array of track data columns
-    fr : int
-        Frequency code
+    track_id : int
+        Track id, or -1 under legacy
+    track_epoch : int
+        Track epoch, or -1 under legacy
     extra_headers : list of str, optional
         Additional header lines inserted before the column legend
     """
-    freq_suffix = get_temporal_suffix(fr, include_time=False)
-    track_file = f'{track_dir}/{station}_track_sat{sat_num:02d}_az{int(avg_az):03d}_{year}{freq_suffix}.txt'
+    if track_id < 0:
+        track_file = f'{track_dir}/{station}_track_sat{sat_num:02d}_az{int(avg_az):03d}.txt'
+    else:
+        track_file = (f'{track_dir}/{station}_track{track_id}_ep{track_epoch}'
+                      f'_sat{sat_num:02d}_az{int(avg_az):03d}.txt')
 
-    freq_label = get_signal_label(fr)
-    header_lines = [
-        f"% Individual Track Data for Station {station}",
-        f"% Satellite: {sat_num}, TrackAvgAz: {avg_az:.1f}, Year: {year}",
-        f"% Frequency: {freq_label}",
-    ]
+    header_lines = [f"% Individual Track Data for Station {station}"]
     if extra_headers:
         header_lines.extend(extra_headers)
     header_lines.extend([
@@ -278,8 +273,7 @@ def subdaily_phase_plot(station, fr, vxyz, outdir, hires_figs, bin_hours=24, bin
     plt.grid()
     plt.gcf().autofmt_xdate()
 
-    # Generate filename with temporal suffix
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+    suffix = get_temporal_suffix(bin_hours)
     if hires_figs:
         plot_path = f'{outdir}/{station}_phase{suffix}.eps'
     else:
@@ -505,14 +499,14 @@ def write_vwc_output(station, vwc_data, year, fr, bin_hours, bin_offset,
     # Generate standard filename
     out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+    suffix = get_temporal_suffix(bin_hours)
     vwcfile = out_dir / f"{station}_vwc{suffix}.txt"
 
     print(f'VWC results being written to {vwcfile}')
 
     with open(vwcfile, 'w') as w:
         N = len(vwc_values)
-        freq_name = get_signal_label(fr)
+        freq_name = get_display_label(fr)
 
         w.write("% Soil Moisture Results for GNSS Station {0:4s} \n".format(station))
         w.write("% Frequency used: {0} \n".format(freq_name))
@@ -583,18 +577,14 @@ def write_rolling_vwc_output(station, vwc_data, fr, bin_hours, extension='', veg
     # Convert MJD to year/doy/month/day for file output
     years, doys, months, days = mjd_to_file_columns(mjd_values)
 
-    # Generate rolling filename
     out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
-
-    freq_suffix = get_file_suffix(fr)
-
-    vwcfile = out_dir / f"{station}_vwc{freq_suffix}_rolling{bin_hours}hr.txt"
+    vwcfile = out_dir / f"{station}_vwc_rolling{bin_hours}hr.txt"
 
     print(f'Rolling VWC results being written to {vwcfile}')
 
     with open(vwcfile, 'w') as w:
         N = len(vwc_values)
-        freq_name = get_signal_label(fr)
+        freq_name = get_display_label(fr)
 
         w.write(f"% Soil Moisture Results for GNSS Station {station}\n")
         w.write(f"% Frequency used: {freq_name}\n")
@@ -1213,8 +1203,7 @@ def apply_vwc_leveling(vwc_values, tmin,
             bin_hours = kwargs.get('bin_hours', 24)
             bin_offset = kwargs.get('bin_offset', 0)
 
-            suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
-            plot_suffix = suffix.replace('.txt', '.png')
+            plot_suffix = get_temporal_suffix(bin_hours) + '.png'
 
             out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
             plot_path = f'{out_dir}/{station}_baseline_leveling{plot_suffix}'
@@ -1437,8 +1426,7 @@ def write_avg_phase(station, fr, avg_phase, extension='', bin_hours=24, bin_offs
     # Use FileManagement for consistent phase file paths
     out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
-    # Generate consistent filename with temporal resolution
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+    suffix = get_temporal_suffix(bin_hours)
     fileout = out_dir / f"{station}_phase{suffix}.txt"
 
     if bin_hours < 24:
@@ -1447,7 +1435,7 @@ def write_avg_phase(station, fr, avg_phase, extension='', bin_hours=24, bin_offs
         print('Daily averaged phases will be written to : ', fileout)
 
     with open(fileout, 'w') as fout:
-        freq_name = get_signal_label(fr)
+        freq_name = get_display_label(fr)
         fout.write(f"% {freq_name} phase results for station {station.upper()}\n")
 
         # Write header based on mode
@@ -1571,6 +1559,15 @@ def load_phase(station, year1, year2, fr, snowmask, extension='', legacy=False):
         print(f"Phase file has {actual_nc} cols; expected {expected_nc}. "
               f"Rerun 'phase{' -legacy T' if legacy else ''}' with the current code.")
         sys.exit()
+
+    # Drop failQC rows (estRH NaN) per the loader contract from
+    # extract_arcs.load_results_with_failqc.
+    estRH_col = per_day_cols.index('estRH')
+    ok = ~np.isnan(results[:, estRH_col])
+    n_dropped = int((~ok).sum())
+    if n_dropped:
+        print(f'Dropped {n_dropped} failQC observations with NaN estRH')
+        results = results[ok, :]
     if snowmask is None:
         nr,nc = np.shape(results)
         if nr > 0:
@@ -1663,7 +1660,7 @@ def help_debug(rt,xdir, station):
     #    debug.close()
 
 
-def load_avg_phase(station,fr,bin_hours=24,extension='',bin_offset=0):
+def load_avg_phase(station,fr,bin_hours=24,extension=''):
     """
     loads a previously computed averaged phase solution with matching temporal resolution.
     this is NOT the same as the multi-track phase results.
@@ -1699,8 +1696,7 @@ def load_avg_phase(station,fr,bin_hours=24,extension='',bin_offset=0):
     # Use FileManagement for consistent phase file paths
     base_path = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
-    # Generate consistent filename with exact temporal resolution matching
-    suffix = get_temporal_suffix(fr, bin_hours, bin_offset)
+    suffix = get_temporal_suffix(bin_hours)
     xfile = base_path / f"{station}_phase{suffix}.txt"
 
     if os.path.exists(xfile):
@@ -2410,14 +2406,11 @@ def write_out_raw_phase(v, fname, legacy=False):
 
     return newv
 
-def write_phase_for_advanced(filename, vxyz):
+def write_phase_for_advanced(filename, vxyz, station, fr):
     """
-    Writes out a file of interim phase results for advanced models
-    developed by Clara Chew
+    Writes per-track phase observations as a QA dump (one row per observation).
 
-    File now written to $REFL_CODE/Files/<station>/<station>_all_phase.txt
-
-    September 8, 2025: Added a new column for MJD
+    File written to $REFL_CODE/Files/<station>/vwc_outputs/<freq>/<station>_all_phase.txt
 
     Parameters
     ----------
@@ -2425,18 +2418,19 @@ def write_phase_for_advanced(filename, vxyz):
         name for output file
     vxyz : numpy array of floats
         as defined in vwc_cl.py
+    station : str
+        4-char station name
+    fr : int
+        frequency code
     """
-    # do a quick sort as they are likely quadrant sorted now
     ii = np.argsort(vxyz[:,0] + vxyz[:,1]/365.25)
     vxyz = vxyz[ii,:]
-    #headers for output file - these are not correct BTW
-    print('Writing interim file for advanced vegetation model ', filename)
-    h0 = "File created by vwc function write_phase_for_advanced \n"
-    h1 = "Year DOY Phase  Azim Sat    RH    nLSPA nLSA    Hour   LSPA   LS  apRH  avgAz  delRH  vegM  MJD \n"
-    h2 = "(1)  (2)  (3)   (4)  (5)    (6)    (7)   (8)     (9)   (10)  (11)  (12)  (13)  (14)  (15)  (16)"
-    #2012   1   9.19  315.6  1   1.850   0.97   0.98  0.59 19.80 19.79  1.85  2
+    print('Writing per-track QA phase dump to ', filename)
+    h0 = f" {get_display_label(fr)} phase results for station {station.upper()}\n"
+    h1 = "Year DOY Phase  Azim Sat    RH    nLSPA nLSA    Hour   LSPA   LS  apRH  avgAz  delRH  vegM  MJD  TrackID TrackEpoch \n"
+    h2 = "(1)  (2)  (3)   (4)  (5)    (6)    (7)   (8)     (9)   (10)  (11)  (12)  (13)  (14)  (15)  (16)  (17)    (18)"
     with open(filename, 'w') as my_file:
-        np.savetxt(my_file, vxyz, fmt="%4.0f %3.0f %6.2f %6.1f %2.0f %7.3f %6.2f %6.2f %5.2f %6.2f %6.2f %6.3f %2.0f %6.3f %2.0f %8.0f ",header=h0+h1+h2,comments='%')
+        np.savetxt(my_file, vxyz, fmt="%4.0f %3.0f %6.2f %6.1f %2.0f %7.3f %6.2f %6.2f %5.2f %6.2f %6.2f %6.3f %2.0f %6.3f %2.0f %8.0f %6.0f %4.0f",header=h0+h1+h2,comments='%')
 
     return
 #                   if adhoc_snow:

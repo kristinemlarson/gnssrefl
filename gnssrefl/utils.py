@@ -169,7 +169,7 @@ class FileManagement:
             if self.file_type == FileTypes.arcs_directory:
                 directory_path = self._get_arcs_directory_path()
             elif self.file_type == FileTypes.individual_tracks:
-                directory_path = self._get_individual_tracks_path()
+                directory_path = self.get_individual_tracks_path()
             elif self.file_type == FileTypes.vwc_outputs:
                 directory_path = self._get_vwc_outputs_path()
             else:
@@ -462,18 +462,20 @@ class FileManagement:
             # No extension: {year}/arcs/{station}/{doy}/
             return self.xdir / str(self.year) / "arcs" / self.station / cdoy
 
-    def _get_individual_tracks_path(self):
+    def get_individual_tracks_path(self):
         """
-        Generate individual tracks directory path with extension support.
+        Per-frequency individual_tracks directory, nested under vwc_outputs so
+        concurrent freqs don't clobber each other.
 
         Directory structure:
-        - No extension: Files/{station}/individual_tracks/
-        - With extension: Files/{station}/{extension}/individual_tracks/
+        - No extension: Files/{station}/vwc_outputs/{label}/individual_tracks/
+        - With extension: Files/{station}/{extension}/vwc_outputs/{label}/individual_tracks/
+
+        ``label`` is ``f{freq}{get_file_suffix}`` (e.g. ``f20_G_L2C``).
         """
-        if self.extension:
-            return self.xdir / "Files" / self.station / self.extension / "individual_tracks"
-        else:
-            return self.xdir / "Files" / self.station / "individual_tracks"
+        if self.frequency is None:
+            raise ValueError("frequency is required for individual_tracks")
+        return self._get_vwc_outputs_path() / "individual_tracks"
 
     def _get_vwc_outputs_path(self):
         """Per-frequency vwc output directory.
@@ -482,12 +484,13 @@ class FileManagement:
         - No extension: Files/{station}/vwc_outputs/{label}/
         - With extension: Files/{station}/{extension}/vwc_outputs/{label}/
 
-        ``label`` comes from ``get_file_suffix`` with the leading underscore
-        stripped (e.g. ``G_L1``, ``C_L5``).
+        ``label`` is ``f{freq}{get_file_suffix}`` (e.g. ``f20_G_L2C``,
+        ``f101_R_L1``) so the gnssrefl freq code is visible alongside the
+        constellation/band tag.
         """
         if self.frequency is None:
             raise ValueError("frequency is required for vwc_outputs")
-        label = get_file_suffix(self.frequency).lstrip('_')
+        label = f'f{self.frequency}{get_file_suffix(self.frequency)}'
         base = self.xdir / "Files" / self.station
         if self.extension:
             base = base / self.extension

@@ -197,12 +197,12 @@ def vwc(station: str, year: int, year_end: int = None, fr: int = None, plt: bool
     -------
 
     Daily phase results in a file at
-        $REFL_CODE/Files/<station>/[<extension>/]<station>_phase_<C>_<label>_<bin_hours>hr+<bin_offset>.txt
+        $REFL_CODE/Files/<station>/[<extension>/]vwc_outputs/<label>/<station>_phase_<bin_hours>hr.txt
         with columns: Year DOY Ph Phsig NormA MM DD
-        (<C> is the constellation char G/R/E/C and <label> the signal label L1/L2C/L5/...)
+        (<label> is f<fr>_<C>_<signal>, e.g. f20_G_L2C; bin_offset lives in the file header)
 
     VWC results in a file at
-        $REFL_CODE/Files/<station>/[<extension>/]<station>_vwc_<C>_<label>_<bin_hours>hr+<bin_offset>.txt
+        $REFL_CODE/Files/<station>/[<extension>/]vwc_outputs/<label>/<station>_vwc_<bin_hours>hr.txt
         with columns: FracYr Year DOY  VWC Month Day
 
     """
@@ -367,7 +367,7 @@ def process_vwc_from_tracks(
         snowfileexists, snow_file = qp.make_snow_filter(station, medf, ReqTracks, year, year_end + 1)
         matplt.close('all')  # we do not want the plots to come to the screen for the daily average
 
-    avg_exist, avg_date, avg_phase = qp.load_avg_phase(station, freq, bin_hours, extension, bin_offset)
+    avg_exist, avg_date, avg_phase = qp.load_avg_phase(station, freq, bin_hours, extension)
 
     legacy_path = vwc_tracks is None
     data_exist, year_sat_phase, doy, hr, phase, azdata, ssat, rh, amp_lsp, amp_ls, ap_rh, results = \
@@ -399,7 +399,7 @@ def process_vwc_from_tracks(
 
     k = 1
     # define the contents of this variable HERE
-    vxyz = np.empty(shape=[0, 16])
+    vxyz = np.empty(shape=[0, 18])
     # column, contents of this variable
     # 0 year
     # 1 doy
@@ -417,6 +417,8 @@ def process_vwc_from_tracks(
     # 13 delRH (for adv model)
     # 14 vegMask (for adv model)
     # 15 MJD for Kristine's sanity
+    # 16 track_id (modern path; -1 sentinel on legacy path)
+    # 17 track_epoch (modern path; -1 sentinel on legacy path)
 
 
     # this is the number of points for a given satellite track
@@ -530,7 +532,9 @@ def process_vwc_from_tracks(
                 vegMask = np.zeros(shape=[NN, 1])
                 vegMask[i] = 1
 
-                newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP, norm_ampLS, h, amp_lsps, amp_lss, ap_rhs, qs, delRH, vegMask.T, mjds)).T
+                tid_col = (tid if tid is not None else -1) * np.ones(shape=[1, NN])
+                ep_col = (ep if ep is not None else -1) * np.ones(shape=[1, NN])
+                newl2 = np.vstack((y, t, new_phase, azd, s, rhs, norm_ampLSP, norm_ampLS, h, amp_lsps, amp_lss, ap_rhs, qs, delRH, vegMask.T, mjds, tid_col, ep_col)).T
 
                 # this is a kind of quality control -use previous solution to have
                 # better feel for whether current solution works. defintely needs to go in a function
@@ -551,7 +555,7 @@ def process_vwc_from_tracks(
                 else:
                     print(f'No previous solution or not enough points for this satellite. sat {int(satellite)} avgAz {track_avg_az:.1f} n={len(newl2)}')
 
-                adv_color = colors[ww:ww + 1]  # sets color for below
+                adv_color = colors[ww % len(colors)]  # cycle when more tracks than palette entries
                 # stack this latest set of values to vxyz
                 vxyz = np.vstack((vxyz, newl2))
                 datetime_dates = []
@@ -624,8 +628,7 @@ def process_vwc_from_tracks(
                   f"({counts['tracks_removed']}/{counts['tracks_total']} tracks fully removed); "
                   f"history appended to {vwc_tracks_path.name}")
 
-    # Generate azimuth plot filename with temporal suffix
-    suffix = qp.get_temporal_suffix(freq, bin_hours, bin_offset)
+    suffix = qp.get_temporal_suffix(bin_hours)
     vwc_out_dir = FileManagement(station, 'vwc_outputs', frequency=fr, extension=extension).get_directory_path()
 
     # Skip saving plots when -plt F or skip_leveling (vwc_hourly two-pass mode)
@@ -650,16 +653,16 @@ def process_vwc_from_tracks(
     # Write averaged phase file for QC on subsequent runs (needed by auto_removal)
     qp.write_avg_phase(station, fr, avg_phase, extension, bin_hours, bin_offset)
 
-    # Write all_phase.txt file if requested
+    # Write all_phase.txt QA file if requested
     if save_tracks:
         fname_phase = f'{vwc_out_dir}/{station}_all_phase.txt'
-        qp.write_phase_for_advanced(fname_phase, vxyz)
+        qp.write_phase_for_advanced(fname_phase, vxyz, station, fr)
 
     # ========================================================================
     # TRACK-LEVEL PHASE DATA (vxyz)
     # ========================================================================
     #
-    # vxyz contains individual satellite track observations (N x 16 array):
+    # vxyz contains individual satellite track observations (N x 18 array):
     #   - Each row = ONE observation from ONE satellite pass
     #   - Example: 10,000+ rows for a year of data
     #   - Columns:
@@ -679,6 +682,8 @@ def process_vwc_from_tracks(
     #       [13] delRH (RH - apriori_RH, meters)
     #       [14] vegMask (vegetation mask flag)
     #       [15] MJD (Modified Julian Day)
+    #       [16] track_id (modern path; -1 sentinel on legacy path)
+    #       [17] track_epoch (modern path; -1 sentinel on legacy path)
     #
     # This track-level data is passed directly to vegetation filters and plotting functions.
     # ========================================================================
@@ -746,13 +751,12 @@ def process_vwc_from_tracks(
 
     if plt:
         print('\nGenerating final VWC plot...')
-        suffix = qp.get_temporal_suffix(fr, bin_hours, bin_offset)
-        plot_suffix = suffix.replace('.txt', '.png')
+        suffix = qp.get_temporal_suffix(bin_hours)
 
         if hires_figs:
-            plot_path = f'{vwc_out_dir}/{station}_vol_soil_moisture{plot_suffix[:-4]}.eps'
+            plot_path = f'{vwc_out_dir}/{station}_vol_soil_moisture{suffix}.eps'
         else:
-            plot_path = f'{vwc_out_dir}/{station}_vol_soil_moisture{plot_suffix}'
+            plot_path = f'{vwc_out_dir}/{station}_vol_soil_moisture{suffix}.png'
 
         qp.vwc_plot(station, vwc_data['datetime'], leveled_vwc, plot_path, circles, plt2screen=plt)
 
@@ -771,7 +775,7 @@ def vwc_legacy(station, year, year_end, fr, plt, screenstats, min_req_pts_track,
     Reads apriori_rh_{fr}.txt (the legacy per-freq track list), then
     delegates the downstream pipeline to process_vwc_from_tracks, which
     matches each phase-file row to a track by (satellite, azimuth within
-    3 deg) when no vwc_tracks.json doc is supplied.
+    3 deg) when no vwc_tracks.json is supplied.
     """
     fr_list = qp.get_vwc_frequency(station, extension, fr)
     if len(fr_list) > 1:
@@ -802,8 +806,8 @@ def get_vwc_tracks_freqs(station, extension=''):
     vwc_tracks_path = FileManagement(station, 'vwc_tracks_file', extension=extension).get_file_path(ensure_directory=False)
     if not vwc_tracks_path.exists():
         return None
-    doc = load_vwc_tracks(vwc_tracks_path)
-    return sorted({int(track['freq']) for track in doc['tracks'].values()})
+    tracks_json = load_vwc_tracks(vwc_tracks_path)
+    return sorted({int(track['freq']) for track in tracks_json['tracks'].values()})
 
 
 def main():
@@ -849,7 +853,12 @@ def main():
         vwc(**args)
     else:
         print(f'Auto-looping over {len(freqs)} frequencies: {freqs}\n')
-        plt_default_for_loop = args.get('plt', False)
+        if 'plt' in args:
+            plt_default_for_loop = args['plt']
+        else:
+            # Non-interactive backend so per-freq plots still save without popping windows.
+            matplt.switch_backend('Agg')
+            plt_default_for_loop = True
         for fr in freqs:
             print(f'\n{"=" * 60}')
             print(f'  vwc -fr {fr}')
