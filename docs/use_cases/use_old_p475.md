@@ -68,11 +68,11 @@ has a lot of tips that will save you time.
 
 We need a list of satellite tracks to use:
 
-<code>vwc_input p475 2021</code>
+<code>vwc_input p475 2021 -legacy T</code>
 
 Now we estimate the phase for each satellite track on each day in 2020 and 2021:
 
-<code>phase p475 2020 1 -year_end 2022 -doy_end 254 </code>
+<code>phase p475 2020 1 -year_end 2022 -doy_end 254 -legacy T</code>
 
 Finally, convert the phase to volumetric water content:
 

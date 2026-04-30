@@ -1,6 +1,8 @@
 # Soil Moisture
 <p align=center>
 
+Note: since v4.1.3, the multi-year `vwc`/`phase` workflow has changed; we use `-legacy T` here for compatibility with previous versions.
+
 Note: some updates have been made to the vwc code and some of these changes may not 
 have made it into this documentation. Some of the changes are discussed [here](https://github.com/kristinemlarson/gnssrefl/pull/367)
 
@@ -92,9 +94,13 @@ The code also requires that you pick the year that you think has the most L2C sa
 This creates a file that will go in <code>$REFL_CODE/input/ssss/ssss_phaseRH_L2.txt</code> where ssss is your station name.
 If you want to remove certain azimuths, just delete or comment out those azimuths (use a %).
 
+For station p038, run:
+
+<code>vwc_input p038 2018 -legacy T</code>
+
 You then need to estimate the phase for the years in question. I will just use 2016 through 2018 for station p038:
 
-<code>phase p038 2016 1 -doy_end 366 -year_end 2018 </code>
+<code>phase p038 2016 1 -doy_end 366 -year_end 2018 -legacy T</code>
 
 Once you have computed the phase values, you cannot change the *a priori* RH values. If you do change them, you 
 need to rerun <code>phase</code>. If you forget about this, you will see offsets in 
@@ -103,7 +109,7 @@ is fast - much faster than the time it took you to create SNR files.
 
 ## 3. Estimate VWC
 
-<code>vwc p038 2016 -year_end 2018</code>
+<code>vwc p038 2016 -year_end 2018 -legacy T</code>
 
 The main inputs are the station name and years you want to use. Other useful (optional) inputs:
 
@@ -184,7 +190,7 @@ track-level KNN correction algorithm as described in [DOI 10.1007/s10291-015-046
 
 To use the advanced vegetation model specify the <code>vegetation_model</code> parameter:
 
-<code>vwc p038 2016 -year_end 2018 -vegetation_model 2</code>
+<code>vwc p038 2016 -year_end 2018 -vegetation_model 2 -legacy T</code>
 
 Use `-save_tracks T` to save individual satellite track data to the <code>$REFL_CODE/Files/p038/individual_tracks</code> folder for further analysis. See the [okl2 advanced model use case](../use_cases/use_okl2_advanced.md) for a complete example.
 

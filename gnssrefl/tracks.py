@@ -1,47 +1,20 @@
 """
-tracks.py: multi-GNSS track ground-truth for gnssrefl.
+Build, manage, and tag multi-GNSS satellite tracks.
 
-This module owns both sides of the multi-GNSS tracks.json artifact:
+The on-disk ``tracks.json`` catalogs the periodic ground tracks visible at a
+station, keyed by ``track_id`` and grouped by ``(sat, freq)``. Each track holds
+a list of ``epochs`` describing the matching parameters (repeat interval,
+anchor MJD, mean azimuth, drift rate).
 
-  * Build side: build_tracks walks SNR files via gnssrefl.extract_arcs,
-    folds arcs into per-(sat, freq) periodic ground tracks, fits a single
-    epoch per track, and writes the JSON.
+The module has two halves: a build side (``build_tracks`` and helpers) that
+collects per-arc geometry and writes the JSON, and a runtime side
+(``load_tracks_json``, ``build_lookup_index``, ``lookup_arc``,
+``attach_track_id``) that tags arcs with their ``(track_id, track_epoch)`` at
+extract time. ``track_id`` is stable across every artifact derived from a
+tracks-shaped JSON (tracks.json, vwc_tracks.json, per-day phase files, vwc
+output files).
 
-  * Runtime side: load_tracks_json, build_lookup_index, lookup_arc, and
-    attach_track_id consume the JSON to tag arcs at extract time with
-    their (track_id, track_epoch).
-
-Why
----
-gnssrefl currently identifies VWC tracks by clustering arcs on azimuth alone
-(+/-3 deg from cluster center). This works for GPS because GPS ground tracks
-repeat every sidereal day, so a sat's daily passes have stable azimuths.
-For non-GPS the repeat period is multi-day:
-
-    GPS:        1 sidereal day  (2 orbits/day)
-    GLONASS:    8 sidereal days (17 orbits / 8 sid days)
-    Galileo:   10 sidereal days (17 orbits / 10 sid days)
-    BeiDou MEO: 7 sidereal days (13 orbits / 7 sid days)
-
-Within one repeat period a single sat traces 10-17 distinct ground tracks
-across the sky. Pure az clustering can't separate them (they cover the
-whole horizon), so the existing VWC code restricts to GPS. This module
-produces a clean ground-truth track set for the other constellations.
-
-This is the minimal MVP variant: each track has exactly one stable epoch
-(epoch_id == 0). The schema reserves ``epochs`` as a list so future
-changepoint-detection work can add entries without breaking readers.
-
-Identity scope
---------------
-There are two layers of identity in the tracks system:
-
-* track_id is forever. The same id appears in every artifact derived from
-  any tracks-shaped JSON (tracks.json, vwc_tracks.json, the per-day phase
-  files, the vwc output files).
-* epoch_id equals the epoch's list index (0..N-1) within one saved
-  tracks_json. It is regenerated on every save_tracks and renumbered on
-  every structural mutation (split_epoch, merge_epochs).
+See ``docs/pages/tracks.md`` for the full design and workflow.
 """
 
 import contextlib
@@ -146,17 +119,16 @@ def unwrap_az(az):
 def load_arcs(station, year, year_end, extension, snr_type=66, fast=False):
     """Collect per-arc geometry for station across [year..year_end] into a DataFrame.
 
-    Unified SNR-walk and results-walk entry point. Both paths return the same
-    schema (year, doy, sat, freq, mjd, azim, rise); the results path also
-    carries RH (useful for later stats).
+    Returns columns ``(year, doy, sat, freq, mjd, azim, rise)``; the fast path
+    additionally carries ``RH``.
 
     * ``fast=False`` (default): walk SNR files day by day via
-      extract_arcs_from_station. Authoritative; covers every frequency the
-      SNR file contains. Slow.
-    * ``fast=True``: read the gnssir results/ + failQC/ artifacts via
-      load_results_with_failqc. Orders of magnitude faster, but only covers
-      frequencies gnssir was configured to run. Requires a prior gnssir run
-      with save_failqc=True.
+      ``extract_arcs_from_station``, covering every frequency the SNR file
+      contains.
+    * ``fast=True``: read the gnssir ``results/`` + ``failQC/`` artifacts via
+      ``load_results_with_failqc``. Orders of magnitude faster, but only covers
+      frequencies gnssir was configured to run, and requires a prior gnssir run
+      with ``save_failqc=True``.
 
     BeiDou GEO/IGSO PRNs in BEIDOU_NON_MEO_SATS are skipped here so the
     rest of the pipeline never sees them.
@@ -397,16 +369,16 @@ def build_tracks(station, year, year_end=None, extension='',
     Collects per-arc geometry (sat, freq, mjd, azim, rise), folds arcs into
     periodic tracks, drops fragment tracks below the per-freq filter
     threshold (10 percent of per-freq median arcs per track), fits a single
-    periodic epoch per surviving track, and writes the JSON via
-    FileManagement.
+    periodic epoch per surviving track, and writes the JSON.
 
     Two arc sources are supported, selected by ``source``:
 
-    * ``'snr'``      walk SNR files via load_arcs: authoritative, slow,
-                     covers every frequency the SNR file contains.
-    * ``'results'``  read results/ + failQC/ via load_arcs_from_results:
-                     fast, but only covers frequencies gnssir was run with.
-    * ``'auto'``     (default) prefer ``'results'`` if any results/ dir is
+    * ``'snr'``      walk SNR files via ``load_arcs`` (slow, covers every
+                     frequency in the SNR file).
+    * ``'results'``  read ``results/`` + ``failQC/`` via
+                     ``load_arcs(..., fast=True)`` (fast, covers only
+                     frequencies gnssir was run with).
+    * ``'auto'``     (default) prefer ``'results'`` if any ``results/`` dir is
                      populated in range; else fall back to ``'snr'``.
 
     Parameters
@@ -580,11 +552,7 @@ _IGNORED_RANGE_PAIR_RE = re.compile(
 
 
 def write_tracks_json(tracks_json, f):
-    """Write tracks_json to file handle ``f`` with custom indentation for
-    readability: indent=2 at the structural level, but each inner
-    ``ignored_ranges`` pair ``[mjd_start, mjd_end]`` is collapsed onto a
-    single line so the range reads as one atomic value.
-    """
+    """Write tracks_json to file handle ``f`` with one ``ignored_ranges`` pair per line."""
     text = json.dumps(tracks_json, indent=2)
     text = _IGNORED_RANGE_PAIR_RE.sub(r'[\1, \2]', text)
     f.write(text)
@@ -648,6 +616,10 @@ def lookup_arc(sat, freq, obs_time_mjd, obs_az_minel, track_lookup_index,
                az_tol=AZ_TOL, time_tol_min=TIME_TOL_MIN):
     """Look up the (track_id, track_epoch, epoch_entry) for a single arc.
 
+    Active matches require the query to fall inside the track's
+    ``[first_mjd, last_mjd]`` interval AND fit the periodic model within
+    ``time_tol_min`` and ``az_tol``.
+
     Parameters
     ----------
     sat, freq : int
@@ -663,10 +635,6 @@ def lookup_arc(sat, freq, obs_time_mjd, obs_az_minel, track_lookup_index,
         Each ``entry_dict`` carries the epoch's matching parameters
         (``first_mjd``, ``last_mjd``, ``anchor_mjd``, ``repeat_interval_d``,
         ``az_avg_minel``, ``az_drift_rate``, ``epoch_type``, ``ignored_ranges``).
-
-    Active matches require the query to fall inside the track's
-    ``[first_mjd, last_mjd]`` interval AND fit the periodic model within
-    ``time_tol_min`` and ``az_tol``.
 
     Returns
     -------
@@ -737,12 +705,10 @@ def attach_track_id(arcs, track_file_path, year, doy, track_cache=None):
         Year and day-of-year of the arcs (used together with each arc's
         ``arc_timestamp`` to compute MJD for the lookup).
     track_cache : dict, optional
-        Path-keyed cache for reusing prebuilt lookup indexes across many
-        calls. When omitted, a module-level default (TRACK_INDEX_CACHE) is
-        used, so repeated calls transparently reuse the same index across
-        stations, extensions, and tracks.json vs vwc_tracks.json. Cache
-        entries are never invalidated; restart the process if a tracks file
-        is rewritten on disk.
+        Path-keyed cache of prebuilt lookup indexes. Defaults to the
+        module-level ``TRACK_INDEX_CACHE``. Cache entries are never
+        invalidated; restart the process if a tracks file is rewritten on
+        disk.
 
     Returns
     -------
@@ -829,11 +795,10 @@ def attach_legacy_apriori(arcs, station, extension=''):
 
 
 def warn_legacy_apriori_and_exit(station, missing_file, extension=''):
-    """If any GPS ``apriori_rh_{fr}.txt`` exists, print a -legacy T hint and exit.
+    """If any GPS ``apriori_rh_{fr}.txt`` exists, print a ``-legacy T`` hint and exit.
 
     Called from modern-path entry points when ``missing_file`` (e.g.
-    ``vwc_tracks.json``) is absent, to nudge users who still have artifacts
-    from a legacy GPS-only run toward passing ``-legacy T``.
+    ``vwc_tracks.json``) is absent.
     """
     for fr in (1, 20, 5):
         fm = FileManagement(station, 'apriori_rh_file', frequency=fr, extension=extension)

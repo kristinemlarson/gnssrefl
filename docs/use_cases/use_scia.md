@@ -51,11 +51,11 @@ It is very short and has a lot of tips that will save you time.
 We need a list of satellite tracks to use. We'll use 2019 for now as the 
 year:
 
-<code>vwc_input scia 2019</code>
+<code>vwc_input scia 2019 -legacy T</code>
 
 Estimate the phase for each satellite track on each day:
 
-<code>phase scia 2018 1 -doy_end 366 -year_end 2020</code>
+<code>phase scia 2018 1 -doy_end 366 -year_end 2020 -legacy T</code>
 
 Finally, convert the phase to volumetric water content. To make it easier to 
 look at the plots, I'll just show the first two years:
