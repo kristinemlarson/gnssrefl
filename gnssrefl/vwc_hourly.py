@@ -27,7 +27,7 @@ from pathlib import Path
 import gnssrefl.gps as g
 import gnssrefl.phase_functions as qp
 from gnssrefl.utils import str2bool, FileManagement
-from gnssrefl.vwc_cl import vwc
+from gnssrefl.vwc_cl import vwc, get_vwc_tracks_freqs
 
 
 def parse_arguments_hourly():
@@ -36,8 +36,15 @@ def parse_arguments_hourly():
     parser.add_argument("station", help="station", type=str)
     parser.add_argument("year", help="year", type=int)
     parser.add_argument("-year_end", default=None, help="year_end", type=int)
-    parser.add_argument("-fr", help="frequency: 1 (L1), 20 (L2C), 5 (L5). Only L2C officially supported.", type=str)
-    parser.add_argument("-plt", default=None, type=str, help="boolean for plotting to screen")
+    parser.add_argument("-fr", default=None, nargs="*", type=int,
+                        help="frequency filter. Omit to loop over every freq in "
+                             "vwc_tracks.json, pass one value for a single-freq run, "
+                             "or pass multiple values (e.g. -fr 20 5) to loop over "
+                             "that subset. L2C is the most validated.")
+    parser.add_argument("-plt", default=None, type=str,
+                        help="boolean for plotting to screen. Default: True for single-frequency "
+                             "runs; False when auto-looping over multiple frequencies. Pass -plt T "
+                             "to force plots during an auto-loop.")
     parser.add_argument("-bin_hours", default=6, type=int, help="time bin size in hours (1,2,3,4,6,8,12). Default is 6")
     parser.add_argument("-minvalperbin", default=None, type=int, help="min number of satellite tracks needed per time bin. Default is 10")
     parser.add_argument("-min_req_pts_track", default=None, type=int, help="min number of points for a track to be kept. Default is 100")
@@ -292,7 +299,7 @@ def plot_hourly_vs_daily_vwc(station, fr, bin_hours, extension=''):
         print(f"Error creating VWC comparison plot: {e}")
 
 
-def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, plt: bool = True, bin_hours: int = 6,
+def vwc_hourly(station: str, year: int, fr: int, year_end: int = None, plt: bool = True, bin_hours: int = 6,
                minvalperbin: int = 5, min_req_pts_track: int = None, polyorder: int = -99,
                snow_filter: bool = False, tmin: float = None, tmax: float = None,
                warning_value: float = None, auto_removal: bool = False, hires_figs: bool = False,
@@ -342,8 +349,10 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
         full Year
     year_end : int, optional
         last year for analysis
-    fr : str, optional
-        GNSS frequency. Default is from JSON or 20 (L2C)
+    fr : int
+        GNSS frequency code (e.g. 20 for GPS L2C, 101 for GLONASS L1).
+        Must be a single freq present in vwc_tracks.json. The CLI auto-loops
+        over multiple freqs by calling this function once per freq.
     bin_hours : int, optional
         time bin size in hours (1,2,3,4,6,8,12). Default is 6
     minvalperbin : int, optional
@@ -364,12 +373,10 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     print(f"Generating hourly rolling VWC with {bin_hours}-hour windows")
     print(f"Processing {bin_hours} offsets for station {station}, year {year}")
 
-    # Resolve frequency once for both models
-    fr_list = qp.get_vwc_frequency(station, extension, fr)
-    if len(fr_list) > 1:
-        print("Error: vwc_hourly can only process one frequency at a time.")
+    if fr is None:
+        print('Error: vwc_hourly requires a single frequency. Pass fr=<int> or use the CLI which auto-loops.')
         sys.exit()
-    resolved_fr = fr_list[0]
+    resolved_fr = int(fr)
 
     if advanced:
         veg_model = 2
@@ -510,7 +517,6 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
     qp.write_rolling_vwc_output(station, vwc_data, resolved_fr, bin_hours, extension, vegetation_model=veg_model)
 
     print(f"Successfully generated {len(vwc_data['vwc'])} hourly rolling VWC measurements")
-    print("WARNING: vwc_hourly is experimental code.")
 
     if plt:
         print("=== Generating VWC Comparison Plot ===")
@@ -520,7 +526,46 @@ def vwc_hourly(station: str, year: int, year_end: int = None, fr: str = None, pl
 def main_hourly():
     """CLI entry point for vwc_hourly command"""
     args = parse_arguments_hourly()
-    vwc_hourly(**args)
+    fr_list = args.pop('fr', None)
+    station = args['station']
+    extension = args.get('extension', '')
+
+    FileManagement(station, 'raw_phase_file', extension=extension).get_file_path().unlink(missing_ok=True)
+
+    available = get_vwc_tracks_freqs(station, extension)
+    if available is None:
+        print('vwc_tracks.json not found. Run `vwc_input` first.')
+        sys.exit()
+    if not available:
+        print('vwc_tracks.json is empty.')
+        sys.exit()
+
+    if fr_list:
+        missing = [f for f in fr_list if f not in available]
+        if missing:
+            print(f'Error: requested frequencies {missing} not in vwc_tracks.json. Available: {available}')
+            sys.exit()
+        freqs = fr_list
+    else:
+        freqs = available
+
+    print('WARNING: vwc_hourly is experimental code.')
+
+    if len(freqs) == 1:
+        args['fr'] = freqs[0]
+        vwc_hourly(**args)
+    else:
+        print(f'Auto-looping over {len(freqs)} frequencies: {freqs}')
+        if 'plt' in args:
+            plt_default = args['plt']
+        else:
+            plt.switch_backend('Agg')
+            plt_default = True
+        for fr in freqs:
+            print(f'\n{"=" * 60}\n  vwc_hourly -fr {fr}\n{"=" * 60}\n')
+            vwc_hourly(**{**args, 'fr': fr, 'plt': plt_default})
+
+    print('WARNING: vwc_hourly is experimental code.')
 
 
 def main():
