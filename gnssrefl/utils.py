@@ -471,8 +471,7 @@ class FileManagement:
         - No extension: Files/{station}/vwc_outputs/{label}/individual_tracks/
         - With extension: Files/{station}/{extension}/vwc_outputs/{label}/individual_tracks/
 
-        ``label`` comes from ``get_file_suffix`` with the leading underscore
-        stripped (e.g. ``G_L1``, ``C_L5``).
+        ``label`` is ``f{freq}{get_file_suffix}`` (e.g. ``f20_G_L2C``).
         """
         if self.frequency is None:
             raise ValueError("frequency is required for individual_tracks")
@@ -485,12 +484,13 @@ class FileManagement:
         - No extension: Files/{station}/vwc_outputs/{label}/
         - With extension: Files/{station}/{extension}/vwc_outputs/{label}/
 
-        ``label`` comes from ``get_file_suffix`` with the leading underscore
-        stripped (e.g. ``G_L1``, ``C_L5``).
+        ``label`` is ``f{freq}{get_file_suffix}`` (e.g. ``f20_G_L2C``,
+        ``f101_R_L1``) so the gnssrefl freq code is visible alongside the
+        constellation/band tag.
         """
         if self.frequency is None:
             raise ValueError("frequency is required for vwc_outputs")
-        label = get_file_suffix(self.frequency).lstrip('_')
+        label = f'f{self.frequency}{get_file_suffix(self.frequency)}'
         base = self.xdir / "Files" / self.station
         if self.extension:
             base = base / self.extension
