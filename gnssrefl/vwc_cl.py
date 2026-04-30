@@ -849,7 +849,14 @@ def main():
         vwc(**args)
     else:
         print(f'Auto-looping over {len(freqs)} frequencies: {freqs}\n')
-        plt_default_for_loop = args.get('plt', False)
+        if 'plt' in args:
+            plt_default_for_loop = args['plt']
+        else:
+            # User omitted -plt during an auto-loop: save per-freq plots but
+            # don't pop 15 windows. Switching to a non-interactive backend
+            # makes plt.show() a no-op while savefig still works.
+            matplt.switch_backend('Agg')
+            plt_default_for_loop = True
         for fr in freqs:
             print(f'\n{"=" * 60}')
             print(f'  vwc -fr {fr}')
