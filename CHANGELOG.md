@@ -5,14 +5,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 
+## 4.1.5
+
+April 30, 2026 
+
+[Mostly changes to vwc hourly](https://github.com/kristinemlarson/gnssrefl/pull/411)
+
 ## 4.1.4
 
 April 24, 2026
 
-[Fix NMEA allocations for Beidou.] Added more Galileo channels.(https://github.com/kristinemlarson/gnssrefl/pull/405)
+[Fix NMEA allocations for Beidou. Added more Galileo channels.](https://github.com/kristinemlarson/gnssrefl/pull/405)
 
 [Add more constellations to soil moisture module](https://github.com/kristinemlarson/gnssrefl/pull/407)
-
 
 ## 4.1.3
 
