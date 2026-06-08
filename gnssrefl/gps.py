@@ -4876,7 +4876,7 @@ def rapid_gfz_orbits(year,month,day):
 
     gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/rapid/'
 
-    new_gns = 'ftp://isdcftp.gfz-potsdam.de/gnss/products/rapid/'
+    new_gns = 'https://isdc-data.gfz.de/gnss/products/rapid/'
 
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
 
@@ -6932,7 +6932,7 @@ def new_ultra_gfz_orbits(year, month, day, hour):
 
     gns = 'ftp://ftp.gfz-potsdam.de/pub/GNSS/products/ultra/'
 
-    new_gns = 'ftp://isdcftp.gfz-potsdam.de/gnss/products/ultra/'
+    new_gns = 'https://isdc-data.gfz.de/gnss/products/ultra/'
 
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
 
@@ -7093,7 +7093,7 @@ def newish_gfz_orbits(year,month,day, orbtype):
 
     wk,sec = kgpsweek(year,month,day,0,0,0)
 
-    new_gns = 'ftp://isdcftp.gfz-potsdam.de/gnss/products/' + orbtype + '/'
+    new_gns = 'https://isdc-data.gfz.de/gnss/products/' + orbtype + '/'
 
     month, day, doy, cyyyy, cyy, cdoy = ymd2ch(year,month,day)
 

@@ -257,7 +257,7 @@ def universal(station9ch, year, doy, archive,srate,stream,debug=False):
             dir1 = 'https://cacsa.nrcan.gc.ca/gps/data/gpsdata/' + cyy + cdoy  + '/' + cyy + 'd' + '/'
             wget.download(dir1+file_name,file_name)
         elif (archive == 'gfz'):
-            dir1 = 'ftp://isdcftp.gfz-potsdam.de/gnss/data/daily/' + cyyyy + '/' + cdoy + '/'
+            dir1 = 'https://isdc-data.gfz.de/gnss/data/daily/' + cyyyy + '/' + cdoy + '/'
             wget.download(dir1+file_name,file_name)
         elif (archive == 'cddis'):
             new_way_dir = '/gnss/data/daily/' + cyyyy + '/' + cdoy + '/' + cyy + 'd/'
