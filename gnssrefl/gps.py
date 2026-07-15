@@ -6067,7 +6067,7 @@ def checkEGM():
     print('local directory location ', localdir)
     if not os.path.isdir(localdir):
         print('Making ', localdir)
-        subprocess.call('mkdir',localdir)
+        os.makedirs(localdir, exist_ok=True)
 
 
     if 'REFL_CODE' in os.environ:
