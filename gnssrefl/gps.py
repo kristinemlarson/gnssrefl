@@ -10,6 +10,7 @@ import os
 import pickle
 import re
 import requests
+import shutil
 import subprocess
 import sys
 import sqlite3
@@ -2322,7 +2323,7 @@ def store_snrfile(filename,year,station):
         print(filename)
         print(xdir, os.path.basename(filename))
         print(os.path.join(xdir, os.path.basename(filename)))
-        os.replace(filename, os.path.join(xdir, os.path.basename(filename)))
+        shutil.move(filename, os.path.join(xdir, os.path.basename(filename)))
     else:
         print('the SNR file does not exist, so nothing was moved')
 
