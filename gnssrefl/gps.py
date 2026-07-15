@@ -2319,6 +2319,9 @@ def store_snrfile(filename,year,station):
     if not os.path.isdir(xdir): #if year folder doesn't exist, make it
         os.makedirs(xdir)
     if (os.path.isfile(filename) == True):
+        print(filename)
+        print(xdir, os.path.basename(filename))
+        print(os.path.join(xdir, os.path.basename(filename)))
         os.replace(filename, os.path.join(xdir, os.path.basename(filename)))
     else:
         print('the SNR file does not exist, so nothing was moved')
@@ -6060,7 +6063,7 @@ def checkEGM():
     xdir = os.environ['REFL_CODE']
     matfile = 'EGM96geoidDATA.mat'
     localdir = xdir + '/Files'
-    #print('local directory location ', localdir)
+    print('local directory location ', localdir)
     if not os.path.isdir(localdir):
         print('Making ', localdir)
         subprocess.call('mkdir',localdir)
